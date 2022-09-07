@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.11 2022-08-24 09:19:36 */
+/*! dwv 0.31.0-beta.12 2022-09-07 10:28:58 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4569,7 +4569,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.11';
+  return '0.31.0-beta.12';
 };
 
 /**
@@ -18325,37 +18325,136 @@ dwv.dicom.comparePosPat = function (pos1, pos2) {
 };
 
 /**
- * Check the required and supported tags.
+ * Check that a DICOM tag definition is present in a parsed element.
  *
  * @param {object} rootElement The root dicom element.
+ * @param {object} tagDefinition The tag definition as {name, tag, type, enum}.
  */
-dwv.dicom.checkDicomSeg = function (rootElement) {
-  // Transfer Syntax
-  var syntax = dwv.dicom.cleanString(rootElement.getFromKey('x00020010'));
-  var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-  if (algoName !== null) {
-    throw new Error('Unsupported compressed segmentation: ' + algoName);
-  }
-
-  // Segmentation Type (required)
-  var segmentationType = rootElement.getFromKey('x00620001');
-  if (!segmentationType) {
-    throw new Error('Missing or empty DICOM segmentation type');
-  }
-  segmentationType = dwv.dicom.cleanString(segmentationType);
-  if (segmentationType !== 'BINARY') {
-    throw new Error('Unsupported segmentation type: ' + segmentationType);
-  }
-
-  // Dimension Organization Type (optional)
-  var dimOrgType = rootElement.getFromKey('x00209311');
-  if (dimOrgType) {
-    dimOrgType = dwv.dicom.cleanString(dimOrgType);
-    if (dimOrgType !== '3D') {
-      throw new Error('Unsupported dimension organization type: ' + dimOrgType);
+dwv.dicom.checkTag = function (rootElement, tagDefinition) {
+  var tagValue = rootElement.getFromKey(tagDefinition.tag);
+  // check null and undefined
+  if (tagDefinition.type === 1 || tagDefinition.type === 2) {
+    if (tagValue === null || typeof tagValue === 'undefined') {
+      throw new Error('Missing or empty ' + tagDefinition.name);
+    }
+  } else {
+    if (tagValue === null || typeof tagValue === 'undefined') {
+      // non mandatory value, exit
+      return;
     }
   }
+  var includes = false;
+  if (Array.isArray(tagValue)) {
+    // trim
+    tagValue = tagValue.map(function (item) {
+      return dwv.dicom.cleanString(item);
+    });
+    for (var i = 0; i < tagDefinition.enum.length; ++i) {
+      if (!Array.isArray(tagDefinition.enum[i])) {
+        throw new Error('Cannot compare array and non array tag value.');
+      }
+      if (dwv.utils.arrayEquals(tagDefinition.enum[i], tagValue)) {
+        includes = true;
+        break;
+      }
+    }
+  } else {
+    // trim
+    if (typeof tagValue === 'string') {
+      tagValue = dwv.dicom.cleanString(tagValue);
+    }
+
+    includes = tagDefinition.enum.includes(tagValue);
+  }
+  if (!includes) {
+    throw new Error(
+      'Unsupported ' + tagDefinition.name + ' value: ' + tagValue);
+  }
 };
+
+/**
+ * List of DICOM Seg required tags.
+ */
+dwv.dicom.requiredSegDicomTags = [
+  {
+    name: 'Transfer Syntax UID',
+    tag: 'x00020010',
+    type: '1',
+    enum: ['1.2.840.10008.1.2.1']
+  },
+  {
+    name: 'Media Storage SOP Class UID',
+    tag: 'x00020002',
+    type: '1',
+    enum: ['1.2.840.10008.5.1.4.1.1.66.4']
+  },
+  {
+    name: 'SOP Class UID',
+    tag: 'x00020002',
+    type: '1',
+    enum: ['1.2.840.10008.5.1.4.1.1.66.4']
+  },
+  {
+    name: 'Modality',
+    tag: 'x00080060',
+    type: '1',
+    enum: ['SEG']
+  },
+  {
+    name: 'Segmentation Type',
+    tag: 'x00620001',
+    type: '1',
+    enum: ['BINARY']
+  },
+  {
+    name: 'Dimension Organization Type',
+    tag: 'x00209311',
+    type: '3',
+    enum: ['3D']
+  },
+  {
+    name: 'Image Type',
+    tag: 'x00080008',
+    type: '1',
+    enum: [['DERIVED', 'PRIMARY']]
+  },
+  {
+    name: 'Samples Per Pixel',
+    tag: 'x00280002',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'Photometric Interpretation',
+    tag: 'x00280004',
+    type: '1',
+    enum: ['MONOCHROME2']
+  },
+  {
+    name: 'Pixel Representation',
+    tag: 'x00280103',
+    type: '1',
+    enum: [0]
+  },
+  {
+    name: 'Bits Allocated',
+    tag: 'x00280100',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'Bits Stored',
+    tag: 'x00280101',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'High Bit',
+    tag: 'x00280102',
+    type: '1',
+    enum: [0]
+  },
+];
 
 /**
  * Check the dimension organization from a dicom element.
@@ -18416,25 +18515,67 @@ dwv.dicom.getDimensionOrganization = function (rootElement) {
 };
 
 /**
+ * Get a code object from a dicom element.
+ *
+ * @param {object} element The dicom element.
+ * @returns {object} A code object.
+ */
+dwv.dicom.getCode = function (element) {
+  // meaning -> CodeMeaning (type1)
+  var code = {
+    meaning: dwv.dicom.cleanString(element.x00080104.value[0])
+  };
+  // value -> CodeValue (type1C)
+  // longValue -> LongCodeValue (type1C)
+  // urnValue -> URNCodeValue (type1C)
+  if (element.x00080100) {
+    code.value = element.x00080100.value[0];
+  } else if (element.x00080119) {
+    code.longValue = element.x00080119.value[0];
+  } else if (element.x00080120) {
+    code.urnValue = element.x00080120.value[0];
+  } else {
+    throw Error('Invalid code with no value, no long value and no urn value.');
+  }
+  // schemeDesignator -> CodingSchemeDesignator (type1C)
+  if (typeof code.value !== 'undefined' ||
+    typeof code.longValue !== 'undefined') {
+    if (element.x00080102) {
+      code.schemeDesignator = element.x00080102.value[0];
+    } else {
+      throw Error(
+        'No coding sheme designator when code value or long value is present');
+    }
+  }
+  return code;
+};
+
+/**
  * Get a segment object from a dicom element.
  *
  * @param {object} element The dicom element.
  * @returns {object} A segment object.
  */
 dwv.dicom.getSegment = function (element) {
-  // number -> SegmentNumber
-  // label -> SegmentLabel
-  // algorithmType -> SegmentAlgorithmType
+  // number -> SegmentNumber (type1)
+  // label -> SegmentLabel (type1)
+  // algorithmType -> SegmentAlgorithmType (type1)
   var segment = {
     number: element.x00620004.value[0],
     label: dwv.dicom.cleanString(element.x00620005.value[0]),
     algorithmType: dwv.dicom.cleanString(element.x00620008.value[0])
   };
-  // algorithmName -> SegmentAlgorithmName
+  // algorithmName -> SegmentAlgorithmName (type1C)
   if (element.x00620009) {
     segment.algorithmName =
       dwv.dicom.cleanString(element.x00620009.value[0]);
   }
+  // // required if type is not MANUAL
+  // if (segment.algorithmType !== 'MANUAL' &&
+  //   (typeof segment.algorithmName === 'undefined' ||
+  //   segment.algorithmName.length === 0)) {
+  //   throw new Error('Empty algorithm name for non MANUAL algorithm type.');
+  // }
   // displayValue ->
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
@@ -18449,7 +18590,98 @@ dwv.dicom.getSegment = function (element) {
     }));
     segment.displayValue = rgb;
   }
+  // Segmented Property Category Code Sequence (type1, only one)
+  if (element.x00620003) {
+    segment.propertyCategoryCode =
+      dwv.dicom.getCode(element.x00620003.value[0]);
+  } else {
+    throw Error('Missing Segmented Property Category Code Sequence.');
+  }
+  // Segmented Property Type Code Sequence (type1)
+  if (element.x0062000F) {
+    segment.propertyTypeCode =
+      dwv.dicom.getCode(element.x0062000F.value[0]);
+  } else {
+    throw Error('Missing Segmented Property Type Code Sequence.');
+  }
+
   return segment;
+};
+
+/**
+ * Check if two segment objects are equal.
+ *
+ * @param {object} seg1 The first segment.
+ * @param {object} seg2 The second segment.
+ * @returns {boolean} True if both segment are equal.
+ */
+dwv.dicom.isEqualSegment = function (seg1, seg2) {
+  // basics
+  if (typeof seg1 === 'undefined' ||
+    typeof seg2 === 'undefined' ||
+    seg1 === null ||
+    seg2 === null) {
+    return false;
+  }
+  var isEqual = seg1.number === seg2.number &&
+    seg1.label === seg2.label &&
+    seg1.algorithmType === seg2.algorithmType;
+  // rgb
+  if (typeof seg1.displayValue.r !== 'undefined') {
+    if (typeof seg2.displayValue.r === 'undefined') {
+      isEqual = false;
+    } else {
+      isEqual = isEqual &&
+        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+    }
+  } else {
+    isEqual = isEqual &&
+      seg1.displayValue === seg2.displayValue;
+  }
+  // algorithmName
+  if (typeof seg1.algorithmName !== 'undefined') {
+    if (typeof seg2.algorithmName === 'undefined') {
+      isEqual = false;
+    } else {
+      isEqual = isEqual &&
+        seg1.algorithmName === seg2.algorithmName;
+    }
+  }
+
+  return isEqual;
+};
+
+/**
+ * Check if two segment objects are similar: either the
+ * number or the displayValue are equal.
+ *
+ * @param {object} seg1 The first segment.
+ * @param {object} seg2 The second segment.
+ * @returns {boolean} True if both segment are similar.
+ */
+dwv.dicom.isSimilarSegment = function (seg1, seg2) {
+  // basics
+  if (typeof seg1 === 'undefined' ||
+    typeof seg2 === 'undefined' ||
+    seg1 === null ||
+    seg2 === null) {
+    return false;
+  }
+  var isSimilar = seg1.number === seg2.number;
+  // rgb
+  if (typeof seg1.displayValue.r !== 'undefined') {
+    if (typeof seg2.displayValue.r === 'undefined') {
+      isSimilar = false;
+    } else {
+      isSimilar = isSimilar ||
+        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+    }
+  } else {
+    isSimilar = isSimilar ||
+      seg1.displayValue === seg2.displayValue;
+  }
+
+  return isSimilar;
 };
 
 /**
@@ -18579,7 +18811,9 @@ dwv.image.MaskFactory = function () {};
 dwv.image.MaskFactory.prototype.create = function (
   dicomElements, pixelBuffer) {
   // check required and supported tags
-  dwv.dicom.checkDicomSeg(dicomElements);
+  for (var d = 0; d < dwv.dicom.requiredSegDicomTags.length; ++d) {
+    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredSegDicomTags[d]);
+  }
 
   // columns
   var columns = dicomElements.getFromKey('x00280011');
@@ -18680,18 +18914,6 @@ dwv.image.MaskFactory.prototype.create = function (
     });
   };
 
-  var arrayEquals = function (arr0, arr1) {
-    if (arr0 === null || arr1 === null) {
-      return false;
-    }
-    if (arr0.length !== arr1.length) {
-      return false;
-    }
-    return arr0.every(function (element, index) {
-      return element === arr1[index];
-    });
-  };
-
   // Per-frame Functional Groups Sequence
   var perFrameFuncGroupSequence = dicomElements.getFromKey('x52009230', true);
   if (!perFrameFuncGroupSequence ||
@@ -18720,7 +18942,7 @@ dwv.image.MaskFactory.prototype.create = function (
       if (typeof imageOrientationPatient === 'undefined') {
         imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else {
-        if (!arrayEquals(
+        if (!dwv.utils.arrayEquals(
           imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
           throw new Error('Unsupported multi orientation dicom seg.');
         }
@@ -18832,8 +19054,14 @@ dwv.image.MaskFactory.prototype.create = function (
     DimensionOrganizationType: '3D',
     DimensionOrganizations: dimension.organizations,
     DimensionIndices: dimension.indices,
-    BitsStored: 8,
+    BitsStored: 1,
+    PatientName: dwv.dicom.cleanString(dicomElements.getFromKey('x00100010')),
+    PatientID: dwv.dicom.cleanString(dicomElements.getFromKey('x00100020')),
+    PatientBirthDate: dicomElements.getFromKey('x00100030'),
+    PatientSex: dwv.dicom.cleanString(dicomElements.getFromKey('x00100040')),
+    StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
+    SeriesNumber: dicomElements.getFromKey('x00200011'),
     ImageOrientationPatient: imageOrientationPatient,
     custom: {
       segments: segments,
@@ -27525,6 +27753,1011 @@ dwv.tool.draw.ArrowFactory.prototype.update = function (
 };
 
 // namespaces
+// import * as DicomWebViewer from 'dwv';
+// export const dwv = DicomWebViewer || {};
+
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Save methods
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+/**
+ * Pad an input string with a '0' to form a 2 digit one.
+ *
+ * @param {string} str The string to pad.
+ * @returns {string} The padded string.
+ */
+function padZeroTwoDigit(str) {
+  return ('0' + str).slice(-2);
+}
+
+/**
+ * Get a DICOM formated date.
+ *
+ * @param {Date} date The date to format.
+ * @returns {string} The formated date.
+ */
+dwv.dicom.getFormatedDate = function (date) {
+  // YYYYMMDD
+  return date.getFullYear().toString() +
+    padZeroTwoDigit((date.getMonth() + 1).toString()) +
+    padZeroTwoDigit(date.getDate().toString());
+};
+
+/**
+ * Get a DICOM formated time.
+ *
+ * @param {Date} date The date to format.
+ * @returns {string} The formated time.
+ */
+dwv.dicom.getFormatedTime = function (date) {
+  // HHMMSS
+  return padZeroTwoDigit(date.getHours().toString()) +
+    padZeroTwoDigit(date.getMinutes().toString()) +
+    padZeroTwoDigit(date.getSeconds().toString());
+};
+
+/**
+ * Get a dicom element from a code object.
+ *
+ * @param {object} code The code object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getCodeElement = function (code) {
+  var codeElement = {
+    CodeMeaning: code.meaning
+  };
+  if (typeof code.value !== 'undefined') {
+    codeElement.CodeValue = code.value;
+  } else if (typeof code.longValue !== 'undefined') {
+    codeElement.LongCodeValue = code.longValue;
+  } else if (typeof code.urnValue !== 'undefined') {
+    codeElement.URNCodeValue = code.longVaurnValuelue;
+  }
+  if (typeof code.schemeDesignator !== 'undefined') {
+    codeElement.CodingSchemeDesignator = code.schemeDesignator;
+  }
+  return codeElement;
+};
+
+/**
+ * Get a dicom element from a segment object.
+ *
+ * @param {object} segment The segment object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getSegmentElement = function (segment) {
+  var algoType = segment.algorithmType;
+  if (typeof algoType === 'undefined') {
+    algoType = 'MANUAL';
+  }
+  var segmentElement = {
+    SegmentNumber: segment.number,
+    SegmentLabel: segment.label,
+    SegmentAlgorithmType: algoType,
+    SegmentedPropertyCategoryCodeSequence: {
+      item0: dwv.dicom.getCodeElement(segment.propertyCategoryCode)
+    },
+    SegmentedPropertyTypeCodeSequence: {
+      item0: dwv.dicom.getCodeElement(segment.propertyTypeCode)
+    }
+  };
+  // display value
+  if (typeof segment.displayValue.r !== 'undefined' &&
+    typeof segment.displayValue.g !== 'undefined' &&
+    typeof segment.displayValue.b !== 'undefined') {
+    var cieLab = dwv.utils.labToUintLab(
+      dwv.utils.srgbToCielab(segment.displayValue));
+    segmentElement.RecommendedDisplayCIELabValue = new Uint16Array([
+      Math.round(cieLab.l),
+      Math.round(cieLab.a),
+      Math.round(cieLab.b)
+    ]);
+  } else {
+    segmentElement.RecommendedDisplayGrayscaleValue = segment.displayValue;
+  }
+  // algo name
+  if (algoType !== 'MANUAL' && typeof segment.algorithmName !== 'undefined') {
+    segmentElement.SegmentAlgorithmName = segment.algorithmName;
+  }
+  return segmentElement;
+};
+
+/**
+ * Get a dicom element from a dimension index object.
+ *
+ * @param {object} dimensionIndex The dimension index object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getDimensionIndexElement = function (dimensionIndex) {
+  var indexElement = {
+    DimensionOrganizationUID: dimensionIndex.organization,
+    DimensionIndexPointer: [dimensionIndex.pointer]
+  };
+  if (typeof dimensionIndex.label !== 'undefined') {
+    indexElement.DimensionDescriptionLabel = dimensionIndex.label;
+  }
+  return indexElement;
+};
+
+/**
+ * Get a dicom element from a frame information object.
+ *
+ * @param {object} frameInfo The frame information object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
+  return {
+    FrameContentSequence: {
+      item0: {
+        DimensionIndexValues: frameInfo.dimIndex
+      }
+    },
+    PlanePositionSequence: {
+      item0: {
+        ImagePositionPatient: frameInfo.imagePosPat
+      }
+    },
+    SegmentIdentificationSequence: {
+      item0: {
+        ReferencedSegmentNumber: frameInfo.refSegmentNumber.toString()
+      }
+    }
+  };
+};
+
+/**
+ * Get a dicom element from a spacing object.
+ *
+ * @param {object} spacing The spacing object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getMeasureSequenceElement = function (spacing) {
+  return {
+    item0: {
+      PixelSpacing: [spacing.get(1), spacing.get(0)],
+      SpacingBetweenSlices: spacing.get(2).toString()
+    }
+  };
+};
+
+/**
+ * Convert a mask image into a DICOM segmentation object.
+ *
+ * @param {dwv.image.Image} image The mask image.
+ * @param {Array} segments The mask segments.
+ * @returns {object} A list of dicom elements.
+ */
+dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
+  // use image segments if not provided as input
+  if (typeof segments === 'undefined') {
+    segments = image.getMeta().segments;
+  }
+
+  var geometry = image.getGeometry();
+  var size = geometry.getSize();
+  var spacing = geometry.getSpacing();
+  var numberOfComponents = image.getNumberOfComponents();
+  var isRGB = numberOfComponents === 3;
+  var orientationPatient = image.getMeta().ImageOrientationPatient;
+
+  var now = new Date();
+
+  // base tags
+  var tags = {
+    TransferSyntaxUID: '1.2.840.10008.1.2.1',
+    MediaStorageSOPClassUID: '1.2.840.10008.5.1.4.1.1.66.4',
+    SOPClassUID: '1.2.840.10008.5.1.4.1.1.66.4',
+    Modality: 'SEG',
+    SegmentationType: 'BINARY',
+    DimensionOrganizationType: '3D',
+    PhotometricInterpretation: 'MONOCHROME2',
+    ImageType: ['DERIVED', 'PRIMARY'],
+    SamplesPerPixel: 1,
+    PixelRepresentation: 0,
+    BitsAllocated: 1,
+    BitsStored: 1,
+    HighBit: 0,
+    PatientName: image.getMeta().PatientName,
+    PatientID: image.getMeta().PatientID,
+    PatientBirthDate: image.getMeta().PatientBirthDate,
+    PatientSex: image.getMeta().PatientSex,
+    ContentDate: dwv.dicom.getFormatedDate(now),
+    ContentTime: dwv.dicom.getFormatedTime(now),
+    ContentLabel: 'QUIBIM edited prostate segmentation',
+    StudyInstanceUID: image.getMeta().StudyInstanceUID,
+    Rows: size.get(1),
+    Columns: size.get(0)
+  };
+
+  // TODO: update numbers
+  tags.SeriesInstanceUID = image.getMeta().SeriesInstanceUID;
+  tags.SeriesNumber = image.getMeta().SeriesNumber;
+
+  // TODO: get from original file
+  tags.LossyImageCompression = '00';
+  tags.InstanceNumber = 0;
+
+  // use existing dimension organization if present
+  if (typeof image.getMeta().DimensionOrganizations !== 'undefined') {
+    var orgs = image.getMeta().DimensionOrganizations;
+    // should be only one
+    tags.DimensionOrganizationSequence = {
+      item0: {
+        DimensionOrganizationUID: orgs[0]
+      }
+    };
+  }
+  // use existing dimension organization if present
+  if (typeof image.getMeta().DimensionIndices !== 'undefined') {
+    var indices = image.getMeta().DimensionIndices;
+    var indicesTag = {};
+    for (var m = 0; m < indices.length; ++m) {
+      indicesTag['item' + m] = dwv.dicom.getDimensionIndexElement(indices[m]);
+    }
+    tags.DimensionIndexSequence = indicesTag;
+  }
+
+  // segments
+  var segmentsTag = {};
+  for (var l = 0; l < segments.length; ++l) {
+    segmentsTag['item' + l] = dwv.dicom.getSegmentElement(segments[l]);
+  }
+  tags.SegmentSequence = segmentsTag;
+
+  // Shared Functional Groups Sequence
+  tags.SharedFunctionalGroupsSequence = {
+    item0: {
+      PlaneOrientationSequence: {
+        item0: {
+          ImageOrientationPatient: orientationPatient
+        }
+      },
+      PixelMeasuresSequence: dwv.dicom.getMeasureSequenceElement(spacing)
+    }
+  };
+
+  var getPixelValue;
+  var equalValues;
+  if (isRGB) {
+    getPixelValue = function (inputOffset) {
+      return {
+        r: image.getValueAtOffset(inputOffset, 0),
+        g: image.getValueAtOffset(inputOffset + 1, 0),
+        b: image.getValueAtOffset(inputOffset + 2, 0)
+      };
+    };
+    equalValues = function (a, b) {
+      return a.r === b.r &&
+        a.g === b.g &&
+        a.b === b.b;
+    };
+  } else {
+    getPixelValue = function (inputOffset) {
+      return image.getValueAtOffset(inputOffset, 0);
+    };
+    equalValues = function (a, b) {
+      return a === b;
+    };
+  }
+
+  // image buffer to multi frame
+  var sliceSize = size.getDimSize(2);
+  var roiBuffers = {};
+  for (var k = 0; k < size.get(2); ++k) {
+    var sliceOffset = k * sliceSize;
+    // initialise buffers
+    var buffers = {};
+    // search pixels
+    for (var o = 0; o < sliceSize; ++o) {
+      var inputOffset = (sliceOffset + o) * numberOfComponents;
+      var pixelValue = getPixelValue(inputOffset);
+      for (var n2 = 0; n2 < segments.length; ++n2) {
+        var number2 = segments[n2].number - 1;
+        if (equalValues(pixelValue, segments[n2].displayValue)) {
+          if (typeof buffers[number2] === 'undefined') {
+            buffers[number2] = new Uint8Array(sliceSize);
+          }
+          buffers[number2][o] = 1;
+        }
+      }
+    }
+
+    // store slice buffers
+    var keys0 = Object.keys(buffers);
+    for (var k0 = 0; k0 < keys0.length; ++k0) {
+      var key0 = keys0[k0];
+      if (typeof roiBuffers[key0] === 'undefined') {
+        roiBuffers[key0] = {};
+      }
+      // ordering by slice index (follows posPat)
+      roiBuffers[key0][k] = buffers[key0];
+    }
+  }
+
+  var frameInfos = [];
+
+  // flatten buffer array
+  var finalBuffers = [];
+  for (var n4 = 0; n4 < segments.length; ++n4) {
+    var number40 = segments[n4].number;
+    var number4 = number40 - 1;
+    var keys1 = Object.keys(roiBuffers[number4]);
+    // revert slice order
+    for (var k1 = keys1.length - 1; k1 >= 0; --k1) {
+      var key1 = keys1[k1];
+      finalBuffers.push(roiBuffers[number4][key1]);
+      // frame info
+      var posPat = image.getGeometry().getOrigins()[key1];
+      frameInfos.push({
+        dimIndex: [number40, keys1.length - k1],
+        imagePosPat: [posPat.getX(), posPat.getY(), posPat.getZ()],
+        refSegmentNumber: number40
+      });
+    }
+  }
+
+  tags.NumberOfFrames = finalBuffers.length.toString();
+
+  // frame infos
+  var frameInfosTag = {};
+  for (var f = 0; f < frameInfos.length; ++f) {
+    frameInfosTag['item' + f] =
+      dwv.dicom.getSegmentFrameInfoElement(frameInfos[f]);
+  }
+  tags.PerFrameFunctionalGroupsSequence = frameInfosTag;
+
+  // convert JSON to DICOM element object
+  var res = dwv.dicom.getElementsFromJSONTags(tags);
+  var dicomElements = res.elements;
+
+  // pixel value length: divide by 8 to trigger binary write
+  var pixVl = finalBuffers.length * sliceSize / 8;
+  dicomElements.x7FE00010 = {
+    tag: {group: '0x7FE0', element: '0x0010', name: 'x7FE00010'},
+    vr: 'OB',
+    vl: pixVl,
+    value: finalBuffers,
+    startOffset: res.offset,
+    endOffset: res.offset + pixVl
+  };
+
+  return dicomElements;
+};
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+// namespaces
+// var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+
+/**
+ * Get the indices that form a circle.
+ * Can be an ellipse to adapt to view.
+ *
+ * @param {dwv.image.Geometry} geometry The geometry.
+ * @param {dwv.math.Point3D} position The circle center.
+ * @param {Array} radiuses The circle radiuses.
+ * @param {Array} dims The 2 dimensions.
+ * @returns {Array} The indices of the circle.
+ */
+dwv.tool.getCircleIndices = function (geometry, position, radiuses, dims) {
+  const centerIndex = geometry.worldToIndex(position);
+  return dwv.math.getEllipseIndices(centerIndex, radiuses, dims);
+};
+
+/**
+ * Get the data origins that correspond to input indices.
+ *
+ * @param {dwv.image.Geometry} geometry The geometry.
+ * @param {Array} allOrigins All orign array.
+ * @param {Array} indices An array of dwv.math.Index.
+ * @returns {Array} An array of origins (dwv.math.Point3D).
+ */
+dwv.tool.getOriginsFromIndices = function (geometry, allOrigins, indices) {
+  const sorted = indices.sort(dwv.math.getIndexCompareFunction(2)); //NOSONAR
+
+  const origin0 = geometry.indexToWorld(sorted[0]);
+  const origin1 = geometry.indexToWorld(sorted[sorted.length - 1]);
+
+  const getEqualZ = function (point) {
+    return function equalZ(x) {
+      return x.getZ() === point.get(2);
+    };
+  };
+
+  let iStart = allOrigins.findIndex(getEqualZ(origin0));
+  if (iStart === -1) {
+    iStart = 0;
+  }
+  let iEnd = allOrigins.findIndex(getEqualZ(origin1));
+  if (iEnd === -1) {
+    iEnd = allOrigins.length - 1;
+  }
+
+  return allOrigins.slice(iStart, iEnd + 1);
+};
+
+/**
+ * Get the data offsets that correspond to input indices.
+ *
+ * @param {dwv.image.Geometry} geometry The geometry.
+ * @param {Array} indices An array of dwv.math.Index.
+ * @returns {Array} An array of offsets.
+ */
+dwv.tool.getOffsetsFromIndices = function (geometry, indices) {
+  const imageSize = geometry.getSize();
+  const offsets = [];
+  for (let i = 0; i < indices.length; ++i) {
+    offsets.push(imageSize.indexToOffset(indices[i]));
+  }
+  return offsets;
+};
+
+/**
+ * Brush class.
+ *
+ * @class
+ * @param {dwv.App} app The associated application.
+ */
+dwv.tool.Brush = function (app) {
+  /**
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.Brush}
+   */
+  const self = this;
+
+  /**
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
+  this.started = false;
+
+  let mask = null;
+  let maskId = null;
+
+  let brushSize = 2;
+  let brushMode = 'add';
+
+  let segments = [
+    {
+      number: 1,
+      label: 'Red',
+      algorithmType: 'MANUAL',
+      displayValue: {r: 255, g: 0, b: 0}
+    },
+    {
+      number: 2,
+      label: 'Green',
+      algorithmType: 'MANUAL',
+      displayValue: {r: 0, g: 255, b: 0}
+    },
+    {
+      number: 3,
+      label: 'Blue',
+      algorithmType: 'MANUAL',
+      displayValue: {r: 0, g: 0, b: 255}
+    }
+  ];
+  let selectedSegment = 0;
+  // undefined, 'replace' or 'add'
+  let newSegmentBehaviour = 'replace';
+
+  let uid = 0;
+
+  /**
+   * Get a mask slice.
+   *
+   * @param {object} geometry The mask geometry.
+   * @param {dwv.math.Point3D} origin The slice origin.
+   * @param {object} meta The mask meta.
+   * @returns {dwv.image.Image} The slice.
+   */
+  function createMaskImage(geometry, origin, meta) {
+    // create data
+    const sizeValues = geometry.getSize().getValues();
+    sizeValues[2] = 1;
+    const maskSize = new dwv.image.Size(sizeValues);
+    const maskGeometry = new dwv.image.Geometry(
+      origin,
+      maskSize,
+      geometry.getSpacing(),
+      geometry.getOrientation());
+    const values = new Uint8Array(maskSize.getDimSize(2) * 3);
+    values.fill(0);
+    ++uid;
+    const uids = [uid];
+    const maskSlice = new dwv.image.Image(maskGeometry, values, uids);
+    maskSlice.setMeta(meta);
+    maskSlice.setPhotometricInterpretation('RGB');
+
+    return maskSlice;
+  }
+
+  /**
+   * Add slices to mask if needed.
+   *
+   * @param {dwv.image.Geometry} baseGeometry The base geometry.
+   * @param {Array} allOrigins All orign array.
+   * @param {dwv.image.Geometry} maskGeometry The mask geometry.
+   * @param {dwv.math.Point3D} position The circle center.
+   * @param {Array} circleDims The circle dimensions.
+   * @param {Array} radiuses The circle radiuses.
+   * @param {object} sliceMeta The slice meta.
+   * @returns {boolean} True if slices were added.
+   */
+  function addMaskSlices(
+    baseGeometry, allOrigins,
+    maskGeometry, position, circleDims, radiuses, sliceMeta) {
+    // circle indices in the image geometry
+    const circleIndices =
+      dwv.tool.getCircleIndices(baseGeometry, position, radiuses, circleDims);
+    const origins =
+      dwv.tool.getOriginsFromIndices(baseGeometry, allOrigins, circleIndices);
+    if (origins.length === 0) {
+      throw new Error('No brush origins...');
+    }
+
+    // get origins that need to be added
+    const origins0 = [];
+    const originsBelow = [];
+    let isAbove = true;
+    let hasCommon = false;
+    // origins start from the top of the circle, first ones (if any)
+    // are above mask origins
+    for (let i = 0; i < origins.length; ++i) {
+      if (!maskGeometry.includesOrigin(origins[i])) {
+        if (isAbove) {
+          origins0.push(origins[i]);
+        } else {
+          originsBelow.push(origins[i]);
+        }
+      } else {
+        isAbove = false;
+        hasCommon = true;
+      }
+    }
+
+    // append slices if needed
+    let originsToAdd = [];
+
+    if (hasCommon) {
+      // common slice case
+      // reverse origins0 to go from existing mask to new one
+      originsToAdd = origins0.reverse().concat(originsBelow);
+    } else {
+      // non common slice case: add in between slices
+      const maskOrigins = maskGeometry.getOrigins();
+      const firstMask = maskOrigins[0];
+      const lastMask = maskOrigins[maskOrigins.length - 1];
+      const firstOrigin = origins0[0];
+      const lastOrigin = origins0[origins0.length - 1];
+      const distanceAbove = firstMask.getDistance(lastOrigin);
+      const distanceBelow = lastMask.getDistance(firstOrigin);
+
+      const imageOrigins = app.getImage(0).getGeometry().getOrigins();
+      if (distanceAbove < distanceBelow) {
+        // in between above
+        const i00 = imageOrigins.findIndex(
+          dwv.math.getEqualPoint3DFunction(lastOrigin));
+        const i01 = imageOrigins.findIndex(
+          dwv.math.getEqualPoint3DFunction(firstMask));
+
+        // reverse to go from existing mask to new one
+        originsToAdd = imageOrigins.slice(i00 + 1, i01).reverse().concat(
+          origins0.reverse()); //NOSONAR
+      } else {
+        // in between bellow
+        const i10 = imageOrigins.findIndex(
+          dwv.math.getEqualPoint3DFunction(lastMask));
+        const i11 = imageOrigins.findIndex(
+          dwv.math.getEqualPoint3DFunction(firstOrigin));
+
+        originsToAdd = imageOrigins.slice(i10 + 1, i11).concat(origins0);
+      }
+    }
+
+    // append slices
+    // TODO: add image multi slice append?
+    for (let l = 0; l < originsToAdd.length; ++l) {
+      mask.getMeta().numberOfFiles += 1;
+      mask.appendSlice(
+        createMaskImage(maskGeometry, originsToAdd[l], sliceMeta));
+    }
+
+    return originsToAdd.length !== 0;
+  }
+
+  /**
+   * Paint the mask at the given offsets.
+   *
+   * @param {Array} offsets The mask offsets.
+   */
+  function paintMaskAtOffsets(offsets) {
+    const buff = mask.getBuffer();
+    const colour = segments[selectedSegment].displayValue;
+    for (let i = 0; i < offsets.length; ++i) {
+      const offset = offsets[i] * 3;
+      buff[offset] = brushMode === 'add' ? colour.r : 0;
+      buff[offset + 1] = brushMode === 'add' ? colour.g : 0;
+      buff[offset + 2] = brushMode === 'add' ? colour.b : 0;
+    }
+    // update segment
+    segments[selectedSegment].algorithmType = 'MANUAL';
+    delete segments[selectedSegment].algorithmName;
+    // update app image
+    app.setImage(maskId, mask);
+    // render
+    app.render(maskId);
+  }
+
+  /**
+   * Get the mask offset for an event.
+   *
+   * @param {object} event The event containing the mask position.
+   * @returns {Array} The array of offset to paint.
+   */
+  function getMaskOffsets(event) {
+    const layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    const layerGroup = app.getLayerGroupById(layerDetails.groupId);
+
+    // reference image related vars
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    const viewController = viewLayer.getViewController();
+    const position = viewController.getPositionFromPlanePoint(planePos);
+
+    const sliceMeta = {
+      Modality: 'SEG',
+      IsSigned: false,
+      numberOfFiles: 1,
+      BitsStored: 1
+    };
+
+    const searchMaskMeta = {
+      Modality: 'SEG'
+    };
+    const isMaskVc = viewController.equalImageMeta(searchMaskMeta);
+
+    // base image geometry
+    const baseImage = app.getImage(0);
+    let baseGeometry = baseImage.getGeometry();
+
+    if (isMaskVc) {
+      // udpate an existing mask
+      mask = app.getImage(event.dataindex);
+      maskId = event.dataindex;
+      baseGeometry = mask.getGeometry();
+      // update segments if needed
+      if (typeof newSegmentBehaviour !== 'undefined') {
+        updateSegments(mask.getMeta().custom.segments);
+      }
+    }
+
+    // create mask if not done yet
+    let maskVl = viewLayer;
+    let maskVc = viewController;
+    if (!mask) {
+      const imgK = baseGeometry.worldToIndex(position).get(2);
+
+      const firstSliceMeta = sliceMeta;
+      firstSliceMeta.SeriesInstanceUID =
+        baseImage.getMeta().SeriesInstanceUID;
+      firstSliceMeta.ImageOrientationPatient =
+        baseImage.getMeta().ImageOrientationPatient;
+
+      mask = createMaskImage(
+        baseGeometry, baseGeometry.getOrigins()[imgK], firstSliceMeta);
+      // fires load events and renders data
+      maskId = app.addNewImage(mask, {});
+
+      // newly create mask case: find the SEG view layer
+      const maskViewLayers = layerGroup.searchViewLayers(searchMaskMeta);
+      if (maskViewLayers.length === 0) {
+        console.warn('No mask view layers');
+      } else if (maskViewLayers.length !== 1) {
+        console.warn('Too many mask view layers', maskViewLayers.length);
+      }
+      maskVl = maskViewLayers[0];
+      maskVc = maskVl.getViewController();
+    }
+
+    sliceMeta.SeriesInstanceUID = mask.getMeta().SeriesInstanceUID;
+    sliceMeta.ImageOrientationPatient =
+      mask.getMeta().ImageOrientationPatient;
+
+    const maskGeometry = mask.getGeometry();
+
+    const scrollIndex = viewController.getScrollIndex();
+    let circleDims;
+    let radiuses;
+    const spacing = baseGeometry.getSpacing(baseGeometry.getOrientation());
+    const r0 = Math.round(brushSize / spacing.get(0));
+    const r1 = Math.round(brushSize / spacing.get(1));
+    const r2 = Math.round(brushSize / spacing.get(2));
+    if (scrollIndex === 0) {
+      circleDims = [1, 2];
+      radiuses = [r1, r2];
+    } else if (scrollIndex === 1) {
+      circleDims = [0, 2];
+      radiuses = [r0, r2];
+    } else if (scrollIndex === 2) {
+      circleDims = [0, 1];
+      radiuses = [r0, r1];
+    }
+
+    const addedSlices = addMaskSlices(
+      baseGeometry, baseImage.getGeometry().getOrigins(),
+      maskGeometry, position, circleDims, radiuses, sliceMeta);
+
+    if (addedSlices) {
+      // update mask position if new slices
+      maskVc.setCurrentPosition(position);
+    }
+
+    // circle indices in the mask geometry
+    const maskPlanePos = maskVl.displayToPlanePos(event._x, event._y);
+    const maskPosition = maskVc.getPositionFromPlanePoint(maskPlanePos);
+    const maskCircleIndices = dwv.tool.getCircleIndices(
+      maskGeometry, maskPosition, radiuses, circleDims);
+
+    return dwv.tool.getOffsetsFromIndices(maskGeometry, maskCircleIndices);
+  }
+
+  /**
+   * Update the internal segment list.
+   *
+   * @param {Array} newSegments The array of new segments.
+   */
+  function updateSegments(newSegments) {
+    if (newSegmentBehaviour === 'replace') {
+      segments = newSegments;
+      if (selectedSegment >= segments.length) {
+        console.warn('Updating selectedSegment to fit new segments');
+        selectedSegment = 0;
+      }
+    } else if (newSegmentBehaviour === 'add') {
+      const getEqualSegFunc = function (segment) {
+        return function (item) {
+          return dwv.dicom.isEqualSegment(item, segment);
+        };
+      };
+      const getSimilarSegFunc = function (segment) {
+        return function (item) {
+          return dwv.dicom.isSimilarSegment(item, segment);
+        };
+      };
+      for (let i = 0; i < newSegments.length; ++i) {
+        const equalSeg = segments.find(getEqualSegFunc(newSegments[i]));
+        // if no equal, check if the segment can be added
+        if (typeof equalSeg === 'undefined') {
+          const similarSeg =
+            segments.find(getSimilarSegFunc(newSegments[i]));
+          // only accept non similar
+          if (typeof similarSeg === 'undefined') {
+            segments.push(newSegments[i]);
+          } else {
+            console.warn(
+              'Not adding segment since a similar one is already present.');
+          }
+        }
+      }
+    } else {
+      console.warn('Unknown newSegmentBehaviour:' + newSegmentBehaviour);
+    }
+  }
+
+  /**
+   * Save the current mask as a DICOM seg object.
+   */
+  function saveSeg() {
+    const fac = new dwv.image.MaskFactory();
+    const dicomElements = fac.toDicom(mask, segments);
+
+    // create writer with default rules
+    const writer = new dwv.dicom.DicomWriter();
+    let dicomBuffer = null;
+    try {
+      dicomBuffer = writer.getBuffer(dicomElements);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+    // view as Blob to allow download
+    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+    // update generate button
+    const element = document.createElement('a');
+    element.href = window.URL.createObjectURL(blob);
+    element.download = 'seg-save.dcm';
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  this.mousedown = function (event) {
+    // start flag
+    self.started = true;
+    // first position
+    self.x0 = event._x;
+    self.y0 = event._y;
+
+    paintMaskAtOffsets(getMaskOffsets(event));
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  this.mousemove = function (event) {
+    if (!self.started) {
+      return;
+    }
+    const diffX = Math.abs(event._x - self.x0);
+    const diffY = Math.abs(event._y - self.y0);
+    if (diffX > brushSize / 2 || diffY > brushSize / 2) {
+      paintMaskAtOffsets(getMaskOffsets(event));
+      self.x0 = event._x;
+      self.y0 = event._y;
+    }
+  };
+
+  /**
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
+    if (self.started) {
+      self.started = false;
+    }
+  };
+
+  /**
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
+  this.mouseout = function (event) {
+    self.mouseup(event);
+  };
+
+  /**
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
+  this.touchstart = function (event) {
+    // call mouse equivalent
+    self.mousedown(event);
+  };
+
+  /**
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
+  this.touchmove = function (event) {
+    // call mouse equivalent
+    self.mousemove(event);
+  };
+
+  /**
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
+  this.touchend = function (event) {
+    // call mouse equivalent
+    self.mouseup(event);
+  };
+
+  /**
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
+  this.keydown = function (event) {
+    event.context = 'dwv.tool.Brush';
+    app.onKeydown(event);
+
+    if (event.key === '+') {
+      brushSize += 1;
+      console.log('Brush size:', brushSize);
+    } else if (event.key === '-') {
+      brushSize -= 1;
+      console.log('Brush size:', brushSize);
+    } else if (!isNaN(parseInt(event.key, 10))) {
+      let index = parseInt(event.key, 10);
+      if (index < segments.length) {
+        selectedSegment = index;
+        console.log('segment:', segments[selectedSegment].label);
+      } else {
+        console.warn('Selected segment does not exist.');
+      }
+    } else if (event.key === 'a') {
+      brushMode = 'add';
+      console.log('Brush mode', brushMode);
+    } else if (event.key === 'd') {
+      brushMode = 'del';
+      console.log('Brush mode', brushMode);
+    } else if (event.key === 's') {
+      console.log('Saving...');
+      saveSeg();
+    }
+
+  };
+
+  /**
+   * Activate the tool.
+   *
+   * @param {boolean} _bool The flag to activate or not.
+   */
+  this.activate = function (_bool) {
+    // does nothing
+  };
+
+  /**
+   * Set the tool live features.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.brushSize !== 'undefined') {
+      brushSize = features.brushSize;
+    }
+    if (typeof features.brushMode !== 'undefined') {
+      brushMode = features.brushMode;
+    }
+    if (typeof features.segments !== 'undefined') {
+      segments = features.segments;
+    }
+    if (typeof features.selectedSegment !== 'undefined' &&
+      features.selectedSegment < segments.length) {
+      selectedSegment = features.selectedSegment;
+    }
+  };
+
+  /**
+   * Initialise the tool.
+   */
+  this.init = function () {
+    // does nothing
+  };
+
+}; // Brush class
+
+/**
+ * Help for this tool.
+ *
+ * @returns {object} The help content.
+ */
+dwv.tool.Brush.prototype.getHelpKeys = function () {
+  return {
+    title: 'tool.Brush.name',
+    brief: 'tool.Brush.brief',
+    mouse: {
+      mouse_click: 'tool.Brush.mouse_click',
+    },
+    touch: {
+      touch_click: 'tool.Brush.touch_click'
+    }
+  };
+};
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
@@ -33997,6 +35230,27 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
 /**
+ * Check for array equality.
+ *
+ * @param {Array} arr0 First array.
+ * @param {*} arr1 Second array.
+ * @returns {boolean} True if both array are defined and contain same values.
+ */
+dwv.utils.arrayEquals = function (arr0, arr1) {
+  if (arr0 === null || arr1 === null) {
+    return false;
+  }
+  if (arr0.length !== arr1.length) {
+    return false;
+  }
+  var arr0sorted = arr0.slice().sort();
+  var arr1sorted = arr1.slice().sort();
+  return arr0sorted.every(function (element, index) {
+    return element === arr1sorted[index];
+  });
+};
+
+/**
  * Convert a Uint8Array to a string.
  *
  * @param {Uint8Array} arr The array to convert.
@@ -34219,6 +35473,23 @@ dwv.utils = dwv.utils || {};
 
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
+
+/**
+ * Check if two rgb objects are equal.
+ *
+ * @param {object} c1 The first colour.
+ * @param {object} c2 The second colour.
+ * @returns {boolean} True if both colour are equal.
+ */
+dwv.utils.isEqualRgb = function (c1, c2) {
+  return c1 !== null &&
+    c2 !== null &&
+    typeof c1 !== 'undefined' &&
+    typeof c2 !== 'undefined' &&
+    c1.r === c2.r &&
+    c1.g === c2.g &&
+    c1.b === c2.b;
+};
 
 /**
  * Convert YBR to RGB.
