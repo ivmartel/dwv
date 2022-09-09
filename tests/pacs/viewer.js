@@ -133,19 +133,21 @@ dwv.test.viewerSetup = function () {
       // store data id
       firstRender.push(event.dataid);
       // log meta data
-      console.log('metadata', _app.getMetaData(event.loadid));
-      // add data row
-      addDataRow(event.loadid);
-      ++dataLoad;
-      // init gui
-      if (dataLoad === numberOfDataToLoad) {
-        // select tool
-        _app.setTool(getSelectedTool());
+      if (event.loadtype === 'image') {
+        console.log('metadata', _app.getMetaData(event.loadid));
+        // add data row
+        addDataRow(event.loadid);
+        ++dataLoad;
+        // init gui
+        if (dataLoad === numberOfDataToLoad) {
+          // select tool
+          _app.setTool(getSelectedTool());
 
-        var changeLayoutSelect = document.getElementById('changelayout');
-        changeLayoutSelect.disabled = false;
-        var resetLayoutButton = document.getElementById('resetlayout');
-        resetLayoutButton.disabled = false;
+          var changeLayoutSelect = document.getElementById('changelayout');
+          changeLayoutSelect.disabled = false;
+          var resetLayoutButton = document.getElementById('resetlayout');
+          resetLayoutButton.disabled = false;
+        }
       }
     }
     // example usage of a dicom SEG as data mask
