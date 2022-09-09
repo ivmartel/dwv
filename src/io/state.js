@@ -9,7 +9,7 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
- * - v0.5 (dwv 0.30.0, ??/2021)
+ * - v0.5 (dwv 0.30.0, 12/2021)
  *   - store position as array
  *   - new draw position group key
  * - v0.4 (dwv 0.29.0, 06/2021)
@@ -43,7 +43,7 @@ dwv.io.State = function () {
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     var drawLayer = layerGroup.getActiveDrawLayer();
-    var position = viewController.getCurrentPosition();
+    var position = viewController.getCurrentIndex();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
@@ -94,7 +94,8 @@ dwv.io.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(new dwv.math.Point(data.position));
+    // position is index...
+    viewController.setCurrentIndex(new dwv.math.Index(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
