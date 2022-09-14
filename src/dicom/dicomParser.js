@@ -436,14 +436,7 @@ dwv.dicom.getTypedArray = function (bitsAllocated, pixelRepresentation, size) {
  * @returns {boolean} True if this VR has a 32-bit VL.
  */
 dwv.dicom.is32bitVLVR = function (vr) {
-  // added locally used 'ox'
-  return (vr === 'OB' ||
-    vr === 'OW' ||
-    vr === 'OF' ||
-    vr === 'ox' ||
-    vr === 'UT' ||
-    vr === 'SQ' ||
-    vr === 'UN');
+  return dwv.dicom.vr32bitVL.includes(vr);
 };
 
 /**
@@ -932,8 +925,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     }
   } else {
     // raw
-    if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
-      vr === 'PN' || vr === 'LT' || vr === 'UT') {
+    if (dwv.dicom.charSetString.includes(vr)) {
       data = reader.readSpecialString(offset, vl);
     } else {
       data = reader.readString(offset, vl);

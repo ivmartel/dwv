@@ -4286,3 +4286,17 @@ dwv.dicom.TagGroups = {
   x7FE0: 'Pixel Data',
   xFFFF: 'Unknown'
 };
+
+// Value Representation (VR) with 32bit Value Length (VL)
+// Added locally used 'ox'
+// see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
+dwv.dicom.vr32bitVL = [
+  'OB', 'OW', 'OF', 'UT', 'SQ', 'UN', 'ox'
+];
+
+// String VR with extended or replaced default character repertoire defined in
+// Specific Character Set (0008,0005)
+// see https://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html#sect_6.1.2.2
+dwv.dicom.charSetString = [
+  'SH', 'LO', 'ST', 'LT', 'PN', 'UT'
+];
