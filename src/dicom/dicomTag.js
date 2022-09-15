@@ -119,7 +119,7 @@ dwv.dicom.Tag.prototype.isWithVR = function () {
  */
 dwv.dicom.Tag.prototype.isPrivate = function () {
   // group is in the '0x####' form
-  var groupNumber = parseInt(this.getGroup().substring(2), 10);
+  var groupNumber = parseInt(this.getGroup().substring(2), 16);
   return groupNumber % 2 === 1;
 };
 
