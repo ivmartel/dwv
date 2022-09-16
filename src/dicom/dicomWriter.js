@@ -410,6 +410,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
     byteOffset = writer.writeUint32Array(byteOffset, value);
   } else if (value instanceof Int32Array) {
     byteOffset = writer.writeInt32Array(byteOffset, value);
+  } else if (value instanceof BigUint64Array) {
+    byteOffset = writer.writeUint64Array(byteOffset, value);
   } else {
     // switch according to VR if input type is undefined
     if (vr === 'UN') {
@@ -421,7 +423,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
     } else if (vr === 'OF') {
       byteOffset = writer.writeInt32Array(byteOffset, value);
     } else if (vr === 'OD') {
-      byteOffset = writer.writeInt64Array(byteOffset, value);
+      byteOffset = writer.writeUint64Array(byteOffset, value);
     } else if (vr === 'US') {
       byteOffset = writer.writeUint16Array(byteOffset, value);
     } else if (vr === 'SS') {

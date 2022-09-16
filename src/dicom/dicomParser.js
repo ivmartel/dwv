@@ -858,8 +858,6 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     } else if (bitsAllocated === 64) {
       if (pixelRepresentation === 0) {
         data.push(reader.readUint64Array(offset, vl));
-      } else {
-        data.push(reader.readInt64Array(offset, vl));
       }
     } else {
       throw new Error('Unsupported bits allocated: ' + bitsAllocated);

@@ -126,6 +126,18 @@ dwv.env.hasClampedArray = function () {
   return dwv.env._hasClampedArray;
 };
 
+// Check if the BigInt type is defined
+dwv.env._hasBigint = (typeof BigInt !== 'undefined');
+
+/**
+ * Browser check for BigInt (associated typed arrays).
+ *
+ * @returns {boolean} True if the env supports the feature.
+ */
+dwv.env.hasBigInt = function () {
+  return dwv.env._hasBigint;
+};
+
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
@@ -149,6 +161,16 @@ dwv.env.check = function () {
   if (!dwv.env.hasTypedArray()) {
     message = 'The Typed arrays are not supported in this browser. ';
     throw new Error(message);
+  }
+  // Check Float64
+  if (!dwv.env.hasFloat64Array()) {
+    dwv.logger.warn('Float64Array is not supported in this browser. ' +
+      'Data including tags with Float64 VR is not supported. ');
+  }
+  // Check BigInt
+  if (!dwv.env.hasBigInt()) {
+    dwv.logger.warn('BigInt is not supported in this browser. ' +
+      'Data including tags with Int64 and Uint64 VRs is not supported. ');
   }
 
   // Replaced if not present ------------
@@ -205,16 +227,6 @@ dwv.env.check = function () {
     // Use Uint8Array instead... Not good
     // TODO Find better replacement!
     window.Uint8ClampedArray = window.Uint8Array;
-  }
-  // check Float64 array
-  if (!dwv.env.hasFloat64Array()) {
-    // silent fail with warning
-    dwv.logger.warn(
-      'The Float64Array is not supported in this browser.' +
-      ' This may impair performance. ');
-    // Use Float32Array instead... Not good
-    // TODO Find better replacement!
-    window.Float64Array = window.Float32Array;
   }
 
   // array Find
