@@ -392,8 +392,10 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
  */
 dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
   writer, vr, vl, byteOffset, value, isImplicit) {
-  // first check input type to know how to write
-  if (value instanceof Uint8Array) {
+
+  if (vr === 'NONE') {
+    // nothing to do!
+  } else if (value instanceof Uint8Array) {
     // binary data has been expanded 8 times at read
     if (value.length === 8 * vl) {
       byteOffset = writer.writeBinaryArray(byteOffset, value);
@@ -414,28 +416,39 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
     byteOffset = writer.writeUint64Array(byteOffset, value);
   } else {
     // switch according to VR if input type is undefined
-    if (vr === 'UN') {
-      byteOffset = writer.writeUint8Array(byteOffset, value);
-    } else if (vr === 'OB') {
-      byteOffset = writer.writeInt8Array(byteOffset, value);
-    } else if (vr === 'OW') {
-      byteOffset = writer.writeInt16Array(byteOffset, value);
-    } else if (vr === 'OF') {
-      byteOffset = writer.writeInt32Array(byteOffset, value);
-    } else if (vr === 'OD') {
-      byteOffset = writer.writeUint64Array(byteOffset, value);
-    } else if (vr === 'US') {
-      byteOffset = writer.writeUint16Array(byteOffset, value);
-    } else if (vr === 'SS') {
-      byteOffset = writer.writeInt16Array(byteOffset, value);
-    } else if (vr === 'UL') {
-      byteOffset = writer.writeUint32Array(byteOffset, value);
-    } else if (vr === 'SL') {
-      byteOffset = writer.writeInt32Array(byteOffset, value);
-    } else if (vr === 'FL') {
-      byteOffset = writer.writeFloat32Array(byteOffset, value);
-    } else if (vr === 'FD') {
-      byteOffset = writer.writeFloat64Array(byteOffset, value);
+    var vrType = dwv.dicom.vrTypes[vr];
+    if (typeof vrType !== 'undefined') {
+      if (vrType === 'Uint8') {
+        byteOffset = writer.writeUint8Array(byteOffset, value);
+      } else if (vrType === 'Uint16') {
+        byteOffset = writer.writeUint16Array(byteOffset, value);
+      } else if (vrType === 'Int16') {
+        byteOffset = writer.writeInt16Array(byteOffset, value);
+      } else if (vrType === 'Uint32') {
+        byteOffset = writer.writeUint32Array(byteOffset, value);
+      } else if (vrType === 'Int32') {
+        byteOffset = writer.writeInt32Array(byteOffset, value);
+      } else if (vrType === 'Uint64') {
+        byteOffset = writer.writeUint64Array(byteOffset, value);
+      } else if (vrType === 'Float32') {
+        byteOffset = writer.writeFloat32Array(byteOffset, value);
+      } else if (vrType === 'Float64') {
+        byteOffset = writer.writeFloat64Array(byteOffset, value);
+      } else if (vrType === 'string') {
+        // join if array
+        if (Array.isArray(value)) {
+          value = value.join('\\');
+        }
+        // write
+        if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
+          vr === 'PN' || vr === 'LT' || vr === 'UT') {
+          byteOffset = writer.writeSpecialString(byteOffset, value);
+        } else {
+          byteOffset = writer.writeString(byteOffset, value);
+        }
+      } else {
+        throw Error('Unknown VR type: ' + vrType);
+      }
     } else if (vr === 'SQ') {
       byteOffset = this.writeDataElementItems(
         writer, byteOffset, value, isImplicit);
@@ -450,17 +463,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
         byteOffset = writer.writeUint16Array(byteOffset, atValue);
       }
     } else {
-      // join if array
-      if (Array.isArray(value)) {
-        value = value.join('\\');
-      }
-      // write
-      if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
-        vr === 'PN' || vr === 'LT' || vr === 'UT') {
-        byteOffset = writer.writeSpecialString(byteOffset, value);
-      } else {
-        byteOffset = writer.writeString(byteOffset, value);
-      }
+      dwv.logger.warn('Unknown VR: ' + vr);
     }
   }
   // return new offset

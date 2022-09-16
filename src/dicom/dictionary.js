@@ -4300,3 +4300,35 @@ dwv.dicom.vr32bitVL = [
 dwv.dicom.charSetString = [
   'SH', 'LO', 'ST', 'LT', 'PN', 'UT'
 ];
+
+// VR types
+// undefined for AT and SQ
+// see https://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1
+dwv.dicom.vrTypes = {
+  AE: 'string',
+  AS: 'string',
+  CS: 'string',
+  DA: 'string',
+  DS: 'string',
+  DT: 'string',
+  FL: 'Float32',
+  FD: 'Float64',
+  IS: 'string',
+  LO: 'string',
+  LT: 'string',
+  OB: 'Uint8',
+  OD: 'Uint64',
+  OF: 'Uint32',
+  OW: 'Uint16',
+  PN: 'string',
+  SH: 'string',
+  SL: 'Int32',
+  SS: 'Int16',
+  ST: 'string',
+  TM: 'string',
+  UI: 'string',
+  UL: 'Uint32',
+  UN: 'Uint8',
+  US: 'Uint16',
+  UT: 'string'
+};

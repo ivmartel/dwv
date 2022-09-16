@@ -810,6 +810,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
   var data = null;
   var isPixelDataTag = dwv.dicom.isPixelDataTag(
     new dwv.dicom.Tag(tag.group, tag.element));
+  var vrType = dwv.dicom.vrTypes[vr];
   if (isPixelDataTag && vl === 'u/l') {
     // implicit pixel data sequence
     data = [];
@@ -862,26 +863,33 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     } else {
       throw new Error('Unsupported bits allocated: ' + bitsAllocated);
     }
-  } else if (vr === 'OB') {
-    data = reader.readUint8Array(offset, vl);
-  } else if (vr === 'OW') {
-    data = reader.readUint16Array(offset, vl);
-  } else if (vr === 'OF') {
-    data = reader.readUint32Array(offset, vl);
-  } else if (vr === 'OD') {
-    data = reader.readUint64Array(offset, vl);
-  } else if (vr === 'US') {
-    data = reader.readUint16Array(offset, vl);
-  } else if (vr === 'UL') {
-    data = reader.readUint32Array(offset, vl);
-  } else if (vr === 'SS') {
-    data = reader.readInt16Array(offset, vl);
-  } else if (vr === 'SL') {
-    data = reader.readInt32Array(offset, vl);
-  } else if (vr === 'FL') {
-    data = reader.readFloat32Array(offset, vl);
-  } else if (vr === 'FD') {
-    data = reader.readFloat64Array(offset, vl);
+  } else if (typeof vrType !== 'undefined') {
+    if (vrType === 'Uint8') {
+      data = reader.readUint8Array(offset, vl);
+    } else if (vrType === 'Uint16') {
+      data = reader.readUint16Array(offset, vl);
+    } else if (vrType === 'Uint32') {
+      data = reader.readUint32Array(offset, vl);
+    } else if (vrType === 'Uint64') {
+      data = reader.readUint64Array(offset, vl);
+    } else if (vrType === 'Int16') {
+      data = reader.readInt16Array(offset, vl);
+    } else if (vrType === 'Int32') {
+      data = reader.readInt32Array(offset, vl);
+    } else if (vrType === 'Float32') {
+      data = reader.readFloat32Array(offset, vl);
+    } else if (vrType === 'Float64') {
+      data = reader.readFloat64Array(offset, vl);
+    } else if (vrType === 'string') {
+      if (dwv.dicom.charSetString.includes(vr)) {
+        data = reader.readSpecialString(offset, vl);
+      } else {
+        data = reader.readString(offset, vl);
+      }
+      data = data.split('\\');
+    } else {
+      throw Error('Unknown VR type: ' + vrType);
+    }
   } else if (vr === 'xs') {
     if (pixelRepresentation === 0) {
       data = reader.readUint16Array(offset, vl);
@@ -902,9 +910,6 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       str += ')';
       data.push(str);
     }
-  } else if (vr === 'UN') {
-    // not available
-    data = reader.readUint8Array(offset, vl);
   } else if (vr === 'SQ') {
     // sequence
     data = [];
@@ -922,13 +927,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       data.push(itemData);
     }
   } else {
-    // raw
-    if (dwv.dicom.charSetString.includes(vr)) {
-      data = reader.readSpecialString(offset, vl);
-    } else {
-      data = reader.readString(offset, vl);
-    }
-    data = data.split('\\');
+    dwv.logger.warn('Unknown VR: ' + vr);
   }
 
   return data;
