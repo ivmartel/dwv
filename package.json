@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "benchmark": "~2.1.4",
-    "clean-jsdoc-theme": "4.1.7",
+    "clean-jsdoc-theme": "4.1.8",
     "eslint": "~8.23.1",
     "eslint-plugin-jsdoc": "~39.3.3",
     "github-release-notes": "0.17.2",
