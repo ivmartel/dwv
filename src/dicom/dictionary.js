@@ -4302,11 +4302,11 @@ dwv.dicom.charSetString = [
 ];
 
 // VR types
-// undefined for AT and SQ
 // see https://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1
 dwv.dicom.vrTypes = {
   AE: 'string',
   AS: 'string',
+  AT: undefined,
   CS: 'string',
   DA: 'string',
   DS: 'string',
@@ -4323,6 +4323,7 @@ dwv.dicom.vrTypes = {
   PN: 'string',
   SH: 'string',
   SL: 'Int32',
+  SQ: undefined,
   SS: 'Int16',
   ST: 'string',
   TM: 'string',

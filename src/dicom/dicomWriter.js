@@ -77,7 +77,9 @@ dwv.dicom.isEven = function (number) {
  * @returns {boolean} True if the VR is a typed array one.
  */
 dwv.dicom.isTypedArrayVr = function (vr) {
-  return dwv.dicom.vrTypes[vr] !== 'string';
+  var vrType = dwv.dicom.vrTypes[vr];
+  return typeof vrType !== 'undefined' &&
+    vrType !== 'string';
 };
 
 /**
@@ -87,7 +89,9 @@ dwv.dicom.isTypedArrayVr = function (vr) {
  * @returns {boolean} True if the VR is a string one.
  */
 dwv.dicom.isStringVr = function (vr) {
-  return dwv.dicom.vrTypes[vr] === 'string';
+  var vrType = dwv.dicom.vrTypes[vr];
+  return typeof vrType !== 'undefined' &&
+    vrType === 'string';
 };
 
 /**
