@@ -70,30 +70,14 @@ dwv.dicom.isEven = function (number) {
 };
 
 /**
- * Is the input VR a non string VR.
- *
- * @param {string} vr The element VR.
- * @returns {boolean} True if the VR is a non string one.
- */
-dwv.dicom.isNonStringVr = function (vr) {
-  return vr === 'UN' ||
-    vr === 'SQ' ||
-    vr === 'AT' ||
-    dwv.dicom.isTypedArrayVr(vr);
-};
-
-/**
  * Is the input VR a VR that stores data in a typed array.
+ * TODO: include ox and xs?
  *
  * @param {string} vr The element VR.
  * @returns {boolean} True if the VR is a typed array one.
  */
 dwv.dicom.isTypedArrayVr = function (vr) {
-  return vr === 'OB' || vr === 'OW' ||
-    vr === 'OF' || vr === 'OD' ||
-    vr === 'US' || vr === 'SS' ||
-    vr === 'UL' || vr === 'SL' ||
-    vr === 'FL' || vr === 'FD';
+  return dwv.dicom.vrTypes[vr] !== 'string';
 };
 
 /**
@@ -103,7 +87,7 @@ dwv.dicom.isTypedArrayVr = function (vr) {
  * @returns {boolean} True if the VR is a string one.
  */
 dwv.dicom.isStringVr = function (vr) {
-  return !dwv.dicom.isNonStringVr(vr);
+  return dwv.dicom.vrTypes[vr] === 'string';
 };
 
 /**
@@ -907,18 +891,27 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
       size = element.value.length;
 
       // convert size to bytes
-      if (element.vr === 'US' || element.vr === 'OW') {
-        size *= Uint16Array.BYTES_PER_ELEMENT;
-      } else if (element.vr === 'SS') {
-        size *= Int16Array.BYTES_PER_ELEMENT;
-      } else if (element.vr === 'UL') {
-        size *= Uint32Array.BYTES_PER_ELEMENT;
-      } else if (element.vr === 'SL') {
-        size *= Int32Array.BYTES_PER_ELEMENT;
-      } else if (element.vr === 'FL') {
-        size *= Float32Array.BYTES_PER_ELEMENT;
-      } else if (element.vr === 'FD') {
-        size *= Float64Array.BYTES_PER_ELEMENT;
+      var vrType = dwv.dicom.vrTypes[element.vr];
+      if (typeof vrType !== 'undefined') {
+        if (vrType === 'Uint8') {
+          size *= Uint8Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Uint16') {
+          size *= Uint16Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Int16') {
+          size *= Int16Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Uint32') {
+          size *= Uint32Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Int32') {
+          size *= Int32Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Float32') {
+          size *= Float32Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Float64') {
+          size *= Float64Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Uint64') {
+          size *= BigUint64Array.BYTES_PER_ELEMENT;
+        } else {
+          throw Error('Unknown VR type: ' + vrType);
+        }
       }
     } else {
       if (value instanceof Array) {
