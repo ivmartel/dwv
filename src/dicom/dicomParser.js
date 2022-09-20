@@ -890,7 +890,15 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     } else {
       throw Error('Unknown VR type: ' + vrType);
     }
+  } else if (vr === 'ox') {
+    // OB or OW
+    if (bitsAllocated === 8) {
+      data = reader.readUint8Array(offset, vl);
+    } else {
+      data = reader.readUint16Array(offset, vl);
+    }
   } else if (vr === 'xs') {
+    // US or SS
     if (pixelRepresentation === 0) {
       data = reader.readUint16Array(offset, vl);
     } else {
