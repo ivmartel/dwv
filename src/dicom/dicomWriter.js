@@ -402,6 +402,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
     byteOffset = writer.writeInt32Array(byteOffset, value);
   } else if (value instanceof BigUint64Array) {
     byteOffset = writer.writeUint64Array(byteOffset, value);
+  } else if (value instanceof BigInt64Array) {
+    byteOffset = writer.writeInt64Array(byteOffset, value);
   } else {
     // switch according to VR if input type is undefined
     var vrType = dwv.dicom.vrTypes[vr];
@@ -418,6 +420,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
         byteOffset = writer.writeInt32Array(byteOffset, value);
       } else if (vrType === 'Uint64') {
         byteOffset = writer.writeUint64Array(byteOffset, value);
+      } else if (vrType === 'Int64') {
+        byteOffset = writer.writeInt64Array(byteOffset, value);
       } else if (vrType === 'Float32') {
         byteOffset = writer.writeFloat32Array(byteOffset, value);
       } else if (vrType === 'Float64') {
@@ -913,6 +917,8 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           size *= Float64Array.BYTES_PER_ELEMENT;
         } else if (vrType === 'Uint64') {
           size *= BigUint64Array.BYTES_PER_ELEMENT;
+        } else if (vrType === 'Int64') {
+          size *= BigInt64Array.BYTES_PER_ELEMENT;
         } else {
           throw Error('Unknown VR type: ' + vrType);
         }

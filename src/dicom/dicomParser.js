@@ -859,6 +859,8 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     } else if (bitsAllocated === 64) {
       if (pixelRepresentation === 0) {
         data.push(reader.readUint64Array(offset, vl));
+      } else {
+        data.push(reader.readInt64Array(offset, vl));
       }
     } else {
       throw new Error('Unsupported bits allocated: ' + bitsAllocated);
@@ -876,6 +878,8 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       data = reader.readInt16Array(offset, vl);
     } else if (vrType === 'Int32') {
       data = reader.readInt32Array(offset, vl);
+    } else if (vrType === 'Int64') {
+      data = reader.readInt64Array(offset, vl);
     } else if (vrType === 'Float32') {
       data = reader.readFloat32Array(offset, vl);
     } else if (vrType === 'Float64') {

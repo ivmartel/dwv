@@ -137,6 +137,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Read BigInt64 (8 bytes) data.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @returns {number} The read data.
+   */
+  this.readBigInt64 = function (byteOffset) {
+    return view.getBigInt64(byteOffset, isLittleEndian);
+  };
+
+  /**
    * Read Float32 (4 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
@@ -327,6 +337,32 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
       data = new Int32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
         data[i] = this.readInt32(byteOffset + bpe * i);
+      }
+    }
+    return data;
+  };
+
+  /**
+   * Read Int64 array.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @param {number} size The size of the array.
+   * @returns {Array} The read data.
+   */
+  this.readInt64Array = function (byteOffset, size) {
+    var bpe = BigInt64Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
+    var data = null;
+    // byteOffset should be a multiple of BigInt64Array.BYTES_PER_ELEMENT (=8)
+    if (byteOffset % bpe === 0) {
+      data = new BigInt64Array(buffer, byteOffset, arraySize);
+      if (needFlip) {
+        dwv.dicom.flipArrayEndianness(data);
+      }
+    } else {
+      data = new BigInt64Array(arraySize);
+      for (var i = 0; i < arraySize; ++i) {
+        data[i] = this.readBigInt64(byteOffset + bpe * i);
       }
     }
     return data;

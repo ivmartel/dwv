@@ -135,6 +135,18 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Write Int64 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
+  this.writeInt64 = function (byteOffset, value) {
+    view.setBigInt64(byteOffset, value, isLittleEndian);
+    return byteOffset + BigInt64Array.BYTES_PER_ELEMENT;
+  };
+
+  /**
    * Write Float32 data.
    *
    * @param {number} byteOffset The offset to start writing from.
@@ -317,6 +329,20 @@ dwv.dicom.DataWriter.prototype.writeUint64Array = function (byteOffset, array) {
 dwv.dicom.DataWriter.prototype.writeInt32Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
     byteOffset = this.writeInt32(byteOffset, array[i]);
+  }
+  return byteOffset;
+};
+
+/**
+ * Write Int64 array.
+ *
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeInt64Array = function (byteOffset, array) {
+  for (var i = 0, len = array.length; i < len; ++i) {
+    byteOffset = this.writeInt64(byteOffset, array[i]);
   }
   return byteOffset;
 };
