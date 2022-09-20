@@ -440,8 +440,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
           value = value.join('\\');
         }
         // write
-        if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
-          vr === 'PN' || vr === 'LT' || vr === 'UT') {
+        if (dwv.dicom.charSetString.includes(vr)) {
           byteOffset = writer.writeSpecialString(byteOffset, value);
         } else {
           byteOffset = writer.writeString(byteOffset, value);
