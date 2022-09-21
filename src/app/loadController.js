@@ -206,10 +206,10 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     } catch (error) {
       self.onerror({
         error: error,
-        loadId: loadId
+        loadid: loadId
       });
       self.onloadend({
-        loadId: loadId
+        loadid: loadId
       });
       return;
     }
