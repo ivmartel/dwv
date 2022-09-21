@@ -181,6 +181,7 @@ dwv.image.ImageFactory.prototype.create = function (
   var meta = {
     numberOfFiles: numberOfFiles,
     Modality: dicomElements.getFromKey('x00080060'),
+    SOPClassUID: dicomElements.getFromKey('x00080016'),
     StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
     BitsStored: dicomElements.getFromKey('x00280101'),
