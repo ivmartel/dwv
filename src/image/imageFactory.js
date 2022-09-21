@@ -178,42 +178,21 @@ dwv.image.ImageFactory.prototype.create = function (
   image.setRescaleSlopeAndIntercept(rsi);
 
   // meta information
-  var meta = {};
-  // data length
-  meta.numberOfFiles = numberOfFiles;
-  // Modality
-  var modality = dicomElements.getFromKey('x00080060');
-  if (modality) {
-    meta.Modality = modality;
-  }
-  // StudyInstanceUID
-  var studyInstanceUID = dicomElements.getFromKey('x0020000D');
-  if (studyInstanceUID) {
-    meta.StudyInstanceUID = studyInstanceUID;
-  }
-  // SeriesInstanceUID
-  var seriesInstanceUID = dicomElements.getFromKey('x0020000E');
-  if (seriesInstanceUID) {
-    meta.SeriesInstanceUID = seriesInstanceUID;
-  }
-  // BitsStored
-  var bitsStored = dicomElements.getFromKey('x00280101');
-  if (bitsStored) {
-    meta.BitsStored = parseInt(bitsStored, 10);
-  }
+  var meta = {
+    numberOfFiles: numberOfFiles,
+    Modality: dicomElements.getFromKey('x00080060'),
+    StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
+    SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
+    BitsStored: dicomElements.getFromKey('x00280101'),
+    PixelRepresentation: dicomElements.getFromKey('x00280103')
+  };
   // PixelRepresentation -> is signed
-  var pixelRepresentation = dicomElements.getFromKey('x00280103');
-  meta.IsSigned = false;
-  if (pixelRepresentation) {
-    meta.IsSigned = (pixelRepresentation === 1);
+  meta.IsSigned = meta.PixelRepresentation === 1;
+  // FrameOfReferenceUID (optional)
+  var frameOfReferenceUID = dicomElements.getFromKey('x00200052');
+  if (frameOfReferenceUID) {
+    meta.FrameOfReferenceUID = frameOfReferenceUID;
   }
-  // PatientPosition
-  var patientPosition = dicomElements.getFromKey('x00185100');
-  meta.PatientPosition = false;
-  if (patientPosition) {
-    meta.PatientPosition = patientPosition;
-  }
-
   // window level presets
   var windowPresets = {};
   var windowCenter = dicomElements.getFromKey('x00281050', true);
