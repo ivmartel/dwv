@@ -757,7 +757,7 @@ dwv.image.MaskFactory.prototype.create = function (
   if (storeAsRGB) {
     image.setPhotometricInterpretation('RGB');
   }
-  // image meta
+  // meta information
   var meta = {
     Modality: 'SEG',
     SegmentationType: 'BINARY',
@@ -779,6 +779,12 @@ dwv.image.MaskFactory.prototype.create = function (
       SOPInstanceUID: dicomElements.getFromKey('x00080018')
     }
   };
+  // FrameOfReferenceUID (optional)
+  var frameOfReferenceUID = dicomElements.getFromKey('x00200052');
+  if (frameOfReferenceUID) {
+    meta.FrameOfReferenceUID = frameOfReferenceUID;
+  }
+
   image.setMeta(meta);
 
   return image;
