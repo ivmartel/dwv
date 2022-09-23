@@ -823,9 +823,9 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     (vr === 'OB' || vr === 'OW' || vr === 'ox')) {
     // check bits allocated and VR
     // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
-    if (bitsAllocated > 8 && vr !== 'OW') {
+    if (bitsAllocated > 8 && vr === 'OB') {
       dwv.logger.warn(
-        'Reading DICOM pixel data with bitsAllocated>8 and vr is not OW.'
+        'Reading DICOM pixel data with bitsAllocated>8 and OB VR.'
       );
     }
     // read
