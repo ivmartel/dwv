@@ -820,18 +820,12 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
         pixelRepresentation, bitsAllocated));
     }
   } else if (isPixelDataTag &&
-    (vr === 'OB' || vr === 'OW' || vr === 'OF' || vr === 'ox')) {
+    (vr === 'OB' || vr === 'OW' || vr === 'ox')) {
     // check bits allocated and VR
-    if (bitsAllocated === 8 && vr === 'OW') {
+    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
+    if (bitsAllocated > 8 && vr !== 'OW') {
       dwv.logger.warn(
-        'Reading DICOM pixel data with vr=OW' +
-        ' and bitsAllocated=8 (should be 16).'
-      );
-    }
-    if (bitsAllocated === 16 && vr === 'OB') {
-      dwv.logger.warn(
-        'Reading DICOM pixel data with vr=OB' +
-        ' and bitsAllocated=16 (should be 8).'
+        'Reading DICOM pixel data with bitsAllocated>8 and vr is not OW.'
       );
     }
     // read
