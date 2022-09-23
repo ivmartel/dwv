@@ -301,18 +301,23 @@ dwv.dicom.getSegment = function (element) {
     segment.displayValue = rgb;
   }
   // Segmented Property Category Code Sequence (type1, only one)
-  if (element.x00620003) {
+  if (typeof element.x00620003 !== 'undefined') {
     segment.propertyCategoryCode =
       dwv.dicom.getCode(element.x00620003.value[0]);
   } else {
     throw Error('Missing Segmented Property Category Code Sequence.');
   }
   // Segmented Property Type Code Sequence (type1)
-  if (element.x0062000F) {
+  if (typeof element.x0062000F !== 'undefined') {
     segment.propertyTypeCode =
       dwv.dicom.getCode(element.x0062000F.value[0]);
   } else {
     throw Error('Missing Segmented Property Type Code Sequence.');
+  }
+  // tracking Id and UID (type1C)
+  if (typeof element.x00620020 !== 'undefined') {
+    segment.trackingId = element.x00620020.value[0];
+    segment.trackingUid = element.x00620021.value[0];
   }
 
   return segment;
