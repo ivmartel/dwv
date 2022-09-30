@@ -783,7 +783,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     endOffset: endOffset
   };
   if (data) {
-    element.elements = data;
+    element.items = data;
   }
   return element;
 };
@@ -814,11 +814,13 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
   if (isPixelDataTag && vl === 'u/l') {
     // implicit pixel data sequence
     data = [];
-    for (var j = 0; j < element.elements.length; ++j) {
+    for (var j = 0; j < element.items.length; ++j) {
       data.push(this.interpretElement(
-        element.elements[j], reader,
+        element.items[j], reader,
         pixelRepresentation, bitsAllocated));
     }
+    // remove non parsed items
+    delete element.items;
   } else if (isPixelDataTag &&
     (vr === 'OB' || vr === 'OW' || vr === 'ox')) {
     // check bits allocated and VR
@@ -919,8 +921,8 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
   } else if (vr === 'SQ') {
     // sequence
     data = [];
-    for (var k = 0; k < element.elements.length; ++k) {
-      var item = element.elements[k];
+    for (var k = 0; k < element.items.length; ++k) {
+      var item = element.items[k];
       var itemData = {};
       var keys = Object.keys(item);
       for (var l = 0; l < keys.length; ++l) {
@@ -932,6 +934,8 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       }
       data.push(itemData);
     }
+    // remove non parsed elements
+    delete element.items;
   } else {
     dwv.logger.warn('Unknown VR: ' + vr);
   }
