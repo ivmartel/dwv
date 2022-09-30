@@ -332,7 +332,7 @@ dwv.dicom.guessTransferSyntax = function (firstDataElement) {
   var oEightGroupBigEndian = '0x0800';
   var oEightGroupLittleEndian = '0x0008';
   // check that group is 0x0008
-  var group = firstDataElement.tag.group;
+  var group = firstDataElement.tag.getGroup();
   if (group !== oEightGroupBigEndian &&
     group !== oEightGroupLittleEndian) {
     throw new Error(
@@ -528,8 +528,7 @@ dwv.dicom.DicomParser.prototype.getDicomElements = function () {
  *
  * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
- * @returns {object} An object containing the tags 'group',
- *   'element' and 'name'.
+ * @returns {object} An object containing the tag and the end offset.
  */
 dwv.dicom.DicomParser.prototype.readTag = function (reader, offset) {
   // group
@@ -538,13 +537,9 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset) {
   // element
   var element = reader.readHex(offset);
   offset += Uint16Array.BYTES_PER_ELEMENT;
-  // name
-  var name = new dwv.dicom.Tag(group, element).getKey();
   // return
   return {
-    group: group,
-    element: element,
-    name: name,
+    tag: new dwv.dicom.Tag(group, element),
     endOffset: offset
   };
 };
@@ -564,7 +559,7 @@ dwv.dicom.DicomParser.prototype.readExplicitItemDataElement = function (
   // read the first item
   var item = this.readDataElement(reader, offset, implicit);
   offset = item.endOffset;
-  itemData[item.tag.name] = item;
+  itemData[item.tag.getKey()] = item;
 
   // read until the end offset
   var endOffset = offset;
@@ -572,7 +567,7 @@ dwv.dicom.DicomParser.prototype.readExplicitItemDataElement = function (
   while (offset < endOffset) {
     item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    itemData[item.tag.name] = item;
+    itemData[item.tag.getKey()] = item;
   }
 
   return {
@@ -599,7 +594,7 @@ dwv.dicom.DicomParser.prototype.readImplicitItemDataElement = function (
   offset = item.endOffset;
 
   // exit if it is a sequence delimitation item
-  if (item.tag.name === 'xFFFEE0DD') {
+  if (dwv.dicom.isSequenceDelimitationItemTag(item.tag)) {
     return {
       data: itemData,
       endOffset: item.endOffset,
@@ -608,16 +603,16 @@ dwv.dicom.DicomParser.prototype.readImplicitItemDataElement = function (
   }
 
   // store item
-  itemData[item.tag.name] = item;
+  itemData[item.tag.getKey()] = item;
 
   // read until the item delimitation item
   var isItemDelim = false;
   while (!isItemDelim) {
     item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    isItemDelim = item.tag.name === 'xFFFEE00D';
+    isItemDelim = dwv.dicom.isItemDelimitationItemTag(item.tag);
     if (!isItemDelim) {
-      itemData[item.tag.name] = item;
+      itemData[item.tag.getKey()] = item;
     }
   }
 
@@ -651,7 +646,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (
   while (!isSeqDelim) {
     item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    isSeqDelim = item.tag.name === 'xFFFEE0DD';
+    isSeqDelim = dwv.dicom.isSequenceDelimitationItemTag(item.tag);
     if (!isSeqDelim) {
       itemData.push(item);
     }
@@ -677,9 +672,9 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (
 dwv.dicom.DicomParser.prototype.readDataElement = function (
   reader, offset, implicit) {
   // Tag: group, element
-  var tagData = this.readTag(reader, offset);
-  var tag = new dwv.dicom.Tag(tagData.group, tagData.element);
-  offset = tagData.endOffset;
+  var readTagRes = this.readTag(reader, offset);
+  var tag = readTagRes.tag;
+  offset = readTagRes.endOffset;
 
   // Value Representation (VR)
   var vr = null;
@@ -724,7 +719,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
   }
 
   // treat private tag with unknown VR and zero VL as a sequence (see #799)
-  //if (dwv.dicom.isPrivateGroup(tag.group) && vr === 'UN' && vl === 0) {
   if (tag.isPrivate() && vr === 'UN' && vl === 0) {
     vr = 'SQ';
   }
@@ -776,7 +770,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
 
   // return
   var element = {
-    tag: tagData,
+    tag: tag,
     vr: vr,
     vl: vlString,
     startOffset: startOffset,
@@ -808,8 +802,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
 
   // data
   var data = null;
-  var isPixelDataTag = dwv.dicom.isPixelDataTag(
-    new dwv.dicom.Tag(tag.group, tag.element));
+  var isPixelDataTag = dwv.dicom.isPixelDataTag(tag);
   var vrType = dwv.dicom.vrTypes[vr];
   if (isPixelDataTag && vl === 'u/l') {
     // implicit pixel data sequence
@@ -991,7 +984,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     // increment offset
     offset = dataElement.endOffset;
     // store the data element
-    this.dicomElements[dataElement.tag.name] = dataElement;
+    this.dicomElements[dataElement.tag.getKey()] = dataElement;
     // get meta length
     var metaLength = parseInt(dataElement.value[0], 10);
 
@@ -1002,7 +995,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
       dataElement = this.readDataElement(metaReader, offset, false);
       offset = dataElement.endOffset;
       // store the data element
-      this.dicomElements[dataElement.tag.name] = dataElement;
+      this.dicomElements[dataElement.tag.getKey()] = dataElement;
     }
 
     // check the TransferSyntaxUID (has to be there!)
@@ -1019,7 +1012,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     // guess transfer syntax
     var tsElement = dwv.dicom.guessTransferSyntax(dataElement);
     // store
-    this.dicomElements[tsElement.tag.name] = tsElement;
+    this.dicomElements[tsElement.tag.getKey()] = tsElement;
     syntax = dwv.dicom.cleanString(tsElement.value[0]);
     // reset offset
     offset = 0;
@@ -1054,10 +1047,10 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     // increment offset
     offset = dataElement.endOffset;
     // store the data element
-    if (typeof this.dicomElements[dataElement.tag.name] === 'undefined') {
-      this.dicomElements[dataElement.tag.name] = dataElement;
+    if (typeof this.dicomElements[dataElement.tag.getKey()] === 'undefined') {
+      this.dicomElements[dataElement.tag.getKey()] = dataElement;
     } else {
-      dwv.logger.warn('Not saving duplicate tag: ' + dataElement.tag.name);
+      dwv.logger.warn('Not saving duplicate tag: ' + dataElement.tag.getKey());
     }
   }
 

@@ -163,8 +163,7 @@ dwv.dicom.isImplicitLengthSequence = function (element) {
  */
 dwv.dicom.isImplicitLengthItem = function (element) {
   // item with no length
-  return (element.tag.name === 'xFFFEE000') &&
-        (element.vl === 'u/l');
+  return dwv.dicom.isItemTag(element.tag) && element.vl === 'u/l';
 };
 
 /**
@@ -175,8 +174,7 @@ dwv.dicom.isImplicitLengthItem = function (element) {
  */
 dwv.dicom.isImplicitLengthPixels = function (element) {
   // pixel data with no length
-  return (element.tag.name === 'x7FE00010') &&
-        (element.vl === 'u/l');
+  return dwv.dicom.isPixelDataTag(element.tag) && element.vl === 'u/l';
 };
 
 /**
@@ -287,15 +285,14 @@ dwv.dicom.DicomWriter = function () {
    */
   this.getElementToWrite = function (element) {
     // get group and tag string name
-    var tag = new dwv.dicom.Tag(element.tag.group, element.tag.element);
-    var groupName = tag.getGroupName();
-    var tagName = tag.getNameFromDictionary();
+    var groupName = element.tag.getGroupName();
+    var tagName = element.tag.getNameFromDictionary();
 
     // apply rules:
     var rule;
-    if (typeof this.rules[element.tag.name] !== 'undefined') {
+    if (typeof this.rules[element.tag.getKey()] !== 'undefined') {
       // 1. tag itself
-      rule = this.rules[element.tag.name];
+      rule = this.rules[element.tag.getKey()];
     } else if (tagName !== null && typeof this.rules[tagName] !== 'undefined') {
       // 2. tag name
       rule = this.rules[tagName];
@@ -349,11 +346,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
     // item delimitation
     if (implicitLength) {
       var itemDelimElement = {
-        tag: {
-          group: '0xFFFE',
-          element: '0xE00D',
-          name: 'ItemDelimitationItem'
-        },
+        tag: dwv.dicom.getItemDelimitationItemTag(),
         vr: 'NONE',
         vl: 0,
         value: []
@@ -489,11 +482,7 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
     var item = {};
     // first item: basic offset table
     item.xFFFEE000 = {
-      tag: {
-        group: '0xFFFE',
-        element: '0xE000',
-        name: 'xFFFEE000'
-      },
+      tag: dwv.dicom.getItemTag(),
       vr: 'UN',
       vl: 0,
       value: []
@@ -501,11 +490,7 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
     // data
     for (var i = 0; i < value.length; ++i) {
       item[i] = {
-        tag: {
-          group: '0xFFFE',
-          element: '0xE000',
-          name: 'xFFFEE000'
-        },
+        tag: dwv.dicom.getItemTag(),
         vr: vr,
         vl: value[i].length,
         value: value[i]
@@ -531,19 +516,18 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
  */
 dwv.dicom.DicomWriter.prototype.writeDataElement = function (
   writer, element, byteOffset, isImplicit) {
-  var isTagWithVR = new dwv.dicom.Tag(
-    element.tag.group, element.tag.element).isWithVR();
+  var isTagWithVR = element.tag.isWithVR();
   var is32bitVLVR = (isImplicit || !isTagWithVR)
     ? true : dwv.dicom.is32bitVLVR(element.vr);
   // group
-  byteOffset = writer.writeHex(byteOffset, element.tag.group);
+  byteOffset = writer.writeHex(byteOffset, element.tag.getGroup());
   // element
-  byteOffset = writer.writeHex(byteOffset, element.tag.element);
+  byteOffset = writer.writeHex(byteOffset, element.tag.getElement());
   // VR
   var vr = element.vr;
   // use VR=UN for private sequence
   if (this.useUnVrForPrivateSq &&
-    new dwv.dicom.Tag(element.tag.group, element.tag.element).isPrivate() &&
+    element.tag.isPrivate() &&
     vr === 'SQ') {
     dwv.logger.warn('Write element using VR=UN for private sequence.');
     vr = 'UN';
@@ -577,7 +561,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
     value = [];
   }
   // write
-  if (element.tag.name === 'x7FE00010') {
+  if (dwv.dicom.isPixelDataTag(element.tag)) {
     byteOffset = this.writePixelDataElementValue(
       writer, element.vr, element.vl, byteOffset, value, isImplicit);
   } else {
@@ -589,11 +573,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
   if (dwv.dicom.isImplicitLengthSequence(element) ||
          dwv.dicom.isImplicitLengthPixels(element)) {
     var seqDelimElement = {
-      tag: {
-        group: '0xFFFE',
-        element: '0xE0DD',
-        name: 'SequenceDelimitationItem'
-      },
+      tag: dwv.dicom.getSequenceDelimitationItemTag(),
       vr: 'NONE',
       vl: 0,
       value: []
@@ -649,8 +629,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       // (dcmdump may crash because of these bytes)
       dwv.dicom.checkUnknownVR(element);
 
-      // tag group name (remove first 0)
-      groupName = dwv.dicom.TagGroups[element.tag.group.substring(1)];
+      // tag group name
+      groupName = element.tag.getGroupName();
 
       // prefix
       if (groupName === 'Meta Element') {
@@ -757,12 +737,11 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
  */
 dwv.dicom.checkUnknownVR = function (element) {
   if (element.vr === 'UN') {
-    var tag = new dwv.dicom.Tag(element.tag.group, element.tag.element);
-    var dictVr = tag.getVrFromDictionary();
+    var dictVr = element.tag.getVrFromDictionary();
     if (dictVr !== null && element.vr !== dictVr) {
       element.vr = dictVr;
-      dwv.logger.info('Element ' + element.tag.group +
-        ' ' + element.tag.element +
+      dwv.logger.info('Element ' + element.tag.getGroup() +
+        ' ' + element.tag.getElement() +
         ' VR changed from UN to ' + element.vr);
     }
   }
@@ -776,9 +755,8 @@ dwv.dicom.checkUnknownVR = function (element) {
  */
 dwv.dicom.getDicomElement = function (tagName) {
   var tag = dwv.dicom.getTagFromDictionary(tagName);
-  // return element definition
   return {
-    tag: {group: tag.getGroup(), element: tag.getElement()},
+    tag: tag,
     vr: tag.getVrFromDictionary()
   };
 };
@@ -833,8 +811,7 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           subSize += dwv.dicom.setElementValue(
             subElement, itemData[elemKeys[j]]);
 
-          name = new dwv.dicom.Tag(
-            subElement.tag.group, subElement.tag.element).getKey();
+          name = subElement.tag.getKey();
           itemElements[name] = subElement;
           subSize += dwv.dicom.getDataElementPrefixByteSize(
             subElement.vr, isImplicit);
@@ -842,26 +819,24 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
         // item (after elements to get the size)
         var itemElement = {
-          tag: {group: '0xFFFE', element: '0xE000'},
+          tag: dwv.dicom.getItemTag(),
           vr: 'NONE',
           vl: (explicitLength ? subSize : 'u/l'),
           value: []
         };
-        name = new dwv.dicom.Tag(
-          itemElement.tag.group, itemElement.tag.element).getKey();
+        name = itemElement.tag.getKey();
         itemElements[name] = itemElement;
         subSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
 
         // item delimitation
         if (!explicitLength) {
           var itemDelimElement = {
-            tag: {group: '0xFFFE', element: '0xE00D'},
+            tag: dwv.dicom.getItemDelimitationItemTag(),
             vr: 'NONE',
             vl: 0,
             value: []
           };
-          name = new dwv.dicom.Tag(
-            itemDelimElement.tag.group, itemDelimElement.tag.element).getKey();
+          name = itemDelimElement.tag.getKey();
           itemElements[name] = itemDelimElement;
           subSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
         }
@@ -980,9 +955,8 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
     dicomElement.startOffset = offset;
     offset += size;
     dicomElement.endOffset = offset;
-    // create the tag group/element key
-    name = new dwv.dicom.Tag(
-      dicomElement.tag.group, dicomElement.tag.element).getKey();
+    // get the tag group/element key
+    name = dicomElement.tag.getKey();
     // store
     dicomElements[name] = dicomElement;
   }

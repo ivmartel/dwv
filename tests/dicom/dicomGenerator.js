@@ -124,7 +124,7 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
   var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    tag: {group: '0x7FE0', element: '0x0010'},
+    tag: dwv.dicom.getPixelDataTag(),
     vr: vr,
     vl: pixVL,
     value: pixels,
