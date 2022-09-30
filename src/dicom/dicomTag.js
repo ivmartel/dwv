@@ -10,6 +10,18 @@ dwv.dicom = dwv.dicom || {};
  * @param {string} element The tag element as '0x####'.
  */
 dwv.dicom.Tag = function (group, element) {
+  if (!group || typeof group === 'undefined') {
+    throw new Error('Cannot create tag with no group.');
+  }
+  if (group.length !== 6 || !group.startsWith('0x')) {
+    throw new Error('Cannot create tag with badly formed group.');
+  }
+  if (!element || typeof element === 'undefined') {
+    throw new Error('Cannot create tag with no element.');
+  }
+  if (element.length !== 6 || !element.startsWith('0x')) {
+    throw new Error('Cannot create tag with badly formed element.');
+  }
   /**
    * Get the tag group.
    *
@@ -36,23 +48,9 @@ dwv.dicom.Tag = function (group, element) {
  */
 dwv.dicom.Tag.prototype.equals = function (rhs) {
   return rhs !== null &&
+    typeof rhs !== 'undefined' &&
     this.getGroup() === rhs.getGroup() &&
     this.getElement() === rhs.getElement();
-};
-
-/**
- * Check for Tag equality.
- *
- * @param {object} rhs The other tag to compare to provided as a simple object.
- * @returns {boolean} True if both tags are equal.
- */
-dwv.dicom.Tag.prototype.equals2 = function (rhs) {
-  if (rhs === null ||
-    typeof rhs.group === 'undefined' ||
-    typeof rhs.element === 'undefined') {
-    return false;
-  }
-  return this.equals(new dwv.dicom.Tag(rhs.group, rhs.element));
 };
 
 /**
@@ -94,7 +92,9 @@ dwv.dicom.Tag.prototype.getGroupName = function () {
  * @returns {object} The DICOM tag.
  */
 dwv.dicom.getTagFromKey = function (key) {
-  return new dwv.dicom.Tag(key.substring(1, 5), key.substring(5, 9));
+  return new dwv.dicom.Tag(
+    '0x' + key.substring(1, 5),
+    '0x' + key.substring(5, 9));
 };
 
 /**

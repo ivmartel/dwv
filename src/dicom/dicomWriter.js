@@ -617,9 +617,9 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   for (var i = 0, leni = keys.length; i < leni; ++i) {
     element = this.getElementToWrite(dicomElements[keys[i]]);
     if (element !== null &&
-       !fmiglTag.equals2(element.tag) &&
-       !icUIDTag.equals2(element.tag) &&
-       !ivnTag.equals2(element.tag)) {
+       !fmiglTag.equals(element.tag) &&
+       !icUIDTag.equals(element.tag) &&
+       !ivnTag.equals(element.tag)) {
       localSize = 0;
 
       // XB7 2020-04-17
