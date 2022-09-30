@@ -545,47 +545,14 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset) {
 };
 
 /**
- * Read an explicit item data element.
+ * Read an item data element.
  *
  * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
  * @param {boolean} implicit Is the DICOM VR implicit?
  * @returns {object} The item data as a list of data elements.
  */
-dwv.dicom.DicomParser.prototype.readExplicitItemDataElement = function (
-  reader, offset, implicit) {
-  var itemData = {};
-
-  // read the first item
-  var item = this.readDataElement(reader, offset, implicit);
-  offset = item.endOffset;
-  itemData[item.tag.getKey()] = item;
-
-  // read until the end offset
-  var endOffset = offset;
-  offset -= item.vl;
-  while (offset < endOffset) {
-    item = this.readDataElement(reader, offset, implicit);
-    offset = item.endOffset;
-    itemData[item.tag.getKey()] = item;
-  }
-
-  return {
-    data: itemData,
-    endOffset: offset,
-    isSeqDelim: false
-  };
-};
-
-/**
- * Read an implicit item data element.
- *
- * @param {dwv.dicom.DataReader} reader The raw data reader.
- * @param {number} offset The offset where to start to read.
- * @param {boolean} implicit Is the DICOM VR implicit?
- * @returns {object} The item data as a list of data elements.
- */
-dwv.dicom.DicomParser.prototype.readImplicitItemDataElement = function (
+dwv.dicom.DicomParser.prototype.readItemDataElement = function (
   reader, offset, implicit) {
   var itemData = {};
 
@@ -605,14 +572,25 @@ dwv.dicom.DicomParser.prototype.readImplicitItemDataElement = function (
   // store item
   itemData[item.tag.getKey()] = item;
 
-  // read until the item delimitation item
-  var isItemDelim = false;
-  while (!isItemDelim) {
-    item = this.readDataElement(reader, offset, implicit);
-    offset = item.endOffset;
-    isItemDelim = dwv.dicom.isItemDelimitationItemTag(item.tag);
-    if (!isItemDelim) {
+  if (item.vl !== 'u/l') {
+    // explicit VR item: read until the end offset
+    var endOffset = offset;
+    offset -= item.vl;
+    while (offset < endOffset) {
+      item = this.readDataElement(reader, offset, implicit);
+      offset = item.endOffset;
       itemData[item.tag.getKey()] = item;
+    }
+  } else {
+    // implicit VR item: read until the item delimitation item
+    var isItemDelim = false;
+    while (!isItemDelim) {
+      item = this.readDataElement(reader, offset, implicit);
+      offset = item.endOffset;
+      isItemDelim = dwv.dicom.isItemDelimitationItemTag(item.tag);
+      if (!isItemDelim) {
+        itemData[item.tag.getKey()] = item;
+      }
     }
   }
 
@@ -740,23 +718,21 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     data = [];
     var itemData;
     if (vlString !== 'u/l') {
-      // explicit VR sequence
       if (vl !== 0) {
-        // read until the end offset
+        // explicit VR sequence: read until the end offset
         var sqEndOffset = offset + vl;
         while (offset < sqEndOffset) {
-          itemData = this.readExplicitItemDataElement(reader, offset, implicit);
+          itemData = this.readItemDataElement(reader, offset, implicit);
           data.push(itemData.data);
           offset = itemData.endOffset;
         }
         endOffset = offset;
       }
     } else {
-      // implicit VR sequence
-      // read until the sequence delimitation item
+      // implicit VR sequence: read until the sequence delimitation item
       var isSeqDelim = false;
       while (!isSeqDelim) {
-        itemData = this.readImplicitItemDataElement(reader, offset, implicit);
+        itemData = this.readItemDataElement(reader, offset, implicit);
         isSeqDelim = itemData.isSeqDelim;
         offset = itemData.endOffset;
         // do not store the delimitation item
