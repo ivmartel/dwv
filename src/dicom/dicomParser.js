@@ -629,6 +629,8 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (
     offset = item.endOffset;
     isSeqDelim = dwv.dicom.isSequenceDelimitationItemTag(item.tag);
     if (!isSeqDelim) {
+      // force pixel item vr to OB
+      item.vr = 'OB';
       itemData.push(item);
     }
   }
