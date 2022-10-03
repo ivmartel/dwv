@@ -373,8 +373,7 @@ dwv.dicom.guessTransferSyntax = function (firstDataElement) {
     tag: {
       group: '0x0002',
       element: '0x0010',
-      name: 'x00020010',
-      endOffset: 4
+      name: 'x00020010'
     },
     vr: 'UI'
   };
