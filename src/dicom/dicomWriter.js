@@ -329,8 +329,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
     // item element (create new to not modify original)
     var implicitLength = item.xFFFEE000.vl === 'u/l';
     var itemElement = {
-      tag: item.xFFFEE000.tag,
-      vr: item.xFFFEE000.vr,
+      tag: dwv.dicom.getItemTag(),
+      vr: 'NONE',
       vl: implicitLength ? 0xffffffff : item.xFFFEE000.vl,
       value: []
     };
@@ -483,7 +483,7 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
     // first item: basic offset table
     item.xFFFEE000 = {
       tag: dwv.dicom.getItemTag(),
-      vr: 'UN',
+      vr: 'NONE',
       vl: 0,
       value: []
     };

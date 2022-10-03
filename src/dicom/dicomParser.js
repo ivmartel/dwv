@@ -569,8 +569,12 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (
     };
   }
 
-  // store item
-  itemData[item.tag.getKey()] = item;
+  // store item (mainly to keep vl)
+  itemData[item.tag.getKey()] = {
+    tag: item.tag,
+    vr: 'NONE',
+    vl: item.vl
+  };
 
   if (item.vl !== 'u/l') {
     // explicit VR item: read until the end offset
@@ -675,7 +679,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       }
     }
   } else {
-    vr = 'UN';
+    vr = 'NONE';
     is32bitVLVR = true;
   }
 
@@ -905,6 +909,9 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     }
     // remove non parsed elements
     delete element.items;
+  } else if (vr === 'NONE') {
+    // no VR -> no data
+    data = [];
   } else {
     dwv.logger.warn('Unknown VR: ' + vr);
   }
