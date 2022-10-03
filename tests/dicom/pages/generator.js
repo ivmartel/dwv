@@ -8,19 +8,6 @@ var _images = null;
 var _generating = false;
 
 /**
- * @returns {string} The name of the selected pixel generator.
- */
-function getPixelGeneratorName() {
-  var tags = JSON.parse(document.getElementById('tags').value);
-  // optional pixel generator (cannot be propagated)
-  var pixelGeneratorName = 'mpr';
-  if (typeof tags.PixelData !== 'undefined') {
-    pixelGeneratorName = tags.PixelData;
-  }
-  return pixelGeneratorName;
-}
-
-/**
  * Generate DICOM data
  */
 dwv.test.onGenerate = function () {
@@ -32,7 +19,6 @@ dwv.test.onGenerate = function () {
   if (!isValidTags()) {
     return;
   }
-  var pixelGeneratorName = getPixelGeneratorName();
 
   var zip = new JSZip();
 
@@ -42,7 +28,7 @@ dwv.test.onGenerate = function () {
   var blob;
   for (var k = 0; k < numberOfSlices; ++k) {
     try {
-      blob = generateSlice(pixelGeneratorName, k);
+      blob = generateSlice(k);
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -75,19 +61,25 @@ dwv.test.onGenerate = function () {
 
 /**
  *
- * @param {string} pixelGeneratorName The name of the pixel generator.
  * @param {number} sliceNumber The slice to generate.
  * @returns {Blob} A blob with the slice DICOM data.
  */
-function generateSlice(pixelGeneratorName, sliceNumber) {
+function generateSlice(sliceNumber) {
   var numberOfSlices = document.getElementById('numberofslices').value;
 
   // get tags from the textarea
   var tags = JSON.parse(document.getElementById('tags').value);
-  // remove extra
+
+  // optional pixel generator json
+  // TODO: make it an html option
+  var pixelGeneratorName = tags.PixelData;
   delete tags.PixelData;
+
   // image position
-  var spacing = tags.PixelSpacing[0];
+  var spacing = 1;
+  if (typeof tags.PixelSpacing !== 'undefined') {
+    spacing = tags.PixelSpacing[0];
+  }
   tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
   // instance number
   tags.InstanceNumber = sliceNumber.toString();
