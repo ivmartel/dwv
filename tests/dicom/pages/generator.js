@@ -91,11 +91,10 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   // instance number
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
-  var res = dwv.dicom.getElementsFromJSONTags(tags);
-  var dicomElements = res.elements;
+  var dicomElements = dwv.dicom.getElementsFromJSONTags(tags);
   // pixels
   dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(
-    tags, res.offset, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
+    tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
 
   // create writer
   var writer = new dwv.dicom.DicomWriter();

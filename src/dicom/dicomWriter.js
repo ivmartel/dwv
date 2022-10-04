@@ -951,17 +951,12 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
   var dicomElements = {};
   var dicomElement;
   var name;
-  var offset = 128 + 4; // preamble
   var size;
   for (var k = 0, len = keys.length; k < len; ++k) {
     // get the DICOM element definition from its name
     dicomElement = dwv.dicom.getDicomElement(keys[k]);
     // set its value
     size = dwv.dicom.setElementValue(dicomElement, tags[keys[k]], isImplicit);
-    // set offsets
-    offset += dwv.dicom.getDataElementPrefixByteSize(
-      dicomElement.vr, isImplicit);
-    offset += size;
     dicomElement.vl = size;
     // get the tag group/element key
     name = dicomElement.tag.getKey();
@@ -969,5 +964,5 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
     dicomElements[name] = dicomElement;
   }
   // return
-  return {elements: dicomElements, offset: offset};
+  return dicomElements;
 };

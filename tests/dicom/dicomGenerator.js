@@ -10,7 +10,6 @@ dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
  * Get the DICOM pixel data from a DICOM tags object.
  *
  * @param {object} tags The DICOM tags object.
- * @param {object} startOffset The start offset of the pixel data.
  * @param {string} pixGeneratorName The name of a pixel generator.
  * @param {number} sliceNumber The slice number.
  * @param {Array} images The images to pass to the generator.
@@ -18,7 +17,7 @@ dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
  * @returns {object} The DICOM pixel data element.
  */
 dwv.dicom.generatePixelDataFromJSONTags = function (
-  tags, startOffset, pixGeneratorName, sliceNumber, images, numberOfSlices) {
+  tags, pixGeneratorName, sliceNumber, images, numberOfSlices) {
 
   // default
   if (typeof pixGeneratorName === 'undefined') {
@@ -127,9 +126,7 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
     tag: dwv.dicom.getPixelDataTag(),
     vr: vr,
     vl: pixVL,
-    value: pixels,
-    startOffset: startOffset,
-    endOffset: startOffset + pixVL
+    value: pixels
   };
 };
 
