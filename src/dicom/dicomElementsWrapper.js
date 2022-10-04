@@ -193,7 +193,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
     dicomElement.value.length === 1 && dicomElement.value[0] === '') {
     str += '(no value available)';
   } else if (dwv.dicom.isPixelDataTag(dicomElement.tag) &&
-    dicomElement.vl === 'u/l') {
+    dicomElement.undefinedLength) {
     str = '(PixelSequence)';
   } else if (dicomElement.vr === 'DA' && pretty) {
     var daValue = dicomElement.value[0];
@@ -311,7 +311,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   }
 
   var isPixSequence = (dwv.dicom.isPixelDataTag(dicomElement.tag) &&
-    dicomElement.vl === 'u/l');
+    dicomElement.undefinedLength);
 
   var line = null;
 
@@ -339,7 +339,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       line += ' (PixelSequence #=' + deSize + ')';
     } else if (dicomElement.vr === 'SQ') {
       line += ' (Sequence with';
-      if (dicomElement.vl === 'u/l') {
+      if (dicomElement.undefinedLength) {
         line += ' undefined';
       } else {
         line += ' explicit';
@@ -406,7 +406,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       // get the item element
       var itemElement = item.xFFFEE000;
       message = '(Item with';
-      if (itemElement.vl === 'u/l') {
+      if (itemElement.undefinedLength) {
         message += ' undefined';
       } else {
         message += ' explicit';
@@ -426,7 +426,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       }
 
       message = '(ItemDelimitationItem';
-      if (itemElement.vl !== 'u/l') {
+      if (!itemElement.undefinedLength) {
         message += ' for re-encoding';
       }
       message += ')';
@@ -442,7 +442,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
     }
 
     message = '(SequenceDelimitationItem';
-    if (dicomElement.vl !== 'u/l') {
+    if (!dicomElement.undefinedLength) {
       message += ' for re-encod.';
     }
     message += ')';

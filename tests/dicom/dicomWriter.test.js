@@ -253,7 +253,7 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
       var subKeys = Object.keys(jsonTags[tagName]);
       var index = 0;
       for (var sk = 0; sk < subKeys.length; ++sk) {
-        if (subKeys[sk] !== 'explicitLength') {
+        if (subKeys[sk] !== 'undefinedLength') {
           var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
           dwv.test.compare(
             jsonTags[tagName][subKeys[sk]], wrap, name, comparator);

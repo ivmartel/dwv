@@ -150,9 +150,12 @@ dwv.dicom.padElementValue = function (element, value) {
  * @returns {boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthSequence = function (element) {
+  var undefinedLength = false;
+  if (typeof element.undefinedLength !== 'undefined') {
+    undefinedLength = element.undefinedLength;
+  }
   // sequence with no length
-  return (element.vr === 'SQ') &&
-        (element.vl === 'u/l');
+  return (element.vr === 'SQ') && undefinedLength;
 };
 
 /**
@@ -162,8 +165,12 @@ dwv.dicom.isImplicitLengthSequence = function (element) {
  * @returns {boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthItem = function (element) {
+  var undefinedLength = false;
+  if (typeof element.undefinedLength !== 'undefined') {
+    undefinedLength = element.undefinedLength;
+  }
   // item with no length
-  return dwv.dicom.isItemTag(element.tag) && element.vl === 'u/l';
+  return dwv.dicom.isItemTag(element.tag) && undefinedLength;
 };
 
 /**
@@ -173,8 +180,12 @@ dwv.dicom.isImplicitLengthItem = function (element) {
  * @returns {boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthPixels = function (element) {
+  var undefinedLength = false;
+  if (typeof element.undefinedLength !== 'undefined') {
+    undefinedLength = element.undefinedLength;
+  }
   // pixel data with no length
-  return dwv.dicom.isPixelDataTag(element.tag) && element.vl === 'u/l';
+  return dwv.dicom.isPixelDataTag(element.tag) && undefinedLength;
 };
 
 /**
@@ -235,14 +246,12 @@ dwv.dicom.DicomWriter = function () {
     clear: function (item) {
       item.value[0] = '';
       item.vl = 0;
-      item.endOffset = item.startOffset;
       return item;
     },
     replace: function (item, value) {
       var paddedValue = dwv.dicom.padElementValue(item, value);
       item.value[0] = paddedValue;
       item.vl = paddedValue.length;
-      item.endOffset = item.startOffset + paddedValue.length;
       return item;
     }
   };
@@ -327,11 +336,14 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
       continue;
     }
     // item element (create new to not modify original)
-    var implicitLength = item.xFFFEE000.vl === 'u/l';
+    var undefinedLength = false;
+    if (typeof item.xFFFEE000.undefinedLength !== 'undefined') {
+      undefinedLength = item.xFFFEE000.undefinedLength;
+    }
     var itemElement = {
       tag: dwv.dicom.getItemTag(),
       vr: 'NONE',
-      vl: implicitLength ? 0xffffffff : item.xFFFEE000.vl,
+      vl: undefinedLength ? 0xffffffff : item.xFFFEE000.vl,
       value: []
     };
     byteOffset = this.writeDataElement(
@@ -344,7 +356,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
       }
     }
     // item delimitation
-    if (implicitLength) {
+    if (undefinedLength) {
       var itemDelimElement = {
         tag: dwv.dicom.getItemDelimitationItemTag(),
         vr: 'NONE',
@@ -543,8 +555,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
   // update vl for sequence or item with implicit length
   var vl = element.vl;
   if (dwv.dicom.isImplicitLengthSequence(element) ||
-        dwv.dicom.isImplicitLengthItem(element) ||
-        dwv.dicom.isImplicitLengthPixels(element)) {
+    dwv.dicom.isImplicitLengthItem(element) ||
+    dwv.dicom.isImplicitLengthPixels(element)) {
     vl = 0xffffffff;
   }
   // VL
@@ -571,7 +583,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
 
   // sequence delimitation item for sequence with implicit length
   if (dwv.dicom.isImplicitLengthSequence(element) ||
-         dwv.dicom.isImplicitLengthPixels(element)) {
+    dwv.dicom.isImplicitLengthPixels(element)) {
     var seqDelimElement = {
       tag: dwv.dicom.getSequenceDelimitationItemTag(),
       vr: 'NONE',
@@ -641,8 +653,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       }
 
       // value
-      var realVl = element.endOffset - element.startOffset;
-      localSize += parseInt(realVl, 10);
+      localSize += element.vl;
 
       // sort elements
       if (groupName === 'Meta Element') {
@@ -783,11 +794,11 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
       var sqItems = [];
       var name;
 
-      // explicit or implicit length
-      var explicitLength = true;
-      if (typeof value.explicitLength !== 'undefined') {
-        explicitLength = value.explicitLength;
-        delete value.explicitLength;
+      // explicit or undefined length
+      var undefinedLength = false;
+      if (typeof value.undefinedLength !== 'undefined') {
+        undefinedLength = value.undefinedLength;
+        delete value.undefinedLength;
       }
 
       // items
@@ -821,7 +832,8 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
         var itemElement = {
           tag: dwv.dicom.getItemTag(),
           vr: 'NONE',
-          vl: (explicitLength ? subSize : 'u/l'),
+          vl: subSize,
+          undefinedLength: undefinedLength,
           value: []
         };
         name = itemElement.tag.getKey();
@@ -829,7 +841,7 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
         subSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
 
         // item delimitation
-        if (!explicitLength) {
+        if (undefinedLength) {
           var itemDelimElement = {
             tag: dwv.dicom.getItemDelimitationItemTag(),
             vr: 'NONE',
@@ -846,16 +858,13 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
       }
 
       // add sequence delimitation size
-      if (!explicitLength) {
+      if (undefinedLength) {
         size += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
       }
 
       element.value = sqItems;
-      if (explicitLength) {
-        element.vl = size;
-      } else {
-        element.vl = 'u/l';
-      }
+      element.vl = size;
+      element.undefinedLength = undefinedLength;
     }
   } else {
     // set the value and calculate size
@@ -952,9 +961,8 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
     // set offsets
     offset += dwv.dicom.getDataElementPrefixByteSize(
       dicomElement.vr, isImplicit);
-    dicomElement.startOffset = offset;
     offset += size;
-    dicomElement.endOffset = offset;
+    dicomElement.vl = size;
     // get the tag group/element key
     name = dicomElement.tag.getKey();
     // store

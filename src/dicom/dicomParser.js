@@ -572,10 +572,11 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (
   itemData[item.tag.getKey()] = {
     tag: item.tag,
     vr: 'NONE',
-    vl: item.vl
+    vl: item.vl,
+    undefinedLength: item.undefinedLength
   };
 
-  if (item.vl !== 'u/l') {
+  if (!item.undefinedLength) {
     // explicit VR item: read until the end offset
     var endOffset = offset;
     offset -= item.vl;
@@ -695,9 +696,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
   }
 
   // check the value of VL
-  var vlString = vl;
+  var undefinedLength = false;
   if (vl === 0xffffffff) {
-    vlString = 'u/l';
+    undefinedLength = true;
     vl = 0;
   }
 
@@ -711,18 +712,19 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
 
   // read sequence elements
   var data = null;
-  if (dwv.dicom.isPixelDataTag(tag) && vlString === 'u/l') {
+  if (dwv.dicom.isPixelDataTag(tag) && undefinedLength) {
     // pixel data sequence (implicit)
     var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
     offset = pixItemData.endOffset;
     startOffset += pixItemData.offsetTableVl;
     data = pixItemData.data;
     endOffset = offset;
+    vl = offset - startOffset;
   } else if (vr === 'SQ') {
     // sequence
     data = [];
     var itemData;
-    if (vlString !== 'u/l') {
+    if (!undefinedLength) {
       if (vl !== 0) {
         // explicit VR sequence: read until the end offset
         var sqEndOffset = offset + vl;
@@ -732,6 +734,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
           offset = itemData.endOffset;
         }
         endOffset = offset;
+        vl = offset - startOffset;
       }
     } else {
       // implicit VR sequence: read until the sequence delimitation item
@@ -746,6 +749,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
         }
       }
       endOffset = offset;
+      vl = offset - startOffset;
     }
   }
 
@@ -753,7 +757,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
   var element = {
     tag: tag,
     vr: vr,
-    vl: vlString,
+    vl: vl,
+    undefinedLength: undefinedLength,
     startOffset: startOffset,
     endOffset: endOffset
   };
@@ -785,7 +790,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
   var data = null;
   var isPixelDataTag = dwv.dicom.isPixelDataTag(tag);
   var vrType = dwv.dicom.vrTypes[vr];
-  if (isPixelDataTag && vl === 'u/l') {
+  if (isPixelDataTag && element.undefinedLength) {
     // implicit pixel data sequence
     data = [];
     for (var j = 0; j < element.items.length; ++j) {
@@ -940,6 +945,9 @@ dwv.dicom.DicomParser.prototype.interpret = function (
       element.value = this.interpretElement(
         element, reader, pixelRepresentation, bitsAllocated);
     }
+    // delete interpretation specific properties
+    delete element.startOffset;
+    delete element.endOffset;
   }
 };
 
@@ -1097,7 +1105,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
   // (third note, "Depending on the transfer syntax...")
   dataElement = this.dicomElements.x7FE00010;
   if (typeof dataElement !== 'undefined') {
-    if (dataElement.vl === 'u/l') {
+    if (dataElement.undefinedLength) {
       var numberOfFrames = 1;
       if (typeof this.dicomElements.x00280008 !== 'undefined') {
         numberOfFrames = dwv.dicom.cleanString(

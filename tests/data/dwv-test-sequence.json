@@ -11,8 +11,8 @@
   "BitsAllocated": 16,
   "BitsStored": 12,
   "HighBit": 11,
-  "ReferencedImageSequence": { 
-    "explicitLength": true,
+  "ReferencedImageSequence": {
+    "undefinedLength": false,
     "item0": {
       "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
       "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
@@ -23,8 +23,8 @@
     },
     "item2": {}
   },
-  "SourceImageSequence": { 
-    "explicitLength": false,
+  "SourceImageSequence": {
+    "undefinedLength": true,
     "item0": {
       "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
       "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
@@ -38,41 +38,41 @@
   "ReferencedPatientSequence": {},
   "ReferencedOverlaySequence": 0,
   "ReferringPhysicianIdentificationSequence": {
-    "explicitLength": true,
+    "undefinedLength": false,
     "item0": {}
   },
   "ConsultingPhysicianIdentificationSequence": {
-    "explicitLength": false,
-    "item0": 0 
+    "undefinedLength": true,
+    "item0": 0
   },
   "ReferencedStudySequence": {
-    "explicitLength": true,
+    "undefinedLength": false,
     "item0": {
       "PurposeOfReferenceCodeSequence": {
         "item0": {
           "CodeValue": "123456"
-        }  
+        }
       }
     }
   },
   "ReferencedSeriesSequence": {
-    "explicitLength": false,
+    "undefinedLength": true,
     "item0": {
       "PurposeOfReferenceCodeSequence": {
         "item0": {
           "CodeValue": "789101"
-        }  
+        }
       }
     }
   },
   "ReferencedInstanceSequence": {
-    "explicitLength": true,
+    "undefinedLength": false,
     "item0": {
       "PurposeOfReferenceCodeSequence": {}
     }
   },
   "ReferencedVisitSequence": {
-    "explicitLength": false,
+    "undefinedLength": true,
     "item0": {
       "PurposeOfReferenceCodeSequence": 0
     }
