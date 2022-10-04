@@ -144,51 +144,6 @@ dwv.dicom.padElementValue = function (element, value) {
 };
 
 /**
- * Is this element an implicit length sequence?
- *
- * @param {object} element The element to check.
- * @returns {boolean} True if it is.
- */
-dwv.dicom.isImplicitLengthSequence = function (element) {
-  var undefinedLength = false;
-  if (typeof element.undefinedLength !== 'undefined') {
-    undefinedLength = element.undefinedLength;
-  }
-  // sequence with no length
-  return (element.vr === 'SQ') && undefinedLength;
-};
-
-/**
- * Is this element an implicit length item?
- *
- * @param {object} element The element to check.
- * @returns {boolean} True if it is.
- */
-dwv.dicom.isImplicitLengthItem = function (element) {
-  var undefinedLength = false;
-  if (typeof element.undefinedLength !== 'undefined') {
-    undefinedLength = element.undefinedLength;
-  }
-  // item with no length
-  return dwv.dicom.isItemTag(element.tag) && undefinedLength;
-};
-
-/**
- * Is this element an implicit length pixel data?
- *
- * @param {object} element The element to check.
- * @returns {boolean} True if it is.
- */
-dwv.dicom.isImplicitLengthPixels = function (element) {
-  var undefinedLength = false;
-  if (typeof element.undefinedLength !== 'undefined') {
-    undefinedLength = element.undefinedLength;
-  }
-  // pixel data with no length
-  return dwv.dicom.isPixelDataTag(element.tag) && undefinedLength;
-};
-
-/**
  * Helper method to flatten an array of typed arrays to 2D typed array
  *
  * @param {Array} initialArray array of typed arrays
@@ -552,11 +507,23 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
     }
   }
 
-  // update vl for sequence or item with implicit length
+  var undefinedLengthSequence = false;
+  if (element.vr === 'SQ' ||
+    dwv.dicom.isPixelDataTag(element.tag)) {
+    if (typeof element.undefinedLength !== 'undefined') {
+      undefinedLengthSequence = element.undefinedLength;
+    }
+  }
+  var undefinedLengthItem = false;
+  if (dwv.dicom.isItemTag(element.tag)) {
+    if (typeof element.undefinedLength !== 'undefined') {
+      undefinedLengthItem = element.undefinedLength;
+    }
+  }
+
+  // update vl for sequence or item with undefined length
   var vl = element.vl;
-  if (dwv.dicom.isImplicitLengthSequence(element) ||
-    dwv.dicom.isImplicitLengthItem(element) ||
-    dwv.dicom.isImplicitLengthPixels(element)) {
+  if (undefinedLengthSequence || undefinedLengthItem) {
     vl = 0xffffffff;
   }
   // VL
@@ -581,9 +548,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
       writer, element.vr, element.vl, byteOffset, value, isImplicit);
   }
 
-  // sequence delimitation item for sequence with implicit length
-  if (dwv.dicom.isImplicitLengthSequence(element) ||
-    dwv.dicom.isImplicitLengthPixels(element)) {
+  // sequence delimitation item for sequence with undefined length
+  if (undefinedLengthSequence) {
     var seqDelimElement = {
       tag: dwv.dicom.getSequenceDelimitationItemTag(),
       vr: 'NONE',
