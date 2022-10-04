@@ -758,10 +758,13 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     tag: tag,
     vr: vr,
     vl: vl,
-    undefinedLength: undefinedLength,
     startOffset: startOffset,
     endOffset: endOffset
   };
+  // only set if true (only for sequences and items)
+  if (undefinedLength) {
+    element.undefinedLength = undefinedLength;
+  }
   if (data) {
     element.items = data;
   }
