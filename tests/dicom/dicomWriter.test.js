@@ -196,29 +196,6 @@ QUnit.test('Test patient anonymisation', function (assert) {
 });
 
 /**
- * Get a string representation of an object.
- * TypedArray.toString can return '[object Uint8Array]' on old browsers
- * (such as in PhantomJs).
- *
- * @param {object} obj The input object
- * @returns {string} The string.
- */
-dwv.test.toString = function (obj) {
-  var res = obj.toString();
-  if (res.substring(0, 7) === '[object' &&
-    res.substring(-6) === 'Array]') {
-    res = '';
-    for (var i = 0; i < obj.length; ++i) {
-      res += obj[i];
-      if (i !== obj.length - 1) {
-        res += ',';
-      }
-    }
-  }
-  return res;
-};
-
-/**
  * Compare JSON tags and DICOM elements
  *
  * @param {object} jsonTags The JSON tags.
@@ -240,24 +217,31 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
     var element = dicomElements.getDEFromKey(tagKey);
     var value = dicomElements.getFromKey(tagKey, true);
     if (element.vr !== 'SQ') {
+      var jsonTag = jsonTags[tagName];
+      // stringify possible array of numbers
+      if (value.length !== 1) {
+        jsonTag = jsonTag.join();
+      }
       comparator.equal(
-        dwv.test.toString(value),
-        jsonTags[tagName],
+        dwv.dicom.cleanString(value.join()),
+        jsonTag,
         name + ' - ' + tagName);
     } else {
       // check content
       if (jsonTags[tagName] === null || jsonTags[tagName] === 0) {
         continue;
       }
+      var sqValue = jsonTags[tagName].value;
+      if (typeof sqValue === 'undefined' ||
+      sqValue === null) {
+        continue;
+      }
       // supposing same order of subkeys and indices...
-      var subKeys = Object.keys(jsonTags[tagName]);
-      var index = 0;
-      for (var sk = 0; sk < subKeys.length; ++sk) {
-        if (subKeys[sk] !== 'undefinedLength') {
-          var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
+      for (var i = 0; i < sqValue.length; ++i) {
+        if (sqValue[i] !== 'undefinedLength') {
+          var wrap = new dwv.dicom.DicomElementsWrapper(value[i]);
           dwv.test.compare(
-            jsonTags[tagName][subKeys[sk]], wrap, name, comparator);
-          ++index;
+            sqValue[i], wrap, name, comparator);
         }
       }
     }
@@ -284,8 +268,11 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
     }
   }
+  // pass tags clone to avoid modifications (for ex by padElement)
+  // TODO: find another way
+  var jsonTags = JSON.parse(JSON.stringify(config.tags));
   // convert JSON to DICOM element object
-  var dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
+  var dicomElements = dwv.dicom.getElementsFromJSONTags(jsonTags);
   // pixels: small gradient square
   dicomElements.x7FE00010 =
     dwv.dicom.generatePixelDataFromJSONTags(config.tags);
