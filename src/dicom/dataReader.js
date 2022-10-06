@@ -107,6 +107,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Read Int16 (2 bytes) data.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @returns {number} The read data.
+   */
+  this.readInt16 = function (byteOffset) {
+    return view.getInt16(byteOffset, isLittleEndian);
+  };
+
+  /**
    * Read Uint32 (4 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
