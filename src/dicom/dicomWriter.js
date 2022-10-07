@@ -432,7 +432,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
   if (vr !== 'SQ' && vr !== 'NONE') {
     var diff = byteOffset - startOffset;
     if (diff !== vl) {
-      dwv.logger.warn('Offset difference and VL are not equal', diff, vl, vr);
+      dwv.logger.warn('Offset difference and VL are not equal: ' +
+        diff + ' != ' + vl + ', vr:' + vr);
     }
   }
 
