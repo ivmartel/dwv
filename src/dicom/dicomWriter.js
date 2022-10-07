@@ -912,8 +912,13 @@ dwv.dicom.setElementValue = function (
         (element.vr === 'OB' || element.vr === 'OW' || element.vr === 'ox')) {
         // use bitsAllocated for pixel data
         // no need to multiply for 8 bits
-        if (typeof bitsAllocated !== 'undefined' && bitsAllocated === 16) {
+        if (typeof bitsAllocated !== 'undefined') {
+          if (bitsAllocated === 1) {
+            // binary data
+            size /= 8;
+          } else if (bitsAllocated === 16) {
           size *= Uint16Array.BYTES_PER_ELEMENT;
+          }
         }
       } else if (typeof vrType !== 'undefined') {
         var bpe = dwv.dicom.getBpeForVrType(vrType);
