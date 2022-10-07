@@ -917,7 +917,7 @@ dwv.dicom.setElementValue = function (
             // binary data
             size /= 8;
           } else if (bitsAllocated === 16) {
-          size *= Uint16Array.BYTES_PER_ELEMENT;
+            size *= Uint16Array.BYTES_PER_ELEMENT;
           }
         }
       } else if (typeof vrType !== 'undefined') {
