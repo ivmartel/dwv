@@ -679,7 +679,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   // create the FileMetaInformationGroupLength element
   var fmigl = dwv.dicom.getDicomElement('FileMetaInformationGroupLength');
   var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, isImplicit);
-  fmiglSize += dwv.dicom.setElementValue(fmigl, [metaLength], false);
+  fmiglSize += dwv.dicom.setElementValue(
+    fmigl, new Uint32Array([metaLength]), false);
 
   // add its size to the total one
   totalSize += fmiglSize;
