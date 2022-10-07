@@ -138,9 +138,12 @@ dwv.dicom.padElementValue = function (element, value) {
     dwv.dicom.isVrToPad(element.vr)) {
     // calculate size
     var size = 0;
-    if (element.vr === 'OB' && value[0] instanceof Uint8Array) {
+    if (element.vr === 'OB' &&
+      typeof value[0].length !== 'undefined') {
       // pixel data comes as an array of typedArray
-      size = value[0].length;
+      for (var i = 0; i < value.length; ++i) {
+        size += value[i].length;
+      }
     } else {
       size = value.join('').length;
     }
@@ -347,6 +350,8 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
 dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
   writer, vr, vl, byteOffset, value, isImplicit) {
 
+  var startOffset = byteOffset;
+
   if (vr === 'NONE') {
     // nothing to do!
   } else if (value instanceof Uint8Array) {
@@ -423,6 +428,14 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
       dwv.logger.warn('Unknown VR: ' + vr);
     }
   }
+
+  if (vr !== 'SQ' && vr !== 'NONE') {
+    var diff = byteOffset - startOffset;
+    if (diff !== vl) {
+      dwv.logger.warn('Offset difference and VL are not equal', diff, vl, vr);
+    }
+  }
+
   // return new offset
   return byteOffset;
 };
@@ -577,13 +590,11 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
  * @returns {ArrayBuffer} The elements as a buffer.
  */
 dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
-  // array keys
-  var keys = Object.keys(dicomElements);
-
   // transfer syntax
   var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
   var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
   var isBigEndian = dwv.dicom.isBigEndianTransferSyntax(syntax);
+  var bitsAllocated = dicomElements.x00280100.value[0];
 
   // calculate buffer size and split elements (meta and non meta)
   var totalSize = 128 + 4; // DICM
@@ -598,6 +609,9 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var icUIDTag = new dwv.dicom.Tag('0x0002', '0x0012');
   // ImplementationVersionName
   var ivnTag = new dwv.dicom.Tag('0x0002', '0x0013');
+
+  // loop through elements to get the buffer size
+  var keys = Object.keys(dicomElements);
   for (var i = 0, leni = keys.length; i < leni; ++i) {
     element = this.getElementToWrite(dicomElements[keys[i]]);
     if (element !== null &&
@@ -614,7 +628,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       dwv.dicom.checkUnknownVR(element);
 
       // update value and vl
-      dwv.dicom.setElementValue(element, element.value, isImplicit);
+      dwv.dicom.setElementValue(
+        element, element.value, isImplicit, bitsAllocated);
 
       // tag group name
       groupName = element.tag.getGroupName();
@@ -748,14 +763,46 @@ dwv.dicom.getDicomElement = function (tagName) {
 };
 
 /**
+ * Get the number of bytes per element for a given VR type.
+ *
+ * @param {string} vrType The VR type as defined in the dictionary.
+ * @returns {number} The bytes per element.
+ */
+dwv.dicom.getBpeForVrType = function (vrType) {
+  var bpe;
+  if (vrType === 'Uint8') {
+    bpe = Uint8Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Uint16') {
+    bpe = Uint16Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Int16') {
+    bpe = Int16Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Uint32') {
+    bpe = Uint32Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Int32') {
+    bpe = Int32Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Float32') {
+    bpe = Float32Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Float64') {
+    bpe = Float64Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Uint64') {
+    bpe = BigUint64Array.BYTES_PER_ELEMENT;
+  } else if (vrType === 'Int64') {
+    bpe = BigInt64Array.BYTES_PER_ELEMENT;
+  }
+  return bpe;
+};
+
+/**
  * Set a DICOM element value according to its VR (Value Representation).
  *
  * @param {object} element The DICOM element to set the value.
  * @param {object} value The value to set.
  * @param {boolean} isImplicit Does the data use implicit VR?
+ * @param {number} bitsAllocated Bits allocated used for pixel data.
  * @returns {number} The total element size.
  */
-dwv.dicom.setElementValue = function (element, value, isImplicit) {
+dwv.dicom.setElementValue = function (
+  element, value, isImplicit, bitsAllocated) {
   // byte size of the element
   var size = 0;
   // special sequence case
@@ -793,7 +840,7 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           }
           // set item value
           subSize += dwv.dicom.setElementValue(
-            subElement, subElement.value, isImplicit);
+            subElement, subElement.value, isImplicit, bitsAllocated);
           newItemElements[itemKey] = subElement;
           // add prefix size
           subSize += dwv.dicom.getDataElementPrefixByteSize(
@@ -841,11 +888,12 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
     // set the value and calculate size
     size = 0;
     var paddedValue = dwv.dicom.padElementValue(element, value);
+    element.value = paddedValue;
     if (element.vr === 'AT') {
-      element.value = paddedValue;
       size = 4;
-    } else if (dwv.dicom.isTypedArrayVr(element.vr)) {
-      element.value = paddedValue;
+    } else if (element.vr === 'xs') {
+      size = element.value.length * Uint16Array.BYTES_PER_ELEMENT;
+    } else if (dwv.dicom.isTypedArrayVr(element.vr) || element.vr === 'ox') {
       if (dwv.dicom.isPixelDataTag(element.tag) &&
         Array.isArray(value)) {
         size = 0;
@@ -858,31 +906,24 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
       // convert size to bytes
       var vrType = dwv.dicom.vrTypes[element.vr];
-      if (typeof vrType !== 'undefined') {
-        if (vrType === 'Uint8') {
-          size *= Uint8Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Uint16') {
+      if (dwv.dicom.isPixelDataTag(element.tag) &&
+        (element.vr === 'OB' || element.vr === 'OW' || element.vr === 'ox')) {
+        // use bitsAllocated for pixel data
+        // no need to multiply for 8 bits
+        if (typeof bitsAllocated !== 'undefined' && bitsAllocated === 16) {
           size *= Uint16Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Int16') {
-          size *= Int16Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Uint32') {
-          size *= Uint32Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Int32') {
-          size *= Int32Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Float32') {
-          size *= Float32Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Float64') {
-          size *= Float64Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Uint64') {
-          size *= BigUint64Array.BYTES_PER_ELEMENT;
-        } else if (vrType === 'Int64') {
-          size *= BigInt64Array.BYTES_PER_ELEMENT;
-        } else {
-          throw Error('Unknown VR type: ' + vrType);
         }
+      } else if (typeof vrType !== 'undefined') {
+        var bpe = dwv.dicom.getBpeForVrType(vrType);
+        if (typeof bpe !== 'undefined') {
+          size *= bpe;
+        } else {
+          throw Error('Unknown bytes per element for VR type: ' + vrType);
+        }
+      } else {
+        throw Error('Unsupported element: ' + element.vr);
       }
     } else {
-      element.value = paddedValue;
       size = paddedValue.join('\\').length;
     }
 
