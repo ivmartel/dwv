@@ -1,6 +1,9 @@
 var dwv = dwv || {};
 dwv.test = dwv.test || {};
 
+// logger level (optional)
+dwv.logger.level = dwv.utils.logger.levels.DEBUG;
+
 // rules file
 var _rulesFile = null;
 // dicom file
