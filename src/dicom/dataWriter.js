@@ -16,33 +16,6 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
     isLittleEndian = true;
   }
 
-  // Default text encoder
-  var defaultTextEncoder = {};
-  defaultTextEncoder.encode = function (buffer) {
-    var result = new Uint8Array(buffer.length);
-    for (var i = 0, leni = buffer.length; i < leni; ++i) {
-      result[i] = buffer.charCodeAt(i);
-    }
-    return result;
-  };
-
-  // Text encoder
-  var textEncoder = defaultTextEncoder;
-  if (typeof window.TextEncoder !== 'undefined') {
-    textEncoder = new TextEncoder('iso-8859-1');
-  }
-
-  /**
-   * Set the utfLabel used to construct the TextEncoder.
-   *
-   * @param {string} label The encoding label.
-   */
-  this.setUtfLabel = function (label) {
-    if (typeof window.TextEncoder !== 'undefined') {
-      textEncoder = new TextEncoder(label);
-    }
-  };
-
   // private DataView
   var view = new DataView(buffer);
 
@@ -182,31 +155,6 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
     var value = parseInt(str.substring(2), 16);
     view.setUint16(byteOffset, value, isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write string data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} str The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeString = function (byteOffset, str) {
-    var data = defaultTextEncoder.encode(str);
-    return this.writeUint8Array(byteOffset, data);
-  };
-
-  /**
-   * Write data as a 'special' string, encoding it if the
-   *   TextEncoder is available.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} str The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeSpecialString = function (byteOffset, str) {
-    var data = textEncoder.encode(str);
-    return this.writeUint8Array(byteOffset, data);
   };
 
 }; // class DataWriter

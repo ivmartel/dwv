@@ -102,6 +102,25 @@ dwv.dicom.getUtfLabel = function (charSetTerm) {
 };
 
 /**
+ * Default text decoder
+ */
+dwv.dicom.DefaultTextDecoder = function () {
+  /**
+   * Decode an input string buffer.
+   *
+   * @param {Uint8Array} buffer The buffer to decode.
+   * @returns {string} The decoded string.
+   */
+  this.decode = function (buffer) {
+    var result = '';
+    for (var i = 0, leni = buffer.length; i < leni; ++i) {
+      result += String.fromCharCode(buffer[i]);
+    }
+    return result;
+  };
+};
+
+/**
  * Get patient orientation label in the reverse direction.
  *
  * @param {string} ori Patient Orientation value.
@@ -485,6 +504,43 @@ dwv.dicom.DicomParser = function () {
    * @type {string}
    */
   var defaultCharacterSet;
+
+  /**
+   * Default text decoder.
+   *
+   * @private
+   * @type {dwv.dicom.DefaultTextDecoder}
+   */
+  var defaultTextDecoder = new dwv.dicom.DefaultTextDecoder();
+
+  /**
+   * Special text decoder.
+   *
+   * @private
+   * @type {dwv.dicom.DefaultTextDecoder|TextDecoder}
+   */
+  var textDecoder = defaultTextDecoder;
+
+  /**
+   * Decode an input string buffer using the default text decoder.
+   *
+   * @param {Uint8Array} buffer The buffer to decode.
+   * @returns {string} The decoded string.
+   */
+  this.decodeString = function (buffer) {
+    return defaultTextDecoder.decode(buffer);
+  };
+
+  /**
+   * Decode an input string buffer using the 'special' text decoder.
+   *
+   * @param {Uint8Array} buffer The buffer to decode.
+   * @returns {string} The decoded string.
+   */
+  this.decodeSpecialString = function (buffer) {
+    return textDecoder.decode(buffer);
+  };
+
   /**
    * Get the default character set.
    *
@@ -493,14 +549,24 @@ dwv.dicom.DicomParser = function () {
   this.getDefaultCharacterSet = function () {
     return defaultCharacterSet;
   };
+
   /**
    * Set the default character set.
-   * param {String} The character set.
    *
    * @param {string} characterSet The input character set.
    */
   this.setDefaultCharacterSet = function (characterSet) {
     defaultCharacterSet = characterSet;
+    this.setCharacterSet(characterSet);
+  };
+
+  /**
+   * Set the text decoder character set.
+   *
+   * @param {string} characterSet The input character set.
+   */
+  this.setDecoderCharacterSet = function (characterSet) {
+    textDecoder = new TextDecoder(characterSet);
   };
 };
 
@@ -672,7 +738,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       }
       is32bitVLVR = true;
     } else {
-      vr = reader.readString(offset, 2);
+      vr = this.decodeString(reader.readUint8Array(offset, 2));
       offset += 2 * Uint8Array.BYTES_PER_ELEMENT;
       is32bitVLVR = dwv.dicom.is32bitVLVR(vr);
       // reserved 2 bytes
@@ -852,10 +918,11 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     } else if (vrType === 'Float64') {
       data = reader.readFloat64Array(offset, vl);
     } else if (vrType === 'string') {
+      var stream = reader.readUint8Array(offset, vl);
       if (dwv.dicom.charSetString.includes(vr)) {
-        data = reader.readSpecialString(offset, vl);
+        data = this.decodeSpecialString(stream);
       } else {
-        data = reader.readString(offset, vl);
+        data = this.decodeString(stream);
       }
       data = data.split('\\');
     } else {
@@ -959,7 +1026,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
 
   // 128 -> 132: magic word
   offset = 128;
-  var magicword = metaReader.readString(offset, 4);
+  var magicword = this.decodeString(metaReader.readUint8Array(offset, 4));
   offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
   if (magicword === 'DICM') {
     // 0x0002, 0x0000: FileMetaInformationGroupLength
@@ -1019,11 +1086,6 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     dataReader = new dwv.dicom.DataReader(buffer, false);
   }
 
-  // default character set
-  if (typeof this.getDefaultCharacterSet() !== 'undefined') {
-    dataReader.setUtfLabel(this.getDefaultCharacterSet());
-  }
-
   // DICOM data elements
   while (offset < buffer.byteLength) {
     // get the data element
@@ -1071,7 +1133,12 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     dwv.logger.warn('Reading DICOM pixel data with default bitsAllocated.');
   }
 
-  // character set
+  // default character set
+  if (typeof this.getDefaultCharacterSet() !== 'undefined') {
+    this.setDecoderCharacterSet(this.getDefaultCharacterSet());
+  }
+
+  // SpecificCharacterSet
   dataElement = this.dicomElements.x00080005;
   if (typeof dataElement !== 'undefined') {
     dataElement.value = this.interpretElement(dataElement, dataReader);
@@ -1083,7 +1150,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
       dwv.logger.warn('Unsupported character set with code extensions: \'' +
         charSetTerm + '\'.');
     }
-    dataReader.setUtfLabel(dwv.dicom.getUtfLabel(charSetTerm));
+    this.setDecoderCharacterSet(dwv.dicom.getUtfLabel(charSetTerm));
   }
 
   // interpret the dicom elements

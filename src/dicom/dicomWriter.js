@@ -182,6 +182,25 @@ dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
 };
 
 /**
+ * Default text encoder.
+ */
+dwv.dicom.DefaultTextEncoder = function () {
+  /**
+   * Encode an input string.
+   *
+   * @param {string} str The string to encode.
+   * @returns {Uint8Array} The encoded string.
+   */
+  this.encode = function (str) {
+    var result = new Uint8Array(str.length);
+    for (var i = 0, leni = str.length; i < leni; ++i) {
+      result[i] = str.charCodeAt(i);
+    }
+    return result;
+  };
+};
+
+/**
  * DICOM writer.
  *
  * Example usage:
@@ -236,6 +255,49 @@ dwv.dicom.DicomWriter = function () {
    * if nothing is found the default rule is applied.
    */
   this.rules = defaultRules;
+
+  /**
+   * Default text encoder.
+   *
+   * @private
+   * @type {dwv.dicom.DefaultTextEncoder}
+   */
+  var defaultTextEncoder = new dwv.dicom.DefaultTextEncoder();
+
+  /**
+   * Special text encoder.
+   *
+   * @private
+   * @type {dwv.dicom.DefaultTextEncoder|TextEncoder}
+   */
+  var textEncoder = defaultTextEncoder;
+
+  /**
+   * Encode string data.
+   *
+   * @param {number} str The string to encode.
+   * @returns {Uint8Array} The encoded string.
+   */
+  this.encodeString = function (str) {
+    return defaultTextEncoder.encode(str);
+  };
+
+  /**
+   * Encode data as a UTF-8.
+   *
+   * @param {number} str The string to write.
+   * @returns {Uint8Array} The encoded string.
+   */
+  this.encodeSpecialString = function (str) {
+    return textEncoder.encode(str);
+  };
+
+  /**
+   * Use a TextEncoder instead of the default text decoder.
+   */
+  this.useSpecialTextEncoder = function () {
+    textEncoder = new TextEncoder();
+  };
 
   /**
    * Example anonymisation rules.
@@ -399,16 +461,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
       } else if (vrType === 'Float64') {
         byteOffset = writer.writeFloat64Array(byteOffset, value);
       } else if (vrType === 'string') {
-        // join if array
-        if (Array.isArray(value)) {
-          value = value.join('\\');
-        }
-        // write
-        if (dwv.dicom.charSetString.includes(vr)) {
-          byteOffset = writer.writeSpecialString(byteOffset, value);
-        } else {
-          byteOffset = writer.writeString(byteOffset, value);
-        }
+        byteOffset = writer.writeUint8Array(byteOffset, value);
       } else {
         throw Error('Unknown VR type: ' + vrType);
       }
@@ -434,7 +487,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
     var diff = byteOffset - startOffset;
     if (diff !== vl) {
       dwv.logger.warn('Offset difference and VL are not equal: ' +
-        diff + ' != ' + vl + ', vr:' + vr);
+        diff + ' != ' + vl + ', vr:' + vr + ', val:' + value);
     }
   }
 
@@ -521,7 +574,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
     vr = 'UN';
   }
   if (isTagWithVR && !isImplicit) {
-    byteOffset = writer.writeString(byteOffset, vr);
+    byteOffset = writer.writeUint8Array(byteOffset, this.encodeString(vr));
     // reserved 2 bytes for 32bit VL
     if (is32bitVLVR) {
       byteOffset += 2;
@@ -592,11 +645,22 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
  * @returns {ArrayBuffer} The elements as a buffer.
  */
 dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
-  // transfer syntax
+  // Transfer Syntax
   var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
   var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
   var isBigEndian = dwv.dicom.isBigEndianTransferSyntax(syntax);
+  // Bits Allocated
   var bitsAllocated = dicomElements.x00280100.value[0];
+  // Specific CharacterSet
+  if (typeof dicomElements.x00080005 !== 'undefined') {
+    var oldscs = dwv.dicom.cleanString(dicomElements.x00080005.value[0]);
+    // force UTF-8 if not default character set
+    if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
+      dwv.logger.debug('Change charset to UTF, was: ' + oldscs);
+      this.useSpecialTextEncoder();
+      dicomElements.x00080005.value = ['ISO_IR 192'];
+    }
+  }
 
   // calculate buffer size and split elements (meta and non meta)
   var totalSize = 128 + 4; // DICM
@@ -630,7 +694,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       dwv.dicom.checkUnknownVR(element);
 
       // update value and vl
-      dwv.dicom.setElementValue(
+      this.setElementValue(
         element, element.value, isImplicit, bitsAllocated);
 
       // tag group name
@@ -663,7 +727,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   // ImplementationClassUID
   var icUID = dwv.dicom.getDicomElement('ImplementationClassUID');
   var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, isImplicit);
-  icUIDSize += dwv.dicom.setElementValue(
+  icUIDSize += this.setElementValue(
     icUID, [dwv.dicom.getUID('ImplementationClassUID')], false);
   metaElements.push(icUID);
   metaLength += icUIDSize;
@@ -672,7 +736,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var ivn = dwv.dicom.getDicomElement('ImplementationVersionName');
   var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
   var ivnValue = 'DWV_' + dwv.getVersion();
-  ivnSize += dwv.dicom.setElementValue(ivn, [ivnValue], false);
+  ivnSize += this.setElementValue(ivn, [ivnValue], false);
   metaElements.push(ivn);
   metaLength += ivnSize;
   totalSize += ivnSize;
@@ -680,25 +744,18 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   // create the FileMetaInformationGroupLength element
   var fmigl = dwv.dicom.getDicomElement('FileMetaInformationGroupLength');
   var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, isImplicit);
-  fmiglSize += dwv.dicom.setElementValue(
+  fmiglSize += this.setElementValue(
     fmigl, new Uint32Array([metaLength]), false);
-
-  // add its size to the total one
   totalSize += fmiglSize;
 
   // create buffer
   var buffer = new ArrayBuffer(totalSize);
   var metaWriter = new dwv.dicom.DataWriter(buffer);
   var dataWriter = new dwv.dicom.DataWriter(buffer, !isBigEndian);
-  // special character set
-  if (typeof dicomElements.x00080005 !== 'undefined') {
-    var scs = dwv.dicom.cleanString(dicomElements.x00080005.value[0]);
-    dataWriter.setUtfLabel(dwv.dicom.getUtfLabel(scs));
-  }
 
   var offset = 128;
   // DICM
-  offset = metaWriter.writeString(offset, 'DICM');
+  offset = metaWriter.writeUint8Array(offset, this.encodeString('DICM'));
   // FileMetaInformationGroupLength
   offset = this.writeDataElement(metaWriter, fmigl, offset, false);
   // write meta
@@ -804,7 +861,7 @@ dwv.dicom.getBpeForVrType = function (vrType) {
  * @param {number} bitsAllocated Bits allocated used for pixel data.
  * @returns {number} The total element size.
  */
-dwv.dicom.setElementValue = function (
+dwv.dicom.DicomWriter.prototype.setElementValue = function (
   element, value, isImplicit, bitsAllocated) {
   // byte size of the element
   var size = 0;
@@ -842,7 +899,7 @@ dwv.dicom.setElementValue = function (
             continue;
           }
           // set item value
-          subSize += dwv.dicom.setElementValue(
+          subSize += this.setElementValue(
             subElement, subElement.value, isImplicit, bitsAllocated);
           newItemElements[itemKey] = subElement;
           // add prefix size
@@ -890,8 +947,19 @@ dwv.dicom.setElementValue = function (
   } else {
     // set the value and calculate size
     size = 0;
+
+    // encode
+    if (dwv.dicom.isStringVr(element.vr)) {
+      if (dwv.dicom.charSetString.includes(element.vr)) {
+        value = this.encodeSpecialString(value.join('\\'));
+      } else {
+        value = this.encodeString(value.join('\\'));
+      }
+    }
+
     var paddedValue = dwv.dicom.padElementValue(element, value);
     element.value = paddedValue;
+
     if (element.vr === 'AT') {
       size = 4;
     } else if (element.vr === 'xs') {
@@ -931,7 +999,7 @@ dwv.dicom.setElementValue = function (
         throw Error('Unsupported element: ' + element.vr);
       }
     } else {
-      size = paddedValue.join('\\').length;
+      size = element.value.length;
     }
 
     element.vl = size;
