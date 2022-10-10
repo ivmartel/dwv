@@ -793,43 +793,44 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
   var data = null;
   var isPixelDataTag = dwv.dicom.isPixelDataTag(tag);
   var vrType = dwv.dicom.vrTypes[vr];
-  if (isPixelDataTag && element.undefinedLength) {
-    // implicit pixel data sequence
-    data = [];
-    for (var j = 0; j < element.items.length; ++j) {
-      data.push(this.interpretElement(
-        element.items[j], reader,
-        pixelRepresentation, bitsAllocated));
-    }
-    // remove non parsed items
-    delete element.items;
-  } else if (isPixelDataTag &&
-    (vr === 'OB' || vr === 'OW' || vr === 'ox')) {
-    // check bits allocated and VR
-    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
-    if (bitsAllocated > 8 && vr === 'OB') {
-      dwv.logger.warn(
-        'Reading DICOM pixel data with bitsAllocated>8 and OB VR.'
-      );
-    }
-    // read
-    data = [];
-    if (bitsAllocated === 1) {
-      data.push(reader.readBinaryArray(offset, vl));
-    } else if (bitsAllocated === 8) {
-      if (pixelRepresentation === 0) {
-        data.push(reader.readUint8Array(offset, vl));
-      } else {
-        data.push(reader.readInt8Array(offset, vl));
+  if (isPixelDataTag) {
+    if (element.undefinedLength) {
+      // implicit pixel data sequence
+      data = [];
+      for (var j = 0; j < element.items.length; ++j) {
+        data.push(this.interpretElement(
+          element.items[j], reader,
+          pixelRepresentation, bitsAllocated));
       }
-    } else if (bitsAllocated === 16) {
-      if (pixelRepresentation === 0) {
-        data.push(reader.readUint16Array(offset, vl));
-      } else {
-        data.push(reader.readInt16Array(offset, vl));
-      }
+      // remove non parsed items
+      delete element.items;
     } else {
-      throw new Error('Unsupported bits allocated: ' + bitsAllocated);
+      // check bits allocated and VR
+      // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
+      if (bitsAllocated > 8 && vr === 'OB') {
+        dwv.logger.warn(
+          'Reading DICOM pixel data with bitsAllocated>8 and OB VR.'
+        );
+      }
+      // read
+      data = [];
+      if (bitsAllocated === 1) {
+        data.push(reader.readBinaryArray(offset, vl));
+      } else if (bitsAllocated === 8) {
+        if (pixelRepresentation === 0) {
+          data.push(reader.readUint8Array(offset, vl));
+        } else {
+          data.push(reader.readInt8Array(offset, vl));
+        }
+      } else if (bitsAllocated === 16) {
+        if (pixelRepresentation === 0) {
+          data.push(reader.readUint16Array(offset, vl));
+        } else {
+          data.push(reader.readInt16Array(offset, vl));
+        }
+      } else {
+        throw new Error('Unsupported bits allocated: ' + bitsAllocated);
+      }
     }
   } else if (typeof vrType !== 'undefined') {
     if (vrType === 'Uint8') {
