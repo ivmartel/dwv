@@ -139,6 +139,7 @@ dwv.dicom.padElementValue = function (element, value) {
     // calculate size
     var size = 0;
     if (element.vr === 'OB' &&
+      value.length !== 0 &&
       typeof value[0].length !== 'undefined') {
       // pixel data comes as an array of typedArray
       for (var i = 0; i < value.length; ++i) {
@@ -591,6 +592,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
  * @returns {ArrayBuffer} The elements as a buffer.
  */
 dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
+  console.log(dicomElements);
   // transfer syntax
   var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
   var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
