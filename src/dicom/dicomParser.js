@@ -828,18 +828,6 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       } else {
         data.push(reader.readInt16Array(offset, vl));
       }
-    } else if (bitsAllocated === 32) {
-      if (pixelRepresentation === 0) {
-        data.push(reader.readUint32Array(offset, vl));
-      } else {
-        data.push(reader.readInt32Array(offset, vl));
-      }
-    } else if (bitsAllocated === 64) {
-      if (pixelRepresentation === 0) {
-        data.push(reader.readUint64Array(offset, vl));
-      } else {
-        data.push(reader.readInt64Array(offset, vl));
-      }
     } else {
       throw new Error('Unsupported bits allocated: ' + bitsAllocated);
     }
