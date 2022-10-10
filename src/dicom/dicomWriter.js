@@ -908,8 +908,7 @@ dwv.dicom.setElementValue = function (
 
       // convert size to bytes
       var vrType = dwv.dicom.vrTypes[element.vr];
-      if (dwv.dicom.isPixelDataTag(element.tag) &&
-        (element.vr === 'OB' || element.vr === 'OW' || element.vr === 'ox')) {
+      if (dwv.dicom.isPixelDataTag(element.tag) || element.vr === 'ox') {
         // use bitsAllocated for pixel data
         // no need to multiply for 8 bits
         if (typeof bitsAllocated !== 'undefined') {
