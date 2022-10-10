@@ -592,7 +592,6 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
  * @returns {ArrayBuffer} The elements as a buffer.
  */
 dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
-  console.log(dicomElements);
   // transfer syntax
   var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
   var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
