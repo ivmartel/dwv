@@ -287,5 +287,25 @@
         }
     },
     "useUnVrForPrivateSq": true
+},
+{
+    "name": "test28",
+    "description": "Big Endian Explicit test data data with UTF-8 charset.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
+        "Modality": "MR",
+        "SpecificCharacterSet": "ISO_IR 192",
+        "PatientName": "dwv-patient-name20",
+        "OtherPatientNames": "déjà-ñu greek: ελληνικά arab: اَلْعَرَبِيَّةُ chinese: 中文",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "PixelSpacing": [1, 1],
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11
+    }
 }
 ]
