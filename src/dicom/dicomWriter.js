@@ -913,14 +913,25 @@ dwv.dicom.setElementValue = function (
       // convert size to bytes
       var vrType = dwv.dicom.vrTypes[element.vr];
       if (dwv.dicom.isPixelDataTag(element.tag) || element.vr === 'ox') {
-        // use bitsAllocated for pixel data
-        // no need to multiply for 8 bits
-        if (typeof bitsAllocated !== 'undefined') {
-          if (bitsAllocated === 1) {
-            // binary data
-            size /= 8;
-          } else if (bitsAllocated === 16) {
-            size *= Uint16Array.BYTES_PER_ELEMENT;
+        if (element.undefinedLength) {
+          var itemPrefixSize =
+            dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
+          // offset table
+          size += itemPrefixSize;
+          // pixel items
+          size += itemPrefixSize * value.length;
+          // add sequence delimitation size
+          size += itemPrefixSize;
+        } else {
+          // use bitsAllocated for pixel data
+          // no need to multiply for 8 bits
+          if (typeof bitsAllocated !== 'undefined') {
+            if (bitsAllocated === 1) {
+              // binary data
+              size /= 8;
+            } else if (bitsAllocated === 16) {
+              size *= Uint16Array.BYTES_PER_ELEMENT;
+            }
           }
         }
       } else if (typeof vrType !== 'undefined') {
