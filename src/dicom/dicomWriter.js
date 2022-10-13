@@ -896,7 +896,7 @@ dwv.dicom.setElementValue = function (
     var paddedValue = dwv.dicom.padElementValue(element, value);
     element.value = paddedValue;
     if (element.vr === 'AT') {
-      size = 4;
+      size = 4 * value.length;
     } else if (element.vr === 'xs') {
       size = element.value.length * Uint16Array.BYTES_PER_ELEMENT;
     } else if (dwv.dicom.isTypedArrayVr(element.vr) || element.vr === 'ox') {
