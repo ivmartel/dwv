@@ -218,7 +218,7 @@
 },
 {
     "name": "test26",
-    "description": "Little Endian Implicit test data with private tags.",
+    "description": "Big Endian Explicit test data with private tags.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
@@ -254,7 +254,7 @@
 },
 {
     "name": "test27",
-    "description": "Little Endian Implicit test data with private tags and VR=UN for private SQ.",
+    "description": "Big Endian Explicit test data with private tags and VR=UN for private SQ.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
@@ -287,5 +287,101 @@
         }
     },
     "useUnVrForPrivateSq": true
+},
+{
+    "name": "test28",
+    "description": "Big Endian Explicit test data with mulitple VRs.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name00",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "PixelSpacing": [1, 1],
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11,
+        "PrivateSQ": {
+            "value": [
+                {
+                    "PrivateAE": "AE",
+                    "PrivateAS": "001D",
+                    "PrivateAT": ["(AFAF,0101)", "(AFAF,0202)"],
+                    "PrivateCS": "CODE_STRING_00",
+                    "PrivateDA": "20220124",
+                    "PrivateDS": ["-1.23456789e-15", "1.23456789e-15"],
+                    "PrivateDT": "20220124173730.999999",
+                    "PrivateFD": [-1.23456789e-308, 1.23456789e-308],
+                    "PrivateFL": [-1.1749999727240737e-38, 1.1749999727240737e-38],
+                    "PrivateIS": "1234",
+                    "PrivateLO": "LOng string",
+                    "PrivateLT": "Long Text",
+                    "PrivateOB": 0,
+                    "PrivateOD": "0",
+                    "PrivateOF": 0,
+                    "PrivateOL": 0,
+                    "PrivateOV": "0",
+                    "PrivateOW": 0,
+                    "PrivatePN": "Tarquin^Fin-tim-lin-bin-whin-bim-lim-bus^-stop-Ftang-Ftang-Ole-Biscuitbarrel",
+                    "PrivateSH": "SHort string",
+                    "PrivateSL": [-2147483648, 2147483647],
+                    "PrivateSS": [-32768, 32767],
+                    "PrivateST": "Short text",
+                    "PrivateSV": ["-9223372036854775808", "9223372036854775807"],
+                    "PrivateTM": "173730.999999",
+                    "PrivateUC": "Unlimited Characters",
+                    "PrivateUI": "1.2.840.10008.5.1.4.1.1.481.13",
+                    "PrivateUL": [0, 4294967295],
+                    "PrivateUN": 0,
+                    "PrivateUR": "https://github.com/ivmartel/dwv",
+                    "PrivateUS": [0, 65535],
+                    "PrivateUT": "Unlimited Text",
+                    "PrivateUV": ["0", "18446744073709551615"]
+                }
+            ]
+        }
+    },
+    "privateDictionary": {
+        "0x0011": {
+            "0x0000": ["UL", "1", "GenericGroupLength"],
+            "0x0001": ["AE", "1", "PrivateAE"],
+            "0x0002": ["AS", "1", "PrivateAS"],
+            "0x0003": ["AT", "1", "PrivateAT"],
+            "0x0004": ["CS", "1", "PrivateCS"],
+            "0x0005": ["DA", "1", "PrivateDA"],
+            "0x0006": ["DS", "1", "PrivateDS"],
+            "0x0007": ["DT", "1", "PrivateDT"],
+            "0x0008": ["FL", "1", "PrivateFL"],
+            "0x0009": ["FD", "1", "PrivateFD"],
+            "0x0010": ["IS", "1", "PrivateIS"],
+            "0x0011": ["LO", "1", "PrivateLO"],
+            "0x0012": ["LT", "1", "PrivateLT"],
+            "0x0013": ["OB", "1", "PrivateOB"],
+            "0x0014": ["OD", "1", "PrivateOD"],
+            "0x0015": ["OF", "1", "PrivateOF"],
+            "0x0016": ["OL", "1", "PrivateOL"],
+            "0x0017": ["OV", "1", "PrivateOV"],
+            "0x0018": ["OW", "1", "PrivateOW"],
+            "0x0019": ["PN", "1", "PrivatePN"],
+            "0x0020": ["SH", "1", "PrivateSH"],
+            "0x0021": ["SL", "1", "PrivateSL"],
+            "0x0022": ["SQ", "1", "PrivateSQ"],
+            "0x0023": ["SS", "1", "PrivateSS"],
+            "0x0024": ["ST", "1", "PrivateST"],
+            "0x0025": ["SV", "1", "PrivateSV"],
+            "0x0026": ["TM", "1", "PrivateTM"],
+            "0x0027": ["UC", "1", "PrivateUC"],
+            "0x0028": ["UI", "1", "PrivateUI"],
+            "0x0029": ["UL", "1", "PrivateUL"],
+            "0x0030": ["UN", "1", "PrivateUN"],
+            "0x0031": ["UR", "1", "PrivateUR"],
+            "0x0032": ["US", "1", "PrivateUS"],
+            "0x0033": ["UT", "1", "PrivateUT"],
+            "0x0034": ["UV", "1", "PrivateUV"]
+        }
+    }
 }
 ]
