@@ -45,33 +45,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     isLittleEndian = true;
   }
 
-  // Default text decoder
-  var defaultTextDecoder = {};
-  defaultTextDecoder.decode = function (buffer) {
-    var result = '';
-    for (var i = 0, leni = buffer.length; i < leni; ++i) {
-      result += String.fromCharCode(buffer[i]);
-    }
-    return result;
-  };
-
-  // Text decoder
-  var textDecoder = defaultTextDecoder;
-  if (typeof window.TextDecoder !== 'undefined') {
-    textDecoder = new TextDecoder('iso-8859-1');
-  }
-
-  /**
-   * Set the utfLabel used to construct the TextDecoder.
-   *
-   * @param {string} label The encoding label.
-   */
-  this.setUtfLabel = function (label) {
-    if (typeof window.TextDecoder !== 'undefined') {
-      textDecoder = new TextDecoder(label);
-    }
-  };
-
   /**
    * Is the Native endianness Little Endian.
    *
@@ -429,32 +402,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     }
     return data;
   };
-
-  /**
-   * Read data as a string.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} nChars The number of characters to read.
-   * @returns {string} The read data.
-   */
-  this.readString = function (byteOffset, nChars) {
-    var data = this.readUint8Array(byteOffset, nChars);
-    return defaultTextDecoder.decode(data);
-  };
-
-  /**
-   * Read data as a 'special' string, decoding it if the
-   *   TextDecoder is available.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} nChars The number of characters to read.
-   * @returns {string} The read data.
-   */
-  this.readSpecialString = function (byteOffset, nChars) {
-    var data = this.readUint8Array(byteOffset, nChars);
-    return textDecoder.decode(data);
-  };
-
 }; // class DataReader
 
 /**
