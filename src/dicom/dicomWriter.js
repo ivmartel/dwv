@@ -341,23 +341,22 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
  * Write data with a specific Value Representation (VR).
  *
  * @param {dwv.dicom.DataWriter} writer The raw data writer.
- * @param {string} vr The data Value Representation (VR).
- * @param {string} vl The data Value Length (VL).
+ * @param {object} element The element to write.
  * @param {number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
  * @param {boolean} isImplicit Is the DICOM VR implicit?
  * @returns {number} The new offset position.
  */
 dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
-  writer, vr, vl, byteOffset, value, isImplicit) {
+  writer, element, byteOffset, value, isImplicit) {
 
   var startOffset = byteOffset;
 
-  if (vr === 'NONE') {
+  if (element.vr === 'NONE') {
     // nothing to do!
   } else if (value instanceof Uint8Array) {
     // binary data has been expanded 8 times at read
-    if (value.length === 8 * vl) {
+    if (value.length === 8 * element.vl) {
       byteOffset = writer.writeBinaryArray(byteOffset, value);
     } else {
       byteOffset = writer.writeUint8Array(byteOffset, value);
@@ -378,7 +377,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
     byteOffset = writer.writeInt64Array(byteOffset, value);
   } else {
     // switch according to VR if input type is undefined
-    var vrType = dwv.dicom.vrTypes[vr];
+    var vrType = dwv.dicom.vrTypes[element.vr];
     if (typeof vrType !== 'undefined') {
       if (vrType === 'Uint8') {
         byteOffset = writer.writeUint8Array(byteOffset, value);
@@ -404,7 +403,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
           value = value.join('\\');
         }
         // write
-        if (dwv.dicom.charSetString.includes(vr)) {
+        if (dwv.dicom.charSetString.includes(element.vr)) {
           byteOffset = writer.writeSpecialString(byteOffset, value);
         } else {
           byteOffset = writer.writeString(byteOffset, value);
@@ -412,10 +411,10 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
       } else {
         throw Error('Unknown VR type: ' + vrType);
       }
-    } else if (vr === 'SQ') {
+    } else if (element.vr === 'SQ') {
       byteOffset = this.writeDataElementItems(
         writer, byteOffset, value, isImplicit);
-    } else if (vr === 'AT') {
+    } else if (element.vr === 'AT') {
       for (var i = 0; i < value.length; ++i) {
         var hexString = value[i] + '';
         var hexString1 = hexString.substring(1, 5);
@@ -426,15 +425,15 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
         byteOffset = writer.writeUint16Array(byteOffset, atValue);
       }
     } else {
-      dwv.logger.warn('Unknown VR: ' + vr);
+      dwv.logger.warn('Unknown VR: ' + element.vr);
     }
   }
 
-  if (vr !== 'SQ' && vr !== 'NONE') {
+  if (element.vr !== 'SQ' && element.vr !== 'NONE') {
     var diff = byteOffset - startOffset;
-    if (diff !== vl) {
+    if (diff !== element.vl) {
       dwv.logger.warn('Offset difference and VL are not equal: ' +
-        diff + ' != ' + vl + ', vr:' + vr);
+        diff + ' != ' + element.vl + ', vr:' + element.vr);
     }
   }
 
@@ -446,17 +445,21 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
  * Write a pixel data element.
  *
  * @param {dwv.dicom.DataWriter} writer The raw data writer.
- * @param {string} vr The data Value Representation (VR).
- * @param {string} vl The data Value Length (VL).
+ * @param {object} element The element to write.
  * @param {number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
  * @param {boolean} isImplicit Is the DICOM VR implicit?
  * @returns {number} The new offset position.
  */
 dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
-  writer, vr, vl, byteOffset, value, isImplicit) {
+  writer, element, byteOffset, value, isImplicit) {
+  // undefined length flag
+  var undefinedLength = false;
+  if (typeof element.undefinedLength !== 'undefined') {
+    undefinedLength = element.undefinedLength;
+  }
   // explicit length
-  if (vl !== 'u/l') {
+  if (!undefinedLength) {
     var finalValue = value[0];
     // flatten multi frame
     if (value.length > 1) {
@@ -464,7 +467,7 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
     }
     // write
     byteOffset = this.writeDataElementValue(
-      writer, vr, vl, byteOffset, finalValue, isImplicit);
+      writer, element, byteOffset, finalValue, isImplicit);
   } else {
     // pixel data as sequence
     var item = {};
@@ -479,7 +482,7 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
     for (var i = 0; i < value.length; ++i) {
       item[i] = {
         tag: dwv.dicom.getItemTag(),
-        vr: vr,
+        vr: element.vr,
         vl: value[i].length,
         value: value[i]
       };
@@ -563,10 +566,10 @@ dwv.dicom.DicomWriter.prototype.writeDataElement = function (
   // write
   if (dwv.dicom.isPixelDataTag(element.tag)) {
     byteOffset = this.writePixelDataElementValue(
-      writer, element.vr, element.vl, byteOffset, value, isImplicit);
+      writer, element, byteOffset, value, isImplicit);
   } else {
     byteOffset = this.writeDataElementValue(
-      writer, element.vr, element.vl, byteOffset, value, isImplicit);
+      writer, element, byteOffset, value, isImplicit);
   }
 
   // sequence delimitation item for sequence with undefined length
