@@ -389,11 +389,7 @@ dwv.dicom.guessTransferSyntax = function (firstDataElement) {
   }
   // set transfer syntax data element
   var dataElement = {
-    tag: {
-      group: '0x0002',
-      element: '0x0010',
-      name: 'x00020010'
-    },
+    tag: new dwv.dicom.Tag('0x0002', '0x0010'),
     vr: 'UI'
   };
   dataElement.value = [syntax + ' ']; // even length
@@ -1058,6 +1054,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     syntax = dwv.dicom.cleanString(dataElement.value[0]);
 
   } else {
+    dwv.logger.warn('No DICM prefix, trying to guess tansfer syntax.');
     // read first element
     dataElement = this.readDataElement(dataReader, 0, false);
     // guess transfer syntax
