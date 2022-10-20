@@ -124,14 +124,13 @@ dwv.dicom.getVrPad = function (vr) {
 
 /**
  * Pad an input value according to its VR.
+ * The input value will be modified if necessary,
  * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
  *
  * @param {object} element The DICOM element to get the VR from.
- * @param {Array} value The value to pad.
- * @returns {Array} The padded value.
+ * @param {Array} value The input value, padded if necessary.
  */
 dwv.dicom.padElementValue = function (element, value) {
-  var newValue = value;
   if (value !== null &&
     typeof value !== 'undefined' &&
     typeof value.length !== 'undefined' &&
@@ -150,10 +149,9 @@ dwv.dicom.padElementValue = function (element, value) {
     }
     // pad if needed
     if (!dwv.dicom.isEven(size)) {
-      newValue[value.length - 1] += dwv.dicom.getVrPad(element.vr);
+      value[value.length - 1] += dwv.dicom.getVrPad(element.vr);
     }
   }
-  return newValue;
 };
 
 /**
@@ -954,27 +952,24 @@ dwv.dicom.DicomWriter.prototype.setElementValue = function (
       }
     }
   } else {
-    // set the value and calculate size
-    size = 0;
-
     // pad if necessary
-    var paddedValue = dwv.dicom.padElementValue(element, value);
+    dwv.dicom.padElementValue(element, value);
 
     // encode
     if (dwv.dicom.isStringVr(element.vr)) {
       if (dwv.dicom.charSetString.includes(element.vr)) {
-        paddedValue = this.encodeSpecialString(paddedValue.join('\\'));
+        value = this.encodeSpecialString(value.join('\\'));
       } else {
-        paddedValue = this.encodeString(paddedValue.join('\\'));
+        value = this.encodeString(value.join('\\'));
       }
     }
 
-    element.value = paddedValue;
-
+    // calculate byte size
+    size = 0;
     if (element.vr === 'AT') {
       size = 4 * value.length;
     } else if (element.vr === 'xs') {
-      size = element.value.length * Uint16Array.BYTES_PER_ELEMENT;
+      size = value.length * Uint16Array.BYTES_PER_ELEMENT;
     } else if (dwv.dicom.isTypedArrayVr(element.vr) || element.vr === 'ox') {
       if (dwv.dicom.isPixelDataTag(element.tag) &&
         Array.isArray(value)) {
@@ -983,7 +978,7 @@ dwv.dicom.DicomWriter.prototype.setElementValue = function (
           size += value[b].length;
         }
       } else {
-        size = element.value.length;
+        size = value.length;
       }
 
       // convert size to bytes
@@ -1021,9 +1016,10 @@ dwv.dicom.DicomWriter.prototype.setElementValue = function (
         throw Error('Unsupported element: ' + element.vr);
       }
     } else {
-      size = element.value.length;
+      size = value.length;
     }
 
+    element.value = value;
     element.vl = size;
   }
 
