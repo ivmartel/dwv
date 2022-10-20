@@ -562,6 +562,12 @@ dwv.dicom.DicomParser = function () {
    * @param {string} characterSet The input character set.
    */
   this.setDecoderCharacterSet = function (characterSet) {
+    /**
+     * The text decoder.
+     *
+     * @external TextDecoder
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
+     */
     textDecoder = new TextDecoder(characterSet);
   };
 };

@@ -296,6 +296,12 @@ dwv.dicom.DicomWriter = function () {
    * Use a TextEncoder instead of the default text decoder.
    */
   this.useSpecialTextEncoder = function () {
+    /**
+     * The text encoder.
+     *
+     * @external TextEncoder
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder
+     */
     textEncoder = new TextEncoder();
   };
 
