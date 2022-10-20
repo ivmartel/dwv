@@ -155,7 +155,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
 
     // ConsultingPhysicianIdentificationSequence: implicit empty item
     var seq13 = tags.getFromName('ConsultingPhysicianIdentificationSequence');
-    assert.equal(seq13.xFFFEE000.value.length, 0,
+    assert.equal(seq13.length, 0,
       'ConsultingPhysicianIdentificationSequence item length');
 
     // ReferencedStudySequence: explicit sequence of sequence

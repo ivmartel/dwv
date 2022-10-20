@@ -38,7 +38,7 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
     var teoTable = [
       {
         name: 'FileMetaInformationGroupLength',
-        value: '27',
+        value: '104',
         group: '0x0002',
         element: '0x0000',
         vr: 'UL',
@@ -51,6 +51,22 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         element: '0x0010',
         vr: 'UI',
         vl: 19
+      },
+      {
+        name: 'ImplementationClassUID',
+        value: '1.2.826.0.1.3680043.9.7278.1.0.31.0-beta.14',
+        group: '0x0002',
+        element: '0x0012',
+        vr: 'UI',
+        vl: 43
+      },
+      {
+        name: 'ImplementationVersionName',
+        value: 'DWV_0.31.0-beta.14',
+        group: '0x0002',
+        element: '0x0013',
+        vr: 'SH',
+        vl: 18
       },
       {
         name: 'Modality',
@@ -176,12 +192,28 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         vl: 101
       },
       {
+        name: 'ImagePositionPatient',
+        value: '0\\0\\0',
+        group: '0x0020',
+        element: '0x0032',
+        vr: 'DS',
+        vl: 5
+      },
+      {
+        name: 'InstanceNumber',
+        value: '0',
+        group: '0x0020',
+        element: '0x0013',
+        vr: 'IS',
+        vl: 1
+      },
+      {
         name: 'PixelData',
         value: '...',
         group: '0x7FE0',
         element: '0x0010',
         vr: 'OW',
-        vl: 2060
+        vl: 2048
       }
     ];
 

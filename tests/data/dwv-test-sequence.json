@@ -13,68 +13,84 @@
   "HighBit": 11,
   "ReferencedImageSequence": {
     "undefinedLength": false,
-    "item0": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-    },
-    "item1": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-    },
-    "item2": {}
+    "value": [
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+      },
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+      },
+      {}
+    ]
   },
   "SourceImageSequence": {
     "undefinedLength": true,
-    "item0": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-    },
-    "item1": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-    },
-    "item2": 0
+    "value": [
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+      },
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+      },
+      0
+    ]
   },
   "ReferencedPatientSequence": {},
   "ReferencedOverlaySequence": 0,
   "ReferringPhysicianIdentificationSequence": {
     "undefinedLength": false,
-    "item0": {}
+    "value": [{}]
   },
   "ConsultingPhysicianIdentificationSequence": {
     "undefinedLength": true,
-    "item0": 0
+    "value": 0
   },
   "ReferencedStudySequence": {
     "undefinedLength": false,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": {
-        "item0": {
-          "CodeValue": "123456"
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": {
+          "value": [
+            {
+              "CodeValue": "123456"
+            }
+          ]
         }
       }
-    }
+    ]
   },
   "ReferencedSeriesSequence": {
     "undefinedLength": true,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": {
-        "item0": {
-          "CodeValue": "789101"
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": {
+          "value": [
+            {
+              "CodeValue": "789101"
+            }
+          ]
         }
       }
-    }
+    ]
   },
   "ReferencedInstanceSequence": {
     "undefinedLength": false,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": {}
-    }
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": {}
+      }
+    ]
   },
   "ReferencedVisitSequence": {
     "undefinedLength": true,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": 0
-    }
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": 0
+      }
+    ]
   }
 }
