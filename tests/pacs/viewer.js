@@ -11,6 +11,9 @@ dwv.image.decoderScripts = {
 // logger level (optional)
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
+// check environment support
+dwv.env.check();
+
 var _app = null;
 var _tools = null;
 
