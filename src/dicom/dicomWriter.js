@@ -748,6 +748,13 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   metaLength += ivnSize;
   totalSize += ivnSize;
 
+  // sort elements
+  var elemSortFunc = function (a, b) {
+    return dwv.dicom.tagCompareFunction(a.tag, b.tag);
+  };
+  metaElements.sort(elemSortFunc);
+  rawElements.sort(elemSortFunc);
+
   // create the FileMetaInformationGroupLength element
   var fmigl = dwv.dicom.getDicomElement('FileMetaInformationGroupLength');
   var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, isImplicit);

@@ -54,6 +54,25 @@ dwv.dicom.Tag.prototype.equals = function (rhs) {
 };
 
 /**
+ * Tag compare function.
+ *
+ * @param {dwv.dicom.Tag} a The first tag.
+ * @param {dwv.dicom.Tag} b The second tag.
+ * @returns {number} The result of the tag comparison,
+ *   positive for b before a, negative for a before b and
+ *   zero to keep same order.
+ */
+dwv.dicom.tagCompareFunction = function (a, b) {
+  // first by group
+  var res = parseInt(a.getGroup()) - parseInt(b.getGroup());
+  if (res === 0) {
+    // by element if same group
+    res = parseInt(a.getElement()) - parseInt(b.getElement());
+  }
+  return res;
+};
+
+/**
  * Get the group-element key used to store DICOM elements.
  *
  * @returns {string} The key as 'x########'.
