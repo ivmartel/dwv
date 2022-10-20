@@ -957,16 +957,18 @@ dwv.dicom.DicomWriter.prototype.setElementValue = function (
     // set the value and calculate size
     size = 0;
 
+    // pad if necessary
+    var paddedValue = dwv.dicom.padElementValue(element, value);
+
     // encode
     if (dwv.dicom.isStringVr(element.vr)) {
       if (dwv.dicom.charSetString.includes(element.vr)) {
-        value = this.encodeSpecialString(value.join('\\'));
+        paddedValue = this.encodeSpecialString(paddedValue.join('\\'));
       } else {
-        value = this.encodeString(value.join('\\'));
+        paddedValue = this.encodeString(paddedValue.join('\\'));
       }
     }
 
-    var paddedValue = dwv.dicom.padElementValue(element, value);
     element.value = paddedValue;
 
     if (element.vr === 'AT') {
