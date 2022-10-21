@@ -4,23 +4,6 @@
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 
-// WARNING about PhantomJS 1.9
-// ---------------------------
-// TypedArray implementation seems incomplete, at least different than observed
-// behavior in browsers...
-// For a DICOM dataset, it was giving an:
-// 'RangeError: ArrayBuffer length minus the byteOffset is not a multiple of
-//  the element size.'
-// Which seem to originate from reading the data of first tag
-// (FileMetaInformationGroupLength, Uint32 -> size=4)
-// at offset 140 of a file of size 3070. 3070-140=2930; 2930/4=732.5...
-//
-// Error which, according to specs, should be thrown when the size of the data
-// to read is not specified (see
-// https://www.khronos.org/registry/typedarray/specs/latest/#7). But it is specified...
-//
-// So I updated the data to be of the correct size (in this case 3072)...
-
 /**
  * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
  * Using remote file for CI integration.
