@@ -218,8 +218,8 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
     var value = dicomElements.getFromKey(tagKey, true);
     if (element.vr !== 'SQ') {
       var jsonTag = jsonTags[tagName];
-      // stringify possible array of numbers
-      if (value.length !== 1) {
+      // stringify possible array
+      if (Array.isArray(jsonTag)) {
         jsonTag = jsonTag.join();
       }
       comparator.equal(
