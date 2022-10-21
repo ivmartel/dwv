@@ -38,7 +38,7 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
     var teoTable = [
       {
         name: 'FileMetaInformationGroupLength',
-        value: '104',
+        value: '90',
         group: '0x0002',
         element: '0x0000',
         vr: 'UL',
@@ -50,23 +50,31 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         group: '0x0002',
         element: '0x0010',
         vr: 'UI',
-        vl: 19
+        vl: 20
       },
       {
         name: 'ImplementationClassUID',
-        value: '1.2.826.0.1.3680043.9.7278.1.0.31.0-beta.14',
+        value: '1.2.826.0.1.3680043.9.7278.1.0.31.0',
         group: '0x0002',
         element: '0x0012',
         vr: 'UI',
-        vl: 43
+        vl: 36
       },
       {
         name: 'ImplementationVersionName',
-        value: 'DWV_0.31.0-beta.14',
+        value: 'DWV_0.31.0',
         group: '0x0002',
         element: '0x0013',
         vr: 'SH',
-        vl: 18
+        vl: 10
+      },
+      {
+        name: 'SOPInstanceUID',
+        value: '1.2.3.0.1.11.111',
+        group: '0x0008',
+        element: '0x0018',
+        vr: 'UI',
+        vl: 16,
       },
       {
         name: 'Modality',
@@ -77,20 +85,55 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         vl: 2
       },
       {
+        name: 'PerformingPhysicianName',
+        value: '(no value available)',
+        group: '0x0008',
+        element: '0x1050',
+        vr: 'PN',
+        vl: 0,
+      },
+      {
+        name: 'ReferencedImageSequence',
+        value: [
+          [
+            {
+              element: '0x1150',
+              group: '0x0008',
+              name: 'ReferencedSOPClassUID',
+              value: '1.2.840.10008.5.1.4.1.1.4',
+              vl: 26,
+              vr: 'UI'
+            },
+            {
+              element: '0x1155',
+              group: '0x0008',
+              name: 'ReferencedSOPInstanceUID',
+              value: '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+              vl: 52,
+              vr: 'UI'
+            }
+          ]
+        ],
+        group: '0x0008',
+        element: '0x1140',
+        vr: 'SQ',
+        vl: 102
+      },
+      {
         name: 'PatientName',
-        value: 'dwv-patient-name',
+        value: 'dwv^PatientName',
         group: '0x0010',
         element: '0x0010',
         vr: 'PN',
         vl: 16
       },
       {
-        name: 'PerformingPhysicianName',
-        value: '(no value available)',
-        group: '0x0008',
-        element: '0x1050',
-        vr: 'PN',
-        vl: 0
+        name: 'PatientID',
+        value: 'dwv-patient-id123',
+        group: '0x0010',
+        element: '0x0020',
+        vr: 'LO',
+        vl: 18
       },
       {
         name: 'dBdt',
@@ -98,15 +141,39 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         group: '0x0018',
         element: '0x1318',
         vr: 'DS',
-        vl: 1
+        vl: 2
       },
       {
-        name: 'PhotometricInterpretation',
-        value: 'MONOCHROME2',
-        group: '0x0028',
-        element: '0x0004',
-        vr: 'CS',
-        vl: 11
+        name: 'StudyInstanceUID',
+        value: '1.2.3.0.1',
+        group: '0x0020',
+        element: '0x000D',
+        vr: 'UI',
+        vl: 10
+      },
+      {
+        name: 'SeriesInstanceUID',
+        value: '1.2.3.0.1.11',
+        group: '0x0020',
+        element: '0x000E',
+        vr: 'UI',
+        vl: 12
+      },
+      {
+        name: 'InstanceNumber',
+        value: '0',
+        group: '0x0020',
+        element: '0x0013',
+        vr: 'IS',
+        vl: 2
+      },
+      {
+        name: 'ImagePositionPatient',
+        value: '0\\0\\0',
+        group: '0x0020',
+        element: '0x0032',
+        vr: 'DS',
+        vl: 6
       },
       {
         name: 'SamplesPerPixel',
@@ -117,12 +184,12 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         vl: 2
       },
       {
-        name: 'PixelRepresentation',
-        value: '0',
+        name: 'PhotometricInterpretation',
+        value: 'MONOCHROME2',
         group: '0x0028',
-        element: '0x0103',
-        vr: 'US',
-        vl: 2
+        element: '0x0004',
+        vr: 'CS',
+        vl: 12
       },
       {
         name: 'Rows',
@@ -165,47 +232,12 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
         vl: 2
       },
       {
-        name: 'ReferencedImageSequence',
-        value: [
-          [
-            {
-              element: '0x1150',
-              group: '0x0008',
-              name: 'ReferencedSOPClassUID',
-              value: '1.2.840.10008.5.1.4.1.1.4',
-              vl: 25,
-              vr: 'UI'
-            },
-            {
-              element: '0x1155',
-              group: '0x0008',
-              name: 'ReferencedSOPInstanceUID',
-              value: '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
-              vl: 52,
-              vr: 'UI'
-            }
-          ]
-        ],
-        group: '0x0008',
-        element: '0x1140',
-        vr: 'SQ',
-        vl: 101
-      },
-      {
-        name: 'ImagePositionPatient',
-        value: '0\\0\\0',
-        group: '0x0020',
-        element: '0x0032',
-        vr: 'DS',
-        vl: 5
-      },
-      {
-        name: 'InstanceNumber',
+        name: 'PixelRepresentation',
         value: '0',
-        group: '0x0020',
-        element: '0x0013',
-        vr: 'IS',
-        vl: 1
+        group: '0x0028',
+        element: '0x0103',
+        vr: 'US',
+        vl: 2
       },
       {
         name: 'PixelData',

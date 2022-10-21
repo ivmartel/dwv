@@ -142,7 +142,7 @@ QUnit.test('Test patient anonymisation', function (assert) {
       }
     };
 
-    var patientsName = 'dwv-patient-test';
+    var patientsName = 'dwv^PatientName';
     var patientID = 'dwv-patient-id123';
     var patientsBirthDate = '19830101';
     var patientsSex = 'M';
