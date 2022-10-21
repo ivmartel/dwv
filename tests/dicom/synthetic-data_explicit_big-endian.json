@@ -319,7 +319,7 @@
                     "PrivateIS": "1234",
                     "PrivateLO": "LOng string",
                     "PrivateLT": "Long Text",
-                    "PrivateOB": 0,
+                    "PrivateOB": [0, 0],
                     "PrivateOD": "0",
                     "PrivateOF": 0,
                     "PrivateOL": 0,

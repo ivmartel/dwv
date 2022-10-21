@@ -96,6 +96,7 @@ dwv.dicom.isStringVr = function (vr) {
 
 /**
  * Is the input VR a VR that could need padding.
+ * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
  *
  * @param {string} vr The element VR.
  * @returns {boolean} True if the VR needs padding.
@@ -123,35 +124,52 @@ dwv.dicom.getVrPad = function (vr) {
 };
 
 /**
- * Pad an input value according to its VR.
- * The input value will be modified if necessary,
- * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
+ * Push a value at the end of an input Uint8Array.
  *
- * @param {object} element The DICOM element to get the VR from.
- * @param {Array} value The input value, padded if necessary.
+ * @param {Uint8Array} arr The input array.
+ * @param {number} value The value to push.
+ * @returns {Uint8Array} The new array.
  */
-dwv.dicom.padElementValue = function (element, value) {
+dwv.dicom.uint8ArrayPush = function (arr, value) {
+  var newArr = new Uint8Array(arr.length + 1);
+  newArr.set(arr);
+  newArr.set(value, arr.length);
+  return newArr;
+};
+
+/**
+ * Pad an input OB value.
+ *
+ * @param {Array|Uint8Array} value The input value.
+ * @returns {Array|Uint8Array} The padded input.
+ */
+dwv.dicom.padOBValue = function (value) {
   if (value !== null &&
     typeof value !== 'undefined' &&
-    typeof value.length !== 'undefined' &&
-    dwv.dicom.isVrToPad(element.vr)) {
-    // calculate size
-    var size = 0;
-    if (element.vr === 'OB' &&
-      value.length !== 0 &&
+    typeof value.length !== 'undefined') {
+    // calculate size and pad if needed
+    if (value.length !== 0 &&
       typeof value[0].length !== 'undefined') {
-      // pixel data comes as an array of typedArray
+      // handle array of array
+      var size = 0;
       for (var i = 0; i < value.length; ++i) {
         size += value[i].length;
       }
+      if (!dwv.dicom.isEven(size)) {
+        value[value.length - 1] = dwv.dicom.uint8ArrayPush(
+          value[value.length - 1], 0);
+      }
     } else {
-      size = value.join('').length;
+      if (!dwv.dicom.isEven(value.length)) {
+        value = dwv.dicom.uint8ArrayPush(value, 0);
+      }
     }
-    // pad if needed
-    if (!dwv.dicom.isEven(size)) {
-      value[value.length - 1] += dwv.dicom.getVrPad(element.vr);
-    }
+  } else {
+    throw new Error('Cannot pad undefined or null OB value.');
   }
+  // uint8ArrayPush may create a new array so we
+  // need to return it
+  return value;
 };
 
 /**
@@ -960,14 +978,23 @@ dwv.dicom.DicomWriter.prototype.setElementValue = function (
     }
   } else {
     // pad if necessary
-    dwv.dicom.padElementValue(element, value);
-
-    // encode
-    if (dwv.dicom.isStringVr(element.vr)) {
-      if (dwv.dicom.charSetString.includes(element.vr)) {
-        value = this.encodeSpecialString(value.join('\\'));
-      } else {
-        value = this.encodeString(value.join('\\'));
+    if (dwv.dicom.isVrToPad(element.vr)) {
+      var pad = dwv.dicom.getVrPad(element.vr);
+      // encode string
+      // TODO: not sure for UN...
+      if (dwv.dicom.isStringVr(element.vr)) {
+        if (dwv.dicom.charSetString.includes(element.vr)) {
+          value = this.encodeSpecialString(value.join('\\'));
+          pad = this.encodeSpecialString(pad);
+        } else {
+          value = this.encodeString(value.join('\\'));
+          pad = this.encodeString(pad);
+        }
+        if (!dwv.dicom.isEven(value.length)) {
+          value = dwv.dicom.uint8ArrayPush(value, pad);
+        }
+      } else if (element.vr === 'OB') {
+        value = dwv.dicom.padOBValue(value);
       }
     }
 
