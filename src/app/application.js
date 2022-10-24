@@ -543,11 +543,8 @@ dwv.App = function () {
    * To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
-      var layerGroup = stage.getLayerGroup(i);
-      layerGroup.fitToContainer();
-      layerGroup.draw();
-    }
+    stage.syncLayerGroupScale();
+
   };
 
   /**
