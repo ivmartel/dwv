@@ -795,7 +795,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
     var skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
-      var valid = typeof event.valid === 'undefined' || event.valid;
+      var valid = true;
+      if (typeof event.valid !== 'undefined') {
+        valid = event.valid;
+      }
       // clear for non valid events
       if (!valid) {
         // clear only once
