@@ -169,6 +169,24 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
+   * Image smoothing flag.
+   * see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled
+   *
+   * @private
+   * @type {boolean}
+   */
+  var imageSmoothingEnabled = false;
+
+  /**
+   * Set the imageSmoothingEnabled flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.enableImageSmoothing = function (flag) {
+    imageSmoothingEnabled = flag;
+  };
+
+  /**
    * Set the associated view.
    *
    * @param {object} view The view.
@@ -513,7 +531,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     );
 
     // disable smoothing (set just before draw, could be reset by resize)
-    context.imageSmoothingEnabled = false;
+    context.imageSmoothingEnabled = imageSmoothingEnabled;
     // draw image
     context.drawImage(offscreenCanvas, 0, 0);
 
