@@ -443,6 +443,8 @@ dwv.ctrl.DrawController = function (konvaLayer) {
 
     // udpate current layer
     konvaLayer.draw();
+
+    return true;
   };
 
   /**

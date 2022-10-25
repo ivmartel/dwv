@@ -920,12 +920,12 @@ dwv.tool.Draw.prototype.hasShape = function (name) {
  * Get the minimum position in a groups' anchors.
  *
  * @param {object} group The group that contains anchors.
- * @returns {object} The minimum position as {x,y}.
+ * @returns {object|undefined} The minimum position as {x,y}.
  */
 dwv.tool.getAnchorMin = function (group) {
   var anchors = group.find('.anchor');
   if (anchors.length === 0) {
-    return;
+    return undefined;
   }
   var minX = anchors[0].x();
   var minY = anchors[0].y();

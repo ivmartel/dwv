@@ -44,7 +44,7 @@ dwv.utils.uint8ArrayToString = function (arr) {
  * @param {Function} callbackFn The find function.
  * @param {number} start The array start index.
  * @param {number} end The array end index.
- * @returns {number} The index where the element was found.
+ * @returns {number|undefined} The index where the element was found.
  */
 dwv.utils.findInArraySubset = function (arr, callbackFn, start, end) {
   // check inputs
@@ -65,7 +65,7 @@ dwv.utils.findInArraySubset = function (arr, callbackFn, start, end) {
       return i;
     }
   }
-  return;
+  return undefined;
 };
 
 /**

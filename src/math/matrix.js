@@ -225,7 +225,7 @@ dwv.math.getMatrixInverse = function (m) {
   var det = m00 * a1212 + m01 * a2012 + m02 * a0112;
   if (det === 0) {
     dwv.logger.warn('Cannot invert 3*3 matrix with zero determinant.');
-    return;
+    return undefined;
   }
   det = 1 / det;
 

@@ -551,7 +551,7 @@ dwv.image.getRegionSliceIterator = function (
  * @param {dwv.math.Point} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Array} regions An array of regions.
- * @returns {object} The slice iterator.
+ * @returns {object|undefined} The slice iterator.
  */
 dwv.image.getVariableRegionSliceIterator = function (
   image, position, isRescaled, regions) {
@@ -603,7 +603,7 @@ dwv.image.getVariableRegionSliceIterator = function (
 
   // exit if no offsets
   if (offsetRegions.length === 0) {
-    return;
+    return undefined;
   }
 
   var startOffset = size.indexToOffset(position.getWithNew2D(

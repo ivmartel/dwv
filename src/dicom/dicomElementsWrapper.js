@@ -579,7 +579,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR
- * @returns {Array} The file list as an array ordered by
+ * @returns {Array|undefined} The file list as an array ordered by
  *   STUDY > SERIES > IMAGES.
  */
 dwv.dicom.getFileListFromDicomDir = function (data) {
@@ -592,13 +592,13 @@ dwv.dicom.getFileListFromDicomDir = function (data) {
   if (typeof elements.x00041220 === 'undefined' ||
     typeof elements.x00041220.value === 'undefined') {
     dwv.logger.warn('No Directory Record Sequence found in DICOMDIR.');
-    return;
+    return undefined;
   }
   var dirSeq = elements.x00041220.value;
 
   if (dirSeq.length === 0) {
     dwv.logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
-    return;
+    return undefined;
   }
 
   var records = [];
