@@ -685,20 +685,53 @@ dwv.image.MaskFactory.prototype.create = function (
     throw new Error('No imageOrientationPatient found for DICOM SEG');
   }
 
-  // add missing posPats
+  var point3DFromArray = function (arr) {
+    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
+  };
+
+  // create geometry
+  var origin = point3DFromArray(framePosPats[0]);
+  var rowCosines = new dwv.math.Vector3D(
+    parseFloat(imageOrientationPatient[0]),
+    parseFloat(imageOrientationPatient[1]),
+    parseFloat(imageOrientationPatient[2]));
+  var colCosines = new dwv.math.Vector3D(
+    parseFloat(imageOrientationPatient[3]),
+    parseFloat(imageOrientationPatient[4]),
+    parseFloat(imageOrientationPatient[5]));
+  var normal = rowCosines.crossProduct(colCosines);
+  /* eslint-disable array-element-newline */
+  var orientationMatrix = new dwv.math.Matrix33([
+    rowCosines.getX(), colCosines.getX(), normal.getX(),
+    rowCosines.getY(), colCosines.getY(), normal.getY(),
+    rowCosines.getZ(), colCosines.getZ(), normal.getZ()
+  ]);
+  var geometry = new dwv.image.Geometry(
+    origin, size, spacing, orientationMatrix);
+
+  // add possibly missing posPats
   var posPats = [];
-  var sliceSpacing = spacing.get(2);
-  for (var g = 0; g < framePosPats.length - 1; ++g) {
-    posPats.push(framePosPats[g]);
-    var nextZ = framePosPats[g][2] - sliceSpacing;
-    var diff = Math.abs(nextZ - framePosPats[g + 1][2]);
-    while (diff >= sliceSpacing) {
-      posPats.push([framePosPats[g][0], framePosPats[g][1], nextZ]);
-      nextZ -= sliceSpacing;
-      diff = Math.abs(nextZ - framePosPats[g + 1][2]);
+  posPats.push(framePosPats[0]);
+  var sliceIndex = 0;
+  for (var g = 1; g < framePosPats.length; ++g) {
+    ++sliceIndex;
+    var index = new dwv.math.Index([0, 0, sliceIndex]);
+    var point = geometry.indexToWorld(index).get3D();
+    var framePosPat = point3DFromArray(framePosPats[g]);
+    // check if more pos pats are needed
+    var dist = framePosPat.getDistance(point);
+    // TODO: good threshold?
+    while (dist > 1e-4) {
+      dwv.logger.debug('Adding intermediate pos pats for DICOM seg');
+      posPats.push([point.getX(), point.getY(), point.getZ()]);
+      ++sliceIndex;
+      index = new dwv.math.Index([0, 0, sliceIndex]);
+      point = geometry.indexToWorld(index).get3D();
+      dist = framePosPat.getDistance(point);
     }
+    // add frame pos pat
+    posPats.push(framePosPats[g]);
   }
-  posPats.push(framePosPats[framePosPats.length - 1]);
 
   var getFindSegmentFunc = function (number) {
     return function (item) {
@@ -714,7 +747,6 @@ dwv.image.MaskFactory.prototype.create = function (
   buffer.fill(0);
   // merge frame buffers
   var sliceOffset = null;
-  var sliceIndex = null;
   var frameOffset = null;
   for (var f = 0; f < frameInfos.length; ++f) {
     // get the slice index from the position in the posPat array
@@ -740,16 +772,6 @@ dwv.image.MaskFactory.prototype.create = function (
     }
   }
 
-  if (typeof spacing === 'undefined') {
-    throw Error('No spacing found in DICOM seg file.');
-  }
-
-  // geometry
-  var point3DFromArray = function (arr) {
-    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
-  };
-  var origin = point3DFromArray(posPats[0]);
-  var geometry = new dwv.image.Geometry(origin, size, spacing);
   var uids = [0];
   for (var m = 1; m < numberOfSlices; ++m) {
     // args: origin, volumeNumber, uid, index, increment
