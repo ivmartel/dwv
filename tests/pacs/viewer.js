@@ -154,20 +154,39 @@ dwv.test.viewerSetup = function () {
       }
     }
     // example usage of a dicom SEG as data mask
-    // if (_app.getMetaData(event.loadid).Modality.value === 'SEG') {
-    //   var vls = _app.getViewLayersByDataIndex(0);
-    //   var vc = vls[0].getViewController();
-    //   var segImage = _app.getImage(event.loadid);
-    //   vc.setViewAlphaFunction(function (value, index) {
-    //     if (segImage.getValueAtOffset(3 * index) === 0 &&
-    //       segImage.getValueAtOffset(3 * index + 1) === 0 &&
-    //       segImage.getValueAtOffset(3 * index + 2) === 0) {
-    //       return 0;
-    //     } else {
-    //       return 0xff;
-    //     }
-    //   });
-    // }
+    var useSegAsMask = false;
+    if (useSegAsMask &&
+      _app.getMetaData(event.loadid).Modality.value === 'SEG') {
+      // image to filter
+      var imgDataIndex = 0;
+      var vls = _app.getViewLayersByDataIndex(imgDataIndex);
+      var vc = vls[0].getViewController();
+      var img = _app.getImage(imgDataIndex);
+      var imgGeometry = img.getGeometry();
+      var sliceSize = imgGeometry.getSize().getDimSize(2);
+      // SEG image
+      var segImage = _app.getImage(event.loadid);
+      // calculate slice difference
+      var segOrigin0 = segImage.getGeometry().getOrigins()[0];
+      var segOrigin0Point = new dwv.math.Point([
+        segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
+      ]);
+      var segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
+      var indexOffset = segOriginIndex.get(2) * sliceSize;
+      // set alpha function
+      vc.setViewAlphaFunction(function (value, index) {
+        // multiply by 3 since SEG is RGB
+        var segIndex = 3 * (index - indexOffset);
+        if (segIndex >= 0 &&
+          segImage.getValueAtOffset(segIndex) === 0 &&
+          segImage.getValueAtOffset(segIndex + 1) === 0 &&
+          segImage.getValueAtOffset(segIndex + 2) === 0) {
+          return 0;
+        } else {
+          return 0xff;
+        }
+      });
+    }
   });
 
   _app.addEventListener('positionchange', function (event) {
