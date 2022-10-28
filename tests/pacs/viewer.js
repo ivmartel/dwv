@@ -153,6 +153,11 @@ dwv.test.viewerSetup = function () {
         }
       }
     }
+
+    if (_app.getMetaData(event.loadid).Modality.value === 'SEG') {
+      logFramePosPats(_app.getMetaData(event.loadid));
+    }
+
     // example usage of a dicom SEG as data mask
     var useSegAsMask = false;
     if (useSegAsMask &&
@@ -823,4 +828,55 @@ function addDataRow(id) {
   // add controls
   cell.appendChild(getControlDiv(opacityId, 'opacity',
     0, 1, vl.getOpacity(), changeOpacity, floatPrecision));
+}
+
+/**
+ * Compare two pos pat keys.
+ *
+ * @param {string} a The key of the first item.
+ * @param {string} b The key of the second item.
+ * @returns {number} Negative if a<b, positive if a>b.
+ */
+function comparePosPat(a, b) {
+  var za = parseFloat(a.split('\\').at(-1));
+  var zb = parseFloat(b.split('\\').at(-1));
+  return za - zb;
+}
+
+/**
+ * Sort an object with pos pat string keys.
+ *
+ * @param {object} obj The object to sort
+ * @returns {object} The sorted object.
+ */
+function sortByPosPatKey(obj) {
+  var keys = Object.keys(obj);
+  keys.sort(comparePosPat);
+  var sorted = new Map();
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    sorted.set(key, obj[key]);
+  }
+  return sorted;
+}
+
+/**
+ * Log the DICCOM seg segments ordered by frame position patients.
+ *
+ * @param {object} elements The DICOM seg elements.
+ */
+function logFramePosPats(elements) {
+  var perFrame = elements.PerFrameFunctionalGroupsSequence.value;
+  var perPos = {};
+  for (var i = 0; i < perFrame.length; ++i) {
+    var posSq = perFrame[i].PlanePositionSequence.value;
+    var pos = posSq[0].ImagePositionPatient.value;
+    if (typeof perPos[pos] === 'undefined') {
+      perPos[pos] = [];
+    }
+    var frameSq = perFrame[i].FrameContentSequence.value;
+    var dim = frameSq[0].DimensionIndexValues.value;
+    perPos[pos].push(dim);
+  }
+  console.log('DICOM SEG Segments', sortByPosPatKey(perPos));
 }
