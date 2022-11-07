@@ -33,7 +33,7 @@
     "benchmark": "~2.1.4",
     "clean-jsdoc-theme": "4.1.8",
     "eslint": "~8.26.0",
-    "eslint-plugin-jsdoc": "~39.3.3",
+    "eslint-plugin-jsdoc": "~39.6.2",
     "github-release-notes": "0.17.2",
     "grunt": "^1.4.0",
     "grunt-cli": "^1.4.2",
