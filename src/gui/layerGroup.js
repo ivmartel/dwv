@@ -226,7 +226,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    *
    * @returns {string} The id of the div.
    */
-  this.getElementId = function () {
+  this.getDivId = function () {
     return containerDiv.id;
   };
 

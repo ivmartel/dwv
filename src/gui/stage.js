@@ -194,9 +194,9 @@ dwv.gui.Stage = function () {
    * @param {string} id The element id to find.
    * @returns {dwv.gui.LayerGroup} The layer group.
    */
-  this.getLayerGroupWithElementId = function (id) {
+  this.getLayerGroupByDivId = function (id) {
     return layerGroups.find(function (item) {
-      return item.getElementId() === id;
+      return item.getDivId() === id;
     });
   };
 

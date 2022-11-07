@@ -249,6 +249,17 @@ dwv.App = function () {
   };
 
   /**
+   * Get a layer group by div id.
+   * The layer is available after the first loaded item.
+   *
+   * @param {string} divId The div id.
+   * @returns {dwv.gui.LayerGroup} The layer group.
+   */
+  this.getLayerGroupByDivId = function (divId) {
+    return stage.getLayerGroupByDivId(divId);
+  };
+
+  /**
    * Get the number of layer groups.
    *
    * @returns {number} The number of groups.
@@ -669,7 +680,7 @@ dwv.App = function () {
     for (var i = 0; i < viewConfigs.length; ++i) {
       var config = viewConfigs[i];
       var layerGroup =
-        stage.getLayerGroupWithElementId(config.divId);
+        stage.getLayerGroupByDivId(config.divId);
       // layer group must exist
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
@@ -1251,7 +1262,7 @@ dwv.App = function () {
     if (!data) {
       throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = stage.getLayerGroupWithElementId(dataViewConfig.divId);
+    var layerGroup = stage.getLayerGroupByDivId(dataViewConfig.divId);
     if (!layerGroup) {
       throw new Error('Cannot initialise layer with group id: ' +
         dataViewConfig.divId);
