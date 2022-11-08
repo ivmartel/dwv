@@ -803,10 +803,16 @@ dwv.image.MaskFactory.prototype.create = function (
   }
   // meta information
   var meta = dwv.dicom.getDefaultDicomSegJson();
-  // UID
+  // Study
+  meta.StudyDate = dicomElements.getFromKey('x00080020');
+  meta.StudyTime = dicomElements.getFromKey('x00080030');
   meta.StudyInstanceUID = dicomElements.getFromKey('x0020000D');
+  meta.StudyID = dicomElements.getFromKey('x00200010');
+  // Series
   meta.SeriesInstanceUID = dicomElements.getFromKey('x0020000E');
   meta.SeriesNumber = dicomElements.getFromKey('x00200011');
+  // ReferringPhysicianName
+  meta.ReferringPhysicianName = dicomElements.getFromKey('x00080090');
   // patient info
   meta.PatientName =
     dwv.dicom.cleanString(dicomElements.getFromKey('x00100010'));
@@ -814,6 +820,11 @@ dwv.image.MaskFactory.prototype.create = function (
   meta.PatientBirthDate = dicomElements.getFromKey('x00100030');
   meta.PatientSex =
     dwv.dicom.cleanString(dicomElements.getFromKey('x00100040'));
+  // Enhanced General Equipment Module
+  meta.Manufacturer = dicomElements.getFromKey('x00080070');
+  meta.ManufacturerModelName = dicomElements.getFromKey('x00081090');
+  meta.DeviceSerialNumber = dicomElements.getFromKey('x00181000');
+  meta.SoftwareVersions = dicomElements.getFromKey('x00181020');
   // dicom seg dimension
   meta.DimensionOrganizationSequence = dimension.organizations;
   meta.DimensionIndexSequence = dimension.indices;
