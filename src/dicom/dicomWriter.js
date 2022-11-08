@@ -695,7 +695,10 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var element;
   var groupName;
   var metaLength = 0;
+  // FileMetaInformationGroupLength
   var fmiglTag = dwv.dicom.getFileMetaInformationGroupLengthTag();
+  // FileMetaInformationVersion
+  var fmivTag = new dwv.dicom.Tag('0x0002', '0x0001');
   // ImplementationClassUID
   var icUIDTag = new dwv.dicom.Tag('0x0002', '0x0012');
   // ImplementationVersionName
@@ -707,6 +710,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     element = this.getElementToWrite(dicomElements[keys[i]]);
     if (element !== null &&
        !fmiglTag.equals(element.tag) &&
+       !fmivTag.equals(element.tag) &&
        !icUIDTag.equals(element.tag) &&
        !ivnTag.equals(element.tag)) {
       localSize = 0;
@@ -749,9 +753,16 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     }
   }
 
+  // FileMetaInformationVersion
+  var fmiv = dwv.dicom.getDicomElement('FileMetaInformationVersion');
+  var fmivSize = dwv.dicom.getDataElementPrefixByteSize(fmiv.vr, false);
+  fmivSize += this.setElementValue(fmiv, [0, 1], false);
+  metaElements.push(fmiv);
+  metaLength += fmivSize;
+  totalSize += fmivSize;
   // ImplementationClassUID
   var icUID = dwv.dicom.getDicomElement('ImplementationClassUID');
-  var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, isImplicit);
+  var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, false);
   icUIDSize += this.setElementValue(
     icUID, [dwv.dicom.getUID('ImplementationClassUID')], false);
   metaElements.push(icUID);
@@ -759,7 +770,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   totalSize += icUIDSize;
   // ImplementationVersionName
   var ivn = dwv.dicom.getDicomElement('ImplementationVersionName');
-  var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
+  var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, false);
   var ivnValue = 'DWV_' + dwv.getVersion();
   ivnSize += this.setElementValue(ivn, [ivnValue], false);
   metaElements.push(ivn);
@@ -775,7 +786,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 
   // create the FileMetaInformationGroupLength element
   var fmigl = dwv.dicom.getDicomElement('FileMetaInformationGroupLength');
-  var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, isImplicit);
+  var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, false);
   fmiglSize += this.setElementValue(
     fmigl, new Uint32Array([metaLength]), false);
   totalSize += fmiglSize;
