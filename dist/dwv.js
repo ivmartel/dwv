@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.15 2022-10-28 12:46:58 */
+/*! dwv 0.31.0-beta.16 2022-11-08 14:56:16 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -320,6 +320,17 @@ dwv.App = function () {
    */
   this.getLayerGroupById = function (groupId) {
     return stage.getLayerGroup(groupId);
+  };
+
+  /**
+   * Get a layer group by div id.
+   * The layer is available after the first loaded item.
+   *
+   * @param {string} divId The div id.
+   * @returns {dwv.gui.LayerGroup} The layer group.
+   */
+  this.getLayerGroupByDivId = function (divId) {
+    return stage.getLayerGroupByDivId(divId);
   };
 
   /**
@@ -743,7 +754,7 @@ dwv.App = function () {
     for (var i = 0; i < viewConfigs.length; ++i) {
       var config = viewConfigs[i];
       var layerGroup =
-        stage.getLayerGroupWithElementId(config.divId);
+        stage.getLayerGroupByDivId(config.divId);
       // layer group must exist
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
@@ -1325,7 +1336,7 @@ dwv.App = function () {
     if (!data) {
       throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = stage.getLayerGroupWithElementId(dataViewConfig.divId);
+    var layerGroup = stage.getLayerGroupByDivId(dataViewConfig.divId);
     if (!layerGroup) {
       throw new Error('Cannot initialise layer with group id: ' +
         dataViewConfig.divId);
@@ -4591,7 +4602,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.15';
+  return '0.31.0-beta.16';
 };
 
 /**
@@ -6083,16 +6094,18 @@ dwv.dicom.isPixelDataTag = function (tag) {
  * Get a tag from the dictionary using a tag string name.
  *
  * @param {string} tagName The tag string name.
- * @returns {object} The tag object.
+ * @returns {object|null} The tag object or null if not found.
  */
 dwv.dicom.getTagFromDictionary = function (tagName) {
+  if (typeof tagName === 'undefined' || tagName === null) {
+    return null;
+  }
   var group = null;
   var element = null;
   var dict = dwv.dicom.dictionary;
   var keys0 = Object.keys(dict);
   var keys1 = null;
-  // label for nested loop break
-  outLabel:
+  var foundTag = false;
   // search through dictionary
   for (var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
     group = keys0[k0];
@@ -6100,12 +6113,16 @@ dwv.dicom.getTagFromDictionary = function (tagName) {
     for (var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
       element = keys1[k1];
       if (dict[group][element][2] === tagName) {
-        break outLabel;
+        foundTag = true;
+        break;
       }
+    }
+    if (foundTag) {
+      break;
     }
   }
   var tag = null;
-  if (group !== null && element !== null) {
+  if (foundTag) {
     tag = new dwv.dicom.Tag(group, element);
   }
   return tag;
@@ -6808,7 +6825,10 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var element;
   var groupName;
   var metaLength = 0;
+  // FileMetaInformationGroupLength
   var fmiglTag = dwv.dicom.getFileMetaInformationGroupLengthTag();
+  // FileMetaInformationVersion
+  var fmivTag = new dwv.dicom.Tag('0x0002', '0x0001');
   // ImplementationClassUID
   var icUIDTag = new dwv.dicom.Tag('0x0002', '0x0012');
   // ImplementationVersionName
@@ -6820,6 +6840,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     element = this.getElementToWrite(dicomElements[keys[i]]);
     if (element !== null &&
        !fmiglTag.equals(element.tag) &&
+       !fmivTag.equals(element.tag) &&
        !icUIDTag.equals(element.tag) &&
        !ivnTag.equals(element.tag)) {
       localSize = 0;
@@ -6862,9 +6883,16 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     }
   }
 
+  // FileMetaInformationVersion
+  var fmiv = dwv.dicom.getDicomElement('FileMetaInformationVersion');
+  var fmivSize = dwv.dicom.getDataElementPrefixByteSize(fmiv.vr, false);
+  fmivSize += this.setElementValue(fmiv, [0, 1], false);
+  metaElements.push(fmiv);
+  metaLength += fmivSize;
+  totalSize += fmivSize;
   // ImplementationClassUID
   var icUID = dwv.dicom.getDicomElement('ImplementationClassUID');
-  var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, isImplicit);
+  var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, false);
   icUIDSize += this.setElementValue(
     icUID, [dwv.dicom.getUID('ImplementationClassUID')], false);
   metaElements.push(icUID);
@@ -6872,7 +6900,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   totalSize += icUIDSize;
   // ImplementationVersionName
   var ivn = dwv.dicom.getDicomElement('ImplementationVersionName');
-  var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
+  var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, false);
   var ivnValue = 'DWV_' + dwv.getVersion();
   ivnSize += this.setElementValue(ivn, [ivnValue], false);
   metaElements.push(ivn);
@@ -6888,7 +6916,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 
   // create the FileMetaInformationGroupLength element
   var fmigl = dwv.dicom.getDicomElement('FileMetaInformationGroupLength');
-  var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, isImplicit);
+  var fmiglSize = dwv.dicom.getDataElementPrefixByteSize(fmigl.vr, false);
   fmiglSize += this.setElementValue(
     fmigl, new Uint32Array([metaLength]), false);
   totalSize += fmiglSize;
@@ -7189,6 +7217,9 @@ dwv.dicom.getElementsFromJSONTags = function (jsonTags) {
   for (var k = 0, len = keys.length; k < len; ++k) {
     // get the DICOM element definition from its name
     var tag = dwv.dicom.getTagFromDictionary(keys[k]);
+    if (!tag) {
+      continue;
+    }
     var vr = tag.getVrFromDictionary();
     // tag value
     var value;
@@ -13495,7 +13526,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    *
    * @returns {string} The id of the div.
    */
-  this.getElementId = function () {
+  this.getDivId = function () {
     return containerDiv.id;
   };
 
@@ -14287,9 +14318,9 @@ dwv.gui.Stage = function () {
    * @param {string} id The element id to find.
    * @returns {dwv.gui.LayerGroup} The layer group.
    */
-  this.getLayerGroupWithElementId = function (id) {
+  this.getLayerGroupByDivId = function (id) {
     return layerGroups.find(function (item) {
-      return item.getElementId() === id;
+      return item.getDivId() === id;
     });
   };
 
@@ -19675,21 +19706,21 @@ dwv.dicom.checkTag = function (rootElement, tagDefinition) {
 /**
  * List of DICOM Seg required tags.
  */
-dwv.dicom.requiredSegDicomTags = [
+dwv.dicom.requiredDicomSegTags = [
   {
-    name: 'Transfer Syntax UID',
+    name: 'TransferSyntaxUID',
     tag: 'x00020010',
     type: '1',
     enum: ['1.2.840.10008.1.2.1']
   },
   {
-    name: 'Media Storage SOP Class UID',
+    name: 'MediaStorageSOPClassUID',
     tag: 'x00020002',
     type: '1',
     enum: ['1.2.840.10008.5.1.4.1.1.66.4']
   },
   {
-    name: 'SOP Class UID',
+    name: 'SOPClassUID',
     tag: 'x00020002',
     type: '1',
     enum: ['1.2.840.10008.5.1.4.1.1.66.4']
@@ -19701,60 +19732,74 @@ dwv.dicom.requiredSegDicomTags = [
     enum: ['SEG']
   },
   {
-    name: 'Segmentation Type',
+    name: 'SegmentationType',
     tag: 'x00620001',
     type: '1',
     enum: ['BINARY']
   },
   {
-    name: 'Dimension Organization Type',
+    name: 'DimensionOrganizationType',
     tag: 'x00209311',
     type: '3',
     enum: ['3D']
   },
   {
-    name: 'Image Type',
+    name: 'ImageType',
     tag: 'x00080008',
     type: '1',
     enum: [['DERIVED', 'PRIMARY']]
   },
   {
-    name: 'Samples Per Pixel',
+    name: 'SamplesPerPixel',
     tag: 'x00280002',
     type: '1',
     enum: [1]
   },
   {
-    name: 'Photometric Interpretation',
+    name: 'PhotometricInterpretation',
     tag: 'x00280004',
     type: '1',
     enum: ['MONOCHROME2']
   },
   {
-    name: 'Pixel Representation',
+    name: 'PixelRepresentation',
     tag: 'x00280103',
     type: '1',
     enum: [0]
   },
   {
-    name: 'Bits Allocated',
+    name: 'BitsAllocated',
     tag: 'x00280100',
     type: '1',
     enum: [1]
   },
   {
-    name: 'Bits Stored',
+    name: 'BitsStored',
     tag: 'x00280101',
     type: '1',
     enum: [1]
   },
   {
-    name: 'High Bit',
+    name: 'HighBit',
     tag: 'x00280102',
     type: '1',
     enum: [0]
   },
 ];
+
+/**
+ * Get the default DICOM seg tags as an object.
+ *
+ * @returns {object} The default tags.
+ */
+dwv.dicom.getDefaultDicomSegJson = function () {
+  var tags = {};
+  for (var i = 0; i < dwv.dicom.requiredDicomSegTags.length; ++i) {
+    var reqTag = dwv.dicom.requiredDicomSegTags[i];
+    tags[reqTag.name] = reqTag.enum[0];
+  }
+  return tags;
+};
 
 /**
  * Check the dimension organization from a dicom element.
@@ -19769,7 +19814,7 @@ dwv.dicom.getDimensionOrganization = function (rootElement) {
     throw new Error('Unsupported dimension organization sequence length');
   }
   // Dimension Organization UID
-  var orgs = [dwv.dicom.cleanString(orgSq[0].x00209164.value[0])];
+  var orgUID = dwv.dicom.cleanString(orgSq[0].x00209164.value[0]);
 
   // Dimension Index Sequence (conditionally required)
   var indices = [];
@@ -19779,38 +19824,46 @@ dwv.dicom.getDimensionOrganization = function (rootElement) {
     if (indexSq.length !== 2) {
       throw new Error('Unsupported dimension index sequence length');
     }
+    var indexPointer;
     for (var i = 0; i < indexSq.length; ++i) {
       // Dimension Organization UID (required)
       var indexOrg = dwv.dicom.cleanString(indexSq[i].x00209164.value[0]);
-      if (indexOrg !== orgs[0]) {
+      if (indexOrg !== orgUID) {
         throw new Error(
           'Dimension Index Sequence contains a unknown Dimension Organization');
       }
       // Dimension Index Pointer (required)
-      var indexPointer =
-        dwv.dicom.cleanString(indexSq[i].x00209165.value[0]);
+      indexPointer = dwv.dicom.cleanString(indexSq[i].x00209165.value[0]);
 
       var index = {
-        organization: indexOrg,
-        pointer: indexPointer
+        DimensionOrganizationUID: indexOrg,
+        DimensionIndexPointer: indexPointer
       };
       // Dimension Description Label (optional)
       if (typeof indexSq[i].x00209421 !== 'undefined') {
-        index.label =
+        index.DimensionDescriptionLabel =
           dwv.dicom.cleanString(indexSq[i].x00209421.value[0]);
       }
       // store
       indices.push(index);
     }
     // expecting Image Position at last position
-    if (indices[1].pointer !== '(0020,0032)') {
+    if (indexPointer !== '(0020,0032)') {
       throw new Error('Unsupported non image position as last index');
     }
   }
 
   return {
-    organizations: orgs,
-    indices: indices
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID
+        }
+      ]
+    },
+    indices: {
+      value: indices
+    }
   };
 };
 
@@ -20116,8 +20169,8 @@ dwv.image.MaskFactory = function () {};
 dwv.image.MaskFactory.prototype.create = function (
   dicomElements, pixelBuffer) {
   // check required and supported tags
-  for (var d = 0; d < dwv.dicom.requiredSegDicomTags.length; ++d) {
-    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredSegDicomTags[d]);
+  for (var d = 0; d < dwv.dicom.requiredDicomSegTags.length; ++d) {
+    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredDicomSegTags[d]);
   }
 
   // columns
@@ -20183,12 +20236,7 @@ dwv.image.MaskFactory.prototype.create = function (
       var planeOrientationSeq = funcGroup0.x00209116;
       if (planeOrientationSeq.value.length !== 0) {
         // should be only one
-        var orientArray = planeOrientationSeq.value[0].x00200037.value;
-        imageOrientationPatient = orientArray.map(
-          function (x) {
-            return parseFloat(x);
-          }
-        );
+        imageOrientationPatient = planeOrientationSeq.value[0].x00200037.value;
       } else {
         dwv.logger.warn(
           'No shared functional group plane orientation sequence items.');
@@ -20375,31 +20423,51 @@ dwv.image.MaskFactory.prototype.create = function (
     image.setPhotometricInterpretation('RGB');
   }
   // meta information
-  var meta = {
-    Modality: 'SEG',
-    SegmentationType: 'BINARY',
-    DimensionOrganizationType: '3D',
-    DimensionOrganizations: dimension.organizations,
-    DimensionIndices: dimension.indices,
-    BitsStored: 1,
-    PatientName: dwv.dicom.cleanString(dicomElements.getFromKey('x00100010')),
-    PatientID: dwv.dicom.cleanString(dicomElements.getFromKey('x00100020')),
-    PatientBirthDate: dicomElements.getFromKey('x00100030'),
-    PatientSex: dwv.dicom.cleanString(dicomElements.getFromKey('x00100040')),
-    StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
-    SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
-    SeriesNumber: dicomElements.getFromKey('x00200011'),
-    ImageOrientationPatient: imageOrientationPatient,
-    custom: {
-      segments: segments,
-      frameInfos: frameInfos,
-      SOPInstanceUID: dicomElements.getFromKey('x00080018')
-    }
+  var meta = dwv.dicom.getDefaultDicomSegJson();
+  // Study
+  meta.StudyDate = dicomElements.getFromKey('x00080020');
+  meta.StudyTime = dicomElements.getFromKey('x00080030');
+  meta.StudyInstanceUID = dicomElements.getFromKey('x0020000D');
+  meta.StudyID = dicomElements.getFromKey('x00200010');
+  // Series
+  meta.SeriesInstanceUID = dicomElements.getFromKey('x0020000E');
+  meta.SeriesNumber = dicomElements.getFromKey('x00200011');
+  // ReferringPhysicianName
+  meta.ReferringPhysicianName = dicomElements.getFromKey('x00080090');
+  // patient info
+  meta.PatientName =
+    dwv.dicom.cleanString(dicomElements.getFromKey('x00100010'));
+  meta.PatientID = dwv.dicom.cleanString(dicomElements.getFromKey('x00100020'));
+  meta.PatientBirthDate = dicomElements.getFromKey('x00100030');
+  meta.PatientSex =
+    dwv.dicom.cleanString(dicomElements.getFromKey('x00100040'));
+  // Enhanced General Equipment Module
+  meta.Manufacturer = dicomElements.getFromKey('x00080070');
+  meta.ManufacturerModelName = dicomElements.getFromKey('x00081090');
+  meta.DeviceSerialNumber = dicomElements.getFromKey('x00181000');
+  meta.SoftwareVersions = dicomElements.getFromKey('x00181020');
+  // dicom seg dimension
+  meta.DimensionOrganizationSequence = dimension.organizations;
+  meta.DimensionIndexSequence = dimension.indices;
+  // custom
+  meta.custom = {
+    segments: segments,
+    frameInfos: frameInfos,
+    SOPInstanceUID: dicomElements.getFromKey('x00080018')
   };
+
+  // number of files: in this case equal to number slices,
+  //   used to calculate buffer size
+  meta.numberOfFiles = numberOfSlices;
   // FrameOfReferenceUID (optional)
   var frameOfReferenceUID = dicomElements.getFromKey('x00200052');
   if (frameOfReferenceUID) {
     meta.FrameOfReferenceUID = frameOfReferenceUID;
+  }
+  // LossyImageCompression (optional)
+  var lossyImageCompression = dicomElements.getFromKey('x00282110');
+  if (lossyImageCompression) {
+    meta.LossyImageCompression = lossyImageCompression;
   }
 
   image.setMeta(meta);

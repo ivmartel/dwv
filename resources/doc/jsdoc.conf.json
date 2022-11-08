@@ -25,7 +25,7 @@
       "package": "package.json",
       "theme_opts": {
         "title": "DWV doc",
-        "footer": "<i>Documentation generated for dwv v0.31.0-beta.15.</i>",
+        "footer": "<i>Documentation generated for dwv v0.31.0-beta.16.</i>",
         "sections": [
           "Tutorials",
           "Namespaces",
@@ -50,7 +50,7 @@
         "codepen": {
           "enable_for": ["examples"],
             "options": {
-            "js_external": "https://github.com/ivmartel/dwv/releases/download/v0.31.0-beta.15/dwv-0.31.0-beta.15.min.js",
+            "js_external": "https://github.com/ivmartel/dwv/releases/download/v0.31.0-beta.16/dwv-0.31.0-beta.16.min.js",
             "html": "<div id='dwv'><div id='layerGroup0'></div></div>"
           }
         }
