@@ -1076,6 +1076,9 @@ dwv.dicom.getElementsFromJSONTags = function (jsonTags) {
   for (var k = 0, len = keys.length; k < len; ++k) {
     // get the DICOM element definition from its name
     var tag = dwv.dicom.getTagFromDictionary(keys[k]);
+    if (!tag) {
+      continue;
+    }
     var vr = tag.getVrFromDictionary();
     // tag value
     var value;

@@ -69,3 +69,35 @@ QUnit.test('Test Tag.', function (assert) {
   assert.ok(dwv.dicom.getTagFromKey('x11112222').equals(tag00),
     'getTagFromKey');
 });
+
+/**
+ * Tests for {@link dwv.dicom.getTagFromDictionary}.
+ *
+ * @function module:tests/dicom~getTagFromDictionary
+ */
+QUnit.test('Test getTagFromDictionary.', function (assert) {
+  var tag00 = dwv.dicom.getTagFromDictionary();
+  assert.equal(tag00, null, 'get undefined');
+  var tag01 = dwv.dicom.getTagFromDictionary(null);
+  assert.equal(tag01, null, 'get null');
+  var tag02 = dwv.dicom.getTagFromDictionary('null');
+  assert.equal(tag02, null, 'get non existing');
+
+  // empty tag name...
+  var tag03 = dwv.dicom.getTagFromDictionary('');
+  var refTag03 = new dwv.dicom.Tag('0x0008', '0x0202');
+  assert.ok(tag03.equals(refTag03), 'get empty');
+
+  var refTag10 = dwv.dicom.getTransferSyntaxUIDTag();
+
+  // extra space
+  var tag04 = dwv.dicom.getTagFromDictionary('TransferSyntaxUID ');
+  assert.equal(tag04, null, 'get with extra space');
+  // bad case
+  var tag05 = dwv.dicom.getTagFromDictionary('TransferSyntaxUid');
+  assert.equal(tag05, null, 'get with bad case');
+
+  // working case
+  var tag10 = dwv.dicom.getTagFromDictionary('TransferSyntaxUID');
+  assert.ok(tag10.equals(refTag10), 'get test #0');
+});

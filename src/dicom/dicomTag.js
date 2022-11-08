@@ -293,16 +293,18 @@ dwv.dicom.isPixelDataTag = function (tag) {
  * Get a tag from the dictionary using a tag string name.
  *
  * @param {string} tagName The tag string name.
- * @returns {object} The tag object.
+ * @returns {object|null} The tag object or null if not found.
  */
 dwv.dicom.getTagFromDictionary = function (tagName) {
+  if (typeof tagName === 'undefined' || tagName === null) {
+    return null;
+  }
   var group = null;
   var element = null;
   var dict = dwv.dicom.dictionary;
   var keys0 = Object.keys(dict);
   var keys1 = null;
-  // label for nested loop break
-  outLabel:
+  var foundTag = false;
   // search through dictionary
   for (var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
     group = keys0[k0];
@@ -310,12 +312,16 @@ dwv.dicom.getTagFromDictionary = function (tagName) {
     for (var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
       element = keys1[k1];
       if (dict[group][element][2] === tagName) {
-        break outLabel;
+        foundTag = true;
+        break;
       }
+    }
+    if (foundTag) {
+      break;
     }
   }
   var tag = null;
-  if (group !== null && element !== null) {
+  if (foundTag) {
     tag = new dwv.dicom.Tag(group, element);
   }
   return tag;
