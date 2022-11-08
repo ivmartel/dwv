@@ -5,6 +5,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name00",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -23,6 +24,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name01",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -41,6 +43,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name02",
         "PhotometricInterpretation": "RGB",
         "SamplesPerPixel": 3,
@@ -60,6 +63,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name03",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -91,6 +95,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name04",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -122,6 +127,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name05",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -222,6 +228,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name00",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -258,6 +265,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name00",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -294,6 +302,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientName": "dwv-patient-name00",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
@@ -390,6 +399,7 @@
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "SpecificCharacterSet": "ISO_IR 192",
         "PatientName": "dwv-patient-name00",
         "OtherPatientNames": "déjà-ñu greek: ελληνικά arab: اَلْعَرَبِيَّةُ chinese: 中文",
