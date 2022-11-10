@@ -112,11 +112,13 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
    * Check if a point is in the origin list.
    *
    * @param {dwv.math.Point3D} point3D The point to check.
+   * @param {number} tol The comparison tolerance
+   *   default to Number.EPSILON.
    * @returns {boolean} True if in list.
    */
-  this.includesOrigin = function (point3D) {
+  this.includesOrigin = function (point3D, tol) {
     for (var i = 0; i < origins.length; ++i) {
-      if (origins[i].isSimilar(point3D, dwv.math.BIG_EPSILON)) {
+      if (origins[i].isSimilar(point3D, tol)) {
         return true;
       }
     }
