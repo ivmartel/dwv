@@ -149,52 +149,21 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   };
 
   /**
-   * Get the slice spacing from the difference in the Z directions
-   * of the origins.
-   *
-   * @returns {number} The spacing.
+   * Calculate slice spacing from origins and replace current
+   *   if needed.
    */
-  this.getSliceGeometrySpacing = function () {
-    if (origins.length === 1) {
-      return 1;
+  function updateSliceSpacing() {
+    var geoSliceSpacing = dwv.image.getSliceGeometrySpacing(
+      origins, orientation);
+    // update local if needed
+    if (typeof geoSliceSpacing !== 'undefined' &&
+      spacing.get(2) !== geoSliceSpacing) {
+      dwv.logger.trace('Updating slice spacing.');
+      var values = spacing.getValues();
+      values[2] = geoSliceSpacing;
+      spacing = new dwv.image.Spacing(values);
     }
-    var sliceSpacing = null;
-    // (x, y, z) = orientationMatrix * (i, j, k)
-    // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
-    // applied on the patient position, reorders indices
-    // so that Z is the slice direction
-    var invOrientation = orientation.getInverse();
-    var deltas = [];
-    for (var i = 0; i < origins.length - 1; ++i) {
-      var origin1 = invOrientation.multiplyVector3D(origins[i]);
-      var origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
-      var diff = Math.abs(origin1.getZ() - origin2.getZ());
-      if (diff === 0) {
-        throw new Error('Zero slice spacing.' +
-          origin1.toString() + ' ' + origin2.toString());
-      }
-      if (sliceSpacing === null) {
-        sliceSpacing = diff;
-      } else {
-        if (!dwv.math.isSimilar(sliceSpacing, diff, dwv.math.BIG_EPSILON)) {
-          deltas.push(Math.abs(sliceSpacing - diff));
-        }
-      }
-    }
-    // warn if non constant
-    if (deltas.length !== 0) {
-      var sumReducer = function (sum, value) {
-        return sum + value;
-      };
-      var mean = deltas.reduce(sumReducer) / deltas.length;
-      if (mean > 1e-4) {
-        dwv.logger.warn('Varying slice spacing, mean delta: ' +
-          mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
-      }
-    }
-
-    return sliceSpacing;
-  };
+  }
 
   /**
    * Get the object spacing.
@@ -207,9 +176,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   this.getSpacing = function (viewOrientation) {
     // update slice spacing after appendSlice
     if (newOrigins) {
-      var values = spacing.getValues();
-      values[2] = this.getSliceGeometrySpacing();
-      spacing = new dwv.image.Spacing(values);
+      updateSliceSpacing();
       newOrigins = false;
     }
     var res = spacing;
@@ -355,7 +322,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
 dwv.image.Geometry.prototype.toString = function () {
   return 'Origin: ' + this.getOrigin() +
     ', Size: ' + this.getSize() +
-    ', Spacing: ' + this.getSpacing();
+    ', Spacing: ' + this.getSpacing() +
+    ', Orientation: ' + this.getOrientation();
 };
 
 /**
@@ -493,4 +461,64 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
 
   // return index
   return new dwv.math.Index(values);
+};
+
+/**
+ * Get the slice spacing from the difference in the Z directions
+ * of input origins.
+ *
+ * @param {Array} origins An array of dwv.math.Point3D.
+ * @param {dwv.math.Matrix} orientation The oritentation matrix.
+ * @param {boolean} withCheck Flag to activate spacing variation check,
+ *   default to true.
+ * @returns {number|undefined} The spacing.
+ */
+dwv.image.getSliceGeometrySpacing = function (origins, orientation, withCheck) {
+  if (typeof withCheck === 'undefined') {
+    withCheck = true;
+  }
+  // check origins
+  if (origins.length <= 1) {
+    return;
+  }
+  // (x, y, z) = orientationMatrix * (i, j, k)
+  // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
+  // applied on the patient position, reorders indices
+  // so that Z is the slice direction
+  var invOrientation = orientation.getInverse();
+  var origin1 = invOrientation.multiplyVector3D(origins[0]);
+  var origin2 = invOrientation.multiplyVector3D(origins[1]);
+  var sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
+  var deltas = [];
+  for (var i = 0; i < origins.length - 1; ++i) {
+    origin1 = invOrientation.multiplyVector3D(origins[i]);
+    origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
+    var diff = Math.abs(origin1.getZ() - origin2.getZ());
+    if (diff === 0) {
+      throw new Error('Zero slice spacing.' +
+        origin1.toString() + ' ' + origin2.toString());
+    }
+    // keep smallest
+    if (diff < sliceSpacing) {
+      sliceSpacing = diff;
+    }
+    if (withCheck) {
+      if (!dwv.math.isSimilar(sliceSpacing, diff, dwv.math.BIG_EPSILON)) {
+        deltas.push(Math.abs(sliceSpacing - diff));
+      }
+    }
+  }
+  // warn if non constant
+  if (withCheck && deltas.length !== 0) {
+    var sumReducer = function (sum, value) {
+      return sum + value;
+    };
+    var mean = deltas.reduce(sumReducer) / deltas.length;
+    if (mean > 1e-4) {
+      dwv.logger.warn('Varying slice spacing, mean delta: ' +
+        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
+    }
+  }
+
+  return sliceSpacing;
 };
