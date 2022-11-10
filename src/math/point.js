@@ -174,15 +174,30 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
 };
 
 /**
- * Get an array find callback for a given point.
+ * Get an array find callback for an equal input point.
  *
  * @param {dwv.math.Point3D} point The point to compare to.
- * @returns {Function} A function that compares its input point to the one
- *   given as input to this function.
+ * @returns {Function} A function that compares, using `equals`,
+ *   its input point to the one given as input to this function.
  */
 dwv.math.getEqualPoint3DFunction = function (point) {
   return function (element) {
     return element.equals(point);
+  };
+};
+
+/**
+ * Get an array find callback for a similar input point.
+ *
+ * @param {dwv.math.Point3D} point The point to compare to.
+ * @param {number} tol The comparison tolerance
+ *   default to Number.EPSILON.
+ * @returns {Function} A function that compares, using `isSimilar`,
+ *   its input point to the one given as input to this function.
+ */
+dwv.math.getSimilarPoint3DFunction = function (point, tol) {
+  return function (element) {
+    return element.isSimilar(point, tol);
   };
 };
 
