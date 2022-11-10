@@ -437,10 +437,12 @@ dwv.dicom.getSpacingFromMeasure = function (measure) {
     parseFloat(pixelSpacing.value[0]),
     parseFloat(pixelSpacing.value[1])
   ];
-  // Spacing Between Slices
-  if (typeof measure.x00180088 !== 'undefined') {
-    var sliceThickness = measure.x00180088;
-    spacingValues.push(parseFloat(sliceThickness.value[0]));
+  // Slice Thickness
+  if (typeof measure.x00180050 !== 'undefined') {
+    spacingValues.push(parseFloat(measure.x00180050.value[0]));
+  } else if (typeof measure.x00180088 !== 'undefined') {
+    // Spacing Between Slices
+    spacingValues.push(parseFloat(measure.x00180088.value[0]));
   }
   return new dwv.image.Spacing(spacingValues);
 };
@@ -706,8 +708,13 @@ dwv.image.MaskFactory.prototype.create = function (
     return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
   };
 
-  // create geometry
-  var origin = point3DFromArray(framePosPats[0]);
+  // frame origins
+  var frameOrigins = [];
+  for (var n = 0; n < framePosPats.length; ++n) {
+    frameOrigins.push(point3DFromArray(framePosPats[n]));
+  }
+
+  // orientation
   var rowCosines = new dwv.math.Vector3D(
     parseFloat(imageOrientationPatient[0]),
     parseFloat(imageOrientationPatient[1]),
@@ -723,8 +730,16 @@ dwv.image.MaskFactory.prototype.create = function (
     rowCosines.getY(), colCosines.getY(), normal.getY(),
     rowCosines.getZ(), colCosines.getZ(), normal.getZ()
   ]);
-  var geometry = new dwv.image.Geometry(
-    origin, size, spacing, orientationMatrix);
+
+  // use calculated spacing
+  var spacingVals = spacing.getValues();
+  spacingVals[2] = dwv.image.getSliceGeometrySpacing(
+    frameOrigins, orientationMatrix, false);
+  var newSpacing = new dwv.image.Spacing(spacingVals);
+
+  // tmp geometry with correct spacing but only one slice
+  var tmpGeometry = new dwv.image.Geometry(
+    frameOrigins[0], size, newSpacing, orientationMatrix);
 
   // add possibly missing posPats
   var posPats = [];
@@ -733,21 +748,34 @@ dwv.image.MaskFactory.prototype.create = function (
   for (var g = 1; g < framePosPats.length; ++g) {
     ++sliceIndex;
     var index = new dwv.math.Index([0, 0, sliceIndex]);
-    var point = geometry.indexToWorld(index).get3D();
-    var framePosPat = point3DFromArray(framePosPats[g]);
+    var point = tmpGeometry.indexToWorld(index).get3D();
+    var frameOrigin = frameOrigins[g];
     // check if more pos pats are needed
-    var dist = framePosPat.getDistance(point);
+    var dist = frameOrigin.getDistance(point);
     // TODO: good threshold?
-    while (dist > 1e-4) {
-      dwv.logger.debug('Adding intermediate pos pats for DICOM seg');
+    while (dist > dwv.math.REAL_WORLD_EPSILON) {
+      dwv.logger.debug('Adding intermediate pos pats for DICOM seg at' +
+        point.toString());
       posPats.push([point.getX(), point.getY(), point.getZ()]);
       ++sliceIndex;
       index = new dwv.math.Index([0, 0, sliceIndex]);
-      point = geometry.indexToWorld(index).get3D();
-      dist = framePosPat.getDistance(point);
+      point = tmpGeometry.indexToWorld(index).get3D();
+      dist = frameOrigin.getDistance(point);
     }
     // add frame pos pat
     posPats.push(framePosPats[g]);
+  }
+
+  // as many slices as posPats
+  var numberOfSlices = posPats.length;
+
+  // final geometry
+  var geometry = new dwv.image.Geometry(
+    frameOrigins[0], size, newSpacing, orientationMatrix);
+  var uids = [0];
+  for (var m = 1; m < numberOfSlices; ++m) {
+    geometry.appendOrigin(point3DFromArray(posPats[m]), m);
+    uids.push(m);
   }
 
   var getFindSegmentFunc = function (number) {
@@ -757,8 +785,6 @@ dwv.image.MaskFactory.prototype.create = function (
   };
 
   // create output buffer
-  // as many slices as posPats
-  var numberOfSlices = posPats.length;
   var mul = storeAsRGB ? 3 : 1;
   var buffer = new pixelBuffer.constructor(mul * sliceSize * numberOfSlices);
   buffer.fill(0);
@@ -787,13 +813,6 @@ dwv.image.MaskFactory.prototype.create = function (
         }
       }
     }
-  }
-
-  var uids = [0];
-  for (var m = 1; m < numberOfSlices; ++m) {
-    // args: origin, volumeNumber, uid, index, increment
-    geometry.appendOrigin(point3DFromArray(posPats[m]), m);
-    uids.push(m);
   }
 
   // create image
