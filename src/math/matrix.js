@@ -9,13 +9,16 @@ if (typeof Number.EPSILON === 'undefined') {
 }
 // -> ~2e-12
 dwv.math.BIG_EPSILON = Number.EPSILON * 1e4;
+// 'real world', for example when comparing positions
+dwv.math.REAL_WORLD_EPSILON = 1e-4;
 
 /**
  * Check if two numbers are similar.
  *
  * @param {number} a The first number.
  * @param {number} b The second number.
- * @param {number} tol The comparison tolerance.
+ * @param {number} tol The comparison tolerance
+ *   default to Number.EPSILON.
  * @returns {boolean} True if similar.
  */
 dwv.math.isSimilar = function (a, b, tol) {
