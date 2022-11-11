@@ -86,7 +86,7 @@ dwv.image.View = function (image) {
    * Store position and not index to stay geometry independent.
    *
    * @private
-   * @type {dwv.math.Index}
+   * @type {dwv.math.Point3D}
    */
   var currentPosition = null;
   /**
@@ -584,6 +584,7 @@ dwv.image.View = function (image) {
     }
 
     // all good
+    //console.log('[v] set cur index OUT');
     return true;
   };
 

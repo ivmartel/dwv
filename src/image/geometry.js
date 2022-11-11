@@ -256,7 +256,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     // -> the sign of the dot product depends on the cosinus of
     //    the angle between the vectors
     //   -> >0 => vectors are codirectional
-    //   -> <0 => vectors are oposite
+    //   -> <0 => vectors are opposite
     var dotProd = normal.dotProduct(pointDir);
     var test = dotProd < 0;
     // TODO: check why coronal behaves differently...
