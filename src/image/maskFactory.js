@@ -14,24 +14,19 @@ dwv.dicom.equalPosPat = function (pos1, pos2) {
 };
 
 /**
- * Compare two position patients.
+ * Get a position patient compare function accroding to an
+ * input orientation.
  *
- * @param {*} pos1 The first position patient.
- * @param {*} pos2 The second position patient.
- * @returns {number|null} A number used to sort elements.
+ * @param {dwv.math.Matrix33} orientation The orientation matrix.
+ * @returns {Function} The position compare function.
  */
-dwv.dicom.comparePosPat = function (pos1, pos2) {
-  var diff = null;
-  var posLen = pos1.length;
-  var index = posLen;
-  for (var i = 0; i < posLen; ++i) {
-    --index;
-    diff = pos2[index] - pos1[index];
-    if (diff !== 0) {
-      return diff;
-    }
-  }
-  return diff;
+dwv.dicom.getComparePosPat = function (orientation) {
+  var invOrientation = orientation.getInverse();
+  return function (pos1, pos2) {
+    var p1 = invOrientation.multiplyArray3D(pos1);
+    var p2 = invOrientation.multiplyArray3D(pos2);
+    return p2[2] - p1[2];
+  };
 };
 
 /**
@@ -693,8 +688,6 @@ dwv.image.MaskFactory.prototype.create = function (
       }
     }
   }
-  // sort positions patient
-  framePosPats.sort(dwv.dicom.comparePosPat);
 
   // check spacing and orientation
   if (typeof spacing === 'undefined') {
@@ -702,16 +695,6 @@ dwv.image.MaskFactory.prototype.create = function (
   }
   if (typeof imageOrientationPatient === 'undefined') {
     throw new Error('No imageOrientationPatient found for DICOM SEG');
-  }
-
-  var point3DFromArray = function (arr) {
-    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
-  };
-
-  // frame origins
-  var frameOrigins = [];
-  for (var n = 0; n < framePosPats.length; ++n) {
-    frameOrigins.push(point3DFromArray(framePosPats[n]));
   }
 
   // orientation
@@ -731,11 +714,29 @@ dwv.image.MaskFactory.prototype.create = function (
     rowCosines.getZ(), colCosines.getZ(), normal.getZ()
   ]);
 
+  // sort positions patient
+  framePosPats.sort(dwv.dicom.getComparePosPat(orientationMatrix));
+
+  var point3DFromArray = function (arr) {
+    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
+  };
+
+  // frame origins
+  var frameOrigins = [];
+  for (var n = 0; n < framePosPats.length; ++n) {
+    frameOrigins.push(point3DFromArray(framePosPats[n]));
+  }
+
   // use calculated spacing
-  var spacingVals = spacing.getValues();
-  spacingVals[2] = dwv.image.getSliceGeometrySpacing(
+  var newSpacing = spacing;
+  var geoSliceSpacing = dwv.image.getSliceGeometrySpacing(
     frameOrigins, orientationMatrix, false);
-  var newSpacing = new dwv.image.Spacing(spacingVals);
+  var spacingValues = spacing.getValues();
+  if (typeof geoSliceSpacing !== 'undefined' &&
+    geoSliceSpacing !== spacingValues[2]) {
+    spacingValues[2] = geoSliceSpacing;
+    newSpacing = new dwv.image.Spacing(spacingValues);
+  }
 
   // tmp geometry with correct spacing but only one slice
   var tmpGeometry = new dwv.image.Geometry(
@@ -754,7 +755,7 @@ dwv.image.MaskFactory.prototype.create = function (
     var dist = frameOrigin.getDistance(point);
     // TODO: good threshold?
     while (dist > dwv.math.REAL_WORLD_EPSILON) {
-      dwv.logger.debug('Adding intermediate pos pats for DICOM seg at' +
+      dwv.logger.debug('Adding intermediate pos pats for DICOM seg at ' +
         point.toString());
       posPats.push([point.getX(), point.getY(), point.getZ()]);
       ++sliceIndex;
