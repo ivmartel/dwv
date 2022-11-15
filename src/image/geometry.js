@@ -250,7 +250,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     var pointDir = point.minus(closestOrigin);
     // use third orientation matrix column as base plane vector
     var normal = new dwv.math.Vector3D(
-      orientation.get(2, 0), orientation.get(2, 1), orientation.get(2, 2));
+      orientation.get(0, 2), orientation.get(1, 2), orientation.get(2, 2));
     // a.dot(b) = ||a|| * ||b|| * cos(theta)
     // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
     // -> the sign of the dot product depends on the cosinus of
