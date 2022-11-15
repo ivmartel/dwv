@@ -3,6 +3,25 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
 /**
+ * Check for array equality after sorting.
+ *
+ * @param {Array} arr0 First array.
+ * @param {*} arr1 Second array.
+ * @returns {boolean} True if both array are defined and contain same values.
+ */
+dwv.utils.arraySortEquals = function (arr0, arr1) {
+  if (arr0 === null ||
+    arr1 === null ||
+    typeof arr0 === 'undefined' ||
+    typeof arr1 === 'undefined') {
+    return false;
+  }
+  var arr0sorted = arr0.slice().sort();
+  var arr1sorted = arr1.slice().sort();
+  return dwv.utils.arrayEquals(arr0sorted, arr1sorted);
+};
+
+/**
  * Check for array equality.
  *
  * @param {Array} arr0 First array.
@@ -19,10 +38,8 @@ dwv.utils.arrayEquals = function (arr0, arr1) {
   if (arr0.length !== arr1.length) {
     return false;
   }
-  var arr0sorted = arr0.slice().sort();
-  var arr1sorted = arr1.slice().sort();
-  return arr0sorted.every(function (element, index) {
-    return element === arr1sorted[index];
+  return arr0.every(function (element, index) {
+    return element === arr1[index];
   });
 };
 

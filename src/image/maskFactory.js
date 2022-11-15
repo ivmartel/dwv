@@ -58,7 +58,7 @@ dwv.dicom.checkTag = function (rootElement, tagDefinition) {
       if (!Array.isArray(tagDefinition.enum[i])) {
         throw new Error('Cannot compare array and non array tag value.');
       }
-      if (dwv.utils.arrayEquals(tagDefinition.enum[i], tagValue)) {
+      if (dwv.utils.arraySortEquals(tagDefinition.enum[i], tagValue)) {
         includes = true;
         break;
       }
@@ -671,7 +671,7 @@ dwv.image.MaskFactory.prototype.create = function (
       if (typeof imageOrientationPatient === 'undefined') {
         imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else {
-        if (!dwv.utils.arrayEquals(
+        if (!dwv.utils.arraySortEquals(
           imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
           throw new Error('Unsupported multi orientation dicom seg.');
         }
