@@ -153,6 +153,27 @@ dwv.dicom.getReverseOrientation = function (ori) {
 };
 
 /**
+ * Get the name of an image orientation patient.
+ *
+ * @param {Array} orientation The image orientation patient.
+ * @returns {string} The orientation name: axial, coronal or sagittal.
+ */
+dwv.dicom.getOrientationName = function (orientation) {
+  var axialOrientation = [1, 0, 0, 0, 1, 0];
+  var coronalOrientation = [1, 0, 0, 0, 0, -1];
+  var sagittalOrientation = [0, 1, 0, 0, 0, -1];
+  var name;
+  if (dwv.utils.arrayEquals(orientation, axialOrientation)) {
+    name = 'axial';
+  } else if (dwv.utils.arrayEquals(orientation, coronalOrientation)) {
+    name = 'coronal';
+  } else if (dwv.utils.arrayEquals(orientation, sagittalOrientation)) {
+    name = 'sagittal';
+  }
+  return name;
+};
+
+/**
  * Tell if a given syntax is an implicit one (element with no VR).
  *
  * @param {string} syntax The transfer syntax to test.
