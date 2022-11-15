@@ -58,22 +58,34 @@ var MPRPixGenerator = function (options) {
       throw new Error('Cannot generate slice, number is above size: ' +
         sliceNumber + ', ' + numberOfSlices);
     }
+    var orientationName =
+      dwv.dicom.getOrientationName(options.imageOrientationPatient);
+    if (orientationName === 'axial') {
+      this.generateAsAxial(pixelBuffer, sliceNumber);
+    } else if (orientationName === 'coronal') {
+      this.generateAsCoronal(pixelBuffer, sliceNumber);
+    } else if (orientationName === 'sagittal') {
+      this.generateAsSagittal(pixelBuffer, sliceNumber);
+    }
+  };
+
+  this.generateAsAxial = function (pixelBuffer, sliceNumber) {
     // axial
     var offset = 0;
     for (var j0 = 0; j0 < halfNRows; ++j0) {
       for (var i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc('axial', i0, j0, sliceNumber);
+        pixelBuffer[offset] = getFunc('axial', i0, j0);
         ++offset;
       }
       offset += halfNCols;
     }
-    if (sliceNumber <= halfNSlices) {
+    if (sliceNumber < halfNSlices) {
       // coronal
       offset = halfNCols;
       for (var j1 = 0; j1 < numberOfRows; ++j1) {
         for (var i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
-            'coronal', i1, (halfNSlices - sliceNumber), j1);
+            'coronal', i1, (halfNSlices - 1 - sliceNumber));
           ++offset;
         }
         offset += halfNCols;
@@ -84,7 +96,77 @@ var MPRPixGenerator = function (options) {
       for (var j2 = 0; j2 < halfNRows; ++j2) {
         for (var i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
-            'sagittal', j2, (numberOfSlices - sliceNumber), i2);
+            'sagittal', j2, (numberOfSlices - 1 - sliceNumber));
+          ++offset;
+        }
+      }
+    }
+  };
+
+  this.generateAsCoronal = function (pixelBuffer, sliceNumber) {
+    // coronal
+    var offset = numberOfColumns * halfNRows + halfNCols;
+    for (var j0 = 0; j0 < halfNRows; ++j0) {
+      for (var i0 = 0; i0 < halfNCols; ++i0) {
+        pixelBuffer[offset] = getFunc('coronal', i0, j0);
+        ++offset;
+      }
+      offset += halfNCols;
+    }
+    if (sliceNumber < halfNSlices) {
+      // axial
+      offset = 0;
+      for (var j1 = 0; j1 < numberOfRows; ++j1) {
+        for (var i1 = 0; i1 < halfNCols; ++i1) {
+          pixelBuffer[offset] = getFunc(
+            'axial', i1, sliceNumber);
+          ++offset;
+        }
+        offset += halfNCols;
+      }
+
+    } else {
+      // sagittal
+      offset = 0;
+      for (var j2 = 0; j2 < halfNRows; ++j2) {
+        for (var i2 = 0; i2 < numberOfColumns; ++i2) {
+          pixelBuffer[offset] = getFunc(
+            'sagittal', sliceNumber, j2 - 1);
+          ++offset;
+        }
+      }
+    }
+  };
+
+  this.generateAsSagittal = function (pixelBuffer, sliceNumber) {
+    // sagittal
+    var offset = halfNCols;
+    for (var j0 = 0; j0 < halfNRows; ++j0) {
+      for (var i0 = 0; i0 < halfNCols; ++i0) {
+        pixelBuffer[offset] = getFunc('sagittal', i0, j0);
+        ++offset;
+      }
+      offset += halfNCols;
+    }
+    if (sliceNumber < halfNSlices) {
+      // axial
+      offset = 0;
+      for (var j1 = 0; j1 < numberOfRows; ++j1) {
+        for (var i1 = 0; i1 < halfNCols; ++i1) {
+          pixelBuffer[offset] = getFunc(
+            'axial', sliceNumber, i1);
+          ++offset;
+        }
+        offset += halfNCols;
+      }
+
+    } else {
+      // coronal
+      offset = numberOfColumns * halfNRows;
+      for (var j2 = 0; j2 < halfNRows; ++j2) {
+        for (var i2 = 0; i2 < numberOfColumns; ++i2) {
+          pixelBuffer[offset] = getFunc(
+            'coronal', sliceNumber, j2 - 1);
           ++offset;
         }
       }
@@ -106,7 +188,7 @@ var MPRPixGenerator = function (options) {
    * @param {number} j The row index.
    * @returns {number} The value at the given position.
    */
-  function getFunc(name, i, j/*, k*/) {
+  function getFunc(name, i, j) {
     var imgIdx = 0;
     if (name === 'axial') {
       imgIdx = 0;

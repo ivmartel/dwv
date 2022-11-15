@@ -87,8 +87,17 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   if (typeof tags.PixelSpacing !== 'undefined') {
     spacing = tags.PixelSpacing[0];
   }
-  tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
+  var orientationName =
+    dwv.dicom.getOrientationName(tags.ImageOrientationPatient);
+  if (orientationName === 'axial') {
+    tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
+  } else if (orientationName === 'coronal') {
+    tags.ImagePositionPatient = [0, sliceNumber * spacing, 0];
+  } else if (orientationName === 'sagittal') {
+    tags.ImagePositionPatient = [sliceNumber * spacing, 0, 0];
+  }
   // instance number
+  tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
   var dicomElements = dwv.dicom.getElementsFromJSONTags(tags);
@@ -246,12 +255,28 @@ dwv.test.onDOMContentLoadedGenerator = function (/*event*/) {
   var tags = JSON.parse(document.getElementById('tags').value);
   if (tags) {
     // set study date
-    var today = new Date();
-    var yearStr = today.getFullYear().toString();
-    var monthStr = (today.getMonth() + 1).toString().padStart(2, '0');
-    var dayStr = today.getDate().toString().padStart(2, '0');
-    tags.StudyDate = yearStr + monthStr + dayStr;
-    // instance UID
+    var now = new Date();
+    tags.StudyDate = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0');
+    tags.StudyTime = now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0');
+    // UID
+    if (typeof tags.StudyInstanceUID === 'undefined') {
+      tags.StudyInstanceUID = dwv.dicom.getUID('StudyInstanceUID');
+      tags.StudyID = 10000;
+    }
+    if (typeof tags.StudyDescription === 'undefined') {
+      tags.StudyDescription = 'dwv generated data';
+    }
+    if (typeof tags.SeriesInstanceUID === 'undefined') {
+      tags.SeriesInstanceUID = dwv.dicom.getUID('SeriesInstanceUID');
+      tags.SeriesNumber = tags.StudyID + 10;
+    }
+    if (typeof tags.SeriesDescription === 'undefined') {
+      tags.SeriesDescription = 'Test data #0';
+    }
     tags.SOPInstanceUID = dwv.dicom.getUID('SOPInstanceUID');
     // write back
     document.getElementById('tags').value = JSON.stringify(tags, null, 2);

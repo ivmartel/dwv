@@ -12,6 +12,7 @@
 <script type="text/javascript" src="../../../src/dicom/dicomTag.js"></script>
 <script type="text/javascript" src="../../../src/dicom/dicomWriter.js"></script>
 <script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="../../../src/utils/array.js"></script>
 <!-- local -->
 <script type="text/javascript" src="../dicomGenerator.js"></script>
 <script type="text/javascript" src="../gradSquarePixGenerator.js"></script>
@@ -78,7 +79,9 @@ be written with explicit zero length, a <code>0</code> value will mean undefined
 {
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
   "Modality": "MR",
-  "PatientName": "dwv-patient-name",
+  "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+  "PatientName": "dwv^patientName",
+  "PatientID": "DWV0001",
   "PhotometricInterpretation": "MONOCHROME2",
   "SamplesPerPixel": 1,
   "PlanarConfiguration": 0,

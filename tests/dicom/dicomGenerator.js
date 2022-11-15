@@ -106,7 +106,8 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
     numberOfRows: numberOfRows,
     numberOfSamples: numberOfSamples,
     numberOfColourPlanes: numberOfColourPlanes,
-    photometricInterpretation: photometricInterpretation
+    photometricInterpretation: photometricInterpretation,
+    imageOrientationPatient: tags.ImageOrientationPatient
   });
   if (typeof generator.setImages !== 'undefined') {
     generator.setImages(images);
