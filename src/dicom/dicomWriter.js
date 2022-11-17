@@ -674,8 +674,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
   var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
   var isBigEndian = dwv.dicom.isBigEndianTransferSyntax(syntax);
-  // Bits Allocated
-  var bitsAllocated = dicomElements.x00280100.value[0];
   // Specific CharacterSet
   if (typeof dicomElements.x00080005 !== 'undefined') {
     var oldscs = dwv.dicom.cleanString(dicomElements.x00080005.value[0]);
@@ -685,6 +683,11 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       this.useSpecialTextEncoder();
       dicomElements.x00080005.value = ['ISO_IR 192'];
     }
+  }
+  // Bits Allocated (for image data)
+  var bitsAllocated;
+  if (typeof dicomElements.x00280100 !== 'undefined') {
+    bitsAllocated = dicomElements.x00280100.value[0];
   }
 
   // calculate buffer size and split elements (meta and non meta)
