@@ -50,6 +50,22 @@ dwv.test.viewerSetup = function () {
     viewOnFirstLoadItem = false;
     dataViewConfigs = prepareAndGetMPRDataViewConfig();
   } else if (_mode === 2) {
+    // simple side by side
+    addLayerGroup('layerGroup0');
+    addLayerGroup('layerGroup1');
+    dataViewConfigs = {
+      0: [
+        {
+          divId: 'layerGroup0'
+        }
+      ],
+      1: [
+        {
+          divId: 'layerGroup1'
+        }
+      ]
+    };
+  } else if (_mode === 3) {
     // multiple data, multiple layer group
     addLayerGroup('layerGroup0');
     addLayerGroup('layerGroup1');
