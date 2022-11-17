@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.16 2022-11-08 14:56:16 */
+/*! dwv 0.31.0-beta.17 2022-11-17 16:14:43 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4602,7 +4602,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.16';
+  return '0.31.0-beta.17';
 };
 
 /**
@@ -4743,6 +4743,27 @@ dwv.dicom.getReverseOrientation = function (ori) {
   }
   // return
   return rori;
+};
+
+/**
+ * Get the name of an image orientation patient.
+ *
+ * @param {Array} orientation The image orientation patient.
+ * @returns {string} The orientation name: axial, coronal or sagittal.
+ */
+dwv.dicom.getOrientationName = function (orientation) {
+  var axialOrientation = [1, 0, 0, 0, 1, 0];
+  var coronalOrientation = [1, 0, 0, 0, 0, -1];
+  var sagittalOrientation = [0, 1, 0, 0, 0, -1];
+  var name;
+  if (dwv.utils.arrayEquals(orientation, axialOrientation)) {
+    name = 'axial';
+  } else if (dwv.utils.arrayEquals(orientation, coronalOrientation)) {
+    name = 'coronal';
+  } else if (dwv.utils.arrayEquals(orientation, sagittalOrientation)) {
+    name = 'sagittal';
+  }
+  return name;
 };
 
 /**
@@ -5708,25 +5729,28 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
   //-------------------------------------------------
   // values needed for data interpretation
 
-  // PixelRepresentation 0->unsigned, 1->signed
-  var pixelRepresentation = 0;
-  dataElement = this.dicomElements.x00280103;
-  if (typeof dataElement !== 'undefined') {
-    dataElement.value = this.interpretElement(dataElement, dataReader);
-    pixelRepresentation = dataElement.value[0];
-  } else {
-    dwv.logger.warn(
-      'Reading DICOM pixel data with default pixelRepresentation.');
-  }
+  // pixel specific
+  if (typeof this.dicomElements.x7FE00010 !== 'undefined') {
+    // PixelRepresentation 0->unsigned, 1->signed
+    var pixelRepresentation = 0;
+    dataElement = this.dicomElements.x00280103;
+    if (typeof dataElement !== 'undefined') {
+      dataElement.value = this.interpretElement(dataElement, dataReader);
+      pixelRepresentation = dataElement.value[0];
+    } else {
+      dwv.logger.warn(
+        'Reading DICOM pixel data with default pixelRepresentation.');
+    }
 
-  // BitsAllocated
-  var bitsAllocated = 16;
-  dataElement = this.dicomElements.x00280100;
-  if (typeof dataElement !== 'undefined') {
-    dataElement.value = this.interpretElement(dataElement, dataReader);
-    bitsAllocated = dataElement.value[0];
-  } else {
-    dwv.logger.warn('Reading DICOM pixel data with default bitsAllocated.');
+    // BitsAllocated
+    var bitsAllocated = 16;
+    dataElement = this.dicomElements.x00280100;
+    if (typeof dataElement !== 'undefined') {
+      dataElement.value = this.interpretElement(dataElement, dataReader);
+      bitsAllocated = dataElement.value[0];
+    } else {
+      dwv.logger.warn('Reading DICOM pixel data with default bitsAllocated.');
+    }
   }
 
   // default character set
@@ -6804,8 +6828,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
   var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
   var isBigEndian = dwv.dicom.isBigEndianTransferSyntax(syntax);
-  // Bits Allocated
-  var bitsAllocated = dicomElements.x00280100.value[0];
   // Specific CharacterSet
   if (typeof dicomElements.x00080005 !== 'undefined') {
     var oldscs = dwv.dicom.cleanString(dicomElements.x00080005.value[0]);
@@ -6815,6 +6837,11 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       this.useSpecialTextEncoder();
       dicomElements.x00080005.value = ['ISO_IR 192'];
     }
+  }
+  // Bits Allocated (for image data)
+  var bitsAllocated;
+  if (typeof dicomElements.x00280100 !== 'undefined') {
+    bitsAllocated = dicomElements.x00280100.value[0];
   }
 
   // calculate buffer size and split elements (meta and non meta)
@@ -14153,9 +14180,22 @@ dwv.gui.PositionBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var pos = new dwv.math.Point(event.value[1]);
+      var pointValues = event.value[1];
       var vc = layerGroup.getActiveViewLayer().getViewController();
-      vc.setCurrentPosition(pos);
+      // handle different number of dimensions
+      var currentPos = vc.getCurrentPosition();
+      var currentDims = currentPos.length();
+      var inputDims = pointValues.length;
+      if (inputDims !== currentDims) {
+        if (inputDims === currentDims - 1) {
+          // add missing dim, for ex: input 3D -> current 4D
+          pointValues.push(currentPos.get(currentDims - 1));
+        } else if (inputDims === currentDims + 1) {
+          // remove extra dim, for ex: input 4D -> current 3D
+          pointValues.pop();
+        }
+      }
+      vc.setCurrentPosition(new dwv.math.Point(pointValues));
     };
   };
 };
@@ -16984,11 +17024,13 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
    * Check if a point is in the origin list.
    *
    * @param {dwv.math.Point3D} point3D The point to check.
+   * @param {number} tol The comparison tolerance
+   *   default to Number.EPSILON.
    * @returns {boolean} True if in list.
    */
-  this.includesOrigin = function (point3D) {
+  this.includesOrigin = function (point3D, tol) {
     for (var i = 0; i < origins.length; ++i) {
-      if (origins[i].isSimilar(point3D, dwv.math.BIG_EPSILON)) {
+      if (origins[i].isSimilar(point3D, tol)) {
         return true;
       }
     }
@@ -17019,52 +17061,21 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   };
 
   /**
-   * Get the slice spacing from the difference in the Z directions
-   * of the origins.
-   *
-   * @returns {number} The spacing.
+   * Calculate slice spacing from origins and replace current
+   *   if needed.
    */
-  this.getSliceGeometrySpacing = function () {
-    if (origins.length === 1) {
-      return 1;
+  function updateSliceSpacing() {
+    var geoSliceSpacing = dwv.image.getSliceGeometrySpacing(
+      origins, orientation);
+    // update local if needed
+    if (typeof geoSliceSpacing !== 'undefined' &&
+      spacing.get(2) !== geoSliceSpacing) {
+      dwv.logger.trace('Updating slice spacing.');
+      var values = spacing.getValues();
+      values[2] = geoSliceSpacing;
+      spacing = new dwv.image.Spacing(values);
     }
-    var sliceSpacing = null;
-    // (x, y, z) = orientationMatrix * (i, j, k)
-    // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
-    // applied on the patient position, reorders indices
-    // so that Z is the slice direction
-    var invOrientation = orientation.getInverse();
-    var deltas = [];
-    for (var i = 0; i < origins.length - 1; ++i) {
-      var origin1 = invOrientation.multiplyVector3D(origins[i]);
-      var origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
-      var diff = Math.abs(origin1.getZ() - origin2.getZ());
-      if (diff === 0) {
-        throw new Error('Zero slice spacing.' +
-          origin1.toString() + ' ' + origin2.toString());
-      }
-      if (sliceSpacing === null) {
-        sliceSpacing = diff;
-      } else {
-        if (!dwv.math.isSimilar(sliceSpacing, diff, dwv.math.BIG_EPSILON)) {
-          deltas.push(Math.abs(sliceSpacing - diff));
-        }
-      }
-    }
-    // warn if non constant
-    if (deltas.length !== 0) {
-      var sumReducer = function (sum, value) {
-        return sum + value;
-      };
-      var mean = deltas.reduce(sumReducer) / deltas.length;
-      if (mean > 1e-4) {
-        dwv.logger.warn('Varying slice spacing, mean delta: ' +
-          mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
-      }
-    }
-
-    return sliceSpacing;
-  };
+  }
 
   /**
    * Get the object spacing.
@@ -17077,9 +17088,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   this.getSpacing = function (viewOrientation) {
     // update slice spacing after appendSlice
     if (newOrigins) {
-      var values = spacing.getValues();
-      values[2] = this.getSliceGeometrySpacing();
-      spacing = new dwv.image.Spacing(values);
+      updateSliceSpacing();
       newOrigins = false;
     }
     var res = spacing;
@@ -17153,13 +17162,13 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     var pointDir = point.minus(closestOrigin);
     // use third orientation matrix column as base plane vector
     var normal = new dwv.math.Vector3D(
-      orientation.get(2, 0), orientation.get(2, 1), orientation.get(2, 2));
+      orientation.get(0, 2), orientation.get(1, 2), orientation.get(2, 2));
     // a.dot(b) = ||a|| * ||b|| * cos(theta)
     // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
     // -> the sign of the dot product depends on the cosinus of
     //    the angle between the vectors
     //   -> >0 => vectors are codirectional
-    //   -> <0 => vectors are oposite
+    //   -> <0 => vectors are opposite
     var dotProd = normal.dotProduct(pointDir);
     var test = dotProd < 0;
     // TODO: check why coronal behaves differently...
@@ -17225,7 +17234,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
 dwv.image.Geometry.prototype.toString = function () {
   return 'Origin: ' + this.getOrigin() +
     ', Size: ' + this.getSize() +
-    ', Spacing: ' + this.getSpacing();
+    ', Spacing: ' + this.getSpacing() +
+    ', Orientation: ' + this.getOrientation();
 };
 
 /**
@@ -17363,6 +17373,66 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
 
   // return index
   return new dwv.math.Index(values);
+};
+
+/**
+ * Get the slice spacing from the difference in the Z directions
+ * of input origins.
+ *
+ * @param {Array} origins An array of dwv.math.Point3D.
+ * @param {dwv.math.Matrix} orientation The oritentation matrix.
+ * @param {boolean} withCheck Flag to activate spacing variation check,
+ *   default to true.
+ * @returns {number|undefined} The spacing.
+ */
+dwv.image.getSliceGeometrySpacing = function (origins, orientation, withCheck) {
+  if (typeof withCheck === 'undefined') {
+    withCheck = true;
+  }
+  // check origins
+  if (origins.length <= 1) {
+    return;
+  }
+  // (x, y, z) = orientationMatrix * (i, j, k)
+  // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
+  // applied on the patient position, reorders indices
+  // so that Z is the slice direction
+  var invOrientation = orientation.getInverse();
+  var origin1 = invOrientation.multiplyVector3D(origins[0]);
+  var origin2 = invOrientation.multiplyVector3D(origins[1]);
+  var sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
+  var deltas = [];
+  for (var i = 0; i < origins.length - 1; ++i) {
+    origin1 = invOrientation.multiplyVector3D(origins[i]);
+    origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
+    var diff = Math.abs(origin1.getZ() - origin2.getZ());
+    if (diff === 0) {
+      throw new Error('Zero slice spacing.' +
+        origin1.toString() + ' ' + origin2.toString());
+    }
+    // keep smallest
+    if (diff < sliceSpacing) {
+      sliceSpacing = diff;
+    }
+    if (withCheck) {
+      if (!dwv.math.isSimilar(sliceSpacing, diff, dwv.math.BIG_EPSILON)) {
+        deltas.push(Math.abs(sliceSpacing - diff));
+      }
+    }
+  }
+  // warn if non constant
+  if (withCheck && deltas.length !== 0) {
+    var sumReducer = function (sum, value) {
+      return sum + value;
+    };
+    var mean = deltas.reduce(sumReducer) / deltas.length;
+    if (mean > 1e-4) {
+      dwv.logger.warn('Varying slice spacing, mean delta: ' +
+        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
+    }
+  }
+
+  return sliceSpacing;
 };
 
 // namespaces
@@ -19635,24 +19705,19 @@ dwv.dicom.equalPosPat = function (pos1, pos2) {
 };
 
 /**
- * Compare two position patients.
+ * Get a position patient compare function accroding to an
+ * input orientation.
  *
- * @param {*} pos1 The first position patient.
- * @param {*} pos2 The second position patient.
- * @returns {number|null} A number used to sort elements.
+ * @param {dwv.math.Matrix33} orientation The orientation matrix.
+ * @returns {Function} The position compare function.
  */
-dwv.dicom.comparePosPat = function (pos1, pos2) {
-  var diff = null;
-  var posLen = pos1.length;
-  var index = posLen;
-  for (var i = 0; i < posLen; ++i) {
-    --index;
-    diff = pos2[index] - pos1[index];
-    if (diff !== 0) {
-      return diff;
-    }
-  }
-  return diff;
+dwv.dicom.getComparePosPat = function (orientation) {
+  var invOrientation = orientation.getInverse();
+  return function (pos1, pos2) {
+    var p1 = invOrientation.multiplyArray3D(pos1);
+    var p2 = invOrientation.multiplyArray3D(pos2);
+    return p2[2] - p1[2];
+  };
 };
 
 /**
@@ -19684,7 +19749,7 @@ dwv.dicom.checkTag = function (rootElement, tagDefinition) {
       if (!Array.isArray(tagDefinition.enum[i])) {
         throw new Error('Cannot compare array and non array tag value.');
       }
-      if (dwv.utils.arrayEquals(tagDefinition.enum[i], tagValue)) {
+      if (dwv.utils.arraySortEquals(tagDefinition.enum[i], tagValue)) {
         includes = true;
         break;
       }
@@ -20058,10 +20123,12 @@ dwv.dicom.getSpacingFromMeasure = function (measure) {
     parseFloat(pixelSpacing.value[0]),
     parseFloat(pixelSpacing.value[1])
   ];
-  // Spacing Between Slices
-  if (typeof measure.x00180088 !== 'undefined') {
-    var sliceThickness = measure.x00180088;
-    spacingValues.push(parseFloat(sliceThickness.value[0]));
+  // Slice Thickness
+  if (typeof measure.x00180050 !== 'undefined') {
+    spacingValues.push(parseFloat(measure.x00180050.value[0]));
+  } else if (typeof measure.x00180088 !== 'undefined') {
+    // Spacing Between Slices
+    spacingValues.push(parseFloat(measure.x00180088.value[0]));
   }
   return new dwv.image.Spacing(spacingValues);
 };
@@ -20295,7 +20362,7 @@ dwv.image.MaskFactory.prototype.create = function (
       if (typeof imageOrientationPatient === 'undefined') {
         imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else {
-        if (!dwv.utils.arrayEquals(
+        if (!dwv.utils.arraySortEquals(
           imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
           throw new Error('Unsupported multi orientation dicom seg.');
         }
@@ -20312,8 +20379,6 @@ dwv.image.MaskFactory.prototype.create = function (
       }
     }
   }
-  // sort positions patient
-  framePosPats.sort(dwv.dicom.comparePosPat);
 
   // check spacing and orientation
   if (typeof spacing === 'undefined') {
@@ -20323,12 +20388,7 @@ dwv.image.MaskFactory.prototype.create = function (
     throw new Error('No imageOrientationPatient found for DICOM SEG');
   }
 
-  var point3DFromArray = function (arr) {
-    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
-  };
-
-  // create geometry
-  var origin = point3DFromArray(framePosPats[0]);
+  // orientation
   var rowCosines = new dwv.math.Vector3D(
     parseFloat(imageOrientationPatient[0]),
     parseFloat(imageOrientationPatient[1]),
@@ -20344,8 +20404,34 @@ dwv.image.MaskFactory.prototype.create = function (
     rowCosines.getY(), colCosines.getY(), normal.getY(),
     rowCosines.getZ(), colCosines.getZ(), normal.getZ()
   ]);
-  var geometry = new dwv.image.Geometry(
-    origin, size, spacing, orientationMatrix);
+
+  // sort positions patient
+  framePosPats.sort(dwv.dicom.getComparePosPat(orientationMatrix));
+
+  var point3DFromArray = function (arr) {
+    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
+  };
+
+  // frame origins
+  var frameOrigins = [];
+  for (var n = 0; n < framePosPats.length; ++n) {
+    frameOrigins.push(point3DFromArray(framePosPats[n]));
+  }
+
+  // use calculated spacing
+  var newSpacing = spacing;
+  var geoSliceSpacing = dwv.image.getSliceGeometrySpacing(
+    frameOrigins, orientationMatrix, false);
+  var spacingValues = spacing.getValues();
+  if (typeof geoSliceSpacing !== 'undefined' &&
+    geoSliceSpacing !== spacingValues[2]) {
+    spacingValues[2] = geoSliceSpacing;
+    newSpacing = new dwv.image.Spacing(spacingValues);
+  }
+
+  // tmp geometry with correct spacing but only one slice
+  var tmpGeometry = new dwv.image.Geometry(
+    frameOrigins[0], size, newSpacing, orientationMatrix);
 
   // add possibly missing posPats
   var posPats = [];
@@ -20354,21 +20440,34 @@ dwv.image.MaskFactory.prototype.create = function (
   for (var g = 1; g < framePosPats.length; ++g) {
     ++sliceIndex;
     var index = new dwv.math.Index([0, 0, sliceIndex]);
-    var point = geometry.indexToWorld(index).get3D();
-    var framePosPat = point3DFromArray(framePosPats[g]);
+    var point = tmpGeometry.indexToWorld(index).get3D();
+    var frameOrigin = frameOrigins[g];
     // check if more pos pats are needed
-    var dist = framePosPat.getDistance(point);
+    var dist = frameOrigin.getDistance(point);
     // TODO: good threshold?
-    while (dist > 1e-4) {
-      dwv.logger.debug('Adding intermediate pos pats for DICOM seg');
+    while (dist > dwv.math.REAL_WORLD_EPSILON) {
+      dwv.logger.debug('Adding intermediate pos pats for DICOM seg at ' +
+        point.toString());
       posPats.push([point.getX(), point.getY(), point.getZ()]);
       ++sliceIndex;
       index = new dwv.math.Index([0, 0, sliceIndex]);
-      point = geometry.indexToWorld(index).get3D();
-      dist = framePosPat.getDistance(point);
+      point = tmpGeometry.indexToWorld(index).get3D();
+      dist = frameOrigin.getDistance(point);
     }
     // add frame pos pat
     posPats.push(framePosPats[g]);
+  }
+
+  // as many slices as posPats
+  var numberOfSlices = posPats.length;
+
+  // final geometry
+  var geometry = new dwv.image.Geometry(
+    frameOrigins[0], size, newSpacing, orientationMatrix);
+  var uids = [0];
+  for (var m = 1; m < numberOfSlices; ++m) {
+    geometry.appendOrigin(point3DFromArray(posPats[m]), m);
+    uids.push(m);
   }
 
   var getFindSegmentFunc = function (number) {
@@ -20378,8 +20477,6 @@ dwv.image.MaskFactory.prototype.create = function (
   };
 
   // create output buffer
-  // as many slices as posPats
-  var numberOfSlices = posPats.length;
   var mul = storeAsRGB ? 3 : 1;
   var buffer = new pixelBuffer.constructor(mul * sliceSize * numberOfSlices);
   buffer.fill(0);
@@ -20408,13 +20505,6 @@ dwv.image.MaskFactory.prototype.create = function (
         }
       }
     }
-  }
-
-  var uids = [0];
-  for (var m = 1; m < numberOfSlices; ++m) {
-    // args: origin, volumeNumber, uid, index, increment
-    geometry.appendOrigin(point3DFromArray(posPats[m]), m);
-    uids.push(m);
   }
 
   // create image
@@ -21260,7 +21350,7 @@ dwv.image.View = function (image) {
    * Store position and not index to stay geometry independent.
    *
    * @private
-   * @type {dwv.math.Index}
+   * @type {dwv.math.Point3D}
    */
   var currentPosition = null;
   /**
@@ -21758,6 +21848,7 @@ dwv.image.View = function (image) {
     }
 
     // all good
+    //console.log('[v] set cur index OUT');
     return true;
   };
 
@@ -26806,13 +26897,16 @@ if (typeof Number.EPSILON === 'undefined') {
 }
 // -> ~2e-12
 dwv.math.BIG_EPSILON = Number.EPSILON * 1e4;
+// 'real world', for example when comparing positions
+dwv.math.REAL_WORLD_EPSILON = 1e-4;
 
 /**
  * Check if two numbers are similar.
  *
  * @param {number} a The first number.
  * @param {number} b The second number.
- * @param {number} tol The comparison tolerance.
+ * @param {number} tol The comparison tolerance
+ *   default to Number.EPSILON.
  * @returns {boolean} True if similar.
  */
 dwv.math.isSimilar = function (a, b, tol) {
@@ -27499,15 +27593,30 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
 };
 
 /**
- * Get an array find callback for a given point.
+ * Get an array find callback for an equal input point.
  *
  * @param {dwv.math.Point3D} point The point to compare to.
- * @returns {Function} A function that compares its input point to the one
- *   given as input to this function.
+ * @returns {Function} A function that compares, using `equals`,
+ *   its input point to the one given as input to this function.
  */
 dwv.math.getEqualPoint3DFunction = function (point) {
   return function (element) {
     return element.equals(point);
+  };
+};
+
+/**
+ * Get an array find callback for a similar input point.
+ *
+ * @param {dwv.math.Point3D} point The point to compare to.
+ * @param {number} tol The comparison tolerance
+ *   default to Number.EPSILON.
+ * @returns {Function} A function that compares, using `isSimilar`,
+ *   its input point to the one given as input to this function.
+ */
+dwv.math.getSimilarPoint3DFunction = function (point, tol) {
+  return function (element) {
+    return element.isSimilar(point, tol);
   };
 };
 
@@ -35628,6 +35737,25 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
 /**
+ * Check for array equality after sorting.
+ *
+ * @param {Array} arr0 First array.
+ * @param {*} arr1 Second array.
+ * @returns {boolean} True if both array are defined and contain same values.
+ */
+dwv.utils.arraySortEquals = function (arr0, arr1) {
+  if (arr0 === null ||
+    arr1 === null ||
+    typeof arr0 === 'undefined' ||
+    typeof arr1 === 'undefined') {
+    return false;
+  }
+  var arr0sorted = arr0.slice().sort();
+  var arr1sorted = arr1.slice().sort();
+  return dwv.utils.arrayEquals(arr0sorted, arr1sorted);
+};
+
+/**
  * Check for array equality.
  *
  * @param {Array} arr0 First array.
@@ -35644,10 +35772,8 @@ dwv.utils.arrayEquals = function (arr0, arr1) {
   if (arr0.length !== arr1.length) {
     return false;
   }
-  var arr0sorted = arr0.slice().sort();
-  var arr1sorted = arr1.slice().sort();
-  return arr0sorted.every(function (element, index) {
-    return element === arr1sorted[index];
+  return arr0.every(function (element, index) {
+    return element === arr1[index];
   });
 };
 
