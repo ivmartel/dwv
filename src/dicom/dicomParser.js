@@ -1136,25 +1136,28 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
   //-------------------------------------------------
   // values needed for data interpretation
 
-  // PixelRepresentation 0->unsigned, 1->signed
-  var pixelRepresentation = 0;
-  dataElement = this.dicomElements.x00280103;
-  if (typeof dataElement !== 'undefined') {
-    dataElement.value = this.interpretElement(dataElement, dataReader);
-    pixelRepresentation = dataElement.value[0];
-  } else {
-    dwv.logger.warn(
-      'Reading DICOM pixel data with default pixelRepresentation.');
-  }
+  // pixel specific
+  if (typeof this.dicomElements.x7FE00010 !== 'undefined') {
+    // PixelRepresentation 0->unsigned, 1->signed
+    var pixelRepresentation = 0;
+    dataElement = this.dicomElements.x00280103;
+    if (typeof dataElement !== 'undefined') {
+      dataElement.value = this.interpretElement(dataElement, dataReader);
+      pixelRepresentation = dataElement.value[0];
+    } else {
+      dwv.logger.warn(
+        'Reading DICOM pixel data with default pixelRepresentation.');
+    }
 
-  // BitsAllocated
-  var bitsAllocated = 16;
-  dataElement = this.dicomElements.x00280100;
-  if (typeof dataElement !== 'undefined') {
-    dataElement.value = this.interpretElement(dataElement, dataReader);
-    bitsAllocated = dataElement.value[0];
-  } else {
-    dwv.logger.warn('Reading DICOM pixel data with default bitsAllocated.');
+    // BitsAllocated
+    var bitsAllocated = 16;
+    dataElement = this.dicomElements.x00280100;
+    if (typeof dataElement !== 'undefined') {
+      dataElement.value = this.interpretElement(dataElement, dataReader);
+      bitsAllocated = dataElement.value[0];
+    } else {
+      dwv.logger.warn('Reading DICOM pixel data with default bitsAllocated.');
+    }
   }
 
   // default character set
