@@ -273,9 +273,11 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
   var jsonTags = JSON.parse(JSON.stringify(config.tags));
   // convert JSON to DICOM element object
   var dicomElements = dwv.dicom.getElementsFromJSONTags(jsonTags);
-  // pixels: small gradient square
-  dicomElements.x7FE00010 =
-    dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+  // pixels (if possible): small gradient square
+  if (dwv.dicom.checkTags(config.tags, dwv.dicom.requiredPixelTags)) {
+    dicomElements.x7FE00010 =
+      dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+  }
 
   // create DICOM buffer
   var writer = new dwv.dicom.DicomWriter();

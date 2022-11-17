@@ -5,6 +5,32 @@ dwv.dicom = dwv.dicom || {};
 // List of pixel generators
 dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
 
+dwv.dicom.requiredPixelTags = [
+  'TransferSyntaxUID',
+  'Rows',
+  'Columns',
+  'BitsAllocated',
+  'PixelRepresentation',
+  'SamplesPerPixel',
+  'PhotometricInterpretation'
+];
+
+dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
+  if (typeof withLog === 'undefined') {
+    withLog = false;
+  }
+  var check = true;
+  for (var i = 0; i < requiredTags.length; ++i) {
+    if (typeof tags[requiredTags[i]] === 'undefined') {
+      if (withLog) {
+        dwv.logger.log('Missing ' + requiredTags[i] + ' for pixel generation.');
+      }
+      check = false;
+      break;
+    }
+  }
+  return check;
+};
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
@@ -31,20 +57,8 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
 
   // check tags
-  if (typeof tags.TransferSyntaxUID === 'undefined') {
-    throw new Error('Missing transfer syntax for pixel generation.');
-  } else if (typeof tags.Rows === 'undefined') {
-    throw new Error('Missing number of rows for pixel generation.');
-  } else if (typeof tags.Columns === 'undefined') {
-    throw new Error('Missing number of columns for pixel generation.');
-  } else if (typeof tags.BitsAllocated === 'undefined') {
-    throw new Error('Missing BitsAllocated for pixel generation.');
-  } else if (typeof tags.PixelRepresentation === 'undefined') {
-    throw new Error('Missing PixelRepresentation for pixel generation.');
-  } else if (typeof tags.SamplesPerPixel === 'undefined') {
-    throw new Error('Missing SamplesPerPixel for pixel generation.');
-  } else if (typeof tags.PhotometricInterpretation === 'undefined') {
-    throw new Error('Missing PhotometricInterpretation for pixel generation.');
+  if (!dwv.dicom.checkTags(tags, dwv.dicom.requiredPixelTags, true)) {
+    throw new Error('Missing meta data for dicom creation.');
   }
 
   // extract info from tags
