@@ -413,5 +413,159 @@
         "BitsStored": 12,
         "HighBit": 11
     }
+},
+{
+    "name": "test10",
+    "description": "KOS test data (non image)",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "Modality": "KO",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
+        "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
+        "ReferencedRequestSequence": {
+           "value": [
+                {
+                    "StudyInstanceUID": "2.25.230835838210269490877844054010808345443",
+                    "RequestedProcedureID": "dwv_test"
+                }
+           ]
+        },
+        "PatientName": "dwv-patient-name00",
+        "ValueType": "CONTAINER",
+        "ConceptNameCodeSequence": {
+           "value": [
+                {
+                    "CodeValue": "113000",
+                    "CodingSchemeDesignator": "DCM",
+                    "CodeMeaning": "Of Interest"
+                }
+           ]
+        },
+        "ContinuityOfContent": "SEPARATE",
+        "CurrentRequestedProcedureEvidenceSequence": {
+           "value": [
+                {
+                    "ReferencedSeriesSequence": {
+                        "value": [
+                            {
+                                "ReferencedSOPSequence": {
+                                    "value": [
+                                        {
+                                            "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                            "ReferencedSOPInstanceUID": "2.25.51126593097902404226932870779417104050",
+                                            "PurposeOfReferenceCodeSequence": {
+                                                "value": [
+                                                    {
+                                                        "CodeMeaning": "T2 Weighted MR Signal Intensity",
+                                                        "CodeValue": "110805",
+                                                        "CodingSchemeDesignator": "DCM"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                "SeriesInstanceUID": "2.25.206839906826617044056015540662886375802"
+                            },
+                            {
+                                "ReferencedSOPSequence": {
+                                    "value": [
+                                        {
+                                            "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                            "ReferencedSOPInstanceUID": "2.25.62556427195710041737905331842356312599",
+                                            "PurposeOfReferenceCodeSequence": {
+                                                "value": [
+                                                    {
+                                                        "CodeMeaning": "Diffusion weighted",
+                                                        "CodeValue": "113043",
+                                                        "CodingSchemeDesignator": "DCM"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                "SeriesInstanceUID": "2.25.189184214038560157073115315824215251609"
+                            },
+                            {
+                                "ReferencedSOPSequence": {
+                                    "value": [
+                                        {
+                                            "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                            "ReferencedSOPInstanceUID": "2.25.193221069050960432374504797359086480739",
+                                            "PurposeOfReferenceCodeSequence": {
+                                                "value": [
+                                                    {
+                                                        "CodeMeaning": "Dynamic Contrast-Enhanced Acquisition",
+                                                        "CodeValue": "130567",
+                                                        "CodingSchemeDesignator": "DCM"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                "SeriesInstanceUID": "2.25.321841946232175181479892615314528451144"
+                            }
+                        ]
+                    },
+                    "StudyInstanceUID": "2.25.230835838210269490877844054010808345443"
+                }
+            ]
+        },
+        "ContentSequence": {
+            "value": [
+                {
+                    "RelationshipType": "CONTAINS",
+                    "ValueType": "TEXT",
+                    "ConceptNameCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Key Object Description",
+                                "CodeValue": "113012",
+                                "CodingSchemeDesignator": "DCM"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "RelationshipType": "CONTAINS",
+                    "ValueType": "IMAGE",
+                    "ReferencedSOPSequence": {
+                        "value": [
+                            {
+                                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                "ReferencedSOPInstanceUID": "2.25.51126593097902404226932870779417104050"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "RelationshipType": "CONTAINS",
+                    "ValueType": "IMAGE",
+                    "ReferencedSOPSequence": {
+                        "value": [
+                            {
+                                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                "ReferencedSOPInstanceUID": "2.25.62556427195710041737905331842356312599"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "RelationshipType": "CONTAINS",
+                    "ValueType": "IMAGE",
+                    "ReferencedSOPSequence": {
+                        "value": [
+                            {
+                                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                                "ReferencedSOPInstanceUID": "2.25.193221069050960432374504797359086480739"
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
 }
 ]
