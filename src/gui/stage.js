@@ -29,9 +29,22 @@ dwv.gui.PositionBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var pos = new dwv.math.Point(event.value[1]);
+      var pointValues = event.value[1];
       var vc = layerGroup.getActiveViewLayer().getViewController();
-      vc.setCurrentPosition(pos);
+      // handle different number of dimensions
+      var currentPos = vc.getCurrentPosition();
+      var currentDims = currentPos.length();
+      var inputDims = pointValues.length;
+      if (inputDims !== currentDims) {
+        if (inputDims === currentDims - 1) {
+          // add missing dim, for ex: input 3D -> current 4D
+          pointValues.push(currentPos.get(currentDims - 1));
+        } else if (inputDims === currentDims + 1) {
+          // remove extra dim, for ex: input 4D -> current 3D
+          pointValues.pop();
+        }
+      }
+      vc.setCurrentPosition(new dwv.math.Point(pointValues));
     };
   };
 };
