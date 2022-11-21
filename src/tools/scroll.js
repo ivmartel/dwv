@@ -113,7 +113,8 @@ dwv.tool.Scroll = function (app) {
 
     // update controller position
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    viewController.setCurrentPosition2D(planePos.x, planePos.y);
+    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    viewController.setCurrentPosition(position);
   };
 
   /**

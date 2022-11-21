@@ -42,7 +42,7 @@ dwv.ctrl.ViewController = function (view) {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition2D(0, 0);
+    this.setCurrentPosition(this.getPositionFrom2D(0, 0));
   };
 
   /**
@@ -367,13 +367,13 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Set the current 2D (x,y) position.
+   * Get a position from a 2D (x,y) position.
    *
    * @param {number} x The column position.
    * @param {number} y The row position.
-   * @returns {boolean} False if not in bounds.
+   * @returns {dwv.math.Point} The associated position.
    */
-  this.setCurrentPosition2D = function (x, y) {
+  this.getPositionFrom2D = function (x, y) {
     // keep third direction
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(x, y, k);
@@ -383,9 +383,7 @@ dwv.ctrl.ViewController = function (view) {
     var geometry = view.getImage().getGeometry();
     var point3D = geometry.pointToWorld(point);
     // merge with current position to keep extra dimensions
-    var position = this.getCurrentPosition().mergeWith3D(point3D);
-
-    return view.setCurrentPosition(position);
+    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**
