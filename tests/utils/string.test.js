@@ -296,3 +296,43 @@ QUnit.test('Test getFileExtension.', function (assert) {
   assert.equal(
     dwv.utils.getFileExtension(test12), res12, 'getFileExtension 12');
 });
+
+/**
+ * Tests for {@link dwv.utils.precisionRound}.
+ *
+ * @function module:tests/utils~precisionRound
+ */
+QUnit.test('Test precisionRound.', function (assert) {
+  // just to be sure...
+  assert.equal(Math.round(-0.6), -1, 'test round #00');
+  assert.equal(Math.round(-0.5), 0, 'test round #01');
+  assert.equal(Math.round(0.5), 1, 'test round #02');
+  assert.equal(Math.round(1.5), 2, 'test round #03');
+
+  assert.equal(dwv.utils.precisionRound(-0.004, 2), 0, 'test #00');
+  assert.equal(dwv.utils.precisionRound(-0.005, 2), 0, 'test #01');
+  assert.equal(dwv.utils.precisionRound(-0.006, 2), -0.01, 'test #02');
+
+  assert.equal(dwv.utils.precisionRound(0.004, 2), 0, 'test #10');
+  assert.equal(dwv.utils.precisionRound(0.005, 2), 0.01, 'test #11');
+  assert.equal(dwv.utils.precisionRound(0.006, 2), 0.01, 'test #1');
+
+  assert.equal(dwv.utils.precisionRound(1.004, 2), 1, 'test #20');
+  assert.equal(dwv.utils.precisionRound(1.005, 2), 1.01, 'test #21');
+  assert.equal(dwv.utils.precisionRound(1.006, 2), 1.01, 'test #22');
+
+  assert.equal(dwv.utils.precisionRound(1.05, 1), 1.1, 'test #31');
+  assert.equal(dwv.utils.precisionRound(1.0005, 3), 1.001, 'test #31');
+  assert.equal(dwv.utils.precisionRound(1.00005, 4), 1.0001, 'test #31');
+  assert.equal(dwv.utils.precisionRound(1.000005, 5), 1.00001, 'test #31');
+
+  assert.equal(dwv.utils.precisionRound(1234.5, 0), 1235, 'test #40');
+  assert.equal(dwv.utils.precisionRound(1234.56, 0), 1235, 'test #41');
+  assert.equal(dwv.utils.precisionRound(1234.5, 1), 1234.5, 'test #42');
+  assert.equal(dwv.utils.precisionRound(1234.56, 1), 1234.6, 'test #43');
+  assert.equal(dwv.utils.precisionRound(1234.5, 2), 1234.5, 'test #44');
+  assert.equal(dwv.utils.precisionRound(1234.56, 2), 1234.56, 'test #45');
+  assert.equal(dwv.utils.precisionRound(1234.566, 2), 1234.57, 'test #46');
+  assert.equal(dwv.utils.precisionRound(1234.5666, 2), 1234.57, 'test #47');
+
+});

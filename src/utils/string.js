@@ -241,3 +241,20 @@ dwv.utils.stringToUint8Array = function (str) {
   }
   return arr;
 };
+
+/**
+ * Round a float number to a given precision.
+ * Inspired from https://stackoverflow.com/a/49729715/3639892.
+ * Can be a solution to not have trailing zero as when
+ * using toFixed or toPrecision.
+ * '+number.toFixed(precision)' does not pass all the tests...
+ *
+ * @param {number} number The number to round.
+ * @param {number} precision The rounding precision.
+ * @returns {number} The rounded number.
+ */
+dwv.utils.precisionRound = function (number, precision) {
+  var factor = Math.pow(10, precision);
+  var delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
+  return Math.round(number * factor + delta) / factor;
+};

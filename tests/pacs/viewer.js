@@ -212,23 +212,12 @@ dwv.test.viewerSetup = function () {
 
   _app.addEventListener('positionchange', function (event) {
     var input = document.getElementById('position');
-    var toFixed2 = function (val) {
-      var str = val.toString();
-      var value = null;
-      var dotIndex = str.indexOf('.');
-      if (dotIndex === -1) {
-        value = str;
-      } else {
-        value = str.slice(0, Math.min(dotIndex + 2, str.length));
-      }
-      return value;
-    };
     var values = event.value[1];
     var text = '(index: ' + event.value[0] + ')';
     if (event.value.length > 2) {
       text += ' value: ' + event.value[2];
     }
-    input.value = values.map(toFixed2);
+    input.value = values.map(getPrecisionRound(2));
     // index as small text
     var span = document.getElementById('positionspan');
     span.innerHTML = text;
@@ -874,6 +863,18 @@ function sortByPosPatKey(obj) {
     sorted.set(key, obj[key]);
   }
   return sorted;
+}
+
+/**
+ * Get a rounding function for a specific precision.
+ *
+ * @param {number} precision The rounding precision.
+ * @returns {Function} The rounding function.
+ */
+function getPrecisionRound(precision) {
+  return function (x) {
+    return dwv.utils.precisionRound(x, precision);
+  };
 }
 
 /**
