@@ -51,46 +51,46 @@ dwv.test.viewerSetup = function () {
     dataViewConfigs = prepareAndGetMPRDataViewConfig();
   } else if (_mode === 2) {
     // simple side by side
-    addLayerGroup('layerGroup0');
-    addLayerGroup('layerGroup1');
+    addLayerGroup('layerGroupA');
+    addLayerGroup('layerGroupB');
     dataViewConfigs = {
       0: [
         {
-          divId: 'layerGroup0'
+          divId: 'layerGroupA'
         }
       ],
       1: [
         {
-          divId: 'layerGroup1'
+          divId: 'layerGroupB'
         }
       ]
     };
   } else if (_mode === 3) {
     // multiple data, multiple layer group
-    addLayerGroup('layerGroup0');
-    addLayerGroup('layerGroup1');
+    addLayerGroup('layerGroupA');
+    addLayerGroup('layerGroupB');
     dataViewConfigs = {
       0: [
         {
-          divId: 'layerGroup0'
+          divId: 'layerGroupA'
         },
         {
-          divId: 'layerGroup1'
+          divId: 'layerGroupB'
         }
       ],
       1: [
         {
-          divId: 'layerGroup0'
+          divId: 'layerGroupA'
         }
       ],
       2: [
         {
-          divId: 'layerGroup1'
+          divId: 'layerGroupB'
         }
       ],
       3: [
         {
-          divId: 'layerGroup1'
+          divId: 'layerGroupB'
         }
       ]
     };
@@ -325,8 +325,8 @@ function prepareAndGetSimpleDataViewConfig() {
   var dwvDiv = document.getElementById('dwv');
   dwvDiv.innerHTML = '';
   // add div
-  addLayerGroup('layerGroup0');
-  return {'*': [{divId: 'layerGroup0'}]};
+  addLayerGroup('layerGroupA');
+  return {'*': [{divId: 'layerGroupA'}]};
 }
 
 /**
@@ -339,21 +339,21 @@ function prepareAndGetMPRDataViewConfig() {
   var dwvDiv = document.getElementById('dwv');
   dwvDiv.innerHTML = '';
   // add divs
-  addLayerGroup('layerGroup0');
-  addLayerGroup('layerGroup1');
-  addLayerGroup('layerGroup2');
+  addLayerGroup('layerGroupA');
+  addLayerGroup('layerGroupC');
+  addLayerGroup('layerGroupS');
   return {
     '*': [
       {
-        divId: 'layerGroup0',
+        divId: 'layerGroupA',
         orientation: 'axial'
       },
       {
-        divId: 'layerGroup1',
+        divId: 'layerGroupC',
         orientation: 'coronal'
       },
       {
-        divId: 'layerGroup2',
+        divId: 'layerGroupS',
         orientation: 'sagittal'
       }
     ]
