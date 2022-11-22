@@ -952,21 +952,10 @@ dwv.App = function () {
    * @param {string} tool The tool.
    */
   this.setTool = function (tool) {
-    // bind tool to layer: not really important which layer since
-    //   tools are responsible for finding the event source layer
-    //   but there needs to be at least one binding...
+    // bind tool to active layer
     for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
       var layerGroup = stage.getLayerGroup(i);
-      // unbind previous layer
-      var vl = layerGroup.getActiveViewLayer();
-      if (vl) {
-        toolboxController.unbindLayer(vl);
-      }
-      var dl = layerGroup.getActiveDrawLayer();
-      if (dl) {
-        toolboxController.unbindLayer(dl);
-      }
-      // bind new layer
+      // draw or view layer
       var layer = null;
       if (tool === 'Draw' ||
         tool === 'Livewire' ||
@@ -1328,6 +1317,9 @@ dwv.App = function () {
 
     // bind
     stage.bindLayerGroups();
+    if (toolboxController) {
+      toolboxController.bindLayer(viewLayer);
+    }
 
     // optional draw layer
     if (toolboxController && toolboxController.hasTool('Draw')) {

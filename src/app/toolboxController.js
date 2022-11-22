@@ -26,6 +26,14 @@ dwv.ctrl.ToolboxController = function (toolList) {
   var callbackStore = [];
 
   /**
+   * Current layer bound to tool.
+   *
+   * @type {object}
+   * @private
+   */
+  var boundLayer;
+
+  /**
    * Initialise.
    */
   this.init = function () {
@@ -112,6 +120,9 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * @param {object} layer The layer to listen to.
    */
   this.bindLayer = function (layer) {
+    if (typeof boundLayer !== 'undefined') {
+      unbindLayer(boundLayer);
+    }
     layer.bindInteraction();
     // interaction events
     var names = dwv.gui.interactionEventNames;
@@ -119,6 +130,8 @@ dwv.ctrl.ToolboxController = function (toolList) {
       layer.addEventListener(names[i],
         getOnMouch(layer.getId(), names[i]));
     }
+    // update class var
+    boundLayer = layer;
   };
 
   /**
@@ -126,7 +139,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
    *
    * @param {object} layer The layer to stop listening to.
    */
-  this.unbindLayer = function (layer) {
+  function unbindLayer(layer) {
     layer.unbindInteraction();
     // interaction events
     var names = dwv.gui.interactionEventNames;
