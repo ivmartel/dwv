@@ -965,7 +965,7 @@ dwv.App = function () {
         layer = layerGroup.getActiveViewLayer();
       }
       if (layer) {
-        toolboxController.bindLayer(layer);
+        toolboxController.bindLayer(layer, layerGroup.getGroupId());
       }
     }
 
@@ -1318,7 +1318,7 @@ dwv.App = function () {
     // bind
     stage.bindLayerGroups();
     if (toolboxController) {
-      toolboxController.bindLayer(viewLayer);
+      toolboxController.bindLayer(viewLayer, layerGroup.getGroupId());
     }
 
     // optional draw layer

@@ -26,12 +26,12 @@ dwv.ctrl.ToolboxController = function (toolList) {
   var callbackStore = [];
 
   /**
-   * Current layer bound to tool.
+   * Current layers bound to tool.
    *
    * @type {object}
    * @private
    */
-  var boundLayer;
+  var boundLayers = {};
 
   /**
    * Initialise.
@@ -118,10 +118,11 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Listen to layer interaction events.
    *
    * @param {object} layer The layer to listen to.
+   * @param {number} layerGroupId The associated layer group id.
    */
-  this.bindLayer = function (layer) {
-    if (typeof boundLayer !== 'undefined') {
-      unbindLayer(boundLayer);
+  this.bindLayer = function (layer, layerGroupId) {
+    if (typeof boundLayers[layerGroupId] !== 'undefined') {
+      unbindLayer(boundLayers[layerGroupId]);
     }
     layer.bindInteraction();
     // interaction events
@@ -131,7 +132,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
         getOnMouch(layer.getId(), names[i]));
     }
     // update class var
-    boundLayer = layer;
+    boundLayers[layerGroupId] = layer;
   };
 
   /**
