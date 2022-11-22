@@ -192,6 +192,23 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the image rescaled value at the input position.
+   *
+   * @param {dwv.math.Point} position the input position.
+   * @returns {number|undefined} The image value or undefined if out of bounds.
+   */
+  this.getRescaledImageValue = function (position) {
+    var image = view.getImage();
+    var geometry = image.getGeometry();
+    var index = geometry.worldToIndex(position);
+    var value;
+    if (geometry.isIndexInBounds(index)) {
+      value = image.getRescaledValueAtIndex(index);
+    }
+    return value;
+  };
+
+  /**
    * Get some values from the associated image in a region.
    *
    * @param {dwv.math.Point2D} min Minimum point.
