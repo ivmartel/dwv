@@ -147,7 +147,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
       layer.removeEventListener(names[i],
         getOnMouch(layer.getId(), names[i]));
     }
-  };
+  }
 
   /**
    * Mou(se) and (T)ouch event handler. This function just determines
