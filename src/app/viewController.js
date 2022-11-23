@@ -195,10 +195,14 @@ dwv.ctrl.ViewController = function (view) {
    * Get the image rescaled value at the input position.
    *
    * @param {dwv.math.Point} position the input position.
-   * @returns {number|undefined} The image value or undefined if out of bounds.
+   * @returns {number|undefined} The image value or undefined if out of bounds
+   *   or no quantifiable (for ex RGB).
    */
   this.getRescaledImageValue = function (position) {
     var image = view.getImage();
+    if (!image.canQuantify()) {
+      return;
+    }
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
     var value;
