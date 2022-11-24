@@ -353,6 +353,15 @@ dwv.tool.Livewire = function (app) {
   };
 
   /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
+  };
+
+  /**
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
@@ -406,4 +415,3 @@ dwv.tool.Livewire.prototype.setFeatures = function (features) {
     this.style.setLineColour(features.shapeColour);
   }
 };
-

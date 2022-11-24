@@ -480,6 +480,15 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
+  };
+
+  /**
    * Add an event listener to this class.
    *
    * @param {string} type The event type.

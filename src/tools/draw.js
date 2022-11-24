@@ -813,6 +813,16 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
+   * Get the type of tool options: here 'factory' since the shape
+   * list contains factories to create each possible shape.
+   *
+   * @returns {string} The type.
+   */
+  this.getOptionsType = function () {
+    return 'factory';
+  };
+
+  /**
    * Set the tool live features: shape colour and shape name.
    *
    * @param {object} features The list of features.
@@ -835,6 +845,15 @@ dwv.tool.Draw = function (app) {
    */
   this.init = function () {
     // does nothing
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
   };
 
   /**

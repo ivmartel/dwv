@@ -300,7 +300,8 @@ dwv.App = function () {
    *     string (default undefined keeps the original slice order)
    * - `binders`: array of layerGroup binders
    * - `tools`: tool name indexed object containing individual tool
-   *   configurations
+   *   configurations in the form of a list of objects containing:
+   *   - options: array of tool options
    * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
    *   after the first loaded data or not
    * - `defaultCharacterSet`: the default chraracter set string used for DICOM
@@ -359,18 +360,16 @@ dwv.App = function () {
           toolList[toolName] = new dwv.tool[toolName](this);
           // register listeners
           if (typeof toolList[toolName].addEventListener !== 'undefined') {
-            if (typeof toolParams.events !== 'undefined') {
-              for (var j = 0; j < toolParams.events.length; ++j) {
-                var eventName = toolParams.events[j];
-                toolList[toolName].addEventListener(eventName, fireEvent);
-              }
+            var names = toolList[toolName].getEventNames();
+            for (var j = 0; j < names.length; ++j) {
+              toolList[toolName].addEventListener(names[j], fireEvent);
             }
           }
           // tool options
           if (typeof toolParams.options !== 'undefined') {
             var type = 'raw';
-            if (typeof toolParams.type !== 'undefined') {
-              type = toolParams.type;
+            if (typeof toolList[toolName].getOptionsType !== 'undefined') {
+              type = toolList[toolName].getOptionsType();
             }
             var toolOptions = toolParams.options;
             if (type === 'instance' ||

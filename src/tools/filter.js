@@ -63,6 +63,16 @@ dwv.tool.Filter = function (app) {
   };
 
   /**
+   * Get the type of tool options: here 'instance' since the filter
+   * list contains instances of each possible filter.
+   *
+   * @returns {string} The type.
+   */
+  this.getOptionsType = function () {
+    return 'instance';
+  };
+
+  /**
    * Initialise the filter. Called once the image is loaded.
    */
   this.init = function () {
@@ -80,6 +90,15 @@ dwv.tool.Filter = function (app) {
   this.keydown = function (event) {
     event.context = 'dwv.tool.Filter';
     app.onKeydown(event);
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['filterrun', 'filterundo'];
   };
 
   /**
