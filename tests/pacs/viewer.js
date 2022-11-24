@@ -170,43 +170,44 @@ dwv.test.viewerSetup = function () {
       }
     }
 
-    if (_app.getMetaData(event.loadid).Modality.value === 'SEG') {
-      logFramePosPats(_app.getMetaData(event.loadid));
-    }
-
-    // example usage of a dicom SEG as data mask
-    var useSegAsMask = false;
-    if (useSegAsMask &&
+    if (event.loadtype === 'image' &&
       _app.getMetaData(event.loadid).Modality.value === 'SEG') {
-      // image to filter
-      var imgDataIndex = 0;
-      var vls = _app.getViewLayersByDataIndex(imgDataIndex);
-      var vc = vls[0].getViewController();
-      var img = _app.getImage(imgDataIndex);
-      var imgGeometry = img.getGeometry();
-      var sliceSize = imgGeometry.getSize().getDimSize(2);
-      // SEG image
-      var segImage = _app.getImage(event.loadid);
-      // calculate slice difference
-      var segOrigin0 = segImage.getGeometry().getOrigins()[0];
-      var segOrigin0Point = new dwv.math.Point([
-        segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
-      ]);
-      var segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
-      var indexOffset = segOriginIndex.get(2) * sliceSize;
-      // set alpha function
-      vc.setViewAlphaFunction(function (value, index) {
-        // multiply by 3 since SEG is RGB
-        var segIndex = 3 * (index - indexOffset);
-        if (segIndex >= 0 &&
-          segImage.getValueAtOffset(segIndex) === 0 &&
-          segImage.getValueAtOffset(segIndex + 1) === 0 &&
-          segImage.getValueAtOffset(segIndex + 2) === 0) {
-          return 0;
-        } else {
-          return 0xff;
-        }
-      });
+      // log SEG details
+      logFramePosPats(_app.getMetaData(event.loadid));
+
+      // example usage of a dicom SEG as data mask
+      var useSegAsMask = false;
+      if (useSegAsMask) {
+        // image to filter
+        var imgDataIndex = 0;
+        var vls = _app.getViewLayersByDataIndex(imgDataIndex);
+        var vc = vls[0].getViewController();
+        var img = _app.getImage(imgDataIndex);
+        var imgGeometry = img.getGeometry();
+        var sliceSize = imgGeometry.getSize().getDimSize(2);
+        // SEG image
+        var segImage = _app.getImage(event.loadid);
+        // calculate slice difference
+        var segOrigin0 = segImage.getGeometry().getOrigins()[0];
+        var segOrigin0Point = new dwv.math.Point([
+          segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
+        ]);
+        var segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
+        var indexOffset = segOriginIndex.get(2) * sliceSize;
+        // set alpha function
+        vc.setViewAlphaFunction(function (value, index) {
+          // multiply by 3 since SEG is RGB
+          var segIndex = 3 * (index - indexOffset);
+          if (segIndex >= 0 &&
+            segImage.getValueAtOffset(segIndex) === 0 &&
+            segImage.getValueAtOffset(segIndex + 1) === 0 &&
+            segImage.getValueAtOffset(segIndex + 2) === 0) {
+            return 0;
+          } else {
+            return 0xff;
+          }
+        });
+      }
     }
   });
 
