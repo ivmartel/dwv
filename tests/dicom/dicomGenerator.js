@@ -5,6 +5,7 @@ dwv.dicom = dwv.dicom || {};
 // List of pixel generators
 dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
 
+// List of required tags for generating pixel data
 dwv.dicom.requiredPixelTags = [
   'TransferSyntaxUID',
   'Rows',
@@ -15,6 +16,14 @@ dwv.dicom.requiredPixelTags = [
   'PhotometricInterpretation'
 ];
 
+/**
+ * Check a list of input tags against a required list.
+ *
+ * @param {object} tags The tags to check.
+ * @param {Array} requiredTags Array of tag names.
+ * @param {boolean} withLog Flag to log errors or not.
+ * @returns {boolean} True if all required tags are present in the input.
+ */
 dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
   if (typeof withLog === 'undefined') {
     withLog = false;
