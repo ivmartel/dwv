@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.17 2022-11-17 16:14:43 */
+/*! dwv 0.31.0-beta.18 2022-11-30 11:36:21 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -374,7 +374,8 @@ dwv.App = function () {
    *     string (default undefined keeps the original slice order)
    * - `binders`: array of layerGroup binders
    * - `tools`: tool name indexed object containing individual tool
-   *   configurations
+   *   configurations in the form of a list of objects containing:
+   *   - options: array of tool options
    * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
    *   after the first loaded data or not
    * - `defaultCharacterSet`: the default chraracter set string used for DICOM
@@ -433,18 +434,16 @@ dwv.App = function () {
           toolList[toolName] = new dwv.tool[toolName](this);
           // register listeners
           if (typeof toolList[toolName].addEventListener !== 'undefined') {
-            if (typeof toolParams.events !== 'undefined') {
-              for (var j = 0; j < toolParams.events.length; ++j) {
-                var eventName = toolParams.events[j];
-                toolList[toolName].addEventListener(eventName, fireEvent);
-              }
+            var names = toolList[toolName].getEventNames();
+            for (var j = 0; j < names.length; ++j) {
+              toolList[toolName].addEventListener(names[j], fireEvent);
             }
           }
           // tool options
           if (typeof toolParams.options !== 'undefined') {
             var type = 'raw';
-            if (typeof toolParams.type !== 'undefined') {
-              type = toolParams.type;
+            if (typeof toolList[toolName].getOptionsType !== 'undefined') {
+              type = toolList[toolName].getOptionsType();
             }
             var toolOptions = toolParams.options;
             if (type === 'instance' ||
@@ -1026,21 +1025,10 @@ dwv.App = function () {
    * @param {string} tool The tool.
    */
   this.setTool = function (tool) {
-    // bind tool to layer: not really important which layer since
-    //   tools are responsible for finding the event source layer
-    //   but there needs to be at least one binding...
+    // bind tool to active layer
     for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
       var layerGroup = stage.getLayerGroup(i);
-      // unbind previous layer
-      var vl = layerGroup.getActiveViewLayer();
-      if (vl) {
-        toolboxController.unbindLayer(vl);
-      }
-      var dl = layerGroup.getActiveDrawLayer();
-      if (dl) {
-        toolboxController.unbindLayer(dl);
-      }
-      // bind new layer
+      // draw or view layer
       var layer = null;
       if (tool === 'Draw' ||
         tool === 'Livewire' ||
@@ -1050,7 +1038,7 @@ dwv.App = function () {
         layer = layerGroup.getActiveViewLayer();
       }
       if (layer) {
-        toolboxController.bindLayer(layer);
+        toolboxController.bindLayer(layer, layerGroup.getGroupId());
       }
     }
 
@@ -1402,6 +1390,9 @@ dwv.App = function () {
 
     // bind
     stage.bindLayerGroups();
+    if (toolboxController) {
+      toolboxController.bindLayer(viewLayer, layerGroup.getGroupId());
+    }
 
     // optional draw layer
     if (toolboxController && toolboxController.hasTool('Draw')) {
@@ -2413,6 +2404,14 @@ dwv.ctrl.ToolboxController = function (toolList) {
   var callbackStore = [];
 
   /**
+   * Current layers bound to tool.
+   *
+   * @type {object}
+   * @private
+   */
+  var boundLayers = {};
+
+  /**
    * Initialise.
    */
   this.init = function () {
@@ -2497,8 +2496,12 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Listen to layer interaction events.
    *
    * @param {object} layer The layer to listen to.
+   * @param {number} layerGroupId The associated layer group id.
    */
-  this.bindLayer = function (layer) {
+  this.bindLayer = function (layer, layerGroupId) {
+    if (typeof boundLayers[layerGroupId] !== 'undefined') {
+      unbindLayer(boundLayers[layerGroupId]);
+    }
     layer.bindInteraction();
     // interaction events
     var names = dwv.gui.interactionEventNames;
@@ -2506,6 +2509,8 @@ dwv.ctrl.ToolboxController = function (toolList) {
       layer.addEventListener(names[i],
         getOnMouch(layer.getId(), names[i]));
     }
+    // update class var
+    boundLayers[layerGroupId] = layer;
   };
 
   /**
@@ -2513,7 +2518,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
    *
    * @param {object} layer The layer to stop listening to.
    */
-  this.unbindLayer = function (layer) {
+  function unbindLayer(layer) {
     layer.unbindInteraction();
     // interaction events
     var names = dwv.gui.interactionEventNames;
@@ -2521,7 +2526,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
       layer.removeEventListener(names[i],
         getOnMouch(layer.getId(), names[i]));
     }
-  };
+  }
 
   /**
    * Mou(se) and (T)ouch event handler. This function just determines
@@ -2634,7 +2639,7 @@ dwv.ctrl.ViewController = function (view) {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition2D(0, 0);
+    this.setCurrentPosition(this.getPositionFrom2D(0, 0));
   };
 
   /**
@@ -2781,6 +2786,36 @@ dwv.ctrl.ViewController = function (view) {
   this.get2DSpacing = function () {
     var spacing = view.getImage().getGeometry().getSpacing();
     return [spacing.get(0), spacing.get(1)];
+  };
+
+  /**
+   * Get the image rescaled value at the input position.
+   *
+   * @param {dwv.math.Point} position the input position.
+   * @returns {number|undefined} The image value or undefined if out of bounds
+   *   or no quantifiable (for ex RGB).
+   */
+  this.getRescaledImageValue = function (position) {
+    var image = view.getImage();
+    if (!image.canQuantify()) {
+      return;
+    }
+    var geometry = image.getGeometry();
+    var index = geometry.worldToIndex(position);
+    var value;
+    if (geometry.isIndexInBounds(index)) {
+      value = image.getRescaledValueAtIndex(index);
+    }
+    return value;
+  };
+
+  /**
+   * Get the image pixel unit.
+   *
+   * @returns {string} The unit
+   */
+  this.getPixelUnit = function () {
+    return view.getImage().getMeta().pixelUnit;
   };
 
   /**
@@ -2959,13 +2994,13 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Set the current 2D (x,y) position.
+   * Get a position from a 2D (x,y) position.
    *
    * @param {number} x The column position.
    * @param {number} y The row position.
-   * @returns {boolean} False if not in bounds.
+   * @returns {dwv.math.Point} The associated position.
    */
-  this.setCurrentPosition2D = function (x, y) {
+  this.getPositionFrom2D = function (x, y) {
     // keep third direction
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(x, y, k);
@@ -2975,9 +3010,7 @@ dwv.ctrl.ViewController = function (view) {
     var geometry = view.getImage().getGeometry();
     var point3D = geometry.pointToWorld(point);
     // merge with current position to keep extra dimensions
-    var position = this.getCurrentPosition().mergeWith3D(point3D);
-
-    return view.setCurrentPosition(position);
+    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**
@@ -4527,6 +4560,28 @@ dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
 };
 
 /**
+ * Get the pixel data unit.
+ *
+ * @returns {string|null} The unit value if available.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getPixelUnit = function () {
+  // RescaleType
+  var unit = this.getFromKey('x00281054');
+  if (!unit) {
+    // Units (for PET)
+    unit = this.getFromKey('x00541001');
+  }
+  // default rescale type for CT
+  if (!unit) {
+    var modality = this.getFromKey('x00080060');
+    if (modality === 'CT') {
+      unit = 'HU';
+    }
+  }
+  return unit;
+};
+
+/**
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR
@@ -4602,7 +4657,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.17';
+  return '0.31.0-beta.18';
 };
 
 /**
@@ -18712,6 +18767,11 @@ dwv.image.ImageFactory.prototype.create = function (
   };
   // PixelRepresentation -> is signed
   meta.IsSigned = meta.PixelRepresentation === 1;
+  // local pixel unit
+  var pixelUnit = dicomElements.getPixelUnit();
+  if (pixelUnit) {
+    meta.pixelUnit = pixelUnit;
+  }
   // FrameOfReferenceUID (optional)
   var frameOfReferenceUID = dicomElements.getFromKey('x00200052');
   if (frameOfReferenceUID) {
@@ -30453,6 +30513,16 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
+   * Get the type of tool options: here 'factory' since the shape
+   * list contains factories to create each possible shape.
+   *
+   * @returns {string} The type.
+   */
+  this.getOptionsType = function () {
+    return 'factory';
+  };
+
+  /**
    * Set the tool live features: shape colour and shape name.
    *
    * @param {object} features The list of features.
@@ -30475,6 +30545,15 @@ dwv.tool.Draw = function (app) {
    */
   this.init = function () {
     // does nothing
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
   };
 
   /**
@@ -31847,6 +31926,16 @@ dwv.tool.Filter = function (app) {
   };
 
   /**
+   * Get the type of tool options: here 'instance' since the filter
+   * list contains instances of each possible filter.
+   *
+   * @returns {string} The type.
+   */
+  this.getOptionsType = function () {
+    return 'instance';
+  };
+
+  /**
    * Initialise the filter. Called once the image is loaded.
    */
   this.init = function () {
@@ -31864,6 +31953,15 @@ dwv.tool.Filter = function (app) {
   this.keydown = function (event) {
     event.context = 'dwv.tool.Filter';
     app.onKeydown(event);
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['filterrun', 'filterundo'];
   };
 
   /**
@@ -32797,6 +32895,15 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
+  };
+
+  /**
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
@@ -33410,6 +33517,15 @@ dwv.tool.Livewire = function (app) {
   };
 
   /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
+  };
+
+  /**
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
@@ -33463,7 +33579,6 @@ dwv.tool.Livewire.prototype.setFeatures = function (features) {
     this.style.setLineColour(features.shapeColour);
   }
 };
-
 
 // namespaces
 var dwv = dwv || {};
@@ -34882,11 +34997,21 @@ dwv.tool.Scroll = function (app) {
   var wheelDeltaY = 0;
 
   /**
+   * Option to show or not a value tooltip on mousemove.
+   *
+   * @type {boolean}
+   */
+  var displayTooltip = false;
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
+    // optional tooltip
+    removeTooltipDiv();
+
     // stop viewer if playing
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
@@ -34903,7 +35028,8 @@ dwv.tool.Scroll = function (app) {
 
     // update controller position
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    viewController.setCurrentPosition2D(planePos.x, planePos.y);
+    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    viewController.setCurrentPosition(position);
   };
 
   /**
@@ -34913,6 +35039,10 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousemove = function (event) {
     if (!self.started) {
+      // optional tooltip
+      if (displayTooltip) {
+        showTooltip(event);
+      }
       return;
     }
 
@@ -34976,6 +35106,8 @@ dwv.tool.Scroll = function (app) {
    */
   this.mouseout = function (event) {
     self.mouseup(event);
+    // remove possible tooltip div
+    removeTooltipDiv();
   };
 
   /**
@@ -35067,6 +35199,7 @@ dwv.tool.Scroll = function (app) {
     event.context = 'dwv.tool.Scroll';
     app.onKeydown(event);
   };
+
   /**
    * Handle double click.
    *
@@ -35081,12 +35214,73 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
+   * Displays a tooltip in a temparary `span`.
+   * Works with css to hide/show the span only on mouse hover.
+   *
+   * @param {object} event The mouse move event.
+   */
+  function showTooltip(event) {
+    // remove previous div
+    removeTooltipDiv();
+
+    // get image value at position
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    var value = viewController.getRescaledImageValue(position);
+
+    // create
+    if (typeof value !== 'undefined') {
+      var span = document.createElement('span');
+      span.id = 'scroll-tooltip';
+      // place span in layer group to avoid upper layer opacity
+      var layerDiv = document.getElementById(viewLayer.getId());
+      layerDiv.parentElement.appendChild(span);
+      // position tooltip
+      span.style.left = (event._x + 10) + 'px';
+      span.style.top = (event._y + 10) + 'px';
+      var text = dwv.utils.precisionRound(value, 3);
+      if (typeof viewController.getPixelUnit() !== 'undefined') {
+        text += ' ' + viewController.getPixelUnit();
+      }
+      span.appendChild(document.createTextNode(text));
+    }
+  }
+
+  /**
+   * Remove the tooltip html div.
+   */
+  function removeTooltipDiv() {
+    var div = document.getElementById('scroll-tooltip');
+    if (div) {
+      div.remove();
+    }
+  }
+
+  /**
    * Activate the tool.
    *
    * @param {boolean} _bool The flag to activate or not.
    */
   this.activate = function (_bool) {
-    // does nothing
+    // remove tooltip html when deactivating
+    if (!_bool) {
+      removeTooltipDiv();
+    }
+  };
+
+  /**
+   * Set the tool live features: disaply tooltip.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.displayTooltip !== 'undefined') {
+      displayTooltip = features.displayTooltip;
+    }
   };
 
   /**
@@ -38281,6 +38475,23 @@ dwv.utils.stringToUint8Array = function (str) {
     arr[i] = str.charCodeAt(i);
   }
   return arr;
+};
+
+/**
+ * Round a float number to a given precision.
+ * Inspired from https://stackoverflow.com/a/49729715/3639892.
+ * Can be a solution to not have trailing zero as when
+ * using toFixed or toPrecision.
+ * '+number.toFixed(precision)' does not pass all the tests...
+ *
+ * @param {number} number The number to round.
+ * @param {number} precision The rounding precision.
+ * @returns {number} The rounded number.
+ */
+dwv.utils.precisionRound = function (number, precision) {
+  var factor = Math.pow(10, precision);
+  var delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
+  return Math.round(number * factor + delta) / factor;
 };
 
 // namespaces
