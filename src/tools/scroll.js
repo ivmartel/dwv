@@ -92,11 +92,21 @@ dwv.tool.Scroll = function (app) {
   var wheelDeltaY = 0;
 
   /**
+   * Option to show or not a value tooltip on mousemove.
+   *
+   * @type {boolean}
+   */
+  var displayTooltip = false;
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
+    // optional tooltip
+    removeTooltipDiv();
+
     // stop viewer if playing
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
@@ -124,6 +134,10 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousemove = function (event) {
     if (!self.started) {
+      // optional tooltip
+      if (displayTooltip) {
+        showTooltip(event);
+      }
       return;
     }
 
@@ -187,6 +201,8 @@ dwv.tool.Scroll = function (app) {
    */
   this.mouseout = function (event) {
     self.mouseup(event);
+    // remove possible tooltip div
+    removeTooltipDiv();
   };
 
   /**
@@ -278,6 +294,7 @@ dwv.tool.Scroll = function (app) {
     event.context = 'dwv.tool.Scroll';
     app.onKeydown(event);
   };
+
   /**
    * Handle double click.
    *
@@ -292,12 +309,73 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
+   * Displays a tooltip in a temparary `span`.
+   * Works with css to hide/show the span only on mouse hover.
+   *
+   * @param {object} event The mouse move event.
+   */
+  function showTooltip(event) {
+    // remove previous div
+    removeTooltipDiv();
+
+    // get image value at position
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    var value = viewController.getRescaledImageValue(position);
+
+    // create
+    if (typeof value !== 'undefined') {
+      var span = document.createElement('span');
+      span.id = 'scroll-tooltip';
+      // place span in layer group to avoid upper layer opacity
+      var layerDiv = document.getElementById(viewLayer.getId());
+      layerDiv.parentElement.appendChild(span);
+      // position tooltip
+      span.style.left = (event._x + 10) + 'px';
+      span.style.top = (event._y + 10) + 'px';
+      var text = dwv.utils.precisionRound(value, 3);
+      if (typeof viewController.getPixelUnit() !== 'undefined') {
+        text += ' ' + viewController.getPixelUnit();
+      }
+      span.appendChild(document.createTextNode(text));
+    }
+  }
+
+  /**
+   * Remove the tooltip html div.
+   */
+  function removeTooltipDiv() {
+    var div = document.getElementById('scroll-tooltip');
+    if (div) {
+      div.remove();
+    }
+  }
+
+  /**
    * Activate the tool.
    *
    * @param {boolean} _bool The flag to activate or not.
    */
   this.activate = function (_bool) {
-    // does nothing
+    // remove tooltip html when deactivating
+    if (!_bool) {
+      removeTooltipDiv();
+    }
+  };
+
+  /**
+   * Set the tool live features: disaply tooltip.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.displayTooltip !== 'undefined') {
+      displayTooltip = features.displayTooltip;
+    }
   };
 
   /**

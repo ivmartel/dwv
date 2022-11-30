@@ -213,6 +213,15 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the image pixel unit.
+   *
+   * @returns {string} The unit
+   */
+  this.getPixelUnit = function () {
+    return view.getImage().getMeta().pixelUnit;
+  };
+
+  /**
    * Get some values from the associated image in a region.
    *
    * @param {dwv.math.Point2D} min Minimum point.
