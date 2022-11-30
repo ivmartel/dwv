@@ -189,6 +189,11 @@ dwv.image.ImageFactory.prototype.create = function (
   };
   // PixelRepresentation -> is signed
   meta.IsSigned = meta.PixelRepresentation === 1;
+  // local pixel unit
+  var pixelUnit = dicomElements.getPixelUnit();
+  if (pixelUnit) {
+    meta.pixelUnit = pixelUnit;
+  }
   // FrameOfReferenceUID (optional)
   var frameOfReferenceUID = dicomElements.getFromKey('x00200052');
   if (frameOfReferenceUID) {

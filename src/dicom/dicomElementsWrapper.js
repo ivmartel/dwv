@@ -576,6 +576,28 @@ dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
 };
 
 /**
+ * Get the pixel data unit.
+ *
+ * @returns {string|null} The unit value if available.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getPixelUnit = function () {
+  // RescaleType
+  var unit = this.getFromKey('x00281054');
+  if (!unit) {
+    // Units (for PET)
+    unit = this.getFromKey('x00541001');
+  }
+  // default rescale type for CT
+  if (!unit) {
+    var modality = this.getFromKey('x00080060');
+    if (modality === 'CT') {
+      unit = 'HU';
+    }
+  }
+  return unit;
+};
+
+/**
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR
