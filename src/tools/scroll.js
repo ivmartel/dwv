@@ -41,7 +41,7 @@ dwv.tool = dwv.tool || {};
  * document.body.appendChild(range);
  * // update app on slider change
  * range.oninput = function () {
- *   var lg = app.getLayerGroupById(0);
+ *   var lg = app.getLayerGroupByDivId('layerGroup0');
  *   var vc = lg.getActiveViewLayer().getViewController();
  *   var index = vc.getCurrentIndex();
  *   var values = index.getValues();
@@ -56,7 +56,7 @@ dwv.tool = dwv.tool || {};
  * });
  * // update slider on slice change (for ex via mouse wheel)
  * app.addEventListener('positionchange', function () {
- *   var lg = app.getLayerGroupById(0);
+ *   var lg = app.getLayerGroupByDivId('layerGroup0');
  *   var vc = lg.getActiveViewLayer().getViewController();
  *   range.value = vc.getCurrentIndex().get(2);
  * });
@@ -109,7 +109,7 @@ dwv.tool.Scroll = function (app) {
 
     // stop viewer if playing
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
@@ -142,7 +142,7 @@ dwv.tool.Scroll = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
 
@@ -275,7 +275,7 @@ dwv.tool.Scroll = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     if (up) {
@@ -302,7 +302,7 @@ dwv.tool.Scroll = function (app) {
    */
   this.dblclick = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
@@ -320,7 +320,7 @@ dwv.tool.Scroll = function (app) {
 
     // get image value at position
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);

@@ -119,7 +119,7 @@ dwv.tool.Livewire = function (app) {
    */
   this.mousedown = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var imageSize = viewLayer.getViewController().getImageSize();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
@@ -180,7 +180,7 @@ dwv.tool.Livewire = function (app) {
       return;
     }
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 

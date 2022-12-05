@@ -328,7 +328,7 @@ dwv.tool.ShapeEditor = function (app) {
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(evt.evt);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
       dwv.tool.validateAnchorPosition(drawLayer.getBaseSize(), this);

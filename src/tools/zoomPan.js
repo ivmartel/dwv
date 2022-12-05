@@ -66,7 +66,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var ty = event._y - self.y0;
     // apply translation
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planeOffset = viewLayer.displayToPlaneScale(tx, ty);
@@ -97,7 +97,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
 
@@ -198,7 +198,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var step = -event.deltaY / 500;
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToMainPlanePos(event._x, event._y);

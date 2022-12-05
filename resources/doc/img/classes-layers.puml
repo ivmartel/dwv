@@ -1,7 +1,7 @@
 @startuml
 
 class App {
-  getLayerGroupById()
+  getLayerGroupByDivId()
 }
 class Stage
 class LayerGroup {

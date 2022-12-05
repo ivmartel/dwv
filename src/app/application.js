@@ -238,17 +238,6 @@ dwv.App = function () {
   };
 
   /**
-   * Get a layer group by id.
-   * The layer is available after the first loaded item.
-   *
-   * @param {number} groupId The group id.
-   * @returns {dwv.gui.LayerGroup} The layer group.
-   */
-  this.getLayerGroupById = function (groupId) {
-    return stage.getLayerGroup(groupId);
-  };
-
-  /**
    * Get a layer group by div id.
    * The layer is available after the first loaded item.
    *
@@ -964,7 +953,7 @@ dwv.App = function () {
         layer = layerGroup.getActiveViewLayer();
       }
       if (layer) {
-        toolboxController.bindLayer(layer, layerGroup.getGroupId());
+        toolboxController.bindLayer(layer, layerGroup.getDivId());
       }
     }
 
@@ -1317,7 +1306,7 @@ dwv.App = function () {
     // bind
     stage.bindLayerGroups();
     if (toolboxController) {
-      toolboxController.bindLayer(viewLayer, layerGroup.getGroupId());
+      toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
     }
 
     // optional draw layer

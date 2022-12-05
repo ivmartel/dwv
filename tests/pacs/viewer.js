@@ -362,12 +362,12 @@ function prepareAndGetMPRDataViewConfig() {
 }
 
 /**
- * Get the layer groups ids from the data view configs.
+ * Get the layer groups div ids from the data view configs.
  *
  * @param {object} dataViewConfigs The configs.
  * @returns {Array} The list of ids.
  */
-function getLayerGroupIds(dataViewConfigs) {
+function getLayerGroupDivIds(dataViewConfigs) {
   var divIds = [];
   var keys = Object.keys(dataViewConfigs);
   for (var i = 0; i < keys.length; ++i) {
@@ -703,7 +703,7 @@ function addDataRow(id) {
   }
 
   var dataViewConfigs = _app.getDataViewConfig();
-  var allLayerGroupIds = getLayerGroupIds(dataViewConfigs);
+  var allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
   var vls = _app.getViewLayersByDataIndex(id);
   var vl = vls[0];
@@ -724,7 +724,7 @@ function addDataRow(id) {
       trow.appendChild(th);
     };
     insertTCell('Id');
-    for (var j = 0; j < allLayerGroupIds.length; ++j) {
+    for (var j = 0; j < allLayerGroupDivIds.length; ++j) {
       insertTCell('LG' + j);
     }
     insertTCell('Alpha Range');
@@ -751,22 +751,23 @@ function addDataRow(id) {
     viewConfig = dataViewConfigs['*'];
   }
   var dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
-  for (var l = 0; l < allLayerGroupIds.length; ++l) {
-    var layerGroupId = allLayerGroupIds[l];
+  for (var l = 0; l < allLayerGroupDivIds.length; ++l) {
+    var layerGroupDivId = allLayerGroupDivIds[l];
     cell = row.insertCell();
-    if (!dataLayerGroupsIds.includes(layerGroupId)) {
+    if (!dataLayerGroupsIds.includes(layerGroupDivId)) {
       continue;
     }
     var radio = document.createElement('input');
     radio.type = 'radio';
     radio.name = 'layerselect-' + l;
-    radio.id = l + '-' + id;
+    radio.id = 'layerselect-' + layerGroupDivId + '-' + id;
     radio.checked = true;
     radio.onchange = function (event) {
-      var fullId = event.srcElement.id;
-      var groupId = fullId.substring(0, fullId.indexOf('-'));
-      var dataId = fullId.substring(fullId.indexOf('-') + 1);
-      var lg = _app.getLayerGroupById(groupId);
+      var fullId = event.target.id;
+      var split = fullId.split('-');
+      var groupDivId = split[1];
+      var dataId = split[2];
+      var lg = _app.getLayerGroupByDivId(groupDivId);
       lg.setActiveViewLayerByDataIndex(parseInt(dataId, 10));
     };
     cell.appendChild(radio);

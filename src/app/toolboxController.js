@@ -118,11 +118,11 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Listen to layer interaction events.
    *
    * @param {object} layer The layer to listen to.
-   * @param {number} layerGroupId The associated layer group id.
+   * @param {string} layerGroupDivId The associated layer group div id.
    */
-  this.bindLayer = function (layer, layerGroupId) {
-    if (typeof boundLayers[layerGroupId] !== 'undefined') {
-      unbindLayer(boundLayers[layerGroupId]);
+  this.bindLayer = function (layer, layerGroupDivId) {
+    if (typeof boundLayers[layerGroupDivId] !== 'undefined') {
+      unbindLayer(boundLayers[layerGroupDivId]);
     }
     layer.bindInteraction();
     // interaction events
@@ -132,7 +132,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
         getOnMouch(layer.getId(), names[i]));
     }
     // update class var
-    boundLayers[layerGroupId] = layer;
+    boundLayers[layerGroupDivId] = layer;
   };
 
   /**

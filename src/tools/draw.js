@@ -168,7 +168,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var drawLayer = layerGroup.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
@@ -225,7 +225,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
@@ -269,7 +269,7 @@ dwv.tool.Draw = function (app) {
     if (points.length === currentFactory.getNPoints()) {
       // store points
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       onFinalPoints(points, layerGroup);
       // reset flag
       started = false;
@@ -303,7 +303,7 @@ dwv.tool.Draw = function (app) {
 
     // store points
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     onFinalPoints(points, layerGroup);
     // reset flag
     started = false;
@@ -339,7 +339,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var pos = viewLayer.displayToPlanePos(event._x, event._y);
 

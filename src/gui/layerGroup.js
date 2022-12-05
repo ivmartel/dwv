@@ -5,31 +5,28 @@ dwv.gui = dwv.gui || {};
 /**
  * Get the layer div id.
  *
- * @param {number} groupId The layer group id.
+ * @param {string} groupDivId The layer group div id.
  * @param {number} layerId The lyaer id.
  * @returns {string} A string id.
  */
-dwv.gui.getLayerDivId = function (groupId, layerId) {
-  return 'layer-' + groupId + '-' + layerId;
+dwv.gui.getLayerDivId = function (groupDivId, layerId) {
+  return groupDivId + '-layer-' + layerId;
 };
 
 /**
  * Get the layer details from a div id.
  *
- * @param {string} idString The layer group id.
- * @returns {object} The layer details as {groupId, layerId}.
+ * @param {string} idString The layer div id.
+ * @returns {object} The layer details as {groupDivId, layerId}.
  */
 dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
-  var posHyphen = idString.lastIndexOf('-');
-  var groupId = null;
-  var layerId = null;
-  if (posHyphen !== -1) {
-    groupId = parseInt(idString.substring(6, posHyphen), 10);
-    layerId = parseInt(idString.substring(posHyphen + 1), 10);
+  var split = idString.split('-layer-');
+  if (split.length !== 2) {
+    dwv.logger.warn('Not the expected layer div id format...');
   }
   return {
-    groupId: groupId,
-    layerId: layerId
+    groupDivId: split[0],
+    layerId: split[1]
   };
 };
 
@@ -39,7 +36,7 @@ dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
  * with the 'layer' class and id generated with `dwv.gui.getLayerDivId`.
- * @returns {object} The layer details as {groupId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerId}.
  */
 dwv.gui.getLayerDetailsFromEvent = function (event) {
   var res = null;
@@ -137,10 +134,9 @@ dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
  * no need yet for a planePos to displayPos...
  *
  * @param {object} containerDiv The associated HTML div.
- * @param {number} groupId The group id.
  * @class
  */
-dwv.gui.LayerGroup = function (containerDiv, groupId) {
+dwv.gui.LayerGroup = function (containerDiv) {
 
   // closure to self
   var self = this;
@@ -228,15 +224,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.getDivId = function () {
     return containerDiv.id;
-  };
-
-  /**
-   * Get the layer group id.
-   *
-   * @returns {number} The id.
-   */
-  this.getGroupId = function () {
-    return groupId;
   };
 
   /**
@@ -490,7 +477,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   function getNextLayerDiv() {
     var div = document.createElement('div');
-    div.id = dwv.gui.getLayerDivId(groupId, layers.length);
+    div.id = dwv.gui.getLayerDivId(self.getDivId(), layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
     return div;

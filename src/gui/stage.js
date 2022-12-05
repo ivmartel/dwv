@@ -187,7 +187,7 @@ dwv.gui.Stage = function () {
    */
   this.addLayerGroup = function (htmlElement) {
     activeLayerGroupIndex = layerGroups.length;
-    var layerGroup = new dwv.gui.LayerGroup(htmlElement, activeLayerGroupIndex);
+    var layerGroup = new dwv.gui.LayerGroup(htmlElement);
     // add to storage
     var isBound = callbackStore && callbackStore.length !== 0;
     if (isBound) {
