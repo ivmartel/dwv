@@ -10,7 +10,7 @@ This page lists details about the dwv architecture.
 The first level is the stage, this class handles a list of LayerGroups for optional synchronisation. A layerGroup is
 a group of layers associated to an HTML element, for now of type `View` and `Draw`. The configuration of the stage
 is done at the creation of the app. See [app::init](./dwv.App.html#init) method for details. Each layer class will
-create its own HTML div with an id created by [dwv::gui::getLayerGroupDivId](./dwv.gui.html#.getLayerGroupDivId). Layers
+create its own HTML div with an id created by [dwv::gui::getLayerDivId](./dwv.gui.html#.getLayerDivId). Layers
 will typically contain a HTML canvas to display its content. Use the [dwv::gui::getLayerDetailsFromEvent](./dwv.gui.html#.getLayerDetailsFromEvent) method to extract the layer details from an event generated from a layer canvas.
 You can then access the layer object via the app `getLayerGroupById` method.
 

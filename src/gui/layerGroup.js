@@ -3,13 +3,13 @@ var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 
 /**
- * Get the layer group div id.
+ * Get the layer div id.
  *
  * @param {number} groupId The layer group id.
  * @param {number} layerId The lyaer id.
  * @returns {string} A string id.
  */
-dwv.gui.getLayerGroupDivId = function (groupId, layerId) {
+dwv.gui.getLayerDivId = function (groupId, layerId) {
   return 'layer-' + groupId + '-' + layerId;
 };
 
@@ -38,7 +38,7 @@ dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
  *
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
- * with the 'layer' class and id generated with `dwv.gui.getLayerGroupDivId`.
+ * with the 'layer' class and id generated with `dwv.gui.getLayerDivId`.
  * @returns {object} The layer details as {groupId, layerId}.
  */
 dwv.gui.getLayerDetailsFromEvent = function (event) {
@@ -490,7 +490,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   function getNextLayerDiv() {
     var div = document.createElement('div');
-    div.id = dwv.gui.getLayerGroupDivId(groupId, layers.length);
+    div.id = dwv.gui.getLayerDivId(groupId, layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
     return div;
