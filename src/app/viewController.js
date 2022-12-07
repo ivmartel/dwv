@@ -42,7 +42,7 @@ dwv.ctrl.ViewController = function (view) {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition(this.getPositionFrom2D(0, 0));
+    this.setCurrentPosition(this.getPositionFromPlanePoint(0, 0));
   };
 
   /**
@@ -400,7 +400,7 @@ dwv.ctrl.ViewController = function (view) {
    * @param {number} y The row position.
    * @returns {dwv.math.Point} The associated position.
    */
-  this.getPositionFrom2D = function (x, y) {
+  this.getPositionFromPlanePoint = function (x, y) {
     // keep third direction
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(x, y, k);
@@ -422,25 +422,6 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.setCurrentIndex = function (index, silent) {
     return view.setCurrentIndex(index, silent);
-  };
-
-  /**
-   * Get a 3D position from a plane 2D position.
-   *
-   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
-   * @returns {dwv.math.Point} The 3D point.
-   */
-  this.getPositionFromPlanePoint = function (point2D) {
-    // keep third direction
-    var k = this.getCurrentScrollIndexValue();
-    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
-    // de-orient
-    var point = planeHelper.getImageOrientedVector3D(planePoint);
-    // ~indexToWorld to not loose precision
-    var geometry = view.getImage().getGeometry();
-    var point3D = geometry.pointToWorld(point);
-    // merge with current position to keep extra dimensions
-    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**

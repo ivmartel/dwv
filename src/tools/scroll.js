@@ -123,7 +123,8 @@ dwv.tool.Scroll = function (app) {
 
     // update controller position
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    var position = viewController.getPositionFromPlanePoint(
+      planePos.x, planePos.y);
     viewController.setCurrentPosition(position);
   };
 
@@ -324,7 +325,8 @@ dwv.tool.Scroll = function (app) {
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    var position = viewController.getPositionFromPlanePoint(
+      planePos.x, planePos.y);
     var value = viewController.getRescaledImageValue(position);
 
     // create
