@@ -97,7 +97,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
    * @returns {dwv.math.Point3D} The object origin.
    */
   this.getOrigin = function () {
-    return origins[origins.length - 1];
+    return origins[0];
   };
   /**
    * Get the object origins.
@@ -258,13 +258,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     //   -> >0 => vectors are codirectional
     //   -> <0 => vectors are opposite
     var dotProd = normal.dotProduct(pointDir);
-    var test = dotProd < 0;
-    // TODO: check why coronal behaves differently...
-    if (orientation.getThirdColMajorDirection() === 1) {
-      test = dotProd > 0;
-    }
     // oposite vectors get higher index
-    var sliceIndex = test ? closestSliceIndex + 1 : closestSliceIndex;
+    var sliceIndex = dotProd > 0 ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   };
 
@@ -361,32 +356,19 @@ dwv.image.Geometry.prototype.isIndexInBounds = function (index, dirs) {
 };
 
 /**
- * Flip the K index.
- *
- * @param {dwv.image.Size} size The image size.
- * @param {number} k The index.
- * @returns {number} The flipped index.
- */
-function flipK(size, k) {
-  return (size.get(2) - 1) - k;
-}
-
-/**
  * Convert an index into world coordinates.
  *
  * @param {dwv.math.Index} index The index to convert.
  * @returns {dwv.math.Point} The corresponding point.
  */
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
-  // flip K index (because of the slice order given by getSliceIndex)
-  var k = flipK(this.getSize(), index.get(2));
   // apply spacing
   // (spacing is oriented, apply before orientation)
   var spacing = this.getSpacing();
   var orientedPoint3D = new dwv.math.Point3D(
     index.get(0) * spacing.get(0),
     index.get(1) * spacing.get(1),
-    k * spacing.get(2)
+    index.get(2) * spacing.get(2)
   );
   // de-orient
   var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
@@ -407,15 +389,13 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
  * @returns {dwv.math.Point3D} The corresponding world 3D point.
  */
 dwv.image.Geometry.prototype.pointToWorld = function (point) {
-  // flip K index (because of the slice order given by getSliceIndex)
-  var k = flipK(this.getSize(), point.getZ());
   // apply spacing
   // (spacing is oriented, apply before orientation)
   var spacing = this.getSpacing();
   var orientedPoint3D = new dwv.math.Point3D(
     point.getX() * spacing.get(0),
     point.getY() * spacing.get(1),
-    k * spacing.get(2)
+    point.getZ() * spacing.get(2)
   );
   // de-orient
   var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
@@ -453,11 +433,7 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
   var spacing = this.getSpacing();
   values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
   values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
-  // flip K index (because of the slice order given by getSliceIndex)
-  var k = Math.round(orientedPoint3D.getZ() / spacing.get(2));
-  // abs to fix #1163
-  // TODO: find out why k can sometimes be negative...
-  values[2] = flipK(this.getSize(), k);
+  values[2] = Math.round(orientedPoint3D.getZ() / spacing.get(2));
 
   // return index
   return new dwv.math.Index(values);

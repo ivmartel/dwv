@@ -1329,6 +1329,18 @@ dwv.App = function () {
 
     // sync layer groups
     stage.syncLayerGroupScale();
+
+    // extra flip for oriented views...
+    if (typeof dataViewConfig.orientation !== 'undefined') {
+      var major = imageGeometry.getOrientation().getThirdColMajorDirection();
+      if (major === 2 && dataViewConfig.orientation !== 'axial') {
+        // flip Y for axial aquired data
+        viewLayer.flipY();
+      } else if (major === 0 && dataViewConfig.orientation !== 'sagittal') {
+        // flip Y for sagittal aquired data
+        viewLayer.flipX();
+      }
+    }
   }
 
-};
+}; // class dwv.App
