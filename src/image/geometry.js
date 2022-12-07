@@ -136,7 +136,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   this.getSize = function (viewOrientation) {
     var res = size;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var values = dwv.math.getOrientedArray3D(
+      var values = dwv.image.getPositiveOrientedArray3D(
         [
           size.get(0),
           size.get(1),
@@ -181,7 +181,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var orientedValues = dwv.math.getOrientedArray3D(
+      var orientedValues = dwv.image.getPositiveOrientedArray3D(
         [
           spacing.get(0),
           spacing.get(1),
@@ -461,6 +461,44 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
 
   // return index
   return new dwv.math.Index(values);
+};
+
+
+/**
+ * Get the oriented values of an input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered according to the orientation.
+ */
+dwv.image.getPositiveOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  var res = orientation.getInverse().multiplyArray3D(array3D);
+  // abs to avoid negatives
+  // TODO: check why abs is needed...
+  res = res.map(function (item) {
+    return Math.abs(item);
+  });
+  return res;
+};
+
+/**
+ * Get the raw values of an oriented input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered to compensate the orientation.
+ */
+dwv.image.getPositiveDeOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  var res = orientation.multiplyArray3D(array3D);
+  // abs to avoid negatives
+  // TODO: check why abs is needed...
+  res = res.map(function (item) {
+    return Math.abs(item);
+  });
+  return res;
 };
 
 /**

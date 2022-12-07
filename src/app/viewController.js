@@ -110,20 +110,17 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the current oriented position.
+   * Get the current oriented index.
    *
-   * @returns {dwv.math.Point} The position.
+   * @returns {dwv.math.Index} The index.
    */
   this.getCurrentOrientedIndex = function () {
     var res = view.getCurrentIndex();
-    // values = orientation * orientedValues
-    // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      var index3D = new dwv.math.Index(
-        [res.get(0), res.get(1), res.get(2)]);
-      var orientedIndex3D =
-         view.getOrientation().getInverse().getAbs().multiplyIndex3D(index3D);
-      var values = orientedIndex3D.getValues();
+      // view oriented => image de-oriented
+      var values = planeHelper.getImageDeOrientedVector3D([
+        res.get(0), res.get(1), res.get(2)
+      ]);
       res = new dwv.math.Index(values);
     }
     return res;

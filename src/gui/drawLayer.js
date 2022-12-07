@@ -201,7 +201,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {dwv.math.Point3D} center The scale center.
    */
   this.setScale = function (newScale, center) {
-    var orientedNewScale = planeHelper.getTargetOrientedXYZ(newScale);
+    var orientedNewScale = planeHelper.getTargetOrientedPositiveXYZ(newScale);
     var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y

@@ -301,6 +301,16 @@ dwv.gui.ViewLayer = function (containerDiv) {
     fireEvent(event);
   };
 
+  this.flipY = function () {
+    offset.y += canvas.height / scale.y;
+    scale.y *= -1;
+  };
+
+  this.flipX = function () {
+    offset.x += canvas.width / scale.x;
+    scale.x *= -1;
+  };
+
   /**
    * Set the layer scale.
    *
@@ -309,7 +319,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.setScale = function (newScale, center) {
     var helper = viewController.getPlaneHelper();
-    var orientedNewScale = helper.getTargetOrientedXYZ(newScale);
+    var orientedNewScale = helper.getTargetOrientedPositiveXYZ(newScale);
     var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y
@@ -441,6 +451,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
     return {
       x: deScaled.x + offset.x,
       y: deScaled.y + offset.y
+    };
+  };
+
+  this.planePosToDisplay = function (x, y) {
+    //console.log('[vl] off', offset, baseOffset);
+    return {
+      x: (x - offset.x + baseOffset.x) * scale.x,
+      y: (y - offset.y + baseOffset.y) * scale.y
     };
   };
 

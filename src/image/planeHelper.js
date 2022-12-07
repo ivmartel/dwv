@@ -85,6 +85,8 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
 
   /**
    * Orient an input vector from target to image space.
+   * WARN: returns absolute values...
+   * TODO: check why abs is needed...
    *
    * @param {dwv.math.Vector3D} planeVector The input vector.
    * @returns {dwv.math.Vector3D} The orienteded vector.
@@ -92,21 +94,61 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   this.getImageOrientedVector3D = function (planeVector) {
     var vector = planeVector;
     if (typeof viewOrientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = viewOrientation * planePoint
-      vector = viewOrientation.getAbs().multiplyVector3D(planeVector);
+      // image oriented => view de-oriented
+      var values = dwv.image.getPositiveDeOrientedArray3D(
+        [
+          planeVector.getX(),
+          planeVector.getY(),
+          planeVector.getZ()
+        ],
+        viewOrientation);
+      vector = new dwv.math.Vector3D(
+        values[0],
+        values[1],
+        values[2]
+      );
     }
     return vector;
   };
 
   /**
+   * De-orient an input vector from image to target space.
+   * WARN: returns absolute values...
+   * TODO: check why abs is needed...
+   *
+   * @param {dwv.math.Vector3D} vector The input vector.
+   * @returns {dwv.math.Vector3D} The de-orienteded vector.
+   */
+  this.getImageDeOrientedVector3D = function (vector) {
+    var planeVector = vector;
+    if (typeof viewOrientation !== 'undefined') {
+      // image de-oriented => view oriented
+      var orientedValues = dwv.image.getPositiveOrientedArray3D(
+        [
+          vector.getX(),
+          vector.getY(),
+          vector.getZ()
+        ],
+        viewOrientation);
+      planeVector = new dwv.math.Vector3D(
+        orientedValues[0],
+        orientedValues[1],
+        orientedValues[2]
+      );
+    }
+    return planeVector;
+  };
+
+  /**
    * Reorder values to follow target orientation.
+   * WARN: returns absolute values...
+   * TODO: check why abs is needed...
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} Reoriented values as {x,y,z}.
    */
-  this.getTargetOrientedXYZ = function (values) {
-    var orientedValues = dwv.math.getOrientedArray3D(
+  this.getTargetOrientedPositiveXYZ = function (values) {
+    var orientedValues = dwv.image.getPositiveOrientedArray3D(
       [
         values.x,
         values.y,

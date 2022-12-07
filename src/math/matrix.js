@@ -390,29 +390,3 @@ dwv.math.getMatrixFromName = function (name) {
   }
   return matrix;
 };
-
-/**
- * Get the oriented values of an input 3D array.
- *
- * @param {Array} array3D The 3D array.
- * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered according to the orientation.
- */
-dwv.math.getOrientedArray3D = function (array3D, orientation) {
-  // values = orientation * orientedValues
-  // -> inv(orientation) * values = orientedValues
-  return orientation.getInverse().getAbs().multiplyArray3D(array3D);
-};
-
-/**
- * Get the raw values of an oriented input 3D array.
- *
- * @param {Array} array3D The 3D array.
- * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered to compensate the orientation.
- */
-dwv.math.getDeOrientedArray3D = function (array3D, orientation) {
-  // values = orientation * orientedValues
-  // -> inv(orientation) * values = orientedValues
-  return orientation.getAbs().multiplyArray3D(array3D);
-};
