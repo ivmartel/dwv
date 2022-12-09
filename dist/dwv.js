@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.18 2022-11-30 11:36:21 */
+/*! dwv 0.31.0-beta.19 2022-12-09 10:21:09 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -309,17 +309,6 @@ dwv.App = function () {
    */
   this.getViewLayersByDataIndex = function (index) {
     return stage.getViewLayersByDataIndex(index);
-  };
-
-  /**
-   * Get a layer group by id.
-   * The layer is available after the first loaded item.
-   *
-   * @param {number} groupId The group id.
-   * @returns {dwv.gui.LayerGroup} The layer group.
-   */
-  this.getLayerGroupById = function (groupId) {
-    return stage.getLayerGroup(groupId);
   };
 
   /**
@@ -1038,7 +1027,7 @@ dwv.App = function () {
         layer = layerGroup.getActiveViewLayer();
       }
       if (layer) {
-        toolboxController.bindLayer(layer, layerGroup.getGroupId());
+        toolboxController.bindLayer(layer, layerGroup.getDivId());
       }
     }
 
@@ -1391,7 +1380,7 @@ dwv.App = function () {
     // bind
     stage.bindLayerGroups();
     if (toolboxController) {
-      toolboxController.bindLayer(viewLayer, layerGroup.getGroupId());
+      toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
     }
 
     // optional draw layer
@@ -1414,9 +1403,21 @@ dwv.App = function () {
 
     // sync layer groups
     stage.syncLayerGroupScale();
+
+    // extra flip for oriented views...
+    if (typeof dataViewConfig.orientation !== 'undefined') {
+      var major = imageGeometry.getOrientation().getThirdColMajorDirection();
+      if (major === 2 && dataViewConfig.orientation !== 'axial') {
+        // flip Y for axial aquired data
+        viewLayer.flipY();
+      } else if (major === 0 && dataViewConfig.orientation !== 'sagittal') {
+        // flip Y for sagittal aquired data
+        viewLayer.flipX();
+      }
+    }
   }
 
-};
+}; // class dwv.App
 
 // namespaces
 var dwv = dwv || {};
@@ -2496,11 +2497,11 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Listen to layer interaction events.
    *
    * @param {object} layer The layer to listen to.
-   * @param {number} layerGroupId The associated layer group id.
+   * @param {string} layerGroupDivId The associated layer group div id.
    */
-  this.bindLayer = function (layer, layerGroupId) {
-    if (typeof boundLayers[layerGroupId] !== 'undefined') {
-      unbindLayer(boundLayers[layerGroupId]);
+  this.bindLayer = function (layer, layerGroupDivId) {
+    if (typeof boundLayers[layerGroupDivId] !== 'undefined') {
+      unbindLayer(boundLayers[layerGroupDivId]);
     }
     layer.bindInteraction();
     // interaction events
@@ -2510,7 +2511,7 @@ dwv.ctrl.ToolboxController = function (toolList) {
         getOnMouch(layer.getId(), names[i]));
     }
     // update class var
-    boundLayers[layerGroupId] = layer;
+    boundLayers[layerGroupDivId] = layer;
   };
 
   /**
@@ -2639,7 +2640,7 @@ dwv.ctrl.ViewController = function (view) {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition(this.getPositionFrom2D(0, 0));
+    this.setCurrentPosition(this.getPositionFromPlanePoint(0, 0));
   };
 
   /**
@@ -2707,20 +2708,17 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the current oriented position.
+   * Get the current oriented index.
    *
-   * @returns {dwv.math.Point} The position.
+   * @returns {dwv.math.Index} The index.
    */
   this.getCurrentOrientedIndex = function () {
     var res = view.getCurrentIndex();
-    // values = orientation * orientedValues
-    // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      var index3D = new dwv.math.Index(
-        [res.get(0), res.get(1), res.get(2)]);
-      var orientedIndex3D =
-         view.getOrientation().getInverse().getAbs().multiplyIndex3D(index3D);
-      var values = orientedIndex3D.getValues();
+      // view oriented => image de-oriented
+      var values = planeHelper.getImageDeOrientedVector3D([
+        res.get(0), res.get(1), res.get(2)
+      ]);
       res = new dwv.math.Index(values);
     }
     return res;
@@ -3000,7 +2998,7 @@ dwv.ctrl.ViewController = function (view) {
    * @param {number} y The row position.
    * @returns {dwv.math.Point} The associated position.
    */
-  this.getPositionFrom2D = function (x, y) {
+  this.getPositionFromPlanePoint = function (x, y) {
     // keep third direction
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(x, y, k);
@@ -3022,25 +3020,6 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.setCurrentIndex = function (index, silent) {
     return view.setCurrentIndex(index, silent);
-  };
-
-  /**
-   * Get a 3D position from a plane 2D position.
-   *
-   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
-   * @returns {dwv.math.Point} The 3D point.
-   */
-  this.getPositionFromPlanePoint = function (point2D) {
-    // keep third direction
-    var k = this.getCurrentScrollIndexValue();
-    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
-    // de-orient
-    var point = planeHelper.getImageOrientedVector3D(planePoint);
-    // ~indexToWorld to not loose precision
-    var geometry = view.getImage().getGeometry();
-    var point3D = geometry.pointToWorld(point);
-    // merge with current position to keep extra dimensions
-    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**
@@ -4657,7 +4636,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.18';
+  return '0.31.0-beta.19';
 };
 
 /**
@@ -12913,7 +12892,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {dwv.math.Point3D} center The scale center.
    */
   this.setScale = function (newScale, center) {
-    var orientedNewScale = planeHelper.getTargetOrientedXYZ(newScale);
+    var orientedNewScale = planeHelper.getTargetOrientedPositiveXYZ(newScale);
     var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y
@@ -13385,33 +13364,30 @@ var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 
 /**
- * Get the layer group div id.
+ * Get the layer div id.
  *
- * @param {number} groupId The layer group id.
+ * @param {string} groupDivId The layer group div id.
  * @param {number} layerId The lyaer id.
  * @returns {string} A string id.
  */
-dwv.gui.getLayerGroupDivId = function (groupId, layerId) {
-  return 'layer-' + groupId + '-' + layerId;
+dwv.gui.getLayerDivId = function (groupDivId, layerId) {
+  return groupDivId + '-layer-' + layerId;
 };
 
 /**
  * Get the layer details from a div id.
  *
- * @param {string} idString The layer group id.
- * @returns {object} The layer details as {groupId, layerId}.
+ * @param {string} idString The layer div id.
+ * @returns {object} The layer details as {groupDivId, layerId}.
  */
 dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
-  var posHyphen = idString.lastIndexOf('-');
-  var groupId = null;
-  var layerId = null;
-  if (posHyphen !== -1) {
-    groupId = parseInt(idString.substring(6, posHyphen), 10);
-    layerId = parseInt(idString.substring(posHyphen + 1), 10);
+  var split = idString.split('-layer-');
+  if (split.length !== 2) {
+    dwv.logger.warn('Not the expected layer div id format...');
   }
   return {
-    groupId: groupId,
-    layerId: layerId
+    groupDivId: split[0],
+    layerId: split[1]
   };
 };
 
@@ -13420,8 +13396,8 @@ dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
  *
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
- * with the 'layer' class and id generated with `dwv.gui.getLayerGroupDivId`.
- * @returns {object} The layer details as {groupId, layerId}.
+ * with the 'layer' class and id generated with `dwv.gui.getLayerDivId`.
+ * @returns {object} The layer details as {groupDivId, layerId}.
  */
 dwv.gui.getLayerDetailsFromEvent = function (event) {
   var res = null;
@@ -13519,10 +13495,9 @@ dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
  * no need yet for a planePos to displayPos...
  *
  * @param {object} containerDiv The associated HTML div.
- * @param {number} groupId The group id.
  * @class
  */
-dwv.gui.LayerGroup = function (containerDiv, groupId) {
+dwv.gui.LayerGroup = function (containerDiv) {
 
   // closure to self
   var self = this;
@@ -13610,15 +13585,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.getDivId = function () {
     return containerDiv.id;
-  };
-
-  /**
-   * Get the layer group id.
-   *
-   * @returns {number} The id.
-   */
-  this.getGroupId = function () {
-    return groupId;
   };
 
   /**
@@ -13872,7 +13838,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   function getNextLayerDiv() {
     var div = document.createElement('div');
-    div.id = dwv.gui.getLayerGroupDivId(groupId, layers.length);
+    div.id = dwv.gui.getLayerDivId(self.getDivId(), layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
     return div;
@@ -14393,7 +14359,7 @@ dwv.gui.Stage = function () {
    */
   this.addLayerGroup = function (htmlElement) {
     activeLayerGroupIndex = layerGroups.length;
-    var layerGroup = new dwv.gui.LayerGroup(htmlElement, activeLayerGroupIndex);
+    var layerGroup = new dwv.gui.LayerGroup(htmlElement);
     // add to storage
     var isBound = callbackStore && callbackStore.length !== 0;
     if (isBound) {
@@ -15175,6 +15141,16 @@ dwv.gui.ViewLayer = function (containerDiv) {
     fireEvent(event);
   };
 
+  this.flipY = function () {
+    offset.y += canvas.height / scale.y;
+    scale.y *= -1;
+  };
+
+  this.flipX = function () {
+    offset.x += canvas.width / scale.x;
+    scale.x *= -1;
+  };
+
   /**
    * Set the layer scale.
    *
@@ -15183,7 +15159,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.setScale = function (newScale, center) {
     var helper = viewController.getPlaneHelper();
-    var orientedNewScale = helper.getTargetOrientedXYZ(newScale);
+    var orientedNewScale = helper.getTargetOrientedPositiveXYZ(newScale);
     var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y
@@ -15315,6 +15291,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
     return {
       x: deScaled.x + offset.x,
       y: deScaled.y + offset.y
+    };
+  };
+
+  this.planePosToDisplay = function (x, y) {
+    //console.log('[vl] off', offset, baseOffset);
+    return {
+      x: (x - offset.x + baseOffset.x) * scale.x,
+      y: (y - offset.y + baseOffset.y) * scale.y
     };
   };
 
@@ -17064,7 +17048,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
    * @returns {dwv.math.Point3D} The object origin.
    */
   this.getOrigin = function () {
-    return origins[origins.length - 1];
+    return origins[0];
   };
   /**
    * Get the object origins.
@@ -17103,7 +17087,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   this.getSize = function (viewOrientation) {
     var res = size;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var values = dwv.math.getOrientedArray3D(
+      var values = dwv.image.getPositiveOrientedArray3D(
         [
           size.get(0),
           size.get(1),
@@ -17148,7 +17132,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var orientedValues = dwv.math.getOrientedArray3D(
+      var orientedValues = dwv.image.getPositiveOrientedArray3D(
         [
           spacing.get(0),
           spacing.get(1),
@@ -17225,13 +17209,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     //   -> >0 => vectors are codirectional
     //   -> <0 => vectors are opposite
     var dotProd = normal.dotProduct(pointDir);
-    var test = dotProd < 0;
-    // TODO: check why coronal behaves differently...
-    if (orientation.getThirdColMajorDirection() === 1) {
-      test = dotProd > 0;
-    }
     // oposite vectors get higher index
-    var sliceIndex = test ? closestSliceIndex + 1 : closestSliceIndex;
+    var sliceIndex = dotProd > 0 ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   };
 
@@ -17328,32 +17307,19 @@ dwv.image.Geometry.prototype.isIndexInBounds = function (index, dirs) {
 };
 
 /**
- * Flip the K index.
- *
- * @param {dwv.image.Size} size The image size.
- * @param {number} k The index.
- * @returns {number} The flipped index.
- */
-function flipK(size, k) {
-  return (size.get(2) - 1) - k;
-}
-
-/**
  * Convert an index into world coordinates.
  *
  * @param {dwv.math.Index} index The index to convert.
  * @returns {dwv.math.Point} The corresponding point.
  */
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
-  // flip K index (because of the slice order given by getSliceIndex)
-  var k = flipK(this.getSize(), index.get(2));
   // apply spacing
   // (spacing is oriented, apply before orientation)
   var spacing = this.getSpacing();
   var orientedPoint3D = new dwv.math.Point3D(
     index.get(0) * spacing.get(0),
     index.get(1) * spacing.get(1),
-    k * spacing.get(2)
+    index.get(2) * spacing.get(2)
   );
   // de-orient
   var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
@@ -17374,15 +17340,13 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
  * @returns {dwv.math.Point3D} The corresponding world 3D point.
  */
 dwv.image.Geometry.prototype.pointToWorld = function (point) {
-  // flip K index (because of the slice order given by getSliceIndex)
-  var k = flipK(this.getSize(), point.getZ());
   // apply spacing
   // (spacing is oriented, apply before orientation)
   var spacing = this.getSpacing();
   var orientedPoint3D = new dwv.math.Point3D(
     point.getX() * spacing.get(0),
     point.getY() * spacing.get(1),
-    k * spacing.get(2)
+    point.getZ() * spacing.get(2)
   );
   // de-orient
   var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
@@ -17420,14 +17384,48 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
   var spacing = this.getSpacing();
   values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
   values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
-  // flip K index (because of the slice order given by getSliceIndex)
-  var k = Math.round(orientedPoint3D.getZ() / spacing.get(2));
-  // abs to fix #1163
-  // TODO: find out why k can sometimes be negative...
-  values[2] = flipK(this.getSize(), k);
+  values[2] = Math.round(orientedPoint3D.getZ() / spacing.get(2));
 
   // return index
   return new dwv.math.Index(values);
+};
+
+
+/**
+ * Get the oriented values of an input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered according to the orientation.
+ */
+dwv.image.getPositiveOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  var res = orientation.getInverse().multiplyArray3D(array3D);
+  // abs to avoid negatives
+  // TODO: check why abs is needed...
+  res = res.map(function (item) {
+    return Math.abs(item);
+  });
+  return res;
+};
+
+/**
+ * Get the raw values of an oriented input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered to compensate the orientation.
+ */
+dwv.image.getPositiveDeOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  var res = orientation.multiplyArray3D(array3D);
+  // abs to avoid negatives
+  // TODO: check why abs is needed...
+  res = res.map(function (item) {
+    return Math.abs(item);
+  });
+  return res;
 };
 
 /**
@@ -20712,6 +20710,8 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
 
   /**
    * Orient an input vector from target to image space.
+   * WARN: returns absolute values...
+   * TODO: check why abs is needed...
    *
    * @param {dwv.math.Vector3D} planeVector The input vector.
    * @returns {dwv.math.Vector3D} The orienteded vector.
@@ -20719,21 +20719,61 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   this.getImageOrientedVector3D = function (planeVector) {
     var vector = planeVector;
     if (typeof viewOrientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = viewOrientation * planePoint
-      vector = viewOrientation.getAbs().multiplyVector3D(planeVector);
+      // image oriented => view de-oriented
+      var values = dwv.image.getPositiveDeOrientedArray3D(
+        [
+          planeVector.getX(),
+          planeVector.getY(),
+          planeVector.getZ()
+        ],
+        viewOrientation);
+      vector = new dwv.math.Vector3D(
+        values[0],
+        values[1],
+        values[2]
+      );
     }
     return vector;
   };
 
   /**
+   * De-orient an input vector from image to target space.
+   * WARN: returns absolute values...
+   * TODO: check why abs is needed...
+   *
+   * @param {dwv.math.Vector3D} vector The input vector.
+   * @returns {dwv.math.Vector3D} The de-orienteded vector.
+   */
+  this.getImageDeOrientedVector3D = function (vector) {
+    var planeVector = vector;
+    if (typeof viewOrientation !== 'undefined') {
+      // image de-oriented => view oriented
+      var orientedValues = dwv.image.getPositiveOrientedArray3D(
+        [
+          vector.getX(),
+          vector.getY(),
+          vector.getZ()
+        ],
+        viewOrientation);
+      planeVector = new dwv.math.Vector3D(
+        orientedValues[0],
+        orientedValues[1],
+        orientedValues[2]
+      );
+    }
+    return planeVector;
+  };
+
+  /**
    * Reorder values to follow target orientation.
+   * WARN: returns absolute values...
+   * TODO: check why abs is needed...
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} Reoriented values as {x,y,z}.
    */
-  this.getTargetOrientedXYZ = function (values) {
-    var orientedValues = dwv.math.getOrientedArray3D(
+  this.getTargetOrientedPositiveXYZ = function (values) {
+    var orientedValues = dwv.image.getPositiveOrientedArray3D(
       [
         values.x,
         values.y,
@@ -27339,32 +27379,6 @@ dwv.math.getMatrixFromName = function (name) {
   return matrix;
 };
 
-/**
- * Get the oriented values of an input 3D array.
- *
- * @param {Array} array3D The 3D array.
- * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered according to the orientation.
- */
-dwv.math.getOrientedArray3D = function (array3D, orientation) {
-  // values = orientation * orientedValues
-  // -> inv(orientation) * values = orientedValues
-  return orientation.getInverse().getAbs().multiplyArray3D(array3D);
-};
-
-/**
- * Get the raw values of an oriented input 3D array.
- *
- * @param {Array} array3D The 3D array.
- * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered to compensate the orientation.
- */
-dwv.math.getDeOrientedArray3D = function (array3D, orientation) {
-  // values = orientation * orientedValues
-  // -> inv(orientation) * values = orientedValues
-  return orientation.getAbs().multiplyArray3D(array3D);
-};
-
 // namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
@@ -29868,7 +29882,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var drawLayer = layerGroup.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
@@ -29925,7 +29939,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
@@ -29969,7 +29983,7 @@ dwv.tool.Draw = function (app) {
     if (points.length === currentFactory.getNPoints()) {
       // store points
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       onFinalPoints(points, layerGroup);
       // reset flag
       started = false;
@@ -30003,7 +30017,7 @@ dwv.tool.Draw = function (app) {
 
     // store points
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     onFinalPoints(points, layerGroup);
     // reset flag
     started = false;
@@ -30039,7 +30053,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
@@ -31419,7 +31433,7 @@ dwv.tool.ShapeEditor = function (app) {
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(evt.evt);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
       dwv.tool.validateAnchorPosition(drawLayer.getBaseSize(), this);
@@ -32584,7 +32598,7 @@ dwv.tool.Floodfill = function (app) {
    */
   var getCoord = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
     return {
@@ -32772,7 +32786,7 @@ dwv.tool.Floodfill = function (app) {
    */
   this.mousedown = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var drawLayer = layerGroup.getActiveDrawLayer();
 
@@ -32819,7 +32833,7 @@ dwv.tool.Floodfill = function (app) {
     self.started = false;
     if (extender) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       self.extend(layerGroup);
     }
   };
@@ -33283,7 +33297,7 @@ dwv.tool.Livewire = function (app) {
    */
   this.mousedown = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var imageSize = viewLayer.getViewController().getImageSize();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
@@ -33344,7 +33358,7 @@ dwv.tool.Livewire = function (app) {
       return;
     }
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
@@ -33634,7 +33648,7 @@ dwv.tool.Opacity = function (app) {
     // do not trigger for small moves
     if (xMove) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       var viewLayer = layerGroup.getActiveViewLayer();
       var op = viewLayer.getOpacity();
       viewLayer.setOpacity(op + (diffX / 200));
@@ -34946,7 +34960,7 @@ dwv.tool = dwv.tool || {};
  * document.body.appendChild(range);
  * // update app on slider change
  * range.oninput = function () {
- *   var lg = app.getLayerGroupById(0);
+ *   var lg = app.getLayerGroupByDivId('layerGroup0');
  *   var vc = lg.getActiveViewLayer().getViewController();
  *   var index = vc.getCurrentIndex();
  *   var values = index.getValues();
@@ -34961,7 +34975,7 @@ dwv.tool = dwv.tool || {};
  * });
  * // update slider on slice change (for ex via mouse wheel)
  * app.addEventListener('positionchange', function () {
- *   var lg = app.getLayerGroupById(0);
+ *   var lg = app.getLayerGroupByDivId('layerGroup0');
  *   var vc = lg.getActiveViewLayer().getViewController();
  *   range.value = vc.getCurrentIndex().get(2);
  * });
@@ -35014,7 +35028,7 @@ dwv.tool.Scroll = function (app) {
 
     // stop viewer if playing
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
@@ -35028,7 +35042,8 @@ dwv.tool.Scroll = function (app) {
 
     // update controller position
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    var position = viewController.getPositionFromPlanePoint(
+      planePos.x, planePos.y);
     viewController.setCurrentPosition(position);
   };
 
@@ -35047,7 +35062,7 @@ dwv.tool.Scroll = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
 
@@ -35180,7 +35195,7 @@ dwv.tool.Scroll = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     if (up) {
@@ -35207,7 +35222,7 @@ dwv.tool.Scroll = function (app) {
    */
   this.dblclick = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
@@ -35225,11 +35240,12 @@ dwv.tool.Scroll = function (app) {
 
     // get image value at position
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var position = viewController.getPositionFrom2D(planePos.x, planePos.y);
+    var position = viewController.getPositionFromPlanePoint(
+      planePos.x, planePos.y);
     var value = viewController.getRescaledImageValue(position);
 
     // create
@@ -35515,7 +35531,7 @@ dwv.tool.WindowLevel = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
@@ -35605,7 +35621,7 @@ dwv.tool.WindowLevel = function (app) {
    */
   this.dblclick = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
     var viewController = viewLayer.getViewController();
@@ -35737,7 +35753,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var ty = event._y - self.y0;
     // apply translation
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planeOffset = viewLayer.displayToPlaneScale(tx, ty);
@@ -35768,7 +35784,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
 
@@ -35869,7 +35885,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var step = -event.deltaY / 500;
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
