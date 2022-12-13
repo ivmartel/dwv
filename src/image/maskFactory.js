@@ -25,7 +25,7 @@ dwv.dicom.getComparePosPat = function (orientation) {
   return function (pos1, pos2) {
     var p1 = invOrientation.multiplyArray3D(pos1);
     var p2 = invOrientation.multiplyArray3D(pos2);
-    return p2[2] - p1[2];
+    return p1[2] - p2[2];
   };
 };
 
