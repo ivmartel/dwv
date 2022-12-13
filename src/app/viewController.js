@@ -118,10 +118,12 @@ dwv.ctrl.ViewController = function (view) {
     var res = view.getCurrentIndex();
     if (typeof view.getOrientation() !== 'undefined') {
       // view oriented => image de-oriented
-      var values = planeHelper.getImageDeOrientedVector3D([
-        res.get(0), res.get(1), res.get(2)
+      var vector = planeHelper.getImageDeOrientedVector3D(
+        new dwv.math.Vector3D(res.get(0), res.get(1), res.get(2))
+      );
+      res = new dwv.math.Index([
+        vector.getX(), vector.getY(), vector.getZ()
       ]);
-      res = new dwv.math.Index(values);
     }
     return res;
   };
