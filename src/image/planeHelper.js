@@ -95,7 +95,7 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
     var vector = planeVector;
     if (typeof viewOrientation !== 'undefined') {
       // image oriented => view de-oriented
-      var values = dwv.image.getPositiveDeOrientedArray3D(
+      var values = dwv.image.getDeOrientedArray3D(
         [
           planeVector.getX(),
           planeVector.getY(),
@@ -123,7 +123,7 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
     var planeVector = vector;
     if (typeof viewOrientation !== 'undefined') {
       // image de-oriented => view oriented
-      var orientedValues = dwv.image.getPositiveOrientedArray3D(
+      var orientedValues = dwv.image.getOrientedArray3D(
         [
           vector.getX(),
           vector.getY(),
@@ -148,7 +148,7 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
    * @returns {object} Reoriented values as {x,y,z}.
    */
   this.getTargetOrientedPositiveXYZ = function (values) {
-    var orientedValues = dwv.image.getPositiveOrientedArray3D(
+    var orientedValues = dwv.image.getOrientedArray3D(
       [
         values.x,
         values.y,

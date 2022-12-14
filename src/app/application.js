@@ -1297,8 +1297,6 @@ dwv.App = function () {
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, dataIndex, opacity);
-    viewLayer.setScale(layerGroup.getScale());
-    viewLayer.setOffset(layerGroup.getOffset());
 
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
@@ -1331,14 +1329,19 @@ dwv.App = function () {
     stage.syncLayerGroupScale();
 
     // extra flip for oriented views...
+    var major = imageGeometry.getOrientation().getThirdColMajorDirection();
     if (typeof dataViewConfig.orientation !== 'undefined') {
-      var major = imageGeometry.getOrientation().getThirdColMajorDirection();
       if (major === 2 && dataViewConfig.orientation !== 'axial') {
-        // flip Y for axial aquired data
-        viewLayer.flipY();
+        // flip Z for axial aquired data
+        layerGroup.flipZ();
       } else if (major === 0 && dataViewConfig.orientation !== 'sagittal') {
-        // flip Y for sagittal aquired data
-        viewLayer.flipX();
+        // flip X for sagittal aquired data
+        layerGroup.flipX();
+      }
+    } else {
+      if (major === 0) {
+        // simple flip Z for undefined target orientation
+        layerGroup.flipScaleZ();
       }
     }
   }

@@ -136,6 +136,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var zoomOffset = {x: 0, y: 0};
 
   /**
+   * The flip offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var flipOffset = {x: 0, y: 0};
+
+  /**
    * Data update flag.
    *
    * @private
@@ -301,14 +309,24 @@ dwv.gui.ViewLayer = function (containerDiv) {
     fireEvent(event);
   };
 
-  this.flipY = function () {
-    offset.y += canvas.height / scale.y;
-    scale.y *= -1;
+  /**
+   * Flip the layer along its X axis.
+   */
+  this.flipX = function () {
+    // scale is handled by layer group
+    // update offset
+    flipOffset.x += canvas.width / scale.x;
+    offset.x += flipOffset.x;
   };
 
-  this.flipX = function () {
-    offset.x += canvas.width / scale.x;
-    scale.x *= -1;
+  /**
+   * Flip the layer along its Y axis.
+   */
+  this.flipY = function () {
+    // scale is handled by layer group
+    // update offset
+    flipOffset.y += canvas.height / scale.y;
+    offset.y += flipOffset.y;
   };
 
   /**
@@ -405,8 +423,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
     var helper = viewController.getPlaneHelper();
     var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
     offset = {
-      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
+      x: planeNewOffset.x +
+        viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: planeNewOffset.y +
+        viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     };
   };
 

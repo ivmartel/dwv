@@ -67,7 +67,8 @@ dwv.gui.getViewOrientation = function (imageOrientation, targetOrientation) {
     viewOrientation =
       imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
   }
-  return viewOrientation;
+  // TODO: why abs???
+  return viewOrientation.getAbs();
 };
 
 /**
@@ -84,7 +85,16 @@ dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
   // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
   // -> Ot = Oi * Ov
   // note: asOneAndZeros as in dwv.gui.getViewOrientation...
-  return imageOrientation.asOneAndZeros().multiply(viewOrientation);
+  var targetOrientation =
+    imageOrientation.asOneAndZeros().multiply(viewOrientation);
+
+  // TODO: why abs???
+  var simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
+  if (simpleImageOrientation.equals(dwv.math.getCoronalMat33().getAbs())) {
+    targetOrientation = targetOrientation.getAbs();
+  }
+
+  return targetOrientation;
 };
 
 /**
@@ -651,6 +661,43 @@ dwv.gui.LayerGroup = function (containerDiv) {
       maxSize = undefined;
     }
     return maxSize;
+  };
+
+  /**
+   * Flip all layers along the X axis.
+   */
+  this.flipX = function () {
+    // flip layer: sets its offset
+    for (var j = 0; j < layers.length; ++j) {
+      if (layers[j] instanceof dwv.gui.ViewLayer) {
+        layers[j].flipX();
+      }
+    }
+    // update scale
+    this.flipScaleZ();
+  };
+
+  /**
+   * Flip all layers along the Z axis.
+   */
+  this.flipZ = function () {
+    // flip layer: sets its offset
+    for (var j = 0; j < layers.length; ++j) {
+      if (layers[j] instanceof dwv.gui.ViewLayer) {
+        layers[j].flipY();
+      }
+    }
+    // update scale
+    this.flipScaleZ();
+  };
+
+  /**
+   * Flip all layers along the Z axis without offset compensation.
+   */
+  this.flipScaleZ = function () {
+    // update scale
+    baseScale.z *= -1;
+    this.setScale(baseScale);
   };
 
   /**

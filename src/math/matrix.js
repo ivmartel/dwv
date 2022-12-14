@@ -353,7 +353,7 @@ dwv.math.getCoronalMat33 = function () {
   return new dwv.math.Matrix33([
     1, 0, 0,
     0, 0, 1,
-    0, 1, 0
+    0, -1, 0
   ]);
   /* eslint-enable array-element-newline */
 };
@@ -366,9 +366,9 @@ dwv.math.getCoronalMat33 = function () {
 dwv.math.getSagittalMat33 = function () {
   /* eslint-disable array-element-newline */
   return new dwv.math.Matrix33([
-    0, 0, 1,
+    0, 0, -1,
     1, 0, 0,
-    0, 1, 0
+    0, -1, 0
   ]);
   /* eslint-enable array-element-newline */
 };

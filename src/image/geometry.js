@@ -136,13 +136,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   this.getSize = function (viewOrientation) {
     var res = size;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var values = dwv.image.getPositiveOrientedArray3D(
+      var values = dwv.image.getOrientedArray3D(
         [
           size.get(0),
           size.get(1),
           size.get(2)
         ],
         viewOrientation);
+      values = values.map(Math.abs);
       res = new dwv.image.Size(values.concat(size.getValues().slice(3)));
     }
     return res;
@@ -181,13 +182,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var orientedValues = dwv.image.getPositiveOrientedArray3D(
+      var orientedValues = dwv.image.getOrientedArray3D(
         [
           spacing.get(0),
           spacing.get(1),
           spacing.get(2)
         ],
         viewOrientation);
+      orientedValues = orientedValues.map(Math.abs);
       res = new dwv.image.Spacing(orientedValues);
     }
     return res;
@@ -447,16 +449,10 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
  * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
  * @returns {Array} The values reordered according to the orientation.
  */
-dwv.image.getPositiveOrientedArray3D = function (array3D, orientation) {
+dwv.image.getOrientedArray3D = function (array3D, orientation) {
   // values = orientation * orientedValues
   // -> inv(orientation) * values = orientedValues
-  var res = orientation.getInverse().multiplyArray3D(array3D);
-  // abs to avoid negatives
-  // TODO: check why abs is needed...
-  res = res.map(function (item) {
-    return Math.abs(item);
-  });
-  return res;
+  return orientation.getInverse().multiplyArray3D(array3D);
 };
 
 /**
@@ -466,15 +462,9 @@ dwv.image.getPositiveOrientedArray3D = function (array3D, orientation) {
  * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
  * @returns {Array} The values reordered to compensate the orientation.
  */
-dwv.image.getPositiveDeOrientedArray3D = function (array3D, orientation) {
+dwv.image.getDeOrientedArray3D = function (array3D, orientation) {
   // values = orientation * orientedValues
-  var res = orientation.multiplyArray3D(array3D);
-  // abs to avoid negatives
-  // TODO: check why abs is needed...
-  res = res.map(function (item) {
-    return Math.abs(item);
-  });
-  return res;
+  return orientation.multiplyArray3D(array3D);
 };
 
 /**
