@@ -60,6 +60,7 @@ canvas {
 .line {
   padding: 5px;
 }
+/** tooltip */
 .layerGroup span {
   display: none;
   background-color: palegreen;
@@ -69,6 +70,20 @@ canvas {
   display: inline-block;
   position: absolute;
   overflow: hidden;
+}
+/** crossshair */
+.layerGroup hr {
+  pointer-events: none;
+  border: none;
+  position: absolute;
+}
+hr.horizontal {
+  border-top: 2px dashed lime;
+}
+hr.vertical {
+  border-top: 2px dashed lime;
+  transform-origin: left;
+  transform: rotate(90deg);
 }
 </style>
 <!-- Third party (load) -->

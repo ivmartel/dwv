@@ -891,6 +891,13 @@ dwv.App = function () {
         undoStack.redo();
       } else if (event.keyCode === 90) { // crtl-z
         undoStack.undo();
+      } else if (event.code === 'Space') { // crtl-space
+        event.preventDefault();
+        for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
+          stage.getLayerGroup(i).setShowCrosshair(
+            !stage.getLayerGroup(i).getShowCrosshair()
+          );
+        }
       }
     }
   };

@@ -210,6 +210,22 @@ dwv.gui.LayerGroup = function (containerDiv) {
   var targetOrientation;
 
   /**
+   * Flag to activate crosshair or not.
+   *
+   * @type {boolean}
+   * @private
+   */
+  var showCrosshair = false;
+
+  /**
+   * The current position used for the crosshair.
+   *
+   * @type {dwv.math.Point}
+   * @private
+   */
+  var currentPosition;
+
+  /**
    * Get the target orientation.
    *
    * @returns {dwv.math.Matrix33} The orientation matrix.
@@ -226,6 +242,44 @@ dwv.gui.LayerGroup = function (containerDiv) {
   this.setTargetOrientation = function (orientation) {
     targetOrientation = orientation;
   };
+
+  /**
+   * Get the showCrosshair flag.
+   *
+   * @returns {boolean} True to display the crosshair.
+   */
+  this.getShowCrosshair = function () {
+    return showCrosshair;
+  };
+
+  /**
+   * Set the showCrosshair flag.
+   *
+   * @param {boolean} flag True to display the crosshair.
+   */
+  this.setShowCrosshair = function (flag) {
+    showCrosshair = flag;
+    if (flag) {
+      // listen to offset and zoom change
+      self.addEventListener('offsetchange', updateCrosshairOnChange);
+      self.addEventListener('zoomchange', updateCrosshairOnChange);
+      // show crosshair div
+      showCrosshairDiv();
+    } else {
+      // listen to offset and zoom change
+      self.removeEventListener('offsetchange', updateCrosshairOnChange);
+      self.removeEventListener('zoomchange', updateCrosshairOnChange);
+      // remove crosshair div
+      removeCrosshairDiv();
+    }
+  };
+
+  /**
+   * Update crosshair on offset or zoom change.
+   */
+  function updateCrosshairOnChange() {
+    showCrosshairDiv();
+  }
 
   /**
    * Get the Id of the container div.
@@ -511,6 +565,64 @@ dwv.gui.LayerGroup = function (containerDiv) {
   };
 
   /**
+   * Show a crosshair at a given position.
+   *
+   * @param {dwv.math.Point} position The position where to show the crosshair.
+   */
+  function showCrosshairDiv(position) {
+    if (typeof position === 'undefined') {
+      position = currentPosition;
+    }
+
+    // remove previous
+    removeCrosshairDiv();
+
+    // use first layer as base for calculating position and
+    // line sizes
+    var layer0 = layers[0];
+    var vc = layer0.getViewController();
+    var p2D = vc.getPlanePositionFromPosition(position);
+    var displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
+
+    // 10px offset
+    // TODO: find why...
+    var offY = 10;
+
+    var lineH = document.createElement('hr');
+    lineH.id = self.getDivId() + '-scroll-crosshair-horizontal';
+    lineH.className = 'horizontal';
+    lineH.style.width = containerDiv.offsetWidth + 'px';
+    lineH.style.left = '0px';
+    lineH.style.top = (displayPos.y - offY) + 'px';
+
+    var lineV = document.createElement('hr');
+    lineV.id = self.getDivId() + '-scroll-crosshair-vertical';
+    lineV.className = 'vertical';
+    lineV.style.width = containerDiv.offsetHeight + 'px';
+    lineV.style.left = (displayPos.x) + 'px';
+    lineV.style.top = (-offY) + 'px';
+
+    containerDiv.appendChild(lineH);
+    containerDiv.appendChild(lineV);
+  }
+
+  /**
+   * Remove crosshair divs.
+   */
+  function removeCrosshairDiv() {
+    var div = document.getElementById(
+      self.getDivId() + '-scroll-crosshair-horizontal');
+    if (div) {
+      div.remove();
+    }
+    div = document.getElementById(
+      self.getDivId() + '-scroll-crosshair-vertical');
+    if (div) {
+      div.remove();
+    }
+  }
+
+  /**
    * Update layers (but not the active view layer) to a position change.
    *
    * @param {object} event The position change event.
@@ -527,6 +639,14 @@ dwv.gui.LayerGroup = function (containerDiv) {
 
     var index = new dwv.math.Index(event.value[0]);
     var position = new dwv.math.Point(event.value[1]);
+
+    // store current position
+    currentPosition = position;
+
+    if (showCrosshair) {
+      showCrosshairDiv(position);
+    }
+
     // origin of the first view layer
     var baseViewLayerOrigin0 = null;
     var baseViewLayerOrigin = null;
