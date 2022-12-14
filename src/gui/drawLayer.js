@@ -227,7 +227,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
           y: center.getY(),
           z: center.getZ()
         });
-        // center was obtained with viewLayer.displayToPlanePosNoBase
+        // center was obtained with viewLayer.displayToMainPlanePos
         // compensated for baseOffset
         // TODO: justify...
         worldCenter = {

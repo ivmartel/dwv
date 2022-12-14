@@ -361,7 +361,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
           y: center.getY(),
           z: center.getZ()
         });
-        // center was obtained with viewLayer.displayToPlanePosNoBase
+        // center was obtained with viewLayer.displayToMainPlanePos
         // compensated for baseOffset
         // TODO: justify...
         worldCenter = {
@@ -475,7 +475,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   this.planePosToDisplay = function (x, y) {
-    //console.log('[vl] off', offset, baseOffset);
     return {
       x: (x - offset.x + baseOffset.x) * scale.x,
       y: (y - offset.y + baseOffset.y) * scale.y
@@ -637,7 +636,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function setBaseSize(size) {
     // check canvas creation
     if (!dwv.gui.canCreateCanvas(size.x, size.y)) {
-      throw new Error('Cannot create canvas ' + size.x + ', ' + size.y);
+      throw new Error('Cannot create canvas with size ' +
+        size.x + ', ' + size.y);
     }
 
     // set local
