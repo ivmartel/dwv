@@ -784,38 +784,9 @@ dwv.gui.LayerGroup = function (containerDiv) {
   };
 
   /**
-   * Flip all layers along the X axis.
-   */
-  this.flipX = function () {
-    // flip layer: sets its offset
-    for (var j = 0; j < layers.length; ++j) {
-      if (layers[j] instanceof dwv.gui.ViewLayer) {
-        layers[j].flipX();
-      }
-    }
-    // update scale
-    this.flipScaleZ();
-  };
-
-  /**
-   * Flip all layers along the Z axis.
-   */
-  this.flipZ = function () {
-    // flip layer: sets its offset
-    for (var j = 0; j < layers.length; ++j) {
-      if (layers[j] instanceof dwv.gui.ViewLayer) {
-        layers[j].flipY();
-      }
-    }
-    // update scale
-    this.flipScaleZ();
-  };
-
-  /**
    * Flip all layers along the Z axis without offset compensation.
    */
   this.flipScaleZ = function () {
-    // update scale
     baseScale.z *= -1;
     this.setScale(baseScale);
   };

@@ -310,21 +310,21 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Flip the layer along its X axis.
+   * Add a flip offset along the layer X axis.
    */
-  this.flipX = function () {
-    // scale is handled by layer group
-    // update offset
+  this.addFlipOffsetX = function () {
+    // flip scale is handled by layer group
+    // flip offset
     flipOffset.x += canvas.width / scale.x;
     offset.x += flipOffset.x;
   };
 
   /**
-   * Flip the layer along its Y axis.
+   * Add a flip offset along the layer Y axis.
    */
-  this.flipY = function () {
-    // scale is handled by layer group
-    // update offset
+  this.addFlipOffsetY = function () {
+    // flip scale is handled by layer group
+    // flip offset
     flipOffset.y += canvas.height / scale.y;
     offset.y += flipOffset.y;
   };

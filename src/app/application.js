@@ -1338,16 +1338,22 @@ dwv.App = function () {
     // extra flip for oriented views...
     var major = imageGeometry.getOrientation().getThirdColMajorDirection();
     if (typeof dataViewConfig.orientation !== 'undefined') {
-      if (major === 2 && dataViewConfig.orientation !== 'axial') {
+      if (major === 2) {
         // flip Z for axial aquired data
-        layerGroup.flipZ();
-      } else if (major === 0 && dataViewConfig.orientation !== 'sagittal') {
+        if (dataViewConfig.orientation !== 'axial') {
+          viewLayer.addFlipOffsetY();
+        }
+        layerGroup.flipScaleZ();
+      } else if (major === 0) {
         // flip X for sagittal aquired data
-        layerGroup.flipX();
+        if (dataViewConfig.orientation !== 'sagittal') {
+          viewLayer.addFlipOffsetX();
+        }
+        layerGroup.flipScaleZ();
       }
     } else {
       if (major === 0) {
-        // simple flip Z for undefined target orientation
+        // simple flip Z for sagittal and undefined target orientation
         layerGroup.flipScaleZ();
       }
     }
