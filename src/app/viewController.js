@@ -416,6 +416,25 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get a 2D (x,y) position from a position.
+   *
+   * @param {dwv.math.Point3D} point3D The 3D position.
+   * @returns {object} The 2D position.
+   */
+  this.getPlanePositionFromPosition = function (point3D) {
+    // orient
+    var geometry = view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    var point = geometry.worldToPoint(point3D);
+    var planePoint = planeHelper.getImageDeOrientedVector3D(point);
+    // return
+    return {
+      x: planePoint.getX(),
+      y: planePoint.getY(),
+    };
+  };
+
+  /**
    * Set the current index.
    *
    * @param {dwv.math.Index} index The index.

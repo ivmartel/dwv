@@ -441,6 +441,35 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
   return new dwv.math.Index(values);
 };
 
+/**
+ * Convert world coordinates into an point.
+ *
+ * @param {dwv.math.Point} point The world point to convert.
+ * @returns {dwv.math.Point3D} The corresponding point.
+ */
+dwv.image.Geometry.prototype.worldToPoint = function (point) {
+  // compensate for origin
+  // (origin is not oriented, compensate before orientation)
+  var origin = this.getOrigin();
+  var point3D = new dwv.math.Point3D(
+    point.get(0) - origin.getX(),
+    point.get(1) - origin.getY(),
+    point.get(2) - origin.getZ()
+  );
+  // orient
+  var orientedPoint3D =
+    this.getOrientation().getInverse().multiplyPoint3D(point3D);
+  // keep >3d values
+  var values = point.getValues();
+  // apply spacing and round
+  var spacing = this.getSpacing();
+  values[0] = orientedPoint3D.getX() / spacing.get(0);
+  values[1] = orientedPoint3D.getY() / spacing.get(1);
+  values[2] = orientedPoint3D.getZ() / spacing.get(2);
+
+  // return index
+  return new dwv.math.Point3D(values[0], values[1], values[2]);
+};
 
 /**
  * Get the oriented values of an input 3D array.
