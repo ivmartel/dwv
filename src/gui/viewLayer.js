@@ -343,9 +343,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
       y: fitScale.y * orientedNewScale.y
     };
 
-    if (newScale.x === 1 &&
-      newScale.y === 1 &&
-      newScale.z === 1) {
+    if (Math.abs(newScale.x) === 1 &&
+      Math.abs(newScale.y) === 1 &&
+      Math.abs(newScale.z) === 1) {
       // reset zoom offset for scale=1
       var resetOffset = {
         x: offset.x - zoomOffset.x,
