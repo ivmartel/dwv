@@ -670,15 +670,14 @@ dwv.gui.LayerGroup = function (containerDiv) {
           if (vc.canSetPosition(position) &&
             typeof origin !== 'undefined') {
             // TODO: compensate for possible different orientation between views
-            // TODO: check why -z...
 
             var scrollDiff = baseViewLayerOrigin0.minus(origin0);
             var scrollOffset = new dwv.math.Vector3D(
-              scrollDiff.getX(), scrollDiff.getY(), -1 * scrollDiff.getZ());
+              scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
 
             var planeDiff = baseViewLayerOrigin.minus(origin);
             var planeOffset = new dwv.math.Vector3D(
-              planeDiff.getX(), planeDiff.getY(), -1 * planeDiff.getZ());
+              planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
 
             hasSetOffset = layers[i].setBaseOffset(scrollOffset, planeOffset);
           }
