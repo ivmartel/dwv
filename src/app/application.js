@@ -1286,11 +1286,13 @@ dwv.App = function () {
       view.setColourMap(dataViewConfig.colourMap);
     }
 
+    var isBaseLayer = layerGroup.getNumberOfLayers() === 0;
+
     // opacity
     var opacity = 1;
     // do we have more than one layer
     // (the layer has not been added to the layer group yet)
-    if (layerGroup.getNumberOfLayers() !== 0) {
+    if (!isBaseLayer) {
       opacity = 0.5;
       // set color map if non was provided
       if (typeof dataViewConfig.colourMap === 'undefined') {
@@ -1335,28 +1337,48 @@ dwv.App = function () {
     // sync layer groups
     stage.syncLayerGroupScale();
 
-    // extra flip for oriented views...
+    // major orientation axis
     var major = imageGeometry.getOrientation().getThirdColMajorDirection();
+
+    // view layer offset (done before scale)
+    viewLayer.setOffset(layerGroup.getOffset());
+    // extra flip offset for oriented views...
     if (typeof dataViewConfig.orientation !== 'undefined') {
       if (major === 2) {
-        // flip Z for axial aquired data
+        // flip offset Y for axial aquired data
         if (dataViewConfig.orientation !== 'axial') {
           viewLayer.addFlipOffsetY();
         }
-        layerGroup.flipScaleZ();
       } else if (major === 0) {
-        // flip X for sagittal aquired data
+        // flip offset X for sagittal aquired data
         if (dataViewConfig.orientation !== 'sagittal') {
           viewLayer.addFlipOffsetX();
         }
-        layerGroup.flipScaleZ();
-      }
-    } else {
-      if (major === 0) {
-        // simple flip Z for sagittal and undefined target orientation
-        layerGroup.flipScaleZ();
       }
     }
+
+    // view layer scale
+    // only flip scale for base layers
+    if (isBaseLayer) {
+      if (typeof dataViewConfig.orientation !== 'undefined') {
+        if (major === 0 || major === 2) {
+          // scale flip Z for oriented views...
+          layerGroup.flipScaleZ();
+        } else {
+          viewLayer.setScale(layerGroup.getScale());
+        }
+      } else {
+        if (major === 0) {
+          // scale flip Z for sagittal and undefined target orientation
+          layerGroup.flipScaleZ();
+        } else {
+          viewLayer.setScale(layerGroup.getScale());
+        }
+      }
+    } else {
+      viewLayer.setScale(layerGroup.getScale());
+    }
+
   }
 
 }; // class dwv.App
