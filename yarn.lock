@@ -279,6 +279,13 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@jsdoc/salty@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@jsdoc/salty/-/salty-0.2.2.tgz#567017ddda2048c5ff921aeffd38564a0578fdca"
+  integrity sha512-A1FrVnc7L9qI2gUGsfN0trTiJNK72Y0CL/VAyrmYEmeKI3pnHDawP64CEev31XLyAAOx2xmDo3tbadPxC0CSbw==
+  dependencies:
+    lodash "^4.17.21"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -889,13 +896,16 @@ clean-css@^4.2.1:
   dependencies:
     source-map "~0.6.0"
 
-clean-jsdoc-theme@4.1.10:
-  version "4.1.10"
-  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.1.10.tgz#12e4917672fb0ff66aa8fd6b26ea2adab0066805"
-  integrity sha512-ETcDFJOQSFieue/DNXU+9KO//xVokacjn4thKVpSiNNpMIwSovgpQ0FmxaZx00wzlWbDO/9P18qSyFyvNXCQtw==
+clean-jsdoc-theme@4.1.12:
+  version "4.1.12"
+  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.1.12.tgz#dbf9be892c8bb52c881fb6be19d800a58360879d"
+  integrity sha512-u9zsDAHcfl4xE1p/Bb18F2WKNxRn4WsHROyLpNL0ozCznN0voj5o3V6WthBVePHu5QCI3fZ9XDOv7fbY0vdEiw==
   dependencies:
+    "@jsdoc/salty" "^0.2.2"
+    common-path-prefix "^3.0.0"
     fs-extra "^10.1.0"
     html-minifier "^4.0.0"
+    lodash "^4.17.21"
     nanoid "^3.3.4"
     showdown "^2.1.0"
 
@@ -1052,6 +1062,11 @@ comment-parser@1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.3.1.tgz#3d7ea3adaf9345594aedee6563f422348f165c1b"
   integrity sha512-B52sN2VNghyq5ofvUsqZjmk6YkihBX5vMSChmSK9v4ShjKf3Vk5Xcmgpw4o+iIgtrnM/u5FiMpz9VKb8lpBveA==
+
+common-path-prefix@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/common-path-prefix/-/common-path-prefix-3.0.0.tgz#7d007a7e07c58c4b4d5f433131a19141b29f11e0"
+  integrity sha512-QE33hToZseCH3jS0qN96O/bSh3kaw/h+Tq7ngyY9eWDUnTlTNUyqfqvCXioLe5Na5jFsL78ra/wuBU4iuEgd4w==
 
 component-emitter@~1.3.0:
   version "1.3.0"
