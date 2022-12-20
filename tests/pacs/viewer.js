@@ -505,7 +505,10 @@ function setupToolsCheckboxes() {
 
   var getKeyCheck = function (char, input) {
     return function (event) {
-      if (event.keyCode === char) {
+      if (!event.ctrlKey &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.keyCode === char) {
         input.click();
       }
     };
