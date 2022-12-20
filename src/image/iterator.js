@@ -617,3 +617,39 @@ dwv.image.getVariableRegionSliceIterator = function (
     dataAccessor, startOffset, endOffset + 1,
     1, offsetRegions);
 };
+
+/**
+ * Get a colour iterator. The input array defines the colours and
+ * their start index.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Array} colours An array of {index, colour} pairs.
+ * @param {number} end The end of the range (excluded).
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.colourRange = function (colours, end) {
+  var nextIndex = 0;
+  var nextColourIndex = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex < end) {
+        if (nextColourIndex + 1 < colours.length &&
+          nextIndex >= colours[nextColourIndex + 1].index) {
+          ++nextColourIndex;
+        }
+        var result = {
+          value: colours[nextColourIndex].colour,
+          done: false,
+          index: nextIndex
+        };
+        ++nextIndex;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
