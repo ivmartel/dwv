@@ -742,6 +742,22 @@ dwv.image.MaskFactory.prototype.create = function (
   var tmpGeometry = new dwv.image.Geometry(
     frameOrigins[0], size, newSpacing, orientationMatrix);
 
+  // origin distance test
+  var isNotSmall = function (value) {
+    var res = value > dwv.math.REAL_WORLD_EPSILON;
+    if (res) {
+      // try larger epsilon
+      res = value > dwv.math.REAL_WORLD_EPSILON * 10;
+      if (!res) {
+        // warn if epsilon < value < epsilon * 10
+        dwv.logger.warn(
+          'Using larger real world epsilon in SEG pos pat adding'
+        );
+      }
+    }
+    return res;
+  };
+
   // add possibly missing posPats
   var posPats = [];
   posPats.push(framePosPats[0]);
@@ -755,7 +771,7 @@ dwv.image.MaskFactory.prototype.create = function (
     var dist = frameOrigin.getDistance(point);
     var distPrevious = dist;
     // TODO: good threshold?
-    while (dist > dwv.math.REAL_WORLD_EPSILON) {
+    while (isNotSmall(dist)) {
       dwv.logger.debug('Adding intermediate pos pats for DICOM seg at ' +
         point.toString());
       posPats.push([point.getX(), point.getY(), point.getZ()]);
