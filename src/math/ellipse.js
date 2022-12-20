@@ -211,17 +211,23 @@ dwv.math.getEllipseIndices = function (center, radius, dir) {
       values[dj] = jmax;
       indices.push(new dwv.math.Index(values.slice()));
       // right - bottom
-      values[dj] = jmin;
-      indices.push(new dwv.math.Index(values.slice()));
+      if (jmin !== jmax) {
+        values[dj] = jmin;
+        indices.push(new dwv.math.Index(values.slice()));
+      }
 
       // left
-      values[di] = imin;
-      // left - top
-      values[dj] = jmax;
-      indices.push(new dwv.math.Index(values.slice()));
-      // left - bottom
-      values[dj] = jmin;
-      indices.push(new dwv.math.Index(values.slice()));
+      if (imin !== imax) {
+        values[di] = imin;
+        // left - top
+        values[dj] = jmax;
+        indices.push(new dwv.math.Index(values.slice()));
+        // left - bottom
+        if (jmin !== jmax) {
+          values[dj] = jmin;
+          indices.push(new dwv.math.Index(values.slice()));
+        }
+      }
     }
   }
   return indices;
