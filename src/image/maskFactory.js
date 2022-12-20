@@ -753,6 +753,7 @@ dwv.image.MaskFactory.prototype.create = function (
     var frameOrigin = frameOrigins[g];
     // check if more pos pats are needed
     var dist = frameOrigin.getDistance(point);
+    var distPrevious = dist;
     // TODO: good threshold?
     while (dist > dwv.math.REAL_WORLD_EPSILON) {
       dwv.logger.debug('Adding intermediate pos pats for DICOM seg at ' +
@@ -762,6 +763,10 @@ dwv.image.MaskFactory.prototype.create = function (
       index = new dwv.math.Index([0, 0, sliceIndex]);
       point = tmpGeometry.indexToWorld(index).get3D();
       dist = frameOrigin.getDistance(point);
+      if (dist > distPrevious) {
+        throw new Error(
+          'Test distance is increasing when adding intermediate pos pats');
+      }
     }
     // add frame pos pat
     posPats.push(framePosPats[g]);
