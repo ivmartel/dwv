@@ -896,15 +896,16 @@ clean-css@^4.2.1:
   dependencies:
     source-map "~0.6.0"
 
-clean-jsdoc-theme@4.1.12:
-  version "4.1.12"
-  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.1.12.tgz#dbf9be892c8bb52c881fb6be19d800a58360879d"
-  integrity sha512-u9zsDAHcfl4xE1p/Bb18F2WKNxRn4WsHROyLpNL0ozCznN0voj5o3V6WthBVePHu5QCI3fZ9XDOv7fbY0vdEiw==
+clean-jsdoc-theme@4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.1.tgz#c87daa8cdc96eb55e26124a8425eb9c2044d12c1"
+  integrity sha512-pTRseFHI/Bq58il3ZutahN9Bt92nzQtkKHud61F/T0gZYNbJbM9PK7RIOwv9n2PcA8nqCXirXCup7RhGC4kilA==
   dependencies:
     "@jsdoc/salty" "^0.2.2"
     common-path-prefix "^3.0.0"
     fs-extra "^10.1.0"
     html-minifier "^4.0.0"
+    klaw-sync "^6.0.0"
     lodash "^4.17.21"
     nanoid "^3.3.4"
     showdown "^2.1.0"
@@ -3206,6 +3207,13 @@ kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
+
+klaw-sync@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/klaw-sync/-/klaw-sync-6.0.0.tgz#1fd2cfd56ebb6250181114f0a581167099c2b28c"
+  integrity sha512-nIeuVSzdCCs6TDPTqI8w1Yre34sSq7AkZ4B3sfOBbI2CgVSB4Du4aLQijFU2+lhAFCwt9+42Hel6lQNIv6AntQ==
+  dependencies:
+    graceful-fs "^4.1.11"
 
 klaw@^3.0.0:
   version "3.0.0"
