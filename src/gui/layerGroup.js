@@ -752,6 +752,11 @@ dwv.gui.LayerGroup = function (containerDiv) {
     for (var j = 0; j < layers.length; ++j) {
       layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
     }
+
+    // update crosshair
+    if (showCrosshair) {
+      showCrosshairDiv();
+    }
   };
 
   /**

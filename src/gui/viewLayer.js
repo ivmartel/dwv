@@ -705,8 +705,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     if (viewOffset.x !== newViewOffset.x || viewOffset.y !== newViewOffset.y) {
       viewOffset = newViewOffset;
       offset = {
-        x: viewOffset.x + baseOffset.x + zoomOffset.x,
-        y: viewOffset.y + baseOffset.y + zoomOffset.y
+        x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+        y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
       };
       // update draw flag
       needsDraw = true;
