@@ -543,7 +543,6 @@ dwv.App = function () {
    */
   this.fitToContainer = function () {
     stage.syncLayerGroupScale();
-
   };
 
   /**
