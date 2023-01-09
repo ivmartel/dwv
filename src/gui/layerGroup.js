@@ -584,23 +584,19 @@ dwv.gui.LayerGroup = function (containerDiv) {
     var p2D = vc.getPlanePositionFromPosition(position);
     var displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
 
-    // 10px offset
-    // TODO: find why...
-    var offY = 10;
-
     var lineH = document.createElement('hr');
     lineH.id = self.getDivId() + '-scroll-crosshair-horizontal';
     lineH.className = 'horizontal';
     lineH.style.width = containerDiv.offsetWidth + 'px';
     lineH.style.left = '0px';
-    lineH.style.top = (displayPos.y - offY) + 'px';
+    lineH.style.top = displayPos.y + 'px';
 
     var lineV = document.createElement('hr');
     lineV.id = self.getDivId() + '-scroll-crosshair-vertical';
     lineV.className = 'vertical';
     lineV.style.width = containerDiv.offsetHeight + 'px';
     lineV.style.left = (displayPos.x) + 'px';
-    lineV.style.top = (-offY) + 'px';
+    lineV.style.top = '0px';
 
     containerDiv.appendChild(lineH);
     containerDiv.appendChild(lineV);
