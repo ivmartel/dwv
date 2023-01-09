@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.20 2022-12-19 10:41:20 */
+/*! dwv 0.31.0-beta.21 2023-01-09 17:12:44 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -617,7 +617,6 @@ dwv.App = function () {
    */
   this.fitToContainer = function () {
     stage.syncLayerGroupScale();
-
   };
 
   /**
@@ -4695,7 +4694,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.20';
+  return '0.31.0-beta.21';
 };
 
 /**
@@ -14004,23 +14003,19 @@ dwv.gui.LayerGroup = function (containerDiv) {
     var p2D = vc.getPlanePositionFromPosition(position);
     var displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
 
-    // 10px offset
-    // TODO: find why...
-    var offY = 10;
-
     var lineH = document.createElement('hr');
     lineH.id = self.getDivId() + '-scroll-crosshair-horizontal';
     lineH.className = 'horizontal';
     lineH.style.width = containerDiv.offsetWidth + 'px';
     lineH.style.left = '0px';
-    lineH.style.top = (displayPos.y - offY) + 'px';
+    lineH.style.top = displayPos.y + 'px';
 
     var lineV = document.createElement('hr');
     lineV.id = self.getDivId() + '-scroll-crosshair-vertical';
     lineV.className = 'vertical';
     lineV.style.width = containerDiv.offsetHeight + 'px';
     lineV.style.left = (displayPos.x) + 'px';
-    lineV.style.top = (-offY) + 'px';
+    lineV.style.top = '0px';
 
     containerDiv.appendChild(lineH);
     containerDiv.appendChild(lineV);
@@ -14175,6 +14170,11 @@ dwv.gui.LayerGroup = function (containerDiv) {
     // apply to layers
     for (var j = 0; j < layers.length; ++j) {
       layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
+    }
+
+    // update crosshair
+    if (showCrosshair) {
+      showCrosshairDiv();
     }
   };
 
@@ -15741,8 +15741,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     if (viewOffset.x !== newViewOffset.x || viewOffset.y !== newViewOffset.y) {
       viewOffset = newViewOffset;
       offset = {
-        x: viewOffset.x + baseOffset.x + zoomOffset.x,
-        y: viewOffset.y + baseOffset.y + zoomOffset.y
+        x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+        y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
       };
       // update draw flag
       needsDraw = true;
@@ -19743,6 +19743,42 @@ dwv.image.getVariableRegionSliceIterator = function (
     1, offsetRegions);
 };
 
+/**
+ * Get a colour iterator. The input array defines the colours and
+ * their start index.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Array} colours An array of {index, colour} pairs.
+ * @param {number} end The end of the range (excluded).
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.colourRange = function (colours, end) {
+  var nextIndex = 0;
+  var nextColourIndex = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex < end) {
+        if (nextColourIndex + 1 < colours.length &&
+          nextIndex >= colours[nextColourIndex + 1].index) {
+          ++nextColourIndex;
+        }
+        var result = {
+          value: colours[nextColourIndex].colour,
+          done: false,
+          index: nextIndex
+        };
+        ++nextIndex;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
 // namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
@@ -20726,6 +20762,22 @@ dwv.image.MaskFactory.prototype.create = function (
   var tmpGeometry = new dwv.image.Geometry(
     frameOrigins[0], size, newSpacing, orientationMatrix);
 
+  // origin distance test
+  var isNotSmall = function (value) {
+    var res = value > dwv.math.REAL_WORLD_EPSILON;
+    if (res) {
+      // try larger epsilon
+      res = value > dwv.math.REAL_WORLD_EPSILON * 10;
+      if (!res) {
+        // warn if epsilon < value < epsilon * 10
+        dwv.logger.warn(
+          'Using larger real world epsilon in SEG pos pat adding'
+        );
+      }
+    }
+    return res;
+  };
+
   // add possibly missing posPats
   var posPats = [];
   posPats.push(framePosPats[0]);
@@ -20737,8 +20789,9 @@ dwv.image.MaskFactory.prototype.create = function (
     var frameOrigin = frameOrigins[g];
     // check if more pos pats are needed
     var dist = frameOrigin.getDistance(point);
+    var distPrevious = dist;
     // TODO: good threshold?
-    while (dist > dwv.math.REAL_WORLD_EPSILON) {
+    while (isNotSmall(dist)) {
       dwv.logger.debug('Adding intermediate pos pats for DICOM seg at ' +
         point.toString());
       posPats.push([point.getX(), point.getY(), point.getZ()]);
@@ -20746,6 +20799,10 @@ dwv.image.MaskFactory.prototype.create = function (
       index = new dwv.math.Index([0, 0, sliceIndex]);
       point = tmpGeometry.indexToWorld(index).get3D();
       dist = frameOrigin.getDistance(point);
+      if (dist > distPrevious) {
+        throw new Error(
+          'Test distance is increasing when adding intermediate pos pats');
+      }
     }
     // add frame pos pat
     posPats.push(framePosPats[g]);
@@ -26722,17 +26779,23 @@ dwv.math.getEllipseIndices = function (center, radius, dir) {
       values[dj] = jmax;
       indices.push(new dwv.math.Index(values.slice()));
       // right - bottom
-      values[dj] = jmin;
-      indices.push(new dwv.math.Index(values.slice()));
+      if (jmin !== jmax) {
+        values[dj] = jmin;
+        indices.push(new dwv.math.Index(values.slice()));
+      }
 
       // left
-      values[di] = imin;
-      // left - top
-      values[dj] = jmax;
-      indices.push(new dwv.math.Index(values.slice()));
-      // left - bottom
-      values[dj] = jmin;
-      indices.push(new dwv.math.Index(values.slice()));
+      if (imin !== imax) {
+        values[di] = imin;
+        // left - top
+        values[dj] = jmax;
+        indices.push(new dwv.math.Index(values.slice()));
+        // left - bottom
+        if (jmin !== jmax) {
+          values[dj] = jmin;
+          indices.push(new dwv.math.Index(values.slice()));
+        }
+      }
     }
   }
   return indices;
