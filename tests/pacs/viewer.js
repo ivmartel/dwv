@@ -228,6 +228,10 @@ dwv.test.viewerSetup = function () {
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
   });
+  // default on resize
+  window.addEventListener('resize', function () {
+    _app.onResize();
+  });
 
   var options = {};
   // special dicom web request header
