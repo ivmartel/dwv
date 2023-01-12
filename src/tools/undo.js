@@ -17,15 +17,6 @@ dwv.tool.UndoStack = function () {
   var stack = [];
 
   /**
-   * Get the stack.
-   *
-   * @returns {Array} The list of stored commands.
-   */
-  this.getStack = function () {
-    return stack;
-  };
-
-  /**
    * Current command index.
    *
    * @private
@@ -40,6 +31,24 @@ dwv.tool.UndoStack = function () {
    * @private
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the stack size.
+   *
+   * @returns {number} The size of the stack.
+   */
+  this.getStackSize = function () {
+    return stack.length;
+  };
+
+  /**
+   * Get the current stack index.
+   *
+   * @returns {number} The stack index.
+   */
+  this.getCurrentStackIndex = function () {
+    return curCmdIndex;
+  };
 
   /**
    * Add a command to the stack.

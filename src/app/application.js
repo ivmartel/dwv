@@ -994,6 +994,23 @@ dwv.App = function () {
     undoStack.redo();
   };
 
+  /**
+   * Get the undo stack size.
+   *
+   * @returns {number} The size of the stack.
+   */
+  this.getStackSize = function () {
+    return undoStack.getStackSize();
+  };
+
+  /**
+   * Get the current undo stack index.
+   *
+   * @returns {number} The stack index.
+   */
+  this.getCurrentStackIndex = function () {
+    return undoStack.getCurrentStackIndex();
+  };
 
   // Private Methods -----------------------------------------------------------
 
