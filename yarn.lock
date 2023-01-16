@@ -2340,9 +2340,9 @@ grunt-contrib-watch@^1.1.0:
     tiny-lr "^1.1.1"
 
 grunt-eslint@^24.0.0:
-  version "24.0.0"
-  resolved "https://registry.yarnpkg.com/grunt-eslint/-/grunt-eslint-24.0.0.tgz#ad14e1cd9c869e0365e2bf4a97241c0c8844c7cc"
-  integrity sha512-WpTeBBFweyhMuPjGwRSQV9JFJ+EczIdlsc7Dd/1g78QVI1aZsk4g/H3e+3S5HEwsS1RKL2YZIrGj8hMLlBfN8w==
+  version "24.0.1"
+  resolved "https://registry.yarnpkg.com/grunt-eslint/-/grunt-eslint-24.0.1.tgz#a07f4063931c6fefcffbfdf2e60ddfd558d5ba31"
+  integrity sha512-gFzp+ikAkwyu6nqBE2zx1pLVL0JPrerG7jaO4uJV3XUGKPIipv4mfhDOS5MyiMrzUtGdXSW8FkRHjoUnfqbW+g==
   dependencies:
     chalk "^4.1.2"
     eslint "^8.0.1"
