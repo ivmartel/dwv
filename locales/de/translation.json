@@ -30,7 +30,8 @@
         "description": "Beschreibung",
         "editMode": "Bearbeitungsmodus",
         "deleteDraws": "Alles löschen",
-        "visible": "Sichtbar"
+        "visible": "Sichtbar",
+        "action": "Handlung"
     },
     "colour": {
         "Yellow": {

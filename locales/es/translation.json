@@ -30,7 +30,8 @@
         "description": "Descripción",
         "editMode": "Modo edición",
         "deleteDraws": "Eliminar todo",
-        "visible": "Visible"
+        "visible": "Visible",
+        "action": "Acción"
     },
     "colour": {
         "Yellow": {

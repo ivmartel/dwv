@@ -30,7 +30,8 @@
         "description": "描述",
         "editMode": "编辑模式",
         "deleteDraws": "删除所有",
-        "visible": "可见"
+        "visible": "可见",
+        "action": "行動"
     },
     "colour": {
         "Yellow": {

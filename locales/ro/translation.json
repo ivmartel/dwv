@@ -30,7 +30,8 @@
         "description": "Descriere",
         "editMode": "Mod Editare",
         "deleteDraws": "Șterge Tot",
-        "visible": "Vizibil"
+        "visible": "Vizibil",
+        "action": "Acțiune"
     },
     "colour": {
         "Yellow": {

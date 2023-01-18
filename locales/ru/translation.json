@@ -30,7 +30,8 @@
         "description": "Описание",
         "editMode": "Редактирование",
         "deleteDraws": "Удалить все",
-        "visible": "Отображение"
+        "visible": "Отображение",
+        "action": "Действие"
     },
     "colour": {
         "Yellow": {

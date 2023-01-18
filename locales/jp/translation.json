@@ -30,7 +30,8 @@
         "description": "説明",
         "editMode": "編集モード",
         "deleteDraws": "すべて削除",
-        "visible": "表示"
+        "visible": "表示",
+        "action": "アクション"
     },
     "colour": {
         "Yellow": {
