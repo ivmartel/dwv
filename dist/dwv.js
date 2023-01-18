@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.21 2023-01-09 17:12:44 */
+/*! dwv 0.31.0-beta.22 2023-01-18 18:57:53 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -309,6 +309,17 @@ dwv.App = function () {
    */
   this.getViewLayersByDataIndex = function (index) {
     return stage.getViewLayersByDataIndex(index);
+  };
+
+  /**
+   * Get the draw layers associated to a data index.
+   * The layer are available after the first loaded item.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getDrawLayersByDataIndex = function (index) {
+    return stage.getDrawLayersByDataIndex(index);
   };
 
   /**
@@ -851,6 +862,16 @@ dwv.App = function () {
     drawController.updateDraw(drawDetails);
   };
   /**
+   * Delete a draw.
+   *
+   * @param {object} drawDetails Details of the drawing to check.
+   */
+  this.deleteDraw = function (drawDetails) {
+    var drawController =
+      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
+    drawController.deleteDraw(drawDetails, fireEvent, this.addToUndoStack);
+  };
+  /**
    * Delete all Draws from all layers.
    */
   this.deleteDraws = function () {
@@ -1068,6 +1089,23 @@ dwv.App = function () {
     undoStack.redo();
   };
 
+  /**
+   * Get the undo stack size.
+   *
+   * @returns {number} The size of the stack.
+   */
+  this.getStackSize = function () {
+    return undoStack.getStackSize();
+  };
+
+  /**
+   * Get the current undo stack index.
+   *
+   * @returns {number} The stack index.
+   */
+  this.getCurrentStackIndex = function () {
+    return undoStack.getCurrentStackIndex();
+  };
 
   // Private Methods -----------------------------------------------------------
 
@@ -2113,6 +2151,30 @@ dwv.ctrl.DrawController = function (konvaLayer) {
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
     exeCallback(delcmd);
+  };
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @param {object} drawDetails Details of the group to update.
+   * @param {object} cmdCallback The DeleteCommand callback.
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   * @returns {boolean} False if the group cannot be found.
+   */
+  this.deleteDraw = function (drawDetails, cmdCallback, exeCallback) {
+    // get the group
+    var group = konvaLayer.findOne('#' + drawDetails.id);
+    if (typeof group === 'undefined') {
+      dwv.logger.warn(
+        '[deleteDraw] Cannot find node with id: ' + drawDetails.id
+      );
+      return false;
+    }
+    // delete
+    this.deleteDrawGroup(group, cmdCallback, exeCallback);
+
+    return true;
   };
 
   /**
@@ -4694,7 +4756,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.21';
+  return '0.31.0-beta.22';
 };
 
 /**
@@ -14543,6 +14605,20 @@ dwv.gui.Stage = function () {
     var res = [];
     for (var i = 0; i < layerGroups.length; ++i) {
       res = res.concat(layerGroups[i].getViewLayersByDataIndex(index));
+    }
+    return res;
+  };
+
+  /**
+   * Get the draw layers associated to a data index.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getDrawLayersByDataIndex = function (index) {
+    var res = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      res = res.concat(layerGroups[i].getDrawLayersByDataIndex(index));
     }
     return res;
   };
@@ -35645,15 +35721,6 @@ dwv.tool.UndoStack = function () {
   var stack = [];
 
   /**
-   * Get the stack.
-   *
-   * @returns {Array} The list of stored commands.
-   */
-  this.getStack = function () {
-    return stack;
-  };
-
-  /**
    * Current command index.
    *
    * @private
@@ -35668,6 +35735,24 @@ dwv.tool.UndoStack = function () {
    * @private
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the stack size.
+   *
+   * @returns {number} The size of the stack.
+   */
+  this.getStackSize = function () {
+    return stack.length;
+  };
+
+  /**
+   * Get the current stack index.
+   *
+   * @returns {number} The stack index.
+   */
+  this.getCurrentStackIndex = function () {
+    return curCmdIndex;
+  };
 
   /**
    * Add a command to the stack.
