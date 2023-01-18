@@ -491,6 +491,30 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
+   * Delete a Draw from the stage.
+   *
+   * @param {object} drawDetails Details of the group to update.
+   * @param {object} cmdCallback The DeleteCommand callback.
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   * @returns {boolean} False if the group cannot be found.
+   */
+  this.deleteDraw = function (drawDetails, cmdCallback, exeCallback) {
+    // get the group
+    var group = konvaLayer.findOne('#' + drawDetails.id);
+    if (typeof group === 'undefined') {
+      dwv.logger.warn(
+        '[deleteDraw] Cannot find node with id: ' + drawDetails.id
+      );
+      return false;
+    }
+    // delete
+    this.deleteDrawGroup(group, cmdCallback, exeCallback);
+
+    return true;
+  };
+
+  /**
    * Delete all Draws from the stage.
    *
    * @param {object} cmdCallback The DeleteCommand callback.

@@ -777,6 +777,16 @@ dwv.App = function () {
     drawController.updateDraw(drawDetails);
   };
   /**
+   * Delete a draw.
+   *
+   * @param {object} drawDetails Details of the drawing to check.
+   */
+  this.deleteDraw = function (drawDetails) {
+    var drawController =
+      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
+    drawController.deleteDraw(drawDetails, fireEvent, this.addToUndoStack);
+  };
+  /**
    * Delete all Draws from all layers.
    */
   this.deleteDraws = function () {
