@@ -238,6 +238,17 @@ dwv.App = function () {
   };
 
   /**
+   * Get the draw layers associated to a data index.
+   * The layer are available after the first loaded item.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getDrawLayersByDataIndex = function (index) {
+    return stage.getDrawLayersByDataIndex(index);
+  };
+
+  /**
    * Get a layer group by div id.
    * The layer is available after the first loaded item.
    *

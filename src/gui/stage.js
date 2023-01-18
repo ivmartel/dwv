@@ -180,6 +180,20 @@ dwv.gui.Stage = function () {
   };
 
   /**
+   * Get the draw layers associated to a data index.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getDrawLayersByDataIndex = function (index) {
+    var res = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      res = res.concat(layerGroups[i].getDrawLayersByDataIndex(index));
+    }
+    return res;
+  };
+
+  /**
    * Add a layer group to the list.
    *
    * @param {object} htmlElement The HTML element of the layer group.
