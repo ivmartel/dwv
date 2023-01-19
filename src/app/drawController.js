@@ -225,8 +225,11 @@ dwv.ctrl.DrawController = function (konvaLayer) {
           if (shape.closed()) {
             type = 'Roi';
           } else if (shapeExtrakids.length !== 0) {
-            if (shapeExtrakids[0].name().indexOf('triangle') !== -1) {
+            var extraName0 = shapeExtrakids[0].name();
+            if (extraName0.indexOf('triangle') !== -1) {
               type = 'Arrow';
+            } else if (extraName0.indexOf('arc') !== -1) {
+              type = 'Protractor';
             } else {
               type = 'Ruler';
             }
