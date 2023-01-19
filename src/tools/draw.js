@@ -769,6 +769,8 @@ dwv.tool.Draw = function (app) {
         throw new Error('Could not find the shape label.');
       }
       var ktext = label.getText();
+      // id for event
+      var groupId = this.id();
 
       var onSaveCallback = function (meta) {
         // store meta
@@ -780,7 +782,8 @@ dwv.tool.Draw = function (app) {
 
         // trigger event
         fireEvent({
-          type: 'drawchange'
+          type: 'drawchange',
+          id: groupId
         });
         // draw
         konvaLayer.draw();
@@ -853,7 +856,9 @@ dwv.tool.Draw = function (app) {
    * @returns {Array} The list of event names.
    */
   this.getEventNames = function () {
-    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
+    return [
+      'drawcreate', 'drawchange', 'drawmove', 'drawdelete', 'drawlabelchange'
+    ];
   };
 
   /**
