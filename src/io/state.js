@@ -42,8 +42,9 @@ dwv.io.State = function () {
     var layerGroup = app.getActiveLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    var drawLayer = layerGroup.getActiveDrawLayer();
     var position = viewController.getCurrentIndex();
+    var drawLayer = layerGroup.getActiveDrawLayer();
+    var drawController = drawLayer.getDrawController();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
@@ -53,7 +54,7 @@ dwv.io.State = function () {
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
-      drawingsDetails: app.getDrawStoreDetails()
+      drawingsDetails: drawController.getDrawStoreDetails()
     });
   };
   /**

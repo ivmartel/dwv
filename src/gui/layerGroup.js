@@ -512,6 +512,8 @@ dwv.gui.LayerGroup = function (containerDiv) {
     var layer = new dwv.gui.DrawLayer(div);
     // add layer
     layers.push(layer);
+    // bind draw layer events
+    bindDrawLayer(layer);
     // return
     return layer;
   };
@@ -532,6 +534,17 @@ dwv.gui.LayerGroup = function (containerDiv) {
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', fireEvent);
     viewLayer.addEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Bind draw layer events to this.
+   *
+   * @param {object} drawLayer The draw layer to bind.
+   */
+  function bindDrawLayer(drawLayer) {
+    // propagate drawLayer events
+    drawLayer.addEventListener('drawcreate', fireEvent);
+    drawLayer.addEventListener('drawdelete', fireEvent);
   }
 
   /**

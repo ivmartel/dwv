@@ -28,8 +28,6 @@ dwv.gui.DrawLayer = function (containerDiv) {
 
   // konva stage
   var konvaStage = null;
-  // konva layer
-  var konvaLayer;
 
   /**
    * The layer base size as {x,y}.
@@ -135,7 +133,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @returns {object} The layer.
    */
   this.getKonvaLayer = function () {
-    return konvaLayer;
+    // there should only be one layer
+    return konvaStage.getLayers()[0];
   };
 
   /**
@@ -345,7 +344,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
     konvaStage.getContent().setAttribute('style', '');
 
     // create layer
-    konvaLayer = new Konva.Layer({
+    var konvaLayer = new Konva.Layer({
       listening: false,
       visible: true
     });
@@ -392,6 +391,64 @@ dwv.gui.DrawLayer = function (containerDiv) {
       x: viewOffset.x + baseOffset.x + zoomOffset.x,
       y: viewOffset.y + baseOffset.y + zoomOffset.y
     });
+  };
+
+  /**
+   * Check the visibility of a given group.
+   *
+   * @param {string} id The id of the group.
+   * @returns {boolean} True if the group is visible.
+   */
+  this.isGroupVisible = function (id) {
+    // get the group
+    var group = drawController.getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // get visibility
+    return group.isVisible();
+  };
+
+  /**
+   * Toggle the visibility of a given group.
+   *
+   * @param {string} id The id of the group.
+   * @returns {boolean} False if the group cannot be found.
+   */
+  this.toogleGroupVisibility = function (id) {
+    // get the group
+    var group = drawController.getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // toggle visible
+    group.visible(!group.isVisible());
+
+    // udpate
+    this.draw();
+
+    return true;
+  };
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @param {string} id The id of the group to delete.
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  this.deleteDraw = function (id, exeCallback) {
+    drawController.deleteDraw(id, fireEvent, exeCallback);
+  };
+
+  /**
+   * Delete all Draws from the stage.
+   *
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  this.deleteDraws = function (exeCallback) {
+    drawController.deleteDraws(fireEvent, exeCallback);
   };
 
   /**

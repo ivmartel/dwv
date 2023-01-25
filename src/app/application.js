@@ -737,27 +737,6 @@ dwv.App = function () {
   };
 
   /**
-   * Get the list of drawing display details.
-   *
-   * @returns {object} The list of draw details including id, position...
-   */
-  this.getDrawDisplayDetails = function () {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    return drawController.getDrawDisplayDetails();
-  };
-
-  /**
-   * Get a list of drawing store details.
-   *
-   * @returns {object} A list of draw details including id, text, quant...
-   */
-  this.getDrawStoreDetails = function () {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    return drawController.getDrawStoreDetails();
-  };
-  /**
    * Set the drawings on the current stage.
    *
    * @param {Array} drawings An array of drawings.
@@ -776,55 +755,6 @@ dwv.App = function () {
     drawController.activateDrawLayer(
       viewController.getCurrentOrientedIndex(),
       viewController.getScrollIndex());
-  };
-  /**
-   * Update a drawing from its details.
-   *
-   * @param {object} drawDetails Details of the drawing to update.
-   */
-  this.updateDraw = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.updateDraw(drawDetails);
-  };
-  /**
-   * Delete a draw.
-   *
-   * @param {object} drawDetails Details of the drawing to check.
-   */
-  this.deleteDraw = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.deleteDraw(drawDetails, fireEvent, this.addToUndoStack);
-  };
-  /**
-   * Delete all Draws from all layers.
-   */
-  this.deleteDraws = function () {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.deleteDraws(fireEvent, this.addToUndoStack);
-  };
-  /**
-   * Check the visibility of a given group.
-   *
-   * @param {object} drawDetails Details of the drawing to check.
-   * @returns {boolean} True if the group is visible.
-   */
-  this.isGroupVisible = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    return drawController.isGroupVisible(drawDetails);
-  };
-  /**
-   * Toggle group visibility.
-   *
-   * @param {object} drawDetails Details of the drawing to update.
-   */
-  this.toogleGroupVisibility = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.toogleGroupVisibility(drawDetails);
   };
 
   /**
@@ -1251,6 +1181,11 @@ dwv.App = function () {
     // propagate view events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       group.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // propagate drawLayer events
+    if (toolboxController.hasTool('Draw')) {
+      group.addEventListener('drawcreate', fireEvent);
+      group.addEventListener('drawdelete', fireEvent);
     }
   }
 
