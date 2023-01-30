@@ -583,7 +583,7 @@ function unbindAppToControls() {
  */
 function onWLChange(event) {
   // width number
-  var elemId = 'width-' + event.dataindex + '-number';
+  var elemId = 'width-' + event.dataid + '-number';
   var elem = document.getElementById(elemId);
   if (elem) {
     elem.value = event.value[1];
@@ -591,19 +591,19 @@ function onWLChange(event) {
     console.warn('wl change: HTML not ready?');
   }
   // width range
-  elemId = 'width-' + event.dataindex + '-range';
+  elemId = 'width-' + event.dataid + '-range';
   elem = document.getElementById(elemId);
   if (elem) {
     elem.value = event.value[1];
   }
   // center number
-  elemId = 'center-' + event.dataindex + '-number';
+  elemId = 'center-' + event.dataid + '-number';
   elem = document.getElementById(elemId);
   if (elem) {
     elem.value = event.value[0];
   }
   // center range
-  elemId = 'center-' + event.dataindex + '-range';
+  elemId = 'center-' + event.dataid + '-range';
   elem = document.getElementById(elemId);
   if (elem) {
     elem.value = event.value[0];
@@ -618,7 +618,7 @@ function onWLChange(event) {
 function onOpacityChange(event) {
   var value = parseFloat(event.value[0]).toPrecision(3);
   // number
-  var elemId = 'opacity-' + event.dataindex + '-number';
+  var elemId = 'opacity-' + event.dataid + '-number';
   var elem = document.getElementById(elemId);
   if (elem) {
     elem.value = value;
@@ -626,7 +626,7 @@ function onOpacityChange(event) {
     console.warn('opacity change: HTML not ready?');
   }
   // range
-  elemId = 'opacity-' + event.dataindex + '-range';
+  elemId = 'opacity-' + event.dataid + '-range';
   elem = document.getElementById(elemId);
   if (elem) {
     elem.value = value;

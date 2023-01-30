@@ -6,13 +6,16 @@ dwv.ctrl = dwv.ctrl || {};
  * View controller.
  *
  * @param {dwv.image.View} view The associated view.
+ * @param {number} index The associated data index.
  * @class
  */
-dwv.ctrl.ViewController = function (view) {
+dwv.ctrl.ViewController = function (view, index) {
   // closure to self
   var self = this;
   // third dimension player ID (created by setInterval)
   var playerID = null;
+  // associated data index
+  var dataIndex = index;
 
   // check view
   if (typeof view.getImage() === 'undefined') {
@@ -25,6 +28,14 @@ dwv.ctrl.ViewController = function (view) {
     view.getImage().getGeometry().getOrientation(),
     view.getOrientation()
   );
+
+  /**
+   * Listener handler.
+   *
+   * @private
+   * @type {object}
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
    * Get the plane helper.
@@ -175,9 +186,11 @@ dwv.ctrl.ViewController = function (view) {
    * Set the associated image.
    *
    * @param {Image} img The associated image.
+   * @param {number} index The data index of the image.
    */
-  this.setImage = function (img) {
+  this.setImage = function (img, index) {
     view.setImage(img);
+    dataIndex = index;
   };
 
   /**
@@ -635,5 +648,38 @@ dwv.ctrl.ViewController = function (view) {
     // enable it
     this.setColourMap(dwv.tool.colourMaps[name]);
   };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    event.dataid = dataIndex;
+    listenerHandler.fireEvent(event);
+  }
 
 }; // class ViewController

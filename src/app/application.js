@@ -1274,13 +1274,17 @@ dwv.App = function () {
 
     // view layer
     var viewLayer = layerGroup.addViewLayer();
-    viewLayer.setView(view);
+    viewLayer.setView(view, dataIndex);
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
-    viewLayer.initialise(size2D, spacing2D, dataIndex, opacity);
+    viewLayer.initialise(size2D, spacing2D, opacity);
 
     // listen to image changes
-    dataController.addEventListener('imagechange', viewLayer.onimagechange);
+    dataController.addEventListener('imageset', viewLayer.onimageset);
+    dataController.addEventListener('imagechange', function (event) {
+      viewLayer.onimagechange(event);
+      self.render(event.dataid);
+    });
 
     // bind
     stage.bindLayerGroups();

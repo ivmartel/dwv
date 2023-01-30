@@ -60,10 +60,14 @@ dwv.ctrl.DataController = function () {
    */
   this.setImage = function (index, image) {
     data[index].image = image;
+    // fire image set
     fireEvent({
-      type: 'imagechange',
-      value: [index, image]
+      type: 'imageset',
+      value: [image],
+      dataid: index
     });
+    // listen to image change
+    image.addEventListener('imagechange', getFireEvent(index));
   };
 
   /**
@@ -82,6 +86,8 @@ dwv.ctrl.DataController = function () {
       image: image,
       meta: getMetaObject(meta)
     };
+    // listen to image change
+    image.addEventListener('imagechange', getFireEvent(index));
   };
 
   /**
@@ -143,6 +149,20 @@ dwv.ctrl.DataController = function () {
    */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
+  }
+
+  /**
+   * Get a fireEvent function that adds the input index
+   * to the event value.
+   *
+   * @param {number} index The data index.
+   * @returns {Function} A fireEvent function.
+   */
+  function getFireEvent(index) {
+    return function (event) {
+      event.dataid = index;
+      fireEvent(event);
+    };
   }
 
   /**

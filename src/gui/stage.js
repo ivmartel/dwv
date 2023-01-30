@@ -11,7 +11,7 @@ dwv.gui.WindowLevelBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         var vc = viewLayers[0].getViewController();
         vc.setWindowLevel(event.value[0], event.value[1]);
@@ -106,11 +106,11 @@ dwv.gui.OpacityBinder = function () {
   this.getCallback = function (layerGroup) {
     return function (event) {
       // exit if no data index
-      if (typeof event.dataindex === 'undefined') {
+      if (typeof event.dataid === 'undefined') {
         return;
       }
       // propagate to first view layer
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();

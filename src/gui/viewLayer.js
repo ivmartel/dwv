@@ -198,8 +198,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Set the associated view.
    *
    * @param {object} view The view.
+   * @param {number} index The associated data index.
    */
-  this.setView = function (view) {
+  this.setView = function (view, index) {
+    dataIndex = index;
     // local listeners
     view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
@@ -210,7 +212,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
       view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
     // create view controller
-    viewController = new dwv.ctrl.ViewController(view);
+    viewController = new dwv.ctrl.ViewController(view, index);
   };
 
   /**
@@ -232,15 +234,27 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Handle an image set event.
+   *
+   * @param {object} event The event.
+   */
+  this.onimageset = function (event) {
+    // event.value = [index, image]
+    if (dataIndex === event.dataid) {
+      viewController.setImage(event.value[0], dataIndex);
+      setBaseSize(viewController.getImageSize().get2D());
+      needsDataUpdate = true;
+    }
+  };
+
+  /**
    * Handle an image change event.
    *
    * @param {object} event The event.
    */
   this.onimagechange = function (event) {
-    // event.value = [index, image]
-    if (dataIndex === event.value[0]) {
-      viewController.setImage(event.value[1]);
-      setBaseSize(viewController.getImageSize().get2D());
+    // event.value = [index]
+    if (dataIndex === event.dataid) {
       needsDataUpdate = true;
     }
   };
@@ -592,13 +606,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
    *
    * @param {object} size The image size as {x,y}.
    * @param {object} spacing The image spacing as {x,y}.
-   * @param {number} index The associated data index.
    * @param {number} alpha The initial data opacity.
    */
-  this.initialise = function (size, spacing, index, alpha) {
+  this.initialise = function (size, spacing, alpha) {
     // set locals
     baseSpacing = spacing;
-    dataIndex = index;
     opacity = Math.min(Math.max(alpha, 0), 1);
 
     // create canvas
@@ -774,7 +786,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   function fireEvent(event) {
     event.srclayerid = self.getId();
-    event.dataindex = dataIndex;
+    event.dataid = dataIndex;
     listenerHandler.fireEvent(event);
   }
 

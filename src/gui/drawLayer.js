@@ -523,7 +523,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    */
   function fireEvent(event) {
     event.srclayerid = self.getId();
-    event.dataindex = dataIndex;
+    event.dataid = dataIndex;
     listenerHandler.fireEvent(event);
   }
 
