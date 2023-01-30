@@ -227,6 +227,35 @@ dwv.test.viewerSetup = function () {
   // default keyboard shortcuts
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
+    // mask segment related
+    if (!isNaN(parseInt(event.key, 10))) {
+      var vc =
+        _app.getActiveLayerGroup().getActiveViewLayer().getViewController();
+      if (!vc.isMask()) {
+        return;
+      }
+      let number = parseInt(event.key, 10);
+      var segHelper = vc.getMaskSegmentHelper();
+      if (segHelper.hasSegment(number)) {
+        var segment = segHelper.getSegment(number);
+        if (event.ctrlKey) {
+          if (event.altKey) {
+            dwv.logger.debug('Delete segment: ' + segment.label);
+            // delete
+            vc.deleteSegment(number, _app.addToUndoStack);
+          } else {
+            dwv.logger.debug('Show/hide segment: ' + segment.label);
+            // show/hide the selected segment
+            if (segHelper.isHidden(number)) {
+              segHelper.removeFromHidden(number);
+            } else {
+              segHelper.addToHidden(number);
+            }
+            vc.applyHiddenSegments();
+          }
+        }
+      }
+    }
   });
   // default on resize
   window.addEventListener('resize', function () {

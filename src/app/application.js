@@ -1278,6 +1278,13 @@ dwv.App = function () {
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, opacity);
+    var viewController = viewLayer.getViewController();
+
+    // listen to controller events
+    if (data.image.getMeta().Modality === 'SEG') {
+      viewController.addEventListener('masksegmentdelete', fireEvent);
+      viewController.addEventListener('masksegmentredraw', fireEvent);
+    }
 
     // listen to image changes
     dataController.addEventListener('imageset', viewLayer.onimageset);
@@ -1299,10 +1306,10 @@ dwv.App = function () {
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
 
       // force positionchange to sync layers
-      var vc = viewLayer.getViewController();
+
       var value = [
-        vc.getCurrentIndex().getValues(),
-        vc.getCurrentPosition().getValues()
+        viewController.getCurrentIndex().getValues(),
+        viewController.getCurrentPosition().getValues()
       ];
       layerGroup.updateLayersToPositionChange({
         value: value,

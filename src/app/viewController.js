@@ -29,6 +29,12 @@ dwv.ctrl.ViewController = function (view, index) {
     view.getOrientation()
   );
 
+  // mask segment helper
+  var maskSegmentHelper;
+  if (view.getImage().getMeta().Modality === 'SEG') {
+    maskSegmentHelper = new dwv.image.MaskSegmentHelper(view.getImage());
+  }
+
   /**
    * Listener handler.
    *
@@ -44,6 +50,46 @@ dwv.ctrl.ViewController = function (view, index) {
    */
   this.getPlaneHelper = function () {
     return planeHelper;
+  };
+
+  /**
+   * Check is the associated image is a mask.
+   *
+   * @returns {boolean} True if the associated image is a mask.
+   */
+  this.isMask = function () {
+    return typeof maskSegmentHelper !== 'undefined';
+  };
+
+  /**
+   * Get the mask segment helper.
+   *
+   * @returns {object} The helper.
+   */
+  this.getMaskSegmentHelper = function () {
+    return maskSegmentHelper;
+  };
+
+  /**
+   * Apply the hidden segments list by setting
+   * the corresponding alpha function.
+   */
+  this.applyHiddenSegments = function () {
+    if (this.isMask) {
+      this.setViewAlphaFunction(maskSegmentHelper.getAlphaFunc());
+    }
+  };
+
+  /**
+   * Delete a segment.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @param {Function} exeCallback The post execution callback.
+   */
+  this.deleteSegment = function (segmentNumber, exeCallback) {
+    if (this.isMask) {
+      maskSegmentHelper.deleteSegment(segmentNumber, fireEvent, exeCallback);
+    }
   };
 
   /**
