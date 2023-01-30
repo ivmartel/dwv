@@ -374,6 +374,39 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Get the offsets where the buffer equals the input value.
+   * Loops through the whole volume, can get long for big data...
+   *
+   * @param {number|object} value The value to check.
+   * @returns {Array} The list of offsets.
+   */
+  this.getOffsets = function (value) {
+    // value to array
+    if (numberOfComponents === 1) {
+      value = [value];
+    } else if (numberOfComponents === 3 &&
+      typeof value.r !== 'undefined') {
+      value = [value.r, value.g, value.b];
+    }
+    // main loop
+    var offsets = [];
+    var equal;
+    for (var i = 0; i < buffer.length; i = i + numberOfComponents) {
+      equal = true;
+      for (var j = 0; j < numberOfComponents; ++j) {
+        if (buffer[i + j] !== value[j]) {
+          equal = false;
+          break;
+        }
+      }
+      if (equal) {
+        offsets.push(i);
+      }
+    }
+    return offsets;
+  };
+
+  /**
    * Clone the image.
    *
    * @returns {Image} A clone of this image.
@@ -675,6 +708,129 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
+
+  // ****************************************
+  // image data modifiers... carefull...
+  // ****************************************
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsets List of offsets where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsets = function (offsets, value) {
+    var offset;
+    for (var i = 0, leni = offsets.length; i < leni; ++i) {
+      offset = offsets[i];
+      buffer[offset] = value.r;
+      buffer[offset + 1] = value.g;
+      buffer[offset + 2] = value.b;
+    }
+    // fire imagechange
+    fireEvent({type: 'imagechange'});
+  };
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @returns {Array} A list of objects representing the original values before
+   *  replacing them.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsetsAndGetOriginals = function (offsetsLists, value) {
+    var originalColoursLists = [];
+
+    // update and store
+    for (let j = 0; j < offsetsLists.length; ++j) {
+      const offsets = offsetsLists[j];
+      // first colour
+      let offset = offsets[0] * 3;
+      let previousColour = {
+        r: buffer[offset],
+        g: buffer[offset + 1],
+        b: buffer[offset + 2]
+      };
+      // original value storage
+      const originalColours = [];
+      originalColours.push({
+        index: 0,
+        colour: previousColour
+      });
+      for (let i = 0; i < offsets.length; ++i) {
+        offset = offsets[i] * 3;
+        const currentColour = {
+          r: buffer[offset],
+          g: buffer[offset + 1],
+          b: buffer[offset + 2]
+        };
+        // check if new colour
+        if (previousColour.r !== currentColour.r ||
+          previousColour.g !== currentColour.g ||
+          previousColour.b !== currentColour.b) {
+          // store new colour
+          originalColours.push({
+            index: i,
+            colour: currentColour
+          });
+          previousColour = currentColour;
+        }
+        // write update colour
+        buffer[offset] = value.r;
+        buffer[offset + 1] = value.g;
+        buffer[offset + 2] = value.b;
+      }
+      originalColoursLists.push(originalColours);
+    }
+    // fire imagechange
+    fireEvent({type: 'imagechange'});
+    return originalColoursLists;
+  };
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object|Array} value The value to set at the given offsets.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsetsWithIterator = function (offsetsLists, value) {
+    for (let j = 0; j < offsetsLists.length; ++j) {
+      const offsets = offsetsLists[j];
+      let iterator;
+      if (typeof value !== 'undefined' &&
+        typeof value.r !== 'undefined') {
+        // input value is a simple color
+        iterator = new dwv.image.colourRange(
+          [{index: 0, colour: value}], offsets.length);
+      } else {
+        // input value is a list of iterators
+        // created by setAtOffsetsAndGetOriginals
+        iterator = new dwv.image.colourRange(
+          value[j], offsets.length);
+      }
+
+      // set values
+      let ival = iterator.next();
+      while (!ival.done) {
+        const offset = offsets[ival.index] * 3;
+        buffer[offset] = ival.value.r;
+        buffer[offset + 1] = ival.value.g;
+        buffer[offset + 2] = ival.value.b;
+        ival = iterator.next();
+      }
+    }
+    /**
+     * Image change event.
+     *
+     * @event dwv.image.Image#imagechange
+     * @type {object}
+     */
+    fireEvent({type: 'imagechange'});
+  };
 };
 
 /**
