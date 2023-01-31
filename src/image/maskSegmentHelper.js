@@ -125,7 +125,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {number} segmentNumber The segment number.
    */
   this.removeFromHidden = function (segmentNumber) {
-    const index = getHiddenIndex(segmentNumber);
+    var index = getHiddenIndex(segmentNumber);
     if (index !== -1) {
       hiddenSegments.splice(index, 1);
     } else {
@@ -140,9 +140,9 @@ dwv.image.MaskSegmentHelper = function (mask) {
    */
   this.getAlphaFunc = function () {
     // get colours
-    const hiddenColours = [{r: 0, g: 0, b: 0}];
-    for (let i = 0; i < hiddenSegments.length; ++i) {
-      const segment = this.getSegment(hiddenSegments[i]);
+    var hiddenColours = [{r: 0, g: 0, b: 0}];
+    for (var i = 0; i < hiddenSegments.length; ++i) {
+      var segment = this.getSegment(hiddenSegments[i]);
       if (typeof segment !== 'undefined') {
         hiddenColours.push(segment.displayValue);
       }
@@ -150,7 +150,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
 
     // create alpha function
     return function (value/*, index*/) {
-      for (let i = 0; i < hiddenColours.length; ++i) {
+      for (var i = 0; i < hiddenColours.length; ++i) {
         if (value[0] === hiddenColours[i].r &&
           value[1] === hiddenColours[i].g &&
           value[2] === hiddenColours[i].b) {
@@ -170,7 +170,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {Function} exeCallback The post execution callback.
    */
   this.deleteSegment = function (segmentNumber, cmdCallback, exeCallback) {
-    const delcmd = new dwv.image.DeleteSegmentCommand(
+    var delcmd = new dwv.image.DeleteSegmentCommand(
       mask, this.getSegment(segmentNumber));
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
@@ -195,10 +195,10 @@ dwv.image.MaskSegmentHelper = function (mask) {
  * @class
  */
 dwv.image.DeleteSegmentCommand = function (mask, segment, silent) {
-  const isSilent = (typeof silent === 'undefined') ? false : silent;
+  var isSilent = (typeof silent === 'undefined') ? false : silent;
 
   // list of offsets with the colour to delete
-  const offsets = mask.getOffsets(segment.displayValue);
+  var offsets = mask.getOffsets(segment.displayValue);
 
   /**
    * Get the command name.

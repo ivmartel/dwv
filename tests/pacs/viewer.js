@@ -234,7 +234,7 @@ dwv.test.viewerSetup = function () {
       if (!vc.isMask()) {
         return;
       }
-      let number = parseInt(event.key, 10);
+      var number = parseInt(event.key, 10);
       var segHelper = vc.getMaskSegmentHelper();
       if (segHelper.hasSegment(number)) {
         var segment = segHelper.getSegment(number);

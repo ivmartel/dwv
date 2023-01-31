@@ -745,24 +745,24 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     var originalColoursLists = [];
 
     // update and store
-    for (let j = 0; j < offsetsLists.length; ++j) {
-      const offsets = offsetsLists[j];
+    for (var j = 0; j < offsetsLists.length; ++j) {
+      var offsets = offsetsLists[j];
       // first colour
-      let offset = offsets[0] * 3;
-      let previousColour = {
+      var offset = offsets[0] * 3;
+      var previousColour = {
         r: buffer[offset],
         g: buffer[offset + 1],
         b: buffer[offset + 2]
       };
       // original value storage
-      const originalColours = [];
+      var originalColours = [];
       originalColours.push({
         index: 0,
         colour: previousColour
       });
-      for (let i = 0; i < offsets.length; ++i) {
+      for (var i = 0; i < offsets.length; ++i) {
         offset = offsets[i] * 3;
-        const currentColour = {
+        var currentColour = {
           r: buffer[offset],
           g: buffer[offset + 1],
           b: buffer[offset + 2]
@@ -798,9 +798,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * @fires dwv.image.Image#imagechange
    */
   this.setAtOffsetsWithIterator = function (offsetsLists, value) {
-    for (let j = 0; j < offsetsLists.length; ++j) {
-      const offsets = offsetsLists[j];
-      let iterator;
+    for (var j = 0; j < offsetsLists.length; ++j) {
+      var offsets = offsetsLists[j];
+      var iterator;
       if (typeof value !== 'undefined' &&
         typeof value.r !== 'undefined') {
         // input value is a simple color
@@ -814,9 +814,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
 
       // set values
-      let ival = iterator.next();
+      var ival = iterator.next();
       while (!ival.done) {
-        const offset = offsets[ival.index] * 3;
+        var offset = offsets[ival.index] * 3;
         buffer[offset] = ival.value.r;
         buffer[offset + 1] = ival.value.g;
         buffer[offset + 2] = ival.value.b;
