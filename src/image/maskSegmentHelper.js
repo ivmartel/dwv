@@ -36,6 +36,12 @@ dwv.image.MaskSegmentHelper = function (mask) {
     return typeof this.getSegment(segmentNumber) !== 'undefined';
   };
 
+  /**
+   * Check if a segment is present in a mask image.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @returns {boolean} True if the segment is present in the mask.
+   */
   this.maskHasSegment = function (segmentNumber) {
     var segment = this.getSegment(segmentNumber);
     if (typeof segment === 'undefined') {
@@ -76,6 +82,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
 
   /**
    * Set the hidden segment list.
+   * TODO: not sure if needed...
    *
    * @param {Array} list The list of hidden segment numbers.
    */
