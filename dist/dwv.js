@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.22 2023-01-18 18:57:53 */
+/*! dwv 0.31.0-beta.23 2023-01-31 09:43:24 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -811,27 +811,6 @@ dwv.App = function () {
   };
 
   /**
-   * Get the list of drawing display details.
-   *
-   * @returns {object} The list of draw details including id, position...
-   */
-  this.getDrawDisplayDetails = function () {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    return drawController.getDrawDisplayDetails();
-  };
-
-  /**
-   * Get a list of drawing store details.
-   *
-   * @returns {object} A list of draw details including id, text, quant...
-   */
-  this.getDrawStoreDetails = function () {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    return drawController.getDrawStoreDetails();
-  };
-  /**
    * Set the drawings on the current stage.
    *
    * @param {Array} drawings An array of drawings.
@@ -850,55 +829,6 @@ dwv.App = function () {
     drawController.activateDrawLayer(
       viewController.getCurrentOrientedIndex(),
       viewController.getScrollIndex());
-  };
-  /**
-   * Update a drawing from its details.
-   *
-   * @param {object} drawDetails Details of the drawing to update.
-   */
-  this.updateDraw = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.updateDraw(drawDetails);
-  };
-  /**
-   * Delete a draw.
-   *
-   * @param {object} drawDetails Details of the drawing to check.
-   */
-  this.deleteDraw = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.deleteDraw(drawDetails, fireEvent, this.addToUndoStack);
-  };
-  /**
-   * Delete all Draws from all layers.
-   */
-  this.deleteDraws = function () {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.deleteDraws(fireEvent, this.addToUndoStack);
-  };
-  /**
-   * Check the visibility of a given group.
-   *
-   * @param {object} drawDetails Details of the drawing to check.
-   * @returns {boolean} True if the group is visible.
-   */
-  this.isGroupVisible = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    return drawController.isGroupVisible(drawDetails);
-  };
-  /**
-   * Toggle group visibility.
-   *
-   * @param {object} drawDetails Details of the drawing to update.
-   */
-  this.toogleGroupVisibility = function (drawDetails) {
-    var drawController =
-      stage.getActiveLayerGroup().getActiveDrawLayer().getDrawController();
-    drawController.toogleGroupVisibility(drawDetails);
   };
 
   /**
@@ -1326,6 +1256,11 @@ dwv.App = function () {
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       group.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
+    // propagate drawLayer events
+    if (toolboxController.hasTool('Draw')) {
+      group.addEventListener('drawcreate', fireEvent);
+      group.addEventListener('drawdelete', fireEvent);
+    }
   }
 
   /**
@@ -1413,13 +1348,24 @@ dwv.App = function () {
 
     // view layer
     var viewLayer = layerGroup.addViewLayer();
-    viewLayer.setView(view);
+    viewLayer.setView(view, dataIndex);
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
-    viewLayer.initialise(size2D, spacing2D, dataIndex, opacity);
+    viewLayer.initialise(size2D, spacing2D, opacity);
+    var viewController = viewLayer.getViewController();
+
+    // listen to controller events
+    if (data.image.getMeta().Modality === 'SEG') {
+      viewController.addEventListener('masksegmentdelete', fireEvent);
+      viewController.addEventListener('masksegmentredraw', fireEvent);
+    }
 
     // listen to image changes
-    dataController.addEventListener('imagechange', viewLayer.onimagechange);
+    dataController.addEventListener('imageset', viewLayer.onimageset);
+    dataController.addEventListener('imagechange', function (event) {
+      viewLayer.onimagechange(event);
+      self.render(event.dataid);
+    });
 
     // bind
     stage.bindLayerGroups();
@@ -1434,10 +1380,10 @@ dwv.App = function () {
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
 
       // force positionchange to sync layers
-      var vc = viewLayer.getViewController();
+
       var value = [
-        vc.getCurrentIndex().getValues(),
-        vc.getCurrentPosition().getValues()
+        viewController.getCurrentIndex().getValues(),
+        viewController.getCurrentPosition().getValues()
       ];
       layerGroup.updateLayersToPositionChange({
         value: value,
@@ -1556,10 +1502,14 @@ dwv.ctrl.DataController = function () {
    */
   this.setImage = function (index, image) {
     data[index].image = image;
+    // fire image set
     fireEvent({
-      type: 'imagechange',
-      value: [index, image]
+      type: 'imageset',
+      value: [image],
+      dataid: index
     });
+    // listen to image change
+    image.addEventListener('imagechange', getFireEvent(index));
   };
 
   /**
@@ -1578,6 +1528,8 @@ dwv.ctrl.DataController = function () {
       image: image,
       meta: getMetaObject(meta)
     };
+    // listen to image change
+    image.addEventListener('imagechange', getFireEvent(index));
   };
 
   /**
@@ -1639,6 +1591,20 @@ dwv.ctrl.DataController = function () {
    */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
+  }
+
+  /**
+   * Get a fireEvent function that adds the input index
+   * to the event value.
+   *
+   * @param {number} index The data index.
+   * @returns {Function} A fireEvent function.
+   */
+  function getFireEvent(index) {
+    return function (event) {
+      event.dataid = index;
+      fireEvent(event);
+    };
   }
 
   /**
@@ -1834,6 +1800,21 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
+   * Get a Konva group using its id.
+   *
+   * @param {string} id The group id.
+   * @returns {object|undefined} The Konva group.
+   */
+  this.getGroup = function (id) {
+    var group = konvaLayer.findOne('#' + id);
+    if (typeof group === 'undefined') {
+      dwv.logger.warn('Cannot find node with id: ' + id
+      );
+    }
+    return group;
+  };
+
+  /**
    * Activate the current draw layer.
    *
    * @param {dwv.math.Index} index The current position.
@@ -1888,8 +1869,11 @@ dwv.ctrl.DrawController = function (konvaLayer) {
           if (shape.closed()) {
             type = 'Roi';
           } else if (shapeExtrakids.length !== 0) {
-            if (shapeExtrakids[0].name().indexOf('triangle') !== -1) {
+            var extraName0 = shapeExtrakids[0].name();
+            if (extraName0.indexOf('triangle') !== -1) {
               type = 'Arrow';
+            } else if (extraName0.indexOf('arc') !== -1) {
+              type = 'Protractor';
             } else {
               type = 'Ruler';
             }
@@ -1911,7 +1895,7 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
-   * Get a list of drawing store details.
+   * Get a list of drawing store details. Used in state.
    *
    * @returns {object} A list of draw details including id, text, quant...
    * TODO Unify with getDrawDisplayDetails?
@@ -2068,73 +2052,6 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
-   * Check the visibility of a given group.
-   *
-   * @param {object} drawDetails Details of the group to check.
-   * @returns {boolean} True if the group is visible.
-   */
-  this.isGroupVisible = function (drawDetails) {
-    // get the group
-    var group = konvaLayer.findOne('#' + drawDetails.id);
-    if (typeof group === 'undefined') {
-      dwv.logger.warn(
-        '[isGroupVisible] Cannot find node with id: ' + drawDetails.id
-      );
-      return false;
-    }
-    // get visibility
-    return group.isVisible();
-  };
-
-  /**
-   * Toggle the visibility of a given group.
-   *
-   * @param {object} drawDetails Details of the group to update.
-   * @returns {boolean} False if the group cannot be found.
-   */
-  this.toogleGroupVisibility = function (drawDetails) {
-    // get the group
-    var group = konvaLayer.findOne('#' + drawDetails.id);
-    if (typeof group === 'undefined') {
-      dwv.logger.warn(
-        '[toogleGroupVisibility] Cannot find node with id: ' + drawDetails.id
-      );
-      return false;
-    }
-    // toggle visible
-    group.visible(!group.isVisible());
-
-    // udpate current layer
-    konvaLayer.draw();
-
-    return true;
-  };
-
-  /**
-   * Delete a Draw from the stage.
-   *
-   * @param {number} groupId The group id of the group to delete.
-   * @param {object} cmdCallback The DeleteCommand callback.
-   * @param {object} exeCallback The callback to call once the
-   *   DeleteCommand has been executed.
-   */
-  this.deleteDrawGroupId = function (groupId, cmdCallback, exeCallback) {
-    var groups = konvaLayer.getChildren();
-    var groupToDelete = groups.getChildren(function (node) {
-      return node.id() === groupId;
-    });
-    if (groupToDelete.length === 1) {
-      this.deleteDrawGroup(groupToDelete[0], cmdCallback, exeCallback);
-    } else if (groupToDelete.length === 0) {
-      dwv.logger.warn('Can\'t delete group with id:\'' + groupId +
-        '\', cannot find it.');
-    } else {
-      dwv.logger.warn('Can\'t delete group with id:\'' + groupId +
-        '\', too many with the same id.');
-    }
-  };
-
-  /**
    * Delete a Draw from the stage.
    *
    * @param {object} group The group to delete.
@@ -2150,25 +2067,23 @@ dwv.ctrl.DrawController = function (konvaLayer) {
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
+    // callback
     exeCallback(delcmd);
   };
 
   /**
    * Delete a Draw from the stage.
    *
-   * @param {object} drawDetails Details of the group to update.
+   * @param {string} id The id of the group to delete.
    * @param {object} cmdCallback The DeleteCommand callback.
    * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    * @returns {boolean} False if the group cannot be found.
    */
-  this.deleteDraw = function (drawDetails, cmdCallback, exeCallback) {
+  this.deleteDraw = function (id, cmdCallback, exeCallback) {
     // get the group
-    var group = konvaLayer.findOne('#' + drawDetails.id);
+    var group = this.getGroup(id);
     if (typeof group === 'undefined') {
-      dwv.logger.warn(
-        '[deleteDraw] Cannot find node with id: ' + drawDetails.id
-      );
       return false;
     }
     // delete
@@ -2703,13 +2618,16 @@ dwv.ctrl = dwv.ctrl || {};
  * View controller.
  *
  * @param {dwv.image.View} view The associated view.
+ * @param {number} index The associated data index.
  * @class
  */
-dwv.ctrl.ViewController = function (view) {
+dwv.ctrl.ViewController = function (view, index) {
   // closure to self
   var self = this;
   // third dimension player ID (created by setInterval)
   var playerID = null;
+  // associated data index
+  var dataIndex = index;
 
   // check view
   if (typeof view.getImage() === 'undefined') {
@@ -2723,6 +2641,20 @@ dwv.ctrl.ViewController = function (view) {
     view.getOrientation()
   );
 
+  // mask segment helper
+  var maskSegmentHelper;
+  if (view.getImage().getMeta().Modality === 'SEG') {
+    maskSegmentHelper = new dwv.image.MaskSegmentHelper(view.getImage());
+  }
+
+  /**
+   * Listener handler.
+   *
+   * @private
+   * @type {object}
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
   /**
    * Get the plane helper.
    *
@@ -2730,6 +2662,46 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.getPlaneHelper = function () {
     return planeHelper;
+  };
+
+  /**
+   * Check is the associated image is a mask.
+   *
+   * @returns {boolean} True if the associated image is a mask.
+   */
+  this.isMask = function () {
+    return typeof maskSegmentHelper !== 'undefined';
+  };
+
+  /**
+   * Get the mask segment helper.
+   *
+   * @returns {object} The helper.
+   */
+  this.getMaskSegmentHelper = function () {
+    return maskSegmentHelper;
+  };
+
+  /**
+   * Apply the hidden segments list by setting
+   * the corresponding alpha function.
+   */
+  this.applyHiddenSegments = function () {
+    if (this.isMask) {
+      this.setViewAlphaFunction(maskSegmentHelper.getAlphaFunc());
+    }
+  };
+
+  /**
+   * Delete a segment.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @param {Function} exeCallback The post execution callback.
+   */
+  this.deleteSegment = function (segmentNumber, exeCallback) {
+    if (this.isMask) {
+      maskSegmentHelper.deleteSegment(segmentNumber, fireEvent, exeCallback);
+    }
   };
 
   /**
@@ -2872,9 +2844,11 @@ dwv.ctrl.ViewController = function (view) {
    * Set the associated image.
    *
    * @param {Image} img The associated image.
+   * @param {number} index The data index of the image.
    */
-  this.setImage = function (img) {
+  this.setImage = function (img, index) {
     view.setImage(img);
+    dataIndex = index;
   };
 
   /**
@@ -3332,6 +3306,39 @@ dwv.ctrl.ViewController = function (view) {
     // enable it
     this.setColourMap(dwv.tool.colourMaps[name]);
   };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    event.dataid = dataIndex;
+    listenerHandler.fireEvent(event);
+  }
 
 }; // class ViewController
 
@@ -4756,7 +4763,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.22';
+  return '0.31.0-beta.23';
 };
 
 /**
@@ -12839,8 +12846,6 @@ dwv.gui.DrawLayer = function (containerDiv) {
 
   // konva stage
   var konvaStage = null;
-  // konva layer
-  var konvaLayer;
 
   /**
    * The layer base size as {x,y}.
@@ -12946,7 +12951,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @returns {object} The layer.
    */
   this.getKonvaLayer = function () {
-    return konvaLayer;
+    // there should only be one layer
+    return konvaStage.getLayers()[0];
   };
 
   /**
@@ -13156,7 +13162,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
     konvaStage.getContent().setAttribute('style', '');
 
     // create layer
-    konvaLayer = new Konva.Layer({
+    var konvaLayer = new Konva.Layer({
       listening: false,
       visible: true
     });
@@ -13203,6 +13209,64 @@ dwv.gui.DrawLayer = function (containerDiv) {
       x: viewOffset.x + baseOffset.x + zoomOffset.x,
       y: viewOffset.y + baseOffset.y + zoomOffset.y
     });
+  };
+
+  /**
+   * Check the visibility of a given group.
+   *
+   * @param {string} id The id of the group.
+   * @returns {boolean} True if the group is visible.
+   */
+  this.isGroupVisible = function (id) {
+    // get the group
+    var group = drawController.getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // get visibility
+    return group.isVisible();
+  };
+
+  /**
+   * Toggle the visibility of a given group.
+   *
+   * @param {string} id The id of the group.
+   * @returns {boolean} False if the group cannot be found.
+   */
+  this.toogleGroupVisibility = function (id) {
+    // get the group
+    var group = drawController.getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // toggle visible
+    group.visible(!group.isVisible());
+
+    // udpate
+    this.draw();
+
+    return true;
+  };
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @param {string} id The id of the group to delete.
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  this.deleteDraw = function (id, exeCallback) {
+    drawController.deleteDraw(id, fireEvent, exeCallback);
+  };
+
+  /**
+   * Delete all Draws from the stage.
+   *
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  this.deleteDraws = function (exeCallback) {
+    drawController.deleteDraws(fireEvent, exeCallback);
   };
 
   /**
@@ -13277,7 +13341,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    */
   function fireEvent(event) {
     event.srclayerid = self.getId();
-    event.dataindex = dataIndex;
+    event.dataid = dataIndex;
     listenerHandler.fireEvent(event);
   }
 
@@ -13993,6 +14057,8 @@ dwv.gui.LayerGroup = function (containerDiv) {
     var layer = new dwv.gui.DrawLayer(div);
     // add layer
     layers.push(layer);
+    // bind draw layer events
+    bindDrawLayer(layer);
     // return
     return layer;
   };
@@ -14013,6 +14079,17 @@ dwv.gui.LayerGroup = function (containerDiv) {
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', fireEvent);
     viewLayer.addEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Bind draw layer events to this.
+   *
+   * @param {object} drawLayer The draw layer to bind.
+   */
+  function bindDrawLayer(drawLayer) {
+    // propagate drawLayer events
+    drawLayer.addEventListener('drawcreate', fireEvent);
+    drawLayer.addEventListener('drawdelete', fireEvent);
   }
 
   /**
@@ -14441,7 +14518,7 @@ dwv.gui.WindowLevelBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         var vc = viewLayers[0].getViewController();
         vc.setWindowLevel(event.value[0], event.value[1]);
@@ -14536,11 +14613,11 @@ dwv.gui.OpacityBinder = function () {
   this.getCallback = function (layerGroup) {
     return function (event) {
       // exit if no data index
-      if (typeof event.dataindex === 'undefined') {
+      if (typeof event.dataid === 'undefined') {
         return;
       }
       // propagate to first view layer
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
@@ -15310,8 +15387,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Set the associated view.
    *
    * @param {object} view The view.
+   * @param {number} index The associated data index.
    */
-  this.setView = function (view) {
+  this.setView = function (view, index) {
+    dataIndex = index;
     // local listeners
     view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
@@ -15322,7 +15401,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
       view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
     // create view controller
-    viewController = new dwv.ctrl.ViewController(view);
+    viewController = new dwv.ctrl.ViewController(view, index);
   };
 
   /**
@@ -15344,15 +15423,27 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Handle an image set event.
+   *
+   * @param {object} event The event.
+   */
+  this.onimageset = function (event) {
+    // event.value = [index, image]
+    if (dataIndex === event.dataid) {
+      viewController.setImage(event.value[0], dataIndex);
+      setBaseSize(viewController.getImageSize().get2D());
+      needsDataUpdate = true;
+    }
+  };
+
+  /**
    * Handle an image change event.
    *
    * @param {object} event The event.
    */
   this.onimagechange = function (event) {
-    // event.value = [index, image]
-    if (dataIndex === event.value[0]) {
-      viewController.setImage(event.value[1]);
-      setBaseSize(viewController.getImageSize().get2D());
+    // event.value = [index]
+    if (dataIndex === event.dataid) {
       needsDataUpdate = true;
     }
   };
@@ -15704,13 +15795,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
    *
    * @param {object} size The image size as {x,y}.
    * @param {object} spacing The image spacing as {x,y}.
-   * @param {number} index The associated data index.
    * @param {number} alpha The initial data opacity.
    */
-  this.initialise = function (size, spacing, index, alpha) {
+  this.initialise = function (size, spacing, alpha) {
     // set locals
     baseSpacing = spacing;
-    dataIndex = index;
     opacity = Math.min(Math.max(alpha, 0), 1);
 
     // create canvas
@@ -15886,7 +15975,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   function fireEvent(event) {
     event.srclayerid = self.getId();
-    event.dataindex = dataIndex;
+    event.dataid = dataIndex;
     listenerHandler.fireEvent(event);
   }
 
@@ -18175,6 +18264,39 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Get the offsets where the buffer equals the input value.
+   * Loops through the whole volume, can get long for big data...
+   *
+   * @param {number|object} value The value to check.
+   * @returns {Array} The list of offsets.
+   */
+  this.getOffsets = function (value) {
+    // value to array
+    if (numberOfComponents === 1) {
+      value = [value];
+    } else if (numberOfComponents === 3 &&
+      typeof value.r !== 'undefined') {
+      value = [value.r, value.g, value.b];
+    }
+    // main loop
+    var offsets = [];
+    var equal;
+    for (var i = 0; i < buffer.length; i = i + numberOfComponents) {
+      equal = true;
+      for (var j = 0; j < numberOfComponents; ++j) {
+        if (buffer[i + j] !== value[j]) {
+          equal = false;
+          break;
+        }
+      }
+      if (equal) {
+        offsets.push(i);
+      }
+    }
+    return offsets;
+  };
+
+  /**
    * Clone the image.
    *
    * @returns {Image} A clone of this image.
@@ -18476,6 +18598,129 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
+
+  // ****************************************
+  // image data modifiers... carefull...
+  // ****************************************
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsets List of offsets where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsets = function (offsets, value) {
+    var offset;
+    for (var i = 0, leni = offsets.length; i < leni; ++i) {
+      offset = offsets[i];
+      buffer[offset] = value.r;
+      buffer[offset + 1] = value.g;
+      buffer[offset + 2] = value.b;
+    }
+    // fire imagechange
+    fireEvent({type: 'imagechange'});
+  };
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @returns {Array} A list of objects representing the original values before
+   *  replacing them.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsetsAndGetOriginals = function (offsetsLists, value) {
+    var originalColoursLists = [];
+
+    // update and store
+    for (var j = 0; j < offsetsLists.length; ++j) {
+      var offsets = offsetsLists[j];
+      // first colour
+      var offset = offsets[0] * 3;
+      var previousColour = {
+        r: buffer[offset],
+        g: buffer[offset + 1],
+        b: buffer[offset + 2]
+      };
+      // original value storage
+      var originalColours = [];
+      originalColours.push({
+        index: 0,
+        colour: previousColour
+      });
+      for (var i = 0; i < offsets.length; ++i) {
+        offset = offsets[i] * 3;
+        var currentColour = {
+          r: buffer[offset],
+          g: buffer[offset + 1],
+          b: buffer[offset + 2]
+        };
+        // check if new colour
+        if (previousColour.r !== currentColour.r ||
+          previousColour.g !== currentColour.g ||
+          previousColour.b !== currentColour.b) {
+          // store new colour
+          originalColours.push({
+            index: i,
+            colour: currentColour
+          });
+          previousColour = currentColour;
+        }
+        // write update colour
+        buffer[offset] = value.r;
+        buffer[offset + 1] = value.g;
+        buffer[offset + 2] = value.b;
+      }
+      originalColoursLists.push(originalColours);
+    }
+    // fire imagechange
+    fireEvent({type: 'imagechange'});
+    return originalColoursLists;
+  };
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object|Array} value The value to set at the given offsets.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsetsWithIterator = function (offsetsLists, value) {
+    for (var j = 0; j < offsetsLists.length; ++j) {
+      var offsets = offsetsLists[j];
+      var iterator;
+      if (typeof value !== 'undefined' &&
+        typeof value.r !== 'undefined') {
+        // input value is a simple color
+        iterator = new dwv.image.colourRange(
+          [{index: 0, colour: value}], offsets.length);
+      } else {
+        // input value is a list of iterators
+        // created by setAtOffsetsAndGetOriginals
+        iterator = new dwv.image.colourRange(
+          value[j], offsets.length);
+      }
+
+      // set values
+      var ival = iterator.next();
+      while (!ival.done) {
+        var offset = offsets[ival.index] * 3;
+        buffer[offset] = ival.value.r;
+        buffer[offset + 1] = ival.value.g;
+        buffer[offset + 2] = ival.value.b;
+        ival = iterator.next();
+      }
+    }
+    /**
+     * Image change event.
+     *
+     * @event dwv.image.Image#imagechange
+     * @type {object}
+     */
+    fireEvent({type: 'imagechange'});
+  };
 };
 
 /**
@@ -20991,6 +21236,291 @@ dwv.image.MaskFactory.prototype.create = function (
   return image;
 };
 
+// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * Mask segment helper.
+ *
+ * @class
+ * @param {object} mask The associated mask image.
+ */
+dwv.image.MaskSegmentHelper = function (mask) {
+
+  /**
+   * The segments: array of segment description.
+   *
+   * @private
+   * @type {Array}
+   */
+  var segments = mask.getMeta().custom.segments;
+
+  /**
+   * List of ids of hidden segments.
+   *
+   * @private
+   * @type {Array}
+   */
+  var hiddenSegments = [];
+
+  /**
+   * Check if a segment is part of the inner segment list.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @returns {boolean} True if the segment is included.
+   */
+  this.hasSegment = function (segmentNumber) {
+    return typeof this.getSegment(segmentNumber) !== 'undefined';
+  };
+
+  this.maskHasSegment = function (segmentNumber) {
+    var segment = this.getSegment(segmentNumber);
+    if (typeof segment === 'undefined') {
+      return true;
+    }
+    return mask.getOffsets(segment.displayValue).length !== 0;
+  };
+
+  /**
+   * Get a segment from the inner segment list.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @returns {object} The segment.
+   */
+  this.getSegment = function (segmentNumber) {
+    return segments.find(function (item) {
+      return item.number === segmentNumber;
+    });
+  };
+
+  /**
+   * Get the inner segment list.
+   *
+   * @returns {Array} The list of segments.
+   */
+  this.getSegments = function () {
+    return segments;
+  };
+
+  /**
+   * Set the inner segment list.
+   *
+   * @param {Array} list The segment list.
+   */
+  this.setSegments = function (list) {
+    segments = list;
+  };
+
+  /**
+   * Set the hidden segment list.
+   *
+   * @param {Array} list The list of hidden segment numbers.
+   */
+  this.setHiddenSegments = function (list) {
+    hiddenSegments = list;
+  };
+
+  /**
+   * Get the index of a segment in the hidden list.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @returns {number|undefined} The index in the array.
+   */
+  function getHiddenIndex(segmentNumber) {
+    return hiddenSegments.findIndex(function (item) {
+      return item === segmentNumber;
+    });
+  }
+
+  /**
+   * Check if a segment is in the hidden list.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @returns {boolean} True if the segment is in the list.
+   */
+  this.isHidden = function (segmentNumber) {
+    return getHiddenIndex(segmentNumber) !== -1;
+  };
+
+  /**
+   * Add a segment to the hidden list.
+   *
+   * @param {number} segmentNumber The segment number.
+   */
+  this.addToHidden = function (segmentNumber) {
+    if (!this.isHidden(segmentNumber)) {
+      hiddenSegments.push(segmentNumber);
+    } else {
+      dwv.logger.warn(
+        'Segment is allready in the hidden list: ' + segmentNumber);
+    }
+  };
+
+  /**
+   * Remove a segment from the hidden list.
+   *
+   * @param {number} segmentNumber The segment number.
+   */
+  this.removeFromHidden = function (segmentNumber) {
+    var index = getHiddenIndex(segmentNumber);
+    if (index !== -1) {
+      hiddenSegments.splice(index, 1);
+    } else {
+      dwv.logger.warn('Segment is not in the hidden list: ' + segmentNumber);
+    }
+  };
+
+  /**
+   * Get the alpha function to apply hidden colors.
+   *
+   * @returns {Function} The corresponding alpha function.
+   */
+  this.getAlphaFunc = function () {
+    // get colours
+    var hiddenColours = [{r: 0, g: 0, b: 0}];
+    for (var i = 0; i < hiddenSegments.length; ++i) {
+      var segment = this.getSegment(hiddenSegments[i]);
+      if (typeof segment !== 'undefined') {
+        hiddenColours.push(segment.displayValue);
+      }
+    }
+
+    // create alpha function
+    return function (value/*, index*/) {
+      for (var i = 0; i < hiddenColours.length; ++i) {
+        if (value[0] === hiddenColours[i].r &&
+          value[1] === hiddenColours[i].g &&
+          value[2] === hiddenColours[i].b) {
+          return 0;
+        }
+      }
+      // default
+      return 255;
+    };
+  };
+
+  /**
+   * Delete a segment.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @param {Function} cmdCallback The command event callback.
+   * @param {Function} exeCallback The post execution callback.
+   */
+  this.deleteSegment = function (segmentNumber, cmdCallback, exeCallback) {
+    var delcmd = new dwv.image.DeleteSegmentCommand(
+      mask, this.getSegment(segmentNumber));
+    delcmd.onExecute = cmdCallback;
+    delcmd.onUndo = cmdCallback;
+    if (delcmd.isValid()) {
+      delcmd.execute();
+      // callback
+      exeCallback(delcmd);
+      // possibly hidden
+      if (this.isHidden(segmentNumber)) {
+        this.removeFromHidden(segmentNumber);
+      }
+    }
+  };
+};
+
+/**
+ * Delete segment command.
+ *
+ * @param {object} mask The mask image.
+ * @param {object} segment The segment to remove.
+ * @param {boolean} silent Whether to send a creation event or not.
+ * @class
+ */
+dwv.image.DeleteSegmentCommand = function (mask, segment, silent) {
+  var isSilent = (typeof silent === 'undefined') ? false : silent;
+
+  // list of offsets with the colour to delete
+  var offsets = mask.getOffsets(segment.displayValue);
+
+  /**
+   * Get the command name.
+   *
+   * @returns {string} The command name.
+   */
+  this.getName = function () {
+    return 'Delete-segment';
+  };
+
+  /**
+   * Check if a command is valid and can be executed.
+   *
+   * @returns {boolean} True if the command is valid.
+   */
+  this.isValid = function () {
+    return offsets.length !== 0;
+  };
+
+  /**
+   * Execute the command.
+   *
+   * @fires dwv.image.DeleteSegmentCommand#masksegmentdelete
+   */
+  this.execute = function () {
+    // remove
+    mask.setAtOffsets(offsets, {r: 0, g: 0, b: 0});
+
+    // callback
+    if (!isSilent) {
+      /**
+       * Segment delete event.
+       *
+       * @event dwv.image.DeleteSegmentCommand#masksegmentdelete
+       * @type {object}
+       * @property {number} segmentnumber The segment number.
+       */
+      this.onExecute({
+        type: 'masksegmentdelete',
+        segmentnumber: segment.number
+      });
+    }
+  };
+
+  /**
+   * Undo the command.
+   *
+   * @fires dwv.image.DeleteSegmentCommand#masksegmentredraw
+   */
+  this.undo = function () {
+    // re-draw
+    mask.setAtOffsets(offsets, segment.displayValue);
+
+    // callback
+    /**
+     * Segment redraw event.
+     *
+     * @event dwv.image.DeleteSegmentCommand#masksegmentredraw
+     * @type {object}
+     * @property {number} segmentnumber The segment number.
+     */
+    this.onUndo({
+      type: 'masksegmentredraw',
+      segmentnumber: segment.number
+    });
+  };
+}; // DeleteSegmentCommand class
+
+/**
+ * Handle an execute event.
+ *
+ * @param {object} _event The execute event with type and id.
+ */
+dwv.image.DeleteSegmentCommand.prototype.onExecute = function (_event) {
+  // default does nothing.
+};
+/**
+ * Handle an undo event.
+ *
+ * @param {object} _event The undo event with type and id.
+ */
+dwv.image.DeleteSegmentCommand.prototype.onUndo = function (_event) {
+  // default does nothing.
+};
 // namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
@@ -25083,8 +25613,9 @@ dwv.io.State = function () {
     var layerGroup = app.getActiveLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    var drawLayer = layerGroup.getActiveDrawLayer();
     var position = viewController.getCurrentIndex();
+    var drawLayer = layerGroup.getActiveDrawLayer();
+    var drawController = drawLayer.getDrawController();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
@@ -25094,7 +25625,7 @@ dwv.io.State = function () {
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
-      drawingsDetails: app.getDrawStoreDetails()
+      drawingsDetails: drawController.getDrawStoreDetails()
     });
   };
   /**
@@ -30857,6 +31388,8 @@ dwv.tool.Draw = function (app) {
         throw new Error('Could not find the shape label.');
       }
       var ktext = label.getText();
+      // id for event
+      var groupId = this.id();
 
       var onSaveCallback = function (meta) {
         // store meta
@@ -30868,7 +31401,8 @@ dwv.tool.Draw = function (app) {
 
         // trigger event
         fireEvent({
-          type: 'drawchange'
+          type: 'drawchange',
+          id: groupId
         });
         // draw
         konvaLayer.draw();
@@ -30941,7 +31475,9 @@ dwv.tool.Draw = function (app) {
    * @returns {Array} The list of event names.
    */
   this.getEventNames = function () {
-    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
+    return [
+      'drawcreate', 'drawchange', 'drawmove', 'drawdelete', 'drawlabelchange'
+    ];
   };
 
   /**
@@ -31362,7 +31898,8 @@ dwv.tool.ChangeGroupCommand = function (
      * @type {object}
      */
     this.onExecute({
-      type: 'drawchange'
+      type: 'drawchange',
+      id: endAnchor.getParent().id()
     });
   };
   /**
@@ -31377,7 +31914,8 @@ dwv.tool.ChangeGroupCommand = function (
     layer.draw();
     // callback
     this.onUndo({
-      type: 'drawchange'
+      type: 'drawchange',
+      id: startAnchor.getParent().id()
     });
   };
 }; // ChangeGroupCommand class
