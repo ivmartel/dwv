@@ -174,12 +174,14 @@ dwv.image.MaskSegmentHelper = function (mask) {
       mask, this.getSegment(segmentNumber));
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
-    delcmd.execute();
-    // callback
-    exeCallback(delcmd);
-    // possibly hidden
-    if (this.isHidden(segmentNumber)) {
-      this.removeFromHidden(segmentNumber);
+    if (delcmd.isValid()) {
+      delcmd.execute();
+      // callback
+      exeCallback(delcmd);
+      // possibly hidden
+      if (this.isHidden(segmentNumber)) {
+        this.removeFromHidden(segmentNumber);
+      }
     }
   };
 };
@@ -204,7 +206,16 @@ dwv.image.DeleteSegmentCommand = function (mask, segment, silent) {
    * @returns {string} The command name.
    */
   this.getName = function () {
-    return 'Remove-segment';
+    return 'Delete-segment';
+  };
+
+  /**
+   * Check if a command is valid and can be executed.
+   *
+   * @returns {boolean} True if the command is valid.
+   */
+  this.isValid = function () {
+    return offsets.length !== 0;
   };
 
   /**
