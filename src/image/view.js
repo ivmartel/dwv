@@ -584,7 +584,6 @@ dwv.image.View = function (image) {
     }
 
     // all good
-    //console.log('[v] set cur index OUT');
     return true;
   };
 
