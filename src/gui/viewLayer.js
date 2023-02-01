@@ -739,7 +739,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
-      containerDiv.addEventListener(names[i], fireEvent);
+      containerDiv.addEventListener(names[i], fireEvent, {passive: true});
     }
   };
 

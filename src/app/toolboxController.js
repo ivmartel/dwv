@@ -197,13 +197,11 @@ dwv.ctrl.ToolboxController = function (toolList) {
         };
       } else if (eventType === 'touchend') {
         callback = function (event) {
-          event.preventDefault();
           applySelectedTool(event);
         };
       } else {
         // mouse or touch events
         callback = function (event) {
-          event.preventDefault();
           augmentEventOffsets(event);
           applySelectedTool(event);
         };

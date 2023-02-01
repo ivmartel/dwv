@@ -818,22 +818,18 @@ dwv.App = function () {
     var size = viewController.getImageSize();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
-        event.preventDefault();
         if (size.moreThanOne(3)) {
           viewController.decrementIndex(3);
         }
       } else if (event.keyCode === 38) { // crtl-arrow-up
-        event.preventDefault();
         if (viewController.canScroll()) {
           viewController.incrementScrollIndex();
         }
       } else if (event.keyCode === 39) { // crtl-arrow-right
-        event.preventDefault();
         if (size.moreThanOne(3)) {
           viewController.incrementIndex(3);
         }
       } else if (event.keyCode === 40) { // crtl-arrow-down
-        event.preventDefault();
         if (viewController.canScroll()) {
           viewController.decrementScrollIndex();
         }
@@ -842,7 +838,6 @@ dwv.App = function () {
       } else if (event.keyCode === 90) { // crtl-z
         undoStack.undo();
       } else if (event.code === 'Space') { // crtl-space
-        event.preventDefault();
         for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
           stage.getLayerGroup(i).setShowCrosshair(
             !stage.getLayerGroup(i).getShowCrosshair()
