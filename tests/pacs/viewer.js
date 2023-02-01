@@ -541,7 +541,7 @@ function setupToolsCheckboxes() {
       if (!event.ctrlKey &&
         !event.altKey &&
         !event.shiftKey &&
-        event.keyCode === char) {
+        event.key === char) {
         input.click();
       }
     };
@@ -568,7 +568,8 @@ function setupToolsCheckboxes() {
     toolsDiv.appendChild(label);
 
     // keyboard shortcut
-    window.addEventListener('keydown', getKeyCheck(key.charCodeAt(0), input));
+    console.log('key', key, key[0]);
+    window.addEventListener('keydown', getKeyCheck(key[0].toLowerCase(), input));
   }
 }
 

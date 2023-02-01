@@ -387,8 +387,10 @@ dwv.tool.Draw = function (app) {
     }
     var konvaLayer;
 
-    // press delete key
-    if (event.keyCode === 46 && shapeEditor.isActive()) {
+    // press delete or backspace key
+    if ((event.key === 'Delete' ||
+      event.key === 'Backspace') &&
+      shapeEditor.isActive()) {
       // get shape
       var shapeGroup = shapeEditor.getShape().getParent();
       konvaLayer = shapeGroup.getLayer();
@@ -404,7 +406,7 @@ dwv.tool.Draw = function (app) {
     }
 
     // escape key: exit shape creation
-    if (event.keyCode === 27 && tmpShapeGroup !== null) {
+    if (event.key === 'Escape' && tmpShapeGroup !== null) {
       konvaLayer = tmpShapeGroup.getLayer();
       // reset temporary shape group
       tmpShapeGroup.destroy();

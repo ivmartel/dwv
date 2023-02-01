@@ -817,27 +817,29 @@ dwv.App = function () {
       stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
     var size = viewController.getImageSize();
     if (event.ctrlKey) {
-      if (event.keyCode === 37) { // crtl-arrow-left
-        if (size.moreThanOne(3)) {
-          viewController.decrementIndex(3);
+      if (event.shiftKey) {
+        if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
+          if (size.moreThanOne(3)) {
+            viewController.decrementIndex(3);
+          }
+        } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
+          if (viewController.canScroll()) {
+            viewController.incrementScrollIndex();
+          }
+        } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
+          if (size.moreThanOne(3)) {
+            viewController.incrementIndex(3);
+          }
+        } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
+          if (viewController.canScroll()) {
+            viewController.decrementScrollIndex();
+          }
         }
-      } else if (event.keyCode === 38) { // crtl-arrow-up
-        if (viewController.canScroll()) {
-          viewController.incrementScrollIndex();
-        }
-      } else if (event.keyCode === 39) { // crtl-arrow-right
-        if (size.moreThanOne(3)) {
-          viewController.incrementIndex(3);
-        }
-      } else if (event.keyCode === 40) { // crtl-arrow-down
-        if (viewController.canScroll()) {
-          viewController.decrementScrollIndex();
-        }
-      } else if (event.keyCode === 89) { // crtl-y
+      } else if (event.key === 'y') { // crtl-y
         undoStack.redo();
-      } else if (event.keyCode === 90) { // crtl-z
+      } else if (event.key === 'z') { // crtl-z
         undoStack.undo();
-      } else if (event.code === 'Space') { // crtl-space
+      } else if (event.key === ' ') { // crtl-space
         for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
           stage.getLayerGroup(i).setShowCrosshair(
             !stage.getLayerGroup(i).getShowCrosshair()
