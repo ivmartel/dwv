@@ -568,7 +568,8 @@ function setupToolsCheckboxes() {
     toolsDiv.appendChild(label);
 
     // keyboard shortcut
-    window.addEventListener('keydown', getKeyCheck(key[0].toLowerCase(), input));
+    window.addEventListener(
+      'keydown', getKeyCheck(key[0].toLowerCase(), input));
   }
 }
 
