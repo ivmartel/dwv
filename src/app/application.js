@@ -1227,9 +1227,7 @@ dwv.App = function () {
 
     // create and setup view
     var viewFactory = new dwv.ViewFactory();
-    var view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(data.meta),
-      data.image);
+    var view = viewFactory.create(data.meta, data.image);
     var viewOrientation = dwv.gui.getViewOrientation(
       imageGeometry.getOrientation(),
       layerGroup.getTargetOrientation()
@@ -1301,18 +1299,17 @@ dwv.App = function () {
       var dl = layerGroup.addDrawLayer();
       dl.initialise(size2D, spacing2D, dataIndex);
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
-
-      // force positionchange to sync layers
-
-      var value = [
-        viewController.getCurrentIndex().getValues(),
-        viewController.getCurrentPosition().getValues()
-      ];
-      layerGroup.updateLayersToPositionChange({
-        value: value,
-        srclayerid: viewLayer.getId()
-      });
     }
+
+    // sync layers position
+    var value = [
+      viewController.getCurrentIndex().getValues(),
+      viewController.getCurrentPosition().getValues()
+    ];
+    layerGroup.updateLayersToPositionChange({
+      value: value,
+      srclayerid: viewLayer.getId()
+    });
 
     // sync layer groups
     stage.syncLayerGroupScale();
