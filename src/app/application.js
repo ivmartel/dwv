@@ -406,12 +406,12 @@ dwv.App = function () {
     // create load controller
     loadController = new dwv.ctrl.LoadController(options.defaultCharacterSet);
     loadController.onloadstart = onloadstart;
-    loadController.onprogress = onprogress;
+    loadController.onprogress = onloadprogress;
     loadController.onloaditem = onloaditem;
     loadController.onload = onload;
     loadController.onloadend = onloadend;
-    loadController.onerror = onerror;
-    loadController.onabort = onabort;
+    loadController.onerror = onloaderror;
+    loadController.onabort = onloadabort;
 
     // create data controller
     dataController = new dwv.ctrl.DataController();
@@ -999,7 +999,7 @@ dwv.App = function () {
    * @param {object} event The progress event.
    * @private
    */
-  function onprogress(event) {
+  function onloadprogress(event) {
     /**
      * Load progress event.
      *
@@ -1124,11 +1124,11 @@ dwv.App = function () {
    * @param {object} event The error event.
    * @private
    */
-  function onerror(event) {
+  function onloaderror(event) {
     /**
      * Load error event.
      *
-     * @event dwv.App#error
+     * @event dwv.App#loaderror
      * @type {object}
      * @property {string} type The event type: error.
      * @property {string} loadType The load type: image or state.
@@ -1137,7 +1137,7 @@ dwv.App = function () {
      * @property {object} error The error.
      * @property {object} target The event target.
      */
-    event.type = 'error';
+    event.type = 'loaderror';
     fireEvent(event);
   }
 
@@ -1147,18 +1147,18 @@ dwv.App = function () {
    * @param {object} event The abort event.
    * @private
    */
-  function onabort(event) {
+  function onloadabort(event) {
     /**
      * Load abort event.
      *
-     * @event dwv.App#abort
+     * @event dwv.App#loadabort
      * @type {object}
      * @property {string} type The event type: abort.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'abort';
+    event.type = 'loadabort';
     fireEvent(event);
   }
 

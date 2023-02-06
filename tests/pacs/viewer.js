@@ -116,7 +116,7 @@ dwv.test.viewerSetup = function () {
   _app.init(config);
 
   // bind events
-  _app.addEventListener('error', function (event) {
+  _app.addEventListener('loaderror', function (event) {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function (event) {
