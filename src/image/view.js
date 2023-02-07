@@ -152,8 +152,13 @@ dwv.image.View = function (image) {
    */
   this.setInitialIndex = function () {
     var geometry = image.getGeometry();
-    var values = new Array(geometry.getSize().length());
+    var size = geometry.getSize();
+    var values = new Array(size.length());
     values.fill(0);
+    // middle
+    values[0] = Math.floor(size.get(0) / 2);
+    values[1] = Math.floor(size.get(1) / 2);
+    values[2] = Math.floor(size.get(2) / 2);
     this.setCurrentIndex(new dwv.math.Index(values), true);
   };
 
