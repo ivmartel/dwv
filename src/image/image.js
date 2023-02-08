@@ -407,6 +407,90 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Check if the input values are in the buffer.
+   * Could loop through the whole volume, can get long for big data...
+   *
+   * @param {Array} values The values to check.
+   * @returns {Array} A list of booleans for each input value,
+   *   set to true if the value is present in the buffer.
+   */
+  this.hasValues = function (values) {
+    // check input
+    if (typeof values === 'undefined' ||
+      values.length === 0) {
+      return [];
+    }
+    // final array value
+    var finalValues = [];
+    for (var v1 = 0; v1 < values.length; ++v1) {
+      if (numberOfComponents === 1) {
+        finalValues.push([values[v1]]);
+      } else if (numberOfComponents === 3) {
+        finalValues.push([
+          values[v1].r,
+          values[v1].g,
+          values[v1].b
+        ]);
+      }
+    }
+    // find callback
+    var equalFunc;
+    if (numberOfComponents === 1) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0];
+      };
+    } else if (numberOfComponents === 3) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0] &&
+          a[1] === b[1] &&
+          a[2] === b[2];
+      };
+    }
+    var getEqualCallback = function (value) {
+      return function (item) {
+        return equalFunc(item, value);
+      };
+    };
+    // main loop
+    var res = new Array(values.length);
+    res.fill(false);
+    var valuesToFind = finalValues.slice();
+    var equal;
+    var indicesToRemove;
+    for (var i = 0, leni = buffer.length;
+      i < leni; i = i + numberOfComponents) {
+      indicesToRemove = [];
+      for (var v = 0; v < valuesToFind.length; ++v) {
+        equal = true;
+        // check value(s)
+        for (var j = 0; j < numberOfComponents; ++j) {
+          if (buffer[i + j] !== valuesToFind[v][j]) {
+            equal = false;
+            break;
+          }
+        }
+        // if found, store answer and add to indices to remove
+        if (equal) {
+          var valIndex = finalValues.findIndex(
+            getEqualCallback(valuesToFind[v]));
+          res[valIndex] = true;
+          indicesToRemove.push(v);
+        }
+      }
+      // remove found values
+      for (var r = 0; r < indicesToRemove.length; ++r) {
+        valuesToFind.splice(indicesToRemove[r], 1);
+      }
+      // exit if no values to find
+      if (valuesToFind.length === 0) {
+        break;
+      }
+    }
+    // return
+    return res;
+  };
+
+  /**
    * Clone the image.
    *
    * @returns {Image} A clone of this image.

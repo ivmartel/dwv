@@ -491,3 +491,69 @@ QUnit.test('Test ImageFactory.', function (assert) {
     zeroStats.asObject(),
     'Rescaled values should be equal');
 });
+
+/**
+ * Tests for {@link dwv.image.Image} hasValues and getOffsets.
+ *
+ * @function module:tests/image~getOffsets
+ */
+QUnit.test('Test hasValues and getOffsets.', function (assert) {
+  var size0 = 3;
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
+  var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
+  var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  var buffer0 = [];
+  buffer0[0] = 1;
+  for (var i0 = 1; i0 < 2 * size0; ++i0) {
+    buffer0[i0] = 0;
+  }
+  for (var i1 = 2 * size0; i1 < size0 * size0; ++i1) {
+    buffer0[i1] = 1;
+  }
+  var theoOffset0 = [1, 2, 3, 4, 5];
+  var theoOffset1 = [0, 6, 7, 8];
+
+  // create the image
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+
+  // test hasValues
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0]), [true]),
+    'Image has values 0'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([1]), [true]),
+    'Image has values 1'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([2]), [false]),
+    'Image has values 2'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0, 1]), [true, true]),
+    'Image has values 0,1'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0, 2]), [true, false]),
+    'Image has values 0,2'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([2, 0]), [false, true]),
+    'Image has values 2,0'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0, 2, 1]), [true, false, true]),
+    'Image has values 0,2,1'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([2, 1, 0]), [false, true, true]),
+    'Image has values 2,1,0'
+  );
+
+  // test offsets list
+  var off00 = image0.getOffsets(0);
+  var off01 = image0.getOffsets(1);
+  assert.ok(dwv.utils.arrayEquals(off00, theoOffset0), 'Image offsets 0');
+  assert.ok(dwv.utils.arrayEquals(off01, theoOffset1), 'Image offsets 1');
+});

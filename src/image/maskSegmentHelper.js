@@ -39,15 +39,29 @@ dwv.image.MaskSegmentHelper = function (mask) {
   /**
    * Check if a segment is present in a mask image.
    *
-   * @param {number} segmentNumber The segment number.
-   * @returns {boolean} True if the segment is present in the mask.
+   * @param {Array} numbers Array of segment numbers.
+   * @returns {Array} Array of boolean set to true
+   *   if the segment is present in the mask.
    */
-  this.maskHasSegment = function (segmentNumber) {
-    var segment = this.getSegment(segmentNumber);
-    if (typeof segment === 'undefined') {
-      return true;
+  this.maskHasSegments = function (numbers) {
+    // create values using displayValue
+    var values = [];
+    var unknowns = [];
+    for (var i = 0; i < numbers.length; ++i) {
+      var segment = this.getSegment(numbers[i]);
+      if (typeof segment !== 'undefined') {
+        values.push(segment.displayValue);
+      } else {
+        dwv.logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
+        unknowns.push(i);
+      }
     }
-    return mask.getOffsets(segment.displayValue).length !== 0;
+    var res = mask.hasValues(values);
+    // insert unknowns as false in result
+    for (var j = 0; j < unknowns.length; ++j) {
+      res.splice(unknowns[j], 0, false);
+    }
+    return res;
   };
 
   /**
