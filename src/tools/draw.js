@@ -564,6 +564,9 @@ dwv.tool.Draw = function (app) {
     // draw
     var drawLayer = layerGroup.getActiveDrawLayer();
     var konvaLayer = drawLayer.getKonvaLayer();
+    if (shapeGroups.length !== 0) {
+      konvaLayer.listening(true);
+    }
     konvaLayer.draw();
   }
 
