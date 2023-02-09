@@ -127,7 +127,7 @@ dwv.io.State = function () {
       scale = {
         x: data.scale.x * baseScale.x,
         y: data.scale.y * baseScale.y,
-        z: 1
+        z: baseScale.z
       };
       offset = {
         x: data.offset.x,
