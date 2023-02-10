@@ -1,4 +1,4 @@
-/*! dwv 0.26.0 2019-05-09 23:26:15 */
+/*! dwv 0.26.1 2023-02-10 18:33:49 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -996,35 +996,37 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
-     * - CRTL-ARROW_LEFT: next frame
-     * - CRTL-ARROW_UP: next slice
-     * - CRTL-ARROW_RIGHT: previous frame
-     * - CRTL-ARROW_DOWN: previous slice
+     * - CRTL-SHIFT-ARROW_LEFT: next frame
+     * - CRTL-SHIFT-ARROW_UP: next slice
+     * - CRTL-SHIFT-ARROW_RIGHT: previous frame
+     * - CRTL-SHIFT-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
         if (event.ctrlKey) {
-            if ( event.keyCode === 37 ) // crtl-arrow-left
-            {
-                event.preventDefault();
-                self.getViewController().decrementFrameNb();
-            }
-            else if ( event.keyCode === 38 ) // crtl-arrow-up
-            {
-                event.preventDefault();
-                self.getViewController().incrementSliceNb();
-            }
-            else if ( event.keyCode === 39 ) // crtl-arrow-right
-            {
-                event.preventDefault();
-                self.getViewController().incrementFrameNb();
-            }
-            else if ( event.keyCode === 40 ) // crtl-arrow-down
-            {
-                event.preventDefault();
-                self.getViewController().decrementSliceNb();
+            if (event.shiftKey) {
+                if ( event.keyCode === 37 ) // crtl-shift-arrow-left
+                {
+                    event.preventDefault();
+                    self.getViewController().decrementFrameNb();
+                }
+                else if ( event.keyCode === 38 ) // crtl-shift-arrow-up
+                {
+                    event.preventDefault();
+                    self.getViewController().incrementSliceNb();
+                }
+                else if ( event.keyCode === 39 ) // crtl-shift-arrow-right
+                {
+                    event.preventDefault();
+                    self.getViewController().incrementFrameNb();
+                }
+                else if ( event.keyCode === 40 ) // crtl-shift-arrow-down
+                {
+                    event.preventDefault();
+                    self.getViewController().decrementSliceNb();
+                }
             }
             else if ( event.keyCode === 89 ) // crtl-y
             {
@@ -2719,6 +2721,7 @@ dwv.ToolboxController = function ()
         canvas.addEventListener("mouseup", onMouch);
         canvas.addEventListener("mouseout", onMouch);
         canvas.addEventListener("mousewheel", onMouch);
+        canvas.addEventListener("wheel", onMouch);
         canvas.addEventListener("DOMMouseScroll", onMouch);
         canvas.addEventListener("dblclick", onMouch);
         // touch listeners
@@ -3630,7 +3633,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.26.0"; };
+dwv.getVersion = function () { return "0.26.1"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -24636,6 +24639,13 @@ dwv.tool.Scroll = function(app)
     var touchTimerID = null;
 
     /**
+     * Accumulated wheel event deltaY.
+     *
+     * @type {number}
+     */
+    var wheelDeltaY = 0;
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -24773,9 +24783,24 @@ dwv.tool.Scroll = function(app)
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function (event) {
-        // ev.wheelDelta on chrome is 120
-        if ( event.wheelDelta > 0 ) {
+    this.wheel = function (event) {
+        // deltaMode (deltaY values on my machine...):
+        // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
+        // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
+        // - 2 (DOM_DELTA_PAGE): ??
+        // TODO: check scroll event
+        var scrollMin = 52;
+        if (event.deltaMode === 1) {
+            scrollMin = 5.99;
+        }
+        wheelDeltaY += event.deltaY;
+        if (Math.abs(wheelDeltaY) < scrollMin) {
+            return;
+        } else {
+            wheelDeltaY = 0;
+        }
+
+        if ( event.deltaY > 0 ) {
             mouseScroll(true);
         } else {
             mouseScroll(false);
