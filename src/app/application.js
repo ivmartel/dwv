@@ -813,11 +813,11 @@ dwv.App = function () {
    * @fires dwv.tool.UndoStack#redo
    */
   this.defaultOnKeydown = function (event) {
+    if (event.ctrlKey) {
+      if (event.shiftKey) {
     var viewController =
       stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
     var size = viewController.getImageSize();
-    if (event.ctrlKey) {
-      if (event.shiftKey) {
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
           if (size.moreThanOne(3)) {
             viewController.decrementIndex(3);
