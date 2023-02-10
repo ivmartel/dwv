@@ -225,7 +225,7 @@ dwv.test.viewerSetup = function () {
   });
 
   // default keyboard shortcuts
-  _app.addEventListener('keydown', function (event) {
+  window.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
     // mask segment related
     if (!isNaN(parseInt(event.key, 10))) {
