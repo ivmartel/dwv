@@ -815,9 +815,9 @@ dwv.App = function () {
   this.defaultOnKeydown = function (event) {
     if (event.ctrlKey) {
       if (event.shiftKey) {
-    var viewController =
-      stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
-    var size = viewController.getImageSize();
+        var viewController =
+          stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
+        var size = viewController.getImageSize();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
           if (size.moreThanOne(3)) {
             viewController.decrementIndex(3);
