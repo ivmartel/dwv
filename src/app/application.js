@@ -937,35 +937,37 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
-     * - CRTL-ARROW_LEFT: next frame
-     * - CRTL-ARROW_UP: next slice
-     * - CRTL-ARROW_RIGHT: previous frame
-     * - CRTL-ARROW_DOWN: previous slice
+     * - CRTL-SHIFT-ARROW_LEFT: next frame
+     * - CRTL-SHIFT-ARROW_UP: next slice
+     * - CRTL-SHIFT-ARROW_RIGHT: previous frame
+     * - CRTL-SHIFT-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
         if (event.ctrlKey) {
-            if ( event.keyCode === 37 ) // crtl-arrow-left
-            {
-                event.preventDefault();
-                self.getViewController().decrementFrameNb();
-            }
-            else if ( event.keyCode === 38 ) // crtl-arrow-up
-            {
-                event.preventDefault();
-                self.getViewController().incrementSliceNb();
-            }
-            else if ( event.keyCode === 39 ) // crtl-arrow-right
-            {
-                event.preventDefault();
-                self.getViewController().incrementFrameNb();
-            }
-            else if ( event.keyCode === 40 ) // crtl-arrow-down
-            {
-                event.preventDefault();
-                self.getViewController().decrementSliceNb();
+            if (event.shiftKey) {
+                if ( event.keyCode === 37 ) // crtl-shift-arrow-left
+                {
+                    event.preventDefault();
+                    self.getViewController().decrementFrameNb();
+                }
+                else if ( event.keyCode === 38 ) // crtl-shift-arrow-up
+                {
+                    event.preventDefault();
+                    self.getViewController().incrementSliceNb();
+                }
+                else if ( event.keyCode === 39 ) // crtl-shift-arrow-right
+                {
+                    event.preventDefault();
+                    self.getViewController().incrementFrameNb();
+                }
+                else if ( event.keyCode === 40 ) // crtl-shift-arrow-down
+                {
+                    event.preventDefault();
+                    self.getViewController().decrementSliceNb();
+                }
             }
             else if ( event.keyCode === 89 ) // crtl-y
             {
