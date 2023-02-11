@@ -1,4 +1,4 @@
-/*! dwv 0.26.1 2023-02-10 18:33:49 */
+/*! dwv 0.26.2 2023-02-11 18:46:33 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -2744,6 +2744,7 @@ dwv.ToolboxController = function ()
         canvas.removeEventListener("mouseup", onMouch);
         canvas.removeEventListener("mouseout", onMouch);
         canvas.removeEventListener("mousewheel", onMouch);
+        canvas.removeEventListener("wheel", onMouch);
         canvas.removeEventListener("DOMMouseScroll", onMouch);
         canvas.removeEventListener("dblclick", onMouch);
         // touch listeners
@@ -2794,6 +2795,7 @@ dwv.ToolboxController = function ()
             event.type === "mouseup" ||
             event.type === "mouseout" ||
             event.type === "mousewheel" ||
+            event.type === "wheel" ||
             event.type === "dblclick" ||
             event.type === "DOMMouseScroll" )
         {
@@ -3633,7 +3635,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.26.1"; };
+dwv.getVersion = function () { return "0.26.2"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -24764,19 +24766,6 @@ dwv.tool.Scroll = function(app)
         }
         // call mouse equivalent
         self.mouseup(event);
-    };
-
-    /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @param {Object} event The mouse scroll event.
-     */
-    this.DOMMouseScroll = function (event) {
-        // ev.detail on firefox is 3
-        if ( event.detail < 0 ) {
-            mouseScroll(true);
-        } else {
-            mouseScroll(false);
-        }
     };
 
     /**
