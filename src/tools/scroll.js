@@ -157,19 +157,6 @@ dwv.tool.Scroll = function(app)
     };
 
     /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @param {Object} event The mouse scroll event.
-     */
-    this.DOMMouseScroll = function (event) {
-        // ev.detail on firefox is 3
-        if ( event.detail < 0 ) {
-            mouseScroll(true);
-        } else {
-            mouseScroll(false);
-        }
-    };
-
-    /**
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
