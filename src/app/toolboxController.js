@@ -162,6 +162,7 @@ dwv.ToolboxController = function ()
         canvas.removeEventListener("mouseup", onMouch);
         canvas.removeEventListener("mouseout", onMouch);
         canvas.removeEventListener("mousewheel", onMouch);
+        canvas.removeEventListener("wheel", onMouch);
         canvas.removeEventListener("DOMMouseScroll", onMouch);
         canvas.removeEventListener("dblclick", onMouch);
         // touch listeners
@@ -212,6 +213,7 @@ dwv.ToolboxController = function ()
             event.type === "mouseup" ||
             event.type === "mouseout" ||
             event.type === "mousewheel" ||
+            event.type === "wheel" ||
             event.type === "dblclick" ||
             event.type === "DOMMouseScroll" )
         {
