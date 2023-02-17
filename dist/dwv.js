@@ -1,4 +1,4 @@
-/*! dwv 0.26.2 2023-02-11 18:46:33 */
+/*! dwv 0.26.3 2023-02-17 14:34:25 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -2720,9 +2720,7 @@ dwv.ToolboxController = function ()
         canvas.addEventListener("mousemove", onMouch);
         canvas.addEventListener("mouseup", onMouch);
         canvas.addEventListener("mouseout", onMouch);
-        canvas.addEventListener("mousewheel", onMouch);
         canvas.addEventListener("wheel", onMouch);
-        canvas.addEventListener("DOMMouseScroll", onMouch);
         canvas.addEventListener("dblclick", onMouch);
         // touch listeners
         canvas.addEventListener("touchstart", onMouch);
@@ -2743,9 +2741,7 @@ dwv.ToolboxController = function ()
         canvas.removeEventListener("mousemove", onMouch);
         canvas.removeEventListener("mouseup", onMouch);
         canvas.removeEventListener("mouseout", onMouch);
-        canvas.removeEventListener("mousewheel", onMouch);
         canvas.removeEventListener("wheel", onMouch);
-        canvas.removeEventListener("DOMMouseScroll", onMouch);
         canvas.removeEventListener("dblclick", onMouch);
         // touch listeners
         canvas.removeEventListener("touchstart", onMouch);
@@ -2794,10 +2790,8 @@ dwv.ToolboxController = function ()
             event.type === "mousedown" ||
             event.type === "mouseup" ||
             event.type === "mouseout" ||
-            event.type === "mousewheel" ||
             event.type === "wheel" ||
-            event.type === "dblclick" ||
-            event.type === "DOMMouseScroll" )
+            event.type === "dblclick" )
         {
             offsets = dwv.html.getEventOffset(event);
             event._xs = offsets[0].x;
@@ -3635,7 +3629,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.26.2"; };
+dwv.getVersion = function () { return "0.26.3"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -25504,22 +25498,11 @@ dwv.tool.ZoomAndPan = function(app)
     };
 
     /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @param {Object} event The mouse scroll event.
-     */
-    this.DOMMouseScroll = function(event){
-        // ev.detail on firefox is 3
-        var step = - event.detail / 30;
-        app.stepZoom(step, event._xs, event._ys);
-    };
-
-    /**
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function(event){
-        // ev.wheelDelta on chrome is 120
-        var step = event.wheelDelta / 1200;
+    this.wheel = function(event){
+        var step = -event.deltaY / 500;
         app.stepZoom(step, event._xs, event._ys);
     };
 
