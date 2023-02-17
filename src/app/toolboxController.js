@@ -138,9 +138,7 @@ dwv.ToolboxController = function ()
         canvas.addEventListener("mousemove", onMouch);
         canvas.addEventListener("mouseup", onMouch);
         canvas.addEventListener("mouseout", onMouch);
-        canvas.addEventListener("mousewheel", onMouch);
         canvas.addEventListener("wheel", onMouch);
-        canvas.addEventListener("DOMMouseScroll", onMouch);
         canvas.addEventListener("dblclick", onMouch);
         // touch listeners
         canvas.addEventListener("touchstart", onMouch);
@@ -161,9 +159,7 @@ dwv.ToolboxController = function ()
         canvas.removeEventListener("mousemove", onMouch);
         canvas.removeEventListener("mouseup", onMouch);
         canvas.removeEventListener("mouseout", onMouch);
-        canvas.removeEventListener("mousewheel", onMouch);
         canvas.removeEventListener("wheel", onMouch);
-        canvas.removeEventListener("DOMMouseScroll", onMouch);
         canvas.removeEventListener("dblclick", onMouch);
         // touch listeners
         canvas.removeEventListener("touchstart", onMouch);
@@ -212,10 +208,8 @@ dwv.ToolboxController = function ()
             event.type === "mousedown" ||
             event.type === "mouseup" ||
             event.type === "mouseout" ||
-            event.type === "mousewheel" ||
             event.type === "wheel" ||
-            event.type === "dblclick" ||
-            event.type === "DOMMouseScroll" )
+            event.type === "dblclick" )
         {
             offsets = dwv.html.getEventOffset(event);
             event._xs = offsets[0].x;

@@ -171,22 +171,11 @@ dwv.tool.ZoomAndPan = function(app)
     };
 
     /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @param {Object} event The mouse scroll event.
-     */
-    this.DOMMouseScroll = function(event){
-        // ev.detail on firefox is 3
-        var step = - event.detail / 30;
-        app.stepZoom(step, event._xs, event._ys);
-    };
-
-    /**
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function(event){
-        // ev.wheelDelta on chrome is 120
-        var step = event.wheelDelta / 1200;
+    this.wheel = function(event){
+        var step = -event.deltaY / 500;
         app.stepZoom(step, event._xs, event._ys);
     };
 
