@@ -1180,7 +1180,7 @@ dwv.App = function () {
       group.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
     // propagate drawLayer events
-    if (toolboxController.hasTool('Draw')) {
+    if (toolboxController && toolboxController.hasTool('Draw')) {
       group.addEventListener('drawcreate', fireEvent);
       group.addEventListener('drawdelete', fireEvent);
     }
