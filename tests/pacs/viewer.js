@@ -171,7 +171,7 @@ dwv.test.viewerSetup = function () {
     }
 
     if (event.loadtype === 'image' &&
-      typeof _app.getMetaData(event.loadid).Modali !== 'undefined' &&
+      typeof _app.getMetaData(event.loadid).Modality !== 'undefined' &&
       _app.getMetaData(event.loadid).Modality.value === 'SEG') {
       // log SEG details
       logFramePosPats(_app.getMetaData(event.loadid));
