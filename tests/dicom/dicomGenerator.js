@@ -32,7 +32,8 @@ dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
   for (var i = 0; i < requiredTags.length; ++i) {
     if (typeof tags[requiredTags[i]] === 'undefined') {
       if (withLog) {
-        dwv.logger.log('Missing ' + requiredTags[i] + ' for pixel generation.');
+        dwv.logger.debug('Missing ' +
+          requiredTags[i] + ' for pixel generation.');
       }
       check = false;
       break;
