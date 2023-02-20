@@ -24,8 +24,10 @@ function getObjectUrlFromTags(config) {
   // convert JSON to DICOM element object
   var dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
   // pixels: small gradient square
-  dicomElements.x7FE00010 =
-    dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+  if (config.tags.Modality !== 'KO') {
+    dicomElements.x7FE00010 =
+      dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+  }
 
   // create DICOM buffer
   var writer = new dwv.dicom.DicomWriter();
