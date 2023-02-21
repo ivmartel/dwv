@@ -1,8 +1,73 @@
-This page details some integrations of dwv. PACS integrations can use the Web Access to Dicom Object (WADO-URI) protocol (see [conformance](./tutorial-conformance.html#wado-uri)). By integrated, I mean that the PACS would handle the searching and once the data is found would allow the user to launch the viewer.
+This page details some integrations of dwv. These PACS integrations use the Web Access to Dicom Object (WADO-URI) protocol (see [conformance](./tutorial-conformance.html#wado-uri)). The PACS handles the searching and once the data is found allows the user to launch the viewer.
 
-Quick summary: [Conquest](#conquest) &#x2705;, [dcm4chee](#dcm4chee) &#x2705;, [Orthanc](#orthanc) &#x2705;, [Google](#google) &#x2705;, [ClearCanvas](#clearcanvas) &#x274C;
+Quick summary: [Orthanc](#orthanc) &#x2705;, [Google](#google) &#x2705;, [Conquest](#conquest) &#x2705;, [dcm4chee](#dcm4chee) &#x2705;
 
 Other type: [WordPress](#wordpress) &#x2705;
+
+## Orthanc
+[Orthanc](http://www.orthanc-server.com/): _"Orthanc aims at providing a simple, yet powerful standalone DICOM server. Orthanc can turn any computer running Windows or Linux into a DICOM store (in other words, a mini-PACS system). Its architecture is lightweight, meaning that no complex database administration is required, nor the installation of third-party dependencies."_ ([entry](http://www.idoimaging.com/program/409) on idoimaging). License: GPL (see Licensing on the [download](http://www.orthanc-server.com/download.php) page).
+
+Follow the steps described on the [dwv-orthanc-plugin](https://github.com/ivmartel/dwv-orthanc-plugin) page.
+
+Operational since dwv `v0.8.0beta` and issue [#110](https://github.com/ivmartel/dwv/issues/110).
+
+DICOM-web support since `v0.31.0`. Check it using this example 'unsafe' dicom web configuration (json):
+
+```json
+{
+  "Name" : "${ORTHANC_NAME} in Docker Compose",
+  "RemoteAccessAllowed" : true,
+  "Plugins" : ["/usr/local/share/orthanc/plugins"],
+  "DicomWeb" : {
+    "Servers" : {
+      "self" : {
+        "Url": "http://localhost:8042/dicom-web/",
+        "Username": "orthanc",
+        "Password": "orthanc",
+        "HasDelete": true
+      }
+    }
+  },
+  "ServeFolders" : {
+    "/dwv" : "/usr/local/dwv"
+  }
+}
+```
+
+DWV is served via the `ServeFolders` to allow it to request files (and not create CORS errors).
+This configuration is then passed (as `orthanc-config.json`) to the folowing example docker compose (yaml):
+
+```yaml
+version: '3.1'
+services:
+  orthanc:
+    image: jodogne/orthanc-plugins:1.9.7
+    command: [/run/secrets/, --trace-dicom]
+    ports:
+      - 4242:4242
+      - 8042:8042
+    secrets:
+      - orthanc.json
+    environment:
+      - ORTHANC_NAME=OrthancTest
+    volumes:
+      - /home/yves/dev/src/github/dwv:/usr/local/dwv
+secrets:
+  orthanc.json:
+    file: orthanc-config.json
+```
+
+Adapt this to the folder containing the dwv code under the `volumes` setting.
+
+Launch it with: `sudo docker-compose up`
+
+You can then access orthanc at [explorer](http://localhost:8042/app/explorer.html). DWV provides a test page to do QIDO and launch the viewer: [dcmweb](http://localhost:8042/dwv/tests/pacs/dcmweb.html) (do not forget to modify the test viewer for it to set the multipart header with the `_dicomWeb` flag).
+
+## Google
+Available via the [dwv-jqmobile](https://github.com/ivmartel/dwv-jqmobile) project.
+
+* Google [Drive web](http://drive.google.com/): right click on a DICOM file and choose `Open with`. DWV should appear in the `Suggested apps`, if not, choose `Connect more apps`, search for 'dwv' and connect it (see [managing drive apps](https://support.google.com/drive/answer/2523073) for details)
+* Google Chrome store: [dwv app](https://chrome.google.com/webstore/detail/dwv/elkmgopbfeoimigdmekflnapemieceja) (see the [chrome apps help](https://support.google.com/chrome/answer/3060053) for details)
 
 ## Conquest
 [Conquest](http://ingenium.home.xs4all.nl/dicom.html): _"a full featured DICOM server based on the public domain UCDMC DICOM code"_ ([entry](http://www.idoimaging.com/program/183) on idoimaging). License: Public Domain (see [medfloss](http://www.medfloss.org/node/93)).
@@ -26,70 +91,6 @@ Conquest installation details:
 Follow the steps described on the [dwv-dcm4chee-web](https://github.com/ivmartel/dwv-dcm4chee-web) page.
 
 Operational since dwv `v0.7.0` and issue [#1](https://github.com/ivmartel/dwv/issues/1).
-
-## Orthanc
-[Orthanc](http://www.orthanc-server.com/): _"Orthanc aims at providing a simple, yet powerful standalone DICOM server. Orthanc can turn any computer running Windows or Linux into a DICOM store (in other words, a mini-PACS system). Its architecture is lightweight, meaning that no complex database administration is required, nor the installation of third-party dependencies."_ ([entry](http://www.idoimaging.com/program/409) on idoimaging). License: GPL (see Licensing on the [download](http://www.orthanc-server.com/download.php) page).
-
-Follow the steps described on the [dwv-orthanc-plugin](https://github.com/ivmartel/dwv-orthanc-plugin) page.
-
-Operational since dwv `v0.8.0beta` and issue [#110](https://github.com/ivmartel/dwv/issues/110).
-
-Example 'unsafe' dicom web configuration (json):
-
-```json
-{
-  "Name" : "${ORTHANC_NAME} in Docker Compose",
-  "RemoteAccessAllowed" : true,
-  "Plugins" : ["/usr/local/share/orthanc/plugins"],
-  "DicomWeb" : {
-    "Servers" : {
-      "self" : {
-        "Url": "http://localhost:8042/dicom-web/",
-        "Username": "orthanc",
-        "Password": "orthanc",
-        "HasDelete": true
-      }
-    }
-  },
-  "ServeFolders" : {
-    "/dwv" : "/usr/local/dwv"
-  }
-}
-```
-
-Example docker compose (yaml, using previous config and serving dwv to allow it to
-retrieve data via dicom web):
-
-```yaml
-version: '3.1'
-services:
-  orthanc:
-    image: jodogne/orthanc-plugins:1.9.7
-    command: [/run/secrets/, --trace-dicom]
-    ports:
-      - 4242:4242
-      - 8042:8042
-    secrets:
-      - orthanc.json
-    environment:
-      - ORTHANC_NAME=OrthancTest
-    volumes:
-      - /home/yves/dev/src/github/dwv:/usr/local/dwv
-secrets:
-  orthanc.json:
-    file: orthanc-config.json
-```
-
-## Google
-Available via the [dwv-jqmobile](https://github.com/ivmartel/dwv-jqmobile) project.
-
-* Google [Drive web](http://drive.google.com/): right click on a DICOM file and choose `Open with`. DWV should appear in the `Suggested apps`, if not, choose `Connect more apps`, search for 'dwv' and connect it (see [managing drive apps](https://support.google.com/drive/answer/2523073) for details)
-* Google Chrome store: [dwv app](https://chrome.google.com/webstore/detail/dwv/elkmgopbfeoimigdmekflnapemieceja) (see the [chrome apps help](https://support.google.com/chrome/answer/3060053) for details)
-
-## ClearCanvas
-[ClearCanvas](http://www.clearcanvas.ca): _"...dedicated to making medical imaging and informatics accessible to all by offering both free open source solutions as well as easy-to-use, affordable clinical solutions approved by regulatory agencies worldwide."_ ([entry](http://www.idoimaging.com/program/357) on idoimaging). The code is available on [github](https://github.com/ClearCanvas/ClearCanvas). License: GPL (see [license](https://github.com/ClearCanvas/ClearCanvas/blob/master/LICENSE.TXT)).
-
-In very slow progress: see issue [#22](https://github.com/ivmartel/dwv/issues/22).
 
 ## WordPress
 See [dicom-support](https://wordpress.org/plugins/dicom-support/) plugin and a [demo](https://tyarcaouen.synology.me/wordpress/dwvblog/).
