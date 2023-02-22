@@ -5,7 +5,6 @@ var dwv = dwv || {};
  * Main application class.
  *
  * @class
- * @tutorial examples
  * @example
  * // create the dwv app
  * var app = new dwv.App();
@@ -317,6 +316,7 @@ dwv.App = function () {
    * // render button
    * var button = document.createElement('button');
    * button.id = 'render';
+   * button.disabled = true;
    * button.appendChild(document.createTextNode('render'));
    * document.body.appendChild(button);
    * app.addEventListener('load', function () {

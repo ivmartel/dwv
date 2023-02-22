@@ -7,6 +7,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {Opacity: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('Opacity');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.Opacity = function (app) {
   /**

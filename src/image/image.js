@@ -39,6 +39,42 @@ dwv.image.getSliceIndex = function (volumeGeometry, sliceGeometry) {
  * @param {dwv.image.Geometry} geometry The geometry of the image.
  * @param {Array} buffer The image data as a one dimensional buffer.
  * @param {Array} imageUids An array of Uids indexed to slice number.
+ * @example
+ * // XMLHttpRequest onload callback
+ * var onload = function (event) {
+ *   // setup the dicom parser
+ *   var dicomParser = new dwv.dicom.DicomParser();
+ *   // parse the buffer
+ *   dicomParser.parse(event.target.response);
+ *   // create the image
+ *   var imageFactory = new dwv.image.ImageFactory();
+ *   // inputs are dicom tags and buffer
+ *   var image = imageFactory.create(
+ *     dicomParser.getDicomElements(),
+ *     dicomParser.getRawDicomElements().x7FE00010.value[0]
+ *   );
+ *   // result div
+ *   var div = document.getElementById('dwv');
+ *   // display the image size
+ *   var size = image.getGeometry().getSize();
+ *   div.appendChild(document.createTextNode(
+ *     'Size: ' + size.toString() +
+ *     ' (should be 256,256,1)'));
+ *   // break line
+ *   div.appendChild(document.createElement('br'));
+ *   // display a pixel value
+ *   div.appendChild(document.createTextNode(
+ *     'Pixel @ [128,40,0]: ' +
+ *     image.getRescaledValue(128,40,0) +
+ *     ' (should be 101)'));
+ * };
+ * // DICOM file request
+ * var request = new XMLHttpRequest();
+ * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 dwv.image.Image = function (geometry, buffer, imageUids) {
 

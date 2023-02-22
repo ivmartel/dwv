@@ -505,6 +505,29 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
  * DicomParser class.
  *
  * @class
+ * @example
+ * // XMLHttpRequest onload callback
+ * var onload = function (event) {
+ *   // setup the dicom parser
+ *   var dicomParser = new dwv.dicom.DicomParser();
+ *   // parse the buffer
+ *   dicomParser.parse(event.target.response);
+ *   // get the wrapped dicom tags
+ *   // (raw tags are available via 'getRawDicomElements')
+ *   var tags = dicomParser.getDicomElements();
+ *   // display the modality
+ *   var div = document.getElementById('dwv');
+ *   div.appendChild(document.createTextNode(
+ *     'Modality: ' + tags.getFromName('Modality')
+ *   ));
+ * };
+ * // DICOM file request
+ * var request = new XMLHttpRequest();
+ * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 dwv.dicom.DicomParser = function () {
   /**
