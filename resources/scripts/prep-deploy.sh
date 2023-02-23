@@ -10,17 +10,13 @@ usage() {
   echo "Usage: $0 -f fileName"
   echo -e "  -f the file to prepare for deploy"
   echo -e "Example:"
-  echo -e "> prepare-deploy -f build/viewer.html"
+  echo -e "> prep-deploy -f build/viewer.html"
   echo ""
   exit 1 # Exit script after printing help
 }
 # print error message (red)
 error() {
   echo -e "\033[31;31m[create] $1\033[0m"
-}
-# print info message (blue)
-info() {
-  echo -e "\033[34;34m[create] $1\033[0m"
 }
 
 # input options
