@@ -18,6 +18,10 @@ usage() {
 error() {
   echo -e "\033[31;31m[create] $1\033[0m"
 }
+# print info message (blue)
+info() {
+  echo -e "\033[34;34m[prep] $1\033[0m"
+}
 
 # input options
 while getopts "f:h" opt
@@ -35,6 +39,8 @@ then
    error "Empty file name";
    usage
 fi
+
+info "Preparing deploy for '$fileName'"
 
 # start source comment
 a0="\(<!-- dwv sources -->\)"
