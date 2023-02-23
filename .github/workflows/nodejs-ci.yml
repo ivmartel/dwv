@@ -35,8 +35,10 @@ jobs:
         rm -Rf ./node_modules/*
         yarn install --prod
         cp -Rf node_modules ./build
+        cp -Rf decoders ./build
         cp -Rf tests/pacs/viewer.* ./build
         ./resources/scripts/prep-deploy.sh -f build/viewer.html
+        ./resources/scripts/prep-deploy.sh -f build/viewer.js
     - name: Push to gh-pages (if tag or develop branch)
       if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_TAG == 'true'
       run: |
