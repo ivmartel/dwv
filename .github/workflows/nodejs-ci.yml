@@ -34,7 +34,9 @@ jobs:
       run: |
         rm -Rf ./node_modules/*
         yarn install --prod
+        ls node_modules
         cp -Rf node_modules ./build
+        ls ./build
         cp -Rf tests/pacs/viewer.* ./build
         ./resources/scripts/prep-deploy.sh -f build/viewer.html
     - name: Push to gh-pages (if tag or develop branch)
