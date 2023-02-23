@@ -73,21 +73,21 @@ var dataDicom = [
     ];
 var dataImg = [
     {
-    title: "JPEG", 
-    uri: "https://upload.wikimedia.org/wikipedia/commons/c/c6/PET-image.jpg", 
-    img: "brainpet-jpg.png", 
+    title: "JPEG",
+    uri: "https://upload.wikimedia.org/wikipedia/commons/c/c6/PET-image.jpg",
+    img: "brainpet-jpg.png",
     desc: "Brain PET from wikipedia (https://en.wikipedia.org/wiki/File:PET-image.jpg), 531*600*1."
     },
     {
-    title: "PNG", 
-    uri: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Brain_MRI_112010_rgbca.png", 
-    img: "brainmri-png.png", 
+    title: "PNG",
+    uri: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Brain_MRI_112010_rgbca.png",
+    img: "brainmri-png.png",
     desc: "Brain MRI from wikipedia (https://en.wikipedia.org/wiki/File:Brain_MRI_112010_rgbca.png), 389*504*1."
     },
     {
-    title: "JPG", 
-    uri: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Acute_leukemia-ALL.jpg", 
-    img: "acute_leukemia.png", 
+    title: "JPG",
+    uri: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Acute_leukemia-ALL.jpg",
+    img: "acute_leukemia.png",
     desc: "Acute Leukimia from wikipedia (https://en.wikipedia.org/wiki/File:Acute_leukemia-ALL.jpg), 347*395*1."
     }];
 
@@ -111,11 +111,9 @@ function getDwvBaseUrl()
 {
     var useTrunkElement = document.getElementById('use-trunk');
     var useTrunk = useTrunkElement.checked;
-    var select = document.getElementById('select-dwv');
-    var flag = select.options[select.selectedIndex].value;
 
     // which viewer
-    var path = "https://ivmartel.github.io/" + flag + "/demo";
+    var path = "https://ivmartel.github.io/dwv/demo";
     // stable or trunk
     if( !useTrunk ) path += "/stable";
     else path += "/trunk";
@@ -205,19 +203,9 @@ manipulation such as contrast, zoom, drag, possibility to draw regions on top of
 image and imaging filters such as threshold and sharpening.</p>
 
 <p>Here are a few data example that are displayed as they could
-be on a web interface to a PACS system. Choose "DWV mobile" if you are using a phone or a tablet, 
-choose "DWV static" on a laptop or desktop. Click <a href="#" id="empty-launch" class="dwvlink">here</a> 
-for a direct launch or click on a list item 
+be on a web interface to a PACS system. Click <a href="#" id="empty-launch" class="dwvlink">here</a>
+for a direct launch or click on a list item
 to launch DWV with the selected data.</p>
-
-<div>
-<label for="select-dwv">Choose which DWV to launch:</label>
-<select id="select-dwv" onChange="updateLinks();">
-<option value="dwv-jqmobile">DWV Mobile</option>
-<option value="dwv-jqui">DWV Static</option>
-<option value="dwv-simplistic">DWV Simplistic</option>
-</select>
-</div>
 
 <ul class="listview" id="uldatadicom"></ul>
 
