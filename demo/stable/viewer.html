@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DWV Test Viewer</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) simple version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<!-- Style -->
+<style type="text/css">
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+table, td, th {
+  border: 1px solid #aaa;
+}
+table {
+  border-collapse: collapse;
+}
+td, th {
+  padding: 10px;
+}
+progress {
+  width: 40%;
+}
+span {
+  font-size: small;
+  font-style: italic;
+}
+.input {
+  margin-bottom: 10px;
+  padding: 5px;
+  background-color: gainsboro;
+}
+#fileinput {
+  width: 50%;
+  border: 1px dotted gray;
+}
+.layerGroup {
+  display:inline-block;
+  height: 350px;
+  width: max(30%, 350px);
+  margin: 5px;
+  background-color: limeGreen;
+  /* allow child centering */
+  position: relative;
+}
+.layer {
+  /* needed for overlay */
+  position: absolute;
+  /* center */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+canvas {
+  /* avoid parent auto-resize */
+  vertical-align: middle;
+}
+.line {
+  padding: 5px;
+}
+/** tooltip */
+.layerGroup span {
+  display: none;
+  background-color: palegreen;
+  padding: 2px;
+}
+.layerGroup:hover span {
+  display: inline-block;
+  position: absolute;
+  overflow: hidden;
+}
+/** crossshair */
+.layerGroup hr {
+  pointer-events: none;
+  border: none;
+  position: absolute;
+  margin: 0;
+}
+hr.horizontal {
+  border-top: 2px dashed lime;
+}
+hr.vertical {
+  border-top: 2px dashed lime;
+  transform-origin: left;
+  transform: rotate(90deg);
+}
+</style>
+<!-- Third party -->
+<script type="text/javascript" src="./node_modules/jszip/dist/jszip.min.js"></script>
+<script type="text/javascript" src="./node_modules/konva/konva.min.js"></script>
+<script type="text/javascript" src="./node_modules/i18next/i18next.min.js"></script>
+<!-- dwv sources --><!--
+<script type="text/javascript" src="../../src/app/application.js"></script>
+<script type="text/javascript" src="../../src/app/dataController.js"></script>
+<script type="text/javascript" src="../../src/app/drawController.js"></script>
+<script type="text/javascript" src="../../src/app/loadController.js"></script>
+<script type="text/javascript" src="../../src/app/viewController.js"></script>
+<script type="text/javascript" src="../../src/app/toolboxController.js"></script>
+<script type="text/javascript" src="../../src/dicom/dataReader.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomElementsWrapper.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomTag.js"></script>
+<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
+<script type="text/javascript" src="../../src/gui/generic.js"></script>
+<script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
+<script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
+<script type="text/javascript" src="../../src/gui/style.js"></script>
+<script type="text/javascript" src="../../src/image/decoder.js"></script>
+<script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
+<script type="text/javascript" src="../../src/image/domReader.js"></script>
+<script type="text/javascript" src="../../src/image/filter.js"></script>
+<script type="text/javascript" src="../../src/image/geometry.js"></script>
+<script type="text/javascript" src="../../src/image/image.js"></script>
+<script type="text/javascript" src="../../src/image/imageFactory.js"></script>
+<script type="text/javascript" src="../../src/image/iterator.js"></script>
+<script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../src/image/maskFactory.js"></script>
+<script type="text/javascript" src="../../src/image/maskSegmentHelper.js"></script>
+<script type="text/javascript" src="../../src/image/planeHelper.js"></script>
+<script type="text/javascript" src="../../src/image/rescaleLut.js"></script>
+<script type="text/javascript" src="../../src/image/rsi.js"></script>
+<script type="text/javascript" src="../../src/image/size.js"></script>
+<script type="text/javascript" src="../../src/image/spacing.js"></script>
+<script type="text/javascript" src="../../src/image/view.js"></script>
+<script type="text/javascript" src="../../src/image/viewFactory.js"></script>
+<script type="text/javascript" src="../../src/image/viewMonochrome.js"></script>
+<script type="text/javascript" src="../../src/image/viewPaletteColor.js"></script>
+<script type="text/javascript" src="../../src/image/viewRgb.js"></script>
+<script type="text/javascript" src="../../src/image/viewYbrFull.js"></script>
+<script type="text/javascript" src="../../src/image/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/image/windowLut.js"></script>
+<script type="text/javascript" src="../../src/io/urlsLoader.js"></script>
+<script type="text/javascript" src="../../src/io/filesLoader.js"></script>
+<script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
+<script type="text/javascript" src="../../src/io/jsonTextLoader.js"></script>
+<script type="text/javascript" src="../../src/io/memoryLoader.js"></script>
+<script type="text/javascript" src="../../src/io/multipartLoader.js"></script>
+<script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
+<script type="text/javascript" src="../../src/io/rawVideoLoader.js"></script>
+<script type="text/javascript" src="../../src/io/state.js"></script>
+<script type="text/javascript" src="../../src/io/zipLoader.js"></script>
+<script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="../../src/math/index.js"></script>
+<script type="text/javascript" src="../../src/math/matrix.js"></script>
+<script type="text/javascript" src="../../src/math/point.js"></script>
+<script type="text/javascript" src="../../src/math/vector.js"></script>
+<script type="text/javascript" src="../../src/math/rectangle.js"></script>
+<script type="text/javascript" src="../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../src/tools/draw.js"></script>
+<script type="text/javascript" src="../../src/tools/drawCommands.js"></script>
+<script type="text/javascript" src="../../src/tools/editor.js"></script>
+<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
+<script type="text/javascript" src="../../src/tools/opacity.js"></script>
+<script type="text/javascript" src="../../src/tools/undo.js"></script>
+<script type="text/javascript" src="../../src/tools/scroll.js"></script>
+<script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
+<script type="text/javascript" src="../../src/utils/array.js"></script>
+<script type="text/javascript" src="../../src/utils/colour.js"></script>
+<script type="text/javascript" src="../../src/utils/env.js"></script>
+<script type="text/javascript" src="../../src/utils/listen.js"></script>
+<script type="text/javascript" src="../../src/utils/logger.js"></script>
+<script type="text/javascript" src="../../src/utils/modernizr.js"></script>
+<script type="text/javascript" src="../../src/utils/operator.js"></script>
+<script type="text/javascript" src="../../src/utils/progress.js"></script>
+<script type="text/javascript" src="../../src/utils/string.js"></script>
+<script type="text/javascript" src="../../src/utils/thread.js"></script>
+<script type="text/javascript" src="../../src/utils/uri.js"></script>
+<script type="text/javascript" src="../../src/utils/i18n.js"></script>
+--><!-- dwv build -->
+<script type="text/javascript" src="./dist/dwv.min.js"></script>
+<!-- local -->
+<script type="text/javascript" src="./viewer.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer);
+</script>
+
+</head>
+
+<body>
+
+<div class="input">
+<label for="fileinput">Input:</label>
+<input type="file" id="fileinput" multiple>
+<progress id="loadprogress" max="100" value="0"></progress>
+</div>
+
+<!-- DWV -->
+<div id="dwv"></div>
+
+<div class="line">
+<label for="position">Position:</label>
+<input type="text" id="position">
+<span id="positionspan"></span>
+</div>
+
+<div class="line">
+<label for="changelayout">Layout:</label>
+<select name="layout" id="changelayout" disabled>
+ <option value="single">Single</option>
+ <option value="mpr">MPR</option>
+</select>
+<button id="resetlayout" disabled>Reset Layout</button>
+</div>
+
+<div class="line" id="binders">Binders:</div>
+
+<div class="line" id="tools">Tools:</div>
+
+<div id="layersdetails"></div>
+
+</body>
+</html>
