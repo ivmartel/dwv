@@ -8,8 +8,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      IS_PUSH_MASTER: ${{ github.ref == 'refs/heads/master' }}
       IS_PUSH_DEVELOP: ${{ github.ref == 'refs/heads/develop' }}
-      IS_PUSH_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -29,8 +29,8 @@ jobs:
       run: |
         rm -Rf ./build
         yarn run build
-    - name: Prepare for deploy (if tag or develop branch)
-      if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_TAG == 'true'
+    - name: Prepare for deploy (if master or develop branch)
+      if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
       run: |
         rm -Rf ./node_modules/*
         yarn install --prod
@@ -39,11 +39,11 @@ jobs:
         cp -Rf tests/pacs/viewer.* ./build
         ./resources/scripts/prep-deploy.sh -f build/viewer.html
         ./resources/scripts/prep-deploy.sh -f build/viewer.js
-    - name: Push to gh-pages (if tag or develop branch)
-      if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_TAG == 'true'
+    - name: Push to gh-pages (if master or develop branch)
+      if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
       run: |
         DEPLOY_DIR=./demo/trunk
-        if ${{ env.IS_PUSH_TAG }}; then
+        if ${{ env.IS_PUSH_MASTER }}; then
           DEPLOY_DIR=./demo/stable
         fi
         ALL=/*
