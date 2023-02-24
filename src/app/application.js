@@ -1295,10 +1295,11 @@ dwv.App = function () {
     }
 
     // optional draw layer
+    var drawLayer;
     if (toolboxController && toolboxController.hasTool('Draw')) {
-      var dl = layerGroup.addDrawLayer();
-      dl.initialise(size2D, spacing2D, dataIndex);
-      dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
+      drawLayer = layerGroup.addDrawLayer();
+      drawLayer.initialise(size2D, spacing2D, dataIndex);
+      drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
     }
 
     // sync layers position
@@ -1325,11 +1326,17 @@ dwv.App = function () {
         // flip offset Y for axial aquired data
         if (dataViewConfig.orientation !== 'axial') {
           viewLayer.addFlipOffsetY();
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.addFlipOffsetY();
+          }
         }
       } else if (major === 0) {
         // flip offset X for sagittal aquired data
         if (dataViewConfig.orientation !== 'sagittal') {
           viewLayer.addFlipOffsetX();
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.addFlipOffsetX();
+          }
         }
       }
     }
@@ -1343,6 +1350,9 @@ dwv.App = function () {
           layerGroup.flipScaleZ();
         } else {
           viewLayer.setScale(layerGroup.getScale());
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.setScale(layerGroup.getScale());
+          }
         }
       } else {
         if (major === 0) {
@@ -1350,10 +1360,16 @@ dwv.App = function () {
           layerGroup.flipScaleZ();
         } else {
           viewLayer.setScale(layerGroup.getScale());
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.setScale(layerGroup.getScale());
+          }
         }
       }
     } else {
       viewLayer.setScale(layerGroup.getScale());
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.setScale(layerGroup.getScale());
+      }
     }
 
   }

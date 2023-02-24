@@ -78,6 +78,14 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var zoomOffset = {x: 0, y: 0};
 
   /**
+   * The flip offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var flipOffset = {x: 0, y: 0};
+
+  /**
    * The draw controller.
    *
    * @private
@@ -194,6 +202,36 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
+   * Add a flip offset along the layer X axis.
+   */
+  this.addFlipOffsetX = function () {
+    // flip scale is handled by layer group
+    // flip offset
+    var scale = konvaStage.scale();
+    var size = konvaStage.size();
+    flipOffset.x += size.width / scale.x;
+    // apply
+    var offset = konvaStage.offset();
+    offset.x += flipOffset.x;
+    konvaStage.offset(offset);
+  };
+
+  /**
+   * Add a flip offset along the layer Y axis.
+   */
+  this.addFlipOffsetY = function () {
+    // flip scale is handled by layer group
+    // flip offset
+    var scale = konvaStage.scale();
+    var size = konvaStage.size();
+    flipOffset.y += size.height / scale.y;
+    // apply
+    var offset = konvaStage.offset();
+    offset.y += flipOffset.y;
+    konvaStage.offset(offset);
+  };
+
+  /**
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
@@ -260,8 +298,10 @@ dwv.gui.DrawLayer = function (containerDiv) {
   this.setOffset = function (newOffset) {
     var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
     konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
+      x: planeNewOffset.x +
+        viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: planeNewOffset.y +
+        viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     });
   };
 
@@ -388,8 +428,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
       y: fitOffset.y / fitScale.y
     };
     konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y
+      x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     });
   };
 
