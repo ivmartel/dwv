@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-02-24 13:29:15 */
+/*! dwv 0.31.0-rc.0 2023-02-24 14:50:02 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1369,10 +1369,11 @@ dwv.App = function () {
     }
 
     // optional draw layer
+    var drawLayer;
     if (toolboxController && toolboxController.hasTool('Draw')) {
-      var dl = layerGroup.addDrawLayer();
-      dl.initialise(size2D, spacing2D, dataIndex);
-      dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
+      drawLayer = layerGroup.addDrawLayer();
+      drawLayer.initialise(size2D, spacing2D, dataIndex);
+      drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
     }
 
     // sync layers position
@@ -1399,11 +1400,17 @@ dwv.App = function () {
         // flip offset Y for axial aquired data
         if (dataViewConfig.orientation !== 'axial') {
           viewLayer.addFlipOffsetY();
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.addFlipOffsetY();
+          }
         }
       } else if (major === 0) {
         // flip offset X for sagittal aquired data
         if (dataViewConfig.orientation !== 'sagittal') {
           viewLayer.addFlipOffsetX();
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.addFlipOffsetX();
+          }
         }
       }
     }
@@ -1417,6 +1424,9 @@ dwv.App = function () {
           layerGroup.flipScaleZ();
         } else {
           viewLayer.setScale(layerGroup.getScale());
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.setScale(layerGroup.getScale());
+          }
         }
       } else {
         if (major === 0) {
@@ -1424,10 +1434,16 @@ dwv.App = function () {
           layerGroup.flipScaleZ();
         } else {
           viewLayer.setScale(layerGroup.getScale());
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.setScale(layerGroup.getScale());
+          }
         }
       }
     } else {
       viewLayer.setScale(layerGroup.getScale());
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.setScale(layerGroup.getScale());
+      }
     }
 
   }
@@ -12911,6 +12927,14 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var zoomOffset = {x: 0, y: 0};
 
   /**
+   * The flip offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var flipOffset = {x: 0, y: 0};
+
+  /**
    * The draw controller.
    *
    * @private
@@ -13027,6 +13051,36 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
+   * Add a flip offset along the layer X axis.
+   */
+  this.addFlipOffsetX = function () {
+    // flip scale is handled by layer group
+    // flip offset
+    var scale = konvaStage.scale();
+    var size = konvaStage.size();
+    flipOffset.x += size.width / scale.x;
+    // apply
+    var offset = konvaStage.offset();
+    offset.x += flipOffset.x;
+    konvaStage.offset(offset);
+  };
+
+  /**
+   * Add a flip offset along the layer Y axis.
+   */
+  this.addFlipOffsetY = function () {
+    // flip scale is handled by layer group
+    // flip offset
+    var scale = konvaStage.scale();
+    var size = konvaStage.size();
+    flipOffset.y += size.height / scale.y;
+    // apply
+    var offset = konvaStage.offset();
+    offset.y += flipOffset.y;
+    konvaStage.offset(offset);
+  };
+
+  /**
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
@@ -13093,8 +13147,10 @@ dwv.gui.DrawLayer = function (containerDiv) {
   this.setOffset = function (newOffset) {
     var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
     konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
+      x: planeNewOffset.x +
+        viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: planeNewOffset.y +
+        viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     });
   };
 
@@ -13221,8 +13277,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
       y: fitOffset.y / fitScale.y
     };
     konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y
+      x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     });
   };
 
@@ -32202,6 +32258,7 @@ var Konva = Konva || {};
  * @returns {object} The default anchor shape.
  */
 dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
+  var radius = style.applyZoomScale(3);
   return new Konva.Ellipse({
     x: x,
     y: y,
@@ -32209,7 +32266,10 @@ dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
     fill: 'rgba(100,100,100,0.7',
     strokeWidth: style.getStrokeWidth(),
     strokeScaleEnabled: false,
-    radius: style.applyZoomScale(3),
+    radius: {
+      x: Math.abs(radius.x),
+      y: Math.abs(radius.y)
+    },
     name: 'anchor',
     id: id,
     dragOnTop: false,
