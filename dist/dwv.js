@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.23 2023-01-31 09:43:24 */
+/*! dwv 0.31.0-rc.0 2023-02-24 11:35:58 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -79,7 +79,6 @@ var dwv = dwv || {};
  * Main application class.
  *
  * @class
- * @tutorial examples
  * @example
  * // create the dwv app
  * var app = new dwv.App();
@@ -391,6 +390,7 @@ dwv.App = function () {
    * // render button
    * var button = document.createElement('button');
    * button.id = 'render';
+   * button.disabled = true;
    * button.appendChild(document.createTextNode('render'));
    * document.body.appendChild(button);
    * app.addEventListener('load', function () {
@@ -480,12 +480,12 @@ dwv.App = function () {
     // create load controller
     loadController = new dwv.ctrl.LoadController(options.defaultCharacterSet);
     loadController.onloadstart = onloadstart;
-    loadController.onprogress = onprogress;
+    loadController.onprogress = onloadprogress;
     loadController.onloaditem = onloaditem;
     loadController.onload = onload;
     loadController.onloadend = onloadend;
-    loadController.onerror = onerror;
-    loadController.onabort = onabort;
+    loadController.onerror = onloaderror;
+    loadController.onabort = onloadabort;
 
     // create data controller
     dataController = new dwv.ctrl.DataController();
@@ -887,36 +887,33 @@ dwv.App = function () {
    * @fires dwv.tool.UndoStack#redo
    */
   this.defaultOnKeydown = function (event) {
-    var viewController =
-      stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
-    var size = viewController.getImageSize();
     if (event.ctrlKey) {
-      if (event.keyCode === 37) { // crtl-arrow-left
-        event.preventDefault();
-        if (size.moreThanOne(3)) {
-          viewController.decrementIndex(3);
+      if (event.shiftKey) {
+        var viewController =
+          stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
+        var size = viewController.getImageSize();
+        if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
+          if (size.moreThanOne(3)) {
+            viewController.decrementIndex(3);
+          }
+        } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
+          if (viewController.canScroll()) {
+            viewController.incrementScrollIndex();
+          }
+        } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
+          if (size.moreThanOne(3)) {
+            viewController.incrementIndex(3);
+          }
+        } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
+          if (viewController.canScroll()) {
+            viewController.decrementScrollIndex();
+          }
         }
-      } else if (event.keyCode === 38) { // crtl-arrow-up
-        event.preventDefault();
-        if (viewController.canScroll()) {
-          viewController.incrementScrollIndex();
-        }
-      } else if (event.keyCode === 39) { // crtl-arrow-right
-        event.preventDefault();
-        if (size.moreThanOne(3)) {
-          viewController.incrementIndex(3);
-        }
-      } else if (event.keyCode === 40) { // crtl-arrow-down
-        event.preventDefault();
-        if (viewController.canScroll()) {
-          viewController.decrementScrollIndex();
-        }
-      } else if (event.keyCode === 89) { // crtl-y
+      } else if (event.key === 'y') { // crtl-y
         undoStack.redo();
-      } else if (event.keyCode === 90) { // crtl-z
+      } else if (event.key === 'z') { // crtl-z
         undoStack.undo();
-      } else if (event.code === 'Space') { // crtl-space
-        event.preventDefault();
+      } else if (event.key === ' ') { // crtl-space
         for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
           stage.getLayerGroup(i).setShowCrosshair(
             !stage.getLayerGroup(i).getShowCrosshair()
@@ -1076,7 +1073,7 @@ dwv.App = function () {
    * @param {object} event The progress event.
    * @private
    */
-  function onprogress(event) {
+  function onloadprogress(event) {
     /**
      * Load progress event.
      *
@@ -1201,11 +1198,11 @@ dwv.App = function () {
    * @param {object} event The error event.
    * @private
    */
-  function onerror(event) {
+  function onloaderror(event) {
     /**
      * Load error event.
      *
-     * @event dwv.App#error
+     * @event dwv.App#loaderror
      * @type {object}
      * @property {string} type The event type: error.
      * @property {string} loadType The load type: image or state.
@@ -1214,7 +1211,7 @@ dwv.App = function () {
      * @property {object} error The error.
      * @property {object} target The event target.
      */
-    event.type = 'error';
+    event.type = 'loaderror';
     fireEvent(event);
   }
 
@@ -1224,18 +1221,18 @@ dwv.App = function () {
    * @param {object} event The abort event.
    * @private
    */
-  function onabort(event) {
+  function onloadabort(event) {
     /**
      * Load abort event.
      *
-     * @event dwv.App#abort
+     * @event dwv.App#loadabort
      * @type {object}
      * @property {string} type The event type: abort.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'abort';
+    event.type = 'loadabort';
     fireEvent(event);
   }
 
@@ -1257,7 +1254,7 @@ dwv.App = function () {
       group.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
     // propagate drawLayer events
-    if (toolboxController.hasTool('Draw')) {
+    if (toolboxController && toolboxController.hasTool('Draw')) {
       group.addEventListener('drawcreate', fireEvent);
       group.addEventListener('drawdelete', fireEvent);
     }
@@ -1304,9 +1301,7 @@ dwv.App = function () {
 
     // create and setup view
     var viewFactory = new dwv.ViewFactory();
-    var view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(data.meta),
-      data.image);
+    var view = viewFactory.create(data.meta, data.image);
     var viewOrientation = dwv.gui.getViewOrientation(
       imageGeometry.getOrientation(),
       layerGroup.getTargetOrientation()
@@ -1378,18 +1373,17 @@ dwv.App = function () {
       var dl = layerGroup.addDrawLayer();
       dl.initialise(size2D, spacing2D, dataIndex);
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
-
-      // force positionchange to sync layers
-
-      var value = [
-        viewController.getCurrentIndex().getValues(),
-        viewController.getCurrentPosition().getValues()
-      ];
-      layerGroup.updateLayersToPositionChange({
-        value: value,
-        srclayerid: viewLayer.getId()
-      });
     }
+
+    // sync layers position
+    var value = [
+      viewController.getCurrentIndex().getValues(),
+      viewController.getCurrentPosition().getValues()
+    ];
+    layerGroup.updateLayersToPositionChange({
+      value: value,
+      srclayerid: viewLayer.getId()
+    });
 
     // sync layer groups
     stage.syncLayerGroupScale();
@@ -2590,13 +2584,11 @@ dwv.ctrl.ToolboxController = function (toolList) {
         };
       } else if (eventType === 'touchend') {
         callback = function (event) {
-          event.preventDefault();
           applySelectedTool(event);
         };
       } else {
         // mouse or touch events
         callback = function (event) {
-          event.preventDefault();
           augmentEventOffsets(event);
           applySelectedTool(event);
         };
@@ -4763,7 +4755,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.23';
+  return '0.31.0-rc.0';
 };
 
 /**
@@ -5259,6 +5251,29 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
  * DicomParser class.
  *
  * @class
+ * @example
+ * // XMLHttpRequest onload callback
+ * var onload = function (event) {
+ *   // setup the dicom parser
+ *   var dicomParser = new dwv.dicom.DicomParser();
+ *   // parse the buffer
+ *   dicomParser.parse(event.target.response);
+ *   // get the wrapped dicom tags
+ *   // (raw tags are available via 'getRawDicomElements')
+ *   var tags = dicomParser.getDicomElements();
+ *   // display the modality
+ *   var div = document.getElementById('dwv');
+ *   div.appendChild(document.createTextNode(
+ *     'Modality: ' + tags.getFromName('Modality')
+ *   ));
+ * };
+ * // DICOM file request
+ * var request = new XMLHttpRequest();
+ * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 dwv.dicom.DicomParser = function () {
   /**
@@ -13026,9 +13041,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
 
     var offset = konvaStage.offset();
 
-    if (newScale.x === 1 &&
-      newScale.y === 1 &&
-      newScale.z === 1) {
+    if (Math.abs(newScale.x) === 1 &&
+      Math.abs(newScale.y) === 1 &&
+      Math.abs(newScale.z) === 1) {
       // reset zoom offset for scale=1
       var resetOffset = {
         x: offset.x - zoomOffset.x,
@@ -15928,7 +15943,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
-      containerDiv.addEventListener(names[i], fireEvent);
+      containerDiv.addEventListener(names[i], fireEvent, {passive: true});
     }
   };
 
@@ -17929,6 +17944,42 @@ dwv.image.getSliceIndex = function (volumeGeometry, sliceGeometry) {
  * @param {dwv.image.Geometry} geometry The geometry of the image.
  * @param {Array} buffer The image data as a one dimensional buffer.
  * @param {Array} imageUids An array of Uids indexed to slice number.
+ * @example
+ * // XMLHttpRequest onload callback
+ * var onload = function (event) {
+ *   // setup the dicom parser
+ *   var dicomParser = new dwv.dicom.DicomParser();
+ *   // parse the buffer
+ *   dicomParser.parse(event.target.response);
+ *   // create the image
+ *   var imageFactory = new dwv.image.ImageFactory();
+ *   // inputs are dicom tags and buffer
+ *   var image = imageFactory.create(
+ *     dicomParser.getDicomElements(),
+ *     dicomParser.getRawDicomElements().x7FE00010.value[0]
+ *   );
+ *   // result div
+ *   var div = document.getElementById('dwv');
+ *   // display the image size
+ *   var size = image.getGeometry().getSize();
+ *   div.appendChild(document.createTextNode(
+ *     'Size: ' + size.toString() +
+ *     ' (should be 256,256,1)'));
+ *   // break line
+ *   div.appendChild(document.createElement('br'));
+ *   // display a pixel value
+ *   div.appendChild(document.createTextNode(
+ *     'Pixel @ [128,40,0]: ' +
+ *     image.getRescaledValue(128,40,0) +
+ *     ' (should be 101)'));
+ * };
+ * // DICOM file request
+ * var request = new XMLHttpRequest();
+ * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 dwv.image.Image = function (geometry, buffer, imageUids) {
 
@@ -18294,6 +18345,90 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
     }
     return offsets;
+  };
+
+  /**
+   * Check if the input values are in the buffer.
+   * Could loop through the whole volume, can get long for big data...
+   *
+   * @param {Array} values The values to check.
+   * @returns {Array} A list of booleans for each input value,
+   *   set to true if the value is present in the buffer.
+   */
+  this.hasValues = function (values) {
+    // check input
+    if (typeof values === 'undefined' ||
+      values.length === 0) {
+      return [];
+    }
+    // final array value
+    var finalValues = [];
+    for (var v1 = 0; v1 < values.length; ++v1) {
+      if (numberOfComponents === 1) {
+        finalValues.push([values[v1]]);
+      } else if (numberOfComponents === 3) {
+        finalValues.push([
+          values[v1].r,
+          values[v1].g,
+          values[v1].b
+        ]);
+      }
+    }
+    // find callback
+    var equalFunc;
+    if (numberOfComponents === 1) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0];
+      };
+    } else if (numberOfComponents === 3) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0] &&
+          a[1] === b[1] &&
+          a[2] === b[2];
+      };
+    }
+    var getEqualCallback = function (value) {
+      return function (item) {
+        return equalFunc(item, value);
+      };
+    };
+    // main loop
+    var res = new Array(values.length);
+    res.fill(false);
+    var valuesToFind = finalValues.slice();
+    var equal;
+    var indicesToRemove;
+    for (var i = 0, leni = buffer.length;
+      i < leni; i = i + numberOfComponents) {
+      indicesToRemove = [];
+      for (var v = 0; v < valuesToFind.length; ++v) {
+        equal = true;
+        // check value(s)
+        for (var j = 0; j < numberOfComponents; ++j) {
+          if (buffer[i + j] !== valuesToFind[v][j]) {
+            equal = false;
+            break;
+          }
+        }
+        // if found, store answer and add to indices to remove
+        if (equal) {
+          var valIndex = finalValues.findIndex(
+            getEqualCallback(valuesToFind[v]));
+          res[valIndex] = true;
+          indicesToRemove.push(v);
+        }
+      }
+      // remove found values
+      for (var r = 0; r < indicesToRemove.length; ++r) {
+        valuesToFind.splice(indicesToRemove[r], 1);
+      }
+      // exit if no values to find
+      if (valuesToFind.length === 0) {
+        break;
+      }
+    }
+    // return
+    return res;
   };
 
   /**
@@ -21274,12 +21409,32 @@ dwv.image.MaskSegmentHelper = function (mask) {
     return typeof this.getSegment(segmentNumber) !== 'undefined';
   };
 
-  this.maskHasSegment = function (segmentNumber) {
-    var segment = this.getSegment(segmentNumber);
-    if (typeof segment === 'undefined') {
-      return true;
+  /**
+   * Check if a segment is present in a mask image.
+   *
+   * @param {Array} numbers Array of segment numbers.
+   * @returns {Array} Array of boolean set to true
+   *   if the segment is present in the mask.
+   */
+  this.maskHasSegments = function (numbers) {
+    // create values using displayValue
+    var values = [];
+    var unknowns = [];
+    for (var i = 0; i < numbers.length; ++i) {
+      var segment = this.getSegment(numbers[i]);
+      if (typeof segment !== 'undefined') {
+        values.push(segment.displayValue);
+      } else {
+        dwv.logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
+        unknowns.push(i);
+      }
     }
-    return mask.getOffsets(segment.displayValue).length !== 0;
+    var res = mask.hasValues(values);
+    // insert unknowns as false in result
+    for (var j = 0; j < unknowns.length; ++j) {
+      res.splice(unknowns[j], 0, false);
+    }
+    return res;
   };
 
   /**
@@ -21314,6 +21469,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
 
   /**
    * Set the hidden segment list.
+   * TODO: not sure if needed...
    *
    * @param {Array} list The list of hidden segment numbers.
    */
@@ -22414,8 +22570,13 @@ dwv.image.View = function (image) {
    */
   this.setInitialIndex = function () {
     var geometry = image.getGeometry();
-    var values = new Array(geometry.getSize().length());
+    var size = geometry.getSize();
+    var values = new Array(size.length());
     values.fill(0);
+    // middle
+    values[0] = Math.floor(size.get(0) / 2);
+    values[1] = Math.floor(size.get(1) / 2);
+    values[2] = Math.floor(size.get(2) / 2);
     this.setCurrentIndex(new dwv.math.Index(values), true);
   };
 
@@ -22846,7 +23007,6 @@ dwv.image.View = function (image) {
     }
 
     // all good
-    //console.log('[v] set cur index OUT');
     return true;
   };
 
@@ -25698,7 +25858,7 @@ dwv.io.State = function () {
       scale = {
         x: data.scale.x * baseScale.x,
         y: data.scale.y * baseScale.y,
-        z: 1
+        z: baseScale.z
       };
       offset = {
         x: data.offset.x,
@@ -31006,8 +31166,10 @@ dwv.tool.Draw = function (app) {
     }
     var konvaLayer;
 
-    // press delete key
-    if (event.keyCode === 46 && shapeEditor.isActive()) {
+    // press delete or backspace key
+    if ((event.key === 'Delete' ||
+      event.key === 'Backspace') &&
+      shapeEditor.isActive()) {
       // get shape
       var shapeGroup = shapeEditor.getShape().getParent();
       konvaLayer = shapeGroup.getLayer();
@@ -31023,7 +31185,7 @@ dwv.tool.Draw = function (app) {
     }
 
     // escape key: exit shape creation
-    if (event.keyCode === 27 && tmpShapeGroup !== null) {
+    if (event.key === 'Escape' && tmpShapeGroup !== null) {
       konvaLayer = tmpShapeGroup.getLayer();
       // reset temporary shape group
       tmpShapeGroup.destroy();
@@ -31181,6 +31343,9 @@ dwv.tool.Draw = function (app) {
     // draw
     var drawLayer = layerGroup.getActiveDrawLayer();
     var konvaLayer = drawLayer.getKonvaLayer();
+    if (shapeGroups.length !== 0) {
+      konvaLayer.listening(true);
+    }
     konvaLayer.draw();
   }
 
@@ -34515,6 +34680,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {Opacity: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('Opacity');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.Opacity = function (app) {
   /**
@@ -36411,6 +36592,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {WindowLevel: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('WindowLevel');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.WindowLevel = function (app) {
   /**
@@ -36615,6 +36812,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {ZoomAndPan: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('ZoomAndPan');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.ZoomAndPan = function (app) {
   /**
