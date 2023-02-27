@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-02-24 14:50:02 */
+/*! dwv 0.31.0-rc.0 2023-02-27 11:47:30 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -34428,6 +34428,24 @@ dwv.tool.Livewire = function (app) {
   var scissors = new dwv.math.Scissors();
 
   /**
+   * Finish a livewire (roi) shape.
+   */
+  function finishShape() {
+    // fire creation event (was not propagated during draw)
+    fireEvent({
+      type: 'drawcreate',
+      id: shapeGroup.id()
+    });
+    // listen
+    command.onExecute = fireEvent;
+    command.onUndo = fireEvent;
+    // save command in undo stack
+    app.addToUndoStack(command);
+    // set flag
+    self.started = false;
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -34463,17 +34481,8 @@ dwv.tool.Livewire = function (app) {
       // final point: at 'tolerance' of the initial point
       if ((Math.abs(index.get(0) - self.x0) < tolerance) &&
         (Math.abs(index.get(1) - self.y0) < tolerance)) {
-        // draw
-        self.mousemove(event);
-        // listen
-        command.onExecute = fireEvent;
-        command.onUndo = fireEvent;
-        // debug
-        dwv.logger.debug('[livewire] finialise path.');
-        // save command in undo stack
-        app.addToUndoStack(command);
-        // set flag
-        self.started = false;
+        // finish
+        finishShape();
       } else {
         // anchor point
         path = currentPath;
@@ -34505,7 +34514,6 @@ dwv.tool.Livewire = function (app) {
     // do the work
     var results = 0;
     var stop = false;
-    dwv.logger.debug('[livewire] getting ready...');
     while (!parentPoints[p.y][p.x] && !stop) {
       results = scissors.doWork();
 
@@ -34520,7 +34528,6 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    dwv.logger.debug('[livewire] ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -34588,11 +34595,7 @@ dwv.tool.Livewire = function (app) {
    * @param {object} _event The double click event.
    */
   this.dblclick = function (_event) {
-    dwv.logger.debug('[livewire] dblclick');
-    // save command in undo stack
-    app.addToUndoStack(command);
-    // set flag
-    self.started = false;
+    finishShape();
   };
 
   /**
