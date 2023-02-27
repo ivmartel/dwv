@@ -116,6 +116,11 @@ dwv.tool.Livewire = function (app) {
    * Finish a livewire (roi) shape.
    */
   function finishShape() {
+    // fire creation event (was not propagated during draw)
+    fireEvent({
+      type: 'drawcreate',
+      id: shapeGroup.id()
+    });
     // listen
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
