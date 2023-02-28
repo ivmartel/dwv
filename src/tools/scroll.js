@@ -279,10 +279,19 @@ dwv.tool.Scroll = function (app) {
     var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    if (up) {
-      viewController.incrementScrollIndex();
-    } else {
-      viewController.decrementScrollIndex();
+    var imageSize = viewController.getImageSize();
+    if (imageSize.canScroll3D()) {
+      if (up) {
+        viewController.incrementScrollIndex();
+      } else {
+        viewController.decrementScrollIndex();
+      }
+    } else if (imageSize.moreThanOne(3)) {
+      if (up) {
+        viewController.incrementIndex(3);
+      } else {
+        viewController.decrementIndex(3);
+      }
     }
   };
 
