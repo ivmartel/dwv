@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-02-27 11:47:30 */
+/*! dwv 0.31.0-rc.0 2023-02-28 10:56:36 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -36354,10 +36354,19 @@ dwv.tool.Scroll = function (app) {
     var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    if (up) {
-      viewController.incrementScrollIndex();
-    } else {
-      viewController.decrementScrollIndex();
+    var imageSize = viewController.getImageSize();
+    if (imageSize.canScroll3D()) {
+      if (up) {
+        viewController.incrementScrollIndex();
+      } else {
+        viewController.decrementScrollIndex();
+      }
+    } else if (imageSize.moreThanOne(3)) {
+      if (up) {
+        viewController.incrementIndex(3);
+      } else {
+        viewController.decrementIndex(3);
+      }
     }
   };
 
