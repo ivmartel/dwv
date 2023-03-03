@@ -108,6 +108,22 @@ dwv.tool.Draw = function (app) {
   var lastPoint = null;
 
   /**
+   * Active shape, ie shape with mouse over.
+   *
+   * @private
+   * @type {object}
+   */
+  var activeShapeGroup;
+
+  /**
+   * Original mouse cursor.
+   *
+   * @private
+   * @type {string}
+   */
+  var originalCursor;
+
+  /**
    * Shape editor.
    *
    * @private
@@ -506,12 +522,13 @@ dwv.tool.Draw = function (app) {
     shapeEditor.disable();
     shapeEditor.setShape(null);
     shapeEditor.setViewController(null);
-    document.body.style.cursor = 'default';
     // get the current draw layer
     var layerGroup = app.getActiveLayerGroup();
     activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
+      // store cursor
+      originalCursor = document.body.style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
       app.addEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
@@ -519,6 +536,11 @@ dwv.tool.Draw = function (app) {
       // same for colour
       this.setFeatures({lineColour: this.style.getLineColour()});
     } else {
+      // reset shape and cursor
+      resetActiveShapeGroup();
+      // reset local var
+      originalCursor = undefined;
+      // remove listeners
       app.removeEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
       });
@@ -606,19 +628,48 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
+   * Reset the active shape group and mouse cursor to their original state.
+   */
+  function resetActiveShapeGroup() {
+    if (typeof originalCursor !== 'undefined') {
+      document.body.style.cursor = originalCursor;
+    }
+    if (typeof activeShapeGroup !== 'undefined') {
+      activeShapeGroup.opacity(1);
+      var colour = self.style.getLineColour();
+      activeShapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
+        function (ashape) {
+          ashape.stroke(colour);
+        }
+      );
+    }
+  }
+
+  /**
    * Set shape group on properties.
    *
    * @param {object} shapeGroup The shape group to set on.
    * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   this.setShapeOn = function (shapeGroup, layerGroup) {
-    // mouse over styling
-    shapeGroup.on('mouseover', function () {
+    // adapt shape and cursor when mouse over
+    var mouseOnShape = function () {
       document.body.style.cursor = 'pointer';
+      shapeGroup.opacity(0.75);
+    };
+    // mouse over event hanlding
+    shapeGroup.on('mouseover', function () {
+      // save local vars
+      activeShapeGroup = shapeGroup;
+      // adapt shape
+      mouseOnShape();
     });
-    // mouse out styling
+    // mouse out event hanlding
     shapeGroup.on('mouseout', function () {
-      document.body.style.cursor = 'default';
+      // reset shape
+      resetActiveShapeGroup();
+      // reset local vars
+      activeShapeGroup = undefined;
     });
 
     var drawLayer = layerGroup.getActiveDrawLayer();
@@ -708,9 +759,14 @@ dwv.tool.Draw = function (app) {
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
-      var pos = {x: this.x(), y: this.y()};
       // remove trash
       trash.remove();
+      // activate(false) will also trigger a dragend.draw
+      if (typeof event === 'undefined' ||
+        typeof event.evt === 'undefined') {
+        return;
+      }
+      var pos = {x: this.x(), y: this.y()};
       // delete case
       var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset, layerGroup);
@@ -731,7 +787,7 @@ dwv.tool.Draw = function (app) {
             ashape.stroke(colour);
           });
         // reset cursor
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = originalCursor;
         // delete command
         var delcmd = new dwv.tool.DeleteGroupCommand(this,
           shapeDisplayName, konvaLayer);
