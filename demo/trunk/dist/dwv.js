@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-03-03 15:38:39 */
+/*! dwv 0.31.0-rc.0 2023-03-03 15:47:14 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -30959,6 +30959,14 @@ dwv.tool.Draw = function (app) {
   var originalCursor;
 
   /**
+   * Mouse cursor.
+   *
+   * @private
+   * @type {string}
+   */
+  var mouseOverCursor = 'pointer';
+
+  /**
    * Shape editor.
    *
    * @private
@@ -31489,7 +31497,7 @@ dwv.tool.Draw = function (app) {
   this.setShapeOn = function (shapeGroup, layerGroup) {
     // adapt shape and cursor when mouse over
     var mouseOnShape = function () {
-      document.body.style.cursor = 'pointer';
+      document.body.style.cursor = mouseOverCursor;
       shapeGroup.opacity(0.75);
     };
     // mouse over event hanlding
@@ -31736,6 +31744,9 @@ dwv.tool.Draw = function (app) {
         throw new Error('Unknown shape: \'' + features.shapeName + '\'');
       }
       this.shapeName = features.shapeName;
+    }
+    if (typeof features.mouseOverCursor !== 'undefined') {
+      mouseOverCursor = features.mouseOverCursor;
     }
   };
 
