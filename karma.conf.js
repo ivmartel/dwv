@@ -13,16 +13,6 @@ module.exports = function (config) {
     files: [
       // dependencies
       {pattern: 'node_modules/konva/konva.min.js', watched: false},
-      {pattern: 'node_modules/i18next/i18next.min.js', watched: false},
-      {
-        pattern: 'node_modules/i18next-http-backend/i18nextHttpBackend.min.js',
-        watched: false
-      },
-      {
-        pattern: 'node_modules/i18next-browser-languagedetector/' +
-          'i18nextBrowserLanguageDetector.min.js',
-        watched: false
-      },
       {pattern: 'node_modules/jszip/dist/jszip.min.js', watched: false},
       // benchmark
       {pattern: 'node_modules/lodash/lodash.min.js', watched: false},
