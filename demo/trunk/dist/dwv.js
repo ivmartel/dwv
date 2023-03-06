@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-03-03 15:47:14 */
+/*! dwv 0.31.0-rc.0 2023-03-06 11:09:37 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -30967,6 +30967,13 @@ dwv.tool.Draw = function (app) {
   var mouseOverCursor = 'pointer';
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Shape editor.
    *
    * @private
@@ -31231,6 +31238,15 @@ dwv.tool.Draw = function (app) {
    */
   this.touchend = function (event) {
     self.dblclick(event);
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**
@@ -34843,6 +34859,13 @@ dwv.tool.Opacity = function (app) {
   this.started = false;
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -34931,6 +34954,15 @@ dwv.tool.Opacity = function (app) {
   this.touchend = function (event) {
     // call mouse equivalent
     self.mouseup(event);
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**
@@ -36227,11 +36259,11 @@ dwv.tool.Scroll = function (app) {
   var touchTimerID = null;
 
   /**
-   * Accumulated wheel event deltaY.
+   * Scroll wheel handler.
    *
-   * @type {number}
+   * @type {dwv.tool.ScrollWheel}
    */
-  var wheelDeltaY = 0;
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
 
   /**
    * Option to show or not a value tooltip on mousemove.
@@ -36396,45 +36428,7 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The mouse wheel event.
    */
   this.wheel = function (event) {
-    // deltaMode (deltaY values on my machine...):
-    // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
-    // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
-    // - 2 (DOM_DELTA_PAGE): ??
-    // TODO: check scroll event
-    var scrollMin = 52;
-    if (event.deltaMode === 1) {
-      scrollMin = 5.99;
-    }
-    wheelDeltaY += event.deltaY;
-    if (Math.abs(wheelDeltaY) < scrollMin) {
-      return;
-    } else {
-      wheelDeltaY = 0;
-    }
-
-    var up = false;
-    if (event.deltaY < 0) {
-      up = true;
-    }
-
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    var imageSize = viewController.getImageSize();
-    if (imageSize.canScroll3D()) {
-      if (up) {
-        viewController.incrementScrollIndex();
-      } else {
-        viewController.decrementScrollIndex();
-      }
-    } else if (imageSize.moreThanOne(3)) {
-      if (up) {
-        viewController.incrementIndex(3);
-      } else {
-        viewController.decrementIndex(3);
-      }
-    }
+    scrollWhell.wheel(event);
   };
 
   /**
@@ -36559,6 +36553,70 @@ dwv.tool.Scroll.prototype.getHelpKeys = function () {
     }
   };
 };
+
+// namespaces
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+
+/**
+ * Scroll wheel class: provides a wheel event handler
+ *   that scroll the corresponding data.
+ *
+ * @class
+ * @param {dwv.App} app The associated application.
+ */
+dwv.tool.ScrollWheel = function (app) {
+  /**
+   * Accumulated wheel event deltaY.
+   *
+   * @type {number}
+   */
+  var wheelDeltaY = 0;
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    // deltaMode (deltaY values on my machine...):
+    // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
+    // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
+    // - 2 (DOM_DELTA_PAGE): ??
+    // TODO: check scroll event
+    var scrollMin = 52;
+    if (event.deltaMode === 1) {
+      scrollMin = 5.99;
+    }
+    wheelDeltaY += event.deltaY;
+    if (Math.abs(wheelDeltaY) < scrollMin) {
+      return;
+    } else {
+      wheelDeltaY = 0;
+    }
+
+    var up = event.deltaY < 0 ? true : false;
+
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var viewController =
+      layerGroup.getActiveViewLayer().getViewController();
+    var imageSize = viewController.getImageSize();
+    if (imageSize.canScroll3D()) {
+      if (up) {
+        viewController.incrementScrollIndex();
+      } else {
+        viewController.decrementScrollIndex();
+      }
+    } else if (imageSize.moreThanOne(3)) {
+      if (up) {
+        viewController.incrementIndex(3);
+      } else {
+        viewController.decrementIndex(3);
+      }
+    }
+  };
+}; // ScrollWheel class
 
 // namespaces
 var dwv = dwv || {};
@@ -36764,6 +36822,13 @@ dwv.tool.WindowLevel = function (app) {
   this.started = false;
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -36893,6 +36958,15 @@ dwv.tool.WindowLevel = function (app) {
         )
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**
