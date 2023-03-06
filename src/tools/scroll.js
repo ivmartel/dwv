@@ -85,11 +85,11 @@ dwv.tool.Scroll = function (app) {
   var touchTimerID = null;
 
   /**
-   * Accumulated wheel event deltaY.
+   * Scroll wheel handler.
    *
-   * @type {number}
+   * @type {dwv.tool.ScrollWheel}
    */
-  var wheelDeltaY = 0;
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
 
   /**
    * Option to show or not a value tooltip on mousemove.
@@ -254,45 +254,7 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The mouse wheel event.
    */
   this.wheel = function (event) {
-    // deltaMode (deltaY values on my machine...):
-    // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
-    // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
-    // - 2 (DOM_DELTA_PAGE): ??
-    // TODO: check scroll event
-    var scrollMin = 52;
-    if (event.deltaMode === 1) {
-      scrollMin = 5.99;
-    }
-    wheelDeltaY += event.deltaY;
-    if (Math.abs(wheelDeltaY) < scrollMin) {
-      return;
-    } else {
-      wheelDeltaY = 0;
-    }
-
-    var up = false;
-    if (event.deltaY < 0) {
-      up = true;
-    }
-
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    var imageSize = viewController.getImageSize();
-    if (imageSize.canScroll3D()) {
-      if (up) {
-        viewController.incrementScrollIndex();
-      } else {
-        viewController.decrementScrollIndex();
-      }
-    } else if (imageSize.moreThanOne(3)) {
-      if (up) {
-        viewController.incrementIndex(3);
-      } else {
-        viewController.decrementIndex(3);
-      }
-    }
+    scrollWhell.wheel(event);
   };
 
   /**

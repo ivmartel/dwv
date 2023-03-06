@@ -132,6 +132,13 @@ dwv.tool.Draw = function (app) {
   var mouseOverCursor = 'pointer';
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Shape editor.
    *
    * @private
@@ -396,6 +403,15 @@ dwv.tool.Draw = function (app) {
    */
   this.touchend = function (event) {
     self.dblclick(event);
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**

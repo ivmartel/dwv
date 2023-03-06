@@ -40,6 +40,13 @@ dwv.tool.WindowLevel = function (app) {
   this.started = false;
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -169,6 +176,15 @@ dwv.tool.WindowLevel = function (app) {
         )
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**

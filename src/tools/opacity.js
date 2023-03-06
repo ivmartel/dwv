@@ -40,6 +40,13 @@ dwv.tool.Opacity = function (app) {
   this.started = false;
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -128,6 +135,15 @@ dwv.tool.Opacity = function (app) {
   this.touchend = function (event) {
     // call mouse equivalent
     self.mouseup(event);
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**
