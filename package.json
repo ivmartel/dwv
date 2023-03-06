@@ -22,7 +22,7 @@
     "defaults"
   ],
   "dependencies": {
-    "jszip": "~3.7.0",
+    "jszip": "~3.10.1",
     "konva": "~8.3.0",
     "magic-wand-tool": "~1.1.7"
   },
