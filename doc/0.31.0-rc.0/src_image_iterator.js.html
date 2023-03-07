@@ -1,0 +1,658 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/image/iterator.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="",baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body class="dark" data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV doc</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="gMKB9jkVlMTZFjQFvZ078"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="XMnq3KWHu5us0GuiC_tcf"><div>Namespaces</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="dwv.html">dwv</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.html">ctrl</a></div><div class="sidebar-section-children"><a href="dwv.dicom.html">dicom</a></div><div class="sidebar-section-children"><a href="dwv.env.html">env</a></div><div class="sidebar-section-children"><a href="dwv.gui.html">gui</a></div><div class="sidebar-section-children"><a href="dwv.image.html">image</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.html">filter</a></div><div class="sidebar-section-children"><a href="dwv.image.lut.html">lut</a></div><div class="sidebar-section-children"><a href="dwv.io.html">io</a></div><div class="sidebar-section-children"><a href="dwv.math.html">math</a></div><div class="sidebar-section-children"><a href="dwv.test.html">test</a></div><div class="sidebar-section-children"><a href="dwv.tool.html">tool</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw_.html">draw</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter_.html">filter</a></div><div class="sidebar-section-children"><a href="dwv.utils.html">utils</a></div><div class="sidebar-section-children"><a href="dwv.utils.logger.html">logger</a></div><div class="sidebar-section-children"><a href="dwv.utils.logger.console.html">console</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="XB1UeGrgiPqtbCK7EE0_T"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="dwv.App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="dwv.image.DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="dwv.image.DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="dwv.image.Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:wlpresetadd">wlpresetadd</a></div><div class="sidebar-section-children"><a href="dwv.tool.ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="dwv.tool.DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="dwv.tool.DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="dwv.tool.MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="dwv.tool.RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="dwv.tool.RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html#event:undoadd">undoadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="nYE11oplZw5EksiXPDNlq"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="dwv.App.html">App</a></div><div class="sidebar-section-children"><a href="dwv.ModernizrInit-ModernizrProto.html">ModernizrProto</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="dwv.dicom.Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="dwv.gui.DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="dwv.gui.LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="dwv.gui.Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="dwv.gui.Style.html">Style</a></div><div class="sidebar-section-children"><a href="dwv.gui.ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="dwv.image.AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="dwv.image.DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="dwv.image.DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="dwv.image.Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="dwv.image.Image.html">Image</a></div><div class="sidebar-section-children"><a href="dwv.image.ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="dwv.image.MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="dwv.image.MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="dwv.image.PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="dwv.image.PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="dwv.image.RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="dwv.image.RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="dwv.image.Size.html">Size</a></div><div class="sidebar-section-children"><a href="dwv.image.Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="dwv.image.SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html">View</a></div><div class="sidebar-section-children"><a href="dwv.image.ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="dwv.image.WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="dwv.image.WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="dwv.io.DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.State.html">State</a></div><div class="sidebar-section-children"><a href="dwv.io.UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="dwv.math.BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="dwv.math.Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="dwv.math.Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="dwv.math.Index.html">Index</a></div><div class="sidebar-section-children"><a href="dwv.math.Line.html">Line</a></div><div class="sidebar-section-children"><a href="dwv.math.Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="dwv.math.Path.html">Path</a></div><div class="sidebar-section-children"><a href="dwv.math.Point.html">Point</a></div><div class="sidebar-section-children"><a href="dwv.math.Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="dwv.math.Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="dwv.math.ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="dwv.math.Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="dwv.math.Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="dwv.math.SimpleStats.html">SimpleStats</a></div><div class="sidebar-section-children"><a href="dwv.math.Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="dwv.tool.ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="dwv.tool.DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="dwv.tool.Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="dwv.tool.Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="dwv.tool.MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="dwv.tool.RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="dwv.tool.ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="dwv.tool.ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="dwv.tool.WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="dwv.tool.ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter.Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter.Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="dwv.utils.ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="dwv.utils.ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="dwv.utils.WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="dwv.utils.WorkerThread.html">WorkerThread</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="gCSpF9Amf-JCfSNz7Y70c"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-i18next.html">i18next</a></div><div class="sidebar-section-children"><a href="external-i18nextBrowserLanguageDetector.html">i18nextBrowserLanguageDetector</a></div><div class="sidebar-section-children"><a href="external-i18nextHttpBackend.html">i18nextHttpBackend</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="dIx1EF6rW_YdnipjQW6PA"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_image_iterator.js</h1></header><article><pre class="prettyprint source lang-js"><code>// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * Get an simple iterator for a given range for a one component data.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies (default=1).
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
+  if (typeof increment === 'undefined') {
+    increment = 1;
+  }
+  var nextIndex = start;
+  // result
+  return {
+    next: function () {
+      if (nextIndex &lt; end) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        nextIndex += increment;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range for a one component data.
+ *
+ * Using 'maxIter' and not an 'end' index since it fails in some edge cases
+ * (for ex coronal2, ie zxy)
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} maxIter The maximum number of iterations.
+ * @param {number} increment Increment between indicies.
+ * @param {number} blockMaxIter Number of applied increment after which
+ *   blockIncrement is applied.
+ * @param {number} blockIncrement Increment after blockMaxIter is reached,
+ *   the value is from block start to the next block start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ *   WARN: don't forget to set the value of start as the last index!
+ * @param {boolean} reverse2 If true, loop from block end to block start.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range = function (dataAccessor, start, maxIter, increment,
+  blockMaxIter, blockIncrement, reverse1, reverse2) {
+  if (typeof reverse1 === 'undefined') {
+    reverse1 = false;
+  }
+  if (typeof reverse2 === 'undefined') {
+    reverse2 = false;
+  }
+
+  // first index of the iteration
+  var nextIndex = start;
+  // adapt first index and increments to reverse values
+  if (reverse1) {
+    blockIncrement *= -1;
+    if (reverse2) {
+      // start at end of line
+      nextIndex -= (blockMaxIter - 1) * increment;
+    } else {
+      increment *= -1;
+    }
+  } else {
+    if (reverse2) {
+      // start at end of line
+      nextIndex += (blockMaxIter - 1) * increment;
+      increment *= -1;
+    }
+  }
+  var finalBlockIncrement = blockIncrement - blockMaxIter * increment;
+
+  // counters
+  var mainCount = 0;
+  var blockCount = 0;
+  // result
+  return {
+    next: function () {
+      if (mainCount &lt; maxIter) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        nextIndex += increment;
+        ++mainCount;
+        ++blockCount;
+        if (blockCount === blockMaxIter) {
+          blockCount = 0;
+          nextIndex += finalBlockIncrement;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: nextIndex
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {number} regionSize The size of the region to iterate through.
+ * @param {number} regionOffset The offset between regions.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.rangeRegion = function (
+  dataAccessor, start, end, increment, regionSize, regionOffset) {
+  var nextIndex = start;
+  var regionElementCount = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex &lt; end) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regionSize) {
+          regionElementCount = 0;
+          nextIndex += regionOffset;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {Array} regions An array of regions: [off0, size, off1].
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.rangeRegions = function (
+  dataAccessor, start, end, increment, regions) {
+  var nextIndex = start;
+  var regionCount = 0;
+  var regionElementCount = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex &lt; end) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false,
+          index: nextIndex
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regions[regionCount][1]) {
+          regionElementCount = 0;
+          // off1 of current group
+          nextIndex += regions[regionCount][2];
+          regionCount += 1;
+          // off0 of next group
+          if (regionCount &lt; regions.length) {
+            nextIndex += regions[regionCount][0];
+          }
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range for a 3 components data.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ *   (end - start) needs to be a multiple of 3...
+ * @param {number} increment The increment between indicies (default=1).
+ * @param {boolean} isPlanar A flag to know if the data is planar
+ *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
+ * @returns {object} A 3 components iterator folowing the iterator and iterable
+ *   protocol, the value is an array of size 3 with each component.
+ */
+dwv.image.simpleRange3d = function (
+  dataAccessor, start, end, increment, isPlanar) {
+  if (typeof increment === 'undefined') {
+    increment = 1;
+  }
+  if (typeof isPlanar === 'undefined') {
+    isPlanar = false;
+  }
+  var nextIndex = start;
+  var componentIncrement = 1;
+  if (isPlanar) {
+    componentIncrement = (end - start) / 3;
+  } else {
+    increment *= 3;
+  }
+  var nextIndex1 = nextIndex + componentIncrement;
+  var nextIndex2 = nextIndex + 2 * componentIncrement;
+
+  // result
+  return {
+    next: function () {
+      if (nextIndex &lt; end) {
+        var result = {
+          value: [
+            dataAccessor(nextIndex),
+            dataAccessor(nextIndex1),
+            dataAccessor(nextIndex2)
+          ],
+          done: false,
+          index: [nextIndex, nextIndex1, nextIndex2]
+        };
+        nextIndex += increment;
+        nextIndex1 += increment;
+        nextIndex2 += increment;
+        return result;
+      }
+      return {
+        done: true,
+        index: [end]
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range for a 3 components data.
+ *
+ * Using 'maxIter' and not an 'end' index since it fails in some edge cases
+ * (for ex coronal2, ie zxy)
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} maxIter The maximum number of iterations.
+ * @param {number} increment Increment between indicies.
+ * @param {number} blockMaxIter Number of applied increment after which
+ *   blockIncrement is applied.
+ * @param {number} blockIncrement Increment after blockMaxIter is reached,
+ *   the value is from block start to the next block start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ *   WARN: don't forget to set the value of start as the last index!
+ * @param {boolean} reverse2 If true, loop from block end to block start.
+ * @param {boolean} isPlanar A flag to know if the data is planar
+ *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
+  blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar) {
+  var iters = [];
+  if (isPlanar) {
+    iters.push(dwv.image.range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 2 * maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  } else {
+    increment *= 3;
+    blockIncrement *= 3;
+    iters.push(dwv.image.range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 1, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 2, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  }
+
+  // result
+  return {
+    next: function () {
+      var r0 = iters[0].next();
+      var r1 = iters[1].next();
+      var r2 = iters[2].next();
+      if (!r0.done) {
+        return {
+          value: [
+            r0.value,
+            r1.value,
+            r2.value
+          ],
+          done: false,
+          index: [
+            r0.index,
+            r1.index,
+            r2.index
+          ]
+        };
+      }
+      return {
+        done: true,
+        index: r2.index
+      };
+    }
+  };
+};
+
+/**
+ * Get a list of values for a given iterator.
+ *
+ * @param {object} iterator The iterator to use to loop through data.
+ * @returns {Array} The list of values.
+ */
+dwv.image.getIteratorValues = function (iterator) {
+  var values = [];
+  var ival = iterator.next();
+  while (!ival.done) {
+    values.push(ival.value);
+    ival = iterator.next();
+  }
+  return values;
+};
+
+/**
+ * Get a slice index iterator.
+ *
+ * @param {dwv.image.Image} image The image to parse.
+ * @param {dwv.math.Point} position The current position.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {dwv.math.Matrix33} viewOrientation The view orientation.
+ * @returns {object} The slice iterator.
+ */
+dwv.image.getSliceIterator = function (
+  image, position, isRescaled, viewOrientation) {
+  var size = image.getGeometry().getSize();
+  // zero-ify non direction index
+  var dirMax2Index = 2;
+  if (viewOrientation &amp;&amp; typeof viewOrientation !== 'undefined') {
+    dirMax2Index = viewOrientation.getColAbsMax(2).index;
+  }
+  var posValues = position.getValues();
+  // keep the main direction and any other than 3D
+  var indexFilter = function (element, index) {
+    return (index === dirMax2Index || index > 2) ? element : 0;
+  };
+  var posStart = new dwv.math.Index(posValues.map(indexFilter));
+  var start = size.indexToOffset(posStart);
+
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
+  var ncols = size.get(0);
+  var nrows = size.get(1);
+  var nslices = size.get(2);
+  var sliceSize = size.getDimSize(2);
+
+  var ncomp = image.getNumberOfComponents();
+  var isPlanar = image.getPlanarConfiguration() === 1;
+  var getRange = function (
+    dataAccessor, start, maxIter, increment,
+    blockMaxIter, blockIncrement, reverse1, reverse2) {
+    if (ncomp === 1) {
+      return dwv.image.range(dataAccessor, start, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2);
+    } else if (ncomp === 3) {
+      return dwv.image.range3d(dataAccessor, 3 * start, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
+    }
+  };
+
+  var range = null;
+  if (viewOrientation &amp;&amp; typeof viewOrientation !== 'undefined') {
+    var dirMax0 = viewOrientation.getColAbsMax(0);
+    var dirMax2 = viewOrientation.getColAbsMax(2);
+
+    // default reverse
+    var reverse1 = false;
+    var reverse2 = false;
+
+    var maxIter = null;
+    if (dirMax2.index === 2) {
+      // axial
+      maxIter = ncols * nrows;
+      if (dirMax0.index === 0) {
+        // xyz
+        range = getRange(dataAccessor,
+          start, maxIter, 1, ncols, ncols, reverse1, reverse2);
+      } else {
+        // yxz
+        range = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, 1, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 0) {
+      // sagittal
+      maxIter = nslices * nrows;
+      if (dirMax0.index === 1) {
+        // yzx
+        range = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
+      } else {
+        // zyx
+        range = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 1) {
+      // coronal
+      maxIter = nslices * ncols;
+      if (dirMax0.index === 0) {
+        // xzy
+        range = getRange(dataAccessor,
+          start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
+      } else {
+        // zxy
+        range = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
+      }
+    } else {
+      throw new Error('Unknown direction: ' + dirMax2.index);
+    }
+  } else {
+    if (image.getNumberOfComponents() === 1) {
+      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+    } else if (image.getNumberOfComponents() === 3) {
+      // 3 times bigger...
+      start *= 3;
+      sliceSize *= 3;
+      range = dwv.image.simpleRange3d(
+        dataAccessor, start, start + sliceSize, 1, isPlanar);
+    } else {
+      throw new Error('Unsupported number of components: ' +
+        image.getNumberOfComponents());
+    }
+  }
+
+  return range;
+};
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {dwv.image.Image} image The image to parse.
+ * @param {dwv.math.Point} position The current position.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {dwv.math.Point2D} min The minimum position (optional).
+ * @param {dwv.math.Point2D} max The maximum position (optional).
+ * @returns {object} The slice iterator.
+ */
+dwv.image.getRegionSliceIterator = function (
+  image, position, isRescaled, min, max) {
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      image.getNumberOfComponents());
+  }
+
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
+  var size = image.getGeometry().getSize();
+  if (typeof min === 'undefined') {
+    min = new dwv.math.Point2D(0, 0);
+  }
+  if (typeof max === 'undefined') {
+    max = new dwv.math.Point2D(
+      size.get(0) - 1,
+      size.get(1)
+    );
+  }
+  // position to pixel for max: extra X is ok, remove extra Y
+  var startOffset = size.indexToOffset(position.getWithNew2D(
+    min.getX(), min.getY()
+  ));
+  var endOffset = size.indexToOffset(position.getWithNew2D(
+    max.getX(), max.getY() - 1
+  ));
+
+  // minimum 1 column
+  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  var rowIncrement = size.get(0) - rangeNumberOfColumns;
+
+  return dwv.image.rangeRegion(
+    dataAccessor, startOffset, endOffset + 1,
+    1, rangeNumberOfColumns, rowIncrement);
+};
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {dwv.image.Image} image The image to parse.
+ * @param {dwv.math.Point} position The current position.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {Array} regions An array of regions.
+ * @returns {object|undefined} The slice iterator.
+ */
+dwv.image.getVariableRegionSliceIterator = function (
+  image, position, isRescaled, regions) {
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      image.getNumberOfComponents());
+  }
+
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
+  var size = image.getGeometry().getSize();
+
+  var offsetRegions = [];
+  var region;
+  var min = null;
+  var max = null;
+  var index = null;
+  for (var i = 0; i &lt; regions.length; ++i) {
+    region = regions[i];
+    var width = region[1][0] - region[0][0];
+    if (width !== 0) {
+      index = i;
+      if (!min) {
+        min = region[0];
+      }
+      offsetRegions.push([
+        region[0][0],
+        width,
+        size.get(0) - region[1][0]
+      ]);
+    }
+  }
+  if (index !== null) {
+    max = regions[index][1];
+  }
+
+  // exit if no offsets
+  if (offsetRegions.length === 0) {
+    return undefined;
+  }
+
+  var startOffset = size.indexToOffset(position.getWithNew2D(
+    min[0], min[1]
+  ));
+  var endOffset = size.indexToOffset(position.getWithNew2D(
+    max[0], max[1]
+  ));
+
+  return dwv.image.rangeRegions(
+    dataAccessor, startOffset, endOffset + 1,
+    1, offsetRegions);
+};
+
+/**
+ * Get a colour iterator. The input array defines the colours and
+ * their start index.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Array} colours An array of {index, colour} pairs.
+ * @param {number} end The end of the range (excluded).
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.colourRange = function (colours, end) {
+  var nextIndex = 0;
+  var nextColourIndex = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex &lt; end) {
+        if (nextColourIndex + 1 &lt; colours.length &amp;&amp;
+          nextIndex >= colours[nextColourIndex + 1].index) {
+          ++nextColourIndex;
+        }
+        var result = {
+          value: colours[nextColourIndex].colour,
+          done: false,
+          index: nextIndex
+        };
+        ++nextIndex;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.31.0-rc.0.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV doc</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="gMKB9jkVlMTZFjQFvZ078"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="XMnq3KWHu5us0GuiC_tcf"><div>Namespaces</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="dwv.html">dwv</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.html">ctrl</a></div><div class="sidebar-section-children"><a href="dwv.dicom.html">dicom</a></div><div class="sidebar-section-children"><a href="dwv.env.html">env</a></div><div class="sidebar-section-children"><a href="dwv.gui.html">gui</a></div><div class="sidebar-section-children"><a href="dwv.image.html">image</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.html">filter</a></div><div class="sidebar-section-children"><a href="dwv.image.lut.html">lut</a></div><div class="sidebar-section-children"><a href="dwv.io.html">io</a></div><div class="sidebar-section-children"><a href="dwv.math.html">math</a></div><div class="sidebar-section-children"><a href="dwv.test.html">test</a></div><div class="sidebar-section-children"><a href="dwv.tool.html">tool</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw_.html">draw</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter_.html">filter</a></div><div class="sidebar-section-children"><a href="dwv.utils.html">utils</a></div><div class="sidebar-section-children"><a href="dwv.utils.logger.html">logger</a></div><div class="sidebar-section-children"><a href="dwv.utils.logger.console.html">console</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="XB1UeGrgiPqtbCK7EE0_T"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="dwv.App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="dwv.App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="dwv.image.DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="dwv.image.DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="dwv.image.Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html#event:wlpresetadd">wlpresetadd</a></div><div class="sidebar-section-children"><a href="dwv.tool.ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="dwv.tool.DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="dwv.tool.DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="dwv.tool.MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="dwv.tool.RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="dwv.tool.RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html#event:undoadd">undoadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="nYE11oplZw5EksiXPDNlq"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="dwv.App.html">App</a></div><div class="sidebar-section-children"><a href="dwv.ModernizrInit-ModernizrProto.html">ModernizrProto</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="dwv.ctrl.ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="dwv.dicom.DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="dwv.dicom.Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="dwv.gui.DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="dwv.gui.LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="dwv.gui.Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="dwv.gui.Style.html">Style</a></div><div class="sidebar-section-children"><a href="dwv.gui.ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="dwv.image.AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="dwv.image.DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="dwv.image.DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="dwv.image.Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="dwv.image.Image.html">Image</a></div><div class="sidebar-section-children"><a href="dwv.image.ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="dwv.image.MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="dwv.image.MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="dwv.image.PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="dwv.image.PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="dwv.image.RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="dwv.image.RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="dwv.image.Size.html">Size</a></div><div class="sidebar-section-children"><a href="dwv.image.Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="dwv.image.SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="dwv.image.View.html">View</a></div><div class="sidebar-section-children"><a href="dwv.image.ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="dwv.image.WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="dwv.image.WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="dwv.image.filter.Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="dwv.io.DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.State.html">State</a></div><div class="sidebar-section-children"><a href="dwv.io.UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="dwv.io.ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="dwv.math.BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="dwv.math.Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="dwv.math.Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="dwv.math.Index.html">Index</a></div><div class="sidebar-section-children"><a href="dwv.math.Line.html">Line</a></div><div class="sidebar-section-children"><a href="dwv.math.Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="dwv.math.Path.html">Path</a></div><div class="sidebar-section-children"><a href="dwv.math.Point.html">Point</a></div><div class="sidebar-section-children"><a href="dwv.math.Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="dwv.math.Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="dwv.math.ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="dwv.math.Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="dwv.math.Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="dwv.math.SimpleStats.html">SimpleStats</a></div><div class="sidebar-section-children"><a href="dwv.math.Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="dwv.tool.ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="dwv.tool.DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="dwv.tool.Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="dwv.tool.Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="dwv.tool.MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="dwv.tool.RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="dwv.tool.Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="dwv.tool.ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="dwv.tool.ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="dwv.tool.UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="dwv.tool.WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="dwv.tool.ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.draw.RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter.Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="dwv.tool.filter.Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="dwv.utils.ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="dwv.utils.ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="dwv.utils.WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="dwv.utils.WorkerThread.html">WorkerThread</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="gCSpF9Amf-JCfSNz7Y70c"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-i18next.html">i18next</a></div><div class="sidebar-section-children"><a href="external-i18nextBrowserLanguageDetector.html">i18nextBrowserLanguageDetector</a></div><div class="sidebar-section-children"><a href="external-i18nextHttpBackend.html">i18nextHttpBackend</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="dIx1EF6rW_YdnipjQW6PA"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>
