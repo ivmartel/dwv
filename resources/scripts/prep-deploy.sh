@@ -59,7 +59,7 @@ then
   sed -i "s/${a2}/${b2}/g" $fileName
 fi
 
-if [ "$(grep -c "../../node_modules" $fileName)" -eq 3 ]
+if [ "$(grep -c "../../node_modules" $fileName)" -eq 2 ]
 then
   info "Move to local node_modules"
   # change path to node_modules
