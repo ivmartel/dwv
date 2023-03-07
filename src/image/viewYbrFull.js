@@ -24,7 +24,7 @@ dwv.image.generateImageDataYbrFull = function (
     array.data[index] = rgb.r;
     array.data[index + 1] = rgb.g;
     array.data[index + 2] = rgb.b;
-    array.data[index + 3] = alphaFunc(ival.value);
+    array.data[index + 3] = alphaFunc(ival.value, ival.index);
     // increment
     index += 4;
     ival = iterator.next();

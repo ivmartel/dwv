@@ -16,33 +16,6 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
     isLittleEndian = true;
   }
 
-  // Default text encoder
-  var defaultTextEncoder = {};
-  defaultTextEncoder.encode = function (buffer) {
-    var result = new Uint8Array(buffer.length);
-    for (var i = 0, leni = buffer.length; i < leni; ++i) {
-      result[i] = buffer.charCodeAt(i);
-    }
-    return result;
-  };
-
-  // Text encoder
-  var textEncoder = defaultTextEncoder;
-  if (typeof window.TextEncoder !== 'undefined') {
-    textEncoder = new TextEncoder('iso-8859-1');
-  }
-
-  /**
-   * Set the utfLabel used to construct the TextEncoder.
-   *
-   * @param {string} label The encoding label.
-   */
-  this.setUtfLabel = function (label) {
-    if (typeof window.TextEncoder !== 'undefined') {
-      textEncoder = new TextEncoder(label);
-    }
-  };
-
   // private DataView
   var view = new DataView(buffer);
 
@@ -111,6 +84,18 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Write Uint64 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
+  this.writeUint64 = function (byteOffset, value) {
+    view.setBigUint64(byteOffset, value, isLittleEndian);
+    return byteOffset + BigUint64Array.BYTES_PER_ELEMENT;
+  };
+
+  /**
    * Write Int32 data.
    *
    * @param {number} byteOffset The offset to start writing from.
@@ -120,6 +105,18 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   this.writeInt32 = function (byteOffset, value) {
     view.setInt32(byteOffset, value, isLittleEndian);
     return byteOffset + Int32Array.BYTES_PER_ELEMENT;
+  };
+
+  /**
+   * Write Int64 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
+  this.writeInt64 = function (byteOffset, value) {
+    view.setBigInt64(byteOffset, value, isLittleEndian);
+    return byteOffset + BigInt64Array.BYTES_PER_ELEMENT;
   };
 
   /**
@@ -155,34 +152,9 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
    */
   this.writeHex = function (byteOffset, str) {
     // remove first two chars and parse
-    var value = parseInt(str.substr(2), 16);
+    var value = parseInt(str.substring(2), 16);
     view.setUint16(byteOffset, value, isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write string data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} str The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeString = function (byteOffset, str) {
-    var data = defaultTextEncoder.encode(str);
-    return this.writeUint8Array(byteOffset, data);
-  };
-
-  /**
-   * Write data as a 'special' string, encoding it if the
-   *   TextEncoder is available.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} str The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeSpecialString = function (byteOffset, str) {
-    var data = textEncoder.encode(str);
-    return this.writeUint8Array(byteOffset, data);
   };
 
 }; // class DataWriter
@@ -282,6 +254,20 @@ dwv.dicom.DataWriter.prototype.writeUint32Array = function (byteOffset, array) {
 };
 
 /**
+ * Write Uint64 array.
+ *
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeUint64Array = function (byteOffset, array) {
+  for (var i = 0, len = array.length; i < len; ++i) {
+    byteOffset = this.writeUint64(byteOffset, array[i]);
+  }
+  return byteOffset;
+};
+
+/**
  * Write Int32 array.
  *
  * @param {number} byteOffset The offset to start writing from.
@@ -291,6 +277,20 @@ dwv.dicom.DataWriter.prototype.writeUint32Array = function (byteOffset, array) {
 dwv.dicom.DataWriter.prototype.writeInt32Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
     byteOffset = this.writeInt32(byteOffset, array[i]);
+  }
+  return byteOffset;
+};
+
+/**
+ * Write Int64 array.
+ *
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeInt64Array = function (byteOffset, array) {
+  for (var i = 0, len = array.length; i < len; ++i) {
+    byteOffset = this.writeInt64(byteOffset, array[i]);
   }
   return byteOffset;
 };

@@ -22,11 +22,12 @@ function getObjectUrlFromTags(config) {
     }
   }
   // convert JSON to DICOM element object
-  var res = dwv.dicom.getElementsFromJSONTags(config.tags);
-  var dicomElements = res.elements;
+  var dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
   // pixels: small gradient square
-  dicomElements.x7FE00010 =
-    dwv.dicom.generatePixelDataFromJSONTags(config.tags, res.offset);
+  if (config.tags.Modality !== 'KO') {
+    dicomElements.x7FE00010 =
+      dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+  }
 
   // create DICOM buffer
   var writer = new dwv.dicom.DicomWriter();

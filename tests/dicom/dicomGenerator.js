@@ -5,48 +5,47 @@ dwv.dicom = dwv.dicom || {};
 // List of pixel generators
 dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
 
+// List of required tags for generating pixel data
+dwv.dicom.requiredPixelTags = [
+  'TransferSyntaxUID',
+  'Rows',
+  'Columns',
+  'BitsAllocated',
+  'PixelRepresentation',
+  'SamplesPerPixel',
+  'PhotometricInterpretation'
+];
+
 /**
- * Get the DICOM element from a DICOM tags object.
+ * Check a list of input tags against a required list.
  *
- * @param {object} tags The DICOM tags object.
- * @returns {object} The DICOM elements and the end offset.
+ * @param {object} tags The tags to check.
+ * @param {Array} requiredTags Array of tag names.
+ * @param {boolean} withLog Flag to log errors or not.
+ * @returns {boolean} True if all required tags are present in the input.
  */
-dwv.dicom.getElementsFromJSONTags = function (tags) {
-  // transfer syntax
-  var isImplicit = dwv.dicom.isImplicitTransferSyntax(tags.TransferSyntaxUID);
-  // convert JSON to DICOM element object
-  var keys = Object.keys(tags);
-  var dicomElements = {};
-  var dicomElement;
-  var name;
-  var offset = 128 + 4; // preamble
-  var size;
-  for (var k = 0, len = keys.length; k < len; ++k) {
-    // get the DICOM element definition from its name
-    dicomElement = dwv.dicom.getDicomElement(keys[k]);
-    // set its value
-    size = dwv.dicom.setElementValue(dicomElement, tags[keys[k]], isImplicit);
-    // set offsets
-    offset += dwv.dicom.getDataElementPrefixByteSize(
-      dicomElement.vr, isImplicit);
-    dicomElement.startOffset = offset;
-    offset += size;
-    dicomElement.endOffset = offset;
-    // create the tag group/element key
-    name = new dwv.dicom.Tag(
-      dicomElement.tag.group, dicomElement.tag.element).getKey();
-    // store
-    dicomElements[name] = dicomElement;
+dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
+  if (typeof withLog === 'undefined') {
+    withLog = false;
   }
-  // return
-  return {elements: dicomElements, offset: offset};
+  var check = true;
+  for (var i = 0; i < requiredTags.length; ++i) {
+    if (typeof tags[requiredTags[i]] === 'undefined') {
+      if (withLog) {
+        dwv.logger.debug('Missing ' +
+          requiredTags[i] + ' for pixel generation.');
+      }
+      check = false;
+      break;
+    }
+  }
+  return check;
 };
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
  *
  * @param {object} tags The DICOM tags object.
- * @param {object} startOffset The start offset of the pixel data.
  * @param {string} pixGeneratorName The name of a pixel generator.
  * @param {number} sliceNumber The slice number.
  * @param {Array} images The images to pass to the generator.
@@ -54,7 +53,7 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
  * @returns {object} The DICOM pixel data element.
  */
 dwv.dicom.generatePixelDataFromJSONTags = function (
-  tags, startOffset, pixGeneratorName, sliceNumber, images, numberOfSlices) {
+  tags, pixGeneratorName, sliceNumber, images, numberOfSlices) {
 
   // default
   if (typeof pixGeneratorName === 'undefined') {
@@ -68,20 +67,8 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
 
   // check tags
-  if (typeof tags.TransferSyntaxUID === 'undefined') {
-    throw new Error('Missing transfer syntax for pixel generation.');
-  } else if (typeof tags.Rows === 'undefined') {
-    throw new Error('Missing number of rows for pixel generation.');
-  } else if (typeof tags.Columns === 'undefined') {
-    throw new Error('Missing number of columns for pixel generation.');
-  } else if (typeof tags.BitsAllocated === 'undefined') {
-    throw new Error('Missing BitsAllocated for pixel generation.');
-  } else if (typeof tags.PixelRepresentation === 'undefined') {
-    throw new Error('Missing PixelRepresentation for pixel generation.');
-  } else if (typeof tags.SamplesPerPixel === 'undefined') {
-    throw new Error('Missing SamplesPerPixel for pixel generation.');
-  } else if (typeof tags.PhotometricInterpretation === 'undefined') {
-    throw new Error('Missing PhotometricInterpretation for pixel generation.');
+  if (!dwv.dicom.checkTags(tags, dwv.dicom.requiredPixelTags, true)) {
+    throw new Error('Missing meta data for dicom creation.');
   }
 
   // extract info from tags
@@ -143,7 +130,8 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
     numberOfRows: numberOfRows,
     numberOfSamples: numberOfSamples,
     numberOfColourPlanes: numberOfColourPlanes,
-    photometricInterpretation: photometricInterpretation
+    photometricInterpretation: photometricInterpretation,
+    imageOrientationPatient: tags.ImageOrientationPatient
   });
   if (typeof generator.setImages !== 'undefined') {
     generator.setImages(images);
@@ -160,12 +148,10 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
   var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    tag: {group: '0x7FE0', element: '0x0010'},
+    tag: dwv.dicom.getPixelDataTag(),
     vr: vr,
     vl: pixVL,
-    value: pixels,
-    startOffset: startOffset,
-    endOffset: startOffset + pixVL
+    value: pixels
   };
 };
 

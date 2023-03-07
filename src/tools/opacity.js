@@ -7,6 +7,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {Opacity: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('Opacity');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.Opacity = function (app) {
   /**
@@ -22,6 +38,13 @@ dwv.tool.Opacity = function (app) {
    * @type {boolean}
    */
   this.started = false;
+
+  /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
 
   /**
    * Handle mouse down event.
@@ -52,7 +75,7 @@ dwv.tool.Opacity = function (app) {
     // do not trigger for small moves
     if (xMove) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       var viewLayer = layerGroup.getActiveViewLayer();
       var op = viewLayer.getOpacity();
       viewLayer.setOpacity(op + (diffX / 200));
@@ -115,6 +138,15 @@ dwv.tool.Opacity = function (app) {
   };
 
   /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
+  };
+
+  /**
    * Handle key down event.
    *
    * @param {object} event The key down event.
@@ -141,21 +173,3 @@ dwv.tool.Opacity = function (app) {
   };
 
 }; // Opacity class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Opacity.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Opacity.name',
-    brief: 'tool.Opacity.brief',
-    mouse: {
-      mouse_drag: 'tool.Opacity.mouse_drag',
-    },
-    touch: {
-      touch_drag: 'tool.Opacity.touch_drag',
-    }
-  };
-};

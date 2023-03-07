@@ -3,7 +3,8 @@ module.exports = {
     browser: true,
     node: true,
     jquery: true,
-    es6: true
+    es6: true,
+    es2020: true
   },
   globals: {
     dwv: 'readonly'

@@ -171,6 +171,21 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
+   * Get a Konva group using its id.
+   *
+   * @param {string} id The group id.
+   * @returns {object|undefined} The Konva group.
+   */
+  this.getGroup = function (id) {
+    var group = konvaLayer.findOne('#' + id);
+    if (typeof group === 'undefined') {
+      dwv.logger.warn('Cannot find node with id: ' + id
+      );
+    }
+    return group;
+  };
+
+  /**
    * Activate the current draw layer.
    *
    * @param {dwv.math.Index} index The current position.
@@ -225,8 +240,11 @@ dwv.ctrl.DrawController = function (konvaLayer) {
           if (shape.closed()) {
             type = 'Roi';
           } else if (shapeExtrakids.length !== 0) {
-            if (shapeExtrakids[0].name().indexOf('triangle') !== -1) {
+            var extraName0 = shapeExtrakids[0].name();
+            if (extraName0.indexOf('triangle') !== -1) {
               type = 'Arrow';
+            } else if (extraName0.indexOf('arc') !== -1) {
+              type = 'Protractor';
             } else {
               type = 'Ruler';
             }
@@ -248,7 +266,7 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
-   * Get a list of drawing store details.
+   * Get a list of drawing store details. Used in state.
    *
    * @returns {object} A list of draw details including id, text, quant...
    * TODO Unify with getDrawDisplayDetails?
@@ -405,71 +423,6 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   };
 
   /**
-   * Check the visibility of a given group.
-   *
-   * @param {object} drawDetails Details of the group to check.
-   * @returns {boolean} True if the group is visible.
-   */
-  this.isGroupVisible = function (drawDetails) {
-    // get the group
-    var group = konvaLayer.findOne('#' + drawDetails.id);
-    if (typeof group === 'undefined') {
-      dwv.logger.warn(
-        '[isGroupVisible] Cannot find node with id: ' + drawDetails.id
-      );
-      return false;
-    }
-    // get visibility
-    return group.isVisible();
-  };
-
-  /**
-   * Toggle the visibility of a given group.
-   *
-   * @param {object} drawDetails Details of the group to update.
-   * @returns {boolean} False if the group cannot be found.
-   */
-  this.toogleGroupVisibility = function (drawDetails) {
-    // get the group
-    var group = konvaLayer.findOne('#' + drawDetails.id);
-    if (typeof group === 'undefined') {
-      dwv.logger.warn(
-        '[toogleGroupVisibility] Cannot find node with id: ' + drawDetails.id
-      );
-      return false;
-    }
-    // toggle visible
-    group.visible(!group.isVisible());
-
-    // udpate current layer
-    konvaLayer.draw();
-  };
-
-  /**
-   * Delete a Draw from the stage.
-   *
-   * @param {number} groupId The group id of the group to delete.
-   * @param {object} cmdCallback The DeleteCommand callback.
-   * @param {object} exeCallback The callback to call once the
-   *   DeleteCommand has been executed.
-   */
-  this.deleteDrawGroupId = function (groupId, cmdCallback, exeCallback) {
-    var groups = konvaLayer.getChildren();
-    var groupToDelete = groups.getChildren(function (node) {
-      return node.id() === groupId;
-    });
-    if (groupToDelete.length === 1) {
-      this.deleteDrawGroup(groupToDelete[0], cmdCallback, exeCallback);
-    } else if (groupToDelete.length === 0) {
-      dwv.logger.warn('Can\'t delete group with id:\'' + groupId +
-        '\', cannot find it.');
-    } else {
-      dwv.logger.warn('Can\'t delete group with id:\'' + groupId +
-        '\', too many with the same id.');
-    }
-  };
-
-  /**
    * Delete a Draw from the stage.
    *
    * @param {object} group The group to delete.
@@ -485,7 +438,29 @@ dwv.ctrl.DrawController = function (konvaLayer) {
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
+    // callback
     exeCallback(delcmd);
+  };
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @param {string} id The id of the group to delete.
+   * @param {object} cmdCallback The DeleteCommand callback.
+   * @param {object} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   * @returns {boolean} False if the group cannot be found.
+   */
+  this.deleteDraw = function (id, cmdCallback, exeCallback) {
+    // get the group
+    var group = this.getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // delete
+    this.deleteDrawGroup(group, cmdCallback, exeCallback);
+
+    return true;
   };
 
   /**

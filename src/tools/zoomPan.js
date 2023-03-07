@@ -7,6 +7,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {ZoomAndPan: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('ZoomAndPan');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.ZoomAndPan = function (app) {
   /**
@@ -66,7 +82,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var ty = event._y - self.y0;
     // apply translation
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planeOffset = viewLayer.displayToPlaneScale(tx, ty);
@@ -97,7 +113,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
 
@@ -120,7 +136,7 @@ dwv.tool.ZoomAndPan = function (app) {
       }
     } else {
       // zoom mode
-      var zoom = (lineRatio - 1) / 2;
+      var zoom = (lineRatio - 1) / 10;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
         var planePos = viewLayer.displayToMainPlanePos(
           self.midPoint.getX(), self.midPoint.getY());
@@ -198,7 +214,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var step = -event.deltaY / 500;
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
@@ -227,26 +243,6 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
 }; // ZoomAndPan class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.ZoomAndPan.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.ZoomAndPan.name',
-    brief: 'tool.ZoomAndPan.brief',
-    mouse: {
-      mouse_wheel: 'tool.ZoomAndPan.mouse_wheel',
-      mouse_drag: 'tool.ZoomAndPan.mouse_drag'
-    },
-    touch: {
-      twotouch_pinch: 'tool.ZoomAndPan.twotouch_pinch',
-      touch_drag: 'tool.ZoomAndPan.touch_drag'
-    }
-  };
-};
 
 /**
  * Initialise the tool.

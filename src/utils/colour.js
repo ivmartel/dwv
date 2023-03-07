@@ -6,6 +6,23 @@ dwv.utils = dwv.utils || {};
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
 /**
+ * Check if two rgb objects are equal.
+ *
+ * @param {object} c1 The first colour.
+ * @param {object} c2 The second colour.
+ * @returns {boolean} True if both colour are equal.
+ */
+dwv.utils.isEqualRgb = function (c1, c2) {
+  return c1 !== null &&
+    c2 !== null &&
+    typeof c1 !== 'undefined' &&
+    typeof c2 !== 'undefined' &&
+    c1.r === c2.r &&
+    c1.g === c2.g &&
+    c1.b === c2.b;
+};
+
+/**
  * Convert YBR to RGB.
  *
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
@@ -24,17 +41,28 @@ dwv.utils.ybrToRgb = function (y, cb, cr) {
 };
 
 /**
- * Convert a hexadecimal colour to RGB.
+ * Convert a hex color into RGB.
  *
- * @param {string} hexColour The hexadecimal color as '#ab01ef'.
- * @returns {object} RGB equivalent as {r,g,b}.
+ * @param {string} hexStr The hex color as '#ab01ef'.
+ * @returns {object} The RGB values as {r,g,b}.
  */
-dwv.utils.hexToRgb = function (hexColour) {
+dwv.utils.hexToRgb = function (hexStr) {
   return {
-    r: parseInt(hexColour.substr(1, 2), 16),
-    g: parseInt(hexColour.substr(3, 2), 16),
-    b: parseInt(hexColour.substr(5, 2), 16)
+    r: parseInt(hexStr.substring(1, 3), 16),
+    g: parseInt(hexStr.substring(3, 5), 16),
+    b: parseInt(hexStr.substring(5, 7), 16)
   };
+};
+
+/**
+ * Convert RGB to its hex equivalent.
+ *
+ * @param {object} rgb The RGB object as {r,g,b}.
+ * @returns {string} A string representing the hex color as '#ab01ef'.
+ */
+dwv.utils.rgbToHex = function (rgb) {
+  return '#' +
+    ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
 };
 
 /**
@@ -111,7 +139,7 @@ dwv.utils.labToUintLab = function (triplet) {
 };
 
 /**
- * CIE Standard Illuminant D65
+ * CIE Standard Illuminant D65, standard 2° observer.
  *
  * @see https://en.wikipedia.org/wiki/Illuminant_D65
  */
@@ -187,7 +215,7 @@ dwv.utils.ciexyzToCielab = function (triplet) {
 /**
  * Convert CIE XYZ to sRGB.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
  * @param {object} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} sRGB triplet as {r,g,b}.
  */
@@ -200,7 +228,8 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
       // 0.416666667 = 1 / 2.4
       res = 1.055 * Math.pow(x, 0.416666667) - 0.055;
     }
-    return res;
+    // clip [0,1]
+    return Math.min(1, Math.max(0, res));
   };
 
   var x = triplet.x / 100;
@@ -217,7 +246,7 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
 /**
  * Convert sRGB to CIE XYZ.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
  * @param {object} triplet sRGB triplet as {r,g,b}.
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */

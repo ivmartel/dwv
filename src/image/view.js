@@ -32,12 +32,12 @@ dwv.image.View = function (image) {
   //   to add the extra dimension
   image.addEventListener('appendframe', function () {
     // update current position if first appendFrame
-    var position = self.getCurrentPosition();
-    if (position.length() === 3) {
+    var index = self.getCurrentIndex();
+    if (index.length() === 3) {
       // add dimension
-      var values = position.getValues();
+      var values = index.getValues();
       values.push(0);
-      self.setCurrentPosition(new dwv.math.Point(values));
+      self.setCurrentIndex(new dwv.math.Index(values));
     }
   });
 
@@ -83,9 +83,10 @@ dwv.image.View = function (image) {
   var colourMap = dwv.image.lut.plain;
   /**
    * Current position as a Point3D.
+   * Store position and not index to stay geometry independent.
    *
    * @private
-   * @type {object}
+   * @type {dwv.math.Point3D}
    */
   var currentPosition = null;
   /**
@@ -140,20 +141,25 @@ dwv.image.View = function (image) {
   };
 
   /**
-   * Set initial position.
+   * Initialise the view: set initial index.
    */
-  this.setInitialPosition = function () {
-    var silent = true;
+  this.init = function () {
+    this.setInitialIndex();
+  };
 
+  /**
+   * Set the initial index to 0.
+   */
+  this.setInitialIndex = function () {
     var geometry = image.getGeometry();
-    var values = new Array(geometry.getSize().length());
+    var size = geometry.getSize();
+    var values = new Array(size.length());
     values.fill(0);
-    var index = new dwv.math.Index(values);
-
-    this.setCurrentPosition(
-      geometry.indexToWorld(index),
-      silent
-    );
+    // middle
+    values[0] = Math.floor(size.get(0) / 2);
+    values[1] = Math.floor(size.get(1) / 2);
+    values[2] = Math.floor(size.get(2) / 2);
+    this.setCurrentIndex(new dwv.math.Index(values), true);
   };
 
   /**
@@ -176,9 +182,10 @@ dwv.image.View = function (image) {
    *
    * @param {*} _value The pixel value. Can be a number for monochrome
    *  data or an array for RGB data.
+   * @param {number} _index The data index of the value.
    * @returns {number} The coresponding alpha [0,255].
    */
-  var alphaFunction = function (_value) {
+  var alphaFunction = function (_value, _index) {
     // default always returns fully visible
     return 0xff;
   };
@@ -222,8 +229,8 @@ dwv.image.View = function (image) {
    */
   this.getCurrentWindowLut = function (rsi) {
     // check position
-    if (!this.getCurrentPosition()) {
-      this.setInitialPosition();
+    if (!this.getCurrentIndex()) {
+      this.setInitialIndex();
     }
     var currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
@@ -417,107 +424,172 @@ dwv.image.View = function (image) {
    * @returns {dwv.math.Index} The current index.
    */
   this.getCurrentIndex = function () {
+    var position = this.getCurrentPosition();
+    if (!position) {
+      return null;
+    }
     var geometry = this.getImage().getGeometry();
-    return geometry.worldToIndex(currentPosition);
+    return geometry.worldToIndex(position);
+  };
+
+  /**
+   * Check is the provided position can be set.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {boolean} True is the position is in bounds.
+   */
+  this.canSetPosition = function (position) {
+    var geometry = image.getGeometry();
+    var index = geometry.worldToIndex(position);
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    return geometry.isIndexInBounds(index, dirs);
+  };
+
+  /**
+   * Get the origin at a given position.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {dwv.math.Point} The origin.
+   */
+  this.getOrigin = function (position) {
+    var geometry = image.getGeometry();
+    var originIndex = 0;
+    if (typeof position !== 'undefined') {
+      var index = geometry.worldToIndex(position);
+      // index is reoriented, 2 is scroll index
+      originIndex = index.get(2);
+    }
+    return geometry.getOrigins()[originIndex];
   };
 
   /**
    * Set the current position.
    *
-   * @param {dwv.math.Point} newPosition The new position.
+   * @param {dwv.math.Point} position The new position.
    * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#positionchange
    */
-  this.setCurrentPosition = function (newPosition, silent) {
-    // check input
-    if (typeof silent === 'undefined') {
-      silent = false;
-    }
-
-    // check if possible
+  this.setCurrentPosition = function (position, silent) {
+    // send invalid event if not in bounds
     var geometry = image.getGeometry();
-    if (!geometry.isInBounds(newPosition)) {
-      return false;
+    var index = geometry.worldToIndex(position);
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
     }
-
-    var isNew = !currentPosition || !currentPosition.equals(newPosition);
-
-    if (isNew) {
-      var posIndex = geometry.worldToIndex(newPosition);
-      var diffDims = null;
-      if (currentPosition) {
-        if (currentPosition.canCompare(newPosition)) {
-          diffDims = currentPosition.compare(newPosition);
-        } else {
-          diffDims = [];
-          var minLen = Math.min(currentPosition.length(), newPosition.length());
-          for (var i = 0; i < minLen; ++i) {
-            if (currentPosition.get(i) !== newPosition.get(i)) {
-              diffDims.push(i);
-            }
-          }
-          var maxLen = Math.max(currentPosition.length(), newPosition.length());
-          for (var j = minLen; j < maxLen; ++j) {
-            diffDims.push(j);
-          }
-        }
-      } else {
-        diffDims = [];
-        for (var k = 0; k < newPosition.length(); ++k) {
-          diffDims.push(k);
-        }
-      }
-
-      // assign
-      currentPosition = newPosition;
-
+    if (!geometry.isIndexInBounds(index, dirs)) {
       if (!silent) {
-        /**
-         * Position change event.
-         *
-         * @event dwv.image.View#positionchange
-         * @type {object}
-         * @property {Array} value The changed value as [index, pixelValue].
-         * @property {Array} diffDims An array of modified indices.
-         */
-        var posEvent = {
+        // fire event with valid: false
+        fireEvent({
           type: 'positionchange',
           value: [
-            posIndex.getValues(),
-            currentPosition.getValues(),
+            index.getValues(),
+            position.getValues(),
           ],
-          diffDims: diffDims,
-          data: {
-            imageUid: image.getImageUid(posIndex)
-          }
-        };
-
-        // add value if possible
-        if (image.canQuantify()) {
-          var pixValue = image.getRescaledValueAtIndex(posIndex);
-          posEvent.value.push(pixValue);
-        }
-
-        // fire
-        fireEvent(posEvent);
+          valid: false
+        });
       }
+      return false;
     }
-
-    // all good
-    return true;
+    return this.setCurrentIndex(index, silent);
   };
 
   /**
    * Set the current index.
    *
-   * @param {dwv.math.Index} index The index.
-   * @param {boolean} silent If true, does not fire a positionchange event.
+   * @param {dwv.math.Index} index The new index.
+   * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
+   * @fires dwv.image.View#positionchange
    */
   this.setCurrentIndex = function (index, silent) {
-    var geometry = this.getImage().getGeometry();
-    return this.setCurrentPosition(geometry.indexToWorld(index), silent);
+    // check input
+    if (typeof silent === 'undefined') {
+      silent = false;
+    }
+
+    var geometry = image.getGeometry();
+    var position = geometry.indexToWorld(index);
+
+    // check if possible
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    if (!geometry.isIndexInBounds(index, dirs)) {
+      // do no send invalid positionchange event: avoid empty repaint
+      return false;
+    }
+
+    // calculate diff dims before updating internal
+    var diffDims = null;
+    var currentIndex = null;
+    if (this.getCurrentPosition()) {
+      currentIndex = this.getCurrentIndex();
+    }
+    if (currentIndex) {
+      if (currentIndex.canCompare(index)) {
+        diffDims = currentIndex.compare(index);
+      } else {
+        diffDims = [];
+        var minLen = Math.min(currentIndex.length(), index.length());
+        for (var i = 0; i < minLen; ++i) {
+          if (currentIndex.get(i) !== index.get(i)) {
+            diffDims.push(i);
+          }
+        }
+        var maxLen = Math.max(currentIndex.length(), index.length());
+        for (var j = minLen; j < maxLen; ++j) {
+          diffDims.push(j);
+        }
+      }
+    } else {
+      diffDims = [];
+      for (var k = 0; k < index.length(); ++k) {
+        diffDims.push(k);
+      }
+    }
+
+    // assign
+    currentPosition = position;
+
+    if (!silent) {
+      /**
+       * Position change event.
+       *
+       * @event dwv.image.View#positionchange
+       * @type {object}
+       * @property {Array} value The changed value as [index, pixelValue].
+       * @property {Array} diffDims An array of modified indices.
+       */
+      var posEvent = {
+        type: 'positionchange',
+        value: [
+          index.getValues(),
+          position.getValues(),
+        ],
+        diffDims: diffDims,
+        data: {
+          imageUid: image.getImageUid(index)
+        }
+      };
+
+      // add value if possible
+      if (image.canQuantify()) {
+        var pixValue = image.getRescaledValueAtIndex(index);
+        posEvent.value.push(pixValue);
+      }
+
+      // fire
+      fireEvent(posEvent);
+    }
+
+    // all good
+    return true;
   };
 
   /**
@@ -679,7 +751,7 @@ dwv.image.View.prototype.getWindowLevelMinMax = function () {
   var width = max - min;
   // full black / white images, defaults to 1.
   if (width < 1) {
-    dwv.logger.warn('Zero or negative width, defaulting to one.');
+    dwv.logger.warn('Zero or negative window width, defaulting to one.');
     width = 1;
   }
   var center = min + width / 2;
@@ -701,16 +773,21 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * Generate display image data to be given to a canvas.
  *
  * @param {Array} array The array to fill in.
+ * @param {dwv.math.Index} index Optional index at which to generate,
+ *   otherwise generates at current index.
  */
-dwv.image.View.prototype.generateImageData = function (array) {
-  // check position
-  if (!this.getCurrentPosition()) {
-    this.setInitialPosition();
+dwv.image.View.prototype.generateImageData = function (array, index) {
+  // check index
+  if (typeof index === 'undefined') {
+    if (!this.getCurrentIndex()) {
+      this.setInitialIndex();
+    }
+    index = this.getCurrentIndex();
   }
+
   var image = this.getImage();
-  var position = this.getCurrentIndex();
   var iterator = dwv.image.getSliceIterator(
-    image, position, false, this.getOrientation());
+    image, index, false, this.getOrientation());
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
@@ -776,8 +853,7 @@ dwv.image.View.prototype.incrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var geometry = this.getImage().getGeometry();
-  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
+  return this.setCurrentIndex(newIndex, silent);
 };
 
 /**
@@ -798,8 +874,7 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var geometry = this.getImage().getGeometry();
-  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
+  return this.setCurrentIndex(newIndex, silent);
 };
 
 /**

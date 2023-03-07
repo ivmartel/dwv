@@ -32,10 +32,11 @@ dwv.tool.draw.FreeHandFactory = function () {
   /**
    * Get the number of points needed to build the shape.
    *
-   * @returns {number} The number of points.
+   * @returns {number|undefined} The number of points.
    */
   this.getNPoints = function () {
-    return 1000;
+    // undefined to end with double click
+    return undefined;
   };
   /**
    * Get the timeout between point storage.

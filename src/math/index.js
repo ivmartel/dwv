@@ -28,7 +28,7 @@ dwv.math.Index = function (values) {
    * Get the index value at the given array index.
    *
    * @param {number} i The index to get.
-   * @returns {number} The value.
+   * @returns {number|undefined} The value or undefined if not in range.
    */
   this.get = function (i) {
     return values[i];
@@ -104,6 +104,27 @@ dwv.math.Index.prototype.equals = function (rhs) {
 };
 
 /**
+ * Compare indices and return different dimensions.
+ *
+ * @param {dwv.math.Index} rhs The index to compare to.
+ * @returns {Array} The list of different dimensions.
+ */
+dwv.math.Index.prototype.compare = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
+    return null;
+  }
+  // check values
+  var diffDims = [];
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      diffDims.push(i);
+    }
+  }
+  return diffDims;
+};
+
+/**
  * Add another index to this one.
  *
  * @param {dwv.math.Index} rhs The index to add.
@@ -148,6 +169,21 @@ dwv.math.getZeroIndex = function (size) {
   var values = new Array(size);
   values.fill(0);
   return new dwv.math.Index(values);
+};
+
+/**
+ * Get an array sort callback.
+ * f(a,b) > 0 -> b,a
+ * f(a,b) < 0 -> a,b
+ * f(a,b) = 0 -> original order
+ *
+ * @param {number} direction The direction to use to compare indices.
+ * @returns {Function} A function that compares two dwv.math.Index.
+ */
+dwv.math.getIndexCompareFunction = function (direction) {
+  return function (a, b) {
+    return a.get(direction) - b.get(direction);
+  };
 };
 
 /**

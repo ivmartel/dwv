@@ -191,10 +191,7 @@ QUnit.test('Test Image append slice.', function (assert) {
   var imgSize = new dwv.image.Size([size, size, 2]);
   var imgSizeMinusOne = new dwv.image.Size([size, size, 1]);
   var imgSpacing = new dwv.image.Spacing([1, 1, 1]);
-  var imgOrigin = new dwv.math.Point3D(0, 0, 1);
-  var imgGeometry0 = new dwv.image.Geometry(
-    imgOrigin, imgSizeMinusOne, imgSpacing);
-  imgGeometry0.appendOrigin(new dwv.math.Point3D(0, 0, 0), 1);
+  var imgOrigin = new dwv.math.Point3D(0, 0, 0);
 
   // slice to append
   var sliceSize = new dwv.image.Size([size, size, 1]);
@@ -206,13 +203,16 @@ QUnit.test('Test Image append slice.', function (assert) {
   // image buffer
   var buffer = new Int16Array(imgSize.getTotalSize());
   for (var j = 0; j < size * size; ++j) {
-    buffer[j] = 1;
+    buffer[j] = 0;
   }
   for (var k = size * size; k < 2 * size * size; ++k) {
-    buffer[k] = 0;
+    buffer[k] = 1;
   }
 
   // image 0
+  var imgGeometry0 = new dwv.image.Geometry(
+    imgOrigin, imgSizeMinusOne, imgSpacing);
+  imgGeometry0.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
   var image0 = new dwv.image.Image(imgGeometry0, buffer, ['0']);
   image0.setMeta({numberOfFiles: 3});
   // append null
@@ -220,7 +220,7 @@ QUnit.test('Test Image append slice.', function (assert) {
     image0.appendSlice(null);
   }, new Error('Cannot append null slice'), 'append null slice');
   // real slice
-  var sliceOrigin = new dwv.math.Point3D(0, 0, 2);
+  var sliceOrigin = new dwv.math.Point3D(0, 0, -1);
   var sliceGeometry = new dwv.image.Geometry(
     sliceOrigin, sliceSize, imgSpacing);
   var slice0 = new dwv.image.Image(sliceGeometry, sliceBuffer, ['1']);
@@ -230,15 +230,15 @@ QUnit.test('Test Image append slice.', function (assert) {
   // test its values
   assert.equal(image0.getValue(0, 0, 0), 2, 'Value at 0,0,0 (append before)');
   assert.equal(image0.getValue(3, 3, 0), 2, 'Value at 3,3,0 (append before)');
-  assert.equal(image0.getValue(0, 0, 1), 1, 'Value at 0,0,1 (append before)');
-  assert.equal(image0.getValue(3, 3, 1), 1, 'Value at 3,3,1 (append before)');
-  assert.equal(image0.getValue(0, 0, 2), 0, 'Value at 0,0,2 (append before)');
-  assert.equal(image0.getValue(3, 3, 2), 0, 'Value at 3,3,2 (append before)');
+  assert.equal(image0.getValue(0, 0, 1), 0, 'Value at 0,0,1 (append before)');
+  assert.equal(image0.getValue(3, 3, 1), 0, 'Value at 3,3,1 (append before)');
+  assert.equal(image0.getValue(0, 0, 2), 1, 'Value at 0,0,2 (append before)');
+  assert.equal(image0.getValue(3, 3, 2), 1, 'Value at 3,3,2 (append before)');
   // test its positions
   var sliceOrigins0 = [];
-  sliceOrigins0[0] = new dwv.math.Point3D(0, 0, 2);
-  sliceOrigins0[1] = new dwv.math.Point3D(0, 0, 1);
-  sliceOrigins0[2] = new dwv.math.Point3D(0, 0, 0);
+  sliceOrigins0[0] = new dwv.math.Point3D(0, 0, -1);
+  sliceOrigins0[1] = new dwv.math.Point3D(0, 0, 0);
+  sliceOrigins0[2] = new dwv.math.Point3D(0, 0, 1);
   assert.ok(
     compareArrayOfVectors(imgGeometry0.getOrigins(), sliceOrigins0),
     'Slice positions (append before)');
@@ -246,28 +246,28 @@ QUnit.test('Test Image append slice.', function (assert) {
   // image 1
   var imgGeometry1 = new dwv.image.Geometry(
     imgOrigin, imgSizeMinusOne, imgSpacing);
-  imgGeometry1.appendOrigin(new dwv.math.Point3D(0, 0, 0), 1);
+  imgGeometry1.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
   var image1 = new dwv.image.Image(imgGeometry1, buffer, ['0']);
   image1.setMeta({numberOfFiles: 3});
-  var sliceOrigin1 = new dwv.math.Point3D(0, 0, -1);
+  var sliceOrigin1 = new dwv.math.Point3D(0, 0, 2);
   var sliceGeometry1 = new dwv.image.Geometry(
     sliceOrigin1, sliceSize, imgSpacing);
-  var slice1 = new dwv.image.Image(sliceGeometry1, sliceBuffer, ['0']);
+  var slice1 = new dwv.image.Image(sliceGeometry1, sliceBuffer, ['1']);
   slice1.setMeta({numberOfFiles: 3});
   // append slice before
   image1.appendSlice(slice1);
   // test its values
-  assert.equal(image1.getValue(0, 0, 0), 1, 'Value at 0,0,0 (append after)');
-  assert.equal(image1.getValue(3, 3, 0), 1, 'Value at 3,3,0 (append after)');
-  assert.equal(image1.getValue(0, 0, 1), 0, 'Value at 0,0,1 (append after)');
-  assert.equal(image1.getValue(3, 3, 1), 0, 'Value at 3,3,1 (append after)');
+  assert.equal(image1.getValue(0, 0, 0), 0, 'Value at 0,0,0 (append after)');
+  assert.equal(image1.getValue(3, 3, 0), 0, 'Value at 3,3,0 (append after)');
+  assert.equal(image1.getValue(0, 0, 1), 1, 'Value at 0,0,1 (append after)');
+  assert.equal(image1.getValue(3, 3, 1), 1, 'Value at 3,3,1 (append after)');
   assert.equal(image1.getValue(0, 0, 2), 2, 'Value at 0,0,2 (append after)');
   assert.equal(image1.getValue(3, 3, 2), 2, 'Value at 3,3,2 (append after)');
   // test its positions
   var sliceOrigins1 = [];
-  sliceOrigins1[0] = new dwv.math.Point3D(0, 0, 1);
-  sliceOrigins1[1] = new dwv.math.Point3D(0, 0, 0);
-  sliceOrigins1[2] = new dwv.math.Point3D(0, 0, -1);
+  sliceOrigins1[0] = new dwv.math.Point3D(0, 0, 0);
+  sliceOrigins1[1] = new dwv.math.Point3D(0, 0, 1);
+  sliceOrigins1[2] = new dwv.math.Point3D(0, 0, 2);
   assert.ok(
     compareArrayOfVectors(imgGeometry1.getOrigins(), sliceOrigins1),
     'Slice positions (append after)');
@@ -275,28 +275,28 @@ QUnit.test('Test Image append slice.', function (assert) {
   // image 2
   var imgGeometry2 = new dwv.image.Geometry(
     imgOrigin, imgSizeMinusOne, imgSpacing);
-  imgGeometry2.appendOrigin(new dwv.math.Point3D(0, 0, 0), 1);
+  imgGeometry2.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
   var image2 = new dwv.image.Image(imgGeometry2, buffer, ['0']);
   image2.setMeta({numberOfFiles: 3});
   var sliceOrigin2 = new dwv.math.Point3D(0, 0, 0.4);
   var sliceGeometry2 = new dwv.image.Geometry(
     sliceOrigin2, sliceSize, imgSpacing);
-  var slice2 = new dwv.image.Image(sliceGeometry2, sliceBuffer, ['0']);
+  var slice2 = new dwv.image.Image(sliceGeometry2, sliceBuffer, ['1']);
   slice2.setMeta({numberOfFiles: 3});
   // append slice before
   image2.appendSlice(slice2);
   // test its values
-  assert.equal(image2.getValue(0, 0, 0), 1, 'Value at 0,0,0 (append between)');
-  assert.equal(image2.getValue(3, 3, 0), 1, 'Value at 3,3,0 (append between)');
+  assert.equal(image2.getValue(0, 0, 0), 0, 'Value at 0,0,0 (append between)');
+  assert.equal(image2.getValue(3, 3, 0), 0, 'Value at 3,3,0 (append between)');
   assert.equal(image2.getValue(0, 0, 1), 2, 'Value at 0,0,1 (append between)');
   assert.equal(image2.getValue(3, 3, 1), 2, 'Value at 3,3,1 (append between)');
-  assert.equal(image2.getValue(0, 0, 2), 0, 'Value at 0,0,2 (append between)');
-  assert.equal(image2.getValue(3, 3, 2), 0, 'Value at 3,3,2 (append between)');
+  assert.equal(image2.getValue(0, 0, 2), 1, 'Value at 0,0,2 (append between)');
+  assert.equal(image2.getValue(3, 3, 2), 1, 'Value at 3,3,2 (append between)');
   // test its positions
   var sliceOrigins2 = [];
-  sliceOrigins2[0] = new dwv.math.Point3D(0, 0, 1);
+  sliceOrigins2[0] = new dwv.math.Point3D(0, 0, 0);
   sliceOrigins2[1] = new dwv.math.Point3D(0, 0, 0.4);
-  sliceOrigins2[2] = new dwv.math.Point3D(0, 0, 0);
+  sliceOrigins2[2] = new dwv.math.Point3D(0, 0, 1);
   assert.ok(
     compareArrayOfVectors(imgGeometry2.getOrigins(), sliceOrigins2),
     'Slice positions (append between)');
@@ -490,4 +490,70 @@ QUnit.test('Test ImageFactory.', function (assert) {
     res0.rescaledStats.asObject(),
     zeroStats.asObject(),
     'Rescaled values should be equal');
+});
+
+/**
+ * Tests for {@link dwv.image.Image} hasValues and getOffsets.
+ *
+ * @function module:tests/image~getOffsets
+ */
+QUnit.test('Test hasValues and getOffsets.', function (assert) {
+  var size0 = 3;
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
+  var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
+  var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  var buffer0 = [];
+  buffer0[0] = 1;
+  for (var i0 = 1; i0 < 2 * size0; ++i0) {
+    buffer0[i0] = 0;
+  }
+  for (var i1 = 2 * size0; i1 < size0 * size0; ++i1) {
+    buffer0[i1] = 1;
+  }
+  var theoOffset0 = [1, 2, 3, 4, 5];
+  var theoOffset1 = [0, 6, 7, 8];
+
+  // create the image
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+
+  // test hasValues
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0]), [true]),
+    'Image has values 0'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([1]), [true]),
+    'Image has values 1'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([2]), [false]),
+    'Image has values 2'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0, 1]), [true, true]),
+    'Image has values 0,1'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0, 2]), [true, false]),
+    'Image has values 0,2'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([2, 0]), [false, true]),
+    'Image has values 2,0'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([0, 2, 1]), [true, false, true]),
+    'Image has values 0,2,1'
+  );
+  assert.ok(
+    dwv.utils.arrayEquals(image0.hasValues([2, 1, 0]), [false, true, true]),
+    'Image has values 2,1,0'
+  );
+
+  // test offsets list
+  var off00 = image0.getOffsets(0);
+  var off01 = image0.getOffsets(1);
+  assert.ok(dwv.utils.arrayEquals(off00, theoOffset0), 'Image offsets 0');
+  assert.ok(dwv.utils.arrayEquals(off01, theoOffset1), 'Image offsets 1');
 });

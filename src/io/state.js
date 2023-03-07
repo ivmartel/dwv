@@ -9,7 +9,7 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
- * - v0.5 (dwv 0.30.0, ??/2021)
+ * - v0.5 (dwv 0.30.0, 12/2021)
  *   - store position as array
  *   - new draw position group key
  * - v0.4 (dwv 0.29.0, 06/2021)
@@ -42,8 +42,9 @@ dwv.io.State = function () {
     var layerGroup = app.getActiveLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
+    var position = viewController.getCurrentIndex();
     var drawLayer = layerGroup.getActiveDrawLayer();
-    var position = viewController.getCurrentPosition();
+    var drawController = drawLayer.getDrawController();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
@@ -53,7 +54,7 @@ dwv.io.State = function () {
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
-      drawingsDetails: app.getDrawStoreDetails()
+      drawingsDetails: drawController.getDrawStoreDetails()
     });
   };
   /**
@@ -94,7 +95,8 @@ dwv.io.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(new dwv.math.Point(data.position));
+    // position is index...
+    viewController.setCurrentIndex(new dwv.math.Index(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
@@ -125,7 +127,7 @@ dwv.io.State = function () {
       scale = {
         x: data.scale.x * baseScale.x,
         y: data.scale.y * baseScale.y,
-        z: 1
+        z: baseScale.z
       };
       offset = {
         x: data.offset.x,
@@ -384,8 +386,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         if (drawGroup.name() === 'ruler-group') {
           quant = {
             length: {
-              value: parseFloat(textExpr.substr(0, txtLen - 2)),
-              unit: textExpr.substr(-2, 2)
+              value: parseFloat(textExpr.substring(0, txtLen - 2)),
+              unit: textExpr.substring(-2)
             }
           };
           textExpr = '{length}';
@@ -393,8 +395,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             surface: {
-              value: parseFloat(textExpr.substr(0, txtLen - 3)),
-              unit: textExpr.substr(-3, 3)
+              value: parseFloat(textExpr.substring(0, txtLen - 3)),
+              unit: textExpr.substring(-3)
             }
           };
           textExpr = '{surface}';
@@ -402,8 +404,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             angle: {
-              value: parseFloat(textExpr.substr(0, txtLen - 1)),
-              unit: textExpr.substr(-1, 1)
+              value: parseFloat(textExpr.substring(0, txtLen - 1)),
+              unit: textExpr.substring(-1)
             }
           };
           textExpr = '{angle}';

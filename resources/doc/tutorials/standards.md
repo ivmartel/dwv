@@ -1,6 +1,6 @@
 These are the standards that should be used when coding for this project.
 
- * Code:  
+ * Code:
    * Check with [ESlint](https://eslint.org/)
    * Follow [google](https://google.github.io/styleguide/jsguide.html) guide,
    * No variables or functions should be defined in the global namespace, all should be in the `dwv` var,
@@ -26,7 +26,6 @@ Others
 
 Others:
  * [Code Climate](https://codeclimate.com) ([status](http://status.codeclimate.com/)): code review + test coverage + lint, [dwv page](https://codeclimate.com/github/ivmartel/dwv)
- * [David-dm](https://david-dm.org/): dependency up to date checker, [dwv page](https://david-dm.org/ivmartel/dwv)
  * [Fossa](https://fossa.com/): license check, [dwv page](https://app.fossa.io/projects/git%2Bgithub.com%2Fivmartel%2Fdwv)
 
 ## Generic

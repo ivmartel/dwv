@@ -1,25 +1,4 @@
 {
-    "docdash": {
-        "search": true,
-        "collapse": true,
-        "private": false,
-        "sectionOrder": [
-          "Tutorials",
-          "Namespaces",
-          "Events",
-          "Classes",
-          "Externals",
-          "Modules"
-        ],
-        "menu": {
-            "Project Website": {
-                "href":"https://github.com/ivmartel/dwv",
-                "target":"_blank",
-                "class":"menu-item",
-                "id":"website_link"
-            }
-        }
-    },
     "plugins": ["node_modules/jsdoc/plugins/markdown"],
     "markdown": {
       "idInHeadings": true
@@ -41,8 +20,40 @@
       "recurse": true,
       "readme": "resources/doc/readme-doc.md",
       "destination": "build/doc",
-      "template": "node_modules/docdash",
+      "template": "node_modules/clean-jsdoc-theme",
       "tutorials": "resources/doc/tutorials",
-      "package": "package.json"
+      "package": "package.json",
+      "theme_opts": {
+        "title": "DWV",
+        "footer": "<i>Documentation generated for dwv v0.31.0-rc.0.</i>",
+        "sections": [
+          "Tutorials",
+          "Namespaces",
+          "Events",
+          "Classes",
+          "Externals",
+          "Modules"
+        ],
+        "menu": [
+          {
+            "title": "github",
+            "link": "https://github.com/ivmartel/dwv",
+            "target": "_blank"
+          },
+          {
+            "title": "npm",
+            "link": "https://www.npmjs.com/package/dwv",
+            "target": "_blank"
+          }
+        ],
+        "create_style": "ul {list-style-type: disc !important;} ul ul {list-style-type: circle !important;}",
+        "codepen": {
+          "enable_for": ["examples"],
+          "options": {
+            "js_external": "https://github.com/ivmartel/dwv/releases/download/v0.31.0-rc.0/dwv-0.31.0-rc.0.min.js",
+            "html": "<div id='dwv'><div id='layerGroup0'></div></div>"
+          }
+        }
+      }
     }
 }

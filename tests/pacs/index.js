@@ -23,7 +23,7 @@ var _dataDicom = [
       file: 'bbmri.dcmdir'
     },
     img: 'babymri-dcmdir.png',
-    desc: 'Brain MR, 256*256*5, ' +
+    desc: 'Brain MR, 256*256*4, ' +
       'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
   },
   {
@@ -33,7 +33,18 @@ var _dataDicom = [
       file: 'bbmri.zip'
     },
     img: 'babymri-zip.png',
-    desc: 'Brain MR, 256*256*5, ' +
+    desc: 'Brain MR, 256*256*2 ' +
+      'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
+  },
+  {
+    title: 'Baby MRI (with state)',
+    uri: {
+      type: 'dwvtest',
+      file: 'bbmri-53323851.dcm',
+      args: '&state=../state/v0.5/state-rectangle.json'
+    },
+    img: 'babymri-rect.png',
+    desc: 'Brain MR, 256*256*1, ' +
       'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
   },
   {

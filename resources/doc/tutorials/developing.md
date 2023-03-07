@@ -10,7 +10,7 @@ If you are using [Tortoise-git](http://code.google.com/p/tortoisegit/), you need
 
 ## Implementation
 
-A text editor can be enough to play with javascript, I use [Atom](https://atom.io/) with the following extra packages: [linter-eslint](https://atom.io/packages/linter-eslint) (based on [linter](https://atom.io/packages/linter)) and [minimap](https://atom.io/packages/minimap).
+A text editor can be enough to play with javascript, I use [VSCodium](https://vscodium.com/) with the the [vscode-eslint](https://open-vsx.org/extension/dbaeumer/vscode-eslint) extension.
 
 
 ## Debugging
@@ -33,14 +33,13 @@ For the application behaviour, check these tools:
  1. Check DICOM [conformance](./tutorial-conformance.html) by loading the test [data](https://github.com/ivmartel/dwv/tree/master/data)
  1. Check [integrations](./tutorial-integrations.html) by launching dwv in some PACS
  1. Check module integration
- 1. Update translations
  1. Create release:
     1. run the `resources/scripts/prep-release` script with the release and previous version
     1. review changes
     1. run the `resources/scripts/finish-release` script with the release and next version
- 1. Check fiddles (links on the [examples](./tutorial-examples.html) wiki page)
  1. Create release from [github releases](https://github.com/ivmartel/dwv/releases) (creates the tag)
  1. Create the doc for the release `yarn run doc` and push it on the `gh-pages` branch
  1. Publish npm package: `npm publish` in the main directory on the `master` branch
+ 1. Check the examples: on class doc or [examples](./tutorial-examples.html)
  1. Create snapshots
  1. Update dependent plugins: wordpress [dicom-support](https://wordpress.org/plugins/dicom-support/), [dwv-orthanc-plugin](https://github.com/ivmartel/dwv-orthanc-plugin), [dwv-dcm4chee-web](https://github.com/ivmartel/dwv-dcm4chee-web)

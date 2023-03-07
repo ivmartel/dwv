@@ -169,7 +169,7 @@ dwv.tool.Floodfill = function (app) {
    */
   var getCoord = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
     return {
@@ -357,7 +357,7 @@ dwv.tool.Floodfill = function (app) {
    */
   this.mousedown = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var drawLayer = layerGroup.getActiveDrawLayer();
 
@@ -404,7 +404,7 @@ dwv.tool.Floodfill = function (app) {
     self.started = false;
     if (extender) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       self.extend(layerGroup);
     }
   };
@@ -468,7 +468,7 @@ dwv.tool.Floodfill = function (app) {
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({shapeColour: this.style.getLineColour()});
     }
   };
 
@@ -477,6 +477,15 @@ dwv.tool.Floodfill = function (app) {
    */
   this.init = function () {
     // does nothing
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
   };
 
   /**
@@ -512,29 +521,12 @@ dwv.tool.Floodfill = function (app) {
 }; // Floodfill class
 
 /**
- * Help for this tool.
+ * Set the tool live features: shape colour.
  *
- * @returns {object} The help content.
+ * @param {object} features The list of features.
  */
-dwv.tool.Floodfill.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Floodfill.name',
-    brief: 'tool.Floodfill.brief',
-    mouse: {
-      click: 'tool.Floodfill.click'
-    },
-    touch: {
-      tap: 'tool.Floodfill.tap'
-    }
-  };
-};
-
-/**
- * Set the line colour of the drawing.
- *
- * @param {string} colour The colour to set.
- */
-dwv.tool.Floodfill.prototype.setLineColour = function (colour) {
-  // set style var
-  this.style.setLineColour(colour);
+dwv.tool.Floodfill.prototype.setFeatures = function (features) {
+  if (typeof features.shapeColour !== 'undefined') {
+    this.style.setLineColour(features.shapeColour);
+  }
 };

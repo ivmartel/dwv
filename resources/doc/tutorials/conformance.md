@@ -37,8 +37,22 @@ See the [definition](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C
 ## Data elements
 All Value Representations (VR) should be supported. See the official [list](http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1).
 
-## WADO
-Web Access to Dicom persistent Objects (WADO) is part of the [DICOMWeb](https://en.wikipedia.org/wiki/DICOMweb) services defined in [Part 3.18](http://dicom.nema.org/dicom/2013/output/chtml/part18/PS3.18.html). WADO-URI can be provided in the DWV URL using `?input=` since <font color="green">v0.3</font>.
+## Dicom web
+Web Access to Dicom persistent Objects (see [DICOMweb](https://en.wikipedia.org/wiki/DICOMweb))
+
+### WADO-RS
+-> RESTful Services (RS) (see [Part 3.18 sect 6.5](https://dicom.nema.org/dicom/2013/output/chtml/part18/sect_6.5.html))
+
+WADO-RS is supported via the `MultipartLoader` since <font color="green">v0.31</font>.
+
+The default `Accept` header should be something like: `multipart/related; type="application/dicom"; transfer-syntax=*'`.
+
+The `tests/pacs/dcmweb.html` test page allows to connect to an Orthanc instance and retrieve data from it.
+
+### WADO-URI
+-> URI based (see [Part 3.18 sect 6.2](https://dicom.nema.org/dicom/2013/output/chtml/part18/sect_6.2.html))
+
+WADO-URI can be provided in the DWV URL using `?input=` since <font color="green">v0.3</font>.
 
 Arguments follow regular URI standard.
  * `requestType`: WADO. **Required**
@@ -52,8 +66,7 @@ Arguments follow regular URI standard.
  * `anonymise`: true or false.
  * If the type is image, then `rows`, `columns`, `windowWidth`, `windowCenter` and more can be specified.
 
-Example:
- * [dicom.vital-it.ch](http://dicom.vital-it.ch) (dead?): [JPEG2000 demo data](http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=2.16.840.1.113669.632.20.1211.10000744858&seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007)
+Example url:
  ```
 http://dicom.vital-it.ch:8089/wado?
     requestType=WADO&
@@ -62,7 +75,9 @@ http://dicom.vital-it.ch:8089/wado?
     seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&
     objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007
 ```
- * [dicomserver.co.uk](http://www.dicomserver.co.uk): [search](http://www.dicomserver.co.uk/wado/), example [brain data](http://www.dicomserver.co.uk/wado/WADO.asp?requestType=WADO&studyUID=0.0.0.0.2.8811.20010413115754.12432&seriesUID=0.0.0.0.3.8811.2.20010413115754.12432&objectUID=0.0.0.0.1.8811.2.19.20010413115754.12432&contentType=application/dicom) (open in [dwv](http://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html?input=http%3a%2f%2fwww.dicomserver.co.uk%2fwado%2fWADO.asp%3frequestType%3dWADO%26studyUID%3d0.0.0.0.2.8811.20010413115754.12432%26seriesUID%3d0.0.0.0.3.8811.2.20010413115754.12432%26objectUID%3d0.0.0.0.1.8811.2.19.20010413115754.12432%26contentType%3dapplication%2fdicom))
+
+Example server: [dicomserver.co.uk](http://www.dicomserver.co.uk), [search](http://www.dicomserver.co.uk/wado/).
+
 
 ## Pixel data
 File data storage, either one frame per file or multiple:
@@ -73,9 +88,14 @@ File data storage, either one frame per file or multiple:
  * without code extensions: &#x2705; *(since v0.15.0, see [#248](https://github.com/ivmartel/dwv/issues/248))*
  * with code extensions: &#x274C;
 
-## Radiotherapy
-The Part PS 3.3 of the DICOM Standard specifies the set of Information Object Definitions (IODs) which provide an abstract definition of real-world objects applicable to communication of digital medical information. The Attributes of an IOD describe the properties of a Real-World Object Instance. Related Attributes are grouped into [Modules](http://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_C.html) which represent a higher level of semantics documented in the Module Specifications found in Annex C of the DICOM Standard. Source: [leadtools](http://www.leadtools.com/sdk/medical/dicom-spec.htm).
+## IOD and Modules
+The Part PS 3.3 of the DICOM Standard specifies the set of Information Object Definitions (IODs) which provide an abstract definition of real-world objects applicable to communication of digital medical information. The Attributes of an IOD describe the properties of a Real-World Object Instance. Related Attributes are grouped into [Modules](http://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_C.html) which represent a higher level of semantics documented in the Module Specifications found in Annex C of the DICOM Standard.
 
-This list are the modules of interest:
- * [Radiotherapy module](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.8.html#sect_C.8.8) -> &#x274C;
- * [Waveform module](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.10.html#sect_C.10.9) -> &#x274C;
+An overview of modules for each IOD is defined in [sect_A.1.4](https://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_A.html#sect_A.1.4) (legend: [sect_A.1.3](https://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_A.html#sect_A.1.3)).
+
+Some IODs:
+ * [CT](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.3.html)
+ * [MR](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.4.html)
+ * [RT Image](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.17.3.html)
+ * [PET](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.21.html)
+ * [Segmentation](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.51.html)

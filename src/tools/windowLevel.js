@@ -7,6 +7,22 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {WindowLevel: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('WindowLevel');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.tool.WindowLevel = function (app) {
   /**
@@ -22,6 +38,13 @@ dwv.tool.WindowLevel = function (app) {
    * @type {boolean}
    */
   this.started = false;
+
+  /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
 
   /**
    * Handle mouse down event.
@@ -48,18 +71,23 @@ dwv.tool.WindowLevel = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
     // difference to last position
     var diffX = event._x - self.x0;
     var diffY = self.y0 - event._y;
+    // data range
+    var range = viewController.getImageRescaledDataRange();
+    // 1/1000 seems to give reasonable results...
+    var pixelToIntensity = (range.max - range.min) * 0.01;
+
     // calculate new window level
-    var windowCenter =
-      parseInt(viewController.getWindowLevel().center, 10) + diffY;
-    var windowWidth =
-      parseInt(viewController.getWindowLevel().width, 10) + diffX;
+    var center = parseInt(viewController.getWindowLevel().center, 10);
+    var width = parseInt(viewController.getWindowLevel().width, 10);
+    var windowCenter = center + Math.round(diffY * pixelToIntensity);
+    var windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
     windowWidth = dwv.image.validateWindowWidth(windowWidth);
 
@@ -133,7 +161,7 @@ dwv.tool.WindowLevel = function (app) {
    */
   this.dblclick = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
     var viewController = viewLayer.getViewController();
@@ -148,6 +176,15 @@ dwv.tool.WindowLevel = function (app) {
         )
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
   };
 
   /**
@@ -177,22 +214,3 @@ dwv.tool.WindowLevel = function (app) {
   };
 
 }; // WindowLevel class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.WindowLevel.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.WindowLevel.name',
-    brief: 'tool.WindowLevel.brief',
-    mouse: {
-      mouse_drag: 'tool.WindowLevel.mouse_drag',
-      double_click: 'tool.WindowLevel.double_click'
-    },
-    touch: {
-      touch_drag: 'tool.WindowLevel.touch_drag'
-    }
-  };
-};

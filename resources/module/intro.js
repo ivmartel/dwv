@@ -4,9 +4,6 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'i18next',
-            'i18next-http-backend',
-            'i18next-browser-languagedetector',
             'jszip',
             'konva',
             'magic-wand-tool'
@@ -18,9 +15,6 @@
 
         // Konva: requires 'canvas'
         module.exports = factory(
-            require('i18next'),
-            require('i18next-http-backend'),
-            require('i18next-browser-languagedetector'),
             require('jszip'),
             require('konva/cmj'),
             require('magic-wand-tool')
@@ -28,18 +22,12 @@
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
-            root.i18next,
-            root.i18nextHttpBackend,
-            root.i18nextBrowserLanguageDetector,
             root.JSZip,
             root.Konva,
             root.MagicWand
         );
     }
 }(this, function (
-    i18next,
-    i18nextHttpBackend,
-    i18nextBrowserLanguageDetector,
     JSZip,
     Konva,
     MagicWand) {
@@ -55,16 +43,6 @@
     var isEsmModule = function (mod) {
       return typeof mod !== 'undefined' &&
         typeof mod.default !== 'undefined';
-    }
-    // i18next (>v17) comes as a module, see #862
-    if (isEsmModule(i18next)) {
-      i18next = i18next.default;
-    }
-    if (isEsmModule(i18nextHttpBackend)) {
-      i18nextHttpBackend = i18nextHttpBackend.default;
-    }
-    if (isEsmModule(i18nextBrowserLanguageDetector)) {
-      i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector.default;
     }
     // Konva (>=v8) comes as a module, see #1044
     if (isEsmModule(Konva)) {

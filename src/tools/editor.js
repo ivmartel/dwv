@@ -20,6 +20,7 @@ var Konva = Konva || {};
  * @returns {object} The default anchor shape.
  */
 dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
+  var radius = style.applyZoomScale(3);
   return new Konva.Ellipse({
     x: x,
     y: y,
@@ -27,7 +28,10 @@ dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
     fill: 'rgba(100,100,100,0.7',
     strokeWidth: style.getStrokeWidth(),
     strokeScaleEnabled: false,
-    radius: style.applyZoomScale(3),
+    radius: {
+      x: Math.abs(radius.x),
+      y: Math.abs(radius.y)
+    },
     name: 'anchor',
     id: id,
     dragOnTop: false,
@@ -328,7 +332,7 @@ dwv.tool.ShapeEditor = function (app) {
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(evt.evt);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
       dwv.tool.validateAnchorPosition(drawLayer.getBaseSize(), this);

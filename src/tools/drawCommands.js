@@ -236,7 +236,8 @@ dwv.tool.ChangeGroupCommand = function (
      * @type {object}
      */
     this.onExecute({
-      type: 'drawchange'
+      type: 'drawchange',
+      id: endAnchor.getParent().id()
     });
   };
   /**
@@ -251,7 +252,8 @@ dwv.tool.ChangeGroupCommand = function (
     layer.draw();
     // callback
     this.onUndo({
-      type: 'drawchange'
+      type: 'drawchange',
+      id: startAnchor.getParent().id()
     });
   };
 }; // ChangeGroupCommand class

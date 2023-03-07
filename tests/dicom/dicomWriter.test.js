@@ -9,6 +9,35 @@ dwv.test = dwv.test || {};
 /* global QUnit */
 
 /**
+ * Tests getUID.
+ *
+ * @function module:tests/dicom~getUID
+ */
+QUnit.test('Test getUID', function (assert) {
+  // check size
+  var uid00 = dwv.dicom.getUID('mytag');
+  assert.ok(uid00.length <= 64, 'uid length #0');
+  var uid01 = dwv.dicom.getUID('mysuperlongtagthatneverfinishes');
+  assert.ok(uid01.length <= 64, 'uid length #1');
+
+  // consecutive for same tag are different
+  var uid10 = dwv.dicom.getUID('mytag');
+  var uid11 = dwv.dicom.getUID('mytag');
+  assert.notEqual(uid10, uid11, 'Consecutive getUID');
+
+  // groups do not start with 0
+  var parts = uid10.split('.');
+  var count = 0;
+  for (var i = 0; i < parts.length; ++i) {
+    var part = parts[i];
+    if (part[0] === '0' && part.length !== 1) {
+      ++count;
+    }
+  }
+  assert.ok(count === 0, 'Zero at start of part');
+});
+
+/**
  * Tests for {@link dwv.dicom.DicomWriter} using simple DICOM data.
  * Using remote file for CI integration.
  *
@@ -113,7 +142,7 @@ QUnit.test('Test patient anonymisation', function (assert) {
       }
     };
 
-    var patientsName = 'dwv-patient-test';
+    var patientsName = 'dwv^PatientName';
     var patientID = 'dwv-patient-id123';
     var patientsBirthDate = '19830101';
     var patientsSex = 'M';
@@ -167,29 +196,6 @@ QUnit.test('Test patient anonymisation', function (assert) {
 });
 
 /**
- * Get a string representation of an object.
- * TypedArray.toString can return '[object Uint8Array]' on old browsers
- * (such as in PhantomJs).
- *
- * @param {object} obj The input object
- * @returns {string} The string.
- */
-dwv.test.toString = function (obj) {
-  var res = obj.toString();
-  if (res.substr(0, 7) === '[object' &&
-        res.substr((res.length - 6), 6) === 'Array]') {
-    res = '';
-    for (var i = 0; i < obj.length; ++i) {
-      res += obj[i];
-      if (i !== obj.length - 1) {
-        res += ',';
-      }
-    }
-  }
-  return res;
-};
-
-/**
  * Compare JSON tags and DICOM elements
  *
  * @param {object} jsonTags The JSON tags.
@@ -211,24 +217,31 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
     var element = dicomElements.getDEFromKey(tagKey);
     var value = dicomElements.getFromKey(tagKey, true);
     if (element.vr !== 'SQ') {
+      var jsonTag = jsonTags[tagName];
+      // stringify possible array
+      if (Array.isArray(jsonTag)) {
+        jsonTag = jsonTag.join();
+      }
       comparator.equal(
-        dwv.test.toString(value),
-        jsonTags[tagName],
+        dwv.dicom.cleanString(value.join()),
+        jsonTag,
         name + ' - ' + tagName);
     } else {
       // check content
       if (jsonTags[tagName] === null || jsonTags[tagName] === 0) {
         continue;
       }
+      var sqValue = jsonTags[tagName].value;
+      if (typeof sqValue === 'undefined' ||
+      sqValue === null) {
+        continue;
+      }
       // supposing same order of subkeys and indices...
-      var subKeys = Object.keys(jsonTags[tagName]);
-      var index = 0;
-      for (var sk = 0; sk < subKeys.length; ++sk) {
-        if (subKeys[sk] !== 'explicitLength') {
-          var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
+      for (var i = 0; i < sqValue.length; ++i) {
+        if (sqValue[i] !== 'undefinedLength') {
+          var wrap = new dwv.dicom.DicomElementsWrapper(value[i]);
           dwv.test.compare(
-            jsonTags[tagName][subKeys[sk]], wrap, name, comparator);
-          ++index;
+            sqValue[i], wrap, name, comparator);
         }
       }
     }
@@ -255,12 +268,16 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
     }
   }
+  // pass tags clone to avoid modifications (for ex by padElement)
+  // TODO: find another way
+  var jsonTags = JSON.parse(JSON.stringify(config.tags));
   // convert JSON to DICOM element object
-  var res = dwv.dicom.getElementsFromJSONTags(config.tags);
-  var dicomElements = res.elements;
-  // pixels: small gradient square
-  dicomElements.x7FE00010 =
-    dwv.dicom.generatePixelDataFromJSONTags(config.tags, res.offset);
+  var dicomElements = dwv.dicom.getElementsFromJSONTags(jsonTags);
+  // pixels (if possible): small gradient square
+  if (dwv.dicom.checkTags(config.tags, dwv.dicom.requiredPixelTags)) {
+    dicomElements.x7FE00010 =
+      dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+  }
 
   // create DICOM buffer
   var writer = new dwv.dicom.DicomWriter();

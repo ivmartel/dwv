@@ -39,22 +39,61 @@ span {
 .layerGroup {
   display:inline-block;
   height: 350px;
-  width: 350px;
+  width: max(30%, 350px);
   margin: 5px;
-  background-color: gainsboro;
+  background-color: limeGreen;
+  /* allow child centering */
+  position: relative;
 }
 .layer {
+  /* needed for overlay */
   position: absolute;
+  /* center */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+canvas {
+  /* avoid parent auto-resize */
+  vertical-align: middle;
 }
 .line {
   padding: 5px;
 }
+/** tooltip */
+.layerGroup span {
+  display: none;
+  background-color: palegreen;
+  padding: 2px;
+}
+.layerGroup:hover span {
+  display: inline-block;
+  position: absolute;
+  overflow: hidden;
+}
+/** crossshair */
+.layerGroup hr {
+  pointer-events: none;
+  border: none;
+  position: absolute;
+  margin: 0;
+}
+hr.horizontal {
+  border-top: 2px dashed lime;
+}
+hr.vertical {
+  border-top: 2px dashed lime;
+  transform-origin: left;
+  transform: rotate(90deg);
+}
 </style>
-<!-- Third party (load) -->
+<!-- Third party -->
 <script type="text/javascript" src="../../node_modules/jszip/dist/jszip.min.js"></script>
-<!-- Local -->
+<script type="text/javascript" src="../../node_modules/konva/konva.min.js"></script>
+<!-- dwv sources -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/dataController.js"></script>
+<script type="text/javascript" src="../../src/app/drawController.js"></script>
 <script type="text/javascript" src="../../src/app/loadController.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
 <script type="text/javascript" src="../../src/app/toolboxController.js"></script>
@@ -78,6 +117,8 @@ span {
 <script type="text/javascript" src="../../src/image/imageFactory.js"></script>
 <script type="text/javascript" src="../../src/image/iterator.js"></script>
 <script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../src/image/maskFactory.js"></script>
+<script type="text/javascript" src="../../src/image/maskSegmentHelper.js"></script>
 <script type="text/javascript" src="../../src/image/planeHelper.js"></script>
 <script type="text/javascript" src="../../src/image/rescaleLut.js"></script>
 <script type="text/javascript" src="../../src/image/rsi.js"></script>
@@ -94,19 +135,31 @@ span {
 <script type="text/javascript" src="../../src/io/urlsLoader.js"></script>
 <script type="text/javascript" src="../../src/io/filesLoader.js"></script>
 <script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
+<script type="text/javascript" src="../../src/io/jsonTextLoader.js"></script>
 <script type="text/javascript" src="../../src/io/memoryLoader.js"></script>
+<script type="text/javascript" src="../../src/io/multipartLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawVideoLoader.js"></script>
+<script type="text/javascript" src="../../src/io/state.js"></script>
 <script type="text/javascript" src="../../src/io/zipLoader.js"></script>
 <script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="../../src/math/index.js"></script>
 <script type="text/javascript" src="../../src/math/matrix.js"></script>
 <script type="text/javascript" src="../../src/math/point.js"></script>
 <script type="text/javascript" src="../../src/math/vector.js"></script>
+<script type="text/javascript" src="../../src/math/rectangle.js"></script>
+<script type="text/javascript" src="../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../src/tools/draw.js"></script>
+<script type="text/javascript" src="../../src/tools/drawCommands.js"></script>
+<script type="text/javascript" src="../../src/tools/editor.js"></script>
+<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
+<script type="text/javascript" src="../../src/tools/opacity.js"></script>
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
+<script type="text/javascript" src="../../src/tools/scrollWheel.js"></script>
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
 <script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
+<script type="text/javascript" src="../../src/utils/array.js"></script>
 <script type="text/javascript" src="../../src/utils/colour.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
@@ -117,18 +170,10 @@ span {
 <script type="text/javascript" src="../../src/utils/string.js"></script>
 <script type="text/javascript" src="../../src/utils/thread.js"></script>
 <script type="text/javascript" src="../../src/utils/uri.js"></script>
-<!-- draw -->
-<script type="text/javascript" src="../../node_modules/konva/konva.min.js"></script>
-<script type="text/javascript" src="../../node_modules/i18next/i18next.min.js"></script>
-<script type="text/javascript" src="../../src/app/drawController.js"></script>
-<script type="text/javascript" src="../../src/tools/draw.js"></script>
-<script type="text/javascript" src="../../src/tools/drawCommands.js"></script>
-<script type="text/javascript" src="../../src/tools/editor.js"></script>
-<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
-<script type="text/javascript" src="../../src/math/rectangle.js"></script>
-<script type="text/javascript" src="../../src/math/stats.js"></script>
 <script type="text/javascript" src="../../src/utils/i18n.js"></script>
-<!-- Local -->
+<!-- dwv build --><!--
+<script type="text/javascript" src="./dist/dwv.min.js"></script>
+--><!-- local -->
 <script type="text/javascript" src="./viewer.js"></script>
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer);
@@ -163,6 +208,8 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 </div>
 
 <div class="line" id="binders">Binders:</div>
+
+<div class="line" id="tools">Tools:</div>
 
 <div id="layersdetails"></div>
 

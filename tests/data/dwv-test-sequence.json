@@ -1,8 +1,12 @@
 {
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
   "Modality": "MR",
-  "PatientName": "dwv-patient-name",
-  "PerformingPhysicianName": "Dr",
+  "PatientName": "dwv^PatientName",
+  "PatientID": "dwv-patient-id123",
+  "StudyInstanceUID": "1.2.3.0.1",
+  "SeriesInstanceUID": "1.2.3.0.1.11",
+  "SOPInstanceUID": "1.2.3.0.1.11.111",
+  "PerformingPhysicianName": "Dr^X",
   "PhotometricInterpretation": "MONOCHROME2",
   "SamplesPerPixel": 1,
   "PixelRepresentation": 0,
@@ -11,70 +15,86 @@
   "BitsAllocated": 16,
   "BitsStored": 12,
   "HighBit": 11,
-  "ReferencedImageSequence": { 
-    "explicitLength": true,
-    "item0": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-    },
-    "item1": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-    },
-    "item2": {}
+  "ReferencedImageSequence": {
+    "undefinedLength": false,
+    "value": [
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+      },
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+      },
+      {}
+    ]
   },
-  "SourceImageSequence": { 
-    "explicitLength": false,
-    "item0": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
-    },
-    "item1": {
-      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
-    },
-    "item2": 0
+  "SourceImageSequence": {
+    "undefinedLength": true,
+    "value": [
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+      },
+      {
+        "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+        "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+      },
+      0
+    ]
   },
   "ReferencedPatientSequence": {},
   "ReferencedOverlaySequence": 0,
   "ReferringPhysicianIdentificationSequence": {
-    "explicitLength": true,
-    "item0": {}
+    "undefinedLength": false,
+    "value": [{}]
   },
   "ConsultingPhysicianIdentificationSequence": {
-    "explicitLength": false,
-    "item0": 0 
+    "undefinedLength": true,
+    "value": 0
   },
   "ReferencedStudySequence": {
-    "explicitLength": true,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": {
-        "item0": {
-          "CodeValue": "123456"
-        }  
+    "undefinedLength": false,
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": {
+          "value": [
+            {
+              "CodeValue": "123456"
+            }
+          ]
+        }
       }
-    }
+    ]
   },
   "ReferencedSeriesSequence": {
-    "explicitLength": false,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": {
-        "item0": {
-          "CodeValue": "789101"
-        }  
+    "undefinedLength": true,
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": {
+          "value": [
+            {
+              "CodeValue": "789101"
+            }
+          ]
+        }
       }
-    }
+    ]
   },
   "ReferencedInstanceSequence": {
-    "explicitLength": true,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": {}
-    }
+    "undefinedLength": false,
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": {}
+      }
+    ]
   },
   "ReferencedVisitSequence": {
-    "explicitLength": false,
-    "item0": {
-      "PurposeOfReferenceCodeSequence": 0
-    }
+    "undefinedLength": true,
+    "value": [
+      {
+        "PurposeOfReferenceCodeSequence": 0
+      }
+    ]
   }
 }

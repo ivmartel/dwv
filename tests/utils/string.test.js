@@ -36,6 +36,61 @@ QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.utils.startsWith}.
+ *
+ * @function module:tests/utils~startsWith
+ */
+QUnit.test('Test StartsWith.', function (assert) {
+  // undefined
+  assert.equal(dwv.utils.startsWith(), false, 'StartsWith undefined');
+  assert.equal(
+    dwv.utils.startsWith('test'),
+    false, 'StartsWith start undefined');
+  // null
+  assert.equal(dwv.utils.startsWith(null), false, 'StartsWith null');
+  assert.equal(
+    dwv.utils.startsWith('test', null),
+    false, 'StartsWith start null');
+  // empty
+  assert.equal(dwv.utils.startsWith('', ''), true, 'StartsWith empty');
+  assert.equal(
+    dwv.utils.startsWith('test', ''),
+    true, 'StartsWith start empty');
+  // short
+  assert.equal(dwv.utils.startsWith('a', 'a'), true, 'StartsWith one letter');
+  assert.equal(
+    dwv.utils.startsWith('a', 'A'),
+    false,
+    'StartsWith one letter case sensitive');
+  // start bigger than input
+  assert.equal(
+    dwv.utils.startsWith('a', 'aba'),
+    false, 'StartsWith large start');
+  // space
+  assert.equal(
+    dwv.utils.startsWith(' test', ' '),
+    true, 'StartsWith start space');
+  assert.equal(
+    dwv.utils.startsWith(' test', 'a'),
+    false, 'StartsWith with space');
+  // regular
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'W'), true, 'StartsWith test#0');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'Winter'),
+    true, 'StartsWith test#1');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'WINT'),
+    false, 'StartsWith test#2');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'Winter is'),
+    true, 'StartsWith test#3');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'Winter is coming.'),
+    true, 'StartsWith test#4');
+});
+
+/**
  * Tests for {@link dwv.utils.endsWith}.
  *
  * @function module:tests/utils~endsWith
@@ -240,4 +295,44 @@ QUnit.test('Test getFileExtension.', function (assert) {
   var res12 = null;
   assert.equal(
     dwv.utils.getFileExtension(test12), res12, 'getFileExtension 12');
+});
+
+/**
+ * Tests for {@link dwv.utils.precisionRound}.
+ *
+ * @function module:tests/utils~precisionRound
+ */
+QUnit.test('Test precisionRound.', function (assert) {
+  // just to be sure...
+  assert.equal(Math.round(-0.6), -1, 'test round #00');
+  assert.equal(Math.round(-0.5), 0, 'test round #01');
+  assert.equal(Math.round(0.5), 1, 'test round #02');
+  assert.equal(Math.round(1.5), 2, 'test round #03');
+
+  assert.equal(dwv.utils.precisionRound(-0.004, 2), 0, 'test #00');
+  assert.equal(dwv.utils.precisionRound(-0.005, 2), 0, 'test #01');
+  assert.equal(dwv.utils.precisionRound(-0.006, 2), -0.01, 'test #02');
+
+  assert.equal(dwv.utils.precisionRound(0.004, 2), 0, 'test #10');
+  assert.equal(dwv.utils.precisionRound(0.005, 2), 0.01, 'test #11');
+  assert.equal(dwv.utils.precisionRound(0.006, 2), 0.01, 'test #1');
+
+  assert.equal(dwv.utils.precisionRound(1.004, 2), 1, 'test #20');
+  assert.equal(dwv.utils.precisionRound(1.005, 2), 1.01, 'test #21');
+  assert.equal(dwv.utils.precisionRound(1.006, 2), 1.01, 'test #22');
+
+  assert.equal(dwv.utils.precisionRound(1.05, 1), 1.1, 'test #31');
+  assert.equal(dwv.utils.precisionRound(1.0005, 3), 1.001, 'test #31');
+  assert.equal(dwv.utils.precisionRound(1.00005, 4), 1.0001, 'test #31');
+  assert.equal(dwv.utils.precisionRound(1.000005, 5), 1.00001, 'test #31');
+
+  assert.equal(dwv.utils.precisionRound(1234.5, 0), 1235, 'test #40');
+  assert.equal(dwv.utils.precisionRound(1234.56, 0), 1235, 'test #41');
+  assert.equal(dwv.utils.precisionRound(1234.5, 1), 1234.5, 'test #42');
+  assert.equal(dwv.utils.precisionRound(1234.56, 1), 1234.6, 'test #43');
+  assert.equal(dwv.utils.precisionRound(1234.5, 2), 1234.5, 'test #44');
+  assert.equal(dwv.utils.precisionRound(1234.56, 2), 1234.56, 'test #45');
+  assert.equal(dwv.utils.precisionRound(1234.566, 2), 1234.57, 'test #46');
+  assert.equal(dwv.utils.precisionRound(1234.5666, 2), 1234.57, 'test #47');
+
 });

@@ -1,5 +1,63 @@
 # Changelog
 
+## [v0.31.0](https://github.com/ivmartel/dwv/releases/tag/v0.31.0) - 07/03/2023
+
+### Added
+
+- Add support for MIME multipart content-type [#1084](https://github.com/ivmartel/dwv/issues/1084)
+- Add support for reading DICOM Seg [#932](https://github.com/ivmartel/dwv/issues/932)
+- Update dictionary to 2022a [#1219](https://github.com/ivmartel/dwv/issues/1219)
+- Add crosshair to layer groups [#1286](https://github.com/ivmartel/dwv/issues/1286)
+- Add pixel value on mouseover [#1273](https://github.com/ivmartel/dwv/issues/1273)
+
+- Remove i18next [#1320](https://github.com/ivmartel/dwv/issues/1320)
+- Allow for mouse wheel scroll in tools that do not use the mouse wheel [#1319](https://github.com/ivmartel/dwv/issues/1319)
+- Change draw shape opacity on mouse over [#1318](https://github.com/ivmartel/dwv/issues/1318)
+- Make mouse wheel scroll multi frame data [#1316](https://github.com/ivmartel/dwv/issues/1316)
+- Use event key property and not keyCode (deprecated) [#1305](https://github.com/ivmartel/dwv/issues/1305)
+- Use passive event listeners [#1304](https://github.com/ivmartel/dwv/issues/1304)
+- Send draw create/delete events when Draw tool is not selected [#1301](https://github.com/ivmartel/dwv/issues/1301)
+- Use lowest image position patient as geometry origin [#1282](https://github.com/ivmartel/dwv/issues/1282)
+- Revise layer id creation to avoid collision [#1277](https://github.com/ivmartel/dwv/issues/1277)
+- Simplify tool configuration in app.init [#1269](https://github.com/ivmartel/dwv/issues/1269)
+- Allow to set the image smoothing [#1247](https://github.com/ivmartel/dwv/issues/1247)
+- Recalculate vl at writing time [#1240](https://github.com/ivmartel/dwv/issues/1240)
+- Fix reading sequence items [#1231](https://github.com/ivmartel/dwv/issues/1231)
+- Remove vr=OW and bitsAllocated=8 warning [#1225](https://github.com/ivmartel/dwv/issues/1225)
+- Move to clean-jsdoc-theme [#1212](https://github.com/ivmartel/dwv/issues/1212)
+- Simplify Application tool API [#1203](https://github.com/ivmartel/dwv/issues/1203)
+- Add index to iterator next returned object [#1202](https://github.com/ivmartel/dwv/issues/1202)
+- Allow to override slice sorting [#1185](https://github.com/ivmartel/dwv/issues/1185)
+- Make scroll from trackpad less sensitive [#1184](https://github.com/ivmartel/dwv/issues/1184)
+- Use same pixel ratio for multiple views [#1182](https://github.com/ivmartel/dwv/issues/1182)
+- Add loadid and isfirstitem to 'loaditem' event [#1180](https://github.com/ivmartel/dwv/issues/1180)
+- Add intermediates slices when creating mask [#1176](https://github.com/ivmartel/dwv/issues/1176)
+- Fix negative index in worldToIndex [#1163](https://github.com/ivmartel/dwv/issues/1163)
+- Smaller data disapears in MPR [#1162](https://github.com/ivmartel/dwv/issues/1162)
+- Window level tool proportional to data range [#1160](https://github.com/ivmartel/dwv/issues/1160)
+- Do not throw error when no data view config [#1155](https://github.com/ivmartel/dwv/issues/1155)
+- Improve writer size calculation [#1142](https://github.com/ivmartel/dwv/issues/1142)
+- Overlay does not compensate for offset at each slice [#1133](https://github.com/ivmartel/dwv/issues/1133)
+- Avoid postion - index conversion in view [#1130](https://github.com/ivmartel/dwv/issues/1130)
+- Overlay data freezes when out of range [#1129](https://github.com/ivmartel/dwv/issues/1129)
+- Race condition for multiple loadURLs [#1121](https://github.com/ivmartel/dwv/issues/1121)
+- Move getElementsFromJSONTags to make it public [#1114](https://github.com/ivmartel/dwv/issues/1114)
+- Application fitToContainer should resize all layer groups [#1113](https://github.com/ivmartel/dwv/issues/1113)
+- Clip values in ciexyz to srgb conversion [#1112](https://github.com/ivmartel/dwv/issues/1112)
+- Replace string substr (deprecated) with substring [#1089](https://github.com/ivmartel/dwv/issues/1089)
+- Update CI to use node 16 [#1080](https://github.com/ivmartel/dwv/issues/1080)
+
+### Fixed
+
+- Fix SpecificCharacterSet when writing DICOM data [#1088](https://github.com/ivmartel/dwv/issues/1088)
+- Bad normal construction [#1264](https://github.com/ivmartel/dwv/issues/1264)
+- An exception was caught when onResize was called [#1233](https://github.com/ivmartel/dwv/issues/1233)
+- readUint64Array is not defined [#1220](https://github.com/ivmartel/dwv/issues/1220)
+- Fix tag isPrivate method [#1218](https://github.com/ivmartel/dwv/issues/1218)
+- Microsoft Edge and Google Drive data [#214](https://github.com/ivmartel/dwv/issues/214)
+
+---
+
 ## [v0.30.8](https://github.com/ivmartel/dwv/releases/tag/v0.30.8) - 03/01/2022
 
 ### Fixed

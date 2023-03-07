@@ -19,11 +19,11 @@ usage() {
 }
 # print error message (red)
 error() {
-  echo -e "\033[31;31m[fini] $1\033[0m"
+  echo -e "\033[1;31m[fini] $1\033[0m"
 }
 # print info message (blue)
 info() {
-  echo -e "\033[34;34m[fini] $1\033[0m"
+  echo -e "\033[1;34m[fini] $1\033[0m"
 }
 
 # script step
@@ -64,7 +64,7 @@ then
   info "(1/4) commit prepared changes"
 
   git commit -a -m "Release ${releaseBranch}"
-  
+
   ((step++))
 fi
 
@@ -78,7 +78,7 @@ then
   git merge --no-ff $releaseBranch
   # push master
   git push origin master
-  
+
   ((step++))
 fi
 
@@ -92,16 +92,19 @@ then
   git merge --no-ff $releaseBranch
   # update version number in files
   a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+\","
-  b0="  \"version\": \"${nextVersion}-beta\","
+  b0="  \"version\": \"${nextVersion}-beta.0\","
   sed -i -r "s/${a0}/${b0}/g" package.json
   a1="  return '[0-9]+\.[0-9]+\.[0-9]+';"
-  b1="  return '${nextVersion}-beta';"
+  b1="  return '${nextVersion}-beta.0';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
+  a2="[0-9]+\.[0-9]+\.[0-9]+"
+  b2="${nextVersion}"
+  sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
   # commit
-  git commit -a -m "Bumped version number to v${nextVersion}-beta"
+  git commit -a -m "Bumped version number to v${nextVersion}-beta.0"
   # push develop
   git push origin develop
-  
+
   ((step++))
 fi
 

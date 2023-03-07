@@ -1,21 +1,24 @@
 ## Fiddle
 
-Some fiddles for you to play...
+Some fiddles for you to play... Some are bundled with the code, scroll below the method arguments to see the example code.
 
 DICOM parsing:
- * [parser example #1](https://jsfiddle.net/ivmartel/v2j2n6pc/): parse DICOM data and display a tag
- * [parser example #2](https://jsfiddle.net/ivmartel/fvy7L60j/): parse DICOM data and create an image
+ * [parser example #1](./dwv.dicom.DicomParser.html#DicomParser): parse DICOM data and display a tag
+
+Image creation:
+ * [image example #1](./dwv.image.Image.html#Image): parse DICOM data and create an image
 
 Displays:
- * [display example #1](https://jsfiddle.net/ivmartel/LteeL0gf/) ([gist](https://gist.github.com/ivmartel/7415ca9b21209e83b5e713d838529795)): the simplest DICOM display example!
- * [display example #1.1](https://jsfiddle.net/ivmartel/jkcmj0px/): any number of displays you want
- * [display example #1.2](https://jsfiddle.net/ivmartel/5ew3t619/): manual render
- * [display example #2](https://jsfiddle.net/ivmartel/kkp7ytk3/): with window/level or zoom
- * [display example #2.1](https://jsfiddle.net/ivmartel/fugw49be/): with draw tool
- * [display example #3](https://jsfiddle.net/ivmartel/hmetaz6f/): with multiple slices
- * [display example #3.1](https://jsfiddle.net/ivmartel/zvt0xemc/): multiple slices and slider (using events)
+ * [display example #1](./dwv.App.html#App) ([gist](https://gist.github.com/ivmartel/7415ca9b21209e83b5e713d838529795)): the simplest DICOM display example!
+ * [display example #1.1](https://jsfiddle.net/ivmartel/jkcmj0px/): any number of displays you want (_jsfiddle_)
+ * [display example #1.2](./dwv.App.html#init): manual render
+ * [display example #2](./dwv.tool.WindowLevel.html#WindowLevel): with window/level
+ * [display example #2.1](https://jsfiddle.net/ivmartel/fugw49be/): with draw tool (_jsfiddle_)
+ * [display example #2.2](./dwv.tool.ZoomAndPan.html#ZoomAndPan): with zoom and pan
+ * [display example #2.3](./dwv.tool.Opacity.html#Opacity): with opacity
+ * [display example #3](./dwv.tool.Scroll.html#Scroll): with multiple slices with or without a slider
 
-All of them: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
+All the ones of jsfiddle: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
 
 ## Module
 

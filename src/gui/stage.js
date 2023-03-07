@@ -11,7 +11,7 @@ dwv.gui.WindowLevelBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         var vc = viewLayers[0].getViewController();
         vc.setWindowLevel(event.value[0], event.value[1]);
@@ -29,9 +29,22 @@ dwv.gui.PositionBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var pos = new dwv.math.Point(event.value[1]);
+      var pointValues = event.value[1];
       var vc = layerGroup.getActiveViewLayer().getViewController();
-      vc.setCurrentPosition(pos);
+      // handle different number of dimensions
+      var currentPos = vc.getCurrentPosition();
+      var currentDims = currentPos.length();
+      var inputDims = pointValues.length;
+      if (inputDims !== currentDims) {
+        if (inputDims === currentDims - 1) {
+          // add missing dim, for ex: input 3D -> current 4D
+          pointValues.push(currentPos.get(currentDims - 1));
+        } else if (inputDims === currentDims + 1) {
+          // remove extra dim, for ex: input 4D -> current 3D
+          pointValues.pop();
+        }
+      }
+      vc.setCurrentPosition(new dwv.math.Point(pointValues));
     };
   };
 };
@@ -45,11 +58,20 @@ dwv.gui.ZoomBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      layerGroup.setScale({
+      var scale = {
         x: event.value[0],
         y: event.value[1],
         z: event.value[2]
-      });
+      };
+      var center;
+      if (event.value.length === 6) {
+        center = new dwv.math.Point3D(
+          event.value[3],
+          event.value[4],
+          event.value[5]
+        );
+      }
+      layerGroup.setScale(scale, center);
       layerGroup.draw();
     };
   };
@@ -84,11 +106,11 @@ dwv.gui.OpacityBinder = function () {
   this.getCallback = function (layerGroup) {
     return function (event) {
       // exit if no data index
-      if (typeof event.dataindex === 'undefined') {
+      if (typeof event.dataid === 'undefined') {
         return;
       }
       // propagate to first view layer
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
@@ -158,6 +180,20 @@ dwv.gui.Stage = function () {
   };
 
   /**
+   * Get the draw layers associated to a data index.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getDrawLayersByDataIndex = function (index) {
+    var res = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      res = res.concat(layerGroups[i].getDrawLayersByDataIndex(index));
+    }
+    return res;
+  };
+
+  /**
    * Add a layer group to the list.
    *
    * @param {object} htmlElement The HTML element of the layer group.
@@ -165,7 +201,7 @@ dwv.gui.Stage = function () {
    */
   this.addLayerGroup = function (htmlElement) {
     activeLayerGroupIndex = layerGroups.length;
-    var layerGroup = new dwv.gui.LayerGroup(htmlElement, activeLayerGroupIndex);
+    var layerGroup = new dwv.gui.LayerGroup(htmlElement);
     // add to storage
     var isBound = callbackStore && callbackStore.length !== 0;
     if (isBound) {
@@ -185,9 +221,9 @@ dwv.gui.Stage = function () {
    * @param {string} id The element id to find.
    * @returns {dwv.gui.LayerGroup} The layer group.
    */
-  this.getLayerGroupWithElementId = function (id) {
+  this.getLayerGroupByDivId = function (id) {
     return layerGroups.find(function (item) {
-      return item.getElementId() === id;
+      return item.getDivId() === id;
     });
   };
 
@@ -234,6 +270,33 @@ dwv.gui.Stage = function () {
   this.draw = function () {
     for (var i = 0; i < layerGroups.length; ++i) {
       layerGroups[i].draw();
+    }
+  };
+
+  /**
+   * Synchronise the fit scale of the group layers.
+   */
+  this.syncLayerGroupScale = function () {
+    var minScale;
+    var hasScale = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      var scale = layerGroups[i].calculateFitScale();
+      if (typeof scale !== 'undefined') {
+        hasScale.push(i);
+        if (typeof minScale === 'undefined' || scale < minScale) {
+          minScale = scale;
+        }
+      }
+    }
+    // exit if no scale
+    if (typeof minScale === 'undefined') {
+      return;
+    }
+    // apply min scale to layers
+    for (var j = 0; j < layerGroups.length; ++j) {
+      if (hasScale.includes(j)) {
+        layerGroups[j].setFitScale(minScale);
+      }
     }
   };
 

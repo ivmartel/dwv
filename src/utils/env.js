@@ -30,9 +30,9 @@ dwv.env.askModernizr = function (property) {
 dwv.env.hasFileApi = function () {
   // regular test does not work on Safari 5
   var isSafari5 = (navigator.appVersion.indexOf('Safari') !== -1) &&
-        (navigator.appVersion.indexOf('Chrome') === -1) &&
-        ((navigator.appVersion.indexOf('5.0.') !== -1) ||
-          (navigator.appVersion.indexOf('5.1.') !== -1));
+    (navigator.appVersion.indexOf('Chrome') === -1) &&
+    ((navigator.appVersion.indexOf('5.0.') !== -1) ||
+    (navigator.appVersion.indexOf('5.1.') !== -1));
   if (isSafari5) {
     dwv.logger.warn('Assuming FileAPI support for Safari5...');
     return true;
@@ -48,9 +48,9 @@ dwv.env.hasFileApi = function () {
  */
 dwv.env.hasXmlHttpRequest = function () {
   return dwv.env.askModernizr('xhrresponsetype') &&
-        dwv.env.askModernizr('xhrresponsetypearraybuffer') &&
-        dwv.env.askModernizr('xhrresponsetypetext') &&
-        'XMLHttpRequest' in window && 'withCredentials' in new XMLHttpRequest();
+    dwv.env.askModernizr('xhrresponsetypearraybuffer') &&
+    dwv.env.askModernizr('xhrresponsetypetext') &&
+    'XMLHttpRequest' in window && 'withCredentials' in new XMLHttpRequest();
 };
 
 /**
@@ -83,8 +83,7 @@ dwv.env.hasInputDirectory = function () {
   return dwv.env.askModernizr('fileinputdirectory');
 };
 
-
-//only check at startup (since we propose a replacement)
+// only check at startup (since we propose a replacement)
 dwv.env._hasTypedArraySlice =
   (typeof Uint8Array.prototype.slice !== 'undefined');
 
@@ -111,7 +110,7 @@ dwv.env.hasFloat64Array = function () {
   return dwv.env._hasFloat64Array;
 };
 
-//only check at startup (since we propose a replacement)
+// only check at startup (since we propose a replacement)
 dwv.env._hasClampedArray = ('Uint8ClampedArray' in window);
 
 /**
@@ -124,6 +123,42 @@ dwv.env._hasClampedArray = ('Uint8ClampedArray' in window);
  */
 dwv.env.hasClampedArray = function () {
   return dwv.env._hasClampedArray;
+};
+
+// Check if the BigInt type is defined
+dwv.env._hasBigint = (typeof BigInt !== 'undefined');
+
+/**
+ * Browser check for BigInt (associated typed arrays).
+ *
+ * @returns {boolean} True if the env supports the feature.
+ */
+dwv.env.hasBigInt = function () {
+  return dwv.env._hasBigint;
+};
+
+// Check if the TextDecoder is defined
+dwv.env._hasTextDecoder = (typeof TextDecoder !== 'undefined');
+
+/**
+ * Does the environement provide TextDecoder.
+ *
+ * @returns {boolean} True if the env supports the feature.
+ */
+dwv.env.hasTextDecoder = function () {
+  return dwv.env._hasTextDecoder;
+};
+
+// Check if the TextEncoder is defined
+dwv.env._hasTextEncoder = (typeof TextEncoder !== 'undefined');
+
+/**
+ * Does the environement provide TextEncoder.
+ *
+ * @returns {boolean} True if the env supports the feature.
+ */
+dwv.env.hasTextEncoder = function () {
+  return dwv.env._hasTextEncoder;
 };
 
 /**
@@ -149,6 +184,22 @@ dwv.env.check = function () {
   if (!dwv.env.hasTypedArray()) {
     message = 'The Typed arrays are not supported in this browser. ';
     throw new Error(message);
+  }
+  // Check text encoding/decoding
+  if (!dwv.env.hasTextDecoder() || !dwv.env.hasTextEncoder()) {
+    message = 'Text decoding/encoding is not supported in this browser.';
+    throw new Error(message);
+  }
+
+  // Check Float64
+  if (!dwv.env.hasFloat64Array()) {
+    dwv.logger.warn('Float64Array is not supported in this browser. ' +
+      'Data including tags with Float64 VR is not supported. ');
+  }
+  // Check BigInt
+  if (!dwv.env.hasBigInt()) {
+    dwv.logger.warn('BigInt is not supported in this browser. ' +
+      'Data including tags with Int64 and Uint64 VRs is not supported. ');
   }
 
   // Replaced if not present ------------
@@ -206,16 +257,6 @@ dwv.env.check = function () {
     // TODO Find better replacement!
     window.Uint8ClampedArray = window.Uint8Array;
   }
-  // check Float64 array
-  if (!dwv.env.hasFloat64Array()) {
-    // silent fail with warning
-    dwv.logger.warn(
-      'The Float64Array is not supported in this browser.' +
-      ' This may impair performance. ');
-    // Use Float32Array instead... Not good
-    // TODO Find better replacement!
-    window.Float64Array = window.Float32Array;
-  }
 
   // array Find
   // https://tc39.github.io/ecma262/#sec-array.prototype.find
@@ -269,8 +310,10 @@ dwv.env.check = function () {
 
   // check string startsWith
   if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function (search, pos) {
-      return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
-    };
+    Object.defineProperty(String.prototype, 'startsWith', {
+      value: function (search, rawPos) {
+        return dwv.utils.startsWith(this, search, rawPos);
+      }
+    });
   }
 };

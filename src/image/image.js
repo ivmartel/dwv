@@ -4,6 +4,31 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Get the slice index of an input slice into a volume geometry.
+ *
+ * @param {dwv.image.Geometry} volumeGeometry The volume geometry.
+ * @param {dwv.image.Geometry} sliceGeometry The slice geometry.
+ * @returns {dwv.math.Index} The index of the slice in the volume geomtry.
+ */
+dwv.image.getSliceIndex = function (volumeGeometry, sliceGeometry) {
+  // possible time
+  var timeId = sliceGeometry.getInitialTime();
+  // index values
+  var values = [];
+  // x, y
+  values.push(0);
+  values.push(0);
+  // z
+  values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
+  // time
+  if (typeof timeId !== 'undefined') {
+    values.push(timeId);
+  }
+  // return index
+  return new dwv.math.Index(values);
+};
+
+/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
@@ -14,6 +39,42 @@ dwv.image = dwv.image || {};
  * @param {dwv.image.Geometry} geometry The geometry of the image.
  * @param {Array} buffer The image data as a one dimensional buffer.
  * @param {Array} imageUids An array of Uids indexed to slice number.
+ * @example
+ * // XMLHttpRequest onload callback
+ * var onload = function (event) {
+ *   // setup the dicom parser
+ *   var dicomParser = new dwv.dicom.DicomParser();
+ *   // parse the buffer
+ *   dicomParser.parse(event.target.response);
+ *   // create the image
+ *   var imageFactory = new dwv.image.ImageFactory();
+ *   // inputs are dicom tags and buffer
+ *   var image = imageFactory.create(
+ *     dicomParser.getDicomElements(),
+ *     dicomParser.getRawDicomElements().x7FE00010.value[0]
+ *   );
+ *   // result div
+ *   var div = document.getElementById('dwv');
+ *   // display the image size
+ *   var size = image.getGeometry().getSize();
+ *   div.appendChild(document.createTextNode(
+ *     'Size: ' + size.toString() +
+ *     ' (should be 256,256,1)'));
+ *   // break line
+ *   div.appendChild(document.createElement('br'));
+ *   // display a pixel value
+ *   div.appendChild(document.createTextNode(
+ *     'Pixel @ [128,40,0]: ' +
+ *     image.getRescaledValue(128,40,0) +
+ *     ' (should be 101)'));
+ * };
+ * // DICOM file request
+ * var request = new XMLHttpRequest();
+ * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 dwv.image.Image = function (geometry, buffer, imageUids) {
 
@@ -349,6 +410,123 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Get the offsets where the buffer equals the input value.
+   * Loops through the whole volume, can get long for big data...
+   *
+   * @param {number|object} value The value to check.
+   * @returns {Array} The list of offsets.
+   */
+  this.getOffsets = function (value) {
+    // value to array
+    if (numberOfComponents === 1) {
+      value = [value];
+    } else if (numberOfComponents === 3 &&
+      typeof value.r !== 'undefined') {
+      value = [value.r, value.g, value.b];
+    }
+    // main loop
+    var offsets = [];
+    var equal;
+    for (var i = 0; i < buffer.length; i = i + numberOfComponents) {
+      equal = true;
+      for (var j = 0; j < numberOfComponents; ++j) {
+        if (buffer[i + j] !== value[j]) {
+          equal = false;
+          break;
+        }
+      }
+      if (equal) {
+        offsets.push(i);
+      }
+    }
+    return offsets;
+  };
+
+  /**
+   * Check if the input values are in the buffer.
+   * Could loop through the whole volume, can get long for big data...
+   *
+   * @param {Array} values The values to check.
+   * @returns {Array} A list of booleans for each input value,
+   *   set to true if the value is present in the buffer.
+   */
+  this.hasValues = function (values) {
+    // check input
+    if (typeof values === 'undefined' ||
+      values.length === 0) {
+      return [];
+    }
+    // final array value
+    var finalValues = [];
+    for (var v1 = 0; v1 < values.length; ++v1) {
+      if (numberOfComponents === 1) {
+        finalValues.push([values[v1]]);
+      } else if (numberOfComponents === 3) {
+        finalValues.push([
+          values[v1].r,
+          values[v1].g,
+          values[v1].b
+        ]);
+      }
+    }
+    // find callback
+    var equalFunc;
+    if (numberOfComponents === 1) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0];
+      };
+    } else if (numberOfComponents === 3) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0] &&
+          a[1] === b[1] &&
+          a[2] === b[2];
+      };
+    }
+    var getEqualCallback = function (value) {
+      return function (item) {
+        return equalFunc(item, value);
+      };
+    };
+    // main loop
+    var res = new Array(values.length);
+    res.fill(false);
+    var valuesToFind = finalValues.slice();
+    var equal;
+    var indicesToRemove;
+    for (var i = 0, leni = buffer.length;
+      i < leni; i = i + numberOfComponents) {
+      indicesToRemove = [];
+      for (var v = 0; v < valuesToFind.length; ++v) {
+        equal = true;
+        // check value(s)
+        for (var j = 0; j < numberOfComponents; ++j) {
+          if (buffer[i + j] !== valuesToFind[v][j]) {
+            equal = false;
+            break;
+          }
+        }
+        // if found, store answer and add to indices to remove
+        if (equal) {
+          var valIndex = finalValues.findIndex(
+            getEqualCallback(valuesToFind[v]));
+          res[valIndex] = true;
+          indicesToRemove.push(v);
+        }
+      }
+      // remove found values
+      for (var r = 0; r < indicesToRemove.length; ++r) {
+        valuesToFind.splice(indicesToRemove[r], 1);
+      }
+      // exit if no values to find
+      if (valuesToFind.length === 0) {
+        break;
+      }
+    }
+    // return
+    return res;
+  };
+
+  /**
    * Clone the image.
    *
    * @returns {Image} A clone of this image.
@@ -401,12 +579,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @param {number} timeId An optional time ID.
    */
-  this.appendSlice = function (rhs, timeId) {
-    if (typeof timeId === 'undefined') {
-      timeId = 0;
-    }
+  this.appendSlice = function (rhs) {
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -432,13 +606,31 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
-      if (key === 'windowPresets') {
+      if (key === 'windowPresets' || key === 'numberOfFiles' ||
+        key === 'custom') {
         continue;
       }
       if (meta[key] !== rhs.getMeta()[key]) {
         throw new Error('Cannot append a slice with different ' + key);
       }
     }
+
+    // possible time
+    var timeId = rhs.getGeometry().getInitialTime();
+
+    // append frame if needed
+    var isNewFrame = false;
+    if (typeof timeId !== 'undefined' && !geometry.hasSlicesAtTime(timeId)) {
+      // update grometry
+      this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
+      // update size
+      size = geometry.getSize();
+      // update flag
+      isNewFrame = true;
+    }
+
+    // get slice index
+    var index = dwv.image.getSliceIndex(geometry, rhs.getGeometry());
 
     // calculate slice size
     var sliceSize = numberOfComponents * size.getDimSize(2);
@@ -448,65 +640,46 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for buffer manipulation.');
     }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
-    if (size.length() === 4) {
-      fullBufferSize *= size.get(3);
-    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
 
-    var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    var values = new Array(geometry.getSize().length());
-    values.fill(0);
-    values[2] = newSliceIndex;
-    if (size.length() === 4) {
-      values[3] = timeId;
-    }
-    var index = new dwv.math.Index(values);
-    var primaryOffset = size.indexToOffset(index);
-    var secondaryOffset = this.getSecondaryOffset(index);
+    // slice index
+    var sliceIndex = index.get(2);
 
-    // first frame special slice by slice append
-    if (timeId === 0) {
-      // store slice
-      var oldNumberOfSlices = size.get(2);
-      // move content if needed
-      var start = primaryOffset;
-      var end;
-      if (newSliceIndex === 0) {
-        // insert slice before current data
-        end = start + oldNumberOfSlices * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      } else if (newSliceIndex < oldNumberOfSlices) {
-        // insert slice in between current data
-        end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      }
+    // slice index including possible 4D
+    var fullSliceIndex = sliceIndex;
+    if (typeof timeId !== 'undefined') {
+      fullSliceIndex += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
     }
-
+    // offset of the input slice
+    var indexOffset = fullSliceIndex * sliceSize;
+    var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
+    // move content if needed
+    if (indexOffset < maxOffset) {
+      buffer.set(
+        buffer.subarray(indexOffset, maxOffset),
+        indexOffset + sliceSize
+      );
+    }
     // add new slice content
-    buffer.set(rhs.getBuffer(), primaryOffset);
+    buffer.set(rhs.getBuffer(), indexOffset);
 
     // update geometry
-    if (timeId === 0) {
-      geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    if (!isNewFrame) {
+      geometry.appendOrigin(
+        rhs.getGeometry().getOrigin(), sliceIndex, timeId);
     }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), secondaryOffset);
+      rhs.getRescaleSlopeAndIntercept(), fullSliceIndex);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(secondaryOffset, 0, rhs.getImageUid());
+    imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -536,7 +709,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              secondaryOffset, 0, rhsPreset.wl[0]);
+              fullSliceIndex, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -575,9 +748,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
 
   /**
    * Append a frame to the image.
+   *
+   * @param {number} time The frame time value.
+   * @param {dwv.math.Point3D} origin The origin of the frame.
    */
-  this.appendFrame = function () {
-    geometry.appendFrame();
+  this.appendFrame = function (time, origin) {
+    geometry.appendFrame(time, origin);
     fireEvent({type: 'appendframe'});
     // memory will be updated at the first appendSlice or appendFrameBuffer
   };
@@ -652,6 +828,129 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
+
+  // ****************************************
+  // image data modifiers... carefull...
+  // ****************************************
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsets List of offsets where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsets = function (offsets, value) {
+    var offset;
+    for (var i = 0, leni = offsets.length; i < leni; ++i) {
+      offset = offsets[i];
+      buffer[offset] = value.r;
+      buffer[offset + 1] = value.g;
+      buffer[offset + 2] = value.b;
+    }
+    // fire imagechange
+    fireEvent({type: 'imagechange'});
+  };
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @returns {Array} A list of objects representing the original values before
+   *  replacing them.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsetsAndGetOriginals = function (offsetsLists, value) {
+    var originalColoursLists = [];
+
+    // update and store
+    for (var j = 0; j < offsetsLists.length; ++j) {
+      var offsets = offsetsLists[j];
+      // first colour
+      var offset = offsets[0] * 3;
+      var previousColour = {
+        r: buffer[offset],
+        g: buffer[offset + 1],
+        b: buffer[offset + 2]
+      };
+      // original value storage
+      var originalColours = [];
+      originalColours.push({
+        index: 0,
+        colour: previousColour
+      });
+      for (var i = 0; i < offsets.length; ++i) {
+        offset = offsets[i] * 3;
+        var currentColour = {
+          r: buffer[offset],
+          g: buffer[offset + 1],
+          b: buffer[offset + 2]
+        };
+        // check if new colour
+        if (previousColour.r !== currentColour.r ||
+          previousColour.g !== currentColour.g ||
+          previousColour.b !== currentColour.b) {
+          // store new colour
+          originalColours.push({
+            index: i,
+            colour: currentColour
+          });
+          previousColour = currentColour;
+        }
+        // write update colour
+        buffer[offset] = value.r;
+        buffer[offset + 1] = value.g;
+        buffer[offset + 2] = value.b;
+      }
+      originalColoursLists.push(originalColours);
+    }
+    // fire imagechange
+    fireEvent({type: 'imagechange'});
+    return originalColoursLists;
+  };
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object|Array} value The value to set at the given offsets.
+   * @fires dwv.image.Image#imagechange
+   */
+  this.setAtOffsetsWithIterator = function (offsetsLists, value) {
+    for (var j = 0; j < offsetsLists.length; ++j) {
+      var offsets = offsetsLists[j];
+      var iterator;
+      if (typeof value !== 'undefined' &&
+        typeof value.r !== 'undefined') {
+        // input value is a simple color
+        iterator = new dwv.image.colourRange(
+          [{index: 0, colour: value}], offsets.length);
+      } else {
+        // input value is a list of iterators
+        // created by setAtOffsetsAndGetOriginals
+        iterator = new dwv.image.colourRange(
+          value[j], offsets.length);
+      }
+
+      // set values
+      var ival = iterator.next();
+      while (!ival.done) {
+        var offset = offsets[ival.index] * 3;
+        buffer[offset] = ival.value.r;
+        buffer[offset + 1] = ival.value.g;
+        buffer[offset + 2] = ival.value.b;
+        ival = iterator.next();
+      }
+    }
+    /**
+     * Image change event.
+     *
+     * @event dwv.image.Image#imagechange
+     * @type {object}
+     */
+    fireEvent({type: 'imagechange'});
+  };
 };
 
 /**

@@ -69,10 +69,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
    * @returns {string} The tag name.
    */
   this.getTagName = function (tag) {
-    var tagObj = new dwv.dicom.Tag(tag.group, tag.element);
-    var name = tagObj.getNameFromDictionary();
+    var name = tag.getNameFromDictionary();
     if (name === null) {
-      name = tagObj.getKey2();
+      name = tag.getKey2();
     }
     return name;
   };
@@ -87,8 +86,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     // element value
     var value = null;
 
-    var isPixel = dicomElement.tag.group === '0x7FE0' &&
-      dicomElement.tag.element === '0x0010';
+    var isPixel = dwv.dicom.isPixelDataTag(dicomElement.tag);
 
     var vr = dicomElement.vr;
     if (vr === 'SQ' &&
@@ -117,8 +115,8 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     // return
     return {
       value: value,
-      group: dicomElement.tag.group,
-      element: dicomElement.tag.element,
+      group: dicomElement.tag.getGroup(),
+      element: dicomElement.tag.getElement(),
       vr: vr,
       vl: dicomElement.vl
     };
@@ -145,7 +143,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     var checkHeader = true;
     for (var i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = dicomElements[keys[i]];
-      if (checkHeader && dicomElement.tag.group !== '0x0002') {
+      if (checkHeader && dicomElement.tag.getGroup() !== '0x0002') {
         result += '\n';
         result += '# Dicom-Data-Set\n';
         result += '# Used TransferSyntax: ';
@@ -194,9 +192,8 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
   if (dicomElement.vr !== 'SQ' &&
     dicomElement.value.length === 1 && dicomElement.value[0] === '') {
     str += '(no value available)';
-  } else if (dicomElement.tag.group === '0x7FE0' &&
-    dicomElement.tag.element === '0x0010' &&
-    dicomElement.vl === 'u/l') {
+  } else if (dwv.dicom.isPixelDataTag(dicomElement.tag) &&
+    dicomElement.undefinedLength) {
     str = '(PixelSequence)';
   } else if (dicomElement.vr === 'DA' && pretty) {
     var daValue = dicomElement.value[0];
@@ -210,15 +207,17 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       dayBeginIndex = 8;
     }
     var da = new Date(
-      parseInt(daValue.substr(0, 4), 10),
-      parseInt(daValue.substr(monthBeginIndex, 2), 10) - 1, // 0-11 range
-      parseInt(daValue.substr(dayBeginIndex, 2), 10));
+      parseInt(daValue.substring(0, 4), 10),
+      parseInt(daValue.substring(
+        monthBeginIndex, monthBeginIndex + 2), 10) - 1, // 0-11 range
+      parseInt(daValue.substring(
+        dayBeginIndex, dayBeginIndex + 2), 10));
     str = da.toLocaleDateString();
   } else if (dicomElement.vr === 'TM' && pretty) {
     var tmValue = dicomElement.value[0];
-    var tmHour = tmValue.substr(0, 2);
-    var tmMinute = tmValue.length >= 4 ? tmValue.substr(2, 2) : '00';
-    var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4, 2) : '00';
+    var tmHour = tmValue.substring(0, 2);
+    var tmMinute = tmValue.length >= 4 ? tmValue.substring(2, 4) : '00';
+    var tmSeconds = tmValue.length >= 6 ? tmValue.substring(4, 6) : '00';
     str = tmHour + ':' + tmMinute + ':' + tmSeconds;
   } else {
     var isOtherVR = false;
@@ -248,9 +247,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       } else if (isOtherVR) {
         var tmp = dicomElement.value[k].toString(16);
         if (dicomElement.vr === 'OB') {
-          tmp = '00'.substr(0, 2 - tmp.length) + tmp;
+          tmp = '00'.substring(0, 2 - tmp.length) + tmp;
         } else {
-          tmp = '0000'.substr(0, 4 - tmp.length) + tmp;
+          tmp = '0000'.substring(0, 4 - tmp.length) + tmp;
         }
         valueStr += tmp;
       } else if (typeof dicomElement.value[k] === 'string') {
@@ -294,8 +293,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   prefix = prefix || '';
 
   // get tag anme from dictionary
-  var tag = new dwv.dicom.Tag(
-    dicomElement.tag.group, dicomElement.tag.element);
+  var tag = dicomElement.tag;
   var tagName = tag.getNameFromDictionary();
 
   var deSize = dicomElement.value.length;
@@ -305,25 +303,23 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   }
 
   // no size for delimitations
-  if (dicomElement.tag.group === '0xFFFE' && (
-    dicomElement.tag.element === '0xE00D' ||
-    dicomElement.tag.element === '0xE0DD')) {
+  if (dwv.dicom.isItemDelimitationItemTag(dicomElement.tag) ||
+    dwv.dicom.isSequenceDelimitationItemTag(dicomElement.tag)) {
     deSize = 0;
   } else if (isOtherVR) {
     deSize = 1;
   }
 
-  var isPixSequence = (dicomElement.tag.group === '0x7FE0' &&
-    dicomElement.tag.element === '0x0010' &&
-    dicomElement.vl === 'u/l');
+  var isPixSequence = (dwv.dicom.isPixelDataTag(dicomElement.tag) &&
+    dicomElement.undefinedLength);
 
   var line = null;
 
   // (group,element)
   line = '(';
-  line += dicomElement.tag.group.substr(2, 5).toLowerCase();
+  line += dicomElement.tag.getGroup().substring(2).toLowerCase();
   line += ',';
-  line += dicomElement.tag.element.substr(2, 5).toLowerCase();
+  line += dicomElement.tag.getElement().substring(2).toLowerCase();
   line += ') ';
   // value representation
   line += dicomElement.vr;
@@ -343,7 +339,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       line += ' (PixelSequence #=' + deSize + ')';
     } else if (dicomElement.vr === 'SQ') {
       line += ' (Sequence with';
-      if (dicomElement.vl === 'u/l') {
+      if (dicomElement.undefinedLength) {
         line += ' undefined';
       } else {
         line += ' explicit';
@@ -410,7 +406,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       // get the item element
       var itemElement = item.xFFFEE000;
       message = '(Item with';
-      if (itemElement.vl === 'u/l') {
+      if (itemElement.undefinedLength) {
         message += ' undefined';
       } else {
         message += ' explicit';
@@ -430,12 +426,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       }
 
       message = '(ItemDelimitationItem';
-      if (itemElement.vl !== 'u/l') {
+      if (!itemElement.undefinedLength) {
         message += ' for re-encoding';
       }
       message += ')';
       var itemDelimElement = {
-        tag: {group: '0xFFFE', element: '0xE00D'},
+        tag: dwv.dicom.getItemDelimitationItemTag(),
         vr: 'na',
         vl: '0',
         value: [message]
@@ -446,12 +442,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
     }
 
     message = '(SequenceDelimitationItem';
-    if (dicomElement.vl !== 'u/l') {
+    if (!dicomElement.undefinedLength) {
       message += ' for re-encod.';
     }
     message += ')';
     var sqDelimElement = {
-      tag: {group: '0xFFFE', element: '0xE0DD'},
+      tag: dwv.dicom.getSequenceDelimitationItemTag(),
       vr: 'na',
       vl: '0',
       value: [message]
@@ -469,7 +465,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
     }
 
     var pixDelimElement = {
-      tag: {group: '0xFFFE', element: '0xE0DD'},
+      tag: dwv.dicom.getSequenceDelimitationItemTag(),
       vr: 'na',
       vl: '0',
       value: ['(SequenceDelimitationItem)']
@@ -511,6 +507,26 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 };
 
 /**
+ * Extract a size from dicom elements.
+ *
+ * @returns {object} The size.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getImageSize = function () {
+  // rows
+  var rows = this.getFromKey('x00280010');
+  if (!rows) {
+    throw new Error('Missing or empty DICOM image number of rows');
+  }
+  // columns
+  var columns = this.getFromKey('x00280011');
+  if (!columns) {
+    throw new Error('Missing or empty DICOM image number of columns');
+  }
+  return new dwv.image.Size([columns, rows, 1]);
+};
+
+
+/**
  * Get the pixel spacing from the different spacing tags.
  *
  * @returns {object} The read spacing or the default [1,1].
@@ -550,10 +566,42 @@ dwv.dicom.DicomElementsWrapper.prototype.getPixelSpacing = function () {
 };
 
 /**
+ * Get the time.
+ *
+ * @returns {number|undefined} The time value if available.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
+  // default returns undefined
+  return undefined;
+};
+
+/**
+ * Get the pixel data unit.
+ *
+ * @returns {string|null} The unit value if available.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getPixelUnit = function () {
+  // RescaleType
+  var unit = this.getFromKey('x00281054');
+  if (!unit) {
+    // Units (for PET)
+    unit = this.getFromKey('x00541001');
+  }
+  // default rescale type for CT
+  if (!unit) {
+    var modality = this.getFromKey('x00080060');
+    if (modality === 'CT') {
+      unit = 'HU';
+    }
+  }
+  return unit;
+};
+
+/**
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR
- * @returns {Array} The file list as an array ordered by
+ * @returns {Array|undefined} The file list as an array ordered by
  *   STUDY > SERIES > IMAGES.
  */
 dwv.dicom.getFileListFromDicomDir = function (data) {
@@ -566,13 +614,13 @@ dwv.dicom.getFileListFromDicomDir = function (data) {
   if (typeof elements.x00041220 === 'undefined' ||
     typeof elements.x00041220.value === 'undefined') {
     dwv.logger.warn('No Directory Record Sequence found in DICOMDIR.');
-    return;
+    return undefined;
   }
   var dirSeq = elements.x00041220.value;
 
   if (dirSeq.length === 0) {
     dwv.logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
-    return;
+    return undefined;
   }
 
   var records = [];

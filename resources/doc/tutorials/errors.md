@@ -24,16 +24,6 @@ One possible reason for permission denial can be related to [Same origin policy]
 
 The same happens when accessing local file(s) from the dwv url. Best to serve files via karma and `yarn run test`.
 
-## XMLHttpRequest cannot load file (non DICOM)
-
-Console error message (Google Chrome): `XMLHttpRequest cannot load file:///G:/devel/src/local/dwv/devel/dwv/locales/fr/translation.json. Cross origin requests are only supported for protocol schemes: http, data, chrome, chrome-extension, https.`
-
-Console error message (Mozilla Firefox): `Failed to execute ‘postMessage’ on ‘DOMWindow’: The target origin provided (‘null’) does not match the recipient window’s origin (‘null’).`
-
-Context: Loading a viewer `index.html` file directly in a browser.
-
-The default viewers use external files to translate strings and for the configuration of the overlay information. It is recommended to run dwv from a local web server. The other solution is to deactivate translation and configurable overlays.
-
 ## Cannot append a slice
 
 Message: `Cannot append a slice with different ...` (number of columns, number of rows, photometric interpretation...).

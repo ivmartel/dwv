@@ -31,7 +31,7 @@ To execute it, run:
 node main.js
 ```
 
-You can create a test packages by running `npm pack` in a folder containing a `package.json` file. Install it
+You can create a test package by running `npm pack` in a folder containing a `package.json` file. Install it
 by running `npm install my-package.tgz`.
 
 Note: I've not tested all the classes of dwv in node, it is possible some of them use browser provided methods that node does not have. For example dwv.App uses the HTML 'canvas' which can be added by installing a 'node-canvas' (see [help](https://github.com/konvajs/konva#5-nodejs) from Konva). Konva is disabled in the module `intro.js` file. Another one could be the 'XMLHttpRequest'...
@@ -39,6 +39,7 @@ Note: I've not tested all the classes of dwv in node, it is possible some of the
 Links:
  * [NPM](https://www.npmjs.com/)
  * `package.json` [standard](https://docs.npmjs.com/files/package.json)
+ * [dwvcli](https://github.com/ivmartel/dwvcli): a cli running dwv in node to parse and anonymise data
 
 For development purposes, you can create your own npm package by calling `npm pack` in the root folder. You can then install it in your project folder using `npm install dwv-#.tgz`.
 

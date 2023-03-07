@@ -6,19 +6,42 @@ dwv.ctrl = dwv.ctrl || {};
  * View controller.
  *
  * @param {dwv.image.View} view The associated view.
+ * @param {number} index The associated data index.
  * @class
  */
-dwv.ctrl.ViewController = function (view) {
+dwv.ctrl.ViewController = function (view, index) {
   // closure to self
   var self = this;
   // third dimension player ID (created by setInterval)
   var playerID = null;
+  // associated data index
+  var dataIndex = index;
+
+  // check view
+  if (typeof view.getImage() === 'undefined') {
+    throw new Error('View does not have an image, cannot setup controller');
+  }
 
   // setup the plane helper
   var planeHelper = new dwv.image.PlaneHelper(
-    view.getImage().getGeometry().getSpacing(),
+    view.getImage().getGeometry().getRealSpacing(),
+    view.getImage().getGeometry().getOrientation(),
     view.getOrientation()
   );
+
+  // mask segment helper
+  var maskSegmentHelper;
+  if (view.getImage().getMeta().Modality === 'SEG') {
+    maskSegmentHelper = new dwv.image.MaskSegmentHelper(view.getImage());
+  }
+
+  /**
+   * Listener handler.
+   *
+   * @private
+   * @type {object}
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
    * Get the plane helper.
@@ -30,13 +53,53 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Check is the associated image is a mask.
+   *
+   * @returns {boolean} True if the associated image is a mask.
+   */
+  this.isMask = function () {
+    return typeof maskSegmentHelper !== 'undefined';
+  };
+
+  /**
+   * Get the mask segment helper.
+   *
+   * @returns {object} The helper.
+   */
+  this.getMaskSegmentHelper = function () {
+    return maskSegmentHelper;
+  };
+
+  /**
+   * Apply the hidden segments list by setting
+   * the corresponding alpha function.
+   */
+  this.applyHiddenSegments = function () {
+    if (this.isMask) {
+      this.setViewAlphaFunction(maskSegmentHelper.getAlphaFunc());
+    }
+  };
+
+  /**
+   * Delete a segment.
+   *
+   * @param {number} segmentNumber The segment number.
+   * @param {Function} exeCallback The post execution callback.
+   */
+  this.deleteSegment = function (segmentNumber, exeCallback) {
+    if (this.isMask) {
+      maskSegmentHelper.deleteSegment(segmentNumber, fireEvent, exeCallback);
+    }
+  };
+
+  /**
    * Initialise the controller.
    */
   this.initialise = function () {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition2D(0, 0);
+    this.setCurrentPosition(this.getPositionFromPlanePoint(0, 0));
   };
 
   /**
@@ -104,21 +167,20 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the current oriented position.
+   * Get the current oriented index.
    *
-   * @returns {dwv.math.Point} The position.
+   * @returns {dwv.math.Index} The index.
    */
   this.getCurrentOrientedIndex = function () {
     var res = view.getCurrentIndex();
-    // values = orientation * orientedValues
-    // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      var index3D = new dwv.math.Index(
-        [res.get(0), res.get(1), res.get(2)]);
-      var orientedIndex3D =
-         view.getOrientation().getInverse().getAbs().multiplyIndex3D(index3D);
-      var values = orientedIndex3D.getValues();
-      res = new dwv.math.Index(values);
+      // view oriented => image de-oriented
+      var vector = planeHelper.getImageDeOrientedVector3D(
+        new dwv.math.Vector3D(res.get(0), res.get(1), res.get(2))
+      );
+      res = new dwv.math.Index([
+        vector.getX(), vector.getY(), vector.getZ()
+      ]);
     }
     return res;
   };
@@ -141,6 +203,10 @@ dwv.ctrl.ViewController = function (view) {
     return view.getCurrentIndex().get(view.getScrollIndex());
   };
 
+  this.getOrigin = function (position) {
+    return view.getOrigin(position);
+  };
+
   /**
    * Get the current scroll position value.
    *
@@ -155,18 +221,22 @@ dwv.ctrl.ViewController = function (view) {
    * Generate display image data to be given to a canvas.
    *
    * @param {Array} array The array to fill in.
+   * @param {dwv.math.Point} position Optional position at which to generate,
+   *   otherwise generates at current position.
    */
-  this.generateImageData = function (array) {
-    view.generateImageData(array);
+  this.generateImageData = function (array, position) {
+    view.generateImageData(array, position);
   };
 
   /**
    * Set the associated image.
    *
    * @param {Image} img The associated image.
+   * @param {number} index The data index of the image.
    */
-  this.setImage = function (img) {
+  this.setImage = function (img, index) {
     view.setImage(img);
+    dataIndex = index;
   };
 
   /**
@@ -177,6 +247,36 @@ dwv.ctrl.ViewController = function (view) {
   this.get2DSpacing = function () {
     var spacing = view.getImage().getGeometry().getSpacing();
     return [spacing.get(0), spacing.get(1)];
+  };
+
+  /**
+   * Get the image rescaled value at the input position.
+   *
+   * @param {dwv.math.Point} position the input position.
+   * @returns {number|undefined} The image value or undefined if out of bounds
+   *   or no quantifiable (for ex RGB).
+   */
+  this.getRescaledImageValue = function (position) {
+    var image = view.getImage();
+    if (!image.canQuantify()) {
+      return;
+    }
+    var geometry = image.getGeometry();
+    var index = geometry.worldToIndex(position);
+    var value;
+    if (geometry.isIndexInBounds(index)) {
+      value = image.getRescaledValueAtIndex(index);
+    }
+    return value;
+  };
+
+  /**
+   * Get the image pixel unit.
+   *
+   * @returns {string} The unit
+   */
+  this.getPixelUnit = function () {
+    return view.getImage().getMeta().pixelUnit;
   };
 
   /**
@@ -284,7 +384,63 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {dwv.image.Size} The size.
    */
   this.getImageSize = function () {
-    return view.getImage().getGeometry().getSize();
+    return view.getImage().getGeometry().getSize(view.getOrientation());
+  };
+
+  /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {object} The 2D size as {x,y}.
+   */
+  this.getImageWorldSize = function () {
+    var geometry = view.getImage().getGeometry();
+    var size = geometry.getSize(view.getOrientation()).get2D();
+    var spacing = geometry.getSpacing(view.getOrientation()).get2D();
+    return {
+      x: size.x * spacing.x,
+      y: size.y * spacing.y
+    };
+  };
+
+  /**
+   * Get the image rescaled data range.
+   *
+   * @returns {object} The range as {min, max}.
+   */
+  this.getImageRescaledDataRange = function () {
+    return view.getImage().getRescaledDataRange();
+  };
+
+  /**
+   * Compare the input meta data to the associated image one.
+   *
+   * @param {object} meta The meta data.
+   * @returns {boolean} True if the associated image has equal meta data.
+   */
+  this.equalImageMeta = function (meta) {
+    var imageMeta = view.getImage().getMeta();
+    // loop through input meta keys
+    var metaKeys = Object.keys(meta);
+    for (var i = 0; i < metaKeys.length; ++i) {
+      var metaKey = metaKeys[i];
+      if (typeof imageMeta[metaKey] === 'undefined') {
+        return false;
+      }
+      if (imageMeta[metaKey] !== meta[metaKey]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Check is the provided position can be set.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {boolean} True is the position is in bounds.
+   */
+  this.canSetPosition = function (position) {
+    return view.canSetPosition(position);
   };
 
   /**
@@ -299,15 +455,42 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Set the current 2D (x,y) position.
+   * Get a position from a 2D (x,y) position.
    *
    * @param {number} x The column position.
    * @param {number} y The row position.
-   * @returns {boolean} False if not in bounds.
+   * @returns {dwv.math.Point} The associated position.
    */
-  this.setCurrentPosition2D = function (x, y) {
-    return view.setCurrentPosition(
-      this.getPositionFromPlanePoint({x: x, y: y}));
+  this.getPositionFromPlanePoint = function (x, y) {
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(x, y, k);
+    // de-orient
+    var point = planeHelper.getImageOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
+    return this.getCurrentPosition().mergeWith3D(point3D);
+  };
+
+  /**
+   * Get a 2D (x,y) position from a position.
+   *
+   * @param {dwv.math.Point3D} point3D The 3D position.
+   * @returns {object} The 2D position.
+   */
+  this.getPlanePositionFromPosition = function (point3D) {
+    // orient
+    var geometry = view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    var point = geometry.worldToPoint(point3D);
+    var planePoint = planeHelper.getImageDeOrientedVector3D(point);
+    // return
+    return {
+      x: planePoint.getX(),
+      y: planePoint.getY(),
+    };
   };
 
   /**
@@ -322,25 +505,6 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get a 3D position from a plane 2D position.
-   *
-   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
-   * @returns {dwv.math.Point} The 3D point.
-   */
-  this.getPositionFromPlanePoint = function (point2D) {
-    // keep third direction
-    var k = this.getCurrentScrollIndexValue();
-    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
-    // de-orient
-    var point = planeHelper.getDeOrientedVector3D(planePoint);
-    // ~indexToWorld to not loose precision
-    var geometry = view.getImage().getGeometry();
-    var point3D = geometry.pointToWorld(point);
-    // merge with current position to keep extra dimensions
-    return this.getCurrentPosition().mergeWith3D(point3D);
-  };
-
-  /**
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
@@ -352,10 +516,10 @@ dwv.ctrl.ViewController = function (view) {
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
     // de-orient
-    var point = planeHelper.getDeOrientedVector3D(planePoint);
+    var point = planeHelper.getTargetDeOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
     var geometry = view.getImage().getGeometry();
-    var spacing = geometry.getSpacing();
+    var spacing = geometry.getRealSpacing();
     return new dwv.math.Point3D(
       point.getX() * spacing.get(0),
       point.getY() * spacing.get(1),
@@ -530,5 +694,38 @@ dwv.ctrl.ViewController = function (view) {
     // enable it
     this.setColourMap(dwv.tool.colourMaps[name]);
   };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    event.dataid = dataIndex;
+    listenerHandler.fireEvent(event);
+  }
 
 }; // class ViewController

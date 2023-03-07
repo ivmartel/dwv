@@ -108,6 +108,37 @@ dwv.tool.Draw = function (app) {
   var lastPoint = null;
 
   /**
+   * Active shape, ie shape with mouse over.
+   *
+   * @private
+   * @type {object}
+   */
+  var activeShapeGroup;
+
+  /**
+   * Original mouse cursor.
+   *
+   * @private
+   * @type {string}
+   */
+  var originalCursor;
+
+  /**
+   * Mouse cursor.
+   *
+   * @private
+   * @type {string}
+   */
+  var mouseOverCursor = 'pointer';
+
+  /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Shape editor.
    *
    * @private
@@ -168,7 +199,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var drawLayer = layerGroup.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
@@ -225,7 +256,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
@@ -269,7 +300,7 @@ dwv.tool.Draw = function (app) {
     if (points.length === currentFactory.getNPoints()) {
       // store points
       var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
       onFinalPoints(points, layerGroup);
       // reset flag
       started = false;
@@ -282,11 +313,15 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-   * Handle double click event.
+   * Handle double click event: some tools use it to finish interaction.
    *
-   * @param {object} event The mouse up event.
+   * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
+    // only end by double click undefined NPoints
+    if (typeof currentFactory.getNPoints() !== 'undefined') {
+      return;
+    }
     // exit if not started draw
     if (!started) {
       return;
@@ -299,7 +334,7 @@ dwv.tool.Draw = function (app) {
 
     // store points
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     onFinalPoints(points, layerGroup);
     // reset flag
     started = false;
@@ -335,7 +370,7 @@ dwv.tool.Draw = function (app) {
     }
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
@@ -371,6 +406,15 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
+  };
+
+  /**
    * Handle key down event.
    *
    * @param {object} event The key down event.
@@ -383,8 +427,10 @@ dwv.tool.Draw = function (app) {
     }
     var konvaLayer;
 
-    // press delete key
-    if (event.keyCode === 46 && shapeEditor.isActive()) {
+    // press delete or backspace key
+    if ((event.key === 'Delete' ||
+      event.key === 'Backspace') &&
+      shapeEditor.isActive()) {
       // get shape
       var shapeGroup = shapeEditor.getShape().getParent();
       konvaLayer = shapeGroup.getLayer();
@@ -400,7 +446,7 @@ dwv.tool.Draw = function (app) {
     }
 
     // escape key: exit shape creation
-    if (event.keyCode === 27 && tmpShapeGroup !== null) {
+    if (event.key === 'Escape' && tmpShapeGroup !== null) {
       konvaLayer = tmpShapeGroup.getLayer();
       // reset temporary shape group
       tmpShapeGroup.destroy();
@@ -500,19 +546,25 @@ dwv.tool.Draw = function (app) {
     shapeEditor.disable();
     shapeEditor.setShape(null);
     shapeEditor.setViewController(null);
-    document.body.style.cursor = 'default';
     // get the current draw layer
     var layerGroup = app.getActiveLayerGroup();
     activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
+      // store cursor
+      originalCursor = document.body.style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
       app.addEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
       });
       // same for colour
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({lineColour: this.style.getLineColour()});
     } else {
+      // reset shape and cursor
+      resetActiveShapeGroup();
+      // reset local var
+      originalCursor = undefined;
+      // remove listeners
       app.removeEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
       });
@@ -558,6 +610,9 @@ dwv.tool.Draw = function (app) {
     // draw
     var drawLayer = layerGroup.getActiveDrawLayer();
     var konvaLayer = drawLayer.getKonvaLayer();
+    if (shapeGroups.length !== 0) {
+      konvaLayer.listening(true);
+    }
     konvaLayer.draw();
   }
 
@@ -597,19 +652,48 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
+   * Reset the active shape group and mouse cursor to their original state.
+   */
+  function resetActiveShapeGroup() {
+    if (typeof originalCursor !== 'undefined') {
+      document.body.style.cursor = originalCursor;
+    }
+    if (typeof activeShapeGroup !== 'undefined') {
+      activeShapeGroup.opacity(1);
+      var colour = self.style.getLineColour();
+      activeShapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
+        function (ashape) {
+          ashape.stroke(colour);
+        }
+      );
+    }
+  }
+
+  /**
    * Set shape group on properties.
    *
    * @param {object} shapeGroup The shape group to set on.
    * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   this.setShapeOn = function (shapeGroup, layerGroup) {
-    // mouse over styling
+    // adapt shape and cursor when mouse over
+    var mouseOnShape = function () {
+      document.body.style.cursor = mouseOverCursor;
+      shapeGroup.opacity(0.75);
+    };
+    // mouse over event hanlding
     shapeGroup.on('mouseover', function () {
-      document.body.style.cursor = 'pointer';
+      // save local vars
+      activeShapeGroup = shapeGroup;
+      // adapt shape
+      mouseOnShape();
     });
-    // mouse out styling
+    // mouse out event hanlding
     shapeGroup.on('mouseout', function () {
-      document.body.style.cursor = 'default';
+      // reset shape
+      resetActiveShapeGroup();
+      // reset local vars
+      activeShapeGroup = undefined;
     });
 
     var drawLayer = layerGroup.getActiveDrawLayer();
@@ -649,10 +733,23 @@ dwv.tool.Draw = function (app) {
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getBaseSize(), this);
+      // get appropriate factory
+      var factory;
+      var keys = Object.keys(self.shapeFactoryList);
+      for (var i = 0; i < keys.length; ++i) {
+        factory = new self.shapeFactoryList[keys[i]];
+        if (factory.isFactoryGroup(shapeGroup)) {
+          // stop at first find
+          break;
+        }
+      }
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot find factory to update quantification.');
+      }
       // update quantification if possible
-      if (typeof currentFactory.updateQuantification !== 'undefined') {
+      if (typeof factory.updateQuantification !== 'undefined') {
         var vc = layerGroup.getActiveViewLayer().getViewController();
-        currentFactory.updateQuantification(this, vc);
+        factory.updateQuantification(this, vc);
       }
       // highlight trash when on it
       var offset = dwv.gui.getEventOffset(event.evt)[0];
@@ -686,9 +783,14 @@ dwv.tool.Draw = function (app) {
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
-      var pos = {x: this.x(), y: this.y()};
       // remove trash
       trash.remove();
+      // activate(false) will also trigger a dragend.draw
+      if (typeof event === 'undefined' ||
+        typeof event.evt === 'undefined') {
+        return;
+      }
+      var pos = {x: this.x(), y: this.y()};
       // delete case
       var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset, layerGroup);
@@ -709,7 +811,7 @@ dwv.tool.Draw = function (app) {
             ashape.stroke(colour);
           });
         // reset cursor
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = originalCursor;
         // delete command
         var delcmd = new dwv.tool.DeleteGroupCommand(this,
           shapeDisplayName, konvaLayer);
@@ -752,6 +854,8 @@ dwv.tool.Draw = function (app) {
         throw new Error('Could not find the shape label.');
       }
       var ktext = label.getText();
+      // id for event
+      var groupId = this.id();
 
       var onSaveCallback = function (meta) {
         // store meta
@@ -763,7 +867,8 @@ dwv.tool.Draw = function (app) {
 
         // trigger event
         fireEvent({
-          type: 'drawchange'
+          type: 'drawchange',
+          id: groupId
         });
         // draw
         konvaLayer.draw();
@@ -784,7 +889,7 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-   * Set the tool options.
+   * Set the tool configuration options.
    *
    * @param {object} options The list of shape names amd classes.
    */
@@ -796,10 +901,52 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
+   * Get the type of tool options: here 'factory' since the shape
+   * list contains factories to create each possible shape.
+   *
+   * @returns {string} The type.
+   */
+  this.getOptionsType = function () {
+    return 'factory';
+  };
+
+  /**
+   * Set the tool live features: shape colour and shape name.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.shapeColour !== 'undefined') {
+      this.style.setLineColour(features.shapeColour);
+    }
+    if (typeof features.shapeName !== 'undefined') {
+      // check if we have it
+      if (!this.hasShape(features.shapeName)) {
+        throw new Error('Unknown shape: \'' + features.shapeName + '\'');
+      }
+      this.shapeName = features.shapeName;
+    }
+    if (typeof features.mouseOverCursor !== 'undefined') {
+      mouseOverCursor = features.mouseOverCursor;
+    }
+  };
+
+  /**
    * Initialise the tool.
    */
   this.init = function () {
     // does nothing
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return [
+      'drawcreate', 'drawchange', 'drawmove', 'drawdelete', 'drawlabelchange'
+    ];
   };
 
   /**
@@ -834,15 +981,6 @@ dwv.tool.Draw = function (app) {
     }
   };
 
-  /**
-   * Set the line colour of the drawing.
-   *
-   * @param {string} colour The colour to set
-   */
-  this.setLineColour = function (colour) {
-    this.style.setLineColour(colour);
-  };
-
   // Private Methods -----------------------------------------------------------
 
   /**
@@ -863,37 +1001,6 @@ dwv.tool.Draw = function (app) {
 }; // Draw class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Draw.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Draw.name',
-    brief: 'tool.Draw.brief',
-    mouse: {
-      mouse_drag: 'tool.Draw.mouse_drag'
-    },
-    touch: {
-      touch_drag: 'tool.Draw.touch_drag'
-    }
-  };
-};
-
-/**
- * Set the shape name of the drawing.
- *
- * @param {string} name The name of the shape.
- */
-dwv.tool.Draw.prototype.setShapeName = function (name) {
-  // check if we have it
-  if (!this.hasShape(name)) {
-    throw new Error('Unknown shape: \'' + name + '\'');
-  }
-  this.shapeName = name;
-};
-
-/**
  * Check if the shape is in the shape list.
  *
  * @param {string} name The name of the shape.
@@ -907,12 +1014,12 @@ dwv.tool.Draw.prototype.hasShape = function (name) {
  * Get the minimum position in a groups' anchors.
  *
  * @param {object} group The group that contains anchors.
- * @returns {object} The minimum position as {x,y}.
+ * @returns {object|undefined} The minimum position as {x,y}.
  */
 dwv.tool.getAnchorMin = function (group) {
   var anchors = group.find('.anchor');
   if (anchors.length === 0) {
-    return;
+    return undefined;
   }
   var minX = anchors[0].x();
   var minY = anchors[0].y();

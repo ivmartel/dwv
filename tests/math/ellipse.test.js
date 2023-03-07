@@ -77,3 +77,39 @@ QUnit.test('Test Ellipse quantify.', function (assert) {
   assert.equal(
     resQuant0.surface.value, theoQuant0.surface.value, 'quant surface');
 });
+
+/**
+ * Tests for getEllipseIndices.
+ *
+ * @function module:tests/math~getEllipseIndices
+ */
+QUnit.test('Test getEllipseIndices.', function (assert) {
+  var center00 = new dwv.math.Index([1, 1]);
+  var radius00 = [2, 2];
+  var dir00 = [0, 1];
+  var theoRes = [];
+  for (var i = 0; i <= radius00[0]; ++i) {
+    for (var j = 0; j <= radius00[1]; ++j) {
+      theoRes.push(new dwv.math.Index([i, j]));
+    }
+  }
+  var indices00 = dwv.math.getEllipseIndices(center00, radius00, dir00);
+  // sort
+  indices00.sort();
+  // filter duplicates
+  indices00 = indices00.filter(function (item, index, arr) {
+    return !item.equals(arr[index - 1]);
+  });
+
+  assert.ok(indices00.length, theoRes.length,
+    'index list and theo result have same size');
+  var isEqual = true;
+  for (var k = 0; k < indices00.length; ++k) {
+    if (!indices00[k].equals(theoRes[k])) {
+      isEqual = false;
+      break;
+    }
+  }
+  assert.ok(isEqual,
+    'index list and theo result have same values');
+});

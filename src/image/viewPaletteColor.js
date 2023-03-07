@@ -43,7 +43,7 @@ dwv.image.generateImageDataPaletteColor = function (
       array.data[index + 1] = colourMap.green[pxValue];
       array.data[index + 2] = colourMap.blue[pxValue];
     }
-    array.data[index + 3] = alphaFunc(pxValue);
+    array.data[index + 3] = alphaFunc(pxValue, ival.index);
     // increment
     index += 4;
     ival = iterator.next();

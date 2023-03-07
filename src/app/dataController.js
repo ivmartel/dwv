@@ -14,9 +14,9 @@ dwv.ctrl.DataController = function () {
    * List of {image, meta}.
    *
    * @private
-   * @type {Array}
+   * @type {object}
    */
-  var data = [];
+  var data = {};
 
   /**
    * Listener handler.
@@ -32,7 +32,7 @@ dwv.ctrl.DataController = function () {
    * @returns {number} The length.
    */
   this.length = function () {
-    return data.length;
+    return Object.keys(data).length;
   };
 
   /**
@@ -60,24 +60,34 @@ dwv.ctrl.DataController = function () {
    */
   this.setImage = function (index, image) {
     data[index].image = image;
+    // fire image set
     fireEvent({
-      type: 'imagechange',
-      value: [index, image]
+      type: 'imageset',
+      value: [image],
+      dataid: index
     });
+    // listen to image change
+    image.addEventListener('imagechange', getFireEvent(index));
   };
 
   /**
    * Add a new data.
    *
+   * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
    */
-  this.addNew = function (image, meta) {
+  this.addNew = function (index, image, meta) {
+    if (typeof data[index] !== 'undefined') {
+      throw new Error('Index already used in storage: ' + index);
+    }
     // store the new image
-    data.push({
+    data[index] = {
       image: image,
       meta: getMetaObject(meta)
-    });
+    };
+    // listen to image change
+    image.addEventListener('imagechange', getFireEvent(index));
   };
 
   /**
@@ -86,40 +96,27 @@ dwv.ctrl.DataController = function () {
    * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
-   * @param {number} timeId The time ID.
    */
-  this.update = function (index, image, meta, timeId) {
+  this.update = function (index, image, meta) {
     var dataToUpdate = data[index];
 
-    // handle possible timepoint
-    if (typeof timeId !== 'undefined') {
-      var size = dataToUpdate.image.getGeometry().getSize();
-      // append frame for first frame (still 3D) or other frames
-      if ((size.length() === 3 && timeId !== 0) ||
-        (size.length() > 3 && timeId >= size.get(3))) {
-        dataToUpdate.image.appendFrame();
-      }
-    }
-
     // add slice to current image
-    dataToUpdate.image.appendSlice(image, timeId);
+    dataToUpdate.image.appendSlice(image);
 
     // update meta data
     // TODO add time support
-    if (timeId === 0) {
-      var idKey = '';
-      if (typeof meta.x00020010 !== 'undefined') {
-        // dicom case
-        idKey = 'InstanceNumber';
-      } else {
-        idKey = 'imageUid';
-      }
-      dataToUpdate.meta = dwv.utils.mergeObjects(
-        dataToUpdate.meta,
-        getMetaObject(meta),
-        idKey,
-        'value');
+    var idKey = '';
+    if (typeof meta.x00020010 !== 'undefined') {
+      // dicom case
+      idKey = 'InstanceNumber';
+    } else {
+      idKey = 'imageUid';
     }
+    dataToUpdate.meta = dwv.utils.mergeObjects(
+      dataToUpdate.meta,
+      getMetaObject(meta),
+      idKey,
+      'value');
   };
 
   /**
@@ -152,6 +149,20 @@ dwv.ctrl.DataController = function () {
    */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
+  }
+
+  /**
+   * Get a fireEvent function that adds the input index
+   * to the event value.
+   *
+   * @param {number} index The data index.
+   * @returns {Function} A fireEvent function.
+   */
+  function getFireEvent(index) {
+    return function (event) {
+      event.dataid = index;
+      fireEvent(event);
+    };
   }
 
   /**

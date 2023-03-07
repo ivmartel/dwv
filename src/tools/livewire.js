@@ -113,13 +113,31 @@ dwv.tool.Livewire = function (app) {
   var scissors = new dwv.math.Scissors();
 
   /**
+   * Finish a livewire (roi) shape.
+   */
+  function finishShape() {
+    // fire creation event (was not propagated during draw)
+    fireEvent({
+      type: 'drawcreate',
+      id: shapeGroup.id()
+    });
+    // listen
+    command.onExecute = fireEvent;
+    command.onUndo = fireEvent;
+    // save command in undo stack
+    app.addToUndoStack(command);
+    // set flag
+    self.started = false;
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var imageSize = viewLayer.getViewController().getImageSize();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
@@ -148,17 +166,8 @@ dwv.tool.Livewire = function (app) {
       // final point: at 'tolerance' of the initial point
       if ((Math.abs(index.get(0) - self.x0) < tolerance) &&
         (Math.abs(index.get(1) - self.y0) < tolerance)) {
-        // draw
-        self.mousemove(event);
-        // listen
-        command.onExecute = fireEvent;
-        command.onUndo = fireEvent;
-        // debug
-        dwv.logger.debug('[livewire] finialise path.');
-        // save command in undo stack
-        app.addToUndoStack(command);
-        // set flag
-        self.started = false;
+        // finish
+        finishShape();
       } else {
         // anchor point
         path = currentPath;
@@ -180,7 +189,7 @@ dwv.tool.Livewire = function (app) {
       return;
     }
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
@@ -190,7 +199,6 @@ dwv.tool.Livewire = function (app) {
     // do the work
     var results = 0;
     var stop = false;
-    dwv.logger.debug('[livewire] getting ready...');
     while (!parentPoints[p.y][p.x] && !stop) {
       results = scissors.doWork();
 
@@ -205,7 +213,6 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    dwv.logger.debug('[livewire] ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -273,11 +280,7 @@ dwv.tool.Livewire = function (app) {
    * @param {object} _event The double click event.
    */
   this.dblclick = function (_event) {
-    dwv.logger.debug('[livewire] dblclick');
-    // save command in undo stack
-    app.addToUndoStack(command);
-    // set flag
-    self.started = false;
+    finishShape();
   };
 
   /**
@@ -341,7 +344,7 @@ dwv.tool.Livewire = function (app) {
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({shapeColour: this.style.getLineColour()});
     }
   };
 
@@ -350,6 +353,15 @@ dwv.tool.Livewire = function (app) {
    */
   this.init = function () {
     // does nothing
+  };
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  this.getEventNames = function () {
+    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
   };
 
   /**
@@ -385,23 +397,12 @@ dwv.tool.Livewire = function (app) {
 }; // Livewire class
 
 /**
- * Help for this tool.
+ * Set the tool live features: shape colour.
  *
- * @returns {object} The help content.
+ * @param {object} features The list of features.
  */
-dwv.tool.Livewire.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Livewire.name',
-    brief: 'tool.Livewire.brief'
-  };
-};
-
-/**
- * Set the line colour of the drawing.
- *
- * @param {string} colour The colour to set.
- */
-dwv.tool.Livewire.prototype.setLineColour = function (colour) {
-  // set style var
-  this.style.setLineColour(colour);
+dwv.tool.Livewire.prototype.setFeatures = function (features) {
+  if (typeof features.shapeColour !== 'undefined') {
+    this.style.setLineColour(features.shapeColour);
+  }
 };

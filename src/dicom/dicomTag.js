@@ -10,6 +10,18 @@ dwv.dicom = dwv.dicom || {};
  * @param {string} element The tag element as '0x####'.
  */
 dwv.dicom.Tag = function (group, element) {
+  if (!group || typeof group === 'undefined') {
+    throw new Error('Cannot create tag with no group.');
+  }
+  if (group.length !== 6 || !group.startsWith('0x')) {
+    throw new Error('Cannot create tag with badly formed group.');
+  }
+  if (!element || typeof element === 'undefined') {
+    throw new Error('Cannot create tag with no element.');
+  }
+  if (element.length !== 6 || !element.startsWith('0x')) {
+    throw new Error('Cannot create tag with badly formed element.');
+  }
   /**
    * Get the tag group.
    *
@@ -36,41 +48,48 @@ dwv.dicom.Tag = function (group, element) {
  */
 dwv.dicom.Tag.prototype.equals = function (rhs) {
   return rhs !== null &&
+    typeof rhs !== 'undefined' &&
     this.getGroup() === rhs.getGroup() &&
     this.getElement() === rhs.getElement();
 };
 
 /**
- * Check for Tag equality.
+ * Tag compare function.
  *
- * @param {object} rhs The other tag to compare to provided as a simple object.
- * @returns {boolean} True if both tags are equal.
+ * @param {dwv.dicom.Tag} a The first tag.
+ * @param {dwv.dicom.Tag} b The second tag.
+ * @returns {number} The result of the tag comparison,
+ *   positive for b before a, negative for a before b and
+ *   zero to keep same order.
  */
-dwv.dicom.Tag.prototype.equals2 = function (rhs) {
-  if (rhs === null ||
-    typeof rhs.group === 'undefined' ||
-    typeof rhs.element === 'undefined') {
-    return false;
+dwv.dicom.tagCompareFunction = function (a, b) {
+  // first by group
+  var res = parseInt(a.getGroup()) - parseInt(b.getGroup());
+  if (res === 0) {
+    // by element if same group
+    res = parseInt(a.getElement()) - parseInt(b.getElement());
   }
-  return this.equals(new dwv.dicom.Tag(rhs.group, rhs.element));
+  return res;
 };
 
 /**
  * Get the group-element key used to store DICOM elements.
  *
- * @returns {string} The key.
+ * @returns {string} The key as 'x########'.
  */
 dwv.dicom.Tag.prototype.getKey = function () {
-  return 'x' + this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+  // group and element are in the '0x####' form
+  return 'x' + this.getGroup().substring(2) + this.getElement().substring(2);
 };
 
 /**
  * Get a simplified group-element key.
  *
- * @returns {string} The key.
+ * @returns {string} The key as '########'.
  */
 dwv.dicom.Tag.prototype.getKey2 = function () {
-  return this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+  // group and element are in the '0x####' form
+  return this.getGroup().substring(2) + this.getElement().substring(2);
 };
 
 /**
@@ -79,7 +98,9 @@ dwv.dicom.Tag.prototype.getKey2 = function () {
  * @returns {string} The name.
  */
 dwv.dicom.Tag.prototype.getGroupName = function () {
-  return dwv.dicom.TagGroups[this.getGroup().substr(1)];
+  // group is in the '0x####' form
+  // TagGroups include the x
+  return dwv.dicom.TagGroups[this.getGroup().substring(1)];
 };
 
 
@@ -90,7 +111,9 @@ dwv.dicom.Tag.prototype.getGroupName = function () {
  * @returns {object} The DICOM tag.
  */
 dwv.dicom.getTagFromKey = function (key) {
-  return new dwv.dicom.Tag(key.substr(1, 4), key.substr(5, 8));
+  return new dwv.dicom.Tag(
+    '0x' + key.substring(1, 5),
+    '0x' + key.substring(5, 9));
 };
 
 /**
@@ -114,7 +137,8 @@ dwv.dicom.Tag.prototype.isWithVR = function () {
  *   ie if its group is an odd number.
  */
 dwv.dicom.Tag.prototype.isPrivate = function () {
-  var groupNumber = parseInt(this.getGroup().substr(2, 6), 10);
+  // group is in the '0x####' form
+  var groupNumber = parseInt(this.getGroup().substring(2), 16);
   return groupNumber % 2 === 1;
 };
 
@@ -269,16 +293,18 @@ dwv.dicom.isPixelDataTag = function (tag) {
  * Get a tag from the dictionary using a tag string name.
  *
  * @param {string} tagName The tag string name.
- * @returns {object} The tag object.
+ * @returns {object|null} The tag object or null if not found.
  */
 dwv.dicom.getTagFromDictionary = function (tagName) {
+  if (typeof tagName === 'undefined' || tagName === null) {
+    return null;
+  }
   var group = null;
   var element = null;
   var dict = dwv.dicom.dictionary;
   var keys0 = Object.keys(dict);
   var keys1 = null;
-  // label for nested loop break
-  outLabel:
+  var foundTag = false;
   // search through dictionary
   for (var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
     group = keys0[k0];
@@ -286,12 +312,16 @@ dwv.dicom.getTagFromDictionary = function (tagName) {
     for (var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
       element = keys1[k1];
       if (dict[group][element][2] === tagName) {
-        break outLabel;
+        foundTag = true;
+        break;
       }
+    }
+    if (foundTag) {
+      break;
     }
   }
   var tag = null;
-  if (group !== null && element !== null) {
+  if (foundTag) {
     tag = new dwv.dicom.Tag(group, element);
   }
   return tag;

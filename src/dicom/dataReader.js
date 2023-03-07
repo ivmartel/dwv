@@ -45,33 +45,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     isLittleEndian = true;
   }
 
-  // Default text decoder
-  var defaultTextDecoder = {};
-  defaultTextDecoder.decode = function (buffer) {
-    var result = '';
-    for (var i = 0, leni = buffer.length; i < leni; ++i) {
-      result += String.fromCharCode(buffer[i]);
-    }
-    return result;
-  };
-
-  // Text decoder
-  var textDecoder = defaultTextDecoder;
-  if (typeof window.TextDecoder !== 'undefined') {
-    textDecoder = new TextDecoder('iso-8859-1');
-  }
-
-  /**
-   * Set the utfLabel used to construct the TextDecoder.
-   *
-   * @param {string} label The encoding label.
-   */
-  this.setUtfLabel = function (label) {
-    if (typeof window.TextDecoder !== 'undefined') {
-      textDecoder = new TextDecoder(label);
-    }
-  };
-
   /**
    * Is the Native endianness Little Endian.
    *
@@ -107,6 +80,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Read Int16 (2 bytes) data.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @returns {number} The read data.
+   */
+  this.readInt16 = function (byteOffset) {
+    return view.getInt16(byteOffset, isLittleEndian);
+  };
+
+  /**
    * Read Uint32 (4 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
@@ -117,6 +100,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Read BigUint64 (8 bytes) data.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @returns {number} The read data.
+   */
+  this.readBigUint64 = function (byteOffset) {
+    return view.getBigUint64(byteOffset, isLittleEndian);
+  };
+
+  /**
    * Read Int32 (4 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
@@ -124,6 +117,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    */
   this.readInt32 = function (byteOffset) {
     return view.getInt32(byteOffset, isLittleEndian);
+  };
+
+  /**
+   * Read BigInt64 (8 bytes) data.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @returns {number} The read data.
+   */
+  this.readBigInt64 = function (byteOffset) {
+    return view.getBigInt64(byteOffset, isLittleEndian);
   };
 
   /**
@@ -271,6 +274,32 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
+   * Read Uint64 array.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @param {number} size The size of the array.
+   * @returns {Array} The read data.
+   */
+  this.readUint64Array = function (byteOffset, size) {
+    var bpe = BigUint64Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
+    var data = null;
+    // byteOffset should be a multiple of BigUint64Array.BYTES_PER_ELEMENT (=8)
+    if (byteOffset % bpe === 0) {
+      data = new BigUint64Array(buffer, byteOffset, arraySize);
+      if (needFlip) {
+        dwv.dicom.flipArrayEndianness(data);
+      }
+    } else {
+      data = new BigUint64Array(arraySize);
+      for (var i = 0; i < arraySize; ++i) {
+        data[i] = this.readBigUint64(byteOffset + bpe * i);
+      }
+    }
+    return data;
+  };
+
+  /**
    * Read Int32 array.
    *
    * @param {number} byteOffset The offset to start reading from.
@@ -291,6 +320,32 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
       data = new Int32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
         data[i] = this.readInt32(byteOffset + bpe * i);
+      }
+    }
+    return data;
+  };
+
+  /**
+   * Read Int64 array.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @param {number} size The size of the array.
+   * @returns {Array} The read data.
+   */
+  this.readInt64Array = function (byteOffset, size) {
+    var bpe = BigInt64Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
+    var data = null;
+    // byteOffset should be a multiple of BigInt64Array.BYTES_PER_ELEMENT (=8)
+    if (byteOffset % bpe === 0) {
+      data = new BigInt64Array(buffer, byteOffset, arraySize);
+      if (needFlip) {
+        dwv.dicom.flipArrayEndianness(data);
+      }
+    } else {
+      data = new BigInt64Array(arraySize);
+      for (var i = 0; i < arraySize; ++i) {
+        data[i] = this.readBigInt64(byteOffset + bpe * i);
       }
     }
     return data;
@@ -347,32 +402,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     }
     return data;
   };
-
-  /**
-   * Read data as a string.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} nChars The number of characters to read.
-   * @returns {string} The read data.
-   */
-  this.readString = function (byteOffset, nChars) {
-    var data = this.readUint8Array(byteOffset, nChars);
-    return defaultTextDecoder.decode(data);
-  };
-
-  /**
-   * Read data as a 'special' string, decoding it if the
-   *   TextDecoder is available.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} nChars The number of characters to read.
-   * @returns {string} The read data.
-   */
-  this.readSpecialString = function (byteOffset, nChars) {
-    var data = this.readUint8Array(byteOffset, nChars);
-    return textDecoder.decode(data);
-  };
-
 }; // class DataReader
 
 /**
@@ -385,5 +414,5 @@ dwv.dicom.DataReader.prototype.readHex = function (byteOffset) {
   // read and convert to hex string
   var str = this.readUint16(byteOffset).toString(16);
   // return padded
-  return '0x0000'.substr(0, 6 - str.length) + str.toUpperCase();
+  return '0x0000'.substring(0, 6 - str.length) + str.toUpperCase();
 };
