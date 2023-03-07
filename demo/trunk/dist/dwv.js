@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-03-06 16:37:58 */
+/*! dwv 0.31.0-rc.0 2023-03-07 11:22:58 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -31814,24 +31814,6 @@ dwv.tool.Draw = function (app) {
 }; // Draw class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Draw.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Draw.name',
-    brief: 'tool.Draw.brief',
-    mouse: {
-      mouse_drag: 'tool.Draw.mouse_drag'
-    },
-    touch: {
-      touch_drag: 'tool.Draw.touch_drag'
-    }
-  };
-};
-
-/**
  * Check if the shape is in the shape list.
  *
  * @param {string} name The name of the shape.
@@ -33209,18 +33191,6 @@ dwv.tool.Filter = function (app) {
 }; // class dwv.tool.Filter
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Filter.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Filter.name',
-    brief: 'tool.Filter.brief'
-  };
-};
-
-/**
  * Get the selected filter.
  *
  * @returns {object} The selected filter.
@@ -34148,24 +34118,6 @@ dwv.tool.Floodfill = function (app) {
 }; // Floodfill class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Floodfill.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Floodfill.name',
-    brief: 'tool.Floodfill.brief',
-    mouse: {
-      click: 'tool.Floodfill.click'
-    },
-    touch: {
-      tap: 'tool.Floodfill.tap'
-    }
-  };
-};
-
-/**
  * Set the tool live features: shape colour.
  *
  * @param {object} features The list of features.
@@ -34773,18 +34725,6 @@ dwv.tool.Livewire = function (app) {
 }; // Livewire class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Livewire.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Livewire.name',
-    brief: 'tool.Livewire.brief'
-  };
-};
-
-/**
  * Set the tool live features: shape colour.
  *
  * @param {object} features The list of features.
@@ -34970,24 +34910,6 @@ dwv.tool.Opacity = function (app) {
   };
 
 }; // Opacity class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Opacity.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Opacity.name',
-    brief: 'tool.Opacity.brief',
-    mouse: {
-      mouse_drag: 'tool.Opacity.mouse_drag',
-    },
-    touch: {
-      touch_drag: 'tool.Opacity.touch_drag',
-    }
-  };
-};
 
 // namespaces
 var dwv = dwv || {};
@@ -36512,26 +36434,6 @@ dwv.tool.Scroll = function (app) {
 
 }; // Scroll class
 
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Scroll.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Scroll.name',
-    brief: 'tool.Scroll.brief',
-    mouse: {
-      mouse_drag: 'tool.Scroll.mouse_drag',
-      double_click: 'tool.Scroll.double_click'
-    },
-    touch: {
-      touch_drag: 'tool.Scroll.touch_drag',
-      tap_and_hold: 'tool.Scroll.tap_and_hold'
-    }
-  };
-};
-
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
@@ -36975,25 +36877,6 @@ dwv.tool.WindowLevel = function (app) {
 
 }; // WindowLevel class
 
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.WindowLevel.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.WindowLevel.name',
-    brief: 'tool.WindowLevel.brief',
-    mouse: {
-      mouse_drag: 'tool.WindowLevel.mouse_drag',
-      double_click: 'tool.WindowLevel.double_click'
-    },
-    touch: {
-      touch_drag: 'tool.WindowLevel.touch_drag'
-    }
-  };
-};
-
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
@@ -37239,26 +37122,6 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
 }; // ZoomAndPan class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.ZoomAndPan.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.ZoomAndPan.name',
-    brief: 'tool.ZoomAndPan.brief',
-    mouse: {
-      mouse_wheel: 'tool.ZoomAndPan.mouse_wheel',
-      mouse_drag: 'tool.ZoomAndPan.mouse_drag'
-    },
-    touch: {
-      twotouch_pinch: 'tool.ZoomAndPan.twotouch_pinch',
-      touch_drag: 'tool.ZoomAndPan.touch_drag'
-    }
-  };
-};
 
 /**
  * Initialise the tool.
