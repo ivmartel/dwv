@@ -1,13 +1,10 @@
-/*! dwv 0.31.0-rc.0 2023-02-24 10:37:41 */
+/*! dwv 0.31.0-rc.0 2023-03-07 16:14:48 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            'i18next',
-            'i18next-http-backend',
-            'i18next-browser-languagedetector',
             'jszip',
             'konva',
             'magic-wand-tool'
@@ -19,9 +16,6 @@
 
         // Konva: requires 'canvas'
         module.exports = factory(
-            require('i18next'),
-            require('i18next-http-backend'),
-            require('i18next-browser-languagedetector'),
             require('jszip'),
             require('konva/cmj'),
             require('magic-wand-tool')
@@ -29,18 +23,12 @@
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
-            root.i18next,
-            root.i18nextHttpBackend,
-            root.i18nextBrowserLanguageDetector,
             root.JSZip,
             root.Konva,
             root.MagicWand
         );
     }
 }(this, function (
-    i18next,
-    i18nextHttpBackend,
-    i18nextBrowserLanguageDetector,
     JSZip,
     Konva,
     MagicWand) {
@@ -56,16 +44,6 @@
     var isEsmModule = function (mod) {
       return typeof mod !== 'undefined' &&
         typeof mod.default !== 'undefined';
-    }
-    // i18next (>v17) comes as a module, see #862
-    if (isEsmModule(i18next)) {
-      i18next = i18next.default;
-    }
-    if (isEsmModule(i18nextHttpBackend)) {
-      i18nextHttpBackend = i18nextHttpBackend.default;
-    }
-    if (isEsmModule(i18nextBrowserLanguageDetector)) {
-      i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector.default;
     }
     // Konva (>=v8) comes as a module, see #1044
     if (isEsmModule(Konva)) {
@@ -1369,10 +1347,11 @@ dwv.App = function () {
     }
 
     // optional draw layer
+    var drawLayer;
     if (toolboxController && toolboxController.hasTool('Draw')) {
-      var dl = layerGroup.addDrawLayer();
-      dl.initialise(size2D, spacing2D, dataIndex);
-      dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
+      drawLayer = layerGroup.addDrawLayer();
+      drawLayer.initialise(size2D, spacing2D, dataIndex);
+      drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
     }
 
     // sync layers position
@@ -1399,11 +1378,17 @@ dwv.App = function () {
         // flip offset Y for axial aquired data
         if (dataViewConfig.orientation !== 'axial') {
           viewLayer.addFlipOffsetY();
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.addFlipOffsetY();
+          }
         }
       } else if (major === 0) {
         // flip offset X for sagittal aquired data
         if (dataViewConfig.orientation !== 'sagittal') {
           viewLayer.addFlipOffsetX();
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.addFlipOffsetX();
+          }
         }
       }
     }
@@ -1417,6 +1402,9 @@ dwv.App = function () {
           layerGroup.flipScaleZ();
         } else {
           viewLayer.setScale(layerGroup.getScale());
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.setScale(layerGroup.getScale());
+          }
         }
       } else {
         if (major === 0) {
@@ -1424,10 +1412,16 @@ dwv.App = function () {
           layerGroup.flipScaleZ();
         } else {
           viewLayer.setScale(layerGroup.getScale());
+          if (typeof drawLayer !== 'undefined') {
+            drawLayer.setScale(layerGroup.getScale());
+          }
         }
       }
     } else {
       viewLayer.setScale(layerGroup.getScale());
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.setScale(layerGroup.getScale());
+      }
     }
 
   }
@@ -12911,6 +12905,14 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var zoomOffset = {x: 0, y: 0};
 
   /**
+   * The flip offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var flipOffset = {x: 0, y: 0};
+
+  /**
    * The draw controller.
    *
    * @private
@@ -13027,6 +13029,36 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
+   * Add a flip offset along the layer X axis.
+   */
+  this.addFlipOffsetX = function () {
+    // flip scale is handled by layer group
+    // flip offset
+    var scale = konvaStage.scale();
+    var size = konvaStage.size();
+    flipOffset.x += size.width / scale.x;
+    // apply
+    var offset = konvaStage.offset();
+    offset.x += flipOffset.x;
+    konvaStage.offset(offset);
+  };
+
+  /**
+   * Add a flip offset along the layer Y axis.
+   */
+  this.addFlipOffsetY = function () {
+    // flip scale is handled by layer group
+    // flip offset
+    var scale = konvaStage.scale();
+    var size = konvaStage.size();
+    flipOffset.y += size.height / scale.y;
+    // apply
+    var offset = konvaStage.offset();
+    offset.y += flipOffset.y;
+    konvaStage.offset(offset);
+  };
+
+  /**
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
@@ -13093,8 +13125,10 @@ dwv.gui.DrawLayer = function (containerDiv) {
   this.setOffset = function (newOffset) {
     var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
     konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
+      x: planeNewOffset.x +
+        viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: planeNewOffset.y +
+        viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     });
   };
 
@@ -13221,8 +13255,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
       y: fitOffset.y / fitScale.y
     };
     konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y
+      x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
     });
   };
 
@@ -30887,6 +30921,37 @@ dwv.tool.Draw = function (app) {
   var lastPoint = null;
 
   /**
+   * Active shape, ie shape with mouse over.
+   *
+   * @private
+   * @type {object}
+   */
+  var activeShapeGroup;
+
+  /**
+   * Original mouse cursor.
+   *
+   * @private
+   * @type {string}
+   */
+  var originalCursor;
+
+  /**
+   * Mouse cursor.
+   *
+   * @private
+   * @type {string}
+   */
+  var mouseOverCursor = 'pointer';
+
+  /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Shape editor.
    *
    * @private
@@ -31154,6 +31219,15 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
+  };
+
+  /**
    * Handle key down event.
    *
    * @param {object} event The key down event.
@@ -31285,12 +31359,13 @@ dwv.tool.Draw = function (app) {
     shapeEditor.disable();
     shapeEditor.setShape(null);
     shapeEditor.setViewController(null);
-    document.body.style.cursor = 'default';
     // get the current draw layer
     var layerGroup = app.getActiveLayerGroup();
     activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
+      // store cursor
+      originalCursor = document.body.style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
       app.addEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
@@ -31298,6 +31373,11 @@ dwv.tool.Draw = function (app) {
       // same for colour
       this.setFeatures({lineColour: this.style.getLineColour()});
     } else {
+      // reset shape and cursor
+      resetActiveShapeGroup();
+      // reset local var
+      originalCursor = undefined;
+      // remove listeners
       app.removeEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
       });
@@ -31385,19 +31465,48 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
+   * Reset the active shape group and mouse cursor to their original state.
+   */
+  function resetActiveShapeGroup() {
+    if (typeof originalCursor !== 'undefined') {
+      document.body.style.cursor = originalCursor;
+    }
+    if (typeof activeShapeGroup !== 'undefined') {
+      activeShapeGroup.opacity(1);
+      var colour = self.style.getLineColour();
+      activeShapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
+        function (ashape) {
+          ashape.stroke(colour);
+        }
+      );
+    }
+  }
+
+  /**
    * Set shape group on properties.
    *
    * @param {object} shapeGroup The shape group to set on.
    * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   this.setShapeOn = function (shapeGroup, layerGroup) {
-    // mouse over styling
+    // adapt shape and cursor when mouse over
+    var mouseOnShape = function () {
+      document.body.style.cursor = mouseOverCursor;
+      shapeGroup.opacity(0.75);
+    };
+    // mouse over event hanlding
     shapeGroup.on('mouseover', function () {
-      document.body.style.cursor = 'pointer';
+      // save local vars
+      activeShapeGroup = shapeGroup;
+      // adapt shape
+      mouseOnShape();
     });
-    // mouse out styling
+    // mouse out event hanlding
     shapeGroup.on('mouseout', function () {
-      document.body.style.cursor = 'default';
+      // reset shape
+      resetActiveShapeGroup();
+      // reset local vars
+      activeShapeGroup = undefined;
     });
 
     var drawLayer = layerGroup.getActiveDrawLayer();
@@ -31487,9 +31596,14 @@ dwv.tool.Draw = function (app) {
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
-      var pos = {x: this.x(), y: this.y()};
       // remove trash
       trash.remove();
+      // activate(false) will also trigger a dragend.draw
+      if (typeof event === 'undefined' ||
+        typeof event.evt === 'undefined') {
+        return;
+      }
+      var pos = {x: this.x(), y: this.y()};
       // delete case
       var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset, layerGroup);
@@ -31510,7 +31624,7 @@ dwv.tool.Draw = function (app) {
             ashape.stroke(colour);
           });
         // reset cursor
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = originalCursor;
         // delete command
         var delcmd = new dwv.tool.DeleteGroupCommand(this,
           shapeDisplayName, konvaLayer);
@@ -31625,6 +31739,9 @@ dwv.tool.Draw = function (app) {
       }
       this.shapeName = features.shapeName;
     }
+    if (typeof features.mouseOverCursor !== 'undefined') {
+      mouseOverCursor = features.mouseOverCursor;
+    }
   };
 
   /**
@@ -31695,24 +31812,6 @@ dwv.tool.Draw = function (app) {
   }
 
 }; // Draw class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Draw.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Draw.name',
-    brief: 'tool.Draw.brief',
-    mouse: {
-      mouse_drag: 'tool.Draw.mouse_drag'
-    },
-    touch: {
-      touch_drag: 'tool.Draw.touch_drag'
-    }
-  };
-};
 
 /**
  * Check if the shape is in the shape list.
@@ -32202,6 +32301,7 @@ var Konva = Konva || {};
  * @returns {object} The default anchor shape.
  */
 dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
+  var radius = style.applyZoomScale(3);
   return new Konva.Ellipse({
     x: x,
     y: y,
@@ -32209,7 +32309,10 @@ dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
     fill: 'rgba(100,100,100,0.7',
     strokeWidth: style.getStrokeWidth(),
     strokeScaleEnabled: false,
-    radius: style.applyZoomScale(3),
+    radius: {
+      x: Math.abs(radius.x),
+      y: Math.abs(radius.y)
+    },
     name: 'anchor',
     id: id,
     dragOnTop: false,
@@ -33086,18 +33189,6 @@ dwv.tool.Filter = function (app) {
   }
 
 }; // class dwv.tool.Filter
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Filter.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Filter.name',
-    brief: 'tool.Filter.brief'
-  };
-};
 
 /**
  * Get the selected filter.
@@ -34027,24 +34118,6 @@ dwv.tool.Floodfill = function (app) {
 }; // Floodfill class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Floodfill.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Floodfill.name',
-    brief: 'tool.Floodfill.brief',
-    mouse: {
-      click: 'tool.Floodfill.click'
-    },
-    touch: {
-      tap: 'tool.Floodfill.tap'
-    }
-  };
-};
-
-/**
  * Set the tool live features: shape colour.
  *
  * @param {object} features The list of features.
@@ -34368,6 +34441,24 @@ dwv.tool.Livewire = function (app) {
   var scissors = new dwv.math.Scissors();
 
   /**
+   * Finish a livewire (roi) shape.
+   */
+  function finishShape() {
+    // fire creation event (was not propagated during draw)
+    fireEvent({
+      type: 'drawcreate',
+      id: shapeGroup.id()
+    });
+    // listen
+    command.onExecute = fireEvent;
+    command.onUndo = fireEvent;
+    // save command in undo stack
+    app.addToUndoStack(command);
+    // set flag
+    self.started = false;
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -34403,17 +34494,8 @@ dwv.tool.Livewire = function (app) {
       // final point: at 'tolerance' of the initial point
       if ((Math.abs(index.get(0) - self.x0) < tolerance) &&
         (Math.abs(index.get(1) - self.y0) < tolerance)) {
-        // draw
-        self.mousemove(event);
-        // listen
-        command.onExecute = fireEvent;
-        command.onUndo = fireEvent;
-        // debug
-        dwv.logger.debug('[livewire] finialise path.');
-        // save command in undo stack
-        app.addToUndoStack(command);
-        // set flag
-        self.started = false;
+        // finish
+        finishShape();
       } else {
         // anchor point
         path = currentPath;
@@ -34445,7 +34527,6 @@ dwv.tool.Livewire = function (app) {
     // do the work
     var results = 0;
     var stop = false;
-    dwv.logger.debug('[livewire] getting ready...');
     while (!parentPoints[p.y][p.x] && !stop) {
       results = scissors.doWork();
 
@@ -34460,7 +34541,6 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    dwv.logger.debug('[livewire] ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -34528,11 +34608,7 @@ dwv.tool.Livewire = function (app) {
    * @param {object} _event The double click event.
    */
   this.dblclick = function (_event) {
-    dwv.logger.debug('[livewire] dblclick');
-    // save command in undo stack
-    app.addToUndoStack(command);
-    // set flag
-    self.started = false;
+    finishShape();
   };
 
   /**
@@ -34649,18 +34725,6 @@ dwv.tool.Livewire = function (app) {
 }; // Livewire class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Livewire.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Livewire.name',
-    brief: 'tool.Livewire.brief'
-  };
-};
-
-/**
  * Set the tool live features: shape colour.
  *
  * @param {object} features The list of features.
@@ -34711,6 +34775,13 @@ dwv.tool.Opacity = function (app) {
    * @type {boolean}
    */
   this.started = false;
+
+  /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
 
   /**
    * Handle mouse down event.
@@ -34804,6 +34875,15 @@ dwv.tool.Opacity = function (app) {
   };
 
   /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
+  };
+
+  /**
    * Handle key down event.
    *
    * @param {object} event The key down event.
@@ -34830,24 +34910,6 @@ dwv.tool.Opacity = function (app) {
   };
 
 }; // Opacity class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Opacity.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Opacity.name',
-    brief: 'tool.Opacity.brief',
-    mouse: {
-      mouse_drag: 'tool.Opacity.mouse_drag',
-    },
-    touch: {
-      touch_drag: 'tool.Opacity.touch_drag',
-    }
-  };
-};
 
 // namespaces
 var dwv = dwv || {};
@@ -36097,11 +36159,11 @@ dwv.tool.Scroll = function (app) {
   var touchTimerID = null;
 
   /**
-   * Accumulated wheel event deltaY.
+   * Scroll wheel handler.
    *
-   * @type {number}
+   * @type {dwv.tool.ScrollWheel}
    */
-  var wheelDeltaY = 0;
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
 
   /**
    * Option to show or not a value tooltip on mousemove.
@@ -36266,36 +36328,7 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The mouse wheel event.
    */
   this.wheel = function (event) {
-    // deltaMode (deltaY values on my machine...):
-    // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
-    // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
-    // - 2 (DOM_DELTA_PAGE): ??
-    // TODO: check scroll event
-    var scrollMin = 52;
-    if (event.deltaMode === 1) {
-      scrollMin = 5.99;
-    }
-    wheelDeltaY += event.deltaY;
-    if (Math.abs(wheelDeltaY) < scrollMin) {
-      return;
-    } else {
-      wheelDeltaY = 0;
-    }
-
-    var up = false;
-    if (event.deltaY < 0) {
-      up = true;
-    }
-
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    if (up) {
-      viewController.incrementScrollIndex();
-    } else {
-      viewController.decrementScrollIndex();
-    }
+    scrollWhell.wheel(event);
   };
 
   /**
@@ -36401,25 +36434,69 @@ dwv.tool.Scroll = function (app) {
 
 }; // Scroll class
 
+// namespaces
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+
 /**
- * Help for this tool.
+ * Scroll wheel class: provides a wheel event handler
+ *   that scroll the corresponding data.
  *
- * @returns {object} The help content.
+ * @class
+ * @param {dwv.App} app The associated application.
  */
-dwv.tool.Scroll.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Scroll.name',
-    brief: 'tool.Scroll.brief',
-    mouse: {
-      mouse_drag: 'tool.Scroll.mouse_drag',
-      double_click: 'tool.Scroll.double_click'
-    },
-    touch: {
-      touch_drag: 'tool.Scroll.touch_drag',
-      tap_and_hold: 'tool.Scroll.tap_and_hold'
+dwv.tool.ScrollWheel = function (app) {
+  /**
+   * Accumulated wheel event deltaY.
+   *
+   * @type {number}
+   */
+  var wheelDeltaY = 0;
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    // deltaMode (deltaY values on my machine...):
+    // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
+    // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
+    // - 2 (DOM_DELTA_PAGE): ??
+    // TODO: check scroll event
+    var scrollMin = 52;
+    if (event.deltaMode === 1) {
+      scrollMin = 5.99;
+    }
+    wheelDeltaY += event.deltaY;
+    if (Math.abs(wheelDeltaY) < scrollMin) {
+      return;
+    } else {
+      wheelDeltaY = 0;
+    }
+
+    var up = event.deltaY < 0 ? true : false;
+
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var viewController =
+      layerGroup.getActiveViewLayer().getViewController();
+    var imageSize = viewController.getImageSize();
+    if (imageSize.canScroll3D()) {
+      if (up) {
+        viewController.incrementScrollIndex();
+      } else {
+        viewController.decrementScrollIndex();
+      }
+    } else if (imageSize.moreThanOne(3)) {
+      if (up) {
+        viewController.incrementIndex(3);
+      } else {
+        viewController.decrementIndex(3);
+      }
     }
   };
-};
+}; // ScrollWheel class
 
 // namespaces
 var dwv = dwv || {};
@@ -36625,6 +36702,13 @@ dwv.tool.WindowLevel = function (app) {
   this.started = false;
 
   /**
+   * Scroll wheel handler.
+   *
+   * @type {dwv.tool.ScrollWheel}
+   */
+  var scrollWhell = new dwv.tool.ScrollWheel(app);
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -36757,6 +36841,15 @@ dwv.tool.WindowLevel = function (app) {
   };
 
   /**
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
+  this.wheel = function (event) {
+    scrollWhell.wheel(event);
+  };
+
+  /**
    * Handle key down event.
    *
    * @param {object} event The key down event.
@@ -36783,25 +36876,6 @@ dwv.tool.WindowLevel = function (app) {
   };
 
 }; // WindowLevel class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.WindowLevel.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.WindowLevel.name',
-    brief: 'tool.WindowLevel.brief',
-    mouse: {
-      mouse_drag: 'tool.WindowLevel.mouse_drag',
-      double_click: 'tool.WindowLevel.double_click'
-    },
-    touch: {
-      touch_drag: 'tool.WindowLevel.touch_drag'
-    }
-  };
-};
 
 // namespaces
 var dwv = dwv || {};
@@ -37048,26 +37122,6 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
 }; // ZoomAndPan class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.ZoomAndPan.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.ZoomAndPan.name',
-    brief: 'tool.ZoomAndPan.brief',
-    mouse: {
-      mouse_wheel: 'tool.ZoomAndPan.mouse_wheel',
-      mouse_drag: 'tool.ZoomAndPan.mouse_drag'
-    },
-    touch: {
-      twotouch_pinch: 'tool.ZoomAndPan.twotouch_pinch',
-      touch_drag: 'tool.ZoomAndPan.touch_drag'
-    }
-  };
-};
 
 /**
  * Initialise the tool.
@@ -37979,189 +38033,29 @@ dwv.env.check = function () {
 
 // namespaces
 var dwv = dwv || {};
-/**
- * The i18next namespace.
- *
- * @external i18next
- * @see https://www.i18next.com
- */
-var i18next = i18next || {};
-/**
- * The i18nextHttpBackend namespace.
- *
- * @external i18nextHttpBackend
- * @see https://github.com/i18next/i18next-http-backend
- */
-var i18nextHttpBackend = i18nextHttpBackend || {};
-/**
- * The i18nextBrowserLanguageDetector namespace.
- *
- * @external i18nextBrowserLanguageDetector
- * @see https://github.com/i18next/i18next-browser-languageDetector
- */
-var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
-
-// This is mainly a wrapper around the i18next object.
-// see its API: http://i18next.com/docs/api/
-
-// global locales path
-dwv.i18nLocalesPath = null;
-
-/**
- * Initialise i18n.
- *
- * @param {string} language The language to translate to. Defaults to 'auto' and
- *   gets the language from the browser.
- * @param {string} localesPath Path to the locales directory.
- */
-dwv.i18nInitialise = function (language, localesPath) {
-  var lng = (typeof language === 'undefined') ? 'auto' : language;
-  var lpath = (typeof localesPath === 'undefined') ? '../..' : localesPath;
-  // store as global
-  dwv.i18nLocalesPath = lpath;
-  // i18n options: default 'en' language and
-  //  only load language, not specialised (for ex en-GB)
-  var options = {
-    fallbackLng: 'en',
-    load: 'languageOnly',
-    backend: {loadPath: lpath + '/locales/{{lng}}/{{ns}}.json'}
-  };
-    // use the HTTP backend to get translation files
-  var i18n = i18next.use(i18nextHttpBackend);
-  // use browser language or the specified one
-  if (lng === 'auto') {
-    i18n.use(i18nextBrowserLanguageDetector);
-  } else {
-    options.lng = lng;
-  }
-  // init i18n: will be ready when the 'loaded' event is fired
-  i18n.init(options);
-};
-
-/**
- * Initialise i18n with recources as input.
- *
- * @param {string} language The language to translate to. Defaults to 'auto' and
- *   gets the language from the browser.
- * @param {object} resources Languages provided as object.
- */
-dwv.i18nInitialiseWithResources = function (language, resources) {
-  var lng = (typeof language === 'undefined') ? 'auto' : language;
-  // i18n options: default 'en' language and
-  //  only load language, not specialised (for ex en-GB)
-  var options = {
-    fallbackLng: 'en',
-    load: 'languageOnly',
-    resources: resources
-  };
-    // use browser language or the specified one
-    // init i18n: will be ready when the 'loaded' event is fired
-  if (lng === 'auto') {
-    var i18n = i18next.use(i18nextBrowserLanguageDetector);
-    i18n.init(options);
-  } else {
-    options.lng = lng;
-    i18next.init(options);
-  }
-};
-
-/**
- * Handle i18n 'initialized' event.
- *
- * @param {object} callback The callback function to call when i18n
- *   is initialised.
- * It can take one argument that will be replaced with the i18n options.
- */
-dwv.i18nOnInitialised = function (callback) {
-  i18next.on('initialized', callback);
-};
-
-/**
- * Stop handling i18n load event.
- */
-dwv.i18nOffInitialised = function () {
-  i18next.off('initialized');
-};
-
-/**
- * Handle i18n failed load event.
- *
- * @param {object} callback The callback function to call when i18n is loaded.
- *  It can take three arguments: lng, ns and msg.
- */
-dwv.i18nOnFailedLoad = function (callback) {
-  i18next.on('failedLoading', callback);
-};
-
-/**
- * Stop handling i18n failed load event.
- */
-dwv.i18nOffFailedLoad = function () {
-  i18next.off('failedLoading');
-};
 
 /**
  * Get the translated text.
  *
  * @param {string} key The key to the text entry.
- * @param {object} options The translation options such as plural, context...
- * @returns {string} The translated text.
+ * @param {object} _options The translation options such as plural, context...
+ * @returns {string|undefined} The translated text.
  */
-dwv.i18n = function (key, options) {
-  return i18next.t(key, options);
-};
-
-/**
- * Check the existence of a translation.
- *
- * @param {string} key The key to the text entry.
- * @param {object} options The translation options such as plural, context...
- * @returns {boolean} True if the key has a translation.
- */
-dwv.i18nExists = function (key, options) {
-  return i18next.exists(key, options);
-};
-
-/**
- * Translate all data-i18n tags in the current html page. If an html tag defines
- * the data-i18n attribute, its value will be used as key to find its
- * corresponding text and will replace the content of the html tag.
- */
-dwv.i18nPage = function () {
-  // get all elements
-  var elements = document.getElementsByTagName('*');
-  // if the element defines data-i18n, replace its content with the tranlation
-  for (var i = 0; i < elements.length; ++i) {
-    if (typeof elements[i].dataset.i18n !== 'undefined') {
-      elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);
-    }
+dwv.i18n = function (key, _options) {
+  // defaut expects something like 'unit.cm2'
+  var unit = {
+    mm: 'mm',
+    cm2: 'cm²',
+    degree: '°'
+  };
+  var props = key.split('.');
+  if (props.length !== 2) {
+    throw new Error('Unexpected translation key length.');
   }
-};
-
-/**
- * Get the current locale resource path.
- * Warning: to be used once i18next is initialised.
- *
- * @param {string} filename The file to locate.
- * @returns {string} The path to the locale resource.
- */
-dwv.i18nGetLocalePath = function (filename) {
-  var lng = i18next.language.substring(0, 2);
-  return dwv.i18nLocalesPath +
-        '/locales/' + lng + '/' + filename;
-};
-
-/**
- * Get the current locale resource path.
- * Warning: to be used once i18next is initialised.
- *
- * @param {string} filename The file to locate.
- * @returns {string} The path to the locale resource.
- */
-dwv.i18nGetFallbackLocalePath = function (filename) {
-  var lng = i18next.languages[i18next.languages.length - 1].substring(0, 2);
-  return dwv.i18nLocalesPath +
-        '/locales/' + lng + '/' + filename;
+  if (props[0] !== 'unit') {
+    throw new Error('Unexpected translation key prefix.');
+  }
+  return unit[props[1]];
 };
 
 // namespaces
