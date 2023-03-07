@@ -47,6 +47,8 @@ WADO-RS is supported via the `MultipartLoader` since <font color="green">v0.31</
 
 The default `Accept` header should be something like: `multipart/related; type="application/dicom"; transfer-syntax=*'`.
 
+The `tests/pacs/dcmweb.html` test page allows to connect to an Orthanc instance and retrieve data from it.
+
 ### WADO-URI
 -> URI based (see [Part 3.18 sect 6.2](https://dicom.nema.org/dicom/2013/output/chtml/part18/sect_6.2.html))
 
@@ -64,8 +66,7 @@ Arguments follow regular URI standard.
  * `anonymise`: true or false.
  * If the type is image, then `rows`, `columns`, `windowWidth`, `windowCenter` and more can be specified.
 
-Example:
- * [dicom.vital-it.ch](http://dicom.vital-it.ch) (dead?): [JPEG2000 demo data](http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=2.16.840.1.113669.632.20.1211.10000744858&seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007)
+Example url:
  ```
 http://dicom.vital-it.ch:8089/wado?
     requestType=WADO&
@@ -74,7 +75,9 @@ http://dicom.vital-it.ch:8089/wado?
     seriesUID=1.3.6.1.4.1.19291.2.1.2.2413568109772100001&
     objectUID=1.3.6.1.4.1.19291.2.1.3.2413568110716100007
 ```
- * [dicomserver.co.uk](http://www.dicomserver.co.uk): [search](http://www.dicomserver.co.uk/wado/), example [brain data](http://www.dicomserver.co.uk/wado/WADO.asp?requestType=WADO&studyUID=0.0.0.0.2.8811.20010413115754.12432&seriesUID=0.0.0.0.3.8811.2.20010413115754.12432&objectUID=0.0.0.0.1.8811.2.19.20010413115754.12432&contentType=application/dicom) (open in [dwv](http://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html?input=http%3a%2f%2fwww.dicomserver.co.uk%2fwado%2fWADO.asp%3frequestType%3dWADO%26studyUID%3d0.0.0.0.2.8811.20010413115754.12432%26seriesUID%3d0.0.0.0.3.8811.2.20010413115754.12432%26objectUID%3d0.0.0.0.1.8811.2.19.20010413115754.12432%26contentType%3dapplication%2fdicom))
+
+Example server: [dicomserver.co.uk](http://www.dicomserver.co.uk), [search](http://www.dicomserver.co.uk/wado/).
+
 
 ## Pixel data
 File data storage, either one frame per file or multiple:
