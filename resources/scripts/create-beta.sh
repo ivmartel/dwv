@@ -53,13 +53,13 @@ if [ $step -eq 1 ]
 then
   info "(1/4) update version number in files"
 
-  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+\","
+  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+\","
   b0="  \"version\": \"${betaVersion}\","
   sed -i -r "s/${a0}/${b0}/g" package.json
-  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+';"
+  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+';"
   b1="  return '${betaVersion}';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
-  a2="[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+"
+  a2="[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+"
   b2="${betaVersion}"
   sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
 
