@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-rc.0 2023-03-07 17:13:56 */
+/*! dwv 0.32.0-beta.0 2023-03-07 18:18:35 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4749,7 +4749,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-rc.0';
+  return '0.32.0-beta.0';
 };
 
 /**
