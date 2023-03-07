@@ -19,11 +19,11 @@ usage() {
 }
 # print error message (red)
 error() {
-  echo -e "\033[31;31m[prep] $1\033[0m"
+  echo -e "\033[1;31m[prep] $1\033[0m"
 }
 # print info message (blue)
 info() {
-  echo -e "\033[34;34m[prep] $1\033[0m"
+  echo -e "\033[1;34m[prep] $1\033[0m"
 }
 
 # script step
