@@ -24,7 +24,7 @@
       "tutorials": "resources/doc/tutorials",
       "package": "package.json",
       "theme_opts": {
-        "title": "DWV doc",
+        "title": "DWV",
         "footer": "<i>Documentation generated for dwv v0.31.0-rc.0.</i>",
         "sections": [
           "Tutorials",
