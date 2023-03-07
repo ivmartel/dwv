@@ -397,18 +397,6 @@ dwv.tool.Livewire = function (app) {
 }; // Livewire class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Livewire.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Livewire.name',
-    brief: 'tool.Livewire.brief'
-  };
-};
-
-/**
  * Set the tool live features: shape colour.
  *
  * @param {object} features The list of features.

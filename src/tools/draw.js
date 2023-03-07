@@ -1001,24 +1001,6 @@ dwv.tool.Draw = function (app) {
 }; // Draw class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Draw.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Draw.name',
-    brief: 'tool.Draw.brief',
-    mouse: {
-      mouse_drag: 'tool.Draw.mouse_drag'
-    },
-    touch: {
-      touch_drag: 'tool.Draw.touch_drag'
-    }
-  };
-};
-
-/**
  * Check if the shape is in the shape list.
  *
  * @param {string} name The name of the shape.

@@ -521,24 +521,6 @@ dwv.tool.Floodfill = function (app) {
 }; // Floodfill class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Floodfill.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Floodfill.name',
-    brief: 'tool.Floodfill.brief',
-    mouse: {
-      click: 'tool.Floodfill.click'
-    },
-    touch: {
-      tap: 'tool.Floodfill.tap'
-    }
-  };
-};
-
-/**
  * Set the tool live features: shape colour.
  *
  * @param {object} features The list of features.

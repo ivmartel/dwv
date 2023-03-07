@@ -134,18 +134,6 @@ dwv.tool.Filter = function (app) {
 }; // class dwv.tool.Filter
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Filter.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Filter.name',
-    brief: 'tool.Filter.brief'
-  };
-};
-
-/**
  * Get the selected filter.
  *
  * @returns {object} The selected filter.

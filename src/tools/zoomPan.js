@@ -245,26 +245,6 @@ dwv.tool.ZoomAndPan = function (app) {
 }; // ZoomAndPan class
 
 /**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.ZoomAndPan.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.ZoomAndPan.name',
-    brief: 'tool.ZoomAndPan.brief',
-    mouse: {
-      mouse_wheel: 'tool.ZoomAndPan.mouse_wheel',
-      mouse_drag: 'tool.ZoomAndPan.mouse_drag'
-    },
-    touch: {
-      twotouch_pinch: 'tool.ZoomAndPan.twotouch_pinch',
-      touch_drag: 'tool.ZoomAndPan.touch_drag'
-    }
-  };
-};
-
-/**
  * Initialise the tool.
  */
 dwv.tool.ZoomAndPan.prototype.init = function () {

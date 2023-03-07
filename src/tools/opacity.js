@@ -173,21 +173,3 @@ dwv.tool.Opacity = function (app) {
   };
 
 }; // Opacity class
-
-/**
- * Help for this tool.
- *
- * @returns {object} The help content.
- */
-dwv.tool.Opacity.prototype.getHelpKeys = function () {
-  return {
-    title: 'tool.Opacity.name',
-    brief: 'tool.Opacity.brief',
-    mouse: {
-      mouse_drag: 'tool.Opacity.mouse_drag',
-    },
-    touch: {
-      touch_drag: 'tool.Opacity.touch_drag',
-    }
-  };
-};
