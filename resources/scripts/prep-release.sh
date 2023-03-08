@@ -61,6 +61,15 @@ fi
 
 info "Preparing release for '$releaseVersion' with previous version '$prevVersion'..."
 
+# ask about gren token
+read -n 1 -p "$(info 'Did you setup the GREN Github token? (y: continue) ')" grenSetup
+if [ "$grenSetup" != "y" ]
+then
+  info 'Exiting'
+  exit
+fi
+echo -e ""
+
 # branch name
 releaseBranch="v${releaseVersion}"
 
