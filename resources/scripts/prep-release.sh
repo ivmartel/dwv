@@ -17,13 +17,19 @@ usage() {
   echo ""
   exit 1 # Exit script after printing help
 }
+
+# messages
+PREFIX="[prep]"
+RESET_COLOR="\033[0m"
 # print error message (red)
+ERROR_COLOR="\033[1;91m"
 error() {
-  echo -e "\033[1;31m[prep] $1\033[0m"
+  echo -e $ERROR_COLOR$PREFIX' '$1$RESET_COLOR
 }
 # print info message (blue)
+INFO_COLOR="\033[1;94m"
 info() {
-  echo -e "\033[1;34m[prep] $1\033[0m"
+  echo -e $INFO_COLOR$PREFIX' '$1$RESET_COLOR
 }
 
 # script step
