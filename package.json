@@ -39,11 +39,11 @@
     "grunt-contrib-uglify": "^5.0.1",
     "grunt-contrib-watch": "^1.1.0",
     "jsdoc": "^4.0.0",
-    "karma": "^6.3.4",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-coverage": "^2.0.3",
+    "karma": "^6.4.1",
+    "karma-chrome-launcher": "^3.1.1",
+    "karma-coverage": "^2.2.0",
     "karma-qunit": "^4.1.2",
-    "qunit": "^2.15.0"
+    "qunit": "^2.19.4"
   },
   "scripts": {
     "lint": "eslint -c '.eslint-full.js' 'src/**/*.js' 'tests/**/*.js' '*.js'",
