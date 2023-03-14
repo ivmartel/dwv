@@ -1,4 +1,4 @@
-/*! dwv 0.32.0-beta.0 2023-03-14 10:30:40 */
+/*! dwv 0.32.0-beta.0 2023-03-14 11:36:06 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5764,7 +5764,10 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     // no VR -> no data
     data = [];
   } else {
-    dwv.logger.warn('Unknown VR: ' + vr);
+    dwv.logger.warn('Unknown VR: ' + vr +
+      ' (for tag ' + element.tag.getKey() + ')');
+    // empty data...
+    data = [];
   }
 
   return data;
