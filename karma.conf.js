@@ -1,15 +1,10 @@
 // Karma configuration file, see link for more information
-// https://karma-runner.github.io/1.0/config/configuration-file.html
+// https://karma-runner.github.io/6.4/config/configuration-file.html
 
 module.exports = function (config) {
   config.set({
     basePath: '.',
     frameworks: ['qunit'],
-    plugins: [
-      require('karma-qunit'),
-      require('karma-chrome-launcher'),
-      require('karma-coverage')
-    ],
     files: [
       // dependencies
       {pattern: 'node_modules/konva/konva.min.js', watched: false},
@@ -17,8 +12,9 @@ module.exports = function (config) {
       // benchmark
       {pattern: 'node_modules/lodash/lodash.min.js', watched: false},
       {pattern: 'node_modules/benchmark/benchmark.js', watched: false},
+      // decoders
+      {pattern: 'decoders/**/*.js', included: false},
       // test data
-      {pattern: 'locales/**/translation.json', included: false, type: 'js'},
       {pattern: 'tests/data/**/*.dcm', included: false},
       {pattern: 'tests/data/DICOMDIR', included: false},
       {pattern: 'tests/data/*.dcmdir', included: false},
@@ -33,7 +29,6 @@ module.exports = function (config) {
       {pattern: 'tests/image/pages/*.js', included: false},
       {pattern: 'tests/pacs/*.js', included: false},
       {pattern: 'tests/bench/*.js', included: false},
-      {pattern: 'decoders/**/*.js', included: false},
       {pattern: 'tests/utils/worker.js', included: false},
       {pattern: 'tests/visual/images/*.jpg', included: false},
       {pattern: 'tests/pacs/images/*.png', included: false},
@@ -46,7 +41,6 @@ module.exports = function (config) {
       'tests/dicom/*.js'
     ],
     proxies: {
-      '/locales/': '/base/locales/',
       '/tests/data/': '/base/tests/data/',
       '/tests/dicom/': '/base/tests/dicom/',
       '/tests/state/': '/base/tests/state/',
