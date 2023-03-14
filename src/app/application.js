@@ -489,8 +489,8 @@ dwv.App = function () {
    * @fires dwv.App#loadprogress
    * @fires dwv.App#loaditem
    * @fires dwv.App#loadend
-   * @fires dwv.App#error
-   * @fires dwv.App#abort
+   * @fires dwv.App#loaderror
+   * @fires dwv.App#loadabort
    */
   this.loadFiles = function (files) {
     if (files.length === 0) {
@@ -512,8 +512,8 @@ dwv.App = function () {
    * @fires dwv.App#loadprogress
    * @fires dwv.App#loaditem
    * @fires dwv.App#loadend
-   * @fires dwv.App#error
-   * @fires dwv.App#abort
+   * @fires dwv.App#loaderror
+   * @fires dwv.App#loadabort
    */
   this.loadURLs = function (urls, options) {
     if (urls.length === 0) {
@@ -532,8 +532,8 @@ dwv.App = function () {
    * @fires dwv.App#loadprogress
    * @fires dwv.App#loaditem
    * @fires dwv.App#loadend
-   * @fires dwv.App#error
-   * @fires dwv.App#abort
+   * @fires dwv.App#loaderror
+   * @fires dwv.App#loadabort
    */
   this.loadImageObject = function (data) {
     loadController.loadImageObject(data);
