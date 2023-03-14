@@ -10,17 +10,6 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    eslint: {
-      options: {
-        overrideConfigFile: '.eslint-full.js'
-      },
-      files: [
-        'Gruntfile.js',
-        'karma.conf.js',
-        'src/**/*.js',
-        'tests/**/*.js'
-      ]
-    },
     karma: {
       unit: {
         configFile: 'karma.conf.js',
@@ -81,14 +70,6 @@ module.exports = function (grunt) {
       }
     },
     watch: {
-      lint: {
-        files: ['**/*.js', '!**/node_modules/**'],
-        tasks: ['eslint'],
-        options: {
-          spawn: false,
-          livereload: true
-        }
-      },
       build: {
         files: ['**/*.js', '!**/node_modules/**'],
         tasks: ['concat', 'copy'],
@@ -103,11 +84,9 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-karma');
 
   // tasks
-  grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('test-ci', ['karma:ci']);
   grunt.registerTask('build', ['concat', 'uglify']);
