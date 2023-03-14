@@ -18,7 +18,7 @@ export interface IFrame {
     lastTime: number;
     frameRate: number;
 }
-export declare type AnimationFn = (frame?: IFrame) => boolean | void;
+export type AnimationFn = (frame?: IFrame) => boolean | void;
 export declare enum KonvaNodeEvent {
     mouseover = "mouseover",
     mouseout = "mouseout",
