@@ -1024,7 +1024,10 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     // no VR -> no data
     data = [];
   } else {
-    dwv.logger.warn('Unknown VR: ' + vr);
+    dwv.logger.warn('Unknown VR: ' + vr +
+      ' (for tag ' + element.tag.getKey() + ')');
+    // empty data...
+    data = [];
   }
 
   return data;
