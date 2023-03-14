@@ -2,30 +2,9 @@ module.exports = function (grunt) {
   // copy target for dev deploy
   // call: yarn run dev --copy-target=../dwv-jqui
   var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
-  // karma ci test coverage
-  var karmaCiReporters = ['progress'];
-  if (grunt.option('coverage')) {
-    karmaCiReporters.push('coverage');
-  }
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    karma: {
-      unit: {
-        configFile: 'karma.conf.js',
-        client: {
-          qunit: {
-            filter: grunt.option('filter')
-          }
-        }
-      },
-      ci: {
-        configFile: 'karma.conf.js',
-        browsers: ['ChromeHeadless'],
-        reporters: karmaCiReporters,
-        singleRun: true
-      }
-    },
     concat: {
       options: {
         banner: '/*!' +
@@ -84,11 +63,8 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-karma');
 
   // tasks
-  grunt.registerTask('test', ['karma:unit']);
-  grunt.registerTask('test-ci', ['karma:ci']);
   grunt.registerTask('build', ['concat', 'uglify']);
   grunt.registerTask('dev', ['watch:build']);
 };

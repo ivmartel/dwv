@@ -38,7 +38,6 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-uglify": "^5.0.1",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-karma": "^4.0.2",
     "jsdoc": "^4.0.0",
     "karma": "^6.3.4",
     "karma-chrome-launcher": "^3.1.0",
@@ -48,8 +47,8 @@
   },
   "scripts": {
     "lint": "eslint -c '.eslint-full.js' 'src/**/*.js' 'tests/**/*.js' '*.js'",
-    "test": "grunt test",
-    "test-ci": "grunt test-ci --coverage",
+    "test": "karma start ./karma.conf.js",
+    "test-ci": "karma start ./karma.conf.js --browsers ChromeHeadless --reporters progress,coverage --single-run",
     "build": "grunt build",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "dev": "grunt dev",
