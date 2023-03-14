@@ -2270,7 +2270,7 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-grunt-cli@^1.4.2, grunt-cli@~1.4.3:
+grunt-cli@^1.4.3, grunt-cli@~1.4.3:
   version "1.4.3"
   resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.4.3.tgz#22c9f1a3d2780bf9b0d206e832e40f8f499175ff"
   integrity sha512-9Dtx/AhVeB4LYzsViCjUQkd0Kw0McN2gYpdmGYKtE2a5Yt7v1Q+HYZVWhqXc/kGnxlMtqKDxSwotiGeFmkrCoQ==
@@ -2281,7 +2281,7 @@ grunt-cli@^1.4.2, grunt-cli@~1.4.3:
     nopt "~4.0.1"
     v8flags "~3.2.0"
 
-grunt-contrib-concat@^2.0.0:
+grunt-contrib-concat@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/grunt-contrib-concat/-/grunt-contrib-concat-2.1.0.tgz#9ac62117a18b48d1bfccb3eef46c960bbd163d75"
   integrity sha512-Vnl95JIOxfhEN7bnYIlCgQz41kkbi7tsZ/9a4usZmxNxi1S2YAIOy8ysFmO8u4MN26Apal1O106BwARdaNxXQw==
@@ -2297,7 +2297,7 @@ grunt-contrib-copy@^1.0.0:
     chalk "^1.1.1"
     file-sync-cmp "^0.1.0"
 
-grunt-contrib-uglify@^5.0.1:
+grunt-contrib-uglify@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/grunt-contrib-uglify/-/grunt-contrib-uglify-5.2.2.tgz#447c0b58451a1fca20768371e07e723a870dfe98"
   integrity sha512-ITxiWxrjjP+RZu/aJ5GLvdele+sxlznh+6fK9Qckio5ma8f7Iv8woZjRkGfafvpuygxNefOJNc+hfjjBayRn2Q==
@@ -2353,7 +2353,7 @@ grunt-legacy-util@~2.0.1:
     underscore.string "~3.3.5"
     which "~2.0.2"
 
-grunt@^1.4.0:
+grunt@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/grunt/-/grunt-1.6.1.tgz#0b4dd1524f26676dcf45d8f636b8d9061a8ede16"
   integrity sha512-/ABUy3gYWu5iBmrUSRBP97JLpQUm0GgVveDCp6t3yRNIoltIYw7rEj3g5y1o2PGPR2vfTRGa7WC/LZHLTXnEzA==
