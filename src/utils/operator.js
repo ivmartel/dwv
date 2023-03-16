@@ -1,7 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-dwv.utils = dwv.utils || {};
-
 /**
  * Check if the input is a generic object, including arrays.
  *
@@ -9,10 +5,10 @@ dwv.utils = dwv.utils || {};
  * @returns {boolean} True if the input is an object.
  * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1319-L1323
  */
-dwv.utils.isObject = function (unknown) {
+export function isObject(unknown) {
   var type = typeof unknown;
   return type === 'function' || type === 'object' && !!unknown;
-};
+}
 
 /**
  * Check if the input is an array.
@@ -21,9 +17,9 @@ dwv.utils.isObject = function (unknown) {
  * @returns {boolean} True if the input is an array.
  * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1313-L1317
  */
-dwv.utils.isArray = function (unknown) {
+export function isArray(unknown) {
   return Array.isArray(unknown);
-};
+}
 
 /**
  * Dump an object to an array.
@@ -32,7 +28,7 @@ dwv.utils.isArray = function (unknown) {
  * @returns {Array} The corresponding array:
  *   [{name: key0, {}}, {name: key1, {}}]
  */
-dwv.utils.objectToArray = function (obj) {
+export function objectToArray(obj) {
   var array = [];
   var keys = Object.keys(obj);
   for (var i = 0; i < keys.length; ++i) {
@@ -42,25 +38,25 @@ dwv.utils.objectToArray = function (obj) {
     for (var j = 0; j < innerKeys.length; ++j) {
       var innerKey = innerKeys[j];
       var value = obj[key][innerKey];
-      if (dwv.utils.isArray(value)) {
+      if (isArray(value)) {
         var arrayValues = [];
         for (var k = 0; k < value.length; ++k) {
-          if (dwv.utils.isObject(value[k])) {
-            arrayValues.push(dwv.utils.objectToArray(value[k]));
+          if (isObject(value[k])) {
+            arrayValues.push(objectToArray(value[k]));
           } else {
             arrayValues.push(value[k]);
           }
         }
         value = arrayValues;
-      } else if (dwv.utils.isObject(value)) {
-        value = dwv.utils.objectToArray(value);
+      } else if (isObject(value)) {
+        value = objectToArray(value);
       }
       row[innerKey] = value;
     }
     array.push(row);
   }
   return array;
-};
+}
 
 /**
  * Merge two similar objects.
@@ -95,7 +91,7 @@ dwv.utils.objectToArray = function (obj) {
  * @param {string} valueKey The key to use to access object values.
  * @returns {object} The merged object.
  */
-dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
+export function mergeObjects(obj1, obj2, idKey, valueKey) {
   var res = {};
   // check id key
   if (!idKey) {
@@ -190,7 +186,7 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
         value = {};
         // add to merged object or create new
         if (mergedObj1) {
-          if (dwv.utils.isObject(subValue1)) {
+          if (isObject(subValue1)) {
             value[valueKey] = subValue1;
           } else {
             // merged object with repeated value
@@ -217,4 +213,4 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
     }
   }
   return res;
-};
+}

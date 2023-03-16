@@ -1,6 +1,4 @@
-// namespaces
-var dwv = dwv || {};
-dwv.utils = dwv.utils || {};
+import {stringToUint8Array} from './string';
 
 /**
  * Check for array equality after sorting.
@@ -9,7 +7,7 @@ dwv.utils = dwv.utils || {};
  * @param {*} arr1 Second array.
  * @returns {boolean} True if both array are defined and contain same values.
  */
-dwv.utils.arraySortEquals = function (arr0, arr1) {
+export function arraySortEquals(arr0, arr1) {
   if (arr0 === null ||
     arr1 === null ||
     typeof arr0 === 'undefined' ||
@@ -18,8 +16,8 @@ dwv.utils.arraySortEquals = function (arr0, arr1) {
   }
   var arr0sorted = arr0.slice().sort();
   var arr1sorted = arr1.slice().sort();
-  return dwv.utils.arrayEquals(arr0sorted, arr1sorted);
-};
+  return arrayEquals(arr0sorted, arr1sorted);
+}
 
 /**
  * Check for array equality.
@@ -28,7 +26,7 @@ dwv.utils.arraySortEquals = function (arr0, arr1) {
  * @param {*} arr1 Second array.
  * @returns {boolean} True if both array are defined and contain same values.
  */
-dwv.utils.arrayEquals = function (arr0, arr1) {
+export function arrayEquals(arr0, arr1) {
   if (arr0 === null ||
     arr1 === null ||
     typeof arr0 === 'undefined' ||
@@ -41,7 +39,7 @@ dwv.utils.arrayEquals = function (arr0, arr1) {
   return arr0.every(function (element, index) {
     return element === arr1[index];
   });
-};
+}
 
 /**
  * Convert a Uint8Array to a string.
@@ -49,9 +47,9 @@ dwv.utils.arrayEquals = function (arr0, arr1) {
  * @param {Uint8Array} arr The array to convert.
  * @returns {string} The array as string.
  */
-dwv.utils.uint8ArrayToString = function (arr) {
+export function uint8ArrayToString(arr) {
   return String.fromCharCode.apply(String, arr);
-};
+}
 
 /**
  * Array find in a subset of the input array.
@@ -63,7 +61,7 @@ dwv.utils.uint8ArrayToString = function (arr) {
  * @param {number} end The array end index.
  * @returns {number|undefined} The index where the element was found.
  */
-dwv.utils.findInArraySubset = function (arr, callbackFn, start, end) {
+export function findInArraySubset(arr, callbackFn, start, end) {
   // check inputs
   if (typeof start === 'undefined' ||
     start < 0 ||
@@ -83,7 +81,7 @@ dwv.utils.findInArraySubset = function (arr, callbackFn, start, end) {
     }
   }
   return undefined;
-};
+}
 
 /**
  * Get a find in array callback.
@@ -91,7 +89,7 @@ dwv.utils.findInArraySubset = function (arr, callbackFn, start, end) {
  * @param {Array} arr1 The array to find.
  * @returns {Function} The find callback function.
  */
-dwv.utils.getFindArrayInArrayCallback = function (arr1) {
+export function getFindArrayInArrayCallback(arr1) {
   return function (element, index, arr0) {
     for (var i = 0; i < arr1.length; ++i) {
       if (arr0[index + i] !== arr1[i]) {
@@ -100,7 +98,7 @@ dwv.utils.getFindArrayInArrayCallback = function (arr1) {
     }
     return true;
   };
-};
+}
 
 /**
  * Extract each element of a multipart ArrayBuffer.
@@ -110,7 +108,7 @@ dwv.utils.getFindArrayInArrayCallback = function (arr1) {
  * @returns {Array} The multipart parts as an array of object as
  *  {'Content-Type', ..., data} (depending on header tags)
  */
-dwv.utils.parseMultipart = function (arr) {
+export function parseMultipart(arr) {
   var u8Array = new Uint8Array(arr);
 
   var parts = [];
@@ -121,10 +119,10 @@ dwv.utils.parseMultipart = function (arr) {
 
   // \r\n\r\n
   var doubleReturnNew = new Uint8Array([0x0d, 0x0a, 0x0d, 0x0a]);
-  var partHeaderEndCb = dwv.utils.getFindArrayInArrayCallback(doubleReturnNew);
+  var partHeaderEndCb = getFindArrayInArrayCallback(doubleReturnNew);
 
   // look for boundary in first part header
-  var partHeaderEndIndex = dwv.utils.findInArraySubset(
+  var partHeaderEndIndex = findInArraySubset(
     u8Array, partHeaderEndCb, 0
   );
   if (typeof partHeaderEndIndex === 'undefined') {
@@ -132,7 +130,7 @@ dwv.utils.parseMultipart = function (arr) {
   }
   var firstPartHeader = u8Array.slice(0, partHeaderEndIndex);
   // switch to string to use split
-  var lines = dwv.utils.uint8ArrayToString(firstPartHeader).split('\r\n');
+  var lines = uint8ArrayToString(firstPartHeader).split('\r\n');
   // boundary should start with '--'
   var boundaryStr;
   for (var i = 0; i < lines.length; ++i) {
@@ -144,12 +142,12 @@ dwv.utils.parseMultipart = function (arr) {
   if (typeof boundaryStr === 'undefined') {
     throw new Error('Can\'t find the boundary between multi-parts');
   }
-  var boundary = dwv.utils.stringToUint8Array(boundaryStr);
-  var boundaryCb = dwv.utils.getFindArrayInArrayCallback(boundary);
+  var boundary = stringToUint8Array(boundaryStr);
+  var boundaryCb = getFindArrayInArrayCallback(boundary);
   var boundaryLen = boundaryStr.length;
 
   // skip mime header
-  var nextBoundaryIndex = dwv.utils.findInArraySubset(
+  var nextBoundaryIndex = findInArraySubset(
     u8Array, boundaryCb, 0
   );
 
@@ -162,7 +160,7 @@ dwv.utils.parseMultipart = function (arr) {
       nextBoundaryIndex + boundaryLen, partHeaderEndIndex);
     // split into object
     var partHeaderLines =
-      dwv.utils.uint8ArrayToString(partHeader).split('\r\n');
+      uint8ArrayToString(partHeader).split('\r\n');
     for (var l = 0; l < partHeaderLines.length; ++l) {
       var line = partHeaderLines[l];
       var semiColonIndex = line.indexOf(':');
@@ -174,7 +172,7 @@ dwv.utils.parseMultipart = function (arr) {
     }
 
     // find next boundary
-    nextBoundaryIndex = dwv.utils.findInArraySubset(
+    nextBoundaryIndex = findInArraySubset(
       u8Array, boundaryCb, partHeaderEndIndex
     );
     // exit if none
@@ -197,14 +195,14 @@ dwv.utils.parseMultipart = function (arr) {
     parts.push(part);
 
     // find next part header end
-    partHeaderEndIndex = dwv.utils.findInArraySubset(
+    partHeaderEndIndex = findInArraySubset(
       u8Array, partHeaderEndCb,
       nextBoundaryIndex + boundaryLen
     );
   }
 
   return parts;
-};
+}
 
 /**
  * Build a multipart message.
@@ -216,7 +214,7 @@ dwv.utils.parseMultipart = function (arr) {
  * @param {string} boundary The message boundary.
  * @returns {Uint8Array} The full multipart message.
  */
-dwv.utils.buildMultipart = function (parts, boundary) {
+export function buildMultipart(parts, boundary) {
   var lineBreak = '\r\n';
   // build headers and calculate size
   var partsSize = 0;
@@ -235,13 +233,13 @@ dwv.utils.buildMultipart = function (parts, boundary) {
       }
     }
     headerStr += lineBreak;
-    var header = dwv.utils.stringToUint8Array(headerStr);
+    var header = stringToUint8Array(headerStr);
     headers.push(header);
     partsSize += header.byteLength + parts[i].data.byteLength;
   }
   // build trailer
   var trailerStr = lineBreak + '--' + boundary + '--' + lineBreak;
-  var trailer = dwv.utils.stringToUint8Array(trailerStr);
+  var trailer = stringToUint8Array(trailerStr);
 
   // final buffer
   var buffer = new Uint8Array(partsSize + trailer.byteLength);
@@ -258,4 +256,4 @@ dwv.utils.buildMultipart = function (parts, boundary) {
 
   // return
   return buffer;
-};
+}

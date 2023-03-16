@@ -1,3 +1,13 @@
+import {
+  capitaliseFirstLetter,
+  startsWith,
+  endsWith,
+  getFlags,
+  replaceFlags,
+  getFileExtension,
+  precisionRound
+} from '../../src/utils/string';
+
 /**
  * Tests for the 'utils/string' file.
  */
@@ -5,300 +15,300 @@
 /* global QUnit */
 
 /**
- * Tests for {@link dwv.utils.capitaliseFirstLetter}.
+ * Tests for {@link capitaliseFirstLetter}.
  *
  * @function module:tests/utils~capitaliseFirstLetter
  */
 QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
   // undefined
-  assert.equal(dwv.utils.capitaliseFirstLetter(), null, 'Capitalise undefined');
+  assert.equal(capitaliseFirstLetter(), null, 'Capitalise undefined');
   // null
-  assert.equal(dwv.utils.capitaliseFirstLetter(null), null, 'Capitalise null');
+  assert.equal(capitaliseFirstLetter(null), null, 'Capitalise null');
   // empty
-  assert.equal(dwv.utils.capitaliseFirstLetter(''), '', 'Capitalise empty');
+  assert.equal(capitaliseFirstLetter(''), '', 'Capitalise empty');
   // short
   assert.equal(
-    dwv.utils.capitaliseFirstLetter('a'), 'A', 'Capitalise one letter');
+    capitaliseFirstLetter('a'), 'A', 'Capitalise one letter');
   // space first
-  assert.equal(dwv.utils.capitaliseFirstLetter(' a'), ' a', 'Capitalise space');
+  assert.equal(capitaliseFirstLetter(' a'), ' a', 'Capitalise space');
   // regular
   assert.equal(
-    dwv.utils.capitaliseFirstLetter('dicom'), 'Dicom', 'Capitalise regular');
+    capitaliseFirstLetter('dicom'), 'Dicom', 'Capitalise regular');
   assert.equal(
-    dwv.utils.capitaliseFirstLetter('Dicom'),
+    capitaliseFirstLetter('Dicom'),
     'Dicom',
     'Capitalise regular no need');
   // with spaces
   assert.equal(
-    dwv.utils.capitaliseFirstLetter('le ciel est bleu'),
+    capitaliseFirstLetter('le ciel est bleu'),
     'Le ciel est bleu',
     'Capitalise sentence');
 });
 
 /**
- * Tests for {@link dwv.utils.startsWith}.
+ * Tests for {@link startsWith}.
  *
  * @function module:tests/utils~startsWith
  */
 QUnit.test('Test StartsWith.', function (assert) {
   // undefined
-  assert.equal(dwv.utils.startsWith(), false, 'StartsWith undefined');
+  assert.equal(startsWith(), false, 'StartsWith undefined');
   assert.equal(
-    dwv.utils.startsWith('test'),
+    startsWith('test'),
     false, 'StartsWith start undefined');
   // null
-  assert.equal(dwv.utils.startsWith(null), false, 'StartsWith null');
+  assert.equal(startsWith(null), false, 'StartsWith null');
   assert.equal(
-    dwv.utils.startsWith('test', null),
+    startsWith('test', null),
     false, 'StartsWith start null');
   // empty
-  assert.equal(dwv.utils.startsWith('', ''), true, 'StartsWith empty');
+  assert.equal(startsWith('', ''), true, 'StartsWith empty');
   assert.equal(
-    dwv.utils.startsWith('test', ''),
+    startsWith('test', ''),
     true, 'StartsWith start empty');
   // short
-  assert.equal(dwv.utils.startsWith('a', 'a'), true, 'StartsWith one letter');
+  assert.equal(startsWith('a', 'a'), true, 'StartsWith one letter');
   assert.equal(
-    dwv.utils.startsWith('a', 'A'),
+    startsWith('a', 'A'),
     false,
     'StartsWith one letter case sensitive');
   // start bigger than input
   assert.equal(
-    dwv.utils.startsWith('a', 'aba'),
+    startsWith('a', 'aba'),
     false, 'StartsWith large start');
   // space
   assert.equal(
-    dwv.utils.startsWith(' test', ' '),
+    startsWith(' test', ' '),
     true, 'StartsWith start space');
   assert.equal(
-    dwv.utils.startsWith(' test', 'a'),
+    startsWith(' test', 'a'),
     false, 'StartsWith with space');
   // regular
   assert.equal(
-    dwv.utils.startsWith('Winter is coming.', 'W'), true, 'StartsWith test#0');
+    startsWith('Winter is coming.', 'W'), true, 'StartsWith test#0');
   assert.equal(
-    dwv.utils.startsWith('Winter is coming.', 'Winter'),
+    startsWith('Winter is coming.', 'Winter'),
     true, 'StartsWith test#1');
   assert.equal(
-    dwv.utils.startsWith('Winter is coming.', 'WINT'),
+    startsWith('Winter is coming.', 'WINT'),
     false, 'StartsWith test#2');
   assert.equal(
-    dwv.utils.startsWith('Winter is coming.', 'Winter is'),
+    startsWith('Winter is coming.', 'Winter is'),
     true, 'StartsWith test#3');
   assert.equal(
-    dwv.utils.startsWith('Winter is coming.', 'Winter is coming.'),
+    startsWith('Winter is coming.', 'Winter is coming.'),
     true, 'StartsWith test#4');
 });
 
 /**
- * Tests for {@link dwv.utils.endsWith}.
+ * Tests for {@link endsWith}.
  *
  * @function module:tests/utils~endsWith
  */
 QUnit.test('Test EndsWith.', function (assert) {
   // undefined
-  assert.equal(dwv.utils.endsWith(), false, 'EndsWith undefined');
-  assert.equal(dwv.utils.endsWith('test'), false, 'EndsWith end undefined');
+  assert.equal(endsWith(), false, 'EndsWith undefined');
+  assert.equal(endsWith('test'), false, 'EndsWith end undefined');
   // null
-  assert.equal(dwv.utils.endsWith(null), false, 'EndsWith null');
-  assert.equal(dwv.utils.endsWith('test', null), false, 'EndsWith end null');
+  assert.equal(endsWith(null), false, 'EndsWith null');
+  assert.equal(endsWith('test', null), false, 'EndsWith end null');
   // empty
-  assert.equal(dwv.utils.endsWith('', ''), true, 'EndsWith empty');
-  assert.equal(dwv.utils.endsWith('test', ''), true, 'EndsWith end empty');
+  assert.equal(endsWith('', ''), true, 'EndsWith empty');
+  assert.equal(endsWith('test', ''), true, 'EndsWith end empty');
   // short
-  assert.equal(dwv.utils.endsWith('a', 'a'), true, 'EndsWith one letter');
+  assert.equal(endsWith('a', 'a'), true, 'EndsWith one letter');
   assert.equal(
-    dwv.utils.endsWith('a', 'A'),
+    endsWith('a', 'A'),
     false,
     'EndsWith one letter case sensitive');
   // end bigger than input
-  assert.equal(dwv.utils.endsWith('a', 'aba'), false, 'EndsWith large end');
+  assert.equal(endsWith('a', 'aba'), false, 'EndsWith large end');
   // space
-  assert.equal(dwv.utils.endsWith('test ', ' '), true, 'EndsWith end space');
-  assert.equal(dwv.utils.endsWith('test ', 'a'), false, 'EndsWith with space');
+  assert.equal(endsWith('test ', ' '), true, 'EndsWith end space');
+  assert.equal(endsWith('test ', 'a'), false, 'EndsWith with space');
   // regular
   assert.equal(
-    dwv.utils.endsWith('Winter is coming.', '.'), true, 'EndsWith test#0');
+    endsWith('Winter is coming.', '.'), true, 'EndsWith test#0');
   assert.equal(
-    dwv.utils.endsWith('Winter is coming.', 'coming.'),
+    endsWith('Winter is coming.', 'coming.'),
     true, 'EndsWith test#1');
   assert.equal(
-    dwv.utils.endsWith('Winter is coming.', 'ING.'),
+    endsWith('Winter is coming.', 'ING.'),
     false, 'EndsWith test#2');
   assert.equal(
-    dwv.utils.endsWith('Winter is coming.', 'is coming.'),
+    endsWith('Winter is coming.', 'is coming.'),
     true, 'EndsWith test#3');
   assert.equal(
-    dwv.utils.endsWith('Winter is coming.', 'Winter is coming.'),
+    endsWith('Winter is coming.', 'Winter is coming.'),
     true, 'EndsWith test#4');
 });
 
 /**
- * Tests for {@link dwv.utils.getFlags}.
+ * Tests for {@link getFlags}.
  *
  * @function module:tests/utils~getFlags
  */
 QUnit.test('Test getFlags.', function (assert) {
   // empty
   assert.equal(
-    dwv.utils.getFlags('').length, 0, 'getFlags empty');
+    getFlags('').length, 0, 'getFlags empty');
   // null
   assert.equal(
-    dwv.utils.getFlags(null).length, 0, 'getFlags null');
+    getFlags(null).length, 0, 'getFlags null');
   // undefined
   assert.equal(
-    dwv.utils.getFlags().length, 0, 'getFlags undefined');
+    getFlags().length, 0, 'getFlags undefined');
   // nothing to do
   var str00 = 'abcd';
   assert.equal(
-    dwv.utils.getFlags(str00).length, 0, 'getFlags nothing to do');
+    getFlags(str00).length, 0, 'getFlags nothing to do');
   // empty braces
   var str01 = '{}';
   assert.equal(
-    dwv.utils.getFlags(str01).length, 0, 'getFlags empty braces');
+    getFlags(str01).length, 0, 'getFlags empty braces');
 
   // real #0
   var str10 = '{a}';
   assert.equal(
-    dwv.utils.getFlags(str10)[0], 'a', 'getFlags #0');
+    getFlags(str10)[0], 'a', 'getFlags #0');
   // real #1
   var str11 = 'aaa{a}aaa';
   assert.equal(
-    dwv.utils.getFlags(str11)[0], 'a', 'getFlags #1');
+    getFlags(str11)[0], 'a', 'getFlags #1');
   // real #2
   var str12 = '{a}-{b}-{c}';
-  var res12 = dwv.utils.getFlags(str12);
+  var res12 = getFlags(str12);
   assert.equal(res12[0], 'a', 'getFlags #2.0');
   assert.equal(res12[1], 'b', 'getFlags #2.1');
   assert.equal(res12[2], 'c', 'getFlags #2.2');
   // real #3
   var str13 = '{a{b}}';
   assert.equal(
-    dwv.utils.getFlags(str13)[0], 'b', 'getFlags #3');
+    getFlags(str13)[0], 'b', 'getFlags #3');
 });
 
 /**
- * Tests for {@link dwv.utils.replaceFlags}.
+ * Tests for {@link replaceFlags}.
  *
  * @function module:tests/utils~replaceFlags
  */
 QUnit.test('Test ReplaceFlags.', function (assert) {
   // empty/null
-  assert.equal(dwv.utils.replaceFlags('', null), '', 'ReplaceFlags empty/null');
+  assert.equal(replaceFlags('', null), '', 'ReplaceFlags empty/null');
   // null/null
   assert.equal(
-    dwv.utils.replaceFlags(null, null), '', 'ReplaceFlags null/null');
+    replaceFlags(null, null), '', 'ReplaceFlags null/null');
   // empty/undefined
-  assert.equal(dwv.utils.replaceFlags(''), '', 'ReplaceFlags empty/undefined');
+  assert.equal(replaceFlags(''), '', 'ReplaceFlags empty/undefined');
   // real
   var str = '{a}';
   var values = {a: {value: 33, unit: 'ohm'}};
   assert.equal(
-    dwv.utils.replaceFlags(str, values), '33.00 ohm', 'ReplaceFlags real');
+    replaceFlags(str, values), '33.00 ohm', 'ReplaceFlags real');
   // real surrounded
   str = 'Resistance:{a}.';
   values = {a: {value: 33, unit: 'ohm'}};
   assert.equal(
-    dwv.utils.replaceFlags(str, values),
+    replaceFlags(str, values),
     'Resistance:33.00 ohm.',
     'ReplaceFlags surrounded');
   // real no unit
   str = '{a}';
   values = {a: {value: 33}};
   assert.equal(
-    dwv.utils.replaceFlags(str, values), '33.00', 'ReplaceFlags real no unit');
+    replaceFlags(str, values), '33.00', 'ReplaceFlags real no unit');
   // no match
   str = '{a}';
   values = {b: {value: 33, unit: 'ohm'}};
   assert.equal(
-    dwv.utils.replaceFlags(str, values), '{a}', 'ReplaceFlags no match');
+    replaceFlags(str, values), '{a}', 'ReplaceFlags no match');
   // no value
   str = '{a}';
   values = {a: {unit: 'ohm'}};
   assert.equal(
-    dwv.utils.replaceFlags(str, values), '{a}', 'ReplaceFlags no value');
+    replaceFlags(str, values), '{a}', 'ReplaceFlags no value');
   // nothing to do
   str = 'a';
   values = {a: {value: 33, unit: 'ohm'}};
   assert.equal(
-    dwv.utils.replaceFlags(str, values), 'a', 'ReplaceFlags nothing to do');
+    replaceFlags(str, values), 'a', 'ReplaceFlags nothing to do');
   // nothing to do no values
   str = 'a';
   values = {};
   assert.equal(
-    dwv.utils.replaceFlags(str, values),
+    replaceFlags(str, values),
     'a',
     'ReplaceFlags nothing to do no values');
 });
 
 /**
- * Tests for {@link dwv.utils.getFileExtension}.
+ * Tests for {@link getFileExtension}.
  *
  * @function module:tests/utils~getFileExtension
  */
 QUnit.test('Test getFileExtension.', function (assert) {
   // undefined
   assert.equal(
-    dwv.utils.getFileExtension(), null, 'getFileExtension undefined');
+    getFileExtension(), null, 'getFileExtension undefined');
   // null
-  assert.equal(dwv.utils.getFileExtension(null), null, 'getFileExtension null');
+  assert.equal(getFileExtension(null), null, 'getFileExtension null');
   // empty
-  assert.equal(dwv.utils.getFileExtension(''), null, 'getFileExtension empty');
+  assert.equal(getFileExtension(''), null, 'getFileExtension empty');
   // dot
-  assert.equal(dwv.utils.getFileExtension('.'), null, 'getFileExtension dot');
+  assert.equal(getFileExtension('.'), null, 'getFileExtension dot');
   // no extension
   assert.equal(
-    dwv.utils.getFileExtension('filename'),
+    getFileExtension('filename'),
     null, 'getFileExtension no extension');
   // test #00
   var test00 = 'image.png';
   var res00 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test00), res00, 'getFileExtension 00: simple');
+    getFileExtension(test00), res00, 'getFileExtension 00: simple');
   // test #01
   var test01 = 'IMAGE.PNG';
   var res01 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test01), res01,
+    getFileExtension(test01), res01,
     'getFileExtension 01: upper case');
   // test #02
   var test02 = 'image.10.png';
   var res02 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test02), res02,
+    getFileExtension(test02), res02,
     'getFileExtension 02: multiple dots');
   // test #03
   var test03 = '.profile';
   var res03 = null;
   assert.equal(
-    dwv.utils.getFileExtension(test03), res03,
+    getFileExtension(test03), res03,
     'getFileExtension 04: start with dot');
   // test #04
   var test04 = 'MR.1.3.12.123456.123456789';
   var res04 = null;
   assert.equal(
-    dwv.utils.getFileExtension(test04), res04,
+    getFileExtension(test04), res04,
     'getFileExtension 03: dots and numbers');
 
   // test #10
   var test10 = '/path/to/file/image.png';
   var res10 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test10), res10, 'getFileExtension 10');
+    getFileExtension(test10), res10, 'getFileExtension 10');
   // test #11
   var test11 = 'domain.org/path/to/file/image.png';
   var res11 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test11), res11, 'getFileExtension 11');
+    getFileExtension(test11), res11, 'getFileExtension 11');
   // test #12
   var test12 = 'domain.org/path/to/file/IMAGE';
   var res12 = null;
   assert.equal(
-    dwv.utils.getFileExtension(test12), res12, 'getFileExtension 12');
+    getFileExtension(test12), res12, 'getFileExtension 12');
 });
 
 /**
- * Tests for {@link dwv.utils.precisionRound}.
+ * Tests for {@link precisionRound}.
  *
  * @function module:tests/utils~precisionRound
  */
@@ -309,30 +319,30 @@ QUnit.test('Test precisionRound.', function (assert) {
   assert.equal(Math.round(0.5), 1, 'test round #02');
   assert.equal(Math.round(1.5), 2, 'test round #03');
 
-  assert.equal(dwv.utils.precisionRound(-0.004, 2), 0, 'test #00');
-  assert.equal(dwv.utils.precisionRound(-0.005, 2), 0, 'test #01');
-  assert.equal(dwv.utils.precisionRound(-0.006, 2), -0.01, 'test #02');
+  assert.equal(precisionRound(-0.004, 2), 0, 'test #00');
+  assert.equal(precisionRound(-0.005, 2), 0, 'test #01');
+  assert.equal(precisionRound(-0.006, 2), -0.01, 'test #02');
 
-  assert.equal(dwv.utils.precisionRound(0.004, 2), 0, 'test #10');
-  assert.equal(dwv.utils.precisionRound(0.005, 2), 0.01, 'test #11');
-  assert.equal(dwv.utils.precisionRound(0.006, 2), 0.01, 'test #1');
+  assert.equal(precisionRound(0.004, 2), 0, 'test #10');
+  assert.equal(precisionRound(0.005, 2), 0.01, 'test #11');
+  assert.equal(precisionRound(0.006, 2), 0.01, 'test #1');
 
-  assert.equal(dwv.utils.precisionRound(1.004, 2), 1, 'test #20');
-  assert.equal(dwv.utils.precisionRound(1.005, 2), 1.01, 'test #21');
-  assert.equal(dwv.utils.precisionRound(1.006, 2), 1.01, 'test #22');
+  assert.equal(precisionRound(1.004, 2), 1, 'test #20');
+  assert.equal(precisionRound(1.005, 2), 1.01, 'test #21');
+  assert.equal(precisionRound(1.006, 2), 1.01, 'test #22');
 
-  assert.equal(dwv.utils.precisionRound(1.05, 1), 1.1, 'test #31');
-  assert.equal(dwv.utils.precisionRound(1.0005, 3), 1.001, 'test #31');
-  assert.equal(dwv.utils.precisionRound(1.00005, 4), 1.0001, 'test #31');
-  assert.equal(dwv.utils.precisionRound(1.000005, 5), 1.00001, 'test #31');
+  assert.equal(precisionRound(1.05, 1), 1.1, 'test #31');
+  assert.equal(precisionRound(1.0005, 3), 1.001, 'test #31');
+  assert.equal(precisionRound(1.00005, 4), 1.0001, 'test #31');
+  assert.equal(precisionRound(1.000005, 5), 1.00001, 'test #31');
 
-  assert.equal(dwv.utils.precisionRound(1234.5, 0), 1235, 'test #40');
-  assert.equal(dwv.utils.precisionRound(1234.56, 0), 1235, 'test #41');
-  assert.equal(dwv.utils.precisionRound(1234.5, 1), 1234.5, 'test #42');
-  assert.equal(dwv.utils.precisionRound(1234.56, 1), 1234.6, 'test #43');
-  assert.equal(dwv.utils.precisionRound(1234.5, 2), 1234.5, 'test #44');
-  assert.equal(dwv.utils.precisionRound(1234.56, 2), 1234.56, 'test #45');
-  assert.equal(dwv.utils.precisionRound(1234.566, 2), 1234.57, 'test #46');
-  assert.equal(dwv.utils.precisionRound(1234.5666, 2), 1234.57, 'test #47');
+  assert.equal(precisionRound(1234.5, 0), 1235, 'test #40');
+  assert.equal(precisionRound(1234.56, 0), 1235, 'test #41');
+  assert.equal(precisionRound(1234.5, 1), 1234.5, 'test #42');
+  assert.equal(precisionRound(1234.56, 1), 1234.6, 'test #43');
+  assert.equal(precisionRound(1234.5, 2), 1234.5, 'test #44');
+  assert.equal(precisionRound(1234.56, 2), 1234.56, 'test #45');
+  assert.equal(precisionRound(1234.566, 2), 1234.57, 'test #46');
+  assert.equal(precisionRound(1234.5666, 2), 1234.57, 'test #47');
 
 });

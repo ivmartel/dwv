@@ -1,6 +1,5 @@
-// namespaces
-var dwv = dwv || {};
-dwv.utils = dwv.utils || {};
+import {logger} from './logger';
+import {splitKeyValueString} from './string';
 
 /**
  * Get an full object URL from a string uri.
@@ -9,11 +8,11 @@ dwv.utils = dwv.utils || {};
  * @returns {URL} A URL object.
  * WARNING: platform support dependent, see https://caniuse.com/#feat=url
  */
-dwv.utils.getUrlFromUriFull = function (uri) {
+function getUrlFromUriFull(uri) {
   // add base to allow for relative urls
   // (base is not used for absolute urls)
   return new URL(uri, window.location.origin);
-};
+}
 
 /**
  * Get an simple object URL from a string uri.
@@ -23,7 +22,7 @@ dwv.utils.getUrlFromUriFull = function (uri) {
  *   'searchParams.get()'
  * WARNING: limited functionality, simple nmock of the URL object.
  */
-dwv.utils.getUrlFromUriSimple = function (uri) {
+export function getUrlFromUriSimple(uri) {
   var url = {};
   // simple implementation (mainly for IE)
   // expecting only one '?'
@@ -54,7 +53,7 @@ dwv.utils.getUrlFromUriSimple = function (uri) {
   };
 
   return url;
-};
+}
 
 /**
  * Get an object URL from a string uri.
@@ -64,16 +63,16 @@ dwv.utils.getUrlFromUriSimple = function (uri) {
  * WANRING: returns an official URL or a simple URL depending on platform,
  *   see https://caniuse.com/#feat=url
  */
-dwv.utils.getUrlFromUri = function (uri) {
+export function getUrlFromUri(uri) {
   var url = null;
-  if (dwv.env.askModernizr('urlparser') &&
-        dwv.env.askModernizr('urlsearchparams')) {
-    url = dwv.utils.getUrlFromUriFull(uri);
-  } else {
-    url = dwv.utils.getUrlFromUriSimple(uri);
-  }
+  // if (dwv.env.askModernizr('urlparser') &&
+  //       dwv.env.askModernizr('urlsearchparams')) {
+    url = getUrlFromUriFull(uri);
+  // } else {
+  //   url = getUrlFromUriSimple(uri);
+  // }
   return url;
-};
+}
 
 /**
  * Split an input URI:
@@ -85,7 +84,7 @@ dwv.utils.getUrlFromUri = function (uri) {
  * @param {string} uri The string to split.
  * @returns {object} The split string.
  */
-dwv.utils.splitUri = function (uri) {
+export function splitUri(uri) {
   // result
   var result = {};
   // check if query string
@@ -100,11 +99,11 @@ dwv.utils.splitUri = function (uri) {
     }
     var query = uri.substring(sepIndex + 1, hashIndex);
     // split key/value pairs of the query
-    result.query = dwv.utils.splitKeyValueString(query);
+    result.query = splitKeyValueString(query);
   }
   // return
   return result;
-};
+}
 
 /**
  * Get the query part, split into an array, of an input URI.
@@ -113,16 +112,16 @@ dwv.utils.splitUri = function (uri) {
  * @param {string} uri The input URI.
  * @returns {object} The query part, split into an array, of the input URI.
  */
-dwv.utils.getUriQuery = function (uri) {
+export function getUriQuery(uri) {
   // split
-  var parts = dwv.utils.splitUri(uri);
+  var parts = splitUri(uri);
   // check not empty
   if (Object.keys(parts).length === 0) {
     return null;
   }
   // return query
   return parts.query;
-};
+}
 
 /**
  * Generic URI query decoder.
@@ -135,17 +134,17 @@ dwv.utils.getUriQuery = function (uri) {
  * @param {Function} callback The function to call with the decoded file urls.
  * @param {object} options Optional url request options.
  */
-dwv.utils.decodeQuery = function (query, callback, options) {
+function decodeQuery(query, callback, options) {
   // manifest
   if (query.type && query.type === 'manifest') {
-    dwv.utils.decodeManifestQuery(query, callback);
+    decodeManifestQuery(query, callback);
   } else {
     // default case: encoded URI with base and key/value pairs
     callback(
-      dwv.utils.decodeKeyValueUri(query.input, query.dwvReplaceMode),
+      decodeKeyValueUri(query.input, query.dwvReplaceMode),
       options);
   }
-};
+}
 
 /**
  * Decode a Key/Value pair URI. If a key is repeated, the result
@@ -159,7 +158,7 @@ dwv.utils.decodeQuery = function (query, callback, options) {
  *   'file' is a special case where the '?' of the query is not kept.
  * @returns {Array} The list of input file urls.
  */
-dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
+export function decodeKeyValueUri(uri, replaceMode) {
   var result = [];
 
   // repeat key replace mode (default to keep key)
@@ -171,7 +170,7 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
   // decode input URI
   var queryUri = decodeURIComponent(uri);
   // get key/value pairs from input URI
-  var inputQueryPairs = dwv.utils.splitUri(queryUri);
+  var inputQueryPairs = splitUri(queryUri);
   if (Object.keys(inputQueryPairs).length === 0) {
     result.push(queryUri);
   } else {
@@ -226,7 +225,7 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
   }
   // return
   return result;
-};
+}
 
 /**
  * Decode a manifest query.
@@ -236,7 +235,7 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
  * with input the input URI and nslices the number of slices.
  * @param {Function} callback The function to call with the decoded urls.
  */
-dwv.utils.decodeManifestQuery = function (query, callback) {
+function decodeManifestQuery(query, callback) {
   var uri = '';
   if (query.input[0] === '/') {
     uri = window.location.protocol + '//' + window.location.host;
@@ -245,14 +244,14 @@ dwv.utils.decodeManifestQuery = function (query, callback) {
   uri += query.input;
 
   // handle error
-  var onError = function (/*event*/) {
-    dwv.logger.warn('RequestError while receiving manifest: ' + this.status);
-  };
+  function onError(/*event*/) {
+    logger.warn('RequestError while receiving manifest: ' + this.status);
+  }
 
   // handle load
-  var onLoad = function (/*event*/) {
-    callback(dwv.utils.decodeManifest(this.responseXML, query.nslices));
-  };
+  function onLoad(/*event*/) {
+    callback(decodeManifest(this.responseXML, query.nslices));
+  }
 
   var request = new XMLHttpRequest();
   request.open('GET', decodeURIComponent(uri), true);
@@ -260,7 +259,7 @@ dwv.utils.decodeManifestQuery = function (query, callback) {
   request.onload = onLoad;
   request.onerror = onError;
   request.send(null);
-};
+}
 
 /**
  * Decode an XML manifest.
@@ -269,7 +268,7 @@ dwv.utils.decodeManifestQuery = function (query, callback) {
  * @param {number} nslices The number of slices to load.
  * @returns {Array} The decoded manifest.
  */
-dwv.utils.decodeManifest = function (manifest, nslices) {
+export function decodeManifest(manifest, nslices) {
   var result = [];
   // wado url
   var wadoElement = manifest.getElementsByTagName('wado_query');
@@ -278,18 +277,18 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
   // patient list
   var patientList = manifest.getElementsByTagName('Patient');
   if (patientList.length > 1) {
-    dwv.logger.warn('More than one patient, loading first one.');
+    logger.warn('More than one patient, loading first one.');
   }
   // study list
   var studyList = patientList[0].getElementsByTagName('Study');
   if (studyList.length > 1) {
-    dwv.logger.warn('More than one study, loading first one.');
+    logger.warn('More than one study, loading first one.');
   }
   var studyUID = studyList[0].getAttribute('StudyInstanceUID');
   // series list
   var seriesList = studyList[0].getElementsByTagName('Series');
   if (seriesList.length > 1) {
-    dwv.logger.warn('More than one series, loading first one.');
+    logger.warn('More than one series, loading first one.');
   }
   var seriesUID = seriesList[0].getAttribute('SeriesInstanceUID');
   // instance list
@@ -309,7 +308,7 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
   }
   // return
   return result;
-};
+}
 
 /**
  * Load from an input uri
@@ -318,14 +317,14 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
  * @param {dwv.App} app The associated app that handles the load.
  * @param {object} options Optional url request options.
  */
-dwv.utils.loadFromUri = function (uri, app, options) {
-  var query = dwv.utils.getUriQuery(uri);
+export function loadFromUri(uri, app, options) {
+  var query = getUriQuery(uri);
   // check query
   if (query && typeof query.input !== 'undefined') {
-    dwv.utils.loadFromQuery(query, app, options);
+    loadFromQuery(query, app, options);
   }
   // no else to allow for empty uris
-};
+}
 
 /**
  * Load from an input query
@@ -334,16 +333,16 @@ dwv.utils.loadFromUri = function (uri, app, options) {
  * @param {object} app The associated app that handles the load.
  * @param {object} options Optional url request options.
  */
-dwv.utils.loadFromQuery = function (query, app, options) {
+function loadFromQuery(query, app, options) {
+  function onLoadEnd(/*event*/) {
+    app.removeEventListener('loadend', onLoadEnd);
+    app.loadURLs([query.state]);
+  }
   // load base
-  dwv.utils.decodeQuery(query, app.loadURLs, options);
+  decodeQuery(query, app.loadURLs, options);
   // optional display state
   if (typeof query.state !== 'undefined') {
     // queue after main data load
-    var onLoadEnd = function (/*event*/) {
-      app.removeEventListener('loadend', onLoadEnd);
-      app.loadURLs([query.state]);
-    };
     app.addEventListener('loadend', onLoadEnd);
   }
-};
+}

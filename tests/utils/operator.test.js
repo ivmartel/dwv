@@ -1,3 +1,9 @@
+import {
+  isObject,
+  isArray,
+  mergeObjects
+} from '../../src/utils/operator';
+
 /**
  * Tests for the 'utils/operator.js' file.
  */
@@ -5,51 +11,51 @@
 /* global QUnit */
 
 /**
- * Tests for {@link dwv.utils.isObject}.
+ * Tests for {@link isObject}.
  *
  * @function module:tests/utils~isObject
  */
 QUnit.test('Test isObject.', function (assert) {
   var obj01 = {name: 'dwv', type: 'app'};
-  assert.equal(dwv.utils.isObject(obj01), true, 'test with object');
+  assert.equal(isObject(obj01), true, 'test with object');
 
   var obj02 = ['one', 'two', 'three'];
-  assert.equal(dwv.utils.isObject(obj02), true, 'test with array');
+  assert.equal(isObject(obj02), true, 'test with array');
 
   var obj03 = 1;
-  assert.equal(dwv.utils.isObject(obj03), false, 'test with number');
+  assert.equal(isObject(obj03), false, 'test with number');
 
   var obj04 = null;
-  assert.equal(dwv.utils.isObject(obj04), false, 'test with null');
+  assert.equal(isObject(obj04), false, 'test with null');
 
   var obj05 = true;
-  assert.equal(dwv.utils.isObject(obj05), false, 'test with bool');
+  assert.equal(isObject(obj05), false, 'test with bool');
 });
 
 /**
- * Tests for {@link dwv.utils.isArray}.
+ * Tests for {@link isArray}.
  *
  * @function module:tests/utils~isArray
  */
 QUnit.test('Test isArray.', function (assert) {
   var obj01 = {name: 'dwv', type: 'app'};
-  assert.equal(dwv.utils.isArray(obj01), false, 'test with object');
+  assert.equal(isArray(obj01), false, 'test with object');
 
   var obj02 = ['one', 'two', 'three'];
-  assert.equal(dwv.utils.isArray(obj02), true, 'test with array');
+  assert.equal(isArray(obj02), true, 'test with array');
 
   var obj03 = 1;
-  assert.equal(dwv.utils.isArray(obj03), false, 'test with number');
+  assert.equal(isArray(obj03), false, 'test with number');
 
   var obj04 = null;
-  assert.equal(dwv.utils.isArray(obj04), false, 'test with null');
+  assert.equal(isArray(obj04), false, 'test with null');
 
   var obj05 = true;
-  assert.equal(dwv.utils.isArray(obj05), false, 'test with bool');
+  assert.equal(isArray(obj05), false, 'test with bool');
 });
 
 /**
- * Tests for {@link dwv.utils.mergeObjects}.
+ * Tests for {@link mergeObjects}.
  *
  * @function module:tests/utils~mergeObjects
  */
@@ -59,20 +65,20 @@ QUnit.test('Test merge objects.', function (assert) {
 
   // bad id key
   var fbad01 = function () {
-    dwv.utils.mergeObjects(obj001, obj002, 'x', 'value');
+    mergeObjects(obj001, obj002, 'x', 'value');
   };
   assert.throws(fbad01, 'merge bad id key');
 
   // bad value key
   var fbad02 = function () {
-    dwv.utils.mergeObjects(obj001, obj002, 'id', 'x');
+    mergeObjects(obj001, obj002, 'id', 'x');
   };
   assert.throws(fbad02, 'merge bad value key');
 
   // same id
   var obj003 = {id: {value: 0}, a: {value: 1}, b: {value: 2}};
   var fbad03 = function () {
-    dwv.utils.mergeObjects(obj001, obj003, 'id', 'value');
+    mergeObjects(obj001, obj003, 'id', 'value');
   };
   assert.throws(fbad03, 'merge with same id value');
 
@@ -85,7 +91,7 @@ QUnit.test('Test merge objects.', function (assert) {
       1: {value: 2}
     }}
   };
-  var res00 = dwv.utils.mergeObjects(obj001, obj002, 'id', 'value');
+  var res00 = mergeObjects(obj001, obj002, 'id', 'value');
   assert.equal(
     JSON.stringify(res00),
     JSON.stringify(ref00),
@@ -102,7 +108,7 @@ QUnit.test('Test merge objects.', function (assert) {
       1: {value: [2]}
     }}
   };
-  var res01 = dwv.utils.mergeObjects(obj011, obj012, 'id', 'value');
+  var res01 = mergeObjects(obj011, obj012, 'id', 'value');
   assert.equal(
     JSON.stringify(res01),
     JSON.stringify(ref01),
@@ -127,7 +133,7 @@ QUnit.test('Test merge objects.', function (assert) {
       2: {value: 2}
     }}
   };
-  var res02 = dwv.utils.mergeObjects(obj021, obj022, 'id', 'value');
+  var res02 = mergeObjects(obj021, obj022, 'id', 'value');
   assert.equal(
     JSON.stringify(res02),
     JSON.stringify(ref02),
@@ -156,7 +162,7 @@ QUnit.test('Test merge objects.', function (assert) {
       2: {value: 3}
     }}
   };
-  var res03 = dwv.utils.mergeObjects(obj031, obj032, 'id', 'value');
+  var res03 = mergeObjects(obj031, obj032, 'id', 'value');
   assert.equal(
     JSON.stringify(res03),
     JSON.stringify(ref03),
@@ -176,7 +182,7 @@ QUnit.test('Test merge objects.', function (assert) {
       1: {value: 1}
     }}
   };
-  var res10 = dwv.utils.mergeObjects(obj101, obj102, 'id', 'value');
+  var res10 = mergeObjects(obj101, obj102, 'id', 'value');
   assert.equal(
     JSON.stringify(res10),
     JSON.stringify(ref10),
@@ -196,7 +202,7 @@ QUnit.test('Test merge objects.', function (assert) {
       1: null
     }}
   };
-  var res11 = dwv.utils.mergeObjects(obj111, obj112, 'id', 'value');
+  var res11 = mergeObjects(obj111, obj112, 'id', 'value');
   assert.equal(
     JSON.stringify(res11),
     JSON.stringify(ref11),
@@ -216,7 +222,7 @@ QUnit.test('Test merge objects.', function (assert) {
       1: {value: 1}
     }}
   };
-  var res12 = dwv.utils.mergeObjects(obj121, obj122, 'id', 'value');
+  var res12 = mergeObjects(obj121, obj122, 'id', 'value');
   assert.equal(
     JSON.stringify(res12),
     JSON.stringify(ref12),
@@ -236,7 +242,7 @@ QUnit.test('Test merge objects.', function (assert) {
       1: {}
     }}
   };
-  var res13 = dwv.utils.mergeObjects(obj131, obj132, 'id', 'value');
+  var res13 = mergeObjects(obj131, obj132, 'id', 'value');
   assert.equal(
     JSON.stringify(res13),
     JSON.stringify(ref13),

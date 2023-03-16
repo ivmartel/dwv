@@ -1,3 +1,10 @@
+import {stringToUint8Array} from '../../src/utils/string';
+import {
+  arraySortEquals,
+  parseMultipart,
+  buildMultipart
+} from '../../src/utils/array';
+
 /**
  * Tests for the 'utils/array' file.
  */
@@ -7,48 +14,48 @@
 QUnit.module('utils');
 
 /**
- * Tests for {@link dwv.utils.arraySortEquals}.
+ * Tests for {@link arraySortEquals}.
  *
  * @function module:tests/utils~arraySortEquals
  */
 QUnit.test('Test arraySortEquals.', function (assert) {
   // null
-  assert.notOk(dwv.utils.arraySortEquals(null, null), '2 null arrays');
-  assert.notOk(dwv.utils.arraySortEquals(null, [1, 2, 3]), 'left null array');
-  assert.notOk(dwv.utils.arraySortEquals([1, 2, 3], null), 'right null array');
+  assert.notOk(arraySortEquals(null, null), '2 null arrays');
+  assert.notOk(arraySortEquals(null, [1, 2, 3]), 'left null array');
+  assert.notOk(arraySortEquals([1, 2, 3], null), 'right null array');
 
   // undefined
-  assert.notOk(dwv.utils.arraySortEquals(undefined, undefined),
+  assert.notOk(arraySortEquals(undefined, undefined),
     '2 undefined arrays');
-  assert.notOk(dwv.utils.arraySortEquals(undefined, [1, 2, 3]),
+  assert.notOk(arraySortEquals(undefined, [1, 2, 3]),
     'left undefined arrays');
-  assert.notOk(dwv.utils.arraySortEquals([1, 2, 3], undefined),
+  assert.notOk(arraySortEquals([1, 2, 3], undefined),
     'right undefined arrays');
 
   // empty
-  assert.notOk(dwv.utils.arraySortEquals([1], []), 'right empty array');
-  assert.notOk(dwv.utils.arraySortEquals([], [1]), 'left empty array');
-  assert.ok(dwv.utils.arraySortEquals([], []), '2 empty arrays');
+  assert.notOk(arraySortEquals([1], []), 'right empty array');
+  assert.notOk(arraySortEquals([], [1]), 'left empty array');
+  assert.ok(arraySortEquals([], []), '2 empty arrays');
 
   // simple arrays
   var arr00 = [1, 2, 3];
-  assert.ok(dwv.utils.arraySortEquals(arr00, arr00), 'array equal #0');
+  assert.ok(arraySortEquals(arr00, arr00), 'array equal #0');
   var arr01 = [3, 2, 1];
-  assert.ok(dwv.utils.arraySortEquals(arr00, arr01), 'array equal #1');
+  assert.ok(arraySortEquals(arr00, arr01), 'array equal #1');
   var arr02 = [1, 2, 3, 4];
-  assert.notOk(dwv.utils.arraySortEquals(arr00, arr02), 'array equal #2');
+  assert.notOk(arraySortEquals(arr00, arr02), 'array equal #2');
   var arr03 = [1, 'a', null, undefined];
-  assert.ok(dwv.utils.arraySortEquals(arr03, arr03), 'array equal #3');
+  assert.ok(arraySortEquals(arr03, arr03), 'array equal #3');
 
   // array of object
   var arr10 = [{a: 0}];
   var arr11 = [{a: 0}];
-  assert.notOk(dwv.utils.arraySortEquals(arr10, arr11),
+  assert.notOk(arraySortEquals(arr10, arr11),
     'array of object equal #0');
   var obj = {a: 0};
   var arr12 = [obj];
   var arr13 = [obj];
-  assert.ok(dwv.utils.arraySortEquals(arr12, arr13),
+  assert.ok(arraySortEquals(arr12, arr13),
     'array of object equal #1');
 });
 
@@ -164,18 +171,18 @@ var compareBuffers = function (buf1, buf2) {
 };
 
 /**
- * Tests for {@link dwv.utils.parseMultipart}.
+ * Tests for {@link parseMultipart}.
  *
  * @function module:tests/utils~parseMultipart
  */
 QUnit.test('Test parseMultipart.', function (assert) {
   // empty
-  var res00 = dwv.utils.parseMultipart(new Uint8Array(0).buffer);
+  var res00 = parseMultipart(new Uint8Array(0).buffer);
   assert.equal(res00.length, 0, 'Empty multipart length');
 
   // empty part
-  var u8Test01 = dwv.utils.stringToUint8Array(multipart01);
-  var res01 = dwv.utils.parseMultipart(u8Test01.buffer);
+  var u8Test01 = stringToUint8Array(multipart01);
+  var res01 = parseMultipart(u8Test01.buffer);
   assert.equal(res01.length, 1, 'Empty multipart part length');
   var keys01 = Object.keys(res01);
   assert.equal(keys01.length, 1, 'Empty multipart part keys length');
@@ -185,19 +192,19 @@ QUnit.test('Test parseMultipart.', function (assert) {
 
   // test #10
   // parse multipart
-  var u8Test10 = dwv.utils.stringToUint8Array(multipart10.str);
-  var resMulti10 = dwv.utils.parseMultipart(u8Test10.buffer);
+  var u8Test10 = stringToUint8Array(multipart10.str);
+  var resMulti10 = parseMultipart(u8Test10.buffer);
   assert.ok(compareMultipartObjects(resMulti10, multipart10.parts),
     'Compare multipart object #10');
   // build multipart
-  var resBuff10 = dwv.utils.buildMultipart(multipart10.parts,
+  var resBuff10 = buildMultipart(multipart10.parts,
     '----WebKitFormBoundaryvef1fLxmoUdYZWXp');
   assert.ok(compareBuffers(resBuff10, u8Test10),
     'Compare multipart buffer #10');
 
   // test #11: with preamble and epilogue
-  var u8Test11 = dwv.utils.stringToUint8Array(multipart11.str);
-  var resMulti11 = dwv.utils.parseMultipart(u8Test11.buffer);
+  var u8Test11 = stringToUint8Array(multipart11.str);
+  var resMulti11 = parseMultipart(u8Test11.buffer);
   assert.ok(compareMultipartObjects(resMulti11, multipart10.parts),
     'Compare multipart object #11');
 });

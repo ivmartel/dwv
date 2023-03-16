@@ -1,6 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-
 /**
  * Get the translated text.
  *
@@ -8,7 +5,7 @@ var dwv = dwv || {};
  * @param {object} _options The translation options such as plural, context...
  * @returns {string|undefined} The translated text.
  */
-dwv.i18n = function (key, _options) {
+export function i18n(key, _options) {
   // defaut expects something like 'unit.cm2'
   var unit = {
     mm: 'mm',
