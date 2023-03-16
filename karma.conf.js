@@ -4,48 +4,10 @@
 module.exports = function (config) {
   config.set({
     basePath: '.',
-    frameworks: ['qunit'],
+    frameworks: ['qunit', 'webpack'],
     files: [
-      // dependencies
-      {pattern: 'node_modules/konva/konva.min.js', watched: false},
-      {pattern: 'node_modules/jszip/dist/jszip.min.js', watched: false},
-      // benchmark
-      {pattern: 'node_modules/lodash/lodash.min.js', watched: false},
-      {pattern: 'node_modules/benchmark/benchmark.js', watched: false},
-      // decoders
-      {pattern: 'decoders/**/*.js', included: false},
-      // test data
-      {pattern: 'tests/data/**/*.dcm', included: false},
-      {pattern: 'tests/data/DICOMDIR', included: false},
-      {pattern: 'tests/data/*.dcmdir', included: false},
-      {pattern: 'tests/data/*.zip', included: false},
-      {pattern: 'tests/dicom/*.json', included: false},
-      {pattern: 'tests/state/**/*.json', included: false},
-      // extra served content
-      {pattern: 'tests/**/*.html', included: false},
-      {pattern: 'tests/visual/appgui.js', included: false},
-      {pattern: 'tests/visual/style.css', included: false},
-      {pattern: 'tests/dicom/pages/*.js', included: false},
-      {pattern: 'tests/image/pages/*.js', included: false},
-      {pattern: 'tests/pacs/*.js', included: false},
-      {pattern: 'tests/bench/*.js', included: false},
-      {pattern: 'tests/utils/worker.js', included: false},
-      {pattern: 'tests/visual/images/*.jpg', included: false},
-      {pattern: 'tests/pacs/images/*.png', included: false},
-      {pattern: 'dist/*.js', included: false},
-      {pattern: 'build/dist/*.js', included: false},
-      // src
-      'src/**/*.js',
-      // test
-      'tests/**/*.test.js',
-      'tests/dicom/*.js'
+      {pattern: 'tests/utils/*.test.js', watched: false}
     ],
-    proxies: {
-      '/tests/data/': '/base/tests/data/',
-      '/tests/dicom/': '/base/tests/dicom/',
-      '/tests/state/': '/base/tests/state/',
-      '/tests/utils/': '/base/tests/utils/'
-    },
     client: {
       clearContext: false,
       qunit: {
@@ -54,13 +16,13 @@ module.exports = function (config) {
       }
     },
     preprocessors: {
-      'src/**/*.js': ['coverage']
+      'src/**/*.js': ['webpack', 'sourcemap'],
+      'tests/**/*.test.js': ['webpack']
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './build/coverage/dwv'),
+      dir: require('path').join(__dirname, './build/coverage/'),
       reporters: [
         {type: 'html', subdir: 'report-html'},
-        {type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt'},
         {type: 'text-summary'}
       ],
       check: {
@@ -74,15 +36,20 @@ module.exports = function (config) {
     },
     reporters: ['progress'],
     logLevel: config.LOG_INFO,
-    customLaunchers: {
-      ChromeWithTestsPage: {
-        base: 'Chrome',
-        flags: [
-          'http://localhost:9876/base/tests/index.html'
-        ]
-      }
-    },
-    browsers: ['ChromeWithTestsPage'],
-    restartOnFileChange: true
+    browsers: ['Chrome'],
+    restartOnFileChange: true,
+    webpack: webpackConfig()
   });
 };
+
+/**
+ * Get the webpack config to pass to Karma.
+ *
+ * @returns {object} The config.
+ */
+function webpackConfig() {
+  const config = require('./webpack.dev.js');
+  delete config.entry;
+  delete config.output;
+  return config;
+}

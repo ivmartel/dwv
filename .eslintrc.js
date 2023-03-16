@@ -4,7 +4,7 @@ module.exports = {
     node: true,
     jquery: true,
     es6: true,
-    es2020: true
+    es2022: true
   },
   globals: {
     dwv: 'readonly'
@@ -12,6 +12,9 @@ module.exports = {
   extends: [
     'eslint:recommended',
   ],
+  parserOptions: {
+    sourceType: 'module'
+  },
   rules: {
     // require triple equal
     // https://eslint.org/docs/rules/eqeqeq
