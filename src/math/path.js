@@ -1,7 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-dwv.math = dwv.math || {};
-
 /**
  * Path shape.
  *
@@ -12,100 +8,106 @@ dwv.math = dwv.math || {};
  *  as indexes (optional).
  * Note: first and last point do not need to be equal.
  */
-dwv.math.Path = function (inputPointArray, inputControlPointIndexArray) {
+export class Path {
+
+  constructor(inputPointArray, inputControlPointIndexArray) {
+    /**
+     * List of points.
+     *
+     * @type {Array}
+     */
+    this.pointArray = inputPointArray ? inputPointArray.slice() : [];
+    /**
+     * List of control points.
+     *
+     * @type {Array}
+     */
+    this.controlPointIndexArray = inputControlPointIndexArray
+      ? inputControlPointIndexArray.slice() : [];
+  }
+
   /**
-   * List of points.
+   * Get a point of the list.
    *
-   * @type {Array}
+   * @param {number} index The index of the point
+   *   to get (beware, no size check).
+   * @returns {Point2D} The Point2D at the given index.
    */
-  this.pointArray = inputPointArray ? inputPointArray.slice() : [];
+  getPoint(index) {
+    return this.pointArray[index];
+  }
+
   /**
-   * List of control points.
+   * Is the given point a control point.
    *
-   * @type {Array}
+   * @param {Point2D} point The Point2D to check.
+   * @returns {boolean} True if a control point.
    */
-  this.controlPointIndexArray = inputControlPointIndexArray
-    ? inputControlPointIndexArray.slice() : [];
-}; // Path class
-
-/**
- * Get a point of the list.
- *
- * @param {number} index The index of the point to get (beware, no size check).
- * @returns {dwv.math.Point2D} The Point2D at the given index.
- */
-dwv.math.Path.prototype.getPoint = function (index) {
-  return this.pointArray[index];
-};
-
-/**
- * Is the given point a control point.
- *
- * @param {dwv.math.Point2D} point The Point2D to check.
- * @returns {boolean} True if a control point.
- */
-dwv.math.Path.prototype.isControlPoint = function (point) {
-  var index = this.pointArray.indexOf(point);
-  if (index !== -1) {
-    return this.controlPointIndexArray.indexOf(index) !== -1;
-  } else {
-    throw new Error('Error: isControlPoint called with not in list point.');
+  isControlPoint(point) {
+    var index = this.pointArray.indexOf(point);
+    if (index !== -1) {
+      return this.controlPointIndexArray.indexOf(index) !== -1;
+    } else {
+      throw new Error('Error: isControlPoint called with not in list point.');
+    }
   }
-};
 
-/**
- * Get the length of the path.
- *
- * @returns {number} The length of the path.
- */
-dwv.math.Path.prototype.getLength = function () {
-  return this.pointArray.length;
-};
-
-/**
- * Add a point to the path.
- *
- * @param {dwv.math.Point2D} point The Point2D to add.
- */
-dwv.math.Path.prototype.addPoint = function (point) {
-  this.pointArray.push(point);
-};
-
-/**
- * Add a control point to the path.
- *
- * @param {dwv.math.Point2D} point The Point2D to make a control point.
- */
-dwv.math.Path.prototype.addControlPoint = function (point) {
-  var index = this.pointArray.indexOf(point);
-  if (index !== -1) {
-    this.controlPointIndexArray.push(index);
-  } else {
-    throw new Error(
-      'Cannot mark a non registered point as control point.');
+  /**
+   * Get the length of the path.
+   *
+   * @returns {number} The length of the path.
+   */
+  getLength() {
+    return this.pointArray.length;
   }
-};
 
-/**
- * Add points to the path.
- *
- * @param {Array} newPointArray The list of Point2D to add.
- */
-dwv.math.Path.prototype.addPoints = function (newPointArray) {
-  this.pointArray = this.pointArray.concat(newPointArray);
-};
-
-/**
- * Append a Path to this one.
- *
- * @param {dwv.math.Path} other The Path to append.
- */
-dwv.math.Path.prototype.appenPath = function (other) {
-  var oldSize = this.pointArray.length;
-  this.pointArray = this.pointArray.concat(other.pointArray);
-  var indexArray = [];
-  for (var i = 0; i < other.controlPointIndexArray.length; ++i) {
-    indexArray[i] = other.controlPointIndexArray[i] + oldSize;
+  /**
+   * Add a point to the path.
+   *
+   * @param {Point2D} point The Point2D to add.
+   */
+  addPoint(point) {
+    this.pointArray.push(point);
   }
-  this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
-};
+
+  /**
+   * Add a control point to the path.
+   *
+   * @param {Point2D} point The Point2D to make a control point.
+   */
+  addControlPoint(point) {
+    var index = this.pointArray.indexOf(point);
+    if (index !== -1) {
+      this.controlPointIndexArray.push(index);
+    } else {
+      throw new Error(
+        'Cannot mark a non registered point as control point.');
+    }
+  }
+
+  /**
+   * Add points to the path.
+   *
+   * @param {Array} newPointArray The list of Point2D to add.
+   */
+  addPoints(newPointArray) {
+    this.pointArray = this.pointArray.concat(newPointArray);
+  }
+
+  /**
+   * Append a Path to this one.
+   *
+   * @param {Path} other The Path to append.
+   */
+  appenPath(other) {
+    var oldSize = this.pointArray.length;
+    this.pointArray = this.pointArray.concat(other.pointArray);
+    var indexArray = [];
+    for (var i = 0; i < other.controlPointIndexArray.length; ++i) {
+      indexArray[i] = other.controlPointIndexArray[i] + oldSize;
+    }
+    this.controlPointIndexArray =
+      this.controlPointIndexArray.concat(indexArray);
+  }
+
+} // Path class

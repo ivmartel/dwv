@@ -1,3 +1,5 @@
+import {BucketQueue} from '../../src/math/bucketQueue';
+
 /**
  * Tests for the 'math/BucketQueue.js' file.
  */
@@ -7,12 +9,12 @@
 QUnit.module('math');
 
 /**
- * Tests for {@link dwv.math.BucketQueue}.
+ * Tests for {@link BucketQueue}.
  *
  * @function module:tests/math~BucketQueue
  */
 QUnit.test('Test BucketQueue.', function (assert) {
-  var queue00 = new dwv.math.BucketQueue();
+  var queue00 = new BucketQueue();
   // isEmpty
   assert.equal(queue00.isEmpty(), true, 'create isEmpty');
 

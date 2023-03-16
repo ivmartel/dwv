@@ -1,3 +1,7 @@
+import {Point2D} from '../../src/math/point';
+import {Index} from '../../src/math/index';
+import {Ellipse, getEllipseIndices} from '../../src/math/ellipse';
+
 /**
  * Tests for the 'math/shapes.js' file.
  */
@@ -5,13 +9,13 @@
 /* global QUnit */
 
 /**
- * Tests for {@link dwv.math.Ellipse}.
+ * Tests for {@link Ellipse}.
  *
  * @function module:tests/math~Ellipse
  */
 QUnit.test('Test Ellipse.', function (assert) {
-  var center0 = new dwv.math.Point2D(0, 0);
-  var e0 = new dwv.math.Ellipse(center0, 2, 4);
+  var center0 = new Point2D(0, 0);
+  var e0 = new Ellipse(center0, 2, 4);
   // getCenter
   assert.equal(e0.getCenter(), center0, 'getCenter');
   // getA
@@ -20,17 +24,17 @@ QUnit.test('Test Ellipse.', function (assert) {
   assert.equal(e0.getB(), 4, 'getB');
 
   // equals: true
-  var e1 = new dwv.math.Ellipse(center0, 2, 4);
+  var e1 = new Ellipse(center0, 2, 4);
   assert.ok(e0.equals(e1), 'equal ellipses');
   // equals: false a
-  var e20 = new dwv.math.Ellipse(center0, 3, 4);
+  var e20 = new Ellipse(center0, 3, 4);
   assert.notOk(e0.equals(e20), 'non equal ellipses a');
   // equals: false b
-  var e21 = new dwv.math.Ellipse(center0, 2, 5);
+  var e21 = new Ellipse(center0, 2, 5);
   assert.notOk(e0.equals(e21), 'non equal ellipses b');
   // equals: false radius
-  var center22 = new dwv.math.Point2D(1, 1);
-  var e22 = new dwv.math.Ellipse(center22, 2, 4);
+  var center22 = new Point2D(1, 1);
+  var e22 = new Ellipse(center22, 2, 4);
   assert.notOk(e0.equals(e22), 'non equal ellipses center');
 
   // getSurface
@@ -40,13 +44,13 @@ QUnit.test('Test Ellipse.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.math.Ellipse} quantification.
+ * Tests for {@link Ellipse} quantification.
  *
  * @function module:tests/math~Ellipse
  */
 QUnit.test('Test Ellipse quantify.', function (assert) {
-  var center0 = new dwv.math.Point2D(2, 2);
-  var e0 = new dwv.math.Ellipse(center0, 1, 2);
+  var center0 = new Point2D(2, 2);
+  var e0 = new Ellipse(center0, 1, 2);
   // view controller
   var mockVc0 = {
     canQuantifyImage: function () {
@@ -56,7 +60,7 @@ QUnit.test('Test Ellipse quantify.', function (assert) {
       return [1, 1];
     },
     getCurrentPosition: function () {
-      return new dwv.math.Index([0, 0, 0]);
+      return new Index([0, 0, 0]);
     },
     getImageVariableRegionValues: function () {
       return [0, 1, 1, 0, 0, 1, 1, 0];
@@ -84,16 +88,16 @@ QUnit.test('Test Ellipse quantify.', function (assert) {
  * @function module:tests/math~getEllipseIndices
  */
 QUnit.test('Test getEllipseIndices.', function (assert) {
-  var center00 = new dwv.math.Index([1, 1]);
+  var center00 = new Index([1, 1]);
   var radius00 = [2, 2];
   var dir00 = [0, 1];
   var theoRes = [];
   for (var i = 0; i <= radius00[0]; ++i) {
     for (var j = 0; j <= radius00[1]; ++j) {
-      theoRes.push(new dwv.math.Index([i, j]));
+      theoRes.push(new Index([i, j]));
     }
   }
-  var indices00 = dwv.math.getEllipseIndices(center00, radius00, dir00);
+  var indices00 = getEllipseIndices(center00, radius00, dir00);
   // sort
   indices00.sort();
   // filter duplicates
