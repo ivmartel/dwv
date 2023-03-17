@@ -13,6 +13,9 @@ import {
   getTagFromDictionary
 } from './dicomTag';
 import {isNativeLittleEndian} from './dataReader';
+import {Size} from '../image/size';
+import {Spacing} from '../image/spacing';
+import {logger} from '../utils/logger';
 
 /**
  * DicomElements wrapper.
@@ -536,9 +539,8 @@ export class DicomElementsWrapper {
     if (!columns) {
       throw new Error('Missing or empty DICOM image number of columns');
     }
-    return new dwv.image.Size([columns, rows, 1]);
+    return new Size([columns, rows, 1]);
   }
-
 
   /**
    * Get the pixel spacing from the different spacing tags.
@@ -566,17 +568,17 @@ export class DicomElementsWrapper {
 
     // check
     if (columnSpacing === 0) {
-      dwv.logger.warn('Zero column spacing.');
+      logger.warn('Zero column spacing.');
       columnSpacing = 1;
     }
     if (rowSpacing === 0) {
-      dwv.logger.warn('Zero row spacing.');
+      logger.warn('Zero row spacing.');
       rowSpacing = 1;
     }
 
     // return
     // (slice spacing will be calculated using the image position patient)
-    return new dwv.image.Spacing([columnSpacing, rowSpacing, 1]);
+    return new Spacing([columnSpacing, rowSpacing, 1]);
   }
 
   /**
@@ -594,7 +596,7 @@ export class DicomElementsWrapper {
    *
    * @returns {string|null} The unit value if available.
    */
-  dgetPixelUnit() {
+  getPixelUnit() {
     // RescaleType
     var unit = this.getFromKey('x00281054');
     if (!unit) {
@@ -629,13 +631,13 @@ export function getFileListFromDicomDir(data) {
   // Directory Record Sequence
   if (typeof elements.x00041220 === 'undefined' ||
     typeof elements.x00041220.value === 'undefined') {
-    dwv.logger.warn('No Directory Record Sequence found in DICOMDIR.');
+    logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return undefined;
   }
   var dirSeq = elements.x00041220.value;
 
   if (dirSeq.length === 0) {
-    dwv.logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
+    logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
     return undefined;
   }
 
