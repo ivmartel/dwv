@@ -1,12 +1,12 @@
-// namespaces
-var dwv = dwv || {};
-dwv.dicom = dwv.dicom || {};
-
-// List of pixel generators
-dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
+import {logger} from '../../src/utils/logger';
+import {getTypedArray} from '../../src/dicom/dicomParser';
+import {getPixelDataTag} from '../../src/dicom/dicomTag';
+import {FilePixGenerator} from './filePixGenerator';
+import {GradSquarePixGenerator} from './gradSquarePixGenerator';
+import {MPRPixGenerator} from './mprPixGenerator';
 
 // List of required tags for generating pixel data
-dwv.dicom.requiredPixelTags = [
+export const RequiredPixelTags = [
   'TransferSyntaxUID',
   'Rows',
   'Columns',
@@ -24,7 +24,7 @@ dwv.dicom.requiredPixelTags = [
  * @param {boolean} withLog Flag to log errors or not.
  * @returns {boolean} True if all required tags are present in the input.
  */
-dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
+export function checkTags(tags, requiredTags, withLog) {
   if (typeof withLog === 'undefined') {
     withLog = false;
   }
@@ -32,7 +32,7 @@ dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
   for (var i = 0; i < requiredTags.length; ++i) {
     if (typeof tags[requiredTags[i]] === 'undefined') {
       if (withLog) {
-        dwv.logger.debug('Missing ' +
+        logger.debug('Missing ' +
           requiredTags[i] + ' for pixel generation.');
       }
       check = false;
@@ -40,7 +40,7 @@ dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
     }
   }
   return check;
-};
+}
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
@@ -52,7 +52,7 @@ dwv.dicom.checkTags = function (tags, requiredTags, withLog) {
  * @param {number} numberOfSlices The result number of slices.
  * @returns {object} The DICOM pixel data element.
  */
-dwv.dicom.generatePixelDataFromJSONTags = function (
+export function generatePixelDataFromJSONTags(
   tags, pixGeneratorName, sliceNumber, images, numberOfSlices) {
 
   // default
@@ -67,7 +67,7 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
 
   // check tags
-  if (!dwv.dicom.checkTags(tags, dwv.dicom.requiredPixelTags, true)) {
+  if (!checkTags(tags, RequiredPixelTags, true)) {
     throw new Error('Missing meta data for dicom creation.');
   }
 
@@ -117,14 +117,19 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
 
   // create pixel array
-  var pixels = dwv.dicom.getTypedArray(
+  var pixels = getTypedArray(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
-  if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] === 'undefined') {
+  var pixelGenerators = {
+    file: FilePixGenerator,
+    gradSquare: GradSquarePixGenerator,
+    mpr: MPRPixGenerator
+  };
+  if (typeof pixelGenerators[pixGeneratorName] === 'undefined') {
     throw new Error('Unknown PixelData generator: ' + pixGeneratorName);
   }
-  var GeneratorClass = dwv.dicom.pixelGenerators[pixGeneratorName].generator;
+  var GeneratorClass = pixelGenerators[pixGeneratorName];
   var generator = new GeneratorClass({
     numberOfColumns: numberOfColumns,
     numberOfRows: numberOfRows,
@@ -148,12 +153,12 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
   var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    tag: dwv.dicom.getPixelDataTag(),
+    tag: getPixelDataTag(),
     vr: vr,
     vl: pixVL,
     value: pixels
   };
-};
+}
 
 /**
  * Extract the image data from an image.
@@ -161,7 +166,7 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
  * @param {Image} image The image to get the data from.
  * @returns {object} The image data buffer.
  */
-dwv.dicom.getImageDataData = function (image) {
+export function getImageDataData(image) {
   // draw the image in the canvas in order to get its data
   var canvas = document.createElement('canvas');
   canvas.width = image.width;
@@ -172,4 +177,4 @@ dwv.dicom.getImageDataData = function (image) {
   var imageData = ctx.getImageData(0, 0, image.width, image.height);
   // data.data
   return imageData.data;
-};
+}

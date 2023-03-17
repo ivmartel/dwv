@@ -5,31 +5,38 @@
  * @param {object} options The generator options.
  * @class
  */
-var FilePixGenerator = function (options) {
+export class FilePixGenerator {
 
-  var numberOfColumns = options.numberOfColumns;
-  var numberOfRows = options.numberOfRows;
-  var isRGB = options.photometricInterpretation === 'RGB';
+  #numberOfColumns;
+  #numberOfRows;
+  #isRGB;
 
-  this.setImages = function (imgs) {
+  constructor(options) {
+    this.#numberOfColumns = options.numberOfColumns;
+    this.#numberOfRows = options.numberOfRows;
+    this.#isRGB = options.photometricInterpretation === 'RGB';
+  }
+
+
+  setImages(imgs) {
     // check sizes
     var img;
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
-      if (img.width !== numberOfColumns) {
+      if (img.width !== this.#numberOfColumns) {
         throw new Error('Image width mismatch: ' +
-          img.width + '!=' + numberOfColumns);
+          img.width + '!=' + this.#numberOfColumns);
       }
-      if (img.height !== numberOfRows) {
+      if (img.height !== this.#numberOfRows) {
         throw new Error('Image height mismatch: ' +
-          img.height + '!=' + numberOfRows);
+          img.height + '!=' + this.#numberOfRows);
       }
     }
     // store
     this.images = imgs;
-  };
+  }
 
-  this.generate = function (pixelBuffer, sliceNumber) {
+  generate(pixelBuffer, sliceNumber) {
     var image = null;
     if (sliceNumber < this.images.length) {
       image = this.images[sliceNumber];
@@ -44,45 +51,40 @@ var FilePixGenerator = function (options) {
     for (var i = 0; i < dataLen; i += 4) {
       pixelBuffer[j] = imageData[i];
       j += 1;
-      if (isRGB) {
+      if (this.#isRGB) {
         pixelBuffer[j + 1] = imageData[i + 1];
         pixelBuffer[j + 2] = imageData[i + 2];
         j += 2;
       }
     }
-  };
-};
+  }
 
-/**
- * Check tags are coherent with image size.
- *
- * @param {object} tags The tags to check.
- * @param {object} image The associated image.
- * @returns {boolean} True if the tags are ok.
- */
-function checkTags(tags, image) {
   /**
-   * @param {number} value The value to check.
-   * @returns {number} The expected value.
+   * Check tags are coherent with image size.
+   *
+   * @param {object} tags The tags to check.
+   * @param {object} image The associated image.
+   * @returns {boolean} True if the tags are ok.
    */
-  function getExpectedSize(value) {
-    return value;
+  static checkTags(tags, image) {
+    /**
+     * @param {number} value The value to check.
+     * @returns {number} The expected value.
+     */
+    function getExpectedSize(value) {
+      return value;
+    }
+
+    var needUpdate = false;
+    if (tags.Columns !== getExpectedSize(image.width)) {
+      tags.Columns = getExpectedSize(image.width);
+      needUpdate = true;
+    }
+    if (tags.Rows !== getExpectedSize(image.height)) {
+      tags.Rows = getExpectedSize(image.height);
+      needUpdate = true;
+    }
+    return needUpdate;
   }
 
-  var needUpdate = false;
-  if (tags.Columns !== getExpectedSize(image.width)) {
-    tags.Columns = getExpectedSize(image.width);
-    needUpdate = true;
-  }
-  if (tags.Rows !== getExpectedSize(image.height)) {
-    tags.Rows = getExpectedSize(image.height);
-    needUpdate = true;
-  }
-  return needUpdate;
-}
-
-dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
-dwv.dicom.pixelGenerators.file = {
-  generator: FilePixGenerator,
-  checkTags: checkTags
-};
+} // class FilePixGenerator

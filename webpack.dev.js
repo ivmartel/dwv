@@ -30,6 +30,30 @@ module.exports = merge(common, {
             plugins: ['istanbul']
           }
         }
+      },
+      {
+        test: /\.json/,
+        type: 'asset/source'
+      },
+      {
+        test: /\.dcm/,
+        generator: {
+          dataUrl: {
+            encoding: 'base64',
+            mimetype: 'application/dicom',
+          },
+        },
+        type: 'asset/inline'
+      },
+      {
+        test: /DICOMDIR/,
+        generator: {
+          dataUrl: {
+            encoding: 'base64',
+            mimetype: 'application/dicom',
+          },
+        },
+        type: 'asset/inline'
       }
     ]
   }

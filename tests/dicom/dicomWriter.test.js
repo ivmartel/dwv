@@ -1,6 +1,27 @@
-// namespace
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+import {
+  cleanString,
+  DicomParser
+} from '../../src/dicom/dicomParser';
+import {
+  DicomWriter,
+  getElementsFromJSONTags,
+  getUID
+} from '../../src/dicom/dicomWriter';
+import {getTagFromDictionary} from '../../src/dicom/dicomTag';
+import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
+import {DicomDictionary} from '../../src/dicom/dictionary';
+import {
+  checkTags,
+  generatePixelDataFromJSONTags,
+  RequiredPixelTags
+} from './dicomGenerator';
+import {b64urlToArrayBuffer} from './utils';
+
+import multiframeTest from '/tests/data/multiframe-test1.dcm';
+import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm';
+import syntheticDataExplicit from '/tests/dicom/synthetic-data_explicit.json';
+import syntheticDataImplicit from '/tests/dicom/synthetic-data_implicit.json';
+import syntheticDataExplicitBE from '/tests/dicom/synthetic-data_explicit_big-endian.json';
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.
@@ -15,14 +36,14 @@ dwv.test = dwv.test || {};
  */
 QUnit.test('Test getUID', function (assert) {
   // check size
-  var uid00 = dwv.dicom.getUID('mytag');
+  var uid00 = getUID('mytag');
   assert.ok(uid00.length <= 64, 'uid length #0');
-  var uid01 = dwv.dicom.getUID('mysuperlongtagthatneverfinishes');
+  var uid01 = getUID('mysuperlongtagthatneverfinishes');
   assert.ok(uid01.length <= 64, 'uid length #1');
 
   // consecutive for same tag are different
-  var uid10 = dwv.dicom.getUID('mytag');
-  var uid11 = dwv.dicom.getUID('mytag');
+  var uid10 = getUID('mytag');
+  var uid11 = getUID('mytag');
   assert.notEqual(uid10, uid11, 'Consecutive getUID');
 
   // groups do not start with 0
@@ -38,161 +59,131 @@ QUnit.test('Test getUID', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.dicom.DicomWriter} using simple DICOM data.
+ * Tests for {@link DicomWriter} using simple DICOM data.
  * Using remote file for CI integration.
  *
  * @function module:tests/dicom~dicomWriterSimpleDicom
  */
 QUnit.test('Test multiframe writer support.', function (assert) {
-  var done = assert.async();
 
-  var request = new XMLHttpRequest();
-  var url = '/tests/data/multiframe-test1.dcm';
-  request.open('GET', url, true);
-  request.responseType = 'arraybuffer';
-  request.onerror = function (event) {
-    console.log(event);
-  };
-  request.onload = function (/*event*/) {
-    assert.ok((this.response.byteLength !== 0), 'Got a response.');
+  // parse DICOM
+  var dicomParser = new DicomParser();
+  dicomParser.parse(b64urlToArrayBuffer(multiframeTest));
 
-    // parse DICOM
-    var dicomParser = new dwv.dicom.DicomParser();
-    dicomParser.parse(this.response);
+  var numCols = 256;
+  var numRows = 256;
+  var numFrames = 16;
+  var bufferSize = numCols * numRows * numFrames;
 
-    var numCols = 256;
-    var numRows = 256;
-    var numFrames = 16;
-    var bufferSize = numCols * numRows * numFrames;
+  // raw tags
+  var rawTags = dicomParser.getRawDicomElements();
+  // check values
+  assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
+  assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
+  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
+  // length of value array for pixel data
+  assert.equal(
+    rawTags.x7FE00010.value[0].length,
+    bufferSize,
+    'Length of value array for pixel data');
 
-    // raw tags
-    var rawTags = dicomParser.getRawDicomElements();
-    // check values
-    assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
-    assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
-    assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
-    // length of value array for pixel data
-    assert.equal(
-      rawTags.x7FE00010.value[0].length,
-      bufferSize,
-      'Length of value array for pixel data');
+  var dicomWriter = new DicomWriter();
+  var buffer = dicomWriter.getBuffer(rawTags);
 
-    var dicomWriter = new dwv.dicom.DicomWriter();
-    var buffer = dicomWriter.getBuffer(rawTags);
+  dicomParser = new DicomParser();
+  dicomParser.parse(buffer);
 
-    dicomParser = new dwv.dicom.DicomParser();
-    dicomParser.parse(buffer);
+  rawTags = dicomParser.getRawDicomElements();
 
-    rawTags = dicomParser.getRawDicomElements();
+  // check values
+  assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
+  assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
+  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
+  // length of value array for pixel data
+  assert.equal(
+    rawTags.x7FE00010.value[0].length,
+    bufferSize,
+    'Length of value array for pixel data');
 
-    // check values
-    assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
-    assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
-    assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
-    // length of value array for pixel data
-    assert.equal(
-      rawTags.x7FE00010.value[0].length,
-      bufferSize,
-      'Length of value array for pixel data');
-
-    // finish async test
-    done();
-  };
-  request.send(null);
 });
 
 /**
- * Tests for {@link dwv.dicom.DicomWriter} anomnymisation.
+ * Tests for {@link DicomWriter} anomnymisation.
  * Using remote file for CI integration.
  *
  * @function module:tests/dicom~dicomWriterAnonymise
  */
 QUnit.test('Test patient anonymisation', function (assert) {
-  var done = assert.async();
 
-  var request = new XMLHttpRequest();
-  var url = '/tests/data/dwv-test-anonymise.dcm';
-  request.open('GET', url, true);
-  request.responseType = 'arraybuffer';
-  request.onerror = function (event) {
-    console.log(event);
+  // parse DICOM
+  var dicomParser = new DicomParser();
+  dicomParser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+
+  var patientsNameAnonymised = 'anonymise-name';
+  var patientsIdAnonymised = 'anonymise-id';
+  // rules with different levels: full tag, tag name and group name
+  var rules = {
+    default: {
+      action: 'copy', value: null
+    },
+    x00100010: {
+      action: 'replace', value: patientsNameAnonymised
+    },
+    PatientID: {
+      action: 'replace', value: patientsIdAnonymised
+    },
+    Patient: {
+      action: 'remove', value: null
+    }
   };
-  request.onload = function (/*event*/) {
-    assert.ok((this.response.byteLength !== 0), 'Got a response.');
 
-    // parse DICOM
-    var dicomParser = new dwv.dicom.DicomParser();
-    dicomParser.parse(this.response);
+  var patientsName = 'dwv^PatientName';
+  var patientID = 'dwv-patient-id123';
+  var patientsBirthDate = '19830101';
+  var patientsSex = 'M';
 
-    var patientsNameAnonymised = 'anonymise-name';
-    var patientsIdAnonymised = 'anonymise-id';
-    // rules with different levels: full tag, tag name and group name
-    var rules = {
-      default: {
-        action: 'copy', value: null
-      },
-      x00100010: {
-        action: 'replace', value: patientsNameAnonymised
-      },
-      PatientID: {
-        action: 'replace', value: patientsIdAnonymised
-      },
-      Patient: {
-        action: 'remove', value: null
-      }
-    };
+  // raw tags
+  var rawTags = dicomParser.getRawDicomElements();
+  // check values
+  assert.equal(
+    rawTags.x00100010.value[0].trim(),
+    patientsName,
+    'patientsName');
+  assert.equal(
+    rawTags.x00100020.value[0].trim(),
+    patientID,
+    'patientID');
+  assert.equal(
+    rawTags.x00100030.value[0].trim(),
+    patientsBirthDate,
+    'patientsBirthDate');
+  assert.equal(
+    rawTags.x00100040.value[0].trim(),
+    patientsSex,
+    'patientsSex');
 
-    var patientsName = 'dwv^PatientName';
-    var patientID = 'dwv-patient-id123';
-    var patientsBirthDate = '19830101';
-    var patientsSex = 'M';
+  var dicomWriter = new DicomWriter();
+  dicomWriter.rules = rules;
+  var buffer = dicomWriter.getBuffer(rawTags);
 
-    // raw tags
-    var rawTags = dicomParser.getRawDicomElements();
-    // check values
-    assert.equal(
-      rawTags.x00100010.value[0].trim(),
-      patientsName,
-      'patientsName');
-    assert.equal(
-      rawTags.x00100020.value[0].trim(),
-      patientID,
-      'patientID');
-    assert.equal(
-      rawTags.x00100030.value[0].trim(),
-      patientsBirthDate,
-      'patientsBirthDate');
-    assert.equal(
-      rawTags.x00100040.value[0].trim(),
-      patientsSex,
-      'patientsSex');
+  dicomParser = new DicomParser();
 
-    var dicomWriter = new dwv.dicom.DicomWriter();
-    dicomWriter.rules = rules;
-    var buffer = dicomWriter.getBuffer(rawTags);
+  dicomParser.parse(buffer);
 
-    dicomParser = new dwv.dicom.DicomParser();
+  rawTags = dicomParser.getRawDicomElements();
 
-    dicomParser.parse(buffer);
+  // check values
+  assert.equal(
+    rawTags.x00100010.value[0],
+    patientsNameAnonymised,
+    'patientName');
+  assert.equal(
+    rawTags.x00100020.value[0],
+    patientsIdAnonymised,
+    'patientID');
+  assert.notOk(rawTags.x00100030, 'patientsBirthDate');
+  assert.notOk(rawTags.x00100040, 'patientsSex');
 
-    rawTags = dicomParser.getRawDicomElements();
-
-    // check values
-    assert.equal(
-      rawTags.x00100010.value[0],
-      patientsNameAnonymised,
-      'patientName');
-    assert.equal(
-      rawTags.x00100020.value[0],
-      patientsIdAnonymised,
-      'patientID');
-    assert.notOk(rawTags.x00100030, 'patientsBirthDate');
-    assert.notOk(rawTags.x00100040, 'patientsSex');
-
-    // finish async test
-    done();
-  };
-  request.send(null);
 });
 
 /**
@@ -204,7 +195,7 @@ QUnit.test('Test patient anonymisation', function (assert) {
  * @param {object} comparator An object with an equal function (such as
  *   Qunit assert).
  */
-dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
+function compare(jsonTags, dicomElements, name, comparator) {
   // check content
   if (jsonTags === null || jsonTags === 0) {
     return;
@@ -212,7 +203,7 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
   var keys = Object.keys(jsonTags);
   for (var k = 0; k < keys.length; ++k) {
     var tagName = keys[k];
-    var tag = dwv.dicom.getTagFromDictionary(tagName);
+    var tag = getTagFromDictionary(tagName);
     var tagKey = tag.getKey();
     var element = dicomElements.getDEFromKey(tagKey);
     var value = dicomElements.getFromKey(tagKey, true);
@@ -223,7 +214,7 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
         jsonTag = jsonTag.join();
       }
       comparator.equal(
-        dwv.dicom.cleanString(value.join()),
+        cleanString(value.join()),
         jsonTag,
         name + ' - ' + tagName);
     } else {
@@ -239,14 +230,14 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
       // supposing same order of subkeys and indices...
       for (var i = 0; i < sqValue.length; ++i) {
         if (sqValue[i] !== 'undefinedLength') {
-          var wrap = new dwv.dicom.DicomElementsWrapper(value[i]);
-          dwv.test.compare(
+          var wrap = new DicomElementsWrapper(value[i]);
+          compare(
             sqValue[i], wrap, name, comparator);
         }
       }
     }
   }
-};
+}
 
 /**
  * Test a JSON config: write a DICOM file and read it back.
@@ -254,7 +245,7 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
  * @param {object} config A JSON config representing DICOM tags.
  * @param {object} assert A Qunit assert.
  */
-dwv.test.testWriteReadDataFromConfig = function (config, assert) {
+function testWriteReadDataFromConfig(config, assert) {
   // add private tags to dict if present
   var useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
@@ -262,7 +253,7 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
     for (var i = 0; i < keys.length; ++i) {
       var group = keys[i];
       var tags = config.privateDictionary[group];
-      dwv.dicom.dictionary[group] = tags;
+      DicomDictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
@@ -272,15 +263,15 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
   // TODO: find another way
   var jsonTags = JSON.parse(JSON.stringify(config.tags));
   // convert JSON to DICOM element object
-  var dicomElements = dwv.dicom.getElementsFromJSONTags(jsonTags);
+  var dicomElements = getElementsFromJSONTags(jsonTags);
   // pixels (if possible): small gradient square
-  if (dwv.dicom.checkTags(config.tags, dwv.dicom.requiredPixelTags)) {
+  if (checkTags(config.tags, RequiredPixelTags)) {
     dicomElements.x7FE00010 =
-      dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+      generatePixelDataFromJSONTags(config.tags);
   }
 
   // create DICOM buffer
-  var writer = new dwv.dicom.DicomWriter();
+  var writer = new DicomWriter();
   writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
   var dicomBuffer = null;
   try {
@@ -291,13 +282,13 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
   }
 
   // parse the buffer
-  var dicomParser = new dwv.dicom.DicomParser();
+  var dicomParser = new DicomParser();
   dicomParser.parse(dicomBuffer);
   var elements = dicomParser.getDicomElements();
 
   // compare contents
-  dwv.test.compare(config.tags, elements, config.name, assert);
-};
+  compare(config.tags, elements, config.name, assert);
+}
 
 /**
  * Tests write/read DICOM data from config file: explicit encoding.
@@ -306,24 +297,10 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
  * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit', function (assert) {
-  var done = assert.async();
-
-  // get the list of configs
-  var request = new XMLHttpRequest();
-  var url = '/tests/dicom/synthetic-data_explicit.json';
-  request.open('GET', url, true);
-  request.onerror = function (event) {
-    console.error(event);
-  };
-  request.onload = function (/*event*/) {
-    var configs = JSON.parse(this.responseText);
-    for (var i = 0; i < configs.length; ++i) {
-      dwv.test.testWriteReadDataFromConfig(configs[i], assert);
-    }
-    // finish async test
-    done();
-  };
-  request.send(null);
+  var configs = JSON.parse(syntheticDataExplicit);
+  for (var i = 0; i < configs.length; ++i) {
+    testWriteReadDataFromConfig(configs[i], assert);
+  }
 });
 
 /**
@@ -333,24 +310,10 @@ QUnit.test('Test synthetic dicom explicit', function (assert) {
  * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom implicit', function (assert) {
-  var done = assert.async();
-
-  // get the list of configs
-  var request = new XMLHttpRequest();
-  var url = '/tests/dicom/synthetic-data_implicit.json';
-  request.open('GET', url, true);
-  request.onerror = function (event) {
-    console.error(event);
-  };
-  request.onload = function (/*event*/) {
-    var configs = JSON.parse(this.responseText);
-    for (var i = 0; i < configs.length; ++i) {
-      dwv.test.testWriteReadDataFromConfig(configs[i], assert);
-    }
-    // finish async test
-    done();
-  };
-  request.send(null);
+  var configs = JSON.parse(syntheticDataImplicit);
+  for (var i = 0; i < configs.length; ++i) {
+    testWriteReadDataFromConfig(configs[i], assert);
+  }
 });
 
 /**
@@ -360,22 +323,8 @@ QUnit.test('Test synthetic dicom implicit', function (assert) {
  * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
-  var done = assert.async();
-
-  // get the list of configs
-  var request = new XMLHttpRequest();
-  var url = '/tests/dicom/synthetic-data_explicit_big-endian.json';
-  request.open('GET', url, true);
-  request.onerror = function (event) {
-    console.error(event);
-  };
-  request.onload = function (/*event*/) {
-    var configs = JSON.parse(this.responseText);
-    for (var i = 0; i < configs.length; ++i) {
-      dwv.test.testWriteReadDataFromConfig(configs[i], assert);
-    }
-    // finish async test
-    done();
-  };
-  request.send(null);
+  var configs = JSON.parse(syntheticDataExplicitBE);
+  for (var i = 0; i < configs.length; ++i) {
+    testWriteReadDataFromConfig(configs[i], assert);
+  }
 });

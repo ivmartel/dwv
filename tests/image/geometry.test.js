@@ -1,3 +1,9 @@
+import {Point3D, Point} from '../../src/math/point';
+import {Index} from '../../src/math/index';
+import {Size} from '../../src/image/size';
+import {Spacing} from '../../src/image/spacing';
+import {Geometry} from '../../src/image/geometry';
+
 /**
  * Tests for the 'image/geometry.js' file.
  */
@@ -7,16 +13,16 @@
 QUnit.module('image');
 
 /**
- * Tests for {@link dwv.image.Geometry}.
+ * Tests for {@link Geometry}.
  *
  * @function module:tests/image~geometry
  */
 QUnit.test('Test Geometry.', function (assert) {
   var size0 = 4;
-  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
-  var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
-  var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  var imgSize0 = new Size([size0, size0, 1]);
+  var imgSpacing0 = new Spacing([1, 1, 1]);
+  var imgOrigin0 = new Point3D(0, 0, 0);
+  var imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
 
   var testData = [
     {vals: [0, 0, 0], offset: 0},
@@ -37,9 +43,9 @@ QUnit.test('Test Geometry.', function (assert) {
     {vals: [3, 3, 0], offset: 15}
   ];
   for (var i = 0; i < testData.length; ++i) {
-    var index = new dwv.math.Index(testData[i].vals);
+    var index = new Index(testData[i].vals);
 
-    var theoPoint = new dwv.math.Point([
+    var theoPoint = new Point([
       testData[i].vals[0], testData[i].vals[1], testData[i].vals[2]
     ]);
     var resPoint = imgGeometry0.indexToWorld(index);

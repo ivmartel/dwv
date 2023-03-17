@@ -1,7 +1,4 @@
 /*eslint max-len:0*/
-// namespaces
-var dwv = dwv || {};
-dwv.dicom = dwv.dicom || {};
 
 /**
  * DICOM tag dictionary 2022a.
@@ -13,7 +10,7 @@ dwv.dicom = dwv.dicom || {};
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and
  *  'xxxx' with '0004'
  */
-dwv.dicom.dictionary = {
+export const DicomDictionary = {
   '0x0000': {
     '0x0000': ['UL', '1', 'CommandGroupLength'],
     '0x0001': ['UL', '1', 'CommandLengthToEnd'],
@@ -5236,7 +5233,7 @@ dwv.dicom.dictionary = {
 
 // taken from gdcm-2.6.1\Source\DataDictionary\GroupName.dic
 // -> removed duplicates (commented)
-dwv.dicom.TagGroups = {
+export const DicomTagGroups = {
   x0000: 'Command',
   x0002: 'Meta Element',
   x0004: 'File Set',
@@ -5314,20 +5311,20 @@ dwv.dicom.TagGroups = {
 // Value Representation (VR) with 32bit Value Length (VL)
 // Added locally used 'ox'
 // see http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1
-dwv.dicom.vr32bitVL = [
+export const Vr32bitVL = [
   'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'SQ', 'SV', 'UC', 'UN', 'UR', 'UT', 'UV', 'ox'
 ];
 
 // String VR with extended or replaced default character repertoire defined in
 // Specific Character Set (0008,0005)
 // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2
-dwv.dicom.charSetString = [
+export const CharSetString = [
   'SH', 'LO', 'UC', 'ST', 'LT', 'UT', 'PN'
 ];
 
 // VR types
 // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1
-dwv.dicom.vrTypes = {
+export const VrTypes = {
   AE: 'string',
   AS: 'string',
   AT: undefined,
