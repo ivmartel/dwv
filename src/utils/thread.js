@@ -180,7 +180,11 @@ ThreadPool.prototype.onabort = function (_event) {};
  * @param {object} parentPool The parent pool.
  */
 class WorkerThread {
+
+  #self;
+
   constructor(parentPool) {
+    this.#self = this;
     this.parentPool = parentPool;
     // thread ID
     this.id = Math.random().toString(36).substring(2, 15);
@@ -244,7 +248,7 @@ class WorkerThread {
     // send event
     this.parentPool.onworkitem(event);
     // tell the parent pool the task is done
-    this.parentPool.onTaskEnd(this);
+    this.parentPool.onTaskEnd(this.#self);
   }
 
   /**
@@ -261,7 +265,7 @@ class WorkerThread {
     // pass to parent
     this.parentPool.handleWorkerError(event);
     // stop the worker and free the thread
-    this.stop();
+    this.#self.stop();
   }
 } // class WorkerThread
 
