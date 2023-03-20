@@ -8,6 +8,7 @@ import {Geometry} from '../../src/image/geometry';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi';
 import {Image} from '../../src/image/image';
 import {ImageFactory} from '../../src/image/imageFactory';
+import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
 
 /**
  * Tests for the 'image/image.js' file.

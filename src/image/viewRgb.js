@@ -1,7 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
 /**
  * Generate image data for 'RGB' photometric interpretation.
  *
@@ -9,7 +5,7 @@ dwv.image = dwv.image || {};
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  */
-dwv.image.generateImageDataRgb = function (
+export function generateImageDataRgb(
   array,
   iterator,
   alphaFunc) {
@@ -25,4 +21,4 @@ dwv.image.generateImageDataRgb = function (
     index += 4;
     ival = iterator.next();
   }
-};
+}

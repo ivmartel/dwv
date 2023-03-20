@@ -1,13 +1,9 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
 /**
  * Minimum window width value.
  *
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2
  */
-dwv.image.MinWindowWidth = 1;
+const MinWindowWidth = 1;
 
 /**
  * Validate an input window width.
@@ -15,9 +11,9 @@ dwv.image.MinWindowWidth = 1;
  * @param {number} value The value to test.
  * @returns {number} A valid window width.
  */
-dwv.image.validateWindowWidth = function (value) {
-  return value < dwv.image.MinWindowWidth ? dwv.image.MinWindowWidth : value;
-};
+export function validateWindowWidth(value) {
+  return value < MinWindowWidth ? MinWindowWidth : value;
+}
 
 /**
  * WindowLevel class.
@@ -33,11 +29,21 @@ dwv.image.validateWindowWidth = function (value) {
  * @param {number} width The window width.
  * @class
  */
-dwv.image.WindowLevel = function (center, width) {
-  // check width
-  if (width < dwv.image.MinWindowWidth) {
-    throw new Error('Window width shall always be greater than or equal to ' +
-      dwv.image.MinWindowWidth);
+export class WindowLevel {
+
+  #center;
+  #width;
+
+  constructor(center, width) {
+    // check width
+    if (width < MinWindowWidth) {
+      throw new Error('Window width shall always be greater than or equal to ' +
+        MinWindowWidth);
+    }
+    this.#center = center;
+    this.#width = width;
+
+    this.#init();
   }
 
   /**
@@ -46,21 +52,23 @@ dwv.image.WindowLevel = function (center, width) {
    * @private
    * @type {number}
    */
-  var signedOffset = 0;
+  #signedOffset = 0;
+
   /**
    * Output value minimum. Defaults to 0.
    *
    * @private
    * @type {number}
    */
-  var ymin = 0;
+  #ymin = 0;
+
   /**
    * Output value maximum. Defaults to 255.
    *
    * @private
    * @type {number}
    */
-  var ymax = 255;
+  #ymax = 255;
 
   /**
    * Input value minimum (calculated).
@@ -68,66 +76,68 @@ dwv.image.WindowLevel = function (center, width) {
    * @private
    * @type {number}
    */
-  var xmin = null;
+  #xmin = null;
+
   /**
    * Input value maximum (calculated).
    *
    * @private
    * @type {number}
    */
-  var xmax = null;
+  #xmax = null;
+
   /**
    * Window level equation slope (calculated).
    *
    * @private
    * @type {number}
    */
-  var slope = null;
+  #slope = null;
+
   /**
    * Window level equation intercept (calculated).
    *
    * @private
    * @type {number}
    */
-  var inter = null;
+  #inter = null;
 
   /**
    * Initialise members. Called at construction.
    *
    * @private
    */
-  function init() {
-    var c = center + signedOffset;
+  #init() {
+    var c = this.#center + this.#signedOffset;
     // from the standard
-    xmin = c - 0.5 - ((width - 1) / 2);
-    xmax = c - 0.5 + ((width - 1) / 2);
+    this.#xmin = c - 0.5 - ((this.#width - 1) / 2);
+    this.#xmax = c - 0.5 + ((this.#width - 1) / 2);
     // develop the equation:
     // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
     // y = ( x / (w-1) ) * (ymax - ymin) +
     //     ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
-    slope = (ymax - ymin) / (width - 1);
-    inter = (-(c - 0.5) / (width - 1) + 0.5) * (ymax - ymin) + ymin;
+    this.#slope = (this.#ymax - this.#ymin) / (this.#width - 1);
+    this.#inter = (-(c - 0.5) / (this.#width - 1) + 0.5) *
+      (this.#ymax - this.#ymin) + this.#ymin;
   }
-
-  // call init
-  init();
 
   /**
    * Get the window center.
    *
    * @returns {number} The window center.
    */
-  this.getCenter = function () {
-    return center;
-  };
+  getCenter() {
+    return this.#center;
+  }
+
   /**
    * Get the window width.
    *
    * @returns {number} The window width.
    */
-  this.getWidth = function () {
-    return width;
-  };
+  getWidth() {
+    return this.#width;
+  }
 
   /**
    * Set the output value range.
@@ -135,23 +145,24 @@ dwv.image.WindowLevel = function (center, width) {
    * @param {number} min The output value minimum.
    * @param {number} max The output value maximum.
    */
-  this.setRange = function (min, max) {
-    ymin = parseInt(min, 10);
-    ymax = parseInt(max, 10);
+  setRange(min, max) {
+    this.#ymin = parseInt(min, 10);
+    this.#ymax = parseInt(max, 10);
     // re-initialise
-    init();
-  };
+    this.#init();
+  }
+
   /**
    * Set the signed offset.
    *
    * @param {number} offset The signed data offset,
    *   typically: slope * ( size / 2).
    */
-  this.setSignedOffset = function (offset) {
-    signedOffset = offset;
+  setSignedOffset(offset) {
+    this.#signedOffset = offset;
     // re-initialise
-    init();
-  };
+    this.#init();
+  }
 
   /**
    * Apply the window level on an input value.
@@ -160,35 +171,35 @@ dwv.image.WindowLevel = function (center, width) {
    * @returns {number} The leveled value, in the
    *  [ymin, ymax] range (default [0,255]).
    */
-  this.apply = function (value) {
-    if (value <= xmin) {
-      return ymin;
-    } else if (value > xmax) {
-      return ymax;
+  apply(value) {
+    if (value <= this.#xmin) {
+      return this.#ymin;
+    } else if (value > this.#xmax) {
+      return this.#ymax;
     } else {
-      return parseInt(((value * slope) + inter), 10);
+      return parseInt(((value * this.#slope) + this.#inter), 10);
     }
-  };
+  }
 
-};
+  /**
+   * Check for window level equality.
+   *
+   * @param {object} rhs The other window level to compare to.
+   * @returns {boolean} True if both window level are equal.
+   */
+  equals(rhs) {
+    return rhs !== null &&
+      this.getCenter() === rhs.getCenter() &&
+      this.getWidth() === rhs.getWidth();
+  }
 
-/**
- * Check for window level equality.
- *
- * @param {object} rhs The other window level to compare to.
- * @returns {boolean} True if both window level are equal.
- */
-dwv.image.WindowLevel.prototype.equals = function (rhs) {
-  return rhs !== null &&
-        this.getCenter() === rhs.getCenter() &&
-        this.getWidth() === rhs.getWidth();
-};
+  /**
+   * Get a string representation of the window level.
+   *
+   * @returns {string} The window level as a string.
+   */
+  toString() {
+    return (this.getCenter() + ', ' + this.getWidth());
+  }
 
-/**
- * Get a string representation of the window level.
- *
- * @returns {string} The window level as a string.
- */
-dwv.image.WindowLevel.prototype.toString = function () {
-  return (this.getCenter() + ', ' + this.getWidth());
-};
+} // class WindowLevel

@@ -1,7 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
@@ -11,7 +7,7 @@ dwv.image = dwv.image || {};
  * @param {object} colourMap The colour map.
  * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
-dwv.image.generateImageDataPaletteColor = function (
+export function generateImageDataPaletteColor(
   array,
   iterator,
   alphaFunc,
@@ -48,4 +44,4 @@ dwv.image.generateImageDataPaletteColor = function (
     index += 4;
     ival = iterator.next();
   }
-};
+}

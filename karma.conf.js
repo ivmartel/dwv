@@ -7,6 +7,7 @@ module.exports = function (config) {
     frameworks: ['qunit', 'webpack'],
     files: [
       {pattern: 'tests/dicom/*.test.js', watched: false},
+      {pattern: 'tests/image/*.test.js', watched: false},
       {pattern: 'tests/math/*.test.js', watched: false},
       {pattern: 'tests/utils/*.test.js', watched: false}
     ],

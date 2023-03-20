@@ -1,7 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
 /**
  * Generate image data for 'YBR_FULL' photometric interpretation.
  *
@@ -9,7 +5,7 @@ dwv.image = dwv.image || {};
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  */
-dwv.image.generateImageDataYbrFull = function (
+export function generateImageDataYbrFull(
   array,
   iterator,
   alphaFunc) {
@@ -29,4 +25,4 @@ dwv.image.generateImageDataYbrFull = function (
     index += 4;
     ival = iterator.next();
   }
-};
+}
