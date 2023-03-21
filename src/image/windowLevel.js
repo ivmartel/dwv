@@ -5,6 +5,16 @@
  */
 const MinWindowWidth = 1;
 
+export const DefaultPresets = {
+  CT: {
+    mediastinum: {center: 40, width: 400},
+    lung: {center: -500, width: 1500},
+    bone: {center: 500, width: 2000},
+    brain: {center: 40, width: 80},
+    head: {center: 90, width: 350}
+  }
+};
+
 /**
  * Validate an input window width.
  *
