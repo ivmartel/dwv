@@ -1,15 +1,14 @@
-// namespaces
-var dwv = dwv || {};
-dwv.gui = dwv.gui || {};
+import {Point, Point3D} from '../math/point';
+import {LayerGroup} from './layerGroup';
 
 /**
  * Window/level binder.
  */
-dwv.gui.WindowLevelBinder = function () {
-  this.getEventType = function () {
+export class WindowLevelBinder {
+  getEventType = function () {
     return 'wlchange';
   };
-  this.getCallback = function (layerGroup) {
+  getCallback = function (layerGroup) {
     return function (event) {
       var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
@@ -18,16 +17,16 @@ dwv.gui.WindowLevelBinder = function () {
       }
     };
   };
-};
+}
 
 /**
  * Position binder.
  */
-dwv.gui.PositionBinder = function () {
-  this.getEventType = function () {
+export class PositionBinder {
+  getEventType = function () {
     return 'positionchange';
   };
-  this.getCallback = function (layerGroup) {
+  getCallback = function (layerGroup) {
     return function (event) {
       var pointValues = event.value[1];
       var vc = layerGroup.getActiveViewLayer().getViewController();
@@ -44,19 +43,19 @@ dwv.gui.PositionBinder = function () {
           pointValues.pop();
         }
       }
-      vc.setCurrentPosition(new dwv.math.Point(pointValues));
+      vc.setCurrentPosition(new Point(pointValues));
     };
   };
-};
+}
 
 /**
  * Zoom binder.
  */
-dwv.gui.ZoomBinder = function () {
-  this.getEventType = function () {
+export class ZoomBinder {
+  getEventType = function () {
     return 'zoomchange';
   };
-  this.getCallback = function (layerGroup) {
+  getCallback = function (layerGroup) {
     return function (event) {
       var scale = {
         x: event.value[0],
@@ -65,7 +64,7 @@ dwv.gui.ZoomBinder = function () {
       };
       var center;
       if (event.value.length === 6) {
-        center = new dwv.math.Point3D(
+        center = new Point3D(
           event.value[3],
           event.value[4],
           event.value[5]
@@ -75,16 +74,16 @@ dwv.gui.ZoomBinder = function () {
       layerGroup.draw();
     };
   };
-};
+}
 
 /**
  * Offset binder.
  */
-dwv.gui.OffsetBinder = function () {
-  this.getEventType = function () {
+export class OffsetBinder {
+  getEventType = function () {
     return 'offsetchange';
   };
-  this.getCallback = function (layerGroup) {
+  getCallback = function (layerGroup) {
     return function (event) {
       layerGroup.setOffset({
         x: event.value[0],
@@ -94,16 +93,16 @@ dwv.gui.OffsetBinder = function () {
       layerGroup.draw();
     };
   };
-};
+}
 
 /**
  * Opacity binder. Only propagates to view layers of the same data.
  */
-dwv.gui.OpacityBinder = function () {
-  this.getEventType = function () {
+export class OpacityBinder {
+  getEventType = function () {
     return 'opacitychange';
   };
-  this.getCallback = function (layerGroup) {
+  getCallback = function (layerGroup) {
     return function (event) {
       // exit if no data index
       if (typeof event.dataid === 'undefined') {
@@ -117,7 +116,7 @@ dwv.gui.OpacityBinder = function () {
       }
     };
   };
-};
+}
 
 /**
  * Stage: controls a list of layer groups and their
@@ -125,45 +124,45 @@ dwv.gui.OpacityBinder = function () {
  *
  * @class
  */
-dwv.gui.Stage = function () {
+export class Stage {
 
   // associated layer groups
-  var layerGroups = [];
+  #layerGroups = [];
   // active layer group index
-  var activeLayerGroupIndex = null;
+  #activeLayerGroupIndex = null;
 
   // layer group binders
-  var binders = [];
+  #binders = [];
   // binder callbacks
-  var callbackStore = null;
+  #callbackStore = null;
 
   /**
    * Get the layer group at the given index.
    *
    * @param {number} index The index.
-   * @returns {dwv.gui.LayerGroup} The layer group.
+   * @returns {LayerGroup} The layer group.
    */
-  this.getLayerGroup = function (index) {
-    return layerGroups[index];
-  };
+  getLayerGroup(index) {
+    return this.#layerGroups[index];
+  }
 
   /**
    * Get the number of layer groups that form the stage.
    *
    * @returns {number} The number of layer groups.
    */
-  this.getNumberOfLayerGroups = function () {
-    return layerGroups.length;
-  };
+  getNumberOfLayerGroups() {
+    return this.#layerGroups.length;
+  }
 
   /**
    * Get the active layer group.
    *
-   * @returns {dwv.gui.LayerGroup} The layer group.
+   * @returns {LayerGroup} The layer group.
    */
-  this.getActiveLayerGroup = function () {
-    return this.getLayerGroup(activeLayerGroupIndex);
-  };
+  getActiveLayerGroup() {
+    return this.getLayerGroup(this.#activeLayerGroupIndex);
+  }
 
   /**
    * Get the view layers associated to a data index.
@@ -171,13 +170,13 @@ dwv.gui.Stage = function () {
    * @param {number} index The data index.
    * @returns {Array} The layers.
    */
-  this.getViewLayersByDataIndex = function (index) {
+  getViewLayersByDataIndex(index) {
     var res = [];
-    for (var i = 0; i < layerGroups.length; ++i) {
-      res = res.concat(layerGroups[i].getViewLayersByDataIndex(index));
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      res = res.concat(this.#layerGroups[i].getViewLayersByDataIndex(index));
     }
     return res;
-  };
+  }
 
   /**
    * Get the draw layers associated to a data index.
@@ -185,102 +184,102 @@ dwv.gui.Stage = function () {
    * @param {number} index The data index.
    * @returns {Array} The layers.
    */
-  this.getDrawLayersByDataIndex = function (index) {
+  getDrawLayersByDataIndex(index) {
     var res = [];
-    for (var i = 0; i < layerGroups.length; ++i) {
-      res = res.concat(layerGroups[i].getDrawLayersByDataIndex(index));
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      res = res.concat(this.#layerGroups[i].getDrawLayersByDataIndex(index));
     }
     return res;
-  };
+  }
 
   /**
    * Add a layer group to the list.
    *
    * @param {object} htmlElement The HTML element of the layer group.
-   * @returns {dwv.gui.LayerGroup} The newly created layer group.
+   * @returns {LayerGroup} The newly created layer group.
    */
-  this.addLayerGroup = function (htmlElement) {
-    activeLayerGroupIndex = layerGroups.length;
-    var layerGroup = new dwv.gui.LayerGroup(htmlElement);
+  addLayerGroup(htmlElement) {
+    this.#activeLayerGroupIndex = this.#layerGroups.length;
+    var layerGroup = new LayerGroup(htmlElement);
     // add to storage
-    var isBound = callbackStore && callbackStore.length !== 0;
+    var isBound = this.#callbackStore && this.#callbackStore.length !== 0;
     if (isBound) {
       this.unbindLayerGroups();
     }
-    layerGroups.push(layerGroup);
+    this.#layerGroups.push(layerGroup);
     if (isBound) {
       this.bindLayerGroups();
     }
     // return created group
     return layerGroup;
-  };
+  }
 
   /**
    * Get a layer group from an HTML element id.
    *
    * @param {string} id The element id to find.
-   * @returns {dwv.gui.LayerGroup} The layer group.
+   * @returns {LayerGroup} The layer group.
    */
-  this.getLayerGroupByDivId = function (id) {
-    return layerGroups.find(function (item) {
+  getLayerGroupByDivId(id) {
+    return this.#layerGroups.find(function (item) {
       return item.getDivId() === id;
     });
-  };
+  }
 
   /**
    * Set the layer groups binders.
    *
    * @param {Array} list The list of binder objects.
    */
-  this.setBinders = function (list) {
+  setBinders(list) {
     if (typeof list === 'undefined' || list === null) {
       throw new Error('Cannot set null or undefined binders');
     }
-    if (binders.length !== 0) {
+    if (this.#binders.length !== 0) {
       this.unbindLayerGroups();
     }
-    binders = list.slice();
+    this.#binders = list.slice();
     this.bindLayerGroups();
-  };
+  }
 
   /**
    * Empty the layer group list.
    */
-  this.empty = function () {
+  empty() {
     this.unbindLayerGroups();
-    for (var i = 0; i < layerGroups.length; ++i) {
-      layerGroups[i].empty();
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      this.#layerGroups[i].empty();
     }
-    layerGroups = [];
-    activeLayerGroupIndex = null;
-  };
+    this.#layerGroups = [];
+    this.#activeLayerGroupIndex = null;
+  }
 
   /**
    * Reset the stage: calls reset on all layer groups.
    */
-  this.reset = function () {
-    for (var i = 0; i < layerGroups.length; ++i) {
-      layerGroups[i].reset();
+  reset() {
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      this.#layerGroups[i].reset();
     }
-  };
+  }
 
   /**
    * Draw the stage: calls draw on all layer groups.
    */
-  this.draw = function () {
-    for (var i = 0; i < layerGroups.length; ++i) {
-      layerGroups[i].draw();
+  draw() {
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      this.#layerGroups[i].draw();
     }
-  };
+  }
 
   /**
    * Synchronise the fit scale of the group layers.
    */
-  this.syncLayerGroupScale = function () {
+  syncLayerGroupScale() {
     var minScale;
     var hasScale = [];
-    for (var i = 0; i < layerGroups.length; ++i) {
-      var scale = layerGroups[i].calculateFitScale();
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      var scale = this.#layerGroups[i].calculateFitScale();
       if (typeof scale !== 'undefined') {
         hasScale.push(i);
         if (typeof minScale === 'undefined' || scale < minScale) {
@@ -293,51 +292,51 @@ dwv.gui.Stage = function () {
       return;
     }
     // apply min scale to layers
-    for (var j = 0; j < layerGroups.length; ++j) {
+    for (var j = 0; j < this.#layerGroups.length; ++j) {
       if (hasScale.includes(j)) {
-        layerGroups[j].setFitScale(minScale);
+        this.#layerGroups[j].setFitScale(minScale);
       }
     }
-  };
+  }
 
   /**
    * Bind the layer groups of the stage.
    */
-  this.bindLayerGroups = function () {
-    if (layerGroups.length === 0 ||
-      layerGroups.length === 1 ||
-      binders.length === 0) {
+  bindLayerGroups() {
+    if (this.#layerGroups.length === 0 ||
+      this.#layerGroups.length === 1 ||
+      this.#binders.length === 0) {
       return;
     }
     // create callback store
-    callbackStore = new Array(layerGroups.length);
+    this.#callbackStore = new Array(this.#layerGroups.length);
     // add listeners
-    for (var i = 0; i < layerGroups.length; ++i) {
-      for (var j = 0; j < binders.length; ++j) {
-        addEventListeners(i, binders[j]);
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      for (var j = 0; j < this.#binders.length; ++j) {
+        this.#addEventListeners(i, this.#binders[j]);
       }
     }
-  };
+  }
 
   /**
    * Unbind the layer groups of the stage.
    */
-  this.unbindLayerGroups = function () {
-    if (layerGroups.length === 0 ||
-      layerGroups.length === 1 ||
-      binders.length === 0 ||
-      !callbackStore) {
+  unbindLayerGroups() {
+    if (this.#layerGroups.length === 0 ||
+      this.#layerGroups.length === 1 ||
+      this.#binders.length === 0 ||
+      !this.#callbackStore) {
       return;
     }
     // remove listeners
-    for (var i = 0; i < layerGroups.length; ++i) {
-      for (var j = 0; j < binders.length; ++j) {
-        removeEventListeners(i, binders[j]);
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
+      for (var j = 0; j < this.#binders.length; ++j) {
+        this.#removeEventListeners(i, this.#binders[j]);
       }
     }
     // clear callback store
-    callbackStore = null;
-  };
+    this.#callbackStore = null;
+  }
 
   /**
    * Get the binder callback function for a given layer group index.
@@ -347,11 +346,11 @@ dwv.gui.Stage = function () {
    * @param {number} index The index of the associated layer group.
    * @returns {Function} The binder function.
    */
-  function getBinderCallback(binder, index) {
-    if (typeof callbackStore[index] === 'undefined') {
-      callbackStore[index] = [];
+  #getBinderCallback(binder, index) {
+    if (typeof this.#callbackStore[index] === 'undefined') {
+      this.#callbackStore[index] = [];
     }
-    var store = callbackStore[index];
+    var store = this.#callbackStore[index];
     var binderObj = store.find(function (elem) {
       return elem.binder === binder;
     });
@@ -359,16 +358,16 @@ dwv.gui.Stage = function () {
       // create new callback object
       binderObj = {
         binder: binder,
-        callback: function (event) {
+        callback: (event) => {
           // stop listeners
-          removeEventListeners(index, binder);
+          this.#removeEventListeners(index, binder);
           // apply binder
-          binder.getCallback(layerGroups[index])(event);
+          binder.getCallback(this.#layerGroups[index])(event);
           // re-start listeners
-          addEventListeners(index, binder);
+          this.#addEventListeners(index, binder);
         }
       };
-      callbackStore[index].push(binderObj);
+      this.#callbackStore[index].push(binderObj);
     }
     return binderObj.callback;
   }
@@ -379,12 +378,12 @@ dwv.gui.Stage = function () {
    * @param {number} index The index of the associated layer group.
    * @param {object} binder The layer binder.
    */
-  function addEventListeners(index, binder) {
-    for (var i = 0; i < layerGroups.length; ++i) {
+  #addEventListeners(index, binder) {
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
       if (i !== index) {
-        layerGroups[index].addEventListener(
+        this.#layerGroups[index].addEventListener(
           binder.getEventType(),
-          getBinderCallback(binder, i)
+          this.#getBinderCallback(binder, i)
         );
       }
     }
@@ -396,14 +395,15 @@ dwv.gui.Stage = function () {
    * @param {number} index The index of the associated layer group.
    * @param {object} binder The layer binder.
    */
-  function removeEventListeners(index, binder) {
-    for (var i = 0; i < layerGroups.length; ++i) {
+  #removeEventListeners(index, binder) {
+    for (var i = 0; i < this.#layerGroups.length; ++i) {
       if (i !== index) {
-        layerGroups[index].removeEventListener(
+        this.#layerGroups[index].removeEventListener(
           binder.getEventType(),
-          getBinderCallback(binder, i)
+          this.#getBinderCallback(binder, i)
         );
       }
     }
   }
-};
+
+} // class Stage

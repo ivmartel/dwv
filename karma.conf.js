@@ -6,12 +6,7 @@ module.exports = function (config) {
     basePath: '.',
     frameworks: ['qunit', 'webpack'],
     files: [
-      {pattern: 'tests/state/*.test.js', watched: false},
-      {pattern: 'tests/io/*.test.js', watched: false},
-      {pattern: 'tests/dicom/*.test.js', watched: false},
-      {pattern: 'tests/image/*.test.js', watched: false},
-      {pattern: 'tests/math/*.test.js', watched: false},
-      {pattern: 'tests/utils/*.test.js', watched: false}
+      {pattern: 'tests/**/*.test.js', watched: false}
     ],
     client: {
       clearContext: false,
