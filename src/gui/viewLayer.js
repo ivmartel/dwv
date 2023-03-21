@@ -2,8 +2,11 @@ import {Index} from '../math/index';
 import {ListenerHandler} from '../utils/listen';
 import {ViewEventNames} from '../image/view';
 import {ViewController} from '../app/viewController';
-import {getScaledOffset, canCreateCanvas} from './generic';
-import {InteractionEventNames} from './viewLayer';
+import {
+  canCreateCanvas,
+  InteractionEventNames
+} from './generic';
+import {getScaledOffset} from './layerGroup';
 
 /**
  * View layer.
