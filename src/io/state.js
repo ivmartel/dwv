@@ -1,8 +1,9 @@
-// namespaces
-var dwv = dwv || {};
-dwv.io = dwv.io || {};
+import {Index} from '../math/index';
+import {colourNameToHex} from '../utils/colour';
+import {getDrawPositionGroupId} from '../app/drawController';
+
 // external
-var Konva = Konva || {};
+import Konva from 'konva';
 
 /**
  * State class.
@@ -31,14 +32,14 @@ var Konva = Konva || {};
  *
  * @class
  */
-dwv.io.State = function () {
+export class State {
   /**
    * Save the application state as JSON.
    *
    * @param {object} app The associated application.
    * @returns {string} The state as a JSON string.
    */
-  this.toJSON = function (app) {
+  toJSON(app) {
     var layerGroup = app.getActiveLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -56,39 +57,41 @@ dwv.io.State = function () {
       drawings: drawLayer.getKonvaLayer().toObject(),
       drawingsDetails: drawController.getDrawStoreDetails()
     });
-  };
+  }
+
   /**
    * Load an application state from JSON.
    *
    * @param {string} json The JSON representation of the state.
    * @returns {object} The state object.
    */
-  this.fromJSON = function (json) {
+  fromJSON(json) {
     var data = JSON.parse(json);
     var res = null;
     if (data.version === '0.1') {
-      res = readV01(data);
+      res = this.#readV01(data);
     } else if (data.version === '0.2') {
-      res = readV02(data);
+      res = this.#readV02(data);
     } else if (data.version === '0.3') {
-      res = readV03(data);
+      res = this.#readV03(data);
     } else if (data.version === '0.4') {
-      res = readV04(data);
+      res = this.#readV04(data);
     } else if (data.version === '0.5') {
-      res = readV05(data);
+      res = this.#readV05(data);
     } else {
       throw new Error('Unknown state file format version: \'' +
         data.version + '\'.');
     }
     return res;
-  };
+  }
+
   /**
    * Load an application state from JSON.
    *
    * @param {object} app The app to apply the state to.
    * @param {object} data The state data.
    */
-  this.apply = function (app, data) {
+  apply(app, data) {
     var layerGroup = app.getActiveLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -96,7 +99,7 @@ dwv.io.State = function () {
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
     // position is index...
-    viewController.setCurrentIndex(new dwv.math.Index(data.position));
+    viewController.setCurrentIndex(new Index(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
@@ -141,7 +144,8 @@ dwv.io.State = function () {
     app.render(0); //todo: fix
     // drawings (will draw the draw layer)
     app.setDrawings(data.drawings, data.drawingsDetails);
-  };
+  }
+
   /**
    * Read an application state from an Object in v0.1 format.
    *
@@ -149,18 +153,19 @@ dwv.io.State = function () {
    * @returns {object} The state object.
    * @private
    */
-  function readV01(data) {
+  #readV01(data) {
     // v0.1 -> v0.2
-    var v02DAndD = dwv.io.v01Tov02DrawingsAndDetails(data.drawings);
+    var v02DAndD = v01Tov02DrawingsAndDetails(data.drawings);
     // v0.2 -> v0.3, v0.4
-    data.drawings = dwv.io.v02Tov03Drawings(v02DAndD.drawings).toObject();
-    data.drawingsDetails = dwv.io.v03Tov04DrawingsDetails(
+    data.drawings = v02Tov03Drawings(v02DAndD.drawings).toObject();
+    data.drawingsDetails = v03Tov04DrawingsDetails(
       v02DAndD.drawingsDetails);
     // v0.4 -> v0.5
-    data = dwv.io.v04Tov05Data(data);
-    data.drawings = dwv.io.v04Tov05Drawings(data.drawings);
+    data = v04Tov05Data(data);
+    data.drawings = v04Tov05Drawings(data.drawings);
     return data;
   }
+
   /**
    * Read an application state from an Object in v0.2 format.
    *
@@ -168,16 +173,17 @@ dwv.io.State = function () {
    * @returns {object} The state object.
    * @private
    */
-  function readV02(data) {
+  #readV02(data) {
     // v0.2 -> v0.3, v0.4
-    data.drawings = dwv.io.v02Tov03Drawings(data.drawings).toObject();
-    data.drawingsDetails = dwv.io.v03Tov04DrawingsDetails(
-      dwv.io.v02Tov03DrawingsDetails(data.drawingsDetails));
+    data.drawings = v02Tov03Drawings(data.drawings).toObject();
+    data.drawingsDetails = v03Tov04DrawingsDetails(
+      v02Tov03DrawingsDetails(data.drawingsDetails));
     // v0.4 -> v0.5
-    data = dwv.io.v04Tov05Data(data);
-    data.drawings = dwv.io.v04Tov05Drawings(data.drawings);
+    data = v04Tov05Data(data);
+    data.drawings = v04Tov05Drawings(data.drawings);
     return data;
   }
+
   /**
    * Read an application state from an Object in v0.3 format.
    *
@@ -185,14 +191,15 @@ dwv.io.State = function () {
    * @returns {object} The state object.
    * @private
    */
-  function readV03(data) {
+  #readV03(data) {
     // v0.3 -> v0.4
-    data.drawingsDetails = dwv.io.v03Tov04DrawingsDetails(data.drawingsDetails);
+    data.drawingsDetails = v03Tov04DrawingsDetails(data.drawingsDetails);
     // v0.4 -> v0.5
-    data = dwv.io.v04Tov05Data(data);
-    data.drawings = dwv.io.v04Tov05Drawings(data.drawings);
+    data = v04Tov05Data(data);
+    data.drawings = v04Tov05Drawings(data.drawings);
     return data;
   }
+
   /**
    * Read an application state from an Object in v0.4 format.
    *
@@ -200,10 +207,10 @@ dwv.io.State = function () {
    * @returns {object} The state object.
    * @private
    */
-  function readV04(data) {
+  #readV04(data) {
     // v0.4 -> v0.5
-    data = dwv.io.v04Tov05Data(data);
-    data.drawings = dwv.io.v04Tov05Drawings(data.drawings);
+    data = v04Tov05Data(data);
+    data.drawings = v04Tov05Drawings(data.drawings);
     return data;
   }
   /**
@@ -213,11 +220,11 @@ dwv.io.State = function () {
    * @returns {object} The state object.
    * @private
    */
-  function readV05(data) {
+  #readV05(data) {
     return data;
   }
 
-}; // State class
+} // State class
 
 /**
  * Convert drawings from v0.2 to v0.3.
@@ -227,7 +234,7 @@ dwv.io.State = function () {
  * @param {Array} drawings An array of drawings.
  * @returns {object} The layer with the converted drawings.
  */
-dwv.io.v02Tov03Drawings = function (drawings) {
+function v02Tov03Drawings(drawings) {
   // Auxiliar variables
   var group, groupShapes, parentGroup;
   // Avoid errors when dropping multiple states
@@ -251,7 +258,7 @@ dwv.io.v02Tov03Drawings = function (drawings) {
       if (groupShapes.length !== 0) {
         // Create position-group set as visible and append it to drawLayer
         parentGroup = new Konva.Group({
-          id: dwv.draw.getDrawPositionGroupId(new dwv.math.Index([1, 1, k, f])),
+          id: getDrawPositionGroupId(new Index([1, 1, k, f])),
           name: 'position-group',
           visible: false
         });
@@ -276,7 +283,7 @@ dwv.io.v02Tov03Drawings = function (drawings) {
   }
 
   return drawLayer;
-};
+}
 
 /**
  * Convert drawings from v0.1 to v0.2.
@@ -286,7 +293,7 @@ dwv.io.v02Tov03Drawings = function (drawings) {
  * @param {Array} inputDrawings An array of drawings.
  * @returns {object} The converted drawings.
  */
-dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
+function v01Tov02DrawingsAndDetails(inputDrawings) {
   var newDrawings = [];
   var drawingsDetails = {};
 
@@ -312,7 +319,7 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         var kshape = drawGroup.getChildren(function (node) {
           return node.name() === 'shape';
         })[0];
-        kshape.stroke(dwv.utils.colourNameToHex(kshape.stroke()));
+        kshape.stroke(colourNameToHex(kshape.stroke()));
         // special line case
         if (drawGroup.name() === 'line-group') {
           // update name
@@ -423,7 +430,7 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
   }
 
   return {drawings: newDrawings, drawingsDetails: drawingsDetails};
-};
+}
 
 /**
  * Convert drawing details from v0.2 to v0.3.
@@ -433,7 +440,7 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
  * @param {Array} details An array of drawing details.
  * @returns {object} The converted drawings.
  */
-dwv.io.v02Tov03DrawingsDetails = function (details) {
+function v02Tov03DrawingsDetails(details) {
   var res = {};
   // Get the positions-groups data
   var groupDetails = typeof details === 'string'
@@ -454,7 +461,7 @@ dwv.io.v02Tov03DrawingsDetails = function (details) {
     }
   }
   return res;
-};
+}
 
 /**
  * Convert drawing details from v0.3 to v0.4.
@@ -464,7 +471,7 @@ dwv.io.v02Tov03DrawingsDetails = function (details) {
  * @param {Array} details An array of drawing details.
  * @returns {object} The converted drawings.
  */
-dwv.io.v03Tov04DrawingsDetails = function (details) {
+function v03Tov04DrawingsDetails(details) {
   var res = {};
   var keys = Object.keys(details);
   // Iterate over each position-groups
@@ -479,7 +486,7 @@ dwv.io.v03Tov04DrawingsDetails = function (details) {
     };
   }
   return res;
-};
+}
 
 /**
  * Convert drawing from v0.4 to v0.5.
@@ -489,11 +496,11 @@ dwv.io.v03Tov04DrawingsDetails = function (details) {
  * @param {Array} data An array of drawing.
  * @returns {object} The converted drawings.
  */
-dwv.io.v04Tov05Data = function (data) {
+function v04Tov05Data(data) {
   var pos = data.position;
   data.position = [pos.i, pos.j, pos.k];
   return data;
-};
+}
 
 /**
  * Convert drawing from v0.4 to v0.5.
@@ -503,7 +510,7 @@ dwv.io.v04Tov05Data = function (data) {
  * @param {Array} inputDrawings An array of drawing.
  * @returns {object} The converted drawings.
  */
-dwv.io.v04Tov05Drawings = function (inputDrawings) {
+function v04Tov05Drawings(inputDrawings) {
   // Iterate over each position-groups
   var posGroups = inputDrawings.children;
   for (var k = 0, lenk = posGroups.length; k < lenk; ++k) {
@@ -521,4 +528,4 @@ dwv.io.v04Tov05Drawings = function (inputDrawings) {
     posGroup.attrs.id = newId;
   }
   return inputDrawings;
-};
+}

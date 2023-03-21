@@ -18,12 +18,12 @@ var Konva = Konva || {};
  * @returns {string} The group id.
  * @deprecated Use the index.toStringId instead.
  */
-dwv.draw.getDrawPositionGroupId = function (currentPosition) {
+export function getDrawPositionGroupId(currentPosition) {
   var sliceNumber = currentPosition.get(2);
   var frameNumber = currentPosition.length() === 4
     ? currentPosition.get(3) : 0;
   return 'slice-' + sliceNumber + '_frame-' + frameNumber;
-};
+}
 
 /**
  * Get the slice and frame position from a group id.
