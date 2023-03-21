@@ -27,8 +27,10 @@ export class MultiProgressHandler {
    */
   #numberOfDimensions = 2;
 
+  #callback;
+
   constructor(callback) {
-    this.callback = callback;
+    this.#callback = callback;
   }
 
   /**
@@ -37,7 +39,7 @@ export class MultiProgressHandler {
    * @param {number} num The number.
    */
   setNumberOfDimensions(num) {
-    this.numberOfDimensions = num;
+    this.#numberOfDimensions = num;
   }
 
   /**
@@ -47,9 +49,9 @@ export class MultiProgressHandler {
    */
   setNToLoad(n) {
     for (var i = 0; i < n; ++i) {
-      this.progresses[i] = [];
-      for (var j = 0; j < this.umberOfDimensions; ++j) {
-        this.progresses[i][j] = 0;
+      this.#progresses[i] = [];
+      for (var j = 0; j < this.#numberOfDimensions; ++j) {
+        this.#progresses[i][j] = 0;
       }
     }
   }
@@ -60,7 +62,7 @@ export class MultiProgressHandler {
    *
    * @param {object} event The progress event.
    */
-  onprogress(event) {
+  onprogress = (event) => {
     // check event
     if (!event.lengthComputable) {
       return;
@@ -74,7 +76,7 @@ export class MultiProgressHandler {
     // calculate percent
     var percent = (event.loaded * 100) / event.total;
     // set percent for index
-    this.progresses[event.index][event.subindex] = percent;
+    this.#progresses[event.index][event.subindex] = percent;
 
     // item progress
     var item = null;
@@ -89,13 +91,13 @@ export class MultiProgressHandler {
     }
 
     // call callback with a global event
-    this.callback({
+    this.#callback({
       lengthComputable: true,
       loaded: this.#getGlobalPercent(),
       total: 100,
       item: item
     });
-  }
+  };
 
   /**
    * Get the item load percent.
@@ -106,10 +108,10 @@ export class MultiProgressHandler {
    */
   #getItemProgress(index) {
     var sum = 0;
-    for (var j = 0; j < this.numberOfDimensions; ++j) {
-      sum += this.progresses[index][j];
+    for (var j = 0; j < this.#numberOfDimensions; ++j) {
+      sum += this.#progresses[index][j];
     }
-    return sum / this.numberOfDimensions;
+    return sum / this.#numberOfDimensions;
   }
 
   /**
@@ -120,7 +122,7 @@ export class MultiProgressHandler {
    */
   #getGlobalPercent() {
     var sum = 0;
-    var lenprog = this.progresses.length;
+    var lenprog = this.#progresses.length;
     for (var i = 0; i < lenprog; ++i) {
       sum += this.#getItemProgress(i);
     }
@@ -135,7 +137,7 @@ export class MultiProgressHandler {
    * @returns {Function} A progress handler function.
    */
   getMonoProgressHandler(index, subindex) {
-    return function (event) {
+    return (event) => {
       event.index = index;
       event.subindex = subindex;
       this.onprogress(event);
@@ -150,7 +152,7 @@ export class MultiProgressHandler {
    * @returns {Function} A progress handler function.
    */
   getUndefinedMonoProgressHandler(subindex) {
-    return function (event) {
+    return (event) => {
       event.subindex = subindex;
       this.onprogress(event);
     };
