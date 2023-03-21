@@ -10,8 +10,7 @@ import {MemoryLoader} from './memoryLoader';
  * @external JSZip
  * @see https://github.com/Stuk/jszip
  */
-//var JSZip = JSZip || {};
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 
 /**
  * ZIP data loader.
