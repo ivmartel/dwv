@@ -1,6 +1,4 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {logger} from '../utils/logger';
 
 /**
  * Mask segment helper.
@@ -8,15 +6,21 @@ dwv.image = dwv.image || {};
  * @class
  * @param {object} mask The associated mask image.
  */
-dwv.image.MaskSegmentHelper = function (mask) {
+export class MaskSegmentHelper {
 
+  #mask;
   /**
    * The segments: array of segment description.
    *
    * @private
    * @type {Array}
    */
-  var segments = mask.getMeta().custom.segments;
+  #segments;
+
+  constructor(mask) {
+    this.#mask = mask;
+    this.#segments = mask.getMeta().custom.segments;
+  }
 
   /**
    * List of ids of hidden segments.
@@ -24,7 +28,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @private
    * @type {Array}
    */
-  var hiddenSegments = [];
+  #hiddenSegments = [];
 
   /**
    * Check if a segment is part of the inner segment list.
@@ -32,9 +36,9 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {number} segmentNumber The segment number.
    * @returns {boolean} True if the segment is included.
    */
-  this.hasSegment = function (segmentNumber) {
+  hasSegment(segmentNumber) {
     return typeof this.getSegment(segmentNumber) !== 'undefined';
-  };
+  }
 
   /**
    * Check if a segment is present in a mask image.
@@ -43,7 +47,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @returns {Array} Array of boolean set to true
    *   if the segment is present in the mask.
    */
-  this.maskHasSegments = function (numbers) {
+  maskHasSegments(numbers) {
     // create values using displayValue
     var values = [];
     var unknowns = [];
@@ -52,17 +56,17 @@ dwv.image.MaskSegmentHelper = function (mask) {
       if (typeof segment !== 'undefined') {
         values.push(segment.displayValue);
       } else {
-        dwv.logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
+        logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
         unknowns.push(i);
       }
     }
-    var res = mask.hasValues(values);
+    var res = this.#mask.hasValues(values);
     // insert unknowns as false in result
     for (var j = 0; j < unknowns.length; ++j) {
       res.splice(unknowns[j], 0, false);
     }
     return res;
-  };
+  }
 
   /**
    * Get a segment from the inner segment list.
@@ -70,29 +74,29 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {number} segmentNumber The segment number.
    * @returns {object} The segment.
    */
-  this.getSegment = function (segmentNumber) {
-    return segments.find(function (item) {
+  getSegment(segmentNumber) {
+    return this.#segments.find(function (item) {
       return item.number === segmentNumber;
     });
-  };
+  }
 
   /**
    * Get the inner segment list.
    *
    * @returns {Array} The list of segments.
    */
-  this.getSegments = function () {
-    return segments;
-  };
+  getSegments() {
+    return this.#segments;
+  }
 
   /**
    * Set the inner segment list.
    *
    * @param {Array} list The segment list.
    */
-  this.setSegments = function (list) {
-    segments = list;
-  };
+  setSegments(list) {
+    this.#segments = list;
+  }
 
   /**
    * Set the hidden segment list.
@@ -100,9 +104,9 @@ dwv.image.MaskSegmentHelper = function (mask) {
    *
    * @param {Array} list The list of hidden segment numbers.
    */
-  this.setHiddenSegments = function (list) {
-    hiddenSegments = list;
-  };
+  setHiddenSegments(list) {
+    this.#hiddenSegments = list;
+  }
 
   /**
    * Get the index of a segment in the hidden list.
@@ -110,8 +114,8 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {number} segmentNumber The segment number.
    * @returns {number|undefined} The index in the array.
    */
-  function getHiddenIndex(segmentNumber) {
-    return hiddenSegments.findIndex(function (item) {
+  #getHiddenIndex(segmentNumber) {
+    return this.#hiddenSegments.findIndex(function (item) {
       return item === segmentNumber;
     });
   }
@@ -122,48 +126,48 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {number} segmentNumber The segment number.
    * @returns {boolean} True if the segment is in the list.
    */
-  this.isHidden = function (segmentNumber) {
-    return getHiddenIndex(segmentNumber) !== -1;
-  };
+  isHidden(segmentNumber) {
+    return this.#getHiddenIndex(segmentNumber) !== -1;
+  }
 
   /**
    * Add a segment to the hidden list.
    *
    * @param {number} segmentNumber The segment number.
    */
-  this.addToHidden = function (segmentNumber) {
+  addToHidden(segmentNumber) {
     if (!this.isHidden(segmentNumber)) {
-      hiddenSegments.push(segmentNumber);
+      this.#hiddenSegments.push(segmentNumber);
     } else {
-      dwv.logger.warn(
+      logger.warn(
         'Segment is allready in the hidden list: ' + segmentNumber);
     }
-  };
+  }
 
   /**
    * Remove a segment from the hidden list.
    *
    * @param {number} segmentNumber The segment number.
    */
-  this.removeFromHidden = function (segmentNumber) {
-    var index = getHiddenIndex(segmentNumber);
+  removeFromHidden(segmentNumber) {
+    var index = this.#getHiddenIndex(segmentNumber);
     if (index !== -1) {
-      hiddenSegments.splice(index, 1);
+      this.#hiddenSegments.splice(index, 1);
     } else {
-      dwv.logger.warn('Segment is not in the hidden list: ' + segmentNumber);
+      logger.warn('Segment is not in the hidden list: ' + segmentNumber);
     }
-  };
+  }
 
   /**
    * Get the alpha function to apply hidden colors.
    *
    * @returns {Function} The corresponding alpha function.
    */
-  this.getAlphaFunc = function () {
+  getAlphaFunc() {
     // get colours
     var hiddenColours = [{r: 0, g: 0, b: 0}];
-    for (var i = 0; i < hiddenSegments.length; ++i) {
-      var segment = this.getSegment(hiddenSegments[i]);
+    for (var i = 0; i < this.#hiddenSegments.length; ++i) {
+      var segment = this.getSegment(this.#hiddenSegments[i]);
       if (typeof segment !== 'undefined') {
         hiddenColours.push(segment.displayValue);
       }
@@ -181,7 +185,7 @@ dwv.image.MaskSegmentHelper = function (mask) {
       // default
       return 255;
     };
-  };
+  }
 
   /**
    * Delete a segment.
@@ -190,9 +194,9 @@ dwv.image.MaskSegmentHelper = function (mask) {
    * @param {Function} cmdCallback The command event callback.
    * @param {Function} exeCallback The post execution callback.
    */
-  this.deleteSegment = function (segmentNumber, cmdCallback, exeCallback) {
-    var delcmd = new dwv.image.DeleteSegmentCommand(
-      mask, this.getSegment(segmentNumber));
+  deleteSegment(segmentNumber, cmdCallback, exeCallback) {
+    var delcmd = new DeleteSegmentCommand(
+      this.#mask, this.getSegment(segmentNumber));
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
     if (delcmd.isValid()) {
@@ -204,8 +208,9 @@ dwv.image.MaskSegmentHelper = function (mask) {
         this.removeFromHidden(segmentNumber);
       }
     }
-  };
-};
+  }
+
+} // class MaskSegmentHelper
 
 /**
  * Delete segment command.
@@ -215,92 +220,104 @@ dwv.image.MaskSegmentHelper = function (mask) {
  * @param {boolean} silent Whether to send a creation event or not.
  * @class
  */
-dwv.image.DeleteSegmentCommand = function (mask, segment, silent) {
-  var isSilent = (typeof silent === 'undefined') ? false : silent;
+export class DeleteSegmentCommand {
 
-  // list of offsets with the colour to delete
-  var offsets = mask.getOffsets(segment.displayValue);
+  #mask;
+  #segment;
+  #isSilent;
+  #offsets;
+
+  constructor(mask, segment, silent) {
+    this.#mask = mask;
+    this.#segment = segment;
+
+    this.#isSilent = (typeof silent === 'undefined') ? false : silent;
+    // list of offsets with the colour to delete
+    this.#offsets = mask.getOffsets(segment.displayValue);
+  }
 
   /**
    * Get the command name.
    *
    * @returns {string} The command name.
    */
-  this.getName = function () {
+  getName() {
     return 'Delete-segment';
-  };
+  }
 
   /**
    * Check if a command is valid and can be executed.
    *
    * @returns {boolean} True if the command is valid.
    */
-  this.isValid = function () {
-    return offsets.length !== 0;
-  };
+  isValid() {
+    return this.#offsets.length !== 0;
+  }
 
   /**
    * Execute the command.
    *
-   * @fires dwv.image.DeleteSegmentCommand#masksegmentdelete
+   * @fires DeleteSegmentCommand#masksegmentdelete
    */
-  this.execute = function () {
+  execute() {
     // remove
-    mask.setAtOffsets(offsets, {r: 0, g: 0, b: 0});
+    this.#mask.setAtOffsets(this.#offsets, {r: 0, g: 0, b: 0});
 
     // callback
-    if (!isSilent) {
+    if (!this.#isSilent) {
       /**
        * Segment delete event.
        *
-       * @event dwv.image.DeleteSegmentCommand#masksegmentdelete
+       * @event DeleteSegmentCommand#masksegmentdelete
        * @type {object}
        * @property {number} segmentnumber The segment number.
        */
       this.onExecute({
         type: 'masksegmentdelete',
-        segmentnumber: segment.number
+        segmentnumber: this.#segment.number
       });
     }
-  };
+  }
 
   /**
    * Undo the command.
    *
-   * @fires dwv.image.DeleteSegmentCommand#masksegmentredraw
+   * @fires DeleteSegmentCommand#masksegmentredraw
    */
-  this.undo = function () {
+  undo() {
     // re-draw
-    mask.setAtOffsets(offsets, segment.displayValue);
+    this.#mask.setAtOffsets(this.#offsets, this.#segment.displayValue);
 
     // callback
     /**
      * Segment redraw event.
      *
-     * @event dwv.image.DeleteSegmentCommand#masksegmentredraw
+     * @event DeleteSegmentCommand#masksegmentredraw
      * @type {object}
      * @property {number} segmentnumber The segment number.
      */
     this.onUndo({
       type: 'masksegmentredraw',
-      segmentnumber: segment.number
+      segmentnumber: this.#segment.number
     });
-  };
-}; // DeleteSegmentCommand class
+  }
 
-/**
- * Handle an execute event.
- *
- * @param {object} _event The execute event with type and id.
- */
-dwv.image.DeleteSegmentCommand.prototype.onExecute = function (_event) {
-  // default does nothing.
-};
-/**
- * Handle an undo event.
- *
- * @param {object} _event The undo event with type and id.
- */
-dwv.image.DeleteSegmentCommand.prototype.onUndo = function (_event) {
-  // default does nothing.
-};
+  /**
+   * Handle an execute event.
+   *
+   * @param {object} _event The execute event with type and id.
+   */
+  onExecute(_event) {
+    // default does nothing.
+  }
+
+  /**
+   * Handle an undo event.
+   *
+   * @param {object} _event The undo event with type and id.
+   */
+  onUndo(_event) {
+    // default does nothing.
+  }
+
+} // DeleteSegmentCommand class

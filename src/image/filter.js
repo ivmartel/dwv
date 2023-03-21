@@ -1,244 +1,239 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-/** @namespace */
-dwv.image.filter = dwv.image.filter || {};
-
 /**
  * Threshold an image between an input minimum and maximum.
  *
  * @class
  */
-dwv.image.filter.Threshold = function () {
+export class Threshold {
   /**
    * Threshold minimum.
    *
    * @private
    * @type {number}
    */
-  var min = 0;
+  #min = 0;
+
   /**
    * Threshold maximum.
    *
    * @private
    * @type {number}
    */
-  var max = 0;
+  #max = 0;
 
   /**
    * Get the threshold minimum.
    *
    * @returns {number} The threshold minimum.
    */
-  this.getMin = function () {
-    return min;
-  };
+  getMin() {
+    return this.#min;
+  }
+
   /**
    * Set the threshold minimum.
    *
    * @param {number} val The threshold minimum.
    */
-  this.setMin = function (val) {
-    min = val;
-  };
+  setMin(val) {
+    this.#min = val;
+  }
+
   /**
    * Get the threshold maximum.
    *
    * @returns {number} The threshold maximum.
    */
-  this.getMax = function () {
-    return max;
-  };
+  getMax() {
+    return this.#max;
+  }
+
   /**
    * Set the threshold maximum.
    *
    * @param {number} val The threshold maximum.
    */
-  this.setMax = function (val) {
-    max = val;
-  };
+  setMax(val) {
+    this.#max = val;
+  }
+
   /**
    * Get the name of the filter.
    *
    * @returns {string} The name of the filter.
    */
-  this.getName = function () {
+  getName() {
     return 'Threshold';
-  };
+  }
 
   /**
    * Original image.
    *
    * @private
-   * @type {dwv.image.Image}
+   * @type {Image}
    */
-  var originalImage = null;
+  #originalImage = null;
+
   /**
    * Set the original image.
    *
-   * @param {dwv.image.Image} image The original image.
+   * @param {Image} image The original image.
    */
-  this.setOriginalImage = function (image) {
-    originalImage = image;
-  };
+  setOriginalImage(image) {
+    this.#originalImage = image;
+  }
+
   /**
    * Get the original image.
    *
-   * @returns {dwv.image.Image} image The original image.
+   * @returns {Image} image The original image.
    */
-  this.getOriginalImage = function () {
-    return originalImage;
-  };
-};
+  getOriginalImage() {
+    return this.#originalImage;
+  }
 
-/**
- * Transform the main image using this filter.
- *
- * @returns {dwv.image.Image} The transformed image.
- */
-dwv.image.filter.Threshold.prototype.update = function () {
-  var image = this.getOriginalImage();
-  var imageMin = image.getDataRange().min;
-  var self = this;
-  var threshFunction = function (value) {
-    if (value < self.getMin() || value > self.getMax()) {
-      return imageMin;
-    } else {
-      return value;
-    }
-  };
-  return image.transform(threshFunction);
-};
+  /**
+   * Transform the main image using this filter.
+   *
+   * @returns {Image} The transformed image.
+   */
+  update() {
+    var image = this.getOriginalImage();
+    var imageMin = image.getDataRange().min;
+    var self = this;
+    var threshFunction = function (value) {
+      if (value < self.getMin() || value > self.getMax()) {
+        return imageMin;
+      } else {
+        return value;
+      }
+    };
+    return image.transform(threshFunction);
+  }
+
+} // class Threshold
 
 /**
  * Sharpen an image using a sharpen convolution matrix.
  *
  * @class
  */
-dwv.image.filter.Sharpen = function () {
+export class Sharpen {
   /**
    * Get the name of the filter.
    *
    * @returns {string} The name of the filter.
    */
-  this.getName = function () {
+  getName() {
     return 'Sharpen';
-  };
+  }
+
   /**
    * Original image.
    *
    * @private
-   * @type {dwv.image.Image}
+   * @type {Image}
    */
-  var originalImage = null;
+  #originalImage = null;
+
   /**
    * Set the original image.
    *
-   * @param {dwv.image.Image} image The original image.
+   * @param {Image} image The original image.
    */
-  this.setOriginalImage = function (image) {
-    originalImage = image;
-  };
+  setOriginalImage(image) {
+    this.#originalImage = image;
+  }
+
   /**
    * Get the original image.
    *
-   * @returns {dwv.image.Image} image The original image.
+   * @returns {Image} image The original image.
    */
-  this.getOriginalImage = function () {
-    return originalImage;
-  };
-};
+  getOriginalImage() {
+    return this.#originalImage;
+  }
 
-/**
- * Transform the main image using this filter.
- *
- * @returns {dwv.image.Image} The transformed image.
- */
-dwv.image.filter.Sharpen.prototype.update = function () {
-  var image = this.getOriginalImage();
+  /**
+   * Transform the main image using this filter.
+   *
+   * @returns {Image} The transformed image.
+   */
+  update() {
+    var image = this.getOriginalImage();
+    /* eslint-disable array-element-newline */
+    return image.convolute2D([
+      0, -1, 0,
+      -1, 5, -1,
+      0, -1, 0
+    ]);
+    /* eslint-enable array-element-newline */
+  }
 
-  return image.convolute2D(
-    [0,
-      -1,
-      0,
-      -1,
-      5,
-      -1,
-      0,
-      -1,
-      0]);
-};
+} // class Sharpen
 
 /**
  * Apply a Sobel filter to an image.
  *
  * @class
  */
-dwv.image.filter.Sobel = function () {
+export class Sobel {
   /**
    * Get the name of the filter.
    *
    * @returns {string} The name of the filter.
    */
-  this.getName = function () {
+  getName() {
     return 'Sobel';
-  };
+  }
+
   /**
    * Original image.
    *
    * @private
-   * @type {dwv.image.Image}
+   * @type {Image}
    */
-  var originalImage = null;
+  #originalImage = null;
+
   /**
    * Set the original image.
    *
-   * @param {dwv.image.Image} image The original image.
+   * @param {Image} image The original image.
    */
-  this.setOriginalImage = function (image) {
-    originalImage = image;
-  };
+  setOriginalImage(image) {
+    this.#originalImage = image;
+  }
+
   /**
    * Get the original image.
    *
-   * @returns {dwv.image.Image} image The original image.
+   * @returns {Image} image The original image.
    */
-  this.getOriginalImage = function () {
-    return originalImage;
-  };
-};
+  getOriginalImage() {
+    return this.#originalImage;
+  }
 
-/**
- * Transform the main image using this filter.
- *
- * @returns {dwv.image.Image} The transformed image.
- */
-dwv.image.filter.Sobel.prototype.update = function () {
-  var image = this.getOriginalImage();
+  /**
+   * Transform the main image using this filter.
+   *
+   * @returns {Image} The transformed image.
+   */
+  update() {
+    var image = this.getOriginalImage();
+    /* eslint-disable array-element-newline */
+    var gradX = image.convolute2D([
+      1, 0, -1,
+      2, 0, -2,
+      1, 0, -1
+    ]);
+    var gradY = image.convolute2D([
+      1, 2, 1,
+      0, 0, 0,
+      -1, -2, -1
+    ]);
+    /* eslint-enable array-element-newline */
+    return gradX.compose(gradY, function (x, y) {
+      return Math.sqrt(x * x + y * y);
+    });
+  }
 
-  var gradX = image.convolute2D(
-    [1,
-      0,
-      -1,
-      2,
-      0,
-      -2,
-      1,
-      0,
-      -1]);
-
-  var gradY = image.convolute2D(
-    [1,
-      2,
-      1,
-      0,
-      0,
-      0,
-      -1,
-      -2,
-      -1]);
-
-  return gradX.compose(gradY, function (x, y) {
-    return Math.sqrt(x * x + y * y);
-  });
-};
+} // class Sobel
