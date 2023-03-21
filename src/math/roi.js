@@ -14,8 +14,6 @@ export class ROI {
    */
   #points = [];
 
-  constructor() {}
-
   /**
    * Get a point of the list at a given index.
    *

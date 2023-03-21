@@ -542,8 +542,6 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  */
 export class DicomParser {
 
-  constructor() {}
-
   /**
    * The list of DICOM elements.
    *

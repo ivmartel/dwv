@@ -20,8 +20,6 @@ import {Point3D} from '../math/point';
  */
 export class ImageFactory {
 
-  constructor() {}
-
   /**
    * Check dicom elements. Throws an error if not suitable.
    *
