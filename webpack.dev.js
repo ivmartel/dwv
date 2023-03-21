@@ -46,6 +46,16 @@ module.exports = merge(common, {
         type: 'asset/inline'
       },
       {
+        test: /\.zip/,
+        generator: {
+          dataUrl: {
+            encoding: 'base64',
+            mimetype: 'application/zip',
+          },
+        },
+        type: 'asset/inline'
+      },
+      {
         test: /DICOMDIR/,
         generator: {
           dataUrl: {

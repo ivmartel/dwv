@@ -1,10 +1,8 @@
-// namespaces
-var dwv = dwv || {};
-/** @namespace */
-dwv.io = dwv.io || {};
+import {MultiProgressHandler} from '../utils/progress';
+import {LoaderList} from './loaderList';
 
 // file content types
-dwv.io.fileContentTypes = {
+export const FileContentTypes = {
   Text: 0,
   ArrayBuffer: 1,
   DataURL: 2
@@ -15,14 +13,7 @@ dwv.io.fileContentTypes = {
  *
  * @class
  */
-dwv.io.FilesLoader = function () {
-  /**
-   * Closure to self.
-   *
-   * @private
-   * @type {object}
-   */
-  var self = this;
+export class FilesLoader {
 
   /**
    * Input data.
@@ -30,7 +21,7 @@ dwv.io.FilesLoader = function () {
    * @private
    * @type {Array}
    */
-  var inputData = null;
+  #inputData = null;
 
   /**
    * Array of launched file readers.
@@ -38,7 +29,7 @@ dwv.io.FilesLoader = function () {
    * @private
    * @type {Array}
    */
-  var readers = [];
+  #readers = [];
 
   /**
    * Data loader.
@@ -46,7 +37,7 @@ dwv.io.FilesLoader = function () {
    * @private
    * @type {object}
    */
-  var runningLoader = null;
+  #runningLoader = null;
 
   /**
    * Number of loaded data.
@@ -54,7 +45,7 @@ dwv.io.FilesLoader = function () {
    * @private
    * @type {number}
    */
-  var nLoad = 0;
+  #nLoad = 0;
 
   /**
    * Number of load end events.
@@ -62,7 +53,7 @@ dwv.io.FilesLoader = function () {
    * @private
    * @type {number}
    */
-  var nLoadend = 0;
+  #nLoadend = 0;
 
   /**
    * The default character set (optional).
@@ -70,25 +61,25 @@ dwv.io.FilesLoader = function () {
    * @private
    * @type {string}
    */
-  var defaultCharacterSet;
+  #defaultCharacterSet;
 
   /**
    * Get the default character set.
    *
    * @returns {string} The default character set.
    */
-  this.getDefaultCharacterSet = function () {
-    return defaultCharacterSet;
-  };
+  getDefaultCharacterSet() {
+    return this.#defaultCharacterSet;
+  }
 
   /**
    * Set the default character set.
    *
    * @param {string} characterSet The character set.
    */
-  this.setDefaultCharacterSet = function (characterSet) {
-    defaultCharacterSet = characterSet;
-  };
+  setDefaultCharacterSet(characterSet) {
+    this.#defaultCharacterSet = characterSet;
+  }
 
   /**
    * Store the current input.
@@ -96,14 +87,14 @@ dwv.io.FilesLoader = function () {
    * @param {object} data The input data.
    * @private
    */
-  function storeInputData(data) {
-    inputData = data;
+  #storeInputData(data) {
+    this.#inputData = data;
     // reset counters
-    nLoad = 0;
-    nLoadend = 0;
+    this.#nLoad = 0;
+    this.#nLoadend = 0;
     // clear storage
-    clearStoredReaders();
-    clearStoredLoader();
+    this.#clearStoredReaders();
+    this.#clearStoredLoader();
   }
 
   /**
@@ -112,8 +103,8 @@ dwv.io.FilesLoader = function () {
    * @param {object} reader The launched reader.
    * @private
    */
-  function storeReader(reader) {
-    readers.push(reader);
+  #storeReader(reader) {
+    this.#readers.push(reader);
   }
 
   /**
@@ -121,8 +112,8 @@ dwv.io.FilesLoader = function () {
    *
    * @private
    */
-  function clearStoredReaders() {
-    readers = [];
+  #clearStoredReaders() {
+    this.#readers = [];
   }
 
   /**
@@ -131,8 +122,8 @@ dwv.io.FilesLoader = function () {
    * @param {object} loader The launched loader.
    * @private
    */
-  function storeLoader(loader) {
-    runningLoader = loader;
+  #storeLoader(loader) {
+    this.#runningLoader = loader;
   }
 
   /**
@@ -140,8 +131,8 @@ dwv.io.FilesLoader = function () {
    *
    * @private
    */
-  function clearStoredLoader() {
-    runningLoader = null;
+  #clearStoredLoader() {
+    this.#runningLoader = null;
   }
 
   /**
@@ -150,9 +141,9 @@ dwv.io.FilesLoader = function () {
    * @param {object} event The load data event.
    * @private
    */
-  function addLoadItem(event) {
-    self.onloaditem(event);
-    addLoad();
+  #addLoadItem(event) {
+    this.onloaditem(event);
+    this.#addLoad();
   }
 
   /**
@@ -162,14 +153,14 @@ dwv.io.FilesLoader = function () {
    * @param {object} _event The load data event.
    * @private
    */
-  function addLoad(_event) {
-    nLoad++;
-    // call self.onload when all is loaded
+  #addLoad(_event) {
+    this.#nLoad++;
+    // call onload when all is loaded
     // (not using the input event since it is not the
     //   general load)
-    if (nLoad === inputData.length) {
-      self.onload({
-        source: inputData
+    if (this.#nLoad === this.#inputData.length) {
+      this.onload({
+        source: this.#inputData
       });
     }
   }
@@ -181,15 +172,15 @@ dwv.io.FilesLoader = function () {
    * @param {object} _event The load end event.
    * @private
    */
-  function addLoadend(_event) {
-    nLoadend++;
-    // call self.onloadend when all is run
+  #addLoadend(_event) {
+    this.#nLoadend++;
+    // call onloadend when all is run
     // (not using the input event since it is not the
     //   general load end)
     // x2 to count for reader + load
-    if (nLoadend === 2 * inputData.length) {
-      self.onloadend({
-        source: inputData
+    if (this.#nLoadend === 2 * this.#inputData.length) {
+      this.onloadend({
+        source: this.#inputData
       });
     }
   }
@@ -202,8 +193,8 @@ dwv.io.FilesLoader = function () {
    * @returns {Function} The augmented callback.
    * @private
    */
-  function augmentCallbackEvent(callback, source) {
-    return function (event) {
+  #augmentCallbackEvent(callback, source) {
+    return (event) => {
       event.source = source;
       callback(event);
     };
@@ -214,12 +205,12 @@ dwv.io.FilesLoader = function () {
    *
    * @param {Array} data The list of files to load.
    */
-  this.load = function (data) {
+  load(data) {
     // check input
     if (typeof data === 'undefined' || data.length === 0) {
       return;
     }
-    storeInputData(data);
+    this.#storeInputData(data);
 
     // send start event
     this.onloadstart({
@@ -227,13 +218,13 @@ dwv.io.FilesLoader = function () {
     });
 
     // create prgress handler
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+    var mproghandler = new MultiProgressHandler(this.onprogress);
     mproghandler.setNToLoad(data.length);
 
     // create loaders
     var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-      loaders.push(new dwv.io[dwv.io.loaderList[m]]());
+    for (var m = 0; m < LoaderList.length; ++m) {
+      loaders.push(new LoaderList[m]());
     }
 
     // find an appropriate loader
@@ -254,17 +245,17 @@ dwv.io.FilesLoader = function () {
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
         if (typeof loader.onloaditem === 'undefined') {
           // handle loaditem locally
-          loader.onload = addLoadItem;
+          loader.onload = this.#addLoadItem;
         } else {
-          loader.onloaditem = self.onloaditem;
-          loader.onload = addLoad;
+          loader.onloaditem = this.onloaditem;
+          loader.onload = this.#addLoad;
         }
-        loader.onloadend = addLoadend;
-        loader.onerror = self.onerror;
-        loader.onabort = self.onabort;
+        loader.onloadend = this.#addLoadend;
+        loader.onerror = this.onerror;
+        loader.onabort = this.onabort;
 
         // store loader
-        storeLoader(loader);
+        this.#storeLoader(loader);
         // exit
         break;
       }
@@ -274,7 +265,7 @@ dwv.io.FilesLoader = function () {
     }
 
     var getLoadHandler = function (loader, dataElement, i) {
-      return function (event) {
+      return (event) => {
         loader.load(event.target.result, dataElement, i);
       };
     };
@@ -296,95 +287,101 @@ dwv.io.FilesLoader = function () {
        */
       var reader = new FileReader();
       // store reader
-      storeReader(reader);
+      this.#storeReader(reader);
 
       // set reader callbacks
       // reader.onloadstart: nothing to do
-      reader.onprogress = augmentCallbackEvent(
+      reader.onprogress = this.#augmentCallbackEvent(
         mproghandler.getMonoProgressHandler(i, 0), dataElement);
       reader.onload = getLoadHandler(loader, dataElement, i);
-      reader.onloadend = addLoadend;
-      reader.onerror = augmentCallbackEvent(self.onerror, dataElement);
-      reader.onabort = augmentCallbackEvent(self.onabort, dataElement);
+      reader.onloadend = this.#addLoadend;
+      reader.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
+      reader.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
       // read
-      if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
+      if (loader.loadFileAs() === FileContentTypes.Text) {
         reader.readAsText(dataElement);
-      } else if (loader.loadFileAs() === dwv.io.fileContentTypes.DataURL) {
+      } else if (loader.loadFileAs() === FileContentTypes.DataURL) {
         reader.readAsDataURL(dataElement);
-      } else if (loader.loadFileAs() === dwv.io.fileContentTypes.ArrayBuffer) {
+      } else if (loader.loadFileAs() === FileContentTypes.ArrayBuffer) {
         reader.readAsArrayBuffer(dataElement);
       }
     }
-  };
+  }
 
   /**
    * Abort a load.
    */
-  this.abort = function () {
+  abort() {
     // abort readers
-    for (var i = 0; i < readers.length; ++i) {
+    for (var i = 0; i < this.#readers.length; ++i) {
       // 0: EMPTY, 1: LOADING, 2: DONE
-      if (readers[i].readyState === 1) {
-        readers[i].abort();
+      if (this.#readers[i].readyState === 1) {
+        this.#readers[i].abort();
       }
     }
     // abort loader
-    if (runningLoader && runningLoader.isLoading()) {
-      runningLoader.abort();
+    if (this.#runningLoader && this.#runningLoader.isLoading()) {
+      this.#runningLoader.abort();
     }
-  };
+  }
 
-}; // class FilesLoader
+  /**
+   * Handle a load start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load start event.
+   */
+  onloadstart(_event) {}
 
-/**
- * Handle a load start event.
- * Default does nothing.
- *
- * @param {object} _event The load start event.
- */
-dwv.io.FilesLoader.prototype.onloadstart = function (_event) {};
-/**
- * Handle a load progress event.
- * Default does nothing.
- *
- * @param {object} _event The progress event.
- */
-dwv.io.FilesLoader.prototype.onprogress = function (_event) {};
-/**
- * Handle a load item event.
- * Default does nothing.
- *
- * @param {object} _event The load item event fired
- *   when a file item has been loaded successfully.
- */
-dwv.io.FilesLoader.prototype.onloaditem = function (_event) {};
-/**
- * Handle a load event.
- * Default does nothing.
- *
- * @param {object} _event The load event fired
- *   when a file has been loaded successfully.
- */
-dwv.io.FilesLoader.prototype.onload = function (_event) {};
-/**
- * Handle a load end event.
- * Default does nothing.
- *
- * @param {object} _event The load end event fired
- *  when a file load has completed, successfully or not.
- */
-dwv.io.FilesLoader.prototype.onloadend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.io.FilesLoader.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.io.FilesLoader.prototype.onabort = function (_event) {};
+  /**
+   * Handle a load progress event.
+   * Default does nothing.
+   *
+   * @param {object} _event The progress event.
+   */
+  onprogress(_event) {}
+
+  /**
+   * Handle a load item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load item event fired
+   *   when a file item has been loaded successfully.
+   */
+  onloaditem(_event) {}
+
+  /**
+   * Handle a load event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   *   when a file has been loaded successfully.
+   */
+  onload(_event) {}
+
+  /**
+   * Handle a load end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load end event fired
+   *  when a file load has completed, successfully or not.
+   */
+  onloadend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class FilesLoader

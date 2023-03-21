@@ -1,6 +1,8 @@
-// namespaces
-var dwv = dwv || {};
-dwv.io = dwv.io || {};
+import {startsWith, getFileExtension} from '../utils/string';
+import {getUrlFromUri} from '../utils/uri';
+import {getViewFromDOMVideo} from '../image/domReader';
+import {FileContentTypes} from './filesLoader';
+import {UrlContentTypes} from './urlsLoader';
 
 /**
  * Raw video loader.
@@ -9,27 +11,25 @@ dwv.io = dwv.io || {};
  *
  * @class
  */
-dwv.io.RawVideoLoader = function () {
-  // closure to self
-  var self = this;
+export class RawVideoLoader {
 
   /**
    * Set the loader options.
    *
    * @param {object} _opt The input options.
    */
-  this.setOptions = function (_opt) {
+  setOptions(_opt) {
     // does nothing
-  };
+  }
 
   /**
    * Is the load ongoing? TODO...
    *
    * @returns {boolean} True if loading.
    */
-  this.isLoading = function () {
+  isLoading() {
     return true;
-  };
+  }
 
   /**
    * Create a Data URI from an HTTP request response.
@@ -39,7 +39,7 @@ dwv.io.RawVideoLoader = function () {
    * @returns {string} The data URI.
    * @private
    */
-  function createDataUri(response, dataType) {
+  #createDataUri(response, dataType) {
     // image data as string
     var bytes = new Uint8Array(response);
     var videoDataStr = '';
@@ -58,13 +58,13 @@ dwv.io.RawVideoLoader = function () {
    * @param {string} origin The data origin.
    * @param {number} index The data index.
    */
-  this.load = function (buffer, origin, index) {
+  load(buffer, origin, index) {
     // create a DOM video
     var video = document.createElement('video');
     if (typeof origin === 'string') {
       // url case
       var ext = origin.split('.').pop().toLowerCase();
-      video.src = createDataUri(buffer, ext);
+      video.src = this.#createDataUri(buffer, ext);
     } else {
       video.src = buffer;
     }
@@ -72,155 +72,157 @@ dwv.io.RawVideoLoader = function () {
     video.file = origin;
     video.index = index;
     // onload handler
-    video.onloadedmetadata = function (/*event*/) {
+    video.onloadedmetadata = (/*event*/) => {
       try {
-        dwv.image.getViewFromDOMVideo(this,
-          self.onloaditem, self.onload,
-          self.onprogress, self.onloadend,
+        getViewFromDOMVideo(this,
+          this.onloaditem, this.onload,
+          this.onprogress, this.onloadend,
           index, origin);
       } catch (error) {
-        self.onerror({
+        this.onerror({
           error: error,
           source: origin
         });
-        self.onloadend({
+        this.onloadend({
           source: origin
         });
       }
     };
-  };
+  }
 
   /**
    * Abort load.
    */
-  this.abort = function () {
-    self.onabort({});
-    self.onloadend({});
-  };
-
-}; // class RawVideoLoader
-
-/**
- * Check if the loader can load the provided file.
- *
- * @param {object} file The file to check.
- * @returns {boolean} True if the file can be loaded.
- */
-dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
-  return file.type.match('video.*');
-};
-
-/**
- * Check if the loader can load the provided url.
- *
- * @param {string} url The url to check.
- * @param {object} options Optional url request options.
- * @returns {boolean} True if the url can be loaded.
- */
-dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
-  if (typeof options !== 'undefined' &&
-    typeof options.requestHeaders !== 'undefined') {
-    // starts with 'video/'
-    var isVideo = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'video/');
-    };
-    return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+  abort() {
+    this.onabort({});
+    this.onloadend({});
   }
 
-  var urlObjext = dwv.utils.getUrlFromUri(url);
-  var ext = dwv.utils.getFileExtension(urlObjext.pathname);
-  return (ext === 'mp4') || (ext === 'ogg') ||
-            (ext === 'webm');
-};
-
-/**
- * Check if the loader can load the provided memory object.
- *
- * @param {object} mem The memory object.
- * @returns {boolean} True if the object can be loaded.
- */
-dwv.io.RawVideoLoader.prototype.canLoadMemory = function (mem) {
-  if (typeof mem.filename !== 'undefined') {
-    return this.canLoadFile(mem.filename);
+  /**
+   * Check if the loader can load the provided file.
+   *
+   * @param {object} file The file to check.
+   * @returns {boolean} True if the file can be loaded.
+   */
+  canLoadFile(file) {
+    return (typeof file.type !== 'undefined' &&
+      file.type.match('video.*'));
   }
-  return false;
-};
 
-/**
- * Get the file content type needed by the loader.
- *
- * @returns {number} One of the 'dwv.io.fileContentTypes'.
- */
-dwv.io.RawVideoLoader.prototype.loadFileAs = function () {
-  return dwv.io.fileContentTypes.DataURL;
-};
+  /**
+   * Check if the loader can load the provided url.
+   *
+   * @param {string} url The url to check.
+   * @param {object} options Optional url request options.
+   * @returns {boolean} True if the url can be loaded.
+   */
+  canLoadUrl(url, options) {
+    // if there are options.requestHeaders, just base check on them
+    if (typeof options !== 'undefined' &&
+      typeof options.requestHeaders !== 'undefined') {
+      // starts with 'video/'
+      var isVideo = function (element) {
+        return element.name === 'Accept' &&
+          startsWith(element.value, 'video/');
+      };
+      return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+    }
 
-/**
- * Get the url content type needed by the loader.
- *
- * @returns {number} One of the 'dwv.io.urlContentTypes'.
- */
-dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
-  return dwv.io.urlContentTypes.ArrayBuffer;
-};
+    var urlObjext = getUrlFromUri(url);
+    var ext = getFileExtension(urlObjext.pathname);
+    return (ext === 'mp4') ||
+      (ext === 'ogg') ||
+      (ext === 'webm');
+  }
 
-/**
- * Handle a load start event.
- * Default does nothing.
- *
- * @param {object} _event The load start event.
- */
-dwv.io.RawVideoLoader.prototype.onloadstart = function (_event) {};
-/**
- * Handle a progress event.
- * Default does nothing.
- *
- * @param {object} _event The progress event.
- */
-dwv.io.RawVideoLoader.prototype.onprogress = function (_event) {};
-/**
- * Handle a load item event.
- * Default does nothing.
- *
- * @param {object} _event The load item event fired
- * when a file item has been loaded successfully.
- */
-dwv.io.RawVideoLoader.prototype.onloaditem = function (_event) {};
-/**
- * Handle a load event.
- * Default does nothing.
- *
- * @param {object} _event The load event fired
- * when a file has been loaded successfully.
- */
-dwv.io.RawVideoLoader.prototype.onload = function (_event) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- *
- * @param {object} _event The load end event fired
- *  when a file load has completed, successfully or not.
- */
-dwv.io.RawVideoLoader.prototype.onloadend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.io.RawVideoLoader.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.io.RawVideoLoader.prototype.onabort = function (_event) {};
+  /**
+   * Check if the loader can load the provided memory object.
+   *
+   * @param {object} mem The memory object.
+   * @returns {boolean} True if the object can be loaded.
+   */
+  canLoadMemory(mem) {
+    if (typeof mem.filename !== 'undefined') {
+      return this.canLoadFile({name: mem.filename});
+    }
+    return false;
+  }
 
-/**
- * Add to Loader list.
- */
-dwv.io.loaderList = dwv.io.loaderList || [];
-dwv.io.loaderList.push('RawVideoLoader');
+  /**
+   * Get the file content type needed by the loader.
+   *
+   * @returns {number} One of the 'fileContentTypes'.
+   */
+  loadFileAs() {
+    return FileContentTypes.DataURL;
+  }
+
+  /**
+   * Get the url content type needed by the loader.
+   *
+   * @returns {number} One of the 'urlContentTypes'.
+   */
+  loadUrlAs() {
+    return UrlContentTypes.ArrayBuffer;
+  }
+
+  /**
+   * Handle a load start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load start event.
+   */
+  onloadstart(_event) {}
+
+  /**
+   * Handle a progress event.
+   * Default does nothing.
+   *
+   * @param {object} _event The progress event.
+   */
+  onprogress(_event) {}
+
+  /**
+   * Handle a load item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load item event fired
+   * when a file item has been loaded successfully.
+   */
+  onloaditem(_event) {}
+
+  /**
+   * Handle a load event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   * when a file has been loaded successfully.
+   */
+  onload(_event) {}
+
+  /**
+   * Handle an load end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load end event fired
+   *  when a file load has completed, successfully or not.
+   */
+  onloadend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class RawVideoLoader
