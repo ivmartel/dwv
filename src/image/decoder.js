@@ -1,6 +1,4 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {ThreadPool, WorkerTask} from '../utils/thread';
 
 /**
  * The JPEG baseline decoder.
@@ -30,6 +28,13 @@ var hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
 /* global JpxImage */
 var hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
 
+const decoderScripts = {
+  jpeg2000: '../../decoders/pdfjs/decode-jpeg2000.js',
+  'jpeg-lossless': '../../decoders/rii-mango/decode-jpegloss.js',
+  'jpeg-baseline': '../../decoders/pdfjs/decode-jpegbaseline.js',
+  rle: '../../decoders/dwv/decode-rle.js'
+};
+
 /**
  * Asynchronous pixel buffer decoder.
  *
@@ -38,13 +43,18 @@ var hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
  *   by the web worker.
  * @param {number} _numberOfData The anticipated number of data to decode.
  */
-dwv.image.AsynchPixelBufferDecoder = function (script, _numberOfData) {
+class AsynchPixelBufferDecoder {
+
+  #script;
+
+  constuctor(script, _numberOfData) {
+    this.#script = script;
+  }
+
   // initialise the thread pool
-  var pool = new dwv.utils.ThreadPool(10);
+  #pool = new ThreadPool(10);
   // flag to know if callbacks are set
-  var areCallbacksSet = false;
-  // closure to self
-  var self = this;
+  #areCallbacksSet = false;
 
   /**
    * Decode a pixel buffer.
@@ -53,20 +63,20 @@ dwv.image.AsynchPixelBufferDecoder = function (script, _numberOfData) {
    * @param {object} pixelMeta The input meta data.
    * @param {object} info Information object about the input data.
    */
-  this.decode = function (pixelBuffer, pixelMeta, info) {
-    if (!areCallbacksSet) {
-      areCallbacksSet = true;
+  decode(pixelBuffer, pixelMeta, info) {
+    if (!this.#areCallbacksSet) {
+      this.#areCallbacksSet = true;
       // set event handlers
-      pool.onworkstart = self.ondecodestart;
-      pool.onworkitem = self.ondecodeditem;
-      pool.onwork = self.ondecoded;
-      pool.onworkend = self.ondecodeend;
-      pool.onerror = self.onerror;
-      pool.onabort = self.onabort;
+      this.#pool.onworkstart = this.ondecodestart;
+      this.#pool.onworkitem = this.ondecodeditem;
+      this.#pool.onwork = this.ondecoded;
+      this.#pool.onworkend = this.ondecodeend;
+      this.#pool.onerror = this.onerror;
+      this.#pool.onabort = this.onabort;
     }
     // create worker task
-    var workerTask = new dwv.utils.WorkerTask(
-      script,
+    var workerTask = new WorkerTask(
+      this.#script,
       {
         buffer: pixelBuffer,
         meta: pixelMeta
@@ -74,67 +84,69 @@ dwv.image.AsynchPixelBufferDecoder = function (script, _numberOfData) {
       info
     );
     // add it the queue and run it
-    pool.addWorkerTask(workerTask);
-  };
+    this.#pool.addWorkerTask(workerTask);
+  }
 
   /**
    * Abort decoding.
    */
-  this.abort = function () {
+  abort() {
     // abort the thread pool, will trigger pool.onabort
-    pool.abort();
-  };
-};
+    this.#pool.abort();
+  }
 
-/**
- * Handle a decode start event.
- * Default does nothing.
- *
- * @param {object} _event The decode start event.
- */
-dwv.image.AsynchPixelBufferDecoder.prototype.ondecodestart = function (
-  _event) {};
-/**
- * Handle a decode item event.
- * Default does nothing.
- *
- * @param {object} _event The decode item event fired
- *   when a decode item ended successfully.
- */
-dwv.image.AsynchPixelBufferDecoder.prototype.ondecodeditem = function (
-  _event) {};
-/**
- * Handle a decode event.
- * Default does nothing.
- *
- * @param {object} _event The decode event fired
- *   when a file has been decoded successfully.
- */
-dwv.image.AsynchPixelBufferDecoder.prototype.ondecoded = function (
-  _event) {};
-/**
- * Handle a decode end event.
- * Default does nothing.
- *
- * @param {object} _event The decode end event fired
- *  when a file decoding has completed, successfully or not.
- */
-dwv.image.AsynchPixelBufferDecoder.prototype.ondecodeend = function (
-  _event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.image.AsynchPixelBufferDecoder.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.image.AsynchPixelBufferDecoder.prototype.onabort = function (_event) {};
+  /**
+   * Handle a decode start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode start event.
+   */
+  ondecodestart(_event) {}
+
+  /**
+   * Handle a decode item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode item event fired
+   *   when a decode item ended successfully.
+   */
+  ondecodeditem(_event) {}
+
+  /**
+   * Handle a decode event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode event fired
+   *   when a file has been decoded successfully.
+   */
+  ondecoded(_event) {}
+
+  /**
+   * Handle a decode end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode end event fired
+   *  when a file decoding has completed, successfully or not.
+   */
+  ondecodeend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class AsynchPixelBufferDecoder
 
 /**
  * Synchronous pixel buffer decoder.
@@ -143,9 +155,18 @@ dwv.image.AsynchPixelBufferDecoder.prototype.onabort = function (_event) {};
  * @param {string} algoName The decompression algorithm name.
  * @param {number} numberOfData The anticipated number of data to decode.
  */
-dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
+class SynchPixelBufferDecoder {
+
+  #algoName;
+  #numberOfData;
+
+  constructor(algoName, numberOfData) {
+    this.#algoName = algoName;
+    this.#numberOfData = numberOfData;
+  }
+
   // decode count
-  var decodeCount = 0;
+  #decodeCount = 0;
 
   /**
    * Decode a pixel buffer.
@@ -157,12 +178,12 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
    * @external JpegImage
    * @external JpxImage
    */
-  this.decode = function (pixelBuffer, pixelMeta, info) {
-    ++decodeCount;
+  decode(pixelBuffer, pixelMeta, info) {
+    ++this.#decodeCount;
 
     var decoder = null;
     var decodedBuffer = null;
-    if (algoName === 'jpeg-lossless') {
+    if (this.#algoName === 'jpeg-lossless') {
       if (!hasJpegLosslessDecoder) {
         throw new Error('No JPEG Lossless decoder provided');
       }
@@ -184,14 +205,14 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
           decodedBuffer = new Uint16Array(decoded.buffer);
         }
       }
-    } else if (algoName === 'jpeg-baseline') {
+    } else if (this.#algoName === 'jpeg-baseline') {
       if (!hasJpegBaselineDecoder) {
         throw new Error('No JPEG Baseline decoder provided');
       }
       decoder = new JpegImage();
       decoder.parse(pixelBuffer);
       decodedBuffer = decoder.getData(decoder.width, decoder.height);
-    } else if (algoName === 'jpeg2000') {
+    } else if (this.#algoName === 'jpeg2000') {
       if (!hasJpeg2000Decoder) {
         throw new Error('No JPEG 2000 decoder provided');
       }
@@ -200,7 +221,7 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
       decoder.parse(pixelBuffer);
       // set the pixel buffer
       decodedBuffer = decoder.tiles[0].items;
-    } else if (algoName === 'rle') {
+    } else if (this.#algoName === 'rle') {
       // decode DICOM buffer
       decoder = new dwv.decoder.RleDecoder();
       // set the pixel buffer
@@ -218,72 +239,74 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
       index: info.itemNumber
     });
     // decode end?
-    if (decodeCount === numberOfData) {
+    if (this.#decodeCount === this.#numberOfData) {
       this.ondecoded({});
       this.ondecodeend({});
     }
-  };
+  }
 
   /**
    * Abort decoding.
    */
-  this.abort = function () {
+  abort() {
     // nothing to do in the synchronous case.
     // callback
     this.onabort({});
     this.ondecodeend({});
-  };
-};
+  }
 
-/**
- * Handle a decode start event.
- * Default does nothing.
- *
- * @param {object} _event The decode start event.
- */
-dwv.image.SynchPixelBufferDecoder.prototype.ondecodestart = function (
-  _event) {};
-/**
- * Handle a decode item event.
- * Default does nothing.
- *
- * @param {object} _event The decode item event fired
- *   when a decode item ended successfully.
- */
-dwv.image.SynchPixelBufferDecoder.prototype.ondecodeditem = function (
-  _event) {};
-/**
- * Handle a decode event.
- * Default does nothing.
- *
- * @param {object} _event The decode event fired
- *   when a file has been decoded successfully.
- */
-dwv.image.SynchPixelBufferDecoder.prototype.ondecoded = function (
-  _event) {};
-/**
- * Handle a decode end event.
- * Default does nothing.
- *
- * @param {object} _event The decode end event fired
- *  when a file decoding has completed, successfully or not.
- */
-dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function (
-  _event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.image.SynchPixelBufferDecoder.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.image.SynchPixelBufferDecoder.prototype.onabort = function (_event) {};
+  /**
+   * Handle a decode start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode start event.
+   */
+  ondecodestart(_event) {}
+
+  /**
+   * Handle a decode item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode item event fired
+   *   when a decode item ended successfully.
+   */
+  ondecodeditem(_event) {}
+
+  /**
+   * Handle a decode event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode event fired
+   *   when a file has been decoded successfully.
+   */
+  ondecoded(_event) {}
+
+  /**
+   * Handle a decode end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode end event fired
+   *  when a file decoding has completed, successfully or not.
+   */
+  ondecodeend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class SynchPixelBufferDecoder
 
 /**
  * Decode a pixel buffer.
@@ -291,10 +314,13 @@ dwv.image.SynchPixelBufferDecoder.prototype.onabort = function (_event) {};
  * @class
  * @param {string} algoName The decompression algorithm name.
  * @param {number} numberOfData The anticipated number of data to decode.
- * If the 'dwv.image.decoderScripts' variable does not contain the desired,
+ * If the 'decoderScripts' variable does not contain the desired,
  * algorythm the decoder will switch to the synchronous mode.
  */
-dwv.image.PixelBufferDecoder = function (algoName, numberOfData) {
+export class PixelBufferDecoder {
+
+  #algoName;
+  #numberOfData;
   /**
    * Pixel decoder.
    * Defined only once.
@@ -302,20 +328,26 @@ dwv.image.PixelBufferDecoder = function (algoName, numberOfData) {
    * @private
    * @type {object}
    */
-  var pixelDecoder = null;
+  #pixelDecoder = null;
 
-  // initialise the asynch decoder (if possible)
-  if (typeof dwv.image.decoderScripts !== 'undefined' &&
-    typeof dwv.image.decoderScripts[algoName] !== 'undefined') {
-    pixelDecoder = new dwv.image.AsynchPixelBufferDecoder(
-      dwv.image.decoderScripts[algoName], numberOfData);
-  } else {
-    pixelDecoder = new dwv.image.SynchPixelBufferDecoder(
-      algoName, numberOfData);
+  constructor(algoName, numberOfData) {
+    this.#algoName = algoName;
+    this.#numberOfData = numberOfData;
+
+    // initialise the asynch decoder (if possible)
+    if (typeof decoderScripts !== 'undefined' &&
+      typeof decoderScripts[algoName] !== 'undefined') {
+      this.#pixelDecoder = new AsynchPixelBufferDecoder(
+        decoderScripts[algoName], numberOfData);
+    } else {
+      this.#pixelDecoder = new SynchPixelBufferDecoder(
+        algoName, numberOfData);
+    }
+
   }
 
   // flag to know if callbacks are set
-  var areCallbacksSet = false;
+  #areCallbacksSet = false;
 
   /**
    * Get data from an input buffer using a DICOM parser.
@@ -324,72 +356,78 @@ dwv.image.PixelBufferDecoder = function (algoName, numberOfData) {
    * @param {object} pixelMeta The input meta data.
    * @param {object} info Information object about the input data.
    */
-  this.decode = function (pixelBuffer, pixelMeta, info) {
-    if (!areCallbacksSet) {
-      areCallbacksSet = true;
+  decode(pixelBuffer, pixelMeta, info) {
+    if (!this.#areCallbacksSet) {
+      this.#areCallbacksSet = true;
       // set callbacks
-      pixelDecoder.ondecodestart = this.ondecodestart;
-      pixelDecoder.ondecodeditem = this.ondecodeditem;
-      pixelDecoder.ondecoded = this.ondecoded;
-      pixelDecoder.ondecodeend = this.ondecodeend;
-      pixelDecoder.onerror = this.onerror;
-      pixelDecoder.onabort = this.onabort;
+      this.#pixelDecoder.ondecodestart = this.ondecodestart;
+      this.#pixelDecoder.ondecodeditem = this.ondecodeditem;
+      this.#pixelDecoder.ondecoded = this.ondecoded;
+      this.#pixelDecoder.ondecodeend = this.ondecodeend;
+      this.#pixelDecoder.onerror = this.onerror;
+      this.#pixelDecoder.onabort = this.onabort;
     }
     // decode and call the callback
-    pixelDecoder.decode(pixelBuffer, pixelMeta, info);
-  };
+    this.#pixelDecoder.decode(pixelBuffer, pixelMeta, info);
+  }
 
   /**
    * Abort decoding.
    */
-  this.abort = function () {
+  abort() {
     // decoder classes should define an abort
-    pixelDecoder.abort();
-  };
-};
+    this.#pixelDecoder.abort();
+  }
 
-/**
- * Handle a decode start event.
- * Default does nothing.
- *
- * @param {object} _event The decode start event.
- */
-dwv.image.PixelBufferDecoder.prototype.ondecodestart = function (_event) {};
-/**
- * Handle a decode item event.
- * Default does nothing.
- *
- * @param {object} _event The decode item event fired
- *   when a decode item ended successfully.
- */
-dwv.image.PixelBufferDecoder.prototype.ondecodeditem = function (_event) {};
-/**
- * Handle a decode event.
- * Default does nothing.
- *
- * @param {object} _event The decode event fired
- *   when a file has been decoded successfully.
- */
-dwv.image.PixelBufferDecoder.prototype.ondecoded = function (_event) {};
-/**
- * Handle a decode end event.
- * Default does nothing.
- *
- * @param {object} _event The decode end event fired
- *  when a file decoding has completed, successfully or not.
- */
-dwv.image.PixelBufferDecoder.prototype.ondecodeend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.image.PixelBufferDecoder.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.image.PixelBufferDecoder.prototype.onabort = function (_event) {};
+  /**
+   * Handle a decode start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode start event.
+   */
+  ondecodestart(_event) {}
+
+  /**
+   * Handle a decode item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode item event fired
+   *   when a decode item ended successfully.
+   */
+  ondecodeditem(_event) {}
+
+  /**
+   * Handle a decode event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode event fired
+   *   when a file has been decoded successfully.
+   */
+  ondecoded(_event) {}
+
+  /**
+   * Handle a decode end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The decode end event fired
+   *  when a file decoding has completed, successfully or not.
+   */
+  ondecodeend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class PixelBufferDecoder
