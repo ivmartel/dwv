@@ -1,5 +1,6 @@
 import {Debug} from './draw';
 import {getDefaultAnchor} from './editor';
+import {logger} from '../utils/logger';
 // external
 import Konva from 'konva';
 
@@ -230,7 +231,7 @@ export class EllipseFactory {
       topLeft.x(anchor.x());
       break;
     default :
-      dwv.logger.error('Unhandled anchor id: ' + anchor.id());
+      logger.error('Unhandled anchor id: ' + anchor.id());
       break;
     }
     // update shape
