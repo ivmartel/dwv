@@ -3,12 +3,7 @@ import {DrawController} from '../app/drawController';
 import {getScaledOffset} from './layerGroup';
 import {InteractionEventNames} from './generic';
 
-/**
- * The Konva namespace.
- *
- * @external Konva
- * @see https://konvajs.org/
- */
+// external
 import Konva from 'konva';
 
 /**
