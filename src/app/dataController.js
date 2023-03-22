@@ -1,14 +1,13 @@
-// namespaces
-var dwv = dwv || {};
-/** @namespace */
-dwv.ctrl = dwv.ctrl || {};
+import {ListenerHandler} from '../utils/listen';
+import {mergeObjects} from '../utils/operator';
+import {DicomElementsWrapper} from '../dicom/dicomElementsWrapper';
 
 /*
  * Data (list of {image, meta}) controller.
  *
  * @class
  */
-dwv.ctrl.DataController = function () {
+export class DataController {
 
   /**
    * List of {image, meta}.
@@ -16,31 +15,31 @@ dwv.ctrl.DataController = function () {
    * @private
    * @type {object}
    */
-  var data = {};
+  #data = {};
 
   /**
    * Listener handler.
    *
-   * @type {dwv.utils.ListenerHandler}
+   * @type {ListenerHandler}
    * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the length of the data storage.
    *
    * @returns {number} The length.
    */
-  this.length = function () {
-    return Object.keys(data).length;
-  };
+  length() {
+    return Object.keys(this.#data).length;
+  }
 
   /**
    * Reset the class: empty the data storage.
    */
-  this.reset = function () {
-    data = [];
-  };
+  reset() {
+    this.#data = [];
+  }
 
   /**
    * Get a data at a given index.
@@ -48,57 +47,57 @@ dwv.ctrl.DataController = function () {
    * @param {number} index The index of the data.
    * @returns {object} The data.
    */
-  this.get = function (index) {
-    return data[index];
-  };
+  get(index) {
+    return this.#data[index];
+  }
 
   /**
    * Set the image at a given index.
    *
    * @param {number} index The index of the data.
-   * @param {dwv.image.Image} image The image to set.
+   * @param {Image} image The image to set.
    */
-  this.setImage = function (index, image) {
-    data[index].image = image;
+  setImage(index, image) {
+    this.#data[index].image = image;
     // fire image set
-    fireEvent({
+    this.#fireEvent({
       type: 'imageset',
       value: [image],
       dataid: index
     });
     // listen to image change
-    image.addEventListener('imagechange', getFireEvent(index));
-  };
+    image.addEventListener('imagechange', this.#getFireEvent(index));
+  }
 
   /**
    * Add a new data.
    *
    * @param {number} index The index of the data.
-   * @param {dwv.image.Image} image The image.
+   * @param {Image} image The image.
    * @param {object} meta The image meta.
    */
-  this.addNew = function (index, image, meta) {
-    if (typeof data[index] !== 'undefined') {
+  addNew(index, image, meta) {
+    if (typeof this.#data[index] !== 'undefined') {
       throw new Error('Index already used in storage: ' + index);
     }
     // store the new image
-    data[index] = {
+    this.#data[index] = {
       image: image,
-      meta: getMetaObject(meta)
+      meta: this.#getMetaObject(meta)
     };
     // listen to image change
-    image.addEventListener('imagechange', getFireEvent(index));
-  };
+    image.addEventListener('imagechange', this.#getFireEvent(index));
+  }
 
   /**
    * Update the current data.
    *
    * @param {number} index The index of the data.
-   * @param {dwv.image.Image} image The image.
+   * @param {Image} image The image.
    * @param {object} meta The image meta.
    */
-  this.update = function (index, image, meta) {
-    var dataToUpdate = data[index];
+  update(index, image, meta) {
+    var dataToUpdate = this.#data[index];
 
     // add slice to current image
     dataToUpdate.image.appendSlice(image);
@@ -112,12 +111,12 @@ dwv.ctrl.DataController = function () {
     } else {
       idKey = 'imageUid';
     }
-    dataToUpdate.meta = dwv.utils.mergeObjects(
+    dataToUpdate.meta = mergeObjects(
       dataToUpdate.meta,
-      getMetaObject(meta),
+      this.#getMetaObject(meta),
       idKey,
       'value');
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -126,9 +125,9 @@ dwv.ctrl.DataController = function () {
    * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
 
   /**
    * Remove an event listener from this class.
@@ -137,9 +136,9 @@ dwv.ctrl.DataController = function () {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
 
   /**
    * Fire an event: call all associated listeners with the input event object.
@@ -147,8 +146,8 @@ dwv.ctrl.DataController = function () {
    * @param {object} event The event to fire.
    * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
+  #fireEvent(event) {
+    this.#listenerHandler.fireEvent(event);
   }
 
   /**
@@ -158,10 +157,10 @@ dwv.ctrl.DataController = function () {
    * @param {number} index The data index.
    * @returns {Function} A fireEvent function.
    */
-  function getFireEvent(index) {
-    return function (event) {
+  #getFireEvent(index) {
+    return (event) => {
       event.dataid = index;
-      fireEvent(event);
+      this.#fireEvent(event);
     };
   }
 
@@ -171,11 +170,11 @@ dwv.ctrl.DataController = function () {
    * @param {*} meta The meta data to convert.
    * @returns {*} object for DICOM, array for DOM image.
    */
-  function getMetaObject(meta) {
+  #getMetaObject(meta) {
     var metaObj = null;
     // wrap meta if dicom (x00020010: transfer syntax)
     if (typeof meta.x00020010 !== 'undefined') {
-      var newDcmMetaData = new dwv.dicom.DicomElementsWrapper(meta);
+      var newDcmMetaData = new DicomElementsWrapper(meta);
       metaObj = newDcmMetaData.dumpToObject();
     } else {
       metaObj = meta;
@@ -183,4 +182,4 @@ dwv.ctrl.DataController = function () {
     return metaObj;
   }
 
-}; // ImageController class
+} // ImageController class
