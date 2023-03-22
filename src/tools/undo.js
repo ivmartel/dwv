@@ -1,20 +1,18 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {ListenerHandler} from '../utils/listen';
 
 /**
  * UndoStack class.
  *
  * @class
  */
-dwv.tool.UndoStack = function () {
+export class UndoStack {
   /**
    * Array of commands.
    *
    * @private
    * @type {Array}
    */
-  var stack = [];
+  #stack = [];
 
   /**
    * Current command index.
@@ -22,7 +20,7 @@ dwv.tool.UndoStack = function () {
    * @private
    * @type {number}
    */
-  var curCmdIndex = 0;
+  #curCmdIndex = 0;
 
   /**
    * Listener handler.
@@ -30,103 +28,103 @@ dwv.tool.UndoStack = function () {
    * @type {object}
    * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the stack size.
    *
    * @returns {number} The size of the stack.
    */
-  this.getStackSize = function () {
-    return stack.length;
-  };
+  getStackSize() {
+    return this.#stack.length;
+  }
 
   /**
    * Get the current stack index.
    *
    * @returns {number} The stack index.
    */
-  this.getCurrentStackIndex = function () {
-    return curCmdIndex;
-  };
+  getCurrentStackIndex() {
+    return this.#curCmdIndex;
+  }
 
   /**
    * Add a command to the stack.
    *
    * @param {object} cmd The command to add.
-   * @fires dwv.tool.UndoStack#undoadd
+   * @fires UndoStack#undoadd
    */
-  this.add = function (cmd) {
+  add(cmd) {
     // clear commands after current index
-    stack = stack.slice(0, curCmdIndex);
+    this.#stack = this.#stack.slice(0, this.#curCmdIndex);
     // store command
-    stack.push(cmd);
+    this.#stack.push(cmd);
     // increment index
-    ++curCmdIndex;
+    ++this.#curCmdIndex;
     /**
      * Command add to undo stack event.
      *
-     * @event dwv.tool.UndoStack#undoadd
+     * @event UndoStack#undoadd
      * @type {object}
      * @property {string} command The name of the command added to the
      *   undo stack.
      */
-    fireEvent({
+    this.#fireEvent({
       type: 'undoadd',
       command: cmd.getName()
     });
-  };
+  }
 
   /**
    * Undo the last command.
    *
-   * @fires dwv.tool.UndoStack#undo
+   * @fires UndoStack#undo
    */
-  this.undo = function () {
+  undo() {
     // a bit inefficient...
-    if (curCmdIndex > 0) {
+    if (this.#curCmdIndex > 0) {
       // decrement command index
-      --curCmdIndex;
+      --this.#curCmdIndex;
       // undo last command
-      stack[curCmdIndex].undo();
+      this.#stack[this.#curCmdIndex].undo();
       /**
        * Command undo event.
        *
-       * @event dwv.tool.UndoStack#undo
+       * @event UndoStack#undo
        * @type {object}
        * @property {string} command The name of the undone command.
        */
-      fireEvent({
+      this.#fireEvent({
         type: 'undo',
-        command: stack[curCmdIndex].getName()
+        command: this.#stack[this.#curCmdIndex].getName()
       });
     }
-  };
+  }
 
   /**
    * Redo the last command.
    *
-   * @fires dwv.tool.UndoStack#redo
+   * @fires UndoStack#redo
    */
-  this.redo = function () {
-    if (curCmdIndex < stack.length) {
+  redo() {
+    if (this.#curCmdIndex < this.#stack.length) {
       // run last command
-      stack[curCmdIndex].execute();
+      this.#stack[this.#curCmdIndex].execute();
       /**
        * Command redo event.
        *
-       * @event dwv.tool.UndoStack#redo
+       * @event UndoStack#redo
        * @type {object}
        * @property {string} command The name of the redone command.
        */
-      fireEvent({
+      this.#fireEvent({
         type: 'redo',
-        command: stack[curCmdIndex].getName()
+        command: this.#stack[this.#curCmdIndex].getName()
       });
       // increment command index
-      ++curCmdIndex;
+      ++this.#curCmdIndex;
     }
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -135,9 +133,10 @@ dwv.tool.UndoStack = function () {
    * @param {object} callback The method associated with the provided
    *    event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
   /**
    * Remove an event listener from this class.
    *
@@ -145,17 +144,18 @@ dwv.tool.UndoStack = function () {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
    * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
+  #fireEvent(event) {
+    this.#listenerHandler.fireEvent(event);
   }
 
-}; // UndoStack class
+} // UndoStack class

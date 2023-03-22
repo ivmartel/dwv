@@ -1,15 +1,14 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {ScrollWheel} from './scrollWheel';
 
 /**
  * Opacity class.
  *
  * @class
- * @param {dwv.App} app The associated application.
+ * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new dwv.App();
+ * var app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -24,39 +23,38 @@ dwv.tool = dwv.tool || {};
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-dwv.tool.Opacity = function (app) {
-  /**
-   * Closure to self: to be used by event handlers.
-   *
-   * @private
-   * @type {dwv.tool.Opacity}
-   */
-  var self = this;
+export class Opacity {
+
+  #app;
   /**
    * Interaction start flag.
    *
    * @type {boolean}
    */
-  this.started = false;
-
+  #started = false;
   /**
    * Scroll wheel handler.
    *
-   * @type {dwv.tool.ScrollWheel}
+   * @type {ScrollWheel}
    */
-  var scrollWhell = new dwv.tool.ScrollWheel(app);
+  #scrollWhell;
+
+  constructor(app) {
+    this.#app = app;
+    this.#scrollWhell = new ScrollWheel(app);
+  }
 
   /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
-  this.mousedown = function (event) {
+  mousedown = (event) => {
     // start flag
-    self.started = true;
+    this.started = true;
     // first position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    this.x0 = event._x;
+    this.y0 = event._y;
   };
 
   /**
@@ -64,25 +62,25 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The mouse move event.
    */
-  this.mousemove = function (event) {
-    if (!self.started) {
+  mousemove = (event) => {
+    if (!this.started) {
       return;
     }
 
     // difference to last X position
-    var diffX = event._x - self.x0;
+    var diffX = event._x - this.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove) {
-      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+      var layerDetails = getLayerDetailsFromEvent(event);
+      var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
       var viewLayer = layerGroup.getActiveViewLayer();
       var op = viewLayer.getOpacity();
       viewLayer.setOpacity(op + (diffX / 200));
       viewLayer.draw();
 
       // reset origin point
-      self.x0 = event._x;
+      this.x0 = event._x;
     }
   };
 
@@ -91,10 +89,10 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} _event The mouse up event.
    */
-  this.mouseup = function (_event) {
-    if (self.started) {
+  mouseup = (_event) => {
+    if (this.#started) {
       // stop recording
-      self.started = false;
+      this.#started = false;
     }
   };
 
@@ -103,8 +101,8 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The mouse out event.
    */
-  this.mouseout = function (event) {
-    self.mouseup(event);
+  mouseout = (event) => {
+    this.mouseup(event);
   };
 
   /**
@@ -112,9 +110,9 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The touch start event.
    */
-  this.touchstart = function (event) {
+  touchstart = (event) => {
     // call mouse equivalent
-    self.mousedown(event);
+    this.mousedown(event);
   };
 
   /**
@@ -122,9 +120,9 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The touch move event.
    */
-  this.touchmove = function (event) {
+  touchmove = (event) => {
     // call mouse equivalent
-    self.mousemove(event);
+    this.mousemove(event);
   };
 
   /**
@@ -132,9 +130,9 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The touch end event.
    */
-  this.touchend = function (event) {
+  touchend = (event) => {
     // call mouse equivalent
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -142,8 +140,8 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The mouse wheel event.
    */
-  this.wheel = function (event) {
-    scrollWhell.wheel(event);
+  wheel = (event) => {
+    this.#scrollWhell.wheel(event);
   };
 
   /**
@@ -151,9 +149,9 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {object} event The key down event.
    */
-  this.keydown = function (event) {
-    event.context = 'dwv.tool.Opacity';
-    app.onKeydown(event);
+  keydown = (event) => {
+    event.context = 'Opacity';
+    this.#app.onKeydown(event);
   };
 
   /**
@@ -161,15 +159,15 @@ dwv.tool.Opacity = function (app) {
    *
    * @param {boolean} _bool The flag to activate or not.
    */
-  this.activate = function (_bool) {
+  activate(_bool) {
     // does nothing
-  };
+  }
 
   /**
    * Initialise the tool.
    */
-  this.init = function () {
+  init() {
     // does nothing
-  };
+  }
 
-}; // Opacity class
+} // Opacity class

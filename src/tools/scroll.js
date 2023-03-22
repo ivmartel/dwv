@@ -1,15 +1,15 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {precisionRound} from '../utils/string';
+import {ScrollWheel} from './scrollWheel';
 
 /**
  * Scroll class.
  *
  * @class
- * @param {dwv.App} app The associated application.
+ * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new dwv.App();
+ * var app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -27,7 +27,7 @@ dwv.tool = dwv.tool || {};
  * ]);
  * @example <caption>Example with slider</caption>
  * // create the dwv app
- * var app = new dwv.App();
+ * var app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -46,7 +46,7 @@ dwv.tool = dwv.tool || {};
  *   var index = vc.getCurrentIndex();
  *   var values = index.getValues();
  *   values[2] = this.value;
- *   vc.setCurrentIndex(new dwv.math.Index(values));
+ *   vc.setCurrentIndex(new math.Index(values));
  * }
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {
@@ -67,59 +67,59 @@ dwv.tool = dwv.tool || {};
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323563.dcm'
  * ]);
  */
-dwv.tool.Scroll = function (app) {
-  /**
-   * Closure to self: to be used by event handlers.
-   *
-   * @private
-   * @type {dwv.tool.Scroll}
-   */
-  var self = this;
+export class Scroll {
+
+  #app;
   /**
    * Interaction start flag.
    *
    * @type {boolean}
    */
-  this.started = false;
-  // touch timer ID (created by setTimeout)
-  var touchTimerID = null;
-
+  #started = false;
   /**
    * Scroll wheel handler.
    *
-   * @type {dwv.tool.ScrollWheel}
+   * @type {ScrollWheel}
    */
-  var scrollWhell = new dwv.tool.ScrollWheel(app);
+  #scrollWhell;
+
+  // touch timer ID (created by setTimeout)
+  #touchTimerID = null;
+
+  constructor(app) {
+    this.#app = app;
+    this.#scrollWhell = new ScrollWheel(app);
+  }
 
   /**
    * Option to show or not a value tooltip on mousemove.
    *
    * @type {boolean}
    */
-  var displayTooltip = false;
+  #displayTooltip = false;
 
   /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
-  this.mousedown = function (event) {
+  mousedown = (event) => {
     // optional tooltip
-    removeTooltipDiv();
+    this.#removeTooltipDiv();
 
     // stop viewer if playing
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
     // start flag
-    self.started = true;
+    this.#started = true;
     // first position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    this.x0 = event._x;
+    this.y0 = event._y;
 
     // update controller position
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
@@ -133,22 +133,22 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The mouse move event.
    */
-  this.mousemove = function (event) {
-    if (!self.started) {
+  mousemove = (event) => {
+    if (!this.#started) {
       // optional tooltip
-      if (displayTooltip) {
-        showTooltip(event);
+      if (this.#displayTooltip) {
+        this.#showTooltip(event);
       }
       return;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
 
     // difference to last Y position
-    var diffY = event._y - self.y0;
+    var diffY = event._y - this.y0;
     var yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
     if (yMove && viewController.canScroll()) {
@@ -161,7 +161,7 @@ dwv.tool.Scroll = function (app) {
     }
 
     // difference to last X position
-    var diffX = event._x - self.x0;
+    var diffX = event._x - this.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     var imageSize = viewController.getImageSize();
@@ -176,10 +176,10 @@ dwv.tool.Scroll = function (app) {
 
     // reset origin point
     if (xMove) {
-      self.x0 = event._x;
+      this.x0 = event._x;
     }
     if (yMove) {
-      self.y0 = event._y;
+      this.y0 = event._y;
     }
   };
 
@@ -188,10 +188,10 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} _event The mouse up event.
    */
-  this.mouseup = function (_event) {
-    if (self.started) {
+  mouseup = (_event) => {
+    if (this.#started) {
       // stop recording
-      self.started = false;
+      this.#started = false;
     }
   };
 
@@ -200,10 +200,10 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The mouse out event.
    */
-  this.mouseout = function (event) {
-    self.mouseup(event);
+  mouseout = (event) => {
+    this.mouseup(event);
     // remove possible tooltip div
-    removeTooltipDiv();
+    this.#removeTooltipDiv();
   };
 
   /**
@@ -211,11 +211,11 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The touch start event.
    */
-  this.touchstart = function (event) {
+  touchstart = (event) => {
     // long touch triggers the dblclick
-    touchTimerID = setTimeout(self.dblclick, 500);
+    this.#touchTimerID = setTimeout(this.dblclick, 500);
     // call mouse equivalent
-    self.mousedown(event);
+    this.mousedown(event);
   };
 
   /**
@@ -223,14 +223,14 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The touch move event.
    */
-  this.touchmove = function (event) {
+  touchmove = (event) => {
     // abort timer if move
-    if (touchTimerID !== null) {
-      clearTimeout(touchTimerID);
-      touchTimerID = null;
+    if (this.#touchTimerID !== null) {
+      clearTimeout(this.#touchTimerID);
+      this.#touchTimerID = null;
     }
     // call mouse equivalent
-    self.mousemove(event);
+    this.mousemove(event);
   };
 
   /**
@@ -238,14 +238,14 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The touch end event.
    */
-  this.touchend = function (event) {
+  touchend = (event) => {
     // abort timer
-    if (touchTimerID !== null) {
-      clearTimeout(touchTimerID);
-      touchTimerID = null;
+    if (this.#touchTimerID !== null) {
+      clearTimeout(this.#touchTimerID);
+      this.#touchTimerID = null;
     }
     // call mouse equivalent
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -253,8 +253,8 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The mouse wheel event.
    */
-  this.wheel = function (event) {
-    scrollWhell.wheel(event);
+  wheel = (event) => {
+    this.#scrollWhell.wheel(event);
   };
 
   /**
@@ -262,9 +262,9 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The key down event.
    */
-  this.keydown = function (event) {
-    event.context = 'dwv.tool.Scroll';
-    app.onKeydown(event);
+  keydown = (event) => {
+    event.context = 'Scroll';
+    this.#app.onKeydown(event);
   };
 
   /**
@@ -272,13 +272,13 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The key down event.
    */
-  this.dblclick = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+  dblclick(event) {
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
-  };
+  }
 
   /**
    * Displays a tooltip in a temparary `span`.
@@ -286,13 +286,13 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {object} event The mouse move event.
    */
-  function showTooltip(event) {
+  #showTooltip(event) {
     // remove previous div
-    removeTooltipDiv();
+    this.#removeTooltipDiv();
 
     // get image value at position
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
     var planePos = viewLayer.displayToPlanePos(event._x, event._y);
@@ -310,7 +310,7 @@ dwv.tool.Scroll = function (app) {
       // position tooltip
       span.style.left = (event._x + 10) + 'px';
       span.style.top = (event._y + 10) + 'px';
-      var text = dwv.utils.precisionRound(value, 3);
+      var text = precisionRound(value, 3);
       if (typeof viewController.getPixelUnit() !== 'undefined') {
         text += ' ' + viewController.getPixelUnit();
       }
@@ -321,7 +321,7 @@ dwv.tool.Scroll = function (app) {
   /**
    * Remove the tooltip html div.
    */
-  function removeTooltipDiv() {
+  #removeTooltipDiv() {
     var div = document.getElementById('scroll-tooltip');
     if (div) {
       div.remove();
@@ -333,29 +333,29 @@ dwv.tool.Scroll = function (app) {
    *
    * @param {boolean} _bool The flag to activate or not.
    */
-  this.activate = function (_bool) {
+  activate(_bool) {
     // remove tooltip html when deactivating
     if (!_bool) {
-      removeTooltipDiv();
+      this.#removeTooltipDiv();
     }
-  };
+  }
 
   /**
    * Set the tool live features: disaply tooltip.
    *
    * @param {object} features The list of features.
    */
-  this.setFeatures = function (features) {
+  setFeatures(features) {
     if (typeof features.displayTooltip !== 'undefined') {
-      displayTooltip = features.displayTooltip;
+      this.#displayTooltip = features.displayTooltip;
     }
-  };
+  }
 
   /**
    * Initialise the tool.
    */
-  this.init = function () {
+  init() {
     // does nothing
-  };
+  }
 
-}; // Scroll class
+} // Scroll class

@@ -13,7 +13,7 @@ var Konva = Konva || {};
 /**
  * Debug flag.
  */
-dwv.tool.draw.debug = false;
+export const Debug = false;
 
 /**
  * Drawing tool.

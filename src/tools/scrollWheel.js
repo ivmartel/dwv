@@ -1,6 +1,4 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 
 /**
  * Scroll wheel class: provides a wheel event handler
@@ -9,20 +7,27 @@ dwv.tool = dwv.tool || {};
  * @class
  * @param {dwv.App} app The associated application.
  */
-dwv.tool.ScrollWheel = function (app) {
+export class ScrollWheel {
+
+  #app;
+
+  constructor(app) {
+    this.#app = app;
+  }
+
   /**
    * Accumulated wheel event deltaY.
    *
    * @type {number}
    */
-  var wheelDeltaY = 0;
+  #wheelDeltaY = 0;
 
   /**
    * Handle mouse wheel event.
    *
    * @param {object} event The mouse wheel event.
    */
-  this.wheel = function (event) {
+  wheel(event) {
     // deltaMode (deltaY values on my machine...):
     // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
     // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
@@ -32,17 +37,17 @@ dwv.tool.ScrollWheel = function (app) {
     if (event.deltaMode === 1) {
       scrollMin = 5.99;
     }
-    wheelDeltaY += event.deltaY;
-    if (Math.abs(wheelDeltaY) < scrollMin) {
+    this.#wheelDeltaY += event.deltaY;
+    if (Math.abs(this.#wheelDeltaY) < scrollMin) {
       return;
     } else {
-      wheelDeltaY = 0;
+      this.#wheelDeltaY = 0;
     }
 
     var up = event.deltaY < 0 ? true : false;
 
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     var imageSize = viewController.getImageSize();
@@ -59,5 +64,6 @@ dwv.tool.ScrollWheel = function (app) {
         viewController.decrementIndex(3);
       }
     }
-  };
-}; // ScrollWheel class
+  }
+
+} // ScrollWheel class
