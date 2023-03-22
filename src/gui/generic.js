@@ -1,3 +1,5 @@
+import {logger} from '../utils/logger';
+
 /**
  * List of interaction event names.
  */
@@ -52,9 +54,9 @@ export function prompt(message, value) {
 /**
  * Prompt the user for some text. Defaults to local one.
  *
- * @see dwv.gui.prompt
+ * @see prompt
  */
-//dwv.prompt = dwv.gui.prompt;
+//dwv.prompt = prompt;
 
 /**
  * Open a dialogue to edit roi data. Defaults to undefined.
@@ -71,7 +73,7 @@ export function prompt(message, value) {
  * @param {Array} touches The list of touch events.
  * @returns {Array} The list of positions of the touch events.
  */
-export function getTouchesPositions(touches) {
+function getTouchesPositions(touches) {
   // get the touch offset from all its parents
   var offsetLeft = 0;
   var offsetTop = 0;
@@ -88,7 +90,7 @@ export function getTouchesPositions(touches) {
       offsetParent = offsetParent.offsetParent;
     }
   } else {
-    dwv.logger.debug('No touch target offset parent.');
+    logger.debug('No touch target offset parent.');
   }
   // set its position
   var positions = [];
@@ -112,11 +114,11 @@ export function getEventOffset(event) {
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = dwv.gui.getTouchesPositions(event.targetTouches);
+    positions = getTouchesPositions(event.targetTouches);
   } else if (typeof event.changedTouches !== 'undefined' &&
     event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = dwv.gui.getTouchesPositions(event.changedTouches);
+    positions = getTouchesPositions(event.changedTouches);
   } else {
     // offsetX/Y: the offset in the X coordinate of the mouse pointer
     // between that event and the padding edge of the target node
