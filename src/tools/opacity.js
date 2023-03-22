@@ -51,7 +51,7 @@ export class Opacity {
    */
   mousedown = (event) => {
     // start flag
-    this.started = true;
+    this.#started = true;
     // first position
     this.x0 = event._x;
     this.y0 = event._y;
@@ -63,7 +63,7 @@ export class Opacity {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    if (!this.started) {
+    if (!this.#started) {
       return;
     }
 

@@ -56,7 +56,7 @@ export class ZoomAndPan {
    * @param {object} event The touch down event.
    */
   twotouchdown = (event) => {
-    this.started = true;
+    this.#started = true;
     // store first point
     this.x0 = event._x;
     this.y0 = event._y;
@@ -73,7 +73,7 @@ export class ZoomAndPan {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    if (!this.started) {
+    if (!this.#started) {
       return;
     }
     // calculate translation
@@ -103,7 +103,7 @@ export class ZoomAndPan {
    * @param {object} event The touch move event.
    */
   twotouchmove = (event) => {
-    if (!this.started) {
+    if (!this.#started) {
       return;
     }
     var point0 = new Point2D(event._x, event._y);
@@ -209,7 +209,7 @@ export class ZoomAndPan {
    *
    * @param {object} event The mouse wheel event.
    */
-  wheel(event) {
+  wheel = (event) => {
     var step = -event.deltaY / 500;
 
     var layerDetails = getLayerDetailsFromEvent(event);
@@ -220,7 +220,7 @@ export class ZoomAndPan {
     var center = viewController.getPlanePositionFromPlanePoint(planePos);
     layerGroup.addScale(step, center);
     layerGroup.draw();
-  }
+  };
 
   /**
    * Handle key down event.

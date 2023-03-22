@@ -1,13 +1,15 @@
 import {ScrollWheel} from './scrollWheel';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
 
 /**
  * WindowLevel tool: handle window/level related events.
  *
  * @class
- * @param {dwv.App} app The associated application.
+ * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new dwv.App();
+ * var app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -63,11 +65,11 @@ export class WindowLevel {
    */
   mousemove = (event) => {
     // check start flag
-    if (!this.started) {
+    if (!this.#started) {
       return;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerDetails = getLayerDetailsFromEvent(event);
     var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -86,12 +88,12 @@ export class WindowLevel {
     var windowCenter = center + Math.round(diffY * pixelToIntensity);
     var windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
-    windowWidth = dwv.image.validateWindowWidth(windowWidth);
+    windowWidth = validateWindowWidth(windowWidth);
 
     // add the manual preset to the view
     viewController.addWindowLevelPresets({
       manual: {
-        wl: [new dwv.image.WindowLevel(windowCenter, windowWidth)],
+        wl: [new WL(windowCenter, windowWidth)],
         name: 'manual'
       }
     });
@@ -157,7 +159,7 @@ export class WindowLevel {
    * @param {object} event The double click event.
    */
   dblclick(event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerDetails = getLayerDetailsFromEvent(event);
     var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
