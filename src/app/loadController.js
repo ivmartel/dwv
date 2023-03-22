@@ -170,7 +170,7 @@ export class LoadController {
     eventInfo.loadid = loadId;
 
     // set callbacks
-    loader.onloadstart = function (event) {
+    loader.onloadstart = (event) => {
       // store loader to allow abort
       this.#currentLoaders[loadId] = {
         loader: loader,

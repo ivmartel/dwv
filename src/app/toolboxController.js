@@ -181,7 +181,7 @@ export class ToolboxController {
       }
     };
 
-    var applySelectedTool = function (event) {
+    var applySelectedTool = (event) => {
       // make sure we have a tool
       if (this.#selectedTool) {
         var func = this.#selectedTool[event.type];

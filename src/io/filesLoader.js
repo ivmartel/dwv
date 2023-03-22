@@ -141,10 +141,10 @@ export class FilesLoader {
    * @param {object} event The load data event.
    * @private
    */
-  #addLoadItem(event) {
+  #addLoadItem = (event) => {
     this.onloaditem(event);
     this.#addLoad();
-  }
+  };
 
   /**
    * Increment the number of loaded data
@@ -153,7 +153,7 @@ export class FilesLoader {
    * @param {object} _event The load data event.
    * @private
    */
-  #addLoad(_event) {
+  #addLoad = (_event) => {
     this.#nLoad++;
     // call onload when all is loaded
     // (not using the input event since it is not the
@@ -163,7 +163,7 @@ export class FilesLoader {
         source: this.#inputData
       });
     }
-  }
+  };
 
   /**
    * Increment the counter of load end events
@@ -172,7 +172,7 @@ export class FilesLoader {
    * @param {object} _event The load end event.
    * @private
    */
-  #addLoadend(_event) {
+  #addLoadend = (_event) => {
     this.#nLoadend++;
     // call onloadend when all is run
     // (not using the input event since it is not the
@@ -183,7 +183,7 @@ export class FilesLoader {
         source: this.#inputData
       });
     }
-  }
+  };
 
   /**
    * Augment a callback event with a srouce.

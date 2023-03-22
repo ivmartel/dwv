@@ -99,9 +99,8 @@ export class Threshold {
   update() {
     var image = this.getOriginalImage();
     var imageMin = image.getDataRange().min;
-    var self = this;
-    var threshFunction = function (value) {
-      if (value < self.getMin() || value > self.getMax()) {
+    var threshFunction = (value) => {
+      if (value < this.getMin() || value > this.getMax()) {
         return imageMin;
       } else {
         return value;

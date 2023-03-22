@@ -272,13 +272,13 @@ export class Scroll {
    *
    * @param {object} event The key down event.
    */
-  dblclick(event) {
+  dblclick = (event) => {
     var layerDetails = getLayerDetailsFromEvent(event);
     var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
-  }
+  };
 
   /**
    * Displays a tooltip in a temparary `span`.

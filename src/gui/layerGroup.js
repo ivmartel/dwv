@@ -286,10 +286,12 @@ export class LayerGroup {
 
   /**
    * Update crosshair on offset or zoom change.
+   *
+   * @param {object} _event The change event.
    */
-  #updateCrosshairOnChange() {
+  #updateCrosshairOnChange = (_event) => {
     this.#showCrosshairDiv();
-  }
+  };
 
   /**
    * Get the Id of the container div.
@@ -969,8 +971,8 @@ export class LayerGroup {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
 } // LayerGroup class
