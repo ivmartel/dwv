@@ -574,7 +574,7 @@ export function getSliceGeometrySpacing(origins, orientation, withCheck) {
     };
     var mean = deltas.reduce(sumReducer) / deltas.length;
     if (mean > 1e-4) {
-      dwv.logger.warn('Varying slice spacing, mean delta: ' +
+      logger.warn('Varying slice spacing, mean delta: ' +
         mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
     }
   }

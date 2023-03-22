@@ -12,6 +12,7 @@ import {
 import {Vector3D} from '../math/vector';
 import {Matrix33} from '../math/matrix';
 import {Point3D} from '../math/point';
+import {logger} from '../utils/logger';
 
 /**
  * {@link Image} factory.
@@ -133,7 +134,7 @@ export class ImageFactory {
     // check buffer size
     var bufferSize = size.getTotalSize() * samplesPerPixel;
     if (bufferSize !== pixelBuffer.length) {
-      dwv.logger.warn('Badly sized pixel buffer: ' +
+      logger.warn('Badly sized pixel buffer: ' +
         pixelBuffer.length + ' != ' + bufferSize);
       if (bufferSize < pixelBuffer.length) {
         pixelBuffer = pixelBuffer.slice(0, size.getTotalSize());
@@ -228,7 +229,7 @@ export class ImageFactory {
           };
         }
         if (width === 0) {
-          dwv.logger.warn('Zero window width found in DICOM.');
+          logger.warn('Zero window width found in DICOM.');
         }
       }
     }
@@ -262,7 +263,7 @@ export class ImageFactory {
           // check double size
           if (vlSize !== 2 * descSize) {
             doScale = true;
-            dwv.logger.info('16bits lut but size is not double. desc: ' +
+            logger.info('16bits lut but size is not double. desc: ' +
               descSize + ' vl: ' + vlSize);
           }
           // (C.7.6.3.1.6 Palette Color Lookup Table Data)
@@ -272,7 +273,7 @@ export class ImageFactory {
             dicomElements.getFromKey('x00280100'), 10);
           if (bitsAllocated === 8) {
             doScale = true;
-            dwv.logger.info(
+            logger.info(
               'Scaling 16bits color lut since bits allocated is 8.');
           }
 
@@ -287,7 +288,7 @@ export class ImageFactory {
           }
         } else if (descriptor[2] === 8) {
           // lut with vr=OW was read as Uint16, convert it to Uint8
-          dwv.logger.info(
+          logger.info(
             'Scaling 16bits color lut since the lut descriptor is 8.');
           var clone = redLut.slice(0);
           redLut = new Uint8Array(clone.buffer);

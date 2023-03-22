@@ -1,6 +1,7 @@
 import {Vector3D} from './vector';
 import {Point3D} from './point';
 import {Index} from './index';
+import {logger} from '../utils/logger';
 
 // difference between 1 and the smallest floating point number greater than 1
 // -> ~2e-16
@@ -304,7 +305,7 @@ function getMatrixInverse(m) {
 
   var det = m00 * a1212 + m01 * a2012 + m02 * a0112;
   if (det === 0) {
-    dwv.logger.warn('Cannot invert 3*3 matrix with zero determinant.');
+    logger.warn('Cannot invert 3*3 matrix with zero determinant.');
     return undefined;
   }
   det = 1 / det;

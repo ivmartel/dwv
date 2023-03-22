@@ -1,3 +1,5 @@
+import {logger} from '../utils/logger';
+
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
@@ -19,7 +21,7 @@ export function generateImageDataPaletteColor(
   };
 
   if (is16BitsStored) {
-    dwv.logger.info('Scaling 16bits data to 8bits.');
+    logger.info('Scaling 16bits data to 8bits.');
   }
 
   var index = 0;

@@ -1,6 +1,7 @@
 import {cleanString} from '../dicom/dicomParser';
 import {Spacing} from '../image/spacing';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
+import {logger} from '../utils/logger';
 
 /**
  * Check two position patients for equality.
@@ -520,7 +521,7 @@ function getSegmentFrameInfo(groupItem) {
         frameInfo.spacing = frameSpacing;
       }
     } else {
-      dwv.logger.warn(
+      logger.warn(
         'No shared functional group pixel measure sequence items.');
     }
   }
@@ -615,7 +616,7 @@ export class MaskFactory {
           imageOrientationPatient =
             planeOrientationSeq.value[0].x00200037.value;
         } else {
-          dwv.logger.warn(
+          logger.warn(
             'No shared functional group plane orientation sequence items.');
         }
       }
@@ -626,7 +627,7 @@ export class MaskFactory {
           // should be only one
           spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
         } else {
-          dwv.logger.warn(
+          logger.warn(
             'No shared functional group pixel measure sequence items.');
         }
       }
@@ -751,7 +752,7 @@ export class MaskFactory {
         res = value > dwv.math.REAL_WORLD_EPSILON * 10;
         if (!res) {
           // warn if epsilon < value < epsilon * 10
-          dwv.logger.warn(
+          logger.warn(
             'Using larger real world epsilon in SEG pos pat adding'
           );
         }
@@ -773,7 +774,7 @@ export class MaskFactory {
       var distPrevious = dist;
       // TODO: good threshold?
       while (isNotSmall(dist)) {
-        dwv.logger.debug('Adding intermediate pos pats for DICOM seg at ' +
+        logger.debug('Adding intermediate pos pats for DICOM seg at ' +
           point.toString());
         posPats.push([point.getX(), point.getY(), point.getZ()]);
         ++sliceIndex;
