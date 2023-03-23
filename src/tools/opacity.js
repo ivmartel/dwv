@@ -26,12 +26,14 @@ import {ScrollWheel} from './scrollWheel';
 export class Opacity {
 
   #app;
+
   /**
    * Interaction start flag.
    *
    * @type {boolean}
    */
   #started = false;
+
   /**
    * Scroll wheel handler.
    *
