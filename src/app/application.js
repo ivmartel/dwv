@@ -28,6 +28,14 @@ import {RectangleFactory} from '../tools/rectangle';
 
 import {Threshold, Sobel, Sharpen} from '../tools/filter';
 
+import {
+  WindowLevelBinder,
+  PositionBinder,
+  ZoomBinder,
+  OffsetBinder,
+  OpacityBinder
+} from '../gui/stage';
+
 const ToolList = {
   WindowLevel,
   Scroll,
@@ -49,6 +57,14 @@ const ToolOptions = {
     Sobel,
     Sharpen
   }
+};
+
+const BinderList = {
+  WindowLevelBinder,
+  PositionBinder,
+  ZoomBinder,
+  OffsetBinder,
+  OpacityBinder
 };
 
 /**
@@ -697,10 +713,18 @@ export class App {
   /**
    * Set the layer groups binders.
    *
-   * @param {Array} list The binders list.
+   * @param {Array} list The list of binder names.
    */
   setLayerGroupsBinders(list) {
-    this.#stage.setBinders(list);
+    // create instances
+    var instances = [];
+    for (var i = 0; i < list.length; ++i) {
+      if (typeof BinderList[list[i]] !== 'undefined') {
+        instances.push(new BinderList[list[i]]);
+      }
+    }
+    // pass to stage
+    this.#stage.setBinders(instances);
   }
 
   /**
