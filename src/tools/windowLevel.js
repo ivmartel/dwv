@@ -158,7 +158,7 @@ export class WindowLevel {
    *
    * @param {object} event The double click event.
    */
-  dblclick(event) {
+  dblclick = (event) => {
     var layerDetails = getLayerDetailsFromEvent(event);
     var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
