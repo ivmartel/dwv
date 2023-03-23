@@ -168,8 +168,6 @@ export class EllipseFactory {
 
   /**
    * Update an ellipse shape.
-   * Warning: do NOT use 'this' here, this method is passed
-   *   as is to the change command.
    *
    * @param {object} anchor The active anchor.
    * @param {object} _style The app style.

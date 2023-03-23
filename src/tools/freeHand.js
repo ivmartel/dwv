@@ -145,8 +145,6 @@ export class FreeHandFactory {
 
   /**
    * Update a FreeHand shape.
-   * Warning: do NOT use 'this' here, this method is passed
-   *   as is to the change command.
    *
    * @param {object} anchor The active anchor.
    * @param {object} style The app style.
