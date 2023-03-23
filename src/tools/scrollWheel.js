@@ -5,7 +5,7 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
  *   that scroll the corresponding data.
  *
  * @class
- * @param {dwv.App} app The associated application.
+ * @param {App} app The associated application.
  */
 export class ScrollWheel {
 

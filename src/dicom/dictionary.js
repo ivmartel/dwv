@@ -5229,7 +5229,7 @@ export const DicomDictionary = {
     '0xE00D': ['NONE', '1', 'ItemDelimitationItem'],
     '0xE0DD': ['NONE', '1', 'SequenceDelimitationItem']
   }
-}; // dwv.dicom.Dictionnary
+}; // Dictionnary
 
 // taken from gdcm-2.6.1\Source\DataDictionary\GroupName.dic
 // -> removed duplicates (commented)

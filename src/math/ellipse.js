@@ -143,7 +143,7 @@ export class Ellipse {
   /**
    * Quantify an ellipse according to view information.
    *
-   * @param {dwv.ctrl.ViewController} viewController The associated view
+   * @param {ViewController} viewController The associated view
    *   controller.
    * @param {Array} flags A list of stat values to calculate.
    * @returns {object} A quantification object.

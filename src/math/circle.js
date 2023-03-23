@@ -22,7 +22,7 @@ function mulABC(a, b, c) {
  * Circle shape.
  *
  * @class
- * @param {dwv.math.Point2D} centre A Point2D representing the centre
+ * @param {Point2D} centre A Point2D representing the centre
  *   of the circle.
  * @param {number} radius The radius of the circle.
  */
@@ -39,7 +39,7 @@ export class Circle {
   /**
    * Get the centre (point) of the circle.
    *
-   * @returns {dwv.math.Point2D} The center (point) of the circle.
+   * @returns {Point2D} The center (point) of the circle.
    */
   getCenter() {
     return this.#centre;
@@ -58,7 +58,7 @@ export class Circle {
   /**
    * Check for equality.
    *
-   * @param {dwv.math.Circle} rhs The object to compare to.
+   * @param {Circle} rhs The object to compare to.
    * @returns {boolean} True if both objects are equal.
    */
   equals(rhs) {
@@ -128,7 +128,7 @@ export class Circle {
   /**
    * Quantify an circle according to view information.
    *
-   * @param {dwv.ctrl.ViewController} viewController The associated view
+   * @param {ViewController} viewController The associated view
    *   controller.
    * @param {Array} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
