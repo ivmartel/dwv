@@ -1,6 +1,7 @@
 import {Size} from '../image/size';
 import {Spacing} from '../image/spacing';
 import {Geometry} from '../image/geometry';
+import {Image} from '../image/image';
 import {Point3D} from '../math/point';
 
 /**

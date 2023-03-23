@@ -4,6 +4,7 @@ import {Point3D} from '../math/point';
 import {isIdentityMat33} from '../math/matrix';
 import {Size} from '../image/size';
 import {Spacing} from '../image/spacing';
+import {Image} from '../image/image';
 import {Geometry} from '../image/geometry';
 import {PlaneHelper} from '../image/planeHelper';
 import {MaskSegmentHelper} from '../image/maskSegmentHelper';

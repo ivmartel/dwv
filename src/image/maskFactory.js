@@ -1,5 +1,6 @@
 import {cleanString} from '../dicom/dicomParser';
 import {Spacing} from '../image/spacing';
+import {Image} from '../image/image';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
 import {Point3D} from '../math/point';
 import {Vector3D} from '../math/vector';
