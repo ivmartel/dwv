@@ -538,9 +538,9 @@ export class Floodfill {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
   /**
    * Set the tool live features: shape colour.

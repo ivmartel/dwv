@@ -860,9 +860,9 @@ export class Image {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
   // ****************************************
   // image data modifiers... carefull...

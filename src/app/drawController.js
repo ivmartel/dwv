@@ -153,7 +153,7 @@ export class DrawController {
    */
   getCurrentPosGroup() {
     // get position groups
-    var posGroups = this.#konvaLayer.getChildren(function (node) {
+    var posGroups = this.#konvaLayer.getChildren((node) => {
       return node.id() === this.#currentPosGroupId;
     });
     // if one group, use it

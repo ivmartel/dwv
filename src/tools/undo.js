@@ -154,8 +154,8 @@ export class UndoStack {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
 } // UndoStack class

@@ -755,9 +755,9 @@ export class View {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
   /**
    * Get the image window/level that covers the full data range.

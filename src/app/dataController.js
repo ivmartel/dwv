@@ -146,9 +146,9 @@ export class DataController {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
   /**
    * Get a fireEvent function that adds the input index
