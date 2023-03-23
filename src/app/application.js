@@ -1,4 +1,5 @@
 import {ViewEventNames} from '../image/view';
+import {ViewFactory} from '../image/viewFactory';
 import {ColourMaps} from '../image/luts';
 import {getMatrixFromName} from '../math/matrix';
 import {Point3D} from '../math/point';
@@ -13,9 +14,41 @@ import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
 
-import {WindowLevel} from '../image/windowLevel';
-const Tools = {
-  WindowLevel
+import {WindowLevel} from '../tools/windowLevel';
+import {Scroll} from '../tools/scroll';
+import {ZoomAndPan} from '../tools/zoomPan';
+import {Opacity} from '../tools/opacity';
+import {Draw} from '../tools/draw';
+
+import {ArrowFactory} from '../tools/arrow';
+import {CircleFactory} from '../tools/circle';
+import {EllipseFactory} from '../tools/ellipse';
+import {ProtractorFactory} from '../tools/protractor';
+import {RectangleFactory} from '../tools/rectangle';
+
+import {Threshold, Sobel, Sharpen} from '../tools/filter';
+
+const ToolList = {
+  WindowLevel,
+  Scroll,
+  ZoomAndPan,
+  Opacity,
+  Draw
+};
+
+const ToolOptions = {
+  draw: {
+    ArrowFactory,
+    CircleFactory,
+    EllipseFactory,
+    ProtractorFactory,
+    RectangleFactory
+  },
+  filter: {
+    Threshold,
+    Sobel,
+    Sharpen
+  }
 };
 
 /**
@@ -371,11 +404,10 @@ export class App {
       var keys = Object.keys(this.#options.tools);
       for (var t = 0; t < keys.length; ++t) {
         var toolName = keys[t];
-        var toolParams = this.#options.tools[toolName];
         // find the tool in the Tools list
-        if (typeof Tools[toolName] !== 'undefined') {
+        if (typeof ToolList[toolName] !== 'undefined') {
           // create tool instance
-          toolList[toolName] = new Tools[toolName](this);
+          toolList[toolName] = new ToolList[toolName](this);
           // register listeners
           if (typeof toolList[toolName].addEventListener !== 'undefined') {
             var names = toolList[toolName].getEventNames();
@@ -384,14 +416,14 @@ export class App {
             }
           }
           // tool options
+          var toolParams = this.#options.tools[toolName];
           if (typeof toolParams.options !== 'undefined') {
             var type = 'raw';
             if (typeof toolList[toolName].getOptionsType !== 'undefined') {
               type = toolList[toolName].getOptionsType();
             }
             var toolOptions = toolParams.options;
-            if (type === 'instance' ||
-                type === 'factory') {
+            if (type === 'instance' || type === 'factory') {
               toolOptions = {};
               for (var i = 0; i < toolParams.options.length; ++i) {
                 var optionName = toolParams.options[i];
@@ -401,10 +433,10 @@ export class App {
                 }
                 var toolNamespace = toolName.charAt(0).toLowerCase() +
                   toolName.slice(1);
-                if (typeof dwv.tool[toolNamespace][optionClassName] !==
+                if (typeof ToolOptions[toolNamespace][optionClassName] !==
                   'undefined') {
                   toolOptions[optionName] =
-                    dwv.tool[toolNamespace][optionClassName];
+                    ToolOptions[toolNamespace][optionClassName];
                 } else {
                   logger.warn('Could not find option class for: ' +
                     optionName);
@@ -784,7 +816,7 @@ export class App {
    */
   getState() {
     var state = new State();
-    return state.toJSON(self);
+    return state.toJSON(this);
   }
 
   // Handler Methods -----------------------------------------------------------
@@ -991,9 +1023,9 @@ export class App {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
-  }
+  };
 
   /**
    * Data load start callback.
@@ -1068,7 +1100,7 @@ export class App {
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
       var state = new State();
-      state.apply(self, state.fromJSON(event.data));
+      state.apply(this, state.fromJSON(event.data));
       eventMetaData = 'state';
     }
 
@@ -1096,7 +1128,7 @@ export class App {
     if (event.loadtype === 'image' &&
     this.#getViewConfigs(event.loadid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
-      self.render(event.loadid);
+      this.render(event.loadid);
     }
   };
 
@@ -1249,7 +1281,7 @@ export class App {
     this.#stage.unbindLayerGroups();
 
     // create and setup view
-    var viewFactory = new dwv.ViewFactory();
+    var viewFactory = new ViewFactory();
     var view = viewFactory.create(data.meta, data.image);
     var viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
@@ -1306,9 +1338,9 @@ export class App {
 
     // listen to image changes
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
-    this.#dataController.addEventListener('imagechange', function (event) {
+    this.#dataController.addEventListener('imagechange', (event) => {
       viewLayer.onimagechange(event);
-      self.render(event.dataid);
+      this.render(event.dataid);
     });
 
     // bind
