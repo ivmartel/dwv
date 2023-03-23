@@ -1,27 +1,33 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {Style} from '../gui/style';
+import {Point2D} from '../math/point';
+import {Path} from '../math/path';
+import {Scissors} from '../math/scissors';
+import {guid} from '../math/stats';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {ListenerHandler} from '../utils/listen';
+import {RoiFactory} from '../math/roi';
+import {DrawGroupCommand} from '../tools/drawCommands';
 
 /**
  * Livewire painting tool.
  *
  * @class
- * @param {dwv.App} app The associated application.
+ * @param {App} app The associated application.
  */
-dwv.tool.Livewire = function (app) {
-  /**
-   * Closure to self: to be used by event handlers.
-   *
-   * @private
-   * @type {dwv.tool.Livewire}
-   */
-  var self = this;
+export class Livewire {
+
+  #app;
+
+  constructor(app) {
+    this.#app = app;
+  }
+
   /**
    * Interaction start flag.
    *
    * @type {boolean}
    */
-  this.started = false;
+  #started = false;
 
   /**
    * Draw command.
@@ -29,49 +35,54 @@ dwv.tool.Livewire = function (app) {
    * @private
    * @type {object}
    */
-  var command = null;
+  #command = null;
+
   /**
    * Current shape group.
    *
    * @private
    * @type {object}
    */
-  var shapeGroup = null;
+  #shapeGroup = null;
+
   /**
    * Drawing style.
    *
-   * @type {dwv.gui.Style}
+   * @type {Style}
    */
-  this.style = new dwv.gui.Style();
+  #style = new Style();
 
   /**
    * Path storage. Paths are stored in reverse order.
    *
    * @private
-   * @type {dwv.math.Path}
+   * @type {Path}
    */
-  var path = new dwv.math.Path();
+  #path = new Path();
+
   /**
    * Current path storage. Paths are stored in reverse order.
    *
    * @private
-   * @type {dwv.math.Path}
+   * @type {Path}
    */
-  var currentPath = new dwv.math.Path();
+  #currentPath = new Path();
+
   /**
    * List of parent points.
    *
    * @private
    * @type {Array}
    */
-  var parentPoints = [];
+  #parentPoints = [];
+
   /**
    * Tolerance.
    *
    * @private
    * @type {number}
    */
-  var tolerance = 5;
+  #tolerance = 5;
 
   /**
    * Listener handler.
@@ -79,7 +90,7 @@ dwv.tool.Livewire = function (app) {
    * @type {object}
    * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * Clear the parent points list.
@@ -87,10 +98,10 @@ dwv.tool.Livewire = function (app) {
    * @param {object} imageSize The image size.
    * @private
    */
-  function clearParentPoints(imageSize) {
+  #clearParentPoints(imageSize) {
     var nrows = imageSize.get(1);
     for (var i = 0; i < nrows; ++i) {
-      parentPoints[i] = [];
+      this.#parentPoints[i] = [];
     }
   }
 
@@ -99,35 +110,35 @@ dwv.tool.Livewire = function (app) {
    *
    * @private
    */
-  function clearPaths() {
-    path = new dwv.math.Path();
-    currentPath = new dwv.math.Path();
+  #clearPaths() {
+    this.#path = new Path();
+    this.#currentPath = new Path();
   }
 
   /**
    * Scissor representation.
    *
    * @private
-   * @type {dwv.math.Scissors}
+   * @type {Scissors}
    */
-  var scissors = new dwv.math.Scissors();
+  #scissors = new Scissors();
 
   /**
    * Finish a livewire (roi) shape.
    */
-  function finishShape() {
+  #finishShape() {
     // fire creation event (was not propagated during draw)
-    fireEvent({
+    this.#fireEvent({
       type: 'drawcreate',
-      id: shapeGroup.id()
+      id: this.#shapeGroup.id()
     });
     // listen
-    command.onExecute = fireEvent;
-    command.onUndo = fireEvent;
+    this.#command.onExecute = this.#fireEvent;
+    this.#command.onUndo = this.#fireEvent;
     // save command in undo stack
-    app.addToUndoStack(command);
+    this.#app.addToUndoStack(this.#command);
     // set flag
-    self.started = false;
+    this.#started = false;
   }
 
   /**
@@ -135,46 +146,46 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} event The mouse down event.
    */
-  this.mousedown = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+  mousedown = (event) => {
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var imageSize = viewLayer.getViewController().getImageSize();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
     // first time
-    if (!self.started) {
-      self.started = true;
-      self.x0 = index.get(0);
-      self.y0 = index.get(1);
+    if (!this.#started) {
+      this.#started = true;
+      this.x0 = index.get(0);
+      this.y0 = index.get(1);
       // clear vars
-      clearPaths();
-      clearParentPoints(imageSize);
-      shapeGroup = null;
+      this.#clearPaths();
+      this.#clearParentPoints(imageSize);
+      this.#shapeGroup = null;
       // update zoom scale
       var drawLayer = layerGroup.getActiveDrawLayer();
-      self.style.setZoomScale(
+      this.#style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
       var p = {x: index.get(0), y: index.get(1)};
-      scissors.doTraining(p);
+      this.#scissors.doTraining(p);
       // add the initial point to the path
-      var p0 = new dwv.math.Point2D(index.get(0), index.get(1));
-      path.addPoint(p0);
-      path.addControlPoint(p0);
+      var p0 = new Point2D(index.get(0), index.get(1));
+      this.#path.addPoint(p0);
+      this.#path.addControlPoint(p0);
     } else {
       // final point: at 'tolerance' of the initial point
-      if ((Math.abs(index.get(0) - self.x0) < tolerance) &&
-        (Math.abs(index.get(1) - self.y0) < tolerance)) {
+      if ((Math.abs(index.get(0) - this.x0) < this.#tolerance) &&
+        (Math.abs(index.get(1) - this.y0) < this.#tolerance)) {
         // finish
-        finishShape();
+        this.#finishShape();
       } else {
         // anchor point
-        path = currentPath;
-        clearParentPoints(imageSize);
+        this.#path = this.#currentPath;
+        this.#clearParentPoints(imageSize);
         var pn = {x: index.get(0), y: index.get(1)};
-        scissors.doTraining(pn);
-        path.addControlPoint(currentPath.getPoint(0));
+        this.#scissors.doTraining(pn);
+        this.#path.addControlPoint(this.#currentPath.getPoint(0));
       }
     }
   };
@@ -184,23 +195,23 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} event The mouse move event.
    */
-  this.mousemove = function (event) {
-    if (!self.started) {
+  mousemove = (event) => {
+    if (!this.#started) {
       return;
     }
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
+    var layerDetails = getLayerDetailsFromEvent(event);
+    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
     // set the point to find the path to
     var p = {x: index.get(0), y: index.get(1)};
-    scissors.setPoint(p);
+    this.#scissors.setPoint(p);
     // do the work
     var results = 0;
     var stop = false;
-    while (!parentPoints[p.y][p.x] && !stop) {
-      results = scissors.doWork();
+    while (!this.#parentPoints[p.y][p.x] && !stop) {
+      results = this.#scissors.doWork();
 
       if (results.length === 0) {
         stop = true;
@@ -209,36 +220,37 @@ dwv.tool.Livewire = function (app) {
         for (var i = 0; i < results.length - 1; i += 2) {
           var _p = results[i];
           var _q = results[i + 1];
-          parentPoints[_p.y][_p.x] = _q;
+          this.#parentPoints[_p.y][_p.x] = _q;
         }
       }
     }
 
     // get the path
-    currentPath = new dwv.math.Path();
+    this.#currentPath = new Path();
     stop = false;
     while (p && !stop) {
-      currentPath.addPoint(new dwv.math.Point2D(p.x, p.y));
-      if (!parentPoints[p.y]) {
+      this.#currentPath.addPoint(new Point2D(p.x, p.y));
+      if (!this.#parentPoints[p.y]) {
         stop = true;
       } else {
-        if (!parentPoints[p.y][p.x]) {
+        if (!this.#parentPoints[p.y][p.x]) {
           stop = true;
         } else {
-          p = parentPoints[p.y][p.x];
+          p = this.#parentPoints[p.y][p.x];
         }
       }
     }
-    currentPath.appenPath(path);
+    this.#currentPath.appenPath(this.#path);
 
     // remove previous draw
-    if (shapeGroup) {
-      shapeGroup.destroy();
+    if (this.#shapeGroup) {
+      this.#shapeGroup.destroy();
     }
     // create shape
-    var factory = new dwv.tool.draw.RoiFactory();
-    shapeGroup = factory.create(currentPath.pointArray, self.style);
-    shapeGroup.id(dwv.math.guid());
+    var factory = new RoiFactory();
+    this.#shapeGroup = factory.create(
+      this.#currentPath.pointArray, this.#style);
+    this.#shapeGroup.id(guid());
 
     var drawLayer = layerGroup.getActiveDrawLayer();
     var drawController = drawLayer.getDrawController();
@@ -246,13 +258,13 @@ dwv.tool.Livewire = function (app) {
     // get the position group
     var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
-    posGroup.add(shapeGroup);
+    posGroup.add(this.#shapeGroup);
 
     // draw shape command
-    command = new dwv.tool.DrawGroupCommand(shapeGroup, 'livewire',
+    this.#command = new DrawGroupCommand(this.#shapeGroup, 'livewire',
       drawLayer.getKonvaLayer());
     // draw
-    command.execute();
+    this.#command.execute();
   };
 
   /**
@@ -260,18 +272,18 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} _event The mouse up event.
    */
-  this.mouseup = function (_event) {
+  mouseup(_event) {
     // nothing to do
-  };
+  }
 
   /**
    * Handle mouse out event.
    *
    * @param {object} event The mouse out event.
    */
-  this.mouseout = function (event) {
+  mouseout = (event) => {
     // treat as mouse up
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -279,8 +291,8 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} _event The double click event.
    */
-  this.dblclick = function (_event) {
-    finishShape();
+  dblclick = (_event) => {
+    this.#finishShape();
   };
 
   /**
@@ -288,9 +300,9 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} event The touch start event.
    */
-  this.touchstart = function (event) {
+  touchstart = (event) => {
     // treat as mouse down
-    self.mousedown(event);
+    this.mousedown(event);
   };
 
   /**
@@ -298,9 +310,9 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} event The touch move event.
    */
-  this.touchmove = function (event) {
+  touchmove = (event) => {
     // treat as mouse move
-    self.mousemove(event);
+    this.mousemove(event);
   };
 
   /**
@@ -308,9 +320,9 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} event The touch end event.
    */
-  this.touchend = function (event) {
+  touchend = (event) => {
     // treat as mouse up
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -318,9 +330,9 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {object} event The key down event.
    */
-  this.keydown = function (event) {
-    event.context = 'dwv.tool.Livewire';
-    app.onKeydown(event);
+  keydown = (event) => {
+    event.context = 'Livewire';
+    this.#app.onKeydown(event);
   };
 
   /**
@@ -328,41 +340,41 @@ dwv.tool.Livewire = function (app) {
    *
    * @param {boolean} bool The flag to activate or not.
    */
-  this.activate = function (bool) {
+  activate(bool) {
     // start scissors if displayed
     if (bool) {
-      var layerGroup = app.getActiveLayerGroup();
+      var layerGroup = this.#app.getActiveLayerGroup();
       var viewLayer = layerGroup.getActiveViewLayer();
 
-      //scissors = new dwv.math.Scissors();
+      //scissors = new Scissors();
       var imageSize = viewLayer.getViewController().getImageSize();
-      scissors.setDimensions(
+      this.#scissors.setDimensions(
         imageSize.get(0),
         imageSize.get(1));
-      scissors.setData(viewLayer.getImageData().data);
+      this.#scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale
-      this.style.setBaseScale(app.getBaseScale());
+      this.#style.setBaseScale(this.#app.getBaseScale());
       // set the default to the first in the list
-      this.setFeatures({shapeColour: this.style.getLineColour()});
+      this.setFeatures({shapeColour: this.#style.getLineColour()});
     }
-  };
+  }
 
   /**
    * Initialise the tool.
    */
-  this.init = function () {
+  init() {
     // does nothing
-  };
+  }
 
   /**
    * Get the list of event names that this tool can fire.
    *
    * @returns {Array} The list of event names.
    */
-  this.getEventNames = function () {
+  getEventNames() {
     return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -371,9 +383,10 @@ dwv.tool.Livewire = function (app) {
    * @param {object} callback The method associated with the provided
    *    event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
   /**
    * Remove an event listener from this class.
    *
@@ -381,28 +394,29 @@ dwv.tool.Livewire = function (app) {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
    * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
+  #fireEvent = (event) => {
+    this.#listenerHandler.fireEvent(event);
+  };
+
+  /**
+   * Set the tool live features: shape colour.
+   *
+   * @param {object} features The list of features.
+   */
+  setFeatures(features) {
+    if (typeof features.shapeColour !== 'undefined') {
+      this.#style.setLineColour(features.shapeColour);
+    }
   }
 
-}; // Livewire class
-
-/**
- * Set the tool live features: shape colour.
- *
- * @param {object} features The list of features.
- */
-dwv.tool.Livewire.prototype.setFeatures = function (features) {
-  if (typeof features.shapeColour !== 'undefined') {
-    this.style.setLineColour(features.shapeColour);
-  }
-};
+} // Livewire class
