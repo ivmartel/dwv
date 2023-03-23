@@ -47,7 +47,7 @@ class AsynchPixelBufferDecoder {
 
   #script;
 
-  constuctor(script, _numberOfData) {
+  constructor(script, _numberOfData) {
     this.#script = script;
   }
 

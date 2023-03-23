@@ -140,7 +140,7 @@ export class MoveGroupCommand {
   #translation;
   #layer;
 
-  constuctor(group, name, translation, layer) {
+  constructor(group, name, translation, layer) {
     this.#group = group;
     this.#name = name;
     this.#translation = translation;
