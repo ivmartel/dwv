@@ -243,11 +243,11 @@ export class ShapeEditor {
   setAnchorsActive(flag) {
     var func = null;
     if (flag) {
-      func = function (anchor) {
+      func = (anchor) => {
         this.#setAnchorOn(anchor);
       };
     } else {
-      func = function (anchor) {
+      func = (anchor) => {
         this.#setAnchorOff(anchor);
       };
     }
@@ -332,40 +332,43 @@ export class ShapeEditor {
     var shapeDisplayName = getShapeDisplayName(this.#shape);
 
     // drag start listener
-    anchor.on('dragstart.edit', (evt) => {
-      startAnchor = this.#getClone(this);
+    anchor.on('dragstart.edit', (event) => {
+      var anchor = event.target;
+      startAnchor = this.#getClone(anchor);
       // prevent bubbling upwards
-      evt.cancelBubble = true;
+      event.cancelBubble = true;
     });
     // drag move listener
-    anchor.on('dragmove.edit', (evt) => {
-      var layerDetails = getLayerDetailsFromEvent(evt.evt);
+    anchor.on('dragmove.edit', (event) => {
+      var anchor = event.target;
+      var layerDetails = getLayerDetailsFromEvent(event.evt);
       var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
-      validateAnchorPosition(drawLayer.getBaseSize(), this);
+      validateAnchorPosition(drawLayer.getBaseSize(), anchor);
       // update shape
       this.#currentFactory.update(
-        this, this.#app.getStyle(), this.#viewController);
+        anchor, this.#app.getStyle(), this.#viewController);
       // redraw
-      if (this.getLayer()) {
-        this.getLayer().draw();
+      if (anchor.getLayer()) {
+        anchor.getLayer().draw();
       } else {
         logger.warn('No layer to draw the anchor!');
       }
       // prevent bubbling upwards
-      evt.cancelBubble = true;
+      event.cancelBubble = true;
     });
     // drag end listener
-    anchor.on('dragend.edit', (evt) => {
-      var endAnchor = this.#getClone(this);
+    anchor.on('dragend.edit', (event) => {
+      var anchor = event.target;
+      var endAnchor = this.#getClone(anchor);
       // store the change command
       var chgcmd = new ChangeGroupCommand(
         shapeDisplayName,
-        this.#currentFactory.update,
+        this.#currentFactory,
         startAnchor,
         endAnchor,
-        this.getLayer(),
+        anchor.getLayer(),
         this.#viewController,
         this.#app.getStyle()
       );
@@ -376,28 +379,31 @@ export class ShapeEditor {
       // reset start anchor
       startAnchor = endAnchor;
       // prevent bubbling upwards
-      evt.cancelBubble = true;
+      event.cancelBubble = true;
     });
     // mouse down listener
-    anchor.on('mousedown touchstart', () => {
-      this.moveToTop();
+    anchor.on('mousedown touchstart', (event) => {
+      var anchor = event.target;
+      anchor.moveToTop();
     });
     // mouse over styling
-    anchor.on('mouseover.edit', () => {
+    anchor.on('mouseover.edit', (event) => {
+      var anchor = event.target;
       // style is handled by the group
-      this.stroke('#ddd');
-      if (this.getLayer()) {
-        this.getLayer().draw();
+      anchor.stroke('#ddd');
+      if (anchor.getLayer()) {
+        anchor.getLayer().draw();
       } else {
         logger.warn('No layer to draw the anchor!');
       }
     });
     // mouse out styling
-    anchor.on('mouseout.edit', () => {
+    anchor.on('mouseout.edit', (event) => {
+      var anchor = event.target;
       // style is handled by the group
-      this.stroke('#999');
-      if (this.getLayer()) {
-        this.getLayer().draw();
+      anchor.stroke('#999');
+      if (anchor.getLayer()) {
+        anchor.getLayer().draw();
       } else {
         logger.warn('No layer to draw the anchor!');
       }

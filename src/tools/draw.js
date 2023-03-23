@@ -567,9 +567,9 @@ export class Draw {
     // listen to app change to update the draw layer
     if (flag) {
       // store cursor
-      this.#originalCursor = document.body.#style.cursor;
+      this.#originalCursor = document.body.style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
-      this.#app.addEventListener('positionchange', function () {
+      this.#app.addEventListener('positionchange', () => {
         this.#updateDrawLayer(layerGroup);
       });
       // same for colour
@@ -580,7 +580,7 @@ export class Draw {
       // reset local var
       this.#originalCursor = undefined;
       // remove listeners
-      this.#app.removeEventListener('positionchange', function () {
+      this.#app.removeEventListener('positionchange', () => {
         this.#updateDrawLayer(layerGroup);
       });
     }
@@ -613,12 +613,12 @@ export class Draw {
     // set shape display properties
     if (visible) {
       // activate shape listeners
-      shapeGroups.forEach(function (group) {
+      shapeGroups.forEach((group) => {
         this.setShapeOn(group, layerGroup);
       });
     } else {
       // de-activate shape listeners
-      shapeGroups.forEach(function (group) {
+      shapeGroups.forEach((group) => {
         this.#setShapeOff(group);
       });
     }
@@ -670,10 +670,10 @@ export class Draw {
    * Reset the active shape group and mouse cursor to their original state.
    */
   #resetActiveShapeGroup() {
-    if (typeof originalCursor !== 'undefined') {
-      document.body.#style.cursor = this.#originalCursor;
+    if (typeof this.#originalCursor !== 'undefined') {
+      document.body.style.cursor = this.#originalCursor;
     }
-    if (typeof activeShapeGroup !== 'undefined') {
+    if (typeof this.#activeShapeGroup !== 'undefined') {
       this.#activeShapeGroup.opacity(1);
       var colour = this.#style.getLineColour();
       this.#activeShapeGroup.getChildren(canNodeChangeColour).forEach(
@@ -693,7 +693,7 @@ export class Draw {
   setShapeOn(shapeGroup, layerGroup) {
     // adapt shape and cursor when mouse over
     var mouseOnShape = () => {
-      document.body.#style.cursor = this.#mouseOverCursor;
+      document.body.style.cursor = this.#mouseOverCursor;
       shapeGroup.opacity(0.75);
     };
     // mouse over event hanlding
@@ -745,14 +745,15 @@ export class Draw {
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', (event) => {
+      var group = event.target;
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
-      validateGroupPosition(drawLayer.getBaseSize(), this);
+      validateGroupPosition(drawLayer.getBaseSize(), group);
       // get appropriate factory
       var factory;
-      var keys = Object.keys(this.shapeFactoryList);
+      var keys = Object.keys(this.#shapeFactoryList);
       for (var i = 0; i < keys.length; ++i) {
-        factory = new this.shapeFactoryList[keys[i]];
+        factory = new this.#shapeFactoryList[keys[i]];
         if (factory.isFactoryGroup(shapeGroup)) {
           // stop at first find
           break;
@@ -764,7 +765,7 @@ export class Draw {
       // update quantification if possible
       if (typeof factory.updateQuantification !== 'undefined') {
         var vc = layerGroup.getActiveViewLayer().getViewController();
-        factory.updateQuantification(this, vc);
+        factory.updateQuantification(group, vc);
       }
       // highlight trash when on it
       var offset = getEventOffset(event.evt)[0];
@@ -798,6 +799,7 @@ export class Draw {
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', (event) => {
+      var group = event.target;
       // remove trash
       this.#trash.remove();
       // activate(false) will also trigger a dragend.draw
@@ -805,7 +807,7 @@ export class Draw {
         typeof event.evt === 'undefined') {
         return;
       }
-      var pos = {x: this.x(), y: this.y()};
+      var pos = {x: group.x(), y: group.y()};
       // delete case
       var offset = getEventOffset(event.evt)[0];
       var eventPos = this.#getRealPosition(offset, layerGroup);
@@ -814,8 +816,8 @@ export class Draw {
       if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
         Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
         // compensate for the drag translation
-        this.x(dragStartPos.x);
-        this.y(dragStartPos.y);
+        group.x(dragStartPos.x);
+        group.y(dragStartPos.y);
         // disable editor
         this.#shapeEditor.disable();
         this.#shapeEditor.setShape(null);
@@ -826,9 +828,9 @@ export class Draw {
             ashape.stroke(colour);
           });
         // reset cursor
-        document.body.#style.cursor = this.#originalCursor;
+        document.body.style.cursor = this.#originalCursor;
         // delete command
-        var delcmd = new DeleteGroupCommand(this,
+        var delcmd = new DeleteGroupCommand(group,
           shapeDisplayName, konvaLayer);
         delcmd.onExecute = this.#fireEvent;
         delcmd.onUndo = this.#fireEvent;
@@ -836,10 +838,12 @@ export class Draw {
         this.#app.addToUndoStack(delcmd);
       } else {
         // save drag move
-        var translation = {x: pos.x - dragStartPos.x,
-          y: pos.y - dragStartPos.y};
+        var translation = {
+          x: pos.x - dragStartPos.x,
+          y: pos.y - dragStartPos.y
+        };
         if (translation.x !== 0 || translation.y !== 0) {
-          var mvcmd = new MoveGroupCommand(this,
+          var mvcmd = new MoveGroupCommand(group,
             shapeDisplayName, translation, konvaLayer);
           mvcmd.onExecute = this.#fireEvent;
           mvcmd.onUndo = this.#fireEvent;
@@ -848,7 +852,7 @@ export class Draw {
           // the move is handled by Konva, trigger an event manually
           this.#fireEvent({
             type: 'drawmove',
-            id: this.id()
+            id: group.id()
           });
         }
         // reset anchors
@@ -858,19 +862,20 @@ export class Draw {
       // draw
       konvaLayer.draw();
       // reset start position
-      dragStartPos = {x: this.x(), y: this.y()};
+      dragStartPos = {x: group.x(), y: group.y()};
     });
     // double click handling: update label
-    shapeGroup.on('dblclick', () => {
+    shapeGroup.on('dblclick', (event) => {
+      var group = event.target;
       // get the label object for this shape
-      var label = this.findOne('Label');
+      var label = group.findOne('Label');
       // should just be one
       if (typeof label === 'undefined') {
         throw new Error('Could not find the shape label.');
       }
       var ktext = label.getText();
       // id for event
-      var groupId = this.id();
+      var groupId = group.id();
 
       var onSaveCallback = function (meta) {
         // store meta
@@ -934,12 +939,12 @@ export class Draw {
     if (typeof features.shapeColour !== 'undefined') {
       this.#style.setLineColour(features.shapeColour);
     }
-    if (typeof features.#shapeName !== 'undefined') {
+    if (typeof features.shapeName !== 'undefined') {
       // check if we have it
-      if (!this.hasShape(features.#shapeName)) {
-        throw new Error('Unknown shape: \'' + features.#shapeName + '\'');
+      if (!this.hasShape(features.shapeName)) {
+        throw new Error('Unknown shape: \'' + features.shapeName + '\'');
       }
-      this.#shapeName = features.#shapeName;
+      this.#shapeName = features.shapeName;
     }
     if (typeof features.mouseOverCursor !== 'undefined') {
       this.#mouseOverCursor = features.mouseOverCursor;
@@ -1004,14 +1009,14 @@ export class Draw {
    * @param {object} event The event to fire.
    * @private
    */
-  #fireEvent(event) {
+  #fireEvent = (event) => {
     if (typeof this.#listeners[event.type] === 'undefined') {
       return;
     }
     for (var i = 0; i < this.#listeners[event.type].length; ++i) {
       this.#listeners[event.type][i](event);
     }
-  }
+  };
 
   /**
    * Check if the shape is in the shape list.

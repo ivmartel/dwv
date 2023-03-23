@@ -237,16 +237,17 @@ export class MoveGroupCommand {
 export class ChangeGroupCommand {
 
   #name;
-  #func;
+  #factory;
   #startAnchor;
   #endAnchor;
   #layer;
   #viewController;
   #style;
 
-  constuctor(name, func, startAnchor, endAnchor, layer, viewController, style) {
+  constructor(
+    name, factory, startAnchor, endAnchor, layer, viewController, style) {
     this.#name = name;
-    this.#func = func;
+    this.#factory = factory;
     this.#startAnchor = startAnchor;
     this.#endAnchor = endAnchor;
     this.#layer = layer;
@@ -270,7 +271,7 @@ export class ChangeGroupCommand {
    */
   execute() {
     // change shape
-    this.#func(
+    this.#factory.update(
       this.#endAnchor,
       this.#style,
       this.#viewController
@@ -297,7 +298,7 @@ export class ChangeGroupCommand {
    */
   undo() {
     // invert change shape
-    this.#func(
+    this.#factory.update(
       this.#startAnchor,
       this.#style,
       this.#viewController
