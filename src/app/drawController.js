@@ -2,6 +2,11 @@ import {getIndexFromStringId} from '../math/index';
 import {logger} from '../utils/logger';
 import {replaceFlags} from '../utils/string';
 import {getShadowColour} from '../utils/colour';
+import {
+  getShapeDisplayName,
+  DrawGroupCommand,
+  DeleteGroupCommand
+} from '../tools/drawCommands';
 
 /**
  * Konva.
@@ -352,7 +357,7 @@ export class DrawController {
         // shape
         var shape = stateGroup.getChildren(isNodeNameShape)[0];
         // create the draw command
-        var cmd = new dwv.tool.DrawGroupCommand(
+        var cmd = new DrawGroupCommand(
           stateGroup, shape.className, this.#konvaLayer);
         // draw command callbacks
         cmd.onExecute = cmdCallback;
@@ -439,8 +444,8 @@ export class DrawController {
    */
   deleteDrawGroup(group, cmdCallback, exeCallback) {
     var shape = group.getChildren(isNodeNameShape)[0];
-    var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
-    var delcmd = new dwv.tool.DeleteGroupCommand(
+    var shapeDisplayName = getShapeDisplayName(shape);
+    var delcmd = new DeleteGroupCommand(
       group, shapeDisplayName, this.#konvaLayer);
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;

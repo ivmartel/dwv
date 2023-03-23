@@ -1,3 +1,5 @@
+import {ybrToRgb} from '../utils/colour';
+
 /**
  * Generate image data for 'YBR_FULL' photometric interpretation.
  *
@@ -14,8 +16,7 @@ export function generateImageDataYbrFull(
   var ival = iterator.next();
   while (!ival.done) {
     // convert ybr to rgb
-    rgb = dwv.utils.ybrToRgb(
-      ival.value[0], ival.value[1], ival.value[2]);
+    rgb = ybrToRgb(ival.value[0], ival.value[1], ival.value[2]);
     // store data
     array.data[index] = rgb.r;
     array.data[index + 1] = rgb.g;

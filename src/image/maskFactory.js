@@ -1,7 +1,17 @@
 import {cleanString} from '../dicom/dicomParser';
 import {Spacing} from '../image/spacing';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
+import {Point3D} from '../math/point';
+import {Vector3D} from '../math/vector';
+import {Index} from '../math/index';
+import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix';
 import {logger} from '../utils/logger';
+import {arraySortEquals} from '../utils/array';
+import {
+  isEqualRgb,
+  cielabToSrgb,
+  uintLabToLab
+} from '../utils/colour';
 
 /**
  * Check two position patients for equality.
@@ -18,7 +28,7 @@ function equalPosPat(pos1, pos2) {
  * Get a position patient compare function accroding to an
  * input orientation.
  *
- * @param {dwv.math.Matrix33} orientation The orientation matrix.
+ * @param {Matrix33} orientation The orientation matrix.
  * @returns {Function} The position compare function.
  */
 function getComparePosPat(orientation) {
@@ -59,7 +69,7 @@ function checkTag(rootElement, tagDefinition) {
       if (!Array.isArray(tagDefinition.enum[i])) {
         throw new Error('Cannot compare array and non array tag value.');
       }
-      if (dwv.utils.arraySortEquals(tagDefinition.enum[i], tagValue)) {
+      if (arraySortEquals(tagDefinition.enum[i], tagValue)) {
         includes = true;
         break;
       }
@@ -311,7 +321,7 @@ function getSegment(element) {
     segment.displayValue = element.x006200C.value;
   } else if (typeof element.x0062000D !== 'undefined') {
     var cielabElement = element.x0062000D.value;
-    var rgb = dwv.utils.cielabToSrgb(dwv.utils.uintLabToLab({
+    var rgb = cielabToSrgb(uintLabToLab({
       l: cielabElement[0],
       a: cielabElement[1],
       b: cielabElement[2]
@@ -365,7 +375,7 @@ export function isEqualSegment(seg1, seg2) {
       isEqual = false;
     } else {
       isEqual = isEqual &&
-        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+        isEqualRgb(seg1.displayValue, seg2.displayValue);
     }
   } else {
     isEqual = isEqual &&
@@ -407,7 +417,7 @@ export function isSimilarSegment(seg1, seg2) {
       isSimilar = false;
     } else {
       isSimilar = isSimilar ||
-        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+        isEqualRgb(seg1.displayValue, seg2.displayValue);
     }
   } else {
     isSimilar = isSimilar ||
@@ -673,7 +683,7 @@ export class MaskFactory {
         if (typeof imageOrientationPatient === 'undefined') {
           imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
         } else {
-          if (!dwv.utils.arraySortEquals(
+          if (!arraySortEquals(
             imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
             throw new Error('Unsupported multi orientation dicom seg.');
           }
@@ -700,17 +710,17 @@ export class MaskFactory {
     }
 
     // orientation
-    var rowCosines = new dwv.math.Vector3D(
+    var rowCosines = new Vector3D(
       parseFloat(imageOrientationPatient[0]),
       parseFloat(imageOrientationPatient[1]),
       parseFloat(imageOrientationPatient[2]));
-    var colCosines = new dwv.math.Vector3D(
+    var colCosines = new Vector3D(
       parseFloat(imageOrientationPatient[3]),
       parseFloat(imageOrientationPatient[4]),
       parseFloat(imageOrientationPatient[5]));
     var normal = rowCosines.crossProduct(colCosines);
     /* eslint-disable array-element-newline */
-    var orientationMatrix = new dwv.math.Matrix33([
+    var orientationMatrix = new Matrix33([
       rowCosines.getX(), colCosines.getX(), normal.getX(),
       rowCosines.getY(), colCosines.getY(), normal.getY(),
       rowCosines.getZ(), colCosines.getZ(), normal.getZ()
@@ -720,7 +730,7 @@ export class MaskFactory {
     framePosPats.sort(getComparePosPat(orientationMatrix));
 
     var point3DFromArray = function (arr) {
-      return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
+      return new Point3D(arr[0], arr[1], arr[2]);
     };
 
     // frame origins
@@ -746,10 +756,10 @@ export class MaskFactory {
 
     // origin distance test
     var isNotSmall = function (value) {
-      var res = value > dwv.math.REAL_WORLD_EPSILON;
+      var res = value > REAL_WORLD_EPSILON;
       if (res) {
         // try larger epsilon
-        res = value > dwv.math.REAL_WORLD_EPSILON * 10;
+        res = value > REAL_WORLD_EPSILON * 10;
         if (!res) {
           // warn if epsilon < value < epsilon * 10
           logger.warn(
@@ -766,7 +776,7 @@ export class MaskFactory {
     var sliceIndex = 0;
     for (var g = 1; g < framePosPats.length; ++g) {
       ++sliceIndex;
-      var index = new dwv.math.Index([0, 0, sliceIndex]);
+      var index = new Index([0, 0, sliceIndex]);
       var point = tmpGeometry.indexToWorld(index).get3D();
       var frameOrigin = frameOrigins[g];
       // check if more pos pats are needed
@@ -778,7 +788,7 @@ export class MaskFactory {
           point.toString());
         posPats.push([point.getX(), point.getY(), point.getZ()]);
         ++sliceIndex;
-        index = new dwv.math.Index([0, 0, sliceIndex]);
+        index = new Index([0, 0, sliceIndex]);
         point = tmpGeometry.indexToWorld(index).get3D();
         dist = frameOrigin.getDistance(point);
         if (dist > distPrevious) {

@@ -1,4 +1,5 @@
 import {Point2D} from './point';
+import {i18n} from '../utils/i18n';
 
 /**
  * Line shape.
@@ -153,7 +154,7 @@ export class Line {
     var spacing = viewController.get2DSpacing();
     var length = this.getWorldLength(spacing[0], spacing[1]);
     if (length !== null) {
-      quant.length = {value: length, unit: dwv.i18n('unit.mm')};
+      quant.length = {value: length, unit: i18n('unit.mm')};
     }
     // return
     return quant;

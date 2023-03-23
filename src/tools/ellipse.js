@@ -1,6 +1,9 @@
 import {Debug} from './draw';
 import {getDefaultAnchor} from './editor';
+import {Ellipse} from '../math/ellipse';
+import {Point2D} from '../math/point';
 import {logger} from '../utils/logger';
+import {getFlags, replaceFlags} from '../utils/string';
 // external
 import Konva from 'konva';
 
@@ -66,7 +69,7 @@ export class EllipseFactory {
     var a = Math.abs(points[0].getX() - points[1].getX());
     var b = Math.abs(points[0].getY() - points[1].getY());
     // physical shape
-    var ellipse = new dwv.math.Ellipse(points[0], a, b);
+    var ellipse = new Ellipse(points[0], a, b);
     // draw shape
     var kshape = new Konva.Ellipse({
       x: ellipse.getCenter().getX(),
@@ -96,8 +99,8 @@ export class EllipseFactory {
     // }
     var quant = ellipse.quantify(
       viewController,
-      dwv.utils.getFlags(textExpr));
-    ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+      getFlags(textExpr));
+    ktext.setText(replaceFlags(textExpr, quant));
     // meta data
     ktext.meta = {
       textExpr: textExpr,
@@ -247,11 +250,11 @@ export class EllipseFactory {
       kellipse.radius(radiusAbs);
     }
     // new ellipse
-    var centerPoint = new dwv.math.Point2D(
+    var centerPoint = new Point2D(
       group.x() + center.x,
       group.y() + center.y
     );
-    var ellipse = new dwv.math.Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
+    var ellipse = new Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
 
     // debug shadow
     if (kshadow) {
@@ -297,20 +300,20 @@ export class EllipseFactory {
     })[0];
 
     // positions: add possible group offset
-    var centerPoint = new dwv.math.Point2D(
+    var centerPoint = new Point2D(
       group.x() + kellipse.x(),
       group.y() + kellipse.y()
     );
     // circle
-    var ellipse = new dwv.math.Ellipse(
+    var ellipse = new Ellipse(
       centerPoint, kellipse.radius().x, kellipse.radius().y);
 
     // update text
     var ktext = klabel.getText();
     var quantification = ellipse.quantify(
       viewController,
-      dwv.utils.getFlags(ktext.meta.textExpr));
-    ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+      getFlags(ktext.meta.textExpr));
+    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
     // update meta
     ktext.meta.quantification = quantification;
   }
@@ -318,7 +321,7 @@ export class EllipseFactory {
   /**
    * Get the debug shadow.
    *
-   * @param {dwv.math.Ellipse} ellipse The ellipse to shadow.
+   * @param {Ellipse} ellipse The ellipse to shadow.
    * @param {object} group The associated group.
    * @returns {object} The shadow konva group.
    */
