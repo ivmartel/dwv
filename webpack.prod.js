@@ -25,5 +25,17 @@ module.exports = merge(common, {
         }
       }
     ]
+  },
+  externals: {
+    konva: {
+      commonjs: 'konva',
+      commonjs2: 'konva',
+      amd: 'konva'
+    },
+    jszip: {
+      commonjs: 'jszip',
+      commonjs2: 'jszip',
+      amd: 'jszip'
+    }
   }
 });
