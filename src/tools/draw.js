@@ -225,7 +225,7 @@ export class Draw {
     });
 
     // update scale
-    self.style.setZoomScale(stage.scale());
+    this.#style.setZoomScale(stage.scale());
 
     if (kshape) {
       var group = kshape.getParent();
@@ -248,7 +248,7 @@ export class Draw {
       // start storing points
       this.#started = true;
       // set factory
-      this.#currentFactory = new this.#shapeFactoryList[self.shapeName]();
+      this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
       // clear array
       this.#points = [];
       // store point
@@ -361,7 +361,7 @@ export class Draw {
    * @param {object} event The mouse out event.
    */
   mouseout = (event) => {
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -370,7 +370,7 @@ export class Draw {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    self.mousedown(event);
+    this.mousedown(event);
   };
 
   /**
@@ -417,7 +417,7 @@ export class Draw {
    * @param {object} event The touch end event.
    */
   touchend = (event) => {
-    self.dblclick(event);
+    this.dblclick(event);
   };
 
   /**
@@ -494,7 +494,7 @@ export class Draw {
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     this.#tmpShapeGroup = this.#currentFactory.create(
-      tmpPoints, self.style, viewController);
+      tmpPoints, this.#style, viewController);
     // do not listen during creation
     var shape = this.#tmpShapeGroup.getChildren(isNodeNameShape)[0];
     shape.listening(false);
@@ -527,7 +527,7 @@ export class Draw {
 
     // create final shape
     var finalShapeGroup = this.#currentFactory.create(
-      finalPoints, self.style, viewController);
+      finalPoints, this.#style, viewController);
     finalShapeGroup.id(guid());
 
     // get the position group
@@ -539,7 +539,7 @@ export class Draw {
     konvaLayer.listening(true);
     // draw shape command
     this.#command = new DrawGroupCommand(
-      finalShapeGroup, self.shapeName, konvaLayer);
+      finalShapeGroup, this.#shapeName, konvaLayer);
     this.#command.onExecute = this.#fireEvent;
     this.#command.onUndo = this.#fireEvent;
     // execute it
@@ -548,7 +548,7 @@ export class Draw {
     this.#app.addToUndoStack(this.#command);
 
     // activate shape listeners
-    self.setShapeOn(finalShapeGroup, layerGroup);
+    this.setShapeOn(finalShapeGroup, layerGroup);
   }
 
   /**
@@ -567,7 +567,7 @@ export class Draw {
     // listen to app change to update the draw layer
     if (flag) {
       // store cursor
-      this.#originalCursor = document.body.style.cursor;
+      this.#originalCursor = document.body.#style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
       this.#app.addEventListener('positionchange', function () {
         this.#updateDrawLayer(layerGroup);
@@ -614,7 +614,7 @@ export class Draw {
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach(function (group) {
-        self.setShapeOn(group, layerGroup);
+        this.setShapeOn(group, layerGroup);
       });
     } else {
       // de-activate shape listeners
@@ -671,11 +671,11 @@ export class Draw {
    */
   #resetActiveShapeGroup() {
     if (typeof originalCursor !== 'undefined') {
-      document.body.style.cursor = this.#originalCursor;
+      document.body.#style.cursor = this.#originalCursor;
     }
     if (typeof activeShapeGroup !== 'undefined') {
       this.#activeShapeGroup.opacity(1);
-      var colour = self.style.getLineColour();
+      var colour = this.#style.getLineColour();
       this.#activeShapeGroup.getChildren(canNodeChangeColour).forEach(
         function (ashape) {
           ashape.stroke(colour);
@@ -693,7 +693,7 @@ export class Draw {
   setShapeOn(shapeGroup, layerGroup) {
     // adapt shape and cursor when mouse over
     var mouseOnShape = () => {
-      document.body.style.cursor = this.#mouseOverCursor;
+      document.body.#style.cursor = this.#mouseOverCursor;
       shapeGroup.opacity(0.75);
     };
     // mouse over event hanlding
@@ -750,9 +750,9 @@ export class Draw {
       validateGroupPosition(drawLayer.getBaseSize(), this);
       // get appropriate factory
       var factory;
-      var keys = Object.keys(self.shapeFactoryList);
+      var keys = Object.keys(this.shapeFactoryList);
       for (var i = 0; i < keys.length; ++i) {
-        factory = new self.shapeFactoryList[keys[i]];
+        factory = new this.shapeFactoryList[keys[i]];
         if (factory.isFactoryGroup(shapeGroup)) {
           // stop at first find
           break;
@@ -826,7 +826,7 @@ export class Draw {
             ashape.stroke(colour);
           });
         // reset cursor
-        document.body.style.cursor = this.#originalCursor;
+        document.body.#style.cursor = this.#originalCursor;
         // delete command
         var delcmd = new DeleteGroupCommand(this,
           shapeDisplayName, konvaLayer);
@@ -934,12 +934,12 @@ export class Draw {
     if (typeof features.shapeColour !== 'undefined') {
       this.#style.setLineColour(features.shapeColour);
     }
-    if (typeof features.shapeName !== 'undefined') {
+    if (typeof features.#shapeName !== 'undefined') {
       // check if we have it
-      if (!this.hasShape(features.shapeName)) {
-        throw new Error('Unknown shape: \'' + features.shapeName + '\'');
+      if (!this.hasShape(features.#shapeName)) {
+        throw new Error('Unknown shape: \'' + features.#shapeName + '\'');
       }
-      this.shapeName = features.shapeName;
+      this.#shapeName = features.#shapeName;
     }
     if (typeof features.mouseOverCursor !== 'undefined') {
       this.#mouseOverCursor = features.mouseOverCursor;
