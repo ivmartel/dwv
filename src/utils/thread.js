@@ -71,7 +71,7 @@ export class ThreadPool {
       workerThread.run(workerTask);
     } else {
       // stop the worker
-      workerThread.#stop();
+      workerThread.stop();
       // no task to run, add to free list
       this.freeThreads.push(workerThread);
       // remove from running list
@@ -93,13 +93,13 @@ export class ThreadPool {
    *
    * @param {object} event The error event.
    */
-  handleWorkerError(event) {
+  handleWorkerError = (event) => {
     // stop all threads
     this.#stop();
     // callback
     this.onerror({error: event});
     this.onworkend({type: 'work-end'});
-  }
+  };
 
   // private ----------------------------------------------------------------
 
