@@ -1,18 +1,6 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
 
-// Image decoders (for web workers)
-dwv.image.decoderScripts = {
-  jpeg2000: '../../decoders/pdfjs/decode-jpeg2000.js',
-  'jpeg-lossless': '../../decoders/rii-mango/decode-jpegloss.js',
-  'jpeg-baseline': '../../decoders/pdfjs/decode-jpegbaseline.js',
-  rle: '../../decoders/dwv/decode-rle.js'
-};
-// logger level (optional)
-dwv.logger.level = dwv.utils.logger.levels.DEBUG;
-
-// check environment support
-dwv.env.check();
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
 var _app = null;
 var _tools = null;
@@ -34,7 +22,10 @@ var _dicomWeb = false;
 /**
  * Setup simple dwv app.
  */
-dwv.test.viewerSetup = function () {
+function viewerSetup() {
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.WARN;
+
   // stage options
   var dataViewConfigs;
   var viewOnFirstLoadItem = true;
@@ -241,11 +232,11 @@ dwv.test.viewerSetup = function () {
         var segment = segHelper.getSegment(number);
         if (event.ctrlKey) {
           if (event.altKey) {
-            dwv.logger.debug('Delete segment: ' + segment.label);
+            console.log('Delete segment: ' + segment.label);
             // delete
             vc.deleteSegment(number, _app.addToUndoStack);
           } else {
-            dwv.logger.debug('Show/hide segment: ' + segment.label);
+            console.log('Show/hide segment: ' + segment.label);
             // show/hide the selected segment
             if (segHelper.isHidden(number)) {
               segHelper.removeFromHidden(number);
@@ -273,22 +264,23 @@ dwv.test.viewerSetup = function () {
   }
   // load from window location
   dwv.utils.loadFromUri(window.location.href, _app, options);
-};
+}
 
 /**
  * Last minute.
  */
-dwv.test.onDOMContentLoadedViewer = function () {
+function onDOMContentLoaded() {
   // setup
-  dwv.test.viewerSetup();
+  viewerSetup();
 
   var positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function () {
     var vls = _app.getViewLayersByDataIndex(0);
     var vc = vls[0].getViewController();
     var values = this.value.split(',');
-    vc.setCurrentPosition(new dwv.math.Point3D(
-      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2]))
+    vc.setCurrentPosition(new dwv.math.Point([
+      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
+    ])
     );
   });
 
@@ -335,7 +327,7 @@ dwv.test.onDOMContentLoadedViewer = function () {
     console.log(event.target.files);
     _app.loadFiles(event.target.files);
   });
-};
+}
 
 /**
  * Append a layer div in the root 'dwv' one.
@@ -445,7 +437,7 @@ function setupBindersCheckboxes() {
   var binders = [];
   // add all binders at startup
   for (var b = 0; b < propList.length; ++b) {
-    binders.push(new dwv.gui[propList[b] + 'Binder']);
+    binders.push(propList[b] + 'Binder');
   }
   _app.setLayerGroupsBinders(binders);
 
@@ -455,7 +447,7 @@ function setupBindersCheckboxes() {
    * @param {string} propName The name of the property to bind.
    */
   function addBinder(propName) {
-    binders.push(new dwv.gui[propName + 'Binder']);
+    binders.push(propName + 'Binder');
     _app.setLayerGroupsBinders(binders);
   }
   /**
@@ -464,10 +456,9 @@ function setupBindersCheckboxes() {
    * @param {string} propName The name of the property to bind.
    */
   function removeBinder(propName) {
-    for (var i = 0; i < binders.length; ++i) {
-      if (binders[i] instanceof dwv.gui[propName + 'Binder']) {
-        binders.splice(i, 1);
-      }
+    var index = binders.indexOf(propName + 'Binder');
+    if (index !== -1) {
+      binders.splice(index, 1);
     }
     _app.setLayerGroupsBinders(binders);
   }
@@ -913,7 +904,7 @@ function sortByPosPatKey(obj) {
  */
 function getPrecisionRound(precision) {
   return function (x) {
-    return dwv.utils.precisionRound(x, precision);
+    return dwv.precisionRound(x, precision);
   };
 }
 

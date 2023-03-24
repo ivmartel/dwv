@@ -6,23 +6,13 @@
  * - Right click on the thumbnail in the left 'Document tree area',
  * - Choose 'Convert to JPEG'.
  */
-
-// Image decoders (for web workers)
-dwv.image.decoderScripts = {
-  jpeg2000: '../../decoders/pdfjs/decode-jpeg2000.js',
-  'jpeg-lossless': '../../decoders/rii-mango/decode-jpegloss.js',
-  'jpeg-baseline': '../../decoders/pdfjs/decode-jpegbaseline.js',
-  rle: '../../decoders/dwv/decode-rle.js'
-};
-
-// logger level (optional)
-dwv.logger.level = dwv.utils.logger.levels.DEBUG;
-
-// check environment support
-dwv.env.check();
+var test = test || {};
 
 // test data line
-dwv.addDataLine = function (id, fileroot, doc) {
+test.addDataLine = function (id, fileroot, doc) {
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.DEBUG;
+
   var mainDiv = document.getElementById('data-lines');
 
   // dwv container

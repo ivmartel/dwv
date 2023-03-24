@@ -31,9 +31,6 @@ td, th {
 </style>
 <!-- Local -->
 <script type="text/javascript" src="./dcmweb.js"></script>
-<!-- dwv -->
-<script type="text/javascript" src="../../src/utils/array.js"></script>
-<script type="text/javascript" src="../../src/utils/string.js"></script>
 </head>
 <body>
 
@@ -55,14 +52,14 @@ the <code>./viewer.js</code>.
 
 <p>
 STOW test with local bbmri data:
-<button id="search" onclick="dwv.test.stow()">STOW</button>
+<button id="stowb">STOW</button>
 </p>
 
 <p>
 <label for="qidoArgs">QIDO query:</label>
 <input id="qidoArgs" type='text' size=30
   value="/series?">
-<button id="search" onclick="dwv.test.qidoSearch()">QIDO</button>
+<button id="searchb">QIDO</button>
 </p>
 
 <div id="result"></div>

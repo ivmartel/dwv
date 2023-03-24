@@ -1,5 +1,16 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ *
+ */
+function onDOMContentLoaded() {
+  var stowButton = document.getElementById('stowb');
+  stowButton.onclick = stow;
+
+  var searchButton = document.getElementById('searchb');
+  searchButton.onclick = qidoSearch;
+}
 
 /**
  * Get a message paragraph.
@@ -8,17 +19,17 @@ dwv.test = dwv.test || {};
  * @param {string} type The message type used as css class.
  * @returns {object} The paragraph element.
  */
-dwv.test.getMessagePara = function (text, type) {
+function getMessagePara(text, type) {
   var p = document.createElement('p');
   p.className = 'message ' + type;
   p.appendChild(document.createTextNode(text));
   return p;
-};
+}
 
 /**
  * Launch a QIDO search on series.
  */
-dwv.test.qidoSearch = function () {
+function qidoSearch() {
   // clear page
   var div = document.getElementById('result');
   div.innerHTML = '';
@@ -32,7 +43,7 @@ dwv.test.qidoSearch = function () {
     if (status !== 200 && status !== 204) {
       message = 'Bad status in QIDO-RS request: ' +
         status + ' (' + event.currentTarget.statusText + ').';
-      div.appendChild(dwv.test.getMessagePara(message, 'error'));
+      div.appendChild(getMessagePara(message, 'error'));
       return;
     }
     // no content
@@ -40,14 +51,14 @@ dwv.test.qidoSearch = function () {
       !event.target.response ||
       typeof event.target.response === 'undefined') {
       message = 'No content.';
-      div.appendChild(dwv.test.getMessagePara(message));
+      div.appendChild(getMessagePara(message));
       return;
     }
     // parse json
     var json = JSON.parse(event.target.response);
     if (json.length === 0) {
       message = 'Empty result.';
-      div.appendChild(dwv.test.getMessagePara(message));
+      div.appendChild(getMessagePara(message));
       return;
     }
     // fill table
@@ -57,7 +68,7 @@ dwv.test.qidoSearch = function () {
     message = 'Error in QIDO-RS request';
     console.error(message, error);
     message += ', see console for details.';
-    div.appendChild(dwv.test.getMessagePara(message, 'error'));
+    div.appendChild(getMessagePara(message, 'error'));
   });
 
   var rootUrl = document.getElementById('rooturl').value;
@@ -65,12 +76,12 @@ dwv.test.qidoSearch = function () {
   qidoReq.open('GET', rootUrl + qidoArgs);
   qidoReq.setRequestHeader('Accept', 'application/dicom+json');
   qidoReq.send();
-};
+}
 
 /**
  * Launch a STOW request.
  */
-dwv.test.stow = function () {
+function stow() {
   var div = document.getElementById('result');
 
   var stowReq = new XMLHttpRequest();
@@ -81,7 +92,7 @@ dwv.test.stow = function () {
     if (status !== 200 && status !== 204) {
       message = 'Bad status in STOW-RS request: ' +
         status + ' (' + event.currentTarget.statusText + ').';
-      div.appendChild(dwv.test.getMessagePara(message, 'error'));
+      div.appendChild(getMessagePara(message, 'error'));
       return;
     }
     // no content
@@ -89,18 +100,18 @@ dwv.test.stow = function () {
       !event.target.response ||
       typeof event.target.response === 'undefined') {
       message = 'No content.';
-      div.appendChild(dwv.test.getMessagePara(message));
+      div.appendChild(getMessagePara(message));
       return;
     }
     // parse json
     message = 'STOW-RS successful!!';
-    div.appendChild(dwv.test.getMessagePara(message, 'success'));
+    div.appendChild(getMessagePara(message, 'success'));
   });
   stowReq.addEventListener('error', function (error) {
     message = 'Error in STOW-RS request';
     console.error(message, error);
     message += ', see console for details.';
-    div.appendChild(dwv.test.getMessagePara(message, 'error'));
+    div.appendChild(getMessagePara(message, 'error'));
   });
 
   // local files to request
@@ -150,7 +161,7 @@ dwv.test.stow = function () {
     req.addEventListener('load', onload);
     req.send();
   }
-};
+}
 
 /**
  * Show the QIDO response as a table.
