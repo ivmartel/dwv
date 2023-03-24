@@ -36,6 +36,7 @@
     "eslint": "~8.36.0",
     "eslint-plugin-jsdoc": "~40.0.2",
     "github-release-notes": "0.17.2",
+    "html-webpack-plugin": "^5.5.0",
     "jsdoc": "^4.0.2",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
@@ -45,6 +46,7 @@
     "karma-webpack": "^5.0.0",
     "qunit": "^2.19.4",
     "webpack": "^5.75.0",
+    "webpack-bundle-analyzer": "^4.8.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
     "webpack-merge": "^5.8.0"
