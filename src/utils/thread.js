@@ -118,53 +118,59 @@ export class ThreadPool {
     this.runningThreads = [];
   }
 
-} // ThreadPool
 
-/**
- * Handle a work start event.
- * Default does nothing.
- *
- * @param {object} _event The work start event.
- */
-ThreadPool.prototype.onworkstart = function (_event) {};
-/**
- * Handle a work item event.
- * Default does nothing.
- *
- * @param {object} _event The work item event fired
- *   when a work item ended successfully.
- */
-ThreadPool.prototype.onworkitem = function (_event) {};
-/**
- * Handle a work event.
- * Default does nothing.
- *
- * @param {object} _event The work event fired
- *   when a work ended successfully.
- */
-ThreadPool.prototype.onwork = function (_event) {};
-/**
- * Handle a work end event.
- * Default does nothing.
- *
- * @param {object} _event The work end event fired
- *  when a work has completed, successfully or not.
- */
-ThreadPool.prototype.onworkend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-ThreadPool.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-ThreadPool.prototype.onabort = function (_event) {};
+  /**
+   * Handle a work start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The work start event.
+   */
+  onworkstart(_event) {}
+
+  /**
+   * Handle a work item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The work item event fired
+   *   when a work item ended successfully.
+   */
+  onworkitem(_event) {}
+
+  /**
+   * Handle a work event.
+   * Default does nothing.
+   *
+   * @param {object} _event The work event fired
+   *   when a work ended successfully.
+   */
+  onwork(_event) {}
+
+  /**
+   * Handle a work end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The work end event fired
+   *  when a work has completed, successfully or not.
+   */
+  onworkend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // ThreadPool
 
 /**
  * Worker background task.
