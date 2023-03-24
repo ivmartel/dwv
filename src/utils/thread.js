@@ -216,9 +216,7 @@ class WorkerThread {
     this.runningTask = workerTask;
     // create a new web worker if not done yet
     if (typeof worker === 'undefined') {
-      //this.worker = new Worker(this.runningTask.script);
-      this.worker = new Worker(
-        new URL(this.runningTask.script, import.meta.url));
+      this.worker = new Worker(this.runningTask.script);
       // set callbacks
       this.worker.onmessage = this.onmessage;
       this.worker.onerror = this.onerror;
