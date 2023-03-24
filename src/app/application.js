@@ -14,58 +14,8 @@ import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
 
-import {WindowLevel} from '../tools/windowLevel';
-import {Scroll} from '../tools/scroll';
-import {ZoomAndPan} from '../tools/zoomPan';
-import {Opacity} from '../tools/opacity';
-import {Draw} from '../tools/draw';
-
-import {ArrowFactory} from '../tools/arrow';
-import {CircleFactory} from '../tools/circle';
-import {EllipseFactory} from '../tools/ellipse';
-import {ProtractorFactory} from '../tools/protractor';
-import {RectangleFactory} from '../tools/rectangle';
-
-import {Threshold, Sobel, Sharpen} from '../tools/filter';
-
-import {
-  WindowLevelBinder,
-  PositionBinder,
-  ZoomBinder,
-  OffsetBinder,
-  OpacityBinder
-} from '../gui/stage';
-
-const ToolList = {
-  WindowLevel,
-  Scroll,
-  ZoomAndPan,
-  Opacity,
-  Draw
-};
-
-const ToolOptions = {
-  draw: {
-    ArrowFactory,
-    CircleFactory,
-    EllipseFactory,
-    ProtractorFactory,
-    RectangleFactory
-  },
-  filter: {
-    Threshold,
-    Sobel,
-    Sharpen
-  }
-};
-
-const BinderList = {
-  WindowLevelBinder,
-  PositionBinder,
-  ZoomBinder,
-  OffsetBinder,
-  OpacityBinder
-};
+import {ToolList, ToolOptions} from '../tools';
+import {BinderList} from '../gui/stage';
 
 /**
  * Main application class.

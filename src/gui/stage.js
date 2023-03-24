@@ -118,6 +118,14 @@ export class OpacityBinder {
   };
 }
 
+export const BinderList = {
+  WindowLevelBinder,
+  PositionBinder,
+  ZoomBinder,
+  OffsetBinder,
+  OpacityBinder
+};
+
 /**
  * Stage: controls a list of layer groups and their
  * synchronisation.
