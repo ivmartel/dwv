@@ -218,7 +218,8 @@ class SynchPixelBufferDecoder {
       decodedBuffer = decoder.tiles[0].items;
     } else if (this.#algoName === 'rle') {
       // decode DICOM buffer
-      decoder = new dwv.decoder.RleDecoder();
+      // eslint-disable-next-line no-undef
+      decoder = new dwvdecoder.RleDecoder();
       // set the pixel buffer
       decodedBuffer = decoder.decode(
         pixelBuffer,
