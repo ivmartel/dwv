@@ -28,7 +28,7 @@ var hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
 /* global JpxImage */
 var hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
 
-export let decoderScripts = {};
+export const decoderScripts = {};
 
 /**
  * Asynchronous pixel buffer decoder.
