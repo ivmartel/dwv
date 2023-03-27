@@ -509,13 +509,13 @@ export class App {
    * @fires App#loaderror
    * @fires App#loadabort
    */
-  loadFiles(files) {
+  loadFiles = (files) => {
     if (files.length === 0) {
       logger.warn('Ignoring empty input file list.');
       return;
     }
     this.#loadController.loadFiles(files);
-  }
+  };
 
   /**
    * Load a list of URLs. Can be image files or a state file.
@@ -532,13 +532,15 @@ export class App {
    * @fires App#loaderror
    * @fires App#loadabort
    */
-  loadURLs(urls, options) {
+  loadURLs = (urls, options) => {
+    console.log('[app] loadUrls', urls);
+
     if (urls.length === 0) {
       logger.warn('Ignoring empty input url list.');
       return;
     }
     this.#loadController.loadURLs(urls, options);
-  }
+  };
 
   /**
    * Load a list of ArrayBuffers.
@@ -552,9 +554,9 @@ export class App {
    * @fires App#loaderror
    * @fires App#loadabort
    */
-  loadImageObject(data) {
+  loadImageObject = (data) => {
     this.#loadController.loadImageObject(data);
-  }
+  };
 
   /**
    * Abort the current load.
