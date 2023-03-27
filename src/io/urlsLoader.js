@@ -152,10 +152,10 @@ export class UrlsLoader {
    * @param {object} event The load data event.
    * @private
    */
-  #addLoadItem(event) {
+  #addLoadItem = (event) => {
     this.onloaditem(event);
     this.#addLoad();
-  }
+  };
 
   /**
    * Increment the number of loaded data
