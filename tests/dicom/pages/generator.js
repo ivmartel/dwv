@@ -1,5 +1,55 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ *
+ */
+function onDOMContentLoaded() {
+  var intagsfileInput = document.getElementById('intagsfile');
+  intagsfileInput.onchange = onInputTagsFile;
+  var jsonlintButton = document.getElementById('jsonlint');
+  jsonlintButton.onclick = launchJSONLint;
+  var saveButton = document.getElementById('save');
+  saveButton.onclick = onSaveTags;
+  var inImgfileInput = document.getElementById('inImgfile');
+  inImgfileInput.onchange = onInputImageFiles;
+  var generateButton = document.getElementById('generate');
+  generateButton.onclick = onGenerate;
+
+  var tags = JSON.parse(document.getElementById('tags').value);
+  if (tags) {
+    // set study date
+    var now = new Date();
+    tags.StudyDate = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0');
+    tags.StudyTime = now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0');
+    // UID
+    if (typeof tags.StudyInstanceUID === 'undefined') {
+      tags.StudyInstanceUID = dwv.dicom.getUID('StudyInstanceUID');
+      tags.StudyID = 10000;
+    }
+    if (typeof tags.StudyDescription === 'undefined') {
+      tags.StudyDescription = 'dwv generated data';
+    }
+    if (typeof tags.SeriesInstanceUID === 'undefined') {
+      tags.SeriesInstanceUID = dwv.dicom.getUID('SeriesInstanceUID');
+      tags.SeriesNumber = tags.StudyID + 10;
+    }
+    if (typeof tags.SeriesDescription === 'undefined') {
+      tags.SeriesDescription = 'Test data #0';
+    }
+    tags.SOPInstanceUID = dwv.dicom.getUID('SOPInstanceUID');
+    // write back
+    document.getElementById('tags').value = JSON.stringify(tags, null, 2);
+  }
+
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.DEBUG;
+}
+
 var JSZip = JSZip || {};
 
 // tags file
@@ -19,7 +69,7 @@ function getPixelGeneratorName() {
 /**
  * Generate DICOM data
  */
-dwv.test.onGenerate = function () {
+function onGenerate() {
   if (_generating) {
     return;
   }
@@ -67,7 +117,7 @@ dwv.test.onGenerate = function () {
     console.error(error);
     alert(error.message);
   });
-};
+}
 
 /**
  *
@@ -117,7 +167,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
 /**
  * Save the tags as a JSON file.
  */
-dwv.test.onSaveTags = function () {
+function onSaveTags() {
   // check validity
   if (!isValidTags()) {
     return;
@@ -130,7 +180,7 @@ dwv.test.onSaveTags = function () {
   var element = document.getElementById('save');
   element.download = (_tagsFile === null ? 'tags.json' : _tagsFile.name);
   element.href = URL.createObjectURL(blob);
-};
+}
 
 /**
  * Is the JSON valid?
@@ -151,18 +201,18 @@ function isValidTags() {
 /**
  * Open JSONLint to check the tags.
  */
-dwv.test.launchJSONlint = function () {
+function launchJSONLint() {
   var text = document.getElementById('tags').value;
   var link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
   window.open(link);
-};
+}
 
 /**
  * Handle input tags file.
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputTagsFile = function (event) {
+function onInputTagsFile(event) {
   if (event.target.files.length === 0) {
     return;
   }
@@ -172,14 +222,14 @@ dwv.test.onInputTagsFile = function (event) {
     document.getElementById('tags').value = event.target.result;
   };
   reader.readAsText(_tagsFile);
-};
+}
 
 /**
  * Handle input image file
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputImageFiles = function (event) {
+function onInputImageFiles(event) {
   if (event.target.files.length === 0) {
     return;
   }
@@ -246,39 +296,4 @@ dwv.test.onInputImageFiles = function (event) {
     reader.onload = onReaderLoad;
     reader.readAsDataURL(file);
   }
-};
-
-/**
- * Last minute.
- */
-dwv.test.onDOMContentLoadedGenerator = function (/*event*/) {
-  var tags = JSON.parse(document.getElementById('tags').value);
-  if (tags) {
-    // set study date
-    var now = new Date();
-    tags.StudyDate = now.getFullYear().toString() +
-      (now.getMonth() + 1).toString().padStart(2, '0') +
-      now.getDate().toString().padStart(2, '0');
-    tags.StudyTime = now.getHours().toString().padStart(2, '0') +
-      now.getMinutes().toString().padStart(2, '0') +
-      now.getSeconds().toString().padStart(2, '0');
-    // UID
-    if (typeof tags.StudyInstanceUID === 'undefined') {
-      tags.StudyInstanceUID = dwv.dicom.getUID('StudyInstanceUID');
-      tags.StudyID = 10000;
-    }
-    if (typeof tags.StudyDescription === 'undefined') {
-      tags.StudyDescription = 'dwv generated data';
-    }
-    if (typeof tags.SeriesInstanceUID === 'undefined') {
-      tags.SeriesInstanceUID = dwv.dicom.getUID('SeriesInstanceUID');
-      tags.SeriesNumber = tags.StudyID + 10;
-    }
-    if (typeof tags.SeriesDescription === 'undefined') {
-      tags.SeriesDescription = 'Test data #0';
-    }
-    tags.SOPInstanceUID = dwv.dicom.getUID('SOPInstanceUID');
-    // write back
-    document.getElementById('tags').value = JSON.stringify(tags, null, 2);
-  }
-};
+}

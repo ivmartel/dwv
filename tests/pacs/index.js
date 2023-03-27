@@ -1,5 +1,16 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ *
+ */
+function onDOMContentLoaded() {
+  createAndPutHtml(_dataDicom, 'datadicom');
+  createAndPutHtml(_dataImg, 'dataimg');
+
+  var localChk = document.getElementById('islocal');
+  localChk.addEventListener('change', onLocalChkChange);
+}
 
 var _githubRaw = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/';
 var _dataDicom = [
@@ -215,14 +226,3 @@ function onLocalChkChange() {
     links[i].href = getDwvUrl(_dataDicom[links[i].id].uri);
   }
 }
-
-/**
- * Last minute
- */
-dwv.test.onDOMContentLoadedPacs = function () {
-  createAndPutHtml(_dataDicom, 'datadicom');
-  createAndPutHtml(_dataImg, 'dataimg');
-
-  var localChk = document.getElementById('islocal');
-  localChk.addEventListener('change', onLocalChkChange);
-};

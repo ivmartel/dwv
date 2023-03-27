@@ -1,5 +1,15 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ *
+ */
+function onDOMContentLoaded() {
+  // create lists
+  getFileConfigsHtmlList('synthetic-data_explicit');
+  getFileConfigsHtmlList('synthetic-data_implicit');
+  getFileConfigsHtmlList('synthetic-data_explicit_big-endian');
+}
 
 /**
  * Create an object url from (JSON) tags.
@@ -91,13 +101,3 @@ function getFileConfigsHtmlList(fileName) {
   };
   request.send(null);
 }
-
-/**
- * Last minute.
- */
-dwv.test.onDOMContentLoadedSynthData = function (/*event*/) {
-  // create lists
-  getFileConfigsHtmlList('synthetic-data_explicit');
-  getFileConfigsHtmlList('synthetic-data_implicit');
-  getFileConfigsHtmlList('synthetic-data_explicit_big-endian');
-};

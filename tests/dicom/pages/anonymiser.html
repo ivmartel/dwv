@@ -3,15 +3,7 @@
 <head>
 <title>DICOM Anonymiser</title>
 <meta charset="UTF-8">
-<!-- dwv -->
-<script type="text/javascript" src="../../../src/utils/logger.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dataReader.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dataWriter.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dicomParser.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dicomTag.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dicomWriter.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
-<!-- own -->
+<!-- local -->
 <script type="text/javascript"src="./anonymiser.js"></script>
 <style>
 body { font-family: Arial, Helvetica, sans-serif; }
@@ -52,10 +44,10 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 
 <fieldset>
 <label for="infile">DICOM file: </label>
-<input id="infile" type="file" name="file" onchange="dwv.test.onInputDICOMFile(event);">
+<input id="infile" type="file" name="file">
 <br>&nbsp;
 <br><label for="inrulesfile">JSON rules file: </label>
-<input id="inrulesfile" type="file" name="file" onchange="dwv.test.onInputRulesFile(event);">
+<input id="inrulesfile" type="file" name="file">
 </fieldset>
 
 <textarea id="rules" rows="25">
@@ -85,9 +77,9 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 </textarea>
 
 <fieldset>
-<a href="#" id="jsonlint" class="button" onclick="dwv.test.launchJSONLint();">JSONLint</a>
-<a href="#" id="save" class="button" onclick="dwv.test.saveRules();">Save Rules</a>
-<a href="#" id="generate" class="button button-disabled" onclick="dwv.test.generate();">Generate</a>
+<a href="#" id="jsonlint" class="button">JSONLint</a>
+<a href="#" id="save" class="button">Save Rules</a>
+<a href="#" id="generate" class="button button-disabled">Generate</a>
 </fieldset>
 </form>
 

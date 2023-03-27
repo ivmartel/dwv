@@ -1,8 +1,24 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
-// logger level (optional)
-dwv.logger.level = dwv.utils.logger.levels.DEBUG;
+/**
+ *
+ */
+function onDOMContentLoaded() {
+  var infileInput = document.getElementById('infile');
+  infileInput.onchange = onInputDICOMFile;
+  var inrulesfileInput = document.getElementById('inrulesfile');
+  inrulesfileInput.onchange = onInputRulesFile;
+  var jsonlintButton = document.getElementById('jsonlint');
+  jsonlintButton.onclick = launchJSONLint;
+  var saveButton = document.getElementById('save');
+  saveButton.onclick = saveRules;
+  var generateButton = document.getElementById('generate');
+  generateButton.onclick = generate;
+
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.DEBUG;
+}
 
 // rules file
 var _rulesFile = null;
@@ -30,7 +46,7 @@ function onLoadDICOMFile(event) {
 /**
  * Generate DICOM data
  */
-dwv.test.generate = function () {
+function generate() {
   // check validity
   if (!isValidRules()) {
     return;
@@ -51,12 +67,12 @@ dwv.test.generate = function () {
   var element = document.getElementById('generate');
   element.href = URL.createObjectURL(blob);
   element.download = 'anonym-' + _dicomFile.name;
-};
+}
 
 /**
  * Save the rules as a JSON file.
  */
-dwv.test.saveRules = function () {
+function saveRules() {
   // check validity
   if (!isValidRules()) {
     return;
@@ -69,7 +85,7 @@ dwv.test.saveRules = function () {
   var element = document.getElementById('save');
   element.download = (_rulesFile === null ? 'rules.json' : _rulesFile.name);
   element.href = URL.createObjectURL(blob);
-};
+}
 
 /**
  * Is the JSON valid?
@@ -89,18 +105,18 @@ function isValidRules() {
 /**
  * open JSONLint to check the rules
  */
-dwv.test.launchJSONLint = function () {
+function launchJSONLint() {
   var text = document.getElementById('rules').value;
   var link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
   window.open(link);
-};
+}
 
 /**
  * handle input DICOM file
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputDICOMFile = function (event) {
+function onInputDICOMFile(event) {
   if (event.target.files.length === 0) {
     return;
   }
@@ -108,14 +124,14 @@ dwv.test.onInputDICOMFile = function (event) {
   var reader = new FileReader();
   reader.onload = onLoadDICOMFile;
   reader.readAsArrayBuffer(_dicomFile);
-};
+}
 
 /**
  *  handle input rules file
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputRulesFile = function (event) {
+function onInputRulesFile(event) {
   if (event.target.files.length === 0) {
     return;
   }
@@ -125,4 +141,4 @@ dwv.test.onInputRulesFile = function (event) {
     document.getElementById('rules').value = event.target.result;
   };
   reader.readAsText(_rulesFile);
-};
+}
