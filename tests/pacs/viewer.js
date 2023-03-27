@@ -913,7 +913,7 @@ function sortByPosPatKey(obj) {
  */
 function getPrecisionRound(precision) {
   return function (x) {
-    return dwv.precisionRound(x, precision);
+    return dwv.utils.precisionRound(x, precision);
   };
 }
 
