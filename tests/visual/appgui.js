@@ -8,10 +8,23 @@
  */
 var test = test || {};
 
-// test data line
-test.addDataLine = function (id, fileroot, doc) {
+// initialise dwv
+test.initDwv = function () {
   // logger level (optional)
   dwv.logger.level = dwv.logger.levels.DEBUG;
+  // image decoders (for web workers)
+  dwv.image.decoderScripts.jpeg2000 =
+    '../../decoders/pdfjs/decode-jpeg2000.js';
+  dwv.image.decoderScripts['jpeg-lossless'] =
+    '../../decoders/rii-mango/decode-jpegloss.js';
+  dwv.image.decoderScripts['jpeg-baseline'] =
+    '../../decoders/pdfjs/decode-jpegbaseline.js';
+  dwv.image.decoderScripts.rle =
+    '../../decoders/dwv/decode-rle.js';
+};
+
+// test data line
+test.addDataLine = function (id, fileroot, doc) {
 
   var mainDiv = document.getElementById('data-lines');
 
