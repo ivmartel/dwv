@@ -24,6 +24,18 @@ module.exports = merge(common, {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      template: './tests/dicom/pages/anonymiser.html',
+      filename: 'tests/dicom/pages/anonymiser.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './tests/dicom/pages/generator.html',
+      filename: 'tests/dicom/pages/generator.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './tests/dicom/pages/synthetic-data.html',
+      filename: 'tests/dicom/pages/synthetic-data.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './tests/pacs/dcmweb.html',
       filename: 'tests/pacs/dcmweb.html',
     }),
