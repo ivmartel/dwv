@@ -1,6 +1,7 @@
-import { Shape, ShapeConfig } from '../Shape';
-import { Animation } from '../Animation';
-import { GetSet } from '../types';
+import { Context } from '../Context.js';
+import { Shape, ShapeConfig } from '../Shape.js';
+import { Animation } from '../Animation.js';
+import { GetSet } from '../types.js';
 export interface SpriteConfig extends ShapeConfig {
     animation: string;
     animations: any;
@@ -12,9 +13,9 @@ export declare class Sprite extends Shape<SpriteConfig> {
     _updated: boolean;
     anim: Animation;
     interval: any;
-    constructor(config: any);
-    _sceneFunc(context: any): void;
-    _hitFunc(context: any): void;
+    constructor(config: SpriteConfig);
+    _sceneFunc(context: Context): void;
+    _hitFunc(context: Context): void;
     _useBufferCanvas(): boolean;
     _setInterval(): void;
     start(): void;

@@ -1,11 +1,11 @@
-import { Transform } from './Util';
-import { SceneCanvas, Canvas } from './Canvas';
-import { Container } from './Container';
-import { GetSet, Vector2d, IRect } from './types';
-import { Stage } from './Stage';
-import { Context } from './Context';
-import { Shape } from './Shape';
-import { Layer } from './Layer';
+import { Transform } from './Util.js';
+import { SceneCanvas, Canvas } from './Canvas.js';
+import { Container } from './Container.js';
+import { GetSet, Vector2d, IRect } from './types.js';
+import { Stage } from './Stage.js';
+import { Context } from './Context.js';
+import { Shape } from './Shape.js';
+import { Layer } from './Layer.js';
 export type Filter = (this: Node, imageData: ImageData) => void;
 type globalCompositeOperationType = '' | 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity';
 export interface NodeConfig {

@@ -1,6 +1,6 @@
-import { Shape, ShapeConfig } from '../Shape';
-import { GetSet } from '../types';
-import { Context } from '../Context';
+import { Shape, ShapeConfig } from '../Shape.js';
+import { GetSet } from '../types.js';
+import { Context } from '../Context.js';
 export interface LineConfig extends ShapeConfig {
     points?: number[] | Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
     tension?: number;

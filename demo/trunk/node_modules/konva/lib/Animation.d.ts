@@ -1,5 +1,5 @@
-import { Layer } from './Layer';
-import { IFrame, AnimationFn } from './types';
+import { Layer } from './Layer.js';
+import { IFrame, AnimationFn } from './types.js';
 export declare class Animation {
     func: AnimationFn;
     id: number;

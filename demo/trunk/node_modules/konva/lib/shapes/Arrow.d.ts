@@ -1,5 +1,6 @@
-import { Line, LineConfig } from './Line';
-import { GetSet } from '../types';
+import { Line, LineConfig } from './Line.js';
+import { GetSet } from '../types.js';
+import { Context } from '../Context.js';
 export interface ArrowConfig extends LineConfig {
     points: number[];
     tension?: number;
@@ -10,8 +11,8 @@ export interface ArrowConfig extends LineConfig {
     pointerAtEnding?: boolean;
 }
 export declare class Arrow extends Line<ArrowConfig> {
-    _sceneFunc(ctx: any): void;
-    __fillStroke(ctx: any): void;
+    _sceneFunc(ctx: Context): void;
+    __fillStroke(ctx: Context): void;
     getSelfRect(): {
         x: number;
         y: number;

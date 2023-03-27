@@ -1,4 +1,4 @@
-/*! dwv 0.32.0-beta.0 2023-03-20 14:00:43 */
+/*! dwv 0.32.0-beta.0 2023-03-27 13:49:50 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -16388,7 +16388,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
     // send decode events
     this.ondecodeditem({
       data: [decodedBuffer],
-      index: info.itemNumber
+      dataIndex: info.dataIndex,
+      numberOfItems: info.numberOfItems,
+      itemNumber: info.itemNumber
     });
     // decode end?
     if (decodeCount === numberOfData) {
@@ -18680,8 +18682,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // append
     if (frameIndex >= meta.numberOfFiles) {
-      throw new Error(
-        'Cannot append a frame at an index above the number of frames');
+      dwv.logger.warn('Ignoring frame at index ' + frameIndex +
+        ' (size: ' + meta.numberOfFiles + ')');
+      return;
     }
     buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry

@@ -1,4 +1,4 @@
-import { Context } from './Context';
+import { Context } from './Context.js';
 interface ICanvasConfig {
     width?: number;
     height?: number;
