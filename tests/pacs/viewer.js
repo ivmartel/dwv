@@ -26,6 +26,15 @@ function viewerSetup() {
   // logger level (optional)
   dwv.logger.level = dwv.logger.levels.WARN;
 
+  dwv.image.decoderScripts.jpeg2000 =
+    '../../decoders/pdfjs/decode-jpeg2000.js';
+  dwv.image.decoderScripts['jpeg-lossless'] =
+    '../../decoders/rii-mango/decode-jpegloss.js';
+  dwv.image.decoderScripts['jpeg-baseline'] =
+    '../../decoders/pdfjs/decode-jpegbaseline.js';
+  dwv.image.decoderScripts.rle =
+    '../../decoders/dwv/decode-rle.js';
+
   // stage options
   var dataViewConfigs;
   var viewOnFirstLoadItem = true;
