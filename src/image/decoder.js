@@ -231,7 +231,9 @@ class SynchPixelBufferDecoder {
     // send decode events
     this.ondecodeditem({
       data: [decodedBuffer],
-      index: info.itemNumber
+      dataIndex: info.dataIndex,
+      numberOfItems: info.numberOfItems,
+      itemNumber: info.itemNumber
     });
     // decode end?
     if (this.#decodeCount === this.#numberOfData) {
