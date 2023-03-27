@@ -771,11 +771,13 @@ export class Image {
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
     }
-    // append
+    // check index
     if (frameIndex >= this.#meta.numberOfFiles) {
-      throw new Error(
-        'Cannot append a frame at an index above the number of frames');
+      logger.warn('Ignoring frame at index ' + frameIndex +
+        ' (size: ' + this.#meta.numberOfFiles + ')');
+      return;
     }
+    // append
     this.#buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry
     this.appendFrame();
