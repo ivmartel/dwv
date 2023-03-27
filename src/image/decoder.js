@@ -215,7 +215,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
     // send decode events
     this.ondecodeditem({
       data: [decodedBuffer],
-      index: info.itemNumber
+      dataIndex: info.dataIndex,
+      numberOfItems: info.numberOfItems,
+      itemNumber: info.itemNumber
     });
     // decode end?
     if (decodeCount === numberOfData) {
