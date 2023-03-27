@@ -68,7 +68,7 @@ export class RawImageLoader {
     // create a DOM image
     var image = new Image();
     // triggered by ctx.drawImage
-    image.onload = (/*event*/) => {
+    image.onload = (event) => {
       try {
         if (!this.#aborted) {
           this.onprogress({
@@ -78,7 +78,7 @@ export class RawImageLoader {
             index: index,
             source: origin
           });
-          this.onload(getViewFromDOMImage(this, origin));
+          this.onload(getViewFromDOMImage(event.target, origin));
         }
       } catch (error) {
         this.onerror({

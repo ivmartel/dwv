@@ -72,9 +72,9 @@ export class RawVideoLoader {
     video.file = origin;
     video.index = index;
     // onload handler
-    video.onloadedmetadata = (/*event*/) => {
+    video.onloadedmetadata = (event) => {
       try {
-        getViewFromDOMVideo(this,
+        getViewFromDOMVideo(event.target,
           this.onloaditem, this.onload,
           this.onprogress, this.onloadend,
           index, origin);
