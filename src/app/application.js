@@ -299,11 +299,11 @@ export class App {
    * @param {object} cmd The command to add.
    * @fires UndoStack#undoadd
    */
-  addToUndoStack(cmd) {
+  addToUndoStack = (cmd) => {
     if (this.#undoStack !== null) {
       this.#undoStack.add(cmd);
     }
-  }
+  };
 
   /**
    * Initialise the application.
