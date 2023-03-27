@@ -533,8 +533,6 @@ export class App {
    * @fires App#loadabort
    */
   loadURLs = (urls, options) => {
-    console.log('[app] loadUrls', urls);
-
     if (urls.length === 0) {
       logger.warn('Ignoring empty input url list.');
       return;
