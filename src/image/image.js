@@ -738,8 +738,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // append
     if (frameIndex >= meta.numberOfFiles) {
-      throw new Error(
-        'Cannot append a frame at an index above the number of frames');
+      dwv.logger.warn('Ignoring frame at index ' + frameIndex +
+        ' (size: ' + meta.numberOfFiles + ')');
+      return;
     }
     buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry
