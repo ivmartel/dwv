@@ -1,4 +1,5 @@
 import {Point2D} from '../../src/math/point';
+import {Index} from '../../src/math/index';
 import {Circle} from '../../src/math/circle';
 
 /**
