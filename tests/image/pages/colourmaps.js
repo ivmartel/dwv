@@ -1,5 +1,19 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ *
+ */
+function onDOMContentLoaded() {
+  createImage('Plain', dwv.image.ColourMaps.plain);
+  createImage('InvPlain', dwv.image.ColourMaps.invPlain);
+  createImage('Rainbow', dwv.image.ColourMaps.rainbow);
+  createImage('Hot', dwv.image.ColourMaps.hot);
+  createImage('Hot Iron', dwv.image.ColourMaps.hot_iron);
+  createImage('Pet', dwv.image.ColourMaps.pet);
+  createImage('Hot Metal Blue', dwv.image.ColourMaps.hot_metal_blue);
+  createImage('Pet 20 step', dwv.image.ColourMaps.pet_20step);
+}
 
 /**
  * Create the colour map image and add it to the document.
@@ -45,18 +59,3 @@ function createImage(colourMapName, colourMap) {
   // add to the document
   document.body.appendChild(div);
 }
-
-/**
- * Last minute.
- */
-dwv.test.onDOMContentLoadedColourmap = function (/*event*/) {
-  createImage('Plain', dwv.image.lut.plain);
-  createImage('InvPlain', dwv.image.lut.invPlain);
-  createImage('Rainbow', dwv.image.lut.rainbow);
-  createImage('Hot', dwv.image.lut.hot);
-  createImage('Hot Iron', dwv.image.lut.hot_iron);
-  createImage('Pet', dwv.image.lut.pet);
-  createImage('Hot Metal Blue', dwv.image.lut.hot_metal_blue);
-  createImage('Pet 20 step', dwv.image.lut.pet_20step);
-  createImage('Test', dwv.image.lut.test);
-};

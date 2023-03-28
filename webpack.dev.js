@@ -40,6 +40,10 @@ module.exports = merge(common, {
       filename: 'tests/dicom/pages/synthetic-data.html',
     }),
     new HtmlWebpackPlugin({
+      template: './tests/image/pages/colourmaps.html',
+      filename: 'tests/image/pages/colourmaps.html',
+    }),
+    new HtmlWebpackPlugin({
       template: './tests/pacs/dcmweb.html',
       filename: 'tests/pacs/dcmweb.html',
     }),

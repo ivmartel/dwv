@@ -15,6 +15,7 @@ import {loadFromUri} from './utils/uri';
 import {precisionRound} from './utils/string';
 import {Point} from './math/point';
 import {decoderScripts} from './image/decoder';
+import {ColourMaps} from './image/luts';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
 
@@ -28,7 +29,8 @@ const dicom = {
   DicomWriter
 };
 const image = {
-  decoderScripts
+  decoderScripts,
+  ColourMaps
 };
 const math = {
   Point
