@@ -2,7 +2,7 @@ import {Rectangle} from '../math/rectangle';
 import {Point2D} from '../math/point';
 import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
-import {Debug} from './draw';
+import {DRAW_DEBUG} from './draw';
 import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
@@ -119,7 +119,7 @@ export class RectangleFactory {
 
     // debug shadow
     var kshadow;
-    if (Debug) {
+    if (DRAW_DEBUG) {
       kshadow = this.#getShadowRectangle(rectangle);
     }
 
@@ -197,7 +197,7 @@ export class RectangleFactory {
     })[0];
     // debug shadow
     var kshadow;
-    if (Debug) {
+    if (DRAW_DEBUG) {
       kshadow = group.getChildren(function (node) {
         return node.name() === 'shadow';
       })[0];

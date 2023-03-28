@@ -1,8 +1,8 @@
 import {startsWith, getFileExtension} from '../utils/string';
 import {getUrlFromUri} from '../utils/uri';
 import {getViewFromDOMImage} from '../image/domReader';
-import {FileContentTypes} from './filesLoader';
-import {UrlContentTypes} from './urlsLoader';
+import {fileContentTypes} from './filesLoader';
+import {urlContentTypes} from './urlsLoader';
 
 /**
  * Raw image loader.
@@ -177,7 +177,7 @@ export class RawImageLoader {
    * @returns {number} One of the 'fileContentTypes'.
    */
   loadFileAs() {
-    return FileContentTypes.DataURL;
+    return fileContentTypes.DataURL;
   }
 
   /**
@@ -186,7 +186,7 @@ export class RawImageLoader {
    * @returns {number} One of the 'urlContentTypes'.
    */
   loadUrlAs() {
-    return UrlContentTypes.ArrayBuffer;
+    return urlContentTypes.ArrayBuffer;
   }
 
   /**

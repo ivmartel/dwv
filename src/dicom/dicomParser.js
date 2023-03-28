@@ -5,9 +5,9 @@ import {
   isPixelDataTag
 } from './dicomTag';
 import {
-  Vr32bitVL,
-  VrTypes,
-  CharSetString
+  vr32bitVL,
+  vrTypes,
+  charSetString
 } from './dictionary';
 import {DataReader} from './dataReader';
 import {DicomElementsWrapper} from './dicomElementsWrapper';
@@ -482,7 +482,7 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
  * @returns {boolean} True if this VR has a 32-bit VL.
  */
 export function is32bitVLVR(vr) {
-  return Vr32bitVL.includes(vr);
+  return vr32bitVL.includes(vr);
 }
 
 /**
@@ -914,7 +914,7 @@ export class DicomParser {
 
     // data
     var data = null;
-    var vrType = VrTypes[vr];
+    var vrType = vrTypes[vr];
     if (isPixelDataTag(tag)) {
       if (element.undefinedLength) {
         // implicit pixel data sequence
@@ -975,7 +975,7 @@ export class DicomParser {
         data = reader.readFloat64Array(offset, vl);
       } else if (vrType === 'string') {
         var stream = reader.readUint8Array(offset, vl);
-        if (CharSetString.includes(vr)) {
+        if (charSetString.includes(vr)) {
           data = this.decodeSpecialString(stream);
         } else {
           data = this.decodeString(stream);

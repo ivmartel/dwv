@@ -1,4 +1,4 @@
-import {Debug} from './draw';
+import {DRAW_DEBUG} from './draw';
 import {getDefaultAnchor} from './editor';
 import {Ellipse} from '../math/ellipse';
 import {Point2D} from '../math/point';
@@ -122,7 +122,7 @@ export class EllipseFactory {
 
     // debug shadow
     var kshadow;
-    if (Debug) {
+    if (DRAW_DEBUG) {
       kshadow = this.#getShadowEllipse(ellipse);
     }
 
@@ -199,7 +199,7 @@ export class EllipseFactory {
     })[0];
     // debug shadow
     var kshadow;
-    if (Debug) {
+    if (DRAW_DEBUG) {
       kshadow = group.getChildren(function (node) {
         return node.name() === 'shadow';
       })[0];

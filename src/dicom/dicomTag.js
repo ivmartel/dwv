@@ -1,6 +1,6 @@
 import {
   dictionary,
-  DicomTagGroups
+  tagGroups
 } from './dictionary';
 
 /**
@@ -95,7 +95,7 @@ export class Tag {
   getGroupName() {
     // group is in the '0x####' form
     // TagGroups include the x
-    return DicomTagGroups[this.getGroup().substring(1)];
+    return tagGroups[this.getGroup().substring(1)];
   }
 
   /**

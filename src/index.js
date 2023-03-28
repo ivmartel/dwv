@@ -19,6 +19,7 @@ import {lut} from './image/luts';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
 import {customUI} from './gui/generic';
+import {defaultPresets} from './image/windowLevel';
 
 const dicom = {
   getUID,
@@ -39,6 +40,9 @@ const image = {
 const math = {
   Point
 };
+const tools = {
+  defaultPresets
+};
 const utils = {
   loadFromUri,
   precisionRound,
@@ -53,5 +57,6 @@ export {
   gui,
   image,
   math,
+  tools,
   utils
 };

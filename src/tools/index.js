@@ -12,7 +12,7 @@ import {RectangleFactory} from './rectangle';
 
 import {Threshold, Sobel, Sharpen} from './filter';
 
-export const ToolList = {
+export const toolList = {
   WindowLevel,
   Scroll,
   ZoomAndPan,
@@ -20,7 +20,7 @@ export const ToolList = {
   Draw
 };
 
-export const ToolOptions = {
+export const toolOptions = {
   draw: {
     ArrowFactory,
     CircleFactory,

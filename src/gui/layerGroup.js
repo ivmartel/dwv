@@ -2,7 +2,7 @@ import {getIdentityMat33, getCoronalMat33} from '../math/matrix';
 import {Index} from '../math/index';
 import {Point} from '../math/point';
 import {Vector3D} from '../math/vector';
-import {ViewEventNames} from '../image/view';
+import {viewEventNames} from '../image/view';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
 import {ViewLayer} from './viewLayer';
@@ -540,8 +540,8 @@ export class LayerGroup {
     viewLayer.addEventListener(
       'positionchange', this.updateLayersToPositionChange);
     // propagate view viewLayer-layer events
-    for (var j = 0; j < ViewEventNames.length; ++j) {
-      viewLayer.addEventListener(ViewEventNames[j], this.#fireEvent);
+    for (var j = 0; j < viewEventNames.length; ++j) {
+      viewLayer.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', this.#fireEvent);

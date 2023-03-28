@@ -1,8 +1,8 @@
 import {MultiProgressHandler} from '../utils/progress';
-import {LoaderList} from './loaderList';
+import {loaderList} from './loaderList';
 
 // file content types
-export const FileContentTypes = {
+export const fileContentTypes = {
   Text: 0,
   ArrayBuffer: 1,
   DataURL: 2
@@ -223,8 +223,8 @@ export class FilesLoader {
 
     // create loaders
     var loaders = [];
-    for (var m = 0; m < LoaderList.length; ++m) {
-      loaders.push(new LoaderList[m]());
+    for (var m = 0; m < loaderList.length; ++m) {
+      loaders.push(new loaderList[m]());
     }
 
     // find an appropriate loader
@@ -298,11 +298,11 @@ export class FilesLoader {
       reader.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
       reader.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
       // read
-      if (loader.loadFileAs() === FileContentTypes.Text) {
+      if (loader.loadFileAs() === fileContentTypes.Text) {
         reader.readAsText(dataElement);
-      } else if (loader.loadFileAs() === FileContentTypes.DataURL) {
+      } else if (loader.loadFileAs() === fileContentTypes.DataURL) {
         reader.readAsDataURL(dataElement);
-      } else if (loader.loadFileAs() === FileContentTypes.ArrayBuffer) {
+      } else if (loader.loadFileAs() === fileContentTypes.ArrayBuffer) {
         reader.readAsArrayBuffer(dataElement);
       }
     }

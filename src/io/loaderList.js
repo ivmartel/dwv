@@ -5,7 +5,7 @@ import {RawImageLoader} from './rawImageLoader';
 import {RawVideoLoader} from './rawVideoLoader';
 import {ZipLoader} from './zipLoader';
 
-export const LoaderList = [
+export const loaderList = [
   DicomDataLoader,
   JSONTextLoader,
   MultipartLoader,

@@ -1,8 +1,8 @@
 import {startsWith} from '../utils/string';
 import {parseMultipart} from '../utils/array';
 import {MemoryLoader} from './memoryLoader';
-import {FileContentTypes} from './filesLoader';
-import {UrlContentTypes} from './urlsLoader';
+import {fileContentTypes} from './filesLoader';
+import {urlContentTypes} from './urlsLoader';
 
 /**
  * Multipart data loader.
@@ -133,7 +133,7 @@ export class MultipartLoader {
    * @returns {number} One of the 'fileContentTypes'.
    */
   loadFileAs() {
-    return FileContentTypes.ArrayBuffer;
+    return fileContentTypes.ArrayBuffer;
   }
 
   /**
@@ -142,7 +142,7 @@ export class MultipartLoader {
    * @returns {number} One of the 'urlContentTypes'.
    */
   loadUrlAs() {
-    return UrlContentTypes.ArrayBuffer;
+    return urlContentTypes.ArrayBuffer;
   }
 
   /**

@@ -1,5 +1,5 @@
 import {MultiProgressHandler} from '../utils/progress';
-import {LoaderList} from './loaderList';
+import {loaderList} from './loaderList';
 
 /**
  * Memory loader.
@@ -173,8 +173,8 @@ export class MemoryLoader {
 
     // create loaders
     var loaders = [];
-    for (var m = 0; m < LoaderList.length; ++m) {
-      loaders.push(new LoaderList[m]());
+    for (var m = 0; m < loaderList.length; ++m) {
+      loaders.push(new loaderList[m]());
     }
 
     // find an appropriate loader

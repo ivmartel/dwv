@@ -5,7 +5,7 @@
  */
 const MinWindowWidth = 1;
 
-export const DefaultPresets = {
+export const defaultPresets = {
   CT: {
     mediastinum: {center: 40, width: 400},
     lung: {center: -500, width: 1500},

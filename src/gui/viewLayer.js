@@ -1,6 +1,6 @@
 import {Index} from '../math/index';
 import {ListenerHandler} from '../utils/listen';
-import {ViewEventNames} from '../image/view';
+import {viewEventNames} from '../image/view';
 import {ViewController} from '../app/viewController';
 import {
   canCreateCanvas,
@@ -218,8 +218,8 @@ export class ViewLayer {
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
     // view events
-    for (var j = 0; j < ViewEventNames.length; ++j) {
-      view.addEventListener(ViewEventNames[j], this.#fireEvent);
+    for (var j = 0; j < viewEventNames.length; ++j) {
+      view.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // create view controller
     this.#viewController = new ViewController(view, index);

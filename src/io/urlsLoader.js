@@ -1,10 +1,10 @@
 import {endsWith, getRootPath} from '../utils/string';
 import {MultiProgressHandler} from '../utils/progress';
 import {getFileListFromDicomDir} from '../dicom/dicomElementsWrapper';
-import {LoaderList} from './loaderList';
+import {loaderList} from './loaderList';
 
 // url content types
-export const UrlContentTypes = {
+export const urlContentTypes = {
   Text: 0,
   ArrayBuffer: 1
 };
@@ -257,8 +257,8 @@ export class UrlsLoader {
 
     // create loaders
     var loaders = [];
-    for (var m = 0; m < LoaderList.length; ++m) {
-      loaders.push(new LoaderList[m]());
+    for (var m = 0; m < loaderList.length; ++m) {
+      loaders.push(new loaderList[m]());
     }
 
     // find an appropriate loader
@@ -376,7 +376,7 @@ export class UrlsLoader {
       request.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
       request.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
       // response type (default is 'text')
-      if (loader.loadUrlAs() === UrlContentTypes.ArrayBuffer) {
+      if (loader.loadUrlAs() === urlContentTypes.ArrayBuffer) {
         request.responseType = 'arraybuffer';
       }
 

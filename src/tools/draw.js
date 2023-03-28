@@ -24,9 +24,9 @@ import {ShapeEditor} from './editor';
 import Konva from 'konva';
 
 /**
- * Debug flag.
+ * Draw Debug flag.
  */
-export const Debug = false;
+export const DRAW_DEBUG = false;
 
 /**
  * Drawing tool.

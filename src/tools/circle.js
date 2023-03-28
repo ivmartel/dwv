@@ -3,7 +3,7 @@ import {Point2D} from '../math/point';
 import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
 import {getDefaultAnchor} from './editor';
-import {Debug} from './draw';
+import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
@@ -123,7 +123,7 @@ export class CircleFactory {
 
     // debug shadow
     var kshadow;
-    if (Debug) {
+    if (DRAW_DEBUG) {
       kshadow = this.#getShadowCircle(circle);
     }
 
@@ -200,7 +200,7 @@ export class CircleFactory {
     })[0];
     // debug shadow
     var kshadow;
-    if (Debug) {
+    if (DRAW_DEBUG) {
       kshadow = group.getChildren(function (node) {
         return node.name() === 'shadow';
       })[0];

@@ -118,7 +118,10 @@ export class OpacityBinder {
   };
 }
 
-export const BinderList = {
+/**
+ * List of binders.
+ */
+export const binderList = {
   WindowLevelBinder,
   PositionBinder,
   ZoomBinder,

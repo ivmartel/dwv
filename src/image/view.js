@@ -16,7 +16,7 @@ import {logger} from '../utils/logger';
  *
  * @type {Array}
  */
-export const ViewEventNames = [
+export const viewEventNames = [
   'wlchange',
   'wlpresetadd',
   'colourchange',

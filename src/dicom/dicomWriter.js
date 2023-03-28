@@ -1,6 +1,6 @@
 import {
-  VrTypes,
-  CharSetString
+  vrTypes,
+  charSetString
 } from './dictionary';
 import {
   Tag,
@@ -99,7 +99,7 @@ function isEven(number) {
  * @returns {boolean} True if the VR is a typed array one.
  */
 function isTypedArrayVr(vr) {
-  var vrType = VrTypes[vr];
+  var vrType = vrTypes[vr];
   return typeof vrType !== 'undefined' &&
     vrType !== 'string';
 }
@@ -111,7 +111,7 @@ function isTypedArrayVr(vr) {
  * @returns {boolean} True if the VR is a string one.
  */
 function isStringVr(vr) {
-  var vrType = VrTypes[vr];
+  var vrType = vrTypes[vr];
   return typeof vrType !== 'undefined' &&
     vrType === 'string';
 }
@@ -482,7 +482,7 @@ export class DicomWriter {
       byteOffset = writer.writeInt64Array(byteOffset, value);
     } else {
       // switch according to VR if input type is undefined
-      var vrType = VrTypes[element.vr];
+      var vrType = vrTypes[element.vr];
       if (typeof vrType !== 'undefined') {
         if (vrType === 'Uint8') {
           byteOffset = writer.writeUint8Array(byteOffset, value);
@@ -957,7 +957,7 @@ export class DicomWriter {
         // encode string
         // TODO: not sure for UN...
         if (isStringVr(element.vr)) {
-          if (CharSetString.includes(element.vr)) {
+          if (charSetString.includes(element.vr)) {
             value = this.encodeSpecialString(value.join('\\'));
             pad = this.encodeSpecialString(pad);
           } else {
@@ -990,7 +990,7 @@ export class DicomWriter {
         }
 
         // convert size to bytes
-        var vrType = VrTypes[element.vr];
+        var vrType = vrTypes[element.vr];
         if (isPixelDataTag(element.tag) || element.vr === 'ox') {
           if (element.undefinedLength) {
             var itemPrefixSize =

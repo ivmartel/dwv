@@ -1,4 +1,4 @@
-import {ViewEventNames} from '../image/view';
+import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
 import {lut} from '../image/luts';
 import {getMatrixFromName} from '../math/matrix';
@@ -14,8 +14,8 @@ import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
 
-import {ToolList, ToolOptions} from '../tools';
-import {BinderList} from '../gui/stage';
+import {toolList, toolOptions} from '../tools';
+import {binderList} from '../gui/stage';
 
 /**
  * Main application class.
@@ -366,31 +366,31 @@ export class App {
     // tools
     if (this.#options.tools && this.#options.tools.length !== 0) {
       // setup the tool list
-      var toolList = {};
+      var appToolList = {};
       var keys = Object.keys(this.#options.tools);
       for (var t = 0; t < keys.length; ++t) {
         var toolName = keys[t];
         // find the tool in the Tools list
-        if (typeof ToolList[toolName] !== 'undefined') {
+        if (typeof toolList[toolName] !== 'undefined') {
           // create tool instance
-          toolList[toolName] = new ToolList[toolName](this);
+          appToolList[toolName] = new toolList[toolName](this);
           // register listeners
-          if (typeof toolList[toolName].addEventListener !== 'undefined') {
-            var names = toolList[toolName].getEventNames();
+          if (typeof appToolList[toolName].addEventListener !== 'undefined') {
+            var names = appToolList[toolName].getEventNames();
             for (var j = 0; j < names.length; ++j) {
-              toolList[toolName].addEventListener(names[j], this.#fireEvent);
+              appToolList[toolName].addEventListener(names[j], this.#fireEvent);
             }
           }
           // tool options
           var toolParams = this.#options.tools[toolName];
           if (typeof toolParams.options !== 'undefined') {
             var type = 'raw';
-            if (typeof toolList[toolName].getOptionsType !== 'undefined') {
-              type = toolList[toolName].getOptionsType();
+            if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
+              type = appToolList[toolName].getOptionsType();
             }
-            var toolOptions = toolParams.options;
+            var appToolOptions = toolParams.options;
             if (type === 'instance' || type === 'factory') {
-              toolOptions = {};
+              appToolOptions = {};
               for (var i = 0; i < toolParams.options.length; ++i) {
                 var optionName = toolParams.options[i];
                 var optionClassName = optionName;
@@ -399,24 +399,24 @@ export class App {
                 }
                 var toolNamespace = toolName.charAt(0).toLowerCase() +
                   toolName.slice(1);
-                if (typeof ToolOptions[toolNamespace][optionClassName] !==
+                if (typeof toolOptions[toolNamespace][optionClassName] !==
                   'undefined') {
-                  toolOptions[optionName] =
-                    ToolOptions[toolNamespace][optionClassName];
+                  appToolOptions[optionName] =
+                    toolOptions[toolNamespace][optionClassName];
                 } else {
                   logger.warn('Could not find option class for: ' +
                     optionName);
                 }
               }
             }
-            toolList[toolName].setOptions(toolOptions);
+            appToolList[toolName].setOptions(appToolOptions);
           }
         } else {
           logger.warn('Could not initialise unknown tool: ' + toolName);
         }
       }
       // add tools to the controller
-      this.#toolboxController = new ToolboxController(toolList);
+      this.#toolboxController = new ToolboxController(appToolList);
     }
 
     // create load controller
@@ -669,8 +669,8 @@ export class App {
     // create instances
     var instances = [];
     for (var i = 0; i < list.length; ++i) {
-      if (typeof BinderList[list[i]] !== 'undefined') {
-        instances.push(new BinderList[list[i]]);
+      if (typeof binderList[list[i]] !== 'undefined') {
+        instances.push(new binderList[list[i]]);
       }
     }
     // pass to stage
@@ -1205,8 +1205,8 @@ export class App {
     group.addEventListener('renderstart', this.#fireEvent);
     group.addEventListener('renderend', this.#fireEvent);
     // propagate view events
-    for (var j = 0; j < ViewEventNames.length; ++j) {
-      group.addEventListener(ViewEventNames[j], this.#fireEvent);
+    for (var j = 0; j < viewEventNames.length; ++j) {
+      group.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // propagate drawLayer events
     if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {

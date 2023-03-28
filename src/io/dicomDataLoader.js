@@ -1,7 +1,7 @@
 import {startsWith, getFileExtension} from '../utils/string';
 import {getUrlFromUri} from '../utils/uri';
-import {FileContentTypes} from './filesLoader';
-import {UrlContentTypes} from './urlsLoader';
+import {fileContentTypes} from './filesLoader';
+import {urlContentTypes} from './urlsLoader';
 import {DicomBufferToView} from '../image/dicomBufferToView';
 
 /**
@@ -169,7 +169,7 @@ export class DicomDataLoader {
    * @returns {number} One of the 'fileContentTypes'.
    */
   loadFileAs() {
-    return FileContentTypes.ArrayBuffer;
+    return fileContentTypes.ArrayBuffer;
   }
 
   /**
@@ -178,7 +178,7 @@ export class DicomDataLoader {
    * @returns {number} One of the 'urlContentTypes'.
    */
   loadUrlAs() {
-    return UrlContentTypes.ArrayBuffer;
+    return urlContentTypes.ArrayBuffer;
   }
 
   /**

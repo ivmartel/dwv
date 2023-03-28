@@ -1,7 +1,7 @@
 import {startsWith, getFileExtension} from '../utils/string';
 import {getUrlFromUri} from '../utils/uri';
-import {FileContentTypes} from './filesLoader';
-import {UrlContentTypes} from './urlsLoader';
+import {fileContentTypes} from './filesLoader';
+import {urlContentTypes} from './urlsLoader';
 
 /**
  * JSON text loader.
@@ -147,7 +147,7 @@ export class JSONTextLoader {
    * @returns {number} One of the 'fileContentTypes'.
    */
   loadFileAs() {
-    return FileContentTypes.Text;
+    return fileContentTypes.Text;
   }
 
   /**
@@ -156,7 +156,7 @@ export class JSONTextLoader {
    * @returns {number} One of the 'urlContentTypes'.
    */
   loadUrlAs() {
-    return UrlContentTypes.Text;
+    return urlContentTypes.Text;
   }
 
   /**

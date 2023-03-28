@@ -1,6 +1,6 @@
 import {View} from './view';
 import {lut} from './luts';
-import {WindowLevel, DefaultPresets} from './windowLevel';
+import {WindowLevel, defaultPresets} from './windowLevel';
 
 /**
  * {@link View} factory.
@@ -43,10 +43,10 @@ export class ViewFactory {
     // Order is important, if no wl from DICOM, this will be the default.
     windowPresets.minmax = {name: 'minmax'};
     // optional modality presets
-    if (typeof DefaultPresets !== 'undefined') {
+    if (typeof defaultPresets !== 'undefined') {
       var modality = image.getMeta().Modality;
-      for (var key in DefaultPresets[modality]) {
-        var preset = DefaultPresets[modality][key];
+      for (var key in defaultPresets[modality]) {
+        var preset = defaultPresets[modality][key];
         windowPresets[key] = {
           wl: new WindowLevel(preset.center, preset.width),
           name: key
