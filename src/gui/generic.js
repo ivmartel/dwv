@@ -52,20 +52,9 @@ export function prompt(message, value) {
 }
 
 /**
- * Prompt the user for some text. Defaults to local one.
- *
- * @see prompt
+ * Custom UI object for client defined UI.
  */
-//dwv.prompt = prompt;
-
-/**
- * Open a dialogue to edit roi data. Defaults to undefined.
- *
- * @param {object} data The roi data.
- * @param {Function} callback The callback to launch on dialogue exit.
- * @see dwv.tool.Draw
- */
-//dwv.openRoiDialog;
+export const CustomUI = {};
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.

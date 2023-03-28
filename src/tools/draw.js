@@ -1,5 +1,9 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {getEventOffset} from '../gui/generic';
+import {
+  getEventOffset,
+  prompt,
+  CustomUI
+} from '../gui/generic';
 import {Point2D} from '../math/point';
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
@@ -895,11 +899,17 @@ export class Draw {
       };
 
       // call client dialog if defined
-      if (typeof dwv.openRoiDialog !== 'undefined') {
-        dwv.openRoiDialog(ktext.meta, onSaveCallback);
+      if (typeof CustomUI.openRoiDialog !== 'undefined') {
+        /**
+         * Open a dialogue to edit roi data. Defaults to undefined.
+         *
+         * @param {object} data The roi data.
+         * @param {Function} callback The callback to launch on dialogue exit.
+         */
+        CustomUI.openRoiDialog(ktext.meta, onSaveCallback);
       } else {
         // simple prompt for the text expression
-        var textExpr = dwv.prompt('Label', ktext.meta.textExpr);
+        var textExpr = prompt('Label', ktext.meta.textExpr);
         if (textExpr !== null) {
           ktext.meta.textExpr = textExpr;
           onSaveCallback(ktext.meta);

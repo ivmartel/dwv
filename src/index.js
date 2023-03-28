@@ -18,6 +18,7 @@ import {decoderScripts} from './image/decoder';
 import {ColourMaps} from './image/luts';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
+import {CustomUI} from './gui/generic';
 
 const dicom = {
   getUID,
@@ -27,6 +28,9 @@ const dicom = {
   DicomDictionary,
   DicomParser,
   DicomWriter
+};
+const gui = {
+  CustomUI
 };
 const image = {
   decoderScripts,
@@ -46,6 +50,7 @@ export {
   logger,
   App,
   dicom,
+  gui,
   image,
   math,
   utils
