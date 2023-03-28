@@ -1,6 +1,5 @@
 import {
   getUrlFromUri,
-  getUrlFromUriSimple,
   splitUri,
   getUriQuery,
   decodeKeyValueUri,
@@ -22,82 +21,55 @@ import {
 QUnit.test('Test getUrlFromUri.', function (assert) {
   // test #00: empty
   var uri00 = 'http://domain.org';
-  var res00f = getUrlFromUri(uri00);
-  var res00s = getUrlFromUriSimple(uri00);
+  var res00 = getUrlFromUri(uri00);
   // pathname
-  assert.equal(res00f.pathname, '/', 'pathname 00');
-  assert.equal(res00s.pathname, res00f.pathname, 'pathname 00 simple');
+  assert.equal(res00.pathname, '/', 'pathname 00');
   // search param
-  assert.equal(res00f.searchParams.get('topic'), null, 'search params 00');
-  assert.equal(res00s.searchParams.get('topic'),
-    res00f.searchParams.get('topic'), 'search params 00 simple');
+  assert.equal(res00.searchParams.get('topic'), null, 'search params 00');
 
   // test #01: simple
   var uri01 = 'https://domain.org/dir/file';
-  var res01f = getUrlFromUri(uri01);
-  var res01s = getUrlFromUriSimple(uri01);
+  var res01 = getUrlFromUri(uri01);
   // pathname
-  assert.equal(res01f.pathname, '/dir/file', 'pathname 01');
-  assert.equal(res01s.pathname, res01f.pathname, 'pathname 01 simple');
+  assert.equal(res01.pathname, '/dir/file', 'pathname 01');
   // search param
-  assert.equal(res01f.searchParams.get('topic'), null, 'search params 01');
-  assert.equal(res01s.searchParams.get('topic'),
-    res01f.searchParams.get('topic'), 'search params 01 simple');
+  assert.equal(res01.searchParams.get('topic'), null, 'search params 01');
 
   // test #02: with file
   var uri02 = 'https://domain.org/dir/image.jpg';
-  var res02f = getUrlFromUri(uri02);
-  var res02s = getUrlFromUriSimple(uri02);
+  var res02 = getUrlFromUri(uri02);
   // pathname
-  assert.equal(res02f.pathname, '/dir/image.jpg', 'pathname 02');
-  assert.equal(res02s.pathname, res02f.pathname, 'pathname 02 simple');
+  assert.equal(res02.pathname, '/dir/image.jpg', 'pathname 02');
   // search param
-  assert.equal(res02f.searchParams.get('topic'), null, 'search params 02');
-  assert.equal(res02s.searchParams.get('topic'),
-    res02f.searchParams.get('topic'), 'search params 02 simple');
+  assert.equal(res02.searchParams.get('topic'), null, 'search params 02');
 
   // test #03: relative
   var uri03 = './dir/image.jpg';
-  var res03f = getUrlFromUri(uri03);
-  var res03s = getUrlFromUriSimple(uri03);
+  var res03 = getUrlFromUri(uri03);
   // pathname
-  assert.equal(res03f.pathname, '/dir/image.jpg', 'pathname 03');
-  assert.equal(res03s.pathname, res03f.pathname, 'pathname 03 simple');
+  assert.equal(res03.pathname, '/dir/image.jpg', 'pathname 03');
   // search param
-  assert.equal(res03f.searchParams.get('topic'), null, 'search params 03');
-  assert.equal(res03s.searchParams.get('topic'),
-    res03f.searchParams.get('topic'), 'search params 03 simple');
+  assert.equal(res03.searchParams.get('topic'), null, 'search params 03');
 
   // test #10: wih search params
   var uri10 = 'https://domain.org/dir/image.jpg?accesstoken=abc';
-  var res10f = getUrlFromUri(uri10);
-  var res10s = getUrlFromUriSimple(uri10);
+  var res10 = getUrlFromUri(uri10);
   // pathname
-  assert.equal(res10f.pathname, '/dir/image.jpg', 'pathname 03');
-  assert.equal(res10s.pathname, res10f.pathname, 'pathname 03 simple');
+  assert.equal(res10.pathname, '/dir/image.jpg', 'pathname 03');
   // search param
   assert.equal(
-    res10f.searchParams.get('accesstoken'), 'abc', 'search params 03');
-  assert.equal(res10s.searchParams.get('accesstoken'),
-    res10f.searchParams.get('accesstoken'), 'search params 03 simple');
+    res10.searchParams.get('accesstoken'), 'abc', 'search params 03');
 
   // test #11: wih search params
   var uri11 = 'https://domain.org/dir/image.jpg?accesstoken=abc&topic=secure';
-  var res11f = getUrlFromUri(uri11);
-  var res11s = getUrlFromUriSimple(uri11);
+  var res11 = getUrlFromUri(uri11);
   // pathname
-  assert.equal(res11f.pathname, '/dir/image.jpg', 'pathname 04');
-  assert.equal(res11s.pathname, res11f.pathname, 'pathname 04 simple');
+  assert.equal(res11.pathname, '/dir/image.jpg', 'pathname 04');
   // search param
   assert.equal(
-    res11f.searchParams.get('accesstoken'), 'abc', 'search params 04');
-  assert.equal(res11s.searchParams.get('accesstoken'),
-    res11f.searchParams.get('accesstoken'), 'search params 04 simple');
+    res11.searchParams.get('accesstoken'), 'abc', 'search params 04');
   assert.equal(
-    res11f.searchParams.get('topic'), 'secure', 'search params 04-2');
-  assert.equal(
-    res11s.searchParams.get('topic'),
-    res11f.searchParams.get('topic'), 'search params 04-2 simple');
+    res11.searchParams.get('topic'), 'secure', 'search params 04-2');
 });
 
 /**
