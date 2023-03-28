@@ -6,6 +6,8 @@
  * - Right click on the thumbnail in the left 'Document tree area',
  * - Choose 'Convert to JPEG'.
  */
+// Do not warn if these variables were not defined before.
+/* global dwv */
 var test = test || {};
 
 // initialise dwv

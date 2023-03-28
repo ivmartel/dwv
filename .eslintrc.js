@@ -2,12 +2,8 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    jquery: true,
     es6: true,
     es2022: true
-  },
-  globals: {
-    dwv: 'readonly'
   },
   extends: [
     'eslint:recommended',

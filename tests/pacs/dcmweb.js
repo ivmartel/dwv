@@ -1,3 +1,6 @@
+// Do not warn if these variables were not defined before.
+/* global dwv */
+
 // setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
