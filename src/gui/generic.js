@@ -54,7 +54,7 @@ export function prompt(message, value) {
 /**
  * Custom UI object for client defined UI.
  */
-export const CustomUI = {};
+export const customUI = {};
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.

@@ -15,10 +15,10 @@ import {loadFromUri} from './utils/uri';
 import {precisionRound} from './utils/string';
 import {Point} from './math/point';
 import {decoderScripts} from './image/decoder';
-import {ColourMaps} from './image/luts';
+import {lut} from './image/luts';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
-import {CustomUI} from './gui/generic';
+import {customUI} from './gui/generic';
 
 const dicom = {
   getUID,
@@ -30,11 +30,11 @@ const dicom = {
   DicomWriter
 };
 const gui = {
-  CustomUI
+  customUI
 };
 const image = {
   decoderScripts,
-  ColourMaps
+  lut
 };
 const math = {
   Point

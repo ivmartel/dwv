@@ -91,7 +91,7 @@ function invId(i) {
   return (lut_range_max - 1) - i;
 }
 
-export const ColourMaps = {
+export const lut = {
   // plain
   plain: {
     red: buildLut(id),

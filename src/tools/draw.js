@@ -2,7 +2,7 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
   getEventOffset,
   prompt,
-  CustomUI
+  customUI
 } from '../gui/generic';
 import {Point2D} from '../math/point';
 import {guid} from '../math/stats';
@@ -899,14 +899,14 @@ export class Draw {
       };
 
       // call client dialog if defined
-      if (typeof CustomUI.openRoiDialog !== 'undefined') {
+      if (typeof customUI.openRoiDialog !== 'undefined') {
         /**
          * Open a dialogue to edit roi data. Defaults to undefined.
          *
          * @param {object} data The roi data.
          * @param {Function} callback The callback to launch on dialogue exit.
          */
-        CustomUI.openRoiDialog(ktext.meta, onSaveCallback);
+        customUI.openRoiDialog(ktext.meta, onSaveCallback);
       } else {
         // simple prompt for the text expression
         var textExpr = prompt('Label', ktext.meta.textExpr);

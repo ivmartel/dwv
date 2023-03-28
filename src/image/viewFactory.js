@@ -1,5 +1,5 @@
 import {View} from './view';
-import {ColourMaps} from './luts';
+import {lut} from './luts';
 import {WindowLevel, DefaultPresets} from './windowLevel';
 
 /**
@@ -22,7 +22,7 @@ export class ViewFactory {
 
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
-      view.setDefaultColourMap(ColourMaps.invPlain);
+      view.setDefaultColourMap(lut.invPlain);
     } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
       var paletteLut = image.getMeta().paletteLut;
       if (typeof (paletteLut) !== 'undefined') {
