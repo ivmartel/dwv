@@ -10,7 +10,7 @@ import bbmriZip from '../data/bbmri.zip';
 import dwvTestBadZip from '../data/dwv-test_bad.zip';
 
 /**
- * Tests for the 'io/urlsLoader.js' file.
+ * Tests for the 'io/memoryLoader.js' file.
  */
 /** @module tests/io */
 // Do not warn if these variables were not defined before.
@@ -18,7 +18,7 @@ import dwvTestBadZip from '../data/dwv-test_bad.zip';
 QUnit.module('io');
 
 /**
- * Check the events of urls load
+ * Check the events of memory load
  *
  * @param {object} assert The Qunit assert object.
  * @param {string} id An id for the test.
@@ -144,11 +144,11 @@ function checkLoad(assert, id, data, nData, nDataOk) {
 }
 
 /**
- * Tests for {@link UrlsLoader} events with single frame data.
+ * Tests for {@link MemoryLoader} events with single frame data.
  *
- * @function module:tests/io~UrlsLoader0
+ * @function module:tests/io~MemoryLoader0
  */
-QUnit.test('Test UrlsLoader events for single frame.', function (assert) {
+QUnit.test('Test MemoryLoader events for single frame.', function (assert) {
   // #0: 2 good dicom
   var data0 = [
     {
@@ -199,11 +199,11 @@ QUnit.test('Test UrlsLoader events for single frame.', function (assert) {
 });
 
 /**
- * Tests for {@link UrlsLoader} events with multi frame data.
+ * Tests for {@link MemoryLoader} events with multi frame data.
  *
- * @function module:tests/io~UrlsLoader1
+ * @function module:tests/io~MemoryLoader1
  */
-QUnit.test('Test UrlsLoader events for multi frame.', function (assert) {
+QUnit.test('Test MemoryLoader events for multi frame.', function (assert) {
   // #0: simple multi frame
   var data0 = [
     {
@@ -226,11 +226,11 @@ QUnit.test('Test UrlsLoader events for multi frame.', function (assert) {
 });
 
 /**
- * Tests for {@link UrlsLoader} events with zipped data.
+ * Tests for {@link MemoryLoader} events with zipped data.
  *
- * @function module:tests/io~UrlsLoader2
+ * @function module:tests/io~MemoryLoader2
  */
-QUnit.test('Test UrlsLoader events for zipped data.', function (assert) {
+QUnit.test('Test MemoryLoader events for zipped data.', function (assert) {
   // #0: simple zip
   var data0 = [
     {

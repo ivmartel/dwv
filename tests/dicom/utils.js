@@ -3,7 +3,7 @@
  * Something like: 'data:application/dicom;base64,SGVsbG8sIFdvcmxkIQ=='
  * The function is independent from the mime type.
  *
- * @param {String} str Base64 url string.
+ * @param {string} str Base64 url string.
  * @returns {ArrayBuffer} The corresponding buffer.
  */
 export function b64urlToArrayBuffer(str) {

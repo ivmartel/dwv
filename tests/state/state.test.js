@@ -54,6 +54,7 @@ QUnit.module('state');
 /**
  * Test a state file.
  *
+ * @param {object} data The test data.
  * @param {string} version The state format version.
  * @param {string} type The type of drawing.
  * @param {object} assert The qunit assert.

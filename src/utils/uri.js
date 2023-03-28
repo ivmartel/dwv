@@ -182,12 +182,16 @@ function decodeManifestQuery(query, callback) {
   // TODO: needs to be decoded (decodeURIComponent?
   uri += query.input;
 
-  // handle error
+  /**
+   * Handle error.
+   */
   function onError(/*event*/) {
     logger.warn('RequestError while receiving manifest: ' + this.status);
   }
 
-  // handle load
+  /**
+   * Handle load.
+   */
   function onLoad(/*event*/) {
     callback(decodeManifest(this.responseXML, query.nslices));
   }
@@ -273,6 +277,9 @@ export function loadFromUri(uri, app, options) {
  * @param {object} options Optional url request options.
  */
 function loadFromQuery(query, app, options) {
+  /**
+   * Load end callback.
+   */
   function onLoadEnd(/*event*/) {
     app.removeEventListener('loadend', onLoadEnd);
     app.loadURLs([query.state]);

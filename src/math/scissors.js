@@ -150,6 +150,12 @@ function computeLaplace(greyscale) {
   return laplace;
 }
 
+/**
+ * Compute the X gradient.
+ *
+ * @param {Array} greyscale The values.
+ * @returns {Array} The gradient.
+ */
 function computeGradX(greyscale) {
   // Returns 2D array of x-gradient values for greyscale
   var gradX = [];
@@ -167,6 +173,12 @@ function computeGradX(greyscale) {
   return gradX;
 }
 
+/**
+ * Compute the Y gradient.
+ *
+ * @param {Array} greyscale The values.
+ * @returns {Array} The gradient.
+ */
 function computeGradY(greyscale) {
   // Returns 2D array of y-gradient values for greyscale
   var gradY = [];
@@ -187,6 +199,15 @@ function computeGradY(greyscale) {
   return gradY;
 }
 
+/**
+ * Compute the gradient unit vector.
+ *
+ * @param {Array} gradX The X gradient.
+ * @param {Array} gradY The Y gradient.
+ * @param {number} px The point X.
+ * @param {number} py The point Y.
+ * @param {object} out The result.
+ */
 function gradUnitVector(gradX, gradY, px, py, out) {
   // Returns the gradient vector at (px,py), scaled to a magnitude of 1
   var ox = gradX[py][px];
@@ -199,6 +220,17 @@ function gradUnitVector(gradX, gradY, px, py, out) {
   out.y = oy / gvm;
 }
 
+/**
+ * Compute the gradient direction.
+ *
+ * @param {Array} gradX The X gradient.
+ * @param {Array} gradY The Y gradient.
+ * @param {number} px The point X.
+ * @param {number} py The point Y.
+ * @param {number} qx The q X.
+ * @param {number} qy The q Y.
+ * @returns {number} The direction.
+ */
 function gradDirection(gradX, gradY, px, py, qx, qy) {
   var __dgpuv = {x: -1, y: -1};
   var __gdquv = {x: -1, y: -1};
@@ -224,6 +256,15 @@ function gradDirection(gradX, gradY, px, py, qx, qy) {
   return __twothirdpi * (Math.acos(dp) + Math.acos(dq));
 }
 
+/**
+ * Compute the sides.
+ *
+ * @param {number} dist The distance.
+ * @param {Array} gradX The X gradient.
+ * @param {Array} gradY The Y gradient.
+ * @param {number} greyscale The value.
+ * @returns {object} The sides.
+ */
 function computeSides(dist, gradX, gradY, greyscale) {
   // Returns 2 2D arrays, containing inside and outside greyscale values.
   // These greyscale values are the intensity just a little bit along the
@@ -263,6 +304,12 @@ function computeSides(dist, gradX, gradY, greyscale) {
   return sides;
 }
 
+/**
+ * Gaussian blur an input buffer.
+ *
+ * @param {Array} buffer The input buffer.
+ * @param {Array} out The result.
+ */
 function gaussianBlur(buffer, out) {
   // Smooth values over to fill in gaps in the mapping
   out[0] = 0.4 * buffer[0] + 0.5 * buffer[1] + 0.1 * buffer[1];

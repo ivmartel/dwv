@@ -153,6 +153,12 @@ var d65 = {
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */
 export function cielabToCiexyz(triplet) {
+  /**
+   * Apply the inverse lab function.
+   *
+   * @param {number} x The input value.
+   * @returns {number} The result
+   */
   function invLabFunc(x) {
     var res = null;
     // delta = 6 / 29 = 0.206896552
@@ -184,6 +190,12 @@ export function cielabToCiexyz(triplet) {
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export function ciexyzToCielab(triplet) {
+  /**
+   * Apply the lab function.
+   *
+   * @param {number} x The input value.
+   * @returns {number} The result
+   */
   function labFunc(x) {
     var res = null;
     // delta = 6 / 29 = 0.206896552
@@ -216,6 +228,12 @@ export function ciexyzToCielab(triplet) {
  * @returns {object} sRGB triplet as {r,g,b}.
  */
 export function ciexyzToSrgb(triplet) {
+  /**
+   * Apply the gamma function.
+   *
+   * @param {number} x The input value.
+   * @returns {number} The result
+   */
   function gammaFunc(x) {
     var res = null;
     if (x <= 0.0031308) {
@@ -247,6 +265,12 @@ export function ciexyzToSrgb(triplet) {
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */
 export function srgbToCiexyz(triplet) {
+  /**
+   * Apply the inverse gamma function.
+   *
+   * @param {number} x The input value.
+   * @returns {number} The result
+   */
   function invGammaFunc(x) {
     var res = null;
     if (x <= 0.04045) {

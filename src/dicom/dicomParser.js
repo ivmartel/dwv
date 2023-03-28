@@ -439,7 +439,7 @@ function guessTransferSyntax(firstDataElement) {
  *   the data: [8, 16, 32].
  * @param {number} pixelRepresentation The pixel representation,
  *   0:unsigned;1:signed.
- * @param {Size} size The size of the new array.
+ * @param {number} size The size of the new array.
  * @returns {Array} The good typed array.
  */
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {

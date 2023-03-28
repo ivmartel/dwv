@@ -238,7 +238,12 @@ function compare(jsonTags, dicomElements, name, comparator) {
   }
 }
 
-// simple GradSquarePixGenerator
+/**
+ * Simple GradSquarePixGenerator
+ *
+ * @param {object} tags The input tags.
+ * @returns {object} The pixel buffer
+ */
 function generateGradSquare(tags) {
 
   var numberOfColumns = tags.Columns;

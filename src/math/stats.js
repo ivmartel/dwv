@@ -5,7 +5,7 @@
  *
  * @param {Array} array The array of values to extract stats from.
  * @param {Array} flags A list of stat values to calculate.
- * @returns {Stats} A stats object.
+ * @returns {object} A stats object.
  */
 export function getStats(array, flags) {
   if (includesFullStatsFlags(flags)) {
@@ -32,7 +32,7 @@ function includesFullStatsFlags(flags) {
  * of an array of values.
  *
  * @param {Array} array The array of values to extract stats from.
- * @returns {SimpleStats} A simple stats object.
+ * @returns {object} A simple stats object.
  */
 function getSimpleStats(array) {
   var min = array[0];
