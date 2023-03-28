@@ -10,7 +10,7 @@ module.exports = merge(common, {
     static: [
       {
         directory: './dist',
-        publicPath: 'dist'
+        publicPath: '/dist'
       },
       {
         directory: './tests',
@@ -23,6 +23,14 @@ module.exports = merge(common, {
       {
         directory: './node_modules/jszip',
         publicPath: '/node_modules/jszip'
+      },
+      {
+        directory: './node_modules/lodash',
+        publicPath: '/node_modules/lodash'
+      },
+      {
+        directory: './node_modules/benchmark',
+        publicPath: '/node_modules/benchmark'
       }
     ],
   },
