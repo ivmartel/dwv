@@ -1,8 +1,15 @@
 import {
   getDwvVersion,
+  getTypedArray,
   DicomParser
 } from './dicom/dicomParser.js';
-import {DicomWriter} from './dicom/dicomWriter';
+import {
+  getUID,
+  getElementsFromJSONTags,
+  DicomWriter
+} from './dicom/dicomWriter';
+import {DicomDictionary} from './dicom/dictionary';
+import {getPixelDataTag} from './dicom/dicomTag';
 import {App} from './app/application';
 import {loadFromUri} from './utils/uri';
 import {precisionRound} from './utils/string';
@@ -12,6 +19,11 @@ import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
 
 const dicom = {
+  getUID,
+  getElementsFromJSONTags,
+  getTypedArray,
+  getPixelDataTag,
+  DicomDictionary,
   DicomParser,
   DicomWriter
 };
