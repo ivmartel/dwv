@@ -20,4 +20,4 @@ export function i18n(key, _options) {
     throw new Error('Unexpected translation key prefix.');
   }
   return unit[props[1]];
-};
+}

@@ -175,7 +175,7 @@ export class WindowLevel {
         )
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));
-  }
+  };
 
   /**
    * Handle mouse wheel event.
