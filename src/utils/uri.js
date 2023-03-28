@@ -6,72 +6,11 @@ import {splitKeyValueString} from './string';
  *
  * @param {string} uri A string representing the url.
  * @returns {URL} A URL object.
- * WARNING: platform support dependent, see https://caniuse.com/#feat=url
  */
-function getUrlFromUriFull(uri) {
+export function getUrlFromUri(uri) {
   // add base to allow for relative urls
   // (base is not used for absolute urls)
   return new URL(uri, window.location.origin);
-}
-
-/**
- * Get an simple object URL from a string uri.
- *
- * @param {string} uri A string representing the url.
- * @returns {URL} A simple URL object that exposes 'pathname' and
- *   'searchParams.get()'
- * WARNING: limited functionality, simple nmock of the URL object.
- */
-export function getUrlFromUriSimple(uri) {
-  var url = {};
-  // simple implementation (mainly for IE)
-  // expecting only one '?'
-  var urlSplit = uri.split('?');
-  // pathname
-  var fullPath = urlSplit[0];
-  // remove host and domain
-  var fullPathSplit = fullPath.split('//');
-  var hostAndPath = fullPathSplit.pop();
-  var hostAndPathSplit = hostAndPath.split('/');
-  hostAndPathSplit.splice(0, 1);
-  url.pathname = '/' + hostAndPathSplit.join('/');
-  // search params
-  var searchSplit = [];
-  if (urlSplit.length === 2) {
-    var search = urlSplit[1];
-    searchSplit = search.split('&');
-  }
-  var searchParams = {};
-  for (var i = 0; i < searchSplit.length; ++i) {
-    var paramSplit = searchSplit[i].split('=');
-    searchParams[paramSplit[0]] = paramSplit[1];
-  }
-  url.searchParams = {
-    get: function (param) {
-      return searchParams[param];
-    }
-  };
-
-  return url;
-}
-
-/**
- * Get an object URL from a string uri.
- *
- * @param {string} uri A string representing the url.
- * @returns {URL} A URL object (full or simple depending upon platform).
- * WANRING: returns an official URL or a simple URL depending on platform,
- *   see https://caniuse.com/#feat=url
- */
-export function getUrlFromUri(uri) {
-  var url = null;
-  // if (dwv.env.askModernizr('urlparser') &&
-  //       dwv.env.askModernizr('urlsearchparams')) {
-    url = getUrlFromUriFull(uri);
-  // } else {
-  //   url = getUrlFromUriSimple(uri);
-  // }
-  return url;
 }
 
 /**
@@ -314,7 +253,7 @@ export function decodeManifest(manifest, nslices) {
  * Load from an input uri
  *
  * @param {string} uri The input uri, for example: 'window.location.href'.
- * @param {dwv.App} app The associated app that handles the load.
+ * @param {App} app The associated app that handles the load.
  * @param {object} options Optional url request options.
  */
 export function loadFromUri(uri, app, options) {
