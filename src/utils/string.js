@@ -156,38 +156,6 @@ export function replaceFlags(inputStr, values) {
 }
 
 /**
- * Replace flags in a input string. Flags are keywords surrounded with curly
- * braces.
- *
- * @param {string} inputStr The input string.
- * @param {Array} values An array of strings.
- * @example
- *    var values = ["a", "b"];
- *    var str = "The length is: {v0}. The size is: {v1}";
- *    var res = replaceFlags2(str, values);
- *    // "The length is: a. The size is: b"
- * @returns {string} The result string.
- */
-function replaceFlags2(inputStr, values) {
-  var res = inputStr;
-  for (var j = 0; j < values.length; ++j) {
-    res = res.replace('{v' + j + '}', values[j]);
-  }
-  return res;
-}
-
-function createDefaultReplaceFormat(values) {
-  var res = '';
-  for (var j = 0; j < values.length; ++j) {
-    if (j !== 0) {
-      res += ', ';
-    }
-    res += '{v' + j + '}';
-  }
-  return res;
-}
-
-/**
  * Get the root of an input path.
  * Splits using `/` as separator.
  *
