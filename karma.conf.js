@@ -48,7 +48,7 @@ module.exports = function (config) {
  * @returns {object} The config.
  */
 function webpackConfig() {
-  const config = require('./webpack.dev.js');
+  const config = require('./webpack.test.js');
   delete config.entry;
   delete config.output;
   return config;

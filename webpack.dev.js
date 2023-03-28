@@ -19,6 +19,10 @@ module.exports = merge(common, {
       {
         directory: './decoders',
         publicPath: '/decoders'
+      },
+      {
+        directory: './node_modules/jszip',
+        publicPath: '/node_modules/jszip'
       }
     ],
   },
@@ -62,26 +66,6 @@ module.exports = merge(common, {
   ],
   module: {
     rules: [
-      {
-        test: /\.m?js$/,
-        exclude: /node_modules/,
-        use: {
-          // babel loader with istanbul
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  useBuiltIns: 'entry',
-                  corejs: '3.22'
-                }
-              ]
-            ],
-            plugins: ['istanbul']
-          }
-        }
-      },
       {
         test: /\.png/,
         type: 'asset/resource'
