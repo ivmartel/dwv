@@ -8,7 +8,7 @@ import {
   getElementsFromJSONTags,
   DicomWriter
 } from './dicom/dicomWriter';
-import {DicomDictionary} from './dicom/dictionary';
+import {dictionary} from './dicom/dictionary';
 import {getPixelDataTag} from './dicom/dicomTag';
 import {App} from './app/application';
 import {loadFromUri} from './utils/uri';
@@ -25,7 +25,7 @@ const dicom = {
   getElementsFromJSONTags,
   getTypedArray,
   getPixelDataTag,
-  DicomDictionary,
+  dictionary,
   DicomParser,
   DicomWriter
 };

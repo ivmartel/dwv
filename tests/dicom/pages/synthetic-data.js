@@ -31,7 +31,7 @@ function getObjectUrlFromTags(config) {
     for (var i = 0; i < keys.length; ++i) {
       var group = keys[i];
       var tags = config.privateDictionary[group];
-      dwv.dicom.DicomDictionary[group] = tags;
+      dwv.dicom.dictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;

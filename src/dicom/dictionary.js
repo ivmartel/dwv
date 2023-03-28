@@ -10,7 +10,7 @@
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and
  *  'xxxx' with '0004'
  */
-export const DicomDictionary = {
+export const dictionary = {
   '0x0000': {
     '0x0000': ['UL', '1', 'CommandGroupLength'],
     '0x0001': ['UL', '1', 'CommandLengthToEnd'],

@@ -12,7 +12,7 @@ import {
   getPixelDataTag
 } from '../../src/dicom/dicomTag';
 import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
-import {DicomDictionary} from '../../src/dicom/dictionary';
+import {dictionary} from '../../src/dicom/dictionary';
 import {b64urlToArrayBuffer} from './utils';
 
 import multiframeTest from '/tests/data/multiframe-test1.dcm';
@@ -354,7 +354,7 @@ function testWriteReadDataFromConfig(config, assert) {
     for (var i = 0; i < keys.length; ++i) {
       var group = keys[i];
       var tags = config.privateDictionary[group];
-      DicomDictionary[group] = tags;
+      dictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;

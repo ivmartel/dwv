@@ -1,5 +1,5 @@
 import {
-  DicomDictionary,
+  dictionary,
   DicomTagGroups
 } from './dictionary';
 
@@ -131,10 +131,10 @@ export class Tag {
    */
   getInfoFromDictionary() {
     var info = null;
-    if (typeof DicomDictionary[this.getGroup()] !== 'undefined' &&
-      typeof DicomDictionary[this.getGroup()][this.getElement()] !==
+    if (typeof dictionary[this.getGroup()] !== 'undefined' &&
+      typeof dictionary[this.getGroup()][this.getElement()] !==
         'undefined') {
-      info = DicomDictionary[this.getGroup()][this.getElement()];
+      info = dictionary[this.getGroup()][this.getElement()];
     }
     return info;
   }
@@ -316,7 +316,7 @@ export function getTagFromDictionary(tagName) {
   }
   var group = null;
   var element = null;
-  var dict = DicomDictionary;
+  var dict = dictionary;
   var keys0 = Object.keys(dict);
   var keys1 = null;
   var foundTag = false;
