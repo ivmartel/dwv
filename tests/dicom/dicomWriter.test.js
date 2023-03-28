@@ -7,21 +7,20 @@ import {
   getElementsFromJSONTags,
   getUID
 } from '../../src/dicom/dicomWriter';
-import {getTagFromDictionary} from '../../src/dicom/dicomTag';
+import {
+  getTagFromDictionary,
+  getPixelDataTag
+} from '../../src/dicom/dicomTag';
 import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
 import {DicomDictionary} from '../../src/dicom/dictionary';
-import {
-  checkTags,
-  generatePixelDataFromJSONTags,
-  RequiredPixelTags
-} from './dicomGenerator';
 import {b64urlToArrayBuffer} from './utils';
 
 import multiframeTest from '/tests/data/multiframe-test1.dcm';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm';
 import syntheticDataExplicit from '/tests/dicom/synthetic-data_explicit.json';
 import syntheticDataImplicit from '/tests/dicom/synthetic-data_implicit.json';
-import syntheticDataExplicitBE from '/tests/dicom/synthetic-data_explicit_big-endian.json';
+import syntheticDataExplicitBE from
+  '/tests/dicom/synthetic-data_explicit_big-endian.json';
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.
@@ -239,6 +238,103 @@ function compare(jsonTags, dicomElements, name, comparator) {
   }
 }
 
+// simple GradSquarePixGenerator
+function generateGradSquare(tags) {
+
+  var numberOfColumns = tags.Columns;
+  var numberOfRows = tags.Rows;
+  var isRGB = tags.PhotometricInterpretation.trim() === 'RGB';
+  var samplesPerPixel = tags.SamplesPerPixel;
+
+  var numberOfSamples = 1;
+  var numberOfColourPlanes = 1;
+  if (samplesPerPixel === 3) {
+    var planarConfiguration = tags.PlanarConfiguration;
+    if (planarConfiguration === 0) {
+      numberOfSamples = 3;
+    } else {
+      numberOfColourPlanes = 3;
+    }
+  }
+
+  var dataLength = numberOfRows * numberOfColumns * samplesPerPixel;
+
+  var bitsAllocated = tags.BitsAllocated;
+  var pixelRepresentation = tags.PixelRepresentation;
+  var pixelBuffer;
+  if (bitsAllocated === 8) {
+    if (pixelRepresentation === 0) {
+      pixelBuffer = new Uint8Array(dataLength);
+    } else {
+      pixelBuffer = new Int8Array(dataLength);
+    }
+  } else if (bitsAllocated === 16) {
+    if (pixelRepresentation === 0) {
+      pixelBuffer = new Uint16Array(dataLength);
+    } else {
+      pixelBuffer = new Int16Array(dataLength);
+    }
+  }
+
+  var halfCols = numberOfRows * 0.5;
+  var halfRows = numberOfColumns * 0.5;
+
+  var background = 0;
+  var maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
+  var max = 100;
+
+  var getFunc;
+  if (isRGB) {
+    getFunc = function (i, j) {
+      var value = background;
+      var jc = Math.abs(j - halfRows);
+      var ic = Math.abs(i - halfCols);
+      if (jc < halfRows / 2 && ic < halfCols / 2) {
+        value += (i * j) * (max / maxNoBounds);
+      }
+      if (value > 255) {
+        value = 200;
+      }
+      return [0, value, value];
+    };
+  } else {
+    getFunc = function (i, j) {
+      var value = 0;
+      var jc = Math.abs(j - halfRows);
+      var ic = Math.abs(i - halfCols);
+      if (jc < halfRows / 2 && ic < halfCols / 2) {
+        value += (i * j) * (max / maxNoBounds);
+      }
+      return [value];
+    };
+  }
+
+  // main loop
+  var offset = 0;
+  for (var c = 0; c < numberOfColourPlanes; ++c) {
+    for (var j = 0; j < numberOfRows; ++j) {
+      for (var i = 0; i < numberOfColumns; ++i) {
+        for (var s = 0; s < numberOfSamples; ++s) {
+          if (numberOfColourPlanes !== 1) {
+            pixelBuffer[offset] = getFunc(i, j)[c];
+          } else {
+            pixelBuffer[offset] = getFunc(i, j)[s];
+          }
+          ++offset;
+        }
+      }
+    }
+  }
+
+  var pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
+  return {
+    tag: getPixelDataTag(),
+    vr: bitsAllocated === 8 ? 'OB' : 'OW',
+    vl: pixVL,
+    value: pixelBuffer
+  };
+}
+
 /**
  * Test a JSON config: write a DICOM file and read it back.
  *
@@ -265,9 +361,8 @@ function testWriteReadDataFromConfig(config, assert) {
   // convert JSON to DICOM element object
   var dicomElements = getElementsFromJSONTags(jsonTags);
   // pixels (if possible): small gradient square
-  if (checkTags(config.tags, RequiredPixelTags)) {
-    dicomElements.x7FE00010 =
-      generatePixelDataFromJSONTags(config.tags);
+  if (config.tags.Modality !== 'KO') {
+    dicomElements.x7FE00010 = generateGradSquare(config.tags);
   }
 
   // create DICOM buffer

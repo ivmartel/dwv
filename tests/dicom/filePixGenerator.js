@@ -1,3 +1,6 @@
+// namespaces
+var test = test || {};
+
 /**
  * FilePixGenerator
  * Generates pixel data from file(s).
@@ -5,38 +8,31 @@
  * @param {object} options The generator options.
  * @class
  */
-export class FilePixGenerator {
+var FilePixGenerator = function (options) {
 
-  #numberOfColumns;
-  #numberOfRows;
-  #isRGB;
+  var numberOfColumns = options.numberOfColumns;
+  var numberOfRows = options.numberOfRows;
+  var isRGB = options.photometricInterpretation === 'RGB';
 
-  constructor(options) {
-    this.#numberOfColumns = options.numberOfColumns;
-    this.#numberOfRows = options.numberOfRows;
-    this.#isRGB = options.photometricInterpretation === 'RGB';
-  }
-
-
-  setImages(imgs) {
+  this.setImages = function (imgs) {
     // check sizes
     var img;
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
-      if (img.width !== this.#numberOfColumns) {
+      if (img.width !== numberOfColumns) {
         throw new Error('Image width mismatch: ' +
-          img.width + '!=' + this.#numberOfColumns);
+          img.width + '!=' + numberOfColumns);
       }
-      if (img.height !== this.#numberOfRows) {
+      if (img.height !== numberOfRows) {
         throw new Error('Image height mismatch: ' +
-          img.height + '!=' + this.#numberOfRows);
+          img.height + '!=' + numberOfRows);
       }
     }
     // store
     this.images = imgs;
-  }
+  };
 
-  generate(pixelBuffer, sliceNumber) {
+  this.generate = function (pixelBuffer, sliceNumber) {
     var image = null;
     if (sliceNumber < this.images.length) {
       image = this.images[sliceNumber];
@@ -44,47 +40,52 @@ export class FilePixGenerator {
       image = this.images[0];
     }
     // get the image data
-    var imageData = dwv.dicom.getImageDataData(image);
+    var imageData = test.getImageDataData(image);
     // extract fist component for the pixelBuffer
     var dataLen = imageData.length;
     var j = 0;
     for (var i = 0; i < dataLen; i += 4) {
       pixelBuffer[j] = imageData[i];
       j += 1;
-      if (this.#isRGB) {
+      if (isRGB) {
         pixelBuffer[j + 1] = imageData[i + 1];
         pixelBuffer[j + 2] = imageData[i + 2];
         j += 2;
       }
     }
-  }
+  };
+};
 
+/**
+ * Check tags are coherent with image size.
+ *
+ * @param {object} tags The tags to check.
+ * @param {object} image The associated image.
+ * @returns {boolean} True if the tags are ok.
+ */
+function checkTags(tags, image) {
   /**
-   * Check tags are coherent with image size.
-   *
-   * @param {object} tags The tags to check.
-   * @param {object} image The associated image.
-   * @returns {boolean} True if the tags are ok.
+   * @param {number} value The value to check.
+   * @returns {number} The expected value.
    */
-  static checkTags(tags, image) {
-    /**
-     * @param {number} value The value to check.
-     * @returns {number} The expected value.
-     */
-    function getExpectedSize(value) {
-      return value;
-    }
-
-    var needUpdate = false;
-    if (tags.Columns !== getExpectedSize(image.width)) {
-      tags.Columns = getExpectedSize(image.width);
-      needUpdate = true;
-    }
-    if (tags.Rows !== getExpectedSize(image.height)) {
-      tags.Rows = getExpectedSize(image.height);
-      needUpdate = true;
-    }
-    return needUpdate;
+  function getExpectedSize(value) {
+    return value;
   }
 
-} // class FilePixGenerator
+  var needUpdate = false;
+  if (tags.Columns !== getExpectedSize(image.width)) {
+    tags.Columns = getExpectedSize(image.width);
+    needUpdate = true;
+  }
+  if (tags.Rows !== getExpectedSize(image.height)) {
+    tags.Rows = getExpectedSize(image.height);
+    needUpdate = true;
+  }
+  return needUpdate;
+}
+
+test.pixelGenerators = test.pixelGenerators || {};
+test.pixelGenerators.file = {
+  generator: FilePixGenerator,
+  checkTags: checkTags
+};

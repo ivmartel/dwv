@@ -1,3 +1,6 @@
+// namespaces
+var test = test || {};
+
 // setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
@@ -25,7 +28,7 @@ function getObjectUrlFromTags(config) {
     for (var i = 0; i < keys.length; ++i) {
       var group = keys[i];
       var tags = config.privateDictionary[group];
-      dwv.dicom.dictionary[group] = tags;
+      dwv.dicom.DicomDictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
@@ -36,7 +39,7 @@ function getObjectUrlFromTags(config) {
   // pixels: small gradient square
   if (config.tags.Modality !== 'KO') {
     dicomElements.x7FE00010 =
-      dwv.dicom.generatePixelDataFromJSONTags(config.tags);
+      test.generatePixelDataFromJSONTags(config.tags);
   }
 
   // create DICOM buffer

@@ -1,3 +1,6 @@
+// namespaces
+var test = test || {};
+
 // setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
@@ -152,7 +155,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   // convert JSON to DICOM element object
   var dicomElements = dwv.dicom.getElementsFromJSONTags(tags);
   // pixels
-  dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(
+  dicomElements.x7FE00010 = test.generatePixelDataFromJSONTags(
     tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
 
   // create writer
@@ -242,8 +245,8 @@ function onInputImageFiles(event) {
     return false;
   };
   var pixGeneratorName = getPixelGeneratorName();
-  if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] !== 'undefined') {
-    checkTags = dwv.dicom.pixelGenerators[pixGeneratorName].checkTags;
+  if (typeof test.pixelGenerators[pixGeneratorName] !== 'undefined') {
+    checkTags = test.pixelGenerators[pixGeneratorName].checkTags;
   }
 
   /**

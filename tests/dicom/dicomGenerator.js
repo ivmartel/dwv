@@ -1,12 +1,11 @@
-import {logger} from '../../src/utils/logger';
-import {getTypedArray} from '../../src/dicom/dicomParser';
-import {getPixelDataTag} from '../../src/dicom/dicomTag';
-import {FilePixGenerator} from './filePixGenerator';
-import {GradSquarePixGenerator} from './gradSquarePixGenerator';
-import {MPRPixGenerator} from './mprPixGenerator';
+// namespaces
+var test = test || {};
+
+// List of pixel generators
+test.pixelGenerators = test.pixelGenerators || {};
 
 // List of required tags for generating pixel data
-export const RequiredPixelTags = [
+test.RequiredPixelTags = [
   'TransferSyntaxUID',
   'Rows',
   'Columns',
@@ -24,7 +23,7 @@ export const RequiredPixelTags = [
  * @param {boolean} withLog Flag to log errors or not.
  * @returns {boolean} True if all required tags are present in the input.
  */
-export function checkTags(tags, requiredTags, withLog) {
+function checkTags(tags, requiredTags, withLog) {
   if (typeof withLog === 'undefined') {
     withLog = false;
   }
@@ -32,7 +31,7 @@ export function checkTags(tags, requiredTags, withLog) {
   for (var i = 0; i < requiredTags.length; ++i) {
     if (typeof tags[requiredTags[i]] === 'undefined') {
       if (withLog) {
-        logger.debug('Missing ' +
+        console.log('Missing ' +
           requiredTags[i] + ' for pixel generation.');
       }
       check = false;
@@ -52,7 +51,7 @@ export function checkTags(tags, requiredTags, withLog) {
  * @param {number} numberOfSlices The result number of slices.
  * @returns {object} The DICOM pixel data element.
  */
-export function generatePixelDataFromJSONTags(
+test.generatePixelDataFromJSONTags = function (
   tags, pixGeneratorName, sliceNumber, images, numberOfSlices) {
 
   // default
@@ -67,7 +66,7 @@ export function generatePixelDataFromJSONTags(
   }
 
   // check tags
-  if (!checkTags(tags, RequiredPixelTags, true)) {
+  if (!checkTags(tags, test.RequiredPixelTags, true)) {
     throw new Error('Missing meta data for dicom creation.');
   }
 
@@ -117,19 +116,14 @@ export function generatePixelDataFromJSONTags(
   }
 
   // create pixel array
-  var pixels = getTypedArray(
+  var pixels = dwv.dicom.getTypedArray(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
-  var pixelGenerators = {
-    file: FilePixGenerator,
-    gradSquare: GradSquarePixGenerator,
-    mpr: MPRPixGenerator
-  };
-  if (typeof pixelGenerators[pixGeneratorName] === 'undefined') {
+  if (typeof test.pixelGenerators[pixGeneratorName] === 'undefined') {
     throw new Error('Unknown PixelData generator: ' + pixGeneratorName);
   }
-  var GeneratorClass = pixelGenerators[pixGeneratorName];
+  var GeneratorClass = test.pixelGenerators[pixGeneratorName].generator;
   var generator = new GeneratorClass({
     numberOfColumns: numberOfColumns,
     numberOfRows: numberOfRows,
@@ -153,12 +147,12 @@ export function generatePixelDataFromJSONTags(
   }
   var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    tag: getPixelDataTag(),
+    tag: dwv.dicom.getPixelDataTag(),
     vr: vr,
     vl: pixVL,
     value: pixels
   };
-}
+};
 
 /**
  * Extract the image data from an image.
@@ -166,7 +160,7 @@ export function generatePixelDataFromJSONTags(
  * @param {Image} image The image to get the data from.
  * @returns {object} The image data buffer.
  */
-export function getImageDataData(image) {
+test.getImageDataData = function (image) {
   // draw the image in the canvas in order to get its data
   var canvas = document.createElement('canvas');
   canvas.width = image.width;
@@ -177,4 +171,4 @@ export function getImageDataData(image) {
   var imageData = ctx.getImageData(0, 0, image.width, image.height);
   // data.data
   return imageData.data;
-}
+};
