@@ -25,14 +25,14 @@ export const InteractionEventNames = [
  */
 export function getElement(containerDivId, name) {
   // get by class in the container div
-  var parent = document.getElementById(containerDivId);
+  const parent = document.getElementById(containerDivId);
   if (!parent) {
     return null;
   }
-  var elements = parent.getElementsByClassName(name);
+  const elements = parent.getElementsByClassName(name);
   // getting the last element since some libraries (ie jquery-mobile) create
   // span in front of regular tags (such as select)...
-  var element = elements[elements.length - 1];
+  let element = elements[elements.length - 1];
   // if not found get by id with 'containerDivId-className'
   if (typeof element === 'undefined') {
     element = document.getElementById(containerDivId + '-' + name);
@@ -64,11 +64,11 @@ export const customUI = {};
  */
 function getTouchesPositions(touches) {
   // get the touch offset from all its parents
-  var offsetLeft = 0;
-  var offsetTop = 0;
+  let offsetLeft = 0;
+  let offsetTop = 0;
   if (touches.length !== 0 &&
     typeof touches[0].target !== 'undefined') {
-    var offsetParent = touches[0].target.offsetParent;
+    let offsetParent = touches[0].target.offsetParent;
     while (offsetParent) {
       if (!isNaN(offsetParent.offsetLeft)) {
         offsetLeft += offsetParent.offsetLeft;
@@ -82,8 +82,8 @@ function getTouchesPositions(touches) {
     logger.debug('No touch target offset parent.');
   }
   // set its position
-  var positions = [];
-  for (var i = 0; i < touches.length; ++i) {
+  const positions = [];
+  for (let i = 0; i < touches.length; ++i) {
     positions.push({
       x: touches[i].pageX - offsetLeft,
       y: touches[i].pageY - offsetTop
@@ -99,7 +99,7 @@ function getTouchesPositions(touches) {
  * @returns {Array} The array of offsets.
  */
 export function getEventOffset(event) {
-  var positions = [];
+  let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
@@ -132,16 +132,16 @@ export function getEventOffset(event) {
  */
 export function canCreateCanvas(width, height) {
   // test canvas with input size
-  var testCvs = document.createElement('canvas');
+  const testCvs = document.createElement('canvas');
   testCvs.width = width;
   testCvs.height = height;
   // crop canvas to speed up test
-  var cropCvs = document.createElement('canvas');
+  const cropCvs = document.createElement('canvas');
   cropCvs.width = 1;
   cropCvs.height = 1;
   // contexts
-  var testCtx = testCvs.getContext('2d');
-  var cropCtx = cropCvs.getContext('2d');
+  const testCtx = testCvs.getContext('2d');
+  const cropCtx = cropCvs.getContext('2d');
   // set data
   if (testCtx) {
     testCtx.fillRect(width - 1, height - 1, 1, 1);

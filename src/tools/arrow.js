@@ -63,9 +63,9 @@ export class ArrowFactory {
    */
   create(points, style, _viewController) {
     // physical shape
-    var line = new Line(points[0], points[1]);
+    const line = new Line(points[0], points[1]);
     // draw shape
-    var kshape = new Konva.Line({
+    const kshape = new Konva.Line({
       points: [line.getBegin().getX(),
         line.getBegin().getY(),
         line.getEnd().getX(),
@@ -76,9 +76,9 @@ export class ArrowFactory {
       name: 'shape'
     });
     // larger hitfunc
-    var linePerp0 = getPerpendicularLine(
+    const linePerp0 = getPerpendicularLine(
       line, points[0], style.scale(10));
-    var linePerp1 = getPerpendicularLine(
+    const linePerp1 = getPerpendicularLine(
       line, points[1], style.scale(10));
     kshape.hitFunc(function (context) {
       context.beginPath();
@@ -90,14 +90,14 @@ export class ArrowFactory {
       context.fillStrokeShape(this);
     });
     // triangle
-    var beginTy = new Point2D(
+    const beginTy = new Point2D(
       line.getBegin().getX(),
       line.getBegin().getY() - 10);
-    var verticalLine = new Line(line.getBegin(), beginTy);
-    var angle = getAngle(line, verticalLine);
-    var angleRad = angle * Math.PI / 180;
-    var radius = 5 * style.getScaledStrokeWidth();
-    var kpoly = new Konva.RegularPolygon({
+    const verticalLine = new Line(line.getBegin(), beginTy);
+    const angle = getAngle(line, verticalLine);
+    const angleRad = angle * Math.PI / 180;
+    const radius = 5 * style.getScaledStrokeWidth();
+    const kpoly = new Konva.RegularPolygon({
       x: line.getBegin().getX() + radius * Math.sin(angleRad),
       y: line.getBegin().getY() + radius * Math.cos(angleRad),
       sides: 3,
@@ -109,7 +109,7 @@ export class ArrowFactory {
       name: 'shape-triangle'
     });
     // quantification
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
@@ -118,7 +118,7 @@ export class ArrowFactory {
       shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // TODO: allow override?
     // if (typeof arrowLabelText !== 'undefined') {
     //   textExpr = arrowLabelText;
@@ -132,9 +132,9 @@ export class ArrowFactory {
       quantification: {}
     };
     // label
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
-    var klabel = new Konva.Label({
+    const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
+    const klabel = new Konva.Label({
       x: line.getEnd().getX() + dX * ktext.width(),
       y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
       scale: style.applyZoomScale(1),
@@ -148,7 +148,7 @@ export class ArrowFactory {
     }));
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     group.add(klabel);
     group.add(kpoly);
@@ -165,9 +165,9 @@ export class ArrowFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var points = shape.points();
+    const points = shape.points();
 
-    var anchors = [];
+    const anchors = [];
     anchors.push(getDefaultAnchor(
       points[0] + shape.x(), points[1] + shape.y(), 'begin', style
     ));
@@ -186,24 +186,24 @@ export class ArrowFactory {
    */
   update(anchor, style, _viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function (node) {
+    const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
       // associated triangle shape
-    var ktriangle = group.getChildren(function (node) {
+    const ktriangle = group.getChildren(function (node) {
       return node.name() === 'shape-triangle';
     })[0];
       // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
       // find special points
-    var begin = group.getChildren(function (node) {
+    const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
-    var end = group.getChildren(function (node) {
+    const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
       // update special points
@@ -219,20 +219,20 @@ export class ArrowFactory {
     }
     // update shape and compensate for possible drag
     // note: shape.position() and shape.size() won't work...
-    var bx = begin.x() - kline.x();
-    var by = begin.y() - kline.y();
-    var ex = end.x() - kline.x();
-    var ey = end.y() - kline.y();
+    const bx = begin.x() - kline.x();
+    const by = begin.y() - kline.y();
+    const ex = end.x() - kline.x();
+    const ey = end.y() - kline.y();
     kline.points([bx, by, ex, ey]);
     // new line
-    var p2d0 = new Point2D(begin.x(), begin.y());
-    var p2d1 = new Point2D(end.x(), end.y());
-    var line = new Line(p2d0, p2d1);
+    const p2d0 = new Point2D(begin.x(), begin.y());
+    const p2d1 = new Point2D(end.x(), end.y());
+    const line = new Line(p2d0, p2d1);
     // larger hitfunc
-    var p2b = new Point2D(bx, by);
-    var p2e = new Point2D(ex, ey);
-    var linePerp0 = getPerpendicularLine(line, p2b, 10);
-    var linePerp1 = getPerpendicularLine(line, p2e, 10);
+    const p2b = new Point2D(bx, by);
+    const p2e = new Point2D(ex, ey);
+    const linePerp0 = getPerpendicularLine(line, p2b, 10);
+    const linePerp1 = getPerpendicularLine(line, p2e, 10);
     kline.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -243,12 +243,12 @@ export class ArrowFactory {
       context.fillStrokeShape(this);
     });
     // udate triangle
-    var beginTy = new Point2D(
+    const beginTy = new Point2D(
       line.getBegin().getX(),
       line.getBegin().getY() - 10);
-    var verticalLine = new Line(line.getBegin(), beginTy);
-    var angle = getAngle(line, verticalLine);
-    var angleRad = angle * Math.PI / 180;
+    const verticalLine = new Line(line.getBegin(), beginTy);
+    const angle = getAngle(line, verticalLine);
+    const angleRad = angle * Math.PI / 180;
     ktriangle.x(
       line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
     ktriangle.y(
@@ -256,12 +256,12 @@ export class ArrowFactory {
     ktriangle.rotation(-angle);
 
     // update text
-    var ktext = klabel.getText();
+    const ktext = klabel.getText();
     ktext.setText(ktext.meta.textExpr);
     // update position
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
-    var textPos = {
+    const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
+    const textPos = {
       x: line.getEnd().getX() + dX * ktext.width(),
       y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
     };

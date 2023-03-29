@@ -159,30 +159,30 @@ QUnit.test('Test getFlags.', function (assert) {
   assert.equal(
     getFlags().length, 0, 'getFlags undefined');
   // nothing to do
-  var str00 = 'abcd';
+  const str00 = 'abcd';
   assert.equal(
     getFlags(str00).length, 0, 'getFlags nothing to do');
   // empty braces
-  var str01 = '{}';
+  const str01 = '{}';
   assert.equal(
     getFlags(str01).length, 0, 'getFlags empty braces');
 
   // real #0
-  var str10 = '{a}';
+  const str10 = '{a}';
   assert.equal(
     getFlags(str10)[0], 'a', 'getFlags #0');
   // real #1
-  var str11 = 'aaa{a}aaa';
+  const str11 = 'aaa{a}aaa';
   assert.equal(
     getFlags(str11)[0], 'a', 'getFlags #1');
   // real #2
-  var str12 = '{a}-{b}-{c}';
-  var res12 = getFlags(str12);
+  const str12 = '{a}-{b}-{c}';
+  const res12 = getFlags(str12);
   assert.equal(res12[0], 'a', 'getFlags #2.0');
   assert.equal(res12[1], 'b', 'getFlags #2.1');
   assert.equal(res12[2], 'c', 'getFlags #2.2');
   // real #3
-  var str13 = '{a{b}}';
+  const str13 = '{a{b}}';
   assert.equal(
     getFlags(str13)[0], 'b', 'getFlags #3');
 });
@@ -201,8 +201,8 @@ QUnit.test('Test ReplaceFlags.', function (assert) {
   // empty/undefined
   assert.equal(replaceFlags(''), '', 'ReplaceFlags empty/undefined');
   // real
-  var str = '{a}';
-  var values = {a: {value: 33, unit: 'ohm'}};
+  let str = '{a}';
+  let values = {a: {value: 33, unit: 'ohm'}};
   assert.equal(
     replaceFlags(str, values), '33.00 ohm', 'ReplaceFlags real');
   // real surrounded
@@ -261,48 +261,48 @@ QUnit.test('Test getFileExtension.', function (assert) {
     getFileExtension('filename'),
     null, 'getFileExtension no extension');
   // test #00
-  var test00 = 'image.png';
-  var res00 = 'png';
+  const test00 = 'image.png';
+  const res00 = 'png';
   assert.equal(
     getFileExtension(test00), res00, 'getFileExtension 00: simple');
   // test #01
-  var test01 = 'IMAGE.PNG';
-  var res01 = 'png';
+  const test01 = 'IMAGE.PNG';
+  const res01 = 'png';
   assert.equal(
     getFileExtension(test01), res01,
     'getFileExtension 01: upper case');
   // test #02
-  var test02 = 'image.10.png';
-  var res02 = 'png';
+  const test02 = 'image.10.png';
+  const res02 = 'png';
   assert.equal(
     getFileExtension(test02), res02,
     'getFileExtension 02: multiple dots');
   // test #03
-  var test03 = '.profile';
-  var res03 = null;
+  const test03 = '.profile';
+  const res03 = null;
   assert.equal(
     getFileExtension(test03), res03,
     'getFileExtension 04: start with dot');
   // test #04
-  var test04 = 'MR.1.3.12.123456.123456789';
-  var res04 = null;
+  const test04 = 'MR.1.3.12.123456.123456789';
+  const res04 = null;
   assert.equal(
     getFileExtension(test04), res04,
     'getFileExtension 03: dots and numbers');
 
   // test #10
-  var test10 = '/path/to/file/image.png';
-  var res10 = 'png';
+  const test10 = '/path/to/file/image.png';
+  const res10 = 'png';
   assert.equal(
     getFileExtension(test10), res10, 'getFileExtension 10');
   // test #11
-  var test11 = 'domain.org/path/to/file/image.png';
-  var res11 = 'png';
+  const test11 = 'domain.org/path/to/file/image.png';
+  const res11 = 'png';
   assert.equal(
     getFileExtension(test11), res11, 'getFileExtension 11');
   // test #12
-  var test12 = 'domain.org/path/to/file/IMAGE';
-  var res12 = null;
+  const test12 = 'domain.org/path/to/file/IMAGE';
+  const res12 = null;
   assert.equal(
     getFileExtension(test12), res12, 'getFileExtension 12');
 });

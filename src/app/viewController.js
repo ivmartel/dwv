@@ -197,10 +197,10 @@ export class ViewController {
    * @returns {Index} The index.
    */
   getCurrentOrientedIndex() {
-    var res = this.#view.getCurrentIndex();
+    let res = this.#view.getCurrentIndex();
     if (typeof this.#view.getOrientation() !== 'undefined') {
       // view oriented => image de-oriented
-      var vector = this.#planeHelper.getImageDeOrientedVector3D(
+      const vector = this.#planeHelper.getImageDeOrientedVector3D(
         new Vector3D(res.get(0), res.get(1), res.get(2))
       );
       res = new Index([
@@ -238,7 +238,7 @@ export class ViewController {
    * @returns {object} The value.
    */
   getCurrentScrollPosition() {
-    var scrollIndex = this.#view.getScrollIndex();
+    const scrollIndex = this.#view.getScrollIndex();
     return this.#view.getCurrentPosition().get(scrollIndex);
   }
 
@@ -270,7 +270,7 @@ export class ViewController {
    * @returns {Array} The 2D spacing.
    */
   get2DSpacing() {
-    var spacing = this.#view.getImage().getGeometry().getSpacing();
+    const spacing = this.#view.getImage().getGeometry().getSpacing();
     return [spacing.get(0), spacing.get(1)];
   }
 
@@ -282,13 +282,13 @@ export class ViewController {
    *   or no quantifiable (for ex RGB).
    */
   getRescaledImageValue(position) {
-    var image = this.#view.getImage();
+    const image = this.#view.getImage();
     if (!image.canQuantify()) {
       return;
     }
-    var geometry = image.getGeometry();
-    var index = geometry.worldToIndex(position);
-    var value;
+    const geometry = image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    let value;
     if (geometry.isIndexInBounds(index)) {
       value = image.getRescaledValueAtIndex(index);
     }
@@ -312,32 +312,32 @@ export class ViewController {
    * @returns {Array} A list of values.
    */
   getImageRegionValues(min, max) {
-    var image = this.#view.getImage();
-    var orientation = this.#view.getOrientation();
-    var position = this.getCurrentIndex();
-    var rescaled = true;
+    let image = this.#view.getImage();
+    const orientation = this.#view.getOrientation();
+    let position = this.getCurrentIndex();
+    let rescaled = true;
 
     // created oriented slice if needed
     if (!isIdentityMat33(orientation)) {
       // generate slice values
-      var sliceIter = getSliceIterator(
+      const sliceIter = getSliceIterator(
         image,
         position,
         rescaled,
         orientation
       );
-      var sliceValues = getIteratorValues(sliceIter);
+      const sliceValues = getIteratorValues(sliceIter);
       // oriented geometry
-      var orientedSize = image.getGeometry().getSize(orientation);
-      var sizeValues = orientedSize.getValues();
+      const orientedSize = image.getGeometry().getSize(orientation);
+      const sizeValues = orientedSize.getValues();
       sizeValues[2] = 1;
-      var sliceSize = new Size(sizeValues);
-      var orientedSpacing = image.getGeometry().getSpacing(orientation);
-      var spacingValues = orientedSpacing.getValues();
+      const sliceSize = new Size(sizeValues);
+      const orientedSpacing = image.getGeometry().getSpacing(orientation);
+      const spacingValues = orientedSpacing.getValues();
       spacingValues[2] = 1;
-      var sliceSpacing = new Spacing(spacingValues);
-      var sliceOrigin = new Point3D(0, 0, 0);
-      var sliceGeometry =
+      const sliceSpacing = new Spacing(spacingValues);
+      const sliceOrigin = new Point3D(0, 0, 0);
+      const sliceGeometry =
         new Geometry(sliceOrigin, sliceSize, sliceSpacing);
       // slice image
       image = new Image(sliceGeometry, sliceValues);
@@ -347,9 +347,9 @@ export class ViewController {
     }
 
     // get region values
-    var iter = getRegionSliceIterator(
+    const iter = getRegionSliceIterator(
       image, position, rescaled, min, max);
-    var values = [];
+    let values = [];
     if (iter) {
       values = getIteratorValues(iter);
     }
@@ -363,12 +363,12 @@ export class ViewController {
    * @returns {Array} A list of values.
    */
   getImageVariableRegionValues(regions) {
-    var iter = getVariableRegionSliceIterator(
+    const iter = getVariableRegionSliceIterator(
       this.#view.getImage(),
       this.getCurrentIndex(),
       true, regions
     );
-    var values = [];
+    let values = [];
     if (iter) {
       values = getIteratorValues(iter);
     }
@@ -419,9 +419,9 @@ export class ViewController {
    * @returns {object} The 2D size as {x,y}.
    */
   getImageWorldSize() {
-    var geometry = this.#view.getImage().getGeometry();
-    var size = geometry.getSize(this.#view.getOrientation()).get2D();
-    var spacing = geometry.getSpacing(this.#view.getOrientation()).get2D();
+    const geometry = this.#view.getImage().getGeometry();
+    const size = geometry.getSize(this.#view.getOrientation()).get2D();
+    const spacing = geometry.getSpacing(this.#view.getOrientation()).get2D();
     return {
       x: size.x * spacing.x,
       y: size.y * spacing.y
@@ -444,11 +444,11 @@ export class ViewController {
    * @returns {boolean} True if the associated image has equal meta data.
    */
   equalImageMeta(meta) {
-    var imageMeta = this.#view.getImage().getMeta();
+    const imageMeta = this.#view.getImage().getMeta();
     // loop through input meta keys
-    var metaKeys = Object.keys(meta);
-    for (var i = 0; i < metaKeys.length; ++i) {
-      var metaKey = metaKeys[i];
+    const metaKeys = Object.keys(meta);
+    for (let i = 0; i < metaKeys.length; ++i) {
+      const metaKey = metaKeys[i];
       if (typeof imageMeta[metaKey] === 'undefined') {
         return false;
       }
@@ -489,13 +489,13 @@ export class ViewController {
    */
   getPositionFromPlanePoint(x, y) {
     // keep third direction
-    var k = this.getCurrentScrollIndexValue();
-    var planePoint = new Point3D(x, y, k);
+    const k = this.getCurrentScrollIndexValue();
+    const planePoint = new Point3D(x, y, k);
     // de-orient
-    var point = this.#planeHelper.getImageOrientedVector3D(planePoint);
+    const point = this.#planeHelper.getImageOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
-    var geometry = this.#view.getImage().getGeometry();
-    var point3D = geometry.pointToWorld(point);
+    const geometry = this.#view.getImage().getGeometry();
+    const point3D = geometry.pointToWorld(point);
     // merge with current position to keep extra dimensions
     return this.getCurrentPosition().mergeWith3D(point3D);
   }
@@ -508,10 +508,10 @@ export class ViewController {
    */
   getPlanePositionFromPosition(point3D) {
     // orient
-    var geometry = this.#view.getImage().getGeometry();
+    const geometry = this.#view.getImage().getGeometry();
     // ~worldToIndex to not loose precision
-    var point = geometry.worldToPoint(point3D);
-    var planePoint = this.#planeHelper.getImageDeOrientedVector3D(point);
+    const point = geometry.worldToPoint(point3D);
+    const planePoint = this.#planeHelper.getImageDeOrientedVector3D(point);
     // return
     return {
       x: planePoint.getX(),
@@ -539,13 +539,13 @@ export class ViewController {
    */
   getPlanePositionFromPlanePoint(point2D) {
     // keep third direction
-    var k = this.getCurrentScrollIndexValue();
-    var planePoint = new Point3D(point2D.x, point2D.y, k);
+    const k = this.getCurrentScrollIndexValue();
+    const planePoint = new Point3D(point2D.x, point2D.y, k);
     // de-orient
-    var point = this.#planeHelper.getTargetDeOrientedVector3D(planePoint);
+    const point = this.#planeHelper.getTargetDeOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
-    var geometry = this.#view.getImage().getGeometry();
-    var spacing = geometry.getRealSpacing();
+    const geometry = this.#view.getImage().getGeometry();
+    const spacing = geometry.getRealSpacing();
     return new Point3D(
       point.getX() * spacing.get(0),
       point.getY() * spacing.get(1),
@@ -613,16 +613,16 @@ export class ViewController {
       return;
     }
     if (this.#playerID === null) {
-      var image = this.#view.getImage();
-      var recommendedDisplayFrameRate =
+      const image = this.#view.getImage();
+      const recommendedDisplayFrameRate =
         image.getMeta().RecommendedDisplayFrameRate;
-      var milliseconds = this.#view.getPlaybackMilliseconds(
+      const milliseconds = this.#view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
-      var size = image.getGeometry().getSize();
-      var canScroll3D = size.canScroll3D();
+      const size = image.getGeometry().getSize();
+      const canScroll3D = size.canScroll3D();
 
       this.#playerID = setInterval(() => {
-        var canDoMore = false;
+        let canDoMore = false;
         if (canScroll3D) {
           canDoMore = this.incrementScrollIndex();
         } else {
@@ -630,16 +630,16 @@ export class ViewController {
         }
         // end of scroll, loop back
         if (!canDoMore) {
-          var pos1 = this.getCurrentIndex();
-          var values = pos1.getValues();
-          var orientation = this.#view.getOrientation();
+          const pos1 = this.getCurrentIndex();
+          const values = pos1.getValues();
+          const orientation = this.#view.getOrientation();
           if (canScroll3D) {
             values[orientation.getThirdColMajorDirection()] = 0;
           } else {
             values[3] = 0;
           }
-          var index = new Index(values);
-          var geometry = this.#view.getImage().getGeometry();
+          const index = new Index(values);
+          const geometry = this.#view.getImage().getGeometry();
           this.setCurrentPosition(geometry.indexToWorld(index));
         }
       }, milliseconds);

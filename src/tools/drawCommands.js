@@ -8,7 +8,7 @@ import Konva from 'konva';
  * @returns {string} The display name.
  */
 export function getShapeDisplayName(shape) {
-  var displayName = 'shape';
+  let displayName = 'shape';
   if (shape instanceof Konva.Line) {
     if (shape.points().length === 4) {
       displayName = 'line';
@@ -187,7 +187,7 @@ export class MoveGroupCommand {
    */
   undo() {
     // invert translate group
-    var minusTrans = {
+    const minusTrans = {
       x: -this.#translation.x,
       y: -this.#translation.y
     };

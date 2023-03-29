@@ -8,7 +8,7 @@ import {ScrollWheel} from './scrollWheel';
  * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -70,14 +70,15 @@ export class Opacity {
     }
 
     // difference to last X position
-    var diffX = event._x - this.x0;
-    var xMove = (Math.abs(diffX) > 15);
+    const diffX = event._x - this.x0;
+    const xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove) {
-      var layerDetails = getLayerDetailsFromEvent(event);
-      var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      var viewLayer = layerGroup.getActiveViewLayer();
-      var op = viewLayer.getOpacity();
+      const layerDetails = getLayerDetailsFromEvent(event);
+      const layerGroup =
+        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const op = viewLayer.getOpacity();
       viewLayer.setOpacity(op + (diffX / 200));
       viewLayer.draw();
 

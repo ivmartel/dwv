@@ -47,12 +47,12 @@ export class RawImageLoader {
    */
   #createDataUri(response, dataType) {
     // image type
-    var imageType = dataType;
+    let imageType = dataType;
     if (!imageType || imageType === 'jpg') {
       imageType = 'jpeg';
     }
     // create uri
-    var file = new Blob([response], {type: 'image/' + imageType});
+    const file = new Blob([response], {type: 'image/' + imageType});
     return window.URL.createObjectURL(file);
   }
 
@@ -66,7 +66,7 @@ export class RawImageLoader {
   load(buffer, origin, index) {
     this.#aborted = false;
     // create a DOM image
-    var image = new Image();
+    const image = new Image();
     // triggered by ctx.drawImage
     image.onload = (event) => {
       try {
@@ -96,7 +96,7 @@ export class RawImageLoader {
     image.index = index;
     if (typeof origin === 'string') {
       // url case
-      var ext = origin.split('.').pop().toLowerCase();
+      const ext = origin.split('.').pop().toLowerCase();
       image.src = this.#createDataUri(buffer, ext);
     } else {
       image.src = buffer;
@@ -135,23 +135,23 @@ export class RawImageLoader {
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
       // starts with 'image/'
-      var isImage = function (element) {
+      const isImage = function (element) {
         return element.name === 'Accept' &&
           startsWith(element.value, 'image/');
       };
       return typeof options.requestHeaders.find(isImage) !== 'undefined';
     }
 
-    var urlObjext = getUrlFromUri(url);
+    const urlObjext = getUrlFromUri(url);
     // extension
-    var ext = getFileExtension(urlObjext.pathname);
-    var hasImageExt = (ext === 'jpeg') || (ext === 'jpg') ||
+    const ext = getFileExtension(urlObjext.pathname);
+    const hasImageExt = (ext === 'jpeg') || (ext === 'jpg') ||
       (ext === 'png') || (ext === 'gif');
     // content type (for wado url)
-    var contentType = urlObjext.searchParams.get('contentType');
-    var hasContentType = contentType !== null &&
+    const contentType = urlObjext.searchParams.get('contentType');
+    const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
-    var hasImageContentType = (contentType === 'image/jpeg') ||
+    const hasImageContentType = (contentType === 'image/jpeg') ||
       (contentType === 'image/png') ||
       (contentType === 'image/gif');
 

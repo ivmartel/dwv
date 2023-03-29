@@ -16,7 +16,7 @@ export function generateImageDataPaletteColor(
   colourMap,
   is16BitsStored) {
   // right shift 8
-  var to8 = function (value) {
+  const to8 = function (value) {
     return value >> 8;
   };
 
@@ -24,9 +24,9 @@ export function generateImageDataPaletteColor(
     logger.info('Scaling 16bits data to 8bits.');
   }
 
-  var index = 0;
-  var pxValue = 0;
-  var ival = iterator.next();
+  let index = 0;
+  let pxValue = 0;
+  let ival = iterator.next();
   while (!ival.done) {
     // pixel value
     pxValue = ival.value;

@@ -99,8 +99,8 @@ export class Livewire {
    * @private
    */
   #clearParentPoints(imageSize) {
-    var nrows = imageSize.get(1);
-    for (var i = 0; i < nrows; ++i) {
+    const nrows = imageSize.get(1);
+    for (let i = 0; i < nrows; ++i) {
       this.#parentPoints[i] = [];
     }
   }
@@ -147,11 +147,11 @@ export class Livewire {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var imageSize = viewLayer.getViewController().getImageSize();
-    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const imageSize = viewLayer.getViewController().getImageSize();
+    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
     // first time
     if (!this.#started) {
@@ -163,14 +163,14 @@ export class Livewire {
       this.#clearParentPoints(imageSize);
       this.#shapeGroup = null;
       // update zoom scale
-      var drawLayer = layerGroup.getActiveDrawLayer();
+      const drawLayer = layerGroup.getActiveDrawLayer();
       this.#style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
-      var p = {x: index.get(0), y: index.get(1)};
+      const p = {x: index.get(0), y: index.get(1)};
       this.#scissors.doTraining(p);
       // add the initial point to the path
-      var p0 = new Point2D(index.get(0), index.get(1));
+      const p0 = new Point2D(index.get(0), index.get(1));
       this.#path.addPoint(p0);
       this.#path.addControlPoint(p0);
     } else {
@@ -183,7 +183,7 @@ export class Livewire {
         // anchor point
         this.#path = this.#currentPath;
         this.#clearParentPoints(imageSize);
-        var pn = {x: index.get(0), y: index.get(1)};
+        const pn = {x: index.get(0), y: index.get(1)};
         this.#scissors.doTraining(pn);
         this.#path.addControlPoint(this.#currentPath.getPoint(0));
       }
@@ -199,17 +199,17 @@ export class Livewire {
     if (!this.#started) {
       return;
     }
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
     // set the point to find the path to
-    var p = {x: index.get(0), y: index.get(1)};
+    let p = {x: index.get(0), y: index.get(1)};
     this.#scissors.setPoint(p);
     // do the work
-    var results = 0;
-    var stop = false;
+    let results = 0;
+    let stop = false;
     while (!this.#parentPoints[p.y][p.x] && !stop) {
       results = this.#scissors.doWork();
 
@@ -217,9 +217,9 @@ export class Livewire {
         stop = true;
       } else {
         // fill parents
-        for (var i = 0; i < results.length - 1; i += 2) {
-          var _p = results[i];
-          var _q = results[i + 1];
+        for (let i = 0; i < results.length - 1; i += 2) {
+          const _p = results[i];
+          const _q = results[i + 1];
           this.#parentPoints[_p.y][_p.x] = _q;
         }
       }
@@ -247,16 +247,16 @@ export class Livewire {
       this.#shapeGroup.destroy();
     }
     // create shape
-    var factory = new RoiFactory();
+    const factory = new RoiFactory();
     this.#shapeGroup = factory.create(
       this.#currentPath.pointArray, this.#style);
     this.#shapeGroup.id(guid());
 
-    var drawLayer = layerGroup.getActiveDrawLayer();
-    var drawController = drawLayer.getDrawController();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const drawController = drawLayer.getDrawController();
 
     // get the position group
-    var posGroup = drawController.getCurrentPosGroup();
+    const posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(this.#shapeGroup);
 
@@ -343,11 +343,11 @@ export class Livewire {
   activate(bool) {
     // start scissors if displayed
     if (bool) {
-      var layerGroup = this.#app.getActiveLayerGroup();
-      var viewLayer = layerGroup.getActiveViewLayer();
+      const layerGroup = this.#app.getActiveLayerGroup();
+      const viewLayer = layerGroup.getActiveViewLayer();
 
       //scissors = new Scissors();
-      var imageSize = viewLayer.getViewController().getImageSize();
+      const imageSize = viewLayer.getViewController().getImageSize();
       this.#scissors.setDimensions(
         imageSize.get(0),
         imageSize.get(1));

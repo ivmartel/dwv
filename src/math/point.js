@@ -245,7 +245,7 @@ export class Point {
     if (values.length === 0) {
       throw new Error('Cannot create point with empty values.');
     }
-    var valueCheck = function (val) {
+    const valueCheck = function (val) {
       return !isNaN(val);
     };
     if (!values.every(valueCheck)) {
@@ -322,7 +322,7 @@ export class Point {
       return false;
     }
     // check values
-    for (var i = 0, leni = this.length(); i < leni; ++i) {
+    for (let i = 0, leni = this.length(); i < leni; ++i) {
       if (this.get(i) !== rhs.get(i)) {
         return false;
       }
@@ -343,8 +343,8 @@ export class Point {
       return null;
     }
     // check values
-    var diffDims = [];
-    for (var i = 0, leni = this.length(); i < leni; ++i) {
+    const diffDims = [];
+    for (let i = 0, leni = this.length(); i < leni; ++i) {
       if (this.get(i) !== rhs.get(i)) {
         diffDims.push(i);
       }
@@ -372,10 +372,10 @@ export class Point {
     if (!this.canCompare(rhs)) {
       return null;
     }
-    var values = [];
-    var values0 = this.getValues();
-    var values1 = rhs.getValues();
-    for (var i = 0; i < values0.length; ++i) {
+    const values = [];
+    const values0 = this.getValues();
+    const values1 = rhs.getValues();
+    for (let i = 0; i < values0.length; ++i) {
       values.push(values0[i] + values1[i]);
     }
     return new Point(values);
@@ -388,7 +388,7 @@ export class Point {
    * @returns {Point} The merge result.
    */
   mergeWith3D(rhs) {
-    var values = this.getValues();
+    const values = this.getValues();
     values[0] = rhs.getX();
     values[1] = rhs.getY();
     values[2] = rhs.getZ();

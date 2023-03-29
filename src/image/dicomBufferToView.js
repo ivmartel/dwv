@@ -53,10 +53,10 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #generateImage(index, origin) {
-    var dicomElements = this.#dicomParserStore[index].getDicomElements();
+    const dicomElements = this.#dicomParserStore[index].getDicomElements();
 
-    var modality = cleanString(dicomElements.getFromKey('x00080060'));
-    var factory;
+    const modality = cleanString(dicomElements.getFromKey('x00080060'));
+    let factory;
     if (modality && modality === 'SEG') {
       factory = new MaskFactory();
     } else {
@@ -65,7 +65,7 @@ export class DicomBufferToView {
 
     // create the image
     try {
-      var image = factory.create(
+      const image = factory.create(
         dicomElements,
         this.#finalBufferStore[index],
         this.#options.numberOfFiles);
@@ -103,21 +103,22 @@ export class DicomBufferToView {
       source: origin
     });
 
-    var dataIndex = event.dataIndex;
+    const dataIndex = event.dataIndex;
 
     // store decoded data
-    var decodedData = event.data[0];
+    const decodedData = event.data[0];
     if (event.numberOfItems !== 1) {
       // allocate buffer if not done yet
       if (typeof this.#decompressedSizes[dataIndex] === 'undefined') {
         this.#decompressedSizes[dataIndex] = decodedData.length;
-        var fullSize = event.numberOfItems * this.#decompressedSizes[dataIndex];
+        const fullSize = event.numberOfItems *
+          this.#decompressedSizes[dataIndex];
         try {
           this.#finalBufferStore[dataIndex] =
             new decodedData.constructor(fullSize);
         } catch (error) {
           if (error instanceof RangeError) {
-            var powerOf2 = Math.floor(Math.log(fullSize) / Math.log(2));
+            const powerOf2 = Math.floor(Math.log(fullSize) / Math.log(2));
             logger.error('Cannot allocate ' +
               decodedData.constructor.name +
               ' of size: ' +
@@ -170,8 +171,8 @@ export class DicomBufferToView {
     });
 
     // DICOM parser
-    var dicomParser = new DicomParser();
-    var imageFactory = new ImageFactory();
+    const dicomParser = new DicomParser();
+    const imageFactory = new ImageFactory();
 
     if (typeof this.#options.defaultCharacterSet !== 'undefined') {
       dicomParser.setDefaultCharacterSet(this.#options.defaultCharacterSet);
@@ -192,13 +193,13 @@ export class DicomBufferToView {
       return;
     }
 
-    var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+    const pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
     // help GC: discard pixel buffer from elements
     dicomParser.getRawDicomElements().x7FE00010.value = [];
-    var syntax = cleanString(
+    const syntax = cleanString(
       dicomParser.getRawDicomElements().x00020010.value[0]);
-    var algoName = getSyntaxDecompressionName(syntax);
-    var needDecompression = (algoName !== null);
+    const algoName = getSyntaxDecompressionName(syntax);
+    const needDecompression = (algoName !== null);
 
     // store
     this.#dicomParserStore[dataIndex] = dicomParser;
@@ -206,31 +207,33 @@ export class DicomBufferToView {
 
     if (needDecompression) {
       // gather pixel buffer meta data
-      var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
-      var pixelRepresentation =
+      const bitsAllocated =
+        dicomParser.getRawDicomElements().x00280100.value[0];
+      const pixelRepresentation =
         dicomParser.getRawDicomElements().x00280103.value[0];
-      var pixelMeta = {
+      const pixelMeta = {
         bitsAllocated: bitsAllocated,
         isSigned: (pixelRepresentation === 1)
       };
-      var columnsElement = dicomParser.getRawDicomElements().x00280011;
-      var rowsElement = dicomParser.getRawDicomElements().x00280010;
+      const columnsElement = dicomParser.getRawDicomElements().x00280011;
+      const rowsElement = dicomParser.getRawDicomElements().x00280010;
       if (typeof columnsElement !== 'undefined' &&
         typeof rowsElement !== 'undefined') {
         pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
       }
-      var samplesPerPixelElement = dicomParser.getRawDicomElements().x00280002;
+      const samplesPerPixelElement =
+        dicomParser.getRawDicomElements().x00280002;
       if (typeof samplesPerPixelElement !== 'undefined') {
         pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
       }
-      var planarConfigurationElement =
+      const planarConfigurationElement =
         dicomParser.getRawDicomElements().x00280006;
       if (typeof planarConfigurationElement !== 'undefined') {
         pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
       }
 
       // number of items
-      var numberOfItems = pixelBuffer.length;
+      const numberOfItems = pixelBuffer.length;
 
       // setup the decoder (one decoder per all converts)
       if (this.#pixelDecoder === null) {
@@ -253,7 +256,7 @@ export class DicomBufferToView {
       }
 
       // launch decode
-      for (var i = 0; i < numberOfItems; ++i) {
+      for (let i = 0; i < numberOfItems; ++i) {
         this.#pixelDecoder.decode(pixelBuffer[i], pixelMeta,
           {
             itemNumber: i,

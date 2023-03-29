@@ -97,9 +97,9 @@ export class Threshold {
    * @returns {Image} The transformed image.
    */
   update() {
-    var image = this.getOriginalImage();
-    var imageMin = image.getDataRange().min;
-    var threshFunction = (value) => {
+    const image = this.getOriginalImage();
+    const imageMin = image.getDataRange().min;
+    const threshFunction = (value) => {
       if (value < this.getMin() || value > this.getMax()) {
         return imageMin;
       } else {
@@ -158,7 +158,7 @@ export class Sharpen {
    * @returns {Image} The transformed image.
    */
   update() {
-    var image = this.getOriginalImage();
+    const image = this.getOriginalImage();
     /* eslint-disable array-element-newline */
     return image.convolute2D([
       0, -1, 0,
@@ -217,14 +217,14 @@ export class Sobel {
    * @returns {Image} The transformed image.
    */
   update() {
-    var image = this.getOriginalImage();
+    const image = this.getOriginalImage();
     /* eslint-disable array-element-newline */
-    var gradX = image.convolute2D([
+    const gradX = image.convolute2D([
       1, 0, -1,
       2, 0, -2,
       1, 0, -1
     ]);
-    var gradY = image.convolute2D([
+    const gradY = image.convolute2D([
       1, 2, 1,
       0, 0, 0,
       -1, -2, -1

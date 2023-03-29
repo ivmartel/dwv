@@ -32,8 +32,8 @@ export function getDwvVersion() {
  * @returns {boolean} True if the buffer includes the prefix.
  */
 export function hasDicomPrefix(buffer) {
-  var prefixArray = new Uint8Array(buffer, 128, 4);
-  var stringReducer = function (previous, current) {
+  const prefixArray = new Uint8Array(buffer, 128, 4);
+  const stringReducer = function (previous, current) {
     return previous += String.fromCharCode(current);
   };
   return prefixArray.reduce(stringReducer, '') === 'DICM';
@@ -46,7 +46,7 @@ export function hasDicomPrefix(buffer) {
  * @returns {string} The cleaned string.
  */
 export function cleanString(inputStr) {
-  var res = inputStr;
+  let res = inputStr;
   if (inputStr) {
     // trim spaces
     res = inputStr.trim();
@@ -69,7 +69,7 @@ export function cleanString(inputStr) {
  * @returns {string} The corresponding UTF label.
  */
 function getUtfLabel(charSetTerm) {
-  var label = 'utf-8';
+  let label = 'utf-8';
   if (charSetTerm === 'ISO_IR 100') {
     label = 'iso-8859-1';
   } else if (charSetTerm === 'ISO_IR 101') {
@@ -123,8 +123,8 @@ class DefaultTextDecoder {
    * @returns {string} The decoded string.
    */
   decode(buffer) {
-    var result = '';
-    for (var i = 0, leni = buffer.length; i < leni; ++i) {
+    let result = '';
+    for (let i = 0, leni = buffer.length; i < leni; ++i) {
       result += String.fromCharCode(buffer[i]);
     }
     return result;
@@ -142,7 +142,7 @@ export function getReverseOrientation(ori) {
     return null;
   }
   // reverse labels
-  var rlabels = {
+  const rlabels = {
     L: 'R',
     R: 'L',
     A: 'P',
@@ -151,10 +151,10 @@ export function getReverseOrientation(ori) {
     F: 'H'
   };
 
-  var rori = '';
-  for (var n = 0; n < ori.length; n++) {
-    var o = ori.substring(n, n + 1);
-    var r = rlabels[o];
+  let rori = '';
+  for (let n = 0; n < ori.length; n++) {
+    const o = ori.substring(n, n + 1);
+    const r = rlabels[o];
     if (r) {
       rori += r;
     }
@@ -170,10 +170,10 @@ export function getReverseOrientation(ori) {
  * @returns {string} The orientation name: axial, coronal or sagittal.
  */
 export function getOrientationName(orientation) {
-  var axialOrientation = [1, 0, 0, 0, 1, 0];
-  var coronalOrientation = [1, 0, 0, 0, 0, -1];
-  var sagittalOrientation = [0, 1, 0, 0, 0, -1];
-  var name;
+  const axialOrientation = [1, 0, 0, 0, 1, 0];
+  const coronalOrientation = [1, 0, 0, 0, 0, -1];
+  const sagittalOrientation = [0, 1, 0, 0, 0, -1];
+  let name;
   if (arrayEquals(orientation, axialOrientation)) {
     name = 'axial';
   } else if (arrayEquals(orientation, coronalOrientation)) {
@@ -276,7 +276,7 @@ function isRleTransferSyntax(syntax) {
  * @returns {string} The name of the decompression algorithm.
  */
 export function getSyntaxDecompressionName(syntax) {
-  var algo = null;
+  let algo = null;
   if (isJpeg2000TransferSyntax(syntax)) {
     algo = 'jpeg2000';
   } else if (isJpegBaselineTransferSyntax(syntax)) {
@@ -320,7 +320,7 @@ function isReadSupportedTransferSyntax(syntax) {
  * @returns {string} The name of the transfer syntax.
  */
 export function getTransferSyntaxName(syntax) {
-  var name = 'Unknown';
+  let name = 'Unknown';
   if (syntax === '1.2.840.10008.1.2') {
     // Implicit VR - Little Endian
     name = 'Little Endian Implicit';
@@ -380,10 +380,10 @@ export function getTransferSyntaxName(syntax) {
  * @returns {object} The transfer syntax data element.
  */
 function guessTransferSyntax(firstDataElement) {
-  var oEightGroupBigEndian = '0x0800';
-  var oEightGroupLittleEndian = '0x0008';
+  const oEightGroupBigEndian = '0x0800';
+  const oEightGroupLittleEndian = '0x0008';
   // check that group is 0x0008
-  var group = firstDataElement.tag.getGroup();
+  const group = firstDataElement.tag.getGroup();
   if (group !== oEightGroupBigEndian &&
     group !== oEightGroupLittleEndian) {
     throw new Error(
@@ -392,13 +392,13 @@ function guessTransferSyntax(firstDataElement) {
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr
-  var vr = firstDataElement.vr;
-  var vr0 = vr.charCodeAt(0);
-  var vr1 = vr.charCodeAt(1);
-  var implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90)
+  const vr = firstDataElement.vr;
+  const vr0 = vr.charCodeAt(0);
+  const vr1 = vr.charCodeAt(1);
+  const implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90)
     ? false : true;
   // guess transfer syntax
-  var syntax = null;
+  let syntax = null;
   if (group === oEightGroupLittleEndian) {
     if (implicit) {
       // ImplicitVRLittleEndian
@@ -420,7 +420,7 @@ function guessTransferSyntax(firstDataElement) {
     }
   }
   // set transfer syntax data element
-  var dataElement = {
+  const dataElement = {
     tag: new Tag('0x0002', '0x0010'),
     vr: 'UI'
   };
@@ -443,7 +443,7 @@ function guessTransferSyntax(firstDataElement) {
  * @returns {Array} The good typed array.
  */
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
-  var res = null;
+  let res = null;
   try {
     if (bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
@@ -466,7 +466,7 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
     }
   } catch (error) {
     if (error instanceof RangeError) {
-      var powerOf2 = Math.floor(Math.log(size) / Math.log(2));
+      const powerOf2 = Math.floor(Math.log(size) / Math.log(2));
       logger.error('Cannot allocate array of size: ' +
         size + ' (>2^' + powerOf2 + ').');
     }
@@ -518,23 +518,23 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  * @class
  * @example
  * // XMLHttpRequest onload callback
- * var onload = function (event) {
+ * const onload = function (event) {
  *   // setup the dicom parser
- *   var dicomParser = new DicomParser();
+ *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the wrapped dicom tags
  *   // (raw tags are available via 'getRawDicomElements')
- *   var tags = dicomParser.getDicomElements();
+ *   const tags = dicomParser.getDicomElements();
  *   // display the modality
- *   var div = document.getElementById('dwv');
+ *   const div = document.getElementById('dwv');
  *   div.appendChild(document.createTextNode(
  *     'Modality: ' + tags.getFromName('Modality')
  *   ));
  * };
  * // DICOM file request
- * var request = new XMLHttpRequest();
- * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
  * request.open('GET', url);
  * request.responseType = 'arraybuffer';
  * request.onload = onload;
@@ -654,10 +654,10 @@ export class DicomParser {
    */
   readTag(reader, offset) {
     // group
-    var group = reader.readHex(offset);
+    const group = reader.readHex(offset);
     offset += Uint16Array.BYTES_PER_ELEMENT;
     // element
-    var element = reader.readHex(offset);
+    const element = reader.readHex(offset);
     offset += Uint16Array.BYTES_PER_ELEMENT;
     // return
     return {
@@ -676,10 +676,10 @@ export class DicomParser {
    */
   readItemDataElement(
     reader, offset, implicit) {
-    var itemData = {};
+    const itemData = {};
 
     // read the first item
-    var item = this.readDataElement(reader, offset, implicit);
+    let item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
 
     // exit if it is a sequence delimitation item
@@ -701,7 +701,7 @@ export class DicomParser {
 
     if (!item.undefinedLength) {
       // explicit VR item: read until the end offset
-      var endOffset = offset;
+      const endOffset = offset;
       offset -= item.vl;
       while (offset < endOffset) {
         item = this.readDataElement(reader, offset, implicit);
@@ -710,7 +710,7 @@ export class DicomParser {
       }
     } else {
       // implicit VR item: read until the item delimitation item
-      var isItemDelim = false;
+      let isItemDelim = false;
       while (!isItemDelim) {
         item = this.readDataElement(reader, offset, implicit);
         offset = item.endOffset;
@@ -739,15 +739,15 @@ export class DicomParser {
    */
   readPixelItemDataElement(
     reader, offset, implicit) {
-    var itemData = [];
+    const itemData = [];
 
     // first item: basic offset table
-    var item = this.readDataElement(reader, offset, implicit);
-    var offsetTableVl = item.vl;
+    let item = this.readDataElement(reader, offset, implicit);
+    const offsetTableVl = item.vl;
     offset = item.endOffset;
 
     // read until the sequence delimitation item
-    var isSeqDelim = false;
+    let isSeqDelim = false;
     while (!isSeqDelim) {
       item = this.readDataElement(reader, offset, implicit);
       offset = item.endOffset;
@@ -779,13 +779,13 @@ export class DicomParser {
   readDataElement(
     reader, offset, implicit) {
     // Tag: group, element
-    var readTagRes = this.readTag(reader, offset);
-    var tag = readTagRes.tag;
+    const readTagRes = this.readTag(reader, offset);
+    const tag = readTagRes.tag;
     offset = readTagRes.endOffset;
 
     // Value Representation (VR)
-    var vr = null;
-    var is32bitVL = false;
+    let vr = null;
+    let is32bitVL = false;
     if (tag.isWithVR()) {
       // implicit VR
       if (implicit) {
@@ -809,7 +809,7 @@ export class DicomParser {
     }
 
     // Value Length (VL)
-    var vl = 0;
+    let vl = 0;
     if (is32bitVL) {
       vl = reader.readUint32(offset);
       offset += Uint32Array.BYTES_PER_ELEMENT;
@@ -819,7 +819,7 @@ export class DicomParser {
     }
 
     // check the value of VL
-    var undefinedLength = false;
+    let undefinedLength = false;
     if (vl === 0xffffffff) {
       undefinedLength = true;
       vl = 0;
@@ -830,14 +830,15 @@ export class DicomParser {
       vr = 'SQ';
     }
 
-    var startOffset = offset;
-    var endOffset = startOffset + vl;
+    let startOffset = offset;
+    let endOffset = startOffset + vl;
 
     // read sequence elements
-    var data = null;
+    let data = null;
     if (isPixelDataTag(tag) && undefinedLength) {
       // pixel data sequence (implicit)
-      var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
+      const pixItemData =
+        this.readPixelItemDataElement(reader, offset, implicit);
       offset = pixItemData.endOffset;
       startOffset += pixItemData.offsetTableVl;
       data = pixItemData.data;
@@ -846,11 +847,11 @@ export class DicomParser {
     } else if (vr === 'SQ') {
       // sequence
       data = [];
-      var itemData;
+      let itemData;
       if (!undefinedLength) {
         if (vl !== 0) {
           // explicit VR sequence: read until the end offset
-          var sqEndOffset = offset + vl;
+          const sqEndOffset = offset + vl;
           while (offset < sqEndOffset) {
             itemData = this.readItemDataElement(reader, offset, implicit);
             data.push(itemData.data);
@@ -861,7 +862,7 @@ export class DicomParser {
         }
       } else {
         // implicit VR sequence: read until the sequence delimitation item
-        var isSeqDelim = false;
+        let isSeqDelim = false;
         while (!isSeqDelim) {
           itemData = this.readItemDataElement(reader, offset, implicit);
           isSeqDelim = itemData.isSeqDelim;
@@ -877,7 +878,7 @@ export class DicomParser {
     }
 
     // return
-    var element = {
+    const element = {
       tag: tag,
       vr: vr,
       vl: vl,
@@ -907,19 +908,19 @@ export class DicomParser {
   interpretElement(
     element, reader, pixelRepresentation, bitsAllocated) {
 
-    var tag = element.tag;
-    var vl = element.vl;
-    var vr = element.vr;
-    var offset = element.startOffset;
+    const tag = element.tag;
+    const vl = element.vl;
+    const vr = element.vr;
+    const offset = element.startOffset;
 
     // data
-    var data = null;
-    var vrType = vrTypes[vr];
+    let data = null;
+    const vrType = vrTypes[vr];
     if (isPixelDataTag(tag)) {
       if (element.undefinedLength) {
         // implicit pixel data sequence
         data = [];
-        for (var j = 0; j < element.items.length; ++j) {
+        for (let j = 0; j < element.items.length; ++j) {
           data.push(this.interpretElement(
             element.items[j], reader,
             pixelRepresentation, bitsAllocated));
@@ -974,7 +975,7 @@ export class DicomParser {
       } else if (vrType === 'Float64') {
         data = reader.readFloat64Array(offset, vl);
       } else if (vrType === 'string') {
-        var stream = reader.readUint8Array(offset, vl);
+        const stream = reader.readUint8Array(offset, vl);
         if (charSetString.includes(vr)) {
           data = this.decodeSpecialString(stream);
         } else {
@@ -1000,12 +1001,12 @@ export class DicomParser {
       }
     } else if (vr === 'AT') {
       // attribute
-      var raw = reader.readUint16Array(offset, vl);
+      const raw = reader.readUint16Array(offset, vl);
       data = [];
-      for (var i = 0, leni = raw.length; i < leni; i += 2) {
-        var stri = raw[i].toString(16);
-        var stri1 = raw[i + 1].toString(16);
-        var str = '(';
+      for (let i = 0, leni = raw.length; i < leni; i += 2) {
+        const stri = raw[i].toString(16);
+        const stri1 = raw[i + 1].toString(16);
+        let str = '(';
         str += '0000'.substring(0, 4 - stri.length) + stri.toUpperCase();
         str += ',';
         str += '0000'.substring(0, 4 - stri1.length) + stri1.toUpperCase();
@@ -1015,12 +1016,12 @@ export class DicomParser {
     } else if (vr === 'SQ') {
       // sequence
       data = [];
-      for (var k = 0; k < element.items.length; ++k) {
-        var item = element.items[k];
-        var itemData = {};
-        var keys = Object.keys(item);
-        for (var l = 0; l < keys.length; ++l) {
-          var subElement = item[keys[l]];
+      for (let k = 0; k < element.items.length; ++k) {
+        const item = element.items[k];
+        const itemData = {};
+        const keys = Object.keys(item);
+        for (let l = 0; l < keys.length; ++l) {
+          const subElement = item[keys[l]];
           subElement.value = this.interpretElement(
             subElement, reader,
             pixelRepresentation, bitsAllocated);
@@ -1056,9 +1057,9 @@ export class DicomParser {
     elements, reader,
     pixelRepresentation, bitsAllocated) {
 
-    var keys = Object.keys(elements);
-    for (var i = 0; i < keys.length; ++i) {
-      var element = elements[keys[i]];
+    const keys = Object.keys(elements);
+    for (let i = 0; i < keys.length; ++i) {
+      const element = elements[keys[i]];
       if (typeof element.value === 'undefined') {
         element.value = this.interpretElement(
           element, reader, pixelRepresentation, bitsAllocated);
@@ -1076,16 +1077,16 @@ export class DicomParser {
    * @param {object} buffer The input array buffer.
    */
   parse(buffer) {
-    var offset = 0;
-    var syntax = '';
-    var dataElement = null;
+    let offset = 0;
+    let syntax = '';
+    let dataElement = null;
     // default readers
-    var metaReader = new DataReader(buffer);
-    var dataReader = new DataReader(buffer);
+    const metaReader = new DataReader(buffer);
+    let dataReader = new DataReader(buffer);
 
     // 128 -> 132: magic word
     offset = 128;
-    var magicword = this.decodeString(metaReader.readUint8Array(offset, 4));
+    const magicword = this.decodeString(metaReader.readUint8Array(offset, 4));
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
     if (magicword === 'DICM') {
       // 0x0002, 0x0000: FileMetaInformationGroupLength
@@ -1096,10 +1097,10 @@ export class DicomParser {
       // store the data element
       this.dicomElements[dataElement.tag.getKey()] = dataElement;
       // get meta length
-      var metaLength = parseInt(dataElement.value[0], 10);
+      const metaLength = parseInt(dataElement.value[0], 10);
 
       // meta elements
-      var metaEnd = offset + metaLength;
+      const metaEnd = offset + metaLength;
       while (offset < metaEnd) {
         // get the data element
         dataElement = this.readDataElement(metaReader, offset, false);
@@ -1121,7 +1122,7 @@ export class DicomParser {
       // read first element
       dataElement = this.readDataElement(dataReader, 0, false);
       // guess transfer syntax
-      var tsElement = guessTransferSyntax(dataElement);
+      const tsElement = guessTransferSyntax(dataElement);
       // store
       this.dicomElements[tsElement.tag.getKey()] = tsElement;
       syntax = cleanString(tsElement.value[0]);
@@ -1136,7 +1137,7 @@ export class DicomParser {
     }
 
     // set implicit flag
-    var implicit = false;
+    let implicit = false;
     if (isImplicitTransferSyntax(syntax)) {
       implicit = true;
     }
@@ -1174,9 +1175,10 @@ export class DicomParser {
     // values needed for data interpretation
 
     // pixel specific
+    let pixelRepresentation = 0;
+    let bitsAllocated = 16;
     if (typeof this.dicomElements.x7FE00010 !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
-      var pixelRepresentation = 0;
       dataElement = this.dicomElements.x00280103;
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
@@ -1187,7 +1189,6 @@ export class DicomParser {
       }
 
       // BitsAllocated
-      var bitsAllocated = 16;
       dataElement = this.dicomElements.x00280100;
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
@@ -1206,7 +1207,7 @@ export class DicomParser {
     dataElement = this.dicomElements.x00080005;
     if (typeof dataElement !== 'undefined') {
       dataElement.value = this.interpretElement(dataElement, dataReader);
-      var charSetTerm;
+      let charSetTerm;
       if (dataElement.value.length === 1) {
         charSetTerm = cleanString(dataElement.value[0]);
       } else {
@@ -1229,32 +1230,32 @@ export class DicomParser {
     dataElement = this.dicomElements.x7FE00010;
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
-        var numberOfFrames = 1;
+        let numberOfFrames = 1;
         if (typeof this.dicomElements.x00280008 !== 'undefined') {
           numberOfFrames = cleanString(
             this.dicomElements.x00280008.value[0]);
         }
-        var pixItems = dataElement.value;
+        const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {
           // concatenate pixel data items
           // concat does not work on typed arrays
           //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
           // manual concat...
-          var nItemPerFrame = pixItems.length / numberOfFrames;
-          var newPixItems = [];
-          var index = 0;
-          for (var f = 0; f < numberOfFrames; ++f) {
+          const nItemPerFrame = pixItems.length / numberOfFrames;
+          const newPixItems = [];
+          let index = 0;
+          for (let f = 0; f < numberOfFrames; ++f) {
             index = f * nItemPerFrame;
             // calculate the size of a frame
-            var size = 0;
-            for (var i = 0; i < nItemPerFrame; ++i) {
+            let size = 0;
+            for (let i = 0; i < nItemPerFrame; ++i) {
               size += pixItems[index + i].length;
             }
             // create new buffer
-            var newBuffer = new pixItems[0].constructor(size);
+            const newBuffer = new pixItems[0].constructor(size);
             // fill new buffer
-            var fragOffset = 0;
-            for (var j = 0; j < nItemPerFrame; ++j) {
+            let fragOffset = 0;
+            for (let j = 0; j < nItemPerFrame; ++j) {
               newBuffer.set(pixItems[index + j], fragOffset);
               fragOffset += pixItems[index + j].length;
             }

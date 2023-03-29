@@ -35,10 +35,10 @@ export class PlaneHelper {
    */
   getOffset3DFromPlaneOffset(offset2D) {
     // make 3D
-    var planeOffset = new Vector3D(
+    const planeOffset = new Vector3D(
       offset2D.x, offset2D.y, 0);
     // de-orient
-    var pixelOffset = this.getTargetDeOrientedVector3D(planeOffset);
+    const pixelOffset = this.getTargetDeOrientedVector3D(planeOffset);
     // ~indexToWorld
     return new Vector3D(
       pixelOffset.getX() * this.#spacing.get(0),
@@ -54,12 +54,12 @@ export class PlaneHelper {
    */
   getPlaneOffsetFromOffset3D(offset3D) {
     // ~worldToIndex
-    var pixelOffset = new Vector3D(
+    const pixelOffset = new Vector3D(
       offset3D.x / this.#spacing.get(0),
       offset3D.y / this.#spacing.get(1),
       offset3D.z / this.#spacing.get(2));
     // orient
-    var planeOffset = this.getTargetOrientedVector3D(pixelOffset);
+    const planeOffset = this.getTargetOrientedVector3D(pixelOffset);
     // make 2D
     return {
       x: planeOffset.getX(),
@@ -74,7 +74,7 @@ export class PlaneHelper {
    * @returns {Vector3D} The oriented vector.
    */
   getTargetOrientedVector3D(vector) {
-    var planeVector = vector;
+    let planeVector = vector;
     if (typeof this.#targetOrientation !== 'undefined') {
       planeVector =
         this.#targetOrientation.getInverse().multiplyVector3D(vector);
@@ -89,7 +89,7 @@ export class PlaneHelper {
    * @returns {Vector3D} The de-orienteded vector.
    */
   getTargetDeOrientedVector3D(planeVector) {
-    var vector = planeVector;
+    let vector = planeVector;
     if (typeof this.#targetOrientation !== 'undefined') {
       vector = this.#targetOrientation.multiplyVector3D(planeVector);
     }
@@ -105,10 +105,10 @@ export class PlaneHelper {
    * @returns {Vector3D} The orienteded vector.
    */
   getImageOrientedVector3D(planeVector) {
-    var vector = planeVector;
+    let vector = planeVector;
     if (typeof this.#viewOrientation !== 'undefined') {
       // image oriented => view de-oriented
-      var values = getDeOrientedArray3D(
+      const values = getDeOrientedArray3D(
         [
           planeVector.getX(),
           planeVector.getY(),
@@ -133,10 +133,10 @@ export class PlaneHelper {
    * @returns {Vector3D} The de-orienteded vector.
    */
   getImageDeOrientedVector3D(vector) {
-    var planeVector = vector;
+    let planeVector = vector;
     if (typeof this.#viewOrientation !== 'undefined') {
       // image de-oriented => view oriented
-      var orientedValues = getOrientedArray3D(
+      const orientedValues = getOrientedArray3D(
         [
           vector.getX(),
           vector.getY(),
@@ -161,7 +161,7 @@ export class PlaneHelper {
    * @returns {object} Reoriented values as {x,y,z}.
    */
   getTargetOrientedPositiveXYZ(values) {
-    var orientedValues = getOrientedArray3D(
+    const orientedValues = getOrientedArray3D(
       [
         values.x,
         values.y,
@@ -181,7 +181,7 @@ export class PlaneHelper {
    * @returns {number} The index.
    */
   getScrollIndex() {
-    var index = null;
+    let index = null;
     if (typeof this.#viewOrientation !== 'undefined') {
       index = this.#viewOrientation.getThirdColMajorDirection();
     } else {
@@ -196,7 +196,7 @@ export class PlaneHelper {
    * @returns {number} The index.
    */
   getNativeScrollIndex() {
-    var index = null;
+    let index = null;
     if (typeof this.#imageOrientation !== 'undefined') {
       index = this.#imageOrientation.getThirdColMajorDirection();
     } else {

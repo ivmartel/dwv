@@ -8,15 +8,15 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  *
  */
 function onDOMContentLoaded() {
-  var infileInput = document.getElementById('infile');
+  const infileInput = document.getElementById('infile');
   infileInput.onchange = onInputDICOMFile;
-  var inrulesfileInput = document.getElementById('inrulesfile');
+  const inrulesfileInput = document.getElementById('inrulesfile');
   inrulesfileInput.onchange = onInputRulesFile;
-  var jsonlintButton = document.getElementById('jsonlint');
+  const jsonlintButton = document.getElementById('jsonlint');
   jsonlintButton.onclick = launchJSONLint;
-  var saveButton = document.getElementById('save');
+  const saveButton = document.getElementById('save');
   saveButton.onclick = saveRules;
-  var generateButton = document.getElementById('generate');
+  const generateButton = document.getElementById('generate');
   generateButton.onclick = generate;
 
   // logger level (optional)
@@ -24,11 +24,11 @@ function onDOMContentLoaded() {
 }
 
 // rules file
-var _rulesFile = null;
+let _rulesFile = null;
 // dicom file
-var _dicomFile = null;
+let _dicomFile = null;
 // DICOM elements
-var _dicomElements = null;
+let _dicomElements = null;
 
 /**
  * Handle DICOM file load
@@ -37,12 +37,12 @@ var _dicomElements = null;
  */
 function onLoadDICOMFile(event) {
   // parse DICOM
-  var parser = new dwv.dicom.DicomParser();
+  const parser = new dwv.dicom.DicomParser();
   parser.parse(event.target.result);
   // store elements
   _dicomElements = parser.getRawDicomElements();
   // activate generate button
-  var element = document.getElementById('generate');
+  const element = document.getElementById('generate');
   element.className = 'button button-active';
 }
 
@@ -55,9 +55,9 @@ function generate() {
     return;
   }
   // create writer with textarea rules
-  var writer = new dwv.dicom.DicomWriter();
+  const writer = new dwv.dicom.DicomWriter();
   writer.rules = JSON.parse(document.getElementById('rules').value);
-  var dicomBuffer = null;
+  let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(_dicomElements);
   } catch (error) {
@@ -65,9 +65,9 @@ function generate() {
     alert(error.message);
   }
   // view as Blob to allow download
-  var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
   // update generate button
-  var element = document.getElementById('generate');
+  const element = document.getElementById('generate');
   element.href = URL.createObjectURL(blob);
   element.download = 'anonym-' + _dicomFile.name;
 }
@@ -81,11 +81,11 @@ function saveRules() {
     return;
   }
   // get text from the textarea
-  var text = document.getElementById('rules').value;
+  const text = document.getElementById('rules').value;
   // view as Blob to allow download
-  var blob = new Blob([text], {type: 'text/plain'});
+  const blob = new Blob([text], {type: 'text/plain'});
   // update save button
-  var element = document.getElementById('save');
+  const element = document.getElementById('save');
   element.download = (_rulesFile === null ? 'rules.json' : _rulesFile.name);
   element.href = URL.createObjectURL(blob);
 }
@@ -109,8 +109,8 @@ function isValidRules() {
  * open JSONLint to check the rules
  */
 function launchJSONLint() {
-  var text = document.getElementById('rules').value;
-  var link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
+  const text = document.getElementById('rules').value;
+  const link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
   window.open(link);
 }
 
@@ -124,7 +124,7 @@ function onInputDICOMFile(event) {
     return;
   }
   _dicomFile = event.target.files[0];
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = onLoadDICOMFile;
   reader.readAsArrayBuffer(_dicomFile);
 }
@@ -139,7 +139,7 @@ function onInputRulesFile(event) {
     return;
   }
   _rulesFile = event.target.files[0];
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function (event) {
     document.getElementById('rules').value = event.target.result;
   };

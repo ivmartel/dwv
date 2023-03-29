@@ -13,9 +13,9 @@ export function generateImageDataMonochrome(
   alphaFunc,
   windowLut,
   colourMap) {
-  var index = 0;
-  var pxValue = 0;
-  var ival = iterator.next();
+  let index = 0;
+  let pxValue = 0;
+  let ival = iterator.next();
   while (!ival.done) {
     // pixel value
     pxValue = windowLut.getValue(ival.value);

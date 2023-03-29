@@ -18,20 +18,20 @@ export class ViewFactory {
    */
   create(dicomElements, image) {
     // view
-    var view = new View(image);
+    const view = new View(image);
 
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
       view.setDefaultColourMap(lut.invPlain);
     } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      var paletteLut = image.getMeta().paletteLut;
+      const paletteLut = image.getMeta().paletteLut;
       if (typeof (paletteLut) !== 'undefined') {
         view.setDefaultColourMap(paletteLut);
       }
     }
 
     // window level presets
-    var windowPresets = {};
+    let windowPresets = {};
     // image presets
     if (typeof image.getMeta().windowPresets !== 'undefined') {
       windowPresets = image.getMeta().windowPresets;
@@ -44,9 +44,9 @@ export class ViewFactory {
     windowPresets.minmax = {name: 'minmax'};
     // optional modality presets
     if (typeof defaultPresets !== 'undefined') {
-      var modality = image.getMeta().Modality;
-      for (var key in defaultPresets[modality]) {
-        var preset = defaultPresets[modality][key];
+      const modality = image.getMeta().Modality;
+      for (let key in defaultPresets[modality]) {
+        const preset = defaultPresets[modality][key];
         windowPresets[key] = {
           wl: new WindowLevel(preset.center, preset.width),
           name: key

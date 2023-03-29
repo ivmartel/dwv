@@ -62,7 +62,7 @@ export class ZipLoader {
 
     // sent un-ziped progress with the data index
     // (max 50% to take into account the memory loading)
-    var unzipPercent = this.#files.length * 100 / this.#zobjs.length;
+    const unzipPercent = this.#files.length * 100 / this.#zobjs.length;
     this.onprogress({
       lengthComputable: true,
       loaded: (unzipPercent / 2),
@@ -77,13 +77,13 @@ export class ZipLoader {
 
     // recursively call until we have all the files
     if (this.#files.length < this.#zobjs.length) {
-      var num = this.#files.length;
+      const num = this.#files.length;
       this.#filename = this.#zobjs[num].name;
       this.#zobjs[num].async('arrayBuffer').then((content) => {
         this.#zipAsyncCallback(content, origin, index);
       });
     } else {
-      var memoryIO = new MemoryLoader();
+      const memoryIO = new MemoryLoader();
       // memoryIO.onloadstart: nothing to do
       memoryIO.onprogress = (progress) => {
         // add 50% to take into account the un-zipping
@@ -126,7 +126,7 @@ export class ZipLoader {
       this.#files = [];
       this.#zobjs = zip.file(/.*\.dcm/);
       // recursively load zip files into the files array
-      var num = this.#files.length;
+      const num = this.#files.length;
       this.#filename = this.#zobjs[num].name;
       this.#zobjs[num].async('arrayBuffer').then((content) => {
         this.#zipAsyncCallback(content, origin, index);
@@ -152,7 +152,7 @@ export class ZipLoader {
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
-    var ext = getFileExtension(file.name);
+    const ext = getFileExtension(file.name);
     return (ext === 'zip');
   }
 
@@ -168,15 +168,15 @@ export class ZipLoader {
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
       // starts with 'application/zip'
-      var isZip = function (element) {
+      const isZip = function (element) {
         return element.name === 'Accept' &&
           startsWith(element.value, 'application/zip');
       };
       return typeof options.requestHeaders.find(isZip) !== 'undefined';
     }
 
-    var urlObjext = getUrlFromUri(url);
-    var ext = getFileExtension(urlObjext.pathname);
+    const urlObjext = getUrlFromUri(url);
+    const ext = getFileExtension(urlObjext.pathname);
     return (ext === 'zip');
   }
 

@@ -1,10 +1,11 @@
 // namespace
+// eslint-disable-next-line no-var
 var dcmb = dcmb || {};
 
 // default test data
-//var githubRaw = 'https://raw.githubusercontent.com/ivmartel/dcmbench/master/data/';
-var githubRaw = '../data/';
-var defaultTestData = [
+//const githubRaw = 'https://raw.githubusercontent.com/ivmartel/dcmbench/master/data/';
+const githubRaw = '../data/';
+const defaultTestData = [
   {
     name: 'bbmri',
     url: githubRaw + 'bbmri-53323131.dcm',
@@ -46,26 +47,26 @@ var defaultTestData = [
     selected: false
   }
 ];
-var parserFunctions = [
+const parserFunctions = [
   {name: 'dwv-previous', selected: true},
   {name: 'dwv-current', selected: true}
 ];
 
 // create default runner object
-var dataRunner = new dcmb.DataRunner();
+const dataRunner = new dcmb.DataRunner();
 dataRunner.setDataList(defaultTestData);
-var benchRunner = new dcmb.BenchFunctionRunner();
+const benchRunner = new dcmb.BenchFunctionRunner();
 dataRunner.setFunctionRunner(benchRunner);
 
 // listen to status changes
 dataRunner.addEventListener('status-change', function (event) {
-  var newStatus = event.value;
+  const newStatus = event.value;
 
   // status text
-  var pStatus = document.getElementById('status');
+  const pStatus = document.getElementById('status');
   pStatus.innerHTML = newStatus;
   // main button
-  var button = document.getElementById('button');
+  const button = document.getElementById('button');
   button.disabled = false;
   if (newStatus === 'ready' ||
     newStatus === 'done' ||
@@ -81,11 +82,11 @@ dataRunner.addEventListener('status-change', function (event) {
   }
 
   if (newStatus === 'done') {
-    var div = document.getElementById('results');
-    var dataHeader = dataRunner.getDataHeader();
-    var results = dataRunner.getResults();
+    const div = document.getElementById('results');
+    const dataHeader = dataRunner.getDataHeader();
+    const results = dataRunner.getResults();
     // use means as table foot
-    var means = ['Mean'];
+    let means = ['Mean'];
     means = means.concat(dcmb.getMeans(results));
     // add to result div
     div.appendChild(dcmb.createTable(
@@ -117,14 +118,14 @@ function checkSelected(parser) {
  * Setup the parsers.
  */
 function setupParsers() {
-  var divParsers = document.getElementById('parsers');
-  var fieldsetElem = divParsers.getElementsByTagName('fieldset')[0];
+  const divParsers = document.getElementById('parsers');
+  const fieldsetElem = divParsers.getElementsByTagName('fieldset')[0];
 
-  var parserName = '';
-  for (var i = 0; i < parserFunctions.length; ++i) {
+  let parserName = '';
+  for (let i = 0; i < parserFunctions.length; ++i) {
     parserName = parserFunctions[i].name;
 
-    var input = document.createElement('input');
+    const input = document.createElement('input');
     input.type = 'checkbox';
     input.name = 'parsers';
     input.id = parserName;
@@ -134,7 +135,7 @@ function setupParsers() {
     };
     input.checked = true;
 
-    var label = document.createElement('label');
+    const label = document.createElement('label');
     label.htmlFor = parserName;
     label.appendChild(document.createTextNode(parserName));
 
@@ -147,19 +148,19 @@ function setupParsers() {
  * Setup the data.
  */
 function setupData() {
-  var dataLi = document.getElementById('data');
-  var data = null;
-  for (var i = 0; i < defaultTestData.length; ++i) {
+  const dataLi = document.getElementById('data');
+  let data = null;
+  for (let i = 0; i < defaultTestData.length; ++i) {
     data = defaultTestData[i];
 
-    var input = document.createElement('input');
+    const input = document.createElement('input');
     input.type = 'checkbox';
     input.className = 'data-item';
     input.checked = data.selected;
     input.id = data.name;
     input.value = data.name;
 
-    var label = document.createElement('label');
+    const label = document.createElement('label');
     label.htmlFor = data.name;
     label.appendChild(document.createTextNode(data.name));
 
@@ -174,9 +175,9 @@ function setupData() {
  * @returns {Array} The selected data.
  */
 function getData() {
-  var dataItemEls = document.getElementsByClassName('data-item');
-  for (var i = 0; i < dataItemEls.length; ++i) {
-    var item = defaultTestData.find(o => o.name === dataItemEls[i].id);
+  const dataItemEls = document.getElementsByClassName('data-item');
+  for (let i = 0; i < dataItemEls.length; ++i) {
+    const item = defaultTestData.find(o => o.name === dataItemEls[i].id);
     if (item) {
       item.selected = dataItemEls[i].checked;
     }
@@ -190,7 +191,7 @@ function getData() {
  * @param {object} input The new parser.
  */
 function onChangeParsers(input) {
-  for (var i = 0; i < parserFunctions.length; ++i) {
+  for (let i = 0; i < parserFunctions.length; ++i) {
     if (parserFunctions[i].name === input.value) {
       parserFunctions[i].selected = input.checked;
       break;
@@ -206,8 +207,8 @@ function onChangeParsers(input) {
  * @param {Array} files The new files.
  */
 dcmb.onChangeInput = function (files) {
-  var inputData = [];
-  for (var i = 0; i < files.length; ++i) {
+  const inputData = [];
+  for (let i = 0; i < files.length; ++i) {
     inputData.push({name: files[i].name,
       file: files[i]});
   }
@@ -220,7 +221,7 @@ dcmb.onChangeInput = function (files) {
  */
 dcmb.onLaunchButton = function () {
   // action according to status
-  var status = dataRunner.getStatus();
+  const status = dataRunner.getStatus();
   if (status === 'ready' ||
     status === 'done' ||
     status === 'cancelled') {
@@ -244,19 +245,19 @@ document.addEventListener('DOMContentLoaded', function (/*event*/) {
   setupData();
 
   // output user agent
-  var preAgent = document.createElement('pre');
+  const preAgent = document.createElement('pre');
   preAgent.appendChild(document.createTextNode('User agent: '));
   preAgent.appendChild(document.createTextNode(navigator.userAgent));
-  var broDiv = document.getElementById('browser');
+  const broDiv = document.getElementById('browser');
   broDiv.appendChild(preAgent);
 
 });
 
 // iframe content is only available at window.onload time
 window.onload = function () {
-  var ifname = '';
-  var func = null;
-  for (var i = 0; i < parserFunctions.length; ++i) {
+  let ifname = '';
+  let func = null;
+  for (let i = 0; i < parserFunctions.length; ++i) {
     ifname = 'iframe-' + parserFunctions[i].name;
     func = document.getElementById(ifname).contentWindow.parse;
     if (func) {

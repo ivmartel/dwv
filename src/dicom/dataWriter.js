@@ -158,7 +158,7 @@ export class DataWriter {
    */
   writeHex(byteOffset, str) {
     // remove first two chars and parse
-    var value = parseInt(str.substring(2), 16);
+    const value = parseInt(str.substring(2), 16);
     this.#view.setUint16(byteOffset, value, this.#isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
   }
@@ -174,11 +174,11 @@ export class DataWriter {
     if (array.length % 8 !== 0) {
       throw new Error('Cannot write boolean array as binary.');
     }
-    var byte = null;
-    var val = null;
-    for (var i = 0, len = array.length; i < len; i += 8) {
+    let byte = null;
+    let val = null;
+    for (let i = 0, len = array.length; i < len; i += 8) {
       byte = 0;
-      for (var j = 0; j < 8; ++j) {
+      for (let j = 0; j < 8; ++j) {
         val = array[i + j] === 0 ? 0 : 1;
         byte += val << j;
       }
@@ -195,7 +195,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeUint8Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeUint8(byteOffset, array[i]);
     }
     return byteOffset;
@@ -209,7 +209,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeInt8Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeInt8(byteOffset, array[i]);
     }
     return byteOffset;
@@ -223,7 +223,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeUint16Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeUint16(byteOffset, array[i]);
     }
     return byteOffset;
@@ -237,7 +237,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeInt16Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeInt16(byteOffset, array[i]);
     }
     return byteOffset;
@@ -251,7 +251,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeUint32Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeUint32(byteOffset, array[i]);
     }
     return byteOffset;
@@ -265,7 +265,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeUint64Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeUint64(byteOffset, array[i]);
     }
     return byteOffset;
@@ -279,7 +279,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeInt32Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeInt32(byteOffset, array[i]);
     }
     return byteOffset;
@@ -293,7 +293,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeInt64Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeInt64(byteOffset, array[i]);
     }
     return byteOffset;
@@ -307,7 +307,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeFloat32Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeFloat32(byteOffset, array[i]);
     }
     return byteOffset;
@@ -321,7 +321,7 @@ export class DataWriter {
    * @returns {number} The new offset position.
    */
   writeFloat64Array(byteOffset, array) {
-    for (var i = 0, len = array.length; i < len; ++i) {
+    for (let i = 0, len = array.length; i < len; ++i) {
       byteOffset = this.writeFloat64(byteOffset, array[i]);
     }
     return byteOffset;

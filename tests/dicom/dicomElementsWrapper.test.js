@@ -21,16 +21,16 @@ QUnit.module('dicom');
 QUnit.test('Test simple DICOM wrapping.', function (assert) {
 
   // parse DICOM
-  var dicomParser = new DicomParser();
+  const dicomParser = new DicomParser();
   dicomParser.parse(b64urlToArrayBuffer(dwvTestSimple));
 
   // wrapped tags
-  var tags = dicomParser.getDicomElements();
+  const tags = dicomParser.getDicomElements();
   // dump to table
-  var table = objectToArray(tags.dumpToObject());
+  const table = objectToArray(tags.dumpToObject());
 
   // regression table
-  var teoTable = [
+  const teoTable = [
     {
       name: 'FileMetaInformationGroupLength',
       value: '90',
@@ -245,11 +245,11 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
   ];
 
   // test
-  var len = table.length;
+  const len = table.length;
   assert.equal(len, teoTable.length, 'dumpToTable length');
 
   // special pixel data case: browsers have different toString
-  for (var i = 0; i < len; ++i) {
+  for (let i = 0; i < len; ++i) {
     if (table[i].name === 'PixelData' &&
       table[i].value === '[object Uint16Array]') {
       table[i].value = '...';

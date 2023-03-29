@@ -1,7 +1,8 @@
 // Do not warn if these variables were not defined before.
 /* global dwv */
 
-// namespaces
+// namespace
+// eslint-disable-next-line no-var
 var test = test || {};
 
 // setup on DOM loaded
@@ -25,12 +26,12 @@ function onDOMContentLoaded() {
  */
 function getObjectUrlFromTags(config) {
   // add private tags to dict if present
-  var useUnVrForPrivateSq = false;
+  let useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
-    var keys = Object.keys(config.privateDictionary);
-    for (var i = 0; i < keys.length; ++i) {
-      var group = keys[i];
-      var tags = config.privateDictionary[group];
+    const keys = Object.keys(config.privateDictionary);
+    for (let i = 0; i < keys.length; ++i) {
+      const group = keys[i];
+      const tags = config.privateDictionary[group];
       dwv.dicom.dictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
@@ -38,7 +39,7 @@ function getObjectUrlFromTags(config) {
     }
   }
   // convert JSON to DICOM element object
-  var dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
+  const dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
   // pixels: small gradient square
   if (config.tags.Modality !== 'KO') {
     dicomElements.x7FE00010 =
@@ -46,12 +47,12 @@ function getObjectUrlFromTags(config) {
   }
 
   // create DICOM buffer
-  var writer = new dwv.dicom.DicomWriter();
+  const writer = new dwv.dicom.DicomWriter();
   writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
-  var dicomBuffer = writer.getBuffer(dicomElements);
+  const dicomBuffer = writer.getBuffer(dicomElements);
 
   // blob and then url
-  var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
   return URL.createObjectURL(blob);
 }
 
@@ -62,21 +63,21 @@ function getObjectUrlFromTags(config) {
  * @returns {object} The html list element.
  */
 function getConfigsHtmlList(configs) {
-  var ul = document.createElement('ul');
-  for (var i = 0; i < configs.length; ++i) {
+  const ul = document.createElement('ul');
+  for (let i = 0; i < configs.length; ++i) {
     // download link
-    var link = document.createElement('a');
+    const link = document.createElement('a');
     try {
       link.href = getObjectUrlFromTags(configs[i]);
     } catch (error) {
       console.log('data:', configs[i].name);
       console.error(error);
     }
-    var fileName = 'dwv-generated-' + configs[i].name + '.dcm';
+    const fileName = 'dwv-generated-' + configs[i].name + '.dcm';
     link.download = fileName;
     link.appendChild(document.createTextNode(fileName));
     // list element
-    var li = document.createElement('li');
+    const li = document.createElement('li');
     li.append(link);
     li.appendChild(document.createTextNode(': ' + configs[i].description));
     // append to list
@@ -91,18 +92,18 @@ function getConfigsHtmlList(configs) {
  * @param {string} fileName The input file name.
  */
 function getFileConfigsHtmlList(fileName) {
-  var url = '/tests/dicom/' + fileName + '.json';
-  var request = new XMLHttpRequest();
+  const url = '/tests/dicom/' + fileName + '.json';
+  const request = new XMLHttpRequest();
   request.open('GET', url, true);
   request.onerror = function (event) {
     console.error(event);
   };
   request.onload = function (/*event*/) {
-    var content = document.getElementById('content');
-    var title = document.createElement('h2');
+    const content = document.getElementById('content');
+    const title = document.createElement('h2');
     title.appendChild(document.createTextNode(fileName));
     content.append(title);
-    var configs = JSON.parse(this.responseText);
+    const configs = JSON.parse(this.responseText);
     content.append(getConfigsHtmlList(configs));
   };
   request.send(null);

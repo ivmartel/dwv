@@ -49,10 +49,10 @@ export class MaskSegmentHelper {
    */
   maskHasSegments(numbers) {
     // create values using displayValue
-    var values = [];
-    var unknowns = [];
-    for (var i = 0; i < numbers.length; ++i) {
-      var segment = this.getSegment(numbers[i]);
+    const values = [];
+    const unknowns = [];
+    for (let i = 0; i < numbers.length; ++i) {
+      const segment = this.getSegment(numbers[i]);
       if (typeof segment !== 'undefined') {
         values.push(segment.displayValue);
       } else {
@@ -60,9 +60,9 @@ export class MaskSegmentHelper {
         unknowns.push(i);
       }
     }
-    var res = this.#mask.hasValues(values);
+    const res = this.#mask.hasValues(values);
     // insert unknowns as false in result
-    for (var j = 0; j < unknowns.length; ++j) {
+    for (let j = 0; j < unknowns.length; ++j) {
       res.splice(unknowns[j], 0, false);
     }
     return res;
@@ -150,7 +150,7 @@ export class MaskSegmentHelper {
    * @param {number} segmentNumber The segment number.
    */
   removeFromHidden(segmentNumber) {
-    var index = this.#getHiddenIndex(segmentNumber);
+    const index = this.#getHiddenIndex(segmentNumber);
     if (index !== -1) {
       this.#hiddenSegments.splice(index, 1);
     } else {
@@ -165,9 +165,9 @@ export class MaskSegmentHelper {
    */
   getAlphaFunc() {
     // get colours
-    var hiddenColours = [{r: 0, g: 0, b: 0}];
-    for (var i = 0; i < this.#hiddenSegments.length; ++i) {
-      var segment = this.getSegment(this.#hiddenSegments[i]);
+    const hiddenColours = [{r: 0, g: 0, b: 0}];
+    for (let i = 0; i < this.#hiddenSegments.length; ++i) {
+      const segment = this.getSegment(this.#hiddenSegments[i]);
       if (typeof segment !== 'undefined') {
         hiddenColours.push(segment.displayValue);
       }
@@ -175,7 +175,7 @@ export class MaskSegmentHelper {
 
     // create alpha function
     return function (value/*, index*/) {
-      for (var i = 0; i < hiddenColours.length; ++i) {
+      for (let i = 0; i < hiddenColours.length; ++i) {
         if (value[0] === hiddenColours[i].r &&
           value[1] === hiddenColours[i].g &&
           value[2] === hiddenColours[i].b) {
@@ -195,7 +195,7 @@ export class MaskSegmentHelper {
    * @param {Function} exeCallback The post execution callback.
    */
   deleteSegment(segmentNumber, cmdCallback, exeCallback) {
-    var delcmd = new DeleteSegmentCommand(
+    const delcmd = new DeleteSegmentCommand(
       this.#mask, this.getSegment(segmentNumber));
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;

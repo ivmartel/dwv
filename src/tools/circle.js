@@ -66,13 +66,13 @@ export class CircleFactory {
   create(
     points, style, viewController) {
     // calculate radius
-    var a = Math.abs(points[0].getX() - points[1].getX());
-    var b = Math.abs(points[0].getY() - points[1].getY());
-    var radius = Math.round(Math.sqrt(a * a + b * b));
+    const a = Math.abs(points[0].getX() - points[1].getX());
+    const b = Math.abs(points[0].getY() - points[1].getY());
+    const radius = Math.round(Math.sqrt(a * a + b * b));
     // physical shape
-    var circle = new Circle(points[0], radius);
+    const circle = new Circle(points[0], radius);
     // draw shape
-    var kshape = new Konva.Circle({
+    const kshape = new Konva.Circle({
       x: circle.getCenter().getX(),
       y: circle.getCenter().getY(),
       radius: circle.getRadius(),
@@ -82,7 +82,7 @@ export class CircleFactory {
       name: 'shape'
     });
     // quantification
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
@@ -91,14 +91,14 @@ export class CircleFactory {
       shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // TODO: allow override?
     // if (typeof circleLabelText !== 'undefined') {
     //   textExpr = circleLabelText;
     // } else {
     textExpr = defaultCircleLabelText;
     // }
-    var quant = circle.quantify(
+    const quant = circle.quantify(
       viewController,
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
@@ -108,7 +108,7 @@ export class CircleFactory {
       quantification: quant
     };
     // label
-    var klabel = new Konva.Label({
+    const klabel = new Konva.Label({
       x: circle.getCenter().getX(),
       y: circle.getCenter().getY(),
       scale: style.applyZoomScale(1),
@@ -122,13 +122,13 @@ export class CircleFactory {
     }));
 
     // debug shadow
-    var kshadow;
+    let kshadow;
     if (DRAW_DEBUG) {
       kshadow = this.#getShadowCircle(circle);
     }
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     if (kshadow) {
       group.add(kshadow);
@@ -147,11 +147,11 @@ export class CircleFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var centerX = shape.x();
-    var centerY = shape.y();
-    var radius = shape.radius();
+    const centerX = shape.x();
+    const centerY = shape.y();
+    const radius = shape.radius();
 
-    var anchors = [];
+    const anchors = [];
     anchors.push(getDefaultAnchor(
       centerX - radius, centerY, 'left', style
     ));
@@ -176,30 +176,30 @@ export class CircleFactory {
    */
   update(anchor, _style, viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kcircle = group.getChildren(function (node) {
+    const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
     // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
     // find special points
-    var left = group.getChildren(function (node) {
+    const left = group.getChildren(function (node) {
       return node.id() === 'left';
     })[0];
-    var right = group.getChildren(function (node) {
+    const right = group.getChildren(function (node) {
       return node.id() === 'right';
     })[0];
-    var bottom = group.getChildren(function (node) {
+    const bottom = group.getChildren(function (node) {
       return node.id() === 'bottom';
     })[0];
-    var top = group.getChildren(function (node) {
+    const top = group.getChildren(function (node) {
       return node.id() === 'top';
     })[0];
     // debug shadow
-    var kshadow;
+    let kshadow;
     if (DRAW_DEBUG) {
       kshadow = group.getChildren(function (node) {
         return node.name() === 'shadow';
@@ -207,12 +207,12 @@ export class CircleFactory {
     }
 
     // circle center
-    var center = {
+    const center = {
       x: kcircle.x(),
       y: kcircle.y()
     };
 
-    var radius;
+    let radius;
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
@@ -260,11 +260,11 @@ export class CircleFactory {
     // update shape: just update the radius
     kcircle.radius(Math.abs(radius));
     // new circle
-    var centerPoint = new Point2D(
+    const centerPoint = new Point2D(
       group.x() + center.x,
       group.y() + center.y
     );
-    var circle = new Circle(centerPoint, radius);
+    const circle = new Circle(centerPoint, radius);
 
     // debug shadow
     if (kshadow) {
@@ -275,7 +275,7 @@ export class CircleFactory {
     }
 
     // update label position
-    var textPos = {x: center.x, y: center.y};
+    const textPos = {x: center.x, y: center.y};
     klabel.position(textPos);
 
     // update quantification
@@ -302,25 +302,25 @@ export class CircleFactory {
   #updateCircleQuantification(
     group, viewController) {
     // associated shape
-    var kcircle = group.getChildren(function (node) {
+    const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
     // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
 
     // positions: add possible group offset
-    var centerPoint = new Point2D(
+    const centerPoint = new Point2D(
       group.x() + kcircle.x(),
       group.y() + kcircle.y()
     );
     // circle
-    var circle = new Circle(centerPoint, kcircle.radius());
+    const circle = new Circle(centerPoint, kcircle.radius());
 
     // update text
-    var ktext = klabel.getText();
-    var quantification = circle.quantify(
+    const ktext = klabel.getText();
+    const quantification = circle.quantify(
       viewController,
       getFlags(ktext.meta.textExpr));
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
@@ -337,21 +337,21 @@ export class CircleFactory {
    */
   #getShadowCircle(circle, group) {
     // possible group offset
-    var offsetX = 0;
-    var offsetY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
     if (typeof group !== 'undefined') {
       offsetX = group.x();
       offsetY = group.y();
     }
-    var kshadow = new Konva.Group();
+    const kshadow = new Konva.Group();
     kshadow.name('shadow');
-    var regions = circle.getRound();
-    for (var i = 0; i < regions.length; ++i) {
-      var region = regions[i];
-      var minX = region[0][0];
-      var minY = region[0][1];
-      var maxX = region[1][0];
-      var pixelLine = new Konva.Rect({
+    const regions = circle.getRound();
+    for (let i = 0; i < regions.length; ++i) {
+      const region = regions[i];
+      const minX = region[0][0];
+      const minY = region[0][1];
+      const maxX = region[1][0];
+      const pixelLine = new Konva.Rect({
         x: minX - offsetX,
         y: minY - offsetY,
         width: maxX - minX,

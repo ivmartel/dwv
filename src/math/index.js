@@ -17,7 +17,7 @@ export class Index {
     if (values.length === 0) {
       throw new Error('Cannot create index with empty values.');
     }
-    var valueCheck = function (val) {
+    const valueCheck = function (val) {
       return !isNaN(val);
     };
     if (!values.every(valueCheck)) {
@@ -94,7 +94,7 @@ export class Index {
       return false;
     }
     // check values
-    for (var i = 0, leni = this.length(); i < leni; ++i) {
+    for (let i = 0, leni = this.length(); i < leni; ++i) {
       if (this.get(i) !== rhs.get(i)) {
         return false;
       }
@@ -115,8 +115,8 @@ export class Index {
       return null;
     }
     // check values
-    var diffDims = [];
-    for (var i = 0, leni = this.length(); i < leni; ++i) {
+    const diffDims = [];
+    for (let i = 0, leni = this.length(); i < leni; ++i) {
       if (this.get(i) !== rhs.get(i)) {
         diffDims.push(i);
       }
@@ -136,8 +136,8 @@ export class Index {
       return null;
     }
     // add values
-    var values = [];
-    for (var i = 0, leni = this.length(); i < leni; ++i) {
+    const values = [];
+    for (let i = 0, leni = this.length(); i < leni; ++i) {
       values.push(this.get(i) + rhs.get(i));
     }
     // seems ok!
@@ -152,8 +152,8 @@ export class Index {
    * @returns {Index} The new index.
    */
   getWithNew2D(i, j) {
-    var values = [i, j];
-    for (var l = 2, lenl = this.length(); l < lenl; ++l) {
+    const values = [i, j];
+    for (let l = 2, lenl = this.length(); l < lenl; ++l) {
       values.push(this.get(l));
     }
     return new Index(values);
@@ -168,17 +168,17 @@ export class Index {
   toStringId(dims) {
     if (typeof dims === 'undefined') {
       dims = [];
-      for (var j = 0; j < this.length(); ++j) {
+      for (let j = 0; j < this.length(); ++j) {
         dims.push(j);
       }
     }
-    for (var ii = 0; ii < dims.length; ++ii) {
+    for (let ii = 0; ii < dims.length; ++ii) {
       if (dims[ii] >= this.length()) {
         throw new Error('Non valid dimension for toStringId.');
       }
     }
-    var res = '';
-    for (var i = 0; i < dims.length; ++i) {
+    let res = '';
+    for (let i = 0; i < dims.length; ++i) {
       if (i !== 0) {
         res += '_';
       }
@@ -196,7 +196,7 @@ export class Index {
  * @returns {Index} The zero index.
  */
 export function getZeroIndex(size) {
-  var values = new Array(size);
+  const values = new Array(size);
   values.fill(0);
   return new Index(values);
 }
@@ -225,11 +225,11 @@ export function getIndexCompareFunction(direction) {
  */
 export function getIndexFromStringId(inputStr) {
   // split ids
-  var strIds = inputStr.split('_');
+  const strIds = inputStr.split('_');
   // get the size of the index
-  var pointLength = 0;
-  var dim;
-  for (var i = 0; i < strIds.length; ++i) {
+  let pointLength = 0;
+  let dim;
+  for (let i = 0; i < strIds.length; ++i) {
     dim = parseInt(strIds[i].substring(1, 2), 10);
     if (dim > pointLength) {
       pointLength = dim;
@@ -239,12 +239,12 @@ export function getIndexFromStringId(inputStr) {
     throw new Error('No dimension found in point stringId');
   }
   // default values
-  var values = new Array(pointLength);
+  const values = new Array(pointLength);
   values.fill(0);
   // get other values from the input string
-  for (var j = 0; j < strIds.length; ++j) {
+  for (let j = 0; j < strIds.length; ++j) {
     dim = parseInt(strIds[j].substring(1, 3), 10);
-    var value = parseInt(strIds[j].substring(3), 10);
+    const value = parseInt(strIds[j].substring(3), 10);
     values[dim] = value;
   }
   return new Index(values);

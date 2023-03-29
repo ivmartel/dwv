@@ -204,11 +204,11 @@ export class DrawLayer {
   addFlipOffsetX() {
     // flip scale is handled by layer group
     // flip offset
-    var scale = this.#konvaStage.scale();
-    var size = this.#konvaStage.size();
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
     this.#flipOffset.x += size.width / scale.x;
     // apply
-    var offset = this.#konvaStage.offset();
+    const offset = this.#konvaStage.offset();
     offset.x += this.#flipOffset.x;
     this.#konvaStage.offset(offset);
   }
@@ -219,11 +219,11 @@ export class DrawLayer {
   addFlipOffsetY() {
     // flip scale is handled by layer group
     // flip offset
-    var scale = this.#konvaStage.scale();
-    var size = this.#konvaStage.size();
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
     this.#flipOffset.y += size.height / scale.y;
     // apply
-    var offset = this.#konvaStage.offset();
+    const offset = this.#konvaStage.offset();
     offset.y += this.#flipOffset.y;
     this.#konvaStage.offset(offset);
   }
@@ -235,20 +235,20 @@ export class DrawLayer {
    * @param {Point3D} center The scale center.
    */
   setScale(newScale, center) {
-    var orientedNewScale =
+    const orientedNewScale =
       this.#planeHelper.getTargetOrientedPositiveXYZ(newScale);
-    var finalNewScale = {
+    const finalNewScale = {
       x: this.#fitScale.x * orientedNewScale.x,
       y: this.#fitScale.y * orientedNewScale.y
     };
 
-    var offset = this.#konvaStage.offset();
+    const offset = this.#konvaStage.offset();
 
     if (Math.abs(newScale.x) === 1 &&
       Math.abs(newScale.y) === 1 &&
       Math.abs(newScale.z) === 1) {
       // reset zoom offset for scale=1
-      var resetOffset = {
+      const resetOffset = {
         x: offset.x - this.#zoomOffset.x,
         y: offset.y - this.#zoomOffset.y
       };
@@ -257,7 +257,7 @@ export class DrawLayer {
       this.#konvaStage.offset(resetOffset);
     } else {
       if (typeof center !== 'undefined') {
-        var worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
+        let worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
           x: center.getX(),
           y: center.getY(),
           z: center.getZ()
@@ -270,10 +270,10 @@ export class DrawLayer {
           y: worldCenter.y + this.#baseOffset.y
         };
 
-        var newOffset = getScaledOffset(
+        const newOffset = getScaledOffset(
           offset, this.#konvaStage.scale(), finalNewScale, worldCenter);
 
-        var newZoomOffset = {
+        const newZoomOffset = {
           x: this.#zoomOffset.x + newOffset.x - offset.x,
           y: this.#zoomOffset.y + newOffset.y - offset.y
         };
@@ -294,7 +294,7 @@ export class DrawLayer {
    * @param {object} newOffset The offset as {x,y}.
    */
   setOffset(newOffset) {
-    var planeNewOffset =
+    const planeNewOffset =
       this.#planeHelper.getPlaneOffsetFromOffset3D(newOffset);
     this.#konvaStage.offset({
       x: planeNewOffset.x +
@@ -318,17 +318,17 @@ export class DrawLayer {
    * @returns {boolean} True if the offset was updated.
    */
   setBaseOffset(scrollOffset, planeOffset) {
-    var scrollIndex = this.#planeHelper.getNativeScrollIndex();
-    var newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
+    const scrollIndex = this.#planeHelper.getNativeScrollIndex();
+    const newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
       x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
       y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
       z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
-    var needsUpdate = this.#baseOffset.x !== newOffset.x ||
+    const needsUpdate = this.#baseOffset.x !== newOffset.x ||
       this.#baseOffset.y !== newOffset.y;
     // reset offset if needed
     if (needsUpdate) {
-      var offset = this.#konvaStage.offset();
+      const offset = this.#konvaStage.offset();
       this.#konvaStage.offset({
         x: offset.x - this.#baseOffset.x + newOffset.x,
         y: offset.y - this.#baseOffset.y + newOffset.y
@@ -389,7 +389,7 @@ export class DrawLayer {
     this.#konvaStage.getContent().setAttribute('style', '');
 
     // create layer
-    var konvaLayer = new Konva.Layer({
+    const konvaLayer = new Konva.Layer({
       listening: false,
       visible: true
     });
@@ -412,7 +412,7 @@ export class DrawLayer {
     this.#konvaStage.setHeight(fitSize.y);
 
     // previous scale without fit
-    var previousScale = {
+    const previousScale = {
       x: this.#konvaStage.scale().x / this.#fitScale.x,
       y: this.#konvaStage.scale().y / this.#fitScale.y
     };
@@ -452,7 +452,7 @@ export class DrawLayer {
    */
   isGroupVisible(id) {
     // get the group
-    var group = this.#drawController.getGroup(id);
+    const group = this.#drawController.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -468,7 +468,7 @@ export class DrawLayer {
    */
   toogleGroupVisibility(id) {
     // get the group
-    var group = this.#drawController.getGroup(id);
+    const group = this.#drawController.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -510,8 +510,8 @@ export class DrawLayer {
     // allow pointer events
     this.#containerDiv.style.pointerEvents = 'auto';
     // interaction events
-    var names = InteractionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       this.#containerDiv.addEventListener(names[i], this.#fireEvent);
     }
   }
@@ -524,8 +524,8 @@ export class DrawLayer {
     // disable pointer events
     this.#containerDiv.style.pointerEvents = 'none';
     // interaction events
-    var names = InteractionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
     }
   }
@@ -589,11 +589,11 @@ export class DrawLayer {
   #updateLabelScale(scale) {
     // same formula as in style::applyZoomScale:
     // compensate for scale and times 2 so that font 10 looks like a 10
-    var ratioX = 2 / scale.x;
-    var ratioY = 2 / scale.y;
+    const ratioX = 2 / scale.x;
+    const ratioY = 2 / scale.y;
     // compensate scale for labels
-    var labels = this.#konvaStage.find('Label');
-    for (var i = 0; i < labels.length; ++i) {
+    const labels = this.#konvaStage.find('Label');
+    for (let i = 0; i < labels.length; ++i) {
       labels[i].scale({x: ratioX, y: ratioY});
     }
   }

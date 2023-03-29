@@ -19,13 +19,13 @@ QUnit.test('Test ThreadPool.', function (assert) {
   // TODO: fix this!
   assert.ok(true);
 
-  // var done = assert.async();
+  // const done = assert.async();
 
   // // create the thread pool and initialise it
-  // var pool = new ThreadPool(20);
+  // const pool = new ThreadPool(20);
 
   // // number of workers
-  // var nTestWorkers = 10;
+  // const nTestWorkers = 10;
 
   // // called on pool end (successfull or not)
   // pool.onworkend = function () {
@@ -37,13 +37,13 @@ QUnit.test('Test ThreadPool.', function (assert) {
   // };
 
   // // called on work
-  // var countWork = 0;
+  // const countWork = 0;
   // pool.onwork = function () {
   //   ++countWork;
   // };
 
   // // called on work item (end of task)
-  // var countWorkItem = 0;
+  // const countWorkItem = 0;
   // pool.onworkitem = function (event) {
   //   if (event.data[0] === 'papageno papagena') {
   //     ++countWorkItem;
@@ -51,9 +51,9 @@ QUnit.test('Test ThreadPool.', function (assert) {
   // };
 
   // // create the workers and run them
-  // for (var i = 0; i < nTestWorkers; ++i) {
+  // for (let i = 0; i < nTestWorkers; ++i) {
   //   // create worker task
-  //   var workerTask = new WorkerTask(
+  //   const workerTask = new WorkerTask(
   //     './worker.js',
   //     {input: 'papageno'},
   //     {itemNumber: i, numberOfItems: nTestWorkers});

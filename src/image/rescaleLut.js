@@ -9,11 +9,9 @@
 export class RescaleLut {
 
   #rsi;
-  #bitsStored;
 
   constructor(rsi, bitsStored) {
     this.#rsi = rsi;
-    this.#bitsStored = bitsStored;
     this.#length = Math.pow(2, bitsStored);
   }
 
@@ -70,7 +68,7 @@ export class RescaleLut {
     }
     // create lut and fill it
     this.#lut = new Float32Array(this.#length);
-    for (var i = 0; i < this.#length; ++i) {
+    for (let i = 0; i < this.#length; ++i) {
       this.#lut[i] = this.#rsi.apply(i);
     }
     // update ready flag

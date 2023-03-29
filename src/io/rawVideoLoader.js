@@ -41,13 +41,14 @@ export class RawVideoLoader {
    */
   #createDataUri(response, dataType) {
     // image data as string
-    var bytes = new Uint8Array(response);
-    var videoDataStr = '';
-    for (var i = 0; i < bytes.byteLength; ++i) {
+    const bytes = new Uint8Array(response);
+    let videoDataStr = '';
+    for (let i = 0; i < bytes.byteLength; ++i) {
       videoDataStr += String.fromCharCode(bytes[i]);
     }
     // create uri
-    var uri = 'data:video/' + dataType + ';base64,' + window.btoa(videoDataStr);
+    const uri = 'data:video/' + dataType +
+      ';base64,' + window.btoa(videoDataStr);
     return uri;
   }
 
@@ -60,10 +61,10 @@ export class RawVideoLoader {
    */
   load(buffer, origin, index) {
     // create a DOM video
-    var video = document.createElement('video');
+    const video = document.createElement('video');
     if (typeof origin === 'string') {
       // url case
-      var ext = origin.split('.').pop().toLowerCase();
+      const ext = origin.split('.').pop().toLowerCase();
       video.src = this.#createDataUri(buffer, ext);
     } else {
       video.src = buffer;
@@ -121,15 +122,15 @@ export class RawVideoLoader {
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
       // starts with 'video/'
-      var isVideo = function (element) {
+      const isVideo = function (element) {
         return element.name === 'Accept' &&
           startsWith(element.value, 'video/');
       };
       return typeof options.requestHeaders.find(isVideo) !== 'undefined';
     }
 
-    var urlObjext = getUrlFromUri(url);
-    var ext = getFileExtension(urlObjext.pathname);
+    const urlObjext = getUrlFromUri(url);
+    const ext = getFileExtension(urlObjext.pathname);
     return (ext === 'mp4') ||
       (ext === 'ogg') ||
       (ext === 'webm');

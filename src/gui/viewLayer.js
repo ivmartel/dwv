@@ -218,7 +218,7 @@ export class ViewLayer {
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
     // view events
-    for (var j = 0; j < viewEventNames.length; ++j) {
+    for (let j = 0; j < viewEventNames.length; ++j) {
       view.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // create view controller
@@ -326,7 +326,7 @@ export class ViewLayer {
      * @type {object}
      * @property {string} type The event type.
      */
-    var event = {
+    const event = {
       type: 'opacitychange',
       value: [this.#opacity]
     };
@@ -360,9 +360,9 @@ export class ViewLayer {
    * @param {Point3D} center The scale center.
    */
   setScale(newScale, center) {
-    var helper = this.#viewController.getPlaneHelper();
-    var orientedNewScale = helper.getTargetOrientedPositiveXYZ(newScale);
-    var finalNewScale = {
+    const helper = this.#viewController.getPlaneHelper();
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ(newScale);
+    const finalNewScale = {
       x: this.#fitScale.x * orientedNewScale.x,
       y: this.#fitScale.y * orientedNewScale.y
     };
@@ -371,7 +371,7 @@ export class ViewLayer {
       Math.abs(newScale.y) === 1 &&
       Math.abs(newScale.z) === 1) {
       // reset zoom offset for scale=1
-      var resetOffset = {
+      const resetOffset = {
         x: this.#offset.x - this.#zoomOffset.x,
         y: this.#offset.y - this.#zoomOffset.y
       };
@@ -380,7 +380,7 @@ export class ViewLayer {
       this.#offset = resetOffset;
     } else {
       if (typeof center !== 'undefined') {
-        var worldCenter = helper.getPlaneOffsetFromOffset3D({
+        let worldCenter = helper.getPlaneOffsetFromOffset3D({
           x: center.getX(),
           y: center.getY(),
           z: center.getZ()
@@ -393,10 +393,10 @@ export class ViewLayer {
           y: worldCenter.y + this.#baseOffset.y
         };
 
-        var newOffset = getScaledOffset(
+        const newOffset = getScaledOffset(
           this.#offset, this.#scale, finalNewScale, worldCenter);
 
-        var newZoomOffset = {
+        const newZoomOffset = {
           x: this.#zoomOffset.x + newOffset.x - this.#offset.x,
           y: this.#zoomOffset.y + newOffset.y - this.#offset.y
         };
@@ -418,14 +418,14 @@ export class ViewLayer {
    * @returns {boolean} True if the offset was updated.
    */
   setBaseOffset(scrollOffset, planeOffset) {
-    var helper = this.#viewController.getPlaneHelper();
-    var scrollIndex = helper.getNativeScrollIndex();
-    var newOffset = helper.getPlaneOffsetFromOffset3D({
+    const helper = this.#viewController.getPlaneHelper();
+    const scrollIndex = helper.getNativeScrollIndex();
+    const newOffset = helper.getPlaneOffsetFromOffset3D({
       x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
       y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
       z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
-    var needsUpdate = this.#baseOffset.x !== newOffset.x ||
+    const needsUpdate = this.#baseOffset.x !== newOffset.x ||
     this.#baseOffset.y !== newOffset.y;
     // reset offset if needed
     if (needsUpdate) {
@@ -444,8 +444,8 @@ export class ViewLayer {
    * @param {object} newOffset The offset as {x,y}.
    */
   setOffset(newOffset) {
-    var helper = this.#viewController.getPlaneHelper();
-    var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
+    const helper = this.#viewController.getPlaneHelper();
+    const planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
     this.#offset = {
       x: planeNewOffset.x +
         this.#viewOffset.x +
@@ -468,7 +468,7 @@ export class ViewLayer {
    * @returns {Index} The equivalent index.
    */
   displayToPlaneIndex(x, y) {
-    var planePos = this.displayToPlanePos(x, y);
+    const planePos = this.displayToPlanePos(x, y);
     return new Index([
       Math.floor(planePos.x),
       Math.floor(planePos.y)
@@ -497,7 +497,7 @@ export class ViewLayer {
    * @returns {object} The plane position as {x,y}.
    */
   displayToPlanePos(x, y) {
-    var deScaled = this.displayToPlaneScale(x, y);
+    const deScaled = this.displayToPlaneScale(x, y);
     return {
       x: deScaled.x + this.#offset.x,
       y: deScaled.y + this.#offset.y
@@ -519,7 +519,7 @@ export class ViewLayer {
    * @returns {object} The main plane position as {x,y}.
    */
   displayToMainPlanePos(x, y) {
-    var planePos = this.displayToPlanePos(x, y);
+    const planePos = this.displayToPlanePos(x, y);
     return {
       x: planePos.x - this.#baseOffset.x,
       y: planePos.y - this.#baseOffset.y
@@ -564,7 +564,7 @@ export class ViewLayer {
      * @type {object}
      * @property {string} type The event type.
      */
-    var event = {
+    let event = {
       type: 'renderstart',
       layerid: this.getId(),
       dataid: this.getDataIndex()
@@ -688,7 +688,7 @@ export class ViewLayer {
    * @param {object} fitOffset The fit offset as {x,y}.
    */
   fitToContainer(fitScale1D, fitSize, fitOffset) {
-    var needsDraw = false;
+    let needsDraw = false;
 
     // update canvas size if needed (triggers canvas reset)
     if (this.#canvas.width !== fitSize.x || this.#canvas.height !== fitSize.y) {
@@ -703,17 +703,17 @@ export class ViewLayer {
     }
 
     // previous scale without fit
-    var previousScale = {
+    const previousScale = {
       x: this.#scale.x / this.#fitScale.x,
       y: this.#scale.y / this.#fitScale.y
     };
     // fit scale
-    var newFitScale = {
+    const newFitScale = {
       x: fitScale1D * this.#baseSpacing.x,
       y: fitScale1D * this.#baseSpacing.y
     };
     // scale
-    var newScale = {
+    const newScale = {
       x: previousScale.x * newFitScale.x,
       y: previousScale.y * newFitScale.y
     };
@@ -726,7 +726,7 @@ export class ViewLayer {
     }
 
     // view offset
-    var newViewOffset = {
+    const newViewOffset = {
       x: fitOffset.x / newFitScale.x,
       y: fitOffset.y / newFitScale.y
     };
@@ -761,8 +761,8 @@ export class ViewLayer {
     // allow pointer events
     this.#containerDiv.style.pointerEvents = 'auto';
     // interaction events
-    var names = InteractionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       this.#containerDiv.addEventListener(
         names[i], this.#fireEvent, {passive: true});
     }
@@ -775,8 +775,8 @@ export class ViewLayer {
     // disable pointer events
     this.#containerDiv.style.pointerEvents = 'none';
     // interaction events
-    var names = InteractionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
     }
   }
@@ -837,7 +837,7 @@ export class ViewLayer {
    */
   #onWLChange = (event) => {
     // generate and draw if no skip flag
-    var skip = typeof event.skipGenerate !== 'undefined' &&
+    const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;
@@ -852,7 +852,7 @@ export class ViewLayer {
    * @private
    */
   #onColourChange = (event) => {
-    var skip = typeof event.skipGenerate !== 'undefined' &&
+    const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;
@@ -867,10 +867,10 @@ export class ViewLayer {
    * @private
    */
   #onPositionChange = (event) => {
-    var skip = typeof event.skipGenerate !== 'undefined' &&
+    const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
-      var valid = true;
+      let valid = true;
       if (typeof event.valid !== 'undefined') {
         valid = event.valid;
       }
@@ -883,13 +883,13 @@ export class ViewLayer {
         }
       } else {
         // 3D dimensions
-        var dims3D = [0, 1, 2];
+        const dims3D = [0, 1, 2];
         // remove scroll index
-        var indexScrollIndex =
+        const indexScrollIndex =
           dims3D.indexOf(this.#viewController.getScrollIndex());
         dims3D.splice(indexScrollIndex, 1);
         // remove non scroll index from diff dims
-        var diffDims = event.diffDims.filter(function (item) {
+        const diffDims = event.diffDims.filter(function (item) {
           return dims3D.indexOf(item) === -1;
         });
         // update if we have something left
@@ -911,7 +911,7 @@ export class ViewLayer {
    * @private
    */
   #onAlphaFuncChange = (event) => {
-    var skip = typeof event.skipGenerate !== 'undefined' &&
+    const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
       this.#needsDataUpdate = true;

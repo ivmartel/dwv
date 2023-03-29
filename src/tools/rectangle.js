@@ -65,9 +65,9 @@ export class RectangleFactory {
    */
   create(points, style, viewController) {
     // physical shape
-    var rectangle = new Rectangle(points[0], points[1]);
+    const rectangle = new Rectangle(points[0], points[1]);
     // draw shape
-    var kshape = new Konva.Rect({
+    const kshape = new Konva.Rect({
       x: rectangle.getBegin().getX(),
       y: rectangle.getBegin().getY(),
       width: rectangle.getWidth(),
@@ -78,7 +78,7 @@ export class RectangleFactory {
       name: 'shape'
     });
     // label text
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
@@ -87,14 +87,14 @@ export class RectangleFactory {
       shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // TODO: allow override?
     // if (typeof rectangleLabelText !== 'undefined') {
     //   textExpr = rectangleLabelText;
     // } else {
     textExpr = defaultRectangleLabelText;
     // }
-    var quant = rectangle.quantify(
+    const quant = rectangle.quantify(
       viewController,
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
@@ -104,7 +104,7 @@ export class RectangleFactory {
       quantification: quant
     };
     // label
-    var klabel = new Konva.Label({
+    const klabel = new Konva.Label({
       x: rectangle.getBegin().getX(),
       y: rectangle.getEnd().getY(),
       scale: style.applyZoomScale(1),
@@ -118,13 +118,13 @@ export class RectangleFactory {
     }));
 
     // debug shadow
-    var kshadow;
+    let kshadow;
     if (DRAW_DEBUG) {
       kshadow = this.#getShadowRectangle(rectangle);
     }
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     if (kshadow) {
       group.add(kshadow);
@@ -143,12 +143,12 @@ export class RectangleFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var rectX = shape.x();
-    var rectY = shape.y();
-    var rectWidth = shape.width();
-    var rectHeight = shape.height();
+    const rectX = shape.x();
+    const rectY = shape.y();
+    const rectWidth = shape.width();
+    const rectHeight = shape.height();
 
-    var anchors = [];
+    const anchors = [];
     anchors.push(getDefaultAnchor(
       rectX, rectY, 'topLeft', style
     ));
@@ -173,30 +173,30 @@ export class RectangleFactory {
    */
   update(anchor, style, viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var krect = group.getChildren(function (node) {
+    const krect = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
     // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
       // find special points
-    var topLeft = group.getChildren(function (node) {
+    const topLeft = group.getChildren(function (node) {
       return node.id() === 'topLeft';
     })[0];
-    var topRight = group.getChildren(function (node) {
+    const topRight = group.getChildren(function (node) {
       return node.id() === 'topRight';
     })[0];
-    var bottomRight = group.getChildren(function (node) {
+    const bottomRight = group.getChildren(function (node) {
       return node.id() === 'bottomRight';
     })[0];
-    var bottomLeft = group.getChildren(function (node) {
+    const bottomLeft = group.getChildren(function (node) {
       return node.id() === 'bottomLeft';
     })[0];
     // debug shadow
-    var kshadow;
+    let kshadow;
     if (DRAW_DEBUG) {
       kshadow = group.getChildren(function (node) {
         return node.name() === 'shadow';
@@ -235,28 +235,28 @@ export class RectangleFactory {
     }
     // update shape
     krect.position(topLeft.position());
-    var width = topRight.x() - topLeft.x();
-    var height = bottomLeft.y() - topLeft.y();
+    const width = topRight.x() - topLeft.x();
+    const height = bottomLeft.y() - topLeft.y();
     if (width && height) {
       krect.size({width: width, height: height});
     }
     // positions: add possible group offset
-    var p2d0 = new Point2D(
+    const p2d0 = new Point2D(
       group.x() + topLeft.x(),
       group.y() + topLeft.y()
     );
-    var p2d1 = new Point2D(
+    const p2d1 = new Point2D(
       group.x() + bottomRight.x(),
       group.y() + bottomRight.y()
     );
     // new rect
-    var rect = new Rectangle(p2d0, p2d1);
+    const rect = new Rectangle(p2d0, p2d1);
 
     // debug shadow based on round (used in quantification)
     if (kshadow) {
-      var round = rect.getRound();
-      var rWidth = round.max.getX() - round.min.getX();
-      var rHeight = round.max.getY() - round.min.getY();
+      const round = rect.getRound();
+      const rWidth = round.max.getX() - round.min.getX();
+      const rHeight = round.max.getY() - round.min.getY();
       kshadow.position({
         x: round.min.getX() - group.x(),
         y: round.min.getY() - group.y()
@@ -265,7 +265,7 @@ export class RectangleFactory {
     }
 
     // update label position
-    var textPos = {
+    const textPos = {
       x: rect.getBegin().getX() - group.x(),
       y: rect.getEnd().getY() - group.y()
     };
@@ -294,29 +294,29 @@ export class RectangleFactory {
    */
   #updateRectangleQuantification(group, viewController) {
     // associated shape
-    var krect = group.getChildren(function (node) {
+    const krect = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
     // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
 
     // positions: add possible group offset
-    var p2d0 = new Point2D(
+    const p2d0 = new Point2D(
       group.x() + krect.x(),
       group.y() + krect.y()
     );
-    var p2d1 = new Point2D(
+    const p2d1 = new Point2D(
       p2d0.getX() + krect.width(),
       p2d0.getY() + krect.height()
     );
     // rectangle
-    var rect = new Rectangle(p2d0, p2d1);
+    const rect = new Rectangle(p2d0, p2d1);
 
     // update text
-    var ktext = klabel.getText();
-    var quantification = rect.quantify(
+    const ktext = klabel.getText();
+    const quantification = rect.quantify(
       viewController,
       getFlags(ktext.meta.textExpr));
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
@@ -331,9 +331,9 @@ export class RectangleFactory {
    * @returns {object} The shadow konva shape.
    */
   #getShadowRectangle(rectangle) {
-    var round = rectangle.getRound();
-    var rWidth = round.max.getX() - round.min.getX();
-    var rHeight = round.max.getY() - round.min.getY();
+    const round = rectangle.getRound();
+    const rWidth = round.max.getX() - round.min.getX();
+    const rHeight = round.max.getY() - round.min.getY();
     return new Konva.Rect({
       x: round.min.getX(),
       y: round.min.getY(),

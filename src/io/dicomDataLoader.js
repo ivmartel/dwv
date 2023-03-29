@@ -102,9 +102,9 @@ export class DicomDataLoader {
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
-    var ext = getFileExtension(file.name);
-    var hasNoExt = (ext === null);
-    var hasDcmExt = (ext === 'dcm');
+    const ext = getFileExtension(file.name);
+    const hasNoExt = (ext === null);
+    const hasDcmExt = (ext === 'dcm');
     return hasNoExt || hasDcmExt;
   }
 
@@ -124,7 +124,7 @@ export class DicomDataLoader {
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
       // starts with 'application/dicom'
-      var isDicom = function (element) {
+      const isDicom = function (element) {
         return element.name === 'Accept' &&
           startsWith(element.value, 'application/dicom') &&
           element.value[18] !== '+';
@@ -132,16 +132,16 @@ export class DicomDataLoader {
       return typeof options.requestHeaders.find(isDicom) !== 'undefined';
     }
 
-    var urlObjext = getUrlFromUri(url);
+    const urlObjext = getUrlFromUri(url);
     // extension
-    var ext = getFileExtension(urlObjext.pathname);
-    var hasNoExt = (ext === null);
-    var hasDcmExt = (ext === 'dcm');
+    const ext = getFileExtension(urlObjext.pathname);
+    const hasNoExt = (ext === null);
+    const hasDcmExt = (ext === 'dcm');
     // content type (for wado url)
-    var contentType = urlObjext.searchParams.get('contentType');
-    var hasContentType = contentType !== null &&
+    const contentType = urlObjext.searchParams.get('contentType');
+    const hasContentType = contentType !== null &&
       typeof contentType !== 'undefined';
-    var hasDicomContentType = (contentType === 'application/dicom');
+    const hasDicomContentType = (contentType === 'application/dicom');
 
     return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
   }

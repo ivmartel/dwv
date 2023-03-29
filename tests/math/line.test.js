@@ -13,9 +13,9 @@ import {Line, getAngle, getPerpendicularLine} from '../../src/math/line';
  * @function module:tests/math~Line
  */
 QUnit.test('Test Line.', function (assert) {
-  var p00 = new Point2D(0, 0);
-  var p01 = new Point2D(0, -5);
-  var l00 = new Line(p00, p01);
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(0, -5);
+  const l00 = new Line(p00, p01);
   // getBegin
   assert.equal(l00.getBegin(), p00, 'getBegin');
   // getEnd
@@ -25,29 +25,29 @@ QUnit.test('Test Line.', function (assert) {
   // getWorldLength
   assert.equal(l00.getWorldLength(0.5, 0.5), 2.5, 'getWorldLength');
   // getMidpoint
-  var pMid = new Point2D(0, -2); // rounded...
+  const pMid = new Point2D(0, -2); // rounded...
   assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');
 
   // equals: true
-  var l01 = new Line(p00, p01);
+  const l01 = new Line(p00, p01);
   assert.ok(l00.equals(l01), 'equal lines');
   // equals: false end
-  var p02 = new Point2D(0, -4);
-  var l02 = new Line(p00, p02);
+  const p02 = new Point2D(0, -4);
+  const l02 = new Line(p00, p02);
   assert.notOk(l00.equals(l02), 'non equal lines end');
   // equals: false begin
-  var l03 = new Line(p02, p01);
+  const l03 = new Line(p02, p01);
   assert.notOk(l00.equals(l03), 'non equal lines begin');
 
   // slope
-  var p10 = new Point2D(1, 1);
-  var l10 = new Line(p00, p10);
+  const p10 = new Point2D(1, 1);
+  const l10 = new Line(p00, p10);
   assert.equal(l10.getSlope(), 1, 'getSlope');
-  var p11 = new Point2D(1, -1);
-  var l11 = new Line(p00, p11);
+  const p11 = new Point2D(1, -1);
+  const l11 = new Line(p00, p11);
   assert.equal(l11.getSlope(), -1, 'getSlope (negative)');
-  var p12 = new Point2D(1, 0);
-  var l12 = new Line(p00, p12);
+  const p12 = new Point2D(1, 0);
+  const l12 = new Line(p00, p12);
   assert.equal(l12.getSlope(), 0, 'getSlope (horizontal)');
   assert.equal(l00.getSlope(), -Infinity, 'getSlope (vertical)');
 
@@ -59,21 +59,21 @@ QUnit.test('Test Line.', function (assert) {
 
   // intercept
   assert.equal(l10.getIntercept(), 0, 'getIntercept (zero)');
-  var p20 = new Point2D(0, 1);
-  var p21 = new Point2D(1, 2);
-  var l20 = new Line(p20, p21);
+  const p20 = new Point2D(0, 1);
+  const p21 = new Point2D(1, 2);
+  const l20 = new Line(p20, p21);
   assert.equal(l20.getIntercept(), 1, 'getIntercept');
-  var p22 = new Point2D(0, -1);
-  var p23 = new Point2D(1, -2);
-  var l21 = new Line(p22, p23);
+  const p22 = new Point2D(0, -1);
+  const p23 = new Point2D(1, -2);
+  const l21 = new Line(p22, p23);
   assert.equal(l21.getIntercept(), -1, 'getIntercept (negative)');
-  var p24 = new Point2D(0, 1);
-  var p25 = new Point2D(-1, 2);
-  var l22 = new Line(p24, p25);
+  const p24 = new Point2D(0, 1);
+  const p25 = new Point2D(-1, 2);
+  const l22 = new Line(p24, p25);
   assert.equal(l22.getIntercept(), 1, 'getIntercept (back)');
-  var p26 = new Point2D(0, -1);
-  var p27 = new Point2D(-1, -2);
-  var l23 = new Line(p26, p27);
+  const p26 = new Point2D(0, -1);
+  const p27 = new Point2D(-1, -2);
+  const l23 = new Line(p26, p27);
   assert.equal(l23.getIntercept(), -1, 'getIntercept (back negative)');
 });
 
@@ -83,33 +83,33 @@ QUnit.test('Test Line.', function (assert) {
  * @function module:tests/math~Line
  */
 QUnit.test('Test angle between lines.', function (assert) {
-  var p00 = new Point2D(0, 0);
-  var p02 = new Point2D(1, -1);
+  const p00 = new Point2D(0, 0);
+  const p02 = new Point2D(1, -1);
 
   // test #0
-  var p01 = new Point2D(1, 1);
-  var l00 = new Line(p00, p01);
-  var l01 = new Line(p00, p02);
+  const p01 = new Point2D(1, 1);
+  const l00 = new Line(p00, p01);
+  const l01 = new Line(p00, p02);
   assert.equal(
     getAngle(l00, l01),
     90,
     'getAngle');
 
   // test #1
-  var p11 = new Point2D(1, 0);
-  var l10 = new Line(p00, p11);
-  var p12 = new Point2D(0, -1);
-  var p13 = new Point2D(1, -1);
-  var l11 = new Line(p12, p13);
+  const p11 = new Point2D(1, 0);
+  const l10 = new Line(p00, p11);
+  const p12 = new Point2D(0, -1);
+  const p13 = new Point2D(1, -1);
+  const l11 = new Line(p12, p13);
   assert.equal(
     getAngle(l10, l11),
     180,
     'getAngle (horizontal parallel)');
 
   // test #2
-  var p20 = new Point2D(0, -5);
-  var l20 = new Line(p00, p20);
-  var l21 = new Line(p11, p02);
+  const p20 = new Point2D(0, -5);
+  const l20 = new Line(p00, p20);
+  const l21 = new Line(p11, p02);
   assert.equal(
     getAngle(l20, l21),
     180,
@@ -122,42 +122,42 @@ QUnit.test('Test angle between lines.', function (assert) {
  * @function module:tests/math~Line
  */
 QUnit.test('Test perpendicular line.', function (assert) {
-  var p00 = new Point2D(0, 0);
-  var p01 = new Point2D(0, -5);
-  var l00 = new Line(p00, p01);
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(0, -5);
+  const l00 = new Line(p00, p01);
 
   // test #0
-  var l0p = getPerpendicularLine(l00, p00, 2);
-  var pl0pbeg = new Point2D(-1, 0);
+  const l0p = getPerpendicularLine(l00, p00, 2);
+  const pl0pbeg = new Point2D(-1, 0);
   assert.ok(l0p.getBegin().equals(pl0pbeg), 'perpendicular horizon begin');
-  var pl0pend = new Point2D(1, 0);
+  const pl0pend = new Point2D(1, 0);
   assert.ok(l0p.getEnd().equals(pl0pend), 'perpendicular horizon end');
 
   // test #1
-  var p11 = new Point2D(1, 0);
-  var l1 = new Line(p00, p11);
-  var l1p = getPerpendicularLine(l1, p00, 2);
-  var pl2pbeg = new Point2D(0, -1);
+  const p11 = new Point2D(1, 0);
+  const l1 = new Line(p00, p11);
+  const l1p = getPerpendicularLine(l1, p00, 2);
+  const pl2pbeg = new Point2D(0, -1);
   assert.ok(l1p.getBegin().equals(pl2pbeg), 'perpendicular vertical begin');
-  var pl2pend = new Point2D(0, 1);
+  const pl2pend = new Point2D(0, 1);
   assert.ok(l1p.getEnd().equals(pl2pend), 'perpendicular vertical end');
 
   // test #0
-  var isSimilar = function (a, b) {
+  const isSimilar = function (a, b) {
     return Math.abs(a - b) < 1e-10;
   };
-  var isSimilarPoint2D = function (p0, p1) {
+  const isSimilarPoint2D = function (p0, p1) {
     return isSimilar(p0.getX(), p1.getX()) &&
             isSimilar(p0.getY(), p1.getY());
   };
 
-  var p6 = new Point2D(0, 1);
-  var p7 = new Point2D(1, 2);
-  var l5 = new Line(p6, p7);
-  var l5p = getPerpendicularLine(l5, p6, 2);
-  var halfSqrt2 = Math.sqrt(2) / 2;
-  var pl5pbeg = new Point2D(-halfSqrt2, 1 + halfSqrt2);
+  const p6 = new Point2D(0, 1);
+  const p7 = new Point2D(1, 2);
+  const l5 = new Line(p6, p7);
+  const l5p = getPerpendicularLine(l5, p6, 2);
+  const halfSqrt2 = Math.sqrt(2) / 2;
+  const pl5pbeg = new Point2D(-halfSqrt2, 1 + halfSqrt2);
   assert.ok(isSimilarPoint2D(l5p.getBegin(), pl5pbeg), 'perpendicular begin');
-  var pl5pend = new Point2D(halfSqrt2, 1 - halfSqrt2);
+  const pl5pend = new Point2D(halfSqrt2, 1 - halfSqrt2);
   assert.ok(isSimilarPoint2D(l5p.getEnd(), pl5pend), 'perpendicular end');
 });

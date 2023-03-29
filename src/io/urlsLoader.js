@@ -252,20 +252,20 @@ export class UrlsLoader {
     this.#storeInputData(data);
 
     // create prgress handler
-    var mproghandler = new MultiProgressHandler(this.onprogress);
+    const mproghandler = new MultiProgressHandler(this.onprogress);
     mproghandler.setNToLoad(data.length);
 
     // create loaders
-    var loaders = [];
-    for (var m = 0; m < loaderList.length; ++m) {
+    const loaders = [];
+    for (let m = 0; m < loaderList.length; ++m) {
       loaders.push(new loaderList[m]());
     }
 
     // find an appropriate loader
-    var dataElement = data[0];
-    var loader = null;
-    var foundLoader = false;
-    for (var l = 0; l < loaders.length; ++l) {
+    let dataElement = data[0];
+    let loader = null;
+    let foundLoader = false;
+    for (let l = 0; l < loaders.length; ++l) {
       loader = loaders[l];
       if (loader.canLoadUrl(dataElement, options)) {
         foundLoader = true;
@@ -298,12 +298,12 @@ export class UrlsLoader {
       throw new Error('No loader found for url: ' + dataElement);
     }
 
-    var getLoadHandler = function (loader, dataElement, i) {
+    const getLoadHandler = function (loader, dataElement, i) {
       return (event) => {
         // check response status
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
         // status 200: "OK"; status 0: "debug"
-        var status = event.target.status;
+        const status = event.target.status;
         if (status !== 200 && status !== 0) {
           this.onerror({
             source: dataElement,
@@ -320,8 +320,8 @@ export class UrlsLoader {
     };
 
     // store last run request index
-    var lastRunRequestIndex = 0;
-    var requestOnLoadEnd = () => {
+    let lastRunRequestIndex = 0;
+    const requestOnLoadEnd = () => {
       this.#addLoadend();
       // launch next in queue
       if (lastRunRequestIndex < this.#requests.length - 1 && !this.#aborting) {
@@ -331,7 +331,7 @@ export class UrlsLoader {
     };
 
     // loop on I/O elements
-    for (var i = 0; i < data.length; ++i) {
+    for (let i = 0; i < data.length; ++i) {
       dataElement = data[i];
 
       // check loader
@@ -344,15 +344,15 @@ export class UrlsLoader {
        * @external XMLHttpRequest
        * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
        */
-      var request = new XMLHttpRequest();
+      const request = new XMLHttpRequest();
       request.open('GET', dataElement, true);
 
       // request options
       if (typeof options !== 'undefined') {
         // optional request headers
         if (typeof options.requestHeaders !== 'undefined') {
-          var requestHeaders = options.requestHeaders;
-          for (var j = 0; j < requestHeaders.length; ++j) {
+          const requestHeaders = options.requestHeaders;
+          for (let j = 0; j < requestHeaders.length; ++j) {
             if (typeof requestHeaders[j].name !== 'undefined' &&
               typeof requestHeaders[j].value !== 'undefined') {
               request.setRequestHeader(
@@ -385,14 +385,14 @@ export class UrlsLoader {
     }
 
     // launch requests in batch
-    var batchSize = this.#requests.length;
+    let batchSize = this.#requests.length;
     if (typeof options !== 'undefined') {
       // optional request batch size
       if (typeof options.batchSize !== 'undefined' && batchSize !== 0) {
         batchSize = Math.min(options.batchSize, this.#requests.length);
       }
     }
-    for (var r = 0; r < batchSize; ++r) {
+    for (let r = 0; r < batchSize; ++r) {
       if (!this.#aborting) {
         lastRunRequestIndex = r;
         this.#requests[lastRunRequestIndex].send(null);
@@ -409,13 +409,13 @@ export class UrlsLoader {
    */
   #loadDicomDir(dicomDirUrl, options) {
     // read DICOMDIR
-    var request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
     request.open('GET', dicomDirUrl, true);
     request.responseType = 'arraybuffer';
     // request.onloadstart: nothing to do
     request.onload = (event) => {
       // check status
-      var status = event.target.status;
+      const status = event.target.status;
       if (status !== 200 && status !== 0) {
         this.onerror({
           source: dicomDirUrl,
@@ -428,13 +428,13 @@ export class UrlsLoader {
         return;
       }
       // get the file list
-      var list = getFileListFromDicomDir(event.target.response);
+      const list = getFileListFromDicomDir(event.target.response);
       // use the first list
-      var urls = list[0][0];
+      const urls = list[0][0];
       // append root url
-      var rootUrl = getRootPath(dicomDirUrl);
-      var fullUrls = [];
-      for (var i = 0; i < urls.length; ++i) {
+      const rootUrl = getRootPath(dicomDirUrl);
+      const fullUrls = [];
+      for (let i = 0; i < urls.length; ++i) {
         fullUrls.push(rootUrl + '/' + urls[i]);
       }
       // load urls
@@ -459,7 +459,7 @@ export class UrlsLoader {
   abort() {
     this.#aborting = true;
     // abort non finished requests
-    for (var i = 0; i < this.#requests.length; ++i) {
+    for (let i = 0; i < this.#requests.length; ++i) {
       // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
       if (this.#requests[i].readyState !== 4) {
         this.#requests[i].abort();

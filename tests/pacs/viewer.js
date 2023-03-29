@@ -4,17 +4,17 @@
 // setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
-var _app = null;
-var _tools = null;
+let _app = null;
+let _tools = null;
 
 // viewer options
-var _mode = 0;
-var _dicomWeb = false;
+let _mode = 0;
+const _dicomWeb = false;
 
 // example private logic for time value retrieval
 // dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
-//   var value;
-//   var time = this.getFromKey('xABCD0123');
+//   const value;
+//   const time = this.getFromKey('xABCD0123');
 //   if (typeof time !== 'undefined') {
 //     value = parseInt(time, 10);
 //   }
@@ -38,11 +38,11 @@ function viewerSetup() {
     '../../decoders/dwv/decode-rle.js';
 
   // stage options
-  var dataViewConfigs;
-  var viewOnFirstLoadItem = true;
+  let dataViewConfigs;
+  let viewOnFirstLoadItem = true;
 
   // use for concurrent load
-  var numberOfDataToLoad = 1;
+  const numberOfDataToLoad = 1;
 
   if (_mode === 0) {
     // simplest: one layer group
@@ -108,7 +108,7 @@ function viewerSetup() {
   };
 
   // app config
-  var config = {
+  const config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
     dataViewConfigs: dataViewConfigs,
     tools: _tools
@@ -124,8 +124,8 @@ function viewerSetup() {
   _app.addEventListener('loadstart', function (event) {
     console.time('load-data-' + event.loadid);
   });
-  var dataLoadProgress = new Array(numberOfDataToLoad);
-  var sumReducer = function (sum, value) {
+  const dataLoadProgress = new Array(numberOfDataToLoad);
+  const sumReducer = function (sum, value) {
     return sum + value;
   };
   _app.addEventListener('loadprogress', function (event) {
@@ -146,8 +146,8 @@ function viewerSetup() {
     console.timeEnd('load-data-' + event.loadid);
   });
 
-  var dataLoad = 0;
-  var firstRender = [];
+  let dataLoad = 0;
+  const firstRender = [];
   _app.addEventListener('loadend', function (event) {
     // update UI at first render
     if (!firstRender.includes(event.loadid)) {
@@ -164,9 +164,9 @@ function viewerSetup() {
           // select tool
           _app.setTool(getSelectedTool());
 
-          var changeLayoutSelect = document.getElementById('changelayout');
+          const changeLayoutSelect = document.getElementById('changelayout');
           changeLayoutSelect.disabled = false;
-          var resetLayoutButton = document.getElementById('resetlayout');
+          const resetLayoutButton = document.getElementById('resetlayout');
           resetLayoutButton.disabled = false;
         }
       }
@@ -179,28 +179,28 @@ function viewerSetup() {
       logFramePosPats(_app.getMetaData(event.loadid));
 
       // example usage of a dicom SEG as data mask
-      var useSegAsMask = false;
+      const useSegAsMask = false;
       if (useSegAsMask) {
         // image to filter
-        var imgDataIndex = 0;
-        var vls = _app.getViewLayersByDataIndex(imgDataIndex);
-        var vc = vls[0].getViewController();
-        var img = _app.getImage(imgDataIndex);
-        var imgGeometry = img.getGeometry();
-        var sliceSize = imgGeometry.getSize().getDimSize(2);
+        const imgDataIndex = 0;
+        const vls = _app.getViewLayersByDataIndex(imgDataIndex);
+        const vc = vls[0].getViewController();
+        const img = _app.getImage(imgDataIndex);
+        const imgGeometry = img.getGeometry();
+        const sliceSize = imgGeometry.getSize().getDimSize(2);
         // SEG image
-        var segImage = _app.getImage(event.loadid);
+        const segImage = _app.getImage(event.loadid);
         // calculate slice difference
-        var segOrigin0 = segImage.getGeometry().getOrigins()[0];
-        var segOrigin0Point = new dwv.math.Point([
+        const segOrigin0 = segImage.getGeometry().getOrigins()[0];
+        const segOrigin0Point = new dwv.math.Point([
           segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
         ]);
-        var segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
-        var indexOffset = segOriginIndex.get(2) * sliceSize;
+        const segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
+        const indexOffset = segOriginIndex.get(2) * sliceSize;
         // set alpha function
         vc.setViewAlphaFunction(function (value, index) {
           // multiply by 3 since SEG is RGB
-          var segIndex = 3 * (index - indexOffset);
+          const segIndex = 3 * (index - indexOffset);
           if (segIndex >= 0 &&
             segImage.getValueAtOffset(segIndex) === 0 &&
             segImage.getValueAtOffset(segIndex + 1) === 0 &&
@@ -215,15 +215,15 @@ function viewerSetup() {
   });
 
   _app.addEventListener('positionchange', function (event) {
-    var input = document.getElementById('position');
-    var values = event.value[1];
-    var text = '(index: ' + event.value[0] + ')';
+    const input = document.getElementById('position');
+    const values = event.value[1];
+    let text = '(index: ' + event.value[0] + ')';
     if (event.value.length > 2) {
       text += ' value: ' + event.value[2];
     }
     input.value = values.map(getPrecisionRound(2));
     // index as small text
-    var span = document.getElementById('positionspan');
+    const span = document.getElementById('positionspan');
     span.innerHTML = text;
   });
 
@@ -232,15 +232,15 @@ function viewerSetup() {
     _app.defaultOnKeydown(event);
     // mask segment related
     if (!isNaN(parseInt(event.key, 10))) {
-      var vc =
+      const vc =
         _app.getActiveLayerGroup().getActiveViewLayer().getViewController();
       if (!vc.isMask()) {
         return;
       }
-      var number = parseInt(event.key, 10);
-      var segHelper = vc.getMaskSegmentHelper();
+      const number = parseInt(event.key, 10);
+      const segHelper = vc.getMaskSegmentHelper();
       if (segHelper.hasSegment(number)) {
-        var segment = segHelper.getSegment(number);
+        const segment = segHelper.getSegment(number);
         if (event.ctrlKey) {
           if (event.altKey) {
             console.log('Delete segment: ' + segment.label);
@@ -265,7 +265,7 @@ function viewerSetup() {
     _app.onResize();
   });
 
-  var options = {};
+  const options = {};
   // special dicom web request header
   if (_dicomWeb) {
     options.requestHeaders = [{
@@ -284,26 +284,26 @@ function onDOMContentLoaded() {
   // setup
   viewerSetup();
 
-  var positionInput = document.getElementById('position');
+  const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function () {
-    var vls = _app.getViewLayersByDataIndex(0);
-    var vc = vls[0].getViewController();
-    var values = this.value.split(',');
+    const vls = _app.getViewLayersByDataIndex(0);
+    const vc = vls[0].getViewController();
+    const values = this.value.split(',');
     vc.setCurrentPosition(new dwv.math.Point([
       parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
     ])
     );
   });
 
-  var resetLayoutButton = document.getElementById('resetlayout');
+  const resetLayoutButton = document.getElementById('resetlayout');
   resetLayoutButton.addEventListener('click', function () {
     _app.resetLayout();
   });
 
-  var changeLayoutSelect = document.getElementById('changelayout');
+  const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.addEventListener('change', function (event) {
-    var configs;
-    var value = event.target.value;
+    let configs;
+    const value = event.target.value;
     if (value === 'mpr') {
       configs = prepareAndGetMPRDataViewConfig();
     } else {
@@ -317,7 +317,7 @@ function onDOMContentLoaded() {
     _app.setDataViewConfig(configs);
 
     clearDataTable();
-    for (var i = 0; i < _app.getNumberOfLoadedData(); ++i) {
+    for (let i = 0; i < _app.getNumberOfLoadedData(); ++i) {
       _app.render(i);
       // add data row (will bind controls)
       addDataRow(i);
@@ -332,7 +332,7 @@ function onDOMContentLoaded() {
   setupToolsCheckboxes();
 
   // bind app to input files
-  var fileinput = document.getElementById('fileinput');
+  const fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
     console.log('%c ----------------', 'color: teal;');
     console.log(event.target.files);
@@ -346,10 +346,10 @@ function onDOMContentLoaded() {
  * @param {string} id The id of the layer.
  */
 function addLayerGroup(id) {
-  var layerDiv = document.createElement('div');
+  const layerDiv = document.createElement('div');
   layerDiv.id = id;
   layerDiv.className = 'layerGroup';
-  var root = document.getElementById('dwv');
+  const root = document.getElementById('dwv');
   root.appendChild(layerDiv);
 }
 
@@ -360,7 +360,7 @@ function addLayerGroup(id) {
  */
 function prepareAndGetSimpleDataViewConfig() {
   // clean up
-  var dwvDiv = document.getElementById('dwv');
+  const dwvDiv = document.getElementById('dwv');
   dwvDiv.innerHTML = '';
   // add div
   addLayerGroup('layerGroupA');
@@ -374,7 +374,7 @@ function prepareAndGetSimpleDataViewConfig() {
  */
 function prepareAndGetMPRDataViewConfig() {
   // clean up
-  var dwvDiv = document.getElementById('dwv');
+  const dwvDiv = document.getElementById('dwv');
   dwvDiv.innerHTML = '';
   // add divs
   addLayerGroup('layerGroupA');
@@ -405,12 +405,12 @@ function prepareAndGetMPRDataViewConfig() {
  * @returns {Array} The list of ids.
  */
 function getLayerGroupDivIds(dataViewConfigs) {
-  var divIds = [];
-  var keys = Object.keys(dataViewConfigs);
-  for (var i = 0; i < keys.length; ++i) {
-    var dataViewConfig = dataViewConfigs[keys[i]];
-    for (var j = 0; j < dataViewConfig.length; ++j) {
-      var divId = dataViewConfig[j].divId;
+  const divIds = [];
+  const keys = Object.keys(dataViewConfigs);
+  for (let i = 0; i < keys.length; ++i) {
+    const dataViewConfig = dataViewConfigs[keys[i]];
+    for (let j = 0; j < dataViewConfig.length; ++j) {
+      const divId = dataViewConfig[j].divId;
       if (!divIds.includes(divId)) {
         divIds.push(divId);
       }
@@ -426,8 +426,8 @@ function getLayerGroupDivIds(dataViewConfigs) {
  * @returns {Array} The list of ids.
  */
 function getDataLayerGroupIds(dataViewConfig) {
-  var divIds = [];
-  for (var j = 0; j < dataViewConfig.length; ++j) {
+  const divIds = [];
+  for (let j = 0; j < dataViewConfig.length; ++j) {
     divIds.push(dataViewConfig[j].divId);
   }
   return divIds;
@@ -437,17 +437,17 @@ function getDataLayerGroupIds(dataViewConfig) {
  * Setup the binders checkboxes
  */
 function setupBindersCheckboxes() {
-  var bindersDiv = document.getElementById('binders');
-  var propList = [
+  const bindersDiv = document.getElementById('binders');
+  const propList = [
     'WindowLevel',
     'Position',
     'Zoom',
     'Offset',
     'Opacity'
   ];
-  var binders = [];
+  const binders = [];
   // add all binders at startup
-  for (var b = 0; b < propList.length; ++b) {
+  for (let b = 0; b < propList.length; ++b) {
     binders.push(propList[b] + 'Binder');
   }
   _app.setLayerGroupsBinders(binders);
@@ -467,7 +467,7 @@ function setupBindersCheckboxes() {
    * @param {string} propName The name of the property to bind.
    */
   function removeBinder(propName) {
-    var index = binders.indexOf(propName + 'Binder');
+    const index = binders.indexOf(propName + 'Binder');
     if (index !== -1) {
       binders.splice(index, 1);
     }
@@ -489,16 +489,16 @@ function setupBindersCheckboxes() {
     };
   }
   // individual binders
-  for (var i = 0; i < propList.length; ++i) {
-    var propName = propList[i];
+  for (let i = 0; i < propList.length; ++i) {
+    const propName = propList[i];
 
-    var input = document.createElement('input');
+    const input = document.createElement('input');
     input.id = 'binder-' + i;
     input.type = 'checkbox';
     input.checked = true;
     input.onchange = getOnInputChange(propName);
 
-    var label = document.createElement('label');
+    const label = document.createElement('label');
     label.htmlFor = input.id;
     label.appendChild(document.createTextNode(propName));
 
@@ -507,16 +507,16 @@ function setupBindersCheckboxes() {
   }
 
   // check all
-  var allInput = document.createElement('input');
+  const allInput = document.createElement('input');
   allInput.id = 'binder-all';
   allInput.type = 'checkbox';
   allInput.checked = true;
   allInput.onchange = function () {
-    for (var j = 0; j < propList.length; ++j) {
+    for (let j = 0; j < propList.length; ++j) {
       document.getElementById('binder-' + j).click();
     }
   };
-  var allLabel = document.createElement('label');
+  const allLabel = document.createElement('label');
   allLabel.htmlFor = allInput.id;
   allLabel.appendChild(document.createTextNode('all'));
   bindersDiv.appendChild(allInput);
@@ -527,10 +527,10 @@ function setupBindersCheckboxes() {
  * Setup the tools checkboxes
  */
 function setupToolsCheckboxes() {
-  var toolsDiv = document.getElementById('tools');
-  var keys = Object.keys(_tools);
+  const toolsDiv = document.getElementById('tools');
+  const keys = Object.keys(_tools);
 
-  var getChangeTool = function (tool) {
+  const getChangeTool = function (tool) {
     return function () {
       _app.setTool(tool);
       if (tool === 'Draw') {
@@ -539,7 +539,7 @@ function setupToolsCheckboxes() {
     };
   };
 
-  var getKeyCheck = function (char, input) {
+  const getKeyCheck = function (char, input) {
     return function (event) {
       if (!event.ctrlKey &&
         !event.altKey &&
@@ -550,10 +550,10 @@ function setupToolsCheckboxes() {
     };
   };
 
-  for (var i = 0; i < keys.length; ++i) {
-    var key = keys[i];
+  for (let i = 0; i < keys.length; ++i) {
+    const key = keys[i];
 
-    var input = document.createElement('input');
+    const input = document.createElement('input');
     input.id = 'tool-' + i;
     input.name = 'tools';
     input.type = 'radio';
@@ -563,7 +563,7 @@ function setupToolsCheckboxes() {
       input.checked = true;
     }
 
-    var label = document.createElement('label');
+    const label = document.createElement('label');
     label.htmlFor = input.id;
     label.appendChild(document.createTextNode(key));
 
@@ -582,9 +582,9 @@ function setupToolsCheckboxes() {
  * @returns {string} The tool name.
  */
 function getSelectedTool() {
-  var toolsInput = document.getElementsByName('tools');
-  var toolIndex = null;
-  for (var j = 0; j < toolsInput.length; ++j) {
+  const toolsInput = document.getElementsByName('tools');
+  let toolIndex = null;
+  for (let j = 0; j < toolsInput.length; ++j) {
     if (toolsInput[j].checked) {
       toolIndex = j;
       break;
@@ -616,8 +616,8 @@ function unbindAppToControls() {
  */
 function onWLChange(event) {
   // width number
-  var elemId = 'width-' + event.dataid + '-number';
-  var elem = document.getElementById(elemId);
+  let elemId = 'width-' + event.dataid + '-number';
+  let elem = document.getElementById(elemId);
   if (elem) {
     elem.value = event.value[1];
   } else {
@@ -649,10 +649,10 @@ function onWLChange(event) {
  * @param {object} event The change event.
  */
 function onOpacityChange(event) {
-  var value = parseFloat(event.value[0]).toPrecision(3);
+  const value = parseFloat(event.value[0]).toPrecision(3);
   // number
-  var elemId = 'opacity-' + event.dataid + '-number';
-  var elem = document.getElementById(elemId);
+  let elemId = 'opacity-' + event.dataid + '-number';
+  let elem = document.getElementById(elemId);
   if (elem) {
     elem.value = value;
   } else {
@@ -670,7 +670,7 @@ function onOpacityChange(event) {
  * Clear the data table.
  */
 function clearDataTable() {
-  var detailsDiv = document.getElementById('layersdetails');
+  const detailsDiv = document.getElementById('layersdetails');
   detailsDiv.innerHTML = '';
 }
 
@@ -687,7 +687,7 @@ function clearDataTable() {
  * @returns {object} The control div.
  */
 function getControlDiv(id, name, min, max, value, callback, precision) {
-  var range = document.createElement('input');
+  const range = document.createElement('input');
   range.id = id + '-range';
   range.className = 'ctrl-range';
   range.type = 'range';
@@ -696,13 +696,13 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
   range.step = ((max - min) * 0.01).toPrecision(precision);
   range.value = value;
 
-  var label = document.createElement('label');
+  const label = document.createElement('label');
   label.id = id + '-label';
   label.className = 'ctrl-label';
   label.htmlFor = range.id;
   label.appendChild(document.createTextNode(name));
 
-  var number = document.createElement('input');
+  const number = document.createElement('input');
   number.id = id + '-number';
   number.className = 'ctrl-number';
   number.type = 'number';
@@ -721,7 +721,7 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
     callback(this.value);
   };
 
-  var div = document.createElement('div');
+  const div = document.createElement('div');
   div.id = id + '-ctrl';
   div.className = 'ctrl';
   div.appendChild(label);
@@ -742,97 +742,97 @@ function addDataRow(id) {
     bindAppToControls();
   }
 
-  var dataViewConfigs = _app.getDataViewConfig();
-  var allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
+  const dataViewConfigs = _app.getDataViewConfig();
+  const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
-  var vls = _app.getViewLayersByDataIndex(id);
-  var vl = vls[0];
-  var vc = vl.getViewController();
-  var wl = vc.getWindowLevel();
+  const vls = _app.getViewLayersByDataIndex(id);
+  const vl = vls[0];
+  const vc = vl.getViewController();
+  const wl = vc.getWindowLevel();
 
-  var table = document.getElementById('layerstable');
-  var body;
+  let table = document.getElementById('layerstable');
+  let body;
   // create table if not present
   if (!table) {
     table = document.createElement('table');
     table.id = 'layerstable';
-    var header = table.createTHead();
-    var trow = header.insertRow(0);
-    var insertTCell = function (text) {
-      var th = document.createElement('th');
+    const header = table.createTHead();
+    const trow = header.insertRow(0);
+    const insertTCell = function (text) {
+      const th = document.createElement('th');
       th.innerHTML = text;
       trow.appendChild(th);
     };
     insertTCell('Id');
-    for (var j = 0; j < allLayerGroupDivIds.length; ++j) {
+    for (let j = 0; j < allLayerGroupDivIds.length; ++j) {
       insertTCell('LG' + j);
     }
     insertTCell('Alpha Range');
     insertTCell('Contrast');
     insertTCell('Alpha');
     body = table.createTBody();
-    var div = document.getElementById('layersdetails');
+    const div = document.getElementById('layersdetails');
     div.appendChild(table);
   } else {
     body = table.getElementsByTagName('tbody')[0];
   }
 
   // add new layer row
-  var row = body.insertRow();
-  var cell;
+  const row = body.insertRow();
+  let cell;
 
   // cell: id
   cell = row.insertCell();
   cell.appendChild(document.createTextNode(id));
 
   // cell: radio
-  var viewConfig = dataViewConfigs[id];
+  let viewConfig = dataViewConfigs[id];
   if (typeof viewConfig === 'undefined') {
     viewConfig = dataViewConfigs['*'];
   }
-  var dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
-  for (var l = 0; l < allLayerGroupDivIds.length; ++l) {
-    var layerGroupDivId = allLayerGroupDivIds[l];
+  const dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
+  for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
+    const layerGroupDivId = allLayerGroupDivIds[l];
     cell = row.insertCell();
     if (!dataLayerGroupsIds.includes(layerGroupDivId)) {
       continue;
     }
-    var radio = document.createElement('input');
+    const radio = document.createElement('input');
     radio.type = 'radio';
     radio.name = 'layerselect-' + l;
     radio.id = 'layerselect-' + layerGroupDivId + '-' + id;
     radio.checked = true;
     radio.onchange = function (event) {
-      var fullId = event.target.id;
-      var split = fullId.split('-');
-      var groupDivId = split[1];
-      var dataId = split[2];
-      var lg = _app.getLayerGroupByDivId(groupDivId);
+      const fullId = event.target.id;
+      const split = fullId.split('-');
+      const groupDivId = split[1];
+      const dataId = split[2];
+      const lg = _app.getLayerGroupByDivId(groupDivId);
       lg.setActiveViewLayerByDataIndex(parseInt(dataId, 10));
     };
     cell.appendChild(radio);
   }
 
-  var image = _app.getImage(vl.getDataIndex());
-  var dataRange = image.getDataRange();
-  var rescaledDataRange = image.getRescaledDataRange();
-  var floatPrecision = 4;
+  const image = _app.getImage(vl.getDataIndex());
+  const dataRange = image.getDataRange();
+  const rescaledDataRange = image.getRescaledDataRange();
+  const floatPrecision = 4;
 
   // cell: alpha range
   cell = row.insertCell();
-  var minId = 'value-min-' + id;
-  var maxId = 'value-max-' + id;
+  const minId = 'value-min-' + id;
+  const maxId = 'value-max-' + id;
   // callback
-  var changeAlphaFunc = function () {
-    var min = parseFloat(document.getElementById(minId + '-number').value);
-    var max = parseFloat(document.getElementById(maxId + '-number').value);
-    var func = function (value) {
+  const changeAlphaFunc = function () {
+    const min = parseFloat(document.getElementById(minId + '-number').value);
+    const max = parseFloat(document.getElementById(maxId + '-number').value);
+    const func = function (value) {
       if (value >= min && value <= max) {
         return 255;
       }
       return 0;
     };
-    for (var i = 0; i < vls.length; ++i) {
+    for (let i = 0; i < vls.length; ++i) {
       vls[i].getViewController().setViewAlphaFunction(func);
     }
   };
@@ -846,13 +846,13 @@ function addDataRow(id) {
 
   // cell: contrast
   cell = row.insertCell();
-  var widthId = 'width-' + id;
-  var centerId = 'center-' + id;
+  const widthId = 'width-' + id;
+  const centerId = 'center-' + id;
   // callback
-  var changeContrast = function () {
-    var width =
+  const changeContrast = function () {
+    const width =
       parseFloat(document.getElementById(widthId + '-number').value);
-    var center =
+    const center =
       parseFloat(document.getElementById(centerId + '-number').value);
     vc.setWindowLevel(center, width);
   };
@@ -866,9 +866,9 @@ function addDataRow(id) {
 
   // cell: opactiy
   cell = row.insertCell();
-  var opacityId = 'opacity-' + id;
+  const opacityId = 'opacity-' + id;
   // callback
-  var changeOpacity = function (value) {
+  const changeOpacity = function (value) {
     vl.setOpacity(value);
     vl.draw();
   };
@@ -885,8 +885,8 @@ function addDataRow(id) {
  * @returns {number} Negative if a<b, positive if a>b.
  */
 function comparePosPat(a, b) {
-  var za = parseFloat(a.split('\\').at(-1));
-  var zb = parseFloat(b.split('\\').at(-1));
+  const za = parseFloat(a.split('\\').at(-1));
+  const zb = parseFloat(b.split('\\').at(-1));
   return za - zb;
 }
 
@@ -897,11 +897,11 @@ function comparePosPat(a, b) {
  * @returns {object} The sorted object.
  */
 function sortByPosPatKey(obj) {
-  var keys = Object.keys(obj);
+  const keys = Object.keys(obj);
   keys.sort(comparePosPat);
-  var sorted = new Map();
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
+  const sorted = new Map();
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
     sorted.set(key, obj[key]);
   }
   return sorted;
@@ -925,16 +925,16 @@ function getPrecisionRound(precision) {
  * @param {object} elements The DICOM seg elements.
  */
 function logFramePosPats(elements) {
-  var perFrame = elements.PerFrameFunctionalGroupsSequence.value;
-  var perPos = {};
-  for (var i = 0; i < perFrame.length; ++i) {
-    var posSq = perFrame[i].PlanePositionSequence.value;
-    var pos = posSq[0].ImagePositionPatient.value;
+  const perFrame = elements.PerFrameFunctionalGroupsSequence.value;
+  const perPos = {};
+  for (let i = 0; i < perFrame.length; ++i) {
+    const posSq = perFrame[i].PlanePositionSequence.value;
+    const pos = posSq[0].ImagePositionPatient.value;
     if (typeof perPos[pos] === 'undefined') {
       perPos[pos] = [];
     }
-    var frameSq = perFrame[i].FrameContentSequence.value;
-    var dim = frameSq[0].DimensionIndexValues.value;
+    const frameSq = perFrame[i].FrameContentSequence.value;
+    const dim = frameSq[0].DimensionIndexValues.value;
     perPos[pos].push(dim);
   }
   console.log('DICOM SEG Segments', sortByPosPatKey(perPos));

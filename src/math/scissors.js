@@ -13,14 +13,14 @@ function computeGreyscale(data, width, height) {
   // Returns 2D augmented array containing greyscale data
   // Greyscale values found by averaging colour channels
   // Input should be in a flat RGBA array, with values between 0 and 255
-  var greyscale = [];
+  const greyscale = [];
 
   // Compute actual values
-  for (var y = 0; y < height; y++) {
+  for (let y = 0; y < height; y++) {
     greyscale[y] = [];
 
-    for (var x = 0; x < width; x++) {
-      var p = (y * width + x) * 4;
+    for (let x = 0; x < width; x++) {
+      const p = (y * width + x) * 4;
       greyscale[y][x] = (data[p] + data[p + 1] + data[p + 2]) / (3 * 255);
     }
   }
@@ -43,14 +43,14 @@ function computeGreyscale(data, width, height) {
   };
 
   greyscale.gradMagnitude = function (x, y) {
-    var dx = this.dx(x, y);
-    var dy = this.dy(x, y);
+    const dx = this.dx(x, y);
+    const dy = this.dy(x, y);
     return Math.sqrt(dx * dx + dy * dy);
   };
 
   greyscale.laplace = function (x, y) {
     // Laplacian of Gaussian
-    var lap = -16 * this[y][x];
+    let lap = -16 * this[y][x];
     lap += this[y - 2][x];
     lap += this[y - 1][x - 1] + 2 * this[y - 1][x] + this[y - 1][x + 1];
     lap += this[y][x - 2] +
@@ -72,12 +72,12 @@ function computeGradient(greyscale) {
   // Returns a 2D array of gradient magnitude values for greyscale. The values
   // are scaled between 0 and 1, and then flipped, so that it works as a cost
   // function.
-  var gradient = [];
+  const gradient = [];
 
-  var max = 0; // Maximum gradient found, for scaling purposes
+  let max = 0; // Maximum gradient found, for scaling purposes
 
-  var x = 0;
-  var y = 0;
+  let x = 0;
+  let y = 0;
 
   for (y = 0; y < greyscale.length - 1; y++) {
     gradient[y] = [];
@@ -91,7 +91,7 @@ function computeGradient(greyscale) {
   }
 
   gradient[greyscale.length - 1] = [];
-  for (var i = 0; i < gradient[0].length; i++) {
+  for (let i = 0; i < gradient[0].length; i++) {
     gradient[greyscale.length - 1][i] = gradient[greyscale.length - 2][i];
   }
 
@@ -111,25 +111,25 @@ function computeGradient(greyscale) {
  */
 function computeLaplace(greyscale) {
   // Returns a 2D array of Laplacian of Gaussian values
-  var laplace = [];
+  const laplace = [];
 
   // Make the edges low cost here.
 
   laplace[0] = [];
   laplace[1] = [];
-  for (var i = 1; i < greyscale.length; i++) {
+  for (let i = 1; i < greyscale.length; i++) {
     // Pad top, since we can't compute Laplacian
     laplace[0][i] = 1;
     laplace[1][i] = 1;
   }
 
-  for (var y = 2; y < greyscale.length - 2; y++) {
+  for (let y = 2; y < greyscale.length - 2; y++) {
     laplace[y] = [];
     // Pad left, ditto
     laplace[y][0] = 1;
     laplace[y][1] = 1;
 
-    for (var x = 2; x < greyscale[y].length - 2; x++) {
+    for (let x = 2; x < greyscale[y].length - 2; x++) {
       // Threshold needed to get rid of clutter.
       laplace[y][x] = (greyscale.laplace(x, y) > 0.33) ? 0 : 1;
     }
@@ -141,7 +141,7 @@ function computeLaplace(greyscale) {
 
   laplace[greyscale.length - 2] = [];
   laplace[greyscale.length - 1] = [];
-  for (var j = 1; j < greyscale.length; j++) {
+  for (let j = 1; j < greyscale.length; j++) {
     // Pad bottom, ditto
     laplace[greyscale.length - 2][j] = 1;
     laplace[greyscale.length - 1][j] = 1;
@@ -158,12 +158,12 @@ function computeLaplace(greyscale) {
  */
 function computeGradX(greyscale) {
   // Returns 2D array of x-gradient values for greyscale
-  var gradX = [];
+  const gradX = [];
 
-  for (var y = 0; y < greyscale.length; y++) {
+  for (let y = 0; y < greyscale.length; y++) {
     gradX[y] = [];
 
-    for (var x = 0; x < greyscale[y].length - 1; x++) {
+    for (let x = 0; x < greyscale[y].length - 1; x++) {
       gradX[y][x] = greyscale.dx(x, y);
     }
 
@@ -181,18 +181,18 @@ function computeGradX(greyscale) {
  */
 function computeGradY(greyscale) {
   // Returns 2D array of y-gradient values for greyscale
-  var gradY = [];
+  const gradY = [];
 
-  for (var y = 0; y < greyscale.length - 1; y++) {
+  for (let y = 0; y < greyscale.length - 1; y++) {
     gradY[y] = [];
 
-    for (var x = 0; x < greyscale[y].length; x++) {
+    for (let x = 0; x < greyscale[y].length; x++) {
       gradY[y][x] = greyscale.dy(x, y);
     }
   }
 
   gradY[greyscale.length - 1] = [];
-  for (var i = 0; i < greyscale[0].length; i++) {
+  for (let i = 0; i < greyscale[0].length; i++) {
     gradY[greyscale.length - 1][i] = gradY[greyscale.length - 2][i];
   }
 
@@ -210,10 +210,10 @@ function computeGradY(greyscale) {
  */
 function gradUnitVector(gradX, gradY, px, py, out) {
   // Returns the gradient vector at (px,py), scaled to a magnitude of 1
-  var ox = gradX[py][px];
-  var oy = gradY[py][px];
+  const ox = gradX[py][px];
+  const oy = gradY[py][px];
 
-  var gvm = Math.sqrt(ox * ox + oy * oy);
+  let gvm = Math.sqrt(ox * ox + oy * oy);
   gvm = Math.max(gvm, 1e-100); // To avoid possible divide-by-0 errors
 
   out.x = ox / gvm;
@@ -232,14 +232,14 @@ function gradUnitVector(gradX, gradY, px, py, out) {
  * @returns {number} The direction.
  */
 function gradDirection(gradX, gradY, px, py, qx, qy) {
-  var __dgpuv = {x: -1, y: -1};
-  var __gdquv = {x: -1, y: -1};
+  const __dgpuv = {x: -1, y: -1};
+  const __gdquv = {x: -1, y: -1};
   // Compute the gradiant direction, in radians, between to points
   gradUnitVector(gradX, gradY, px, py, __dgpuv);
   gradUnitVector(gradX, gradY, qx, qy, __gdquv);
 
-  var dp = __dgpuv.y * (qx - px) - __dgpuv.x * (qy - py);
-  var dq = __gdquv.y * (qx - px) - __gdquv.x * (qy - py);
+  let dp = __dgpuv.y * (qx - px) - __dgpuv.x * (qy - py);
+  let dq = __gdquv.y * (qx - px) - __gdquv.x * (qy - py);
 
   // Make sure dp is positive, to keep things consistant
   if (dp < 0) {
@@ -271,25 +271,25 @@ function computeSides(dist, gradX, gradY, greyscale) {
   // gradient vector, in either direction, from the supplied point. These
   // values are used when using active-learning Intelligent Scissors
 
-  var sides = {};
+  const sides = {};
   sides.inside = [];
   sides.outside = [];
 
-  var guv = {x: -1, y: -1}; // Current gradient unit vector
+  const guv = {x: -1, y: -1}; // Current gradient unit vector
 
-  for (var y = 0; y < gradX.length; y++) {
+  for (let y = 0; y < gradX.length; y++) {
     sides.inside[y] = [];
     sides.outside[y] = [];
 
-    for (var x = 0; x < gradX[y].length; x++) {
+    for (let x = 0; x < gradX[y].length; x++) {
       gradUnitVector(gradX, gradY, x, y, guv);
 
       //(x, y) rotated 90 = (y, -x)
 
-      var ix = Math.round(x + dist * guv.y);
-      var iy = Math.round(y - dist * guv.x);
-      var ox = Math.round(x - dist * guv.y);
-      var oy = Math.round(y + dist * guv.x);
+      let ix = Math.round(x + dist * guv.y);
+      let iy = Math.round(y - dist * guv.x);
+      let ox = Math.round(x - dist * guv.y);
+      let oy = Math.round(y + dist * guv.x);
 
       ix = Math.max(Math.min(ix, gradX[y].length - 1), 0);
       ox = Math.max(Math.min(ox, gradX[y].length - 1), 0);
@@ -316,12 +316,12 @@ function gaussianBlur(buffer, out) {
   out[1] = 0.25 * buffer[0] + 0.4 * buffer[1] + 0.25 * buffer[2] +
     0.1 * buffer[3];
 
-  for (var i = 2; i < buffer.length - 2; i++) {
+  for (let i = 2; i < buffer.length - 2; i++) {
     out[i] = 0.05 * buffer[i - 2] + 0.25 * buffer[i - 1] +
       0.4 * buffer[i] + 0.25 * buffer[i + 1] + 0.05 * buffer[i + 2];
   }
 
-  var len = buffer.length;
+  const len = buffer.length;
   out[len - 2] = 0.25 * buffer[len - 1] + 0.4 * buffer[len - 2] +
     0.25 * buffer[len - 3] + 0.1 * buffer[len - 4];
   out[len - 1] = 0.4 * buffer[len - 1] + 0.5 * buffer[len - 2] +
@@ -433,7 +433,7 @@ export class Scissors {
     this.gradX = computeGradX(this.greyscale);
     this.gradY = computeGradY(this.greyscale);
 
-    var sides = computeSides(
+    const sides = computeSides(
       this.edgeWidth, this.gradX, this.gradY, this.greyscale);
     this.inside = sides.inside;
     this.outside = sides.outside;
@@ -445,10 +445,10 @@ export class Scissors {
 
   findTrainingPoints(p) {
     // Grab the last handful of points for training
-    var points = [];
+    const points = [];
 
     if (this.parents !== null) {
-      for (var i = 0; i < this.trainingLength && p; i++) {
+      for (let i = 0; i < this.trainingLength && p; i++) {
         points.push(p);
         p = this.parents[p.y][p.x];
       }
@@ -469,7 +469,7 @@ export class Scissors {
       return; // Not enough points, I think. It might crash if length = 0.
     }
 
-    var buffer = [];
+    const buffer = [];
     this.calculateTraining(
       buffer, this.edgeGran, this.greyscale, this.edgeTraining);
     this.calculateTraining(
@@ -490,17 +490,17 @@ export class Scissors {
 
   calculateTraining(
     buffer, granularity, input, output) {
-    var i = 0;
+    let i = 0;
     // Build a map of raw-weights to trained-weights by favoring input values
     buffer.length = granularity;
     for (i = 0; i < granularity; i++) {
       buffer[i] = 0;
     }
 
-    var maxVal = 1;
+    let maxVal = 1;
     for (i = 0; i < this.trainingPoints.length; i++) {
-      var p = this.trainingPoints[i];
-      var idx = this.getTrainingIdx(granularity, input[p.y][p.x]);
+      const p = this.trainingPoints[i];
+      const idx = this.getTrainingIdx(granularity, input[p.y][p.x]);
       buffer[idx] += 1;
 
       maxVal = Math.max(maxVal, buffer[idx]);
@@ -518,7 +518,7 @@ export class Scissors {
   addInStaticGrad(have, need) {
     // Average gradient raw-weights to trained-weights map with standard weight
     // map so that we don't end up with something to spiky
-    for (var i = 0; i < this.gradGran; i++) {
+    for (let i = 0; i < this.gradGran; i++) {
       this.gradTraining[i] = Math.min(
         this.gradTraining[i],
         1 - i * (need - have) / (need * this.gradGran)
@@ -532,22 +532,22 @@ export class Scissors {
 
   dist(px, py, qx, qy) {
     // The grand culmunation of most of the code: the weighted distance function
-    var grad = this.gradient[qy][qx];
+    let grad = this.gradient[qy][qx];
 
     if (px === qx || py === qy) {
       // The distance is Euclidean-ish; non-diagonal edges should be shorter
       grad *= Math.SQRT1_2;
     }
 
-    var lap = this.laplace[qy][qx];
-    var dir = this.gradDirection(px, py, qx, qy);
+    const lap = this.laplace[qy][qx];
+    const dir = this.gradDirection(px, py, qx, qy);
 
     if (this.trained) {
       // Apply training magic
-      var gradT = this.getTrainedGrad(grad);
-      var edgeT = this.getTrainedEdge(this.greyscale[py][px]);
-      var insideT = this.getTrainedInside(this.inside[py][px]);
-      var outsideT = this.getTrainedOutside(this.outside[py][px]);
+      const gradT = this.getTrainedGrad(grad);
+      const edgeT = this.getTrainedEdge(this.greyscale[py][px]);
+      const insideT = this.getTrainedInside(this.inside[py][px]);
+      const outsideT = this.getTrainedOutside(this.outside[py][px]);
 
       return 0.3 * gradT + 0.3 * lap + 0.1 * (dir + edgeT + insideT + outsideT);
     } else {
@@ -557,16 +557,16 @@ export class Scissors {
   }
 
   adj(p) {
-    var list = [];
+    const list = [];
 
-    var sx = Math.max(p.x - 1, 0);
-    var sy = Math.max(p.y - 1, 0);
-    var ex = Math.min(p.x + 1, this.greyscale[0].length - 1);
-    var ey = Math.min(p.y + 1, this.greyscale.length - 1);
+    const sx = Math.max(p.x - 1, 0);
+    const sy = Math.max(p.y - 1, 0);
+    const ex = Math.min(p.x + 1, this.greyscale[0].length - 1);
+    const ey = Math.min(p.y + 1, this.greyscale.length - 1);
 
-    var idx = 0;
-    for (var y = sy; y <= ey; y++) {
-      for (var x = sx; x <= ex; x++) {
+    let idx = 0;
+    for (let y = sy; y <= ey; y++) {
+      for (let x = sx; x <= ex; x++) {
         if (x !== p.x || y !== p.y) {
           list[idx++] = {x: x, y: y};
         }
@@ -581,8 +581,8 @@ export class Scissors {
 
     this.curPoint = sp;
 
-    var x = 0;
-    var y = 0;
+    let x = 0;
+    let y = 0;
 
     this.visited = [];
     for (y = 0; y < this.height; y++) {
@@ -622,20 +622,20 @@ export class Scissors {
 
     this.timeout = null;
 
-    var pointCount = 0;
-    var newPoints = [];
+    let pointCount = 0;
+    const newPoints = [];
     while (!this.pq.isEmpty() && pointCount < this.pointsPerPost) {
-      var p = this.pq.pop();
+      const p = this.pq.pop();
       newPoints.push(p);
       newPoints.push(this.parents[p.y][p.x]);
 
       this.visited[p.y][p.x] = true;
 
-      var adjList = this.adj(p);
-      for (var i = 0; i < adjList.length; i++) {
-        var q = adjList[i];
+      const adjList = this.adj(p);
+      for (let i = 0; i < adjList.length; i++) {
+        const q = adjList[i];
 
-        var pqCost = this.cost[p.y][p.x] + this.dist(p.x, p.y, q.x, q.y);
+        const pqCost = this.cost[p.y][p.x] + this.dist(p.x, p.y, q.x, q.y);
 
         if (pqCost < this.cost[q.y][q.x]) {
           if (this.cost[q.y][q.x] !== Number.MAX_VALUE) {

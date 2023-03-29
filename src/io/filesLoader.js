@@ -218,20 +218,20 @@ export class FilesLoader {
     });
 
     // create prgress handler
-    var mproghandler = new MultiProgressHandler(this.onprogress);
+    const mproghandler = new MultiProgressHandler(this.onprogress);
     mproghandler.setNToLoad(data.length);
 
     // create loaders
-    var loaders = [];
-    for (var m = 0; m < loaderList.length; ++m) {
+    const loaders = [];
+    for (let m = 0; m < loaderList.length; ++m) {
       loaders.push(new loaderList[m]());
     }
 
     // find an appropriate loader
-    var dataElement = data[0];
-    var loader = null;
-    var foundLoader = false;
-    for (var l = 0; l < loaders.length; ++l) {
+    let dataElement = data[0];
+    let loader = null;
+    let foundLoader = false;
+    for (let l = 0; l < loaders.length; ++l) {
       loader = loaders[l];
       if (loader.canLoadFile(dataElement)) {
         foundLoader = true;
@@ -264,14 +264,14 @@ export class FilesLoader {
       throw new Error('No loader found for file: ' + dataElement.name);
     }
 
-    var getLoadHandler = function (loader, dataElement, i) {
+    const getLoadHandler = function (loader, dataElement, i) {
       return (event) => {
         loader.load(event.target.result, dataElement, i);
       };
     };
 
     // loop on I/O elements
-    for (var i = 0; i < data.length; ++i) {
+    for (let i = 0; i < data.length; ++i) {
       dataElement = data[i];
 
       // check loader
@@ -285,7 +285,7 @@ export class FilesLoader {
        * @external FileReader
        * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
        */
-      var reader = new FileReader();
+      const reader = new FileReader();
       // store reader
       this.#storeReader(reader);
 
@@ -313,7 +313,7 @@ export class FilesLoader {
    */
   abort() {
     // abort readers
-    for (var i = 0; i < this.#readers.length; ++i) {
+    for (let i = 0; i < this.#readers.length; ++i) {
       // 0: EMPTY, 1: LOADING, 2: DONE
       if (this.#readers[i].readyState === 1) {
         this.#readers[i].abort();

@@ -35,21 +35,21 @@ import syntheticDataExplicitBE from
  */
 QUnit.test('Test getUID', function (assert) {
   // check size
-  var uid00 = getUID('mytag');
+  const uid00 = getUID('mytag');
   assert.ok(uid00.length <= 64, 'uid length #0');
-  var uid01 = getUID('mysuperlongtagthatneverfinishes');
+  const uid01 = getUID('mysuperlongtagthatneverfinishes');
   assert.ok(uid01.length <= 64, 'uid length #1');
 
   // consecutive for same tag are different
-  var uid10 = getUID('mytag');
-  var uid11 = getUID('mytag');
+  const uid10 = getUID('mytag');
+  const uid11 = getUID('mytag');
   assert.notEqual(uid10, uid11, 'Consecutive getUID');
 
   // groups do not start with 0
-  var parts = uid10.split('.');
-  var count = 0;
-  for (var i = 0; i < parts.length; ++i) {
-    var part = parts[i];
+  const parts = uid10.split('.');
+  let count = 0;
+  for (let i = 0; i < parts.length; ++i) {
+    const part = parts[i];
     if (part[0] === '0' && part.length !== 1) {
       ++count;
     }
@@ -66,16 +66,16 @@ QUnit.test('Test getUID', function (assert) {
 QUnit.test('Test multiframe writer support.', function (assert) {
 
   // parse DICOM
-  var dicomParser = new DicomParser();
+  let dicomParser = new DicomParser();
   dicomParser.parse(b64urlToArrayBuffer(multiframeTest));
 
-  var numCols = 256;
-  var numRows = 256;
-  var numFrames = 16;
-  var bufferSize = numCols * numRows * numFrames;
+  const numCols = 256;
+  const numRows = 256;
+  const numFrames = 16;
+  const bufferSize = numCols * numRows * numFrames;
 
   // raw tags
-  var rawTags = dicomParser.getRawDicomElements();
+  let rawTags = dicomParser.getRawDicomElements();
   // check values
   assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
   assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
@@ -86,8 +86,8 @@ QUnit.test('Test multiframe writer support.', function (assert) {
     bufferSize,
     'Length of value array for pixel data');
 
-  var dicomWriter = new DicomWriter();
-  var buffer = dicomWriter.getBuffer(rawTags);
+  const dicomWriter = new DicomWriter();
+  const buffer = dicomWriter.getBuffer(rawTags);
 
   dicomParser = new DicomParser();
   dicomParser.parse(buffer);
@@ -115,13 +115,13 @@ QUnit.test('Test multiframe writer support.', function (assert) {
 QUnit.test('Test patient anonymisation', function (assert) {
 
   // parse DICOM
-  var dicomParser = new DicomParser();
+  let dicomParser = new DicomParser();
   dicomParser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
 
-  var patientsNameAnonymised = 'anonymise-name';
-  var patientsIdAnonymised = 'anonymise-id';
+  const patientsNameAnonymised = 'anonymise-name';
+  const patientsIdAnonymised = 'anonymise-id';
   // rules with different levels: full tag, tag name and group name
-  var rules = {
+  const rules = {
     default: {
       action: 'copy', value: null
     },
@@ -136,13 +136,13 @@ QUnit.test('Test patient anonymisation', function (assert) {
     }
   };
 
-  var patientsName = 'dwv^PatientName';
-  var patientID = 'dwv-patient-id123';
-  var patientsBirthDate = '19830101';
-  var patientsSex = 'M';
+  const patientsName = 'dwv^PatientName';
+  const patientID = 'dwv-patient-id123';
+  const patientsBirthDate = '19830101';
+  const patientsSex = 'M';
 
   // raw tags
-  var rawTags = dicomParser.getRawDicomElements();
+  let rawTags = dicomParser.getRawDicomElements();
   // check values
   assert.equal(
     rawTags.x00100010.value[0].trim(),
@@ -161,9 +161,9 @@ QUnit.test('Test patient anonymisation', function (assert) {
     patientsSex,
     'patientsSex');
 
-  var dicomWriter = new DicomWriter();
+  const dicomWriter = new DicomWriter();
   dicomWriter.rules = rules;
-  var buffer = dicomWriter.getBuffer(rawTags);
+  const buffer = dicomWriter.getBuffer(rawTags);
 
   dicomParser = new DicomParser();
 
@@ -199,15 +199,15 @@ function compare(jsonTags, dicomElements, name, comparator) {
   if (jsonTags === null || jsonTags === 0) {
     return;
   }
-  var keys = Object.keys(jsonTags);
-  for (var k = 0; k < keys.length; ++k) {
-    var tagName = keys[k];
-    var tag = getTagFromDictionary(tagName);
-    var tagKey = tag.getKey();
-    var element = dicomElements.getDEFromKey(tagKey);
-    var value = dicomElements.getFromKey(tagKey, true);
+  const keys = Object.keys(jsonTags);
+  for (let k = 0; k < keys.length; ++k) {
+    const tagName = keys[k];
+    const tag = getTagFromDictionary(tagName);
+    const tagKey = tag.getKey();
+    const element = dicomElements.getDEFromKey(tagKey);
+    const value = dicomElements.getFromKey(tagKey, true);
     if (element.vr !== 'SQ') {
-      var jsonTag = jsonTags[tagName];
+      let jsonTag = jsonTags[tagName];
       // stringify possible array
       if (Array.isArray(jsonTag)) {
         jsonTag = jsonTag.join();
@@ -221,15 +221,15 @@ function compare(jsonTags, dicomElements, name, comparator) {
       if (jsonTags[tagName] === null || jsonTags[tagName] === 0) {
         continue;
       }
-      var sqValue = jsonTags[tagName].value;
+      const sqValue = jsonTags[tagName].value;
       if (typeof sqValue === 'undefined' ||
       sqValue === null) {
         continue;
       }
       // supposing same order of subkeys and indices...
-      for (var i = 0; i < sqValue.length; ++i) {
+      for (let i = 0; i < sqValue.length; ++i) {
         if (sqValue[i] !== 'undefinedLength') {
-          var wrap = new DicomElementsWrapper(value[i]);
+          const wrap = new DicomElementsWrapper(value[i]);
           compare(
             sqValue[i], wrap, name, comparator);
         }
@@ -246,15 +246,15 @@ function compare(jsonTags, dicomElements, name, comparator) {
  */
 function generateGradSquare(tags) {
 
-  var numberOfColumns = tags.Columns;
-  var numberOfRows = tags.Rows;
-  var isRGB = tags.PhotometricInterpretation.trim() === 'RGB';
-  var samplesPerPixel = tags.SamplesPerPixel;
+  const numberOfColumns = tags.Columns;
+  const numberOfRows = tags.Rows;
+  const isRGB = tags.PhotometricInterpretation.trim() === 'RGB';
+  const samplesPerPixel = tags.SamplesPerPixel;
 
-  var numberOfSamples = 1;
-  var numberOfColourPlanes = 1;
+  let numberOfSamples = 1;
+  let numberOfColourPlanes = 1;
   if (samplesPerPixel === 3) {
-    var planarConfiguration = tags.PlanarConfiguration;
+    const planarConfiguration = tags.PlanarConfiguration;
     if (planarConfiguration === 0) {
       numberOfSamples = 3;
     } else {
@@ -262,11 +262,11 @@ function generateGradSquare(tags) {
     }
   }
 
-  var dataLength = numberOfRows * numberOfColumns * samplesPerPixel;
+  const dataLength = numberOfRows * numberOfColumns * samplesPerPixel;
 
-  var bitsAllocated = tags.BitsAllocated;
-  var pixelRepresentation = tags.PixelRepresentation;
-  var pixelBuffer;
+  const bitsAllocated = tags.BitsAllocated;
+  const pixelRepresentation = tags.PixelRepresentation;
+  let pixelBuffer;
   if (bitsAllocated === 8) {
     if (pixelRepresentation === 0) {
       pixelBuffer = new Uint8Array(dataLength);
@@ -281,19 +281,19 @@ function generateGradSquare(tags) {
     }
   }
 
-  var halfCols = numberOfRows * 0.5;
-  var halfRows = numberOfColumns * 0.5;
+  const halfCols = numberOfRows * 0.5;
+  const halfRows = numberOfColumns * 0.5;
 
-  var background = 0;
-  var maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
-  var max = 100;
+  const background = 0;
+  const maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
+  const max = 100;
 
-  var getFunc;
+  let getFunc;
   if (isRGB) {
     getFunc = function (i, j) {
-      var value = background;
-      var jc = Math.abs(j - halfRows);
-      var ic = Math.abs(i - halfCols);
+      let value = background;
+      const jc = Math.abs(j - halfRows);
+      const ic = Math.abs(i - halfCols);
       if (jc < halfRows / 2 && ic < halfCols / 2) {
         value += (i * j) * (max / maxNoBounds);
       }
@@ -304,9 +304,9 @@ function generateGradSquare(tags) {
     };
   } else {
     getFunc = function (i, j) {
-      var value = 0;
-      var jc = Math.abs(j - halfRows);
-      var ic = Math.abs(i - halfCols);
+      let value = 0;
+      const jc = Math.abs(j - halfRows);
+      const ic = Math.abs(i - halfCols);
       if (jc < halfRows / 2 && ic < halfCols / 2) {
         value += (i * j) * (max / maxNoBounds);
       }
@@ -315,11 +315,11 @@ function generateGradSquare(tags) {
   }
 
   // main loop
-  var offset = 0;
-  for (var c = 0; c < numberOfColourPlanes; ++c) {
-    for (var j = 0; j < numberOfRows; ++j) {
-      for (var i = 0; i < numberOfColumns; ++i) {
-        for (var s = 0; s < numberOfSamples; ++s) {
+  let offset = 0;
+  for (let c = 0; c < numberOfColourPlanes; ++c) {
+    for (let j = 0; j < numberOfRows; ++j) {
+      for (let i = 0; i < numberOfColumns; ++i) {
+        for (let s = 0; s < numberOfSamples; ++s) {
           if (numberOfColourPlanes !== 1) {
             pixelBuffer[offset] = getFunc(i, j)[c];
           } else {
@@ -331,7 +331,7 @@ function generateGradSquare(tags) {
     }
   }
 
-  var pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
+  const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
   return {
     tag: getPixelDataTag(),
     vr: bitsAllocated === 8 ? 'OB' : 'OW',
@@ -348,12 +348,12 @@ function generateGradSquare(tags) {
  */
 function testWriteReadDataFromConfig(config, assert) {
   // add private tags to dict if present
-  var useUnVrForPrivateSq = false;
+  let useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
-    var keys = Object.keys(config.privateDictionary);
-    for (var i = 0; i < keys.length; ++i) {
-      var group = keys[i];
-      var tags = config.privateDictionary[group];
+    const keys = Object.keys(config.privateDictionary);
+    for (let i = 0; i < keys.length; ++i) {
+      const group = keys[i];
+      const tags = config.privateDictionary[group];
       dictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
@@ -362,18 +362,18 @@ function testWriteReadDataFromConfig(config, assert) {
   }
   // pass tags clone to avoid modifications (for ex by padElement)
   // TODO: find another way
-  var jsonTags = JSON.parse(JSON.stringify(config.tags));
+  const jsonTags = JSON.parse(JSON.stringify(config.tags));
   // convert JSON to DICOM element object
-  var dicomElements = getElementsFromJSONTags(jsonTags);
+  const dicomElements = getElementsFromJSONTags(jsonTags);
   // pixels (if possible): small gradient square
   if (config.tags.Modality !== 'KO') {
     dicomElements.x7FE00010 = generateGradSquare(config.tags);
   }
 
   // create DICOM buffer
-  var writer = new DicomWriter();
+  const writer = new DicomWriter();
   writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
-  var dicomBuffer = null;
+  let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(dicomElements);
   } catch (error) {
@@ -382,9 +382,9 @@ function testWriteReadDataFromConfig(config, assert) {
   }
 
   // parse the buffer
-  var dicomParser = new DicomParser();
+  const dicomParser = new DicomParser();
   dicomParser.parse(dicomBuffer);
-  var elements = dicomParser.getDicomElements();
+  const elements = dicomParser.getDicomElements();
 
   // compare contents
   compare(config.tags, elements, config.name, assert);
@@ -397,8 +397,8 @@ function testWriteReadDataFromConfig(config, assert) {
  * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit', function (assert) {
-  var configs = JSON.parse(syntheticDataExplicit);
-  for (var i = 0; i < configs.length; ++i) {
+  const configs = JSON.parse(syntheticDataExplicit);
+  for (let i = 0; i < configs.length; ++i) {
     testWriteReadDataFromConfig(configs[i], assert);
   }
 });
@@ -410,8 +410,8 @@ QUnit.test('Test synthetic dicom explicit', function (assert) {
  * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom implicit', function (assert) {
-  var configs = JSON.parse(syntheticDataImplicit);
-  for (var i = 0; i < configs.length; ++i) {
+  const configs = JSON.parse(syntheticDataImplicit);
+  for (let i = 0; i < configs.length; ++i) {
     testWriteReadDataFromConfig(configs[i], assert);
   }
 });
@@ -423,8 +423,8 @@ QUnit.test('Test synthetic dicom implicit', function (assert) {
  * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
-  var configs = JSON.parse(syntheticDataExplicitBE);
-  for (var i = 0; i < configs.length; ++i) {
+  const configs = JSON.parse(syntheticDataExplicitBE);
+  for (let i = 0; i < configs.length; ++i) {
     testWriteReadDataFromConfig(configs[i], assert);
   }
 });

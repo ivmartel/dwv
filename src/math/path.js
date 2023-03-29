@@ -44,7 +44,7 @@ export class Path {
    * @returns {boolean} True if a control point.
    */
   isControlPoint(point) {
-    var index = this.pointArray.indexOf(point);
+    const index = this.pointArray.indexOf(point);
     if (index !== -1) {
       return this.controlPointIndexArray.indexOf(index) !== -1;
     } else {
@@ -76,7 +76,7 @@ export class Path {
    * @param {Point2D} point The Point2D to make a control point.
    */
   addControlPoint(point) {
-    var index = this.pointArray.indexOf(point);
+    const index = this.pointArray.indexOf(point);
     if (index !== -1) {
       this.controlPointIndexArray.push(index);
     } else {
@@ -100,10 +100,10 @@ export class Path {
    * @param {Path} other The Path to append.
    */
   appenPath(other) {
-    var oldSize = this.pointArray.length;
+    const oldSize = this.pointArray.length;
     this.pointArray = this.pointArray.concat(other.pointArray);
-    var indexArray = [];
-    for (var i = 0; i < other.controlPointIndexArray.length; ++i) {
+    const indexArray = [];
+    for (let i = 0; i < other.controlPointIndexArray.length; ++i) {
       indexArray[i] = other.controlPointIndexArray[i] + oldSize;
     }
     this.controlPointIndexArray =

@@ -44,7 +44,7 @@ QUnit.test('Test Spacing.', function (assert) {
   new Error('Cannot create spacing with non number or zero values.'),
   'spacing with string values.');
 
-  var spacing01 = new Spacing([2, 3, 4]);
+  const spacing01 = new Spacing([2, 3, 4]);
   // test its values
   assert.equal(spacing01.get(0), 2, 'getColumnSpacing');
   assert.equal(spacing01.get(1), 3, 'getRowSpacing');
@@ -52,14 +52,14 @@ QUnit.test('Test Spacing.', function (assert) {
   // equality
   assert.equal(spacing01.equals(null), false, 'equals null false');
   assert.equal(spacing01.equals(), false, 'equals undefined false');
-  var spacing02 = new Spacing([2, 3]);
+  const spacing02 = new Spacing([2, 3]);
   assert.equal(spacing01.equals(spacing02), false,
     'equals different length false');
 
   assert.equal(spacing01.equals(spacing01), 1, 'equals self true');
-  var spacing03 = new Spacing([2, 3, 4]);
+  const spacing03 = new Spacing([2, 3, 4]);
   assert.equal(spacing01.equals(spacing03), 1, 'equals true');
-  var spacing04 = new Spacing([3, 3, 4]);
+  const spacing04 = new Spacing([3, 3, 4]);
   assert.equal(spacing01.equals(spacing04), 0, 'equals false');
 
 });

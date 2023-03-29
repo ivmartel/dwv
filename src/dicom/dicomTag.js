@@ -105,7 +105,7 @@ export class Tag {
    * @returns {boolean} True if this tag has a VR.
    */
   isWithVR() {
-    var element = this.getElement();
+    const element = this.getElement();
     return !(this.getGroup() === '0xFFFE' &&
       (element === '0xE000' || element === '0xE00D' || element === '0xE0DD')
     );
@@ -120,7 +120,7 @@ export class Tag {
    */
   isPrivate() {
     // group is in the '0x####' form
-    var groupNumber = parseInt(this.getGroup().substring(2), 16);
+    const groupNumber = parseInt(this.getGroup().substring(2), 16);
     return groupNumber % 2 === 1;
   }
 
@@ -130,7 +130,7 @@ export class Tag {
    * @returns {Array} The info as [vr, multiplicity, name].
    */
   getInfoFromDictionary() {
-    var info = null;
+    let info = null;
     if (typeof dictionary[this.getGroup()] !== 'undefined' &&
       typeof dictionary[this.getGroup()][this.getElement()] !==
         'undefined') {
@@ -145,8 +145,8 @@ export class Tag {
    * @returns {string} The VR.
    */
   getVrFromDictionary() {
-    var vr = null;
-    var info = this.getInfoFromDictionary();
+    let vr = null;
+    const info = this.getInfoFromDictionary();
     if (info !== null) {
       vr = info[0];
     }
@@ -159,8 +159,8 @@ export class Tag {
    * @returns {string} The VR.
    */
   getNameFromDictionary() {
-    var name = null;
-    var info = this.getInfoFromDictionary();
+    let name = null;
+    const info = this.getInfoFromDictionary();
     if (info !== null) {
       name = info[2];
     }
@@ -180,7 +180,7 @@ export class Tag {
  */
 export function tagCompareFunction(a, b) {
   // first by group
-  var res = parseInt(a.getGroup()) - parseInt(b.getGroup());
+  let res = parseInt(a.getGroup()) - parseInt(b.getGroup());
   if (res === 0) {
     // by element if same group
     res = parseInt(a.getElement()) - parseInt(b.getElement());
@@ -314,17 +314,17 @@ export function getTagFromDictionary(tagName) {
   if (typeof tagName === 'undefined' || tagName === null) {
     return null;
   }
-  var group = null;
-  var element = null;
-  var dict = dictionary;
-  var keys0 = Object.keys(dict);
-  var keys1 = null;
-  var foundTag = false;
+  let group = null;
+  let element = null;
+  const dict = dictionary;
+  const keys0 = Object.keys(dict);
+  let keys1 = null;
+  let foundTag = false;
   // search through dictionary
-  for (var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
+  for (let k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
     group = keys0[k0];
     keys1 = Object.keys(dict[group]);
-    for (var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
+    for (let k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
       element = keys1[k1];
       if (dict[group][element][2] === tagName) {
         foundTag = true;
@@ -335,7 +335,7 @@ export function getTagFromDictionary(tagName) {
       break;
     }
   }
-  var tag = null;
+  let tag = null;
   if (foundTag) {
     tag = new Tag(group, element);
   }

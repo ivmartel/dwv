@@ -61,12 +61,12 @@ QUnit.test('Test Tag.', function (assert) {
   new Error('Cannot create tag with badly formed element.'),
   'tag with bad element #1.');
 
-  var tag00 = new Tag('0x1111', '0x2222');
+  const tag00 = new Tag('0x1111', '0x2222');
   assert.notOk(tag00.equals(null), 'equals to null');
   assert.notOk(tag00.equals(), 'equals to undef');
-  var tag01 = new Tag('0x1112', '0x2222');
+  const tag01 = new Tag('0x1112', '0x2222');
   assert.notOk(tag00.equals(tag01), 'not equals #0');
-  var tag02 = new Tag('0x1111', '0x2221');
+  const tag02 = new Tag('0x1111', '0x2221');
   assert.notOk(tag00.equals(tag02), 'not equals #1');
   assert.ok(tag00.equals(tag00), 'equals #0');
 
@@ -83,28 +83,28 @@ QUnit.test('Test Tag.', function (assert) {
  * @function module:tests/dicom~getTagFromDictionary
  */
 QUnit.test('Test getTagFromDictionary.', function (assert) {
-  var tag00 = getTagFromDictionary();
+  const tag00 = getTagFromDictionary();
   assert.equal(tag00, null, 'get undefined');
-  var tag01 = getTagFromDictionary(null);
+  const tag01 = getTagFromDictionary(null);
   assert.equal(tag01, null, 'get null');
-  var tag02 = getTagFromDictionary('null');
+  const tag02 = getTagFromDictionary('null');
   assert.equal(tag02, null, 'get non existing');
 
   // empty tag name...
-  var tag03 = getTagFromDictionary('');
-  var refTag03 = new Tag('0x0008', '0x0202');
+  const tag03 = getTagFromDictionary('');
+  const refTag03 = new Tag('0x0008', '0x0202');
   assert.ok(tag03.equals(refTag03), 'get empty');
 
-  var refTag10 = getTransferSyntaxUIDTag();
+  const refTag10 = getTransferSyntaxUIDTag();
 
   // extra space
-  var tag04 = getTagFromDictionary('TransferSyntaxUID ');
+  const tag04 = getTagFromDictionary('TransferSyntaxUID ');
   assert.equal(tag04, null, 'get with extra space');
   // bad case
-  var tag05 = getTagFromDictionary('TransferSyntaxUid');
+  const tag05 = getTagFromDictionary('TransferSyntaxUid');
   assert.equal(tag05, null, 'get with bad case');
 
   // working case
-  var tag10 = getTagFromDictionary('TransferSyntaxUID');
+  const tag10 = getTagFromDictionary('TransferSyntaxUID');
   assert.ok(tag10.equals(refTag10), 'get test #0');
 });

@@ -48,9 +48,9 @@ export class MultiProgressHandler {
    * @param {number} n The number of data to load.
    */
   setNToLoad(n) {
-    for (var i = 0; i < n; ++i) {
+    for (let i = 0; i < n; ++i) {
       this.#progresses[i] = [];
-      for (var j = 0; j < this.#numberOfDimensions; ++j) {
+      for (let j = 0; j < this.#numberOfDimensions; ++j) {
         this.#progresses[i][j] = 0;
       }
     }
@@ -74,12 +74,12 @@ export class MultiProgressHandler {
       return;
     }
     // calculate percent
-    var percent = (event.loaded * 100) / event.total;
+    const percent = (event.loaded * 100) / event.total;
     // set percent for index
     this.#progresses[event.index][event.subindex] = percent;
 
     // item progress
-    var item = null;
+    let item = null;
     if (typeof event.item !== 'undefined') {
       item = event.item;
     } else {
@@ -107,8 +107,8 @@ export class MultiProgressHandler {
    * @private
    */
   #getItemProgress(index) {
-    var sum = 0;
-    for (var j = 0; j < this.#numberOfDimensions; ++j) {
+    let sum = 0;
+    for (let j = 0; j < this.#numberOfDimensions; ++j) {
       sum += this.#progresses[index][j];
     }
     return sum / this.#numberOfDimensions;
@@ -121,9 +121,9 @@ export class MultiProgressHandler {
    * @private
    */
   #getGlobalPercent() {
-    var sum = 0;
-    var lenprog = this.#progresses.length;
-    for (var i = 0; i < lenprog; ++i) {
+    let sum = 0;
+    const lenprog = this.#progresses.length;
+    for (let i = 0; i < lenprog; ++i) {
       sum += this.#getItemProgress(i);
     }
     return Math.round(sum / lenprog);

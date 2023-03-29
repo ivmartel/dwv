@@ -15,12 +15,12 @@ export function simpleRange(dataAccessor, start, end, increment) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
-  var nextIndex = start;
+  let nextIndex = start;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -65,7 +65,7 @@ export function range(dataAccessor, start, maxIter, increment,
   }
 
   // first index of the iteration
-  var nextIndex = start;
+  let nextIndex = start;
   // adapt first index and increments to reverse values
   if (reverse1) {
     blockIncrement *= -1;
@@ -82,16 +82,16 @@ export function range(dataAccessor, start, maxIter, increment,
       increment *= -1;
     }
   }
-  var finalBlockIncrement = blockIncrement - blockMaxIter * increment;
+  const finalBlockIncrement = blockIncrement - blockMaxIter * increment;
 
   // counters
-  var mainCount = 0;
-  var blockCount = 0;
+  let mainCount = 0;
+  let blockCount = 0;
   // result
   return {
     next: function () {
       if (mainCount < maxIter) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -127,13 +127,13 @@ export function range(dataAccessor, start, maxIter, increment,
  */
 export function rangeRegion(
   dataAccessor, start, end, increment, regionSize, regionOffset) {
-  var nextIndex = start;
-  var regionElementCount = 0;
+  let nextIndex = start;
+  let regionElementCount = 0;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -167,14 +167,14 @@ export function rangeRegion(
  */
 export function rangeRegions(
   dataAccessor, start, end, increment, regions) {
-  var nextIndex = start;
-  var regionCount = 0;
-  var regionElementCount = 0;
+  let nextIndex = start;
+  let regionCount = 0;
+  let regionElementCount = 0;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -223,21 +223,21 @@ export function simpleRange3d(
   if (typeof isPlanar === 'undefined') {
     isPlanar = false;
   }
-  var nextIndex = start;
-  var componentIncrement = 1;
+  let nextIndex = start;
+  let componentIncrement = 1;
   if (isPlanar) {
     componentIncrement = (end - start) / 3;
   } else {
     increment *= 3;
   }
-  var nextIndex1 = nextIndex + componentIncrement;
-  var nextIndex2 = nextIndex + 2 * componentIncrement;
+  let nextIndex1 = nextIndex + componentIncrement;
+  let nextIndex2 = nextIndex + 2 * componentIncrement;
 
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: [
             dataAccessor(nextIndex),
             dataAccessor(nextIndex1),
@@ -282,7 +282,7 @@ export function simpleRange3d(
  */
 export function range3d(dataAccessor, start, maxIter, increment,
   blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar) {
-  var iters = [];
+  const iters = [];
   if (isPlanar) {
     iters.push(range(
       dataAccessor, start, maxIter, increment,
@@ -316,9 +316,9 @@ export function range3d(dataAccessor, start, maxIter, increment,
   // result
   return {
     next: function () {
-      var r0 = iters[0].next();
-      var r1 = iters[1].next();
-      var r2 = iters[2].next();
+      const r0 = iters[0].next();
+      const r1 = iters[1].next();
+      const r2 = iters[2].next();
       if (!r0.done) {
         return {
           value: [
@@ -349,8 +349,8 @@ export function range3d(dataAccessor, start, maxIter, increment,
  * @returns {Array} The list of values.
  */
 export function getIteratorValues(iterator) {
-  var values = [];
-  var ival = iterator.next();
+  const values = [];
+  let ival = iterator.next();
   while (!ival.done) {
     values.push(ival.value);
     ival = iterator.next();
@@ -369,25 +369,25 @@ export function getIteratorValues(iterator) {
  */
 export function getSliceIterator(
   image, position, isRescaled, viewOrientation) {
-  var size = image.getGeometry().getSize();
+  const size = image.getGeometry().getSize();
   // zero-ify non direction index
-  var dirMax2Index = 2;
+  let dirMax2Index = 2;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
     dirMax2Index = viewOrientation.getColAbsMax(2).index;
   }
-  var posValues = position.getValues();
+  const posValues = position.getValues();
   // keep the main direction and any other than 3D
-  var indexFilter = function (element, index) {
+  const indexFilter = function (element, index) {
     return (index === dirMax2Index || index > 2) ? element : 0;
   };
-  var posStart = new Index(posValues.map(indexFilter));
-  var start = size.indexToOffset(posStart);
+  const posStart = new Index(posValues.map(indexFilter));
+  let start = size.indexToOffset(posStart);
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var dataAccessor = null;
+  let dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -398,14 +398,14 @@ export function getSliceIterator(
     };
   }
 
-  var ncols = size.get(0);
-  var nrows = size.get(1);
-  var nslices = size.get(2);
-  var sliceSize = size.getDimSize(2);
+  const ncols = size.get(0);
+  const nrows = size.get(1);
+  const nslices = size.get(2);
+  let sliceSize = size.getDimSize(2);
 
-  var ncomp = image.getNumberOfComponents();
-  var isPlanar = image.getPlanarConfiguration() === 1;
-  var getRange = function (
+  const ncomp = image.getNumberOfComponents();
+  const isPlanar = image.getPlanarConfiguration() === 1;
+  const getRange = function (
     dataAccessor, start, maxIter, increment,
     blockMaxIter, blockIncrement, reverse1, reverse2) {
     if (ncomp === 1) {
@@ -417,16 +417,16 @@ export function getSliceIterator(
     }
   };
 
-  var rangeObj = null;
+  let rangeObj = null;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
-    var dirMax0 = viewOrientation.getColAbsMax(0);
-    var dirMax2 = viewOrientation.getColAbsMax(2);
+    const dirMax0 = viewOrientation.getColAbsMax(0);
+    const dirMax2 = viewOrientation.getColAbsMax(2);
 
     // default reverse
-    var reverse1 = false;
-    var reverse2 = false;
+    const reverse1 = false;
+    const reverse2 = false;
 
-    var maxIter = null;
+    let maxIter = null;
     if (dirMax2.index === 2) {
       // axial
       maxIter = ncols * nrows;
@@ -505,7 +505,7 @@ export function getRegionSliceIterator(
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var dataAccessor = null;
+  let dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -516,7 +516,7 @@ export function getRegionSliceIterator(
     };
   }
 
-  var size = image.getGeometry().getSize();
+  const size = image.getGeometry().getSize();
   if (typeof min === 'undefined') {
     min = new Point2D(0, 0);
   }
@@ -527,16 +527,16 @@ export function getRegionSliceIterator(
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
-  var startOffset = size.indexToOffset(position.getWithNew2D(
+  const startOffset = size.indexToOffset(position.getWithNew2D(
     min.getX(), min.getY()
   ));
-  var endOffset = size.indexToOffset(position.getWithNew2D(
+  const endOffset = size.indexToOffset(position.getWithNew2D(
     max.getX(), max.getY() - 1
   ));
 
   // minimum 1 column
-  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
-  var rowIncrement = size.get(0) - rangeNumberOfColumns;
+  const rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  const rowIncrement = size.get(0) - rangeNumberOfColumns;
 
   return rangeRegion(
     dataAccessor, startOffset, endOffset + 1,
@@ -563,7 +563,7 @@ export function getVariableRegionSliceIterator(
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var dataAccessor = null;
+  let dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -574,16 +574,16 @@ export function getVariableRegionSliceIterator(
     };
   }
 
-  var size = image.getGeometry().getSize();
+  const size = image.getGeometry().getSize();
 
-  var offsetRegions = [];
-  var region;
-  var min = null;
-  var max = null;
-  var index = null;
-  for (var i = 0; i < regions.length; ++i) {
+  const offsetRegions = [];
+  let region;
+  let min = null;
+  let max = null;
+  let index = null;
+  for (let i = 0; i < regions.length; ++i) {
     region = regions[i];
-    var width = region[1][0] - region[0][0];
+    const width = region[1][0] - region[0][0];
     if (width !== 0) {
       index = i;
       if (!min) {
@@ -605,10 +605,10 @@ export function getVariableRegionSliceIterator(
     return undefined;
   }
 
-  var startOffset = size.indexToOffset(position.getWithNew2D(
+  const startOffset = size.indexToOffset(position.getWithNew2D(
     min[0], min[1]
   ));
-  var endOffset = size.indexToOffset(position.getWithNew2D(
+  const endOffset = size.indexToOffset(position.getWithNew2D(
     max[0], max[1]
   ));
 
@@ -627,8 +627,8 @@ export function getVariableRegionSliceIterator(
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
 export function colourRange(colours, end) {
-  var nextIndex = 0;
-  var nextColourIndex = 0;
+  let nextIndex = 0;
+  let nextColourIndex = 0;
   // result
   return {
     next: function () {
@@ -637,7 +637,7 @@ export function colourRange(colours, end) {
           nextIndex >= colours[nextColourIndex + 1].index) {
           ++nextColourIndex;
         }
-        var result = {
+        const result = {
           value: colours[nextColourIndex].colour,
           done: false,
           index: nextIndex

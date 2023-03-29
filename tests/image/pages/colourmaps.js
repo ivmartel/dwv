@@ -26,18 +26,18 @@ function onDOMContentLoaded() {
  */
 function createImage(colourMapName, colourMap) {
   // default size
-  var height = 40;
-  var width = 256;
+  const height = 40;
+  const width = 256;
   // create canvas
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var context = canvas.getContext('2d');
+  const context = canvas.getContext('2d');
   // fill in the image data
-  var imageData = context.createImageData(canvas.width, canvas.height);
-  var index = 0;
-  for (var j = 0; j < canvas.height; ++j) {
-    for (var i = 0; i < canvas.width; ++i) {
+  const imageData = context.createImageData(canvas.width, canvas.height);
+  let index = 0;
+  for (let j = 0; j < canvas.height; ++j) {
+    for (let i = 0; i < canvas.width; ++i) {
       index = (i + j * imageData.width) * 4;
       imageData.data[index] = colourMap.red[i];
       imageData.data[index + 1] = colourMap.green[i];
@@ -49,10 +49,10 @@ function createImage(colourMapName, colourMap) {
   context.putImageData(imageData, 0, 0);
 
   // html
-  var div = document.createElement('div');
+  const div = document.createElement('div');
   div.id = colourMapName;
-  var paragraph = document.createElement('p');
-  var link = document.createElement('a');
+  const paragraph = document.createElement('p');
+  const link = document.createElement('a');
   link.href = canvas.toDataURL('image/png');
   link.appendChild(document.createTextNode(colourMapName));
   // put all together

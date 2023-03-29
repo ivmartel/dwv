@@ -53,8 +53,8 @@ export class DicomElementsWrapper {
     if (typeof asArray === 'undefined') {
       asArray = false;
     }
-    var value = null;
-    var dElement = this.#dicomElements[groupElementKey];
+    let value = null;
+    const dElement = this.#dicomElements[groupElementKey];
     if (typeof dElement !== 'undefined') {
       // raw value if only one
       if (dElement.value.length === 1 && asArray === false) {
@@ -72,10 +72,10 @@ export class DicomElementsWrapper {
    * @returns {object} The DICOM tags as an object.
    */
   dumpToObject() {
-    var keys = Object.keys(this.#dicomElements);
-    var obj = {};
-    var dicomElement = null;
-    for (var i = 0, leni = keys.length; i < leni; ++i) {
+    const keys = Object.keys(this.#dicomElements);
+    const obj = {};
+    let dicomElement = null;
+    for (let i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = this.#dicomElements[keys[i]];
       obj[this.getTagName(dicomElement.tag)] =
         this.getElementAsObject(dicomElement);
@@ -90,7 +90,7 @@ export class DicomElementsWrapper {
    * @returns {string} The tag name.
    */
   getTagName(tag) {
-    var name = tag.getNameFromDictionary();
+    let name = tag.getNameFromDictionary();
     if (name === null) {
       name = tag.getKey2();
     }
@@ -105,23 +105,23 @@ export class DicomElementsWrapper {
    */
   getElementAsObject(dicomElement) {
     // element value
-    var value = null;
+    let value = null;
 
-    var isPixel = isPixelDataTag(dicomElement.tag);
+    const isPixel = isPixelDataTag(dicomElement.tag);
 
-    var vr = dicomElement.vr;
+    const vr = dicomElement.vr;
     if (vr === 'SQ' &&
       typeof dicomElement.value !== 'undefined' &&
       !isPixel) {
       value = [];
-      var items = dicomElement.value;
-      var itemValues = null;
-      for (var i = 0; i < items.length; ++i) {
+      const items = dicomElement.value;
+      let itemValues = null;
+      for (let i = 0; i < items.length; ++i) {
         itemValues = {};
-        var keys = Object.keys(items[i]);
-        for (var k = 0; k < keys.length; ++k) {
-          var itemElement = items[i][keys[k]];
-          var key = this.getTagName(itemElement.tag);
+        const keys = Object.keys(items[i]);
+        for (let k = 0; k < keys.length; ++k) {
+          const itemElement = items[i][keys[k]];
+          const key = this.getTagName(itemElement.tag);
           // do not inclure Item elements
           if (key !== 'Item') {
             itemValues[key] = this.getElementAsObject(itemElement);
@@ -149,8 +149,8 @@ export class DicomElementsWrapper {
    * @returns {string} The dumped file.
    */
   dump() {
-    var keys = Object.keys(this.#dicomElements);
-    var result = '\n';
+    const keys = Object.keys(this.#dicomElements);
+    let result = '\n';
     result += '# Dicom-File-Format\n';
     result += '\n';
     result += '# Dicom-Meta-Information-Header\n';
@@ -160,15 +160,15 @@ export class DicomElementsWrapper {
     } else {
       result += 'NOT Little Endian Explicit\n';
     }
-    var dicomElement = null;
-    var checkHeader = true;
-    for (var i = 0, leni = keys.length; i < leni; ++i) {
+    let dicomElement = null;
+    let checkHeader = true;
+    for (let i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = this.#dicomElements[keys[i]];
       if (checkHeader && dicomElement.tag.getGroup() !== '0x0002') {
         result += '\n';
         result += '# Dicom-Data-Set\n';
         result += '# Used TransferSyntax: ';
-        var syntax = cleanString(
+        const syntax = cleanString(
           this.#dicomElements.x00020010.value[0]);
         result += getTransferSyntaxName(syntax);
         result += '\n';
@@ -188,8 +188,8 @@ export class DicomElementsWrapper {
    */
   getElementValueAsString(
     dicomElement, pretty) {
-    var str = '';
-    var strLenLimit = 65;
+    let str = '';
+    const strLenLimit = 65;
 
     // dafault to pretty output
     if (typeof pretty === 'undefined') {
@@ -201,7 +201,7 @@ export class DicomElementsWrapper {
     }
 
     // Polyfill for Number.isInteger.
-    var isInteger = Number.isInteger || function (value) {
+    const isInteger = Number.isInteger || function (value) {
       return typeof value === 'number' &&
         isFinite(value) &&
         Math.floor(value) === value;
@@ -216,17 +216,17 @@ export class DicomElementsWrapper {
       dicomElement.undefinedLength) {
       str = '(PixelSequence)';
     } else if (dicomElement.vr === 'DA' && pretty) {
-      var daValue = dicomElement.value[0];
+      const daValue = dicomElement.value[0];
       // Two possible date formats:
       // - standard 'YYYYMMDD'
       // - non-standard 'YYYY.MM.DD' (previous ACR-NEMA)
-      var monthBeginIndex = 4;
-      var dayBeginIndex = 6;
+      let monthBeginIndex = 4;
+      let dayBeginIndex = 6;
       if (daValue.length !== 8) {
         monthBeginIndex = 5;
         dayBeginIndex = 8;
       }
-      var da = new Date(
+      const da = new Date(
         parseInt(daValue.substring(0, 4), 10),
         parseInt(daValue.substring(
           monthBeginIndex, monthBeginIndex + 2), 10) - 1, // 0-11 range
@@ -234,38 +234,38 @@ export class DicomElementsWrapper {
           dayBeginIndex, dayBeginIndex + 2), 10));
       str = da.toLocaleDateString();
     } else if (dicomElement.vr === 'TM' && pretty) {
-      var tmValue = dicomElement.value[0];
-      var tmHour = tmValue.substring(0, 2);
-      var tmMinute = tmValue.length >= 4 ? tmValue.substring(2, 4) : '00';
-      var tmSeconds = tmValue.length >= 6 ? tmValue.substring(4, 6) : '00';
+      const tmValue = dicomElement.value[0];
+      const tmHour = tmValue.substring(0, 2);
+      const tmMinute = tmValue.length >= 4 ? tmValue.substring(2, 4) : '00';
+      const tmSeconds = tmValue.length >= 6 ? tmValue.substring(4, 6) : '00';
       str = tmHour + ':' + tmMinute + ':' + tmSeconds;
     } else {
-      var isOtherVR = false;
+      let isOtherVR = false;
       if (dicomElement.vr.length !== 0) {
         isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
       }
-      var isFloatNumberVR = (dicomElement.vr === 'FL' ||
+      const isFloatNumberVR = (dicomElement.vr === 'FL' ||
         dicomElement.vr === 'FD' ||
         dicomElement.vr === 'DS');
-      var valueStr = '';
-      for (var k = 0, lenk = dicomElement.value.length; k < lenk; ++k) {
+      let valueStr = '';
+      for (let k = 0, lenk = dicomElement.value.length; k < lenk; ++k) {
         valueStr = '';
         if (k !== 0) {
           valueStr += '\\';
         }
         if (isFloatNumberVR) {
-          var val = dicomElement.value[k];
+          let val = dicomElement.value[k];
           if (typeof val === 'string') {
             val = cleanString(val);
           }
-          var num = Number(val);
+          const num = Number(val);
           if (!isInteger(num) && pretty) {
             valueStr += num.toPrecision(4);
           } else {
             valueStr += num.toString();
           }
         } else if (isOtherVR) {
-          var tmp = dicomElement.value[k].toString(16);
+          let tmp = dicomElement.value[k].toString(16);
           if (dicomElement.vr === 'OB') {
             tmp = '00'.substring(0, 2 - tmp.length) + tmp;
           } else {
@@ -311,11 +311,11 @@ export class DicomElementsWrapper {
     prefix = prefix || '';
 
     // get tag anme from dictionary
-    var tag = dicomElement.tag;
-    var tagName = tag.getNameFromDictionary();
+    const tag = dicomElement.tag;
+    const tagName = tag.getNameFromDictionary();
 
-    var deSize = dicomElement.value.length;
-    var isOtherVR = false;
+    let deSize = dicomElement.value.length;
+    let isOtherVR = false;
     if (dicomElement.vr.length !== 0) {
       isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
     }
@@ -328,10 +328,10 @@ export class DicomElementsWrapper {
       deSize = 1;
     }
 
-    var isPixSequence = (isPixelDataTag(dicomElement.tag) &&
+    const isPixSequence = (isPixelDataTag(dicomElement.tag) &&
       dicomElement.undefinedLength);
 
-    var line = null;
+    let line = null;
 
     // (group,element)
     line = '(';
@@ -386,9 +386,9 @@ export class DicomElementsWrapper {
     }
 
     // align #
-    var nSpaces = 55 - line.length;
+    const nSpaces = 55 - line.length;
     if (nSpaces > 0) {
-      for (var s = 0; s < nSpaces; ++s) {
+      for (let s = 0; s < nSpaces; ++s) {
         line += ' ';
       }
     }
@@ -409,20 +409,20 @@ export class DicomElementsWrapper {
       line += 'Unknown Tag & Data';
     }
 
-    var message = null;
+    let message = null;
 
     // continue for sequence
     if (dicomElement.vr === 'SQ') {
-      var item = null;
-      for (var l = 0, lenl = dicomElement.value.length; l < lenl; ++l) {
+      let item = null;
+      for (let l = 0, lenl = dicomElement.value.length; l < lenl; ++l) {
         item = dicomElement.value[l];
-        var itemKeys = Object.keys(item);
+        const itemKeys = Object.keys(item);
         if (itemKeys.length === 0) {
           continue;
         }
 
         // get the item element
-        var itemElement = item.xFFFEE000;
+        const itemElement = item.xFFFEE000;
         message = '(Item with';
         if (itemElement.undefinedLength) {
           message += ' undefined';
@@ -436,7 +436,7 @@ export class DicomElementsWrapper {
         line += '\n';
         line += this.getElementAsString(itemElement, prefix + '  ');
 
-        for (var m = 0, lenm = itemKeys.length; m < lenm; ++m) {
+        for (let m = 0, lenm = itemKeys.length; m < lenm; ++m) {
           if (itemKeys[m] !== 'xFFFEE000') {
             line += '\n';
             line += this.getElementAsString(item[itemKeys[m]], prefix + '    ');
@@ -448,7 +448,7 @@ export class DicomElementsWrapper {
           message += ' for re-encoding';
         }
         message += ')';
-        var itemDelimElement = {
+        const itemDelimElement = {
           tag: getItemDelimitationItemTag(),
           vr: 'na',
           vl: '0',
@@ -464,7 +464,7 @@ export class DicomElementsWrapper {
         message += ' for re-encod.';
       }
       message += ')';
-      var sqDelimElement = {
+      const sqDelimElement = {
         tag: getSequenceDelimitationItemTag(),
         vr: 'na',
         vl: '0',
@@ -474,15 +474,15 @@ export class DicomElementsWrapper {
       line += this.getElementAsString(sqDelimElement, prefix);
     } else if (isPixSequence) {
       // pixel sequence
-      var pixItem = null;
-      for (var n = 0, lenn = dicomElement.value.length; n < lenn; ++n) {
+      let pixItem = null;
+      for (let n = 0, lenn = dicomElement.value.length; n < lenn; ++n) {
         pixItem = dicomElement.value[n];
         line += '\n';
         pixItem.vr = 'pi';
         line += this.getElementAsString(pixItem, prefix + '  ');
       }
 
-      var pixDelimElement = {
+      const pixDelimElement = {
         tag: getSequenceDelimitationItemTag(),
         vr: 'na',
         vl: '0',
@@ -514,8 +514,8 @@ export class DicomElementsWrapper {
    * @returns {object} The DICOM element value.
    */
   getFromName(name) {
-    var value = null;
-    var tag = getTagFromDictionary(name);
+    let value = null;
+    const tag = getTagFromDictionary(name);
     // check that we are not at the end of the dictionary
     if (tag !== null) {
       value = this.getFromKey(tag.getKey());
@@ -530,12 +530,12 @@ export class DicomElementsWrapper {
    */
   getImageSize() {
     // rows
-    var rows = this.getFromKey('x00280010');
+    const rows = this.getFromKey('x00280010');
     if (!rows) {
       throw new Error('Missing or empty DICOM image number of rows');
     }
     // columns
-    var columns = this.getFromKey('x00280011');
+    const columns = this.getFromKey('x00280011');
     if (!columns) {
       throw new Error('Missing or empty DICOM image number of columns');
     }
@@ -549,16 +549,16 @@ export class DicomElementsWrapper {
    */
   getPixelSpacing() {
     // default
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    let rowSpacing = 1;
+    let columnSpacing = 1;
 
     // 1. PixelSpacing
     // 2. ImagerPixelSpacing
     // 3. NominalScannedPixelSpacing
     // 4. PixelAspectRatio
-    var keys = ['x00280030', 'x00181164', 'x00182010', 'x00280034'];
-    for (var k = 0; k < keys.length; ++k) {
-      var spacing = this.getFromKey(keys[k], true);
+    const keys = ['x00280030', 'x00181164', 'x00182010', 'x00280034'];
+    for (let k = 0; k < keys.length; ++k) {
+      const spacing = this.getFromKey(keys[k], true);
       if (spacing && spacing.length === 2) {
         rowSpacing = parseFloat(spacing[0]);
         columnSpacing = parseFloat(spacing[1]);
@@ -598,14 +598,14 @@ export class DicomElementsWrapper {
    */
   getPixelUnit() {
     // RescaleType
-    var unit = this.getFromKey('x00281054');
+    let unit = this.getFromKey('x00281054');
     if (!unit) {
       // Units (for PET)
       unit = this.getFromKey('x00541001');
     }
     // default rescale type for CT
     if (!unit) {
-      var modality = this.getFromKey('x00080060');
+      const modality = this.getFromKey('x00080060');
       if (modality === 'CT') {
         unit = 'HU';
       }
@@ -624,9 +624,9 @@ export class DicomElementsWrapper {
  */
 export function getFileListFromDicomDir(data) {
   // parse file
-  var parser = new DicomParser();
+  const parser = new DicomParser();
   parser.parse(data);
-  var elements = parser.getRawDicomElements();
+  const elements = parser.getRawDicomElements();
 
   // Directory Record Sequence
   if (typeof elements.x00041220 === 'undefined' ||
@@ -634,23 +634,23 @@ export function getFileListFromDicomDir(data) {
     logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return undefined;
   }
-  var dirSeq = elements.x00041220.value;
+  const dirSeq = elements.x00041220.value;
 
   if (dirSeq.length === 0) {
     logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
     return undefined;
   }
 
-  var records = [];
-  var series = null;
-  var study = null;
-  for (var i = 0; i < dirSeq.length; ++i) {
+  const records = [];
+  let series = null;
+  let study = null;
+  for (let i = 0; i < dirSeq.length; ++i) {
     // Directory Record Type
     if (typeof dirSeq[i].x00041430 === 'undefined' ||
       typeof dirSeq[i].x00041430.value === 'undefined') {
       continue;
     }
-    var recType = cleanString(dirSeq[i].x00041430.value[0]);
+    const recType = cleanString(dirSeq[i].x00041430.value[0]);
 
     // supposed to come in order...
     if (recType === 'STUDY') {
@@ -665,10 +665,10 @@ export function getFileListFromDicomDir(data) {
         typeof dirSeq[i].x00041500.value === 'undefined') {
         continue;
       }
-      var refFileIds = dirSeq[i].x00041500.value;
+      const refFileIds = dirSeq[i].x00041500.value;
       // clean and join ids
-      var refFileId = '';
-      for (var j = 0; j < refFileIds.length; ++j) {
+      let refFileId = '';
+      for (let j = 0; j < refFileIds.length; ++j) {
         if (j !== 0) {
           refFileId += '/';
         }

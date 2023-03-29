@@ -12,7 +12,7 @@ import {Index} from './index';
  *  null if one of the last two is null.
  */
 function mulABC(a, b, c) {
-  var res = null;
+  let res = null;
   if (b !== null && c !== null) {
     res = a * b * c;
   }
@@ -110,24 +110,24 @@ export class Ellipse {
    * @returns {Array} The rounded limits.
    */
   getRound() {
-    var centerX = this.getCenter().getX();
-    var centerY = this.getCenter().getY();
-    var radiusX = this.getA();
-    var radiusY = this.getB();
-    var radiusRatio = radiusX / radiusY;
-    var rySquare = Math.pow(radiusY, 2);
+    const centerX = this.getCenter().getX();
+    const centerY = this.getCenter().getY();
+    const radiusX = this.getA();
+    const radiusY = this.getB();
+    const radiusRatio = radiusX / radiusY;
+    const rySquare = Math.pow(radiusY, 2);
     // Y bounds
-    var minY = centerY - radiusY;
-    var maxY = centerY + radiusY;
-    var regions = [];
+    const minY = centerY - radiusY;
+    const maxY = centerY + radiusY;
+    const regions = [];
     // loop through lines and store limits
-    for (var y = minY; y < maxY; ++y) {
-      var diff = rySquare - Math.pow(y - centerY, 2);
+    for (let y = minY; y < maxY; ++y) {
+      const diff = rySquare - Math.pow(y - centerY, 2);
       // remove small values (possibly negative)
       if (Math.abs(diff) < 1e-7) {
         continue;
       }
-      var transX = radiusRatio * Math.sqrt(diff);
+      const transX = radiusRatio * Math.sqrt(diff);
       // remove small values
       if (transX < 0.5) {
         continue;
@@ -149,20 +149,20 @@ export class Ellipse {
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
-    var quant = {};
+    const quant = {};
     // surface
-    var spacing = viewController.get2DSpacing();
-    var surface = this.getWorldSurface(spacing[0], spacing[1]);
+    const spacing = viewController.get2DSpacing();
+    const surface = this.getWorldSurface(spacing[0], spacing[1]);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n('unit.cm2')};
     }
 
     // pixel quantification
     if (viewController.canQuantifyImage()) {
-      var regions = this.getRound();
+      const regions = this.getRound();
       if (regions.length !== 0) {
-        var values = viewController.getImageVariableRegionValues(regions);
-        var quantif = getStats(values, flags);
+        const values = viewController.getImageVariableRegionValues(regions);
+        const quantif = getStats(values, flags);
         quant.min = {value: quantif.min, unit: ''};
         quant.max = {value: quantif.max, unit: ''};
         quant.mean = {value: quantif.mean, unit: ''};
@@ -194,28 +194,28 @@ export class Ellipse {
  * @returns {Array} The indices of the ellipse.
  */
 export function getEllipseIndices(center, radius, dir) {
-  var centerValues = center.getValues();
+  const centerValues = center.getValues();
   // keep all values for possible extra dimensions
-  var values = centerValues.slice();
-  var indices = [];
-  var radiusI = radius[0];
-  var radiusJ = radius[1];
-  var radiusRatio = radiusI / radiusJ;
-  var radiusJ2 = Math.pow(radiusJ, 2);
-  var di = dir[0];
-  var dj = dir[1];
+  const values = centerValues.slice();
+  const indices = [];
+  const radiusI = radius[0];
+  const radiusJ = radius[1];
+  const radiusRatio = radiusI / radiusJ;
+  const radiusJ2 = Math.pow(radiusJ, 2);
+  const di = dir[0];
+  const dj = dir[1];
   // deduce 4 positions from top right
-  for (var j = 0; j < radiusJ; ++j) {
+  for (let j = 0; j < radiusJ; ++j) {
     // right triangle formed by radiuses, j and len
     // ellipse: i*i / a*a + j*j / b*b = 1
     // -> i = a/b * sqrt(b*b - j*j)
-    var len = Math.round(
+    const len = Math.round(
       radiusRatio * Math.sqrt(radiusJ2 - Math.pow(j, 2)));
-    var jmax = centerValues[dj] + j;
-    var jmin = centerValues[dj] - j;
-    for (var i = 0; i < len; ++i) {
-      var imax = centerValues[di] + i;
-      var imin = centerValues[di] - i;
+    const jmax = centerValues[dj] + j;
+    const jmin = centerValues[dj] - j;
+    for (let i = 0; i < len; ++i) {
+      const imax = centerValues[di] + i;
+      const imin = centerValues[di] - i;
 
       // right
       values[di] = imax;

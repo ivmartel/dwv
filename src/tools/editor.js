@@ -15,7 +15,7 @@ import Konva from 'konva';
  * @returns {object} The default anchor shape.
  */
 export function getDefaultAnchor(x, y, id, style) {
-  var radius = style.applyZoomScale(3);
+  const radius = style.applyZoomScale(3);
   return new Konva.Ellipse({
     x: x,
     y: y,
@@ -117,11 +117,11 @@ export class ShapeEditor {
       // remove old anchors
       this.#removeAnchors();
       // find a factory for the input shape
-      var group = this.#shape.getParent();
-      var keys = Object.keys(this.#shapeFactoryList);
+      const group = this.#shape.getParent();
+      const keys = Object.keys(this.#shapeFactoryList);
       this.#currentFactory = null;
-      for (var i = 0; i < keys.length; ++i) {
-        var factory = new this.#shapeFactoryList[keys[i]];
+      for (let i = 0; i < keys.length; ++i) {
+        const factory = new this.#shapeFactoryList[keys[i]];
         if (factory.isFactoryGroup(group)) {
           this.#currentFactory = factory;
           // stop at first find
@@ -218,7 +218,7 @@ export class ShapeEditor {
    */
   #applyFuncToAnchors(func) {
     if (this.#shape && this.#shape.getParent()) {
-      var anchors = this.#shape.getParent().find('.anchor');
+      const anchors = this.#shape.getParent().find('.anchor');
       anchors.forEach(func);
     }
   }
@@ -241,7 +241,7 @@ export class ShapeEditor {
    * @param {boolean} flag The active (on/off) flag.
    */
   setAnchorsActive(flag) {
-    var func = null;
+    let func = null;
     if (flag) {
       func = (anchor) => {
         this.#setAnchorOn(anchor);
@@ -276,12 +276,12 @@ export class ShapeEditor {
       return;
     }
     // get shape group
-    var group = this.#shape.getParent();
+    const group = this.#shape.getParent();
 
     // activate and add anchors to group
-    var anchors =
+    const anchors =
       this.#currentFactory.getAnchors(this.#shape, this.#app.getStyle());
-    for (var i = 0; i < anchors.length; ++i) {
+    for (let i = 0; i < anchors.length; ++i) {
       // set anchor on
       this.#setAnchorOn(anchors[i]);
       // add the anchor to the group
@@ -298,12 +298,12 @@ export class ShapeEditor {
    */
   #getClone(anchor) {
     // create closure to properties
-    var parent = anchor.getParent();
-    var id = anchor.id();
-    var x = anchor.x();
-    var y = anchor.y();
+    const parent = anchor.getParent();
+    const id = anchor.id();
+    const x = anchor.x();
+    const y = anchor.y();
     // create clone object
-    var clone = {};
+    const clone = {};
     clone.getParent = function () {
       return parent;
     };
@@ -326,24 +326,25 @@ export class ShapeEditor {
    * @private
    */
   #setAnchorOn(anchor) {
-    var startAnchor = null;
+    let startAnchor = null;
 
     // command name based on shape type
-    var shapeDisplayName = getShapeDisplayName(this.#shape);
+    const shapeDisplayName = getShapeDisplayName(this.#shape);
 
     // drag start listener
     anchor.on('dragstart.edit', (event) => {
-      var anchor = event.target;
+      const anchor = event.target;
       startAnchor = this.#getClone(anchor);
       // prevent bubbling upwards
       event.cancelBubble = true;
     });
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
-      var anchor = event.target;
-      var layerDetails = getLayerDetailsFromEvent(event.evt);
-      var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      var drawLayer = layerGroup.getActiveDrawLayer();
+      const anchor = event.target;
+      const layerDetails = getLayerDetailsFromEvent(event.evt);
+      const layerGroup =
+        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+      const drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
       validateAnchorPosition(drawLayer.getBaseSize(), anchor);
       // update shape
@@ -360,10 +361,10 @@ export class ShapeEditor {
     });
     // drag end listener
     anchor.on('dragend.edit', (event) => {
-      var anchor = event.target;
-      var endAnchor = this.#getClone(anchor);
+      const anchor = event.target;
+      const endAnchor = this.#getClone(anchor);
       // store the change command
-      var chgcmd = new ChangeGroupCommand(
+      const chgcmd = new ChangeGroupCommand(
         shapeDisplayName,
         this.#currentFactory,
         startAnchor,
@@ -383,12 +384,12 @@ export class ShapeEditor {
     });
     // mouse down listener
     anchor.on('mousedown touchstart', (event) => {
-      var anchor = event.target;
+      const anchor = event.target;
       anchor.moveToTop();
     });
     // mouse over styling
     anchor.on('mouseover.edit', (event) => {
-      var anchor = event.target;
+      const anchor = event.target;
       // style is handled by the group
       anchor.stroke('#ddd');
       if (anchor.getLayer()) {
@@ -399,7 +400,7 @@ export class ShapeEditor {
     });
     // mouse out styling
     anchor.on('mouseout.edit', (event) => {
-      var anchor = event.target;
+      const anchor = event.target;
       // style is handled by the group
       anchor.stroke('#999');
       if (anchor.getLayer()) {

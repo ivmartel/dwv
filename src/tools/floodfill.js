@@ -187,10 +187,10 @@ export class Floodfill {
    * @private
    */
   #getCoord = (event) => {
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
     return {
       x: index.get(0),
       y: index.get(1)
@@ -209,7 +209,7 @@ export class Floodfill {
   #calcBorder(points, threshold, simple) {
 
     this.#parentPoints = [];
-    var image = {
+    const image = {
       data: this.#imageInfo.data,
       width: this.#imageInfo.width,
       height: this.#imageInfo.height,
@@ -219,7 +219,7 @@ export class Floodfill {
     this.#mask = MagicWand.floodFill(image, points.x, points.y, threshold);
     this.#mask = MagicWand.gaussBlurOnlyBorder(this.#mask, this.#blurRadius);
 
-    var cs = MagicWand.traceContours(this.#mask);
+    let cs = MagicWand.traceContours(this.#mask);
     cs = MagicWand.simplifyContours(
       cs, this.#simplifyTolerant, this.#simplifyCount);
 
@@ -227,7 +227,7 @@ export class Floodfill {
       if (simple) {
         return cs[0].points;
       }
-      for (var j = 0, icsl = cs[0].points.length; j < icsl; j++) {
+      for (let j = 0, icsl = cs[0].points.length; j < icsl; j++) {
         this.#parentPoints.push(new Point2D(
           cs[0].points[j].x,
           cs[0].points[j].y
@@ -253,15 +253,15 @@ export class Floodfill {
     this.#border = this.#calcBorder(point, threshold);
     // Paint the border
     if (this.#border) {
-      var factory = new RoiFactory();
+      const factory = new RoiFactory();
       this.#shapeGroup = factory.create(this.#border, this.#style);
       this.#shapeGroup.id(guid());
 
-      var drawLayer = layerGroup.getActiveDrawLayer();
-      var drawController = drawLayer.getDrawController();
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      const drawController = drawLayer.getDrawController();
 
       // get the position group
-      var posGroup = drawController.getCurrentPosGroup();
+      const posGroup = drawController.getCurrentPosGroup();
       // add shape group to position group
       posGroup.add(this.#shapeGroup);
 
@@ -298,15 +298,15 @@ export class Floodfill {
       this.#shapeGroup.destroy();
     }
 
-    var viewController =
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
-    var pos = viewController.getCurrentIndex();
-    var imageSize = viewController.getImageSize();
-    var threshold = this.#currentthreshold || this.#initialthreshold;
+    const pos = viewController.getCurrentIndex();
+    const imageSize = viewController.getImageSize();
+    const threshold = this.#currentthreshold || this.#initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
-    for (var i = pos.get(2),
+    for (let i = pos.get(2),
       len = end
         ? end : imageSize.get(2);
       i < len; i++) {
@@ -318,7 +318,7 @@ export class Floodfill {
     viewController.setCurrentPosition(pos);
 
     // Iterate over the prev images and paint border on each slice.
-    for (var j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
+    for (let j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
       if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
@@ -350,13 +350,13 @@ export class Floodfill {
       if (!this.#border) {
         return false;
       }
-      var arr = [];
-      for (var i = 0, bl = this.#border.length; i < bl; ++i) {
+      const arr = [];
+      for (let i = 0, bl = this.#border.length; i < bl; ++i) {
         arr.push(this.#border[i].x);
         arr.push(this.#border[i].y);
       }
       shape.setPoints(arr);
-      var shapeLayer = shape.getLayer();
+      const shapeLayer = shape.getLayer();
       shapeLayer.draw();
       this.onThresholdChange(modifyThreshold);
     }, 100);
@@ -377,10 +377,10 @@ export class Floodfill {
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var drawLayer = layerGroup.getActiveDrawLayer();
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const drawLayer = layerGroup.getActiveDrawLayer();
 
     this.#imageInfo = viewLayer.getImageData();
     if (!this.#imageInfo) {
@@ -407,7 +407,7 @@ export class Floodfill {
     if (!this.#started) {
       return;
     }
-    var movedpoint = this.#getCoord(event);
+    const movedpoint = this.#getCoord(event);
     this.#currentthreshold = Math.round(Math.sqrt(
       Math.pow((this.#initialpoint.x - movedpoint.x), 2) +
       Math.pow((this.#initialpoint.y - movedpoint.y), 2)) / 2);
@@ -425,8 +425,9 @@ export class Floodfill {
   mouseup = (event) => {
     this.#started = false;
     if (this.#extender) {
-      var layerDetails = getLayerDetailsFromEvent(event);
-      var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+      const layerDetails = getLayerDetailsFromEvent(event);
+      const layerGroup =
+        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
       this.extend(layerGroup);
     }
   };

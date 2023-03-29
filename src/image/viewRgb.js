@@ -9,8 +9,8 @@ export function generateImageDataRgb(
   array,
   iterator,
   alphaFunc) {
-  var index = 0;
-  var ival = iterator.next();
+  let index = 0;
+  let ival = iterator.next();
   while (!ival.done) {
     // store data
     array.data[index] = ival.value[0];

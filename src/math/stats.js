@@ -35,13 +35,13 @@ function includesFullStatsFlags(flags) {
  * @returns {object} A simple stats object.
  */
 function getSimpleStats(array) {
-  var min = array[0];
-  var max = min;
-  var sum = 0;
-  var sumSqr = 0;
-  var val = 0;
-  var length = array.length;
-  for (var i = 0; i < length; ++i) {
+  let min = array[0];
+  let max = min;
+  let sum = 0;
+  let sumSqr = 0;
+  let val = 0;
+  const length = array.length;
+  for (let i = 0; i < length; ++i) {
     val = array[i];
     if (val < min) {
       min = val;
@@ -52,10 +52,10 @@ function getSimpleStats(array) {
     sumSqr += val * val;
   }
 
-  var mean = sum / length;
+  const mean = sum / length;
   // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-  var variance = sumSqr / length - mean * mean;
-  var stdDev = Math.sqrt(variance);
+  const variance = sumSqr / length - mean * mean;
+  const stdDev = Math.sqrt(variance);
 
   return {
     min: min,
@@ -74,7 +74,7 @@ function getSimpleStats(array) {
  */
 function getFullStats(array) {
   // get simple stats
-  var stats = getSimpleStats(array);
+  const stats = getSimpleStats(array);
 
   // sort array... can get slow...
   array.sort(function (a, b) {
@@ -113,10 +113,10 @@ function getPercentile(array, ratio) {
     return array[array.length - 1];
   }
   // general case: interpolate between indices if needed
-  var i = (array.length - 1) * ratio;
-  var i0 = Math.floor(i);
-  var v0 = array[i0];
-  var v1 = array[i0 + 1];
+  const i = (array.length - 1) * ratio;
+  const i0 = Math.floor(i);
+  const v0 = array[i0];
+  const v1 = array[i0 + 1];
   return v0 + (v1 - v0) * (i - i0);
 }
 

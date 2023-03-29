@@ -62,13 +62,13 @@ export class FreeHandFactory {
   create(
     points, style, _viewController) {
     // points stored the Konvajs way
-    var arr = [];
-    for (var i = 0; i < points.length; ++i) {
+    const arr = [];
+    for (let i = 0; i < points.length; ++i) {
       arr.push(points[i].getX());
       arr.push(points[i].getY());
     }
     // draw shape
-    var kshape = new Konva.Line({
+    const kshape = new Konva.Line({
       points: arr,
       stroke: style.getLineColour(),
       strokeWidth: style.getStrokeWidth(),
@@ -78,13 +78,13 @@ export class FreeHandFactory {
     });
 
     // text
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // TODO: allow override?
     // if (typeof freeHandLabelText !== 'undefined') {
     //   textExpr = freeHandLabelText;
@@ -99,7 +99,7 @@ export class FreeHandFactory {
     };
 
     // label
-    var klabel = new Konva.Label({
+    const klabel = new Konva.Label({
       x: points[0].getX(),
       y: points[0].getY() + style.scale(10),
       scale: style.applyZoomScale(1),
@@ -113,7 +113,7 @@ export class FreeHandFactory {
     }));
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     group.add(klabel);
     group.add(kshape);
@@ -129,13 +129,13 @@ export class FreeHandFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var points = shape.points();
+    const points = shape.points();
 
-    var anchors = [];
-    for (var i = 0; i < points.length; i = i + 2) {
-      var px = points[i] + shape.x();
-      var py = points[i + 1] + shape.y();
-      var name = i;
+    const anchors = [];
+    for (let i = 0; i < points.length; i = i + 2) {
+      const px = points[i] + shape.x();
+      const py = points[i + 1] + shape.y();
+      const name = i;
       anchors.push(getDefaultAnchor(
         px, py, name, style
       ));
@@ -152,35 +152,35 @@ export class FreeHandFactory {
    */
   update(anchor, style, _viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function (node) {
+    const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
       // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
 
     // update self
-    var point = group.getChildren(function (node) {
+    const point = group.getChildren(function (node) {
       return node.id() === anchor.id();
     })[0];
     point.x(anchor.x());
     point.y(anchor.y());
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
-    var points = kline.points();
+    const points = kline.points();
     points[anchor.id()] = anchor.x() - kline.x();
     points[anchor.id() + 1] = anchor.y() - kline.y();
     // concat to make Konva think it is a new array
     kline.points(points.concat());
 
     // update text
-    var ktext = klabel.getText();
+    const ktext = klabel.getText();
     ktext.setText(ktext.meta.textExpr);
     // update position
-    var textPos = {
+    const textPos = {
       x: points[0] + kline.x(),
       y: points[1] + kline.y() + style.scale(10)
     };

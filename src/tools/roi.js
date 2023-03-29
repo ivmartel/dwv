@@ -62,17 +62,17 @@ export class RoiFactory {
    */
   create(points, style, _viewController) {
     // physical shape
-    var roi = new ROI();
+    const roi = new ROI();
     // add input points to the ROI
     roi.addPoints(points);
     // points stored the Konvajs way
-    var arr = [];
-    for (var i = 0; i < roi.getLength(); ++i) {
+    const arr = [];
+    for (let i = 0; i < roi.getLength(); ++i) {
       arr.push(roi.getPoint(i).getX());
       arr.push(roi.getPoint(i).getY());
     }
     // draw shape
-    var kshape = new Konva.Line({
+    const kshape = new Konva.Line({
       points: arr,
       stroke: style.getLineColour(),
       strokeWidth: style.getStrokeWidth(),
@@ -82,13 +82,13 @@ export class RoiFactory {
     });
 
     // text
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // todo: allow overrride?
     // if (typeof roiLabelText !== 'undefined') {
     //   textExpr = roiLabelText;
@@ -103,7 +103,7 @@ export class RoiFactory {
     };
 
     // label
-    var klabel = new Konva.Label({
+    const klabel = new Konva.Label({
       x: roi.getPoint(0).getX(),
       y: roi.getPoint(0).getY() + style.scale(10),
       scale: style.applyZoomScale(1),
@@ -117,7 +117,7 @@ export class RoiFactory {
     }));
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     group.add(klabel);
     group.add(kshape);
@@ -133,13 +133,13 @@ export class RoiFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var points = shape.points();
+    const points = shape.points();
 
-    var anchors = [];
-    for (var i = 0; i < points.length; i = i + 2) {
-      var px = points[i] + shape.x();
-      var py = points[i + 1] + shape.y();
-      var name = i;
+    const anchors = [];
+    for (let i = 0; i < points.length; i = i + 2) {
+      const px = points[i] + shape.x();
+      const py = points[i + 1] + shape.y();
+      const name = i;
       anchors.push(getDefaultAnchor(
         px, py, name, style
       ));
@@ -156,34 +156,34 @@ export class RoiFactory {
    */
   update(anchor, style, _viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kroi = group.getChildren(function (node) {
+    const kroi = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
       // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
 
     // update self
-    var point = group.getChildren(function (node) {
+    const point = group.getChildren(function (node) {
       return node.id() === anchor.id();
     })[0];
     point.x(anchor.x());
     point.y(anchor.y());
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
-    var points = kroi.points();
+    const points = kroi.points();
     points[anchor.id()] = anchor.x() - kroi.x();
     points[anchor.id() + 1] = anchor.y() - kroi.y();
     kroi.points(points);
 
     // update text
-    var ktext = klabel.getText();
+    const ktext = klabel.getText();
     ktext.setText(ktext.meta.textExpr);
     // update position
-    var textPos = {
+    const textPos = {
       x: points[0] + kroi.x(),
       y: points[1] + kroi.y() + style.scale(10)
     };

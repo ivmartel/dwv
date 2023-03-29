@@ -42,7 +42,7 @@ export class ToolboxController {
    * Initialise.
    */
   init() {
-    for (var key in this.#toolList) {
+    for (let key in this.#toolList) {
       this.#toolList[key].init();
     }
     // keydown listener
@@ -132,8 +132,8 @@ export class ToolboxController {
     }
     layer.bindInteraction();
     // interaction events
-    var names = InteractionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       layer.addEventListener(names[i],
         this.#getOnMouch(layer.getId(), names[i]));
     }
@@ -149,8 +149,8 @@ export class ToolboxController {
   #unbindLayer(layer) {
     layer.unbindInteraction();
     // interaction events
-    var names = InteractionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       layer.removeEventListener(names[i],
         this.#getOnMouch(layer.getId(), names[i]));
     }
@@ -168,9 +168,9 @@ export class ToolboxController {
    */
   #getOnMouch(layerId, eventType) {
     // augment event with converted offsets
-    var augmentEventOffsets = function (event) {
+    const augmentEventOffsets = function (event) {
       // event offset(s)
-      var offsets = getEventOffset(event);
+      const offsets = getEventOffset(event);
       // should have at least one offset
       event._x = offsets[0].x;
       event._y = offsets[0].y;
@@ -181,10 +181,10 @@ export class ToolboxController {
       }
     };
 
-    var applySelectedTool = (event) => {
+    const applySelectedTool = (event) => {
       // make sure we have a tool
       if (this.#selectedTool) {
-        var func = this.#selectedTool[event.type];
+        const func = this.#selectedTool[event.type];
         if (func) {
           func(event);
         }
@@ -196,7 +196,7 @@ export class ToolboxController {
     }
 
     if (typeof this.#callbackStore[layerId][eventType] === 'undefined') {
-      var callback = null;
+      let callback = null;
       if (eventType === 'keydown') {
         callback = function (event) {
           applySelectedTool(event);

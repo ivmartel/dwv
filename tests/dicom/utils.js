@@ -9,9 +9,9 @@
 export function b64urlToArrayBuffer(str) {
   const parts = str.split(';base64,');
   const byteChars = window.atob(parts[1]);
-  var buf = new ArrayBuffer(byteChars.length);
-  var bufView = new Uint8Array(buf);
-  for (var i = 0, strLen = byteChars.length; i < strLen; i++) {
+  const buf = new ArrayBuffer(byteChars.length);
+  const bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = byteChars.length; i < strLen; i++) {
     bufView[i] = byteChars.charCodeAt(i);
   }
   return buf;

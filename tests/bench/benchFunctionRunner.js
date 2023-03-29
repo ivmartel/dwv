@@ -1,6 +1,8 @@
-// namespace
+// namespaces
+// eslint-disable-next-line no-var
 var dcmb = dcmb || {};
 // benchmark.js
+// eslint-disable-next-line no-var
 var Benchmark = Benchmark || {};
 
 /**
@@ -10,7 +12,7 @@ var Benchmark = Benchmark || {};
 dcmb.BenchFunctionRunner = function () {
 
   // the functions to run
-  var functions = null;
+  let functions = null;
 
   /**
    * Set the runner functions.
@@ -30,24 +32,24 @@ dcmb.BenchFunctionRunner = function () {
    * {count: number, added: boolean, removed: boolean, value: string}
    */
   this.run = function (buffer) {
-    var results = [];
+    const results = [];
 
     // benchmark suite
-    var suite = new Benchmark.Suite('bench');
+    const suite = new Benchmark.Suite('bench');
     // handle end of cycle
     suite.on('cycle', function (event) {
       // console output
       console.log(String(event.target));
       // store results
-      var opsPerSec = event.target.hz;
-      var rme = event.target.stats.rme;
-      var rmeTxt = rme.toFixed(rme < 100 ? 2 : 0);
-      var text = opsPerSec + ' \u00B1' + rmeTxt + '%';
+      const opsPerSec = event.target.hz;
+      const rme = event.target.stats.rme;
+      const rmeTxt = rme.toFixed(rme < 100 ? 2 : 0);
+      const text = opsPerSec + ' \u00B1' + rmeTxt + '%';
       results.push(text);
     });
 
     // avoid creating functions in loops
-    var getFunc = function (f, a) {
+    const getFunc = function (f, a) {
       return function () {
         // run on a clone of the input array
         // (in case it is modified...)
@@ -55,7 +57,7 @@ dcmb.BenchFunctionRunner = function () {
       };
     };
     // add parsers to suite
-    for (var i = 0; i < functions.length; ++i) {
+    for (let i = 0; i < functions.length; ++i) {
       suite.add(functions[i].name, getFunc(functions[i].func, buffer));
     }
     // run async
@@ -70,8 +72,8 @@ dcmb.BenchFunctionRunner = function () {
    * @returns {Array} An array representing a header row to the result data.
    */
   this.getFunctionHeader = function () {
-    var header = [];
-    for (var i = 0; i < functions.length; ++i) {
+    const header = [];
+    for (let i = 0; i < functions.length; ++i) {
       header.push(functions[i].name);
     }
     return header;

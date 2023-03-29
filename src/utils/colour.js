@@ -139,7 +139,7 @@ export function labToUintLab(triplet) {
  *
  * @see https://en.wikipedia.org/wiki/Illuminant_D65
  */
-var d65 = {
+const d65 = {
   x: 95.0489,
   y: 100,
   z: 108.884
@@ -160,7 +160,7 @@ export function cielabToCiexyz(triplet) {
    * @returns {number} The result
    */
   function invLabFunc(x) {
-    var res = null;
+    let res = null;
     // delta = 6 / 29 = 0.206896552
     if (x > 0.206896552) {
       res = Math.pow(x, 3);
@@ -172,8 +172,8 @@ export function cielabToCiexyz(triplet) {
     return res;
   }
 
-  var illuminant = d65;
-  var l0 = (triplet.l + 16) / 116;
+  const illuminant = d65;
+  const l0 = (triplet.l + 16) / 116;
 
   return {
     x: illuminant.x * invLabFunc(l0 + triplet.a / 500),
@@ -197,7 +197,7 @@ export function ciexyzToCielab(triplet) {
    * @returns {number} The result
    */
   function labFunc(x) {
-    var res = null;
+    let res = null;
     // delta = 6 / 29 = 0.206896552
     // delta^3 = 0.008856452
     if (x > 0.008856452) {
@@ -210,8 +210,8 @@ export function ciexyzToCielab(triplet) {
     return res;
   }
 
-  var illuminant = d65;
-  var fy = labFunc(triplet.y / illuminant.y);
+  const illuminant = d65;
+  const fy = labFunc(triplet.y / illuminant.y);
 
   return {
     l: 116 * fy - 16,
@@ -235,7 +235,7 @@ export function ciexyzToSrgb(triplet) {
    * @returns {number} The result
    */
   function gammaFunc(x) {
-    var res = null;
+    let res = null;
     if (x <= 0.0031308) {
       res = 12.92 * x;
     } else {
@@ -246,9 +246,9 @@ export function ciexyzToSrgb(triplet) {
     return Math.min(1, Math.max(0, res));
   }
 
-  var x = triplet.x / 100;
-  var y = triplet.y / 100;
-  var z = triplet.z / 100;
+  const x = triplet.x / 100;
+  const y = triplet.y / 100;
+  const z = triplet.z / 100;
 
   return {
     r: Math.round(255 * gammaFunc(3.2406 * x - 1.5372 * y - 0.4986 * z)),
@@ -272,7 +272,7 @@ export function srgbToCiexyz(triplet) {
    * @returns {number} The result
    */
   function invGammaFunc(x) {
-    var res = null;
+    let res = null;
     if (x <= 0.04045) {
       res = x / 12.92;
     } else {
@@ -281,9 +281,9 @@ export function srgbToCiexyz(triplet) {
     return res;
   }
 
-  var rl = invGammaFunc(triplet.r / 255);
-  var gl = invGammaFunc(triplet.g / 255);
-  var bl = invGammaFunc(triplet.b / 255);
+  const rl = invGammaFunc(triplet.r / 255);
+  const gl = invGammaFunc(triplet.g / 255);
+  const bl = invGammaFunc(triplet.b / 255);
 
   return {
     x: 100 * (0.4124 * rl + 0.3576 * gl + 0.1805 * bl),
@@ -320,7 +320,7 @@ export function srgbToCielab(triplet) {
  */
 export function colourNameToHex(name) {
   // default colours used in dwv version < 0.17
-  var dict = {
+  const dict = {
     Yellow: '#ffff00',
     Red: '#ff0000',
     White: '#ffffff',
@@ -330,7 +330,7 @@ export function colourNameToHex(name) {
     Fuchsia: '#ff00ff',
     Black: '#000000'
   };
-  var res = '#ffff00';
+  let res = '#ffff00';
   if (typeof dict[name] !== 'undefined') {
     res = dict[name];
   }

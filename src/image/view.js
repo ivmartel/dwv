@@ -44,10 +44,10 @@ export class View {
     //   to add the extra dimension
     this.#image.addEventListener('appendframe', () => {
       // update current position if first appendFrame
-      var index = this.getCurrentIndex();
+      const index = this.getCurrentIndex();
       if (index.length() === 3) {
         // add dimension
-        var values = index.getValues();
+        const values = index.getValues();
         values.push(0);
         this.setCurrentIndex(new Index(values));
       }
@@ -167,9 +167,9 @@ export class View {
    * Set the initial index to 0.
    */
   setInitialIndex() {
-    var geometry = this.#image.getGeometry();
-    var size = geometry.getSize();
-    var values = new Array(size.length());
+    const geometry = this.#image.getGeometry();
+    const size = geometry.getSize();
+    const values = new Array(size.length());
     values.fill(0);
     // middle
     values[0] = Math.floor(size.get(0) / 2);
@@ -248,14 +248,14 @@ export class View {
     if (!this.getCurrentIndex()) {
       this.setInitialIndex();
     }
-    var currentIndex = this.getCurrentIndex();
+    const currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = this.#image.getRescaleSlopeAndIntercept(currentIndex);
     }
 
     // get the current window level
-    var wl = null;
+    let wl = null;
     // special case for 'perslice' presets
     if (this.#currentPresetName &&
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
@@ -263,7 +263,7 @@ export class View {
         'undefined' &&
       this.#windowPresets[this.#currentPresetName].perslice === true) {
       // get the preset for this slice
-      var offset = this.#image.getSecondaryOffset(currentIndex);
+      const offset = this.#image.getSecondaryOffset(currentIndex);
       wl = this.#windowPresets[this.#currentPresetName].wl[offset];
     }
     // regular case
@@ -276,14 +276,14 @@ export class View {
     }
 
     // get the window lut
-    var wlut = this.#windowLuts[rsi.toString()];
+    let wlut = this.#windowLuts[rsi.toString()];
     if (typeof wlut === 'undefined') {
       // create the rescale lookup table
-      var rescaleLut = new RescaleLut(
+      const rescaleLut = new RescaleLut(
         this.#image.getRescaleSlopeAndIntercept(0),
         this.#image.getMeta().BitsStored);
       // create the window lookup table
-      var windowLut = new WindowLut(
+      const windowLut = new WindowLut(
         rescaleLut, this.#image.getMeta().IsSigned);
       // store
       this.addWindowLut(windowLut);
@@ -291,7 +291,7 @@ export class View {
     }
 
     // update lut window level if not present or different from previous
-    var lutWl = wlut.getWindowLevel();
+    const lutWl = wlut.getWindowLevel();
     if (!wl.equals(lutWl)) {
       // set lut window level
       wlut.setWindowLevel(wl);
@@ -320,7 +320,7 @@ export class View {
    * @param {Window} wlut The window LUT of the image.
    */
   addWindowLut(wlut) {
-    var rsi = wlut.getRescaleLut().getRSI();
+    const rsi = wlut.getRescaleLut().getRSI();
     this.#windowLuts[rsi.toString()] = wlut;
   }
 
@@ -366,9 +366,9 @@ export class View {
    * @param {object} presets The window presets.
    */
   addWindowPresets(presets) {
-    var keys = Object.keys(presets);
-    var key = null;
-    for (var i = 0; i < keys.length; ++i) {
+    const keys = Object.keys(presets);
+    let key = null;
+    for (let i = 0; i < keys.length; ++i) {
       key = keys[i];
       if (typeof this.#windowPresets[key] !== 'undefined') {
         if (typeof this.#windowPresets[key].perslice !== 'undefined' &&
@@ -444,11 +444,11 @@ export class View {
    * @returns {Index} The current index.
    */
   getCurrentIndex() {
-    var position = this.getCurrentPosition();
+    const position = this.getCurrentPosition();
     if (!position) {
       return null;
     }
-    var geometry = this.getImage().getGeometry();
+    const geometry = this.getImage().getGeometry();
     return geometry.worldToIndex(position);
   }
 
@@ -459,9 +459,9 @@ export class View {
    * @returns {boolean} True is the position is in bounds.
    */
   canSetPosition(position) {
-    var geometry = this.#image.getGeometry();
-    var index = geometry.worldToIndex(position);
-    var dirs = [this.getScrollIndex()];
+    const geometry = this.#image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    const dirs = [this.getScrollIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -475,10 +475,10 @@ export class View {
    * @returns {Point} The origin.
    */
   getOrigin(position) {
-    var geometry = this.#image.getGeometry();
-    var originIndex = 0;
+    const geometry = this.#image.getGeometry();
+    let originIndex = 0;
     if (typeof position !== 'undefined') {
-      var index = geometry.worldToIndex(position);
+      const index = geometry.worldToIndex(position);
       // index is reoriented, 2 is scroll index
       originIndex = index.get(2);
     }
@@ -495,9 +495,9 @@ export class View {
    */
   setCurrentPosition(position, silent) {
     // send invalid event if not in bounds
-    var geometry = this.#image.getGeometry();
-    var index = geometry.worldToIndex(position);
-    var dirs = [this.getScrollIndex()];
+    const geometry = this.#image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    const dirs = [this.getScrollIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -532,11 +532,11 @@ export class View {
       silent = false;
     }
 
-    var geometry = this.#image.getGeometry();
-    var position = geometry.indexToWorld(index);
+    const geometry = this.#image.getGeometry();
+    const position = geometry.indexToWorld(index);
 
     // check if possible
-    var dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -546,8 +546,8 @@ export class View {
     }
 
     // calculate diff dims before updating internal
-    var diffDims = null;
-    var currentIndex = null;
+    let diffDims = null;
+    let currentIndex = null;
     if (this.getCurrentPosition()) {
       currentIndex = this.getCurrentIndex();
     }
@@ -556,20 +556,20 @@ export class View {
         diffDims = currentIndex.compare(index);
       } else {
         diffDims = [];
-        var minLen = Math.min(currentIndex.length(), index.length());
-        for (var i = 0; i < minLen; ++i) {
+        const minLen = Math.min(currentIndex.length(), index.length());
+        for (let i = 0; i < minLen; ++i) {
           if (currentIndex.get(i) !== index.get(i)) {
             diffDims.push(i);
           }
         }
-        var maxLen = Math.max(currentIndex.length(), index.length());
-        for (var j = minLen; j < maxLen; ++j) {
+        const maxLen = Math.max(currentIndex.length(), index.length());
+        for (let j = minLen; j < maxLen; ++j) {
           diffDims.push(j);
         }
       }
     } else {
       diffDims = [];
-      for (var k = 0; k < index.length(); ++k) {
+      for (let k = 0; k < index.length(); ++k) {
         diffDims.push(k);
       }
     }
@@ -586,7 +586,7 @@ export class View {
        * @property {Array} value The changed value as [index, pixelValue].
        * @property {Array} diffDims An array of modified indices.
        */
-      var posEvent = {
+      const posEvent = {
         type: 'positionchange',
         value: [
           index.getValues(),
@@ -600,7 +600,7 @@ export class View {
 
       // add value if possible
       if (this.#image.canQuantify()) {
-        var pixValue = this.#image.getRescaledValueAtIndex(index);
+        const pixValue = this.#image.getRescaledValueAtIndex(index);
         posEvent.value.push(pixValue);
       }
 
@@ -637,16 +637,16 @@ export class View {
     }
 
     // new window level
-    var newWl = new WindowLevel(center, width);
+    const newWl = new WindowLevel(center, width);
 
     // check if new
-    var isNew = !newWl.equals(this.#currentWl);
+    const isNew = !newWl.equals(this.#currentWl);
 
     // compare to previous if present
     if (isNew) {
-      var isNewWidth = this.#currentWl
+      const isNewWidth = this.#currentWl
         ? this.#currentWl.getWidth() !== width : true;
-      var isNewCenter = this.#currentWl
+      const isNewCenter = this.#currentWl
         ? this.#currentWl.getCenter() !== center : true;
       // assign
       this.#currentWl = newWl;
@@ -681,7 +681,7 @@ export class View {
    * @param {boolean} silent Flag to launch events with skipGenerate.
    */
   setWindowLevelPreset(name, silent) {
-    var preset = this.getWindowPresets()[name];
+    const preset = this.getWindowPresets()[name];
     if (typeof preset === 'undefined') {
       throw new Error('Unknown window level preset: \'' + name + '\'');
     }
@@ -690,11 +690,11 @@ export class View {
       preset.wl = [this.getWindowLevelMinMax()];
     }
     // default to first
-    var wl = preset.wl[0];
+    let wl = preset.wl[0];
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      var offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
+      const offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
       wl = preset.wl[offset];
     }
     // set w/l
@@ -709,7 +709,7 @@ export class View {
    * @param {boolean} silent Flag to launch events with skipGenerate.
    */
   setWindowLevelPresetById(id, silent) {
-    var keys = Object.keys(this.getWindowPresets());
+    const keys = Object.keys(this.getWindowPresets());
     this.setWindowLevelPreset(keys[id], silent);
   }
 
@@ -719,8 +719,8 @@ export class View {
    * @returns {View} A full copy of this {View}.
    */
   clone() {
-    var copy = new View(this.getImage());
-    for (var key in this.#windowLuts) {
+    const copy = new View(this.getImage());
+    for (let key in this.#windowLuts) {
       copy.addWindowLut(this.#windowLuts[key]);
     }
     copy.setListeners(this.getListeners());
@@ -766,16 +766,16 @@ export class View {
    * @returns {object} A min/max window level.
    */
   getWindowLevelMinMax() {
-    var range = this.getImage().getRescaledDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
+    const range = this.getImage().getRescaledDataRange();
+    const min = range.min;
+    const max = range.max;
+    let width = max - min;
     // full black / white images, defaults to 1.
     if (width < 1) {
       logger.warn('Zero or negative window width, defaulting to one.');
       width = 1;
     }
-    var center = min + width / 2;
+    const center = min + width / 2;
     return new WindowLevel(center, width);
   }
 
@@ -785,7 +785,7 @@ export class View {
    */
   setWindowLevelMinMax() {
     // calculate center and width
-    var wl = this.getWindowLevelMinMax();
+    const wl = this.getWindowLevelMinMax();
     // set window level
     this.setWindowLevel(wl.getCenter(), wl.getWidth(), 'minmax');
   }
@@ -806,11 +806,11 @@ export class View {
       index = this.getCurrentIndex();
     }
 
-    var image = this.getImage();
-    var iterator = getSliceIterator(
+    const image = this.getImage();
+    const iterator = getSliceIterator(
       image, index, false, this.getOrientation());
 
-    var photoInterpretation = image.getPhotometricInterpretation();
+    const photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation) {
     case 'MONOCHROME1':
     case 'MONOCHROME2':
@@ -864,16 +864,16 @@ export class View {
    * @returns {boolean} False if not in bounds.
    */
   incrementIndex(dim, silent) {
-    var index = this.getCurrentIndex();
-    var values = new Array(index.length());
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
     values.fill(0);
     if (dim < values.length) {
       values[dim] = 1;
     } else {
       console.warn('Cannot increment given index: ', dim, values.length);
     }
-    var incr = new Index(values);
-    var newIndex = index.add(incr);
+    const incr = new Index(values);
+    const newIndex = index.add(incr);
     return this.setCurrentIndex(newIndex, silent);
   }
 
@@ -885,16 +885,16 @@ export class View {
    * @returns {boolean} False if not in bounds.
    */
   decrementIndex(dim, silent) {
-    var index = this.getCurrentIndex();
-    var values = new Array(index.length());
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
     values.fill(0);
     if (dim < values.length) {
       values[dim] = -1;
     } else {
       console.warn('Cannot decrement given index: ', dim, values.length);
     }
-    var incr = new Index(values);
-    var newIndex = index.add(incr);
+    const incr = new Index(values);
+    const newIndex = index.add(incr);
     return this.setCurrentIndex(newIndex, silent);
   }
 
@@ -904,8 +904,8 @@ export class View {
    * @returns {number} The index.
    */
   getScrollIndex() {
-    var index = null;
-    var orientation = this.getOrientation();
+    let index = null;
+    const orientation = this.getOrientation();
     if (typeof orientation !== 'undefined') {
       index = orientation.getThirdColMajorDirection();
     } else {

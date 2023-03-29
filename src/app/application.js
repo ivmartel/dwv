@@ -23,7 +23,7 @@ import {binderList} from '../gui/stage';
  * @class
  * @example
  * // create the dwv app
- * var app = new App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
@@ -110,7 +110,7 @@ export class App {
    * @returns {number} The new image id.
    */
   addNewImage(image, meta) {
-    var id = this.#dataController.length();
+    const id = this.#dataController.length();
 
     // load start event
     this.#fireEvent({
@@ -180,8 +180,8 @@ export class App {
    * @returns {boolean} True if the data has a third dimension greater than one.
    */
   canScroll() {
-    var viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
-    var controller = viewLayer.getViewController();
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
     return controller.canScroll();
   }
 
@@ -191,8 +191,8 @@ export class App {
    * @returns {boolean} True if the data is monochrome.
    */
   canWindowLevel() {
-    var viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
-    var controller = viewLayer.getViewController();
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
     return controller.canWindowLevel();
   }
 
@@ -324,20 +324,20 @@ export class App {
    *   parsing
    * @example
    * // create the dwv app
-   * var app = new App();
+   * const app = new App();
    * // initialise
    * app.init({
    *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
    *   viewOnFirstLoadItem: false
    * });
    * // render button
-   * var button = document.createElement('button');
+   * const button = document.createElement('button');
    * button.id = 'render';
    * button.disabled = true;
    * button.appendChild(document.createTextNode('render'));
    * document.body.appendChild(button);
    * app.addEventListener('load', function () {
-   *   var button = document.getElementById('render');
+   *   const button = document.getElementById('render');
    *   button.disabled = false;
    *   button.onclick = function () {
    *     // render data #0
@@ -366,38 +366,38 @@ export class App {
     // tools
     if (this.#options.tools && this.#options.tools.length !== 0) {
       // setup the tool list
-      var appToolList = {};
-      var keys = Object.keys(this.#options.tools);
-      for (var t = 0; t < keys.length; ++t) {
-        var toolName = keys[t];
+      const appToolList = {};
+      const keys = Object.keys(this.#options.tools);
+      for (let t = 0; t < keys.length; ++t) {
+        const toolName = keys[t];
         // find the tool in the Tools list
         if (typeof toolList[toolName] !== 'undefined') {
           // create tool instance
           appToolList[toolName] = new toolList[toolName](this);
           // register listeners
           if (typeof appToolList[toolName].addEventListener !== 'undefined') {
-            var names = appToolList[toolName].getEventNames();
-            for (var j = 0; j < names.length; ++j) {
+            const names = appToolList[toolName].getEventNames();
+            for (let j = 0; j < names.length; ++j) {
               appToolList[toolName].addEventListener(names[j], this.#fireEvent);
             }
           }
           // tool options
-          var toolParams = this.#options.tools[toolName];
+          const toolParams = this.#options.tools[toolName];
           if (typeof toolParams.options !== 'undefined') {
-            var type = 'raw';
+            let type = 'raw';
             if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
               type = appToolList[toolName].getOptionsType();
             }
-            var appToolOptions = toolParams.options;
+            let appToolOptions = toolParams.options;
             if (type === 'instance' || type === 'factory') {
               appToolOptions = {};
-              for (var i = 0; i < toolParams.options.length; ++i) {
-                var optionName = toolParams.options[i];
-                var optionClassName = optionName;
+              for (let i = 0; i < toolParams.options.length; ++i) {
+                const optionName = toolParams.options[i];
+                let optionClassName = optionName;
                 if (type === 'factory') {
                   optionClassName += 'Factory';
                 }
-                var toolNamespace = toolName.charAt(0).toLowerCase() +
+                const toolNamespace = toolName.charAt(0).toLowerCase() +
                   toolName.slice(1);
                 if (typeof toolOptions[toolNamespace][optionClassName] !==
                   'undefined') {
@@ -577,8 +577,8 @@ export class App {
    * Init the Window/Level display
    */
   initWLDisplay() {
-    var viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
-    var controller = viewLayer.getViewController();
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
     controller.initialise();
   }
 
@@ -595,7 +595,7 @@ export class App {
       typeof this.#options.dataViewConfigs === 'undefined') {
       throw new Error('No available data view configuration');
     }
-    var configs = [];
+    let configs = [];
     if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
       configs = this.#options.dataViewConfigs['*'];
     } else if (
@@ -636,17 +636,17 @@ export class App {
    * @param {object} dataViewConfigs The data view config.
    */
   #createLayerGroups(dataViewConfigs) {
-    var dataKeys = Object.keys(dataViewConfigs);
-    var divIds = [];
-    for (var i = 0; i < dataKeys.length; ++i) {
-      var dataConfigs = dataViewConfigs[dataKeys[i]];
-      for (var j = 0; j < dataConfigs.length; ++j) {
-        var viewConfig = dataConfigs[j];
+    const dataKeys = Object.keys(dataViewConfigs);
+    const divIds = [];
+    for (let i = 0; i < dataKeys.length; ++i) {
+      const dataConfigs = dataViewConfigs[dataKeys[i]];
+      for (let j = 0; j < dataConfigs.length; ++j) {
+        const viewConfig = dataConfigs[j];
         // view configs can contain the same divIds, avoid duplicating
         if (!divIds.includes(viewConfig.divId)) {
           // create new layer group
-          var element = document.getElementById(viewConfig.divId);
-          var layerGroup = this.#stage.addLayerGroup(element);
+          const element = document.getElementById(viewConfig.divId);
+          const layerGroup = this.#stage.addLayerGroup(element);
           // bind events
           this.#bindLayerGroupToApp(layerGroup);
           // optional orientation
@@ -667,8 +667,8 @@ export class App {
    */
   setLayerGroupsBinders(list) {
     // create instances
-    var instances = [];
-    for (var i = 0; i < list.length; ++i) {
+    const instances = [];
+    for (let i = 0; i < list.length; ++i) {
       if (typeof binderList[list[i]] !== 'undefined') {
         instances.push(new binderList[list[i]]);
       }
@@ -694,16 +694,16 @@ export class App {
     }
 
     // loop on all configs
-    var viewConfigs = this.#getViewConfigs(dataIndex);
+    const viewConfigs = this.#getViewConfigs(dataIndex);
     // nothing to do if no view config
     if (viewConfigs.length === 0) {
       logger.info('Not rendering data: ' + dataIndex +
         ' (no data view config)');
       return;
     }
-    for (var i = 0; i < viewConfigs.length; ++i) {
-      var config = viewConfigs[i];
-      var layerGroup =
+    for (let i = 0; i < viewConfigs.length; ++i) {
+      const config = viewConfigs[i];
+      const layerGroup =
       this.#stage.getLayerGroupByDivId(config.divId);
       // layer group must exist
       if (!layerGroup) {
@@ -731,10 +731,10 @@ export class App {
    * @param {number} cy The zoom center Y coordinate.
    */
   zoom(step, cx, cy) {
-    var layerGroup = this.#stage.getActiveLayerGroup();
-    var viewController = layerGroup.getActiveViewLayer().getViewController();
-    var k = viewController.getCurrentScrollPosition();
-    var center = new Point3D(cx, cy, k);
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewController = layerGroup.getActiveViewLayer().getViewController();
+    const k = viewController.getCurrentScrollPosition();
+    const center = new Point3D(cx, cy, k);
     layerGroup.addScale(step, center);
     layerGroup.draw();
   }
@@ -746,7 +746,7 @@ export class App {
    * @param {number} ty The translation along Y.
    */
   translate(tx, ty) {
-    var layerGroup = this.#stage.getActiveLayerGroup();
+    const layerGroup = this.#stage.getActiveLayerGroup();
     layerGroup.addTranslation({x: tx, y: ty});
     layerGroup.draw();
   }
@@ -757,7 +757,7 @@ export class App {
    * @param {number} alpha The opacity ([0:1] range).
    */
   setOpacity(alpha) {
-    var viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
     viewLayer.setOpacity(alpha);
     viewLayer.draw();
   }
@@ -769,10 +769,10 @@ export class App {
    * @param {Array} drawingsDetails An array of drawings details.
    */
   setDrawings(drawings, drawingsDetails) {
-    var layerGroup = this.#stage.getActiveLayerGroup();
-    var viewController =
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    var drawController =
+    const drawController =
       layerGroup.getActiveDrawLayer().getDrawController();
 
     drawController.setDrawings(
@@ -789,7 +789,7 @@ export class App {
    * @returns {object} The state of the app as a JSON object.
    */
   getState() {
-    var state = new State();
+    const state = new State();
     return state.toJSON(this);
   }
 
@@ -841,10 +841,10 @@ export class App {
   defaultOnKeydown = (event) => {
     if (event.ctrlKey) {
       if (event.shiftKey) {
-        var viewController =
+        const viewController =
           this.#stage.getActiveLayerGroup()
             .getActiveViewLayer().getViewController();
-        var size = viewController.getImageSize();
+        const size = viewController.getImageSize();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
           if (size.moreThanOne(3)) {
             viewController.decrementIndex(3);
@@ -867,7 +867,7 @@ export class App {
       } else if (event.key === 'z') { // crtl-z
         this.#undoStack.undo();
       } else if (event.key === ' ') { // crtl-space
-        for (var i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
+        for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
           this.#stage.getLayerGroup(i).setShowCrosshair(
             !this.#stage.getLayerGroup(i).getShowCrosshair()
           );
@@ -899,7 +899,7 @@ export class App {
    * @param {string} colourMap The colour map name.
    */
   setColourMap(colourMap) {
-    var viewController =
+    const viewController =
       this.#stage.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
     viewController.setColourMapFromName(colourMap);
@@ -911,7 +911,7 @@ export class App {
    * @param {object} preset The window/level preset.
    */
   setWindowLevelPreset(preset) {
-    var viewController =
+    const viewController =
       this.#stage.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
     viewController.setWindowLevelPreset(preset);
@@ -924,10 +924,10 @@ export class App {
    */
   setTool(tool) {
     // bind tool to active layer
-    for (var i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
-      var layerGroup = this.#stage.getLayerGroup(i);
+    for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
+      const layerGroup = this.#stage.getLayerGroup(i);
       // draw or view layer
-      var layer = null;
+      let layer = null;
       if (tool === 'Draw' ||
         tool === 'Livewire' ||
         tool === 'Floodfill') {
@@ -1060,9 +1060,9 @@ export class App {
       logger.error('Missing loaditem event load type.');
     }
 
-    var isFirstLoadItem = event.isfirstitem;
+    const isFirstLoadItem = event.isfirstitem;
 
-    var eventMetaData = null;
+    let eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
         this.#dataController.addNew(
@@ -1073,7 +1073,7 @@ export class App {
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
-      var state = new State();
+      const state = new State();
       state.apply(this, state.fromJSON(event.data));
       eventMetaData = 'state';
     }
@@ -1205,7 +1205,7 @@ export class App {
     group.addEventListener('renderstart', this.#fireEvent);
     group.addEventListener('renderend', this.#fireEvent);
     // propagate view events
-    for (var j = 0; j < viewEventNames.length; ++j) {
+    for (let j = 0; j < viewEventNames.length; ++j) {
       group.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // propagate drawLayer events
@@ -1240,24 +1240,24 @@ export class App {
    * @param {object} dataViewConfig The data view config.
    */
   #addViewLayer(dataIndex, dataViewConfig) {
-    var data = this.#dataController.get(dataIndex);
+    const data = this.#dataController.get(dataIndex);
     if (!data) {
       throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
+    const layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
     if (!layerGroup) {
       throw new Error('Cannot initialise layer with group id: ' +
         dataViewConfig.divId);
     }
-    var imageGeometry = data.image.getGeometry();
+    const imageGeometry = data.image.getGeometry();
 
     // un-bind
     this.#stage.unbindLayerGroups();
 
     // create and setup view
-    var viewFactory = new ViewFactory();
-    var view = viewFactory.create(data.meta, data.image);
-    var viewOrientation = getViewOrientation(
+    const viewFactory = new ViewFactory();
+    const view = viewFactory.create(data.meta, data.image);
+    const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
       layerGroup.getTargetOrientation()
     );
@@ -1282,10 +1282,10 @@ export class App {
       view.setColourMap(dataViewConfig.colourMap);
     }
 
-    var isBaseLayer = layerGroup.getNumberOfLayers() === 0;
+    const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
 
     // opacity
-    var opacity = 1;
+    let opacity = 1;
     // do we have more than one layer
     // (the layer has not been added to the layer group yet)
     if (!isBaseLayer) {
@@ -1297,12 +1297,12 @@ export class App {
     }
 
     // view layer
-    var viewLayer = layerGroup.addViewLayer();
+    const viewLayer = layerGroup.addViewLayer();
     viewLayer.setView(view, dataIndex);
-    var size2D = imageGeometry.getSize(viewOrientation).get2D();
-    var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
+    const size2D = imageGeometry.getSize(viewOrientation).get2D();
+    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, opacity);
-    var viewController = viewLayer.getViewController();
+    const viewController = viewLayer.getViewController();
 
     // listen to controller events
     if (data.image.getMeta().Modality === 'SEG') {
@@ -1324,7 +1324,7 @@ export class App {
     }
 
     // optional draw layer
-    var drawLayer;
+    let drawLayer;
     if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
       drawLayer = layerGroup.addDrawLayer();
       drawLayer.initialise(size2D, spacing2D, dataIndex);
@@ -1332,7 +1332,7 @@ export class App {
     }
 
     // sync layers position
-    var value = [
+    const value = [
       viewController.getCurrentIndex().getValues(),
       viewController.getCurrentPosition().getValues()
     ];
@@ -1345,7 +1345,7 @@ export class App {
     this.#stage.syncLayerGroupScale();
 
     // major orientation axis
-    var major = imageGeometry.getOrientation().getThirdColMajorDirection();
+    const major = imageGeometry.getOrientation().getThirdColMajorDirection();
 
     // view layer offset (done before scale)
     viewLayer.setOffset(layerGroup.getOffset());

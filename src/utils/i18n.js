@@ -7,12 +7,12 @@
  */
 export function i18n(key, _options) {
   // defaut expects something like 'unit.cm2'
-  var unit = {
+  const unit = {
     mm: 'mm',
     cm2: 'cm²',
     degree: '°'
   };
-  var props = key.split('.');
+  const props = key.split('.');
   if (props.length !== 2) {
     throw new Error('Unexpected translation key length.');
   }

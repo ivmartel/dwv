@@ -19,7 +19,7 @@ export class Size {
     if (values.length === 0) {
       throw new Error('Cannot create size with empty values.');
     }
-    var valueCheck = function (val) {
+    const valueCheck = function (val) {
       return !isNaN(val) && val !== 0;
     };
     if (!values.every(valueCheck)) {
@@ -82,7 +82,7 @@ export class Size {
    * @returns {boolean} True if scrollable.
    */
   canScroll3D(viewOrientation) {
-    var dimension = 2;
+    let dimension = 2;
     if (typeof viewOrientation !== 'undefined') {
       dimension = viewOrientation.getThirdColMajorDirection();
     }
@@ -97,9 +97,9 @@ export class Size {
    * @returns {boolean} True if scrollable.
    */
   canScroll(viewOrientation) {
-    var canScroll = this.canScroll3D(viewOrientation);
+    let canScroll = this.canScroll3D(viewOrientation);
     // check possible other dimensions
-    for (var i = 3; i < this.length(); ++i) {
+    for (let i = 3; i < this.length(); ++i) {
       canScroll = canScroll || this.moreThanOne(i);
     }
     return canScroll;
@@ -123,8 +123,8 @@ export class Size {
         throw new Error('Invalid start value for getDimSize');
       }
     }
-    var size = 1;
-    for (var i = start; i < dimension; ++i) {
+    let size = 1;
+    for (let i = start; i < dimension; ++i) {
       size *= this.get(i);
     }
     return size;
@@ -152,12 +152,12 @@ export class Size {
       return false;
     }
     // check length
-    var length = this.length();
+    const length = this.length();
     if (length !== rhs.length()) {
       return false;
     }
     // check values
-    for (var i = 0; i < length; ++i) {
+    for (let i = 0; i < length; ++i) {
       if (this.get(i) !== rhs.get(i)) {
         return false;
       }
@@ -179,29 +179,29 @@ export class Size {
       return false;
     }
     // check length
-    var length = this.length();
+    const length = this.length();
     if (length !== index.length()) {
       return false;
     }
     // create dirs if not there
     if (typeof dirs === 'undefined') {
       dirs = [];
-      for (var j = 0; j < length; ++j) {
+      for (let j = 0; j < length; ++j) {
         dirs.push(j);
       }
     } else {
-      for (var k = 0; k < length; ++k) {
+      for (let k = 0; k < length; ++k) {
         if (dirs[k] > length - 1) {
           throw new Error('Wrong input dir value: ' + dirs[k]);
         }
       }
     }
     // check values is 0 <= v < size
-    var inBound = function (value, size) {
+    const inBound = function (value, size) {
       return value >= 0 && value < size;
     };
     // check
-    for (var i = 0; i < dirs.length; ++i) {
+    for (let i = 0; i < dirs.length; ++i) {
       if (!inBound(index.get(dirs[i]), this.get(dirs[i]))) {
         return false;
       }
@@ -229,8 +229,8 @@ export class Size {
         throw new Error('Invalid start value for indexToOffset');
       }
     }
-    var offset = 0;
-    for (var i = start; i < this.length(); ++i) {
+    let offset = 0;
+    for (let i = start; i < this.length(); ++i) {
       offset += index.get(i) * this.getDimSize(i, start);
     }
     return offset;
@@ -243,10 +243,10 @@ export class Size {
    * @returns {Index} The index.
    */
   offsetToIndex(offset) {
-    var values = new Array(this.length());
-    var off = offset;
-    var dimSize = 0;
-    for (var i = this.length() - 1; i > 0; --i) {
+    const values = new Array(this.length());
+    let off = offset;
+    let dimSize = 0;
+    for (let i = this.length() - 1; i > 0; --i) {
       dimSize = this.getDimSize(i);
       values[i] = Math.floor(off / dimSize);
       off = off - values[i] * dimSize;

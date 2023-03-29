@@ -64,12 +64,12 @@ export class Geometry {
    * @returns {number} The total count.
    */
   getCurrentTotalNumberOfSlices() {
-    var keys = Object.keys(this.#timeOrigins);
+    const keys = Object.keys(this.#timeOrigins);
     if (keys.length === 0) {
       return this.#origins.length;
     }
-    var count = 0;
-    for (var i = 0; i < keys.length; ++i) {
+    let count = 0;
+    for (let i = 0; i < keys.length; ++i) {
       count += this.#timeOrigins[keys[i]].length;
     }
     return count;
@@ -93,13 +93,13 @@ export class Geometry {
    * @returns {number|undefined} The count.
    */
   getCurrentNumberOfSlicesBeforeTime(time) {
-    var keys = Object.keys(this.#timeOrigins);
+    const keys = Object.keys(this.#timeOrigins);
     if (keys.length === 0) {
       return undefined;
     }
-    var count = 0;
-    for (var i = 0; i < keys.length; ++i) {
-      var key = keys[i];
+    let count = 0;
+    for (let i = 0; i < keys.length; ++i) {
+      const key = keys[i];
       if (parseInt(key, 10) === time) {
         break;
       }
@@ -136,7 +136,7 @@ export class Geometry {
    * @returns {boolean} True if in list.
    */
   includesOrigin(point3D, tol) {
-    for (var i = 0; i < this.#origins.length; ++i) {
+    for (let i = 0; i < this.#origins.length; ++i) {
       if (this.#origins[i].isSimilar(point3D, tol)) {
         return true;
       }
@@ -153,9 +153,9 @@ export class Geometry {
    * @returns {Size} The object size.
    */
   getSize(viewOrientation) {
-    var res = this.#size;
+    let res = this.#size;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var values = getOrientedArray3D(
+      let values = getOrientedArray3D(
         [
           this.#size.get(0),
           this.#size.get(1),
@@ -173,7 +173,7 @@ export class Geometry {
    *   if needed.
    */
   #updateSliceSpacing() {
-    var geoSliceSpacing = getSliceGeometrySpacing(
+    const geoSliceSpacing = getSliceGeometrySpacing(
       this.#origins,
       this.#orientation
     );
@@ -181,7 +181,7 @@ export class Geometry {
     if (typeof geoSliceSpacing !== 'undefined' &&
       this.#spacing.get(2) !== geoSliceSpacing) {
       logger.trace('Updating slice spacing.');
-      var values = this.#spacing.getValues();
+      const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
       this.#spacing = new Spacing(values);
     }
@@ -201,9 +201,9 @@ export class Geometry {
       this.#updateSliceSpacing();
       this.#newOrigins = false;
     }
-    var res = this.#spacing;
+    let res = this.#spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var orientedValues = getOrientedArray3D(
+      let orientedValues = getOrientedArray3D(
         [
           this.#spacing.get(0),
           this.#spacing.get(1),
@@ -254,27 +254,27 @@ export class Geometry {
     // cannot use this.worldToIndex(point).getK() since
     // we cannot guaranty consecutive slices...
 
-    var localOrigins = this.#origins;
+    let localOrigins = this.#origins;
     if (typeof time !== 'undefined') {
       localOrigins = this.#timeOrigins[time];
     }
 
     // find the closest index
-    var closestSliceIndex = 0;
-    var minDist = point.getDistance(localOrigins[0]);
-    var dist = 0;
-    for (var i = 0; i < localOrigins.length; ++i) {
+    let closestSliceIndex = 0;
+    let minDist = point.getDistance(localOrigins[0]);
+    let dist = 0;
+    for (let i = 0; i < localOrigins.length; ++i) {
       dist = point.getDistance(localOrigins[i]);
       if (dist < minDist) {
         minDist = dist;
         closestSliceIndex = i;
       }
     }
-    var closestOrigin = localOrigins[closestSliceIndex];
+    const closestOrigin = localOrigins[closestSliceIndex];
     // direction between the input point and the closest origin
-    var pointDir = point.minus(closestOrigin);
+    const pointDir = point.minus(closestOrigin);
     // use third orientation matrix column as base plane vector
-    var normal = new Vector3D(
+    const normal = new Vector3D(
       this.#orientation.get(0, 2),
       this.#orientation.get(1, 2),
       this.#orientation.get(2, 2)
@@ -285,9 +285,9 @@ export class Geometry {
     //    the angle between the vectors
     //   -> >0 => vectors are codirectional
     //   -> <0 => vectors are opposite
-    var dotProd = normal.dotProduct(pointDir);
+    const dotProd = normal.dotProduct(pointDir);
     // oposite vectors get higher index
-    var sliceIndex = dotProd > 0 ? closestSliceIndex + 1 : closestSliceIndex;
+    const sliceIndex = dotProd > 0 ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   }
 
@@ -307,7 +307,7 @@ export class Geometry {
       // add in origin array
       this.#origins.splice(index, 0, origin);
       // increment second dimension
-      var values = this.#size.getValues();
+      const values = this.#size.getValues();
       values[2] += 1;
       this.#size = new Size(values);
     }
@@ -323,8 +323,8 @@ export class Geometry {
     // add origin to list
     this.#timeOrigins[time] = [origin];
     // increment third dimension
-    var sizeValues = this.#size.getValues();
-    var spacingValues = this.#spacing.getValues();
+    const sizeValues = this.#size.getValues();
+    const spacingValues = this.#spacing.getValues();
     if (sizeValues.length === 4) {
       sizeValues[3] += 1;
     } else {
@@ -390,17 +390,17 @@ export class Geometry {
   indexToWorld(index) {
     // apply spacing
     // (spacing is oriented, apply before orientation)
-    var spacing = this.getSpacing();
-    var orientedPoint3D = new Point3D(
+    const spacing = this.getSpacing();
+    const orientedPoint3D = new Point3D(
       index.get(0) * spacing.get(0),
       index.get(1) * spacing.get(1),
       index.get(2) * spacing.get(2)
     );
     // de-orient
-    var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
+    const point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
     // keep >3d values
-    var values = index.getValues();
-    var origin = this.getOrigin();
+    const values = index.getValues();
+    const origin = this.getOrigin();
     values[0] = origin.getX() + point3D.getX();
     values[1] = origin.getY() + point3D.getY();
     values[2] = origin.getZ() + point3D.getZ();
@@ -417,16 +417,16 @@ export class Geometry {
   pointToWorld(point) {
     // apply spacing
     // (spacing is oriented, apply before orientation)
-    var spacing = this.getSpacing();
-    var orientedPoint3D = new Point3D(
+    const spacing = this.getSpacing();
+    const orientedPoint3D = new Point3D(
       point.getX() * spacing.get(0),
       point.getY() * spacing.get(1),
       point.getZ() * spacing.get(2)
     );
     // de-orient
-    var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
+    const point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
     // return point3D
-    var origin = this.getOrigin();
+    const origin = this.getOrigin();
     return new Point3D(
       origin.getX() + point3D.getX(),
       origin.getY() + point3D.getY(),
@@ -444,19 +444,19 @@ export class Geometry {
     // compensate for origin
     // (origin is not oriented, compensate before orientation)
     // TODO: use slice origin...
-    var origin = this.getOrigin();
-    var point3D = new Point3D(
+    const origin = this.getOrigin();
+    const point3D = new Point3D(
       point.get(0) - origin.getX(),
       point.get(1) - origin.getY(),
       point.get(2) - origin.getZ()
     );
     // orient
-    var orientedPoint3D =
+    const orientedPoint3D =
       this.getOrientation().getInverse().multiplyPoint3D(point3D);
     // keep >3d values
-    var values = point.getValues();
+    const values = point.getValues();
     // apply spacing and round
-    var spacing = this.getSpacing();
+    const spacing = this.getSpacing();
     values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
     values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
     values[2] = Math.round(orientedPoint3D.getZ() / spacing.get(2));
@@ -474,19 +474,19 @@ export class Geometry {
   worldToPoint(point) {
     // compensate for origin
     // (origin is not oriented, compensate before orientation)
-    var origin = this.getOrigin();
-    var point3D = new Point3D(
+    const origin = this.getOrigin();
+    const point3D = new Point3D(
       point.get(0) - origin.getX(),
       point.get(1) - origin.getY(),
       point.get(2) - origin.getZ()
     );
     // orient
-    var orientedPoint3D =
+    const orientedPoint3D =
       this.getOrientation().getInverse().multiplyPoint3D(point3D);
     // keep >3d values
-    var values = point.getValues();
+    const values = point.getValues();
     // apply spacing and round
-    var spacing = this.getSpacing();
+    const spacing = this.getSpacing();
     values[0] = orientedPoint3D.getX() / spacing.get(0);
     values[1] = orientedPoint3D.getY() / spacing.get(1);
     values[2] = orientedPoint3D.getZ() / spacing.get(2);
@@ -544,15 +544,15 @@ export function getSliceGeometrySpacing(origins, orientation, withCheck) {
   // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
   // applied on the patient position, reorders indices
   // so that Z is the slice direction
-  var invOrientation = orientation.getInverse();
-  var origin1 = invOrientation.multiplyVector3D(origins[0]);
-  var origin2 = invOrientation.multiplyVector3D(origins[1]);
-  var sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
-  var deltas = [];
-  for (var i = 0; i < origins.length - 1; ++i) {
+  const invOrientation = orientation.getInverse();
+  let origin1 = invOrientation.multiplyVector3D(origins[0]);
+  let origin2 = invOrientation.multiplyVector3D(origins[1]);
+  let sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
+  const deltas = [];
+  for (let i = 0; i < origins.length - 1; ++i) {
     origin1 = invOrientation.multiplyVector3D(origins[i]);
     origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
-    var diff = Math.abs(origin1.getZ() - origin2.getZ());
+    const diff = Math.abs(origin1.getZ() - origin2.getZ());
     if (diff === 0) {
       throw new Error('Zero slice spacing.' +
         origin1.toString() + ' ' + origin2.toString());
@@ -569,10 +569,10 @@ export function getSliceGeometrySpacing(origins, orientation, withCheck) {
   }
   // warn if non constant
   if (withCheck && deltas.length !== 0) {
-    var sumReducer = function (sum, value) {
+    const sumReducer = function (sum, value) {
       return sum + value;
     };
-    var mean = deltas.reduce(sumReducer) / deltas.length;
+    const mean = deltas.reduce(sumReducer) / deltas.length;
     if (mean > 1e-4) {
       logger.warn('Varying slice spacing, mean delta: ' +
         mean.toFixed(3) + ' (' + deltas.length + ' case(s))');

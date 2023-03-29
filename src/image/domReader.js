@@ -13,10 +13,10 @@ import {Point3D} from '../math/point';
 function imageDataToBuffer(imageData) {
   // remove alpha
   // TODO support passing the full image data
-  var dataLen = imageData.data.length;
-  var buffer = new Uint8Array((dataLen / 4) * 3);
-  var j = 0;
-  for (var i = 0; i < dataLen; i += 4) {
+  const dataLen = imageData.data.length;
+  const buffer = new Uint8Array((dataLen / 4) * 3);
+  let j = 0;
+  for (let i = 0; i < dataLen; i += 4) {
     buffer[j] = imageData.data[i];
     buffer[j + 1] = imageData.data[i + 1];
     buffer[j + 2] = imageData.data[i + 2];
@@ -41,18 +41,18 @@ function getDefaultImage(
   imageBuffer, numberOfFrames,
   imageUid) {
   // image size
-  var imageSize = new Size([width, height, 1]);
+  const imageSize = new Size([width, height, 1]);
   // default spacing
   // TODO: misleading...
-  var imageSpacing = new Spacing([1, 1, 1]);
+  const imageSpacing = new Spacing([1, 1, 1]);
   // default origin
-  var origin = new Point3D(0, 0, sliceIndex);
+  const origin = new Point3D(0, 0, sliceIndex);
   // create image
-  var geometry = new Geometry(origin, imageSize, imageSpacing);
-  var image = new Image(geometry, imageBuffer, [imageUid]);
+  const geometry = new Geometry(origin, imageSize, imageSpacing);
+  const image = new Image(geometry, imageBuffer, [imageUid]);
   image.setPhotometricInterpretation('RGB');
   // meta information
-  var meta = {};
+  const meta = {};
   meta.BitsStored = 8;
   if (typeof numberOfFrames !== 'undefined') {
     meta.numberOfFiles = numberOfFrames;
@@ -71,20 +71,20 @@ function getDefaultImage(
  */
 export function getViewFromDOMImage(domImage, origin) {
   // image size
-  var width = domImage.width;
-  var height = domImage.height;
+  const width = domImage.width;
+  const height = domImage.height;
 
   // draw the image in the canvas in order to get its data
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(domImage, 0, 0);
   // get the image data
-  var imageData = ctx.getImageData(0, 0, width, height);
+  const imageData = ctx.getImageData(0, 0, width, height);
 
   // image properties
-  var info = {};
+  const info = {};
   if (typeof domImage.origin === 'string') {
     info['origin'] = {value: domImage.origin};
   } else {
@@ -95,12 +95,12 @@ export function getViewFromDOMImage(domImage, origin) {
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
 
-  var sliceIndex = domImage.index ? domImage.index : 0;
+  const sliceIndex = domImage.index ? domImage.index : 0;
   info['imageUid'] = {value: sliceIndex};
 
   // create view
-  var imageBuffer = imageDataToBuffer(imageData);
-  var image = getDefaultImage(
+  const imageBuffer = imageDataToBuffer(imageData);
+  const image = getDefaultImage(
     width, height, sliceIndex, imageBuffer, 1, sliceIndex);
 
   // return
@@ -128,16 +128,16 @@ export function getViewFromDOMVideo(
   video, onloaditem, onload, onprogress, onloadend,
   dataIndex, origin) {
   // video size
-  var width = video.videoWidth;
-  var height = video.videoHeight;
+  const width = video.videoWidth;
+  const height = video.videoHeight;
 
   // default frame rate...
-  var frameRate = 30;
+  const frameRate = 30;
   // number of frames
-  var numberOfFrames = Math.ceil(video.duration * frameRate);
+  const numberOfFrames = Math.ceil(video.duration * frameRate);
 
   // video properties
-  var info = {};
+  const info = {};
   if (video.file) {
     info['fileName'] = {value: video.file.name};
     info['fileType'] = {value: video.file.type};
@@ -149,18 +149,18 @@ export function getViewFromDOMVideo(
   info['imageUid'] = {value: 0};
 
   // draw the image in the canvas in order to get its data
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
 
   // using seeked to loop through all video frames
   video.addEventListener('seeked', onseeked, false);
 
   // current frame index
-  var frameIndex = 0;
+  let frameIndex = 0;
   // video image
-  var image = null;
+  let image = null;
 
   /**
    * Draw the context and store it as a frame
@@ -177,7 +177,7 @@ export function getViewFromDOMVideo(
     // draw image
     ctx.drawImage(video, 0, 0);
     // context to image buffer
-    var imgBuffer = imageDataToBuffer(
+    const imgBuffer = imageDataToBuffer(
       ctx.getImageData(0, 0, width, height));
     if (frameIndex === 0) {
       // create view
@@ -198,7 +198,7 @@ export function getViewFromDOMVideo(
     ++frameIndex;
   }
 
-  var nextTime = 0;
+  let nextTime = 0;
 
   /**
    * Handle seeked event

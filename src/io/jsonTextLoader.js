@@ -94,7 +94,7 @@ export class JSONTextLoader {
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
-    var ext = getFileExtension(file.name);
+    const ext = getFileExtension(file.name);
     return (ext === 'json');
   }
 
@@ -110,7 +110,7 @@ export class JSONTextLoader {
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
       // starts with 'application/json' or 'application/dicom+json
-      var isJson = function (element) {
+      const isJson = function (element) {
         return element.name === 'Accept' &&
           startsWith(element.value, 'application/json') &&
           startsWith(element.value, 'application/dicom+json');
@@ -118,8 +118,8 @@ export class JSONTextLoader {
       return typeof options.requestHeaders.find(isJson) !== 'undefined';
     }
 
-    var urlObjext = getUrlFromUri(url);
-    var ext = getFileExtension(urlObjext.pathname);
+    const urlObjext = getUrlFromUri(url);
+    const ext = getFileExtension(urlObjext.pathname);
     return (ext === 'json');
   }
 

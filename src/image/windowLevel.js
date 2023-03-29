@@ -118,7 +118,7 @@ export class WindowLevel {
    * @private
    */
   #init() {
-    var c = this.#center + this.#signedOffset;
+    const c = this.#center + this.#signedOffset;
     // from the standard
     this.#xmin = c - 0.5 - ((this.#width - 1) / 2);
     this.#xmax = c - 0.5 + ((this.#width - 1) / 2);

@@ -30,7 +30,7 @@ export class BucketQueue {
 
   push(item) {
     // Prepend item to the list in the appropriate bucket
-    var bucket = this.getBucket(item);
+    const bucket = this.getBucket(item);
     item.next = this.buckets[bucket];
     this.buckets[bucket] = item;
 
@@ -48,7 +48,7 @@ export class BucketQueue {
     }
 
     // All items in bucket have same cost, return the first one
-    var ret = this.buckets[this.loc];
+    const ret = this.buckets[this.loc];
     this.buckets[this.loc] = ret.next;
     ret.next = null;
 
@@ -64,8 +64,8 @@ export class BucketQueue {
     }
 
     // To find node, go to bucket and search through unsorted list.
-    var bucket = this.getBucket(item);
-    var node = this.buckets[bucket];
+    const bucket = this.getBucket(item);
+    let node = this.buckets[bucket];
 
     while (node !== null &&
       !(node.next !== null &&
@@ -97,9 +97,9 @@ export class BucketQueue {
 
   buildArray(newSize) {
     // Create array and initialze pointers to null
-    var buckets = new Array(newSize);
+    const buckets = new Array(newSize);
 
-    for (var i = 0; i < buckets.length; i++) {
+    for (let i = 0; i < buckets.length; i++) {
       buckets[i] = null;
     }
 

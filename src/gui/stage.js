@@ -10,9 +10,9 @@ export class WindowLevelBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
+      const viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
-        var vc = viewLayers[0].getViewController();
+        const vc = viewLayers[0].getViewController();
         vc.setWindowLevel(event.value[0], event.value[1]);
       }
     };
@@ -28,12 +28,12 @@ export class PositionBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      var pointValues = event.value[1];
-      var vc = layerGroup.getActiveViewLayer().getViewController();
+      const pointValues = event.value[1];
+      const vc = layerGroup.getActiveViewLayer().getViewController();
       // handle different number of dimensions
-      var currentPos = vc.getCurrentPosition();
-      var currentDims = currentPos.length();
-      var inputDims = pointValues.length;
+      const currentPos = vc.getCurrentPosition();
+      const currentDims = currentPos.length();
+      const inputDims = pointValues.length;
       if (inputDims !== currentDims) {
         if (inputDims === currentDims - 1) {
           // add missing dim, for ex: input 3D -> current 4D
@@ -57,12 +57,12 @@ export class ZoomBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      var scale = {
+      const scale = {
         x: event.value[0],
         y: event.value[1],
         z: event.value[2]
       };
-      var center;
+      let center;
       if (event.value.length === 6) {
         center = new Point3D(
           event.value[3],
@@ -109,7 +109,7 @@ export class OpacityBinder {
         return;
       }
       // propagate to first view layer
-      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
+      const viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
       if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
@@ -182,8 +182,8 @@ export class Stage {
    * @returns {Array} The layers.
    */
   getViewLayersByDataIndex(index) {
-    var res = [];
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    let res = [];
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       res = res.concat(this.#layerGroups[i].getViewLayersByDataIndex(index));
     }
     return res;
@@ -196,8 +196,8 @@ export class Stage {
    * @returns {Array} The layers.
    */
   getDrawLayersByDataIndex(index) {
-    var res = [];
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    let res = [];
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       res = res.concat(this.#layerGroups[i].getDrawLayersByDataIndex(index));
     }
     return res;
@@ -211,9 +211,9 @@ export class Stage {
    */
   addLayerGroup(htmlElement) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
-    var layerGroup = new LayerGroup(htmlElement);
+    const layerGroup = new LayerGroup(htmlElement);
     // add to storage
-    var isBound = this.#callbackStore && this.#callbackStore.length !== 0;
+    const isBound = this.#callbackStore && this.#callbackStore.length !== 0;
     if (isBound) {
       this.unbindLayerGroups();
     }
@@ -258,7 +258,7 @@ export class Stage {
    */
   empty() {
     this.unbindLayerGroups();
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       this.#layerGroups[i].empty();
     }
     this.#layerGroups = [];
@@ -269,7 +269,7 @@ export class Stage {
    * Reset the stage: calls reset on all layer groups.
    */
   reset() {
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       this.#layerGroups[i].reset();
     }
   }
@@ -278,7 +278,7 @@ export class Stage {
    * Draw the stage: calls draw on all layer groups.
    */
   draw() {
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       this.#layerGroups[i].draw();
     }
   }
@@ -287,10 +287,10 @@ export class Stage {
    * Synchronise the fit scale of the group layers.
    */
   syncLayerGroupScale() {
-    var minScale;
-    var hasScale = [];
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
-      var scale = this.#layerGroups[i].calculateFitScale();
+    let minScale;
+    const hasScale = [];
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      const scale = this.#layerGroups[i].calculateFitScale();
       if (typeof scale !== 'undefined') {
         hasScale.push(i);
         if (typeof minScale === 'undefined' || scale < minScale) {
@@ -303,7 +303,7 @@ export class Stage {
       return;
     }
     // apply min scale to layers
-    for (var j = 0; j < this.#layerGroups.length; ++j) {
+    for (let j = 0; j < this.#layerGroups.length; ++j) {
       if (hasScale.includes(j)) {
         this.#layerGroups[j].setFitScale(minScale);
       }
@@ -322,8 +322,8 @@ export class Stage {
     // create callback store
     this.#callbackStore = new Array(this.#layerGroups.length);
     // add listeners
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
-      for (var j = 0; j < this.#binders.length; ++j) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      for (let j = 0; j < this.#binders.length; ++j) {
         this.#addEventListeners(i, this.#binders[j]);
       }
     }
@@ -340,8 +340,8 @@ export class Stage {
       return;
     }
     // remove listeners
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
-      for (var j = 0; j < this.#binders.length; ++j) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      for (let j = 0; j < this.#binders.length; ++j) {
         this.#removeEventListeners(i, this.#binders[j]);
       }
     }
@@ -361,8 +361,8 @@ export class Stage {
     if (typeof this.#callbackStore[index] === 'undefined') {
       this.#callbackStore[index] = [];
     }
-    var store = this.#callbackStore[index];
-    var binderObj = store.find(function (elem) {
+    const store = this.#callbackStore[index];
+    let binderObj = store.find(function (elem) {
       return elem.binder === binder;
     });
     if (typeof binderObj === 'undefined') {
@@ -390,7 +390,7 @@ export class Stage {
    * @param {object} binder The layer binder.
    */
   #addEventListeners(index, binder) {
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       if (i !== index) {
         this.#layerGroups[index].addEventListener(
           binder.getEventType(),
@@ -407,7 +407,7 @@ export class Stage {
    * @param {object} binder The layer binder.
    */
   #removeEventListeners(index, binder) {
-    for (var i = 0; i < this.#layerGroups.length; ++i) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
       if (i !== index) {
         this.#layerGroups[index].removeEventListener(
           binder.getEventType(),

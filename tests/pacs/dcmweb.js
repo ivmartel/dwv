@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  *
  */
 function onDOMContentLoaded() {
-  var stowButton = document.getElementById('stowb');
+  const stowButton = document.getElementById('stowb');
   stowButton.onclick = stow;
 
-  var searchButton = document.getElementById('searchb');
+  const searchButton = document.getElementById('searchb');
   searchButton.onclick = qidoSearch;
 }
 
@@ -23,7 +23,7 @@ function onDOMContentLoaded() {
  * @returns {object} The paragraph element.
  */
 function getMessagePara(text, type) {
-  var p = document.createElement('p');
+  const p = document.createElement('p');
   p.className = 'message ' + type;
   p.appendChild(document.createTextNode(text));
   return p;
@@ -34,14 +34,14 @@ function getMessagePara(text, type) {
  */
 function qidoSearch() {
   // clear page
-  var div = document.getElementById('result');
+  const div = document.getElementById('result');
   div.innerHTML = '';
 
   // qido get list
-  var qidoReq = new XMLHttpRequest();
-  var message;
+  const qidoReq = new XMLHttpRequest();
+  let message;
   qidoReq.addEventListener('load', function (event) {
-    var status = event.currentTarget.status;
+    const status = event.currentTarget.status;
     // bad status
     if (status !== 200 && status !== 204) {
       message = 'Bad status in QIDO-RS request: ' +
@@ -58,7 +58,7 @@ function qidoSearch() {
       return;
     }
     // parse json
-    var json = JSON.parse(event.target.response);
+    const json = JSON.parse(event.target.response);
     if (json.length === 0) {
       message = 'Empty result.';
       div.appendChild(getMessagePara(message));
@@ -74,8 +74,8 @@ function qidoSearch() {
     div.appendChild(getMessagePara(message, 'error'));
   });
 
-  var rootUrl = document.getElementById('rooturl').value;
-  var qidoArgs = document.getElementById('qidoArgs').value;
+  const rootUrl = document.getElementById('rooturl').value;
+  const qidoArgs = document.getElementById('qidoArgs').value;
   qidoReq.open('GET', rootUrl + qidoArgs);
   qidoReq.setRequestHeader('Accept', 'application/dicom+json');
   qidoReq.send();
@@ -85,12 +85,12 @@ function qidoSearch() {
  * Launch a STOW request.
  */
 function stow() {
-  var div = document.getElementById('result');
+  const div = document.getElementById('result');
 
-  var stowReq = new XMLHttpRequest();
-  var message;
+  const stowReq = new XMLHttpRequest();
+  let message;
   stowReq.addEventListener('load', function (event) {
-    var status = event.currentTarget.status;
+    const status = event.currentTarget.status;
     // bad status
     if (status !== 200 && status !== 204) {
       message = 'Bad status in STOW-RS request: ' +
@@ -118,16 +118,16 @@ function stow() {
   });
 
   // local files to request
-  var urls = [
+  const urls = [
     '../data/bbmri-53323131.dcm',
     '../data/bbmri-53323275.dcm',
     '../data/bbmri-53323419.dcm'
   ];
   // files' data
-  var data = [];
+  const data = [];
 
   // load handler: store data and, when all data is received, launch STOW
-  var onload = function (event) {
+  const onload = function (event) {
     // store
     if (data.length < urls.length) {
       data.push(event.target.response);
@@ -136,18 +136,18 @@ function stow() {
     // if all, launch STOW
     if (data.length === urls.length) {
       // bundle data in multipart
-      var parts = [];
-      for (var j = 0; j < data.length; ++j) {
+      const parts = [];
+      for (let j = 0; j < data.length; ++j) {
         parts.push({
           'Content-Type': 'application/dicom',
           data: new Uint8Array(data[j])
         });
       }
-      var boundary = '----dwttestboundary';
-      var content = dwv.utils.buildMultipart(parts, boundary);
+      const boundary = '----dwttestboundary';
+      const content = dwv.utils.buildMultipart(parts, boundary);
 
       // STOW request
-      var rootUrl = document.getElementById('rooturl').value;
+      const rootUrl = document.getElementById('rooturl').value;
       stowReq.open('POST', rootUrl + 'studies');
       stowReq.setRequestHeader('Accept', 'application/dicom+json');
       stowReq.setRequestHeader('Content-Type',
@@ -157,8 +157,8 @@ function stow() {
   };
 
   // launch data requests
-  for (var i = 0; i < urls.length; ++i) {
-    var req = new XMLHttpRequest();
+  for (let i = 0; i < urls.length; ++i) {
+    const req = new XMLHttpRequest();
     req.open('GET', urls[i]);
     req.responseType = 'arraybuffer';
     req.addEventListener('load', onload);
@@ -172,18 +172,18 @@ function stow() {
  * @param {object} json The qido response as json object.
  */
 function qidoResponseToTable(json) {
-  var viewerUrl = './viewer.html?input=';
+  const viewerUrl = './viewer.html?input=';
 
-  var hasSeries = typeof json[0]['0020000E'] !== 'undefined';
+  const hasSeries = typeof json[0]['0020000E'] !== 'undefined';
 
-  var table = document.createElement('table');
+  const table = document.createElement('table');
   table.id = 'series-table';
 
   // table header
-  var header = table.createTHead();
-  var trow = header.insertRow(0);
-  var insertTCell = function (text, width) {
-    var th = document.createElement('th');
+  const header = table.createTHead();
+  const trow = header.insertRow(0);
+  const insertTCell = function (text, width) {
+    const th = document.createElement('th');
     if (typeof width !== 'undefined') {
       th.width = width;
     }
@@ -199,23 +199,23 @@ function qidoResponseToTable(json) {
   }
 
   // table body
-  var body = table.createTBody();
-  var cell;
-  for (var i = 0; i < json.length; ++i) {
-    var row = body.insertRow();
+  const body = table.createTBody();
+  let cell;
+  for (let i = 0; i < json.length; ++i) {
+    const row = body.insertRow();
     // number
     cell = row.insertCell();
     cell.appendChild(document.createTextNode(i));
     // study
     cell = row.insertCell();
-    var studyUid = json[i]['0020000D'].Value;
+    const studyUid = json[i]['0020000D'].Value;
     cell.title = studyUid;
     cell.appendChild(document.createTextNode(studyUid));
 
     if (hasSeries) {
       // series
       cell = row.insertCell();
-      var seriesUid = json[i]['0020000E'].Value;
+      const seriesUid = json[i]['0020000E'].Value;
       cell.title = seriesUid;
       cell.appendChild(document.createTextNode(seriesUid));
       // modality
@@ -223,7 +223,7 @@ function qidoResponseToTable(json) {
       cell.appendChild(document.createTextNode(json[i]['00080060'].Value));
       // action
       cell = row.insertCell();
-      var a = document.createElement('a');
+      const a = document.createElement('a');
       a.href = viewerUrl + json[i]['00081190'].Value;
       a.target = '_blank';
       a.appendChild(document.createTextNode('view'));
@@ -231,6 +231,6 @@ function qidoResponseToTable(json) {
     }
   }
 
-  var div = document.getElementById('result');
+  const div = document.getElementById('result');
   div.appendChild(table);
 }

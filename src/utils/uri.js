@@ -25,18 +25,18 @@ export function getUrlFromUri(uri) {
  */
 export function splitUri(uri) {
   // result
-  var result = {};
+  const result = {};
   // check if query string
-  var sepIndex = null;
+  let sepIndex = null;
   if (uri && (sepIndex = uri.indexOf('?')) !== -1) {
     // base: before the '?'
     result.base = uri.substring(0, sepIndex);
     // query : after the '?' and until possible '#'
-    var hashIndex = uri.indexOf('#');
+    let hashIndex = uri.indexOf('#');
     if (hashIndex === -1) {
       hashIndex = uri.length;
     }
-    var query = uri.substring(sepIndex + 1, hashIndex);
+    const query = uri.substring(sepIndex + 1, hashIndex);
     // split key/value pairs of the query
     result.query = splitKeyValueString(query);
   }
@@ -53,7 +53,7 @@ export function splitUri(uri) {
  */
 export function getUriQuery(uri) {
   // split
-  var parts = splitUri(uri);
+  const parts = splitUri(uri);
   // check not empty
   if (Object.keys(parts).length === 0) {
     return null;
@@ -98,25 +98,25 @@ function decodeQuery(query, callback, options) {
  * @returns {Array} The list of input file urls.
  */
 export function decodeKeyValueUri(uri, replaceMode) {
-  var result = [];
+  const result = [];
 
   // repeat key replace mode (default to keep key)
-  var repeatKeyReplaceMode = 'key';
+  let repeatKeyReplaceMode = 'key';
   if (replaceMode) {
     repeatKeyReplaceMode = replaceMode;
   }
 
   // decode input URI
-  var queryUri = decodeURIComponent(uri);
+  const queryUri = decodeURIComponent(uri);
   // get key/value pairs from input URI
-  var inputQueryPairs = splitUri(queryUri);
+  const inputQueryPairs = splitUri(queryUri);
   if (Object.keys(inputQueryPairs).length === 0) {
     result.push(queryUri);
   } else {
-    var keys = Object.keys(inputQueryPairs.query);
+    const keys = Object.keys(inputQueryPairs.query);
     // find repeat key
-    var repeatKey = null;
-    for (var i = 0; i < keys.length; ++i) {
+    let repeatKey = null;
+    for (let i = 0; i < keys.length; ++i) {
       if (inputQueryPairs.query[keys[i]] instanceof Array) {
         repeatKey = keys[i];
         break;
@@ -126,9 +126,9 @@ export function decodeKeyValueUri(uri, replaceMode) {
     if (!repeatKey) {
       result.push(queryUri);
     } else {
-      var repeatList = inputQueryPairs.query[repeatKey];
+      const repeatList = inputQueryPairs.query[repeatKey];
       // build base uri
-      var baseUrl = inputQueryPairs.base;
+      let baseUrl = inputQueryPairs.base;
       // add '?' when:
       // - base is not empty
       // - the repeatKey is not 'file'
@@ -136,8 +136,8 @@ export function decodeKeyValueUri(uri, replaceMode) {
       if (baseUrl !== '' && repeatKey !== 'file') {
         baseUrl += '?';
       }
-      var gotOneArg = false;
-      for (var j = 0; j < keys.length; ++j) {
+      let gotOneArg = false;
+      for (let j = 0; j < keys.length; ++j) {
         if (keys[j] !== repeatKey) {
           if (gotOneArg) {
             baseUrl += '&';
@@ -147,8 +147,8 @@ export function decodeKeyValueUri(uri, replaceMode) {
         }
       }
       // append built urls to result
-      var url;
-      for (var k = 0; k < repeatList.length; ++k) {
+      let url;
+      for (let k = 0; k < repeatList.length; ++k) {
         url = baseUrl;
         if (gotOneArg) {
           url += '&';
@@ -175,7 +175,7 @@ export function decodeKeyValueUri(uri, replaceMode) {
  * @param {Function} callback The function to call with the decoded urls.
  */
 function decodeManifestQuery(query, callback) {
-  var uri = '';
+  let uri = '';
   if (query.input[0] === '/') {
     uri = window.location.protocol + '//' + window.location.host;
   }
@@ -196,7 +196,7 @@ function decodeManifestQuery(query, callback) {
     callback(decodeManifest(this.responseXML, query.nslices));
   }
 
-  var request = new XMLHttpRequest();
+  const request = new XMLHttpRequest();
   request.open('GET', decodeURIComponent(uri), true);
   request.responseType = 'document';
   request.onload = onLoad;
@@ -212,38 +212,38 @@ function decodeManifestQuery(query, callback) {
  * @returns {Array} The decoded manifest.
  */
 export function decodeManifest(manifest, nslices) {
-  var result = [];
+  const result = [];
   // wado url
-  var wadoElement = manifest.getElementsByTagName('wado_query');
-  var wadoURL = wadoElement[0].getAttribute('wadoURL');
-  var rootURL = wadoURL + '?requestType=WADO&contentType=application/dicom&';
+  const wadoElement = manifest.getElementsByTagName('wado_query');
+  const wadoURL = wadoElement[0].getAttribute('wadoURL');
+  const rootURL = wadoURL + '?requestType=WADO&contentType=application/dicom&';
   // patient list
-  var patientList = manifest.getElementsByTagName('Patient');
+  const patientList = manifest.getElementsByTagName('Patient');
   if (patientList.length > 1) {
     logger.warn('More than one patient, loading first one.');
   }
   // study list
-  var studyList = patientList[0].getElementsByTagName('Study');
+  const studyList = patientList[0].getElementsByTagName('Study');
   if (studyList.length > 1) {
     logger.warn('More than one study, loading first one.');
   }
-  var studyUID = studyList[0].getAttribute('StudyInstanceUID');
+  const studyUID = studyList[0].getAttribute('StudyInstanceUID');
   // series list
-  var seriesList = studyList[0].getElementsByTagName('Series');
+  const seriesList = studyList[0].getElementsByTagName('Series');
   if (seriesList.length > 1) {
     logger.warn('More than one series, loading first one.');
   }
-  var seriesUID = seriesList[0].getAttribute('SeriesInstanceUID');
+  const seriesUID = seriesList[0].getAttribute('SeriesInstanceUID');
   // instance list
-  var instanceList = seriesList[0].getElementsByTagName('Instance');
+  const instanceList = seriesList[0].getElementsByTagName('Instance');
   // loop on instances and push links
-  var max = instanceList.length;
+  let max = instanceList.length;
   if (nslices < max) {
     max = nslices;
   }
-  for (var i = 0; i < max; ++i) {
-    var sopInstanceUID = instanceList[i].getAttribute('SOPInstanceUID');
-    var link = rootURL +
+  for (let i = 0; i < max; ++i) {
+    const sopInstanceUID = instanceList[i].getAttribute('SOPInstanceUID');
+    const link = rootURL +
         '&studyUID=' + studyUID +
         '&seriesUID=' + seriesUID +
         '&objectUID=' + sopInstanceUID;
@@ -261,7 +261,7 @@ export function decodeManifest(manifest, nslices) {
  * @param {object} options Optional url request options.
  */
 export function loadFromUri(uri, app, options) {
-  var query = getUriQuery(uri);
+  const query = getUriQuery(uri);
   // check query
   if (query && typeof query.input !== 'undefined') {
     loadFromQuery(query, app, options);

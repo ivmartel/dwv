@@ -14,7 +14,7 @@ export class ThreadPool {
     // lsit of available threads
     this.freeThreads = [];
     // create 'poolSize' number of worker threads
-    for (var i = 0; i < poolSize; ++i) {
+    for (let i = 0; i < poolSize; ++i) {
       this.freeThreads.push(new WorkerThread(this));
     }
     // list of running threads (unsed in abort)
@@ -35,7 +35,7 @@ export class ThreadPool {
     // launch task or queue
     if (this.freeThreads.length > 0) {
       // get the first free worker thread
-      var workerThread = this.freeThreads.shift();
+      const workerThread = this.freeThreads.shift();
       // add the thread to the runnning list
       this.runningThreads.push(workerThread);
       // run the input task
@@ -66,7 +66,7 @@ export class ThreadPool {
     // launch next task in queue or finish
     if (this.taskQueue.length > 0) {
       // get waiting task
-      var workerTask = this.taskQueue.shift();
+      const workerTask = this.taskQueue.shift();
       // use input thread to run the waiting task
       workerThread.run(workerTask);
     } else {
@@ -75,7 +75,7 @@ export class ThreadPool {
       // no task to run, add to free list
       this.freeThreads.push(workerThread);
       // remove from running list
-      for (var i = 0; i < this.runningThreads.length; ++i) {
+      for (let i = 0; i < this.runningThreads.length; ++i) {
         if (this.runningThreads[i].getId() === workerThread.getId()) {
           this.runningThreads.splice(i, 1);
         }
@@ -112,7 +112,7 @@ export class ThreadPool {
     // clear tasks
     this.taskQueue = [];
     // cancel running workers
-    for (var i = 0; i < this.runningThreads.length; ++i) {
+    for (let i = 0; i < this.runningThreads.length; ++i) {
       this.runningThreads[i].stop();
     }
     this.runningThreads = [];

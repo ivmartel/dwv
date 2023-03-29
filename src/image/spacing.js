@@ -17,7 +17,7 @@ export class Spacing {
     if (values.length === 0) {
       throw new Error('Cannot create spacing with empty values.');
     }
-    var valueCheck = function (val) {
+    const valueCheck = function (val) {
       return !isNaN(val) && val !== 0;
     };
     if (!values.every(valueCheck)) {
@@ -75,12 +75,12 @@ export class Spacing {
       return false;
     }
     // check length
-    var length = this.length();
+    const length = this.length();
     if (length !== rhs.length()) {
       return false;
     }
     // check values
-    for (var i = 0; i < length; ++i) {
+    for (let i = 0; i < length; ++i) {
       if (this.get(i) !== rhs.get(i)) {
         return false;
       }

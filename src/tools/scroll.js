@@ -9,7 +9,7 @@ import {ScrollWheel} from './scrollWheel';
  * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -27,37 +27,37 @@ import {ScrollWheel} from './scrollWheel';
  * ]);
  * @example <caption>Example with slider</caption>
  * // create the dwv app
- * var app = new App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
  *   tools: {Scroll: {}}
  * });
  * // create range
- * var range = document.createElement('input');
+ * const range = document.createElement('input');
  * range.type = 'range';
  * range.min = 0;
  * range.id = 'sliceRange';
  * document.body.appendChild(range);
  * // update app on slider change
  * range.oninput = function () {
- *   var lg = app.getLayerGroupByDivId('layerGroup0');
- *   var vc = lg.getActiveViewLayer().getViewController();
- *   var index = vc.getCurrentIndex();
- *   var values = index.getValues();
+ *   const lg = app.getLayerGroupByDivId('layerGroup0');
+ *   const vc = lg.getActiveViewLayer().getViewController();
+ *   const index = vc.getCurrentIndex();
+ *   const values = index.getValues();
  *   values[2] = this.value;
  *   vc.setCurrentIndex(new math.Index(values));
  * }
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {
  *   app.setTool('Scroll');
- *   var size = app.getImage(0).getGeometry().getSize();
+ *   const size = app.getImage(0).getGeometry().getSize();
  *   range.max = size.get(2) - 1;
  * });
  * // update slider on slice change (for ex via mouse wheel)
  * app.addEventListener('positionchange', function () {
- *   var lg = app.getLayerGroupByDivId('layerGroup0');
- *   var vc = lg.getActiveViewLayer().getViewController();
+ *   const lg = app.getLayerGroupByDivId('layerGroup0');
+ *   const vc = lg.getActiveViewLayer().getViewController();
  *   range.value = vc.getCurrentIndex().get(2);
  * });
  * // load dicom data
@@ -108,10 +108,10 @@ export class Scroll {
     this.#removeTooltipDiv();
 
     // stop viewer if playing
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var viewController = viewLayer.getViewController();
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
@@ -122,8 +122,8 @@ export class Scroll {
     this.y0 = event._y;
 
     // update controller position
-    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var position = viewController.getPositionFromPlanePoint(
+    const planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    const position = viewController.getPositionFromPlanePoint(
       planePos.x, planePos.y);
     viewController.setCurrentPosition(position);
   };
@@ -142,14 +142,14 @@ export class Scroll {
       return;
     }
 
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var viewController = viewLayer.getViewController();
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
 
     // difference to last Y position
-    var diffY = event._y - this.y0;
-    var yMove = (Math.abs(diffY) > 15);
+    const diffY = event._y - this.y0;
+    const yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
     if (yMove && viewController.canScroll()) {
       // update view controller
@@ -161,10 +161,10 @@ export class Scroll {
     }
 
     // difference to last X position
-    var diffX = event._x - this.x0;
-    var xMove = (Math.abs(diffX) > 15);
+    const diffX = event._x - this.x0;
+    const xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
-    var imageSize = viewController.getImageSize();
+    const imageSize = viewController.getImageSize();
     if (xMove && imageSize.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
@@ -273,9 +273,9 @@ export class Scroll {
    * @param {object} event The key down event.
    */
   dblclick = (event) => {
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewController =
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
   };
@@ -291,26 +291,26 @@ export class Scroll {
     this.#removeTooltipDiv();
 
     // get image value at position
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var viewController = viewLayer.getViewController();
-    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var position = viewController.getPositionFromPlanePoint(
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    const position = viewController.getPositionFromPlanePoint(
       planePos.x, planePos.y);
-    var value = viewController.getRescaledImageValue(position);
+    const value = viewController.getRescaledImageValue(position);
 
     // create
     if (typeof value !== 'undefined') {
-      var span = document.createElement('span');
+      const span = document.createElement('span');
       span.id = 'scroll-tooltip';
       // place span in layer group to avoid upper layer opacity
-      var layerDiv = document.getElementById(viewLayer.getId());
+      const layerDiv = document.getElementById(viewLayer.getId());
       layerDiv.parentElement.appendChild(span);
       // position tooltip
       span.style.left = (event._x + 10) + 'px';
       span.style.top = (event._y + 10) + 'px';
-      var text = precisionRound(value, 3);
+      let text = precisionRound(value, 3);
       if (typeof viewController.getPixelUnit() !== 'undefined') {
         text += ' ' + viewController.getPixelUnit();
       }
@@ -322,7 +322,7 @@ export class Scroll {
    * Remove the tooltip html div.
    */
   #removeTooltipDiv() {
-    var div = document.getElementById('scroll-tooltip');
+    const div = document.getElementById('scroll-tooltip');
     if (div) {
       div.remove();
     }

@@ -97,14 +97,14 @@ export class DataController {
    * @param {object} meta The image meta.
    */
   update(index, image, meta) {
-    var dataToUpdate = this.#data[index];
+    const dataToUpdate = this.#data[index];
 
     // add slice to current image
     dataToUpdate.image.appendSlice(image);
 
     // update meta data
     // TODO add time support
-    var idKey = '';
+    let idKey = '';
     if (typeof meta.x00020010 !== 'undefined') {
       // dicom case
       idKey = 'InstanceNumber';
@@ -171,10 +171,10 @@ export class DataController {
    * @returns {*} object for DICOM, array for DOM image.
    */
   #getMetaObject(meta) {
-    var metaObj = null;
+    let metaObj = null;
     // wrap meta if dicom (x00020010: transfer syntax)
     if (typeof meta.x00020010 !== 'undefined') {
-      var newDcmMetaData = new DicomElementsWrapper(meta);
+      const newDcmMetaData = new DicomElementsWrapper(meta);
       metaObj = newDcmMetaData.dumpToObject();
     } else {
       metaObj = meta;

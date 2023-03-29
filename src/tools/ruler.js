@@ -63,9 +63,9 @@ export class RulerFactory {
    */
   create(points, style, viewController) {
     // physical shape
-    var line = new Line(points[0], points[1]);
+    const line = new Line(points[0], points[1]);
     // draw shape
-    var kshape = new Konva.Line({
+    const kshape = new Konva.Line({
       points: [line.getBegin().getX(),
         line.getBegin().getY(),
         line.getEnd().getX(),
@@ -76,11 +76,11 @@ export class RulerFactory {
       name: 'shape'
     });
 
-    var tickLen = style.scale(10);
+    const tickLen = style.scale(10);
 
     // tick begin
-    var linePerp0 = getPerpendicularLine(line, points[0], tickLen);
-    var ktick0 = new Konva.Line({
+    const linePerp0 = getPerpendicularLine(line, points[0], tickLen);
+    const ktick0 = new Konva.Line({
       points: [linePerp0.getBegin().getX(),
         linePerp0.getBegin().getY(),
         linePerp0.getEnd().getX(),
@@ -92,8 +92,8 @@ export class RulerFactory {
     });
 
     // tick end
-    var linePerp1 = getPerpendicularLine(line, points[1], tickLen);
-    var ktick1 = new Konva.Line({
+    const linePerp1 = getPerpendicularLine(line, points[1], tickLen);
+    const ktick1 = new Konva.Line({
       points: [linePerp1.getBegin().getX(),
         linePerp1.getBegin().getY(),
         linePerp1.getEnd().getX(),
@@ -116,7 +116,7 @@ export class RulerFactory {
     });
 
     // quantification
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
@@ -125,14 +125,14 @@ export class RulerFactory {
       shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // TODO: allow override?
     // if (typeof rulerLabelText !== 'undefined') {
     //   textExpr = rulerLabelText;
     // } else {
     textExpr = defaultRulerLabelText;
     // }
-    var quant = line.quantify(
+    const quant = line.quantify(
       viewController,
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
@@ -143,9 +143,9 @@ export class RulerFactory {
     };
 
     // label
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
-    var klabel = new Konva.Label({
+    const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
+    const klabel = new Konva.Label({
       x: line.getEnd().getX() + dX * ktext.width(),
       y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
       scale: style.applyZoomScale(1),
@@ -159,7 +159,7 @@ export class RulerFactory {
     }));
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     group.add(klabel);
     group.add(ktick0);
@@ -177,9 +177,9 @@ export class RulerFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var points = shape.points();
+    const points = shape.points();
 
-    var anchors = [];
+    const anchors = [];
     anchors.push(getDefaultAnchor(
       points[0] + shape.x(), points[1] + shape.y(), 'begin', style
     ));
@@ -198,28 +198,28 @@ export class RulerFactory {
    */
   update(anchor, style, viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function (node) {
+    const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
       // associated tick0
-    var ktick0 = group.getChildren(function (node) {
+    const ktick0 = group.getChildren(function (node) {
       return node.name() === 'shape-tick0';
     })[0];
       // associated tick1
-    var ktick1 = group.getChildren(function (node) {
+    const ktick1 = group.getChildren(function (node) {
       return node.name() === 'shape-tick1';
     })[0];
       // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
       // find special points
-    var begin = group.getChildren(function (node) {
+    const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
-    var end = group.getChildren(function (node) {
+    const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
       // update special points
@@ -235,24 +235,24 @@ export class RulerFactory {
     }
     // update shape and compensate for possible drag
     // note: shape.position() and shape.size() won't work...
-    var bx = begin.x() - kline.x();
-    var by = begin.y() - kline.y();
-    var ex = end.x() - kline.x();
-    var ey = end.y() - kline.y();
+    const bx = begin.x() - kline.x();
+    const by = begin.y() - kline.y();
+    const ex = end.x() - kline.x();
+    const ey = end.y() - kline.y();
     kline.points([bx, by, ex, ey]);
     // new line
-    var p2d0 = new Point2D(begin.x(), begin.y());
-    var p2d1 = new Point2D(end.x(), end.y());
-    var line = new Line(p2d0, p2d1);
+    const p2d0 = new Point2D(begin.x(), begin.y());
+    const p2d1 = new Point2D(end.x(), end.y());
+    const line = new Line(p2d0, p2d1);
     // tick
-    var p2b = new Point2D(bx, by);
-    var p2e = new Point2D(ex, ey);
-    var linePerp0 = getPerpendicularLine(line, p2b, style.scale(10));
+    const p2b = new Point2D(bx, by);
+    const p2e = new Point2D(ex, ey);
+    const linePerp0 = getPerpendicularLine(line, p2b, style.scale(10));
     ktick0.points([linePerp0.getBegin().getX(),
       linePerp0.getBegin().getY(),
       linePerp0.getEnd().getX(),
       linePerp0.getEnd().getY()]);
-    var linePerp1 = getPerpendicularLine(line, p2e, style.scale(10));
+    const linePerp1 = getPerpendicularLine(line, p2e, style.scale(10));
     ktick1.points([linePerp1.getBegin().getX(),
       linePerp1.getBegin().getY(),
       linePerp1.getEnd().getX(),
@@ -269,17 +269,17 @@ export class RulerFactory {
     });
 
     // update text
-    var ktext = klabel.getText();
-    var quantification = line.quantify(
+    const ktext = klabel.getText();
+    const quantification = line.quantify(
       viewController,
       getFlags(ktext.meta.textExpr));
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
     // update meta
     ktext.meta.quantification = quantification;
     // update position
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
-    var textPos = {
+    const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
+    const textPos = {
       x: line.getEnd().getX() + dX * ktext.width(),
       y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
     };

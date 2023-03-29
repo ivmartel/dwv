@@ -7,7 +7,7 @@ import {ThreadPool, WorkerTask} from '../utils/thread';
  * @see https://github.com/mozilla/pdf.js/blob/master/src/core/jpg.js
  */
 /* global JpegImage */
-var hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
+const hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
 
 /**
  * The JPEG decoder namespace.
@@ -16,7 +16,7 @@ var hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
  * @see https://github.com/rii-mango/JPEGLosslessDecoderJS
  */
 /* global jpeg */
-var hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
+const hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
     (typeof jpeg.lossless !== 'undefined');
 
 /**
@@ -26,7 +26,7 @@ var hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
  * @see https://github.com/jpambrun/jpx-medical/blob/master/jpx.js
  */
 /* global JpxImage */
-var hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
+const hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
 
 export const decoderScripts = {};
 
@@ -70,7 +70,7 @@ class AsynchPixelBufferDecoder {
       this.#pool.onabort = this.onabort;
     }
     // create worker task
-    var workerTask = new WorkerTask(
+    const workerTask = new WorkerTask(
       this.#script,
       {
         buffer: pixelBuffer,
@@ -176,17 +176,17 @@ class SynchPixelBufferDecoder {
   decode(pixelBuffer, pixelMeta, info) {
     ++this.#decodeCount;
 
-    var decoder = null;
-    var decodedBuffer = null;
+    let decoder = null;
+    let decodedBuffer = null;
     if (this.#algoName === 'jpeg-lossless') {
       if (!hasJpegLosslessDecoder) {
         throw new Error('No JPEG Lossless decoder provided');
       }
       // bytes per element
-      var bpe = pixelMeta.bitsAllocated / 8;
-      var buf = new Uint8Array(pixelBuffer);
+      const bpe = pixelMeta.bitsAllocated / 8;
+      const buf = new Uint8Array(pixelBuffer);
       decoder = new jpeg.lossless.Decoder();
-      var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
+      const decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
       if (pixelMeta.bitsAllocated === 8) {
         if (pixelMeta.isSigned) {
           decodedBuffer = new Int8Array(decoded.buffer);

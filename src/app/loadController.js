@@ -39,7 +39,7 @@ export class LoadController {
    */
   loadFiles(files) {
     // has been checked for emptiness.
-    var ext = files[0].name.split('.').pop().toLowerCase();
+    const ext = files[0].name.split('.').pop().toLowerCase();
     if (ext === 'json') {
       this.#loadStateFile(files[0]);
     } else {
@@ -57,7 +57,7 @@ export class LoadController {
    */
   loadURLs(urls, options) {
     // has been checked for emptiness.
-    var ext = urls[0].split('.').pop().toLowerCase();
+    const ext = urls[0].split('.').pop().toLowerCase();
     if (ext === 'json') {
       this.#loadStateUrl(urls[0], options);
     } else {
@@ -73,7 +73,7 @@ export class LoadController {
    */
   loadImageObject(data) {
     // create IO
-    var memoryIO = new MemoryLoader();
+    const memoryIO = new MemoryLoader();
     // load data
     this.#loadData(data, memoryIO, 'image');
   }
@@ -82,8 +82,8 @@ export class LoadController {
    * Abort the current loaders.
    */
   abort() {
-    var keys = Object.keys(this.#currentLoaders);
-    for (var i = 0; i < keys.length; ++i) {
+    const keys = Object.keys(this.#currentLoaders);
+    for (let i = 0; i < keys.length; ++i) {
       this.#currentLoaders[i].loader.abort();
       delete this.#currentLoaders[i];
     }
@@ -99,7 +99,7 @@ export class LoadController {
    */
   #loadImageFiles(files) {
     // create IO
-    var fileIO = new FilesLoader();
+    const fileIO = new FilesLoader();
     fileIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
     this.#loadData(files, fileIO, 'image');
@@ -116,7 +116,7 @@ export class LoadController {
    */
   #loadImageUrls(urls, options) {
     // create IO
-    var urlIO = new UrlsLoader();
+    const urlIO = new UrlsLoader();
     urlIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
     this.#loadData(urls, urlIO, 'image', options);
@@ -130,7 +130,7 @@ export class LoadController {
    */
   #loadStateFile(file) {
     // create IO
-    var fileIO = new FilesLoader();
+    const fileIO = new FilesLoader();
     // load data
     this.#loadData([file], fileIO, 'state');
   }
@@ -146,7 +146,7 @@ export class LoadController {
    */
   #loadStateUrl(url, options) {
     // create IO
-    var urlIO = new UrlsLoader();
+    const urlIO = new UrlsLoader();
     // load data
     this.#loadData([url], urlIO, 'state', options);
   }
@@ -161,12 +161,12 @@ export class LoadController {
    * @private
    */
   #loadData(data, loader, loadType, options) {
-    var eventInfo = {
+    const eventInfo = {
       loadtype: loadType,
     };
 
     // load id
-    var loadId = this.#getNextLoadId();
+    const loadId = this.#getNextLoadId();
     eventInfo.loadid = loadId;
 
     // set callbacks
@@ -181,7 +181,7 @@ export class LoadController {
     };
     loader.onprogress = this.#augmentCallbackEvent(this.onprogress, eventInfo);
     loader.onloaditem = (event) => {
-      var eventInfoItem = {
+      const eventInfoItem = {
         loadtype: loadType,
         loadid: loadId
       };
@@ -230,9 +230,9 @@ export class LoadController {
    */
   #augmentCallbackEvent(callback, info) {
     return function (event) {
-      var keys = Object.keys(info);
-      for (var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
+      const keys = Object.keys(info);
+      for (let i = 0; i < keys.length; ++i) {
+        const key = keys[i];
         event[key] = info[key];
       }
       callback(event);

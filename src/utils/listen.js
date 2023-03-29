@@ -44,7 +44,7 @@ export class ListenerHandler {
       return;
     }
     // remove from listeners array
-    for (var i = 0; i < this.listeners[type].length; ++i) {
+    for (let i = 0; i < this.listeners[type].length; ++i) {
       if (this.listeners[type][i] === callback) {
         this.listeners[type].splice(i, 1);
       }
@@ -63,8 +63,8 @@ export class ListenerHandler {
     }
     // fire events from a copy of the listeners array
     // to avoid interference from possible add/remove
-    var stack = this.listeners[event.type].slice();
-    for (var i = 0; i < stack.length; ++i) {
+    const stack = this.listeners[event.type].slice();
+    for (let i = 0; i < stack.length; ++i) {
       stack[i](event);
     }
   }

@@ -61,8 +61,8 @@ QUnit.module('state');
  */
 function testState(data, version, type, assert) {
   // read state
-  var state = new State();
-  var jsonData = state.fromJSON(data);
+  const state = new State();
+  const jsonData = state.fromJSON(data);
   // check drawings values
   checkDrawings(
     jsonData.drawings, jsonData.drawingsDetails, version, type, assert);
@@ -82,7 +82,7 @@ function testState(data, version, type, assert) {
  */
 function checkStateHeader(jsonData, version, assert) {
   // header data
-  var headerData = {
+  const headerData = {
     version: version,
     'window-center': 441,
     'window-width': 911,
@@ -122,32 +122,32 @@ function checkDrawings(drawings, details, version, type, assert) {
     checkRulerDrawings(drawings.children, details, version, assert);
   } else if (drawings.children.length === 1) {
 
-    var layerKid = drawings.children[0];
+    const layerKid = drawings.children[0];
     assert.equal(layerKid.className, 'Group', 'Layer first level is a group.');
     assert.equal(
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
-    var groupId = '#2-0';
+    const groupId = '#2-0';
     assert.equal(
       layerKid.attrs.id,
       groupId,
       'Position group has the proper id.');
 
     // third level: shape group(s)
-    var posGroupKid = layerKid.children[0];
+    const posGroupKid = layerKid.children[0];
     assert.equal(
       posGroupKid.className,
       'Group',
       'Position group first level is a group.');
 
-    var unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
+    const unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
 
     // shape specific checks
     if (type === 'arrow') {
       checkArrowDrawing(posGroupKid, details, version, assert);
     } else if (type === 'ruler' && version !== '0.1') {
-      var refRuler = {
+      const refRuler = {
         id: '4gvkz8v6wzw',
         points: [51, 135, 216, 134],
         colour: '#ffff80',
@@ -158,7 +158,7 @@ function checkDrawings(drawings, details, version, type, assert) {
       checkRulerDrawing(
         posGroupKid, details, version, refRuler, assert);
     } else if (type === 'line' && version === '0.1') {
-      var refLine = {
+      const refLine = {
         id: '4gvkz8v6wzw',
         points: [51, 135, 216, 134],
         colour: '#ffff00',
@@ -210,11 +210,11 @@ function checkArrowDrawing(posGroupKid, details, version, assert) {
 
   // kids
   assert.equal(posGroupKid.children.length, 3, 'Shape group has 3 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  var hasPoly = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  let hasPoly = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -238,7 +238,7 @@ function checkArrowDrawing(posGroupKid, details, version, assert) {
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -247,7 +247,7 @@ function checkArrowDrawing(posGroupKid, details, version, assert) {
         labelGroupKid0.attrs.text,
         'Eye',
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -264,7 +264,7 @@ function checkArrowDrawing(posGroupKid, details, version, assert) {
   assert.ok(hasPoly, 'Shape group contains a polygon.');
 
   // details
-  var details0 = details.pf8zteo5r4;
+  const details0 = details.pf8zteo5r4;
   assert.equal(
     details0.meta.textExpr, 'Eye', 'Details textExpr has the proper value.');
   if (parseFloat(version) <= 0.3) {
@@ -301,12 +301,12 @@ function checkRulerDrawing(
 
   // kids
   assert.equal(posGroupKid.children.length, 4, 'Shape group has 4 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  var hasTick1 = false;
-  var hasTick2 = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  let hasTick1 = false;
+  let hasTick2 = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -330,7 +330,7 @@ function checkRulerDrawing(
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -339,7 +339,7 @@ function checkRulerDrawing(
         labelGroupKid0.attrs.text,
         ref.text,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -361,7 +361,7 @@ function checkRulerDrawing(
   assert.ok(hasTick2, 'Shape group contains a tick2.');
 
   // details
-  var details0 = details[ref.id];
+  const details0 = details[ref.id];
   assert.equal(
     details0.meta.textExpr,
     ref.textExpr,
@@ -384,11 +384,11 @@ function checkRulerDrawing(
  */
 function checkRulerDrawings(layerKids, details, version, assert) {
 
-  var ndraws = 5;
+  const ndraws = 5;
   assert.equal(layerKids.length, ndraws, 'Layer has ' + ndraws + ' kids.');
 
-  var unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
-  var refRulers = [
+  const unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
+  const refRulers = [
     {
       id: 'onzlkbs8p',
       points: [120, 110, 120, 60],
@@ -431,8 +431,8 @@ function checkRulerDrawings(layerKids, details, version, assert) {
     }
   ];
 
-  for (var i = 0; i < ndraws; ++i) {
-    var layerKid = layerKids[i];
+  for (let i = 0; i < ndraws; ++i) {
+    const layerKid = layerKids[i];
     assert.equal(
       layerKid.className,
       'Group',
@@ -441,14 +441,14 @@ function checkRulerDrawings(layerKids, details, version, assert) {
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
-    var groupId = '#2-' + (i + 1);
+    const groupId = '#2-' + (i + 1);
     assert.equal(
       layerKid.attrs.id,
       groupId,
       'Position group has the proper id.');
 
     // third level: shape group(s)
-    var posGroupKid = layerKid.children[0];
+    const posGroupKid = layerKid.children[0];
     assert.equal(
       posGroupKid.className,
       'Group',
@@ -485,10 +485,10 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -508,7 +508,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
         ],
         'Line has the proper points.');
       /* eslint-enable array-element-newline */
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -519,7 +519,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -530,7 +530,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
           'Brain',
           'Text has the proper value.');
       }
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -542,7 +542,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
 
   // details
   if (version !== '0.1') {
-    var details0 = details['4l24ofouhmf'];
+    const details0 = details['4l24ofouhmf'];
     assert.equal(
       details0.meta.textExpr,
       'Brain',
@@ -582,10 +582,10 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -624,7 +624,7 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -633,7 +633,7 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
         labelGroupKid0.attrs.text,
         'Brain',
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -644,7 +644,7 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
   assert.ok(hasLabel, 'Shape group contains a label.');
 
   // details
-  var details0 = details['08m011yjp8je'];
+  const details0 = details['08m011yjp8je'];
   assert.equal(
     details0.meta.textExpr,
     'Brain',
@@ -684,10 +684,10 @@ function checkEllipseDrawing(
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -707,7 +707,7 @@ function checkEllipseDrawing(
         shapeGroupKid.attrs.radiusY,
         32,
         'Ellipse has the proper radiusY.');
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -718,17 +718,17 @@ function checkEllipseDrawing(
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
-      var unit = parseFloat(version) <= 0.3 ? 'cm2' : ' cm²';
+      const unit = parseFloat(version) <= 0.3 ? 'cm2' : ' cm²';
       assert.equal(
         labelGroupKid0.attrs.text,
         '53.28' + unit,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -740,7 +740,7 @@ function checkEllipseDrawing(
 
   // details
   if (version !== '0.1') {
-    var details0 = details.c6j16qt6vt6;
+    const details0 = details.c6j16qt6vt6;
     assert.equal(
       details0.meta.textExpr,
       '{surface}',
@@ -781,11 +781,11 @@ function checkProtractorDrawing(
 
   // kids
   assert.equal(posGroupKid.children.length, 3, 'Shape group has 3 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  var hasArc = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  let hasArc = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -799,7 +799,7 @@ function checkProtractorDrawing(
         shapeGroupKid.attrs.points,
         [33, 164, 81, 145, 93, 198],
         'Line has the proper points.');
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -810,17 +810,17 @@ function checkProtractorDrawing(
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
-      var unit = parseFloat(version) <= 0.3 ? '°' : ' °';
+      const unit = parseFloat(version) <= 0.3 ? '°' : ' °';
       assert.equal(
         labelGroupKid0.attrs.text,
         '80.15' + unit,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -838,7 +838,7 @@ function checkProtractorDrawing(
 
   // details
   if (version !== '0.1') {
-    var details0 = details['49g7kqi3p4u'];
+    const details0 = details['49g7kqi3p4u'];
     assert.equal(
       details0.meta.textExpr,
       '{angle}',
@@ -879,10 +879,10 @@ function checkRectangleDrawing(
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -908,7 +908,7 @@ function checkRectangleDrawing(
         shapeGroupKid.attrs.height,
         64,
         'Rectangle has the proper height.');
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -919,17 +919,17 @@ function checkRectangleDrawing(
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
-      var unit = parseFloat(version, 10) <= 0.3 ? 'cm2' : ' cm²';
+      const unit = parseFloat(version, 10) <= 0.3 ? 'cm2' : ' cm²';
       assert.equal(
         labelGroupKid0.attrs.text,
         '66.56' + unit,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -941,7 +941,7 @@ function checkRectangleDrawing(
 
   // details
   if (version !== '0.1') {
-    var details0 = details.db0puu209qe;
+    const details0 = details.db0puu209qe;
     assert.equal(
       details0.meta.textExpr,
       '{surface}',

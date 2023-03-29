@@ -40,12 +40,12 @@ export class State {
    * @returns {string} The state as a JSON string.
    */
   toJSON(app) {
-    var layerGroup = app.getActiveLayerGroup();
-    var viewController =
+    const layerGroup = app.getActiveLayerGroup();
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    var position = viewController.getCurrentIndex();
-    var drawLayer = layerGroup.getActiveDrawLayer();
-    var drawController = drawLayer.getDrawController();
+    const position = viewController.getCurrentIndex();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const drawController = drawLayer.getDrawController();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
@@ -66,8 +66,8 @@ export class State {
    * @returns {object} The state object.
    */
   fromJSON(json) {
-    var data = JSON.parse(json);
-    var res = null;
+    const data = JSON.parse(json);
+    let res = null;
     if (data.version === '0.1') {
       res = this.#readV01(data);
     } else if (data.version === '0.2') {
@@ -92,8 +92,8 @@ export class State {
    * @param {object} data The state data.
    */
   apply(app, data) {
-    var layerGroup = app.getActiveLayerGroup();
-    var viewController =
+    const layerGroup = app.getActiveLayerGroup();
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
     // display
     viewController.setWindowLevel(
@@ -101,9 +101,9 @@ export class State {
     // position is index...
     viewController.setCurrentIndex(new Index(data.position));
     // apply saved scale on top of current base one
-    var baseScale = app.getActiveLayerGroup().getBaseScale();
-    var scale = null;
-    var offset = null;
+    const baseScale = app.getActiveLayerGroup().getBaseScale();
+    let scale = null;
+    let offset = null;
     if (typeof data.scaleCenter !== 'undefined') {
       scale = {
         x: data.scale * baseScale.x,
@@ -117,10 +117,10 @@ export class State {
       // origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
       // (zoom.x -> initial zoom = base scale, origin.x = 0)
       // Tx = origin.x + (trans.x * zoom.x)
-      var originX = data.scaleCenter.x - data.scaleCenter.x * data.scale;
-      var originY = data.scaleCenter.y - data.scaleCenter.y * data.scale;
-      var oldTx = originX + data.translation.x * scale.x;
-      var oldTy = originY + data.translation.y * scale.y;
+      const originX = data.scaleCenter.x - data.scaleCenter.x * data.scale;
+      const originY = data.scaleCenter.y - data.scaleCenter.y * data.scale;
+      const oldTx = originX + data.translation.x * scale.x;
+      const oldTy = originY + data.translation.y * scale.y;
       offset = {
         x: -oldTx / scale.x,
         y: -oldTy / scale.y,
@@ -155,7 +155,7 @@ export class State {
    */
   #readV01(data) {
     // v0.1 -> v0.2
-    var v02DAndD = v01Tov02DrawingsAndDetails(data.drawings);
+    const v02DAndD = v01Tov02DrawingsAndDetails(data.drawings);
     // v0.2 -> v0.3, v0.4
     data.drawings = v02Tov03Drawings(v02DAndD.drawings).toObject();
     data.drawingsDetails = v03Tov04DrawingsDetails(
@@ -236,24 +236,24 @@ export class State {
  */
 function v02Tov03Drawings(drawings) {
   // Auxiliar variables
-  var group, groupShapes, parentGroup;
+  let group, groupShapes, parentGroup;
   // Avoid errors when dropping multiple states
   //drawLayer.getChildren().each(function(node){
   //    node.visible(false);
   //});
 
-  var drawLayer = new Konva.Layer({
+  const drawLayer = new Konva.Layer({
     listening: false,
     visible: true
   });
 
   // Get the positions-groups data
-  var groupDrawings = typeof drawings === 'string'
+  const groupDrawings = typeof drawings === 'string'
     ? JSON.parse(drawings) : drawings;
   // Iterate over each position-groups
-  for (var k = 0, lenk = groupDrawings.length; k < lenk; ++k) {
+  for (let k = 0, lenk = groupDrawings.length; k < lenk; ++k) {
     // Iterate over each frame
-    for (var f = 0, lenf = groupDrawings[k].length; f < lenf; ++f) {
+    for (let f = 0, lenf = groupDrawings[k].length; f < lenf; ++f) {
       groupShapes = groupDrawings[k][f];
       if (groupShapes.length !== 0) {
         // Create position-group set as visible and append it to drawLayer
@@ -264,7 +264,7 @@ function v02Tov03Drawings(drawings) {
         });
 
         // Iterate over shapes-group
-        for (var g = 0, leng = groupShapes.length; g < leng; ++g) {
+        for (let g = 0, leng = groupShapes.length; g < leng; ++g) {
           // create the konva group
           group = Konva.Node.create(groupShapes[g]);
           // enforce draggable: only the shape was draggable in v0.2,
@@ -294,29 +294,29 @@ function v02Tov03Drawings(drawings) {
  * @returns {object} The converted drawings.
  */
 function v01Tov02DrawingsAndDetails(inputDrawings) {
-  var newDrawings = [];
-  var drawingsDetails = {};
+  const newDrawings = [];
+  const drawingsDetails = {};
 
-  var drawGroups;
-  var drawGroup;
+  let drawGroups;
+  let drawGroup;
   // loop over each slice
-  for (var k = 0, lenk = inputDrawings.length; k < lenk; ++k) {
+  for (let k = 0, lenk = inputDrawings.length; k < lenk; ++k) {
     // loop over each frame
     newDrawings[k] = [];
-    for (var f = 0, lenf = inputDrawings[k].length; f < lenf; ++f) {
+    for (let f = 0, lenf = inputDrawings[k].length; f < lenf; ++f) {
       // draw group
       drawGroups = inputDrawings[k][f];
-      var newFrameDrawings = [];
+      const newFrameDrawings = [];
       // Iterate over shapes-group
-      for (var g = 0, leng = drawGroups.length; g < leng; ++g) {
+      for (let g = 0, leng = drawGroups.length; g < leng; ++g) {
         // create konva group from input
         drawGroup = Konva.Node.create(drawGroups[g]);
         // force visible (not set in state)
         drawGroup.visible(true);
         // label position
-        var pos = {x: 0, y: 0};
+        let pos = {x: 0, y: 0};
         // update shape colour
-        var kshape = drawGroup.getChildren(function (node) {
+        const kshape = drawGroup.getChildren(function (node) {
           return node.name() === 'shape';
         })[0];
         kshape.stroke(colourNameToHex(kshape.stroke()));
@@ -325,7 +325,7 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
           // update name
           drawGroup.name('ruler-group');
           // add ticks
-          var ktick0 = new Konva.Line({
+          const ktick0 = new Konva.Line({
             points: [kshape.points()[0],
               kshape.points()[1],
               kshape.points()[0],
@@ -333,7 +333,7 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
             name: 'shape-tick0'
           });
           drawGroup.add(ktick0);
-          var ktick1 = new Konva.Line({
+          const ktick1 = new Konva.Line({
             points: [kshape.points()[2],
               kshape.points()[3],
               kshape.points()[2],
@@ -343,18 +343,18 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
           drawGroup.add(ktick1);
         }
         // special protractor case: update arc name
-        var karcs = drawGroup.getChildren(function (node) {
+        const karcs = drawGroup.getChildren(function (node) {
           return node.name() === 'arc';
         });
         if (karcs.length === 1) {
           karcs[0].name('shape-arc');
         }
         // get its text
-        var ktexts = drawGroup.getChildren(function (node) {
+        const ktexts = drawGroup.getChildren(function (node) {
           return node.name() === 'text';
         });
         // update text: move it into a label
-        var ktext = new Konva.Text({
+        let ktext = new Konva.Text({
           name: 'text',
           text: ''
         });
@@ -373,7 +373,7 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
           }
         }
         // create new label with text and tag
-        var klabel = new Konva.Label({
+        const klabel = new Konva.Label({
           x: pos.x,
           y: pos.y,
           name: 'label'
@@ -386,9 +386,9 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
         newFrameDrawings.push(JSON.stringify(drawGroup.toObject()));
 
         // create details (v0.3 format)
-        var textExpr = ktext.text();
-        var txtLen = textExpr.length;
-        var quant = null;
+        let textExpr = ktext.text();
+        const txtLen = textExpr.length;
+        let quant = null;
         // adapt to text with flag
         if (drawGroup.name() === 'ruler-group') {
           quant = {
@@ -441,17 +441,17 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
  * @returns {object} The converted drawings.
  */
 function v02Tov03DrawingsDetails(details) {
-  var res = {};
+  const res = {};
   // Get the positions-groups data
-  var groupDetails = typeof details === 'string'
+  const groupDetails = typeof details === 'string'
     ? JSON.parse(details) : details;
   // Iterate over each position-groups
-  for (var k = 0, lenk = groupDetails.length; k < lenk; ++k) {
+  for (let k = 0, lenk = groupDetails.length; k < lenk; ++k) {
     // Iterate over each frame
-    for (var f = 0, lenf = groupDetails[k].length; f < lenf; ++f) {
+    for (let f = 0, lenf = groupDetails[k].length; f < lenf; ++f) {
       // Iterate over shapes-group
-      for (var g = 0, leng = groupDetails[k][f].length; g < leng; ++g) {
-        var group = groupDetails[k][f][g];
+      for (let g = 0, leng = groupDetails[k][f].length; g < leng; ++g) {
+        const group = groupDetails[k][f][g];
         res[group.id] = {
           textExpr: group.textExpr,
           longText: group.longText,
@@ -472,11 +472,11 @@ function v02Tov03DrawingsDetails(details) {
  * @returns {object} The converted drawings.
  */
 function v03Tov04DrawingsDetails(details) {
-  var res = {};
-  var keys = Object.keys(details);
+  const res = {};
+  const keys = Object.keys(details);
   // Iterate over each position-groups
-  for (var k = 0, lenk = keys.length; k < lenk; ++k) {
-    var detail = details[keys[k]];
+  for (let k = 0, lenk = keys.length; k < lenk; ++k) {
+    const detail = details[keys[k]];
     res[keys[k]] = {
       meta: {
         textExpr: detail.textExpr,
@@ -497,7 +497,7 @@ function v03Tov04DrawingsDetails(details) {
  * @returns {object} The converted drawings.
  */
 function v04Tov05Data(data) {
-  var pos = data.position;
+  const pos = data.position;
   data.position = [pos.i, pos.j, pos.k];
   return data;
 }
@@ -512,14 +512,14 @@ function v04Tov05Data(data) {
  */
 function v04Tov05Drawings(inputDrawings) {
   // Iterate over each position-groups
-  var posGroups = inputDrawings.children;
-  for (var k = 0, lenk = posGroups.length; k < lenk; ++k) {
-    var posGroup = posGroups[k];
-    var id = posGroup.attrs.id;
-    var ids = id.split('_');
-    var sliceNumber = parseInt(ids[0].substring(6), 10); // 'slice-0'
-    var frameNumber = parseInt(ids[1].substring(6), 10); // 'frame-0'
-    var newId = '#2-';
+  const posGroups = inputDrawings.children;
+  for (let k = 0, lenk = posGroups.length; k < lenk; ++k) {
+    const posGroup = posGroups[k];
+    const id = posGroup.attrs.id;
+    const ids = id.split('_');
+    const sliceNumber = parseInt(ids[0].substring(6), 10); // 'slice-0'
+    const frameNumber = parseInt(ids[1].substring(6), 10); // 'frame-0'
+    let newId = '#2-';
     if (sliceNumber === 0 && frameNumber !== 0) {
       newId += frameNumber;
     } else {

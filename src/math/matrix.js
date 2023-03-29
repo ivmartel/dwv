@@ -80,8 +80,8 @@ export class Matrix33 {
   equals(rhs, p) {
     // TODO: add type check
     // check values
-    for (var i = 0; i < 3; ++i) {
-      for (var j = 0; j < 3; ++j) {
+    for (let i = 0; i < 3; ++i) {
+      for (let j = 0; j < 3; ++j) {
         if (!isSimilar(this.get(i, j), rhs.get(i, j), p)) {
           return false;
         }
@@ -96,12 +96,12 @@ export class Matrix33 {
    * @returns {string} The matrix as a string.
    */
   toString() {
-    var str = '[';
-    for (var i = 0; i < 3; ++i) {
+    let str = '[';
+    for (let i = 0; i < 3; ++i) {
       if (i !== 0) {
         str += ', \n ';
       }
-      for (var j = 0; j < 3; ++j) {
+      for (let j = 0; j < 3; ++j) {
         if (j !== 0) {
           str += ', ';
         }
@@ -119,11 +119,11 @@ export class Matrix33 {
    * @returns {Matrix33} The product matrix.
    */
   multiply(rhs) {
-    var values = [];
-    for (var i = 0; i < 3; ++i) {
-      for (var j = 0; j < 3; ++j) {
-        var tmp = 0;
-        for (var k = 0; k < 3; ++k) {
+    const values = [];
+    for (let i = 0; i < 3; ++i) {
+      for (let j = 0; j < 3; ++j) {
+        let tmp = 0;
+        for (let k = 0; k < 3; ++k) {
           tmp += this.get(i, k) * rhs.get(k, j);
         }
         values.push(tmp);
@@ -138,9 +138,9 @@ export class Matrix33 {
    * @returns {Matrix33} The result matrix.
    */
   getAbs() {
-    var values = [];
-    for (var i = 0; i < 3; ++i) {
-      for (var j = 0; j < 3; ++j) {
+    const values = [];
+    for (let i = 0; i < 3; ++i) {
+      for (let j = 0; j < 3; ++j) {
         values.push(Math.abs(this.get(i, j)));
       }
     }
@@ -158,10 +158,10 @@ export class Matrix33 {
       throw new Error('Cannot multiply 3x3 matrix with non 3D array: ',
         array3D.length);
     }
-    var values = [];
-    for (var i = 0; i < 3; ++i) {
-      var tmp = 0;
-      for (var j = 0; j < 3; ++j) {
+    const values = [];
+    for (let i = 0; i < 3; ++i) {
+      let tmp = 0;
+      for (let j = 0; j < 3; ++j) {
         tmp += this.get(i, j) * array3D[j];
       }
       values.push(tmp);
@@ -176,7 +176,7 @@ export class Matrix33 {
    * @returns {Vector3D} The result 3D vector.
    */
   multiplyVector3D(vector3D) {
-    var array3D = this.multiplyArray3D(
+    const array3D = this.multiplyArray3D(
       [vector3D.getX(), vector3D.getY(), vector3D.getZ()]
     );
     return new Vector3D(array3D[0], array3D[1], array3D[2]);
@@ -189,7 +189,7 @@ export class Matrix33 {
    * @returns {Point3D} The result 3D point.
    */
   multiplyPoint3D(point3D) {
-    var array3D = this.multiplyArray3D(
+    const array3D = this.multiplyArray3D(
       [point3D.getX(), point3D.getY(), point3D.getZ()]
     );
     return new Point3D(array3D[0], array3D[1], array3D[2]);
@@ -202,7 +202,7 @@ export class Matrix33 {
    * @returns {Index} The result 3D index.
    */
   multiplyIndex3D(index3D) {
-    var array3D = this.multiplyArray3D(index3D.getValues());
+    const array3D = this.multiplyArray3D(index3D.getValues());
     return new Index(array3D);
   }
 
@@ -213,13 +213,13 @@ export class Matrix33 {
    * @returns {object} The {value,index} of the maximum.
    */
   getRowAbsMax(row) {
-    var values = [
+    const values = [
       Math.abs(this.get(row, 0)),
       Math.abs(this.get(row, 1)),
       Math.abs(this.get(row, 2))
     ];
-    var absMax = Math.max.apply(null, values);
-    var index = values.indexOf(absMax);
+    const absMax = Math.max.apply(null, values);
+    const index = values.indexOf(absMax);
     return {
       value: this.get(row, index),
       index: index
@@ -233,13 +233,13 @@ export class Matrix33 {
    * @returns {object} The {value,index} of the maximum.
    */
   getColAbsMax(col) {
-    var values = [
+    const values = [
       Math.abs(this.get(0, col)),
       Math.abs(this.get(1, col)),
       Math.abs(this.get(2, col))
     ];
-    var absMax = Math.max.apply(null, values);
-    var index = values.indexOf(absMax);
+    const absMax = Math.max.apply(null, values);
+    const index = values.indexOf(absMax);
     return {
       value: this.get(index, col),
       index: index
@@ -252,11 +252,11 @@ export class Matrix33 {
    * @returns {Matrix33} The simplified matrix.
    */
   asOneAndZeros() {
-    var res = [];
-    for (var j = 0; j < 3; ++j) {
-      var max = this.getRowAbsMax(j);
-      var sign = max.value > 0 ? 1 : -1;
-      for (var i = 0; i < 3; ++i) {
+    const res = [];
+    for (let j = 0; j < 3; ++j) {
+      const max = this.getRowAbsMax(j);
+      const sign = max.value > 0 ? 1 : -1;
+      for (let i = 0; i < 3; ++i) {
         if (i === max.index) {
           //res.push(1);
           res.push(1 * sign);
@@ -289,28 +289,28 @@ export class Matrix33 {
  * @see https://github.com/willnode/N-Matrix-Programmer
  */
 function getMatrixInverse(m) {
-  var m00 = m.get(0, 0);
-  var m01 = m.get(0, 1);
-  var m02 = m.get(0, 2);
-  var m10 = m.get(1, 0);
-  var m11 = m.get(1, 1);
-  var m12 = m.get(1, 2);
-  var m20 = m.get(2, 0);
-  var m21 = m.get(2, 1);
-  var m22 = m.get(2, 2);
+  const m00 = m.get(0, 0);
+  const m01 = m.get(0, 1);
+  const m02 = m.get(0, 2);
+  const m10 = m.get(1, 0);
+  const m11 = m.get(1, 1);
+  const m12 = m.get(1, 2);
+  const m20 = m.get(2, 0);
+  const m21 = m.get(2, 1);
+  const m22 = m.get(2, 2);
 
-  var a1212 = m11 * m22 - m12 * m21;
-  var a2012 = m12 * m20 - m10 * m22;
-  var a0112 = m10 * m21 - m11 * m20;
+  const a1212 = m11 * m22 - m12 * m21;
+  const a2012 = m12 * m20 - m10 * m22;
+  const a0112 = m10 * m21 - m11 * m20;
 
-  var det = m00 * a1212 + m01 * a2012 + m02 * a0112;
+  let det = m00 * a1212 + m01 * a2012 + m02 * a0112;
   if (det === 0) {
     logger.warn('Cannot invert 3*3 matrix with zero determinant.');
     return undefined;
   }
   det = 1 / det;
 
-  var values = [
+  const values = [
     det * a1212,
     det * (m02 * m21 - m01 * m22),
     det * (m01 * m12 - m02 * m11),
@@ -387,7 +387,7 @@ export function getSagittalMat33() {
  * @returns {Matrix33} The orientation matrix.
  */
 export function getMatrixFromName(name) {
-  var matrix = null;
+  let matrix = null;
   if (name === 'axial') {
     matrix = getIdentityMat33();
   } else if (name === 'coronal') {

@@ -27,22 +27,22 @@ QUnit.module('io');
  * @param {number} nDataOk The theoretical number of data with no error.
  */
 function checkLoad(assert, id, data, nData, nDataOk) {
-  var done = assert.async();
+  const done = assert.async();
 
-  var prefix = '[' + id + '] ';
-  var nDataError = nData - nDataOk;
+  const prefix = '[' + id + '] ';
+  const nDataError = nData - nDataOk;
 
   // checks
-  var loadStartDates = [];
-  var progressDates = [];
-  var loadItemDates = [];
-  var loadDates = [];
-  var errorDates = [];
-  var abortDates = [];
-  var gotLoadEnd = false;
+  const loadStartDates = [];
+  const progressDates = [];
+  const loadItemDates = [];
+  const loadDates = [];
+  const errorDates = [];
+  const abortDates = [];
+  let gotLoadEnd = false;
 
   // create loader
-  var loader = new MemoryLoader();
+  const loader = new MemoryLoader();
   // callbacks
   loader.onloadstart = function (/*event*/) {
     loadStartDates.push(new Date());
@@ -57,7 +57,7 @@ function checkLoad(assert, id, data, nData, nDataOk) {
     loadDates.push(new Date());
   };
   loader.onloadend = function (/*event*/) {
-    var loadEndDate = new Date();
+    const loadEndDate = new Date();
     assert.notOk(gotLoadEnd,
       prefix + 'Received first load end.');
     gotLoadEnd = true;
@@ -71,7 +71,7 @@ function checkLoad(assert, id, data, nData, nDataOk) {
     }
     assert.equal(loadItemDates.length, nDataOk,
       prefix + 'Received ' + nDataOk + ' load item.');
-    var nLoad = nDataError === 0 ? 1 : 0;
+    const nLoad = nDataError === 0 ? 1 : 0;
     assert.equal(loadDates.length, nLoad,
       prefix + 'Received ' + nLoad + ' load.');
     assert.equal(errorDates.length, nDataError,
@@ -80,14 +80,14 @@ function checkLoad(assert, id, data, nData, nDataOk) {
       prefix + 'Received 0 abort(s).');
 
     // check start/end sequence
-    var loadStartDate = loadStartDates[0];
+    const loadStartDate = loadStartDates[0];
     assert.ok(loadStartDate < loadEndDate,
       prefix + 'Received start before load end.');
 
-    var firstProgressDate = null;
-    var lastProgressDate = null;
-    var firstLoadItemDate = null;
-    var lastLoadItemDate = null;
+    let firstProgressDate = null;
+    let lastProgressDate = null;
+    let firstLoadItemDate = null;
+    let lastLoadItemDate = null;
 
     if (nDataOk !== 0) {
       // check progress sequence
@@ -104,7 +104,8 @@ function checkLoad(assert, id, data, nData, nDataOk) {
       firstLoadItemDate = loadItemDates[0];
       lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
       assert.ok(loadStartDate <= firstLoadItemDate,
-        prefix + 'Received start before first load item.');
+        prefix + 'Received start before first load item.' +
+        loadStartDate.toJSON() + ' - ' + firstLoadItemDate.toJSON());
       assert.ok(loadEndDate >= lastLoadItemDate,
         prefix + 'Received end after last load item.');
     }
@@ -112,7 +113,7 @@ function checkLoad(assert, id, data, nData, nDataOk) {
     // check load or error event sequence
     if (nDataError === 0) {
       // load is sent if no error happened
-      var loadDate = loadDates[0];
+      const loadDate = loadDates[0];
       assert.ok(loadStartDate <= loadDate,
         prefix + 'Received start before load.');
       assert.ok(loadDate >= lastProgressDate,
@@ -123,8 +124,8 @@ function checkLoad(assert, id, data, nData, nDataOk) {
         prefix + 'Received end after load.');
     } else {
       errorDates.sort();
-      var firstErrorDate = errorDates[0];
-      var lastErrorDate = errorDates[errorDates.length - 1];
+      const firstErrorDate = errorDates[0];
+      const lastErrorDate = errorDates[errorDates.length - 1];
       assert.ok(loadStartDate <= firstErrorDate,
         prefix + 'Received start before first error.');
       assert.ok(loadEndDate >= lastErrorDate,
@@ -150,7 +151,7 @@ function checkLoad(assert, id, data, nData, nDataOk) {
  */
 QUnit.test('Test MemoryLoader events for single frame.', function (assert) {
   // #0: 2 good dicom
-  var data0 = [
+  const data0 = [
     {
       data: b64urlToArrayBuffer(bbmri53323131),
       filename: 'bbmri-53323131.dcm'
@@ -160,30 +161,30 @@ QUnit.test('Test MemoryLoader events for single frame.', function (assert) {
       filename: 'bbmri-53323275.dcm'
     }
   ];
-  var nData0 = data0.length;
-  var nDataOk0 = nData0;
+  const nData0 = data0.length;
+  const nDataOk0 = nData0;
   checkLoad(assert, '0', data0, nData0, nDataOk0);
 
   // // #1: 2 not found (404) dicom
-  // var data1 = [
+  // const data1 = [
   //   '/a.dcm',
   //   '/b.dcm',
   // ];
-  // var nData1 = data1.length;
-  // var nDataOk1 = 0;
+  // const nData1 = data1.length;
+  // const nDataOk1 = 0;
   // checkLoad(assert, '1', data1, nData1, nDataOk1);
 
   // // #2: 2 dicom, 1 not found (404, error in XHR request)
-  // var data2 = [
+  // const data2 = [
   //   '/tests/data/bbmri-53323131.dcm',
   //   '/b.dcm',
   // ];
-  // var nData2 = data2.length;
-  // var nDataOk2 = 1;
+  // const nData2 = data2.length;
+  // const nDataOk2 = 1;
   // checkLoad(assert, '2', data2, nData2, nDataOk2);
 
   // #3: 2 dicom, 1 bad (no rows, error in loader)
-  var data3 = [
+  const data3 = [
     {
       data: b64urlToArrayBuffer(dwvTestSimple),
       filename: 'dwv-test-simple.dcm'
@@ -193,8 +194,8 @@ QUnit.test('Test MemoryLoader events for single frame.', function (assert) {
       filename: 'dwv-test_no-number-rows.dcm',
     }
   ];
-  var nData3 = data3.length;
-  var nDataOk3 = 1;
+  const nData3 = data3.length;
+  const nDataOk3 = 1;
   checkLoad(assert, '3', data3, nData3, nDataOk3);
 });
 
@@ -205,23 +206,23 @@ QUnit.test('Test MemoryLoader events for single frame.', function (assert) {
  */
 QUnit.test('Test MemoryLoader events for multi frame.', function (assert) {
   // #0: simple multi frame
-  var data0 = [
+  const data0 = [
     {
       data: b64urlToArrayBuffer(multiframeTest1),
       filename: 'multiframe-test1.dcm'
     }
   ];
-  var nData0 = data0.length;
-  var nDataOk0 = nData0;
+  const nData0 = data0.length;
+  const nDataOk0 = nData0;
   checkLoad(assert, '0', data0, nData0, nDataOk0);
 
   // #1: encoded multi frame
   // TODO seems to cause problems to phantomjs...
-  /*var data1 = [
+  /*const data1 = [
         "/tests/data/multiframe-jpegloss-ge.dcm",
     ];
-    var nData1 = data1.length;
-    var nDataOk1 = nData1;
+    const nData1 = data1.length;
+    const nDataOk1 = nData1;
     checkLoad(assert, "1", data1, nData1, nDataOk1);*/
 });
 
@@ -232,33 +233,33 @@ QUnit.test('Test MemoryLoader events for multi frame.', function (assert) {
  */
 QUnit.test('Test MemoryLoader events for zipped data.', function (assert) {
   // #0: simple zip
-  var data0 = [
+  const data0 = [
     {
       data: b64urlToArrayBuffer(bbmriZip),
       filename: 'bbmri.zip'
     }
   ];
-  var nData0 = 2;
-  var nDataOk0 = 2;
+  const nData0 = 2;
+  const nDataOk0 = 2;
   checkLoad(assert, '0', data0, nData0, nDataOk0);
 
   // // #1: bad link to zip
-  // var data1 = [
+  // const data1 = [
   //   '/tests/data/a.zip',
   // ];
-  // var nData1 = 1;
-  // var nDataOk1 = 0;
+  // const nData1 = 1;
+  // const nDataOk1 = 0;
   // checkLoad(assert, '1', data1, nData1, nDataOk1);
 
   // #2: zip with erroneus data
-  var data2 = [
+  const data2 = [
     {
       data: b64urlToArrayBuffer(dwvTestBadZip),
       filename: 'dwv-test_bad.zip'
     }
   ];
-  var nData2 = 2;
-  var nDataOk2 = 1;
+  const nData2 = 2;
+  const nDataOk2 = 1;
   checkLoad(assert, '2', data2, nData2, nDataOk2);
 });
 
@@ -270,19 +271,19 @@ QUnit.test('Test MemoryLoader events for zipped data.', function (assert) {
 // TODO...
 // QUnit.test('Test UrlsLoader events for DCMDIR data.', function (assert) {
 //   // #0: simple DCMDIR
-//   var data0 = [
+//   const data0 = [
 //     '/tests/data/bbmri.dcmdir',
 //   ];
-//   var nData0 = 4;
-//   var nDataOk0 = 4;
+//   const nData0 = 4;
+//   const nDataOk0 = 4;
 //   checkLoad(assert, '0', data0, nData0, nDataOk0);
 
 //   // #1: bad link to DCMDIR
-//   var data1 = [
+//   const data1 = [
 //     '/tests/data/a.dcmdir',
 //   ];
-//   var nData1 = 1;
-//   var nDataOk1 = 0;
+//   const nData1 = 1;
+//   const nDataOk1 = 0;
 //   checkLoad(assert, '1', data1, nData1, nDataOk1);
 
 //   // #2: DCMDIR with bad links -> TODO

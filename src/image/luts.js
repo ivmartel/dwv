@@ -11,8 +11,8 @@ const lut_range_max = 256;
  * @returns {Array} THe LUT.
  */
 function buildLut(func) {
-  var lut = [];
-  for (var i = 0; i < lut_range_max; ++i) {
+  const lut = [];
+  for (let i = 0; i < lut_range_max; ++i) {
     lut.push(func(i));
   }
   return lut;
@@ -25,7 +25,7 @@ function buildLut(func) {
  * @returns {number} The lut value.
  */
 function toMaxFirstThird(i) {
-  var val = i * 3;
+  const val = i * 3;
   if (val > lut_range_max - 1) {
     return lut_range_max - 1;
   }
@@ -41,8 +41,8 @@ function toMaxFirstThird(i) {
  * @returns {number} The lut value.
  */
 function toMaxSecondThird(i) {
-  var third = lut_range_max / 3;
-  var val = 0;
+  const third = lut_range_max / 3;
+  let val = 0;
   if (i >= third) {
     val = (i - third) * 3;
     if (val > lut_range_max - 1) {
@@ -60,8 +60,8 @@ function toMaxSecondThird(i) {
  * @returns {number} The lut value.
  */
 function toMaxThirdThird(i) {
-  var third = lut_range_max / 3;
-  var val = 0;
+  const third = lut_range_max / 3;
+  let val = 0;
   if (i >= 2 * third) {
     val = (i - 2 * third) * 3;
     if (val > lut_range_max - 1) {

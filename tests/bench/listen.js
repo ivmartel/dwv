@@ -1,4 +1,5 @@
 // namespaces
+// eslint-disable-next-line no-var
 var dcmb = dcmb || {};
 dcmb.utils = dcmb.utils || {};
 
@@ -13,7 +14,7 @@ dcmb.utils.ListenerHandler = function () {
    *
    * @private
    */
-  var listeners = {};
+  const listeners = {};
 
   /**
    * Add an event listener.
@@ -44,7 +45,7 @@ dcmb.utils.ListenerHandler = function () {
       return;
     }
     // remove from listeners array
-    for (var i = 0; i < listeners[type].length; ++i) {
+    for (let i = 0; i < listeners[type].length; ++i) {
       if (listeners[type][i] === callback) {
         listeners[type].splice(i, 1);
       }
@@ -62,7 +63,7 @@ dcmb.utils.ListenerHandler = function () {
       return;
     }
     // fire events
-    for (var i = 0; i < listeners[event.type].length; ++i) {
+    for (let i = 0; i < listeners[event.type].length; ++i) {
       listeners[event.type][i](event);
     }
   };

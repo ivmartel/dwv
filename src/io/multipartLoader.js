@@ -52,7 +52,7 @@ export class MultipartLoader {
     // set loading flag
     this.#isLoading = true;
 
-    var memoryIO = new MemoryLoader();
+    const memoryIO = new MemoryLoader();
     // memoryIO.onloadstart: nothing to do
     memoryIO.onprogress = (progress) => {
       // add 50% to take into account the un-Multipartping
@@ -107,7 +107,7 @@ export class MultipartLoader {
     // if there are options.requestHeaders, just base check on them
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      var isMultipart = function (element) {
+      const isMultipart = function (element) {
         return element.name === 'Accept' &&
           startsWith(element.value, 'multipart/related');
       };

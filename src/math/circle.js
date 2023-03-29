@@ -11,7 +11,7 @@ import {getStats} from './stats';
  *  null if one of the last two is null.
  */
 function mulABC(a, b, c) {
-  var res = null;
+  let res = null;
   if (b !== null && c !== null) {
     res = a * b * c;
   }
@@ -97,22 +97,22 @@ export class Circle {
    * @returns {Array} The rounded limits.
    */
   getRound() {
-    var centerX = this.getCenter().getX();
-    var centerY = this.getCenter().getY();
-    var radius = this.getRadius();
-    var rSquare = Math.pow(radius, 2);
+    const centerX = this.getCenter().getX();
+    const centerY = this.getCenter().getY();
+    const radius = this.getRadius();
+    const rSquare = Math.pow(radius, 2);
     // Y bounds
-    var minY = centerY - radius;
-    var maxY = centerY + radius;
-    var regions = [];
+    const minY = centerY - radius;
+    const maxY = centerY + radius;
+    const regions = [];
     // loop through lines and store limits
-    for (var y = minY; y < maxY; ++y) {
-      var diff = rSquare - Math.pow(y - centerY, 2);
+    for (let y = minY; y < maxY; ++y) {
+      const diff = rSquare - Math.pow(y - centerY, 2);
       // remove small values (possibly negative)
       if (Math.abs(diff) < 1e-7) {
         continue;
       }
-      var transX = Math.sqrt(diff);
+      const transX = Math.sqrt(diff);
       // remove small values
       if (transX < 0.5) {
         continue;
@@ -134,20 +134,20 @@ export class Circle {
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
-    var quant = {};
+    const quant = {};
     // surface
-    var spacing = viewController.get2DSpacing();
-    var surface = this.getWorldSurface(spacing[0], spacing[1]);
+    const spacing = viewController.get2DSpacing();
+    const surface = this.getWorldSurface(spacing[0], spacing[1]);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n('unit.cm2')};
     }
 
     // pixel quantification
     if (viewController.canQuantifyImage()) {
-      var regions = this.getRound();
+      const regions = this.getRound();
       if (regions.length !== 0) {
-        var values = viewController.getImageVariableRegionValues(regions);
-        var quantif = getStats(values, flags);
+        const values = viewController.getImageVariableRegionValues(regions);
+        const quantif = getStats(values, flags);
         quant.min = {value: quantif.min, unit: ''};
         quant.max = {value: quantif.max, unit: ''};
         quant.mean = {value: quantif.mean, unit: ''};

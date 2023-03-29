@@ -19,6 +19,10 @@ module.exports = {
     // https://eslint.org/docs/rules/semi
     semi: ['error'],
 
+    // no var
+    // https://eslint.org/docs/rules/no-var
+    'no-var': 'error',
+
     // allow for some unused args
     // https://eslint.org/docs/rules/no-unused-vars
     'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],

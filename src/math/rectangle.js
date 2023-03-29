@@ -12,7 +12,7 @@ import {i18n} from '../utils/i18n';
  *  null if one of the last two is null.
  */
 function mulABC(a, b, c) {
-  var res = null;
+  let res = null;
   if (b !== null && c !== null) {
     res = a * b * c;
   }
@@ -80,8 +80,8 @@ export class Rectangle {
    * @returns {number} The surface of the rectangle.
    */
   getSurface() {
-    var begin = this.getBegin();
-    var end = this.getEnd();
+    const begin = this.getBegin();
+    const end = this.getEnd();
     return Math.abs(end.getX() - begin.getX()) *
       Math.abs(end.getY() - begin.getY());
   }
@@ -154,19 +154,19 @@ export class Rectangle {
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
-    var quant = {};
+    const quant = {};
     // surface
-    var spacing = viewController.get2DSpacing();
-    var surface = this.getWorldSurface(spacing[0], spacing[1]);
+    const spacing = viewController.get2DSpacing();
+    const surface = this.getWorldSurface(spacing[0], spacing[1]);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n('unit.cm2')};
     }
 
     // pixel quantification
     if (viewController.canQuantifyImage()) {
-      var round = this.getRound();
-      var values = viewController.getImageRegionValues(round.min, round.max);
-      var quantif = getStats(values, flags);
+      const round = this.getRound();
+      const values = viewController.getImageRegionValues(round.min, round.max);
+      const quantif = getStats(values, flags);
       quant.min = {value: quantif.min, unit: ''};
       quant.max = {value: quantif.max, unit: ''};
       quant.mean = {value: quantif.mean, unit: ''};

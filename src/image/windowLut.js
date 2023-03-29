@@ -96,7 +96,7 @@ export class WindowLut {
     this.#signedShift = 0;
     this.#windowLevel.setSignedOffset(0);
     if (this.#isSigned) {
-      var size = this.#rescaleLut.getLength();
+      const size = this.#rescaleLut.getLength();
       this.#signedShift = size / 2;
       this.#windowLevel.setSignedOffset(
         this.#rescaleLut.getRSI().getSlope() * this.#signedShift);
@@ -119,14 +119,14 @@ export class WindowLut {
       this.#rescaleLut.initialise();
     }
     // create window lut
-    var size = this.#rescaleLut.getLength();
+    const size = this.#rescaleLut.getLength();
     if (!this.#lut) {
       // use clamped array (polyfilled in env.js)
       this.#lut = new Uint8ClampedArray(size);
     }
     // by default WindowLevel returns a value in the [0,255] range
     // this is ok with regular Arrays and ClampedArray.
-    for (var i = 0; i < size; ++i) {
+    for (let i = 0; i < size; ++i) {
       this.#lut[i] = this.#windowLevel.apply(this.#rescaleLut.getValue(i));
     }
 

@@ -5,7 +5,7 @@
  * @returns {string} The new string.
  */
 export function capitaliseFirstLetter(string) {
-  var res = string;
+  let res = string;
   if (string) {
     res = string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -26,7 +26,7 @@ export function startsWith(str, search, rawPos) {
     typeof search === 'undefined' || search === null) {
     return false;
   }
-  var pos = rawPos > 0 ? rawPos | 0 : 0;
+  const pos = rawPos > 0 ? rawPos | 0 : 0;
   return str.substring(pos, pos + search.length) === search;
 }
 
@@ -55,13 +55,13 @@ export function endsWith(str, search) {
  */
 export function splitKeyValueString(inputStr) {
   // result
-  var result = {};
+  const result = {};
   // check input string
   if (inputStr) {
     // split key/value pairs
-    var pairs = inputStr.split('&');
-    for (var i = 0; i < pairs.length; ++i) {
-      var pair = pairs[i].split('=');
+    const pairs = inputStr.split('&');
+    for (let i = 0; i < pairs.length; ++i) {
+      const pair = pairs[i].split('=');
       // if the key does not exist, create it
       if (!result[pair[0]]) {
         result[pair[0]] = pair[1];
@@ -85,16 +85,16 @@ export function splitKeyValueString(inputStr) {
  * @returns {Array} An array of found flags.
  */
 export function getFlags(inputStr) {
-  var flags = [];
+  const flags = [];
   // check input string
   if (inputStr === null || typeof inputStr === 'undefined') {
     return flags;
   }
 
   // word surrounded by curly braces
-  var regex = /{(\w+)}/g;
+  const regex = /{(\w+)}/g;
 
-  var match = regex.exec(inputStr);
+  let match = regex.exec(inputStr);
   while (match) {
     flags.push(match[1]); // first matching group
     match = regex.exec(inputStr);
@@ -109,13 +109,13 @@ export function getFlags(inputStr) {
  * @param {string} inputStr The input string.
  * @param {object} values A object of {value, unit}.
  * @example
- *    var values = {"length": { "value": 33, "unit": "cm" } };
- *    var str = "The length is: {length}.";
- *    var res = replaceFlags(str, values); // "The length is: 33 cm."
+ *    const values = {"length": { "value": 33, "unit": "cm" } };
+ *    const str = "The length is: {length}.";
+ *    const res = replaceFlags(str, values); // "The length is: 33 cm."
  * @returns {string} The result string.
  */
 export function replaceFlags(inputStr, values) {
-  var res = '';
+  let res = '';
   // check input string
   if (inputStr === null || typeof inputStr === 'undefined') {
     return res;
@@ -127,13 +127,13 @@ export function replaceFlags(inputStr, values) {
   }
 
   // loop through flags
-  var keys = getFlags(inputStr);
-  for (var i = 0; i < keys.length; ++i) {
-    var valueObj = values[keys[i]];
+  const keys = getFlags(inputStr);
+  for (let i = 0; i < keys.length; ++i) {
+    const valueObj = values[keys[i]];
     if (valueObj !== null && typeof valueObj !== 'undefined' &&
       valueObj.value !== null && typeof valueObj.value !== 'undefined') {
       // value string
-      var valueStr = valueObj.value.toPrecision(4);
+      let valueStr = valueObj.value.toPrecision(4);
       // add unit if available
       // space or no space? Yes apart from degree...
       // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
@@ -146,7 +146,7 @@ export function replaceFlags(inputStr, values) {
         valueStr += valueObj.unit;
       }
       // flag to replace
-      var flag = '{' + keys[i] + '}';
+      const flag = '{' + keys[i] + '}';
       // replace
       res = res.replace(flag, valueStr);
     }
@@ -175,15 +175,15 @@ export function getRootPath(path) {
  * @returns {string} The lower case file extension or null for none.
  */
 export function getFileExtension(filePath) {
-  var ext = null;
+  let ext = null;
   if (typeof filePath !== 'undefined' &&
     filePath !== null &&
     filePath[0] !== '.') {
-    var pathSplit = filePath.toLowerCase().split('.');
+    const pathSplit = filePath.toLowerCase().split('.');
     if (pathSplit.length !== 1) {
       ext = pathSplit.pop();
       // extension should contain at least one letter and no slash
-      var regExp = /[a-z]/;
+      const regExp = /[a-z]/;
       if (!regExp.test(ext) || ext.includes('/')) {
         ext = null;
       }
@@ -199,8 +199,8 @@ export function getFileExtension(filePath) {
  * @returns {Uint8Array} The Uint8Array.
  */
 export function stringToUint8Array(str) {
-  var arr = new Uint8Array(str.length);
-  for (var i = 0, leni = str.length; i < leni; i++) {
+  const arr = new Uint8Array(str.length);
+  for (let i = 0, leni = str.length; i < leni; i++) {
     arr[i] = str.charCodeAt(i);
   }
   return arr;
@@ -218,7 +218,7 @@ export function stringToUint8Array(str) {
  * @returns {number} The rounded number.
  */
 export function precisionRound(number, precision) {
-  var factor = Math.pow(10, precision);
-  var delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
+  const factor = Math.pow(10, precision);
+  const delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
   return Math.round(number * factor + delta) / factor;
 }

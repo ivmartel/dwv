@@ -14,9 +14,9 @@ import {RescaleSlopeAndIntercept} from './rsi';
  */
 function getSliceIndex(volumeGeometry, sliceGeometry) {
   // possible time
-  var timeId = sliceGeometry.getInitialTime();
+  const timeId = sliceGeometry.getInitialTime();
   // index values
-  var values = [];
+  const values = [];
   // x, y
   values.push(0);
   values.push(0);
@@ -43,22 +43,22 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  * @param {Array} imageUids An array of Uids indexed to slice number.
  * @example
  * // XMLHttpRequest onload callback
- * var onload = function (event) {
+ * const onload = function (event) {
  *   // setup the dicom parser
- *   var dicomParser = new DicomParser();
+ *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // create the image
- *   var imageFactory = new ImageFactory();
+ *   const imageFactory = new ImageFactory();
  *   // inputs are dicom tags and buffer
- *   var image = imageFactory.create(
+ *   const image = imageFactory.create(
  *     dicomParser.getDicomElements(),
  *     dicomParser.getRawDicomElements().x7FE00010.value[0]
  *   );
  *   // result div
- *   var div = document.getElementById('dwv');
+ *   const div = document.getElementById('dwv');
  *   // display the image size
- *   var size = image.getGeometry().getSize();
+ *   const size = image.getGeometry().getSize();
  *   div.appendChild(document.createTextNode(
  *     'Size: ' + size.toString() +
  *     ' (should be 256,256,1)'));
@@ -71,8 +71,8 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  *     ' (should be 101)'));
  * };
  * // DICOM file request
- * var request = new XMLHttpRequest();
- * var url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
  * request.open('GET', url);
  * request.responseType = 'arraybuffer';
  * request.onload = onload;
@@ -198,7 +198,7 @@ export class Image {
    * @returns {string} The UID.
    */
   getImageUid(index) {
-    var uid = this.#imageUids[0];
+    let uid = this.#imageUids[0];
     if (this.#imageUids.length !== 1 && typeof index !== 'undefined') {
       uid = this.#imageUids[this.getSecondaryOffset(index)];
     }
@@ -251,9 +251,9 @@ export class Image {
    *   after applying the view orientation.
    */
   canScroll(viewOrientation) {
-    var size = this.getGeometry().getSize();
+    const size = this.getGeometry().getSize();
     // also check the numberOfFiles in case we are in the middle of a load
-    var nFiles = 1;
+    let nFiles = 1;
     if (typeof this.#meta.numberOfFiles !== 'undefined') {
       nFiles = this.#meta.numberOfFiles;
     }
@@ -287,12 +287,12 @@ export class Image {
    * @returns {object} The rescale slope and intercept.
    */
   getRescaleSlopeAndIntercept(index) {
-    var res = this.#rsi;
+    let res = this.#rsi;
     if (!this.isConstantRSI()) {
       if (typeof index === 'undefined') {
         throw new Error('Cannot get non constant RSI with empty slice index.');
       }
-      var offset = this.getSecondaryOffset(index);
+      const offset = this.getSecondaryOffset(index);
       if (typeof this.#rsis[offset] !== 'undefined') {
         res = this.#rsis[offset];
       } else {
@@ -339,7 +339,7 @@ export class Image {
           // switch to non constant mode
           this.#rsis = [];
           // initialise RSIs
-          for (var i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
+          for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
             this.#rsis.push(i);
           }
           // store
@@ -457,11 +457,11 @@ export class Image {
       value = [value.r, value.g, value.b];
     }
     // main loop
-    var offsets = [];
-    var equal;
-    for (var i = 0; i < this.#buffer.length; i = i + this.#numberOfComponents) {
+    const offsets = [];
+    let equal;
+    for (let i = 0; i < this.#buffer.length; i = i + this.#numberOfComponents) {
       equal = true;
-      for (var j = 0; j < this.#numberOfComponents; ++j) {
+      for (let j = 0; j < this.#numberOfComponents; ++j) {
         if (this.#buffer[i + j] !== value[j]) {
           equal = false;
           break;
@@ -489,8 +489,8 @@ export class Image {
       return [];
     }
     // final array value
-    var finalValues = [];
-    for (var v1 = 0; v1 < values.length; ++v1) {
+    const finalValues = [];
+    for (let v1 = 0; v1 < values.length; ++v1) {
       if (this.#numberOfComponents === 1) {
         finalValues.push([values[v1]]);
       } else if (this.#numberOfComponents === 3) {
@@ -502,7 +502,7 @@ export class Image {
       }
     }
     // find callback
-    var equalFunc;
+    let equalFunc;
     if (this.#numberOfComponents === 1) {
       equalFunc = function (a, b) {
         return a[0] === b[0];
@@ -514,24 +514,24 @@ export class Image {
           a[2] === b[2];
       };
     }
-    var getEqualCallback = function (value) {
+    const getEqualCallback = function (value) {
       return function (item) {
         return equalFunc(item, value);
       };
     };
     // main loop
-    var res = new Array(values.length);
+    const res = new Array(values.length);
     res.fill(false);
-    var valuesToFind = finalValues.slice();
-    var equal;
-    var indicesToRemove;
-    for (var i = 0, leni = this.#buffer.length;
+    const valuesToFind = finalValues.slice();
+    let equal;
+    let indicesToRemove;
+    for (let i = 0, leni = this.#buffer.length;
       i < leni; i = i + this.#numberOfComponents) {
       indicesToRemove = [];
-      for (var v = 0; v < valuesToFind.length; ++v) {
+      for (let v = 0; v < valuesToFind.length; ++v) {
         equal = true;
         // check value(s)
-        for (var j = 0; j < this.#numberOfComponents; ++j) {
+        for (let j = 0; j < this.#numberOfComponents; ++j) {
           if (this.#buffer[i + j] !== valuesToFind[v][j]) {
             equal = false;
             break;
@@ -539,14 +539,14 @@ export class Image {
         }
         // if found, store answer and add to indices to remove
         if (equal) {
-          var valIndex = finalValues.findIndex(
+          const valIndex = finalValues.findIndex(
             getEqualCallback(valuesToFind[v]));
           res[valIndex] = true;
           indicesToRemove.push(v);
         }
       }
       // remove found values
-      for (var r = 0; r < indicesToRemove.length; ++r) {
+      for (let r = 0; r < indicesToRemove.length; ++r) {
         valuesToFind.splice(indicesToRemove[r], 1);
       }
       // exit if no values to find
@@ -565,14 +565,14 @@ export class Image {
    */
   clone() {
     // clone the image buffer
-    var clonedBuffer = this.#buffer.slice(0);
+    const clonedBuffer = this.#buffer.slice(0);
     // create the image copy
-    var copy = new Image(this.getGeometry(), clonedBuffer, this.#imageUids);
+    const copy = new Image(this.getGeometry(), clonedBuffer, this.#imageUids);
     // copy the RSI(s)
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
     } else {
-      for (var i = 0; i < this.#getSecondaryOffsetMax(); ++i) {
+      for (let i = 0; i < this.#getSecondaryOffsetMax(); ++i) {
         copy.setRescaleSlopeAndIntercept(
           this.#getRescaleSlopeAndInterceptAtOffset(i), i);
       }
@@ -592,7 +592,7 @@ export class Image {
    */
   #realloc(size) {
     // save buffer
-    var tmpBuffer = this.#buffer;
+    let tmpBuffer = this.#buffer;
     // create new
     this.#buffer = getTypedArray(
       this.#buffer.BYTES_PER_ELEMENT * 8,
@@ -617,8 +617,8 @@ export class Image {
     if (rhs === null) {
       throw new Error('Cannot append null slice');
     }
-    var rhsSize = rhs.getGeometry().getSize();
-    var size = this.#geometry.getSize();
+    const rhsSize = rhs.getGeometry().getSize();
+    let size = this.#geometry.getSize();
     if (rhsSize.get(2) !== 1) {
       throw new Error('Cannot append more than one slice');
     }
@@ -638,7 +638,7 @@ export class Image {
         'Cannot append a slice with different photometric interpretation');
     }
     // all meta should be equal
-    for (var key in this.#meta) {
+    for (let key in this.#meta) {
       if (key === 'windowPresets' || key === 'numberOfFiles' ||
         key === 'custom') {
         continue;
@@ -649,10 +649,10 @@ export class Image {
     }
 
     // possible time
-    var timeId = rhs.getGeometry().getInitialTime();
+    const timeId = rhs.getGeometry().getInitialTime();
 
     // append frame if needed
-    var isNewFrame = false;
+    let isNewFrame = false;
     if (typeof timeId !== 'undefined' &&
       !this.#geometry.hasSlicesAtTime(timeId)) {
       // update grometry
@@ -664,32 +664,33 @@ export class Image {
     }
 
     // get slice index
-    var index = getSliceIndex(this.#geometry, rhs.getGeometry());
+    const index = getSliceIndex(this.#geometry, rhs.getGeometry());
 
     // calculate slice size
-    var sliceSize = this.#numberOfComponents * size.getDimSize(2);
+    const sliceSize = this.#numberOfComponents * size.getDimSize(2);
 
     // create full buffer if not done yet
     if (typeof this.#meta.numberOfFiles === 'undefined') {
       throw new Error('Missing number of files for buffer manipulation.');
     }
-    var fullBufferSize = sliceSize * this.#meta.numberOfFiles;
+    const fullBufferSize = sliceSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
     }
 
     // slice index
-    var sliceIndex = index.get(2);
+    const sliceIndex = index.get(2);
 
     // slice index including possible 4D
-    var fullSliceIndex = sliceIndex;
+    let fullSliceIndex = sliceIndex;
     if (typeof timeId !== 'undefined') {
       fullSliceIndex +=
         this.#geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
     }
     // offset of the input slice
-    var indexOffset = fullSliceIndex * sliceSize;
-    var maxOffset = this.#geometry.getCurrentTotalNumberOfSlices() * sliceSize;
+    const indexOffset = fullSliceIndex * sliceSize;
+    const maxOffset =
+      this.#geometry.getCurrentTotalNumberOfSlices() * sliceSize;
     // move content if needed
     if (indexOffset < maxOffset) {
       this.#buffer.set(
@@ -711,21 +712,21 @@ export class Image {
       rhs.getRescaleSlopeAndIntercept(), fullSliceIndex);
 
     // current number of images
-    var numberOfImages = this.#imageUids.length;
+    const numberOfImages = this.#imageUids.length;
 
     // insert sop instance UIDs
     this.#imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof this.#meta.windowPresets !== 'undefined') {
-      var windowPresets = this.#meta.windowPresets;
-      var rhsPresets = rhs.getMeta().windowPresets;
-      var keys = Object.keys(rhsPresets);
-      var pkey = null;
-      for (var i = 0; i < keys.length; ++i) {
+      const windowPresets = this.#meta.windowPresets;
+      const rhsPresets = rhs.getMeta().windowPresets;
+      const keys = Object.keys(rhsPresets);
+      let pkey = null;
+      for (let i = 0; i < keys.length; ++i) {
         pkey = keys[i];
-        var rhsPreset = rhsPresets[pkey];
-        var windowPreset = windowPresets[pkey];
+        const rhsPreset = rhsPresets[pkey];
+        const windowPreset = windowPresets[pkey];
         if (typeof windowPreset !== 'undefined') {
           // if not set or false, check perslice
           if (typeof windowPreset.perslice === 'undefined' ||
@@ -735,7 +736,7 @@ export class Image {
               windowPreset.perslice = true;
               // fill wl array with copy of wl[0]
               // (loop on number of images minus the existing one)
-              for (var j = 0; j < numberOfImages - 1; ++j) {
+              for (let j = 0; j < numberOfImages - 1; ++j) {
                 windowPreset.wl.push(windowPreset.wl[0]);
               }
             }
@@ -762,12 +763,12 @@ export class Image {
    */
   appendFrameBuffer(frameBuffer, frameIndex) {
     // create full buffer if not done yet
-    var size = this.#geometry.getSize();
-    var frameSize = this.#numberOfComponents * size.getDimSize(2);
+    const size = this.#geometry.getSize();
+    const frameSize = this.#numberOfComponents * size.getDimSize(2);
     if (typeof this.#meta.numberOfFiles === 'undefined') {
       throw new Error('Missing number of files for frame buffer manipulation.');
     }
-    var fullBufferSize = frameSize * this.#meta.numberOfFiles;
+    const fullBufferSize = frameSize * this.#meta.numberOfFiles;
     if (this.#buffer.length !== fullBufferSize) {
       this.#realloc(fullBufferSize);
     }
@@ -826,7 +827,7 @@ export class Image {
    */
   getHistogram() {
     if (!this.#histogram) {
-      var res = this.calculateHistogram();
+      const res = this.calculateHistogram();
       this.#dataRange = res.dataRange;
       this.#rescaledDataRange = res.rescaledDataRange;
       this.#histogram = res.histogram;
@@ -878,8 +879,8 @@ export class Image {
    * @fires Image#imagechange
    */
   setAtOffsets(offsets, value) {
-    var offset;
-    for (var i = 0, leni = offsets.length; i < leni; ++i) {
+    let offset;
+    for (let i = 0, leni = offsets.length; i < leni; ++i) {
       offset = offsets[i];
       this.#buffer[offset] = value.r;
       this.#buffer[offset + 1] = value.g;
@@ -899,27 +900,27 @@ export class Image {
    * @fires Image#imagechange
    */
   setAtOffsetsAndGetOriginals(offsetsLists, value) {
-    var originalColoursLists = [];
+    const originalColoursLists = [];
 
     // update and store
-    for (var j = 0; j < offsetsLists.length; ++j) {
-      var offsets = offsetsLists[j];
+    for (let j = 0; j < offsetsLists.length; ++j) {
+      const offsets = offsetsLists[j];
       // first colour
-      var offset = offsets[0] * 3;
-      var previousColour = {
+      let offset = offsets[0] * 3;
+      let previousColour = {
         r: this.#buffer[offset],
         g: this.#buffer[offset + 1],
         b: this.#buffer[offset + 2]
       };
       // original value storage
-      var originalColours = [];
+      const originalColours = [];
       originalColours.push({
         index: 0,
         colour: previousColour
       });
-      for (var i = 0; i < offsets.length; ++i) {
+      for (let i = 0; i < offsets.length; ++i) {
         offset = offsets[i] * 3;
-        var currentColour = {
+        const currentColour = {
           r: this.#buffer[offset],
           g: this.#buffer[offset + 1],
           b: this.#buffer[offset + 2]
@@ -955,9 +956,9 @@ export class Image {
    * @fires Image#imagechange
    */
   setAtOffsetsWithIterator(offsetsLists, value) {
-    for (var j = 0; j < offsetsLists.length; ++j) {
-      var offsets = offsetsLists[j];
-      var iterator;
+    for (let j = 0; j < offsetsLists.length; ++j) {
+      const offsets = offsetsLists[j];
+      let iterator;
       if (typeof value !== 'undefined' &&
         typeof value.r !== 'undefined') {
         // input value is a simple color
@@ -971,9 +972,9 @@ export class Image {
       }
 
       // set values
-      var ival = iterator.next();
+      let ival = iterator.next();
       while (!ival.done) {
-        var offset = offsets[ival.index] * 3;
+        const offset = offsets[ival.index] * 3;
         this.#buffer[offset] = ival.value.r;
         this.#buffer[offset + 1] = ival.value.g;
         this.#buffer[offset + 2] = ival.value.b;
@@ -1000,8 +1001,8 @@ export class Image {
    * Warning: No size check...
    */
   getValue(i, j, k, f) {
-    var frame = (f || 0);
-    var index = new Index([i, j, k, frame]);
+    const frame = (f || 0);
+    const index = new Index([i, j, k, frame]);
     return this.getValueAtOffset(
       this.getGeometry().getSize().indexToOffset(index));
   }
@@ -1032,13 +1033,13 @@ export class Image {
     if (typeof f === 'undefined') {
       f = 0;
     }
-    var val = this.getValue(i, j, k, f);
+    let val = this.getValue(i, j, k, f);
     if (!this.isIdentityRSI()) {
       if (this.isConstantRSI()) {
         val = this.getRescaleSlopeAndIntercept().apply(val);
       } else {
-        var values = [i, j, k, f];
-        var index = new Index(values);
+        const values = [i, j, k, f];
+        const index = new Index(values);
         val = this.getRescaleSlopeAndIntercept(index).apply(val);
       }
     }
@@ -1066,12 +1067,12 @@ export class Image {
    * Warning: No size check...
    */
   getRescaledValueAtOffset(offset) {
-    var val = this.getValueAtOffset(offset);
+    let val = this.getValueAtOffset(offset);
     if (!this.isIdentityRSI()) {
       if (this.isConstantRSI()) {
         val = this.getRescaleSlopeAndIntercept().apply(val);
       } else {
-        var index = this.getGeometry().getSize().offsetToIndex(offset);
+        const index = this.getGeometry().getSize().offsetToIndex(offset);
         val = this.getRescaleSlopeAndIntercept(index).apply(val);
       }
     }
@@ -1085,16 +1086,16 @@ export class Image {
    * @returns {object} The range {min, max}.
    */
   calculateDataRange() {
-    var min = this.getValueAtOffset(0);
-    var max = min;
-    var value = 0;
-    var size = this.getGeometry().getSize();
-    var leni = size.getTotalSize();
+    let min = this.getValueAtOffset(0);
+    let max = min;
+    let value = 0;
+    const size = this.getGeometry().getSize();
+    let leni = size.getTotalSize();
     // max to 3D
     if (size.length() >= 3) {
       leni = size.getDimSize(3);
     }
-    for (var i = 0; i < leni; ++i) {
+    for (let i = 0; i < leni; ++i) {
       value = this.getValueAtOffset(i);
       if (value > max) {
         max = value;
@@ -1117,24 +1118,24 @@ export class Image {
     if (this.isIdentityRSI()) {
       return this.getDataRange();
     } else if (this.isConstantRSI()) {
-      var range = this.getDataRange();
-      var resmin = this.getRescaleSlopeAndIntercept().apply(range.min);
-      var resmax = this.getRescaleSlopeAndIntercept().apply(range.max);
+      const range = this.getDataRange();
+      const resmin = this.getRescaleSlopeAndIntercept().apply(range.min);
+      const resmax = this.getRescaleSlopeAndIntercept().apply(range.max);
       return {
         min: ((resmin < resmax) ? resmin : resmax),
         max: ((resmin > resmax) ? resmin : resmax)
       };
     } else {
-      var rmin = this.getRescaledValueAtOffset(0);
-      var rmax = rmin;
-      var rvalue = 0;
-      var size = this.getGeometry().getSize();
-      var leni = size.getTotalSize();
+      let rmin = this.getRescaledValueAtOffset(0);
+      let rmax = rmin;
+      let rvalue = 0;
+      const size = this.getGeometry().getSize();
+      let leni = size.getTotalSize();
       // max to 3D
       if (size.length() === 3) {
         leni = size.getDimSize(3);
       }
-      for (var i = 0; i < leni; ++i) {
+      for (let i = 0; i < leni; ++i) {
         rvalue = this.getRescaledValueAtOffset(i);
         if (rvalue > rmax) {
           rmax = rvalue;
@@ -1154,15 +1155,15 @@ export class Image {
    * @returns {object} The histogram, data range and rescaled data range.
    */
   calculateHistogram() {
-    var size = this.getGeometry().getSize();
-    var histo = [];
-    var min = this.getValueAtOffset(0);
-    var max = min;
-    var value = 0;
-    var rmin = this.getRescaledValueAtOffset(0);
-    var rmax = rmin;
-    var rvalue = 0;
-    for (var i = 0, leni = size.getTotalSize(); i < leni; ++i) {
+    const size = this.getGeometry().getSize();
+    const histo = [];
+    let min = this.getValueAtOffset(0);
+    let max = min;
+    let value = 0;
+    let rmin = this.getRescaledValueAtOffset(0);
+    let rmax = rmin;
+    let rvalue = 0;
+    for (let i = 0, leni = size.getTotalSize(); i < leni; ++i) {
       value = this.getValueAtOffset(i);
       if (value > max) {
         max = value;
@@ -1180,11 +1181,11 @@ export class Image {
       histo[rvalue] = (histo[rvalue] || 0) + 1;
     }
     // set data range
-    var dataRange = {min: min, max: max};
-    var rescaledDataRange = {min: rmin, max: rmax};
+    const dataRange = {min: min, max: max};
+    const rescaledDataRange = {min: rmin, max: rmax};
     // generate data for plotting
-    var histogram = [];
-    for (var b = rmin; b <= rmax; ++b) {
+    const histogram = [];
+    for (let b = rmin; b <= rmax; ++b) {
       histogram.push([b, (histo[b] || 0)]);
     }
     // return
@@ -1210,12 +1211,12 @@ export class Image {
         weights.length);
     }
 
-    var newImage = this.clone();
-    var newBuffer = newImage.getBuffer();
+    const newImage = this.clone();
+    const newBuffer = newImage.getBuffer();
 
-    var imgSize = this.getGeometry().getSize();
-    var dimOffset = imgSize.getDimSize(2) * this.getNumberOfComponents();
-    for (var k = 0; k < imgSize.get(2); ++k) {
+    const imgSize = this.getGeometry().getSize();
+    const dimOffset = imgSize.getDimSize(2) * this.getNumberOfComponents();
+    for (let k = 0; k < imgSize.get(2); ++k) {
       this.convoluteBuffer(weights, newBuffer, k * dimOffset);
     }
 
@@ -1233,14 +1234,14 @@ export class Image {
    */
   convoluteBuffer(
     weights, buffer, startOffset) {
-    var imgSize = this.getGeometry().getSize();
-    var ncols = imgSize.get(0);
-    var nrows = imgSize.get(1);
-    var ncomp = this.getNumberOfComponents();
+    const imgSize = this.getGeometry().getSize();
+    const ncols = imgSize.get(0);
+    const nrows = imgSize.get(1);
+    const ncomp = this.getNumberOfComponents();
 
     // number of component and planar configuration vars
-    var factor = 1;
-    var componentOffset = 1;
+    let factor = 1;
+    let componentOffset = 1;
     if (ncomp === 3) {
       if (this.getPlanarConfiguration() === 0) {
         factor = 3;
@@ -1253,7 +1254,7 @@ export class Image {
     /*jshint indent:false */
 
     // default weight offset matrix
-    var wOff = [];
+    const wOff = [];
     wOff[0] = (-ncols - 1) * factor;
     wOff[1] = (-ncols) * factor;
     wOff[2] = (-ncols + 1) * factor;
@@ -1268,45 +1269,45 @@ export class Image {
     // borders are extended (see http://en.wikipedia.org/wiki/Kernel_%28image_processing%29)
 
     // i=0, j=0
-    var wOff00 = [];
+    const wOff00 = [];
     wOff00[0] = wOff[4]; wOff00[1] = wOff[4]; wOff00[2] = wOff[5];
     wOff00[3] = wOff[4]; wOff00[4] = wOff[4]; wOff00[5] = wOff[5];
     wOff00[6] = wOff[7]; wOff00[7] = wOff[7]; wOff00[8] = wOff[8];
     // i=0, j=*
-    var wOff0x = [];
+    const wOff0x = [];
     wOff0x[0] = wOff[1]; wOff0x[1] = wOff[1]; wOff0x[2] = wOff[2];
     wOff0x[3] = wOff[4]; wOff0x[4] = wOff[4]; wOff0x[5] = wOff[5];
     wOff0x[6] = wOff[7]; wOff0x[7] = wOff[7]; wOff0x[8] = wOff[8];
     // i=0, j=nrows
-    var wOff0n = [];
+    const wOff0n = [];
     wOff0n[0] = wOff[1]; wOff0n[1] = wOff[1]; wOff0n[2] = wOff[2];
     wOff0n[3] = wOff[4]; wOff0n[4] = wOff[4]; wOff0n[5] = wOff[5];
     wOff0n[6] = wOff[4]; wOff0n[7] = wOff[4]; wOff0n[8] = wOff[5];
 
     // i=*, j=0
-    var wOffx0 = [];
+    const wOffx0 = [];
     wOffx0[0] = wOff[3]; wOffx0[1] = wOff[4]; wOffx0[2] = wOff[5];
     wOffx0[3] = wOff[3]; wOffx0[4] = wOff[4]; wOffx0[5] = wOff[5];
     wOffx0[6] = wOff[6]; wOffx0[7] = wOff[7]; wOffx0[8] = wOff[8];
     // i=*, j=* -> wOff
     // i=*, j=nrows
-    var wOffxn = [];
+    const wOffxn = [];
     wOffxn[0] = wOff[0]; wOffxn[1] = wOff[1]; wOffxn[2] = wOff[2];
     wOffxn[3] = wOff[3]; wOffxn[4] = wOff[4]; wOffxn[5] = wOff[5];
     wOffxn[6] = wOff[3]; wOffxn[7] = wOff[4]; wOffxn[8] = wOff[5];
 
     // i=ncols, j=0
-    var wOffn0 = [];
+    const wOffn0 = [];
     wOffn0[0] = wOff[3]; wOffn0[1] = wOff[4]; wOffn0[2] = wOff[4];
     wOffn0[3] = wOff[3]; wOffn0[4] = wOff[4]; wOffn0[5] = wOff[4];
     wOffn0[6] = wOff[6]; wOffn0[7] = wOff[7]; wOffn0[8] = wOff[7];
     // i=ncols, j=*
-    var wOffnx = [];
+    const wOffnx = [];
     wOffnx[0] = wOff[0]; wOffnx[1] = wOff[1]; wOffnx[2] = wOff[1];
     wOffnx[3] = wOff[3]; wOffnx[4] = wOff[4]; wOffnx[5] = wOff[4];
     wOffnx[6] = wOff[6]; wOffnx[7] = wOff[7]; wOffnx[8] = wOff[7];
     // i=ncols, j=nrows
-    var wOffnn = [];
+    const wOffnn = [];
     wOffnn[0] = wOff[0]; wOffnn[1] = wOff[1]; wOffnn[2] = wOff[1];
     wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
     wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
@@ -1315,14 +1316,14 @@ export class Image {
     /*jshint indent:4 */
 
     // loop vars
-    var pixelOffset = startOffset;
-    var newValue = 0;
-    var wOffFinal = [];
-    for (var c = 0; c < ncomp; ++c) {
+    let pixelOffset = startOffset;
+    let newValue = 0;
+    let wOffFinal = [];
+    for (let c = 0; c < ncomp; ++c) {
       // component offset
       pixelOffset += c * componentOffset;
-      for (var j = 0; j < nrows; ++j) {
-        for (var i = 0; i < ncols; ++i) {
+      for (let j = 0; j < nrows; ++j) {
+        for (let i = 0; i < ncols; ++i) {
           wOffFinal = wOff;
           // special border cases
           if (i === 0 && j === 0) {
@@ -1345,7 +1346,7 @@ export class Image {
           // calculate the weighed sum of the source image pixels that
           // fall under the convolution matrix
           newValue = 0;
-          for (var wi = 0; wi < 9; ++wi) {
+          for (let wi = 0; wi < 9; ++wi) {
             newValue += this.getValueAtOffset(
               pixelOffset + wOffFinal[wi]) * weights[wi];
           }
@@ -1366,9 +1367,9 @@ export class Image {
    * Note: Uses the raw buffer values.
    */
   transform(operator) {
-    var newImage = this.clone();
-    var newBuffer = newImage.getBuffer();
-    for (var i = 0, leni = newBuffer.length; i < leni; ++i) {
+    const newImage = this.clone();
+    const newBuffer = newImage.getBuffer();
+    for (let i = 0, leni = newBuffer.length; i < leni; ++i) {
       newBuffer[i] = operator(newImage.getValueAtOffset(i));
     }
     return newImage;
@@ -1384,9 +1385,9 @@ export class Image {
    * Note: Uses the raw buffer values.
    */
   compose(rhs, operator) {
-    var newImage = this.clone();
-    var newBuffer = newImage.getBuffer();
-    for (var i = 0, leni = newBuffer.length; i < leni; ++i) {
+    const newImage = this.clone();
+    const newBuffer = newImage.getBuffer();
+    for (let i = 0, leni = newBuffer.length; i < leni; ++i) {
       // using the operator on the local buffer, i.e. the
       // latest (not original) data
       newBuffer[i] = Math.floor(

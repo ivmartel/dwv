@@ -14,12 +14,12 @@ export function isNativeLittleEndian() {
  * @param {object} array The array to flip (modified).
  */
 function flipArrayEndianness(array) {
-  var blen = array.byteLength;
-  var u8 = new Uint8Array(array.buffer, array.byteOffset, blen);
-  var bpe = array.BYTES_PER_ELEMENT;
-  var tmp;
-  for (var i = 0; i < blen; i += bpe) {
-    for (var j = i + bpe - 1, k = i; j > k; j--, k++) {
+  const blen = array.byteLength;
+  const u8 = new Uint8Array(array.buffer, array.byteOffset, blen);
+  const bpe = array.BYTES_PER_ELEMENT;
+  let tmp;
+  for (let i = 0; i < blen; i += bpe) {
+    for (let j = i + bpe - 1, k = i; j > k; j--, k++) {
       tmp = u8[k];
       u8[k] = u8[j];
       u8[j] = tmp;
@@ -160,13 +160,13 @@ export class DataReader {
    */
   readBinaryArray(byteOffset, size) {
     // input
-    var bitArray = new Uint8Array(this.#buffer, byteOffset, size);
+    const bitArray = new Uint8Array(this.#buffer, byteOffset, size);
     // result
-    var byteArrayLength = 8 * bitArray.length;
-    var data = new Uint8Array(byteArrayLength);
-    var bitNumber = 0;
-    var bitIndex = 0;
-    for (var i = 0; i < byteArrayLength; ++i) {
+    const byteArrayLength = 8 * bitArray.length;
+    const data = new Uint8Array(byteArrayLength);
+    let bitNumber = 0;
+    let bitIndex = 0;
+    for (let i = 0; i < byteArrayLength; ++i) {
       bitNumber = i % 8;
       bitIndex = Math.floor(i / 8);
       // see https://stackoverflow.com/questions/4854207/get-a-specific-bit-from-byte/4854257
@@ -205,9 +205,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readUint16Array(byteOffset, size) {
-    var bpe = Uint16Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = Uint16Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of Uint16Array.BYTES_PER_ELEMENT (=2)
     if (byteOffset % bpe === 0) {
       data = new Uint16Array(this.#buffer, byteOffset, arraySize);
@@ -216,7 +216,7 @@ export class DataReader {
       }
     } else {
       data = new Uint16Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readUint16(byteOffset + bpe * i);
       }
     }
@@ -231,9 +231,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readInt16Array(byteOffset, size) {
-    var bpe = Int16Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = Int16Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of Int16Array.BYTES_PER_ELEMENT (=2)
     if (byteOffset % bpe === 0) {
       data = new Int16Array(this.#buffer, byteOffset, arraySize);
@@ -242,7 +242,7 @@ export class DataReader {
       }
     } else {
       data = new Int16Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readInt16(byteOffset + bpe * i);
       }
     }
@@ -257,9 +257,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readUint32Array(byteOffset, size) {
-    var bpe = Uint32Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = Uint32Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of Uint32Array.BYTES_PER_ELEMENT (=4)
     if (byteOffset % bpe === 0) {
       data = new Uint32Array(this.#buffer, byteOffset, arraySize);
@@ -268,7 +268,7 @@ export class DataReader {
       }
     } else {
       data = new Uint32Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readUint32(byteOffset + bpe * i);
       }
     }
@@ -283,9 +283,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readUint64Array(byteOffset, size) {
-    var bpe = BigUint64Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = BigUint64Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of BigUint64Array.BYTES_PER_ELEMENT (=8)
     if (byteOffset % bpe === 0) {
       data = new BigUint64Array(this.#buffer, byteOffset, arraySize);
@@ -294,7 +294,7 @@ export class DataReader {
       }
     } else {
       data = new BigUint64Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readBigUint64(byteOffset + bpe * i);
       }
     }
@@ -309,9 +309,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readInt32Array(byteOffset, size) {
-    var bpe = Int32Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = Int32Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of Int32Array.BYTES_PER_ELEMENT (=4)
     if (byteOffset % bpe === 0) {
       data = new Int32Array(this.#buffer, byteOffset, arraySize);
@@ -320,7 +320,7 @@ export class DataReader {
       }
     } else {
       data = new Int32Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readInt32(byteOffset + bpe * i);
       }
     }
@@ -335,9 +335,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readInt64Array(byteOffset, size) {
-    var bpe = BigInt64Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = BigInt64Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of BigInt64Array.BYTES_PER_ELEMENT (=8)
     if (byteOffset % bpe === 0) {
       data = new BigInt64Array(this.#buffer, byteOffset, arraySize);
@@ -346,7 +346,7 @@ export class DataReader {
       }
     } else {
       data = new BigInt64Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readBigInt64(byteOffset + bpe * i);
       }
     }
@@ -361,9 +361,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readFloat32Array(byteOffset, size) {
-    var bpe = Float32Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = Float32Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of Float32Array.BYTES_PER_ELEMENT (=4)
     if (byteOffset % bpe === 0) {
       data = new Float32Array(this.#buffer, byteOffset, arraySize);
@@ -372,7 +372,7 @@ export class DataReader {
       }
     } else {
       data = new Float32Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readFloat32(byteOffset + bpe * i);
       }
     }
@@ -387,9 +387,9 @@ export class DataReader {
    * @returns {Array} The read data.
    */
   readFloat64Array(byteOffset, size) {
-    var bpe = Float64Array.BYTES_PER_ELEMENT;
-    var arraySize = size / bpe;
-    var data = null;
+    const bpe = Float64Array.BYTES_PER_ELEMENT;
+    const arraySize = size / bpe;
+    let data = null;
     // byteOffset should be a multiple of Float64Array.BYTES_PER_ELEMENT (=8)
     if (byteOffset % bpe === 0) {
       data = new Float64Array(this.#buffer, byteOffset, arraySize);
@@ -398,7 +398,7 @@ export class DataReader {
       }
     } else {
       data = new Float64Array(arraySize);
-      for (var i = 0; i < arraySize; ++i) {
+      for (let i = 0; i < arraySize; ++i) {
         data[i] = this.readFloat64(byteOffset + bpe * i);
       }
     }
@@ -413,7 +413,7 @@ export class DataReader {
    */
   readHex(byteOffset) {
     // read and convert to hex string
-    var str = this.readUint16(byteOffset).toString(16);
+    const str = this.readUint16(byteOffset).toString(16);
     // return padded
     return '0x0000'.substring(0, 6 - str.length) + str.toUpperCase();
   }

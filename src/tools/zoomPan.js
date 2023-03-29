@@ -9,7 +9,7 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
  * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -61,8 +61,8 @@ export class ZoomAndPan {
     this.x0 = event._x;
     this.y0 = event._y;
     // first line
-    var point0 = new Point2D(event._x, event._y);
-    var point1 = new Point2D(event._x1, event._y1);
+    const point0 = new Point2D(event._x, event._y);
+    const point1 = new Point2D(event._x1, event._y1);
     this.line0 = new Line(point0, point1);
     this.midPoint = this.line0.getMidpoint();
   };
@@ -77,15 +77,15 @@ export class ZoomAndPan {
       return;
     }
     // calculate translation
-    var tx = event._x - this.x0;
-    var ty = event._y - this.y0;
+    const tx = event._x - this.x0;
+    const ty = event._y - this.y0;
     // apply translation
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var viewController = viewLayer.getViewController();
-    var planeOffset = viewLayer.displayToPlaneScale(tx, ty);
-    var offset3D = viewController.getOffset3DFromPlaneOffset(planeOffset);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planeOffset = viewLayer.displayToPlaneScale(tx, ty);
+    const offset3D = viewController.getOffset3DFromPlaneOffset(planeOffset);
     layerGroup.addTranslation({
       x: offset3D.getX(),
       y: offset3D.getY(),
@@ -106,25 +106,25 @@ export class ZoomAndPan {
     if (!this.#started) {
       return;
     }
-    var point0 = new Point2D(event._x, event._y);
-    var point1 = new Point2D(event._x1, event._y1);
-    var newLine = new Line(point0, point1);
-    var lineRatio = newLine.getLength() / this.line0.getLength();
+    const point0 = new Point2D(event._x, event._y);
+    const point1 = new Point2D(event._x1, event._y1);
+    const newLine = new Line(point0, point1);
+    const lineRatio = newLine.getLength() / this.line0.getLength();
 
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var viewController = viewLayer.getViewController();
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
 
     if (lineRatio === 1) {
       // scroll mode
       // difference  to last position
-      var diffY = event._y - this.y0;
+      const diffY = event._y - this.y0;
       // do not trigger for small moves
       if (Math.abs(diffY) < 15) {
         return;
       }
-      var imageSize = viewController.getImageSize();
+      const imageSize = viewController.getImageSize();
       // update view controller
       if (imageSize.canScroll(2)) {
         if (diffY > 0) {
@@ -135,11 +135,11 @@ export class ZoomAndPan {
       }
     } else {
       // zoom mode
-      var zoom = (lineRatio - 1) / 10;
+      const zoom = (lineRatio - 1) / 10;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        var planePos = viewLayer.displayToMainPlanePos(
+        const planePos = viewLayer.displayToMainPlanePos(
           this.midPoint.getX(), this.midPoint.getY());
-        var center = viewController.getPlanePositionFromPlanePoint(planePos);
+        const center = viewController.getPlanePositionFromPlanePoint(planePos);
         layerGroup.addScale(zoom, center);
         layerGroup.draw();
       }
@@ -173,7 +173,7 @@ export class ZoomAndPan {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    var touches = event.targetTouches;
+    const touches = event.targetTouches;
     if (touches.length === 1) {
       this.mousedown(event);
     } else if (touches.length === 2) {
@@ -187,7 +187,7 @@ export class ZoomAndPan {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    var touches = event.targetTouches;
+    const touches = event.targetTouches;
     if (touches.length === 1) {
       this.mousemove(event);
     } else if (touches.length === 2) {
@@ -210,14 +210,14 @@ export class ZoomAndPan {
    * @param {object} event The mouse wheel event.
    */
   wheel = (event) => {
-    var step = -event.deltaY / 500;
+    const step = -event.deltaY / 500;
 
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var viewController = viewLayer.getViewController();
-    var planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
-    var center = viewController.getPlanePositionFromPlanePoint(planePos);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
+    const center = viewController.getPlanePositionFromPlanePoint(planePos);
     layerGroup.addScale(step, center);
     layerGroup.draw();
   };

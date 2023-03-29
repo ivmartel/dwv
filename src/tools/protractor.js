@@ -64,26 +64,26 @@ export class ProtractorFactory {
    */
   create(points, style, _viewController) {
     // physical shape
-    var line0 = new Line(points[0], points[1]);
+    const line0 = new Line(points[0], points[1]);
     // points stored the Konvajs way
-    var pointsArray = [];
-    for (var i = 0; i < points.length; ++i) {
+    const pointsArray = [];
+    for (let i = 0; i < points.length; ++i) {
       pointsArray.push(points[i].getX());
       pointsArray.push(points[i].getY());
     }
     // draw shape
-    var kshape = new Konva.Line({
+    const kshape = new Konva.Line({
       points: pointsArray,
       stroke: style.getLineColour(),
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
       name: 'shape'
     });
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     // text and decoration
     if (points.length === 3) {
-      var line1 = new Line(points[1], points[2]);
+      const line1 = new Line(points[1], points[2]);
       // larger hitfunc
       kshape.hitFunc(function (context) {
         context.beginPath();
@@ -94,15 +94,15 @@ export class ProtractorFactory {
         context.fillStrokeShape(this);
       });
       // quantification
-      var angle = getAngle(line0, line1);
-      var inclination = line0.getInclination();
+      let angle = getAngle(line0, line1);
+      let inclination = line0.getInclination();
       if (angle > 180) {
         angle = 360 - angle;
         inclination += angle;
       }
 
       // quantification
-      var ktext = new Konva.Text({
+      const ktext = new Konva.Text({
         fontSize: style.getFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -111,14 +111,14 @@ export class ProtractorFactory {
         shadowOffset: style.getShadowOffset(),
         name: 'text'
       });
-      var textExpr = '';
+      let textExpr = '';
       // TODO: allow override?
       // if (typeof protractorLabelText !== 'undefined') {
       //   textExpr = protractorLabelText;
       // } else {
       textExpr = defaultProtractorLabelText;
       // }
-      var quant = {
+      const quant = {
         angle: {
           value: angle,
           unit: i18n('unit.degree')
@@ -132,9 +132,11 @@ export class ProtractorFactory {
       };
 
       // label
-      var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
-      var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-      var klabel = new Konva.Label({
+      const midX =
+        (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
+      const midY =
+        (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
+      const klabel = new Konva.Label({
         x: midX,
         y: midY - style.applyZoomScale(15).y,
         scale: style.applyZoomScale(1),
@@ -148,8 +150,8 @@ export class ProtractorFactory {
       }));
 
       // arc
-      var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
-      var karc = new Konva.Arc({
+      const radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
+      const karc = new Konva.Arc({
         innerRadius: radius,
         outerRadius: radius,
         stroke: style.getLineColour(),
@@ -180,9 +182,9 @@ export class ProtractorFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var points = shape.points();
+    const points = shape.points();
 
-    var anchors = [];
+    const anchors = [];
     anchors.push(getDefaultAnchor(
       points[0] + shape.x(), points[1] + shape.y(), 'begin', style
     ));
@@ -204,27 +206,27 @@ export class ProtractorFactory {
    */
   update(anchor, style, _viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kline = group.getChildren(function (node) {
+    const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
       // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
       // associated arc
-    var karc = group.getChildren(function (node) {
+    const karc = group.getChildren(function (node) {
       return node.name() === 'shape-arc';
     })[0];
       // find special points
-    var begin = group.getChildren(function (node) {
+    const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
-    var mid = group.getChildren(function (node) {
+    const mid = group.getChildren(function (node) {
       return node.id() === 'mid';
     })[0];
-    var end = group.getChildren(function (node) {
+    const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
       // update special points
@@ -244,12 +246,12 @@ export class ProtractorFactory {
     }
     // update shape and compensate for possible drag
     // note: shape.position() and shape.size() won't work...
-    var bx = begin.x() - kline.x();
-    var by = begin.y() - kline.y();
-    var mx = mid.x() - kline.x();
-    var my = mid.y() - kline.y();
-    var ex = end.x() - kline.x();
-    var ey = end.y() - kline.y();
+    const bx = begin.x() - kline.x();
+    const by = begin.y() - kline.y();
+    const mx = mid.x() - kline.x();
+    const my = mid.y() - kline.y();
+    const ex = end.x() - kline.x();
+    const ey = end.y() - kline.y();
     kline.points([bx, by, mx, my, ex, ey]);
     // larger hitfunc
     kline.hitFunc(function (context) {
@@ -261,42 +263,42 @@ export class ProtractorFactory {
       context.fillStrokeShape(this);
     });
     // update text
-    var p2d0 = new Point2D(begin.x(), begin.y());
-    var p2d1 = new Point2D(mid.x(), mid.y());
-    var p2d2 = new Point2D(end.x(), end.y());
-    var line0 = new Line(p2d0, p2d1);
-    var line1 = new Line(p2d1, p2d2);
-    var angle = getAngle(line0, line1);
-    var inclination = line0.getInclination();
+    const p2d0 = new Point2D(begin.x(), begin.y());
+    const p2d1 = new Point2D(mid.x(), mid.y());
+    const p2d2 = new Point2D(end.x(), end.y());
+    const line0 = new Line(p2d0, p2d1);
+    const line1 = new Line(p2d1, p2d2);
+    let angle = getAngle(line0, line1);
+    let inclination = line0.getInclination();
     if (angle > 180) {
       angle = 360 - angle;
       inclination += angle;
     }
 
     // update text
-    var ktext = klabel.getText();
-    var quantification = {
+    const ktext = klabel.getText();
+    const quantification = {
       angle: {value: angle, unit: i18n('unit.degree')}
     };
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
     // update meta
     ktext.meta.quantification = quantification;
     // update position
-    var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
-    var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-    var textPos = {
+    const midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
+    const midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
+    const textPos = {
       x: midX,
       y: midY - style.applyZoomScale(15).y
     };
     klabel.position(textPos);
 
     // arc
-    var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
+    const radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
     karc.innerRadius(radius);
     karc.outerRadius(radius);
     karc.angle(angle);
     karc.rotation(-inclination);
-    var arcPos = {x: mid.x(), y: mid.y()};
+    const arcPos = {x: mid.x(), y: mid.y()};
     karc.position(arcPos);
   }
 

@@ -9,7 +9,7 @@ import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
  * @param {App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -69,24 +69,24 @@ export class WindowLevel {
       return;
     }
 
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewController =
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
     // difference to last position
-    var diffX = event._x - this.x0;
-    var diffY = this.y0 - event._y;
+    const diffX = event._x - this.x0;
+    const diffY = this.y0 - event._y;
     // data range
-    var range = viewController.getImageRescaledDataRange();
+    const range = viewController.getImageRescaledDataRange();
     // 1/1000 seems to give reasonable results...
-    var pixelToIntensity = (range.max - range.min) * 0.01;
+    const pixelToIntensity = (range.max - range.min) * 0.01;
 
     // calculate new window level
-    var center = parseInt(viewController.getWindowLevel().center, 10);
-    var width = parseInt(viewController.getWindowLevel().width, 10);
-    var windowCenter = center + Math.round(diffY * pixelToIntensity);
-    var windowWidth = width + Math.round(diffX * pixelToIntensity);
+    const center = parseInt(viewController.getWindowLevel().center, 10);
+    const width = parseInt(viewController.getWindowLevel().width, 10);
+    const windowCenter = center + Math.round(diffY * pixelToIntensity);
+    let windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
     windowWidth = validateWindowWidth(windowWidth);
 
@@ -159,12 +159,12 @@ export class WindowLevel {
    * @param {object} event The double click event.
    */
   dblclick = (event) => {
-    var layerDetails = getLayerDetailsFromEvent(event);
-    var layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
-    var viewController = viewLayer.getViewController();
-    var image = this.#app.getImage(viewLayer.getDataIndex());
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const viewController = viewLayer.getViewController();
+    const image = this.#app.getImage(viewLayer.getDataIndex());
 
     // update view controller
     viewController.setWindowLevel(

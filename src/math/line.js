@@ -88,10 +88,10 @@ export class Line {
    *  or null for null spacings.
    */
   getWorldLength(spacingX, spacingY) {
-    var wlen = null;
+    let wlen = null;
     if (spacingX !== null && spacingY !== null) {
-      var dxs = this.getDeltaX() * spacingX;
-      var dys = this.getDeltaY() * spacingY;
+      const dxs = this.getDeltaX() * spacingX;
+      const dys = this.getDeltaY() * spacingY;
       wlen = Math.sqrt(dxs * dxs + dys * dys);
     }
     return wlen;
@@ -137,7 +137,8 @@ export class Line {
    */
   getInclination() {
     // tan(theta) = slope
-    var angle = Math.atan2(this.getDeltaY(), this.getDeltaX()) * 180 / Math.PI;
+    const angle =
+      Math.atan2(this.getDeltaY(), this.getDeltaX()) * 180 / Math.PI;
     // shift?
     return 180 - angle;
   }
@@ -149,10 +150,10 @@ export class Line {
    * @returns {object} A quantification object.
    */
   quantify(viewController) {
-    var quant = {};
+    const quant = {};
     // length
-    var spacing = viewController.get2DSpacing();
-    var length = this.getWorldLength(spacing[0], spacing[1]);
+    const spacing = viewController.get2DSpacing();
+    const length = this.getWorldLength(spacing[0], spacing[1]);
     if (length !== null) {
       quant.length = {value: length, unit: i18n('unit.mm')};
     }
@@ -170,16 +171,16 @@ export class Line {
  * @returns {number} The angle.
  */
 export function getAngle(line0, line1) {
-  var dx0 = line0.getDeltaX();
-  var dy0 = line0.getDeltaY();
-  var dx1 = line1.getDeltaX();
-  var dy1 = line1.getDeltaY();
+  const dx0 = line0.getDeltaX();
+  const dy0 = line0.getDeltaY();
+  const dx1 = line1.getDeltaX();
+  const dy1 = line1.getDeltaY();
   // dot = ||a||*||b||*cos(theta)
-  var dot = dx0 * dx1 + dy0 * dy1;
+  const dot = dx0 * dx1 + dy0 * dy1;
   // cross = ||a||*||b||*sin(theta)
-  var det = dx0 * dy1 - dy0 * dx1;
+  const det = dx0 * dy1 - dy0 * dx1;
   // tan = sin / cos
-  var angle = Math.atan2(det, dot) * 180 / Math.PI;
+  const angle = Math.atan2(det, dot) * 180 / Math.PI;
   // complementary angle
   // shift?
   return 360 - (180 - angle);
@@ -195,20 +196,20 @@ export function getAngle(line0, line1) {
  */
 export function getPerpendicularLine(line, point, length) {
   // begin point
-  var beginX = 0;
-  var beginY = 0;
+  let beginX = 0;
+  let beginY = 0;
   // end point
-  var endX = 0;
-  var endY = 0;
+  let endX = 0;
+  let endY = 0;
 
   // check slope:
   // 0 -> horizontal
   // Infinite -> vertical (a/Infinite = 0)
   if (line.getSlope() !== 0) {
     // a0 * a1 = -1
-    var slope = -1 / line.getSlope();
+    const slope = -1 / line.getSlope();
     // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
-    var intercept = point.getY() - slope * point.getX();
+    const intercept = point.getY() - slope * point.getX();
 
     // 1. (x - x0)^2 + (y - y0)^2 = d^2
     // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
@@ -217,7 +218,7 @@ export function getPerpendicularLine(line, point, length) {
 
     // length is the distance between begin and end,
     // point is half way between both -> d = length / 2
-    var dx = length / (2 * Math.sqrt(1 + slope * slope));
+    const dx = length / (2 * Math.sqrt(1 + slope * slope));
 
     // begin point
     beginX = point.getX() - dx;

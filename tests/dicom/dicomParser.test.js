@@ -24,19 +24,19 @@ import dwvDicomDir from '../data/DICOMDIR';
  */
 QUnit.test('Test simple DICOM parsing.', function (assert) {
 
-  var buffer = b64urlToArrayBuffer(dwvTestSimple);
+  const buffer = b64urlToArrayBuffer(dwvTestSimple);
 
   assert.ok(hasDicomPrefix(buffer), 'Response has DICOM prefix.');
 
   // parse DICOM
-  var dicomParser = new DicomParser();
+  const dicomParser = new DicomParser();
   dicomParser.parse(buffer);
 
-  var numRows = 32;
-  var numCols = 32;
+  const numRows = 32;
+  const numCols = 32;
 
   // raw tags
-  var rawTags = dicomParser.getRawDicomElements();
+  const rawTags = dicomParser.getRawDicomElements();
   // check values
   assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows (raw)');
   assert.equal(
@@ -47,7 +47,7 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
     'ReferencedImageSequence SQ (raw)');
 
   // wrapped tags
-  var tags = dicomParser.getDicomElements();
+  const tags = dicomParser.getDicomElements();
   // wrong key
   assert.equal(tags.getFromKey('x12345678'), null, 'Wrong key');
   assert.notOk(tags.getFromKey('x12345678'), 'Wrong key fails if test');
@@ -82,22 +82,22 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
  */
 QUnit.test('Test sequence DICOM parsing.', function (assert) {
 
-  var buffer = b64urlToArrayBuffer(dwvTestSequence);
+  const buffer = b64urlToArrayBuffer(dwvTestSequence);
 
   assert.ok(hasDicomPrefix(buffer), 'Response has DICOM prefix.');
 
   // parse DICOM
-  var dicomParser = new DicomParser();
+  const dicomParser = new DicomParser();
   dicomParser.parse(buffer);
   // raw tags
-  var rawTags = dicomParser.getRawDicomElements();
+  const rawTags = dicomParser.getRawDicomElements();
   assert.ok((Object.keys(rawTags).length !== 0), 'Got raw tags.');
   // wrapped tags
-  var tags = dicomParser.getDicomElements();
+  const tags = dicomParser.getDicomElements();
   assert.ok((tags.dumpToObject().length !== 0), 'Got wrapped tags.');
 
   // ReferencedImageSequence: explicit sequence
-  var seq00 = tags.getFromName('ReferencedImageSequence');
+  const seq00 = tags.getFromName('ReferencedImageSequence');
   assert.equal(seq00.length, 3, 'ReferencedImageSequence length');
   assert.equal(seq00[0].x00081155.value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
@@ -107,7 +107,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
     'ReferencedImageSequence - item1 - ReferencedSOPInstanceUID');
 
   // SourceImageSequence: implicit sequence
-  var seq01 = tags.getFromName('SourceImageSequence');
+  const seq01 = tags.getFromName('SourceImageSequence');
   assert.equal(seq01.length, 3, 'SourceImageSequence length');
   assert.equal(seq01[0].x00081155.value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
@@ -117,25 +117,25 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
     'SourceImageSequence - item1 - ReferencedSOPInstanceUID');
 
   // ReferencedPatientSequence: explicit empty sequence
-  var seq10 = tags.getFromName('ReferencedPatientSequence');
+  const seq10 = tags.getFromName('ReferencedPatientSequence');
   assert.equal(seq10.length, 0, 'ReferencedPatientSequence length');
 
   // ReferencedOverlaySequence: implicit empty sequence
-  var seq11 = tags.getFromName('ReferencedOverlaySequence');
+  const seq11 = tags.getFromName('ReferencedOverlaySequence');
   assert.equal(seq11.length, 0, 'ReferencedOverlaySequence length');
 
   // ReferringPhysicianIdentificationSequence: explicit empty item
-  var seq12 = tags.getFromName('ReferringPhysicianIdentificationSequence');
+  const seq12 = tags.getFromName('ReferringPhysicianIdentificationSequence');
   assert.equal(seq12.xFFFEE000.value.length, 0,
     'ReferringPhysicianIdentificationSequence item length');
 
   // ConsultingPhysicianIdentificationSequence: implicit empty item
-  var seq13 = tags.getFromName('ConsultingPhysicianIdentificationSequence');
+  const seq13 = tags.getFromName('ConsultingPhysicianIdentificationSequence');
   assert.equal(seq13.length, 0,
     'ConsultingPhysicianIdentificationSequence item length');
 
   // ReferencedStudySequence: explicit sequence of sequence
-  var seq20 = tags.getFromName('ReferencedStudySequence');
+  const seq20 = tags.getFromName('ReferencedStudySequence');
   // just one element
   //assert.equal(seq20.length, 2, "ReferencedStudySequence length");
   assert.equal(seq20.x0040A170.value[0].x00080100.value[0],
@@ -143,7 +143,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
     'ReferencedStudySequence - seq - item0 - CodeValue');
 
   // ReferencedSeriesSequence: implicit sequence of sequence
-  var seq21 = tags.getFromName('ReferencedSeriesSequence');
+  const seq21 = tags.getFromName('ReferencedSeriesSequence');
   // just one element
   //assert.equal(seq21.length, 2, "ReferencedSeriesSequence length");
   assert.equal(seq21.x0040A170.value[0].x00080100.value[0],
@@ -151,12 +151,12 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
     'ReferencedSeriesSequence - seq - item0 - CodeValue');
 
   // ReferencedInstanceSequence: explicit empty sequence of sequence
-  var seq30 = tags.getFromName('ReferencedInstanceSequence');
+  const seq30 = tags.getFromName('ReferencedInstanceSequence');
   assert.equal(seq30.x0040A170.value.length, 0,
     'ReferencedInstanceSequence - seq - length');
 
   // ReferencedVisitSequence: implicit empty sequence of sequence
-  var seq31 = tags.getFromName('ReferencedVisitSequence');
+  const seq31 = tags.getFromName('ReferencedVisitSequence');
   assert.equal(seq31.x0040A170.value.length, 0,
     'ReferencedVisitSequence - seq - length');
 
@@ -177,11 +177,11 @@ QUnit.test('Test cleanString.', function (assert) {
   // short
   assert.equal(cleanString('a'), 'a', 'Clean short');
   // special
-  var special = String.fromCharCode('u200B');
+  const special = String.fromCharCode('u200B');
   assert.equal(cleanString(special), '', 'Clean just special');
   // regular
-  var str = ' El cielo azul ';
-  var refStr = 'El cielo azul';
+  let str = ' El cielo azul ';
+  let refStr = 'El cielo azul';
   assert.equal(cleanString(str), refStr, 'Clean regular');
   // regular with special
   str = ' El cielo azul' + special;
@@ -204,14 +204,14 @@ QUnit.test('Test cleanString.', function (assert) {
 QUnit.test('Test DICOMDIR parsing.', function (assert) {
 
   // get the file list
-  var list = getFileListFromDicomDir(
+  const list = getFileListFromDicomDir(
     b64urlToArrayBuffer(dwvDicomDir)
   );
 
   // check file list
-  var nFilesSeries0Study0 = 23;
-  var nFilesSeries1Study0 = 20;
-  var nFilesSeries0Study1 = 1;
+  const nFilesSeries0Study0 = 23;
+  const nFilesSeries1Study0 = 20;
+  const nFilesSeries0Study1 = 1;
   assert.equal(list.length, 2, 'Number of study');
   assert.equal(list[0].length, 2, 'Number of series in first study');
   assert.equal(list[1].length, 1, 'Number of series in second study');
@@ -230,24 +230,24 @@ QUnit.test('Test DICOMDIR parsing.', function (assert) {
   );
 
   // files
-  var files00 = [];
-  var iStart = 0;
-  var iEnd = nFilesSeries0Study0;
-  for (var i = iStart; i < iEnd; ++i) {
+  const files00 = [];
+  let iStart = 0;
+  let iEnd = nFilesSeries0Study0;
+  for (let i = iStart; i < iEnd; ++i) {
     files00.push('IMAGES/IM' + i);
   }
   assert.deepEqual(list[0][0], files00, 'Study#0:Series#0 file names');
-  var files01 = [];
+  const files01 = [];
   iStart = iEnd;
   iEnd += nFilesSeries1Study0;
-  for (i = iStart; i < iEnd; ++i) {
+  for (let i = iStart; i < iEnd; ++i) {
     files01.push('IMAGES/IM' + i);
   }
   assert.deepEqual(list[0][0], files00, 'Study#0:Series#1 file names');
-  var files10 = [];
+  const files10 = [];
   iStart = iEnd;
   iEnd += nFilesSeries0Study1;
-  for (i = iStart; i < iEnd; ++i) {
+  for (let i = iStart; i < iEnd; ++i) {
     files10.push('IMAGES/IM' + i);
   }
   assert.deepEqual(list[0][0], files00, 'Study#1:Series#0 file names');

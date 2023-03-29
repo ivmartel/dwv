@@ -48,7 +48,7 @@ export class Filter {
    */
   activate(bool) {
     // setup event listening
-    for (var key in this.filterList) {
+    for (let key in this.filterList) {
       if (bool) {
         this.filterList[key].addEventListener('filterrun', this.#fireEvent);
         this.filterList[key].addEventListener('filter-undo', this.#fireEvent);
@@ -69,7 +69,7 @@ export class Filter {
   setOptions(options) {
     this.#filterList = {};
     // try to instanciate filters from the options
-    for (var key in options) {
+    for (let key in options) {
       this.#filterList[key] = new options[key](this.#app);
     }
   }
@@ -89,7 +89,7 @@ export class Filter {
    */
   init() {
     // setup event listening
-    for (var key in this.#filterList) {
+    for (let key in this.#filterList) {
       this.#filterList[key].init();
     }
   }
@@ -175,7 +175,7 @@ export class Filter {
       this.#selectedFilter.activate(true);
     }
     if (typeof features.run !== 'undefined' && features.run) {
-      var args = {};
+      let args = {};
       if (typeof features.runArgs !== 'undefined') {
         args = features.runArgs;
       }
@@ -259,7 +259,7 @@ export class Threshold {
    * @param {*} args The filter arguments.
    */
   run(args) {
-    var filter = new ThresholdFilter();
+    const filter = new ThresholdFilter();
     filter.setMin(args.min);
     filter.setMax(args.max);
     // reset the image if asked
@@ -267,7 +267,7 @@ export class Threshold {
       filter.setOriginalImage(this.#app.getLastImage());
       this.#resetImage = false;
     }
-    var command = new RunFilterCommand(filter, this.#app);
+    const command = new RunFilterCommand(filter, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
@@ -353,9 +353,9 @@ export class Sharpen {
    * @param {*} _args The filter arguments.
    */
   run(_args) {
-    var filter = new SharpenFilter();
+    const filter = new SharpenFilter();
     filter.setOriginalImage(this.#app.getLastImage());
-    var command = new RunFilterCommand(filter, this.#app);
+    const command = new RunFilterCommand(filter, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
@@ -441,9 +441,9 @@ export class Sobel {
    * @param {*} _args The filter arguments.
    */
   run(_args) {
-    var filter = new SobelFilter();
+    const filter = new SobelFilter();
     filter.setOriginalImage(this.#app.getLastImage());
-    var command = new RunFilterCommand(filter, this.#app);
+    const command = new RunFilterCommand(filter, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
@@ -529,7 +529,7 @@ export class RunFilterCommand {
      * @property {string} type The event type: filterrun.
      * @property {number} id The id of the run command.
      */
-    var event = {
+    const event = {
       type: 'filterrun',
       id: this.getName()
     };
@@ -555,7 +555,7 @@ export class RunFilterCommand {
      * @property {string} type The event type: filterundo.
      * @property {number} id The id of the undone run command.
      */
-    var event = {
+    const event = {
       type: 'filterundo',
       id: this.getName()
     }; // callback

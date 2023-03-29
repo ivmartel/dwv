@@ -14,8 +14,8 @@ import {Ellipse, getEllipseIndices} from '../../src/math/ellipse';
  * @function module:tests/math~Ellipse
  */
 QUnit.test('Test Ellipse.', function (assert) {
-  var center0 = new Point2D(0, 0);
-  var e0 = new Ellipse(center0, 2, 4);
+  const center0 = new Point2D(0, 0);
+  const e0 = new Ellipse(center0, 2, 4);
   // getCenter
   assert.equal(e0.getCenter(), center0, 'getCenter');
   // getA
@@ -24,17 +24,17 @@ QUnit.test('Test Ellipse.', function (assert) {
   assert.equal(e0.getB(), 4, 'getB');
 
   // equals: true
-  var e1 = new Ellipse(center0, 2, 4);
+  const e1 = new Ellipse(center0, 2, 4);
   assert.ok(e0.equals(e1), 'equal ellipses');
   // equals: false a
-  var e20 = new Ellipse(center0, 3, 4);
+  const e20 = new Ellipse(center0, 3, 4);
   assert.notOk(e0.equals(e20), 'non equal ellipses a');
   // equals: false b
-  var e21 = new Ellipse(center0, 2, 5);
+  const e21 = new Ellipse(center0, 2, 5);
   assert.notOk(e0.equals(e21), 'non equal ellipses b');
   // equals: false radius
-  var center22 = new Point2D(1, 1);
-  var e22 = new Ellipse(center22, 2, 4);
+  const center22 = new Point2D(1, 1);
+  const e22 = new Ellipse(center22, 2, 4);
   assert.notOk(e0.equals(e22), 'non equal ellipses center');
 
   // getSurface
@@ -49,10 +49,10 @@ QUnit.test('Test Ellipse.', function (assert) {
  * @function module:tests/math~Ellipse
  */
 QUnit.test('Test Ellipse quantify.', function (assert) {
-  var center0 = new Point2D(2, 2);
-  var e0 = new Ellipse(center0, 1, 2);
+  const center0 = new Point2D(2, 2);
+  const e0 = new Ellipse(center0, 1, 2);
   // view controller
-  var mockVc0 = {
+  const mockVc0 = {
     canQuantifyImage: function () {
       return true;
     },
@@ -66,14 +66,14 @@ QUnit.test('Test Ellipse quantify.', function (assert) {
       return [0, 1, 1, 0, 0, 1, 1, 0];
     }
   };
-  var theoQuant0 = {
+  const theoQuant0 = {
     min: {value: 0, unit: ''},
     max: {value: 1, unit: ''},
     mean: {value: 0.5, unit: ''},
     stdDev: {value: 0.5, unit: ''},
     surface: {value: 0.06283185307179587, unit: undefined}
   };
-  var resQuant0 = e0.quantify(mockVc0);
+  const resQuant0 = e0.quantify(mockVc0);
   assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
   assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
   assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');
@@ -88,16 +88,16 @@ QUnit.test('Test Ellipse quantify.', function (assert) {
  * @function module:tests/math~getEllipseIndices
  */
 QUnit.test('Test getEllipseIndices.', function (assert) {
-  var center00 = new Index([1, 1]);
-  var radius00 = [2, 2];
-  var dir00 = [0, 1];
-  var theoRes = [];
-  for (var i = 0; i <= radius00[0]; ++i) {
-    for (var j = 0; j <= radius00[1]; ++j) {
+  const center00 = new Index([1, 1]);
+  const radius00 = [2, 2];
+  const dir00 = [0, 1];
+  const theoRes = [];
+  for (let i = 0; i <= radius00[0]; ++i) {
+    for (let j = 0; j <= radius00[1]; ++j) {
       theoRes.push(new Index([i, j]));
     }
   }
-  var indices00 = getEllipseIndices(center00, radius00, dir00);
+  let indices00 = getEllipseIndices(center00, radius00, dir00);
   // sort
   indices00.sort();
   // filter duplicates
@@ -107,8 +107,8 @@ QUnit.test('Test getEllipseIndices.', function (assert) {
 
   assert.ok(indices00.length, theoRes.length,
     'index list and theo result have same size');
-  var isEqual = true;
-  for (var k = 0; k < indices00.length; ++k) {
+  let isEqual = true;
+  for (let k = 0; k < indices00.length; ++k) {
     if (!indices00[k].equals(theoRes[k])) {
       isEqual = false;
       break;

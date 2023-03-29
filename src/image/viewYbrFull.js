@@ -11,9 +11,9 @@ export function generateImageDataYbrFull(
   array,
   iterator,
   alphaFunc) {
-  var index = 0;
-  var rgb = null;
-  var ival = iterator.next();
+  let index = 0;
+  let rgb = null;
+  let ival = iterator.next();
   while (!ival.done) {
     // convert ybr to rgb
     rgb = ybrToRgb(ival.value[0], ival.value[1], ival.value[2]);

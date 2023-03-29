@@ -1,7 +1,8 @@
 // Do not warn if these variables were not defined before.
 /* global dwv */
 
-// namespaces
+// namespace
+// eslint-disable-next-line no-var
 var test = test || {};
 
 // List of pixel generators
@@ -30,8 +31,8 @@ function checkTags(tags, requiredTags, withLog) {
   if (typeof withLog === 'undefined') {
     withLog = false;
   }
-  var check = true;
-  for (var i = 0; i < requiredTags.length; ++i) {
+  let check = true;
+  for (let i = 0; i < requiredTags.length; ++i) {
     if (typeof tags[requiredTags[i]] === 'undefined') {
       if (withLog) {
         console.log('Missing ' +
@@ -74,16 +75,16 @@ test.generatePixelDataFromJSONTags = function (
   }
 
   // extract info from tags
-  var numberOfRows = tags.Rows;
-  var numberOfColumns = tags.Columns;
-  var bitsAllocated = tags.BitsAllocated;
-  var pixelRepresentation = tags.PixelRepresentation;
-  var samplesPerPixel = tags.SamplesPerPixel;
+  const numberOfRows = tags.Rows;
+  const numberOfColumns = tags.Columns;
+  const bitsAllocated = tags.BitsAllocated;
+  const pixelRepresentation = tags.PixelRepresentation;
+  const samplesPerPixel = tags.SamplesPerPixel;
   // trim in case config contains padding
-  var photometricInterpretation = tags.PhotometricInterpretation.trim();
+  const photometricInterpretation = tags.PhotometricInterpretation.trim();
 
-  var sliceLength = numberOfRows * numberOfColumns;
-  var dataLength = sliceLength * samplesPerPixel;
+  const sliceLength = numberOfRows * numberOfColumns;
+  const dataLength = sliceLength * samplesPerPixel;
 
   // check values
   if (samplesPerPixel !== 1 && samplesPerPixel !== 3) {
@@ -99,13 +100,13 @@ test.generatePixelDataFromJSONTags = function (
       photometricInterpretation + ' with SamplesPerPixel: ' + samplesPerPixel);
   }
 
-  var numberOfSamples = 1;
-  var numberOfColourPlanes = 1;
+  let numberOfSamples = 1;
+  let numberOfColourPlanes = 1;
   if (samplesPerPixel === 3) {
     if (typeof tags.PlanarConfiguration === 'undefined') {
       throw new Error('Missing PlanarConfiguration for pixel generation.');
     }
-    var planarConfiguration = tags.PlanarConfiguration;
+    const planarConfiguration = tags.PlanarConfiguration;
     if (planarConfiguration !== 0 && planarConfiguration !== 1) {
       throw new Error(
         'Unsupported PlanarConfiguration for pixel generation: ' +
@@ -119,15 +120,15 @@ test.generatePixelDataFromJSONTags = function (
   }
 
   // create pixel array
-  var pixels = dwv.dicom.getTypedArray(
+  const pixels = dwv.dicom.getTypedArray(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
   if (typeof test.pixelGenerators[pixGeneratorName] === 'undefined') {
     throw new Error('Unknown PixelData generator: ' + pixGeneratorName);
   }
-  var GeneratorClass = test.pixelGenerators[pixGeneratorName].generator;
-  var generator = new GeneratorClass({
+  const GeneratorClass = test.pixelGenerators[pixGeneratorName].generator;
+  const generator = new GeneratorClass({
     numberOfColumns: numberOfColumns,
     numberOfRows: numberOfRows,
     numberOfSamples: numberOfSamples,
@@ -144,11 +145,11 @@ test.generatePixelDataFromJSONTags = function (
   generator.generate(pixels, sliceNumber);
 
   // create and return the DICOM element
-  var vr = 'OW';
+  let vr = 'OW';
   if (bitsAllocated === 8) {
     vr = 'OB';
   }
-  var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
+  const pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
     tag: dwv.dicom.getPixelDataTag(),
     vr: vr,
@@ -165,13 +166,13 @@ test.generatePixelDataFromJSONTags = function (
  */
 test.getImageDataData = function (image) {
   // draw the image in the canvas in order to get its data
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = image.width;
   canvas.height = image.height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(image, 0, 0);
   // get the image data
-  var imageData = ctx.getImageData(0, 0, image.width, image.height);
+  const imageData = ctx.getImageData(0, 0, image.width, image.height);
   // data.data
   return imageData.data;
 };

@@ -66,12 +66,12 @@ export class EllipseFactory {
   create(
     points, style, viewController) {
     // calculate radius
-    var a = Math.abs(points[0].getX() - points[1].getX());
-    var b = Math.abs(points[0].getY() - points[1].getY());
+    const a = Math.abs(points[0].getX() - points[1].getX());
+    const b = Math.abs(points[0].getY() - points[1].getY());
     // physical shape
-    var ellipse = new Ellipse(points[0], a, b);
+    const ellipse = new Ellipse(points[0], a, b);
     // draw shape
-    var kshape = new Konva.Ellipse({
+    const kshape = new Konva.Ellipse({
       x: ellipse.getCenter().getX(),
       y: ellipse.getCenter().getY(),
       radius: {x: ellipse.getA(), y: ellipse.getB()},
@@ -81,7 +81,7 @@ export class EllipseFactory {
       name: 'shape'
     });
     // quantification
-    var ktext = new Konva.Text({
+    const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
@@ -90,14 +90,14 @@ export class EllipseFactory {
       shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
-    var textExpr = '';
+    let textExpr = '';
     // TODO: allow override?
     // if (typeof ellipseLabelText !== 'undefined') {
     //   textExpr = ellipseLabelText;
     // } else {
     textExpr = defaultEllipseLabelText;
     // }
-    var quant = ellipse.quantify(
+    const quant = ellipse.quantify(
       viewController,
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
@@ -107,7 +107,7 @@ export class EllipseFactory {
       quantification: quant
     };
     // label
-    var klabel = new Konva.Label({
+    const klabel = new Konva.Label({
       x: ellipse.getCenter().getX(),
       y: ellipse.getCenter().getY(),
       scale: style.applyZoomScale(1),
@@ -121,13 +121,13 @@ export class EllipseFactory {
     }));
 
     // debug shadow
-    var kshadow;
+    let kshadow;
     if (DRAW_DEBUG) {
       kshadow = this.#getShadowEllipse(ellipse);
     }
 
     // return group
-    var group = new Konva.Group();
+    const group = new Konva.Group();
     group.name(this.getGroupName());
     if (kshadow) {
       group.add(kshadow);
@@ -146,11 +146,11 @@ export class EllipseFactory {
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
-    var ellipseX = shape.x();
-    var ellipseY = shape.y();
-    var radius = shape.radius();
+    const ellipseX = shape.x();
+    const ellipseY = shape.y();
+    const radius = shape.radius();
 
-    var anchors = [];
+    const anchors = [];
     anchors.push(getDefaultAnchor(
       ellipseX - radius.x, ellipseY - radius.y, 'topLeft', style
     ));
@@ -175,30 +175,30 @@ export class EllipseFactory {
    */
   update(anchor, _style, viewController) {
     // parent group
-    var group = anchor.getParent();
+    const group = anchor.getParent();
     // associated shape
-    var kellipse = group.getChildren(function (node) {
+    const kellipse = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
       // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
       // find special points
-    var topLeft = group.getChildren(function (node) {
+    const topLeft = group.getChildren(function (node) {
       return node.id() === 'topLeft';
     })[0];
-    var topRight = group.getChildren(function (node) {
+    const topRight = group.getChildren(function (node) {
       return node.id() === 'topRight';
     })[0];
-    var bottomRight = group.getChildren(function (node) {
+    const bottomRight = group.getChildren(function (node) {
       return node.id() === 'bottomRight';
     })[0];
-    var bottomLeft = group.getChildren(function (node) {
+    const bottomLeft = group.getChildren(function (node) {
       return node.id() === 'bottomLeft';
     })[0];
     // debug shadow
-    var kshadow;
+    let kshadow;
     if (DRAW_DEBUG) {
       kshadow = group.getChildren(function (node) {
         return node.name() === 'shadow';
@@ -236,23 +236,23 @@ export class EllipseFactory {
       break;
     }
     // update shape
-    var radiusX = (topRight.x() - topLeft.x()) / 2;
-    var radiusY = (bottomRight.y() - topRight.y()) / 2;
-    var center = {
+    const radiusX = (topRight.x() - topLeft.x()) / 2;
+    const radiusY = (bottomRight.y() - topRight.y()) / 2;
+    const center = {
       x: topLeft.x() + radiusX,
       y: topRight.y() + radiusY
     };
     kellipse.position(center);
-    var radiusAbs = {x: Math.abs(radiusX), y: Math.abs(radiusY)};
+    const radiusAbs = {x: Math.abs(radiusX), y: Math.abs(radiusY)};
     if (radiusAbs) {
       kellipse.radius(radiusAbs);
     }
     // new ellipse
-    var centerPoint = new Point2D(
+    const centerPoint = new Point2D(
       group.x() + center.x,
       group.y() + center.y
     );
-    var ellipse = new Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
+    const ellipse = new Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
 
     // debug shadow
     if (kshadow) {
@@ -263,7 +263,7 @@ export class EllipseFactory {
     }
 
     // update label position
-    var textPos = {x: center.x, y: center.y};
+    const textPos = {x: center.x, y: center.y};
     klabel.position(textPos);
 
     // update quantification
@@ -289,26 +289,26 @@ export class EllipseFactory {
    */
   #updateEllipseQuantification(group, viewController) {
     // associated shape
-    var kellipse = group.getChildren(function (node) {
+    const kellipse = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
     // associated label
-    var klabel = group.getChildren(function (node) {
+    const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
 
     // positions: add possible group offset
-    var centerPoint = new Point2D(
+    const centerPoint = new Point2D(
       group.x() + kellipse.x(),
       group.y() + kellipse.y()
     );
     // circle
-    var ellipse = new Ellipse(
+    const ellipse = new Ellipse(
       centerPoint, kellipse.radius().x, kellipse.radius().y);
 
     // update text
-    var ktext = klabel.getText();
-    var quantification = ellipse.quantify(
+    const ktext = klabel.getText();
+    const quantification = ellipse.quantify(
       viewController,
       getFlags(ktext.meta.textExpr));
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
@@ -325,21 +325,21 @@ export class EllipseFactory {
    */
   #getShadowEllipse(ellipse, group) {
     // possible group offset
-    var offsetX = 0;
-    var offsetY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
     if (typeof group !== 'undefined') {
       offsetX = group.x();
       offsetY = group.y();
     }
-    var kshadow = new Konva.Group();
+    const kshadow = new Konva.Group();
     kshadow.name('shadow');
-    var regions = ellipse.getRound();
-    for (var i = 0; i < regions.length; ++i) {
-      var region = regions[i];
-      var minX = region[0][0];
-      var minY = region[0][1];
-      var maxX = region[1][0];
-      var pixelLine = new Konva.Rect({
+    const regions = ellipse.getRound();
+    for (let i = 0; i < regions.length; ++i) {
+      const region = regions[i];
+      const minX = region[0][0];
+      const minY = region[0][1];
+      const maxX = region[1][0];
+      const pixelLine = new Konva.Rect({
         x: minX - offsetX,
         y: minY - offsetY,
         width: maxX - minX,

@@ -12,8 +12,8 @@ import {getStats, guid} from '../../src/math/stats';
  * @function module:tests/math~getSimpleStats
  */
 QUnit.test('Test getSimpleStats.', function (assert) {
-  var arr0 = [1, 2, 3, 4, 5];
-  var q0 = getStats(arr0);
+  const arr0 = [1, 2, 3, 4, 5];
+  const q0 = getStats(arr0);
   // min
   assert.equal(q0.min, 1, 'min.0');
   // max
@@ -23,8 +23,8 @@ QUnit.test('Test getSimpleStats.', function (assert) {
   // stdDev
   assert.equal(q0.stdDev, 1.4142135623730951, 'stdDev.0');
 
-  var arr1 = [9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4];
-  var q1 = getStats(arr1);
+  const arr1 = [9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4];
+  const q1 = getStats(arr1);
   // min
   assert.equal(q1.min, 2, 'min.1');
   // max
@@ -41,8 +41,8 @@ QUnit.test('Test getSimpleStats.', function (assert) {
  * @function module:tests/math~getFullStats
  */
 QUnit.test('Test getFullStats.', function (assert) {
-  var arr0 = [15, 20, 35, 40, 50];
-  var q0 = getStats(arr0, ['median']);
+  const arr0 = [15, 20, 35, 40, 50];
+  const q0 = getStats(arr0, ['median']);
   // median
   assert.equal(q0.median, 35, 'median.0');
   // p25
@@ -50,8 +50,8 @@ QUnit.test('Test getFullStats.', function (assert) {
   // p75
   assert.equal(q0.p75, 40, 'p75.0');
 
-  var arr1 = [15, 20, 35, 40, 50, 60];
-  var q1 = getStats(arr1, ['median']);
+  const arr1 = [15, 20, 35, 40, 50, 60];
+  const q1 = getStats(arr1, ['median']);
   // median
   assert.equal(q1.median, 37.5, 'median.1');
   // p25
@@ -66,19 +66,19 @@ QUnit.test('Test getFullStats.', function (assert) {
  * @function module:tests/math~guid
  */
 QUnit.test('Test GUID.', function (assert) {
-  var id0 = guid();
-  var id1 = guid();
+  const id0 = guid();
+  const id1 = guid();
   assert.equal((id0 === id1), false, 'Two GUids should not be equal.');
 
-  var duplicates = 0;
+  let duplicates = 0;
   // create an array of guids
-  var ids = [];
-  for (var i = 0; i < 1000; ++i) {
+  const ids = [];
+  for (let i = 0; i < 1000; ++i) {
     ids[ids.length] = guid();
   }
   // check duplicates
-  var id = 0;
-  for (i = 0; i < ids.length - 1; ++i) {
+  let id = 0;
+  for (let i = 0; i < ids.length - 1; ++i) {
     id = ids.pop();
     if (ids.indexOf(id) !== -1) {
       ++duplicates;
