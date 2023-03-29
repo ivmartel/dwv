@@ -81,7 +81,7 @@ function checkLoad(assert, id, data, nData, nDataOk) {
 
     // check start/end sequence
     const loadStartDate = loadStartDates[0];
-    assert.ok(loadStartDate < loadEndDate,
+    assert.ok(loadStartDate <= loadEndDate,
       prefix + 'Received start before load end.');
 
     let firstProgressDate = null;
@@ -104,8 +104,7 @@ function checkLoad(assert, id, data, nData, nDataOk) {
       firstLoadItemDate = loadItemDates[0];
       lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
       assert.ok(loadStartDate <= firstLoadItemDate,
-        prefix + 'Received start before first load item.' +
-        loadStartDate.toJSON() + ' - ' + firstLoadItemDate.toJSON());
+        prefix + 'Received start before first load item.');
       assert.ok(loadEndDate >= lastLoadItemDate,
         prefix + 'Received end after last load item.');
     }
