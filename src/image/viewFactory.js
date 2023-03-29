@@ -45,7 +45,7 @@ export class ViewFactory {
     // optional modality presets
     if (typeof defaultPresets !== 'undefined') {
       const modality = image.getMeta().Modality;
-      for (let key in defaultPresets[modality]) {
+      for (const key in defaultPresets[modality]) {
         const preset = defaultPresets[modality][key];
         windowPresets[key] = {
           wl: new WindowLevel(preset.center, preset.width),

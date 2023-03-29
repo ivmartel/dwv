@@ -8,7 +8,7 @@ let _app = null;
 let _tools = null;
 
 // viewer options
-let _mode = 0;
+const _mode = 0;
 const _dicomWeb = false;
 
 // example private logic for time value retrieval

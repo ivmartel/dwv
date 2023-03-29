@@ -638,7 +638,7 @@ export class Image {
         'Cannot append a slice with different photometric interpretation');
     }
     // all meta should be equal
-    for (let key in this.#meta) {
+    for (const key in this.#meta) {
       if (key === 'windowPresets' || key === 'numberOfFiles' ||
         key === 'custom') {
         continue;

@@ -23,6 +23,10 @@ module.exports = {
     // https://eslint.org/docs/rules/no-var
     'no-var': 'error',
 
+    // prefer const
+    // https://eslint.org/docs/rules/prefer-const
+    'prefer-const': 'error',
+
     // allow for some unused args
     // https://eslint.org/docs/rules/no-unused-vars
     'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],

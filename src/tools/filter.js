@@ -48,7 +48,7 @@ export class Filter {
    */
   activate(bool) {
     // setup event listening
-    for (let key in this.filterList) {
+    for (const key in this.filterList) {
       if (bool) {
         this.filterList[key].addEventListener('filterrun', this.#fireEvent);
         this.filterList[key].addEventListener('filter-undo', this.#fireEvent);
@@ -69,7 +69,7 @@ export class Filter {
   setOptions(options) {
     this.#filterList = {};
     // try to instanciate filters from the options
-    for (let key in options) {
+    for (const key in options) {
       this.#filterList[key] = new options[key](this.#app);
     }
   }
@@ -89,7 +89,7 @@ export class Filter {
    */
   init() {
     // setup event listening
-    for (let key in this.#filterList) {
+    for (const key in this.#filterList) {
       this.#filterList[key].init();
     }
   }

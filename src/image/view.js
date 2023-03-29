@@ -720,7 +720,7 @@ export class View {
    */
   clone() {
     const copy = new View(this.getImage());
-    for (let key in this.#windowLuts) {
+    for (const key in this.#windowLuts) {
       copy.addWindowLut(this.#windowLuts[key]);
     }
     copy.setListeners(this.getListeners());

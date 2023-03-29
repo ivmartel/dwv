@@ -42,7 +42,7 @@ export class ToolboxController {
    * Initialise.
    */
   init() {
-    for (let key in this.#toolList) {
+    for (const key in this.#toolList) {
       this.#toolList[key].init();
     }
     // keydown listener
