@@ -1,7 +1,7 @@
 // Do not warn if these variables were not defined before.
 /* global dwv */
 
-// setup on DOM loaded
+// call setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
 let _app = null;
@@ -278,7 +278,7 @@ function viewerSetup() {
 }
 
 /**
- * Last minute.
+ * Setup.
  */
 function onDOMContentLoaded() {
   // setup

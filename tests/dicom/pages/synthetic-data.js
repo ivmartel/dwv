@@ -5,11 +5,11 @@
 // eslint-disable-next-line no-var
 var test = test || {};
 
-// setup on DOM loaded
+// call setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
 /**
- *
+ * Setup.
  */
 function onDOMContentLoaded() {
   // create lists

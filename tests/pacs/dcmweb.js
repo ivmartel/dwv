@@ -1,11 +1,11 @@
 // Do not warn if these variables were not defined before.
 /* global dwv */
 
-// setup on DOM loaded
+// call setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
 /**
- *
+ * Setup.
  */
 function onDOMContentLoaded() {
   const stowButton = document.getElementById('stowb');

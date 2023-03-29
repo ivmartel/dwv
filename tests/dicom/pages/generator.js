@@ -7,11 +7,11 @@ var test = test || {};
 // eslint-disable-next-line no-var
 var JSZip = JSZip || {};
 
-// setup on DOM loaded
+// call setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
 /**
- *
+ * Setup.
  */
 function onDOMContentLoaded() {
   const intagsfileInput = document.getElementById('intagsfile');
