@@ -9,7 +9,7 @@ module.exports = {
     library: '[name]',
     libraryTarget: 'umd',
     globalObject: 'this',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'build/dist'),
     clean: true,
   }
 };
