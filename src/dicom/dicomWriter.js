@@ -265,7 +265,7 @@ export class DicomWriter {
    *
    * @param {boolean} flag True to use UN VR.
    */
-  setUseUnVrForPrivateSq (flag) {
+  setUseUnVrForPrivateSq(flag) {
     this.#useUnVrForPrivateSq = flag;
   }
 
