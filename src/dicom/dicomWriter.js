@@ -293,7 +293,7 @@ export class DicomWriter {
   };
 
   /**
-   * Public (modifiable) rules.
+   * Writing rules.
    * Set of objects as:
    *   name : { action: 'actionName', value: 'optionalValue }
    * The names are either 'default', tagName or groupName.
@@ -301,7 +301,16 @@ export class DicomWriter {
    * First checked by tagName and then by groupName,
    * if nothing is found the default rule is applied.
    */
-  rules = this.#defaultRules;
+  #rules = this.#defaultRules;
+
+  /**
+   * Set the writing rules.
+   *
+   * @param {object} rules The input rules.
+   */
+  setRules(rules) {
+    this.#rules = rules;
+  }
 
   /**
    * Default text encoder.
@@ -379,18 +388,19 @@ export class DicomWriter {
 
     // apply rules:
     let rule;
-    if (typeof this.rules[element.tag.getKey()] !== 'undefined') {
+    if (typeof this.#rules[element.tag.getKey()] !== 'undefined') {
       // 1. tag itself
-      rule = this.rules[element.tag.getKey()];
-    } else if (tagName !== null && typeof this.rules[tagName] !== 'undefined') {
+      rule = this.#rules[element.tag.getKey()];
+    } else if (tagName !== null &&
+      typeof this.#rules[tagName] !== 'undefined') {
       // 2. tag name
-      rule = this.rules[tagName];
-    } else if (typeof this.rules[groupName] !== 'undefined') {
+      rule = this.#rules[tagName];
+    } else if (typeof this.#rules[groupName] !== 'undefined') {
       // 3. group name
-      rule = this.rules[groupName];
+      rule = this.#rules[groupName];
     } else {
       // 4. default
-      rule = this.rules['default'];
+      rule = this.#rules['default'];
     }
     // apply action on element and return
     return this.#actions[rule.action](element, rule.value);
