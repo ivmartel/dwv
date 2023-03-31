@@ -12,27 +12,73 @@ import {Spacing} from './spacing';
 
 /**
  * 2D/3D Geometry class.
- *
- * @class
- * @param {Point3D} origin The object origin (a 3D point).
- * @param {Size} size The object size.
- * @param {Spacing} spacing The object spacing.
- * @param {Matrix33} orientation The object orientation (3*3 matrix,
- *   default to 3*3 identity).
- * @param {number} time Optional time index.
  */
 export class Geometry {
 
+  /**
+   * Array of origins.
+   *
+   * @private
+   * @type {Array}
+   */
   #origins;
+
+  /**
+   * Data size.
+   *
+   * @private
+   * @type {Size}
+   */
   #size;
+
+  /**
+   * Data spacing.
+   *
+   * @private
+   * @type {Spacing}
+   */
   #spacing;
-  // local helper object for time points
+
+  /**
+   * Local helper object for time points.
+   *
+   * @private
+   * @type {object}
+   */
   #timeOrigins = {};
+
+  /**
+   * Initial time index.
+   *
+   * @private
+   * @type {number}
+   */
   #initialTime;
+
+  /**
+   * Data orientation.
+   *
+   * @private
+   * @type {Matrix33}
+   */
   #orientation = new getIdentityMat33();
-  // flag to know if new origins were added
+
+  /**
+   * Flag to know if new origins were added.
+   *
+   * @private
+   * @type {boolean}
+   */
   #newOrigins = false;
 
+  /**
+   * @param {Point3D} origin The object origin (a 3D point).
+   * @param {Size} size The object size.
+   * @param {Spacing} spacing The object spacing.
+   * @param {Matrix33} orientation The object orientation (3*3 matrix,
+   *   default to 3*3 identity).
+   * @param {number} time Optional time index.
+   */
   constructor(origin, size, spacing, orientation, time) {
     this.#origins = [origin];
     this.#size = size;

@@ -5,16 +5,29 @@ import {
 
 /**
  * Immutable tag.
- *
- * @class
- * @param {string} group The tag group as '0x####'.
- * @param {string} element The tag element as '0x####'.
  */
 export class Tag {
 
+  /**
+   * The tag group.
+   *
+   * @private
+   * @type {string}
+   */
   #group;
+
+  /**
+   * The tag element.
+   *
+   * @private
+   * @type {string}
+   */
   #element;
 
+  /**
+   * @param {string} group The tag group as '0x####'.
+   * @param {string} element The tag element as '0x####'.
+   */
   constructor(group, element) {
     if (!group || typeof group === 'undefined') {
       throw new Error('Cannot create tag with no group.');

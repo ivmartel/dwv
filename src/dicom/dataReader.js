@@ -29,16 +29,25 @@ function flipArrayEndianness(array) {
 
 /**
  * Data reader.
- *
- * @class
- * @param {Array} buffer The input array buffer.
- * @param {boolean} isLittleEndian Flag to tell if the data is little
- *   or big endian.
  */
 export class DataReader {
 
+  /**
+   * The input buffer.
+   *
+   * @private
+   * @type {Array}
+   */
   #buffer;
+
+  /**
+   * Is the endianness Little Endian.
+   *
+   * @private
+   * @type {boolean}
+   */
   #isLittleEndian = true;
+
   /**
    * Is the Native endianness Little Endian.
    *
@@ -46,6 +55,7 @@ export class DataReader {
    * @type {boolean}
    */
   #isNativeLittleEndian = isNativeLittleEndian();
+
   /**
    * Flag to know if the TypedArray data needs flipping.
    *
@@ -53,6 +63,7 @@ export class DataReader {
    * @type {boolean}
    */
   #needFlip;
+
   /**
    * The main data view.
    *
@@ -61,6 +72,11 @@ export class DataReader {
    */
   #view;
 
+  /**
+   * @param {Array} buffer The input array buffer.
+   * @param {boolean} isLittleEndian Flag to tell if the data is little
+   *   or big endian.
+   */
   constructor(buffer, isLittleEndian) {
     this.#buffer = buffer;
     // Set endian flag if not defined.

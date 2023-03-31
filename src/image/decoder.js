@@ -32,24 +32,41 @@ export const decoderScripts = {};
 
 /**
  * Asynchronous pixel buffer decoder.
- *
- * @class
- * @param {string} script The path to the decoder script to be used
- *   by the web worker.
- * @param {number} _numberOfData The anticipated number of data to decode.
  */
 class AsynchPixelBufferDecoder {
 
+  /**
+   * The associated worker script.
+   *
+   * @private
+   * @type {string}
+   */
   #script;
 
+  /**
+   * Associated thread pool.
+   *
+   * @private
+   * @type {ThreadPool}
+   */
+  #pool = new ThreadPool(10);
+
+  /**
+   * Flag to know if callbacks are set.
+   *
+   * @private
+   * @type {boolean}
+   */
+  #areCallbacksSet = false;
+
+  /**
+   * @param {string} script The path to the decoder script to be used
+   *   by the web worker.
+   * @param {number} _numberOfData The anticipated number of data to decode.
+   */
   constructor(script, _numberOfData) {
     this.#script = script;
   }
-
-  // initialise the thread pool
-  #pool = new ThreadPool(10);
-  // flag to know if callbacks are set
-  #areCallbacksSet = false;
 
   /**
    * Decode a pixel buffer.
@@ -145,16 +162,29 @@ class AsynchPixelBufferDecoder {
 
 /**
  * Synchronous pixel buffer decoder.
- *
- * @class
- * @param {string} algoName The decompression algorithm name.
- * @param {number} numberOfData The anticipated number of data to decode.
  */
 class SynchPixelBufferDecoder {
 
+  /**
+   * Name of the compression algorithm.
+   *
+   * @private
+   * @type {string}
+   */
   #algoName;
+
+  /**
+   * Number of data.
+   *
+   * @private
+   * @type {number}
+   */
   #numberOfData;
 
+  /**
+   * @param {string} algoName The decompression algorithm name.
+   * @param {number} numberOfData The anticipated number of data to decode.
+   */
   constructor(algoName, numberOfData) {
     this.#algoName = algoName;
     this.#numberOfData = numberOfData;
@@ -309,16 +339,19 @@ class SynchPixelBufferDecoder {
 /**
  * Decode a pixel buffer.
  *
- * @class
- * @param {string} algoName The decompression algorithm name.
- * @param {number} numberOfData The anticipated number of data to decode.
  * If the 'decoderScripts' variable does not contain the desired,
  * algorythm the decoder will switch to the synchronous mode.
  */
 export class PixelBufferDecoder {
 
-  #algoName;
-  #numberOfData;
+  /**
+   * Flag to know if callbacks are set.
+   *
+   * @private
+   * @type {boolean}
+   */
+  #areCallbacksSet = false;
+
   /**
    * Pixel decoder.
    * Defined only once.
@@ -328,10 +361,11 @@ export class PixelBufferDecoder {
    */
   #pixelDecoder = null;
 
+  /**
+   * @param {string} algoName The decompression algorithm name.
+   * @param {number} numberOfData The anticipated number of data to decode.
+   */
   constructor(algoName, numberOfData) {
-    this.#algoName = algoName;
-    this.#numberOfData = numberOfData;
-
     // initialise the asynch decoder (if possible)
     if (typeof decoderScripts !== 'undefined' &&
       typeof decoderScripts[algoName] !== 'undefined') {
@@ -341,11 +375,7 @@ export class PixelBufferDecoder {
       this.#pixelDecoder = new SynchPixelBufferDecoder(
         algoName, numberOfData);
     }
-
   }
-
-  // flag to know if callbacks are set
-  #areCallbacksSet = false;
 
   /**
    * Get data from an input buffer using a DICOM parser.

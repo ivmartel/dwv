@@ -28,31 +28,18 @@ export const viewEventNames = [
 /**
  * View class.
  *
- * @class
- * @param {Image} image The associated image.
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
  */
 export class View {
 
+  /**
+   * The associated image.
+   *
+   * @private
+   * @type {Image}
+   */
   #image;
-
-  constructor(image) {
-    this.#image = image;
-
-    // listen to appendframe event to update the current position
-    //   to add the extra dimension
-    this.#image.addEventListener('appendframe', () => {
-      // update current position if first appendFrame
-      const index = this.getCurrentIndex();
-      if (index.length() === 3) {
-        // add dimension
-        const values = index.getValues();
-        values.push(0);
-        this.setCurrentIndex(new Index(values));
-      }
-    });
-  }
 
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
@@ -119,6 +106,26 @@ export class View {
    * @private
    */
   #listenerHandler = new ListenerHandler();
+
+  /**
+   * @param {Image} image The associated image.
+   */
+  constructor(image) {
+    this.#image = image;
+
+    // listen to appendframe event to update the current position
+    //   to add the extra dimension
+    this.#image.addEventListener('appendframe', () => {
+      // update current position if first appendFrame
+      const index = this.getCurrentIndex();
+      if (index.length() === 3) {
+        // add dimension
+        const values = index.getValues();
+        values.push(0);
+        this.setCurrentIndex(new Index(values));
+      }
+    });
+  }
 
   /**
    * Get the associated image.

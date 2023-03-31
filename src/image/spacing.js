@@ -2,14 +2,20 @@
  * Immutable Spacing class.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
- *
- * @class
- * @param {Array} values The size values.
  */
 export class Spacing {
 
+  /**
+   * The spacing values.
+   *
+   * @private
+   * @type {Array}
+   */
   #values;
 
+  /**
+   * @param {Array} values The spacing values.
+   */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
       throw new Error('Cannot create spacing with no values.');

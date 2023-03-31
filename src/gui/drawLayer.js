@@ -8,22 +8,23 @@ import Konva from 'konva';
 
 /**
  * Draw layer.
- *
- * @param {HTMLElement} containerDiv The layer div, its id will be used
- *   as this layer id.
- * @class
  */
 export class DrawLayer {
 
+  /**
+   * The container div.
+   *
+   * @private
+   * @type {HTMLElement}
+   */
   #containerDiv;
 
-  constructor(containerDiv) {
-    this.#containerDiv = containerDiv;
-    // specific css class name
-    this.#containerDiv.className += ' drawLayer';
-  }
-
-  // konva stage
+  /**
+   * Konva stage.
+   *
+   * @private
+   * @type {Konva.Stage}
+   */
   #konvaStage = null;
 
   /**
@@ -105,6 +106,16 @@ export class DrawLayer {
    * @type {number}
    */
   #dataIndex = null;
+
+  /**
+   * @param {HTMLElement} containerDiv The layer div, its id will be used
+   *   as this layer id.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+    // specific css class name
+    this.#containerDiv.className += ' drawLayer';
+  }
 
   /**
    * Get the associated data index.

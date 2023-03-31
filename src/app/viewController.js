@@ -19,18 +19,50 @@ import {ListenerHandler} from '../utils/listen';
 
 /**
  * View controller.
- *
- * @param {View} view The associated view.
- * @param {number} index The associated data index.
- * @class
  */
 export class ViewController {
 
+  /**
+   * Associated View.
+   *
+   * @type {View}
+   * @private
+   */
   #view;
+
+  /**
+   * Associated data index.
+   *
+   * @type {number}
+   * @private
+   */
   #index;
+
+  /**
+   * Plane helper.
+   *
+   * @type {PlaneHelper}
+   * @private
+   */
   #planeHelper;
+
+  /**
+   * Mask segment helper.
+   *
+   * @type {MaskSegmentHelper}
+   * @private
+   */
   #maskSegmentHelper;
 
+  // third dimension player ID (created by setInterval)
+  #playerID = null;
+  // associated data index
+  #dataIndex = this.#index;
+
+  /**
+   * @param {View} view The associated view.
+   * @param {number} index The associated data index.
+   */
   constructor(view, index) {
     // check view
     if (typeof view.getImage() === 'undefined') {
@@ -53,11 +85,6 @@ export class ViewController {
         new MaskSegmentHelper(view.getImage());
     }
   }
-
-  // third dimension player ID (created by setInterval)
-  #playerID = null;
-  // associated data index
-  #dataIndex = this.#index;
 
   /**
    * Listener handler.

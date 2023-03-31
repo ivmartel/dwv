@@ -148,19 +148,23 @@ export function getScaledOffset(offset, scale, newScale, center) {
  * World -> display
  * planePos = viewController.getOffset3DFromPlaneOffset(pos)
  * no need yet for a planePos to displayPos...
- *
- * @param {object} containerDiv The associated HTML div.
- * @class
  */
 export class LayerGroup {
 
+  /**
+   * The container div.
+   *
+   * @private
+   * @type {HTMLElement}
+   */
   #containerDiv;
 
-  constructor(containerDiv) {
-    this.#containerDiv = containerDiv;
-  }
-
-  // list of layers
+  /**
+   * List of layers.
+   *
+   * @private
+   * @type {Array}
+   */
   #layers = [];
 
   /**
@@ -234,6 +238,13 @@ export class LayerGroup {
    * @private
    */
   #currentPosition;
+
+  /**
+   * @param {HTMLElement} containerDiv The associated HTML div.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+  }
 
   /**
    * Get the target orientation.

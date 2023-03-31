@@ -1,14 +1,16 @@
 /**
  * Data writer.
- *
- * @class
- * @param {Array} buffer The input array buffer.
- * @param {boolean} isLittleEndian Flag to tell if the data is
- *   little or big endian.
  */
 export class DataWriter {
 
+  /**
+   * Is the endianness Little Endian.
+   *
+   * @private
+   * @type {boolean}
+   */
   #isLittleEndian = true;
+
   /**
    * The main data view.
    *
@@ -17,6 +19,11 @@ export class DataWriter {
    */
   #view;
 
+  /**
+   * @param {Array} buffer The input array buffer.
+   * @param {boolean} isLittleEndian Flag to tell if the data is
+   *   little or big endian.
+   */
   constructor(buffer, isLittleEndian) {
     // Set endian flag if not defined.
     if (typeof isLittleEndian !== 'undefined') {

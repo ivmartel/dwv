@@ -37,10 +37,6 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  * - photometric interpretation (default MONOCHROME2),
  * - planar configuration (default RGBRGB...).
  *
- * @class
- * @param {Geometry} geometry The geometry of the image.
- * @param {Array} buffer The image data as a one dimensional buffer.
- * @param {Array} imageUids An array of Uids indexed to slice number.
  * @example
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
@@ -80,19 +76,29 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  */
 export class Image {
 
+  /**
+   * Data geometry.
+   *
+   * @private
+   * @type {Geometry}
+   */
   #geometry;
+
+  /**
+   * Data buffer.
+   *
+   * @private
+   * @type {Array}
+   */
   #buffer;
+
+  /**
+   * Image UIDs.
+   *
+   * @private
+   * @type {Array}
+   */
   #imageUids;
-
-  constructor(geometry, buffer, imageUids) {
-    this.#geometry = geometry;
-    this.#buffer = buffer;
-    this.#imageUids = imageUids;
-
-    this.#numberOfComponents = this.#buffer.length / (
-      this.#geometry.getSize().getTotalSize());
-
-  }
 
   /**
    * Constant rescale slope and intercept (default).
@@ -190,6 +196,20 @@ export class Image {
    * @type {object}
    */
   #listenerHandler = new ListenerHandler();
+
+  /**
+   * @param {Geometry} geometry The geometry of the image.
+   * @param {Array} buffer The image data as a one dimensional buffer.
+   * @param {Array} imageUids An array of Uids indexed to slice number.
+   */
+  constructor(geometry, buffer, imageUids) {
+    this.#geometry = geometry;
+    this.#buffer = buffer;
+    this.#imageUids = imageUids;
+
+    this.#numberOfComponents = this.#buffer.length / (
+      this.#geometry.getSize().getTotalSize());
+  }
 
   /**
    * Get the image UID at a given index.

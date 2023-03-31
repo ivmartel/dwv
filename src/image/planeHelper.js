@@ -4,19 +4,46 @@ import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
 /**
  * Plane geometry helper.
- *
- * @class
- * @param {Spacing} spacing The spacing.
- * @param {Matrix} imageOrientation The image oientation.
- * @param {Matrix} viewOrientation The view orientation.
  */
 export class PlaneHelper {
 
+  /**
+   * The associated spacing.
+   *
+   * @private
+   * @type {Spacing}
+   */
   #spacing;
+
+  /**
+   * The image orientation.
+   *
+   * @private
+   * @type {Matrix33}
+   */
   #imageOrientation;
+
+  /**
+   * The viewe orientation.
+   *
+   * @private
+   * @type {Matrix33}
+   */
   #viewOrientation;
+
+  /**
+   * The target orientation.
+   *
+   * @private
+   * @type {Matrix33}
+   */
   #targetOrientation;
 
+  /**
+   * @param {Spacing} spacing The spacing.
+   * @param {Matrix} imageOrientation The image oientation.
+   * @param {Matrix} viewOrientation The view orientation.
+   */
   constructor(spacing, imageOrientation, viewOrientation) {
     this.#spacing = spacing;
     this.#imageOrientation = imageOrientation;
@@ -25,7 +52,6 @@ export class PlaneHelper {
     this.#targetOrientation = getTargetOrientation(
       imageOrientation, viewOrientation);
   }
-
 
   /**
    * Get a 3D offset from a plane one.

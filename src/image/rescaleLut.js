@@ -1,19 +1,16 @@
 /**
  * Rescale LUT class.
  * Typically converts from integer to float.
- *
- * @class
- * @param {object} rsi The rescale slope and intercept.
- * @param {number} bitsStored The number of bits used to store the data.
  */
 export class RescaleLut {
 
+  /**
+   * The rescale slope.
+   *
+   * @private
+   * @type {RescaleSlopeAndIntercept}
+   */
   #rsi;
-
-  constructor(rsi, bitsStored) {
-    this.#rsi = rsi;
-    this.#length = Math.pow(2, bitsStored);
-  }
 
   /**
    * The internal array.
@@ -38,6 +35,15 @@ export class RescaleLut {
    * @type {number}
    */
   #length;
+
+  /**
+   * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
+   * @param {number} bitsStored The number of bits used to store the data.
+   */
+  constructor(rsi, bitsStored) {
+    this.#rsi = rsi;
+    this.#length = Math.pow(2, bitsStored);
+  }
 
   /**
    * Get the Rescale Slope and Intercept (RSI).

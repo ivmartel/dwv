@@ -131,20 +131,29 @@ export function getHierarchyLog(layer, prefix) {
 
 /**
  * Draw controller.
- *
- * @class
- * @param {object} konvaLayer The draw layer.
  */
 export class DrawController {
 
+  /**
+   * The Konva layer.
+   *
+   * @type {Konva.Layer}
+   */
   #konvaLayer;
 
+  /**
+   * Current position group id.
+   *
+   * @type {string}
+   */
+  #currentPosGroupId = null;
+
+  /**
+   * @param {Konva.Layer} konvaLayer The draw layer.
+   */
   constructor(konvaLayer) {
     this.#konvaLayer = konvaLayer;
   }
-
-  // current position group id
-  #currentPosGroupId = null;
 
   /**
    * Get the current position group.

@@ -4,23 +4,39 @@ import {UrlsLoader} from '../io/urlsLoader';
 
 /**
  * Load controller.
- *
- * @param {string} defaultCharacterSet The default character set.
- * @class
  */
 export class LoadController {
 
+  /**
+   * The default character set.
+   *
+   * @type {string}
+   * @private
+   */
   #defaultCharacterSet;
 
+  /**
+   * List of current loaders.
+   *
+   * @type {object}
+   * @private
+   */
+  #currentLoaders = {};
+
+  /**
+   * load counter.
+   *
+   * @type {number}
+   * @private
+   */
+  #counter = -1;
+
+  /**
+   * @param {string} defaultCharacterSet The default character set.
+   */
   constructor(defaultCharacterSet) {
     this.#defaultCharacterSet = defaultCharacterSet;
   }
-
-  // current loaders
-  #currentLoaders = {};
-
-  // load counter
-  #counter = -1;
 
   /**
    * Get the next load id.

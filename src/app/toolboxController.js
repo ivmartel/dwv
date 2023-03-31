@@ -2,17 +2,16 @@ import {InteractionEventNames, getEventOffset} from '../gui/generic';
 
 /**
  * Toolbox controller.
- *
- * @param {Array} toolList The list of tool objects.
- * @class
  */
 export class ToolboxController {
 
+  /**
+   * List of tools to control.
+   *
+   * @type {Array}
+   * @private
+   */
   #toolList;
-
-  constructor(toolList) {
-    this.#toolList = toolList;
-  }
 
   /**
    * Selected tool.
@@ -37,6 +36,13 @@ export class ToolboxController {
    * @private
    */
   #boundLayers = {};
+
+  /**
+   * @param {Array} toolList The list of tool objects.
+   */
+  constructor(toolList) {
+    this.#toolList = toolList;
+  }
 
   /**
    * Initialise.

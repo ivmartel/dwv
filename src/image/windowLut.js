@@ -1,20 +1,25 @@
 /**
  * Window LUT class.
  * Typically converts from float to integer.
- *
- * @class
- * @param {number} rescaleLut The associated rescale LUT.
- * @param {boolean} isSigned Flag to know if the data is signed or not.
  */
 export class WindowLut {
 
+  /**
+   * The rescale LUT.
+   *
+   * @private
+   * @type {RescaleLut}
+   */
   #rescaleLut;
+
+  /**
+   * Signed data flag.
+   *
+   * @private
+   * @type {boolean}
+   */
   #isSigned;
 
-  constructor(rescaleLut, isSigned) {
-    this.#rescaleLut = rescaleLut;
-    this.#isSigned = isSigned;
-  }
   /**
    * The internal array: Uint8ClampedArray clamps between 0 and 255.
    *
@@ -46,6 +51,15 @@ export class WindowLut {
    * @type {number}
    */
   #signedShift = 0;
+
+  /**
+   * @param {RescaleLut} rescaleLut The associated rescale LUT.
+   * @param {boolean} isSigned Flag to know if the data is signed or not.
+   */
+  constructor(rescaleLut, isSigned) {
+    this.#rescaleLut = rescaleLut;
+    this.#isSigned = isSigned;
+  }
 
   /**
    * Get the window / level.

@@ -19,14 +19,20 @@ import {logger} from '../utils/logger';
 
 /**
  * DicomElements wrapper.
- *
- * @class
- * @param {Array} dicomElements The elements to wrap.
  */
 export class DicomElementsWrapper {
 
+  /**
+   * Wrapped elements.
+   *
+   * @private
+   * @type {Array}
+   */
   #dicomElements;
 
+  /**
+   * @param {Array} dicomElements The elements to wrap.
+   */
   constructor(dicomElements) {
     this.#dicomElements = dicomElements;
   }

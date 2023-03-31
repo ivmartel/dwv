@@ -6,12 +6,20 @@ import {Index} from '../math/index';
  *  modify the index values.
  *
  * @class
- * @param {Array} values The size values.
  */
 export class Size {
 
+  /**
+   * The size values.
+   *
+   * @private
+   * @type {Array}
+   */
   #values;
 
+  /**
+   * @param {Array} values The size values.
+   */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
       throw new Error('Cannot create size with no values.');

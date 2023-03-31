@@ -2,13 +2,17 @@ import {logger} from '../utils/logger';
 
 /**
  * Mask segment helper.
- *
- * @class
- * @param {object} mask The associated mask image.
  */
 export class MaskSegmentHelper {
 
+  /**
+   * The associated mask.
+   *
+   * @private
+   * @type {Image}
+   */
   #mask;
+
   /**
    * The segments: array of segment description.
    *
@@ -17,11 +21,6 @@ export class MaskSegmentHelper {
    */
   #segments;
 
-  constructor(mask) {
-    this.#mask = mask;
-    this.#segments = mask.getMeta().custom.segments;
-  }
-
   /**
    * List of ids of hidden segments.
    *
@@ -29,6 +28,14 @@ export class MaskSegmentHelper {
    * @type {Array}
    */
   #hiddenSegments = [];
+
+  /**
+   * @param {Image} mask The associated mask image.
+   */
+  constructor(mask) {
+    this.#mask = mask;
+    this.#segments = mask.getMeta().custom.segments;
+  }
 
   /**
    * Check if a segment is part of the inner segment list.
@@ -214,19 +221,46 @@ export class MaskSegmentHelper {
 
 /**
  * Delete segment command.
- *
- * @param {object} mask The mask image.
- * @param {object} segment The segment to remove.
- * @param {boolean} silent Whether to send a creation event or not.
- * @class
  */
 export class DeleteSegmentCommand {
 
+  /**
+   * The associated mask.
+   *
+   * @private
+   * @type {Image}
+   */
   #mask;
+
+  /**
+   * The segment to remove.
+   *
+   * @private
+   * @type {object}
+   */
   #segment;
+
+  /**
+   * Flag to send creation events.
+   *
+   * @private
+   * @type {boolean}
+   */
   #isSilent;
+
+  /**
+   * List of offsets.
+   *
+   * @private
+   * @type {Array}
+   */
   #offsets;
 
+  /**
+   * @param {object} mask The mask image.
+   * @param {object} segment The segment to remove.
+   * @param {boolean} silent Whether to send a creation event or not.
+   */
   constructor(mask, segment, silent) {
     this.#mask = mask;
     this.#segment = segment;
