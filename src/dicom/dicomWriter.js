@@ -258,7 +258,16 @@ export class DicomWriter {
 
   // flag to use VR=UN for private sequences, default to false
   // (mainly used in tests)
-  useUnVrForPrivateSq = false;
+  #useUnVrForPrivateSq = false;
+
+  /**
+   * Set the use UN VR for private sequence flag.
+   *
+   * @param {boolean} flag True to use UN VR.
+   */
+  setUseUnVrForPrivateSq (flag) {
+    this.#useUnVrForPrivateSq = flag;
+  }
 
   // possible tag actions
   #actions = {
@@ -613,7 +622,7 @@ export class DicomWriter {
     // VR
     let vr = element.vr;
     // use VR=UN for private sequence
-    if (this.useUnVrForPrivateSq &&
+    if (this.#useUnVrForPrivateSq &&
       element.tag.isPrivate() &&
       vr === 'SQ') {
       logger.warn('Write element using VR=UN for private sequence.');
@@ -840,8 +849,6 @@ export class DicomWriter {
         ' (diff:' + (offset - metaOffset) + ')');
     }
 
-    // pass flag to writer
-    dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
     // write non meta
     for (let k = 0, lenk = rawElements.length; k < lenk; ++k) {
       offset = this.writeDataElement(

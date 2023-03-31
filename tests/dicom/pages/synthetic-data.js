@@ -48,7 +48,7 @@ function getObjectUrlFromTags(config) {
 
   // create DICOM buffer
   const writer = new dwv.dicom.DicomWriter();
-  writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
+  writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
   const dicomBuffer = writer.getBuffer(dicomElements);
 
   // blob and then url

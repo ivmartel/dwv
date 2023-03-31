@@ -372,7 +372,7 @@ function testWriteReadDataFromConfig(config, assert) {
 
   // create DICOM buffer
   const writer = new DicomWriter();
-  writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
+  writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
   let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(dicomElements);

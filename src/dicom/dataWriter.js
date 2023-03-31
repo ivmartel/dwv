@@ -17,10 +17,6 @@ export class DataWriter {
    */
   #view;
 
-  // flag to use VR=UN for private sequences, default to false
-  // (mainly used in tests)
-  useUnVrForPrivateSq = false;
-
   constructor(buffer, isLittleEndian) {
     // Set endian flag if not defined.
     if (typeof isLittleEndian !== 'undefined') {
