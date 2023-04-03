@@ -1,11 +1,9 @@
-// namespaces
-var dwv = dwv || {};
-dwv.gui = dwv.gui || {};
+import {logger} from '../utils/logger';
 
 /**
  * List of interaction event names.
  */
-dwv.gui.interactionEventNames = [
+export const InteractionEventNames = [
   'mousedown',
   'mousemove',
   'mouseup',
@@ -25,30 +23,22 @@ dwv.gui.interactionEventNames = [
  * @returns {object} The found element or null.
  * @deprecated
  */
-dwv.gui.getElement = function (containerDivId, name) {
+export function getElement(containerDivId, name) {
   // get by class in the container div
-  var parent = document.getElementById(containerDivId);
+  const parent = document.getElementById(containerDivId);
   if (!parent) {
     return null;
   }
-  var elements = parent.getElementsByClassName(name);
+  const elements = parent.getElementsByClassName(name);
   // getting the last element since some libraries (ie jquery-mobile) create
   // span in front of regular tags (such as select)...
-  var element = elements[elements.length - 1];
+  let element = elements[elements.length - 1];
   // if not found get by id with 'containerDivId-className'
   if (typeof element === 'undefined') {
     element = document.getElementById(containerDivId + '-' + name);
   }
   return element;
-};
-
-/**
- * Get a HTML element associated to a container div. Defaults to local one.
- *
- * @see dwv.gui.getElement
- * @deprecated
- */
-dwv.getElement = dwv.gui.getElement;
+}
 
 /**
  * Prompt the user for some text. Uses window.prompt.
@@ -57,25 +47,14 @@ dwv.getElement = dwv.gui.getElement;
  * @param {string} value The input default value.
  * @returns {string} The new value.
  */
-dwv.gui.prompt = function (message, value) {
+export function prompt(message, value) {
   return prompt(message, value);
-};
+}
 
 /**
- * Prompt the user for some text. Defaults to local one.
- *
- * @see dwv.gui.prompt
+ * Custom UI object for client defined UI.
  */
-dwv.prompt = dwv.gui.prompt;
-
-/**
- * Open a dialogue to edit roi data. Defaults to undefined.
- *
- * @param {object} data The roi data.
- * @param {Function} callback The callback to launch on dialogue exit.
- * @see dwv.tool.Draw
- */
-dwv.openRoiDialog;
+export const customUI = {};
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.
@@ -83,13 +62,13 @@ dwv.openRoiDialog;
  * @param {Array} touches The list of touch events.
  * @returns {Array} The list of positions of the touch events.
  */
-dwv.gui.getTouchesPositions = function (touches) {
+function getTouchesPositions(touches) {
   // get the touch offset from all its parents
-  var offsetLeft = 0;
-  var offsetTop = 0;
+  let offsetLeft = 0;
+  let offsetTop = 0;
   if (touches.length !== 0 &&
     typeof touches[0].target !== 'undefined') {
-    var offsetParent = touches[0].target.offsetParent;
+    let offsetParent = touches[0].target.offsetParent;
     while (offsetParent) {
       if (!isNaN(offsetParent.offsetLeft)) {
         offsetLeft += offsetParent.offsetLeft;
@@ -100,18 +79,18 @@ dwv.gui.getTouchesPositions = function (touches) {
       offsetParent = offsetParent.offsetParent;
     }
   } else {
-    dwv.logger.debug('No touch target offset parent.');
+    logger.debug('No touch target offset parent.');
   }
   // set its position
-  var positions = [];
-  for (var i = 0; i < touches.length; ++i) {
+  const positions = [];
+  for (let i = 0; i < touches.length; ++i) {
     positions.push({
       x: touches[i].pageX - offsetLeft,
       y: touches[i].pageY - offsetTop
     });
   }
   return positions;
-};
+}
 
 /**
  * Get the offset of an input event.
@@ -119,16 +98,16 @@ dwv.gui.getTouchesPositions = function (touches) {
  * @param {object} event The event to get the offset from.
  * @returns {Array} The array of offsets.
  */
-dwv.gui.getEventOffset = function (event) {
-  var positions = [];
+export function getEventOffset(event) {
+  let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = dwv.gui.getTouchesPositions(event.targetTouches);
+    positions = getTouchesPositions(event.targetTouches);
   } else if (typeof event.changedTouches !== 'undefined' &&
     event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = dwv.gui.getTouchesPositions(event.changedTouches);
+    positions = getTouchesPositions(event.changedTouches);
   } else {
     // offsetX/Y: the offset in the X coordinate of the mouse pointer
     // between that event and the padding edge of the target node
@@ -140,7 +119,7 @@ dwv.gui.getEventOffset = function (event) {
     });
   }
   return positions;
-};
+}
 
 /**
  * Test if a canvas with the input size can be created.
@@ -151,18 +130,18 @@ dwv.gui.getEventOffset = function (event) {
  * @param {number} height The canvas height.
  * @returns {boolean} True is the canvas can be created.
  */
-dwv.gui.canCreateCanvas = function (width, height) {
+export function canCreateCanvas(width, height) {
   // test canvas with input size
-  var testCvs = document.createElement('canvas');
+  const testCvs = document.createElement('canvas');
   testCvs.width = width;
   testCvs.height = height;
   // crop canvas to speed up test
-  var cropCvs = document.createElement('canvas');
+  const cropCvs = document.createElement('canvas');
   cropCvs.width = 1;
   cropCvs.height = 1;
   // contexts
-  var testCtx = testCvs.getContext('2d');
-  var cropCtx = cropCvs.getContext('2d');
+  const testCtx = testCvs.getContext('2d');
+  const cropCtx = cropCvs.getContext('2d');
   // set data
   if (testCtx) {
     testCtx.fillRect(width - 1, height - 1, 1, 1);
@@ -173,4 +152,4 @@ dwv.gui.canCreateCanvas = function (width, height) {
   }
   // Verify image data (alpha component, Pass = 255, Fail = 0)
   return cropCtx && cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
-};
+}

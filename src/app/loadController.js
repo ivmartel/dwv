@@ -1,30 +1,51 @@
-// namespaces
-var dwv = dwv || {};
-dwv.ctrl = dwv.ctrl || {};
+import {FilesLoader} from '../io/filesLoader';
+import {MemoryLoader} from '../io/memoryLoader';
+import {UrlsLoader} from '../io/urlsLoader';
 
 /**
  * Load controller.
- *
- * @param {string} defaultCharacterSet The default character set.
- * @class
  */
-dwv.ctrl.LoadController = function (defaultCharacterSet) {
-  // closure to self
-  var self = this;
-  // current loaders
-  var currentLoaders = {};
+export class LoadController {
 
-  // load counter
-  var counter = -1;
+  /**
+   * The default character set.
+   *
+   * @type {string}
+   * @private
+   */
+  #defaultCharacterSet;
+
+  /**
+   * List of current loaders.
+   *
+   * @type {object}
+   * @private
+   */
+  #currentLoaders = {};
+
+  /**
+   * load counter.
+   *
+   * @type {number}
+   * @private
+   */
+  #counter = -1;
+
+  /**
+   * @param {string} defaultCharacterSet The default character set.
+   */
+  constructor(defaultCharacterSet) {
+    this.#defaultCharacterSet = defaultCharacterSet;
+  }
 
   /**
    * Get the next load id.
    *
    * @returns {number} The next id.
    */
-  function getNextLoadId() {
-    ++counter;
-    return counter;
+  #getNextLoadId() {
+    ++this.#counter;
+    return this.#counter;
   }
 
   /**
@@ -32,15 +53,15 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    *
    * @param {Array} files The list of files to load.
    */
-  this.loadFiles = function (files) {
+  loadFiles(files) {
     // has been checked for emptiness.
-    var ext = files[0].name.split('.').pop().toLowerCase();
+    const ext = files[0].name.split('.').pop().toLowerCase();
     if (ext === 'json') {
-      loadStateFile(files[0]);
+      this.#loadStateFile(files[0]);
     } else {
-      loadImageFiles(files);
+      this.#loadImageFiles(files);
     }
-  };
+  }
 
   /**
    * Load a list of URLs. Can be image files or a state file.
@@ -50,15 +71,15 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
-  this.loadURLs = function (urls, options) {
+  loadURLs(urls, options) {
     // has been checked for emptiness.
-    var ext = urls[0].split('.').pop().toLowerCase();
+    const ext = urls[0].split('.').pop().toLowerCase();
     if (ext === 'json') {
-      loadStateUrl(urls[0], options);
+      this.#loadStateUrl(urls[0], options);
     } else {
-      loadImageUrls(urls, options);
+      this.#loadImageUrls(urls, options);
     }
-  };
+  }
 
   /**
    * Load a list of ArrayBuffers.
@@ -66,23 +87,23 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
    */
-  this.loadImageObject = function (data) {
+  loadImageObject(data) {
     // create IO
-    var memoryIO = new dwv.io.MemoryLoader();
+    const memoryIO = new MemoryLoader();
     // load data
-    loadData(data, memoryIO, 'image');
-  };
+    this.#loadData(data, memoryIO, 'image');
+  }
 
   /**
    * Abort the current loaders.
    */
-  this.abort = function () {
-    var keys = Object.keys(currentLoaders);
-    for (var i = 0; i < keys.length; ++i) {
-      currentLoaders[i].loader.abort();
-      delete currentLoaders[i];
+  abort() {
+    const keys = Object.keys(this.#currentLoaders);
+    for (let i = 0; i < keys.length; ++i) {
+      this.#currentLoaders[i].loader.abort();
+      delete this.#currentLoaders[i];
     }
-  };
+  }
 
   // private ----------------------------------------------------------------
 
@@ -92,12 +113,12 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @param {Array} files The list of image files to load.
    * @private
    */
-  function loadImageFiles(files) {
+  #loadImageFiles(files) {
     // create IO
-    var fileIO = new dwv.io.FilesLoader();
-    fileIO.setDefaultCharacterSet(defaultCharacterSet);
+    const fileIO = new FilesLoader();
+    fileIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    loadData(files, fileIO, 'image');
+    this.#loadData(files, fileIO, 'image');
   }
 
   /**
@@ -109,12 +130,12 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * - withCredentials: credentials flag to pass to the request.
    * @private
    */
-  function loadImageUrls(urls, options) {
+  #loadImageUrls(urls, options) {
     // create IO
-    var urlIO = new dwv.io.UrlsLoader();
-    urlIO.setDefaultCharacterSet(defaultCharacterSet);
+    const urlIO = new UrlsLoader();
+    urlIO.setDefaultCharacterSet(this.#defaultCharacterSet);
     // load data
-    loadData(urls, urlIO, 'image', options);
+    this.#loadData(urls, urlIO, 'image', options);
   }
 
   /**
@@ -123,11 +144,11 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @param {string} file The state file to load.
    * @private
    */
-  function loadStateFile(file) {
+  #loadStateFile(file) {
     // create IO
-    var fileIO = new dwv.io.FilesLoader();
+    const fileIO = new FilesLoader();
     // load data
-    loadData([file], fileIO, 'state');
+    this.#loadData([file], fileIO, 'state');
   }
 
   /**
@@ -139,11 +160,11 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * - withCredentials: credentials flag to pass to the request.
    * @private
    */
-  function loadStateUrl(url, options) {
+  #loadStateUrl(url, options) {
     // create IO
-    var urlIO = new dwv.io.UrlsLoader();
+    const urlIO = new UrlsLoader();
     // load data
-    loadData([url], urlIO, 'state', options);
+    this.#loadData([url], urlIO, 'state', options);
   }
 
   /**
@@ -155,60 +176,60 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @param {object} options Options passed to the final loader.
    * @private
    */
-  function loadData(data, loader, loadType, options) {
-    var eventInfo = {
+  #loadData(data, loader, loadType, options) {
+    const eventInfo = {
       loadtype: loadType,
     };
 
     // load id
-    var loadId = getNextLoadId();
+    const loadId = this.#getNextLoadId();
     eventInfo.loadid = loadId;
 
     // set callbacks
-    loader.onloadstart = function (event) {
+    loader.onloadstart = (event) => {
       // store loader to allow abort
-      currentLoaders[loadId] = {
+      this.#currentLoaders[loadId] = {
         loader: loader,
         isFirstItem: true
       };
       // callback
-      augmentCallbackEvent(self.onloadstart, eventInfo)(event);
+      this.#augmentCallbackEvent(this.onloadstart, eventInfo)(event);
     };
-    loader.onprogress = augmentCallbackEvent(self.onprogress, eventInfo);
-    loader.onloaditem = function (event) {
-      var eventInfoItem = {
+    loader.onprogress = this.#augmentCallbackEvent(this.onprogress, eventInfo);
+    loader.onloaditem = (event) => {
+      const eventInfoItem = {
         loadtype: loadType,
         loadid: loadId
       };
-      if (typeof currentLoaders[loadId] !== 'undefined') {
-        eventInfoItem.isfirstitem = currentLoaders[loadId].isFirstItem;
+      if (typeof this.#currentLoaders[loadId] !== 'undefined') {
+        eventInfoItem.isfirstitem = this.#currentLoaders[loadId].isFirstItem;
       }
       // callback
-      augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
+      this.#augmentCallbackEvent(this.onloaditem, eventInfoItem)(event);
       // update loader
-      if (typeof currentLoaders[loadId] !== 'undefined' &&
-        currentLoaders[loadId].isFirstItem) {
-        currentLoaders[loadId].isFirstItem = false;
+      if (typeof this.#currentLoaders[loadId] !== 'undefined' &&
+        this.#currentLoaders[loadId].isFirstItem) {
+        this.#currentLoaders[loadId].isFirstItem = false;
       }
     };
-    loader.onload = augmentCallbackEvent(self.onload, eventInfo);
-    loader.onloadend = function (event) {
+    loader.onload = this.#augmentCallbackEvent(this.onload, eventInfo);
+    loader.onloadend = (event) => {
       // reset current loader
-      delete currentLoaders[loadId];
+      delete this.#currentLoaders[loadId];
       // callback
-      augmentCallbackEvent(self.onloadend, eventInfo)(event);
+      this.#augmentCallbackEvent(this.onloadend, eventInfo)(event);
     };
-    loader.onerror = augmentCallbackEvent(self.onerror, eventInfo);
-    loader.onabort = augmentCallbackEvent(self.onabort, eventInfo);
+    loader.onerror = this.#augmentCallbackEvent(this.onerror, eventInfo);
+    loader.onabort = this.#augmentCallbackEvent(this.onabort, eventInfo);
     // launch load
     try {
       loader.load(data, options);
     } catch (error) {
-      self.onerror({
+      this.onerror({
         error: error,
         loadid: loadId
       });
-      self.onloadend({
+      this.onloadend({
         loadid: loadId
       });
       return;
@@ -223,60 +244,65 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @param {object} info Info object to append to the event.
    * @returns {object} A function representing the modified callback.
    */
-  function augmentCallbackEvent(callback, info) {
+  #augmentCallbackEvent(callback, info) {
     return function (event) {
-      var keys = Object.keys(info);
-      for (var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
+      const keys = Object.keys(info);
+      for (let i = 0; i < keys.length; ++i) {
+        const key = keys[i];
         event[key] = info[key];
       }
       callback(event);
     };
   }
 
-}; // class LoadController
+  /**
+   * Handle a load start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load start event.
+   */
+  onloadstart(_event) {}
 
-/**
- * Handle a load start event.
- * Default does nothing.
- *
- * @param {object} _event The load start event.
- */
-dwv.ctrl.LoadController.prototype.onloadstart = function (_event) {};
-/**
- * Handle a load progress event.
- * Default does nothing.
- *
- * @param {object} _event The progress event.
- */
-dwv.ctrl.LoadController.prototype.onprogress = function (_event) {};
-/**
- * Handle a load event.
- * Default does nothing.
- *
- * @param {object} _event The load event fired
- *   when a file has been loaded successfully.
- */
-dwv.ctrl.LoadController.prototype.onload = function (_event) {};
-/**
- * Handle a load end event.
- * Default does nothing.
- *
- * @param {object} _event The load end event fired
- *  when a file load has completed, successfully or not.
- */
-dwv.ctrl.LoadController.prototype.onloadend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.ctrl.LoadController.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.ctrl.LoadController.prototype.onabort = function (_event) {};
+  /**
+   * Handle a load progress event.
+   * Default does nothing.
+   *
+   * @param {object} _event The progress event.
+   */
+  onprogress(_event) {}
+
+  /**
+   * Handle a load event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   *   when a file has been loaded successfully.
+   */
+  onload(_event) {}
+
+  /**
+   * Handle a load end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load end event fired
+   *  when a file load has completed, successfully or not.
+   */
+  onloadend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class LoadController

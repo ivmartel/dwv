@@ -1,13 +1,22 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {Index} from '../math/index';
+import {RescaleLut} from './rescaleLut';
+import {WindowLut} from './windowLut';
+import {lut} from './luts';
+import {WindowLevel} from './windowLevel';
+import {generateImageDataMonochrome} from './viewMonochrome';
+import {generateImageDataPaletteColor} from './viewPaletteColor';
+import {generateImageDataRgb} from './viewRgb';
+import {generateImageDataYbrFull} from './viewYbrFull';
+import {getSliceIterator} from '../image/iterator';
+import {ListenerHandler} from '../utils/listen';
+import {logger} from '../utils/logger';
 
 /**
  * List of view event names.
  *
  * @type {Array}
  */
-dwv.image.viewEventNames = [
+export const viewEventNames = [
   'wlchange',
   'wlpresetadd',
   'colourchange',
@@ -19,27 +28,18 @@ dwv.image.viewEventNames = [
 /**
  * View class.
  *
- * @class
- * @param {Image} image The associated image.
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
  */
-dwv.image.View = function (image) {
-  // closure to self
-  var self = this;
+export class View {
 
-  // listen to appendframe event to update the current position
-  //   to add the extra dimension
-  image.addEventListener('appendframe', function () {
-    // update current position if first appendFrame
-    var index = self.getCurrentIndex();
-    if (index.length() === 3) {
-      // add dimension
-      var values = index.getValues();
-      values.push(0);
-      self.setCurrentIndex(new dwv.math.Index(values));
-    }
-  });
+  /**
+   * The associated image.
+   *
+   * @private
+   * @type {Image}
+   */
+  #image;
 
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
@@ -47,7 +47,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {Window}
    */
-  var windowLuts = {};
+  #windowLuts = {};
 
   /**
    * Window presets.
@@ -56,7 +56,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {object}
    */
-  var windowPresets = {minmax: {name: 'minmax'}};
+  #windowPresets = {minmax: {name: 'minmax'}};
 
   /**
    * Current window preset name.
@@ -64,7 +64,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {string}
    */
-  var currentPresetName = null;
+  #currentPresetName = null;
 
   /**
    * Current window level.
@@ -72,7 +72,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {object}
    */
-  var currentWl = null;
+  #currentWl = null;
 
   /**
    * colour map.
@@ -80,22 +80,24 @@ dwv.image.View = function (image) {
    * @private
    * @type {object}
    */
-  var colourMap = dwv.image.lut.plain;
+  #colourMap = lut.plain;
+
   /**
    * Current position as a Point3D.
    * Store position and not index to stay geometry independent.
    *
    * @private
-   * @type {dwv.math.Point3D}
+   * @type {Point3D}
    */
-  var currentPosition = null;
+  #currentPosition = null;
+
   /**
    * View orientation. Undefined will use the original slice ordering.
    *
    * @private
    * @type {object}
    */
-  var orientation;
+  #orientation;
 
   /**
    * Listener handler.
@@ -103,64 +105,85 @@ dwv.image.View = function (image) {
    * @type {object}
    * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
+
+  /**
+   * @param {Image} image The associated image.
+   */
+  constructor(image) {
+    this.#image = image;
+
+    // listen to appendframe event to update the current position
+    //   to add the extra dimension
+    this.#image.addEventListener('appendframe', () => {
+      // update current position if first appendFrame
+      const index = this.getCurrentIndex();
+      if (index.length() === 3) {
+        // add dimension
+        const values = index.getValues();
+        values.push(0);
+        this.setCurrentIndex(new Index(values));
+      }
+    });
+  }
 
   /**
    * Get the associated image.
    *
    * @returns {Image} The associated image.
    */
-  this.getImage = function () {
-    return image;
-  };
+  getImage() {
+    return this.#image;
+  }
+
   /**
    * Set the associated image.
    *
    * @param {Image} inImage The associated image.
    */
-  this.setImage = function (inImage) {
-    image = inImage;
-  };
+  setImage(inImage) {
+    this.#image = inImage;
+  }
 
   /**
    * Get the view orientation.
    *
-   * @returns {dwv.math.Matrix33} The orientation matrix.
+   * @returns {Matrix33} The orientation matrix.
    */
-  this.getOrientation = function () {
-    return orientation;
-  };
+  getOrientation() {
+    return this.#orientation;
+  }
 
   /**
    * Set the view orientation.
    *
-   * @param {dwv.math.Matrix33} mat33 The orientation matrix.
+   * @param {Matrix33} mat33 The orientation matrix.
    */
-  this.setOrientation = function (mat33) {
-    orientation = mat33;
-  };
+  setOrientation(mat33) {
+    this.#orientation = mat33;
+  }
 
   /**
    * Initialise the view: set initial index.
    */
-  this.init = function () {
+  init() {
     this.setInitialIndex();
-  };
+  }
 
   /**
    * Set the initial index to 0.
    */
-  this.setInitialIndex = function () {
-    var geometry = image.getGeometry();
-    var size = geometry.getSize();
-    var values = new Array(size.length());
+  setInitialIndex() {
+    const geometry = this.#image.getGeometry();
+    const size = geometry.getSize();
+    const values = new Array(size.length());
     values.fill(0);
     // middle
     values[0] = Math.floor(size.get(0) / 2);
     values[1] = Math.floor(size.get(1) / 2);
     values[2] = Math.floor(size.get(2) / 2);
-    this.setCurrentIndex(new dwv.math.Index(values), true);
-  };
+    this.setCurrentIndex(new Index(values), true);
+  }
 
   /**
    * Get the milliseconds per frame from frame rate.
@@ -168,14 +191,14 @@ dwv.image.View = function (image) {
    * @param {number} recommendedDisplayFrameRate Recommended Display Frame Rate.
    * @returns {number} The milliseconds per frame.
    */
-  this.getPlaybackMilliseconds = function (recommendedDisplayFrameRate) {
+  getPlaybackMilliseconds(recommendedDisplayFrameRate) {
     if (!recommendedDisplayFrameRate) {
       // Default to 10 FPS if none is found in the meta
       recommendedDisplayFrameRate = 10;
     }
     // round milliseconds per frame to nearest whole number
     return Math.round(1000 / recommendedDisplayFrameRate);
-  };
+  }
 
   /**
    * Per value alpha function.
@@ -185,7 +208,7 @@ dwv.image.View = function (image) {
    * @param {number} _index The data index of the value.
    * @returns {number} The coresponding alpha [0,255].
    */
-  var alphaFunction = function (_value, _index) {
+  #alphaFunction = function (_value, _index) {
     // default always returns fully visible
     return 0xff;
   };
@@ -195,28 +218,28 @@ dwv.image.View = function (image) {
    *
    * @returns {Function} The function.
    */
-  this.getAlphaFunction = function () {
-    return alphaFunction;
-  };
+  getAlphaFunction() {
+    return this.#alphaFunction;
+  }
 
   /**
    * Set alpha function.
    *
    * @param {Function} func The function.
-   * @fires dwv.image.View#alphafuncchange
+   * @fires View#alphafuncchange
    */
-  this.setAlphaFunction = function (func) {
-    alphaFunction = func;
+  setAlphaFunction(func) {
+    this.#alphaFunction = func;
     /**
      * Alpha func change event.
      *
-     * @event dwv.image.View#alphafuncchange
+     * @event View#alphafuncchange
      * @type {object}
      */
-    fireEvent({
+    this.#fireEvent({
       type: 'alphafuncchange'
     });
-  };
+  }
 
   /**
    * Get the window LUT of the image.
@@ -225,55 +248,57 @@ dwv.image.View = function (image) {
    * @param {object} rsi Optional image rsi, will take the one of the
    *   current slice otherwise.
    * @returns {Window} The window LUT of the image.
-   * @fires dwv.image.View#wlchange
+   * @fires View#wlchange
    */
-  this.getCurrentWindowLut = function (rsi) {
+  getCurrentWindowLut(rsi) {
     // check position
     if (!this.getCurrentIndex()) {
       this.setInitialIndex();
     }
-    var currentIndex = this.getCurrentIndex();
+    const currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
-      rsi = image.getRescaleSlopeAndIntercept(currentIndex);
+      rsi = this.#image.getRescaleSlopeAndIntercept(currentIndex);
     }
 
     // get the current window level
-    var wl = null;
+    let wl = null;
     // special case for 'perslice' presets
-    if (currentPresetName &&
-      typeof windowPresets[currentPresetName] !== 'undefined' &&
-      typeof windowPresets[currentPresetName].perslice !== 'undefined' &&
-      windowPresets[currentPresetName].perslice === true) {
+    if (this.#currentPresetName &&
+      typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
+      typeof this.#windowPresets[this.#currentPresetName].perslice !==
+        'undefined' &&
+      this.#windowPresets[this.#currentPresetName].perslice === true) {
       // get the preset for this slice
-      var offset = image.getSecondaryOffset(currentIndex);
-      wl = windowPresets[currentPresetName].wl[offset];
+      const offset = this.#image.getSecondaryOffset(currentIndex);
+      wl = this.#windowPresets[this.#currentPresetName].wl[offset];
     }
     // regular case
     if (!wl) {
       // if no current, use first id
-      if (!currentWl) {
+      if (!this.#currentWl) {
         this.setWindowLevelPresetById(0, true);
       }
-      wl = currentWl;
+      wl = this.#currentWl;
     }
 
     // get the window lut
-    var wlut = windowLuts[rsi.toString()];
+    let wlut = this.#windowLuts[rsi.toString()];
     if (typeof wlut === 'undefined') {
       // create the rescale lookup table
-      var rescaleLut = new dwv.image.RescaleLut(
-        image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored);
+      const rescaleLut = new RescaleLut(
+        this.#image.getRescaleSlopeAndIntercept(0),
+        this.#image.getMeta().BitsStored);
       // create the window lookup table
-      var windowLut = new dwv.image.WindowLut(
-        rescaleLut, image.getMeta().IsSigned);
+      const windowLut = new WindowLut(
+        rescaleLut, this.#image.getMeta().IsSigned);
       // store
       this.addWindowLut(windowLut);
       wlut = windowLut;
     }
 
     // update lut window level if not present or different from previous
-    var lutWl = wlut.getWindowLevel();
+    const lutWl = wlut.getWindowLevel();
     if (!wl.equals(lutWl)) {
       // set lut window level
       wlut.setWindowLevel(wl);
@@ -282,7 +307,7 @@ dwv.image.View = function (image) {
       if (!lutWl ||
         lutWl.getWidth() !== wl.getWidth() ||
         lutWl.getCenter() !== wl.getCenter()) {
-        fireEvent({
+        this.#fireEvent({
           type: 'wlchange',
           value: [wl.getCenter(), wl.getWidth()],
           wc: wl.getCenter(),
@@ -294,197 +319,199 @@ dwv.image.View = function (image) {
 
     // return
     return wlut;
-  };
+  }
+
   /**
    * Add the window LUT to the list.
    *
    * @param {Window} wlut The window LUT of the image.
    */
-  this.addWindowLut = function (wlut) {
-    var rsi = wlut.getRescaleLut().getRSI();
-    windowLuts[rsi.toString()] = wlut;
-  };
+  addWindowLut(wlut) {
+    const rsi = wlut.getRescaleLut().getRSI();
+    this.#windowLuts[rsi.toString()] = wlut;
+  }
 
   /**
    * Get the window presets.
    *
    * @returns {object} The window presets.
    */
-  this.getWindowPresets = function () {
-    return windowPresets;
-  };
+  getWindowPresets() {
+    return this.#windowPresets;
+  }
 
   /**
    * Get the window presets names.
    *
    * @returns {object} The list of window presets names.
    */
-  this.getWindowPresetsNames = function () {
-    return Object.keys(windowPresets);
-  };
+  getWindowPresetsNames() {
+    return Object.keys(this.#windowPresets);
+  }
 
   /**
    * Set the window presets.
    *
    * @param {object} presets The window presets.
    */
-  this.setWindowPresets = function (presets) {
-    windowPresets = presets;
-  };
+  setWindowPresets(presets) {
+    this.#windowPresets = presets;
+  }
 
   /**
    * Set the default colour map.
    *
    * @param {object} map The colour map.
    */
-  this.setDefaultColourMap = function (map) {
-    colourMap = map;
-  };
+  setDefaultColourMap(map) {
+    this.#colourMap = map;
+  }
 
   /**
    * Add window presets to the existing ones.
    *
    * @param {object} presets The window presets.
    */
-  this.addWindowPresets = function (presets) {
-    var keys = Object.keys(presets);
-    var key = null;
-    for (var i = 0; i < keys.length; ++i) {
+  addWindowPresets(presets) {
+    const keys = Object.keys(presets);
+    let key = null;
+    for (let i = 0; i < keys.length; ++i) {
       key = keys[i];
-      if (typeof windowPresets[key] !== 'undefined') {
-        if (typeof windowPresets[key].perslice !== 'undefined' &&
-          windowPresets[key].perslice === true) {
+      if (typeof this.#windowPresets[key] !== 'undefined') {
+        if (typeof this.#windowPresets[key].perslice !== 'undefined' &&
+        this.#windowPresets[key].perslice === true) {
           throw new Error('Cannot add perslice preset');
         } else {
-          windowPresets[key] = presets[key];
+          this.#windowPresets[key] = presets[key];
         }
       } else {
         // add new
-        windowPresets[key] = presets[key];
+        this.#windowPresets[key] = presets[key];
         // fire event
         /**
          * Window/level add preset event.
          *
-         * @event dwv.image.View#wlpresetadd
+         * @event View#wlpresetadd
          * @type {object}
          * @property {string} name The name of the preset.
          */
-        fireEvent({
+        this.#fireEvent({
           type: 'wlpresetadd',
           name: key
         });
       }
     }
-  };
+  }
 
   /**
    * Get the colour map of the image.
    *
    * @returns {object} The colour map of the image.
    */
-  this.getColourMap = function () {
-    return colourMap;
-  };
+  getColourMap() {
+    return this.#colourMap;
+  }
+
   /**
    * Set the colour map of the image.
    *
    * @param {object} map The colour map of the image.
-   * @fires dwv.image.View#colourchange
+   * @fires View#colourchange
    */
-  this.setColourMap = function (map) {
-    colourMap = map;
+  setColourMap(map) {
+    this.#colourMap = map;
     /**
      * Color change event.
      *
-     * @event dwv.image.View#colourchange
+     * @event View#colourchange
      * @type {object}
      * @property {Array} value The changed value.
      * @property {number} wc The new window center value.
      * @property {number} ww The new window wdth value.
      */
-    fireEvent({
+    this.#fireEvent({
       type: 'colourchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
       ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
     });
-  };
+  }
 
   /**
    * Get the current position.
    *
-   * @returns {dwv.math.Point} The current position.
+   * @returns {Point} The current position.
    */
-  this.getCurrentPosition = function () {
-    return currentPosition;
-  };
+  getCurrentPosition() {
+    return this.#currentPosition;
+  }
 
   /**
    * Get the current index.
    *
-   * @returns {dwv.math.Index} The current index.
+   * @returns {Index} The current index.
    */
-  this.getCurrentIndex = function () {
-    var position = this.getCurrentPosition();
+  getCurrentIndex() {
+    const position = this.getCurrentPosition();
     if (!position) {
       return null;
     }
-    var geometry = this.getImage().getGeometry();
+    const geometry = this.getImage().getGeometry();
     return geometry.worldToIndex(position);
-  };
+  }
 
   /**
    * Check is the provided position can be set.
    *
-   * @param {dwv.math.Point} position The position.
+   * @param {Point} position The position.
    * @returns {boolean} True is the position is in bounds.
    */
-  this.canSetPosition = function (position) {
-    var geometry = image.getGeometry();
-    var index = geometry.worldToIndex(position);
-    var dirs = [this.getScrollIndex()];
+  canSetPosition(position) {
+    const geometry = this.#image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    const dirs = [this.getScrollIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
     return geometry.isIndexInBounds(index, dirs);
-  };
+  }
 
   /**
    * Get the origin at a given position.
    *
-   * @param {dwv.math.Point} position The position.
-   * @returns {dwv.math.Point} The origin.
+   * @param {Point} position The position.
+   * @returns {Point} The origin.
    */
-  this.getOrigin = function (position) {
-    var geometry = image.getGeometry();
-    var originIndex = 0;
+  getOrigin(position) {
+    const geometry = this.#image.getGeometry();
+    let originIndex = 0;
     if (typeof position !== 'undefined') {
-      var index = geometry.worldToIndex(position);
+      const index = geometry.worldToIndex(position);
       // index is reoriented, 2 is scroll index
       originIndex = index.get(2);
     }
     return geometry.getOrigins()[originIndex];
-  };
+  }
 
   /**
    * Set the current position.
    *
-   * @param {dwv.math.Point} position The new position.
+   * @param {Point} position The new position.
    * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
-   * @fires dwv.image.View#positionchange
+   * @fires View#positionchange
    */
-  this.setCurrentPosition = function (position, silent) {
+  setCurrentPosition(position, silent) {
     // send invalid event if not in bounds
-    var geometry = image.getGeometry();
-    var index = geometry.worldToIndex(position);
-    var dirs = [this.getScrollIndex()];
+    const geometry = this.#image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    const dirs = [this.getScrollIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
     if (!geometry.isIndexInBounds(index, dirs)) {
       if (!silent) {
         // fire event with valid: false
-        fireEvent({
+        this.#fireEvent({
           type: 'positionchange',
           value: [
             index.getValues(),
@@ -496,27 +523,27 @@ dwv.image.View = function (image) {
       return false;
     }
     return this.setCurrentIndex(index, silent);
-  };
+  }
 
   /**
    * Set the current index.
    *
-   * @param {dwv.math.Index} index The new index.
+   * @param {Index} index The new index.
    * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
-   * @fires dwv.image.View#positionchange
+   * @fires View#positionchange
    */
-  this.setCurrentIndex = function (index, silent) {
+  setCurrentIndex(index, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
-    var geometry = image.getGeometry();
-    var position = geometry.indexToWorld(index);
+    const geometry = this.#image.getGeometry();
+    const position = geometry.indexToWorld(index);
 
     // check if possible
-    var dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -526,8 +553,8 @@ dwv.image.View = function (image) {
     }
 
     // calculate diff dims before updating internal
-    var diffDims = null;
-    var currentIndex = null;
+    let diffDims = null;
+    let currentIndex = null;
     if (this.getCurrentPosition()) {
       currentIndex = this.getCurrentIndex();
     }
@@ -536,37 +563,37 @@ dwv.image.View = function (image) {
         diffDims = currentIndex.compare(index);
       } else {
         diffDims = [];
-        var minLen = Math.min(currentIndex.length(), index.length());
-        for (var i = 0; i < minLen; ++i) {
+        const minLen = Math.min(currentIndex.length(), index.length());
+        for (let i = 0; i < minLen; ++i) {
           if (currentIndex.get(i) !== index.get(i)) {
             diffDims.push(i);
           }
         }
-        var maxLen = Math.max(currentIndex.length(), index.length());
-        for (var j = minLen; j < maxLen; ++j) {
+        const maxLen = Math.max(currentIndex.length(), index.length());
+        for (let j = minLen; j < maxLen; ++j) {
           diffDims.push(j);
         }
       }
     } else {
       diffDims = [];
-      for (var k = 0; k < index.length(); ++k) {
+      for (let k = 0; k < index.length(); ++k) {
         diffDims.push(k);
       }
     }
 
     // assign
-    currentPosition = position;
+    this.#currentPosition = position;
 
     if (!silent) {
       /**
        * Position change event.
        *
-       * @event dwv.image.View#positionchange
+       * @event View#positionchange
        * @type {object}
        * @property {Array} value The changed value as [index, pixelValue].
        * @property {Array} diffDims An array of modified indices.
        */
-      var posEvent = {
+      const posEvent = {
         type: 'positionchange',
         value: [
           index.getValues(),
@@ -574,23 +601,23 @@ dwv.image.View = function (image) {
         ],
         diffDims: diffDims,
         data: {
-          imageUid: image.getImageUid(index)
+          imageUid: this.#image.getImageUid(index)
         }
       };
 
       // add value if possible
-      if (image.canQuantify()) {
-        var pixValue = image.getRescaledValueAtIndex(index);
+      if (this.#image.canQuantify()) {
+        const pixValue = this.#image.getRescaledValueAtIndex(index);
         posEvent.value.push(pixValue);
       }
 
       // fire
-      fireEvent(posEvent);
+      this.#fireEvent(posEvent);
     }
 
     // all good
     return true;
-  };
+  }
 
   /**
    * Set the view window/level.
@@ -600,9 +627,9 @@ dwv.image.View = function (image) {
    * @param {string} name Associated preset name, defaults to 'manual'.
    * Warning: uses the latest set rescale LUT or the default linear one.
    * @param {boolean} silent Flag to launch events with skipGenerate.
-   * @fires dwv.image.View#wlchange
+   * @fires View#wlchange
    */
-  this.setWindowLevel = function (center, width, name, silent) {
+  setWindowLevel(center, width, name, silent) {
     // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
     if (width < 1) {
       return;
@@ -617,31 +644,33 @@ dwv.image.View = function (image) {
     }
 
     // new window level
-    var newWl = new dwv.image.WindowLevel(center, width);
+    const newWl = new WindowLevel(center, width);
 
     // check if new
-    var isNew = !newWl.equals(currentWl);
+    const isNew = !newWl.equals(this.#currentWl);
 
     // compare to previous if present
     if (isNew) {
-      var isNewWidth = currentWl ? currentWl.getWidth() !== width : true;
-      var isNewCenter = currentWl ? currentWl.getCenter() !== center : true;
+      const isNewWidth = this.#currentWl
+        ? this.#currentWl.getWidth() !== width : true;
+      const isNewCenter = this.#currentWl
+        ? this.#currentWl.getCenter() !== center : true;
       // assign
-      currentWl = newWl;
-      currentPresetName = name;
+      this.#currentWl = newWl;
+      this.#currentPresetName = name;
 
       if (isNewWidth || isNewCenter) {
         /**
          * Window/level change event.
          *
-         * @event dwv.image.View#wlchange
+         * @event View#wlchange
          * @type {object}
          * @property {Array} value The changed value.
          * @property {number} wc The new window center value.
          * @property {number} ww The new window wdth value.
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
-        fireEvent({
+        this.#fireEvent({
           type: 'wlchange',
           value: [center, width],
           wc: center,
@@ -650,7 +679,7 @@ dwv.image.View = function (image) {
         });
       }
     }
-  };
+  }
 
   /**
    * Set the window level to the preset with the input name.
@@ -658,8 +687,8 @@ dwv.image.View = function (image) {
    * @param {string} name The name of the preset to activate.
    * @param {boolean} silent Flag to launch events with skipGenerate.
    */
-  this.setWindowLevelPreset = function (name, silent) {
-    var preset = this.getWindowPresets()[name];
+  setWindowLevelPreset(name, silent) {
+    const preset = this.getWindowPresets()[name];
     if (typeof preset === 'undefined') {
       throw new Error('Unknown window level preset: \'' + name + '\'');
     }
@@ -668,17 +697,17 @@ dwv.image.View = function (image) {
       preset.wl = [this.getWindowLevelMinMax()];
     }
     // default to first
-    var wl = preset.wl[0];
+    let wl = preset.wl[0];
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      var offset = image.getSecondaryOffset(this.getCurrentIndex());
+      const offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
       wl = preset.wl[offset];
     }
     // set w/l
     this.setWindowLevel(
       wl.getCenter(), wl.getWidth(), name, silent);
-  };
+  }
 
   /**
    * Set the window level to the preset with the input id.
@@ -686,24 +715,24 @@ dwv.image.View = function (image) {
    * @param {number} id The id of the preset to activate.
    * @param {boolean} silent Flag to launch events with skipGenerate.
    */
-  this.setWindowLevelPresetById = function (id, silent) {
-    var keys = Object.keys(this.getWindowPresets());
+  setWindowLevelPresetById(id, silent) {
+    const keys = Object.keys(this.getWindowPresets());
     this.setWindowLevelPreset(keys[id], silent);
-  };
+  }
 
   /**
    * Clone the image using all meta data and the original data buffer.
    *
-   * @returns {dwv.image.View} A full copy of this {dwv.image.View}.
+   * @returns {View} A full copy of this {View}.
    */
-  this.clone = function () {
-    var copy = new dwv.image.View(this.getImage());
-    for (var key in windowLuts) {
-      copy.addWindowLut(windowLuts[key]);
+  clone() {
+    const copy = new View(this.getImage());
+    for (const key in this.#windowLuts) {
+      copy.addWindowLut(this.#windowLuts[key]);
     }
     copy.setListeners(this.getListeners());
     return copy;
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -712,9 +741,9 @@ dwv.image.View = function (image) {
    * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
 
   /**
    * Remove an event listener from this class.
@@ -723,9 +752,9 @@ dwv.image.View = function (image) {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
 
   /**
    * Fire an event: call all associated listeners with the input event object.
@@ -733,182 +762,183 @@ dwv.image.View = function (image) {
    * @param {object} event The event to fire.
    * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
-  }
-};
+  #fireEvent = (event) => {
+    this.#listenerHandler.fireEvent(event);
+  };
 
-/**
- * Get the image window/level that covers the full data range.
- * Warning: uses the latest set rescale LUT or the default linear one.
- *
- * @returns {object} A min/max window level.
- */
-dwv.image.View.prototype.getWindowLevelMinMax = function () {
-  var range = this.getImage().getRescaledDataRange();
-  var min = range.min;
-  var max = range.max;
-  var width = max - min;
-  // full black / white images, defaults to 1.
-  if (width < 1) {
-    dwv.logger.warn('Zero or negative window width, defaulting to one.');
-    width = 1;
-  }
-  var center = min + width / 2;
-  return new dwv.image.WindowLevel(center, width);
-};
-
-/**
- * Set the image window/level to cover the full data range.
- * Warning: uses the latest set rescale LUT or the default linear one.
- */
-dwv.image.View.prototype.setWindowLevelMinMax = function () {
-  // calculate center and width
-  var wl = this.getWindowLevelMinMax();
-  // set window level
-  this.setWindowLevel(wl.getCenter(), wl.getWidth(), 'minmax');
-};
-
-/**
- * Generate display image data to be given to a canvas.
- *
- * @param {Array} array The array to fill in.
- * @param {dwv.math.Index} index Optional index at which to generate,
- *   otherwise generates at current index.
- */
-dwv.image.View.prototype.generateImageData = function (array, index) {
-  // check index
-  if (typeof index === 'undefined') {
-    if (!this.getCurrentIndex()) {
-      this.setInitialIndex();
+  /**
+   * Get the image window/level that covers the full data range.
+   * Warning: uses the latest set rescale LUT or the default linear one.
+   *
+   * @returns {object} A min/max window level.
+   */
+  getWindowLevelMinMax() {
+    const range = this.getImage().getRescaledDataRange();
+    const min = range.min;
+    const max = range.max;
+    let width = max - min;
+    // full black / white images, defaults to 1.
+    if (width < 1) {
+      logger.warn('Zero or negative window width, defaulting to one.');
+      width = 1;
     }
-    index = this.getCurrentIndex();
+    const center = min + width / 2;
+    return new WindowLevel(center, width);
   }
 
-  var image = this.getImage();
-  var iterator = dwv.image.getSliceIterator(
-    image, index, false, this.getOrientation());
-
-  var photoInterpretation = image.getPhotometricInterpretation();
-  switch (photoInterpretation) {
-  case 'MONOCHROME1':
-  case 'MONOCHROME2':
-    dwv.image.generateImageDataMonochrome(
-      array,
-      iterator,
-      this.getAlphaFunction(),
-      this.getCurrentWindowLut(),
-      this.getColourMap()
-    );
-    break;
-
-  case 'PALETTE COLOR':
-    dwv.image.generateImageDataPaletteColor(
-      array,
-      iterator,
-      this.getAlphaFunction(),
-      this.getColourMap(),
-      image.getMeta().BitsStored === 16
-    );
-    break;
-
-  case 'RGB':
-    dwv.image.generateImageDataRgb(
-      array,
-      iterator,
-      this.getAlphaFunction(),
-      this.getCurrentWindowLut()
-    );
-    break;
-
-  case 'YBR_FULL':
-    dwv.image.generateImageDataYbrFull(
-      array,
-      iterator,
-      this.getAlphaFunction()
-    );
-    break;
-
-  default:
-    throw new Error(
-      'Unsupported photometric interpretation: ' + photoInterpretation);
+  /**
+   * Set the image window/level to cover the full data range.
+   * Warning: uses the latest set rescale LUT or the default linear one.
+   */
+  setWindowLevelMinMax() {
+    // calculate center and width
+    const wl = this.getWindowLevelMinMax();
+    // set window level
+    this.setWindowLevel(wl.getCenter(), wl.getWidth(), 'minmax');
   }
-};
 
-/**
- * Increment the provided dimension.
- *
- * @param {number} dim The dimension to increment.
- * @param {boolean} silent Do not send event.
- * @returns {boolean} False if not in bounds.
- */
-dwv.image.View.prototype.incrementIndex = function (dim, silent) {
-  var index = this.getCurrentIndex();
-  var values = new Array(index.length());
-  values.fill(0);
-  if (dim < values.length) {
-    values[dim] = 1;
-  } else {
-    console.warn('Cannot increment given index: ', dim, values.length);
+  /**
+   * Generate display image data to be given to a canvas.
+   *
+   * @param {Array} array The array to fill in.
+   * @param {Index} index Optional index at which to generate,
+   *   otherwise generates at current index.
+   */
+  generateImageData(array, index) {
+    // check index
+    if (typeof index === 'undefined') {
+      if (!this.getCurrentIndex()) {
+        this.setInitialIndex();
+      }
+      index = this.getCurrentIndex();
+    }
+
+    const image = this.getImage();
+    const iterator = getSliceIterator(
+      image, index, false, this.getOrientation());
+
+    const photoInterpretation = image.getPhotometricInterpretation();
+    switch (photoInterpretation) {
+    case 'MONOCHROME1':
+    case 'MONOCHROME2':
+      generateImageDataMonochrome(
+        array,
+        iterator,
+        this.getAlphaFunction(),
+        this.getCurrentWindowLut(),
+        this.getColourMap()
+      );
+      break;
+
+    case 'PALETTE COLOR':
+      generateImageDataPaletteColor(
+        array,
+        iterator,
+        this.getAlphaFunction(),
+        this.getColourMap(),
+        image.getMeta().BitsStored === 16
+      );
+      break;
+
+    case 'RGB':
+      generateImageDataRgb(
+        array,
+        iterator,
+        this.getAlphaFunction(),
+        this.getCurrentWindowLut()
+      );
+      break;
+
+    case 'YBR_FULL':
+      generateImageDataYbrFull(
+        array,
+        iterator,
+        this.getAlphaFunction()
+      );
+      break;
+
+    default:
+      throw new Error(
+        'Unsupported photometric interpretation: ' + photoInterpretation);
+    }
   }
-  var incr = new dwv.math.Index(values);
-  var newIndex = index.add(incr);
-  return this.setCurrentIndex(newIndex, silent);
-};
 
-/**
- * Decrement the provided dimension.
- *
- * @param {number} dim The dimension to increment.
- * @param {boolean} silent Do not send event.
- * @returns {boolean} False if not in bounds.
- */
-dwv.image.View.prototype.decrementIndex = function (dim, silent) {
-  var index = this.getCurrentIndex();
-  var values = new Array(index.length());
-  values.fill(0);
-  if (dim < values.length) {
-    values[dim] = -1;
-  } else {
-    console.warn('Cannot decrement given index: ', dim, values.length);
+  /**
+   * Increment the provided dimension.
+   *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} silent Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  incrementIndex(dim, silent) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = 1;
+    } else {
+      console.warn('Cannot increment given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    const newIndex = index.add(incr);
+    return this.setCurrentIndex(newIndex, silent);
   }
-  var incr = new dwv.math.Index(values);
-  var newIndex = index.add(incr);
-  return this.setCurrentIndex(newIndex, silent);
-};
 
-/**
- * Get the scroll dimension index.
- *
- * @returns {number} The index.
- */
-dwv.image.View.prototype.getScrollIndex = function () {
-  var index = null;
-  var orientation = this.getOrientation();
-  if (typeof orientation !== 'undefined') {
-    index = orientation.getThirdColMajorDirection();
-  } else {
-    index = 2;
+  /**
+   * Decrement the provided dimension.
+   *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} silent Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  decrementIndex(dim, silent) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = -1;
+    } else {
+      console.warn('Cannot decrement given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    const newIndex = index.add(incr);
+    return this.setCurrentIndex(newIndex, silent);
   }
-  return index;
-};
 
-/**
- * Decrement the scroll dimension index.
- *
- * @param {boolean} silent Do not send event.
- * @returns {boolean} False if not in bounds.
- */
-dwv.image.View.prototype.decrementScrollIndex = function (silent) {
-  return this.decrementIndex(this.getScrollIndex(), silent);
-};
+  /**
+   * Get the scroll dimension index.
+   *
+   * @returns {number} The index.
+   */
+  getScrollIndex() {
+    let index = null;
+    const orientation = this.getOrientation();
+    if (typeof orientation !== 'undefined') {
+      index = orientation.getThirdColMajorDirection();
+    } else {
+      index = 2;
+    }
+    return index;
+  }
 
-/**
- * Increment the scroll dimension index.
- *
- * @param {boolean} silent Do not send event.
- * @returns {boolean} False if not in bounds.
- */
-dwv.image.View.prototype.incrementScrollIndex = function (silent) {
-  return this.incrementIndex(this.getScrollIndex(), silent);
-};
+  /**
+   * Decrement the scroll dimension index.
+   *
+   * @param {boolean} silent Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  decrementScrollIndex(silent) {
+    return this.decrementIndex(this.getScrollIndex(), silent);
+  }
+
+  /**
+   * Increment the scroll dimension index.
+   *
+   * @param {boolean} silent Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  incrementScrollIndex(silent) {
+    return this.incrementIndex(this.getScrollIndex(), silent);
+  }
+
+} // class View

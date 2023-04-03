@@ -1,4 +1,5 @@
 // namespace
+// eslint-disable-next-line no-var
 var dcmb = dcmb || {};
 dcmb.utils = dcmb.utils || {};
 
@@ -6,28 +7,28 @@ dcmb.utils = dcmb.utils || {};
 dcmb.DataRunner = function () {
 
   // closure to self
-  var self = this;
+  const self = this;
 
   // data list
-  var dataList = null;
+  let dataList = null;
   // function runner
-  var functionRunner = null;
+  let functionRunner = null;
 
   // current data index
-  var dataIndex = 0;
+  let dataIndex = 0;
 
   // result array
-  var results = null;
+  let results = null;
 
   // status
-  var status = 'ready';
+  let status = 'ready';
 
   /**
    * Listener handler.
    *
    * @type {object}
    */
-  var listenerHandler = new dcmb.utils.ListenerHandler();
+  const listenerHandler = new dcmb.utils.ListenerHandler();
 
   // Get the status.
   this.getStatus = function () {
@@ -41,8 +42,8 @@ dcmb.DataRunner = function () {
 
   // Get the data header.
   this.getDataHeader = function () {
-    var header = [];
-    for (var i = 0; i < dataList.length; ++i) {
+    const header = [];
+    for (let i = 0; i < dataList.length; ++i) {
       header.push(dataList[i].name);
     }
     return header;
@@ -87,7 +88,7 @@ dcmb.DataRunner = function () {
     }
 
     // current data
-    var data = dataList[dataIndex];
+    const data = dataList[dataIndex];
 
     // console output
     console.log('Launch with: \'' + data.name + '\'');
@@ -97,7 +98,7 @@ dcmb.DataRunner = function () {
     // read according to type
     if (typeof data.file === 'undefined') {
       // XMLHttpRequest
-      var request = new XMLHttpRequest();
+      const request = new XMLHttpRequest();
       request.open('GET', data.url, true);
       request.responseType = 'arraybuffer';
       request.onload = function (/*event*/) {
@@ -106,7 +107,7 @@ dcmb.DataRunner = function () {
       request.send(null);
     } else {
       // FileReader
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function (event) {
         onloadBuffer(event.target.result);
       };

@@ -1,23 +1,24 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
 /**
  * Rescale LUT class.
  * Typically converts from integer to float.
- *
- * @class
- * @param {object} rsi The rescale slope and intercept.
- * @param {number} bitsStored The number of bits used to store the data.
  */
-dwv.image.RescaleLut = function (rsi, bitsStored) {
+export class RescaleLut {
+
+  /**
+   * The rescale slope.
+   *
+   * @private
+   * @type {RescaleSlopeAndIntercept}
+   */
+  #rsi;
+
   /**
    * The internal array.
    *
    * @private
    * @type {Float32Array}
    */
-  var lut = null;
+  #lut = null;
 
   /**
    * Flag to know if the lut is ready or not.
@@ -25,7 +26,7 @@ dwv.image.RescaleLut = function (rsi, bitsStored) {
    * @private
    * @type {boolean}
    */
-  var isReady = false;
+  #isReady = false;
 
   /**
    * The size of the LUT array.
@@ -33,16 +34,25 @@ dwv.image.RescaleLut = function (rsi, bitsStored) {
    * @private
    * @type {number}
    */
-  var length = Math.pow(2, bitsStored);
+  #length;
+
+  /**
+   * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
+   * @param {number} bitsStored The number of bits used to store the data.
+   */
+  constructor(rsi, bitsStored) {
+    this.#rsi = rsi;
+    this.#length = Math.pow(2, bitsStored);
+  }
 
   /**
    * Get the Rescale Slope and Intercept (RSI).
    *
    * @returns {object} The rescale slope and intercept object.
    */
-  this.getRSI = function () {
-    return rsi;
-  };
+  getRSI() {
+    return this.#rsi;
+  }
 
   /**
    * Is the lut ready to use or not? If not, the user must
@@ -50,35 +60,35 @@ dwv.image.RescaleLut = function (rsi, bitsStored) {
    *
    * @returns {boolean} True if the lut is ready to use.
    */
-  this.isReady = function () {
-    return isReady;
-  };
+  isReady() {
+    return this.#isReady;
+  }
 
   /**
    * Initialise the LUT.
    */
-  this.initialise = function () {
+  initialise() {
     // check if already initialised
-    if (isReady) {
+    if (this.#isReady) {
       return;
     }
     // create lut and fill it
-    lut = new Float32Array(length);
-    for (var i = 0; i < length; ++i) {
-      lut[i] = rsi.apply(i);
+    this.#lut = new Float32Array(this.#length);
+    for (let i = 0; i < this.#length; ++i) {
+      this.#lut[i] = this.#rsi.apply(i);
     }
     // update ready flag
-    isReady = true;
-  };
+    this.#isReady = true;
+  }
 
   /**
    * Get the length of the LUT array.
    *
    * @returns {number} The length of the LUT array.
    */
-  this.getLength = function () {
-    return length;
-  };
+  getLength() {
+    return this.#length;
+  }
 
   /**
    * Get the value of the LUT at the given offset.
@@ -86,7 +96,8 @@ dwv.image.RescaleLut = function (rsi, bitsStored) {
    * @param {number} offset The input offset in [0,2^bitsStored] range.
    * @returns {number} The float32 value of the LUT at the given offset.
    */
-  this.getValue = function (offset) {
-    return lut[offset];
-  };
-};
+  getValue(offset) {
+    return this.#lut[offset];
+  }
+
+} // class RescaleLut

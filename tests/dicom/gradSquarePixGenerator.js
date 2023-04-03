@@ -1,3 +1,7 @@
+// namespace
+// eslint-disable-next-line no-var
+var test = test || {};
+
 /**
  * GradSquarePixGenerator
  * Generates pixel data as a small gradient square.
@@ -5,33 +9,33 @@
  * @param {object} options The generator options.
  * @class
  */
-var GradSquarePixGenerator = function (options) {
+const GradSquarePixGenerator = function (options) {
 
-  var numberOfColumns = options.numberOfColumns;
-  var numberOfRows = options.numberOfRows;
-  var numberOfSamples = options.numberOfSamples;
-  var numberOfColourPlanes = options.numberOfColourPlanes;
-  var isRGB = options.photometricInterpretation === 'RGB';
+  const numberOfColumns = options.numberOfColumns;
+  const numberOfRows = options.numberOfRows;
+  const numberOfSamples = options.numberOfSamples;
+  const numberOfColourPlanes = options.numberOfColourPlanes;
+  const isRGB = options.photometricInterpretation === 'RGB';
 
-  var halfCols = numberOfColumns * 0.5;
-  var halfRows = numberOfRows * 0.5;
+  const halfCols = numberOfColumns * 0.5;
+  const halfRows = numberOfRows * 0.5;
 
-  var background = 0;
-  var maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
-  var max = 100;
+  const background = 0;
+  const maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
+  let max = 100;
 
   this.generate = function (pixelBuffer, sliceNumber) {
-    var getFunc = isRGB ? getRGB : getGrey;
+    const getFunc = isRGB ? getRGB : getGrey;
 
     // slice dependent max
     max = 100 + sliceNumber * 100;
 
     // main loop
-    var offset = 0;
-    for (var c = 0; c < numberOfColourPlanes; ++c) {
-      for (var j = 0; j < numberOfRows; ++j) {
-        for (var i = 0; i < numberOfColumns; ++i) {
-          for (var s = 0; s < numberOfSamples; ++s) {
+    let offset = 0;
+    for (let c = 0; c < numberOfColourPlanes; ++c) {
+      for (let j = 0; j < numberOfRows; ++j) {
+        for (let i = 0; i < numberOfColumns; ++i) {
+          for (let s = 0; s < numberOfSamples; ++s) {
             if (numberOfColourPlanes !== 1) {
               pixelBuffer[offset] = getFunc(i, j)[c];
             } else {
@@ -52,9 +56,9 @@ var GradSquarePixGenerator = function (options) {
    * @returns {Array} The grey value.
    */
   function getGrey(i, j) {
-    var value = background;
-    var jc = Math.abs(j - halfRows);
-    var ic = Math.abs(i - halfCols);
+    let value = background;
+    const jc = Math.abs(j - halfRows);
+    const ic = Math.abs(i - halfCols);
     if (jc < halfRows / 2 && ic < halfCols / 2) {
       value += (i * j) * (max / maxNoBounds);
     }
@@ -69,9 +73,9 @@ var GradSquarePixGenerator = function (options) {
    * @returns {Array} The [R,G,B] values.
    */
   function getRGB(i, j) {
-    var value = 0;
-    var jc = Math.abs(j - halfRows);
-    var ic = Math.abs(i - halfCols);
+    let value = 0;
+    const jc = Math.abs(j - halfRows);
+    const ic = Math.abs(i - halfCols);
     if (jc < halfRows / 2 && ic < halfCols / 2) {
       value += (i * j) * (max / maxNoBounds);
     }
@@ -82,7 +86,7 @@ var GradSquarePixGenerator = function (options) {
   }
 };
 
-dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
-dwv.dicom.pixelGenerators.gradSquare = {
+test.pixelGenerators = test.pixelGenerators || {};
+test.pixelGenerators.gradSquare = {
   generator: GradSquarePixGenerator
 };

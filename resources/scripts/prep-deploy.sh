@@ -48,16 +48,12 @@ fi
 
 info "Preparing deploy for '$fileName'"
 
-if [ "$(grep -c "<!-- dwv sources -->" $fileName)" -eq 1 ]
+if [ "$(grep -c "<!-- dwv build -->" $fileName)" -eq 1 ]
 then
   info "Switching dwv source to dwv build"
-  # start source comment
-  a0="\(<!-- dwv sources -->\)"
-  b0="\1<!--"
-  sed -i "s/${a0}/${b0}/g" $fileName
   # end source comment, remove start build comment
   a1="\(<!-- dwv build -->\)\(<!--\)"
-  b1="-->\1"
+  b1="\1"
   sed -i "s/${a1}/${b1}/g" $fileName
   # remove end build comment
   a2="\(-->\)\(<!-- local -->\)"
@@ -65,16 +61,7 @@ then
   sed -i "s/${a2}/${b2}/g" $fileName
 fi
 
-if [ "$(grep -c "../../node_modules" $fileName)" -eq 2 ]
-then
-  info "Move to local node_modules"
-  # change path to node_modules
-  a3="src=\"..\/..\/node_modules\/"
-  b3="src=\".\/node_modules\/"
-  sed -i "s/${a3}/${b3}/g" $fileName
-fi
-
-if [ "$(grep -c ": '../../decoders" $fileName)" -eq 4 ]
+if [ "$(grep -c "    '../../decoders" $fileName)" -eq 4 ]
 then
   info "Move to local decoders"
   # change path to decoders

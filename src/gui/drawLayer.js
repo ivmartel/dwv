@@ -1,33 +1,31 @@
-// namespaces
-var dwv = dwv || {};
-/** @namespace */
-dwv.gui = dwv.gui || {};
+import {ListenerHandler} from '../utils/listen';
+import {DrawController} from '../app/drawController';
+import {getScaledOffset} from './layerGroup';
+import {InteractionEventNames} from './generic';
 
-/**
- * The Konva namespace.
- *
- * @external Konva
- * @see https://konvajs.org/
- */
-var Konva = Konva || {};
+// external
+import Konva from 'konva';
 
 /**
  * Draw layer.
- *
- * @param {HTMLElement} containerDiv The layer div, its id will be used
- *   as this layer id.
- * @class
  */
-dwv.gui.DrawLayer = function (containerDiv) {
+export class DrawLayer {
 
-  // specific css class name
-  containerDiv.className += ' drawLayer';
+  /**
+   * The container div.
+   *
+   * @private
+   * @type {HTMLElement}
+   */
+  #containerDiv;
 
-  // closure to self
-  var self = this;
-
-  // konva stage
-  var konvaStage = null;
+  /**
+   * Konva stage.
+   *
+   * @private
+   * @type {Konva.Stage}
+   */
+  #konvaStage = null;
 
   /**
    * The layer base size as {x,y}.
@@ -35,7 +33,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var baseSize;
+  #baseSize;
 
   /**
    * The layer base spacing as {x,y}.
@@ -43,7 +41,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var baseSpacing;
+  #baseSpacing;
 
   /**
    * The layer fit scale.
@@ -51,7 +49,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var fitScale = {x: 1, y: 1};
+  #fitScale = {x: 1, y: 1};
 
   /**
    * The base layer offset.
@@ -59,7 +57,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var baseOffset = {x: 0, y: 0};
+  #baseOffset = {x: 0, y: 0};
 
   /**
    * The view offset.
@@ -67,7 +65,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var viewOffset = {x: 0, y: 0};
+  #viewOffset = {x: 0, y: 0};
 
   /**
    * The zoom offset.
@@ -75,7 +73,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var zoomOffset = {x: 0, y: 0};
+  #zoomOffset = {x: 0, y: 0};
 
   /**
    * The flip offset.
@@ -83,7 +81,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var flipOffset = {x: 0, y: 0};
+  #flipOffset = {x: 0, y: 0};
 
   /**
    * The draw controller.
@@ -91,7 +89,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var drawController = null;
+  #drawController = null;
 
   /**
    * The plane helper.
@@ -99,7 +97,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var planeHelper;
+  #planeHelper;
 
   /**
    * The associated data index.
@@ -107,16 +105,26 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    * @type {number}
    */
-  var dataIndex = null;
+  #dataIndex = null;
+
+  /**
+   * @param {HTMLElement} containerDiv The layer div, its id will be used
+   *   as this layer id.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+    // specific css class name
+    this.#containerDiv.className += ' drawLayer';
+  }
 
   /**
    * Get the associated data index.
    *
    * @returns {number} The index.
    */
-  this.getDataIndex = function () {
-    return dataIndex;
-  };
+  getDataIndex() {
+    return this.#dataIndex;
+  }
 
   /**
    * Listener handler.
@@ -124,44 +132,44 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @type {object}
    * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the Konva stage.
    *
    * @returns {object} The stage.
    */
-  this.getKonvaStage = function () {
-    return konvaStage;
-  };
+  getKonvaStage() {
+    return this.#konvaStage;
+  }
 
   /**
    * Get the Konva layer.
    *
    * @returns {object} The layer.
    */
-  this.getKonvaLayer = function () {
+  getKonvaLayer() {
     // there should only be one layer
-    return konvaStage.getLayers()[0];
-  };
+    return this.#konvaStage.getLayers()[0];
+  }
 
   /**
    * Get the draw controller.
    *
    * @returns {object} The controller.
    */
-  this.getDrawController = function () {
-    return drawController;
-  };
+  getDrawController() {
+    return this.#drawController;
+  }
 
   /**
    * Set the plane helper.
    *
    * @param {object} helper The helper.
    */
-  this.setPlaneHelper = function (helper) {
-    planeHelper = helper;
-  };
+  setPlaneHelper(helper) {
+    this.#planeHelper = helper;
+  }
 
   // common layer methods [start] ---------------
 
@@ -170,96 +178,97 @@ dwv.gui.DrawLayer = function (containerDiv) {
    *
    * @returns {string} The string id.
    */
-  this.getId = function () {
-    return containerDiv.id;
-  };
+  getId() {
+    return this.#containerDiv.id;
+  }
 
   /**
    * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
    */
-  this.getBaseSize = function () {
-    return baseSize;
-  };
+  getBaseSize() {
+    return this.#baseSize;
+  }
 
   /**
    * Get the layer opacity.
    *
    * @returns {number} The opacity ([0:1] range).
    */
-  this.getOpacity = function () {
-    return konvaStage.opacity();
-  };
+  getOpacity() {
+    return this.#konvaStage.opacity();
+  }
 
   /**
    * Set the layer opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).
    */
-  this.setOpacity = function (alpha) {
-    konvaStage.opacity(Math.min(Math.max(alpha, 0), 1));
-  };
+  setOpacity(alpha) {
+    this.#konvaStage.opacity(Math.min(Math.max(alpha, 0), 1));
+  }
 
   /**
    * Add a flip offset along the layer X axis.
    */
-  this.addFlipOffsetX = function () {
+  addFlipOffsetX() {
     // flip scale is handled by layer group
     // flip offset
-    var scale = konvaStage.scale();
-    var size = konvaStage.size();
-    flipOffset.x += size.width / scale.x;
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
+    this.#flipOffset.x += size.width / scale.x;
     // apply
-    var offset = konvaStage.offset();
-    offset.x += flipOffset.x;
-    konvaStage.offset(offset);
-  };
+    const offset = this.#konvaStage.offset();
+    offset.x += this.#flipOffset.x;
+    this.#konvaStage.offset(offset);
+  }
 
   /**
    * Add a flip offset along the layer Y axis.
    */
-  this.addFlipOffsetY = function () {
+  addFlipOffsetY() {
     // flip scale is handled by layer group
     // flip offset
-    var scale = konvaStage.scale();
-    var size = konvaStage.size();
-    flipOffset.y += size.height / scale.y;
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
+    this.#flipOffset.y += size.height / scale.y;
     // apply
-    var offset = konvaStage.offset();
-    offset.y += flipOffset.y;
-    konvaStage.offset(offset);
-  };
+    const offset = this.#konvaStage.offset();
+    offset.y += this.#flipOffset.y;
+    this.#konvaStage.offset(offset);
+  }
 
   /**
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
-   * @param {dwv.math.Point3D} center The scale center.
+   * @param {Point3D} center The scale center.
    */
-  this.setScale = function (newScale, center) {
-    var orientedNewScale = planeHelper.getTargetOrientedPositiveXYZ(newScale);
-    var finalNewScale = {
-      x: fitScale.x * orientedNewScale.x,
-      y: fitScale.y * orientedNewScale.y
+  setScale(newScale, center) {
+    const orientedNewScale =
+      this.#planeHelper.getTargetOrientedPositiveXYZ(newScale);
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
     };
 
-    var offset = konvaStage.offset();
+    const offset = this.#konvaStage.offset();
 
     if (Math.abs(newScale.x) === 1 &&
       Math.abs(newScale.y) === 1 &&
       Math.abs(newScale.z) === 1) {
       // reset zoom offset for scale=1
-      var resetOffset = {
-        x: offset.x - zoomOffset.x,
-        y: offset.y - zoomOffset.y
+      const resetOffset = {
+        x: offset.x - this.#zoomOffset.x,
+        y: offset.y - this.#zoomOffset.y
       };
       // store new offset
-      zoomOffset = {x: 0, y: 0};
-      konvaStage.offset(resetOffset);
+      this.#zoomOffset = {x: 0, y: 0};
+      this.#konvaStage.offset(resetOffset);
     } else {
       if (typeof center !== 'undefined') {
-        var worldCenter = planeHelper.getPlaneOffsetFromOffset3D({
+        let worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
           x: center.getX(),
           y: center.getY(),
           z: center.getZ()
@@ -268,96 +277,103 @@ dwv.gui.DrawLayer = function (containerDiv) {
         // compensated for baseOffset
         // TODO: justify...
         worldCenter = {
-          x: worldCenter.x + baseOffset.x,
-          y: worldCenter.y + baseOffset.y
+          x: worldCenter.x + this.#baseOffset.x,
+          y: worldCenter.y + this.#baseOffset.y
         };
 
-        var newOffset = dwv.gui.getScaledOffset(
-          offset, konvaStage.scale(), finalNewScale, worldCenter);
+        const newOffset = getScaledOffset(
+          offset, this.#konvaStage.scale(), finalNewScale, worldCenter);
 
-        var newZoomOffset = {
-          x: zoomOffset.x + newOffset.x - offset.x,
-          y: zoomOffset.y + newOffset.y - offset.y
+        const newZoomOffset = {
+          x: this.#zoomOffset.x + newOffset.x - offset.x,
+          y: this.#zoomOffset.y + newOffset.y - offset.y
         };
         // store new offset
-        zoomOffset = newZoomOffset;
-        konvaStage.offset(newOffset);
+        this.#zoomOffset = newZoomOffset;
+        this.#konvaStage.offset(newOffset);
       }
     }
 
-    konvaStage.scale(finalNewScale);
+    this.#konvaStage.scale(finalNewScale);
     // update labels
-    updateLabelScale(finalNewScale);
-  };
+    this.#updateLabelScale(finalNewScale);
+  }
 
   /**
    * Set the layer offset.
    *
    * @param {object} newOffset The offset as {x,y}.
    */
-  this.setOffset = function (newOffset) {
-    var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
-    konvaStage.offset({
+  setOffset(newOffset) {
+    const planeNewOffset =
+      this.#planeHelper.getPlaneOffsetFromOffset3D(newOffset);
+    this.#konvaStage.offset({
       x: planeNewOffset.x +
-        viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
+        this.#viewOffset.x +
+        this.#baseOffset.x +
+        this.#zoomOffset.x +
+        this.#flipOffset.x,
       y: planeNewOffset.y +
-        viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
+        this.#viewOffset.y +
+        this.#baseOffset.y +
+        this.#zoomOffset.y +
+        this.#flipOffset.y
     });
-  };
+  }
 
   /**
    * Set the base layer offset. Updates the layer offset.
    *
-   * @param {dwv.math.Vector3D} scrollOffset The scroll offset vector.
-   * @param {dwv.math.Vector3D} planeOffset The plane offset vector.
+   * @param {Vector3D} scrollOffset The scroll offset vector.
+   * @param {Vector3D} planeOffset The plane offset vector.
    * @returns {boolean} True if the offset was updated.
    */
-  this.setBaseOffset = function (scrollOffset, planeOffset) {
-    var scrollIndex = planeHelper.getNativeScrollIndex();
-    var newOffset = planeHelper.getPlaneOffsetFromOffset3D({
+  setBaseOffset(scrollOffset, planeOffset) {
+    const scrollIndex = this.#planeHelper.getNativeScrollIndex();
+    const newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
       x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
       y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
       z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
-    var needsUpdate = baseOffset.x !== newOffset.x ||
-      baseOffset.y !== newOffset.y;
+    const needsUpdate = this.#baseOffset.x !== newOffset.x ||
+      this.#baseOffset.y !== newOffset.y;
     // reset offset if needed
     if (needsUpdate) {
-      var offset = konvaStage.offset();
-      konvaStage.offset({
-        x: offset.x - baseOffset.x + newOffset.x,
-        y: offset.y - baseOffset.y + newOffset.y
+      const offset = this.#konvaStage.offset();
+      this.#konvaStage.offset({
+        x: offset.x - this.#baseOffset.x + newOffset.x,
+        y: offset.y - this.#baseOffset.y + newOffset.y
       });
-      baseOffset = newOffset;
+      this.#baseOffset = newOffset;
     }
     return needsUpdate;
-  };
+  }
 
   /**
    * Display the layer.
    *
    * @param {boolean} flag Whether to display the layer or not.
    */
-  this.display = function (flag) {
-    containerDiv.style.display = flag ? '' : 'none';
-  };
+  display(flag) {
+    this.#containerDiv.style.display = flag ? '' : 'none';
+  }
 
   /**
    * Check if the layer is visible.
    *
    * @returns {boolean} True if the layer is visible.
    */
-  this.isVisible = function () {
-    return containerDiv.style.display === '';
-  };
+  isVisible() {
+    return this.#containerDiv.style.display === '';
+  }
 
   /**
    * Draw the content (imageData) of the layer.
    * The imageData variable needs to be set
    */
-  this.draw = function () {
-    konvaStage.draw();
-  };
+  draw() {
+    this.#konvaStage.draw();
+  }
 
   /**
    * Initialise the layer: set the canvas and context
@@ -366,33 +382,33 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} spacing The image spacing as {x,y}.
    * @param {number} index The associated data index.
    */
-  this.initialise = function (size, spacing, index) {
+  initialise(size, spacing, index) {
     // set locals
-    baseSize = size;
-    baseSpacing = spacing;
-    dataIndex = index;
+    this.#baseSize = size;
+    this.#baseSpacing = spacing;
+    this.#dataIndex = index;
 
     // create stage
-    konvaStage = new Konva.Stage({
-      container: containerDiv,
-      width: baseSize.x,
-      height: baseSize.y,
+    this.#konvaStage = new Konva.Stage({
+      container: this.#containerDiv,
+      width: this.#baseSize.x,
+      height: this.#baseSize.y,
       listening: false
     });
     // reset style
     // (avoids a not needed vertical scrollbar)
-    konvaStage.getContent().setAttribute('style', '');
+    this.#konvaStage.getContent().setAttribute('style', '');
 
     // create layer
-    var konvaLayer = new Konva.Layer({
+    const konvaLayer = new Konva.Layer({
       listening: false,
       visible: true
     });
-    konvaStage.add(konvaLayer);
+    this.#konvaStage.add(konvaLayer);
 
     // create draw controller
-    drawController = new dwv.ctrl.DrawController(konvaLayer);
-  };
+    this.#drawController = new DrawController(konvaLayer);
+  }
 
   /**
    * Fit the layer to its parent container.
@@ -401,37 +417,43 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} fitSize The fit size as {x,y}.
    * @param {object} fitOffset The fit offset as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D, fitSize, fitOffset) {
+  fitToContainer(fitScale1D, fitSize, fitOffset) {
     // update konva
-    konvaStage.setWidth(fitSize.x);
-    konvaStage.setHeight(fitSize.y);
+    this.#konvaStage.setWidth(fitSize.x);
+    this.#konvaStage.setHeight(fitSize.y);
 
     // previous scale without fit
-    var previousScale = {
-      x: konvaStage.scale().x / fitScale.x,
-      y: konvaStage.scale().y / fitScale.y
+    const previousScale = {
+      x: this.#konvaStage.scale().x / this.#fitScale.x,
+      y: this.#konvaStage.scale().y / this.#fitScale.y
     };
     // update fit scale
-    fitScale = {
-      x: fitScale1D * baseSpacing.x,
-      y: fitScale1D * baseSpacing.y
+    this.#fitScale = {
+      x: fitScale1D * this.#baseSpacing.x,
+      y: fitScale1D * this.#baseSpacing.y
     };
     // update scale
-    konvaStage.scale({
-      x: previousScale.x * fitScale.x,
-      y: previousScale.y * fitScale.y
+    this.#konvaStage.scale({
+      x: previousScale.x * this.#fitScale.x,
+      y: previousScale.y * this.#fitScale.y
     });
 
     // update offsets
-    viewOffset = {
-      x: fitOffset.x / fitScale.x,
-      y: fitOffset.y / fitScale.y
+    this.#viewOffset = {
+      x: fitOffset.x / this.#fitScale.x,
+      y: fitOffset.y / this.#fitScale.y
     };
-    konvaStage.offset({
-      x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
+    this.#konvaStage.offset({
+      x: this.#viewOffset.x +
+        this.#baseOffset.x +
+        this.#zoomOffset.x +
+        this.#flipOffset.x,
+      y: this.#viewOffset.y +
+        this.#baseOffset.y +
+        this.#zoomOffset.y +
+        this.#flipOffset.y
     });
-  };
+  }
 
   /**
    * Check the visibility of a given group.
@@ -439,15 +461,15 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {string} id The id of the group.
    * @returns {boolean} True if the group is visible.
    */
-  this.isGroupVisible = function (id) {
+  isGroupVisible(id) {
     // get the group
-    var group = drawController.getGroup(id);
+    const group = this.#drawController.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
     // get visibility
     return group.isVisible();
-  };
+  }
 
   /**
    * Toggle the visibility of a given group.
@@ -455,9 +477,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {string} id The id of the group.
    * @returns {boolean} False if the group cannot be found.
    */
-  this.toogleGroupVisibility = function (id) {
+  toogleGroupVisibility(id) {
     // get the group
-    var group = drawController.getGroup(id);
+    const group = this.#drawController.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -468,7 +490,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
     this.draw();
 
     return true;
-  };
+  }
 
   /**
    * Delete a Draw from the stage.
@@ -477,9 +499,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
-  this.deleteDraw = function (id, exeCallback) {
-    drawController.deleteDraw(id, fireEvent, exeCallback);
-  };
+  deleteDraw(id, exeCallback) {
+    this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
+  }
 
   /**
    * Delete all Draws from the stage.
@@ -487,51 +509,51 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
-  this.deleteDraws = function (exeCallback) {
-    drawController.deleteDraws(fireEvent, exeCallback);
-  };
+  deleteDraws(exeCallback) {
+    this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
+  }
 
   /**
    * Enable and listen to container interaction events.
    */
-  this.bindInteraction = function () {
-    konvaStage.listening(true);
+  bindInteraction() {
+    this.#konvaStage.listening(true);
     // allow pointer events
-    containerDiv.style.pointerEvents = 'auto';
+    this.#containerDiv.style.pointerEvents = 'auto';
     // interaction events
-    var names = dwv.gui.interactionEventNames;
-    for (var i = 0; i < names.length; ++i) {
-      containerDiv.addEventListener(names[i], fireEvent);
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
+      this.#containerDiv.addEventListener(names[i], this.#fireEvent);
     }
-  };
+  }
 
   /**
    * Disable and stop listening to container interaction events.
    */
-  this.unbindInteraction = function () {
-    konvaStage.listening(false);
+  unbindInteraction() {
+    this.#konvaStage.listening(false);
     // disable pointer events
-    containerDiv.style.pointerEvents = 'none';
+    this.#containerDiv.style.pointerEvents = 'none';
     // interaction events
-    var names = dwv.gui.interactionEventNames;
-    for (var i = 0; i < names.length; ++i) {
-      containerDiv.removeEventListener(names[i], fireEvent);
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
+      this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
     }
-  };
+  }
 
   /**
    * Set the current position.
    *
-   * @param {dwv.math.Point} position The new position.
-   * @param {dwv.math.Index} index The new index.
+   * @param {Point} position The new position.
+   * @param {Index} index The new index.
    * @returns {boolean} True if the position was updated.
    */
-  this.setCurrentPosition = function (position, index) {
+  setCurrentPosition(position, index) {
     this.getDrawController().activateDrawLayer(
-      index, planeHelper.getScrollIndex());
+      index, this.#planeHelper.getScrollIndex());
     // TODO: add check
     return true;
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -540,9 +562,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
 
   /**
    * Remove an event listener from this class.
@@ -551,9 +573,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
 
   /**
    * Fire an event: call all associated listeners with the input event object.
@@ -561,11 +583,11 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} event The event to fire.
    * @private
    */
-  function fireEvent(event) {
-    event.srclayerid = self.getId();
-    event.dataid = dataIndex;
-    listenerHandler.fireEvent(event);
-  }
+  #fireEvent = (event) => {
+    event.srclayerid = this.getId();
+    event.dataid = this.#dataIndex;
+    this.#listenerHandler.fireEvent(event);
+  };
 
   // common layer methods [end] ---------------
 
@@ -575,15 +597,16 @@ dwv.gui.DrawLayer = function (containerDiv) {
    *
    * @param {object} scale The scale to compensate for as {x,y}.
    */
-  function updateLabelScale(scale) {
+  #updateLabelScale(scale) {
     // same formula as in style::applyZoomScale:
     // compensate for scale and times 2 so that font 10 looks like a 10
-    var ratioX = 2 / scale.x;
-    var ratioY = 2 / scale.y;
+    const ratioX = 2 / scale.x;
+    const ratioY = 2 / scale.y;
     // compensate scale for labels
-    var labels = konvaStage.find('Label');
-    for (var i = 0; i < labels.length; ++i) {
+    const labels = this.#konvaStage.find('Label');
+    for (let i = 0; i < labels.length; ++i) {
       labels[i].scale({x: ratioX, y: ratioY});
     }
   }
-}; // DrawLayer class
+
+} // DrawLayer class

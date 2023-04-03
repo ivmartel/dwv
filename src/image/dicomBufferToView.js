@@ -1,15 +1,17 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {logger} from '../utils/logger';
+import {
+  DicomParser,
+  cleanString,
+  getSyntaxDecompressionName
+} from '../dicom/dicomParser';
+import {ImageFactory} from './imageFactory';
+import {MaskFactory} from './maskFactory';
+import {PixelBufferDecoder} from './decoder';
 
 /**
- * Create a dwv.image.View from a DICOM buffer.
- *
- * @class
+ * Create a View from a DICOM buffer.
  */
-dwv.image.DicomBufferToView = function () {
-  // closure to self
-  var self = this;
+export class DicomBufferToView {
 
   /**
    * Converter options.
@@ -17,16 +19,16 @@ dwv.image.DicomBufferToView = function () {
    * @private
    * @type {object}
    */
-  var options;
+  #options;
 
   /**
    * Set the converter options.
    *
    * @param {object} opt The input options.
    */
-  this.setOptions = function (opt) {
-    options = opt;
-  };
+  setOptions(opt) {
+    this.#options = opt;
+  }
 
   /**
    * Pixel buffer decoder.
@@ -35,12 +37,12 @@ dwv.image.DicomBufferToView = function () {
    * @private
    * @type {object}
    */
-  var pixelDecoder = null;
+  #pixelDecoder = null;
 
   // local tmp storage
-  var dicomParserStore = [];
-  var finalBufferStore = [];
-  var decompressedSizes = [];
+  #dicomParserStore = [];
+  #finalBufferStore = [];
+  #decompressedSizes = [];
 
   /**
    * Generate the image object.
@@ -48,37 +50,37 @@ dwv.image.DicomBufferToView = function () {
    * @param {number} index The data index.
    * @param {string} origin The data origin.
    */
-  function generateImage(index, origin) {
-    var dicomElements = dicomParserStore[index].getDicomElements();
+  #generateImage(index, origin) {
+    const dicomElements = this.#dicomParserStore[index].getDicomElements();
 
-    var modality = dwv.dicom.cleanString(dicomElements.getFromKey('x00080060'));
-    var factory;
+    const modality = cleanString(dicomElements.getFromKey('x00080060'));
+    let factory;
     if (modality && modality === 'SEG') {
-      factory = new dwv.image.MaskFactory();
+      factory = new MaskFactory();
     } else {
-      factory = new dwv.image.ImageFactory();
+      factory = new ImageFactory();
     }
 
     // create the image
     try {
-      var image = factory.create(
+      const image = factory.create(
         dicomElements,
-        finalBufferStore[index],
-        options.numberOfFiles);
+        this.#finalBufferStore[index],
+        this.#options.numberOfFiles);
       // call onloaditem
-      self.onloaditem({
+      this.onloaditem({
         data: {
           image: image,
-          info: dicomParserStore[index].getRawDicomElements()
+          info: this.#dicomParserStore[index].getRawDicomElements()
         },
         source: origin
       });
     } catch (error) {
-      self.onerror({
+      this.onerror({
         error: error,
         source: origin
       });
-      self.onloadend({
+      this.onloadend({
         source: origin
       });
     }
@@ -89,9 +91,9 @@ dwv.image.DicomBufferToView = function () {
    *
    * @param {object} event The decoded item event.
    */
-  function onDecodedItem(event) {
+  #onDecodedItem(event) {
     // send progress
-    self.onprogress({
+    this.onprogress({
       lengthComputable: true,
       loaded: event.itemNumber + 1,
       total: event.numberOfItems,
@@ -99,33 +101,35 @@ dwv.image.DicomBufferToView = function () {
       source: origin
     });
 
-    var dataIndex = event.dataIndex;
+    const dataIndex = event.dataIndex;
 
     // store decoded data
-    var decodedData = event.data[0];
+    const decodedData = event.data[0];
     if (event.numberOfItems !== 1) {
       // allocate buffer if not done yet
-      if (typeof decompressedSizes[dataIndex] === 'undefined') {
-        decompressedSizes[dataIndex] = decodedData.length;
-        var fullSize = event.numberOfItems * decompressedSizes[dataIndex];
+      if (typeof this.#decompressedSizes[dataIndex] === 'undefined') {
+        this.#decompressedSizes[dataIndex] = decodedData.length;
+        const fullSize = event.numberOfItems *
+          this.#decompressedSizes[dataIndex];
         try {
-          finalBufferStore[dataIndex] = new decodedData.constructor(fullSize);
+          this.#finalBufferStore[dataIndex] =
+            new decodedData.constructor(fullSize);
         } catch (error) {
           if (error instanceof RangeError) {
-            var powerOf2 = Math.floor(Math.log(fullSize) / Math.log(2));
-            dwv.logger.error('Cannot allocate ' +
+            const powerOf2 = Math.floor(Math.log(fullSize) / Math.log(2));
+            logger.error('Cannot allocate ' +
               decodedData.constructor.name +
               ' of size: ' +
               fullSize + ' (>2^' + powerOf2 + ') for decompressed data.');
           }
           // abort
-          pixelDecoder.abort();
+          this.#pixelDecoder.abort();
           // send events
-          self.onerror({
+          this.onerror({
             error: error,
             source: origin
           });
-          self.onloadend({
+          this.onloadend({
             source: origin
           });
           // exit
@@ -133,20 +137,20 @@ dwv.image.DicomBufferToView = function () {
         }
       }
       // hoping for all items to have the same size...
-      if (decodedData.length !== decompressedSizes[dataIndex]) {
-        dwv.logger.warn('Unsupported varying decompressed data size: ' +
-          decodedData.length + ' != ' + decompressedSizes[dataIndex]);
+      if (decodedData.length !== this.#decompressedSizes[dataIndex]) {
+        logger.warn('Unsupported varying decompressed data size: ' +
+          decodedData.length + ' != ' + this.#decompressedSizes[dataIndex]);
       }
       // set buffer item data
-      finalBufferStore[dataIndex].set(
-        decodedData, decompressedSizes[dataIndex] * event.itemNumber);
+      this.#finalBufferStore[dataIndex].set(
+        decodedData, this.#decompressedSizes[dataIndex] * event.itemNumber);
     } else {
-      finalBufferStore[dataIndex] = decodedData;
+      this.#finalBufferStore[dataIndex] = decodedData;
     }
 
     // create image for the first item
     if (event.itemNumber === 0) {
-      generateImage(dataIndex, origin);
+      this.#generateImage(dataIndex, origin);
     }
   }
 
@@ -157,18 +161,19 @@ dwv.image.DicomBufferToView = function () {
    * @param {string} origin The data origin.
    * @param {number} dataIndex The data index.
    */
-  this.convert = function (buffer, origin, dataIndex) {
-    self.onloadstart({
+  convert(buffer, origin, dataIndex) {
+
+    this.onloadstart({
       source: origin,
       dataIndex: dataIndex
     });
 
     // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    var imageFactory = new dwv.ImageFactory();
+    const dicomParser = new DicomParser();
+    const imageFactory = new ImageFactory();
 
-    if (typeof options.defaultCharacterSet !== 'undefined') {
-      dicomParser.setDefaultCharacterSet(options.defaultCharacterSet);
+    if (typeof this.#options.defaultCharacterSet !== 'undefined') {
+      dicomParser.setDefaultCharacterSet(this.#options.defaultCharacterSet);
     }
     // parse the buffer
     try {
@@ -176,79 +181,81 @@ dwv.image.DicomBufferToView = function () {
       // check elements are good for image
       imageFactory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
-      self.onerror({
+      this.onerror({
         error: error,
         source: origin
       });
-      self.onloadend({
+      this.onloadend({
         source: origin
       });
       return;
     }
 
-    var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+    const pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
     // help GC: discard pixel buffer from elements
     dicomParser.getRawDicomElements().x7FE00010.value = [];
-    var syntax = dwv.dicom.cleanString(
+    const syntax = cleanString(
       dicomParser.getRawDicomElements().x00020010.value[0]);
-    var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-    var needDecompression = (algoName !== null);
+    const algoName = getSyntaxDecompressionName(syntax);
+    const needDecompression = (algoName !== null);
 
     // store
-    dicomParserStore[dataIndex] = dicomParser;
-    finalBufferStore[dataIndex] = pixelBuffer[0];
+    this.#dicomParserStore[dataIndex] = dicomParser;
+    this.#finalBufferStore[dataIndex] = pixelBuffer[0];
 
     if (needDecompression) {
       // gather pixel buffer meta data
-      var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
-      var pixelRepresentation =
+      const bitsAllocated =
+        dicomParser.getRawDicomElements().x00280100.value[0];
+      const pixelRepresentation =
         dicomParser.getRawDicomElements().x00280103.value[0];
-      var pixelMeta = {
+      const pixelMeta = {
         bitsAllocated: bitsAllocated,
         isSigned: (pixelRepresentation === 1)
       };
-      var columnsElement = dicomParser.getRawDicomElements().x00280011;
-      var rowsElement = dicomParser.getRawDicomElements().x00280010;
+      const columnsElement = dicomParser.getRawDicomElements().x00280011;
+      const rowsElement = dicomParser.getRawDicomElements().x00280010;
       if (typeof columnsElement !== 'undefined' &&
         typeof rowsElement !== 'undefined') {
         pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
       }
-      var samplesPerPixelElement = dicomParser.getRawDicomElements().x00280002;
+      const samplesPerPixelElement =
+        dicomParser.getRawDicomElements().x00280002;
       if (typeof samplesPerPixelElement !== 'undefined') {
         pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
       }
-      var planarConfigurationElement =
+      const planarConfigurationElement =
         dicomParser.getRawDicomElements().x00280006;
       if (typeof planarConfigurationElement !== 'undefined') {
         pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
       }
 
       // number of items
-      var numberOfItems = pixelBuffer.length;
+      const numberOfItems = pixelBuffer.length;
 
       // setup the decoder (one decoder per all converts)
-      if (pixelDecoder === null) {
-        pixelDecoder = new dwv.image.PixelBufferDecoder(
+      if (this.#pixelDecoder === null) {
+        this.#pixelDecoder = new PixelBufferDecoder(
           algoName, numberOfItems);
         // callbacks
         // pixelDecoder.ondecodestart: nothing to do
-        pixelDecoder.ondecodeditem = function (event) {
-          onDecodedItem(event);
+        this.#pixelDecoder.ondecodeditem = (event) => {
+          this.#onDecodedItem(event);
           // send onload and onloadend when all items have been decoded
           if (event.itemNumber + 1 === event.numberOfItems) {
-            self.onload(event);
-            self.onloadend(event);
+            this.onload(event);
+            this.onloadend(event);
           }
         };
         // pixelDecoder.ondecoded: nothing to do
         // pixelDecoder.ondecodeend: nothing to do
-        pixelDecoder.onerror = self.onerror;
-        pixelDecoder.onabort = self.onabort;
+        this.#pixelDecoder.onerror = this.onerror;
+        this.#pixelDecoder.onabort = this.onabort;
       }
 
       // launch decode
-      for (var i = 0; i < numberOfItems; ++i) {
-        pixelDecoder.decode(pixelBuffer[i], pixelMeta,
+      for (let i = 0; i < numberOfItems; ++i) {
+        this.#pixelDecoder.decode(pixelBuffer[i], pixelMeta,
           {
             itemNumber: i,
             numberOfItems: numberOfItems,
@@ -259,7 +266,7 @@ dwv.image.DicomBufferToView = function () {
     } else {
       // no decompression
       // send progress
-      self.onprogress({
+      this.onprogress({
         lengthComputable: true,
         loaded: 100,
         total: 100,
@@ -267,76 +274,82 @@ dwv.image.DicomBufferToView = function () {
         source: origin
       });
       // generate image
-      generateImage(dataIndex, origin);
+      this.#generateImage(dataIndex, origin);
       // send load events
-      self.onload({
+      this.onload({
         source: origin
       });
-      self.onloadend({
+      this.onloadend({
         source: origin
       });
     }
-  };
+  }
 
   /**
    * Abort a conversion.
    */
-  this.abort = function () {
+  abort() {
     // abort decoding, will trigger pixelDecoder.onabort
-    if (pixelDecoder) {
-      pixelDecoder.abort();
+    if (this.#pixelDecoder) {
+      this.#pixelDecoder.abort();
     }
-  };
-};
+  }
 
-/**
- * Handle a load start event.
- * Default does nothing.
- *
- * @param {object} _event The load start event.
- */
-dwv.image.DicomBufferToView.prototype.onloadstart = function (_event) {};
-/**
- * Handle a load item event.
- * Default does nothing.
- *
- * @param {object} _event The load item event.
- */
-dwv.image.DicomBufferToView.prototype.onloaditem = function (_event) {};
-/**
- * Handle a load progress event.
- * Default does nothing.
- *
- * @param {object} _event The progress event.
- */
-dwv.image.DicomBufferToView.prototype.onprogress = function (_event) {};
-/**
- * Handle a load event.
- * Default does nothing.
- *
- * @param {object} _event The load event fired
- *   when a file has been loaded successfully.
- */
-dwv.image.DicomBufferToView.prototype.onload = function (_event) {};
-/**
- * Handle a load end event.
- * Default does nothing.
- *
- * @param {object} _event The load end event fired
- *  when a file load has completed, successfully or not.
- */
-dwv.image.DicomBufferToView.prototype.onloadend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.image.DicomBufferToView.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.image.DicomBufferToView.prototype.onabort = function (_event) {};
+  /**
+   * Handle a load start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load start event.
+   */
+  onloadstart(_event) {}
+
+  /**
+   * Handle a load item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load item event.
+   */
+  onloaditem(_event) {}
+
+  /**
+   * Handle a load progress event.
+   * Default does nothing.
+   *
+   * @param {object} _event The progress event.
+   */
+  onprogress(_event) {}
+
+  /**
+   * Handle a load event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   *   when a file has been loaded successfully.
+   */
+  onload(_event) {}
+  /**
+   * Handle a load end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load end event fired
+   *  when a file load has completed, successfully or not.
+   */
+  onloadend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class DicomBufferToView

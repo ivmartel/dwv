@@ -1,6 +1,8 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {Size} from '../image/size';
+import {Spacing} from '../image/spacing';
+import {Geometry} from '../image/geometry';
+import {Image} from '../image/image';
+import {Point3D} from '../math/point';
 
 /**
  * Create a simple array buffer from an ImageData buffer.
@@ -8,20 +10,20 @@ dwv.image = dwv.image || {};
  * @param {object} imageData The ImageData taken from a context.
  * @returns {Array} The image buffer.
  */
-dwv.image.imageDataToBuffer = function (imageData) {
+function imageDataToBuffer(imageData) {
   // remove alpha
   // TODO support passing the full image data
-  var dataLen = imageData.data.length;
-  var buffer = new Uint8Array((dataLen / 4) * 3);
-  var j = 0;
-  for (var i = 0; i < dataLen; i += 4) {
+  const dataLen = imageData.data.length;
+  const buffer = new Uint8Array((dataLen / 4) * 3);
+  let j = 0;
+  for (let i = 0; i < dataLen; i += 4) {
     buffer[j] = imageData.data[i];
     buffer[j + 1] = imageData.data[i + 1];
     buffer[j + 2] = imageData.data[i + 2];
     j += 3;
   }
   return buffer;
-};
+}
 
 /**
  * Get an image from an input context imageData.
@@ -34,23 +36,23 @@ dwv.image.imageDataToBuffer = function (imageData) {
  * @param {string} imageUid The image UID.
  * @returns {object} The corresponding view.
  */
-dwv.image.getDefaultImage = function (
+function getDefaultImage(
   width, height, sliceIndex,
   imageBuffer, numberOfFrames,
   imageUid) {
   // image size
-  var imageSize = new dwv.image.Size([width, height, 1]);
+  const imageSize = new Size([width, height, 1]);
   // default spacing
   // TODO: misleading...
-  var imageSpacing = new dwv.image.Spacing([1, 1, 1]);
+  const imageSpacing = new Spacing([1, 1, 1]);
   // default origin
-  var origin = new dwv.math.Point3D(0, 0, sliceIndex);
+  const origin = new Point3D(0, 0, sliceIndex);
   // create image
-  var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing);
-  var image = new dwv.image.Image(geometry, imageBuffer, [imageUid]);
+  const geometry = new Geometry(origin, imageSize, imageSpacing);
+  const image = new Image(geometry, imageBuffer, [imageUid]);
   image.setPhotometricInterpretation('RGB');
   // meta information
-  var meta = {};
+  const meta = {};
   meta.BitsStored = 8;
   if (typeof numberOfFrames !== 'undefined') {
     meta.numberOfFiles = numberOfFrames;
@@ -58,7 +60,7 @@ dwv.image.getDefaultImage = function (
   image.setMeta(meta);
   // return
   return image;
-};
+}
 
 /**
  * Get data from an input image using a canvas.
@@ -67,22 +69,22 @@ dwv.image.getDefaultImage = function (
  * @param {object} origin The data origin.
  * @returns {object} A load data event.
  */
-dwv.image.getViewFromDOMImage = function (domImage, origin) {
+export function getViewFromDOMImage(domImage, origin) {
   // image size
-  var width = domImage.width;
-  var height = domImage.height;
+  const width = domImage.width;
+  const height = domImage.height;
 
   // draw the image in the canvas in order to get its data
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(domImage, 0, 0);
   // get the image data
-  var imageData = ctx.getImageData(0, 0, width, height);
+  const imageData = ctx.getImageData(0, 0, width, height);
 
   // image properties
-  var info = {};
+  const info = {};
   if (typeof domImage.origin === 'string') {
     info['origin'] = {value: domImage.origin};
   } else {
@@ -93,12 +95,12 @@ dwv.image.getViewFromDOMImage = function (domImage, origin) {
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
 
-  var sliceIndex = domImage.index ? domImage.index : 0;
+  const sliceIndex = domImage.index ? domImage.index : 0;
   info['imageUid'] = {value: sliceIndex};
 
   // create view
-  var imageBuffer = dwv.image.imageDataToBuffer(imageData);
-  var image = dwv.image.getDefaultImage(
+  const imageBuffer = imageDataToBuffer(imageData);
+  const image = getDefaultImage(
     width, height, sliceIndex, imageBuffer, 1, sliceIndex);
 
   // return
@@ -109,7 +111,7 @@ dwv.image.getViewFromDOMImage = function (domImage, origin) {
     },
     source: origin
   };
-};
+}
 
 /**
  * Get data from an input image using a canvas.
@@ -122,20 +124,20 @@ dwv.image.getViewFromDOMImage = function (domImage, origin) {
  * @param {number} dataIndex The data index.
  * @param {object} origin The data origin.
  */
-dwv.image.getViewFromDOMVideo = function (
+export function getViewFromDOMVideo(
   video, onloaditem, onload, onprogress, onloadend,
   dataIndex, origin) {
   // video size
-  var width = video.videoWidth;
-  var height = video.videoHeight;
+  const width = video.videoWidth;
+  const height = video.videoHeight;
 
   // default frame rate...
-  var frameRate = 30;
+  const frameRate = 30;
   // number of frames
-  var numberOfFrames = Math.ceil(video.duration * frameRate);
+  const numberOfFrames = Math.ceil(video.duration * frameRate);
 
   // video properties
-  var info = {};
+  const info = {};
   if (video.file) {
     info['fileName'] = {value: video.file.name};
     info['fileType'] = {value: video.file.type};
@@ -147,18 +149,18 @@ dwv.image.getViewFromDOMVideo = function (
   info['imageUid'] = {value: 0};
 
   // draw the image in the canvas in order to get its data
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
 
   // using seeked to loop through all video frames
   video.addEventListener('seeked', onseeked, false);
 
   // current frame index
-  var frameIndex = 0;
+  let frameIndex = 0;
   // video image
-  var image = null;
+  let image = null;
 
   /**
    * Draw the context and store it as a frame
@@ -175,11 +177,11 @@ dwv.image.getViewFromDOMVideo = function (
     // draw image
     ctx.drawImage(video, 0, 0);
     // context to image buffer
-    var imgBuffer = dwv.image.imageDataToBuffer(
+    const imgBuffer = imageDataToBuffer(
       ctx.getImageData(0, 0, width, height));
     if (frameIndex === 0) {
       // create view
-      image = dwv.image.getDefaultImage(
+      image = getDefaultImage(
         width, height, 1, imgBuffer, numberOfFrames, dataIndex);
       // call callback
       onloaditem({
@@ -196,7 +198,7 @@ dwv.image.getViewFromDOMVideo = function (
     ++frameIndex;
   }
 
-  var nextTime = 0;
+  let nextTime = 0;
 
   /**
    * Handle seeked event
@@ -223,4 +225,4 @@ dwv.image.getViewFromDOMVideo = function (
 
   // trigger the first seek
   video.currentTime = nextTime;
-};
+}

@@ -1,15 +1,13 @@
-// namespaces
-var dwv = dwv || {};
-dwv.io = dwv.io || {};
+import {startsWith, getFileExtension} from '../utils/string';
+import {getUrlFromUri} from '../utils/uri';
+import {getViewFromDOMImage} from '../image/domReader';
+import {fileContentTypes} from './filesLoader';
+import {urlContentTypes} from './urlsLoader';
 
 /**
  * Raw image loader.
- *
- * @class
  */
-dwv.io.RawImageLoader = function () {
-  // closure to self
-  var self = this;
+export class RawImageLoader {
 
   /**
    * if abort is triggered, all image.onload callbacks have to be cancelled
@@ -17,25 +15,25 @@ dwv.io.RawImageLoader = function () {
    * @type {boolean}
    * @private
    */
-  var aborted = false;
+  #aborted = false;
 
   /**
    * Set the loader options.
    *
    * @param {object} _opt The input options.
    */
-  this.setOptions = function (_opt) {
+  setOptions(_opt) {
     // does nothing
-  };
+  }
 
   /**
    * Is the load ongoing? TODO...
    *
    * @returns {boolean} True if loading.
    */
-  this.isLoading = function () {
+  isLoading() {
     return true;
-  };
+  }
 
   /**
    * Create a Data URI from an HTTP request response.
@@ -45,14 +43,14 @@ dwv.io.RawImageLoader = function () {
    * @returns {string} The data URI.
    * @private
    */
-  function createDataUri(response, dataType) {
+  #createDataUri(response, dataType) {
     // image type
-    var imageType = dataType;
+    let imageType = dataType;
     if (!imageType || imageType === 'jpg') {
       imageType = 'jpeg';
     }
     // create uri
-    var file = new Blob([response], {type: 'image/' + imageType});
+    const file = new Blob([response], {type: 'image/' + imageType});
     return window.URL.createObjectURL(file);
   }
 
@@ -63,30 +61,30 @@ dwv.io.RawImageLoader = function () {
    * @param {string} origin The data origin.
    * @param {number} index The data index.
    */
-  this.load = function (buffer, origin, index) {
-    aborted = false;
+  load(buffer, origin, index) {
+    this.#aborted = false;
     // create a DOM image
-    var image = new Image();
+    const image = new Image();
     // triggered by ctx.drawImage
-    image.onload = function (/*event*/) {
+    image.onload = (event) => {
       try {
-        if (!aborted) {
-          self.onprogress({
+        if (!this.#aborted) {
+          this.onprogress({
             lengthComputable: true,
             loaded: 100,
             total: 100,
             index: index,
             source: origin
           });
-          self.onload(dwv.image.getViewFromDOMImage(this, origin));
+          this.onload(getViewFromDOMImage(event.target, origin));
         }
       } catch (error) {
-        self.onerror({
+        this.onerror({
           error: error,
           source: origin
         });
       } finally {
-        self.onloadend({
+        this.onloadend({
           source: origin
         });
       }
@@ -96,147 +94,147 @@ dwv.io.RawImageLoader = function () {
     image.index = index;
     if (typeof origin === 'string') {
       // url case
-      var ext = origin.split('.').pop().toLowerCase();
-      image.src = createDataUri(buffer, ext);
+      const ext = origin.split('.').pop().toLowerCase();
+      image.src = this.#createDataUri(buffer, ext);
     } else {
       image.src = buffer;
     }
-  };
+  }
 
   /**
    * Abort load.
    */
-  this.abort = function () {
-    aborted = true;
-    self.onabort({});
-    self.onloadend({});
-  };
-
-}; // class RawImageLoader
-
-/**
- * Check if the loader can load the provided file.
- *
- * @param {object} file The file to check.
- * @returns {boolean} True if the file can be loaded.
- */
-dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
-  return file.type.match('image.*');
-};
-
-/**
- * Check if the loader can load the provided url.
- *
- * @param {string} url The url to check.
- * @param {object} options Optional url request options.
- * @returns {boolean} True if the url can be loaded.
- */
-dwv.io.RawImageLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
-  if (typeof options !== 'undefined' &&
-    typeof options.requestHeaders !== 'undefined') {
-    // starts with 'image/'
-    var isImage = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'image/');
-    };
-    return typeof options.requestHeaders.find(isImage) !== 'undefined';
+  abort() {
+    this.#aborted = true;
+    this.onabort({});
+    this.onloadend({});
   }
 
-  var urlObjext = dwv.utils.getUrlFromUri(url);
-  // extension
-  var ext = dwv.utils.getFileExtension(urlObjext.pathname);
-  var hasImageExt = (ext === 'jpeg') || (ext === 'jpg') ||
-            (ext === 'png') || (ext === 'gif');
+  /**
+   * Check if the loader can load the provided file.
+   *
+   * @param {object} file The file to check.
+   * @returns {boolean} True if the file can be loaded.
+   */
+  canLoadFile(file) {
+    return (typeof file.type !== 'undefined' &&
+      file.type.match('image.*'));
+  }
+
+  /**
+   * Check if the loader can load the provided url.
+   *
+   * @param {string} url The url to check.
+   * @param {object} options Optional url request options.
+   * @returns {boolean} True if the url can be loaded.
+   */
+  canLoadUrl(url, options) {
+    // if there are options.requestHeaders, just base check on them
+    if (typeof options !== 'undefined' &&
+      typeof options.requestHeaders !== 'undefined') {
+      // starts with 'image/'
+      const isImage = function (element) {
+        return element.name === 'Accept' &&
+          startsWith(element.value, 'image/');
+      };
+      return typeof options.requestHeaders.find(isImage) !== 'undefined';
+    }
+
+    const urlObjext = getUrlFromUri(url);
+    // extension
+    const ext = getFileExtension(urlObjext.pathname);
+    const hasImageExt = (ext === 'jpeg') || (ext === 'jpg') ||
+      (ext === 'png') || (ext === 'gif');
     // content type (for wado url)
-  var contentType = urlObjext.searchParams.get('contentType');
-  var hasContentType = contentType !== null &&
-        typeof contentType !== 'undefined';
-  var hasImageContentType = (contentType === 'image/jpeg') ||
-        (contentType === 'image/png') ||
-        (contentType === 'image/gif');
+    const contentType = urlObjext.searchParams.get('contentType');
+    const hasContentType = contentType !== null &&
+      typeof contentType !== 'undefined';
+    const hasImageContentType = (contentType === 'image/jpeg') ||
+      (contentType === 'image/png') ||
+      (contentType === 'image/gif');
 
-  return hasContentType ? hasImageContentType : hasImageExt;
-};
-
-/**
- * Check if the loader can load the provided memory object.
- *
- * @param {object} mem The memory object.
- * @returns {boolean} True if the object can be loaded.
- */
-dwv.io.RawImageLoader.prototype.canLoadMemory = function (mem) {
-  if (typeof mem.filename !== 'undefined') {
-    return this.canLoadFile(mem.filename);
+    return hasContentType ? hasImageContentType : hasImageExt;
   }
-  return false;
-};
 
-/**
- * Get the file content type needed by the loader.
- *
- * @returns {number} One of the 'dwv.io.fileContentTypes'.
- */
-dwv.io.RawImageLoader.prototype.loadFileAs = function () {
-  return dwv.io.fileContentTypes.DataURL;
-};
+  /**
+   * Check if the loader can load the provided memory object.
+   *
+   * @param {object} mem The memory object.
+   * @returns {boolean} True if the object can be loaded.
+   */
+  canLoadMemory(mem) {
+    if (typeof mem.filename !== 'undefined') {
+      return this.canLoadFile({name: mem.filename});
+    }
+    return false;
+  }
 
-/**
- * Get the url content type needed by the loader.
- *
- * @returns {number} One of the 'dwv.io.urlContentTypes'.
- */
-dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
-  return dwv.io.urlContentTypes.ArrayBuffer;
-};
+  /**
+   * Get the file content type needed by the loader.
+   *
+   * @returns {number} One of the 'fileContentTypes'.
+   */
+  loadFileAs() {
+    return fileContentTypes.DataURL;
+  }
 
-/**
- * Handle a load start event.
- * Default does nothing.
- *
- * @param {object} _event The load start event.
- */
-dwv.io.RawImageLoader.prototype.onloadstart = function (_event) {};
-/**
- * Handle a progress event.
- * Default does nothing.
- *
- * @param {object} _event The progress event.
- */
-dwv.io.RawImageLoader.prototype.onprogress = function (_event) {};
-/**
- * Handle a load event.
- * Default does nothing.
- *
- * @param {object} _event The load event fired
- *   when a file has been loaded successfully.
- */
-dwv.io.RawImageLoader.prototype.onload = function (_event) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- *
- * @param {object} _event The load end event fired
- *  when a file load has completed, successfully or not.
- */
-dwv.io.RawImageLoader.prototype.onloadend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.io.RawImageLoader.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.io.RawImageLoader.prototype.onabort = function (_event) {};
+  /**
+   * Get the url content type needed by the loader.
+   *
+   * @returns {number} One of the 'urlContentTypes'.
+   */
+  loadUrlAs() {
+    return urlContentTypes.ArrayBuffer;
+  }
 
-/**
- * Add to Loader list.
- */
-dwv.io.loaderList = dwv.io.loaderList || [];
-dwv.io.loaderList.push('RawImageLoader');
+  /**
+   * Handle a load start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load start event.
+   */
+  onloadstart(_event) {}
+
+  /**
+   * Handle a progress event.
+   * Default does nothing.
+   *
+   * @param {object} _event The progress event.
+   */
+  onprogress(_event) {}
+
+  /**
+   * Handle a load event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   *   when a file has been loaded successfully.
+   */
+  onload(_event) {}
+
+  /**
+   * Handle an load end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load end event fired
+   *  when a file load has completed, successfully or not.
+   */
+  onloadend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class RawImageLoader

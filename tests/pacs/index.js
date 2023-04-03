@@ -1,8 +1,19 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// call setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
-var _githubRaw = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/';
-var _dataDicom = [
+/**
+ * Setup.
+ */
+function onDOMContentLoaded() {
+  createAndPutHtml(_dataDicom, 'datadicom');
+  createAndPutHtml(_dataImg, 'dataimg');
+
+  const localChk = document.getElementById('islocal');
+  localChk.addEventListener('change', onLocalChkChange);
+}
+
+const _githubRaw = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/';
+const _dataDicom = [
   {
     title: 'Baby MRI',
     uri: {
@@ -105,7 +116,7 @@ var _dataDicom = [
   }
 ];
 
-var _dataImg = [
+const _dataImg = [
   {
     title: 'JPEG',
     uri: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/PET-image.jpg',
@@ -136,13 +147,13 @@ var _dataImg = [
  * @returns {string} The full dwv url.
  */
 function getDwvUrl(uri) {
-  var uricomp = null;
+  let uricomp = null;
   if (typeof uri.type !== 'undefined') {
     uricomp = uri.file;
     if (uri.type === 'dwvtest') {
-      var localChk = document.getElementById('islocal');
-      var islocal = localChk ? localChk.checked : true;
-      var uriroot = '';
+      const localChk = document.getElementById('islocal');
+      const islocal = localChk ? localChk.checked : true;
+      let uriroot = '';
       if (islocal) {
         uriroot = '../';
       } else {
@@ -154,12 +165,12 @@ function getDwvUrl(uri) {
     uricomp = uri;
   }
 
-  var uriargs = '';
+  let uriargs = '';
   if (typeof uri.args !== 'undefined') {
     uriargs = uri.args;
   }
 
-  var url = 'viewer.html';
+  let url = 'viewer.html';
   if (typeof uri !== 'undefined') {
     url += '?input=' + encodeURIComponent(uricomp) + uriargs;
   }
@@ -173,35 +184,35 @@ function getDwvUrl(uri) {
  * @param {string} id The html list element.
  */
 function createAndPutHtml(data, id) {
-  for (var i = 0; i < data.length; ++i) {
+  for (let i = 0; i < data.length; ++i) {
     // image
-    var image = document.createElement('img');
+    const image = document.createElement('img');
     image.src = './images/' + data[i].img;
     // title
-    var title = document.createElement('h2');
+    const title = document.createElement('h2');
     title.appendChild(document.createTextNode(data[i].title));
     // description
-    var desc = document.createElement('p');
+    const desc = document.createElement('p');
     desc.appendChild(document.createTextNode(data[i].desc));
     if (data[i].comment) {
-      var comment = document.createElement('b');
+      const comment = document.createElement('b');
       comment.appendChild(document.createTextNode(' ' + data[i].comment));
       desc.appendChild(comment);
     }
 
     // link
-    var link = document.createElement('a');
+    const link = document.createElement('a');
     link.href = getDwvUrl(data[i].uri);
     link.id = i;
     link.className = 'dwvlink ' + id;
     link.appendChild(image);
 
     // list item
-    var li = document.createElement('li');
+    const li = document.createElement('li');
     li.appendChild(link);
     li.appendChild(title);
     li.appendChild(desc);
-    var ul = document.getElementById('ul_' + id);
+    const ul = document.getElementById('ul_' + id);
     ul.appendChild(li);
   }
 }
@@ -210,19 +221,8 @@ function createAndPutHtml(data, id) {
  * Update dicom links on checkbox change.
  */
 function onLocalChkChange() {
-  var links = document.getElementsByClassName('datadicom');
-  for (var i = 0; i < links.length; ++i) {
+  const links = document.getElementsByClassName('datadicom');
+  for (let i = 0; i < links.length; ++i) {
     links[i].href = getDwvUrl(_dataDicom[links[i].id].uri);
   }
 }
-
-/**
- * Last minute
- */
-dwv.test.onDOMContentLoadedPacs = function () {
-  createAndPutHtml(_dataDicom, 'datadicom');
-  createAndPutHtml(_dataImg, 'dataimg');
-
-  var localChk = document.getElementById('islocal');
-  localChk.addEventListener('change', onLocalChkChange);
-};

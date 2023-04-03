@@ -1,3 +1,17 @@
+import {
+  isEqualRgb,
+  ybrToRgb,
+  hexToRgb,
+  rgbToHex,
+  isDarkColour,
+  cielabToCiexyz,
+  ciexyzToCielab,
+  ciexyzToSrgb,
+  srgbToCiexyz,
+  cielabToSrgb,
+  srgbToCielab
+} from '../../src/utils/colour';
+
 /**
  * Tests for the 'utils/colour' file.
  */
@@ -6,11 +20,11 @@
 /* global QUnit */
 QUnit.module('utils');
 
-var isSimilar = function (a, b, tol) {
+const isSimilar = function (a, b, tol) {
   if (typeof tol === 'undefined') {
     tol = 1e-6;
   }
-  var diff = Math.abs(a - b);
+  const diff = Math.abs(a - b);
   if (tol / diff > 10) {
     console.log('precision could be lower: ', diff, tol);
   }
@@ -18,191 +32,191 @@ var isSimilar = function (a, b, tol) {
 };
 
 /**
- * Tests for {@link dwv.utils.isEqualRgb}.
+ * Tests for {@link isEqualRgb}.
  *
  * @function module:tests/utils~isEqualRgb
  */
 QUnit.test('Test isEqualRgb.', function (assert) {
-  var rgb00 = {r: 0, g: 0, b: 0};
-  var rgb01;
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb01), 'equal undefined #0');
-  assert.ok(!dwv.utils.isEqualRgb(rgb01, rgb00), 'equal undefined #1');
-  assert.ok(!dwv.utils.isEqualRgb(rgb01, rgb01), 'equal undefined #2');
-  var rgb02 = null;
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb02), 'equal null #0');
-  assert.ok(!dwv.utils.isEqualRgb(rgb02, rgb00), 'equal null #0');
-  assert.ok(!dwv.utils.isEqualRgb(rgb02, rgb02), 'equal null #2');
+  const rgb00 = {r: 0, g: 0, b: 0};
+  let rgb01;
+  assert.ok(!isEqualRgb(rgb00, rgb01), 'equal undefined #0');
+  assert.ok(!isEqualRgb(rgb01, rgb00), 'equal undefined #1');
+  assert.ok(!isEqualRgb(rgb01, rgb01), 'equal undefined #2');
+  const rgb02 = null;
+  assert.ok(!isEqualRgb(rgb00, rgb02), 'equal null #0');
+  assert.ok(!isEqualRgb(rgb02, rgb00), 'equal null #0');
+  assert.ok(!isEqualRgb(rgb02, rgb02), 'equal null #2');
 
-  var rgb03 = {r: undefined, g: undefined, b: undefined};
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb03), 'equal undefined prop #0');
-  assert.ok(dwv.utils.isEqualRgb(rgb03, rgb03), 'equal undefined prop #1');
+  const rgb03 = {r: undefined, g: undefined, b: undefined};
+  assert.ok(!isEqualRgb(rgb00, rgb03), 'equal undefined prop #0');
+  assert.ok(isEqualRgb(rgb03, rgb03), 'equal undefined prop #1');
 
-  assert.ok(dwv.utils.isEqualRgb(rgb00, rgb00), 'equal #0');
+  assert.ok(isEqualRgb(rgb00, rgb00), 'equal #0');
 
-  var rgb20 = {r: 1, g: 0, b: 0};
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb20), 'not equal #0');
-  var rgb21 = {r: 0, g: 1, b: 0};
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb21), 'not equal #1');
-  var rgb22 = {r: 0, g: 0, b: 1};
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb22), 'not equal #2');
-  var rgb23 = {r: 1, g: 1, b: 1};
-  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb23), 'not equal #3');
+  const rgb20 = {r: 1, g: 0, b: 0};
+  assert.ok(!isEqualRgb(rgb00, rgb20), 'not equal #0');
+  const rgb21 = {r: 0, g: 1, b: 0};
+  assert.ok(!isEqualRgb(rgb00, rgb21), 'not equal #1');
+  const rgb22 = {r: 0, g: 0, b: 1};
+  assert.ok(!isEqualRgb(rgb00, rgb22), 'not equal #2');
+  const rgb23 = {r: 1, g: 1, b: 1};
+  assert.ok(!isEqualRgb(rgb00, rgb23), 'not equal #3');
 });
 
 /**
- * Tests for {@link dwv.utils.ybrToRgb}.
+ * Tests for {@link ybrToRgb}.
  *
  * @function module:tests/utils~ybrToRgb
  */
 QUnit.test('Test ybrToRgb.', function (assert) {
-  var rgb00 = dwv.utils.ybrToRgb(0, 0, 0);
+  const rgb00 = ybrToRgb(0, 0, 0);
   assert.equal(rgb00.r, -179.456, 'ybr 0,0,0: red');
   assert.ok(isSimilar(rgb00.g, 135.459839), 'ybr 0,0,0: green');
   assert.equal(rgb00.b, -226.816, 'ybr 0,0,0: blue');
 
-  var rgb01 = dwv.utils.ybrToRgb(128, 128, 128);
+  const rgb01 = ybrToRgb(128, 128, 128);
   assert.equal(rgb01.r, 128, 'ybr 128,128,128: red');
   assert.equal(rgb01.g, 128, 'ybr 128,128,128: green');
   assert.equal(rgb01.b, 128, 'ybr 128,128,128: blue');
 
-  var rgb02 = dwv.utils.ybrToRgb(255, 255, 255);
+  const rgb02 = ybrToRgb(255, 255, 255);
   assert.equal(rgb02.r, 433.054, 'ybr 255,255,255: red');
   assert.equal(rgb02.g, 120.59844, 'ybr 255,255,255: green');
   assert.equal(rgb02.b, 480.044, 'ybr 255,255,255: blue');
 });
 
 /**
- * Tests for {@link dwv.utils.hexToRgb}.
+ * Tests for {@link hexToRgb}.
  *
  * @function module:tests/utils~hexToRgb
  */
 QUnit.test('Test hexToRgb.', function (assert) {
-  var hex00 = '#000000';
-  var rgb00 = dwv.utils.hexToRgb(hex00);
+  const hex00 = '#000000';
+  const rgb00 = hexToRgb(hex00);
   assert.equal(rgb00.r, 0, 'hexToRgb #00: r');
   assert.equal(rgb00.g, 0, 'hexToRgb #00: g');
   assert.equal(rgb00.b, 0, 'hexToRgb #00: b');
-  assert.equal(dwv.utils.rgbToHex(rgb00), hex00, 'rgbToHex #00');
+  assert.equal(rgbToHex(rgb00), hex00, 'rgbToHex #00');
 
-  var hex01 = '#ffffff';
-  var rgb01 = dwv.utils.hexToRgb(hex01);
+  const hex01 = '#ffffff';
+  const rgb01 = hexToRgb(hex01);
   assert.equal(rgb01.r, 255, 'hexToRgb #01: r');
   assert.equal(rgb01.g, 255, 'hexToRgb #01: g');
   assert.equal(rgb01.b, 255, 'hexToRgb #01: b');
-  assert.equal(dwv.utils.rgbToHex(rgb01), hex01, 'rgbToHex #01');
+  assert.equal(rgbToHex(rgb01), hex01, 'rgbToHex #01');
 
-  var hex02 = '#7f7f7f';
-  var rgb02 = dwv.utils.hexToRgb(hex02);
+  const hex02 = '#7f7f7f';
+  const rgb02 = hexToRgb(hex02);
   assert.equal(rgb02.r, 127, 'hexToRgb #02: r');
   assert.equal(rgb02.g, 127, 'hexToRgb #02: g');
   assert.equal(rgb02.b, 127, 'hexToRgb #02: b');
-  assert.equal(dwv.utils.rgbToHex(rgb02), hex02, 'rgbToHex #02');
+  assert.equal(rgbToHex(rgb02), hex02, 'rgbToHex #02');
 
-  var hex03 = '#4e33d6';
-  var rgb03 = dwv.utils.hexToRgb(hex03);
+  const hex03 = '#4e33d6';
+  const rgb03 = hexToRgb(hex03);
   assert.equal(rgb03.r, 78, 'hexToRgb #03: r');
   assert.equal(rgb03.g, 51, 'hexToRgb #03: g');
   assert.equal(rgb03.b, 214, 'hexToRgb #03: b');
-  assert.equal(dwv.utils.rgbToHex(rgb03), hex03, 'rgbToHex #03');
+  assert.equal(rgbToHex(rgb03), hex03, 'rgbToHex #03');
 });
 
 /**
- * Tests for {@link dwv.utils.isDarkColour}.
+ * Tests for {@link isDarkColour}.
  *
  * @function module:tests/utils~isDarkColour
  */
 QUnit.test('Test isDarkColour.', function (assert) {
-  var test00 = dwv.utils.isDarkColour('#000000');
+  const test00 = isDarkColour('#000000');
   assert.equal(test00, true, 'isDarkColour black');
 
-  var test01 = dwv.utils.isDarkColour('#ffffff');
+  const test01 = isDarkColour('#ffffff');
   assert.equal(test01, false, 'isDarkColour white');
 
-  var test02 = dwv.utils.isDarkColour('#7f7f7f');
+  const test02 = isDarkColour('#7f7f7f');
   assert.equal(test02, true, 'isDarkColour grey 0');
 
-  var test03 = dwv.utils.isDarkColour('#7f7f8f');
+  const test03 = isDarkColour('#7f7f8f');
   assert.equal(test03, false, 'isDarkColour grey 1');
 
-  var test04 = dwv.utils.isDarkColour('#4e33d6');
+  const test04 = isDarkColour('#4e33d6');
   assert.equal(test04, true, 'isDarkColour blue');
 });
 
 /**
- * Tests for {@link dwv.utils.cielabToCiexyz}.
+ * Tests for {@link cielabToCiexyz}.
  * ref: https://www.easyrgb.com/en/convert.php
  *
  * @function module:tests/utils~cielabToCiexyz
  */
 QUnit.test('Test cielab to ciexyz.', function (assert) {
-  var lab00 = {l: 0, a: 0, b: 0};
-  var xyz00 = dwv.utils.cielabToCiexyz(lab00);
+  const lab00 = {l: 0, a: 0, b: 0};
+  const xyz00 = cielabToCiexyz(lab00);
   assert.ok(isSimilar(xyz00.x, 0), 'lab 0,0,0: x');
   assert.ok(isSimilar(xyz00.y, 0), 'lab 0,0,0: y');
   assert.ok(isSimilar(xyz00.z, 0), 'lab 0,0,0: z');
 
-  var lab01 = {l: 100, a: 0, b: 0};
-  var xyz01 = dwv.utils.cielabToCiexyz(lab01);
+  const lab01 = {l: 100, a: 0, b: 0};
+  const xyz01 = cielabToCiexyz(lab01);
   assert.equal(xyz01.x, 95.0489, 'lab 100,0,0: x');
   assert.equal(xyz01.y, 100, 'lab 100,0,0: y');
   assert.equal(xyz01.z, 108.884, 'lab 100,0,0: z');
 });
 
 /**
- * Tests for {@link dwv.utils.ciexyzToCielab}.
+ * Tests for {@link ciexyzToCielab}.
  * ref: https://www.easyrgb.com/en/convert.php
  *
  * @function module:tests/utils~ciexyzToCielab
  */
 QUnit.test('Test ciexyz to cielab.', function (assert) {
-  var xyz00 = {x: 0, y: 0, z: 0};
-  var lab00 = dwv.utils.ciexyzToCielab(xyz00);
+  const xyz00 = {x: 0, y: 0, z: 0};
+  const lab00 = ciexyzToCielab(xyz00);
   assert.ok(isSimilar(lab00.l, 0), 'xyz 0,0,0: l');
   assert.equal(lab00.a, 0, 'xyz 0,0,0: a');
   assert.equal(lab00.b, 0, 'xyz 0,0,0: b');
 
-  var xyz01 = {x: 95.0489, y: 100, z: 108.884};
-  var lab01 = dwv.utils.ciexyzToCielab(xyz01);
+  const xyz01 = {x: 95.0489, y: 100, z: 108.884};
+  const lab01 = ciexyzToCielab(xyz01);
   assert.equal(lab01.l, 100, 'xyz 100,0,0: x');
   assert.equal(lab01.a, 0, 'xyz 100,0,0: y');
   assert.equal(lab01.b, 0, 'xyz 100,0,0: z');
 });
 
 /**
- * Tests for {@link dwv.utils.ciexyzToSrgb}.
+ * Tests for {@link ciexyzToSrgb}.
  * ref: https://www.easyrgb.com/en/convert.php
  *
  * @function module:tests/utils~ciexyzToSrgb
  */
 QUnit.test('Test ciexyz to srgb.', function (assert) {
-  var xyz00 = {x: 0, y: 0, z: 0};
-  var rgb00 = dwv.utils.ciexyzToSrgb(xyz00);
+  const xyz00 = {x: 0, y: 0, z: 0};
+  const rgb00 = ciexyzToSrgb(xyz00);
   assert.equal(rgb00.r, 0, 'xyz 0,0,0: r');
   assert.equal(rgb00.g, 0, 'xyz 0,0,0: g');
   assert.equal(rgb00.b, 0, 'xyz 0,0,0: b');
 
-  var xyz01 = {x: 95.0489, y: 100, z: 108.884};
-  var rgb01 = dwv.utils.ciexyzToSrgb(xyz01);
+  const xyz01 = {x: 95.0489, y: 100, z: 108.884};
+  const rgb01 = ciexyzToSrgb(xyz01);
   assert.equal(rgb01.r, 255, 'xyz D65: r');
   assert.equal(rgb01.g, 255, 'xyz D65: g');
   assert.equal(rgb01.b, 255, 'xyz D65: b');
 });
 
 /**
- * Tests for {@link dwv.utils.srgbToCiexyz}.
+ * Tests for {@link srgbToCiexyz}.
  * ref: https://www.easyrgb.com/en/convert.php
  *
  * @function module:tests/utils~srgbToCiexyz
  */
 QUnit.test('Test srgb to ciexyz.', function (assert) {
-  var rgb00 = {r: 0, g: 0, b: 0};
-  var xyz00 = dwv.utils.srgbToCiexyz(rgb00);
+  const rgb00 = {r: 0, g: 0, b: 0};
+  const xyz00 = srgbToCiexyz(rgb00);
   assert.equal(xyz00.x, 0, 'rgb 0,0,0: x');
   assert.equal(xyz00.y, 0, 'rgb 0,0,0: y');
   assert.equal(xyz00.z, 0, 'rgb 0,0,0: z');
 
-  var rgb01 = {r: 255, g: 255, b: 255};
-  var xyz01 = dwv.utils.srgbToCiexyz(rgb01);
+  const rgb01 = {r: 255, g: 255, b: 255};
+  const xyz01 = srgbToCiexyz(rgb01);
   // TODO: good enough precision?
   assert.ok(isSimilar(xyz01.x, 95.0489, 2e-3), 'rgb D65: x');
   assert.equal(xyz01.y, 100, 'rgb D65: y');
@@ -210,40 +224,40 @@ QUnit.test('Test srgb to ciexyz.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.utils.cielabToSrgb}.
+ * Tests for {@link cielabToSrgb}.
  * ref: https://www.easyrgb.com/en/convert.php
  *
  * @function module:tests/utils~cielabToSrgb
  */
 QUnit.test('Test cielab to rgb.', function (assert) {
-  var lab00 = {l: 0, a: 0, b: 0};
-  var rgb00 = dwv.utils.cielabToSrgb(lab00);
+  const lab00 = {l: 0, a: 0, b: 0};
+  const rgb00 = cielabToSrgb(lab00);
   assert.equal(rgb00.r, 0, 'lab 0,0,0: r');
   assert.equal(rgb00.g, 0, 'lab 0,0,0: g');
   assert.equal(rgb00.b, 0, 'lab 0,0,0: b');
 
-  var lab01 = {l: 100, a: 0, b: 0};
-  var rgb01 = dwv.utils.cielabToSrgb(lab01);
+  const lab01 = {l: 100, a: 0, b: 0};
+  const rgb01 = cielabToSrgb(lab01);
   assert.equal(rgb01.r, 255, 'lab 100,0,0: r');
   assert.equal(rgb01.g, 255, 'lab 100,0,0: g');
   assert.equal(rgb01.b, 255, 'lab 100,0,0: b');
 });
 
 /**
- * Tests for {@link dwv.utils.srgbToCielab}.
+ * Tests for {@link srgbToCielab}.
  * ref: https://www.easyrgb.com/en/convert.php
  *
  * @function module:tests/utils~srgbToCielab
  */
 QUnit.test('Test rgb to cielab.', function (assert) {
-  var rgb00 = {r: 0, g: 0, b: 0};
-  var lab00 = dwv.utils.srgbToCielab(rgb00);
+  const rgb00 = {r: 0, g: 0, b: 0};
+  const lab00 = srgbToCielab(rgb00);
   assert.ok(isSimilar(lab00.l, 0), 'rgb 0,0,0: l');
   assert.equal(lab00.a, 0, 'rgb 0,0,0: a');
   assert.equal(lab00.b, 0, 'rgb 0,0,0: b');
 
-  var rgb01 = {r: 255, g: 255, b: 255};
-  var lab01 = dwv.utils.srgbToCielab(rgb01);
+  const rgb01 = {r: 255, g: 255, b: 255};
+  const lab01 = srgbToCielab(rgb01);
   assert.equal(lab01.l, 100, 'rgb 100,0,0: l');
   // TODO: good enough precision?
   assert.ok(isSimilar(lab01.a, 0, 2e-3), 'rgb 100,0,0: a');

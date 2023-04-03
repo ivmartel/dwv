@@ -1,7 +1,3 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
 /**
  * Generate image data for 'MONOCHROME*' photometric interpretation.
  *
@@ -11,15 +7,15 @@ dwv.image = dwv.image || {};
  * @param {object} windowLut The window/level LUT.
  * @param {object} colourMap The colour map.
  */
-dwv.image.generateImageDataMonochrome = function (
+export function generateImageDataMonochrome(
   array,
   iterator,
   alphaFunc,
   windowLut,
   colourMap) {
-  var index = 0;
-  var pxValue = 0;
-  var ival = iterator.next();
+  let index = 0;
+  let pxValue = 0;
+  let ival = iterator.next();
   while (!ival.done) {
     // pixel value
     pxValue = windowLut.getValue(ival.value);
@@ -32,4 +28,4 @@ dwv.image.generateImageDataMonochrome = function (
     index += 4;
     ival = iterator.next();
   }
-};
+}
