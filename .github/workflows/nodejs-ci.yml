@@ -33,7 +33,7 @@ jobs:
       if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
       run: |
         rm -Rf ./node_modules/*
-        yarn install --prod
+        yarn install --prod --frozen-lockfile
         cp -Rf node_modules ./build
         cp -Rf decoders ./build
         cp -Rf tests/pacs/viewer.* ./build
