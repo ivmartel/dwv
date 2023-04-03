@@ -1,15 +1,28 @@
 /**
  * Rescale Slope and Intercept
- *
- * @class
- * @param {number} slope The slope of the RSI.
- * @param {number} intercept The intercept of the RSI.
  */
 export class RescaleSlopeAndIntercept {
 
+  /**
+   * The slope.
+   *
+   * @private
+   * @type {number}
+   */
   #slope;
+
+  /**
+   * The intercept.
+   *
+   * @private
+   * @type {number}
+   */
   #intercept;
 
+  /**
+   * @param {number} slope The slope of the RSI.
+   * @param {number} intercept The intercept of the RSI.
+   */
   constructor(slope, intercept) {
     /*// Check the rescale slope.
       if(typeof(slope) === 'undefined') {

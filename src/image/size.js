@@ -4,8 +4,6 @@ import {Index} from '../math/index';
  * Immutable Size class.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
- *
- * @class
  */
 export class Size {
 

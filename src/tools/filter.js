@@ -7,14 +7,20 @@ import {
 
 /**
  * Filter tool.
- *
- * @class
- * @param {App} app The associated app.
  */
 export class Filter {
 
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }
@@ -206,14 +212,19 @@ export class Filter {
 
 /**
  * Threshold filter tool.
- *
- * @class
- * @param {App} app The associated application.
  */
 export class Threshold {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }
@@ -311,14 +322,19 @@ export class Threshold {
 
 /**
  * Sharpen filter tool.
- *
- * @class
- * @param {App} app The associated application.
  */
 export class Sharpen {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }
@@ -399,14 +415,19 @@ export class Sharpen {
 
 /**
  * Sobel filter tool.
- *
- * @class
- * @param {App} app The associated application.
  */
 export class Sobel {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }
@@ -487,16 +508,29 @@ export class Sobel {
 
 /**
  * Run filter command.
- *
- * @class
- * @param {object} filter The filter to run.
- * @param {App} app The associated application.
  */
 export class RunFilterCommand {
 
+  /**
+   * The filter to run.
+   *
+   * @private
+   * @type {object}
+   */
   #filter;
+
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {object} filter The filter to run.
+   * @param {App} app The associated application.
+   */
   constructor(filter, app) {
     this.#filter = filter;
     this.#app = app;

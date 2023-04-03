@@ -35,15 +35,29 @@ export function validateWindowWidth(value) {
  * </pre>
  *
  * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
- * @param {number} center The window center.
- * @param {number} width The window width.
- * @class
  */
 export class WindowLevel {
 
+  /**
+   * The center.
+   *
+   * @private
+   * @type {number}
+   */
   #center;
+
+  /**
+   * The width.
+   *
+   * @private
+   * @type {number}
+   */
   #width;
 
+  /**
+   * @param {number} center The window center.
+   * @param {number} width The window width.
+   */
   constructor(center, width) {
     // check width
     if (width < MinWindowWidth) {

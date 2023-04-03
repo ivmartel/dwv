@@ -9,8 +9,6 @@ const defaultFreeHandLabelText = '';
 
 /**
  * FreeHand factory.
- *
- * @class
  */
 export class FreeHandFactory {
   /**

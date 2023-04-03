@@ -10,14 +10,19 @@ import {DrawGroupCommand} from '../tools/drawCommands';
 
 /**
  * Livewire painting tool.
- *
- * @class
- * @param {App} app The associated application.
  */
 export class Livewire {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }

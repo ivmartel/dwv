@@ -31,16 +31,28 @@ export function isSimilar(a, b, tol) {
 
 /**
  * Immutable 3x3 Matrix.
- *
- * @param {Array} values row-major ordered 9 values.
- * @class
  */
 export class Matrix33 {
 
+  /**
+   * Matrix values.
+   *
+   * @private
+   * @type {Array}
+   */
   #values;
-  // matrix inverse, calculated at first ask
+
+  /**
+   * Matrix inverse, calculated at first ask
+   *
+   * @private
+   * @type {Array}
+   */
   #inverse;
 
+  /**
+   * @param {Array} values row-major ordered 9 values.
+   */
   constructor(values) {
     this.#values = values;
   }

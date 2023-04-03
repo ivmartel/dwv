@@ -10,8 +10,6 @@ const defaultRoiLabelText = '';
 
 /**
  * ROI factory.
- *
- * @class
  */
 export class RoiFactory {
   /**

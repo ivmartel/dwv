@@ -515,7 +515,6 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
 /**
  * DicomParser class.
  *
- * @class
  * @example
  * // XMLHttpRequest onload callback
  * const onload = function (event) {

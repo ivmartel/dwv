@@ -2,8 +2,6 @@ import {ListenerHandler} from '../utils/listen';
 
 /**
  * UndoStack class.
- *
- * @class
  */
 export class UndoStack {
   /**

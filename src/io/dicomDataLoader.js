@@ -6,8 +6,6 @@ import {DicomBufferToView} from '../image/dicomBufferToView';
 
 /**
  * DICOM data loader.
- *
- * @class
  */
 export class DicomDataLoader {
 

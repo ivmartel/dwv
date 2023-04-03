@@ -14,8 +14,6 @@ const defaultCircleLabelText = '{surface}';
 
 /**
  * Circle factory.
- *
- * @class
  */
 export class CircleFactory {
   /**

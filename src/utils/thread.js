@@ -1,12 +1,12 @@
 /**
  * Thread Pool.
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
- *
- * @class
- * @param {number} poolSize The size of the pool.
  */
 export class ThreadPool {
 
+  /**
+   * @param {number} poolSize The size of the pool.
+   */
   constructor(poolSize) {
     this.poolSize = poolSize;
     // task queue
@@ -181,12 +181,12 @@ export class ThreadPool {
 
 /**
  * Worker thread.
- *
- * @class
- * @param {object} parentPool The parent pool.
  */
 class WorkerThread {
 
+  /**
+   * @param {object} parentPool The parent pool.
+   */
   constructor(parentPool) {
     this.parentPool = parentPool;
     // thread ID
@@ -272,13 +272,13 @@ class WorkerThread {
 
 /**
  * Worker task.
- *
- * @class
- * @param {string} script The worker script.
- * @param {object} message The data to pass to the worker.
- * @param {object} info Information object about the input data.
  */
 export class WorkerTask {
+  /**
+   * @param {string} script The worker script.
+   * @param {object} message The data to pass to the worker.
+   * @param {object} info Information object about the input data.
+   */
   constructor(script, message, info) {
     // worker script
     this.script = script;

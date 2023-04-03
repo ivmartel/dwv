@@ -4,8 +4,6 @@ import {WindowLevel, defaultPresets} from './windowLevel';
 
 /**
  * {@link View} factory.
- *
- * @class
  */
 export class ViewFactory {
 

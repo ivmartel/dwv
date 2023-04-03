@@ -5,8 +5,6 @@ import {urlContentTypes} from './urlsLoader';
 
 /**
  * JSON text loader.
- *
- * @class
  */
 export class JSONTextLoader {
 

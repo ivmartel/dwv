@@ -12,8 +12,6 @@ const defaultArrowLabelText = '';
 
 /**
  * Arrow factory.
- *
- * @class
  */
 export class ArrowFactory {
   /**

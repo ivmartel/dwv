@@ -21,18 +21,31 @@ function mulABC(a, b, c) {
 
 /**
  * Rectangle shape.
- *
- * @class
- * @param {Point2D} begin A Point2D representing the beginning
- *   of the rectangle.
- * @param {Point2D} end A Point2D representing the end
- *   of the rectangle.
  */
 export class Rectangle {
 
+  /**
+   * Rectangle begin point.
+   *
+   * @private
+   * @type {Point2D}
+   */
   #begin;
+
+  /**
+   * Rectangle end point.
+   *
+   * @private
+   * @type {Point2D}
+   */
   #end;
 
+  /**
+   * @param {Point2D} begin A Point2D representing the beginning
+   *   of the rectangle.
+   * @param {Point2D} end A Point2D representing the end
+   *   of the rectangle.
+   */
   constructor(begin, end) {
     this.#begin = new Point2D(
       Math.min(begin.getX(), end.getX()),

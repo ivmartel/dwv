@@ -21,19 +21,39 @@ function mulABC(a, b, c) {
 
 /**
  * Ellipse shape.
- *
- * @class
- * @param {Point2D} centre A Point2D representing the centre
- *   of the ellipse.
- * @param {number} a The radius of the ellipse on the horizontal axe.
- * @param {number} b The radius of the ellipse on the vertical axe.
  */
 export class Ellipse {
 
+  /**
+   * Ellipse centre.
+   *
+   * @private
+   * @type {Point2D}
+   */
   #centre;
+
+  /**
+   * Ellipse horizontal radius.
+   *
+   * @private
+   * @type {number}
+   */
   #a;
+
+  /**
+   * Ellipse vertical radius.
+   *
+   * @private
+   * @type {number}
+   */
   #b;
 
+  /**
+   * @param {Point2D} centre A Point2D representing the centre
+   *   of the ellipse.
+   * @param {number} a The radius of the ellipse on the horizontal axe.
+   * @param {number} b The radius of the ellipse on the vertical axe.
+   */
   constructor(centre, a, b) {
     this.#centre = centre;
     this.#a = a;

@@ -14,8 +14,6 @@ const defaultRectangleLabelText = '{surface}';
 
 /**
  * Rectangle factory.
- *
- * @class
  */
 export class RectangleFactory {
   /**

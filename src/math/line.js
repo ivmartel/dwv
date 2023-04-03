@@ -3,17 +3,30 @@ import {i18n} from '../utils/i18n';
 
 /**
  * Line shape.
- *
- * @class
- * @param {Point2D} begin A Point2D representing the beginning
- *   of the line.
- * @param {Point2D} end A Point2D representing the end of the line.
  */
 export class Line {
 
+  /**
+   * Line begin point.
+   *
+   * @private
+   * @type {Point2D}
+   */
   #begin;
+
+  /**
+   * Line end point.
+   *
+   * @private
+   * @type {Point2D}
+   */
   #end;
 
+  /**
+   * @param {Point2D} begin A Point2D representing the beginning
+   *   of the line.
+   * @param {Point2D} end A Point2D representing the end of the line.
+   */
   constructor(begin, end) {
     this.#begin = begin;
     this.#end = end;

@@ -251,8 +251,6 @@ class DefaultTextEncoder {
  *   const element = document.getElementById("download");
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
- *
- * @class
  */
 export class DicomWriter {
 

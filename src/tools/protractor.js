@@ -13,8 +13,6 @@ const defaultProtractorLabelText = '{angle}';
 
 /**
  * Protractor factory.
- *
- * @class
  */
 export class ProtractorFactory {
   /**

@@ -20,7 +20,6 @@ import {binderList} from '../gui/stage';
 /**
  * Main application class.
  *
- * @class
  * @example
  * // create the dwv app
  * const app = new App();

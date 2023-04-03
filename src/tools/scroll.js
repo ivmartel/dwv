@@ -5,8 +5,6 @@ import {ScrollWheel} from './scrollWheel';
 /**
  * Scroll class.
  *
- * @class
- * @param {App} app The associated application.
  * @example
  * // create the dwv app
  * const app = new App();
@@ -68,24 +66,41 @@ import {ScrollWheel} from './scrollWheel';
  * ]);
  */
 export class Scroll {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
+
   /**
    * Interaction start flag.
    *
+   * @private
    * @type {boolean}
    */
   #started = false;
+
   /**
    * Scroll wheel handler.
    *
+   * @private
    * @type {ScrollWheel}
    */
   #scrollWhell;
 
-  // touch timer ID (created by setTimeout)
+  /**
+   * Touch timer ID (created by setTimeout).
+   *
+   * @private
+   * @type {number}
+   */
   #touchTimerID = null;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);

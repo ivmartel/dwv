@@ -3,24 +3,30 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 /**
  * Scroll wheel class: provides a wheel event handler
  *   that scroll the corresponding data.
- *
- * @class
- * @param {App} app The associated application.
  */
 export class ScrollWheel {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
-
-  constructor(app) {
-    this.#app = app;
-  }
 
   /**
    * Accumulated wheel event deltaY.
    *
+   * @private
    * @type {number}
    */
   #wheelDeltaY = 0;
+
+  /**
+   * @param {App} app The associated application.
+   */
+  constructor(app) {
+    this.#app = app;
+  }
 
   /**
    * Handle mouse wheel event.

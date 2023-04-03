@@ -47,17 +47,21 @@ export const DRAW_DEBUG = false;
  * - shapeGroup > posGroup
  *    pros: more logical
  *    cons: slice/frame display: 2 loops
- *
- * @class
- * @param {App} app The associated application.
  */
 export class Draw {
 
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
   /**
    * Scroll wheel handler.
    *
+   * @private
    * @type {ScrollWheel}
    */
   #scrollWhell;
@@ -81,10 +85,14 @@ export class Draw {
   /**
    * Drawing style.
    *
+   * @private
    * @type {Style}
    */
   #style;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);

@@ -16,8 +16,6 @@ import {logger} from '../utils/logger';
 
 /**
  * {@link Image} factory.
- *
- * @class
  */
 export class ImageFactory {
 

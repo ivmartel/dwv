@@ -14,8 +14,6 @@ const defaultEllipseLabelText = '{surface}';
 
 /**
  * Ellipse factory.
- *
- * @class
  */
 export class EllipseFactory {
   /**

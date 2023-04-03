@@ -5,8 +5,6 @@ import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
 /**
  * WindowLevel tool: handle window/level related events.
  *
- * @class
- * @param {App} app The associated application.
  * @example
  * // create the dwv app
  * const app = new App();
@@ -26,20 +24,33 @@ import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
  */
 export class WindowLevel {
 
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
+
   /**
    * Interaction start flag.
    *
+   * @private
    * @type {boolean}
    */
   #started = false;
+
   /**
    * Scroll wheel handler.
    *
+   * @private
    * @type {ScrollWheel}
    */
   #scrollWhell;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);

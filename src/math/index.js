@@ -2,14 +2,20 @@
  * Immutable index.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
- *
- * @class
- * @param {Array} values The index values.
  */
 export class Index {
 
+  /**
+   * Index values.
+   *
+   * @private
+   * @type {Array}
+   */
   #values;
 
+  /**
+   * @param {Array} values The index values.
+   */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
       throw new Error('Cannot create index with no values.');

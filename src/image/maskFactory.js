@@ -542,8 +542,6 @@ function getSegmentFrameInfo(groupItem) {
 
 /**
  * Mask {@link Image} factory.
- *
- * @class
  */
 export class MaskFactory {
 

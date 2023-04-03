@@ -37,14 +37,20 @@ export function getDefaultAnchor(x, y, id, style) {
 
 /**
  * Shape editor.
- *
- * @param {object} app The associated application.
- * @class
  */
 export class ShapeEditor {
 
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }

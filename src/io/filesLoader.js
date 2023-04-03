@@ -10,8 +10,6 @@ export const fileContentTypes = {
 
 /**
  * Files loader.
- *
- * @class
  */
 export class FilesLoader {
 

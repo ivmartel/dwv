@@ -12,8 +12,6 @@ const defaultRulerLabelText = '{length}';
 
 /**
  * Ruler factory.
- *
- * @class
  */
 export class RulerFactory {
   /**

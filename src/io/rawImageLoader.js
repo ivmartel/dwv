@@ -6,8 +6,6 @@ import {urlContentTypes} from './urlsLoader';
 
 /**
  * Raw image loader.
- *
- * @class
  */
 export class RawImageLoader {
 

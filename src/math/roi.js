@@ -1,8 +1,6 @@
 /**
  * Region Of Interest shape.
  * Note: should be a closed path.
- *
- * @class
  */
 export class ROI {
 

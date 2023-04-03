@@ -10,20 +10,16 @@ import {getScaledOffset} from './layerGroup';
 
 /**
  * View layer.
- *
- * @param {object} containerDiv The layer div, its id will be used
- *   as this layer id.
- * @class
  */
 export class ViewLayer {
 
+  /**
+   * Container div.
+   *
+   * @private
+   * @type {HTMLElement}
+   */
   #containerDiv;
-
-  constructor(containerDiv) {
-    this.#containerDiv = containerDiv;
-    // specific css class name
-    this.#containerDiv.className += ' viewLayer';
-  }
 
   /**
    * The view controller.
@@ -170,15 +166,6 @@ export class ViewLayer {
   #dataIndex = null;
 
   /**
-   * Get the associated data index.
-   *
-   * @returns {number} The index.
-   */
-  getDataIndex() {
-    return this.#dataIndex;
-  }
-
-  /**
    * Listener handler.
    *
    * @private
@@ -194,6 +181,25 @@ export class ViewLayer {
    * @type {boolean}
    */
   #imageSmoothingEnabled = false;
+
+  /**
+   * @param {HTMLElement} containerDiv The layer div, its id will be used
+   *   as this layer id.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+    // specific css class name
+    this.#containerDiv.className += ' viewLayer';
+  }
+
+  /**
+   * Get the associated data index.
+   *
+   * @returns {number} The index.
+   */
+  getDataIndex() {
+    return this.#dataIndex;
+  }
 
   /**
    * Set the imageSmoothingEnabled flag value.

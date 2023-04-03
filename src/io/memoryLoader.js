@@ -3,8 +3,6 @@ import {loaderList} from './loaderList';
 
 /**
  * Memory loader.
- *
- * @class
  */
 export class MemoryLoader {
 

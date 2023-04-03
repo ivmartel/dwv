@@ -339,8 +339,6 @@ function gaussianBlur(buffer, out) {
  * {@link http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579}
  *
  * Highly inspired from {@link http://code.google.com/p/livewire-javascript/}
- *
- * @class
  */
 export class Scissors {
 

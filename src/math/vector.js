@@ -1,17 +1,37 @@
 /**
  * Immutable 3D vector.
- *
- * @class
- * @param {number} x The X component of the vector.
- * @param {number} y The Y component of the vector.
- * @param {number} z The Z component of the vector.
  */
 export class Vector3D {
 
+  /**
+   * X coordinate.
+   *
+   * @private
+   * @type {number}
+   */
   #x;
+
+  /**
+   * Y coordinate.
+   *
+   * @private
+   * @type {number}
+   */
   #y;
+
+  /**
+   * Z coordinate.
+   *
+   * @private
+   * @type {number}
+   */
   #z;
 
+  /**
+   * @param {number} x The X component of the vector.
+   * @param {number} y The Y component of the vector.
+   * @param {number} z The Z component of the vector.
+   */
   constructor(x, y, z) {
     this.#x = x;
     this.#y = y;

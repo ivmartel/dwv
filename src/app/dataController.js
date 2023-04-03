@@ -4,8 +4,6 @@ import {DicomElementsWrapper} from '../dicom/dicomElementsWrapper';
 
 /*
  * Data (list of {image, meta}) controller.
- *
- * @class
  */
 export class DataController {
 

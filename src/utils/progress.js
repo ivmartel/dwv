@@ -3,7 +3,6 @@
  * Stores a multi dimensional list of progresses to allow to
  * calculate a global progress.
  *
- * @param {Function} callback The function to pass the global progress to.
  */
 export class MultiProgressHandler {
 
@@ -27,8 +26,17 @@ export class MultiProgressHandler {
    */
   #numberOfDimensions = 2;
 
+  /**
+   * Progress callback.
+   *
+   * @private
+   * @type {Function}
+   */
   #callback;
 
+  /**
+   * @param {Function} callback The function to pass the global progress to.
+   */
   constructor(callback) {
     this.#callback = callback;
   }

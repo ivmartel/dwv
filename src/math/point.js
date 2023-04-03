@@ -3,16 +3,29 @@ import {Vector3D} from './vector';
 
 /**
  * Immutable 2D point.
- *
- * @class
- * @param {number} x The X coordinate for the point.
- * @param {number} y The Y coordinate for the point.
  */
 export class Point2D {
 
+  /**
+   * X position.
+   *
+   * @private
+   * @type {number}
+   */
   #x;
+
+  /**
+   * Y position.
+   *
+   * @private
+   * @type {number}
+   */
   #y;
 
+  /**
+   * @param {number} x The X coordinate for the point.
+   * @param {number} y The Y coordinate for the point.
+   */
   constructor(x, y) {
     this.#x = x;
     this.#y = y;
@@ -85,18 +98,38 @@ export class Point2D {
 
 /**
  * Immutable 3D point.
- *
- * @class
- * @param {number} x The X coordinate for the point.
- * @param {number} y The Y coordinate for the point.
- * @param {number} z The Z coordinate for the point.
  */
 export class Point3D {
 
+  /**
+   * X position.
+   *
+   * @private
+   * @type {number}
+   */
   #x;
+
+  /**
+   * Y position.
+   *
+   * @private
+   * @type {number}
+   */
   #y;
+
+  /**
+   * Z position.
+   *
+   * @private
+   * @type {number}
+   */
   #z;
 
+  /**
+   * @param {number} x The X coordinate for the point.
+   * @param {number} y The Y coordinate for the point.
+   * @param {number} z The Z coordinate for the point.
+   */
   constructor(x, y, z) {
     this.#x = x;
     this.#y = y;
@@ -230,14 +263,20 @@ export function getSimilarPoint3DFunction(point, tol) {
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
- *
- * @class
- * @param {Array} values The point values.
  */
 export class Point {
 
+  /**
+   * Point values.
+   *
+   * @private
+   * @type {number}
+   */
   #values;
 
+  /**
+   * @param {Array} values The point values.
+   */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
       throw new Error('Cannot create point with no values.');

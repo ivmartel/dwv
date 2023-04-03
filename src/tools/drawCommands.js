@@ -28,21 +28,55 @@ export function getShapeDisplayName(shape) {
 
 /**
  * Draw group command.
- *
- * @param {object} group The group draw.
- * @param {string} name The shape display name.
- * @param {object} layer The layer where to draw the group.
- * @param {boolean} silent Whether to send a creation event or not.
- * @class
  */
 export class DrawGroupCommand {
 
+  /**
+   * The group to draw.
+   *
+   * @private
+   * @type {Konva.Group}
+   */
   #group;
+
+  /**
+   * The shape display name.
+   *
+   * @private
+   * @type {string}
+   */
   #name;
+
+  /**
+   * The Konva layer.
+   *
+   * @private
+   * @type {Konva.Layer}
+   */
   #layer;
+
+  /**
+   * Flag to send events.
+   *
+   * @private
+   * @type {boolean}
+   */
   #isSilent;
+
+  /**
+   * The group parent.
+   *
+   * @private
+   * @type {object}
+   */
   #parent;
 
+  /**
+   * @param {Konva.Group} group The group draw.
+   * @param {string} name The shape display name.
+   * @param {Konva.Layer} layer The layer where to draw the group.
+   * @param {boolean} silent Whether to send a creation event or not.
+   */
   constructor(group, name, layer, silent) {
     this.#group = group;
     this.#name = name;
@@ -126,20 +160,47 @@ export class DrawGroupCommand {
 
 /**
  * Move group command.
- *
- * @param {object} group The group draw.
- * @param {string} name The shape display name.
- * @param {object} translation A 2D translation to move the group by.
- * @param {object} layer The layer where to move the group.
- * @class
  */
 export class MoveGroupCommand {
 
+  /**
+   * The group to move.
+   *
+   * @private
+   * @type {Konva.Group}
+   */
   #group;
+
+  /**
+   * The shape display name.
+   *
+   * @private
+   * @type {string}
+   */
   #name;
+
+  /**
+   * The 2D translation as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
   #translation;
+
+  /**
+   * The Konva layer.
+   *
+   * @private
+   * @type {Konva.Layer}
+   */
   #layer;
 
+  /**
+   * @param {Konva.Group} group The group draw.
+   * @param {string} name The shape display name.
+   * @param {object} translation A 2D translation to move the group by.
+   * @param {Konva.Layer} layer The layer where to move the group.
+   */
   constructor(group, name, translation, layer) {
     this.#group = group;
     this.#name = name;
@@ -224,26 +285,74 @@ export class MoveGroupCommand {
 
 /**
  * Change group command.
- *
- * @param {string} name The shape display name.
- * @param {object} func The change function.
- * @param {object} startAnchor The anchor that starts the change.
- * @param {object} endAnchor The anchor that ends the change.
- * @param {object} layer The layer where to change the group.
- * @param {object} viewController The associated viewController.
- * @param {object} style The app style.
- * @class
  */
 export class ChangeGroupCommand {
 
+  /**
+   * The shape display name.
+   *
+   * @private
+   * @type {string}
+   */
   #name;
+
+  /**
+   * The shape factory.
+   *
+   * @private
+   * @type {object}
+   */
   #factory;
+
+  /**
+   * The start anchor.
+   *
+   * @private
+   * @type {object}
+   */
   #startAnchor;
+
+  /**
+   * The end anchor.
+   *
+   * @private
+   * @type {object}
+   */
   #endAnchor;
+
+  /**
+   * The Konva layer.
+   *
+   * @private
+   * @type {Konva.Layer}
+   */
   #layer;
+
+  /**
+   * The associated view controller.
+   *
+   * @private
+   * @type {ViewController}
+   */
   #viewController;
+
+  /**
+   * The app style.
+   *
+   * @private
+   * @type {Style}
+   */
   #style;
 
+  /**
+   * @param {string} name The shape display name.
+   * @param {object} factory The shape factory.
+   * @param {object} startAnchor The anchor that starts the change.
+   * @param {object} endAnchor The anchor that ends the change.
+   * @param {Konva.Layer} layer The layer where to change the group.
+   * @param {ViewController} viewController The associated viewController.
+   * @param {Style} style The app style.
+   */
   constructor(
     name, factory, startAnchor, endAnchor, layer, viewController, style) {
     this.#name = name;
@@ -334,19 +443,46 @@ export class ChangeGroupCommand {
 
 /**
  * Delete group command.
- *
- * @param {object} group The group draw.
- * @param {string} name The shape display name.
- * @param {object} layer The layer where to delete the group.
- * @class
  */
 export class DeleteGroupCommand {
 
+  /**
+   * The group to draw.
+   *
+   * @private
+   * @type {Konva.Group}
+   */
   #group;
+
+  /**
+   * The shape display name.
+   *
+   * @private
+   * @type {string}
+   */
   #name;
+
+  /**
+   * The Konva layer.
+   *
+   * @private
+   * @type {Konva.Layer}
+   */
   #layer;
+
+  /**
+   * The group parent.
+   *
+   * @private
+   * @type {object}
+   */
   #parent;
 
+  /**
+   * @param {object} group The group draw.
+   * @param {string} name The shape display name.
+   * @param {object} layer The layer where to delete the group.
+   */
   constructor(group, name, layer) {
     this.#group = group;
     this.#name = name;

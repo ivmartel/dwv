@@ -5,8 +5,6 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 /**
  * ZoomAndPan class.
  *
- * @class
- * @param {App} app The associated application.
  * @example
  * // create the dwv app
  * const app = new App();
@@ -26,14 +24,25 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
  */
 export class ZoomAndPan {
 
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
+
   /**
    * Interaction start flag.
    *
+   * @private
    * @type {boolean}
    */
   #started = false;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }

@@ -6,8 +6,6 @@ import {urlContentTypes} from './urlsLoader';
 
 /**
  * Multipart data loader.
- *
- * @class
  */
 export class MultipartLoader {
 

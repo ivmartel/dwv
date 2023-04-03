@@ -1,7 +1,5 @@
 /**
  * Threshold an image between an input minimum and maximum.
- *
- * @class
  */
 export class Threshold {
   /**
@@ -113,8 +111,6 @@ export class Threshold {
 
 /**
  * Sharpen an image using a sharpen convolution matrix.
- *
- * @class
  */
 export class Sharpen {
   /**
@@ -172,8 +168,6 @@ export class Sharpen {
 
 /**
  * Apply a Sobel filter to an image.
- *
- * @class
  */
 export class Sobel {
   /**

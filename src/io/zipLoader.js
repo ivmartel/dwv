@@ -14,8 +14,6 @@ import JSZip from 'jszip';
 
 /**
  * ZIP data loader.
- *
- * @class
  */
 export class ZipLoader {
 

@@ -4,8 +4,6 @@ import {ScrollWheel} from './scrollWheel';
 /**
  * Opacity class.
  *
- * @class
- * @param {App} app The associated application.
  * @example
  * // create the dwv app
  * const app = new App();
@@ -24,7 +22,12 @@ import {ScrollWheel} from './scrollWheel';
  * ]);
  */
 export class Opacity {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
   /**
@@ -41,6 +44,9 @@ export class Opacity {
    */
   #scrollWhell;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);

@@ -29,8 +29,6 @@ import Konva from 'konva';
  *   - content: window-center, window-width, position, scale,
  *       scaleCenter, translation, drawings
  *   - drawings: array [nslices] with all groups
- *
- * @class
  */
 export class State {
   /**

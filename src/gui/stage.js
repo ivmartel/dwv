@@ -132,8 +132,6 @@ export const binderList = {
 /**
  * Stage: controls a list of layer groups and their
  * synchronisation.
- *
- * @class
  */
 export class Stage {
 

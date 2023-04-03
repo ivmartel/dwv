@@ -10,8 +10,6 @@ import {PixelBufferDecoder} from './decoder';
 
 /**
  * Create a View from a DICOM buffer.
- *
- * @class
  */
 export class DicomBufferToView {
 

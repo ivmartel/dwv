@@ -20,17 +20,30 @@ function mulABC(a, b, c) {
 
 /**
  * Circle shape.
- *
- * @class
- * @param {Point2D} centre A Point2D representing the centre
- *   of the circle.
- * @param {number} radius The radius of the circle.
  */
 export class Circle {
 
+  /**
+   * Circle centre.
+   *
+   * @private
+   * @type {Point2D}
+   */
   #centre;
+
+  /**
+   * Circle radius.
+   *
+   * @private
+   * @type {number}
+   */
   #radius;
 
+  /**
+   * @param {Point2D} centre A Point2D representing the centre
+   *   of the circle.
+   * @param {number} radius The radius of the circle.
+   */
   constructor(centre, radius) {
     this.#centre = centre;
     this.#radius = radius;

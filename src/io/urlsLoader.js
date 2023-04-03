@@ -11,8 +11,6 @@ export const urlContentTypes = {
 
 /**
  * Urls loader.
- *
- * @class
  */
 export class UrlsLoader {
 

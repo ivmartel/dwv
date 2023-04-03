@@ -2,8 +2,6 @@ import {getShadowColour} from '../utils/colour';
 
 /**
  * Style class.
- *
- * @class
  */
 export class Style {
   /**

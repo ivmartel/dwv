@@ -6,13 +6,13 @@
  *
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
- *
- * @class
- * @param {number} bits Number of bits.
- * @param {Function} cost_functor The cost functor.
  */
 export class BucketQueue {
 
+  /**
+   * @param {number} bits Number of bits.
+   * @param {Function} cost_functor The cost functor.
+   */
   constructor(bits, cost_functor) {
     this.bucketCount = 1 << bits; // # of buckets = 2^bits
     this.mask = this.bucketCount - 1; // 2^bits - 1 = index mask
@@ -26,7 +26,6 @@ export class BucketQueue {
       };
     this.buckets = this.buildArray(this.bucketCount);
   }
-
 
   push(item) {
     // Prepend item to the list in the appropriate bucket

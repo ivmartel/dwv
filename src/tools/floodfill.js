@@ -17,14 +17,19 @@ import MagicWand from 'magic-wand-tool';
 
 /**
  * Floodfill painting tool.
- *
- * @class
- * @param {App} app The associated application.
  */
 export class Floodfill {
-
+  /**
+   * Associated app.
+   *
+   * @private
+   * @type {App}
+   */
   #app;
 
+  /**
+   * @param {App} app The associated application.
+   */
   constructor(app) {
     this.#app = app;
   }
