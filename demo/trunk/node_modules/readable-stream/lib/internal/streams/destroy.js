@@ -15,9 +15,15 @@ function destroy(err, cb) {
   if (readableDestroyed || writableDestroyed) {
     if (cb) {
       cb(err);
-    } else if (err && (!this._writableState || !this._writableState.errorEmitted)) {
-      pna.nextTick(emitErrorNT, this, err);
+    } else if (err) {
+      if (!this._writableState) {
+        pna.nextTick(emitErrorNT, this, err);
+      } else if (!this._writableState.errorEmitted) {
+        this._writableState.errorEmitted = true;
+        pna.nextTick(emitErrorNT, this, err);
+      }
     }
+
     return this;
   }
 
@@ -35,9 +41,11 @@ function destroy(err, cb) {
 
   this._destroy(err || null, function (err) {
     if (!cb && err) {
-      pna.nextTick(emitErrorNT, _this, err);
-      if (_this._writableState) {
+      if (!_this._writableState) {
+        pna.nextTick(emitErrorNT, _this, err);
+      } else if (!_this._writableState.errorEmitted) {
         _this._writableState.errorEmitted = true;
+        pna.nextTick(emitErrorNT, _this, err);
       }
     } else if (cb) {
       cb(err);
@@ -59,6 +67,8 @@ function undestroy() {
     this._writableState.destroyed = false;
     this._writableState.ended = false;
     this._writableState.ending = false;
+    this._writableState.finalCalled = false;
+    this._writableState.prefinished = false;
     this._writableState.finished = false;
     this._writableState.errorEmitted = false;
   }

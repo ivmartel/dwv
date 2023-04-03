@@ -53,7 +53,7 @@ var Stream = require('./internal/streams/stream');
 /*<replacement>*/
 
 var Buffer = require('safe-buffer').Buffer;
-var OurUint8Array = global.Uint8Array || function () {};
+var OurUint8Array = (typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : {}).Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
 }
@@ -623,8 +623,8 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
       // also returned false.
       // => Check whether `dest` is still a piping destination.
       if ((state.pipesCount === 1 && state.pipes === dest || state.pipesCount > 1 && indexOf(state.pipes, dest) !== -1) && !cleanedUp) {
-        debug('false write response, pause', src._readableState.awaitDrain);
-        src._readableState.awaitDrain++;
+        debug('false write response, pause', state.awaitDrain);
+        state.awaitDrain++;
         increasedAwaitDrain = true;
       }
       src.pause();
@@ -718,7 +718,7 @@ Readable.prototype.unpipe = function (dest) {
     state.flowing = false;
 
     for (var i = 0; i < len; i++) {
-      dests[i].emit('unpipe', this, unpipeInfo);
+      dests[i].emit('unpipe', this, { hasUnpiped: false });
     }return this;
   }
 
