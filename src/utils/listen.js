@@ -1,19 +1,16 @@
 /**
  * ListenerHandler class: handles add/removing and firing listeners.
  *
- * @class
  * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget#example
  */
 export class ListenerHandler {
-
-  constructor() {
-    /**
-     * listeners.
-     *
-     * @private
-     */
-    this.listeners = {};
-  }
+  /**
+   * listeners.
+   *
+   * @private
+   * @type {object}
+   */
+  #listeners = {};
 
   /**
    * Add an event listener.
@@ -24,11 +21,11 @@ export class ListenerHandler {
    */
   add(type, callback) {
     // create array if not present
-    if (typeof this.listeners[type] === 'undefined') {
-      this.listeners[type] = [];
+    if (typeof this.#listeners[type] === 'undefined') {
+      this.#listeners[type] = [];
     }
     // add callback to listeners array
-    this.listeners[type].push(callback);
+    this.#listeners[type].push(callback);
   }
 
   /**
@@ -40,13 +37,13 @@ export class ListenerHandler {
    */
   remove(type, callback) {
     // check if the type is present
-    if (typeof this.listeners[type] === 'undefined') {
+    if (typeof this.#listeners[type] === 'undefined') {
       return;
     }
     // remove from listeners array
-    for (let i = 0; i < this.listeners[type].length; ++i) {
-      if (this.listeners[type][i] === callback) {
-        this.listeners[type].splice(i, 1);
+    for (let i = 0; i < this.#listeners[type].length; ++i) {
+      if (this.#listeners[type][i] === callback) {
+        this.#listeners[type].splice(i, 1);
       }
     }
   }
@@ -56,16 +53,16 @@ export class ListenerHandler {
    *
    * @param {object} event The event to fire.
    */
-  fireEvent(event) {
+  fireEvent = (event) => {
     // check if they are listeners for the event type
-    if (typeof this.listeners[event.type] === 'undefined') {
+    if (typeof this.#listeners[event.type] === 'undefined') {
       return;
     }
     // fire events from a copy of the listeners array
     // to avoid interference from possible add/remove
-    const stack = this.listeners[event.type].slice();
+    const stack = this.#listeners[event.type].slice();
     for (let i = 0; i < stack.length; ++i) {
       stack[i](event);
     }
-  }
+  };
 }
