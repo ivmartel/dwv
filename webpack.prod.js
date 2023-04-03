@@ -28,6 +28,7 @@ module.exports = merge(common, {
   },
   externals: {
     konva: 'Konva',
-    jszip: 'JSZip'
+    jszip: 'JSZip',
+    'magic-wand-tool': 'MagicWand'
   }
 });
