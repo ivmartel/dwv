@@ -11,10 +11,7 @@ These are the standards that should be used when coding for this project.
  * Versioning: [Semantic Versioning](http://semver.org/)
  * Branch: try to follow some kind of [branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 
-These standards are enforced using Continuous Integration with [github-actions](https://github.com/features/actions): builds using [node](http://nodejs.org/) (see `.github/workflows/nodejs-ci.yml`) and [yarn](https://classic.yarnpkg.com). The CI basically executes `yarn install` that reads the `package.json` file and then runs `yarn run test`. This test target is configured to run a task runner called [Grunt](http://gruntjs.com/) which is configured with the `Gruntfile.js` file. The `package.json` file contains shortcuts to grunt scripts:
-  * `yarn run test` -> [grunt-karma](https://www.npmjs.org/package/grunt-karma) that allows to run qunit tests using a headless browser such a Google Chrome
-  * `yarn run lint` -> [grunt-eslint](https://www.npmjs.org/package/grunt-eslint) that lints the code
-  * `yarn run build` -> [grunt-contrib-concat](https://www.npmjs.org/package/grunt-contrib-concat) that concatenates a list of files together and [grunt-contrib-uglify](https://www.npmjs.org/package/grunt-contrib-uglify) that minifies the code
+These standards are enforced using Continuous Integration with [github-actions](https://github.com/features/actions): builds using [node](http://nodejs.org/) (see `.github/workflows/nodejs-ci.yml`) and [yarn](https://classic.yarnpkg.com). The CI executes the lint and test scripts.
 
 Others
  * Icons: firefox-os [styleguide](http://www.mozilla.org/en-US/styleguide/products/firefox-os/icons/)
