@@ -28,7 +28,7 @@ export function getDefaultAnchor(x, y, id, style) {
       y: Math.abs(radius.y)
     },
     name: 'anchor',
-    id: id,
+    id: id.toString(),
     dragOnTop: false,
     draggable: true,
     visible: false
