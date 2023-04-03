@@ -5,7 +5,7 @@ import {Scissors} from '../math/scissors';
 import {guid} from '../math/stats';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
-import {RoiFactory} from '../math/roi';
+import {RoiFactory} from '../tools/roi';
 import {DrawGroupCommand} from '../tools/drawCommands';
 
 /**
