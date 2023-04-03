@@ -349,7 +349,7 @@ export class Floodfill {
     }
 
     clearTimeout(this.#painterTimeout);
-    this.#painterTimeout = setTimeout(function () {
+    this.#painterTimeout = setTimeout(() => {
       this.#border = this.#calcBorder(
         this.#initialpoint, modifyThreshold, true);
       if (!this.#border) {
