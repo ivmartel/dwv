@@ -1063,6 +1063,8 @@ export class DicomParser {
           element, reader, pixelRepresentation, bitsAllocated);
       }
       // delete interpretation specific properties
+      delete element.tag;
+      delete element.vl;
       delete element.startOffset;
       delete element.endOffset;
     }
