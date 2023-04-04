@@ -51,9 +51,9 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #generateImage(index, origin) {
-    const dicomElements = this.#dicomParserStore[index].getDicomElements();
+    const dicomElements = this.#dicomParserStore[index].getRawDicomElements();
 
-    const modality = cleanString(dicomElements.getFromKey('x00080060'));
+    const modality = cleanString(dicomElements['x00080060'].value[0]);
     let factory;
     if (modality && modality === 'SEG') {
       factory = new MaskFactory();
@@ -179,7 +179,7 @@ export class DicomBufferToView {
     try {
       dicomParser.parse(buffer);
       // check elements are good for image
-      imageFactory.checkElements(dicomParser.getDicomElements());
+      imageFactory.checkElements(dicomParser.getRawDicomElements());
     } catch (error) {
       this.onerror({
         error: error,

@@ -20,9 +20,9 @@ var arrayBuffer = new Uint8Array(data).buffer;
 var dicomParser = new dwv.dicom.DicomParser();
 dicomParser.parse(arrayBuffer);
 // wrapped tags
-var tags = dicomParser.getDicomElements();
+var tags = dicomParser.getRawDicomElements();
 // log
-console.log(tags.getFromName('PatientName'));
+console.log(tags['x00100010'].value[0]);
 ```
 
 To execute it, run:

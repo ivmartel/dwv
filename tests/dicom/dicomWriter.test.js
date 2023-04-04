@@ -11,7 +11,6 @@ import {
   getTagFromDictionary,
   getPixelDataTag
 } from '../../src/dicom/dicomTag';
-import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
 import {dictionary} from '../../src/dicom/dictionary';
 import {b64urlToArrayBuffer} from './utils';
 
@@ -204,8 +203,8 @@ function compare(jsonTags, dicomElements, name, comparator) {
     const tagName = keys[k];
     const tag = getTagFromDictionary(tagName);
     const tagKey = tag.getKey();
-    const element = dicomElements.getDEFromKey(tagKey);
-    const value = dicomElements.getFromKey(tagKey, true);
+    const element = dicomElements[tagKey];
+    const value = element.value;
     if (element.vr !== 'SQ') {
       let jsonTag = jsonTags[tagName];
       // stringify possible array
@@ -229,9 +228,8 @@ function compare(jsonTags, dicomElements, name, comparator) {
       // supposing same order of subkeys and indices...
       for (let i = 0; i < sqValue.length; ++i) {
         if (sqValue[i] !== 'undefinedLength') {
-          const wrap = new DicomElementsWrapper(value[i]);
           compare(
-            sqValue[i], wrap, name, comparator);
+            sqValue[i], value[i], name, comparator);
         }
       }
     }
@@ -384,7 +382,7 @@ function testWriteReadDataFromConfig(config, assert) {
   // parse the buffer
   const dicomParser = new DicomParser();
   dicomParser.parse(dicomBuffer);
-  const elements = dicomParser.getDicomElements();
+  const elements = dicomParser.getRawDicomElements();
 
   // compare contents
   compare(config.tags, elements, config.name, assert);

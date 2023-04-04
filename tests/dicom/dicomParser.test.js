@@ -47,28 +47,26 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
     'ReferencedImageSequence SQ (raw)');
 
   // wrapped tags
-  const tags = dicomParser.getDicomElements();
+  const tags = dicomParser.getRawDicomElements();
   // wrong key
-  assert.equal(tags.getFromKey('x12345678'), null, 'Wrong key');
-  assert.notOk(tags.getFromKey('x12345678'), 'Wrong key fails if test');
+  assert.ok(typeof tags['x12345678'] === 'undefined',
+    'Wrong key fails if test');
   // empty key
-  assert.equal(tags.getFromKey('x00081050'), '', 'Empty key');
-  assert.notOk(tags.getFromKey('x00081050'), 'Empty key fails if test');
+  assert.ok(typeof tags[''] === 'undefined',
+    'Empty key fails if test');
   // good key
-  assert.equal(tags.getFromKey('x00280010'), numRows, 'Good key');
-  assert.ok(tags.getFromKey('x00280010'), 'Good key passes if test');
-  // zero value (passes test since it is a string)
-  assert.equal(tags.getFromKey('x00181318'), 0, 'Good key, zero value');
-  assert.ok(tags.getFromKey('x00181318'),
-    'Good key, zero value passes if test');
+  assert.ok(typeof tags['x00280010'] !== 'undefined',
+    'Good key passes if test');
 
+  // zero value (passes test since it is a string)
+  assert.equal(tags['x00181318'].value[0], 0, 'Good key, zero value');
   // check values
-  assert.equal(tags.getFromName('Rows'), numRows, 'Number of rows');
-  assert.equal(tags.getFromName('Columns'), numCols, 'Number of columns');
+  assert.equal(tags['x00280010'].value[0], numRows, 'Number of rows');
+  assert.equal(tags['x00280011'].value[0], numCols, 'Number of columns');
   // ReferencedImageSequence - ReferencedSOPInstanceUID
   // only one item value -> returns the object directly
-  // (no need for tags.getFromName("ReferencedImageSequence")[0])
-  assert.equal(tags.getFromName('ReferencedImageSequence').x00081155.value[0],
+  // (no need for tags["ReferencedImageSequence")[0])
+  assert.equal(tags['x00081140'].value[0].x00081155.value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
     'ReferencedImageSequence SQ');
 
@@ -90,14 +88,11 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
   const dicomParser = new DicomParser();
   dicomParser.parse(buffer);
   // raw tags
-  const rawTags = dicomParser.getRawDicomElements();
-  assert.ok((Object.keys(rawTags).length !== 0), 'Got raw tags.');
-  // wrapped tags
-  const tags = dicomParser.getDicomElements();
-  assert.ok((tags.dumpToObject().length !== 0), 'Got wrapped tags.');
+  const tags = dicomParser.getRawDicomElements();
+  assert.ok((Object.keys(tags).length !== 0), 'Got raw tags.');
 
   // ReferencedImageSequence: explicit sequence
-  const seq00 = tags.getFromName('ReferencedImageSequence');
+  const seq00 = tags['x00081140'].value;
   assert.equal(seq00.length, 3, 'ReferencedImageSequence length');
   assert.equal(seq00[0].x00081155.value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
@@ -107,7 +102,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
     'ReferencedImageSequence - item1 - ReferencedSOPInstanceUID');
 
   // SourceImageSequence: implicit sequence
-  const seq01 = tags.getFromName('SourceImageSequence');
+  const seq01 = tags['x00082112'].value;
   assert.equal(seq01.length, 3, 'SourceImageSequence length');
   assert.equal(seq01[0].x00081155.value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
@@ -117,47 +112,47 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
     'SourceImageSequence - item1 - ReferencedSOPInstanceUID');
 
   // ReferencedPatientSequence: explicit empty sequence
-  const seq10 = tags.getFromName('ReferencedPatientSequence');
+  const seq10 = tags['x00081120'].value;
   assert.equal(seq10.length, 0, 'ReferencedPatientSequence length');
 
   // ReferencedOverlaySequence: implicit empty sequence
-  const seq11 = tags.getFromName('ReferencedOverlaySequence');
+  const seq11 = tags['x00081130'].value;
   assert.equal(seq11.length, 0, 'ReferencedOverlaySequence length');
 
   // ReferringPhysicianIdentificationSequence: explicit empty item
-  const seq12 = tags.getFromName('ReferringPhysicianIdentificationSequence');
-  assert.equal(seq12.xFFFEE000.value.length, 0,
+  const seq12 = tags['x00080096'].value;
+  assert.equal(seq12[0].xFFFEE000.value.length, 0,
     'ReferringPhysicianIdentificationSequence item length');
 
   // ConsultingPhysicianIdentificationSequence: implicit empty item
-  const seq13 = tags.getFromName('ConsultingPhysicianIdentificationSequence');
+  const seq13 = tags['x0008009D'].value;
   assert.equal(seq13.length, 0,
     'ConsultingPhysicianIdentificationSequence item length');
 
   // ReferencedStudySequence: explicit sequence of sequence
-  const seq20 = tags.getFromName('ReferencedStudySequence');
+  const seq20 = tags['x00081110'].value;
   // just one element
   //assert.equal(seq20.length, 2, "ReferencedStudySequence length");
-  assert.equal(seq20.x0040A170.value[0].x00080100.value[0],
+  assert.equal(seq20[0].x0040A170.value[0].x00080100.value[0],
     '123456',
     'ReferencedStudySequence - seq - item0 - CodeValue');
 
   // ReferencedSeriesSequence: implicit sequence of sequence
-  const seq21 = tags.getFromName('ReferencedSeriesSequence');
+  const seq21 = tags['x00081115'].value;
   // just one element
   //assert.equal(seq21.length, 2, "ReferencedSeriesSequence length");
-  assert.equal(seq21.x0040A170.value[0].x00080100.value[0],
+  assert.equal(seq21[0].x0040A170.value[0].x00080100.value[0],
     '789101',
     'ReferencedSeriesSequence - seq - item0 - CodeValue');
 
   // ReferencedInstanceSequence: explicit empty sequence of sequence
-  const seq30 = tags.getFromName('ReferencedInstanceSequence');
-  assert.equal(seq30.x0040A170.value.length, 0,
+  const seq30 = tags['x0008114A'].value;
+  assert.equal(seq30[0].x0040A170.value.length, 0,
     'ReferencedInstanceSequence - seq - length');
 
   // ReferencedVisitSequence: implicit empty sequence of sequence
-  const seq31 = tags.getFromName('ReferencedVisitSequence');
-  assert.equal(seq31.x0040A170.value.length, 0,
+  const seq31 = tags['x00081125'].value;
+  assert.equal(seq31[0].x0040A170.value.length, 0,
     'ReferencedVisitSequence - seq - length');
 
 });

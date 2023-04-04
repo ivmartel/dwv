@@ -522,13 +522,12 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
- *   // get the wrapped dicom tags
- *   // (raw tags are available via 'getRawDicomElements')
- *   const tags = dicomParser.getDicomElements();
+ *   // get the dicom tags
+ *   const tags = dicomParser.getRawDicomElements();
  *   // display the modality
  *   const div = document.getElementById('dwv');
  *   div.appendChild(document.createTextNode(
- *     'Modality: ' + tags.getFromName('Modality')
+ *     'Modality: ' + tags['x00080060'].value[0]
  *   ));
  * };
  * // DICOM file request

@@ -4,7 +4,6 @@ import {
   getTransferSyntaxName
 } from './dicomParser';
 import {
-  Tag,
   isPixelDataTag,
   isItemDelimitationItemTag,
   isSequenceDelimitationItemTag,
@@ -13,7 +12,6 @@ import {
   getTagFromDictionary
 } from './dicomTag';
 import {isNativeLittleEndian} from './dataReader';
-import {Size} from '../image/size';
 import {Spacing} from '../image/spacing';
 import {logger} from '../utils/logger';
 
@@ -35,16 +33,6 @@ export class DicomElementsWrapper {
    */
   constructor(dicomElements) {
     this.#dicomElements = dicomElements;
-  }
-
-  /**
-   * Get a DICOM Element value from a group/element key.
-   *
-   * @param {string} groupElementKey The key to retrieve.
-   * @returns {object} The DICOM element.
-   */
-  getDEFromKey(groupElementKey) {
-    return this.#dicomElements[groupElementKey];
   }
 
   /**
@@ -83,8 +71,8 @@ export class DicomElementsWrapper {
     let dicomElement = null;
     for (let i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = this.#dicomElements[keys[i]];
-      obj[this.getTagName(dicomElement.tag)] =
-        this.getElementAsObject(dicomElement);
+      obj[this.#getTagName(dicomElement.tag)] =
+        this.#getElementAsObject(dicomElement);
     }
     return obj;
   }
@@ -95,7 +83,7 @@ export class DicomElementsWrapper {
    * @param {object} tag The DICOM tag object.
    * @returns {string} The tag name.
    */
-  getTagName(tag) {
+  #getTagName(tag) {
     let name = tag.getNameFromDictionary();
     if (name === null) {
       name = tag.getKey2();
@@ -109,7 +97,7 @@ export class DicomElementsWrapper {
    * @param {object} dicomElement The DICOM element.
    * @returns {object} The element as a simple object.
    */
-  getElementAsObject(dicomElement) {
+  #getElementAsObject(dicomElement) {
     // element value
     let value = null;
 
@@ -127,16 +115,16 @@ export class DicomElementsWrapper {
         const keys = Object.keys(items[i]);
         for (let k = 0; k < keys.length; ++k) {
           const itemElement = items[i][keys[k]];
-          const key = this.getTagName(itemElement.tag);
+          const key = this.#getTagName(itemElement.tag);
           // do not inclure Item elements
           if (key !== 'Item') {
-            itemValues[key] = this.getElementAsObject(itemElement);
+            itemValues[key] = this.#getElementAsObject(itemElement);
           }
         }
         value.push(itemValues);
       }
     } else {
-      value = this.getElementValueAsString(dicomElement);
+      value = this.#getElementValueAsString(dicomElement);
     }
 
     // return
@@ -180,7 +168,7 @@ export class DicomElementsWrapper {
         result += '\n';
         checkHeader = false;
       }
-      result += this.getElementAsString(dicomElement) + '\n';
+      result += this.#getElementAsString(dicomElement) + '\n';
     }
     return result;
   }
@@ -192,7 +180,7 @@ export class DicomElementsWrapper {
    * @param {boolean} pretty When set to true, returns a 'pretified' content.
    * @returns {string} A string representation of the DICOM element.
    */
-  getElementValueAsString(
+  #getElementValueAsString(
     dicomElement, pretty) {
     let str = '';
     const strLenLimit = 65;
@@ -296,23 +284,13 @@ export class DicomElementsWrapper {
   }
 
   /**
-   * Get a data element value as a string.
-   *
-   * @param {string} groupElementKey The key to retrieve.
-   * @returns {string} The element as a string.
-   */
-  getElementValueAsStringFromKey(groupElementKey) {
-    return this.getElementValueAsString(this.getDEFromKey(groupElementKey));
-  }
-
-  /**
    * Get a data element as a string.
    *
    * @param {object} dicomElement The DICOM element.
    * @param {string} prefix A string to prepend this one.
    * @returns {string} The element as a string.
    */
-  getElementAsString(dicomElement, prefix) {
+  #getElementAsString(dicomElement, prefix) {
     // default prefix
     prefix = prefix || '';
 
@@ -382,11 +360,11 @@ export class DicomElementsWrapper {
           dicomElement.vr === 'AT') {
         // 'O'ther array, limited display length
         line += ' ';
-        line += this.getElementValueAsString(dicomElement, false);
+        line += this.#getElementValueAsString(dicomElement, false);
       } else {
         // default
         line += ' [';
-        line += this.getElementValueAsString(dicomElement, false);
+        line += this.#getElementValueAsString(dicomElement, false);
         line += ']';
       }
     }
@@ -440,12 +418,13 @@ export class DicomElementsWrapper {
         itemElement.vr = 'na';
 
         line += '\n';
-        line += this.getElementAsString(itemElement, prefix + '  ');
+        line += this.#getElementAsString(itemElement, prefix + '  ');
 
         for (let m = 0, lenm = itemKeys.length; m < lenm; ++m) {
           if (itemKeys[m] !== 'xFFFEE000') {
             line += '\n';
-            line += this.getElementAsString(item[itemKeys[m]], prefix + '    ');
+            line += this.#getElementAsString(item[itemKeys[m]],
+              prefix + '    ');
           }
         }
 
@@ -461,7 +440,7 @@ export class DicomElementsWrapper {
           value: [message]
         };
         line += '\n';
-        line += this.getElementAsString(itemDelimElement, prefix + '  ');
+        line += this.#getElementAsString(itemDelimElement, prefix + '  ');
 
       }
 
@@ -477,7 +456,7 @@ export class DicomElementsWrapper {
         value: [message]
       };
       line += '\n';
-      line += this.getElementAsString(sqDelimElement, prefix);
+      line += this.#getElementAsString(sqDelimElement, prefix);
     } else if (isPixSequence) {
       // pixel sequence
       let pixItem = null;
@@ -485,7 +464,7 @@ export class DicomElementsWrapper {
         pixItem = dicomElement.value[n];
         line += '\n';
         pixItem.vr = 'pi';
-        line += this.getElementAsString(pixItem, prefix + '  ');
+        line += this.#getElementAsString(pixItem, prefix + '  ');
       }
 
       const pixDelimElement = {
@@ -495,21 +474,10 @@ export class DicomElementsWrapper {
         value: ['(SequenceDelimitationItem)']
       };
       line += '\n';
-      line += this.getElementAsString(pixDelimElement, prefix);
+      line += this.#getElementAsString(pixDelimElement, prefix);
     }
 
     return prefix + line;
-  }
-
-  /**
-   * Get a DICOM Element value from a group and an element.
-   *
-   * @param {number} group The group.
-   * @param {number} element The element.
-   * @returns {object} The DICOM element value.
-   */
-  getFromGroupElement(group, element) {
-    return this.getFromKey(new Tag(group, element).getKey());
   }
 
   /**
@@ -529,97 +497,107 @@ export class DicomElementsWrapper {
     return value;
   }
 
-  /**
-   * Extract a size from dicom elements.
-   *
-   * @returns {object} The size.
-   */
-  getImageSize() {
-    // rows
-    const rows = this.getFromKey('x00280010');
-    if (!rows) {
-      throw new Error('Missing or empty DICOM image number of rows');
-    }
-    // columns
-    const columns = this.getFromKey('x00280011');
-    if (!columns) {
-      throw new Error('Missing or empty DICOM image number of columns');
-    }
-    return new Size([columns, rows, 1]);
-  }
-
-  /**
-   * Get the pixel spacing from the different spacing tags.
-   *
-   * @returns {object} The read spacing or the default [1,1].
-   */
-  getPixelSpacing() {
-    // default
-    let rowSpacing = 1;
-    let columnSpacing = 1;
-
-    // 1. PixelSpacing
-    // 2. ImagerPixelSpacing
-    // 3. NominalScannedPixelSpacing
-    // 4. PixelAspectRatio
-    const keys = ['x00280030', 'x00181164', 'x00182010', 'x00280034'];
-    for (let k = 0; k < keys.length; ++k) {
-      const spacing = this.getFromKey(keys[k], true);
-      if (spacing && spacing.length === 2) {
-        rowSpacing = parseFloat(spacing[0]);
-        columnSpacing = parseFloat(spacing[1]);
-        break;
-      }
-    }
-
-    // check
-    if (columnSpacing === 0) {
-      logger.warn('Zero column spacing.');
-      columnSpacing = 1;
-    }
-    if (rowSpacing === 0) {
-      logger.warn('Zero row spacing.');
-      rowSpacing = 1;
-    }
-
-    // return
-    // (slice spacing will be calculated using the image position patient)
-    return new Spacing([columnSpacing, rowSpacing, 1]);
-  }
-
-  /**
-   * Get the time.
-   *
-   * @returns {number|undefined} The time value if available.
-   */
-  getTime() {
-    // default returns undefined
-    return undefined;
-  }
-
-  /**
-   * Get the pixel data unit.
-   *
-   * @returns {string|null} The unit value if available.
-   */
-  getPixelUnit() {
-    // RescaleType
-    let unit = this.getFromKey('x00281054');
-    if (!unit) {
-      // Units (for PET)
-      unit = this.getFromKey('x00541001');
-    }
-    // default rescale type for CT
-    if (!unit) {
-      const modality = this.getFromKey('x00080060');
-      if (modality === 'CT') {
-        unit = 'HU';
-      }
-    }
-    return unit;
-  }
-
 } // class DicomElementsWrapper
+
+/**
+ * Extract the 2D size from dicom elements.
+ *
+ * @returns {object} The size.
+ */
+export function getImage2DSize(elements) {
+  // rows
+  const rows = elements['x00280010'];
+  if (typeof rows === 'undefined') {
+    throw new Error('Missing DICOM image number of rows');
+  }
+  if (rows.value.length === 0) {
+    throw new Error('Empty DICOM image number of rows');
+  }
+  // columns
+  const columns = elements['x00280011'];
+  if (typeof columns === 'undefined') {
+    throw new Error('Missing DICOM image number of columns');
+  }
+  if (columns.value.length === 0) {
+    throw new Error('Empty DICOM image number of columns');
+  }
+  return [columns.value[0], rows.value[0]];
+}
+
+/**
+ * Get the pixel spacing from the different spacing tags.
+ *
+ * @returns {object} The read spacing or the default [1,1].
+ */
+export function getPixelSpacing(elements) {
+  // default
+  let rowSpacing = 1;
+  let columnSpacing = 1;
+
+  // 1. PixelSpacing
+  // 2. ImagerPixelSpacing
+  // 3. NominalScannedPixelSpacing
+  // 4. PixelAspectRatio
+  const keys = ['x00280030', 'x00181164', 'x00182010', 'x00280034'];
+  for (let k = 0; k < keys.length; ++k) {
+    const spacing = elements[keys[k]];
+    if (spacing && spacing.value.length === 2) {
+      rowSpacing = parseFloat(spacing.value[0]);
+      columnSpacing = parseFloat(spacing.value[1]);
+      break;
+    }
+  }
+
+  // check
+  if (columnSpacing === 0) {
+    logger.warn('Zero column spacing.');
+    columnSpacing = 1;
+  }
+  if (rowSpacing === 0) {
+    logger.warn('Zero row spacing.');
+    rowSpacing = 1;
+  }
+
+  // return
+  // (slice spacing will be calculated using the image position patient)
+  return new Spacing([columnSpacing, rowSpacing, 1]);
+}
+
+/**
+ * Get the time.
+ *
+ * @returns {number|undefined} The time value if available.
+ */
+export function getTime(_elements) {
+  // default returns undefined
+  return undefined;
+}
+
+/**
+ * Get the pixel data unit.
+ *
+ * @returns {string|null} The unit value if available.
+ */
+export function getPixelUnit(elements) {
+  let unit;
+  // 1. RescaleType
+  // 2. Units (for PET)
+  const keys = ['x00281054', 'x00541001'];
+  for (let i = 0; i < keys.length; ++i) {
+    const element = elements[keys[i]];
+    if (typeof element !== 'undefined') {
+      unit = element.value[0];
+    }
+  }
+  // default rescale type for CT
+  if (typeof unit !== 'undefined') {
+    const modality = elements['x00080060'].value[0];
+    if (modality === 'CT') {
+      unit = 'HU';
+    }
+  }
+  return unit;
+}
 
 /**
  * Get the file list from a DICOMDIR
