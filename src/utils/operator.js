@@ -131,7 +131,8 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
   }
   let id1 = obj1[idKey][valueKey];
   const id2 = obj2[idKey][valueKey][0];
-  // for merged object, id1 is an array
+  // update id key
+  res[idKey] = obj1[idKey];
   if (mergedObj1) {
     // check if array does not include id2
     for (let k = 0; k < id1.length; ++k) {
@@ -140,7 +141,6 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
                     id2 + ', id1: ' + id1);
       }
     }
-    res[idKey] = obj1[idKey];
     res[idKey][valueKey].push(id2);
   } else {
     id1 = id1[0];
@@ -148,8 +148,9 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
       throw new Error('Cannot merge object with same ids: ' +
                 id1 + ', id2: ' + id2);
     }
-    // create merge object
-    res[idKey] = {value: [id1, id2], merged: true};
+    // update merge object
+    res[idKey][valueKey].push(id2);
+    res[idKey].merged = true;
   }
 
   // get keys
