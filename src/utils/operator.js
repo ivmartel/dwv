@@ -1,3 +1,5 @@
+import {arrayEquals} from './array';
+
 /**
  * Check if the input is a generic object, including arrays.
  *
@@ -63,9 +65,9 @@ export function objectToArray(obj) {
  * Objects need to be in the form of:
  * <code>
  * {
- *   idKey: {valueKey: 0},
- *   key0: {valueKey: "abc"},
- *   key1: {valueKey: 33}
+ *   idKey: {valueKey: [0]},
+ *   key0: {valueKey: ["abc"]},
+ *   key1: {valueKey: [33]}
  * }
  * </code>
  * Merged objects will be in the form of:
@@ -73,14 +75,14 @@ export function objectToArray(obj) {
  * {
  *   idKey: {valueKey: [0,1,2], merged: true},
  *   key0: {valueKey: {
- *     0: {valueKey: "abc"},
- *     1: {valueKey: "def"},
- *     2: {valueKey: "ghi"}
+ *     0: ["abc"],
+ *     1: ["def"],
+ *     2: ["ghi"]
  *   }},
  *   key1: {valueKey: {
- *     0: {valueKey: 33},
- *     1: {valueKey: 44},
- *     2: {valueKey: 55}
+ *     0: [33],
+ *     1: [44],
+ *     2: [55]
  *   }}
  * }
  * </code>
@@ -127,8 +129,8 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
     throw new Error('Id value not found in second object while merging: ' +
             idKey + ', valueKey: ' + valueKey + ', ojb: ' + obj2);
   }
-  const id1 = obj1[idKey][valueKey];
-  const id2 = obj2[idKey][valueKey];
+  let id1 = obj1[idKey][valueKey];
+  const id2 = obj2[idKey][valueKey][0];
   // for merged object, id1 is an array
   if (mergedObj1) {
     // check if array does not include id2
@@ -141,6 +143,7 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
     res[idKey] = obj1[idKey];
     res[idKey][valueKey].push(id2);
   } else {
+    id1 = id1[0];
     if (id1 === id2) {
       throw new Error('Cannot merge object with same ids: ' +
                 id1 + ', id2: ' + id2);
@@ -162,8 +165,8 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
     const key = keys[i];
     if (key !== idKey) {
       // first
-      let value1 = null;
-      let subValue1 = null;
+      let value1;
+      let subValue1;
       if (Object.prototype.hasOwnProperty.call(obj1, key)) {
         value1 = obj1[key];
         if (Object.prototype.hasOwnProperty.call(value1, valueKey)) {
@@ -171,8 +174,8 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
         }
       }
       // second
-      let value2 = null;
-      let subValue2 = null;
+      let value2;
+      let subValue2;
       if (Object.prototype.hasOwnProperty.call(obj2, key)) {
         value2 = obj2[key];
         if (Object.prototype.hasOwnProperty.call(value2, valueKey)) {
@@ -181,32 +184,35 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
       }
       // result value
       let value;
+      // use existing to copy properties
+      if (typeof value1 !== 'undefined') {
+        value = value1;
+      } else if (typeof value2 !== 'undefined') {
+        value = value2;
+      }
       // create merge object if different values
-      if (subValue2 !== subValue1) {
-        value = {};
+      if (!arrayEquals(subValue1, subValue2)) {
         // add to merged object or create new
         if (mergedObj1) {
-          if (isObject(subValue1)) {
-            value[valueKey] = subValue1;
-          } else {
+          if (isArray(subValue1)) {
             // merged object with repeated value
             // copy it with the index list
             value[valueKey] = {};
             for (let j = 0; j < id1.length; j++) {
-              value[valueKey][id1[j]] = value1;
+              value[valueKey][id1[j]] = subValue1;
             }
+          } else {
+            value[valueKey] = subValue1;
           }
           // add obj2 value
-          value[valueKey][id2] = value2;
+          value[valueKey][id2] = subValue2;
         } else {
           // create merge object
           const newValue = {};
-          newValue[id1] = value1;
-          newValue[id2] = value2;
+          newValue[id1] = subValue1;
+          newValue[id2] = subValue2;
           value[valueKey] = newValue;
         }
-      } else {
-        value = value1;
       }
       // store value in result object
       res[key] = value;
