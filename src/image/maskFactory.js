@@ -478,7 +478,7 @@ function getSegmentFrameInfo(groupItem) {
     for (let i = 0; i < derivationImageSq.length; ++i) {
       const sourceImages = [];
       if (typeof derivationImageSq[i]['x00082112'] !== 'undefined') {
-        const sourceImageSq = derivationImageSq[i]['xz00082112'].value;
+        const sourceImageSq = derivationImageSq[i]['x00082112'].value;
         for (let j = 0; j < sourceImageSq.length; ++j) {
           const sourceImage = {};
           // Referenced SOP Class UID
