@@ -1023,6 +1023,10 @@ export class DicomParser {
           subElement.value = this.interpretElement(
             subElement, reader,
             pixelRepresentation, bitsAllocated);
+          delete subElement.tag;
+          delete subElement.vl;
+          delete subElement.startOffset;
+          delete subElement.endOffset;
           itemData[keys[l]] = subElement;
         }
         data.push(itemData);
