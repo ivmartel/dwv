@@ -76,12 +76,12 @@ QUnit.test('Test multiframe writer support.', function (assert) {
   // raw tags
   let rawTags = dicomParser.getRawDicomElements();
   // check values
-  assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
-  assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
-  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
+  assert.equal(rawTags['x00280008'].value[0], numFrames, 'Number of frames');
+  assert.equal(rawTags['x00280011'].value[0], numCols, 'Number of columns');
+  assert.equal(rawTags['x00280010'].value[0], numRows, 'Number of rows');
   // length of value array for pixel data
   assert.equal(
-    rawTags.x7FE00010.value[0].length,
+    rawTags['x7FE00010'].value[0].length,
     bufferSize,
     'Length of value array for pixel data');
 
@@ -94,12 +94,12 @@ QUnit.test('Test multiframe writer support.', function (assert) {
   rawTags = dicomParser.getRawDicomElements();
 
   // check values
-  assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
-  assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
-  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
+  assert.equal(rawTags['x00280008'].value[0], numFrames, 'Number of frames');
+  assert.equal(rawTags['x00280011'].value[0], numCols, 'Number of columns');
+  assert.equal(rawTags['x00280010'].value[0], numRows, 'Number of rows');
   // length of value array for pixel data
   assert.equal(
-    rawTags.x7FE00010.value[0].length,
+    rawTags['x7FE00010'].value[0].length,
     bufferSize,
     'Length of value array for pixel data');
 
@@ -144,26 +144,27 @@ QUnit.test('Test patient anonymisation', function (assert) {
   let rawTags = dicomParser.getRawDicomElements();
   // check values
   assert.equal(
-    rawTags.x00100010.value[0].trim(),
+    rawTags['x00100010'].value[0].trim(),
     patientsName,
     'patientsName');
   assert.equal(
-    rawTags.x00100020.value[0].trim(),
+    rawTags['x00100020'].value[0].trim(),
     patientID,
     'patientID');
   assert.equal(
-    rawTags.x00100030.value[0].trim(),
+    rawTags['x00100030'].value[0].trim(),
     patientsBirthDate,
     'patientsBirthDate');
   assert.equal(
-    rawTags.x00100040.value[0].trim(),
+    rawTags['x00100040'].value[0].trim(),
     patientsSex,
     'patientsSex');
 
   const dicomWriter = new DicomWriter();
   dicomWriter.setRules(rules);
+  console.log('write');
   const buffer = dicomWriter.getBuffer(rawTags);
-
+  console.log('after write');
   dicomParser = new DicomParser();
 
   dicomParser.parse(buffer);
@@ -172,15 +173,15 @@ QUnit.test('Test patient anonymisation', function (assert) {
 
   // check values
   assert.equal(
-    rawTags.x00100010.value[0],
+    rawTags['x00100010'].value[0],
     patientsNameAnonymised,
     'patientName');
   assert.equal(
-    rawTags.x00100020.value[0],
+    rawTags['x00100020'].value[0],
     patientsIdAnonymised,
     'patientID');
-  assert.notOk(rawTags.x00100030, 'patientsBirthDate');
-  assert.notOk(rawTags.x00100040, 'patientsSex');
+  assert.notOk(rawTags['x00100030'], 'patientsBirthDate');
+  assert.notOk(rawTags['x00100040'], 'patientsSex');
 
 });
 
@@ -365,7 +366,7 @@ function testWriteReadDataFromConfig(config, assert) {
   const dicomElements = getElementsFromJSONTags(jsonTags);
   // pixels (if possible): small gradient square
   if (config.tags.Modality !== 'KO') {
-    dicomElements.x7FE00010 = generateGradSquare(config.tags);
+    dicomElements['x7FE00010'] = generateGradSquare(config.tags);
   }
 
   // create DICOM buffer

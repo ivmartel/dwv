@@ -42,7 +42,7 @@ function getObjectUrlFromTags(config) {
   const dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
   // pixels: small gradient square
   if (config.tags.Modality !== 'KO') {
-    dicomElements.x7FE00010 =
+    dicomElements['x7FE00010'] =
       test.generatePixelDataFromJSONTags(config.tags);
   }
 

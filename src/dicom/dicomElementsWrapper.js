@@ -167,7 +167,7 @@ export class DicomElementsWrapper {
         result += '# Dicom-Data-Set\n';
         result += '# Used TransferSyntax: ';
         const syntax = cleanString(
-          this.#dicomElements.x00020010.value[0]);
+          this.#dicomElements['x00020010'].value[0]);
         result += getTransferSyntaxName(syntax);
         result += '\n';
         checkHeader = false;
@@ -409,7 +409,7 @@ export class DicomElementsWrapper {
 
         // get the item element
         const itemTag = getItemTag();
-        const itemElement = item.xFFFEE000;
+        const itemElement = item['xFFFEE000'];
         message = '(Item with';
         if (itemElement.undefinedLength) {
           message += ' undefined';
@@ -619,12 +619,12 @@ export function getFileListFromDicomDir(data) {
   const elements = parser.getRawDicomElements();
 
   // Directory Record Sequence
-  if (typeof elements.x00041220 === 'undefined' ||
-    typeof elements.x00041220.value === 'undefined') {
+  if (typeof elements['x00041220'] === 'undefined' ||
+    typeof elements['x00041220'].value === 'undefined') {
     logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return undefined;
   }
-  const dirSeq = elements.x00041220.value;
+  const dirSeq = elements['x00041220'].value;
 
   if (dirSeq.length === 0) {
     logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
@@ -636,11 +636,11 @@ export function getFileListFromDicomDir(data) {
   let study = null;
   for (let i = 0; i < dirSeq.length; ++i) {
     // Directory Record Type
-    if (typeof dirSeq[i].x00041430 === 'undefined' ||
-      typeof dirSeq[i].x00041430.value === 'undefined') {
+    if (typeof dirSeq[i]['x00041430'] === 'undefined' ||
+      typeof dirSeq[i]['x00041430'].value === 'undefined') {
       continue;
     }
-    const recType = cleanString(dirSeq[i].x00041430.value[0]);
+    const recType = cleanString(dirSeq[i]['x00041430'].value[0]);
 
     // supposed to come in order...
     if (recType === 'STUDY') {
@@ -651,11 +651,11 @@ export function getFileListFromDicomDir(data) {
       study.push(series);
     } else if (recType === 'IMAGE') {
       // Referenced File ID
-      if (typeof dirSeq[i].x00041500 === 'undefined' ||
-        typeof dirSeq[i].x00041500.value === 'undefined') {
+      if (typeof dirSeq[i]['x00041500'] === 'undefined' ||
+        typeof dirSeq[i]['x00041500'].value === 'undefined') {
         continue;
       }
-      const refFileIds = dirSeq[i].x00041500.value;
+      const refFileIds = dirSeq[i]['x00041500'].value;
       // clean and join ids
       let refFileId = '';
       for (let j = 0; j < refFileIds.length; ++j) {

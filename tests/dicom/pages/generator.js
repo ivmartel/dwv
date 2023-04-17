@@ -159,7 +159,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   // convert JSON to DICOM element object
   const dicomElements = dwv.dicom.getElementsFromJSONTags(tags);
   // pixels
-  dicomElements.x7FE00010 = test.generatePixelDataFromJSONTags(
+  dicomElements['x7FE00010'] = test.generatePixelDataFromJSONTags(
     tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
 
   // create writer

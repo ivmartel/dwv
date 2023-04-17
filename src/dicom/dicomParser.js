@@ -1114,7 +1114,7 @@ export class DicomParser {
       }
 
       // check the TransferSyntaxUID (has to be there!)
-      dataElement = this.dicomElements.x00020010;
+      dataElement = this.dicomElements['x00020010'];
       if (typeof dataElement === 'undefined') {
         throw new Error('Not a valid DICOM file (no TransferSyntaxUID found)');
       }
@@ -1181,9 +1181,9 @@ export class DicomParser {
     // pixel specific
     let pixelRepresentation = 0;
     let bitsAllocated = 16;
-    if (typeof this.dicomElements.x7FE00010 !== 'undefined') {
+    if (typeof this.dicomElements['x7FE00010'] !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
-      dataElement = this.dicomElements.x00280103;
+      dataElement = this.dicomElements['x00280103'];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
         pixelRepresentation = dataElement.value[0];
@@ -1193,7 +1193,7 @@ export class DicomParser {
       }
 
       // BitsAllocated
-      dataElement = this.dicomElements.x00280100;
+      dataElement = this.dicomElements['x00280100'];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
         bitsAllocated = dataElement.value[0];
@@ -1208,7 +1208,7 @@ export class DicomParser {
     }
 
     // SpecificCharacterSet
-    dataElement = this.dicomElements.x00080005;
+    dataElement = this.dicomElements['x00080005'];
     if (typeof dataElement !== 'undefined') {
       dataElement.value = this.interpretElement(dataElement, dataReader);
       let charSetTerm;
@@ -1231,13 +1231,13 @@ export class DicomParser {
     // handle fragmented pixel buffer
     // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
-    dataElement = this.dicomElements.x7FE00010;
+    dataElement = this.dicomElements['x7FE00010'];
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
         let numberOfFrames = 1;
-        if (typeof this.dicomElements.x00280008 !== 'undefined') {
+        if (typeof this.dicomElements['x00280008'] !== 'undefined') {
           numberOfFrames = cleanString(
-            this.dicomElements.x00280008.value[0]);
+            this.dicomElements['x00280008'].value[0]);
         }
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {

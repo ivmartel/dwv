@@ -467,21 +467,21 @@ QUnit.test('Test ImageFactory.', function (assert) {
 
   const dicomElements0 = [];
   // columns
-  dicomElements0.x00280011 = {value: [imgSize0.get(0)]};
+  dicomElements0['x00280011'] = {value: [imgSize0.get(0)]};
   // rows
-  dicomElements0.x00280010 = {value: [imgSize0.get(1)]};
+  dicomElements0['x00280010'] = {value: [imgSize0.get(1)]};
   // spacing
-  dicomElements0.x00280030 = {
+  dicomElements0['x00280030'] = {
     value: [imgSpacing0.get(1), imgSpacing0.get(2)]
   };
   // transfer syntax (explicit VR)
-  dicomElements0.x00020010 = {value: ['1.2.840.10008.1.2.1']};
+  dicomElements0['x00020010'] = {value: ['1.2.840.10008.1.2.1']};
   // SOP class UID
-  dicomElements0.x00080016 = {value: ['1.2.840.10008.5.1.4.1.1.4']};
+  dicomElements0['x00080016'] = {value: ['1.2.840.10008.5.1.4.1.1.4']};
   // modality
-  dicomElements0.x00080060 = {value: ['MR']};
+  dicomElements0['x00080060'] = {value: ['MR']};
   // SOP instance UID
-  dicomElements0.x00080018 = {value: ['1.2.840.34.56.78999654.234]']};
+  dicomElements0['x00080018'] = {value: ['1.2.840.34.56.78999654.234]']};
 
   // create the image factory
   const factory0 = new ImageFactory();

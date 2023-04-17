@@ -102,7 +102,7 @@ export class DataController {
     // update meta data
     // TODO add time support
     let idKey = '';
-    if (typeof meta.x00020010 !== 'undefined') {
+    if (typeof meta['x00020010'] !== 'undefined') {
       // dicom case, use 'InstanceNumber'
       idKey = 'x00200013';
     } else {

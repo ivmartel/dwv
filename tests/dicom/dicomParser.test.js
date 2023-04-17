@@ -38,11 +38,11 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
   // raw tags
   const rawTags = dicomParser.getRawDicomElements();
   // check values
-  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows (raw)');
+  assert.equal(rawTags['x00280010'].value[0], numRows, 'Number of rows (raw)');
   assert.equal(
-    rawTags.x00280011.value[0], numCols, 'Number of columns (raw)');
+    rawTags['x00280011'].value[0], numCols, 'Number of columns (raw)');
   // ReferencedImageSequence - ReferencedSOPInstanceUID
-  assert.equal(rawTags.x00081140.value[0].x00081155.value[0],
+  assert.equal(rawTags['x00081140'].value[0]['x00081155'].value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
     'ReferencedImageSequence SQ (raw)');
 
@@ -66,7 +66,7 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
   // ReferencedImageSequence - ReferencedSOPInstanceUID
   // only one item value -> returns the object directly
   // (no need for tags["ReferencedImageSequence")[0])
-  assert.equal(tags['x00081140'].value[0].x00081155.value[0],
+  assert.equal(tags['x00081140'].value[0]['x00081155'].value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
     'ReferencedImageSequence SQ');
 
@@ -94,20 +94,20 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
   // ReferencedImageSequence: explicit sequence
   const seq00 = tags['x00081140'].value;
   assert.equal(seq00.length, 3, 'ReferencedImageSequence length');
-  assert.equal(seq00[0].x00081155.value[0],
+  assert.equal(seq00[0]['x00081155'].value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
     'ReferencedImageSequence - item0 - ReferencedSOPInstanceUID');
-  assert.equal(seq00[1].x00081155.value[0],
+  assert.equal(seq00[1]['x00081155'].value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511286933854090',
     'ReferencedImageSequence - item1 - ReferencedSOPInstanceUID');
 
   // SourceImageSequence: implicit sequence
   const seq01 = tags['x00082112'].value;
   assert.equal(seq01.length, 3, 'SourceImageSequence length');
-  assert.equal(seq01[0].x00081155.value[0],
+  assert.equal(seq01[0]['x00081155'].value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
     'SourceImageSequence - item0 - ReferencedSOPInstanceUID');
-  assert.equal(seq01[1].x00081155.value[0],
+  assert.equal(seq01[1]['x00081155'].value[0],
     '1.3.12.2.1107.5.2.32.35162.2012021515511286933854090',
     'SourceImageSequence - item1 - ReferencedSOPInstanceUID');
 
@@ -121,7 +121,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
 
   // ReferringPhysicianIdentificationSequence: explicit empty item
   const seq12 = tags['x00080096'].value;
-  assert.equal(seq12[0].xFFFEE000.value.length, 0,
+  assert.equal(seq12[0]['xFFFEE000'].value.length, 0,
     'ReferringPhysicianIdentificationSequence item length');
 
   // ConsultingPhysicianIdentificationSequence: implicit empty item
@@ -133,7 +133,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
   const seq20 = tags['x00081110'].value;
   // just one element
   //assert.equal(seq20.length, 2, "ReferencedStudySequence length");
-  assert.equal(seq20[0].x0040A170.value[0].x00080100.value[0],
+  assert.equal(seq20[0]['x0040A170'].value[0]['x00080100'].value[0],
     '123456',
     'ReferencedStudySequence - seq - item0 - CodeValue');
 
@@ -141,18 +141,18 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
   const seq21 = tags['x00081115'].value;
   // just one element
   //assert.equal(seq21.length, 2, "ReferencedSeriesSequence length");
-  assert.equal(seq21[0].x0040A170.value[0].x00080100.value[0],
+  assert.equal(seq21[0]['x0040A170'].value[0]['x00080100'].value[0],
     '789101',
     'ReferencedSeriesSequence - seq - item0 - CodeValue');
 
   // ReferencedInstanceSequence: explicit empty sequence of sequence
   const seq30 = tags['x0008114A'].value;
-  assert.equal(seq30[0].x0040A170.value.length, 0,
+  assert.equal(seq30[0]['x0040A170'].value.length, 0,
     'ReferencedInstanceSequence - seq - length');
 
   // ReferencedVisitSequence: implicit empty sequence of sequence
   const seq31 = tags['x00081125'].value;
-  assert.equal(seq31[0].x0040A170.value.length, 0,
+  assert.equal(seq31[0]['x0040A170'].value.length, 0,
     'ReferencedVisitSequence - seq - length');
 
 });

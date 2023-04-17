@@ -49,7 +49,7 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  *   // inputs are dicom tags and buffer
  *   const image = imageFactory.create(
  *     dicomParser.getRawDicomElements(),
- *     dicomParser.getRawDicomElements().x7FE00010.value[0]
+ *     dicomParser.getRawDicomElements()['x7FE00010'].value[0]
  *   );
  *   // result div
  *   const div = document.getElementById('dwv');

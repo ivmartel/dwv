@@ -208,7 +208,7 @@ function getDimensionOrganization(rootElement) {
     throw new Error('Unsupported dimension organization sequence length');
   }
   // Dimension Organization UID
-  const orgUID = cleanString(orgSq.value[0].x00209164.value[0]);
+  const orgUID = cleanString(orgSq.value[0]['x00209164'].value[0]);
 
   // Dimension Index Sequence (conditionally required)
   const indices = [];
@@ -222,22 +222,22 @@ function getDimensionOrganization(rootElement) {
     let indexPointer;
     for (let i = 0; i < indexSq.length; ++i) {
       // Dimension Organization UID (required)
-      const indexOrg = cleanString(indexSq[i].x00209164.value[0]);
+      const indexOrg = cleanString(indexSq[i]['x00209164'].value[0]);
       if (indexOrg !== orgUID) {
         throw new Error(
           'Dimension Index Sequence contains a unknown Dimension Organization');
       }
       // Dimension Index Pointer (required)
-      indexPointer = cleanString(indexSq[i].x00209165.value[0]);
+      indexPointer = cleanString(indexSq[i]['x00209165'].value[0]);
 
       const index = {
         DimensionOrganizationUID: indexOrg,
         DimensionIndexPointer: indexPointer
       };
       // Dimension Description Label (optional)
-      if (typeof indexSq[i].x00209421 !== 'undefined') {
+      if (typeof indexSq[i]['x00209421'] !== 'undefined') {
         index.DimensionDescriptionLabel =
-          cleanString(indexSq[i].x00209421.value[0]);
+          cleanString(indexSq[i]['x00209421'].value[0]);
       }
       // store
       indices.push(index);
@@ -271,25 +271,25 @@ function getDimensionOrganization(rootElement) {
 function getCode(element) {
   // meaning -> CodeMeaning (type1)
   const code = {
-    meaning: cleanString(element.x00080104.value[0])
+    meaning: cleanString(element['x00080104'].value[0])
   };
   // value -> CodeValue (type1C)
   // longValue -> LongCodeValue (type1C)
   // urnValue -> URNCodeValue (type1C)
-  if (element.x00080100) {
-    code.value = element.x00080100.value[0];
-  } else if (element.x00080119) {
-    code.longValue = element.x00080119.value[0];
-  } else if (element.x00080120) {
-    code.urnValue = element.x00080120.value[0];
+  if (element['x00080100']) {
+    code.value = element['x00080100'].value[0];
+  } else if (element['x00080119']) {
+    code.longValue = element['x00080119'].value[0];
+  } else if (element['x00080120']) {
+    code.urnValue = element['x00080120'].value[0];
   } else {
     throw Error('Invalid code with no value, no long value and no urn value.');
   }
   // schemeDesignator -> CodingSchemeDesignator (type1C)
   if (typeof code.value !== 'undefined' ||
     typeof code.longValue !== 'undefined') {
-    if (element.x00080102) {
-      code.schemeDesignator = element.x00080102.value[0];
+    if (element['x00080102']) {
+      code.schemeDesignator = element['x00080102'].value[0];
     } else {
       throw Error(
         'No coding sheme designator when code value or long value is present');
@@ -309,14 +309,14 @@ function getSegment(element) {
   // label -> SegmentLabel (type1)
   // algorithmType -> SegmentAlgorithmType (type1)
   const segment = {
-    number: element.x00620004.value[0],
-    label: cleanString(element.x00620005.value[0]),
-    algorithmType: cleanString(element.x00620008.value[0])
+    number: element['x00620004'].value[0],
+    label: cleanString(element['x00620005'].value[0]),
+    algorithmType: cleanString(element['x00620008'].value[0])
   };
   // algorithmName -> SegmentAlgorithmName (type1C)
-  if (element.x00620009) {
+  if (element['x00620009']) {
     segment.algorithmName =
-      cleanString(element.x00620009.value[0]);
+      cleanString(element['x00620009'].value[0]);
   }
   // // required if type is not MANUAL
   // if (segment.algorithmType !== 'MANUAL' &&
@@ -327,10 +327,10 @@ function getSegment(element) {
   // displayValue ->
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
-  if (typeof element.x0062000C !== 'undefined') {
-    segment.displayValue = element.x006200C.value;
-  } else if (typeof element.x0062000D !== 'undefined') {
-    const cielabElement = element.x0062000D.value;
+  if (typeof element['x0062000C'] !== 'undefined') {
+    segment.displayValue = element['x006200C'].value;
+  } else if (typeof element['x0062000D'] !== 'undefined') {
+    const cielabElement = element['x0062000D'].value;
     const rgb = cielabToSrgb(uintLabToLab({
       l: cielabElement[0],
       a: cielabElement[1],
@@ -339,23 +339,23 @@ function getSegment(element) {
     segment.displayValue = rgb;
   }
   // Segmented Property Category Code Sequence (type1, only one)
-  if (typeof element.x00620003 !== 'undefined') {
+  if (typeof element['x00620003'] !== 'undefined') {
     segment.propertyCategoryCode =
-      getCode(element.x00620003.value[0]);
+      getCode(element['x00620003'].value[0]);
   } else {
     throw Error('Missing Segmented Property Category Code Sequence.');
   }
   // Segmented Property Type Code Sequence (type1)
-  if (typeof element.x0062000F !== 'undefined') {
+  if (typeof element['x0062000F'] !== 'undefined') {
     segment.propertyTypeCode =
-      getCode(element.x0062000F.value[0]);
+      getCode(element['x0062000F'].value[0]);
   } else {
     throw Error('Missing Segmented Property Type Code Sequence.');
   }
   // tracking Id and UID (type1C)
-  if (typeof element.x00620020 !== 'undefined') {
-    segment.trackingId = element.x00620020.value[0];
-    segment.trackingUid = element.x00620021.value[0];
+  if (typeof element['x00620020'] !== 'undefined') {
+    segment.trackingId = element['x00620020'].value[0];
+    segment.trackingUid = element['x00620021'].value[0];
   }
 
   return segment;
@@ -445,20 +445,20 @@ export function isSimilarSegment(seg1, seg2) {
  */
 function getSpacingFromMeasure(measure) {
   // Pixel Spacing
-  if (typeof measure.x00280030 === 'undefined') {
+  if (typeof measure['x00280030'] === 'undefined') {
     return null;
   }
-  const pixelSpacing = measure.x00280030;
+  const pixelSpacing = measure['x00280030'];
   const spacingValues = [
     parseFloat(pixelSpacing.value[0]),
     parseFloat(pixelSpacing.value[1])
   ];
   // Slice Thickness
-  if (typeof measure.x00180050 !== 'undefined') {
-    spacingValues.push(parseFloat(measure.x00180050.value[0]));
-  } else if (typeof measure.x00180088 !== 'undefined') {
+  if (typeof measure['x00180050'] !== 'undefined') {
+    spacingValues.push(parseFloat(measure['x00180050'].value[0]));
+  } else if (typeof measure['x00180088'] !== 'undefined') {
     // Spacing Between Slices
-    spacingValues.push(parseFloat(measure.x00180088.value[0]));
+    spacingValues.push(parseFloat(measure['x00180088'].value[0]));
   }
   return new Spacing(spacingValues);
 }
@@ -472,24 +472,24 @@ function getSpacingFromMeasure(measure) {
 function getSegmentFrameInfo(groupItem) {
   // Derivation Image Sequence
   const derivationImages = [];
-  if (typeof groupItem.x00089124 !== 'undefined') {
-    const derivationImageSq = groupItem.x00089124.value;
+  if (typeof groupItem['x00089124'] !== 'undefined') {
+    const derivationImageSq = groupItem['x00089124'].value;
     // Source Image Sequence
     for (let i = 0; i < derivationImageSq.length; ++i) {
       const sourceImages = [];
-      if (typeof derivationImageSq[i].x00082112 !== 'undefined') {
-        const sourceImageSq = derivationImageSq[i].x00082112.value;
+      if (typeof derivationImageSq[i]['x00082112'] !== 'undefined') {
+        const sourceImageSq = derivationImageSq[i]['xz00082112'].value;
         for (let j = 0; j < sourceImageSq.length; ++j) {
           const sourceImage = {};
           // Referenced SOP Class UID
-          if (typeof sourceImageSq[j].x00081150 !== 'undefined') {
+          if (typeof sourceImageSq[j]['x00081150'] !== 'undefined') {
             sourceImage.referencedSOPClassUID =
-              sourceImageSq[j].x00081150.value[0];
+              sourceImageSq[j]['x00081150'].value[0];
           }
           // Referenced SOP Instance UID
-          if (typeof sourceImageSq[j].x00081155 !== 'undefined') {
+          if (typeof sourceImageSq[j]['x00081155'] !== 'undefined') {
             sourceImage.referencedSOPInstanceUID =
-              sourceImageSq[j].x00081155.value[0];
+              sourceImageSq[j]['x00081155'].value[0];
           }
           sourceImages.push(sourceImage);
         }
@@ -498,17 +498,17 @@ function getSegmentFrameInfo(groupItem) {
     }
   }
   // Frame Content Sequence (required, only one)
-  const frameContentSq = groupItem.x00209111.value;
+  const frameContentSq = groupItem['x00209111'].value;
   // Dimension Index Value
-  const dimIndex = frameContentSq[0].x00209157.value;
+  const dimIndex = frameContentSq[0]['x00209157'].value;
   // Segment Identification Sequence (required, only one)
-  const segmentIdSq = groupItem.x0062000A.value;
+  const segmentIdSq = groupItem['x0062000A'].value;
   // Referenced Segment Number
-  const refSegmentNumber = segmentIdSq[0].x0062000B.value[0];
+  const refSegmentNumber = segmentIdSq[0]['x0062000B'].value[0];
   // Plane Position Sequence (required, only one)
-  const planePosSq = groupItem.x00209113.value;
+  const planePosSq = groupItem['x00209113'].value;
   // Image Position (Patient) (conditionally required)
-  const imagePosPat = planePosSq[0].x00200032.value;
+  const imagePosPat = planePosSq[0]['x00200032'].value;
   for (let p = 0; p < imagePosPat.length; ++p) {
     imagePosPat[p] = parseFloat(imagePosPat[p], 10);
   }
@@ -519,20 +519,20 @@ function getSegmentFrameInfo(groupItem) {
     refSegmentNumber: refSegmentNumber
   };
   // Plane Orientation Sequence
-  if (typeof groupItem.x00209116 !== 'undefined') {
-    const framePlaneOrientationSeq = groupItem.x00209116;
+  if (typeof groupItem['x00209116'] !== 'undefined') {
+    const framePlaneOrientationSeq = groupItem['x00209116'];
     if (framePlaneOrientationSeq.value.length !== 0) {
       // should only be one Image Orientation (Patient)
       const frameImageOrientation =
-        framePlaneOrientationSeq.value[0].x00200037.value;
+        framePlaneOrientationSeq.value[0]['x00200037'].value;
       if (typeof frameImageOrientation !== 'undefined') {
         frameInfo.imageOrientationPatient = frameImageOrientation;
       }
     }
   }
   // Pixel Measures Sequence
-  if (typeof groupItem.x00289110 !== 'undefined') {
-    const framePixelMeasuresSeq = groupItem.x00289110;
+  if (typeof groupItem['x00289110'] !== 'undefined') {
+    const framePixelMeasuresSeq = groupItem['x00289110'];
     if (framePixelMeasuresSeq.value.length !== 0) {
       // should only be one
       const frameSpacing =
@@ -618,20 +618,20 @@ export class MaskFactory {
       // should be only one
       const funcGroup0 = sharedFunctionalGroupsSeq.value[0];
       // Plane Orientation Sequence
-      if (typeof funcGroup0.x00209116 !== 'undefined') {
-        const planeOrientationSeq = funcGroup0.x00209116;
+      if (typeof funcGroup0['x00209116'] !== 'undefined') {
+        const planeOrientationSeq = funcGroup0['x00209116'];
         if (planeOrientationSeq.value.length !== 0) {
           // should be only one
           imageOrientationPatient =
-            planeOrientationSeq.value[0].x00200037.value;
+            planeOrientationSeq.value[0]['x00200037'].value;
         } else {
           logger.warn(
             'No shared functional group plane orientation sequence items.');
         }
       }
       // Pixel Measures Sequence
-      if (typeof funcGroup0.x00289110 !== 'undefined') {
-        const pixelMeasuresSeq = funcGroup0.x00289110;
+      if (typeof funcGroup0['x00289110'] !== 'undefined') {
+        const pixelMeasuresSeq = funcGroup0['x00289110'];
         if (pixelMeasuresSeq.value.length !== 0) {
           // should be only one
           spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
