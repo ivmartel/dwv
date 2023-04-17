@@ -955,23 +955,23 @@ export class DicomParser {
       }
     } else if (typeof vrType !== 'undefined') {
       if (vrType === 'Uint8') {
-        data = reader.readUint8Array(offset, vl);
+        data = Array.from(reader.readUint8Array(offset, vl));
       } else if (vrType === 'Uint16') {
-        data = reader.readUint16Array(offset, vl);
+        data = Array.from(reader.readUint16Array(offset, vl));
       } else if (vrType === 'Uint32') {
-        data = reader.readUint32Array(offset, vl);
+        data = Array.from(reader.readUint32Array(offset, vl));
       } else if (vrType === 'Uint64') {
-        data = reader.readUint64Array(offset, vl);
+        data = Array.from(reader.readUint64Array(offset, vl));
       } else if (vrType === 'Int16') {
-        data = reader.readInt16Array(offset, vl);
+        data = Array.from(reader.readInt16Array(offset, vl));
       } else if (vrType === 'Int32') {
-        data = reader.readInt32Array(offset, vl);
+        data = Array.from(reader.readInt32Array(offset, vl));
       } else if (vrType === 'Int64') {
         data = reader.readInt64Array(offset, vl);
       } else if (vrType === 'Float32') {
-        data = reader.readFloat32Array(offset, vl);
+        data = Array.from(reader.readFloat32Array(offset, vl));
       } else if (vrType === 'Float64') {
-        data = reader.readFloat64Array(offset, vl);
+        data = Array.from(reader.readFloat64Array(offset, vl));
       } else if (vrType === 'string') {
         const stream = reader.readUint8Array(offset, vl);
         if (charSetString.includes(vr)) {
@@ -986,16 +986,16 @@ export class DicomParser {
     } else if (vr === 'ox') {
       // OB or OW
       if (bitsAllocated === 8) {
-        data = reader.readUint8Array(offset, vl);
+        data = Array.from(reader.readUint8Array(offset, vl));
       } else {
-        data = reader.readUint16Array(offset, vl);
+        data = Array.from(reader.readUint16Array(offset, vl));
       }
     } else if (vr === 'xs') {
       // US or SS
       if (pixelRepresentation === 0) {
-        data = reader.readUint16Array(offset, vl);
+        data = Array.from(reader.readUint16Array(offset, vl));
       } else {
-        data = reader.readInt16Array(offset, vl);
+        data = Array.from(reader.readInt16Array(offset, vl));
       }
     } else if (vr === 'AT') {
       // attribute
