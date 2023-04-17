@@ -919,6 +919,8 @@ export class DicomWriter {
           for (let j = 0, lenj = itemKeys.length; j < lenj; ++j) {
             const itemKey = itemKeys[j];
             const subElement = oldItemElements[itemKey];
+            subElement.tag = getTagFromKey(itemKey);
+
             if (isItemTag(subElement.tag)) {
               continue;
             }

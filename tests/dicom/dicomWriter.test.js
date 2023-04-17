@@ -162,9 +162,8 @@ QUnit.test('Test patient anonymisation', function (assert) {
 
   const dicomWriter = new DicomWriter();
   dicomWriter.setRules(rules);
-  console.log('write');
   const buffer = dicomWriter.getBuffer(rawTags);
-  console.log('after write');
+
   dicomParser = new DicomParser();
 
   dicomParser.parse(buffer);
