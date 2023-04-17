@@ -52,6 +52,9 @@ QUnit.test('Test isArray.', function (assert) {
 
   const obj05 = true;
   assert.equal(isArray(obj05), false, 'test with bool');
+
+  const obj06 = new Uint8Array([0, 1, 2]);
+  assert.equal(isArray(obj06), false, 'test with Uint8Array');
 });
 
 /**
