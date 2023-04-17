@@ -27,8 +27,8 @@
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.0",
-    "@babel/preset-env": "^7.20.2",
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
     "babel-loader": "^9.1.2",
     "babel-plugin-istanbul": "^6.1.1",
     "benchmark": "~2.1.4",
