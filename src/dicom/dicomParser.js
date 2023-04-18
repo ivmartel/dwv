@@ -955,13 +955,21 @@ export class DicomParser {
       }
     } else if (typeof vrType !== 'undefined') {
       if (vrType === 'Uint8') {
-        data = Array.from(reader.readUint8Array(offset, vl));
+        data = reader.readUint8Array(offset, vl);
       } else if (vrType === 'Uint16') {
-        data = Array.from(reader.readUint16Array(offset, vl));
+        data = reader.readUint16Array(offset, vl);
+        // keep as binary for 'O*' VR
+        if (vr[0] !== 'O') {
+          data = Array.from(data);
+        }
       } else if (vrType === 'Uint32') {
-        data = Array.from(reader.readUint32Array(offset, vl));
+        data = reader.readUint32Array(offset, vl);
+        // keep as binary for 'O*' VR
+        if (vr[0] !== 'O') {
+          data = Array.from(data);
+        }
       } else if (vrType === 'Uint64') {
-        data = Array.from(reader.readUint64Array(offset, vl));
+        data = reader.readUint64Array(offset, vl);
       } else if (vrType === 'Int16') {
         data = Array.from(reader.readInt16Array(offset, vl));
       } else if (vrType === 'Int32') {
