@@ -30,50 +30,39 @@ QUnit.test('Test Tag.', function (assert) {
   new Error('Cannot create tag with no group.'),
   'tag with empty group.');
   assert.throws(function () {
-    new Tag('0x12');
+    new Tag('12');
   },
-  new Error('Cannot create tag with badly formed group.'),
+  new Error('Cannot create tag with badly sized group.'),
   'tag with bad group #0.');
-  assert.throws(function () {
-    new Tag('1234');
-  },
-  new Error('Cannot create tag with badly formed group.'),
-  'tag with bad group #1.');
 
   assert.throws(function () {
-    new Tag('0x1234');
+    new Tag('1234');
   },
   new Error('Cannot create tag with no element.'),
   'tag with undef element.');
   assert.throws(function () {
-    new Tag('0x1234', '');
+    new Tag('1234', '');
   },
   new Error('Cannot create tag with no element.'),
   'tag with empty element.');
   assert.throws(function () {
-    new Tag('0x1234', '0x12');
+    new Tag('1234', '12');
   },
-  new Error('Cannot create tag with badly formed element.'),
+  new Error('Cannot create tag with badly sized element.'),
   'tag with bad element #0.');
-  assert.throws(function () {
-    new Tag('0x1234', '1234');
-  },
-  new Error('Cannot create tag with badly formed element.'),
-  'tag with bad element #1.');
 
-  const tag00 = new Tag('0x1111', '0x2222');
+  const tag00 = new Tag('1111', '2222');
   assert.notOk(tag00.equals(null), 'equals to null');
   assert.notOk(tag00.equals(), 'equals to undef');
-  const tag01 = new Tag('0x1112', '0x2222');
+  const tag01 = new Tag('1112', '2222');
   assert.notOk(tag00.equals(tag01), 'not equals #0');
-  const tag02 = new Tag('0x1111', '0x2221');
+  const tag02 = new Tag('1111', '2221');
   assert.notOk(tag00.equals(tag02), 'not equals #1');
   assert.ok(tag00.equals(tag00), 'equals #0');
 
-  assert.equal(tag00.getKey(), 'x11112222', 'get key');
-  assert.equal(tag00.getKey2(), '11112222', 'get key 2');
+  assert.equal(tag00.getKey(), '11112222', 'get key');
 
-  assert.ok(getTagFromKey('x11112222').equals(tag00),
+  assert.ok(getTagFromKey('11112222').equals(tag00),
     'getTagFromKey');
 });
 
@@ -92,7 +81,7 @@ QUnit.test('Test getTagFromDictionary.', function (assert) {
 
   // empty tag name...
   const tag03 = getTagFromDictionary('');
-  const refTag03 = new Tag('0x0008', '0x0202');
+  const refTag03 = new Tag('0008', '0202');
   assert.ok(tag03.equals(refTag03), 'get empty');
 
   const refTag10 = getTransferSyntaxUIDTag();

@@ -89,7 +89,7 @@ export class DicomElementsWrapper {
   #getTagName(tag) {
     let name = tag.getNameFromDictionary();
     if (name === null) {
-      name = tag.getKey2();
+      name = tag.getKey();
     }
     return name;
   }
@@ -161,11 +161,11 @@ export class DicomElementsWrapper {
     for (let i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = this.#dicomElements[keys[i]];
       tag = getTagFromKey(keys[i]);
-      if (checkHeader && tag.getGroup() !== '0x0002') {
+      if (checkHeader && tag.getGroup() !== '0002') {
         result += '\n';
         result += '# Dicom-Data-Set\n';
         result += '# Used TransferSyntax: ';
-        const syntax = this.#dicomElements['x00020010'].value[0];
+        const syntax = this.#dicomElements['00020010'].value[0];
         result += getTransferSyntaxName(syntax);
         result += '\n';
         checkHeader = false;
@@ -401,7 +401,7 @@ export class DicomElementsWrapper {
 
         // get the item element
         const itemTag = getItemTag();
-        const itemElement = item['xFFFEE000'];
+        const itemElement = item['FFFEE000'];
         message = '(Item with';
         if (itemElement.undefinedLength) {
           message += ' undefined';
@@ -504,7 +504,7 @@ export class DicomElementsWrapper {
  */
 export function getImage2DSize(elements) {
   // rows
-  const rows = elements['x00280010'];
+  const rows = elements['00280010'];
   if (typeof rows === 'undefined') {
     throw new Error('Missing DICOM image number of rows');
   }
@@ -512,7 +512,7 @@ export function getImage2DSize(elements) {
     throw new Error('Empty DICOM image number of rows');
   }
   // columns
-  const columns = elements['x00280011'];
+  const columns = elements['00280011'];
   if (typeof columns === 'undefined') {
     throw new Error('Missing DICOM image number of columns');
   }
@@ -536,7 +536,7 @@ export function getPixelSpacing(elements) {
   // 2. ImagerPixelSpacing
   // 3. NominalScannedPixelSpacing
   // 4. PixelAspectRatio
-  const keys = ['x00280030', 'x00181164', 'x00182010', 'x00280034'];
+  const keys = ['00280030', '00181164', '00182010', '00280034'];
   for (let k = 0; k < keys.length; ++k) {
     const spacing = elements[keys[k]];
     if (spacing && spacing.value.length === 2) {
@@ -580,7 +580,7 @@ export function getPixelUnit(elements) {
   let unit;
   // 1. RescaleType
   // 2. Units (for PET)
-  const keys = ['x00281054', 'x00541001'];
+  const keys = ['00281054', '00541001'];
   for (let i = 0; i < keys.length; ++i) {
     const element = elements[keys[i]];
     if (typeof element !== 'undefined') {
@@ -589,7 +589,7 @@ export function getPixelUnit(elements) {
   }
   // default rescale type for CT
   if (typeof unit !== 'undefined') {
-    const modality = elements['x00080060'].value[0];
+    const modality = elements['00080060'].value[0];
     if (modality === 'CT') {
       unit = 'HU';
     }
@@ -611,12 +611,12 @@ export function getFileListFromDicomDir(data) {
   const elements = parser.getRawDicomElements();
 
   // Directory Record Sequence
-  if (typeof elements['x00041220'] === 'undefined' ||
-    typeof elements['x00041220'].value === 'undefined') {
+  if (typeof elements['00041220'] === 'undefined' ||
+    typeof elements['00041220'].value === 'undefined') {
     logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return undefined;
   }
-  const dirSeq = elements['x00041220'].value;
+  const dirSeq = elements['00041220'].value;
 
   if (dirSeq.length === 0) {
     logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
@@ -628,11 +628,11 @@ export function getFileListFromDicomDir(data) {
   let study = null;
   for (let i = 0; i < dirSeq.length; ++i) {
     // Directory Record Type
-    if (typeof dirSeq[i]['x00041430'] === 'undefined' ||
-      typeof dirSeq[i]['x00041430'].value === 'undefined') {
+    if (typeof dirSeq[i]['00041430'] === 'undefined' ||
+      typeof dirSeq[i]['00041430'].value === 'undefined') {
       continue;
     }
-    const recType = dirSeq[i]['x00041430'].value[0];
+    const recType = dirSeq[i]['00041430'].value[0];
 
     // supposed to come in order...
     if (recType === 'STUDY') {
@@ -643,11 +643,11 @@ export function getFileListFromDicomDir(data) {
       study.push(series);
     } else if (recType === 'IMAGE') {
       // Referenced File ID
-      if (typeof dirSeq[i]['x00041500'] === 'undefined' ||
-        typeof dirSeq[i]['x00041500'].value === 'undefined') {
+      if (typeof dirSeq[i]['00041500'] === 'undefined' ||
+        typeof dirSeq[i]['00041500'].value === 'undefined') {
         continue;
       }
-      const refFileIds = dirSeq[i]['x00041500'].value;
+      const refFileIds = dirSeq[i]['00041500'].value;
       // join ids
       series.push(refFileIds.join('/'));
     }

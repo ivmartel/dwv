@@ -22,7 +22,7 @@ dicomParser.parse(arrayBuffer);
 // wrapped tags
 var tags = dicomParser.getRawDicomElements();
 // log
-console.log(tags['x00100010'].value[0]);
+console.log(tags['00100010'].value[0]);
 ```
 
 To execute it, run:

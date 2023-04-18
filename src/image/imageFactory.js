@@ -48,7 +48,7 @@ export class ImageFactory {
     const sizeValues = [size2D[0], size2D[1], 1];
 
     // frames
-    const frames = dicomElements['x00280008'];
+    const frames = dicomElements['00280008'];
     if (frames) {
       sizeValues.push(frames.value[0]);
     }
@@ -60,13 +60,13 @@ export class ImageFactory {
     const spacing = getPixelSpacing(dicomElements);
 
     // TransferSyntaxUID
-    const syntax = dicomElements['x00020010'].value[0];
+    const syntax = dicomElements['00020010'].value[0];
     const jpeg2000 = isJpeg2000TransferSyntax(syntax);
     const jpegBase = isJpegBaselineTransferSyntax(syntax);
     const jpegLoss = isJpegLosslessTransferSyntax(syntax);
 
     // ImagePositionPatient
-    const imagePositionPatient = dicomElements['x00200032'];
+    const imagePositionPatient = dicomElements['00200032'];
     // slice position
     let slicePosition = new Array(0, 0, 0);
     if (typeof imagePositionPatient !== 'undefined') {
@@ -79,7 +79,7 @@ export class ImageFactory {
 
     // slice orientation (cosines are matrices' columns)
     // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
-    const imageOrientationPatient = dicomElements['x00200037'];
+    const imageOrientationPatient = dicomElements['00200037'];
     let orientationMatrix;
     if (typeof imageOrientationPatient !== 'undefined') {
       const rowCosines = new Vector3D(
@@ -109,14 +109,14 @@ export class ImageFactory {
 
     // SOP Instance UID
     let sopInstanceUid;
-    const siu = dicomElements['x00080018'];
+    const siu = dicomElements['00080018'];
     if (typeof siu !== 'undefined') {
       sopInstanceUid = siu.value[0];
     }
 
     // Sample per pixels
     let samplesPerPixel = 1;
-    const spp = dicomElements['x00280002'];
+    const spp = dicomElements['00280002'];
     if (typeof spp !== 'undefined') {
       samplesPerPixel = spp.value[0];
     }
@@ -136,7 +136,7 @@ export class ImageFactory {
     // image
     const image = new Image(geometry, pixelBuffer, [sopInstanceUid]);
     // PhotometricInterpretation
-    const photometricInterpretation = dicomElements['x00280004'];
+    const photometricInterpretation = dicomElements['00280004'];
     if (typeof photometricInterpretation !== 'undefined') {
       let photo = photometricInterpretation.value[0].toUpperCase();
       // jpeg decoders output RGB data
@@ -151,7 +151,7 @@ export class ImageFactory {
       image.setPhotometricInterpretation(photo);
     }
     // PlanarConfiguration
-    const planarConfiguration = dicomElements['x00280006'];
+    const planarConfiguration = dicomElements['00280006'];
     if (typeof planarConfiguration !== 'undefined') {
       image.setPlanarConfiguration(planarConfiguration.value[0]);
     }
@@ -159,7 +159,7 @@ export class ImageFactory {
     // rescale slope and intercept
     let slope = 1;
     // RescaleSlope
-    const rescaleSlope = dicomElements['x00281053'];
+    const rescaleSlope = dicomElements['00281053'];
     if (typeof rescaleSlope !== 'undefined') {
       const value = parseFloat(rescaleSlope.value[0]);
       if (!isNaN(value)) {
@@ -168,7 +168,7 @@ export class ImageFactory {
     }
     let intercept = 0;
     // RescaleIntercept
-    const rescaleIntercept = dicomElements['x00281052'];
+    const rescaleIntercept = dicomElements['00281052'];
     if (typeof rescaleIntercept !== 'undefined') {
       const value = parseFloat(rescaleIntercept.value[0]);
       if (!isNaN(value)) {
@@ -181,25 +181,25 @@ export class ImageFactory {
     // meta information
     const meta = {
       numberOfFiles: numberOfFiles,
-      Modality: dicomElements['x00080060'].value[0],
+      Modality: dicomElements['00080060'].value[0],
     };
-    const sopClassUID = dicomElements['x00080016'];
+    const sopClassUID = dicomElements['00080016'];
     if (typeof sopClassUID !== 'undefined') {
       meta.SOPClassUID = sopClassUID.value[0];
     }
-    const studyUID = dicomElements['x0020000D'];
+    const studyUID = dicomElements['0020000D'];
     if (typeof studyUID !== 'undefined') {
       meta.StudyInstanceUID = studyUID.value[0];
     }
-    const seriesUID = dicomElements['x0020000E'];
+    const seriesUID = dicomElements['0020000E'];
     if (typeof seriesUID !== 'undefined') {
       meta.SeriesInstanceUID = seriesUID.value[0];
     }
-    const bits = dicomElements['x00280101'];
+    const bits = dicomElements['00280101'];
     if (typeof bits !== 'undefined') {
       meta.BitsStored = bits.value[0];
     }
-    const pixelRep = dicomElements['x00280103'];
+    const pixelRep = dicomElements['00280103'];
     if (typeof pixelRep !== 'undefined') {
       meta.PixelRepresentation = pixelRep.value[0];
     }
@@ -211,15 +211,15 @@ export class ImageFactory {
       meta.pixelUnit = pixelUnit;
     }
     // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dicomElements['x00200052'];
+    const frameOfReferenceUID = dicomElements['00200052'];
     if (typeof frameOfReferenceUID !== 'undefined') {
       meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
     }
     // window level presets
     const windowPresets = {};
-    const windowCenter = dicomElements['x00281050'];
-    const windowWidth = dicomElements['x00281051'];
-    const windowCWExplanation = dicomElements['x00281055'];
+    const windowCenter = dicomElements['00281050'];
+    const windowWidth = dicomElements['00281051'];
+    const windowCWExplanation = dicomElements['00281055'];
     if (typeof windowCenter !== 'undefined' &&
       typeof windowWidth !== 'undefined') {
       let name;
@@ -248,11 +248,11 @@ export class ImageFactory {
 
     // PALETTE COLOR luts
     if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      let redLut = dicomElements['x00281201'];
-      let greenLut = dicomElements['x00281202'];
-      let blueLut = dicomElements['x00281203'];
+      let redLut = dicomElements['00281201'];
+      let greenLut = dicomElements['00281202'];
+      let blueLut = dicomElements['00281203'];
       // check red palette descriptor (should all be equal)
-      const descriptor = dicomElements['x00281101'];
+      const descriptor = dicomElements['00281101'];
       if (typeof descriptor !== 'undefined' &&
               descriptor.length === 3) {
         if (descriptor[2] === 16) {
@@ -280,7 +280,7 @@ export class ImageFactory {
           // Palette color values must always be scaled across the full
           // range of available intensities
           const bitsAllocated = parseInt(
-            dicomElements['x00280100'].value[0], 10);
+            dicomElements['00280100'].value[0], 10);
           if (bitsAllocated === 8) {
             doScale = true;
             logger.info(
@@ -317,7 +317,7 @@ export class ImageFactory {
     }
 
     // RecommendedDisplayFrameRate
-    const recommendedDisplayFrameRate = dicomElements['x00082144'];
+    const recommendedDisplayFrameRate = dicomElements['00082144'];
     if (typeof recommendedDisplayFrameRate !== 'undefined') {
       meta.RecommendedDisplayFrameRate = parseInt(
         recommendedDisplayFrameRate.value[0], 10);

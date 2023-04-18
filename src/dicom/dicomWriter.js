@@ -365,11 +365,11 @@ export class DicomWriter {
   anonymisationRules = {
     default: {action: 'remove', value: null},
     PatientName: {action: 'replace', value: 'Anonymized'}, // tag
-    'Meta Element': {action: 'copy', value: null}, // group 'x0002'
-    Acquisition: {action: 'copy', value: null}, // group 'x0018'
-    'Image Presentation': {action: 'copy', value: null}, // group 'x0028'
-    Procedure: {action: 'copy', value: null}, // group 'x0040'
-    'Pixel Data': {action: 'copy', value: null} // group 'x7fe0'
+    'Meta Element': {action: 'copy', value: null}, // group '0002'
+    Acquisition: {action: 'copy', value: null}, // group '0018'
+    'Image Presentation': {action: 'copy', value: null}, // group '0028'
+    Procedure: {action: 'copy', value: null}, // group '0040'
+    'Pixel Data': {action: 'copy', value: null} // group '7fe0'
   };
 
   /**
@@ -424,20 +424,20 @@ export class DicomWriter {
       }
       // item element (create new to not modify original)
       let undefinedLength = false;
-      if (typeof item['xFFFEE000'].undefinedLength !== 'undefined') {
-        undefinedLength = item['xFFFEE000'].undefinedLength;
+      if (typeof item['FFFEE000'].undefinedLength !== 'undefined') {
+        undefinedLength = item['FFFEE000'].undefinedLength;
       }
       const itemElement = {
         tag: getItemTag(),
         vr: 'NONE',
-        vl: undefinedLength ? 0xffffffff : item['xFFFEE000'].vl,
+        vl: undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
         value: []
       };
       byteOffset = this.writeDataElement(
         writer, itemElement, byteOffset, isImplicit);
       // write rest
       for (let m = 0; m < itemKeys.length; ++m) {
-        if (itemKeys[m] !== 'xFFFEE000' && itemKeys[m] !== 'xFFFEE00D') {
+        if (itemKeys[m] !== 'FFFEE000' && itemKeys[m] !== 'FFFEE00D') {
           byteOffset = this.writeDataElement(
             writer, item[itemKeys[m]], byteOffset, isImplicit);
         }
@@ -585,7 +585,7 @@ export class DicomWriter {
       // pixel data as sequence
       const item = {};
       // first item: basic offset table
-      item['xFFFEE000'] = {
+      item['FFFEE000'] = {
         tag: getItemTag(),
         vr: 'NONE',
         vl: 0,
@@ -709,23 +709,23 @@ export class DicomWriter {
    */
   getBuffer(dicomElements) {
     // Transfer Syntax
-    const syntax = dicomElements['x00020010'].value[0];
+    const syntax = dicomElements['00020010'].value[0];
     const isImplicit = isImplicitTransferSyntax(syntax);
     const isBigEndian = isBigEndianTransferSyntax(syntax);
     // Specific CharacterSet
-    if (typeof dicomElements['x00080005'] !== 'undefined') {
-      const oldscs = dicomElements['x00080005'].value[0];
+    if (typeof dicomElements['00080005'] !== 'undefined') {
+      const oldscs = dicomElements['00080005'].value[0];
       // force UTF-8 if not default character set
       if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
         logger.debug('Change charset to UTF, was: ' + oldscs);
         this.useSpecialTextEncoder();
-        dicomElements['x00080005'].value = ['ISO_IR 192'];
+        dicomElements['00080005'].value = ['ISO_IR 192'];
       }
     }
     // Bits Allocated (for image data)
     let bitsAllocated;
-    if (typeof dicomElements['x00280100'] !== 'undefined') {
-      bitsAllocated = dicomElements['x00280100'].value[0];
+    if (typeof dicomElements['00280100'] !== 'undefined') {
+      bitsAllocated = dicomElements['00280100'].value[0];
     }
 
     // calculate buffer size and split elements (meta and non meta)
@@ -739,11 +739,11 @@ export class DicomWriter {
     // FileMetaInformationGroupLength
     const fmiglTag = getFileMetaInformationGroupLengthTag();
     // FileMetaInformationVersion
-    const fmivTag = new Tag('0x0002', '0x0001');
+    const fmivTag = new Tag('0002', '0001');
     // ImplementationClassUID
-    const icUIDTag = new Tag('0x0002', '0x0012');
+    const icUIDTag = new Tag('0002', '0012');
     // ImplementationVersionName
-    const ivnTag = new Tag('0x0002', '0x0013');
+    const ivnTag = new Tag('0002', '0013');
 
     // loop through elements to get the buffer size
     const keys = Object.keys(dicomElements);

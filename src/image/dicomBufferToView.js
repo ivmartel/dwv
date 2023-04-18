@@ -52,7 +52,7 @@ export class DicomBufferToView {
   #generateImage(index, origin) {
     const dicomElements = this.#dicomParserStore[index].getRawDicomElements();
 
-    const modality = dicomElements['x00080060'].value[0];
+    const modality = dicomElements['00080060'].value[0];
     let factory;
     if (modality && modality === 'SEG') {
       factory = new MaskFactory();
@@ -190,10 +190,10 @@ export class DicomBufferToView {
       return;
     }
 
-    const pixelBuffer = dicomParser.getRawDicomElements()['x7FE00010'].value;
+    const pixelBuffer = dicomParser.getRawDicomElements()['7FE00010'].value;
     // help GC: discard pixel buffer from elements
-    dicomParser.getRawDicomElements()['x7FE00010'].value = [];
-    const syntax = dicomParser.getRawDicomElements()['x00020010'].value[0];
+    dicomParser.getRawDicomElements()['7FE00010'].value = [];
+    const syntax = dicomParser.getRawDicomElements()['00020010'].value[0];
     const algoName = getSyntaxDecompressionName(syntax);
     const needDecompression = (algoName !== null);
 
@@ -204,26 +204,26 @@ export class DicomBufferToView {
     if (needDecompression) {
       // gather pixel buffer meta data
       const bitsAllocated =
-        dicomParser.getRawDicomElements()['x00280100'].value[0];
+        dicomParser.getRawDicomElements()['00280100'].value[0];
       const pixelRepresentation =
-        dicomParser.getRawDicomElements()['x00280103'].value[0];
+        dicomParser.getRawDicomElements()['00280103'].value[0];
       const pixelMeta = {
         bitsAllocated: bitsAllocated,
         isSigned: (pixelRepresentation === 1)
       };
-      const columnsElement = dicomParser.getRawDicomElements()['x00280011'];
-      const rowsElement = dicomParser.getRawDicomElements()['x00280010'];
+      const columnsElement = dicomParser.getRawDicomElements()['00280011'];
+      const rowsElement = dicomParser.getRawDicomElements()['00280010'];
       if (typeof columnsElement !== 'undefined' &&
         typeof rowsElement !== 'undefined') {
         pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
       }
       const samplesPerPixelElement =
-        dicomParser.getRawDicomElements()['x00280002'];
+        dicomParser.getRawDicomElements()['00280002'];
       if (typeof samplesPerPixelElement !== 'undefined') {
         pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
       }
       const planarConfigurationElement =
-        dicomParser.getRawDicomElements()['x00280006'];
+        dicomParser.getRawDicomElements()['00280006'];
       if (typeof planarConfigurationElement !== 'undefined') {
         pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
       }

@@ -381,15 +381,15 @@ export function getTransferSyntaxName(syntax) {
  * @returns {object} The transfer syntax data element.
  */
 function guessTransferSyntax(firstDataElement) {
-  const oEightGroupBigEndian = '0x0800';
-  const oEightGroupLittleEndian = '0x0008';
-  // check that group is 0x0008
+  const oEightGroupBigEndian = '0800';
+  const oEightGroupLittleEndian = '0008';
+  // check that group is 0008
   const group = firstDataElement.tag.getGroup();
   if (group !== oEightGroupBigEndian &&
     group !== oEightGroupLittleEndian) {
     throw new Error(
       'Not a valid DICOM file (no magic DICM word found' +
-        ' and first element not in 0x0008 group)'
+        ' and first element not in 0008 group)'
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr
@@ -422,7 +422,7 @@ function guessTransferSyntax(firstDataElement) {
   }
   // set transfer syntax data element
   const dataElement = {
-    tag: new Tag('0x0002', '0x0010'),
+    tag: new Tag('0002', '0010'),
     vr: 'UI'
   };
   dataElement.value = [syntax + ' ']; // even length
@@ -528,7 +528,7 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  *   // display the modality
  *   const div = document.getElementById('dwv');
  *   div.appendChild(document.createTextNode(
- *     'Modality: ' + tags['x00080060'].value[0]
+ *     'Modality: ' + tags['00080060'].value[0]
  *   ));
  * };
  * // DICOM file request
@@ -1102,7 +1102,7 @@ export class DicomParser {
     const magicword = this.decodeString(metaReader.readUint8Array(offset, 4));
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
     if (magicword === 'DICM') {
-      // 0x0002, 0x0000: FileMetaInformationGroupLength
+      // 0002, 0000: FileMetaInformationGroupLength (vr='UL')
       dataElement = this.readDataElement(metaReader, offset, false);
       dataElement.value = this.interpretElement(dataElement, metaReader);
       // increment offset
@@ -1110,7 +1110,7 @@ export class DicomParser {
       // store the data element
       this.dicomElements[dataElement.tag.getKey()] = dataElement;
       // get meta length
-      const metaLength = parseInt(dataElement.value[0], 10);
+      const metaLength = dataElement.value[0];
 
       // meta elements
       const metaEnd = offset + metaLength;
@@ -1123,7 +1123,7 @@ export class DicomParser {
       }
 
       // check the TransferSyntaxUID (has to be there!)
-      dataElement = this.dicomElements['x00020010'];
+      dataElement = this.dicomElements['00020010'];
       if (typeof dataElement === 'undefined') {
         throw new Error('Not a valid DICOM file (no TransferSyntaxUID found)');
       }
@@ -1190,9 +1190,9 @@ export class DicomParser {
     // pixel specific
     let pixelRepresentation = 0;
     let bitsAllocated = 16;
-    if (typeof this.dicomElements['x7FE00010'] !== 'undefined') {
+    if (typeof this.dicomElements['7FE00010'] !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
-      dataElement = this.dicomElements['x00280103'];
+      dataElement = this.dicomElements['00280103'];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
         pixelRepresentation = dataElement.value[0];
@@ -1202,7 +1202,7 @@ export class DicomParser {
       }
 
       // BitsAllocated
-      dataElement = this.dicomElements['x00280100'];
+      dataElement = this.dicomElements['00280100'];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
         bitsAllocated = dataElement.value[0];
@@ -1217,7 +1217,7 @@ export class DicomParser {
     }
 
     // SpecificCharacterSet
-    dataElement = this.dicomElements['x00080005'];
+    dataElement = this.dicomElements['00080005'];
     if (typeof dataElement !== 'undefined') {
       dataElement.value = this.interpretElement(dataElement, dataReader);
       let charSetTerm;
@@ -1240,12 +1240,12 @@ export class DicomParser {
     // handle fragmented pixel buffer
     // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
-    dataElement = this.dicomElements['x7FE00010'];
+    dataElement = this.dicomElements['7FE00010'];
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
         let numberOfFrames = 1;
-        if (typeof this.dicomElements['x00280008'] !== 'undefined') {
-          numberOfFrames = Number(this.dicomElements['x00280008'].value[0]);
+        if (typeof this.dicomElements['00280008'] !== 'undefined') {
+          numberOfFrames = Number(this.dicomElements['00280008'].value[0]);
         }
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {
