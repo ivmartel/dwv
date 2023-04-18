@@ -549,8 +549,7 @@ export class MaskFactory {
    * @param {Array} pixelBuffer The pixel buffer.
    * @returns {Image} A new Image.
    */
-  create(
-    dicomElements, pixelBuffer) {
+  create(dicomElements, pixelBuffer) {
     // check required and supported tags
     for (let d = 0; d < RequiredDicomSegTags.length; ++d) {
       checkTag(dicomElements, RequiredDicomSegTags[d]);

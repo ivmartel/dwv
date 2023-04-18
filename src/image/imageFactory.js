@@ -42,8 +42,7 @@ export class ImageFactory {
    * @param {number} numberOfFiles The input number of files.
    * @returns {Image} A new Image.
    */
-  create(
-    dicomElements, pixelBuffer, numberOfFiles) {
+  create(dicomElements, pixelBuffer, numberOfFiles) {
     const size2D = getImage2DSize(dicomElements);
     const sizeValues = [size2D[0], size2D[1], 1];
 
