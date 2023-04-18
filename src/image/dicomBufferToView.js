@@ -1,7 +1,6 @@
 import {logger} from '../utils/logger';
 import {
   DicomParser,
-  cleanString,
   getSyntaxDecompressionName
 } from '../dicom/dicomParser';
 import {ImageFactory} from './imageFactory';
@@ -53,7 +52,7 @@ export class DicomBufferToView {
   #generateImage(index, origin) {
     const dicomElements = this.#dicomParserStore[index].getRawDicomElements();
 
-    const modality = cleanString(dicomElements['x00080060'].value[0]);
+    const modality = dicomElements['x00080060'].value[0];
     let factory;
     if (modality && modality === 'SEG') {
       factory = new MaskFactory();
@@ -194,8 +193,7 @@ export class DicomBufferToView {
     const pixelBuffer = dicomParser.getRawDicomElements()['x7FE00010'].value;
     // help GC: discard pixel buffer from elements
     dicomParser.getRawDicomElements()['x7FE00010'].value = [];
-    const syntax = cleanString(
-      dicomParser.getRawDicomElements()['x00020010'].value[0]);
+    const syntax = dicomParser.getRawDicomElements()['x00020010'].value[0];
     const algoName = getSyntaxDecompressionName(syntax);
     const needDecompression = (algoName !== null);
 

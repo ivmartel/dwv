@@ -4,7 +4,6 @@ import {RescaleSlopeAndIntercept} from './rsi';
 import {WindowLevel} from './windowLevel';
 import {Image} from './image';
 import {
-  cleanString,
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
   isJpegLosslessTransferSyntax
@@ -61,8 +60,7 @@ export class ImageFactory {
     const spacing = getPixelSpacing(dicomElements);
 
     // TransferSyntaxUID
-    const transferSyntaxUID = dicomElements['x00020010'].value[0];
-    const syntax = cleanString(transferSyntaxUID);
+    const syntax = dicomElements['x00020010'].value[0];
     const jpeg2000 = isJpeg2000TransferSyntax(syntax);
     const jpegBase = isJpegBaselineTransferSyntax(syntax);
     const jpegLoss = isJpegLosslessTransferSyntax(syntax);
@@ -113,7 +111,7 @@ export class ImageFactory {
     let sopInstanceUid;
     const siu = dicomElements['x00080018'];
     if (typeof siu !== 'undefined') {
-      sopInstanceUid = cleanString(siu.value[0]);
+      sopInstanceUid = siu.value[0];
     }
 
     // Sample per pixels
@@ -140,8 +138,7 @@ export class ImageFactory {
     // PhotometricInterpretation
     const photometricInterpretation = dicomElements['x00280004'];
     if (typeof photometricInterpretation !== 'undefined') {
-      let photo = cleanString(photometricInterpretation.value[0])
-        .toUpperCase();
+      let photo = photometricInterpretation.value[0].toUpperCase();
       // jpeg decoders output RGB data
       if ((jpeg2000 || jpegBase || jpegLoss) &&
         (photo !== 'MONOCHROME1' && photo !== 'MONOCHROME2')) {
@@ -232,7 +229,7 @@ export class ImageFactory {
         if (center && width && width !== 0) {
           name = '';
           if (typeof windowCWExplanation !== 'undefined') {
-            name = cleanString(windowCWExplanation.value[j]);
+            name = windowCWExplanation.value[j];
           }
           if (name === '') {
             name = 'Default' + j;

@@ -1,6 +1,5 @@
 import {
   DicomParser,
-  cleanString,
   getTransferSyntaxName
 } from './dicomParser';
 import {
@@ -166,8 +165,7 @@ export class DicomElementsWrapper {
         result += '\n';
         result += '# Dicom-Data-Set\n';
         result += '# Used TransferSyntax: ';
-        const syntax = cleanString(
-          this.#dicomElements['x00020010'].value[0]);
+        const syntax = this.#dicomElements['x00020010'].value[0];
         result += getTransferSyntaxName(syntax);
         result += '\n';
         checkHeader = false;
@@ -251,11 +249,7 @@ export class DicomElementsWrapper {
           valueStr += '\\';
         }
         if (isFloatNumberVR) {
-          let val = dicomElement.value[k];
-          if (typeof val === 'string') {
-            val = cleanString(val);
-          }
-          const num = Number(val);
+          const num = Number(dicomElement.value[k]);
           if (!isInteger(num) && pretty) {
             valueStr += num.toPrecision(4);
           } else {
@@ -269,8 +263,6 @@ export class DicomElementsWrapper {
             tmp = '0000'.substring(0, 4 - tmp.length) + tmp;
           }
           valueStr += tmp;
-        } else if (typeof dicomElement.value[k] === 'string') {
-          valueStr += cleanString(dicomElement.value[k]);
         } else {
           valueStr += dicomElement.value[k];
         }
@@ -640,7 +632,7 @@ export function getFileListFromDicomDir(data) {
       typeof dirSeq[i]['x00041430'].value === 'undefined') {
       continue;
     }
-    const recType = cleanString(dirSeq[i]['x00041430'].value[0]);
+    const recType = dirSeq[i]['x00041430'].value[0];
 
     // supposed to come in order...
     if (recType === 'STUDY') {
@@ -656,15 +648,8 @@ export function getFileListFromDicomDir(data) {
         continue;
       }
       const refFileIds = dirSeq[i]['x00041500'].value;
-      // clean and join ids
-      let refFileId = '';
-      for (let j = 0; j < refFileIds.length; ++j) {
-        if (j !== 0) {
-          refFileId += '/';
-        }
-        refFileId += cleanString(refFileIds[j]);
-      }
-      series.push(refFileId);
+      // join ids
+      series.push(refFileIds.join('/'));
     }
   }
   return records;

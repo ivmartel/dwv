@@ -16,7 +16,6 @@ import {
 } from './dicomTag';
 import {
   getDwvVersion,
-  cleanString,
   is32bitVLVR,
   isImplicitTransferSyntax,
   isBigEndianTransferSyntax,
@@ -710,12 +709,12 @@ export class DicomWriter {
    */
   getBuffer(dicomElements) {
     // Transfer Syntax
-    const syntax = cleanString(dicomElements['x00020010'].value[0]);
+    const syntax = dicomElements['x00020010'].value[0];
     const isImplicit = isImplicitTransferSyntax(syntax);
     const isBigEndian = isBigEndianTransferSyntax(syntax);
     // Specific CharacterSet
     if (typeof dicomElements['x00080005'] !== 'undefined') {
-      const oldscs = cleanString(dicomElements['x00080005'].value[0]);
+      const oldscs = dicomElements['x00080005'].value[0];
       // force UTF-8 if not default character set
       if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
         logger.debug('Change charset to UTF, was: ' + oldscs);

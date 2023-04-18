@@ -1,7 +1,4 @@
-import {
-  cleanString,
-  DicomParser
-} from '../../src/dicom/dicomParser';
+import {DicomParser} from '../../src/dicom/dicomParser';
 import {
   DicomWriter,
   getElementsFromJSONTags,
@@ -212,7 +209,7 @@ function compare(jsonTags, dicomElements, name, comparator) {
         jsonTag = jsonTag.join();
       }
       comparator.equal(
-        cleanString(value.join()),
+        value.join(),
         jsonTag,
         name + ' - ' + tagName);
     } else {

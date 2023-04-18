@@ -1,4 +1,3 @@
-import {cleanString} from '../dicom/dicomParser';
 import {getImage2DSize} from '../dicom/dicomElementsWrapper';
 import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
@@ -70,10 +69,6 @@ function checkTag(rootElement, tagDefinition) {
     tagValue = element.value;
   }
   if (Array.isArray(tagValue)) {
-    // trim
-    tagValue = tagValue.map(function (item) {
-      return cleanString(item);
-    });
     for (let i = 0; i < tagDefinition.enum.length; ++i) {
       if (!Array.isArray(tagDefinition.enum[i])) {
         throw new Error('Cannot compare array and non array tag value.');
@@ -84,11 +79,6 @@ function checkTag(rootElement, tagDefinition) {
       }
     }
   } else {
-    // trim
-    if (typeof tagValue === 'string') {
-      tagValue = cleanString(tagValue);
-    }
-
     includes = tagDefinition.enum.includes(tagValue);
   }
   if (!includes) {
@@ -208,7 +198,7 @@ function getDimensionOrganization(rootElement) {
     throw new Error('Unsupported dimension organization sequence length');
   }
   // Dimension Organization UID
-  const orgUID = cleanString(orgSq.value[0]['x00209164'].value[0]);
+  const orgUID = orgSq.value[0]['x00209164'].value[0];
 
   // Dimension Index Sequence (conditionally required)
   const indices = [];
@@ -222,13 +212,13 @@ function getDimensionOrganization(rootElement) {
     let indexPointer;
     for (let i = 0; i < indexSq.length; ++i) {
       // Dimension Organization UID (required)
-      const indexOrg = cleanString(indexSq[i]['x00209164'].value[0]);
+      const indexOrg = indexSq[i]['x00209164'].value[0];
       if (indexOrg !== orgUID) {
         throw new Error(
           'Dimension Index Sequence contains a unknown Dimension Organization');
       }
       // Dimension Index Pointer (required)
-      indexPointer = cleanString(indexSq[i]['x00209165'].value[0]);
+      indexPointer = indexSq[i]['x00209165'].value[0];
 
       const index = {
         DimensionOrganizationUID: indexOrg,
@@ -236,8 +226,7 @@ function getDimensionOrganization(rootElement) {
       };
       // Dimension Description Label (optional)
       if (typeof indexSq[i]['x00209421'] !== 'undefined') {
-        index.DimensionDescriptionLabel =
-          cleanString(indexSq[i]['x00209421'].value[0]);
+        index.DimensionDescriptionLabel = indexSq[i]['x00209421'].value[0];
       }
       // store
       indices.push(index);
@@ -271,7 +260,7 @@ function getDimensionOrganization(rootElement) {
 function getCode(element) {
   // meaning -> CodeMeaning (type1)
   const code = {
-    meaning: cleanString(element['x00080104'].value[0])
+    meaning: element['x00080104'].value[0]
   };
   // value -> CodeValue (type1C)
   // longValue -> LongCodeValue (type1C)
@@ -310,13 +299,12 @@ function getSegment(element) {
   // algorithmType -> SegmentAlgorithmType (type1)
   const segment = {
     number: element['x00620004'].value[0],
-    label: cleanString(element['x00620005'].value[0]),
-    algorithmType: cleanString(element['x00620008'].value[0])
+    label: element['x00620005'].value[0],
+    algorithmType: element['x00620008'].value[0]
   };
   // algorithmName -> SegmentAlgorithmName (type1C)
   if (element['x00620009']) {
-    segment.algorithmName =
-      cleanString(element['x00620009'].value[0]);
+    segment.algorithmName = element['x00620009'].value[0];
   }
   // // required if type is not MANUAL
   // if (segment.algorithmType !== 'MANUAL' &&
@@ -866,12 +854,10 @@ export class MaskFactory {
     // ReferringPhysicianName
     meta.ReferringPhysicianName = dicomElements['x00080090'].value[0];
     // patient info
-    meta.PatientName =
-      cleanString(dicomElements['x00100010'].value[0]);
-    meta.PatientID = cleanString(dicomElements['x00100020'].value[0]);
+    meta.PatientName = dicomElements['x00100010'].value[0];
+    meta.PatientID = dicomElements['x00100020'].value[0];
     meta.PatientBirthDate = dicomElements['x00100030'].value[0];
-    meta.PatientSex =
-      cleanString(dicomElements['x00100040'].value[0]);
+    meta.PatientSex = dicomElements['x00100040'].value[0];
     // Enhanced General Equipment Module
     meta.Manufacturer = dicomElements['x00080070'].value[0];
     meta.ManufacturerModelName = dicomElements['x00081090'].value[0];

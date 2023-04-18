@@ -41,6 +41,7 @@ export function hasDicomPrefix(buffer) {
 
 /**
  * Clean string: trim and remove ending.
+ * (exported for tests only)
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.
@@ -987,7 +988,7 @@ export class DicomParser {
         } else {
           data = this.decodeString(stream);
         }
-        data = data.split('\\');
+        data = cleanString(data).split('\\');
       } else {
         throw Error('Unknown VR type: ' + vrType);
       }
@@ -1127,7 +1128,7 @@ export class DicomParser {
         throw new Error('Not a valid DICOM file (no TransferSyntaxUID found)');
       }
       dataElement.value = this.interpretElement(dataElement, metaReader);
-      syntax = cleanString(dataElement.value[0]);
+      syntax = dataElement.value[0];
 
     } else {
       logger.warn('No DICM prefix, trying to guess tansfer syntax.');
@@ -1137,7 +1138,7 @@ export class DicomParser {
       const tsElement = guessTransferSyntax(dataElement);
       // store
       this.dicomElements[tsElement.tag.getKey()] = tsElement;
-      syntax = cleanString(tsElement.value[0]);
+      syntax = tsElement.value[0];
       // reset offset
       offset = 0;
     }
@@ -1221,9 +1222,9 @@ export class DicomParser {
       dataElement.value = this.interpretElement(dataElement, dataReader);
       let charSetTerm;
       if (dataElement.value.length === 1) {
-        charSetTerm = cleanString(dataElement.value[0]);
+        charSetTerm = dataElement.value[0];
       } else {
-        charSetTerm = cleanString(dataElement.value[1]);
+        charSetTerm = dataElement.value[1];
         logger.warn('Unsupported character set with code extensions: \'' +
           charSetTerm + '\'.');
       }
@@ -1244,8 +1245,7 @@ export class DicomParser {
       if (dataElement.undefinedLength) {
         let numberOfFrames = 1;
         if (typeof this.dicomElements['x00280008'] !== 'undefined') {
-          numberOfFrames = cleanString(
-            this.dicomElements['x00280008'].value[0]);
+          numberOfFrames = Number(this.dicomElements['x00280008'].value[0]);
         }
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {
