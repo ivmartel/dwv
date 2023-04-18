@@ -20,7 +20,7 @@ var arrayBuffer = new Uint8Array(data).buffer;
 var dicomParser = new dwv.dicom.DicomParser();
 dicomParser.parse(arrayBuffer);
 // wrapped tags
-var tags = dicomParser.getRawDicomElements();
+var tags = dicomParser.getDicomElements();
 // log
 console.log(tags['00100010'].value[0]);
 ```

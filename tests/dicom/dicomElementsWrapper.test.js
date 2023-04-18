@@ -1,4 +1,5 @@
 import {DicomParser} from '../../src/dicom/dicomParser';
+import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
 import {objectToArray} from '../../src/utils/operator';
 import {b64urlToArrayBuffer} from './utils';
 
@@ -26,8 +27,9 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
 
   // wrapped tags
   const tags = dicomParser.getDicomElements();
+  const wrapper = new DicomElementsWrapper(tags);
   // dump to table
-  const table = objectToArray(tags.dumpToObject());
+  const table = objectToArray(wrapper.dumpToObject());
 
   // regression table
   const teoTable = [

@@ -608,7 +608,7 @@ export function getFileListFromDicomDir(data) {
   // parse file
   const parser = new DicomParser();
   parser.parse(data);
-  const elements = parser.getRawDicomElements();
+  const elements = parser.getDicomElements();
 
   // Directory Record Sequence
   if (typeof elements['00041220'] === 'undefined' ||

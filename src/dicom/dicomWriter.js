@@ -245,7 +245,7 @@ class DefaultTextEncoder {
  *   const parser = new DicomParser();
  *   parser.parse(this.response);
  *
- *   const writer = new DicomWriter(parser.getRawDicomElements());
+ *   const writer = new DicomWriter(parser.getDicomElements());
  *   const blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
  *
  *   const element = document.getElementById("download");

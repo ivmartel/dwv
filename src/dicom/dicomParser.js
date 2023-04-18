@@ -10,7 +10,6 @@ import {
   charSetString
 } from './dictionary';
 import {DataReader} from './dataReader';
-import {DicomElementsWrapper} from './dicomElementsWrapper';
 import {logger} from '../utils/logger';
 import {arrayEquals} from '../utils/array';
 
@@ -524,7 +523,7 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the dicom tags
- *   const tags = dicomParser.getRawDicomElements();
+ *   const tags = dicomParser.getDicomElements();
  *   // display the modality
  *   const div = document.getElementById('dwv');
  *   div.appendChild(document.createTextNode(
@@ -631,17 +630,8 @@ export class DicomParser {
    *
    * @returns {object} The raw DICOM elements.
    */
-  getRawDicomElements() {
-    return this.dicomElements;
-  }
-
-  /**
-   * Get the DICOM data elements.
-   *
-   * @returns {object} The DICOM elements.
-   */
   getDicomElements() {
-    return new DicomElementsWrapper(this.dicomElements);
+    return this.dicomElements;
   }
 
   /**

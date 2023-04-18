@@ -50,7 +50,7 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #generateImage(index, origin) {
-    const dicomElements = this.#dicomParserStore[index].getRawDicomElements();
+    const dicomElements = this.#dicomParserStore[index].getDicomElements();
 
     const modality = dicomElements['00080060'].value[0];
     let factory;
@@ -70,7 +70,7 @@ export class DicomBufferToView {
       this.onloaditem({
         data: {
           image: image,
-          info: this.#dicomParserStore[index].getRawDicomElements()
+          info: this.#dicomParserStore[index].getDicomElements()
         },
         source: origin
       });
@@ -178,7 +178,7 @@ export class DicomBufferToView {
     try {
       dicomParser.parse(buffer);
       // check elements are good for image
-      imageFactory.checkElements(dicomParser.getRawDicomElements());
+      imageFactory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
       this.onerror({
         error: error,
@@ -190,10 +190,11 @@ export class DicomBufferToView {
       return;
     }
 
-    const pixelBuffer = dicomParser.getRawDicomElements()['7FE00010'].value;
+
+    const pixelBuffer = dicomParser.getDicomElements()['7FE00010'].value;
     // help GC: discard pixel buffer from elements
-    dicomParser.getRawDicomElements()['7FE00010'].value = [];
-    const syntax = dicomParser.getRawDicomElements()['00020010'].value[0];
+    dicomParser.getDicomElements()['7FE00010'].value = [];
+    const syntax = dicomParser.getDicomElements()['00020010'].value[0];
     const algoName = getSyntaxDecompressionName(syntax);
     const needDecompression = (algoName !== null);
 
@@ -204,26 +205,26 @@ export class DicomBufferToView {
     if (needDecompression) {
       // gather pixel buffer meta data
       const bitsAllocated =
-        dicomParser.getRawDicomElements()['00280100'].value[0];
+        dicomParser.getDicomElements()['00280100'].value[0];
       const pixelRepresentation =
-        dicomParser.getRawDicomElements()['00280103'].value[0];
+        dicomParser.getDicomElements()['00280103'].value[0];
       const pixelMeta = {
         bitsAllocated: bitsAllocated,
         isSigned: (pixelRepresentation === 1)
       };
-      const columnsElement = dicomParser.getRawDicomElements()['00280011'];
-      const rowsElement = dicomParser.getRawDicomElements()['00280010'];
+      const columnsElement = dicomParser.getDicomElements()['00280011'];
+      const rowsElement = dicomParser.getDicomElements()['00280010'];
       if (typeof columnsElement !== 'undefined' &&
         typeof rowsElement !== 'undefined') {
         pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
       }
       const samplesPerPixelElement =
-        dicomParser.getRawDicomElements()['00280002'];
+        dicomParser.getDicomElements()['00280002'];
       if (typeof samplesPerPixelElement !== 'undefined') {
         pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
       }
       const planarConfigurationElement =
-        dicomParser.getRawDicomElements()['00280006'];
+        dicomParser.getDicomElements()['00280006'];
       if (typeof planarConfigurationElement !== 'undefined') {
         pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
       }

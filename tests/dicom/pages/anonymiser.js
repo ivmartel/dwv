@@ -40,7 +40,7 @@ function onLoadDICOMFile(event) {
   const parser = new dwv.dicom.DicomParser();
   parser.parse(event.target.result);
   // store elements
-  _dicomElements = parser.getRawDicomElements();
+  _dicomElements = parser.getDicomElements();
   // activate generate button
   const element = document.getElementById('generate');
   element.className = 'button button-active';

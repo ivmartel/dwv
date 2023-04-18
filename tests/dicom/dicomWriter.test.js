@@ -71,7 +71,7 @@ QUnit.test('Test multiframe writer support.', function (assert) {
   const bufferSize = numCols * numRows * numFrames;
 
   // raw tags
-  let rawTags = dicomParser.getRawDicomElements();
+  let rawTags = dicomParser.getDicomElements();
   // check values
   assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
   assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
@@ -88,7 +88,7 @@ QUnit.test('Test multiframe writer support.', function (assert) {
   dicomParser = new DicomParser();
   dicomParser.parse(buffer);
 
-  rawTags = dicomParser.getRawDicomElements();
+  rawTags = dicomParser.getDicomElements();
 
   // check values
   assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
@@ -138,7 +138,7 @@ QUnit.test('Test patient anonymisation', function (assert) {
   const patientsSex = 'M';
 
   // raw tags
-  let rawTags = dicomParser.getRawDicomElements();
+  let rawTags = dicomParser.getDicomElements();
   // check values
   assert.equal(
     rawTags['00100010'].value[0].trim(),
@@ -165,7 +165,7 @@ QUnit.test('Test patient anonymisation', function (assert) {
 
   dicomParser.parse(buffer);
 
-  rawTags = dicomParser.getRawDicomElements();
+  rawTags = dicomParser.getDicomElements();
 
   // check values
   assert.equal(
@@ -379,7 +379,7 @@ function testWriteReadDataFromConfig(config, assert) {
   // parse the buffer
   const dicomParser = new DicomParser();
   dicomParser.parse(dicomBuffer);
-  const elements = dicomParser.getRawDicomElements();
+  const elements = dicomParser.getDicomElements();
 
   // compare contents
   compare(config.tags, elements, config.name, assert);

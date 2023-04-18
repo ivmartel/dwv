@@ -36,7 +36,7 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
   const numCols = 32;
 
   // raw tags
-  const rawTags = dicomParser.getRawDicomElements();
+  const rawTags = dicomParser.getDicomElements();
   // check values
   assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows (raw)');
   assert.equal(
@@ -47,7 +47,7 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
     'ReferencedImageSequence SQ (raw)');
 
   // wrapped tags
-  const tags = dicomParser.getRawDicomElements();
+  const tags = dicomParser.getDicomElements();
   // wrong key
   assert.ok(typeof tags['12345678'] === 'undefined',
     'Wrong key fails if test');
@@ -88,7 +88,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
   const dicomParser = new DicomParser();
   dicomParser.parse(buffer);
   // raw tags
-  const tags = dicomParser.getRawDicomElements();
+  const tags = dicomParser.getDicomElements();
   assert.ok((Object.keys(tags).length !== 0), 'Got raw tags.');
 
   // ReferencedImageSequence: explicit sequence
