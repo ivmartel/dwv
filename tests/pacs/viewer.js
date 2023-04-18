@@ -173,8 +173,8 @@ function viewerSetup() {
     }
 
     if (event.loadtype === 'image' &&
-      typeof _app.getMetaData(event.loadid).Modality !== 'undefined' &&
-      _app.getMetaData(event.loadid).Modality.value === 'SEG') {
+      typeof _app.getMetaData(event.loadid)['00080060'] !== 'undefined' &&
+      _app.getMetaData(event.loadid)['00080060'].value[0] === 'SEG') {
       // log SEG details
       logFramePosPats(_app.getMetaData(event.loadid));
 
@@ -925,16 +925,21 @@ function getPrecisionRound(precision) {
  * @param {object} elements The DICOM seg elements.
  */
 function logFramePosPats(elements) {
-  const perFrame = elements.PerFrameFunctionalGroupsSequence.value;
+  // PerFrameFunctionalGroupsSequence
+  const perFrame = elements['52009230'].value;
   const perPos = {};
   for (let i = 0; i < perFrame.length; ++i) {
-    const posSq = perFrame[i].PlanePositionSequence.value;
-    const pos = posSq[0].ImagePositionPatient.value;
+    // PlanePositionSequence
+    const posSq = perFrame[i]['00209113'].value;
+    // ImagePositionPatient
+    const pos = posSq[0]['00200032'].value;
     if (typeof perPos[pos] === 'undefined') {
       perPos[pos] = [];
     }
-    const frameSq = perFrame[i].FrameContentSequence.value;
-    const dim = frameSq[0].DimensionIndexValues.value;
+    // FrameContentSequence
+    const frameSq = perFrame[i]['00209111'].value;
+    // DimensionIndexValues
+    const dim = frameSq[0]['00209157'].value;
     perPos[pos].push(dim);
   }
   console.log('DICOM SEG Segments', sortByPosPatKey(perPos));

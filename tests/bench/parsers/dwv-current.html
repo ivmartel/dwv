@@ -32,8 +32,9 @@ dump = function (buffer) {
   var dwvParser = new dwv.dicom.DicomParser();
   // parse the buffer
   dwvParser.parse(buffer);
+  var wrapper = new DicomElementsWrapper(dwvParser.getDicomElements());
   // return dump
-  return dwvParser.getDicomElements().dump();
+  return wrapper.dump();
 };
 </script>
 
