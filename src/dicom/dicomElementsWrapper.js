@@ -19,6 +19,8 @@ import {logger} from '../utils/logger';
 
 /**
  * DicomElements wrapper.
+ *
+ * Warning: limited support for merged meta data.
  */
 export class DicomElementsWrapper {
 
