@@ -215,7 +215,7 @@ const MPRPixGenerator = function (options) {
  * @param {object} image The associated image.
  * @returns {boolean} True if the tags are ok.
  */
-function checkTags(tags, image) {
+function mprCheckTags(tags, image) {
   /**
    * @param {number} value The value to check.
    * @returns {number} The expected value.
@@ -239,5 +239,5 @@ function checkTags(tags, image) {
 test.pixelGenerators = test.pixelGenerators || {};
 test.pixelGenerators.mpr = {
   generator: MPRPixGenerator,
-  checkTags: checkTags
+  checkTags: mprCheckTags
 };
