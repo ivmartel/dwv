@@ -52,12 +52,16 @@ export class DicomBufferToView {
   #generateImage(index, origin) {
     const dicomElements = this.#dicomParserStore[index].getDicomElements();
 
-    const modality = dicomElements['00080060'].value[0];
-    let factory;
-    if (modality && modality === 'SEG') {
-      factory = new MaskFactory();
-    } else {
-      factory = new ImageFactory();
+    // default factory
+    let factory = new ImageFactory();
+
+    // mask factory for DICOM SEG
+    const element = dicomElements['00080060'];
+    if (typeof element !== 'undefined') {
+      const modality = element.value[0];
+      if (modality === 'SEG') {
+        factory = new MaskFactory();
+      }
     }
 
     // create the image

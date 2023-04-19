@@ -179,9 +179,12 @@ export class ImageFactory {
 
     // meta information
     const meta = {
-      numberOfFiles: numberOfFiles,
-      Modality: dicomElements['00080060'].value[0],
+      numberOfFiles: numberOfFiles
     };
+    const modality = dicomElements['00080060'];
+    if (typeof modality !== 'undefined') {
+      meta.Modality = modality.value[0];
+    }
     const sopClassUID = dicomElements['00080016'];
     if (typeof sopClassUID !== 'undefined') {
       meta.SOPClassUID = sopClassUID.value[0];
