@@ -153,15 +153,15 @@ export class DataWriter {
   }
 
   /**
-   * Write string data as hexadecimal.
+   * Write string data of length 4 as hexadecimal (no '0x' prefix).
    *
    * @param {number} byteOffset The offset to start writing from.
-   * @param {number} str The padded hexadecimal string to write ('0x####').
+   * @param {number} str The hexadecimal string to write ('####').
    * @returns {number} The new offset position.
    */
   writeHex(byteOffset, str) {
     // remove first two chars and parse
-    const value = parseInt(str.substring(2), 16);
+    const value = parseInt(str, 16);
     this.#view.setUint16(byteOffset, value, this.#isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
   }

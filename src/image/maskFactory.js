@@ -1,4 +1,4 @@
-import {cleanString} from '../dicom/dicomParser';
+import {getImage2DSize} from '../dicom/dicomElementsWrapper';
 import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
@@ -13,6 +13,7 @@ import {
   cielabToSrgb,
   uintLabToLab
 } from '../utils/colour';
+import {Size} from './size';
 
 /**
  * Check two position patients for equality.
@@ -48,24 +49,26 @@ function getComparePosPat(orientation) {
  * @param {object} tagDefinition The tag definition as {name, tag, type, enum}.
  */
 function checkTag(rootElement, tagDefinition) {
-  let tagValue = rootElement.getFromKey(tagDefinition.tag);
+  const element = rootElement[tagDefinition.tag];
   // check null and undefined
   if (tagDefinition.type === 1 || tagDefinition.type === 2) {
-    if (tagValue === null || typeof tagValue === 'undefined') {
+    if (typeof element === 'undefined') {
       throw new Error('Missing or empty ' + tagDefinition.name);
     }
   } else {
-    if (tagValue === null || typeof tagValue === 'undefined') {
+    if (typeof element === 'undefined') {
       // non mandatory value, exit
       return;
     }
   }
   let includes = false;
+  let tagValue;
+  if (element.value.length === 1) {
+    tagValue = element.value[0];
+  } else {
+    tagValue = element.value;
+  }
   if (Array.isArray(tagValue)) {
-    // trim
-    tagValue = tagValue.map(function (item) {
-      return cleanString(item);
-    });
     for (let i = 0; i < tagDefinition.enum.length; ++i) {
       if (!Array.isArray(tagDefinition.enum[i])) {
         throw new Error('Cannot compare array and non array tag value.');
@@ -76,11 +79,6 @@ function checkTag(rootElement, tagDefinition) {
       }
     }
   } else {
-    // trim
-    if (typeof tagValue === 'string') {
-      tagValue = cleanString(tagValue);
-    }
-
     includes = tagDefinition.enum.includes(tagValue);
   }
   if (!includes) {
@@ -195,17 +193,18 @@ function getDefaultDicomSegJson() {
  */
 function getDimensionOrganization(rootElement) {
   // Dimension Organization Sequence (required)
-  const orgSq = rootElement.getFromKey('x00209221', true);
-  if (!orgSq || orgSq.length !== 1) {
+  const orgSq = rootElement['00209221'];
+  if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
     throw new Error('Unsupported dimension organization sequence length');
   }
   // Dimension Organization UID
-  const orgUID = cleanString(orgSq[0].x00209164.value[0]);
+  const orgUID = orgSq.value[0]['00209164'].value[0];
 
   // Dimension Index Sequence (conditionally required)
   const indices = [];
-  const indexSq = rootElement.getFromKey('x00209222', true);
-  if (indexSq) {
+  const indexSqElem = rootElement['00209222'];
+  if (typeof indexSqElem !== 'undefined') {
+    const indexSq = indexSqElem.value;
     // expecting 2D index
     if (indexSq.length !== 2) {
       throw new Error('Unsupported dimension index sequence length');
@@ -213,22 +212,21 @@ function getDimensionOrganization(rootElement) {
     let indexPointer;
     for (let i = 0; i < indexSq.length; ++i) {
       // Dimension Organization UID (required)
-      const indexOrg = cleanString(indexSq[i].x00209164.value[0]);
+      const indexOrg = indexSq[i]['00209164'].value[0];
       if (indexOrg !== orgUID) {
         throw new Error(
           'Dimension Index Sequence contains a unknown Dimension Organization');
       }
       // Dimension Index Pointer (required)
-      indexPointer = cleanString(indexSq[i].x00209165.value[0]);
+      indexPointer = indexSq[i]['00209165'].value[0];
 
       const index = {
         DimensionOrganizationUID: indexOrg,
         DimensionIndexPointer: indexPointer
       };
       // Dimension Description Label (optional)
-      if (typeof indexSq[i].x00209421 !== 'undefined') {
-        index.DimensionDescriptionLabel =
-          cleanString(indexSq[i].x00209421.value[0]);
+      if (typeof indexSq[i]['00209421'] !== 'undefined') {
+        index.DimensionDescriptionLabel = indexSq[i]['00209421'].value[0];
       }
       // store
       indices.push(index);
@@ -262,25 +260,25 @@ function getDimensionOrganization(rootElement) {
 function getCode(element) {
   // meaning -> CodeMeaning (type1)
   const code = {
-    meaning: cleanString(element.x00080104.value[0])
+    meaning: element['00080104'].value[0]
   };
   // value -> CodeValue (type1C)
   // longValue -> LongCodeValue (type1C)
   // urnValue -> URNCodeValue (type1C)
-  if (element.x00080100) {
-    code.value = element.x00080100.value[0];
-  } else if (element.x00080119) {
-    code.longValue = element.x00080119.value[0];
-  } else if (element.x00080120) {
-    code.urnValue = element.x00080120.value[0];
+  if (element['00080100']) {
+    code.value = element['00080100'].value[0];
+  } else if (element['00080119']) {
+    code.longValue = element['00080119'].value[0];
+  } else if (element['00080120']) {
+    code.urnValue = element['00080120'].value[0];
   } else {
     throw Error('Invalid code with no value, no long value and no urn value.');
   }
   // schemeDesignator -> CodingSchemeDesignator (type1C)
   if (typeof code.value !== 'undefined' ||
     typeof code.longValue !== 'undefined') {
-    if (element.x00080102) {
-      code.schemeDesignator = element.x00080102.value[0];
+    if (element['00080102']) {
+      code.schemeDesignator = element['00080102'].value[0];
     } else {
       throw Error(
         'No coding sheme designator when code value or long value is present');
@@ -300,14 +298,13 @@ function getSegment(element) {
   // label -> SegmentLabel (type1)
   // algorithmType -> SegmentAlgorithmType (type1)
   const segment = {
-    number: element.x00620004.value[0],
-    label: cleanString(element.x00620005.value[0]),
-    algorithmType: cleanString(element.x00620008.value[0])
+    number: element['00620004'].value[0],
+    label: element['00620005'].value[0],
+    algorithmType: element['00620008'].value[0]
   };
   // algorithmName -> SegmentAlgorithmName (type1C)
-  if (element.x00620009) {
-    segment.algorithmName =
-      cleanString(element.x00620009.value[0]);
+  if (element['00620009']) {
+    segment.algorithmName = element['00620009'].value[0];
   }
   // // required if type is not MANUAL
   // if (segment.algorithmType !== 'MANUAL' &&
@@ -318,10 +315,10 @@ function getSegment(element) {
   // displayValue ->
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
-  if (typeof element.x0062000C !== 'undefined') {
-    segment.displayValue = element.x006200C.value;
-  } else if (typeof element.x0062000D !== 'undefined') {
-    const cielabElement = element.x0062000D.value;
+  if (typeof element['0062000C'] !== 'undefined') {
+    segment.displayValue = element['006200C'].value;
+  } else if (typeof element['0062000D'] !== 'undefined') {
+    const cielabElement = element['0062000D'].value;
     const rgb = cielabToSrgb(uintLabToLab({
       l: cielabElement[0],
       a: cielabElement[1],
@@ -330,23 +327,23 @@ function getSegment(element) {
     segment.displayValue = rgb;
   }
   // Segmented Property Category Code Sequence (type1, only one)
-  if (typeof element.x00620003 !== 'undefined') {
+  if (typeof element['00620003'] !== 'undefined') {
     segment.propertyCategoryCode =
-      getCode(element.x00620003.value[0]);
+      getCode(element['00620003'].value[0]);
   } else {
     throw Error('Missing Segmented Property Category Code Sequence.');
   }
   // Segmented Property Type Code Sequence (type1)
-  if (typeof element.x0062000F !== 'undefined') {
+  if (typeof element['0062000F'] !== 'undefined') {
     segment.propertyTypeCode =
-      getCode(element.x0062000F.value[0]);
+      getCode(element['0062000F'].value[0]);
   } else {
     throw Error('Missing Segmented Property Type Code Sequence.');
   }
   // tracking Id and UID (type1C)
-  if (typeof element.x00620020 !== 'undefined') {
-    segment.trackingId = element.x00620020.value[0];
-    segment.trackingUid = element.x00620021.value[0];
+  if (typeof element['00620020'] !== 'undefined') {
+    segment.trackingId = element['00620020'].value[0];
+    segment.trackingUid = element['00620021'].value[0];
   }
 
   return segment;
@@ -436,20 +433,20 @@ export function isSimilarSegment(seg1, seg2) {
  */
 function getSpacingFromMeasure(measure) {
   // Pixel Spacing
-  if (typeof measure.x00280030 === 'undefined') {
+  if (typeof measure['00280030'] === 'undefined') {
     return null;
   }
-  const pixelSpacing = measure.x00280030;
+  const pixelSpacing = measure['00280030'];
   const spacingValues = [
     parseFloat(pixelSpacing.value[0]),
     parseFloat(pixelSpacing.value[1])
   ];
   // Slice Thickness
-  if (typeof measure.x00180050 !== 'undefined') {
-    spacingValues.push(parseFloat(measure.x00180050.value[0]));
-  } else if (typeof measure.x00180088 !== 'undefined') {
+  if (typeof measure['00180050'] !== 'undefined') {
+    spacingValues.push(parseFloat(measure['00180050'].value[0]));
+  } else if (typeof measure['00180088'] !== 'undefined') {
     // Spacing Between Slices
-    spacingValues.push(parseFloat(measure.x00180088.value[0]));
+    spacingValues.push(parseFloat(measure['00180088'].value[0]));
   }
   return new Spacing(spacingValues);
 }
@@ -463,24 +460,24 @@ function getSpacingFromMeasure(measure) {
 function getSegmentFrameInfo(groupItem) {
   // Derivation Image Sequence
   const derivationImages = [];
-  if (typeof groupItem.x00089124 !== 'undefined') {
-    const derivationImageSq = groupItem.x00089124.value;
+  if (typeof groupItem['00089124'] !== 'undefined') {
+    const derivationImageSq = groupItem['00089124'].value;
     // Source Image Sequence
     for (let i = 0; i < derivationImageSq.length; ++i) {
       const sourceImages = [];
-      if (typeof derivationImageSq[i].x00082112 !== 'undefined') {
-        const sourceImageSq = derivationImageSq[i].x00082112.value;
+      if (typeof derivationImageSq[i]['00082112'] !== 'undefined') {
+        const sourceImageSq = derivationImageSq[i]['00082112'].value;
         for (let j = 0; j < sourceImageSq.length; ++j) {
           const sourceImage = {};
           // Referenced SOP Class UID
-          if (typeof sourceImageSq[j].x00081150 !== 'undefined') {
+          if (typeof sourceImageSq[j]['00081150'] !== 'undefined') {
             sourceImage.referencedSOPClassUID =
-              sourceImageSq[j].x00081150.value[0];
+              sourceImageSq[j]['00081150'].value[0];
           }
           // Referenced SOP Instance UID
-          if (typeof sourceImageSq[j].x00081155 !== 'undefined') {
+          if (typeof sourceImageSq[j]['00081155'] !== 'undefined') {
             sourceImage.referencedSOPInstanceUID =
-              sourceImageSq[j].x00081155.value[0];
+              sourceImageSq[j]['00081155'].value[0];
           }
           sourceImages.push(sourceImage);
         }
@@ -489,17 +486,17 @@ function getSegmentFrameInfo(groupItem) {
     }
   }
   // Frame Content Sequence (required, only one)
-  const frameContentSq = groupItem.x00209111.value;
+  const frameContentSq = groupItem['00209111'].value;
   // Dimension Index Value
-  const dimIndex = frameContentSq[0].x00209157.value;
+  const dimIndex = frameContentSq[0]['00209157'].value;
   // Segment Identification Sequence (required, only one)
-  const segmentIdSq = groupItem.x0062000A.value;
+  const segmentIdSq = groupItem['0062000A'].value;
   // Referenced Segment Number
-  const refSegmentNumber = segmentIdSq[0].x0062000B.value[0];
+  const refSegmentNumber = segmentIdSq[0]['0062000B'].value[0];
   // Plane Position Sequence (required, only one)
-  const planePosSq = groupItem.x00209113.value;
+  const planePosSq = groupItem['00209113'].value;
   // Image Position (Patient) (conditionally required)
-  const imagePosPat = planePosSq[0].x00200032.value;
+  const imagePosPat = planePosSq[0]['00200032'].value;
   for (let p = 0; p < imagePosPat.length; ++p) {
     imagePosPat[p] = parseFloat(imagePosPat[p], 10);
   }
@@ -510,20 +507,20 @@ function getSegmentFrameInfo(groupItem) {
     refSegmentNumber: refSegmentNumber
   };
   // Plane Orientation Sequence
-  if (typeof groupItem.x00209116 !== 'undefined') {
-    const framePlaneOrientationSeq = groupItem.x00209116;
+  if (typeof groupItem['00209116'] !== 'undefined') {
+    const framePlaneOrientationSeq = groupItem['00209116'];
     if (framePlaneOrientationSeq.value.length !== 0) {
       // should only be one Image Orientation (Patient)
       const frameImageOrientation =
-        framePlaneOrientationSeq.value[0].x00200037.value;
+        framePlaneOrientationSeq.value[0]['00200037'].value;
       if (typeof frameImageOrientation !== 'undefined') {
         frameInfo.imageOrientationPatient = frameImageOrientation;
       }
     }
   }
   // Pixel Measures Sequence
-  if (typeof groupItem.x00289110 !== 'undefined') {
-    const framePixelMeasuresSeq = groupItem.x00289110;
+  if (typeof groupItem['00289110'] !== 'undefined') {
+    const framePixelMeasuresSeq = groupItem['00289110'];
     if (framePixelMeasuresSeq.value.length !== 0) {
       // should only be one
       const frameSpacing =
@@ -552,31 +549,23 @@ export class MaskFactory {
    * @param {Array} pixelBuffer The pixel buffer.
    * @returns {Image} A new Image.
    */
-  create(
-    dicomElements, pixelBuffer) {
+  create(dicomElements, pixelBuffer) {
     // check required and supported tags
     for (let d = 0; d < RequiredDicomSegTags.length; ++d) {
       checkTag(dicomElements, RequiredDicomSegTags[d]);
     }
 
-    // columns
-    const columns = dicomElements.getFromKey('x00280011');
-    if (!columns) {
-      throw new Error('Missing or empty DICOM image number of columns');
-    }
-    // rows
-    const rows = dicomElements.getFromKey('x00280010');
-    if (!rows) {
-      throw new Error('Missing or empty DICOM image number of rows');
-    }
-    const sliceSize = columns * rows;
+    // image size
+    const size2D = getImage2DSize(dicomElements);
+    const size = new Size([size2D[0], size2D[1], 1]);
+
+    const sliceSize = size.getTotalSize();
 
     // frames
-    let frames = dicomElements.getFromKey('x00280008');
-    if (!frames) {
-      frames = 1;
-    } else {
-      frames = parseInt(frames, 10);
+    let frames = 1;
+    const framesElem = dicomElements['00280008'];
+    if (typeof framesElem !== 'undefined') {
+      frames = parseInt(framesElem.value[0], 10);
     }
 
     if (frames !== pixelBuffer.length / sliceSize) {
@@ -589,14 +578,14 @@ export class MaskFactory {
     const dimension = getDimensionOrganization(dicomElements);
 
     // Segment Sequence
-    const segSequence = dicomElements.getFromKey('x00620002', true);
-    if (!segSequence || typeof segSequence === 'undefined') {
+    const segSequence = dicomElements['00620002'];
+    if (typeof segSequence === 'undefined') {
       throw new Error('Missing or empty segmentation sequence');
     }
     const segments = [];
     let storeAsRGB = false;
-    for (let i = 0; i < segSequence.length; ++i) {
-      const segment = getSegment(segSequence[i]);
+    for (let i = 0; i < segSequence.value.length; ++i) {
+      const segment = getSegment(segSequence.value[i]);
       if (typeof segment.displayValue.r !== 'undefined' &&
         typeof segment.displayValue.g !== 'undefined' &&
         typeof segment.displayValue.b !== 'undefined') {
@@ -607,32 +596,29 @@ export class MaskFactory {
       segments.push(segment);
     }
 
-    // image size
-    const size = dicomElements.getImageSize();
 
     // Shared Functional Groups Sequence
     let spacing;
     let imageOrientationPatient;
-    const sharedFunctionalGroupsSeq =
-      dicomElements.getFromKey('x52009229', true);
-    if (sharedFunctionalGroupsSeq && sharedFunctionalGroupsSeq.length !== 0) {
+    const sharedFunctionalGroupsSeq = dicomElements['52009229'];
+    if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
       // should be only one
-      const funcGroup0 = sharedFunctionalGroupsSeq[0];
+      const funcGroup0 = sharedFunctionalGroupsSeq.value[0];
       // Plane Orientation Sequence
-      if (typeof funcGroup0.x00209116 !== 'undefined') {
-        const planeOrientationSeq = funcGroup0.x00209116;
+      if (typeof funcGroup0['00209116'] !== 'undefined') {
+        const planeOrientationSeq = funcGroup0['00209116'];
         if (planeOrientationSeq.value.length !== 0) {
           // should be only one
           imageOrientationPatient =
-            planeOrientationSeq.value[0].x00200037.value;
+            planeOrientationSeq.value[0]['00200037'].value;
         } else {
           logger.warn(
             'No shared functional group plane orientation sequence items.');
         }
       }
       // Pixel Measures Sequence
-      if (typeof funcGroup0.x00289110 !== 'undefined') {
-        const pixelMeasuresSeq = funcGroup0.x00289110;
+      if (typeof funcGroup0['00289110'] !== 'undefined') {
+        const pixelMeasuresSeq = funcGroup0['00289110'];
         if (pixelMeasuresSeq.value.length !== 0) {
           // should be only one
           spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
@@ -656,21 +642,19 @@ export class MaskFactory {
     };
 
     // Per-frame Functional Groups Sequence
-    const perFrameFuncGroupSequence =
-      dicomElements.getFromKey('x52009230', true);
-    if (!perFrameFuncGroupSequence ||
-      typeof perFrameFuncGroupSequence === 'undefined') {
+    const perFrameFuncGroupSequence = dicomElements['52009230'];
+    if (typeof perFrameFuncGroupSequence === 'undefined') {
       throw new Error('Missing or empty per frame functional sequence');
     }
-    if (frames !== perFrameFuncGroupSequence.length) {
+    if (frames !== perFrameFuncGroupSequence.value.length) {
       throw new Error(
         'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
     }
     // create frame info object from per frame func
     const frameInfos = [];
-    for (let j = 0; j < perFrameFuncGroupSequence.length; ++j) {
+    for (let j = 0; j < perFrameFuncGroupSequence.value.length; ++j) {
       frameInfos.push(
-        getSegmentFrameInfo(perFrameFuncGroupSequence[j]));
+        getSegmentFrameInfo(perFrameFuncGroupSequence.value[j]));
     }
 
     // check frame infos
@@ -859,27 +843,25 @@ export class MaskFactory {
     // meta information
     const meta = getDefaultDicomSegJson();
     // Study
-    meta.StudyDate = dicomElements.getFromKey('x00080020');
-    meta.StudyTime = dicomElements.getFromKey('x00080030');
-    meta.StudyInstanceUID = dicomElements.getFromKey('x0020000D');
-    meta.StudyID = dicomElements.getFromKey('x00200010');
+    meta.StudyDate = dicomElements['00080020'].value[0];
+    meta.StudyTime = dicomElements['00080030'].value[0];
+    meta.StudyInstanceUID = dicomElements['0020000D'].value[0];
+    meta.StudyID = dicomElements['00200010'].value[0];
     // Series
-    meta.SeriesInstanceUID = dicomElements.getFromKey('x0020000E');
-    meta.SeriesNumber = dicomElements.getFromKey('x00200011');
+    meta.SeriesInstanceUID = dicomElements['0020000E'].value[0];
+    meta.SeriesNumber = dicomElements['00200011'].value[0];
     // ReferringPhysicianName
-    meta.ReferringPhysicianName = dicomElements.getFromKey('x00080090');
+    meta.ReferringPhysicianName = dicomElements['00080090'].value[0];
     // patient info
-    meta.PatientName =
-      cleanString(dicomElements.getFromKey('x00100010'));
-    meta.PatientID = cleanString(dicomElements.getFromKey('x00100020'));
-    meta.PatientBirthDate = dicomElements.getFromKey('x00100030');
-    meta.PatientSex =
-      cleanString(dicomElements.getFromKey('x00100040'));
+    meta.PatientName = dicomElements['00100010'].value[0];
+    meta.PatientID = dicomElements['00100020'].value[0];
+    meta.PatientBirthDate = dicomElements['00100030'].value[0];
+    meta.PatientSex = dicomElements['00100040'].value[0];
     // Enhanced General Equipment Module
-    meta.Manufacturer = dicomElements.getFromKey('x00080070');
-    meta.ManufacturerModelName = dicomElements.getFromKey('x00081090');
-    meta.DeviceSerialNumber = dicomElements.getFromKey('x00181000');
-    meta.SoftwareVersions = dicomElements.getFromKey('x00181020');
+    meta.Manufacturer = dicomElements['00080070'].value[0];
+    meta.ManufacturerModelName = dicomElements['00081090'].value[0];
+    meta.DeviceSerialNumber = dicomElements['00181000'].value[0];
+    meta.SoftwareVersions = dicomElements['00181020'].value[0];
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
     meta.DimensionIndexSequence = dimension.indices;
@@ -887,21 +869,21 @@ export class MaskFactory {
     meta.custom = {
       segments: segments,
       frameInfos: frameInfos,
-      SOPInstanceUID: dicomElements.getFromKey('x00080018')
+      SOPInstanceUID: dicomElements['00080018'].value[0]
     };
 
     // number of files: in this case equal to number slices,
     //   used to calculate buffer size
     meta.numberOfFiles = numberOfSlices;
     // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dicomElements.getFromKey('x00200052');
+    const frameOfReferenceUID = dicomElements['00200052'];
     if (frameOfReferenceUID) {
-      meta.FrameOfReferenceUID = frameOfReferenceUID;
+      meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
     }
     // LossyImageCompression (optional)
-    const lossyImageCompression = dicomElements.getFromKey('x00282110');
+    const lossyImageCompression = dicomElements['00282110'];
     if (lossyImageCompression) {
-      meta.LossyImageCompression = lossyImageCompression;
+      meta.LossyImageCompression = lossyImageCompression.value[0];
     }
 
     image.setMeta(meta);

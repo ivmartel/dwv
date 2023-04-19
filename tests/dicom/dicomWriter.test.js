@@ -1,7 +1,4 @@
-import {
-  cleanString,
-  DicomParser
-} from '../../src/dicom/dicomParser';
+import {DicomParser} from '../../src/dicom/dicomParser';
 import {
   DicomWriter,
   getElementsFromJSONTags,
@@ -11,7 +8,6 @@ import {
   getTagFromDictionary,
   getPixelDataTag
 } from '../../src/dicom/dicomTag';
-import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
 import {dictionary} from '../../src/dicom/dictionary';
 import {b64urlToArrayBuffer} from './utils';
 
@@ -75,14 +71,14 @@ QUnit.test('Test multiframe writer support.', function (assert) {
   const bufferSize = numCols * numRows * numFrames;
 
   // raw tags
-  let rawTags = dicomParser.getRawDicomElements();
+  let rawTags = dicomParser.getDicomElements();
   // check values
-  assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
-  assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
-  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
+  assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
+  assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
+  assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows');
   // length of value array for pixel data
   assert.equal(
-    rawTags.x7FE00010.value[0].length,
+    rawTags['7FE00010'].value[0].length,
     bufferSize,
     'Length of value array for pixel data');
 
@@ -92,15 +88,15 @@ QUnit.test('Test multiframe writer support.', function (assert) {
   dicomParser = new DicomParser();
   dicomParser.parse(buffer);
 
-  rawTags = dicomParser.getRawDicomElements();
+  rawTags = dicomParser.getDicomElements();
 
   // check values
-  assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
-  assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
-  assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
+  assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
+  assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
+  assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows');
   // length of value array for pixel data
   assert.equal(
-    rawTags.x7FE00010.value[0].length,
+    rawTags['7FE00010'].value[0].length,
     bufferSize,
     'Length of value array for pixel data');
 
@@ -125,7 +121,7 @@ QUnit.test('Test patient anonymisation', function (assert) {
     default: {
       action: 'copy', value: null
     },
-    x00100010: {
+    '00100010': {
       action: 'replace', value: patientsNameAnonymised
     },
     PatientID: {
@@ -142,22 +138,22 @@ QUnit.test('Test patient anonymisation', function (assert) {
   const patientsSex = 'M';
 
   // raw tags
-  let rawTags = dicomParser.getRawDicomElements();
+  let rawTags = dicomParser.getDicomElements();
   // check values
   assert.equal(
-    rawTags.x00100010.value[0].trim(),
+    rawTags['00100010'].value[0].trim(),
     patientsName,
     'patientsName');
   assert.equal(
-    rawTags.x00100020.value[0].trim(),
+    rawTags['00100020'].value[0].trim(),
     patientID,
     'patientID');
   assert.equal(
-    rawTags.x00100030.value[0].trim(),
+    rawTags['00100030'].value[0].trim(),
     patientsBirthDate,
     'patientsBirthDate');
   assert.equal(
-    rawTags.x00100040.value[0].trim(),
+    rawTags['00100040'].value[0].trim(),
     patientsSex,
     'patientsSex');
 
@@ -169,19 +165,19 @@ QUnit.test('Test patient anonymisation', function (assert) {
 
   dicomParser.parse(buffer);
 
-  rawTags = dicomParser.getRawDicomElements();
+  rawTags = dicomParser.getDicomElements();
 
   // check values
   assert.equal(
-    rawTags.x00100010.value[0],
+    rawTags['00100010'].value[0],
     patientsNameAnonymised,
     'patientName');
   assert.equal(
-    rawTags.x00100020.value[0],
+    rawTags['00100020'].value[0],
     patientsIdAnonymised,
     'patientID');
-  assert.notOk(rawTags.x00100030, 'patientsBirthDate');
-  assert.notOk(rawTags.x00100040, 'patientsSex');
+  assert.notOk(rawTags['00100030'], 'patientsBirthDate');
+  assert.notOk(rawTags['00100040'], 'patientsSex');
 
 });
 
@@ -204,8 +200,8 @@ function compare(jsonTags, dicomElements, name, comparator) {
     const tagName = keys[k];
     const tag = getTagFromDictionary(tagName);
     const tagKey = tag.getKey();
-    const element = dicomElements.getDEFromKey(tagKey);
-    const value = dicomElements.getFromKey(tagKey, true);
+    const element = dicomElements[tagKey];
+    const value = element.value;
     if (element.vr !== 'SQ') {
       let jsonTag = jsonTags[tagName];
       // stringify possible array
@@ -213,7 +209,7 @@ function compare(jsonTags, dicomElements, name, comparator) {
         jsonTag = jsonTag.join();
       }
       comparator.equal(
-        cleanString(value.join()),
+        value.join(),
         jsonTag,
         name + ' - ' + tagName);
     } else {
@@ -229,9 +225,8 @@ function compare(jsonTags, dicomElements, name, comparator) {
       // supposing same order of subkeys and indices...
       for (let i = 0; i < sqValue.length; ++i) {
         if (sqValue[i] !== 'undefinedLength') {
-          const wrap = new DicomElementsWrapper(value[i]);
           compare(
-            sqValue[i], wrap, name, comparator);
+            sqValue[i], value[i], name, comparator);
         }
       }
     }
@@ -367,7 +362,7 @@ function testWriteReadDataFromConfig(config, assert) {
   const dicomElements = getElementsFromJSONTags(jsonTags);
   // pixels (if possible): small gradient square
   if (config.tags.Modality !== 'KO') {
-    dicomElements.x7FE00010 = generateGradSquare(config.tags);
+    dicomElements['7FE00010'] = generateGradSquare(config.tags);
   }
 
   // create DICOM buffer

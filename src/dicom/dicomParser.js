@@ -10,7 +10,6 @@ import {
   charSetString
 } from './dictionary';
 import {DataReader} from './dataReader';
-import {DicomElementsWrapper} from './dicomElementsWrapper';
 import {logger} from '../utils/logger';
 import {arrayEquals} from '../utils/array';
 
@@ -41,6 +40,7 @@ export function hasDicomPrefix(buffer) {
 
 /**
  * Clean string: trim and remove ending.
+ * (exported for tests only)
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.
@@ -380,15 +380,15 @@ export function getTransferSyntaxName(syntax) {
  * @returns {object} The transfer syntax data element.
  */
 function guessTransferSyntax(firstDataElement) {
-  const oEightGroupBigEndian = '0x0800';
-  const oEightGroupLittleEndian = '0x0008';
-  // check that group is 0x0008
+  const oEightGroupBigEndian = '0800';
+  const oEightGroupLittleEndian = '0008';
+  // check that group is 0008
   const group = firstDataElement.tag.getGroup();
   if (group !== oEightGroupBigEndian &&
     group !== oEightGroupLittleEndian) {
     throw new Error(
       'Not a valid DICOM file (no magic DICM word found' +
-        ' and first element not in 0x0008 group)'
+        ' and first element not in 0008 group)'
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr
@@ -421,7 +421,7 @@ function guessTransferSyntax(firstDataElement) {
   }
   // set transfer syntax data element
   const dataElement = {
-    tag: new Tag('0x0002', '0x0010'),
+    tag: new Tag('0002', '0010'),
     vr: 'UI'
   };
   dataElement.value = [syntax + ' ']; // even length
@@ -522,13 +522,12 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
- *   // get the wrapped dicom tags
- *   // (raw tags are available via 'getRawDicomElements')
+ *   // get the dicom tags
  *   const tags = dicomParser.getDicomElements();
  *   // display the modality
  *   const div = document.getElementById('dwv');
  *   div.appendChild(document.createTextNode(
- *     'Modality: ' + tags.getFromName('Modality')
+ *     'Modality: ' + tags['00080060'].value[0]
  *   ));
  * };
  * // DICOM file request
@@ -631,17 +630,8 @@ export class DicomParser {
    *
    * @returns {object} The raw DICOM elements.
    */
-  getRawDicomElements() {
-    return this.dicomElements;
-  }
-
-  /**
-   * Get the DICOM data elements.
-   *
-   * @returns {object} The DICOM elements.
-   */
   getDicomElements() {
-    return new DicomElementsWrapper(this.dicomElements);
+    return this.dicomElements;
   }
 
   /**
@@ -789,7 +779,7 @@ export class DicomParser {
       // implicit VR
       if (implicit) {
         vr = tag.getVrFromDictionary();
-        if (vr === null) {
+        if (typeof vr === 'undefined') {
           vr = 'UN';
         }
         is32bitVL = true;
@@ -959,20 +949,28 @@ export class DicomParser {
         data = reader.readUint8Array(offset, vl);
       } else if (vrType === 'Uint16') {
         data = reader.readUint16Array(offset, vl);
+        // keep as binary for 'O*' VR
+        if (vr[0] !== 'O') {
+          data = Array.from(data);
+        }
       } else if (vrType === 'Uint32') {
         data = reader.readUint32Array(offset, vl);
+        // keep as binary for 'O*' VR
+        if (vr[0] !== 'O') {
+          data = Array.from(data);
+        }
       } else if (vrType === 'Uint64') {
         data = reader.readUint64Array(offset, vl);
       } else if (vrType === 'Int16') {
-        data = reader.readInt16Array(offset, vl);
+        data = Array.from(reader.readInt16Array(offset, vl));
       } else if (vrType === 'Int32') {
-        data = reader.readInt32Array(offset, vl);
+        data = Array.from(reader.readInt32Array(offset, vl));
       } else if (vrType === 'Int64') {
         data = reader.readInt64Array(offset, vl);
       } else if (vrType === 'Float32') {
-        data = reader.readFloat32Array(offset, vl);
+        data = Array.from(reader.readFloat32Array(offset, vl));
       } else if (vrType === 'Float64') {
-        data = reader.readFloat64Array(offset, vl);
+        data = Array.from(reader.readFloat64Array(offset, vl));
       } else if (vrType === 'string') {
         const stream = reader.readUint8Array(offset, vl);
         if (charSetString.includes(vr)) {
@@ -980,23 +978,23 @@ export class DicomParser {
         } else {
           data = this.decodeString(stream);
         }
-        data = data.split('\\');
+        data = cleanString(data).split('\\');
       } else {
         throw Error('Unknown VR type: ' + vrType);
       }
     } else if (vr === 'ox') {
       // OB or OW
       if (bitsAllocated === 8) {
-        data = reader.readUint8Array(offset, vl);
+        data = Array.from(reader.readUint8Array(offset, vl));
       } else {
-        data = reader.readUint16Array(offset, vl);
+        data = Array.from(reader.readUint16Array(offset, vl));
       }
     } else if (vr === 'xs') {
       // US or SS
       if (pixelRepresentation === 0) {
-        data = reader.readUint16Array(offset, vl);
+        data = Array.from(reader.readUint16Array(offset, vl));
       } else {
-        data = reader.readInt16Array(offset, vl);
+        data = Array.from(reader.readInt16Array(offset, vl));
       }
     } else if (vr === 'AT') {
       // attribute
@@ -1024,6 +1022,10 @@ export class DicomParser {
           subElement.value = this.interpretElement(
             subElement, reader,
             pixelRepresentation, bitsAllocated);
+          delete subElement.tag;
+          delete subElement.vl;
+          delete subElement.startOffset;
+          delete subElement.endOffset;
           itemData[keys[l]] = subElement;
         }
         data.push(itemData);
@@ -1064,6 +1066,8 @@ export class DicomParser {
           element, reader, pixelRepresentation, bitsAllocated);
       }
       // delete interpretation specific properties
+      delete element.tag;
+      delete element.vl;
       delete element.startOffset;
       delete element.endOffset;
     }
@@ -1088,7 +1092,7 @@ export class DicomParser {
     const magicword = this.decodeString(metaReader.readUint8Array(offset, 4));
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
     if (magicword === 'DICM') {
-      // 0x0002, 0x0000: FileMetaInformationGroupLength
+      // 0002, 0000: FileMetaInformationGroupLength (vr='UL')
       dataElement = this.readDataElement(metaReader, offset, false);
       dataElement.value = this.interpretElement(dataElement, metaReader);
       // increment offset
@@ -1096,7 +1100,7 @@ export class DicomParser {
       // store the data element
       this.dicomElements[dataElement.tag.getKey()] = dataElement;
       // get meta length
-      const metaLength = parseInt(dataElement.value[0], 10);
+      const metaLength = dataElement.value[0];
 
       // meta elements
       const metaEnd = offset + metaLength;
@@ -1109,12 +1113,12 @@ export class DicomParser {
       }
 
       // check the TransferSyntaxUID (has to be there!)
-      dataElement = this.dicomElements.x00020010;
+      dataElement = this.dicomElements['00020010'];
       if (typeof dataElement === 'undefined') {
         throw new Error('Not a valid DICOM file (no TransferSyntaxUID found)');
       }
       dataElement.value = this.interpretElement(dataElement, metaReader);
-      syntax = cleanString(dataElement.value[0]);
+      syntax = dataElement.value[0];
 
     } else {
       logger.warn('No DICM prefix, trying to guess tansfer syntax.');
@@ -1124,7 +1128,7 @@ export class DicomParser {
       const tsElement = guessTransferSyntax(dataElement);
       // store
       this.dicomElements[tsElement.tag.getKey()] = tsElement;
-      syntax = cleanString(tsElement.value[0]);
+      syntax = tsElement.value[0];
       // reset offset
       offset = 0;
     }
@@ -1176,9 +1180,9 @@ export class DicomParser {
     // pixel specific
     let pixelRepresentation = 0;
     let bitsAllocated = 16;
-    if (typeof this.dicomElements.x7FE00010 !== 'undefined') {
+    if (typeof this.dicomElements['7FE00010'] !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
-      dataElement = this.dicomElements.x00280103;
+      dataElement = this.dicomElements['00280103'];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
         pixelRepresentation = dataElement.value[0];
@@ -1188,7 +1192,7 @@ export class DicomParser {
       }
 
       // BitsAllocated
-      dataElement = this.dicomElements.x00280100;
+      dataElement = this.dicomElements['00280100'];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.interpretElement(dataElement, dataReader);
         bitsAllocated = dataElement.value[0];
@@ -1203,14 +1207,14 @@ export class DicomParser {
     }
 
     // SpecificCharacterSet
-    dataElement = this.dicomElements.x00080005;
+    dataElement = this.dicomElements['00080005'];
     if (typeof dataElement !== 'undefined') {
       dataElement.value = this.interpretElement(dataElement, dataReader);
       let charSetTerm;
       if (dataElement.value.length === 1) {
-        charSetTerm = cleanString(dataElement.value[0]);
+        charSetTerm = dataElement.value[0];
       } else {
-        charSetTerm = cleanString(dataElement.value[1]);
+        charSetTerm = dataElement.value[1];
         logger.warn('Unsupported character set with code extensions: \'' +
           charSetTerm + '\'.');
       }
@@ -1226,13 +1230,12 @@ export class DicomParser {
     // handle fragmented pixel buffer
     // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
-    dataElement = this.dicomElements.x7FE00010;
+    dataElement = this.dicomElements['7FE00010'];
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
         let numberOfFrames = 1;
-        if (typeof this.dicomElements.x00280008 !== 'undefined') {
-          numberOfFrames = cleanString(
-            this.dicomElements.x00280008.value[0]);
+        if (typeof this.dicomElements['00280008'] !== 'undefined') {
+          numberOfFrames = Number(this.dicomElements['00280008'].value[0]);
         }
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {

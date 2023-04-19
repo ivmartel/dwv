@@ -8,7 +8,6 @@ import {Geometry} from '../../src/image/geometry';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi';
 import {Image} from '../../src/image/image';
 import {ImageFactory} from '../../src/image/imageFactory';
-import {DicomElementsWrapper} from '../../src/dicom/dicomElementsWrapper';
 
 /**
  * Tests for the 'image/image.js' file.
@@ -468,23 +467,26 @@ QUnit.test('Test ImageFactory.', function (assert) {
 
   const dicomElements0 = [];
   // columns
-  dicomElements0.x00280011 = {value: imgSize0.get(0)};
+  dicomElements0['00280011'] = {value: [imgSize0.get(0)]};
   // rows
-  dicomElements0.x00280010 = {value: imgSize0.get(1)};
+  dicomElements0['00280010'] = {value: [imgSize0.get(1)]};
   // spacing
-  dicomElements0.x00280030 = {
+  dicomElements0['00280030'] = {
     value: [imgSpacing0.get(1), imgSpacing0.get(2)]
   };
   // transfer syntax (explicit VR)
-  dicomElements0.x00020010 = {value: '1.2.840.10008.1.2.1'};
+  dicomElements0['00020010'] = {value: ['1.2.840.10008.1.2.1']};
+  // SOP class UID
+  dicomElements0['00080016'] = {value: ['1.2.840.10008.5.1.4.1.1.4']};
+  // modality
+  dicomElements0['00080060'] = {value: ['MR']};
+  // SOP instance UID
+  dicomElements0['00080018'] = {value: ['1.2.840.34.56.78999654.234]']};
 
-  // wrap the dicom elements
-  const wrappedDicomElements0 =
-    new DicomElementsWrapper(dicomElements0);
   // create the image factory
   const factory0 = new ImageFactory();
   // create the image
-  const image0 = factory0.create(wrappedDicomElements0, buffer0);
+  const image0 = factory0.create(dicomElements0, buffer0);
 
   // test its geometry
   assert.ok(image0.getGeometry().equals(imgGeometry0), 'Image geometry');

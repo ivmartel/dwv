@@ -422,16 +422,16 @@ export class DataReader {
   }
 
   /**
-   * Read data as an hexadecimal string.
+   * Read data as an hexadecimal string of length 4 (no '0x' prefix).
    *
    * @param {number} byteOffset The offset to start reading from.
-   * @returns {Array} The read data.
+   * @returns {String} The read data ('####').
    */
   readHex(byteOffset) {
     // read and convert to hex string
     const str = this.readUint16(byteOffset).toString(16);
     // return padded
-    return '0x0000'.substring(0, 6 - str.length) + str.toUpperCase();
+    return '0000'.substring(0, 4 - str.length) + str.toUpperCase();
   }
 
 } // class DataReader

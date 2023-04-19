@@ -22,7 +22,7 @@ dicomParser.parse(arrayBuffer);
 // wrapped tags
 var tags = dicomParser.getDicomElements();
 // log
-console.log(tags.getFromName('PatientName'));
+console.log(tags['00100010'].value[0]);
 ```
 
 To execute it, run:

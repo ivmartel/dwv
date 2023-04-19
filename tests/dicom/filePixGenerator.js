@@ -64,7 +64,7 @@ const FilePixGenerator = function (options) {
  * @param {object} image The associated image.
  * @returns {boolean} True if the tags are ok.
  */
-function checkTags(tags, image) {
+function fileCheckTags(tags, image) {
   /**
    * @param {number} value The value to check.
    * @returns {number} The expected value.
@@ -88,5 +88,5 @@ function checkTags(tags, image) {
 test.pixelGenerators = test.pixelGenerators || {};
 test.pixelGenerators.file = {
   generator: FilePixGenerator,
-  checkTags: checkTags
+  checkTags: fileCheckTags
 };

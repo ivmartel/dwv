@@ -1,6 +1,5 @@
 import {ListenerHandler} from '../utils/listen';
 import {mergeObjects} from '../utils/operator';
-import {DicomElementsWrapper} from '../dicom/dicomElementsWrapper';
 
 /*
  * Data (list of {image, meta}) controller.
@@ -81,7 +80,7 @@ export class DataController {
     // store the new image
     this.#data[index] = {
       image: image,
-      meta: this.#getMetaObject(meta)
+      meta: meta
     };
     // listen to image change
     image.addEventListener('imagechange', this.#getFireEvent(index));
@@ -103,15 +102,15 @@ export class DataController {
     // update meta data
     // TODO add time support
     let idKey = '';
-    if (typeof meta.x00020010 !== 'undefined') {
-      // dicom case
-      idKey = 'InstanceNumber';
+    if (typeof meta['00020010'] !== 'undefined') {
+      // dicom case, use 'InstanceNumber'
+      idKey = '00200013';
     } else {
       idKey = 'imageUid';
     }
     dataToUpdate.meta = mergeObjects(
       dataToUpdate.meta,
-      this.#getMetaObject(meta),
+      meta,
       idKey,
       'value');
   }
@@ -160,24 +159,6 @@ export class DataController {
       event.dataid = index;
       this.#fireEvent(event);
     };
-  }
-
-  /**
-   * Get a meta data object.
-   *
-   * @param {*} meta The meta data to convert.
-   * @returns {*} object for DICOM, array for DOM image.
-   */
-  #getMetaObject(meta) {
-    let metaObj = null;
-    // wrap meta if dicom (x00020010: transfer syntax)
-    if (typeof meta.x00020010 !== 'undefined') {
-      const newDcmMetaData = new DicomElementsWrapper(meta);
-      metaObj = newDcmMetaData.dumpToObject();
-    } else {
-      metaObj = meta;
-    }
-    return metaObj;
   }
 
 } // ImageController class
