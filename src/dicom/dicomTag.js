@@ -179,10 +179,10 @@ export class Tag {
  */
 export function tagCompareFunction(a, b) {
   // first by group
-  let res = parseInt(a.getGroup()) - parseInt(b.getGroup());
+  let res = parseInt(a.getGroup(), 16) - parseInt(b.getGroup(), 16);
   if (res === 0) {
     // by element if same group
-    res = parseInt(a.getElement()) - parseInt(b.getElement());
+    res = parseInt(a.getElement(), 16) - parseInt(b.getElement(), 16);
   }
   return res;
 }
