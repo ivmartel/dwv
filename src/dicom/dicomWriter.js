@@ -389,7 +389,7 @@ export class DicomWriter {
     if (typeof this.#rules[element.tag.getKey()] !== 'undefined') {
       // 1. tag itself
       rule = this.#rules[element.tag.getKey()];
-    } else if (tagName !== null &&
+    } else if (typeof tagName !== 'undefined' &&
       typeof this.#rules[tagName] !== 'undefined') {
       // 2. tag name
       rule = this.#rules[tagName];
@@ -1065,7 +1065,7 @@ export class DicomWriter {
 function checkUnknownVR(element) {
   if (element.vr === 'UN') {
     const dictVr = element.tag.getVrFromDictionary();
-    if (dictVr !== null && element.vr !== dictVr) {
+    if (typeof dictVr !== 'undefined' && element.vr !== dictVr) {
       element.vr = dictVr;
       logger.info('Element ' + element.tag.getGroup() +
         ' ' + element.tag.getElement() +

@@ -126,10 +126,10 @@ export class Tag {
   /**
    * Get the tag info from the dicom dictionary.
    *
-   * @returns {Array} The info as [vr, multiplicity, name].
+   * @returns {Array|undefined} The info as [vr, multiplicity, name].
    */
   getInfoFromDictionary() {
-    let info = null;
+    let info;
     if (typeof dictionary[this.getGroup()] !== 'undefined' &&
       typeof dictionary[this.getGroup()][this.getElement()] !==
         'undefined') {
@@ -141,12 +141,12 @@ export class Tag {
   /**
    * Get the tag Value Representation (VR) from the dicom dictionary.
    *
-   * @returns {string} The VR.
+   * @returns {string|undefined} The VR.
    */
   getVrFromDictionary() {
-    let vr = null;
+    let vr;
     const info = this.getInfoFromDictionary();
-    if (info !== null) {
+    if (typeof info !== 'undefined') {
       vr = info[0];
     }
     return vr;
@@ -155,12 +155,12 @@ export class Tag {
   /**
    * Get the tag name from the dicom dictionary.
    *
-   * @returns {string} The VR.
+   * @returns {string|undefined} The VR.
    */
   getNameFromDictionary() {
-    let name = null;
+    let name;
     const info = this.getInfoFromDictionary();
-    if (info !== null) {
+    if (typeof info !== 'undefined') {
       name = info[2];
     }
     return name;

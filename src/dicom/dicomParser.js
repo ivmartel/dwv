@@ -779,7 +779,7 @@ export class DicomParser {
       // implicit VR
       if (implicit) {
         vr = tag.getVrFromDictionary();
-        if (vr === null) {
+        if (typeof vr === 'undefined') {
           vr = 'UN';
         }
         is32bitVL = true;
