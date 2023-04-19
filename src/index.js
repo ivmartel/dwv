@@ -1,6 +1,7 @@
 import {
   getDwvVersion,
   getTypedArray,
+  getOrientationName,
   DicomParser
 } from './dicom/dicomParser.js';
 import {
@@ -26,6 +27,7 @@ const dicom = {
   getElementsFromJSONTags,
   getTypedArray,
   getPixelDataTag,
+  getOrientationName,
   dictionary,
   DicomParser,
   DicomWriter
