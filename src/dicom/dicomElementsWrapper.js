@@ -313,9 +313,9 @@ export class DicomElementsWrapper {
 
     // (group,element)
     line = '(';
-    line += tag.getGroup().substring(2).toLowerCase();
+    line += tag.getGroup().toLowerCase();
     line += ',';
-    line += tag.getElement().substring(2).toLowerCase();
+    line += tag.getElement().toLowerCase();
     line += ') ';
     // value representation
     line += dicomElement.vr;
