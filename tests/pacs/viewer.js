@@ -155,7 +155,7 @@ function viewerSetup() {
       firstRender.push(event.dataid);
       // log meta data
       if (event.loadtype === 'image') {
-        console.log('metadata', _app.getMetaData(event.loadid));
+        console.log('metadata', _app.getMetaDataWithNames(event.loadid));
         // add data row
         addDataRow(event.loadid);
         ++dataLoad;

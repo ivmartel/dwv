@@ -13,6 +13,7 @@ import {UndoStack} from '../tools/undo';
 import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
+import {getTagFromKey} from '../dicom/dicomTag';
 
 import {toolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
@@ -162,6 +163,26 @@ export class App {
    */
   getMetaData(index) {
     return this.#dataController.get(index).meta;
+  }
+
+  /**
+   * Get the meta data with names instead of tag keys.
+   *
+   * @param {number} index The data index.
+   * @returns {object} The list of meta data.
+   */
+  getMetaDataWithNames(index) {
+    const meta = this.getMetaData(index);
+    return Object.keys(meta).reduce((accumulator, currentValue) => {
+      const tag = getTagFromKey(currentValue);
+      let key = tag.getNameFromDictionary();
+      if (typeof key === 'undefined') {
+        // add 'x' to help sorting
+        key = 'x' + tag.getKey();
+      }
+      accumulator[key] = meta[currentValue];
+      return accumulator;
+    }, {});
   }
 
   /**
