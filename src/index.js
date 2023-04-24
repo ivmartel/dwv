@@ -9,6 +9,7 @@ import {
   getElementsFromJSONTags,
   DicomWriter
 } from './dicom/dicomWriter';
+import {TagValueExtractor} from './dicom/dicomElementsWrapper.js';
 import {dictionary} from './dicom/dictionary';
 import {getPixelDataTag} from './dicom/dicomTag';
 import {App} from './app/application';
@@ -29,6 +30,7 @@ const dicom = {
   getPixelDataTag,
   getOrientationName,
   dictionary,
+  TagValueExtractor,
   DicomParser,
   DicomWriter
 };

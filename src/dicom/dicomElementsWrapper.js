@@ -564,16 +564,6 @@ export function getPixelSpacing(elements) {
 }
 
 /**
- * Get the time.
- *
- * @returns {number|undefined} The time value if available.
- */
-export function getTime(_elements) {
-  // default returns undefined
-  return undefined;
-}
-
-/**
  * Get the pixel data unit.
  *
  * @returns {string|null} The unit value if available.
@@ -655,4 +645,22 @@ export function getFileListFromDicomDir(data) {
     }
   }
   return records;
+}
+
+/**
+ * Methods used to extract values from DICOM elements.
+ *
+ * Implemented as class and method to allow for override via its prototype.
+ */
+export class TagValueExtractor {
+  /**
+   * Get the time.
+   *
+   * @param {object} _elements The DICOM elements.
+   * @returns {number|undefined} The time value if available.
+   */
+  getTime(_elements) {
+    // default returns undefined
+    return undefined;
+  }
 }

@@ -11,8 +11,8 @@ import {
 import {
   getImage2DSize,
   getPixelSpacing,
-  getTime,
-  getPixelUnit
+  getPixelUnit,
+  TagValueExtractor
 } from '../dicom/dicomElementsWrapper';
 import {Vector3D} from '../math/vector';
 import {Matrix33} from '../math/matrix';
@@ -102,7 +102,8 @@ export class ImageFactory {
     // geometry
     const origin = new Point3D(
       slicePosition[0], slicePosition[1], slicePosition[2]);
-    const time = getTime(dicomElements);
+    const extractor = new TagValueExtractor();
+    const time = extractor.getTime(dicomElements);
     const geometry = new Geometry(
       origin, size, spacing, orientationMatrix, time);
 
