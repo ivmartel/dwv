@@ -11,16 +11,6 @@ let _tools = null;
 const _mode = 0;
 const _dicomWeb = false;
 
-// example private logic for time value retrieval
-// dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
-//   const value;
-//   const time = this.getFromKey('xABCD0123');
-//   if (typeof time !== 'undefined') {
-//     value = parseInt(time, 10);
-//   }
-//   return value;
-// };
-
 /**
  * Setup simple dwv app.
  */
@@ -36,6 +26,16 @@ function viewerSetup() {
     '../../decoders/pdfjs/decode-jpegbaseline.js';
   dwv.image.decoderScripts.rle =
     '../../decoders/dwv/decode-rle.js';
+
+  // // example private logic for time value retrieval
+  // dwv.dicom.TagValueExtractor.prototype.getTime = function (elements) {
+  //   let value;
+  //   const time = elements['ABCD0123'];
+  //   if (typeof time !== 'undefined') {
+  //     value = parseInt(time.value[0], 10);
+  //   }
+  //   return value;
+  // };
 
   // stage options
   let dataViewConfigs;
