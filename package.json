@@ -34,7 +34,7 @@
     "benchmark": "~2.1.4",
     "clean-jsdoc-theme": "^4.2.6",
     "eslint": "~8.38.0",
-    "eslint-plugin-jsdoc": "~41.1.2",
+    "eslint-plugin-jsdoc": "~43.0.7",
     "github-release-notes": "0.17.2",
     "html-webpack-plugin": "^5.5.0",
     "jsdoc": "^4.0.2",
