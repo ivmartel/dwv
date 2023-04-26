@@ -46,7 +46,7 @@ export class ViewFactory {
       for (const key in defaultPresets[modality]) {
         const preset = defaultPresets[modality][key];
         windowPresets[key] = {
-          wl: new WindowLevel(preset.center, preset.width),
+          wl: [new WindowLevel(preset.center, preset.width)],
           name: key
         };
       }
