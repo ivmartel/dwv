@@ -56,7 +56,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
     for (var key in dwv.tool.defaultpresets[modality]) {
       var preset = dwv.tool.defaultpresets[modality][key];
       windowPresets[key] = {
-        wl: new dwv.image.WindowLevel(preset.center, preset.width),
+        wl: [new dwv.image.WindowLevel(preset.center, preset.width)],
         name: key
       };
     }
