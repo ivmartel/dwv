@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.31.1](https://github.com/ivmartel/dwv/releases/tag/v0.31.1) - 27/04/2023
+
+### Fixed
+
+- MPR bad offset when loading larger data [#1348](https://github.com/ivmartel/dwv/issues/1348)
+- DICOM seg loading failure 'Test distance is increasing' [#1347](https://github.com/ivmartel/dwv/issues/1347)
+- Error when accessing modality w/l presets [#1346](https://github.com/ivmartel/dwv/issues/1346)
+
 ## [v0.31.0](https://github.com/ivmartel/dwv/releases/tag/v0.31.0) - 07/03/2023
 
 ### Added

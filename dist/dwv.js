@@ -1,4 +1,4 @@
-/*! dwv 0.31.0 2023-03-07 18:27:54 */
+/*! dwv 0.31.1 2023-04-27 19:37:50 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4749,7 +4749,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0';
+  return '0.31.1';
 };
 
 /**
@@ -15923,6 +15923,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
       needsDraw = true;
     }
 
+    // previous fit scale
+    var previousFitScale = fitScale;
     // previous scale without fit
     var previousScale = {
       x: scale.x / fitScale.x,
@@ -15951,9 +15953,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
       x: fitOffset.x / newFitScale.x,
       y: fitOffset.y / newFitScale.y
     };
+    var newFlipOffset = {
+      x: flipOffset.x * previousFitScale.x / newFitScale.x,
+      y: flipOffset.y * previousFitScale.y / newFitScale.y
+    };
     // check if different
-    if (viewOffset.x !== newViewOffset.x || viewOffset.y !== newViewOffset.y) {
+    if (viewOffset.x !== newViewOffset.x ||
+      viewOffset.y !== newViewOffset.y ||
+      flipOffset.x !== newFlipOffset.x ||
+      flipOffset.y !== newFlipOffset.y) {
+      // update private local offsets
+      flipOffset = newFlipOffset;
       viewOffset = newViewOffset;
+      // update global offset
       offset = {
         x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
         y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
@@ -21263,6 +21275,15 @@ dwv.image.MaskFactory.prototype.create = function (
         dwv.logger.warn(
           'Using larger real world epsilon in SEG pos pat adding'
         );
+      } else {
+        // try even larger epsilon
+        res = value > dwv.math.REAL_WORLD_EPSILON * 100;
+        if (!res) {
+          // warn if epsilon < value < epsilon * 100
+          dwv.logger.warn(
+            'Using even larger real world epsilon in SEG pos pat adding'
+          );
+        }
       }
     }
     return res;
@@ -23423,7 +23444,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
     for (var key in dwv.tool.defaultpresets[modality]) {
       var preset = dwv.tool.defaultpresets[modality][key];
       windowPresets[key] = {
-        wl: new dwv.image.WindowLevel(preset.center, preset.width),
+        wl: [new dwv.image.WindowLevel(preset.center, preset.width)],
         name: key
       };
     }
