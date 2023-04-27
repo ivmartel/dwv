@@ -685,6 +685,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
       needsDraw = true;
     }
 
+    // previous fit scale
+    var previousFitScale = fitScale;
     // previous scale without fit
     var previousScale = {
       x: scale.x / fitScale.x,
@@ -713,9 +715,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
       x: fitOffset.x / newFitScale.x,
       y: fitOffset.y / newFitScale.y
     };
+    var newFlipOffset = {
+      x: flipOffset.x * previousFitScale.x / newFitScale.x,
+      y: flipOffset.y * previousFitScale.y / newFitScale.y
+    };
     // check if different
-    if (viewOffset.x !== newViewOffset.x || viewOffset.y !== newViewOffset.y) {
+    if (viewOffset.x !== newViewOffset.x ||
+      viewOffset.y !== newViewOffset.y ||
+      flipOffset.x !== newFlipOffset.x ||
+      flipOffset.y !== newFlipOffset.y) {
+      // update private local offsets
+      flipOffset = newFlipOffset;
       viewOffset = newViewOffset;
+      // update global offset
       offset = {
         x: viewOffset.x + baseOffset.x + zoomOffset.x + flipOffset.x,
         y: viewOffset.y + baseOffset.y + zoomOffset.y + flipOffset.y
