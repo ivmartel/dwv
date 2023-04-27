@@ -753,6 +753,15 @@ dwv.image.MaskFactory.prototype.create = function (
         dwv.logger.warn(
           'Using larger real world epsilon in SEG pos pat adding'
         );
+      } else {
+        // try even larger epsilon
+        res = value > dwv.math.REAL_WORLD_EPSILON * 100;
+        if (!res) {
+          // warn if epsilon < value < epsilon * 100
+          dwv.logger.warn(
+            'Using even larger real world epsilon in SEG pos pat adding'
+          );
+        }
       }
     }
     return res;
