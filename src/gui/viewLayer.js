@@ -707,7 +707,8 @@ export class ViewLayer {
       // update draw flag
       needsDraw = true;
     }
-
+    // previous fit scale
+    const previousFitScale = this.#fitScale;
     // previous scale without fit
     const previousScale = {
       x: this.#scale.x / this.#fitScale.x,
@@ -736,10 +737,19 @@ export class ViewLayer {
       x: fitOffset.x / newFitScale.x,
       y: fitOffset.y / newFitScale.y
     };
+    const newFlipOffset = {
+      x: this.#flipOffset.x * previousFitScale.x / newFitScale.x,
+      y: this.#flipOffset.y * previousFitScale.y / newFitScale.y
+    };
     // check if different
     if (this.#viewOffset.x !== newViewOffset.x ||
-      this.#viewOffset.y !== newViewOffset.y) {
+      this.#viewOffset.y !== newViewOffset.y ||
+      this.#flipOffset.x !== newFlipOffset.x ||
+      this.#flipOffset.y !== newFlipOffset.y) {
+      // update private local offsets
+      this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
+      // update global offset
       this.#offset = {
         x: this.#viewOffset.x +
           this.#baseOffset.x +
