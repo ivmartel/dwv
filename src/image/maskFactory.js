@@ -740,6 +740,7 @@ export class MaskFactory {
       frameOrigins[0], size, newSpacing, orientationMatrix);
 
     // origin distance test
+    // TODO: maybe use sliceSpacing / 10
     const isNotSmall = function (value) {
       let res = value > REAL_WORLD_EPSILON;
       if (res) {
@@ -750,6 +751,14 @@ export class MaskFactory {
           logger.warn(
             'Using larger real world epsilon in SEG pos pat adding'
           );
+        } else {
+          res = value > REAL_WORLD_EPSILON * 100;
+          if (!res) {
+            // warn if epsilon < value < epsilon * 100
+            logger.warn(
+              'Using larger+ real world epsilon in SEG pos pat adding'
+            );
+          }
         }
       }
       return res;
