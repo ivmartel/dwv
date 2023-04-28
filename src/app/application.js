@@ -821,7 +821,6 @@ export class App {
    * Can be connected to a window 'resize' event.
    *
    * @param {object} _event The change event.
-   * @private
    */
   onResize = (_event) => {
     this.fitToContainer();
