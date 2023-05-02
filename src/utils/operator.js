@@ -35,6 +35,9 @@ export function objectToArray(obj) {
   const keys = Object.keys(obj);
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
+    if (obj[key] === null) {
+      continue;
+    }
     const row = {name: key};
     const innerKeys = Object.keys(obj[key]);
     for (let j = 0; j < innerKeys.length; ++j) {
