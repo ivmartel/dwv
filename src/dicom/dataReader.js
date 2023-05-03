@@ -425,7 +425,7 @@ export class DataReader {
    * Read data as an hexadecimal string of length 4 (no '0x' prefix).
    *
    * @param {number} byteOffset The offset to start reading from.
-   * @returns {String} The read data ('####').
+   * @returns {string} The read data ('####').
    */
   readHex(byteOffset) {
     // read and convert to hex string

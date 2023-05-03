@@ -99,6 +99,7 @@ export class DicomElementsWrapper {
   /**
    * Get a DICOM element as a simple object.
    *
+   * @param {Tag} tag The DICOM tag.
    * @param {object} dicomElement The DICOM element.
    * @returns {object} The element as a simple object.
    */
@@ -180,6 +181,7 @@ export class DicomElementsWrapper {
   /**
    * Get a data element value as a string.
    *
+   * @param {Tag} tag The DICOM tag.
    * @param {object} dicomElement The DICOM element.
    * @param {boolean} pretty When set to true, returns a 'pretified' content.
    * @returns {string} A string representation of the DICOM element.
@@ -283,6 +285,7 @@ export class DicomElementsWrapper {
   /**
    * Get a data element as a string.
    *
+   * @param {Tag} tag The DICOM tag.
    * @param {object} dicomElement The DICOM element.
    * @param {string} prefix A string to prepend this one.
    * @returns {string} The element as a string.
@@ -502,6 +505,7 @@ export class DicomElementsWrapper {
 /**
  * Extract the 2D size from dicom elements.
  *
+ * @param {object} elements The DICOM elements.
  * @returns {object} The size.
  */
 export function getImage2DSize(elements) {
@@ -527,6 +531,7 @@ export function getImage2DSize(elements) {
 /**
  * Get the pixel spacing from the different spacing tags.
  *
+ * @param {object} elements The DICOM elements.
  * @returns {object} The read spacing or the default [1,1].
  */
 export function getPixelSpacing(elements) {
@@ -566,6 +571,7 @@ export function getPixelSpacing(elements) {
 /**
  * Get the pixel data unit.
  *
+ * @param {object} elements The DICOM elements.
  * @returns {string|null} The unit value if available.
  */
 export function getPixelUnit(elements) {
