@@ -982,6 +982,9 @@ export class DicomParser {
       } else {
         throw Error('Unknown VR type: ' + vrType);
       }
+    } else if (vr === 'xx') {
+      // US or OW
+      data = Array.from(reader.readUint16Array(offset, vl));
     } else if (vr === 'ox') {
       // OB or OW
       if (bitsAllocated === 8) {
@@ -990,7 +993,7 @@ export class DicomParser {
         data = Array.from(reader.readUint16Array(offset, vl));
       }
     } else if (vr === 'xs') {
-      // US or SS
+      // (US or SS) or (US or SS or OW)
       if (pixelRepresentation === 0) {
         data = Array.from(reader.readUint16Array(offset, vl));
       } else {

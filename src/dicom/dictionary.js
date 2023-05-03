@@ -5,7 +5,11 @@
  * DICOM tag dictionary 2022a.
  * Generated using xml standard conversion from {@link https://github.com/ivmartel/dcmStdToJs} v0.1.0.
  * Conversion changes:
- * - (vr) 'See Note' -> 'NONE', 'OB or OW' -> 'ox', 'US or SS' -> 'xs'
+ * - (vr) 'See Note' -> 'NONE'
+ * - (vr) 'OB or OW' -> 'ox'
+ * - (vr) 'US or SS' -> 'xs'
+ * - (vr) 'US or OW' -> 'xx'
+ * - (vr) 'US or SS or OW' -> 'xs'
  * - added 'GenericGroupLength' element to each group
  * Local changes:
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and
@@ -2135,7 +2139,7 @@ export const dictionary = {
     '1112': ['xs', '4', 'LargeGreenPaletteColorLookupTableDescriptor'],
     '1113': ['xs', '4', 'LargeBluePaletteColorLookupTableDescriptor'],
     '1199': ['UI', '1', 'PaletteColorLookupTableUID'],
-    '1200': ['US or SS or OW', '1-n or 1', 'GrayLookupTableData'],
+    '1200': ['xs', '1-n or 1', 'GrayLookupTableData'],
     '1201': ['OW', '1', 'RedPaletteColorLookupTableData'],
     '1202': ['OW', '1', 'GreenPaletteColorLookupTableData'],
     '1203': ['OW', '1', 'BluePaletteColorLookupTableData'],
@@ -2179,7 +2183,7 @@ export const dictionary = {
     '3002': ['xs', '3', 'LUTDescriptor'],
     '3003': ['LO', '1', 'LUTExplanation'],
     '3004': ['LO', '1', 'ModalityLUTType'],
-    '3006': ['US or OW', '1-n or 1', 'LUTData'],
+    '3006': ['xx', '1-n or 1', 'LUTData'],
     '3010': ['SQ', '1', 'VOILUTSequence'],
     '3110': ['SQ', '1', 'SoftcopyVOILUTSequence'],
     '4000': ['LT', '1', 'ImagePresentationComments'],
