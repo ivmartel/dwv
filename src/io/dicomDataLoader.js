@@ -73,7 +73,10 @@ export class DicomDataLoader {
         // call listeners
         this.onloadend(event);
       };
-      this.#db2v.onerror = this.onerror;
+      this.#db2v.onerror = (event) => {
+        event.source = origin;
+        this.onerror(event);
+      };
       this.#db2v.onabort = this.onabort;
     }
 
