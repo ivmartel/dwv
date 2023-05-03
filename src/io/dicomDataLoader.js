@@ -75,7 +75,10 @@ dwv.io.DicomDataLoader = function () {
         // call listeners
         self.onloadend(event);
       };
-      db2v.onerror = self.onerror;
+      db2v.onerror = function (event) {
+        event.source = origin;
+        self.onerror(event);
+      };
       db2v.onabort = self.onabort;
     }
 
