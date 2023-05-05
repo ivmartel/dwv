@@ -223,6 +223,8 @@ dwv.utils.WorkerThread = function (parentPool) {
   this.stop = function () {
     // stop the worker
     worker.terminate();
+    // force create at next run
+    worker = undefined;
   };
 
   /**
