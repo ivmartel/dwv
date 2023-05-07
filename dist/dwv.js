@@ -1,4 +1,4 @@
-/*! dwv 0.31.1 2023-04-27 19:37:50 */
+/*! dwv 0.31.2 2023-05-07 12:03:47 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4749,7 +4749,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.1';
+  return '0.31.2';
 };
 
 /**
@@ -24031,7 +24031,10 @@ dwv.io.DicomDataLoader = function () {
         // call listeners
         self.onloadend(event);
       };
-      db2v.onerror = self.onerror;
+      db2v.onerror = function (event) {
+        event.source = origin;
+        self.onerror(event);
+      };
       db2v.onabort = self.onabort;
     }
 
@@ -38955,6 +38958,9 @@ dwv.utils.objectToArray = function (obj) {
   var keys = Object.keys(obj);
   for (var i = 0; i < keys.length; ++i) {
     var key = keys[i];
+    if (obj[key] === null) {
+      continue;
+    }
     var row = {name: key};
     var innerKeys = Object.keys(obj[key]);
     for (var j = 0; j < innerKeys.length; ++j) {
@@ -39784,6 +39790,8 @@ dwv.utils.WorkerThread = function (parentPool) {
   this.stop = function () {
     // stop the worker
     worker.terminate();
+    // force create at next run
+    worker = undefined;
   };
 
   /**

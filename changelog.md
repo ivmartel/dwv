@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.31.2](https://github.com/ivmartel/dwv/releases/tag/v0.31.2) - 07/05/2023
+
+### Fixed
+
+- Cannot run thread after stop [#1358](https://github.com/ivmartel/dwv/issues/1358)
+- Error in objectToArray [#1354](https://github.com/ivmartel/dwv/issues/1354)
+
+### Added
+
+- Add source to dicom load errors [#1355](https://github.com/ivmartel/dwv/issues/1355)
+
 ## [v0.31.1](https://github.com/ivmartel/dwv/releases/tag/v0.31.1) - 27/04/2023
 
 ### Fixed
