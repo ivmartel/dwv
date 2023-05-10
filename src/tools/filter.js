@@ -230,6 +230,14 @@ export class Threshold {
   }
 
   /**
+   * Associated filter.
+   *
+   * @type {object}
+   * @private
+   */
+  #filter = new ThresholdFilter();
+
+  /**
    * Flag to know wether to reset the image or not.
    *
    * @type {boolean}
@@ -270,15 +278,14 @@ export class Threshold {
    * @param {*} args The filter arguments.
    */
   run(args) {
-    const filter = new ThresholdFilter();
-    filter.setMin(args.min);
-    filter.setMax(args.max);
+    this.#filter.setMin(args.min);
+    this.#filter.setMax(args.max);
     // reset the image if asked
     if (this.#resetImage) {
-      filter.setOriginalImage(this.#app.getLastImage());
+      this.#filter.setOriginalImage(this.#app.getLastImage());
       this.#resetImage = false;
     }
-    const command = new RunFilterCommand(filter, this.#app);
+    const command = new RunFilterCommand(this.#filter, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
