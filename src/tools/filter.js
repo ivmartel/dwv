@@ -54,14 +54,14 @@ export class Filter {
    */
   activate(bool) {
     // setup event listening
-    for (const key in this.filterList) {
+    for (const key in this.#filterList) {
       if (bool) {
-        this.filterList[key].addEventListener('filterrun', this.#fireEvent);
-        this.filterList[key].addEventListener('filter-undo', this.#fireEvent);
+        this.#filterList[key].addEventListener('filterrun', this.#fireEvent);
+        this.#filterList[key].addEventListener('filter-undo', this.#fireEvent);
       } else {
-        this.filterList[key].removeEventListener(
+        this.#filterList[key].removeEventListener(
           'filterrun', this.#fireEvent);
-        this.filterList[key].removeEventListener(
+        this.#filterList[key].removeEventListener(
           'filter-undo', this.#fireEvent);
       }
     }
@@ -176,7 +176,7 @@ export class Filter {
         this.#selectedFilter.activate(false);
       }
       // enable new one
-      this.#selectedFilter = this.filterList[features.filterName];
+      this.#selectedFilter = this.#filterList[features.filterName];
       // activate the selected filter
       this.#selectedFilter.activate(true);
     }
@@ -195,7 +195,7 @@ export class Filter {
    * @returns {Array} The list of filter objects.
    */
   getFilterList() {
-    return this.filterList;
+    return this.#filterList;
   }
 
   /**
@@ -205,7 +205,7 @@ export class Filter {
    * @returns {string} The filter list element for the given name.
    */
   hasFilter(name) {
-    return this.filterList[name];
+    return this.#filterList[name];
   }
 
 } // class Filter
