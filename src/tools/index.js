@@ -15,7 +15,7 @@ import {RectangleFactory} from './rectangle';
 import {RoiFactory} from './roi';
 import {RulerFactory} from './ruler';
 
-import {Threshold, Sobel, Sharpen} from './filter';
+import {Filter, Threshold, Sobel, Sharpen} from './filter';
 
 export const toolList = {
   WindowLevel,
@@ -23,6 +23,7 @@ export const toolList = {
   ZoomAndPan,
   Opacity,
   Draw,
+  Filter,
   Floodfill,
   Livewire
 };
