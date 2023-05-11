@@ -3,13 +3,13 @@ import {
   getTypedArray,
   getOrientationName,
   DicomParser
-} from './dicom/dicomParser.js';
+} from './dicom/dicomParser';
 import {
   getUID,
   getElementsFromJSONTags,
   DicomWriter
 } from './dicom/dicomWriter';
-import {TagValueExtractor} from './dicom/dicomElementsWrapper.js';
+import {TagValueExtractor} from './dicom/dicomElementsWrapper';
 import {dictionary} from './dicom/dictionary';
 import {getPixelDataTag} from './dicom/dicomTag';
 import {App} from './app/application';
