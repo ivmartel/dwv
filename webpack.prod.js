@@ -27,8 +27,23 @@ module.exports = merge(common, {
     ]
   },
   externals: {
-    konva: 'Konva',
-    jszip: 'JSZip',
-    'magic-wand-tool': 'MagicWand'
+    konva: {
+      root: 'Konva',
+      commonjs: 'konva',
+      commonjs2: 'konva',
+      amd: 'konva'
+    },
+    jszip: {
+      root: 'JSZip',
+      commonjs: 'jszip',
+      commonjs2: 'jszip',
+      amd: 'jszip'
+    },
+    'magic-wand-tool': {
+      root: 'MagicWand',
+      commonjs: 'magic-wand-tool',
+      commonjs2: 'magic-wand-tool',
+      amd: 'konmagic-wand-tool',
+    }
   }
 });
