@@ -57,8 +57,8 @@ export function uint8ArrayToString(arr) {
  *
  * @param {Array} arr The input array to search.
  * @param {Function} callbackFn The find function.
- * @param {number} start The array start index.
- * @param {number} end The array end index.
+ * @param {number|undefined} start The array start index.
+ * @param {number|undefined} end The array end index.
  * @returns {number|undefined} The index where the element was found.
  */
 export function findInArraySubset(arr, callbackFn, start, end) {

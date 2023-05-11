@@ -69,7 +69,7 @@ export function getUriQuery(uri) {
  * or encoded URI with base and key value/pairs:
  *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
  *
- * @param {string} query The query part to the input URI.
+ * @param {object} query The query part to the input URI.
  * @param {Function} callback The function to call with the decoded file urls.
  * @param {object} options Optional url request options.
  */
