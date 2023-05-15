@@ -6,7 +6,6 @@ export class RescaleSlopeAndIntercept {
   /**
    * The slope.
    *
-   * @private
    * @type {number}
    */
   #slope;
@@ -14,7 +13,6 @@ export class RescaleSlopeAndIntercept {
   /**
    * The intercept.
    *
-   * @private
    * @type {number}
    */
   #intercept;

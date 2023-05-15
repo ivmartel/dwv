@@ -8,7 +8,6 @@ export class MaskSegmentHelper {
   /**
    * The associated mask.
    *
-   * @private
    * @type {Image}
    */
   #mask;
@@ -16,7 +15,6 @@ export class MaskSegmentHelper {
   /**
    * The segments: array of segment description.
    *
-   * @private
    * @type {Array}
    */
   #segments;
@@ -24,7 +22,6 @@ export class MaskSegmentHelper {
   /**
    * List of ids of hidden segments.
    *
-   * @private
    * @type {Array}
    */
   #hiddenSegments = [];
@@ -227,7 +224,6 @@ export class DeleteSegmentCommand {
   /**
    * The associated mask.
    *
-   * @private
    * @type {Image}
    */
   #mask;
@@ -235,7 +231,6 @@ export class DeleteSegmentCommand {
   /**
    * The segment to remove.
    *
-   * @private
    * @type {object}
    */
   #segment;
@@ -243,7 +238,6 @@ export class DeleteSegmentCommand {
   /**
    * Flag to send creation events.
    *
-   * @private
    * @type {boolean}
    */
   #isSilent;
@@ -251,7 +245,6 @@ export class DeleteSegmentCommand {
   /**
    * List of offsets.
    *
-   * @private
    * @type {Array}
    */
   #offsets;

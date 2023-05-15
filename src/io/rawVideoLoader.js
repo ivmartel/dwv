@@ -35,7 +35,6 @@ export class RawVideoLoader {
    * @param {object} response The HTTP request response.
    * @param {string} dataType The data type.
    * @returns {string} The data URI.
-   * @private
    */
   #createDataUri(response, dataType) {
     // image data as string

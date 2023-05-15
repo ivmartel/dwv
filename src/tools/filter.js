@@ -13,7 +13,6 @@ export class Filter {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -43,7 +42,6 @@ export class Filter {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -145,7 +143,6 @@ export class Filter {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
@@ -217,7 +214,6 @@ export class Threshold {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -233,7 +229,6 @@ export class Threshold {
    * Associated filter.
    *
    * @type {object}
-   * @private
    */
   #filter = new ThresholdFilter();
 
@@ -241,7 +236,6 @@ export class Threshold {
    * Flag to know wether to reset the image or not.
    *
    * @type {boolean}
-   * @private
    */
   #resetImage = true;
 
@@ -249,7 +243,6 @@ export class Threshold {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -319,7 +312,6 @@ export class Threshold {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
@@ -334,7 +326,6 @@ export class Sharpen {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -350,7 +341,6 @@ export class Sharpen {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -412,7 +402,6 @@ export class Sharpen {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
@@ -427,7 +416,6 @@ export class Sobel {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -443,7 +431,6 @@ export class Sobel {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -505,7 +492,6 @@ export class Sobel {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
@@ -521,7 +507,6 @@ export class RunFilterCommand {
   /**
    * The filter to run.
    *
-   * @private
    * @type {object}
    */
   #filter;
@@ -529,7 +514,6 @@ export class RunFilterCommand {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;

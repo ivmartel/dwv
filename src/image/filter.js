@@ -5,7 +5,6 @@ export class Threshold {
   /**
    * Threshold minimum.
    *
-   * @private
    * @type {number}
    */
   #min = 0;
@@ -13,7 +12,6 @@ export class Threshold {
   /**
    * Threshold maximum.
    *
-   * @private
    * @type {number}
    */
   #max = 0;
@@ -66,7 +64,6 @@ export class Threshold {
   /**
    * Original image.
    *
-   * @private
    * @type {Image}
    */
   #originalImage = null;
@@ -125,7 +122,6 @@ export class Sharpen {
   /**
    * Original image.
    *
-   * @private
    * @type {Image}
    */
   #originalImage = null;
@@ -182,7 +178,6 @@ export class Sobel {
   /**
    * Original image.
    *
-   * @private
    * @type {Image}
    */
   #originalImage = null;

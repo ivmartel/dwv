@@ -13,7 +13,6 @@ export class RawImageLoader {
    * if abort is triggered, all image.onload callbacks have to be cancelled
    *
    * @type {boolean}
-   * @private
    */
   #aborted = false;
 
@@ -41,7 +40,6 @@ export class RawImageLoader {
    * @param {object} response The HTTP request response.
    * @param {string} dataType The data type.
    * @returns {string} The data URI.
-   * @private
    */
   #createDataUri(response, dataType) {
     // image type

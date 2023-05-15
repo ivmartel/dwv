@@ -27,7 +27,6 @@ export class Rectangle {
   /**
    * Rectangle begin point.
    *
-   * @private
    * @type {Point2D}
    */
   #begin;
@@ -35,7 +34,6 @@ export class Rectangle {
   /**
    * Rectangle end point.
    *
-   * @private
    * @type {Point2D}
    */
   #end;

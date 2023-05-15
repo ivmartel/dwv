@@ -79,7 +79,6 @@ export class Image {
   /**
    * Data geometry.
    *
-   * @private
    * @type {Geometry}
    */
   #geometry;
@@ -87,7 +86,6 @@ export class Image {
   /**
    * Data buffer.
    *
-   * @private
    * @type {Array}
    */
   #buffer;
@@ -95,7 +93,6 @@ export class Image {
   /**
    * Image UIDs.
    *
-   * @private
    * @type {Array}
    */
   #imageUids;
@@ -103,7 +100,6 @@ export class Image {
   /**
    * Constant rescale slope and intercept (default).
    *
-   * @private
    * @type {object}
    */
   #rsi = new RescaleSlopeAndIntercept(1, 0);
@@ -111,7 +107,6 @@ export class Image {
   /**
    * Varying rescale slope and intercept.
    *
-   * @private
    * @type {Array}
    */
   #rsis = null;
@@ -119,7 +114,6 @@ export class Image {
   /**
    * Flag to know if the RSIs are all identity (1,0).
    *
-   * @private
    * @type {boolean}
    */
   #isIdentityRSI = true;
@@ -127,7 +121,6 @@ export class Image {
   /**
    * Flag to know if the RSIs are all equals.
    *
-   * @private
    * @type {boolean}
    */
   #isConstantRSI = true;
@@ -135,7 +128,6 @@ export class Image {
   /**
    * Photometric interpretation (MONOCHROME, RGB...).
    *
-   * @private
    * @type {string}
    */
   #photometricInterpretation = 'MONOCHROME2';
@@ -144,7 +136,6 @@ export class Image {
    * Planar configuration for RGB data (0:RGBRGBRGBRGB... or
    *   1:RRR...GGG...BBB...).
    *
-   * @private
    * @type {number}
    */
   #planarConfiguration = 0;
@@ -152,7 +143,6 @@ export class Image {
   /**
    * Number of components.
    *
-   * @private
    * @type {number}
    */
   #numberOfComponents;
@@ -160,7 +150,6 @@ export class Image {
   /**
    * Meta information.
    *
-   * @private
    * @type {object}
    */
   #meta = {};
@@ -168,7 +157,6 @@ export class Image {
   /**
    * Data range.
    *
-   * @private
    * @type {object}
    */
   #dataRange = null;
@@ -176,7 +164,6 @@ export class Image {
   /**
    * Rescaled data range.
    *
-   * @private
    * @type {object}
    */
   #rescaledDataRange = null;
@@ -184,7 +171,6 @@ export class Image {
   /**
    * Histogram.
    *
-   * @private
    * @type {Array}
    */
   #histogram = null;
@@ -192,7 +178,6 @@ export class Image {
   /**
    * Listener handler.
    *
-   * @private
    * @type {object}
    */
   #listenerHandler = new ListenerHandler();
@@ -881,7 +866,6 @@ export class Image {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

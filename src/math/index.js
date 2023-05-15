@@ -8,7 +8,6 @@ export class Index {
   /**
    * Index values.
    *
-   * @private
    * @type {Array}
    */
   #values;

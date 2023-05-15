@@ -34,7 +34,6 @@ export class DrawGroupCommand {
   /**
    * The group to draw.
    *
-   * @private
    * @type {Konva.Group}
    */
   #group;
@@ -42,7 +41,6 @@ export class DrawGroupCommand {
   /**
    * The shape display name.
    *
-   * @private
    * @type {string}
    */
   #name;
@@ -50,7 +48,6 @@ export class DrawGroupCommand {
   /**
    * The Konva layer.
    *
-   * @private
    * @type {Konva.Layer}
    */
   #layer;
@@ -58,7 +55,6 @@ export class DrawGroupCommand {
   /**
    * Flag to send events.
    *
-   * @private
    * @type {boolean}
    */
   #isSilent;
@@ -66,7 +62,6 @@ export class DrawGroupCommand {
   /**
    * The group parent.
    *
-   * @private
    * @type {object}
    */
   #parent;
@@ -166,7 +161,6 @@ export class MoveGroupCommand {
   /**
    * The group to move.
    *
-   * @private
    * @type {Konva.Group}
    */
   #group;
@@ -174,7 +168,6 @@ export class MoveGroupCommand {
   /**
    * The shape display name.
    *
-   * @private
    * @type {string}
    */
   #name;
@@ -182,7 +175,6 @@ export class MoveGroupCommand {
   /**
    * The 2D translation as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #translation;
@@ -190,7 +182,6 @@ export class MoveGroupCommand {
   /**
    * The Konva layer.
    *
-   * @private
    * @type {Konva.Layer}
    */
   #layer;
@@ -291,7 +282,6 @@ export class ChangeGroupCommand {
   /**
    * The shape display name.
    *
-   * @private
    * @type {string}
    */
   #name;
@@ -299,7 +289,6 @@ export class ChangeGroupCommand {
   /**
    * The shape factory.
    *
-   * @private
    * @type {object}
    */
   #factory;
@@ -307,7 +296,6 @@ export class ChangeGroupCommand {
   /**
    * The start anchor.
    *
-   * @private
    * @type {object}
    */
   #startAnchor;
@@ -315,7 +303,6 @@ export class ChangeGroupCommand {
   /**
    * The end anchor.
    *
-   * @private
    * @type {object}
    */
   #endAnchor;
@@ -323,7 +310,6 @@ export class ChangeGroupCommand {
   /**
    * The Konva layer.
    *
-   * @private
    * @type {Konva.Layer}
    */
   #layer;
@@ -331,7 +317,6 @@ export class ChangeGroupCommand {
   /**
    * The associated view controller.
    *
-   * @private
    * @type {ViewController}
    */
   #viewController;
@@ -339,7 +324,6 @@ export class ChangeGroupCommand {
   /**
    * The app style.
    *
-   * @private
    * @type {Style}
    */
   #style;
@@ -449,7 +433,6 @@ export class DeleteGroupCommand {
   /**
    * The group to draw.
    *
-   * @private
    * @type {Konva.Group}
    */
   #group;
@@ -457,7 +440,6 @@ export class DeleteGroupCommand {
   /**
    * The shape display name.
    *
-   * @private
    * @type {string}
    */
   #name;
@@ -465,7 +447,6 @@ export class DeleteGroupCommand {
   /**
    * The Konva layer.
    *
-   * @private
    * @type {Konva.Layer}
    */
   #layer;
@@ -473,7 +454,6 @@ export class DeleteGroupCommand {
   /**
    * The group parent.
    *
-   * @private
    * @type {object}
    */
   #parent;

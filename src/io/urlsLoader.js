@@ -17,7 +17,6 @@ export class UrlsLoader {
   /**
    * Input data.
    *
-   * @private
    * @type {Array}
    */
   #inputData = null;
@@ -25,7 +24,6 @@ export class UrlsLoader {
   /**
    * Array of launched requests.
    *
-   * @private
    * @type {Array}
    */
   #requests = [];
@@ -33,7 +31,6 @@ export class UrlsLoader {
   /**
    * Data loader.
    *
-   * @private
    * @type {object}
    */
   #runningLoader = null;
@@ -41,7 +38,6 @@ export class UrlsLoader {
   /**
    * Number of loaded data.
    *
-   * @private
    * @type {number}
    */
   #nLoad = 0;
@@ -49,7 +45,6 @@ export class UrlsLoader {
   /**
    * Number of load end events.
    *
-   * @private
    * @type {number}
    */
   #nLoadend = 0;
@@ -57,7 +52,6 @@ export class UrlsLoader {
   /**
    * Flag to know if the load is aborting.
    *
-   * @private
    * @type {boolean}
    */
   #aborting;
@@ -65,7 +59,6 @@ export class UrlsLoader {
   /**
    * The default character set (optional).
    *
-   * @private
    * @type {string}
    */
   #defaultCharacterSet;
@@ -92,7 +85,6 @@ export class UrlsLoader {
    * Store the current input.
    *
    * @param {object} data The input data.
-   * @private
    */
   #storeInputData(data) {
     this.#inputData = data;
@@ -110,7 +102,6 @@ export class UrlsLoader {
    * Store a launched request.
    *
    * @param {object} request The launched request.
-   * @private
    */
   #storeRequest(request) {
     this.#requests.push(request);
@@ -119,7 +110,6 @@ export class UrlsLoader {
   /**
    * Clear the stored requests.
    *
-   * @private
    */
   #clearStoredRequests() {
     this.#requests = [];
@@ -129,7 +119,6 @@ export class UrlsLoader {
    * Store the launched loader.
    *
    * @param {object} loader The launched loader.
-   * @private
    */
   #storeLoader(loader) {
     this.#runningLoader = loader;
@@ -138,7 +127,6 @@ export class UrlsLoader {
   /**
    * Clear the stored loader.
    *
-   * @private
    */
   #clearStoredLoader() {
     this.#runningLoader = null;
@@ -148,7 +136,6 @@ export class UrlsLoader {
    * Launch a load item event and call addLoad.
    *
    * @param {object} event The load data event.
-   * @private
    */
   #addLoadItem = (event) => {
     this.onloaditem(event);
@@ -160,7 +147,6 @@ export class UrlsLoader {
    *   and call onload if loaded all data.
    *
    * @param {object} _event The load data event.
-   * @private
    */
   #addLoad = (_event) => {
     this.#nLoad++;
@@ -179,7 +165,6 @@ export class UrlsLoader {
    *   and run callbacks when all done, erroneus or not.
    *
    * @param {object} _event The load end event.
-   * @private
    */
   #addLoadend = (_event) => {
     this.#nLoadend++;
@@ -200,7 +185,6 @@ export class UrlsLoader {
    * @param {object} callback The callback to augment its event.
    * @param {object} source The source to add to the event.
    * @returns {Function} The augmented callback.
-   * @private
    */
   #augmentCallbackEvent(callback, source) {
     return (event) => {
@@ -240,7 +224,6 @@ export class UrlsLoader {
    *  - withCredentials: boolean xhr.withCredentials flag to pass
    *    to the request
    *  - batchSize: the size of the request url batch
-   * @private
    */
   #loadUrls(data, options) {
     // check input
@@ -403,7 +386,6 @@ export class UrlsLoader {
    *
    * @param {string} dicomDirUrl The DICOMDIR url.
    * @param {object} options Load options.
-   * @private
    */
   #loadDicomDir(dicomDirUrl, options) {
     // read DICOMDIR

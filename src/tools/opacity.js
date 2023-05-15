@@ -25,7 +25,6 @@ export class Opacity {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;

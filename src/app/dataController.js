@@ -9,7 +9,6 @@ export class DataController {
   /**
    * List of {image, meta}.
    *
-   * @private
    * @type {object}
    */
   #data = {};
@@ -18,7 +17,6 @@ export class DataController {
    * Listener handler.
    *
    * @type {ListenerHandler}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -141,7 +139,6 @@ export class DataController {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

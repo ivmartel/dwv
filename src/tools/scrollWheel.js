@@ -8,7 +8,6 @@ export class ScrollWheel {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -16,7 +15,6 @@ export class ScrollWheel {
   /**
    * Accumulated wheel event deltaY.
    *
-   * @private
    * @type {number}
    */
   #wheelDeltaY = 0;

@@ -43,7 +43,6 @@ export class ShapeEditor {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -59,7 +58,6 @@ export class ShapeEditor {
    * Shape factory list
    *
    * @type {object}
-   * @private
    */
   #shapeFactoryList = null;
 
@@ -67,14 +65,12 @@ export class ShapeEditor {
    * Current shape factory.
    *
    * @type {object}
-   * @private
    */
   #currentFactory = null;
 
   /**
    * Edited shape.
    *
-   * @private
    * @type {object}
    */
   #shape = null;
@@ -82,7 +78,6 @@ export class ShapeEditor {
   /**
    * Edited view controller. Used for quantification update.
    *
-   * @private
    * @type {object}
    */
   #viewController = null;
@@ -90,7 +85,6 @@ export class ShapeEditor {
   /**
    * Active flag.
    *
-   * @private
    * @type {boolean}
    */
   #isActive = false;
@@ -98,7 +92,6 @@ export class ShapeEditor {
   /**
    * Draw event callback.
    *
-   * @private
    * @type {Function}
    */
   #drawEventCallback = null;
@@ -220,7 +213,6 @@ export class ShapeEditor {
    * Apply a function on all anchors.
    *
    * @param {object} func A f(shape) function.
-   * @private
    */
   #applyFuncToAnchors(func) {
     if (this.#shape && this.#shape.getParent()) {
@@ -233,7 +225,6 @@ export class ShapeEditor {
    * Set anchors visibility.
    *
    * @param {boolean} flag The visible flag.
-   * @private
    */
   #setAnchorsVisible(flag) {
     this.#applyFuncToAnchors(function (anchor) {
@@ -262,8 +253,6 @@ export class ShapeEditor {
 
   /**
    * Remove anchors.
-   *
-   * @private
    */
   #removeAnchors() {
     this.#applyFuncToAnchors(function (anchor) {
@@ -273,8 +262,6 @@ export class ShapeEditor {
 
   /**
    * Add the shape anchors.
-   *
-   * @private
    */
   #addAnchors() {
     // exit if no shape or no layer
@@ -300,7 +287,6 @@ export class ShapeEditor {
    *
    * @param {object} anchor The anchor to clone.
    * @returns {object} A clone of the input anchor.
-   * @private
    */
   #getClone(anchor) {
     // create closure to properties
@@ -329,7 +315,6 @@ export class ShapeEditor {
    * Set the anchor on listeners.
    *
    * @param {object} anchor The anchor to set on.
-   * @private
    */
   #setAnchorOn(anchor) {
     let startAnchor = null;
@@ -421,7 +406,6 @@ export class ShapeEditor {
    * Set the anchor off listeners.
    *
    * @param {object} anchor The anchor to set off.
-   * @private
    */
   #setAnchorOff(anchor) {
     anchor.off('dragstart.edit');

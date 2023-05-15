@@ -14,7 +14,6 @@ export class DrawLayer {
   /**
    * The container div.
    *
-   * @private
    * @type {HTMLElement}
    */
   #containerDiv;
@@ -22,7 +21,6 @@ export class DrawLayer {
   /**
    * Konva stage.
    *
-   * @private
    * @type {Konva.Stage}
    */
   #konvaStage = null;
@@ -30,7 +28,6 @@ export class DrawLayer {
   /**
    * The layer base size as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #baseSize;
@@ -38,7 +35,6 @@ export class DrawLayer {
   /**
    * The layer base spacing as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #baseSpacing;
@@ -46,7 +42,6 @@ export class DrawLayer {
   /**
    * The layer fit scale.
    *
-   * @private
    * @type {object}
    */
   #fitScale = {x: 1, y: 1};
@@ -54,7 +49,6 @@ export class DrawLayer {
   /**
    * The base layer offset.
    *
-   * @private
    * @type {object}
    */
   #baseOffset = {x: 0, y: 0};
@@ -62,7 +56,6 @@ export class DrawLayer {
   /**
    * The view offset.
    *
-   * @private
    * @type {object}
    */
   #viewOffset = {x: 0, y: 0};
@@ -70,7 +63,6 @@ export class DrawLayer {
   /**
    * The zoom offset.
    *
-   * @private
    * @type {object}
    */
   #zoomOffset = {x: 0, y: 0};
@@ -78,7 +70,6 @@ export class DrawLayer {
   /**
    * The flip offset.
    *
-   * @private
    * @type {object}
    */
   #flipOffset = {x: 0, y: 0};
@@ -86,7 +77,6 @@ export class DrawLayer {
   /**
    * The draw controller.
    *
-   * @private
    * @type {object}
    */
   #drawController = null;
@@ -94,7 +84,6 @@ export class DrawLayer {
   /**
    * The plane helper.
    *
-   * @private
    * @type {object}
    */
   #planeHelper;
@@ -102,7 +91,6 @@ export class DrawLayer {
   /**
    * The associated data index.
    *
-   * @private
    * @type {number}
    */
   #dataIndex = null;
@@ -130,7 +118,6 @@ export class DrawLayer {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -581,7 +568,6 @@ export class DrawLayer {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     event.srclayerid = this.getId();

@@ -27,7 +27,6 @@ export class ZoomAndPan {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -35,7 +34,6 @@ export class ZoomAndPan {
   /**
    * Interaction start flag.
    *
-   * @private
    * @type {boolean}
    */
   #started = false;

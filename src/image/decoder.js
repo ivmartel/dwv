@@ -38,7 +38,6 @@ class AsynchPixelBufferDecoder {
   /**
    * The associated worker script.
    *
-   * @private
    * @type {string}
    */
   #script;
@@ -46,7 +45,6 @@ class AsynchPixelBufferDecoder {
   /**
    * Associated thread pool.
    *
-   * @private
    * @type {ThreadPool}
    */
   #pool = new ThreadPool(10);
@@ -54,7 +52,6 @@ class AsynchPixelBufferDecoder {
   /**
    * Flag to know if callbacks are set.
    *
-   * @private
    * @type {boolean}
    */
   #areCallbacksSet = false;
@@ -168,7 +165,6 @@ class SynchPixelBufferDecoder {
   /**
    * Name of the compression algorithm.
    *
-   * @private
    * @type {string}
    */
   #algoName;
@@ -176,7 +172,6 @@ class SynchPixelBufferDecoder {
   /**
    * Number of data.
    *
-   * @private
    * @type {number}
    */
   #numberOfData;
@@ -347,7 +342,6 @@ export class PixelBufferDecoder {
   /**
    * Flag to know if callbacks are set.
    *
-   * @private
    * @type {boolean}
    */
   #areCallbacksSet = false;
@@ -356,7 +350,6 @@ export class PixelBufferDecoder {
    * Pixel decoder.
    * Defined only once.
    *
-   * @private
    * @type {object}
    */
   #pixelDecoder = null;

@@ -10,7 +10,6 @@ export class Size {
   /**
    * The size values.
    *
-   * @private
    * @type {Array}
    */
   #values;

@@ -11,7 +11,6 @@ export class LoadController {
    * The default character set.
    *
    * @type {string}
-   * @private
    */
   #defaultCharacterSet;
 
@@ -19,7 +18,6 @@ export class LoadController {
    * List of current loaders.
    *
    * @type {object}
-   * @private
    */
   #currentLoaders = {};
 
@@ -27,7 +25,6 @@ export class LoadController {
    * load counter.
    *
    * @type {number}
-   * @private
    */
   #counter = -1;
 
@@ -111,7 +108,6 @@ export class LoadController {
    * Load a list of image files.
    *
    * @param {Array} files The list of image files to load.
-   * @private
    */
   #loadImageFiles(files) {
     // create IO
@@ -128,7 +124,6 @@ export class LoadController {
    * @param {object} options The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
-   * @private
    */
   #loadImageUrls(urls, options) {
     // create IO
@@ -142,7 +137,6 @@ export class LoadController {
    * Load a State file.
    *
    * @param {string} file The state file to load.
-   * @private
    */
   #loadStateFile(file) {
     // create IO
@@ -158,7 +152,6 @@ export class LoadController {
    * @param {object} options The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
-   * @private
    */
   #loadStateUrl(url, options) {
     // create IO
@@ -174,7 +167,6 @@ export class LoadController {
    * @param {object} loader The data loader.
    * @param {string} loadType The data load type: 'image' or 'state'.
    * @param {object} options Options passed to the final loader.
-   * @private
    */
   #loadData(data, loader, loadType, options) {
     const eventInfo = {

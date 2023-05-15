@@ -37,7 +37,6 @@ export class Matrix33 {
   /**
    * Matrix values.
    *
-   * @private
    * @type {Array}
    */
   #values;
@@ -45,7 +44,6 @@ export class Matrix33 {
   /**
    * Matrix inverse, calculated at first ask
    *
-   * @private
    * @type {Array}
    */
   #inverse;

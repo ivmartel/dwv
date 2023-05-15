@@ -13,7 +13,6 @@ export class MultiProgressHandler {
    * Second dimension is a list of possible progresses, for example
    *   the progress of the download and the progress of the decoding.
    *
-   * @private
    * @type {Array}
    */
   #progresses = [];
@@ -21,7 +20,6 @@ export class MultiProgressHandler {
   /**
    * Number of dimensions.
    *
-   * @private
    * @type {number}
    */
   #numberOfDimensions = 2;
@@ -29,7 +27,6 @@ export class MultiProgressHandler {
   /**
    * Progress callback.
    *
-   * @private
    * @type {Function}
    */
   #callback;
@@ -112,7 +109,6 @@ export class MultiProgressHandler {
    *
    * @param {number} index The index of the item.
    * @returns {number} The load percentage.
-   * @private
    */
   #getItemProgress(index) {
     let sum = 0;
@@ -126,7 +122,6 @@ export class MultiProgressHandler {
    * Get the global load percent including the provided one.
    *
    * @returns {number} The accumulated percentage.
-   * @private
    */
   #getGlobalPercent() {
     let sum = 0;

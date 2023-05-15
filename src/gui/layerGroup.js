@@ -154,7 +154,6 @@ export class LayerGroup {
   /**
    * The container div.
    *
-   * @private
    * @type {HTMLElement}
    */
   #containerDiv;
@@ -162,7 +161,6 @@ export class LayerGroup {
   /**
    * List of layers.
    *
-   * @private
    * @type {Array}
    */
   #layers = [];
@@ -170,7 +168,6 @@ export class LayerGroup {
   /**
    * The layer scale as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #scale = {x: 1, y: 1, z: 1};
@@ -178,7 +175,6 @@ export class LayerGroup {
   /**
    * The base scale as {x,y}: all posterior scale will be on top of this one.
    *
-   * @private
    * @type {object}
    */
   #baseScale = {x: 1, y: 1, z: 1};
@@ -186,7 +182,6 @@ export class LayerGroup {
   /**
    * The layer offset as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #offset = {x: 0, y: 0, z: 0};
@@ -194,7 +189,6 @@ export class LayerGroup {
   /**
    * Active view layer index.
    *
-   * @private
    * @type {number}
    */
   #activeViewLayerIndex = null;
@@ -202,7 +196,6 @@ export class LayerGroup {
   /**
    * Active draw layer index.
    *
-   * @private
    * @type {number}
    */
   #activeDrawLayerIndex = null;
@@ -211,7 +204,6 @@ export class LayerGroup {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -219,7 +211,6 @@ export class LayerGroup {
    * The target orientation matrix.
    *
    * @type {object}
-   * @private
    */
   #targetOrientation;
 
@@ -227,7 +218,6 @@ export class LayerGroup {
    * Flag to activate crosshair or not.
    *
    * @type {boolean}
-   * @private
    */
   #showCrosshair = false;
 
@@ -235,7 +225,6 @@ export class LayerGroup {
    * The current position used for the crosshair.
    *
    * @type {Point}
-   * @private
    */
   #currentPosition;
 
@@ -980,7 +969,6 @@ export class LayerGroup {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

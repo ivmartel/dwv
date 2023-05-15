@@ -106,7 +106,6 @@ export class ThreadPool {
   /**
    * Stop the pool: stop all running threads.
    *
-   * @private
    */
   #stop() {
     // clear tasks
@@ -241,7 +240,6 @@ class WorkerThread {
    * which also indicates the end of this worker.
    *
    * @param {object} event The message event.
-   * @private
    */
   onmessage = (event) => {
     // augment event
@@ -258,7 +256,6 @@ class WorkerThread {
    * Error event handler.
    *
    * @param {object} event The error event.
-   * @private
    */
   onerror = (event) => {
     // augment event

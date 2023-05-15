@@ -8,7 +8,6 @@ export class Spacing {
   /**
    * The spacing values.
    *
-   * @private
    * @type {Array}
    */
   #values;

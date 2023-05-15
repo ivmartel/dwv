@@ -18,7 +18,7 @@ import {getTagFromKey} from '../dicom/dicomTag';
 import {toolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 
-/**
+/**An accessibility modifier cannot be used with a private identifier
  * Main application class.
  *
  * @example
@@ -60,7 +60,6 @@ export class App {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -1014,7 +1013,6 @@ export class App {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);
@@ -1024,7 +1022,6 @@ export class App {
    * Data load start callback.
    *
    * @param {object} event The load start event.
-   * @private
    */
   #onloadstart = (event) => {
     /**
@@ -1045,7 +1042,6 @@ export class App {
    * Data load progress callback.
    *
    * @param {object} event The progress event.
-   * @private
    */
   #onloadprogress = (event) => {
     /**
@@ -1068,7 +1064,6 @@ export class App {
    * Data load callback.
    *
    * @param {object} event The load event.
-   * @private
    */
   #onloaditem = (event) => {
     // check event
@@ -1129,7 +1124,6 @@ export class App {
    * Data load callback.
    *
    * @param {object} event The load event.
-   * @private
    */
   #onload = (event) => {
     /**
@@ -1148,7 +1142,6 @@ export class App {
    * Data load end callback.
    *
    * @param {object} event The load end event.
-   * @private
    */
   #onloadend = (event) => {
     /**
@@ -1170,7 +1163,6 @@ export class App {
    * Data load error callback.
    *
    * @param {object} event The error event.
-   * @private
    */
   #onloaderror = (event) => {
     /**
@@ -1193,7 +1185,6 @@ export class App {
    * Data load abort callback.
    *
    * @param {object} event The abort event.
-   * @private
    */
   #onloadabort = (event) => {
     /**
@@ -1214,7 +1205,6 @@ export class App {
    * Bind layer group events to app.
    *
    * @param {object} group The layer group.
-   * @private
    */
   #bindLayerGroupToApp(group) {
     // propagate layer group events
@@ -1240,7 +1230,6 @@ export class App {
    *
    * @param {number} dataIndex The data index.
    * @param {object} dataViewConfig The data view config.
-   * @private
    */
   #initialiseBaseLayers(dataIndex, dataViewConfig) {
     // add layers

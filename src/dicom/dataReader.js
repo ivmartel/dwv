@@ -35,7 +35,6 @@ export class DataReader {
   /**
    * The input buffer.
    *
-   * @private
    * @type {Array}
    */
   #buffer;
@@ -43,7 +42,6 @@ export class DataReader {
   /**
    * Is the endianness Little Endian.
    *
-   * @private
    * @type {boolean}
    */
   #isLittleEndian = true;
@@ -51,7 +49,6 @@ export class DataReader {
   /**
    * Is the Native endianness Little Endian.
    *
-   * @private
    * @type {boolean}
    */
   #isNativeLittleEndian = isNativeLittleEndian();
@@ -59,7 +56,6 @@ export class DataReader {
   /**
    * Flag to know if the TypedArray data needs flipping.
    *
-   * @private
    * @type {boolean}
    */
   #needFlip;
@@ -67,7 +63,6 @@ export class DataReader {
   /**
    * The main data view.
    *
-   * @private
    * @type {DataView}
    */
   #view;

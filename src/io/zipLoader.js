@@ -20,7 +20,6 @@ export class ZipLoader {
   /**
    * Loading flag.
    *
-   * @private
    * @type {boolean}
    */
   #isLoading = false;
@@ -53,7 +52,6 @@ export class ZipLoader {
    * @param {ArrayBuffer} content unzipped file image
    * @param {object} origin The origin of the file.
    * @param {number} index The data index.
-   * @private
    */
   #zipAsyncCallback(content, origin, index) {
     this.#files.push({filename: this.#filename, data: content});

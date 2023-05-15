@@ -12,7 +12,6 @@ export class DicomDataLoader {
   /**
    * Loader options.
    *
-   * @private
    * @type {object}
    */
   #options = {};
@@ -20,7 +19,6 @@ export class DicomDataLoader {
   /**
    * Loading flag.
    *
-   * @private
    * @type {boolean}
    */
   #isLoading = false;
@@ -46,7 +44,6 @@ export class DicomDataLoader {
   /**
    * DICOM buffer to View (asynchronous)
    *
-   * @private
    */
   #db2v = new DicomBufferToView();
 

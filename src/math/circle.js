@@ -26,7 +26,6 @@ export class Circle {
   /**
    * Circle centre.
    *
-   * @private
    * @type {Point2D}
    */
   #centre;
@@ -34,7 +33,6 @@ export class Circle {
   /**
    * Circle radius.
    *
-   * @private
    * @type {number}
    */
   #radius;

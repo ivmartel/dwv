@@ -11,7 +11,6 @@ export class JSONTextLoader {
   /**
    * Loading flag.
    *
-   * @private
    * @type {boolean}
    */
   #isLoading = false;

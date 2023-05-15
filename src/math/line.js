@@ -9,7 +9,6 @@ export class Line {
   /**
    * Line begin point.
    *
-   * @private
    * @type {Point2D}
    */
   #begin;
@@ -17,7 +16,6 @@ export class Line {
   /**
    * Line end point.
    *
-   * @private
    * @type {Point2D}
    */
   #end;

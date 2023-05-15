@@ -18,7 +18,6 @@ export class Geometry {
   /**
    * Array of origins.
    *
-   * @private
    * @type {Array}
    */
   #origins;
@@ -26,7 +25,6 @@ export class Geometry {
   /**
    * Data size.
    *
-   * @private
    * @type {Size}
    */
   #size;
@@ -34,7 +32,6 @@ export class Geometry {
   /**
    * Data spacing.
    *
-   * @private
    * @type {Spacing}
    */
   #spacing;
@@ -42,7 +39,6 @@ export class Geometry {
   /**
    * Local helper object for time points.
    *
-   * @private
    * @type {object}
    */
   #timeOrigins = {};
@@ -50,7 +46,6 @@ export class Geometry {
   /**
    * Initial time index.
    *
-   * @private
    * @type {number}
    */
   #initialTime;
@@ -58,7 +53,6 @@ export class Geometry {
   /**
    * Data orientation.
    *
-   * @private
    * @type {Matrix33}
    */
   #orientation = new getIdentityMat33();
@@ -66,7 +60,6 @@ export class Geometry {
   /**
    * Flag to know if new origins were added.
    *
-   * @private
    * @type {boolean}
    */
   #newOrigins = false;

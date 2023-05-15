@@ -36,7 +36,6 @@ export class View {
   /**
    * The associated image.
    *
-   * @private
    * @type {Image}
    */
   #image;
@@ -44,7 +43,6 @@ export class View {
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
    *
-   * @private
    * @type {Window}
    */
   #windowLuts = {};
@@ -53,7 +51,6 @@ export class View {
    * Window presets.
    * Minmax will be filled at first use (see view.setWindowLevelPreset).
    *
-   * @private
    * @type {object}
    */
   #windowPresets = {minmax: {name: 'minmax'}};
@@ -61,7 +58,6 @@ export class View {
   /**
    * Current window preset name.
    *
-   * @private
    * @type {string}
    */
   #currentPresetName = null;
@@ -69,7 +65,6 @@ export class View {
   /**
    * Current window level.
    *
-   * @private
    * @type {object}
    */
   #currentWl = null;
@@ -77,7 +72,6 @@ export class View {
   /**
    * colour map.
    *
-   * @private
    * @type {object}
    */
   #colourMap = lut.plain;
@@ -86,7 +80,6 @@ export class View {
    * Current position as a Point3D.
    * Store position and not index to stay geometry independent.
    *
-   * @private
    * @type {Point3D}
    */
   #currentPosition = null;
@@ -94,7 +87,6 @@ export class View {
   /**
    * View orientation. Undefined will use the original slice ordering.
    *
-   * @private
    * @type {object}
    */
   #orientation;
@@ -103,7 +95,6 @@ export class View {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -760,7 +751,6 @@ export class View {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

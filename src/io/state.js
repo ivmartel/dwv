@@ -149,7 +149,6 @@ export class State {
    *
    * @param {object} data The Object representation of the state.
    * @returns {object} The state object.
-   * @private
    */
   #readV01(data) {
     // v0.1 -> v0.2
@@ -169,7 +168,6 @@ export class State {
    *
    * @param {object} data The Object representation of the state.
    * @returns {object} The state object.
-   * @private
    */
   #readV02(data) {
     // v0.2 -> v0.3, v0.4
@@ -187,7 +185,6 @@ export class State {
    *
    * @param {object} data The Object representation of the state.
    * @returns {object} The state object.
-   * @private
    */
   #readV03(data) {
     // v0.3 -> v0.4
@@ -203,7 +200,6 @@ export class State {
    *
    * @param {object} data The Object representation of the state.
    * @returns {object} The state object.
-   * @private
    */
   #readV04(data) {
     // v0.4 -> v0.5
@@ -216,7 +212,6 @@ export class State {
    *
    * @param {object} data The Object representation of the state.
    * @returns {object} The state object.
-   * @private
    */
   #readV05(data) {
     return data;

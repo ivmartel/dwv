@@ -6,7 +6,6 @@ export class Vector3D {
   /**
    * X coordinate.
    *
-   * @private
    * @type {number}
    */
   #x;
@@ -14,7 +13,6 @@ export class Vector3D {
   /**
    * Y coordinate.
    *
-   * @private
    * @type {number}
    */
   #y;
@@ -22,7 +20,6 @@ export class Vector3D {
   /**
    * Z coordinate.
    *
-   * @private
    * @type {number}
    */
   #z;

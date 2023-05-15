@@ -12,7 +12,6 @@ export class MultipartLoader {
   /**
    * Loading flag.
    *
-   * @private
    * @type {boolean}
    */
   #isLoading = false;

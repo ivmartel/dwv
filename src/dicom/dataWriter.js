@@ -6,7 +6,6 @@ export class DataWriter {
   /**
    * Is the endianness Little Endian.
    *
-   * @private
    * @type {boolean}
    */
   #isLittleEndian = true;
@@ -14,7 +13,6 @@ export class DataWriter {
   /**
    * The main data view.
    *
-   * @private
    * @type {DataView}
    */
   #view;

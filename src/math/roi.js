@@ -7,7 +7,6 @@ export class ROI {
   /**
    * List of points.
    *
-   * @private
    * @type {Array}
    */
   #points = [];

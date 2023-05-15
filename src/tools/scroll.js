@@ -69,7 +69,6 @@ export class Scroll {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -77,7 +76,6 @@ export class Scroll {
   /**
    * Interaction start flag.
    *
-   * @private
    * @type {boolean}
    */
   #started = false;
@@ -85,7 +83,6 @@ export class Scroll {
   /**
    * Scroll wheel handler.
    *
-   * @private
    * @type {ScrollWheel}
    */
   #scrollWhell;
@@ -93,7 +90,6 @@ export class Scroll {
   /**
    * Touch timer ID (created by setTimeout).
    *
-   * @private
    * @type {number}
    */
   #touchTimerID = null;

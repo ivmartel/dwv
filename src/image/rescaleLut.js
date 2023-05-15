@@ -7,7 +7,6 @@ export class RescaleLut {
   /**
    * The rescale slope.
    *
-   * @private
    * @type {RescaleSlopeAndIntercept}
    */
   #rsi;
@@ -15,7 +14,6 @@ export class RescaleLut {
   /**
    * The internal array.
    *
-   * @private
    * @type {Float32Array}
    */
   #lut = null;
@@ -23,7 +21,6 @@ export class RescaleLut {
   /**
    * Flag to know if the lut is ready or not.
    *
-   * @private
    * @type {boolean}
    */
   #isReady = false;
@@ -31,7 +28,6 @@ export class RescaleLut {
   /**
    * The size of the LUT array.
    *
-   * @private
    * @type {number}
    */
   #length;

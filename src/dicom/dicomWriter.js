@@ -313,7 +313,6 @@ export class DicomWriter {
   /**
    * Default text encoder.
    *
-   * @private
    * @type {DefaultTextEncoder}
    */
   #defaultTextEncoder = new DefaultTextEncoder();
@@ -321,7 +320,6 @@ export class DicomWriter {
   /**
    * Special text encoder.
    *
-   * @private
    * @type {DefaultTextEncoder|TextEncoder}
    */
   #textEncoder = this.#defaultTextEncoder;

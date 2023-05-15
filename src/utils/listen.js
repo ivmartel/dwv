@@ -7,7 +7,6 @@ export class ListenerHandler {
   /**
    * listeners.
    *
-   * @private
    * @type {object}
    */
   #listeners = {};

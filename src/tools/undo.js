@@ -7,7 +7,6 @@ export class UndoStack {
   /**
    * Array of commands.
    *
-   * @private
    * @type {Array}
    */
   #stack = [];
@@ -15,7 +14,6 @@ export class UndoStack {
   /**
    * Current command index.
    *
-   * @private
    * @type {number}
    */
   #curCmdIndex = 0;
@@ -24,7 +22,6 @@ export class UndoStack {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -150,7 +147,6 @@ export class UndoStack {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

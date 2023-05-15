@@ -41,7 +41,6 @@ export class WindowLevel {
   /**
    * The center.
    *
-   * @private
    * @type {number}
    */
   #center;
@@ -49,7 +48,6 @@ export class WindowLevel {
   /**
    * The width.
    *
-   * @private
    * @type {number}
    */
   #width;
@@ -73,7 +71,6 @@ export class WindowLevel {
   /**
    * Signed data offset. Defaults to 0.
    *
-   * @private
    * @type {number}
    */
   #signedOffset = 0;
@@ -81,7 +78,6 @@ export class WindowLevel {
   /**
    * Output value minimum. Defaults to 0.
    *
-   * @private
    * @type {number}
    */
   #ymin = 0;
@@ -89,7 +85,6 @@ export class WindowLevel {
   /**
    * Output value maximum. Defaults to 255.
    *
-   * @private
    * @type {number}
    */
   #ymax = 255;
@@ -97,7 +92,6 @@ export class WindowLevel {
   /**
    * Input value minimum (calculated).
    *
-   * @private
    * @type {number}
    */
   #xmin = null;
@@ -105,7 +99,6 @@ export class WindowLevel {
   /**
    * Input value maximum (calculated).
    *
-   * @private
    * @type {number}
    */
   #xmax = null;
@@ -113,7 +106,6 @@ export class WindowLevel {
   /**
    * Window level equation slope (calculated).
    *
-   * @private
    * @type {number}
    */
   #slope = null;
@@ -121,7 +113,6 @@ export class WindowLevel {
   /**
    * Window level equation intercept (calculated).
    *
-   * @private
    * @type {number}
    */
   #inter = null;
@@ -129,7 +120,6 @@ export class WindowLevel {
   /**
    * Initialise members. Called at construction.
    *
-   * @private
    */
   #init() {
     const c = this.#center + this.#signedOffset;

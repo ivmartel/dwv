@@ -550,7 +550,6 @@ export class DicomParser {
   /**
    * Default character set (optional).
    *
-   * @private
    * @type {string}
    */
   #defaultCharacterSet;
@@ -558,7 +557,6 @@ export class DicomParser {
   /**
    * Default text decoder.
    *
-   * @private
    * @type {DefaultTextDecoder}
    */
   #defaultTextDecoder = new DefaultTextDecoder();
@@ -566,7 +564,6 @@ export class DicomParser {
   /**
    * Special text decoder.
    *
-   * @private
    * @type {DefaultTextDecoder|TextDecoder}
    */
   #textDecoder = this.#defaultTextDecoder;

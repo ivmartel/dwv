@@ -11,7 +11,6 @@ export class Tag {
   /**
    * The tag group.
    *
-   * @private
    * @type {string}
    */
   #group;
@@ -19,7 +18,6 @@ export class Tag {
   /**
    * The tag element.
    *
-   * @private
    * @type {string}
    */
   #element;

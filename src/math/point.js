@@ -9,7 +9,6 @@ export class Point2D {
   /**
    * X position.
    *
-   * @private
    * @type {number}
    */
   #x;
@@ -17,7 +16,6 @@ export class Point2D {
   /**
    * Y position.
    *
-   * @private
    * @type {number}
    */
   #y;
@@ -104,7 +102,6 @@ export class Point3D {
   /**
    * X position.
    *
-   * @private
    * @type {number}
    */
   #x;
@@ -112,7 +109,6 @@ export class Point3D {
   /**
    * Y position.
    *
-   * @private
    * @type {number}
    */
   #y;
@@ -120,7 +116,6 @@ export class Point3D {
   /**
    * Z position.
    *
-   * @private
    * @type {number}
    */
   #z;
@@ -269,7 +264,6 @@ export class Point {
   /**
    * Point values.
    *
-   * @private
    * @type {number}
    */
   #values;

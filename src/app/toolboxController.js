@@ -9,7 +9,6 @@ export class ToolboxController {
    * List of tools to control.
    *
    * @type {Array}
-   * @private
    */
   #toolList;
 
@@ -17,7 +16,6 @@ export class ToolboxController {
    * Selected tool.
    *
    * @type {object}
-   * @private
    */
   #selectedTool = null;
 
@@ -25,7 +23,6 @@ export class ToolboxController {
    * Callback store to allow attach/detach.
    *
    * @type {Array}
-   * @private
    */
   #callbackStore = [];
 
@@ -33,7 +30,6 @@ export class ToolboxController {
    * Current layers bound to tool.
    *
    * @type {object}
-   * @private
    */
   #boundLayers = {};
 
@@ -170,7 +166,6 @@ export class ToolboxController {
    * @param {string} layerId The layer id.
    * @param {string} eventType The event type.
    * @returns {object} A callback for the provided layer and event.
-   * @private
    */
   #getOnMouch(layerId, eventType) {
     // augment event with converted offsets

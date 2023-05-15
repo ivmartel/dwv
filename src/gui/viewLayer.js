@@ -16,7 +16,6 @@ export class ViewLayer {
   /**
    * Container div.
    *
-   * @private
    * @type {HTMLElement}
    */
   #containerDiv;
@@ -24,7 +23,6 @@ export class ViewLayer {
   /**
    * The view controller.
    *
-   * @private
    * @type {object}
    */
   #viewController = null;
@@ -32,7 +30,6 @@ export class ViewLayer {
   /**
    * The main display canvas.
    *
-   * @private
    * @type {object}
    */
   #canvas = null;
@@ -40,7 +37,6 @@ export class ViewLayer {
   /**
    * The offscreen canvas: used to store the raw, unscaled pixel data.
    *
-   * @private
    * @type {object}
    */
   #offscreenCanvas = null;
@@ -48,7 +44,6 @@ export class ViewLayer {
   /**
    * The associated CanvasRenderingContext2D.
    *
-   * @private
    * @type {object}
    */
   #context = null;
@@ -56,7 +51,6 @@ export class ViewLayer {
   /**
    * Flag to know if the current position is valid.
    *
-   * @private
    * @type {boolean}
    */
   #isValidPosition = true;
@@ -64,7 +58,6 @@ export class ViewLayer {
   /**
    * The image data array.
    *
-   * @private
    * @type {Array}
    */
   #imageData = null;
@@ -72,7 +65,6 @@ export class ViewLayer {
   /**
    * The layer base size as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #baseSize;
@@ -80,7 +72,6 @@ export class ViewLayer {
   /**
    * The layer base spacing as {x,y}.
    *
-   * @private
    * @type {object}
    */
   #baseSpacing;
@@ -88,7 +79,6 @@ export class ViewLayer {
   /**
    * The layer opacity.
    *
-   * @private
    * @type {number}
    */
   #opacity = 1;
@@ -96,7 +86,6 @@ export class ViewLayer {
   /**
    * The layer scale.
    *
-   * @private
    * @type {object}
    */
   #scale = {x: 1, y: 1};
@@ -104,7 +93,6 @@ export class ViewLayer {
   /**
    * The layer fit scale.
    *
-   * @private
    * @type {object}
    */
   #fitScale = {x: 1, y: 1};
@@ -112,7 +100,6 @@ export class ViewLayer {
   /**
    * The layer offset.
    *
-   * @private
    * @type {object}
    */
   #offset = {x: 0, y: 0};
@@ -120,7 +107,6 @@ export class ViewLayer {
   /**
    * The base layer offset.
    *
-   * @private
    * @type {object}
    */
   #baseOffset = {x: 0, y: 0};
@@ -128,7 +114,6 @@ export class ViewLayer {
   /**
    * The view offset.
    *
-   * @private
    * @type {object}
    */
   #viewOffset = {x: 0, y: 0};
@@ -136,7 +121,6 @@ export class ViewLayer {
   /**
    * The zoom offset.
    *
-   * @private
    * @type {object}
    */
   #zoomOffset = {x: 0, y: 0};
@@ -144,7 +128,6 @@ export class ViewLayer {
   /**
    * The flip offset.
    *
-   * @private
    * @type {object}
    */
   #flipOffset = {x: 0, y: 0};
@@ -152,7 +135,6 @@ export class ViewLayer {
   /**
    * Data update flag.
    *
-   * @private
    * @type {boolean}
    */
   #needsDataUpdate = null;
@@ -160,7 +142,6 @@ export class ViewLayer {
   /**
    * The associated data index.
    *
-   * @private
    * @type {number}
    */
   #dataIndex = null;
@@ -168,7 +149,6 @@ export class ViewLayer {
   /**
    * Listener handler.
    *
-   * @private
    * @type {object}
    */
   #listenerHandler = new ListenerHandler();
@@ -177,7 +157,6 @@ export class ViewLayer {
    * Image smoothing flag.
    * see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled
    *
-   * @private
    * @type {boolean}
    */
   #imageSmoothingEnabled = false;
@@ -823,7 +802,6 @@ export class ViewLayer {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     event.srclayerid = this.getId();
@@ -849,7 +827,6 @@ export class ViewLayer {
    * Handle window/level change.
    *
    * @param {object} event The event fired when changing the window/level.
-   * @private
    */
   #onWLChange = (event) => {
     // generate and draw if no skip flag
@@ -865,7 +842,6 @@ export class ViewLayer {
    * Handle colour map change.
    *
    * @param {object} event The event fired when changing the colour map.
-   * @private
    */
   #onColourChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&
@@ -880,7 +856,6 @@ export class ViewLayer {
    * Handle position change.
    *
    * @param {object} event The event fired when changing the position.
-   * @private
    */
   #onPositionChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&
@@ -924,7 +899,6 @@ export class ViewLayer {
    * Handle alpha function change.
    *
    * @param {object} event The event fired when changing the function.
-   * @private
    */
   #onAlphaFuncChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&

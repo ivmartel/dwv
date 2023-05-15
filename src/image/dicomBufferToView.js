@@ -15,7 +15,6 @@ export class DicomBufferToView {
   /**
    * Converter options.
    *
-   * @private
    * @type {object}
    */
   #options;
@@ -33,7 +32,6 @@ export class DicomBufferToView {
    * Pixel buffer decoder.
    * Define only once to allow optional asynchronous mode.
    *
-   * @private
    * @type {object}
    */
   #pixelDecoder = null;

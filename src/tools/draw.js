@@ -53,7 +53,6 @@ export class Draw {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -61,7 +60,6 @@ export class Draw {
   /**
    * Scroll wheel handler.
    *
-   * @private
    * @type {ScrollWheel}
    */
   #scrollWhell;
@@ -69,7 +67,6 @@ export class Draw {
   /**
    * Shape editor.
    *
-   * @private
    * @type {object}
    */
   #shapeEditor;
@@ -77,7 +74,6 @@ export class Draw {
   /**
    * Trash draw: a cross.
    *
-   * @private
    * @type {object}
    */
   #trash;
@@ -85,7 +81,6 @@ export class Draw {
   /**
    * Drawing style.
    *
-   * @private
    * @type {Style}
    */
   #style;
@@ -124,7 +119,6 @@ export class Draw {
   /**
    * Interaction start flag.
    *
-   * @private
    * @type {boolean}
    */
   #started = false;
@@ -140,14 +134,12 @@ export class Draw {
    * Current shape factory.
    *
    * @type {object}
-   * @private
    */
   #currentFactory = null;
 
   /**
    * Draw command.
    *
-   * @private
    * @type {object}
    */
   #command = null;
@@ -155,7 +147,6 @@ export class Draw {
   /**
    * Current shape group.
    *
-   * @private
    * @type {object}
    */
   #tmpShapeGroup = null;
@@ -170,7 +161,6 @@ export class Draw {
   /**
    * List of points.
    *
-   * @private
    * @type {Array}
    */
   #points = [];
@@ -178,7 +168,6 @@ export class Draw {
   /**
    * Last selected point.
    *
-   * @private
    * @type {object}
    */
   #lastPoint = null;
@@ -186,7 +175,6 @@ export class Draw {
   /**
    * Active shape, ie shape with mouse over.
    *
-   * @private
    * @type {object}
    */
   #activeShapeGroup;
@@ -194,7 +182,6 @@ export class Draw {
   /**
    * Original mouse cursor.
    *
-   * @private
    * @type {string}
    */
   #originalCursor;
@@ -202,15 +189,12 @@ export class Draw {
   /**
    * Mouse cursor.
    *
-   * @private
    * @type {string}
    */
   #mouseOverCursor = 'pointer';
 
   /**
    * Event listeners.
-   *
-   * @private
    */
   #listeners = {};
 
@@ -668,7 +652,6 @@ export class Draw {
    * @param {object} index The input index as {x,y}.
    * @param {LayerGroup} layerGroup The origin layer group.
    * @returns {object} The real position in the image as {x,y}.
-   * @private
    */
   #getRealPosition(index, layerGroup) {
     const drawLayer = layerGroup.getActiveDrawLayer();
@@ -1026,7 +1009,6 @@ export class Draw {
    * Fire an event: call all associated listeners.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     if (typeof this.#listeners[event.type] === 'undefined') {

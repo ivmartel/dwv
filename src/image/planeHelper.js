@@ -10,7 +10,6 @@ export class PlaneHelper {
   /**
    * The associated spacing.
    *
-   * @private
    * @type {Spacing}
    */
   #spacing;
@@ -18,7 +17,6 @@ export class PlaneHelper {
   /**
    * The image orientation.
    *
-   * @private
    * @type {Matrix33}
    */
   #imageOrientation;
@@ -26,7 +24,6 @@ export class PlaneHelper {
   /**
    * The viewe orientation.
    *
-   * @private
    * @type {Matrix33}
    */
   #viewOrientation;
@@ -34,7 +31,6 @@ export class PlaneHelper {
   /**
    * The target orientation.
    *
-   * @private
    * @type {Matrix33}
    */
   #targetOrientation;

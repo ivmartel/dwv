@@ -27,7 +27,6 @@ export class DicomElementsWrapper {
   /**
    * Wrapped elements.
    *
-   * @private
    * @type {Array}
    */
   #dicomElements;

@@ -27,7 +27,6 @@ export class WindowLevel {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -35,7 +34,6 @@ export class WindowLevel {
   /**
    * Interaction start flag.
    *
-   * @private
    * @type {boolean}
    */
   #started = false;
@@ -43,7 +41,6 @@ export class WindowLevel {
   /**
    * Scroll wheel handler.
    *
-   * @private
    * @type {ScrollWheel}
    */
   #scrollWhell;

@@ -22,7 +22,6 @@ export class Floodfill {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -37,14 +36,12 @@ export class Floodfill {
   /**
    * Original variables from external library. Used as in the lib example.
    *
-   * @private
    * @type {number}
    */
   #blurRadius = 5;
   /**
    * Original variables from external library. Used as in the lib example.
    *
-   * @private
    * @type {number}
    */
   #simplifyTolerant = 0;
@@ -52,7 +49,6 @@ export class Floodfill {
   /**
    * Original variables from external library. Used as in the lib example.
    *
-   * @private
    * @type {number}
    */
   #simplifyCount = 2000;
@@ -60,7 +56,6 @@ export class Floodfill {
   /**
    * Canvas info
    *
-   * @private
    * @type {object}
    */
   #imageInfo = null;
@@ -68,7 +63,6 @@ export class Floodfill {
   /**
    * Object created by MagicWand lib containing border points
    *
-   * @private
    * @type {object}
    */
   #mask = null;
@@ -76,7 +70,6 @@ export class Floodfill {
   /**
    * threshold default tolerance of the tool border
    *
-   * @private
    * @type {number}
    */
   #initialthreshold = 10;
@@ -84,7 +77,6 @@ export class Floodfill {
   /**
    * threshold tolerance of the tool border
    *
-   * @private
    * @type {number}
    */
   #currentthreshold = null;
@@ -98,7 +90,6 @@ export class Floodfill {
   /**
    * Draw command.
    *
-   * @private
    * @type {object}
    */
   #command = null;
@@ -106,7 +97,6 @@ export class Floodfill {
   /**
    * Current shape group.
    *
-   * @private
    * @type {object}
    */
   #shapeGroup = null;
@@ -114,7 +104,6 @@ export class Floodfill {
   /**
    * Coordinates of the fist mousedown event.
    *
-   * @private
    * @type {object}
    */
   #initialpoint;
@@ -122,7 +111,6 @@ export class Floodfill {
   /**
    * Floodfill border.
    *
-   * @private
    * @type {object}
    */
   #border = null;
@@ -130,7 +118,6 @@ export class Floodfill {
   /**
    * List of parent points.
    *
-   * @private
    * @type {Array}
    */
   #parentPoints = [];
@@ -138,7 +125,6 @@ export class Floodfill {
   /**
    * Assistant variable to paint border on all slices.
    *
-   * @private
    * @type {boolean}
    */
   #extender = false;
@@ -146,7 +132,6 @@ export class Floodfill {
   /**
    * Timeout for painting on mousemove.
    *
-   * @private
    */
   #painterTimeout;
 
@@ -161,7 +146,6 @@ export class Floodfill {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -189,7 +173,6 @@ export class Floodfill {
    *
    * @param {object} event The original event.
    * @returns {object} The coordinates as a {x,y}.
-   * @private
    */
   #getCoord = (event) => {
     const layerDetails = getLayerDetailsFromEvent(event);
@@ -205,7 +188,6 @@ export class Floodfill {
   /**
    * Calculate border.
    *
-   * @private
    * @param {object} points The input points.
    * @param {number} threshold The threshold of the floodfill.
    * @param {boolean} simple Return first points or a list.
@@ -247,7 +229,6 @@ export class Floodfill {
   /**
    * Paint Floodfill.
    *
-   * @private
    * @param {object} point The start point.
    * @param {number} threshold The border threshold.
    * @param {object} layerGroup The origin layer group.
@@ -542,7 +523,6 @@ export class Floodfill {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

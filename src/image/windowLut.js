@@ -7,7 +7,6 @@ export class WindowLut {
   /**
    * The rescale LUT.
    *
-   * @private
    * @type {RescaleLut}
    */
   #rescaleLut;
@@ -15,7 +14,6 @@ export class WindowLut {
   /**
    * Signed data flag.
    *
-   * @private
    * @type {boolean}
    */
   #isSigned;
@@ -23,7 +21,6 @@ export class WindowLut {
   /**
    * The internal array: Uint8ClampedArray clamps between 0 and 255.
    *
-   * @private
    * @type {Uint8ClampedArray}
    */
   #lut = null;
@@ -31,7 +28,6 @@ export class WindowLut {
   /**
    * The window level.
    *
-   * @private
    * @type {object}
    */
   #windowLevel = null;
@@ -39,7 +35,6 @@ export class WindowLut {
   /**
    * Flag to know if the lut is ready or not.
    *
-   * @private
    * @type {boolean}
    */
   #isReady = false;
@@ -47,7 +42,6 @@ export class WindowLut {
   /**
    * Shift for signed data.
    *
-   * @private
    * @type {number}
    */
   #signedShift = 0;

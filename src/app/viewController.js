@@ -26,7 +26,6 @@ export class ViewController {
    * Associated View.
    *
    * @type {View}
-   * @private
    */
   #view;
 
@@ -34,7 +33,6 @@ export class ViewController {
    * Associated data index.
    *
    * @type {number}
-   * @private
    */
   #index;
 
@@ -42,7 +40,6 @@ export class ViewController {
    * Plane helper.
    *
    * @type {PlaneHelper}
-   * @private
    */
   #planeHelper;
 
@@ -50,7 +47,6 @@ export class ViewController {
    * Mask segment helper.
    *
    * @type {MaskSegmentHelper}
-   * @private
    */
   #maskSegmentHelper;
 
@@ -89,7 +85,6 @@ export class ViewController {
   /**
    * Listener handler.
    *
-   * @private
    * @type {object}
    */
   #listenerHandler = new ListenerHandler();
@@ -774,7 +769,6 @@ export class ViewController {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     event.dataid = this.#dataIndex;

@@ -9,7 +9,6 @@ export class MemoryLoader {
   /**
    * Input data.
    *
-   * @private
    * @type {Array}
    */
   #inputData = null;
@@ -17,7 +16,6 @@ export class MemoryLoader {
   /**
    * Data loader.
    *
-   * @private
    * @type {object}
    */
   #runningLoader = null;
@@ -25,7 +23,6 @@ export class MemoryLoader {
   /**
    * Number of loaded data.
    *
-   * @private
    * @type {number}
    */
   #nLoad = 0;
@@ -33,7 +30,6 @@ export class MemoryLoader {
   /**
    * Number of load end events.
    *
-   * @private
    * @type {number}
    */
   #nLoadend = 0;
@@ -41,7 +37,6 @@ export class MemoryLoader {
   /**
    * The default character set (optional).
    *
-   * @private
    * @type {string}
    */
   #defaultCharacterSet;
@@ -68,7 +63,6 @@ export class MemoryLoader {
    * Store the current input.
    *
    * @param {object} data The input data.
-   * @private
    */
   #storeInputData(data) {
     this.#inputData = data;
@@ -83,7 +77,6 @@ export class MemoryLoader {
    * Store the launched loader.
    *
    * @param {object} loader The launched loader.
-   * @private
    */
   #storeLoader(loader) {
     this.#runningLoader = loader;
@@ -92,7 +85,6 @@ export class MemoryLoader {
   /**
    * Clear the stored loader.
    *
-   * @private
    */
   #clearStoredLoader() {
     this.#runningLoader = null;
@@ -102,7 +94,6 @@ export class MemoryLoader {
    * Launch a load item event and call addLoad.
    *
    * @param {object} event The load data event.
-   * @private
    */
   #addLoadItem(event) {
     this.onloaditem(event);
@@ -114,7 +105,6 @@ export class MemoryLoader {
    *   and call onload if loaded all data.
    *
    * @param {object} _event The load data event.
-   * @private
    */
   #addLoad = (_event) => {
     this.#nLoad++;
@@ -133,7 +123,6 @@ export class MemoryLoader {
    *   and run callbacks when all done, erroneus or not.
    *
    * @param {object} _event The load end event.
-   * @private
    */
   #addLoadend = (_event) => {
     this.#nLoadend++;

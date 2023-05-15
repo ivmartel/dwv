@@ -15,7 +15,6 @@ export class Livewire {
   /**
    * Associated app.
    *
-   * @private
    * @type {App}
    */
   #app;
@@ -37,7 +36,6 @@ export class Livewire {
   /**
    * Draw command.
    *
-   * @private
    * @type {object}
    */
   #command = null;
@@ -45,7 +43,6 @@ export class Livewire {
   /**
    * Current shape group.
    *
-   * @private
    * @type {object}
    */
   #shapeGroup = null;
@@ -60,7 +57,6 @@ export class Livewire {
   /**
    * Path storage. Paths are stored in reverse order.
    *
-   * @private
    * @type {Path}
    */
   #path = new Path();
@@ -68,7 +64,6 @@ export class Livewire {
   /**
    * Current path storage. Paths are stored in reverse order.
    *
-   * @private
    * @type {Path}
    */
   #currentPath = new Path();
@@ -76,7 +71,6 @@ export class Livewire {
   /**
    * List of parent points.
    *
-   * @private
    * @type {Array}
    */
   #parentPoints = [];
@@ -84,7 +78,6 @@ export class Livewire {
   /**
    * Tolerance.
    *
-   * @private
    * @type {number}
    */
   #tolerance = 5;
@@ -93,7 +86,6 @@ export class Livewire {
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
   #listenerHandler = new ListenerHandler();
 
@@ -101,7 +93,6 @@ export class Livewire {
    * Clear the parent points list.
    *
    * @param {object} imageSize The image size.
-   * @private
    */
   #clearParentPoints(imageSize) {
     const nrows = imageSize.get(1);
@@ -112,8 +103,6 @@ export class Livewire {
 
   /**
    * Clear the stored paths.
-   *
-   * @private
    */
   #clearPaths() {
     this.#path = new Path();
@@ -123,7 +112,6 @@ export class Livewire {
   /**
    * Scissor representation.
    *
-   * @private
    * @type {Scissors}
    */
   #scissors = new Scissors();
@@ -407,7 +395,6 @@ export class Livewire {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
   #fireEvent = (event) => {
     this.#listenerHandler.fireEvent(event);

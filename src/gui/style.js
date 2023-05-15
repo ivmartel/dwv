@@ -7,7 +7,6 @@ export class Style {
   /**
    * Font size.
    *
-   * @private
    * @type {number}
    */
   #fontSize = 10;
@@ -15,7 +14,6 @@ export class Style {
   /**
    * Font family.
    *
-   * @private
    * @type {string}
    */
   #fontFamily = 'Verdana';
@@ -23,7 +21,6 @@ export class Style {
   /**
    * Text colour.
    *
-   * @private
    * @type {string}
    */
   #textColour = '#fff';
@@ -31,7 +28,6 @@ export class Style {
   /**
    * Line colour.
    *
-   * @private
    * @type {string}
    */
   #lineColour = '#ffff80';
@@ -39,7 +35,6 @@ export class Style {
   /**
    * Base scale.
    *
-   * @private
    * @type {object}
    */
   #baseScale = {x: 1, y: 1};
@@ -47,7 +42,6 @@ export class Style {
   /**
    * Zoom scale.
    *
-   * @private
    * @type {object}
    */
   #zoomScale = {x: 1, y: 1};
@@ -55,7 +49,6 @@ export class Style {
   /**
    * Stroke width.
    *
-   * @private
    * @type {number}
    */
   #strokeWidth = 2;
@@ -63,7 +56,6 @@ export class Style {
   /**
    * Shadow offset.
    *
-   * @private
    * @type {object}
    */
   #shadowOffset = {x: 0.25, y: 0.25};
@@ -71,7 +63,6 @@ export class Style {
   /**
    * Tag opacity.
    *
-   * @private
    * @type {number}
    */
   #tagOpacity = 0.2;
@@ -79,7 +70,6 @@ export class Style {
   /**
    * Text padding.
    *
-   * @private
    * @type {number}
    */
   #textPadding = 3;

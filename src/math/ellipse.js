@@ -27,7 +27,6 @@ export class Ellipse {
   /**
    * Ellipse centre.
    *
-   * @private
    * @type {Point2D}
    */
   #centre;
@@ -35,7 +34,6 @@ export class Ellipse {
   /**
    * Ellipse horizontal radius.
    *
-   * @private
    * @type {number}
    */
   #a;
@@ -43,7 +41,6 @@ export class Ellipse {
   /**
    * Ellipse vertical radius.
    *
-   * @private
    * @type {number}
    */
   #b;
