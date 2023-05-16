@@ -9,70 +9,92 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  */
 function onDOMContentLoaded() {
   const stowButton = document.getElementById('stowb');
-  stowButton.onclick = stow;
+  stowButton.onclick = launchStow;
 
   const searchButton = document.getElementById('searchb');
-  searchButton.onclick = qidoSearch;
+  searchButton.onclick = launchQido;
 }
 
 /**
- * Get a message paragraph.
+ * Show a message.
  *
  * @param {string} text The text message.
- * @param {string} type The message type used as css class.
- * @returns {object} The paragraph element.
+ * @param {string} [type] The message type used as css class.
  */
-function getMessagePara(text, type) {
+function showMessage(text, type) {
   const p = document.createElement('p');
   p.className = 'message ' + type;
   p.appendChild(document.createTextNode(text));
-  return p;
+
+  const div = document.getElementById('result');
+  div.innerHTML = '';
+  div.appendChild(p);
 }
 
 /**
- * Launch a QIDO search on series.
+ * Check a response event and print error if any.
+ *
+ * @param {object} event The load event.
+ * @param {string} name The context name.
+ * @returns {boolean} True if response is ok.
  */
-function qidoSearch() {
-  // clear page
-  const div = document.getElementById('result');
-  div.innerHTML = '';
+function checkResponseEvent(event, name) {
+  let res = true;
 
+  let message;
+  const status = event.currentTarget.status;
+  if (status !== 200 && status !== 204) {
+    message = 'Bad status in ' + name + ' request: ' +
+      status + ' (' + event.currentTarget.statusText + ').';
+    showMessage(message, 'error');
+    res = false;
+  } else if (status === 204 ||
+    !event.target.response ||
+    typeof event.target.response === 'undefined') {
+    message = 'No content for ' + name + ' request.';
+    showMessage(message);
+    res = false;
+  }
+  return res;
+}
+
+/**
+ * Get a load error handler.
+ *
+ * @param {string} name The context name.
+ * @returns {Function} The error handler.
+ */
+function getOnLoadError(name) {
+  // message
+  const message = 'Error in ' + name + ' request, see console for details.';
+
+  return function (event) {
+    console.error(message, event);
+    showMessage(message, 'error');
+  };
+}
+
+/**
+ * Launch a QIDO request.
+ */
+function launchQido() {
   // qido get list
   const qidoReq = new XMLHttpRequest();
-  let message;
   qidoReq.addEventListener('load', function (event) {
-    const status = event.currentTarget.status;
-    // bad status
-    if (status !== 200 && status !== 204) {
-      message = 'Bad status in QIDO-RS request: ' +
-        status + ' (' + event.currentTarget.statusText + ').';
-      div.appendChild(getMessagePara(message, 'error'));
-      return;
-    }
-    // no content
-    if (status === 204 ||
-      !event.target.response ||
-      typeof event.target.response === 'undefined') {
-      message = 'No content.';
-      div.appendChild(getMessagePara(message));
+    // check
+    if (!checkResponseEvent(event, 'QIDO-RS')) {
       return;
     }
     // parse json
     const json = JSON.parse(event.target.response);
     if (json.length === 0) {
-      message = 'Empty result.';
-      div.appendChild(getMessagePara(message));
+      showMessage('Empty result for QIDO-RS request.');
       return;
     }
     // fill table
     qidoResponseToTable(json);
   });
-  qidoReq.addEventListener('error', function (error) {
-    message = 'Error in QIDO-RS request';
-    console.error(message, error);
-    message += ', see console for details.';
-    div.appendChild(getMessagePara(message, 'error'));
-  });
+  qidoReq.addEventListener('error', getOnLoadError('QIDO-RS'));
 
   const rootUrl = document.getElementById('rooturl').value;
   const qidoArgs = document.getElementById('qidoArgs').value;
@@ -84,38 +106,19 @@ function qidoSearch() {
 /**
  * Launch a STOW request.
  */
-function stow() {
-  const div = document.getElementById('result');
-
+function launchStow() {
   const stowReq = new XMLHttpRequest();
   let message;
   stowReq.addEventListener('load', function (event) {
-    const status = event.currentTarget.status;
-    // bad status
-    if (status !== 200 && status !== 204) {
-      message = 'Bad status in STOW-RS request: ' +
-        status + ' (' + event.currentTarget.statusText + ').';
-      div.appendChild(getMessagePara(message, 'error'));
-      return;
-    }
-    // no content
-    if (status === 204 ||
-      !event.target.response ||
-      typeof event.target.response === 'undefined') {
-      message = 'No content.';
-      div.appendChild(getMessagePara(message));
+    // check
+    if (!checkResponseEvent(event, 'STOW-RS')) {
       return;
     }
     // parse json
     message = 'STOW-RS successful!!';
-    div.appendChild(getMessagePara(message, 'success'));
+    showMessage(message, 'success');
   });
-  stowReq.addEventListener('error', function (error) {
-    message = 'Error in STOW-RS request';
-    console.error(message, error);
-    message += ', see console for details.';
-    div.appendChild(getMessagePara(message, 'error'));
-  });
+  stowReq.addEventListener('error', getOnLoadError('STOW-RS'));
 
   // local files to request
   const urls = [
