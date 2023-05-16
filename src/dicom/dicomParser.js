@@ -223,8 +223,8 @@ export function isJpegBaselineTransferSyntax(syntax) {
  */
 function isJpegRetiredTransferSyntax(syntax) {
   return (syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
-    !isJpegBaselineTransferSyntax() &&
-    !isJpegLosslessTransferSyntax()) ||
+    !isJpegBaselineTransferSyntax(syntax) &&
+    !isJpegLosslessTransferSyntax(syntax)) ||
     syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
 }
 
@@ -605,7 +605,6 @@ export class DicomParser {
    */
   setDefaultCharacterSet(characterSet) {
     this.#defaultCharacterSet = characterSet;
-    this.setCharacterSet(characterSet);
   }
 
   /**
