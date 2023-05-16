@@ -134,7 +134,7 @@ function isVrToPad(vr) {
  * @returns {string} The value used to pad.
  */
 function getVrPad(vr) {
-  let pad = 0;
+  let pad = '';
   if (isStringVr(vr)) {
     if (vr === 'UI') {
       pad = '\0';
@@ -179,11 +179,11 @@ function padOBValue(value) {
       }
       if (!isEven(size)) {
         value[value.length - 1] = uint8ArrayPush(
-          value[value.length - 1], 0);
+          value[value.length - 1], [0]);
       }
     } else {
       if (!isEven(value.length)) {
-        value = uint8ArrayPush(value, 0);
+        value = uint8ArrayPush(value, [0]);
       }
     }
   } else {
@@ -532,7 +532,7 @@ export class DicomWriter {
           const hexString2 = hexString.substring(6, 10);
           const dec1 = parseInt(hexString1, 16);
           const dec2 = parseInt(hexString2, 16);
-          const atValue = new Uint16Array([dec1, dec2]);
+          const atValue = [dec1, dec2];
           byteOffset = writer.writeUint16Array(byteOffset, atValue);
         }
       } else {
@@ -970,16 +970,17 @@ export class DicomWriter {
     } else {
       // pad if necessary
       if (isVrToPad(element.vr)) {
-        let pad = getVrPad(element.vr);
+        const padStr = getVrPad(element.vr);
         // encode string
         // TODO: not sure for UN...
         if (isStringVr(element.vr)) {
+          let pad;
           if (charSetString.includes(element.vr)) {
             value = this.encodeSpecialString(value.join('\\'));
-            pad = this.encodeSpecialString(pad);
+            pad = this.encodeSpecialString(padStr);
           } else {
             value = this.encodeString(value.join('\\'));
-            pad = this.encodeString(pad);
+            pad = this.encodeString(padStr);
           }
           if (!isEven(value.length)) {
             value = uint8ArrayPush(value, pad);
