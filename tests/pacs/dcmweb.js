@@ -12,7 +12,7 @@ function onDOMContentLoaded() {
   stowButton.onclick = launchStow;
 
   const searchButton = document.getElementById('qidobutton');
-  searchButton.onclick = launchQido;
+  searchButton.onclick = launchMainQido;
 }
 
 /**
@@ -27,7 +27,6 @@ function showMessage(text, type) {
   p.appendChild(document.createTextNode(text));
 
   const div = document.getElementById('result');
-  div.innerHTML = '';
   div.appendChild(p);
 }
 
@@ -35,23 +34,23 @@ function showMessage(text, type) {
  * Check a response event and print error if any.
  *
  * @param {object} event The load event.
- * @param {string} name The context name.
+ * @param {string} reqName The request name.
  * @returns {boolean} True if response is ok.
  */
-function checkResponseEvent(event, name) {
+function checkResponseEvent(event, reqName) {
   let res = true;
 
   let message;
   const status = event.currentTarget.status;
   if (status !== 200 && status !== 204) {
-    message = 'Bad status in ' + name + ' request: ' +
+    message = 'Bad status for request ' + reqName + ': ' +
       status + ' (' + event.currentTarget.statusText + ').';
     showMessage(message, 'error');
     res = false;
   } else if (status === 204 ||
     !event.target.response ||
     typeof event.target.response === 'undefined') {
-    message = 'No content for ' + name + ' request.';
+    message = 'No content for request ' + reqName;
     showMessage(message);
     res = false;
   }
@@ -61,12 +60,12 @@ function checkResponseEvent(event, name) {
 /**
  * Get a load error handler.
  *
- * @param {string} name The context name.
+ * @param {string} reqName The request name.
  * @returns {Function} The error handler.
  */
-function getOnLoadError(name) {
+function getOnLoadError(reqName) {
   // message
-  const message = 'Error in ' + name + ' request, see console for details.';
+  const message = 'Error in request ' + reqName + ', see console for details.';
 
   return function (event) {
     console.error(message, event);
@@ -75,30 +74,88 @@ function getOnLoadError(name) {
 }
 
 /**
- * Launch a QIDO request.
+ * Launch main QIDO query to retrieve series.
  */
-function launchQido() {
-  // qido get list
+function launchMainQido() {
+  // clear result div
+  const div = document.getElementById('result');
+  div.innerHTML = '';
+  // launch
+  const url = document.getElementById('rooturl').value +
+    document.getElementById('qidoArgs').value;
+  launchQido(url, onMainQidoLoad, 'QIDO-RS');
+}
+
+// local vars...
+let _mainJson;
+let _loadedInstances;
+
+/**
+ * Handle the data loaded by the main QIDO query.
+ *
+ * @param {Array} json JSON array data.
+ */
+function onMainQidoLoad(json) {
+  // update locals
+  _mainJson = json;
+  _loadedInstances = 0;
+  // get instances
+  const rootUrl = document.getElementById('rooturl').value;
+  for (let i = 0; i < json.length; ++i) {
+    const study = json[i]['0020000D'].Value;
+    const series = json[i]['0020000E'].Value;
+    const url = rootUrl +
+      'studies/' + study +
+      '/series/' + series +
+      '/instances?';
+    launchQido(url, getOnInstanceLoad(i), 'QIDO-RS[' + i + ']');
+  }
+}
+
+/**
+ * Get an instance load handler.
+ *
+ * @param {number} i The id of the load.
+ * @returns {Function} The hanlder.
+ */
+function getOnInstanceLoad(i) {
+  return function (json) {
+    const mid = Math.floor(json.length / 2);
+    _mainJson[i].thumbInstance = json[mid]['00080018'].Value;
+    // display table once all loaded
+    ++_loadedInstances;
+    if (_loadedInstances === _mainJson.length) {
+      qidoResponseToTable(_mainJson);
+    }
+  };
+}
+
+/**
+ * Launch a QIDO request.
+ *
+ * @param {string} url The url of the request.
+ * @param {Function} loadCallback The load callback.
+ * @param {string} reqName The request name.
+ */
+function launchQido(url, loadCallback, reqName) {
   const qidoReq = new XMLHttpRequest();
   qidoReq.addEventListener('load', function (event) {
     // check
-    if (!checkResponseEvent(event, 'QIDO-RS')) {
+    if (!checkResponseEvent(event, reqName)) {
       return;
     }
     // parse json
     const json = JSON.parse(event.target.response);
     if (json.length === 0) {
-      showMessage('Empty result for QIDO-RS request.');
+      showMessage('Empty result for request ' + reqName);
       return;
     }
-    // fill table
-    qidoResponseToTable(json);
+    // callback
+    loadCallback(json);
   });
-  qidoReq.addEventListener('error', getOnLoadError('QIDO-RS'));
+  qidoReq.addEventListener('error', getOnLoadError(reqName));
 
-  const rootUrl = document.getElementById('rooturl').value;
-  const qidoArgs = document.getElementById('qidoArgs').value;
-  qidoReq.open('GET', rootUrl + qidoArgs);
+  qidoReq.open('GET', url);
   qidoReq.setRequestHeader('Accept', 'application/dicom+json');
   qidoReq.send();
 }
@@ -107,18 +164,19 @@ function launchQido() {
  * Launch a STOW request.
  */
 function launchStow() {
+  const reqName = 'STOW-RS';
   const stowReq = new XMLHttpRequest();
   let message;
   stowReq.addEventListener('load', function (event) {
     // check
-    if (!checkResponseEvent(event, 'STOW-RS')) {
+    if (!checkResponseEvent(event, reqName)) {
       return;
     }
     // parse json
     message = 'STOW-RS successful!!';
     showMessage(message, 'success');
   });
-  stowReq.addEventListener('error', getOnLoadError('STOW-RS'));
+  stowReq.addEventListener('error', getOnLoadError(reqName));
 
   // local files to request
   const urls = [
@@ -172,7 +230,7 @@ function launchStow() {
 /**
  * Show the QIDO response as a table.
  *
- * @param {object} json The qido response as json object.
+ * @param {Array} json The qido response as json object.
  */
 function qidoResponseToTable(json) {
   const viewerUrl = './viewer.html?input=';
@@ -229,11 +287,38 @@ function qidoResponseToTable(json) {
       const a = document.createElement('a');
       a.href = viewerUrl + json[i]['00081190'].Value;
       a.target = '_blank';
-      a.appendChild(document.createTextNode('view'));
       cell.appendChild(a);
+
+      // add thumbnail to link
+      const rootUrl = document.getElementById('rooturl').value;
+      const url = rootUrl +
+        'studies/' + studyUid +
+        '/series/' + seriesUid +
+        '/instances/' + json[i].thumbInstance +
+        '/rendered?viewport=64,64';
+      // no default accept in orthanc (?)
+      const options = {
+        headers: {
+          Accept: 'image/png'
+        }
+      };
+      fetch(url, options)
+        .then(res => res.blob())
+        .then(blob => {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(blob);
+          a.appendChild(img);
+        });
     }
   }
 
+  const p = document.createElement('p');
+  p.style.fontStyle = 'italic';
+  p.appendChild(document.createTextNode(
+    '(Click a thumbnail to launch the viewer)'
+  ));
+
   const div = document.getElementById('result');
   div.appendChild(table);
+  div.appendChild(p);
 }
