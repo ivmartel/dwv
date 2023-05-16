@@ -267,12 +267,12 @@ export class ViewController {
   /**
    * Generate display image data to be given to a canvas.
    *
-   * @param {Array} array The array to fill in.
-   * @param {Point} position Optional position at which to generate,
-   *   otherwise generates at current position.
+   * @param {ImageData} array The array to fill in.
+   * @param {Index} index Optional index at which to generate,
+   *   otherwise generates at current index.
    */
-  generateImageData(array, position) {
-    this.#view.generateImageData(array, position);
+  generateImageData(array, index) {
+    this.#view.generateImageData(array, index);
   }
 
   /**
@@ -495,7 +495,8 @@ export class ViewController {
    * Set the current position.
    *
    * @param {Point} pos The position.
-   * @param {boolean} silent If true, does not fire a positionchange event.
+   * @param {boolean} [silent] If true, does not fire a
+   *   positionchange event.
    * @returns {boolean} False if not in bounds.
    */
   setCurrentPosition(pos, silent) {
@@ -556,7 +557,7 @@ export class ViewController {
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
-   * @param {Point2D} point2D The 2D position as {x,y}.
+   * @param {object} point2D The 2D position as {x,y}.
    * @returns {Point3D} The 3D point.
    */
   getPlanePositionFromPlanePoint(point2D) {
@@ -588,7 +589,7 @@ export class ViewController {
    * Increment the provided dimension.
    *
    * @param {number} dim The dimension to increment.
-   * @param {boolean} silent Do not send event.
+   * @param {boolean} [silent] Do not send event.
    * @returns {boolean} False if not in bounds.
    */
   incrementIndex(dim, silent) {
@@ -599,7 +600,7 @@ export class ViewController {
    * Decrement the provided dimension.
    *
    * @param {number} dim The dimension to increment.
-   * @param {boolean} silent Do not send event.
+   * @param {boolean} [silent] Do not send event.
    * @returns {boolean} False if not in bounds.
    */
   decrementIndex(dim, silent) {
@@ -609,7 +610,7 @@ export class ViewController {
   /**
    * Decrement the scroll dimension index.
    *
-   * @param {boolean} silent Do not send event.
+   * @param {boolean} [silent] Do not send event.
    * @returns {boolean} False if not in bounds.
    */
   decrementScrollIndex(silent) {
@@ -619,7 +620,7 @@ export class ViewController {
   /**
    * Increment the scroll dimension index.
    *
-   * @param {boolean} silent Do not send event.
+   * @param {boolean} [silent] Do not send event.
    * @returns {boolean} False if not in bounds.
    */
   incrementScrollIndex(silent) {
@@ -723,7 +724,7 @@ export class ViewController {
   /**
    * Set the view per value alpha function.
    *
-   * @param {Function} func The function.
+   * @param {(value, index) => number} func The function.
    */
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);

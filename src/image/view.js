@@ -790,11 +790,11 @@ export class View {
   /**
    * Generate display image data to be given to a canvas.
    *
-   * @param {Array} array The array to fill in.
+   * @param {ImageData} data The iamge data to fill in.
    * @param {Index} index Optional index at which to generate,
    *   otherwise generates at current index.
    */
-  generateImageData(array, index) {
+  generateImageData(data, index) {
     // check index
     if (typeof index === 'undefined') {
       if (!this.getCurrentIndex()) {
@@ -812,7 +812,7 @@ export class View {
     case 'MONOCHROME1':
     case 'MONOCHROME2':
       generateImageDataMonochrome(
-        array,
+        data,
         iterator,
         this.getAlphaFunction(),
         this.getCurrentWindowLut(),
@@ -822,7 +822,7 @@ export class View {
 
     case 'PALETTE COLOR':
       generateImageDataPaletteColor(
-        array,
+        data,
         iterator,
         this.getAlphaFunction(),
         this.getColourMap(),
@@ -832,7 +832,7 @@ export class View {
 
     case 'RGB':
       generateImageDataRgb(
-        array,
+        data,
         iterator,
         this.getAlphaFunction(),
         this.getCurrentWindowLut()
@@ -841,7 +841,7 @@ export class View {
 
     case 'YBR_FULL':
       generateImageDataYbrFull(
-        array,
+        data,
         iterator,
         this.getAlphaFunction()
       );
