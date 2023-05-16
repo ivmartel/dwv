@@ -53,7 +53,7 @@ export class ViewController {
   // third dimension player ID (created by setInterval)
   #playerID = null;
   // associated data index
-  #dataIndex = this.#index;
+  #dataIndex;
 
   /**
    * @param {View} view The associated view.
@@ -104,7 +104,7 @@ export class ViewController {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return typeof maskSegmentHelper !== 'undefined';
+    return typeof this.#maskSegmentHelper !== 'undefined';
   }
 
   /**
