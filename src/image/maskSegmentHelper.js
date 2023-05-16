@@ -165,7 +165,7 @@ export class MaskSegmentHelper {
   /**
    * Get the alpha function to apply hidden colors.
    *
-   * @returns {Function} The corresponding alpha function.
+   * @returns {(value, index) => number} The corresponding alpha function.
    */
   getAlphaFunc() {
     // get colours
@@ -195,7 +195,7 @@ export class MaskSegmentHelper {
    * Delete a segment.
    *
    * @param {number} segmentNumber The segment number.
-   * @param {Function} cmdCallback The command event callback.
+   * @param {(event) => void} cmdCallback The command event callback.
    * @param {Function} exeCallback The post execution callback.
    */
   deleteSegment(segmentNumber, cmdCallback, exeCallback) {
@@ -250,9 +250,9 @@ export class DeleteSegmentCommand {
   #offsets;
 
   /**
-   * @param {object} mask The mask image.
+   * @param {Image} mask The mask image.
    * @param {object} segment The segment to remove.
-   * @param {boolean} silent Whether to send a creation event or not.
+   * @param {boolean} [silent] Whether to send a creation event or not.
    */
   constructor(mask, segment, silent) {
     this.#mask = mask;

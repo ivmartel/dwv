@@ -184,7 +184,7 @@ export class UrlsLoader {
    *
    * @param {object} callback The callback to augment its event.
    * @param {object} source The source to add to the event.
-   * @returns {Function} The augmented callback.
+   * @returns {(event) => void} The augmented callback.
    */
   #augmentCallbackEvent(callback, source) {
     return (event) => {

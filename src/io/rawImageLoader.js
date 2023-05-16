@@ -55,7 +55,7 @@ export class RawImageLoader {
   /**
    * Load data.
    *
-   * @param {object} buffer The read data.
+   * @param {ArrayBuffer} buffer The read data.
    * @param {string} origin The data origin.
    * @param {number} index The data index.
    */

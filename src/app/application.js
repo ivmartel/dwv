@@ -520,7 +520,7 @@ export class App {
   /**
    * Load a list of files. Can be image files or a state file.
    *
-   * @param {Array} files The list of files to load.
+   * @param {FileList} files The list of files to load.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem

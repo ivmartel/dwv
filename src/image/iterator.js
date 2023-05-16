@@ -8,7 +8,7 @@ import {Point2D} from '../math/point';
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
- * @param {number} increment The increment between indicies (default=1).
+ * @param {number} [increment] The increment between indicies (default=1).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
 export function simpleRange(dataAccessor, start, end, increment) {
@@ -362,7 +362,7 @@ export function getIteratorValues(iterator) {
  * Get a slice index iterator.
  *
  * @param {Image} image The image to parse.
- * @param {Point} position The current position.
+ * @param {Index} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Matrix33} viewOrientation The view orientation.
  * @returns {object} The slice iterator.

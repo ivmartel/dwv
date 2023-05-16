@@ -83,7 +83,7 @@ export class Size {
   /**
    * Check if the associated data is scrollable in 3D.
    *
-   * @param {Matrix33} viewOrientation The orientation matrix.
+   * @param {Matrix33} [viewOrientation] The orientation matrix.
    * @returns {boolean} True if scrollable.
    */
   canScroll3D(viewOrientation) {
@@ -114,7 +114,7 @@ export class Size {
    * Get the size of a given dimension.
    *
    * @param {number} dimension The dimension.
-   * @param {number} start Optional start dimension to start counting from.
+   * @param {number} [start] Optional start dimension to start counting from.
    * @returns {number} The size.
    */
   getDimSize(dimension, start) {
@@ -138,7 +138,7 @@ export class Size {
   /**
    * Get the total size.
    *
-   * @param {number} start Optional start dimension to base the offset on.
+   * @param {number} [start] Optional start dimension to base the offset on.
    * @returns {number} The total size.
    */
   getTotalSize(start) {
@@ -219,7 +219,7 @@ export class Size {
    * Convert an index to an offset in memory.
    *
    * @param {Index} index The index to convert.
-   * @param {number} start Optional start dimension to base the offset on.
+   * @param {number} [start] Optional start dimension to base the offset on.
    * @returns {number} The offset.
    */
   indexToOffset(index, start) {

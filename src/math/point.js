@@ -215,7 +215,7 @@ export class Point3D {
    * Get the difference to another Point3D.
    *
    * @param {Point3D} point3D The input point.
-   * @returns {Point3D} The 3D vector from the input point to this one.
+   * @returns {Vector3D} The 3D vector from the input point to this one.
    */
   minus(point3D) {
     return new Vector3D(
@@ -264,7 +264,7 @@ export class Point {
   /**
    * Point values.
    *
-   * @type {number}
+   * @type {Array}
    */
   #values;
 

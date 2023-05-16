@@ -48,7 +48,7 @@ export class LoadController {
   /**
    * Load a list of files. Can be image files or a state file.
    *
-   * @param {Array} files The list of files to load.
+   * @param {FileList} files The list of files to load.
    */
   loadFiles(files) {
     // has been checked for emptiness.
@@ -107,7 +107,7 @@ export class LoadController {
   /**
    * Load a list of image files.
    *
-   * @param {Array} files The list of image files to load.
+   * @param {FileList} files The list of image files to load.
    */
   #loadImageFiles(files) {
     // create IO
@@ -136,7 +136,7 @@ export class LoadController {
   /**
    * Load a State file.
    *
-   * @param {string} file The state file to load.
+   * @param {File} file The state file to load.
    */
   #loadStateFile(file) {
     // create IO
@@ -163,7 +163,7 @@ export class LoadController {
   /**
    * Load a list of data.
    *
-   * @param {Array} data Array of data to load.
+   * @param {Array|FileList} data Array of data to load.
    * @param {object} loader The data loader.
    * @param {string} loadType The data load type: 'image' or 'state'.
    * @param {object} options Options passed to the final loader.

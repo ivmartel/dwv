@@ -7,7 +7,7 @@ const __twothirdpi = (2 / (3 * Math.PI));
  * @param {Array} data The input data.
  * @param {number} width The width of the output.
  * @param {number} height The height of the output.
- * @returns {Array} A greyscale object
+ * @returns {object} A greyscale object
  */
 function computeGreyscale(data, width, height) {
   // Returns 2D augmented array containing greyscale data
@@ -153,7 +153,7 @@ function computeLaplace(greyscale) {
 /**
  * Compute the X gradient.
  *
- * @param {Array} greyscale The values.
+ * @param {object} greyscale The values.
  * @returns {Array} The gradient.
  */
 function computeGradX(greyscale) {
@@ -176,7 +176,7 @@ function computeGradX(greyscale) {
 /**
  * Compute the Y gradient.
  *
- * @param {Array} greyscale The values.
+ * @param {object} greyscale The values.
  * @returns {Array} The gradient.
  */
 function computeGradY(greyscale) {

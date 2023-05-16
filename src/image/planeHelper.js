@@ -37,8 +37,8 @@ export class PlaneHelper {
 
   /**
    * @param {Spacing} spacing The spacing.
-   * @param {Matrix} imageOrientation The image oientation.
-   * @param {Matrix} viewOrientation The view orientation.
+   * @param {Matrix33} imageOrientation The image oientation.
+   * @param {Matrix33} viewOrientation The view orientation.
    */
   constructor(spacing, imageOrientation, viewOrientation) {
     this.#spacing = spacing;

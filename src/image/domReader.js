@@ -8,7 +8,7 @@ import {Point3D} from '../math/point';
  * Create a simple array buffer from an ImageData buffer.
  *
  * @param {object} imageData The ImageData taken from a context.
- * @returns {Array} The image buffer.
+ * @returns {Uint8Array} The image buffer.
  */
 function imageDataToBuffer(imageData) {
   // remove alpha
@@ -65,7 +65,7 @@ function getDefaultImage(
 /**
  * Get data from an input image using a canvas.
  *
- * @param {object} domImage The DOM Image.
+ * @param {object} domImage The DOM Image, an HTMLImageElement with extra info.
  * @param {object} origin The data origin.
  * @returns {object} A load data event.
  */
@@ -116,12 +116,12 @@ export function getViewFromDOMImage(domImage, origin) {
 /**
  * Get data from an input image using a canvas.
  *
- * @param {object} video The DOM Video.
+ * @param {object} video The DOM Video, an HTMLVideoElement with extra info.
  * @param {Function} onloaditem On load callback.
  * @param {object} onload The function to call once the data is loaded.
  * @param {object} onprogress The function to call to report progress.
  * @param {object} onloadend The function to call to report load end.
- * @param {number} dataIndex The data index.
+ * @param {string} dataIndex The data index.
  * @param {object} origin The data origin.
  */
 export function getViewFromDOMVideo(

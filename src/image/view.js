@@ -43,7 +43,7 @@ export class View {
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
    *
-   * @type {Window}
+   * @type {object}
    */
   #windowLuts = {};
 
@@ -77,10 +77,10 @@ export class View {
   #colourMap = lut.plain;
 
   /**
-   * Current position as a Point3D.
+   * Current position as a Point.
    * Store position and not index to stay geometry independent.
    *
-   * @type {Point3D}
+   * @type {Point}
    */
   #currentPosition = null;
 
@@ -207,7 +207,7 @@ export class View {
   /**
    * Get the alpha function.
    *
-   * @returns {Function} The function.
+   * @returns {(value, index) => number} The function.
    */
   getAlphaFunction() {
     return this.#alphaFunction;
@@ -216,7 +216,7 @@ export class View {
   /**
    * Set alpha function.
    *
-   * @param {Function} func The function.
+   * @param {(value, index) => number} func The function.
    * @fires View#alphafuncchange
    */
   setAlphaFunction(func) {
@@ -236,9 +236,9 @@ export class View {
    * Get the window LUT of the image.
    * Warning: can be undefined in no window/level was set.
    *
-   * @param {object} rsi Optional image rsi, will take the one of the
+   * @param {object} [rsi] Optional image rsi, will take the one of the
    *   current slice otherwise.
-   * @returns {Window} The window LUT of the image.
+   * @returns {WindowLut} The window LUT of the image.
    * @fires View#wlchange
    */
   getCurrentWindowLut(rsi) {
@@ -315,7 +315,7 @@ export class View {
   /**
    * Add the window LUT to the list.
    *
-   * @param {Window} wlut The window LUT of the image.
+   * @param {WindowLut} wlut The window LUT of the image.
    */
   addWindowLut(wlut) {
     const rsi = wlut.getRescaleLut().getRSI();
@@ -520,7 +520,7 @@ export class View {
    * Set the current index.
    *
    * @param {Index} index The new index.
-   * @param {boolean} silent Flag to fire event or not.
+   * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
    * @fires View#positionchange
    */
@@ -615,9 +615,9 @@ export class View {
    *
    * @param {number} center The window center.
    * @param {number} width The window width.
-   * @param {string} name Associated preset name, defaults to 'manual'.
+   * @param {string} [name] Associated preset name, defaults to 'manual'.
    * Warning: uses the latest set rescale LUT or the default linear one.
-   * @param {boolean} silent Flag to launch events with skipGenerate.
+   * @param {boolean} [silent] Flag to launch events with skipGenerate.
    * @fires View#wlchange
    */
   setWindowLevel(center, width, name, silent) {
@@ -676,7 +676,7 @@ export class View {
    * Set the window level to the preset with the input name.
    *
    * @param {string} name The name of the preset to activate.
-   * @param {boolean} silent Flag to launch events with skipGenerate.
+   * @param {boolean} [silent] Flag to launch events with skipGenerate.
    */
   setWindowLevelPreset(name, silent) {
     const preset = this.getWindowPresets()[name];
@@ -704,7 +704,7 @@ export class View {
    * Set the window level to the preset with the input id.
    *
    * @param {number} id The id of the preset to activate.
-   * @param {boolean} silent Flag to launch events with skipGenerate.
+   * @param {boolean} [silent] Flag to launch events with skipGenerate.
    */
   setWindowLevelPresetById(id, silent) {
     const keys = Object.keys(this.getWindowPresets());

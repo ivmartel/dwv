@@ -185,7 +185,7 @@ export class Image {
   /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {Array} buffer The image data as a one dimensional buffer.
-   * @param {Array} imageUids An array of Uids indexed to slice number.
+   * @param {Array} [imageUids] An array of Uids indexed to slice number.
    */
   constructor(geometry, buffer, imageUids) {
     this.#geometry = geometry;
@@ -199,7 +199,7 @@ export class Image {
   /**
    * Get the image UID at a given index.
    *
-   * @param {Index} index The index at which to get the id.
+   * @param {Index} [index] The index at which to get the id.
    * @returns {string} The UID.
    */
   getImageUid(index) {
@@ -288,7 +288,7 @@ export class Image {
   /**
    * Get the rescale slope and intercept.
    *
-   * @param {Index} index The index (only needed for non constant rsi).
+   * @param {Index} [index] The index (only needed for non constant rsi).
    * @returns {object} The rescale slope and intercept.
    */
   getRescaleSlopeAndIntercept(index) {
@@ -321,7 +321,7 @@ export class Image {
    * Set the rescale slope and intercept.
    *
    * @param {object} inRsi The input rescale slope and intercept.
-   * @param {number} offset The rsi offset (only needed for non constant rsi).
+   * @param {number} [offset] The rsi offset (only needed for non constant rsi).
    */
   setRescaleSlopeAndIntercept(inRsi, offset) {
     // update identity flag

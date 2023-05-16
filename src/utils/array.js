@@ -55,10 +55,10 @@ export function uint8ArrayToString(arr) {
  * Array find in a subset of the input array.
  * Equivalent to: arr.slice(start, end).find(callbackFn)
  *
- * @param {Array} arr The input array to search.
+ * @param {Uint8Array} arr The input array to search.
  * @param {Function} callbackFn The find function.
  * @param {number|undefined} start The array start index.
- * @param {number|undefined} end The array end index.
+ * @param {number|undefined} [end] The array end index.
  * @returns {number|undefined} The index where the element was found.
  */
 export function findInArraySubset(arr, callbackFn, start, end) {
@@ -86,7 +86,7 @@ export function findInArraySubset(arr, callbackFn, start, end) {
 /**
  * Get a find in array callback.
  *
- * @param {Array} arr1 The array to find.
+ * @param {Uint8Array} arr1 The array to find.
  * @returns {Function} The find callback function.
  */
 export function getFindArrayInArrayCallback(arr1) {

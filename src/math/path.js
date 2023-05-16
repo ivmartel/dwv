@@ -4,9 +4,9 @@
 export class Path {
 
   /**
-   * @param {Array} inputPointArray The list of Point2D that make
+   * @param {Array} [inputPointArray] The list of Point2D that make
    *   the path (optional).
-   * @param {Array} inputControlPointIndexArray The list of control
+   * @param {Array} [inputControlPointIndexArray] The list of control
    *  point of path, as indexes (optional).
    * Note: first and last point do not need to be equal.
    */

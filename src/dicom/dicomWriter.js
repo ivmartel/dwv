@@ -131,7 +131,7 @@ function isVrToPad(vr) {
  * Get the VR specific padding value.
  *
  * @param {string} vr The element VR.
- * @returns {boolean} The value used to pad.
+ * @returns {string} The value used to pad.
  */
 function getVrPad(vr) {
   let pad = 0;
@@ -148,8 +148,8 @@ function getVrPad(vr) {
 /**
  * Push a value at the end of an input Uint8Array.
  *
- * @param {Uint8Array} arr The input array.
- * @param {number} value The value to push.
+ * @param {Array|Uint8Array} arr The input array.
+ * @param {Array|Uint8Array} value The value to push.
  * @returns {Uint8Array} The new array.
  */
 function uint8ArrayPush(arr, value) {
@@ -327,7 +327,7 @@ export class DicomWriter {
   /**
    * Encode string data.
    *
-   * @param {number} str The string to encode.
+   * @param {string} str The string to encode.
    * @returns {Uint8Array} The encoded string.
    */
   encodeString(str) {
@@ -337,7 +337,7 @@ export class DicomWriter {
   /**
    * Encode data as a UTF-8.
    *
-   * @param {number} str The string to write.
+   * @param {string} str The string to write.
    * @returns {Uint8Array} The encoded string.
    */
   encodeSpecialString(str) {
@@ -879,7 +879,7 @@ export class DicomWriter {
    * @param {object} element The DICOM element to set the value.
    * @param {object} value The value to set.
    * @param {boolean} isImplicit Does the data use implicit VR?
-   * @param {number} bitsAllocated Bits allocated used for pixel data.
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The total element size.
    */
   setElementValue(

@@ -1,7 +1,7 @@
 /**
  * Is the Native endianness Little Endian.
  *
- * @type {boolean}
+ * @returns {boolean} True if little endian.
  */
 export function isNativeLittleEndian() {
   return new Int8Array(new Int16Array([1]).buffer)[0] > 0;
@@ -35,7 +35,7 @@ export class DataReader {
   /**
    * The input buffer.
    *
-   * @type {Array}
+   * @type {ArrayBuffer}
    */
   #buffer;
 
@@ -68,9 +68,9 @@ export class DataReader {
   #view;
 
   /**
-   * @param {Array} buffer The input array buffer.
-   * @param {boolean} isLittleEndian Flag to tell if the data is little
-   *   or big endian.
+   * @param {ArrayBuffer} buffer The input array buffer.
+   * @param {boolean} [isLittleEndian] Flag to tell if the data is little
+   *   or big endian (default: true).
    */
   constructor(buffer, isLittleEndian) {
     this.#buffer = buffer;
@@ -116,7 +116,7 @@ export class DataReader {
    * Read BigUint64 (8 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
-   * @returns {number} The read data.
+   * @returns {bigint} The read data.
    */
   readBigUint64(byteOffset) {
     return this.#view.getBigUint64(byteOffset, this.#isLittleEndian);
@@ -136,7 +136,7 @@ export class DataReader {
    * Read BigInt64 (8 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
-   * @returns {number} The read data.
+   * @returns {bigint} The read data.
    */
   readBigInt64(byteOffset) {
     return this.#view.getBigInt64(byteOffset, this.#isLittleEndian);
@@ -167,7 +167,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Uint8Array} The read data.
    */
   readBinaryArray(byteOffset, size) {
     // input
@@ -191,7 +191,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Uint8Array} The read data.
    */
   readUint8Array(byteOffset, size) {
     return new Uint8Array(this.#buffer, byteOffset, size);
@@ -202,7 +202,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Int8Array} The read data.
    */
   readInt8Array(byteOffset, size) {
     return new Int8Array(this.#buffer, byteOffset, size);
@@ -213,7 +213,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Uint16Array} The read data.
    */
   readUint16Array(byteOffset, size) {
     const bpe = Uint16Array.BYTES_PER_ELEMENT;
@@ -239,7 +239,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Int16Array} The read data.
    */
   readInt16Array(byteOffset, size) {
     const bpe = Int16Array.BYTES_PER_ELEMENT;
@@ -265,7 +265,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Uint32Array} The read data.
    */
   readUint32Array(byteOffset, size) {
     const bpe = Uint32Array.BYTES_PER_ELEMENT;
@@ -291,7 +291,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {BigUint64Array} The read data.
    */
   readUint64Array(byteOffset, size) {
     const bpe = BigUint64Array.BYTES_PER_ELEMENT;
@@ -317,7 +317,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Int32Array} The read data.
    */
   readInt32Array(byteOffset, size) {
     const bpe = Int32Array.BYTES_PER_ELEMENT;
@@ -343,7 +343,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {BigInt64Array} The read data.
    */
   readInt64Array(byteOffset, size) {
     const bpe = BigInt64Array.BYTES_PER_ELEMENT;
@@ -369,7 +369,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Float32Array} The read data.
    */
   readFloat32Array(byteOffset, size) {
     const bpe = Float32Array.BYTES_PER_ELEMENT;
@@ -395,7 +395,7 @@ export class DataReader {
    *
    * @param {number} byteOffset The offset to start reading from.
    * @param {number} size The size of the array.
-   * @returns {Array} The read data.
+   * @returns {Float64Array} The read data.
    */
   readFloat64Array(byteOffset, size) {
     const bpe = Float64Array.BYTES_PER_ELEMENT;

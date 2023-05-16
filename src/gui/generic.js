@@ -18,7 +18,7 @@ export const InteractionEventNames = [
 /**
  * Get a HTML element associated to a container div.
  *
- * @param {number} containerDivId The id of the container div.
+ * @param {string} containerDivId The id of the container div.
  * @param {string} name The name or id to find.
  * @returns {object} The found element or null.
  * @deprecated

@@ -58,7 +58,7 @@ export class WindowLut {
   /**
    * Get the window / level.
    *
-   * @returns {object} The window / level.
+   * @returns {WindowLevel} The window / level.
    */
   getWindowLevel() {
     return this.#windowLevel;
@@ -95,7 +95,7 @@ export class WindowLut {
   /**
    * Set the window center and width.
    *
-   * @param {object} wl The window level.
+   * @param {WindowLevel} wl The window level.
    */
   setWindowLevel(wl) {
     // store the window values

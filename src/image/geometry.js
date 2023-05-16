@@ -68,9 +68,9 @@ export class Geometry {
    * @param {Point3D} origin The object origin (a 3D point).
    * @param {Size} size The object size.
    * @param {Spacing} spacing The object spacing.
-   * @param {Matrix33} orientation The object orientation (3*3 matrix,
+   * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
    *   default to 3*3 identity).
-   * @param {number} time Optional time index.
+   * @param {number} [time] Optional time index.
    */
   constructor(origin, size, spacing, orientation, time) {
     this.#origins = [origin];
@@ -188,7 +188,7 @@ export class Geometry {
    * Warning: the size comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {Matrix33} viewOrientation The view orientation (optional)
+   * @param {Matrix33} [viewOrientation] The view orientation (optional)
    * @returns {Size} The object size.
    */
   getSize(viewOrientation) {
@@ -231,7 +231,7 @@ export class Geometry {
    * Warning: the spacing comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {Matrix33} viewOrientation The view orientation (optional)
+   * @param {Matrix33} [viewOrientation] The view orientation (optional)
    * @returns {Spacing} The object spacing.
    */
   getSpacing(viewOrientation) {
@@ -335,7 +335,7 @@ export class Geometry {
    *
    * @param {Point3D} origin The origin to append.
    * @param {number} index The index at which to append.
-   * @param {number} time Optional time index.
+   * @param {number} [time] Optional time index.
    */
   appendOrigin(origin, index, time) {
     if (typeof time !== 'undefined') {
@@ -413,7 +413,7 @@ export class Geometry {
    * Check that a index is within bounds.
    *
    * @param {Index} index The index to check.
-   * @param {Array} dirs Optional list of directions to check.
+   * @param {Array} [dirs] Optional list of directions to check.
    * @returns {boolean} True if the given coordinates are within bounds.
    */
   isIndexInBounds(index, dirs) {
@@ -566,8 +566,8 @@ export function getDeOrientedArray3D(array3D, orientation) {
  * of input origins.
  *
  * @param {Array} origins An array of Point3D.
- * @param {Matrix} orientation The oritentation matrix.
- * @param {boolean} withCheck Flag to activate spacing variation check,
+ * @param {Matrix33} orientation The oritentation matrix.
+ * @param {boolean} [withCheck] Flag to activate spacing variation check,
  *   default to true.
  * @returns {number|undefined} The spacing.
  */

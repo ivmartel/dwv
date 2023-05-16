@@ -440,7 +440,8 @@ function guessTransferSyntax(firstDataElement) {
  * @param {number} pixelRepresentation The pixel representation,
  *   0:unsigned;1:signed.
  * @param {number} size The size of the new array.
- * @returns {Array} The good typed array.
+ * @returns {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array}
+ *   The good typed array.
  */
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   let res = null;
@@ -543,7 +544,7 @@ export class DicomParser {
   /**
    * The list of DICOM elements.
    *
-   * @type {Array}
+   * @type {object}
    */
   dicomElements = {};
 
@@ -721,7 +722,7 @@ export class DicomParser {
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
    * @param {boolean} implicit Is the DICOM VR implicit?
-   * @returns {Array} The item data as an array of data elements.
+   * @returns {object} The item data as an array of data elements.
    */
   #readPixelItemDataElement(
     reader, offset, implicit) {
@@ -886,9 +887,9 @@ export class DicomParser {
    *
    * @param {object} element The data element.
    * @param {DataReader} reader The raw data reader.
-   * @param {number} pixelRepresentation PixelRepresentation 0->unsigned,
+   * @param {number} [pixelRepresentation] PixelRepresentation 0->unsigned,
    *   1->signed (needed for pixel data or VR=xs).
-   * @param {number} bitsAllocated Bits allocated (needed for pixel data).
+   * @param {number} [bitsAllocated] Bits allocated (needed for pixel data).
    * @returns {object} The interpreted data.
    */
   #interpretElement(
@@ -1077,7 +1078,7 @@ export class DicomParser {
    * Parse the complete DICOM file (given as input to the class).
    * Fills in the member object 'dicomElements'.
    *
-   * @param {object} buffer The input array buffer.
+   * @param {ArrayBuffer} buffer The input array buffer.
    */
   parse(buffer) {
     let offset = 0;

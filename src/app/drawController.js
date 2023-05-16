@@ -92,7 +92,7 @@ export function isPositionNode(node) {
  * Get a lambda to check a node's id.
  *
  * @param {string} id The id to check.
- * @returns {Function} A function to check a node's id.
+ * @returns {(node) => boolean} A function to check a node's id.
  */
 export function isNodeWithId(id) {
   return function (node) {

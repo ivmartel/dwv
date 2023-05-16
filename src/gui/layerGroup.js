@@ -562,7 +562,7 @@ export class LayerGroup {
   /**
    * Get the next layer DOM div.
    *
-   * @returns {HTMLElement} A DOM div.
+   * @returns {HTMLDivElement} A DOM div.
    */
   #getNextLayerDiv() {
     const div = document.createElement('div');
@@ -592,7 +592,8 @@ export class LayerGroup {
   /**
    * Show a crosshair at a given position.
    *
-   * @param {Point} position The position where to show the crosshair.
+   * @param {Point} [position] The position where to show the crosshair,
+   *   defaults to current position.
    */
   #showCrosshairDiv(position) {
     if (typeof position === 'undefined') {
@@ -836,7 +837,7 @@ export class LayerGroup {
    * Set the layers' scale.
    *
    * @param {object} newScale The scale to apply as {x,y,z}.
-   * @param {Point3D} center The scale center Point3D.
+   * @param {Point3D} [center] The scale center Point3D.
    * @fires LayerGroup#zoomchange
    */
   setScale(newScale, center) {

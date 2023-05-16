@@ -158,7 +158,7 @@ export class DicomBufferToView {
   /**
    * Get data from an input buffer using a DICOM parser.
    *
-   * @param {Array} buffer The input data buffer.
+   * @param {ArrayBuffer} buffer The input data buffer.
    * @param {string} origin The data origin.
    * @param {number} dataIndex The data index.
    */

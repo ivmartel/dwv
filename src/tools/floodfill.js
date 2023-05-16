@@ -317,7 +317,7 @@ export class Floodfill {
    * Modify tolerance threshold and redraw ROI.
    *
    * @param {number} modifyThreshold The new threshold.
-   * @param {shape} shape The shape to update.
+   * @param {object} shape The shape to update.
    */
   modifyThreshold(modifyThreshold, shape) {
 

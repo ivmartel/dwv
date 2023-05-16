@@ -19,7 +19,7 @@ export function getStats(array, flags) {
  * Does the input flag list contain a full stat element?
  *
  * @param {Array} flags A list of stat values to calculate.
- * @returns {boolean} True if one of the flags is a full start flag.
+ * @returns {boolean} True if one of the flags is a full stat flag.
  */
 function includesFullStatsFlags(flags) {
   return typeof flags !== 'undefined' &&

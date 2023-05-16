@@ -14,7 +14,7 @@ export class DrawLayer {
   /**
    * The container div.
    *
-   * @type {HTMLElement}
+   * @type {HTMLDivElement}
    */
   #containerDiv;
 
@@ -96,7 +96,7 @@ export class DrawLayer {
   #dataIndex = null;
 
   /**
-   * @param {HTMLElement} containerDiv The layer div, its id will be used
+   * @param {HTMLDivElement} containerDiv The layer div, its id will be used
    *   as this layer id.
    */
   constructor(containerDiv) {

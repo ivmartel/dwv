@@ -17,7 +17,7 @@ export function capitaliseFirstLetter(string) {
  *
  * @param {string} str The input string.
  * @param {string} search The searched start.
- * @param {number} rawPos The position in this string at which to begin
+ * @param {number} [rawPos] The position in this string at which to begin
  *  searching for searchString. Defaults to 0.
  * @returns {boolean} True if the input string starts with the searched string.
  */

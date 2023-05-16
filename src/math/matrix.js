@@ -44,7 +44,7 @@ export class Matrix33 {
   /**
    * Matrix inverse, calculated at first ask
    *
-   * @type {Array}
+   * @type {Matrix33}
    */
   #inverse;
 
@@ -83,7 +83,7 @@ export class Matrix33 {
    * Check for Matrix33 equality.
    *
    * @param {Matrix33} rhs The other matrix to compare to.
-   * @param {number} p A numeric expression for the precision to use in check
+   * @param {number} [p] A numeric expression for the precision to use in check
    *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
    * @returns {boolean} True if both matrices are equal.
    */

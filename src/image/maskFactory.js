@@ -31,7 +31,7 @@ function equalPosPat(pos1, pos2) {
  * input orientation.
  *
  * @param {Matrix33} orientation The orientation matrix.
- * @returns {Function} The position compare function.
+ * @returns {(a, b) => number} The position compare function.
  */
 function getComparePosPat(orientation) {
   const invOrientation = orientation.getInverse();

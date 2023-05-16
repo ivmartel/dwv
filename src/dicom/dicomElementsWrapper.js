@@ -42,7 +42,7 @@ export class DicomElementsWrapper {
    * Get a DICOM Element value from a group/element key.
    *
    * @param {string} groupElementKey The key to retrieve.
-   * @param {boolean} asArray Get the value as an Array.
+   * @param {boolean} [asArray] Get the value as an Array.
    * @returns {object} The DICOM element value.
    */
   getFromKey(groupElementKey, asArray) {
@@ -182,7 +182,7 @@ export class DicomElementsWrapper {
    *
    * @param {Tag} tag The DICOM tag.
    * @param {object} dicomElement The DICOM element.
-   * @param {boolean} pretty When set to true, returns a 'pretified' content.
+   * @param {boolean} [pretty] When set to true, returns a 'pretified' content.
    * @returns {string} A string representation of the DICOM element.
    */
   #getElementValueAsString(tag, dicomElement, pretty) {
@@ -286,7 +286,7 @@ export class DicomElementsWrapper {
    *
    * @param {Tag} tag The DICOM tag.
    * @param {object} dicomElement The DICOM element.
-   * @param {string} prefix A string to prepend this one.
+   * @param {string} [prefix] A string to prepend this one.
    * @returns {string} The element as a string.
    */
   #getElementAsString(tag, dicomElement, prefix) {

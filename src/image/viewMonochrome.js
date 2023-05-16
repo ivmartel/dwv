@@ -1,7 +1,7 @@
 /**
  * Generate image data for 'MONOCHROME*' photometric interpretation.
  *
- * @param {Array} array The array to store the outut data
+ * @param {ImageData} array The array to store the outut data
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  * @param {object} windowLut The window/level LUT.

@@ -8,7 +8,7 @@ export class ToolboxController {
   /**
    * List of tools to control.
    *
-   * @type {Array}
+   * @type {object}
    */
   #toolList;
 
@@ -34,7 +34,7 @@ export class ToolboxController {
   #boundLayers = {};
 
   /**
-   * @param {Array} toolList The list of tool objects.
+   * @param {object} toolList The list of tool objects.
    */
   constructor(toolList) {
     this.#toolList = toolList;
@@ -65,7 +65,7 @@ export class ToolboxController {
    * Check if a tool is in the tool list.
    *
    * @param {string} name The name to check.
-   * @returns {string} The tool list element for the given name.
+   * @returns {boolean} The tool list element for the given name.
    */
   hasTool(name) {
     return typeof this.getToolList()[name] !== 'undefined';

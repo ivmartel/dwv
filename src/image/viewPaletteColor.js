@@ -3,7 +3,7 @@ import {logger} from '../utils/logger';
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
- * @param {Array} array The array to store the outut data
+ * @param {ImageData} array The array to store the outut data
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  * @param {object} colourMap The colour map.

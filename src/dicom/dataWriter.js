@@ -18,8 +18,8 @@ export class DataWriter {
   #view;
 
   /**
-   * @param {Array} buffer The input array buffer.
-   * @param {boolean} isLittleEndian Flag to tell if the data is
+   * @param {ArrayBuffer} buffer The input array buffer.
+   * @param {boolean} [isLittleEndian] Flag to tell if the data is
    *   little or big endian.
    */
   constructor(buffer, isLittleEndian) {
@@ -94,7 +94,7 @@ export class DataWriter {
    * Write Uint64 data.
    *
    * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
+   * @param {bigint} value The data to write.
    * @returns {number} The new offset position.
    */
   writeUint64(byteOffset, value) {
@@ -118,7 +118,7 @@ export class DataWriter {
    * Write Int64 data.
    *
    * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
+   * @param {bigint} value The data to write.
    * @returns {number} The new offset position.
    */
   writeInt64(byteOffset, value) {
@@ -154,7 +154,7 @@ export class DataWriter {
    * Write string data of length 4 as hexadecimal (no '0x' prefix).
    *
    * @param {number} byteOffset The offset to start writing from.
-   * @param {number} str The hexadecimal string to write ('####').
+   * @param {string} str The hexadecimal string to write ('####').
    * @returns {number} The new offset position.
    */
   writeHex(byteOffset, str) {
@@ -192,7 +192,7 @@ export class DataWriter {
    * Write Uint8 array.
    *
    * @param {number} byteOffset The offset to start writing from.
-   * @param {Array} array The array to write.
+   * @param {Array|Uint8Array} array The array to write.
    * @returns {number} The new offset position.
    */
   writeUint8Array(byteOffset, array) {

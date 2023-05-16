@@ -70,7 +70,7 @@ export class DrawGroupCommand {
    * @param {Konva.Group} group The group draw.
    * @param {string} name The shape display name.
    * @param {Konva.Layer} layer The layer where to draw the group.
-   * @param {boolean} silent Whether to send a creation event or not.
+   * @param {boolean} [silent] Whether to send a creation event or not.
    */
   constructor(group, name, layer, silent) {
     this.#group = group;

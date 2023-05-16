@@ -156,8 +156,8 @@ export class WindowLevel {
   /**
    * Set the output value range.
    *
-   * @param {number} min The output value minimum.
-   * @param {number} max The output value maximum.
+   * @param {string} min The output value minimum.
+   * @param {string} max The output value maximum.
    */
   setRange(min, max) {
     this.#ymin = parseInt(min, 10);
