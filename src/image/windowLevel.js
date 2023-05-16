@@ -191,7 +191,7 @@ export class WindowLevel {
     } else if (value > this.#xmax) {
       return this.#ymax;
     } else {
-      return parseInt(((value * this.#slope) + this.#inter), 10);
+      return (value * this.#slope) + this.#inter;
     }
   }
 

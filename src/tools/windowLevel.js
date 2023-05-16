@@ -176,12 +176,12 @@ export class WindowLevel {
 
     // update view controller
     viewController.setWindowLevel(
-      parseInt(image.getRescaledValueAtIndex(
+      image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(
           index.get(0),
           index.get(1)
         )
-      ), 10),
+      ),
       parseInt(viewController.getWindowLevel().width, 10));
   };
 

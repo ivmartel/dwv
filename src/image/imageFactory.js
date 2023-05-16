@@ -227,8 +227,8 @@ export class ImageFactory {
       typeof windowWidth !== 'undefined') {
       let name;
       for (let j = 0; j < windowCenter.value.length; ++j) {
-        const center = parseFloat(windowCenter.value[j], 10);
-        const width = parseFloat(windowWidth.value[j], 10);
+        const center = parseFloat(windowCenter.value[j]);
+        const width = parseFloat(windowWidth.value[j]);
         if (center && width && width !== 0) {
           name = '';
           if (typeof windowCWExplanation !== 'undefined') {

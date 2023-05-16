@@ -498,7 +498,7 @@ function getSegmentFrameInfo(groupItem) {
   // Image Position (Patient) (conditionally required)
   const imagePosPat = planePosSq[0]['00200032'].value;
   for (let p = 0; p < imagePosPat.length; ++p) {
-    imagePosPat[p] = parseFloat(imagePosPat[p], 10);
+    imagePosPat[p] = parseFloat(imagePosPat[p]);
   }
   const frameInfo = {
     dimIndex: dimIndex,

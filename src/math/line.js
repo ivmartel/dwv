@@ -115,8 +115,8 @@ export class Line {
    */
   getMidpoint() {
     return new Point2D(
-      parseInt((this.getBegin().getX() + this.getEnd().getX()) / 2, 10),
-      parseInt((this.getBegin().getY() + this.getEnd().getY()) / 2, 10)
+      (this.getBegin().getX() + this.getEnd().getX()) / 2,
+      (this.getBegin().getY() + this.getEnd().getY()) / 2
     );
   }
 
