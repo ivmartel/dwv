@@ -488,14 +488,14 @@ export function getSliceIterator(
  * Get a slice index iterator for a rectangular region.
  *
  * @param {Image} image The image to parse.
- * @param {Point} position The current position.
+ * @param {Index} index The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Point2D} min The minimum position (optional).
  * @param {Point2D} max The maximum position (optional).
  * @returns {object} The slice iterator.
  */
 export function getRegionSliceIterator(
-  image, position, isRescaled, min, max) {
+  image, index, isRescaled, min, max) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
@@ -527,10 +527,10 @@ export function getRegionSliceIterator(
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
-  const startOffset = size.indexToOffset(position.getWithNew2D(
+  const startOffset = size.indexToOffset(index.getWithNew2D(
     min.getX(), min.getY()
   ));
-  const endOffset = size.indexToOffset(position.getWithNew2D(
+  const endOffset = size.indexToOffset(index.getWithNew2D(
     max.getX(), max.getY() - 1
   ));
 
@@ -547,13 +547,13 @@ export function getRegionSliceIterator(
  * Get a slice index iterator for a rectangular region.
  *
  * @param {Image} image The image to parse.
- * @param {Point} position The current position.
+ * @param {Index} index The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Array} regions An array of regions.
  * @returns {object|undefined} The slice iterator.
  */
 export function getVariableRegionSliceIterator(
-  image, position, isRescaled, regions) {
+  image, index, isRescaled, regions) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
@@ -580,12 +580,12 @@ export function getVariableRegionSliceIterator(
   let region;
   let min = null;
   let max = null;
-  let index = null;
+  let regionIndex = null;
   for (let i = 0; i < regions.length; ++i) {
     region = regions[i];
     const width = region[1][0] - region[0][0];
     if (width !== 0) {
-      index = i;
+      regionIndex = i;
       if (!min) {
         min = region[0];
       }
@@ -596,8 +596,8 @@ export function getVariableRegionSliceIterator(
       ]);
     }
   }
-  if (index !== null) {
-    max = regions[index][1];
+  if (regionIndex !== null) {
+    max = regions[regionIndex][1];
   }
 
   // exit if no offsets
@@ -605,10 +605,10 @@ export function getVariableRegionSliceIterator(
     return undefined;
   }
 
-  const startOffset = size.indexToOffset(position.getWithNew2D(
+  const startOffset = size.indexToOffset(index.getWithNew2D(
     min[0], min[1]
   ));
-  const endOffset = size.indexToOffset(position.getWithNew2D(
+  const endOffset = size.indexToOffset(index.getWithNew2D(
     max[0], max[1]
   ));
 
