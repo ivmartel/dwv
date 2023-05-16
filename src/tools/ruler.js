@@ -1,6 +1,6 @@
 import {Line, getPerpendicularLine} from '../math/line';
 import {Point2D} from '../math/point';
-import {getFlags, replaceFlags} from '../utils/string';
+import {replaceFlags} from '../utils/string';
 import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
