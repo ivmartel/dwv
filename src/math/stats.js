@@ -24,7 +24,9 @@ export function getStats(array, flags) {
 function includesFullStatsFlags(flags) {
   return typeof flags !== 'undefined' &&
     flags !== null &&
-    flags.includes('median', 'p25', 'p75');
+    (flags.includes('median') ||
+    flags.includes('p25') ||
+    flags.includes('p75'));
 }
 
 /**

@@ -92,7 +92,7 @@ export class Scroll {
    *
    * @type {number}
    */
-  #touchTimerID = null;
+  #touchTimerID;
 
   /**
    * @param {App} app The associated application.

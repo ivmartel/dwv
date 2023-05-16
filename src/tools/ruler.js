@@ -130,9 +130,7 @@ export class RulerFactory {
     // } else {
     textExpr = defaultRulerLabelText;
     // }
-    const quant = line.quantify(
-      viewController,
-      getFlags(textExpr));
+    const quant = line.quantify(viewController);
     ktext.setText(replaceFlags(textExpr, quant));
     // meta data
     ktext.meta = {
@@ -268,9 +266,7 @@ export class RulerFactory {
 
     // update text
     const ktext = klabel.getText();
-    const quantification = line.quantify(
-      viewController,
-      getFlags(ktext.meta.textExpr));
+    const quantification = line.quantify(viewController);
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
     // update meta
     ktext.meta.quantification = quantification;

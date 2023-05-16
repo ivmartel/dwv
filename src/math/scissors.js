@@ -13,7 +13,7 @@ function computeGreyscale(data, width, height) {
   // Returns 2D augmented array containing greyscale data
   // Greyscale values found by averaging colour channels
   // Input should be in a flat RGBA array, with values between 0 and 255
-  const greyscale = [];
+  const greyscale = {};
 
   // Compute actual values
   for (let y = 0; y < height; y++) {
@@ -348,7 +348,7 @@ export class Scissors {
 
     this.curPoint = null; // Corrent point we're searching on.
     this.searchGranBits = 8; // Bits of resolution for BucketQueue.
-    this.searchGran = 1 << this.earchGranBits; //bits.
+    this.searchGran = 1 << this.searchGranBits; //bits.
     this.pointsPerPost = 500;
 
     // Precomputed image data. All in ranges 0 >= x >= 1 and

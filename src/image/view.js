@@ -278,7 +278,7 @@ export class View {
     if (typeof wlut === 'undefined') {
       // create the rescale lookup table
       const rescaleLut = new RescaleLut(
-        this.#image.getRescaleSlopeAndIntercept(0),
+        this.#image.getRescaleSlopeAndIntercept(),
         this.#image.getMeta().BitsStored);
       // create the window lookup table
       const windowLut = new WindowLut(
@@ -834,8 +834,7 @@ export class View {
       generateImageDataRgb(
         data,
         iterator,
-        this.getAlphaFunction(),
-        this.getCurrentWindowLut()
+        this.getAlphaFunction()
       );
       break;
 

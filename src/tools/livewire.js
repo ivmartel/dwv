@@ -201,7 +201,7 @@ export class Livewire {
     let p = {x: index.get(0), y: index.get(1)};
     this.#scissors.setPoint(p);
     // do the work
-    let results = 0;
+    let results = [];
     let stop = false;
     while (!this.#parentPoints[p.y][p.x] && !stop) {
       results = this.#scissors.doWork();

@@ -156,7 +156,7 @@ export class Draw {
    *
    * @type {string}
    */
-  #shapeName = 0;
+  #shapeName;
 
   /**
    * List of points.

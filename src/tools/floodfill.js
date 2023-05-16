@@ -222,7 +222,7 @@ export class Floodfill {
       }
       return this.#parentPoints;
     } else {
-      return false;
+      return [];
     }
   }
 
@@ -236,7 +236,7 @@ export class Floodfill {
    */
   #paintBorder(point, threshold, layerGroup) {
     // Calculate the border
-    this.#border = this.#calcBorder(point, threshold);
+    this.#border = this.#calcBorder(point, threshold, false);
     // Paint the border
     if (this.#border) {
       const factory = new RoiFactory();
