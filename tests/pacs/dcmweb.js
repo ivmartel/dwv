@@ -102,8 +102,8 @@ function onMainQidoLoad(json) {
   // get instances
   const rootUrl = document.getElementById('rooturl').value;
   for (let i = 0; i < json.length; ++i) {
-    const study = json[i]['0020000D'].Value;
-    const series = json[i]['0020000E'].Value;
+    const study = json[i]['0020000D'].Value[0];
+    const series = json[i]['0020000E'].Value[0];
     const url = rootUrl +
       'studies/' + study +
       '/series/' + series +
@@ -142,7 +142,7 @@ function getOnInstanceLoad(i) {
       thumbIndex = numbers[Math.floor(numbers.length / 2)].index;
     }
     // store thumbnail instance
-    _mainJson[i].thumbInstance = json[thumbIndex]['00080018'].Value;
+    _mainJson[i].thumbInstance = json[thumbIndex]['00080018'].Value[0];
     // display table once all loaded
     ++_loadedInstances;
     if (_loadedInstances === _mainJson.length) {
@@ -290,23 +290,23 @@ function qidoResponseToTable(json) {
     cell.appendChild(document.createTextNode(i));
     // study
     cell = row.insertCell();
-    const studyUid = json[i]['0020000D'].Value;
+    const studyUid = json[i]['0020000D'].Value[0];
     cell.title = studyUid;
     cell.appendChild(document.createTextNode(studyUid));
 
     if (hasSeries) {
       // series
       cell = row.insertCell();
-      const seriesUid = json[i]['0020000E'].Value;
+      const seriesUid = json[i]['0020000E'].Value[0];
       cell.title = seriesUid;
       cell.appendChild(document.createTextNode(seriesUid));
       // modality
       cell = row.insertCell();
-      cell.appendChild(document.createTextNode(json[i]['00080060'].Value));
+      cell.appendChild(document.createTextNode(json[i]['00080060'].Value[0]));
       // action
       cell = row.insertCell();
       const a = document.createElement('a');
-      a.href = viewerUrl + json[i]['00081190'].Value;
+      a.href = viewerUrl + json[i]['00081190'].Value[0];
       a.target = '_blank';
       cell.appendChild(a);
 
