@@ -719,20 +719,6 @@ export class View {
   }
 
   /**
-   * Clone the image using all meta data and the original data buffer.
-   *
-   * @returns {View} A full copy of this {View}.
-   */
-  clone() {
-    const copy = new View(this.getImage());
-    for (const key in this.#windowLuts) {
-      copy.addWindowLut(this.#windowLuts[key]);
-    }
-    copy.setListeners(this.getListeners());
-    return copy;
-  }
-
-  /**
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
