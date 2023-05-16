@@ -202,6 +202,15 @@ export class RawImageLoader {
   onprogress(_event) {}
 
   /**
+   * Handle a load item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load item event fired
+   *   when a file item has been loaded successfully.
+   */
+  onloaditem(_event) {}
+
+  /**
    * Handle a load event.
    * Default does nothing.
    *

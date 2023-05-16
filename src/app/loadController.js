@@ -273,6 +273,15 @@ export class LoadController {
   onload(_event) {}
 
   /**
+   * Handle a load item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   *   when an item has been loaded successfully.
+   */
+  onloaditem(_event) {}
+
+  /**
    * Handle a load end event.
    * Default does nothing.
    *
