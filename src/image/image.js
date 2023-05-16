@@ -328,14 +328,14 @@ export class Image {
     this.#isIdentityRSI = this.#isIdentityRSI && inRsi.isID();
     // update constant flag
     if (!this.#isConstantRSI) {
-      if (typeof index === 'undefined') {
+      if (typeof offset === 'undefined') {
         throw new Error(
           'Cannot store non constant RSI with empty slice index.');
       }
       this.#rsis.splice(offset, 0, inRsi);
     } else {
       if (!this.#rsi.equals(inRsi)) {
-        if (typeof index === 'undefined') {
+        if (typeof offset === 'undefined') {
           // no slice index, replace existing
           this.#rsi = inRsi;
         } else {
@@ -796,7 +796,7 @@ export class Image {
    * @param {Point3D} origin The origin of the frame.
    */
   appendFrame(time, origin) {
-    this.#geometry.appendFrame(time, origin);
+    this.#geometry.appendFrame(origin, time);
     this.#fireEvent({type: 'appendframe'});
     // memory will be updated at the first appendSlice or appendFrameBuffer
   }
