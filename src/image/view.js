@@ -205,9 +205,16 @@ export class View {
   };
 
   /**
+   * @callback alphaFn
+   * @param {object} value The pixel value.
+   * @param {object} index The values' index.
+   * @returns {number} The value to display.
+   */
+
+  /**
    * Get the alpha function.
    *
-   * @returns {(value, index) => number} The function.
+   * @returns {alphaFn} The function.
    */
   getAlphaFunction() {
     return this.#alphaFunction;
@@ -216,7 +223,7 @@ export class View {
   /**
    * Set alpha function.
    *
-   * @param {(value, index) => number} func The function.
+   * @param {alphaFn} func The function.
    * @fires View#alphafuncchange
    */
   setAlphaFunction(func) {

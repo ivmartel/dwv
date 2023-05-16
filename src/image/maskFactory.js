@@ -27,11 +27,19 @@ function equalPosPat(pos1, pos2) {
 }
 
 /**
+ * @callback compareFn
+ * @param {object} a The first object.
+ * @param {object} b The first object.
+ * @returns {number} >0 to sort a after b, <0 to sort a before b,
+ *   0 to not change order.
+ */
+
+/**
  * Get a position patient compare function accroding to an
  * input orientation.
  *
  * @param {Matrix33} orientation The orientation matrix.
- * @returns {(a, b) => number} The position compare function.
+ * @returns {compareFn} The position compare function.
  */
 function getComparePosPat(orientation) {
   const invOrientation = orientation.getInverse();

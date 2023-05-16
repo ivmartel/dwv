@@ -163,9 +163,16 @@ export class MaskSegmentHelper {
   }
 
   /**
+   * @callback alphaFn
+   * @param {object} value The pixel value.
+   * @param {object} index The values' index.
+   * @returns {number} The value to display.
+   */
+
+  /**
    * Get the alpha function to apply hidden colors.
    *
-   * @returns {(value, index) => number} The corresponding alpha function.
+   * @returns {alphaFn} The corresponding alpha function.
    */
   getAlphaFunc() {
     // get colours
@@ -192,10 +199,15 @@ export class MaskSegmentHelper {
   }
 
   /**
+   * @callback eventFn
+   * @param {object} event The event.
+   */
+
+  /**
    * Delete a segment.
    *
    * @param {number} segmentNumber The segment number.
-   * @param {(event) => void} cmdCallback The command event callback.
+   * @param {eventFn} cmdCallback The command event callback.
    * @param {Function} exeCallback The post execution callback.
    */
   deleteSegment(segmentNumber, cmdCallback, exeCallback) {

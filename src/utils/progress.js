@@ -132,12 +132,18 @@ export class MultiProgressHandler {
     return Math.round(sum / lenprog);
   }
 
+
+  /**
+   * @callback eventFn
+   * @param {object} event The event.
+   */
+
   /**
    * Create a mono progress event handler.
    *
    * @param {number} index The index of the data.
    * @param {number} subindex The sub-index of the data.
-   * @returns {(event) => void} A progress handler function.
+   * @returns {eventFn} A progress handler function.
    */
   getMonoProgressHandler(index, subindex) {
     return (event) => {
@@ -152,7 +158,7 @@ export class MultiProgressHandler {
    * Warning: The caller handles the progress index.
    *
    * @param {number} subindex The sub-index of the data.
-   * @returns {(event) => void} A progress handler function.
+   * @returns {eventFn} A progress handler function.
    */
   getUndefinedMonoProgressHandler(subindex) {
     return (event) => {

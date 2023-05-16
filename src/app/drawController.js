@@ -89,10 +89,16 @@ export function isPositionNode(node) {
 }
 
 /**
+ * @callback testFn
+ * @param {object} node The node.
+ * @returns {boolean} True if the node passes the test.
+ */
+
+/**
  * Get a lambda to check a node's id.
  *
  * @param {string} id The id to check.
- * @returns {(node) => boolean} A function to check a node's id.
+ * @returns {testFn} A function to check a node's id.
  */
 export function isNodeWithId(id) {
   return function (node) {

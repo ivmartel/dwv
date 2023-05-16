@@ -170,11 +170,16 @@ export class FilesLoader {
   };
 
   /**
+   * @callback eventFn
+   * @param {object} event The event.
+   */
+
+  /**
    * Augment a callback event with a srouce.
    *
    * @param {object} callback The callback to augment its event.
    * @param {object} source The source to add to the event.
-   * @returns {(event) => void} The augmented callback.
+   * @returns {eventFn} The augmented callback.
    */
   #augmentCallbackEvent(callback, source) {
     return (event) => {
