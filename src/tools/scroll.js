@@ -321,7 +321,7 @@ export class Scroll {
       // position tooltip
       span.style.left = (event._x + 10) + 'px';
       span.style.top = (event._y + 10) + 'px';
-      let text = precisionRound(value, 3);
+      let text = precisionRound(value, 3).toString();
       if (typeof viewController.getPixelUnit() !== 'undefined') {
         text += ' ' + viewController.getPixelUnit();
       }
