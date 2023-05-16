@@ -10,6 +10,11 @@ import {logger} from '../utils/logger';
 import {Size} from './size';
 import {Spacing} from './spacing';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Matrix33} from '../math/matrix';
+/* eslint-enable no-unused-vars */
+
 /**
  * 2D/3D Geometry class.
  */
@@ -55,7 +60,7 @@ export class Geometry {
    *
    * @type {Matrix33}
    */
-  #orientation = new getIdentityMat33();
+  #orientation = getIdentityMat33();
 
   /**
    * Flag to know if new origins were added.
