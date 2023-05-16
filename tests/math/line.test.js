@@ -25,7 +25,7 @@ QUnit.test('Test Line.', function (assert) {
   // getWorldLength
   assert.equal(l00.getWorldLength(0.5, 0.5), 2.5, 'getWorldLength');
   // getMidpoint
-  const pMid = new Point2D(0, -2); // rounded...
+  const pMid = new Point2D(0, -2.5); // rounded...
   assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');
 
   // equals: true
