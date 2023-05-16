@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  * Setup.
  */
 function onDOMContentLoaded() {
-  const stowButton = document.getElementById('stowb');
+  const stowButton = document.getElementById('stowbutton');
   stowButton.onclick = launchStow;
 
-  const searchButton = document.getElementById('searchb');
+  const searchButton = document.getElementById('qidobutton');
   searchButton.onclick = launchQido;
 }
 
