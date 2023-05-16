@@ -120,8 +120,29 @@ function onMainQidoLoad(json) {
  */
 function getOnInstanceLoad(i) {
   return function (json) {
-    const mid = Math.floor(json.length / 2);
-    _mainJson[i].thumbInstance = json[mid]['00080018'].Value;
+    // extract list of instance numbers
+    // (carefull, optional tag...)
+    const numbers = [];
+    for (let i = 0; i < json.length; ++i) {
+      const elem = json[i]['00200013']; // instance number
+      if (typeof elem !== 'undefined') {
+        numbers.push({
+          index: i,
+          number: elem.Value[0]
+        });
+      }
+    }
+    // default middle index
+    let thumbIndex = Math.floor(json.length / 2);
+    // sort using instance number and get middle index
+    if (numbers.length === json.length) {
+      numbers.sort(function (a, b) {
+        return a.number - b.number;
+      });
+      thumbIndex = numbers[Math.floor(numbers.length / 2)].index;
+    }
+    // store thumbnail instance
+    _mainJson[i].thumbInstance = json[thumbIndex]['00080018'].Value;
     // display table once all loaded
     ++_loadedInstances;
     if (_loadedInstances === _mainJson.length) {
