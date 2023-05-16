@@ -58,7 +58,7 @@ export class ViewLayer {
   /**
    * The image data array.
    *
-   * @type {Array}
+   * @type {ImageData}
    */
   #imageData = null;
 
