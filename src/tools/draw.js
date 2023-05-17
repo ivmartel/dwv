@@ -399,7 +399,7 @@ export class Draw {
       // allow for anchor points
       if (this.#points.length < this.#currentFactory.getNPoints()) {
         clearTimeout(this.timer);
-        this.timer = setTimeout(function () {
+        this.timer = setTimeout(() => {
           this.#points.push(this.#lastPoint);
         }, this.#currentFactory.getTimeout());
       }
@@ -873,7 +873,7 @@ export class Draw {
       // id for event
       const groupId = group.id();
 
-      const onSaveCallback = function (meta) {
+      const onSaveCallback = (meta) => {
         // store meta
         ktext.meta = meta;
         // update text expression
