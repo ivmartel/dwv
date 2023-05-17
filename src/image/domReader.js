@@ -202,14 +202,16 @@ export function getViewFromDOMVideo(
 
   /**
    * Handle seeked event
+   *
+   * @param {object} event The seeked event.
    */
-  function onseeked(/*event*/) {
+  function onseeked(event) {
     // store
     storeFrame();
     // set the next time
     // (not using currentTime, it seems to get offseted)
     nextTime += 1 / frameRate;
-    if (nextTime <= this.duration) {
+    if (nextTime <= event.target.duration) {
       this.currentTime = nextTime;
     } else {
       onload({

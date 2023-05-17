@@ -85,7 +85,7 @@ export class ArrowFactory {
       context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
       context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
       context.closePath();
-      context.fillStrokeShape(this);
+      context.fillStrokeShape(kshape);
     });
     // triangle
     const beginTy = new Point2D(
@@ -238,7 +238,7 @@ export class ArrowFactory {
       context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
       context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
       context.closePath();
-      context.fillStrokeShape(this);
+      context.fillStrokeShape(kline);
     });
     // udate triangle
     const beginTy = new Point2D(

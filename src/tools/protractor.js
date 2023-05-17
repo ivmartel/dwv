@@ -89,7 +89,7 @@ export class ProtractorFactory {
         context.lineTo(points[1].getX(), points[1].getY());
         context.lineTo(points[2].getX(), points[2].getY());
         context.closePath();
-        context.fillStrokeShape(this);
+        context.fillStrokeShape(kshape);
       });
       // quantification
       let angle = getAngle(line0, line1);
@@ -258,7 +258,7 @@ export class ProtractorFactory {
       context.lineTo(mx, my);
       context.lineTo(ex, ey);
       context.closePath();
-      context.fillStrokeShape(this);
+      context.fillStrokeShape(kline);
     });
     // update text
     const p2d0 = new Point2D(begin.x(), begin.y());

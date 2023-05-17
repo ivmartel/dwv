@@ -184,16 +184,21 @@ function decodeManifestQuery(query, callback) {
 
   /**
    * Handle error.
+   *
+   * @param {object} event The error event.
    */
-  function onError(/*event*/) {
-    logger.warn('RequestError while receiving manifest: ' + this.status);
+  function onError(event) {
+    logger.warn('RequestError while receiving manifest: ' +
+      event.target.status);
   }
 
   /**
    * Handle load.
+   *
+   * @param {object} event The load event.
    */
-  function onLoad(/*event*/) {
-    callback(decodeManifest(this.responseXML, query.nslices));
+  function onLoad(event) {
+    callback(decodeManifest(event.target.responseXML, query.nslices));
   }
 
   const request = new XMLHttpRequest();

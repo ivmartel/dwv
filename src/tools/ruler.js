@@ -110,7 +110,7 @@ export class RulerFactory {
       context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
       context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
       context.closePath();
-      context.fillStrokeShape(this);
+      context.fillStrokeShape(kshape);
     });
 
     // quantification
@@ -261,7 +261,7 @@ export class RulerFactory {
       context.lineTo(linePerp1.getEnd().getX(), linePerp1.getEnd().getY());
       context.lineTo(linePerp1.getBegin().getX(), linePerp1.getBegin().getY());
       context.closePath();
-      context.fillStrokeShape(this);
+      context.fillStrokeShape(kline);
     });
 
     // update text
