@@ -234,6 +234,19 @@ function v02Tov03Drawings(drawings) {
   //    node.visible(false);
   //});
 
+  /**
+   * Get the draw group id for a given position.
+   *
+   * @param {Index} currentPosition The current position.
+   * @returns {string} The group id.
+   */
+  function getDrawPositionGroupId(currentPosition) {
+    const sliceNumber = currentPosition.get(2);
+    const frameNumber = currentPosition.length() === 4
+      ? currentPosition.get(3) : 0;
+    return 'slice-' + sliceNumber + '_frame-' + frameNumber;
+  }
+
   const drawLayer = new Konva.Layer({
     listening: false,
     visible: true
@@ -249,9 +262,8 @@ function v02Tov03Drawings(drawings) {
       groupShapes = groupDrawings[k][f];
       if (groupShapes.length !== 0) {
         // Create position-group set as visible and append it to drawLayer
-        const index = new Index([1, 1, k, f]);
         parentGroup = new Konva.Group({
-          id: index.toStringId(),
+          id: getDrawPositionGroupId(new Index([1, 1, k, f])),
           name: 'position-group',
           visible: false
         });
