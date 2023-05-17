@@ -406,8 +406,8 @@ export class DrawLayer {
    */
   fitToContainer(fitScale1D, fitSize, fitOffset) {
     // update konva
-    this.#konvaStage.setWidth(fitSize.x);
-    this.#konvaStage.setHeight(fitSize.y);
+    this.#konvaStage.width(fitSize.x);
+    this.#konvaStage.height(fitSize.y);
 
     // previous scale without fit
     const previousScale = {
