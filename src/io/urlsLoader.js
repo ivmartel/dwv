@@ -398,6 +398,9 @@ export class UrlsLoader {
     request.open('GET', dicomDirUrl, true);
     request.responseType = 'arraybuffer';
     // request.onloadstart: nothing to do
+    /**
+     * @param {object} event The load event.
+     */
     request.onload = (event) => {
       // check status
       const status = event.target.status;
@@ -405,25 +408,25 @@ export class UrlsLoader {
         this.onerror({
           source: dicomDirUrl,
           error: 'GET ' + event.target.responseURL +
-                        ' ' + event.target.status +
-                        ' (' + event.target.statusText + ')',
+            ' ' + event.target.status +
+            ' (' + event.target.statusText + ')',
           target: event.target
         });
         this.onloadend({});
-        return;
+      } else {
+        // get the file list
+        const list = getFileListFromDicomDir(event.target.response);
+        // use the first list
+        const urls = list[0][0];
+        // append root url
+        const rootUrl = getRootPath(dicomDirUrl);
+        const fullUrls = [];
+        for (let i = 0; i < urls.length; ++i) {
+          fullUrls.push(rootUrl + '/' + urls[i]);
+        }
+        // load urls
+        this.#loadUrls(fullUrls, options);
       }
-      // get the file list
-      const list = getFileListFromDicomDir(event.target.response);
-      // use the first list
-      const urls = list[0][0];
-      // append root url
-      const rootUrl = getRootPath(dicomDirUrl);
-      const fullUrls = [];
-      for (let i = 0; i < urls.length; ++i) {
-        fullUrls.push(rootUrl + '/' + urls[i]);
-      }
-      // load urls
-      this.#loadUrls(fullUrls, options);
     };
     request.onerror = (event) => {
       this.#augmentCallbackEvent(this.onerror, dicomDirUrl)(event);
