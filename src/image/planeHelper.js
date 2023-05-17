@@ -119,9 +119,21 @@ export class PlaneHelper {
   }
 
   /**
+   * De-orient an input point from target to real space.
+   *
+   * @param {Point3D} planePoint The input point.
+   * @returns {Point3D} The de-orienteded point.
+   */
+  getTargetDeOrientedPoint3D(planePoint) {
+    let point = planePoint;
+    if (typeof this.#targetOrientation !== 'undefined') {
+      point = this.#targetOrientation.multiplyPoint3D(planePoint);
+    }
+    return point;
+  }
+
+  /**
    * Orient an input vector from target to image space.
-   * WARN: returns absolute values...
-   * TODO: check why abs is needed...
    *
    * @param {Vector3D} planeVector The input vector.
    * @returns {Vector3D} The orienteded vector.
@@ -147,9 +159,33 @@ export class PlaneHelper {
   }
 
   /**
+   * Orient an input point from target to image space.
+   *
+   * @param {Point3D} planePoint The input vector.
+   * @returns {Point3D} The orienteded vector.
+   */
+  getImageOrientedPoint3D(planePoint) {
+    let point = planePoint;
+    if (typeof this.#viewOrientation !== 'undefined') {
+      // image oriented => view de-oriented
+      const values = getDeOrientedArray3D(
+        [
+          planePoint.getX(),
+          planePoint.getY(),
+          planePoint.getZ()
+        ],
+        this.#viewOrientation);
+      point = new Point3D(
+        values[0],
+        values[1],
+        values[2]
+      );
+    }
+    return point;
+  }
+
+  /**
    * De-orient an input vector from image to target space.
-   * WARN: returns absolute values...
-   * TODO: check why abs is needed...
    *
    * @param {Vector3D} vector The input vector.
    * @returns {Vector3D} The de-orienteded vector.
@@ -175,9 +211,33 @@ export class PlaneHelper {
   }
 
   /**
+   * De-orient an input point from image to target space.
+   *
+   * @param {Point3D} point The input point.
+   * @returns {Point3D} The de-orienteded point.
+   */
+  getImageDeOrientedPoint3D(point) {
+    let planePoint = point;
+    if (typeof this.#viewOrientation !== 'undefined') {
+      // image de-oriented => view oriented
+      const orientedValues = getOrientedArray3D(
+        [
+          point.getX(),
+          point.getY(),
+          point.getZ()
+        ],
+        this.#viewOrientation);
+      planePoint = new Point3D(
+        orientedValues[0],
+        orientedValues[1],
+        orientedValues[2]
+      );
+    }
+    return planePoint;
+  }
+
+  /**
    * Reorder values to follow target orientation.
-   * WARN: returns absolute values...
-   * TODO: check why abs is needed...
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} Reoriented values as {x,y,z}.

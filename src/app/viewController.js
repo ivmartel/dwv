@@ -515,7 +515,7 @@ export class ViewController {
     const k = this.getCurrentScrollIndexValue();
     const planePoint = new Point3D(x, y, k);
     // de-orient
-    const point = this.#planeHelper.getImageOrientedVector3D(planePoint);
+    const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
     // ~indexToWorld to not loose precision
     const geometry = this.#view.getImage().getGeometry();
     const point3D = geometry.pointToWorld(point);
@@ -526,15 +526,15 @@ export class ViewController {
   /**
    * Get a 2D (x,y) position from a position.
    *
-   * @param {Point3D} point3D The 3D position.
+   * @param {Point} point The 3D position.
    * @returns {object} The 2D position.
    */
-  getPlanePositionFromPosition(point3D) {
+  getPlanePositionFromPosition(point) {
     // orient
     const geometry = this.#view.getImage().getGeometry();
     // ~worldToIndex to not loose precision
-    const point = geometry.worldToPoint(point3D);
-    const planePoint = this.#planeHelper.getImageDeOrientedVector3D(point);
+    const point3D = geometry.worldToPoint(point);
+    const planePoint = this.#planeHelper.getImageDeOrientedPoint3D(point3D);
     // return
     return {
       x: planePoint.getX(),
@@ -565,7 +565,7 @@ export class ViewController {
     const k = this.getCurrentScrollIndexValue();
     const planePoint = new Point3D(point2D.x, point2D.y, k);
     // de-orient
-    const point = this.#planeHelper.getTargetDeOrientedVector3D(planePoint);
+    const point = this.#planeHelper.getTargetDeOrientedPoint3D(planePoint);
     // ~indexToWorld to not loose precision
     const geometry = this.#view.getImage().getGeometry();
     const spacing = geometry.getRealSpacing();
