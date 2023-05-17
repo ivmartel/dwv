@@ -934,14 +934,4 @@ export class ViewLayer {
     this.#context.restore();
   }
 
-  /**
-   * Align on another layer.
-   *
-   * @param {ViewLayer} rhs The layer to align on.
-   */
-  align(rhs) {
-    this.#canvas.style.top = rhs.getCanvas().offsetTop;
-    this.#canvas.style.left = rhs.getCanvas().offsetLeft;
-  }
-
 } // ViewLayer class
