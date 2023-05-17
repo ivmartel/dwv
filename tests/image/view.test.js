@@ -128,9 +128,9 @@ QUnit.test('Test generate data MONO.', function (assert) {
     0,
     0,
     255,
-    127,
-    127,
-    127,
+    128,
+    128,
+    128,
     255,
     255,
     255,
@@ -140,12 +140,11 @@ QUnit.test('Test generate data MONO.', function (assert) {
     255,
     255,
     255];
-  const testContent0 = true;
+  let testContent0 = true;
   for (let i = 0; i < size0 * size0 * 4; ++i) {
     if (theoData0[i] !== imageData.data[i]) {
-      console.log(i, theoData0[i], imageData.data[i]);
-      //testContent0 = false;
-      //break;
+      testContent0 = false;
+      break;
     }
   }
   assert.equal(testContent0, true, 'check image data');
