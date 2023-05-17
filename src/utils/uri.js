@@ -263,7 +263,7 @@ export function decodeManifest(manifest, nslices) {
  *
  * @param {string} uri The input uri, for example: 'window.location.href'.
  * @param {App} app The associated app that handles the load.
- * @param {object} options Optional url request options.
+ * @param {object} [options] Optional url request options.
  */
 export function loadFromUri(uri, app, options) {
   const query = getUriQuery(uri);
