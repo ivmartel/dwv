@@ -137,7 +137,7 @@ export class RoiFactory {
     for (let i = 0; i < points.length; i = i + 2) {
       const px = points[i] + shape.x();
       const py = points[i + 1] + shape.y();
-      const name = i;
+      const name = i.toString();
       anchors.push(getDefaultAnchor(
         px, py, name, style
       ));
