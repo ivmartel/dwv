@@ -28,7 +28,15 @@ const hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
 /* global JpxImage */
 const hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
 
-export const decoderScripts = {};
+/**
+ * Decoder scripts to be passed to web workers for image decoding.
+ */
+export const decoderScripts = {
+  jpeg2000: '',
+  'jpeg-lossless': '',
+  'jpeg-baseline': '',
+  rle: ''
+};
 
 /**
  * Asynchronous pixel buffer decoder.
