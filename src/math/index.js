@@ -167,7 +167,7 @@ export class Index {
   /**
    * Get a string id from the index values in the form of: '#0-1_#1-2'.
    *
-   * @param {Array} dims Optional list of dimensions to use.
+   * @param {Array} [dims] Optional list of dimensions to use.
    * @returns {string} The string id.
    */
   toStringId(dims) {

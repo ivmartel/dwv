@@ -486,7 +486,7 @@ function v03Tov04DrawingsDetails(details) {
  * - v0.4: position as object
  * - v0.5: position as array
  *
- * @param {Array} data An array of drawing.
+ * @param {object} data An array of drawing.
  * @returns {object} The converted drawings.
  */
 function v04Tov05Data(data) {
@@ -500,7 +500,7 @@ function v04Tov05Data(data) {
  * - v0.4: draw id as 'slice-0_frame-1'
  * - v0.5: draw id as '#2-0_#3-1''
  *
- * @param {Array} inputDrawings An array of drawing.
+ * @param {object} inputDrawings An array of drawing.
  * @returns {object} The converted drawings.
  */
 function v04Tov05Drawings(inputDrawings) {

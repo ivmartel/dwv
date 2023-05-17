@@ -90,9 +90,14 @@ export class ShapeEditor {
   #isActive = false;
 
   /**
+   * @callback eventFn
+   * @param {object} event The event.
+   */
+
+  /**
    * Draw event callback.
    *
-   * @type {Function}
+   * @type {eventFn}
    */
   #drawEventCallback = null;
 
