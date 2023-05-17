@@ -406,16 +406,17 @@ export class Floodfill {
   /**
    * Handle mouse up event.
    *
-   * @param {object} event The mouse up event.
+   * @param {object} _event The mouse up event.
    */
-  mouseup = (event) => {
+  mouseup = (_event) => {
     this.#started = false;
-    if (this.#extender) {
-      const layerDetails = getLayerDetailsFromEvent(event);
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      this.extend(layerGroup);
-    }
+    // TODO: re-activate
+    // if (this.#extender) {
+    //   const layerDetails = getLayerDetailsFromEvent(event);
+    //   const layerGroup =
+    //     this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    //   this.extend(layerGroup);
+    // }
   };
 
   /**
