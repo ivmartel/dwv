@@ -74,7 +74,10 @@ export class RawImageLoader {
             index: index,
             source: origin
           });
-          this.onload(getViewFromDOMImage(event.target, origin));
+          const data = getViewFromDOMImage(event.target, origin);
+          // only expecting one item
+          this.onloaditem(data);
+          this.onload(data);
         }
       } catch (error) {
         this.onerror({

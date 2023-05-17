@@ -55,10 +55,13 @@ export class JSONTextLoader {
         index: index,
         source: origin
       });
-      this.onload({
+      const data = {
         data: text,
         source: origin
-      });
+      };
+      // only expecting one item
+      this.onloaditem(data);
+      this.onload(data);
     } catch (error) {
       this.onerror({
         error: error,

@@ -91,16 +91,6 @@ export class MemoryLoader {
   }
 
   /**
-   * Launch a load item event and call addLoad.
-   *
-   * @param {object} event The load data event.
-   */
-  #addLoadItem(event) {
-    this.onloaditem(event);
-    this.#addLoad();
-  }
-
-  /**
    * Increment the number of loaded data
    *   and call onload if loaded all data.
    *
@@ -180,13 +170,8 @@ export class MemoryLoader {
         // set loader callbacks
         // loader.onloadstart: nothing to do
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
-        if (typeof loader.onloaditem === 'undefined') {
-          // handle loaditem locally
-          loader.onload = this.#addLoadItem;
-        } else {
-          loader.onloaditem = this.onloaditem;
-          loader.onload = this.#addLoad;
-        }
+        loader.onloaditem = this.onloaditem;
+        loader.onload = this.#addLoad;
         loader.onloadend = this.#addLoadend;
         loader.onerror = this.onerror;
         loader.onabort = this.onabort;
