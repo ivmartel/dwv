@@ -171,17 +171,21 @@ export class App {
    * @returns {object} The list of meta data.
    */
   getMetaDataWithNames(index) {
-    const meta = this.getMetaData(index);
-    return Object.keys(meta).reduce((accumulator, currentValue) => {
-      const tag = getTagFromKey(currentValue);
-      let key = tag.getNameFromDictionary();
-      if (typeof key === 'undefined') {
-        // add 'x' to help sorting
-        key = 'x' + tag.getKey();
-      }
-      accumulator[key] = meta[currentValue];
-      return accumulator;
-    }, {});
+    let meta = this.getMetaData(index);
+    if (typeof meta['00020010'] !== 'undefined') {
+      // replace tag key with tag name for dicom
+      meta = Object.keys(meta).reduce((accumulator, currentValue) => {
+        const tag = getTagFromKey(currentValue);
+        let key = tag.getNameFromDictionary();
+        if (typeof key === 'undefined') {
+          // add 'x' to help sorting
+          key = 'x' + tag.getKey();
+        }
+        accumulator[key] = meta[currentValue];
+        return accumulator;
+      }, {});
+    }
+    return meta;
   }
 
   /**
