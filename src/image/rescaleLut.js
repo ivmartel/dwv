@@ -1,3 +1,8 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {RescaleSlopeAndIntercept} from './rsi';
+/* eslint-enable no-unused-vars */
+
 /**
  * Rescale LUT class.
  * Typically converts from integer to float.

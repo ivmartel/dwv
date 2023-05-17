@@ -8,6 +8,11 @@ import {
   DeleteGroupCommand
 } from '../tools/drawCommands';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Index} from '../math/index';
+/* eslint-enable no-unused-vars */
+
 /**
  * Konva.
  *

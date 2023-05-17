@@ -5,6 +5,11 @@ import {validateAnchorPosition} from './draw';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the default anchor shape.
  *

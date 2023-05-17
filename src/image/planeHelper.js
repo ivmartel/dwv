@@ -3,6 +3,12 @@ import {Point3D} from '../math/point';
 import {getTargetOrientation} from '../gui/layerGroup';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Matrix33} from '../math/matrix';
+import {Spacing} from './spacing';
+/* eslint-enable no-unused-vars */
+
 /**
  * Plane geometry helper.
  */

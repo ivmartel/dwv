@@ -2,6 +2,11 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {precisionRound} from '../utils/string';
 import {ScrollWheel} from './scrollWheel';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Scroll class.
  *

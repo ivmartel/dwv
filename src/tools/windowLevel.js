@@ -2,6 +2,11 @@ import {ScrollWheel} from './scrollWheel';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * WindowLevel tool: handle window/level related events.
  *

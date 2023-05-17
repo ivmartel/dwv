@@ -8,6 +8,12 @@ import {
 } from './generic';
 import {getScaledOffset} from './layerGroup';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Vector3D} from '../math/vector';
+import {Point, Point3D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * View layer.
  */

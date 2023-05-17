@@ -2,6 +2,11 @@ import {View} from './view';
 import {lut} from './luts';
 import {WindowLevel, defaultPresets} from './windowLevel';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Image} from './image';
+/* eslint-enable no-unused-vars */
+
 /**
  * {@link View} factory.
  */

@@ -8,6 +8,12 @@ import {logger} from '../utils/logger';
 import {ViewLayer} from './viewLayer';
 import {DrawLayer} from './drawLayer';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Matrix33} from '../math/matrix';
+import {Point3D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the layer div id.
  *

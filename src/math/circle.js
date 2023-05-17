@@ -1,6 +1,12 @@
 import {i18n} from '../utils/i18n';
 import {getStats} from './stats';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point2D} from '../math/point';
+import {ViewController} from '../app/viewController';
+/* eslint-enable no-unused-vars */
+
 /**
  * Mulitply the three inputs if the last two are not null.
  *

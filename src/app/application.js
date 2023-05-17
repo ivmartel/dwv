@@ -18,6 +18,12 @@ import {getTagFromKey} from '../dicom/dicomTag';
 import {toolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../gui/layerGroup';
+import {Image} from '../image/image';
+/* eslint-enable no-unused-vars */
+
 /**An accessibility modifier cannot be used with a private identifier
  * Main application class.
  *

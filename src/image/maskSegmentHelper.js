@@ -1,5 +1,10 @@
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Image} from './image';
+/* eslint-enable no-unused-vars */
+
 /**
  * Mask segment helper.
  */

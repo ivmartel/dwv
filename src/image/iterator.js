@@ -1,6 +1,13 @@
 import {Index} from '../math/index';
 import {Point2D} from '../math/point';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Image} from './image';
+import {Point} from '../math/point';
+import {Matrix33} from '../math/matrix';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get an simple iterator for a given range for a one component data.
  *

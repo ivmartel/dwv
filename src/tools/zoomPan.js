@@ -2,6 +2,11 @@ import {Point2D} from '../math/point';
 import {Line} from '../math/line';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * ZoomAndPan class.
  *

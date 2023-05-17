@@ -6,6 +6,13 @@ import {InteractionEventNames} from './generic';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point, Point3D} from '../math/point';
+import {Index} from '../math/index';
+import {Vector3D} from '../math/vector';
+/* eslint-enable no-unused-vars */
+
 /**
  * Draw layer.
  */

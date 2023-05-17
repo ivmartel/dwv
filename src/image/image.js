@@ -6,6 +6,12 @@ import {ListenerHandler} from '../utils/listen';
 import {colourRange} from './iterator';
 import {RescaleSlopeAndIntercept} from './rsi';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Geometry} from './geometry';
+import {Matrix33} from '../math/matrix';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the slice index of an input slice into a volume geometry.
  *

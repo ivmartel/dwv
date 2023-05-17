@@ -11,6 +11,13 @@ import {getSliceIterator} from '../image/iterator';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Image} from './image';
+import {Matrix33} from '../math/matrix';
+import {Point, Point3D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * List of view event names.
  *

@@ -1,3 +1,8 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point2D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * Path shape.
  */

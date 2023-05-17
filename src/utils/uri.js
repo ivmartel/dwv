@@ -1,6 +1,11 @@
 import {logger} from './logger';
 import {splitKeyValueString} from './string';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get an full object URL from a string uri.
  *

@@ -17,6 +17,12 @@ import {
 import {lut} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {View} from '../image/view';
+import {Point, Point2D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * View controller.
  */
