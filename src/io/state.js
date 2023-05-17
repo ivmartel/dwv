@@ -1,6 +1,5 @@
 import {Index} from '../math/index';
 import {colourNameToHex} from '../utils/colour';
-import {getDrawPositionGroupId} from '../app/drawController';
 
 // external
 import Konva from 'konva';
@@ -250,8 +249,9 @@ function v02Tov03Drawings(drawings) {
       groupShapes = groupDrawings[k][f];
       if (groupShapes.length !== 0) {
         // Create position-group set as visible and append it to drawLayer
+        const index = new Index([1, 1, k, f]);
         parentGroup = new Konva.Group({
-          id: getDrawPositionGroupId(new Index([1, 1, k, f])),
+          id: index.toStringId(),
           name: 'position-group',
           visible: false
         });
