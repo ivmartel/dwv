@@ -17,38 +17,6 @@ import {
 import Konva from 'konva';
 
 /**
- * Get the draw group id for a given position.
- *
- * @param {Point} currentPosition The current position.
- * @returns {string} The group id.
- * @deprecated Use the index.toStringId instead.
- */
-export function getDrawPositionGroupId(currentPosition) {
-  const sliceNumber = currentPosition.get(2);
-  const frameNumber = currentPosition.length() === 4
-    ? currentPosition.get(3) : 0;
-  return 'slice-' + sliceNumber + '_frame-' + frameNumber;
-}
-
-/**
- * Get the slice and frame position from a group id.
- *
- * @param {string} groupId The group id.
- * @returns {object} The slice and frame number.
- * @deprecated Use the getVectorFromStringId instead.
- */
-export function getPositionFromGroupId(groupId) {
-  const sepIndex = groupId.indexOf('_');
-  if (sepIndex === -1) {
-    logger.warn('Badly formed PositionGroupId: ' + groupId);
-  }
-  return {
-    sliceNumber: groupId.substring(6, sepIndex),
-    frameNumber: groupId.substring(sepIndex + 7)
-  };
-}
-
-/**
  * Is an input node's name 'shape'.
  *
  * @param {object} node A Konva node.
