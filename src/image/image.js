@@ -1,4 +1,5 @@
 import {Index} from '../math/index';
+import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
 import {getTypedArray} from '../dicom/dicomParser';
 import {ListenerHandler} from '../utils/listen';
