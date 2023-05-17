@@ -661,7 +661,7 @@ export class Image {
     if (typeof timeId !== 'undefined' &&
       !this.#geometry.hasSlicesAtTime(timeId)) {
       // update grometry
-      this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
+      this.appendFrame(timeId, rhs.getGeometry().getOrigin());
       // update size
       size = this.#geometry.getSize();
       // update flag
@@ -786,7 +786,7 @@ export class Image {
     // append
     this.#buffer.set(frameBuffer, frameSize * frameIndex);
     // update geometry
-    this.appendFrame();
+    this.appendFrame(frameIndex, new Point3D(0, 0, 0));
   }
 
   /**
