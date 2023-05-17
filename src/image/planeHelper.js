@@ -1,4 +1,5 @@
 import {Vector3D} from '../math/vector';
+import {Point3D} from '../math/point';
 import {getTargetOrientation} from '../gui/layerGroup';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
