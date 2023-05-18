@@ -92,6 +92,7 @@ export class Image {
 
   /**
    * List of compatible typed arrays.
+   *
    * @typedef {(
    *   Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
