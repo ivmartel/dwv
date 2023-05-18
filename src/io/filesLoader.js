@@ -179,6 +179,21 @@ export class FilesLoader {
   }
 
   /**
+   * Get a load handler for a data element.
+   *
+   * @param {object} loader The associated loader.
+   * @param {object} dataElement The data element.
+   * @param {number} i The index of the element.
+   * @returns {eventFn} A load handler.
+   */
+  #getLoadHandler(loader, dataElement, i) {
+    return (event) => {
+      loader.load(event.target.result, dataElement, i);
+    };
+  }
+
+
+  /**
    * Load a list of files.
    *
    * @param {Array} data The list of files to load.
@@ -237,12 +252,6 @@ export class FilesLoader {
       throw new Error('No loader found for file: ' + dataElement.name);
     }
 
-    const getLoadHandler = function (loader, dataElement, i) {
-      return (event) => {
-        loader.load(event.target.result, dataElement, i);
-      };
-    };
-
     // loop on I/O elements
     for (let i = 0; i < data.length; ++i) {
       dataElement = data[i];
@@ -266,7 +275,7 @@ export class FilesLoader {
       // reader.onloadstart: nothing to do
       reader.onprogress = this.#augmentCallbackEvent(
         mproghandler.getMonoProgressHandler(i, 0), dataElement);
-      reader.onload = getLoadHandler(loader, dataElement, i);
+      reader.onload = this.#getLoadHandler(loader, dataElement, i);
       reader.onloadend = this.#addLoadend;
       reader.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
       reader.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
