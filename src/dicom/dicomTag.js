@@ -61,6 +61,11 @@ export class Tag {
     return this.#element;
   }
 
+  /**
+   * Get as string representation of the tag: 'key: name'.
+   *
+   * @returns {string} A string representing the tag.
+   */
   toString() {
     return this.getKey() + ': ' + this.getNameFromDictionary();
   }
