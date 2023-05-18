@@ -209,14 +209,14 @@ export class LayerGroup {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
   /**
    * The target orientation matrix.
    *
-   * @type {object}
+   * @type {Matrix33}
    */
   #targetOrientation;
 
@@ -360,7 +360,7 @@ export class LayerGroup {
   /**
    * Get the active image layer.
    *
-   * @returns {object} The layer.
+   * @returns {ViewLayer} The layer.
    */
   getActiveViewLayer() {
     return this.#layers[this.#activeViewLayerIndex];
@@ -370,7 +370,7 @@ export class LayerGroup {
    * Get the view layers associated to a data index.
    *
    * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataIndex(index) {
     const res = [];
@@ -387,7 +387,7 @@ export class LayerGroup {
    * Search view layers for equal imae meta data.
    *
    * @param {object} meta The meta data to find.
-   * @returns {Array} The list of view layers that contain matched data.
+   * @returns {ViewLayer[]} The list of view layers that contain matched data.
    */
   searchViewLayers(meta) {
     const res = [];
@@ -419,7 +419,7 @@ export class LayerGroup {
   /**
    * Get the active draw layer.
    *
-   * @returns {object} The layer.
+   * @returns {DrawLayer} The layer.
    */
   getActiveDrawLayer() {
     return this.#layers[this.#activeDrawLayerIndex];
@@ -429,7 +429,7 @@ export class LayerGroup {
    * Get the draw layers associated to a data index.
    *
    * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataIndex(index) {
     const res = [];
@@ -493,7 +493,7 @@ export class LayerGroup {
   /**
    * Add a view layer.
    *
-   * @returns {object} The created layer.
+   * @returns {ViewLayer} The created layer.
    */
   addViewLayer() {
     // layer index
@@ -517,7 +517,7 @@ export class LayerGroup {
   /**
    * Add a draw layer.
    *
-   * @returns {object} The created layer.
+   * @returns {DrawLayer} The created layer.
    */
   addDrawLayer() {
     // store active index
@@ -539,7 +539,7 @@ export class LayerGroup {
   /**
    * Bind view layer events to this.
    *
-   * @param {object} viewLayer The view layer to bind.
+   * @param {ViewLayer} viewLayer The view layer to bind.
    */
   #bindViewLayer(viewLayer) {
     // listen to position change to update other group layers
@@ -557,7 +557,7 @@ export class LayerGroup {
   /**
    * Bind draw layer events to this.
    *
-   * @param {object} drawLayer The draw layer to bind.
+   * @param {DrawLayer} drawLayer The draw layer to bind.
    */
   #bindDrawLayer(drawLayer) {
     // propagate drawLayer events
