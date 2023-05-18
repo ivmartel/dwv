@@ -181,6 +181,7 @@ export class DataReader {
       bitNumber = i % 8;
       bitIndex = Math.floor(i / 8);
       // see https://stackoverflow.com/questions/4854207/get-a-specific-bit-from-byte/4854257
+      // @ts-ignore
       data[i] = 255 * ((bitArray[bitIndex] & (1 << bitNumber)) !== 0);
     }
     return data;

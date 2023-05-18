@@ -368,6 +368,7 @@ export class ViewController {
       const sliceGeometry =
         new Geometry(sliceOrigin, sliceSize, sliceSpacing);
       // slice image
+      // @ts-ignore
       image = new Image(sliceGeometry, sliceValues);
       // update position
       position = new Index([0, 0, 0]);

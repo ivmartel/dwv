@@ -51,6 +51,7 @@ export function cleanString(inputStr) {
     // trim spaces
     res = inputStr.trim();
     // get rid of ending zero-width space (u200B)
+    // @ts-ignore
     if (res[res.length - 1] === String.fromCharCode('u200B')) {
       res = res.substring(0, res.length - 1);
     }

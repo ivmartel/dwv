@@ -824,6 +824,7 @@ export class MaskFactory {
     // create output buffer
     const mul = storeAsRGB ? 3 : 1;
     const buffer =
+      // @ts-ignore
       new pixelBuffer.constructor(mul * sliceSize * numberOfSlices);
     buffer.fill(0);
     // merge frame buffers

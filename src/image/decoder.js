@@ -7,6 +7,7 @@ import {ThreadPool, WorkerTask} from '../utils/thread';
  * @see https://github.com/mozilla/pdf.js/blob/master/src/core/jpg.js
  */
 /* global JpegImage */
+// @ts-ignore
 const hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
 
 /**
@@ -16,8 +17,9 @@ const hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
  * @see https://github.com/rii-mango/JPEGLosslessDecoderJS
  */
 /* global jpeg */
-const hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
-    (typeof jpeg.lossless !== 'undefined');
+const hasJpegLosslessDecoder =
+  // @ts-ignore
+  (typeof jpeg !== 'undefined') && (typeof jpeg.lossless !== 'undefined');
 
 /**
  * The JPEG 2000 decoder.
@@ -26,7 +28,10 @@ const hasJpegLosslessDecoder = (typeof jpeg !== 'undefined') &&
  * @see https://github.com/jpambrun/jpx-medical/blob/master/jpx.js
  */
 /* global JpxImage */
+// @ts-ignore
 const hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
+
+/* global dwvdecoder */
 
 /**
  * Decoder scripts to be passed to web workers for image decoding.
@@ -218,6 +223,7 @@ class SynchPixelBufferDecoder {
       // bytes per element
       const bpe = pixelMeta.bitsAllocated / 8;
       const buf = new Uint8Array(pixelBuffer);
+      // @ts-ignore
       decoder = new jpeg.lossless.Decoder();
       const decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
       if (pixelMeta.bitsAllocated === 8) {
@@ -237,6 +243,7 @@ class SynchPixelBufferDecoder {
       if (!hasJpegBaselineDecoder) {
         throw new Error('No JPEG Baseline decoder provided');
       }
+      // @ts-ignore
       decoder = new JpegImage();
       decoder.parse(pixelBuffer);
       decodedBuffer = decoder.getData(decoder.width, decoder.height);
@@ -245,13 +252,14 @@ class SynchPixelBufferDecoder {
         throw new Error('No JPEG 2000 decoder provided');
       }
       // decompress pixel buffer into Int16 image
+      // @ts-ignore
       decoder = new JpxImage();
       decoder.parse(pixelBuffer);
       // set the pixel buffer
       decodedBuffer = decoder.tiles[0].items;
     } else if (this.#algoName === 'rle') {
       // decode DICOM buffer
-      // eslint-disable-next-line no-undef
+      // @ts-ignore
       decoder = new dwvdecoder.RleDecoder();
       // set the pixel buffer
       decodedBuffer = decoder.decode(
