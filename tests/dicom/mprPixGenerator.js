@@ -66,7 +66,7 @@ const MPRPixGenerator = function (options) {
         sliceNumber + ', ' + numberOfSlices);
     }
     const orientationName =
-      dwv.dicom.getOrientationName(options.imageOrientationPatient);
+      dwv.getOrientationName(options.imageOrientationPatient);
     if (orientationName === 'axial') {
       this.generateAsAxial(pixelBuffer, sliceNumber);
     } else if (orientationName === 'coronal') {

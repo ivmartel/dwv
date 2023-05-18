@@ -32,14 +32,14 @@ function getObjectUrlFromTags(config) {
     for (let i = 0; i < keys.length; ++i) {
       const group = keys[i];
       const tags = config.privateDictionary[group];
-      dwv.dicom.dictionary[group] = tags;
+      dwv.dictionary[group] = tags;
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
     }
   }
   // convert JSON to DICOM element object
-  const dicomElements = dwv.dicom.getElementsFromJSONTags(config.tags);
+  const dicomElements = dwv.getElementsFromJSONTags(config.tags);
   // pixels: small gradient square
   if (config.tags.Modality !== 'KO') {
     dicomElements['7FE00010'] =
@@ -47,7 +47,7 @@ function getObjectUrlFromTags(config) {
   }
 
   // create DICOM buffer
-  const writer = new dwv.dicom.DicomWriter();
+  const writer = new dwv.DicomWriter();
   writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
   const dicomBuffer = writer.getBuffer(dicomElements);
 

@@ -18,13 +18,13 @@ test.initDwv = function () {
   // logger level (optional)
   dwv.logger.level = dwv.logger.levels.DEBUG;
   // image decoders (for web workers)
-  dwv.image.decoderScripts.jpeg2000 =
+  dwv.decoderScripts.jpeg2000 =
     '../../decoders/pdfjs/decode-jpeg2000.js';
-  dwv.image.decoderScripts['jpeg-lossless'] =
+  dwv.decoderScripts['jpeg-lossless'] =
     '../../decoders/rii-mango/decode-jpegloss.js';
-  dwv.image.decoderScripts['jpeg-baseline'] =
+  dwv.decoderScripts['jpeg-baseline'] =
     '../../decoders/pdfjs/decode-jpegbaseline.js';
-  dwv.image.decoderScripts.rle =
+  dwv.decoderScripts.rle =
     '../../decoders/dwv/decode-rle.js';
 };
 
