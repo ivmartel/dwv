@@ -469,17 +469,6 @@ export class App {
   }
 
   /**
-   * Get a HTML element associated to the application.
-   *
-   * @param {string} _name The name or id to find.
-   * @returns {object} The found element or null.
-   * @deprecated
-   */
-  getElement(_name) {
-    return null;
-  }
-
-  /**
    * Reset the application.
    */
   reset() {
