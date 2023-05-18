@@ -109,8 +109,6 @@ then
   info "(3/4) create build"
 
   yarn run build
-  # copy build to dist
-  cp build/dist/*.js dist
 
   ((step++))
 fi
