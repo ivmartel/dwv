@@ -91,9 +91,18 @@ export class Image {
   #geometry;
 
   /**
+   * List of compatible typed arrays.
+   * @typedef {(
+   *   Uint8Array | Int8Array |
+   *   Uint16Array | Int16Array |
+   *   Uint32Array | Int32Array
+   * )} TypedArray
+   */
+
+  /**
    * Data buffer.
    *
-   * @type {Array}
+   * @type {TypedArray}
    */
   #buffer;
 
@@ -191,7 +200,7 @@ export class Image {
 
   /**
    * @param {Geometry} geometry The geometry of the image.
-   * @param {Array} buffer The image data as a one dimensional buffer.
+   * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {Array} [imageUids] An array of Uids indexed to slice number.
    */
   constructor(geometry, buffer, imageUids) {
@@ -230,7 +239,7 @@ export class Image {
    * Get the data buffer of the image.
    *
    * @todo dangerous...
-   * @returns {Array} The data buffer of the image.
+   * @returns {TypedArray} The data buffer of the image.
    */
   getBuffer() {
     return this.#buffer;
@@ -1240,7 +1249,7 @@ export class Image {
    * Note: Uses raw buffer values.
    *
    * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
-   * @param {Array} buffer The buffer to convolute.
+   * @param {TypedArray} buffer The buffer to convolute.
    * @param {number} startOffset The index to start at.
    */
   convoluteBuffer(

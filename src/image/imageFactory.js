@@ -38,7 +38,8 @@ export class ImageFactory {
    * Get an {@link Image} object from the read DICOM file.
    *
    * @param {object} dicomElements The DICOM tags.
-   * @param {Array} pixelBuffer The pixel buffer.
+   * @param {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array}
+   *   pixelBuffer The pixel buffer.
    * @param {number} numberOfFiles The input number of files.
    * @returns {Image} A new Image.
    */
