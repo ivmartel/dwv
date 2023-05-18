@@ -69,10 +69,13 @@ export class EllipseFactory {
     // physical shape
     const ellipse = new Ellipse(points[0], a, b);
     // draw shape
+    const radius = {x: ellipse.getA(), y: ellipse.getB()};
     const kshape = new Konva.Ellipse({
       x: ellipse.getCenter().getX(),
       y: ellipse.getCenter().getY(),
-      radius: {x: ellipse.getA(), y: ellipse.getB()},
+      radius: radius,
+      radiusX: radius.x,
+      radiusY: radius.y,
       stroke: style.getLineColour(),
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,

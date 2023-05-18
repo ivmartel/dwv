@@ -21,6 +21,10 @@ import {App} from '../app/application';
  */
 export function getDefaultAnchor(x, y, id, style) {
   const radius = style.applyZoomScale(3);
+  const absRadius = {
+    x: Math.abs(radius.x),
+    y: Math.abs(radius.y)
+  };
   return new Konva.Ellipse({
     x: x,
     y: y,
@@ -28,10 +32,9 @@ export function getDefaultAnchor(x, y, id, style) {
     fill: 'rgba(100,100,100,0.7',
     strokeWidth: style.getStrokeWidth(),
     strokeScaleEnabled: false,
-    radius: {
-      x: Math.abs(radius.x),
-      y: Math.abs(radius.y)
-    },
+    radius: absRadius,
+    radiusX: absRadius.x,
+    radiusY: absRadius.y,
     name: 'anchor',
     id: id.toString(),
     dragOnTop: false,
