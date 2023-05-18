@@ -94,7 +94,8 @@ export class RoiFactory {
     textExpr = defaultRoiLabelText;
     // }
     ktext.setText(textExpr);
-    // meta data
+    // augment text with meta
+    // @ts-ignore
     ktext.meta = {
       textExpr: textExpr,
       quantification: {}
