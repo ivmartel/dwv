@@ -5,7 +5,7 @@
   "compiler": {},
   "apiReport": {
     "enabled": true,
-    "reportFolder": "build/api",
+    "reportFolder": "resources/api",
     "reportTempFolder": "build/api/temp"
   },
   "docModel": {
