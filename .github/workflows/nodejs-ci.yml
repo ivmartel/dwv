@@ -34,8 +34,9 @@ jobs:
       run: |
         rm -Rf ./node_modules/*
         yarn install --prod --frozen-lockfile
-        cp -Rf dist ./build/demo
+        mkdir ./build/demo
         cp -Rf node_modules ./build/demo
+        cp -Rf dist ./build/demo
         cp -Rf decoders ./build/demo
         cp -Rf tests/pacs/viewer.* ./build/demo
         ./resources/scripts/prep-deploy.sh -f build/demo/viewer.html
