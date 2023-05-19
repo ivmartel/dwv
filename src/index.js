@@ -1,5 +1,6 @@
 // app
 import {App} from './app/application';
+import {ViewController} from './app/viewController';
 // dicom
 import {
   getDwvVersion,
@@ -22,14 +23,19 @@ import {ViewLayer} from './gui/viewLayer';
 import {DrawLayer} from './gui/drawLayer';
 // image
 import {Image} from './image/image';
+import {View} from './image/view';
 import {Geometry} from './image/geometry';
 import {Size} from './image/size';
 import {Spacing} from './image/spacing';
 import {decoderScripts} from './image/decoder';
 import {lut} from './image/luts';
 import {defaultPresets} from './image/windowLevel';
+import {RescaleSlopeAndIntercept} from './image/rsi';
+import {RescaleLut} from './image/rescaleLut';
+import {WindowLut} from './image/windowLut';
+import {WindowLevel} from './image/windowLevel';
 // math
-import {Point, Point3D} from './math/point';
+import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
 import {Index} from './math/index';
 import {Matrix33} from './math/matrix';
@@ -42,6 +48,7 @@ import {isObject, isArray, objectToArray} from './utils/operator';
 
 export {
   App,
+  ViewController,
   DicomParser,
   DicomWriter,
   TagValueExtractor,
@@ -50,11 +57,17 @@ export {
   DrawLayer,
   ViewLayer,
   Image,
+  View,
   Geometry,
   Size,
   Spacing,
+  RescaleSlopeAndIntercept,
+  RescaleLut,
+  WindowLut,
+  WindowLevel,
   Index,
   Point,
+  Point2D,
   Point3D,
   Vector3D,
   Matrix33,

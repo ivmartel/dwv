@@ -5699,6 +5699,17 @@ export class Point {
 }
 
 // @public
+export class Point2D {
+    constructor(x: number, y: number);
+    equals(rhs: Point2D): boolean;
+    getDistance(point2D: Point2D): number;
+    getRound(): Point2D;
+    getX(): number;
+    getY(): number;
+    toString(): string;
+}
+
+// @public
 export class Point3D {
     constructor(x: number, y: number, z: number);
     equals(rhs: Point3D): boolean;
@@ -5713,6 +5724,27 @@ export class Point3D {
 
 // @public
 export function precisionRound(number: number, precision: number): number;
+
+// @public
+export class RescaleLut {
+    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
+    getLength(): number;
+    getRSI(): RescaleSlopeAndIntercept;
+    getValue(offset: number): number;
+    initialise(): void;
+    isReady(): boolean;
+}
+
+// @public
+export class RescaleSlopeAndIntercept {
+    constructor(slope: number, intercept: number);
+    apply(value: number): number;
+    equals(rhs: RescaleSlopeAndIntercept): boolean;
+    getIntercept(): number;
+    getSlope(): number;
+    isID(): boolean;
+    toString(): string;
+}
 
 // @public
 export class Size {
@@ -5779,6 +5811,106 @@ export class Vector3D {
 }
 
 // @public
+export class View {
+    constructor(image: Image_2);
+    addEventListener(type: string, callback: object): void;
+    addWindowLut(wlut: WindowLut): void;
+    addWindowPresets(presets: object): void;
+    canSetPosition(position: Point): boolean;
+    decrementIndex(dim: number, silent: boolean): boolean;
+    decrementScrollIndex(silent: boolean): boolean;
+    generateImageData(data: ImageData, index: Index): void;
+    getAlphaFunction(): (value: object, index: object) => number;
+    getColourMap(): object;
+    getCurrentIndex(): Index;
+    getCurrentPosition(): Point;
+    getCurrentWindowLut(rsi?: object): WindowLut;
+    getImage(): Image_2;
+    getOrientation(): Matrix33;
+    getOrigin(position: Point): Point;
+    getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
+    getScrollIndex(): number;
+    getWindowLevelMinMax(): object;
+    getWindowPresets(): object;
+    getWindowPresetsNames(): object;
+    incrementIndex(dim: number, silent: boolean): boolean;
+    incrementScrollIndex(silent: boolean): boolean;
+    init(): void;
+    removeEventListener(type: string, callback: object): void;
+    setAlphaFunction(func: (value: object, index: object) => number): void;
+    setColourMap(map: object): void;
+    setCurrentIndex(index: Index, silent?: boolean): boolean;
+    setCurrentPosition(position: Point, silent: boolean): boolean;
+    setDefaultColourMap(map: object): void;
+    setImage(inImage: Image_2): void;
+    setInitialIndex(): void;
+    setOrientation(mat33: Matrix33): void;
+    setWindowLevel(center: number, width: number, name?: string, silent?: boolean): void;
+    setWindowLevelMinMax(): void;
+    setWindowLevelPreset(name: string, silent?: boolean): void;
+    setWindowLevelPresetById(id: number, silent?: boolean): void;
+    setWindowPresets(presets: object): void;
+}
+
+// @public
+export class ViewController {
+    constructor(view: View, index: number);
+    addEventListener(type: string, callback: object): void;
+    addWindowLevelPresets(presets: object): object;
+    applyHiddenSegments(): void;
+    canQuantifyImage(): boolean;
+    canScroll(): boolean;
+    canSetPosition(position: Point): boolean;
+    canWindowLevel(): boolean;
+    decrementIndex(dim: number, silent?: boolean): boolean;
+    decrementScrollIndex(silent?: boolean): boolean;
+    deleteSegment(segmentNumber: number, exeCallback: Function): void;
+    equalImageMeta(meta: object): boolean;
+    generateImageData(array: ImageData, index: Index): void;
+    get2DSpacing(): any[];
+    getColourMap(): object;
+    getCurrentIndex(): Index;
+    getCurrentOrientedIndex(): Index;
+    getCurrentPosition(): Point;
+    getCurrentScrollIndexValue(): object;
+    getCurrentScrollPosition(): object;
+    getImageRegionValues(min: Point2D, max: Point2D): any[];
+    getImageRescaledDataRange(): object;
+    getImageSize(): Size;
+    getImageVariableRegionValues(regions: any[]): any[];
+    getImageWorldSize(): object;
+    getMaskSegmentHelper(): object;
+    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    getOrigin(position: Point): Point;
+    getPixelUnit(): string;
+    getPlaneHelper(): object;
+    getPlanePositionFromPlanePoint(point2D: object): Point3D;
+    getPlanePositionFromPosition(point: Point): object;
+    getPositionFromPlanePoint(x: number, y: number): Point;
+    getRescaledImageValue(position: Point): number | undefined;
+    getScrollIndex(): number;
+    getWindowLevel(): object;
+    getWindowLevelPresetsNames(): any[];
+    incrementIndex(dim: number, silent?: boolean): boolean;
+    incrementScrollIndex(silent?: boolean): boolean;
+    initialise(): void;
+    isMask(): boolean;
+    isPlaying(): boolean;
+    play(): void;
+    removeEventListener(type: string, callback: object): void;
+    setColourMap(colourMap: object): void;
+    setColourMapFromName(name: string): void;
+    setCurrentIndex(index: Index, silent: boolean): boolean;
+    setCurrentPosition(pos: Point, silent?: boolean): boolean;
+    setImage(img: Image_2, index: number): void;
+    setViewAlphaFunction(func: (value: object, index: object) => number): void;
+    setWindowLevel(wc: number, ww: number): void;
+    setWindowLevelPreset(name: string): void;
+    setWindowLevelPresetById(id: number): void;
+    stop(): void;
+}
+
+// @public
 export class ViewLayer {
     constructor(containerDiv: HTMLElement);
     addEventListener(type: string, callback: object): void;
@@ -5800,7 +5932,7 @@ export class ViewLayer {
     getImageData(): object;
     getImageWorldSize(): object;
     getOpacity(): number;
-    getViewController(): object;
+    getViewController(): ViewController;
     initialise(size: object, spacing: object, alpha: number): void;
     isVisible(): boolean;
     onimagechange: (event: object) => void;
@@ -5814,6 +5946,31 @@ export class ViewLayer {
     setScale(newScale: object, center: Point3D): void;
     setView(view: object, index: number): void;
     unbindInteraction(): void;
+}
+
+// @public
+export class WindowLevel {
+    constructor(center: number, width: number);
+    apply(value: number): number;
+    equals(rhs: WindowLevel): boolean;
+    getCenter(): number;
+    getWidth(): number;
+    setRange(min: string, max: string): void;
+    setSignedOffset(offset: number): void;
+    toString(): string;
+}
+
+// @public
+export class WindowLut {
+    constructor(rescaleLut: RescaleLut, isSigned: boolean);
+    getLength(): number;
+    getRescaleLut(): RescaleLut;
+    getValue(offset: number): number;
+    getWindowLevel(): WindowLevel;
+    isReady(): boolean;
+    isSigned(): boolean;
+    setWindowLevel(wl: WindowLevel): void;
+    update(): void;
 }
 
 // (No @packageDocumentation comment for this package)
