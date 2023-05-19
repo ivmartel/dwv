@@ -8,6 +8,12 @@ import {
 } from './generic';
 import {getScaledOffset} from './layerGroup';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Vector3D} from '../math/vector';
+import {Point, Point3D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * View layer.
  */
@@ -213,7 +219,7 @@ export class ViewLayer {
   /**
    * Get the view controller.
    *
-   * @returns {object} The controller.
+   * @returns {ViewController} The controller.
    */
   getViewController() {
     return this.#viewController;
@@ -489,6 +495,13 @@ export class ViewLayer {
     };
   }
 
+  /**
+   * Get a display position from a plane position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The display position as {x,y}.
+   */
   planePosToDisplay(x, y) {
     return {
       x: (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x,

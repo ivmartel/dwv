@@ -90,7 +90,8 @@ export class FreeHandFactory {
     textExpr = defaultFreeHandLabelText;
     // }
     ktext.setText(textExpr);
-    // meta data
+    // augment text with meta
+    // @ts-ignore
     ktext.meta = {
       textExpr: textExpr,
       quantification: {}

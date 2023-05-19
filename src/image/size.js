@@ -1,5 +1,10 @@
 import {Index} from '../math/index';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Matrix33} from '../math/matrix';
+/* eslint-enable no-unused-vars */
+
 /**
  * Immutable Size class.
  * Warning: the input array is NOT cloned, modifying it will

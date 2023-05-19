@@ -17,6 +17,12 @@ import {
 import {lut} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {View} from '../image/view';
+import {Point, Point2D} from '../math/point';
+/* eslint-enable no-unused-vars */
+
 /**
  * View controller.
  */
@@ -250,6 +256,12 @@ export class ViewController {
     return this.#view.getCurrentIndex().get(this.#view.getScrollIndex());
   }
 
+  /**
+   * Get the origin at a given posittion.
+   *
+   * @param {Point} position The input position.
+   * @returns {Point} The origin.
+   */
   getOrigin(position) {
     return this.#view.getOrigin(position);
   }
@@ -362,6 +374,7 @@ export class ViewController {
       const sliceGeometry =
         new Geometry(sliceOrigin, sliceSize, sliceSpacing);
       // slice image
+      // @ts-ignore
       image = new Image(sliceGeometry, sliceValues);
       // update position
       position = new Index([0, 0, 0]);

@@ -226,7 +226,7 @@ function launchStow() {
         });
       }
       const boundary = '----dwttestboundary';
-      const content = dwv.utils.buildMultipart(parts, boundary);
+      const content = dwv.buildMultipart(parts, boundary);
 
       // STOW request
       const rootUrl = document.getElementById('rooturl').value;

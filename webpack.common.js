@@ -11,7 +11,7 @@ module.exports = {
       type: 'umd'
     },
     globalObject: 'this',
-    path: path.resolve(__dirname, 'build/dist'),
+    path: path.resolve(__dirname, 'dist'),
     clean: true,
   }
 };

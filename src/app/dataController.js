@@ -1,6 +1,11 @@
 import {ListenerHandler} from '../utils/listen';
 import {mergeObjects} from '../utils/operator';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Image} from '../image/image';
+/* eslint-enable no-unused-vars */
+
 /*
  * Data (list of {image, meta}) controller.
  */

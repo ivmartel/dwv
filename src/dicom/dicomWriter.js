@@ -330,7 +330,7 @@ export class DicomWriter {
    * @param {string} str The string to encode.
    * @returns {Uint8Array} The encoded string.
    */
-  encodeString(str) {
+  #encodeString(str) {
     return this.#defaultTextEncoder.encode(str);
   }
 
@@ -340,7 +340,7 @@ export class DicomWriter {
    * @param {string} str The string to write.
    * @returns {Uint8Array} The encoded string.
    */
-  encodeSpecialString(str) {
+  #encodeSpecialString(str) {
     return this.#textEncoder.encode(str);
   }
 
@@ -358,17 +358,19 @@ export class DicomWriter {
   }
 
   /**
-   * Example anonymisation rules.
+   * Use default anonymisation rules.
    */
-  anonymisationRules = {
-    default: {action: 'remove', value: null},
-    PatientName: {action: 'replace', value: 'Anonymized'}, // tag
-    'Meta Element': {action: 'copy', value: null}, // group '0002'
-    Acquisition: {action: 'copy', value: null}, // group '0018'
-    'Image Presentation': {action: 'copy', value: null}, // group '0028'
-    Procedure: {action: 'copy', value: null}, // group '0040'
-    'Pixel Data': {action: 'copy', value: null} // group '7fe0'
-  };
+  useDefaultAnonymisationRules() {
+    this.setRules({
+      default: {action: 'remove', value: null},
+      PatientName: {action: 'replace', value: 'Anonymized'}, // tag
+      'Meta Element': {action: 'copy', value: null}, // group '0002'
+      Acquisition: {action: 'copy', value: null}, // group '0018'
+      'Image Presentation': {action: 'copy', value: null}, // group '0028'
+      Procedure: {action: 'copy', value: null}, // group '0040'
+      'Pixel Data': {action: 'copy', value: null} // group '7fe0'
+    });
+  }
 
   /**
    * Get the element to write according to the class rules.
@@ -377,7 +379,7 @@ export class DicomWriter {
    * @param {object} element The element to check
    * @returns {object} The element to write, can be null.
    */
-  getElementToWrite(element) {
+  #getElementToWrite(element) {
     // get group and tag string name
     const groupName = element.tag.getGroupName();
     const tagName = element.tag.getNameFromDictionary();
@@ -411,7 +413,7 @@ export class DicomWriter {
    * @param {boolean} isImplicit Is the DICOM VR implicit?
    * @returns {number} The new offset position.
    */
-  writeDataElementItems(
+  #writeDataElementItems(
     writer, byteOffset, items, isImplicit) {
     let item = null;
     for (let i = 0; i < items.length; ++i) {
@@ -431,12 +433,12 @@ export class DicomWriter {
         vl: undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
         value: []
       };
-      byteOffset = this.writeDataElement(
+      byteOffset = this.#writeDataElement(
         writer, itemElement, byteOffset, isImplicit);
       // write rest
       for (let m = 0; m < itemKeys.length; ++m) {
         if (itemKeys[m] !== 'FFFEE000' && itemKeys[m] !== 'FFFEE00D') {
-          byteOffset = this.writeDataElement(
+          byteOffset = this.#writeDataElement(
             writer, item[itemKeys[m]], byteOffset, isImplicit);
         }
       }
@@ -448,7 +450,7 @@ export class DicomWriter {
           vl: 0,
           value: []
         };
-        byteOffset = this.writeDataElement(
+        byteOffset = this.#writeDataElement(
           writer, itemDelimElement, byteOffset, isImplicit);
       }
     }
@@ -467,7 +469,7 @@ export class DicomWriter {
    * @param {boolean} isImplicit Is the DICOM VR implicit?
    * @returns {number} The new offset position.
    */
-  writeDataElementValue(
+  #writeDataElementValue(
     writer, element, byteOffset, value, isImplicit) {
 
     const startOffset = byteOffset;
@@ -523,7 +525,7 @@ export class DicomWriter {
           throw Error('Unknown VR type: ' + vrType);
         }
       } else if (element.vr === 'SQ') {
-        byteOffset = this.writeDataElementItems(
+        byteOffset = this.#writeDataElementItems(
           writer, byteOffset, value, isImplicit);
       } else if (element.vr === 'AT') {
         for (let i = 0; i < value.length; ++i) {
@@ -562,7 +564,7 @@ export class DicomWriter {
    * @param {boolean} isImplicit Is the DICOM VR implicit?
    * @returns {number} The new offset position.
    */
-  writePixelDataElementValue(
+  #writePixelDataElementValue(
     writer, element, byteOffset, value, isImplicit) {
     // undefined length flag
     let undefinedLength = false;
@@ -577,7 +579,7 @@ export class DicomWriter {
         finalValue = flattenArrayOfTypedArrays(value);
       }
       // write
-      byteOffset = this.writeDataElementValue(
+      byteOffset = this.#writeDataElementValue(
         writer, element, byteOffset, finalValue, isImplicit);
     } else {
       // pixel data as sequence
@@ -599,7 +601,7 @@ export class DicomWriter {
         };
       }
       // write
-      byteOffset = this.writeDataElementItems(
+      byteOffset = this.#writeDataElementItems(
         writer, byteOffset, [item], isImplicit);
     }
 
@@ -616,7 +618,7 @@ export class DicomWriter {
    * @param {boolean} isImplicit Is the DICOM VR implicit?
    * @returns {number} The new offset position.
    */
-  writeDataElement(
+  #writeDataElement(
     writer, element, byteOffset, isImplicit) {
     const isTagWithVR = element.tag.isWithVR();
     const is32bitVL = (isImplicit || !isTagWithVR)
@@ -635,7 +637,7 @@ export class DicomWriter {
       vr = 'UN';
     }
     if (isTagWithVR && !isImplicit) {
-      byteOffset = writer.writeUint8Array(byteOffset, this.encodeString(vr));
+      byteOffset = writer.writeUint8Array(byteOffset, this.#encodeString(vr));
       // reserved 2 bytes for 32bit VL
       if (is32bitVL) {
         byteOffset += 2;
@@ -676,10 +678,10 @@ export class DicomWriter {
     }
     // write
     if (isPixelDataTag(element.tag)) {
-      byteOffset = this.writePixelDataElementValue(
+      byteOffset = this.#writePixelDataElementValue(
         writer, element, byteOffset, value, isImplicit);
     } else {
-      byteOffset = this.writeDataElementValue(
+      byteOffset = this.#writeDataElementValue(
         writer, element, byteOffset, value, isImplicit);
     }
 
@@ -691,7 +693,7 @@ export class DicomWriter {
         vl: 0,
         value: []
       };
-      byteOffset = this.writeDataElement(
+      byteOffset = this.#writeDataElement(
         writer, seqDelimElement, byteOffset, isImplicit);
     }
 
@@ -748,7 +750,7 @@ export class DicomWriter {
     for (let i = 0, leni = keys.length; i < leni; ++i) {
       const originalElement = dicomElements[keys[i]];
       originalElement.tag = getTagFromKey(keys[i]);
-      element = this.getElementToWrite(originalElement);
+      element = this.#getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
         !fmivTag.equals(element.tag) &&
@@ -764,7 +766,7 @@ export class DicomWriter {
         checkUnknownVR(element);
 
         // update value and vl
-        this.setElementValue(
+        this.#setElementValue(
           element, element.value, isImplicit, bitsAllocated);
 
         // tag group name
@@ -797,14 +799,14 @@ export class DicomWriter {
     // FileMetaInformationVersion
     const fmiv = getDicomElement('FileMetaInformationVersion');
     let fmivSize = getDataElementPrefixByteSize(fmiv.vr, false);
-    fmivSize += this.setElementValue(fmiv, [0, 1], false);
+    fmivSize += this.#setElementValue(fmiv, [0, 1], false);
     metaElements.push(fmiv);
     metaLength += fmivSize;
     totalSize += fmivSize;
     // ImplementationClassUID
     const icUID = getDicomElement('ImplementationClassUID');
     let icUIDSize = getDataElementPrefixByteSize(icUID.vr, false);
-    icUIDSize += this.setElementValue(
+    icUIDSize += this.#setElementValue(
       icUID, [getUID('ImplementationClassUID')], false);
     metaElements.push(icUID);
     metaLength += icUIDSize;
@@ -813,7 +815,7 @@ export class DicomWriter {
     const ivn = getDicomElement('ImplementationVersionName');
     let ivnSize = getDataElementPrefixByteSize(ivn.vr, false);
     const ivnValue = 'DWV_' + getDwvVersion();
-    ivnSize += this.setElementValue(ivn, [ivnValue], false);
+    ivnSize += this.#setElementValue(ivn, [ivnValue], false);
     metaElements.push(ivn);
     metaLength += ivnSize;
     totalSize += ivnSize;
@@ -828,7 +830,7 @@ export class DicomWriter {
     // create the FileMetaInformationGroupLength element
     const fmigl = getDicomElement('FileMetaInformationGroupLength');
     let fmiglSize = getDataElementPrefixByteSize(fmigl.vr, false);
-    fmiglSize += this.setElementValue(
+    fmiglSize += this.#setElementValue(
       fmigl, new Uint32Array([metaLength]), false);
     totalSize += fmiglSize;
 
@@ -839,12 +841,12 @@ export class DicomWriter {
 
     let offset = 128;
     // DICM
-    offset = metaWriter.writeUint8Array(offset, this.encodeString('DICM'));
+    offset = metaWriter.writeUint8Array(offset, this.#encodeString('DICM'));
     // FileMetaInformationGroupLength
-    offset = this.writeDataElement(metaWriter, fmigl, offset, false);
+    offset = this.#writeDataElement(metaWriter, fmigl, offset, false);
     // write meta
     for (let j = 0, lenj = metaElements.length; j < lenj; ++j) {
-      offset = this.writeDataElement(
+      offset = this.#writeDataElement(
         metaWriter, metaElements[j], offset, false);
     }
 
@@ -859,7 +861,7 @@ export class DicomWriter {
 
     // write non meta
     for (let k = 0, lenk = rawElements.length; k < lenk; ++k) {
-      offset = this.writeDataElement(
+      offset = this.#writeDataElement(
         dataWriter, rawElements[k], offset, isImplicit);
     }
 
@@ -882,7 +884,7 @@ export class DicomWriter {
    * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The total element size.
    */
-  setElementValue(
+  #setElementValue(
     element, value, isImplicit, bitsAllocated) {
     // byte size of the element
     let size = 0;
@@ -922,7 +924,7 @@ export class DicomWriter {
               continue;
             }
             // set item value
-            subSize += this.setElementValue(
+            subSize += this.#setElementValue(
               subElement, subElement.value, isImplicit, bitsAllocated);
             newItemElements[itemKey] = subElement;
             // add prefix size
@@ -976,11 +978,11 @@ export class DicomWriter {
         if (isStringVr(element.vr)) {
           let pad;
           if (charSetString.includes(element.vr)) {
-            value = this.encodeSpecialString(value.join('\\'));
-            pad = this.encodeSpecialString(padStr);
+            value = this.#encodeSpecialString(value.join('\\'));
+            pad = this.#encodeSpecialString(padStr);
           } else {
-            value = this.encodeString(value.join('\\'));
-            pad = this.encodeString(padStr);
+            value = this.#encodeString(value.join('\\'));
+            pad = this.#encodeString(padStr);
           }
           if (!isEven(value.length)) {
             value = uint8ArrayPush(value, pad);

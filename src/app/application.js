@@ -18,7 +18,13 @@ import {getTagFromKey} from '../dicom/dicomTag';
 import {toolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 
-/**An accessibility modifier cannot be used with a private identifier
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../gui/layerGroup';
+import {Image} from '../image/image';
+/* eslint-enable no-unused-vars */
+
+/**
  * Main application class.
  *
  * @example
@@ -460,17 +466,6 @@ export class App {
     if (typeof this.#options.binders !== 'undefined') {
       this.#stage.setBinders(this.#options.binders);
     }
-  }
-
-  /**
-   * Get a HTML element associated to the application.
-   *
-   * @param {string} _name The name or id to find.
-   * @returns {object} The found element or null.
-   * @deprecated
-   */
-  getElement(_name) {
-    return null;
   }
 
   /**

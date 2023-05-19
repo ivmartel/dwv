@@ -8,6 +8,11 @@ import {
   DeleteGroupCommand
 } from '../tools/drawCommands';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Index} from '../math/index';
+/* eslint-enable no-unused-vars */
+
 /**
  * Konva.
  *
@@ -223,6 +228,7 @@ export class DrawController {
     const groups = this.#konvaLayer.getChildren();
     for (let j = 0, lenj = groups.length; j < lenj; ++j) {
       const position = getIndexFromStringId(groups[j].id());
+      // @ts-ignore
       const collec = groups[j].getChildren();
       for (let i = 0, leni = collec.length; i < leni; ++i) {
         const shape = collec[i].getChildren(isNodeNameShape)[0];
@@ -275,6 +281,7 @@ export class DrawController {
     let posKids;
     let group;
     for (let i = 0, leni = posGroups.length; i < leni; ++i) {
+      // @ts-ignore
       posKids = posGroups[i].getChildren();
       for (let j = 0, lenj = posKids.length; j < lenj; ++j) {
         group = posKids[j];
@@ -336,6 +343,7 @@ export class DrawController {
         // the group when we change it)
         const stateGroup = statePosKids[0];
         // add group to posGroup (switches its parent)
+        // @ts-ignore
         posGroup.add(stateGroup);
         // shape
         const shape = stateGroup.getChildren(isNodeNameShape)[0];
@@ -379,11 +387,13 @@ export class DrawController {
       return;
     }
     // shape
+    // @ts-ignore
     const shapes = group.getChildren(isNodeNameShape);
     for (let i = 0; i < shapes.length; ++i) {
       shapes[i].stroke(drawDetails.color);
     }
     // shape extra
+    // @ts-ignore
     const shapesExtra = group.getChildren(isNodeNameShapeExtra);
     for (let j = 0; j < shapesExtra.length; ++j) {
       if (typeof shapesExtra[j].stroke() !== 'undefined') {
@@ -394,6 +404,7 @@ export class DrawController {
       }
     }
     // label
+    // @ts-ignore
     const label = group.getChildren(isNodeNameLabel)[0];
     const shadowColor = getShadowColour(drawDetails.color);
     const kids = label.getChildren();

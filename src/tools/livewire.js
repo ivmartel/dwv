@@ -8,6 +8,11 @@ import {ListenerHandler} from '../utils/listen';
 import {RoiFactory} from '../tools/roi';
 import {DrawGroupCommand} from '../tools/drawCommands';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Livewire painting tool.
  */

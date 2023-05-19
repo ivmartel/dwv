@@ -37,20 +37,20 @@ function onDOMContentLoaded() {
       now.getSeconds().toString().padStart(2, '0');
     // UID
     if (typeof tags.StudyInstanceUID === 'undefined') {
-      tags.StudyInstanceUID = dwv.dicom.getUID('StudyInstanceUID');
+      tags.StudyInstanceUID = dwv.getUID('StudyInstanceUID');
       tags.StudyID = 10000;
     }
     if (typeof tags.StudyDescription === 'undefined') {
       tags.StudyDescription = 'dwv generated data';
     }
     if (typeof tags.SeriesInstanceUID === 'undefined') {
-      tags.SeriesInstanceUID = dwv.dicom.getUID('SeriesInstanceUID');
+      tags.SeriesInstanceUID = dwv.getUID('SeriesInstanceUID');
       tags.SeriesNumber = tags.StudyID + 10;
     }
     if (typeof tags.SeriesDescription === 'undefined') {
       tags.SeriesDescription = 'Test data #0';
     }
-    tags.SOPInstanceUID = dwv.dicom.getUID('SOPInstanceUID');
+    tags.SOPInstanceUID = dwv.getUID('SOPInstanceUID');
     // write back
     document.getElementById('tags').value = JSON.stringify(tags, null, 2);
   }
@@ -145,7 +145,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
     spacing = tags.PixelSpacing[0];
   }
   const orientationName =
-    dwv.dicom.getOrientationName(tags.ImageOrientationPatient);
+    dwv.getOrientationName(tags.ImageOrientationPatient);
   if (orientationName === 'axial') {
     tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
   } else if (orientationName === 'coronal') {
@@ -157,13 +157,13 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
-  const dicomElements = dwv.dicom.getElementsFromJSONTags(tags);
+  const dicomElements = dwv.getElementsFromJSONTags(tags);
   // pixels
   dicomElements['7FE00010'] = test.generatePixelDataFromJSONTags(
     tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
 
   // create writer
-  const writer = new dwv.dicom.DicomWriter();
+  const writer = new dwv.DicomWriter();
   const dicomBuffer = writer.getBuffer(dicomElements);
 
   // view as Blob to allow download

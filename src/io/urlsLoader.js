@@ -211,6 +211,35 @@ export class UrlsLoader {
   }
 
   /**
+   * Get a load handler for a data element.
+   *
+   * @param {object} loader The associated loader.
+   * @param {object} dataElement The data element.
+   * @param {number} i The index of the element.
+   * @returns {eventFn} A load handler.
+   */
+  #getLoadHandler(loader, dataElement, i) {
+    return (event) => {
+      // check response status
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+      // status 200: "OK"; status 0: "debug"
+      const status = event.target.status;
+      if (status !== 200 && status !== 0) {
+        this.onerror({
+          source: dataElement,
+          error: 'GET ' + event.target.responseURL +
+            ' ' + event.target.status +
+            ' (' + event.target.statusText + ')',
+          target: event.target
+        });
+        this.#addLoadend();
+      } else {
+        loader.load(event.target.response, dataElement, i);
+      }
+    };
+  }
+
+  /**
    * Load a list of urls.
    *
    * @param {Array} data The list of urls to load.
@@ -269,27 +298,6 @@ export class UrlsLoader {
       throw new Error('No loader found for url: ' + dataElement);
     }
 
-    const getLoadHandler = function (loader, dataElement, i) {
-      return (event) => {
-        // check response status
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-        // status 200: "OK"; status 0: "debug"
-        const status = event.target.status;
-        if (status !== 200 && status !== 0) {
-          this.onerror({
-            source: dataElement,
-            error: 'GET ' + event.target.responseURL +
-              ' ' + event.target.status +
-              ' (' + event.target.statusText + ')',
-            target: event.target
-          });
-          this.#addLoadend();
-        } else {
-          loader.load(event.target.response, dataElement, i);
-        }
-      };
-    };
-
     // store last run request index
     let lastRunRequestIndex = 0;
     const requestOnLoadEnd = () => {
@@ -342,7 +350,7 @@ export class UrlsLoader {
       // request.onloadstart: nothing to do
       request.onprogress = this.#augmentCallbackEvent(
         mproghandler.getMonoProgressHandler(i, 0), dataElement);
-      request.onload = getLoadHandler(loader, dataElement, i);
+      request.onload = this.#getLoadHandler(loader, dataElement, i);
       request.onloadend = requestOnLoadEnd;
       request.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
       request.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);

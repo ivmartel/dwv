@@ -2,6 +2,11 @@ import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {precisionRound} from '../utils/string';
 import {ScrollWheel} from './scrollWheel';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Scroll class.
  *
@@ -224,6 +229,7 @@ export class Scroll {
    */
   touchstart = (event) => {
     // long touch triggers the dblclick
+    // @ts-ignore
     this.#touchTimerID = setTimeout(this.dblclick, 500);
     // call mouse equivalent
     this.mousedown(event);

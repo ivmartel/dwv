@@ -13,33 +13,35 @@ function computeGreyscale(data, width, height) {
   // Returns 2D augmented array containing greyscale data
   // Greyscale values found by averaging colour channels
   // Input should be in a flat RGBA array, with values between 0 and 255
-  const greyscale = {};
+  const greyscale = {
+    data: []
+  };
 
   // Compute actual values
   for (let y = 0; y < height; y++) {
-    greyscale[y] = [];
+    greyscale.data[y] = [];
 
     for (let x = 0; x < width; x++) {
       const p = (y * width + x) * 4;
-      greyscale[y][x] = (data[p] + data[p + 1] + data[p + 2]) / (3 * 255);
+      greyscale.data[y][x] = (data[p] + data[p + 1] + data[p + 2]) / (3 * 255);
     }
   }
 
   // Augment with convenience functions
   greyscale.dx = function (x, y) {
-    if (x + 1 === this[y].length) {
+    if (x + 1 === this.data[y].length) {
       // If we're at the end, back up one
       x--;
     }
-    return this[y][x + 1] - this[y][x];
+    return this.data[y][x + 1] - this.data[y][x];
   };
 
   greyscale.dy = function (x, y) {
-    if (y + 1 === this.length) {
+    if (y + 1 === this.data.length) {
       // If we're at the end, back up one
       y--;
     }
-    return this[y][x] - this[y + 1][x];
+    return this.data[y][x] - this.data[y + 1][x];
   };
 
   greyscale.gradMagnitude = function (x, y) {
@@ -50,13 +52,19 @@ function computeGreyscale(data, width, height) {
 
   greyscale.laplace = function (x, y) {
     // Laplacian of Gaussian
-    let lap = -16 * this[y][x];
-    lap += this[y - 2][x];
-    lap += this[y - 1][x - 1] + 2 * this[y - 1][x] + this[y - 1][x + 1];
-    lap += this[y][x - 2] +
-      2 * this[y][x - 1] + 2 * this[y][x + 1] + this[y][x + 2];
-    lap += this[y + 1][x - 1] + 2 * this[y + 1][x] + this[y + 1][x + 1];
-    lap += this[y + 2][x];
+    let lap = -16 * this.data[y][x];
+    lap += this.data[y - 2][x];
+    lap += this.data[y - 1][x - 1] +
+      2 * this.data[y - 1][x] +
+      this.data[y - 1][x + 1];
+    lap += this.data[y][x - 2] +
+      2 * this.data[y][x - 1] +
+      2 * this.data[y][x + 1] +
+      this.data[y][x + 2];
+    lap += this.data[y + 1][x - 1] +
+      2 * this.data[y + 1][x] +
+      this.data[y + 1][x + 1];
+    lap += this.data[y + 2][x];
 
     return lap;
   };
@@ -79,25 +87,28 @@ function computeGradient(greyscale) {
   let x = 0;
   let y = 0;
 
-  for (y = 0; y < greyscale.length - 1; y++) {
+  for (y = 0; y < greyscale.data.length - 1; y++) {
     gradient[y] = [];
 
-    for (x = 0; x < greyscale[y].length - 1; x++) {
+    for (x = 0; x < greyscale.data[y].length - 1; x++) {
       gradient[y][x] = greyscale.gradMagnitude(x, y);
       max = Math.max(gradient[y][x], max);
     }
 
-    gradient[y][greyscale[y].length - 1] = gradient[y][greyscale.length - 2];
+    gradient[y][greyscale.data[y].length - 1] =
+      gradient[y][greyscale.data.length - 2];
   }
 
-  gradient[greyscale.length - 1] = [];
+  gradient[greyscale.data.length - 1] = [];
   for (let i = 0; i < gradient[0].length; i++) {
-    gradient[greyscale.length - 1][i] = gradient[greyscale.length - 2][i];
+    gradient[greyscale.data.length - 1][i] =
+      gradient[greyscale.data.length - 2][i];
   }
 
   // Flip and scale.
   for (y = 0; y < gradient.length; y++) {
     for (x = 0; x < gradient[y].length; x++) {
+      // @ts-ignore
       gradient[y][x] = 1 - (gradient[y][x] / max);
     }
   }
@@ -117,34 +128,34 @@ function computeLaplace(greyscale) {
 
   laplace[0] = [];
   laplace[1] = [];
-  for (let i = 1; i < greyscale.length; i++) {
+  for (let i = 1; i < greyscale.data.length; i++) {
     // Pad top, since we can't compute Laplacian
     laplace[0][i] = 1;
     laplace[1][i] = 1;
   }
 
-  for (let y = 2; y < greyscale.length - 2; y++) {
+  for (let y = 2; y < greyscale.data.length - 2; y++) {
     laplace[y] = [];
     // Pad left, ditto
     laplace[y][0] = 1;
     laplace[y][1] = 1;
 
-    for (let x = 2; x < greyscale[y].length - 2; x++) {
+    for (let x = 2; x < greyscale.data[y].length - 2; x++) {
       // Threshold needed to get rid of clutter.
       laplace[y][x] = (greyscale.laplace(x, y) > 0.33) ? 0 : 1;
     }
 
     // Pad right, ditto
-    laplace[y][greyscale[y].length - 2] = 1;
-    laplace[y][greyscale[y].length - 1] = 1;
+    laplace[y][greyscale.data[y].length - 2] = 1;
+    laplace[y][greyscale.data[y].length - 1] = 1;
   }
 
-  laplace[greyscale.length - 2] = [];
-  laplace[greyscale.length - 1] = [];
-  for (let j = 1; j < greyscale.length; j++) {
+  laplace[greyscale.data.length - 2] = [];
+  laplace[greyscale.data.length - 1] = [];
+  for (let j = 1; j < greyscale.data.length; j++) {
     // Pad bottom, ditto
-    laplace[greyscale.length - 2][j] = 1;
-    laplace[greyscale.length - 1][j] = 1;
+    laplace[greyscale.data.length - 2][j] = 1;
+    laplace[greyscale.data.length - 1][j] = 1;
   }
 
   return laplace;
@@ -160,14 +171,15 @@ function computeGradX(greyscale) {
   // Returns 2D array of x-gradient values for greyscale
   const gradX = [];
 
-  for (let y = 0; y < greyscale.length; y++) {
+  for (let y = 0; y < greyscale.data.length; y++) {
     gradX[y] = [];
 
-    for (let x = 0; x < greyscale[y].length - 1; x++) {
+    for (let x = 0; x < greyscale.data[y].length - 1; x++) {
       gradX[y][x] = greyscale.dx(x, y);
     }
 
-    gradX[y][greyscale[y].length - 1] = gradX[y][greyscale[y].length - 2];
+    gradX[y][greyscale.data[y].length - 1] =
+      gradX[y][greyscale.data[y].length - 2];
   }
 
   return gradX;
@@ -183,17 +195,17 @@ function computeGradY(greyscale) {
   // Returns 2D array of y-gradient values for greyscale
   const gradY = [];
 
-  for (let y = 0; y < greyscale.length - 1; y++) {
+  for (let y = 0; y < greyscale.data.length - 1; y++) {
     gradY[y] = [];
 
-    for (let x = 0; x < greyscale[y].length; x++) {
+    for (let x = 0; x < greyscale.data[y].length; x++) {
       gradY[y][x] = greyscale.dy(x, y);
     }
   }
 
-  gradY[greyscale.length - 1] = [];
-  for (let i = 0; i < greyscale[0].length; i++) {
-    gradY[greyscale.length - 1][i] = gradY[greyscale.length - 2][i];
+  gradY[greyscale.data.length - 1] = [];
+  for (let i = 0; i < greyscale.data[0].length; i++) {
+    gradY[greyscale.data.length - 1][i] = gradY[greyscale.data.length - 2][i];
   }
 
   return gradY;
@@ -262,7 +274,7 @@ function gradDirection(gradX, gradY, px, py, qx, qy) {
  * @param {number} dist The distance.
  * @param {Array} gradX The X gradient.
  * @param {Array} gradY The Y gradient.
- * @param {number} greyscale The value.
+ * @param {object} greyscale The value.
  * @returns {object} The sides.
  */
 function computeSides(dist, gradX, gradY, greyscale) {
@@ -296,8 +308,8 @@ function computeSides(dist, gradX, gradY, greyscale) {
       iy = Math.max(Math.min(iy, gradX.length - 1), 0);
       oy = Math.max(Math.min(oy, gradX.length - 1), 0);
 
-      sides.inside[y][x] = greyscale[iy][ix];
-      sides.outside[y][x] = greyscale[oy][ox];
+      sides.inside[y][x] = greyscale.data[iy][ix];
+      sides.outside[y][x] = greyscale.data[oy][ox];
     }
   }
 
@@ -543,7 +555,7 @@ export class Scissors {
     if (this.trained) {
       // Apply training magic
       const gradT = this.getTrainedGrad(grad);
-      const edgeT = this.getTrainedEdge(this.greyscale[py][px]);
+      const edgeT = this.getTrainedEdge(this.greyscale.data[py][px]);
       const insideT = this.getTrainedInside(this.inside[py][px]);
       const outsideT = this.getTrainedOutside(this.outside[py][px]);
 
@@ -559,8 +571,8 @@ export class Scissors {
 
     const sx = Math.max(p.x - 1, 0);
     const sy = Math.max(p.y - 1, 0);
-    const ex = Math.min(p.x + 1, this.greyscale[0].length - 1);
-    const ey = Math.min(p.y + 1, this.greyscale.length - 1);
+    const ex = Math.min(p.x + 1, this.greyscale.data[0].length - 1);
+    const ey = Math.min(p.y + 1, this.greyscale.data.length - 1);
 
     let idx = 0;
     for (let y = sy; y <= ey; y++) {
@@ -573,6 +585,10 @@ export class Scissors {
 
     return list;
   }
+
+  #costFunction = (p) => {
+    return Math.round(this.searchGran * this.cost[p.y][p.x]);
+  };
 
   setPoint(sp) {
     this.setWorking(true);
@@ -602,15 +618,10 @@ export class Scissors {
         this.cost[y][x] = Number.MAX_VALUE;
       }
     }
-
-    this.pq = new BucketQueue(this.searchGranBits, function (p) {
-      return Math.round(this.searchGran * this.costArr[p.y][p.x]);
-    });
-    this.pq.searchGran = this.searchGran;
-    this.pq.costArr = this.cost;
-
-    this.pq.push(sp);
     this.cost[sp.y][sp.x] = 0;
+
+    this.pq = new BucketQueue(this.searchGranBits, this.#costFunction);
+    this.pq.push(sp);
   }
 
   doWork() {

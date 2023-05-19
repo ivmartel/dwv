@@ -66,16 +66,13 @@ export class RawVideoLoader {
     } else {
       video.src = buffer;
     }
-    // storing values to pass them on
-    video.file = origin;
-    video.index = index;
     // onload handler
     video.onloadedmetadata = (event) => {
       try {
         getViewFromDOMVideo(event.target,
           this.onloaditem, this.onload,
           this.onprogress, this.onloadend,
-          index, origin);
+          origin, index);
       } catch (error) {
         this.onerror({
           error: error,

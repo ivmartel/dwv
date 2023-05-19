@@ -5,6 +5,11 @@ import {
   Sharpen as SharpenFilter
 } from '../image/filter';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Filter tool.
  */

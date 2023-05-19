@@ -1,3 +1,8 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {RescaleSlopeAndIntercept} from './rsi';
+/* eslint-enable no-unused-vars */
+
 /**
  * Rescale LUT class.
  * Typically converts from integer to float.
@@ -44,7 +49,7 @@ export class RescaleLut {
   /**
    * Get the Rescale Slope and Intercept (RSI).
    *
-   * @returns {object} The rescale slope and intercept object.
+   * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
    */
   getRSI() {
     return this.#rsi;

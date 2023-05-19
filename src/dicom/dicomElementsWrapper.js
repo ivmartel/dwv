@@ -17,6 +17,11 @@ import {isNativeLittleEndian} from './dataReader';
 import {Spacing} from '../image/spacing';
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Tag} from './dicomTag';
+/* eslint-enable no-unused-vars */
+
 /**
  * DicomElements wrapper.
  *

@@ -124,7 +124,8 @@ export class ArrowFactory {
     textExpr = defaultArrowLabelText;
     // }
     ktext.setText(textExpr);
-    // meta data
+    // augment text with meta data
+    // @ts-ignore
     ktext.meta = {
       textExpr: textExpr,
       quantification: {}

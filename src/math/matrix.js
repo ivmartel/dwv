@@ -3,12 +3,10 @@ import {Point3D} from './point';
 import {Index} from './index';
 import {logger} from '../utils/logger';
 
-// difference between 1 and the smallest floating point number greater than 1
+// Number.EPSILON is difference between 1 and the smallest
+// floating point number greater than 1
 // -> ~2e-16
-if (typeof Number.EPSILON === 'undefined') {
-  Number.EPSILON = Math.pow(2, -52);
-}
-// -> ~2e-12
+// BIG_EPSILON -> ~2e-12
 export const BIG_EPSILON = Number.EPSILON * 1e4;
 // 'real world', for example when comparing positions
 export const REAL_WORLD_EPSILON = 1e-4;
@@ -18,7 +16,7 @@ export const REAL_WORLD_EPSILON = 1e-4;
  *
  * @param {number} a The first number.
  * @param {number} b The second number.
- * @param {number} tol The comparison tolerance
+ * @param {number} tol The comparison tolerance,
  *   default to Number.EPSILON.
  * @returns {boolean} True if similar.
  */

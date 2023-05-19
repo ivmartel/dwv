@@ -1,6 +1,11 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ScrollWheel} from './scrollWheel';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * Opacity class.
  *

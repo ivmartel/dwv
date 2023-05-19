@@ -79,8 +79,6 @@ then
   info "(2/4) create build"
 
   yarn run build
-  # copy build to dist
-  cp build/dist/*.js dist
 
   ((step++))
 fi

@@ -100,7 +100,8 @@ export class CircleFactory {
       viewController,
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
-    // meta data
+    // augment text with meta data
+    // @ts-ignore
     ktext.meta = {
       textExpr: textExpr,
       quantification: quant

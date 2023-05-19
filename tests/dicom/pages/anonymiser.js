@@ -37,7 +37,7 @@ let _dicomElements = null;
  */
 function onLoadDICOMFile(event) {
   // parse DICOM
-  const parser = new dwv.dicom.DicomParser();
+  const parser = new dwv.DicomParser();
   parser.parse(event.target.result);
   // store elements
   _dicomElements = parser.getDicomElements();
@@ -55,7 +55,7 @@ function generate() {
     return;
   }
   // create writer with textarea rules
-  const writer = new dwv.dicom.DicomWriter();
+  const writer = new dwv.DicomWriter();
   writer.setRules(JSON.parse(document.getElementById('rules').value));
   let dicomBuffer = null;
   try {

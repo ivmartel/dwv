@@ -65,11 +65,13 @@ function getDefaultImage(
 /**
  * Get data from an input image using a canvas.
  *
- * @param {object} domImage The DOM Image, an HTMLImageElement with extra info.
- * @param {object} origin The data origin.
+ * @param {HTMLImageElement} domImage The DOM Image,
+ *   an HTMLImageElement with extra info.
+ * @param {string|File} origin The data origin.
+ * @param {number} index The data index.
  * @returns {object} A load data event.
  */
-export function getViewFromDOMImage(domImage, origin) {
+export function getViewFromDOMImage(domImage, origin, index) {
   // image size
   const width = domImage.width;
   const height = domImage.height;
@@ -85,23 +87,23 @@ export function getViewFromDOMImage(domImage, origin) {
 
   // image properties
   const info = {};
-  if (typeof domImage.origin === 'string') {
-    info['origin'] = {value: domImage.origin};
+  if (typeof origin === 'string') {
+    info['origin'] = {value: origin};
   } else {
-    info['fileName'] = {value: domImage.origin.name};
-    info['fileType'] = {value: domImage.origin.type};
-    info['fileLastModifiedDate'] = {value: domImage.origin.lastModifiedDate};
+    info['fileName'] = {value: origin.name};
+    info['fileType'] = {value: origin.type};
+    info['fileLastModifiedDate'] = {value: origin.lastModified};
   }
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
 
-  const sliceIndex = domImage.index ? domImage.index : 0;
+  const sliceIndex = index ? index : 0;
   info['imageUid'] = {value: sliceIndex};
 
   // create view
   const imageBuffer = imageDataToBuffer(imageData);
   const image = getDefaultImage(
-    width, height, sliceIndex, imageBuffer, 1, sliceIndex);
+    width, height, sliceIndex, imageBuffer, 1, sliceIndex.toString());
 
   // return
   return {
@@ -121,12 +123,12 @@ export function getViewFromDOMImage(domImage, origin) {
  * @param {object} onload The function to call once the data is loaded.
  * @param {object} onprogress The function to call to report progress.
  * @param {object} onloadend The function to call to report load end.
- * @param {string} dataIndex The data index.
- * @param {object} origin The data origin.
+ * @param {string|File} origin The data origin.
+ * @param {number} dataIndex The data index.
  */
 export function getViewFromDOMVideo(
   video, onloaditem, onload, onprogress, onloadend,
-  dataIndex, origin) {
+  origin, dataIndex) {
   // video size
   const width = video.videoWidth;
   const height = video.videoHeight;
@@ -138,10 +140,12 @@ export function getViewFromDOMVideo(
 
   // video properties
   const info = {};
-  if (video.file) {
-    info['fileName'] = {value: video.file.name};
-    info['fileType'] = {value: video.file.type};
-    info['fileLastModifiedDate'] = {value: video.file.lastModifiedDate};
+  if (typeof origin === 'string') {
+    info['origin'] = {value: origin};
+  } else {
+    info['fileName'] = {value: origin.name};
+    info['fileType'] = {value: origin.type};
+    info['fileLastModifiedDate'] = {value: origin.lastModified};
   }
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
@@ -182,7 +186,7 @@ export function getViewFromDOMVideo(
     if (frameIndex === 0) {
       // create view
       image = getDefaultImage(
-        width, height, 1, imgBuffer, numberOfFrames, dataIndex);
+        width, height, 1, imgBuffer, numberOfFrames, dataIndex.toString());
       // call callback
       onloaditem({
         data: {

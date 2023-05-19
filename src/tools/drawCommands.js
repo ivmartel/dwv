@@ -1,6 +1,12 @@
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Style} from '../gui/style';
+import {ViewController} from '../app/viewController';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the display name of the input shape.
  *

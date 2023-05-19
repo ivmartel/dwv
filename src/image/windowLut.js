@@ -1,3 +1,9 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {RescaleLut} from './rescaleLut';
+import {WindowLevel} from './windowLevel';
+/* eslint-enable no-unused-vars */
+
 /**
  * Window LUT class.
  * Typically converts from float to integer.
@@ -76,7 +82,7 @@ export class WindowLut {
   /**
    * Get the rescale lut.
    *
-   * @returns {object} The rescale lut.
+   * @returns {RescaleLut} The rescale lut.
    */
   getRescaleLut() {
     return this.#rescaleLut;

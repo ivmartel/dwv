@@ -23,6 +23,13 @@ import {ShapeEditor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+import {Style} from '../gui/style';
+import {LayerGroup} from '../gui/layerGroup';
+/* eslint-enable no-unused-vars */
+
 /**
  * Draw Debug flag.
  */

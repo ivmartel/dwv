@@ -123,7 +123,8 @@ export class ProtractorFactory {
         }
       };
       ktext.setText(replaceFlags(textExpr, quant));
-      // meta data
+      // augment text with meta
+      // @ts-ignore
       ktext.meta = {
         textExpr: textExpr,
         quantification: quant

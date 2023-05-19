@@ -37,7 +37,7 @@ export class RawImageLoader {
   /**
    * Create a Data URI from an HTTP request response.
    *
-   * @param {object} response The HTTP request response.
+   * @param {ArrayBuffer} response The HTTP request response.
    * @param {string} dataType The data type.
    * @returns {string} The data URI.
    */
@@ -55,8 +55,8 @@ export class RawImageLoader {
   /**
    * Load data.
    *
-   * @param {ArrayBuffer} buffer The read data.
-   * @param {string} origin The data origin.
+   * @param {ArrayBuffer|string} buffer The read data.
+   * @param {string|File} origin The data origin.
    * @param {number} index The data index.
    */
   load(buffer, origin, index) {
@@ -64,7 +64,7 @@ export class RawImageLoader {
     // create a DOM image
     const image = new Image();
     // triggered by ctx.drawImage
-    image.onload = (event) => {
+    image.onload = (/*event*/) => {
       try {
         if (!this.#aborted) {
           this.onprogress({
@@ -74,7 +74,7 @@ export class RawImageLoader {
             index: index,
             source: origin
           });
-          const data = getViewFromDOMImage(event.target, origin);
+          const data = getViewFromDOMImage(image, origin, index);
           // only expecting one item
           this.onloaditem(data);
           this.onload(data);
@@ -91,14 +91,13 @@ export class RawImageLoader {
       }
     };
     // storing values to pass them on
-    image.origin = origin;
-    image.index = index;
-    if (typeof origin === 'string') {
+    if (typeof buffer === 'string') {
+      // file case
+      image.src = buffer;
+    } else if (typeof origin === 'string') {
       // url case
       const ext = origin.split('.').pop().toLowerCase();
       image.src = this.#createDataUri(buffer, ext);
-    } else {
-      image.src = buffer;
     }
   }
 

@@ -5,6 +5,11 @@
  */
 const MinWindowWidth = 1;
 
+/**
+ * List of default window level presets.
+ *
+ * @type {{[key: string]: {[key: string]: {center: number, width: number}}}}
+ */
 export const defaultPresets = {
   CT: {
     mediastinum: {center: 40, width: 400},
@@ -198,7 +203,7 @@ export class WindowLevel {
   /**
    * Check for window level equality.
    *
-   * @param {object} rhs The other window level to compare to.
+   * @param {WindowLevel} rhs The other window level to compare to.
    * @returns {boolean} True if both window level are equal.
    */
   equals(rhs) {

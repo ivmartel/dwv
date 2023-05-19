@@ -9,8 +9,8 @@ module.exports = merge(common, {
     open: '/tests',
     static: [
       {
-        directory: './build/dist',
-        publicPath: '/build/dist'
+        directory: './dist',
+        publicPath: '/dist'
       },
       {
         directory: './tests',

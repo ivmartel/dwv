@@ -120,7 +120,7 @@ test.generatePixelDataFromJSONTags = function (
   }
 
   // create pixel array
-  const pixels = dwv.dicom.getTypedArray(
+  const pixels = dwv.getTypedArray(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
@@ -151,7 +151,7 @@ test.generatePixelDataFromJSONTags = function (
   }
   const pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    tag: dwv.dicom.getPixelDataTag(),
+    tag: dwv.getPixelDataTag(),
     vr: vr,
     vl: pixVL,
     value: pixels
