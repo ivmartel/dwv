@@ -62,6 +62,6 @@
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "gren": "gren",
     "types": "tsc -p tsconfig.json",
-    "api": "api-extractor run --local --verbose"
+    "api": "api-extractor run --local"
   }
 }
