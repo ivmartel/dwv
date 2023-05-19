@@ -61,11 +61,11 @@ then
   sed -i "s/${a2}/${b2}/g" $fileName
 fi
 
-if [ "$(grep -c "    '../../decoders" $fileName)" -eq 4 ]
+if [ "$(grep -c "'../../decoders/" $fileName)" -eq 4 ]
 then
   info "Move to local decoders"
   # change path to decoders
-  a4=": '..\/..\/decoders\/"
-  b4=": '.\/decoders\/"
+  a4="'..\/..\/decoders\/"
+  b4="'.\/decoders\/"
   sed -i "s/${a4}/${b4}/g" $fileName
 fi
