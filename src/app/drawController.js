@@ -8,6 +8,11 @@ import {
   DeleteGroupCommand
 } from '../tools/drawCommands';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Index} from '../math/index';
+/* eslint-enable no-unused-vars */
+
 /**
  * Konva.
  *
@@ -15,13 +20,6 @@ import {
  * @see https://konvajs.org/
  */
 import Konva from 'konva';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Index} from '../math/index';
-import {Group} from 'konva/lib/Group';
-import {Shape} from 'konva/lib/Shape';
-/* eslint-enable no-unused-vars */
 
 /**
  * Is an input node's name 'shape'.
