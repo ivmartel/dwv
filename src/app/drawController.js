@@ -391,7 +391,6 @@ export class DrawController {
     // shape
     // @ts-ignore
     const shapes = group.getChildren(isNodeNameShape);
-    console.log('shapes', shapes);
     for (let i = 0; i < shapes.length; ++i) {
       shapes[i].stroke(drawDetails.color);
     }
