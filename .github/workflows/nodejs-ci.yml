@@ -50,6 +50,7 @@ jobs:
         ALL=/*
         git config user.email github-actions@github.com
         git config user.name github-actions
+        git checkout .
         git checkout gh-pages
         rm -Rf $DEPLOY_DIR$ALL
         cp -Rf ./build/demo/* $DEPLOY_DIR
