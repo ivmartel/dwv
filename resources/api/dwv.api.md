@@ -76,47 +76,15 @@ export const decoderScripts: {
     rle: string;
 };
 
-// @public (undocumented)
-export namespace defaultPresets {
-    // (undocumented)
-    export namespace CT {
-        // (undocumented)
-        export namespace bone {
-            const // (undocumented)
+// @public
+export const defaultPresets: {
+    [key: string]: {
+        [key: string]: {
             center: number;
-            const // (undocumented)
             width: number;
-        }
-        // (undocumented)
-        export namespace brain {
-            const // (undocumented)
-            center: number;
-            const // (undocumented)
-            width: number;
-        }
-        // (undocumented)
-        export namespace head {
-            const // (undocumented)
-            center: number;
-            const // (undocumented)
-            width: number;
-        }
-        // (undocumented)
-        export namespace lung {
-            const // (undocumented)
-            center: number;
-            const // (undocumented)
-            width: number;
-        }
-        // (undocumented)
-        export namespace mediastinum {
-            const // (undocumented)
-            center: number;
-            const // (undocumented)
-            width: number;
-        }
-    }
-}
+        };
+    };
+};
 
 // @public
 export class DicomParser {
@@ -5558,108 +5526,32 @@ export function loadFromUri(uri: string, app: App, options?: object): void;
 
 // @public (undocumented)
 export namespace logger {
-    // (undocumented)
-    export function debug(msg: string): void;
+    const // (undocumented)
+    levels: {
+        [key: string]: number;
+    };
     const // (undocumented)
     level: number;
+    // (undocumented)
+    export function debug(msg: string): void;
     // (undocumented)
     export function error(msg: string): void;
     // (undocumented)
     export function info(msg: string): void;
-    // (undocumented)
-    export namespace levels {
-        const // (undocumented)
-        TRACE: number;
-        const // (undocumented)
-        DEBUG: number;
-        const // (undocumented)
-        INFO: number;
-        const // (undocumented)
-        WARN: number;
-        const // (undocumented)
-        ERROR: number;
-    }
     // (undocumented)
     export function trace(msg: string): void;
     // (undocumented)
     export function warn(msg: string): void;
 }
 
-// @public (undocumented)
-export namespace lut {
-    // (undocumented)
-    export namespace hot {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace hot_iron {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace hot_metal_blue {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace invPlain {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace pet {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace pet_20step {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace plain {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-    // (undocumented)
-    export namespace rainbow {
-        const // (undocumented)
-        red: any[];
-        const // (undocumented)
-        green: any[];
-        const // (undocumented)
-        blue: any[];
-    }
-}
+// @public
+export const lut: {
+    [key: string]: {
+        red: number[];
+        green: number[];
+        blue: number[];
+    };
+};
 
 // @public
 export class Matrix33 {
