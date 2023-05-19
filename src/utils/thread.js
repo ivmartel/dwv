@@ -229,9 +229,11 @@ class WorkerThread {
    */
   stop() {
     // stop the worker
-    this.worker.terminate();
-    // force create at next run
-    this.worker = undefined;
+    if (typeof this.worker !== 'undefined') {
+      this.worker.terminate();
+      // force create at next run
+      this.worker = undefined;
+    }
   }
 
   /**
