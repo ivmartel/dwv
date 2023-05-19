@@ -49,7 +49,7 @@ export class RescaleLut {
   /**
    * Get the Rescale Slope and Intercept (RSI).
    *
-   * @returns {object} The rescale slope and intercept object.
+   * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
    */
   getRSI() {
     return this.#rsi;

@@ -65,7 +65,7 @@ export class RescaleSlopeAndIntercept {
   /**
    * Check for RSI equality.
    *
-   * @param {object} rhs The other RSI to compare to.
+   * @param {RescaleSlopeAndIntercept} rhs The other RSI to compare to.
    * @returns {boolean} True if both RSI are equal.
    */
   equals(rhs) {
