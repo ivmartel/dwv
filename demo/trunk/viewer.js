@@ -18,17 +18,17 @@ function viewerSetup() {
   // logger level (optional)
   dwv.logger.level = dwv.logger.levels.WARN;
 
-  dwv.image.decoderScripts.jpeg2000 =
+  dwv.decoderScripts.jpeg2000 =
     '../../decoders/pdfjs/decode-jpeg2000.js';
-  dwv.image.decoderScripts['jpeg-lossless'] =
+  dwv.decoderScripts['jpeg-lossless'] =
     '../../decoders/rii-mango/decode-jpegloss.js';
-  dwv.image.decoderScripts['jpeg-baseline'] =
+  dwv.decoderScripts['jpeg-baseline'] =
     '../../decoders/pdfjs/decode-jpegbaseline.js';
-  dwv.image.decoderScripts.rle =
+  dwv.decoderScripts.rle =
     '../../decoders/dwv/decode-rle.js';
 
   // // example private logic for time value retrieval
-  // dwv.dicom.TagValueExtractor.prototype.getTime = function (elements) {
+  // dwv.TagValueExtractor.prototype.getTime = function (elements) {
   //   let value;
   //   const time = elements['ABCD0123'];
   //   if (typeof time !== 'undefined') {
@@ -192,7 +192,7 @@ function viewerSetup() {
         const segImage = _app.getImage(event.loadid);
         // calculate slice difference
         const segOrigin0 = segImage.getGeometry().getOrigins()[0];
-        const segOrigin0Point = new dwv.math.Point([
+        const segOrigin0Point = new dwv.Point([
           segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
         ]);
         const segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
@@ -274,7 +274,7 @@ function viewerSetup() {
     }];
   }
   // load from window location
-  dwv.utils.loadFromUri(window.location.href, _app, options);
+  dwv.loadFromUri(window.location.href, _app, options);
 }
 
 /**
@@ -289,7 +289,7 @@ function onDOMContentLoaded() {
     const vls = _app.getViewLayersByDataIndex(0);
     const vc = vls[0].getViewController();
     const values = this.value.split(',');
-    vc.setCurrentPosition(new dwv.math.Point([
+    vc.setCurrentPosition(new dwv.Point([
       parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
     ])
     );
@@ -915,7 +915,7 @@ function sortByPosPatKey(obj) {
  */
 function getPrecisionRound(precision) {
   return function (x) {
-    return dwv.utils.precisionRound(x, precision);
+    return dwv.precisionRound(x, precision);
   };
 }
 
