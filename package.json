@@ -55,13 +55,14 @@
   },
   "scripts": {
     "start": "webpack serve --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js",
+    "pack": "webpack --config webpack.prod.js",
+    "build": "yarn run pack && yarn run types && yarn run api",
     "lint": "eslint -c '.eslint-full.js' 'src/**/*.js' 'tests/**/*.js' '*.js'",
     "test": "karma start ./karma.conf.js",
     "test-ci": "karma start ./karma.conf.js --browsers ChromeHeadless --reporters progress,coverage --single-run",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "gren": "gren",
     "types": "tsc -p tsconfig.json",
-    "api": "api-extractor run --local"
+    "api": "api-extractor run -c api-extractor.json"
   }
 }
