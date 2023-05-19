@@ -1,4 +1,4 @@
-/**An accessibility modifier cannot be used with a private identifier
+/**
  * Main application class.
  *
  * @example
@@ -451,30 +451,19 @@ export declare const decoderScripts: {
     rle: string;
 };
 
-export declare namespace defaultPresets {
-    export namespace CT {
-        export namespace mediastinum {
-            const center: number;
-            const width: number;
-        }
-        export namespace lung {
-            const center: number;
-            const width: number;
-        }
-        export namespace bone {
-            const center: number;
-            const width: number;
-        }
-        export namespace brain {
-            const center: number;
-            const width: number;
-        }
-        export namespace head {
-            const center: number;
-            const width: number;
-        }
-    }
-}
+/**
+ * List of default window level presets.
+ *
+ * @type {{[key: string]: {[key: string]: {center: number, width: number}}}}
+ */
+export declare const defaultPresets: {
+    [key: string]: {
+        [key: string]: {
+            center: number;
+            width: number;
+        };
+    };
+};
 
 /**
  * DicomParser class.
@@ -6302,10 +6291,10 @@ export declare function getUriQuery(uri: string): object;
 declare class Image_2 {
     /**
      * @param {Geometry} geometry The geometry of the image.
-     * @param {Array} buffer The image data as a one dimensional buffer.
+     * @param {TypedArray} buffer The image data as a one dimensional buffer.
      * @param {Array} [imageUids] An array of Uids indexed to slice number.
      */
-    constructor(geometry: Geometry, buffer: any[], imageUids?: any[]);
+    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: any[]);
     /**
      * Get the image UID at a given index.
      *
@@ -6323,9 +6312,9 @@ declare class Image_2 {
      * Get the data buffer of the image.
      *
      * @todo dangerous...
-     * @returns {Array} The data buffer of the image.
+     * @returns {TypedArray} The data buffer of the image.
      */
-    getBuffer(): any[];
+    getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
     /**
      * Can the image values be quantified?
      *
@@ -6613,10 +6602,10 @@ declare class Image_2 {
      * Note: Uses raw buffer values.
      *
      * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
-     * @param {Array} buffer The buffer to convolute.
+     * @param {TypedArray} buffer The buffer to convolute.
      * @param {number} startOffset The index to start at.
      */
-    convoluteBuffer(weights: any[], buffer: any[], startOffset: number): void;
+    convoluteBuffer(weights: any[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     /**
      * Transform an image using a specific operator.
      * WARNING: no size check!
@@ -7013,48 +7002,18 @@ export declare namespace logger {
     export function error(msg: string): void;
 }
 
-export declare namespace lut {
-    export namespace plain {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace invPlain {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace rainbow {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace hot {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace hot_iron {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace pet {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace hot_metal_blue {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-    export namespace pet_20step {
-        const red: any[];
-        const green: any[];
-        const blue: any[];
-    }
-}
+/**
+ * List of available lookup tables (lut).
+ *
+ * @type {{[key: string]: {red: number[], green: number[], blue: number[]}}}
+ */
+export declare const lut: {
+    [key: string]: {
+        red: number[];
+        green: number[];
+        blue: number[];
+    };
+};
 
 /**
  * Immutable 3x3 Matrix.
@@ -7253,6 +7212,56 @@ export declare class Point {
 }
 
 /**
+ * Immutable 2D point.
+ */
+export declare class Point2D {
+    /**
+     * @param {number} x The X coordinate for the point.
+     * @param {number} y The Y coordinate for the point.
+     */
+    constructor(x: number, y: number);
+    /**
+     * Get the X position of the point.
+     *
+     * @returns {number} The X position of the point.
+     */
+    getX(): number;
+    /**
+     * Get the Y position of the point.
+     *
+     * @returns {number} The Y position of the point.
+     */
+    getY(): number;
+    /**
+     * Check for Point2D equality.
+     *
+     * @param {Point2D} rhs The other point to compare to.
+     * @returns {boolean} True if both points are equal.
+     */
+    equals(rhs: Point2D): boolean;
+    /**
+     * Get a string representation of the Point2D.
+     *
+     * @returns {string} The point as a string.
+     */
+    toString(): string;
+    /**
+     * Get the distance to another Point2D.
+     *
+     * @param {Point2D} point2D The input point.
+     * @returns {number} The distance to the input point.
+     */
+    getDistance(point2D: Point2D): number;
+    /**
+     * Round a Point2D.
+     *
+     * @returns {Point2D} The rounded point.
+     */
+    getRound(): Point2D;
+    #private;
+}
+
+/**
  * Immutable 3D point.
  */
 export declare class Point3D {
@@ -7331,6 +7340,99 @@ export declare class Point3D {
  * @returns {number} The rounded number.
  */
 export declare function precisionRound(number: number, precision: number): number;
+
+/**
+ * Rescale LUT class.
+ * Typically converts from integer to float.
+ */
+export declare class RescaleLut {
+    /**
+     * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
+     * @param {number} bitsStored The number of bits used to store the data.
+     */
+    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
+    /**
+     * Get the Rescale Slope and Intercept (RSI).
+     *
+     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
+     */
+    getRSI(): RescaleSlopeAndIntercept;
+    /**
+     * Is the lut ready to use or not? If not, the user must
+     * call 'initialise'.
+     *
+     * @returns {boolean} True if the lut is ready to use.
+     */
+    isReady(): boolean;
+    /**
+     * Initialise the LUT.
+     */
+    initialise(): void;
+    /**
+     * Get the length of the LUT array.
+     *
+     * @returns {number} The length of the LUT array.
+     */
+    getLength(): number;
+    /**
+     * Get the value of the LUT at the given offset.
+     *
+     * @param {number} offset The input offset in [0,2^bitsStored] range.
+     * @returns {number} The float32 value of the LUT at the given offset.
+     */
+    getValue(offset: number): number;
+    #private;
+}
+
+/**
+ * Rescale Slope and Intercept
+ */
+export declare class RescaleSlopeAndIntercept {
+    /**
+     * @param {number} slope The slope of the RSI.
+     * @param {number} intercept The intercept of the RSI.
+     */
+    constructor(slope: number, intercept: number);
+    /**
+     * Get the slope of the RSI.
+     *
+     * @returns {number} The slope of the RSI.
+     */
+    getSlope(): number;
+    /**
+     * Get the intercept of the RSI.
+     *
+     * @returns {number} The intercept of the RSI.
+     */
+    getIntercept(): number;
+    /**
+     * Apply the RSI on an input value.
+     *
+     * @param {number} value The input value.
+     * @returns {number} The value to rescale.
+     */
+    apply(value: number): number;
+    /**
+     * Check for RSI equality.
+     *
+     * @param {RescaleSlopeAndIntercept} rhs The other RSI to compare to.
+     * @returns {boolean} True if both RSI are equal.
+     */
+    equals(rhs: RescaleSlopeAndIntercept): boolean;
+    /**
+     * Get a string representation of the RSI.
+     *
+     * @returns {string} The RSI as a string.
+     */
+    toString(): string;
+    /**
+     * Is this RSI an ID RSI.
+     *
+     * @returns {boolean} True if the RSI has a slope of 1 and no intercept.
+     */
+    isID(): boolean;
+    #private;
+}
 
 /**
  * Immutable Size class.
@@ -7660,6 +7762,643 @@ export declare class Vector3D {
 }
 
 /**
+ * View class.
+ *
+ * Need to set the window lookup table once created
+ * (either directly or with helper methods).
+ */
+export declare class View {
+    /**
+     * @param {Image} image The associated image.
+     */
+    constructor(image: Image_2);
+    /**
+     * Get the associated image.
+     *
+     * @returns {Image} The associated image.
+     */
+    getImage(): Image_2;
+    /**
+     * Set the associated image.
+     *
+     * @param {Image} inImage The associated image.
+     */
+    setImage(inImage: Image_2): void;
+    /**
+     * Get the view orientation.
+     *
+     * @returns {Matrix33} The orientation matrix.
+     */
+    getOrientation(): Matrix33;
+    /**
+     * Set the view orientation.
+     *
+     * @param {Matrix33} mat33 The orientation matrix.
+     */
+    setOrientation(mat33: Matrix33): void;
+    /**
+     * Initialise the view: set initial index.
+     */
+    init(): void;
+    /**
+     * Set the initial index to 0.
+     */
+    setInitialIndex(): void;
+    /**
+     * Get the milliseconds per frame from frame rate.
+     *
+     * @param {number} recommendedDisplayFrameRate Recommended Display Frame Rate.
+     * @returns {number} The milliseconds per frame.
+     */
+    getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
+    /**
+     * @callback alphaFn@callback alphaFn
+     * @param {object} value The pixel value.
+     * @param {object} index The values' index.
+     * @returns {number} The value to display.
+     */
+    /**
+     * Get the alpha function.
+     *
+     * @returns {alphaFn} The function.
+     */
+    getAlphaFunction(): (value: object, index: object) => number;
+    /**
+     * Set alpha function.
+     *
+     * @param {alphaFn} func The function.
+     * @fires View#alphafuncchange
+     */
+    setAlphaFunction(func: (value: object, index: object) => number): void;
+    /**
+     * Get the window LUT of the image.
+     * Warning: can be undefined in no window/level was set.
+     *
+     * @param {object} [rsi] Optional image rsi, will take the one of the
+     *   current slice otherwise.
+     * @returns {WindowLut} The window LUT of the image.
+     * @fires View#wlchange
+     */
+    getCurrentWindowLut(rsi?: object): WindowLut;
+    /**
+     * Add the window LUT to the list.
+     *
+     * @param {WindowLut} wlut The window LUT of the image.
+     */
+    addWindowLut(wlut: WindowLut): void;
+    /**
+     * Get the window presets.
+     *
+     * @returns {object} The window presets.
+     */
+    getWindowPresets(): object;
+    /**
+     * Get the window presets names.
+     *
+     * @returns {object} The list of window presets names.
+     */
+    getWindowPresetsNames(): object;
+    /**
+     * Set the window presets.
+     *
+     * @param {object} presets The window presets.
+     */
+    setWindowPresets(presets: object): void;
+    /**
+     * Set the default colour map.
+     *
+     * @param {object} map The colour map.
+     */
+    setDefaultColourMap(map: object): void;
+    /**
+     * Add window presets to the existing ones.
+     *
+     * @param {object} presets The window presets.
+     */
+    addWindowPresets(presets: object): void;
+    /**
+     * Get the colour map of the image.
+     *
+     * @returns {object} The colour map of the image.
+     */
+    getColourMap(): object;
+    /**
+     * Set the colour map of the image.
+     *
+     * @param {object} map The colour map of the image.
+     * @fires View#colourchange
+     */
+    setColourMap(map: object): void;
+    /**
+     * Get the current position.
+     *
+     * @returns {Point} The current position.
+     */
+    getCurrentPosition(): Point;
+    /**
+     * Get the current index.
+     *
+     * @returns {Index} The current index.
+     */
+    getCurrentIndex(): Index;
+    /**
+     * Check is the provided position can be set.
+     *
+     * @param {Point} position The position.
+     * @returns {boolean} True is the position is in bounds.
+     */
+    canSetPosition(position: Point): boolean;
+    /**
+     * Get the origin at a given position.
+     *
+     * @param {Point} position The position.
+     * @returns {Point} The origin.
+     */
+    getOrigin(position: Point): Point;
+    /**
+     * Set the current position.
+     *
+     * @param {Point} position The new position.
+     * @param {boolean} silent Flag to fire event or not.
+     * @returns {boolean} False if not in bounds
+     * @fires View#positionchange
+     */
+    setCurrentPosition(position: Point, silent: boolean): boolean;
+    /**
+     * Set the current index.
+     *
+     * @param {Index} index The new index.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} False if not in bounds.
+     * @fires View#positionchange
+     */
+    setCurrentIndex(index: Index, silent?: boolean): boolean;
+    /**
+     * Set the view window/level.
+     *
+     * @param {number} center The window center.
+     * @param {number} width The window width.
+     * @param {string} [name] Associated preset name, defaults to 'manual'.
+     * Warning: uses the latest set rescale LUT or the default linear one.
+     * @param {boolean} [silent] Flag to launch events with skipGenerate.
+     * @fires View#wlchange
+     */
+    setWindowLevel(center: number, width: number, name?: string, silent?: boolean): void;
+    /**
+     * Set the window level to the preset with the input name.
+     *
+     * @param {string} name The name of the preset to activate.
+     * @param {boolean} [silent] Flag to launch events with skipGenerate.
+     */
+    setWindowLevelPreset(name: string, silent?: boolean): void;
+    /**
+     * Set the window level to the preset with the input id.
+     *
+     * @param {number} id The id of the preset to activate.
+     * @param {boolean} [silent] Flag to launch events with skipGenerate.
+     */
+    setWindowLevelPresetById(id: number, silent?: boolean): void;
+    /**
+     * Add an event listener to this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type, will be called with the fired event.
+     */
+    addEventListener(type: string, callback: object): void;
+    /**
+     * Remove an event listener from this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type.
+     */
+    removeEventListener(type: string, callback: object): void;
+    /**
+     * Get the image window/level that covers the full data range.
+     * Warning: uses the latest set rescale LUT or the default linear one.
+     *
+     * @returns {object} A min/max window level.
+     */
+    getWindowLevelMinMax(): object;
+    /**
+     * Set the image window/level to cover the full data range.
+     * Warning: uses the latest set rescale LUT or the default linear one.
+     */
+    setWindowLevelMinMax(): void;
+    /**
+     * Generate display image data to be given to a canvas.
+     *
+     * @param {ImageData} data The iamge data to fill in.
+     * @param {Index} index Optional index at which to generate,
+     *   otherwise generates at current index.
+     */
+    generateImageData(data: ImageData, index: Index): void;
+    /**
+     * Increment the provided dimension.
+     *
+     * @param {number} dim The dimension to increment.
+     * @param {boolean} silent Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    incrementIndex(dim: number, silent: boolean): boolean;
+    /**
+     * Decrement the provided dimension.
+     *
+     * @param {number} dim The dimension to increment.
+     * @param {boolean} silent Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    decrementIndex(dim: number, silent: boolean): boolean;
+    /**
+     * Get the scroll dimension index.
+     *
+     * @returns {number} The index.
+     */
+    getScrollIndex(): number;
+    /**
+     * Decrement the scroll dimension index.
+     *
+     * @param {boolean} silent Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    decrementScrollIndex(silent: boolean): boolean;
+    /**
+     * Increment the scroll dimension index.
+     *
+     * @param {boolean} silent Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    incrementScrollIndex(silent: boolean): boolean;
+    #private;
+}
+
+/**
+ * View controller.
+ */
+export declare class ViewController {
+    /**
+     * @param {View} view The associated view.
+     * @param {number} index The associated data index.
+     */
+    constructor(view: View, index: number);
+    /**
+     * Get the plane helper.
+     *
+     * @returns {object} The helper.
+     */
+    getPlaneHelper(): object;
+    /**
+     * Check is the associated image is a mask.
+     *
+     * @returns {boolean} True if the associated image is a mask.
+     */
+    isMask(): boolean;
+    /**
+     * Get the mask segment helper.
+     *
+     * @returns {object} The helper.
+     */
+    getMaskSegmentHelper(): object;
+    /**
+     * Apply the hidden segments list by setting
+     * the corresponding alpha function.
+     */
+    applyHiddenSegments(): void;
+    /**
+     * Delete a segment.
+     *
+     * @param {number} segmentNumber The segment number.
+     * @param {Function} exeCallback The post execution callback.
+     */
+    deleteSegment(segmentNumber: number, exeCallback: Function): void;
+    /**
+     * Initialise the controller.
+     */
+    initialise(): void;
+    /**
+     * Get the window/level presets names.
+     *
+     * @returns {Array} The presets names.
+     */
+    getWindowLevelPresetsNames(): any[];
+    /**
+     * Add window/level presets to the view.
+     *
+     * @param {object} presets A preset object.
+     * @returns {object} The list of presets.
+     */
+    addWindowLevelPresets(presets: object): object;
+    /**
+     * Set the window level to the preset with the input name.
+     *
+     * @param {string} name The name of the preset to activate.
+     */
+    setWindowLevelPreset(name: string): void;
+    /**
+     * Set the window level to the preset with the input id.
+     *
+     * @param {number} id The id of the preset to activate.
+     */
+    setWindowLevelPresetById(id: number): void;
+    /**
+     * Check if the controller is playing.
+     *
+     * @returns {boolean} True if the controler is playing.
+     */
+    isPlaying(): boolean;
+    /**
+     * Get the current position.
+     *
+     * @returns {Point} The position.
+     */
+    getCurrentPosition(): Point;
+    /**
+     * Get the current index.
+     *
+     * @returns {Index} The current index.
+     */
+    getCurrentIndex(): Index;
+    /**
+     * Get the current oriented index.
+     *
+     * @returns {Index} The index.
+     */
+    getCurrentOrientedIndex(): Index;
+    /**
+     * Get the scroll index.
+     *
+     * @returns {number} The index.
+     */
+    getScrollIndex(): number;
+    /**
+     * Get the current scroll index value.
+     *
+     * @returns {object} The value.
+     */
+    getCurrentScrollIndexValue(): object;
+    /**
+     * Get the origin at a given posittion.
+     *
+     * @param {Point} position The input position.
+     * @returns {Point} The origin.
+     */
+    getOrigin(position: Point): Point;
+    /**
+     * Get the current scroll position value.
+     *
+     * @returns {object} The value.
+     */
+    getCurrentScrollPosition(): object;
+    /**
+     * Generate display image data to be given to a canvas.
+     *
+     * @param {ImageData} array The array to fill in.
+     * @param {Index} index Optional index at which to generate,
+     *   otherwise generates at current index.
+     */
+    generateImageData(array: ImageData, index: Index): void;
+    /**
+     * Set the associated image.
+     *
+     * @param {Image} img The associated image.
+     * @param {number} index The data index of the image.
+     */
+    setImage(img: Image_2, index: number): void;
+    /**
+     * Get the current spacing.
+     *
+     * @returns {Array} The 2D spacing.
+     */
+    get2DSpacing(): any[];
+    /**
+     * Get the image rescaled value at the input position.
+     *
+     * @param {Point} position the input position.
+     * @returns {number|undefined} The image value or undefined if out of bounds
+     *   or no quantifiable (for ex RGB).
+     */
+    getRescaledImageValue(position: Point): number | undefined;
+    /**
+     * Get the image pixel unit.
+     *
+     * @returns {string} The unit
+     */
+    getPixelUnit(): string;
+    /**
+     * Get some values from the associated image in a region.
+     *
+     * @param {Point2D} min Minimum point.
+     * @param {Point2D} max Maximum point.
+     * @returns {Array} A list of values.
+     */
+    getImageRegionValues(min: Point2D, max: Point2D): any[];
+    /**
+     * Get some values from the associated image in variable regions.
+     *
+     * @param {Array} regions A list of regions.
+     * @returns {Array} A list of values.
+     */
+    getImageVariableRegionValues(regions: any[]): any[];
+    /**
+     * Can the image values be quantified?
+     *
+     * @returns {boolean} True if possible.
+     */
+    canQuantifyImage(): boolean;
+    /**
+     * Can window and level be applied to the data?
+     *
+     * @returns {boolean} True if possible.
+     */
+    canWindowLevel(): boolean;
+    /**
+     * Can the data be scrolled?
+     *
+     * @returns {boolean} True if the data has either the third dimension
+     * or above greater than one.
+     */
+    canScroll(): boolean;
+    /**
+     * Get the image size.
+     *
+     * @returns {Size} The size.
+     */
+    getImageSize(): Size;
+    /**
+     * Get the image world (mm) 2D size.
+     *
+     * @returns {object} The 2D size as {x,y}.
+     */
+    getImageWorldSize(): object;
+    /**
+     * Get the image rescaled data range.
+     *
+     * @returns {object} The range as {min, max}.
+     */
+    getImageRescaledDataRange(): object;
+    /**
+     * Compare the input meta data to the associated image one.
+     *
+     * @param {object} meta The meta data.
+     * @returns {boolean} True if the associated image has equal meta data.
+     */
+    equalImageMeta(meta: object): boolean;
+    /**
+     * Check is the provided position can be set.
+     *
+     * @param {Point} position The position.
+     * @returns {boolean} True is the position is in bounds.
+     */
+    canSetPosition(position: Point): boolean;
+    /**
+     * Set the current position.
+     *
+     * @param {Point} pos The position.
+     * @param {boolean} [silent] If true, does not fire a
+     *   positionchange event.
+     * @returns {boolean} False if not in bounds.
+     */
+    setCurrentPosition(pos: Point, silent?: boolean): boolean;
+    /**
+     * Get a position from a 2D (x,y) position.
+     *
+     * @param {number} x The column position.
+     * @param {number} y The row position.
+     * @returns {Point} The associated position.
+     */
+    getPositionFromPlanePoint(x: number, y: number): Point;
+    /**
+     * Get a 2D (x,y) position from a position.
+     *
+     * @param {Point} point The 3D position.
+     * @returns {object} The 2D position.
+     */
+    getPlanePositionFromPosition(point: Point): object;
+    /**
+     * Set the current index.
+     *
+     * @param {Index} index The index.
+     * @param {boolean} silent If true, does not fire a positionchange event.
+     * @returns {boolean} False if not in bounds.
+     */
+    setCurrentIndex(index: Index, silent: boolean): boolean;
+    /**
+     * Get a plane 3D position from a plane 2D position: does not compensate
+     *   for the image origin. Needed for setting the scale center...
+     *
+     * @param {object} point2D The 2D position as {x,y}.
+     * @returns {Point3D} The 3D point.
+     */
+    getPlanePositionFromPlanePoint(point2D: object): Point3D;
+    /**
+     * Get a 3D offset from a plane one.
+     *
+     * @param {object} offset2D The plane offset as {x,y}.
+     * @returns {Vector3D} The 3D world offset.
+     */
+    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    /**
+     * Increment the provided dimension.
+     *
+     * @param {number} dim The dimension to increment.
+     * @param {boolean} [silent] Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    incrementIndex(dim: number, silent?: boolean): boolean;
+    /**
+     * Decrement the provided dimension.
+     *
+     * @param {number} dim The dimension to increment.
+     * @param {boolean} [silent] Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    decrementIndex(dim: number, silent?: boolean): boolean;
+    /**
+     * Decrement the scroll dimension index.
+     *
+     * @param {boolean} [silent] Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    decrementScrollIndex(silent?: boolean): boolean;
+    /**
+     * Increment the scroll dimension index.
+     *
+     * @param {boolean} [silent] Do not send event.
+     * @returns {boolean} False if not in bounds.
+     */
+    incrementScrollIndex(silent?: boolean): boolean;
+    /**
+     * Scroll play: loop through all slices.
+     */
+    play(): void;
+    /**
+     * Stop scroll playing.
+     */
+    stop(): void;
+    /**
+     * Get the window/level.
+     *
+     * @returns {object} The window center and width.
+     */
+    getWindowLevel(): object;
+    /**
+     * Set the window/level.
+     *
+     * @param {number} wc The window center.
+     * @param {number} ww The window width.
+     */
+    setWindowLevel(wc: number, ww: number): void;
+    /**
+     * Get the colour map.
+     *
+     * @returns {object} The colour map.
+     */
+    getColourMap(): object;
+    /**
+     * Set the colour map.
+     *
+     * @param {object} colourMap The colour map.
+     */
+    setColourMap(colourMap: object): void;
+    /**
+     * @callback alphaFn@callback alphaFn
+     * @param {object} value The pixel value.
+     * @param {object} index The values' index.
+     * @returns {number} The value to display.
+     */
+    /**
+     * Set the view per value alpha function.
+     *
+     * @param {alphaFn} func The function.
+     */
+    setViewAlphaFunction(func: (value: object, index: object) => number): void;
+    /**
+     * Set the colour map from a name.
+     *
+     * @param {string} name The name of the colour map to set.
+     */
+    setColourMapFromName(name: string): void;
+    /**
+     * Add an event listener to this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type, will be called with the fired event.
+     */
+    addEventListener(type: string, callback: object): void;
+    /**
+     * Remove an event listener from this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type.
+     */
+    removeEventListener(type: string, callback: object): void;
+    #private;
+}
+
+/**
  * View layer.
  */
 export declare class ViewLayer {
@@ -7690,9 +8429,9 @@ export declare class ViewLayer {
     /**
      * Get the view controller.
      *
-     * @returns {object} The controller.
+     * @returns {ViewController} The controller.
      */
-    getViewController(): object;
+    getViewController(): ViewController;
     /**
      * Get the canvas image data.
      *
@@ -7882,6 +8621,135 @@ export declare class ViewLayer {
      * Clear the context.
      */
     clear(): void;
+    #private;
+}
+
+/**
+ * WindowLevel class.
+ * <br>Pseudo-code:
+ * <pre>
+ *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
+ *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
+ *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
+ * </pre>
+ *
+ * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ */
+export declare class WindowLevel {
+    /**
+     * @param {number} center The window center.
+     * @param {number} width The window width.
+     */
+    constructor(center: number, width: number);
+    /**
+     * Get the window center.
+     *
+     * @returns {number} The window center.
+     */
+    getCenter(): number;
+    /**
+     * Get the window width.
+     *
+     * @returns {number} The window width.
+     */
+    getWidth(): number;
+    /**
+     * Set the output value range.
+     *
+     * @param {string} min The output value minimum.
+     * @param {string} max The output value maximum.
+     */
+    setRange(min: string, max: string): void;
+    /**
+     * Set the signed offset.
+     *
+     * @param {number} offset The signed data offset,
+     *   typically: slope * ( size / 2).
+     */
+    setSignedOffset(offset: number): void;
+    /**
+     * Apply the window level on an input value.
+     *
+     * @param {number} value The value to rescale as an integer.
+     * @returns {number} The leveled value, in the
+     *  [ymin, ymax] range (default [0,255]).
+     */
+    apply(value: number): number;
+    /**
+     * Check for window level equality.
+     *
+     * @param {WindowLevel} rhs The other window level to compare to.
+     * @returns {boolean} True if both window level are equal.
+     */
+    equals(rhs: WindowLevel): boolean;
+    /**
+     * Get a string representation of the window level.
+     *
+     * @returns {string} The window level as a string.
+     */
+    toString(): string;
+    #private;
+}
+
+/**
+ * Window LUT class.
+ * Typically converts from float to integer.
+ */
+export declare class WindowLut {
+    /**
+     * @param {RescaleLut} rescaleLut The associated rescale LUT.
+     * @param {boolean} isSigned Flag to know if the data is signed or not.
+     */
+    constructor(rescaleLut: RescaleLut, isSigned: boolean);
+    /**
+     * Get the window / level.
+     *
+     * @returns {WindowLevel} The window / level.
+     */
+    getWindowLevel(): WindowLevel;
+    /**
+     * Get the signed flag.
+     *
+     * @returns {boolean} The signed flag.
+     */
+    isSigned(): boolean;
+    /**
+     * Get the rescale lut.
+     *
+     * @returns {RescaleLut} The rescale lut.
+     */
+    getRescaleLut(): RescaleLut;
+    /**
+     * Is the lut ready to use or not? If not, the user must
+     * call 'update'.
+     *
+     * @returns {boolean} True if the lut is ready to use.
+     */
+    isReady(): boolean;
+    /**
+     * Set the window center and width.
+     *
+     * @param {WindowLevel} wl The window level.
+     */
+    setWindowLevel(wl: WindowLevel): void;
+    /**
+     * Update the lut if needed..
+     */
+    update(): void;
+    /**
+     * Get the length of the LUT array.
+     *
+     * @returns {number} The length of the LUT array.
+     */
+    getLength(): number;
+    /**
+     * Get the value of the LUT at the given offset.
+     *
+     * @param {number} offset The input offset in [0,2^bitsStored] range.
+     * @returns {number} The integer value (default [0,255]) of the LUT
+     *   at the given offset.
+     */
+    getValue(offset: number): number;
     #private;
 }
 
