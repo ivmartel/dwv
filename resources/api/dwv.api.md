@@ -5526,18 +5526,27 @@ export function loadFromUri(uri: string, app: App, options?: object): void;
 
 // @public (undocumented)
 export namespace logger {
-    const // (undocumented)
-    levels: {
-        [key: string]: number;
-    };
-    const // (undocumented)
-    level: number;
     // (undocumented)
     export function debug(msg: string): void;
+    const // (undocumented)
+    level: number;
     // (undocumented)
     export function error(msg: string): void;
     // (undocumented)
     export function info(msg: string): void;
+    // (undocumented)
+    export namespace levels {
+        const // (undocumented)
+        TRACE: number;
+        const // (undocumented)
+        DEBUG: number;
+        const // (undocumented)
+        INFO: number;
+        const // (undocumented)
+        WARN: number;
+        const // (undocumented)
+        ERROR: number;
+    }
     // (undocumented)
     export function trace(msg: string): void;
     // (undocumented)
