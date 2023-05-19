@@ -91,6 +91,11 @@ function invId(i) {
   return (lut_range_max - 1) - i;
 }
 
+/**
+ * List of available lookup tables (lut).
+ *
+ * @type {{[key: string]: {red: number[], green: number[], blue: number[]}}}
+ */
 export const lut = {
   // plain
   plain: {

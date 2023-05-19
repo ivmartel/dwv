@@ -5,6 +5,11 @@
  */
 const MinWindowWidth = 1;
 
+/**
+ * List of default window level presets.
+ *
+ * @type {{[key: string]: {[key: string]: {center: number, width: number}}}}
+ */
 export const defaultPresets = {
   CT: {
     mediastinum: {center: 40, width: 400},
