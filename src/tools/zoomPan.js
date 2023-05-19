@@ -136,13 +136,12 @@ export class ZoomAndPan {
       if (Math.abs(diffY) < 15) {
         return;
       }
-      const imageSize = viewController.getImageSize();
       // update view controller
-      if (imageSize.canScroll(2)) {
+      if (viewController.canScroll()) {
         if (diffY > 0) {
-          viewController.incrementIndex(2);
+          viewController.incrementScrollIndex();
         } else {
-          viewController.decrementIndex(2);
+          viewController.decrementScrollIndex();
         }
       }
     } else {
