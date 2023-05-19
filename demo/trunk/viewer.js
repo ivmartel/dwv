@@ -19,13 +19,13 @@ function viewerSetup() {
   dwv.logger.level = dwv.logger.levels.WARN;
 
   dwv.decoderScripts.jpeg2000 =
-    '../../decoders/pdfjs/decode-jpeg2000.js';
+    './decoders/pdfjs/decode-jpeg2000.js';
   dwv.decoderScripts['jpeg-lossless'] =
-    '../../decoders/rii-mango/decode-jpegloss.js';
+    './decoders/rii-mango/decode-jpegloss.js';
   dwv.decoderScripts['jpeg-baseline'] =
-    '../../decoders/pdfjs/decode-jpegbaseline.js';
+    './decoders/pdfjs/decode-jpegbaseline.js';
   dwv.decoderScripts.rle =
-    '../../decoders/dwv/decode-rle.js';
+    './decoders/dwv/decode-rle.js';
 
   // // example private logic for time value retrieval
   // dwv.TagValueExtractor.prototype.getTime = function (elements) {
