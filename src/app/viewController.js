@@ -256,6 +256,12 @@ export class ViewController {
     return this.#view.getCurrentIndex().get(this.#view.getScrollIndex());
   }
 
+  /**
+   * Get the origin at a given posittion.
+   *
+   * @param {Point} position The input position.
+   * @returns {Point} The origin.
+   */
   getOrigin(position) {
     return this.#view.getOrigin(position);
   }

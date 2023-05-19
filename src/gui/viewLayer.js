@@ -219,7 +219,7 @@ export class ViewLayer {
   /**
    * Get the view controller.
    *
-   * @returns {object} The controller.
+   * @returns {ViewController} The controller.
    */
   getViewController() {
     return this.#viewController;

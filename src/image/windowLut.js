@@ -82,7 +82,7 @@ export class WindowLut {
   /**
    * Get the rescale lut.
    *
-   * @returns {object} The rescale lut.
+   * @returns {RescaleLut} The rescale lut.
    */
   getRescaleLut() {
     return this.#rescaleLut;

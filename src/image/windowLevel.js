@@ -198,7 +198,7 @@ export class WindowLevel {
   /**
    * Check for window level equality.
    *
-   * @param {object} rhs The other window level to compare to.
+   * @param {WindowLevel} rhs The other window level to compare to.
    * @returns {boolean} True if both window level are equal.
    */
   equals(rhs) {
