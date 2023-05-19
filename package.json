@@ -62,7 +62,7 @@
     "test-ci": "karma start ./karma.conf.js --browsers ChromeHeadless --reporters progress,coverage --single-run",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "gren": "gren",
-    "types": "tsc -p tsconfig.json",
-    "api": "api-extractor run -c api-extractor.json"
+    "types": "tsc -p resources/api/tsconfig.json",
+    "api": "api-extractor run -c resources/api/api-extractor.json"
   }
 }

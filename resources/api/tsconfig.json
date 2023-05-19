@@ -13,7 +13,7 @@
     "noImplicitThis": true,
     "alwaysStrict": true,
     "esModuleInterop": true,
-    "outDir": "build/types"
+    "outDir": "../../build/types"
   },
-  "files": ["src/index.js"]
+  "files": ["../../src/index.js"]
 }

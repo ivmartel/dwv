@@ -1,19 +1,20 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
-  "mainEntryPointFilePath": "build/types/index.d.ts",
+  "mainEntryPointFilePath": "../../build/types/index.d.ts",
   "bundledPackages": [],
   "compiler": {},
   "apiReport": {
     "enabled": true,
-    "reportFolder": "resources/api",
-    "reportTempFolder": "build/api/temp"
+    "reportFolder": "./",
+    "reportTempFolder": "../../build/api/temp"
   },
   "docModel": {
     "enabled": true,
-    "apiJsonFilePath": "build/api/temp/dwv.api.json"
+    "apiJsonFilePath": "../../build/api/temp/dwv.api.json"
   },
   "dtsRollup": {
-    "enabled": true
+    "enabled": true,
+    "untrimmedFilePath": "../../dist/dwv.d.ts"
   },
   "tsdocMetadata": {
     "enabled": false
