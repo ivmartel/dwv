@@ -37,7 +37,7 @@ export class App {
     initWLDisplay(): void;
     loadFiles: (files: FileList) => void;
     loadImageObject: (data: any[]) => void;
-    loadURLs: (urls: any[], options: object) => void;
+    loadURLs: (urls: any[], options?: object) => void;
     onKeydown: (event: object) => void;
     onResize: (_event: object) => void;
     redo(): void;

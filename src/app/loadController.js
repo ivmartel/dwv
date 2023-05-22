@@ -64,7 +64,7 @@ export class LoadController {
    * Load a list of URLs. Can be image files or a state file.
    *
    * @param {Array} urls The list of urls to load.
-   * @param {object} options The load options:
+   * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
@@ -121,7 +121,7 @@ export class LoadController {
    * Load a list of image URLs.
    *
    * @param {Array} urls The list of urls to load.
-   * @param {object} options The load options:
+   * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
@@ -149,7 +149,7 @@ export class LoadController {
    * Load a State url.
    *
    * @param {string} url The state url to load.
-   * @param {object} options The load options:
+   * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
@@ -166,7 +166,7 @@ export class LoadController {
    * @param {Array|FileList} data Array of data to load.
    * @param {object} loader The data loader.
    * @param {string} loadType The data load type: 'image' or 'state'.
-   * @param {object} options Options passed to the final loader.
+   * @param {object} [options] Options passed to the final loader.
    */
   #loadData(data, loader, loadType, options) {
     const eventInfo = {

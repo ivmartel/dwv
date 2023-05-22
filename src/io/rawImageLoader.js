@@ -125,7 +125,7 @@ export class RawImageLoader {
    * Check if the loader can load the provided url.
    *
    * @param {string} url The url to check.
-   * @param {object} options Optional url request options.
+   * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {

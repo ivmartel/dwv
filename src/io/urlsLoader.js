@@ -192,7 +192,7 @@ export class UrlsLoader {
    * Load a list of URLs or a DICOMDIR.
    *
    * @param {Array} data The list of urls to load.
-   * @param {object} options Load options.
+   * @param {object} [options] Load options.
    */
   load(data, options) {
     // send start event
@@ -243,7 +243,7 @@ export class UrlsLoader {
    * Load a list of urls.
    *
    * @param {Array} data The list of urls to load.
-   * @param {object} options The options object, can contain:
+   * @param {object} [options] The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass
    *    to the request
@@ -383,7 +383,7 @@ export class UrlsLoader {
    * Load a DICOMDIR.
    *
    * @param {string} dicomDirUrl The DICOMDIR url.
-   * @param {object} options Load options.
+   * @param {object} [options] Load options.
    */
   #loadDicomDir(dicomDirUrl, options) {
     // read DICOMDIR

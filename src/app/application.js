@@ -539,7 +539,7 @@ export class App {
    * Load a list of URLs. Can be image files or a state file.
    *
    * @param {Array} urls The list of urls to load.
-   * @param {object} options The options object, can contain:
+   * @param {object} [options] The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
    *  - batchSize: the size of the request url batch

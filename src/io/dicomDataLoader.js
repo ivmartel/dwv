@@ -114,7 +114,7 @@ export class DicomDataLoader {
    *  - the url has no 'contentType' and no extension or the extension is 'dcm'
    *
    * @param {string} url The url to check.
-   * @param {object} options Optional url request options.
+   * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
