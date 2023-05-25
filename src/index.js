@@ -14,7 +14,7 @@ import {
   DicomWriter
 } from './dicom/dicomWriter';
 import {TagValueExtractor} from './dicom/dicomElementsWrapper';
-import {dictionary} from './dicom/dictionary';
+import {addTagsToDictionary} from './dicom/dictionary';
 import {Tag, getPixelDataTag} from './dicom/dicomTag';
 // gui
 import {customUI} from './gui/generic';
@@ -73,10 +73,10 @@ export {
   Matrix33,
   logger,
   decoderScripts,
-  dictionary,
   customUI,
   lut,
   defaultPresets,
+  addTagsToDictionary,
   getDwvVersion,
   getUID,
   getElementsFromJSONTags,

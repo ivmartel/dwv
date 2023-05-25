@@ -32,7 +32,7 @@ function getObjectUrlFromTags(config) {
     for (let i = 0; i < keys.length; ++i) {
       const group = keys[i];
       const tags = config.privateDictionary[group];
-      dwv.dictionary[group] = tags;
+      dwv.addTagsToDictionary(group, tags);
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;

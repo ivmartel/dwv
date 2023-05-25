@@ -5234,7 +5234,18 @@ export const dictionary = {
     'E00D': ['NONE', '1', 'ItemDelimitationItem'],
     'E0DD': ['NONE', '1', 'SequenceDelimitationItem']
   }
-}; // Dictionnary
+}; // Dictionary
+
+/**
+ * Add tags to the dictionary.
+ *
+ * @param {string} group The group key.
+ * @param {object} tags The tags to add.
+ */
+export function addTagsToDictionary(group, tags) {
+  // TODO: add checks!
+  dictionary[group] = tags;
+}
 
 // taken from gdcm-2.6.1\Source\DataDictionary\GroupName.dic
 // -> removed duplicates (commented)
