@@ -42,18 +42,15 @@ export class DicomBufferToView {
   #decompressedSizes = [];
 
   /**
-   * Generate the image object.
+   * Get the factory associated to input DICOM elements.
    *
-   * @param {number} index The data index.
-   * @param {string} origin The data origin.
+   * @param {object} elements The DICOM elements.
+   * @returns {ImageFactory|MaskFactory} The associated factory.
    */
-  #generateImage(index, origin) {
-    const dicomElements = this.#dicomParserStore[index].getDicomElements();
-
-    // set factory
+  #getFactory(elements) {
     let factory;
     // mask factory for DICOM SEG
-    const element = dicomElements['00080060'];
+    const element = elements['00080060'];
     if (typeof element !== 'undefined') {
       const modality = element.value[0];
       if (modality === 'SEG') {
@@ -64,7 +61,18 @@ export class DicomBufferToView {
     if (typeof factory === 'undefined') {
       factory = new ImageFactory();
     }
+    return factory;
+  }
 
+  /**
+   * Generate the image object.
+   *
+   * @param {number} index The data index.
+   * @param {string} origin The data origin.
+   */
+  #generateImage(index, origin) {
+    const dicomElements = this.#dicomParserStore[index].getDicomElements();
+    const factory = this.#getFactory(dicomElements);
     // create the image
     try {
       const image = factory.create(
@@ -75,7 +83,7 @@ export class DicomBufferToView {
       this.onloaditem({
         data: {
           image: image,
-          info: this.#dicomParserStore[index].getDicomElements()
+          info: dicomElements
         },
         source: origin
       });
@@ -174,7 +182,6 @@ export class DicomBufferToView {
 
     // DICOM parser
     const dicomParser = new DicomParser();
-    const imageFactory = new ImageFactory();
 
     if (typeof this.#options.defaultCharacterSet !== 'undefined') {
       dicomParser.setDefaultCharacterSet(this.#options.defaultCharacterSet);
@@ -182,8 +189,9 @@ export class DicomBufferToView {
     // parse the buffer
     try {
       dicomParser.parse(buffer);
-      // check elements are good for image
-      imageFactory.checkElements(dicomParser.getDicomElements());
+      // check elements
+      const factory = this.#getFactory(dicomParser.getDicomElements());
+      factory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
       this.onerror({
         error: error,
