@@ -550,6 +550,15 @@ function getSegmentFrameInfo(groupItem) {
  */
 export class MaskFactory {
 
+  /*
+   * Check dicom elements. Throws an error if not suitable.
+   *
+   * @param {object} _dicomElements The DICOM tags.
+   */
+  checkElements(_dicomElements) {
+    // does nothing
+  }
+
   /**
    * Get an {@link Image} object from the read DICOM file.
    *
