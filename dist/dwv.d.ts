@@ -252,6 +252,13 @@ export declare class App {
      */
     loadURLs: (urls: any[], options?: object) => void;
     /**
+     * Load from an input uri.
+     *
+     * @param {string} uri The input uri, for example: 'window.location.href'.
+     * @param {object} [options] Optional url request options.
+     */
+    loadFromUri: (uri: string, options?: object) => void;
+    /**
      * Load a list of ArrayBuffers.
      *
      * @param {Array} data The list of ArrayBuffers to load
@@ -6976,15 +6983,6 @@ export declare class LayerGroup {
     removeEventListener(type: string, callback: object): void;
     #private;
 }
-
-/**
- * Load from an input uri
- *
- * @param {string} uri The input uri, for example: 'window.location.href'.
- * @param {App} app The associated app that handles the load.
- * @param {object} [options] Optional url request options.
- */
-export declare function loadFromUri(uri: string, app: App, options?: object): void;
 
 export declare namespace logger {
     export namespace levels {

@@ -279,7 +279,7 @@ function viewerSetup() {
     }];
   }
   // load from window location
-  dwv.loadFromUri(window.location.href, _app, options);
+  _app.loadFromUri(window.location.href, options);
 }
 
 /**

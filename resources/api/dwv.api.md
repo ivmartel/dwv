@@ -36,6 +36,7 @@ export class App {
     init(opt: object): void;
     initWLDisplay(): void;
     loadFiles: (files: FileList) => void;
+    loadFromUri: (uri: string, options?: object) => void;
     loadImageObject: (data: any[]) => void;
     loadURLs: (urls: any[], options?: object) => void;
     onKeydown: (event: object) => void;
@@ -5520,9 +5521,6 @@ export class LayerGroup {
     setTargetOrientation(orientation: Matrix33): void;
     updateLayersToPositionChange: (event: object) => void;
 }
-
-// @public
-export function loadFromUri(uri: string, app: App, options?: object): void;
 
 // @public (undocumented)
 export namespace logger {

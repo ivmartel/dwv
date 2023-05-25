@@ -9,6 +9,7 @@ import {getViewOrientation} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
 import {State} from '../io/state';
 import {logger} from '../utils/logger';
+import {getUriQuery, decodeQuery} from '../utils/uri';
 import {UndoStack} from '../tools/undo';
 import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
@@ -556,6 +557,34 @@ export class App {
       return;
     }
     this.#loadController.loadURLs(urls, options);
+  };
+
+  /**
+   * Load from an input uri.
+   *
+   * @param {string} uri The input uri, for example: 'window.location.href'.
+   * @param {object} [options] Optional url request options.
+   */
+  loadFromUri = (uri, options) => {
+    const query = getUriQuery(uri);
+
+    // load end callback: loads the state.
+    const onLoadEnd = (/*event*/) => {
+      this.removeEventListener('loadend', onLoadEnd);
+      this.loadURLs([query.state]);
+    };
+
+    // check query
+    if (query && typeof query.input !== 'undefined') {
+      // optional display state
+      if (typeof query.state !== 'undefined') {
+        // queue after main data load
+        this.addEventListener('loadend', onLoadEnd);
+      }
+      // load base image
+      decodeQuery(query, this.loadURLs, options);
+    }
+    // no else to allow for empty uris
   };
 
   /**

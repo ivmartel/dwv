@@ -1,11 +1,6 @@
 import {logger} from './logger';
 import {splitKeyValueString} from './string';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-/* eslint-enable no-unused-vars */
-
 /**
  * Get an full object URL from a string uri.
  *
@@ -78,7 +73,7 @@ export function getUriQuery(uri) {
  * @param {Function} callback The function to call with the decoded file urls.
  * @param {object} options Optional url request options.
  */
-function decodeQuery(query, callback, options) {
+export function decodeQuery(query, callback, options) {
   // manifest
   if (query.type && query.type === 'manifest') {
     decodeManifestQuery(query, callback);
@@ -261,44 +256,4 @@ export function decodeManifest(manifest, nslices) {
   }
   // return
   return result;
-}
-
-/**
- * Load from an input uri
- *
- * @param {string} uri The input uri, for example: 'window.location.href'.
- * @param {App} app The associated app that handles the load.
- * @param {object} [options] Optional url request options.
- */
-export function loadFromUri(uri, app, options) {
-  const query = getUriQuery(uri);
-  // check query
-  if (query && typeof query.input !== 'undefined') {
-    loadFromQuery(query, app, options);
-  }
-  // no else to allow for empty uris
-}
-
-/**
- * Load from an input query
- *
- * @param {object} query A query derived from an uri.
- * @param {object} app The associated app that handles the load.
- * @param {object} options Optional url request options.
- */
-function loadFromQuery(query, app, options) {
-  /**
-   * Load end callback.
-   */
-  function onLoadEnd(/*event*/) {
-    app.removeEventListener('loadend', onLoadEnd);
-    app.loadURLs([query.state]);
-  }
-  // load base
-  decodeQuery(query, app.loadURLs, options);
-  // optional display state
-  if (typeof query.state !== 'undefined') {
-    // queue after main data load
-    app.addEventListener('loadend', onLoadEnd);
-  }
 }
