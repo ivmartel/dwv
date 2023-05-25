@@ -28,6 +28,7 @@ export class ImageFactory {
    * Check dicom elements. Throws an error if not suitable.
    *
    * @param {object} dicomElements The DICOM tags.
+   * @returns {object|undefined} A possible warning.
    */
   checkElements(dicomElements) {
     // will throw if columns or rows is not defined

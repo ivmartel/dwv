@@ -1108,7 +1108,8 @@ export class App {
       source: event.source,
       loadtype: event.loadtype,
       loadid: event.loadid,
-      isfirstitem: event.isfirstitem
+      isfirstitem: event.isfirstitem,
+      warn: event.warn
     });
 
     // render if first and flag allows

@@ -40,6 +40,7 @@ export class DicomBufferToView {
   #dicomParserStore = [];
   #finalBufferStore = [];
   #decompressedSizes = [];
+  #factoryWarnings = [];
 
   /**
    * Get the factory associated to input DICOM elements.
@@ -85,7 +86,8 @@ export class DicomBufferToView {
           image: image,
           info: dicomElements
         },
-        source: origin
+        source: origin,
+        warn: this.#factoryWarnings[index]
       });
     } catch (error) {
       this.onerror({
@@ -187,11 +189,12 @@ export class DicomBufferToView {
       dicomParser.setDefaultCharacterSet(this.#options.defaultCharacterSet);
     }
     // parse the buffer
+    let warning;
     try {
       dicomParser.parse(buffer);
       // check elements
       const factory = this.#getFactory(dicomParser.getDicomElements());
-      factory.checkElements(dicomParser.getDicomElements());
+      warning = factory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
       this.onerror({
         error: error,
@@ -214,6 +217,7 @@ export class DicomBufferToView {
     // store
     this.#dicomParserStore[dataIndex] = dicomParser;
     this.#finalBufferStore[dataIndex] = pixelBuffer[0];
+    this.#factoryWarnings[dataIndex] = warning;
 
     if (needDecompression) {
       // gather pixel buffer meta data

@@ -142,6 +142,11 @@ function viewerSetup() {
       _app.render(event.loadid);
     }
   });
+  _app.addEventListener('loaditem', function (event) {
+    if (typeof event.warn !== 'undefined') {
+      console.warn('load-warn', event.warn);
+    }
+  });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.loadid);
   });

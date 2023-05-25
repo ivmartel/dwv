@@ -554,6 +554,7 @@ export class MaskFactory {
    * Check dicom elements. Throws an error if not suitable.
    *
    * @param {object} _dicomElements The DICOM tags.
+   * @returns {object|undefined} A possible warning.
    */
   checkElements(_dicomElements) {
     // does nothing
