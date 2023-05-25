@@ -181,6 +181,9 @@ export function getOrientationName(orientation: any[]): string;
 export function getPixelDataTag(): Tag;
 
 // @public
+export function getTagFromKey(key: string): Tag;
+
+// @public
 export function getTypedArray(bitsAllocated: number, pixelRepresentation: number, size: number): Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array;
 
 // @public

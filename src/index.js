@@ -15,7 +15,11 @@ import {
 } from './dicom/dicomWriter';
 import {TagValueExtractor} from './dicom/dicomElementsWrapper';
 import {addTagsToDictionary} from './dicom/dictionary';
-import {Tag, getPixelDataTag} from './dicom/dicomTag';
+import {
+  Tag,
+  getTagFromKey,
+  getPixelDataTag
+} from './dicom/dicomTag';
 // gui
 import {customUI} from './gui/generic';
 import {LayerGroup} from './gui/layerGroup';
@@ -81,6 +85,7 @@ export {
   getUID,
   getElementsFromJSONTags,
   getTypedArray,
+  getTagFromKey,
   getPixelDataTag,
   getOrientationName,
   precisionRound,
