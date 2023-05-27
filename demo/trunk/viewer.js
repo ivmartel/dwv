@@ -160,7 +160,8 @@ function viewerSetup() {
       firstRender.push(event.dataid);
       // log meta data
       if (event.loadtype === 'image') {
-        console.log('metadata', _app.getMetaDataWithNames(event.loadid));
+        console.log('metadata',
+          getMetaDataWithNames(_app.getMetaData(event.loadid)));
         // add data row
         addDataRow(event.loadid);
         ++dataLoad;
@@ -948,4 +949,28 @@ function logFramePosPats(elements) {
     perPos[pos].push(dim);
   }
   console.log('DICOM SEG Segments', sortByPosPatKey(perPos));
+}
+
+/**
+ * Get the meta data with names instead of tag keys.
+ *
+ * @param {object} metaData The initial meta data.
+ * @returns {object} The list of meta data.
+ */
+function getMetaDataWithNames(metaData) {
+  let meta;
+  if (typeof metaData['00020010'] !== 'undefined') {
+    // replace tag key with tag name for dicom
+    meta = Object.keys(metaData).reduce((accumulator, currentValue) => {
+      const tag = dwv.getTagFromKey(currentValue);
+      let key = tag.getNameFromDictionary();
+      if (typeof key === 'undefined') {
+        // add 'x' to help sorting
+        key = 'x' + tag.getKey();
+      }
+      accumulator[key] = metaData[currentValue];
+      return accumulator;
+    }, {});
+  }
+  return meta;
 }

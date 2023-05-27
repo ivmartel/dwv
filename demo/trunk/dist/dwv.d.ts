@@ -64,13 +64,6 @@ export declare class App {
      */
     getMetaData(index: number): object;
     /**
-     * Get the meta data with names instead of tag keys.
-     *
-     * @param {number} index The data index.
-     * @returns {object} The list of meta data.
-     */
-    getMetaDataWithNames(index: number): object;
-    /**
      * Get the number of loaded data.
      *
      * @returns {number} The number.
