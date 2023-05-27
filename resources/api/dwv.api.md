@@ -27,7 +27,6 @@ export class App {
     getLastImage(): Image_2;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(index: number): object;
-    getMetaDataWithNames(index: number): object;
     getNumberOfLayerGroups(): number;
     getNumberOfLoadedData(): number;
     getOffset(): object;
