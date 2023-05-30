@@ -5,7 +5,6 @@ import {
   getTime,
   getDateTime
 } from '../../src/dicom/dicomElementsWrapper';
-import {objectToArray} from '../../src/utils/operator';
 import {b64urlToArrayBuffer} from './utils';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm';
@@ -33,158 +32,127 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
   // wrapped tags
   const tags = dicomParser.getDicomElements();
   const wrapper = new DicomElementsWrapper(tags);
-  // dump to table
-  const table = objectToArray(wrapper.dumpToObject());
+  // dump to object
+  const tagsObject = wrapper.dumpToObject();
 
   // regression table
-  const teoTable = [
-    {
-      name: 'FileMetaInformationGroupLength',
+  const theoObject = {
+    FileMetaInformationGroupLength: {
       value: '90',
       vr: 'UL'
     },
-    {
-      name: 'TransferSyntaxUID',
+    TransferSyntaxUID: {
       value: '1.2.840.10008.1.2.1',
       vr: 'UI'
     },
-    {
-      name: 'ImplementationClassUID',
+    ImplementationClassUID: {
       value: '1.2.826.0.1.3680043.9.7278.1.0.31.0',
       vr: 'UI'
     },
-    {
-      name: 'ImplementationVersionName',
+    ImplementationVersionName: {
       value: 'DWV_0.31.0',
       vr: 'SH'
     },
-    {
-      name: 'SOPInstanceUID',
+    SOPInstanceUID: {
       value: '1.2.3.0.1.11.111',
       vr: 'UI'
     },
-    {
-      name: 'Modality',
+    Modality: {
       value: 'MR',
       vr: 'CS'
     },
-    {
-      name: 'PerformingPhysicianName',
+    PerformingPhysicianName: {
       value: '(no value available)',
       vr: 'PN'
     },
-    {
-      name: 'ReferencedImageSequence',
+    ReferencedImageSequence: {
       value: [
-        [
-          {
-            name: 'ReferencedSOPClassUID',
+        {
+          ReferencedSOPClassUID: {
             value: '1.2.840.10008.5.1.4.1.1.4',
             vr: 'UI'
           },
-          {
-            name: 'ReferencedSOPInstanceUID',
+          ReferencedSOPInstanceUID: {
             value: '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
             vr: 'UI'
           }
-        ]
+        }
       ],
       vr: 'SQ'
     },
-    {
-      name: 'PatientName',
+    PatientName: {
       value: 'dwv^PatientName',
       vr: 'PN'
     },
-    {
-      name: 'PatientID',
+    PatientID: {
       value: 'dwv-patient-id123',
       vr: 'LO'
     },
-    {
-      name: 'dBdt',
+    dBdt: {
       value: '0',
       vr: 'DS'
     },
-    {
-      name: 'StudyInstanceUID',
+    StudyInstanceUID: {
       value: '1.2.3.0.1',
       vr: 'UI'
     },
-    {
-      name: 'SeriesInstanceUID',
+    SeriesInstanceUID: {
       value: '1.2.3.0.1.11',
       vr: 'UI'
     },
-    {
-      name: 'InstanceNumber',
+    InstanceNumber: {
       value: '0',
       vr: 'IS'
     },
-    {
-      name: 'ImagePositionPatient',
+    ImagePositionPatient: {
       value: '0\\0\\0',
       vr: 'DS'
     },
-    {
-      name: 'SamplesPerPixel',
+    SamplesPerPixel: {
       value: '1',
       vr: 'US'
     },
-    {
-      name: 'PhotometricInterpretation',
+    PhotometricInterpretation: {
       value: 'MONOCHROME2',
       vr: 'CS'
     },
-    {
-      name: 'Rows',
+    Rows: {
       value: '32',
       vr: 'US'
     },
-    {
-      name: 'Columns',
+    Columns: {
       value: '32',
       vr: 'US'
     },
-    {
-      name: 'BitsAllocated',
+    BitsAllocated: {
       value: '16',
       vr: 'US'
     },
-    {
-      name: 'BitsStored',
+    BitsStored: {
       value: '12',
       vr: 'US'
     },
-    {
-      name: 'HighBit',
+    HighBit: {
       value: '11',
       vr: 'US'
     },
-    {
-      name: 'PixelRepresentation',
+    PixelRepresentation: {
       value: '0',
       vr: 'US'
     },
-    {
-      name: 'PixelData',
+    PixelData: {
       value: '...',
       vr: 'OW'
     }
-  ];
+  };
 
-  // test
-  const len = table.length;
-  assert.equal(len, teoTable.length, 'dumpToTable length');
-
-  // special pixel data case: browsers have different toString
-  for (let i = 0; i < len; ++i) {
-    if (table[i].name === 'PixelData' &&
-      table[i].value === '[object Uint16Array]') {
-      table[i].value = '...';
-    }
-  }
-  assert.deepEqual(table, teoTable, 'dumpToTable content');
+  // test length
+  const keys = Object.keys(tagsObject);
+  const len = keys.length;
+  const theoKeys = Object.keys(theoObject);
+  assert.equal(len, theoKeys.length, 'dumpToTable length');
+  // test content
+  assert.deepEqual(tagsObject, theoObject, 'dumpToTable content');
 });
 
 /**

@@ -261,12 +261,6 @@ export class Index {
 }
 
 // @public
-export function isArray(unknown: any): boolean;
-
-// @public
-export function isObject(unknown: any): boolean;
-
-// @public
 export class LayerGroup {
     constructor(containerDiv: HTMLElement);
     addDrawLayer(): DrawLayer;
@@ -364,9 +358,6 @@ export class Matrix33 {
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
 }
-
-// @public
-export function objectToArray(obj: object): any[];
 
 // @public
 export class Point {

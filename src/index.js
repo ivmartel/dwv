@@ -49,7 +49,6 @@ import {getUriQuery} from './utils/uri';
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
-import {isObject, isArray, objectToArray} from './utils/operator';
 
 export {
   App,
@@ -92,8 +91,5 @@ export {
   getReverseOrientation,
   precisionRound,
   buildMultipart,
-  getUriQuery,
-  isObject,
-  isArray,
-  objectToArray
+  getUriQuery
 };

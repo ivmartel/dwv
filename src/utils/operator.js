@@ -1,69 +1,6 @@
 import {arrayEquals} from './array';
 
 /**
- * Check if the input is a generic object, including arrays.
- *
- * @param {*} unknown The input to check.
- * @returns {boolean} True if the input is an object.
- * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1319-L1323
- */
-export function isObject(unknown) {
-  const type = typeof unknown;
-  return type === 'function' || type === 'object' && !!unknown;
-}
-
-/**
- * Check if the input is an array.
- *
- * @param {*} unknown The input to check.
- * @returns {boolean} True if the input is an array.
- * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1313-L1317
- */
-export function isArray(unknown) {
-  return Array.isArray(unknown);
-}
-
-/**
- * Dump an object to an array.
- *
- * @param {object} obj The input object as: {key0: {}, key1: {}}
- * @returns {Array} The corresponding array:
- *   [{name: key0, {}}, {name: key1, {}}]
- */
-export function objectToArray(obj) {
-  const array = [];
-  const keys = Object.keys(obj);
-  for (let i = 0; i < keys.length; ++i) {
-    const key = keys[i];
-    if (obj[key] === null) {
-      continue;
-    }
-    const row = {name: key};
-    const innerKeys = Object.keys(obj[key]);
-    for (let j = 0; j < innerKeys.length; ++j) {
-      const innerKey = innerKeys[j];
-      let value = obj[key][innerKey];
-      if (isArray(value)) {
-        const arrayValues = [];
-        for (let k = 0; k < value.length; ++k) {
-          if (isObject(value[k])) {
-            arrayValues.push(objectToArray(value[k]));
-          } else {
-            arrayValues.push(value[k]);
-          }
-        }
-        value = arrayValues;
-      } else if (isObject(value)) {
-        value = objectToArray(value);
-      }
-      row[innerKey] = value;
-    }
-    array.push(row);
-  }
-  return array;
-}
-
-/**
  * Merge two similar objects.
  * Objects need to be in the form of:
  * <code>
@@ -198,7 +135,7 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
       if (!arrayEquals(subValue1, subValue2)) {
         // add to merged object or create new
         if (mergedObj1) {
-          if (isArray(subValue1)) {
+          if (Array.isArray(subValue1)) {
             // merged object with repeated value
             // copy it with the index list
             value[valueKey] = {};

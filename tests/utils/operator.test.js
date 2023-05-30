@@ -1,61 +1,10 @@
-import {
-  isObject,
-  isArray,
-  mergeObjects
-} from '../../src/utils/operator';
+import {mergeObjects} from '../../src/utils/operator';
 
 /**
  * Tests for the 'utils/operator.js' file.
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-
-/**
- * Tests for {@link isObject}.
- *
- * @function module:tests/utils~isObject
- */
-QUnit.test('Test isObject.', function (assert) {
-  const obj01 = {name: 'dwv', type: 'app'};
-  assert.equal(isObject(obj01), true, 'test with object');
-
-  const obj02 = ['one', 'two', 'three'];
-  assert.equal(isObject(obj02), true, 'test with array');
-
-  const obj03 = 1;
-  assert.equal(isObject(obj03), false, 'test with number');
-
-  const obj04 = null;
-  assert.equal(isObject(obj04), false, 'test with null');
-
-  const obj05 = true;
-  assert.equal(isObject(obj05), false, 'test with bool');
-});
-
-/**
- * Tests for {@link isArray}.
- *
- * @function module:tests/utils~isArray
- */
-QUnit.test('Test isArray.', function (assert) {
-  const obj01 = {name: 'dwv', type: 'app'};
-  assert.equal(isArray(obj01), false, 'test with object');
-
-  const obj02 = ['one', 'two', 'three'];
-  assert.equal(isArray(obj02), true, 'test with array');
-
-  const obj03 = 1;
-  assert.equal(isArray(obj03), false, 'test with number');
-
-  const obj04 = null;
-  assert.equal(isArray(obj04), false, 'test with null');
-
-  const obj05 = true;
-  assert.equal(isArray(obj05), false, 'test with bool');
-
-  const obj06 = new Uint8Array([0, 1, 2]);
-  assert.equal(isArray(obj06), false, 'test with Uint8Array');
-});
 
 /**
  * Tests for {@link mergeObjects}.
