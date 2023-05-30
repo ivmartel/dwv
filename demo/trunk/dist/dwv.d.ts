@@ -1500,24 +1500,6 @@ export declare class Index {
 }
 
 /**
- * Check if the input is an array.
- *
- * @param {*} unknown The input to check.
- * @returns {boolean} True if the input is an array.
- * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1313-L1317
- */
-export declare function isArray(unknown: any): boolean;
-
-/**
- * Check if the input is a generic object, including arrays.
- *
- * @param {*} unknown The input to check.
- * @returns {boolean} True if the input is an object.
- * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1319-L1323
- */
-export declare function isObject(unknown: any): boolean;
-
-/**
  * Layer group.
  *
  * Display position: {x,y}
@@ -1902,15 +1884,6 @@ export declare class Matrix33 {
     getThirdColMajorDirection(): number;
     #private;
 }
-
-/**
- * Dump an object to an array.
- *
- * @param {object} obj The input object as: {key0: {}, key1: {}}
- * @returns {Array} The corresponding array:
- *   [{name: key0, {}}, {name: key1, {}}]
- */
-export declare function objectToArray(obj: object): any[];
 
 /**
  * Immutable point.
