@@ -958,17 +958,17 @@ function logFramePosPats(elements) {
  * @returns {object} The list of meta data.
  */
 function getMetaDataWithNames(metaData) {
-  let meta;
-  if (typeof metaData['00020010'] !== 'undefined') {
+  let meta = metaData;
+  if (typeof meta['00020010'] !== 'undefined') {
     // replace tag key with tag name for dicom
-    meta = Object.keys(metaData).reduce((accumulator, currentValue) => {
+    meta = Object.keys(meta).reduce((accumulator, currentValue) => {
       const tag = dwv.getTagFromKey(currentValue);
       let key = tag.getNameFromDictionary();
       if (typeof key === 'undefined') {
         // add 'x' to help sorting
         key = 'x' + tag.getKey();
       }
-      accumulator[key] = metaData[currentValue];
+      accumulator[key] = meta[currentValue];
       return accumulator;
     }, {});
   }
