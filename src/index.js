@@ -48,6 +48,7 @@ import {Matrix33} from './math/matrix';
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
+import {i18n} from './utils/i18n';
 
 export {
   App,
@@ -79,6 +80,7 @@ export {
   customUI,
   lut,
   defaultPresets,
+  i18n,
   addTagsToDictionary,
   getDwvVersion,
   getUID,

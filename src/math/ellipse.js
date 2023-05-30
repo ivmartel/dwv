@@ -177,7 +177,7 @@ export class Ellipse {
     const spacing = viewController.get2DSpacing();
     const surface = this.getWorldSurface(spacing[0], spacing[1]);
     if (surface !== null) {
-      quant.surface = {value: surface / 100, unit: i18n('unit.cm2')};
+      quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }
 
     // pixel quantification

@@ -191,6 +191,11 @@ export function getTypedArray(bitsAllocated: number, pixelRepresentation: number
 // @public
 export function getUID(tagName: string): string;
 
+// @public (undocumented)
+export namespace i18n {
+    export function t(key: string): string;
+}
+
 // @public
 class Image_2 {
     constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: any[]);

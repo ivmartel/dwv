@@ -166,7 +166,7 @@ export class Line {
     const spacing = viewController.get2DSpacing();
     const length = this.getWorldLength(spacing[0], spacing[1]);
     if (length !== null) {
-      quant.length = {value: length, unit: i18n('unit.mm')};
+      quant.length = {value: length, unit: i18n.t('unit.mm')};
     }
     // return
     return quant;

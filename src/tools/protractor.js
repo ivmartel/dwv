@@ -119,7 +119,7 @@ export class ProtractorFactory {
       const quant = {
         angle: {
           value: angle,
-          unit: i18n('unit.degree')
+          unit: i18n.t('unit.degree')
         }
       };
       ktext.setText(replaceFlags(textExpr, quant));
@@ -277,7 +277,7 @@ export class ProtractorFactory {
     // update text
     const ktext = klabel.getText();
     const quantification = {
-      angle: {value: angle, unit: i18n('unit.degree')}
+      angle: {value: angle, unit: i18n.t('unit.degree')}
     };
     ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
     // update meta
