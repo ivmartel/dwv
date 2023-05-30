@@ -1022,6 +1022,16 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
  */
 export declare function getUID(tagName: string): string;
 
+export declare namespace i18n {
+    /**
+     * Get the translated text.
+     *
+     * @param {string} key The key to the text entry.
+     * @returns {string|undefined} The translated text.
+     */
+    export function t(key: string): string;
+}
+
 /**
  * Image class.
  * Usable once created, optional are:
