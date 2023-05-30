@@ -90,7 +90,7 @@ export function decodeQuery(query, callback, options) {
  * be an array of base + each key.
  *
  * @param {string} uri The URI to decode.
- * @param {string} replaceMode The key replace more.
+ * @param {string} replaceMode The key replace mode.
  *   replaceMode can be:
  *   - key (default): keep the key
  *   - other than key: do not use the key
