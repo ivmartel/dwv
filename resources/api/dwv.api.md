@@ -180,6 +180,9 @@ export function getOrientationName(orientation: any[]): string;
 export function getPixelDataTag(): Tag;
 
 // @public
+export function getReverseOrientation(ori: string): string;
+
+// @public
 export function getTagFromKey(key: string): Tag;
 
 // @public

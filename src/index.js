@@ -6,6 +6,7 @@ import {
   getDwvVersion,
   getTypedArray,
   getOrientationName,
+  getReverseOrientation,
   DicomParser
 } from './dicom/dicomParser';
 import {
@@ -88,6 +89,7 @@ export {
   getTagFromKey,
   getPixelDataTag,
   getOrientationName,
+  getReverseOrientation,
   precisionRound,
   buildMultipart,
   getUriQuery,
