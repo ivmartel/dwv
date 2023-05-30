@@ -19,7 +19,7 @@ import {arrayEquals} from '../utils/array';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.32.0-beta.1';
+  return '0.32.0-beta.2';
 }
 
 /**
