@@ -348,17 +348,15 @@ export declare class App {
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
      * Can be connected to a window 'resize' event.
-     *
-     * @param {object} _event The change event.
      */
-    onResize: (_event: object) => void;
+    onResize: () => void;
     /**
      * Key down callback. Meant to be used in tools.
      *
-     * @param {object} event The key down event.
+     * @param {KeyboardEvent} event The key down event.
      * @fires App#keydown
      */
-    onKeydown: (event: object) => void;
+    onKeydown: (event: KeyboardEvent) => void;
     /**
      * Key down event handler example.
      * - CRTL-Z: undo
@@ -368,11 +366,11 @@ export declare class App {
      * - CRTL-ARROW_RIGHT: previous element on fourth dim
      * - CRTL-ARROW_DOWN: previous element on third dim
      *
-     * @param {object} event The key down event.
+     * @param {KeyboardEvent} event The key down event.
      * @fires UndoStack#undo
      * @fires UndoStack#redo
      */
-    defaultOnKeydown: (event: object) => void;
+    defaultOnKeydown: (event: KeyboardEvent) => void;
     /**
      * Reset the display
      */

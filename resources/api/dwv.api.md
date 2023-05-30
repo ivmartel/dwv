@@ -15,7 +15,7 @@ export class App {
     addToUndoStack: (cmd: object) => void;
     canScroll(): boolean;
     canWindowLevel(): boolean;
-    defaultOnKeydown: (event: object) => void;
+    defaultOnKeydown: (event: KeyboardEvent) => void;
     fitToContainer(): void;
     getActiveLayerGroup(): LayerGroup;
     getAddedScale(): object;
@@ -41,8 +41,8 @@ export class App {
     loadFromUri: (uri: string, options?: object) => void;
     loadImageObject: (data: any[]) => void;
     loadURLs: (urls: any[], options?: object) => void;
-    onKeydown: (event: object) => void;
-    onResize: (_event: object) => void;
+    onKeydown: (event: KeyboardEvent) => void;
+    onResize: () => void;
     redo(): void;
     removeEventListener(type: string, callback: object): void;
     render(dataIndex: number): void;

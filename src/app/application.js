@@ -829,7 +829,7 @@ export class App {
   /**
    * Key down callback. Meant to be used in tools.
    *
-   * @param {object} event The key down event.
+   * @param {KeyboardEvent} event The key down event.
    * @fires App#keydown
    */
   onKeydown = (event) => {
@@ -853,7 +853,7 @@ export class App {
    * - CRTL-ARROW_RIGHT: previous element on fourth dim
    * - CRTL-ARROW_DOWN: previous element on third dim
    *
-   * @param {object} event The key down event.
+   * @param {KeyboardEvent} event The key down event.
    * @fires UndoStack#undo
    * @fires UndoStack#redo
    */
