@@ -45,7 +45,6 @@ import {Vector3D} from './math/vector';
 import {Index} from './math/index';
 import {Matrix33} from './math/matrix';
 // utils
-import {getUriQuery} from './utils/uri';
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
@@ -90,6 +89,5 @@ export {
   getOrientationName,
   getReverseOrientation,
   precisionRound,
-  buildMultipart,
-  getUriQuery
+  buildMultipart
 };

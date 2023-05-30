@@ -1025,15 +1025,6 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
 export declare function getUID(tagName: string): string;
 
 /**
- * Get the query part, split into an array, of an input URI.
- * The URI scheme is: 'base?query#fragment'
- *
- * @param {string} uri The input URI.
- * @returns {object} The query part, split into an array, of the input URI.
- */
-export declare function getUriQuery(uri: string): object;
-
-/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
