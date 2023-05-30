@@ -348,10 +348,8 @@ export declare class App {
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
      * Can be connected to a window 'resize' event.
-     *
-     * @param {object} _event The change event.
      */
-    onResize: (_event: object) => void;
+    onResize: () => void;
     /**
      * Key down callback. Meant to be used in tools.
      *
