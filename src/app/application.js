@@ -821,10 +821,8 @@ export class App {
    * Handle resize: fit the display to the window.
    * To be called once the image is loaded.
    * Can be connected to a window 'resize' event.
-   *
-   * @param {object} _event The change event.
    */
-  onResize = (_event) => {
+  onResize = () => {
     this.fitToContainer();
   };
 
