@@ -228,8 +228,10 @@ export class DataReader {
       }
     } else {
       data = new Uint16Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readUint16(byteOffset + bpe * i);
+        data[i] = this.readUint16(index);
+        index += bpe;
       }
     }
     return data;
@@ -254,8 +256,10 @@ export class DataReader {
       }
     } else {
       data = new Int16Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readInt16(byteOffset + bpe * i);
+        data[i] = this.readInt16(index);
+        index += bpe;
       }
     }
     return data;
@@ -280,8 +284,10 @@ export class DataReader {
       }
     } else {
       data = new Uint32Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readUint32(byteOffset + bpe * i);
+        data[i] = this.readUint32(index);
+        index += bpe;
       }
     }
     return data;
@@ -306,8 +312,10 @@ export class DataReader {
       }
     } else {
       data = new BigUint64Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readBigUint64(byteOffset + bpe * i);
+        data[i] = this.readBigUint64(index);
+        index += bpe;
       }
     }
     return data;
@@ -332,8 +340,10 @@ export class DataReader {
       }
     } else {
       data = new Int32Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readInt32(byteOffset + bpe * i);
+        data[i] = this.readInt32(index);
+        index += bpe;
       }
     }
     return data;
@@ -358,8 +368,10 @@ export class DataReader {
       }
     } else {
       data = new BigInt64Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readBigInt64(byteOffset + bpe * i);
+        data[i] = this.readBigInt64(index);
+        index += bpe;
       }
     }
     return data;
@@ -384,8 +396,10 @@ export class DataReader {
       }
     } else {
       data = new Float32Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readFloat32(byteOffset + bpe * i);
+        data[i] = this.readFloat32(index);
+        index += bpe;
       }
     }
     return data;
@@ -410,8 +424,10 @@ export class DataReader {
       }
     } else {
       data = new Float64Array(arraySize);
+      let index = byteOffset;
       for (let i = 0; i < arraySize; ++i) {
-        data[i] = this.readFloat64(byteOffset + bpe * i);
+        data[i] = this.readFloat64(index);
+        index += bpe;
       }
     }
     return data;
