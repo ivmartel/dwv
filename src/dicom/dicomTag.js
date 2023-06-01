@@ -79,8 +79,8 @@ export class Tag {
   equals(rhs) {
     return rhs !== null &&
       typeof rhs !== 'undefined' &&
-      this.getGroup() === rhs.getGroup() &&
-      this.getElement() === rhs.getElement();
+      this.#group === rhs.getGroup() &&
+      this.#element === rhs.getElement();
   }
 
   /**
@@ -89,7 +89,7 @@ export class Tag {
    * @returns {string} The key as '########'.
    */
   getKey() {
-    return this.getGroup() + this.getElement();
+    return this.#group + this.#element;
   }
 
   /**
@@ -98,7 +98,7 @@ export class Tag {
    * @returns {string} The name.
    */
   getGroupName() {
-    return tagGroups[this.getGroup()];
+    return tagGroups[this.#group];
   }
 
   /**
@@ -108,9 +108,10 @@ export class Tag {
    * @returns {boolean} True if this tag has a VR.
    */
   isWithVR() {
-    const element = this.getElement();
-    return !(this.getGroup() === 'FFFE' &&
-      (element === 'E000' || element === 'E00D' || element === 'E0DD')
+    return !(this.#group === 'FFFE' &&
+      (this.#element === 'E000' ||
+      this.#element === 'E00D' ||
+      this.#element === 'E0DD')
     );
   }
 
@@ -122,8 +123,7 @@ export class Tag {
    *   ie if its group is an odd number.
    */
   isPrivate() {
-    const groupNumber = parseInt(this.getGroup(), 16);
-    return groupNumber % 2 === 1;
+    return parseInt(this.#group, 16) % 2 === 1;
   }
 
   /**
@@ -133,10 +133,10 @@ export class Tag {
    */
   getInfoFromDictionary() {
     let info;
-    if (typeof dictionary[this.getGroup()] !== 'undefined' &&
-      typeof dictionary[this.getGroup()][this.getElement()] !==
+    if (typeof dictionary[this.#group] !== 'undefined' &&
+      typeof dictionary[this.#group][this.#element] !==
         'undefined') {
-      info = dictionary[this.getGroup()][this.getElement()];
+      info = dictionary[this.#group][this.#element];
     }
     return info;
   }
@@ -250,7 +250,8 @@ export function getItemTag() {
  * @returns {boolean} True if the asked tag.
  */
 export function isItemTag(tag) {
-  return tag.equals(getItemTag());
+  // faster than tag.equals(getItemTag());
+  return tag.getKey() === 'FFFEE000';
 }
 
 /**
@@ -269,7 +270,8 @@ export function getItemDelimitationItemTag() {
  * @returns {boolean} True if the asked tag.
  */
 export function isItemDelimitationItemTag(tag) {
-  return tag.equals(getItemDelimitationItemTag());
+  // faster than tag.equals(getItemDelimitationItemTag());
+  return tag.getKey() === 'FFFEE00D';
 }
 
 /**
@@ -288,7 +290,8 @@ export function getSequenceDelimitationItemTag() {
  * @returns {boolean} True if the asked tag.
  */
 export function isSequenceDelimitationItemTag(tag) {
-  return tag.equals(getSequenceDelimitationItemTag());
+  // faster than tag.equals(getSequenceDelimitationItemTag());
+  return tag.getKey() === 'FFFEE0DD';
 }
 
 /**
@@ -307,7 +310,8 @@ export function getPixelDataTag() {
  * @returns {boolean} True if the asked tag.
  */
 export function isPixelDataTag(tag) {
-  return tag.equals(getPixelDataTag());
+  // faster than tag.equals(getPixelDataTag());
+  return tag.getKey() === '7FE00010';
 }
 
 /**
