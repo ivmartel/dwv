@@ -102,7 +102,7 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
   const keys = keys1.concat(keys2);
 
   // loop through keys
-  for (let i = 0, leni = keys.length; i < leni; ++i) {
+  for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
     if (key !== idKey) {
       // first
@@ -139,7 +139,7 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
             // merged object with repeated value
             // copy it with the index list
             value[valueKey] = {};
-            for (let j = 0; j < id1.length; j++) {
+            for (let j = 0; j < id1.length; ++j) {
               value[valueKey][id1[j]] = subValue1;
             }
           } else {
