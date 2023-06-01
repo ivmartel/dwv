@@ -661,8 +661,7 @@ export class DicomParser {
    * @param {boolean} implicit Is the DICOM VR implicit?
    * @returns {object} The item data as a list of data elements.
    */
-  #readItemDataElement(
-    reader, offset, implicit) {
+  #readItemDataElement(reader, offset, implicit) {
     const itemData = {};
 
     // read the first item
@@ -763,8 +762,7 @@ export class DicomParser {
    * @returns {object} An object containing the element
    *   'tag', 'vl', 'vr', 'data' and 'endOffset'.
    */
-  #readDataElement(
-    reader, offset, implicit) {
+  #readDataElement(reader, offset, implicit) {
     // Tag: group, element
     const readTagRes = this.#readTag(reader, offset);
     const tag = readTagRes.tag;
@@ -1158,12 +1156,11 @@ export class DicomParser {
       // increment offset
       offset = dataElement.endOffset;
       // store the data element
-      if (typeof this.#dicomElements[dataElement.tag.getKey()] ===
-        'undefined') {
-        this.#dicomElements[dataElement.tag.getKey()] = dataElement;
+      const key = dataElement.tag.getKey();
+      if (typeof this.#dicomElements[key] === 'undefined') {
+        this.#dicomElements[key] = dataElement;
       } else {
-        logger.warn('Not saving duplicate tag: ' +
-          dataElement.tag.getKey());
+        logger.warn('Not saving duplicate tag: ' + key);
       }
     }
 
@@ -1204,8 +1201,8 @@ export class DicomParser {
     }
 
     // default character set
-    if (typeof this.getDefaultCharacterSet() !== 'undefined') {
-      this.setDecoderCharacterSet(this.getDefaultCharacterSet());
+    if (typeof this.#defaultCharacterSet !== 'undefined') {
+      this.setDecoderCharacterSet(this.#defaultCharacterSet);
     }
 
     // SpecificCharacterSet
