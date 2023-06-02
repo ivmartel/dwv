@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.32.0](https://github.com/ivmartel/dwv/releases/tag/v0.32.0) - 02/06/2023
+
+### Added
+
+- Make dwv importable as an es6 module [#399](https://github.com/ivmartel/dwv/issues/399)
+- typings [#669](https://github.com/ivmartel/dwv/issues/669)
+- Follow DICOM json standard  [#1071](https://github.com/ivmartel/dwv/issues/1071)
+
+### Fixed
+
+- Unknown VR breaks code [#1325](https://github.com/ivmartel/dwv/issues/1325)
+
+---
+
 ## [v0.31.0](https://github.com/ivmartel/dwv/releases/tag/v0.31.0) - 07/03/2023
 
 ### Added
