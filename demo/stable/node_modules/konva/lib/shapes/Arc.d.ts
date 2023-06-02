@@ -1,5 +1,6 @@
-import { Shape, ShapeConfig } from '../Shape';
-import { GetSet } from '../types';
+import { Shape, ShapeConfig } from '../Shape.js';
+import { GetSet } from '../types.js';
+import { Context } from '../Context.js';
 export interface ArcConfig extends ShapeConfig {
     angle: number;
     innerRadius: number;
@@ -7,11 +8,11 @@ export interface ArcConfig extends ShapeConfig {
     clockwise?: boolean;
 }
 export declare class Arc extends Shape<ArcConfig> {
-    _sceneFunc(context: any): void;
+    _sceneFunc(context: Context): void;
     getWidth(): number;
     getHeight(): number;
-    setWidth(width: any): void;
-    setHeight(height: any): void;
+    setWidth(width: number): void;
+    setHeight(height: number): void;
     getSelfRect(): {
         x: number;
         y: number;

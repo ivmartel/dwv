@@ -1,13 +1,14 @@
-import { Shape, ShapeConfig } from '../Shape';
-import { GetSet } from '../types';
+import { Shape, ShapeConfig } from '../Shape.js';
+import { GetSet } from '../types.js';
+import { Context } from '../Context.js';
 export interface CircleConfig extends ShapeConfig {
     radius?: number;
 }
 export declare class Circle extends Shape<CircleConfig> {
-    _sceneFunc(context: any): void;
+    _sceneFunc(context: Context): void;
     getWidth(): number;
     getHeight(): number;
-    setWidth(width: any): void;
-    setHeight(height: any): void;
+    setWidth(width: number): void;
+    setHeight(height: number): void;
     radius: GetSet<number, this>;
 }

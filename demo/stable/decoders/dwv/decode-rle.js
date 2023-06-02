@@ -9,7 +9,8 @@ importScripts('rle.js');
 self.addEventListener('message', function (event) {
 
   // decode DICOM buffer
-  var decoder = new dwv.decoder.RleDecoder();
+  // eslint-disable-next-line no-undef
+  var decoder = new dwvdecoder.RleDecoder();
   // post decoded data
   self.postMessage([decoder.decode(
     event.data.buffer,

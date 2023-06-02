@@ -1,6 +1,6 @@
-import { Container, ContainerConfig } from './Container';
-import { Node } from './Node';
-import { Shape } from './Shape';
+import { Container, ContainerConfig } from './Container.js';
+import { Node } from './Node.js';
+import { Shape } from './Shape.js';
 export interface GroupConfig extends ContainerConfig {
 }
 export declare class Group extends Container<Group | Shape> {

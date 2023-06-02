@@ -1,2 +1,2 @@
-import { Filter } from '../Node';
+import { Filter } from '../Node.js';
 export declare const Posterize: Filter;

@@ -1,12 +1,12 @@
 // namespaces
-var dwv = dwv || {};
-dwv.decoder = dwv.decoder || {};
+// (do not use dwv since it is the exported module name)
+var dwvdecoder = dwvdecoder || {};
 
 /**
  * RLE (Run-length encoding) decoder class.
  * @constructor
  */
-dwv.decoder.RleDecoder = function () {};
+dwvdecoder.RleDecoder = function () {};
 
 /**
  * Decode a RLE buffer.
@@ -20,7 +20,7 @@ dwv.decoder.RleDecoder = function () {};
  * @returns The decoded buffer.
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_G.3.html
  */
-dwv.decoder.RleDecoder.prototype.decode = function (buffer,
+dwvdecoder.RleDecoder.prototype.decode = function (buffer,
   bitsAllocated, isSigned, sliceSize, samplesPerPixel, planarConfiguration) {
 
   // bytes per element

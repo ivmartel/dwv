@@ -1,2 +1,2 @@
-import { Konva } from './_FullInternals';
+import { Konva } from './_FullInternals.js';
 export default Konva;

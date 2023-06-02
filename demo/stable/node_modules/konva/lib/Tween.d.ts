@@ -1,5 +1,5 @@
-import { Animation } from './Animation';
-import { Node, NodeConfig } from './Node';
+import { Animation } from './Animation.js';
+import { Node, NodeConfig } from './Node.js';
 declare class TweenEngine {
     prop: string;
     propFunc: Function;
