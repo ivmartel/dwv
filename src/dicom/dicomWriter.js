@@ -1,6 +1,7 @@
 import {
-  vrTypes,
-  charSetString
+  is32bitVLVR,
+  isCharSetStringVR,
+  vrTypes
 } from './dictionary';
 import {
   Tag,
@@ -16,7 +17,6 @@ import {
 } from './dicomTag';
 import {
   getDwvVersion,
-  is32bitVLVR,
   isImplicitTransferSyntax,
   isBigEndianTransferSyntax,
   getDataElementPrefixByteSize
@@ -977,7 +977,7 @@ export class DicomWriter {
         // TODO: not sure for UN...
         if (isStringVr(element.vr)) {
           let pad;
-          if (charSetString.includes(element.vr)) {
+          if (isCharSetStringVR(element.vr)) {
             value = this.#encodeSpecialString(value.join('\\'));
             pad = this.#encodeSpecialString(padStr);
           } else {

@@ -5327,16 +5327,55 @@ export const tagGroups = {
 // Value Representation (VR) with 32bit Value Length (VL)
 // Added locally used 'ox'
 // see http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1
-export const vr32bitVL = [
-  'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'SQ', 'SV', 'UC', 'UN', 'UR', 'UT', 'UV', 'ox'
-];
+const vr32bitVL = {
+  'OB': true,
+  'OD': true,
+  'OF': true,
+  'OL': true,
+  'OV': true,
+  'OW': true,
+  'SQ': true,
+  'SV': true,
+  'UC': true,
+  'UN': true,
+  'UR': true,
+  'UT': true,
+  'UV': true,
+  'ox': true
+};
+
+/**
+ * Does the input Value Representation (VR) have a 32bit Value Length (VL).
+ *
+ * @param {string} vr The data Value Representation (VR).
+ * @returns {boolean} True if this VR has a 32-bit VL.
+ */
+export function is32bitVLVR(vr) {
+  return typeof vr32bitVL[vr] !== 'undefined';
+}
 
 // String VR with extended or replaced default character repertoire defined in
 // Specific Character Set (0008,0005)
 // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2
-export const charSetString = [
-  'SH', 'LO', 'UC', 'ST', 'LT', 'UT', 'PN'
-];
+const vrCharSetString = {
+  'SH': true,
+  'LO': true,
+  'UC': true,
+  'ST': true,
+  'LT': true,
+  'UT': true,
+  'PN': true
+};
+
+/**
+ * Does the input Value Representation (VR) have an special character repertoire.
+ *
+ * @param {string} vr The data VR.
+ * @returns {boolean} True if this VR has a special char set.
+ */
+export function isCharSetStringVR(vr) {
+  return typeof vrCharSetString[vr] !== 'undefined';
+}
 
 // VR types
 // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1

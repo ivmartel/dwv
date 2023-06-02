@@ -5,9 +5,9 @@ import {
   isPixelDataTag
 } from './dicomTag';
 import {
-  vr32bitVL,
+  is32bitVLVR,
+  isCharSetStringVR,
   vrTypes,
-  charSetString
 } from './dictionary';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
@@ -479,17 +479,6 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
     }
   }
   return res;
-}
-
-/**
- * Does this Value Representation (VR) have a 32bit Value Length (VL).
- * Ref: [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1}.
- *
- * @param {string} vr The data Value Representation (VR).
- * @returns {boolean} True if this VR has a 32-bit VL.
- */
-export function is32bitVLVR(vr) {
-  return vr32bitVL.includes(vr);
 }
 
 /**
@@ -974,7 +963,7 @@ export class DicomParser {
         data = Array.from(reader.readFloat64Array(offset, vl));
       } else if (vrType === 'string') {
         const stream = reader.readUint8Array(offset, vl);
-        if (charSetString.includes(vr)) {
+        if (isCharSetStringVR(vr)) {
           data = this.#decodeSpecialString(stream);
         } else {
           data = this.#decodeString(stream);
