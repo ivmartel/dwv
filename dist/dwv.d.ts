@@ -2396,7 +2396,8 @@ export declare class Tag {
     getGroupName(): string;
     /**
      * Does this tag have a VR.
-     * Basically the Item, ItemDelimitationItem and SequenceDelimitationItem tags.
+     * Basically not the Item, ItemDelimitationItem nor
+     *  SequenceDelimitationItem tags.
      *
      * @returns {boolean} True if this tag has a VR.
      */
