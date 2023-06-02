@@ -164,9 +164,23 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
  */
 QUnit.test('Test cleanString.', function (assert) {
   // undefined
-  assert.equal(cleanString(), null, 'Clean undefined');
+  assert.throws(function () {
+    cleanString();
+  },
+  new TypeError('Cannot read properties of undefined (reading \'length\')'),
+  'cleanstring undefined throws.');
   // null
-  assert.equal(cleanString(null), null, 'Clean null');
+  assert.throws(function () {
+    cleanString(null);
+  },
+  new TypeError('Cannot read properties of null (reading \'length\')'),
+  'cleanstring null throws.');
+  // number
+  assert.throws(function () {
+    cleanString(3);
+  },
+  new TypeError('res.trim is not a function'),
+  'cleanstring number throws.');
   // empty
   assert.equal(cleanString(''), '', 'Clean empty');
   // short
@@ -185,7 +199,7 @@ QUnit.test('Test cleanString.', function (assert) {
     cleanString(str), refStr, 'Clean regular with special');
   // regular with special and ending space (not trimmed)
   str = ' El cielo azul ' + special;
-  refStr = 'El cielo azul ';
+  refStr = 'El cielo azul';
   assert.equal(
     cleanString(str), refStr, 'Clean regular with special 2');
 });

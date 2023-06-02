@@ -38,8 +38,14 @@ export function hasDicomPrefix(buffer) {
   return prefixArray.reduce(stringReducer, '') === 'DICM';
 }
 
+// Zero-width space (u200B)
+// @ts-ignore
+const ZWS = String.fromCharCode('u200B');
+
 /**
- * Clean string: trim and remove ending.
+ * Clean string: remove zero-width space ending and trim.
+ * Warning: no tests are done on the input, will fail if
+ *   null or undefined or not string.
  * (exported for tests only)
  *
  * @param {string} inputStr The string to clean.
@@ -47,15 +53,14 @@ export function hasDicomPrefix(buffer) {
  */
 export function cleanString(inputStr) {
   let res = inputStr;
-  if (inputStr) {
-    // trim spaces
-    res = inputStr.trim();
-    // get rid of ending zero-width space (u200B)
-    // @ts-ignore
-    if (res[res.length - 1] === String.fromCharCode('u200B')) {
-      res = res.substring(0, res.length - 1);
-    }
+  // get rid of ending zero-width space
+  const lastIndex = inputStr.length - 1;
+  if (inputStr[lastIndex] === ZWS) {
+    res = inputStr.substring(0, lastIndex);
   }
+  // trim spaces
+  res = res.trim();
+  // return
   return res;
 }
 
