@@ -5328,20 +5328,20 @@ export const tagGroups = {
 // Added locally used 'ox'
 // see http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1
 const vr32bitVL = {
-  'OB': true,
-  'OD': true,
-  'OF': true,
-  'OL': true,
-  'OV': true,
-  'OW': true,
-  'SQ': true,
-  'SV': true,
-  'UC': true,
-  'UN': true,
-  'UR': true,
-  'UT': true,
-  'UV': true,
-  'ox': true
+  OB: true,
+  OD: true,
+  OF: true,
+  OL: true,
+  OV: true,
+  OW: true,
+  SQ: true,
+  SV: true,
+  UC: true,
+  UN: true,
+  UR: true,
+  UT: true,
+  UV: true,
+  ox: true
 };
 
 /**
@@ -5358,13 +5358,13 @@ export function is32bitVLVR(vr) {
 // Specific Character Set (0008,0005)
 // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2
 const vrCharSetString = {
-  'SH': true,
-  'LO': true,
-  'UC': true,
-  'ST': true,
-  'LT': true,
-  'UT': true,
-  'PN': true
+  SH: true,
+  LO: true,
+  UC: true,
+  ST: true,
+  LT: true,
+  UT: true,
+  PN: true
 };
 
 /**
