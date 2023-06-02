@@ -33,12 +33,14 @@ jobs:
       if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
       run: |
         rm -Rf ./node_modules/*
-        yarn install --prod
-        cp -Rf node_modules ./build
-        cp -Rf decoders ./build
-        cp -Rf tests/pacs/viewer.* ./build
-        ./resources/scripts/prep-deploy.sh -f build/viewer.html
-        ./resources/scripts/prep-deploy.sh -f build/viewer.js
+        yarn install --prod --frozen-lockfile
+        mkdir ./build/demo
+        cp -Rf node_modules ./build/demo
+        cp -Rf dist ./build/demo
+        cp -Rf decoders ./build/demo
+        cp -Rf tests/pacs/viewer.* ./build/demo
+        ./resources/scripts/prep-deploy.sh -f build/demo/viewer.html
+        ./resources/scripts/prep-deploy.sh -f build/demo/viewer.js
     - name: Push to gh-pages (if master or develop branch)
       if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
       run: |
@@ -49,9 +51,10 @@ jobs:
         ALL=/*
         git config user.email github-actions@github.com
         git config user.name github-actions
+        git checkout .
         git checkout gh-pages
         rm -Rf $DEPLOY_DIR$ALL
-        cp -Rf ./build/* $DEPLOY_DIR
+        cp -Rf ./build/demo/* $DEPLOY_DIR
         git add -A $DEPLOY_DIR
         git diff-index --quiet HEAD ||
           git commit -m "CI run ${{ github.run_number }} pushed to gh-pages"

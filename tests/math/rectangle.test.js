@@ -1,3 +1,7 @@
+import {Point2D} from '../../src/math/point';
+import {Index} from '../../src/math/index';
+import {Rectangle} from '../../src/math/rectangle';
+
 /**
  * Tests for the 'math/shapes.js' file.
  */
@@ -5,28 +9,28 @@
 /* global QUnit */
 
 /**
- * Tests for {@link dwv.math.Rectangle}.
+ * Tests for {@link Rectangle}.
  *
  * @function module:tests/math~Rectangle
  */
 QUnit.test('Test Rectangle.', function (assert) {
-  var p00 = new dwv.math.Point2D(0, 0);
-  var p01 = new dwv.math.Point2D(-4, -4);
-  var r00 = new dwv.math.Rectangle(p00, p01);
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(-4, -4);
+  const r00 = new Rectangle(p00, p01);
   // getBegin
   assert.equal(r00.getBegin().equals(p01), true, 'getBegin');
   // getEnd
   assert.equal(r00.getEnd().equals(p00), true, 'getEnd');
 
   // equals: true
-  var r01 = new dwv.math.Rectangle(p00, p01);
+  const r01 = new Rectangle(p00, p01);
   assert.ok(r00.equals(r01), 'equal rectangles');
   // equals: false end
-  var p02 = new dwv.math.Point2D(0, -4);
-  var r02 = new dwv.math.Rectangle(p00, p02);
+  const p02 = new Point2D(0, -4);
+  const r02 = new Rectangle(p00, p02);
   assert.notOk(r00.equals(r02), 'non equal rectangles end');
   // equals: false begin
-  var r03 = new dwv.math.Rectangle(p02, p01);
+  const r03 = new Rectangle(p02, p01);
   assert.notOk(r00.equals(r03), 'non equal rectangles begin');
 
   // getRealWidth
@@ -44,16 +48,16 @@ QUnit.test('Test Rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.math.Rectangle} quantification.
+ * Tests for {@link Rectangle} quantification.
  *
  * @function module:tests/math~Rectangle
  */
 QUnit.test('Test Rectangle quantify.', function (assert) {
-  var p00 = new dwv.math.Point2D(0, 0);
-  var p01 = new dwv.math.Point2D(4, 4);
-  var r00 = new dwv.math.Rectangle(p00, p01);
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(4, 4);
+  const r00 = new Rectangle(p00, p01);
   // view controller
-  var mockVc0 = {
+  const mockVc0 = {
     canQuantifyImage: function () {
       return true;
     },
@@ -61,20 +65,20 @@ QUnit.test('Test Rectangle quantify.', function (assert) {
       return [1, 1];
     },
     getCurrentPosition: function () {
-      return new dwv.math.Index([0, 0, 0]);
+      return new Index([0, 0, 0]);
     },
     getImageRegionValues: function () {
       return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];
     }
   };
-  var theoQuant0 = {
+  const theoQuant0 = {
     min: {value: 0, unit: ''},
     max: {value: 1, unit: ''},
     mean: {value: 0.25, unit: ''},
     stdDev: {value: 0.4330127018922193, unit: ''},
     surface: {value: 0.16, unit: undefined}
   };
-  var resQuant0 = r00.quantify(mockVc0);
+  const resQuant0 = r00.quantify(mockVc0);
   assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
   assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
   assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');

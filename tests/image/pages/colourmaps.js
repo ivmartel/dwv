@@ -1,5 +1,22 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// Do not warn if these variables were not defined before.
+/* global dwv */
+
+// call setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ * Setup.
+ */
+function onDOMContentLoaded() {
+  createImage('Plain', dwv.lut.plain);
+  createImage('InvPlain', dwv.lut.invPlain);
+  createImage('Rainbow', dwv.lut.rainbow);
+  createImage('Hot', dwv.lut.hot);
+  createImage('Hot Iron', dwv.lut.hot_iron);
+  createImage('Pet', dwv.lut.pet);
+  createImage('Hot Metal Blue', dwv.lut.hot_metal_blue);
+  createImage('Pet 20 step', dwv.lut.pet_20step);
+}
 
 /**
  * Create the colour map image and add it to the document.
@@ -9,18 +26,18 @@ dwv.test = dwv.test || {};
  */
 function createImage(colourMapName, colourMap) {
   // default size
-  var height = 40;
-  var width = 256;
+  const height = 40;
+  const width = 256;
   // create canvas
-  var canvas = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var context = canvas.getContext('2d');
+  const context = canvas.getContext('2d');
   // fill in the image data
-  var imageData = context.createImageData(canvas.width, canvas.height);
-  var index = 0;
-  for (var j = 0; j < canvas.height; ++j) {
-    for (var i = 0; i < canvas.width; ++i) {
+  const imageData = context.createImageData(canvas.width, canvas.height);
+  let index = 0;
+  for (let j = 0; j < canvas.height; ++j) {
+    for (let i = 0; i < canvas.width; ++i) {
       index = (i + j * imageData.width) * 4;
       imageData.data[index] = colourMap.red[i];
       imageData.data[index + 1] = colourMap.green[i];
@@ -32,10 +49,10 @@ function createImage(colourMapName, colourMap) {
   context.putImageData(imageData, 0, 0);
 
   // html
-  var div = document.createElement('div');
+  const div = document.createElement('div');
   div.id = colourMapName;
-  var paragraph = document.createElement('p');
-  var link = document.createElement('a');
+  const paragraph = document.createElement('p');
+  const link = document.createElement('a');
   link.href = canvas.toDataURL('image/png');
   link.appendChild(document.createTextNode(colourMapName));
   // put all together
@@ -45,18 +62,3 @@ function createImage(colourMapName, colourMap) {
   // add to the document
   document.body.appendChild(div);
 }
-
-/**
- * Last minute.
- */
-dwv.test.onDOMContentLoadedColourmap = function (/*event*/) {
-  createImage('Plain', dwv.image.lut.plain);
-  createImage('InvPlain', dwv.image.lut.invPlain);
-  createImage('Rainbow', dwv.image.lut.rainbow);
-  createImage('Hot', dwv.image.lut.hot);
-  createImage('Hot Iron', dwv.image.lut.hot_iron);
-  createImage('Pet', dwv.image.lut.pet);
-  createImage('Hot Metal Blue', dwv.image.lut.hot_metal_blue);
-  createImage('Pet 20 step', dwv.image.lut.pet_20step);
-  createImage('Test', dwv.image.lut.test);
-};

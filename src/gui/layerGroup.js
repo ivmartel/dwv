@@ -1,6 +1,18 @@
-// namespaces
-var dwv = dwv || {};
-dwv.gui = dwv.gui || {};
+import {getIdentityMat33, getCoronalMat33} from '../math/matrix';
+import {Index} from '../math/index';
+import {Point} from '../math/point';
+import {Vector3D} from '../math/vector';
+import {viewEventNames} from '../image/view';
+import {ListenerHandler} from '../utils/listen';
+import {logger} from '../utils/logger';
+import {ViewLayer} from './viewLayer';
+import {DrawLayer} from './drawLayer';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Matrix33} from '../math/matrix';
+import {Point3D} from '../math/point';
+/* eslint-enable no-unused-vars */
 
 /**
  * Get the layer div id.
@@ -9,9 +21,9 @@ dwv.gui = dwv.gui || {};
  * @param {number} layerId The lyaer id.
  * @returns {string} A string id.
  */
-dwv.gui.getLayerDivId = function (groupDivId, layerId) {
+export function getLayerDivId(groupDivId, layerId) {
   return groupDivId + '-layer-' + layerId;
-};
+}
 
 /**
  * Get the layer details from a div id.
@@ -19,45 +31,45 @@ dwv.gui.getLayerDivId = function (groupDivId, layerId) {
  * @param {string} idString The layer div id.
  * @returns {object} The layer details as {groupDivId, layerId}.
  */
-dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
-  var split = idString.split('-layer-');
+export function getLayerDetailsFromLayerDivId(idString) {
+  const split = idString.split('-layer-');
   if (split.length !== 2) {
-    dwv.logger.warn('Not the expected layer div id format...');
+    logger.warn('Not the expected layer div id format...');
   }
   return {
     groupDivId: split[0],
     layerId: split[1]
   };
-};
+}
 
 /**
  * Get the layer details from a mouse event.
  *
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
- * with the 'layer' class and id generated with `dwv.gui.getLayerDivId`.
+ * with the 'layer' class and id generated with `getLayerDivId`.
  * @returns {object} The layer details as {groupDivId, layerId}.
  */
-dwv.gui.getLayerDetailsFromEvent = function (event) {
-  var res = null;
+export function getLayerDetailsFromEvent(event) {
+  let res = null;
   // get the closest element from the event target and with the 'layer' class
-  var layerDiv = event.target.closest('.layer');
+  const layerDiv = event.target.closest('.layer');
   if (layerDiv && typeof layerDiv.id !== 'undefined') {
-    res = dwv.gui.getLayerDetailsFromLayerDivId(layerDiv.id);
+    res = getLayerDetailsFromLayerDivId(layerDiv.id);
   }
   return res;
-};
+}
 
 /**
  * Get the view orientation according to an image and target orientation.
  * The view orientation is used to go from target to image space.
  *
- * @param {dwv.math.Matrix33} imageOrientation The image geometry.
- * @param {dwv.math.Matrix33} targetOrientation The target orientation.
- * @returns {dwv.math.Matrix33} The view orientation.
+ * @param {Matrix33} imageOrientation The image geometry.
+ * @param {Matrix33} targetOrientation The target orientation.
+ * @returns {Matrix33} The view orientation.
  */
-dwv.gui.getViewOrientation = function (imageOrientation, targetOrientation) {
-  var viewOrientation = dwv.math.getIdentityMat33();
+export function getViewOrientation(imageOrientation, targetOrientation) {
+  let viewOrientation = getIdentityMat33();
   if (typeof targetOrientation !== 'undefined') {
     // i: image, v: view, t: target, O: orientation, P: point
     // [Img] -- Oi --> [Real] <-- Ot -- [Target]
@@ -69,33 +81,33 @@ dwv.gui.getViewOrientation = function (imageOrientation, targetOrientation) {
   }
   // TODO: why abs???
   return viewOrientation.getAbs();
-};
+}
 
 /**
  * Get the target orientation according to an image and view orientation.
  * The target orientation is used to go from target to real space.
  *
- * @param {dwv.math.Matrix33} imageOrientation The image geometry.
- * @param {dwv.math.Matrix33} viewOrientation The view orientation.
- * @returns {dwv.math.Matrix33} The target orientation.
+ * @param {Matrix33} imageOrientation The image geometry.
+ * @param {Matrix33} viewOrientation The view orientation.
+ * @returns {Matrix33} The target orientation.
  */
-dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
+export function getTargetOrientation(imageOrientation, viewOrientation) {
   // i: image, v: view, t: target, O: orientation, P: point
   // [Img] -- Oi --> [Real] <-- Ot -- [Target]
   // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
   // -> Ot = Oi * Ov
-  // note: asOneAndZeros as in dwv.gui.getViewOrientation...
-  var targetOrientation =
+  // note: asOneAndZeros as in getViewOrientation...
+  let targetOrientation =
     imageOrientation.asOneAndZeros().multiply(viewOrientation);
 
   // TODO: why abs???
-  var simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
-  if (simpleImageOrientation.equals(dwv.math.getCoronalMat33().getAbs())) {
+  const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
+  if (simpleImageOrientation.equals(getCoronalMat33().getAbs())) {
     targetOrientation = targetOrientation.getAbs();
   }
 
   return targetOrientation;
-};
+}
 
 /**
  * Get a scaled offset to adapt to new scale and such as the input center
@@ -107,7 +119,7 @@ dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
  * @param {object} center The scale center as {x,y}.
  * @returns {object} The scaled offset as {x,y}.
  */
-dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
+export function getScaledOffset(offset, scale, newScale, center) {
   // worldPoint = indexPoint / scale + offset
   //=> indexPoint = (worldPoint - offset ) * scale
 
@@ -117,7 +129,7 @@ dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
   //=> newOffset = indexCenter / oldScale + oldOffset -
   //     indexCenter / newScale
   //=> newOffset = worldCenter - indexCenter / newScale
-  var indexCenter = {
+  const indexCenter = {
     x: (center.x - offset.x) * scale.x,
     y: (center.y - offset.y) * scale.y
   };
@@ -125,7 +137,7 @@ dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
     x: center.x - (indexCenter.x / newScale.x),
     y: center.y - (indexCenter.y / newScale.y)
   };
-};
+}
 
 /**
  * Layer group.
@@ -142,419 +154,425 @@ dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
  * World -> display
  * planePos = viewController.getOffset3DFromPlaneOffset(pos)
  * no need yet for a planePos to displayPos...
- *
- * @param {object} containerDiv The associated HTML div.
- * @class
  */
-dwv.gui.LayerGroup = function (containerDiv) {
+export class LayerGroup {
 
-  // closure to self
-  var self = this;
-  // list of layers
-  var layers = [];
+  /**
+   * The container div.
+   *
+   * @type {HTMLElement}
+   */
+  #containerDiv;
+
+  /**
+   * List of layers.
+   *
+   * @type {Array}
+   */
+  #layers = [];
 
   /**
    * The layer scale as {x,y}.
    *
-   * @private
    * @type {object}
    */
-  var scale = {x: 1, y: 1, z: 1};
+  #scale = {x: 1, y: 1, z: 1};
 
   /**
    * The base scale as {x,y}: all posterior scale will be on top of this one.
    *
-   * @private
    * @type {object}
    */
-  var baseScale = {x: 1, y: 1, z: 1};
+  #baseScale = {x: 1, y: 1, z: 1};
 
   /**
    * The layer offset as {x,y}.
    *
-   * @private
    * @type {object}
    */
-  var offset = {x: 0, y: 0, z: 0};
+  #offset = {x: 0, y: 0, z: 0};
 
   /**
    * Active view layer index.
    *
-   * @private
    * @type {number}
    */
-  var activeViewLayerIndex = null;
+  #activeViewLayerIndex = null;
 
   /**
    * Active draw layer index.
    *
-   * @private
    * @type {number}
    */
-  var activeDrawLayerIndex = null;
+  #activeDrawLayerIndex = null;
 
   /**
    * Listener handler.
    *
-   * @type {object}
-   * @private
+   * @type {ListenerHandler}
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * The target orientation matrix.
    *
-   * @type {object}
-   * @private
+   * @type {Matrix33}
    */
-  var targetOrientation;
+  #targetOrientation;
 
   /**
    * Flag to activate crosshair or not.
    *
    * @type {boolean}
-   * @private
    */
-  var showCrosshair = false;
+  #showCrosshair = false;
 
   /**
    * The current position used for the crosshair.
    *
-   * @type {dwv.math.Point}
-   * @private
+   * @type {Point}
    */
-  var currentPosition;
+  #currentPosition;
+
+  /**
+   * @param {HTMLElement} containerDiv The associated HTML div.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+  }
 
   /**
    * Get the target orientation.
    *
-   * @returns {dwv.math.Matrix33} The orientation matrix.
+   * @returns {Matrix33} The orientation matrix.
    */
-  this.getTargetOrientation = function () {
-    return targetOrientation;
-  };
+  getTargetOrientation() {
+    return this.#targetOrientation;
+  }
 
   /**
    * Set the target orientation.
    *
-   * @param {dwv.math.Matrix33} orientation The orientation matrix.
+   * @param {Matrix33} orientation The orientation matrix.
    */
-  this.setTargetOrientation = function (orientation) {
-    targetOrientation = orientation;
-  };
+  setTargetOrientation(orientation) {
+    this.#targetOrientation = orientation;
+  }
 
   /**
    * Get the showCrosshair flag.
    *
    * @returns {boolean} True to display the crosshair.
    */
-  this.getShowCrosshair = function () {
-    return showCrosshair;
-  };
+  getShowCrosshair() {
+    return this.#showCrosshair;
+  }
 
   /**
    * Set the showCrosshair flag.
    *
    * @param {boolean} flag True to display the crosshair.
    */
-  this.setShowCrosshair = function (flag) {
-    showCrosshair = flag;
+  setShowCrosshair(flag) {
+    this.#showCrosshair = flag;
     if (flag) {
       // listen to offset and zoom change
-      self.addEventListener('offsetchange', updateCrosshairOnChange);
-      self.addEventListener('zoomchange', updateCrosshairOnChange);
+      this.addEventListener('offsetchange', this.#updateCrosshairOnChange);
+      this.addEventListener('zoomchange', this.#updateCrosshairOnChange);
       // show crosshair div
-      showCrosshairDiv();
+      this.#showCrosshairDiv();
     } else {
       // listen to offset and zoom change
-      self.removeEventListener('offsetchange', updateCrosshairOnChange);
-      self.removeEventListener('zoomchange', updateCrosshairOnChange);
+      this.removeEventListener('offsetchange', this.#updateCrosshairOnChange);
+      this.removeEventListener('zoomchange', this.#updateCrosshairOnChange);
       // remove crosshair div
-      removeCrosshairDiv();
+      this.#removeCrosshairDiv();
     }
-  };
+  }
 
   /**
    * Update crosshair on offset or zoom change.
+   *
+   * @param {object} _event The change event.
    */
-  function updateCrosshairOnChange() {
-    showCrosshairDiv();
-  }
+  #updateCrosshairOnChange = (_event) => {
+    this.#showCrosshairDiv();
+  };
 
   /**
    * Get the Id of the container div.
    *
    * @returns {string} The id of the div.
    */
-  this.getDivId = function () {
-    return containerDiv.id;
-  };
+  getDivId() {
+    return this.#containerDiv.id;
+  }
 
   /**
    * Get the layer scale.
    *
    * @returns {object} The scale as {x,y,z}.
    */
-  this.getScale = function () {
-    return scale;
-  };
+  getScale() {
+    return this.#scale;
+  }
 
   /**
    * Get the base scale.
    *
    * @returns {object} The scale as {x,y,z}.
    */
-  this.getBaseScale = function () {
-    return baseScale;
-  };
+  getBaseScale() {
+    return this.#baseScale;
+  }
 
   /**
    * Get the added scale: the scale added to the base scale
    *
    * @returns {object} The scale as {x,y,z}.
    */
-  this.getAddedScale = function () {
+  getAddedScale() {
     return {
-      x: scale.x / baseScale.x,
-      y: scale.y / baseScale.y,
-      z: scale.z / baseScale.z
+      x: this.#scale.x / this.#baseScale.x,
+      y: this.#scale.y / this.#baseScale.y,
+      z: this.#scale.z / this.#baseScale.z
     };
-  };
+  }
 
   /**
    * Get the layer offset.
    *
    * @returns {object} The offset as {x,y,z}.
    */
-  this.getOffset = function () {
-    return offset;
-  };
+  getOffset() {
+    return this.#offset;
+  }
 
   /**
    * Get the number of layers handled by this class.
    *
    * @returns {number} The number of layers.
    */
-  this.getNumberOfLayers = function () {
-    return layers.length;
-  };
+  getNumberOfLayers() {
+    return this.#layers.length;
+  }
 
   /**
    * Get the active image layer.
    *
-   * @returns {object} The layer.
+   * @returns {ViewLayer} The layer.
    */
-  this.getActiveViewLayer = function () {
-    return layers[activeViewLayerIndex];
-  };
+  getActiveViewLayer() {
+    return this.#layers[this.#activeViewLayerIndex];
+  }
 
   /**
    * Get the view layers associated to a data index.
    *
    * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @returns {ViewLayer[]} The layers.
    */
-  this.getViewLayersByDataIndex = function (index) {
-    var res = [];
-    for (var i = 0; i < layers.length; ++i) {
-      if (layers[i] instanceof dwv.gui.ViewLayer &&
-        layers[i].getDataIndex() === index) {
-        res.push(layers[i]);
+  getViewLayersByDataIndex(index) {
+    const res = [];
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof ViewLayer &&
+        this.#layers[i].getDataIndex() === index) {
+        res.push(this.#layers[i]);
       }
     }
     return res;
-  };
+  }
 
   /**
    * Search view layers for equal imae meta data.
    *
    * @param {object} meta The meta data to find.
-   * @returns {Array} The list of view layers that contain matched data.
+   * @returns {ViewLayer[]} The list of view layers that contain matched data.
    */
-  this.searchViewLayers = function (meta) {
-    var res = [];
-    for (var i = 0; i < layers.length; ++i) {
-      if (layers[i] instanceof dwv.gui.ViewLayer) {
-        if (layers[i].getViewController().equalImageMeta(meta)) {
-          res.push(layers[i]);
+  searchViewLayers(meta) {
+    const res = [];
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof ViewLayer) {
+        if (this.#layers[i].getViewController().equalImageMeta(meta)) {
+          res.push(this.#layers[i]);
         }
       }
     }
     return res;
-  };
+  }
 
   /**
    * Get the view layers data indices.
    *
    * @returns {Array} The list of indices.
    */
-  this.getViewDataIndices = function () {
-    var res = [];
-    for (var i = 0; i < layers.length; ++i) {
-      if (layers[i] instanceof dwv.gui.ViewLayer) {
-        res.push(layers[i].getDataIndex());
+  getViewDataIndices() {
+    const res = [];
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof ViewLayer) {
+        res.push(this.#layers[i].getDataIndex());
       }
     }
     return res;
-  };
+  }
 
   /**
    * Get the active draw layer.
    *
-   * @returns {object} The layer.
+   * @returns {DrawLayer} The layer.
    */
-  this.getActiveDrawLayer = function () {
-    return layers[activeDrawLayerIndex];
-  };
+  getActiveDrawLayer() {
+    return this.#layers[this.#activeDrawLayerIndex];
+  }
 
   /**
    * Get the draw layers associated to a data index.
    *
    * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @returns {DrawLayer[]} The layers.
    */
-  this.getDrawLayersByDataIndex = function (index) {
-    var res = [];
-    for (var i = 0; i < layers.length; ++i) {
-      if (layers[i] instanceof dwv.gui.DrawLayer &&
-        layers[i].getDataIndex() === index) {
-        res.push(layers[i]);
+  getDrawLayersByDataIndex(index) {
+    const res = [];
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof DrawLayer &&
+        this.#layers[i].getDataIndex() === index) {
+        res.push(this.#layers[i]);
       }
     }
     return res;
-  };
+  }
 
   /**
    * Set the active view layer.
    *
    * @param {number} index The index of the layer to set as active.
    */
-  this.setActiveViewLayer = function (index) {
-    activeViewLayerIndex = index;
-  };
+  setActiveViewLayer(index) {
+    this.#activeViewLayerIndex = index;
+  }
 
   /**
    * Set the active view layer with a data index.
    *
    * @param {number} index The data index.
    */
-  this.setActiveViewLayerByDataIndex = function (index) {
-    for (var i = 0; i < layers.length; ++i) {
-      if (layers[i] instanceof dwv.gui.ViewLayer &&
-        layers[i].getDataIndex() === index) {
+  setActiveViewLayerByDataIndex(index) {
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof ViewLayer &&
+        this.#layers[i].getDataIndex() === index) {
         this.setActiveViewLayer(i);
         break;
       }
     }
-  };
+  }
 
   /**
    * Set the active draw layer.
    *
    * @param {number} index The index of the layer to set as active.
    */
-  this.setActiveDrawLayer = function (index) {
-    activeDrawLayerIndex = index;
-  };
+  setActiveDrawLayer(index) {
+    this.#activeDrawLayerIndex = index;
+  }
 
   /**
    * Set the active draw layer with a data index.
    *
    * @param {number} index The data index.
    */
-  this.setActiveDrawLayerByDataIndex = function (index) {
-    for (var i = 0; i < layers.length; ++i) {
-      if (layers[i] instanceof dwv.gui.DrawLayer &&
-        layers[i].getDataIndex() === index) {
+  setActiveDrawLayerByDataIndex(index) {
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof DrawLayer &&
+        this.#layers[i].getDataIndex() === index) {
         this.setActiveDrawLayer(i);
         break;
       }
     }
-  };
+  }
 
   /**
    * Add a view layer.
    *
-   * @returns {object} The created layer.
+   * @returns {ViewLayer} The created layer.
    */
-  this.addViewLayer = function () {
+  addViewLayer() {
     // layer index
-    var viewLayerIndex = layers.length;
+    const viewLayerIndex = this.#layers.length;
     // create div
-    var div = getNextLayerDiv();
+    const div = this.#getNextLayerDiv();
     // prepend to container
-    containerDiv.append(div);
+    this.#containerDiv.append(div);
     // view layer
-    var layer = new dwv.gui.ViewLayer(div);
+    const layer = new ViewLayer(div);
     // add layer
-    layers.push(layer);
+    this.#layers.push(layer);
     // mark it as active
     this.setActiveViewLayer(viewLayerIndex);
     // bind view layer events
-    bindViewLayer(layer);
+    this.#bindViewLayer(layer);
     // return
     return layer;
-  };
+  }
 
   /**
    * Add a draw layer.
    *
-   * @returns {object} The created layer.
+   * @returns {DrawLayer} The created layer.
    */
-  this.addDrawLayer = function () {
+  addDrawLayer() {
     // store active index
-    activeDrawLayerIndex = layers.length;
+    this.#activeDrawLayerIndex = this.#layers.length;
     // create div
-    var div = getNextLayerDiv();
+    const div = this.#getNextLayerDiv();
     // prepend to container
-    containerDiv.append(div);
+    this.#containerDiv.append(div);
     // draw layer
-    var layer = new dwv.gui.DrawLayer(div);
+    const layer = new DrawLayer(div);
     // add layer
-    layers.push(layer);
+    this.#layers.push(layer);
     // bind draw layer events
-    bindDrawLayer(layer);
+    this.#bindDrawLayer(layer);
     // return
     return layer;
-  };
+  }
 
   /**
    * Bind view layer events to this.
    *
-   * @param {object} viewLayer The view layer to bind.
+   * @param {ViewLayer} viewLayer The view layer to bind.
    */
-  function bindViewLayer(viewLayer) {
+  #bindViewLayer(viewLayer) {
     // listen to position change to update other group layers
     viewLayer.addEventListener(
-      'positionchange', self.updateLayersToPositionChange);
+      'positionchange', this.updateLayersToPositionChange);
     // propagate view viewLayer-layer events
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    for (let j = 0; j < viewEventNames.length; ++j) {
+      viewLayer.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // propagate viewLayer events
-    viewLayer.addEventListener('renderstart', fireEvent);
-    viewLayer.addEventListener('renderend', fireEvent);
+    viewLayer.addEventListener('renderstart', this.#fireEvent);
+    viewLayer.addEventListener('renderend', this.#fireEvent);
   }
 
   /**
    * Bind draw layer events to this.
    *
-   * @param {object} drawLayer The draw layer to bind.
+   * @param {DrawLayer} drawLayer The draw layer to bind.
    */
-  function bindDrawLayer(drawLayer) {
+  #bindDrawLayer(drawLayer) {
     // propagate drawLayer events
-    drawLayer.addEventListener('drawcreate', fireEvent);
-    drawLayer.addEventListener('drawdelete', fireEvent);
+    drawLayer.addEventListener('drawcreate', this.#fireEvent);
+    drawLayer.addEventListener('drawdelete', this.#fireEvent);
   }
 
   /**
    * Get the next layer DOM div.
    *
-   * @returns {HTMLElement} A DOM div.
+   * @returns {HTMLDivElement} A DOM div.
    */
-  function getNextLayerDiv() {
-    var div = document.createElement('div');
-    div.id = dwv.gui.getLayerDivId(self.getDivId(), layers.length);
+  #getNextLayerDiv() {
+    const div = document.createElement('div');
+    div.id = getLayerDivId(this.getDivId(), this.#layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
     return div;
@@ -563,69 +581,70 @@ dwv.gui.LayerGroup = function (containerDiv) {
   /**
    * Empty the layer list.
    */
-  this.empty = function () {
-    layers = [];
+  empty() {
+    this.#layers = [];
     // reset active indices
-    activeViewLayerIndex = null;
-    activeDrawLayerIndex = null;
+    this.#activeViewLayerIndex = null;
+    this.#activeDrawLayerIndex = null;
     // clean container div
-    var previous = containerDiv.getElementsByClassName('layer');
+    const previous = this.#containerDiv.getElementsByClassName('layer');
     if (previous) {
       while (previous.length > 0) {
         previous[0].remove();
       }
     }
-  };
+  }
 
   /**
    * Show a crosshair at a given position.
    *
-   * @param {dwv.math.Point} position The position where to show the crosshair.
+   * @param {Point} [position] The position where to show the crosshair,
+   *   defaults to current position.
    */
-  function showCrosshairDiv(position) {
+  #showCrosshairDiv(position) {
     if (typeof position === 'undefined') {
-      position = currentPosition;
+      position = this.#currentPosition;
     }
 
     // remove previous
-    removeCrosshairDiv();
+    this.#removeCrosshairDiv();
 
     // use first layer as base for calculating position and
     // line sizes
-    var layer0 = layers[0];
-    var vc = layer0.getViewController();
-    var p2D = vc.getPlanePositionFromPosition(position);
-    var displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
+    const layer0 = this.#layers[0];
+    const vc = layer0.getViewController();
+    const p2D = vc.getPlanePositionFromPosition(position);
+    const displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
 
-    var lineH = document.createElement('hr');
-    lineH.id = self.getDivId() + '-scroll-crosshair-horizontal';
+    const lineH = document.createElement('hr');
+    lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
     lineH.className = 'horizontal';
-    lineH.style.width = containerDiv.offsetWidth + 'px';
+    lineH.style.width = this.#containerDiv.offsetWidth + 'px';
     lineH.style.left = '0px';
     lineH.style.top = displayPos.y + 'px';
 
-    var lineV = document.createElement('hr');
-    lineV.id = self.getDivId() + '-scroll-crosshair-vertical';
+    const lineV = document.createElement('hr');
+    lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
     lineV.className = 'vertical';
-    lineV.style.width = containerDiv.offsetHeight + 'px';
+    lineV.style.width = this.#containerDiv.offsetHeight + 'px';
     lineV.style.left = (displayPos.x) + 'px';
     lineV.style.top = '0px';
 
-    containerDiv.appendChild(lineH);
-    containerDiv.appendChild(lineV);
+    this.#containerDiv.appendChild(lineH);
+    this.#containerDiv.appendChild(lineV);
   }
 
   /**
    * Remove crosshair divs.
    */
-  function removeCrosshairDiv() {
-    var div = document.getElementById(
-      self.getDivId() + '-scroll-crosshair-horizontal');
+  #removeCrosshairDiv() {
+    let div = document.getElementById(
+      this.getDivId() + '-scroll-crosshair-horizontal');
     if (div) {
       div.remove();
     }
     div = document.getElementById(
-      self.getDivId() + '-scroll-crosshair-vertical');
+      this.getDivId() + '-scroll-crosshair-vertical');
     if (div) {
       div.remove();
     }
@@ -636,41 +655,41 @@ dwv.gui.LayerGroup = function (containerDiv) {
    *
    * @param {object} event The position change event.
    */
-  this.updateLayersToPositionChange = function (event) {
+  updateLayersToPositionChange = (event) => {
     // pause positionchange listeners
-    for (var j = 0; j < layers.length; ++j) {
-      if (layers[j] instanceof dwv.gui.ViewLayer) {
-        layers[j].removeEventListener(
-          'positionchange', self.updateLayersToPositionChange);
-        layers[j].removeEventListener('positionchange', fireEvent);
+    for (let j = 0; j < this.#layers.length; ++j) {
+      if (this.#layers[j] instanceof ViewLayer) {
+        this.#layers[j].removeEventListener(
+          'positionchange', this.updateLayersToPositionChange);
+        this.#layers[j].removeEventListener('positionchange', this.#fireEvent);
       }
     }
 
-    var index = new dwv.math.Index(event.value[0]);
-    var position = new dwv.math.Point(event.value[1]);
+    const index = new Index(event.value[0]);
+    const position = new Point(event.value[1]);
 
     // store current position
-    currentPosition = position;
+    this.#currentPosition = position;
 
-    if (showCrosshair) {
-      showCrosshairDiv(position);
+    if (this.#showCrosshair) {
+      this.#showCrosshairDiv(position);
     }
 
     // origin of the first view layer
-    var baseViewLayerOrigin0 = null;
-    var baseViewLayerOrigin = null;
+    let baseViewLayerOrigin0 = null;
+    let baseViewLayerOrigin = null;
     // update position for all layers except the source one
-    for (var i = 0; i < layers.length; ++i) {
+    for (let i = 0; i < this.#layers.length; ++i) {
 
       // update base offset (does not trigger redraw)
       // TODO check draw layers update
-      var hasSetOffset = false;
-      if (layers[i] instanceof dwv.gui.ViewLayer) {
-        var vc = layers[i].getViewController();
+      let hasSetOffset = false;
+      if (this.#layers[i] instanceof ViewLayer) {
+        const vc = this.#layers[i].getViewController();
         // origin0 should always be there
-        var origin0 = vc.getOrigin();
+        const origin0 = vc.getOrigin();
         // depending on position, origin could be undefined
-        var origin = vc.getOrigin(position);
+        const origin = vc.getOrigin(position);
 
         if (!baseViewLayerOrigin) {
           baseViewLayerOrigin0 = origin0;
@@ -680,37 +699,38 @@ dwv.gui.LayerGroup = function (containerDiv) {
             typeof origin !== 'undefined') {
             // TODO: compensate for possible different orientation between views
 
-            var scrollDiff = baseViewLayerOrigin0.minus(origin0);
-            var scrollOffset = new dwv.math.Vector3D(
+            const scrollDiff = baseViewLayerOrigin0.minus(origin0);
+            const scrollOffset = new Vector3D(
               scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
 
-            var planeDiff = baseViewLayerOrigin.minus(origin);
-            var planeOffset = new dwv.math.Vector3D(
+            const planeDiff = baseViewLayerOrigin.minus(origin);
+            const planeOffset = new Vector3D(
               planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
 
-            hasSetOffset = layers[i].setBaseOffset(scrollOffset, planeOffset);
+            hasSetOffset =
+              this.#layers[i].setBaseOffset(scrollOffset, planeOffset);
           }
         }
       }
 
       // update position (triggers redraw)
-      var hasSetPos = false;
-      if (layers[i].getId() !== event.srclayerid) {
-        hasSetPos = layers[i].setCurrentPosition(position, index);
+      let hasSetPos = false;
+      if (this.#layers[i].getId() !== event.srclayerid) {
+        hasSetPos = this.#layers[i].setCurrentPosition(position, index);
       }
 
       // force redraw if needed
       if (!hasSetPos && hasSetOffset) {
-        layers[i].draw();
+        this.#layers[i].draw();
       }
     }
 
     // re-start positionchange listeners
-    for (var k = 0; k < layers.length; ++k) {
-      if (layers[k] instanceof dwv.gui.ViewLayer) {
-        layers[k].addEventListener(
-          'positionchange', self.updateLayersToPositionChange);
-        layers[k].addEventListener('positionchange', fireEvent);
+    for (let k = 0; k < this.#layers.length; ++k) {
+      if (this.#layers[k] instanceof ViewLayer) {
+        this.#layers[k].addEventListener(
+          'positionchange', this.updateLayersToPositionChange);
+        this.#layers[k].addEventListener('positionchange', this.#fireEvent);
       }
     }
   };
@@ -720,68 +740,68 @@ dwv.gui.LayerGroup = function (containerDiv) {
    *
    * @returns {number|undefined} The fit scale.
    */
-  this.calculateFitScale = function () {
+  calculateFitScale() {
     // check container
-    if (containerDiv.offsetWidth === 0 &&
-      containerDiv.offsetHeight === 0) {
+    if (this.#containerDiv.offsetWidth === 0 &&
+      this.#containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
     // get max size
-    var maxSize = this.getMaxSize();
+    const maxSize = this.getMaxSize();
     if (typeof maxSize === 'undefined') {
       return undefined;
     }
     // return best fit
     return Math.min(
-      containerDiv.offsetWidth / maxSize.x,
-      containerDiv.offsetHeight / maxSize.y
+      this.#containerDiv.offsetWidth / maxSize.x,
+      this.#containerDiv.offsetHeight / maxSize.y
     );
-  };
+  }
 
   /**
    * Set the layer group fit scale.
    *
    * @param {number} scaleIn The fit scale.
    */
-  this.setFitScale = function (scaleIn) {
+  setFitScale(scaleIn) {
     // get maximum size
-    var maxSize = this.getMaxSize();
+    const maxSize = this.getMaxSize();
     // exit if none
     if (typeof maxSize === 'undefined') {
       return;
     }
 
-    var containerSize = {
-      x: containerDiv.offsetWidth,
-      y: containerDiv.offsetHeight
+    const containerSize = {
+      x: this.#containerDiv.offsetWidth,
+      y: this.#containerDiv.offsetHeight
     };
     // offset to keep data centered
-    var fitOffset = {
+    const fitOffset = {
       x: -0.5 * (containerSize.x - Math.floor(maxSize.x * scaleIn)),
       y: -0.5 * (containerSize.y - Math.floor(maxSize.y * scaleIn))
     };
 
     // apply to layers
-    for (var j = 0; j < layers.length; ++j) {
-      layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
+    for (let j = 0; j < this.#layers.length; ++j) {
+      this.#layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
     }
 
     // update crosshair
-    if (showCrosshair) {
-      showCrosshairDiv();
+    if (this.#showCrosshair) {
+      this.#showCrosshairDiv();
     }
-  };
+  }
 
   /**
    * Get the largest data size.
    *
    * @returns {object|undefined} The largest size as {x,y}.
    */
-  this.getMaxSize = function () {
-    var maxSize = {x: 0, y: 0};
-    for (var j = 0; j < layers.length; ++j) {
-      if (layers[j] instanceof dwv.gui.ViewLayer) {
-        var size = layers[j].getImageWorldSize();
+  getMaxSize() {
+    let maxSize = {x: 0, y: 0};
+    for (let j = 0; j < this.#layers.length; ++j) {
+      if (this.#layers[j] instanceof ViewLayer) {
+        const size = this.#layers[j].getImageWorldSize();
         if (size.x > maxSize.x) {
           maxSize.x = size.x;
         }
@@ -794,47 +814,47 @@ dwv.gui.LayerGroup = function (containerDiv) {
       maxSize = undefined;
     }
     return maxSize;
-  };
+  }
 
   /**
    * Flip all layers along the Z axis without offset compensation.
    */
-  this.flipScaleZ = function () {
-    baseScale.z *= -1;
-    this.setScale(baseScale);
-  };
+  flipScaleZ() {
+    this.#baseScale.z *= -1;
+    this.setScale(this.#baseScale);
+  }
 
   /**
    * Add scale to the layers. Scale cannot go lower than 0.1.
    *
    * @param {number} scaleStep The scale to add.
-   * @param {dwv.math.Point3D} center The scale center Point3D.
+   * @param {Point3D} center The scale center Point3D.
    */
-  this.addScale = function (scaleStep, center) {
-    var newScale = {
-      x: scale.x * (1 + scaleStep),
-      y: scale.y * (1 + scaleStep),
-      z: scale.z * (1 + scaleStep)
+  addScale(scaleStep, center) {
+    const newScale = {
+      x: this.#scale.x * (1 + scaleStep),
+      y: this.#scale.y * (1 + scaleStep),
+      z: this.#scale.z * (1 + scaleStep)
     };
     this.setScale(newScale, center);
-  };
+  }
 
   /**
    * Set the layers' scale.
    *
    * @param {object} newScale The scale to apply as {x,y,z}.
-   * @param {dwv.math.Point3D} center The scale center Point3D.
-   * @fires dwv.ctrl.LayerGroup#zoomchange
+   * @param {Point3D} [center] The scale center Point3D.
+   * @fires LayerGroup#zoomchange
    */
-  this.setScale = function (newScale, center) {
-    scale = newScale;
+  setScale(newScale, center) {
+    this.#scale = newScale;
     // apply to layers
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].setScale(scale, center);
+    for (let i = 0; i < this.#layers.length; ++i) {
+      this.#layers[i].setScale(this.#scale, center);
     }
 
     // event value
-    var value = [
+    const value = [
       newScale.x,
       newScale.y,
       newScale.z
@@ -848,83 +868,87 @@ dwv.gui.LayerGroup = function (containerDiv) {
     /**
      * Zoom change event.
      *
-     * @event dwv.ctrl.LayerGroup#zoomchange
+     * @event LayerGroup#zoomchange
      * @type {object}
      * @property {Array} value The changed value.
      */
-    fireEvent({
+    this.#fireEvent({
       type: 'zoomchange',
       value: value
     });
-  };
+  }
 
   /**
    * Add translation to the layers.
    *
    * @param {object} translation The translation as {x,y,z}.
    */
-  this.addTranslation = function (translation) {
+  addTranslation(translation) {
     this.setOffset({
-      x: offset.x - translation.x,
-      y: offset.y - translation.y,
-      z: offset.z - translation.z
+      x: this.#offset.x - translation.x,
+      y: this.#offset.y - translation.y,
+      z: this.#offset.z - translation.z
     });
-  };
+  }
 
   /**
    * Set the layers' offset.
    *
    * @param {object} newOffset The offset as {x,y,z}.
-   * @fires dwv.ctrl.LayerGroup#offsetchange
+   * @fires LayerGroup#offsetchange
    */
-  this.setOffset = function (newOffset) {
+  setOffset(newOffset) {
     // store
-    offset = newOffset;
+    this.#offset = newOffset;
     // apply to layers
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].setOffset(offset);
+    for (let i = 0; i < this.#layers.length; ++i) {
+      this.#layers[i].setOffset(this.#offset);
     }
 
     /**
      * Offset change event.
      *
-     * @event dwv.ctrl.LayerGroup#offsetchange
+     * @event LayerGroup#offsetchange
      * @type {object}
      * @property {Array} value The changed value.
      */
-    fireEvent({
+    this.#fireEvent({
       type: 'offsetchange',
-      value: [offset.x, offset.y, offset.z],
+      value: [
+        this.#offset.x,
+        this.#offset.y,
+        this.#offset.z
+      ]
     });
-  };
+  }
 
   /**
    * Reset the stage to its initial scale and no offset.
    */
-  this.reset = function () {
-    this.setScale(baseScale);
+  reset() {
+    this.setScale(this.#baseScale);
     this.setOffset({x: 0, y: 0, z: 0});
-  };
+  }
 
   /**
    * Draw the layer.
    */
-  this.draw = function () {
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].draw();
+  draw() {
+    for (let i = 0; i < this.#layers.length; ++i) {
+      this.#layers[i].draw();
     }
-  };
+  }
 
   /**
    * Display the layer.
    *
    * @param {boolean} flag Whether to display the layer or not.
    */
-  this.display = function (flag) {
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].display(flag);
+  display(flag) {
+    for (let i = 0; i < this.#layers.length; ++i) {
+      this.#layers[i].display(flag);
     }
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -933,9 +957,9 @@ dwv.gui.LayerGroup = function (containerDiv) {
    * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
 
   /**
    * Remove an event listener from this class.
@@ -944,18 +968,17 @@ dwv.gui.LayerGroup = function (containerDiv) {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
 
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
-  }
+  #fireEvent = (event) => {
+    this.#listenerHandler.fireEvent(event);
+  };
 
-}; // LayerGroup class
+} // LayerGroup class

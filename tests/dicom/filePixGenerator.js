@@ -1,3 +1,7 @@
+// namespace
+// eslint-disable-next-line no-var
+var test = test || {};
+
 /**
  * FilePixGenerator
  * Generates pixel data from file(s).
@@ -5,16 +9,16 @@
  * @param {object} options The generator options.
  * @class
  */
-var FilePixGenerator = function (options) {
+const FilePixGenerator = function (options) {
 
-  var numberOfColumns = options.numberOfColumns;
-  var numberOfRows = options.numberOfRows;
-  var isRGB = options.photometricInterpretation === 'RGB';
+  const numberOfColumns = options.numberOfColumns;
+  const numberOfRows = options.numberOfRows;
+  const isRGB = options.photometricInterpretation === 'RGB';
 
   this.setImages = function (imgs) {
     // check sizes
-    var img;
-    for (var i = 0; i < imgs.length; ++i) {
+    let img;
+    for (let i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== numberOfColumns) {
         throw new Error('Image width mismatch: ' +
@@ -30,18 +34,18 @@ var FilePixGenerator = function (options) {
   };
 
   this.generate = function (pixelBuffer, sliceNumber) {
-    var image = null;
+    let image = null;
     if (sliceNumber < this.images.length) {
       image = this.images[sliceNumber];
     } else {
       image = this.images[0];
     }
     // get the image data
-    var imageData = dwv.dicom.getImageDataData(image);
+    const imageData = test.getImageDataData(image);
     // extract fist component for the pixelBuffer
-    var dataLen = imageData.length;
-    var j = 0;
-    for (var i = 0; i < dataLen; i += 4) {
+    const dataLen = imageData.length;
+    let j = 0;
+    for (let i = 0; i < dataLen; i += 4) {
       pixelBuffer[j] = imageData[i];
       j += 1;
       if (isRGB) {
@@ -60,7 +64,7 @@ var FilePixGenerator = function (options) {
  * @param {object} image The associated image.
  * @returns {boolean} True if the tags are ok.
  */
-function checkTags(tags, image) {
+function fileCheckTags(tags, image) {
   /**
    * @param {number} value The value to check.
    * @returns {number} The expected value.
@@ -69,7 +73,7 @@ function checkTags(tags, image) {
     return value;
   }
 
-  var needUpdate = false;
+  let needUpdate = false;
   if (tags.Columns !== getExpectedSize(image.width)) {
     tags.Columns = getExpectedSize(image.width);
     needUpdate = true;
@@ -81,8 +85,8 @@ function checkTags(tags, image) {
   return needUpdate;
 }
 
-dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
-dwv.dicom.pixelGenerators.file = {
+test.pixelGenerators = test.pixelGenerators || {};
+test.pixelGenerators.file = {
   generator: FilePixGenerator,
-  checkTags: checkTags
+  checkTags: fileCheckTags
 };

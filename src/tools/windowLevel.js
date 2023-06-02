@@ -1,15 +1,18 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {ScrollWheel} from './scrollWheel';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
 
 /**
  * WindowLevel tool: handle window/level related events.
  *
- * @class
- * @param {dwv.App} app The associated application.
  * @example
  * // create the dwv app
- * var app = new dwv.App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -24,39 +27,48 @@ dwv.tool = dwv.tool || {};
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-dwv.tool.WindowLevel = function (app) {
+export class WindowLevel {
+
   /**
-   * Closure to self: to be used by event handlers.
+   * Associated app.
    *
-   * @private
-   * @type {dwv.tool.WindowLevel}
+   * @type {App}
    */
-  var self = this;
+  #app;
+
   /**
    * Interaction start flag.
    *
    * @type {boolean}
    */
-  this.started = false;
+  #started = false;
 
   /**
    * Scroll wheel handler.
    *
-   * @type {dwv.tool.ScrollWheel}
+   * @type {ScrollWheel}
    */
-  var scrollWhell = new dwv.tool.ScrollWheel(app);
+  #scrollWhell;
+
+  /**
+   * @param {App} app The associated application.
+   */
+  constructor(app) {
+    this.#app = app;
+    this.#scrollWhell = new ScrollWheel(app);
+  }
 
   /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
-  this.mousedown = function (event) {
+  mousedown = (event) => {
     // set start flag
-    self.started = true;
+    this.#started = true;
     // store initial position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    this.x0 = event._x;
+    this.y0 = event._y;
   };
 
   /**
@@ -64,45 +76,45 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The mouse move event.
    */
-  this.mousemove = function (event) {
+  mousemove = (event) => {
     // check start flag
-    if (!self.started) {
+    if (!this.#started) {
       return;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewController =
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
     // difference to last position
-    var diffX = event._x - self.x0;
-    var diffY = self.y0 - event._y;
+    const diffX = event._x - this.x0;
+    const diffY = this.y0 - event._y;
     // data range
-    var range = viewController.getImageRescaledDataRange();
+    const range = viewController.getImageRescaledDataRange();
     // 1/1000 seems to give reasonable results...
-    var pixelToIntensity = (range.max - range.min) * 0.01;
+    const pixelToIntensity = (range.max - range.min) * 0.01;
 
     // calculate new window level
-    var center = parseInt(viewController.getWindowLevel().center, 10);
-    var width = parseInt(viewController.getWindowLevel().width, 10);
-    var windowCenter = center + Math.round(diffY * pixelToIntensity);
-    var windowWidth = width + Math.round(diffX * pixelToIntensity);
+    const center = parseInt(viewController.getWindowLevel().center, 10);
+    const width = parseInt(viewController.getWindowLevel().width, 10);
+    const windowCenter = center + Math.round(diffY * pixelToIntensity);
+    let windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
-    windowWidth = dwv.image.validateWindowWidth(windowWidth);
+    windowWidth = validateWindowWidth(windowWidth);
 
     // add the manual preset to the view
     viewController.addWindowLevelPresets({
       manual: {
-        wl: [new dwv.image.WindowLevel(windowCenter, windowWidth)],
+        wl: [new WL(windowCenter, windowWidth)],
         name: 'manual'
       }
     });
     viewController.setWindowLevelPreset('manual');
 
     // store position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    this.x0 = event._x;
+    this.y0 = event._y;
   };
 
   /**
@@ -110,10 +122,10 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} _event The mouse up event.
    */
-  this.mouseup = function (_event) {
+  mouseup = (_event) => {
     // set start flag
-    if (self.started) {
-      self.started = false;
+    if (this.#started) {
+      this.#started = false;
     }
   };
 
@@ -122,9 +134,9 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The mouse out event.
    */
-  this.mouseout = function (event) {
+  mouseout = (event) => {
     // treat as mouse up
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -132,8 +144,8 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The touch start event.
    */
-  this.touchstart = function (event) {
-    self.mousedown(event);
+  touchstart = (event) => {
+    this.mousedown(event);
   };
 
   /**
@@ -141,8 +153,8 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The touch move event.
    */
-  this.touchmove = function (event) {
-    self.mousemove(event);
+  touchmove = (event) => {
+    this.mousemove(event);
   };
 
   /**
@@ -150,8 +162,8 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The touch end event.
    */
-  this.touchend = function (event) {
-    self.mouseup(event);
+  touchend = (event) => {
+    this.mouseup(event);
   };
 
   /**
@@ -159,22 +171,22 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The double click event.
    */
-  this.dblclick = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
-    var viewController = viewLayer.getViewController();
-    var image = app.getImage(viewLayer.getDataIndex());
+  dblclick = (event) => {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const viewController = viewLayer.getViewController();
+    const image = this.#app.getImage(viewLayer.getDataIndex());
 
     // update view controller
     viewController.setWindowLevel(
-      parseInt(image.getRescaledValueAtIndex(
+      image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(
           index.get(0),
           index.get(1)
         )
-      ), 10),
+      ),
       parseInt(viewController.getWindowLevel().width, 10));
   };
 
@@ -183,8 +195,8 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The mouse wheel event.
    */
-  this.wheel = function (event) {
-    scrollWhell.wheel(event);
+  wheel = (event) => {
+    this.#scrollWhell.wheel(event);
   };
 
   /**
@@ -192,9 +204,9 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {object} event The key down event.
    */
-  this.keydown = function (event) {
-    event.context = 'dwv.tool.WindowLevel';
-    app.onKeydown(event);
+  keydown = (event) => {
+    event.context = 'WindowLevel';
+    this.#app.onKeydown(event);
   };
 
   /**
@@ -202,15 +214,15 @@ dwv.tool.WindowLevel = function (app) {
    *
    * @param {boolean} _bool The flag to activate or not.
    */
-  this.activate = function (_bool) {
+  activate(_bool) {
     // does nothing
-  };
+  }
 
   /**
    * Initialise the tool.
    */
-  this.init = function () {
+  init() {
     // does nothing
-  };
+  }
 
-}; // WindowLevel class
+} // WindowLevel class

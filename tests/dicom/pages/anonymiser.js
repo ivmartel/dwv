@@ -1,15 +1,34 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// Do not warn if these variables were not defined before.
+/* global dwv */
 
-// logger level (optional)
-dwv.logger.level = dwv.utils.logger.levels.DEBUG;
+// call setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ * Setup.
+ */
+function onDOMContentLoaded() {
+  const infileInput = document.getElementById('infile');
+  infileInput.onchange = onInputDICOMFile;
+  const inrulesfileInput = document.getElementById('inrulesfile');
+  inrulesfileInput.onchange = onInputRulesFile;
+  const jsonlintButton = document.getElementById('jsonlint');
+  jsonlintButton.onclick = launchJSONLint;
+  const saveButton = document.getElementById('save');
+  saveButton.onclick = saveRules;
+  const generateButton = document.getElementById('generate');
+  generateButton.onclick = generate;
+
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.DEBUG;
+}
 
 // rules file
-var _rulesFile = null;
+let _rulesFile = null;
 // dicom file
-var _dicomFile = null;
+let _dicomFile = null;
 // DICOM elements
-var _dicomElements = null;
+let _dicomElements = null;
 
 /**
  * Handle DICOM file load
@@ -18,27 +37,27 @@ var _dicomElements = null;
  */
 function onLoadDICOMFile(event) {
   // parse DICOM
-  var parser = new dwv.dicom.DicomParser();
+  const parser = new dwv.DicomParser();
   parser.parse(event.target.result);
   // store elements
-  _dicomElements = parser.getRawDicomElements();
+  _dicomElements = parser.getDicomElements();
   // activate generate button
-  var element = document.getElementById('generate');
+  const element = document.getElementById('generate');
   element.className = 'button button-active';
 }
 
 /**
  * Generate DICOM data
  */
-dwv.test.generate = function () {
+function generate() {
   // check validity
   if (!isValidRules()) {
     return;
   }
   // create writer with textarea rules
-  var writer = new dwv.dicom.DicomWriter();
-  writer.rules = JSON.parse(document.getElementById('rules').value);
-  var dicomBuffer = null;
+  const writer = new dwv.DicomWriter();
+  writer.setRules(JSON.parse(document.getElementById('rules').value));
+  let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(_dicomElements);
   } catch (error) {
@@ -46,30 +65,30 @@ dwv.test.generate = function () {
     alert(error.message);
   }
   // view as Blob to allow download
-  var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
   // update generate button
-  var element = document.getElementById('generate');
+  const element = document.getElementById('generate');
   element.href = URL.createObjectURL(blob);
   element.download = 'anonym-' + _dicomFile.name;
-};
+}
 
 /**
  * Save the rules as a JSON file.
  */
-dwv.test.saveRules = function () {
+function saveRules() {
   // check validity
   if (!isValidRules()) {
     return;
   }
   // get text from the textarea
-  var text = document.getElementById('rules').value;
+  const text = document.getElementById('rules').value;
   // view as Blob to allow download
-  var blob = new Blob([text], {type: 'text/plain'});
+  const blob = new Blob([text], {type: 'text/plain'});
   // update save button
-  var element = document.getElementById('save');
+  const element = document.getElementById('save');
   element.download = (_rulesFile === null ? 'rules.json' : _rulesFile.name);
   element.href = URL.createObjectURL(blob);
-};
+}
 
 /**
  * Is the JSON valid?
@@ -89,40 +108,40 @@ function isValidRules() {
 /**
  * open JSONLint to check the rules
  */
-dwv.test.launchJSONLint = function () {
-  var text = document.getElementById('rules').value;
-  var link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
+function launchJSONLint() {
+  const text = document.getElementById('rules').value;
+  const link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
   window.open(link);
-};
+}
 
 /**
  * handle input DICOM file
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputDICOMFile = function (event) {
+function onInputDICOMFile(event) {
   if (event.target.files.length === 0) {
     return;
   }
   _dicomFile = event.target.files[0];
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = onLoadDICOMFile;
   reader.readAsArrayBuffer(_dicomFile);
-};
+}
 
 /**
  *  handle input rules file
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputRulesFile = function (event) {
+function onInputRulesFile(event) {
   if (event.target.files.length === 0) {
     return;
   }
   _rulesFile = event.target.files[0];
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function (event) {
     document.getElementById('rules').value = event.target.result;
   };
   reader.readAsText(_rulesFile);
-};
+}

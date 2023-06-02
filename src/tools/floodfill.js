@@ -1,154 +1,167 @@
-// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
+import {DrawGroupCommand} from '../tools/drawCommands';
+import {RoiFactory} from '../tools/roi';
+import {guid} from '../math/stats';
+import {Point2D} from '../math/point';
+import {Style} from '../gui/style';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {ListenerHandler} from '../utils/listen';
+import {logger} from '../utils/logger';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * The magic wand namespace.
  *
  * @external MagicWand
  * @see https://github.com/Tamersoul/magic-wand-js
  */
-var MagicWand = MagicWand || {};
+import MagicWand from 'magic-wand-tool';
 
 /**
  * Floodfill painting tool.
- *
- * @class
- * @param {dwv.App} app The associated application.
  */
-dwv.tool.Floodfill = function (app) {
+export class Floodfill {
+  /**
+   * Associated app.
+   *
+   * @type {App}
+   */
+  #app;
+
+  /**
+   * @param {App} app The associated application.
+   */
+  constructor(app) {
+    this.#app = app;
+  }
+
   /**
    * Original variables from external library. Used as in the lib example.
    *
-   * @private
    * @type {number}
    */
-  var blurRadius = 5;
+  #blurRadius = 5;
   /**
    * Original variables from external library. Used as in the lib example.
    *
-   * @private
    * @type {number}
    */
-  var simplifyTolerant = 0;
+  #simplifyTolerant = 0;
+
   /**
    * Original variables from external library. Used as in the lib example.
    *
-   * @private
    * @type {number}
    */
-  var simplifyCount = 2000;
+  #simplifyCount = 2000;
+
   /**
    * Canvas info
    *
-   * @private
    * @type {object}
    */
-  var imageInfo = null;
+  #imageInfo = null;
+
   /**
    * Object created by MagicWand lib containing border points
    *
-   * @private
    * @type {object}
    */
-  var mask = null;
+  #mask = null;
+
   /**
    * threshold default tolerance of the tool border
    *
-   * @private
    * @type {number}
    */
-  var initialthreshold = 10;
+  #initialthreshold = 10;
+
   /**
    * threshold tolerance of the tool border
    *
-   * @private
    * @type {number}
    */
-  var currentthreshold = null;
-  /**
-   * Closure to self: to be used by event handlers.
-   *
-   * @private
-   * @type {dwv.tool.Floodfill}
-   */
-  var self = this;
+  #currentthreshold = null;
+
   /**
    * Interaction start flag.
    *
    * @type {boolean}
    */
-  this.started = false;
+  #started = false;
   /**
    * Draw command.
    *
-   * @private
    * @type {object}
    */
-  var command = null;
+  #command = null;
+
   /**
    * Current shape group.
    *
-   * @private
    * @type {object}
    */
-  var shapeGroup = null;
+  #shapeGroup = null;
+
   /**
    * Coordinates of the fist mousedown event.
    *
-   * @private
    * @type {object}
    */
-  var initialpoint;
+  #initialpoint;
+
   /**
    * Floodfill border.
    *
-   * @private
    * @type {object}
    */
-  var border = null;
+  #border = null;
+
   /**
    * List of parent points.
    *
-   * @private
    * @type {Array}
    */
-  var parentPoints = [];
+  #parentPoints = [];
+
   /**
    * Assistant variable to paint border on all slices.
    *
-   * @private
    * @type {boolean}
    */
-  var extender = false;
+  #extender = false;
+
   /**
    * Timeout for painting on mousemove.
    *
-   * @private
    */
-  var painterTimeout;
+  #painterTimeout;
+
   /**
    * Drawing style.
    *
-   * @type {dwv.gui.Style}
+   * @type {Style}
    */
-  this.style = new dwv.gui.Style();
+  #style = new Style();
 
   /**
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * Set extend option for painting border on all slices.
    *
    * @param {boolean} bool The option to set
    */
-  this.setExtend = function (bool) {
-    extender = bool;
-  };
+  setExtend(bool) {
+    this.#extender = bool;
+  }
 
   /**
    * Get extend option for painting border on all slices.
@@ -156,22 +169,21 @@ dwv.tool.Floodfill = function (app) {
    * @returns {boolean} The actual value of of the variable to use Floodfill
    *   on museup.
    */
-  this.getExtend = function () {
-    return extender;
-  };
+  getExtend() {
+    return this.#extender;
+  }
 
   /**
    * Get (x, y) coordinates referenced to the canvas
    *
    * @param {object} event The original event.
    * @returns {object} The coordinates as a {x,y}.
-   * @private
    */
-  var getCoord = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+  #getCoord = (event) => {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
     return {
       x: index.get(0),
       y: index.get(1)
@@ -181,85 +193,84 @@ dwv.tool.Floodfill = function (app) {
   /**
    * Calculate border.
    *
-   * @private
    * @param {object} points The input points.
    * @param {number} threshold The threshold of the floodfill.
    * @param {boolean} simple Return first points or a list.
    * @returns {Array} The parent points.
    */
-  var calcBorder = function (points, threshold, simple) {
+  #calcBorder(points, threshold, simple) {
 
-    parentPoints = [];
-    var image = {
-      data: imageInfo.data,
-      width: imageInfo.width,
-      height: imageInfo.height,
+    this.#parentPoints = [];
+    const image = {
+      data: this.#imageInfo.data,
+      width: this.#imageInfo.width,
+      height: this.#imageInfo.height,
       bytes: 4
     };
 
-    mask = MagicWand.floodFill(image, points.x, points.y, threshold);
-    mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius);
+    this.#mask = MagicWand.floodFill(image, points.x, points.y, threshold);
+    this.#mask = MagicWand.gaussBlurOnlyBorder(this.#mask, this.#blurRadius);
 
-    var cs = MagicWand.traceContours(mask);
-    cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
+    let cs = MagicWand.traceContours(this.#mask);
+    cs = MagicWand.simplifyContours(
+      cs, this.#simplifyTolerant, this.#simplifyCount);
 
     if (cs.length > 0 && cs[0].points[0].x) {
       if (simple) {
         return cs[0].points;
       }
-      for (var j = 0, icsl = cs[0].points.length; j < icsl; j++) {
-        parentPoints.push(new dwv.math.Point2D(
+      for (let j = 0, icsl = cs[0].points.length; j < icsl; j++) {
+        this.#parentPoints.push(new Point2D(
           cs[0].points[j].x,
           cs[0].points[j].y
         ));
       }
-      return parentPoints;
+      return this.#parentPoints;
     } else {
-      return false;
+      return [];
     }
-  };
+  }
 
   /**
    * Paint Floodfill.
    *
-   * @private
    * @param {object} point The start point.
    * @param {number} threshold The border threshold.
    * @param {object} layerGroup The origin layer group.
    * @returns {boolean} False if no border.
    */
-  var paintBorder = function (point, threshold, layerGroup) {
+  #paintBorder(point, threshold, layerGroup) {
     // Calculate the border
-    border = calcBorder(point, threshold);
+    this.#border = this.#calcBorder(point, threshold, false);
     // Paint the border
-    if (border) {
-      var factory = new dwv.tool.draw.RoiFactory();
-      shapeGroup = factory.create(border, self.style);
-      shapeGroup.id(dwv.math.guid());
+    if (this.#border) {
+      const factory = new RoiFactory();
+      this.#shapeGroup = factory.create(this.#border, this.#style);
+      this.#shapeGroup.id(guid());
 
-      var drawLayer = layerGroup.getActiveDrawLayer();
-      var drawController = drawLayer.getDrawController();
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      const drawController = drawLayer.getDrawController();
 
       // get the position group
-      var posGroup = drawController.getCurrentPosGroup();
+      const posGroup = drawController.getCurrentPosGroup();
       // add shape group to position group
-      posGroup.add(shapeGroup);
+      posGroup.add(this.#shapeGroup);
 
       // draw shape command
-      command = new dwv.tool.DrawGroupCommand(shapeGroup, 'floodfill',
+      this.#command = new DrawGroupCommand(this.#shapeGroup, 'floodfill',
         drawLayer.getKonvaLayer());
-      command.onExecute = fireEvent;
-      command.onUndo = fireEvent;
+      this.#command.onExecute = this.#fireEvent;
+      this.#command.onUndo = this.#fireEvent;
       // // draw
-      command.execute();
+      this.#command.execute();
       // save it in undo stack
-      app.addToUndoStack(command);
+      this.#app.addToUndoStack(this.#command);
 
       return true;
     } else {
       return false;
     }
-  };
+  }
 
   /**
    * Create Floodfill in all the prev and next slices while border is found
@@ -268,29 +279,29 @@ dwv.tool.Floodfill = function (app) {
    * @param {number} end The last slice to extend to.
    * @param {object} layerGroup The origin layer group.
    */
-  this.extend = function (ini, end, layerGroup) {
+  extend(ini, end, layerGroup) {
     //avoid errors
-    if (!initialpoint) {
+    if (!this.#initialpoint) {
       throw '\'initialpoint\' not found. User must click before use extend!';
     }
     // remove previous draw
-    if (shapeGroup) {
-      shapeGroup.destroy();
+    if (this.#shapeGroup) {
+      this.#shapeGroup.destroy();
     }
 
-    var viewController =
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
-    var pos = viewController.getCurrentIndex();
-    var imageSize = viewController.getImageSize();
-    var threshold = currentthreshold || initialthreshold;
+    const pos = viewController.getCurrentIndex();
+    const imageSize = viewController.getImageSize();
+    const threshold = this.#currentthreshold || this.#initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
-    for (var i = pos.get(2),
+    for (let i = pos.get(2),
       len = end
         ? end : imageSize.get(2);
       i < len; i++) {
-      if (!paintBorder(initialpoint, threshold, layerGroup)) {
+      if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
       viewController.incrementIndex(2);
@@ -298,83 +309,84 @@ dwv.tool.Floodfill = function (app) {
     viewController.setCurrentPosition(pos);
 
     // Iterate over the prev images and paint border on each slice.
-    for (var j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
-      if (!paintBorder(initialpoint, threshold, layerGroup)) {
+    for (let j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
+      if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
       viewController.decrementIndex(2);
     }
     viewController.setCurrentPosition(pos);
-  };
+  }
 
   /**
    * Modify tolerance threshold and redraw ROI.
    *
    * @param {number} modifyThreshold The new threshold.
-   * @param {shape} shape The shape to update.
+   * @param {object} shape The shape to update.
    */
-  this.modifyThreshold = function (modifyThreshold, shape) {
+  modifyThreshold(modifyThreshold, shape) {
 
-    if (!shape && shapeGroup) {
-      shape = shapeGroup.getChildren(function (node) {
+    if (!shape && this.#shapeGroup) {
+      shape = this.#shapeGroup.getChildren(function (node) {
         return node.name() === 'shape';
       })[0];
     } else {
       throw 'No shape found';
     }
 
-    clearTimeout(painterTimeout);
-    painterTimeout = setTimeout(function () {
-      border = calcBorder(initialpoint, modifyThreshold, true);
-      if (!border) {
+    clearTimeout(this.#painterTimeout);
+    this.#painterTimeout = setTimeout(() => {
+      this.#border = this.#calcBorder(
+        this.#initialpoint, modifyThreshold, true);
+      if (!this.#border) {
         return false;
       }
-      var arr = [];
-      for (var i = 0, bl = border.length; i < bl; ++i) {
-        arr.push(border[i].x);
-        arr.push(border[i].y);
+      const arr = [];
+      for (let i = 0, bl = this.#border.length; i < bl; ++i) {
+        arr.push(this.#border[i].x);
+        arr.push(this.#border[i].y);
       }
       shape.setPoints(arr);
-      var shapeLayer = shape.getLayer();
+      const shapeLayer = shape.getLayer();
       shapeLayer.draw();
-      self.onThresholdChange(modifyThreshold);
+      this.onThresholdChange(modifyThreshold);
     }, 100);
-  };
+  }
 
   /**
    * Event fired when threshold change
    *
    * @param {number} _value Current threshold
    */
-  this.onThresholdChange = function (_value) {
+  onThresholdChange(_value) {
     // Defaults do nothing
-  };
+  }
 
   /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
-  this.mousedown = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var drawLayer = layerGroup.getActiveDrawLayer();
+  mousedown = (event) => {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const drawLayer = layerGroup.getActiveDrawLayer();
 
-    imageInfo = viewLayer.getImageData();
-    if (!imageInfo) {
-      dwv.logger.error('No image found');
+    this.#imageInfo = viewLayer.getImageData();
+    if (!this.#imageInfo) {
+      logger.error('No image found');
       return;
     }
 
     // update zoom scale
-    self.style.setZoomScale(
+    this.#style.setZoomScale(
       drawLayer.getKonvaLayer().getAbsoluteScale());
 
-    self.started = true;
-    initialpoint = getCoord(event);
-    paintBorder(initialpoint, initialthreshold, layerGroup);
-    self.onThresholdChange(initialthreshold);
+    this.#started = true;
+    this.#initialpoint = this.#getCoord(event);
+    this.#paintBorder(this.#initialpoint, this.#initialthreshold, layerGroup);
+    this.onThresholdChange(this.#initialthreshold);
   };
 
   /**
@@ -382,17 +394,18 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} event The mouse move event.
    */
-  this.mousemove = function (event) {
-    if (!self.started) {
+  mousemove = (event) => {
+    if (!this.#started) {
       return;
     }
-    var movedpoint = getCoord(event);
-    currentthreshold = Math.round(Math.sqrt(
-      Math.pow((initialpoint.x - movedpoint.x), 2) +
-      Math.pow((initialpoint.y - movedpoint.y), 2)) / 2);
-    currentthreshold = currentthreshold < initialthreshold
-      ? initialthreshold : currentthreshold - initialthreshold;
-    self.modifyThreshold(currentthreshold);
+    const movedpoint = this.#getCoord(event);
+    this.#currentthreshold = Math.round(Math.sqrt(
+      Math.pow((this.#initialpoint.x - movedpoint.x), 2) +
+      Math.pow((this.#initialpoint.y - movedpoint.y), 2)) / 2);
+    this.#currentthreshold = this.#currentthreshold < this.#initialthreshold
+      ? this.#initialthreshold
+      : this.#currentthreshold - this.#initialthreshold;
+    this.modifyThreshold(this.#currentthreshold);
   };
 
   /**
@@ -400,13 +413,15 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} _event The mouse up event.
    */
-  this.mouseup = function (_event) {
-    self.started = false;
-    if (extender) {
-      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupByDivId(layerDetails.groupDivId);
-      self.extend(layerGroup);
-    }
+  mouseup = (_event) => {
+    this.#started = false;
+    // TODO: re-activate
+    // if (this.#extender) {
+    //   const layerDetails = getLayerDetailsFromEvent(event);
+    //   const layerGroup =
+    //     this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    //   this.extend(layerGroup);
+    // }
   };
 
   /**
@@ -414,8 +429,8 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} event The mouse out event.
    */
-  this.mouseout = function (event) {
-    self.mouseup(event);
+  mouseout = (event) => {
+    this.mouseup(event);
   };
 
   /**
@@ -423,9 +438,9 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} event The touch start event.
    */
-  this.touchstart = function (event) {
+  touchstart = (event) => {
     // treat as mouse down
-    self.mousedown(event);
+    this.mousedown(event);
   };
 
   /**
@@ -433,9 +448,9 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} event The touch move event.
    */
-  this.touchmove = function (event) {
+  touchmove = (event) => {
     // treat as mouse move
-    self.mousemove(event);
+    this.mousemove(event);
   };
 
   /**
@@ -443,9 +458,9 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} event The touch end event.
    */
-  this.touchend = function (event) {
+  touchend = (event) => {
     // treat as mouse up
-    self.mouseup(event);
+    this.mouseup(event);
   };
 
   /**
@@ -453,9 +468,9 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {object} event The key down event.
    */
-  this.keydown = function (event) {
-    event.context = 'dwv.tool.Floodfill';
-    app.onKeydown(event);
+  keydown = (event) => {
+    event.context = 'Floodfill';
+    this.#app.onKeydown(event);
   };
 
   /**
@@ -463,30 +478,30 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {boolean} bool The flag to activate or not.
    */
-  this.activate = function (bool) {
+  activate(bool) {
     if (bool) {
       // init with the app window scale
-      this.style.setBaseScale(app.getBaseScale());
+      this.#style.setBaseScale(this.#app.getBaseScale());
       // set the default to the first in the list
-      this.setFeatures({shapeColour: this.style.getLineColour()});
+      this.setFeatures({shapeColour: this.#style.getLineColour()});
     }
-  };
+  }
 
   /**
    * Initialise the tool.
    */
-  this.init = function () {
+  init() {
     // does nothing
-  };
+  }
 
   /**
    * Get the list of event names that this tool can fire.
    *
    * @returns {Array} The list of event names.
    */
-  this.getEventNames = function () {
+  getEventNames() {
     return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
-  };
+  }
 
   /**
    * Add an event listener to this class.
@@ -495,9 +510,10 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
   /**
    * Remove an event listener from this class.
    *
@@ -505,28 +521,28 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
+  #fireEvent = (event) => {
+    this.#listenerHandler.fireEvent(event);
+  };
+
+  /**
+   * Set the tool live features: shape colour.
+   *
+   * @param {object} features The list of features.
+   */
+  setFeatures(features) {
+    if (typeof features.shapeColour !== 'undefined') {
+      this.#style.setLineColour(features.shapeColour);
+    }
   }
 
-}; // Floodfill class
-
-/**
- * Set the tool live features: shape colour.
- *
- * @param {object} features The list of features.
- */
-dwv.tool.Floodfill.prototype.setFeatures = function (features) {
-  if (typeof features.shapeColour !== 'undefined') {
-    this.style.setLineColour(features.shapeColour);
-  }
-};
+} // Floodfill class

@@ -1,25 +1,22 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {ybrToRgb} from '../utils/colour';
 
 /**
  * Generate image data for 'YBR_FULL' photometric interpretation.
  *
- * @param {Array} array The array to store the outut data
+ * @param {ImageData} array The array to store the outut data
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  */
-dwv.image.generateImageDataYbrFull = function (
+export function generateImageDataYbrFull(
   array,
   iterator,
   alphaFunc) {
-  var index = 0;
-  var rgb = null;
-  var ival = iterator.next();
+  let index = 0;
+  let rgb = null;
+  let ival = iterator.next();
   while (!ival.done) {
     // convert ybr to rgb
-    rgb = dwv.utils.ybrToRgb(
-      ival.value[0], ival.value[1], ival.value[2]);
+    rgb = ybrToRgb(ival.value[0], ival.value[1], ival.value[2]);
     // store data
     array.data[index] = rgb.r;
     array.data[index + 1] = rgb.g;
@@ -29,4 +26,4 @@ dwv.image.generateImageDataYbrFull = function (
     index += 4;
     ival = iterator.next();
   }
-};
+}

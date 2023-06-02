@@ -1,38 +1,34 @@
-// namespaces
-var dwv = dwv || {};
-dwv.utils = dwv.utils || {};
-
 /**
  * Capitalise the first letter of a string.
  *
  * @param {string} string The string to capitalise the first letter.
  * @returns {string} The new string.
  */
-dwv.utils.capitaliseFirstLetter = function (string) {
-  var res = string;
+export function capitaliseFirstLetter(string) {
+  let res = string;
   if (string) {
     res = string.charAt(0).toUpperCase() + string.slice(1);
   }
   return res;
-};
+}
 
 /**
  * Check if a string starts with the input element.
  *
  * @param {string} str The input string.
  * @param {string} search The searched start.
- * @param {number} rawPos The position in this string at which to begin
+ * @param {number} [rawPos] The position in this string at which to begin
  *  searching for searchString. Defaults to 0.
  * @returns {boolean} True if the input string starts with the searched string.
  */
-dwv.utils.startsWith = function (str, search, rawPos) {
+export function startsWith(str, search, rawPos) {
   if (typeof str === 'undefined' || str === null ||
     typeof search === 'undefined' || search === null) {
     return false;
   }
-  var pos = rawPos > 0 ? rawPos | 0 : 0;
+  const pos = rawPos > 0 ? rawPos | 0 : 0;
   return str.substring(pos, pos + search.length) === search;
-};
+}
 
 /**
  * Check if a string ends with the input element.
@@ -41,13 +37,13 @@ dwv.utils.startsWith = function (str, search, rawPos) {
  * @param {string} search The searched ending.
  * @returns {boolean} True if the input string ends with the searched string.
  */
-dwv.utils.endsWith = function (str, search) {
+export function endsWith(str, search) {
   if (typeof str === 'undefined' || str === null ||
     typeof search === 'undefined' || search === null) {
     return false;
   }
   return str.substring(str.length - search.length) === search;
-};
+}
 
 /**
  * Split key/value string:
@@ -57,15 +53,15 @@ dwv.utils.endsWith = function (str, search) {
  * @param {string} inputStr The string to split.
  * @returns {object} The split string.
  */
-dwv.utils.splitKeyValueString = function (inputStr) {
+export function splitKeyValueString(inputStr) {
   // result
-  var result = {};
+  const result = {};
   // check input string
   if (inputStr) {
     // split key/value pairs
-    var pairs = inputStr.split('&');
-    for (var i = 0; i < pairs.length; ++i) {
-      var pair = pairs[i].split('=');
+    const pairs = inputStr.split('&');
+    for (let i = 0; i < pairs.length; ++i) {
+      const pair = pairs[i].split('=');
       // if the key does not exist, create it
       if (!result[pair[0]]) {
         result[pair[0]] = pair[1];
@@ -79,7 +75,7 @@ dwv.utils.splitKeyValueString = function (inputStr) {
     }
   }
   return result;
-};
+}
 
 /**
  * Get flags from an input string. Flags are words surrounded with curly
@@ -88,23 +84,23 @@ dwv.utils.splitKeyValueString = function (inputStr) {
  * @param {string} inputStr The input string.
  * @returns {Array} An array of found flags.
  */
-dwv.utils.getFlags = function (inputStr) {
-  var flags = [];
+export function getFlags(inputStr) {
+  const flags = [];
   // check input string
   if (inputStr === null || typeof inputStr === 'undefined') {
     return flags;
   }
 
   // word surrounded by curly braces
-  var regex = /{(\w+)}/g;
+  const regex = /{(\w+)}/g;
 
-  var match = regex.exec(inputStr);
+  let match = regex.exec(inputStr);
   while (match) {
     flags.push(match[1]); // first matching group
     match = regex.exec(inputStr);
   }
   return flags;
-};
+}
 
 /**
  * Replace flags in a input string. Flags are keywords surrounded with curly
@@ -113,13 +109,13 @@ dwv.utils.getFlags = function (inputStr) {
  * @param {string} inputStr The input string.
  * @param {object} values A object of {value, unit}.
  * @example
- *    var values = {"length": { "value": 33, "unit": "cm" } };
- *    var str = "The length is: {length}.";
- *    var res = dwv.utils.replaceFlags(str, values); // "The length is: 33 cm."
+ *    const values = {"length": { "value": 33, "unit": "cm" } };
+ *    const str = "The length is: {length}.";
+ *    const res = replaceFlags(str, values); // "The length is: 33 cm."
  * @returns {string} The result string.
  */
-dwv.utils.replaceFlags = function (inputStr, values) {
-  var res = '';
+export function replaceFlags(inputStr, values) {
+  let res = '';
   // check input string
   if (inputStr === null || typeof inputStr === 'undefined') {
     return res;
@@ -131,13 +127,13 @@ dwv.utils.replaceFlags = function (inputStr, values) {
   }
 
   // loop through flags
-  var keys = dwv.utils.getFlags(inputStr);
-  for (var i = 0; i < keys.length; ++i) {
-    var valueObj = values[keys[i]];
+  const keys = getFlags(inputStr);
+  for (let i = 0; i < keys.length; ++i) {
+    const valueObj = values[keys[i]];
     if (valueObj !== null && typeof valueObj !== 'undefined' &&
       valueObj.value !== null && typeof valueObj.value !== 'undefined') {
       // value string
-      var valueStr = valueObj.value.toPrecision(4);
+      let valueStr = valueObj.value.toPrecision(4);
       // add unit if available
       // space or no space? Yes apart from degree...
       // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
@@ -150,46 +146,14 @@ dwv.utils.replaceFlags = function (inputStr, values) {
         valueStr += valueObj.unit;
       }
       // flag to replace
-      var flag = '{' + keys[i] + '}';
+      const flag = '{' + keys[i] + '}';
       // replace
       res = res.replace(flag, valueStr);
     }
   }
   // return
   return res;
-};
-
-/**
- * Replace flags in a input string. Flags are keywords surrounded with curly
- * braces.
- *
- * @param {string} inputStr The input string.
- * @param {Array} values An array of strings.
- * @example
- *    var values = ["a", "b"];
- *    var str = "The length is: {v0}. The size is: {v1}";
- *    var res = dwv.utils.replaceFlags2(str, values);
- *    // "The length is: a. The size is: b"
- * @returns {string} The result string.
- */
-dwv.utils.replaceFlags2 = function (inputStr, values) {
-  var res = inputStr;
-  for (var j = 0; j < values.length; ++j) {
-    res = res.replace('{v' + j + '}', values[j]);
-  }
-  return res;
-};
-
-dwv.utils.createDefaultReplaceFormat = function (values) {
-  var res = '';
-  for (var j = 0; j < values.length; ++j) {
-    if (j !== 0) {
-      res += ', ';
-    }
-    res += '{v' + j + '}';
-  }
-  return res;
-};
+}
 
 /**
  * Get the root of an input path.
@@ -198,9 +162,9 @@ dwv.utils.createDefaultReplaceFormat = function (values) {
  * @param {string} path The input path
  * @returns {string} The input path without its last part.
  */
-dwv.utils.getRootPath = function (path) {
+export function getRootPath(path) {
   return path.split('/').slice(0, -1).join('/');
-};
+}
 
 /**
  * Get a file extension: anything after the last dot.
@@ -210,23 +174,23 @@ dwv.utils.getRootPath = function (path) {
  * @param {string} filePath The file path containing the file name.
  * @returns {string} The lower case file extension or null for none.
  */
-dwv.utils.getFileExtension = function (filePath) {
-  var ext = null;
+export function getFileExtension(filePath) {
+  let ext = null;
   if (typeof filePath !== 'undefined' &&
     filePath !== null &&
     filePath[0] !== '.') {
-    var pathSplit = filePath.toLowerCase().split('.');
+    const pathSplit = filePath.toLowerCase().split('.');
     if (pathSplit.length !== 1) {
       ext = pathSplit.pop();
       // extension should contain at least one letter and no slash
-      var regExp = /[a-z]/;
+      const regExp = /[a-z]/;
       if (!regExp.test(ext) || ext.includes('/')) {
         ext = null;
       }
     }
   }
   return ext;
-};
+}
 
 /**
  * Convert a string to a Uint8Array.
@@ -234,13 +198,13 @@ dwv.utils.getFileExtension = function (filePath) {
  * @param {string} str The string to convert.
  * @returns {Uint8Array} The Uint8Array.
  */
-dwv.utils.stringToUint8Array = function (str) {
-  var arr = new Uint8Array(str.length);
-  for (var i = 0, leni = str.length; i < leni; i++) {
+export function stringToUint8Array(str) {
+  const arr = new Uint8Array(str.length);
+  for (let i = 0, leni = str.length; i < leni; i++) {
     arr[i] = str.charCodeAt(i);
   }
   return arr;
-};
+}
 
 /**
  * Round a float number to a given precision.
@@ -253,8 +217,8 @@ dwv.utils.stringToUint8Array = function (str) {
  * @param {number} precision The rounding precision.
  * @returns {number} The rounded number.
  */
-dwv.utils.precisionRound = function (number, precision) {
-  var factor = Math.pow(10, precision);
-  var delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
+export function precisionRound(number, precision) {
+  const factor = Math.pow(10, precision);
+  const delta = 0.01 / factor; // fixes precisionRound(1.005, 2)
   return Math.round(number * factor + delta) / factor;
-};
+}

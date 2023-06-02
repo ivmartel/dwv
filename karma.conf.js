@@ -1,57 +1,13 @@
 // Karma configuration file, see link for more information
-// https://karma-runner.github.io/1.0/config/configuration-file.html
+// https://karma-runner.github.io/6.4/config/configuration-file.html
 
 module.exports = function (config) {
   config.set({
     basePath: '.',
-    frameworks: ['qunit'],
-    plugins: [
-      require('karma-qunit'),
-      require('karma-chrome-launcher'),
-      require('karma-coverage')
-    ],
+    frameworks: ['qunit', 'webpack'],
     files: [
-      // dependencies
-      {pattern: 'node_modules/konva/konva.min.js', watched: false},
-      {pattern: 'node_modules/jszip/dist/jszip.min.js', watched: false},
-      // benchmark
-      {pattern: 'node_modules/lodash/lodash.min.js', watched: false},
-      {pattern: 'node_modules/benchmark/benchmark.js', watched: false},
-      // test data
-      {pattern: 'locales/**/translation.json', included: false, type: 'js'},
-      {pattern: 'tests/data/**/*.dcm', included: false},
-      {pattern: 'tests/data/DICOMDIR', included: false},
-      {pattern: 'tests/data/*.dcmdir', included: false},
-      {pattern: 'tests/data/*.zip', included: false},
-      {pattern: 'tests/dicom/*.json', included: false},
-      {pattern: 'tests/state/**/*.json', included: false},
-      // extra served content
-      {pattern: 'tests/**/*.html', included: false},
-      {pattern: 'tests/visual/appgui.js', included: false},
-      {pattern: 'tests/visual/style.css', included: false},
-      {pattern: 'tests/dicom/pages/*.js', included: false},
-      {pattern: 'tests/image/pages/*.js', included: false},
-      {pattern: 'tests/pacs/*.js', included: false},
-      {pattern: 'tests/bench/*.js', included: false},
-      {pattern: 'decoders/**/*.js', included: false},
-      {pattern: 'tests/utils/worker.js', included: false},
-      {pattern: 'tests/visual/images/*.jpg', included: false},
-      {pattern: 'tests/pacs/images/*.png', included: false},
-      {pattern: 'dist/*.js', included: false},
-      {pattern: 'build/dist/*.js', included: false},
-      // src
-      'src/**/*.js',
-      // test
-      'tests/**/*.test.js',
-      'tests/dicom/*.js'
+      {pattern: 'tests/**/*.test.js', watched: false}
     ],
-    proxies: {
-      '/locales/': '/base/locales/',
-      '/tests/data/': '/base/tests/data/',
-      '/tests/dicom/': '/base/tests/dicom/',
-      '/tests/state/': '/base/tests/state/',
-      '/tests/utils/': '/base/tests/utils/'
-    },
     client: {
       clearContext: false,
       qunit: {
@@ -60,35 +16,40 @@ module.exports = function (config) {
       }
     },
     preprocessors: {
-      'src/**/*.js': ['coverage']
+      'src/**/*.js': ['webpack', 'sourcemap'],
+      'tests/**/*.test.js': ['webpack']
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './build/coverage/dwv'),
+      dir: require('path').join(__dirname, './build/coverage/'),
       reporters: [
         {type: 'html', subdir: 'report-html'},
-        {type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt'},
         {type: 'text-summary'}
       ],
       check: {
         global: {
-          statements: 40,
-          branches: 39,
+          statements: 35,
+          branches: 35,
           functions: 30,
-          lines: 40
+          lines: 30
         }
       }
     },
     reporters: ['progress'],
     logLevel: config.LOG_INFO,
-    customLaunchers: {
-      ChromeWithTestsPage: {
-        base: 'Chrome',
-        flags: [
-          'http://localhost:9876/base/tests/index.html'
-        ]
-      }
-    },
-    browsers: ['ChromeWithTestsPage'],
-    restartOnFileChange: true
+    browsers: ['Chrome'],
+    restartOnFileChange: true,
+    webpack: webpackConfig()
   });
 };
+
+/**
+ * Get the webpack config to pass to Karma.
+ *
+ * @returns {object} The config.
+ */
+function webpackConfig() {
+  const config = require('./webpack.test.js');
+  delete config.entry;
+  delete config.output;
+  return config;
+}

@@ -1,56 +1,51 @@
-// namespaces
-var dwv = dwv || {};
-dwv.io = dwv.io || {};
+import {startsWith, getFileExtension} from '../utils/string';
+import {getUrlFromUri} from '../utils/uri';
+import {fileContentTypes} from './filesLoader';
+import {urlContentTypes} from './urlsLoader';
+import {DicomBufferToView} from '../image/dicomBufferToView';
 
 /**
  * DICOM data loader.
- *
- * @class
  */
-dwv.io.DicomDataLoader = function () {
-  // closure to self
-  var self = this;
+export class DicomDataLoader {
 
   /**
    * Loader options.
    *
-   * @private
    * @type {object}
    */
-  var options = {};
+  #options = {};
 
   /**
    * Loading flag.
    *
-   * @private
    * @type {boolean}
    */
-  var isLoading = false;
+  #isLoading = false;
 
   /**
    * Set the loader options.
    *
    * @param {object} opt The input options.
    */
-  this.setOptions = function (opt) {
-    options = opt;
-  };
+  setOptions(opt) {
+    this.#options = opt;
+  }
 
   /**
    * Is the load ongoing?
    *
    * @returns {boolean} True if loading.
    */
-  this.isLoading = function () {
-    return isLoading;
-  };
+  isLoading() {
+    return this.#isLoading;
+  }
 
   /**
-   * DICOM buffer to dwv.image.View (asynchronous)
+   * DICOM buffer to View (asynchronous)
    *
-   * @private
    */
-  var db2v = new dwv.image.DicomBufferToView();
+  #db2v = new DicomBufferToView();
 
   /**
    * Load data.
@@ -59,185 +54,187 @@ dwv.io.DicomDataLoader = function () {
    * @param {string} origin The data origin.
    * @param {number} index The data index.
    */
-  this.load = function (buffer, origin, index) {
+  load(buffer, origin, index) {
     // setup db2v ony once
-    if (!isLoading) {
+    if (!this.#isLoading) {
       // pass options
-      db2v.setOptions(options);
+      this.#db2v.setOptions(this.#options);
       // connect handlers
-      db2v.onloadstart = self.onloadstart;
-      db2v.onprogress = self.onprogress;
-      db2v.onloaditem = self.onloaditem;
-      db2v.onload = self.onload;
-      db2v.onloadend = function (event) {
+      this.#db2v.onloadstart = this.onloadstart;
+      this.#db2v.onprogress = this.onprogress;
+      this.#db2v.onloaditem = this.onloaditem;
+      this.#db2v.onload = this.onload;
+      this.#db2v.onloadend = (event) => {
         // reset loading flag
-        isLoading = false;
+        this.#isLoading = false;
         // call listeners
-        self.onloadend(event);
+        this.onloadend(event);
       };
-      db2v.onerror = self.onerror;
-      db2v.onabort = self.onabort;
+      this.#db2v.onerror = (event) => {
+        event.source = origin;
+        this.onerror(event);
+      };
+      this.#db2v.onabort = this.onabort;
     }
 
     // set loading flag
-    isLoading = true;
+    this.#isLoading = true;
     // convert
-    db2v.convert(buffer, origin, index);
-  };
+    this.#db2v.convert(buffer, origin, index);
+  }
 
   /**
    * Abort load.
    */
-  this.abort = function () {
+  abort() {
     // reset loading flag
-    isLoading = false;
+    this.#isLoading = false;
     // abort conversion, will trigger db2v.onabort
-    db2v.abort();
-  };
-
-}; // class DicomDataLoader
-
-/**
- * Check if the loader can load the provided file.
- *
- * @param {object} file The file to check.
- * @returns {boolean} True if the file can be loaded.
- */
-dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
-  var ext = dwv.utils.getFileExtension(file.name);
-  var hasNoExt = (ext === null);
-  var hasDcmExt = (ext === 'dcm');
-  return hasNoExt || hasDcmExt;
-};
-
-/**
- * Check if the loader can load the provided url.
- * True if:
- *  - the url has a 'contentType' and it is 'application/dicom'
- *    (as in wado urls)
- *  - the url has no 'contentType' and no extension or the extension is 'dcm'
- *
- * @param {string} url The url to check.
- * @param {object} options Optional url request options.
- * @returns {boolean} True if the url can be loaded.
- */
-dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
-  if (typeof options !== 'undefined' &&
-    typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/dicom'
-    var isDicom = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/dicom') &&
-        element.value[18] !== '+';
-    };
-    return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+    this.#db2v.abort();
   }
 
-  var urlObjext = dwv.utils.getUrlFromUri(url);
-  // extension
-  var ext = dwv.utils.getFileExtension(urlObjext.pathname);
-  var hasNoExt = (ext === null);
-  var hasDcmExt = (ext === 'dcm');
-  // content type (for wado url)
-  var contentType = urlObjext.searchParams.get('contentType');
-  var hasContentType = contentType !== null &&
-    typeof contentType !== 'undefined';
-  var hasDicomContentType = (contentType === 'application/dicom');
-
-  return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
-};
-
-/**
- * Check if the loader can load the provided memory object.
- *
- * @param {object} mem The memory object.
- * @returns {boolean} True if the object can be loaded.
- */
-dwv.io.DicomDataLoader.prototype.canLoadMemory = function (mem) {
-  if (typeof mem['Content-Type'] !== 'undefined' &&
-    mem['Content-Type'] === 'application/dicom') {
-    return true;
+  /**
+   * Check if the loader can load the provided file.
+   *
+   * @param {object} file The file to check.
+   * @returns {boolean} True if the file can be loaded.
+   */
+  canLoadFile(file) {
+    const ext = getFileExtension(file.name);
+    const hasNoExt = (ext === null);
+    const hasDcmExt = (ext === 'dcm');
+    return hasNoExt || hasDcmExt;
   }
-  if (typeof mem.filename !== 'undefined') {
-    return this.canLoadFile(mem.filename);
+
+  /**
+   * Check if the loader can load the provided url.
+   * True if:
+   *  - the url has a 'contentType' and it is 'application/dicom'
+   *    (as in wado urls)
+   *  - the url has no 'contentType' and no extension or the extension is 'dcm'
+   *
+   * @param {string} url The url to check.
+   * @param {object} [options] Optional url request options.
+   * @returns {boolean} True if the url can be loaded.
+   */
+  canLoadUrl(url, options) {
+    // if there are options.requestHeaders, just base check on them
+    if (typeof options !== 'undefined' &&
+      typeof options.requestHeaders !== 'undefined') {
+      // starts with 'application/dicom'
+      const isDicom = function (element) {
+        return element.name === 'Accept' &&
+          startsWith(element.value, 'application/dicom') &&
+          element.value[18] !== '+';
+      };
+      return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+    }
+
+    const urlObjext = getUrlFromUri(url);
+    // extension
+    const ext = getFileExtension(urlObjext.pathname);
+    const hasNoExt = (ext === null);
+    const hasDcmExt = (ext === 'dcm');
+    // content type (for wado url)
+    const contentType = urlObjext.searchParams.get('contentType');
+    const hasContentType = contentType !== null &&
+      typeof contentType !== 'undefined';
+    const hasDicomContentType = (contentType === 'application/dicom');
+
+    return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
   }
-  return false;
-};
 
-/**
- * Get the file content type needed by the loader.
- *
- * @returns {number} One of the 'dwv.io.fileContentTypes'.
- */
-dwv.io.DicomDataLoader.prototype.loadFileAs = function () {
-  return dwv.io.fileContentTypes.ArrayBuffer;
-};
+  /**
+   * Check if the loader can load the provided memory object.
+   *
+   * @param {object} mem The memory object.
+   * @returns {boolean} True if the object can be loaded.
+   */
+  canLoadMemory(mem) {
+    if (typeof mem['Content-Type'] !== 'undefined' &&
+      mem['Content-Type'] === 'application/dicom') {
+      return true;
+    }
+    if (typeof mem.filename !== 'undefined') {
+      return this.canLoadFile({name: mem.filename});
+    }
+    return false;
+  }
 
-/**
- * Get the url content type needed by the loader.
- *
- * @returns {number} One of the 'dwv.io.urlContentTypes'.
- */
-dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
-  return dwv.io.urlContentTypes.ArrayBuffer;
-};
+  /**
+   * Get the file content type needed by the loader.
+   *
+   * @returns {number} One of the 'fileContentTypes'.
+   */
+  loadFileAs() {
+    return fileContentTypes.ArrayBuffer;
+  }
 
-/**
- * Handle a load start event.
- * Default does nothing.
- *
- * @param {object} _event The load start event.
- */
-dwv.io.DicomDataLoader.prototype.onloadstart = function (_event) {};
-/**
- * Handle a progress event.
- * Default does nothing.
- *
- * @param {object} _event The load progress event.
- */
-dwv.io.DicomDataLoader.prototype.onprogress = function (_event) {};
-/**
- * Handle a load item event.
- * Default does nothing.
- *
- * @param {object} _event The load item event fired
- *   when a file item has been loaded successfully.
- */
-dwv.io.DicomDataLoader.prototype.onloaditem = function (_event) {};
-/**
- * Handle a load event.
- * Default does nothing.
- *
- * @param {object} _event The load event fired
- *   when a file has been loaded successfully.
- */
-dwv.io.DicomDataLoader.prototype.onload = function (_event) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- *
- * @param {object} _event The load end event fired
- *  when a file load has completed, successfully or not.
- */
-dwv.io.DicomDataLoader.prototype.onloadend = function (_event) {};
-/**
- * Handle an error event.
- * Default does nothing.
- *
- * @param {object} _event The error event.
- */
-dwv.io.DicomDataLoader.prototype.onerror = function (_event) {};
-/**
- * Handle an abort event.
- * Default does nothing.
- *
- * @param {object} _event The abort event.
- */
-dwv.io.DicomDataLoader.prototype.onabort = function (_event) {};
+  /**
+   * Get the url content type needed by the loader.
+   *
+   * @returns {number} One of the 'urlContentTypes'.
+   */
+  loadUrlAs() {
+    return urlContentTypes.ArrayBuffer;
+  }
 
-/**
- * Add to Loader list.
- */
-dwv.io.loaderList = dwv.io.loaderList || [];
-dwv.io.loaderList.push('DicomDataLoader');
+  /**
+   * Handle a load start event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load start event.
+   */
+  onloadstart(_event) {}
+
+  /**
+   * Handle a progress event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load progress event.
+   */
+  onprogress(_event) {}
+
+  /**
+   * Handle a load item event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load item event fired
+   *   when a file item has been loaded successfully.
+   */
+  onloaditem(_event) {}
+
+  /**
+   * Handle a load event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load event fired
+   *   when a file has been loaded successfully.
+   */
+  onload(_event) {}
+
+  /**
+   * Handle an load end event.
+   * Default does nothing.
+   *
+   * @param {object} _event The load end event fired
+   *  when a file load has completed, successfully or not.
+   */
+  onloadend(_event) {}
+
+  /**
+   * Handle an error event.
+   * Default does nothing.
+   *
+   * @param {object} _event The error event.
+   */
+  onerror(_event) {}
+  /**
+   * Handle an abort event.
+   * Default does nothing.
+   *
+   * @param {object} _event The abort event.
+   */
+  onabort(_event) {}
+
+} // class DicomDataLoader

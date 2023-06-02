@@ -1,34 +1,32 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {logger} from '../utils/logger';
 
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
- * @param {Array} array The array to store the outut data
+ * @param {ImageData} array The array to store the outut data
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  * @param {object} colourMap The colour map.
  * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
-dwv.image.generateImageDataPaletteColor = function (
+export function generateImageDataPaletteColor(
   array,
   iterator,
   alphaFunc,
   colourMap,
   is16BitsStored) {
   // right shift 8
-  var to8 = function (value) {
+  const to8 = function (value) {
     return value >> 8;
   };
 
   if (is16BitsStored) {
-    dwv.logger.info('Scaling 16bits data to 8bits.');
+    logger.info('Scaling 16bits data to 8bits.');
   }
 
-  var index = 0;
-  var pxValue = 0;
-  var ival = iterator.next();
+  let index = 0;
+  let pxValue = 0;
+  let ival = iterator.next();
   while (!ival.done) {
     // pixel value
     pxValue = ival.value;
@@ -48,4 +46,4 @@ dwv.image.generateImageDataPaletteColor = function (
     index += 4;
     ival = iterator.next();
   }
-};
+}

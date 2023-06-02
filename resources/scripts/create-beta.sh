@@ -16,13 +16,19 @@ usage() {
   echo ""
   exit 1 # Exit script after printing help
 }
+
+# messages
+PREFIX="[create]"
+RESET_COLOR="\033[0m"
 # print error message (red)
+ERROR_COLOR="\033[1;91m"
 error() {
-  echo -e "\033[1;31m[create] $1\033[0m"
+  echo -e $ERROR_COLOR$PREFIX' '$1$RESET_COLOR
 }
 # print info message (blue)
+INFO_COLOR="\033[1;94m"
 info() {
-  echo -e "\033[1;34m[create] $1\033[0m"
+  echo -e $INFO_COLOR$PREFIX' '$1$RESET_COLOR
 }
 
 # script step
@@ -53,13 +59,13 @@ if [ $step -eq 1 ]
 then
   info "(1/4) update version number in files"
 
-  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+\","
+  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+\","
   b0="  \"version\": \"${betaVersion}\","
   sed -i -r "s/${a0}/${b0}/g" package.json
-  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+';"
+  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+';"
   b1="  return '${betaVersion}';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
-  a2="[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+"
+  a2="[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+"
   b2="${betaVersion}"
   sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
 
@@ -73,8 +79,6 @@ then
   info "(2/4) create build"
 
   yarn run build
-  # copy build to dist
-  cp build/dist/*.js dist
 
   ((step++))
 fi

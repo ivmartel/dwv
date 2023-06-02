@@ -1,11 +1,47 @@
-// namespaces
-var dwv = dwv || {};
-/**
- * Just used for tests.
- *
- * @namespace
- */
-dwv.test = dwv.test || {};
+import {State} from '../../src/io/state';
+
+import v01Ellipse from './v0.1/state-ellipse.json';
+import v01LineMulti from './v0.1/state-line_multi-slice.json';
+import v01Line from './v0.1/state-line.json';
+import v01Protractor from './v0.1/state-protractor.json';
+import v01Rectangle from './v0.1/state-rectangle.json';
+import v01Roi from './v0.1/state-roi.json';
+
+import v02Arrow from './v0.2/state-arrow.json';
+import v02Ellipse from './v0.2/state-ellipse.json';
+import v02Hand from './v0.2/state-hand.json';
+import v02Protractor from './v0.2/state-protractor.json';
+import v02Rectangle from './v0.2/state-rectangle.json';
+import v02Roi from './v0.2/state-roi.json';
+import v02RulerMulti from './v0.2/state-ruler_multi-slice.json';
+import v02Ruler from './v0.2/state-ruler.json';
+
+import v03Arrow from './v0.3/state-arrow.json';
+import v03Ellipse from './v0.3/state-ellipse.json';
+import v03Hand from './v0.3/state-hand.json';
+import v03Protractor from './v0.3/state-protractor.json';
+import v03Rectangle from './v0.3/state-rectangle.json';
+import v03Roi from './v0.3/state-roi.json';
+import v03RulerMulti from './v0.3/state-ruler_multi-slice.json';
+import v03Ruler from './v0.3/state-ruler.json';
+
+import v04Arrow from './v0.4/state-arrow.json';
+import v04Ellipse from './v0.4/state-ellipse.json';
+import v04Hand from './v0.4/state-hand.json';
+import v04Protractor from './v0.4/state-protractor.json';
+import v04Rectangle from './v0.4/state-rectangle.json';
+import v04Roi from './v0.4/state-roi.json';
+import v04RulerMulti from './v0.4/state-ruler_multi-slice.json';
+import v04Ruler from './v0.4/state-ruler.json';
+
+import v05Arrow from './v0.5/state-arrow.json';
+import v05Ellipse from './v0.5/state-ellipse.json';
+import v05Hand from './v0.5/state-hand.json';
+import v05Protractor from './v0.5/state-protractor.json';
+import v05Rectangle from './v0.5/state-rectangle.json';
+import v05Roi from './v0.5/state-roi.json';
+import v05RulerMulti from './v0.5/state-ruler_multi-slice.json';
+import v05Ruler from './v0.5/state-ruler.json';
 
 /**
  * Tests for the 'app/state.js' file.
@@ -18,43 +54,24 @@ QUnit.module('state');
 /**
  * Test a state file.
  *
+ * @param {object} data The test data.
  * @param {string} version The state format version.
  * @param {string} type The type of drawing.
  * @param {object} assert The qunit assert.
  */
-dwv.test.testState = function (version, type, assert) {
-  var done = assert.async();
-  // test file request
-  var request = new XMLHttpRequest();
-  var url = '/tests/state/v' + version + '/state-' + type + '.json';
-  request.open('GET', url, true);
-  request.onerror = function (event) {
-    console.log(event);
-  };
-  request.onload = function (/*event*/) {
-    // status 200: "OK"; status 0: "debug"
-    if (this.status !== 200 && this.status !== 0) {
-      assert.ok(false, 'Error while loading test data.');
-      done();
-      return;
-    }
-    // read state
-    var state = new dwv.io.State();
-    var jsonData = state.fromJSON(this.responseText);
-    // check drawings values
-    dwv.test.checkDrawings(
-      jsonData.drawings, jsonData.drawingsDetails, version, type, assert);
-    // delete drawing to allow simple equal check
-    delete jsonData.drawings;
-    delete jsonData.drawingsDetails;
-    // check values expect drawings
-    dwv.test.checkStateHeader(jsonData, version, assert);
-    // finish async test
-    done();
-  };
-  // send request
-  request.send(null);
-};
+function testState(data, version, type, assert) {
+  // read state
+  const state = new State();
+  const jsonData = state.fromJSON(data);
+  // check drawings values
+  checkDrawings(
+    jsonData.drawings, jsonData.drawingsDetails, version, type, assert);
+  // delete drawing to allow simple equal check
+  delete jsonData.drawings;
+  delete jsonData.drawingsDetails;
+  // check values expect drawings
+  checkStateHeader(jsonData, version, assert);
+}
 
 /**
  * Check state header.
@@ -63,9 +80,9 @@ dwv.test.testState = function (version, type, assert) {
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkStateHeader = function (jsonData, version, assert) {
+function checkStateHeader(jsonData, version, assert) {
   // header data
-  var headerData = {
+  const headerData = {
     version: version,
     'window-center': 441,
     'window-width': 911,
@@ -84,7 +101,7 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
     headerData.position = [0, 0, 114.63];
   }
   assert.deepEqual(jsonData, headerData);
-};
+}
 
 /**
  * Check drawings.
@@ -95,42 +112,42 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
  * @param {string} type The type of drawing.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
+function checkDrawings(drawings, details, version, type, assert) {
   // first level: layer
   assert.equal(drawings.className, 'Layer', 'State drawings is a layer.');
 
   // second level: position groups
   if (drawings.children.length === 5 &&
         (type === 'ruler_multi-slice' || type === 'line_multi-slice')) {
-    dwv.test.checkRulerDrawings(drawings.children, details, version, assert);
+    checkRulerDrawings(drawings.children, details, version, assert);
   } else if (drawings.children.length === 1) {
 
-    var layerKid = drawings.children[0];
+    const layerKid = drawings.children[0];
     assert.equal(layerKid.className, 'Group', 'Layer first level is a group.');
     assert.equal(
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
-    var groupId = '#2-0';
+    const groupId = '#2-0';
     assert.equal(
       layerKid.attrs.id,
       groupId,
       'Position group has the proper id.');
 
     // third level: shape group(s)
-    var posGroupKid = layerKid.children[0];
+    const posGroupKid = layerKid.children[0];
     assert.equal(
       posGroupKid.className,
       'Group',
       'Position group first level is a group.');
 
-    var unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
+    const unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
 
     // shape specific checks
     if (type === 'arrow') {
-      dwv.test.checkArrowDrawing(posGroupKid, details, version, assert);
+      checkArrowDrawing(posGroupKid, details, version, assert);
     } else if (type === 'ruler' && version !== '0.1') {
-      var refRuler = {
+      const refRuler = {
         id: '4gvkz8v6wzw',
         points: [51, 135, 216, 134],
         colour: '#ffff80',
@@ -138,10 +155,10 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
         textExpr: '{length}',
         longText: 'What a ruler!'
       };
-      dwv.test.checkRulerDrawing(
+      checkRulerDrawing(
         posGroupKid, details, version, refRuler, assert);
     } else if (type === 'line' && version === '0.1') {
-      var refLine = {
+      const refLine = {
         id: '4gvkz8v6wzw',
         points: [51, 135, 216, 134],
         colour: '#ffff00',
@@ -149,25 +166,25 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
         textExpr: '{length}',
         longText: ''
       };
-      dwv.test.checkRulerDrawing(
+      checkRulerDrawing(
         posGroupKid, details, version, refLine, assert);
     } else if (type === 'roi') {
-      dwv.test.checkRoiDrawing(posGroupKid, details, version, assert);
+      checkRoiDrawing(posGroupKid, details, version, assert);
     } else if (type === 'hand') {
-      dwv.test.checkHandDrawing(posGroupKid, details, version, assert);
+      checkHandDrawing(posGroupKid, details, version, assert);
     } else if (type === 'ellipse') {
-      dwv.test.checkEllipseDrawing(posGroupKid, details, version, assert);
+      checkEllipseDrawing(posGroupKid, details, version, assert);
     } else if (type === 'protractor') {
-      dwv.test.checkProtractorDrawing(posGroupKid, details, version, assert);
+      checkProtractorDrawing(posGroupKid, details, version, assert);
     } else if (type === 'rectangle') {
-      dwv.test.checkRectangleDrawing(posGroupKid, details, version, assert);
+      checkRectangleDrawing(posGroupKid, details, version, assert);
     } else {
       assert.ok(false, 'Unknown draw type.');
     }
   } else {
     assert.ok(false, 'Not the expected number of position groups.');
   }
-};
+}
 
 /**
  * Check an arrow drawing.
@@ -177,7 +194,7 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
+function checkArrowDrawing(posGroupKid, details, version, assert) {
   // check group
   assert.equal(
     posGroupKid.attrs.name, 'line-group', 'Shape group is a line group.');
@@ -193,11 +210,11 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
 
   // kids
   assert.equal(posGroupKid.children.length, 3, 'Shape group has 3 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  var hasPoly = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  let hasPoly = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -221,7 +238,7 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -230,7 +247,7 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
         labelGroupKid0.attrs.text,
         'Eye',
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -247,7 +264,7 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
   assert.ok(hasPoly, 'Shape group contains a polygon.');
 
   // details
-  var details0 = details.pf8zteo5r4;
+  const details0 = details.pf8zteo5r4;
   assert.equal(
     details0.meta.textExpr, 'Eye', 'Details textExpr has the proper value.');
   if (parseFloat(version) <= 0.3) {
@@ -256,7 +273,7 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
       'This is an eye!',
       'Details longText has the proper value.');
   }
-};
+}
 
 /**
  * Check a ruler drawing.
@@ -267,7 +284,7 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
  * @param {string} ref The reference data to compare to.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkRulerDrawing = function (
+function checkRulerDrawing(
   posGroupKid, details, version, ref, assert) {
   // check group
   assert.equal(
@@ -284,12 +301,12 @@ dwv.test.checkRulerDrawing = function (
 
   // kids
   assert.equal(posGroupKid.children.length, 4, 'Shape group has 4 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  var hasTick1 = false;
-  var hasTick2 = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  let hasTick1 = false;
+  let hasTick2 = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -313,7 +330,7 @@ dwv.test.checkRulerDrawing = function (
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -322,7 +339,7 @@ dwv.test.checkRulerDrawing = function (
         labelGroupKid0.attrs.text,
         ref.text,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -344,7 +361,7 @@ dwv.test.checkRulerDrawing = function (
   assert.ok(hasTick2, 'Shape group contains a tick2.');
 
   // details
-  var details0 = details[ref.id];
+  const details0 = details[ref.id];
   assert.equal(
     details0.meta.textExpr,
     ref.textExpr,
@@ -355,7 +372,7 @@ dwv.test.checkRulerDrawing = function (
       ref.longText,
       'Details longText has the proper value.');
   }
-};
+}
 
 /**
  * Check a multi slice ruler drawing.
@@ -365,13 +382,13 @@ dwv.test.checkRulerDrawing = function (
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
+function checkRulerDrawings(layerKids, details, version, assert) {
 
-  var ndraws = 5;
+  const ndraws = 5;
   assert.equal(layerKids.length, ndraws, 'Layer has ' + ndraws + ' kids.');
 
-  var unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
-  var refRulers = [
+  const unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
+  const refRulers = [
     {
       id: 'onzlkbs8p',
       points: [120, 110, 120, 60],
@@ -414,8 +431,8 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
     }
   ];
 
-  for (var i = 0; i < ndraws; ++i) {
-    var layerKid = layerKids[i];
+  for (let i = 0; i < ndraws; ++i) {
+    const layerKid = layerKids[i];
     assert.equal(
       layerKid.className,
       'Group',
@@ -424,23 +441,23 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
-    var groupId = '#2-' + (i + 1);
+    const groupId = '#2-' + (i + 1);
     assert.equal(
       layerKid.attrs.id,
       groupId,
       'Position group has the proper id.');
 
     // third level: shape group(s)
-    var posGroupKid = layerKid.children[0];
+    const posGroupKid = layerKid.children[0];
     assert.equal(
       posGroupKid.className,
       'Group',
       'Position group first level is a group.');
 
-    dwv.test.checkRulerDrawing(
+    checkRulerDrawing(
       posGroupKid, details, version, refRulers[i], assert);
   }
-};
+}
 
 /**
  * Check a roi drawing.
@@ -450,7 +467,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
+function checkRoiDrawing(posGroupKid, details, version, assert) {
   // check group
   assert.equal(
     posGroupKid.attrs.name,
@@ -468,10 +485,10 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -491,7 +508,7 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
         ],
         'Line has the proper points.');
       /* eslint-enable array-element-newline */
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -502,7 +519,7 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -513,7 +530,7 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
           'Brain',
           'Text has the proper value.');
       }
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -525,7 +542,7 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
 
   // details
   if (version !== '0.1') {
-    var details0 = details['4l24ofouhmf'];
+    const details0 = details['4l24ofouhmf'];
     assert.equal(
       details0.meta.textExpr,
       'Brain',
@@ -537,7 +554,7 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
         'Details longText has the proper value.');
     }
   }
-};
+}
 
 /**
  * Check a hand drawing.
@@ -547,7 +564,7 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
+function checkHandDrawing(posGroupKid, details, version, assert) {
   // check group
   assert.equal(
     posGroupKid.attrs.name,
@@ -565,10 +582,10 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -607,7 +624,7 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
@@ -616,7 +633,7 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
         labelGroupKid0.attrs.text,
         'Brain',
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -627,7 +644,7 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
   assert.ok(hasLabel, 'Shape group contains a label.');
 
   // details
-  var details0 = details['08m011yjp8je'];
+  const details0 = details['08m011yjp8je'];
   assert.equal(
     details0.meta.textExpr,
     'Brain',
@@ -638,7 +655,7 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
       'This is a roundy brain!',
       'Details longText has the proper value.');
   }
-};
+}
 
 /**
  * Check an ellipse drawing.
@@ -648,7 +665,7 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkEllipseDrawing = function (
+function checkEllipseDrawing(
   posGroupKid, details, version, assert) {
   // check group
   assert.equal(
@@ -667,10 +684,10 @@ dwv.test.checkEllipseDrawing = function (
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -690,7 +707,7 @@ dwv.test.checkEllipseDrawing = function (
         shapeGroupKid.attrs.radiusY,
         32,
         'Ellipse has the proper radiusY.');
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -701,17 +718,17 @@ dwv.test.checkEllipseDrawing = function (
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
-      var unit = parseFloat(version) <= 0.3 ? 'cm2' : ' cm²';
+      const unit = parseFloat(version) <= 0.3 ? 'cm2' : ' cm²';
       assert.equal(
         labelGroupKid0.attrs.text,
         '53.28' + unit,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -723,7 +740,7 @@ dwv.test.checkEllipseDrawing = function (
 
   // details
   if (version !== '0.1') {
-    var details0 = details.c6j16qt6vt6;
+    const details0 = details.c6j16qt6vt6;
     assert.equal(
       details0.meta.textExpr,
       '{surface}',
@@ -735,7 +752,7 @@ dwv.test.checkEllipseDrawing = function (
         'Details longText has the proper value.');
     }
   }
-};
+}
 
 /**
  * Check a protractor drawing.
@@ -745,7 +762,7 @@ dwv.test.checkEllipseDrawing = function (
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkProtractorDrawing = function (
+function checkProtractorDrawing(
   posGroupKid, details, version, assert) {
   // check group
   assert.equal(
@@ -764,11 +781,11 @@ dwv.test.checkProtractorDrawing = function (
 
   // kids
   assert.equal(posGroupKid.children.length, 3, 'Shape group has 3 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  var hasArc = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  let hasArc = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -782,7 +799,7 @@ dwv.test.checkProtractorDrawing = function (
         shapeGroupKid.attrs.points,
         [33, 164, 81, 145, 93, 198],
         'Line has the proper points.');
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -793,17 +810,17 @@ dwv.test.checkProtractorDrawing = function (
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
-      var unit = parseFloat(version) <= 0.3 ? '°' : ' °';
+      const unit = parseFloat(version) <= 0.3 ? '°' : ' °';
       assert.equal(
         labelGroupKid0.attrs.text,
         '80.15' + unit,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -821,7 +838,7 @@ dwv.test.checkProtractorDrawing = function (
 
   // details
   if (version !== '0.1') {
-    var details0 = details['49g7kqi3p4u'];
+    const details0 = details['49g7kqi3p4u'];
     assert.equal(
       details0.meta.textExpr,
       '{angle}',
@@ -833,7 +850,7 @@ dwv.test.checkProtractorDrawing = function (
         'Details longText has the proper value.');
     }
   }
-};
+}
 
 /**
  * Check a rectangle drawing.
@@ -843,7 +860,7 @@ dwv.test.checkProtractorDrawing = function (
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkRectangleDrawing = function (
+function checkRectangleDrawing(
   posGroupKid, details, version, assert) {
   // check group
   assert.equal(
@@ -862,10 +879,10 @@ dwv.test.checkRectangleDrawing = function (
 
   // kids
   assert.equal(posGroupKid.children.length, 2, 'Shape group has 2 kids.');
-  var hasShape = false;
-  var hasLabel = false;
-  for (var i = 0; i < posGroupKid.children.length; ++i) {
-    var shapeGroupKid = posGroupKid.children[i];
+  let hasShape = false;
+  let hasLabel = false;
+  for (let i = 0; i < posGroupKid.children.length; ++i) {
+    const shapeGroupKid = posGroupKid.children[i];
     if (shapeGroupKid.attrs.name === 'shape') {
       hasShape = true;
       assert.equal(
@@ -891,7 +908,7 @@ dwv.test.checkRectangleDrawing = function (
         shapeGroupKid.attrs.height,
         64,
         'Rectangle has the proper height.');
-      var colour = (version === '0.1' ? '#ffff00' : '#ffff80');
+      const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
         colour,
@@ -902,17 +919,17 @@ dwv.test.checkRectangleDrawing = function (
         shapeGroupKid.attrs.draggable,
         'Shape group \'label\' must not be draggable.');
       assert.equal(shapeGroupKid.children.length, 2, 'Label has 2 kids.');
-      var labelGroupKid0 = shapeGroupKid.children[0];
+      const labelGroupKid0 = shapeGroupKid.children[0];
       assert.equal(
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
-      var unit = parseFloat(version, 10) <= 0.3 ? 'cm2' : ' cm²';
+      const unit = parseFloat(version, 10) <= 0.3 ? 'cm2' : ' cm²';
       assert.equal(
         labelGroupKid0.attrs.text,
         '66.56' + unit,
         'Text has the proper value.');
-      var labelGroupKid1 = shapeGroupKid.children[1];
+      const labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
         labelGroupKid1.className,
         'Tag',
@@ -924,7 +941,7 @@ dwv.test.checkRectangleDrawing = function (
 
   // details
   if (version !== '0.1') {
-    var details0 = details.db0puu209qe;
+    const details0 = details.db0puu209qe;
     assert.equal(
       details0.meta.textExpr,
       '{surface}',
@@ -936,348 +953,348 @@ dwv.test.checkRectangleDrawing = function (
         'Details longText has the proper value.');
     }
   }
-};
+}
 
 /**
- * Tests for {@link dwv.io.State} v0.1 containing a line.
+ * Tests for {@link State} v0.1 containing a line.
  *
  * @function module:tests/state~testV01Line
  */
 QUnit.test('Test read v0.1 state: line.', function (assert) {
-  dwv.test.testState('0.1', 'line', assert);
+  testState(v01Line, '0.1', 'line', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.1 containing a roi.
+ * Tests for {@link State} v0.1 containing a roi.
  *
  * @function module:tests/state~testV01Roi
  */
 QUnit.test('Test read v0.1 state: roi.', function (assert) {
-  dwv.test.testState('0.1', 'roi', assert);
+  testState(v01Roi, '0.1', 'roi', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.1 containing an ellipse.
+ * Tests for {@link State} v0.1 containing an ellipse.
  *
  * @function module:tests/state~testV01Ellipse
  */
 QUnit.test('Test read v0.1 state: ellipse.', function (assert) {
-  dwv.test.testState('0.1', 'ellipse', assert);
+  testState(v01Ellipse, '0.1', 'ellipse', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.1 containing a protractor.
+ * Tests for {@link State} v0.1 containing a protractor.
  *
  * @function module:tests/state~testV01Protractor
  */
 QUnit.test('Test read v0.1 state: protractor.', function (assert) {
-  dwv.test.testState('0.1', 'protractor', assert);
+  testState(v01Protractor, '0.1', 'protractor', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.1 containing a rectangle.
+ * Tests for {@link State} v0.1 containing a rectangle.
  *
  * @function module:tests/state~testV01Rectangle
  */
 QUnit.test('Test read v0.1 state: rectangle.', function (assert) {
-  dwv.test.testState('0.1', 'rectangle', assert);
+  testState(v01Rectangle, '0.1', 'rectangle', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.1 containing a multi slice ruler.
+ * Tests for {@link State} v0.1 containing a multi slice ruler.
  *
  * @function module:tests/state~testV01MultiSliceRuler
  */
 QUnit.test('Test read v0.1 state: line multi-slice.', function (assert) {
-  dwv.test.testState('0.1', 'line_multi-slice', assert);
+  testState(v01LineMulti, '0.1', 'line_multi-slice', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing an arrow.
+ * Tests for {@link State} v0.2 containing an arrow.
  *
  * @function module:tests/state~testV02Arrow
  */
 QUnit.test('Test read v0.2 state: arrow.', function (assert) {
-  dwv.test.testState('0.2', 'arrow', assert);
+  testState(v02Arrow, '0.2', 'arrow', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing a ruler.
+ * Tests for {@link State} v0.2 containing a ruler.
  *
  * @function module:tests/state~testV02Ruler
  */
 QUnit.test('Test read v0.2 state: ruler.', function (assert) {
-  dwv.test.testState('0.2', 'ruler', assert);
+  testState(v02Ruler, '0.2', 'ruler', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing a roi.
+ * Tests for {@link State} v0.2 containing a roi.
  *
  * @function module:tests/state~testV02Roi
  */
 QUnit.test('Test read v0.2 state: roi.', function (assert) {
-  dwv.test.testState('0.2', 'roi', assert);
+  testState(v02Roi, '0.2', 'roi', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing a hand draw.
+ * Tests for {@link State} v0.2 containing a hand draw.
  *
  * @function module:tests/state~testV02Hand
  */
 QUnit.test('Test read v0.2 state: hand.', function (assert) {
-  dwv.test.testState('0.2', 'hand', assert);
+  testState(v02Hand, '0.2', 'hand', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing an ellipse.
+ * Tests for {@link State} v0.2 containing an ellipse.
  *
  * @function module:tests/state~testV02Ellipses
  */
 QUnit.test('Test read v0.2 state: ellipse.', function (assert) {
-  dwv.test.testState('0.2', 'ellipse', assert);
+  testState(v02Ellipse, '0.2', 'ellipse', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing a protractor.
+ * Tests for {@link State} v0.2 containing a protractor.
  *
  * @function module:tests/state~testV02Protractor
  */
 QUnit.test('Test read v0.2 state: protractor.', function (assert) {
-  dwv.test.testState('0.2', 'protractor', assert);
+  testState(v02Protractor, '0.2', 'protractor', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing a rectangle.
+ * Tests for {@link State} v0.2 containing a rectangle.
  *
  * @function module:tests/state~testV02Rectangle
  */
 QUnit.test('Test read v0.2 state: rectangle.', function (assert) {
-  dwv.test.testState('0.2', 'rectangle', assert);
+  testState(v02Rectangle, '0.2', 'rectangle', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.2 containing a multi slice ruler.
+ * Tests for {@link State} v0.2 containing a multi slice ruler.
  *
  * @function module:tests/state~testV02MultiSliceRuler
  */
 QUnit.test('Test read v0.2 state: ruler multi-slice.', function (assert) {
-  dwv.test.testState('0.2', 'ruler_multi-slice', assert);
+  testState(v02RulerMulti, '0.2', 'ruler_multi-slice', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing an arrow.
+ * Tests for {@link State} v0.3 containing an arrow.
  *
  * @function module:tests/state~testV03Arrow
  */
 QUnit.test('Test read v0.3 state: arrow.', function (assert) {
-  dwv.test.testState('0.3', 'arrow', assert);
+  testState(v03Arrow, '0.3', 'arrow', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing a ruler.
+ * Tests for {@link State} v0.3 containing a ruler.
  *
  * @function module:tests/state~testV03Ruler
  */
 QUnit.test('Test read v0.3 state: ruler.', function (assert) {
-  dwv.test.testState('0.3', 'ruler', assert);
+  testState(v03Ruler, '0.3', 'ruler', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing a roi.
+ * Tests for {@link State} v0.3 containing a roi.
  *
  * @function module:tests/state~testV03Roi
  */
 QUnit.test('Test read v0.3 state: roi.', function (assert) {
-  dwv.test.testState('0.3', 'roi', assert);
+  testState(v03Roi, '0.3', 'roi', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing a hand draw.
+ * Tests for {@link State} v0.3 containing a hand draw.
  *
  * @function module:tests/state~testV03Hand
  */
 QUnit.test('Test read v0.3 state: hand.', function (assert) {
-  dwv.test.testState('0.3', 'hand', assert);
+  testState(v03Hand, '0.3', 'hand', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing an ellipse.
+ * Tests for {@link State} v0.3 containing an ellipse.
  *
  * @function module:tests/state~testV03Ellipse
  */
 QUnit.test('Test read v0.3 state: ellipse.', function (assert) {
-  dwv.test.testState('0.3', 'ellipse', assert);
+  testState(v03Ellipse, '0.3', 'ellipse', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing a protractor.
+ * Tests for {@link State} v0.3 containing a protractor.
  *
  * @function module:tests/state~testV03Protractor
  */
 QUnit.test('Test read v0.3 state: protractor.', function (assert) {
-  dwv.test.testState('0.3', 'protractor', assert);
+  testState(v03Protractor, '0.3', 'protractor', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing a rectangle.
+ * Tests for {@link State} v0.3 containing a rectangle.
  *
  * @function module:tests/state~testV03Rectangle
  */
 QUnit.test('Test read v0.3 state: rectangle.', function (assert) {
-  dwv.test.testState('0.3', 'rectangle', assert);
+  testState(v03Rectangle, '0.3', 'rectangle', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.3 containing a multi slice ruler.
+ * Tests for {@link State} v0.3 containing a multi slice ruler.
  *
  * @function module:tests/state~testV03MultiSliceRuler
  */
 QUnit.test('Test read v0.3 state: ruler multi-slice.', function (assert) {
-  dwv.test.testState('0.3', 'ruler_multi-slice', assert);
+  testState(v03RulerMulti, '0.3', 'ruler_multi-slice', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing an arrow.
+ * Tests for {@link State} v0.4 containing an arrow.
  *
  * @function module:tests/state~testV04Arrow
  */
 QUnit.test('Test read v0.4 state: arrow.', function (assert) {
-  dwv.test.testState('0.4', 'arrow', assert);
+  testState(v04Arrow, '0.4', 'arrow', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing a ruler.
+ * Tests for {@link State} v0.4 containing a ruler.
  *
  * @function module:tests/state~testV04Ruler
  */
 QUnit.test('Test read v0.4 state: ruler.', function (assert) {
-  dwv.test.testState('0.4', 'ruler', assert);
+  testState(v04Ruler, '0.4', 'ruler', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing a roi.
+ * Tests for {@link State} v0.4 containing a roi.
  *
  * @function module:tests/state~testV04Roi
  */
 QUnit.test('Test read v0.4 state: roi.', function (assert) {
-  dwv.test.testState('0.4', 'roi', assert);
+  testState(v04Roi, '0.4', 'roi', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing a hand draw.
+ * Tests for {@link State} v0.4 containing a hand draw.
  *
  * @function module:tests/state~testV04Hand
  */
 QUnit.test('Test read v0.4 state: hand.', function (assert) {
-  dwv.test.testState('0.4', 'hand', assert);
+  testState(v04Hand, '0.4', 'hand', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing an ellipse.
+ * Tests for {@link State} v0.4 containing an ellipse.
  *
  * @function module:tests/state~testV04Ellipse
  */
 QUnit.test('Test read v0.4 state: ellipse.', function (assert) {
-  dwv.test.testState('0.4', 'ellipse', assert);
+  testState(v04Ellipse, '0.4', 'ellipse', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing a protractor.
+ * Tests for {@link State} v0.4 containing a protractor.
  *
  * @function module:tests/state~testV04Protractor
  */
 QUnit.test('Test read v0.4 state: protractor.', function (assert) {
-  dwv.test.testState('0.4', 'protractor', assert);
+  testState(v04Protractor, '0.4', 'protractor', assert);
 });
 
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing a rectangle.
+ * Tests for {@link State} v0.4 containing a rectangle.
  *
  * @function module:tests/state~testV04Rectangle
  */
 QUnit.test('Test read v0.4 state: rectangle.', function (assert) {
-  dwv.test.testState('0.4', 'rectangle', assert);
+  testState(v04Rectangle, '0.4', 'rectangle', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.4 containing a multi slice ruler.
+ * Tests for {@link State} v0.4 containing a multi slice ruler.
  *
  * @function module:tests/state~testV04MultiSliceRuler
  */
 QUnit.test('Test read v0.4 state: ruler multi-slice.', function (assert) {
-  dwv.test.testState('0.4', 'ruler_multi-slice', assert);
+  testState(v04RulerMulti, '0.4', 'ruler_multi-slice', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing an arrow.
+ * Tests for {@link State} v0.5 containing an arrow.
  *
  * @function module:tests/state~testV05Arrow
  */
 QUnit.test('Test read v0.5 state: arrow.', function (assert) {
-  dwv.test.testState('0.5', 'arrow', assert);
+  testState(v05Arrow, '0.5', 'arrow', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing a ruler.
+ * Tests for {@link State} v0.5 containing a ruler.
  *
  * @function module:tests/state~testV05Ruler
  */
 QUnit.test('Test read v0.5 state: ruler.', function (assert) {
-  dwv.test.testState('0.5', 'ruler', assert);
+  testState(v05Ruler, '0.5', 'ruler', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing a roi.
+ * Tests for {@link State} v0.5 containing a roi.
  *
  * @function module:tests/state~testV05Roi
  */
 QUnit.test('Test read v0.5 state: roi.', function (assert) {
-  dwv.test.testState('0.5', 'roi', assert);
+  testState(v05Roi, '0.5', 'roi', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing a hand draw.
+ * Tests for {@link State} v0.5 containing a hand draw.
  *
  * @function module:tests/state~testV05Hand
  */
 QUnit.test('Test read v0.5 state: hand.', function (assert) {
-  dwv.test.testState('0.5', 'hand', assert);
+  testState(v05Hand, '0.5', 'hand', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing an ellipse.
+ * Tests for {@link State} v0.5 containing an ellipse.
  *
  * @function module:tests/state~testV05Ellipse
  */
 QUnit.test('Test read v0.5 state: ellipse.', function (assert) {
-  dwv.test.testState('0.5', 'ellipse', assert);
+  testState(v05Ellipse, '0.5', 'ellipse', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing a protractor.
+ * Tests for {@link State} v0.5 containing a protractor.
  *
  * @function module:tests/state~testV05Protractor
  */
 QUnit.test('Test read v0.5 state: protractor.', function (assert) {
-  dwv.test.testState('0.5', 'protractor', assert);
+  testState(v05Protractor, '0.5', 'protractor', assert);
 });
 
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing a rectangle.
+ * Tests for {@link State} v0.5 containing a rectangle.
  *
  * @function module:tests/state~testV05Rectangle
  */
 QUnit.test('Test read v0.5 state: rectangle.', function (assert) {
-  dwv.test.testState('0.5', 'rectangle', assert);
+  testState(v05Rectangle, '0.5', 'rectangle', assert);
 });
 
 /**
- * Tests for {@link dwv.io.State} v0.5 containing a multi slice ruler.
+ * Tests for {@link State} v0.5 containing a multi slice ruler.
  *
  * @function module:tests/state~testV05MultiSliceRuler
  */
 QUnit.test('Test read v0.5 state: ruler multi-slice.', function (assert) {
-  dwv.test.testState('0.5', 'ruler_multi-slice', assert);
+  testState(v05RulerMulti, '0.5', 'ruler_multi-slice', assert);
 });

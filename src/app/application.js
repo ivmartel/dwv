@@ -1,13 +1,35 @@
-/** @namespace */
-var dwv = dwv || {};
+import {viewEventNames} from '../image/view';
+import {ViewFactory} from '../image/viewFactory';
+import {lut} from '../image/luts';
+import {getMatrixFromName} from '../math/matrix';
+import {Point3D} from '../math/point';
+import {Stage} from '../gui/stage';
+import {Style} from '../gui/style';
+import {getViewOrientation} from '../gui/layerGroup';
+import {ListenerHandler} from '../utils/listen';
+import {State} from '../io/state';
+import {logger} from '../utils/logger';
+import {getUriQuery, decodeQuery} from '../utils/uri';
+import {UndoStack} from '../tools/undo';
+import {ToolboxController} from './toolboxController';
+import {LoadController} from './loadController';
+import {DataController} from './dataController';
+
+import {toolList, toolOptions} from '../tools';
+import {binderList} from '../gui/stage';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../gui/layerGroup';
+import {Image} from '../image/image';
+/* eslint-enable no-unused-vars */
 
 /**
  * Main application class.
  *
- * @class
  * @example
  * // create the dwv app
- * var app = new dwv.App();
+ * const app = new App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
@@ -17,86 +39,86 @@ var dwv = dwv || {};
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
  * ]);
  */
-dwv.App = function () {
-  // closure to self
-  var self = this;
+export class App {
 
   // app options
-  var options = null;
+  #options = null;
 
   // data controller
-  var dataController = null;
+  #dataController = null;
 
   // toolbox controller
-  var toolboxController = null;
+  #toolboxController = null;
 
   // load controller
-  var loadController = null;
+  #loadController = null;
 
   // stage
-  var stage = null;
+  #stage = null;
 
   // UndoStack
-  var undoStack = null;
+  #undoStack = null;
 
   // Generic style
-  var style = new dwv.gui.Style();
+  #style = new Style();
 
   /**
    * Listener handler.
    *
    * @type {object}
-   * @private
    */
-  var listenerHandler = new dwv.utils.ListenerHandler();
+  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the image.
    *
    * @param {number} index The data index.
-   * @returns {dwv.image.Image} The associated image.
+   * @returns {Image} The associated image.
    */
-  this.getImage = function (index) {
-    return dataController.get(index).image;
-  };
+  getImage(index) {
+    return this.#dataController.get(index).image;
+  }
+
   /**
    * Get the last loaded image.
    *
-   * @returns {dwv.image.Image} The image.
+   * @returns {Image} The image.
    */
-  this.getLastImage = function () {
-    return dataController.get(dataController.length() - 1).image;
-  };
+  getLastImage() {
+    return this.#dataController.get(this.#dataController.length() - 1).image;
+  }
+
   /**
    * Set the image at the given index.
    *
    * @param {number} index The data index.
-   * @param {dwv.image.Image} img The associated image.
+   * @param {Image} img The associated image.
    */
-  this.setImage = function (index, img) {
-    dataController.setImage(index, img);
-  };
+  setImage(index, img) {
+    this.#dataController.setImage(index, img);
+  }
+
   /**
    * Set the last image.
    *
-   * @param {dwv.image.Image} img The associated image.
+   * @param {Image} img The associated image.
    */
-  this.setLastImage = function (img) {
-    dataController.setImage(dataController.length() - 1, img);
-  };
+  setLastImage(img) {
+    this.#dataController.setImage(this.#dataController.length() - 1, img);
+  }
 
   /**
    * Add a new image.
    *
-   * @param {dwv.image.Image} image The new image.
+   * @param {Image} image The new image.
    * @param {object} meta The image meta.
    * @returns {number} The new image id.
    */
-  this.addNewImage = function (image, meta) {
-    var id = dataController.length();
+  addNewImage(image, meta) {
+    const id = this.#dataController.length();
 
     // load start event
-    fireEvent({
+    this.#fireEvent({
       type: 'loadstart',
       loadtype: 'image',
       source: 'internal',
@@ -104,10 +126,10 @@ dwv.App = function () {
     });
 
     // add image to data controller
-    dataController.addNew(id, image, meta);
+    this.#dataController.addNew(id, image, meta);
 
     // load item event
-    fireEvent({
+    this.#fireEvent({
       type: 'loaditem',
       loadtype: 'image',
       data: meta,
@@ -117,18 +139,18 @@ dwv.App = function () {
     });
 
     // optional render
-    if (options.viewOnFirstLoadItem) {
+    if (this.#options.viewOnFirstLoadItem) {
       this.render(id);
     }
 
     // load events
-    fireEvent({
+    this.#fireEvent({
       type: 'load',
       loadtype: 'image',
       source: 'internal',
       loadid: id
     });
-    fireEvent({
+    this.#fireEvent({
       type: 'loadend',
       loadtype: 'image',
       source: 'internal',
@@ -136,7 +158,7 @@ dwv.App = function () {
     });
 
     return id;
-  };
+  }
 
   /**
    * Get the meta data.
@@ -144,86 +166,86 @@ dwv.App = function () {
    * @param {number} index The data index.
    * @returns {object} The list of meta data.
    */
-  this.getMetaData = function (index) {
-    return dataController.get(index).meta;
-  };
+  getMetaData(index) {
+    return this.#dataController.get(index).meta;
+  }
 
   /**
    * Get the number of loaded data.
    *
    * @returns {number} The number.
    */
-  this.getNumberOfLoadedData = function () {
-    return dataController.length();
-  };
+  getNumberOfLoadedData() {
+    return this.#dataController.length();
+  }
 
   /**
    * Can the data be scrolled?
    *
    * @returns {boolean} True if the data has a third dimension greater than one.
    */
-  this.canScroll = function () {
-    var viewLayer = stage.getActiveLayerGroup().getActiveViewLayer();
-    var controller = viewLayer.getViewController();
+  canScroll() {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
     return controller.canScroll();
-  };
+  }
 
   /**
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if the data is monochrome.
    */
-  this.canWindowLevel = function () {
-    var viewLayer = stage.getActiveLayerGroup().getActiveViewLayer();
-    var controller = viewLayer.getViewController();
+  canWindowLevel() {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
     return controller.canWindowLevel();
-  };
+  }
 
   /**
    * Get the layer scale on top of the base scale.
    *
    * @returns {object} The scale as {x,y}.
    */
-  this.getAddedScale = function () {
-    return stage.getActiveLayerGroup().getAddedScale();
-  };
+  getAddedScale() {
+    return this.#stage.getActiveLayerGroup().getAddedScale();
+  }
 
   /**
    * Get the base scale.
    *
    * @returns {object} The scale as {x,y}.
    */
-  this.getBaseScale = function () {
-    return stage.getActiveLayerGroup().getBaseScale();
-  };
+  getBaseScale() {
+    return this.#stage.getActiveLayerGroup().getBaseScale();
+  }
 
   /**
    * Get the layer offset.
    *
    * @returns {object} The offset.
    */
-  this.getOffset = function () {
-    return stage.getActiveLayerGroup().getOffset();
-  };
+  getOffset() {
+    return this.#stage.getActiveLayerGroup().getOffset();
+  }
 
   /**
    * Get the toolbox controller.
    *
    * @returns {object} The controller.
    */
-  this.getToolboxController = function () {
-    return toolboxController;
-  };
+  getToolboxController() {
+    return this.#toolboxController;
+  }
 
   /**
    * Get the active layer group.
    * The layer is available after the first loaded item.
    *
-   * @returns {dwv.gui.LayerGroup} The layer group.
+   * @returns {LayerGroup} The layer group.
    */
-  this.getActiveLayerGroup = function () {
-    return stage.getActiveLayerGroup();
-  };
+  getActiveLayerGroup() {
+    return this.#stage.getActiveLayerGroup();
+  }
 
   /**
    * Get the view layers associated to a data index.
@@ -232,9 +254,9 @@ dwv.App = function () {
    * @param {number} index The data index.
    * @returns {Array} The layers.
    */
-  this.getViewLayersByDataIndex = function (index) {
-    return stage.getViewLayersByDataIndex(index);
-  };
+  getViewLayersByDataIndex(index) {
+    return this.#stage.getViewLayersByDataIndex(index);
+  }
 
   /**
    * Get the draw layers associated to a data index.
@@ -243,48 +265,48 @@ dwv.App = function () {
    * @param {number} index The data index.
    * @returns {Array} The layers.
    */
-  this.getDrawLayersByDataIndex = function (index) {
-    return stage.getDrawLayersByDataIndex(index);
-  };
+  getDrawLayersByDataIndex(index) {
+    return this.#stage.getDrawLayersByDataIndex(index);
+  }
 
   /**
    * Get a layer group by div id.
    * The layer is available after the first loaded item.
    *
    * @param {string} divId The div id.
-   * @returns {dwv.gui.LayerGroup} The layer group.
+   * @returns {LayerGroup} The layer group.
    */
-  this.getLayerGroupByDivId = function (divId) {
-    return stage.getLayerGroupByDivId(divId);
-  };
+  getLayerGroupByDivId(divId) {
+    return this.#stage.getLayerGroupByDivId(divId);
+  }
 
   /**
    * Get the number of layer groups.
    *
    * @returns {number} The number of groups.
    */
-  this.getNumberOfLayerGroups = function () {
-    return stage.getNumberOfLayerGroups();
-  };
+  getNumberOfLayerGroups() {
+    return this.#stage.getNumberOfLayerGroups();
+  }
 
   /**
    * Get the app style.
    *
    * @returns {object} The app style.
    */
-  this.getStyle = function () {
-    return style;
-  };
+  getStyle() {
+    return this.#style;
+  }
 
   /**
    * Add a command to the undo stack.
    *
    * @param {object} cmd The command to add.
-   * @fires dwv.tool.UndoStack#undoadd
+   * @fires UndoStack#undoadd
    */
-  this.addToUndoStack = function (cmd) {
-    if (undoStack !== null) {
-      undoStack.add(cmd);
+  addToUndoStack = (cmd) => {
+    if (this.#undoStack !== null) {
+      this.#undoStack.add(cmd);
     }
   };
 
@@ -307,20 +329,20 @@ dwv.App = function () {
    *   parsing
    * @example
    * // create the dwv app
-   * var app = new dwv.App();
+   * const app = new App();
    * // initialise
    * app.init({
    *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
    *   viewOnFirstLoadItem: false
    * });
    * // render button
-   * var button = document.createElement('button');
+   * const button = document.createElement('button');
    * button.id = 'render';
    * button.disabled = true;
    * button.appendChild(document.createTextNode('render'));
    * document.body.appendChild(button);
    * app.addEventListener('load', function () {
-   *   var button = document.getElementById('render');
+   *   const button = document.getElementById('render');
    *   button.disabled = false;
    *   button.onclick = function () {
    *     // render data #0
@@ -332,130 +354,119 @@ dwv.App = function () {
    *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
    * ]);
    */
-  this.init = function (opt) {
+  init(opt) {
     // store
-    options = opt;
+    this.#options = opt;
     // defaults
-    if (typeof options.viewOnFirstLoadItem === 'undefined') {
-      options.viewOnFirstLoadItem = true;
+    if (typeof this.#options.viewOnFirstLoadItem === 'undefined') {
+      this.#options.viewOnFirstLoadItem = true;
     }
 
     // undo stack
-    undoStack = new dwv.tool.UndoStack();
-    undoStack.addEventListener('undoadd', fireEvent);
-    undoStack.addEventListener('undo', fireEvent);
-    undoStack.addEventListener('redo', fireEvent);
+    this.#undoStack = new UndoStack();
+    this.#undoStack.addEventListener('undoadd', this.#fireEvent);
+    this.#undoStack.addEventListener('undo', this.#fireEvent);
+    this.#undoStack.addEventListener('redo', this.#fireEvent);
 
     // tools
-    if (options.tools && options.tools.length !== 0) {
+    if (this.#options.tools && this.#options.tools.length !== 0) {
       // setup the tool list
-      var toolList = {};
-      var keys = Object.keys(options.tools);
-      for (var t = 0; t < keys.length; ++t) {
-        var toolName = keys[t];
-        var toolParams = options.tools[toolName];
-        // find the tool in the dwv.tool namespace
-        if (typeof dwv.tool[toolName] !== 'undefined') {
+      const appToolList = {};
+      const keys = Object.keys(this.#options.tools);
+      for (let t = 0; t < keys.length; ++t) {
+        const toolName = keys[t];
+        // find the tool in the Tools list
+        if (typeof toolList[toolName] !== 'undefined') {
           // create tool instance
-          toolList[toolName] = new dwv.tool[toolName](this);
+          appToolList[toolName] = new toolList[toolName](this);
           // register listeners
-          if (typeof toolList[toolName].addEventListener !== 'undefined') {
-            var names = toolList[toolName].getEventNames();
-            for (var j = 0; j < names.length; ++j) {
-              toolList[toolName].addEventListener(names[j], fireEvent);
+          if (typeof appToolList[toolName].addEventListener !== 'undefined') {
+            const names = appToolList[toolName].getEventNames();
+            for (let j = 0; j < names.length; ++j) {
+              appToolList[toolName].addEventListener(names[j], this.#fireEvent);
             }
           }
           // tool options
+          const toolParams = this.#options.tools[toolName];
           if (typeof toolParams.options !== 'undefined') {
-            var type = 'raw';
-            if (typeof toolList[toolName].getOptionsType !== 'undefined') {
-              type = toolList[toolName].getOptionsType();
+            let type = 'raw';
+            if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
+              type = appToolList[toolName].getOptionsType();
             }
-            var toolOptions = toolParams.options;
-            if (type === 'instance' ||
-                type === 'factory') {
-              toolOptions = {};
-              for (var i = 0; i < toolParams.options.length; ++i) {
-                var optionName = toolParams.options[i];
-                var optionClassName = optionName;
+            let appToolOptions = toolParams.options;
+            if (type === 'instance' || type === 'factory') {
+              appToolOptions = {};
+              for (let i = 0; i < toolParams.options.length; ++i) {
+                const optionName = toolParams.options[i];
+                let optionClassName = optionName;
                 if (type === 'factory') {
                   optionClassName += 'Factory';
                 }
-                var toolNamespace = toolName.charAt(0).toLowerCase() +
+                const toolNamespace = toolName.charAt(0).toLowerCase() +
                   toolName.slice(1);
-                if (typeof dwv.tool[toolNamespace][optionClassName] !==
+                if (typeof toolOptions[toolNamespace][optionClassName] !==
                   'undefined') {
-                  toolOptions[optionName] =
-                    dwv.tool[toolNamespace][optionClassName];
+                  appToolOptions[optionName] =
+                    toolOptions[toolNamespace][optionClassName];
                 } else {
-                  dwv.logger.warn('Could not find option class for: ' +
+                  logger.warn('Could not find option class for: ' +
                     optionName);
                 }
               }
             }
-            toolList[toolName].setOptions(toolOptions);
+            appToolList[toolName].setOptions(appToolOptions);
           }
         } else {
-          dwv.logger.warn('Could not initialise unknown tool: ' + toolName);
+          logger.warn('Could not initialise unknown tool: ' + toolName);
         }
       }
       // add tools to the controller
-      toolboxController = new dwv.ctrl.ToolboxController(toolList);
+      this.#toolboxController = new ToolboxController(appToolList);
     }
 
     // create load controller
-    loadController = new dwv.ctrl.LoadController(options.defaultCharacterSet);
-    loadController.onloadstart = onloadstart;
-    loadController.onprogress = onloadprogress;
-    loadController.onloaditem = onloaditem;
-    loadController.onload = onload;
-    loadController.onloadend = onloadend;
-    loadController.onerror = onloaderror;
-    loadController.onabort = onloadabort;
+    this.#loadController =
+      new LoadController(this.#options.defaultCharacterSet);
+    this.#loadController.onloadstart = this.#onloadstart;
+    this.#loadController.onprogress = this.#onloadprogress;
+    this.#loadController.onloaditem = this.#onloaditem;
+    this.#loadController.onload = this.#onload;
+    this.#loadController.onloadend = this.#onloadend;
+    this.#loadController.onerror = this.#onloaderror;
+    this.#loadController.onabort = this.#onloadabort;
 
     // create data controller
-    dataController = new dwv.ctrl.DataController();
+    this.#dataController = new DataController();
     // create stage
-    stage = new dwv.gui.Stage();
-    if (typeof options.binders !== 'undefined') {
-      stage.setBinders(options.binders);
+    this.#stage = new Stage();
+    if (typeof this.#options.binders !== 'undefined') {
+      this.#stage.setBinders(this.#options.binders);
     }
-  };
-
-  /**
-   * Get a HTML element associated to the application.
-   *
-   * @param {string} _name The name or id to find.
-   * @returns {object} The found element or null.
-   * @deprecated
-   */
-  this.getElement = function (_name) {
-    return null;
-  };
+  }
 
   /**
    * Reset the application.
    */
-  this.reset = function () {
+  reset() {
     // clear objects
-    dataController.reset();
-    stage.empty();
+    this.#dataController.reset();
+    this.#stage.empty();
     // reset undo/redo
-    if (undoStack) {
-      undoStack = new dwv.tool.UndoStack();
-      undoStack.addEventListener('undoadd', fireEvent);
-      undoStack.addEventListener('undo', fireEvent);
-      undoStack.addEventListener('redo', fireEvent);
+    if (this.#undoStack) {
+      this.#undoStack = new UndoStack();
+      this.#undoStack.addEventListener('undoadd', this.#fireEvent);
+      this.#undoStack.addEventListener('undo', this.#fireEvent);
+      this.#undoStack.addEventListener('redo', this.#fireEvent);
     }
-  };
+  }
 
   /**
    * Reset the layout of the application.
    */
-  this.resetLayout = function () {
-    stage.reset();
-    stage.draw();
-  };
+  resetLayout() {
+    this.#stage.reset();
+    this.#stage.draw();
+  }
 
   /**
    * Add an event listener to this class.
@@ -464,9 +475,9 @@ dwv.App = function () {
    * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
 
   /**
    * Remove an event listener from this class.
@@ -475,52 +486,80 @@ dwv.App = function () {
    * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
 
   // load API [begin] -------------------------------------------------------
 
   /**
    * Load a list of files. Can be image files or a state file.
    *
-   * @param {Array} files The list of files to load.
-   * @fires dwv.App#loadstart
-   * @fires dwv.App#loadprogress
-   * @fires dwv.App#loaditem
-   * @fires dwv.App#loadend
-   * @fires dwv.App#error
-   * @fires dwv.App#abort
+   * @param {FileList} files The list of files to load.
+   * @fires App#loadstart
+   * @fires App#loadprogress
+   * @fires App#loaditem
+   * @fires App#loadend
+   * @fires App#loaderror
+   * @fires App#loadabort
    */
-  this.loadFiles = function (files) {
+  loadFiles = (files) => {
     if (files.length === 0) {
-      dwv.logger.warn('Ignoring empty input file list.');
+      logger.warn('Ignoring empty input file list.');
       return;
     }
-    loadController.loadFiles(files);
+    this.#loadController.loadFiles(files);
   };
 
   /**
    * Load a list of URLs. Can be image files or a state file.
    *
    * @param {Array} urls The list of urls to load.
-   * @param {object} options The options object, can contain:
+   * @param {object} [options] The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
    *  - batchSize: the size of the request url batch
-   * @fires dwv.App#loadstart
-   * @fires dwv.App#loadprogress
-   * @fires dwv.App#loaditem
-   * @fires dwv.App#loadend
-   * @fires dwv.App#error
-   * @fires dwv.App#abort
+   * @fires App#loadstart
+   * @fires App#loadprogress
+   * @fires App#loaditem
+   * @fires App#loadend
+   * @fires App#loaderror
+   * @fires App#loadabort
    */
-  this.loadURLs = function (urls, options) {
+  loadURLs = (urls, options) => {
     if (urls.length === 0) {
-      dwv.logger.warn('Ignoring empty input url list.');
+      logger.warn('Ignoring empty input url list.');
       return;
     }
-    loadController.loadURLs(urls, options);
+    this.#loadController.loadURLs(urls, options);
+  };
+
+  /**
+   * Load from an input uri.
+   *
+   * @param {string} uri The input uri, for example: 'window.location.href'.
+   * @param {object} [options] Optional url request options.
+   */
+  loadFromUri = (uri, options) => {
+    const query = getUriQuery(uri);
+
+    // load end callback: loads the state.
+    const onLoadEnd = (/*event*/) => {
+      this.removeEventListener('loadend', onLoadEnd);
+      this.loadURLs([query.state]);
+    };
+
+    // check query
+    if (query && typeof query.input !== 'undefined') {
+      // optional display state
+      if (typeof query.state !== 'undefined') {
+        // queue after main data load
+        this.addEventListener('loadend', onLoadEnd);
+      }
+      // load base image
+      decodeQuery(query, this.loadURLs, options);
+    }
+    // no else to allow for empty uris
   };
 
   /**
@@ -528,23 +567,23 @@ dwv.App = function () {
    *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
-   * @fires dwv.App#loadstart
-   * @fires dwv.App#loadprogress
-   * @fires dwv.App#loaditem
-   * @fires dwv.App#loadend
-   * @fires dwv.App#error
-   * @fires dwv.App#abort
+   * @fires App#loadstart
+   * @fires App#loadprogress
+   * @fires App#loaditem
+   * @fires App#loadend
+   * @fires App#loaderror
+   * @fires App#loadabort
    */
-  this.loadImageObject = function (data) {
-    loadController.loadImageObject(data);
+  loadImageObject = (data) => {
+    this.#loadController.loadImageObject(data);
   };
 
   /**
    * Abort the current load.
    */
-  this.abortLoad = function () {
-    loadController.abort();
-  };
+  abortLoad() {
+    this.#loadController.abort();
+  }
 
   // load API [end] ---------------------------------------------------------
 
@@ -552,18 +591,18 @@ dwv.App = function () {
    * Fit the display to the data of each layer group.
    * To be called once the image is loaded.
    */
-  this.fitToContainer = function () {
-    stage.syncLayerGroupScale();
-  };
+  fitToContainer() {
+    this.#stage.syncLayerGroupScale();
+  }
 
   /**
    * Init the Window/Level display
    */
-  this.initWLDisplay = function () {
-    var viewLayer = stage.getActiveLayerGroup().getActiveViewLayer();
-    var controller = viewLayer.getViewController();
+  initWLDisplay() {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
     controller.initialise();
-  };
+  }
 
   /**
    * Get the layer group configuration from a data index.
@@ -572,17 +611,18 @@ dwv.App = function () {
    * @param {number} dataIndex The data index.
    * @returns {Array} The list of associated configs.
    */
-  function getViewConfigs(dataIndex) {
+  #getViewConfigs(dataIndex) {
     // check options
-    if (options.dataViewConfigs === null ||
-      typeof options.dataViewConfigs === 'undefined') {
+    if (this.#options.dataViewConfigs === null ||
+      typeof this.#options.dataViewConfigs === 'undefined') {
       throw new Error('No available data view configuration');
     }
-    var configs = [];
-    if (typeof options.dataViewConfigs['*'] !== 'undefined') {
-      configs = options.dataViewConfigs['*'];
-    } else if (typeof options.dataViewConfigs[dataIndex] !== 'undefined') {
-      configs = options.dataViewConfigs[dataIndex];
+    let configs = [];
+    if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
+      configs = this.#options.dataViewConfigs['*'];
+    } else if (
+      typeof this.#options.dataViewConfigs[dataIndex] !== 'undefined') {
+      configs = this.#options.dataViewConfigs[dataIndex];
     }
     return configs;
   }
@@ -593,23 +633,23 @@ dwv.App = function () {
    *
    * @returns {object} The configuration list.
    */
-  this.getDataViewConfig = function () {
-    return options.dataViewConfigs;
-  };
+  getDataViewConfig() {
+    return this.#options.dataViewConfigs;
+  }
 
   /**
    * Set the data view configuration (see the init options for details).
    *
    * @param {object} configs The configuration list.
    */
-  this.setDataViewConfig = function (configs) {
+  setDataViewConfig(configs) {
     // clean up
-    stage.empty();
+    this.#stage.empty();
     // set new
-    options.dataViewConfigs = configs;
+    this.#options.dataViewConfigs = configs;
     // create layer groups
-    createLayerGroups(configs);
-  };
+    this.#createLayerGroups(configs);
+  }
 
   /**
    * Create layer groups according to a data view config:
@@ -617,24 +657,24 @@ dwv.App = function () {
    *
    * @param {object} dataViewConfigs The data view config.
    */
-  function createLayerGroups(dataViewConfigs) {
-    var dataKeys = Object.keys(dataViewConfigs);
-    var divIds = [];
-    for (var i = 0; i < dataKeys.length; ++i) {
-      var dataConfigs = dataViewConfigs[dataKeys[i]];
-      for (var j = 0; j < dataConfigs.length; ++j) {
-        var viewConfig = dataConfigs[j];
+  #createLayerGroups(dataViewConfigs) {
+    const dataKeys = Object.keys(dataViewConfigs);
+    const divIds = [];
+    for (let i = 0; i < dataKeys.length; ++i) {
+      const dataConfigs = dataViewConfigs[dataKeys[i]];
+      for (let j = 0; j < dataConfigs.length; ++j) {
+        const viewConfig = dataConfigs[j];
         // view configs can contain the same divIds, avoid duplicating
         if (!divIds.includes(viewConfig.divId)) {
           // create new layer group
-          var element = document.getElementById(viewConfig.divId);
-          var layerGroup = stage.addLayerGroup(element);
+          const element = document.getElementById(viewConfig.divId);
+          const layerGroup = this.#stage.addLayerGroup(element);
           // bind events
-          bindLayerGroupToApp(layerGroup);
+          this.#bindLayerGroupToApp(layerGroup);
           // optional orientation
           if (typeof viewConfig.orientation !== 'undefined') {
             layerGroup.setTargetOrientation(
-              dwv.math.getMatrixFromName(viewConfig.orientation));
+              getMatrixFromName(viewConfig.orientation));
           }
           divIds.push(viewConfig.divId);
         }
@@ -645,40 +685,48 @@ dwv.App = function () {
   /**
    * Set the layer groups binders.
    *
-   * @param {Array} list The binders list.
+   * @param {Array} list The list of binder names.
    */
-  this.setLayerGroupsBinders = function (list) {
-    stage.setBinders(list);
-  };
+  setLayerGroupsBinders(list) {
+    // create instances
+    const instances = [];
+    for (let i = 0; i < list.length; ++i) {
+      if (typeof binderList[list[i]] !== 'undefined') {
+        instances.push(new binderList[list[i]]);
+      }
+    }
+    // pass to stage
+    this.#stage.setBinders(instances);
+  }
 
   /**
    * Render the current data.
    *
    * @param {number} dataIndex The data index to render.
    */
-  this.render = function (dataIndex) {
+  render(dataIndex) {
     if (typeof dataIndex === 'undefined' || dataIndex === null) {
       throw new Error('Cannot render without data index');
     }
 
     // create layer groups if not done yet
     // (create all to allow for ratio sync)
-    if (stage.getNumberOfLayerGroups() === 0) {
-      createLayerGroups(options.dataViewConfigs);
+    if (this.#stage.getNumberOfLayerGroups() === 0) {
+      this.#createLayerGroups(this.#options.dataViewConfigs);
     }
 
     // loop on all configs
-    var viewConfigs = getViewConfigs(dataIndex);
+    const viewConfigs = this.#getViewConfigs(dataIndex);
     // nothing to do if no view config
     if (viewConfigs.length === 0) {
-      dwv.logger.info('Not rendering data: ' + dataIndex +
+      logger.info('Not rendering data: ' + dataIndex +
         ' (no data view config)');
       return;
     }
-    for (var i = 0; i < viewConfigs.length; ++i) {
-      var config = viewConfigs[i];
-      var layerGroup =
-        stage.getLayerGroupByDivId(config.divId);
+    for (let i = 0; i < viewConfigs.length; ++i) {
+      const config = viewConfigs[i];
+      const layerGroup =
+      this.#stage.getLayerGroupByDivId(config.divId);
       // layer group must exist
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
@@ -687,15 +735,15 @@ dwv.App = function () {
       // warn: needs a loaded DOM
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         if (layerGroup.getNumberOfLayers() === 0) {
-          initialiseBaseLayers(dataIndex, config);
+          this.#initialiseBaseLayers(dataIndex, config);
         } else {
-          addViewLayer(dataIndex, config);
+          this.#addViewLayer(dataIndex, config);
         }
       }
       // draw
       layerGroup.draw();
     }
-  };
+  }
 
   /**
    * Zoom to the layers.
@@ -704,14 +752,14 @@ dwv.App = function () {
    * @param {number} cx The zoom center X coordinate.
    * @param {number} cy The zoom center Y coordinate.
    */
-  this.zoom = function (step, cx, cy) {
-    var layerGroup = stage.getActiveLayerGroup();
-    var viewController = layerGroup.getActiveViewLayer().getViewController();
-    var k = viewController.getCurrentScrollPosition();
-    var center = new dwv.math.Point3D(cx, cy, k);
+  zoom(step, cx, cy) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewController = layerGroup.getActiveViewLayer().getViewController();
+    const k = viewController.getCurrentScrollPosition();
+    const center = new Point3D(cx, cy, k);
     layerGroup.addScale(step, center);
     layerGroup.draw();
-  };
+  }
 
   /**
    * Apply a translation to the layers.
@@ -719,22 +767,22 @@ dwv.App = function () {
    * @param {number} tx The translation along X.
    * @param {number} ty The translation along Y.
    */
-  this.translate = function (tx, ty) {
-    var layerGroup = stage.getActiveLayerGroup();
+  translate(tx, ty) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
     layerGroup.addTranslation({x: tx, y: ty});
     layerGroup.draw();
-  };
+  }
 
   /**
    * Set the image layer opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).
    */
-  this.setOpacity = function (alpha) {
-    var viewLayer = stage.getActiveLayerGroup().getActiveViewLayer();
+  setOpacity(alpha) {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
     viewLayer.setOpacity(alpha);
     viewLayer.draw();
-  };
+  }
 
   /**
    * Set the drawings on the current stage.
@@ -742,30 +790,30 @@ dwv.App = function () {
    * @param {Array} drawings An array of drawings.
    * @param {Array} drawingsDetails An array of drawings details.
    */
-  this.setDrawings = function (drawings, drawingsDetails) {
-    var layerGroup = stage.getActiveLayerGroup();
-    var viewController =
+  setDrawings(drawings, drawingsDetails) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    var drawController =
+    const drawController =
       layerGroup.getActiveDrawLayer().getDrawController();
 
     drawController.setDrawings(
-      drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+      drawings, drawingsDetails, this.#fireEvent, this.addToUndoStack);
 
     drawController.activateDrawLayer(
       viewController.getCurrentOrientedIndex(),
       viewController.getScrollIndex());
-  };
+  }
 
   /**
    * Get the JSON state of the app.
    *
    * @returns {object} The state of the app as a JSON object.
    */
-  this.getState = function () {
-    var state = new dwv.io.State();
-    return state.toJSON(self);
-  };
+  getState() {
+    const state = new State();
+    return state.toJSON(this);
+  }
 
   // Handler Methods -----------------------------------------------------------
 
@@ -773,30 +821,27 @@ dwv.App = function () {
    * Handle resize: fit the display to the window.
    * To be called once the image is loaded.
    * Can be connected to a window 'resize' event.
-   *
-   * @param {object} _event The change event.
-   * @private
    */
-  this.onResize = function (_event) {
-    self.fitToContainer();
+  onResize = () => {
+    this.fitToContainer();
   };
 
   /**
    * Key down callback. Meant to be used in tools.
    *
-   * @param {object} event The key down event.
-   * @fires dwv.App#keydown
+   * @param {KeyboardEvent} event The key down event.
+   * @fires App#keydown
    */
-  this.onKeydown = function (event) {
+  onKeydown = (event) => {
     /**
      * Key down event.
      *
-     * @event dwv.App#keydown
+     * @event App#keydown
      * @type {KeyboardEvent}
      * @property {string} type The event type: keydown.
      * @property {string} context The tool where the event originated.
      */
-    fireEvent(event);
+    this.#fireEvent(event);
   };
 
   /**
@@ -808,16 +853,17 @@ dwv.App = function () {
    * - CRTL-ARROW_RIGHT: previous element on fourth dim
    * - CRTL-ARROW_DOWN: previous element on third dim
    *
-   * @param {object} event The key down event.
-   * @fires dwv.tool.UndoStack#undo
-   * @fires dwv.tool.UndoStack#redo
+   * @param {KeyboardEvent} event The key down event.
+   * @fires UndoStack#undo
+   * @fires UndoStack#redo
    */
-  this.defaultOnKeydown = function (event) {
+  defaultOnKeydown = (event) => {
     if (event.ctrlKey) {
       if (event.shiftKey) {
-        var viewController =
-          stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
-        var size = viewController.getImageSize();
+        const viewController =
+          this.#stage.getActiveLayerGroup()
+            .getActiveViewLayer().getViewController();
+        const size = viewController.getImageSize();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
           if (size.moreThanOne(3)) {
             viewController.decrementIndex(3);
@@ -836,13 +882,13 @@ dwv.App = function () {
           }
         }
       } else if (event.key === 'y') { // crtl-y
-        undoStack.redo();
+        this.#undoStack.redo();
       } else if (event.key === 'z') { // crtl-z
-        undoStack.undo();
+        this.#undoStack.undo();
       } else if (event.key === ' ') { // crtl-space
-        for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
-          stage.getLayerGroup(i).setShowCrosshair(
-            !stage.getLayerGroup(i).getShowCrosshair()
+        for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
+          this.#stage.getLayerGroup(i).setShowCrosshair(
+            !this.#stage.getLayerGroup(i).getShowCrosshair()
           );
         }
       }
@@ -854,51 +900,53 @@ dwv.App = function () {
   /**
    * Reset the display
    */
-  this.resetDisplay = function () {
-    self.resetLayout();
-    self.initWLDisplay();
-  };
+  resetDisplay() {
+    this.resetLayout();
+    this.initWLDisplay();
+  }
 
   /**
    * Reset the app zoom.s
    */
-  this.resetZoom = function () {
-    self.resetLayout();
-  };
+  resetZoom() {
+    this.resetLayout();
+  }
 
   /**
    * Set the colour map.
    *
    * @param {string} colourMap The colour map name.
    */
-  this.setColourMap = function (colourMap) {
-    var viewController =
-      stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
+  setColourMap(colourMap) {
+    const viewController =
+      this.#stage.getActiveLayerGroup()
+        .getActiveViewLayer().getViewController();
     viewController.setColourMapFromName(colourMap);
-  };
+  }
 
   /**
    * Set the window/level preset.
    *
    * @param {object} preset The window/level preset.
    */
-  this.setWindowLevelPreset = function (preset) {
-    var viewController =
-      stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
+  setWindowLevelPreset(preset) {
+    const viewController =
+      this.#stage.getActiveLayerGroup()
+        .getActiveViewLayer().getViewController();
     viewController.setWindowLevelPreset(preset);
-  };
+  }
 
   /**
    * Set the tool
    *
    * @param {string} tool The tool.
    */
-  this.setTool = function (tool) {
+  setTool(tool) {
     // bind tool to active layer
-    for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
-      var layerGroup = stage.getLayerGroup(i);
+    for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
+      const layerGroup = this.#stage.getLayerGroup(i);
       // draw or view layer
-      var layer = null;
+      let layer = null;
       if (tool === 'Draw' ||
         tool === 'Livewire' ||
         tool === 'Floodfill') {
@@ -907,58 +955,58 @@ dwv.App = function () {
         layer = layerGroup.getActiveViewLayer();
       }
       if (layer) {
-        toolboxController.bindLayer(layer, layerGroup.getDivId());
+        this.#toolboxController.bindLayer(layer, layerGroup.getDivId());
       }
     }
 
     // set toolbox tool
-    toolboxController.setSelectedTool(tool);
-  };
+    this.#toolboxController.setSelectedTool(tool);
+  }
 
   /**
    * Set the tool live features.
    *
    * @param {object} list The list of features.
    */
-  this.setToolFeatures = function (list) {
-    toolboxController.setToolFeatures(list);
-  };
+  setToolFeatures(list) {
+    this.#toolboxController.setToolFeatures(list);
+  }
 
   /**
    * Undo the last action
    *
-   * @fires dwv.tool.UndoStack#undo
+   * @fires UndoStack#undo
    */
-  this.undo = function () {
-    undoStack.undo();
-  };
+  undo() {
+    this.#undoStack.undo();
+  }
 
   /**
    * Redo the last action
    *
-   * @fires dwv.tool.UndoStack#redo
+   * @fires UndoStack#redo
    */
-  this.redo = function () {
-    undoStack.redo();
-  };
+  redo() {
+    this.#undoStack.redo();
+  }
 
   /**
    * Get the undo stack size.
    *
    * @returns {number} The size of the stack.
    */
-  this.getStackSize = function () {
-    return undoStack.getStackSize();
-  };
+  getStackSize() {
+    return this.#undoStack.getStackSize();
+  }
 
   /**
    * Get the current undo stack index.
    *
    * @returns {number} The stack index.
    */
-  this.getCurrentStackIndex = function () {
-    return undoStack.getCurrentStackIndex();
-  };
+  getCurrentStackIndex() {
+    return this.#undoStack.getCurrentStackIndex();
+  }
 
   // Private Methods -----------------------------------------------------------
 
@@ -966,23 +1014,21 @@ dwv.App = function () {
    * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
-   * @private
    */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
-  }
+  #fireEvent = (event) => {
+    this.#listenerHandler.fireEvent(event);
+  };
 
   /**
    * Data load start callback.
    *
    * @param {object} event The load start event.
-   * @private
    */
-  function onloadstart(event) {
+  #onloadstart = (event) => {
     /**
      * Load start event.
      *
-     * @event dwv.App#loadstart
+     * @event App#loadstart
      * @type {object}
      * @property {string} type The event type: loadstart.
      * @property {string} loadType The load type: image or state.
@@ -990,20 +1036,19 @@ dwv.App = function () {
      *   File for a file.
      */
     event.type = 'loadstart';
-    fireEvent(event);
-  }
+    this.#fireEvent(event);
+  };
 
   /**
    * Data load progress callback.
    *
    * @param {object} event The progress event.
-   * @private
    */
-  function onloadprogress(event) {
+  #onloadprogress = (event) => {
     /**
      * Load progress event.
      *
-     * @event dwv.App#loadprogress
+     * @event App#loadprogress
      * @type {object}
      * @property {string} type The event type: loadprogress.
      * @property {string} loadType The load type: image or state.
@@ -1013,46 +1058,45 @@ dwv.App = function () {
      * @property {number} total The total percentage.
      */
     event.type = 'loadprogress';
-    fireEvent(event);
-  }
+    this.#fireEvent(event);
+  };
 
   /**
    * Data load callback.
    *
    * @param {object} event The load event.
-   * @private
    */
-  function onloaditem(event) {
+  #onloaditem = (event) => {
     // check event
     if (typeof event.data === 'undefined') {
-      dwv.logger.error('Missing loaditem event data.');
+      logger.error('Missing loaditem event data.');
     }
     if (typeof event.loadtype === 'undefined') {
-      dwv.logger.error('Missing loaditem event load type.');
+      logger.error('Missing loaditem event load type.');
     }
 
-    var isFirstLoadItem = event.isfirstitem;
+    const isFirstLoadItem = event.isfirstitem;
 
-    var eventMetaData = null;
+    let eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
-        dataController.addNew(
+        this.#dataController.addNew(
           event.loadid, event.data.image, event.data.info);
       } else {
-        dataController.update(
+        this.#dataController.update(
           event.loadid, event.data.image, event.data.info);
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
-      var state = new dwv.io.State();
-      state.apply(self, state.fromJSON(event.data));
+      const state = new State();
+      state.apply(this, state.fromJSON(event.data));
       eventMetaData = 'state';
     }
 
     /**
      * Load item event: fired when a load item is successfull.
      *
-     * @event dwv.App#loaditem
+     * @event App#loaditem
      * @type {object}
      * @property {string} type The event type: loaditem.
      * @property {string} loadType The load type: image or state.
@@ -1060,54 +1104,53 @@ dwv.App = function () {
      *   File for a file.
      * @property {object} data The loaded meta data.
      */
-    fireEvent({
+    this.#fireEvent({
       type: 'loaditem',
       data: eventMetaData,
       source: event.source,
       loadtype: event.loadtype,
       loadid: event.loadid,
-      isfirstitem: event.isfirstitem
+      isfirstitem: event.isfirstitem,
+      warn: event.warn
     });
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
-      getViewConfigs(event.loadid).length !== 0 &&
-      isFirstLoadItem && options.viewOnFirstLoadItem) {
-      self.render(event.loadid);
+    this.#getViewConfigs(event.loadid).length !== 0 &&
+      isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
+      this.render(event.loadid);
     }
-  }
+  };
 
   /**
    * Data load callback.
    *
    * @param {object} event The load event.
-   * @private
    */
-  function onload(event) {
+  #onload = (event) => {
     /**
      * Load event: fired when a load finishes successfully.
      *
-     * @event dwv.App#load
+     * @event App#load
      * @type {object}
      * @property {string} type The event type: load.
      * @property {string} loadType The load type: image or state.
      */
     event.type = 'load';
-    fireEvent(event);
-  }
+    this.#fireEvent(event);
+  };
 
   /**
    * Data load end callback.
    *
    * @param {object} event The load end event.
-   * @private
    */
-  function onloadend(event) {
+  #onloadend = (event) => {
     /**
      * Main load end event: fired when the load finishes,
      *   successfully or not.
      *
-     * @event dwv.App#loadend
+     * @event App#loadend
      * @type {object}
      * @property {string} type The event type: loadend.
      * @property {string} loadType The load type: image or state.
@@ -1115,20 +1158,19 @@ dwv.App = function () {
      *   File for a file.
      */
     event.type = 'loadend';
-    fireEvent(event);
-  }
+    this.#fireEvent(event);
+  };
 
   /**
    * Data load error callback.
    *
    * @param {object} event The error event.
-   * @private
    */
-  function onloaderror(event) {
+  #onloaderror = (event) => {
     /**
      * Load error event.
      *
-     * @event dwv.App#loaderror
+     * @event App#loaderror
      * @type {object}
      * @property {string} type The event type: error.
      * @property {string} loadType The load type: image or state.
@@ -1138,20 +1180,19 @@ dwv.App = function () {
      * @property {object} target The event target.
      */
     event.type = 'loaderror';
-    fireEvent(event);
-  }
+    this.#fireEvent(event);
+  };
 
   /**
    * Data load abort callback.
    *
    * @param {object} event The abort event.
-   * @private
    */
-  function onloadabort(event) {
+  #onloadabort = (event) => {
     /**
      * Load abort event.
      *
-     * @event dwv.App#loadabort
+     * @event App#loadabort
      * @type {object}
      * @property {string} type The event type: abort.
      * @property {string} loadType The load type: image or state.
@@ -1159,30 +1200,29 @@ dwv.App = function () {
      *   File for a file.
      */
     event.type = 'loadabort';
-    fireEvent(event);
-  }
+    this.#fireEvent(event);
+  };
 
   /**
    * Bind layer group events to app.
    *
    * @param {object} group The layer group.
-   * @private
    */
-  function bindLayerGroupToApp(group) {
+  #bindLayerGroupToApp(group) {
     // propagate layer group events
-    group.addEventListener('zoomchange', fireEvent);
-    group.addEventListener('offsetchange', fireEvent);
+    group.addEventListener('zoomchange', this.#fireEvent);
+    group.addEventListener('offsetchange', this.#fireEvent);
     // propagate viewLayer events
-    group.addEventListener('renderstart', fireEvent);
-    group.addEventListener('renderend', fireEvent);
+    group.addEventListener('renderstart', this.#fireEvent);
+    group.addEventListener('renderend', this.#fireEvent);
     // propagate view events
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      group.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    for (let j = 0; j < viewEventNames.length; ++j) {
+      group.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // propagate drawLayer events
-    if (toolboxController && toolboxController.hasTool('Draw')) {
-      group.addEventListener('drawcreate', fireEvent);
-      group.addEventListener('drawdelete', fireEvent);
+    if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
+      group.addEventListener('drawcreate', this.#fireEvent);
+      group.addEventListener('drawdelete', this.#fireEvent);
     }
   }
 
@@ -1192,15 +1232,14 @@ dwv.App = function () {
    *
    * @param {number} dataIndex The data index.
    * @param {object} dataViewConfig The data view config.
-   * @private
    */
-  function initialiseBaseLayers(dataIndex, dataViewConfig) {
+  #initialiseBaseLayers(dataIndex, dataViewConfig) {
     // add layers
-    addViewLayer(dataIndex, dataViewConfig);
+    this.#addViewLayer(dataIndex, dataViewConfig);
 
     // initialise the toolbox
-    if (toolboxController) {
-      toolboxController.init();
+    if (this.#toolboxController) {
+      this.#toolboxController.init();
     }
   }
 
@@ -1210,25 +1249,25 @@ dwv.App = function () {
    * @param {number} dataIndex The data index.
    * @param {object} dataViewConfig The data view config.
    */
-  function addViewLayer(dataIndex, dataViewConfig) {
-    var data = dataController.get(dataIndex);
+  #addViewLayer(dataIndex, dataViewConfig) {
+    const data = this.#dataController.get(dataIndex);
     if (!data) {
       throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = stage.getLayerGroupByDivId(dataViewConfig.divId);
+    const layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
     if (!layerGroup) {
       throw new Error('Cannot initialise layer with group id: ' +
         dataViewConfig.divId);
     }
-    var imageGeometry = data.image.getGeometry();
+    const imageGeometry = data.image.getGeometry();
 
     // un-bind
-    stage.unbindLayerGroups();
+    this.#stage.unbindLayerGroups();
 
     // create and setup view
-    var viewFactory = new dwv.ViewFactory();
-    var view = viewFactory.create(data.meta, data.image);
-    var viewOrientation = dwv.gui.getViewOrientation(
+    const viewFactory = new ViewFactory();
+    const view = viewFactory.create(data.meta, data.image);
+    const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
       layerGroup.getTargetOrientation()
     );
@@ -1253,57 +1292,57 @@ dwv.App = function () {
       view.setColourMap(dataViewConfig.colourMap);
     }
 
-    var isBaseLayer = layerGroup.getNumberOfLayers() === 0;
+    const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
 
     // opacity
-    var opacity = 1;
+    let opacity = 1;
     // do we have more than one layer
     // (the layer has not been added to the layer group yet)
     if (!isBaseLayer) {
       opacity = 0.5;
       // set color map if non was provided
       if (typeof dataViewConfig.colourMap === 'undefined') {
-        view.setColourMap(dwv.image.lut.rainbow);
+        view.setColourMap(lut.rainbow);
       }
     }
 
     // view layer
-    var viewLayer = layerGroup.addViewLayer();
+    const viewLayer = layerGroup.addViewLayer();
     viewLayer.setView(view, dataIndex);
-    var size2D = imageGeometry.getSize(viewOrientation).get2D();
-    var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
+    const size2D = imageGeometry.getSize(viewOrientation).get2D();
+    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, opacity);
-    var viewController = viewLayer.getViewController();
+    const viewController = viewLayer.getViewController();
 
     // listen to controller events
     if (data.image.getMeta().Modality === 'SEG') {
-      viewController.addEventListener('masksegmentdelete', fireEvent);
-      viewController.addEventListener('masksegmentredraw', fireEvent);
+      viewController.addEventListener('masksegmentdelete', this.#fireEvent);
+      viewController.addEventListener('masksegmentredraw', this.#fireEvent);
     }
 
     // listen to image changes
-    dataController.addEventListener('imageset', viewLayer.onimageset);
-    dataController.addEventListener('imagechange', function (event) {
+    this.#dataController.addEventListener('imageset', viewLayer.onimageset);
+    this.#dataController.addEventListener('imagechange', (event) => {
       viewLayer.onimagechange(event);
-      self.render(event.dataid);
+      this.render(event.dataid);
     });
 
     // bind
-    stage.bindLayerGroups();
-    if (toolboxController) {
-      toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
+    this.#stage.bindLayerGroups();
+    if (this.#toolboxController) {
+      this.#toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
     }
 
     // optional draw layer
-    var drawLayer;
-    if (toolboxController && toolboxController.hasTool('Draw')) {
+    let drawLayer;
+    if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
       drawLayer = layerGroup.addDrawLayer();
       drawLayer.initialise(size2D, spacing2D, dataIndex);
       drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
     }
 
     // sync layers position
-    var value = [
+    const value = [
       viewController.getCurrentIndex().getValues(),
       viewController.getCurrentPosition().getValues()
     ];
@@ -1313,10 +1352,10 @@ dwv.App = function () {
     });
 
     // sync layer groups
-    stage.syncLayerGroupScale();
+    this.#stage.syncLayerGroupScale();
 
     // major orientation axis
-    var major = imageGeometry.getOrientation().getThirdColMajorDirection();
+    const major = imageGeometry.getOrientation().getThirdColMajorDirection();
 
     // view layer offset (done before scale)
     viewLayer.setOffset(layerGroup.getOffset());
@@ -1374,4 +1413,4 @@ dwv.App = function () {
 
   }
 
-}; // class dwv.App
+} // class App

@@ -251,10 +251,10 @@
         }
     },
     "privateDictionary": {
-        "0x0011": {
-            "0x0000": ["UL", "1", "GenericGroupLength"],
-            "0x0001": ["US", "1", "PrivateNumber"],
-            "0x0002": ["SQ", "1", "PrivateSequence"]
+        "0011": {
+            "0000": ["UL", "1", "GenericGroupLength"],
+            "0001": ["US", "1", "PrivateNumber"],
+            "0002": ["SQ", "1", "PrivateSequence"]
         }
     },
     "useUnVrForPrivateSq": false
@@ -288,10 +288,10 @@
         }
     },
     "privateDictionary": {
-        "0x0011": {
-            "0x0000": ["UL", "1", "GenericGroupLength"],
-            "0x0001": ["US", "1", "PrivateNumber"],
-            "0x0002": ["SQ", "1", "PrivateSequence"]
+        "0011": {
+            "0000": ["UL", "1", "GenericGroupLength"],
+            "0001": ["US", "1", "PrivateNumber"],
+            "0002": ["SQ", "1", "PrivateSequence"]
         }
     },
     "useUnVrForPrivateSq": true
@@ -354,42 +354,42 @@
         }
     },
     "privateDictionary": {
-        "0x0011": {
-            "0x0000": ["UL", "1", "GenericGroupLength"],
-            "0x0001": ["AE", "1", "PrivateAE"],
-            "0x0002": ["AS", "1", "PrivateAS"],
-            "0x0003": ["AT", "1", "PrivateAT"],
-            "0x0004": ["CS", "1", "PrivateCS"],
-            "0x0005": ["DA", "1", "PrivateDA"],
-            "0x0006": ["DS", "1", "PrivateDS"],
-            "0x0007": ["DT", "1", "PrivateDT"],
-            "0x0008": ["FL", "1", "PrivateFL"],
-            "0x0009": ["FD", "1", "PrivateFD"],
-            "0x0010": ["IS", "1", "PrivateIS"],
-            "0x0011": ["LO", "1", "PrivateLO"],
-            "0x0012": ["LT", "1", "PrivateLT"],
-            "0x0013": ["OB", "1", "PrivateOB"],
-            "0x0014": ["OD", "1", "PrivateOD"],
-            "0x0015": ["OF", "1", "PrivateOF"],
-            "0x0016": ["OL", "1", "PrivateOL"],
-            "0x0017": ["OV", "1", "PrivateOV"],
-            "0x0018": ["OW", "1", "PrivateOW"],
-            "0x0019": ["PN", "1", "PrivatePN"],
-            "0x0020": ["SH", "1", "PrivateSH"],
-            "0x0021": ["SL", "1", "PrivateSL"],
-            "0x0022": ["SQ", "1", "PrivateSQ"],
-            "0x0023": ["SS", "1", "PrivateSS"],
-            "0x0024": ["ST", "1", "PrivateST"],
-            "0x0025": ["SV", "1", "PrivateSV"],
-            "0x0026": ["TM", "1", "PrivateTM"],
-            "0x0027": ["UC", "1", "PrivateUC"],
-            "0x0028": ["UI", "1", "PrivateUI"],
-            "0x0029": ["UL", "1", "PrivateUL"],
-            "0x0030": ["UN", "1", "PrivateUN"],
-            "0x0031": ["UR", "1", "PrivateUR"],
-            "0x0032": ["US", "1", "PrivateUS"],
-            "0x0033": ["UT", "1", "PrivateUT"],
-            "0x0034": ["UV", "1", "PrivateUV"]
+        "0011": {
+            "0000": ["UL", "1", "GenericGroupLength"],
+            "0001": ["AE", "1", "PrivateAE"],
+            "0002": ["AS", "1", "PrivateAS"],
+            "0003": ["AT", "1", "PrivateAT"],
+            "0004": ["CS", "1", "PrivateCS"],
+            "0005": ["DA", "1", "PrivateDA"],
+            "0006": ["DS", "1", "PrivateDS"],
+            "0007": ["DT", "1", "PrivateDT"],
+            "0008": ["FL", "1", "PrivateFL"],
+            "0009": ["FD", "1", "PrivateFD"],
+            "0010": ["IS", "1", "PrivateIS"],
+            "0011": ["LO", "1", "PrivateLO"],
+            "0012": ["LT", "1", "PrivateLT"],
+            "0013": ["OB", "1", "PrivateOB"],
+            "0014": ["OD", "1", "PrivateOD"],
+            "0015": ["OF", "1", "PrivateOF"],
+            "0016": ["OL", "1", "PrivateOL"],
+            "0017": ["OV", "1", "PrivateOV"],
+            "0018": ["OW", "1", "PrivateOW"],
+            "0019": ["PN", "1", "PrivatePN"],
+            "0020": ["SH", "1", "PrivateSH"],
+            "0021": ["SL", "1", "PrivateSL"],
+            "0022": ["SQ", "1", "PrivateSQ"],
+            "0023": ["SS", "1", "PrivateSS"],
+            "0024": ["ST", "1", "PrivateST"],
+            "0025": ["SV", "1", "PrivateSV"],
+            "0026": ["TM", "1", "PrivateTM"],
+            "0027": ["UC", "1", "PrivateUC"],
+            "0028": ["UI", "1", "PrivateUI"],
+            "0029": ["UL", "1", "PrivateUL"],
+            "0030": ["UN", "1", "PrivateUN"],
+            "0031": ["UR", "1", "PrivateUR"],
+            "0032": ["US", "1", "PrivateUS"],
+            "0033": ["UT", "1", "PrivateUT"],
+            "0034": ["UV", "1", "PrivateUV"]
         }
     }
 },

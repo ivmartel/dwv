@@ -1,3 +1,6 @@
+import {Index} from '../../src/math/index';
+import {Size} from '../../src/image/size';
+
 /**
  * Tests for the 'image/size.js' file.
  */
@@ -5,44 +8,44 @@
 /* global QUnit */
 
 /**
- * Tests for {@link dwv.image.Size}.
+ * Tests for {@link Size}.
  *
  * @function module:tests/image~size
  */
 QUnit.test('Test Size.', function (assert) {
   // error cases
   assert.throws(function () {
-    new dwv.image.Size();
+    new Size();
   },
   new Error('Cannot create size with no values.'),
   'size with undef values array.');
   assert.throws(function () {
-    new dwv.image.Size(null);
+    new Size(null);
   },
   new Error('Cannot create size with no values.'),
   'size with null values array.');
   assert.throws(function () {
-    new dwv.image.Size([]);
+    new Size([]);
   },
   new Error('Cannot create size with empty values.'),
   'size with empty values array.');
   assert.throws(function () {
-    new dwv.image.Size([2, 2, 0]);
+    new Size([2, 2, 0]);
   },
   new Error('Cannot create size with non number or zero values.'),
   'size with zero values.');
   assert.throws(function () {
-    new dwv.image.Size([2, undefined, 2]);
+    new Size([2, undefined, 2]);
   },
   new Error('Cannot create size with non number or zero values.'),
   'size with undef values.');
   assert.throws(function () {
-    new dwv.image.Size([2, 'a', 2]);
+    new Size([2, 'a', 2]);
   },
   new Error('Cannot create size with non number or zero values.'),
   'size with string values.');
 
-  var size0 = new dwv.image.Size([2, 3, 4]);
+  const size0 = new Size([2, 3, 4]);
   // length
   assert.equal(size0.length(), 3, 'length');
   // test its values
@@ -61,28 +64,28 @@ QUnit.test('Test Size.', function (assert) {
   // equality
   assert.equal(size0.equals(null), false, 'equals null false');
   assert.equal(size0.equals(), false, 'equals undefined false');
-  var size10 = new dwv.image.Size([2, 3]);
+  const size10 = new Size([2, 3]);
   assert.equal(size0.equals(size10), false, 'equals different length false');
 
   assert.equal(size0.equals(size0), true, 'equals self true');
-  var size11 = new dwv.image.Size([2, 3, 4]);
+  const size11 = new Size([2, 3, 4]);
   assert.equal(size0.equals(size11), true, 'equals true');
-  var size12 = new dwv.image.Size([3, 3, 4]);
+  const size12 = new Size([3, 3, 4]);
   assert.equal(size0.equals(size12), false, 'equals false');
 
   // is in bounds
-  var index0 = new dwv.math.Index([0, 0, 0]);
+  let index0 = new Index([0, 0, 0]);
   assert.equal(size0.isInBounds(index0), true, 'isInBounds 0,0,0');
-  index0 = new dwv.math.Index([0, 0]);
+  index0 = new Index([0, 0]);
   assert.equal(size0.isInBounds(index0), false, 'isInBounds 0,0');
-  index0 = new dwv.math.Index([1, 2, 3]);
+  index0 = new Index([1, 2, 3]);
   assert.equal(size0.isInBounds(index0), true, 'isInBounds max');
-  index0 = new dwv.math.Index([2, 3, 4]);
+  index0 = new Index([2, 3, 4]);
   assert.equal(size0.isInBounds(index0), false, 'isInBounds too big');
-  index0 = new dwv.math.Index([-1, 2, 3]);
+  index0 = new Index([-1, 2, 3]);
   assert.equal(size0.isInBounds(index0), false, 'isInBounds too small');
   // with dirs
-  index0 = new dwv.math.Index([0, 0, 0]);
+  index0 = new Index([0, 0, 0]);
   assert.equal(size0.isInBounds(index0, [0, 1]), true,
     'isInBounds [0, 1] 0,0,0');
   assert.equal(size0.isInBounds(index0, [1, 2]), true,
@@ -92,12 +95,12 @@ QUnit.test('Test Size.', function (assert) {
   },
   new Error('Wrong input dir value: 3'),
   'isInBounds bad dir');
-  index0 = new dwv.math.Index([2, 3, 4]);
+  index0 = new Index([2, 3, 4]);
   assert.equal(size0.isInBounds(index0, [1, 2]), false,
     'isInBounds [0, 1] 2,3,4');
 
   // can scroll
-  var size20 = new dwv.image.Size([2, 1, 2]);
+  const size20 = new Size([2, 1, 2]);
   assert.equal(size20.moreThanOne(0), true, 'moreThanOne 20-0');
   assert.equal(size20.moreThanOne(1), false, 'moreThanOne 20-1');
   assert.equal(size20.moreThanOne(2), true, 'moreThanOne 20-2');
@@ -109,13 +112,13 @@ QUnit.test('Test Size.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.image.Size.indexToOffset}.
+ * Tests for {@link Size.indexToOffset}.
  *
  * @function module:tests/image~indexToOffset
  */
 QUnit.test('Test index to and from offset.', function (assert) {
-  var size00 = new dwv.image.Size([4, 3, 2]);
-  var testData00 = [
+  const size00 = new Size([4, 3, 2]);
+  const testData00 = [
     {values: [0, 0, 0], offset: 0},
     {values: [1, 0, 0], offset: 1},
     {values: [2, 0, 0], offset: 2},
@@ -141,9 +144,9 @@ QUnit.test('Test index to and from offset.', function (assert) {
     {values: [2, 2, 1], offset: 22},
     {values: [3, 2, 1], offset: 23}
   ];
-  for (var i = 0; i < testData00.length; ++i) {
-    var index = new dwv.math.Index(testData00[i].values);
-    var offset = testData00[i].offset;
+  for (let i = 0; i < testData00.length; ++i) {
+    const index = new Index(testData00[i].values);
+    const offset = testData00[i].offset;
     assert.equal(
       size00.indexToOffset(index), offset, 'indexToOffset #' + i);
     assert.ok(
@@ -151,8 +154,8 @@ QUnit.test('Test index to and from offset.', function (assert) {
   }
 
   // test indexToOffset with start
-  var size01 = new dwv.image.Size([5, 4, 3, 2]);
-  var index01 = new dwv.math.Index([0, 0, 0, 0]);
+  const size01 = new Size([5, 4, 3, 2]);
+  const index01 = new Index([0, 0, 0, 0]);
   // error: start too big
   assert.throws(function () {
     size01.indexToOffset(index01, 4);
@@ -160,7 +163,7 @@ QUnit.test('Test index to and from offset.', function (assert) {
   new Error('Invalid start value for indexToOffset'),
   'indexToOffset start too big');
   // error: index bad length
-  var index02 = new dwv.math.Index([0, 0, 0]);
+  const index02 = new Index([0, 0, 0]);
   assert.throws(function () {
     size01.indexToOffset(index02, 2);
   },
@@ -168,12 +171,12 @@ QUnit.test('Test index to and from offset.', function (assert) {
   'indexToOffset start index bad length');
   // no error
   assert.equal(size01.indexToOffset(index01, 2), 0, 'indexToOffset start #0');
-  var index03 = new dwv.math.Index([0, 0, 1, 0]);
+  const index03 = new Index([0, 0, 1, 0]);
   assert.equal(size01.indexToOffset(index03, 2), 1, 'indexToOffset start #1');
-  var index04 = new dwv.math.Index([0, 0, 0, 1]);
+  const index04 = new Index([0, 0, 0, 1]);
   assert.equal(size01.indexToOffset(index04, 2), 3, 'indexToOffset start #2');
-  var index05 = new dwv.math.Index([0, 0, 3, 2]);
+  const index05 = new Index([0, 0, 3, 2]);
   assert.equal(size01.indexToOffset(index05, 2), 9, 'indexToOffset start #3');
-  var index06 = new dwv.math.Index([0, 0, 3, 2]);
+  const index06 = new Index([0, 0, 3, 2]);
   assert.equal(size01.indexToOffset(index06, 3), 2, 'indexToOffset start #4');
 });

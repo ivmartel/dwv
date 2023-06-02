@@ -1,6 +1,12 @@
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
+import {Index} from '../math/index';
+import {Point2D} from '../math/point';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Image} from './image';
+import {Point} from '../math/point';
+import {Matrix33} from '../math/matrix';
+/* eslint-enable no-unused-vars */
 
 /**
  * Get an simple iterator for a given range for a one component data.
@@ -9,19 +15,19 @@ dwv.image = dwv.image || {};
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
- * @param {number} increment The increment between indicies (default=1).
+ * @param {number} [increment] The increment between indicies (default=1).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
+export function simpleRange(dataAccessor, start, end, increment) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
-  var nextIndex = start;
+  let nextIndex = start;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -35,7 +41,7 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
       };
     }
   };
-};
+}
 
 /**
  * Get an iterator for a given range for a one component data.
@@ -56,7 +62,7 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
  * @param {boolean} reverse2 If true, loop from block end to block start.
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.range = function (dataAccessor, start, maxIter, increment,
+export function range(dataAccessor, start, maxIter, increment,
   blockMaxIter, blockIncrement, reverse1, reverse2) {
   if (typeof reverse1 === 'undefined') {
     reverse1 = false;
@@ -66,7 +72,7 @@ dwv.image.range = function (dataAccessor, start, maxIter, increment,
   }
 
   // first index of the iteration
-  var nextIndex = start;
+  let nextIndex = start;
   // adapt first index and increments to reverse values
   if (reverse1) {
     blockIncrement *= -1;
@@ -83,16 +89,16 @@ dwv.image.range = function (dataAccessor, start, maxIter, increment,
       increment *= -1;
     }
   }
-  var finalBlockIncrement = blockIncrement - blockMaxIter * increment;
+  const finalBlockIncrement = blockIncrement - blockMaxIter * increment;
 
   // counters
-  var mainCount = 0;
-  var blockCount = 0;
+  let mainCount = 0;
+  let blockCount = 0;
   // result
   return {
     next: function () {
       if (mainCount < maxIter) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -112,7 +118,7 @@ dwv.image.range = function (dataAccessor, start, maxIter, increment,
       };
     }
   };
-};
+}
 
 /**
  * Get an iterator for a given range with bounds (for a one component data).
@@ -126,15 +132,15 @@ dwv.image.range = function (dataAccessor, start, maxIter, increment,
  * @param {number} regionOffset The offset between regions.
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.rangeRegion = function (
+export function rangeRegion(
   dataAccessor, start, end, increment, regionSize, regionOffset) {
-  var nextIndex = start;
-  var regionElementCount = 0;
+  let nextIndex = start;
+  let regionElementCount = 0;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -153,7 +159,7 @@ dwv.image.rangeRegion = function (
       };
     }
   };
-};
+}
 
 /**
  * Get an iterator for a given range with bounds (for a one component data).
@@ -166,16 +172,16 @@ dwv.image.rangeRegion = function (
  * @param {Array} regions An array of regions: [off0, size, off1].
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.rangeRegions = function (
+export function rangeRegions(
   dataAccessor, start, end, increment, regions) {
-  var nextIndex = start;
-  var regionCount = 0;
-  var regionElementCount = 0;
+  let nextIndex = start;
+  let regionCount = 0;
+  let regionElementCount = 0;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: dataAccessor(nextIndex),
           done: false,
           index: nextIndex
@@ -200,7 +206,7 @@ dwv.image.rangeRegions = function (
       };
     }
   };
-};
+}
 
 /**
  * Get an iterator for a given range for a 3 components data.
@@ -216,7 +222,7 @@ dwv.image.rangeRegions = function (
  * @returns {object} A 3 components iterator folowing the iterator and iterable
  *   protocol, the value is an array of size 3 with each component.
  */
-dwv.image.simpleRange3d = function (
+export function simpleRange3d(
   dataAccessor, start, end, increment, isPlanar) {
   if (typeof increment === 'undefined') {
     increment = 1;
@@ -224,21 +230,21 @@ dwv.image.simpleRange3d = function (
   if (typeof isPlanar === 'undefined') {
     isPlanar = false;
   }
-  var nextIndex = start;
-  var componentIncrement = 1;
+  let nextIndex = start;
+  let componentIncrement = 1;
   if (isPlanar) {
     componentIncrement = (end - start) / 3;
   } else {
     increment *= 3;
   }
-  var nextIndex1 = nextIndex + componentIncrement;
-  var nextIndex2 = nextIndex + 2 * componentIncrement;
+  let nextIndex1 = nextIndex + componentIncrement;
+  let nextIndex2 = nextIndex + 2 * componentIncrement;
 
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        var result = {
+        const result = {
           value: [
             dataAccessor(nextIndex),
             dataAccessor(nextIndex1),
@@ -258,7 +264,7 @@ dwv.image.simpleRange3d = function (
       };
     }
   };
-};
+}
 
 /**
  * Get an iterator for a given range for a 3 components data.
@@ -281,34 +287,34 @@ dwv.image.simpleRange3d = function (
  *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
+export function range3d(dataAccessor, start, maxIter, increment,
   blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar) {
-  var iters = [];
+  const iters = [];
   if (isPlanar) {
-    iters.push(dwv.image.range(
+    iters.push(range(
       dataAccessor, start, maxIter, increment,
       blockMaxIter, blockIncrement, reverse1, reverse2
     ));
-    iters.push(dwv.image.range(
+    iters.push(range(
       dataAccessor, start + maxIter * increment, maxIter, increment,
       blockMaxIter, blockIncrement, reverse1, reverse2
     ));
-    iters.push(dwv.image.range(
+    iters.push(range(
       dataAccessor, start + 2 * maxIter * increment, maxIter, increment,
       blockMaxIter, blockIncrement, reverse1, reverse2
     ));
   } else {
     increment *= 3;
     blockIncrement *= 3;
-    iters.push(dwv.image.range(
+    iters.push(range(
       dataAccessor, start, maxIter, increment,
       blockMaxIter, blockIncrement, reverse1, reverse2
     ));
-    iters.push(dwv.image.range(
+    iters.push(range(
       dataAccessor, start + 1, maxIter, increment,
       blockMaxIter, blockIncrement, reverse1, reverse2
     ));
-    iters.push(dwv.image.range(
+    iters.push(range(
       dataAccessor, start + 2, maxIter, increment,
       blockMaxIter, blockIncrement, reverse1, reverse2
     ));
@@ -317,9 +323,9 @@ dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
   // result
   return {
     next: function () {
-      var r0 = iters[0].next();
-      var r1 = iters[1].next();
-      var r2 = iters[2].next();
+      const r0 = iters[0].next();
+      const r1 = iters[1].next();
+      const r2 = iters[2].next();
       if (!r0.done) {
         return {
           value: [
@@ -341,7 +347,7 @@ dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
       };
     }
   };
-};
+}
 
 /**
  * Get a list of values for a given iterator.
@@ -349,46 +355,46 @@ dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
  * @param {object} iterator The iterator to use to loop through data.
  * @returns {Array} The list of values.
  */
-dwv.image.getIteratorValues = function (iterator) {
-  var values = [];
-  var ival = iterator.next();
+export function getIteratorValues(iterator) {
+  const values = [];
+  let ival = iterator.next();
   while (!ival.done) {
     values.push(ival.value);
     ival = iterator.next();
   }
   return values;
-};
+}
 
 /**
  * Get a slice index iterator.
  *
- * @param {dwv.image.Image} image The image to parse.
- * @param {dwv.math.Point} position The current position.
+ * @param {Image} image The image to parse.
+ * @param {Index} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
- * @param {dwv.math.Matrix33} viewOrientation The view orientation.
+ * @param {Matrix33} viewOrientation The view orientation.
  * @returns {object} The slice iterator.
  */
-dwv.image.getSliceIterator = function (
+export function getSliceIterator(
   image, position, isRescaled, viewOrientation) {
-  var size = image.getGeometry().getSize();
+  const size = image.getGeometry().getSize();
   // zero-ify non direction index
-  var dirMax2Index = 2;
+  let dirMax2Index = 2;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
     dirMax2Index = viewOrientation.getColAbsMax(2).index;
   }
-  var posValues = position.getValues();
+  const posValues = position.getValues();
   // keep the main direction and any other than 3D
-  var indexFilter = function (element, index) {
+  const indexFilter = function (element, index) {
     return (index === dirMax2Index || index > 2) ? element : 0;
   };
-  var posStart = new dwv.math.Index(posValues.map(indexFilter));
-  var start = size.indexToOffset(posStart);
+  const posStart = new Index(posValues.map(indexFilter));
+  let start = size.indexToOffset(posStart);
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var dataAccessor = null;
+  let dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -399,45 +405,45 @@ dwv.image.getSliceIterator = function (
     };
   }
 
-  var ncols = size.get(0);
-  var nrows = size.get(1);
-  var nslices = size.get(2);
-  var sliceSize = size.getDimSize(2);
+  const ncols = size.get(0);
+  const nrows = size.get(1);
+  const nslices = size.get(2);
+  let sliceSize = size.getDimSize(2);
 
-  var ncomp = image.getNumberOfComponents();
-  var isPlanar = image.getPlanarConfiguration() === 1;
-  var getRange = function (
+  const ncomp = image.getNumberOfComponents();
+  const isPlanar = image.getPlanarConfiguration() === 1;
+  const getRange = function (
     dataAccessor, start, maxIter, increment,
     blockMaxIter, blockIncrement, reverse1, reverse2) {
     if (ncomp === 1) {
-      return dwv.image.range(dataAccessor, start, maxIter, increment,
+      return range(dataAccessor, start, maxIter, increment,
         blockMaxIter, blockIncrement, reverse1, reverse2);
     } else if (ncomp === 3) {
-      return dwv.image.range3d(dataAccessor, 3 * start, maxIter, increment,
+      return range3d(dataAccessor, 3 * start, maxIter, increment,
         blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
     }
   };
 
-  var range = null;
+  let rangeObj = null;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
-    var dirMax0 = viewOrientation.getColAbsMax(0);
-    var dirMax2 = viewOrientation.getColAbsMax(2);
+    const dirMax0 = viewOrientation.getColAbsMax(0);
+    const dirMax2 = viewOrientation.getColAbsMax(2);
 
     // default reverse
-    var reverse1 = false;
-    var reverse2 = false;
+    const reverse1 = false;
+    const reverse2 = false;
 
-    var maxIter = null;
+    let maxIter = null;
     if (dirMax2.index === 2) {
       // axial
       maxIter = ncols * nrows;
       if (dirMax0.index === 0) {
         // xyz
-        range = getRange(dataAccessor,
+        rangeObj = getRange(dataAccessor,
           start, maxIter, 1, ncols, ncols, reverse1, reverse2);
       } else {
         // yxz
-        range = getRange(dataAccessor,
+        rangeObj = getRange(dataAccessor,
           start, maxIter, ncols, nrows, 1, reverse1, reverse2);
       }
     } else if (dirMax2.index === 0) {
@@ -445,11 +451,11 @@ dwv.image.getSliceIterator = function (
       maxIter = nslices * nrows;
       if (dirMax0.index === 1) {
         // yzx
-        range = getRange(dataAccessor,
+        rangeObj = getRange(dataAccessor,
           start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
       } else {
         // zyx
-        range = getRange(dataAccessor,
+        rangeObj = getRange(dataAccessor,
           start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
       }
     } else if (dirMax2.index === 1) {
@@ -457,11 +463,11 @@ dwv.image.getSliceIterator = function (
       maxIter = nslices * ncols;
       if (dirMax0.index === 0) {
         // xzy
-        range = getRange(dataAccessor,
+        rangeObj = getRange(dataAccessor,
           start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
       } else {
         // zxy
-        range = getRange(dataAccessor,
+        rangeObj = getRange(dataAccessor,
           start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
       }
     } else {
@@ -469,12 +475,12 @@ dwv.image.getSliceIterator = function (
     }
   } else {
     if (image.getNumberOfComponents() === 1) {
-      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+      rangeObj = simpleRange(dataAccessor, start, start + sliceSize);
     } else if (image.getNumberOfComponents() === 3) {
       // 3 times bigger...
       start *= 3;
       sliceSize *= 3;
-      range = dwv.image.simpleRange3d(
+      rangeObj = simpleRange3d(
         dataAccessor, start, start + sliceSize, 1, isPlanar);
     } else {
       throw new Error('Unsupported number of components: ' +
@@ -482,21 +488,21 @@ dwv.image.getSliceIterator = function (
     }
   }
 
-  return range;
-};
+  return rangeObj;
+}
 
 /**
  * Get a slice index iterator for a rectangular region.
  *
- * @param {dwv.image.Image} image The image to parse.
- * @param {dwv.math.Point} position The current position.
+ * @param {Image} image The image to parse.
+ * @param {Index} index The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
- * @param {dwv.math.Point2D} min The minimum position (optional).
- * @param {dwv.math.Point2D} max The maximum position (optional).
+ * @param {Point2D} min The minimum position (optional).
+ * @param {Point2D} max The maximum position (optional).
  * @returns {object} The slice iterator.
  */
-dwv.image.getRegionSliceIterator = function (
-  image, position, isRescaled, min, max) {
+export function getRegionSliceIterator(
+  image, index, isRescaled, min, max) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
@@ -506,7 +512,7 @@ dwv.image.getRegionSliceIterator = function (
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var dataAccessor = null;
+  let dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -517,44 +523,44 @@ dwv.image.getRegionSliceIterator = function (
     };
   }
 
-  var size = image.getGeometry().getSize();
+  const size = image.getGeometry().getSize();
   if (typeof min === 'undefined') {
-    min = new dwv.math.Point2D(0, 0);
+    min = new Point2D(0, 0);
   }
   if (typeof max === 'undefined') {
-    max = new dwv.math.Point2D(
+    max = new Point2D(
       size.get(0) - 1,
       size.get(1)
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
-  var startOffset = size.indexToOffset(position.getWithNew2D(
+  const startOffset = size.indexToOffset(index.getWithNew2D(
     min.getX(), min.getY()
   ));
-  var endOffset = size.indexToOffset(position.getWithNew2D(
+  const endOffset = size.indexToOffset(index.getWithNew2D(
     max.getX(), max.getY() - 1
   ));
 
   // minimum 1 column
-  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
-  var rowIncrement = size.get(0) - rangeNumberOfColumns;
+  const rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  const rowIncrement = size.get(0) - rangeNumberOfColumns;
 
-  return dwv.image.rangeRegion(
+  return rangeRegion(
     dataAccessor, startOffset, endOffset + 1,
     1, rangeNumberOfColumns, rowIncrement);
-};
+}
 
 /**
  * Get a slice index iterator for a rectangular region.
  *
- * @param {dwv.image.Image} image The image to parse.
- * @param {dwv.math.Point} position The current position.
+ * @param {Image} image The image to parse.
+ * @param {Index} index The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Array} regions An array of regions.
  * @returns {object|undefined} The slice iterator.
  */
-dwv.image.getVariableRegionSliceIterator = function (
-  image, position, isRescaled, regions) {
+export function getVariableRegionSliceIterator(
+  image, index, isRescaled, regions) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
@@ -564,7 +570,7 @@ dwv.image.getVariableRegionSliceIterator = function (
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var dataAccessor = null;
+  let dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
       return image.getRescaledValueAtOffset(offset);
@@ -575,18 +581,18 @@ dwv.image.getVariableRegionSliceIterator = function (
     };
   }
 
-  var size = image.getGeometry().getSize();
+  const size = image.getGeometry().getSize();
 
-  var offsetRegions = [];
-  var region;
-  var min = null;
-  var max = null;
-  var index = null;
-  for (var i = 0; i < regions.length; ++i) {
+  const offsetRegions = [];
+  let region;
+  let min = null;
+  let max = null;
+  let regionIndex = null;
+  for (let i = 0; i < regions.length; ++i) {
     region = regions[i];
-    var width = region[1][0] - region[0][0];
+    const width = region[1][0] - region[0][0];
     if (width !== 0) {
-      index = i;
+      regionIndex = i;
       if (!min) {
         min = region[0];
       }
@@ -597,8 +603,8 @@ dwv.image.getVariableRegionSliceIterator = function (
       ]);
     }
   }
-  if (index !== null) {
-    max = regions[index][1];
+  if (regionIndex !== null) {
+    max = regions[regionIndex][1];
   }
 
   // exit if no offsets
@@ -606,17 +612,17 @@ dwv.image.getVariableRegionSliceIterator = function (
     return undefined;
   }
 
-  var startOffset = size.indexToOffset(position.getWithNew2D(
+  const startOffset = size.indexToOffset(index.getWithNew2D(
     min[0], min[1]
   ));
-  var endOffset = size.indexToOffset(position.getWithNew2D(
+  const endOffset = size.indexToOffset(index.getWithNew2D(
     max[0], max[1]
   ));
 
-  return dwv.image.rangeRegions(
+  return rangeRegions(
     dataAccessor, startOffset, endOffset + 1,
     1, offsetRegions);
-};
+}
 
 /**
  * Get a colour iterator. The input array defines the colours and
@@ -627,9 +633,9 @@ dwv.image.getVariableRegionSliceIterator = function (
  * @param {number} end The end of the range (excluded).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.colourRange = function (colours, end) {
-  var nextIndex = 0;
-  var nextColourIndex = 0;
+export function colourRange(colours, end) {
+  let nextIndex = 0;
+  let nextColourIndex = 0;
   // result
   return {
     next: function () {
@@ -638,7 +644,7 @@ dwv.image.colourRange = function (colours, end) {
           nextIndex >= colours[nextColourIndex + 1].index) {
           ++nextColourIndex;
         }
-        var result = {
+        const result = {
           value: colours[nextColourIndex].colour,
           done: false,
           index: nextIndex
@@ -652,4 +658,4 @@ dwv.image.colourRange = function (colours, end) {
       };
     }
   };
-};
+}

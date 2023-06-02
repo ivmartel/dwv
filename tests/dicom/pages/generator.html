@@ -5,25 +5,13 @@
 <meta charset="UTF-8">
 <!-- third party -->
 <script type="text/javascript" src="../../../node_modules/jszip/dist/jszip.min.js"></script>
-<!-- dwv -->
-<script type="text/javascript" src="../../../src/utils/logger.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dataWriter.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dicomParser.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dicomTag.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dicomWriter.js"></script>
-<script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
-<script type="text/javascript" src="../../../src/utils/array.js"></script>
 <!-- local -->
 <script type="text/javascript" src="../dicomGenerator.js"></script>
 <script type="text/javascript" src="../gradSquarePixGenerator.js"></script>
 <script type="text/javascript" src="../filePixGenerator.js"></script>
 <script type="text/javascript" src="../mprPixGenerator.js"></script>
-<!-- own -->
+<!-- local -->
 <script type="text/javascript" src="./generator.js"></script>
-<script type="text/javascript">
-// last minute
-document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedGenerator);
-</script>
 <style>
 body { font-family: Arial, Helvetica, sans-serif; }
 textarea { width: 99%; margin: 2px; }
@@ -70,9 +58,9 @@ be written with explicit zero length, a <code>0</code> value will mean undefined
 
 <fieldset>
 <label for="intagsfile">JSON DICOM tags file: </label>
-<input id="intagsfile" type="file" name="file" onchange="dwv.test.onInputTagsFile(event);">
-<a href="#" id="jsonlint" class="button" onclick="dwv.test.launchJSONlint();">JSONLint</a>
-<a href="#" id="save" class="button" onclick="dwv.test.onSaveTags();">Save Tags</a>
+<input id="intagsfile" type="file" name="file">
+<a href="#" id="jsonlint" class="button">JSONLint</a>
+<a href="#" id="save" class="button">Save Tags</a>
 </fieldset>
 
 <textarea id="tags" rows="25">
@@ -100,8 +88,8 @@ be written with explicit zero length, a <code>0</code> value will mean undefined
 <label for="numberofslices">Number of slices: </label>
 <input type="number" id="numberofslices" value="1"/>
 <label for="inImgfile">Image file(s): </label>
-<input id="inImgfile" type="file" multiple="true" name="file" onchange="dwv.test.onInputImageFiles(event);">
-<a href="#" id="generate" class="button" onclick="dwv.test.onGenerate();">Generate</a>
+<input id="inImgfile" type="file" multiple="true" name="file">
+<a href="#" id="generate" class="button">Generate</a>
 </fieldset>
 </form>
 

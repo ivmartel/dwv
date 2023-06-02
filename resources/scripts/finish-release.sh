@@ -17,13 +17,19 @@ usage() {
   echo ""
   exit 1 # Exit script after printing help
 }
+
+# messages
+PREFIX="[fini]"
+RESET_COLOR="\033[0m"
 # print error message (red)
+ERROR_COLOR="\033[1;91m"
 error() {
-  echo -e "\033[1;31m[fini] $1\033[0m"
+  echo -e $ERROR_COLOR$PREFIX' '$1$RESET_COLOR
 }
 # print info message (blue)
+INFO_COLOR="\033[1;94m"
 info() {
-  echo -e "\033[1;34m[fini] $1\033[0m"
+  echo -e $INFO_COLOR$PREFIX' '$1$RESET_COLOR
 }
 
 # script step
@@ -98,7 +104,7 @@ then
   b1="  return '${nextVersion}-beta.0';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
   a2="[0-9]+\.[0-9]+\.[0-9]+"
-  b2="${nextVersion}"
+  b2="${nextVersion}-beta.0"
   sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
   # commit
   git commit -a -m "Bumped version number to v${nextVersion}-beta.0"

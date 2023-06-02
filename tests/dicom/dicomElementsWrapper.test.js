@@ -1,3 +1,14 @@
+import {DicomParser} from '../../src/dicom/dicomParser';
+import {
+  DicomElementsWrapper,
+  getDate,
+  getTime,
+  getDateTime
+} from '../../src/dicom/dicomElementsWrapper';
+import {b64urlToArrayBuffer} from './utils';
+
+import dwvTestSimple from '../data/dwv-test-simple.dcm';
+
 /**
  * Tests for the 'dicom/dicomElementsWrapper.js' file.
  */
@@ -7,263 +18,252 @@
 QUnit.module('dicom');
 
 /**
- * Tests for {@link dwv.dicom.DicomElementsWrapper} using simple DICOM data.
+ * Tests for {@link DicomElementsWrapper} using simple DICOM data.
  * Using remote file for CI integration.
  *
  * @function module:tests/dicom~dicomElementsWrapper
  */
 QUnit.test('Test simple DICOM wrapping.', function (assert) {
-  var done = assert.async();
 
-  var request = new XMLHttpRequest();
-  var url = '/tests/data/dwv-test-simple.dcm';
-  request.open('GET', url, true);
-  request.responseType = 'arraybuffer';
-  request.onerror = function (event) {
-    console.log(event);
-  };
-  request.onload = function (/*event*/) {
-    assert.ok((this.response.byteLength !== 0), 'Got a response.');
+  // parse DICOM
+  const dicomParser = new DicomParser();
+  dicomParser.parse(b64urlToArrayBuffer(dwvTestSimple));
 
-    // parse DICOM
-    var dicomParser = new dwv.dicom.DicomParser();
-    dicomParser.parse(this.response);
+  // wrapped tags
+  const tags = dicomParser.getDicomElements();
+  const wrapper = new DicomElementsWrapper(tags);
+  // dump to object
+  const tagsObject = wrapper.dumpToObject();
 
-    // wrapped tags
-    var tags = dicomParser.getDicomElements();
-    // dump to table
-    var table = dwv.utils.objectToArray(tags.dumpToObject());
-
-    // regression table
-    var teoTable = [
-      {
-        name: 'FileMetaInformationGroupLength',
-        value: '90',
-        group: '0x0002',
-        element: '0x0000',
-        vr: 'UL',
-        vl: 4
-      },
-      {
-        name: 'TransferSyntaxUID',
-        value: '1.2.840.10008.1.2.1',
-        group: '0x0002',
-        element: '0x0010',
-        vr: 'UI',
-        vl: 20
-      },
-      {
-        name: 'ImplementationClassUID',
-        value: '1.2.826.0.1.3680043.9.7278.1.0.31.0',
-        group: '0x0002',
-        element: '0x0012',
-        vr: 'UI',
-        vl: 36
-      },
-      {
-        name: 'ImplementationVersionName',
-        value: 'DWV_0.31.0',
-        group: '0x0002',
-        element: '0x0013',
-        vr: 'SH',
-        vl: 10
-      },
-      {
-        name: 'SOPInstanceUID',
-        value: '1.2.3.0.1.11.111',
-        group: '0x0008',
-        element: '0x0018',
-        vr: 'UI',
-        vl: 16,
-      },
-      {
-        name: 'Modality',
-        value: 'MR',
-        group: '0x0008',
-        element: '0x0060',
-        vr: 'CS',
-        vl: 2
-      },
-      {
-        name: 'PerformingPhysicianName',
-        value: '(no value available)',
-        group: '0x0008',
-        element: '0x1050',
-        vr: 'PN',
-        vl: 0,
-      },
-      {
-        name: 'ReferencedImageSequence',
-        value: [
-          [
-            {
-              element: '0x1150',
-              group: '0x0008',
-              name: 'ReferencedSOPClassUID',
-              value: '1.2.840.10008.5.1.4.1.1.4',
-              vl: 26,
-              vr: 'UI'
-            },
-            {
-              element: '0x1155',
-              group: '0x0008',
-              name: 'ReferencedSOPInstanceUID',
-              value: '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
-              vl: 52,
-              vr: 'UI'
-            }
-          ]
-        ],
-        group: '0x0008',
-        element: '0x1140',
-        vr: 'SQ',
-        vl: 102
-      },
-      {
-        name: 'PatientName',
-        value: 'dwv^PatientName',
-        group: '0x0010',
-        element: '0x0010',
-        vr: 'PN',
-        vl: 16
-      },
-      {
-        name: 'PatientID',
-        value: 'dwv-patient-id123',
-        group: '0x0010',
-        element: '0x0020',
-        vr: 'LO',
-        vl: 18
-      },
-      {
-        name: 'dBdt',
-        value: '0',
-        group: '0x0018',
-        element: '0x1318',
-        vr: 'DS',
-        vl: 2
-      },
-      {
-        name: 'StudyInstanceUID',
-        value: '1.2.3.0.1',
-        group: '0x0020',
-        element: '0x000D',
-        vr: 'UI',
-        vl: 10
-      },
-      {
-        name: 'SeriesInstanceUID',
-        value: '1.2.3.0.1.11',
-        group: '0x0020',
-        element: '0x000E',
-        vr: 'UI',
-        vl: 12
-      },
-      {
-        name: 'InstanceNumber',
-        value: '0',
-        group: '0x0020',
-        element: '0x0013',
-        vr: 'IS',
-        vl: 2
-      },
-      {
-        name: 'ImagePositionPatient',
-        value: '0\\0\\0',
-        group: '0x0020',
-        element: '0x0032',
-        vr: 'DS',
-        vl: 6
-      },
-      {
-        name: 'SamplesPerPixel',
-        value: '1',
-        group: '0x0028',
-        element: '0x0002',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'PhotometricInterpretation',
-        value: 'MONOCHROME2',
-        group: '0x0028',
-        element: '0x0004',
-        vr: 'CS',
-        vl: 12
-      },
-      {
-        name: 'Rows',
-        value: '32',
-        group: '0x0028',
-        element: '0x0010',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'Columns',
-        value: '32',
-        group: '0x0028',
-        element: '0x0011',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'BitsAllocated',
-        value: '16',
-        group: '0x0028',
-        element: '0x0100',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'BitsStored',
-        value: '12',
-        group: '0x0028',
-        element: '0x0101',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'HighBit',
-        value: '11',
-        group: '0x0028',
-        element: '0x0102',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'PixelRepresentation',
-        value: '0',
-        group: '0x0028',
-        element: '0x0103',
-        vr: 'US',
-        vl: 2
-      },
-      {
-        name: 'PixelData',
-        value: '...',
-        group: '0x7FE0',
-        element: '0x0010',
-        vr: 'OW',
-        vl: 2048
-      }
-    ];
-
-    // test
-    var len = table.length;
-    assert.equal(len, teoTable.length, 'dumpToTable length');
-
-    // special pixel data case: browsers have different toString
-    for (var i = 0; i < len; ++i) {
-      if (table[i].name === 'PixelData' &&
-        table[i].value === '[object Uint16Array]') {
-        table[i].value = '...';
-      }
+  // regression table
+  const theoObject = {
+    FileMetaInformationGroupLength: {
+      value: '90',
+      vr: 'UL'
+    },
+    TransferSyntaxUID: {
+      value: '1.2.840.10008.1.2.1',
+      vr: 'UI'
+    },
+    ImplementationClassUID: {
+      value: '1.2.826.0.1.3680043.9.7278.1.0.31.0',
+      vr: 'UI'
+    },
+    ImplementationVersionName: {
+      value: 'DWV_0.31.0',
+      vr: 'SH'
+    },
+    SOPInstanceUID: {
+      value: '1.2.3.0.1.11.111',
+      vr: 'UI'
+    },
+    Modality: {
+      value: 'MR',
+      vr: 'CS'
+    },
+    PerformingPhysicianName: {
+      value: '(no value available)',
+      vr: 'PN'
+    },
+    ReferencedImageSequence: {
+      value: [
+        {
+          ReferencedSOPClassUID: {
+            value: '1.2.840.10008.5.1.4.1.1.4',
+            vr: 'UI'
+          },
+          ReferencedSOPInstanceUID: {
+            value: '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+            vr: 'UI'
+          }
+        }
+      ],
+      vr: 'SQ'
+    },
+    PatientName: {
+      value: 'dwv^PatientName',
+      vr: 'PN'
+    },
+    PatientID: {
+      value: 'dwv-patient-id123',
+      vr: 'LO'
+    },
+    dBdt: {
+      value: '0',
+      vr: 'DS'
+    },
+    StudyInstanceUID: {
+      value: '1.2.3.0.1',
+      vr: 'UI'
+    },
+    SeriesInstanceUID: {
+      value: '1.2.3.0.1.11',
+      vr: 'UI'
+    },
+    InstanceNumber: {
+      value: '0',
+      vr: 'IS'
+    },
+    ImagePositionPatient: {
+      value: '0\\0\\0',
+      vr: 'DS'
+    },
+    SamplesPerPixel: {
+      value: '1',
+      vr: 'US'
+    },
+    PhotometricInterpretation: {
+      value: 'MONOCHROME2',
+      vr: 'CS'
+    },
+    Rows: {
+      value: '32',
+      vr: 'US'
+    },
+    Columns: {
+      value: '32',
+      vr: 'US'
+    },
+    BitsAllocated: {
+      value: '16',
+      vr: 'US'
+    },
+    BitsStored: {
+      value: '12',
+      vr: 'US'
+    },
+    HighBit: {
+      value: '11',
+      vr: 'US'
+    },
+    PixelRepresentation: {
+      value: '0',
+      vr: 'US'
+    },
+    PixelData: {
+      value: '...',
+      vr: 'OW'
     }
-    assert.deepEqual(table, teoTable, 'dumpToTable content');
-
-    // finish async test
-    done();
   };
-  request.send(null);
+
+  // test length
+  const keys = Object.keys(tagsObject);
+  const len = keys.length;
+  const theoKeys = Object.keys(theoObject);
+  assert.equal(len, theoKeys.length, 'dumpToTable length');
+  // test content
+  assert.deepEqual(tagsObject, theoObject, 'dumpToTable content');
+});
+
+/**
+ * Tests for getDate.
+ *
+ * @function module:tests/dicom~dicomElementsWrapper
+ */
+QUnit.test('Test getDate.', function (assert) {
+  const da00 = getDate(undefined);
+  const daTheo00 = undefined;
+  assert.equal(da00, daTheo00, 'test date #00');
+
+  const da10 = getDate({value: ['20230501']});
+  const daTheo10 = {year: 2023, monthIndex: 4, day: 1};
+  assert.deepEqual(da10, daTheo10, 'test date #10');
+
+  const da11 = getDate({value: ['20230131']});
+  const daTheo11 = {year: 2023, monthIndex: 0, day: 31};
+  assert.deepEqual(da11, daTheo11, 'test date #11');
+});
+
+/**
+ * Tests for getDate.
+ *
+ * @function module:tests/dicom~dicomElementsWrapper
+ */
+QUnit.test('Test getTime.', function (assert) {
+  const tm00 = getTime(undefined);
+  const tmTheo00 = undefined;
+  assert.equal(tm00, tmTheo00, 'test time #00');
+
+  const tm10 = getTime({value: ['19']});
+  const tmTheo10 = {hours: 19, minutes: 0, seconds: 0, milliseconds: 0};
+  assert.deepEqual(tm10, tmTheo10, 'test time #10');
+
+  const tm11 = getTime({value: ['1936']});
+  const tmTheo11 = {hours: 19, minutes: 36, seconds: 0, milliseconds: 0};
+  assert.deepEqual(tm11, tmTheo11, 'test time #11');
+
+  const tm12 = getTime({value: ['193610']});
+  const tmTheo12 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 0};
+  assert.deepEqual(tm12, tmTheo12, 'test time #12');
+
+  const tm13 = getTime({value: ['193610.012345']});
+  const tmTheo13 = {hours: 19, minutes: 36, seconds: 10, milliseconds: 12};
+  assert.deepEqual(tm13, tmTheo13, 'test time #13');
+});
+
+/**
+ * Tests for getDateTime.
+ *
+ * @function module:tests/dicom~dicomElementsWrapper
+ */
+QUnit.test('Test getDateTime.', function (assert) {
+  const dt00 = getDateTime(undefined);
+  const dtTheo00 = undefined;
+  assert.equal(dt00, dtTheo00, 'test date-time #00');
+
+  const dt10 = getDateTime({value: ['2023']});
+  const dtTheo10 = {
+    date: {year: 2023, monthIndex: 0, day: 0},
+    time: undefined
+  };
+  assert.deepEqual(dt10, dtTheo10, 'test time #10');
+
+  const dt11 = getDateTime({value: ['202305']});
+  const dtTheo11 = {
+    date: {year: 2023, monthIndex: 4, day: 0},
+    time: undefined
+  };
+  assert.deepEqual(dt11, dtTheo11, 'test time #11');
+
+  const dt12 = getDateTime({value: ['20230501']});
+  const dtTheo12 = {
+    date: {year: 2023, monthIndex: 4, day: 1},
+    time: undefined
+  };
+  assert.deepEqual(dt12, dtTheo12, 'test time #12');
+
+  const dt13 = getDateTime({value: ['2023050119']});
+  const dtTheo13 = {
+    date: {year: 2023, monthIndex: 4, day: 1},
+    time: {hours: 19, minutes: 0, seconds: 0, milliseconds: 0}
+  };
+  assert.deepEqual(dt13, dtTheo13, 'test time #13');
+
+  const dt14 = getDateTime({value: ['202305011936']});
+  const dtTheo14 = {
+    date: {year: 2023, monthIndex: 4, day: 1},
+    time: {hours: 19, minutes: 36, seconds: 0, milliseconds: 0}
+  };
+  assert.deepEqual(dt14, dtTheo14, 'test time #14');
+
+  const dt15 = getDateTime({value: ['20230501193610']});
+  const dtTheo15 = {
+    date: {year: 2023, monthIndex: 4, day: 1},
+    time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 0}
+  };
+  assert.deepEqual(dt15, dtTheo15, 'test time #15');
+
+  const dt16 = getDateTime({value: ['20230501193610.012345']});
+  const dtTheo16 = {
+    date: {year: 2023, monthIndex: 4, day: 1},
+    time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}
+  };
+  assert.deepEqual(dt16, dtTheo16, 'test time #16');
+
+  const dt17 = getDateTime({value: ['20230501193610.012345&0200']});
+  const dtTheo17 = {
+    date: {year: 2023, monthIndex: 4, day: 1},
+    time: {hours: 19, minutes: 36, seconds: 10, milliseconds: 12}
+  };
+  assert.deepEqual(dt17, dtTheo17, 'test time #17');
 });

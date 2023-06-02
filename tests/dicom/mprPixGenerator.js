@@ -1,3 +1,10 @@
+// Do not warn if these variables were not defined before.
+/* global dwv */
+
+// namespace
+// eslint-disable-next-line no-var
+var test = test || {};
+
 /**
  * MPRPixGenerator
  * Generates pixel data from file with an input per orientation.
@@ -5,26 +12,26 @@
  * @param {object} options The generator options.
  * @class
  */
-var MPRPixGenerator = function (options) {
+const MPRPixGenerator = function (options) {
 
-  var self = this;
+  const self = this;
 
-  var numberOfColumns = options.numberOfColumns;
-  var numberOfRows = options.numberOfRows;
-  var isRGB = options.photometricInterpretation === 'RGB';
+  const numberOfColumns = options.numberOfColumns;
+  const numberOfRows = options.numberOfRows;
+  const isRGB = options.photometricInterpretation === 'RGB';
 
   if (isRGB) {
     throw new Error('The MPRPixGenerator does not support RGB data.');
   }
 
-  var halfNCols = numberOfColumns * 0.5;
-  var halfNRows = numberOfRows * 0.5;
+  const halfNCols = numberOfColumns * 0.5;
+  const halfNRows = numberOfRows * 0.5;
 
   this.images = [];
   this.buffers = [];
 
-  var numberOfSlices = 0;
-  var halfNSlices = 0;
+  let numberOfSlices = 0;
+  let halfNSlices = 0;
   this.setNumberOfSlices = function (num) {
     numberOfSlices = num;
     halfNSlices = num * 0.5;
@@ -32,8 +39,8 @@ var MPRPixGenerator = function (options) {
 
   this.setImages = function (imgs) {
     // check sizes
-    var img;
-    for (var i = 0; i < imgs.length; ++i) {
+    let img;
+    for (let i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== halfNCols) {
         throw new Error('Image width mismatch: ' +
@@ -48,8 +55,8 @@ var MPRPixGenerator = function (options) {
     this.images = imgs;
     // store buffers
     this.buffers = [];
-    for (var i0 = 0; i0 < imgs.length; ++i0) {
-      this.buffers.push(dwv.dicom.getImageDataData(this.images[i0]));
+    for (let i0 = 0; i0 < imgs.length; ++i0) {
+      this.buffers.push(test.getImageDataData(this.images[i0]));
     }
   };
 
@@ -58,8 +65,8 @@ var MPRPixGenerator = function (options) {
       throw new Error('Cannot generate slice, number is above size: ' +
         sliceNumber + ', ' + numberOfSlices);
     }
-    var orientationName =
-      dwv.dicom.getOrientationName(options.imageOrientationPatient);
+    const orientationName =
+      dwv.getOrientationName(options.imageOrientationPatient);
     if (orientationName === 'axial') {
       this.generateAsAxial(pixelBuffer, sliceNumber);
     } else if (orientationName === 'coronal') {
@@ -71,9 +78,9 @@ var MPRPixGenerator = function (options) {
 
   this.generateAsAxial = function (pixelBuffer, sliceNumber) {
     // axial
-    var offset = 0;
-    for (var j0 = 0; j0 < halfNRows; ++j0) {
-      for (var i0 = 0; i0 < halfNCols; ++i0) {
+    let offset = 0;
+    for (let j0 = 0; j0 < halfNRows; ++j0) {
+      for (let i0 = 0; i0 < halfNCols; ++i0) {
         pixelBuffer[offset] = getFunc('axial', i0, j0);
         ++offset;
       }
@@ -82,8 +89,8 @@ var MPRPixGenerator = function (options) {
     if (sliceNumber < halfNSlices) {
       // coronal
       offset = halfNCols;
-      for (var j1 = 0; j1 < numberOfRows; ++j1) {
-        for (var i1 = 0; i1 < halfNCols; ++i1) {
+      for (let j1 = 0; j1 < numberOfRows; ++j1) {
+        for (let i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
             'coronal', i1, (halfNSlices - 1 - sliceNumber));
           ++offset;
@@ -93,8 +100,8 @@ var MPRPixGenerator = function (options) {
     } else {
       // sagittal
       offset = numberOfColumns * halfNRows;
-      for (var j2 = 0; j2 < halfNRows; ++j2) {
-        for (var i2 = 0; i2 < numberOfColumns; ++i2) {
+      for (let j2 = 0; j2 < halfNRows; ++j2) {
+        for (let i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
             'sagittal', j2, (numberOfSlices - 1 - sliceNumber));
           ++offset;
@@ -105,9 +112,9 @@ var MPRPixGenerator = function (options) {
 
   this.generateAsCoronal = function (pixelBuffer, sliceNumber) {
     // coronal
-    var offset = numberOfColumns * halfNRows + halfNCols;
-    for (var j0 = 0; j0 < halfNRows; ++j0) {
-      for (var i0 = 0; i0 < halfNCols; ++i0) {
+    let offset = numberOfColumns * halfNRows + halfNCols;
+    for (let j0 = 0; j0 < halfNRows; ++j0) {
+      for (let i0 = 0; i0 < halfNCols; ++i0) {
         pixelBuffer[offset] = getFunc('coronal', i0, j0);
         ++offset;
       }
@@ -116,8 +123,8 @@ var MPRPixGenerator = function (options) {
     if (sliceNumber < halfNSlices) {
       // axial
       offset = 0;
-      for (var j1 = 0; j1 < numberOfRows; ++j1) {
-        for (var i1 = 0; i1 < halfNCols; ++i1) {
+      for (let j1 = 0; j1 < numberOfRows; ++j1) {
+        for (let i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
             'axial', i1, sliceNumber);
           ++offset;
@@ -128,8 +135,8 @@ var MPRPixGenerator = function (options) {
     } else {
       // sagittal
       offset = 0;
-      for (var j2 = 0; j2 < halfNRows; ++j2) {
-        for (var i2 = 0; i2 < numberOfColumns; ++i2) {
+      for (let j2 = 0; j2 < halfNRows; ++j2) {
+        for (let i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
             'sagittal', sliceNumber, j2 - 1);
           ++offset;
@@ -140,9 +147,9 @@ var MPRPixGenerator = function (options) {
 
   this.generateAsSagittal = function (pixelBuffer, sliceNumber) {
     // sagittal
-    var offset = halfNCols;
-    for (var j0 = 0; j0 < halfNRows; ++j0) {
-      for (var i0 = 0; i0 < halfNCols; ++i0) {
+    let offset = halfNCols;
+    for (let j0 = 0; j0 < halfNRows; ++j0) {
+      for (let i0 = 0; i0 < halfNCols; ++i0) {
         pixelBuffer[offset] = getFunc('sagittal', i0, j0);
         ++offset;
       }
@@ -151,8 +158,8 @@ var MPRPixGenerator = function (options) {
     if (sliceNumber < halfNSlices) {
       // axial
       offset = 0;
-      for (var j1 = 0; j1 < numberOfRows; ++j1) {
-        for (var i1 = 0; i1 < halfNCols; ++i1) {
+      for (let j1 = 0; j1 < numberOfRows; ++j1) {
+        for (let i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
             'axial', sliceNumber, i1);
           ++offset;
@@ -163,8 +170,8 @@ var MPRPixGenerator = function (options) {
     } else {
       // coronal
       offset = numberOfColumns * halfNRows;
-      for (var j2 = 0; j2 < halfNRows; ++j2) {
-        for (var i2 = 0; i2 < numberOfColumns; ++i2) {
+      for (let j2 = 0; j2 < halfNRows; ++j2) {
+        for (let i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
             'coronal', sliceNumber, j2 - 1);
           ++offset;
@@ -189,7 +196,7 @@ var MPRPixGenerator = function (options) {
    * @returns {number} The value at the given position.
    */
   function getFunc(name, i, j) {
-    var imgIdx = 0;
+    let imgIdx = 0;
     if (name === 'axial') {
       imgIdx = 0;
     } else if (name === 'coronal') {
@@ -208,7 +215,7 @@ var MPRPixGenerator = function (options) {
  * @param {object} image The associated image.
  * @returns {boolean} True if the tags are ok.
  */
-function checkTags(tags, image) {
+function mprCheckTags(tags, image) {
   /**
    * @param {number} value The value to check.
    * @returns {number} The expected value.
@@ -217,7 +224,7 @@ function checkTags(tags, image) {
     return 2 * value;
   }
 
-  var needUpdate = false;
+  let needUpdate = false;
   if (tags.Columns !== getExpectedSize(image.width)) {
     tags.Columns = getExpectedSize(image.width);
     needUpdate = true;
@@ -229,8 +236,8 @@ function checkTags(tags, image) {
   return needUpdate;
 }
 
-dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
-dwv.dicom.pixelGenerators.mpr = {
+test.pixelGenerators = test.pixelGenerators || {};
+test.pixelGenerators.mpr = {
   generator: MPRPixGenerator,
-  checkTags: checkTags
+  checkTags: mprCheckTags
 };

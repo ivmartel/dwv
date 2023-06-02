@@ -1,17 +1,74 @@
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
+// Do not warn if these variables were not defined before.
+/* global dwv */
+
+// namespaces
+// eslint-disable-next-line no-var
+var test = test || {};
+// eslint-disable-next-line no-var
 var JSZip = JSZip || {};
 
+// call setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+/**
+ * Setup.
+ */
+function onDOMContentLoaded() {
+  const intagsfileInput = document.getElementById('intagsfile');
+  intagsfileInput.onchange = onInputTagsFile;
+  const jsonlintButton = document.getElementById('jsonlint');
+  jsonlintButton.onclick = launchJSONLint;
+  const saveButton = document.getElementById('save');
+  saveButton.onclick = onSaveTags;
+  const inImgfileInput = document.getElementById('inImgfile');
+  inImgfileInput.onchange = onInputImageFiles;
+  const generateButton = document.getElementById('generate');
+  generateButton.onclick = onGenerate;
+
+  const tags = JSON.parse(document.getElementById('tags').value);
+  if (tags) {
+    // set study date
+    const now = new Date();
+    tags.StudyDate = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0');
+    tags.StudyTime = now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0');
+    // UID
+    if (typeof tags.StudyInstanceUID === 'undefined') {
+      tags.StudyInstanceUID = dwv.getUID('StudyInstanceUID');
+      tags.StudyID = 10000;
+    }
+    if (typeof tags.StudyDescription === 'undefined') {
+      tags.StudyDescription = 'dwv generated data';
+    }
+    if (typeof tags.SeriesInstanceUID === 'undefined') {
+      tags.SeriesInstanceUID = dwv.getUID('SeriesInstanceUID');
+      tags.SeriesNumber = tags.StudyID + 10;
+    }
+    if (typeof tags.SeriesDescription === 'undefined') {
+      tags.SeriesDescription = 'Test data #0';
+    }
+    tags.SOPInstanceUID = dwv.getUID('SOPInstanceUID');
+    // write back
+    document.getElementById('tags').value = JSON.stringify(tags, null, 2);
+  }
+
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.DEBUG;
+}
+
 // tags file
-var _tagsFile = null;
-var _images = null;
-var _generating = false;
+let _tagsFile = null;
+let _images = null;
+let _generating = false;
 
 /**
  * @returns {string} The name of the selected pixel generator.
  */
 function getPixelGeneratorName() {
-  var tags = JSON.parse(document.getElementById('tags').value);
+  const tags = JSON.parse(document.getElementById('tags').value);
   // optional pixel generator (cannot be propagated)
   return tags.PixelData;
 }
@@ -19,7 +76,7 @@ function getPixelGeneratorName() {
 /**
  * Generate DICOM data
  */
-dwv.test.onGenerate = function () {
+function onGenerate() {
   if (_generating) {
     return;
   }
@@ -28,15 +85,15 @@ dwv.test.onGenerate = function () {
   if (!isValidTags()) {
     return;
   }
-  var pixelGeneratorName = getPixelGeneratorName();
+  const pixelGeneratorName = getPixelGeneratorName();
 
-  var zip = new JSZip();
+  const zip = new JSZip();
 
-  var numberOfSlices = document.getElementById('numberofslices').value;
+  const numberOfSlices = document.getElementById('numberofslices').value;
 
   console.log('Generating slices...');
-  var blob;
-  for (var k = 0; k < numberOfSlices; ++k) {
+  let blob;
+  for (let k = 0; k < numberOfSlices; ++k) {
     try {
       blob = generateSlice(pixelGeneratorName, k);
     } catch (error) {
@@ -49,7 +106,7 @@ dwv.test.onGenerate = function () {
 
   zip.generateAsync({type: 'blob'}).then(function (blob) {
     console.log('Zipping data...');
-    var element = document.getElementById('generate');
+    const element = document.getElementById('generate');
     element.download = 'dwv-generated.zip';
     element.href = URL.createObjectURL(blob);
 
@@ -67,7 +124,7 @@ dwv.test.onGenerate = function () {
     console.error(error);
     alert(error.message);
   });
-};
+}
 
 /**
  *
@@ -76,19 +133,19 @@ dwv.test.onGenerate = function () {
  * @returns {Blob} A blob with the slice DICOM data.
  */
 function generateSlice(pixelGeneratorName, sliceNumber) {
-  var numberOfSlices = document.getElementById('numberofslices').value;
+  const numberOfSlices = document.getElementById('numberofslices').value;
 
   // get tags from the textarea
-  var tags = JSON.parse(document.getElementById('tags').value);
+  const tags = JSON.parse(document.getElementById('tags').value);
   // remove extra
   delete tags.PixelData;
   // image position
-  var spacing = 1;
+  let spacing = 1;
   if (typeof tags.PixelSpacing !== 'undefined') {
     spacing = tags.PixelSpacing[0];
   }
-  var orientationName =
-    dwv.dicom.getOrientationName(tags.ImageOrientationPatient);
+  const orientationName =
+    dwv.getOrientationName(tags.ImageOrientationPatient);
   if (orientationName === 'axial') {
     tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
   } else if (orientationName === 'coronal') {
@@ -100,37 +157,37 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
-  var dicomElements = dwv.dicom.getElementsFromJSONTags(tags);
+  const dicomElements = dwv.getElementsFromJSONTags(tags);
   // pixels
-  dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(
+  dicomElements['7FE00010'] = test.generatePixelDataFromJSONTags(
     tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
 
   // create writer
-  var writer = new dwv.dicom.DicomWriter();
-  var dicomBuffer = writer.getBuffer(dicomElements);
+  const writer = new dwv.DicomWriter();
+  const dicomBuffer = writer.getBuffer(dicomElements);
 
   // view as Blob to allow download
-  var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
   return blob;
 }
 
 /**
  * Save the tags as a JSON file.
  */
-dwv.test.onSaveTags = function () {
+function onSaveTags() {
   // check validity
   if (!isValidTags()) {
     return;
   }
   // get text from the textarea
-  var text = document.getElementById('tags').value;
+  const text = document.getElementById('tags').value;
   // view as Blob to allow download
-  var blob = new Blob([text], {type: 'text/plain'});
+  const blob = new Blob([text], {type: 'text/plain'});
   // update save button
-  var element = document.getElementById('save');
+  const element = document.getElementById('save');
   element.download = (_tagsFile === null ? 'tags.json' : _tagsFile.name);
   element.href = URL.createObjectURL(blob);
-};
+}
 
 /**
  * Is the JSON valid?
@@ -151,49 +208,49 @@ function isValidTags() {
 /**
  * Open JSONLint to check the tags.
  */
-dwv.test.launchJSONlint = function () {
-  var text = document.getElementById('tags').value;
-  var link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
+function launchJSONLint() {
+  const text = document.getElementById('tags').value;
+  const link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
   window.open(link);
-};
+}
 
 /**
  * Handle input tags file.
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputTagsFile = function (event) {
+function onInputTagsFile(event) {
   if (event.target.files.length === 0) {
     return;
   }
   _tagsFile = event.target.files[0];
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function (event) {
     document.getElementById('tags').value = event.target.result;
   };
   reader.readAsText(_tagsFile);
-};
+}
 
 /**
  * Handle input image file
  *
  * @param {object} event The input field event.
  */
-dwv.test.onInputImageFiles = function (event) {
+function onInputImageFiles(event) {
   if (event.target.files.length === 0) {
     return;
   }
-  var files = event.target.files;
+  const files = event.target.files;
 
   // update number of slices field
   document.getElementById('numberofslices').value = files.length;
 
-  var checkTags = function (/*tags, image*/) {
+  let checkTags = function (/*tags, image*/) {
     return false;
   };
-  var pixGeneratorName = getPixelGeneratorName();
-  if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] !== 'undefined') {
-    checkTags = dwv.dicom.pixelGenerators[pixGeneratorName].checkTags;
+  const pixGeneratorName = getPixelGeneratorName();
+  if (typeof test.pixelGenerators[pixGeneratorName] !== 'undefined') {
+    checkTags = test.pixelGenerators[pixGeneratorName].checkTags;
   }
 
   /**
@@ -202,13 +259,13 @@ dwv.test.onInputImageFiles = function (event) {
    * @param {object} event The reader load event.
    */
   function onReaderLoad(event) {
-    var image = new Image();
-    image.origin = file.name;
+    const image = new Image();
+    image.origin = event.target.file.name;
     // check size
     image.onload = function () {
       if (_images.length === 0) {
         // update tags if needed at first image load
-        var tags = JSON.parse(document.getElementById('tags').value);
+        const tags = JSON.parse(document.getElementById('tags').value);
         if (checkTags(tags, this)) {
           /* eslint-disable-next-line no-alert */
           alert('Updating tags to input image meta data.');
@@ -216,7 +273,7 @@ dwv.test.onInputImageFiles = function (event) {
         }
       } else {
         // check all images have equal sizes
-        var message;
+        let message;
         if (this.width !== _images[0].width) {
           message = 'Image width mismatch between input files: ' +
               this.width + ' != ' + _images[0].width;
@@ -240,45 +297,10 @@ dwv.test.onInputImageFiles = function (event) {
   }
 
   _images = [];
-  for (var i = 0; i < files.length; ++i) {
-    var file = files[i];
-    var reader = new FileReader();
+  for (let i = 0; i < files.length; ++i) {
+    const file = files[i];
+    const reader = new FileReader();
     reader.onload = onReaderLoad;
     reader.readAsDataURL(file);
   }
-};
-
-/**
- * Last minute.
- */
-dwv.test.onDOMContentLoadedGenerator = function (/*event*/) {
-  var tags = JSON.parse(document.getElementById('tags').value);
-  if (tags) {
-    // set study date
-    var now = new Date();
-    tags.StudyDate = now.getFullYear().toString() +
-      (now.getMonth() + 1).toString().padStart(2, '0') +
-      now.getDate().toString().padStart(2, '0');
-    tags.StudyTime = now.getHours().toString().padStart(2, '0') +
-      now.getMinutes().toString().padStart(2, '0') +
-      now.getSeconds().toString().padStart(2, '0');
-    // UID
-    if (typeof tags.StudyInstanceUID === 'undefined') {
-      tags.StudyInstanceUID = dwv.dicom.getUID('StudyInstanceUID');
-      tags.StudyID = 10000;
-    }
-    if (typeof tags.StudyDescription === 'undefined') {
-      tags.StudyDescription = 'dwv generated data';
-    }
-    if (typeof tags.SeriesInstanceUID === 'undefined') {
-      tags.SeriesInstanceUID = dwv.dicom.getUID('SeriesInstanceUID');
-      tags.SeriesNumber = tags.StudyID + 10;
-    }
-    if (typeof tags.SeriesDescription === 'undefined') {
-      tags.SeriesDescription = 'Test data #0';
-    }
-    tags.SOPInstanceUID = dwv.dicom.getUID('SOPInstanceUID');
-    // write back
-    document.getElementById('tags').value = JSON.stringify(tags, null, 2);
-  }
-};
+}

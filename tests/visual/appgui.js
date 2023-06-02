@@ -6,45 +6,53 @@
  * - Right click on the thumbnail in the left 'Document tree area',
  * - Choose 'Convert to JPEG'.
  */
+// Do not warn if these variables were not defined before.
+/* global dwv */
 
-// Image decoders (for web workers)
-dwv.image.decoderScripts = {
-  jpeg2000: '../../decoders/pdfjs/decode-jpeg2000.js',
-  'jpeg-lossless': '../../decoders/rii-mango/decode-jpegloss.js',
-  'jpeg-baseline': '../../decoders/pdfjs/decode-jpegbaseline.js',
-  rle: '../../decoders/dwv/decode-rle.js'
+// namespace
+// eslint-disable-next-line no-var
+var test = test || {};
+
+// initialise dwv
+test.initDwv = function () {
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.DEBUG;
+  // image decoders (for web workers)
+  dwv.decoderScripts.jpeg2000 =
+    '../../decoders/pdfjs/decode-jpeg2000.js';
+  dwv.decoderScripts['jpeg-lossless'] =
+    '../../decoders/rii-mango/decode-jpegloss.js';
+  dwv.decoderScripts['jpeg-baseline'] =
+    '../../decoders/pdfjs/decode-jpegbaseline.js';
+  dwv.decoderScripts.rle =
+    '../../decoders/dwv/decode-rle.js';
 };
 
-// logger level (optional)
-dwv.logger.level = dwv.utils.logger.levels.DEBUG;
-
-// check environment support
-dwv.env.check();
-
 // test data line
-dwv.addDataLine = function (id, fileroot, doc) {
-  var mainDiv = document.getElementById('data-lines');
+test.addDataLine = function (id, fileroot, doc) {
+
+  const mainDiv = document.getElementById('data-lines');
 
   // dwv container
-  var dwvDiv = document.createElement('div');
+  const dwvDiv = document.createElement('div');
   dwvDiv.id = 'dwv' + id;
   dwvDiv.className = 'dwv';
-  var layConDiv = document.createElement('div');
+  const layConDiv = document.createElement('div');
   layConDiv.id = 'layerGroup' + id;
   layConDiv.className = 'layerGroup';
   dwvDiv.appendChild(layConDiv);
   mainDiv.appendChild(dwvDiv);
 
   // dwv application
-  var config = {
+  const config = {
     dataViewConfigs: {0: [{divId: layConDiv.id}]},
   };
-  var url = '../data/' + fileroot + '.dcm';
-  var app = new dwv.App();
+  const url = '../data/' + fileroot + '.dcm';
+  const app = new dwv.App();
   app.init(config);
   // display loading time
-  var listener = function (event) {
-    var timerLabel = 'load-data[' + fileroot + ']';
+  const listener = function (event) {
+    const timerLabel = 'load-data[' + fileroot + ']';
     if (event.type === 'loadstart') {
       console.time(timerLabel);
     } else if (event.type === 'loadend') {
@@ -57,27 +65,27 @@ dwv.addDataLine = function (id, fileroot, doc) {
   app.loadURLs([url]);
 
   // image
-  var image = document.createElement('img');
+  const image = document.createElement('img');
   image.src = './images/' + fileroot + '.jpg';
   image.setAttribute('class', 'snapshot');
   mainDiv.appendChild(image);
 
   // doc
-  var docDiv = document.createElement('div');
+  const docDiv = document.createElement('div');
   docDiv.setAttribute('class', 'doc');
-  var docUl = document.createElement('ul');
-  var keys = Object.keys(doc);
-  for (var i = 0; i < keys.length; ++i) {
-    var li = document.createElement('li');
-    var spanKey = document.createElement('span');
+  const docUl = document.createElement('ul');
+  const keys = Object.keys(doc);
+  for (let i = 0; i < keys.length; ++i) {
+    const li = document.createElement('li');
+    const spanKey = document.createElement('span');
     spanKey.setAttribute('class', 'key');
     spanKey.appendChild(document.createTextNode(keys[i]));
-    var spanValue = document.createElement('span');
+    const spanValue = document.createElement('span');
     spanValue.setAttribute('class', 'value');
     spanValue.appendChild(document.createTextNode(doc[keys[i]]));
     if (keys[i] === 'origin') {
 
-      var spanOrig = document.createElement('span');
+      const spanOrig = document.createElement('span');
       spanOrig.setAttribute('class', 'path');
       spanOrig.setAttribute('title', doc.path);
       spanOrig.appendChild(document.createTextNode(doc[keys[i]]));
@@ -98,7 +106,7 @@ dwv.addDataLine = function (id, fileroot, doc) {
   mainDiv.appendChild(docDiv);
 
   // separator
-  var sepDiv = document.createElement('div');
+  const sepDiv = document.createElement('div');
   sepDiv.setAttribute('class', 'separator');
   mainDiv.appendChild(sepDiv);
 };

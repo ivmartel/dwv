@@ -1,7 +1,21 @@
-// namespace
-var dwv = dwv || {};
-dwv.test = dwv.test || {};
-dwv.test.data = dwv.test.data || {};
+import {Point3D} from '../../src/math/point';
+import {Index} from '../../src/math/index';
+import {
+  Matrix33,
+  getIdentityMat33,
+  getMatrixFromName
+} from '../../src/math/matrix';
+import {Size} from '../../src/image/size';
+import {Spacing} from '../../src/image/spacing';
+import {Geometry} from '../../src/image/geometry';
+import {
+  simpleRange,
+  simpleRange3d,
+  range,
+  rangeRegion,
+  getSliceIterator
+} from '../../src/image/iterator';
+import {Image} from '../../src/image/image';
 
 /**
  * Tests for the 'image/iterator.js' file.
@@ -10,7 +24,7 @@ dwv.test.data = dwv.test.data || {};
 /* global QUnit */
 
 /* eslint-disable array-element-newline */
-dwv.test.data.iterator0 = {
+const dataIterator0 = {
   ncols: 3,
   nrows: 2,
   nslices: 4,
@@ -153,15 +167,15 @@ dwv.test.data.iterator0 = {
  * @param {object} iter The iterator.
  * @returns {Array} The result array.
  */
-dwv.test.runIterator = function (iter) {
-  var res = [];
-  var ival = iter.next();
+function runIterator(iter) {
+  const res = [];
+  let ival = iter.next();
   while (!ival.done) {
     res.push(ival.value);
     ival = iter.next();
   }
   return res;
-};
+}
 
 /**
  * Check iter.
@@ -171,29 +185,29 @@ dwv.test.runIterator = function (iter) {
  * @param {Array} theoValues Theoretical values.
  * @param {string} name String to identify test.
  */
-dwv.test.checkIterator = function (assert, getIter, theoValues, name) {
-  for (var i = 0; i < theoValues.length; ++i) {
-    var res = dwv.test.runIterator(getIter(i));
-    var theo = theoValues[i];
+function checkIterator(assert, getIter, theoValues, name) {
+  for (let i = 0; i < theoValues.length; ++i) {
+    const res = runIterator(getIter(i));
+    const theo = theoValues[i];
     assert.deepEqual(res, theo, 'range ' + name + ' #' + i);
   }
-};
+}
 
 /**
- * Tests for {@link dwv.image.simpleRange}.
+ * Tests for {@link simpleRange}.
  *
  * @function module:tests/image~simpleRange
  */
 QUnit.test('Test simpleRange iterator.', function (assert) {
-  var dataAccessor = function (offset) {
+  const dataAccessor = function (offset) {
     return offset;
   };
   // test #0: default increment
-  var test0Min = 0;
-  var test0Max = 10;
-  var i0Theo = test0Min;
-  var iter0 = dwv.image.simpleRange(dataAccessor, test0Min, test0Max);
-  var ival0 = iter0.next();
+  const test0Min = 0;
+  const test0Max = 10;
+  let i0Theo = test0Min;
+  const iter0 = simpleRange(dataAccessor, test0Min, test0Max);
+  let ival0 = iter0.next();
   while (!ival0.done) {
     assert.equal(ival0.value, i0Theo, '#0 iterator next');
     ival0 = iter0.next();
@@ -202,13 +216,13 @@ QUnit.test('Test simpleRange iterator.', function (assert) {
   assert.equal(test0Max, i0Theo, '#0 iterator max');
 
   // test #1: specific increment
-  var test1Min = 1;
-  var test1Max = 21;
-  var test1Incr = 2;
-  var i1Theo = test1Min;
-  var iter1 = dwv.image.simpleRange(
+  const test1Min = 1;
+  const test1Max = 21;
+  const test1Incr = 2;
+  let i1Theo = test1Min;
+  const iter1 = simpleRange(
     dataAccessor, test1Min, test1Max, test1Incr);
-  var ival1 = iter1.next();
+  let ival1 = iter1.next();
   while (!ival1.done) {
     assert.equal(ival1.value, i1Theo, '#1 iterator next');
     ival1 = iter1.next();
@@ -218,197 +232,197 @@ QUnit.test('Test simpleRange iterator.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.image.range}.
+ * Tests for {@link range}.
  *
  * @function module:tests/image~range
  */
 QUnit.test('Test range iterator: axial', function (assert) {
   // test data
-  var testData0 = dwv.test.data.iterator0;
-  var ncols = testData0.ncols;
-  var nrows = testData0.nrows;
-  var sliceSize = ncols * nrows;
-  var dataAccessor = function (offset) {
+  const testData0 = dataIterator0;
+  const ncols = testData0.ncols;
+  const nrows = testData0.nrows;
+  const sliceSize = ncols * nrows;
+  const dataAccessor = function (offset) {
     return testData0.buffer[offset];
   };
 
   // axial: xyz
-  var getAxIter = function (reverse1, reverse2) {
+  const getAxIter = function (reverse1, reverse2) {
     return function (index) {
-      var min = index * sliceSize;
-      var max = min + sliceSize;
-      var start = reverse1 ? max - 1 : min;
-      var maxIter = sliceSize;
-      return dwv.image.range(dataAccessor,
+      const min = index * sliceSize;
+      const max = min + sliceSize;
+      const start = reverse1 ? max - 1 : min;
+      const maxIter = sliceSize;
+      return range(dataAccessor,
         start, maxIter, 1, ncols, ncols, reverse1, reverse2);
     };
   };
 
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAxIter(false, false), testData0.valuesAx, 'axial');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAxIter(true, false), testData0.valuesAxR1, 'axialR1');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAxIter(false, true), testData0.valuesAxR2, 'axialR2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAxIter(true, true), testData0.valuesAxR1R2, 'axialR1R2');
 
   // axial: yxz
-  var getAx2Iter = function (reverse1, reverse2) {
+  const getAx2Iter = function (reverse1, reverse2) {
     return function (index) {
-      var min = index * sliceSize;
-      var max = min + sliceSize;
-      var start = reverse1 ? max - 1 : min;
-      var maxIter = sliceSize;
-      return dwv.image.range(dataAccessor,
+      const min = index * sliceSize;
+      const max = min + sliceSize;
+      const start = reverse1 ? max - 1 : min;
+      const maxIter = sliceSize;
+      return range(dataAccessor,
         start, maxIter, ncols, nrows, 1, reverse1, reverse2);
     };
   };
 
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAx2Iter(false, false), testData0.valuesAx2, 'axial2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAx2Iter(true, false), testData0.valuesAx2R1, 'axial2R1');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAx2Iter(false, true), testData0.valuesAx2R2, 'axial2R2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAx2Iter(true, true), testData0.valuesAx2R1R2, 'axial2R1R2');
 });
 
 /**
- * Tests for {@link dwv.image.range}.
+ * Tests for {@link range}.
  *
  * @function module:tests/image~range
  */
 QUnit.test('Test range iterator: coronal', function (assert) {
   // test data
-  var testData0 = dwv.test.data.iterator0;
-  var ncols = testData0.ncols;
-  var nrows = testData0.nrows;
-  var nslices = testData0.nslices;
-  var sliceSize = ncols * nrows;
-  var dataAccessor = function (offset) {
+  const testData0 = dataIterator0;
+  const ncols = testData0.ncols;
+  const nrows = testData0.nrows;
+  const nslices = testData0.nslices;
+  const sliceSize = ncols * nrows;
+  const dataAccessor = function (offset) {
     return testData0.buffer[offset];
   };
 
   // coronal: xzy
-  var getCoroIter = function (reverse1, reverse2) {
+  const getCoroIter = function (reverse1, reverse2) {
     return function (index) {
-      var min = index * ncols;
-      var max = min + (nslices - 1) * sliceSize + ncols;
-      var start = reverse1 ? max - 1 : min;
-      var maxIter = nslices * ncols;
-      return dwv.image.range(dataAccessor,
+      const min = index * ncols;
+      const max = min + (nslices - 1) * sliceSize + ncols;
+      const start = reverse1 ? max - 1 : min;
+      const maxIter = nslices * ncols;
+      return range(dataAccessor,
         start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
     };
   };
 
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoroIter(false, false), testData0.valuesCo, 'coronal');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoroIter(true, false), testData0.valuesCoR1, 'coronalR1');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoroIter(false, true), testData0.valuesCoR2, 'coronalR2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoroIter(true, true), testData0.valuesCoR1R2, 'coronalR1R2');
 
   // coronal: zxy
-  var getCoro2Iter = function (reverse1, reverse2) {
+  const getCoro2Iter = function (reverse1, reverse2) {
     return function (index) {
-      var min = index * ncols;
-      var max = min + (nslices - 1) * sliceSize + ncols;
-      var start = reverse1 ? max - 1 : min;
-      var maxIter = nslices * ncols;
-      return dwv.image.range(dataAccessor,
+      const min = index * ncols;
+      const max = min + (nslices - 1) * sliceSize + ncols;
+      const start = reverse1 ? max - 1 : min;
+      const maxIter = nslices * ncols;
+      return range(dataAccessor,
         start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
     };
   };
 
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoro2Iter(false, false), testData0.valuesCo2, 'coronal2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoro2Iter(true, false), testData0.valuesCo2R1, 'coronal2R1');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoro2Iter(false, true), testData0.valuesCo2R2, 'coronal2R2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoro2Iter(true, true), testData0.valuesCo2R1R2, 'coronal2R1R2');
 });
 
 /**
- * Tests for {@link dwv.image.range}.
+ * Tests for {@link range}.
  *
  * @function module:tests/image~range
  */
 QUnit.test('Test range iterator: sagittal', function (assert) {
   // test data
-  var testData0 = dwv.test.data.iterator0;
-  var ncols = testData0.ncols;
-  var nrows = testData0.nrows;
-  var nslices = testData0.nslices;
-  var sliceSize = ncols * nrows;
-  var dataAccessor = function (offset) {
+  const testData0 = dataIterator0;
+  const ncols = testData0.ncols;
+  const nrows = testData0.nrows;
+  const nslices = testData0.nslices;
+  const sliceSize = ncols * nrows;
+  const dataAccessor = function (offset) {
     return testData0.buffer[offset];
   };
 
   // sagittal: yzx
-  var getSagIter = function (reverse1, reverse2) {
+  const getSagIter = function (reverse1, reverse2) {
     return function (index) {
-      var min = index;
-      var max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
-      var start = reverse1 ? max : min;
-      var maxIter = nslices * nrows;
-      return dwv.image.range(dataAccessor,
+      const min = index;
+      const max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
+      const start = reverse1 ? max : min;
+      const maxIter = nslices * nrows;
+      return range(dataAccessor,
         start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
     };
   };
 
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSagIter(false, false), testData0.valuesSa, 'sagittal');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSagIter(true, false), testData0.valuesSaR1, 'sagittalR1');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSagIter(false, true), testData0.valuesSaR2, 'sagittalR2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSagIter(true, true), testData0.valuesSaR1R2, 'sagittalR1R2');
 
   // sagittal: zyx
-  var getSag2Iter = function (reverse1, reverse2) {
+  const getSag2Iter = function (reverse1, reverse2) {
     return function (index) {
-      var min = index;
-      var max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
-      var start = reverse1 ? max : min;
-      var maxIter = nslices * nrows;
-      return dwv.image.range(dataAccessor,
+      const min = index;
+      const max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
+      const start = reverse1 ? max : min;
+      const maxIter = nslices * nrows;
+      return range(dataAccessor,
         start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
     };
   };
 
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSag2Iter(false, false), testData0.valuesSa2, 'sagittal2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSag2Iter(true, false), testData0.valuesSa2R1, 'sagittal2R1');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSag2Iter(false, true), testData0.valuesSa2R2, 'sagittal2R2');
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSag2Iter(true, true), testData0.valuesSa2R1R2, 'sagittal2R1R2');
 });
 
 /**
- * Tests for {@link dwv.image.simpleRange3d}.
+ * Tests for {@link simpleRange3d}.
  *
  * @function module:tests/image~simpleRange3d
  */
 QUnit.test('Test 3 components iterator.', function (assert) {
-  var dataAccessor = function (offset) {
+  const dataAccessor = function (offset) {
     return offset;
   };
   // test #0: default increment, default planar
-  var test0Min = 0;
-  var test0Size = 3;
-  var test0Max = test0Min + 3 * test0Size;
-  var i0Theo = test0Min;
-  var iter0 = dwv.image.simpleRange3d(dataAccessor, test0Min, test0Max);
-  var ival0 = iter0.next();
+  const test0Min = 0;
+  const test0Size = 3;
+  const test0Max = test0Min + 3 * test0Size;
+  let i0Theo = test0Min;
+  const iter0 = simpleRange3d(dataAccessor, test0Min, test0Max);
+  let ival0 = iter0.next();
   while (!ival0.done) {
     assert.equal(ival0.value[0], i0Theo, '#0 3d iterator value');
     assert.equal(ival0.value[1], i0Theo + 1, '#0 3d iterator value1');
@@ -420,14 +434,14 @@ QUnit.test('Test 3 components iterator.', function (assert) {
   assert.equal(test0Max, i0Theo, '#0 3d iterator max');
 
   // test #1: non default increment, default planar (false)
-  var test1Min = 1;
-  var test1Size = 6;
-  var test1Max = test1Min + 3 * test1Size;
-  var test1Incr = 2;
-  var i1Theo = test1Min;
-  var iter1 = dwv.image.simpleRange3d(
+  const test1Min = 1;
+  const test1Size = 6;
+  const test1Max = test1Min + 3 * test1Size;
+  const test1Incr = 2;
+  let i1Theo = test1Min;
+  const iter1 = simpleRange3d(
     dataAccessor, test1Min, test1Max, test1Incr);
-  var ival1 = iter1.next();
+  let ival1 = iter1.next();
   while (!ival1.done) {
     assert.equal(ival1.value[0], i1Theo, '#1 3d iterator value');
     assert.equal(ival1.value[1], i1Theo + 1, '#1 3d iterator value1');
@@ -438,13 +452,13 @@ QUnit.test('Test 3 components iterator.', function (assert) {
   assert.equal(test1Max, i1Theo, '#1 3d iterator max');
 
   // test #2: default increment, planar
-  var test2Min = 2;
-  var test2Size = 6;
-  var test2Max = test2Min + 3 * test2Size;
-  var i2Theo = test2Min;
-  var iter2 = dwv.image.simpleRange3d(
+  const test2Min = 2;
+  const test2Size = 6;
+  const test2Max = test2Min + 3 * test2Size;
+  let i2Theo = test2Min;
+  const iter2 = simpleRange3d(
     dataAccessor, test2Min, test2Max, 1, true);
-  var ival2 = iter2.next();
+  let ival2 = iter2.next();
   while (!ival2.done) {
     assert.equal(ival2.value[0], i2Theo, '#2 3d iterator value');
     assert.equal(ival2.value[1], i2Theo + test2Size, '#2 3d iterator value1');
@@ -456,14 +470,14 @@ QUnit.test('Test 3 components iterator.', function (assert) {
   assert.equal(test2Max, i2Theo, '#2 3d iterator max');
 
   // test #2: non default increment, planar
-  var test3Min = 3;
-  var test3Size = 6;
-  var test3Max = test3Min + 3 * test3Size;
-  var test3Incr = 2;
-  var i3Theo = test3Min;
-  var iter3 = dwv.image.simpleRange3d(
+  const test3Min = 3;
+  const test3Size = 6;
+  const test3Max = test3Min + 3 * test3Size;
+  const test3Incr = 2;
+  let i3Theo = test3Min;
+  const iter3 = simpleRange3d(
     dataAccessor, test3Min, test3Max, test3Incr, true);
-  var ival3 = iter3.next();
+  let ival3 = iter3.next();
   while (!ival3.done) {
     assert.equal(ival3.value[0], i3Theo, '#3 3d iterator value');
     assert.equal(ival3.value[1], i3Theo + test3Size, '#3 3d iterator value1');
@@ -476,121 +490,121 @@ QUnit.test('Test 3 components iterator.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.image.getSliceIterator}.
+ * Tests for {@link getSliceIterator}.
  *
  * @function module:tests/image~getSliceIterator
  */
 QUnit.test('Test getSliceIterator.', function (assert) {
 
   // test data
-  var testData0 = dwv.test.data.iterator0;
+  const testData0 = dataIterator0;
 
-  var imgSize00 = new dwv.image.Size([
+  const imgSize00 = new Size([
     testData0.ncols, testData0.nrows, 1
   ]);
-  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
-  var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
-  var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize00, imgSpacing0);
-  imgGeometry0.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
-  imgGeometry0.appendOrigin(new dwv.math.Point3D(0, 0, 2), 2);
-  imgGeometry0.appendOrigin(new dwv.math.Point3D(0, 0, 3), 3);
-  var image0 = new dwv.image.Image(imgGeometry0, testData0.buffer);
+  const imgSpacing0 = new Spacing([1, 1, 1]);
+  const imgOrigin0 = new Point3D(0, 0, 0);
+  const imgGeometry0 = new Geometry(imgOrigin0, imgSize00, imgSpacing0);
+  imgGeometry0.appendOrigin(new Point3D(0, 0, 1), 1);
+  imgGeometry0.appendOrigin(new Point3D(0, 0, 2), 2);
+  imgGeometry0.appendOrigin(new Point3D(0, 0, 3), 3);
+  const image0 = new Image(imgGeometry0, testData0.buffer);
 
-  var isRescaled = false;
-  var viewOrientation;
+  const isRescaled = false;
+  let viewOrientation;
 
   // axial
-  var getAxIter = function (orientation) {
+  const getAxIter = function (orientation) {
     return function (index) {
-      var position = new dwv.math.Index([0, 0, index]);
-      return dwv.image.getSliceIterator(
+      const position = new Index([0, 0, index]);
+      return getSliceIterator(
         image0, position, isRescaled, orientation);
     };
   };
 
   // axial: xyz
-  viewOrientation = dwv.math.getIdentityMat33();
-  dwv.test.checkIterator(assert,
+  viewOrientation = getIdentityMat33();
+  checkIterator(assert,
     getAxIter(viewOrientation), testData0.valuesAx, 'axial');
   // axial: yxz
   /* eslint-disable array-element-newline */
-  viewOrientation = new dwv.math.Matrix33([
+  viewOrientation = new Matrix33([
     0, 1, 0,
     1, 0, 0,
     0, 0, 1
   ]);
   /* eslint-enable array-element-newline */
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getAxIter(viewOrientation), testData0.valuesAx2, 'axial2');
 
   // coronal
-  var getCoroIter = function (orientation) {
+  const getCoroIter = function (orientation) {
     return function (index) {
-      var position = new dwv.math.Index([0, index, 0]);
-      return dwv.image.getSliceIterator(
+      const position = new Index([0, index, 0]);
+      return getSliceIterator(
         image0, position, isRescaled, orientation);
     };
   };
 
   // coronal: xzy
-  viewOrientation = dwv.math.getMatrixFromName('coronal');
-  dwv.test.checkIterator(assert,
+  viewOrientation = getMatrixFromName('coronal');
+  checkIterator(assert,
     getCoroIter(viewOrientation), testData0.valuesCo, 'coronal');
   // coronal: zxy
   /* eslint-disable array-element-newline */
-  viewOrientation = new dwv.math.Matrix33([
+  viewOrientation = new Matrix33([
     0, 1, 0,
     0, 0, 1,
     1, 0, 0
   ]);
   /* eslint-enable array-element-newline */
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getCoroIter(viewOrientation), testData0.valuesCo2, 'coronal2');
 
   // sagittal
-  var getSagIter = function (orientation) {
+  const getSagIter = function (orientation) {
     return function (index) {
-      var position = new dwv.math.Index([index, 0, 0]);
-      return dwv.image.getSliceIterator(
+      const position = new Index([index, 0, 0]);
+      return getSliceIterator(
         image0, position, isRescaled, orientation);
     };
   };
 
   // sagittal: yzx
-  viewOrientation = dwv.math.getMatrixFromName('sagittal');
-  dwv.test.checkIterator(assert,
+  viewOrientation = getMatrixFromName('sagittal');
+  checkIterator(assert,
     getSagIter(viewOrientation), testData0.valuesSa, 'sagittal');
   // sagittal: zyx
   /* eslint-disable array-element-newline */
-  viewOrientation = new dwv.math.Matrix33([
+  viewOrientation = new Matrix33([
     0, 0, 1,
     0, 1, 0,
     1, 0, 0
   ]);
   /* eslint-enable array-element-newline */
-  dwv.test.checkIterator(assert,
+  checkIterator(assert,
     getSagIter(viewOrientation), testData0.valuesSa2, 'sagittal2');
 });
 
 /**
- * Tests for {@link dwv.image.rangeRegion}.
+ * Tests for {@link rangeRegion}.
  *
  * @function module:tests/image~rangeRegion
  */
 QUnit.test('Test region iterator.', function (assert) {
-  var dataAccessor = function (offset) {
+  const dataAccessor = function (offset) {
     return offset;
   };
   // test #0: simulate regular iterator
-  var test0Min = 0;
-  var test0Max = 10;
-  var test0Incr = 1;
-  var test0NCols = 3;
-  var test0RowIncr = 0;
-  var i0Theo = test0Min;
-  var iter0 = dwv.image.rangeRegion(
+  const test0Min = 0;
+  const test0Max = 10;
+  const test0Incr = 1;
+  const test0NCols = 3;
+  const test0RowIncr = 0;
+  let i0Theo = test0Min;
+  const iter0 = rangeRegion(
     dataAccessor, test0Min, test0Max, test0Incr, test0NCols, test0RowIncr);
-  var ival0 = iter0.next();
+  let ival0 = iter0.next();
   while (!ival0.done) {
     assert.equal(ival0.value, i0Theo, '#0 iterator next');
     ival0 = iter0.next();
@@ -599,16 +613,16 @@ QUnit.test('Test region iterator.', function (assert) {
   assert.equal(test0Max, i0Theo, '#0 iterator max');
 
   // test #1: with col/row
-  var test1Min = 0;
-  var test1Max = 10;
-  var test1Incr = 1;
-  var test1NCols = 2;
-  var test1RowIncr = 1;
-  var i1Theo = test1Min;
-  var iter1 = dwv.image.rangeRegion(
+  const test1Min = 0;
+  const test1Max = 10;
+  const test1Incr = 1;
+  const test1NCols = 2;
+  const test1RowIncr = 1;
+  let i1Theo = test1Min;
+  const iter1 = rangeRegion(
     dataAccessor, test1Min, test1Max, test1Incr, test1NCols, test1RowIncr);
-  var ival1 = iter1.next();
-  var countCol = 0;
+  let ival1 = iter1.next();
+  let countCol = 0;
   while (!ival1.done) {
     assert.equal(ival1.value, i1Theo, '#1 iterator next');
     ival1 = iter1.next();

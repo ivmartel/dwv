@@ -1,76 +1,84 @@
-// namespaces
-var dwv = dwv || {};
-dwv.ctrl = dwv.ctrl || {};
+import {InteractionEventNames, getEventOffset} from '../gui/generic';
 
 /**
  * Toolbox controller.
- *
- * @param {Array} toolList The list of tool objects.
- * @class
  */
-dwv.ctrl.ToolboxController = function (toolList) {
+export class ToolboxController {
+
+  /**
+   * List of tools to control.
+   *
+   * @type {object}
+   */
+  #toolList;
+
   /**
    * Selected tool.
    *
    * @type {object}
-   * @private
    */
-  var selectedTool = null;
+  #selectedTool = null;
 
   /**
    * Callback store to allow attach/detach.
    *
    * @type {Array}
-   * @private
    */
-  var callbackStore = [];
+  #callbackStore = [];
 
   /**
    * Current layers bound to tool.
    *
    * @type {object}
-   * @private
    */
-  var boundLayers = {};
+  #boundLayers = {};
+
+  /**
+   * @param {object} toolList The list of tool objects.
+   */
+  constructor(toolList) {
+    this.#toolList = toolList;
+  }
 
   /**
    * Initialise.
    */
-  this.init = function () {
-    for (var key in toolList) {
-      toolList[key].init();
+  init() {
+    for (const key in this.#toolList) {
+      this.#toolList[key].init();
     }
     // keydown listener
-    window.addEventListener('keydown', getOnMouch('window', 'keydown'), true);
-  };
+    window.addEventListener('keydown',
+      this.#getOnMouch('window', 'keydown'), true);
+  }
 
   /**
    * Get the tool list.
    *
    * @returns {Array} The list of tool objects.
    */
-  this.getToolList = function () {
-    return toolList;
-  };
+  getToolList() {
+    return this.#toolList;
+  }
 
   /**
    * Check if a tool is in the tool list.
    *
    * @param {string} name The name to check.
-   * @returns {string} The tool list element for the given name.
+   * @returns {boolean} The tool list element for the given name.
    */
-  this.hasTool = function (name) {
+  hasTool(name) {
     return typeof this.getToolList()[name] !== 'undefined';
-  };
+  }
 
   /**
    * Get the selected tool.
    *
    * @returns {object} The selected tool.
    */
-  this.getSelectedTool = function () {
-    return selectedTool;
-  };
+  getSelectedTool() {
+    return this.#selectedTool;
+  }
 
   /**
    * Get the selected tool event handler.
@@ -79,40 +87,40 @@ dwv.ctrl.ToolboxController = function (toolList) {
    *   mousedown, touchstart...
    * @returns {Function} The event handler.
    */
-  this.getSelectedToolEventHandler = function (eventType) {
+  getSelectedToolEventHandler(eventType) {
     return this.getSelectedTool()[eventType];
-  };
+  }
 
   /**
    * Set the selected tool.
    *
    * @param {string} name The name of the tool.
    */
-  this.setSelectedTool = function (name) {
+  setSelectedTool(name) {
     // check if we have it
     if (!this.hasTool(name)) {
       throw new Error('Unknown tool: \'' + name + '\'');
     }
     // de-activate previous
-    if (selectedTool) {
-      selectedTool.activate(false);
+    if (this.#selectedTool) {
+      this.#selectedTool.activate(false);
     }
     // set internal var
-    selectedTool = toolList[name];
+    this.#selectedTool = this.#toolList[name];
     // activate new tool
-    selectedTool.activate(true);
-  };
+    this.#selectedTool.activate(true);
+  }
 
   /**
    * Set the selected tool live features.
    *
    * @param {object} list The list of features.
    */
-  this.setToolFeatures = function (list) {
+  setToolFeatures(list) {
     if (this.getSelectedTool()) {
       this.getSelectedTool().setFeatures(list);
     }
-  };
+  }
 
   /**
    * Listen to layer interaction events.
@@ -120,33 +128,33 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * @param {object} layer The layer to listen to.
    * @param {string} layerGroupDivId The associated layer group div id.
    */
-  this.bindLayer = function (layer, layerGroupDivId) {
-    if (typeof boundLayers[layerGroupDivId] !== 'undefined') {
-      unbindLayer(boundLayers[layerGroupDivId]);
+  bindLayer(layer, layerGroupDivId) {
+    if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
+      this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
     }
     layer.bindInteraction();
     // interaction events
-    var names = dwv.gui.interactionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       layer.addEventListener(names[i],
-        getOnMouch(layer.getId(), names[i]));
+        this.#getOnMouch(layer.getId(), names[i]));
     }
     // update class var
-    boundLayers[layerGroupDivId] = layer;
-  };
+    this.#boundLayers[layerGroupDivId] = layer;
+  }
 
   /**
    * Remove canvas mouse and touch listeners.
    *
    * @param {object} layer The layer to stop listening to.
    */
-  function unbindLayer(layer) {
+  #unbindLayer(layer) {
     layer.unbindInteraction();
     // interaction events
-    var names = dwv.gui.interactionEventNames;
-    for (var i = 0; i < names.length; ++i) {
+    const names = InteractionEventNames;
+    for (let i = 0; i < names.length; ++i) {
       layer.removeEventListener(names[i],
-        getOnMouch(layer.getId(), names[i]));
+        this.#getOnMouch(layer.getId(), names[i]));
     }
   }
 
@@ -158,13 +166,12 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * @param {string} layerId The layer id.
    * @param {string} eventType The event type.
    * @returns {object} A callback for the provided layer and event.
-   * @private
    */
-  function getOnMouch(layerId, eventType) {
+  #getOnMouch(layerId, eventType) {
     // augment event with converted offsets
-    var augmentEventOffsets = function (event) {
+    const augmentEventOffsets = function (event) {
       // event offset(s)
-      var offsets = dwv.gui.getEventOffset(event);
+      const offsets = getEventOffset(event);
       // should have at least one offset
       event._x = offsets[0].x;
       event._y = offsets[0].y;
@@ -175,22 +182,22 @@ dwv.ctrl.ToolboxController = function (toolList) {
       }
     };
 
-    var applySelectedTool = function (event) {
+    const applySelectedTool = (event) => {
       // make sure we have a tool
-      if (selectedTool) {
-        var func = selectedTool[event.type];
+      if (this.#selectedTool) {
+        const func = this.#selectedTool[event.type];
         if (func) {
           func(event);
         }
       }
     };
 
-    if (typeof callbackStore[layerId] === 'undefined') {
-      callbackStore[layerId] = [];
+    if (typeof this.#callbackStore[layerId] === 'undefined') {
+      this.#callbackStore[layerId] = [];
     }
 
-    if (typeof callbackStore[layerId][eventType] === 'undefined') {
-      var callback = null;
+    if (typeof this.#callbackStore[layerId][eventType] === 'undefined') {
+      let callback = null;
       if (eventType === 'keydown') {
         callback = function (event) {
           applySelectedTool(event);
@@ -207,10 +214,10 @@ dwv.ctrl.ToolboxController = function (toolList) {
         };
       }
       // store callback
-      callbackStore[layerId][eventType] = callback;
+      this.#callbackStore[layerId][eventType] = callback;
     }
 
-    return callbackStore[layerId][eventType];
+    return this.#callbackStore[layerId][eventType];
   }
 
-}; // class ToolboxController
+} // class ToolboxController
