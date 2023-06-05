@@ -49,7 +49,7 @@ import {App} from '../app/application';
  *   const index = vc.getCurrentIndex();
  *   const values = index.getValues();
  *   values[2] = this.value;
- *   vc.setCurrentIndex(new math.Index(values));
+ *   vc.setCurrentIndex(new Index(values));
  * }
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {
