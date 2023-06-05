@@ -1,0 +1,762 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/dicom/dicomElementsWrapper.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="",baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body class="dark" data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="F1NKGTv-ZDM7UE1m6Ja8y"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="mRgskexXZzuf_-ZvMasO6"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="BGC7bqK3tK0Y0vJXkOF1z"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="rWcxPDxnm-QnhJc3MHMic"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="09uo6OYAA48lX1leRYO5L"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_dicom_dicomElementsWrapper.js</h1></header><article><pre class="prettyprint source lang-js"><code>import {
+  DicomParser,
+  getTransferSyntaxName
+} from './dicomParser';
+import {
+  isPixelDataTag,
+  isItemDelimitationItemTag,
+  isSequenceDelimitationItemTag,
+  getItemTag,
+  getItemDelimitationItemTag,
+  getSequenceDelimitationItemTag,
+  getPixelDataTag,
+  getTagFromDictionary,
+  getTagFromKey
+} from './dicomTag';
+import {isNativeLittleEndian} from './dataReader';
+import {Spacing} from '../image/spacing';
+import {logger} from '../utils/logger';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Tag} from './dicomTag';
+/* eslint-enable no-unused-vars */
+
+/**
+ * DicomElements wrapper.
+ *
+ * Warning: limited support for merged meta data.
+ */
+export class DicomElementsWrapper {
+
+  /**
+   * Wrapped elements.
+   *
+   * @type {Array}
+   */
+  #dicomElements;
+
+  /**
+   * @param {Array} dicomElements The elements to wrap.
+   */
+  constructor(dicomElements) {
+    this.#dicomElements = dicomElements;
+  }
+
+  /**
+   * Get a DICOM Element value from a group/element key.
+   *
+   * @param {string} groupElementKey The key to retrieve.
+   * @param {boolean} [asArray] Get the value as an Array.
+   * @returns {object} The DICOM element value.
+   */
+  getFromKey(groupElementKey, asArray) {
+    // default
+    if (typeof asArray === 'undefined') {
+      asArray = false;
+    }
+    let value = null;
+    const dElement = this.#dicomElements[groupElementKey];
+    if (typeof dElement !== 'undefined') {
+      // raw value if only one
+      if (dElement.value.length === 1 &amp;&amp; asArray === false) {
+        value = dElement.value[0];
+      } else {
+        value = dElement.value;
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Dump the DICOM tags to an object.
+   *
+   * @returns {object} The DICOM tags as an object.
+   */
+  dumpToObject() {
+    const keys = Object.keys(this.#dicomElements);
+    const obj = {};
+    let dicomElement = null;
+    for (let i = 0, leni = keys.length; i &lt; leni; ++i) {
+      dicomElement = this.#dicomElements[keys[i]];
+      const tag = getTagFromKey(keys[i]);
+      obj[this.#getTagName(tag)] =
+        this.#getElementAsObject(tag, dicomElement);
+    }
+    return obj;
+  }
+
+  /**
+   * Get a tag string name from the dictionary.
+   *
+   * @param {object} tag The DICOM tag object.
+   * @returns {string} The tag name.
+   */
+  #getTagName(tag) {
+    let name = tag.getNameFromDictionary();
+    if (name === null) {
+      name = tag.getKey();
+    }
+    return name;
+  }
+
+  /**
+   * Get a DICOM element as a simple object.
+   *
+   * @param {Tag} tag The DICOM tag.
+   * @param {object} dicomElement The DICOM element.
+   * @returns {object} The element as a simple object.
+   */
+  #getElementAsObject(tag, dicomElement) {
+    // element value
+    let value = null;
+
+    const isPixel = isPixelDataTag(tag);
+
+    const vr = dicomElement.vr;
+    if (vr === 'SQ' &amp;&amp;
+      typeof dicomElement.value !== 'undefined' &amp;&amp;
+      !isPixel) {
+      value = [];
+      const items = dicomElement.value;
+      let itemValues = null;
+      for (let i = 0; i &lt; items.length; ++i) {
+        itemValues = {};
+        const keys = Object.keys(items[i]);
+        for (let k = 0; k &lt; keys.length; ++k) {
+          const itemElement = items[i][keys[k]];
+          const tag = getTagFromKey(keys[k]);
+          const key = this.#getTagName(tag);
+          // do not inclure Item elements
+          if (key !== 'Item') {
+            itemValues[key] = this.#getElementAsObject(tag, itemElement);
+          }
+        }
+        value.push(itemValues);
+      }
+    } else {
+      value = this.#getElementValueAsString(tag, dicomElement);
+    }
+
+    // return
+    return {
+      value: value,
+      vr: vr
+    };
+  }
+
+  /**
+   * Dump the DICOM tags to a string.
+   *
+   * @returns {string} The dumped file.
+   */
+  dump() {
+    const keys = Object.keys(this.#dicomElements);
+    let result = '\n';
+    result += '# Dicom-File-Format\n';
+    result += '\n';
+    result += '# Dicom-Meta-Information-Header\n';
+    result += '# Used TransferSyntax: ';
+    if (isNativeLittleEndian()) {
+      result += 'Little Endian Explicit\n';
+    } else {
+      result += 'NOT Little Endian Explicit\n';
+    }
+    let dicomElement = null;
+    let tag = null;
+    let checkHeader = true;
+    for (let i = 0, leni = keys.length; i &lt; leni; ++i) {
+      dicomElement = this.#dicomElements[keys[i]];
+      tag = getTagFromKey(keys[i]);
+      if (checkHeader &amp;&amp; tag.getGroup() !== '0002') {
+        result += '\n';
+        result += '# Dicom-Data-Set\n';
+        result += '# Used TransferSyntax: ';
+        const syntax = this.#dicomElements['00020010'].value[0];
+        result += getTransferSyntaxName(syntax);
+        result += '\n';
+        checkHeader = false;
+      }
+      result += this.#getElementAsString(tag, dicomElement) + '\n';
+    }
+    return result;
+  }
+
+  /**
+   * Get a data element value as a string.
+   *
+   * @param {Tag} tag The DICOM tag.
+   * @param {object} dicomElement The DICOM element.
+   * @param {boolean} [pretty] When set to true, returns a 'pretified' content.
+   * @returns {string} A string representation of the DICOM element.
+   */
+  #getElementValueAsString(tag, dicomElement, pretty) {
+    let str = '';
+    const strLenLimit = 65;
+
+    // dafault to pretty output
+    if (typeof pretty === 'undefined') {
+      pretty = true;
+    }
+    // check dicom element input
+    if (typeof dicomElement === 'undefined' || dicomElement === null) {
+      return str;
+    }
+
+    // Polyfill for Number.isInteger.
+    const isInteger = Number.isInteger || function (value) {
+      return typeof value === 'number' &amp;&amp;
+        isFinite(value) &amp;&amp;
+        Math.floor(value) === value;
+    };
+
+    // TODO Support sequences.
+
+    if (dicomElement.vr !== 'SQ' &amp;&amp;
+      dicomElement.value.length === 1 &amp;&amp; dicomElement.value[0] === '') {
+      str += '(no value available)';
+    } else if (isPixelDataTag(tag) &amp;&amp;
+      dicomElement.undefinedLength) {
+      str = '(PixelSequence)';
+    } else if (dicomElement.vr === 'DA' &amp;&amp; pretty) {
+      const daObj = getDate(dicomElement);
+      const da = new Date(daObj.year, daObj.monthIndex, daObj.day);
+      str = da.toLocaleDateString();
+    } else if (dicomElement.vr === 'TM' &amp;&amp; pretty) {
+      const tmObj = getTime(dicomElement);
+      str = tmObj.hours + ':' + tmObj.minutes + ':' + tmObj.seconds;
+    } else {
+      let isOtherVR = false;
+      if (dicomElement.vr.length !== 0) {
+        isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
+      }
+      const isFloatNumberVR = (dicomElement.vr === 'FL' ||
+        dicomElement.vr === 'FD' ||
+        dicomElement.vr === 'DS');
+      let valueStr = '';
+      for (let k = 0, lenk = dicomElement.value.length; k &lt; lenk; ++k) {
+        valueStr = '';
+        if (k !== 0) {
+          valueStr += '\\';
+        }
+        if (isFloatNumberVR) {
+          const num = Number(dicomElement.value[k]);
+          if (!isInteger(num) &amp;&amp; pretty) {
+            valueStr += num.toPrecision(4);
+          } else {
+            valueStr += num.toString();
+          }
+        } else if (isOtherVR) {
+          let tmp = dicomElement.value[k].toString(16);
+          if (dicomElement.vr === 'OB') {
+            tmp = '00'.substring(0, 2 - tmp.length) + tmp;
+          } else {
+            tmp = '0000'.substring(0, 4 - tmp.length) + tmp;
+          }
+          valueStr += tmp;
+        } else {
+          valueStr += dicomElement.value[k];
+        }
+        // check length
+        if (str.length + valueStr.length &lt;= strLenLimit) {
+          str += valueStr;
+        } else {
+          str += '...';
+          break;
+        }
+      }
+    }
+    return str;
+  }
+
+  /**
+   * Get a data element as a string.
+   *
+   * @param {Tag} tag The DICOM tag.
+   * @param {object} dicomElement The DICOM element.
+   * @param {string} [prefix] A string to prepend this one.
+   * @returns {string} The element as a string.
+   */
+  #getElementAsString(tag, dicomElement, prefix) {
+    // default prefix
+    prefix = prefix || '';
+
+    // get tag anme from dictionary
+    const tagName = tag.getNameFromDictionary();
+
+    let deSize = dicomElement.value.length;
+    let isOtherVR = false;
+    if (dicomElement.vr.length !== 0) {
+      isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
+    }
+
+    // no size for delimitations
+    if (isItemDelimitationItemTag(tag) ||
+      isSequenceDelimitationItemTag(tag)) {
+      deSize = 0;
+    } else if (isOtherVR) {
+      deSize = 1;
+    }
+
+    const isPixSequence = (isPixelDataTag(tag) &amp;&amp;
+      dicomElement.undefinedLength);
+
+    let line = null;
+
+    // (group,element)
+    line = '(';
+    line += tag.getGroup().toLowerCase();
+    line += ',';
+    line += tag.getElement().toLowerCase();
+    line += ') ';
+    // value representation
+    line += dicomElement.vr;
+    // value
+    if (dicomElement.vr !== 'SQ' &amp;&amp;
+      dicomElement.value.length === 1 &amp;&amp;
+      dicomElement.value[0] === '') {
+      line += ' (no value available)';
+      deSize = 0;
+    } else {
+      // simple number display
+      if (dicomElement.vr === 'na') {
+        line += ' ';
+        line += dicomElement.value[0];
+      } else if (isPixSequence) {
+        // pixel sequence
+        line += ' (PixelSequence #=' + deSize + ')';
+      } else if (dicomElement.vr === 'SQ') {
+        line += ' (Sequence with';
+        if (dicomElement.undefinedLength) {
+          line += ' undefined';
+        } else {
+          line += ' explicit';
+        }
+        line += ' length #=';
+        line += dicomElement.value.length;
+        line += ')';
+      } else if (isOtherVR ||
+          dicomElement.vr === 'pi' ||
+          dicomElement.vr === 'UL' ||
+          dicomElement.vr === 'US' ||
+          dicomElement.vr === 'SL' ||
+          dicomElement.vr === 'SS' ||
+          dicomElement.vr === 'FL' ||
+          dicomElement.vr === 'FD' ||
+          dicomElement.vr === 'AT') {
+        // 'O'ther array, limited display length
+        line += ' ';
+        line += this.#getElementValueAsString(tag, dicomElement, false);
+      } else {
+        // default
+        line += ' [';
+        line += this.#getElementValueAsString(tag, dicomElement, false);
+        line += ']';
+      }
+    }
+
+    // align #
+    const nSpaces = 55 - line.length;
+    if (nSpaces > 0) {
+      for (let s = 0; s &lt; nSpaces; ++s) {
+        line += ' ';
+      }
+    }
+    line += ' # ';
+    if (dicomElement.vl &lt; 100) {
+      line += ' ';
+    }
+    if (dicomElement.vl &lt; 10) {
+      line += ' ';
+    }
+    line += dicomElement.vl;
+    line += ', ';
+    line += deSize; //dictElement[1];
+    line += ' ';
+    if (tagName !== null) {
+      line += tagName;
+    } else {
+      line += 'Unknown Tag &amp; Data';
+    }
+
+    let message = null;
+
+    // continue for sequence
+    if (dicomElement.vr === 'SQ') {
+      let item = null;
+      for (let l = 0, lenl = dicomElement.value.length; l &lt; lenl; ++l) {
+        item = dicomElement.value[l];
+        const itemKeys = Object.keys(item);
+        if (itemKeys.length === 0) {
+          continue;
+        }
+
+        // get the item element
+        const itemTag = getItemTag();
+        const itemElement = item['FFFEE000'];
+        message = '(Item with';
+        if (itemElement.undefinedLength) {
+          message += ' undefined';
+        } else {
+          message += ' explicit';
+        }
+        message += ' length #=' + (itemKeys.length - 1) + ')';
+        itemElement.value = [message];
+        itemElement.vr = 'na';
+
+        line += '\n';
+        line += this.#getElementAsString(itemTag, itemElement, prefix + '  ');
+
+        for (let m = 0, lenm = itemKeys.length; m &lt; lenm; ++m) {
+          const itemTag = getTagFromKey(itemKeys[m]);
+          if (itemKeys[m] !== 'xFFFEE000') {
+            line += '\n';
+            line += this.#getElementAsString(itemTag, item[itemKeys[m]],
+              prefix + '    ');
+          }
+        }
+
+        message = '(ItemDelimitationItem';
+        if (!itemElement.undefinedLength) {
+          message += ' for re-encoding';
+        }
+        message += ')';
+        const itemDelimTag = getItemDelimitationItemTag();
+        const itemDelimElement = {
+          vr: 'na',
+          vl: '0',
+          value: [message]
+        };
+        line += '\n';
+        line += this.#getElementAsString(
+          itemDelimTag, itemDelimElement, prefix + '  ');
+
+      }
+
+      message = '(SequenceDelimitationItem';
+      if (!dicomElement.undefinedLength) {
+        message += ' for re-encod.';
+      }
+      message += ')';
+      const sqDelimTag = getSequenceDelimitationItemTag();
+      const sqDelimElement = {
+        vr: 'na',
+        vl: '0',
+        value: [message]
+      };
+      line += '\n';
+      line += this.#getElementAsString(sqDelimTag, sqDelimElement, prefix);
+    } else if (isPixSequence) {
+      // pixel sequence
+      let pixItem = null;
+      for (let n = 0, lenn = dicomElement.value.length; n &lt; lenn; ++n) {
+        pixItem = dicomElement.value[n];
+        line += '\n';
+        pixItem.vr = 'pi';
+        line += this.#getElementAsString(
+          getPixelDataTag(), pixItem, prefix + '  ');
+      }
+
+      const pixDelimTag = getSequenceDelimitationItemTag();
+      const pixDelimElement = {
+        vr: 'na',
+        vl: '0',
+        value: ['(SequenceDelimitationItem)']
+      };
+      line += '\n';
+      line += this.#getElementAsString(pixDelimTag, pixDelimElement, prefix);
+    }
+
+    return prefix + line;
+  }
+
+  /**
+   * Get a DICOM Element value from a tag name.
+   * Uses the DICOM dictionary.
+   *
+   * @param {string} name The tag name.
+   * @returns {object} The DICOM element value.
+   */
+  getFromName(name) {
+    let value = null;
+    const tag = getTagFromDictionary(name);
+    // check that we are not at the end of the dictionary
+    if (tag !== null) {
+      value = this.getFromKey(tag.getKey());
+    }
+    return value;
+  }
+
+} // class DicomElementsWrapper
+
+/**
+ * Extract the 2D size from dicom elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {object} The size.
+ */
+export function getImage2DSize(elements) {
+  // rows
+  const rows = elements['00280010'];
+  if (typeof rows === 'undefined') {
+    throw new Error('Missing DICOM image number of rows');
+  }
+  if (rows.value.length === 0) {
+    throw new Error('Empty DICOM image number of rows');
+  }
+  // columns
+  const columns = elements['00280011'];
+  if (typeof columns === 'undefined') {
+    throw new Error('Missing DICOM image number of columns');
+  }
+  if (columns.value.length === 0) {
+    throw new Error('Empty DICOM image number of columns');
+  }
+  return [columns.value[0], rows.value[0]];
+}
+
+/**
+ * Get the pixel spacing from the different spacing tags.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {object} The read spacing or the default [1,1].
+ */
+export function getPixelSpacing(elements) {
+  // default
+  let rowSpacing = 1;
+  let columnSpacing = 1;
+
+  // 1. PixelSpacing
+  // 2. ImagerPixelSpacing
+  // 3. NominalScannedPixelSpacing
+  // 4. PixelAspectRatio
+  const keys = ['00280030', '00181164', '00182010', '00280034'];
+  for (let k = 0; k &lt; keys.length; ++k) {
+    const spacing = elements[keys[k]];
+    if (spacing &amp;&amp; spacing.value.length === 2) {
+      rowSpacing = parseFloat(spacing.value[0]);
+      columnSpacing = parseFloat(spacing.value[1]);
+      break;
+    }
+  }
+
+  // check
+  if (columnSpacing === 0) {
+    logger.warn('Zero column spacing.');
+    columnSpacing = 1;
+  }
+  if (rowSpacing === 0) {
+    logger.warn('Zero row spacing.');
+    rowSpacing = 1;
+  }
+
+  // return
+  // (slice spacing will be calculated using the image position patient)
+  return new Spacing([columnSpacing, rowSpacing, 1]);
+}
+
+/**
+ * Get the pixel data unit.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {string|null} The unit value if available.
+ */
+export function getPixelUnit(elements) {
+  let unit;
+  // 1. RescaleType
+  // 2. Units (for PET)
+  const keys = ['00281054', '00541001'];
+  for (let i = 0; i &lt; keys.length; ++i) {
+    const element = elements[keys[i]];
+    if (typeof element !== 'undefined') {
+      unit = element.value[0];
+    }
+  }
+  // default rescale type for CT
+  if (typeof unit !== 'undefined') {
+    const modality = elements['00080060'].value[0];
+    if (modality === 'CT') {
+      unit = 'HU';
+    }
+  }
+  return unit;
+}
+
+/**
+ * Get a 'date' object with {year, monthIndex, day} ready for the
+ *   Date constructor from a DICOM element with vr=DA.
+ *
+ * @param {object} element The DICOM element with date information.
+ * @returns {{year, monthIndex, day}|undefined} The 'date' object.
+ */
+export function getDate(element) {
+  if (typeof element === 'undefined') {
+    return undefined;
+  }
+  if (element.value.length !== 1) {
+    return undefined;
+  }
+  const daValue = element.value[0];
+  // Two possible formats:
+  // - standard 'YYYYMMDD'
+  // - non-standard 'YYYY.MM.DD' (previous ACR-NEMA)
+  let monthBeginIndex = 4;
+  let dayBeginIndex = 6;
+  if (daValue.length === 10) {
+    monthBeginIndex = 5;
+    dayBeginIndex = 8;
+  }
+  const daYears = parseInt(daValue.substring(0, 4), 10);
+  // 0-11 range
+  const daMonthIndex = daValue.length >= monthBeginIndex + 2
+    ? parseInt(daValue.substring(
+      monthBeginIndex, monthBeginIndex + 2), 10) - 1 : 0;
+  const daDay = daValue.length === dayBeginIndex + 2
+    ? parseInt(daValue.substring(
+      dayBeginIndex, dayBeginIndex + 2), 10) : 0;
+  return {
+    year: daYears,
+    monthIndex: daMonthIndex,
+    day: daDay
+  };
+}
+
+/**
+ * Get a time object with {hours, minutes, seconds} ready for the
+ *   Date constructor from a DICOM element with vr=TM.
+ *
+ * @param {object} element The DICOM element with date information.
+ * @returns {{hours, minutes, seconds, milliseconds}|undefined} The time object.
+ */
+export function getTime(element) {
+  if (typeof element === 'undefined') {
+    return undefined;
+  }
+  if (element.value.length !== 1) {
+    return undefined;
+  }
+  // format: HH[MMSS.FFFFFF]
+  const tmValue = element.value[0];
+  const tmHours = parseInt(tmValue.substring(0, 2), 10);
+  const tmMinutes = tmValue.length >= 4
+    ? parseInt(tmValue.substring(2, 4), 10) : 0;
+  const tmSeconds = tmValue.length >= 6
+    ? parseInt(tmValue.substring(4, 6), 10) : 0;
+  const tmFracSecondsStr = tmValue.length >= 8
+    ? tmValue.substring(7, 10) : 0;
+  const tmMilliSeconds = tmFracSecondsStr === 0 ? 0
+    : parseInt(tmFracSecondsStr, 10) *
+      Math.pow(10, 3 - tmFracSecondsStr.length);
+  return {
+    hours: tmHours,
+    minutes: tmMinutes,
+    seconds: tmSeconds,
+    milliseconds: tmMilliSeconds
+  };
+}
+
+/**
+ * Get a 'dateTime' object with {date, time} ready for the
+ *   Date constructor from a DICOM element with vr=DT.
+ *
+ * @param {object} element The DICOM element with date-time information.
+ * @returns {{date, time}|undefined} The time object.
+ */
+export function getDateTime(element) {
+  if (typeof element === 'undefined') {
+    return undefined;
+  }
+  if (element.value.length !== 1) {
+    return undefined;
+  }
+  // format: YYYYMMDDHHMMSS.FFFFFF&amp;ZZXX
+  const dtFullValue = element.value[0];
+  // remove offset (&amp;ZZXX)
+  const dtValue = dtFullValue.split('&amp;')[0];
+  const dtDate = getDate({value: [dtValue.substring(0, 8)]});
+  const dtTime = dtValue.length >= 9
+    ? getTime({value: [dtValue.substring(8)]}) : undefined;
+  return {
+    date: dtDate,
+    time: dtTime
+  };
+}
+
+/**
+ * Get the file list from a DICOMDIR
+ *
+ * @param {object} data The buffer data of the DICOMDIR
+ * @returns {Array|undefined} The file list as an array ordered by
+ *   STUDY > SERIES > IMAGES.
+ */
+export function getFileListFromDicomDir(data) {
+  // parse file
+  const parser = new DicomParser();
+  parser.parse(data);
+  const elements = parser.getDicomElements();
+
+  // Directory Record Sequence
+  if (typeof elements['00041220'] === 'undefined' ||
+    typeof elements['00041220'].value === 'undefined') {
+    logger.warn('No Directory Record Sequence found in DICOMDIR.');
+    return undefined;
+  }
+  const dirSeq = elements['00041220'].value;
+
+  if (dirSeq.length === 0) {
+    logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
+    return undefined;
+  }
+
+  const records = [];
+  let series = null;
+  let study = null;
+  for (let i = 0; i &lt; dirSeq.length; ++i) {
+    // Directory Record Type
+    if (typeof dirSeq[i]['00041430'] === 'undefined' ||
+      typeof dirSeq[i]['00041430'].value === 'undefined') {
+      continue;
+    }
+    const recType = dirSeq[i]['00041430'].value[0];
+
+    // supposed to come in order...
+    if (recType === 'STUDY') {
+      study = [];
+      records.push(study);
+    } else if (recType === 'SERIES') {
+      series = [];
+      study.push(series);
+    } else if (recType === 'IMAGE') {
+      // Referenced File ID
+      if (typeof dirSeq[i]['00041500'] === 'undefined' ||
+        typeof dirSeq[i]['00041500'].value === 'undefined') {
+        continue;
+      }
+      const refFileIds = dirSeq[i]['00041500'].value;
+      // join ids
+      series.push(refFileIds.join('/'));
+    }
+  }
+  return records;
+}
+
+/**
+ * Methods used to extract values from DICOM elements.
+ *
+ * Implemented as class and method to allow for override via its prototype.
+ */
+export class TagValueExtractor {
+  /**
+   * Get the time.
+   *
+   * @param {object} _elements The DICOM elements.
+   * @returns {number|undefined} The time value if available.
+   */
+  getTime(_elements) {
+    // default returns undefined
+    return undefined;
+  }
+}
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.32.0.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="F1NKGTv-ZDM7UE1m6Ja8y"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="mRgskexXZzuf_-ZvMasO6"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="BGC7bqK3tK0Y0vJXkOF1z"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="rWcxPDxnm-QnhJc3MHMic"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="09uo6OYAA48lX1leRYO5L"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>
