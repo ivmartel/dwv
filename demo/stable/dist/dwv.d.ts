@@ -460,11 +460,11 @@ export declare const decoderScripts: {
 /**
  * List of default window level presets.
  *
- * @type {{[key: string]: {[key: string]: {center: number, width: number}}}}
+ * @type {Object.<string, Object.<string, {center: number, width: number}>>}
  */
 export declare const defaultPresets: {
-    [key: string]: {
-        [key: string]: {
+    [x: string]: {
+        [x: string]: {
             center: number;
             width: number;
         };
@@ -1766,10 +1766,10 @@ export declare namespace logger {
 /**
  * List of available lookup tables (lut).
  *
- * @type {{[key: string]: {red: number[], green: number[], blue: number[]}}}
+ * @type {Object<string, {red: number[], green: number[], blue: number[]}>}
  */
 export declare const lut: {
-    [key: string]: {
+    [x: string]: {
         red: number[];
         green: number[];
         blue: number[];
