@@ -12,7 +12,7 @@ import {App} from '../app/application';
  *
  * @example
  * // create the dwv app
- * const app = new App();
+ * const app = new dwv.App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -30,7 +30,7 @@ import {App} from '../app/application';
  * ]);
  * @example <caption>Example with slider</caption>
  * // create the dwv app
- * const app = new App();
+ * const app = new dwv.App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},

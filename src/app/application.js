@@ -29,7 +29,7 @@ import {Image} from '../image/image';
  *
  * @example
  * // create the dwv app
- * const app = new App();
+ * const app = new dwv.App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
@@ -329,7 +329,7 @@ export class App {
    *   parsing
    * @example
    * // create the dwv app
-   * const app = new App();
+   * const app = new dwv.App();
    * // initialise
    * app.init({
    *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
