@@ -8,7 +8,7 @@ const MinWindowWidth = 1;
 /**
  * List of default window level presets.
  *
- * @type {{[key: string]: {[key: string]: {center: number, width: number}}}}
+ * @type {Object.<string, Object.<string, {center: number, width: number}>>}
  */
 export const defaultPresets = {
   CT: {
