@@ -4890,10 +4890,10 @@ klaw@^3.0.0:
   dependencies:
     graceful-fs "^4.1.9"
 
-konva@~8.4.2:
-  version "8.4.3"
-  resolved "https://registry.yarnpkg.com/konva/-/konva-8.4.3.tgz#d6754fdb53e69295c24dbdfe967a27f92da51e47"
-  integrity sha512-ARqdgAbdNIougRlOKvkQwHlGhXPRBV4KvhCP+qoPpGoVQwwiJe4Hkdu4HHdRPb9rGUp04jDTAxBzEwBsE272pg==
+konva@~9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-9.1.0.tgz#81e18664d8d5f6921921b8cc38f6388d02fc0a19"
+  integrity sha512-XKJ8H05HPEdO/BGK2Jf8jYbkDE0SdFvc686Ibdc7LqB1eK9lKOR0zvCa0hKDPDbWAfYvDOIuOHyoz5obefL72g==
 
 latest-version@^3.0.0:
   version "3.1.0"
