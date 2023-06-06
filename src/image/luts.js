@@ -94,7 +94,7 @@ function invId(i) {
 /**
  * List of available lookup tables (lut).
  *
- * @type {{[key: string]: {red: number[], green: number[], blue: number[]}}}
+ * @type {Object<string, {red: number[], green: number[], blue: number[]}>}
  */
 export const lut = {
   // plain

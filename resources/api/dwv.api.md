@@ -81,8 +81,8 @@ export const decoderScripts: {
 
 // @public
 export const defaultPresets: {
-    [key: string]: {
-        [key: string]: {
+    [x: string]: {
+        [x: string]: {
             center: number;
             width: number;
         };
@@ -335,7 +335,7 @@ export namespace logger {
 
 // @public
 export const lut: {
-    [key: string]: {
+    [x: string]: {
         red: number[];
         green: number[];
         blue: number[];

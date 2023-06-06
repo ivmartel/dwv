@@ -515,7 +515,7 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // setup the dicom parser
- *   const dicomParser = new DicomParser();
+ *   const dicomParser = new dwv.DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the dicom tags

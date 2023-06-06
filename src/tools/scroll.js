@@ -12,7 +12,7 @@ import {App} from '../app/application';
  *
  * @example
  * // create the dwv app
- * const app = new App();
+ * const app = new dwv.App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -30,7 +30,7 @@ import {App} from '../app/application';
  * ]);
  * @example <caption>Example with slider</caption>
  * // create the dwv app
- * const app = new App();
+ * const app = new dwv.App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -49,7 +49,7 @@ import {App} from '../app/application';
  *   const index = vc.getCurrentIndex();
  *   const values = index.getValues();
  *   values[2] = this.value;
- *   vc.setCurrentIndex(new math.Index(values));
+ *   vc.setCurrentIndex(new Index(values));
  * }
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {
