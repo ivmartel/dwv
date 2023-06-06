@@ -11,7 +11,7 @@ export declare function addTagsToDictionary(group: string, tags: object): void;
  *
  * @example
  * // create the dwv app
- * const app = new App();
+ * const app = new dwv.App();
  * // initialise
  * app.init({
  *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
@@ -174,7 +174,7 @@ export declare class App {
      *   parsing
      * @example
      * // create the dwv app
-     * const app = new App();
+     * const app = new dwv.App();
      * // initialise
      * app.init({
      *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
@@ -460,11 +460,11 @@ export declare const decoderScripts: {
 /**
  * List of default window level presets.
  *
- * @type {{[key: string]: {[key: string]: {center: number, width: number}}}}
+ * @type {Object.<string, Object.<string, {center: number, width: number}>>}
  */
 export declare const defaultPresets: {
-    [key: string]: {
-        [key: string]: {
+    [x: string]: {
+        [x: string]: {
             center: number;
             width: number;
         };
@@ -478,7 +478,7 @@ export declare const defaultPresets: {
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // setup the dicom parser
- *   const dicomParser = new DicomParser();
+ *   const dicomParser = new dwv.DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the dicom tags
@@ -1043,11 +1043,11 @@ export declare namespace i18n {
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // setup the dicom parser
- *   const dicomParser = new DicomParser();
+ *   const dicomParser = new dwv.DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // create the image
- *   const imageFactory = new ImageFactory();
+ *   const imageFactory = new dwv.ImageFactory();
  *   // inputs are dicom tags and buffer
  *   const image = imageFactory.create(
  *     dicomParser.getDicomElements(),
@@ -1766,10 +1766,10 @@ export declare namespace logger {
 /**
  * List of available lookup tables (lut).
  *
- * @type {{[key: string]: {red: number[], green: number[], blue: number[]}}}
+ * @type {Object<string, {red: number[], green: number[], blue: number[]}>}
  */
 export declare const lut: {
-    [key: string]: {
+    [x: string]: {
         red: number[];
         green: number[];
         blue: number[];
