@@ -510,7 +510,7 @@ export class View {
     getOrigin(position: Point): Point;
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
     getScrollIndex(): number;
-    getWindowLevelMinMax(): object;
+    getWindowLevelMinMax(): WindowCenterAndWidth;
     getWindowPresets(): object;
     getWindowPresetsNames(): object;
     incrementIndex(dim: number, silent: boolean): boolean;
@@ -629,10 +629,10 @@ export class ViewLayer {
 }
 
 // @public
-export class WindowLevel {
+export class WindowCenterAndWidth {
     constructor(center: number, width: number);
     apply(value: number): number;
-    equals(rhs: WindowLevel): boolean;
+    equals(rhs: WindowCenterAndWidth): boolean;
     getCenter(): number;
     getWidth(): number;
     setRange(min: string, max: string): void;
@@ -646,10 +646,10 @@ export class WindowLut {
     getLength(): number;
     getRescaleLut(): RescaleLut;
     getValue(offset: number): number;
-    getWindowLevel(): WindowLevel;
+    getWindowLevel(): WindowCenterAndWidth;
     isReady(): boolean;
     isSigned(): boolean;
-    setWindowLevel(wl: WindowLevel): void;
+    setWindowLevel(wl: WindowCenterAndWidth): void;
     update(): void;
 }
 

@@ -1,6 +1,9 @@
 import {View} from './view';
 import {lut} from './luts';
-import {WindowLevel, defaultPresets} from './windowLevel';
+import {
+  WindowCenterAndWidth,
+  defaultPresets
+} from './windowCenterAndWidth';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -51,7 +54,7 @@ export class ViewFactory {
       for (const key in defaultPresets[modality]) {
         const preset = defaultPresets[modality][key];
         windowPresets[key] = {
-          wl: [new WindowLevel(preset.center, preset.width)],
+          wl: [new WindowCenterAndWidth(preset.center, preset.width)],
           name: key
         };
       }

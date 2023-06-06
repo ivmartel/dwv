@@ -1,7 +1,7 @@
 // doc imports
 /* eslint-disable no-unused-vars */
 import {RescaleLut} from './rescaleLut';
-import {WindowLevel} from './windowLevel';
+import {WindowCenterAndWidth} from './windowCenterAndWidth';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -34,7 +34,7 @@ export class WindowLut {
   /**
    * The window level.
    *
-   * @type {object}
+   * @type {WindowCenterAndWidth}
    */
   #windowLevel = null;
 
@@ -64,7 +64,7 @@ export class WindowLut {
   /**
    * Get the window / level.
    *
-   * @returns {WindowLevel} The window / level.
+   * @returns {WindowCenterAndWidth} The window / level.
    */
   getWindowLevel() {
     return this.#windowLevel;
@@ -101,7 +101,7 @@ export class WindowLut {
   /**
    * Set the window center and width.
    *
-   * @param {WindowLevel} wl The window level.
+   * @param {WindowCenterAndWidth} wl The window level.
    */
   setWindowLevel(wl) {
     // store the window values

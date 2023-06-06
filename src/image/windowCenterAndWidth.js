@@ -3,7 +3,7 @@
  *
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2
  */
-const MinWindowWidth = 1;
+const minWindowWidth = 1;
 
 /**
  * List of default window level presets.
@@ -27,11 +27,11 @@ export const defaultPresets = {
  * @returns {number} A valid window width.
  */
 export function validateWindowWidth(value) {
-  return value < MinWindowWidth ? MinWindowWidth : value;
+  return value < minWindowWidth ? minWindowWidth : value;
 }
 
 /**
- * WindowLevel class.
+ * WindowCenterAndWidth class.
  * <br>Pseudo-code:
  * <pre>
  *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
@@ -41,7 +41,7 @@ export function validateWindowWidth(value) {
  *
  * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
  */
-export class WindowLevel {
+export class WindowCenterAndWidth {
 
   /**
    * The center.
@@ -63,9 +63,9 @@ export class WindowLevel {
    */
   constructor(center, width) {
     // check width
-    if (width < MinWindowWidth) {
+    if (width < minWindowWidth) {
       throw new Error('Window width shall always be greater than or equal to ' +
-        MinWindowWidth);
+        minWindowWidth);
     }
     this.#center = center;
     this.#width = width;
@@ -203,7 +203,7 @@ export class WindowLevel {
   /**
    * Check for window level equality.
    *
-   * @param {WindowLevel} rhs The other window level to compare to.
+   * @param {WindowCenterAndWidth} rhs The other window level to compare to.
    * @returns {boolean} True if both window level are equal.
    */
   equals(rhs) {

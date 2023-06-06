@@ -2,7 +2,7 @@ import {Index} from '../math/index';
 import {RescaleLut} from './rescaleLut';
 import {WindowLut} from './windowLut';
 import {lut} from './luts';
-import {WindowLevel} from './windowLevel';
+import {WindowCenterAndWidth} from './windowCenterAndWidth';
 import {generateImageDataMonochrome} from './viewMonochrome';
 import {generateImageDataPaletteColor} from './viewPaletteColor';
 import {generateImageDataRgb} from './viewRgb';
@@ -649,7 +649,7 @@ export class View {
     }
 
     // new window level
-    const newWl = new WindowLevel(center, width);
+    const newWl = new WindowCenterAndWidth(center, width);
 
     // check if new
     const isNew = !newWl.equals(this.#currentWl);
@@ -760,7 +760,7 @@ export class View {
    * Get the image window/level that covers the full data range.
    * Warning: uses the latest set rescale LUT or the default linear one.
    *
-   * @returns {object} A min/max window level.
+   * @returns {WindowCenterAndWidth} A min/max window level.
    */
   getWindowLevelMinMax() {
     const range = this.getImage().getRescaledDataRange();
@@ -773,7 +773,7 @@ export class View {
       width = 1;
     }
     const center = min + width / 2;
-    return new WindowLevel(center, width);
+    return new WindowCenterAndWidth(center, width);
   }
 
   /**

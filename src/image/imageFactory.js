@@ -1,7 +1,7 @@
 import {Size} from './size';
 import {Geometry} from './geometry';
 import {RescaleSlopeAndIntercept} from './rsi';
-import {WindowLevel} from './windowLevel';
+import {WindowCenterAndWidth} from './windowCenterAndWidth';
 import {Image} from './image';
 import {
   isJpeg2000TransferSyntax,
@@ -241,7 +241,7 @@ export class ImageFactory {
             name = 'Default' + j;
           }
           windowPresets[name] = {
-            wl: [new WindowLevel(center, width)],
+            wl: [new WindowCenterAndWidth(center, width)],
             name: name
           };
         }

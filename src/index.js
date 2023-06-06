@@ -34,11 +34,14 @@ import {Size} from './image/size';
 import {Spacing} from './image/spacing';
 import {decoderScripts} from './image/decoder';
 import {lut} from './image/luts';
-import {defaultPresets} from './image/windowLevel';
+import {} from './image/windowCenterAndWidth';
 import {RescaleSlopeAndIntercept} from './image/rsi';
 import {RescaleLut} from './image/rescaleLut';
 import {WindowLut} from './image/windowLut';
-import {WindowLevel} from './image/windowLevel';
+import {
+  defaultPresets,
+  WindowCenterAndWidth
+} from './image/windowCenterAndWidth';
 // math
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
@@ -68,7 +71,7 @@ export {
   RescaleSlopeAndIntercept,
   RescaleLut,
   WindowLut,
-  WindowLevel,
+  WindowCenterAndWidth,
   Index,
   Point,
   Point2D,

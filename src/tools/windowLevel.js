@@ -1,6 +1,9 @@
 import {ScrollWheel} from './scrollWheel';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {WindowLevel as WL, validateWindowWidth} from '../image/windowLevel';
+import {
+  WindowCenterAndWidth,
+  validateWindowWidth
+} from '../image/windowCenterAndWidth';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -106,7 +109,7 @@ export class WindowLevel {
     // add the manual preset to the view
     viewController.addWindowLevelPresets({
       manual: {
-        wl: [new WL(windowCenter, windowWidth)],
+        wl: [new WindowCenterAndWidth(windowCenter, windowWidth)],
         name: 'manual'
       }
     });
