@@ -41,9 +41,23 @@ export function getElement(containerDivId, name) {
 }
 
 /**
- * Custom UI object for client defined UI.
+ * Overridalbe custom UI object for client defined UI.
  */
-export const customUI = {};
+export const customUI = {
+  /**
+   * Open a dialogue to edit roi data. Defaults to window.prompt.
+   *
+   * @param {object} data The roi data.
+   * @param {Function} callback The callback to launch on dialogue exit.
+   */
+  openRoiDialog(data, callback) {
+    const textExpr = prompt('Label', data.textExpr);
+    if (textExpr !== null) {
+      data.textExpr = textExpr;
+      callback(data);
+    }
+  }
+};
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.

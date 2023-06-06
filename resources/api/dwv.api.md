@@ -68,8 +68,10 @@ export class App {
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
-// @public
-export const customUI: {};
+// @public (undocumented)
+export namespace customUI {
+    export function openRoiDialog(data: any, callback: Function): void;
+}
 
 // @public
 export const decoderScripts: {

@@ -442,10 +442,15 @@ export declare class App {
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
-/**
- * Custom UI object for client defined UI.
- */
-export declare const customUI: {};
+export declare namespace customUI {
+    /**
+     * Open a dialogue to edit roi data. Defaults to window.prompt.
+     *
+     * @param {object} data The roi data.
+     * @param {Function} callback The callback to launch on dialogue exit.
+     */
+    export function openRoiDialog(data: any, callback: Function): void;
+}
 
 /**
  * Decoder scripts to be passed to web workers for image decoding.

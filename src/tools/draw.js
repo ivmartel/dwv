@@ -896,23 +896,8 @@ export class Draw {
         konvaLayer.draw();
       };
 
-      // call client dialog if defined
-      if (typeof customUI.openRoiDialog !== 'undefined') {
-        /**
-         * Open a dialogue to edit roi data. Defaults to undefined.
-         *
-         * @param {object} data The roi data.
-         * @param {Function} callback The callback to launch on dialogue exit.
-         */
-        customUI.openRoiDialog(ktext.meta, onSaveCallback);
-      } else {
-        // simple prompt for the text expression
-        const textExpr = prompt('Label', ktext.meta.textExpr);
-        if (textExpr !== null) {
-          ktext.meta.textExpr = textExpr;
-          onSaveCallback(ktext.meta);
-        }
-      }
+      // call roi dialog
+      customUI.openRoiDialog(ktext.meta, onSaveCallback);
     });
   }
 
