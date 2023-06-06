@@ -27,6 +27,16 @@ function viewerSetup() {
   dwv.decoderScripts.rle =
     './decoders/dwv/decode-rle.js';
 
+  // // example private logic for roi dialog
+  // dwv.customUI.openRoiDialog = function (meta, cb) {
+  //   console.log('roi dialog', meta);
+  //   const textExpr = prompt('[Custom dialog] Label', meta.textExpr);
+  //   if (textExpr !== null) {
+  //     meta.textExpr = textExpr;
+  //     cb(meta);
+  //   }
+  // };
+
   // // example private logic for time value retrieval
   // dwv.TagValueExtractor.prototype.getTime = function (elements) {
   //   let value;
