@@ -41,17 +41,6 @@ export function getElement(containerDivId, name) {
 }
 
 /**
- * Prompt the user for some text. Uses window.prompt.
- *
- * @param {string} message The message in front of the input field.
- * @param {string} value The input default value.
- * @returns {string} The new value.
- */
-export function prompt(message, value) {
-  return prompt(message, value);
-}
-
-/**
  * Custom UI object for client defined UI.
  */
 export const customUI = {};

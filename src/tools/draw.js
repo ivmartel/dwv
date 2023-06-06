@@ -1,7 +1,6 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
   getEventOffset,
-  prompt,
   customUI
 } from '../gui/generic';
 import {Point2D} from '../math/point';
