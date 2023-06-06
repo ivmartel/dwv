@@ -1890,6 +1890,52 @@ export declare class Matrix33 {
 }
 
 /**
+ * DICOM Header overlay info controller.
+ */
+export declare class OverlayData {
+    /**
+     * @param {App} app The associated application.
+     * @param {number} dataId The associated data ID.
+     * @param {object} configs The overlay config.
+     */
+    constructor(app: App, dataId: number, configs: object);
+    /**
+     * Reset the data.
+     */
+    reset(): void;
+    /**
+     * Handle a new loaded item event.
+     * @param {Object} event The loaditem event.
+     */
+    onLoadItem: (event: any) => void;
+    /**
+     * Toggle info listeners.
+     */
+    addAppListeners(): void;
+    /**
+     * Toggle info listeners.
+     */
+    removeAppListeners(): void;
+    /**
+     * Add an event listener to this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type, will be called with the fired event.
+     */
+    addEventListener(type: string, callback: object): void;
+    /**
+     * Remove an event listener from this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type.
+     */
+    removeEventListener(type: string, callback: object): void;
+    #private;
+}
+
+/**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.

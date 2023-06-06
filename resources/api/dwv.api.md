@@ -364,6 +364,17 @@ export class Matrix33 {
 }
 
 // @public
+export class OverlayData {
+    constructor(app: App, dataId: number, configs: object);
+    addAppListeners(): void;
+    addEventListener(type: string, callback: object): void;
+    onLoadItem: (event: any) => void;
+    removeAppListeners(): void;
+    removeEventListener(type: string, callback: object): void;
+    reset(): void;
+}
+
+// @public
 export class Point {
     constructor(values: any[]);
     add(rhs: Point): Point;

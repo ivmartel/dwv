@@ -26,6 +26,7 @@ import {customUI} from './gui/generic';
 import {LayerGroup} from './gui/layerGroup';
 import {ViewLayer} from './gui/viewLayer';
 import {DrawLayer} from './gui/drawLayer';
+import {OverlayData} from './gui/overlayData';
 // image
 import {Image} from './image/image';
 import {View} from './image/view';
@@ -62,6 +63,7 @@ export {
   Tag,
   LayerGroup,
   DrawLayer,
+  OverlayData,
   ViewLayer,
   Image,
   View,
