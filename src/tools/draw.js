@@ -869,7 +869,7 @@ export class Draw {
     });
     // double click handling: update label
     shapeGroup.on('dblclick', (event) => {
-      const group = event.target;
+      const group = event.currentTarget;
       // get the label object for this shape
       const label = group.findOne('Label');
       // should just be one
