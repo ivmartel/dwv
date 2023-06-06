@@ -91,6 +91,9 @@ function invId(i) {
   return (lut_range_max - 1) - i;
 }
 
+// jsdoc does not understand index signatures as type...
+// for ex: {[key: string]: {red: number[], green: number[], blue: number[]}}
+
 /**
  * List of available lookup tables (lut).
  *
