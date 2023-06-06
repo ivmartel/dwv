@@ -22,7 +22,6 @@ If you have questions, please [open an issue](https://www.github.com/ivmartel/dw
  - `test-ci`: one shot test run
  - `build`: create release files
  - `doc`: create documentation
- - `dev`: watch for changes and copy build (to be connected with a demo viewer)
 
 I'm using `yarn` as the main package manager. Best to use it to install since
 the lock file (that contains the exact dependency tree) is a yarn file.
@@ -40,11 +39,11 @@ cd dwv
 # install dependencies
 yarn install
 
-# launch tests: will open a browser with test pages
-yarn run test
+# launch: will open a browser with example pages
+yarn run start
 ```
 
-This will open your default browser with the different test pages, check the 'viewer' link for a simple test viewer.
+This will open your default browser with the different example pages, check the 'viewer' link for a simple test viewer.
 
 ## Notes
 
