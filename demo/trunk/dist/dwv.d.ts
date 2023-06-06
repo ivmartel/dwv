@@ -2736,9 +2736,9 @@ export declare class View {
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
      *
-     * @returns {object} A min/max window level.
+     * @returns {WindowCenterAndWidth} A min/max window level.
      */
-    getWindowLevelMinMax(): object;
+    getWindowLevelMinMax(): WindowCenterAndWidth;
     /**
      * Set the image window/level to cover the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -3383,7 +3383,7 @@ export declare class ViewLayer {
 }
 
 /**
- * WindowLevel class.
+ * WindowCenterAndWidth class.
  * <br>Pseudo-code:
  * <pre>
  *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
@@ -3393,7 +3393,7 @@ export declare class ViewLayer {
  *
  * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
  */
-export declare class WindowLevel {
+export declare class WindowCenterAndWidth {
     /**
      * @param {number} center The window center.
      * @param {number} width The window width.
@@ -3436,10 +3436,10 @@ export declare class WindowLevel {
     /**
      * Check for window level equality.
      *
-     * @param {WindowLevel} rhs The other window level to compare to.
+     * @param {WindowCenterAndWidth} rhs The other window level to compare to.
      * @returns {boolean} True if both window level are equal.
      */
-    equals(rhs: WindowLevel): boolean;
+    equals(rhs: WindowCenterAndWidth): boolean;
     /**
      * Get a string representation of the window level.
      *
@@ -3462,9 +3462,9 @@ export declare class WindowLut {
     /**
      * Get the window / level.
      *
-     * @returns {WindowLevel} The window / level.
+     * @returns {WindowCenterAndWidth} The window / level.
      */
-    getWindowLevel(): WindowLevel;
+    getWindowLevel(): WindowCenterAndWidth;
     /**
      * Get the signed flag.
      *
@@ -3487,9 +3487,9 @@ export declare class WindowLut {
     /**
      * Set the window center and width.
      *
-     * @param {WindowLevel} wl The window level.
+     * @param {WindowCenterAndWidth} wl The window level.
      */
-    setWindowLevel(wl: WindowLevel): void;
+    setWindowLevel(wl: WindowCenterAndWidth): void;
     /**
      * Update the lut if needed..
      */
