@@ -172,6 +172,7 @@ export declare class App {
      *   after the first loaded data or not
      * - `defaultCharacterSet`: the default chraracter set string used for DICOM
      *   parsing
+     * - `overlayConfig`: list of tags / properties used as overlay information.
      * @example
      * // create the dwv app
      * const app = new dwv.App();
@@ -427,6 +428,19 @@ export declare class App {
      * @returns {number} The stack index.
      */
     getCurrentStackIndex(): number;
+    /**
+     * Get the overlay data for a data index.
+     *
+     * @param {number} dataIndex The data index.
+     * @returns {OverlayData} The overlay data.
+     */
+    getOverlayData(dataIndex: number): OverlayData;
+    /**
+     * Toggle overlay listeners.
+     *
+     * @param {number} dataIndex The data index
+     */
+    toggleOverlayListeners(dataIndex: number): void;
     #private;
 }
 
@@ -1905,9 +1919,16 @@ export declare class OverlayData {
     reset(): void;
     /**
      * Handle a new loaded item event.
-     * @param {Object} event The loaditem event.
+     *
+     * @param {object} data The item meta data.
      */
-    onLoadItem: (event: any) => void;
+    addItemMeta(data: object): void;
+    /**
+     * Is this class listening to app events.
+     *
+     * @returns {boolean} True is listening to app events.
+     */
+    isListening(): boolean;
     /**
      * Toggle info listeners.
      */

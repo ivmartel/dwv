@@ -75,6 +75,8 @@ export class OverlayData {
 
   #eventNames = [];
 
+  #isListening;
+
   /**
    * @param {App} app The associated application.
    * @param {number} dataId The associated data ID.
@@ -120,11 +122,11 @@ export class OverlayData {
   /**
    * Handle a new loaded item event.
    *
-   * @param {object} event The loaditem event.
+   * @param {object} data The item meta data.
    */
-  onLoadItem = (event) => {
+  addItemMeta(data) {
+    console.log('add', data);
     // create and store overlay data
-    const data = event.data;
     let dataUid;
     // check if dicom data (00020010: transfer syntax)
     if (typeof data['00020010'] !== 'undefined') {
@@ -149,7 +151,7 @@ export class OverlayData {
     }
     // store uid
     this.#currentDataUid = dataUid;
-  };
+  }
 
   /**
    * Handle a changed slice event.
@@ -174,7 +176,7 @@ export class OverlayData {
 
     const sliceOverlayData = this.#data[this.#currentDataUid];
     if (typeof sliceOverlayData === 'undefined') {
-      console.warn('No slice overlay data');
+      console.warn('No slice overlay data for: ' + this.#currentDataUid);
       return;
     }
 
@@ -214,6 +216,15 @@ export class OverlayData {
   };
 
   /**
+   * Is this class listening to app events.
+   *
+   * @returns {boolean} True is listening to app events.
+   */
+  isListening() {
+    return this.#isListening;
+  }
+
+  /**
    * Toggle info listeners.
    */
   addAppListeners() {
@@ -223,6 +234,8 @@ export class OverlayData {
     for (let i = 0; i < this.#eventNames.length; ++i) {
       this.#app.addEventListener(this.#eventNames[i], this.#updateData);
     }
+    // update flag
+    this.#isListening = true;
   }
 
   /**
@@ -235,6 +248,8 @@ export class OverlayData {
     for (let i = 0; i < this.#eventNames.length; ++i) {
       this.#app.removeEventListener(this.#eventNames[i], this.#updateData);
     }
+    // update flag
+    this.#isListening = false;
   }
 
   /**

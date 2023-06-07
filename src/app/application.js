@@ -14,7 +14,7 @@ import {UndoStack} from '../tools/undo';
 import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
-
+import {OverlayData} from '../gui/overlayData';
 import {toolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 
@@ -61,6 +61,9 @@ export class App {
 
   // Generic style
   #style = new Style();
+
+  // overlay datas
+  #overlayDatas = {};
 
   /**
    * Listener handler.
@@ -327,6 +330,7 @@ export class App {
    *   after the first loaded data or not
    * - `defaultCharacterSet`: the default chraracter set string used for DICOM
    *   parsing
+   * - `overlayConfig`: list of tags / properties used as overlay information.
    * @example
    * // create the dwv app
    * const app = new dwv.App();
@@ -1008,6 +1012,36 @@ export class App {
     return this.#undoStack.getCurrentStackIndex();
   }
 
+  /**
+   * Get the overlay data for a data index.
+   *
+   * @param {number} dataIndex The data index.
+   * @returns {OverlayData} The overlay data.
+   */
+  getOverlayData(dataIndex) {
+    let data;
+    if (typeof this.#overlayDatas !== 'undefined') {
+      data = this.#overlayDatas[dataIndex];
+    }
+    return data;
+  }
+
+  /**
+   * Toggle overlay listeners.
+   *
+   * @param {number} dataIndex The data index.
+   */
+  toggleOverlayListeners(dataIndex) {
+    const data = this.getOverlayData(dataIndex);
+    if (typeof data !== 'undefined') {
+      if (data.isListening()) {
+        data.removeAppListeners();
+      } else {
+        data.addAppListeners();
+      }
+    }
+  }
+
   // Private Methods -----------------------------------------------------------
 
   /**
@@ -1025,6 +1059,11 @@ export class App {
    * @param {object} event The load start event.
    */
   #onloadstart = (event) => {
+    // create overlay data
+    if (typeof this.#options.overlayConfig !== 'undefined') {
+      this.#overlayDatas[event.loadid] = new OverlayData(
+        this, event.loadid, this.#options.overlayConfig);
+    }
     /**
      * Load start event.
      *
@@ -1113,6 +1152,11 @@ export class App {
       isfirstitem: event.isfirstitem,
       warn: event.warn
     });
+
+    if (typeof this.#overlayDatas !== 'undefined' &&
+      typeof this.#overlayDatas[event.loadid] !== 'undefined') {
+      this.#overlayDatas[event.loadid].addItemMeta(eventMetaData);
+    }
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
