@@ -438,7 +438,7 @@ export declare class App {
     /**
      * Toggle overlay listeners.
      *
-     * @param {number} dataIndex The data index
+     * @param {number} dataIndex The data index.
      */
     toggleOverlayListeners(dataIndex: number): void;
     #private;
@@ -1904,7 +1904,7 @@ export declare class Matrix33 {
 }
 
 /**
- * DICOM Header overlay info controller.
+ * DICOM Header overlay info.
  */
 export declare class OverlayData {
     /**
