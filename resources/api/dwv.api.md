@@ -30,6 +30,7 @@ export class App {
     getNumberOfLayerGroups(): number;
     getNumberOfLoadedData(): number;
     getOffset(): object;
+    getOverlayData(dataIndex: number): OverlayData;
     getStackSize(): number;
     getState(): object;
     getStyle(): object;
@@ -60,6 +61,7 @@ export class App {
     setTool(tool: string): void;
     setToolFeatures(list: object): void;
     setWindowLevelPreset(preset: object): void;
+    toggleOverlayListeners(dataIndex: number): void;
     translate(tx: number, ty: number): void;
     undo(): void;
     zoom(step: number, cx: number, cy: number): void;
@@ -361,6 +363,18 @@ export class Matrix33 {
     multiplyPoint3D(point3D: Point3D): Point3D;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
+}
+
+// @public
+export class OverlayData {
+    constructor(app: App, dataId: number, configs: object);
+    addAppListeners(): void;
+    addEventListener(type: string, callback: object): void;
+    addItemMeta(data: object): void;
+    isListening(): boolean;
+    removeAppListeners(): void;
+    removeEventListener(type: string, callback: object): void;
+    reset(): void;
 }
 
 // @public
