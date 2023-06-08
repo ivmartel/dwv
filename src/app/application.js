@@ -455,6 +455,7 @@ export class App {
     // clear objects
     this.#dataController.reset();
     this.#stage.empty();
+    this.#overlayDatas = {};
     // reset undo/redo
     if (this.#undoStack) {
       this.#undoStack = new UndoStack();
