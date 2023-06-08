@@ -58,7 +58,7 @@ function replaceFlags(inputStr, values) {
 }
 
 /**
- * DICOM Header overlay info controller.
+ * DICOM Header overlay info.
  */
 export class OverlayData {
 
@@ -69,14 +69,55 @@ export class OverlayData {
    */
   #app;
 
+  /**
+   * Associated data id.
+   * 
+   * @type {number}
+   */
   #dataId;
 
+  /**
+   * Overlay config.
+   * 
+   * @type {object}
+   */
   #configs;
 
+  /**
+   * List of event used by the config.
+   * 
+   * @type {Array}
+   */
   #eventNames = [];
 
+  /**
+   * Flag to know if listening to app.
+   * 
+   * @type {boolean}
+   */
   #isListening;
 
+  /**
+   * Overlay data.
+   * 
+   * @type {Array}
+   * */
+  #data = [];
+
+  /** 
+   * Current data uid: set on pos change.
+   * 
+   * @type {nubmer}
+   */
+  #currentDataUid;
+
+  /**
+   * Listener handler.
+   * 
+   * @type {ListenerHandler}
+   */
+  #listenerHandler = new ListenerHandler();
+  
   /**
    * @param {App} app The associated application.
    * @param {number} dataId The associated data ID.
@@ -103,13 +144,6 @@ export class OverlayData {
     // add app listeners
     this.addAppListeners();
   }
-
-  // overlay data
-  #data = [];
-  // current data uid: set on pos change
-  #currentDataUid;
-  // listener handler
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Reset the data.
@@ -173,7 +207,6 @@ export class OverlayData {
    *   registered in toggleListeners
    */
   #updateData = (event) => {
-
     const sliceOverlayData = this.#data[this.#currentDataUid];
     if (typeof sliceOverlayData === 'undefined') {
       console.warn('No slice overlay data for: ' + this.#currentDataUid);
@@ -286,11 +319,11 @@ export class OverlayData {
 } // class OverlayData
 
 /**
- * Create overlay string array of the image in each corner.
+ * Create overlay data array for a DICOM image.
  *
  * @param {object} dicomElements DICOM elements of the image.
  * @param {object} configs The overlay data configs.
- * @returns {Array} Array of string to be shown in each corner.
+ * @returns {Array} Overlay data array.
  */
 function createOverlayData(dicomElements, configs) {
   const overlays = [];
@@ -359,11 +392,11 @@ function createOverlayData(dicomElements, configs) {
 }
 
 /**
- * Create overlay string array of the image in each corner.
+ * Create overlay data array for a DOM image.
  *
- * @param {object} info DICOM elements of the image.
+ * @param {object} info Meta data.
  * @param {object} configs The overlay data configs.
- * @returns {Array} Array of string to be shown in each corner.
+ * @returns {Array} Overlay data array.
  */
 function createOverlayDataForDom(info, configs) {
   const overlays = [];
