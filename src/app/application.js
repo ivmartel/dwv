@@ -1153,6 +1153,7 @@ export class App {
       warn: event.warn
     });
 
+    // update overlay data if present
     if (typeof this.#overlayDatas !== 'undefined' &&
       typeof this.#overlayDatas[event.loadid] !== 'undefined') {
       this.#overlayDatas[event.loadid].addItemMeta(eventMetaData);
