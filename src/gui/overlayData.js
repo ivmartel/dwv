@@ -159,7 +159,6 @@ export class OverlayData {
    * @param {object} data The item meta data.
    */
   addItemMeta(data) {
-    console.log('add', data);
     // create and store overlay data
     let dataUid;
     // check if dicom data (00020010: transfer syntax)
