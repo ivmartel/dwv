@@ -192,8 +192,12 @@ export class OverlayData {
    * @param {object} event The slicechange event.
    */
   #onSliceChange = (event) => {
+    if (event.dataid !== this.#dataId) {
+      return;
+    }
     if (typeof event.data !== 'undefined' &&
-      typeof event.data.imageUid !== 'undefined') {
+      typeof event.data.imageUid !== 'undefined' &&
+      this.#currentDataUid !== event.data.imageUid) {
       this.#currentDataUid = event.data.imageUid;
       this.#updateData(event);
     }
@@ -206,6 +210,10 @@ export class OverlayData {
    *   registered in toggleListeners
    */
   #updateData = (event) => {
+    if (event.dataid !== this.#dataId) {
+      return;
+    }
+
     const sliceOverlayData = this.#data[this.#currentDataUid];
     if (typeof sliceOverlayData === 'undefined') {
       console.warn('No slice overlay data for: ' + this.#currentDataUid);
