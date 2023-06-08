@@ -71,53 +71,53 @@ export class OverlayData {
 
   /**
    * Associated data id.
-   * 
+   *
    * @type {number}
    */
   #dataId;
 
   /**
    * Overlay config.
-   * 
+   *
    * @type {object}
    */
   #configs;
 
   /**
    * List of event used by the config.
-   * 
+   *
    * @type {Array}
    */
   #eventNames = [];
 
   /**
    * Flag to know if listening to app.
-   * 
+   *
    * @type {boolean}
    */
   #isListening;
 
   /**
    * Overlay data.
-   * 
+   *
    * @type {Array}
-   * */
+   */
   #data = [];
 
-  /** 
+  /**
    * Current data uid: set on pos change.
-   * 
-   * @type {nubmer}
+   *
+   * @type {number}
    */
   #currentDataUid;
 
   /**
    * Listener handler.
-   * 
+   *
    * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
-  
+
   /**
    * @param {App} app The associated application.
    * @param {number} dataId The associated data ID.
