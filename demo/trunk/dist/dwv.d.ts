@@ -172,6 +172,7 @@ export declare class App {
      *   after the first loaded data or not
      * - `defaultCharacterSet`: the default chraracter set string used for DICOM
      *   parsing
+     * - `overlayConfig`: list of tags / properties used as overlay information.
      * @example
      * // create the dwv app
      * const app = new dwv.App();
@@ -427,6 +428,19 @@ export declare class App {
      * @returns {number} The stack index.
      */
     getCurrentStackIndex(): number;
+    /**
+     * Get the overlay data for a data index.
+     *
+     * @param {number} dataIndex The data index.
+     * @returns {OverlayData} The overlay data.
+     */
+    getOverlayData(dataIndex: number): OverlayData;
+    /**
+     * Toggle overlay listeners.
+     *
+     * @param {number} dataIndex The data index.
+     */
+    toggleOverlayListeners(dataIndex: number): void;
     #private;
 }
 
@@ -1886,6 +1900,59 @@ export declare class Matrix33 {
      * @returns {number} The index of the absolute maximum of the last column.
      */
     getThirdColMajorDirection(): number;
+    #private;
+}
+
+/**
+ * DICOM Header overlay info.
+ */
+export declare class OverlayData {
+    /**
+     * @param {App} app The associated application.
+     * @param {number} dataId The associated data ID.
+     * @param {object} configs The overlay config.
+     */
+    constructor(app: App, dataId: number, configs: object);
+    /**
+     * Reset the data.
+     */
+    reset(): void;
+    /**
+     * Handle a new loaded item event.
+     *
+     * @param {object} data The item meta data.
+     */
+    addItemMeta(data: object): void;
+    /**
+     * Is this class listening to app events.
+     *
+     * @returns {boolean} True is listening to app events.
+     */
+    isListening(): boolean;
+    /**
+     * Toggle info listeners.
+     */
+    addAppListeners(): void;
+    /**
+     * Toggle info listeners.
+     */
+    removeAppListeners(): void;
+    /**
+     * Add an event listener to this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type, will be called with the fired event.
+     */
+    addEventListener(type: string, callback: object): void;
+    /**
+     * Remove an event listener from this class.
+     *
+     * @param {string} type The event type.
+     * @param {object} callback The method associated with the provided
+     *   event type.
+     */
+    removeEventListener(type: string, callback: object): void;
     #private;
 }
 
