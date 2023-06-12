@@ -14,8 +14,9 @@ import {logger} from '../utils/logger';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from './image';
+import {RescaleSlopeAndIntercept} from './rsi';
 import {Matrix33} from '../math/matrix';
-import {Point, Point3D} from '../math/point';
+import {Point} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -250,8 +251,8 @@ export class View {
    * Get the window LUT of the image.
    * Warning: can be undefined in no window/level was set.
    *
-   * @param {object} [rsi] Optional image rsi, will take the one of the
-   *   current slice otherwise.
+   * @param {RescaleSlopeAndIntercept} [rsi] Optional image rsi,
+   *  will take the one of the current slice otherwise.
    * @returns {WindowLut} The window LUT of the image.
    * @fires View#wlchange
    */
@@ -292,7 +293,7 @@ export class View {
     if (typeof wlut === 'undefined') {
       // create the rescale lookup table
       const rescaleLut = new RescaleLut(
-        this.#image.getRescaleSlopeAndIntercept(),
+        rsi,
         this.#image.getMeta().BitsStored);
       // create the window lookup table
       const windowLut = new WindowLut(

@@ -117,14 +117,14 @@ export class Image {
   /**
    * Constant rescale slope and intercept (default).
    *
-   * @type {object}
+   * @type {RescaleSlopeAndIntercept}
    */
   #rsi = new RescaleSlopeAndIntercept(1, 0);
 
   /**
    * Varying rescale slope and intercept.
    *
-   * @type {Array}
+   * @type {RescaleSlopeAndIntercept[]}
    */
   #rsis = null;
 
@@ -306,7 +306,7 @@ export class Image {
    * Get the rescale slope and intercept.
    *
    * @param {Index} [index] The index (only needed for non constant rsi).
-   * @returns {object} The rescale slope and intercept.
+   * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept.
    */
   getRescaleSlopeAndIntercept(index) {
     let res = this.#rsi;
@@ -328,7 +328,7 @@ export class Image {
    * Get the rsi at a specified (secondary) offset.
    *
    * @param {number} offset The desired (secondary) offset.
-   * @returns {object} The coresponding rsi.
+   * @returns {RescaleSlopeAndIntercept} The coresponding rsi.
    */
   #getRescaleSlopeAndInterceptAtOffset(offset) {
     return this.#rsis[offset];
@@ -337,7 +337,8 @@ export class Image {
   /**
    * Set the rescale slope and intercept.
    *
-   * @param {object} inRsi The input rescale slope and intercept.
+   * @param {RescaleSlopeAndIntercept} inRsi The input rescale
+   *   slope and intercept.
    * @param {number} [offset] The rsi offset (only needed for non constant rsi).
    */
   setRescaleSlopeAndIntercept(inRsi, offset) {
@@ -362,7 +363,7 @@ export class Image {
           this.#rsis = [];
           // initialise RSIs
           for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
-            this.#rsis.push(i);
+            this.#rsis.push(this.#rsi);
           }
           // store
           this.#rsi = null;

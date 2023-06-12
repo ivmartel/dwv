@@ -231,7 +231,7 @@ class Image_2 {
     getRescaledValue(i: number, j: number, k: number, f: number): number;
     getRescaledValueAtIndex(index: Index): number;
     getRescaledValueAtOffset(offset: number): number;
-    getRescaleSlopeAndIntercept(index?: Index): object;
+    getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     getSecondaryOffset(index: Index): number;
     getValue(i: number, j: number, k: number, f: number): number;
     getValueAtIndex(index: Index): number;
@@ -246,7 +246,7 @@ class Image_2 {
     setMeta(rhs: object): void;
     setPhotometricInterpretation(interp: string): void;
     setPlanarConfiguration(config: number): void;
-    setRescaleSlopeAndIntercept(inRsi: object, offset?: number): void;
+    setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
     transform(operator: Function): Image_2;
 }
 export { Image_2 as Image }
@@ -518,7 +518,7 @@ export class View {
     getColourMap(): object;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
-    getCurrentWindowLut(rsi?: object): WindowLut;
+    getCurrentWindowLut(rsi?: RescaleSlopeAndIntercept): WindowLut;
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position: Point): Point;
