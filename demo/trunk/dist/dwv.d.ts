@@ -1154,16 +1154,17 @@ declare class Image_2 {
      * Get the rescale slope and intercept.
      *
      * @param {Index} [index] The index (only needed for non constant rsi).
-     * @returns {object} The rescale slope and intercept.
+     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept.
      */
-    getRescaleSlopeAndIntercept(index?: Index): object;
+    getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     /**
      * Set the rescale slope and intercept.
      *
-     * @param {object} inRsi The input rescale slope and intercept.
+     * @param {RescaleSlopeAndIntercept} inRsi The input rescale
+     *   slope and intercept.
      * @param {number} [offset] The rsi offset (only needed for non constant rsi).
      */
-    setRescaleSlopeAndIntercept(inRsi: object, offset?: number): void;
+    setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
     /**
      * Are all the RSIs identity (1,0).
      *
@@ -2659,12 +2660,12 @@ export declare class View {
      * Get the window LUT of the image.
      * Warning: can be undefined in no window/level was set.
      *
-     * @param {object} [rsi] Optional image rsi, will take the one of the
-     *   current slice otherwise.
+     * @param {RescaleSlopeAndIntercept} [rsi] Optional image rsi,
+     *  will take the one of the current slice otherwise.
      * @returns {WindowLut} The window LUT of the image.
      * @fires View#wlchange
      */
-    getCurrentWindowLut(rsi?: object): WindowLut;
+    getCurrentWindowLut(rsi?: RescaleSlopeAndIntercept): WindowLut;
     /**
      * Add the window LUT to the list.
      *
