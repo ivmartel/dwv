@@ -671,6 +671,20 @@ export class Image {
       }
     }
 
+    // update ranges
+    const rhsRange = rhs.getDataRange();
+    const range = this.getDataRange();
+    this.#dataRange = {
+      min: Math.min(rhsRange.min, range.min),
+      max: Math.max(rhsRange.max, range.max),
+    };
+    const rhsResRange = rhs.getRescaledDataRange();
+    const resRange = this.getRescaledDataRange();
+    this.#rescaledDataRange = {
+      min: Math.min(rhsResRange.min, resRange.min),
+      max: Math.max(rhsResRange.max, resRange.max),
+    };
+
     // possible time
     const timeId = rhs.getGeometry().getInitialTime();
 
