@@ -5,6 +5,8 @@ import {getTypedArray} from '../dicom/dicomParser';
 import {ListenerHandler} from '../utils/listen';
 import {colourRange} from './iterator';
 import {RescaleSlopeAndIntercept} from './rsi';
+import {ImageFactory} from './imageFactory';
+import {MaskFactory} from './maskFactory';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -38,6 +40,35 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
 }
 
 /**
+ * Create an Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The Image object.
+ */
+export function createImage(elements) {
+  const factory = new ImageFactory();
+  return factory.create(
+    elements,
+    elements['7FE00010'].value[0],
+    1
+  );
+}
+
+/**
+ * Create a mask Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The mask Image object.
+ */
+export function createMaskImage(elements) {
+  const factory = new MaskFactory();
+  return factory.create(
+    elements,
+    elements['7FE00010'].value[0]
+  );
+}
+
+/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
@@ -47,17 +78,11 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
  * @example
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   // setup the dicom parser
+ *   // parse the dicom buffer
  *   const dicomParser = new dwv.DicomParser();
- *   // parse the buffer
  *   dicomParser.parse(event.target.response);
- *   // create the image
- *   const imageFactory = new dwv.ImageFactory();
- *   // inputs are dicom tags and buffer
- *   const image = imageFactory.create(
- *     dicomParser.getDicomElements(),
- *     dicomParser.getDicomElements()['7FE00010'].value[0]
- *   );
+ *   // create the image object
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size

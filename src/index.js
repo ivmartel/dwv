@@ -28,14 +28,20 @@ import {ViewLayer} from './gui/viewLayer';
 import {DrawLayer} from './gui/drawLayer';
 import {OverlayData} from './gui/overlayData';
 // image
-import {Image} from './image/image';
-import {View} from './image/view';
+import {
+  Image,
+  createImage,
+  createMaskImage
+} from './image/image';
+import {
+  View,
+  createView
+} from './image/view';
 import {Geometry} from './image/geometry';
 import {Size} from './image/size';
 import {Spacing} from './image/spacing';
 import {decoderScripts} from './image/decoder';
 import {lut} from './image/luts';
-import {} from './image/windowCenterAndWidth';
 import {RescaleSlopeAndIntercept} from './image/rsi';
 import {RescaleLut} from './image/rescaleLut';
 import {WindowLut} from './image/windowLut';
@@ -87,6 +93,9 @@ export {
   defaultPresets,
   i18n,
   addTagsToDictionary,
+  createImage,
+  createMaskImage,
+  createView,
   getDwvVersion,
   getUID,
   getElementsFromJSONTags,

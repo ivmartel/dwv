@@ -7,6 +7,7 @@ import {generateImageDataMonochrome} from './viewMonochrome';
 import {generateImageDataPaletteColor} from './viewPaletteColor';
 import {generateImageDataRgb} from './viewRgb';
 import {generateImageDataYbrFull} from './viewYbrFull';
+import {ViewFactory} from './viewFactory';
 import {getSliceIterator} from '../image/iterator';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
@@ -34,10 +35,53 @@ export const viewEventNames = [
 ];
 
 /**
+ * Create a View from DICOM elements and image.
+ *
+ * @param {object} elements The DICOM elements.
+ * @param {Image} image The associated image.
+ * @returns {View} The View object.
+ */
+export function createView(elements, image) {
+  const factory = new ViewFactory();
+  return factory.create(elements, image);
+}
+
+/**
  * View class.
  *
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
+ *
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
+ *   // parse the dicom buffer
+ *   const dicomParser = new dwv.DicomParser();
+ *   dicomParser.parse(event.target.response);
+ *   // create the image object
+ *   const image = createImage(dicomParser.getDicomElements());
+ *   // create the view
+ *   const view = createView(dicomParser.getDicomElements(), image);
+ *   // setup canvas
+ *   const canvas = document.createElement('canvas');
+ *   canvas.width = 256;
+ *   canvas.height = 256;
+ *   const ctx = canvas.getContext("2d");
+ *   // update the image data
+ *   const imageData = ctx.createImageData(256, 256);
+ *   view.generateImageData(imageData);
+ *   ctx.putImageData(imageData, 0, 0);
+ *   // update html
+ *   const div = document.getElementById('dwv');
+ *   div.appendChild(canvas);;
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export class View {
 
