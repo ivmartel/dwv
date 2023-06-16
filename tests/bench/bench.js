@@ -155,17 +155,22 @@ function setupData() {
 
     const input = document.createElement('input');
     input.type = 'checkbox';
-    input.className = 'data-item';
+    input.className = 'data-item-input';
     input.checked = data.selected;
     input.id = data.name;
     input.value = data.name;
 
     const label = document.createElement('label');
     label.htmlFor = data.name;
+    label.className = 'data-item-label';
     label.appendChild(document.createTextNode(data.name));
 
-    dataLi.appendChild(input);
-    dataLi.appendChild(label);
+    const div = document.createElement('div');
+    div.className = 'data-item';
+    div.appendChild(input);
+    div.appendChild(label);
+
+    dataLi.appendChild(div);
   }
 }
 
@@ -236,9 +241,6 @@ dcmb.onLaunchButton = function () {
 
 // last minute
 document.addEventListener('DOMContentLoaded', function (/*event*/) {
-  // drag and drop
-  //dcmb.setupDragDrop(updateDataList);
-
   // parsers
   setupParsers();
 
