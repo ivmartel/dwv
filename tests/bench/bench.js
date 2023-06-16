@@ -180,7 +180,7 @@ function setupData() {
  * @returns {Array} The selected data.
  */
 function getData() {
-  const dataItemEls = document.getElementsByClassName('data-item');
+  const dataItemEls = document.getElementsByClassName('data-item-input');
   for (let i = 0; i < dataItemEls.length; ++i) {
     const item = defaultTestData.find(o => o.name === dataItemEls[i].id);
     if (item) {
