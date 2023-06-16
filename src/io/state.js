@@ -4,6 +4,11 @@ import {colourNameToHex} from '../utils/colour';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../app/application';
+/* eslint-enable no-unused-vars */
+
 /**
  * State class.
  * Saves: data url/path, display info.
@@ -33,7 +38,7 @@ export class State {
   /**
    * Save the application state as JSON.
    *
-   * @param {object} app The associated application.
+   * @param {App} app The associated application.
    * @returns {string} The state as a JSON string.
    */
   toJSON(app) {
@@ -59,7 +64,7 @@ export class State {
   /**
    * Load an application state from JSON.
    *
-   * @param {string} json The JSON representation of the state.
+   * @param {string} json The state as a JSON string.
    * @returns {object} The state object.
    */
   fromJSON(json) {
@@ -85,7 +90,7 @@ export class State {
   /**
    * Load an application state from JSON.
    *
-   * @param {object} app The app to apply the state to.
+   * @param {App} app The app to apply the state to.
    * @param {object} data The state data.
    */
   apply(app, data) {
