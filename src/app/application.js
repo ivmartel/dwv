@@ -808,11 +808,21 @@ export class App {
   /**
    * Get the JSON state of the app.
    *
-   * @returns {object} The state of the app as a JSON object.
+   * @returns {string} The state of the app as a JSON string.
    */
-  getState() {
+  getJsonState() {
     const state = new State();
     return state.toJSON(this);
+  }
+
+  /**
+   * Apply a JSON state to this app.
+   *
+   * @param {string} jsonState The state of the app as a JSON string.
+   */
+  applyJsonState(jsonState) {
+    const state = new State();
+    state.apply(this, state.fromJSON(jsonState));
   }
 
   // Handler Methods -----------------------------------------------------------
@@ -1088,8 +1098,7 @@ export class App {
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
-      const state = new State();
-      state.apply(this, state.fromJSON(event.data));
+      this.applyJsonState(event.data);
       eventMetaData = 'state';
     }
 
