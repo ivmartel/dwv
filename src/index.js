@@ -27,8 +27,15 @@ import {LayerGroup} from './gui/layerGroup';
 import {ViewLayer} from './gui/viewLayer';
 import {DrawLayer} from './gui/drawLayer';
 // image
-import {Image} from './image/image';
-import {View} from './image/view';
+import {
+  Image,
+  createImage,
+  createMaskImage
+} from './image/image';
+import {
+  View,
+  createView
+} from './image/view';
 import {Geometry} from './image/geometry';
 import {Size} from './image/size';
 import {Spacing} from './image/spacing';
@@ -85,6 +92,9 @@ export {
   defaultPresets,
   i18n,
   addTagsToDictionary,
+  createImage,
+  createMaskImage,
+  createView,
   getDwvVersion,
   getUID,
   getElementsFromJSONTags,
