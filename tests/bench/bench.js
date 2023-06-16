@@ -258,12 +258,12 @@ document.addEventListener('DOMContentLoaded', function (/*event*/) {
 // iframe content is only available at window.onload time
 window.onload = function () {
   let ifname = '';
-  let func = null;
+  let test = null;
   for (let i = 0; i < parserFunctions.length; ++i) {
     ifname = 'iframe-' + parserFunctions[i].name;
-    func = document.getElementById(ifname).contentWindow.parse;
-    if (func) {
-      parserFunctions[i].func = func;
+    test = document.getElementById(ifname).contentWindow.tests[1];
+    if (test) {
+      parserFunctions[i].test = test;
     }
   }
   benchRunner.setFunctions(parserFunctions.filter(checkSelected));

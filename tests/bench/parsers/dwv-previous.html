@@ -9,22 +9,37 @@
 <script src="https://unpkg.com/dwv"></script>
 
 <script type="text/javascript">
-// Parse a DICOM buffer.
-parse = function (buffer) {
-  // setup the dicom parser
-  var dwvParser = new dwv.dicom.DicomParser();
-  // parse the buffer
-  dwvParser.parse(buffer);
-};
-// Parse a DICOM buffer and return the memory.
-parse2 = function (buffer) {
-  // setup the dicom parser
-  var dwvParser = new dwv.dicom.DicomParser();
-  // parse the buffer
-  dwvParser.parse(buffer);
-  // return the memory state
-  return performance.memory;
-};
+tests = [
+  {
+    setup: function (buffer) {
+      return buffer;
+    },
+    run: function (buffer) {
+      // parse the dicom buffer
+      var dwvParser = new dwv.DicomParser();
+      dwvParser.parse(buffer);
+    }
+  },
+  {
+    setup: function (buffer) {
+      // parse the dicom buffer
+      var dwvParser = new dwv.DicomParser();
+      dwvParser.parse(buffer);
+      // return
+      return [dwvParser.getDicomElements()];
+    },
+    run: function (input) {
+      const elements = input[0];
+      // create the image
+      const image = dwv.createImage(elements);
+      // create the view
+      const view = dwv.createView(elements, image);
+      // generate image data
+      var imgData = new ImageData(256, 256);
+      view.generateImageData(imgData);
+    }
+  }
+];
 </script>
 
 </html>

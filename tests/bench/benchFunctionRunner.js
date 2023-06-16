@@ -58,7 +58,8 @@ dcmb.BenchFunctionRunner = function () {
     };
     // add parsers to suite
     for (let i = 0; i < functions.length; ++i) {
-      suite.add(functions[i].name, getFunc(functions[i].func, buffer));
+      const input = functions[i].test.setup(buffer);
+      suite.add(functions[i].name, getFunc(functions[i].test.run, input));
     }
     // run async
     suite.run({async: false});
