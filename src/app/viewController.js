@@ -559,7 +559,7 @@ export class ViewController {
    * Set the current index.
    *
    * @param {Index} index The index.
-   * @param {boolean} silent If true, does not fire a positionchange event.
+   * @param {boolean} [silent] If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
   setCurrentIndex(index, silent) {
