@@ -341,9 +341,15 @@ export declare class App {
     /**
      * Get the JSON state of the app.
      *
-     * @returns {object} The state of the app as a JSON object.
+     * @returns {string} The state of the app as a JSON string.
      */
-    getState(): object;
+    getJsonState(): string;
+    /**
+     * Apply a JSON state to this app.
+     *
+     * @param {string} jsonState The state of the app as a JSON string.
+     */
+    applyJsonState(jsonState: string): void;
     /**
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
@@ -443,9 +449,39 @@ export declare class App {
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
 /**
- * Custom UI object for client defined UI.
+ * Create an Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The Image object.
  */
-export declare const customUI: {};
+export declare function createImage(elements: object): Image_2;
+
+/**
+ * Create a mask Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The mask Image object.
+ */
+export declare function createMaskImage(elements: object): Image_2;
+
+/**
+ * Create a View from DICOM elements and image.
+ *
+ * @param {object} elements The DICOM elements.
+ * @param {Image} image The associated image.
+ * @returns {View} The View object.
+ */
+export declare function createView(elements: object, image: Image_2): View;
+
+export declare namespace customUI {
+    /**
+     * Open a dialogue to edit roi data. Defaults to window.prompt.
+     *
+     * @param {object} data The roi data.
+     * @param {Function} callback The callback to launch on dialogue exit.
+     */
+    export function openRoiDialog(data: any, callback: Function): void;
+}
 
 /**
  * Decoder scripts to be passed to web workers for image decoding.
@@ -1042,17 +1078,11 @@ export declare namespace i18n {
  * @example
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   // setup the dicom parser
+ *   // parse the dicom buffer
  *   const dicomParser = new dwv.DicomParser();
- *   // parse the buffer
  *   dicomParser.parse(event.target.response);
- *   // create the image
- *   const imageFactory = new dwv.ImageFactory();
- *   // inputs are dicom tags and buffer
- *   const image = imageFactory.create(
- *     dicomParser.getDicomElements(),
- *     dicomParser.getDicomElements()['7FE00010'].value[0]
- *   );
+ *   // create the image object
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -2519,6 +2549,37 @@ export declare class Vector3D {
  *
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
+ *
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
+ *   // parse the dicom buffer
+ *   const dicomParser = new dwv.DicomParser();
+ *   dicomParser.parse(event.target.response);
+ *   // create the image object
+ *   const image = createImage(dicomParser.getDicomElements());
+ *   // create the view
+ *   const view = createView(dicomParser.getDicomElements(), image);
+ *   // setup canvas
+ *   const canvas = document.createElement('canvas');
+ *   canvas.width = 256;
+ *   canvas.height = 256;
+ *   const ctx = canvas.getContext("2d");
+ *   // update the image data
+ *   const imageData = ctx.createImageData(256, 256);
+ *   view.generateImageData(imageData);
+ *   ctx.putImageData(imageData, 0, 0);
+ *   // update html
+ *   const div = document.getElementById('dwv');
+ *   div.appendChild(canvas);;
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export declare class View {
     /**
@@ -2731,9 +2792,9 @@ export declare class View {
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
      *
-     * @returns {object} A min/max window level.
+     * @returns {WindowCenterAndWidth} A min/max window level.
      */
-    getWindowLevelMinMax(): object;
+    getWindowLevelMinMax(): WindowCenterAndWidth;
     /**
      * Set the image window/level to cover the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -3032,10 +3093,10 @@ export declare class ViewController {
      * Set the current index.
      *
      * @param {Index} index The index.
-     * @param {boolean} silent If true, does not fire a positionchange event.
+     * @param {boolean} [silent] If true, does not fire a positionchange event.
      * @returns {boolean} False if not in bounds.
      */
-    setCurrentIndex(index: Index, silent: boolean): boolean;
+    setCurrentIndex(index: Index, silent?: boolean): boolean;
     /**
      * Get a plane 3D position from a plane 2D position: does not compensate
      *   for the image origin. Needed for setting the scale center...
@@ -3378,7 +3439,7 @@ export declare class ViewLayer {
 }
 
 /**
- * WindowLevel class.
+ * WindowCenterAndWidth class.
  * <br>Pseudo-code:
  * <pre>
  *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
@@ -3388,7 +3449,7 @@ export declare class ViewLayer {
  *
  * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
  */
-export declare class WindowLevel {
+export declare class WindowCenterAndWidth {
     /**
      * @param {number} center The window center.
      * @param {number} width The window width.
@@ -3431,10 +3492,10 @@ export declare class WindowLevel {
     /**
      * Check for window level equality.
      *
-     * @param {WindowLevel} rhs The other window level to compare to.
+     * @param {WindowCenterAndWidth} rhs The other window level to compare to.
      * @returns {boolean} True if both window level are equal.
      */
-    equals(rhs: WindowLevel): boolean;
+    equals(rhs: WindowCenterAndWidth): boolean;
     /**
      * Get a string representation of the window level.
      *
@@ -3457,9 +3518,9 @@ export declare class WindowLut {
     /**
      * Get the window / level.
      *
-     * @returns {WindowLevel} The window / level.
+     * @returns {WindowCenterAndWidth} The window / level.
      */
-    getWindowLevel(): WindowLevel;
+    getWindowLevel(): WindowCenterAndWidth;
     /**
      * Get the signed flag.
      *
@@ -3482,9 +3543,9 @@ export declare class WindowLut {
     /**
      * Set the window center and width.
      *
-     * @param {WindowLevel} wl The window level.
+     * @param {WindowCenterAndWidth} wl The window level.
      */
-    setWindowLevel(wl: WindowLevel): void;
+    setWindowLevel(wl: WindowCenterAndWidth): void;
     /**
      * Update the lut if needed..
      */
