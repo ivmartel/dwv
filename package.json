@@ -20,7 +20,7 @@
     "node": ">= 14.0.0"
   },
   "browserslist": [
-    "defaults"
+    ">1%, last 2 versions, not dead"
   ],
   "dependencies": {
     "jszip": "~3.10.1",
