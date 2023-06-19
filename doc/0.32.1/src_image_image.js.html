@@ -1,0 +1,1449 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/image/image.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="",baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body class="dark" data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="4WkZ5A7wosJZdJTW-I5Qa"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="35nGHXv3_Bpbqsfxt-a1y"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="zP1j7qeIyZJ-P2JDYcTre"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="WindowCenterAndWidth.html">WindowCenterAndWidth</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="E1z8PvXQzOSepvYANynXk"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="YX45Wdq_9qThjaiQPkuFc"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_image_image.js</h1></header><article><pre class="prettyprint source lang-js"><code>import {Index} from '../math/index';
+import {Point3D} from '../math/point';
+import {logger} from '../utils/logger';
+import {getTypedArray} from '../dicom/dicomParser';
+import {ListenerHandler} from '../utils/listen';
+import {colourRange} from './iterator';
+import {RescaleSlopeAndIntercept} from './rsi';
+import {ImageFactory} from './imageFactory';
+import {MaskFactory} from './maskFactory';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Geometry} from './geometry';
+import {Matrix33} from '../math/matrix';
+/* eslint-enable no-unused-vars */
+
+/**
+ * Get the slice index of an input slice into a volume geometry.
+ *
+ * @param {Geometry} volumeGeometry The volume geometry.
+ * @param {Geometry} sliceGeometry The slice geometry.
+ * @returns {Index} The index of the slice in the volume geomtry.
+ */
+function getSliceIndex(volumeGeometry, sliceGeometry) {
+  // possible time
+  const timeId = sliceGeometry.getInitialTime();
+  // index values
+  const values = [];
+  // x, y
+  values.push(0);
+  values.push(0);
+  // z
+  values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
+  // time
+  if (typeof timeId !== 'undefined') {
+    values.push(timeId);
+  }
+  // return index
+  return new Index(values);
+}
+
+/**
+ * Create an Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The Image object.
+ */
+export function createImage(elements) {
+  const factory = new ImageFactory();
+  return factory.create(
+    elements,
+    elements['7FE00010'].value[0],
+    1
+  );
+}
+
+/**
+ * Create a mask Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The mask Image object.
+ */
+export function createMaskImage(elements) {
+  const factory = new MaskFactory();
+  return factory.create(
+    elements,
+    elements['7FE00010'].value[0]
+  );
+}
+
+/**
+ * Image class.
+ * Usable once created, optional are:
+ * - rescale slope and intercept (default 1:0),
+ * - photometric interpretation (default MONOCHROME2),
+ * - planar configuration (default RGBRGB...).
+ *
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
+ *   // parse the dicom buffer
+ *   const dicomParser = new dwv.DicomParser();
+ *   dicomParser.parse(event.target.response);
+ *   // create the image object
+ *   const image = createImage(dicomParser.getDicomElements());
+ *   // result div
+ *   const div = document.getElementById('dwv');
+ *   // display the image size
+ *   const size = image.getGeometry().getSize();
+ *   div.appendChild(document.createTextNode(
+ *     'Size: ' + size.toString() +
+ *     ' (should be 256,256,1)'));
+ *   // break line
+ *   div.appendChild(document.createElement('br'));
+ *   // display a pixel value
+ *   div.appendChild(document.createTextNode(
+ *     'Pixel @ [128,40,0]: ' +
+ *     image.getRescaledValue(128,40,0) +
+ *     ' (should be 101)'));
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
+ */
+export class Image {
+
+  /**
+   * Data geometry.
+   *
+   * @type {Geometry}
+   */
+  #geometry;
+
+  /**
+   * List of compatible typed arrays.
+   *
+   * @typedef {(
+   *   Uint8Array | Int8Array |
+   *   Uint16Array | Int16Array |
+   *   Uint32Array | Int32Array
+   * )} TypedArray
+   */
+
+  /**
+   * Data buffer.
+   *
+   * @type {TypedArray}
+   */
+  #buffer;
+
+  /**
+   * Image UIDs.
+   *
+   * @type {Array}
+   */
+  #imageUids;
+
+  /**
+   * Constant rescale slope and intercept (default).
+   *
+   * @type {object}
+   */
+  #rsi = new RescaleSlopeAndIntercept(1, 0);
+
+  /**
+   * Varying rescale slope and intercept.
+   *
+   * @type {Array}
+   */
+  #rsis = null;
+
+  /**
+   * Flag to know if the RSIs are all identity (1,0).
+   *
+   * @type {boolean}
+   */
+  #isIdentityRSI = true;
+
+  /**
+   * Flag to know if the RSIs are all equals.
+   *
+   * @type {boolean}
+   */
+  #isConstantRSI = true;
+
+  /**
+   * Photometric interpretation (MONOCHROME, RGB...).
+   *
+   * @type {string}
+   */
+  #photometricInterpretation = 'MONOCHROME2';
+
+  /**
+   * Planar configuration for RGB data (0:RGBRGBRGBRGB... or
+   *   1:RRR...GGG...BBB...).
+   *
+   * @type {number}
+   */
+  #planarConfiguration = 0;
+
+  /**
+   * Number of components.
+   *
+   * @type {number}
+   */
+  #numberOfComponents;
+
+  /**
+   * Meta information.
+   *
+   * @type {object}
+   */
+  #meta = {};
+
+  /**
+   * Data range.
+   *
+   * @type {object}
+   */
+  #dataRange = null;
+
+  /**
+   * Rescaled data range.
+   *
+   * @type {object}
+   */
+  #rescaledDataRange = null;
+
+  /**
+   * Histogram.
+   *
+   * @type {Array}
+   */
+  #histogram = null;
+
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   */
+  #listenerHandler = new ListenerHandler();
+
+  /**
+   * @param {Geometry} geometry The geometry of the image.
+   * @param {TypedArray} buffer The image data as a one dimensional buffer.
+   * @param {Array} [imageUids] An array of Uids indexed to slice number.
+   */
+  constructor(geometry, buffer, imageUids) {
+    this.#geometry = geometry;
+    this.#buffer = buffer;
+    this.#imageUids = imageUids;
+
+    this.#numberOfComponents = this.#buffer.length / (
+      this.#geometry.getSize().getTotalSize());
+  }
+
+  /**
+   * Get the image UID at a given index.
+   *
+   * @param {Index} [index] The index at which to get the id.
+   * @returns {string} The UID.
+   */
+  getImageUid(index) {
+    let uid = this.#imageUids[0];
+    if (this.#imageUids.length !== 1 &amp;&amp; typeof index !== 'undefined') {
+      uid = this.#imageUids[this.getSecondaryOffset(index)];
+    }
+    return uid;
+  }
+
+  /**
+   * Get the geometry of the image.
+   *
+   * @returns {Geometry} The geometry.
+   */
+  getGeometry() {
+    return this.#geometry;
+  }
+
+  /**
+   * Get the data buffer of the image.
+   *
+   * @todo dangerous...
+   * @returns {TypedArray} The data buffer of the image.
+   */
+  getBuffer() {
+    return this.#buffer;
+  }
+
+  /**
+   * Can the image values be quantified?
+   *
+   * @returns {boolean} True if only one component.
+   */
+  canQuantify() {
+    return this.getNumberOfComponents() === 1;
+  }
+
+  /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  canWindowLevel() {
+    return this.getPhotometricInterpretation()
+      .match(/MONOCHROME/) !== null;
+  }
+
+  /**
+   * Can the data be scrolled?
+   *
+   * @param {Matrix33} viewOrientation The view orientation.
+   * @returns {boolean} True if the data has a third dimension greater than one
+   *   after applying the view orientation.
+   */
+  canScroll(viewOrientation) {
+    const size = this.getGeometry().getSize();
+    // also check the numberOfFiles in case we are in the middle of a load
+    let nFiles = 1;
+    if (typeof this.#meta.numberOfFiles !== 'undefined') {
+      nFiles = this.#meta.numberOfFiles;
+    }
+    return size.canScroll(viewOrientation) || nFiles !== 1;
+  }
+
+  /**
+   * Get the secondary offset max.
+   *
+   * @returns {number} The maximum offset.
+   */
+  #getSecondaryOffsetMax() {
+    return this.#geometry.getSize().getTotalSize(2);
+  }
+
+  /**
+   * Get the secondary offset: an offset that takes into account
+   *   the slice and above dimension numbers.
+   *
+   * @param {Index} index The index.
+   * @returns {number} The offset.
+   */
+  getSecondaryOffset(index) {
+    return this.#geometry.getSize().indexToOffset(index, 2);
+  }
+
+  /**
+   * Get the rescale slope and intercept.
+   *
+   * @param {Index} [index] The index (only needed for non constant rsi).
+   * @returns {object} The rescale slope and intercept.
+   */
+  getRescaleSlopeAndIntercept(index) {
+    let res = this.#rsi;
+    if (!this.isConstantRSI()) {
+      if (typeof index === 'undefined') {
+        throw new Error('Cannot get non constant RSI with empty slice index.');
+      }
+      const offset = this.getSecondaryOffset(index);
+      if (typeof this.#rsis[offset] !== 'undefined') {
+        res = this.#rsis[offset];
+      } else {
+        logger.warn('undefined non constant rsi at ' + offset);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get the rsi at a specified (secondary) offset.
+   *
+   * @param {number} offset The desired (secondary) offset.
+   * @returns {object} The coresponding rsi.
+   */
+  #getRescaleSlopeAndInterceptAtOffset(offset) {
+    return this.#rsis[offset];
+  }
+
+  /**
+   * Set the rescale slope and intercept.
+   *
+   * @param {object} inRsi The input rescale slope and intercept.
+   * @param {number} [offset] The rsi offset (only needed for non constant rsi).
+   */
+  setRescaleSlopeAndIntercept(inRsi, offset) {
+    // update identity flag
+    this.#isIdentityRSI = this.#isIdentityRSI &amp;&amp; inRsi.isID();
+    // update constant flag
+    if (!this.#isConstantRSI) {
+      if (typeof offset === 'undefined') {
+        throw new Error(
+          'Cannot store non constant RSI with empty slice index.');
+      }
+      this.#rsis.splice(offset, 0, inRsi);
+    } else {
+      if (!this.#rsi.equals(inRsi)) {
+        if (typeof offset === 'undefined') {
+          // no slice index, replace existing
+          this.#rsi = inRsi;
+        } else {
+          // first non constant rsi
+          this.#isConstantRSI = false;
+          // switch to non constant mode
+          this.#rsis = [];
+          // initialise RSIs
+          for (let i = 0, leni = this.#getSecondaryOffsetMax(); i &lt; leni; ++i) {
+            this.#rsis.push(i);
+          }
+          // store
+          this.#rsi = null;
+          this.#rsis.splice(offset, 0, inRsi);
+        }
+      }
+    }
+  }
+
+  /**
+   * Are all the RSIs identity (1,0).
+   *
+   * @returns {boolean} True if they are.
+   */
+  isIdentityRSI() {
+    return this.#isIdentityRSI;
+  }
+
+  /**
+   * Are all the RSIs equal.
+   *
+   * @returns {boolean} True if they are.
+   */
+  isConstantRSI() {
+    return this.#isConstantRSI;
+  }
+
+  /**
+   * Get the photometricInterpretation of the image.
+   *
+   * @returns {string} The photometricInterpretation of the image.
+   */
+  getPhotometricInterpretation() {
+    return this.#photometricInterpretation;
+  }
+
+  /**
+   * Set the photometricInterpretation of the image.
+   *
+   * @param {string} interp The photometricInterpretation of the image.
+   */
+  setPhotometricInterpretation(interp) {
+    this.#photometricInterpretation = interp;
+  }
+
+  /**
+   * Get the planarConfiguration of the image.
+   *
+   * @returns {number} The planarConfiguration of the image.
+   */
+  getPlanarConfiguration() {
+    return this.#planarConfiguration;
+  }
+
+  /**
+   * Set the planarConfiguration of the image.
+   *
+   * @param {number} config The planarConfiguration of the image.
+   */
+  setPlanarConfiguration(config) {
+    this.#planarConfiguration = config;
+  }
+
+  /**
+   * Get the numberOfComponents of the image.
+   *
+   * @returns {number} The numberOfComponents of the image.
+   */
+  getNumberOfComponents() {
+    return this.#numberOfComponents;
+  }
+
+  /**
+   * Get the meta information of the image.
+   *
+   * @returns {object} The meta information of the image.
+   */
+  getMeta() {
+    return this.#meta;
+  }
+
+  /**
+   * Set the meta information of the image.
+   *
+   * @param {object} rhs The meta information of the image.
+   */
+  setMeta(rhs) {
+    this.#meta = rhs;
+  }
+
+  /**
+   * Get value at offset. Warning: No size check...
+   *
+   * @param {number} offset The desired offset.
+   * @returns {number} The value at offset.
+   */
+  getValueAtOffset(offset) {
+    return this.#buffer[offset];
+  }
+
+  /**
+   * Get the offsets where the buffer equals the input value.
+   * Loops through the whole volume, can get long for big data...
+   *
+   * @param {number|object} value The value to check.
+   * @returns {Array} The list of offsets.
+   */
+  getOffsets(value) {
+    // value to array
+    if (this.#numberOfComponents === 1) {
+      value = [value];
+    } else if (this.#numberOfComponents === 3 &amp;&amp;
+      typeof value.r !== 'undefined') {
+      value = [value.r, value.g, value.b];
+    }
+    // main loop
+    const offsets = [];
+    let equal;
+    for (let i = 0; i &lt; this.#buffer.length; i = i + this.#numberOfComponents) {
+      equal = true;
+      for (let j = 0; j &lt; this.#numberOfComponents; ++j) {
+        if (this.#buffer[i + j] !== value[j]) {
+          equal = false;
+          break;
+        }
+      }
+      if (equal) {
+        offsets.push(i);
+      }
+    }
+    return offsets;
+  }
+
+  /**
+   * Check if the input values are in the buffer.
+   * Could loop through the whole volume, can get long for big data...
+   *
+   * @param {Array} values The values to check.
+   * @returns {Array} A list of booleans for each input value,
+   *   set to true if the value is present in the buffer.
+   */
+  hasValues(values) {
+    // check input
+    if (typeof values === 'undefined' ||
+      values.length === 0) {
+      return [];
+    }
+    // final array value
+    const finalValues = [];
+    for (let v1 = 0; v1 &lt; values.length; ++v1) {
+      if (this.#numberOfComponents === 1) {
+        finalValues.push([values[v1]]);
+      } else if (this.#numberOfComponents === 3) {
+        finalValues.push([
+          values[v1].r,
+          values[v1].g,
+          values[v1].b
+        ]);
+      }
+    }
+    // find callback
+    let equalFunc;
+    if (this.#numberOfComponents === 1) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0];
+      };
+    } else if (this.#numberOfComponents === 3) {
+      equalFunc = function (a, b) {
+        return a[0] === b[0] &amp;&amp;
+          a[1] === b[1] &amp;&amp;
+          a[2] === b[2];
+      };
+    }
+    const getEqualCallback = function (value) {
+      return function (item) {
+        return equalFunc(item, value);
+      };
+    };
+    // main loop
+    const res = new Array(values.length);
+    res.fill(false);
+    const valuesToFind = finalValues.slice();
+    let equal;
+    let indicesToRemove;
+    for (let i = 0, leni = this.#buffer.length;
+      i &lt; leni; i = i + this.#numberOfComponents) {
+      indicesToRemove = [];
+      for (let v = 0; v &lt; valuesToFind.length; ++v) {
+        equal = true;
+        // check value(s)
+        for (let j = 0; j &lt; this.#numberOfComponents; ++j) {
+          if (this.#buffer[i + j] !== valuesToFind[v][j]) {
+            equal = false;
+            break;
+          }
+        }
+        // if found, store answer and add to indices to remove
+        if (equal) {
+          const valIndex = finalValues.findIndex(
+            getEqualCallback(valuesToFind[v]));
+          res[valIndex] = true;
+          indicesToRemove.push(v);
+        }
+      }
+      // remove found values
+      for (let r = 0; r &lt; indicesToRemove.length; ++r) {
+        valuesToFind.splice(indicesToRemove[r], 1);
+      }
+      // exit if no values to find
+      if (valuesToFind.length === 0) {
+        break;
+      }
+    }
+    // return
+    return res;
+  }
+
+  /**
+   * Clone the image.
+   *
+   * @returns {Image} A clone of this image.
+   */
+  clone() {
+    // clone the image buffer
+    const clonedBuffer = this.#buffer.slice(0);
+    // create the image copy
+    const copy = new Image(this.getGeometry(), clonedBuffer, this.#imageUids);
+    // copy the RSI(s)
+    if (this.isConstantRSI()) {
+      copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
+    } else {
+      for (let i = 0; i &lt; this.#getSecondaryOffsetMax(); ++i) {
+        copy.setRescaleSlopeAndIntercept(
+          this.#getRescaleSlopeAndInterceptAtOffset(i), i);
+      }
+    }
+    // copy extras
+    copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
+    copy.setPlanarConfiguration(this.getPlanarConfiguration());
+    copy.setMeta(this.getMeta());
+    // return
+    return copy;
+  }
+
+  /**
+   * Re-allocate buffer memory to an input size.
+   *
+   * @param {number} size The new size.
+   */
+  #realloc(size) {
+    // save buffer
+    let tmpBuffer = this.#buffer;
+    // create new
+    this.#buffer = getTypedArray(
+      this.#buffer.BYTES_PER_ELEMENT * 8,
+      this.#meta.IsSigned ? 1 : 0,
+      size);
+    if (this.#buffer === null) {
+      throw new Error('Cannot reallocate data for image.');
+    }
+    // put old in new
+    this.#buffer.set(tmpBuffer);
+    // clean
+    tmpBuffer = null;
+  }
+
+  /**
+   * Append a slice to the image.
+   *
+   * @param {Image} rhs The slice to append.
+   */
+  appendSlice(rhs) {
+    // check input
+    if (rhs === null) {
+      throw new Error('Cannot append null slice');
+    }
+    const rhsSize = rhs.getGeometry().getSize();
+    let size = this.#geometry.getSize();
+    if (rhsSize.get(2) !== 1) {
+      throw new Error('Cannot append more than one slice');
+    }
+    if (size.get(0) !== rhsSize.get(0)) {
+      throw new Error('Cannot append a slice with different number of columns');
+    }
+    if (size.get(1) !== rhsSize.get(1)) {
+      throw new Error('Cannot append a slice with different number of rows');
+    }
+    if (!this.#geometry.getOrientation().equals(
+      rhs.getGeometry().getOrientation(), 0.0001)) {
+      throw new Error('Cannot append a slice with different orientation');
+    }
+    if (this.#photometricInterpretation !==
+      rhs.getPhotometricInterpretation()) {
+      throw new Error(
+        'Cannot append a slice with different photometric interpretation');
+    }
+    // all meta should be equal
+    for (const key in this.#meta) {
+      if (key === 'windowPresets' || key === 'numberOfFiles' ||
+        key === 'custom') {
+        continue;
+      }
+      if (this.#meta[key] !== rhs.getMeta()[key]) {
+        throw new Error('Cannot append a slice with different ' + key);
+      }
+    }
+
+    // possible time
+    const timeId = rhs.getGeometry().getInitialTime();
+
+    // append frame if needed
+    let isNewFrame = false;
+    if (typeof timeId !== 'undefined' &amp;&amp;
+      !this.#geometry.hasSlicesAtTime(timeId)) {
+      // update grometry
+      this.appendFrame(timeId, rhs.getGeometry().getOrigin());
+      // update size
+      size = this.#geometry.getSize();
+      // update flag
+      isNewFrame = true;
+    }
+
+    // get slice index
+    const index = getSliceIndex(this.#geometry, rhs.getGeometry());
+
+    // calculate slice size
+    const sliceSize = this.#numberOfComponents * size.getDimSize(2);
+
+    // create full buffer if not done yet
+    if (typeof this.#meta.numberOfFiles === 'undefined') {
+      throw new Error('Missing number of files for buffer manipulation.');
+    }
+    const fullBufferSize = sliceSize * this.#meta.numberOfFiles;
+    if (this.#buffer.length !== fullBufferSize) {
+      this.#realloc(fullBufferSize);
+    }
+
+    // slice index
+    const sliceIndex = index.get(2);
+
+    // slice index including possible 4D
+    let fullSliceIndex = sliceIndex;
+    if (typeof timeId !== 'undefined') {
+      fullSliceIndex +=
+        this.#geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
+    }
+    // offset of the input slice
+    const indexOffset = fullSliceIndex * sliceSize;
+    const maxOffset =
+      this.#geometry.getCurrentTotalNumberOfSlices() * sliceSize;
+    // move content if needed
+    if (indexOffset &lt; maxOffset) {
+      this.#buffer.set(
+        this.#buffer.subarray(indexOffset, maxOffset),
+        indexOffset + sliceSize
+      );
+    }
+    // add new slice content
+    this.#buffer.set(rhs.getBuffer(), indexOffset);
+
+    // update geometry
+    if (!isNewFrame) {
+      this.#geometry.appendOrigin(
+        rhs.getGeometry().getOrigin(), sliceIndex, timeId);
+    }
+    // update rsi
+    // (rhs should just have one rsi)
+    this.setRescaleSlopeAndIntercept(
+      rhs.getRescaleSlopeAndIntercept(), fullSliceIndex);
+
+    // current number of images
+    const numberOfImages = this.#imageUids.length;
+
+    // insert sop instance UIDs
+    this.#imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
+
+    // update window presets
+    if (typeof this.#meta.windowPresets !== 'undefined') {
+      const windowPresets = this.#meta.windowPresets;
+      const rhsPresets = rhs.getMeta().windowPresets;
+      const keys = Object.keys(rhsPresets);
+      let pkey = null;
+      for (let i = 0; i &lt; keys.length; ++i) {
+        pkey = keys[i];
+        const rhsPreset = rhsPresets[pkey];
+        const windowPreset = windowPresets[pkey];
+        if (typeof windowPreset !== 'undefined') {
+          // if not set or false, check perslice
+          if (typeof windowPreset.perslice === 'undefined' ||
+            windowPreset.perslice === false) {
+            // if different preset.wl, mark it as perslice
+            if (!windowPreset.wl[0].equals(rhsPreset.wl[0])) {
+              windowPreset.perslice = true;
+              // fill wl array with copy of wl[0]
+              // (loop on number of images minus the existing one)
+              for (let j = 0; j &lt; numberOfImages - 1; ++j) {
+                windowPreset.wl.push(windowPreset.wl[0]);
+              }
+            }
+          }
+          // store (first) rhs preset.wl if needed
+          if (typeof windowPreset.perslice !== 'undefined' &amp;&amp;
+            windowPreset.perslice === true) {
+            windowPresets[pkey].wl.splice(
+              fullSliceIndex, 0, rhsPreset.wl[0]);
+          }
+        } else {
+          // if not defined (it should be), store all
+          windowPresets[pkey] = rhsPresets[pkey];
+        }
+      }
+    }
+  }
+
+  /**
+   * Append a frame buffer to the image.
+   *
+   * @param {object} frameBuffer The frame buffer to append.
+   * @param {number} frameIndex The frame index.
+   */
+  appendFrameBuffer(frameBuffer, frameIndex) {
+    // create full buffer if not done yet
+    const size = this.#geometry.getSize();
+    const frameSize = this.#numberOfComponents * size.getDimSize(2);
+    if (typeof this.#meta.numberOfFiles === 'undefined') {
+      throw new Error('Missing number of files for frame buffer manipulation.');
+    }
+    const fullBufferSize = frameSize * this.#meta.numberOfFiles;
+    if (this.#buffer.length !== fullBufferSize) {
+      this.#realloc(fullBufferSize);
+    }
+    // check index
+    if (frameIndex >= this.#meta.numberOfFiles) {
+      logger.warn('Ignoring frame at index ' + frameIndex +
+        ' (size: ' + this.#meta.numberOfFiles + ')');
+      return;
+    }
+    // append
+    this.#buffer.set(frameBuffer, frameSize * frameIndex);
+    // update geometry
+    this.appendFrame(frameIndex, new Point3D(0, 0, 0));
+  }
+
+  /**
+   * Append a frame to the image.
+   *
+   * @param {number} time The frame time value.
+   * @param {Point3D} origin The origin of the frame.
+   */
+  appendFrame(time, origin) {
+    this.#geometry.appendFrame(origin, time);
+    this.#fireEvent({type: 'appendframe'});
+    // memory will be updated at the first appendSlice or appendFrameBuffer
+  }
+
+  /**
+   * Get the data range.
+   *
+   * @returns {object} The data range.
+   */
+  getDataRange() {
+    if (!this.#dataRange) {
+      this.#dataRange = this.calculateDataRange();
+    }
+    return this.#dataRange;
+  }
+
+  /**
+   * Get the rescaled data range.
+   *
+   * @returns {object} The rescaled data range.
+   */
+  getRescaledDataRange() {
+    if (!this.#rescaledDataRange) {
+      this.#rescaledDataRange = this.calculateRescaledDataRange();
+    }
+    return this.#rescaledDataRange;
+  }
+
+  /**
+   * Get the histogram.
+   *
+   * @returns {Array} The histogram.
+   */
+  getHistogram() {
+    if (!this.#histogram) {
+      const res = this.calculateHistogram();
+      this.#dataRange = res.dataRange;
+      this.#rescaledDataRange = res.rescaledDataRange;
+      this.#histogram = res.histogram;
+    }
+    return this.#histogram;
+  }
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   */
+  #fireEvent = (event) => {
+    this.#listenerHandler.fireEvent(event);
+  };
+
+  // ****************************************
+  // image data modifiers... carefull...
+  // ****************************************
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsets List of offsets where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @fires Image#imagechange
+   */
+  setAtOffsets(offsets, value) {
+    let offset;
+    for (let i = 0, leni = offsets.length; i &lt; leni; ++i) {
+      offset = offsets[i];
+      this.#buffer[offset] = value.r;
+      this.#buffer[offset + 1] = value.g;
+      this.#buffer[offset + 2] = value.b;
+    }
+    // fire imagechange
+    this.#fireEvent({type: 'imagechange'});
+  }
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object} value The value to set at the given offsets.
+   * @returns {Array} A list of objects representing the original values before
+   *  replacing them.
+   * @fires Image#imagechange
+   */
+  setAtOffsetsAndGetOriginals(offsetsLists, value) {
+    const originalColoursLists = [];
+
+    // update and store
+    for (let j = 0; j &lt; offsetsLists.length; ++j) {
+      const offsets = offsetsLists[j];
+      // first colour
+      let offset = offsets[0] * 3;
+      let previousColour = {
+        r: this.#buffer[offset],
+        g: this.#buffer[offset + 1],
+        b: this.#buffer[offset + 2]
+      };
+      // original value storage
+      const originalColours = [];
+      originalColours.push({
+        index: 0,
+        colour: previousColour
+      });
+      for (let i = 0; i &lt; offsets.length; ++i) {
+        offset = offsets[i] * 3;
+        const currentColour = {
+          r: this.#buffer[offset],
+          g: this.#buffer[offset + 1],
+          b: this.#buffer[offset + 2]
+        };
+        // check if new colour
+        if (previousColour.r !== currentColour.r ||
+          previousColour.g !== currentColour.g ||
+          previousColour.b !== currentColour.b) {
+          // store new colour
+          originalColours.push({
+            index: i,
+            colour: currentColour
+          });
+          previousColour = currentColour;
+        }
+        // write update colour
+        this.#buffer[offset] = value.r;
+        this.#buffer[offset + 1] = value.g;
+        this.#buffer[offset + 2] = value.b;
+      }
+      originalColoursLists.push(originalColours);
+    }
+    // fire imagechange
+    this.#fireEvent({type: 'imagechange'});
+    return originalColoursLists;
+  }
+
+  /**
+   * Set the inner buffer values at given offsets.
+   *
+   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {object|Array} value The value to set at the given offsets.
+   * @fires Image#imagechange
+   */
+  setAtOffsetsWithIterator(offsetsLists, value) {
+    for (let j = 0; j &lt; offsetsLists.length; ++j) {
+      const offsets = offsetsLists[j];
+      let iterator;
+      if (typeof value !== 'undefined' &amp;&amp;
+        typeof value.r !== 'undefined') {
+        // input value is a simple color
+        iterator = colourRange(
+          [{index: 0, colour: value}], offsets.length);
+      } else {
+        // input value is a list of iterators
+        // created by setAtOffsetsAndGetOriginals
+        iterator = colourRange(
+          value[j], offsets.length);
+      }
+
+      // set values
+      let ival = iterator.next();
+      while (!ival.done) {
+        const offset = offsets[ival.index] * 3;
+        this.#buffer[offset] = ival.value.r;
+        this.#buffer[offset + 1] = ival.value.g;
+        this.#buffer[offset + 2] = ival.value.b;
+        ival = iterator.next();
+      }
+    }
+    /**
+     * Image change event.
+     *
+     * @event Image#imagechange
+     * @type {object}
+     */
+    this.#fireEvent({type: 'imagechange'});
+  }
+
+  /**
+   * Get the value of the image at a specific coordinate.
+   *
+   * @param {number} i The X index.
+   * @param {number} j The Y index.
+   * @param {number} k The Z index.
+   * @param {number} f The frame number.
+   * @returns {number} The value at the desired position.
+   * Warning: No size check...
+   */
+  getValue(i, j, k, f) {
+    const frame = (f || 0);
+    const index = new Index([i, j, k, frame]);
+    return this.getValueAtOffset(
+      this.getGeometry().getSize().indexToOffset(index));
+  }
+
+  /**
+   * Get the value of the image at a specific index.
+   *
+   * @param {Index} index The index.
+   * @returns {number} The value at the desired position.
+   * Warning: No size check...
+   */
+  getValueAtIndex(index) {
+    return this.getValueAtOffset(
+      this.getGeometry().getSize().indexToOffset(index));
+  }
+
+  /**
+   * Get the rescaled value of the image at a specific position.
+   *
+   * @param {number} i The X index.
+   * @param {number} j The Y index.
+   * @param {number} k The Z index.
+   * @param {number} f The frame number.
+   * @returns {number} The rescaled value at the desired position.
+   * Warning: No size check...
+   */
+  getRescaledValue(i, j, k, f) {
+    if (typeof f === 'undefined') {
+      f = 0;
+    }
+    let val = this.getValue(i, j, k, f);
+    if (!this.isIdentityRSI()) {
+      if (this.isConstantRSI()) {
+        val = this.getRescaleSlopeAndIntercept().apply(val);
+      } else {
+        const values = [i, j, k, f];
+        const index = new Index(values);
+        val = this.getRescaleSlopeAndIntercept(index).apply(val);
+      }
+    }
+    return val;
+  }
+
+  /**
+   * Get the rescaled value of the image at a specific index.
+   *
+   * @param {Index} index The index.
+   * @returns {number} The rescaled value at the desired position.
+   * Warning: No size check...
+   */
+  getRescaledValueAtIndex(index) {
+    return this.getRescaledValueAtOffset(
+      this.getGeometry().getSize().indexToOffset(index)
+    );
+  }
+
+  /**
+   * Get the rescaled value of the image at a specific offset.
+   *
+   * @param {number} offset The desired offset.
+   * @returns {number} The rescaled value at the desired offset.
+   * Warning: No size check...
+   */
+  getRescaledValueAtOffset(offset) {
+    let val = this.getValueAtOffset(offset);
+    if (!this.isIdentityRSI()) {
+      if (this.isConstantRSI()) {
+        val = this.getRescaleSlopeAndIntercept().apply(val);
+      } else {
+        const index = this.getGeometry().getSize().offsetToIndex(offset);
+        val = this.getRescaleSlopeAndIntercept(index).apply(val);
+      }
+    }
+    return val;
+  }
+
+  /**
+   * Calculate the data range of the image.
+   * WARNING: for speed reasons, only calculated on the first frame...
+   *
+   * @returns {object} The range {min, max}.
+   */
+  calculateDataRange() {
+    let min = this.getValueAtOffset(0);
+    let max = min;
+    let value = 0;
+    const size = this.getGeometry().getSize();
+    let leni = size.getTotalSize();
+    // max to 3D
+    if (size.length() >= 3) {
+      leni = size.getDimSize(3);
+    }
+    for (let i = 0; i &lt; leni; ++i) {
+      value = this.getValueAtOffset(i);
+      if (value > max) {
+        max = value;
+      }
+      if (value &lt; min) {
+        min = value;
+      }
+    }
+    // return
+    return {min: min, max: max};
+  }
+
+  /**
+   * Calculate the rescaled data range of the image.
+   * WARNING: for speed reasons, only calculated on the first frame...
+   *
+   * @returns {object} The range {min, max}.
+   */
+  calculateRescaledDataRange() {
+    if (this.isIdentityRSI()) {
+      return this.getDataRange();
+    } else if (this.isConstantRSI()) {
+      const range = this.getDataRange();
+      const resmin = this.getRescaleSlopeAndIntercept().apply(range.min);
+      const resmax = this.getRescaleSlopeAndIntercept().apply(range.max);
+      return {
+        min: ((resmin &lt; resmax) ? resmin : resmax),
+        max: ((resmin > resmax) ? resmin : resmax)
+      };
+    } else {
+      let rmin = this.getRescaledValueAtOffset(0);
+      let rmax = rmin;
+      let rvalue = 0;
+      const size = this.getGeometry().getSize();
+      let leni = size.getTotalSize();
+      // max to 3D
+      if (size.length() === 3) {
+        leni = size.getDimSize(3);
+      }
+      for (let i = 0; i &lt; leni; ++i) {
+        rvalue = this.getRescaledValueAtOffset(i);
+        if (rvalue > rmax) {
+          rmax = rvalue;
+        }
+        if (rvalue &lt; rmin) {
+          rmin = rvalue;
+        }
+      }
+      // return
+      return {min: rmin, max: rmax};
+    }
+  }
+
+  /**
+   * Calculate the histogram of the image.
+   *
+   * @returns {object} The histogram, data range and rescaled data range.
+   */
+  calculateHistogram() {
+    const size = this.getGeometry().getSize();
+    const histo = [];
+    let min = this.getValueAtOffset(0);
+    let max = min;
+    let value = 0;
+    let rmin = this.getRescaledValueAtOffset(0);
+    let rmax = rmin;
+    let rvalue = 0;
+    for (let i = 0, leni = size.getTotalSize(); i &lt; leni; ++i) {
+      value = this.getValueAtOffset(i);
+      if (value > max) {
+        max = value;
+      }
+      if (value &lt; min) {
+        min = value;
+      }
+      rvalue = this.getRescaledValueAtOffset(i);
+      if (rvalue > rmax) {
+        rmax = rvalue;
+      }
+      if (rvalue &lt; rmin) {
+        rmin = rvalue;
+      }
+      histo[rvalue] = (histo[rvalue] || 0) + 1;
+    }
+    // set data range
+    const dataRange = {min: min, max: max};
+    const rescaledDataRange = {min: rmin, max: rmax};
+    // generate data for plotting
+    const histogram = [];
+    for (let b = rmin; b &lt;= rmax; ++b) {
+      histogram.push([b, (histo[b] || 0)]);
+    }
+    // return
+    return {
+      dataRange: dataRange,
+      rescaledDataRange: rescaledDataRange,
+      histogram: histogram
+    };
+  }
+
+  /**
+   * Convolute the image with a given 2D kernel.
+   *
+   * Note: Uses raw buffer values.
+   *
+   * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+   * @returns {Image} The convoluted image.
+   */
+  convolute2D(weights) {
+    if (weights.length !== 9) {
+      throw new Error(
+        'The convolution matrix does not have a length of 9; it has ' +
+        weights.length);
+    }
+
+    const newImage = this.clone();
+    const newBuffer = newImage.getBuffer();
+
+    const imgSize = this.getGeometry().getSize();
+    const dimOffset = imgSize.getDimSize(2) * this.getNumberOfComponents();
+    for (let k = 0; k &lt; imgSize.get(2); ++k) {
+      this.convoluteBuffer(weights, newBuffer, k * dimOffset);
+    }
+
+    return newImage;
+  }
+
+  /**
+   * Convolute an image buffer with a given 2D kernel.
+   *
+   * Note: Uses raw buffer values.
+   *
+   * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+   * @param {TypedArray} buffer The buffer to convolute.
+   * @param {number} startOffset The index to start at.
+   */
+  convoluteBuffer(
+    weights, buffer, startOffset) {
+    const imgSize = this.getGeometry().getSize();
+    const ncols = imgSize.get(0);
+    const nrows = imgSize.get(1);
+    const ncomp = this.getNumberOfComponents();
+
+    // number of component and planar configuration vars
+    let factor = 1;
+    let componentOffset = 1;
+    if (ncomp === 3) {
+      if (this.getPlanarConfiguration() === 0) {
+        factor = 3;
+      } else {
+        componentOffset = imgSize.getDimSize(2);
+      }
+    }
+
+    // allow special indent for matrices
+    /*jshint indent:false */
+
+    // default weight offset matrix
+    const wOff = [];
+    wOff[0] = (-ncols - 1) * factor;
+    wOff[1] = (-ncols) * factor;
+    wOff[2] = (-ncols + 1) * factor;
+    wOff[3] = -factor;
+    wOff[4] = 0;
+    wOff[5] = 1 * factor;
+    wOff[6] = (ncols - 1) * factor;
+    wOff[7] = (ncols) * factor;
+    wOff[8] = (ncols + 1) * factor;
+
+    // border weight offset matrices
+    // borders are extended (see http://en.wikipedia.org/wiki/Kernel_%28image_processing%29)
+
+    // i=0, j=0
+    const wOff00 = [];
+    wOff00[0] = wOff[4]; wOff00[1] = wOff[4]; wOff00[2] = wOff[5];
+    wOff00[3] = wOff[4]; wOff00[4] = wOff[4]; wOff00[5] = wOff[5];
+    wOff00[6] = wOff[7]; wOff00[7] = wOff[7]; wOff00[8] = wOff[8];
+    // i=0, j=*
+    const wOff0x = [];
+    wOff0x[0] = wOff[1]; wOff0x[1] = wOff[1]; wOff0x[2] = wOff[2];
+    wOff0x[3] = wOff[4]; wOff0x[4] = wOff[4]; wOff0x[5] = wOff[5];
+    wOff0x[6] = wOff[7]; wOff0x[7] = wOff[7]; wOff0x[8] = wOff[8];
+    // i=0, j=nrows
+    const wOff0n = [];
+    wOff0n[0] = wOff[1]; wOff0n[1] = wOff[1]; wOff0n[2] = wOff[2];
+    wOff0n[3] = wOff[4]; wOff0n[4] = wOff[4]; wOff0n[5] = wOff[5];
+    wOff0n[6] = wOff[4]; wOff0n[7] = wOff[4]; wOff0n[8] = wOff[5];
+
+    // i=*, j=0
+    const wOffx0 = [];
+    wOffx0[0] = wOff[3]; wOffx0[1] = wOff[4]; wOffx0[2] = wOff[5];
+    wOffx0[3] = wOff[3]; wOffx0[4] = wOff[4]; wOffx0[5] = wOff[5];
+    wOffx0[6] = wOff[6]; wOffx0[7] = wOff[7]; wOffx0[8] = wOff[8];
+    // i=*, j=* -> wOff
+    // i=*, j=nrows
+    const wOffxn = [];
+    wOffxn[0] = wOff[0]; wOffxn[1] = wOff[1]; wOffxn[2] = wOff[2];
+    wOffxn[3] = wOff[3]; wOffxn[4] = wOff[4]; wOffxn[5] = wOff[5];
+    wOffxn[6] = wOff[3]; wOffxn[7] = wOff[4]; wOffxn[8] = wOff[5];
+
+    // i=ncols, j=0
+    const wOffn0 = [];
+    wOffn0[0] = wOff[3]; wOffn0[1] = wOff[4]; wOffn0[2] = wOff[4];
+    wOffn0[3] = wOff[3]; wOffn0[4] = wOff[4]; wOffn0[5] = wOff[4];
+    wOffn0[6] = wOff[6]; wOffn0[7] = wOff[7]; wOffn0[8] = wOff[7];
+    // i=ncols, j=*
+    const wOffnx = [];
+    wOffnx[0] = wOff[0]; wOffnx[1] = wOff[1]; wOffnx[2] = wOff[1];
+    wOffnx[3] = wOff[3]; wOffnx[4] = wOff[4]; wOffnx[5] = wOff[4];
+    wOffnx[6] = wOff[6]; wOffnx[7] = wOff[7]; wOffnx[8] = wOff[7];
+    // i=ncols, j=nrows
+    const wOffnn = [];
+    wOffnn[0] = wOff[0]; wOffnn[1] = wOff[1]; wOffnn[2] = wOff[1];
+    wOffnn[3] = wOff[3]; wOffnn[4] = wOff[4]; wOffnn[5] = wOff[4];
+    wOffnn[6] = wOff[3]; wOffnn[7] = wOff[4]; wOffnn[8] = wOff[4];
+
+    // restore indent for rest of method
+    /*jshint indent:4 */
+
+    // loop vars
+    let pixelOffset = startOffset;
+    let newValue = 0;
+    let wOffFinal = [];
+    for (let c = 0; c &lt; ncomp; ++c) {
+      // component offset
+      pixelOffset += c * componentOffset;
+      for (let j = 0; j &lt; nrows; ++j) {
+        for (let i = 0; i &lt; ncols; ++i) {
+          wOffFinal = wOff;
+          // special border cases
+          if (i === 0 &amp;&amp; j === 0) {
+            wOffFinal = wOff00;
+          } else if (i === 0 &amp;&amp; j === (nrows - 1)) {
+            wOffFinal = wOff0n;
+          } else if (i === (ncols - 1) &amp;&amp; j === 0) {
+            wOffFinal = wOffn0;
+          } else if (i === (ncols - 1) &amp;&amp; j === (nrows - 1)) {
+            wOffFinal = wOffnn;
+          } else if (i === 0 &amp;&amp; j !== (nrows - 1) &amp;&amp; j !== 0) {
+            wOffFinal = wOff0x;
+          } else if (i === (ncols - 1) &amp;&amp; j !== (nrows - 1) &amp;&amp; j !== 0) {
+            wOffFinal = wOffnx;
+          } else if (i !== 0 &amp;&amp; i !== (ncols - 1) &amp;&amp; j === 0) {
+            wOffFinal = wOffx0;
+          } else if (i !== 0 &amp;&amp; i !== (ncols - 1) &amp;&amp; j === (nrows - 1)) {
+            wOffFinal = wOffxn;
+          }
+          // calculate the weighed sum of the source image pixels that
+          // fall under the convolution matrix
+          newValue = 0;
+          for (let wi = 0; wi &lt; 9; ++wi) {
+            newValue += this.getValueAtOffset(
+              pixelOffset + wOffFinal[wi]) * weights[wi];
+          }
+          buffer[pixelOffset] = newValue;
+          // increment pixel offset
+          pixelOffset += factor;
+        }
+      }
+    }
+  }
+
+  /**
+   * Transform an image using a specific operator.
+   * WARNING: no size check!
+   *
+   * @param {Function} operator The operator to use when transforming.
+   * @returns {Image} The transformed image.
+   * Note: Uses the raw buffer values.
+   */
+  transform(operator) {
+    const newImage = this.clone();
+    const newBuffer = newImage.getBuffer();
+    for (let i = 0, leni = newBuffer.length; i &lt; leni; ++i) {
+      newBuffer[i] = operator(newImage.getValueAtOffset(i));
+    }
+    return newImage;
+  }
+
+  /**
+   * Compose this image with another one and using a specific operator.
+   * WARNING: no size check!
+   *
+   * @param {Image} rhs The image to compose with.
+   * @param {Function} operator The operator to use when composing.
+   * @returns {Image} The composed image.
+   * Note: Uses the raw buffer values.
+   */
+  compose(rhs, operator) {
+    const newImage = this.clone();
+    const newBuffer = newImage.getBuffer();
+    for (let i = 0, leni = newBuffer.length; i &lt; leni; ++i) {
+      // using the operator on the local buffer, i.e. the
+      // latest (not original) data
+      newBuffer[i] = Math.floor(
+        operator(this.getValueAtOffset(i), rhs.getValueAtOffset(i))
+      );
+    }
+    return newImage;
+  }
+
+} // class Image
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.32.1.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="4WkZ5A7wosJZdJTW-I5Qa"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="35nGHXv3_Bpbqsfxt-a1y"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="zP1j7qeIyZJ-P2JDYcTre"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="WindowCenterAndWidth.html">WindowCenterAndWidth</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="E1z8PvXQzOSepvYANynXk"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="YX45Wdq_9qThjaiQPkuFc"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

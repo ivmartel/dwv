@@ -1,0 +1,989 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: tests/pacs/viewer.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="",baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body class="dark" data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="4WkZ5A7wosJZdJTW-I5Qa"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="35nGHXv3_Bpbqsfxt-a1y"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="zP1j7qeIyZJ-P2JDYcTre"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="WindowCenterAndWidth.html">WindowCenterAndWidth</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="E1z8PvXQzOSepvYANynXk"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="YX45Wdq_9qThjaiQPkuFc"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">tests_pacs_viewer.js</h1></header><article><pre class="prettyprint source lang-js"><code>// Do not warn if these variables were not defined before.
+/* global dwv */
+
+// call setup on DOM loaded
+document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+
+let _app = null;
+let _tools = null;
+
+// viewer options
+const _mode = 0;
+const _dicomWeb = false;
+
+/**
+ * Setup simple dwv app.
+ */
+function viewerSetup() {
+  // logger level (optional)
+  dwv.logger.level = dwv.logger.levels.WARN;
+
+  dwv.decoderScripts.jpeg2000 =
+    '../../decoders/pdfjs/decode-jpeg2000.js';
+  dwv.decoderScripts['jpeg-lossless'] =
+    '../../decoders/rii-mango/decode-jpegloss.js';
+  dwv.decoderScripts['jpeg-baseline'] =
+    '../../decoders/pdfjs/decode-jpegbaseline.js';
+  dwv.decoderScripts.rle =
+    '../../decoders/dwv/decode-rle.js';
+
+  // // example private logic for roi dialog
+  // dwv.customUI.openRoiDialog = function (meta, cb) {
+  //   console.log('roi dialog', meta);
+  //   const textExpr = prompt('[Custom dialog] Label', meta.textExpr);
+  //   if (textExpr !== null) {
+  //     meta.textExpr = textExpr;
+  //     cb(meta);
+  //   }
+  // };
+
+  // // example private logic for time value retrieval
+  // dwv.TagValueExtractor.prototype.getTime = function (elements) {
+  //   let value;
+  //   const time = elements['ABCD0123'];
+  //   if (typeof time !== 'undefined') {
+  //     value = parseInt(time.value[0], 10);
+  //   }
+  //   return value;
+  // };
+
+  // stage options
+  let dataViewConfigs;
+  let viewOnFirstLoadItem = true;
+
+  // use for concurrent load
+  const numberOfDataToLoad = 1;
+
+  if (_mode === 0) {
+    // simplest: one layer group
+    dataViewConfigs = prepareAndGetSimpleDataViewConfig();
+  } else if (_mode === 1) {
+    // MPR
+    viewOnFirstLoadItem = false;
+    dataViewConfigs = prepareAndGetMPRDataViewConfig();
+  } else if (_mode === 2) {
+    // simple side by side
+    addLayerGroup('layerGroupA');
+    addLayerGroup('layerGroupB');
+    dataViewConfigs = {
+      0: [
+        {
+          divId: 'layerGroupA'
+        }
+      ],
+      1: [
+        {
+          divId: 'layerGroupB'
+        }
+      ]
+    };
+  } else if (_mode === 3) {
+    // multiple data, multiple layer group
+    addLayerGroup('layerGroupA');
+    addLayerGroup('layerGroupB');
+    dataViewConfigs = {
+      0: [
+        {
+          divId: 'layerGroupA'
+        },
+        {
+          divId: 'layerGroupB'
+        }
+      ],
+      1: [
+        {
+          divId: 'layerGroupA'
+        }
+      ],
+      2: [
+        {
+          divId: 'layerGroupB'
+        }
+      ],
+      3: [
+        {
+          divId: 'layerGroupB'
+        }
+      ]
+    };
+  }
+
+  // tools
+  _tools = {
+    Scroll: {},
+    WindowLevel: {},
+    ZoomAndPan: {},
+    Opacity: {},
+    Draw: {options: ['Rectangle']}
+  };
+
+  // app config
+  const config = {
+    viewOnFirstLoadItem: viewOnFirstLoadItem,
+    dataViewConfigs: dataViewConfigs,
+    tools: _tools
+  };
+  // app
+  _app = new dwv.App();
+  _app.init(config);
+
+  // bind events
+  _app.addEventListener('loaderror', function (event) {
+    console.error('load error', event);
+  });
+  _app.addEventListener('loadstart', function (event) {
+    console.time('load-data-' + event.loadid);
+  });
+  const dataLoadProgress = new Array(numberOfDataToLoad);
+  const sumReducer = function (sum, value) {
+    return sum + value;
+  };
+  _app.addEventListener('loadprogress', function (event) {
+    if (typeof event.lengthComputable !== 'undefined' &amp;&amp;
+      event.lengthComputable) {
+      dataLoadProgress[event.loadid] =
+        Math.ceil((event.loaded / event.total) * 100);
+      document.getElementById('loadprogress').value =
+        dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
+    }
+  });
+  _app.addEventListener('load', function (event) {
+    if (!viewOnFirstLoadItem) {
+      _app.render(event.loadid);
+    }
+  });
+  _app.addEventListener('loaditem', function (event) {
+    if (typeof event.warn !== 'undefined') {
+      console.warn('load-warn', event.warn);
+    }
+  });
+  _app.addEventListener('loadend', function (event) {
+    console.timeEnd('load-data-' + event.loadid);
+  });
+
+  let dataLoad = 0;
+  const firstRender = [];
+  _app.addEventListener('loadend', function (event) {
+    // update UI at first render
+    if (!firstRender.includes(event.loadid)) {
+      // store data id
+      firstRender.push(event.dataid);
+      // log meta data
+      if (event.loadtype === 'image') {
+        console.log('metadata',
+          getMetaDataWithNames(_app.getMetaData(event.loadid)));
+        // add data row
+        addDataRow(event.loadid);
+        ++dataLoad;
+        // init gui
+        if (dataLoad === numberOfDataToLoad) {
+          // select tool
+          _app.setTool(getSelectedTool());
+
+          const changeLayoutSelect = document.getElementById('changelayout');
+          changeLayoutSelect.disabled = false;
+          const resetLayoutButton = document.getElementById('resetlayout');
+          resetLayoutButton.disabled = false;
+        }
+      }
+    }
+
+    if (event.loadtype === 'image' &amp;&amp;
+      typeof _app.getMetaData(event.loadid)['00080060'] !== 'undefined' &amp;&amp;
+      _app.getMetaData(event.loadid)['00080060'].value[0] === 'SEG') {
+      // log SEG details
+      logFramePosPats(_app.getMetaData(event.loadid));
+
+      // example usage of a dicom SEG as data mask
+      const useSegAsMask = false;
+      if (useSegAsMask) {
+        // image to filter
+        const imgDataIndex = 0;
+        const vls = _app.getViewLayersByDataIndex(imgDataIndex);
+        const vc = vls[0].getViewController();
+        const img = _app.getImage(imgDataIndex);
+        const imgGeometry = img.getGeometry();
+        const sliceSize = imgGeometry.getSize().getDimSize(2);
+        // SEG image
+        const segImage = _app.getImage(event.loadid);
+        // calculate slice difference
+        const segOrigin0 = segImage.getGeometry().getOrigins()[0];
+        const segOrigin0Point = new dwv.Point([
+          segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
+        ]);
+        const segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
+        const indexOffset = segOriginIndex.get(2) * sliceSize;
+        // set alpha function
+        vc.setViewAlphaFunction(function (value, index) {
+          // multiply by 3 since SEG is RGB
+          const segIndex = 3 * (index - indexOffset);
+          if (segIndex >= 0 &amp;&amp;
+            segImage.getValueAtOffset(segIndex) === 0 &amp;&amp;
+            segImage.getValueAtOffset(segIndex + 1) === 0 &amp;&amp;
+            segImage.getValueAtOffset(segIndex + 2) === 0) {
+            return 0;
+          } else {
+            return 0xff;
+          }
+        });
+      }
+    }
+  });
+
+  _app.addEventListener('positionchange', function (event) {
+    const input = document.getElementById('position');
+    const values = event.value[1];
+    let text = '(index: ' + event.value[0] + ')';
+    if (event.value.length > 2) {
+      text += ' value: ' + event.value[2];
+    }
+    input.value = values.map(getPrecisionRound(2));
+    // index as small text
+    const span = document.getElementById('positionspan');
+    span.innerHTML = text;
+  });
+
+  // default keyboard shortcuts
+  window.addEventListener('keydown', function (event) {
+    _app.defaultOnKeydown(event);
+    // mask segment related
+    if (!isNaN(parseInt(event.key, 10))) {
+      const vc =
+        _app.getActiveLayerGroup().getActiveViewLayer().getViewController();
+      if (!vc.isMask()) {
+        return;
+      }
+      const number = parseInt(event.key, 10);
+      const segHelper = vc.getMaskSegmentHelper();
+      if (segHelper.hasSegment(number)) {
+        const segment = segHelper.getSegment(number);
+        if (event.ctrlKey) {
+          if (event.altKey) {
+            console.log('Delete segment: ' + segment.label);
+            // delete
+            vc.deleteSegment(number, _app.addToUndoStack);
+          } else {
+            console.log('Show/hide segment: ' + segment.label);
+            // show/hide the selected segment
+            if (segHelper.isHidden(number)) {
+              segHelper.removeFromHidden(number);
+            } else {
+              segHelper.addToHidden(number);
+            }
+            vc.applyHiddenSegments();
+          }
+        }
+      }
+    }
+  });
+  // default on resize
+  window.addEventListener('resize', function () {
+    _app.onResize();
+  });
+
+  const options = {};
+  // special dicom web request header
+  if (_dicomWeb) {
+    options.requestHeaders = [{
+      name: 'Accept',
+      value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
+    }];
+  }
+  // load from window location
+  _app.loadFromUri(window.location.href, options);
+}
+
+/**
+ * Setup.
+ */
+function onDOMContentLoaded() {
+  // setup
+  viewerSetup();
+
+  const positionInput = document.getElementById('position');
+  positionInput.addEventListener('change', function () {
+    const vls = _app.getViewLayersByDataIndex(0);
+    const vc = vls[0].getViewController();
+    const values = this.value.split(',');
+    vc.setCurrentPosition(new dwv.Point([
+      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
+    ])
+    );
+  });
+
+  const resetLayoutButton = document.getElementById('resetlayout');
+  resetLayoutButton.addEventListener('click', function () {
+    _app.resetLayout();
+  });
+
+  const changeLayoutSelect = document.getElementById('changelayout');
+  changeLayoutSelect.addEventListener('change', function (event) {
+    let configs;
+    const value = event.target.value;
+    if (value === 'mpr') {
+      configs = prepareAndGetMPRDataViewConfig();
+    } else {
+      configs = prepareAndGetSimpleDataViewConfig();
+    }
+
+    // unbind app to controls
+    unbindAppToControls();
+
+    // set config
+    _app.setDataViewConfig(configs);
+
+    clearDataTable();
+    for (let i = 0; i &lt; _app.getNumberOfLoadedData(); ++i) {
+      _app.render(i);
+      // add data row (will bind controls)
+      addDataRow(i);
+    }
+
+    // need to set tool after config change
+    _app.setTool(getSelectedTool());
+  });
+
+  setupBindersCheckboxes();
+
+  setupToolsCheckboxes();
+
+  // bind app to input files
+  const fileinput = document.getElementById('fileinput');
+  fileinput.addEventListener('change', function (event) {
+    console.log('%c ----------------', 'color: teal;');
+    console.log(event.target.files);
+    _app.loadFiles(event.target.files);
+  });
+}
+
+/**
+ * Append a layer div in the root 'dwv' one.
+ *
+ * @param {string} id The id of the layer.
+ */
+function addLayerGroup(id) {
+  const layerDiv = document.createElement('div');
+  layerDiv.id = id;
+  layerDiv.className = 'layerGroup';
+  const root = document.getElementById('dwv');
+  root.appendChild(layerDiv);
+}
+
+/**
+ * Create simple view config(s).
+ *
+ * @returns {object} The view config.
+ */
+function prepareAndGetSimpleDataViewConfig() {
+  // clean up
+  const dwvDiv = document.getElementById('dwv');
+  dwvDiv.innerHTML = '';
+  // add div
+  addLayerGroup('layerGroupA');
+  return {'*': [{divId: 'layerGroupA'}]};
+}
+
+/**
+ * Create MPR view config(s).
+ *
+ * @returns {object} The view config.
+ */
+function prepareAndGetMPRDataViewConfig() {
+  // clean up
+  const dwvDiv = document.getElementById('dwv');
+  dwvDiv.innerHTML = '';
+  // add divs
+  addLayerGroup('layerGroupA');
+  addLayerGroup('layerGroupC');
+  addLayerGroup('layerGroupS');
+  return {
+    '*': [
+      {
+        divId: 'layerGroupA',
+        orientation: 'axial'
+      },
+      {
+        divId: 'layerGroupC',
+        orientation: 'coronal'
+      },
+      {
+        divId: 'layerGroupS',
+        orientation: 'sagittal'
+      }
+    ]
+  };
+}
+
+/**
+ * Get the layer groups div ids from the data view configs.
+ *
+ * @param {object} dataViewConfigs The configs.
+ * @returns {Array} The list of ids.
+ */
+function getLayerGroupDivIds(dataViewConfigs) {
+  const divIds = [];
+  const keys = Object.keys(dataViewConfigs);
+  for (let i = 0; i &lt; keys.length; ++i) {
+    const dataViewConfig = dataViewConfigs[keys[i]];
+    for (let j = 0; j &lt; dataViewConfig.length; ++j) {
+      const divId = dataViewConfig[j].divId;
+      if (!divIds.includes(divId)) {
+        divIds.push(divId);
+      }
+    }
+  }
+  return divIds;
+}
+
+/**
+ * Get the layer group ids associated to a data.
+ *
+ * @param {Array} dataViewConfig The data view config.
+ * @returns {Array} The list of ids.
+ */
+function getDataLayerGroupIds(dataViewConfig) {
+  const divIds = [];
+  for (let j = 0; j &lt; dataViewConfig.length; ++j) {
+    divIds.push(dataViewConfig[j].divId);
+  }
+  return divIds;
+}
+
+/**
+ * Setup the binders checkboxes
+ */
+function setupBindersCheckboxes() {
+  const bindersDiv = document.getElementById('binders');
+  const propList = [
+    'WindowLevel',
+    'Position',
+    'Zoom',
+    'Offset',
+    'Opacity'
+  ];
+  const binders = [];
+  // add all binders at startup
+  for (let b = 0; b &lt; propList.length; ++b) {
+    binders.push(propList[b] + 'Binder');
+  }
+  _app.setLayerGroupsBinders(binders);
+
+  /**
+   * Add a binder.
+   *
+   * @param {string} propName The name of the property to bind.
+   */
+  function addBinder(propName) {
+    binders.push(propName + 'Binder');
+    _app.setLayerGroupsBinders(binders);
+  }
+  /**
+   * Remove a binder.
+   *
+   * @param {string} propName The name of the property to bind.
+   */
+  function removeBinder(propName) {
+    const index = binders.indexOf(propName + 'Binder');
+    if (index !== -1) {
+      binders.splice(index, 1);
+    }
+    _app.setLayerGroupsBinders(binders);
+  }
+  /**
+   * Get the input change handler for a binder.
+   *
+   * @param {string} propName The name of the property to bind.
+   * @returns {object} The handler.
+   */
+  function getOnInputChange(propName) {
+    return function (event) {
+      if (event.target.checked) {
+        addBinder(propName);
+      } else {
+        removeBinder(propName);
+      }
+    };
+  }
+  // individual binders
+  for (let i = 0; i &lt; propList.length; ++i) {
+    const propName = propList[i];
+
+    const input = document.createElement('input');
+    input.id = 'binder-' + i;
+    input.type = 'checkbox';
+    input.checked = true;
+    input.onchange = getOnInputChange(propName);
+
+    const label = document.createElement('label');
+    label.htmlFor = input.id;
+    label.appendChild(document.createTextNode(propName));
+
+    bindersDiv.appendChild(input);
+    bindersDiv.appendChild(label);
+  }
+
+  // check all
+  const allInput = document.createElement('input');
+  allInput.id = 'binder-all';
+  allInput.type = 'checkbox';
+  allInput.checked = true;
+  allInput.onchange = function () {
+    for (let j = 0; j &lt; propList.length; ++j) {
+      document.getElementById('binder-' + j).click();
+    }
+  };
+  const allLabel = document.createElement('label');
+  allLabel.htmlFor = allInput.id;
+  allLabel.appendChild(document.createTextNode('all'));
+  bindersDiv.appendChild(allInput);
+  bindersDiv.appendChild(allLabel);
+}
+
+/**
+ * Setup the tools checkboxes
+ */
+function setupToolsCheckboxes() {
+  const toolsDiv = document.getElementById('tools');
+  const keys = Object.keys(_tools);
+
+  const getChangeTool = function (tool) {
+    return function () {
+      _app.setTool(tool);
+      if (tool === 'Draw') {
+        _app.setToolFeatures({shapeName: 'Rectangle'});
+      }
+    };
+  };
+
+  const getKeyCheck = function (char, input) {
+    return function (event) {
+      if (!event.ctrlKey &amp;&amp;
+        !event.altKey &amp;&amp;
+        !event.shiftKey &amp;&amp;
+        event.key === char) {
+        input.click();
+      }
+    };
+  };
+
+  for (let i = 0; i &lt; keys.length; ++i) {
+    const key = keys[i];
+
+    const input = document.createElement('input');
+    input.id = 'tool-' + i;
+    input.name = 'tools';
+    input.type = 'radio';
+    input.onchange = getChangeTool(key);
+
+    if (key === 'Scroll') {
+      input.checked = true;
+    }
+
+    const label = document.createElement('label');
+    label.htmlFor = input.id;
+    label.appendChild(document.createTextNode(key));
+
+    toolsDiv.appendChild(input);
+    toolsDiv.appendChild(label);
+
+    // keyboard shortcut
+    window.addEventListener(
+      'keydown', getKeyCheck(key[0].toLowerCase(), input));
+  }
+}
+
+/**
+ * Get the selected tool
+ *
+ * @returns {string} The tool name.
+ */
+function getSelectedTool() {
+  const toolsInput = document.getElementsByName('tools');
+  let toolIndex = null;
+  for (let j = 0; j &lt; toolsInput.length; ++j) {
+    if (toolsInput[j].checked) {
+      toolIndex = j;
+      break;
+    }
+  }
+  return Object.keys(_tools)[toolIndex];
+}
+
+/**
+ * Bind app to controls.
+ */
+function bindAppToControls() {
+  _app.addEventListener('wlchange', onWLChange);
+  _app.addEventListener('opacitychange', onOpacityChange);
+}
+
+/**
+ * Unbind app to controls.
+ */
+function unbindAppToControls() {
+  _app.removeEventListener('wlchange', onWLChange);
+  _app.removeEventListener('opacitychange', onOpacityChange);
+}
+
+/**
+ * Handle app wl change.
+ *
+ * @param {object} event The change event.
+ */
+function onWLChange(event) {
+  // width number
+  let elemId = 'width-' + event.dataid + '-number';
+  let elem = document.getElementById(elemId);
+  if (elem) {
+    elem.value = event.value[1];
+  } else {
+    console.warn('wl change: HTML not ready?');
+  }
+  // width range
+  elemId = 'width-' + event.dataid + '-range';
+  elem = document.getElementById(elemId);
+  if (elem) {
+    elem.value = event.value[1];
+  }
+  // center number
+  elemId = 'center-' + event.dataid + '-number';
+  elem = document.getElementById(elemId);
+  if (elem) {
+    elem.value = event.value[0];
+  }
+  // center range
+  elemId = 'center-' + event.dataid + '-range';
+  elem = document.getElementById(elemId);
+  if (elem) {
+    elem.value = event.value[0];
+  }
+}
+
+/**
+ * Handle app opacity change.
+ *
+ * @param {object} event The change event.
+ */
+function onOpacityChange(event) {
+  const value = parseFloat(event.value[0]).toPrecision(3);
+  // number
+  let elemId = 'opacity-' + event.dataid + '-number';
+  let elem = document.getElementById(elemId);
+  if (elem) {
+    elem.value = value;
+  } else {
+    console.warn('opacity change: HTML not ready?');
+  }
+  // range
+  elemId = 'opacity-' + event.dataid + '-range';
+  elem = document.getElementById(elemId);
+  if (elem) {
+    elem.value = value;
+  }
+}
+
+/**
+ * Clear the data table.
+ */
+function clearDataTable() {
+  const detailsDiv = document.getElementById('layersdetails');
+  detailsDiv.innerHTML = '';
+}
+
+/**
+ * Get a control div: label, range and number field.
+ *
+ * @param {string} id The control id.
+ * @param {string} name The control name.
+ * @param {number} min The control minimum value.
+ * @param {number} max The control maximum value.
+ * @param {number} value The control value.
+ * @param {Function} callback The callback on control value change.
+ * @param {number} precision Optional number field float precision.
+ * @returns {object} The control div.
+ */
+function getControlDiv(id, name, min, max, value, callback, precision) {
+  const range = document.createElement('input');
+  range.id = id + '-range';
+  range.className = 'ctrl-range';
+  range.type = 'range';
+  range.min = min.toPrecision(precision);
+  range.max = max.toPrecision(precision);
+  range.step = ((max - min) * 0.01).toPrecision(precision);
+  range.value = value;
+
+  const label = document.createElement('label');
+  label.id = id + '-label';
+  label.className = 'ctrl-label';
+  label.htmlFor = range.id;
+  label.appendChild(document.createTextNode(name));
+
+  const number = document.createElement('input');
+  number.id = id + '-number';
+  number.className = 'ctrl-number';
+  number.type = 'number';
+  number.min = range.min;
+  number.max = range.max;
+  number.step = range.step;
+  number.value = parseFloat(value).toPrecision(precision);
+
+  // callback and bind range and number
+  number.oninput = function () {
+    range.value = this.value;
+    callback(this.value);
+  };
+  range.oninput = function () {
+    number.value = parseFloat(this.value).toPrecision(precision);
+    callback(this.value);
+  };
+
+  const div = document.createElement('div');
+  div.id = id + '-ctrl';
+  div.className = 'ctrl';
+  div.appendChild(label);
+  div.appendChild(range);
+  div.appendChild(number);
+
+  return div;
+}
+
+/**
+ * Add a data row.
+ *
+ * @param {number} id The data index.
+ */
+function addDataRow(id) {
+  // bind app to controls on first id
+  if (id === 0) {
+    bindAppToControls();
+  }
+
+  const dataViewConfigs = _app.getDataViewConfig();
+  const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
+  // use first view layer
+  const vls = _app.getViewLayersByDataIndex(id);
+  const vl = vls[0];
+  const vc = vl.getViewController();
+  const wl = vc.getWindowLevel();
+
+  let table = document.getElementById('layerstable');
+  let body;
+  // create table if not present
+  if (!table) {
+    table = document.createElement('table');
+    table.id = 'layerstable';
+    const header = table.createTHead();
+    const trow = header.insertRow(0);
+    const insertTCell = function (text) {
+      const th = document.createElement('th');
+      th.innerHTML = text;
+      trow.appendChild(th);
+    };
+    insertTCell('Id');
+    for (let j = 0; j &lt; allLayerGroupDivIds.length; ++j) {
+      insertTCell('LG' + j);
+    }
+    insertTCell('Alpha Range');
+    insertTCell('Contrast');
+    insertTCell('Alpha');
+    body = table.createTBody();
+    const div = document.getElementById('layersdetails');
+    div.appendChild(table);
+  } else {
+    body = table.getElementsByTagName('tbody')[0];
+  }
+
+  // add new layer row
+  const row = body.insertRow();
+  let cell;
+
+  // cell: id
+  cell = row.insertCell();
+  cell.appendChild(document.createTextNode(id));
+
+  // cell: radio
+  let viewConfig = dataViewConfigs[id];
+  if (typeof viewConfig === 'undefined') {
+    viewConfig = dataViewConfigs['*'];
+  }
+  const dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
+  for (let l = 0; l &lt; allLayerGroupDivIds.length; ++l) {
+    const layerGroupDivId = allLayerGroupDivIds[l];
+    cell = row.insertCell();
+    if (!dataLayerGroupsIds.includes(layerGroupDivId)) {
+      continue;
+    }
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'layerselect-' + l;
+    radio.id = 'layerselect-' + layerGroupDivId + '-' + id;
+    radio.checked = true;
+    radio.onchange = function (event) {
+      const fullId = event.target.id;
+      const split = fullId.split('-');
+      const groupDivId = split[1];
+      const dataId = split[2];
+      const lg = _app.getLayerGroupByDivId(groupDivId);
+      lg.setActiveViewLayerByDataIndex(parseInt(dataId, 10));
+    };
+    cell.appendChild(radio);
+  }
+
+  const image = _app.getImage(vl.getDataIndex());
+  const dataRange = image.getDataRange();
+  const rescaledDataRange = image.getRescaledDataRange();
+  const floatPrecision = 4;
+
+  // cell: alpha range
+  cell = row.insertCell();
+  const minId = 'value-min-' + id;
+  const maxId = 'value-max-' + id;
+  // callback
+  const changeAlphaFunc = function () {
+    const min = parseFloat(document.getElementById(minId + '-number').value);
+    const max = parseFloat(document.getElementById(maxId + '-number').value);
+    const func = function (value) {
+      if (value >= min &amp;&amp; value &lt;= max) {
+        return 255;
+      }
+      return 0;
+    };
+    for (let i = 0; i &lt; vls.length; ++i) {
+      vls[i].getViewController().setViewAlphaFunction(func);
+    }
+  };
+  // add controls
+  cell.appendChild(getControlDiv(minId, 'min',
+    dataRange.min, dataRange.max, dataRange.min,
+    changeAlphaFunc, floatPrecision));
+  cell.appendChild(getControlDiv(maxId, 'max',
+    dataRange.min, dataRange.max, dataRange.max,
+    changeAlphaFunc, floatPrecision));
+
+  // cell: contrast
+  cell = row.insertCell();
+  const widthId = 'width-' + id;
+  const centerId = 'center-' + id;
+  // callback
+  const changeContrast = function () {
+    const width =
+      parseFloat(document.getElementById(widthId + '-number').value);
+    const center =
+      parseFloat(document.getElementById(centerId + '-number').value);
+    vc.setWindowLevel(center, width);
+  };
+  // add controls
+  cell.appendChild(getControlDiv(widthId, 'width',
+    0, rescaledDataRange.max - rescaledDataRange.min, wl.width,
+    changeContrast, floatPrecision));
+  cell.appendChild(getControlDiv(centerId, 'center',
+    rescaledDataRange.min, rescaledDataRange.max, wl.center,
+    changeContrast, floatPrecision));
+
+  // cell: opactiy
+  cell = row.insertCell();
+  const opacityId = 'opacity-' + id;
+  // callback
+  const changeOpacity = function (value) {
+    vl.setOpacity(value);
+    vl.draw();
+  };
+  // add controls
+  cell.appendChild(getControlDiv(opacityId, 'opacity',
+    0, 1, vl.getOpacity(), changeOpacity, floatPrecision));
+}
+
+/**
+ * Compare two pos pat keys.
+ *
+ * @param {string} a The key of the first item.
+ * @param {string} b The key of the second item.
+ * @returns {number} Negative if a&lt;b, positive if a>b.
+ */
+function comparePosPat(a, b) {
+  const za = parseFloat(a.split('\\').at(-1));
+  const zb = parseFloat(b.split('\\').at(-1));
+  return za - zb;
+}
+
+/**
+ * Sort an object with pos pat string keys.
+ *
+ * @param {object} obj The object to sort
+ * @returns {object} The sorted object.
+ */
+function sortByPosPatKey(obj) {
+  const keys = Object.keys(obj);
+  keys.sort(comparePosPat);
+  const sorted = new Map();
+  for (let i = 0; i &lt; keys.length; i++) {
+    const key = keys[i];
+    sorted.set(key, obj[key]);
+  }
+  return sorted;
+}
+
+/**
+ * Get a rounding function for a specific precision.
+ *
+ * @param {number} precision The rounding precision.
+ * @returns {Function} The rounding function.
+ */
+function getPrecisionRound(precision) {
+  return function (x) {
+    return dwv.precisionRound(x, precision);
+  };
+}
+
+/**
+ * Log the DICCOM seg segments ordered by frame position patients.
+ *
+ * @param {object} elements The DICOM seg elements.
+ */
+function logFramePosPats(elements) {
+  // PerFrameFunctionalGroupsSequence
+  const perFrame = elements['52009230'].value;
+  const perPos = {};
+  for (let i = 0; i &lt; perFrame.length; ++i) {
+    // PlanePositionSequence
+    const posSq = perFrame[i]['00209113'].value;
+    // ImagePositionPatient
+    const pos = posSq[0]['00200032'].value;
+    if (typeof perPos[pos] === 'undefined') {
+      perPos[pos] = [];
+    }
+    // FrameContentSequence
+    const frameSq = perFrame[i]['00209111'].value;
+    // DimensionIndexValues
+    const dim = frameSq[0]['00209157'].value;
+    perPos[pos].push(dim);
+  }
+  console.log('DICOM SEG Segments', sortByPosPatKey(perPos));
+}
+
+/**
+ * Get the meta data with names instead of tag keys.
+ *
+ * @param {object} metaData The initial meta data.
+ * @returns {object} The list of meta data.
+ */
+function getMetaDataWithNames(metaData) {
+  let meta = metaData;
+  if (typeof meta['00020010'] !== 'undefined') {
+    // replace tag key with tag name for dicom
+    meta = Object.keys(meta).reduce((accumulator, currentValue) => {
+      const tag = dwv.getTagFromKey(currentValue);
+      let key = tag.getNameFromDictionary();
+      if (typeof key === 'undefined') {
+        // add 'x' to help sorting
+        key = 'x' + tag.getKey();
+      }
+      accumulator[key] = meta[currentValue];
+      return accumulator;
+    }, {});
+  }
+  return meta;
+}
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.32.1.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="4WkZ5A7wosJZdJTW-I5Qa"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="35nGHXv3_Bpbqsfxt-a1y"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadabort">loadabort</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaderror">loaderror</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html#event:drawchange">drawchange</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html#event:drawdelete">drawdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagechange">imagechange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html#event:drawmove">drawmove</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourchange">colourchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="zP1j7qeIyZJ-P2JDYcTre"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeGroupCommand.html">ChangeGroupCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteGroupCommand.html">DeleteGroupCommand</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomElementsWrapper.html">DicomElementsWrapper</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="FreeHandFactory.html">FreeHandFactory</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="MoveGroupCommand.html">MoveGroupCommand</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RescaleLut.html">RescaleLut</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="ShapeEditor.html">ShapeEditor</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="WindowCenterAndWidth.html">WindowCenterAndWidth</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="E1z8PvXQzOSepvYANynXk"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-Konva.html">Konva</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="YX45Wdq_9qThjaiQPkuFc"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>
