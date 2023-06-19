@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.32.1](https://github.com/ivmartel/dwv/releases/tag/v0.32.1) - 19/06/2023
+
+### Added
+
+- Update API to provide image creation and state apply [#1410](https://github.com/ivmartel/dwv/issues/1410)
+- Change babel configuration [#1409](https://github.com/ivmartel/dwv/issues/1409)
+
+### Fixed
+
+- Uncaught TypeError: t.findOne is not a function [#1392](https://github.com/ivmartel/dwv/issues/1392)
+
+---
+
 ## [v0.32.0](https://github.com/ivmartel/dwv/releases/tag/v0.32.0) - 02/06/2023
 
 ### Added
@@ -11,6 +24,29 @@
 ### Fixed
 
 - Unknown VR breaks code [#1325](https://github.com/ivmartel/dwv/issues/1325)
+
+---
+
+## [v0.31.2](https://github.com/ivmartel/dwv/releases/tag/v0.31.2) - 07/05/2023
+
+### Fixed
+
+- Cannot run thread after stop [#1358](https://github.com/ivmartel/dwv/issues/1358)
+- Error in objectToArray [#1354](https://github.com/ivmartel/dwv/issues/1354)
+
+### Added
+
+- Add source to dicom load errors [#1355](https://github.com/ivmartel/dwv/issues/1355)
+
+---
+
+## [v0.31.1](https://github.com/ivmartel/dwv/releases/tag/v0.31.1) - 27/04/2023
+
+### Fixed
+
+- MPR bad offset when loading larger data [#1348](https://github.com/ivmartel/dwv/issues/1348)
+- DICOM seg loading failure 'Test distance is increasing' [#1347](https://github.com/ivmartel/dwv/issues/1347)
+- Error when accessing modality w/l presets [#1346](https://github.com/ivmartel/dwv/issues/1346)
 
 ---
 
