@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.32.1](https://github.com/ivmartel/dwv/releases/tag/v0.32.1) - 19/06/2023
+
+### Added
+
+- Update API to provide image creation and state apply [#1410](https://github.com/ivmartel/dwv/issues/1410)
+- Change babel configuration [#1409](https://github.com/ivmartel/dwv/issues/1409)
+
+### Fixed
+
+- Uncaught TypeError: t.findOne is not a function [#1392](https://github.com/ivmartel/dwv/issues/1392)
+
+
 ## [v0.32.0](https://github.com/ivmartel/dwv/releases/tag/v0.32.0) - 02/06/2023
 
 ### Added

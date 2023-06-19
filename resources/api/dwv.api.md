@@ -13,6 +13,7 @@ export class App {
     addEventListener(type: string, callback: object): void;
     addNewImage(image: Image_2, meta: object): number;
     addToUndoStack: (cmd: object) => void;
+    applyJsonState(jsonState: string): void;
     canScroll(): boolean;
     canWindowLevel(): boolean;
     defaultOnKeydown: (event: KeyboardEvent) => void;
@@ -24,6 +25,7 @@ export class App {
     getDataViewConfig(): object;
     getDrawLayersByDataIndex(index: number): any[];
     getImage(index: number): Image_2;
+    getJsonState(): string;
     getLastImage(): Image_2;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(index: number): object;
@@ -31,7 +33,6 @@ export class App {
     getNumberOfLoadedData(): number;
     getOffset(): object;
     getStackSize(): number;
-    getState(): object;
     getStyle(): object;
     getToolboxController(): object;
     getViewLayersByDataIndex(index: number): any[];
@@ -67,6 +68,15 @@ export class App {
 
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+// @public
+export function createImage(elements: object): Image_2;
+
+// @public
+export function createMaskImage(elements: object): Image_2;
+
+// @public
+export function createView(elements: object, image: Image_2): View;
 
 // @public (undocumented)
 export namespace customUI {
@@ -580,7 +590,7 @@ export class ViewController {
     removeEventListener(type: string, callback: object): void;
     setColourMap(colourMap: object): void;
     setColourMapFromName(name: string): void;
-    setCurrentIndex(index: Index, silent: boolean): boolean;
+    setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     setImage(img: Image_2, index: number): void;
     setViewAlphaFunction(func: (value: object, index: object) => number): void;
