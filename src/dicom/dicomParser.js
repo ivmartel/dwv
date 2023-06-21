@@ -430,7 +430,7 @@ function guessTransferSyntax(firstDataElement) {
     tag: new Tag('0002', '0010'),
     vr: 'UI'
   };
-  dataElement.value = [syntax + ' ']; // even length
+  dataElement.value = [syntax];
   dataElement.vl = dataElement.value[0].length;
   dataElement.startOffset = firstDataElement.startOffset;
   dataElement.endOffset = dataElement.startOffset + dataElement.vl;
