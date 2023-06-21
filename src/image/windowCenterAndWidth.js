@@ -159,19 +159,6 @@ export class WindowCenterAndWidth {
   }
 
   /**
-   * Set the output value range.
-   *
-   * @param {string} min The output value minimum.
-   * @param {string} max The output value maximum.
-   */
-  setRange(min, max) {
-    this.#ymin = parseInt(min, 10);
-    this.#ymax = parseInt(max, 10);
-    // re-initialise
-    this.#init();
-  }
-
-  /**
    * Set the signed offset.
    *
    * @param {number} offset The signed data offset,
@@ -208,17 +195,9 @@ export class WindowCenterAndWidth {
    */
   equals(rhs) {
     return rhs !== null &&
+      typeof rhs !== 'undefined' &&
       this.getCenter() === rhs.getCenter() &&
       this.getWidth() === rhs.getWidth();
-  }
-
-  /**
-   * Get a string representation of the window level.
-   *
-   * @returns {string} The window level as a string.
-   */
-  toString() {
-    return (this.getCenter() + ', ' + this.getWidth());
   }
 
 } // class WindowLevel
