@@ -4,6 +4,7 @@ import {Spacing} from '../../src/image/spacing';
 import {Geometry} from '../../src/image/geometry';
 import {Image} from '../../src/image/image';
 import {View} from '../../src/image/view';
+import {RescaleSlopeAndIntercept} from '../../src/image/rsi';
 
 /**
  * Tests for the 'image/view.js' file.
@@ -143,6 +144,66 @@ QUnit.test('Test generate data MONO.', function (assert) {
   let testContent0 = true;
   for (let i = 0; i < size0 * size0 * 4; ++i) {
     if (theoData0[i] !== imageData.data[i]) {
+      testContent0 = false;
+      break;
+    }
+  }
+  assert.equal(testContent0, true, 'check image data');
+});
+
+/**
+ * Tests for {@link View} generateImageData MONO with RSI.
+ *
+ * @function module:tests/image~generateImageDataMONO
+ */
+QUnit.test('Test generate data MONO with RSI.', function (assert) {
+  // create an image
+  const size0 = 2;
+  const imgSize0 = new Size([size0, size0, 1]);
+  const imgSpacing0 = new Spacing([1, 1, 1]);
+  const imgOrigin0 = new Point3D(0, 0, 0);
+  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const buffer0 = [];
+  for (let i = 0; i < size0 * size0; ++i) {
+    buffer0[i] = i;
+  }
+  const image0 = new Image(imgGeometry0, buffer0);
+  image0.setMeta({BitsStored: 8});
+  image0.setRescaleSlopeAndIntercept(new RescaleSlopeAndIntercept(2, 0));
+  // create a view
+  const view0 = new View(image0);
+  // create the image data
+  const imageData = {
+    width: size0,
+    height: size0,
+    data: new Uint8ClampedArray(size0 * size0 * 4)
+  };
+
+  // default window level
+  view0.setWindowLevelMinMax();
+  // call generate data
+  view0.generateImageData(imageData);
+  // TODO proper data?
+  const theoData0 = [0,
+    0,
+    0,
+    255,
+    102,
+    102,
+    102,
+    255,
+    204,
+    204,
+    204,
+    255,
+    255,
+    255,
+    255,
+    255];
+  let testContent0 = true;
+  for (let i = 0; i < size0 * size0 * 4; ++i) {
+    if (theoData0[i] !== imageData.data[i]) {
+      console.log(i, theoData0[i], imageData.data[i]);
       testContent0 = false;
       break;
     }
