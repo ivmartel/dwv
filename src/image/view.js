@@ -97,7 +97,7 @@ export class View {
    *
    * @type {object}
    */
-  #windowLuts = {};
+  #windowLut;
 
   /**
    * Window presets.
@@ -295,36 +295,29 @@ export class View {
    * Get the window LUT of the image.
    * Warning: can be undefined in no window/level was set.
    *
-   * @param {RescaleSlopeAndIntercept} [rsi] Optional image rsi,
-   *  will take the one of the current slice otherwise.
    * @returns {WindowLut} The window LUT of the image.
    * @fires View#wlchange
    */
-  getCurrentWindowLut(rsi) {
-    // check position
-    if (!this.getCurrentIndex()) {
-      this.setInitialIndex();
-    }
-    const currentIndex = this.getCurrentIndex();
-    // use current rsi if not provided
-    if (typeof rsi === 'undefined') {
-      rsi = this.#image.getRescaleSlopeAndIntercept(currentIndex);
-    }
-
+  getCurrentWindowLut() {
     // get the current window level
-    let wl = null;
+    let wl;
     // special case for 'perslice' presets
     if (this.#currentPresetName &&
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName].perslice !==
         'undefined' &&
       this.#windowPresets[this.#currentPresetName].perslice === true) {
+      // check position
+      if (!this.getCurrentIndex()) {
+        this.setInitialIndex();
+      }
+      const currentIndex = this.getCurrentIndex();
       // get the preset for this slice
       const offset = this.#image.getSecondaryOffset(currentIndex);
       wl = this.#windowPresets[this.#currentPresetName].wl[offset];
     }
     // regular case
-    if (!wl) {
+    if (typeof wl === 'undefined') {
       // if no current, use first id
       if (!this.#currentWl) {
         this.setWindowLevelPresetById(0, true);
@@ -333,28 +326,36 @@ export class View {
     }
 
     // get the window lut
-    let wlut = this.#windowLuts[rsi.toString()];
-    if (typeof wlut === 'undefined') {
+    if (typeof this.#windowLut === 'undefined') {
+      // if the image rsi is not constant, the iterator will use
+      //  rescaled values -> no need to handle non constant rsi here
+      let rsi;
+      let isDiscrete;
+      if (this.#image.isConstantRSI()) {
+        rsi = this.#image.getRescaleSlopeAndIntercept();
+        isDiscrete = true;
+      } else {
+        rsi = new RescaleSlopeAndIntercept(1, 0);
+        isDiscrete = false;
+      }
       // create the rescale lookup table
       const rescaleLut = new RescaleLut(
         rsi,
         this.#image.getMeta().BitsStored);
       // create the window lookup table
-      const windowLut = new WindowLut(
-        rescaleLut, this.#image.getMeta().IsSigned);
-      // store
-      this.addWindowLut(windowLut);
-      wlut = windowLut;
+      this.#windowLut = new WindowLut(
+        rescaleLut,
+        this.#image.getMeta().IsSigned,
+        isDiscrete);
     }
 
     // update lut window level if not present or different from previous
-    const lutWl = wlut.getWindowLevel();
-    if (!wl.equals(lutWl)) {
+    const lutWl = this.#windowLut.getWindowLevel();
+    if (typeof lutWl === 'undefined' || !wl.equals(lutWl)) {
       // set lut window level
-      wlut.setWindowLevel(wl);
-      wlut.update();
+      this.#windowLut.setWindowLevel(wl);
       // fire change event
-      if (!lutWl ||
+      if (typeof lutWl === 'undefined' ||
         lutWl.getWidth() !== wl.getWidth() ||
         lutWl.getCenter() !== wl.getCenter()) {
         this.#fireEvent({
@@ -368,17 +369,7 @@ export class View {
     }
 
     // return
-    return wlut;
-  }
-
-  /**
-   * Add the window LUT to the list.
-   *
-   * @param {WindowLut} wlut The window LUT of the image.
-   */
-  addWindowLut(wlut) {
-    const rsi = wlut.getRescaleLut().getRSI();
-    this.#windowLuts[rsi.toString()] = wlut;
+    return this.#windowLut;
   }
 
   /**
@@ -849,8 +840,9 @@ export class View {
     }
 
     const image = this.getImage();
+    const isRescaled = !image.isConstantRSI();
     const iterator = getSliceIterator(
-      image, index, false, this.getOrientation());
+      image, index, isRescaled, this.getOrientation());
 
     const photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation) {
