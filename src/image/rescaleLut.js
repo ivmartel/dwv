@@ -17,18 +17,11 @@ export class RescaleLut {
   #rsi;
 
   /**
-   * The internal array.
-   *
-   * @type {Float32Array}
-   */
-  #lut = null;
-
-  /**
-   * Flag to know if the lut is ready or not.
+   * Is the RSI an identity one.
    *
    * @type {boolean}
    */
-  #isReady = false;
+  #isIdRsi;
 
   /**
    * The size of the LUT array.
@@ -38,12 +31,29 @@ export class RescaleLut {
   #length;
 
   /**
+   * The internal LUT array.
+   *
+   * @type {Float32Array}
+   */
+  #lut;
+
+  /**
    * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
    * @param {number} bitsStored The number of bits used to store the data.
    */
   constructor(rsi, bitsStored) {
     this.#rsi = rsi;
+    this.#isIdRsi = rsi.isID();
+
     this.#length = Math.pow(2, bitsStored);
+
+    // create lut if not identity RSI
+    if (!this.#isIdRsi) {
+      this.#lut = new Float32Array(this.#length);
+      for (let i = 0; i < this.#length; ++i) {
+        this.#lut[i] = this.#rsi.apply(i);
+      }
+    }
   }
 
   /**
@@ -53,33 +63,6 @@ export class RescaleLut {
    */
   getRSI() {
     return this.#rsi;
-  }
-
-  /**
-   * Is the lut ready to use or not? If not, the user must
-   * call 'initialise'.
-   *
-   * @returns {boolean} True if the lut is ready to use.
-   */
-  isReady() {
-    return this.#isReady;
-  }
-
-  /**
-   * Initialise the LUT.
-   */
-  initialise() {
-    // check if already initialised
-    if (this.#isReady) {
-      return;
-    }
-    // create lut and fill it
-    this.#lut = new Float32Array(this.#length);
-    for (let i = 0; i < this.#length; ++i) {
-      this.#lut[i] = this.#rsi.apply(i);
-    }
-    // update ready flag
-    this.#isReady = true;
   }
 
   /**
@@ -94,11 +77,12 @@ export class RescaleLut {
   /**
    * Get the value of the LUT at the given offset.
    *
-   * @param {number} offset The input offset in [0,2^bitsStored] range.
+   * @param {number} offset The input offset in [0,2^bitsStored] range
+   *   or full range for ID rescale.
    * @returns {number} The float32 value of the LUT at the given offset.
    */
   getValue(offset) {
-    return this.#lut[offset];
+    return this.#isIdRsi ? offset : this.#lut[offset];
   }
 
 } // class RescaleLut
