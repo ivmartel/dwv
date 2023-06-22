@@ -12,6 +12,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 table, td, th {
+  margin-top: 5px;
   border: 1px solid #aaa;
 }
 table {
@@ -27,10 +28,12 @@ span {
   font-size: small;
   font-style: italic;
 }
-.input {
-  margin-bottom: 10px;
-  padding: 5px;
-  background-color: gainsboro;
+input[type=number] {
+  width: 75px;
+}
+input[type=range] {
+  width: 100px;
+  margin: 0px 10px;
 }
 #fileinput {
   width: 50%;
@@ -40,7 +43,7 @@ span {
   display:inline-block;
   height: 350px;
   width: max(30%, 350px);
-  margin: 5px;
+  margin: 5px 5px 5px 0;
   background-color: limeGreen;
   /* allow child centering */
   position: relative;
@@ -59,6 +62,7 @@ canvas {
 }
 .line {
   padding: 5px;
+  background-color: #E8E8E8;
 }
 /** tooltip */
 .layerGroup span {
@@ -99,7 +103,7 @@ hr.vertical {
 
 <body>
 
-<div class="input">
+<div class="line">
 <label for="fileinput">Input:</label>
 <input type="file" id="fileinput" multiple>
 <progress id="loadprogress" max="100" value="0"></progress>
