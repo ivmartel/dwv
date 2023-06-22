@@ -16,7 +16,7 @@ const _dicomWeb = false;
  */
 function viewerSetup() {
   // logger level (optional)
-  dwv.logger.level = dwv.logger.levels.WARN;
+  dwv.logger.level = dwv.logger.levels.INFO;
 
   dwv.decoderScripts.jpeg2000 =
     '../../decoders/pdfjs/decode-jpeg2000.js';
