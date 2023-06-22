@@ -420,9 +420,10 @@ export class View {
       key = keys[i];
       if (typeof this.#windowPresets[key] !== 'undefined') {
         if (typeof this.#windowPresets[key].perslice !== 'undefined' &&
-        this.#windowPresets[key].perslice === true) {
+          this.#windowPresets[key].perslice === true) {
           throw new Error('Cannot add perslice preset');
         } else {
+          // update existing
           this.#windowPresets[key] = presets[key];
         }
       } else {
@@ -699,6 +700,21 @@ export class View {
       // assign
       this.#currentWl = newWl;
       this.#currentPresetName = name;
+
+      // update manual
+      if (name === 'manual') {
+        if (typeof this.#windowPresets[name] !== 'undefined') {
+          this.#windowPresets[name].wl[0] = newWl;
+        } else {
+          // add if not present
+          this.addWindowPresets({
+            manual: {
+              wl: [newWl],
+              name: 'manual'
+            }
+          });
+        }
+      }
 
       if (isNewWidth || isNewCenter) {
         /**
