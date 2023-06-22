@@ -12,7 +12,9 @@ import {
   getImage2DSize,
   getPixelSpacing,
   getPixelUnit,
-  TagValueExtractor
+  TagValueExtractor,
+  getSuvFactor,
+  canGetSuvFactor
 } from '../dicom/dicomElementsWrapper';
 import {Vector3D} from '../math/vector';
 import {Matrix33} from '../math/matrix';
@@ -178,8 +180,6 @@ export class ImageFactory {
         intercept = value;
       }
     }
-    const rsi = new RescaleSlopeAndIntercept(slope, intercept);
-    image.setRescaleSlopeAndIntercept(rsi);
 
     // meta information
     const meta = {
@@ -189,6 +189,23 @@ export class ImageFactory {
     if (typeof modality !== 'undefined') {
       meta.Modality = modality.value[0];
     }
+
+    // PET SUV
+    let intensityFactor = 1;
+    if (modality.value[0] === 'PT') {
+      const warn = canGetSuvFactor(dicomElements);
+      if (warn.length === 0) {
+        intensityFactor = getSuvFactor(dicomElements);
+        logger.info('Applying PET SUV calibration: ' + intensityFactor);
+        slope *= intensityFactor;
+        intercept *= intensityFactor;
+      } else {
+        logger.warn(warn);
+      }
+    }
+    const rsi = new RescaleSlopeAndIntercept(slope, intercept);
+    image.setRescaleSlopeAndIntercept(rsi);
+
     const sopClassUID = dicomElements['00080016'];
     if (typeof sopClassUID !== 'undefined') {
       meta.SOPClassUID = sopClassUID.value[0];
@@ -231,7 +248,7 @@ export class ImageFactory {
       let name;
       for (let j = 0; j < windowCenter.value.length; ++j) {
         const center = parseFloat(windowCenter.value[j]);
-        const width = parseFloat(windowWidth.value[j]);
+        let width = parseFloat(windowWidth.value[j]);
         if (center && width && width !== 0) {
           name = '';
           if (typeof windowCWExplanation !== 'undefined') {
@@ -240,8 +257,15 @@ export class ImageFactory {
           if (name === '') {
             name = 'Default' + j;
           }
+          width *= intensityFactor;
+          if (width < 1) {
+            width = 1;
+          }
           windowPresets[name] = {
-            wl: [new WindowCenterAndWidth(center, width)],
+            wl: [new WindowCenterAndWidth(
+              center * intensityFactor,
+              width
+            )],
             name: name
           };
         }
