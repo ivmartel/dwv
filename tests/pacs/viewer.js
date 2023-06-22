@@ -677,6 +677,22 @@ function onWLChange(event) {
   if (elem) {
     elem.value = event.value[0];
   }
+  // preset select
+  elemId = 'preset-' + event.dataid + '-select';
+  elem = document.getElementById(elemId);
+  if (elem) {
+    const options = elem.options;
+    const optId = 'preset-manual';
+    let manualOpt = options.namedItem(optId);
+    if (!manualOpt) {
+      const opt = document.createElement('option');
+      opt.id = optId;
+      opt.value = 'manual';
+      opt.appendChild(document.createTextNode('Manual'));
+      manualOpt = elem.appendChild(opt);
+    }
+    elem.selectedIndex = manualOpt.index;
+  }
 }
 
 /**
@@ -805,6 +821,7 @@ function addDataRow(id) {
     }
     insertTCell('Alpha Range');
     insertTCell('Contrast');
+    insertTCell('Preset');
     insertTCell('Alpha');
     body = table.createTBody();
     const div = document.getElementById('layersdetails');
@@ -899,6 +916,27 @@ function addDataRow(id) {
   cell.appendChild(getControlDiv(centerId, 'center',
     rescaledDataRange.min, rescaledDataRange.max, wl.center,
     changeContrast, floatPrecision));
+
+  // cell: presets
+  cell = row.insertCell();
+  // callback
+  const changePreset = function (event) {
+    const selectedIndex = event.target.selectedIndex;
+    vc.setWindowLevelPreset(event.target.value);
+    // force name after wl change
+    event.target.selectedIndex = selectedIndex;
+  };
+  const select = document.createElement('select');
+  select.id = 'preset-' + id + '-select';
+  const presets = vc.getWindowLevelPresetsNames();
+  for (const preset of presets) {
+    const option = document.createElement('option');
+    option.value = preset;
+    option.appendChild(document.createTextNode(preset));
+    select.appendChild(option);
+  }
+  select.onchange = changePreset;
+  cell.appendChild(select);
 
   // cell: opactiy
   cell = row.insertCell();
