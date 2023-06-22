@@ -681,17 +681,24 @@ function onWLChange(event) {
   elemId = 'preset-' + event.dataid + '-select';
   elem = document.getElementById(elemId);
   if (elem) {
-    const options = elem.options;
-    const optId = 'preset-manual';
-    let manualOpt = options.namedItem(optId);
-    if (!manualOpt) {
-      const opt = document.createElement('option');
-      opt.id = optId;
-      opt.value = 'manual';
-      opt.appendChild(document.createTextNode('Manual'));
-      manualOpt = elem.appendChild(opt);
+    const lg = _app.getActiveLayerGroup();
+    const vl = lg.getViewLayersByDataIndex(event.dataid)[0];
+    const vc = vl.getViewController();
+    const presetName = vc.getCurrentWindowPresetName();
+    const optName = 'manual';
+    if (presetName === optName) {
+      const options = elem.options;
+      const optId = 'preset-manual';
+      let manualOpt = options.namedItem(optId);
+      if (!manualOpt) {
+        const opt = document.createElement('option');
+        opt.id = optId;
+        opt.value = optName;
+        opt.appendChild(document.createTextNode(optName));
+        manualOpt = elem.appendChild(opt);
+      }
+      elem.selectedIndex = manualOpt.index;
     }
-    elem.selectedIndex = manualOpt.index;
   }
 }
 
@@ -921,10 +928,7 @@ function addDataRow(id) {
   cell = row.insertCell();
   // callback
   const changePreset = function (event) {
-    const selectedIndex = event.target.selectedIndex;
     vc.setWindowLevelPreset(event.target.value);
-    // force name after wl change
-    event.target.selectedIndex = selectedIndex;
   };
   const select = document.createElement('select');
   select.id = 'preset-' + id + '-select';
