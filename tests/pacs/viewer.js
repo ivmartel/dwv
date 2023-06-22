@@ -8,7 +8,7 @@ let _app = null;
 let _tools = null;
 
 // viewer options
-const _mode = 0;
+const _startMode = 0;
 const _dicomWeb = false;
 
 /**
@@ -54,30 +54,16 @@ function viewerSetup() {
   // use for concurrent load
   const numberOfDataToLoad = 1;
 
-  if (_mode === 0) {
+  if (_startMode === 0) {
     // simplest: one layer group
-    dataViewConfigs = prepareAndGetSimpleDataViewConfig();
-  } else if (_mode === 1) {
+    dataViewConfigs = prepareAndGetOnebyOneDataViewConfig();
+  } else if (_startMode === 1) {
     // MPR
     viewOnFirstLoadItem = false;
     dataViewConfigs = prepareAndGetMPRDataViewConfig();
-  } else if (_mode === 2) {
-    // simple side by side
-    addLayerGroup('layerGroupA');
-    addLayerGroup('layerGroupB');
-    dataViewConfigs = {
-      0: [
-        {
-          divId: 'layerGroupA'
-        }
-      ],
-      1: [
-        {
-          divId: 'layerGroupB'
-        }
-      ]
-    };
-  } else if (_mode === 3) {
+  } else if (_startMode === 2) {
+    dataViewConfigs = prepareAndGetOnebyTwoDataViewConfig();
+  } else if (_startMode === 3) {
     // multiple data, multiple layer group
     addLayerGroup('layerGroupA');
     addLayerGroup('layerGroupB');
@@ -322,8 +308,10 @@ function onDOMContentLoaded() {
     const value = event.target.value;
     if (value === 'mpr') {
       configs = prepareAndGetMPRDataViewConfig();
+    } else if (value === 'side') {
+      configs = prepareAndGetOnebyTwoDataViewConfig();
     } else {
-      configs = prepareAndGetSimpleDataViewConfig();
+      configs = prepareAndGetOnebyOneDataViewConfig();
     }
 
     // unbind app to controls
@@ -370,17 +358,49 @@ function addLayerGroup(id) {
 }
 
 /**
- * Create simple view config(s).
+ * Create 1*1 view config(s).
  *
  * @returns {object} The view config.
  */
-function prepareAndGetSimpleDataViewConfig() {
+function prepareAndGetOnebyOneDataViewConfig() {
   // clean up
   const dwvDiv = document.getElementById('dwv');
   dwvDiv.innerHTML = '';
   // add div
   addLayerGroup('layerGroupA');
-  return {'*': [{divId: 'layerGroupA'}]};
+  return {
+    '*': [
+      {
+        divId: 'layerGroupA'
+      }
+    ]
+  };
+}
+
+/**
+ * Create 1*2 view config(s).
+ *
+ * @returns {object} The view config.
+ */
+function prepareAndGetOnebyTwoDataViewConfig() {
+  // clean up
+  const dwvDiv = document.getElementById('dwv');
+  dwvDiv.innerHTML = '';
+  // add div
+  addLayerGroup('layerGroupA');
+  addLayerGroup('layerGroupB');
+  return {
+    0: [
+      {
+        divId: 'layerGroupA'
+      }
+    ],
+    1: [
+      {
+        divId: 'layerGroupB'
+      }
+    ]
+  };
 }
 
 /**
