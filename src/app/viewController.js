@@ -707,6 +707,15 @@ export class ViewController {
   }
 
   /**
+   * Get the current window level preset name.
+   *
+   * @returns {string} The preset name.
+   */
+  getCurrentWindowPresetName() {
+    return this.#view.getCurrentWindowPresetName();
+  }
+
+  /**
    * Set the window/level.
    *
    * @param {number} wc The window center.

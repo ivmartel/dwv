@@ -446,6 +446,15 @@ export class View {
   }
 
   /**
+   * Get the current window level preset name.
+   *
+   * @returns {string} The preset name.
+   */
+  getCurrentWindowPresetName() {
+    return this.#currentPresetName;
+  }
+
+  /**
    * Get the colour map of the image.
    *
    * @returns {object} The colour map of the image.
