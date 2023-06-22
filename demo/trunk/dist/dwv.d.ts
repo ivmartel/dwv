@@ -2735,6 +2735,12 @@ export declare class View {
      */
     addWindowPresets(presets: object): void;
     /**
+     * Get the current window level preset name.
+     *
+     * @returns {string} The preset name.
+     */
+    getCurrentWindowPresetName(): string;
+    /**
      * Get the colour map of the image.
      *
      * @returns {object} The colour map of the image.
@@ -3200,6 +3206,12 @@ export declare class ViewController {
      * @returns {object} The window center and width.
      */
     getWindowLevel(): object;
+    /**
+     * Get the current window level preset name.
+     *
+     * @returns {string} The preset name.
+     */
+    getCurrentWindowPresetName(): string;
     /**
      * Set the window/level.
      *
