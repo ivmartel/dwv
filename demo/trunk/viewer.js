@@ -456,17 +456,32 @@ function getLayerGroupDivIds(dataViewConfigs) {
 }
 
 /**
- * Get the layer group ids associated to a data.
+ * Get the layer group div ids associated to a view config.
  *
  * @param {Array} dataViewConfig The data view config.
- * @returns {Array} The list of ids.
+ * @returns {Array} The list of div ids.
  */
-function getDataLayerGroupIds(dataViewConfig) {
+function getDivIds(dataViewConfig) {
   const divIds = [];
   for (let j = 0; j < dataViewConfig.length; ++j) {
     divIds.push(dataViewConfig[j].divId);
   }
   return divIds;
+}
+
+/**
+ * Get the layer group div ids associated to a data id.
+ *
+ * @param {number} dataId The data id.
+ * @returns {Array} The list of div ids.
+ */
+function getDataLayerGroupDivIds(dataId) {
+  const dataViewConfigs = _app.getDataViewConfig();
+  let viewConfig = dataViewConfigs[dataId];
+  if (typeof viewConfig === 'undefined') {
+    viewConfig = dataViewConfigs['*'];
+  }
+  return getDivIds(viewConfig);
 }
 
 /**
@@ -681,23 +696,27 @@ function onWLChange(event) {
   elemId = 'preset-' + event.dataid + '-select';
   elem = document.getElementById(elemId);
   if (elem) {
-    const lg = _app.getActiveLayerGroup();
-    const vl = lg.getViewLayersByDataIndex(event.dataid)[0];
-    const vc = vl.getViewController();
-    const presetName = vc.getCurrentWindowPresetName();
-    const optName = 'manual';
-    if (presetName === optName) {
-      const options = elem.options;
-      const optId = 'preset-manual';
-      let manualOpt = options.namedItem(optId);
-      if (!manualOpt) {
-        const opt = document.createElement('option');
-        opt.id = optId;
-        opt.value = optName;
-        opt.appendChild(document.createTextNode(optName));
-        manualOpt = elem.appendChild(opt);
+    const ids = getDataLayerGroupDivIds(event.dataid);
+    const lg = _app.getLayerGroupByDivId(ids[0]);
+    const vls = lg.getViewLayersByDataIndex(event.dataid);
+    if (typeof vls !== 'undefined' && vls.length !== 0) {
+      const vl = vls[0];
+      const vc = vl.getViewController();
+      const presetName = vc.getCurrentWindowPresetName();
+      const optName = 'manual';
+      if (presetName === optName) {
+        const options = elem.options;
+        const optId = 'preset-manual';
+        let manualOpt = options.namedItem(optId);
+        if (!manualOpt) {
+          const opt = document.createElement('option');
+          opt.id = optId;
+          opt.value = optName;
+          opt.appendChild(document.createTextNode(optName));
+          manualOpt = elem.appendChild(opt);
+        }
+        elem.selectedIndex = manualOpt.index;
       }
-      elem.selectedIndex = manualOpt.index;
     }
   }
 }
@@ -850,7 +869,7 @@ function addDataRow(id) {
   if (typeof viewConfig === 'undefined') {
     viewConfig = dataViewConfigs['*'];
   }
-  const dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
+  const dataLayerGroupsIds = getDivIds(viewConfig);
   for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
     const layerGroupDivId = allLayerGroupDivIds[l];
     cell = row.insertCell();
