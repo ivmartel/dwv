@@ -331,9 +331,10 @@ function onDOMContentLoaded() {
     _app.setTool(getSelectedTool());
   });
 
+  // setup
   setupBindersCheckboxes();
-
   setupToolsCheckboxes();
+  setupTests();
 
   // bind app to input files
   const fileinput = document.getElementById('fileinput');
@@ -1064,4 +1065,95 @@ function getMetaDataWithNames(metaData) {
     }, {});
   }
   return meta;
+}
+
+/**
+ * Setup test line.
+ */
+function setupTests() {
+  const renderTestButton = document.createElement('button');
+  renderTestButton.onclick = runRenderTest;
+  renderTestButton.appendChild(document.createTextNode('render test'));
+
+  const testsDiv = document.getElementById('tests');
+  testsDiv.appendChild(renderTestButton);
+}
+
+/**
+ * Get simple stats for an array.
+ *
+ * @param {Array} array Input array.
+ * @returns {object} min, max, mean and standard deviation.
+ */
+function getSimpleStats(array) {
+  let min = array[0];
+  let max = min;
+  let sum = 0;
+  let sumSqr = 0;
+  let val = 0;
+  const length = array.length;
+  for (let i = 0; i < length; ++i) {
+    val = array[i];
+    if (val < min) {
+      min = val;
+    } else if (val > max) {
+      max = val;
+    }
+    sum += val;
+    sumSqr += val * val;
+  }
+
+  const mean = sum / length;
+  // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+  const variance = sumSqr / length - mean * mean;
+  const stdDev = Math.sqrt(variance);
+
+  return {
+    min: min,
+    max: max,
+    mean: mean,
+    stdDev: stdDev
+  };
+}
+
+/**
+ * Run render tests.
+ */
+function runRenderTest() {
+  const numberOfRun = 20;
+
+  const vl = _app.getActiveLayerGroup().getActiveViewLayer();
+  const vc = vl.getViewController();
+  const runner = function () {
+    vc.incrementIndex(2);
+  };
+
+  let startTime;
+  const timings = [];
+  const onRenderStart = function (/*event*/) {
+    startTime = performance.now();
+  };
+  const onRenderEnd = function (/*event*/) {
+    const endTime = performance.now();
+    timings.push(endTime - startTime);
+    startTime = undefined;
+
+    if (timings.length < numberOfRun) {
+      setTimeout(() => {
+        runner();
+      }, 100);
+    } else {
+      console.log('Stats:', getSimpleStats(timings));
+      // clean up
+      _app.removeEventListener('renderstart', onRenderStart);
+      _app.removeEventListener('renderend', onRenderEnd);
+    }
+  };
+
+  // setup
+  _app.addEventListener('renderstart', onRenderStart);
+  _app.addEventListener('renderend', onRenderEnd);
+
+  // start
+  runner();
 }
