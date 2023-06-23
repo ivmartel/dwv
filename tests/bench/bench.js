@@ -51,6 +51,7 @@ const parserFunctions = [
   {name: 'dwv-previous', selected: true},
   {name: 'dwv-current', selected: true}
 ];
+const numberOfTests = 2;
 
 // create default runner object
 const dataRunner = new dcmb.DataRunner();
@@ -145,6 +146,37 @@ function setupParsers() {
 }
 
 /**
+ * Setup the tests.
+ */
+function setupTests() {
+  const divTests = document.getElementById('tests');
+  const fieldsetElem = divTests.getElementsByTagName('fieldset')[0];
+  const names = ['parser', 'render'];
+
+  for (let i = 0; i < numberOfTests; ++i) {
+    const testId = 'test-' + i;
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'tests';
+    input.id = testId;
+    input.value = i;
+    input.onclick = function () {
+      onChangeTests(this);
+    };
+    if (i === 0) {
+      input.checked = true;
+    }
+
+    const label = document.createElement('label');
+    label.htmlFor = testId;
+    label.appendChild(document.createTextNode(names[i]));
+
+    fieldsetElem.appendChild(input);
+    fieldsetElem.appendChild(label);
+  }
+}
+
+/**
  * Setup the data.
  */
 function setupData() {
@@ -206,6 +238,19 @@ function onChangeParsers(input) {
 }
 
 /**
+ * Handle a parser test change,
+ *
+ * @param {object} input The new test.
+ */
+function onChangeTests(input) {
+  const selectedTest = input.value;
+  for (let i = 0; i < parserFunctions.length; ++i) {
+    parserFunctions[i].test = parserFunctions[i].tests[selectedTest];
+  }
+  benchRunner.setFunctions(parserFunctions.filter(checkSelected));
+}
+
+/**
  * Handle change in the input file element.
  * - Updates the data list by calling updateDataList.
  *
@@ -241,10 +286,10 @@ dcmb.onLaunchButton = function () {
 
 // last minute
 document.addEventListener('DOMContentLoaded', function (/*event*/) {
-  // parsers
+  // setup
   setupParsers();
-
   setupData();
+  setupTests();
 
   // output user agent
   const preAgent = document.createElement('pre');
@@ -258,12 +303,17 @@ document.addEventListener('DOMContentLoaded', function (/*event*/) {
 // iframe content is only available at window.onload time
 window.onload = function () {
   let ifname = '';
-  let test = null;
+  let tests = null;
   for (let i = 0; i < parserFunctions.length; ++i) {
     ifname = 'iframe-' + parserFunctions[i].name;
-    test = document.getElementById(ifname).contentWindow.tests[1];
-    if (test) {
-      parserFunctions[i].test = test;
+    tests = document.getElementById(ifname).contentWindow.tests;
+    if (typeof tests !== 'undefined') {
+      if (tests.length !== numberOfTests) {
+        throw new Error('Wrong number of tests for parser ' +
+          parserFunctions[i].name);
+      }
+      parserFunctions[i].tests = tests;
+      parserFunctions[i].test = tests[0];
     }
   }
   benchRunner.setFunctions(parserFunctions.filter(checkSelected));
