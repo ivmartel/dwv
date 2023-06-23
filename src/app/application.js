@@ -736,7 +736,7 @@ export class App {
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
       }
-      // initialise or add view
+      // add view
       // warn: needs a loaded DOM
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         this.#addViewLayer(dataIndex, config);
