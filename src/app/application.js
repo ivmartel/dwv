@@ -731,7 +731,7 @@ export class App {
     for (let i = 0; i < viewConfigs.length; ++i) {
       const config = viewConfigs[i];
       const layerGroup =
-      this.#stage.getLayerGroupByDivId(config.divId);
+        this.#stage.getLayerGroupByDivId(config.divId);
       // layer group must exist
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
@@ -739,11 +739,7 @@ export class App {
       // initialise or add view
       // warn: needs a loaded DOM
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
-        if (layerGroup.getNumberOfLayers() === 0) {
-          this.#initialiseBaseLayers(dataIndex, config);
-        } else {
-          this.#addViewLayer(dataIndex, config);
-        }
+        this.#addViewLayer(dataIndex, config);
       }
       // draw
       layerGroup.draw();
@@ -1282,23 +1278,6 @@ export class App {
   }
 
   /**
-   * Initialise the layers.
-   * To be called once the DICOM data has been loaded.
-   *
-   * @param {number} dataIndex The data index.
-   * @param {object} dataViewConfig The data view config.
-   */
-  #initialiseBaseLayers(dataIndex, dataViewConfig) {
-    // add layers
-    this.#addViewLayer(dataIndex, dataViewConfig);
-
-    // initialise the toolbox
-    if (this.#toolboxController) {
-      this.#toolboxController.init();
-    }
-  }
-
-  /**
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
@@ -1307,11 +1286,12 @@ export class App {
   #addViewLayer(dataIndex, dataViewConfig) {
     const data = this.#dataController.get(dataIndex);
     if (!data) {
-      throw new Error('Cannot initialise layer with data id: ' + dataIndex);
+      throw new Error('Cannot initialise layer with missing data, id: ' +
+        dataIndex);
     }
     const layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
     if (!layerGroup) {
-      throw new Error('Cannot initialise layer with group id: ' +
+      throw new Error('Cannot initialise layer with missing group, id: ' +
         dataViewConfig.divId);
     }
     const imageGeometry = data.image.getGeometry();
@@ -1463,6 +1443,13 @@ export class App {
       viewLayer.setScale(layerGroup.getScale());
       if (typeof drawLayer !== 'undefined') {
         drawLayer.setScale(layerGroup.getScale());
+      }
+    }
+
+    // initialise the toolbox for base
+    if (isBaseLayer) {
+      if (this.#toolboxController) {
+        this.#toolboxController.init();
       }
     }
 
