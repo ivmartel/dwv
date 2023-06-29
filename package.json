@@ -28,8 +28,8 @@
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
-    "@babel/preset-env": "^7.21.4",
+    "@babel/core": "^7.22.5",
+    "@babel/preset-env": "^7.22.5",
     "@microsoft/api-extractor": "^7.34.9",
     "babel-loader": "^9.1.2",
     "babel-plugin-istanbul": "^6.1.1",
