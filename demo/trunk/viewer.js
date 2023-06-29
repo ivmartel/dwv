@@ -586,7 +586,8 @@ function setupToolsCheckboxes() {
     return function () {
       _app.setTool(tool);
       if (tool === 'Draw') {
-        _app.setToolFeatures({shapeName: 'Rectangle'});
+        const name = _tools.Draw.options[0];
+        _app.setToolFeatures({shapeName: name});
       }
     };
   };
