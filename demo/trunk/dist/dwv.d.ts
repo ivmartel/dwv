@@ -2941,6 +2941,12 @@ export declare class ViewController {
      */
     initialise(): void;
     /**
+     * Get the image modality.
+     *
+     * @returns {string} The modality.
+     */
+    getModality(): string;
+    /**
      * Get the window/level presets names.
      *
      * @returns {Array} The presets names.
