@@ -47,6 +47,12 @@ function viewerSetup() {
   //   return value;
   // };
 
+  // // example labelText override
+  // dwv.defaults.labelText.rectangle = {
+  //   '*': '{surface}!',
+  //   MR: '{surface}!!'
+  // };
+
   // stage options
   let dataViewConfigs;
   let viewOnFirstLoadItem = true;

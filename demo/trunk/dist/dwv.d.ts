@@ -521,6 +521,8 @@ export declare const defaultPresets: {
     };
 };
 
+export declare const defaults: {};
+
 /**
  * DicomParser class.
  *
