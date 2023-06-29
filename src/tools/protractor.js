@@ -1,15 +1,19 @@
 import {Line, getAngle} from '../math/line';
 import {Point2D} from '../math/point';
 import {replaceFlags} from '../utils/string';
+import {defaults} from '../app/defaults';
 import {i18n} from '../utils/i18n';
 import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for protractor.
+ * (not modality dependent, only one value)
  */
-const defaultProtractorLabelText = '{angle}';
+defaults.labelText.protractor = {
+  '*': '{angle}'
+};
 
 /**
  * Protractor factory.
@@ -57,10 +61,10 @@ export class ProtractorFactory {
    *
    * @param {Array} points The points from which to extract the protractor.
    * @param {object} style The drawing style.
-   * @param {object} _viewController The associated view controller.
+   * @param {object} viewController The associated view controller.
    * @returns {object} The Konva group.
    */
-  create(points, style, _viewController) {
+  create(points, style, viewController) {
     // physical shape
     const line0 = new Line(points[0], points[1]);
     // points stored the Konvajs way
@@ -110,12 +114,12 @@ export class ProtractorFactory {
         name: 'text'
       });
       let textExpr = '';
-      // TODO: allow override?
-      // if (typeof protractorLabelText !== 'undefined') {
-      //   textExpr = protractorLabelText;
-      // } else {
-      textExpr = defaultProtractorLabelText;
-      // }
+      const modality = viewController.getModality();
+      if (typeof defaults.labelText.protractor[modality] !== 'undefined') {
+        textExpr = defaults.labelText.protractor[modality];
+      } else {
+        textExpr = defaults.labelText.protractor['*'];
+      }
       const quant = {
         angle: {
           value: angle,

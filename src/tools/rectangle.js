@@ -2,15 +2,18 @@ import {Rectangle} from '../math/rectangle';
 import {Point2D} from '../math/point';
 import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
-import {DRAW_DEBUG} from './draw';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
+import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for rectangle.
  */
-const defaultRectangleLabelText = '{surface}';
+defaults.labelText.rectangle = {
+  '*': '{surface}'
+};
 
 /**
  * Rectangle factory.
@@ -86,12 +89,12 @@ export class RectangleFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof rectangleLabelText !== 'undefined') {
-    //   textExpr = rectangleLabelText;
-    // } else {
-    textExpr = defaultRectangleLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.rectangle[modality] !== 'undefined') {
+      textExpr = defaults.labelText.rectangle[modality];
+    } else {
+      textExpr = defaults.labelText.rectangle['*'];
+    }
     const quant = rectangle.quantify(
       viewController,
       getFlags(textExpr));

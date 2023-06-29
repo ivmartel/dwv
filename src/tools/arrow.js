@@ -1,14 +1,16 @@
 import {Point2D} from '../math/point';
 import {Line, getPerpendicularLine, getAngle} from '../math/line';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
-
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for arrow.
  */
-const defaultArrowLabelText = '';
+defaults.labelText.arrow = {
+  '*': ''
+};
 
 /**
  * Arrow factory.
@@ -56,10 +58,10 @@ export class ArrowFactory {
    *
    * @param {Array} points The points from which to extract the line.
    * @param {object} style The drawing style.
-   * @param {object} _viewController The associated view controller.
+   * @param {object} viewController The associated view controller.
    * @returns {object} The Konva object.
    */
-  create(points, style, _viewController) {
+  create(points, style, viewController) {
     // physical shape
     const line = new Line(points[0], points[1]);
     // draw shape
@@ -117,12 +119,12 @@ export class ArrowFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof arrowLabelText !== 'undefined') {
-    //   textExpr = arrowLabelText;
-    // } else {
-    textExpr = defaultArrowLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.arrow[modality] !== 'undefined') {
+      textExpr = defaults.labelText.arrow[modality];
+    } else {
+      textExpr = defaults.labelText.arrow['*'];
+    }
     ktext.setText(textExpr);
     // augment text with meta data
     // @ts-ignore

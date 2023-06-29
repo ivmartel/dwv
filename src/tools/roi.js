@@ -1,12 +1,15 @@
 import {ROI} from '../math/roi';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for roi.
  */
-const defaultRoiLabelText = '';
+defaults.labelText.roi = {
+  '*': ''
+};
 
 /**
  * ROI factory.
@@ -55,10 +58,10 @@ export class RoiFactory {
    *
    * @param {Array} points The points from which to extract the line.
    * @param {object} style The drawing style.
-   * @param {object} _viewController The associated view controller.
+   * @param {object} viewController The associated view controller.
    * @returns {object} The Konva group.
    */
-  create(points, style, _viewController) {
+  create(points, style, viewController) {
     // physical shape
     const roi = new ROI();
     // add input points to the ROI
@@ -87,12 +90,12 @@ export class RoiFactory {
       name: 'text'
     });
     let textExpr = '';
-    // todo: allow overrride?
-    // if (typeof roiLabelText !== 'undefined') {
-    //   textExpr = roiLabelText;
-    // } else {
-    textExpr = defaultRoiLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.roi[modality] !== 'undefined') {
+      textExpr = defaults.labelText.roi[modality];
+    } else {
+      textExpr = defaults.labelText.roi['*'];
+    }
     ktext.setText(textExpr);
     // augment text with meta
     // @ts-ignore

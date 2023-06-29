@@ -1,14 +1,17 @@
 import {Line, getPerpendicularLine} from '../math/line';
 import {Point2D} from '../math/point';
 import {replaceFlags} from '../utils/string';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for ruler.
  */
-const defaultRulerLabelText = '{length}';
+defaults.labelText.ruler = {
+  '*': '{length}'
+};
 
 /**
  * Ruler factory.
@@ -124,12 +127,12 @@ export class RulerFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof rulerLabelText !== 'undefined') {
-    //   textExpr = rulerLabelText;
-    // } else {
-    textExpr = defaultRulerLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.ruler[modality] !== 'undefined') {
+      textExpr = defaults.labelText.ruler[modality];
+    } else {
+      textExpr = defaults.labelText.ruler['*'];
+    }
     const quant = line.quantify(viewController);
     ktext.setText(replaceFlags(textExpr, quant));
     // augment text with meta

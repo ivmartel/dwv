@@ -1,16 +1,19 @@
-import {DRAW_DEBUG} from './draw';
-import {getDefaultAnchor} from './editor';
 import {Ellipse} from '../math/ellipse';
 import {Point2D} from '../math/point';
-import {logger} from '../utils/logger';
 import {getFlags, replaceFlags} from '../utils/string';
+import {logger} from '../utils/logger';
+import {defaults} from '../app/defaults';
+import {getDefaultAnchor} from './editor';
+import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for ellipse.
  */
-const defaultEllipseLabelText = '{surface}';
+defaults.labelText.ellipse = {
+  '*': '{surface}'
+};
 
 /**
  * Ellipse factory.
@@ -92,12 +95,12 @@ export class EllipseFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof ellipseLabelText !== 'undefined') {
-    //   textExpr = ellipseLabelText;
-    // } else {
-    textExpr = defaultEllipseLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.ellipse[modality] !== 'undefined') {
+      textExpr = defaults.labelText.ellipse[modality];
+    } else {
+      textExpr = defaults.labelText.ellipse['*'];
+    }
     const quant = ellipse.quantify(
       viewController,
       getFlags(textExpr));

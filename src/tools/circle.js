@@ -2,15 +2,18 @@ import {Circle} from '../math/circle';
 import {Point2D} from '../math/point';
 import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
 import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for circle.
  */
-const defaultCircleLabelText = '{surface}';
+defaults.labelText.circle = {
+  '*': '{surface}'
+};
 
 /**
  * Circle factory.
@@ -61,8 +64,7 @@ export class CircleFactory {
    * @param {object} viewController The associated view controller.
    * @returns {object} The Konva group.
    */
-  create(
-    points, style, viewController) {
+  create(points, style, viewController) {
     // calculate radius
     const a = Math.abs(points[0].getX() - points[1].getX());
     const b = Math.abs(points[0].getY() - points[1].getY());
@@ -90,12 +92,12 @@ export class CircleFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof circleLabelText !== 'undefined') {
-    //   textExpr = circleLabelText;
-    // } else {
-    textExpr = defaultCircleLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.circle[modality] !== 'undefined') {
+      textExpr = defaults.labelText.circle[modality];
+    } else {
+      textExpr = defaults.labelText.circle['*'];
+    }
     const quant = circle.quantify(
       viewController,
       getFlags(textExpr));

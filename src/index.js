@@ -1,5 +1,6 @@
 // app
 import {App} from './app/application';
+import {defaults} from './app/defaults';
 import {ViewController} from './app/viewController';
 // dicom
 import {
@@ -86,6 +87,7 @@ export {
   Point3D,
   Vector3D,
   Matrix33,
+  defaults,
   logger,
   decoderScripts,
   customUI,

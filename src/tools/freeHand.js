@@ -1,11 +1,15 @@
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
 /**
- * Default draw label text.
+ * Default label text for freeHand.
+ * (not modality dependent, only one value)
  */
-const defaultFreeHandLabelText = '';
+defaults.labelText.freeHand = {
+  '*': ''
+};
 
 /**
  * FreeHand factory.
@@ -54,11 +58,10 @@ export class FreeHandFactory {
    *
    * @param {Array} points The points from which to extract the line.
    * @param {object} style The drawing style.
-   * @param {object} _viewController The associated view controller.
+   * @param {object} viewController The associated view controller.
    * @returns {object} The Konva group.
    */
-  create(
-    points, style, _viewController) {
+  create(points, style, viewController) {
     // points stored the Konvajs way
     const arr = [];
     for (let i = 0; i < points.length; ++i) {
@@ -83,12 +86,12 @@ export class FreeHandFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof freeHandLabelText !== 'undefined') {
-    //   textExpr = freeHandLabelText;
-    // } else {
-    textExpr = defaultFreeHandLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.freeHand[modality] !== 'undefined') {
+      textExpr = defaults.labelText.freeHand[modality];
+    } else {
+      textExpr = defaults.labelText.freeHand['*'];
+    }
     ktext.setText(textExpr);
     // augment text with meta
     // @ts-ignore
