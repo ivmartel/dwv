@@ -1794,13 +1794,13 @@ export declare class LayerGroup {
 
 export declare namespace logger {
     export namespace levels {
-        const TRACE: number;
-        const DEBUG: number;
-        const INFO: number;
-        const WARN: number;
-        const ERROR: number;
+        let TRACE: number;
+        let DEBUG: number;
+        let INFO: number;
+        let WARN: number;
+        let ERROR: number;
     }
-    const level: number;
+    let level: number;
     export function trace(msg: string): void;
     export function debug(msg: string): void;
     export function info(msg: string): void;
