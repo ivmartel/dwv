@@ -156,6 +156,15 @@ export class ViewController {
   }
 
   /**
+   * Get the image modality.
+   *
+   * @returns {string} The modality.
+   */
+  getModality() {
+    return this.#view.getImage().getMeta().Modality;
+  }
+
+  /**
    * Get the window/level presets names.
    *
    * @returns {Array} The presets names.
