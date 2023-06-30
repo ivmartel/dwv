@@ -342,9 +342,15 @@ export declare class App {
     /**
      * Get the JSON state of the app.
      *
-     * @returns {object} The state of the app as a JSON object.
+     * @returns {string} The state of the app as a JSON string.
      */
-    getState(): object;
+    getJsonState(): string;
+    /**
+     * Apply a JSON state to this app.
+     *
+     * @param {string} jsonState The state of the app as a JSON string.
+     */
+    applyJsonState(jsonState: string): void;
     /**
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
@@ -456,6 +462,31 @@ export declare class App {
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
+/**
+ * Create an Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The Image object.
+ */
+export declare function createImage(elements: object): Image_2;
+
+/**
+ * Create a mask Image from DICOM elements.
+ *
+ * @param {object} elements The DICOM elements.
+ * @returns {Image} The mask Image object.
+ */
+export declare function createMaskImage(elements: object): Image_2;
+
+/**
+ * Create a View from DICOM elements and image.
+ *
+ * @param {object} elements The DICOM elements.
+ * @param {Image} image The associated image.
+ * @returns {View} The View object.
+ */
+export declare function createView(elements: object, image: Image_2): View;
+
 export declare namespace customUI {
     /**
      * Open a dialogue to edit roi data. Defaults to window.prompt.
@@ -489,6 +520,8 @@ export declare const defaultPresets: {
         };
     };
 };
+
+export declare const defaults: {};
 
 /**
  * DicomParser class.
@@ -1061,17 +1094,11 @@ export declare namespace i18n {
  * @example
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   // setup the dicom parser
+ *   // parse the dicom buffer
  *   const dicomParser = new dwv.DicomParser();
- *   // parse the buffer
  *   dicomParser.parse(event.target.response);
- *   // create the image
- *   const imageFactory = new dwv.ImageFactory();
- *   // inputs are dicom tags and buffer
- *   const image = imageFactory.create(
- *     dicomParser.getDicomElements(),
- *     dicomParser.getDicomElements()['7FE00010'].value[0]
- *   );
+ *   // create the image object
+ *   const image = dwv.createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -1154,16 +1181,17 @@ declare class Image_2 {
      * Get the rescale slope and intercept.
      *
      * @param {Index} [index] The index (only needed for non constant rsi).
-     * @returns {object} The rescale slope and intercept.
+     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept.
      */
-    getRescaleSlopeAndIntercept(index?: Index): object;
+    getRescaleSlopeAndIntercept(index?: Index): RescaleSlopeAndIntercept;
     /**
      * Set the rescale slope and intercept.
      *
-     * @param {object} inRsi The input rescale slope and intercept.
+     * @param {RescaleSlopeAndIntercept} inRsi The input rescale
+     *   slope and intercept.
      * @param {number} [offset] The rsi offset (only needed for non constant rsi).
      */
-    setRescaleSlopeAndIntercept(inRsi: object, offset?: number): void;
+    setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
     /**
      * Are all the RSIs identity (1,0).
      *
@@ -1768,13 +1796,13 @@ export declare class LayerGroup {
 
 export declare namespace logger {
     export namespace levels {
-        const TRACE: number;
-        const DEBUG: number;
-        const INFO: number;
-        const WARN: number;
-        const ERROR: number;
+        let TRACE: number;
+        let DEBUG: number;
+        let INFO: number;
+        let WARN: number;
+        let ERROR: number;
     }
-    const level: number;
+    let level: number;
     export function trace(msg: string): void;
     export function debug(msg: string): void;
     export function info(msg: string): void;
@@ -2182,17 +2210,6 @@ export declare class RescaleLut {
      */
     getRSI(): RescaleSlopeAndIntercept;
     /**
-     * Is the lut ready to use or not? If not, the user must
-     * call 'initialise'.
-     *
-     * @returns {boolean} True if the lut is ready to use.
-     */
-    isReady(): boolean;
-    /**
-     * Initialise the LUT.
-     */
-    initialise(): void;
-    /**
      * Get the length of the LUT array.
      *
      * @returns {number} The length of the LUT array.
@@ -2201,7 +2218,8 @@ export declare class RescaleLut {
     /**
      * Get the value of the LUT at the given offset.
      *
-     * @param {number} offset The input offset in [0,2^bitsStored] range.
+     * @param {number} offset The input offset in [0,2^bitsStored] range
+     *   or full range for ID rescale.
      * @returns {number} The float32 value of the LUT at the given offset.
      */
     getValue(offset: number): number;
@@ -2243,12 +2261,6 @@ export declare class RescaleSlopeAndIntercept {
      * @returns {boolean} True if both RSI are equal.
      */
     equals(rhs: RescaleSlopeAndIntercept): boolean;
-    /**
-     * Get a string representation of the RSI.
-     *
-     * @returns {string} The RSI as a string.
-     */
-    toString(): string;
     /**
      * Is this RSI an ID RSI.
      *
@@ -2591,6 +2603,37 @@ export declare class Vector3D {
  *
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
+ *
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
+ *   // parse the dicom buffer
+ *   const dicomParser = new dwv.DicomParser();
+ *   dicomParser.parse(event.target.response);
+ *   // create the image object
+ *   const image = createImage(dicomParser.getDicomElements());
+ *   // create the view
+ *   const view = createView(dicomParser.getDicomElements(), image);
+ *   // setup canvas
+ *   const canvas = document.createElement('canvas');
+ *   canvas.width = 256;
+ *   canvas.height = 256;
+ *   const ctx = canvas.getContext("2d");
+ *   // update the image data
+ *   const imageData = ctx.createImageData(256, 256);
+ *   view.generateImageData(imageData);
+ *   ctx.putImageData(imageData, 0, 0);
+ *   // update html
+ *   const div = document.getElementById('dwv');
+ *   div.appendChild(canvas);;
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export declare class View {
     /**
@@ -2659,18 +2702,10 @@ export declare class View {
      * Get the window LUT of the image.
      * Warning: can be undefined in no window/level was set.
      *
-     * @param {object} [rsi] Optional image rsi, will take the one of the
-     *   current slice otherwise.
      * @returns {WindowLut} The window LUT of the image.
      * @fires View#wlchange
      */
-    getCurrentWindowLut(rsi?: object): WindowLut;
-    /**
-     * Add the window LUT to the list.
-     *
-     * @param {WindowLut} wlut The window LUT of the image.
-     */
-    addWindowLut(wlut: WindowLut): void;
+    getCurrentWindowLut(): WindowLut;
     /**
      * Get the window presets.
      *
@@ -2701,6 +2736,12 @@ export declare class View {
      * @param {object} presets The window presets.
      */
     addWindowPresets(presets: object): void;
+    /**
+     * Get the current window level preset name.
+     *
+     * @returns {string} The preset name.
+     */
+    getCurrentWindowPresetName(): string;
     /**
      * Get the colour map of the image.
      *
@@ -2901,6 +2942,12 @@ export declare class ViewController {
      * Initialise the controller.
      */
     initialise(): void;
+    /**
+     * Get the image modality.
+     *
+     * @returns {string} The modality.
+     */
+    getModality(): string;
     /**
      * Get the window/level presets names.
      *
@@ -3104,10 +3151,10 @@ export declare class ViewController {
      * Set the current index.
      *
      * @param {Index} index The index.
-     * @param {boolean} silent If true, does not fire a positionchange event.
+     * @param {boolean} [silent] If true, does not fire a positionchange event.
      * @returns {boolean} False if not in bounds.
      */
-    setCurrentIndex(index: Index, silent: boolean): boolean;
+    setCurrentIndex(index: Index, silent?: boolean): boolean;
     /**
      * Get a plane 3D position from a plane 2D position: does not compensate
      *   for the image origin. Needed for setting the scale center...
@@ -3167,6 +3214,12 @@ export declare class ViewController {
      * @returns {object} The window center and width.
      */
     getWindowLevel(): object;
+    /**
+     * Get the current window level preset name.
+     *
+     * @returns {string} The preset name.
+     */
+    getCurrentWindowPresetName(): string;
     /**
      * Set the window/level.
      *
@@ -3479,13 +3532,6 @@ export declare class WindowCenterAndWidth {
      */
     getWidth(): number;
     /**
-     * Set the output value range.
-     *
-     * @param {string} min The output value minimum.
-     * @param {string} max The output value maximum.
-     */
-    setRange(min: string, max: string): void;
-    /**
      * Set the signed offset.
      *
      * @param {number} offset The signed data offset,
@@ -3507,12 +3553,6 @@ export declare class WindowCenterAndWidth {
      * @returns {boolean} True if both window level are equal.
      */
     equals(rhs: WindowCenterAndWidth): boolean;
-    /**
-     * Get a string representation of the window level.
-     *
-     * @returns {string} The window level as a string.
-     */
-    toString(): string;
     #private;
 }
 
@@ -3522,10 +3562,14 @@ export declare class WindowCenterAndWidth {
  */
 export declare class WindowLut {
     /**
+     * Construct a window LUT object, window level is set with
+     *   the 'setWindowLevel' method.
+     *
      * @param {RescaleLut} rescaleLut The associated rescale LUT.
      * @param {boolean} isSigned Flag to know if the data is signed or not.
+     * @param {boolean} isDiscrete Flag to know if the input data is discrete.
      */
-    constructor(rescaleLut: RescaleLut, isSigned: boolean);
+    constructor(rescaleLut: RescaleLut, isSigned: boolean, isDiscrete: boolean);
     /**
      * Get the window / level.
      *
@@ -3533,24 +3577,11 @@ export declare class WindowLut {
      */
     getWindowLevel(): WindowCenterAndWidth;
     /**
-     * Get the signed flag.
-     *
-     * @returns {boolean} The signed flag.
-     */
-    isSigned(): boolean;
-    /**
      * Get the rescale lut.
      *
      * @returns {RescaleLut} The rescale lut.
      */
     getRescaleLut(): RescaleLut;
-    /**
-     * Is the lut ready to use or not? If not, the user must
-     * call 'update'.
-     *
-     * @returns {boolean} True if the lut is ready to use.
-     */
-    isReady(): boolean;
     /**
      * Set the window center and width.
      *
@@ -3558,19 +3589,10 @@ export declare class WindowLut {
      */
     setWindowLevel(wl: WindowCenterAndWidth): void;
     /**
-     * Update the lut if needed..
-     */
-    update(): void;
-    /**
-     * Get the length of the LUT array.
-     *
-     * @returns {number} The length of the LUT array.
-     */
-    getLength(): number;
-    /**
      * Get the value of the LUT at the given offset.
      *
-     * @param {number} offset The input offset in [0,2^bitsStored] range.
+     * @param {number} offset The input offset in [0,2^bitsStored] range
+     *   for discrete data or full range for non discrete.
      * @returns {number} The integer value (default [0,255]) of the LUT
      *   at the given offset.
      */

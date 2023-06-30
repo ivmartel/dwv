@@ -13,6 +13,7 @@ export class App {
     addEventListener(type: string, callback: object): void;
     addNewImage(image: Image_2, meta: object): number;
     addToUndoStack: (cmd: object) => void;
+    applyJsonState(jsonState: string): void;
     canScroll(): boolean;
     canWindowLevel(): boolean;
     defaultOnKeydown: (event: KeyboardEvent) => void;
@@ -24,6 +25,7 @@ export class App {
     getDataViewConfig(): object;
     getDrawLayersByDataIndex(index: number): any[];
     getImage(index: number): Image_2;
+    getJsonState(): string;
     getLastImage(): Image_2;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(index: number): object;
@@ -32,7 +34,6 @@ export class App {
     getOffset(): object;
     getOverlayData(dataIndex: number): OverlayData;
     getStackSize(): number;
-    getState(): object;
     getStyle(): object;
     getToolboxController(): object;
     getViewLayersByDataIndex(index: number): any[];
@@ -70,6 +71,15 @@ export class App {
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
+// @public
+export function createImage(elements: object): Image_2;
+
+// @public
+export function createMaskImage(elements: object): Image_2;
+
+// @public
+export function createView(elements: object, image: Image_2): View;
+
 // @public (undocumented)
 export namespace customUI {
     export function openRoiDialog(data: any, callback: Function): void;
@@ -92,6 +102,9 @@ export const defaultPresets: {
         };
     };
 };
+
+// @public (undocumented)
+export const defaults: {};
 
 // @public
 export class DicomParser {
@@ -312,7 +325,7 @@ export class LayerGroup {
 export namespace logger {
     // (undocumented)
     export function debug(msg: string): void;
-    const // (undocumented)
+    let // (undocumented)
     level: number;
     // (undocumented)
     export function error(msg: string): void;
@@ -320,15 +333,15 @@ export namespace logger {
     export function info(msg: string): void;
     // (undocumented)
     export namespace levels {
-        const // (undocumented)
+        let // (undocumented)
         TRACE: number;
-        const // (undocumented)
+        let // (undocumented)
         DEBUG: number;
-        const // (undocumented)
+        let // (undocumented)
         INFO: number;
-        const // (undocumented)
+        let // (undocumented)
         WARN: number;
-        const // (undocumented)
+        let // (undocumented)
         ERROR: number;
     }
     // (undocumented)
@@ -425,8 +438,6 @@ export class RescaleLut {
     getLength(): number;
     getRSI(): RescaleSlopeAndIntercept;
     getValue(offset: number): number;
-    initialise(): void;
-    isReady(): boolean;
 }
 
 // @public
@@ -437,7 +448,6 @@ export class RescaleSlopeAndIntercept {
     getIntercept(): number;
     getSlope(): number;
     isID(): boolean;
-    toString(): string;
 }
 
 // @public
@@ -508,7 +518,6 @@ export class Vector3D {
 export class View {
     constructor(image: Image_2);
     addEventListener(type: string, callback: object): void;
-    addWindowLut(wlut: WindowLut): void;
     addWindowPresets(presets: object): void;
     canSetPosition(position: Point): boolean;
     decrementIndex(dim: number, silent: boolean): boolean;
@@ -518,7 +527,8 @@ export class View {
     getColourMap(): object;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
-    getCurrentWindowLut(rsi?: RescaleSlopeAndIntercept): WindowLut;
+    getCurrentWindowLut(): WindowLut;
+    getCurrentWindowPresetName(): string;
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position: Point): Point;
@@ -568,12 +578,14 @@ export class ViewController {
     getCurrentPosition(): Point;
     getCurrentScrollIndexValue(): object;
     getCurrentScrollPosition(): object;
+    getCurrentWindowPresetName(): string;
     getImageRegionValues(min: Point2D, max: Point2D): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
     getImageVariableRegionValues(regions: any[]): any[];
     getImageWorldSize(): object;
     getMaskSegmentHelper(): object;
+    getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
     getOrigin(position: Point): Point;
     getPixelUnit(): string;
@@ -594,7 +606,7 @@ export class ViewController {
     removeEventListener(type: string, callback: object): void;
     setColourMap(colourMap: object): void;
     setColourMapFromName(name: string): void;
-    setCurrentIndex(index: Index, silent: boolean): boolean;
+    setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     setImage(img: Image_2, index: number): void;
     setViewAlphaFunction(func: (value: object, index: object) => number): void;
@@ -649,22 +661,16 @@ export class WindowCenterAndWidth {
     equals(rhs: WindowCenterAndWidth): boolean;
     getCenter(): number;
     getWidth(): number;
-    setRange(min: string, max: string): void;
     setSignedOffset(offset: number): void;
-    toString(): string;
 }
 
 // @public
 export class WindowLut {
-    constructor(rescaleLut: RescaleLut, isSigned: boolean);
-    getLength(): number;
+    constructor(rescaleLut: RescaleLut, isSigned: boolean, isDiscrete: boolean);
     getRescaleLut(): RescaleLut;
     getValue(offset: number): number;
     getWindowLevel(): WindowCenterAndWidth;
-    isReady(): boolean;
-    isSigned(): boolean;
     setWindowLevel(wl: WindowCenterAndWidth): void;
-    update(): void;
 }
 
 // (No @packageDocumentation comment for this package)
