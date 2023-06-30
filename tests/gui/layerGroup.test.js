@@ -1,4 +1,5 @@
 import {
+  LayerGroup,
   getLayerDivId,
   getLayerDetailsFromLayerDivId
 } from '../../src/gui/layerGroup';
@@ -38,4 +39,62 @@ QUnit.test('Test LayerGroup string id.', function (assert) {
     'getLayerDetailsFromLayerDivId groupId #01');
   assert.equal(details01.layerId, theoDetails01.layerId,
     'getLayerDetailsFromLayerDivId layerId #01');
+});
+
+/**
+ * Tests for {@link LayerGroup} creation.
+ *
+ * @function module:tests/gui~LayerGroup
+ */
+QUnit.test('Test LayerGroup.', function (assert) {
+  const element00 = document.createElement('div');
+  element00.id = 'layerGroup00';
+  const layerGroup00 = new LayerGroup(element00);
+  assert.equal(layerGroup00.getNumberOfLayers(), 0,
+    'new layerGroup has no layers');
+  assert.equal(layerGroup00.getDivId(), element00.id,
+    'new layerGroup div id');
+});
+
+
+/**
+ * Tests for {@link LayerGroup} add/remove view layer.
+ *
+ * @function module:tests/gui~LayerGroup
+ */
+QUnit.test('Test LayerGroup add/remove view layer.', function (assert) {
+  const element00 = document.createElement('div');
+  element00.id = 'layerGroup00';
+  const layerGroup00 = new LayerGroup(element00);
+  assert.equal(layerGroup00.getNumberOfLayers(), 0,
+    'new layerGroup has no layers');
+
+  const vl00 = layerGroup00.addViewLayer();
+  assert.equal(layerGroup00.getNumberOfLayers(), 1,
+    'layerGroup has one view layers after add');
+
+  layerGroup00.removeLayer(vl00);
+  assert.equal(layerGroup00.getNumberOfLayers(), 0,
+    'layerGroup has no view layers after remove');
+});
+
+/**
+ * Tests for {@link LayerGroup} add/remove draw layer.
+ *
+ * @function module:tests/gui~LayerGroup
+ */
+QUnit.test('Test LayerGroup add/remove draw layer.', function (assert) {
+  const element00 = document.createElement('div');
+  element00.id = 'layerGroup00';
+  const layerGroup00 = new LayerGroup(element00);
+  assert.equal(layerGroup00.getNumberOfLayers(), 0,
+    'new layerGroup has no layers');
+
+  const dl00 = layerGroup00.addDrawLayer();
+  assert.equal(layerGroup00.getNumberOfLayers(), 1,
+    'layerGroup has one draw layers after add');
+
+  layerGroup00.removeLayer(dl00);
+  assert.equal(layerGroup00.getNumberOfLayers(), 0,
+    'layerGroup has no view layers after remove');
 });

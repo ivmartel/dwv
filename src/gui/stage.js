@@ -264,6 +264,31 @@ export class Stage {
   }
 
   /**
+   * Remove a layer group from this stage.
+   *
+   * @param {LayerGroup} layerGroup The layer group to remove.
+   */
+  removeLayerGroup(layerGroup) {
+    // find layer
+    const index = this.#layerGroups.findIndex((item) => item === layerGroup);
+    if (index === -1) {
+      throw new Error('Cannot find layerGroup');
+    }
+    // unbind
+    this.unbindLayerGroups();
+    // empty layer group
+    layerGroup.empty();
+    // remove from storage
+    this.#layerGroups.splice(index, 1);
+    // update active index
+    if (this.#activeLayerGroupIndex === index) {
+      this.#activeLayerGroupIndex = undefined;
+    }
+    // bind
+    this.bindLayerGroups();
+  }
+
+  /**
    * Reset the stage: calls reset on all layer groups.
    */
   reset() {

@@ -555,6 +555,24 @@ export class LayerGroup {
   }
 
   /**
+   * Un-bind a view layer events to this.
+   *
+   * @param {ViewLayer} viewLayer The view layer to unbind.
+   */
+  #unbindViewLayer(viewLayer) {
+    // listen to position change to update other group layers
+    viewLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    // propagate view viewLayer-layer events
+    for (let j = 0; j < viewEventNames.length; ++j) {
+      viewLayer.removeEventListener(viewEventNames[j], this.#fireEvent);
+    }
+    // propagate viewLayer events
+    viewLayer.removeEventListener('renderstart', this.#fireEvent);
+    viewLayer.removeEventListener('renderend', this.#fireEvent);
+  }
+
+  /**
    * Bind draw layer events to this.
    *
    * @param {DrawLayer} drawLayer The draw layer to bind.
@@ -563,6 +581,17 @@ export class LayerGroup {
     // propagate drawLayer events
     drawLayer.addEventListener('drawcreate', this.#fireEvent);
     drawLayer.addEventListener('drawdelete', this.#fireEvent);
+  }
+
+  /**
+   * Un-bind a draw layer events to this.
+   *
+   * @param {DrawLayer} drawLayer The draw layer to unbind.
+   */
+  #unbindDrawLayer(drawLayer) {
+    // propagate drawLayer events
+    drawLayer.removeEventListener('drawcreate', this.#fireEvent);
+    drawLayer.removeEventListener('drawdelete', this.#fireEvent);
   }
 
   /**
@@ -592,6 +621,38 @@ export class LayerGroup {
       while (previous.length > 0) {
         previous[0].remove();
       }
+    }
+  }
+
+  /**
+   * Remove a layer from this layer group.
+   *
+   * @param {ViewLayer | DrawLayer} layer The layer to remove.
+   */
+  removeLayer(layer) {
+    // find layer
+    const index = this.#layers.findIndex((item) => item === layer);
+    if (index === -1) {
+      throw new Error('Cannot find layer');
+    }
+    // unbind and update active index
+    if (layer instanceof ViewLayer) {
+      this.#unbindViewLayer(layer);
+      if (this.#activeViewLayerIndex === index) {
+        this.#activeViewLayerIndex = undefined;
+      }
+    } else {
+      this.#unbindDrawLayer(layer);
+      if (this.#activeDrawLayerIndex === index) {
+        this.#activeDrawLayerIndex = undefined;
+      }
+    }
+    // remove from storage
+    this.#layers.splice(index, 1);
+    // update html
+    const layerDiv = document.getElementById(layer.getId());
+    if (layerDiv) {
+      layerDiv.remove();
     }
   }
 

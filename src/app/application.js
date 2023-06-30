@@ -657,8 +657,90 @@ export class App {
   }
 
   /**
+   * Add a data view config.
+   *
+   * @param {number} dataId The data id.
+   * @param {object} config The view configuration.
+   */
+  addDataViewConfig(dataId, config) {
+    // add to list
+    const configs = this.#options.dataViewConfigs;
+    if (typeof configs[dataId] === 'undefined') {
+      configs[dataId] = [];
+    }
+    const equalDivId = function (item) {
+      return item.divId === config.divId;
+    };
+    const itemIndex = configs[dataId].findIndex(equalDivId);
+    if (itemIndex === -1) {
+      this.#options.dataViewConfigs[dataId].push(config);
+    } else {
+      throw new Error('Duplicate view sconfig for data ' + dataId +
+        ' and div ' + config.divId);
+    }
+
+    // data is loaded, create view
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      const lg = this.#stage.getLayerGroupByDivId(config.divId);
+      if (typeof lg === 'undefined') {
+        // create layer group
+        this.#createLayerGroup(config);
+      } else {
+        // add view
+        this.#addViewLayer(dataId, config);
+      }
+    }
+  }
+
+  /**
+   * Remove a data view config.
+   *
+   * @param {number} dataId The data id.
+   * @param {object} config The view configuration.
+   */
+  removeDataViewConfig(dataId, config) {
+    // remove from list
+    const configs = this.#options.dataViewConfigs;
+    if (typeof configs[dataId] === 'undefined') {
+      // no config for dataId
+      return;
+    }
+    const equalDivId = function (item) {
+      return item.divId === config.divId;
+    };
+    const itemIndex = configs[dataId].findIndex(equalDivId);
+    if (itemIndex === -1) {
+      // no config for divId
+      return;
+    }
+    configs[dataId].splice(itemIndex, 1);
+
+    // data is loaded, remove view
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      const lg = this.#stage.getLayerGroupByDivId(config.divId);
+      if (typeof lg !== 'undefined') {
+        const vls = lg.getViewLayersByDataIndex(dataId);
+        if (vls.length === 1) {
+          lg.removeLayer(vls[0]);
+        } else {
+          throw new Error('Expected one view layer, got ' + vls.length);
+        }
+        const dls = lg.getDrawLayersByDataIndex(dataId);
+        if (dls.length === 1) {
+          lg.removeLayer(dls[0]);
+        } else {
+          throw new Error('Expected one draw layer, got ' + dls.length);
+        }
+        if (lg.getNumberOfLayers() === 0) {
+          this.#stage.removeLayerGroup(lg);
+        }
+      }
+    }
+  }
+
+  /**
    * Create layer groups according to a data view config:
-   * adds them to stage and bind them.
+   * adds them to stage and binds them.
    *
    * @param {object} dataViewConfigs The data view config.
    */
@@ -671,19 +753,29 @@ export class App {
         const viewConfig = dataConfigs[j];
         // view configs can contain the same divIds, avoid duplicating
         if (!divIds.includes(viewConfig.divId)) {
-          // create new layer group
-          const element = document.getElementById(viewConfig.divId);
-          const layerGroup = this.#stage.addLayerGroup(element);
-          // bind events
-          this.#bindLayerGroupToApp(layerGroup);
-          // optional orientation
-          if (typeof viewConfig.orientation !== 'undefined') {
-            layerGroup.setTargetOrientation(
-              getMatrixFromName(viewConfig.orientation));
-          }
+          this.#createLayerGroup(viewConfig);
           divIds.push(viewConfig.divId);
         }
       }
+    }
+  }
+
+  /**
+   * Create a layer group according to a view config:
+   * adds it to stage and binds it.
+   *
+   * @param {object} viewConfig The view config.
+   */
+  #createLayerGroup(viewConfig) {
+    // create new layer group
+    const element = document.getElementById(viewConfig.divId);
+    const layerGroup = this.#stage.addLayerGroup(element);
+    // bind events
+    this.#bindLayerGroupToApp(layerGroup);
+    // optional orientation
+    if (typeof viewConfig.orientation !== 'undefined') {
+      layerGroup.setTargetOrientation(
+        getMatrixFromName(viewConfig.orientation));
     }
   }
 
