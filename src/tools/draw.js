@@ -19,7 +19,6 @@ import {
 } from '../app/drawController';
 import {ScrollWheel} from './scrollWheel';
 import {ShapeEditor} from './editor';
-import {defaults} from '../app/defaults';
 // external
 import Konva from 'konva';
 
@@ -29,11 +28,6 @@ import {App} from '../app/application';
 import {Style} from '../gui/style';
 import {LayerGroup} from '../gui/layerGroup';
 /* eslint-enable no-unused-vars */
-
-/**
- * Default label text object.
- */
-defaults.labelText = {};
 
 /**
  * Draw Debug flag.

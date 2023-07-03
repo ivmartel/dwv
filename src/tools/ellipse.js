@@ -9,13 +9,6 @@ import {DRAW_DEBUG} from './draw';
 import Konva from 'konva';
 
 /**
- * Default label text for ellipse.
- */
-defaults.labelText.ellipse = {
-  '*': '{surface}'
-};
-
-/**
  * Ellipse factory.
  */
 export class EllipseFactory {

@@ -5,13 +5,6 @@ import {getDefaultAnchor} from './editor';
 import Konva from 'konva';
 
 /**
- * Default label text for roi.
- */
-defaults.labelText.roi = {
-  '*': ''
-};
-
-/**
  * ROI factory.
  */
 export class RoiFactory {

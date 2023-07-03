@@ -4,14 +4,6 @@ import {getDefaultAnchor} from './editor';
 import Konva from 'konva';
 
 /**
- * Default label text for freeHand.
- * (not modality dependent, only one value)
- */
-defaults.labelText.freeHand = {
-  '*': ''
-};
-
-/**
  * FreeHand factory.
  */
 export class FreeHandFactory {

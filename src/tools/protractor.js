@@ -8,14 +8,6 @@ import {getDefaultAnchor} from './editor';
 import Konva from 'konva';
 
 /**
- * Default label text for protractor.
- * (not modality dependent, only one value)
- */
-defaults.labelText.protractor = {
-  '*': '{angle}'
-};
-
-/**
  * Protractor factory.
  */
 export class ProtractorFactory {

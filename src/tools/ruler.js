@@ -7,13 +7,6 @@ import {getDefaultAnchor} from './editor';
 import Konva from 'konva';
 
 /**
- * Default label text for ruler.
- */
-defaults.labelText.ruler = {
-  '*': '{length}'
-};
-
-/**
  * Ruler factory.
  */
 export class RulerFactory {

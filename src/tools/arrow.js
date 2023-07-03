@@ -6,13 +6,6 @@ import {getDefaultAnchor} from './editor';
 import Konva from 'konva';
 
 /**
- * Default label text for arrow.
- */
-defaults.labelText.arrow = {
-  '*': ''
-};
-
-/**
  * Arrow factory.
  */
 export class ArrowFactory {

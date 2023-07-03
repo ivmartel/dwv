@@ -9,13 +9,6 @@ import {DRAW_DEBUG} from './draw';
 import Konva from 'konva';
 
 /**
- * Default label text for circle.
- */
-defaults.labelText.circle = {
-  '*': '{surface}'
-};
-
-/**
  * Circle factory.
  */
 export class CircleFactory {

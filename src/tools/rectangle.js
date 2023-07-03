@@ -9,13 +9,6 @@ import {DRAW_DEBUG} from './draw';
 import Konva from 'konva';
 
 /**
- * Default label text for rectangle.
- */
-defaults.labelText.rectangle = {
-  '*': '{surface}'
-};
-
-/**
  * Rectangle factory.
  */
 export class RectangleFactory {
