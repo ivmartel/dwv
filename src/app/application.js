@@ -679,16 +679,14 @@ export class App {
         ' and div ' + config.divId);
     }
 
-    // data is loaded, create view
+    // add layer group if not done
+    if (typeof this.#stage.getLayerGroupByDivId(config.divId) === 'undefined') {
+      this.#createLayerGroup(config);
+    }
+
+    // add view if data is loaded
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      const lg = this.#stage.getLayerGroupByDivId(config.divId);
-      if (typeof lg === 'undefined') {
-        // create layer group
-        this.#createLayerGroup(config);
-      } else {
-        // add view
-        this.#addViewLayer(dataId, config);
-      }
+      this.#addViewLayer(dataId, config);
     }
   }
 
