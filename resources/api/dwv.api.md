@@ -10,6 +10,7 @@ export function addTagsToDictionary(group: string, tags: object): void;
 // @public
 export class App {
     abortLoad(): void;
+    addDataViewConfig(dataId: number, config: object): void;
     addEventListener(type: string, callback: object): void;
     addNewImage(image: Image_2, meta: object): number;
     addToUndoStack: (cmd: object) => void;
@@ -46,6 +47,7 @@ export class App {
     onKeydown: (event: KeyboardEvent) => void;
     onResize: () => void;
     redo(): void;
+    removeDataViewConfig(dataId: number, config: object): void;
     removeEventListener(type: string, callback: object): void;
     render(dataIndex: number): void;
     reset(): void;
@@ -104,7 +106,14 @@ export const defaultPresets: {
 };
 
 // @public (undocumented)
-export const defaults: {};
+export namespace defaults {
+    let // (undocumented)
+    labelText: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+}
 
 // @public
 export class DicomParser {
@@ -307,6 +316,7 @@ export class LayerGroup {
     getViewDataIndices(): any[];
     getViewLayersByDataIndex(index: number): ViewLayer[];
     removeEventListener(type: string, callback: object): void;
+    removeLayer(layer: ViewLayer | DrawLayer): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveDrawLayer(index: number): void;

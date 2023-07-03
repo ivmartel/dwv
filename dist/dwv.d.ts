@@ -300,6 +300,20 @@ export declare class App {
      */
     setDataViewConfig(configs: object): void;
     /**
+     * Add a data view config.
+     *
+     * @param {number} dataId The data id.
+     * @param {object} config The view configuration.
+     */
+    addDataViewConfig(dataId: number, config: object): void;
+    /**
+     * Remove a data view config.
+     *
+     * @param {number} dataId The data id.
+     * @param {object} config The view configuration.
+     */
+    removeDataViewConfig(dataId: number, config: object): void;
+    /**
      * Set the layer groups binders.
      *
      * @param {Array} list The list of binder names.
@@ -521,7 +535,13 @@ export declare const defaultPresets: {
     };
 };
 
-export declare const defaults: {};
+export declare namespace defaults {
+    let labelText: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+}
 
 /**
  * DicomParser class.
@@ -1705,6 +1725,12 @@ export declare class LayerGroup {
      * Empty the layer list.
      */
     empty(): void;
+    /**
+     * Remove a layer from this layer group.
+     *
+     * @param {ViewLayer | DrawLayer} layer The layer to remove.
+     */
+    removeLayer(layer: ViewLayer | DrawLayer): void;
     /**
      * Update layers (but not the active view layer) to a position change.
      *
