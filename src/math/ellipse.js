@@ -173,14 +173,22 @@ export class Ellipse {
    */
   quantify(viewController, flags) {
     const quant = {};
-    // surface
+    // shape quantification
     const spacing = viewController.get2DSpacing();
+    quant.a = {
+      value: this.getA() * spacing[0],
+      unit: i18n.t('unit.mm')
+    };
+    quant.b = {
+      value: this.getB() * spacing[1],
+      unit: i18n.t('unit.mm')
+    };
     const surface = this.getWorldSurface(spacing[0], spacing[1]);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }
 
-    // pixel quantification
+    // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const regions = this.getRound();
       if (regions.length !== 0) {

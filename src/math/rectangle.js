@@ -166,14 +166,22 @@ export class Rectangle {
    */
   quantify(viewController, flags) {
     const quant = {};
-    // surface
+    // shape quantification
     const spacing = viewController.get2DSpacing();
+    quant.width = {
+      value: this.getWidth() * spacing[0],
+      unit: i18n.t('unit.mm')
+    };
+    quant.height = {
+      value: this.getHeight() * spacing[1],
+      unit: i18n.t('unit.mm')
+    };
     const surface = this.getWorldSurface(spacing[0], spacing[1]);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }
 
-    // pixel quantification
+    // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const round = this.getRound();
       const values = viewController.getImageRegionValues(round.min, round.max);
