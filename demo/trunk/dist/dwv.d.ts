@@ -535,7 +535,13 @@ export declare const defaultPresets: {
     };
 };
 
-export declare const defaults: {};
+export declare namespace defaults {
+    let labelText: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+}
 
 /**
  * DicomParser class.
