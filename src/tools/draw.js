@@ -606,8 +606,11 @@ export class Draw {
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #activateCurrentPositionShapes(visible, layerGroup) {
-    const drawController =
-      layerGroup.getActiveDrawLayer().getDrawController();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      return;
+    }
+    const drawController = drawLayer.getDrawController();
 
     // get shape groups at the current position
     const shapeGroups =
@@ -626,7 +629,6 @@ export class Draw {
       });
     }
     // draw
-    const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
     if (shapeGroups.length !== 0) {
       konvaLayer.listening(true);
