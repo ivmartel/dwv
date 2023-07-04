@@ -64,11 +64,11 @@ export declare class App {
      */
     getMetaData(index: number): object;
     /**
-     * Get the number of loaded data.
+     * Get the list of ids in the data storage.
      *
-     * @returns {number} The number.
+     * @returns {Array} The list of data ids.
      */
-    getNumberOfLoadedData(): number;
+    getDataIds(): any[];
     /**
      * Can the data be scrolled?
      *
