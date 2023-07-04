@@ -88,7 +88,8 @@ export class App {
    * @returns {Image} The image.
    */
   getLastImage() {
-    return this.#dataController.get(this.#dataController.length() - 1).image;
+    const dataIds = this.#dataController.getDataIds();
+    return this.#dataController.get(dataIds[dataIds.length - 1]).image;
   }
 
   /**
@@ -107,7 +108,8 @@ export class App {
    * @param {Image} img The associated image.
    */
   setLastImage(img) {
-    this.#dataController.setImage(this.#dataController.length() - 1, img);
+    const dataIds = this.#dataController.getDataIds();
+    this.#dataController.setImage(dataIds[dataIds.length - 1], img);
   }
 
   /**
@@ -118,7 +120,7 @@ export class App {
    * @returns {number} The new image id.
    */
   addNewImage(image, meta) {
-    const id = this.#dataController.length();
+    const id = this.#dataController.getDataIds().length;
 
     // load start event
     this.#fireEvent({
@@ -174,12 +176,12 @@ export class App {
   }
 
   /**
-   * Get the number of loaded data.
+   * Get the list of ids in the data storage.
    *
-   * @returns {number} The number.
+   * @returns {Array} The list of data ids.
    */
-  getNumberOfLoadedData() {
-    return this.#dataController.length();
+  getDataIds() {
+    return this.#dataController.getDataIds();
   }
 
   /**
@@ -675,7 +677,7 @@ export class App {
     if (itemIndex === -1) {
       this.#options.dataViewConfigs[dataId].push(config);
     } else {
-      throw new Error('Duplicate view sconfig for data ' + dataId +
+      throw new Error('Duplicate view config for data ' + dataId +
         ' and div ' + config.divId);
     }
 
@@ -828,7 +830,8 @@ export class App {
       }
       // add view
       // warn: needs a loaded DOM
-      if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
+      if (typeof this.#dataController.get(dataIndex) !== 'undefined' &&
+        layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         this.#addViewLayer(dataIndex, config);
       }
       // draw

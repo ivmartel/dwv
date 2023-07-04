@@ -327,10 +327,11 @@ function onDOMContentLoaded() {
     _app.setDataViewConfig(configs);
 
     clearDataTable();
-    for (let i = 0; i < _app.getNumberOfLoadedData(); ++i) {
-      _app.render(i);
+    const dataIds = _app.getDataIds();
+    for (let i = 0; i < dataIds.length; ++i) {
+      _app.render(dataIds[i]);
       // add data row (will bind controls)
-      addDataRow(i);
+      addDataRow(dataIds[i]);
     }
 
     // need to set tool after config change

@@ -26,12 +26,12 @@ export class DataController {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * Get the length of the data storage.
+   * Get the list of ids in the data storage.
    *
-   * @returns {number} The length.
+   * @returns {Array} The list of data ids.
    */
-  length() {
-    return Object.keys(this.#data).length;
+  getDataIds() {
+    return Object.keys(this.#data);
   }
 
   /**
