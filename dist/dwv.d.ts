@@ -64,11 +64,11 @@ export declare class App {
      */
     getMetaData(index: number): object;
     /**
-     * Get the number of loaded data.
+     * Get the list of ids in the data storage.
      *
-     * @returns {number} The number.
+     * @returns {Array} The list of data ids.
      */
-    getNumberOfLoadedData(): number;
+    getDataIds(): any[];
     /**
      * Can the data be scrolled?
      *
@@ -314,6 +314,14 @@ export declare class App {
      */
     removeDataViewConfig(dataId: number, config: object): void;
     /**
+     * Update a data view config.
+     *
+     * @param {number} dataId The data id.
+     * @param {string} divId The div id.
+     * @param {object} config The view configuration.
+     */
+    updateDataViewConfig(dataId: number, divId: string, config: object): void;
+    /**
      * Set the layer groups binders.
      *
      * @param {Array} list The list of binder names.
@@ -323,8 +331,9 @@ export declare class App {
      * Render the current data.
      *
      * @param {number} dataIndex The data index to render.
+     * @param {Array} [viewConfigs] The list of configs to render.
      */
-    render(dataIndex: number): void;
+    render(dataIndex: number, viewConfigs?: any[]): void;
     /**
      * Zoom to the layers.
      *

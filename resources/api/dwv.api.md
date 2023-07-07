@@ -23,6 +23,7 @@ export class App {
     getAddedScale(): object;
     getBaseScale(): object;
     getCurrentStackIndex(): number;
+    getDataIds(): any[];
     getDataViewConfig(): object;
     getDrawLayersByDataIndex(index: number): any[];
     getImage(index: number): Image_2;
@@ -31,7 +32,6 @@ export class App {
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(index: number): object;
     getNumberOfLayerGroups(): number;
-    getNumberOfLoadedData(): number;
     getOffset(): object;
     getOverlayData(dataIndex: number): OverlayData;
     getStackSize(): number;
@@ -49,7 +49,7 @@ export class App {
     redo(): void;
     removeDataViewConfig(dataId: number, config: object): void;
     removeEventListener(type: string, callback: object): void;
-    render(dataIndex: number): void;
+    render(dataIndex: number, viewConfigs?: any[]): void;
     reset(): void;
     resetDisplay(): void;
     resetLayout(): void;
@@ -67,6 +67,7 @@ export class App {
     toggleOverlayListeners(dataIndex: number): void;
     translate(tx: number, ty: number): void;
     undo(): void;
+    updateDataViewConfig(dataId: number, divId: string, config: object): void;
     zoom(step: number, cx: number, cy: number): void;
 }
 
