@@ -155,7 +155,7 @@ function viewerSetup() {
 
   let dataLoad = 0;
   const firstRender = [];
-  _app.addEventListener('loadend', function (event) {
+  _app.addEventListener('load', function (event) {
     // update UI at first render
     if (!firstRender.includes(event.loadid)) {
       // store data id
