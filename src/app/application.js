@@ -1260,7 +1260,7 @@ export class App {
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
-    this.#getViewConfigs(event.loadid).length !== 0 &&
+      this.#getViewConfigs(event.loadid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
       this.render(event.loadid);
     }
