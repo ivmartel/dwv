@@ -314,6 +314,14 @@ export declare class App {
      */
     removeDataViewConfig(dataId: number, config: object): void;
     /**
+     * Update a data view config.
+     *
+     * @param {number} dataId The data id.
+     * @param {string} divId The div id.
+     * @param {object} config The view configuration.
+     */
+    updateDataViewConfig(dataId: number, divId: string, config: object): void;
+    /**
      * Set the layer groups binders.
      *
      * @param {Array} list The list of binder names.
