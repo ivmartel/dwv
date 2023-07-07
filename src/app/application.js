@@ -1455,12 +1455,6 @@ export class App {
       this.render(event.dataid);
     });
 
-    // bind
-    this.#stage.bindLayerGroups();
-    if (this.#toolboxController) {
-      this.#toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
-    }
-
     // optional draw layer
     let drawLayer;
     if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
@@ -1537,6 +1531,12 @@ export class App {
       if (typeof drawLayer !== 'undefined') {
         drawLayer.setScale(layerGroup.getScale());
       }
+    }
+
+    // bind
+    this.#stage.bindLayerGroups();
+    if (this.#toolboxController) {
+      this.#toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
     }
 
     // initialise the toolbox for base
