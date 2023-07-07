@@ -686,10 +686,8 @@ export class App {
       this.#createLayerGroup(config);
     }
 
-    // add view if data is loaded
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      this.#addViewLayer(dataId, config);
-    }
+    // render (will create layers)
+    this.render(dataId, [config]);
   }
 
   /**
@@ -736,6 +734,55 @@ export class App {
         }
       }
     }
+  }
+
+  /**
+   * Update a data view config.
+   *
+   * @param {number} dataId The data id.
+   * @param {string} divId The div id.
+   * @param {object} config The view configuration.
+   */
+  updateDataViewConfig(dataId, divId, config) {
+    const configs = this.#options.dataViewConfigs;
+    if (typeof configs[dataId] === 'undefined') {
+      throw new Error('No config for dataId: ' + dataId);
+    }
+    const equalDivId = function (item) {
+      return item.divId === divId;
+    };
+    const itemIndex = configs[dataId].findIndex(equalDivId);
+    if (itemIndex === -1) {
+      throw new Error('No config for dataId: ' +
+        dataId + ' and divId: ' + divId);
+    }
+
+    configs[dataId][itemIndex] = config;
+
+    // remove previous layers
+    const lg = this.#stage.getLayerGroupByDivId(config.divId);
+    if (typeof lg !== 'undefined') {
+      const vls = lg.getViewLayersByDataIndex(dataId);
+      if (vls.length === 1) {
+        lg.removeLayer(vls[0]);
+      } else {
+        throw new Error('Expected one view layer, got ' + vls.length);
+      }
+      const dls = lg.getDrawLayersByDataIndex(dataId);
+      if (dls.length === 1) {
+        lg.removeLayer(dls[0]);
+      } else {
+        throw new Error('Expected one draw layer, got ' + dls.length);
+      }
+      // set possible orientation
+      if (typeof config.orientation !== 'undefined') {
+        lg.setTargetOrientation(
+          getMatrixFromName(config.orientation));
+      }
+    }
+
+    // render (will create layer)
+    this.render(dataId, [config]);
   }
 
   /**
