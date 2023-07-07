@@ -323,8 +323,9 @@ export declare class App {
      * Render the current data.
      *
      * @param {number} dataIndex The data index to render.
+     * @param {Array} [viewConfigs] The list of configs to render.
      */
-    render(dataIndex: number): void;
+    render(dataIndex: number, viewConfigs?: any[]): void;
     /**
      * Zoom to the layers.
      *
