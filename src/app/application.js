@@ -800,8 +800,9 @@ export class App {
    * Render the current data.
    *
    * @param {number} dataIndex The data index to render.
+   * @param {Array} [viewConfigs] The list of configs to render.
    */
-  render(dataIndex) {
+  render(dataIndex, viewConfigs) {
     if (typeof dataIndex === 'undefined' || dataIndex === null) {
       throw new Error('Cannot render without data index');
     }
@@ -812,14 +813,19 @@ export class App {
       this.#createLayerGroups(this.#options.dataViewConfigs);
     }
 
-    // loop on all configs
-    const viewConfigs = this.#getViewConfigs(dataIndex);
+    // use options list if non provided
+    if (typeof viewConfigs === 'undefined') {
+      viewConfigs = this.#getViewConfigs(dataIndex);
+    }
+
     // nothing to do if no view config
     if (viewConfigs.length === 0) {
       logger.info('Not rendering data: ' + dataIndex +
         ' (no data view config)');
       return;
     }
+
+    // loop on configs
     for (let i = 0; i < viewConfigs.length; ++i) {
       const config = viewConfigs[i];
       const layerGroup =
