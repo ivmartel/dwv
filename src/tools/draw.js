@@ -200,6 +200,13 @@ export class Draw {
   #mouseOverCursor = 'pointer';
 
   /**
+   * With scroll flag.
+   *
+   * @type {boolean}
+   */
+  #withScroll = true;
+
+  /**
    * Event listeners.
    */
   #listeners = {};
@@ -429,7 +436,9 @@ export class Draw {
    * @param {object} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#scrollWhell.wheel(event);
+    if (this.#withScroll) {
+      this.#scrollWhell.wheel(event);
+    }
   };
 
   /**
@@ -943,6 +952,9 @@ export class Draw {
     }
     if (typeof features.mouseOverCursor !== 'undefined') {
       this.#mouseOverCursor = features.mouseOverCursor;
+    }
+    if (typeof features.withScroll !== 'undefined') {
+      this.#withScroll = features.withScroll;
     }
   }
 
