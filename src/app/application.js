@@ -625,11 +625,10 @@ export class App {
       throw new Error('No available data view configuration');
     }
     let configs = [];
-    if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
-      configs = this.#options.dataViewConfigs['*'];
-    } else if (
-      typeof this.#options.dataViewConfigs[dataIndex] !== 'undefined') {
+    if (typeof this.#options.dataViewConfigs[dataIndex] !== 'undefined') {
       configs = this.#options.dataViewConfigs[dataIndex];
+    } else if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
+      configs = this.#options.dataViewConfigs['*'];
     }
     return configs;
   }
@@ -712,6 +711,9 @@ export class App {
       return;
     }
     configs[dataId].splice(itemIndex, 1);
+    if (configs[dataId].length === 0) {
+      delete configs[dataId];
+    }
 
     // data is loaded, remove view
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
