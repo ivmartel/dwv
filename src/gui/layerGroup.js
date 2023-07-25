@@ -615,6 +615,8 @@ export class LayerGroup {
     // reset active indices
     this.#activeViewLayerIndex = null;
     this.#activeDrawLayerIndex = null;
+    // remove possible crosshair
+    this.#removeCrosshairDiv();
     // clean container div
     const previous = this.#containerDiv.getElementsByClassName('layer');
     if (previous) {
