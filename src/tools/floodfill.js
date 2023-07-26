@@ -258,8 +258,11 @@ export class Floodfill {
       posGroup.add(this.#shapeGroup);
 
       // draw shape command
-      this.#command = new DrawGroupCommand(this.#shapeGroup, 'floodfill',
-        drawLayer.getKonvaLayer());
+      this.#command = new DrawGroupCommand(
+        this.#shapeGroup,
+        'floodfill',
+        drawLayer
+      );
       this.#command.onExecute = this.#fireEvent;
       this.#command.onUndo = this.#fireEvent;
       // // draw

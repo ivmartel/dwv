@@ -11,6 +11,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Index} from '../math/index';
+import {DrawLayer} from '../gui/drawLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -114,6 +115,13 @@ export function getHierarchyLog(layer, prefix) {
 export class DrawController {
 
   /**
+   * The draw layer.
+   *
+   * @type {DrawLayer}
+   */
+  #drawLayer;
+
+  /**
    * The Konva layer.
    *
    * @type {Konva.Layer}
@@ -128,10 +136,11 @@ export class DrawController {
   #currentPosGroupId = null;
 
   /**
-   * @param {Konva.Layer} konvaLayer The draw layer.
+   * @param {DrawLayer} drawLayer The draw layer.
    */
-  constructor(konvaLayer) {
-    this.#konvaLayer = konvaLayer;
+  constructor(drawLayer) {
+    this.#drawLayer = drawLayer;
+    this.#konvaLayer = drawLayer.getKonvaLayer();
   }
 
   /**
@@ -349,7 +358,10 @@ export class DrawController {
         const shape = stateGroup.getChildren(isNodeNameShape)[0];
         // create the draw command
         const cmd = new DrawGroupCommand(
-          stateGroup, shape.className, this.#konvaLayer);
+          stateGroup,
+          shape.className,
+          this.#drawLayer
+        );
         // draw command callbacks
         cmd.onExecute = cmdCallback;
         cmd.onUndo = cmdCallback;
@@ -440,7 +452,10 @@ export class DrawController {
     const shape = group.getChildren(isNodeNameShape)[0];
     const shapeDisplayName = getShapeDisplayName(shape);
     const delcmd = new DeleteGroupCommand(
-      group, shapeDisplayName, this.#konvaLayer);
+      group,
+      shapeDisplayName,
+      this.#drawLayer
+    );
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
     delcmd.execute();

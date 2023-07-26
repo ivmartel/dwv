@@ -451,7 +451,6 @@ export class Draw {
       event.context = 'Draw';
       this.#app.onKeydown(event);
     }
-    let konvaLayer;
 
     // press delete or backspace key
     if ((event.key === 'Delete' ||
@@ -459,12 +458,15 @@ export class Draw {
       this.#shapeEditor.isActive()) {
       // get shape
       const shapeGroup = this.#shapeEditor.getShape().getParent();
-      konvaLayer = shapeGroup.getLayer();
+      const drawLayer = this.#app.getActiveLayerGroup().getActiveDrawLayer();
       const shapeDisplayName = getShapeDisplayName(
         shapeGroup.getChildren(isNodeNameShape)[0]);
       // delete command
-      const delcmd = new DeleteGroupCommand(shapeGroup,
-        shapeDisplayName, konvaLayer);
+      const delcmd = new DeleteGroupCommand(
+        shapeGroup,
+        shapeDisplayName,
+        drawLayer
+      );
       delcmd.onExecute = this.#fireEvent;
       delcmd.onUndo = this.#fireEvent;
       delcmd.execute();
@@ -473,7 +475,7 @@ export class Draw {
 
     // escape key: exit shape creation
     if (event.key === 'Escape' && this.#tmpShapeGroup !== null) {
-      konvaLayer = this.#tmpShapeGroup.getLayer();
+      const konvaLayer = this.#tmpShapeGroup.getLayer();
       // reset temporary shape group
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
@@ -522,19 +524,18 @@ export class Draw {
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #onFinalPoints(finalPoints, layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const konvaLayer = drawLayer.getKonvaLayer();
-
     // reset temporary shape group
     if (this.#tmpShapeGroup) {
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
     }
 
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    const drawController =
-      layerGroup.getActiveDrawLayer().getDrawController();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const konvaLayer = drawLayer.getKonvaLayer();
+    const drawController = drawLayer.getDrawController();
+
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
 
     // create final shape
     const finalShapeGroup = this.#currentFactory.create(
@@ -550,7 +551,10 @@ export class Draw {
     konvaLayer.listening(true);
     // draw shape command
     this.#command = new DrawGroupCommand(
-      finalShapeGroup, this.#shapeName, konvaLayer);
+      finalShapeGroup,
+      this.#shapeName,
+      drawLayer
+    );
     this.#command.onExecute = this.#fireEvent;
     this.#command.onUndo = this.#fireEvent;
     // execute it
@@ -840,8 +844,11 @@ export class Draw {
         // reset cursor
         document.body.style.cursor = this.#originalCursor;
         // delete command
-        const delcmd = new DeleteGroupCommand(group,
-          shapeDisplayName, konvaLayer);
+        const delcmd = new DeleteGroupCommand(
+          group,
+          shapeDisplayName,
+          drawLayer
+        );
         delcmd.onExecute = this.#fireEvent;
         delcmd.onUndo = this.#fireEvent;
         delcmd.execute();
@@ -853,8 +860,12 @@ export class Draw {
           y: pos.y - dragStartPos.y
         };
         if (translation.x !== 0 || translation.y !== 0) {
-          const mvcmd = new MoveGroupCommand(group,
-            shapeDisplayName, translation, konvaLayer);
+          const mvcmd = new MoveGroupCommand(
+            group,
+            shapeDisplayName,
+            translation,
+            drawLayer
+          );
           mvcmd.onExecute = this.#fireEvent;
           mvcmd.onUndo = this.#fireEvent;
           this.#app.addToUndoStack(mvcmd);
@@ -862,7 +873,8 @@ export class Draw {
           // the move is handled by Konva, trigger an event manually
           this.#fireEvent({
             type: 'drawmove',
-            id: group.id()
+            id: group.id(),
+            dataid: drawLayer.getDataIndex()
           });
         }
         // reset anchors

@@ -374,6 +374,10 @@ export class ShapeEditor {
     // drag end listener
     anchor.on('dragend.edit', (event) => {
       const anchor = event.target;
+      const layerDetails = getLayerDetailsFromEvent(event.evt);
+      const layerGroup =
+        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+      const drawLayer = layerGroup.getActiveDrawLayer();
       const endAnchor = this.#getClone(anchor);
       // store the change command
       const chgcmd = new ChangeGroupCommand(
@@ -381,7 +385,7 @@ export class ShapeEditor {
         this.#currentFactory,
         startAnchor,
         endAnchor,
-        anchor.getLayer(),
+        drawLayer,
         this.#viewController,
         this.#app.getStyle()
       );

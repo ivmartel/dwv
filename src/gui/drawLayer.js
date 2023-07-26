@@ -401,7 +401,7 @@ export class DrawLayer {
     this.#konvaStage.add(konvaLayer);
 
     // create draw controller
-    this.#drawController = new DrawController(konvaLayer);
+    this.#drawController = new DrawController(this);
   }
 
   /**

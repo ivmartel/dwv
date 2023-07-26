@@ -4,6 +4,7 @@ import Konva from 'konva';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Style} from '../gui/style';
+import {DrawLayer} from '../gui/drawLayer';
 import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
@@ -52,9 +53,9 @@ export class DrawGroupCommand {
   #name;
 
   /**
-   * The Konva layer.
+   * The draw layer.
    *
-   * @type {Konva.Layer}
+   * @type {DrawLayer}
    */
   #layer;
 
@@ -75,7 +76,7 @@ export class DrawGroupCommand {
   /**
    * @param {Konva.Group} group The group draw.
    * @param {string} name The shape display name.
-   * @param {Konva.Layer} layer The layer where to draw the group.
+   * @param {DrawLayer} layer The layer where to draw the group.
    * @param {boolean} [silent] Whether to send a creation event or not.
    */
   constructor(group, name, layer, silent) {
@@ -104,7 +105,7 @@ export class DrawGroupCommand {
     // add the group to the parent (in case of undo/redo)
     this.#parent.add(this.#group);
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     if (!this.#isSilent) {
       /**
@@ -116,7 +117,8 @@ export class DrawGroupCommand {
        */
       this.onExecute({
         type: 'drawcreate',
-        id: this.#group.id()
+        id: this.#group.id(),
+        dataid: this.#layer.getDataIndex()
       });
     }
   }
@@ -130,11 +132,12 @@ export class DrawGroupCommand {
     // remove the group from the parent layer
     this.#group.remove();
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     this.onUndo({
       type: 'drawdelete',
-      id: this.#group.id()
+      id: this.#group.id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 
@@ -186,9 +189,9 @@ export class MoveGroupCommand {
   #translation;
 
   /**
-   * The Konva layer.
+   * The draw layer.
    *
-   * @type {Konva.Layer}
+   * @type {DrawLayer}
    */
   #layer;
 
@@ -196,7 +199,7 @@ export class MoveGroupCommand {
    * @param {Konva.Group} group The group draw.
    * @param {string} name The shape display name.
    * @param {object} translation A 2D translation to move the group by.
-   * @param {Konva.Layer} layer The layer where to move the group.
+   * @param {DrawLayer} layer The layer where to move the group.
    */
   constructor(group, name, translation, layer) {
     this.#group = group;
@@ -223,7 +226,7 @@ export class MoveGroupCommand {
     // translate group
     this.#group.move(this.#translation);
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     /**
      * Draw move event.
@@ -234,7 +237,8 @@ export class MoveGroupCommand {
      */
     this.onExecute({
       type: 'drawmove',
-      id: this.#group.id()
+      id: this.#group.id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 
@@ -251,11 +255,12 @@ export class MoveGroupCommand {
     };
     this.#group.move(minusTrans);
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     this.onUndo({
       type: 'drawmove',
-      id: this.#group.id()
+      id: this.#group.id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 
@@ -314,9 +319,9 @@ export class ChangeGroupCommand {
   #endAnchor;
 
   /**
-   * The Konva layer.
+   * The draw layer.
    *
-   * @type {Konva.Layer}
+   * @type {DrawLayer}
    */
   #layer;
 
@@ -339,7 +344,7 @@ export class ChangeGroupCommand {
    * @param {object} factory The shape factory.
    * @param {object} startAnchor The anchor that starts the change.
    * @param {object} endAnchor The anchor that ends the change.
-   * @param {Konva.Layer} layer The layer where to change the group.
+   * @param {DrawLayer} layer The layer where to change the group.
    * @param {ViewController} viewController The associated viewController.
    * @param {Style} style The app style.
    */
@@ -376,7 +381,7 @@ export class ChangeGroupCommand {
       this.#viewController
     );
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     /**
      * Draw change event.
@@ -386,7 +391,8 @@ export class ChangeGroupCommand {
      */
     this.onExecute({
       type: 'drawchange',
-      id: this.#endAnchor.getParent().id()
+      id: this.#endAnchor.getParent().id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 
@@ -403,11 +409,12 @@ export class ChangeGroupCommand {
       this.#viewController
     );
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     this.onUndo({
       type: 'drawchange',
-      id: this.#startAnchor.getParent().id()
+      id: this.#startAnchor.getParent().id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 
@@ -451,9 +458,9 @@ export class DeleteGroupCommand {
   #name;
 
   /**
-   * The Konva layer.
+   * The draw layer.
    *
-   * @type {Konva.Layer}
+   * @type {DrawLayer}
    */
   #layer;
 
@@ -465,9 +472,9 @@ export class DeleteGroupCommand {
   #parent;
 
   /**
-   * @param {object} group The group draw.
+   * @param {Konva.Group} group The group draw.
    * @param {string} name The shape display name.
-   * @param {object} layer The layer where to delete the group.
+   * @param {DrawLayer} layer The layer where to delete the group.
    */
   constructor(group, name, layer) {
     this.#group = group;
@@ -494,7 +501,7 @@ export class DeleteGroupCommand {
     // remove the group from its parent
     this.#group.remove();
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     /**
      * Draw delete event.
@@ -505,7 +512,8 @@ export class DeleteGroupCommand {
      */
     this.onExecute({
       type: 'drawdelete',
-      id: this.#group.id()
+      id: this.#group.id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 
@@ -518,11 +526,12 @@ export class DeleteGroupCommand {
     // add the group to its parent
     this.#parent.add(this.#group);
     // draw
-    this.#layer.draw();
+    this.#layer.getKonvaLayer().draw();
     // callback
     this.onUndo({
       type: 'drawcreate',
-      id: this.#group.id()
+      id: this.#group.id(),
+      dataid: this.#layer.getDataIndex()
     });
   }
 

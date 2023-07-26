@@ -259,8 +259,11 @@ export class Livewire {
     posGroup.add(this.#shapeGroup);
 
     // draw shape command
-    this.#command = new DrawGroupCommand(this.#shapeGroup, 'livewire',
-      drawLayer.getKonvaLayer());
+    this.#command = new DrawGroupCommand(
+      this.#shapeGroup,
+      'livewire',
+      drawLayer
+    );
     // draw
     this.#command.execute();
   };
