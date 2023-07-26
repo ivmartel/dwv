@@ -1,3 +1,5 @@
+import Konva from 'konva';
+
 /**
  * Add tags to the dictionary.
  *
@@ -676,15 +678,15 @@ export declare class DrawLayer {
     /**
      * Get the Konva stage.
      *
-     * @returns {object} The stage.
+     * @returns {Konva.Stage} The stage.
      */
-    getKonvaStage(): object;
+    getKonvaStage(): Konva.Stage;
     /**
      * Get the Konva layer.
      *
-     * @returns {object} The layer.
+     * @returns {Konva.Layer} The layer.
      */
-    getKonvaLayer(): object;
+    getKonvaLayer(): Konva.Layer;
     /**
      * Get the draw controller.
      *

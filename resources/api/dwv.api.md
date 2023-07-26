@@ -4,6 +4,8 @@
 
 ```ts
 
+import Konva from 'konva';
+
 // @public
 export function addTagsToDictionary(group: string, tags: object): void;
 
@@ -150,8 +152,8 @@ export class DrawLayer {
     getDataIndex(): number;
     getDrawController(): object;
     getId(): string;
-    getKonvaLayer(): object;
-    getKonvaStage(): object;
+    getKonvaLayer(): Konva.Layer;
+    getKonvaStage(): Konva.Stage;
     getOpacity(): number;
     initialise(size: object, spacing: object, index: number): void;
     isGroupVisible(id: string): boolean;
