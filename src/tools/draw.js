@@ -252,8 +252,7 @@ export class Draw {
     } else {
       // disable edition
       this.#shapeEditor.disable();
-      this.#shapeEditor.setShape(null);
-      this.#shapeEditor.setViewController(null);
+      this.#shapeEditor.reset();
       // start storing points
       this.#started = true;
       // set factory
@@ -571,8 +570,7 @@ export class Draw {
   activate(flag) {
     // reset shape display properties
     this.#shapeEditor.disable();
-    this.#shapeEditor.setShape(null);
-    this.#shapeEditor.setViewController(null);
+    this.#shapeEditor.reset();
     // get the current draw layer
     const layerGroup = this.#app.getActiveLayerGroup();
     this.#activateCurrentPositionShapes(flag, layerGroup);
@@ -833,8 +831,7 @@ export class Draw {
         group.y(dragStartPos.y);
         // disable editor
         this.#shapeEditor.disable();
-        this.#shapeEditor.setShape(null);
-        this.#shapeEditor.setViewController(null);
+        this.#shapeEditor.reset();
         // reset colour
         shapeGroup.getChildren(canNodeChangeColour).forEach(
           function (ashape) {

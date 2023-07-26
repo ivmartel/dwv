@@ -211,6 +211,14 @@ export class ShapeEditor {
   }
 
   /**
+   * Reset the editor.
+   */
+  reset() {
+    this.#shape = undefined;
+    this.#viewController = undefined;
+  }
+
+  /**
    * Reset the anchors.
    */
   resetAnchors() {
