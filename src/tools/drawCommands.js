@@ -114,6 +114,7 @@ export class DrawGroupCommand {
        * @event DrawGroupCommand#drawcreate
        * @type {object}
        * @property {number} id The id of the create draw.
+       * @property {number} dataid The associated data id.
        */
       this.onExecute({
         type: 'drawcreate',
@@ -234,6 +235,7 @@ export class MoveGroupCommand {
      * @event MoveGroupCommand#drawmove
      * @type {object}
      * @property {number} id The id of the create draw.
+     * @property {number} dataid The associated data id.
      */
     this.onExecute({
       type: 'drawmove',
@@ -388,6 +390,8 @@ export class ChangeGroupCommand {
      *
      * @event ChangeGroupCommand#drawchange
      * @type {object}
+     * @property {number} id The id of the create draw.
+     * @property {number} dataid The associated data id.
      */
     this.onExecute({
       type: 'drawchange',
@@ -509,6 +513,7 @@ export class DeleteGroupCommand {
      * @event DeleteGroupCommand#drawdelete
      * @type {object}
      * @property {number} id The id of the create draw.
+     * @property {number} dataid The associated data id.
      */
     this.onExecute({
       type: 'drawdelete',
