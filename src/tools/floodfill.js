@@ -10,6 +10,7 @@ import {logger} from '../utils/logger';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {LayerGroup} from '../gui/layerGroup';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -236,7 +237,7 @@ export class Floodfill {
    *
    * @param {object} point The start point.
    * @param {number} threshold The border threshold.
-   * @param {object} layerGroup The origin layer group.
+   * @param {LayerGroup} layerGroup The origin layer group.
    * @returns {boolean} False if no border.
    */
   #paintBorder(point, threshold, layerGroup) {

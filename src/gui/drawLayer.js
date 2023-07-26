@@ -131,7 +131,7 @@ export class DrawLayer {
   /**
    * Get the Konva stage.
    *
-   * @returns {object} The stage.
+   * @returns {Konva.Stage} The stage.
    */
   getKonvaStage() {
     return this.#konvaStage;
@@ -140,7 +140,7 @@ export class DrawLayer {
   /**
    * Get the Konva layer.
    *
-   * @returns {object} The layer.
+   * @returns {Konva.Layer} The layer.
    */
   getKonvaLayer() {
     // there should only be one layer
