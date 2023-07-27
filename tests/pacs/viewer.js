@@ -825,17 +825,17 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
  */
 function addDataRow(id) {
   // bind app to controls on first id
-  if (id === 0) {
+  if (parseInt(id, 10) === 0) {
     bindAppToControls();
   }
 
   const dataViewConfigs = _app.getDataViewConfig();
   const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
-  const vls = _app.getViewLayersByDataIndex(id);
-  const vl = vls[0];
-  const vc = vl.getViewController();
-  const wl = vc.getWindowLevel();
+  const initialVls = _app.getViewLayersByDataIndex(id);
+  const initialVl = initialVls[0];
+  const initialVc = initialVl.getViewController();
+  const initialWl = initialVc.getWindowLevel();
 
   let table = document.getElementById('layerstable');
   let body;
@@ -869,6 +869,19 @@ function addDataRow(id) {
   const row = body.insertRow();
   let cell;
 
+  const getSelectedLayerGroupIds = function () {
+    const res = [];
+    for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
+      const layerGroupDivId = allLayerGroupDivIds[l];
+      const elemId = 'layerselect-' + layerGroupDivId + '-' + id;
+      const elem = document.getElementById(elemId);
+      if (elem && elem.checked) {
+        res.push(layerGroupDivId);
+      }
+    }
+    return res;
+  };
+
   // cell: id
   cell = row.insertCell();
   cell.appendChild(document.createTextNode(id));
@@ -896,12 +909,12 @@ function addDataRow(id) {
       const groupDivId = split[1];
       const dataId = split[2];
       const lg = _app.getLayerGroupByDivId(groupDivId);
-      lg.setActiveViewLayerByDataIndex(parseInt(dataId, 10));
+      lg.setActiveViewLayerByDataIndex(dataId);
     };
     cell.appendChild(radio);
   }
 
-  const image = _app.getImage(vl.getDataIndex());
+  const image = _app.getImage(initialVl.getDataIndex());
   const dataRange = image.getDataRange();
   const rescaledDataRange = image.getRescaledDataRange();
   const floatPrecision = 4;
@@ -920,8 +933,12 @@ function addDataRow(id) {
       }
       return 0;
     };
-    for (let i = 0; i < vls.length; ++i) {
-      vls[i].getViewController().setViewAlphaFunction(func);
+    // update selected layers
+    const lgIds = getSelectedLayerGroupIds();
+    for (let i = 0; i < lgIds.length; ++i) {
+      const lg = _app.getLayerGroupByDivId(lgIds[i]);
+      const vc = lg.getActiveViewLayer().getViewController();
+      vc.setViewAlphaFunction(func);
     }
   };
   // add controls
@@ -942,25 +959,37 @@ function addDataRow(id) {
       parseFloat(document.getElementById(widthId + '-number').value);
     const center =
       parseFloat(document.getElementById(centerId + '-number').value);
-    vc.setWindowLevel(center, width);
+    // update selected layers
+    const lgIds = getSelectedLayerGroupIds();
+    for (let i = 0; i < lgIds.length; ++i) {
+      const lg = _app.getLayerGroupByDivId(lgIds[i]);
+      const vc = lg.getActiveViewLayer().getViewController();
+      vc.setWindowLevel(center, width);
+    }
   };
   // add controls
   cell.appendChild(getControlDiv(widthId, 'width',
-    0, rescaledDataRange.max - rescaledDataRange.min, wl.width,
+    0, rescaledDataRange.max - rescaledDataRange.min, initialWl.width,
     changeContrast, floatPrecision));
   cell.appendChild(getControlDiv(centerId, 'center',
-    rescaledDataRange.min, rescaledDataRange.max, wl.center,
+    rescaledDataRange.min, rescaledDataRange.max, initialWl.center,
     changeContrast, floatPrecision));
 
   // cell: presets
   cell = row.insertCell();
   // callback
   const changePreset = function (event) {
-    vc.setWindowLevelPreset(event.target.value);
+    // update selected layers
+    const lgIds = getSelectedLayerGroupIds();
+    for (let i = 0; i < lgIds.length; ++i) {
+      const lg = _app.getLayerGroupByDivId(lgIds[i]);
+      const vc = lg.getActiveViewLayer().getViewController();
+      vc.setWindowLevelPreset(event.target.value);
+    }
   };
   const select = document.createElement('select');
   select.id = 'preset-' + id + '-select';
-  const presets = vc.getWindowLevelPresetsNames();
+  const presets = initialVc.getWindowLevelPresetsNames();
   for (const preset of presets) {
     const option = document.createElement('option');
     option.value = preset;
@@ -975,12 +1004,18 @@ function addDataRow(id) {
   const opacityId = 'opacity-' + id;
   // callback
   const changeOpacity = function (value) {
-    vl.setOpacity(value);
-    vl.draw();
+    // update selected layers
+    const lgIds = getSelectedLayerGroupIds();
+    for (let i = 0; i < lgIds.length; ++i) {
+      const lg = _app.getLayerGroupByDivId(lgIds[i]);
+      const vl = lg.getActiveViewLayer();
+      vl.setOpacity(value);
+      vl.draw();
+    }
   };
   // add controls
   cell.appendChild(getControlDiv(opacityId, 'opacity',
-    0, 1, vl.getOpacity(), changeOpacity, floatPrecision));
+    0, 1, initialVl.getOpacity(), changeOpacity, floatPrecision));
 }
 
 /**
