@@ -248,7 +248,7 @@ export class View {
    *
    * @param {*} _value The pixel value. Can be a number for monochrome
    *  data or an array for RGB data.
-   * @param {number} _index The data index of the value.
+   * @param {number} _index The index of the value.
    * @returns {number} The coresponding alpha [0,255].
    */
   #alphaFunction = function (_value, _index) {
