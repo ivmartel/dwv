@@ -30,7 +30,7 @@ Data can come from 3 types of source: url (via a [XMLHttpRequest](https://develo
 
 Each 'meta' loader will then delegate the individual data load to a specialised loader according
 to its answer to the `canLoadUrl` or `canLoadFile` call. The current specialised loaders are:
-1. [DicomDataLoader](./DicomDataLoader.html): reads DICOM dataIndex
+1. [DicomDataLoader](./DicomDataLoader.html): for DICOM data
 1. [JSONTextLoader](./JSONTextLoader.html): for JSON data
 1. [RawImageLoader](./RawImageLoader.html): for image formats supported by the browser
 1. [RawVideoLoader](./RawVideoLoader.html): for video formats supported by the browser
