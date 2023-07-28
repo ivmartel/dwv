@@ -550,7 +550,7 @@ export class RunFilterCommand {
     // run filter and set app image
     this.#app.setLastImage(this.#filter.update());
     // update display
-    this.#app.render(0); //todo: fix
+    this.#app.render(this.#app.getDataIds()[0]); //todo: fix
     /**
      * Filter run event.
      *
@@ -576,7 +576,7 @@ export class RunFilterCommand {
     // reset the image
     this.#app.setLastImage(this.#filter.getOriginalImage());
     // update display
-    this.#app.render(0); //todo: fix
+    this.#app.render(this.#app.getDataIds()[0]); //todo: fix
     /**
      * Filter undo event.
      *

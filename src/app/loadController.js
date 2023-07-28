@@ -36,13 +36,13 @@ export class LoadController {
   }
 
   /**
-   * Get the next load id.
+   * Get the next data id.
    *
-   * @returns {number} The next id.
+   * @returns {string} The data id.
    */
-  #getNextLoadId() {
+  #getNextDataId() {
     ++this.#counter;
-    return this.#counter;
+    return this.#counter.toString();
   }
 
   /**
@@ -173,14 +173,14 @@ export class LoadController {
       loadtype: loadType,
     };
 
-    // load id
-    const loadId = this.#getNextLoadId();
-    eventInfo.loadid = loadId;
+    // data id
+    const dataId = this.#getNextDataId();
+    eventInfo.dataid = dataId;
 
     // set callbacks
     loader.onloadstart = (event) => {
       // store loader to allow abort
-      this.#currentLoaders[loadId] = {
+      this.#currentLoaders[dataId] = {
         loader: loader,
         isFirstItem: true
       };
@@ -191,23 +191,23 @@ export class LoadController {
     loader.onloaditem = (event) => {
       const eventInfoItem = {
         loadtype: loadType,
-        loadid: loadId
+        dataid: dataId
       };
-      if (typeof this.#currentLoaders[loadId] !== 'undefined') {
-        eventInfoItem.isfirstitem = this.#currentLoaders[loadId].isFirstItem;
+      if (typeof this.#currentLoaders[dataId] !== 'undefined') {
+        eventInfoItem.isfirstitem = this.#currentLoaders[dataId].isFirstItem;
       }
       // callback
       this.#augmentCallbackEvent(this.onloaditem, eventInfoItem)(event);
       // update loader
-      if (typeof this.#currentLoaders[loadId] !== 'undefined' &&
-        this.#currentLoaders[loadId].isFirstItem) {
-        this.#currentLoaders[loadId].isFirstItem = false;
+      if (typeof this.#currentLoaders[dataId] !== 'undefined' &&
+        this.#currentLoaders[dataId].isFirstItem) {
+        this.#currentLoaders[dataId].isFirstItem = false;
       }
     };
     loader.onload = this.#augmentCallbackEvent(this.onload, eventInfo);
     loader.onloadend = (event) => {
       // reset current loader
-      delete this.#currentLoaders[loadId];
+      delete this.#currentLoaders[dataId];
       // callback
       this.#augmentCallbackEvent(this.onloadend, eventInfo)(event);
     };
@@ -219,10 +219,10 @@ export class LoadController {
     } catch (error) {
       this.onerror({
         error: error,
-        loadid: loadId
+        dataid: dataId
       });
       this.onloadend({
-        loadid: loadId
+        dataid: dataId
       });
       return;
     }

@@ -146,11 +146,11 @@ export class ViewLayer {
   #needsDataUpdate = null;
 
   /**
-   * The associated data index.
+   * The associated data id.
    *
-   * @type {number}
+   * @type {string}
    */
-  #dataIndex = null;
+  #dataId;
 
   /**
    * Listener handler.
@@ -178,12 +178,12 @@ export class ViewLayer {
   }
 
   /**
-   * Get the associated data index.
+   * Get the associated data id.
    *
-   * @returns {number} The index.
+   * @returns {string} The data id.
    */
-  getDataIndex() {
-    return this.#dataIndex;
+  getDataId() {
+    return this.#dataId;
   }
 
   /**
@@ -199,10 +199,10 @@ export class ViewLayer {
    * Set the associated view.
    *
    * @param {object} view The view.
-   * @param {number} index The associated data index.
+   * @param {string} dataId The associated data id.
    */
-  setView(view, index) {
-    this.#dataIndex = index;
+  setView(view, dataId) {
+    this.#dataId = dataId;
     // local listeners
     view.addEventListener('wlchange', this.#onWLChange);
     view.addEventListener('colourchange', this.#onColourChange);
@@ -213,7 +213,7 @@ export class ViewLayer {
       view.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // create view controller
-    this.#viewController = new ViewController(view, index);
+    this.#viewController = new ViewController(view, dataId);
   }
 
   /**
@@ -241,8 +241,8 @@ export class ViewLayer {
    */
   onimageset = (event) => {
     // event.value = [index, image]
-    if (this.#dataIndex === event.dataid) {
-      this.#viewController.setImage(event.value[0], this.#dataIndex);
+    if (this.#dataId === event.dataid) {
+      this.#viewController.setImage(event.value[0], this.#dataId);
       this.#setBaseSize(this.#viewController.getImageSize().get2D());
       this.#needsDataUpdate = true;
     }
@@ -255,7 +255,7 @@ export class ViewLayer {
    */
   onimagechange = (event) => {
     // event.value = [index]
-    if (this.#dataIndex === event.dataid) {
+    if (this.#dataId === event.dataid) {
       this.#needsDataUpdate = true;
     }
   };
@@ -565,7 +565,7 @@ export class ViewLayer {
     let event = {
       type: 'renderstart',
       layerid: this.getId(),
-      dataid: this.getDataIndex()
+      dataid: this.getDataId()
     };
     this.#fireEvent(event);
 
@@ -610,7 +610,7 @@ export class ViewLayer {
     event = {
       type: 'renderend',
       layerid: this.getId(),
-      dataid: this.getDataIndex()
+      dataid: this.getDataId()
     };
     this.#fireEvent(event);
   }
@@ -818,7 +818,7 @@ export class ViewLayer {
    */
   #fireEvent = (event) => {
     event.srclayerid = this.getId();
-    event.dataid = this.#dataIndex;
+    event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);
   };
 

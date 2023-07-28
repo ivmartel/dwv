@@ -10,7 +10,7 @@ export class WindowLevelBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      const viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
       if (viewLayers.length !== 0) {
         const vc = viewLayers[0].getViewController();
         vc.setWindowLevel(event.value[0], event.value[1]);
@@ -104,12 +104,12 @@ export class OpacityBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      // exit if no data index
+      // exit if no data id
       if (typeof event.dataid === 'undefined') {
         return;
       }
       // propagate to first view layer
-      const viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
       if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
@@ -174,29 +174,29 @@ export class Stage {
   }
 
   /**
-   * Get the view layers associated to a data index.
+   * Get the view layers associated to a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Array} The layers.
    */
-  getViewLayersByDataIndex(index) {
+  getViewLayersByDataId(dataId) {
     let res = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getViewLayersByDataIndex(index));
+      res = res.concat(this.#layerGroups[i].getViewLayersByDataId(dataId));
     }
     return res;
   }
 
   /**
-   * Get the draw layers associated to a data index.
+   * Get the draw layers associated to a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Array} The layers.
    */
-  getDrawLayersByDataIndex(index) {
+  getDrawLayersByDataId(dataId) {
     let res = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getDrawLayersByDataIndex(index));
+      res = res.concat(this.#layerGroups[i].getDrawLayersByDataId(dataId));
     }
     return res;
   }

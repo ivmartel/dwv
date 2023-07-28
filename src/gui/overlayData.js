@@ -72,7 +72,7 @@ export class OverlayData {
   /**
    * Associated data id.
    *
-   * @type {number}
+   * @type {string}
    */
   #dataId;
 
@@ -120,7 +120,7 @@ export class OverlayData {
 
   /**
    * @param {App} app The associated application.
-   * @param {number} dataId The associated data ID.
+   * @param {string} dataId The associated data id.
    * @param {object} configs The overlay config.
    */
   constructor(app, dataId, configs) {

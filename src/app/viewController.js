@@ -36,11 +36,11 @@ export class ViewController {
   #view;
 
   /**
-   * Associated data index.
+   * Associated data id.
    *
-   * @type {number}
+   * @type {string}
    */
-  #index;
+  #dataId;
 
   /**
    * Plane helper.
@@ -58,21 +58,19 @@ export class ViewController {
 
   // third dimension player ID (created by setInterval)
   #playerID = null;
-  // associated data index
-  #dataIndex;
 
   /**
    * @param {View} view The associated view.
-   * @param {number} index The associated data index.
+   * @param {string} dataId The associated data id.
    */
-  constructor(view, index) {
+  constructor(view, dataId) {
     // check view
     if (typeof view.getImage() === 'undefined') {
       throw new Error('View does not have an image, cannot setup controller');
     }
 
     this.#view = view;
-    this.#index = index;
+    this.#dataId = dataId;
 
     // setup the plane helper
     this.#planeHelper = new PlaneHelper(
@@ -300,11 +298,11 @@ export class ViewController {
    * Set the associated image.
    *
    * @param {Image} img The associated image.
-   * @param {number} index The data index of the image.
+   * @param {string} dataId The data id of the image.
    */
-  setImage(img, index) {
+  setImage(img, dataId) {
     this.#view.setImage(img);
-    this.#dataIndex = index;
+    this.#dataId = dataId;
   }
 
   /**
@@ -810,7 +808,7 @@ export class ViewController {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
-    event.dataid = this.#dataIndex;
+    event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);
   };
 

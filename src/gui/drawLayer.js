@@ -96,11 +96,11 @@ export class DrawLayer {
   #planeHelper;
 
   /**
-   * The associated data index.
+   * The associated data id.
    *
-   * @type {number}
+   * @type {string}
    */
-  #dataIndex = null;
+  #dataId;
 
   /**
    * @param {HTMLDivElement} containerDiv The layer div, its id will be used
@@ -113,12 +113,12 @@ export class DrawLayer {
   }
 
   /**
-   * Get the associated data index.
+   * Get the associated data id.
    *
-   * @returns {number} The index.
+   * @returns {string} The id.
    */
-  getDataIndex() {
-    return this.#dataIndex;
+  getDataId() {
+    return this.#dataId;
   }
 
   /**
@@ -374,13 +374,13 @@ export class DrawLayer {
    *
    * @param {object} size The image size as {x,y}.
    * @param {object} spacing The image spacing as {x,y}.
-   * @param {number} index The associated data index.
+   * @param {string} dataId The associated data id.
    */
-  initialise(size, spacing, index) {
+  initialise(size, spacing, dataId) {
     // set locals
     this.#baseSize = size;
     this.#baseSpacing = spacing;
-    this.#dataIndex = index;
+    this.#dataId = dataId;
 
     // create stage
     this.#konvaStage = new Konva.Stage({
@@ -578,7 +578,7 @@ export class DrawLayer {
    */
   #fireEvent = (event) => {
     event.srclayerid = this.getId();
-    event.dataid = this.#dataIndex;
+    event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);
   };
 

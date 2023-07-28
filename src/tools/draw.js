@@ -874,7 +874,7 @@ export class Draw {
           this.#fireEvent({
             type: 'drawmove',
             id: group.id(),
-            dataid: drawLayer.getDataIndex()
+            dataid: drawLayer.getDataId()
           });
         }
         // reset anchors

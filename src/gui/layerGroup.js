@@ -367,16 +367,16 @@ export class LayerGroup {
   }
 
   /**
-   * Get the view layers associated to a data index.
+   * Get the view layers associated to a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {ViewLayer[]} The layers.
    */
-  getViewLayersByDataIndex(index) {
+  getViewLayersByDataId(dataId) {
     const res = [];
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof ViewLayer &&
-        this.#layers[i].getDataIndex() === index) {
+        this.#layers[i].getDataId() === dataId) {
         res.push(this.#layers[i]);
       }
     }
@@ -410,7 +410,7 @@ export class LayerGroup {
     const res = [];
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof ViewLayer) {
-        res.push(this.#layers[i].getDataIndex());
+        res.push(this.#layers[i].getDataId());
       }
     }
     return res;
@@ -426,16 +426,16 @@ export class LayerGroup {
   }
 
   /**
-   * Get the draw layers associated to a data index.
+   * Get the draw layers associated to a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {DrawLayer[]} The layers.
    */
-  getDrawLayersByDataIndex(index) {
+  getDrawLayersByDataId(dataId) {
     const res = [];
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof DrawLayer &&
-        this.#layers[i].getDataIndex() === index) {
+        this.#layers[i].getDataId() === dataId) {
         res.push(this.#layers[i]);
       }
     }
@@ -452,14 +452,14 @@ export class LayerGroup {
   }
 
   /**
-   * Set the active view layer with a data index.
+   * Set the active view layer with a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    */
-  setActiveViewLayerByDataIndex(index) {
+  setActiveViewLayerByDataId(dataId) {
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof ViewLayer &&
-        this.#layers[i].getDataIndex() === index) {
+        this.#layers[i].getDataId() === dataId) {
         this.setActiveViewLayer(i);
         break;
       }
@@ -476,14 +476,14 @@ export class LayerGroup {
   }
 
   /**
-   * Set the active draw layer with a data index.
+   * Set the active draw layer with a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    */
-  setActiveDrawLayerByDataIndex(index) {
+  setActiveDrawLayerByDataId(dataId) {
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof DrawLayer &&
-        this.#layers[i].getDataIndex() === index) {
+        this.#layers[i].getDataId() === dataId) {
         this.setActiveDrawLayer(i);
         break;
       }

@@ -75,11 +75,11 @@ export class App {
   /**
    * Get the image.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Image} The associated image.
    */
-  getImage(index) {
-    return this.#dataController.get(index).image;
+  getImage(dataId) {
+    return this.#dataController.get(dataId).image;
   }
 
   /**
@@ -93,13 +93,13 @@ export class App {
   }
 
   /**
-   * Set the image at the given index.
+   * Set the image at the given id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @param {Image} img The associated image.
    */
-  setImage(index, img) {
-    this.#dataController.setImage(index, img);
+  setImage(dataId, img) {
+    this.#dataController.setImage(dataId, img);
   }
 
   /**
@@ -117,21 +117,21 @@ export class App {
    *
    * @param {Image} image The new image.
    * @param {object} meta The image meta.
-   * @returns {number} The new image id.
+   * @returns {string} The new image data id.
    */
   addNewImage(image, meta) {
-    const id = this.#dataController.getDataIds().length;
+    const dataId = this.#dataController.getDataIds().length;
 
     // load start event
     this.#fireEvent({
       type: 'loadstart',
       loadtype: 'image',
       source: 'internal',
-      loadid: id
+      dataid: dataId
     });
 
     // add image to data controller
-    this.#dataController.addNew(id, image, meta);
+    this.#dataController.addNew(dataId, image, meta);
 
     // load item event
     this.#fireEvent({
@@ -139,13 +139,13 @@ export class App {
       loadtype: 'image',
       data: meta,
       source: 'internal',
-      loadid: id,
+      dataid: dataId,
       isfirstitem: true
     });
 
     // optional render
     if (this.#options.viewOnFirstLoadItem) {
-      this.render(id);
+      this.render(dataId);
     }
 
     // load events
@@ -153,26 +153,26 @@ export class App {
       type: 'load',
       loadtype: 'image',
       source: 'internal',
-      loadid: id
+      dataid: dataId
     });
     this.#fireEvent({
       type: 'loadend',
       loadtype: 'image',
       source: 'internal',
-      loadid: id
+      dataid: dataId
     });
 
-    return id;
+    return dataId;
   }
 
   /**
    * Get the meta data.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {object} The list of meta data.
    */
-  getMetaData(index) {
-    return this.#dataController.get(index).meta;
+  getMetaData(dataId) {
+    return this.#dataController.get(dataId).meta;
   }
 
   /**
@@ -253,25 +253,25 @@ export class App {
   }
 
   /**
-   * Get the view layers associated to a data index.
+   * Get the view layers associated to a data id.
    * The layer are available after the first loaded item.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Array} The layers.
    */
-  getViewLayersByDataIndex(index) {
-    return this.#stage.getViewLayersByDataIndex(index);
+  getViewLayersByDataId(dataId) {
+    return this.#stage.getViewLayersByDataId(dataId);
   }
 
   /**
-   * Get the draw layers associated to a data index.
+   * Get the draw layers associated to a data id.
    * The layer are available after the first loaded item.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Array} The layers.
    */
-  getDrawLayersByDataIndex(index) {
-    return this.#stage.getDrawLayersByDataIndex(index);
+  getDrawLayersByDataId(dataId) {
+    return this.#stage.getDrawLayersByDataId(dataId);
   }
 
   /**
@@ -319,7 +319,7 @@ export class App {
    * Initialise the application.
    *
    * @param {object} opt The application option with:
-   * - `dataViewConfigs`: data indexed object containing the data view
+   * - `dataViewConfigs`: dataId indexed object containing the data view
    *   configurations in the form of a list of objects containing:
    *   - divId: the HTML div id
    *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
@@ -612,21 +612,21 @@ export class App {
   }
 
   /**
-   * Get the layer group configuration from a data index.
+   * Get the layer group configuration from a data id.
    * Defaults to div id 'layerGroup' if no association object has been set.
    *
-   * @param {number} dataIndex The data index.
+   * @param {string} dataId The data id.
    * @returns {Array} The list of associated configs.
    */
-  #getViewConfigs(dataIndex) {
+  #getViewConfigs(dataId) {
     // check options
     if (this.#options.dataViewConfigs === null ||
       typeof this.#options.dataViewConfigs === 'undefined') {
       throw new Error('No available data view configuration');
     }
     let configs = [];
-    if (typeof this.#options.dataViewConfigs[dataIndex] !== 'undefined') {
-      configs = this.#options.dataViewConfigs[dataIndex];
+    if (typeof this.#options.dataViewConfigs[dataId] !== 'undefined') {
+      configs = this.#options.dataViewConfigs[dataId];
     } else if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
       configs = this.#options.dataViewConfigs['*'];
     }
@@ -660,7 +660,7 @@ export class App {
   /**
    * Add a data view config.
    *
-   * @param {number} dataId The data id.
+   * @param {string} dataId The data id.
    * @param {object} config The view configuration.
    */
   addDataViewConfig(dataId, config) {
@@ -692,7 +692,7 @@ export class App {
   /**
    * Remove a data view config.
    *
-   * @param {number} dataId The data id.
+   * @param {string} dataId The data id.
    * @param {object} config The view configuration.
    */
   removeDataViewConfig(dataId, config) {
@@ -719,13 +719,13 @@ export class App {
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
       const lg = this.#stage.getLayerGroupByDivId(config.divId);
       if (typeof lg !== 'undefined') {
-        const vls = lg.getViewLayersByDataIndex(dataId);
+        const vls = lg.getViewLayersByDataId(dataId);
         if (vls.length === 1) {
           lg.removeLayer(vls[0]);
         } else {
           throw new Error('Expected one view layer, got ' + vls.length);
         }
-        const dls = lg.getDrawLayersByDataIndex(dataId);
+        const dls = lg.getDrawLayersByDataId(dataId);
         if (dls.length === 1) {
           lg.removeLayer(dls[0]);
         } else {
@@ -741,7 +741,7 @@ export class App {
   /**
    * Update a data view config.
    *
-   * @param {number} dataId The data id.
+   * @param {string} dataId The data id.
    * @param {string} divId The div id.
    * @param {object} config The view configuration.
    */
@@ -764,13 +764,13 @@ export class App {
     // remove previous layers
     const lg = this.#stage.getLayerGroupByDivId(config.divId);
     if (typeof lg !== 'undefined') {
-      const vls = lg.getViewLayersByDataIndex(dataId);
+      const vls = lg.getViewLayersByDataId(dataId);
       if (vls.length === 1) {
         lg.removeLayer(vls[0]);
       } else {
         throw new Error('Expected one view layer, got ' + vls.length);
       }
-      const dls = lg.getDrawLayersByDataIndex(dataId);
+      const dls = lg.getDrawLayersByDataId(dataId);
       if (dls.length === 1) {
         lg.removeLayer(dls[0]);
       } else {
@@ -848,12 +848,12 @@ export class App {
   /**
    * Render the current data.
    *
-   * @param {number} dataIndex The data index to render.
+   * @param {string} dataId The data id to render.
    * @param {Array} [viewConfigs] The list of configs to render.
    */
-  render(dataIndex, viewConfigs) {
-    if (typeof dataIndex === 'undefined' || dataIndex === null) {
-      throw new Error('Cannot render without data index');
+  render(dataId, viewConfigs) {
+    if (typeof dataId === 'undefined' || dataId === null) {
+      throw new Error('Cannot render without data id');
     }
 
     // create layer groups if not done yet
@@ -864,12 +864,12 @@ export class App {
 
     // use options list if non provided
     if (typeof viewConfigs === 'undefined') {
-      viewConfigs = this.#getViewConfigs(dataIndex);
+      viewConfigs = this.#getViewConfigs(dataId);
     }
 
     // nothing to do if no view config
     if (viewConfigs.length === 0) {
-      logger.info('Not rendering data: ' + dataIndex +
+      logger.info('Not rendering data: ' + dataId +
         ' (no data view config)');
       return;
     }
@@ -885,9 +885,9 @@ export class App {
       }
       // add view
       // warn: needs a loaded DOM
-      if (typeof this.#dataController.get(dataIndex) !== 'undefined' &&
-        layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
-        this.#addViewLayer(dataIndex, config);
+      if (typeof this.#dataController.get(dataId) !== 'undefined' &&
+        layerGroup.getViewLayersByDataId(dataId).length === 0) {
+        this.#addViewLayer(dataId, config);
       }
       // draw
       layerGroup.draw();
@@ -1168,15 +1168,15 @@ export class App {
   }
 
   /**
-   * Get the overlay data for a data index.
+   * Get the overlay data for a data id.
    *
-   * @param {number} dataIndex The data index.
-   * @returns {OverlayData} The overlay data.
+   * @param {string} dataId The data id.
+   * @returns {OverlayData|undefined} The overlay data.
    */
-  getOverlayData(dataIndex) {
+  getOverlayData(dataId) {
     let data;
     if (typeof this.#overlayDatas !== 'undefined') {
-      data = this.#overlayDatas[dataIndex];
+      data = this.#overlayDatas[dataId];
     }
     return data;
   }
@@ -1184,10 +1184,10 @@ export class App {
   /**
    * Toggle overlay listeners.
    *
-   * @param {number} dataIndex The data index.
+   * @param {string} dataId The data id.
    */
-  toggleOverlayListeners(dataIndex) {
-    const data = this.getOverlayData(dataIndex);
+  toggleOverlayListeners(dataId) {
+    const data = this.getOverlayData(dataId);
     if (typeof data !== 'undefined') {
       if (data.isListening()) {
         data.removeAppListeners();
@@ -1216,8 +1216,8 @@ export class App {
   #onloadstart = (event) => {
     // create overlay data
     if (typeof this.#options.overlayConfig !== 'undefined') {
-      this.#overlayDatas[event.loadid] = new OverlayData(
-        this, event.loadid, this.#options.overlayConfig);
+      this.#overlayDatas[event.dataid] = new OverlayData(
+        this, event.dataid, this.#options.overlayConfig);
     }
     /**
      * Load start event.
@@ -1275,10 +1275,10 @@ export class App {
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
         this.#dataController.addNew(
-          event.loadid, event.data.image, event.data.info);
+          event.dataid, event.data.image, event.data.info);
       } else {
         this.#dataController.update(
-          event.loadid, event.data.image, event.data.info);
+          event.dataid, event.data.image, event.data.info);
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
@@ -1302,22 +1302,22 @@ export class App {
       data: eventMetaData,
       source: event.source,
       loadtype: event.loadtype,
-      loadid: event.loadid,
+      dataid: event.dataid,
       isfirstitem: event.isfirstitem,
       warn: event.warn
     });
 
     // update overlay data if present
     if (typeof this.#overlayDatas !== 'undefined' &&
-      typeof this.#overlayDatas[event.loadid] !== 'undefined') {
-      this.#overlayDatas[event.loadid].addItemMeta(eventMetaData);
+      typeof this.#overlayDatas[event.dataid] !== 'undefined') {
+      this.#overlayDatas[event.dataid].addItemMeta(eventMetaData);
     }
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
-      this.#getViewConfigs(event.loadid).length !== 0 &&
+      this.#getViewConfigs(event.dataid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
-      this.render(event.loadid);
+      this.render(event.dataid);
     }
   };
 
@@ -1428,14 +1428,14 @@ export class App {
   /**
    * Add a view layer.
    *
-   * @param {number} dataIndex The data index.
+   * @param {string} dataId The data id.
    * @param {object} dataViewConfig The data view config.
    */
-  #addViewLayer(dataIndex, dataViewConfig) {
-    const data = this.#dataController.get(dataIndex);
+  #addViewLayer(dataId, dataViewConfig) {
+    const data = this.#dataController.get(dataId);
     if (!data) {
       throw new Error('Cannot initialise layer with missing data, id: ' +
-        dataIndex);
+      dataId);
     }
     const layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
     if (!layerGroup) {
@@ -1491,7 +1491,7 @@ export class App {
 
     // view layer
     const viewLayer = layerGroup.addViewLayer();
-    viewLayer.setView(view, dataIndex);
+    viewLayer.setView(view, dataId);
     const size2D = imageGeometry.getSize(viewOrientation).get2D();
     const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, opacity);
@@ -1514,7 +1514,7 @@ export class App {
     let drawLayer;
     if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
       drawLayer = layerGroup.addDrawLayer();
-      drawLayer.initialise(size2D, spacing2D, dataIndex);
+      drawLayer.initialise(size2D, spacing2D, dataId);
       drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
     }
 

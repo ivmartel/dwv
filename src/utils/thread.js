@@ -247,7 +247,7 @@ class WorkerThread {
     // augment event
     event.itemNumber = this.runningTask.info.itemNumber;
     event.numberOfItems = this.runningTask.info.numberOfItems;
-    event.dataIndex = this.runningTask.info.dataIndex;
+    event.dataid = this.runningTask.info.dataId;
     // send event
     this.parentPool.onworkitem(event);
     // tell the parent pool the task is done
@@ -263,7 +263,7 @@ class WorkerThread {
     // augment event
     event.itemNumber = this.runningTask.info.itemNumber;
     event.numberOfItems = this.runningTask.info.numberOfItems;
-    event.dataIndex = this.runningTask.info.dataIndex;
+    event.dataid = this.runningTask.info.dataId;
     // pass to parent
     this.parentPool.handleWorkerError(event);
     // stop the worker and free the thread

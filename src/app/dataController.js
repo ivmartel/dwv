@@ -44,60 +44,60 @@ export class DataController {
   /**
    * Get a data at a given index.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @returns {object} The data.
    */
-  get(index) {
-    return this.#data[index];
+  get(dataId) {
+    return this.#data[dataId];
   }
 
   /**
    * Set the image at a given index.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @param {Image} image The image to set.
    */
-  setImage(index, image) {
-    this.#data[index].image = image;
+  setImage(dataId, image) {
+    this.#data[dataId].image = image;
     // fire image set
     this.#fireEvent({
       type: 'imageset',
       value: [image],
-      dataid: index
+      dataid: dataId
     });
     // listen to image change
-    image.addEventListener('imagechange', this.#getFireEvent(index));
+    image.addEventListener('imagechange', this.#getFireEvent(dataId));
   }
 
   /**
    * Add a new data.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @param {Image} image The image.
    * @param {object} meta The image meta.
    */
-  addNew(index, image, meta) {
-    if (typeof this.#data[index] !== 'undefined') {
-      throw new Error('Index already used in storage: ' + index);
+  addNew(dataId, image, meta) {
+    if (typeof this.#data[dataId] !== 'undefined') {
+      throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
-    this.#data[index] = {
+    this.#data[dataId] = {
       image: image,
       meta: meta
     };
     // listen to image change
-    image.addEventListener('imagechange', this.#getFireEvent(index));
+    image.addEventListener('imagechange', this.#getFireEvent(dataId));
   }
 
   /**
    * Update the current data.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @param {Image} image The image.
    * @param {object} meta The image meta.
    */
-  update(index, image, meta) {
-    const dataToUpdate = this.#data[index];
+  update(dataId, image, meta) {
+    const dataToUpdate = this.#data[dataId];
 
     // add slice to current image
     dataToUpdate.image.appendSlice(image);
@@ -150,15 +150,15 @@ export class DataController {
   };
 
   /**
-   * Get a fireEvent function that adds the input index
+   * Get a fireEvent function that adds the input data id
    * to the event value.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Function} A fireEvent function.
    */
-  #getFireEvent(index) {
+  #getFireEvent(dataId) {
     return (event) => {
-      event.dataid = index;
+      event.dataid = dataId;
       this.#fireEvent(event);
     };
   }

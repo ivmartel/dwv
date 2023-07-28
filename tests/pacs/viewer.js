@@ -124,7 +124,7 @@ function viewerSetup() {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function (event) {
-    console.time('load-data-' + event.loadid);
+    console.time('load-data-' + event.dataid);
   });
   const dataLoadProgress = new Array(numberOfDataToLoad);
   const sumReducer = function (sum, value) {
@@ -133,15 +133,16 @@ function viewerSetup() {
   _app.addEventListener('loadprogress', function (event) {
     if (typeof event.lengthComputable !== 'undefined' &&
       event.lengthComputable) {
-      dataLoadProgress[event.loadid] =
+      dataLoadProgress[event.dataid] =
         Math.ceil((event.loaded / event.total) * 100);
       document.getElementById('loadprogress').value =
         dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
     }
   });
   _app.addEventListener('load', function (event) {
+    console.log(event.dataid);
     if (!viewOnFirstLoadItem) {
-      _app.render(event.loadid);
+      _app.render(event.dataid);
     }
   });
   _app.addEventListener('loaditem', function (event) {
@@ -150,22 +151,22 @@ function viewerSetup() {
     }
   });
   _app.addEventListener('loadend', function (event) {
-    console.timeEnd('load-data-' + event.loadid);
+    console.timeEnd('load-data-' + event.dataid);
   });
 
   let dataLoad = 0;
   const firstRender = [];
   _app.addEventListener('load', function (event) {
     // update UI at first render
-    if (!firstRender.includes(event.loadid)) {
+    if (!firstRender.includes(event.dataid)) {
       // store data id
       firstRender.push(event.dataid);
       // log meta data
       if (event.loadtype === 'image') {
         console.log('metadata',
-          getMetaDataWithNames(_app.getMetaData(event.loadid)));
+          getMetaDataWithNames(_app.getMetaData(event.dataid)));
         // add data row
-        addDataRow(event.loadid);
+        addDataRow(event.dataid);
         ++dataLoad;
         // init gui
         if (dataLoad === numberOfDataToLoad) {
@@ -181,23 +182,23 @@ function viewerSetup() {
     }
 
     if (event.loadtype === 'image' &&
-      typeof _app.getMetaData(event.loadid)['00080060'] !== 'undefined' &&
-      _app.getMetaData(event.loadid)['00080060'].value[0] === 'SEG') {
+      typeof _app.getMetaData(event.dataid)['00080060'] !== 'undefined' &&
+      _app.getMetaData(event.dataid)['00080060'].value[0] === 'SEG') {
       // log SEG details
-      logFramePosPats(_app.getMetaData(event.loadid));
+      logFramePosPats(_app.getMetaData(event.dataid));
 
       // example usage of a dicom SEG as data mask
       const useSegAsMask = false;
       if (useSegAsMask) {
         // image to filter
-        const imgDataIndex = 0;
-        const vls = _app.getViewLayersByDataIndex(imgDataIndex);
+        const dataId = 0;
+        const vls = _app.getViewLayersByDataId(dataId);
         const vc = vls[0].getViewController();
-        const img = _app.getImage(imgDataIndex);
+        const img = _app.getImage(dataId);
         const imgGeometry = img.getGeometry();
         const sliceSize = imgGeometry.getSize().getDimSize(2);
         // SEG image
-        const segImage = _app.getImage(event.loadid);
+        const segImage = _app.getImage(event.dataid);
         // calculate slice difference
         const segOrigin0 = segImage.getGeometry().getOrigins()[0];
         const segOrigin0Point = new dwv.Point([
@@ -294,7 +295,7 @@ function onDOMContentLoaded() {
 
   const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function () {
-    const vls = _app.getViewLayersByDataIndex(0);
+    const vls = _app.getViewLayersByDataId('0');
     const vc = vls[0].getViewController();
     const values = this.value.split(',');
     vc.setCurrentPosition(new dwv.Point([
@@ -480,7 +481,7 @@ function getDivIds(dataViewConfig) {
 /**
  * Get the layer group div ids associated to a data id.
  *
- * @param {number} dataId The data id.
+ * @param {string} dataId The data id.
  * @returns {Array} The list of div ids.
  */
 function getDataLayerGroupDivIds(dataId) {
@@ -707,7 +708,7 @@ function onWLChange(event) {
   if (elem) {
     const ids = getDataLayerGroupDivIds(event.dataid);
     const lg = _app.getLayerGroupByDivId(ids[0]);
-    const vls = lg.getViewLayersByDataIndex(event.dataid);
+    const vls = lg.getViewLayersByDataId(event.dataid);
     if (typeof vls !== 'undefined' && vls.length !== 0) {
       const vl = vls[0];
       const vc = vl.getViewController();
@@ -821,18 +822,18 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
 /**
  * Add a data row.
  *
- * @param {number} id The data index.
+ * @param {string} dataId The data id.
  */
-function addDataRow(id) {
+function addDataRow(dataId) {
   // bind app to controls on first id
-  if (parseInt(id, 10) === 0) {
+  if (dataId === '0') {
     bindAppToControls();
   }
 
   const dataViewConfigs = _app.getDataViewConfig();
   const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
-  const initialVls = _app.getViewLayersByDataIndex(id);
+  const initialVls = _app.getViewLayersByDataId(dataId);
   const initialVl = initialVls[0];
   const initialVc = initialVl.getViewController();
   const initialWl = initialVc.getWindowLevel();
@@ -873,7 +874,7 @@ function addDataRow(id) {
     const res = [];
     for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
       const layerGroupDivId = allLayerGroupDivIds[l];
-      const elemId = 'layerselect-' + layerGroupDivId + '-' + id;
+      const elemId = 'layerselect-' + layerGroupDivId + '-' + dataId;
       const elem = document.getElementById(elemId);
       if (elem && elem.checked) {
         res.push(layerGroupDivId);
@@ -884,10 +885,10 @@ function addDataRow(id) {
 
   // cell: id
   cell = row.insertCell();
-  cell.appendChild(document.createTextNode(id));
+  cell.appendChild(document.createTextNode(dataId));
 
   // cell: radio
-  let viewConfig = dataViewConfigs[id];
+  let viewConfig = dataViewConfigs[dataId];
   if (typeof viewConfig === 'undefined') {
     viewConfig = dataViewConfigs['*'];
   }
@@ -901,7 +902,7 @@ function addDataRow(id) {
     const radio = document.createElement('input');
     radio.type = 'radio';
     radio.name = 'layerselect-' + l;
-    radio.id = 'layerselect-' + layerGroupDivId + '-' + id;
+    radio.id = 'layerselect-' + layerGroupDivId + '-' + dataId;
     radio.checked = true;
     radio.onchange = function (event) {
       const fullId = event.target.id;
@@ -909,20 +910,20 @@ function addDataRow(id) {
       const groupDivId = split[1];
       const dataId = split[2];
       const lg = _app.getLayerGroupByDivId(groupDivId);
-      lg.setActiveViewLayerByDataIndex(dataId);
+      lg.setActiveViewLayerByDataId(dataId);
     };
     cell.appendChild(radio);
   }
 
-  const image = _app.getImage(initialVl.getDataIndex());
+  const image = _app.getImage(initialVl.getDataId());
   const dataRange = image.getDataRange();
   const rescaledDataRange = image.getRescaledDataRange();
   const floatPrecision = 4;
 
   // cell: alpha range
   cell = row.insertCell();
-  const minId = 'value-min-' + id;
-  const maxId = 'value-max-' + id;
+  const minId = 'value-min-' + dataId;
+  const maxId = 'value-max-' + dataId;
   // callback
   const changeAlphaFunc = function () {
     const min = parseFloat(document.getElementById(minId + '-number').value);
@@ -951,8 +952,8 @@ function addDataRow(id) {
 
   // cell: contrast
   cell = row.insertCell();
-  const widthId = 'width-' + id;
-  const centerId = 'center-' + id;
+  const widthId = 'width-' + dataId;
+  const centerId = 'center-' + dataId;
   // callback
   const changeContrast = function () {
     const width =
@@ -988,7 +989,7 @@ function addDataRow(id) {
     }
   };
   const select = document.createElement('select');
-  select.id = 'preset-' + id + '-select';
+  select.id = 'preset-' + dataId + '-select';
   const presets = initialVc.getWindowLevelPresetsNames();
   for (const preset of presets) {
     const option = document.createElement('option');
@@ -1001,7 +1002,7 @@ function addDataRow(id) {
 
   // cell: opactiy
   cell = row.insertCell();
-  const opacityId = 'opacity-' + id;
+  const opacityId = 'opacity-' + dataId;
   // callback
   const changeOpacity = function (value) {
     // update selected layers
