@@ -8,7 +8,7 @@ let _app = null;
 let _tools = null;
 
 // viewer options
-const _startMode = 0;
+let _layout = 'one';
 const _dicomWeb = false;
 
 /**
@@ -54,50 +54,21 @@ function viewerSetup() {
   // };
 
   // stage options
-  let dataViewConfigs;
   let viewOnFirstLoadItem = true;
 
   // use for concurrent load
   const numberOfDataToLoad = 1;
 
-  if (_startMode === 0) {
+  if (_layout === 'one') {
     // simplest: one layer group
-    dataViewConfigs = prepareAndGetOnebyOneDataViewConfig();
-  } else if (_startMode === 1) {
+    addLayerGroups(1);
+  } else if (_layout === 'side') {
+    // side by side
+    addLayerGroups(2);
+  } else if (_layout === 'mpr') {
     // MPR
     viewOnFirstLoadItem = false;
-    dataViewConfigs = prepareAndGetMPRDataViewConfig();
-  } else if (_startMode === 2) {
-    dataViewConfigs = prepareAndGetOnebyTwoDataViewConfig();
-  } else if (_startMode === 3) {
-    // multiple data, multiple layer group
-    addLayerGroup('layerGroupA');
-    addLayerGroup('layerGroupB');
-    dataViewConfigs = {
-      0: [
-        {
-          divId: 'layerGroupA'
-        },
-        {
-          divId: 'layerGroupB'
-        }
-      ],
-      1: [
-        {
-          divId: 'layerGroupA'
-        }
-      ],
-      2: [
-        {
-          divId: 'layerGroupB'
-        }
-      ],
-      3: [
-        {
-          divId: 'layerGroupB'
-        }
-      ]
-    };
+    addLayerGroups(3);
   }
 
   // tools
@@ -112,7 +83,6 @@ function viewerSetup() {
   // app config
   const config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
-    dataViewConfigs: dataViewConfigs,
     tools: _tools
   };
   // app
@@ -125,6 +95,20 @@ function viewerSetup() {
   });
   _app.addEventListener('loadstart', function (event) {
     console.time('load-data-' + event.dataid);
+    // update data view config
+    const dataIds = [event.dataid];
+    let configs;
+    if (_layout === 'one') {
+      configs = getOnebyOneDataViewConfig(dataIds);
+    } else if (_layout === 'side') {
+      configs = getOnebyTwoDataViewConfig(dataIds);
+    } else if (_layout === 'mpr') {
+      configs = getMPRDataViewConfig(dataIds);
+    }
+    const viewConfigs = configs[event.dataid];
+    for (let i = 0; i < viewConfigs.length; ++i) {
+      _app.addDataViewConfig(event.dataid, viewConfigs[i]);
+    }
   });
   const dataLoadProgress = new Array(numberOfDataToLoad);
   const sumReducer = function (sum, value) {
@@ -140,7 +124,6 @@ function viewerSetup() {
     }
   });
   _app.addEventListener('load', function (event) {
-    console.log(event.dataid);
     if (!viewOnFirstLoadItem) {
       _app.render(event.dataid);
     }
@@ -311,14 +294,25 @@ function onDOMContentLoaded() {
 
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.addEventListener('change', function (event) {
+    const layout = event.target.value;
+    if (layout !== 'one' &&
+      layout !== 'side' &&
+      layout !== 'mpr') {
+      throw new Error('Unknown layout: ' + layout);
+    }
+    _layout = layout;
+
     let configs;
-    const value = event.target.value;
-    if (value === 'mpr') {
-      configs = prepareAndGetMPRDataViewConfig();
-    } else if (value === 'side') {
-      configs = prepareAndGetOnebyTwoDataViewConfig();
-    } else {
-      configs = prepareAndGetOnebyOneDataViewConfig();
+    const dataIds = _app.getDataIds();
+    if (layout === 'one') {
+      addLayerGroups(1);
+      configs = getOnebyOneDataViewConfig(dataIds);
+    } else if (layout === 'side') {
+      addLayerGroups(2);
+      configs = getOnebyTwoDataViewConfig(dataIds);
+    } else if (layout === 'mpr') {
+      addLayerGroups(3);
+      configs = getMPRDataViewConfig(dataIds);
     }
 
     // unbind app to controls
@@ -328,7 +322,6 @@ function onDOMContentLoaded() {
     _app.setDataViewConfig(configs);
 
     clearDataTable();
-    const dataIds = _app.getDataIds();
     for (let i = 0; i < dataIds.length; ++i) {
       _app.render(dataIds[i]);
       // add data row (will bind controls)
@@ -367,80 +360,88 @@ function addLayerGroup(id) {
 }
 
 /**
- * Create 1*1 view config(s).
+ * Add Layer Groups.
  *
- * @returns {object} The view config.
+ * @param {number} number The number of layer groups.
  */
-function prepareAndGetOnebyOneDataViewConfig() {
+function addLayerGroups(number) {
   // clean up
   const dwvDiv = document.getElementById('dwv');
   dwvDiv.innerHTML = '';
   // add div
-  addLayerGroup('layerGroupA');
-  return {
-    '*': [
-      {
-        divId: 'layerGroupA'
-      }
-    ]
-  };
+  for (let i = 0; i < number; ++i) {
+    addLayerGroup('layerGroup' + i);
+  }
+}
+
+/**
+ * Get a full view for a given div id.
+ *
+ * @param {string} divId The div id.
+ * @returns {object} The config
+ */
+function getViewConfig(divId) {
+  const config = {divId: divId};
+  if (_layout === 'mpr') {
+    if (divId === 'layerGroup0') {
+      config.orientation = 'axial';
+    } else if (divId === 'layerGroup1') {
+      config.orientation = 'coronal';
+    } else if (divId === 'layerGroup2') {
+      config.orientation = 'sagittal';
+    }
+  }
+  return config;
 }
 
 /**
  * Create 1*2 view config(s).
  *
+ * @param {Array} dataIds The list of dataIds.
  * @returns {object} The view config.
  */
-function prepareAndGetOnebyTwoDataViewConfig() {
-  // clean up
-  const dwvDiv = document.getElementById('dwv');
-  dwvDiv.innerHTML = '';
-  // add div
-  addLayerGroup('layerGroupA');
-  addLayerGroup('layerGroupB');
-  return {
-    0: [
-      {
-        divId: 'layerGroupA'
-      }
-    ],
-    1: [
-      {
-        divId: 'layerGroupB'
-      }
-    ]
-  };
+function getOnebyOneDataViewConfig(dataIds) {
+  const configs = {};
+  for (let i = 0; i < dataIds.length; ++i) {
+    configs[dataIds[i]] = [getViewConfig('layerGroup0')];
+  }
+  return configs;
 }
 
 /**
- * Create MPR view config(s).
+ * Create 1*2 view config(s).
  *
+ * @param {Array} dataIds The list of dataIds.
  * @returns {object} The view config.
  */
-function prepareAndGetMPRDataViewConfig() {
-  // clean up
-  const dwvDiv = document.getElementById('dwv');
-  dwvDiv.innerHTML = '';
-  // add divs
-  addLayerGroup('layerGroupA');
-  addLayerGroup('layerGroupC');
-  addLayerGroup('layerGroupS');
-  return {
-    '*': [
-      {
-        divId: 'layerGroupA',
-        orientation: 'axial'
-      },
-      {
-        divId: 'layerGroupC',
-        orientation: 'coronal'
-      },
-      {
-        divId: 'layerGroupS',
-        orientation: 'sagittal'
-      }
-    ]
-  };
+function getOnebyTwoDataViewConfig(dataIds) {
+  const configs = {};
+  for (let i = 0; i < dataIds.length; ++i) {
+    if (i % 2 === 0) {
+      configs[dataIds[i]] = [getViewConfig('layerGroup0')];
+    } else {
+      configs[dataIds[i]] = [getViewConfig('layerGroup1')];
+    }
+  }
+  return configs;
+}
+
+/**
+ * Get MPR view config(s).
+ *
+ * @param {Array} dataIds The list of dataIds.
+ * @returns {object} The view config.
+ */
+function getMPRDataViewConfig(dataIds) {
+  const configs = {};
+  for (let i = 0; i < dataIds.length; ++i) {
+    configs[dataIds[i]] = [
+      getViewConfig('layerGroup0'),
+      getViewConfig('layerGroup1'),
+      getViewConfig('layerGroup2')
+    ];
+  }
+  return configs;
 }
 
 /**
@@ -870,6 +871,7 @@ function addDataRow(dataId) {
   const row = body.insertRow();
   let cell;
 
+  // get the selected layer group ids
   const getSelectedLayerGroupIds = function () {
     const res = [];
     for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
@@ -881,6 +883,59 @@ function addDataRow(dataId) {
       }
     }
     return res;
+  };
+
+  // get a layer radio button
+  const getLayerRadio = function (index, divId) {
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'layerselect-' + index;
+    radio.id = 'layerselect-' + divId + '-' + dataId;
+    radio.checked = true;
+    radio.onchange = function (event) {
+      const fullId = event.target.id;
+      const split = fullId.split('-');
+      const groupDivId = split[1];
+      const dataId = split[2];
+      const lg = _app.getLayerGroupByDivId(groupDivId);
+      lg.setActiveViewLayerByDataId(dataId);
+    };
+    return radio;
+  };
+
+  // get a layer add button
+  const getLayerAdd = function (index, divId) {
+    const button = document.createElement('button');
+    button.name = 'layeradd-' + index;
+    button.id = 'layeradd-' + divId + '-' + dataId;
+    button.appendChild(document.createTextNode('+'));
+    button.onclick = function () {
+      // update app
+      _app.addDataViewConfig(dataId, getViewConfig(divId));
+      // update html
+      const parent = button.parentElement;
+      parent.replaceChildren();
+      parent.appendChild(getLayerRadio(index, divId));
+      parent.appendChild(getLayerRem(index, divId));
+    };
+    return button;
+  };
+
+  // get a layer remove button
+  const getLayerRem = function (index, divId) {
+    const button = document.createElement('button');
+    button.name = 'layerrem-' + index;
+    button.id = 'layerrem-' + divId + '-' + dataId;
+    button.appendChild(document.createTextNode('-'));
+    button.onclick = function () {
+      // update app
+      _app.removeDataViewConfig(dataId, getViewConfig(divId));
+      // update html
+      const parent = button.parentElement;
+      parent.replaceChildren();
+      parent.appendChild(getLayerAdd(index, divId));
+    };
+    return button;
   };
 
   // cell: id
@@ -896,23 +951,12 @@ function addDataRow(dataId) {
   for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
     const layerGroupDivId = allLayerGroupDivIds[l];
     cell = row.insertCell();
-    if (!dataLayerGroupsIds.includes(layerGroupDivId)) {
-      continue;
+    if (dataLayerGroupsIds.includes(layerGroupDivId)) {
+      cell.appendChild(getLayerRadio(l, layerGroupDivId));
+      cell.appendChild(getLayerRem(l, layerGroupDivId));
+    } else {
+      cell.appendChild(getLayerAdd(l, layerGroupDivId));
     }
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = 'layerselect-' + l;
-    radio.id = 'layerselect-' + layerGroupDivId + '-' + dataId;
-    radio.checked = true;
-    radio.onchange = function (event) {
-      const fullId = event.target.id;
-      const split = fullId.split('-');
-      const groupDivId = split[1];
-      const dataId = split[2];
-      const lg = _app.getLayerGroupByDivId(groupDivId);
-      lg.setActiveViewLayerByDataId(dataId);
-    };
-    cell.appendChild(radio);
   }
 
   const image = _app.getImage(initialVl.getDataId());
