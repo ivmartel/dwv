@@ -294,8 +294,15 @@ function onDOMContentLoaded() {
 
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.addEventListener('change', function (event) {
-    let configs;
     const layout = event.target.value;
+    if (layout !== 'one' &&
+      layout !== 'side' &&
+      layout !== 'mpr') {
+      throw new Error('Unknown layout: ' + layout);
+    }
+    _layout = layout;
+
+    let configs;
     const dataIds = _app.getDataIds();
     if (layout === 'one') {
       addLayerGroups(1);
@@ -306,10 +313,7 @@ function onDOMContentLoaded() {
     } else if (layout === 'mpr') {
       addLayerGroups(3);
       configs = getMPRDataViewConfig(dataIds);
-    } else {
-      throw new Error('Unknown layout: ' + layout);
     }
-    _layout = layout;
 
     // unbind app to controls
     unbindAppToControls();
@@ -371,6 +375,26 @@ function addLayerGroups(number) {
 }
 
 /**
+ * Get a full view for a given div id.
+ *
+ * @param {string} divId The div id.
+ * @returns {object} The config
+ */
+function getViewConfig(divId) {
+  const config = {divId: divId};
+  if (_layout === 'mpr') {
+    if (divId === 'layerGroup0') {
+      config.orientation = 'axial';
+    } else if (divId === 'layerGroup1') {
+      config.orientation = 'coronal';
+    } else if (divId === 'layerGroup2') {
+      config.orientation = 'sagittal';
+    }
+  }
+  return config;
+}
+
+/**
  * Create 1*2 view config(s).
  *
  * @param {Array} dataIds The list of dataIds.
@@ -379,11 +403,7 @@ function addLayerGroups(number) {
 function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
   for (let i = 0; i < dataIds.length; ++i) {
-    configs[dataIds[i]] = [
-      {
-        divId: 'layerGroup0'
-      }
-    ];
+    configs[dataIds[i]] = [getViewConfig('layerGroup0')];
   }
   return configs;
 }
@@ -398,17 +418,9 @@ function getOnebyTwoDataViewConfig(dataIds) {
   const configs = {};
   for (let i = 0; i < dataIds.length; ++i) {
     if (i % 2 === 0) {
-      configs[dataIds[i]] = [
-        {
-          divId: 'layerGroup0'
-        }
-      ];
+      configs[dataIds[i]] = [getViewConfig('layerGroup0')];
     } else {
-      configs[dataIds[i]] = [
-        {
-          divId: 'layerGroup1'
-        }
-      ];
+      configs[dataIds[i]] = [getViewConfig('layerGroup1')];
     }
   }
   return configs;
@@ -424,18 +436,9 @@ function getMPRDataViewConfig(dataIds) {
   const configs = {};
   for (let i = 0; i < dataIds.length; ++i) {
     configs[dataIds[i]] = [
-      {
-        divId: 'layerGroup0',
-        orientation: 'axial'
-      },
-      {
-        divId: 'layerGroup1',
-        orientation: 'coronal'
-      },
-      {
-        divId: 'layerGroup2',
-        orientation: 'sagittal'
-      }
+      getViewConfig('layerGroup0'),
+      getViewConfig('layerGroup1'),
+      getViewConfig('layerGroup2')
     ];
   }
   return configs;
@@ -908,7 +911,7 @@ function addDataRow(dataId) {
     button.appendChild(document.createTextNode('+'));
     button.onclick = function () {
       // update app
-      _app.addDataViewConfig(dataId, {divId: divId});
+      _app.addDataViewConfig(dataId, getViewConfig(divId));
       // update html
       const parent = button.parentElement;
       parent.replaceChildren();
@@ -926,7 +929,7 @@ function addDataRow(dataId) {
     button.appendChild(document.createTextNode('-'));
     button.onclick = function () {
       // update app
-      _app.removeDataViewConfig(dataId, {divId: divId});
+      _app.removeDataViewConfig(dataId, getViewConfig(divId));
       // update html
       const parent = button.parentElement;
       parent.replaceChildren();
