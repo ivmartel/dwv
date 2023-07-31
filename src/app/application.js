@@ -367,6 +367,9 @@ export class App {
     if (typeof this.#options.viewOnFirstLoadItem === 'undefined') {
       this.#options.viewOnFirstLoadItem = true;
     }
+    if (typeof this.#options.dataViewConfigs === 'undefined') {
+      this.#options.dataViewConfigs = {};
+    }
 
     // undo stack
     this.#undoStack = new UndoStack();
