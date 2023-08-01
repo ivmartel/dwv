@@ -1483,22 +1483,30 @@ export class App {
       });
     }
 
+    // do we have more than one layer
+    // (the layer has not been added to the layer group yet)
+    const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
+
     // colour map
     if (typeof dataViewConfig.colourMap !== 'undefined') {
       view.setColourMap(dataViewConfig.colourMap);
+    } else {
+      if (!isBaseLayer) {
+        if (data.image.getMeta().Modality === 'PT') {
+          view.setColourMap(lut.hot);
+        } else {
+          view.setColourMap(lut.rainbow);
+        }
+      }
     }
-
-    const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
 
     // opacity
     let opacity = 1;
-    // do we have more than one layer
-    // (the layer has not been added to the layer group yet)
-    if (!isBaseLayer) {
-      opacity = 0.5;
-      // set color map if non was provided
-      if (typeof dataViewConfig.colourMap === 'undefined') {
-        view.setColourMap(lut.rainbow);
+    if (typeof dataViewConfig.opacity !== 'undefined') {
+      opacity = dataViewConfig.opacity;
+    } else {
+      if (!isBaseLayer) {
+        opacity = 0.4;
       }
     }
 
