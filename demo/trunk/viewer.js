@@ -160,6 +160,8 @@ function viewerSetup() {
           changeLayoutSelect.disabled = false;
           const resetLayoutButton = document.getElementById('resetlayout');
           resetLayoutButton.disabled = false;
+          const smoothingChk = document.getElementById('changesmoothing');
+          smoothingChk.disabled = false;
         }
       }
     }
@@ -288,11 +290,13 @@ function onDOMContentLoaded() {
   });
 
   const resetLayoutButton = document.getElementById('resetlayout');
+  resetLayoutButton.disabled = true;
   resetLayoutButton.addEventListener('click', function () {
     _app.resetLayout();
   });
 
   const changeLayoutSelect = document.getElementById('changelayout');
+  changeLayoutSelect.disabled = true;
   changeLayoutSelect.addEventListener('change', function (event) {
     const layout = event.target.value;
     if (layout !== 'one' &&
@@ -333,6 +337,8 @@ function onDOMContentLoaded() {
   });
 
   const smoothingChk = document.getElementById('changesmoothing');
+  smoothingChk.checked = false;
+  smoothingChk.disabled = true;
   smoothingChk.addEventListener('change', function (event) {
     _app.setImageSmoothing(event.target.checked);
   });
