@@ -373,6 +373,17 @@ export class Stage {
   }
 
   /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      this.#layerGroups[i].setImageSmoothing(flag);
+    }
+  }
+
+  /**
    * Get the binder callback function for a given layer group index.
    * The function is created if not yet stored.
    *

@@ -615,6 +615,16 @@ export class App {
   }
 
   /**
+   * Set the imageSmoothing flag value. Default is false.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#stage.setImageSmoothing(flag);
+    this.#stage.draw();
+  }
+
+  /**
    * Get the layer group configuration from a data id.
    * Defaults to div id 'layerGroup' if no association object has been set.
    *

@@ -235,6 +235,13 @@ export class LayerGroup {
   #currentPosition;
 
   /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
+
+  /**
    * @param {HTMLElement} containerDiv The associated HTML div.
    */
   constructor(containerDiv) {
@@ -287,6 +294,21 @@ export class LayerGroup {
       this.removeEventListener('zoomchange', this.#updateCrosshairOnChange);
       // remove crosshair div
       this.#removeCrosshairDiv();
+    }
+  }
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+    // set for existing layers
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (this.#layers[i] instanceof ViewLayer) {
+        this.#layers[i].setImageSmoothing(flag);
+      }
     }
   }
 
@@ -504,6 +526,7 @@ export class LayerGroup {
     this.#containerDiv.append(div);
     // view layer
     const layer = new ViewLayer(div);
+    layer.setImageSmoothing(this.#imageSmoothing);
     // add layer
     this.#layers.push(layer);
     // mark it as active
