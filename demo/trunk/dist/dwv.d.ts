@@ -289,6 +289,12 @@ export declare class App {
      */
     initWLDisplay(): void;
     /**
+     * Set the imageSmoothing flag value. Default is false.
+     *
+     * @param {boolean} flag True to enable smoothing.
+     */
+    setImageSmoothing(flag: boolean): void;
+    /**
      * Get the data view config.
      * Carefull, returns a reference, do not modify without resetting.
      *
@@ -1621,6 +1627,12 @@ export declare class LayerGroup {
      * @param {boolean} flag True to display the crosshair.
      */
     setShowCrosshair(flag: boolean): void;
+    /**
+     * Set the imageSmoothing flag value.
+     *
+     * @param {boolean} flag True to enable smoothing.
+     */
+    setImageSmoothing(flag: boolean): void;
     /**
      * Get the Id of the container div.
      *
@@ -3329,11 +3341,11 @@ export declare class ViewLayer {
      */
     getDataId(): string;
     /**
-     * Set the imageSmoothingEnabled flag value.
+     * Set the imageSmoothing flag value.
      *
      * @param {boolean} flag True to enable smoothing.
      */
-    enableImageSmoothing(flag: boolean): void;
+    setImageSmoothing(flag: boolean): void;
     /**
      * Set the associated view.
      *

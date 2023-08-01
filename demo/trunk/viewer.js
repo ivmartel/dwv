@@ -332,6 +332,11 @@ function onDOMContentLoaded() {
     _app.setTool(getSelectedTool());
   });
 
+  const smoothingChk = document.getElementById('changesmoothing');
+  smoothingChk.addEventListener('change', function (event) {
+    _app.setImageSmoothing(event.target.checked);
+  });
+
   // setup
   setupBindersCheckboxes();
   setupToolsCheckboxes();
