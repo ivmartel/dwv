@@ -165,7 +165,7 @@ export class ViewLayer {
    *
    * @type {boolean}
    */
-  #imageSmoothingEnabled = false;
+  #imageSmoothing = false;
 
   /**
    * @param {HTMLElement} containerDiv The layer div, its id will be used
@@ -187,12 +187,12 @@ export class ViewLayer {
   }
 
   /**
-   * Set the imageSmoothingEnabled flag value.
+   * Set the imageSmoothing flag value.
    *
    * @param {boolean} flag True to enable smoothing.
    */
-  enableImageSmoothing(flag) {
-    this.#imageSmoothingEnabled = flag;
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
   }
 
   /**
@@ -596,7 +596,7 @@ export class ViewLayer {
     );
 
     // disable smoothing (set just before draw, could be reset by resize)
-    this.#context.imageSmoothingEnabled = this.#imageSmoothingEnabled;
+    this.#context.imageSmoothingEnabled = this.#imageSmoothing;
     // draw image
     this.#context.drawImage(this.#offscreenCanvas, 0, 0);
 
