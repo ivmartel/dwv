@@ -1127,7 +1127,7 @@ export class App {
         layer = layerGroup.getActiveViewLayer();
       }
       if (layer) {
-        this.#toolboxController.bindLayer(layer, layerGroup.getDivId());
+        this.#toolboxController.bindLayerGroup(layerGroup.getDivId(), layer);
       }
     }
 
@@ -1612,7 +1612,7 @@ export class App {
     // bind
     this.#stage.bindLayerGroups();
     if (this.#toolboxController) {
-      this.#toolboxController.bindLayer(viewLayer, layerGroup.getDivId());
+      this.#toolboxController.bindLayerGroup(layerGroup.getDivId(), viewLayer);
     }
 
     // initialise the toolbox for base

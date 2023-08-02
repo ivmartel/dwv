@@ -125,13 +125,25 @@ export class ToolboxController {
   /**
    * Listen to layer interaction events.
    *
-   * @param {object} layer The layer to listen to.
    * @param {string} layerGroupDivId The associated layer group div id.
+   * @param {object} layer The layer to listen to.
    */
-  bindLayer(layer, layerGroupDivId) {
+  bindLayerGroup(layerGroupDivId, layer) {
     if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
       this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
     }
+    // update class var
+    this.#boundLayers[layerGroupDivId] = layer;
+    // bind layer
+    this.#bindLayer(layer);
+  }
+
+  /**
+   * Add canvas mouse and touch listeners.
+   *
+   * @param {object} layer The layer to start listening to.
+   */
+  #bindLayer(layer) {
     layer.bindInteraction();
     // interaction events
     const names = InteractionEventNames;
@@ -139,8 +151,6 @@ export class ToolboxController {
       layer.addEventListener(names[i],
         this.#getOnMouch(layer.getId(), names[i]));
     }
-    // update class var
-    this.#boundLayers[layerGroupDivId] = layer;
   }
 
   /**
