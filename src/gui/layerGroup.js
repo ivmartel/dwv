@@ -197,14 +197,14 @@ export class LayerGroup {
    *
    * @type {number}
    */
-  #activeViewLayerIndex = null;
+  #activeViewLayerIndex = undefined;
 
   /**
    * Active draw layer index.
    *
    * @type {number}
    */
-  #activeDrawLayerIndex = null;
+  #activeDrawLayerIndex = undefined;
 
   /**
    * Listener handler.
@@ -376,16 +376,28 @@ export class LayerGroup {
    * @returns {number} The number of layers.
    */
   getNumberOfLayers() {
-    return this.#layers.length;
+    let count = 0;
+    this.#layers.forEach(item => {
+      if (typeof item !== 'undefined') {
+        count++;
+      }
+    });
+    return count;
   }
 
   /**
    * Get the active image layer.
    *
-   * @returns {ViewLayer} The layer.
+   * @returns {ViewLayer|undefined} The layer.
    */
   getActiveViewLayer() {
-    return this.#layers[this.#activeViewLayerIndex];
+    let layer;
+    if (typeof this.#activeViewLayerIndex !== 'undefined') {
+      layer = this.#layers[this.#activeViewLayerIndex];
+    } else {
+      logger.info('No active view layer to return');
+    }
+    return layer;
   }
 
   /**
@@ -441,10 +453,16 @@ export class LayerGroup {
   /**
    * Get the active draw layer.
    *
-   * @returns {DrawLayer} The layer.
+   * @returns {DrawLayer|undefined} The layer.
    */
   getActiveDrawLayer() {
-    return this.#layers[this.#activeDrawLayerIndex];
+    let layer;
+    if (typeof this.#activeDrawLayerIndex !== 'undefined') {
+      layer = this.#layers[this.#activeDrawLayerIndex];
+    } else {
+      logger.info('No active draw layer to return');
+    }
+    return layer;
   }
 
   /**
@@ -470,7 +488,12 @@ export class LayerGroup {
    * @param {number} index The index of the layer to set as active.
    */
   setActiveViewLayer(index) {
-    this.#activeViewLayerIndex = index;
+    if (this.#layers[index] instanceof ViewLayer) {
+      this.#activeViewLayerIndex = index;
+    } else {
+      logger.warn('No view layer to set as active with index: ' +
+        index);
+    }
   }
 
   /**
@@ -479,12 +502,20 @@ export class LayerGroup {
    * @param {string} dataId The data id.
    */
   setActiveViewLayerByDataId(dataId) {
+    let index;
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof ViewLayer &&
         this.#layers[i].getDataId() === dataId) {
-        this.setActiveViewLayer(i);
+        // stop at first one
+        index = i;
         break;
       }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveViewLayer(index);
+    } else {
+      logger.warn('No view layer to set as active with dataId: ' +
+        dataId);
     }
   }
 
@@ -494,7 +525,12 @@ export class LayerGroup {
    * @param {number} index The index of the layer to set as active.
    */
   setActiveDrawLayer(index) {
-    this.#activeDrawLayerIndex = index;
+    if (this.#layers[index] instanceof DrawLayer) {
+      this.#activeDrawLayerIndex = index;
+    } else {
+      logger.warn('No draw layer to set as active with index: ' +
+        index);
+    }
   }
 
   /**
@@ -503,12 +539,20 @@ export class LayerGroup {
    * @param {string} dataId The data id.
    */
   setActiveDrawLayerByDataId(dataId) {
+    let index;
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof DrawLayer &&
         this.#layers[i].getDataId() === dataId) {
-        this.setActiveDrawLayer(i);
+        // stop at first one
+        index = i;
         break;
       }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveDrawLayer(index);
+    } else {
+      logger.warn('No draw layer to set as active with dataId: ' +
+        dataId);
     }
   }
 
@@ -636,8 +680,8 @@ export class LayerGroup {
   empty() {
     this.#layers = [];
     // reset active indices
-    this.#activeViewLayerIndex = null;
-    this.#activeDrawLayerIndex = null;
+    this.#activeViewLayerIndex = undefined;
+    this.#activeDrawLayerIndex = undefined;
     // remove possible crosshair
     this.#removeCrosshairDiv();
     // clean container div
@@ -651,6 +695,9 @@ export class LayerGroup {
 
   /**
    * Remove a layer from this layer group.
+   * Warning: if current active layer, the index will
+   *   be set to `undefined`. Call one of the setActive
+   *   methods to define the active index.
    *
    * @param {ViewLayer | DrawLayer} layer The layer to remove.
    */
@@ -658,7 +705,7 @@ export class LayerGroup {
     // find layer
     const index = this.#layers.findIndex((item) => item === layer);
     if (index === -1) {
-      throw new Error('Cannot find layer');
+      throw new Error('Cannot find layer to remove');
     }
     // unbind and update active index
     if (layer instanceof ViewLayer) {
@@ -672,8 +719,8 @@ export class LayerGroup {
         this.#activeDrawLayerIndex = undefined;
       }
     }
-    // remove from storage
-    this.#layers.splice(index, 1);
+    // reset in storage
+    this.#layers[index] = undefined;
     // update html
     const layerDiv = document.getElementById(layer.getId());
     if (layerDiv) {
@@ -766,6 +813,9 @@ export class LayerGroup {
     let baseViewLayerOrigin = null;
     // update position for all layers except the source one
     for (let i = 0; i < this.#layers.length; ++i) {
+      if (typeof this.#layers[i] === 'undefined') {
+        continue;
+      }
 
       // update base offset (does not trigger redraw)
       // TODO check draw layers update
@@ -869,7 +919,9 @@ export class LayerGroup {
 
     // apply to layers
     for (let j = 0; j < this.#layers.length; ++j) {
-      this.#layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
+      if (typeof this.#layers[j] !== 'undefined') {
+        this.#layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
+      }
     }
 
     // update crosshair
@@ -936,7 +988,9 @@ export class LayerGroup {
     this.#scale = newScale;
     // apply to layers
     for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].setScale(this.#scale, center);
+      if (typeof this.#layers[i] !== 'undefined') {
+        this.#layers[i].setScale(this.#scale, center);
+      }
     }
 
     // event value
@@ -988,7 +1042,9 @@ export class LayerGroup {
     this.#offset = newOffset;
     // apply to layers
     for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].setOffset(this.#offset);
+      if (typeof this.#layers[i] !== 'undefined') {
+        this.#layers[i].setOffset(this.#offset);
+      }
     }
 
     /**
@@ -1021,7 +1077,9 @@ export class LayerGroup {
    */
   draw() {
     for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].draw();
+      if (typeof this.#layers[i] !== 'undefined') {
+        this.#layers[i].draw();
+      }
     }
   }
 
@@ -1032,7 +1090,9 @@ export class LayerGroup {
    */
   display(flag) {
     for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].display(flag);
+      if (typeof this.#layers[i] !== 'undefined') {
+        this.#layers[i].display(flag);
+      }
     }
   }
 

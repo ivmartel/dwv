@@ -72,10 +72,16 @@ QUnit.test('Test LayerGroup add/remove view layer.', function (assert) {
   const vl00 = layerGroup00.addViewLayer();
   assert.equal(layerGroup00.getNumberOfLayers(), 1,
     'layerGroup has one view layers after add');
+  let activeType = typeof layerGroup00.getActiveViewLayer();
+  assert.ok(activeType !== 'undefined',
+    'layerGroup active view layer is defined after add');
 
   layerGroup00.removeLayer(vl00);
   assert.equal(layerGroup00.getNumberOfLayers(), 0,
     'layerGroup has no view layers after remove');
+  activeType = typeof layerGroup00.getActiveViewLayer();
+  assert.ok(activeType === 'undefined',
+    'layerGroup active view layer is undefined after remove');
 });
 
 /**
@@ -93,8 +99,14 @@ QUnit.test('Test LayerGroup add/remove draw layer.', function (assert) {
   const dl00 = layerGroup00.addDrawLayer();
   assert.equal(layerGroup00.getNumberOfLayers(), 1,
     'layerGroup has one draw layers after add');
+  let activeType = typeof layerGroup00.getActiveDrawLayer();
+  assert.ok(activeType !== 'undefined',
+    'layerGroup active draw layer is defined after add');
 
   layerGroup00.removeLayer(dl00);
   assert.equal(layerGroup00.getNumberOfLayers(), 0,
-    'layerGroup has no view layers after remove');
+    'layerGroup has no draw layers after remove');
+  activeType = typeof layerGroup00.getActiveDrawLayer();
+  assert.ok(activeType === 'undefined',
+    'layerGroup active draw layer is undefined after remove');
 });
