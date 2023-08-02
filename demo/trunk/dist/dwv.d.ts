@@ -1672,9 +1672,9 @@ export declare class LayerGroup {
     /**
      * Get the active image layer.
      *
-     * @returns {ViewLayer} The layer.
+     * @returns {ViewLayer|undefined} The layer.
      */
-    getActiveViewLayer(): ViewLayer;
+    getActiveViewLayer(): ViewLayer | undefined;
     /**
      * Get the view layers associated to a data id.
      *
@@ -1698,9 +1698,9 @@ export declare class LayerGroup {
     /**
      * Get the active draw layer.
      *
-     * @returns {DrawLayer} The layer.
+     * @returns {DrawLayer|undefined} The layer.
      */
-    getActiveDrawLayer(): DrawLayer;
+    getActiveDrawLayer(): DrawLayer | undefined;
     /**
      * Get the draw layers associated to a data id.
      *
@@ -1750,6 +1750,9 @@ export declare class LayerGroup {
     empty(): void;
     /**
      * Remove a layer from this layer group.
+     * Warning: if current active layer, the index will
+     *   be set to `undefined`. Call one of the setActive
+     *   methods to define the active index.
      *
      * @param {ViewLayer | DrawLayer} layer The layer to remove.
      */
