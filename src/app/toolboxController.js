@@ -1,5 +1,12 @@
 import {InteractionEventNames, getEventOffset} from '../gui/generic';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../gui/layerGroup';
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
+/* eslint-enable no-unused-vars */
+
 /**
  * Toolbox controller.
  */
@@ -125,15 +132,16 @@ export class ToolboxController {
   /**
    * Listen to layer interaction events.
    *
-   * @param {string} layerGroupDivId The associated layer group div id.
-   * @param {object} layer The layer to listen to.
+   * @param {LayerGroup} layerGroup The associated layer group.
+   * @param {ViewLayer | DrawLayer} layer The layer to listen to.
    */
-  bindLayerGroup(layerGroupDivId, layer) {
-    if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
-      this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
+  bindLayerGroup(layerGroup, layer) {
+    const divid = layerGroup.getDivId();
+    if (typeof this.#boundLayers[divid] !== 'undefined') {
+      this.#unbindLayer(this.#boundLayers[divid]);
     }
     // update class var
-    this.#boundLayers[layerGroupDivId] = layer;
+    this.#boundLayers[divid] = layer;
     // bind layer
     this.#bindLayer(layer);
   }
