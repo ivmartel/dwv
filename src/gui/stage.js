@@ -272,7 +272,7 @@ export class Stage {
     // find layer
     const index = this.#layerGroups.findIndex((item) => item === layerGroup);
     if (index === -1) {
-      throw new Error('Cannot find layerGroup');
+      throw new Error('Cannot find layerGroup to remove');
     }
     // unbind
     this.unbindLayerGroups();
