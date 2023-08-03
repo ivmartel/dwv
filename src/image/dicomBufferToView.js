@@ -111,11 +111,11 @@ export class DicomBufferToView {
       lengthComputable: true,
       loaded: event.itemNumber + 1,
       total: event.numberOfItems,
-      index: event.dataIndex,
+      index: event.index,
       source: origin
     });
 
-    const dataIndex = event.dataIndex;
+    const dataIndex = event.index;
 
     // store decoded data
     const decodedData = event.data[0];
@@ -179,7 +179,7 @@ export class DicomBufferToView {
 
     this.onloadstart({
       source: origin,
-      dataIndex: dataIndex
+      index: dataIndex
     });
 
     // DICOM parser
@@ -275,7 +275,7 @@ export class DicomBufferToView {
           {
             itemNumber: i,
             numberOfItems: numberOfItems,
-            dataIndex: dataIndex
+            index: dataIndex
           }
         );
       }
