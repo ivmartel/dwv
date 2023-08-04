@@ -909,7 +909,12 @@ function addDataRow(dataId) {
       const groupDivId = split[1];
       const dataId = split[2];
       const lg = _app.getLayerGroupByDivId(groupDivId);
-      lg.setActiveViewLayerByDataId(dataId);
+      const tool = getSelectedTool();
+      if (tool === 'Draw') {
+        lg.setActiveDrawLayerByDataId(dataId);
+      } else {
+        lg.setActiveViewLayerByDataId(dataId);
+      }
     };
     return radio;
   };

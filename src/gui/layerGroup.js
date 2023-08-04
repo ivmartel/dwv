@@ -490,6 +490,17 @@ export class LayerGroup {
   setActiveViewLayer(index) {
     if (this.#layers[index] instanceof ViewLayer) {
       this.#activeViewLayerIndex = index;
+      /**
+       * Active view layer change event.
+       *
+       * @event LayerGroup#activeviewlayerchange
+       * @type {object}
+       * @property {Array} value The changed value.
+       */
+      this.#fireEvent({
+        type: 'activelayerchange',
+        value: [this.#layers[index]]
+      });
     } else {
       logger.warn('No view layer to set as active with index: ' +
         index);
@@ -527,6 +538,10 @@ export class LayerGroup {
   setActiveDrawLayer(index) {
     if (this.#layers[index] instanceof DrawLayer) {
       this.#activeDrawLayerIndex = index;
+      this.#fireEvent({
+        type: 'activelayerchange',
+        value: [this.#layers[index]]
+      });
     } else {
       logger.warn('No draw layer to set as active with index: ' +
         index);

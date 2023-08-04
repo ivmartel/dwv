@@ -133,23 +133,51 @@ export class ToolboxController {
    * Listen to layer interaction events.
    *
    * @param {LayerGroup} layerGroup The associated layer group.
-   * @param {ViewLayer | DrawLayer} layer The layer to listen to.
+   * @param {ViewLayer|DrawLayer} layer The layer to listen to.
    */
   bindLayerGroup(layerGroup, layer) {
-    const divid = layerGroup.getDivId();
-    if (typeof this.#boundLayers[divid] !== 'undefined') {
-      this.#unbindLayer(this.#boundLayers[divid]);
+    const divId = layerGroup.getDivId();
+    // listen to active layer changes
+    layerGroup.addEventListener(
+      'activelayerchange', this.#getActiveLayerChangeHandler(divId));
+    // bind the layer
+    this.#internalBindLayerGroup(divId, layer);
+  }
+
+  /**
+   * Bind a layer group to this controller.
+   *
+   * @param {string} layerGroupDivId The layer group div id.
+   * @param {ViewLayer|DrawLayer} layer The layer.
+   */
+  #internalBindLayerGroup(layerGroupDivId, layer) {
+    // remove from local list if preset
+    if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
+      this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
     }
-    // update class var
-    this.#boundLayers[divid] = layer;
+    // replace layer in local list
+    this.#boundLayers[layerGroupDivId] = layer;
     // bind layer
     this.#bindLayer(layer);
   }
 
   /**
-   * Add canvas mouse and touch listeners.
+   * Get an active layer change handler.
    *
-   * @param {object} layer The layer to start listening to.
+   * @param {string} divId The associated layer group div id.
+   * @returns {function} The event handler.
+   */
+  #getActiveLayerChangeHandler(divId) {
+    return (event) => {
+      const layer = event.value[0];
+      this.#internalBindLayerGroup(divId, layer);
+    };
+  }
+
+  /**
+   * Add canvas mouse and touch listeners to a layer.
+   *
+   * @param {ViewLayer|DrawLayer} layer The layer to start listening to.
    */
   #bindLayer(layer) {
     layer.bindInteraction();
@@ -162,9 +190,9 @@ export class ToolboxController {
   }
 
   /**
-   * Remove canvas mouse and touch listeners.
+   * Remove canvas mouse and touch listeners to a layer.
    *
-   * @param {object} layer The layer to stop listening to.
+   * @param {ViewLayer|DrawLayer} layer The layer to stop listening to.
    */
   #unbindLayer(layer) {
     layer.unbindInteraction();
