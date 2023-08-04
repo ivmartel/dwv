@@ -165,7 +165,7 @@ export class ToolboxController {
    * Get an active layer change handler.
    *
    * @param {string} divId The associated layer group div id.
-   * @returns {function} The event handler.
+   * @returns {Function} The event handler.
    */
   #getActiveLayerChangeHandler(divId) {
     return (event) => {
