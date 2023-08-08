@@ -745,7 +745,6 @@ export class Draw {
       // store colour
       colour = shapeGroup.getChildren(isNodeNameShape)[0].stroke();
       // display trash
-      const drawLayer = layerGroup.getActiveDrawLayer();
       const stage = drawLayer.getKonvaStage();
       const scale = stage.scale();
       const invscale = {x: 1 / scale.x, y: 1 / scale.y};
@@ -761,7 +760,6 @@ export class Draw {
     // drag move event handling
     shapeGroup.on('dragmove.draw', (event) => {
       const group = event.target;
-      const drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       validateGroupPosition(drawLayer.getBaseSize(), group);
       // get appropriate factory
@@ -910,7 +908,8 @@ export class Draw {
         // trigger event
         this.#fireEvent({
           type: 'drawchange',
-          id: groupId
+          id: groupId,
+          dataid: drawLayer.getDataId()
         });
         // draw
         konvaLayer.draw();
