@@ -100,6 +100,13 @@ export class View {
   #windowLut;
 
   /**
+   * Flag for image constant RSI.
+   *
+   * @type {boolean}
+   */
+  #isConstantRSI;
+
+  /**
    * Window presets.
    * Minmax will be filled at first use (see view.setWindowLevelPreset).
    *
@@ -326,12 +333,15 @@ export class View {
     }
 
     // get the window lut
-    if (typeof this.#windowLut === 'undefined') {
-      // if the image rsi is not constant, the iterator will use
-      //  rescaled values -> no need to handle non constant rsi here
+    if (typeof this.#isConstantRSI === 'undefined' ||
+      this.#image.isConstantRSI() !== this.#isConstantRSI) {
+      this.#isConstantRSI = this.#image.isConstantRSI();
+      // set or update windowLut if isConstantRSI has changed
+      // (can be different at first slice and after having loaded
+      //  the full volume...)
       let rsi;
       let isDiscrete;
-      if (this.#image.isConstantRSI()) {
+      if (this.#isConstantRSI) {
         rsi = this.#image.getRescaleSlopeAndIntercept();
         isDiscrete = true;
       } else {
