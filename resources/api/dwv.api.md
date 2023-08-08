@@ -12,9 +12,9 @@ export function addTagsToDictionary(group: string, tags: object): void;
 // @public
 export class App {
     abortLoad(): void;
-    addDataViewConfig(dataId: number, config: object): void;
+    addDataViewConfig(dataId: string, config: object): void;
     addEventListener(type: string, callback: object): void;
-    addNewImage(image: Image_2, meta: object): number;
+    addNewImage(image: Image_2, meta: object): string;
     addToUndoStack: (cmd: object) => void;
     applyJsonState(jsonState: string): void;
     canScroll(): boolean;
@@ -27,19 +27,19 @@ export class App {
     getCurrentStackIndex(): number;
     getDataIds(): any[];
     getDataViewConfig(): object;
-    getDrawLayersByDataIndex(index: number): any[];
-    getImage(index: number): Image_2;
+    getDrawLayersByDataId(dataId: string): any[];
+    getImage(dataId: string): Image_2;
     getJsonState(): string;
     getLastImage(): Image_2;
     getLayerGroupByDivId(divId: string): LayerGroup;
-    getMetaData(index: number): object;
+    getMetaData(dataId: string): object;
     getNumberOfLayerGroups(): number;
     getOffset(): object;
-    getOverlayData(dataIndex: number): OverlayData;
+    getOverlayData(dataId: string): OverlayData | undefined;
     getStackSize(): number;
     getStyle(): object;
     getToolboxController(): object;
-    getViewLayersByDataIndex(index: number): any[];
+    getViewLayersByDataId(dataId: string): any[];
     init(opt: object): void;
     initWLDisplay(): void;
     loadFiles: (files: FileList) => void;
@@ -49,9 +49,9 @@ export class App {
     onKeydown: (event: KeyboardEvent) => void;
     onResize: () => void;
     redo(): void;
-    removeDataViewConfig(dataId: number, config: object): void;
+    removeDataViewConfig(dataId: string, config: object): void;
     removeEventListener(type: string, callback: object): void;
-    render(dataIndex: number, viewConfigs?: any[]): void;
+    render(dataId: string, viewConfigs?: any[]): void;
     reset(): void;
     resetDisplay(): void;
     resetLayout(): void;
@@ -59,17 +59,18 @@ export class App {
     setColourMap(colourMap: string): void;
     setDataViewConfig(configs: object): void;
     setDrawings(drawings: any[], drawingsDetails: any[]): void;
-    setImage(index: number, img: Image_2): void;
+    setImage(dataId: string, img: Image_2): void;
+    setImageSmoothing(flag: boolean): void;
     setLastImage(img: Image_2): void;
     setLayerGroupsBinders(list: any[]): void;
     setOpacity(alpha: number): void;
     setTool(tool: string): void;
     setToolFeatures(list: object): void;
     setWindowLevelPreset(preset: object): void;
-    toggleOverlayListeners(dataIndex: number): void;
+    toggleOverlayListeners(dataId: string): void;
     translate(tx: number, ty: number): void;
     undo(): void;
-    updateDataViewConfig(dataId: number, divId: string, config: object): void;
+    updateDataViewConfig(dataId: string, divId: string, config: object): void;
     zoom(step: number, cx: number, cy: number): void;
 }
 
@@ -149,13 +150,13 @@ export class DrawLayer {
     draw(): void;
     fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
     getBaseSize(): object;
-    getDataIndex(): number;
+    getDataId(): string;
     getDrawController(): object;
     getId(): string;
     getKonvaLayer(): Konva.Layer;
     getKonvaStage(): Konva.Stage;
     getOpacity(): number;
-    initialise(size: object, spacing: object, index: number): void;
+    initialise(size: object, spacing: object, dataId: string): void;
     isGroupVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: object): void;
@@ -304,12 +305,12 @@ export class LayerGroup {
     draw(): void;
     empty(): void;
     flipScaleZ(): void;
-    getActiveDrawLayer(): DrawLayer;
-    getActiveViewLayer(): ViewLayer;
+    getActiveDrawLayer(): DrawLayer | undefined;
+    getActiveViewLayer(): ViewLayer | undefined;
     getAddedScale(): object;
     getBaseScale(): object;
     getDivId(): string;
-    getDrawLayersByDataIndex(index: number): DrawLayer[];
+    getDrawLayersByDataId(dataId: string): DrawLayer[];
     getMaxSize(): object | undefined;
     getNumberOfLayers(): number;
     getOffset(): object;
@@ -317,16 +318,17 @@ export class LayerGroup {
     getShowCrosshair(): boolean;
     getTargetOrientation(): Matrix33;
     getViewDataIndices(): any[];
-    getViewLayersByDataIndex(index: number): ViewLayer[];
+    getViewLayersByDataId(dataId: string): ViewLayer[];
     removeEventListener(type: string, callback: object): void;
     removeLayer(layer: ViewLayer | DrawLayer): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveDrawLayer(index: number): void;
-    setActiveDrawLayerByDataIndex(index: number): void;
+    setActiveDrawLayerByDataId(dataId: string): void;
     setActiveViewLayer(index: number): void;
-    setActiveViewLayerByDataIndex(index: number): void;
+    setActiveViewLayerByDataId(dataId: string): void;
     setFitScale(scaleIn: number): void;
+    setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: object): void;
     setScale(newScale: object, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
@@ -393,7 +395,7 @@ export class Matrix33 {
 
 // @public
 export class OverlayData {
-    constructor(app: App, dataId: number, configs: object);
+    constructor(app: App, dataId: string, configs: object);
     addAppListeners(): void;
     addEventListener(type: string, callback: object): void;
     addItemMeta(data: object): void;
@@ -571,7 +573,7 @@ export class View {
 
 // @public
 export class ViewController {
-    constructor(view: View, index: number);
+    constructor(view: View, dataId: string);
     addEventListener(type: string, callback: object): void;
     addWindowLevelPresets(presets: object): object;
     applyHiddenSegments(): void;
@@ -621,7 +623,7 @@ export class ViewController {
     setColourMapFromName(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
-    setImage(img: Image_2, index: number): void;
+    setImage(img: Image_2, dataId: string): void;
     setViewAlphaFunction(func: (value: object, index: object) => number): void;
     setWindowLevel(wc: number, ww: number): void;
     setWindowLevelPreset(name: string): void;
@@ -643,10 +645,9 @@ export class ViewLayer {
     displayToPlanePos(x: number, y: number): object;
     displayToPlaneScale(x: number, y: number): object;
     draw(): void;
-    enableImageSmoothing(flag: boolean): void;
     fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
     getBaseSize(): object;
-    getDataIndex(): number;
+    getDataId(): string;
     getId(): string;
     getImageData(): object;
     getImageWorldSize(): object;
@@ -660,10 +661,11 @@ export class ViewLayer {
     removeEventListener(type: string, callback: object): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
+    setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: object): void;
     setOpacity(alpha: number): void;
     setScale(newScale: object, center: Point3D): void;
-    setView(view: object, index: number): void;
+    setView(view: object, dataId: string): void;
     unbindInteraction(): void;
 }
 

@@ -27,10 +27,10 @@ export declare class App {
     /**
      * Get the image.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @returns {Image} The associated image.
      */
-    getImage(index: number): Image_2;
+    getImage(dataId: string): Image_2;
     /**
      * Get the last loaded image.
      *
@@ -38,12 +38,12 @@ export declare class App {
      */
     getLastImage(): Image_2;
     /**
-     * Set the image at the given index.
+     * Set the image at the given id.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @param {Image} img The associated image.
      */
-    setImage(index: number, img: Image_2): void;
+    setImage(dataId: string, img: Image_2): void;
     /**
      * Set the last image.
      *
@@ -55,16 +55,16 @@ export declare class App {
      *
      * @param {Image} image The new image.
      * @param {object} meta The image meta.
-     * @returns {number} The new image id.
+     * @returns {string} The new image data id.
      */
-    addNewImage(image: Image_2, meta: object): number;
+    addNewImage(image: Image_2, meta: object): string;
     /**
      * Get the meta data.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @returns {object} The list of meta data.
      */
-    getMetaData(index: number): object;
+    getMetaData(dataId: string): object;
     /**
      * Get the list of ids in the data storage.
      *
@@ -115,21 +115,21 @@ export declare class App {
      */
     getActiveLayerGroup(): LayerGroup;
     /**
-     * Get the view layers associated to a data index.
+     * Get the view layers associated to a data id.
      * The layer are available after the first loaded item.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @returns {Array} The layers.
      */
-    getViewLayersByDataIndex(index: number): any[];
+    getViewLayersByDataId(dataId: string): any[];
     /**
-     * Get the draw layers associated to a data index.
+     * Get the draw layers associated to a data id.
      * The layer are available after the first loaded item.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @returns {Array} The layers.
      */
-    getDrawLayersByDataIndex(index: number): any[];
+    getDrawLayersByDataId(dataId: string): any[];
     /**
      * Get a layer group by div id.
      * The layer is available after the first loaded item.
@@ -161,7 +161,7 @@ export declare class App {
      * Initialise the application.
      *
      * @param {object} opt The application option with:
-     * - `dataViewConfigs`: data indexed object containing the data view
+     * - `dataViewConfigs`: dataId indexed object containing the data view
      *   configurations in the form of a list of objects containing:
      *   - divId: the HTML div id
      *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
@@ -289,6 +289,12 @@ export declare class App {
      */
     initWLDisplay(): void;
     /**
+     * Set the imageSmoothing flag value. Default is false.
+     *
+     * @param {boolean} flag True to enable smoothing.
+     */
+    setImageSmoothing(flag: boolean): void;
+    /**
      * Get the data view config.
      * Carefull, returns a reference, do not modify without resetting.
      *
@@ -304,25 +310,25 @@ export declare class App {
     /**
      * Add a data view config.
      *
-     * @param {number} dataId The data id.
+     * @param {string} dataId The data id.
      * @param {object} config The view configuration.
      */
-    addDataViewConfig(dataId: number, config: object): void;
+    addDataViewConfig(dataId: string, config: object): void;
     /**
      * Remove a data view config.
      *
-     * @param {number} dataId The data id.
+     * @param {string} dataId The data id.
      * @param {object} config The view configuration.
      */
-    removeDataViewConfig(dataId: number, config: object): void;
+    removeDataViewConfig(dataId: string, config: object): void;
     /**
      * Update a data view config.
      *
-     * @param {number} dataId The data id.
+     * @param {string} dataId The data id.
      * @param {string} divId The div id.
      * @param {object} config The view configuration.
      */
-    updateDataViewConfig(dataId: number, divId: string, config: object): void;
+    updateDataViewConfig(dataId: string, divId: string, config: object): void;
     /**
      * Set the layer groups binders.
      *
@@ -332,10 +338,10 @@ export declare class App {
     /**
      * Render the current data.
      *
-     * @param {number} dataIndex The data index to render.
+     * @param {string} dataId The data id to render.
      * @param {Array} [viewConfigs] The list of configs to render.
      */
-    render(dataIndex: number, viewConfigs?: any[]): void;
+    render(dataId: string, viewConfigs?: any[]): void;
     /**
      * Zoom to the layers.
      *
@@ -460,18 +466,18 @@ export declare class App {
      */
     getCurrentStackIndex(): number;
     /**
-     * Get the overlay data for a data index.
+     * Get the overlay data for a data id.
      *
-     * @param {number} dataIndex The data index.
-     * @returns {OverlayData} The overlay data.
+     * @param {string} dataId The data id.
+     * @returns {OverlayData|undefined} The overlay data.
      */
-    getOverlayData(dataIndex: number): OverlayData;
+    getOverlayData(dataId: string): OverlayData | undefined;
     /**
      * Toggle overlay listeners.
      *
-     * @param {number} dataIndex The data index.
+     * @param {string} dataId The data id.
      */
-    toggleOverlayListeners(dataIndex: number): void;
+    toggleOverlayListeners(dataId: string): void;
     #private;
 }
 
@@ -670,11 +676,11 @@ export declare class DrawLayer {
      */
     constructor(containerDiv: HTMLDivElement);
     /**
-     * Get the associated data index.
+     * Get the associated data id.
      *
-     * @returns {number} The index.
+     * @returns {string} The id.
      */
-    getDataIndex(): number;
+    getDataId(): string;
     /**
      * Get the Konva stage.
      *
@@ -774,9 +780,9 @@ export declare class DrawLayer {
      *
      * @param {object} size The image size as {x,y}.
      * @param {object} spacing The image spacing as {x,y}.
-     * @param {number} index The associated data index.
+     * @param {string} dataId The associated data id.
      */
-    initialise(size: object, spacing: object, index: number): void;
+    initialise(size: object, spacing: object, dataId: string): void;
     /**
      * Fit the layer to its parent container.
      *
@@ -1622,6 +1628,12 @@ export declare class LayerGroup {
      */
     setShowCrosshair(flag: boolean): void;
     /**
+     * Set the imageSmoothing flag value.
+     *
+     * @param {boolean} flag True to enable smoothing.
+     */
+    setImageSmoothing(flag: boolean): void;
+    /**
      * Get the Id of the container div.
      *
      * @returns {string} The id of the div.
@@ -1660,16 +1672,16 @@ export declare class LayerGroup {
     /**
      * Get the active image layer.
      *
-     * @returns {ViewLayer} The layer.
+     * @returns {ViewLayer|undefined} The layer.
      */
-    getActiveViewLayer(): ViewLayer;
+    getActiveViewLayer(): ViewLayer | undefined;
     /**
-     * Get the view layers associated to a data index.
+     * Get the view layers associated to a data id.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @returns {ViewLayer[]} The layers.
      */
-    getViewLayersByDataIndex(index: number): ViewLayer[];
+    getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
      * Search view layers for equal imae meta data.
      *
@@ -1686,16 +1698,16 @@ export declare class LayerGroup {
     /**
      * Get the active draw layer.
      *
-     * @returns {DrawLayer} The layer.
+     * @returns {DrawLayer|undefined} The layer.
      */
-    getActiveDrawLayer(): DrawLayer;
+    getActiveDrawLayer(): DrawLayer | undefined;
     /**
-     * Get the draw layers associated to a data index.
+     * Get the draw layers associated to a data id.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      * @returns {DrawLayer[]} The layers.
      */
-    getDrawLayersByDataIndex(index: number): DrawLayer[];
+    getDrawLayersByDataId(dataId: string): DrawLayer[];
     /**
      * Set the active view layer.
      *
@@ -1703,11 +1715,11 @@ export declare class LayerGroup {
      */
     setActiveViewLayer(index: number): void;
     /**
-     * Set the active view layer with a data index.
+     * Set the active view layer with a data id.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      */
-    setActiveViewLayerByDataIndex(index: number): void;
+    setActiveViewLayerByDataId(dataId: string): void;
     /**
      * Set the active draw layer.
      *
@@ -1715,11 +1727,11 @@ export declare class LayerGroup {
      */
     setActiveDrawLayer(index: number): void;
     /**
-     * Set the active draw layer with a data index.
+     * Set the active draw layer with a data id.
      *
-     * @param {number} index The data index.
+     * @param {string} dataId The data id.
      */
-    setActiveDrawLayerByDataIndex(index: number): void;
+    setActiveDrawLayerByDataId(dataId: string): void;
     /**
      * Add a view layer.
      *
@@ -1738,6 +1750,9 @@ export declare class LayerGroup {
     empty(): void;
     /**
      * Remove a layer from this layer group.
+     * Warning: if current active layer, the index will
+     *   be set to `undefined`. Call one of the setActive
+     *   methods to define the active index.
      *
      * @param {ViewLayer | DrawLayer} layer The layer to remove.
      */
@@ -1974,10 +1989,10 @@ export declare class Matrix33 {
 export declare class OverlayData {
     /**
      * @param {App} app The associated application.
-     * @param {number} dataId The associated data ID.
+     * @param {string} dataId The associated data id.
      * @param {object} configs The overlay config.
      */
-    constructor(app: App, dataId: number, configs: object);
+    constructor(app: App, dataId: string, configs: object);
     /**
      * Reset the data.
      */
@@ -2942,9 +2957,9 @@ export declare class View {
 export declare class ViewController {
     /**
      * @param {View} view The associated view.
-     * @param {number} index The associated data index.
+     * @param {string} dataId The associated data id.
      */
-    constructor(view: View, index: number);
+    constructor(view: View, dataId: string);
     /**
      * Get the plane helper.
      *
@@ -3071,9 +3086,9 @@ export declare class ViewController {
      * Set the associated image.
      *
      * @param {Image} img The associated image.
-     * @param {number} index The data index of the image.
+     * @param {string} dataId The data id of the image.
      */
-    setImage(img: Image_2, index: number): void;
+    setImage(img: Image_2, dataId: string): void;
     /**
      * Get the current spacing.
      *
@@ -3323,24 +3338,24 @@ export declare class ViewLayer {
      */
     constructor(containerDiv: HTMLElement);
     /**
-     * Get the associated data index.
+     * Get the associated data id.
      *
-     * @returns {number} The index.
+     * @returns {string} The data id.
      */
-    getDataIndex(): number;
+    getDataId(): string;
     /**
-     * Set the imageSmoothingEnabled flag value.
+     * Set the imageSmoothing flag value.
      *
      * @param {boolean} flag True to enable smoothing.
      */
-    enableImageSmoothing(flag: boolean): void;
+    setImageSmoothing(flag: boolean): void;
     /**
      * Set the associated view.
      *
      * @param {object} view The view.
-     * @param {number} index The associated data index.
+     * @param {string} dataId The associated data id.
      */
-    setView(view: object, index: number): void;
+    setView(view: object, dataId: string): void;
     /**
      * Get the view controller.
      *
