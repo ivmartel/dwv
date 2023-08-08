@@ -1506,7 +1506,7 @@ export class App {
       opacity = dataViewConfig.opacity;
     } else {
       if (!isBaseLayer) {
-        opacity = 0.4;
+        opacity = 0.5;
       }
     }
 
