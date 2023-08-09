@@ -347,6 +347,7 @@ function onDOMContentLoaded() {
   setupBindersCheckboxes();
   setupToolsCheckboxes();
   setupTests();
+  setupAbout();
 
   // bind app to input files
   const fileinput = document.getElementById('fileinput');
@@ -1260,4 +1261,20 @@ function runRenderTest() {
 
   // start
   runner();
+}
+
+/**
+ * Setup about line.
+ */
+function setupAbout() {
+  const testsDiv = document.getElementById('about');
+  const link = document.createElement('a');
+  link.href = 'https://github.com/ivmartel/dwv';
+  link.appendChild(document.createTextNode('dwv'));
+  const text = document.createTextNode(
+    ' v' + dwv.getDwvVersion() +
+    ' on ' + navigator.userAgent);
+
+  testsDiv.appendChild(link);
+  testsDiv.appendChild(text);
 }
