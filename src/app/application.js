@@ -790,11 +790,6 @@ export class App {
       } else {
         throw new Error('Expected one draw layer, got ' + dls.length);
       }
-      // set possible orientation
-      if (typeof config.orientation !== 'undefined') {
-        lg.setTargetOrientation(
-          getMatrixFromName(config.orientation));
-      }
     }
 
     // render (will create layer)
@@ -835,11 +830,6 @@ export class App {
     const layerGroup = this.#stage.addLayerGroup(element);
     // bind events
     this.#bindLayerGroupToApp(layerGroup);
-    // optional orientation
-    if (typeof viewConfig.orientation !== 'undefined') {
-      layerGroup.setTargetOrientation(
-        getMatrixFromName(viewConfig.orientation));
-    }
   }
 
   /**
@@ -1466,7 +1456,7 @@ export class App {
     const view = viewFactory.create(data.meta, data.image);
     const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
-      layerGroup.getTargetOrientation()
+      getMatrixFromName(dataViewConfig.orientation)
     );
     view.setOrientation(viewOrientation);
 

@@ -214,13 +214,6 @@ export class LayerGroup {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * The target orientation matrix.
-   *
-   * @type {Matrix33}
-   */
-  #targetOrientation;
-
-  /**
    * Flag to activate crosshair or not.
    *
    * @type {boolean}
@@ -246,24 +239,6 @@ export class LayerGroup {
    */
   constructor(containerDiv) {
     this.#containerDiv = containerDiv;
-  }
-
-  /**
-   * Get the target orientation.
-   *
-   * @returns {Matrix33} The orientation matrix.
-   */
-  getTargetOrientation() {
-    return this.#targetOrientation;
-  }
-
-  /**
-   * Set the target orientation.
-   *
-   * @param {Matrix33} orientation The orientation matrix.
-   */
-  setTargetOrientation(orientation) {
-    this.#targetOrientation = orientation;
   }
 
   /**
