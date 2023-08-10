@@ -934,6 +934,9 @@ function addDataRow(dataId) {
       parent.replaceChildren();
       parent.appendChild(getLayerRadio(index, divId));
       parent.appendChild(getLayerRem(index, divId));
+      parent.appendChild(getLayerUpdate(index, divId, 'axial'));
+      parent.appendChild(getLayerUpdate(index, divId, 'coronal'));
+      parent.appendChild(getLayerUpdate(index, divId, 'sagittal'));
     };
     return button;
   };
@@ -955,6 +958,22 @@ function addDataRow(dataId) {
     return button;
   };
 
+  // get a layer update button
+  const getLayerUpdate = function (index, divId, orientation) {
+    const button = document.createElement('button');
+    const letter = orientation[0].toUpperCase();
+    button.name = 'layerupd-' + index + '_' + letter;
+    button.id = 'layerupd-' + divId + '-' + dataId + '_' + letter;
+    button.appendChild(document.createTextNode(letter));
+    button.onclick = function () {
+      // update app
+      const config = getViewConfig(divId);
+      config.orientation = orientation;
+      _app.updateDataViewConfig(dataId, divId, config);
+    };
+    return button;
+  };
+
   // cell: id
   cell = row.insertCell();
   cell.appendChild(document.createTextNode(dataId));
@@ -971,6 +990,9 @@ function addDataRow(dataId) {
     if (dataLayerGroupsIds.includes(layerGroupDivId)) {
       cell.appendChild(getLayerRadio(l, layerGroupDivId));
       cell.appendChild(getLayerRem(l, layerGroupDivId));
+      cell.appendChild(getLayerUpdate(l, layerGroupDivId, 'axial'));
+      cell.appendChild(getLayerUpdate(l, layerGroupDivId, 'coronal'));
+      cell.appendChild(getLayerUpdate(l, layerGroupDivId, 'sagittal'));
     } else {
       cell.appendChild(getLayerAdd(l, layerGroupDivId));
     }
