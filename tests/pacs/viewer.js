@@ -925,6 +925,7 @@ function addDataRow(dataId) {
     const button = document.createElement('button');
     button.name = 'layeradd-' + index;
     button.id = 'layeradd-' + divId + '-' + dataId;
+    button.title = 'Add layer';
     button.appendChild(document.createTextNode('+'));
     button.onclick = function () {
       // update app
@@ -946,6 +947,7 @@ function addDataRow(dataId) {
     const button = document.createElement('button');
     button.name = 'layerrem-' + index;
     button.id = 'layerrem-' + divId + '-' + dataId;
+    button.title = 'Remove layer';
     button.appendChild(document.createTextNode('-'));
     button.onclick = function () {
       // update app
@@ -964,6 +966,7 @@ function addDataRow(dataId) {
     const letter = orientation[0].toUpperCase();
     button.name = 'layerupd-' + index + '_' + letter;
     button.id = 'layerupd-' + divId + '-' + dataId + '_' + letter;
+    button.title = 'Change layer orientation to ' + orientation;
     button.appendChild(document.createTextNode(letter));
     button.onclick = function () {
       // update app
