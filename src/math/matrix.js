@@ -392,10 +392,10 @@ export function getSagittalMat33() {
  * Get an orientation matrix from a name.
  *
  * @param {string} name The orientation name.
- * @returns {Matrix33} The orientation matrix.
+ * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getMatrixFromName(name) {
-  let matrix = null;
+  let matrix;
   if (name === 'axial') {
     matrix = getIdentityMat33();
   } else if (name === 'coronal') {
