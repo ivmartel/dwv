@@ -1605,18 +1605,6 @@ export declare class LayerGroup {
      */
     constructor(containerDiv: HTMLElement);
     /**
-     * Get the target orientation.
-     *
-     * @returns {Matrix33} The orientation matrix.
-     */
-    getTargetOrientation(): Matrix33;
-    /**
-     * Set the target orientation.
-     *
-     * @param {Matrix33} orientation The orientation matrix.
-     */
-    setTargetOrientation(orientation: Matrix33): void;
-    /**
      * Get the showCrosshair flag.
      *
      * @returns {boolean} True to display the crosshair.
