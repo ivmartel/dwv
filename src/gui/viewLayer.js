@@ -104,6 +104,13 @@ export class ViewLayer {
   #fitScale = {x: 1, y: 1};
 
   /**
+   * The layer flip scale.
+   *
+   * @type {object}
+   */
+  #flipScale = {x: 1, y: 1, z: 1};
+
+  /**
    * The layer offset.
    *
    * @type {object}
@@ -345,6 +352,13 @@ export class ViewLayer {
   }
 
   /**
+   * Flip the scale along the layer Z axis.
+   */
+  flipScaleZ() {
+    this.#flipScale.z *= -1;
+  }
+
+  /**
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
@@ -352,7 +366,11 @@ export class ViewLayer {
    */
   setScale(newScale, center) {
     const helper = this.#viewController.getPlaneHelper();
-    const orientedNewScale = helper.getTargetOrientedPositiveXYZ(newScale);
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
     const finalNewScale = {
       x: this.#fitScale.x * orientedNewScale.x,
       y: this.#fitScale.y * orientedNewScale.y
