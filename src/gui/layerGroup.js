@@ -799,8 +799,8 @@ export class LayerGroup {
     }
 
     // origin of the first view layer
-    let baseViewLayerOrigin0 = null;
-    let baseViewLayerOrigin = null;
+    let baseViewLayerOrigin0;
+    let baseViewLayerOrigin;
     // update position for all layers except the source one
     for (let i = 0; i < this.#layers.length; ++i) {
       if (typeof this.#layers[i] === 'undefined') {
@@ -817,7 +817,7 @@ export class LayerGroup {
         // depending on position, origin could be undefined
         const origin = vc.getOrigin(position);
 
-        if (!baseViewLayerOrigin) {
+        if (typeof baseViewLayerOrigin === 'undefined') {
           baseViewLayerOrigin0 = origin0;
           baseViewLayerOrigin = origin;
         } else {
