@@ -753,6 +753,7 @@ export class App {
 
   /**
    * Update a data view config.
+   * Removes and re-creates the layer if found.
    *
    * @param {string} dataId The data id.
    * @param {string} divId The div id.
