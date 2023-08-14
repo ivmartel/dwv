@@ -27,6 +27,11 @@ function viewerSetup() {
   dwv.decoderScripts.rle =
     '../../decoders/dwv/decode-rle.js';
 
+  dwv.defaultPresets.PT = {
+    'suv5-10': {center: 5, width: 10},
+    'suv6-8': {center: 6, width: 8}
+  };
+
   // // example private logic for roi dialog
   // dwv.customUI.openRoiDialog = function (meta, cb) {
   //   console.log('roi dialog', meta);
