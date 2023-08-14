@@ -783,8 +783,10 @@ export class Draw {
       // highlight trash when on it
       const offset = getEventOffset(event.evt)[0];
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      const trashHalfWidth = this.#trash.width() * this.#trash.scaleX() / 2;
-      const trashHalfHeight = this.#trash.height() * this.#trash.scaleY() / 2;
+      const trashHalfWidth =
+        this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
+      const trashHalfHeight =
+        this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
       if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
         Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
         this.#trash.getChildren().forEach(function (tshape) {
@@ -824,8 +826,10 @@ export class Draw {
       // delete case
       const offset = getEventOffset(event.evt)[0];
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      const trashHalfWidth = this.#trash.width() * this.#trash.scaleX() / 2;
-      const trashHalfHeight = this.#trash.height() * this.#trash.scaleY() / 2;
+      const trashHalfWidth =
+        this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
+      const trashHalfHeight =
+        this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
       if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
         Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
         // compensate for the drag translation
