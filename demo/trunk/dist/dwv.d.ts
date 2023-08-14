@@ -3083,9 +3083,9 @@ export declare class ViewController {
      */
     setImage(img: Image_2, dataId: string): void;
     /**
-     * Get the current spacing.
+     * Get the current view (2D) spacing.
      *
-     * @returns {Array} The 2D spacing.
+     * @returns {Array} The spacing as a 2D array.
      */
     get2DSpacing(): any[];
     /**
