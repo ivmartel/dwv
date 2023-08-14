@@ -323,6 +323,7 @@ export declare class App {
     removeDataViewConfig(dataId: string, config: object): void;
     /**
      * Update a data view config.
+     * Removes and re-creates the layer if found.
      *
      * @param {string} dataId The data id.
      * @param {string} divId The div id.
@@ -737,6 +738,10 @@ export declare class DrawLayer {
      * Add a flip offset along the layer Y axis.
      */
     addFlipOffsetY(): void;
+    /**
+     * Flip the scale along the layer Z axis.
+     */
+    flipScaleZ(): void;
     /**
      * Set the layer scale.
      *
@@ -1603,18 +1608,6 @@ export declare class LayerGroup {
      * @param {HTMLElement} containerDiv The associated HTML div.
      */
     constructor(containerDiv: HTMLElement);
-    /**
-     * Get the target orientation.
-     *
-     * @returns {Matrix33} The orientation matrix.
-     */
-    getTargetOrientation(): Matrix33;
-    /**
-     * Set the target orientation.
-     *
-     * @param {Matrix33} orientation The orientation matrix.
-     */
-    setTargetOrientation(orientation: Matrix33): void;
     /**
      * Get the showCrosshair flag.
      *
@@ -3090,9 +3083,9 @@ export declare class ViewController {
      */
     setImage(img: Image_2, dataId: string): void;
     /**
-     * Get the current spacing.
+     * Get the current view (2D) spacing.
      *
-     * @returns {Array} The 2D spacing.
+     * @returns {Array} The spacing as a 2D array.
      */
     get2DSpacing(): any[];
     /**
@@ -3418,6 +3411,10 @@ export declare class ViewLayer {
      * Add a flip offset along the layer Y axis.
      */
     addFlipOffsetY(): void;
+    /**
+     * Flip the scale along the layer Z axis.
+     */
+    flipScaleZ(): void;
     /**
      * Set the layer scale.
      *
