@@ -77,7 +77,7 @@ function viewerSetup() {
     WindowLevel: {},
     ZoomAndPan: {},
     Opacity: {},
-    Draw: {options: ['Rectangle']}
+    Draw: {options: ['Ruler', 'Circle']}
   };
 
   // app config
@@ -603,12 +603,11 @@ function setupToolsCheckboxes() {
   const toolsDiv = document.getElementById('tools');
   const keys = Object.keys(_tools);
 
-  const getChangeTool = function (tool) {
+  const getChangeTool = function (tool, option) {
     return function () {
       _app.setTool(tool);
       if (tool === 'Draw') {
-        const name = _tools.Draw.options[0];
-        _app.setToolFeatures({shapeName: name});
+        _app.setToolFeatures({shapeName: option});
       }
     };
   };
@@ -626,27 +625,43 @@ function setupToolsCheckboxes() {
 
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
-
-    const input = document.createElement('input');
-    input.id = 'tool-' + i;
-    input.name = 'tools';
-    input.type = 'radio';
-    input.onchange = getChangeTool(key);
-
-    if (key === 'Scroll') {
-      input.checked = true;
+    const tool = _tools[key];
+    let options = [''];
+    if (typeof tool.options !== 'undefined') {
+      options = tool.options;
     }
 
-    const label = document.createElement('label');
-    label.htmlFor = input.id;
-    label.appendChild(document.createTextNode(key));
+    for (let j = 0; j < options.length; ++j) {
+      const input = document.createElement('input');
+      input.name = 'tools';
+      input.type = 'radio';
+      input.id = 'tool-' + i;
+      input.title = key;
+      if (options[j] !== '') {
+        input.id += '-' + options[j];
+        input.title += ':' + options[j];
+      }
+      input.onchange = getChangeTool(key, options[j]);
 
-    toolsDiv.appendChild(input);
-    toolsDiv.appendChild(label);
+      if (key === 'Scroll') {
+        input.checked = true;
+      }
 
-    // keyboard shortcut
-    window.addEventListener(
-      'keydown', getKeyCheck(key[0].toLowerCase(), input));
+      const label = document.createElement('label');
+      label.htmlFor = input.id;
+      label.title = input.title;
+      label.appendChild(document.createTextNode(input.title));
+
+      toolsDiv.appendChild(input);
+      toolsDiv.appendChild(label);
+
+      // keyboard shortcut
+      let shortcut = key[0].toLowerCase();
+      if (options[j] !== '') {
+        shortcut = options[j][0].toLowerCase();
+      }
+      window.addEventListener('keydown', getKeyCheck(shortcut, input));
+    }
   }
 }
 
