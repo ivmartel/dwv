@@ -801,6 +801,8 @@ export class LayerGroup {
     // origin of the first view layer
     let baseViewLayerOrigin0;
     let baseViewLayerOrigin;
+    let scrollOffset;
+    let planeOffset;
     // update position for all layers except the source one
     for (let i = 0; i < this.#layers.length; ++i) {
       if (typeof this.#layers[i] === 'undefined') {
@@ -808,7 +810,6 @@ export class LayerGroup {
       }
 
       // update base offset (does not trigger redraw)
-      // TODO check draw layers update
       let hasSetOffset = false;
       if (this.#layers[i] instanceof ViewLayer) {
         const vc = this.#layers[i].getViewController();
@@ -824,19 +825,21 @@ export class LayerGroup {
           if (vc.canSetPosition(position) &&
             typeof origin !== 'undefined') {
             // TODO: compensate for possible different orientation between views
-
             const scrollDiff = baseViewLayerOrigin0.minus(origin0);
-            const scrollOffset = new Vector3D(
+            scrollOffset = new Vector3D(
               scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
-
             const planeDiff = baseViewLayerOrigin.minus(origin);
-            const planeOffset = new Vector3D(
+            planeOffset = new Vector3D(
               planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
-
-            hasSetOffset =
-              this.#layers[i].setBaseOffset(scrollOffset, planeOffset);
           }
         }
+      }
+      // also set for draw layers
+      // (should be next after a view layer)
+      if (typeof scrollOffset !== 'undefined' &&
+        typeof planeOffset !== 'undefined') {
+        hasSetOffset =
+          this.#layers[i].setBaseOffset(scrollOffset, planeOffset);
       }
 
       // update position (triggers redraw)
