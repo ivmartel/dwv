@@ -379,7 +379,7 @@ export class DicomWriter {
    * @param {object} element The element to check
    * @returns {object} The element to write, can be null.
    */
-  #getElementToWrite(element) {
+  getElementToWrite(element) {
     // get group and tag string name
     const groupName = element.tag.getGroupName();
     const tagName = element.tag.getNameFromDictionary();
