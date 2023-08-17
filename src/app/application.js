@@ -495,7 +495,7 @@ export class App {
   /**
    * Load a list of files. Can be image files or a state file.
    *
-   * @param {FileList} files The list of files to load.
+   * @param {File[]} files The list of files to load.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -514,7 +514,7 @@ export class App {
   /**
    * Load a list of URLs. Can be image files or a state file.
    *
-   * @param {Array} urls The list of urls to load.
+   * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
