@@ -7,6 +7,7 @@ import {
   getTypedArray,
   getOrientationName,
   getReverseOrientation,
+  hasDicomPrefix,
   DicomParser
 } from './dicom/dicomParser';
 import {
@@ -102,6 +103,7 @@ export {
   getPixelDataTag,
   getOrientationName,
   getReverseOrientation,
+  hasDicomPrefix,
   precisionRound,
   buildMultipart
 };
