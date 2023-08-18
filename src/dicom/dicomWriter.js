@@ -750,7 +750,7 @@ export class DicomWriter {
     for (let i = 0, leni = keys.length; i < leni; ++i) {
       const originalElement = dicomElements[keys[i]];
       originalElement.tag = getTagFromKey(keys[i]);
-      element = this.#getElementToWrite(originalElement);
+      element = this.getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
         !fmivTag.equals(element.tag) &&
