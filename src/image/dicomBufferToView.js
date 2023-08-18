@@ -7,6 +7,15 @@ import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
 import {PixelBufferDecoder} from './decoder';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from '../dicom/dataElement';
+/* eslint-enable no-unused-vars */
+
+/**
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+
 /**
  * Create a View from a DICOM buffer.
  */
@@ -45,7 +54,7 @@ export class DicomBufferToView {
   /**
    * Get the factory associated to input DICOM elements.
    *
-   * @param {object} elements The DICOM elements.
+   * @param {DataElements} elements The DICOM elements.
    * @returns {ImageFactory|MaskFactory} The associated factory.
    */
   #getFactory(elements) {
@@ -72,19 +81,19 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #generateImage(index, origin) {
-    const dicomElements = this.#dicomParserStore[index].getDicomElements();
-    const factory = this.#getFactory(dicomElements);
+    const dataElements = this.#dicomParserStore[index].getDicomElements();
+    const factory = this.#getFactory(dataElements);
     // create the image
     try {
       const image = factory.create(
-        dicomElements,
+        dataElements,
         this.#finalBufferStore[index],
         this.#options.numberOfFiles);
       // call onloaditem
       this.onloaditem({
         data: {
           image: image,
-          info: dicomElements
+          info: dataElements
         },
         source: origin,
         warn: this.#factoryWarnings[index]

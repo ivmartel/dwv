@@ -15,6 +15,7 @@ import {
   getElementsFromJSONTags,
   DicomWriter
 } from './dicom/dicomWriter';
+import {DataElement} from './dicom/dataElement';
 import {TagValueExtractor} from './dicom/dicomElementsWrapper';
 import {addTagsToDictionary} from './dicom/dictionary';
 import {
@@ -63,6 +64,7 @@ import {i18n} from './utils/i18n';
 export {
   App,
   ViewController,
+  DataElement,
   DicomParser,
   DicomWriter,
   TagValueExtractor,

@@ -15,6 +15,15 @@ import {
 } from '../utils/colour';
 import {Size} from './size';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from '../dicom/dataElement';
+/* eslint-enable no-unused-vars */
+
+/**
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+
 /**
  * Check two position patients for equality.
  *
@@ -53,11 +62,11 @@ function getComparePosPat(orientation) {
 /**
  * Check that a DICOM tag definition is present in a parsed element.
  *
- * @param {object} rootElement The root dicom element.
+ * @param {DataElements} dataElements The root dicom element.
  * @param {object} tagDefinition The tag definition as {name, tag, type, enum}.
  */
-function checkTag(rootElement, tagDefinition) {
-  const element = rootElement[tagDefinition.tag];
+function checkTag(dataElements, tagDefinition) {
+  const element = dataElements[tagDefinition.tag];
   // check null and undefined
   if (tagDefinition.type === 1 || tagDefinition.type === 2) {
     if (typeof element === 'undefined') {
@@ -196,12 +205,12 @@ function getDefaultDicomSegJson() {
 /**
  * Check the dimension organization from a dicom element.
  *
- * @param {object} rootElement The root dicom element.
+ * @param {DataElements} dataElements The root dicom element.
  * @returns {object} The dimension organizations and indices.
  */
-function getDimensionOrganization(rootElement) {
+function getDimensionOrganization(dataElements) {
   // Dimension Organization Sequence (required)
-  const orgSq = rootElement['00209221'];
+  const orgSq = dataElements['00209221'];
   if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
     throw new Error('Unsupported dimension organization sequence length');
   }
@@ -210,7 +219,7 @@ function getDimensionOrganization(rootElement) {
 
   // Dimension Index Sequence (conditionally required)
   const indices = [];
-  const indexSqElem = rootElement['00209222'];
+  const indexSqElem = dataElements['00209222'];
   if (typeof indexSqElem !== 'undefined') {
     const indexSq = indexSqElem.value;
     // expecting 2D index
@@ -262,31 +271,31 @@ function getDimensionOrganization(rootElement) {
 /**
  * Get a code object from a dicom element.
  *
- * @param {object} element The dicom element.
+ * @param {DataElements} dataElements The dicom element.
  * @returns {object} A code object.
  */
-function getCode(element) {
+function getCode(dataElements) {
   // meaning -> CodeMeaning (type1)
   const code = {
-    meaning: element['00080104'].value[0]
+    meaning: dataElements['00080104'].value[0]
   };
   // value -> CodeValue (type1C)
   // longValue -> LongCodeValue (type1C)
   // urnValue -> URNCodeValue (type1C)
-  if (element['00080100']) {
-    code.value = element['00080100'].value[0];
-  } else if (element['00080119']) {
-    code.longValue = element['00080119'].value[0];
-  } else if (element['00080120']) {
-    code.urnValue = element['00080120'].value[0];
+  if (dataElements['00080100']) {
+    code.value = dataElements['00080100'].value[0];
+  } else if (dataElements['00080119']) {
+    code.longValue = dataElements['00080119'].value[0];
+  } else if (dataElements['00080120']) {
+    code.urnValue = dataElements['00080120'].value[0];
   } else {
     throw Error('Invalid code with no value, no long value and no urn value.');
   }
   // schemeDesignator -> CodingSchemeDesignator (type1C)
   if (typeof code.value !== 'undefined' ||
     typeof code.longValue !== 'undefined') {
-    if (element['00080102']) {
-      code.schemeDesignator = element['00080102'].value[0];
+    if (dataElements['00080102']) {
+      code.schemeDesignator = dataElements['00080102'].value[0];
     } else {
       throw Error(
         'No coding sheme designator when code value or long value is present');
@@ -298,21 +307,21 @@ function getCode(element) {
 /**
  * Get a segment object from a dicom element.
  *
- * @param {object} element The dicom element.
+ * @param {DataElements} dataElements The dicom element.
  * @returns {object} A segment object.
  */
-function getSegment(element) {
+function getSegment(dataElements) {
   // number -> SegmentNumber (type1)
   // label -> SegmentLabel (type1)
   // algorithmType -> SegmentAlgorithmType (type1)
   const segment = {
-    number: element['00620004'].value[0],
-    label: element['00620005'].value[0],
-    algorithmType: element['00620008'].value[0]
+    number: dataElements['00620004'].value[0],
+    label: dataElements['00620005'].value[0],
+    algorithmType: dataElements['00620008'].value[0]
   };
   // algorithmName -> SegmentAlgorithmName (type1C)
-  if (element['00620009']) {
-    segment.algorithmName = element['00620009'].value[0];
+  if (dataElements['00620009']) {
+    segment.algorithmName = dataElements['00620009'].value[0];
   }
   // // required if type is not MANUAL
   // if (segment.algorithmType !== 'MANUAL' &&
@@ -323,10 +332,10 @@ function getSegment(element) {
   // displayValue ->
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
-  if (typeof element['0062000C'] !== 'undefined') {
-    segment.displayValue = element['006200C'].value;
-  } else if (typeof element['0062000D'] !== 'undefined') {
-    const cielabElement = element['0062000D'].value;
+  if (typeof dataElements['0062000C'] !== 'undefined') {
+    segment.displayValue = dataElements['006200C'].value;
+  } else if (typeof dataElements['0062000D'] !== 'undefined') {
+    const cielabElement = dataElements['0062000D'].value;
     const rgb = cielabToSrgb(uintLabToLab({
       l: cielabElement[0],
       a: cielabElement[1],
@@ -335,23 +344,23 @@ function getSegment(element) {
     segment.displayValue = rgb;
   }
   // Segmented Property Category Code Sequence (type1, only one)
-  if (typeof element['00620003'] !== 'undefined') {
+  if (typeof dataElements['00620003'] !== 'undefined') {
     segment.propertyCategoryCode =
-      getCode(element['00620003'].value[0]);
+      getCode(dataElements['00620003'].value[0]);
   } else {
     throw Error('Missing Segmented Property Category Code Sequence.');
   }
   // Segmented Property Type Code Sequence (type1)
-  if (typeof element['0062000F'] !== 'undefined') {
+  if (typeof dataElements['0062000F'] !== 'undefined') {
     segment.propertyTypeCode =
-      getCode(element['0062000F'].value[0]);
+      getCode(dataElements['0062000F'].value[0]);
   } else {
     throw Error('Missing Segmented Property Type Code Sequence.');
   }
   // tracking Id and UID (type1C)
-  if (typeof element['00620020'] !== 'undefined') {
-    segment.trackingId = element['00620020'].value[0];
-    segment.trackingUid = element['00620021'].value[0];
+  if (typeof dataElements['00620020'] !== 'undefined') {
+    segment.trackingId = dataElements['00620020'].value[0];
+    segment.trackingUid = dataElements['00620021'].value[0];
   }
 
   return segment;
@@ -436,25 +445,25 @@ export function isSimilarSegment(seg1, seg2) {
 /**
  * Get a spacing object from a dicom measure element.
  *
- * @param {object} measure The dicom element.
+ * @param {DataElements} dataElements The dicom element.
  * @returns {Spacing} A spacing object.
  */
-function getSpacingFromMeasure(measure) {
+function getSpacingFromMeasure(dataElements) {
   // Pixel Spacing
-  if (typeof measure['00280030'] === 'undefined') {
+  if (typeof dataElements['00280030'] === 'undefined') {
     return null;
   }
-  const pixelSpacing = measure['00280030'];
+  const pixelSpacing = dataElements['00280030'];
   const spacingValues = [
     parseFloat(pixelSpacing.value[0]),
     parseFloat(pixelSpacing.value[1])
   ];
   // Slice Thickness
-  if (typeof measure['00180050'] !== 'undefined') {
-    spacingValues.push(parseFloat(measure['00180050'].value[0]));
-  } else if (typeof measure['00180088'] !== 'undefined') {
+  if (typeof dataElements['00180050'] !== 'undefined') {
+    spacingValues.push(parseFloat(dataElements['00180050'].value[0]));
+  } else if (typeof dataElements['00180088'] !== 'undefined') {
     // Spacing Between Slices
-    spacingValues.push(parseFloat(measure['00180088'].value[0]));
+    spacingValues.push(parseFloat(dataElements['00180088'].value[0]));
   }
   return new Spacing(spacingValues);
 }
@@ -462,14 +471,14 @@ function getSpacingFromMeasure(measure) {
 /**
  * Get a frame information object from a dicom element.
  *
- * @param {object} groupItem The dicom element.
+ * @param {DataElements} dataElements The dicom element.
  * @returns {object} A frame information object.
  */
-function getSegmentFrameInfo(groupItem) {
+function getSegmentFrameInfo(dataElements) {
   // Derivation Image Sequence
   const derivationImages = [];
-  if (typeof groupItem['00089124'] !== 'undefined') {
-    const derivationImageSq = groupItem['00089124'].value;
+  if (typeof dataElements['00089124'] !== 'undefined') {
+    const derivationImageSq = dataElements['00089124'].value;
     // Source Image Sequence
     for (let i = 0; i < derivationImageSq.length; ++i) {
       const sourceImages = [];
@@ -494,15 +503,15 @@ function getSegmentFrameInfo(groupItem) {
     }
   }
   // Frame Content Sequence (required, only one)
-  const frameContentSq = groupItem['00209111'].value;
+  const frameContentSq = dataElements['00209111'].value;
   // Dimension Index Value
   const dimIndex = frameContentSq[0]['00209157'].value;
   // Segment Identification Sequence (required, only one)
-  const segmentIdSq = groupItem['0062000A'].value;
+  const segmentIdSq = dataElements['0062000A'].value;
   // Referenced Segment Number
   const refSegmentNumber = segmentIdSq[0]['0062000B'].value[0];
   // Plane Position Sequence (required, only one)
-  const planePosSq = groupItem['00209113'].value;
+  const planePosSq = dataElements['00209113'].value;
   // Image Position (Patient) (conditionally required)
   const imagePosPat = planePosSq[0]['00200032'].value;
   for (let p = 0; p < imagePosPat.length; ++p) {
@@ -515,8 +524,8 @@ function getSegmentFrameInfo(groupItem) {
     refSegmentNumber: refSegmentNumber
   };
   // Plane Orientation Sequence
-  if (typeof groupItem['00209116'] !== 'undefined') {
-    const framePlaneOrientationSeq = groupItem['00209116'];
+  if (typeof dataElements['00209116'] !== 'undefined') {
+    const framePlaneOrientationSeq = dataElements['00209116'];
     if (framePlaneOrientationSeq.value.length !== 0) {
       // should only be one Image Orientation (Patient)
       const frameImageOrientation =
@@ -527,8 +536,8 @@ function getSegmentFrameInfo(groupItem) {
     }
   }
   // Pixel Measures Sequence
-  if (typeof groupItem['00289110'] !== 'undefined') {
-    const framePixelMeasuresSeq = groupItem['00289110'];
+  if (typeof dataElements['00289110'] !== 'undefined') {
+    const framePixelMeasuresSeq = dataElements['00289110'];
     if (framePixelMeasuresSeq.value.length !== 0) {
       // should only be one
       const frameSpacing =
@@ -563,27 +572,27 @@ export class MaskFactory {
   /**
    * Get an {@link Image} object from the read DICOM file.
    *
-   * @param {object} dicomElements The DICOM tags.
+   * @param {DataElements} dataElements The DICOM tags.
    * @param {Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @returns {Image} A new Image.
    */
-  create(dicomElements, pixelBuffer) {
+  create(dataElements, pixelBuffer) {
     // check required and supported tags
     for (let d = 0; d < RequiredDicomSegTags.length; ++d) {
-      checkTag(dicomElements, RequiredDicomSegTags[d]);
+      checkTag(dataElements, RequiredDicomSegTags[d]);
     }
 
     // image size
-    const size2D = getImage2DSize(dicomElements);
+    const size2D = getImage2DSize(dataElements);
     const size = new Size([size2D[0], size2D[1], 1]);
 
     const sliceSize = size.getTotalSize();
 
     // frames
     let frames = 1;
-    const framesElem = dicomElements['00280008'];
+    const framesElem = dataElements['00280008'];
     if (typeof framesElem !== 'undefined') {
       frames = parseInt(framesElem.value[0], 10);
     }
@@ -595,10 +604,10 @@ export class MaskFactory {
     }
 
     // Dimension Organization and Index
-    const dimension = getDimensionOrganization(dicomElements);
+    const dimension = getDimensionOrganization(dataElements);
 
     // Segment Sequence
-    const segSequence = dicomElements['00620002'];
+    const segSequence = dataElements['00620002'];
     if (typeof segSequence === 'undefined') {
       throw new Error('Missing or empty segmentation sequence');
     }
@@ -620,7 +629,7 @@ export class MaskFactory {
     // Shared Functional Groups Sequence
     let spacing;
     let imageOrientationPatient;
-    const sharedFunctionalGroupsSeq = dicomElements['52009229'];
+    const sharedFunctionalGroupsSeq = dataElements['52009229'];
     if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
       // should be only one
       const funcGroup0 = sharedFunctionalGroupsSeq.value[0];
@@ -662,7 +671,7 @@ export class MaskFactory {
     };
 
     // Per-frame Functional Groups Sequence
-    const perFrameFuncGroupSequence = dicomElements['52009230'];
+    const perFrameFuncGroupSequence = dataElements['52009230'];
     if (typeof perFrameFuncGroupSequence === 'undefined') {
       throw new Error('Missing or empty per frame functional sequence');
     }
@@ -873,25 +882,25 @@ export class MaskFactory {
     // meta information
     const meta = getDefaultDicomSegJson();
     // Study
-    meta.StudyDate = dicomElements['00080020'].value[0];
-    meta.StudyTime = dicomElements['00080030'].value[0];
-    meta.StudyInstanceUID = dicomElements['0020000D'].value[0];
-    meta.StudyID = dicomElements['00200010'].value[0];
+    meta.StudyDate = dataElements['00080020'].value[0];
+    meta.StudyTime = dataElements['00080030'].value[0];
+    meta.StudyInstanceUID = dataElements['0020000D'].value[0];
+    meta.StudyID = dataElements['00200010'].value[0];
     // Series
-    meta.SeriesInstanceUID = dicomElements['0020000E'].value[0];
-    meta.SeriesNumber = dicomElements['00200011'].value[0];
+    meta.SeriesInstanceUID = dataElements['0020000E'].value[0];
+    meta.SeriesNumber = dataElements['00200011'].value[0];
     // ReferringPhysicianName
-    meta.ReferringPhysicianName = dicomElements['00080090'].value[0];
+    meta.ReferringPhysicianName = dataElements['00080090'].value[0];
     // patient info
-    meta.PatientName = dicomElements['00100010'].value[0];
-    meta.PatientID = dicomElements['00100020'].value[0];
-    meta.PatientBirthDate = dicomElements['00100030'].value[0];
-    meta.PatientSex = dicomElements['00100040'].value[0];
+    meta.PatientName = dataElements['00100010'].value[0];
+    meta.PatientID = dataElements['00100020'].value[0];
+    meta.PatientBirthDate = dataElements['00100030'].value[0];
+    meta.PatientSex = dataElements['00100040'].value[0];
     // Enhanced General Equipment Module
-    meta.Manufacturer = dicomElements['00080070'].value[0];
-    meta.ManufacturerModelName = dicomElements['00081090'].value[0];
-    meta.DeviceSerialNumber = dicomElements['00181000'].value[0];
-    meta.SoftwareVersions = dicomElements['00181020'].value[0];
+    meta.Manufacturer = dataElements['00080070'].value[0];
+    meta.ManufacturerModelName = dataElements['00081090'].value[0];
+    meta.DeviceSerialNumber = dataElements['00181000'].value[0];
+    meta.SoftwareVersions = dataElements['00181020'].value[0];
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
     meta.DimensionIndexSequence = dimension.indices;
@@ -899,19 +908,19 @@ export class MaskFactory {
     meta.custom = {
       segments: segments,
       frameInfos: frameInfos,
-      SOPInstanceUID: dicomElements['00080018'].value[0]
+      SOPInstanceUID: dataElements['00080018'].value[0]
     };
 
     // number of files: in this case equal to number slices,
     //   used to calculate buffer size
     meta.numberOfFiles = numberOfSlices;
     // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dicomElements['00200052'];
+    const frameOfReferenceUID = dataElements['00200052'];
     if (frameOfReferenceUID) {
       meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
     }
     // LossyImageCompression (optional)
-    const lossyImageCompression = dicomElements['00282110'];
+    const lossyImageCompression = dataElements['00282110'];
     if (lossyImageCompression) {
       meta.LossyImageCompression = lossyImageCompression.value[0];
     }
