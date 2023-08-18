@@ -241,16 +241,27 @@ class DefaultTextEncoder {
 /**
  * DICOM writer.
  *
- * Example usage:
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
  *   const parser = new DicomParser();
- *   parser.parse(this.response);
- *
+ *   parser.parse(event.target.response);
+ *   // create writer with parser data elements
  *   const writer = new DicomWriter(parser.getDicomElements());
+ *   // create modified buffer and put it in a Blol
  *   const blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *
+ *   // example download link
  *   const element = document.getElementById("download");
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export class DicomWriter {
 
@@ -267,7 +278,11 @@ export class DicomWriter {
     this.#useUnVrForPrivateSq = flag;
   }
 
-  // possible tag actions
+  /**
+   * Possible tag actions.
+   *
+   * @type {Object<string, Function>}
+   */
   #actions = {
     copy: function (item) {
       return item;
@@ -285,26 +300,34 @@ export class DicomWriter {
     }
   };
 
-  // default rules: just copy
+  /**
+   * Default rules: just copy
+   *
+   * @type {Object<string, {action: string, value: any}>}
+   */
   #defaultRules = {
     default: {action: 'copy', value: null}
   };
 
   /**
    * Writing rules.
-   * Set of objects as:
-   *   name : { action: 'actionName', value: 'optionalValue }
-   * The names are either 'default', tagName or groupName.
-   * Each DICOM element will be checked to see if a rule is applicable.
-   * First checked by tagName and then by groupName,
-   * if nothing is found the default rule is applied.
+   *
+   * @type {Object<string, {action: string, value: any}>}
    */
   #rules = this.#defaultRules;
 
   /**
    * Set the writing rules.
+   * Set of objects as:
+   *   `name : { action: 'actionName', value: 'optionalValue' }`
+   * The names are either `default`, tagName or groupName.
+   * Each DICOM element will be checked to see if a rule is applicable.
+   * First checked by tagName and then by groupName,
+   * if nothing is found the default rule is applied.
+   * Possible action names are: `copy`, `remove`, `clear`, `replace`.
    *
-   * @param {object} rules The input rules.
+   * @param {Object<string, {action: string, value: any}>} rules
+   *   The input rules.
    */
   setRules(rules) {
     this.#rules = rules;
