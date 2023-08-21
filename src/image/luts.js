@@ -8,7 +8,7 @@ const lut_range_max = 256;
  * Build a LUT of size lut_range_max.
  *
  * @param {Function} func The i to lut function.
- * @returns {Array} THe LUT.
+ * @returns {Array} The LUT.
  */
 function buildLut(func) {
   const lut = [];
@@ -91,19 +91,44 @@ function invId(i) {
   return (lut_range_max - 1) - i;
 }
 
+/**
+ * Colour map: red, green and blue components
+ * to associate with intensity values.
+ */
+export class ColourMap {
+  /**
+   * Red component: 256 values in the [0, 255] range.
+   *
+   * @type {number[]}
+   */
+  red;
+  /**
+   * Green component: 256 values in the [0, 255] range.
+   *
+   * @type {number[]}
+   */
+  green;
+  /**
+   * Blue component: 256 values in the [0, 255] range.
+   *
+   * @type {number[]}
+   */
+  blue;
+}
+
 // 1. jsdoc gives an error for index signatures as type:
 // {[key: string]: {red: number[], green: number[], blue: number[]}}
 // -> ERROR: Unable to parse a tag's type expression for source file ...
 //    Invalid type expression
 // 2. by default in typescript mode, eslint/jsdoc gives a warning when using:
-// Object<string, {red: number[], green: number[], blue: number[]}>
+// Object<string, ColourMap>
 // -> Use object shorthand or index signatures instead of `Object`,
 //    e.g., `{[key: string]: string}`
 
 /**
  * List of available lookup tables (lut).
  *
- * @type {Object<string, {red: number[], green: number[], blue: number[]}>}
+ * @type {Object<string, ColourMap>}
  */
 export const lut = {
   // plain

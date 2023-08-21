@@ -22,7 +22,46 @@ import {binderList} from '../gui/stage';
 /* eslint-disable no-unused-vars */
 import {LayerGroup} from '../gui/layerGroup';
 import {Image} from '../image/image';
+import {ColourMap} from '../image/luts';
 /* eslint-enable no-unused-vars */
+
+/**
+ * View configuration: mainly defines the ´divId´
+ * of the associated HTML div.
+ */
+export class ViewConfig {
+  /**
+   * Associated HTML div id.
+   *
+   * @type {string}
+   */
+  divId;
+  /**
+   * Orientation of the data; 'axial', 'coronal' or 'sagittal'.
+   * If undefined, will use the data aquisition plane.
+   *
+   * @type {string}
+   */
+  orientation;
+  /**
+   * View colour map.
+   *
+   * @type {ColourMap}
+   */
+  colourMap;
+  /**
+   * Layer opacity; in [0, 1] range.
+   *
+   * @type {number}
+   */
+  opacity;
+}
+
+/**
+ * List of ViewConfigs indexed by dataIds.
+ *
+ * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
+ */
 
 /**
  * Main application class.
@@ -609,7 +648,7 @@ export class App {
    * Defaults to div id 'layerGroup' if no association object has been set.
    *
    * @param {number} dataIndex The data index.
-   * @returns {Array} The list of associated configs.
+   * @returns {ViewConfig[]} The list of associated configs.
    */
   #getViewConfigs(dataIndex) {
     // check options
@@ -631,18 +670,19 @@ export class App {
    * Get the data view config.
    * Carefull, returns a reference, do not modify without resetting.
    *
-   * @returns {object} The configuration list.
+   * @returns {Object<string, ViewConfig[]>} The configuration list.
    */
-  getDataViewConfig() {
+  getDataViewConfigs() {
     return this.#options.dataViewConfigs;
   }
 
   /**
-   * Set the data view configuration (see the init options for details).
+   * Set the data view configuration.
+   * Resets the stage and recreates all the views.
    *
-   * @param {object} configs The configuration list.
+   * @param {Object<string, ViewConfig[]>} configs The configuration list.
    */
-  setDataViewConfig(configs) {
+  setDataViewConfigs(configs) {
     // clean up
     this.#stage.empty();
     // set new
@@ -655,15 +695,15 @@ export class App {
    * Create layer groups according to a data view config:
    * adds them to stage and bind them.
    *
-   * @param {object} dataViewConfigs The data view config.
+   * @param {DataViewConfigs} dataViewConfigs The data view config.
    */
   #createLayerGroups(dataViewConfigs) {
     const dataKeys = Object.keys(dataViewConfigs);
     const divIds = [];
     for (let i = 0; i < dataKeys.length; ++i) {
-      const dataConfigs = dataViewConfigs[dataKeys[i]];
-      for (let j = 0; j < dataConfigs.length; ++j) {
-        const viewConfig = dataConfigs[j];
+      const viewConfigs = dataViewConfigs[dataKeys[i]];
+      for (let j = 0; j < viewConfigs.length; ++j) {
+        const viewConfig = viewConfigs[j];
         // view configs can contain the same divIds, avoid duplicating
         if (!divIds.includes(viewConfig.divId)) {
           // create new layer group
@@ -925,13 +965,13 @@ export class App {
   /**
    * Set the colour map.
    *
-   * @param {string} colourMap The colour map name.
+   * @param {string} name The colour map name.
    */
-  setColourMap(colourMap) {
+  setColourMap(name) {
     const viewController =
       this.#stage.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
-    viewController.setColourMapFromName(colourMap);
+    viewController.setColourMapFromName(name);
   }
 
   /**
@@ -1240,11 +1280,11 @@ export class App {
    * To be called once the DICOM data has been loaded.
    *
    * @param {number} dataIndex The data index.
-   * @param {object} dataViewConfig The data view config.
+   * @param {ViewConfig} viewConfig The view config.
    */
-  #initialiseBaseLayers(dataIndex, dataViewConfig) {
+  #initialiseBaseLayers(dataIndex, viewConfig) {
     // add layers
-    this.#addViewLayer(dataIndex, dataViewConfig);
+    this.#addViewLayer(dataIndex, viewConfig);
 
     // initialise the toolbox
     if (this.#toolboxController) {
@@ -1256,17 +1296,17 @@ export class App {
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
-   * @param {object} dataViewConfig The data view config.
+   * @param {ViewConfig} viewConfig The data view config.
    */
-  #addViewLayer(dataIndex, dataViewConfig) {
+  #addViewLayer(dataIndex, viewConfig) {
     const data = this.#dataController.get(dataIndex);
     if (!data) {
       throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    const layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
+    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
     if (!layerGroup) {
       throw new Error('Cannot initialise layer with group id: ' +
-        dataViewConfig.divId);
+        viewConfig.divId);
     }
     const imageGeometry = data.image.getGeometry();
 
@@ -1297,8 +1337,8 @@ export class App {
     }
 
     // colour map
-    if (typeof dataViewConfig.colourMap !== 'undefined') {
-      view.setColourMap(dataViewConfig.colourMap);
+    if (typeof viewConfig.colourMap !== 'undefined') {
+      view.setColourMap(viewConfig.colourMap);
     }
 
     const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
@@ -1310,7 +1350,7 @@ export class App {
     if (!isBaseLayer) {
       opacity = 0.5;
       // set color map if non was provided
-      if (typeof dataViewConfig.colourMap === 'undefined') {
+      if (typeof viewConfig.colourMap === 'undefined') {
         view.setColourMap(lut.rainbow);
       }
     }
@@ -1369,10 +1409,10 @@ export class App {
     // view layer offset (done before scale)
     viewLayer.setOffset(layerGroup.getOffset());
     // extra flip offset for oriented views...
-    if (typeof dataViewConfig.orientation !== 'undefined') {
+    if (typeof viewConfig.orientation !== 'undefined') {
       if (major === 2) {
         // flip offset Y for axial aquired data
-        if (dataViewConfig.orientation !== 'axial') {
+        if (viewConfig.orientation !== 'axial') {
           viewLayer.addFlipOffsetY();
           if (typeof drawLayer !== 'undefined') {
             drawLayer.addFlipOffsetY();
@@ -1380,7 +1420,7 @@ export class App {
         }
       } else if (major === 0) {
         // flip offset X for sagittal aquired data
-        if (dataViewConfig.orientation !== 'sagittal') {
+        if (viewConfig.orientation !== 'sagittal') {
           viewLayer.addFlipOffsetX();
           if (typeof drawLayer !== 'undefined') {
             drawLayer.addFlipOffsetX();
@@ -1392,7 +1432,7 @@ export class App {
     // view layer scale
     // only flip scale for base layers
     if (isBaseLayer) {
-      if (typeof dataViewConfig.orientation !== 'undefined') {
+      if (typeof viewConfig.orientation !== 'undefined') {
         if (major === 0 || major === 2) {
           // scale flip Z for oriented views...
           layerGroup.flipScaleZ();

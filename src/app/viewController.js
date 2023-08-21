@@ -20,6 +20,7 @@ import {ListenerHandler} from '../utils/listen';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {View} from '../image/view';
+import {ColourMap} from '../image/luts';
 import {Point, Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
@@ -719,7 +720,7 @@ export class ViewController {
   /**
    * Get the colour map.
    *
-   * @returns {object} The colour map.
+   * @returns {ColourMap} The colour map.
    */
   getColourMap() {
     return this.#view.getColourMap();
@@ -728,7 +729,7 @@ export class ViewController {
   /**
    * Set the colour map.
    *
-   * @param {object} colourMap The colour map.
+   * @param {ColourMap} colourMap The colour map.
    */
   setColourMap(colourMap) {
     this.#view.setColourMap(colourMap);

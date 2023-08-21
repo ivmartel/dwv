@@ -1,5 +1,8 @@
 // app
-import {App} from './app/application';
+import {
+  App,
+  ViewConfig
+} from './app/application';
 import {ViewController} from './app/viewController';
 // dicom
 import {
@@ -41,7 +44,10 @@ import {Geometry} from './image/geometry';
 import {Size} from './image/size';
 import {Spacing} from './image/spacing';
 import {decoderScripts} from './image/decoder';
-import {lut} from './image/luts';
+import {
+  ColourMap,
+  lut
+} from './image/luts';
 import {RescaleSlopeAndIntercept} from './image/rsi';
 import {RescaleLut} from './image/rescaleLut';
 import {WindowLut} from './image/windowLut';
@@ -62,6 +68,7 @@ import {i18n} from './utils/i18n';
 
 export {
   App,
+  ViewConfig,
   ViewController,
   DicomParser,
   DicomWriter,
@@ -71,6 +78,7 @@ export {
   DrawLayer,
   ViewLayer,
   Image,
+  ColourMap,
   View,
   Geometry,
   Size,
