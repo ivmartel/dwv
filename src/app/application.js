@@ -58,6 +58,43 @@ export class ViewConfig {
 }
 
 /**
+ * Application options.
+ */
+export class AppOptions {
+  /**
+   * DataId indexed object containing the data view configurations.
+   *
+   * @type {Object<string, ViewConfig[]>}
+   */
+  dataViewConfigs;
+  /**
+   * Array of layerGroup binder names.
+   *
+   * @type {string[]}
+   */
+  binders;
+  /**
+   * Tool name indexed object containing individual tool configurations.
+   *
+   * @type {Object<string, {options: string[]}>}
+   */
+  tools;
+  /**
+   * Boolean flag to trigger the first data render
+   *   after the first loaded data or not.
+   *
+   * @type {boolean}
+   */
+  viewOnFirstLoadItem;
+  /**
+   * The default chraracter set string used for DICOM parsing.
+   *
+   * @type {string}
+   */
+  defaultCharacterSet;
+}
+
+/**
  * List of ViewConfigs indexed by dataIds.
  *
  * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
@@ -80,7 +117,11 @@ export class ViewConfig {
  */
 export class App {
 
-  // app options
+  /**
+   * App options.
+   *
+   * @type {AppOptions}
+   */
   #options = null;
 
   // data controller
@@ -352,20 +393,7 @@ export class App {
   /**
    * Initialise the application.
    *
-   * @param {object} opt The application option with:
-   * - `dataViewConfigs`: data indexed object containing the data view
-   *   configurations in the form of a list of objects containing:
-   *   - divId: the HTML div id
-   *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
-   *     string (default undefined keeps the original slice order)
-   * - `binders`: array of layerGroup binders
-   * - `tools`: tool name indexed object containing individual tool
-   *   configurations in the form of a list of objects containing:
-   *   - options: array of tool options
-   * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
-   *   after the first loaded data or not
-   * - `defaultCharacterSet`: the default chraracter set string used for DICOM
-   *   parsing
+   * @param {AppOptions} opt The application options
    * @example
    * // create the dwv app
    * const app = new dwv.App();
@@ -408,7 +436,7 @@ export class App {
     this.#undoStack.addEventListener('redo', this.#fireEvent);
 
     // tools
-    if (this.#options.tools && this.#options.tools.length !== 0) {
+    if (typeof this.#options.tools !== 'undefined') {
       // setup the tool list
       const appToolList = {};
       const keys = Object.keys(this.#options.tools);
@@ -432,7 +460,7 @@ export class App {
             if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
               type = appToolList[toolName].getOptionsType();
             }
-            let appToolOptions = toolParams.options;
+            let appToolOptions;
             if (type === 'instance' || type === 'factory') {
               appToolOptions = {};
               for (let i = 0; i < toolParams.options.length; ++i) {
@@ -452,6 +480,8 @@ export class App {
                     optionName);
                 }
               }
+            } else {
+              appToolOptions = toolParams.options;
             }
             appToolList[toolName].setOptions(appToolOptions);
           }

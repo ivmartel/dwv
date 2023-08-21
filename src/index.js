@@ -1,5 +1,6 @@
 // app
 import {
+  AppOptions,
   App,
   ViewConfig
 } from './app/application';
@@ -68,6 +69,7 @@ import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
 
 export {
+  AppOptions,
   App,
   ViewConfig,
   ViewController,
