@@ -8,6 +8,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from './image';
+import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -18,11 +19,11 @@ export class ViewFactory {
   /**
    * Get an View object from the read DICOM file.
    *
-   * @param {object} dicomElements The DICOM tags.
+   * @param {Object<string, DataElement>} dataElements The DICOM tags.
    * @param {Image} image The associated image.
    * @returns {View} The new View.
    */
-  create(dicomElements, image) {
+  create(dataElements, image) {
     // view
     const view = new View(image);
 
