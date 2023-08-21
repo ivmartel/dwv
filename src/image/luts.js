@@ -130,7 +130,7 @@ export class ColourMap {
  *
  * @type {Object<string, ColourMap>}
  */
-export const lut = {
+export const luts = {
   // plain
   plain: {
     red: buildLut(id),

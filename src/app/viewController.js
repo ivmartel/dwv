@@ -14,7 +14,7 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {lut} from '../image/luts';
+import {luts} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
 // doc imports
@@ -758,11 +758,11 @@ export class ViewController {
    */
   setColourMapFromName(name) {
     // check if we have it
-    if (!lut[name]) {
+    if (!luts[name]) {
       throw new Error('Unknown colour map: \'' + name + '\'');
     }
     // enable it
-    this.setColourMap(lut[name]);
+    this.setColourMap(luts[name]);
   }
 
   /**

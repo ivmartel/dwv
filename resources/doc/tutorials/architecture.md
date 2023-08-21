@@ -52,7 +52,7 @@ canvas array data:
    as in CT)
    (see [image/windowLut.js](./WindowLut.html))
 1. Assign a colour to each values using a colour map
-   (see [image/lut.js](./global.html#lut))
+   (see [image/luts.js](./global.html#luts))
 1. You now have the canvas data!
 
 All this is materialised in the `generateImageData*` functions.

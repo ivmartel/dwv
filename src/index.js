@@ -46,7 +46,7 @@ import {Spacing} from './image/spacing';
 import {decoderScripts} from './image/decoder';
 import {
   ColourMap,
-  lut
+  luts
 } from './image/luts';
 import {RescaleSlopeAndIntercept} from './image/rsi';
 import {RescaleLut} from './image/rescaleLut';
@@ -96,7 +96,7 @@ export {
   logger,
   decoderScripts,
   customUI,
-  lut,
+  luts,
   defaultPresets,
   i18n,
   addTagsToDictionary,

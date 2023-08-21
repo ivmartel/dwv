@@ -8,14 +8,14 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  * Setup.
  */
 function onDOMContentLoaded() {
-  createImage('Plain', dwv.lut.plain);
-  createImage('InvPlain', dwv.lut.invPlain);
-  createImage('Rainbow', dwv.lut.rainbow);
-  createImage('Hot', dwv.lut.hot);
-  createImage('Hot Iron', dwv.lut.hot_iron);
-  createImage('Pet', dwv.lut.pet);
-  createImage('Hot Metal Blue', dwv.lut.hot_metal_blue);
-  createImage('Pet 20 step', dwv.lut.pet_20step);
+  createImage('Plain', dwv.luts.plain);
+  createImage('InvPlain', dwv.luts.invPlain);
+  createImage('Rainbow', dwv.luts.rainbow);
+  createImage('Hot', dwv.luts.hot);
+  createImage('Hot Iron', dwv.luts.hot_iron);
+  createImage('Pet', dwv.luts.pet);
+  createImage('Hot Metal Blue', dwv.luts.hot_metal_blue);
+  createImage('Pet 20 step', dwv.luts.pet_20step);
 }
 
 /**

@@ -1,6 +1,6 @@
 import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
-import {lut} from '../image/luts';
+import {luts} from '../image/luts';
 import {getMatrixFromName} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
@@ -1351,7 +1351,7 @@ export class App {
       opacity = 0.5;
       // set color map if non was provided
       if (typeof viewConfig.colourMap === 'undefined') {
-        view.setColourMap(lut.rainbow);
+        view.setColourMap(luts.rainbow);
       }
     }
 

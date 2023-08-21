@@ -1,5 +1,5 @@
 import {View} from './view';
-import {lut} from './luts';
+import {luts} from './luts';
 import {
   WindowCenterAndWidth,
   defaultPresets
@@ -28,7 +28,7 @@ export class ViewFactory {
 
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
-      view.setDefaultColourMap(lut.invPlain);
+      view.setDefaultColourMap(luts.invPlain);
     } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
       const paletteLut = image.getMeta().paletteLut;
       if (typeof (paletteLut) !== 'undefined') {

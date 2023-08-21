@@ -1,7 +1,7 @@
 import {Index} from '../math/index';
 import {RescaleLut} from './rescaleLut';
 import {WindowLut} from './windowLut';
-import {lut} from './luts';
+import {luts} from './luts';
 import {WindowCenterAndWidth} from './windowCenterAndWidth';
 import {generateImageDataMonochrome} from './viewMonochrome';
 import {generateImageDataPaletteColor} from './viewPaletteColor';
@@ -126,7 +126,7 @@ export class View {
    *
    * @type {ColourMap}
    */
-  #colourMap = lut.plain;
+  #colourMap = luts.plain;
 
   /**
    * Current position as a Point.
