@@ -12,10 +12,6 @@ import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
- */
-
-/**
  * {@link View} factory.
  */
 export class ViewFactory {
@@ -23,7 +19,7 @@ export class ViewFactory {
   /**
    * Get an View object from the read DICOM file.
    *
-   * @param {DataElements} dataElements The DICOM tags.
+   * @param {Object<string, DataElement>} dataElements The DICOM tags.
    * @param {Image} image The associated image.
    * @returns {View} The new View.
    */

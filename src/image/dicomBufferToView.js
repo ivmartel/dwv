@@ -13,10 +13,6 @@ import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
- */
-
-/**
  * Create a View from a DICOM buffer.
  */
 export class DicomBufferToView {
@@ -54,7 +50,7 @@ export class DicomBufferToView {
   /**
    * Get the factory associated to input DICOM elements.
    *
-   * @param {DataElements} elements The DICOM elements.
+   * @param {Object<string, DataElement>} elements The DICOM elements.
    * @returns {ImageFactory|MaskFactory} The associated factory.
    */
   #getFactory(elements) {
