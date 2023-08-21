@@ -330,7 +330,7 @@ function onDOMContentLoaded() {
     unbindAppToControls();
 
     // set config
-    _app.setDataViewConfig(configs);
+    _app.setDataViewConfigs(configs);
 
     clearDataTable();
     for (let i = 0; i < _app.getNumberOfLoadedData(); ++i) {
@@ -758,7 +758,7 @@ function addDataRow(id) {
     bindAppToControls();
   }
 
-  const dataViewConfigs = _app.getDataViewConfig();
+  const dataViewConfigs = _app.getDataViewConfigs();
   const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
   const vls = _app.getViewLayersByDataIndex(id);
