@@ -238,6 +238,7 @@ export class ViewLayer {
    * Handle an image set event.
    *
    * @param {object} event The event.
+   * @function
    */
   onimageset = (event) => {
     // event.value = [index, image]
@@ -252,6 +253,7 @@ export class ViewLayer {
    * Handle an image change event.
    *
    * @param {object} event The event.
+   * @function
    */
   onimagechange = (event) => {
     // event.value = [index]

@@ -385,6 +385,7 @@ export class App {
    *
    * @param {object} cmd The command to add.
    * @fires UndoStack#undoadd
+   * @function
    */
   addToUndoStack = (cmd) => {
     if (this.#undoStack !== null) {
@@ -573,6 +574,7 @@ export class App {
    * @fires App#loadend
    * @fires App#loaderror
    * @fires App#loadabort
+   * @function
    */
   loadFiles = (files) => {
     if (files.length === 0) {
@@ -596,6 +598,7 @@ export class App {
    * @fires App#loadend
    * @fires App#loaderror
    * @fires App#loadabort
+   * @function
    */
   loadURLs = (urls, options) => {
     if (urls.length === 0) {
@@ -610,6 +613,7 @@ export class App {
    *
    * @param {string} uri The input uri, for example: 'window.location.href'.
    * @param {object} [options] Optional url request options.
+   * @function
    */
   loadFromUri = (uri, options) => {
     const query = getUriQuery(uri);
@@ -644,6 +648,7 @@ export class App {
    * @fires App#loadend
    * @fires App#loaderror
    * @fires App#loadabort
+   * @function
    */
   loadImageObject = (data) => {
     this.#loadController.loadImageObject(data);
@@ -903,6 +908,8 @@ export class App {
    * Handle resize: fit the display to the window.
    * To be called once the image is loaded.
    * Can be connected to a window 'resize' event.
+   *
+   * @function
    */
   onResize = () => {
     this.fitToContainer();
@@ -913,6 +920,7 @@ export class App {
    *
    * @param {KeyboardEvent} event The key down event.
    * @fires App#keydown
+   * @function
    */
   onKeydown = (event) => {
     /**
@@ -938,6 +946,7 @@ export class App {
    * @param {KeyboardEvent} event The key down event.
    * @fires UndoStack#undo
    * @fires UndoStack#redo
+   * @function
    */
   defaultOnKeydown = (event) => {
     if (event.ctrlKey) {

@@ -654,6 +654,7 @@ export class LayerGroup {
    * Update layers (but not the active view layer) to a position change.
    *
    * @param {object} event The position change event.
+   * @function
    */
   updateLayersToPositionChange = (event) => {
     // pause positionchange listeners
