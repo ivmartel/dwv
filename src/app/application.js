@@ -37,22 +37,22 @@ export class ViewConfig {
    */
   divId;
   /**
-   * Orientation of the data; 'axial', 'coronal' or 'sagittal'.
+   * Optional orientation of the data; 'axial', 'coronal' or 'sagittal'.
    * If undefined, will use the data aquisition plane.
    *
-   * @type {string}
+   * @type {string|undefined}
    */
   orientation;
   /**
-   * View colour map.
+   * Optional view colour map.
    *
-   * @type {ColourMap}
+   * @type {ColourMap|undefined}
    */
   colourMap;
   /**
-   * Layer opacity; in [0, 1] range.
+   * Optional layer opacity; in [0, 1] range.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
   opacity;
 }
@@ -68,28 +68,30 @@ export class AppOptions {
    */
   dataViewConfigs;
   /**
-   * Array of layerGroup binder names.
-   *
-   * @type {string[]}
-   */
-  binders;
-  /**
    * Tool name indexed object containing individual tool configurations.
    *
    * @type {Object<string, {options: string[]}>}
    */
   tools;
   /**
-   * Boolean flag to trigger the first data render
-   *   after the first loaded data or not.
+   * Optional array of layerGroup binder names.
    *
-   * @type {boolean}
+   * @type {string[]|undefined}
+   */
+  binders;
+  /**
+   * Optional boolean flag to trigger the first data render
+   *   after the first loaded data or not. Defaults to true;
+   *
+   * @type {boolean|undefined}
    */
   viewOnFirstLoadItem;
   /**
-   * The default chraracter set string used for DICOM parsing.
+   * Optional default chraracter set string used for DICOM parsing if
+   * not passed in DICOM file.
+   * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
    *
-   * @type {string}
+   * @type {string|undefined}
    */
   defaultCharacterSet;
 }
