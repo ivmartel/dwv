@@ -1158,12 +1158,13 @@ function getBpeForVrType(vrType) {
 }
 
 /**
- * Get the DICOM elements from a DICOM json tags object.
+ * Get the DICOM elements from a 'simple' DICOM json tags object.
  * The json is a simplified version of the oficial DICOM json with
  * tag names instead of keys and direct values (no value property) for
- * simple tags.
+ * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {object} jsonTags The DICOM json tags object.
+ * @param {Object<string, any>} jsonTags The DICOM
+ *   json tags object.
  * @returns {Object<string, DataElement>} The DICOM elements.
  */
 export function getElementsFromJSONTags(jsonTags) {
