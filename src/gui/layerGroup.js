@@ -734,10 +734,21 @@ export class LayerGroup {
 
     // use first layer as base for calculating position and
     // line sizes
-    const layer0 = this.#layers[0];
-    const vc = layer0.getViewController();
+    let baseLayer;
+    for (let j = 0; j < this.#layers.length; ++j) {
+      if (this.#layers[j] instanceof ViewLayer) {
+        baseLayer = this.#layers[j];
+        break;
+      }
+    }
+    if (typeof baseLayer === 'undefined') {
+      logger.warn('No layer to show crosshair');
+      return;
+    }
+
+    const vc = baseLayer.getViewController();
     const p2D = vc.getPlanePositionFromPosition(position);
-    const displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
+    const displayPos = baseLayer.planePosToDisplay(p2D.x, p2D.y);
 
     const lineH = document.createElement('hr');
     lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
