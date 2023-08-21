@@ -22,7 +22,9 @@ export class App {
     getAddedScale(): object;
     getBaseScale(): object;
     getCurrentStackIndex(): number;
-    getDataViewConfig(): object;
+    getDataViewConfigs(): {
+        [x: string]: ViewConfig[];
+    };
     getDrawLayersByDataIndex(index: number): any[];
     getImage(index: number): Image_2;
     getJsonState(): string;
@@ -36,12 +38,12 @@ export class App {
     getStyle(): object;
     getToolboxController(): object;
     getViewLayersByDataIndex(index: number): any[];
-    init(opt: object): void;
+    init(opt: AppOptions): void;
     initWLDisplay(): void;
-    loadFiles: (files: FileList) => void;
+    loadFiles: (files: File[]) => void;
     loadFromUri: (uri: string, options?: object) => void;
     loadImageObject: (data: any[]) => void;
-    loadURLs: (urls: any[], options?: object) => void;
+    loadURLs: (urls: string[], options?: object) => void;
     onKeydown: (event: KeyboardEvent) => void;
     onResize: () => void;
     redo(): void;
@@ -51,8 +53,10 @@ export class App {
     resetDisplay(): void;
     resetLayout(): void;
     resetZoom(): void;
-    setColourMap(colourMap: string): void;
-    setDataViewConfig(configs: object): void;
+    setColourMap(name: string): void;
+    setDataViewConfigs(configs: {
+        [x: string]: ViewConfig[];
+    }): void;
     setDrawings(drawings: any[], drawingsDetails: any[]): void;
     setImage(index: number, img: Image_2): void;
     setLastImage(img: Image_2): void;
@@ -67,7 +71,29 @@ export class App {
 }
 
 // @public
+export class AppOptions {
+    binders: string[] | undefined;
+    dataViewConfigs: {
+        [x: string]: ViewConfig[];
+    };
+    defaultCharacterSet: string | undefined;
+    tools: {
+        [x: string]: {
+            options: string[];
+        };
+    };
+    viewOnFirstLoadItem: boolean | undefined;
+}
+
+// @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+// @public
+export class ColourMap {
+    blue: number[];
+    green: number[];
+    red: number[];
+}
 
 // @public
 export function createImage(elements: object): Image_2;
@@ -81,6 +107,19 @@ export function createView(elements: object, image: Image_2): View;
 // @public (undocumented)
 export namespace customUI {
     export function openRoiDialog(data: any, callback: Function): void;
+}
+
+// @public
+export class DataElement {
+    constructor(vr: string);
+    endOffset: number;
+    items: any[];
+    startOffset: number;
+    tag: Tag;
+    undefinedLength: boolean;
+    value: any[];
+    vl: number;
+    vr: string;
 }
 
 // @public
@@ -104,7 +143,9 @@ export const defaultPresets: {
 // @public
 export class DicomParser {
     getDefaultCharacterSet(): string;
-    getDicomElements(): object;
+    getDicomElements(): {
+        [x: string]: DataElement;
+    };
     parse(buffer: ArrayBuffer): void;
     setDecoderCharacterSet(characterSet: string): void;
     setDefaultCharacterSet(characterSet: string): void;
@@ -112,8 +153,13 @@ export class DicomParser {
 
 // @public
 export class DicomWriter {
-    getBuffer(dicomElements: any[]): ArrayBuffer;
-    setRules(rules: object): void;
+    getBuffer(dataElements: {
+        [x: string]: DataElement;
+    }): ArrayBuffer;
+    getElementToWrite(element: DataElement): DataElement | null;
+    setRules(rules: {
+        [x: string]: WriterRule;
+    }): void;
     setUseUnVrForPrivateSq(flag: boolean): void;
     useDefaultAnonymisationRules(): void;
     useSpecialTextEncoder(): void;
@@ -183,7 +229,11 @@ export class Geometry {
 export function getDwvVersion(): string;
 
 // @public
-export function getElementsFromJSONTags(jsonTags: object): object;
+export function getElementsFromJSONTags(jsonTags: {
+    [x: string]: any;
+}): {
+    [x: string]: DataElement;
+};
 
 // @public
 export function getOrientationName(orientation: any[]): string;
@@ -202,6 +252,9 @@ export function getTypedArray(bitsAllocated: number, pixelRepresentation: number
 
 // @public
 export function getUID(tagName: string): string;
+
+// @public
+export function hasDicomPrefix(buffer: ArrayBuffer): boolean;
 
 // @public (undocumented)
 export namespace i18n {
@@ -346,12 +399,8 @@ export namespace logger {
 }
 
 // @public
-export const lut: {
-    [x: string]: {
-        red: number[];
-        green: number[];
-        blue: number[];
-    };
+export const luts: {
+    [x: string]: ColourMap;
 };
 
 // @public
@@ -484,7 +533,9 @@ export class Tag {
 
 // @public
 export class TagValueExtractor {
-    getTime(_elements: object): number | undefined;
+    getTime(_elements: {
+        [x: string]: DataElement;
+    }): number | undefined;
 }
 
 // @public
@@ -492,7 +543,7 @@ export class Vector3D {
     constructor(x: number, y: number, z: number);
     crossProduct(vector3D: Vector3D): Vector3D;
     dotProduct(vector3D: Vector3D): number;
-    equals(rhs: object): boolean;
+    equals(rhs: Vector3D): boolean;
     getX(): number;
     getY(): number;
     getZ(): number;
@@ -511,7 +562,7 @@ export class View {
     decrementScrollIndex(silent: boolean): boolean;
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: object, index: object) => number;
-    getColourMap(): object;
+    getColourMap(): ColourMap;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
     getCurrentWindowLut(rsi?: object): WindowLut;
@@ -528,10 +579,10 @@ export class View {
     init(): void;
     removeEventListener(type: string, callback: object): void;
     setAlphaFunction(func: (value: object, index: object) => number): void;
-    setColourMap(map: object): void;
+    setColourMap(map: ColourMap): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(position: Point, silent: boolean): boolean;
-    setDefaultColourMap(map: object): void;
+    setDefaultColourMap(map: ColourMap): void;
     setImage(inImage: Image_2): void;
     setInitialIndex(): void;
     setOrientation(mat33: Matrix33): void;
@@ -540,6 +591,14 @@ export class View {
     setWindowLevelPreset(name: string, silent?: boolean): void;
     setWindowLevelPresetById(id: number, silent?: boolean): void;
     setWindowPresets(presets: object): void;
+}
+
+// @public
+export class ViewConfig {
+    colourMap: ColourMap | undefined;
+    divId: string;
+    opacity: number | undefined;
+    orientation: string | undefined;
 }
 
 // @public
@@ -558,7 +617,7 @@ export class ViewController {
     equalImageMeta(meta: object): boolean;
     generateImageData(array: ImageData, index: Index): void;
     get2DSpacing(): any[];
-    getColourMap(): object;
+    getColourMap(): ColourMap;
     getCurrentIndex(): Index;
     getCurrentOrientedIndex(): Index;
     getCurrentPosition(): Point;
@@ -588,7 +647,7 @@ export class ViewController {
     isPlaying(): boolean;
     play(): void;
     removeEventListener(type: string, callback: object): void;
-    setColourMap(colourMap: object): void;
+    setColourMap(colourMap: ColourMap): void;
     setColourMapFromName(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
@@ -661,6 +720,12 @@ export class WindowLut {
     isSigned(): boolean;
     setWindowLevel(wl: WindowCenterAndWidth): void;
     update(): void;
+}
+
+// @public
+export class WriterRule {
+    action: string;
+    value: any;
 }
 
 // (No @packageDocumentation comment for this package)

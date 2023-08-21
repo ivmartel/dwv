@@ -7,6 +7,11 @@
 export declare function addTagsToDictionary(group: string, tags: object): void;
 
 /**
+ * List of ViewConfigs indexed by dataIds.
+ *
+ * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
+ */
+/**
  * Main application class.
  *
  * @example
@@ -153,25 +158,13 @@ export declare class App {
      *
      * @param {object} cmd The command to add.
      * @fires UndoStack#undoadd
+     * @function
      */
     addToUndoStack: (cmd: object) => void;
     /**
      * Initialise the application.
      *
-     * @param {object} opt The application option with:
-     * - `dataViewConfigs`: data indexed object containing the data view
-     *   configurations in the form of a list of objects containing:
-     *   - divId: the HTML div id
-     *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
-     *     string (default undefined keeps the original slice order)
-     * - `binders`: array of layerGroup binders
-     * - `tools`: tool name indexed object containing individual tool
-     *   configurations in the form of a list of objects containing:
-     *   - options: array of tool options
-     * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
-     *   after the first loaded data or not
-     * - `defaultCharacterSet`: the default chraracter set string used for DICOM
-     *   parsing
+     * @param {AppOptions} opt The application options
      * @example
      * // create the dwv app
      * const app = new dwv.App();
@@ -199,7 +192,7 @@ export declare class App {
      *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
      * ]);
      */
-    init(opt: object): void;
+    init(opt: AppOptions): void;
     /**
      * Reset the application.
      */
@@ -227,19 +220,20 @@ export declare class App {
     /**
      * Load a list of files. Can be image files or a state file.
      *
-     * @param {FileList} files The list of files to load.
+     * @param {File[]} files The list of files to load.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
      * @fires App#loaderror
      * @fires App#loadabort
+     * @function
      */
-    loadFiles: (files: FileList) => void;
+    loadFiles: (files: File[]) => void;
     /**
      * Load a list of URLs. Can be image files or a state file.
      *
-     * @param {Array} urls The list of urls to load.
+     * @param {string[]} urls The list of urls to load.
      * @param {object} [options] The options object, can contain:
      *  - requestHeaders: an array of {name, value} to use as request headers
      *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
@@ -250,13 +244,15 @@ export declare class App {
      * @fires App#loadend
      * @fires App#loaderror
      * @fires App#loadabort
+     * @function
      */
-    loadURLs: (urls: any[], options?: object) => void;
+    loadURLs: (urls: string[], options?: object) => void;
     /**
      * Load from an input uri.
      *
      * @param {string} uri The input uri, for example: 'window.location.href'.
      * @param {object} [options] Optional url request options.
+     * @function
      */
     loadFromUri: (uri: string, options?: object) => void;
     /**
@@ -270,6 +266,7 @@ export declare class App {
      * @fires App#loadend
      * @fires App#loaderror
      * @fires App#loadabort
+     * @function
      */
     loadImageObject: (data: any[]) => void;
     /**
@@ -289,15 +286,20 @@ export declare class App {
      * Get the data view config.
      * Carefull, returns a reference, do not modify without resetting.
      *
-     * @returns {object} The configuration list.
+     * @returns {Object<string, ViewConfig[]>} The configuration list.
      */
-    getDataViewConfig(): object;
+    getDataViewConfigs(): {
+        [x: string]: ViewConfig[];
+    };
     /**
-     * Set the data view configuration (see the init options for details).
+     * Set the data view configuration.
+     * Resets the stage and recreates all the views.
      *
-     * @param {object} configs The configuration list.
+     * @param {Object<string, ViewConfig[]>} configs The configuration list.
      */
-    setDataViewConfig(configs: object): void;
+    setDataViewConfigs(configs: {
+        [x: string]: ViewConfig[];
+    }): void;
     /**
      * Set the layer groups binders.
      *
@@ -354,6 +356,8 @@ export declare class App {
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
      * Can be connected to a window 'resize' event.
+     *
+     * @function
      */
     onResize: () => void;
     /**
@@ -361,6 +365,7 @@ export declare class App {
      *
      * @param {KeyboardEvent} event The key down event.
      * @fires App#keydown
+     * @function
      */
     onKeydown: (event: KeyboardEvent) => void;
     /**
@@ -375,6 +380,7 @@ export declare class App {
      * @param {KeyboardEvent} event The key down event.
      * @fires UndoStack#undo
      * @fires UndoStack#redo
+     * @function
      */
     defaultOnKeydown: (event: KeyboardEvent) => void;
     /**
@@ -388,9 +394,9 @@ export declare class App {
     /**
      * Set the colour map.
      *
-     * @param {string} colourMap The colour map name.
+     * @param {string} name The colour map name.
      */
-    setColourMap(colourMap: string): void;
+    setColourMap(name: string): void;
     /**
      * Set the window/level preset.
      *
@@ -437,6 +443,51 @@ export declare class App {
 }
 
 /**
+ * Application options.
+ */
+export declare class AppOptions {
+    /**
+     * DataId indexed object containing the data view configurations.
+     *
+     * @type {Object<string, ViewConfig[]>}
+     */
+    dataViewConfigs: {
+        [x: string]: ViewConfig[];
+    };
+    /**
+     * Tool name indexed object containing individual tool configurations.
+     *
+     * @type {Object<string, {options: string[]}>}
+     */
+    tools: {
+        [x: string]: {
+            options: string[];
+        };
+    };
+    /**
+     * Optional array of layerGroup binder names.
+     *
+     * @type {string[]|undefined}
+     */
+    binders: string[] | undefined;
+    /**
+     * Optional boolean flag to trigger the first data render
+     *   after the first loaded data or not. Defaults to true;
+     *
+     * @type {boolean|undefined}
+     */
+    viewOnFirstLoadItem: boolean | undefined;
+    /**
+     * Optional default chraracter set string used for DICOM parsing if
+     * not passed in DICOM file.
+     * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+     *
+     * @type {string|undefined}
+     */
+    defaultCharacterSet: string | undefined;
+}
+
+/**
  * Build a multipart message.
  * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
  * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
@@ -447,6 +498,31 @@ export declare class App {
  * @returns {Uint8Array} The full multipart message.
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+/**
+ * Colour map: red, green and blue components
+ * to associate with intensity values.
+ */
+export declare class ColourMap {
+    /**
+     * Red component: 256 values in the [0, 255] range.
+     *
+     * @type {number[]}
+     */
+    red: number[];
+    /**
+     * Green component: 256 values in the [0, 255] range.
+     *
+     * @type {number[]}
+     */
+    green: number[];
+    /**
+     * Blue component: 256 values in the [0, 255] range.
+     *
+     * @type {number[]}
+     */
+    blue: number[];
+}
 
 /**
  * Create an Image from DICOM elements.
@@ -481,6 +557,64 @@ export declare namespace customUI {
      * @param {Function} callback The callback to launch on dialogue exit.
      */
     export function openRoiDialog(data: any, callback: Function): void;
+}
+
+/**
+ * DICOM data element.
+ */
+export declare class DataElement {
+    /**
+     * @param {string} vr The element VR (Value Representation).
+     */
+    constructor(vr: string);
+    /**
+     * The element Value Representation.
+     *
+     * @type {string}
+     */
+    vr: string;
+    /**
+     * The element value.
+     *
+     * @type {Array}
+     */
+    value: any[];
+    /**
+     * The element dicom tag.
+     *
+     * @type {Tag}
+     */
+    tag: Tag;
+    /**
+     * The element Value Length.
+     *
+     * @type {number}
+     */
+    vl: number;
+    /**
+     * Flag to know if defined or undefined sequence length.
+     *
+     * @type {boolean}
+     */
+    undefinedLength: boolean;
+    /**
+     * The element start offset.
+     *
+     * @type {number}
+     */
+    startOffset: number;
+    /**
+     * The element end offset.
+     *
+     * @type {number}
+     */
+    endOffset: number;
+    /**
+     * The sequence items.
+     *
+     * @type {Array}
+     */
+    items: any[];
 }
 
 /**
@@ -553,14 +687,16 @@ export declare class DicomParser {
      */
     setDecoderCharacterSet(characterSet: string): void;
     /**
-     * Get the raw DICOM data elements.
+     * Get the DICOM data elements.
      *
-     * @returns {object} The raw DICOM elements.
+     * @returns {Object<string, DataElement>} The data elements.
      */
-    getDicomElements(): object;
+    getDicomElements(): {
+        [x: string]: DataElement;
+    };
     /**
      * Parse the complete DICOM file (given as input to the class).
-     * Fills in the member object 'dicomElements'.
+     * Fills in the member object 'dataElements'.
      *
      * @param {ArrayBuffer} buffer The input array buffer.
      */
@@ -571,16 +707,27 @@ export declare class DicomParser {
 /**
  * DICOM writer.
  *
- * Example usage:
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
  *   const parser = new DicomParser();
- *   parser.parse(this.response);
- *
+ *   parser.parse(event.target.response);
+ *   // create writer with parser data elements
  *   const writer = new DicomWriter(parser.getDicomElements());
+ *   // create modified buffer and put it in a Blol
  *   const blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *
+ *   // example download link
  *   const element = document.getElementById("download");
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export declare class DicomWriter {
     /**
@@ -591,10 +738,16 @@ export declare class DicomWriter {
     setUseUnVrForPrivateSq(flag: boolean): void;
     /**
      * Set the writing rules.
+     * List of writer rules indexed by either `default`, tagName or groupName.
+     * Each DICOM element will be checked to see if a rule is applicable.
+     * First checked by tagName and then by groupName,
+     * if nothing is found the default rule is applied.
      *
-     * @param {object} rules The input rules.
+     * @param {Object<string, WriterRule>} rules The input rules.
      */
-    setRules(rules: object): void;
+    setRules(rules: {
+        [x: string]: WriterRule;
+    }): void;
     /**
      * Use a TextEncoder instead of the default text decoder.
      */
@@ -604,12 +757,22 @@ export declare class DicomWriter {
      */
     useDefaultAnonymisationRules(): void;
     /**
+     * Get the element to write according to the class rules.
+     * Priority order: tagName, groupName, default.
+     *
+     * @param {DataElement} element The element to check
+     * @returns {DataElement|null} The element to write, can be null.
+     */
+    getElementToWrite(element: DataElement): DataElement | null;
+    /**
      * Get the ArrayBuffer corresponding to input DICOM elements.
      *
-     * @param {Array} dicomElements The wrapped elements to write.
+     * @param {Object<string, DataElement>} dataElements The elements to write.
      * @returns {ArrayBuffer} The elements as a buffer.
      */
-    getBuffer(dicomElements: any[]): ArrayBuffer;
+    getBuffer(dataElements: {
+        [x: string]: DataElement;
+    }): ArrayBuffer;
     #private;
 }
 
@@ -985,6 +1148,12 @@ export declare class Geometry {
 }
 
 /**
+ * List of DICOM data elements indexed via a 8 character string formed from
+ * the group and element numbers.
+ *
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+/**
  * Get the version of the library.
  *
  * @returns {string} The version of the library.
@@ -992,15 +1161,20 @@ export declare class Geometry {
 export declare function getDwvVersion(): string;
 
 /**
- * Get the DICOM elements from a DICOM json tags object.
+ * Get the DICOM elements from a 'simple' DICOM json tags object.
  * The json is a simplified version of the oficial DICOM json with
  * tag names instead of keys and direct values (no value property) for
- * simple tags.
+ * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {object} jsonTags The DICOM json tags object.
- * @returns {object} The DICOM elements.
+ * @param {Object<string, any>} jsonTags The DICOM
+ *   json tags object.
+ * @returns {Object<string, DataElement>} The DICOM elements.
  */
-export declare function getElementsFromJSONTags(jsonTags: object): object;
+export declare function getElementsFromJSONTags(jsonTags: {
+    [x: string]: any;
+}): {
+    [x: string]: DataElement;
+};
 
 /**
  * Get the name of an image orientation patient.
@@ -1058,6 +1232,16 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
  */
 export declare function getUID(tagName: string): string;
 
+/**
+ * Check that an input buffer includes the DICOM prefix 'DICM'
+ * after the 128 bytes preamble.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *
+ * @param {ArrayBuffer} buffer The buffer to check.
+ * @returns {boolean} True if the buffer includes the prefix.
+ */
+export declare function hasDicomPrefix(buffer: ArrayBuffer): boolean;
+
 export declare namespace i18n {
     /**
      * Get the translated text.
@@ -1082,7 +1266,7 @@ export declare namespace i18n {
  *   const dicomParser = new dwv.DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = dwv.createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -1692,6 +1876,7 @@ export declare class LayerGroup {
      * Update layers (but not the active view layer) to a position change.
      *
      * @param {object} event The position change event.
+     * @function
      */
     updateLayersToPositionChange: (event: object) => void;
     /**
@@ -1796,14 +1981,10 @@ export declare namespace logger {
 /**
  * List of available lookup tables (lut).
  *
- * @type {Object<string, {red: number[], green: number[], blue: number[]}>}
+ * @type {Object<string, ColourMap>}
  */
-export declare const lut: {
-    [x: string]: {
-        red: number[];
-        green: number[];
-        blue: number[];
-    };
+export declare const luts: {
+    [x: string]: ColourMap;
 };
 
 /**
@@ -2470,10 +2651,12 @@ export declare class TagValueExtractor {
     /**
      * Get the time.
      *
-     * @param {object} _elements The DICOM elements.
+     * @param {Object<string, DataElement>} _elements The DICOM elements.
      * @returns {number|undefined} The time value if available.
      */
-    getTime(_elements: object): number | undefined;
+    getTime(_elements: {
+        [x: string]: DataElement;
+    }): number | undefined;
 }
 
 /**
@@ -2507,10 +2690,10 @@ export declare class Vector3D {
     /**
      * Check for Vector3D equality.
      *
-     * @param {object} rhs The other vector to compare to.
+     * @param {Vector3D} rhs The other vector to compare to.
      * @returns {boolean} True if both vectors are equal.
      */
-    equals(rhs: object): boolean;
+    equals(rhs: Vector3D): boolean;
     /**
      * Get a string representation of the Vector3D.
      *
@@ -2681,9 +2864,9 @@ export declare class View {
     /**
      * Set the default colour map.
      *
-     * @param {object} map The colour map.
+     * @param {ColourMap} map The colour map.
      */
-    setDefaultColourMap(map: object): void;
+    setDefaultColourMap(map: ColourMap): void;
     /**
      * Add window presets to the existing ones.
      *
@@ -2693,16 +2876,16 @@ export declare class View {
     /**
      * Get the colour map of the image.
      *
-     * @returns {object} The colour map of the image.
+     * @returns {ColourMap} The colour map of the image.
      */
-    getColourMap(): object;
+    getColourMap(): ColourMap;
     /**
      * Set the colour map of the image.
      *
-     * @param {object} map The colour map of the image.
+     * @param {ColourMap} map The colour map of the image.
      * @fires View#colourchange
      */
-    setColourMap(map: object): void;
+    setColourMap(map: ColourMap): void;
     /**
      * Get the current position.
      *
@@ -2845,6 +3028,38 @@ export declare class View {
      */
     incrementScrollIndex(silent: boolean): boolean;
     #private;
+}
+
+/**
+ * View configuration: mainly defines the ´divId´
+ * of the associated HTML div.
+ */
+export declare class ViewConfig {
+    /**
+     * Associated HTML div id.
+     *
+     * @type {string}
+     */
+    divId: string;
+    /**
+     * Optional orientation of the data; 'axial', 'coronal' or 'sagittal'.
+     * If undefined, will use the data aquisition plane.
+     *
+     * @type {string|undefined}
+     */
+    orientation: string | undefined;
+    /**
+     * Optional view colour map.
+     *
+     * @type {ColourMap|undefined}
+     */
+    colourMap: ColourMap | undefined;
+    /**
+     * Optional layer opacity; in [0, 1] range.
+     *
+     * @type {number|undefined}
+     */
+    opacity: number | undefined;
 }
 
 /**
@@ -3166,15 +3381,15 @@ export declare class ViewController {
     /**
      * Get the colour map.
      *
-     * @returns {object} The colour map.
+     * @returns {ColourMap} The colour map.
      */
-    getColourMap(): object;
+    getColourMap(): ColourMap;
     /**
      * Set the colour map.
      *
-     * @param {object} colourMap The colour map.
+     * @param {ColourMap} colourMap The colour map.
      */
-    setColourMap(colourMap: object): void;
+    setColourMap(colourMap: ColourMap): void;
     /**
      * @callback alphaFn@callback alphaFn
      * @param {object} value The pixel value.
@@ -3256,12 +3471,14 @@ export declare class ViewLayer {
      * Handle an image set event.
      *
      * @param {object} event The event.
+     * @function
      */
     onimageset: (event: object) => void;
     /**
      * Handle an image change event.
      *
      * @param {object} event The event.
+     * @function
      */
     onimagechange: (event: object) => void;
     /**
@@ -3565,6 +3782,24 @@ export declare class WindowLut {
      */
     getValue(offset: number): number;
     #private;
+}
+
+/**
+ * Writer rule.
+ */
+export declare class WriterRule {
+    /**
+     * Rule action: `copy`, `remove`, `clear` or `replace`.
+     *
+     * @type {string}
+     */
+    action: string;
+    /**
+     * Value to use for replace action.
+     *
+     * @type {any}
+     */
+    value: any;
 }
 
 export { }
