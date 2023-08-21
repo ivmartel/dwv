@@ -17,7 +17,8 @@ import {
 import {
   getUID,
   getElementsFromJSONTags,
-  DicomWriter
+  DicomWriter,
+  WriterRule
 } from './dicom/dicomWriter';
 import {DataElement} from './dicom/dataElement';
 import {TagValueExtractor} from './dicom/dicomElementsWrapper';
@@ -76,6 +77,7 @@ export {
   DataElement,
   DicomParser,
   DicomWriter,
+  WriterRule,
   TagValueExtractor,
   Tag,
   LayerGroup,

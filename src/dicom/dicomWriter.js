@@ -40,6 +40,24 @@ function getDwvUIDPrefix() {
 let _uidCount = 0;
 
 /**
+ * Writer rule.
+ */
+export class WriterRule {
+  /**
+   * Rule action: `copy`, `remove`, `clear` or `replace`.
+   *
+   * @type {string}
+   */
+  action;
+  /**
+   * Value to use for replace action.
+   *
+   * @type {any}
+   */
+  value;
+}
+
+/**
  * Get a UID for a DICOM tag.
  * Note: Use https://github.com/uuidjs/uuid?
  *
@@ -304,7 +322,7 @@ export class DicomWriter {
   /**
    * Default rules: just copy
    *
-   * @type {Object<string, {action: string, value: any}>}
+   * @type {Object<string, WriterRule>}
    */
   #defaultRules = {
     default: {action: 'copy', value: null}
@@ -313,22 +331,18 @@ export class DicomWriter {
   /**
    * Writing rules.
    *
-   * @type {Object<string, {action: string, value: any}>}
+   * @type {Object<string, WriterRule>}
    */
   #rules = this.#defaultRules;
 
   /**
    * Set the writing rules.
-   * Set of objects as:
-   *   `name : { action: 'actionName', value: 'optionalValue' }`
-   * The names are either `default`, tagName or groupName.
+   * List of writer rules indexed by either `default`, tagName or groupName.
    * Each DICOM element will be checked to see if a rule is applicable.
    * First checked by tagName and then by groupName,
    * if nothing is found the default rule is applied.
-   * Possible action names are: `copy`, `remove`, `clear`, `replace`.
    *
-   * @param {Object<string, {action: string, value: any}>} rules
-   *   The input rules.
+   * @param {Object<string, WriterRule>} rules The input rules.
    */
   setRules(rules) {
     this.#rules = rules;
