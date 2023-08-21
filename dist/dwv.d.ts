@@ -554,7 +554,7 @@ export declare const defaultPresets: {
 };
 
 export declare namespace defaults {
-    let labelText: {
+    const labelText: {
         [x: string]: {
             [x: string]: string;
         };
@@ -1841,13 +1841,13 @@ export declare class LayerGroup {
 
 export declare namespace logger {
     export namespace levels {
-        let TRACE: number;
-        let DEBUG: number;
-        let INFO: number;
-        let WARN: number;
-        let ERROR: number;
+        const TRACE: number;
+        const DEBUG: number;
+        const INFO: number;
+        const WARN: number;
+        const ERROR: number;
     }
-    let level: number;
+    const level: number;
     export function trace(msg: string): void;
     export function debug(msg: string): void;
     export function info(msg: string): void;

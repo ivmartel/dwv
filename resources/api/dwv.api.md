@@ -111,7 +111,7 @@ export const defaultPresets: {
 
 // @public (undocumented)
 export namespace defaults {
-    let // (undocumented)
+    const // (undocumented)
     labelText: {
         [x: string]: {
             [x: string]: string;
@@ -339,7 +339,7 @@ export class LayerGroup {
 export namespace logger {
     // (undocumented)
     export function debug(msg: string): void;
-    let // (undocumented)
+    const // (undocumented)
     level: number;
     // (undocumented)
     export function error(msg: string): void;
@@ -347,15 +347,15 @@ export namespace logger {
     export function info(msg: string): void;
     // (undocumented)
     export namespace levels {
-        let // (undocumented)
+        const // (undocumented)
         TRACE: number;
-        let // (undocumented)
+        const // (undocumented)
         DEBUG: number;
-        let // (undocumented)
+        const // (undocumented)
         INFO: number;
-        let // (undocumented)
+        const // (undocumented)
         WARN: number;
-        let // (undocumented)
+        const // (undocumented)
         ERROR: number;
     }
     // (undocumented)
