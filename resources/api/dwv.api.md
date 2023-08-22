@@ -10,7 +10,7 @@ export function addTagsToDictionary(group: string, tags: object): void;
 // @public
 export class App {
     abortLoad(): void;
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     addNewImage(image: Image_2, meta: object): number;
     addToUndoStack: (cmd: object) => void;
     applyJsonState(jsonState: string): void;
@@ -47,7 +47,7 @@ export class App {
     onKeydown: (event: KeyboardEvent) => void;
     onResize: () => void;
     redo(): void;
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     render(dataIndex: number): void;
     reset(): void;
     resetDisplay(): void;
@@ -72,15 +72,16 @@ export class App {
 
 // @public
 export class AppOptions {
+    constructor(dataViewConfigs: {
+        [x: string]: ViewConfig[];
+    });
     binders: string[] | undefined;
     dataViewConfigs: {
         [x: string]: ViewConfig[];
     };
     defaultCharacterSet: string | undefined;
     tools: {
-        [x: string]: {
-            options: string[];
-        };
+        [x: string]: ToolConfig;
     };
     viewOnFirstLoadItem: boolean | undefined;
 }
@@ -168,7 +169,7 @@ export class DicomWriter {
 // @public
 export class DrawLayer {
     constructor(containerDiv: HTMLDivElement);
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
     bindInteraction(): void;
@@ -187,7 +188,7 @@ export class DrawLayer {
     initialise(size: object, spacing: object, index: number): void;
     isGroupVisible(id: string): boolean;
     isVisible(): boolean;
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setOffset(newOffset: object): void;
@@ -264,7 +265,7 @@ export namespace i18n {
 // @public
 class Image_2 {
     constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: any[]);
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     appendFrame(time: number, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
     appendSlice(rhs: Image_2): void;
@@ -300,7 +301,7 @@ class Image_2 {
     hasValues(values: any[]): any[];
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     setAtOffsets(offsets: any[], value: object): void;
     setAtOffsetsAndGetOriginals(offsetsLists: any[], value: object): any[];
     setAtOffsetsWithIterator(offsetsLists: any[], value: object | any[]): void;
@@ -314,24 +315,24 @@ export { Image_2 as Image }
 
 // @public
 export class Index {
-    constructor(values: any[]);
+    constructor(values: number[]);
     add(rhs: Index): Index;
     canCompare(rhs: Index): boolean;
-    compare(rhs: Index): any[];
+    compare(rhs: Index): number[];
     equals(rhs: Index): boolean;
     get(i: number): number | undefined;
-    getValues(): any[];
+    getValues(): number[];
     getWithNew2D(i: number, j: number): Index;
     length(): number;
     toString(): string;
-    toStringId(dims?: any[]): string;
+    toStringId(dims?: number[]): string;
 }
 
 // @public
 export class LayerGroup {
     constructor(containerDiv: HTMLElement);
     addDrawLayer(): DrawLayer;
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     addScale(scaleStep: number, center: Point3D): void;
     addTranslation(translation: object): void;
     addViewLayer(): ViewLayer;
@@ -354,7 +355,7 @@ export class LayerGroup {
     getTargetOrientation(): Matrix33;
     getViewDataIndices(): any[];
     getViewLayersByDataIndex(index: number): ViewLayer[];
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveDrawLayer(index: number): void;
@@ -424,14 +425,14 @@ export class Matrix33 {
 
 // @public
 export class Point {
-    constructor(values: any[]);
+    constructor(values: number[]);
     add(rhs: Point): Point;
     canCompare(rhs: Point): boolean;
-    compare(rhs: Point): any[];
+    compare(rhs: Point): number[];
     equals(rhs: Point): boolean;
     get(i: number): number;
     get3D(): Point3D;
-    getValues(): any[];
+    getValues(): number[];
     length(): number;
     mergeWith3D(rhs: Point3D): Point;
     toString(): string;
@@ -539,6 +540,12 @@ export class TagValueExtractor {
 }
 
 // @public
+export class ToolConfig {
+    constructor(options?: string[]);
+    options: string[] | undefined;
+}
+
+// @public
 export class Vector3D {
     constructor(x: number, y: number, z: number);
     crossProduct(vector3D: Vector3D): Vector3D;
@@ -554,7 +561,7 @@ export class Vector3D {
 // @public
 export class View {
     constructor(image: Image_2);
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     addWindowLut(wlut: WindowLut): void;
     addWindowPresets(presets: object): void;
     canSetPosition(position: Point): boolean;
@@ -577,7 +584,7 @@ export class View {
     incrementIndex(dim: number, silent: boolean): boolean;
     incrementScrollIndex(silent: boolean): boolean;
     init(): void;
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: object, index: object) => number): void;
     setColourMap(map: ColourMap): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
@@ -595,6 +602,7 @@ export class View {
 
 // @public
 export class ViewConfig {
+    constructor(divId: string);
     colourMap: ColourMap | undefined;
     divId: string;
     opacity: number | undefined;
@@ -604,7 +612,7 @@ export class ViewConfig {
 // @public
 export class ViewController {
     constructor(view: View, index: number);
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     addWindowLevelPresets(presets: object): object;
     applyHiddenSegments(): void;
     canQuantifyImage(): boolean;
@@ -646,7 +654,7 @@ export class ViewController {
     isMask(): boolean;
     isPlaying(): boolean;
     play(): void;
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     setColourMap(colourMap: ColourMap): void;
     setColourMapFromName(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
@@ -662,7 +670,7 @@ export class ViewController {
 // @public
 export class ViewLayer {
     constructor(containerDiv: HTMLElement);
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
     bindInteraction(): void;
@@ -687,7 +695,7 @@ export class ViewLayer {
     onimagechange: (event: object) => void;
     onimageset: (event: object) => void;
     planePosToDisplay(x: number, y: number): object;
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
     setOffset(newOffset: object): void;

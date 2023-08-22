@@ -18,9 +18,10 @@ export declare function addTagsToDictionary(group: string, tags: object): void;
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * app.init({
- *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
- * });
+ * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new AppOptions(viewConfigs);
+ * app.init(options);
  * // load dicom data
  * app.loadURLs([
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
@@ -169,10 +170,11 @@ export declare class App {
      * // create the dwv app
      * const app = new dwv.App();
      * // initialise
-     * app.init({
-     *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
-     *   viewOnFirstLoadItem: false
-     * });
+     * const viewConfig0 = new ViewConfig('layerGroup0');
+     * const viewConfigs = {'*': [viewConfig0]};
+     * const options = new AppOptions(viewConfigs);
+     * options.viewOnFirstLoadItem = false;
+     * app.init(options);
      * // render button
      * const button = document.createElement('button');
      * button.id = 'render';
@@ -205,18 +207,18 @@ export declare class App {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Load a list of files. Can be image files or a state file.
      *
@@ -447,6 +449,13 @@ export declare class App {
  */
 export declare class AppOptions {
     /**
+     * @param {Object<string, ViewConfig[]>} dataViewConfigs DataId
+     *   indexed object containing the data view configurations.
+     */
+    constructor(dataViewConfigs: {
+        [x: string]: ViewConfig[];
+    });
+    /**
      * DataId indexed object containing the data view configurations.
      *
      * @type {Object<string, ViewConfig[]>}
@@ -457,12 +466,10 @@ export declare class AppOptions {
     /**
      * Tool name indexed object containing individual tool configurations.
      *
-     * @type {Object<string, {options: string[]}>}
+     * @type {Object<string, ToolConfig>}
      */
     tools: {
-        [x: string]: {
-            options: string[];
-        };
+        [x: string]: ToolConfig;
     };
     /**
      * Optional array of layerGroup binder names.
@@ -950,18 +957,18 @@ export declare class DrawLayer {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 
@@ -1485,18 +1492,18 @@ declare class Image_2 {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Set the inner buffer values at given offsets.
      *
@@ -1638,9 +1645,9 @@ export { Image_2 as Image }
  */
 export declare class Index {
     /**
-     * @param {Array} values The index values.
+     * @param {number[]} values The index values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get the index value at the given array index.
      *
@@ -1663,9 +1670,9 @@ export declare class Index {
     /**
      * Get the values of this index.
      *
-     * @returns {Array} The array of values.
+     * @returns {number[]} The array of values.
      */
-    getValues(): any[];
+    getValues(): number[];
     /**
      * Check if the input index can be compared to this one.
      *
@@ -1684,9 +1691,9 @@ export declare class Index {
      * Compare indices and return different dimensions.
      *
      * @param {Index} rhs The index to compare to.
-     * @returns {Array} The list of different dimensions.
+     * @returns {number[]} The list of different dimensions.
      */
-    compare(rhs: Index): any[];
+    compare(rhs: Index): number[];
     /**
      * Add another index to this one.
      *
@@ -1705,10 +1712,10 @@ export declare class Index {
     /**
      * Get a string id from the index values in the form of: '#0-1_#1-2'.
      *
-     * @param {Array} [dims] Optional list of dimensions to use.
+     * @param {number[]} [dims] Optional list of dimensions to use.
      * @returns {string} The string id.
      */
-    toStringId(dims?: any[]): string;
+    toStringId(dims?: number[]): string;
     #private;
 }
 
@@ -1947,18 +1954,18 @@ export declare class LayerGroup {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 
@@ -2102,9 +2109,9 @@ export declare class Matrix33 {
  */
 export declare class Point {
     /**
-     * @param {Array} values The point values.
+     * @param {number[]} values The point values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get the index value at the given array index.
      *
@@ -2127,9 +2134,9 @@ export declare class Point {
     /**
      * Get the values of this index.
      *
-     * @returns {Array} The array of values.
+     * @returns {number[]} The array of values.
      */
-    getValues(): any[];
+    getValues(): number[];
     /**
      * Check if the input point can be compared to this one.
      *
@@ -2148,9 +2155,9 @@ export declare class Point {
      * Compare points and return different dimensions.
      *
      * @param {Point} rhs The point to compare to.
-     * @returns {Array} The list of different dimensions.
+     * @returns {number[]} The list of different dimensions.
      */
-    compare(rhs: Point): any[];
+    compare(rhs: Point): number[];
     /**
      * Get the 3D part of this point.
      *
@@ -2660,6 +2667,24 @@ export declare class TagValueExtractor {
 }
 
 /**
+ * Tool configuration.
+ */
+export declare class ToolConfig {
+    /**
+     * @param {string[]} [options] Optional tool options.
+     */
+    constructor(options?: string[]);
+    /**
+     * Optional tool options.
+     * For Draw: list of shape names.
+     * For Filter: list of filter names.
+     *
+     * @type {string[]|undefined}
+     */
+    options: string[] | undefined;
+}
+
+/**
  * Immutable 3D vector.
  */
 export declare class Vector3D {
@@ -2959,18 +2984,18 @@ export declare class View {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -3035,6 +3060,10 @@ export declare class View {
  * of the associated HTML div.
  */
 export declare class ViewConfig {
+    /**
+     * @param {string} divId The associated HTML div id.
+     */
+    constructor(divId: string);
     /**
      * Associated HTML div id.
      *
@@ -3412,18 +3441,18 @@ export declare class ViewController {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 
@@ -3628,18 +3657,18 @@ export declare class ViewLayer {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Set the current position.
      *
