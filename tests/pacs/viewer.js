@@ -118,14 +118,12 @@ function viewerSetup() {
   };
 
   // app config
-  const config = {
-    viewOnFirstLoadItem: viewOnFirstLoadItem,
-    dataViewConfigs: dataViewConfigs,
-    tools: _tools
-  };
+  const options = new dwv.AppOptions(dataViewConfigs);
+  options.tools = _tools;
+  options.viewOnFirstLoadItem = viewOnFirstLoadItem;
   // app
   _app = new dwv.App();
-  _app.init(config);
+  _app.init(options);
 
   // bind events
   _app.addEventListener('loaderror', function (event) {
@@ -281,16 +279,16 @@ function viewerSetup() {
     _app.onResize();
   });
 
-  const options = {};
+  const uriOptions = {};
   // special dicom web request header
   if (_dicomWeb) {
-    options.requestHeaders = [{
+    uriOptions.requestHeaders = [{
       name: 'Accept',
       value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
     }];
   }
   // load from window location
-  _app.loadFromUri(window.location.href, options);
+  _app.loadFromUri(window.location.href, uriOptions);
 }
 
 /**

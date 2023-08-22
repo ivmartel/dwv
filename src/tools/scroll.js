@@ -14,10 +14,11 @@ import {App} from '../app/application';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * app.init({
- *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
- *   tools: {Scroll: {}}
- * });
+ * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {Scroll: new ToolConfig()};
+ * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
  *   app.setTool('Scroll');
@@ -32,10 +33,11 @@ import {App} from '../app/application';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * app.init({
- *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
- *   tools: {Scroll: {}}
- * });
+ * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {Scroll: new ToolConfig()};
+ * app.init(options);
  * // create range
  * const range = document.createElement('input');
  * range.type = 'range';

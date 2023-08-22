@@ -44,12 +44,12 @@ test.addDataLine = function (id, fileroot, doc) {
   mainDiv.appendChild(dwvDiv);
 
   // dwv application
-  const config = {
-    dataViewConfigs: {0: [{divId: layConDiv.id}]},
-  };
+  const viewConfig0 = new dwv.ViewConfig(layConDiv.id);
+  const viewConfigs = {0: [viewConfig0]};
+  const options = new dwv.AppOptions(viewConfigs);
   const url = '../data/' + fileroot + '.dcm';
   const app = new dwv.App();
-  app.init(config);
+  app.init(options);
   // display loading time
   const listener = function (event) {
     const timerLabel = 'load-data[' + fileroot + ']';
