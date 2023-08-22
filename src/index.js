@@ -2,7 +2,8 @@
 import {
   AppOptions,
   App,
-  ViewConfig
+  ViewConfig,
+  ToolConfig
 } from './app/application';
 import {ViewController} from './app/viewController';
 // dicom
@@ -73,6 +74,7 @@ export {
   AppOptions,
   App,
   ViewConfig,
+  ToolConfig,
   ViewController,
   DataElement,
   DicomParser,

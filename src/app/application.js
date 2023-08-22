@@ -55,6 +55,34 @@ export class ViewConfig {
    * @type {number|undefined}
    */
   opacity;
+
+  /**
+   * @param {string} divId The associated HTML div id.
+   */
+  constructor(divId) {
+    this.divId = divId;
+  }
+}
+
+/**
+ * Tool configuration.
+ */
+export class ToolConfig {
+  /**
+   * Optional tool options.
+   * For Draw: list of shape names.
+   * For Filter: list of filter names.
+   *
+   * @type {string[]|undefined}
+   */
+  options;
+
+  /**
+   * @param {string[]} [options] Optional tool options.
+   */
+  constructor(options) {
+    this.options = options;
+  }
 }
 
 /**
@@ -70,7 +98,7 @@ export class AppOptions {
   /**
    * Tool name indexed object containing individual tool configurations.
    *
-   * @type {Object<string, {options: string[]}>}
+   * @type {Object<string, ToolConfig>}
    */
   tools;
   /**
@@ -94,6 +122,14 @@ export class AppOptions {
    * @type {string|undefined}
    */
   defaultCharacterSet;
+
+  /**
+   * @param {Object<string, ViewConfig[]>} dataViewConfigs DataId
+   *   indexed object containing the data view configurations.
+   */
+  constructor(dataViewConfigs) {
+    this.dataViewConfigs = dataViewConfigs;
+  }
 }
 
 /**
@@ -458,7 +494,8 @@ export class App {
           }
           // tool options
           const toolParams = this.#options.tools[toolName];
-          if (typeof toolParams.options !== 'undefined') {
+          if (typeof toolParams.options !== 'undefined' &&
+            toolParams.options.length !== 0) {
             let type = 'raw';
             if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
               type = appToolList[toolName].getOptionsType();
