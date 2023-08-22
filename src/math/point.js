@@ -264,12 +264,12 @@ export class Point {
   /**
    * Point values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
   /**
-   * @param {Array} values The point values.
+   * @param {number[]} values The point values.
    */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
@@ -318,7 +318,7 @@ export class Point {
   /**
    * Get the values of this index.
    *
-   * @returns {Array} The array of values.
+   * @returns {number[]} The array of values.
    */
   getValues() {
     return this.#values.slice();
@@ -368,7 +368,7 @@ export class Point {
    * Compare points and return different dimensions.
    *
    * @param {Point} rhs The point to compare to.
-   * @returns {Array} The list of different dimensions.
+   * @returns {number[]} The list of different dimensions.
    */
   compare(rhs) {
     // check if can compare
