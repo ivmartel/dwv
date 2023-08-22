@@ -116,15 +116,6 @@ export class ColourMap {
   blue;
 }
 
-// 1. jsdoc gives an error for index signatures as type:
-// {[key: string]: {red: number[], green: number[], blue: number[]}}
-// -> ERROR: Unable to parse a tag's type expression for source file ...
-//    Invalid type expression
-// 2. by default in typescript mode, eslint/jsdoc gives a warning when using:
-// Object<string, ColourMap>
-// -> Use object shorthand or index signatures instead of `Object`,
-//    e.g., `{[key: string]: string}`
-
 /**
  * List of available lookup tables (lut).
  *
