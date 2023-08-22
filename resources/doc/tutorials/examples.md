@@ -5,6 +5,9 @@ Some fiddles for you to play... Some are bundled with the code, scroll below the
 DICOM parsing:
  * [parser example #1](./DicomParser.html#DicomParser): parse DICOM data and display a tag
 
+DICOM writing:
+ * [writer example #1](./DicomWriter.html#DicomWriter): parse DICOM data and write it back
+
 Image creation:
  * [image example #1](./Image.html#Image): parse DICOM data and create an image
 

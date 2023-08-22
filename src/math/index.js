@@ -8,12 +8,12 @@ export class Index {
   /**
    * Index values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
   /**
-   * @param {Array} values The index values.
+   * @param {number[]} values The index values.
    */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
@@ -62,7 +62,7 @@ export class Index {
   /**
    * Get the values of this index.
    *
-   * @returns {Array} The array of values.
+   * @returns {number[]} The array of values.
    */
   getValues() {
     return this.#values.slice();
@@ -112,7 +112,7 @@ export class Index {
    * Compare indices and return different dimensions.
    *
    * @param {Index} rhs The index to compare to.
-   * @returns {Array} The list of different dimensions.
+   * @returns {number[]} The list of different dimensions.
    */
   compare(rhs) {
     // check if can compare
@@ -167,7 +167,7 @@ export class Index {
   /**
    * Get a string id from the index values in the form of: '#0-1_#1-2'.
    *
-   * @param {Array} [dims] Optional list of dimensions to use.
+   * @param {number[]} [dims] Optional list of dimensions to use.
    * @returns {string} The string id.
    */
   toStringId(dims) {

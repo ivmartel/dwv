@@ -210,7 +210,7 @@ export function getTagFromKey(key) {
 /**
  * Get the TransferSyntaxUID Tag.
  *
- * @returns {object} The tag.
+ * @returns {Tag} The tag.
  */
 export function getTransferSyntaxUIDTag() {
   return new Tag('0002', '0010');
@@ -219,7 +219,7 @@ export function getTransferSyntaxUIDTag() {
 /**
  * Get the FileMetaInformationGroupLength Tag.
  *
- * @returns {object} The tag.
+ * @returns {Tag} The tag.
  */
 export function getFileMetaInformationGroupLengthTag() {
   return new Tag('0002', '0000');
@@ -319,7 +319,7 @@ export function isPixelDataTag(tag) {
  * Get a tag from the dictionary using a tag string name.
  *
  * @param {string} tagName The tag string name.
- * @returns {object|null} The tag object or null if not found.
+ * @returns {Tag|undefined} The tag object or null if not found.
  */
 export function getTagFromDictionary(tagName) {
   if (typeof tagName === 'undefined' || tagName === null) {
@@ -346,7 +346,7 @@ export function getTagFromDictionary(tagName) {
       break;
     }
   }
-  let tag = null;
+  let tag;
   if (foundTag) {
     tag = new Tag(group, element);
   }

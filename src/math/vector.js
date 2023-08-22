@@ -65,7 +65,7 @@ export class Vector3D {
   /**
    * Check for Vector3D equality.
    *
-   * @param {object} rhs The other vector to compare to.
+   * @param {Vector3D} rhs The other vector to compare to.
    * @returns {boolean} True if both vectors are equal.
    */
   equals(rhs) {

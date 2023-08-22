@@ -14,12 +14,13 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {lut} from '../image/luts';
+import {luts} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {View} from '../image/view';
+import {ColourMap} from '../image/luts';
 import {Point, Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
@@ -736,7 +737,7 @@ export class ViewController {
   /**
    * Get the colour map.
    *
-   * @returns {object} The colour map.
+   * @returns {ColourMap} The colour map.
    */
   getColourMap() {
     return this.#view.getColourMap();
@@ -745,7 +746,7 @@ export class ViewController {
   /**
    * Set the colour map.
    *
-   * @param {object} colourMap The colour map.
+   * @param {ColourMap} colourMap The colour map.
    */
   setColourMap(colourMap) {
     this.#view.setColourMap(colourMap);
@@ -774,18 +775,18 @@ export class ViewController {
    */
   setColourMapFromName(name) {
     // check if we have it
-    if (!lut[name]) {
+    if (!luts[name]) {
       throw new Error('Unknown colour map: \'' + name + '\'');
     }
     // enable it
-    this.setColourMap(lut[name]);
+    this.setColourMap(luts[name]);
   }
 
   /**
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type, will be called with the fired event.
    */
   addEventListener(type, callback) {
@@ -796,7 +797,7 @@ export class ViewController {
    * Remove an event listener from this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type.
    */
   removeEventListener(type, callback) {

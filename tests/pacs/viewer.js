@@ -86,13 +86,12 @@ function viewerSetup() {
   };
 
   // app config
-  const config = {
-    viewOnFirstLoadItem: viewOnFirstLoadItem,
-    tools: _tools
-  };
+  const options = new dwv.AppOptions();
+  options.tools = _tools;
+  options.viewOnFirstLoadItem = viewOnFirstLoadItem;
   // app
   _app = new dwv.App();
-  _app.init(config);
+  _app.init(options);
 
   // bind events
   _app.addEventListener('loaderror', function (event) {
@@ -264,16 +263,16 @@ function viewerSetup() {
     _app.onResize();
   });
 
-  const options = {};
+  const uriOptions = {};
   // special dicom web request header
   if (_dicomWeb) {
-    options.requestHeaders = [{
+    uriOptions.requestHeaders = [{
       name: 'Accept',
       value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
     }];
   }
   // load from window location
-  _app.loadFromUri(window.location.href, options);
+  _app.loadFromUri(window.location.href, uriOptions);
 }
 
 /**
@@ -328,7 +327,7 @@ function onDOMContentLoaded() {
     unbindAppToControls();
 
     // set config
-    _app.setDataViewConfig(configs);
+    _app.setDataViewConfigs(configs);
 
     clearDataTable();
     for (let i = 0; i < dataIds.length; ++i) {
@@ -503,7 +502,7 @@ function getDivIds(dataViewConfig) {
  * @returns {Array} The list of div ids.
  */
 function getDataLayerGroupDivIds(dataId) {
-  const dataViewConfigs = _app.getDataViewConfig();
+  const dataViewConfigs = _app.getDataViewConfigs();
   let viewConfig = dataViewConfigs[dataId];
   if (typeof viewConfig === 'undefined') {
     viewConfig = dataViewConfigs['*'];
@@ -863,7 +862,7 @@ function addDataRow(dataId) {
     bindAppToControls();
   }
 
-  const dataViewConfigs = _app.getDataViewConfig();
+  const dataViewConfigs = _app.getDataViewConfigs();
   const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
   const initialVls = _app.getViewLayersByDataId(dataId);

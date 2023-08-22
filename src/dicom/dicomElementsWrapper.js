@@ -20,6 +20,7 @@ import {logger} from '../utils/logger';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Tag} from './dicomTag';
+import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -938,7 +939,7 @@ export class TagValueExtractor {
   /**
    * Get the time.
    *
-   * @param {object} _elements The DICOM elements.
+   * @param {Object<string, DataElement>} _elements The DICOM elements.
    * @returns {number|undefined} The time value if available.
    */
   getTime(_elements) {

@@ -48,7 +48,7 @@ export class LoadController {
   /**
    * Load a list of files. Can be image files or a state file.
    *
-   * @param {FileList} files The list of files to load.
+   * @param {File[]} files The list of files to load.
    */
   loadFiles(files) {
     // has been checked for emptiness.
@@ -63,7 +63,7 @@ export class LoadController {
   /**
    * Load a list of URLs. Can be image files or a state file.
    *
-   * @param {Array} urls The list of urls to load.
+   * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
@@ -107,7 +107,7 @@ export class LoadController {
   /**
    * Load a list of image files.
    *
-   * @param {FileList} files The list of image files to load.
+   * @param {File[]} files The list of image files to load.
    */
   #loadImageFiles(files) {
     // create IO
@@ -120,7 +120,7 @@ export class LoadController {
   /**
    * Load a list of image URLs.
    *
-   * @param {Array} urls The list of urls to load.
+   * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
@@ -163,7 +163,7 @@ export class LoadController {
   /**
    * Load a list of data.
    *
-   * @param {Array|FileList} data Array of data to load.
+   * @param {string[]|File[]|Array} data Array of data to load.
    * @param {object} loader The data loader.
    * @param {string} loadType The data load type: 'image' or 'state'.
    * @param {object} [options] Options passed to the final loader.

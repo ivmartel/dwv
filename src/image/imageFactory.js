@@ -21,6 +21,15 @@ import {Matrix33} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from '../dicom/dataElement';
+/* eslint-enable no-unused-vars */
+
+/**
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+
 /**
  * {@link Image} factory.
  */
@@ -29,30 +38,30 @@ export class ImageFactory {
   /**
    * Check dicom elements. Throws an error if not suitable.
    *
-   * @param {object} dicomElements The DICOM tags.
+   * @param {DataElements} dataElements The DICOM data elements.
    * @returns {object|undefined} A possible warning.
    */
-  checkElements(dicomElements) {
+  checkElements(dataElements) {
     // will throw if columns or rows is not defined
-    getImage2DSize(dicomElements);
+    getImage2DSize(dataElements);
   }
 
   /**
    * Get an {@link Image} object from the read DICOM file.
    *
-   * @param {object} dicomElements The DICOM tags.
+   * @param {DataElements} dataElements The DICOM tags.
    * @param {Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @param {number} numberOfFiles The input number of files.
    * @returns {Image} A new Image.
    */
-  create(dicomElements, pixelBuffer, numberOfFiles) {
-    const size2D = getImage2DSize(dicomElements);
+  create(dataElements, pixelBuffer, numberOfFiles) {
+    const size2D = getImage2DSize(dataElements);
     const sizeValues = [size2D[0], size2D[1], 1];
 
     // frames
-    const frames = dicomElements['00280008'];
+    const frames = dataElements['00280008'];
     if (frames) {
       sizeValues.push(frames.value[0]);
     }
@@ -61,16 +70,16 @@ export class ImageFactory {
     const size = new Size(sizeValues);
 
     // image spacing
-    const spacing = getPixelSpacing(dicomElements);
+    const spacing = getPixelSpacing(dataElements);
 
     // TransferSyntaxUID
-    const syntax = dicomElements['00020010'].value[0];
+    const syntax = dataElements['00020010'].value[0];
     const jpeg2000 = isJpeg2000TransferSyntax(syntax);
     const jpegBase = isJpegBaselineTransferSyntax(syntax);
     const jpegLoss = isJpegLosslessTransferSyntax(syntax);
 
     // ImagePositionPatient
-    const imagePositionPatient = dicomElements['00200032'];
+    const imagePositionPatient = dataElements['00200032'];
     // slice position
     let slicePosition = new Array(0, 0, 0);
     if (typeof imagePositionPatient !== 'undefined') {
@@ -83,7 +92,7 @@ export class ImageFactory {
 
     // slice orientation (cosines are matrices' columns)
     // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
-    const imageOrientationPatient = dicomElements['00200037'];
+    const imageOrientationPatient = dataElements['00200037'];
     let orientationMatrix;
     if (typeof imageOrientationPatient !== 'undefined') {
       const rowCosines = new Vector3D(
@@ -108,20 +117,20 @@ export class ImageFactory {
     const origin = new Point3D(
       slicePosition[0], slicePosition[1], slicePosition[2]);
     const extractor = new TagValueExtractor();
-    const time = extractor.getTime(dicomElements);
+    const time = extractor.getTime(dataElements);
     const geometry = new Geometry(
       origin, size, spacing, orientationMatrix, time);
 
     // SOP Instance UID
     let sopInstanceUid;
-    const siu = dicomElements['00080018'];
+    const siu = dataElements['00080018'];
     if (typeof siu !== 'undefined') {
       sopInstanceUid = siu.value[0];
     }
 
     // Sample per pixels
     let samplesPerPixel = 1;
-    const spp = dicomElements['00280002'];
+    const spp = dataElements['00280002'];
     if (typeof spp !== 'undefined') {
       samplesPerPixel = spp.value[0];
     }
@@ -141,7 +150,7 @@ export class ImageFactory {
     // image
     const image = new Image(geometry, pixelBuffer, [sopInstanceUid]);
     // PhotometricInterpretation
-    const photometricInterpretation = dicomElements['00280004'];
+    const photometricInterpretation = dataElements['00280004'];
     if (typeof photometricInterpretation !== 'undefined') {
       let photo = photometricInterpretation.value[0].toUpperCase();
       // jpeg decoders output RGB data
@@ -156,7 +165,7 @@ export class ImageFactory {
       image.setPhotometricInterpretation(photo);
     }
     // PlanarConfiguration
-    const planarConfiguration = dicomElements['00280006'];
+    const planarConfiguration = dataElements['00280006'];
     if (typeof planarConfiguration !== 'undefined') {
       image.setPlanarConfiguration(planarConfiguration.value[0]);
     }
@@ -164,7 +173,7 @@ export class ImageFactory {
     // rescale slope and intercept
     let slope = 1;
     // RescaleSlope
-    const rescaleSlope = dicomElements['00281053'];
+    const rescaleSlope = dataElements['00281053'];
     if (typeof rescaleSlope !== 'undefined') {
       const value = parseFloat(rescaleSlope.value[0]);
       if (!isNaN(value)) {
@@ -173,7 +182,7 @@ export class ImageFactory {
     }
     let intercept = 0;
     // RescaleIntercept
-    const rescaleIntercept = dicomElements['00281052'];
+    const rescaleIntercept = dataElements['00281052'];
     if (typeof rescaleIntercept !== 'undefined') {
       const value = parseFloat(rescaleIntercept.value[0]);
       if (!isNaN(value)) {
@@ -185,7 +194,7 @@ export class ImageFactory {
     const meta = {
       numberOfFiles: numberOfFiles
     };
-    const modality = dicomElements['00080060'];
+    const modality = dataElements['00080060'];
     if (typeof modality !== 'undefined') {
       meta.Modality = modality.value[0];
     }
@@ -193,9 +202,9 @@ export class ImageFactory {
     // PET SUV
     let intensityFactor = 1;
     if (modality.value[0] === 'PT') {
-      const warn = canGetSuvFactor(dicomElements);
+      const warn = canGetSuvFactor(dataElements);
       if (warn.length === 0) {
-        intensityFactor = getSuvFactor(dicomElements);
+        intensityFactor = getSuvFactor(dataElements);
         logger.info('Applying PET SUV calibration: ' + intensityFactor);
         slope *= intensityFactor;
         intercept *= intensityFactor;
@@ -206,43 +215,43 @@ export class ImageFactory {
     const rsi = new RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept(rsi);
 
-    const sopClassUID = dicomElements['00080016'];
+    const sopClassUID = dataElements['00080016'];
     if (typeof sopClassUID !== 'undefined') {
       meta.SOPClassUID = sopClassUID.value[0];
     }
-    const studyUID = dicomElements['0020000D'];
+    const studyUID = dataElements['0020000D'];
     if (typeof studyUID !== 'undefined') {
       meta.StudyInstanceUID = studyUID.value[0];
     }
-    const seriesUID = dicomElements['0020000E'];
+    const seriesUID = dataElements['0020000E'];
     if (typeof seriesUID !== 'undefined') {
       meta.SeriesInstanceUID = seriesUID.value[0];
     }
-    const bits = dicomElements['00280101'];
+    const bits = dataElements['00280101'];
     if (typeof bits !== 'undefined') {
       meta.BitsStored = bits.value[0];
     }
-    const pixelRep = dicomElements['00280103'];
+    const pixelRep = dataElements['00280103'];
     if (typeof pixelRep !== 'undefined') {
       meta.PixelRepresentation = pixelRep.value[0];
     }
     // PixelRepresentation -> is signed
     meta.IsSigned = meta.PixelRepresentation === 1;
     // local pixel unit
-    const pixelUnit = getPixelUnit(dicomElements);
+    const pixelUnit = getPixelUnit(dataElements);
     if (typeof pixelUnit !== 'undefined') {
       meta.pixelUnit = pixelUnit;
     }
     // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dicomElements['00200052'];
+    const frameOfReferenceUID = dataElements['00200052'];
     if (typeof frameOfReferenceUID !== 'undefined') {
       meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
     }
     // window level presets
     const windowPresets = {};
-    const windowCenter = dicomElements['00281050'];
-    const windowWidth = dicomElements['00281051'];
-    const windowCWExplanation = dicomElements['00281055'];
+    const windowCenter = dataElements['00281050'];
+    const windowWidth = dataElements['00281051'];
+    const windowCWExplanation = dataElements['00281055'];
     if (typeof windowCenter !== 'undefined' &&
       typeof windowWidth !== 'undefined') {
       let name;
@@ -278,19 +287,22 @@ export class ImageFactory {
 
     // PALETTE COLOR luts
     if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      let redLut = dicomElements['00281201'];
-      let greenLut = dicomElements['00281202'];
-      let blueLut = dicomElements['00281203'];
+      const redLutElement = dataElements['00281201'];
+      const greenLutElement = dataElements['00281202'];
+      const blueLutElement = dataElements['00281203'];
+      let redLut;
+      let greenLut;
+      let blueLut;
       // check red palette descriptor (should all be equal)
-      const descriptor = dicomElements['00281101'];
+      const descriptor = dataElements['00281101'];
       if (typeof descriptor !== 'undefined' &&
-              descriptor.length === 3) {
-        if (descriptor[2] === 16) {
+        descriptor.value.length === 3) {
+        if (descriptor.value[2] === 16) {
           let doScale = false;
           // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
           // Some implementations have encoded 8 bit entries with 16 bits
           // allocated, padding the high bits;
-          let descSize = descriptor[0];
+          let descSize = descriptor.value[0];
           // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
           // The first Palette Color Lookup Table Descriptor value is the
           // number of entries in the lookup table. When the number of table
@@ -299,7 +311,7 @@ export class ImageFactory {
             descSize = 65536;
           }
           // red palette VL
-          const vlSize = redLut.vl;
+          const vlSize = redLutElement.vl;
           // check double size
           if (vlSize !== 2 * descSize) {
             doScale = true;
@@ -310,7 +322,7 @@ export class ImageFactory {
           // Palette color values must always be scaled across the full
           // range of available intensities
           const bitsAllocated = parseInt(
-            dicomElements['00280100'].value[0], 10);
+            dataElements['00280100'].value[0], 10);
           if (bitsAllocated === 8) {
             doScale = true;
             logger.info(
@@ -322,19 +334,22 @@ export class ImageFactory {
               return value >> 8;
             };
 
-            redLut = redLut.map(scaleTo8);
-            greenLut = greenLut.map(scaleTo8);
-            blueLut = blueLut.map(scaleTo8);
+            redLut = redLutElement.value.map(scaleTo8);
+            greenLut = greenLutElement.value.map(scaleTo8);
+            blueLut = blueLutElement.value.map(scaleTo8);
           }
-        } else if (descriptor[2] === 8) {
+        } else if (descriptor.value[2] === 8) {
           // lut with vr=OW was read as Uint16, convert it to Uint8
           logger.info(
             'Scaling 16bits color lut since the lut descriptor is 8.');
-          let clone = redLut.slice(0);
+          let clone = redLutElement.value.slice(0);
+          // @ts-expect-error
           redLut = new Uint8Array(clone.buffer);
-          clone = greenLut.slice(0);
+          clone = greenLutElement.value.slice(0);
+          // @ts-expect-error
           greenLut = new Uint8Array(clone.buffer);
-          clone = blueLut.slice(0);
+          clone = blueLutElement.value.slice(0);
+          // @ts-expect-error
           blueLut = new Uint8Array(clone.buffer);
         }
       }
@@ -347,7 +362,7 @@ export class ImageFactory {
     }
 
     // RecommendedDisplayFrameRate
-    const recommendedDisplayFrameRate = dicomElements['00082144'];
+    const recommendedDisplayFrameRate = dataElements['00082144'];
     if (typeof recommendedDisplayFrameRate !== 'undefined') {
       meta.RecommendedDisplayFrameRate = parseInt(
         recommendedDisplayFrameRate.value[0], 10);

@@ -14,10 +14,11 @@ import {App} from '../app/application';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * app.init({
- *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
- *   tools: {ZoomAndPan: {}}
- * });
+ * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {ZoomAndPan: new ToolConfig()};
+ * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
  *   app.setTool('ZoomAndPan');

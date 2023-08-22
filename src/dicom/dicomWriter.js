@@ -21,6 +21,7 @@ import {
   isBigEndianTransferSyntax,
   getDataElementPrefixByteSize
 } from './dicomParser';
+import {DataElement} from './dataElement';
 import {DataWriter} from './dataWriter';
 import {logger} from '../utils/logger';
 
@@ -37,6 +38,24 @@ function getDwvUIDPrefix() {
 
 // local generated uid counter
 let _uidCount = 0;
+
+/**
+ * Writer rule.
+ */
+export class WriterRule {
+  /**
+   * Rule action: `copy`, `remove`, `clear` or `replace`.
+   *
+   * @type {string}
+   */
+  action;
+  /**
+   * Value to use for replace action.
+   *
+   * @type {any}
+   */
+  value;
+}
 
 /**
  * Get a UID for a DICOM tag.
@@ -241,16 +260,27 @@ class DefaultTextEncoder {
 /**
  * DICOM writer.
  *
- * Example usage:
+ * @example
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
  *   const parser = new DicomParser();
- *   parser.parse(this.response);
- *
+ *   parser.parse(event.target.response);
+ *   // create writer with parser data elements
  *   const writer = new DicomWriter(parser.getDicomElements());
+ *   // create modified buffer and put it in a Blol
  *   const blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *
+ *   // example download link
  *   const element = document.getElementById("download");
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export class DicomWriter {
 
@@ -267,7 +297,11 @@ export class DicomWriter {
     this.#useUnVrForPrivateSq = flag;
   }
 
-  // possible tag actions
+  /**
+   * Possible tag actions.
+   *
+   * @type {Object<string, Function>}
+   */
   #actions = {
     copy: function (item) {
       return item;
@@ -285,26 +319,30 @@ export class DicomWriter {
     }
   };
 
-  // default rules: just copy
+  /**
+   * Default rules: just copy
+   *
+   * @type {Object<string, WriterRule>}
+   */
   #defaultRules = {
     default: {action: 'copy', value: null}
   };
 
   /**
    * Writing rules.
-   * Set of objects as:
-   *   name : { action: 'actionName', value: 'optionalValue }
-   * The names are either 'default', tagName or groupName.
-   * Each DICOM element will be checked to see if a rule is applicable.
-   * First checked by tagName and then by groupName,
-   * if nothing is found the default rule is applied.
+   *
+   * @type {Object<string, WriterRule>}
    */
   #rules = this.#defaultRules;
 
   /**
    * Set the writing rules.
+   * List of writer rules indexed by either `default`, tagName or groupName.
+   * Each DICOM element will be checked to see if a rule is applicable.
+   * First checked by tagName and then by groupName,
+   * if nothing is found the default rule is applied.
    *
-   * @param {object} rules The input rules.
+   * @param {Object<string, WriterRule>} rules The input rules.
    */
   setRules(rules) {
     this.#rules = rules;
@@ -376,10 +414,10 @@ export class DicomWriter {
    * Get the element to write according to the class rules.
    * Priority order: tagName, groupName, default.
    *
-   * @param {object} element The element to check
-   * @returns {object} The element to write, can be null.
+   * @param {DataElement} element The element to check
+   * @returns {DataElement|null} The element to write, can be null.
    */
-  #getElementToWrite(element) {
+  getElementToWrite(element) {
     // get group and tag string name
     const groupName = element.tag.getGroupName();
     const tagName = element.tag.getNameFromDictionary();
@@ -427,12 +465,16 @@ export class DicomWriter {
       if (typeof item['FFFEE000'].undefinedLength !== 'undefined') {
         undefinedLength = item['FFFEE000'].undefinedLength;
       }
-      const itemElement = {
-        tag: getItemTag(),
-        vr: 'NONE',
-        vl: undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
-        value: []
-      };
+      // const itemElement = {
+      //   tag: getItemTag(),
+      //   vr: 'NONE',
+      //   vl: undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
+      //   value: []
+      // };
+      const itemElement = new DataElement('NONE');
+      itemElement.vl = undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
+      itemElement.tag = getItemTag();
+      itemElement.value = [];
       byteOffset = this.#writeDataElement(
         writer, itemElement, byteOffset, isImplicit);
       // write rest
@@ -444,12 +486,16 @@ export class DicomWriter {
       }
       // item delimitation
       if (undefinedLength) {
-        const itemDelimElement = {
-          tag: getItemDelimitationItemTag(),
-          vr: 'NONE',
-          vl: 0,
-          value: []
-        };
+        // const itemDelimElement = {
+        //   tag: getItemDelimitationItemTag(),
+        //   vr: 'NONE',
+        //   vl: 0,
+        //   value: []
+        // };
+        const itemDelimElement = new DataElement('NONE');
+        itemDelimElement.vl = 0;
+        itemDelimElement.tag = getItemDelimitationItemTag();
+        itemDelimElement.value = [];
         byteOffset = this.#writeDataElement(
           writer, itemDelimElement, byteOffset, isImplicit);
       }
@@ -463,7 +509,7 @@ export class DicomWriter {
    * Write data with a specific Value Representation (VR).
    *
    * @param {DataWriter} writer The raw data writer.
-   * @param {object} element The element to write.
+   * @param {DataElement} element The element to write.
    * @param {number} byteOffset The offset to start writing from.
    * @param {Array} value The array to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
@@ -558,7 +604,7 @@ export class DicomWriter {
    * Write a pixel data element.
    *
    * @param {DataWriter} writer The raw data writer.
-   * @param {object} element The element to write.
+   * @param {DataElement} element The element to write.
    * @param {number} byteOffset The offset to start writing from.
    * @param {Array} value The array to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
@@ -613,7 +659,7 @@ export class DicomWriter {
    * Write a data element.
    *
    * @param {DataWriter} writer The raw data writer.
-   * @param {object} element The DICOM data element to write.
+   * @param {DataElement} element The DICOM data element to write.
    * @param {number} byteOffset The offset to start writing from.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
    * @returns {number} The new offset position.
@@ -687,12 +733,16 @@ export class DicomWriter {
 
     // sequence delimitation item for sequence with undefined length
     if (undefinedLengthSequence) {
-      const seqDelimElement = {
-        tag: getSequenceDelimitationItemTag(),
-        vr: 'NONE',
-        vl: 0,
-        value: []
-      };
+      // const seqDelimElement = {
+      //   tag: getSequenceDelimitationItemTag(),
+      //   vr: 'NONE',
+      //   vl: 0,
+      //   value: []
+      // };
+      const seqDelimElement = new DataElement('NONE');
+      seqDelimElement.vl = 0;
+      seqDelimElement.tag = getSequenceDelimitationItemTag();
+      seqDelimElement.value = [];
       byteOffset = this.#writeDataElement(
         writer, seqDelimElement, byteOffset, isImplicit);
     }
@@ -704,28 +754,31 @@ export class DicomWriter {
   /**
    * Get the ArrayBuffer corresponding to input DICOM elements.
    *
-   * @param {Array} dicomElements The wrapped elements to write.
+   * @param {Object<string, DataElement>} dataElements The elements to write.
    * @returns {ArrayBuffer} The elements as a buffer.
    */
-  getBuffer(dicomElements) {
+  getBuffer(dataElements) {
     // Transfer Syntax
-    const syntax = dicomElements['00020010'].value[0];
+    // const el = dataElements['00020010'];
+    // el.value = 1;
+    // el.vl = 'a';
+    const syntax = dataElements['00020010'].value[0];
     const isImplicit = isImplicitTransferSyntax(syntax);
     const isBigEndian = isBigEndianTransferSyntax(syntax);
     // Specific CharacterSet
-    if (typeof dicomElements['00080005'] !== 'undefined') {
-      const oldscs = dicomElements['00080005'].value[0];
+    if (typeof dataElements['00080005'] !== 'undefined') {
+      const oldscs = dataElements['00080005'].value[0];
       // force UTF-8 if not default character set
       if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
         logger.debug('Change charset to UTF, was: ' + oldscs);
         this.useSpecialTextEncoder();
-        dicomElements['00080005'].value = ['ISO_IR 192'];
+        dataElements['00080005'].value = ['ISO_IR 192'];
       }
     }
     // Bits Allocated (for image data)
     let bitsAllocated;
-    if (typeof dicomElements['00280100'] !== 'undefined') {
-      bitsAllocated = dicomElements['00280100'].value[0];
+    if (typeof dataElements['00280100'] !== 'undefined') {
+      bitsAllocated = dataElements['00280100'].value[0];
     }
 
     // calculate buffer size and split elements (meta and non meta)
@@ -746,11 +799,11 @@ export class DicomWriter {
     const ivnTag = new Tag('0002', '0013');
 
     // loop through elements to get the buffer size
-    const keys = Object.keys(dicomElements);
+    const keys = Object.keys(dataElements);
     for (let i = 0, leni = keys.length; i < leni; ++i) {
-      const originalElement = dicomElements[keys[i]];
+      const originalElement = dataElements[keys[i]];
       originalElement.tag = getTagFromKey(keys[i]);
-      element = this.#getElementToWrite(originalElement);
+      element = this.getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
         !fmivTag.equals(element.tag) &&
@@ -797,14 +850,14 @@ export class DicomWriter {
     }
 
     // FileMetaInformationVersion
-    const fmiv = getDicomElement('FileMetaInformationVersion');
+    const fmiv = getDataElement('FileMetaInformationVersion');
     let fmivSize = getDataElementPrefixByteSize(fmiv.vr, false);
     fmivSize += this.#setElementValue(fmiv, [0, 1], false);
     metaElements.push(fmiv);
     metaLength += fmivSize;
     totalSize += fmivSize;
     // ImplementationClassUID
-    const icUID = getDicomElement('ImplementationClassUID');
+    const icUID = getDataElement('ImplementationClassUID');
     let icUIDSize = getDataElementPrefixByteSize(icUID.vr, false);
     icUIDSize += this.#setElementValue(
       icUID, [getUID('ImplementationClassUID')], false);
@@ -812,7 +865,7 @@ export class DicomWriter {
     metaLength += icUIDSize;
     totalSize += icUIDSize;
     // ImplementationVersionName
-    const ivn = getDicomElement('ImplementationVersionName');
+    const ivn = getDataElement('ImplementationVersionName');
     let ivnSize = getDataElementPrefixByteSize(ivn.vr, false);
     const ivnValue = 'DWV_' + getDwvVersion();
     ivnSize += this.#setElementValue(ivn, [ivnValue], false);
@@ -828,7 +881,7 @@ export class DicomWriter {
     rawElements.sort(elemSortFunc);
 
     // create the FileMetaInformationGroupLength element
-    const fmigl = getDicomElement('FileMetaInformationGroupLength');
+    const fmigl = getDataElement('FileMetaInformationGroupLength');
     let fmiglSize = getDataElementPrefixByteSize(fmigl.vr, false);
     fmiglSize += this.#setElementValue(
       fmigl, new Uint32Array([metaLength]), false);
@@ -878,7 +931,7 @@ export class DicomWriter {
   /**
    * Set a DICOM element value according to its VR (Value Representation).
    *
-   * @param {object} element The DICOM element to set the value.
+   * @param {DataElement} element The DICOM element to set the value.
    * @param {object} value The value to set.
    * @param {boolean} isImplicit Does the data use implicit VR?
    * @param {number} [bitsAllocated] Bits allocated used for pixel data.
@@ -1061,7 +1114,7 @@ export class DicomWriter {
  * Fix for broken DICOM elements: Replace "UN" with correct VR if the
  * element exists in dictionary
  *
- * @param {object} element The DICOM element.
+ * @param {DataElement} element The DICOM element.
  */
 function checkUnknownVR(element) {
   if (element.vr === 'UN') {
@@ -1079,14 +1132,13 @@ function checkUnknownVR(element) {
  * Get a DICOM element from its tag name (value set separatly).
  *
  * @param {string} tagName The string tag name.
- * @returns {object} The DICOM element.
+ * @returns {DataElement} The DICOM element.
  */
-function getDicomElement(tagName) {
+function getDataElement(tagName) {
   const tag = getTagFromDictionary(tagName);
-  return {
-    tag: tag,
-    vr: tag.getVrFromDictionary()
-  };
+  const element = new DataElement(tag.getVrFromDictionary());
+  element.tag = tag;
+  return element;
 }
 
 /**
@@ -1120,21 +1172,22 @@ function getBpeForVrType(vrType) {
 }
 
 /**
- * Get the DICOM elements from a DICOM json tags object.
+ * Get the DICOM elements from a 'simple' DICOM json tags object.
  * The json is a simplified version of the oficial DICOM json with
  * tag names instead of keys and direct values (no value property) for
- * simple tags.
+ * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {object} jsonTags The DICOM json tags object.
- * @returns {object} The DICOM elements.
+ * @param {Object<string, any>} jsonTags The DICOM
+ *   json tags object.
+ * @returns {Object<string, DataElement>} The DICOM elements.
  */
 export function getElementsFromJSONTags(jsonTags) {
   const keys = Object.keys(jsonTags);
-  const dicomElements = {};
+  const dataElements = {};
   for (let k = 0, len = keys.length; k < len; ++k) {
     // get the DICOM element definition from its name
     const tag = getTagFromDictionary(keys[k]);
-    if (!tag) {
+    if (typeof tag === 'undefined') {
       continue;
     }
     const vr = tag.getVrFromDictionary();
@@ -1164,17 +1217,16 @@ export function getElementsFromJSONTags(jsonTags) {
       }
     }
     // create element
-    const dicomElement = {
-      tag: tag,
-      vr: vr,
-      value: value
-    };
+    const dataElement = new DataElement(vr);
+    dataElement.tag = tag;
+    dataElement.value = value;
     if (undefinedLength) {
-      dicomElement.undefinedLength = undefinedLength;
+      dataElement.undefinedLength = undefinedLength;
     }
     // store
-    dicomElements[tag.getKey()] = dicomElement;
+    dataElements[tag.getKey()] = dataElement;
   }
   // return
-  return dicomElements;
+  // @ts-expect-error
+  return dataElements;
 }

@@ -1,7 +1,7 @@
 import {Index} from '../math/index';
 import {RescaleLut} from './rescaleLut';
 import {WindowLut} from './windowLut';
-import {lut} from './luts';
+import {luts} from './luts';
 import {WindowCenterAndWidth} from './windowCenterAndWidth';
 import {generateImageDataMonochrome} from './viewMonochrome';
 import {generateImageDataPaletteColor} from './viewPaletteColor';
@@ -16,6 +16,7 @@ import {logger} from '../utils/logger';
 /* eslint-disable no-unused-vars */
 import {Image} from './image';
 import {RescaleSlopeAndIntercept} from './rsi';
+import {ColourMap} from './luts';
 import {Matrix33} from '../math/matrix';
 import {Point} from '../math/point';
 /* eslint-enable no-unused-vars */
@@ -131,9 +132,9 @@ export class View {
   /**
    * colour map.
    *
-   * @type {object}
+   * @type {ColourMap}
    */
-  #colourMap = lut.plain;
+  #colourMap = luts.plain;
 
   /**
    * Current position as a Point.
@@ -412,7 +413,7 @@ export class View {
   /**
    * Set the default colour map.
    *
-   * @param {object} map The colour map.
+   * @param {ColourMap} map The colour map.
    */
   setDefaultColourMap(map) {
     this.#colourMap = map;
@@ -467,7 +468,7 @@ export class View {
   /**
    * Get the colour map of the image.
    *
-   * @returns {object} The colour map of the image.
+   * @returns {ColourMap} The colour map of the image.
    */
   getColourMap() {
     return this.#colourMap;
@@ -476,7 +477,7 @@ export class View {
   /**
    * Set the colour map of the image.
    *
-   * @param {object} map The colour map of the image.
+   * @param {ColourMap} map The colour map of the image.
    * @fires View#colourchange
    */
   setColourMap(map) {
@@ -800,7 +801,7 @@ export class View {
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type, will be called with the fired event.
    */
   addEventListener(type, callback) {
@@ -811,7 +812,7 @@ export class View {
    * Remove an event listener from this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type.
    */
   removeEventListener(type, callback) {

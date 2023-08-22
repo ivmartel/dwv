@@ -1,6 +1,6 @@
 import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
-import {lut} from '../image/luts';
+import {luts} from '../image/luts';
 import {getMatrixFromName} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
@@ -22,7 +22,127 @@ import {binderList} from '../gui/stage';
 /* eslint-disable no-unused-vars */
 import {LayerGroup} from '../gui/layerGroup';
 import {Image} from '../image/image';
+import {ColourMap} from '../image/luts';
 /* eslint-enable no-unused-vars */
+
+/**
+ * View configuration: mainly defines the ´divId´
+ * of the associated HTML div.
+ */
+export class ViewConfig {
+  /**
+   * Associated HTML div id.
+   *
+   * @type {string}
+   */
+  divId;
+  /**
+   * Optional orientation of the data; 'axial', 'coronal' or 'sagittal'.
+   * If undefined, will use the data aquisition plane.
+   *
+   * @type {string|undefined}
+   */
+  orientation;
+  /**
+   * Optional view colour map.
+   *
+   * @type {ColourMap|undefined}
+   */
+  colourMap;
+  /**
+   * Optional layer opacity; in [0, 1] range.
+   *
+   * @type {number|undefined}
+   */
+  opacity;
+
+  /**
+   * @param {string} divId The associated HTML div id.
+   */
+  constructor(divId) {
+    this.divId = divId;
+  }
+}
+
+/**
+ * Tool configuration.
+ */
+export class ToolConfig {
+  /**
+   * Optional tool options.
+   * For Draw: list of shape names.
+   * For Filter: list of filter names.
+   *
+   * @type {string[]|undefined}
+   */
+  options;
+
+  /**
+   * @param {string[]} [options] Optional tool options.
+   */
+  constructor(options) {
+    this.options = options;
+  }
+}
+
+/**
+ * Application options.
+ */
+export class AppOptions {
+  /**
+   * DataId indexed object containing the data view configurations.
+   *
+   * @type {Object<string, ViewConfig[]>|undefined}
+   */
+  dataViewConfigs;
+  /**
+   * Tool name indexed object containing individual tool configurations.
+   *
+   * @type {Object<string, ToolConfig>|undefined}
+   */
+  tools;
+  /**
+   * Optional array of layerGroup binder names.
+   *
+   * @type {string[]|undefined}
+   */
+  binders;
+  /**
+   * Optional boolean flag to trigger the first data render
+   *   after the first loaded data or not. Defaults to true;
+   *
+   * @type {boolean|undefined}
+   */
+  viewOnFirstLoadItem;
+  /**
+   * Optional default chraracter set string used for DICOM parsing if
+   * not passed in DICOM file.
+   * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+   *
+   * @type {string|undefined}
+   */
+  defaultCharacterSet;
+  /**
+   * Optional overlay config.
+   *
+   * @type {object|undefined}
+   */
+  overlayConfig;
+
+  /**
+   * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
+   *   indexed object containing the data view configurations.
+   */
+  constructor(dataViewConfigs) {
+    this.dataViewConfigs = dataViewConfigs;
+  }
+}
+
+/**
+ * List of ViewConfigs indexed by dataIds.
+ *
+ * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
+ */
 
 /**
  * Main application class.
@@ -31,9 +151,10 @@ import {Image} from '../image/image';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * app.init({
- *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
- * });
+ * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new AppOptions(viewConfigs);
+ * app.init(options);
  * // load dicom data
  * app.loadURLs([
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
@@ -41,7 +162,11 @@ import {Image} from '../image/image';
  */
 export class App {
 
-  // app options
+  /**
+   * App options.
+   *
+   * @type {AppOptions}
+   */
   #options = null;
 
   // data controller
@@ -308,6 +433,7 @@ export class App {
    *
    * @param {object} cmd The command to add.
    * @fires UndoStack#undoadd
+   * @function
    */
   addToUndoStack = (cmd) => {
     if (this.#undoStack !== null) {
@@ -318,29 +444,16 @@ export class App {
   /**
    * Initialise the application.
    *
-   * @param {object} opt The application option with:
-   * - `dataViewConfigs`: dataId indexed object containing the data view
-   *   configurations in the form of a list of objects containing:
-   *   - divId: the HTML div id
-   *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
-   *     string (default undefined keeps the original slice order)
-   * - `binders`: array of layerGroup binders
-   * - `tools`: tool name indexed object containing individual tool
-   *   configurations in the form of a list of objects containing:
-   *   - options: array of tool options
-   * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
-   *   after the first loaded data or not
-   * - `defaultCharacterSet`: the default chraracter set string used for DICOM
-   *   parsing
-   * - `overlayConfig`: list of tags / properties used as overlay information.
+   * @param {AppOptions} opt The application options
    * @example
    * // create the dwv app
    * const app = new dwv.App();
    * // initialise
-   * app.init({
-   *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
-   *   viewOnFirstLoadItem: false
-   * });
+   * const viewConfig0 = new ViewConfig('layerGroup0');
+   * const viewConfigs = {'*': [viewConfig0]};
+   * const options = new AppOptions(viewConfigs);
+   * options.viewOnFirstLoadItem = false;
+   * app.init(options);
    * // render button
    * const button = document.createElement('button');
    * button.id = 'render';
@@ -378,7 +491,7 @@ export class App {
     this.#undoStack.addEventListener('redo', this.#fireEvent);
 
     // tools
-    if (this.#options.tools && this.#options.tools.length !== 0) {
+    if (typeof this.#options.tools !== 'undefined') {
       // setup the tool list
       const appToolList = {};
       const keys = Object.keys(this.#options.tools);
@@ -397,12 +510,13 @@ export class App {
           }
           // tool options
           const toolParams = this.#options.tools[toolName];
-          if (typeof toolParams.options !== 'undefined') {
+          if (typeof toolParams.options !== 'undefined' &&
+            toolParams.options.length !== 0) {
             let type = 'raw';
             if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
               type = appToolList[toolName].getOptionsType();
             }
-            let appToolOptions = toolParams.options;
+            let appToolOptions;
             if (type === 'instance' || type === 'factory') {
               appToolOptions = {};
               for (let i = 0; i < toolParams.options.length; ++i) {
@@ -422,6 +536,8 @@ export class App {
                     optionName);
                 }
               }
+            } else {
+              appToolOptions = toolParams.options;
             }
             appToolList[toolName].setOptions(appToolOptions);
           }
@@ -482,7 +598,7 @@ export class App {
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type, will be called with the fired event.
    */
   addEventListener(type, callback) {
@@ -493,7 +609,7 @@ export class App {
    * Remove an event listener from this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type.
    */
   removeEventListener(type, callback) {
@@ -505,13 +621,14 @@ export class App {
   /**
    * Load a list of files. Can be image files or a state file.
    *
-   * @param {FileList} files The list of files to load.
+   * @param {File[]} files The list of files to load.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
    * @fires App#loaderror
    * @fires App#loadabort
+   * @function
    */
   loadFiles = (files) => {
     if (files.length === 0) {
@@ -524,7 +641,7 @@ export class App {
   /**
    * Load a list of URLs. Can be image files or a state file.
    *
-   * @param {Array} urls The list of urls to load.
+   * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
@@ -535,6 +652,7 @@ export class App {
    * @fires App#loadend
    * @fires App#loaderror
    * @fires App#loadabort
+   * @function
    */
   loadURLs = (urls, options) => {
     if (urls.length === 0) {
@@ -549,6 +667,7 @@ export class App {
    *
    * @param {string} uri The input uri, for example: 'window.location.href'.
    * @param {object} [options] Optional url request options.
+   * @function
    */
   loadFromUri = (uri, options) => {
     const query = getUriQuery(uri);
@@ -583,6 +702,7 @@ export class App {
    * @fires App#loadend
    * @fires App#loaderror
    * @fires App#loadabort
+   * @function
    */
   loadImageObject = (data) => {
     this.#loadController.loadImageObject(data);
@@ -629,7 +749,7 @@ export class App {
    * Defaults to div id 'layerGroup' if no association object has been set.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The list of associated configs.
+   * @returns {ViewConfig[]} The list of associated configs.
    */
   #getViewConfigs(dataId) {
     // check options
@@ -650,18 +770,19 @@ export class App {
    * Get the data view config.
    * Carefull, returns a reference, do not modify without resetting.
    *
-   * @returns {object} The configuration list.
+   * @returns {Object<string, ViewConfig[]>} The configuration list.
    */
-  getDataViewConfig() {
+  getDataViewConfigs() {
     return this.#options.dataViewConfigs;
   }
 
   /**
-   * Set the data view configuration (see the init options for details).
+   * Set the data view configuration.
+   * Resets the stage and recreates all the views.
    *
-   * @param {object} configs The configuration list.
+   * @param {Object<string, ViewConfig[]>} configs The configuration list.
    */
-  setDataViewConfig(configs) {
+  setDataViewConfigs(configs) {
     // clean up
     this.#stage.empty();
     // set new
@@ -800,15 +921,15 @@ export class App {
    * Create layer groups according to a data view config:
    * adds them to stage and binds them.
    *
-   * @param {object} dataViewConfigs The data view config.
+   * @param {DataViewConfigs} dataViewConfigs The data view config.
    */
   #createLayerGroups(dataViewConfigs) {
     const dataKeys = Object.keys(dataViewConfigs);
     const divIds = [];
     for (let i = 0; i < dataKeys.length; ++i) {
-      const dataConfigs = dataViewConfigs[dataKeys[i]];
-      for (let j = 0; j < dataConfigs.length; ++j) {
-        const viewConfig = dataConfigs[j];
+      const viewConfigs = dataViewConfigs[dataKeys[i]];
+      for (let j = 0; j < viewConfigs.length; ++j) {
+        const viewConfig = viewConfigs[j];
         // view configs can contain the same divIds, avoid duplicating
         if (!divIds.includes(viewConfig.divId)) {
           this.#createLayerGroup(viewConfig);
@@ -984,6 +1105,8 @@ export class App {
    * Handle resize: fit the display to the window.
    * To be called once the image is loaded.
    * Can be connected to a window 'resize' event.
+   *
+   * @function
    */
   onResize = () => {
     this.fitToContainer();
@@ -994,6 +1117,7 @@ export class App {
    *
    * @param {KeyboardEvent} event The key down event.
    * @fires App#keydown
+   * @function
    */
   onKeydown = (event) => {
     /**
@@ -1019,6 +1143,7 @@ export class App {
    * @param {KeyboardEvent} event The key down event.
    * @fires UndoStack#undo
    * @fires UndoStack#redo
+   * @function
    */
   defaultOnKeydown = (event) => {
     if (event.ctrlKey) {
@@ -1078,13 +1203,13 @@ export class App {
   /**
    * Set the colour map.
    *
-   * @param {string} colourMap The colour map name.
+   * @param {string} name The colour map name.
    */
-  setColourMap(colourMap) {
+  setColourMap(name) {
     const viewController =
       this.#stage.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
-    viewController.setColourMapFromName(colourMap);
+    viewController.setColourMapFromName(name);
   }
 
   /**
@@ -1433,18 +1558,18 @@ export class App {
    * Add a view layer.
    *
    * @param {string} dataId The data id.
-   * @param {object} dataViewConfig The data view config.
+   * @param {ViewConfig} viewConfig The data view config.
    */
-  #addViewLayer(dataId, dataViewConfig) {
+  #addViewLayer(dataId, viewConfig) {
     const data = this.#dataController.get(dataId);
     if (!data) {
       throw new Error('Cannot initialise layer with missing data, id: ' +
       dataId);
     }
-    const layerGroup = this.#stage.getLayerGroupByDivId(dataViewConfig.divId);
+    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
     if (!layerGroup) {
       throw new Error('Cannot initialise layer with missing group, id: ' +
-        dataViewConfig.divId);
+        viewConfig.divId);
     }
     const imageGeometry = data.image.getGeometry();
 
@@ -1456,7 +1581,7 @@ export class App {
     const view = viewFactory.create(data.meta, data.image);
     const viewOrientation = getViewOrientation(
       imageGeometry.getOrientation(),
-      getMatrixFromName(dataViewConfig.orientation)
+      getMatrixFromName(viewConfig.orientation)
     );
     view.setOrientation(viewOrientation);
 
@@ -1479,22 +1604,22 @@ export class App {
     const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
 
     // colour map
-    if (typeof dataViewConfig.colourMap !== 'undefined') {
-      view.setColourMap(dataViewConfig.colourMap);
+    if (typeof viewConfig.colourMap !== 'undefined') {
+      view.setColourMap(viewConfig.colourMap);
     } else {
       if (!isBaseLayer) {
         if (data.image.getMeta().Modality === 'PT') {
-          view.setColourMap(lut.hot);
+          view.setColourMap(luts.hot);
         } else {
-          view.setColourMap(lut.rainbow);
+          view.setColourMap(luts.rainbow);
         }
       }
     }
 
     // opacity
     let opacity = 1;
-    if (typeof dataViewConfig.opacity !== 'undefined') {
-      opacity = dataViewConfig.opacity;
+    if (typeof viewConfig.opacity !== 'undefined') {
+      opacity = viewConfig.opacity;
     } else {
       if (!isBaseLayer) {
         opacity = 0.5;
@@ -1553,19 +1678,19 @@ export class App {
     let flipOffsetX = false;
     let flipOffsetY = false;
     let flipScaleZ = false;
-    if (typeof dataViewConfig.orientation !== 'undefined') {
+    if (typeof viewConfig.orientation !== 'undefined') {
       if (major === 2) {
         // scale flip Z for oriented views...
         flipScaleZ = true;
         // flip offset Y for axial aquired data
-        if (dataViewConfig.orientation !== 'axial') {
+        if (viewConfig.orientation !== 'axial') {
           flipOffsetY = true;
         }
       } else if (major === 0) {
         // scale flip Z for oriented views...
         flipScaleZ = true;
         // flip offset X for sagittal aquired data
-        if (dataViewConfig.orientation !== 'sagittal') {
+        if (viewConfig.orientation !== 'sagittal') {
           flipOffsetX = true;
         }
       }

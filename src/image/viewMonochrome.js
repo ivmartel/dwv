@@ -1,11 +1,17 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {WindowLut} from './windowLut';
+import {ColourMap} from './luts';
+/* eslint-enable no-unused-vars */
+
 /**
  * Generate image data for 'MONOCHROME*' photometric interpretation.
  *
  * @param {ImageData} array The array to store the outut data
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
- * @param {object} windowLut The window/level LUT.
- * @param {object} colourMap The colour map.
+ * @param {WindowLut} windowLut The window/level LUT.
+ * @param {ColourMap} colourMap The colour map.
  */
 export function generateImageDataMonochrome(
   array,

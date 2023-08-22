@@ -8,7 +8,7 @@ module.exports = {
   ],
   rules: {
     // tag lines
-    // https://github.com/gajus/eslint-plugin-jsdoc#eslint-plugin-jsdoc-rules-tag-lines
+    // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/tag-lines.md
     'jsdoc/tag-lines': ['error', 'any', {'startLines': 1}]
   }
 };

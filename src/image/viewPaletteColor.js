@@ -1,12 +1,17 @@
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ColourMap} from './luts';
+/* eslint-enable no-unused-vars */
+
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
  * @param {ImageData} array The array to store the outut data
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
- * @param {object} colourMap The colour map.
+ * @param {ColourMap} colourMap The colour map.
  * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
 export function generateImageDataPaletteColor(

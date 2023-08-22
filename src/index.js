@@ -1,5 +1,10 @@
 // app
-import {App} from './app/application';
+import {
+  AppOptions,
+  App,
+  ViewConfig,
+  ToolConfig
+} from './app/application';
 import {defaults} from './app/defaults';
 import {ViewController} from './app/viewController';
 // dicom
@@ -8,13 +13,16 @@ import {
   getTypedArray,
   getOrientationName,
   getReverseOrientation,
+  hasDicomPrefix,
   DicomParser
 } from './dicom/dicomParser';
 import {
   getUID,
   getElementsFromJSONTags,
-  DicomWriter
+  DicomWriter,
+  WriterRule
 } from './dicom/dicomWriter';
+import {DataElement} from './dicom/dataElement';
 import {TagValueExtractor} from './dicom/dicomElementsWrapper';
 import {addTagsToDictionary} from './dicom/dictionary';
 import {
@@ -42,7 +50,10 @@ import {Geometry} from './image/geometry';
 import {Size} from './image/size';
 import {Spacing} from './image/spacing';
 import {decoderScripts} from './image/decoder';
-import {lut} from './image/luts';
+import {
+  ColourMap,
+  luts
+} from './image/luts';
 import {RescaleSlopeAndIntercept} from './image/rsi';
 import {RescaleLut} from './image/rescaleLut';
 import {WindowLut} from './image/windowLut';
@@ -62,10 +73,15 @@ import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
 
 export {
+  AppOptions,
   App,
+  ViewConfig,
+  ToolConfig,
   ViewController,
+  DataElement,
   DicomParser,
   DicomWriter,
+  WriterRule,
   TagValueExtractor,
   Tag,
   LayerGroup,
@@ -73,6 +89,7 @@ export {
   OverlayData,
   ViewLayer,
   Image,
+  ColourMap,
   View,
   Geometry,
   Size,
@@ -91,7 +108,7 @@ export {
   logger,
   decoderScripts,
   customUI,
-  lut,
+  luts,
   defaultPresets,
   i18n,
   addTagsToDictionary,
@@ -106,6 +123,7 @@ export {
   getPixelDataTag,
   getOrientationName,
   getReverseOrientation,
+  hasDicomPrefix,
   precisionRound,
   buildMultipart
 };
