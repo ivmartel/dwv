@@ -966,7 +966,7 @@ export class Draw {
    * Add an event listener on the app.
    *
    * @param {string} type The event type.
-   * @param {object} listener The method associated with the provided
+   * @param {Function} listener The function associated with the provided
    *   event type.
    */
   addEventListener(type, listener) {
@@ -980,7 +980,7 @@ export class Draw {
    * Remove an event listener from the app.
    *
    * @param {string} type The event type.
-   * @param {object} listener The method associated with the provided
+   * @param {Function} listener The function associated with the provided
    *   event type.
    */
   removeEventListener(type, listener) {

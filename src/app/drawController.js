@@ -452,8 +452,8 @@ export class DrawController {
    * Delete a Draw from the stage.
    *
    * @param {string} id The id of the group to delete.
-   * @param {object} cmdCallback The DeleteCommand callback.
-   * @param {object} exeCallback The callback to call once the
+   * @param {Function} cmdCallback The DeleteCommand callback.
+   * @param {Function} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    * @returns {boolean} False if the group cannot be found.
    */
@@ -472,8 +472,8 @@ export class DrawController {
   /**
    * Delete all Draws from the stage.
    *
-   * @param {object} cmdCallback The DeleteCommand callback.
-   * @param {object} exeCallback The callback to call once the
+   * @param {Function} cmdCallback The DeleteCommand callback.
+   * @param {Function} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
   deleteDraws(cmdCallback, exeCallback) {

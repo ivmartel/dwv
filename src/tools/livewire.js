@@ -378,7 +378,7 @@ export class Livewire {
    * Add an event listener to this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *    event type, will be called with the fired event.
    */
   addEventListener(type, callback) {
@@ -389,7 +389,7 @@ export class Livewire {
    * Remove an event listener from this class.
    *
    * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
+   * @param {Function} callback The function associated with the provided
    *   event type.
    */
   removeEventListener(type, callback) {
