@@ -98,7 +98,7 @@ export class AppOptions {
   /**
    * Tool name indexed object containing individual tool configurations.
    *
-   * @type {Object<string, ToolConfig>}
+   * @type {Object<string, ToolConfig>|undefined}
    */
   tools;
   /**
