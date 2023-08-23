@@ -110,9 +110,9 @@ export declare class App {
     /**
      * Get the toolbox controller.
      *
-     * @returns {object} The controller.
+     * @returns {ToolboxController} The controller.
      */
-    getToolboxController(): object;
+    getToolboxController(): ToolboxController;
     /**
      * Get the active layer group.
      * The layer is available after the first loaded item.
@@ -125,17 +125,17 @@ export declare class App {
      * The layer are available after the first loaded item.
      *
      * @param {string} dataId The data id.
-     * @returns {Array} The layers.
+     * @returns {ViewLayer[]} The layers.
      */
-    getViewLayersByDataId(dataId: string): any[];
+    getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
      * Get the draw layers associated to a data id.
      * The layer are available after the first loaded item.
      *
      * @param {string} dataId The data id.
-     * @returns {Array} The layers.
+     * @returns {DrawLayer[]} The layers.
      */
-    getDrawLayersByDataId(dataId: string): any[];
+    getDrawLayersByDataId(dataId: string): DrawLayer[];
     /**
      * Get a layer group by div id.
      * The layer is available after the first loaded item.
@@ -921,9 +921,9 @@ export declare class DrawLayer {
      * Set the layer scale.
      *
      * @param {object} newScale The scale as {x,y}.
-     * @param {Point3D} center The scale center.
+     * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     /**
      * Set the layer offset.
      *
@@ -2771,6 +2771,67 @@ export declare class TagValueExtractor {
 }
 
 /**
+ * Toolbox controller.
+ */
+export declare class ToolboxController {
+    /**
+     * @param {object} toolList The list of tool objects.
+     */
+    constructor(toolList: object);
+    /**
+     * Initialise.
+     */
+    init(): void;
+    /**
+     * Get the tool list.
+     *
+     * @returns {Array} The list of tool objects.
+     */
+    getToolList(): any[];
+    /**
+     * Check if a tool is in the tool list.
+     *
+     * @param {string} name The name to check.
+     * @returns {boolean} The tool list element for the given name.
+     */
+    hasTool(name: string): boolean;
+    /**
+     * Get the selected tool.
+     *
+     * @returns {object} The selected tool.
+     */
+    getSelectedTool(): object;
+    /**
+     * Get the selected tool event handler.
+     *
+     * @param {string} eventType The event type, for example
+     *   mousedown, touchstart...
+     * @returns {Function} The event handler.
+     */
+    getSelectedToolEventHandler(eventType: string): Function;
+    /**
+     * Set the selected tool.
+     *
+     * @param {string} name The name of the tool.
+     */
+    setSelectedTool(name: string): void;
+    /**
+     * Set the selected tool live features.
+     *
+     * @param {object} list The list of features.
+     */
+    setToolFeatures(list: object): void;
+    /**
+     * Listen to layer interaction events.
+     *
+     * @param {LayerGroup} layerGroup The associated layer group.
+     * @param {ViewLayer|DrawLayer} layer The layer to listen to.
+     */
+    bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
+    #private;
+}
+
+/**
  * Tool configuration.
  */
 export declare class ToolConfig {
@@ -3670,9 +3731,9 @@ export declare class ViewLayer {
      * Set the layer scale.
      *
      * @param {object} newScale The scale as {x,y}.
-     * @param {Point3D} center The scale center.
+     * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
