@@ -795,7 +795,7 @@ export class App {
    * Add a data view config.
    *
    * @param {string} dataId The data id.
-   * @param {object} config The view configuration.
+   * @param {ViewConfig} config The view configuration.
    */
   addDataViewConfig(dataId, config) {
     // add to list
@@ -827,7 +827,7 @@ export class App {
    * Remove a data view config.
    *
    * @param {string} dataId The data id.
-   * @param {object} config The view configuration.
+   * @param {ViewConfig} config The view configuration.
    */
   removeDataViewConfig(dataId, config) {
     // remove from list
@@ -878,7 +878,7 @@ export class App {
    *
    * @param {string} dataId The data id.
    * @param {string} divId The div id.
-   * @param {object} config The view configuration.
+   * @param {ViewConfig} config The view configuration.
    */
   updateDataViewConfig(dataId, divId, config) {
     const configs = this.#options.dataViewConfigs;
@@ -943,7 +943,7 @@ export class App {
    * Create a layer group according to a view config:
    * adds it to stage and binds it.
    *
-   * @param {object} viewConfig The view config.
+   * @param {ViewConfig} viewConfig The view config.
    */
   #createLayerGroup(viewConfig) {
     // create new layer group
@@ -974,7 +974,7 @@ export class App {
    * Render the current data.
    *
    * @param {string} dataId The data id to render.
-   * @param {Array} [viewConfigs] The list of configs to render.
+   * @param {ViewConfig[]} [viewConfigs] The list of configs to render.
    */
   render(dataId, viewConfigs) {
     if (typeof dataId === 'undefined' || dataId === null) {
