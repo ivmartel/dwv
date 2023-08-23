@@ -833,6 +833,9 @@ export class LayerGroup {
         if (typeof baseViewLayerOrigin === 'undefined') {
           baseViewLayerOrigin0 = origin0;
           baseViewLayerOrigin = origin;
+          const zeroOffset = new Vector3D(0, 0, 0);
+          hasSetOffset =
+            this.#layers[i].setBaseOffset(zeroOffset, zeroOffset);
         } else {
           if (vc.canSetPosition(position) &&
             typeof origin !== 'undefined') {
