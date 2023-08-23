@@ -21,6 +21,8 @@ import {binderList} from '../gui/stage';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {LayerGroup} from '../gui/layerGroup';
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
 import {ColourMap} from '../image/luts';
 /* eslint-enable no-unused-vars */
@@ -169,22 +171,46 @@ export class App {
    */
   #options = null;
 
-  // data controller
+  /**
+   * Data controller.
+   *
+   * @type {DataController}
+   */
   #dataController = null;
 
-  // toolbox controller
+  /**
+   * Toolbox controller.
+   *
+   * @type {ToolboxController}
+   */
   #toolboxController = null;
 
-  // load controller
+  /**
+   * Load controller.
+   *
+   * @type {LoadController}
+   */
   #loadController = null;
 
-  // stage
+  /**
+   * Stage.
+   *
+   * @type {Stage}
+   */
   #stage = null;
 
-  // UndoStack
+  /**
+   * Undo stack.
+   *
+   * @type {UndoStack}
+   */
   #undoStack = null;
 
-  // Generic style
+  /**
+   * Style.
+   *
+   * @type {Style}
+   */
   #style = new Style();
 
   // overlay datas
@@ -245,7 +271,7 @@ export class App {
    * @returns {string} The new image data id.
    */
   addNewImage(image, meta) {
-    const dataId = this.#dataController.getDataIds().length;
+    const dataId = this.#dataController.getDataIds().length.toString();
 
     // load start event
     this.#fireEvent({
@@ -361,7 +387,7 @@ export class App {
   /**
    * Get the toolbox controller.
    *
-   * @returns {object} The controller.
+   * @returns {ToolboxController} The controller.
    */
   getToolboxController() {
     return this.#toolboxController;
@@ -382,7 +408,7 @@ export class App {
    * The layer are available after the first loaded item.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The layers.
+   * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataId(dataId) {
     return this.#stage.getViewLayersByDataId(dataId);
@@ -393,7 +419,7 @@ export class App {
    * The layer are available after the first loaded item.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The layers.
+   * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataId(dataId) {
     return this.#stage.getDrawLayersByDataId(dataId);

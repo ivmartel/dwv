@@ -7,6 +7,7 @@ import {
 } from './app/application';
 import {defaults} from './app/defaults';
 import {ViewController} from './app/viewController';
+import {ToolboxController} from './app/toolboxController';
 // dicom
 import {
   getDwvVersion,
@@ -78,6 +79,7 @@ export {
   ViewConfig,
   ToolConfig,
   ViewController,
+  ToolboxController,
   DataElement,
   DicomParser,
   DicomWriter,
