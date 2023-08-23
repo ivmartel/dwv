@@ -237,7 +237,7 @@ export class DrawLayer {
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
-   * @param {Point3D} center The scale center.
+   * @param {Point3D} [center] The scale center.
    */
   setScale(newScale, center) {
     const orientedNewScale =

@@ -21,6 +21,8 @@ import {binderList} from '../gui/stage';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {LayerGroup} from '../gui/layerGroup';
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
 import {ColourMap} from '../image/luts';
 /* eslint-enable no-unused-vars */
@@ -163,22 +165,46 @@ export class App {
    */
   #options = null;
 
-  // data controller
+  /**
+   * Data controller.
+   *
+   * @type {DataController}
+   */
   #dataController = null;
 
-  // toolbox controller
+  /**
+   * Toolbox controller.
+   *
+   * @type {ToolboxController}
+   */
   #toolboxController = null;
 
-  // load controller
+  /**
+   * Load controller.
+   *
+   * @type {LoadController}
+   */
   #loadController = null;
 
-  // stage
+  /**
+   * Stage.
+   *
+   * @type {Stage}
+   */
   #stage = null;
 
-  // UndoStack
+  /**
+   * Undo stack.
+   *
+   * @type {UndoStack}
+   */
   #undoStack = null;
 
-  // Generic style
+  /**
+   * Style.
+   *
+   * @type {Style}
+   */
   #style = new Style();
 
   /**
@@ -350,7 +376,7 @@ export class App {
   /**
    * Get the toolbox controller.
    *
-   * @returns {object} The controller.
+   * @returns {ToolboxController} The controller.
    */
   getToolboxController() {
     return this.#toolboxController;
@@ -371,7 +397,7 @@ export class App {
    * The layer are available after the first loaded item.
    *
    * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataIndex(index) {
     return this.#stage.getViewLayersByDataIndex(index);
@@ -382,7 +408,7 @@ export class App {
    * The layer are available after the first loaded item.
    *
    * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataIndex(index) {
     return this.#stage.getDrawLayersByDataIndex(index);
