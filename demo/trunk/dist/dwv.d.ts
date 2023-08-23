@@ -314,25 +314,25 @@ export declare class App {
      * Add a data view config.
      *
      * @param {string} dataId The data id.
-     * @param {object} config The view configuration.
+     * @param {ViewConfig} config The view configuration.
      */
-    addDataViewConfig(dataId: string, config: object): void;
+    addDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
      * Remove a data view config.
      *
      * @param {string} dataId The data id.
-     * @param {object} config The view configuration.
+     * @param {ViewConfig} config The view configuration.
      */
-    removeDataViewConfig(dataId: string, config: object): void;
+    removeDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
      * Update a data view config.
      * Removes and re-creates the layer if found.
      *
      * @param {string} dataId The data id.
      * @param {string} divId The div id.
-     * @param {object} config The view configuration.
+     * @param {ViewConfig} config The view configuration.
      */
-    updateDataViewConfig(dataId: string, divId: string, config: object): void;
+    updateDataViewConfig(dataId: string, divId: string, config: ViewConfig): void;
     /**
      * Set the layer groups binders.
      *
@@ -343,9 +343,9 @@ export declare class App {
      * Render the current data.
      *
      * @param {string} dataId The data id to render.
-     * @param {Array} [viewConfigs] The list of configs to render.
+     * @param {ViewConfig[]} [viewConfigs] The list of configs to render.
      */
-    render(dataId: string, viewConfigs?: any[]): void;
+    render(dataId: string, viewConfigs?: ViewConfig[]): void;
     /**
      * Zoom to the layers.
      *
