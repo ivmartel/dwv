@@ -214,7 +214,6 @@ export class DrawLayer {
    * Add a flip offset along the layer X axis.
    */
   addFlipOffsetX() {
-    // flip scale is handled by layer group
     // flip offset
     const scale = this.#konvaStage.scale();
     const size = this.#konvaStage.size();
@@ -229,7 +228,6 @@ export class DrawLayer {
    * Add a flip offset along the layer Y axis.
    */
   addFlipOffsetY() {
-    // flip scale is handled by layer group
     // flip offset
     const scale = this.#konvaStage.scale();
     const size = this.#konvaStage.size();
