@@ -23,7 +23,7 @@ export class Geometry {
   /**
    * Array of origins.
    *
-   * @type {Array}
+   * @type {Point3D[]}
    */
   #origins;
 
@@ -44,7 +44,7 @@ export class Geometry {
   /**
    * Local helper object for time points.
    *
-   * @type {object}
+   * @type {Object<string, Point3D[]>}
    */
   #timeOrigins = {};
 
@@ -165,7 +165,7 @@ export class Geometry {
   /**
    * Get the object origins.
    *
-   * @returns {Array} The object origins.
+   * @returns {Point3D[]} The object origins.
    */
   getOrigins() {
     return this.#origins;
@@ -418,7 +418,7 @@ export class Geometry {
    * Check that a index is within bounds.
    *
    * @param {Index} index The index to check.
-   * @param {Array} [dirs] Optional list of directions to check.
+   * @param {number[]} [dirs] Optional list of directions to check.
    * @returns {boolean} True if the given coordinates are within bounds.
    */
   isIndexInBounds(index, dirs) {
@@ -570,7 +570,7 @@ export function getDeOrientedArray3D(array3D, orientation) {
  * Get the slice spacing from the difference in the Z directions
  * of input origins.
  *
- * @param {Array} origins An array of Point3D.
+ * @param {Point3D[]} origins An array of Point3D.
  * @param {Matrix33} orientation The oritentation matrix.
  * @param {boolean} [withCheck] Flag to activate spacing variation check,
  *   default to true.
@@ -589,13 +589,13 @@ export function getSliceGeometrySpacing(origins, orientation, withCheck) {
   // applied on the patient position, reorders indices
   // so that Z is the slice direction
   const invOrientation = orientation.getInverse();
-  let origin1 = invOrientation.multiplyVector3D(origins[0]);
-  let origin2 = invOrientation.multiplyVector3D(origins[1]);
+  let origin1 = invOrientation.multiplyPoint3D(origins[0]);
+  let origin2 = invOrientation.multiplyPoint3D(origins[1]);
   let sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
   const deltas = [];
   for (let i = 0; i < origins.length - 1; ++i) {
-    origin1 = invOrientation.multiplyVector3D(origins[i]);
-    origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
+    origin1 = invOrientation.multiplyPoint3D(origins[i]);
+    origin2 = invOrientation.multiplyPoint3D(origins[i + 1]);
     const diff = Math.abs(origin1.getZ() - origin2.getZ());
     if (diff === 0) {
       throw new Error('Zero slice spacing.' +

@@ -35,7 +35,7 @@ export class Matrix33 {
   /**
    * Matrix values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
@@ -47,7 +47,7 @@ export class Matrix33 {
   #inverse;
 
   /**
-   * @param {Array} values row-major ordered 9 values.
+   * @param {number[]} values row-major ordered 9 values.
    */
   constructor(values) {
     this.#values = values;
@@ -58,7 +58,7 @@ export class Matrix33 {
    *
    * @param {number} row The row at wich to get the value.
    * @param {number} col The column at wich to get the value.
-   * @returns {number} The value at the position.
+   * @returns {number|undefined} The value at the position.
    */
   get(row, col) {
     return this.#values[row * 3 + col];
@@ -158,8 +158,8 @@ export class Matrix33 {
   /**
    * Multiply this matrix by a 3D array.
    *
-   * @param {Array} array3D The input 3D array.
-   * @returns {Array} The result 3D array.
+   * @param {number[]} array3D The input 3D array.
+   * @returns {number[]} The result 3D array.
    */
   multiplyArray3D(array3D) {
     if (array3D.length !== 3) {

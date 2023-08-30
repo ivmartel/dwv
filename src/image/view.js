@@ -18,7 +18,10 @@ import {Image} from './image';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {ColourMap} from './luts';
 import {Matrix33} from '../math/matrix';
-import {Point} from '../math/point';
+import {
+  Point,
+  Point3D
+} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -541,7 +544,7 @@ export class View {
    * Get the origin at a given position.
    *
    * @param {Point} position The position.
-   * @returns {Point} The origin.
+   * @returns {Point3D} The origin.
    */
   getOrigin(position) {
     const geometry = this.#image.getGeometry();

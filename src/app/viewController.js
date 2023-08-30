@@ -265,10 +265,10 @@ export class ViewController {
   }
 
   /**
-   * Get the origin at a given posittion.
+   * Get the origin at a given position.
    *
    * @param {Point} position The input position.
-   * @returns {Point} The origin.
+   * @returns {Point3D} The origin.
    */
   getOrigin(position) {
     return this.#view.getOrigin(position);
