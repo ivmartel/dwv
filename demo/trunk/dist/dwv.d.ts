@@ -984,7 +984,7 @@ export declare class DrawLayer {
      * @param {string} id The id of the group.
      * @returns {boolean} False if the group cannot be found.
      */
-    toogleGroupVisibility(id: string): boolean;
+    toggleGroupVisibility(id: string): boolean;
     /**
      * Delete a Draw from the stage.
      *
@@ -3966,17 +3966,21 @@ export declare class WindowLut {
  */
 export declare class WriterRule {
     /**
+     * @param {string} action The rule action.
+     */
+    constructor(action: string);
+    /**
      * Rule action: `copy`, `remove`, `clear` or `replace`.
      *
      * @type {string}
      */
     action: string;
     /**
-     * Value to use for replace action.
+     * Optional value to use for replace action.
      *
-     * @type {any}
+     * @type {any|undefined}
      */
-    value: any;
+    value: any | undefined;
 }
 
 export { }
