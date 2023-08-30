@@ -471,7 +471,7 @@ export class DrawLayer {
    * @param {string} id The id of the group.
    * @returns {boolean} False if the group cannot be found.
    */
-  toogleGroupVisibility(id) {
+  toggleGroupVisibility(id) {
     // get the group
     const group = this.#drawController.getGroup(id);
     if (typeof group === 'undefined') {
