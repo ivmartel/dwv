@@ -1699,34 +1699,60 @@ export class App {
 
     // major orientation axis
     const major = imageGeometry.getOrientation().getThirdColMajorDirection();
+    const rowAbsMax0 = imageGeometry.getOrientation().getRowAbsMax(0).value;
+    const rowAbsMax1 = imageGeometry.getOrientation().getRowAbsMax(1).value;
 
-    // flip
+    // flip flags
     let flipOffsetX = false;
     let flipOffsetY = false;
     let flipScaleZ = false;
-    if (typeof viewConfig.orientation !== 'undefined') {
-      if (major === 2) {
-        // scale flip Z for oriented views...
-        flipScaleZ = true;
-        // flip offset Y for axial aquired data
-        if (viewConfig.orientation !== 'axial') {
-          flipOffsetY = true;
-        }
-      } else if (major === 0) {
-        // scale flip Z for oriented views...
-        flipScaleZ = true;
-        // flip offset X for sagittal aquired data
-        if (viewConfig.orientation !== 'sagittal') {
+
+    if (major === 0) {
+      // sagittal case
+      // TODO: find other examples than bbmri
+      flipScaleZ = true;
+      if (typeof viewConfig.orientation !== 'undefined' &&
+        viewConfig.orientation !== 'sagittal') {
+        flipOffsetX = true;
+      }
+    } else if (major === 1) {
+      // coronal case
+      // TODO: find examples
+    } else if (major === 2) {
+      // axial case
+      // TODO: find an all negative test case
+      if (typeof viewConfig.orientation === 'undefined' ||
+        viewConfig.orientation === 'axial') {
+        if (rowAbsMax0 < 0) {
           flipOffsetX = true;
         }
-      }
-    } else {
-      if (major === 0) {
-        // scale flip Z for sagittal and undefined target orientation
+        if (rowAbsMax1 < 0) {
+          flipOffsetY = true;
+        }
+      } else {
         flipScaleZ = true;
+        if (rowAbsMax0 > 0 && rowAbsMax1 > 0) {
+          flipOffsetY = true;
+        }
+        if (viewConfig.orientation === 'coronal') {
+          if (rowAbsMax0 < 0) {
+            flipOffsetX = true;
+            if (rowAbsMax1 < 0) {
+              flipOffsetY = true;
+            }
+          }
+        } else if (viewConfig.orientation === 'sagittal') {
+          if (rowAbsMax1 < 0) {
+            flipOffsetX = true;
+            if (rowAbsMax0 < 0) {
+              flipOffsetY = true;
+            }
+          }
+        }
       }
     }
-    // apply
+
+    // apply flips
     if (flipOffsetX) {
       viewLayer.addFlipOffsetX();
       if (typeof drawLayer !== 'undefined') {
