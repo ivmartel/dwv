@@ -1720,7 +1720,6 @@ export class App {
       // TODO: find examples
     } else if (major === 2) {
       // axial case
-      // TODO: find an all negative test case
       if (typeof viewConfig.orientation === 'undefined' ||
         viewConfig.orientation === 'axial') {
         if (rowAbsMax0 < 0) {
