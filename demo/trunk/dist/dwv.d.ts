@@ -1087,9 +1087,9 @@ export declare class Geometry {
     /**
      * Get the object origins.
      *
-     * @returns {Array} The object origins.
+     * @returns {Point3D[]} The object origins.
      */
-    getOrigins(): any[];
+    getOrigins(): Point3D[];
     /**
      * Check if a point is in the origin list.
      *
@@ -1182,10 +1182,10 @@ export declare class Geometry {
      * Check that a index is within bounds.
      *
      * @param {Index} index The index to check.
-     * @param {Array} [dirs] Optional list of directions to check.
+     * @param {number[]} [dirs] Optional list of directions to check.
      * @returns {boolean} True if the given coordinates are within bounds.
      */
-    isIndexInBounds(index: Index, dirs?: any[]): boolean;
+    isIndexInBounds(index: Index, dirs?: number[]): boolean;
     /**
      * Convert an index into world coordinates.
      *
@@ -2066,17 +2066,17 @@ export declare const luts: {
  */
 export declare class Matrix33 {
     /**
-     * @param {Array} values row-major ordered 9 values.
+     * @param {number[]} values row-major ordered 9 values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get a value of the matrix.
      *
      * @param {number} row The row at wich to get the value.
      * @param {number} col The column at wich to get the value.
-     * @returns {number} The value at the position.
+     * @returns {number|undefined} The value at the position.
      */
-    get(row: number, col: number): number;
+    get(row: number, col: number): number | undefined;
     /**
      * Get the inverse of this matrix.
      *
@@ -2115,10 +2115,10 @@ export declare class Matrix33 {
     /**
      * Multiply this matrix by a 3D array.
      *
-     * @param {Array} array3D The input 3D array.
-     * @returns {Array} The result 3D array.
+     * @param {number[]} array3D The input 3D array.
+     * @returns {number[]} The result 3D array.
      */
-    multiplyArray3D(array3D: any[]): any[];
+    multiplyArray3D(array3D: number[]): number[];
     /**
      * Multiply this matrix by a 3D vector.
      *
@@ -3097,9 +3097,9 @@ export declare class View {
      * Get the origin at a given position.
      *
      * @param {Point} position The position.
-     * @returns {Point} The origin.
+     * @returns {Point3D} The origin.
      */
-    getOrigin(position: Point): Point;
+    getOrigin(position: Point): Point3D;
     /**
      * Set the current position.
      *
@@ -3365,12 +3365,12 @@ export declare class ViewController {
      */
     getCurrentScrollIndexValue(): object;
     /**
-     * Get the origin at a given posittion.
+     * Get the origin at a given position.
      *
      * @param {Point} position The input position.
-     * @returns {Point} The origin.
+     * @returns {Point3D} The origin.
      */
-    getOrigin(position: Point): Point;
+    getOrigin(position: Point): Point3D;
     /**
      * Get the current scroll position value.
      *
