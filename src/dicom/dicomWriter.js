@@ -50,11 +50,18 @@ export class WriterRule {
    */
   action;
   /**
-   * Value to use for replace action.
+   * Optional value to use for replace action.
    *
-   * @type {any}
+   * @type {any|undefined}
    */
   value;
+
+  /**
+   * @param {string} action The rule action.
+   */
+  constructor(action) {
+    this.action = action;
+  }
 }
 
 /**
