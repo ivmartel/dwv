@@ -343,10 +343,26 @@ export class Geometry {
    * @param {number} [time] Optional time index.
    */
   appendOrigin(origin, index, time) {
+    // equal callback
+    const equalToOrigin = function (element) {
+      return element.equals(origin);
+    };
     if (typeof time !== 'undefined') {
+      // check if not already in list
+      const found = this.#timeOrigins[time].find(equalToOrigin);
+      if (typeof found !== 'undefined') {
+        throw new Error('Cannot append same time origin twice');
+      }
+      // add in origin array
       this.#timeOrigins[time].splice(index, 0, origin);
     }
     if (typeof time === 'undefined' || time === this.#initialTime) {
+      // check if not already in list
+      const found = this.#origins.find(equalToOrigin);
+      if (typeof found !== 'undefined') {
+        throw new Error('Cannot append same origin twice');
+      }
+      // update flag
       this.#newOrigins = true;
       // add in origin array
       this.#origins.splice(index, 0, origin);
