@@ -114,6 +114,17 @@ export class ColourMap {
    * @type {number[]}
    */
   blue;
+
+  /**
+   * @param {number[]} red Red component.
+   * @param {number[]} green Green component.
+   * @param {number[]} blue Blue component.
+   */
+  constructor(red, green, blue) {
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
+  }
 }
 
 /**
