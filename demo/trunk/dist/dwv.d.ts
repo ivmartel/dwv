@@ -563,6 +563,12 @@ export declare function buildMultipart(parts: any[], boundary: string): Uint8Arr
  */
 export declare class ColourMap {
     /**
+     * @param {number[]} red Red component.
+     * @param {number[]} green Green component.
+     * @param {number[]} blue Blue component.
+     */
+    constructor(red: number[], green: number[], blue: number[]);
+    /**
      * Red component: 256 values in the [0, 255] range.
      *
      * @type {number[]}
