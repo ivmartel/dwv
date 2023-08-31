@@ -1699,8 +1699,8 @@ export class App {
 
     // major orientation axis
     const major = imageGeometry.getOrientation().getThirdColMajorDirection();
-    const rowAbsMax0 = imageGeometry.getOrientation().getRowAbsMax(0).value;
-    const rowAbsMax1 = imageGeometry.getOrientation().getRowAbsMax(1).value;
+    const colAbsMax0 = imageGeometry.getOrientation().getColAbsMax(0).value;
+    const colAbsMax1 = imageGeometry.getOrientation().getColAbsMax(1).value;
 
     // flip flags
     let flipOffsetX = false;
@@ -1709,11 +1709,38 @@ export class App {
 
     if (major === 0) {
       // sagittal case
-      // TODO: find other examples than bbmri
-      flipScaleZ = true;
-      if (typeof viewConfig.orientation !== 'undefined' &&
-        viewConfig.orientation !== 'sagittal') {
-        flipOffsetX = true;
+      if (typeof viewConfig.orientation === 'undefined' ||
+        viewConfig.orientation === 'sagittal') {
+        flipScaleZ = true;
+        if (colAbsMax0 < 0) {
+          flipOffsetX = true;
+        }
+        if (colAbsMax1 > 0) {
+          flipOffsetY = true;
+        }
+      } else {
+        // common
+        if (colAbsMax0 > 0 && colAbsMax1 < 0) {
+          flipOffsetX = true;
+        }
+        if (colAbsMax0 < 0 && colAbsMax1 > 0) {
+          flipOffsetX = true;
+          flipOffsetY = true;
+        }
+        // specific
+        if (viewConfig.orientation === 'axial') {
+          if (colAbsMax0 > 0) {
+            flipScaleZ = true;
+          }
+          if (colAbsMax0 < 0 && colAbsMax1 < 0) {
+            flipOffsetY = true;
+          }
+        } else if (viewConfig.orientation === 'coronal') {
+          flipScaleZ = true;
+          if (colAbsMax0 > 0 && colAbsMax1 > 0) {
+            flipOffsetY = true;
+          }
+        }
       }
     } else if (major === 1) {
       // coronal case
@@ -1722,30 +1749,30 @@ export class App {
       // axial case
       if (typeof viewConfig.orientation === 'undefined' ||
         viewConfig.orientation === 'axial') {
-        if (rowAbsMax0 < 0) {
+        if (colAbsMax0 < 0) {
           flipOffsetX = true;
         }
-        if (rowAbsMax1 < 0) {
+        if (colAbsMax1 < 0) {
           flipOffsetY = true;
         }
       } else {
+        // common
         flipScaleZ = true;
-        if (rowAbsMax0 > 0 && rowAbsMax1 > 0) {
+        if (colAbsMax0 > 0 && colAbsMax1 > 0) {
           flipOffsetY = true;
         }
+        if (colAbsMax0 < 0 && colAbsMax1 < 0) {
+          flipOffsetX = true;
+          flipOffsetY = true;
+        }
+        // specific
         if (viewConfig.orientation === 'coronal') {
-          if (rowAbsMax0 < 0) {
+          if (colAbsMax0 < 0 && colAbsMax1 > 0) {
             flipOffsetX = true;
-            if (rowAbsMax1 < 0) {
-              flipOffsetY = true;
-            }
           }
         } else if (viewConfig.orientation === 'sagittal') {
-          if (rowAbsMax1 < 0) {
+          if (colAbsMax0 > 0 && colAbsMax1 < 0) {
             flipOffsetX = true;
-            if (rowAbsMax0 < 0) {
-              flipOffsetY = true;
-            }
           }
         }
       }
