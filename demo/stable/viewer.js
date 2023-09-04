@@ -27,6 +27,16 @@ function viewerSetup() {
   dwv.decoderScripts.rle =
     './decoders/dwv/decode-rle.js';
 
+  // // example private logic for roi dialog
+  // dwv.customUI.openRoiDialog = function (meta, cb) {
+  //   console.log('roi dialog', meta);
+  //   const textExpr = prompt('[Custom dialog] Label', meta.textExpr);
+  //   if (textExpr !== null) {
+  //     meta.textExpr = textExpr;
+  //     cb(meta);
+  //   }
+  // };
+
   // // example private logic for time value retrieval
   // dwv.TagValueExtractor.prototype.getTime = function (elements) {
   //   let value;
@@ -108,14 +118,12 @@ function viewerSetup() {
   };
 
   // app config
-  const config = {
-    viewOnFirstLoadItem: viewOnFirstLoadItem,
-    dataViewConfigs: dataViewConfigs,
-    tools: _tools
-  };
+  const options = new dwv.AppOptions(dataViewConfigs);
+  options.tools = _tools;
+  options.viewOnFirstLoadItem = viewOnFirstLoadItem;
   // app
   _app = new dwv.App();
-  _app.init(config);
+  _app.init(options);
 
   // bind events
   _app.addEventListener('loaderror', function (event) {
@@ -271,16 +279,16 @@ function viewerSetup() {
     _app.onResize();
   });
 
-  const options = {};
+  const uriOptions = {};
   // special dicom web request header
   if (_dicomWeb) {
-    options.requestHeaders = [{
+    uriOptions.requestHeaders = [{
       name: 'Accept',
       value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
     }];
   }
   // load from window location
-  _app.loadFromUri(window.location.href, options);
+  _app.loadFromUri(window.location.href, uriOptions);
 }
 
 /**
@@ -320,7 +328,7 @@ function onDOMContentLoaded() {
     unbindAppToControls();
 
     // set config
-    _app.setDataViewConfig(configs);
+    _app.setDataViewConfigs(configs);
 
     clearDataTable();
     for (let i = 0; i < _app.getNumberOfLoadedData(); ++i) {
@@ -748,7 +756,7 @@ function addDataRow(id) {
     bindAppToControls();
   }
 
-  const dataViewConfigs = _app.getDataViewConfig();
+  const dataViewConfigs = _app.getDataViewConfigs();
   const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
   // use first view layer
   const vls = _app.getViewLayersByDataIndex(id);
