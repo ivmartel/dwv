@@ -108,10 +108,6 @@ export function getFlags(inputStr) {
  *
  * @param {string} inputStr The input string.
  * @param {object} values A object of {value, unit}.
- * @example
- *    const values = {"length": { "value": 33, "unit": "cm" } };
- *    const str = "The length is: {length}.";
- *    const res = dwv.replaceFlags(str, values); // "The length is: 33 cm."
  * @returns {string} The result string.
  */
 export function replaceFlags(inputStr, values) {

@@ -1,6 +1,6 @@
 ## Fiddle
 
-Some fiddles for you to play... Some are bundled with the code, scroll below the method arguments to see the example code.
+Some fiddles for you to play... Some are bundled with the code, scroll below the method arguments to see the example code. They all use the `dwv` prefix since the example are run in a pure javascript environment. This is not necessary in an es6 environment where you use the names defined when you import the classes.
 
 DICOM parsing:
  * [parser example #1](./DicomParser.html#DicomParser): parse DICOM data and display a tag
