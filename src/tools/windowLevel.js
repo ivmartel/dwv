@@ -17,10 +17,10 @@ import {App} from '../app/application';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new AppOptions(viewConfigs);
- * options.tools = {WindowLevel: new ToolConfig()};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * options.tools = {WindowLevel: new dwv.ToolConfig()};
  * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
