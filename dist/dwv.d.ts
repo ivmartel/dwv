@@ -108,9 +108,9 @@ export declare class App {
     /**
      * Get the toolbox controller.
      *
-     * @returns {object} The controller.
+     * @returns {ToolboxController} The controller.
      */
-    getToolboxController(): object;
+    getToolboxController(): ToolboxController;
     /**
      * Get the active layer group.
      * The layer is available after the first loaded item.
@@ -123,17 +123,17 @@ export declare class App {
      * The layer are available after the first loaded item.
      *
      * @param {number} index The data index.
-     * @returns {Array} The layers.
+     * @returns {ViewLayer[]} The layers.
      */
-    getViewLayersByDataIndex(index: number): any[];
+    getViewLayersByDataIndex(index: number): ViewLayer[];
     /**
      * Get the draw layers associated to a data index.
      * The layer are available after the first loaded item.
      *
      * @param {number} index The data index.
-     * @returns {Array} The layers.
+     * @returns {DrawLayer[]} The layers.
      */
-    getDrawLayersByDataIndex(index: number): any[];
+    getDrawLayersByDataIndex(index: number): DrawLayer[];
     /**
      * Get a layer group by div id.
      * The layer is available after the first loaded item.
@@ -466,11 +466,11 @@ export declare class AppOptions {
     /**
      * Tool name indexed object containing individual tool configurations.
      *
-     * @type {Object<string, ToolConfig>}
+     * @type {Object<string, ToolConfig>|undefined}
      */
     tools: {
         [x: string]: ToolConfig;
-    };
+    } | undefined;
     /**
      * Optional array of layerGroup binder names.
      *
@@ -511,6 +511,12 @@ export declare function buildMultipart(parts: any[], boundary: string): Uint8Arr
  * to associate with intensity values.
  */
 export declare class ColourMap {
+    /**
+     * @param {number[]} red Red component.
+     * @param {number[]} green Green component.
+     * @param {number[]} blue Blue component.
+     */
+    constructor(red: number[], green: number[], blue: number[]);
     /**
      * Red component: 256 values in the [0, 255] range.
      *
@@ -858,9 +864,9 @@ export declare class DrawLayer {
      * Set the layer scale.
      *
      * @param {object} newScale The scale as {x,y}.
-     * @param {Point3D} center The scale center.
+     * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     /**
      * Set the layer offset.
      *
@@ -921,7 +927,7 @@ export declare class DrawLayer {
      * @param {string} id The id of the group.
      * @returns {boolean} False if the group cannot be found.
      */
-    toogleGroupVisibility(id: string): boolean;
+    toggleGroupVisibility(id: string): boolean;
     /**
      * Delete a Draw from the stage.
      *
@@ -2667,6 +2673,67 @@ export declare class TagValueExtractor {
 }
 
 /**
+ * Toolbox controller.
+ */
+export declare class ToolboxController {
+    /**
+     * @param {object} toolList The list of tool objects.
+     */
+    constructor(toolList: object);
+    /**
+     * Initialise.
+     */
+    init(): void;
+    /**
+     * Get the tool list.
+     *
+     * @returns {Array} The list of tool objects.
+     */
+    getToolList(): any[];
+    /**
+     * Check if a tool is in the tool list.
+     *
+     * @param {string} name The name to check.
+     * @returns {boolean} The tool list element for the given name.
+     */
+    hasTool(name: string): boolean;
+    /**
+     * Get the selected tool.
+     *
+     * @returns {object} The selected tool.
+     */
+    getSelectedTool(): object;
+    /**
+     * Get the selected tool event handler.
+     *
+     * @param {string} eventType The event type, for example
+     *   mousedown, touchstart...
+     * @returns {Function} The event handler.
+     */
+    getSelectedToolEventHandler(eventType: string): Function;
+    /**
+     * Set the selected tool.
+     *
+     * @param {string} name The name of the tool.
+     */
+    setSelectedTool(name: string): void;
+    /**
+     * Set the selected tool live features.
+     *
+     * @param {object} list The list of features.
+     */
+    setToolFeatures(list: object): void;
+    /**
+     * Listen to layer interaction events.
+     *
+     * @param {object} layer The layer to listen to.
+     * @param {string} layerGroupDivId The associated layer group div id.
+     */
+    bindLayer(layer: object, layerGroupDivId: string): void;
+    #private;
+}
+
+/**
  * Tool configuration.
  */
 export declare class ToolConfig {
@@ -3552,9 +3619,9 @@ export declare class ViewLayer {
      * Set the layer scale.
      *
      * @param {object} newScale The scale as {x,y}.
-     * @param {Point3D} center The scale center.
+     * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
@@ -3818,17 +3885,21 @@ export declare class WindowLut {
  */
 export declare class WriterRule {
     /**
+     * @param {string} action The rule action.
+     */
+    constructor(action: string);
+    /**
      * Rule action: `copy`, `remove`, `clear` or `replace`.
      *
      * @type {string}
      */
     action: string;
     /**
-     * Value to use for replace action.
+     * Optional value to use for replace action.
      *
-     * @type {any}
+     * @type {any|undefined}
      */
-    value: any;
+    value: any | undefined;
 }
 
 export { }

@@ -25,7 +25,7 @@ export class App {
     getDataViewConfigs(): {
         [x: string]: ViewConfig[];
     };
-    getDrawLayersByDataIndex(index: number): any[];
+    getDrawLayersByDataIndex(index: number): DrawLayer[];
     getImage(index: number): Image_2;
     getJsonState(): string;
     getLastImage(): Image_2;
@@ -36,8 +36,8 @@ export class App {
     getOffset(): object;
     getStackSize(): number;
     getStyle(): object;
-    getToolboxController(): object;
-    getViewLayersByDataIndex(index: number): any[];
+    getToolboxController(): ToolboxController;
+    getViewLayersByDataIndex(index: number): ViewLayer[];
     init(opt: AppOptions): void;
     initWLDisplay(): void;
     loadFiles: (files: File[]) => void;
@@ -82,7 +82,7 @@ export class AppOptions {
     defaultCharacterSet: string | undefined;
     tools: {
         [x: string]: ToolConfig;
-    };
+    } | undefined;
     viewOnFirstLoadItem: boolean | undefined;
 }
 
@@ -91,6 +91,7 @@ export function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
 // @public
 export class ColourMap {
+    constructor(red: number[], green: number[], blue: number[]);
     blue: number[];
     green: number[];
     red: number[];
@@ -194,8 +195,8 @@ export class DrawLayer {
     setOffset(newOffset: object): void;
     setOpacity(alpha: number): void;
     setPlaneHelper(helper: object): void;
-    setScale(newScale: object, center: Point3D): void;
-    toogleGroupVisibility(id: string): boolean;
+    setScale(newScale: object, center?: Point3D): void;
+    toggleGroupVisibility(id: string): boolean;
     unbindInteraction(): void;
 }
 
@@ -540,6 +541,19 @@ export class TagValueExtractor {
 }
 
 // @public
+export class ToolboxController {
+    constructor(toolList: object);
+    bindLayer(layer: object, layerGroupDivId: string): void;
+    getSelectedTool(): object;
+    getSelectedToolEventHandler(eventType: string): Function;
+    getToolList(): any[];
+    hasTool(name: string): boolean;
+    init(): void;
+    setSelectedTool(name: string): void;
+    setToolFeatures(list: object): void;
+}
+
+// @public
 export class ToolConfig {
     constructor(options?: string[]);
     options: string[] | undefined;
@@ -700,7 +714,7 @@ export class ViewLayer {
     setCurrentPosition(position: Point, _index: Index): boolean;
     setOffset(newOffset: object): void;
     setOpacity(alpha: number): void;
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     setView(view: object, index: number): void;
     unbindInteraction(): void;
 }
@@ -732,8 +746,9 @@ export class WindowLut {
 
 // @public
 export class WriterRule {
+    constructor(action: string);
     action: string;
-    value: any;
+    value: any | undefined;
 }
 
 // (No @packageDocumentation comment for this package)

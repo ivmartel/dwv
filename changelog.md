@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.32.2](https://github.com/ivmartel/dwv/releases/tag/v0.32.2) - 04/09/2023
+
+### Added
+
+- Add app options type  [#1481](https://github.com/ivmartel/dwv/issues/1481)
+- Add data element type [#1474](https://github.com/ivmartel/dwv/issues/1474)
+- Export luts as plural not singular [#1478](https://github.com/ivmartel/dwv/issues/1478)
+- Add data view config type [#1475](https://github.com/ivmartel/dwv/issues/1475)
+- Use File[] and not Filelist [#1476](https://github.com/ivmartel/dwv/issues/1476)
+
 ## [v0.32.1](https://github.com/ivmartel/dwv/releases/tag/v0.32.1) - 19/06/2023
 
 ### Added
