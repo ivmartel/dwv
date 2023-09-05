@@ -200,17 +200,21 @@ export class ImageFactory {
     }
 
     // PET SUV
-    let intensityFactor = 1;
+    let isPetWithSuv = false;
     if (modality.value[0] === 'PT') {
       const warn = canGetSuvFactor(dataElements);
       if (warn.length === 0) {
-        intensityFactor = getSuvFactor(dataElements);
-        logger.info('Applying PET SUV calibration: ' + intensityFactor);
-        slope *= intensityFactor;
-        intercept *= intensityFactor;
+        isPetWithSuv = true;
       } else {
         logger.warn(warn);
       }
+    }
+    let intensityFactor = 1;
+    if (isPetWithSuv) {
+      intensityFactor = getSuvFactor(dataElements);
+      logger.info('Applying PET SUV calibration: ' + intensityFactor);
+      slope *= intensityFactor;
+      intercept *= intensityFactor;
     }
     const rsi = new RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept(rsi);
@@ -238,9 +242,13 @@ export class ImageFactory {
     // PixelRepresentation -> is signed
     meta.IsSigned = meta.PixelRepresentation === 1;
     // local pixel unit
-    const pixelUnit = getPixelUnit(dataElements);
-    if (typeof pixelUnit !== 'undefined') {
-      meta.pixelUnit = pixelUnit;
+    if (isPetWithSuv) {
+      meta.pixelUnit = 'SUV';
+    } else {
+      const pixelUnit = getPixelUnit(dataElements);
+      if (typeof pixelUnit !== 'undefined') {
+        meta.pixelUnit = pixelUnit;
+      }
     }
     // FrameOfReferenceUID (optional)
     const frameOfReferenceUID = dataElements['00200052'];

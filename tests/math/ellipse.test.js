@@ -64,6 +64,9 @@ QUnit.test('Test Ellipse quantify.', function (assert) {
     },
     getImageVariableRegionValues: function () {
       return [0, 1, 1, 0, 0, 1, 1, 0];
+    },
+    getPixelUnit: function () {
+      return '';
     }
   };
   const theoQuant0 = {

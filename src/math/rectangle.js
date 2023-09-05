@@ -190,19 +190,20 @@ export class Rectangle {
     if (viewController.canQuantifyImage()) {
       const round = this.getRound();
       const values = viewController.getImageRegionValues(round.min, round.max);
+      const unit = viewController.getPixelUnit();
       const quantif = getStats(values, flags);
-      quant.min = {value: quantif.min, unit: ''};
-      quant.max = {value: quantif.max, unit: ''};
-      quant.mean = {value: quantif.mean, unit: ''};
-      quant.stdDev = {value: quantif.stdDev, unit: ''};
+      quant.min = {value: quantif.min, unit: unit};
+      quant.max = {value: quantif.max, unit: unit};
+      quant.mean = {value: quantif.mean, unit: unit};
+      quant.stdDev = {value: quantif.stdDev, unit: unit};
       if (typeof quantif.median !== 'undefined') {
-        quant.median = {value: quantif.median, unit: ''};
+        quant.median = {value: quantif.median, unit: unit};
       }
       if (typeof quantif.p25 !== 'undefined') {
-        quant.p25 = {value: quantif.p25, unit: ''};
+        quant.p25 = {value: quantif.p25, unit: unit};
       }
       if (typeof quantif.p75 !== 'undefined') {
-        quant.p75 = {value: quantif.p75, unit: ''};
+        quant.p75 = {value: quantif.p75, unit: unit};
       }
     }
 
