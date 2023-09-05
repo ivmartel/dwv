@@ -7,6 +7,12 @@ import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Protractor factory.
  */
@@ -41,7 +47,7 @@ export class ProtractorFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -51,10 +57,10 @@ export class ProtractorFactory {
   /**
    * Create a protractor shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the protractor.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the protractor.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -172,8 +178,8 @@ export class ProtractorFactory {
   /**
    * Get anchors to update a protractor shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
@@ -196,8 +202,8 @@ export class ProtractorFactory {
    * Update a protractor shape.
    *
    * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} _viewController The associated view controller.
+   * @param {Style} style The app style.
+   * @param {ViewController} _viewController The associated view controller.
    */
   update(anchor, style, _viewController) {
     // parent group

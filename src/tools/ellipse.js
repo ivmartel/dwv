@@ -8,6 +8,12 @@ import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Ellipse factory.
  */
@@ -42,7 +48,7 @@ export class EllipseFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -52,10 +58,10 @@ export class EllipseFactory {
   /**
    * Create an ellipse shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the ellipse.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the ellipse.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(
     points, style, viewController) {
@@ -139,9 +145,9 @@ export class EllipseFactory {
   /**
    * Get anchors to update an ellipse shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Ellipse} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const ellipseX = shape.x();
@@ -168,8 +174,8 @@ export class EllipseFactory {
    * Update an ellipse shape.
    *
    * @param {object} anchor The active anchor.
-   * @param {object} _style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Style} _style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, _style, viewController) {
     // parent group
@@ -272,7 +278,7 @@ export class EllipseFactory {
    * Update the quantification of an Ellipse.
    *
    * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
     this.#updateEllipseQuantification(group, viewController);
@@ -283,7 +289,7 @@ export class EllipseFactory {
    *   function to be used in update).
    *
    * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    */
   #updateEllipseQuantification(group, viewController) {
     // associated shape
@@ -318,7 +324,7 @@ export class EllipseFactory {
    * Get the debug shadow.
    *
    * @param {Ellipse} ellipse The ellipse to shadow.
-   * @param {object} group The associated group.
+   * @param {Konva.Group} [group] The associated group.
    * @returns {object} The shadow konva group.
    */
   #getShadowEllipse(ellipse, group) {

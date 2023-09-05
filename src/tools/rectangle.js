@@ -8,6 +8,12 @@ import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Rectangle factory.
  */
@@ -42,7 +48,7 @@ export class RectangleFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -52,10 +58,10 @@ export class RectangleFactory {
   /**
    * Create a rectangle shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the rectangle.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the rectangle.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -133,9 +139,9 @@ export class RectangleFactory {
   /**
    * Get anchors to update a rectangle shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Shape} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const rectX = shape.x();
@@ -162,9 +168,9 @@ export class RectangleFactory {
   /**
    * Update a rectangle shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, style, viewController) {
     // parent group
@@ -274,7 +280,7 @@ export class RectangleFactory {
    * Update the quantification of a Rectangle.
    *
    * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
     this.#updateRectangleQuantification(group, viewController);
@@ -285,7 +291,7 @@ export class RectangleFactory {
    *   function to be used in update).
    *
    * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    */
   #updateRectangleQuantification(group, viewController) {
     // associated shape
@@ -322,8 +328,8 @@ export class RectangleFactory {
   /**
    * Get the debug shadow.
    *
-   * @param {object} rectangle The rectangle to shadow.
-   * @returns {object} The shadow konva shape.
+   * @param {Rectangle} rectangle The rectangle to shadow.
+   * @returns {Konva.Rect} The shadow konva shape.
    */
   #getShadowRectangle(rectangle) {
     const round = rectangle.getRound();

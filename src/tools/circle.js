@@ -8,6 +8,12 @@ import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Circle factory.
  */
@@ -42,7 +48,7 @@ export class CircleFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -52,10 +58,10 @@ export class CircleFactory {
   /**
    * Create a circle shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the circle.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the circle.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // calculate radius
@@ -136,9 +142,9 @@ export class CircleFactory {
   /**
    * Get anchors to update a circle shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Circle} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const centerX = shape.x();
@@ -165,8 +171,8 @@ export class CircleFactory {
    * Update a circle shape.
    *
    * @param {object} anchor The active anchor.
-   * @param {object} _style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Style} _style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, _style, viewController) {
     // parent group
@@ -280,7 +286,7 @@ export class CircleFactory {
    * Update the quantification of a Circle.
    *
    * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
     this.#updateCircleQuantification(group, viewController);
@@ -291,7 +297,7 @@ export class CircleFactory {
    *   function to be used in update).
    *
    * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    */
   #updateCircleQuantification(
     group, viewController) {
@@ -326,7 +332,7 @@ export class CircleFactory {
    * Get the debug shadow.
    *
    * @param {Circle} circle The circle to shadow.
-   * @param {object} group The associated group.
+   * @param {Konva.Group} [group] The associated group.
    * @returns {object} The shadow konva group.
    */
   #getShadowCircle(circle, group) {

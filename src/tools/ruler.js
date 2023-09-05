@@ -6,6 +6,12 @@ import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Ruler factory.
  */
@@ -40,7 +46,7 @@ export class RulerFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -50,10 +56,10 @@ export class RulerFactory {
   /**
    * Create a ruler shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the line.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -165,9 +171,9 @@ export class RulerFactory {
   /**
    * Get anchors to update a ruler shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const points = shape.points();
@@ -186,8 +192,8 @@ export class RulerFactory {
    * Update a ruler shape.
    *
    * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Style} style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, style, viewController) {
     // parent group

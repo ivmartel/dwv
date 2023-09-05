@@ -4,6 +4,13 @@ import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point2D} from '../math/point';
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * ROI factory.
  */
@@ -39,7 +46,7 @@ export class RoiFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -49,10 +56,10 @@ export class RoiFactory {
   /**
    * Create a roi shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the line.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} [viewController] The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -83,11 +90,13 @@ export class RoiFactory {
       name: 'text'
     });
     let textExpr = '';
-    const modality = viewController.getModality();
-    if (typeof defaults.labelText.roi[modality] !== 'undefined') {
-      textExpr = defaults.labelText.roi[modality];
-    } else {
-      textExpr = defaults.labelText.roi['*'];
+    if (typeof viewController !== 'undefined') {
+      const modality = viewController.getModality();
+      if (typeof defaults.labelText.roi[modality] !== 'undefined') {
+        textExpr = defaults.labelText.roi[modality];
+      } else {
+        textExpr = defaults.labelText.roi['*'];
+      }
     }
     ktext.setText(textExpr);
     // augment text with meta
@@ -123,9 +132,9 @@ export class RoiFactory {
   /**
    * Get anchors to update a roi shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const points = shape.points();
@@ -146,8 +155,8 @@ export class RoiFactory {
    * Update a roi shape.
    *
    * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} _viewController The associated view controller.
+   * @param {Style} style The app style.
+   * @param {ViewController} _viewController The associated view controller.
    */
   update(anchor, style, _viewController) {
     // parent group
