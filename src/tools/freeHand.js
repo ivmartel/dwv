@@ -172,8 +172,9 @@ export class FreeHandFactory {
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
     const points = kline.points();
-    points[anchor.id()] = anchor.x() - kline.x();
-    points[anchor.id() + 1] = anchor.y() - kline.y();
+    const index = parseInt(anchor.id(), 10);
+    points[index] = anchor.x() - kline.x();
+    points[index + 1] = anchor.y() - kline.y();
     // concat to make Konva think it is a new array
     kline.points(points.concat());
 
