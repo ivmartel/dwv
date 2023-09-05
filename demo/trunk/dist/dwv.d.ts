@@ -855,6 +855,133 @@ export declare class DicomWriter {
 }
 
 /**
+ * Draw controller.
+ */
+export declare class DrawController {
+    /**
+     * @param {DrawLayer} drawLayer The draw layer.
+     */
+    constructor(drawLayer: DrawLayer);
+    /**
+     * Get the current position group.
+     *
+     * @returns {object} The Konva.Group.
+     */
+    getCurrentPosGroup(): object;
+    /**
+     * Reset: clear the layers array.
+     */
+    reset(): void;
+    /**
+     * Get a Konva group using its id.
+     *
+     * @param {string} id The group id.
+     * @returns {object|undefined} The Konva group.
+     */
+    getGroup(id: string): object | undefined;
+    /**
+     * Activate the current draw layer.
+     *
+     * @param {Index} index The current position.
+     * @param {number} scrollIndex The scroll index.
+     */
+    activateDrawLayer(index: Index, scrollIndex: number): void;
+    /**
+     * Get a list of drawing display details.
+     *
+     * @returns {DrawDetails[]} A list of draw details.
+     */
+    getDrawDisplayDetails(): DrawDetails[];
+    /**
+     * Get a list of drawing store details. Used in state.
+     *
+     * @returns {object} A list of draw details including id, text, quant...
+     * TODO Unify with getDrawDisplayDetails?
+     */
+    getDrawStoreDetails(): object;
+    /**
+     * Set the drawings on the current stage.
+     *
+     * @param {Array} drawings An array of drawings.
+     * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+     * @param {object} cmdCallback The DrawCommand callback.
+     * @param {object} exeCallback The callback to call once the
+     *   DrawCommand has been executed.
+     */
+    setDrawings(drawings: any[], drawingsDetails: DrawDetails[], cmdCallback: object, exeCallback: object): void;
+    /**
+     * Update a drawing from its details.
+     *
+     * @param {DrawDetails} drawDetails Details of the drawing to update.
+     */
+    updateDraw(drawDetails: DrawDetails): void;
+    /**
+     * Delete a Draw from the stage.
+     *
+     * @param {object} group The group to delete.
+     * @param {object} cmdCallback The DeleteCommand callback.
+     * @param {object} exeCallback The callback to call once the
+     *  DeleteCommand has been executed.
+     */
+    deleteDrawGroup(group: object, cmdCallback: object, exeCallback: object): void;
+    /**
+     * Delete a Draw from the stage.
+     *
+     * @param {string} id The id of the group to delete.
+     * @param {Function} cmdCallback The DeleteCommand callback.
+     * @param {Function} exeCallback The callback to call once the
+     *  DeleteCommand has been executed.
+     * @returns {boolean} False if the group cannot be found.
+     */
+    deleteDraw(id: string, cmdCallback: Function, exeCallback: Function): boolean;
+    /**
+     * Delete all Draws from the stage.
+     *
+     * @param {Function} cmdCallback The DeleteCommand callback.
+     * @param {Function} exeCallback The callback to call once the
+     *  DeleteCommand has been executed.
+     */
+    deleteDraws(cmdCallback: Function, exeCallback: Function): void;
+    #private;
+}
+
+/**
+ * Draw details.
+ */
+export declare class DrawDetails {
+    /**
+     * The draw ID.
+     *
+     * @type {number}
+     */
+    id: number;
+    /**
+     * The draw position: an Index converted to string.
+     *
+     * @type {string}
+     */
+    position: string;
+    /**
+     * The draw type.
+     *
+     * @type {string}
+     */
+    type: string;
+    /**
+     * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+     *
+     * @type {string}
+     */
+    color: string;
+    /**
+     * The draw meta.
+     *
+     * @type {DrawMeta}
+     */
+    meta: DrawMeta;
+}
+
+/**
  * Draw layer.
  */
 export declare class DrawLayer {
@@ -1045,6 +1172,25 @@ export declare class DrawLayer {
      */
     removeEventListener(type: string, callback: Function): void;
     #private;
+}
+
+/**
+ * Draw meta data.
+ */
+export declare class DrawMeta {
+    /**
+     * Draw quantification.
+     *
+     * @type {object}
+     */
+    quantification: object;
+    /**
+     * Draw text expression. Can contain variables surrounded with '{}' that will
+     * be extracted from the quantification object.
+     *
+     * @type {string}
+     */
+    textExpr: string;
 }
 
 /**
