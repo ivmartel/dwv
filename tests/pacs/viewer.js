@@ -158,7 +158,11 @@ function viewerSetup() {
         // init gui
         if (dataLoad === numberOfDataToLoad) {
           // select tool
-          _app.setTool(getSelectedTool());
+          const selectedTool = getSelectedTool();
+          _app.setTool(selectedTool.name);
+          if (selectedTool.name === 'Draw') {
+            _app.setToolFeatures({shapeName: selectedTool.option});
+          }
 
           const changeLayoutSelect = document.getElementById('changelayout');
           changeLayoutSelect.disabled = false;
@@ -337,7 +341,13 @@ function onDOMContentLoaded() {
     }
 
     // need to set tool after config change
-    _app.setTool(getSelectedTool());
+    const selectedTool = getSelectedTool();
+    if (typeof selectedTool !== 'undefined') {
+      _app.setTool(selectedTool.name);
+      if (selectedTool.name === 'Draw') {
+        _app.setToolFeatures({shapeName: selectedTool.option});
+      }
+    }
   });
 
   const smoothingChk = document.getElementById('changesmoothing');
@@ -672,18 +682,26 @@ function setupToolsCheckboxes() {
 /**
  * Get the selected tool
  *
- * @returns {string} The tool name.
+ * @returns {object|undefined} The tool name and possible option.
  */
 function getSelectedTool() {
+  let res;
   const toolsInput = document.getElementsByName('tools');
-  let toolIndex = null;
+  let toolName;
   for (let j = 0; j < toolsInput.length; ++j) {
     if (toolsInput[j].checked) {
-      toolIndex = j;
+      toolName = toolsInput[j].title;
       break;
     }
   }
-  return Object.keys(_tools)[toolIndex];
+  if (typeof toolName !== 'undefined') {
+    const split = toolName.split(':');
+    res = {
+      name: split[0],
+      option: split[1]
+    };
+  }
+  return res;
 }
 
 /**
