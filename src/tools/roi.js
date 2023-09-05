@@ -179,8 +179,9 @@ export class RoiFactory {
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
     const points = kroi.points();
-    points[anchor.id()] = anchor.x() - kroi.x();
-    points[anchor.id() + 1] = anchor.y() - kroi.y();
+    const index = parseInt(anchor.id(), 10);
+    points[index] = anchor.x() - kroi.x();
+    points[index + 1] = anchor.y() - kroi.y();
     kroi.points(points);
 
     // update text
