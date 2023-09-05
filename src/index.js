@@ -6,6 +6,11 @@ import {
   ToolConfig
 } from './app/application';
 import {defaults} from './app/defaults';
+import {
+  DrawMeta,
+  DrawDetails,
+  DrawController
+} from './app/drawController';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
 // dicom
@@ -78,6 +83,9 @@ export {
   App,
   ViewConfig,
   ToolConfig,
+  DrawMeta,
+  DrawDetails,
+  DrawController,
   ViewController,
   ToolboxController,
   DataElement,

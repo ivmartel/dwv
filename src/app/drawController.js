@@ -23,6 +23,66 @@ import {DrawLayer} from '../gui/drawLayer';
 import Konva from 'konva';
 
 /**
+ * Draw meta data.
+ */
+export class DrawMeta {
+  /**
+   * Draw quantification.
+   *
+   * @type {object}
+   */
+  quantification;
+
+  /**
+   * Draw text expression. Can contain variables surrounded with '{}' that will
+   * be extracted from the quantification object.
+   *
+   * @type {string}
+   */
+  textExpr;
+}
+
+/**
+ * Draw details.
+ */
+export class DrawDetails {
+  /**
+   * The draw ID.
+   *
+   * @type {number}
+   */
+  id;
+
+  /**
+   * The draw position: an Index converted to string.
+   *
+   * @type {string}
+   */
+  position;
+
+  /**
+   * The draw type.
+   *
+   * @type {string}
+   */
+  type;
+
+  /**
+   * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   *
+   * @type {string}
+   */
+  color;
+
+  /**
+   * The draw meta.
+   *
+   * @type {DrawMeta}
+   */
+  meta;
+}
+
+/**
  * Is an input node's name 'shape'.
  *
  * @param {object} node A Konva node.
@@ -229,8 +289,7 @@ export class DrawController {
   /**
    * Get a list of drawing display details.
    *
-   * @returns {Array} A list of draw details as
-   *   {id, position, type, color, meta}
+   * @returns {DrawDetails[]} A list of draw details.
    */
   getDrawDisplayDetails() {
     const list = [];
@@ -317,7 +376,7 @@ export class DrawController {
    * Set the drawings on the current stage.
    *
    * @param {Array} drawings An array of drawings.
-   * @param {Array} drawingsDetails An array of drawings details.
+   * @param {DrawDetails[]} drawingsDetails An array of drawings details.
    * @param {object} cmdCallback The DrawCommand callback.
    * @param {object} exeCallback The callback to call once the
    *   DrawCommand has been executed.
@@ -387,7 +446,7 @@ export class DrawController {
   /**
    * Update a drawing from its details.
    *
-   * @param {object} drawDetails Details of the drawing to update.
+   * @param {DrawDetails} drawDetails Details of the drawing to update.
    */
   updateDraw(drawDetails) {
     // get the group
