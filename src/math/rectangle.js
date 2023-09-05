@@ -2,6 +2,11 @@ import {Point2D} from './point';
 import {getStats} from './stats';
 import {i18n} from '../utils/i18n';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+/* eslint-enable no-unused-vars */
+
 /**
  * Mulitply the three inputs if the last two are not null.
  *
@@ -160,8 +165,8 @@ export class Rectangle {
   /**
    * Quantify a rectangle according to view information.
    *
-   * @param {object} viewController The associated view controller.
-   * @param {Array} flags A list of stat values to calculate.
+   * @param {ViewController} viewController The associated view controller.
+   * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
