@@ -150,7 +150,7 @@ export class View {
   /**
    * View orientation. Undefined will use the original slice ordering.
    *
-   * @type {object}
+   * @type {Matrix33}
    */
   #orientation;
 
