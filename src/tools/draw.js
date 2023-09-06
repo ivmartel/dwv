@@ -243,10 +243,9 @@ export class Draw {
       // (and avoid anchors mouse down)
       if (selectedShape && selectedShape !== this.#shapeEditor.getShape()) {
         this.#shapeEditor.disable();
-        this.#shapeEditor.setShape(selectedShape);
         const viewController =
           layerGroup.getActiveViewLayer().getViewController();
-        this.#shapeEditor.setViewController(viewController);
+        this.#shapeEditor.setShape(selectedShape, drawLayer, viewController);
         this.#shapeEditor.enable();
       }
     } else {

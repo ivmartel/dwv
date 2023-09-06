@@ -1,4 +1,3 @@
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {logger} from '../utils/logger';
 import {getShapeDisplayName, ChangeGroupCommand} from './drawCommands';
 import {validateAnchorPosition} from './draw';
@@ -9,6 +8,7 @@ import Konva from 'konva';
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
 import {ViewController} from '../app/viewController';
+import {DrawLayer} from '../gui/drawLayer';
 import {Style} from '../gui/style';
 /* eslint-enable no-unused-vars */
 
@@ -86,7 +86,14 @@ export class ShapeEditor {
   #shape = null;
 
   /**
-   * Edited view controller. Used for quantification update.
+   * Associated draw layer. Used to bound anchor move.
+   *
+   * @type {DrawLayer}
+   */
+  #drawLayer;
+
+  /**
+   * Associated view controller. Used for quantification update.
    *
    * @type {ViewController}
    */
@@ -124,9 +131,13 @@ export class ShapeEditor {
    * Set the shape to edit.
    *
    * @param {Konva.Shape} inshape The shape to edit.
+   * @param {DrawLayer} drawLayer The associated draw layer.
+   * @param {ViewController} viewController The associated view controller.
    */
-  setShape(inshape) {
+  setShape(inshape, drawLayer, viewController) {
     this.#shape = inshape;
+    this.#drawLayer = drawLayer;
+    this.#viewController = viewController;
     if (this.#shape) {
       // remove old anchors
       this.#removeAnchors();
@@ -148,15 +159,6 @@ export class ShapeEditor {
       // add new anchors
       this.#addAnchors();
     }
-  }
-
-  /**
-   * Set the associated image.
-   *
-   * @param {ViewController} vc The associated view controller.
-   */
-  setViewController(vc) {
-    this.#viewController = vc;
   }
 
   /**
@@ -217,6 +219,7 @@ export class ShapeEditor {
    */
   reset() {
     this.#shape = undefined;
+    this.#drawLayer = undefined;
     this.#viewController = undefined;
   }
 
@@ -358,12 +361,8 @@ export class ShapeEditor {
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
       const anchor = event.target;
-      const layerDetails = getLayerDetailsFromEvent(event.evt);
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      const drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
-      validateAnchorPosition(drawLayer.getBaseSize(), anchor);
+      validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
       // update shape
       this.#currentFactory.update(
         anchor, this.#app.getStyle(), this.#viewController);
@@ -382,10 +381,6 @@ export class ShapeEditor {
       if (anchor instanceof Konva.Stage) {
         return;
       }
-      const layerDetails = getLayerDetailsFromEvent(event.evt);
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      const drawLayer = layerGroup.getActiveDrawLayer();
       const endAnchor = this.#getClone(anchor);
       // store the change command
       const chgcmd = new ChangeGroupCommand(
@@ -393,7 +388,7 @@ export class ShapeEditor {
         this.#currentFactory,
         startAnchor,
         endAnchor,
-        drawLayer,
+        this.#drawLayer,
         this.#viewController,
         this.#app.getStyle()
       );
