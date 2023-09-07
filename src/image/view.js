@@ -27,7 +27,7 @@ import {
 /**
  * List of view event names.
  *
- * @type {Array}
+ * @type {string[]}
  */
 export const viewEventNames = [
   'wlchange',
@@ -541,9 +541,9 @@ export class View {
   }
 
   /**
-   * Get the origin at a given position.
+   * Get the first origin or at a given position.
    *
-   * @param {Point} position The position.
+   * @param {Point} [position] Optional position.
    * @returns {Point3D} The origin.
    */
   getOrigin(position) {
