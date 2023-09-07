@@ -187,7 +187,7 @@ export class WindowLevel {
   /**
    * Handle mouse wheel event.
    *
-   * @param {object} event The mouse wheel event.
+   * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
     this.#scrollWhell.wheel(event);

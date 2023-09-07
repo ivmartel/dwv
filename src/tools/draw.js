@@ -433,7 +433,7 @@ export class Draw {
   /**
    * Handle mouse wheel event.
    *
-   * @param {object} event The mouse wheel event.
+   * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
     if (this.#withScroll) {
