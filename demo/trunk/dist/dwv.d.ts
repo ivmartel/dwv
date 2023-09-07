@@ -865,9 +865,9 @@ export declare class DrawController {
     /**
      * Get the current position group.
      *
-     * @returns {object} The Konva.Group.
+     * @returns {Konva.Group|undefined} The Konva.Group.
      */
-    getCurrentPosGroup(): object;
+    getCurrentPosGroup(): Konva.Group | undefined;
     /**
      * Reset: clear the layers array.
      */
@@ -918,12 +918,12 @@ export declare class DrawController {
     /**
      * Delete a Draw from the stage.
      *
-     * @param {object} group The group to delete.
+     * @param {Konva.Group} group The group to delete.
      * @param {object} cmdCallback The DeleteCommand callback.
      * @param {object} exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDrawGroup(group: object, cmdCallback: object, exeCallback: object): void;
+    deleteDrawGroup(group: Konva.Group, cmdCallback: object, exeCallback: object): void;
     /**
      * Delete a Draw from the stage.
      *
