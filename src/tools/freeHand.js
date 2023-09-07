@@ -147,7 +147,7 @@ export class FreeHandFactory {
   /**
    * Update a FreeHand shape.
    *
-   * @param {object} anchor The active anchor.
+   * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The app style.
    * @param {ViewController} _viewController The associated view controller.
    */
@@ -158,10 +158,16 @@ export class FreeHandFactory {
     const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated label
+    if (!(kline instanceof Konva.Line)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // update self
     const point = group.getChildren(function (node) {
@@ -180,7 +186,9 @@ export class FreeHandFactory {
 
     // update text
     const ktext = klabel.getText();
-    ktext.setText(ktext.meta.textExpr);
+    // @ts-expect-error
+    const meta = ktext.meta;
+    ktext.setText(meta.textExpr);
     // update position
     const textPos = {
       x: points[0] + kline.x(),

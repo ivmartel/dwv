@@ -85,7 +85,7 @@ export class DrawDetails {
 /**
  * Is an input node's name 'shape'.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'shape'.
  */
 export function isNodeNameShape(node) {
@@ -95,7 +95,7 @@ export function isNodeNameShape(node) {
 /**
  * Is a node an extra shape associated with a main one.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name starts with 'shape-'.
  */
 export function isNodeNameShapeExtra(node) {
@@ -105,7 +105,7 @@ export function isNodeNameShapeExtra(node) {
 /**
  * Is an input node's name 'label'.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'label'.
  */
 export function isNodeNameLabel(node) {
@@ -115,7 +115,7 @@ export function isNodeNameLabel(node) {
 /**
  * Is an input node a position node.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'position-group'.
  */
 export function isPositionNode(node) {
@@ -124,7 +124,7 @@ export function isPositionNode(node) {
 
 /**
  * @callback testFn
- * @param {object} node The node.
+ * @param {Konva.Node} node The node.
  * @returns {boolean} True if the node passes the test.
  */
 
@@ -143,7 +143,7 @@ export function isNodeWithId(id) {
 /**
  * Is the input node a node that has the 'stroke' method.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'anchor' and 'label'.
  */
 export function canNodeChangeColour(node) {
@@ -206,7 +206,7 @@ export class DrawController {
   /**
    * Get the current position group.
    *
-   * @returns {object} The Konva.Group.
+   * @returns {Konva.Group|undefined} The Konva.Group.
    */
   getCurrentPosGroup() {
     // get position groups
@@ -215,9 +215,11 @@ export class DrawController {
     });
     // if one group, use it
     // if no group, create one
-    let posGroup = null;
+    let posGroup;
     if (posGroups.length === 1) {
-      posGroup = posGroups[0];
+      if (posGroups[0] instanceof Konva.Group) {
+        posGroup = posGroups[0];
+      }
     } else if (posGroups.length === 0) {
       posGroup = new Konva.Group();
       posGroup.name('position-group');
@@ -502,13 +504,16 @@ export class DrawController {
   /**
    * Delete a Draw from the stage.
    *
-   * @param {object} group The group to delete.
+   * @param {Konva.Group} group The group to delete.
    * @param {object} cmdCallback The DeleteCommand callback.
    * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
   deleteDrawGroup(group, cmdCallback, exeCallback) {
     const shape = group.getChildren(isNodeNameShape)[0];
+    if (!(shape instanceof Konva.Shape)) {
+      return;
+    }
     const shapeDisplayName = getShapeDisplayName(shape);
     const delcmd = new DeleteGroupCommand(
       group,
@@ -553,7 +558,11 @@ export class DrawController {
   deleteDraws(cmdCallback, exeCallback) {
     const groups = this.#konvaLayer.getChildren();
     while (groups.length) {
-      this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
+      if (groups[0] instanceof Konva.Group) {
+        this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
+      } else {
+        logger.warn('Found non group in layer while deleting');
+      }
     }
   }
 

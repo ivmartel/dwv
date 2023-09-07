@@ -11,7 +11,7 @@ import {ViewController} from '../app/viewController';
 /**
  * Get the display name of the input shape.
  *
- * @param {object} shape The Konva shape.
+ * @param {Konva.Shape} shape The Konva shape.
  * @returns {string} The display name.
  */
 export function getShapeDisplayName(shape) {
@@ -471,7 +471,7 @@ export class DeleteGroupCommand {
   /**
    * The group parent.
    *
-   * @type {object}
+   * @type {Konva.Container}
    */
   #parent;
 

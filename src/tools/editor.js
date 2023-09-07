@@ -351,7 +351,7 @@ export class ShapeEditor {
     // drag start listener
     anchor.on('dragstart.edit', (event) => {
       const anchor = event.target;
-      if (anchor instanceof Konva.Stage) {
+      if (!(anchor instanceof Konva.Shape)) {
         return;
       }
       startAnchor = this.#getClone(anchor);
@@ -361,6 +361,9 @@ export class ShapeEditor {
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
       const anchor = event.target;
+      if (!(anchor instanceof Konva.Shape)) {
+        return;
+      }
       // validate the anchor position
       validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
       // update shape
@@ -378,7 +381,7 @@ export class ShapeEditor {
     // drag end listener
     anchor.on('dragend.edit', (event) => {
       const anchor = event.target;
-      if (anchor instanceof Konva.Stage) {
+      if (!(anchor instanceof Konva.Shape)) {
         return;
       }
       const endAnchor = this.#getClone(anchor);
@@ -409,7 +412,7 @@ export class ShapeEditor {
     // mouse over styling
     anchor.on('mouseover.edit', (event) => {
       const anchor = event.target;
-      if (anchor instanceof Konva.Stage) {
+      if (!(anchor instanceof Konva.Shape)) {
         return;
       }
       // style is handled by the group
@@ -423,7 +426,7 @@ export class ShapeEditor {
     // mouse out styling
     anchor.on('mouseout.edit', (event) => {
       const anchor = event.target;
-      if (anchor instanceof Konva.Stage) {
+      if (!(anchor instanceof Konva.Shape)) {
         return;
       }
       // style is handled by the group

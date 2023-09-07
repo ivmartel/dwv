@@ -154,7 +154,7 @@ export class RoiFactory {
   /**
    * Update a roi shape.
    *
-   * @param {object} anchor The active anchor.
+   * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The app style.
    * @param {ViewController} _viewController The associated view controller.
    */
@@ -165,10 +165,16 @@ export class RoiFactory {
     const kroi = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated label
+    if (!(kroi instanceof Konva.Line)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // update self
     const point = group.getChildren(function (node) {
@@ -186,7 +192,9 @@ export class RoiFactory {
 
     // update text
     const ktext = klabel.getText();
-    ktext.setText(ktext.meta.textExpr);
+    // @ts-expect-error
+    const meta = ktext.meta;
+    ktext.setText(meta.textExpr);
     // update position
     const textPos = {
       x: points[0] + kroi.x(),

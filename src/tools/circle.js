@@ -102,7 +102,7 @@ export class CircleFactory {
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
     // augment text with meta data
-    // @ts-ignore
+    // @ts-expect-error
     ktext.meta = {
       textExpr: textExpr,
       quantification: quant
@@ -170,17 +170,23 @@ export class CircleFactory {
   /**
    * Update a circle shape.
    *
-   * @param {object} anchor The active anchor.
+   * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} _style The app style.
    * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, _style, viewController) {
     // parent group
     const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
     const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
+    if (!(kcircle instanceof Konva.Circle)) {
+      return;
+    }
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
@@ -285,7 +291,7 @@ export class CircleFactory {
   /**
    * Update the quantification of a Circle.
    *
-   * @param {object} group The group with the shape.
+   * @param {Konva.Group} group The group with the shape.
    * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
@@ -296,7 +302,7 @@ export class CircleFactory {
    * Update the quantification of a Circle (as a static
    *   function to be used in update).
    *
-   * @param {object} group The group with the shape.
+   * @param {Konva.Group} group The group with the shape.
    * @param {ViewController} viewController The associated view controller.
    */
   #updateCircleQuantification(
@@ -305,10 +311,16 @@ export class CircleFactory {
     const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
+    if (!(kcircle instanceof Konva.Circle)) {
+      return;
+    }
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // positions: add possible group offset
     const centerPoint = new Point2D(
@@ -320,12 +332,14 @@ export class CircleFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = circle.quantify(
       viewController,
-      getFlags(ktext.meta.textExpr));
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+      getFlags(meta.textExpr));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
   }
 
   /**
@@ -333,7 +347,7 @@ export class CircleFactory {
    *
    * @param {Circle} circle The circle to shadow.
    * @param {Konva.Group} [group] The associated group.
-   * @returns {object} The shadow konva group.
+   * @returns {Konva.Group} The shadow konva group.
    */
   #getShadowCircle(circle, group) {
     // possible group offset

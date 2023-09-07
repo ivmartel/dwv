@@ -180,7 +180,7 @@ export class ArrowFactory {
   /**
    * Update an arrow shape.
    *
-   * @param {object} anchor The active anchor.
+   * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The app style.
    * @param {ViewController} _viewController The associated view controller.
    */
@@ -191,22 +191,31 @@ export class ArrowFactory {
     const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated triangle shape
+    if (!(kline instanceof Konva.Line)) {
+      return;
+    }
+    // associated triangle shape
     const ktriangle = group.getChildren(function (node) {
       return node.name() === 'shape-triangle';
     })[0];
-      // associated label
+    if (!(ktriangle instanceof Konva.RegularPolygon)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
-      // find special points
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // find special points
     const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
     const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
-      // update special points
+    // update special points
     switch (anchor.id()) {
     case 'begin':
       begin.x(anchor.x());
@@ -257,6 +266,7 @@ export class ArrowFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
     ktext.setText(ktext.meta.textExpr);
     // update position
     const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;

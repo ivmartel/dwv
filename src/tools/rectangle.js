@@ -175,6 +175,9 @@ export class RectangleFactory {
   update(anchor, style, viewController) {
     // parent group
     const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
     const krect = group.getChildren(function (node) {
       return node.name() === 'shape';
@@ -279,7 +282,7 @@ export class RectangleFactory {
   /**
    * Update the quantification of a Rectangle.
    *
-   * @param {object} group The group with the shape.
+   * @param {Konva.Group} group The group with the shape.
    * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
@@ -290,7 +293,7 @@ export class RectangleFactory {
    * Update the quantification of a Rectangle (as a static
    *   function to be used in update).
    *
-   * @param {object} group The group with the shape.
+   * @param {Konva.Group} group The group with the shape.
    * @param {ViewController} viewController The associated view controller.
    */
   #updateRectangleQuantification(group, viewController) {
@@ -302,6 +305,9 @@ export class RectangleFactory {
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // positions: add possible group offset
     const p2d0 = new Point2D(
@@ -317,12 +323,14 @@ export class RectangleFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = rect.quantify(
       viewController,
-      getFlags(ktext.meta.textExpr));
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+      getFlags(meta.textExpr));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
   }
 
   /**
