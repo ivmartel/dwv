@@ -1,6 +1,12 @@
 import {Point, Point3D} from '../math/point';
 import {LayerGroup} from './layerGroup';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
+/* eslint-enable no-unused-vars */
+
 /**
  * Window/level binder.
  */
@@ -135,9 +141,18 @@ export const binderList = {
  */
 export class Stage {
 
-  // associated layer groups
+  /**
+   * Associated layer groups.
+   *
+   * @type {LayerGroup[]}
+   */
   #layerGroups = [];
-  // active layer group index
+
+  /**
+   * Active layer group index.
+   *
+   * @type {number}
+   */
   #activeLayerGroupIndex = null;
 
   // layer group binders
@@ -177,7 +192,7 @@ export class Stage {
    * Get the view layers associated to a data id.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The layers.
+   * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataId(dataId) {
     let res = [];
@@ -191,7 +206,7 @@ export class Stage {
    * Get the draw layers associated to a data id.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The layers.
+   * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataId(dataId) {
     let res = [];
