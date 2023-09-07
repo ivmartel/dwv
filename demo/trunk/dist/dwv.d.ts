@@ -3252,12 +3252,12 @@ export declare class View {
      */
     canSetPosition(position: Point): boolean;
     /**
-     * Get the origin at a given position.
+     * Get the first origin or at a given position.
      *
-     * @param {Point} position The position.
+     * @param {Point} [position] Optional position.
      * @returns {Point3D} The origin.
      */
-    getOrigin(position: Point): Point3D;
+    getOrigin(position?: Point): Point3D;
     /**
      * Set the current position.
      *
@@ -3523,12 +3523,12 @@ export declare class ViewController {
      */
     getCurrentScrollIndexValue(): object;
     /**
-     * Get the origin at a given position.
+     * Get the first origin or at a given position.
      *
-     * @param {Point} position The input position.
+     * @param {Point} [position] Opitonal position.
      * @returns {Point3D} The origin.
      */
-    getOrigin(position: Point): Point3D;
+    getOrigin(position?: Point): Point3D;
     /**
      * Get the current scroll position value.
      *
