@@ -438,6 +438,7 @@ export class DrawLayer {
       y: this.#konvaStage.scale().y / this.#fitScale.y
     };
     // update fit scale
+    const previousFitScale = this.#fitScale;
     this.#fitScale = {
       x: fitScale1D * this.#baseSpacing.x,
       y: fitScale1D * this.#baseSpacing.y
@@ -453,6 +454,11 @@ export class DrawLayer {
       x: fitOffset.x / this.#fitScale.x,
       y: fitOffset.y / this.#fitScale.y
     };
+    this.#flipOffset = {
+      x: this.#flipOffset.x * previousFitScale.x / this.#fitScale.x,
+      y: this.#flipOffset.y * previousFitScale.y / this.#fitScale.y
+    };
+
     this.#konvaStage.offset({
       x: this.#viewOffset.x +
         this.#baseOffset.x +
