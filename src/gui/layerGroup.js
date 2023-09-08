@@ -759,22 +759,25 @@ export class LayerGroup {
     const p2D = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(p2D.x, p2D.y);
 
-    const lineH = document.createElement('hr');
-    lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
-    lineH.className = 'horizontal';
-    lineH.style.width = this.#containerDiv.offsetWidth + 'px';
-    lineH.style.left = '0px';
-    lineH.style.top = displayPos.y + 'px';
+    if (typeof displayPos.y !== 'undefined') {
+      const lineH = document.createElement('hr');
+      lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
+      lineH.className = 'horizontal';
+      lineH.style.width = this.#containerDiv.offsetWidth + 'px';
+      lineH.style.left = '0px';
+      lineH.style.top = displayPos.y + 'px';
+      this.#containerDiv.appendChild(lineH);
+    }
 
-    const lineV = document.createElement('hr');
-    lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
-    lineV.className = 'vertical';
-    lineV.style.width = this.#containerDiv.offsetHeight + 'px';
-    lineV.style.left = (displayPos.x) + 'px';
-    lineV.style.top = '0px';
-
-    this.#containerDiv.appendChild(lineH);
-    this.#containerDiv.appendChild(lineV);
+    if (typeof displayPos.x !== 'undefined') {
+      const lineV = document.createElement('hr');
+      lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
+      lineV.className = 'vertical';
+      lineV.style.width = this.#containerDiv.offsetHeight + 'px';
+      lineV.style.left = (displayPos.x) + 'px';
+      lineV.style.top = '0px';
+      this.#containerDiv.appendChild(lineV);
+    }
   }
 
   /**

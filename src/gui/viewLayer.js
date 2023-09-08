@@ -516,13 +516,20 @@ export class ViewLayer {
    *
    * @param {number} x The X position.
    * @param {number} y The Y position.
-   * @returns {object} The display position as {x,y}.
+   * @returns {object} The display position as {x,y}, can be individually
+   *   undefined if out of bounds.
    */
   planePosToDisplay(x, y) {
-    return {
-      x: (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x,
-      y: (y - this.#offset.y + this.#baseOffset.y) * this.#scale.y
-    };
+    let posX = (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x;
+    let posY = (y - this.#offset.y + this.#baseOffset.y) * this.#scale.y;
+    // check if in bounds
+    if (posX < 0 || posX >= this.#canvas.width) {
+      posX = undefined;
+    }
+    if (posY < 0 || posY >= this.#canvas.height) {
+      posY = undefined;
+    }
+    return {x: posX, y: posY};
   }
 
   /**
