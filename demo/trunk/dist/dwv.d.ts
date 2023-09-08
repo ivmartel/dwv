@@ -3935,7 +3935,8 @@ export declare class ViewLayer {
      *
      * @param {number} x The X position.
      * @param {number} y The Y position.
-     * @returns {object} The display position as {x,y}.
+     * @returns {object} The display position as {x,y}, can be individually
+     *   undefined if out of bounds.
      */
     planePosToDisplay(x: number, y: number): object;
     /**
