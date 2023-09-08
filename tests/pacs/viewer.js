@@ -340,6 +340,14 @@ function onDOMContentLoaded() {
       addDataRow(dataIds[i]);
     }
 
+    // show crosshair depending on layout
+    if (layout !== 'one') {
+      const divIds = getLayerGroupDivIds(configs);
+      for (const divId of divIds) {
+        _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
+      }
+    }
+
     // need to set tool after config change
     const selectedTool = getSelectedTool();
     if (typeof selectedTool !== 'undefined') {
