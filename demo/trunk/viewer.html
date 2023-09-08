@@ -46,10 +46,14 @@ input[type=range] {
   font-size: small;
   font-style: italic;
 }
-.layerGroup {
-  display:inline-block;
+#dwv {
+  display: flex;
   height: 350px;
-  width: max(30%, 350px);
+  /* compensate for layer absolute position */
+  margin-bottom: 10px;
+}
+.layerGroup {
+  flex: 1 1;
   margin: 5px 5px 5px 0;
   background-color: limeGreen;
   /* allow child centering */
