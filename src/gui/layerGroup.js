@@ -164,10 +164,13 @@ export class LayerGroup {
    */
   #containerDiv;
 
+  // jsdoc does not like
+  // @type {(ViewLayer|DrawLayer)[]}
+
   /**
    * List of layers.
    *
-   * @type {(ViewLayer|DrawLayer)[]}
+   * @type {Array<ViewLayer|DrawLayer>}
    */
   #layers = [];
 
