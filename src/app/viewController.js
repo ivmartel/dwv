@@ -57,8 +57,12 @@ export class ViewController {
    */
   #maskSegmentHelper;
 
-  // third dimension player ID (created by setInterval)
-  #playerID = null;
+  /**
+   * Third dimension player ID (created by setInterval).
+   *
+   * @type {number|undefined}
+   */
+  #playerID;
 
   /**
    * @param {View} view The associated view.
@@ -206,7 +210,7 @@ export class ViewController {
    * @returns {boolean} True if the controler is playing.
    */
   isPlaying() {
-    return (this.#playerID !== null);
+    return (typeof this.#playerID !== 'undefined');
   }
 
   /**
@@ -666,7 +670,7 @@ export class ViewController {
       const size = image.getGeometry().getSize();
       const canScroll3D = size.canScroll3D();
 
-      this.#playerID = setInterval(() => {
+      this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
           canDoMore = this.incrementScrollIndex();
@@ -697,9 +701,9 @@ export class ViewController {
    * Stop scroll playing.
    */
   stop() {
-    if (this.#playerID !== null) {
+    if (typeof this.#playerID !== 'undefined') {
       clearInterval(this.#playerID);
-      this.#playerID = null;
+      this.#playerID = undefined;
     }
   }
 
