@@ -3399,11 +3399,11 @@ export declare class ViewConfig {
      */
     orientation: string | undefined;
     /**
-     * Optional view colour map.
+     * Optional view colour map name.
      *
-     * @type {ColourMap|undefined}
+     * @type {string|undefined}
      */
-    colourMap: ColourMap | undefined;
+    colourMap: string | undefined;
     /**
      * Optional layer opacity; in [0, 1] range.
      *
@@ -3747,11 +3747,18 @@ export declare class ViewController {
      */
     getColourMap(): ColourMap;
     /**
+     * Get the colour map name.
+     *
+     * @returns {string} The colour map name.
+     */
+    getColourMapName(): string;
+    /**
      * Set the colour map.
      *
-     * @param {ColourMap} colourMap The colour map.
+     * @param {ColourMap} map The colour map.
+     * @param {string} [name] The colour map name.
      */
-    setColourMap(colourMap: ColourMap): void;
+    setColourMap(map: ColourMap, name?: string): void;
     /**
      * @callback alphaFn@callback alphaFn
      * @param {object} value The pixel value.
