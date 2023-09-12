@@ -58,6 +58,14 @@ export class ViewController {
   #maskSegmentHelper;
 
   /**
+   * Colour map name.
+   * Defaults to 'plain' as defined in Views' default.
+   *
+   * #type {string}
+   */
+  #colourMapName = 'plain';
+
+  /**
    * Third dimension player ID (created by setInterval).
    *
    * @type {number|undefined}
@@ -748,12 +756,23 @@ export class ViewController {
   }
 
   /**
+   * Get the colour map name.
+   *
+   * @returns {string} The colour map name.
+   */
+  getColourMapName() {
+    return this.#colourMapName;
+  }
+
+  /**
    * Set the colour map.
    *
-   * @param {ColourMap} colourMap The colour map.
+   * @param {ColourMap} map The colour map.
+   * @param {string} [name] The colour map name.
    */
-  setColourMap(colourMap) {
-    this.#view.setColourMap(colourMap);
+  setColourMap(map, name) {
+    this.#colourMapName = name;
+    this.#view.setColourMap(map);
   }
 
   /**
@@ -783,7 +802,7 @@ export class ViewController {
       throw new Error('Unknown colour map: \'' + name + '\'');
     }
     // enable it
-    this.setColourMap(luts[name]);
+    this.setColourMap(luts[name], name);
   }
 
   /**

@@ -1,6 +1,5 @@
 import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
-import {luts} from '../image/luts';
 import {getMatrixFromName} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
@@ -24,7 +23,6 @@ import {LayerGroup} from '../gui/layerGroup';
 import {ViewLayer} from '../gui/viewLayer';
 import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
-import {ColourMap} from '../image/luts';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -46,9 +44,9 @@ export class ViewConfig {
    */
   orientation;
   /**
-   * Optional view colour map.
+   * Optional view colour map name.
    *
-   * @type {ColourMap|undefined}
+   * @type {string|undefined}
    */
   colourMap;
   /**
@@ -1629,19 +1627,6 @@ export class App {
     // (the layer has not been added to the layer group yet)
     const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
 
-    // colour map
-    if (typeof viewConfig.colourMap !== 'undefined') {
-      view.setColourMap(viewConfig.colourMap);
-    } else {
-      if (!isBaseLayer) {
-        if (data.image.getMeta().Modality === 'PT') {
-          view.setColourMap(luts.hot);
-        } else {
-          view.setColourMap(luts.rainbow);
-        }
-      }
-    }
-
     // opacity
     let opacity = 1;
     if (typeof viewConfig.opacity !== 'undefined') {
@@ -1658,7 +1643,21 @@ export class App {
     const size2D = imageGeometry.getSize(viewOrientation).get2D();
     const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, opacity);
+
+    // view controller
     const viewController = viewLayer.getViewController();
+    // colour map
+    if (typeof viewConfig.colourMap !== 'undefined') {
+      viewController.setColourMapFromName(viewConfig.colourMap);
+    } else {
+      if (!isBaseLayer) {
+        if (data.image.getMeta().Modality === 'PT') {
+          viewController.setColourMapFromName('hot');
+        } else {
+          viewController.setColourMapFromName('rainbow');
+        }
+      }
+    }
 
     // listen to controller events
     if (data.image.getMeta().Modality === 'SEG') {
