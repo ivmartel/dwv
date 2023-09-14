@@ -127,10 +127,10 @@ The library can be integrated in a web application, a browser without any extens
 The user can generate a view of the image data according to properties set in the DICOM data. The image will be created in a `<canvas>` HTML element inside an HTML element provided by the user (via its `id`).
 
 #### DWV-URS-UI-011 Image reorientation
-The user can decide which orientation the displayed image should use: the aquisition orientation, 'axial', 'coronal' or 'sagittal'. Axial uses `z` as main axis, coronal uses `y` and sagittal uses `x`.
+The user can decide which orientation the displayed image should use: the acquisition orientation, 'axial', 'coronal' or 'sagittal'. Axial uses `z` as main axis, coronal uses `y` and sagittal uses `x`.
 
 #### DWV-URS-UI-012 Image overlay
-The user can load mulitple data in a single HTML div. This will result in multiple HTML `<canvas>` aligned with each other by using the Image Position Patient DICOM tag.
+The user can load multiple data in a single HTML div. This will result in multiple HTML `<canvas>` aligned with each other by using the Image Position Patient DICOM tag.
 
 #### DWV-URS-UI-020 Change image window/level
 The user can change the window/level of the displayed image. On change, a `wlchange` event will be fired containing the changed values.
@@ -148,10 +148,10 @@ The user can change the opacity of the displayed image. On change, a `opacitycha
 The user can decide to synchronise or not the window/level between different views of the same data.
 
 #### DWV-URS-UI-031 Views position synchronisation
-The user can decide to synchronise or not the position between differnet views.
+The user can decide to synchronise or not the position between different views.
 
 #### DWV-URS-UI-032 Views zoom/pan synchronisation
-The user can decide to synchronise or not the window/level between differnet views.
+The user can decide to synchronise or not the window/level between different views.
 
 #### DWV-URS-UI-033 Views opacity synchronisation
 The user can decide to synchronise or not the opacity between different views of the same data.
@@ -198,22 +198,22 @@ The user can filter the input image using a contour extraction filter.
 The user can draw an arrow shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. A label can be associated to the shape. No measures nor quantifications are provided with the shape.
 
 #### DWV-URS-UI-102 Draw circle
-The user can draw a circle shape on the displayed data. A circle is characterised by a center point and a radius. The center can be changed when moving the complete shape, the radius via control points on the shape. A label can be associated to the shape. The folowing measures are provided with the shape: radius and surface. The folowing quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
+The user can draw a circle shape on the displayed data. A circle is characterised by a center point and a radius. The center can be changed when moving the complete shape, the radius via control points on the shape. A label can be associated to the shape. The following measures are provided with the shape: radius and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
 
 #### DWV-URS-UI-103 Draw ellipse
-The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. The folowing measures are provided with the shape: radius a, radius b and surface. The folowing quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
+The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. The following measures are provided with the shape: radius a, radius b and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
 
 #### DWV-URS-UI-104 Draw free hand
 The user can draw a free hand shape on the displayed data. A free hand shape is charaterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape.
 
 #### DWV-URS-UI-105 Draw protractor
-The user can draw a protractor shape on the displayed data. A protractor is charaterised by three modifiable anchor points. The shape can be moved in its entirety. The folowing measure are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape.
+The user can draw a protractor shape on the displayed data. A protractor is charaterised by three modifiable anchor points. The shape can be moved in its entirety. The following measure are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape.
 
 #### DWV-URS-UI-106 Draw rectangle
-The user can draw a rectangle shape on the displayed data. A rectangle is charaterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The folowing measures are provided with the shape: width, height and surface. The folowing quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
+The user can draw a rectangle shape on the displayed data. A rectangle is charaterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: width, height and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape.
 
 #### DWV-URS-UI-107 Draw ruler
-The user can draw a ruller shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The folowing measure are provided with the shape: the length of the line. No quantifications are provided with the shape.
+The user can draw a ruler shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measure are provided with the shape: the length of the line. No quantifications are provided with the shape.
 
 #### DWV-URS-UI-150 Draw delete
 The user can delete draws.
