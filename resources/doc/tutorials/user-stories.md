@@ -16,7 +16,7 @@ Note: for more details about which parts of the DICOM standard are supported, se
 #### DWV-URS-IO-001 Load DICOM file(s)
 The user can load DICOM data provided as one or multiple HTML File(s) representing DICOM files.
 
-#### DWV-URS-IO-001 Load DICOM ZIP file
+#### DWV-URS-IO-002 Load DICOM ZIP file
 The user can load DICOM data provided as one HTML file representing a ZIP file containing one or multiple DICOM file(s).
 
 #### DWV-URS-IO-010 Load DICOM discrete URL(s)
@@ -147,13 +147,13 @@ The user can change the opacity of the displayed image. On change, a `opacitycha
 #### DWV-URS-UI-030 Views window/level synchronisation
 The user can decide to synchronise or not the window/level between different views of the same data.
 
-#### DWV-URS-UI-030 Views position synchronisation
+#### DWV-URS-UI-031 Views position synchronisation
 The user can decide to synchronise or not the position between differnet views.
 
-#### DWV-URS-UI-030 Views zoom/pan synchronisation
+#### DWV-URS-UI-032 Views zoom/pan synchronisation
 The user can decide to synchronise or not the window/level between differnet views.
 
-#### DWV-URS-UI-030 Views opacity synchronisation
+#### DWV-URS-UI-033 Views opacity synchronisation
 The user can decide to synchronise or not the opacity between different views of the same data.
 
 #### DWV-URS-UI-040 Window/Level tool
@@ -182,8 +182,14 @@ The user must be able to reset the zoom/pan value to their original values.
 The user can change the image opacity via specific interaction on the image `<canvas>`:
  * `left click drag` or `one touch drag` to change the opacity.
 
-#### DWV-URS-UI-050 Image filtering
-The user can filter the input image using thresholding, contrast enhancement and contour extraction filters.
+#### DWV-URS-UI-050 Image thresholding
+The user can filter the input image using a thresholding filter.
+
+#### DWV-URS-UI-051 Image contrast enhancement
+The user can filter the input image using a contrast enhancement filter.
+
+#### DWV-URS-UI-052 Image contour extraction
+The user can filter the input image using a contour extraction filter.
 
 
 ### Draw
@@ -212,7 +218,7 @@ The user can draw a ruller shape on the displayed data. An arrow is characterise
 #### DWV-URS-UI-150 Draw delete
 The user can delete draws.
 
-#### DWV-URS-UI-150 Draw action undo/redo
+#### DWV-URS-UI-151 Draw action undo/redo
 The user can undo/redo all actions of the draw tool using `CRTL-Z` and `CRTL-Y` or special buttons on touch enabled devices. The actions are: anchor move, shape move, shape creation and shape deletion.
 
 #### DWV-URS-UI-200 Livewire
