@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  * Setup.
  */
 function onDOMContentLoaded() {
-  const stowButton = document.getElementById('stowbutton');
-  stowButton.onclick = launchStow;
+  const fileinput = document.getElementById('fileinput');
+  fileinput.addEventListener('change', launchStow);
 
   const searchButton = document.getElementById('qidobutton');
   searchButton.onclick = launchMainQido;
@@ -57,7 +57,8 @@ function checkResponseEvent(event, reqName) {
   const status = event.currentTarget.status;
   if (status !== 200 && status !== 204) {
     message = 'Bad status for request ' + reqName + ': ' +
-      status + ' (' + event.currentTarget.statusText + ').';
+      status + ' (' + event.currentTarget.statusText + ') "' +
+      event.currentTarget.responseText + '"';
     showMessage(message, 'error');
     res = false;
   } else if (status === 204 ||
@@ -200,8 +201,12 @@ function launchQido(url, loadCallback, reqName) {
 
 /**
  * Launch a STOW request.
+ *
+ * @type {object} The file input change event.
  */
-function launchStow() {
+function launchStow(event) {
+  const files = event.target.files;
+
   const reqName = 'STOW-RS';
   const stowReq = new XMLHttpRequest();
   let message;
@@ -216,24 +221,17 @@ function launchStow() {
   });
   stowReq.addEventListener('error', getOnLoadError(reqName));
 
-  // local files to request
-  const urls = [
-    '../data/bbmri-53323131.dcm',
-    '../data/bbmri-53323275.dcm',
-    '../data/bbmri-53323419.dcm'
-  ];
   // files' data
   const data = [];
 
   // load handler: store data and, when all data is received, launch STOW
   const onload = function (event) {
     // store
-    if (data.length < urls.length) {
-      data.push(event.target.response);
+    if (data.length < files.length) {
+      data.push(event.target.result);
     }
-
     // if all, launch STOW
-    if (data.length === urls.length) {
+    if (data.length === files.length) {
       // bundle data in multipart
       const parts = [];
       for (let j = 0; j < data.length; ++j) {
@@ -260,12 +258,10 @@ function launchStow() {
   };
 
   // launch data requests
-  for (let i = 0; i < urls.length; ++i) {
-    const req = new XMLHttpRequest();
-    req.open('GET', urls[i]);
-    req.responseType = 'arraybuffer';
-    req.addEventListener('load', onload);
-    req.send();
+  for (let i = 0; i < files.length; ++i) {
+    const reader = new FileReader();
+    reader.addEventListener('load', onload);
+    reader.readAsArrayBuffer(files[i]);
   }
 }
 
