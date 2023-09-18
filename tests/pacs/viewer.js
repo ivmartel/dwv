@@ -9,7 +9,6 @@ let _tools = null;
 
 // viewer options
 let _layout = 'one';
-const _dicomWeb = false;
 
 /**
  * Setup simple dwv app.
@@ -268,12 +267,40 @@ function viewerSetup() {
   });
 
   const uriOptions = {};
-  // special dicom web request header
-  if (_dicomWeb) {
-    uriOptions.requestHeaders = [{
-      name: 'Accept',
-      value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
-    }];
+  // special dicom web cookie
+  if (document.cookie) {
+    const cookies = document.cookie.split('; ');
+    // accept
+    const acceptItem = cookies.find((item) => item.startsWith('accept='));
+    if (typeof acceptItem !== 'undefined') {
+      // accept is encoded in dcmweb.js (allows for ';')
+      const accept = decodeURIComponent(acceptItem.split('=')[1]);
+      if (typeof accept !== 'undefined' && accept.length !== 0) {
+        uriOptions.requestHeaders = [];
+        uriOptions.requestHeaders.push({
+          name: 'Accept',
+          value: accept
+        });
+      }
+      // clean up
+      document.cookie = 'accept=';
+    }
+    // token
+    const tokenItem = cookies.find((item) => item.startsWith('access_token='));
+    if (typeof tokenItem !== 'undefined') {
+      const token = tokenItem.split('=')[1];
+      if (typeof token !== 'undefined' && token.length !== 0) {
+        if (typeof uriOptions.requestHeaders === 'undefined') {
+          uriOptions.requestHeaders = [];
+        }
+        uriOptions.requestHeaders.push({
+          name: 'Authorization',
+          value: 'Bearer ' + token
+        });
+      }
+      // clean up
+      document.cookie = 'access_token=';
+    }
   }
   // load from window location
   _app.loadFromUri(window.location.href, uriOptions);

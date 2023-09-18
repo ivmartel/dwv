@@ -31,6 +31,19 @@ function showMessage(text, type) {
 }
 
 /**
+ * Get the optional token.
+ *
+ * @returns {string|undefined} The token
+ */
+function getToken() {
+  let token = document.getElementById('token').value;
+  if (typeof token !== 'undefined' && token.length === 0) {
+    token = undefined;
+  }
+  return token;
+}
+
+/**
  * Check a response event and print error if any.
  *
  * @param {object} event The load event.
@@ -105,7 +118,7 @@ function onMainQidoLoad(json) {
     const study = json[i]['0020000D'].Value[0];
     const series = json[i]['0020000E'].Value[0];
     const url = rootUrl +
-      'studies/' + study +
+      '/studies/' + study +
       '/series/' + series +
       '/instances?';
     launchQido(url, getOnInstanceLoad(i), 'QIDO-RS[' + i + ']');
@@ -178,6 +191,10 @@ function launchQido(url, loadCallback, reqName) {
 
   qidoReq.open('GET', url);
   qidoReq.setRequestHeader('Accept', 'application/dicom+json');
+  const token = getToken();
+  if (typeof token !== 'undefined') {
+    qidoReq.setRequestHeader('Authorization', 'Bearer ' + token);
+  }
   qidoReq.send();
 }
 
@@ -305,25 +322,46 @@ function qidoResponseToTable(json) {
       cell.appendChild(document.createTextNode(json[i]['00080060'].Value[0]));
       // action
       cell = row.insertCell();
+
+      const rootUrl = document.getElementById('rooturl').value;
+      const seriesUrl = rootUrl +
+      '/studies/' + studyUid +
+      '/series/' + seriesUid;
+      const thumbUrl = seriesUrl +
+        '/instances/' + json[i].thumbInstance +
+        '/rendered?viewport=64,64';
+
       const a = document.createElement('a');
-      a.href = viewerUrl + json[i]['00081190'].Value[0];
+      a.href = viewerUrl + seriesUrl;
       a.target = '_blank';
       cell.appendChild(a);
 
       // add thumbnail to link
-      const rootUrl = document.getElementById('rooturl').value;
-      const url = rootUrl +
-        'studies/' + studyUid +
-        '/series/' + seriesUid +
-        '/instances/' + json[i].thumbInstance +
-        '/rendered?viewport=64,64';
+
       // no default accept in orthanc (?)
       const options = {
         headers: {
           Accept: 'image/png'
         }
       };
-      fetch(url, options)
+      const token = getToken();
+      if (typeof token !== 'undefined') {
+        options.headers['Authorization'] = 'Bearer ' + token;
+      }
+      // store a cookie with accept and token to allow opening in viewer
+      // (should be deleted in viewer.js...)
+      a.onclick = function () {
+        document.cookie = 'accept=' +
+          encodeURIComponent(
+            'multipart/related; type="application/dicom"; transfer-syntax=*;'
+          ) + '; ';
+        if (typeof token !== 'undefined') {
+          document.cookie = 'access_token=' + token + '; ';
+        }
+        document.cookie = 'samesite=strict; ';
+      };
+
+      fetch(thumbUrl, options)
         .then(res => res.blob())
         .then(blob => {
           const img = document.createElement('img');
