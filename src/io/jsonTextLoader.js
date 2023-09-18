@@ -130,10 +130,10 @@ export class JSONTextLoader {
    * @returns {boolean} True if the object can be loaded.
    */
   canLoadMemory(mem) {
-    if (typeof mem['Content-Type'] !== 'undefined') {
-      if (mem['Content-Type'].includes('json')) {
-        return true;
-      }
+    const contentType = mem['Content-Type'];
+    if (typeof contentType !== 'undefined' &&
+      contentType.startsWith('application/json')) {
+      return true;
     }
     if (typeof mem.filename !== 'undefined') {
       return this.canLoadFile({name: mem.filename});
