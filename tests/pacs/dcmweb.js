@@ -247,10 +247,14 @@ function launchStow() {
 
       // STOW request
       const rootUrl = document.getElementById('rooturl').value;
-      stowReq.open('POST', rootUrl + 'studies');
+      stowReq.open('POST', rootUrl + '/studies');
       stowReq.setRequestHeader('Accept', 'application/dicom+json');
       stowReq.setRequestHeader('Content-Type',
         'multipart/related; type="application/dicom"; boundary=' + boundary);
+      const token = getToken();
+      if (typeof token !== 'undefined') {
+        stowReq.setRequestHeader('Authorization', 'Bearer ' + token);
+      }
       stowReq.send(content);
     }
   };
@@ -366,6 +370,8 @@ function qidoResponseToTable(json) {
         .then(blob => {
           const img = document.createElement('img');
           img.src = URL.createObjectURL(blob);
+          // force width in case viewport option is not supported
+          img.width = 64;
           a.appendChild(img);
         });
     }
