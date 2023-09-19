@@ -97,72 +97,98 @@ function launchMainQido() {
   // launch
   const url = document.getElementById('rooturl').value +
     document.getElementById('qidoArgs').value;
-  launchQido(url, onMainQidoLoad, 'QIDO-RS');
+  launchQido(url, onSeriesLoad, 'QIDO-RS');
 }
 
 // local vars...
-let _mainJson;
-let _loadedInstances;
+const _studiesJson = {};
+let _seriesJson = {};
+let _loadedSeries;
 
 /**
- * Handle the data loaded by the main QIDO query.
+ * Handle a series QIDO query load.
  *
  * @param {Array} json JSON array data.
  */
-function onMainQidoLoad(json) {
-  // update locals
-  _mainJson = json;
-  _loadedInstances = 0;
+function onSeriesLoad(json) {
+  // reset locals
+  _seriesJson = {};
+  _loadedSeries = 0;
   // get instances
   const rootUrl = document.getElementById('rooturl').value;
   for (let i = 0; i < json.length; ++i) {
-    const study = json[i]['0020000D'].Value[0];
-    const series = json[i]['0020000E'].Value[0];
+    const studyUID = json[i]['0020000D'].Value[0];
+    const seriesUID = json[i]['0020000E'].Value[0];
+    // store
+    if (typeof _studiesJson[studyUID] === 'undefined') {
+      _studiesJson[studyUID] = [];
+    }
+    _studiesJson[studyUID].push(json[i]);
+    // load instances
     const url = rootUrl +
-      '/studies/' + study +
-      '/series/' + series +
+      '/studies/' + studyUID +
+      '/series/' + seriesUID +
       '/instances?';
-    launchQido(url, getOnInstanceLoad(i), 'QIDO-RS[' + i + ']');
+    launchQido(
+      url,
+      getOnInstancesLoad(seriesUID, json.length),
+      'QIDO-RS[' + i + ']'
+    );
   }
 }
 
 /**
- * Get an instance load handler.
+ * Get an instances QIDO query load handler.
  *
- * @param {number} i The id of the load.
+ * @param {string} seriesUID The series UID.
+ * @param {number} numberOfSeries The number of series.
  * @returns {Function} The hanlder.
  */
-function getOnInstanceLoad(i) {
+function getOnInstancesLoad(seriesUID, numberOfSeries) {
   return function (json) {
-    // extract list of instance numbers
-    // (carefull, optional tag...)
-    const numbers = [];
-    for (let i = 0; i < json.length; ++i) {
-      const elem = json[i]['00200013']; // instance number
-      if (typeof elem !== 'undefined') {
-        numbers.push({
-          index: i,
-          number: elem.Value[0]
-        });
-      }
+    // store
+    if (typeof _seriesJson[seriesUID] !== 'undefined') {
+      console.warn('Overwrite series json for ' + seriesUID);
     }
-    // default middle index
-    let thumbIndex = Math.floor(json.length / 2);
-    // sort using instance number and get middle index
-    if (numbers.length === json.length) {
-      numbers.sort(function (a, b) {
-        return a.number - b.number;
-      });
-      thumbIndex = numbers[Math.floor(numbers.length / 2)].index;
-    }
-    // store thumbnail instance
-    _mainJson[i].thumbInstance = json[thumbIndex]['00080018'].Value[0];
+    _seriesJson[seriesUID] = json;
     // display table once all loaded
-    ++_loadedInstances;
-    if (_loadedInstances === _mainJson.length) {
-      qidoResponseToTable(_mainJson);
+    ++_loadedSeries;
+    if (_loadedSeries === numberOfSeries) {
+      qidoResponseToTable(_studiesJson);
     }
   };
+}
+
+/**
+ * Get the SOPInstanceUID of the thumbnail instance.
+ *
+ * @param {object} json An instances QIDO query result.
+ * @returns {string} The SOPInstanceUID.
+ */
+function getThumbInstanceUID(json) {
+  // extract list of instance numbers
+  // (carefull, optional tag...)
+  const numbers = [];
+  for (let i = 0; i < json.length; ++i) {
+    const elem = json[i]['00200013']; // instance number
+    if (typeof elem !== 'undefined') {
+      numbers.push({
+        index: i,
+        number: elem.Value[0]
+      });
+    }
+  }
+  // default middle index
+  let thumbIndex = Math.floor(json.length / 2);
+  // sort using instance number and get middle index
+  if (numbers.length === json.length) {
+    numbers.sort(function (a, b) {
+      return a.number - b.number;
+    });
+    thumbIndex = numbers[Math.floor(numbers.length / 2)].index;
+  }
+  // return SOPInstanceUID
+  return json[thumbIndex]['00080018'].Value[0];
 }
 
 /**
@@ -267,13 +293,9 @@ function launchStow(event) {
 
 /**
  * Show the QIDO response as a table.
- *
- * @param {Array} json The qido response as json object.
  */
-function qidoResponseToTable(json) {
+function qidoResponseToTable() {
   const viewerUrl = './viewer.html?input=';
-
-  const hasSeries = typeof json[0]['0020000E'] !== 'undefined';
 
   const table = document.createElement('table');
   table.id = 'series-table';
@@ -291,50 +313,53 @@ function qidoResponseToTable(json) {
   };
   insertTCell('#', '40px');
   insertTCell('Study');
-  if (hasSeries) {
-    insertTCell('Series');
-    insertTCell('Modality', '70px');
-    insertTCell('Action');
-  }
+  insertTCell('Series');
+  insertTCell('Modality', '70px');
+  insertTCell('Action');
 
   // table body
   const body = table.createTBody();
   let cell;
-  for (let i = 0; i < json.length; ++i) {
-    const row = body.insertRow();
-    // number
-    cell = row.insertCell();
-    cell.appendChild(document.createTextNode(i));
-    // study
-    cell = row.insertCell();
-    const studyUid = json[i]['0020000D'].Value[0];
-    cell.title = studyUid;
-    cell.appendChild(document.createTextNode(studyUid));
+  const keys = Object.keys(_studiesJson);
+  for (let i = 0; i < keys.length; ++i) {
+    const seriesJson = _studiesJson[keys[i]];
+    for (let j = 0; j < seriesJson.length; ++j) {
+      const serieJson = seriesJson[j];
+      const row = body.insertRow();
+      // number
+      cell = row.insertCell();
+      cell.appendChild(document.createTextNode(i + '-' + j));
+      // study
+      cell = row.insertCell();
+      const studyUID = serieJson['0020000D'].Value[0];
+      cell.title = studyUID;
+      cell.appendChild(document.createTextNode(studyUID));
 
-    if (hasSeries) {
       // series
       cell = row.insertCell();
-      const seriesUid = json[i]['0020000E'].Value[0];
-      cell.title = seriesUid;
-      cell.appendChild(document.createTextNode(seriesUid));
+      const seriesUID = serieJson['0020000E'].Value[0];
+      cell.title = seriesUID;
+      cell.appendChild(document.createTextNode(seriesUID));
       // modality
       cell = row.insertCell();
-      cell.appendChild(document.createTextNode(json[i]['00080060'].Value[0]));
+      const modality = serieJson['00080060'].Value[0];
+      cell.appendChild(document.createTextNode(modality));
       // action
       cell = row.insertCell();
 
       const rootUrl = document.getElementById('rooturl').value;
       const seriesUrl = rootUrl +
-      '/studies/' + studyUid +
-      '/series/' + seriesUid;
+      '/studies/' + studyUID +
+      '/series/' + seriesUID;
+      const thumbInstanceUID = getThumbInstanceUID(_seriesJson[seriesUID]);
       const thumbUrl = seriesUrl +
-        '/instances/' + json[i].thumbInstance +
+        '/instances/' + thumbInstanceUID +
         '/rendered?viewport=64,64';
 
-      const a = document.createElement('a');
-      a.href = viewerUrl + seriesUrl;
-      a.target = '_blank';
-      cell.appendChild(a);
+      const multipartLink = document.createElement('a');
+      multipartLink.href = viewerUrl + seriesUrl;
+      multipartLink.target = '_blank';
+      cell.appendChild(multipartLink);
 
       // add thumbnail to link
 
@@ -350,7 +375,7 @@ function qidoResponseToTable(json) {
       }
       // store a cookie with accept and token to allow opening in viewer
       // (should be deleted in viewer.js...)
-      a.onclick = function () {
+      multipartLink.onclick = function () {
         document.cookie = 'accept=' +
           encodeURIComponent(
             'multipart/related; type="application/dicom"; transfer-syntax=*;'
@@ -368,7 +393,7 @@ function qidoResponseToTable(json) {
           img.src = URL.createObjectURL(blob);
           // force width in case viewport option is not supported
           img.width = 64;
-          a.appendChild(img);
+          multipartLink.appendChild(img);
         });
     }
   }
