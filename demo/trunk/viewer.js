@@ -267,6 +267,7 @@ function viewerSetup() {
   });
 
   const uriOptions = {};
+  // uriOptions.batchSize = 100;
   // special dicom web cookie
   if (document.cookie) {
     const cookies = document.cookie.split('; ');
