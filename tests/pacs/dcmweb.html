@@ -22,12 +22,22 @@ td, th {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+#result p {
+  padding: 2px;
+}
 .error {
-  color: red;
+  background-color: red;
+  color: white;
 }
-.success {
-  color: green;
+.success, .progress {
+  background-color: seagreen;
+  color: white;
 }
+.info {
+  background-color: skyblue;
+  color: white;
+}
+
 </style>
 <!-- Local -->
 <script type="text/javascript" src="./dcmweb.js"></script>
@@ -51,6 +61,8 @@ td, th {
 <p>
 <label for="fileinput">STOW query:</label>
 <input type="file" id="fileinput" multiple>
+<button id="stowMultipartButton">Multipart</button>
+<button id="stowInstancesButton">Instances</button>
 </p>
 
 <p>

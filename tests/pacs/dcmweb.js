@@ -8,8 +8,10 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  * Setup.
  */
 function onDOMContentLoaded() {
-  const fileinput = document.getElementById('fileinput');
-  fileinput.addEventListener('change', launchStow);
+  const stowMultipartButton = document.getElementById('stowMultipartButton');
+  stowMultipartButton.onclick = launchStowMultipart;
+  const stowInstancesButton = document.getElementById('stowInstancesButton');
+  stowInstancesButton.onclick = launchStowInstances;
 
   const searchButton = document.getElementById('qidobutton');
   searchButton.onclick = launchMainQido;
@@ -24,6 +26,26 @@ function onDOMContentLoaded() {
 function showMessage(text, type) {
   const p = document.createElement('p');
   p.className = 'message ' + type;
+  p.appendChild(document.createTextNode(text));
+
+  const div = document.getElementById('result');
+  div.appendChild(p);
+}
+
+/**
+ * Show a progress message.
+ *
+ * @param {string} text The text message.
+ */
+function showProgress(text) {
+  let p = document.getElementById('progress');
+  if (!p) {
+    p = document.createElement('p');
+    p.id = 'progress';
+    p.className = 'progress';
+  } else {
+    p.innerHTML = '';
+  }
   p.appendChild(document.createTextNode(text));
 
   const div = document.getElementById('result');
@@ -55,7 +77,7 @@ function checkResponseEvent(event, reqName) {
 
   let message;
   const status = event.currentTarget.status;
-  if (status !== 200 && status !== 204) {
+  if (status !== 200 && status !== 202 && status !== 204) {
     message = 'Bad status for request ' + reqName + ': ' +
       status + ' (' + event.currentTarget.statusText + ') "' +
       event.currentTarget.responseText + '"';
@@ -91,6 +113,8 @@ function getOnLoadError(reqName) {
  * Launch main QIDO query to retrieve series.
  */
 function launchMainQido() {
+  // reset locals
+  _studiesJson = {};
   // clear result div
   const div = document.getElementById('result');
   div.innerHTML = '';
@@ -101,7 +125,7 @@ function launchMainQido() {
 }
 
 // local vars...
-const _studiesJson = {};
+let _studiesJson = {};
 let _seriesJson = {};
 let _loadedSeries;
 
@@ -129,6 +153,8 @@ function onSeriesLoad(json) {
       '/studies/' + studyUID +
       '/series/' + seriesUID +
       '/instances?';
+    // you can limit the number of answers with 'limit=number'
+    // azure has a default limit a 100...
     launchQido(
       url,
       getOnInstancesLoad(seriesUID, json.length),
@@ -226,14 +252,20 @@ function launchQido(url, loadCallback, reqName) {
 }
 
 /**
- * Launch a STOW request.
- *
- * @type {object} The file input change event.
+ * Launch a STOW request with multipart data.
+ * Beware: large request could timeout...
  */
-function launchStow(event) {
-  const files = event.target.files;
+function launchStowMultipart() {
+  const fileinput = document.getElementById('fileinput');
+  const files = fileinput.files;
 
   const reqName = 'STOW-RS';
+
+  // clear result div
+  const div = document.getElementById('result');
+  div.innerHTML = '';
+  showMessage('RUNNING ' + reqName + ' (multipart) request...', 'info');
+
   const stowReq = new XMLHttpRequest();
   let message;
   stowReq.addEventListener('load', function (event) {
@@ -241,11 +273,17 @@ function launchStow(event) {
     if (!checkResponseEvent(event, reqName)) {
       return;
     }
-    // parse json
-    message = 'STOW-RS successful!!';
+    // show success message
+    message = reqName + ' (multipart) successful!!';
     showMessage(message, 'success');
   });
   stowReq.addEventListener('error', getOnLoadError(reqName));
+  stowReq.addEventListener('progress', function (event) {
+    if (event.lengthComputable) {
+      const message = event.loaded + '/' + event.total;
+      showProgress(message);
+    }
+  });
 
   // files' data
   const data = [];
@@ -281,6 +319,62 @@ function launchStow(event) {
       }
       stowReq.send(content);
     }
+  };
+
+  // launch data requests
+  for (let i = 0; i < files.length; ++i) {
+    const reader = new FileReader();
+    reader.addEventListener('load', onload);
+    reader.readAsArrayBuffer(files[i]);
+  }
+}
+
+/**
+ * Launch a STOW request per instances.
+ */
+function launchStowInstances() {
+  const fileinput = document.getElementById('fileinput');
+  const files = fileinput.files;
+
+  const reqName = 'STOW-RS';
+  let numberOfStowed = 0;
+
+  // clear result div
+  const div = document.getElementById('result');
+  div.innerHTML = '';
+  showMessage('RUNNING ' + reqName +
+    ' (instances) ' + files.length + ' requests...', 'info');
+
+  // load handler: store data and, when all data is received, launch STOW
+  const onload = function (event) {
+    // STOW request
+    const stowReq = new XMLHttpRequest();
+    let message;
+    stowReq.addEventListener('load', function (event) {
+      // check
+      if (!checkResponseEvent(event, reqName)) {
+        return;
+      }
+      // show success message
+      ++numberOfStowed;
+      const progress = numberOfStowed + '/' + files.length;
+      showProgress(progress);
+      if (numberOfStowed === files.length) {
+        message = reqName + ' (instances) successful!!';
+        showMessage(message, 'success');
+      }
+    });
+    stowReq.addEventListener('error', getOnLoadError(reqName));
+
+    const rootUrl = document.getElementById('rooturl').value;
+    stowReq.open('POST', rootUrl + '/studies');
+    stowReq.setRequestHeader('Accept', 'application/dicom+json');
+    stowReq.setRequestHeader('Content-Type', 'application/dicom');
+    const token = getToken();
+    if (typeof token !== 'undefined') {
+      stowReq.setRequestHeader('Authorization', 'Bearer ' + token);
+    }
+    stowReq.send(event.target.result);
   };
 
   // launch data requests
@@ -356,10 +450,58 @@ function qidoResponseToTable() {
         '/instances/' + thumbInstanceUID +
         '/rendered?viewport=64,64';
 
+      // multipart link
       const multipartLink = document.createElement('a');
       multipartLink.href = viewerUrl + seriesUrl;
-      multipartLink.target = '_blank';
       cell.appendChild(multipartLink);
+
+      // store a cookie with accept and token to allow opening in viewer
+      // (should be deleted in viewer.js...)
+      multipartLink.onclick = function () {
+        document.cookie = 'accept=' +
+          encodeURIComponent(
+            'multipart/related; type="application/dicom"; transfer-syntax=*;'
+          ) + '; ';
+        if (typeof token !== 'undefined') {
+          document.cookie = 'access_token=' + token + '; ';
+        }
+        document.cookie = 'samesite=strict; ';
+      };
+
+      const span = document.createElement('span');
+      span.appendChild(document.createTextNode(' '));
+      cell.appendChild(span);
+
+      // instances link
+      const instancesJson = _seriesJson[seriesUID];
+      let instanceUrl = seriesUrl + '/instances/?';
+      for (let k = 0; k < instancesJson.length; ++k) {
+        if (k !== 0) {
+          instanceUrl += '&';
+        }
+        instanceUrl += 'file=' + instancesJson[k]['00080018'].Value[0];
+      }
+      const instanceLink = document.createElement('a');
+      instanceLink.href = viewerUrl +
+        encodeURIComponent(instanceUrl) +
+        '&dwvReplaceMode=void';
+      instanceLink.appendChild(document.createTextNode('instances'));
+      cell.appendChild(instanceLink);
+
+      const spanAfter = document.createElement('span');
+      spanAfter.appendChild(document.createTextNode(
+        ' (' + instancesJson.length + ')'));
+      cell.appendChild(spanAfter);
+
+      // store a cookie with accept and token to allow opening in viewer
+      // (should be deleted in viewer.js...)
+      instanceLink.onclick = function () {
+        document.cookie = 'accept=application/dicom; ';
+        if (typeof token !== 'undefined') {
+          document.cookie = 'access_token=' + token + '; ';
+        }
+        document.cookie = 'samesite=strict; ';
+      };
 
       // add thumbnail to link
 
@@ -373,18 +515,6 @@ function qidoResponseToTable() {
       if (typeof token !== 'undefined') {
         options.headers['Authorization'] = 'Bearer ' + token;
       }
-      // store a cookie with accept and token to allow opening in viewer
-      // (should be deleted in viewer.js...)
-      multipartLink.onclick = function () {
-        document.cookie = 'accept=' +
-          encodeURIComponent(
-            'multipart/related; type="application/dicom"; transfer-syntax=*;'
-          ) + '; ';
-        if (typeof token !== 'undefined') {
-          document.cookie = 'access_token=' + token + '; ';
-        }
-        document.cookie = 'samesite=strict; ';
-      };
 
       fetch(thumbUrl, options)
         .then(res => res.blob())
