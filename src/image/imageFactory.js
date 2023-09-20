@@ -194,6 +194,8 @@ export class ImageFactory {
     const meta = {
       numberOfFiles: numberOfFiles
     };
+
+    // Modality
     const modality = dataElements['00080060'];
     if (typeof modality !== 'undefined') {
       meta.Modality = modality.value[0];
@@ -201,7 +203,8 @@ export class ImageFactory {
 
     // PET SUV
     let isPetWithSuv = false;
-    if (modality.value[0] === 'PT') {
+    if (typeof meta.Modality !== 'undefined' &&
+      meta.Modality === 'PT') {
       const warn = canGetSuvFactor(dataElements);
       if (warn.length === 0) {
         isPetWithSuv = true;

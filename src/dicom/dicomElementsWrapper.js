@@ -576,9 +576,12 @@ export function getPixelUnit(elements) {
   }
   // default rescale type for CT
   if (typeof unit === 'undefined') {
-    const modality = elements['00080060'].value[0];
-    if (modality === 'CT') {
-      unit = 'HU';
+    const element = elements['00080060'];
+    if (typeof element !== 'undefined') {
+      const modality = element.value[0];
+      if (modality === 'CT') {
+        unit = 'HU';
+      }
     }
   }
   return unit;
