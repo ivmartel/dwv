@@ -386,6 +386,33 @@ function launchStowInstances() {
 }
 
 /**
+ * Get a common prefix from a list of strings.
+ *
+ * @param {string[]} values The values to extract the prefix from
+ * @returns {string|undefined} The common prefix
+ */
+function getCommonPrefix(values) {
+  const size = values.length;
+  if (size === 0) {
+    return;
+  }
+  if (size === 1) {
+    return values[0];
+  }
+  // sort
+  values.sort();
+  // minimum length
+  const end = Math.min(values[0].length, values[size - 1].length);
+  // common characters between first and last
+  let i = 0;
+  while (i < end && values[0][i] === values[size - 1][i]) {
+    i++;
+  }
+  // extract prefix
+  return values[0].substring(0, i);
+}
+
+/**
  * Show the QIDO response as a table.
  */
 function qidoResponseToTable() {
@@ -474,12 +501,17 @@ function qidoResponseToTable() {
 
       // instances link
       const instancesJson = _seriesJson[seriesUID];
-      let instanceUrl = seriesUrl + '/instances/?';
+      const instancesUIDs = [];
       for (let k = 0; k < instancesJson.length; ++k) {
+        instancesUIDs.push(instancesJson[k]['00080018'].Value[0]);
+      }
+      const prefix = getCommonPrefix(instancesUIDs);
+      let instanceUrl = seriesUrl + '/instances/' + prefix + '?';
+      for (let k = 0; k < instancesUIDs.length; ++k) {
         if (k !== 0) {
           instanceUrl += '&';
         }
-        instanceUrl += 'file=' + instancesJson[k]['00080018'].Value[0];
+        instanceUrl += 'file=' + instancesUIDs[k].substring(prefix.length);
       }
       const instanceLink = document.createElement('a');
       instanceLink.href = viewerUrl +
