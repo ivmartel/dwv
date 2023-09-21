@@ -503,7 +503,7 @@ export class View {
     this.#fireEvent({
       type: 'colourchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
-      ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
+      ww: this.getCurrentWindowLut().getWindowLevel().getWidth(),
       value: [name]
     });
   }
