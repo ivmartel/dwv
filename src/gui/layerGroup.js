@@ -364,6 +364,22 @@ export class LayerGroup {
   }
 
   /**
+   * Get the number of view layers handled by this class.
+   *
+   * @returns {number} The number of layers.
+   */
+  getNumberOfViewLayers() {
+    let count = 0;
+    this.#layers.forEach(item => {
+      if (typeof item !== 'undefined' &&
+        item instanceof ViewLayer) {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  /**
    * Get the active image layer.
    *
    * @returns {ViewLayer|undefined} The layer.

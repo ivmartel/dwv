@@ -116,7 +116,8 @@ export class OpacityBinder {
       }
       // propagate to first view layer
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0) {
+      if (viewLayers.length !== 0 &&
+        layerGroup.getNumberOfViewLayers() > 1) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
       }
