@@ -32,7 +32,7 @@ import {
 export const viewEventNames = [
   'wlchange',
   'wlpresetadd',
-  'colourchange',
+  'colourmapchange',
   'positionchange',
   'opacitychange',
   'alphafuncchange'
@@ -494,16 +494,12 @@ export class View {
     /**
      * Color change event.
      *
-     * @event View#colourchange
+     * @event View#colourmapchange
      * @type {object}
      * @property {Array} value The changed value.
-     * @property {number} wc The new window center value.
-     * @property {number} ww The new window wdth value.
      */
     this.#fireEvent({
-      type: 'colourchange',
-      wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
-      ww: this.getCurrentWindowLut().getWindowLevel().getWidth(),
+      type: 'colourmapchange',
       value: [name]
     });
   }

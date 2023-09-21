@@ -212,7 +212,7 @@ export class ViewLayer {
     this.#dataId = dataId;
     // local listeners
     view.addEventListener('wlchange', this.#onWLChange);
-    view.addEventListener('colourchange', this.#onColourChange);
+    view.addEventListener('colourmapchange', this.#onColourMapChange);
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
     // view events
@@ -879,7 +879,7 @@ export class ViewLayer {
    *
    * @param {object} event The event fired when changing the colour map.
    */
-  #onColourChange = (event) => {
+  #onColourMapChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {
