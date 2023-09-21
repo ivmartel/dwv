@@ -3208,12 +3208,6 @@ export declare class View {
      */
     setWindowPresets(presets: object): void;
     /**
-     * Set the default colour map.
-     *
-     * @param {ColourMap} map The colour map.
-     */
-    setDefaultColourMap(map: ColourMap): void;
-    /**
      * Add window presets to the existing ones.
      *
      * @param {object} presets The window presets.
@@ -3228,16 +3222,16 @@ export declare class View {
     /**
      * Get the colour map of the image.
      *
-     * @returns {ColourMap} The colour map of the image.
+     * @returns {string} The colour map name.
      */
-    getColourMap(): ColourMap;
+    getColourMap(): string;
     /**
      * Set the colour map of the image.
      *
-     * @param {ColourMap} map The colour map of the image.
-     * @fires View#colourchange
+     * @param {string} name The colour map name.
+     * @fires View#colourmapchange
      */
-    setColourMap(map: ColourMap): void;
+    setColourMap(name: string): void;
     /**
      * Get the current position.
      *
@@ -3749,22 +3743,15 @@ export declare class ViewController {
     /**
      * Get the colour map.
      *
-     * @returns {ColourMap} The colour map.
-     */
-    getColourMap(): ColourMap;
-    /**
-     * Get the colour map name.
-     *
      * @returns {string} The colour map name.
      */
-    getColourMapName(): string;
+    getColourMap(): string;
     /**
      * Set the colour map.
      *
-     * @param {ColourMap} map The colour map.
      * @param {string} [name] The colour map name.
      */
-    setColourMap(map: ColourMap, name?: string): void;
+    setColourMap(name?: string): void;
     /**
      * @callback alphaFn@callback alphaFn
      * @param {object} value The pixel value.
@@ -3777,12 +3764,6 @@ export declare class ViewController {
      * @param {alphaFn} func The function.
      */
     setViewAlphaFunction(func: (value: object, index: object) => number): void;
-    /**
-     * Set the colour map from a name.
-     *
-     * @param {string} name The name of the colour map to set.
-     */
-    setColourMapFromName(name: string): void;
     /**
      * Add an event listener to this class.
      *
