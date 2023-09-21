@@ -299,13 +299,20 @@ export class ImageFactory {
 
     // PALETTE COLOR luts
     if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
+      // Red Palette Color Lookup Table Data
       const redLutElement = dataElements['00281201'];
+      // Green Palette Color Lookup Table Data
       const greenLutElement = dataElements['00281202'];
+      // Blue Palette Color Lookup Table Data
       const blueLutElement = dataElements['00281203'];
       let redLut;
       let greenLut;
       let blueLut;
       // check red palette descriptor (should all be equal)
+      // Red Palette Color Lookup Table Descriptor
+      // 0: number of entries in the lookup table
+      // 1: first input value mapped
+      // 2: number of bits for each entry in the Lookup Table Data (8 or 16)
       const descriptor = dataElements['00281101'];
       if (typeof descriptor !== 'undefined' &&
         descriptor.value.length === 3) {
@@ -323,6 +330,7 @@ export class ImageFactory {
             descSize = 65536;
           }
           // red palette VL
+          // TODO vl is undefined, find info elsewhere...
           const vlSize = redLutElement.vl;
           // check double size
           if (vlSize !== 2 * descSize) {
