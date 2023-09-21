@@ -3,6 +3,7 @@ import {Geometry} from './geometry';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {WindowCenterAndWidth} from './windowCenterAndWidth';
 import {Image} from './image';
+import {luts} from './luts';
 import {
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
@@ -355,17 +356,17 @@ export class ImageFactory {
             'Scaling 16bits color lut since the lut descriptor is 8.');
           let clone = redLutElement.value.slice(0);
           // @ts-expect-error
-          redLut = new Uint8Array(clone.buffer);
+          redLut = Array.from(new Uint8Array(clone.buffer));
           clone = greenLutElement.value.slice(0);
           // @ts-expect-error
-          greenLut = new Uint8Array(clone.buffer);
+          greenLut = Array.from(new Uint8Array(clone.buffer));
           clone = blueLutElement.value.slice(0);
           // @ts-expect-error
-          blueLut = new Uint8Array(clone.buffer);
+          blueLut = Array.from(new Uint8Array(clone.buffer));
         }
       }
       // set the palette
-      meta.paletteLut = {
+      luts['palette'] = {
         red: redLut,
         green: greenLut,
         blue: blueLut

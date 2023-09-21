@@ -14,7 +14,6 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {luts} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
 // doc imports
@@ -749,30 +748,19 @@ export class ViewController {
   /**
    * Get the colour map.
    *
-   * @returns {ColourMap} The colour map.
+   * @returns {string} The colour map name.
    */
   getColourMap() {
     return this.#view.getColourMap();
   }
 
   /**
-   * Get the colour map name.
-   *
-   * @returns {string} The colour map name.
-   */
-  getColourMapName() {
-    return this.#colourMapName;
-  }
-
-  /**
    * Set the colour map.
    *
-   * @param {ColourMap} map The colour map.
    * @param {string} [name] The colour map name.
    */
-  setColourMap(map, name) {
-    this.#colourMapName = name;
-    this.#view.setColourMap(map);
+  setColourMap(name) {
+    this.#view.setColourMap(name);
   }
 
   /**
@@ -789,20 +777,6 @@ export class ViewController {
    */
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
-  }
-
-  /**
-   * Set the colour map from a name.
-   *
-   * @param {string} name The name of the colour map to set.
-   */
-  setColourMapFromName(name) {
-    // check if we have it
-    if (!luts[name]) {
-      throw new Error('Unknown colour map: \'' + name + '\'');
-    }
-    // enable it
-    this.setColourMap(luts[name], name);
   }
 
   /**

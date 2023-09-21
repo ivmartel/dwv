@@ -1233,7 +1233,7 @@ export class App {
     const viewController =
       this.#stage.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
-    viewController.setColourMapFromName(name);
+    viewController.setColourMap(name);
   }
 
   /**
@@ -1648,13 +1648,13 @@ export class App {
     const viewController = viewLayer.getViewController();
     // colour map
     if (typeof viewConfig.colourMap !== 'undefined') {
-      viewController.setColourMapFromName(viewConfig.colourMap);
+      viewController.setColourMap(viewConfig.colourMap);
     } else {
       if (!isBaseLayer) {
         if (data.image.getMeta().Modality === 'PT') {
-          viewController.setColourMapFromName('hot');
+          viewController.setColourMap('hot');
         } else {
-          viewController.setColourMapFromName('rainbow');
+          viewController.setColourMap('rainbow');
         }
       }
     }

@@ -133,11 +133,11 @@ export class View {
   #currentWl = null;
 
   /**
-   * colour map.
+   * Colour map name.
    *
-   * @type {ColourMap}
+   * @type {string}
    */
-  #colourMap = luts.plain;
+  #colourMapName = 'plain';
 
   /**
    * Current position as a Point.
@@ -414,15 +414,6 @@ export class View {
   }
 
   /**
-   * Set the default colour map.
-   *
-   * @param {ColourMap} map The colour map.
-   */
-  setDefaultColourMap(map) {
-    this.#colourMap = map;
-  }
-
-  /**
    * Add window presets to the existing ones.
    *
    * @param {object} presets The window presets.
@@ -471,20 +462,35 @@ export class View {
   /**
    * Get the colour map of the image.
    *
-   * @returns {ColourMap} The colour map of the image.
+   * @returns {string} The colour map name.
    */
   getColourMap() {
-    return this.#colourMap;
+    return this.#colourMapName;
+  }
+
+  /**
+   * Get the colour map object.
+   *
+   * @returns {ColourMap} The colour map.
+   */
+  #getColourMapLut() {
+    return luts[this.#colourMapName];
   }
 
   /**
    * Set the colour map of the image.
    *
-   * @param {ColourMap} map The colour map of the image.
-   * @fires View#colourchange
+   * @param {string} name The colour map name.
+   * @fires View#colourmapchange
    */
-  setColourMap(map) {
-    this.#colourMap = map;
+  setColourMap(name) {
+    // check if we have it
+    if (!luts[name]) {
+      throw new Error('Unknown colour map: \'' + name + '\'');
+    }
+
+    this.#colourMapName = name;
+
     /**
      * Color change event.
      *
@@ -498,6 +504,7 @@ export class View {
       type: 'colourchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
       ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
+      value: [name]
     });
   }
 
@@ -892,7 +899,7 @@ export class View {
         iterator,
         this.getAlphaFunction(),
         this.getCurrentWindowLut(),
-        this.getColourMap()
+        this.#getColourMapLut()
       );
       break;
 
@@ -901,7 +908,7 @@ export class View {
         data,
         iterator,
         this.getAlphaFunction(),
-        this.getColourMap(),
+        this.#getColourMapLut(),
         image.getMeta().BitsStored === 16
       );
       break;

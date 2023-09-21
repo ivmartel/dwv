@@ -4,6 +4,7 @@ import {
   WindowCenterAndWidth,
   defaultPresets
 } from './windowCenterAndWidth';
+import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -29,11 +30,12 @@ export class ViewFactory {
 
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
-      view.setDefaultColourMap(luts.invPlain);
+      view.setColourMap('invPlain');
     } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      const paletteLut = image.getMeta().paletteLut;
-      if (typeof (paletteLut) !== 'undefined') {
-        view.setDefaultColourMap(paletteLut);
+      if (typeof luts['palette'] !== 'undefined') {
+        view.setColourMap('palette');
+      } else {
+        logger.warn('Cannot find Palette lut');
       }
     }
 
