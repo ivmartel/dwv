@@ -2017,6 +2017,12 @@ export declare class LayerGroup {
      */
     getNumberOfLayers(): number;
     /**
+     * Get the number of view layers handled by this class.
+     *
+     * @returns {number} The number of layers.
+     */
+    getNumberOfViewLayers(): number;
+    /**
      * Get the active image layer.
      *
      * @returns {ViewLayer|undefined} The layer.
