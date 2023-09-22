@@ -26,6 +26,24 @@ export class WindowLevelBinder {
 }
 
 /**
+ * Colour map binder.
+ */
+export class ColourMapBinder {
+  getEventType = function () {
+    return 'colourmapchange';
+  };
+  getCallback = function (layerGroup) {
+    return function (event) {
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
+      if (viewLayers.length !== 0) {
+        const vc = viewLayers[0].getViewController();
+        vc.setColourMap(event.value[0]);
+      }
+    };
+  };
+}
+
+/**
  * Position binder.
  */
 export class PositionBinder {
@@ -133,7 +151,8 @@ export const binderList = {
   PositionBinder,
   ZoomBinder,
   OffsetBinder,
-  OpacityBinder
+  OpacityBinder,
+  ColourMapBinder
 };
 
 /**
