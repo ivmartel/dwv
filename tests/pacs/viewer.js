@@ -566,7 +566,8 @@ function setupBindersCheckboxes() {
     'Position',
     'Zoom',
     'Offset',
-    'Opacity'
+    'Opacity',
+    'ColourMap'
   ];
   const binders = [];
   // add all binders at startup
@@ -1133,6 +1134,8 @@ function addDataRow(dataId) {
 
   // cell: presets
   cell = row.insertCell();
+
+  // window level preset
   // callback
   const changePreset = function (event) {
     // update selected layers
@@ -1143,17 +1146,52 @@ function addDataRow(dataId) {
       vc.setWindowLevelPreset(event.target.value);
     }
   };
-  const select = document.createElement('select');
-  select.id = 'preset-' + dataId + '-select';
+  const selectPreset = document.createElement('select');
+  selectPreset.id = 'preset-' + dataId + '-select';
   const presets = initialVc.getWindowLevelPresetsNames();
   for (const preset of presets) {
     const option = document.createElement('option');
     option.value = preset;
     option.appendChild(document.createTextNode(preset));
-    select.appendChild(option);
+    selectPreset.appendChild(option);
   }
-  select.onchange = changePreset;
-  cell.appendChild(select);
+  selectPreset.onchange = changePreset;
+  const labelPreset = document.createElement('label');
+  labelPreset.htmlFor = selectPreset.id;
+  labelPreset.appendChild(document.createTextNode('wl: '));
+  cell.appendChild(labelPreset);
+  cell.appendChild(selectPreset);
+
+  // break line
+  const br = document.createElement('br');
+  cell.appendChild(br);
+
+  // colour map
+  // callback
+  const changeColourMap = function (event) {
+    // update selected layers
+    const lgIds = getSelectedLayerGroupIds();
+    for (let i = 0; i < lgIds.length; ++i) {
+      const lg = _app.getLayerGroupByDivId(lgIds[i]);
+      const vc = lg.getActiveViewLayer().getViewController();
+      vc.setColourMap(event.target.value);
+    }
+  };
+  const selectColourMap = document.createElement('select');
+  selectColourMap.id = 'colourmap-' + dataId + '-select';
+  const colourMaps = Object.keys(dwv.luts);
+  for (const colourMap of colourMaps) {
+    const option = document.createElement('option');
+    option.value = colourMap;
+    option.appendChild(document.createTextNode(colourMap));
+    selectColourMap.appendChild(option);
+  }
+  selectColourMap.onchange = changeColourMap;
+  const labelColourMap = document.createElement('label');
+  labelColourMap.htmlFor = selectColourMap.id;
+  labelColourMap.appendChild(document.createTextNode('cm: '));
+  cell.appendChild(labelColourMap);
+  cell.appendChild(selectColourMap);
 
   // cell: opactiy
   cell = row.insertCell();
