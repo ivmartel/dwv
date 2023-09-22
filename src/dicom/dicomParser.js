@@ -31,7 +31,7 @@ import {DataElement} from '../dicom/dataElement';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.32.2';
+  return '0.32.3';
 }
 
 /**
