@@ -1706,6 +1706,8 @@ export class App {
     let flipOffsetX = false;
     let flipOffsetY = false;
     let flipScaleZ = false;
+    let flipScaleY = false;
+    let flipScaleX = false;
 
     if (major === 0) {
       // sagittal case
@@ -1744,7 +1746,54 @@ export class App {
       }
     } else if (major === 1) {
       // coronal case
-      // TODO: find examples
+      if (typeof viewConfig.orientation === 'undefined' ||
+        viewConfig.orientation === 'coronal') {
+        if (colAbsMax0 < 0) {
+          flipOffsetX = true;
+          flipScaleX = true;
+          if (colAbsMax1 > 0) {
+            flipOffsetY = true;
+            flipScaleZ = true;
+          }
+        }
+        if (colAbsMax1 > 0) {
+          flipOffsetY = true;
+          flipScaleZ = true;
+        }
+      } else {
+        // specific
+        if (viewConfig.orientation === 'axial') {
+          if (colAbsMax0 < 0 && colAbsMax1 > 0) {
+            flipOffsetX = true;
+            flipScaleX = true;
+          }
+          if (colAbsMax0 < 0 && colAbsMax1 < 0) {
+            flipOffsetX = true;
+            flipScaleX = true;
+            flipOffsetY = true;
+            flipScaleY = true;
+          }
+          if (colAbsMax0 > 0 && colAbsMax1 > 0) {
+            flipOffsetY = true;
+            flipScaleY = true;
+          }
+        } else if (viewConfig.orientation === 'sagittal') {
+          if (colAbsMax0 < 0 && colAbsMax1 > 0) {
+            flipOffsetY = true;
+            flipScaleZ = true;
+          }
+          if (colAbsMax0 < 0 && colAbsMax1 < 0) {
+            flipOffsetX = true;
+            flipScaleY = true;
+          }
+          if (colAbsMax0 > 0 && colAbsMax1 > 0) {
+            flipOffsetX = true;
+            flipOffsetY = true;
+            flipScaleY = true;
+            flipScaleZ = true;
+          }
+        }
+      }
     } else if (major === 2) {
       // axial case
       if (typeof viewConfig.orientation === 'undefined' ||
@@ -1789,6 +1838,18 @@ export class App {
       viewLayer.addFlipOffsetY();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.addFlipOffsetY();
+      }
+    }
+    if (flipScaleX) {
+      viewLayer.flipScaleX();
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.flipScaleX();
+      }
+    }
+    if (flipScaleY) {
+      viewLayer.flipScaleY();
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.flipScaleY();
       }
     }
     if (flipScaleZ) {
