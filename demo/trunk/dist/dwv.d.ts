@@ -3749,9 +3749,9 @@ export declare class ViewController {
     /**
      * Set the colour map.
      *
-     * @param {string} [name] The colour map name.
+     * @param {string} name The colour map name.
      */
-    setColourMap(name?: string): void;
+    setColourMap(name: string): void;
     /**
      * @callback alphaFn@callback alphaFn
      * @param {object} value The pixel value.
