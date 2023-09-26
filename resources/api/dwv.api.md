@@ -401,6 +401,7 @@ export class LayerGroup {
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getMaxSize(): object | undefined;
     getNumberOfLayers(): number;
+    getNumberOfViewLayers(): number;
     getOffset(): object;
     getScale(): object;
     getShowCrosshair(): boolean;
@@ -642,7 +643,7 @@ export class View {
     decrementScrollIndex(silent: boolean): boolean;
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: object, index: object) => number;
-    getColourMap(): ColourMap;
+    getColourMap(): string;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
     getCurrentWindowLut(): WindowLut;
@@ -660,10 +661,9 @@ export class View {
     init(): void;
     removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: object, index: object) => number): void;
-    setColourMap(map: ColourMap): void;
+    setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(position: Point, silent: boolean): boolean;
-    setDefaultColourMap(map: ColourMap): void;
     setImage(inImage: Image_2): void;
     setInitialIndex(): void;
     setOrientation(mat33: Matrix33): void;
@@ -699,8 +699,7 @@ export class ViewController {
     equalImageMeta(meta: object): boolean;
     generateImageData(array: ImageData, index: Index): void;
     get2DSpacing(): any[];
-    getColourMap(): ColourMap;
-    getColourMapName(): string;
+    getColourMap(): string;
     getCurrentIndex(): Index;
     getCurrentOrientedIndex(): Index;
     getCurrentPosition(): Point;
@@ -732,8 +731,7 @@ export class ViewController {
     isPlaying(): boolean;
     play(): void;
     removeEventListener(type: string, callback: Function): void;
-    setColourMap(map: ColourMap, name?: string): void;
-    setColourMapFromName(name: string): void;
+    setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     setImage(img: Image_2, dataId: string): void;
