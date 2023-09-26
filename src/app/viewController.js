@@ -757,7 +757,7 @@ export class ViewController {
   /**
    * Set the colour map.
    *
-   * @param {string} [name] The colour map name.
+   * @param {string} name The colour map name.
    */
   setColourMap(name) {
     this.#view.setColourMap(name);
