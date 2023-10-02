@@ -175,6 +175,13 @@ export class Stage {
    */
   #activeLayerGroupIndex = null;
 
+  /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
+
   // layer group binders
   #binders = [];
   // binder callbacks
@@ -245,6 +252,7 @@ export class Stage {
   addLayerGroup(htmlElement) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
     const layerGroup = new LayerGroup(htmlElement);
+    layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;
     if (isBound) {
@@ -413,6 +421,8 @@ export class Stage {
    * @param {boolean} flag True to enable smoothing.
    */
   setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+    // set for existing layer groups
     for (let i = 0; i < this.#layerGroups.length; ++i) {
       this.#layerGroups[i].setImageSmoothing(flag);
     }
