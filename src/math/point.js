@@ -240,21 +240,6 @@ export function getEqualPoint3DFunction(point) {
 }
 
 /**
- * Get an array find callback for a similar input point.
- *
- * @param {Point3D} point The point to compare to.
- * @param {number} tol The comparison tolerance
- *   default to Number.EPSILON.
- * @returns {Function} A function that compares, using `isSimilar`,
- *   its input point to the one given as input to this function.
- */
-export function getSimilarPoint3DFunction(point, tol) {
-  return function (element) {
-    return element.isSimilar(point, tol);
-  };
-}
-
-/**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
