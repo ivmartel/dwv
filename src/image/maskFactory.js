@@ -193,7 +193,7 @@ const RequiredDicomSegTags = [
  *
  * @returns {object} The default tags.
  */
-function getDefaultDicomSegJson() {
+export function getDefaultDicomSegJson() {
   const tags = {};
   for (let i = 0; i < RequiredDicomSegTags.length; ++i) {
     const reqTag = RequiredDicomSegTags[i];
