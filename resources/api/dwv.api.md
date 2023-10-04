@@ -644,16 +644,7 @@ export class ToolConfig {
 }
 
 // @public (undocumented)
-export namespace toolList {
-        { WindowLevel };
-        { Scroll };
-        { ZoomAndPan };
-        { Opacity };
-        { Draw };
-        { Filter };
-        { Floodfill };
-        { Livewire };
-}
+export const toolList: {};
 
 // @public
 export class Vector3D {
