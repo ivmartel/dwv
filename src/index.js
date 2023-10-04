@@ -38,7 +38,10 @@ import {
 } from './dicom/dicomTag';
 // gui
 import {customUI} from './gui/generic';
-import {LayerGroup} from './gui/layerGroup';
+import {
+  LayerGroup,
+  getLayerDetailsFromEvent
+} from './gui/layerGroup';
 import {ViewLayer} from './gui/viewLayer';
 import {DrawLayer} from './gui/drawLayer';
 import {OverlayData} from './gui/overlayData';
@@ -67,16 +70,27 @@ import {
   defaultPresets,
   WindowCenterAndWidth
 } from './image/windowCenterAndWidth';
+import {
+  MaskFactory,
+  getDefaultDicomSegJson
+} from './image/maskFactory';
 // math
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
 import {Index} from './math/index';
 import {Matrix33} from './math/matrix';
+import {getEllipseIndices} from './math/ellipse';
+// tools
+import {toolList} from './tools/index';
 // utils
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
+import {
+  labToUintLab,
+  srgbToCielab
+} from './utils/colour';
 
 export {
   AppOptions,
@@ -114,6 +128,7 @@ export {
   Point3D,
   Vector3D,
   Matrix33,
+  MaskFactory,
   defaults,
   logger,
   decoderScripts,
@@ -121,13 +136,17 @@ export {
   luts,
   defaultPresets,
   i18n,
+  toolList,
   addTagsToDictionary,
   createImage,
   createMaskImage,
   createView,
   getDwvVersion,
+  getDefaultDicomSegJson,
   getUID,
   getElementsFromJSONTags,
+  getEllipseIndices,
+  getLayerDetailsFromEvent,
   getTypedArray,
   getTagFromKey,
   getPixelDataTag,
@@ -135,5 +154,7 @@ export {
   getReverseOrientation,
   hasDicomPrefix,
   precisionRound,
-  buildMultipart
+  buildMultipart,
+  labToUintLab,
+  srgbToCielab
 };
