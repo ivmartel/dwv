@@ -3078,16 +3078,7 @@ export declare class ToolConfig {
     options: string[] | undefined;
 }
 
-export declare namespace toolList {
-        { WindowLevel };
-        { Scroll };
-        { ZoomAndPan };
-        { Opacity };
-        { Draw };
-        { Filter };
-        { Floodfill };
-        { Livewire };
-}
+export declare const toolList: {};
 
 /**
  * Immutable 3D vector.
