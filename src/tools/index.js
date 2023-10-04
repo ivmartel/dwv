@@ -17,7 +17,9 @@ import {RulerFactory} from './ruler';
 
 import {Filter, Threshold, Sobel, Sharpen} from './filter';
 
-export const toolList = {
+export const toolList = {};
+
+export const defaultToolList = {
   WindowLevel,
   Scroll,
   ZoomAndPan,

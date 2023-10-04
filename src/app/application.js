@@ -14,7 +14,7 @@ import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
 import {OverlayData} from '../gui/overlayData';
-import {toolList, toolOptions} from '../tools';
+import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 
 // doc imports
@@ -521,10 +521,15 @@ export class App {
       const keys = Object.keys(this.#options.tools);
       for (let t = 0; t < keys.length; ++t) {
         const toolName = keys[t];
-        // find the tool in the Tools list
-        if (typeof toolList[toolName] !== 'undefined') {
+        // find the tool in the default tool list
+        let toolConstructor = defaultToolList[toolName];
+        // or use external one
+        if (typeof toolConstructor === 'undefined') {
+          toolConstructor = toolList[toolName];
+        }
+        if (typeof toolConstructor !== 'undefined') {
           // create tool instance
-          appToolList[toolName] = new toolList[toolName](this);
+          appToolList[toolName] = new toolConstructor(this);
           // register listeners
           if (typeof appToolList[toolName].addEventListener !== 'undefined') {
             const names = appToolList[toolName].getEventNames();
