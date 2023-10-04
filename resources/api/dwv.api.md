@@ -279,6 +279,9 @@ export class Geometry {
 }
 
 // @public
+export function getDefaultDicomSegJson(): object;
+
+// @public
 export function getDwvVersion(): string;
 
 // @public
@@ -287,6 +290,12 @@ export function getElementsFromJSONTags(jsonTags: {
 }): {
     [x: string]: DataElement;
 };
+
+// @public
+export function getEllipseIndices(center: Index, radius: any[], dir: any[]): any[];
+
+// @public
+export function getLayerDetailsFromEvent(event: object): object;
 
 // @public
 export function getOrientationName(orientation: any[]): string;
@@ -381,6 +390,9 @@ export class Index {
 }
 
 // @public
+export function labToUintLab(triplet: object): object;
+
+// @public
 export class LayerGroup {
     constructor(containerDiv: HTMLElement);
     addDrawLayer(): DrawLayer;
@@ -456,6 +468,14 @@ export namespace logger {
 export const luts: {
     [x: string]: ColourMap;
 };
+
+// @public
+export class MaskFactory {
+    // (undocumented)
+    checkElements(_dicomElements: any): void;
+    // Warning: (ae-forgotten-export) The symbol "DataElements" needs to be exported by the entry point index.d.ts
+    create(dataElements: DataElements, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+}
 
 // @public
 export class Matrix33 {
@@ -579,6 +599,9 @@ export class Spacing {
 }
 
 // @public
+export function srgbToCielab(triplet: object): object;
+
+// @public
 export class Tag {
     constructor(group: string, element: string);
     equals(rhs: Tag): boolean;
@@ -618,6 +641,18 @@ export class ToolboxController {
 export class ToolConfig {
     constructor(options?: string[]);
     options: string[] | undefined;
+}
+
+// @public (undocumented)
+export namespace toolList {
+        { WindowLevel };
+        { Scroll };
+        { ZoomAndPan };
+        { Opacity };
+        { Draw };
+        { Filter };
+        { Floodfill };
+        { Livewire };
 }
 
 // @public

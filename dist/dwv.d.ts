@@ -681,6 +681,10 @@ export declare class DataElement {
     items: any[];
 }
 
+declare type DataElements = {
+    [x: string]: DataElement;
+};
+
 /**
  * Decoder scripts to be passed to web workers for image decoding.
  */
@@ -1376,6 +1380,13 @@ export declare class Geometry {
 }
 
 /**
+ * Get the default DICOM seg tags as an object.
+ *
+ * @returns {object} The default tags.
+ */
+export declare function getDefaultDicomSegJson(): object;
+
+/**
  * List of DICOM data elements indexed via a 8 character string formed from
  * the group and element numbers.
  *
@@ -1403,6 +1414,26 @@ export declare function getElementsFromJSONTags(jsonTags: {
 }): {
     [x: string]: DataElement;
 };
+
+/**
+ * Get the indices that form a ellpise.
+ *
+ * @param {Index} center The ellipse center.
+ * @param {Array} radius The 2 ellipse radiuses.
+ * @param {Array} dir The 2 ellipse directions.
+ * @returns {Array} The indices of the ellipse.
+ */
+export declare function getEllipseIndices(center: Index, radius: any[], dir: any[]): any[];
+
+/**
+ * Get the layer details from a mouse event.
+ *
+ * @param {object} event The event to get the layer div id from. Expecting
+ * an event origininating from a canvas inside a layer HTML div
+ * with the 'layer' class and id generated with `getLayerDivId`.
+ * @returns {object} The layer details as {groupDivId, layerId}.
+ */
+export declare function getLayerDetailsFromEvent(event: object): object;
 
 /**
  * Get the name of an image orientation patient.
@@ -1942,6 +1973,15 @@ export declare class Index {
 }
 
 /**
+ * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
+ *   unsigned int CIE LAB ([0, 65535]).
+ *
+ * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
+ */
+export declare function labToUintLab(triplet: object): object;
+
+/**
  * Layer group.
  *
  * Display position: {x,y}
@@ -2224,6 +2264,23 @@ export declare namespace logger {
 export declare const luts: {
     [x: string]: ColourMap;
 };
+
+/**
+ * Mask {@link Image} factory.
+ */
+export declare class MaskFactory {
+    checkElements(_dicomElements: any): void;
+    /**
+     * Get an {@link Image} object from the read DICOM file.
+     *
+     * @param {DataElements} dataElements The DICOM tags.
+     * @param {Uint8Array | Int8Array |
+         *   Uint16Array | Int16Array |
+         *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+     * @returns {Image} A new Image.
+     */
+    create(dataElements: DataElements, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+}
 
 /**
  * Immutable 3x3 Matrix.
@@ -2835,6 +2892,14 @@ export declare class Spacing {
 }
 
 /**
+ * Convert sRGB to CIE LAB (standard illuminant D65).
+ *
+ * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @returns {object} CIE LAB triplet as {l,a,b}.
+ */
+export declare function srgbToCielab(triplet: object): object;
+
+/**
  * Immutable tag.
  */
 export declare class Tag {
@@ -3011,6 +3076,17 @@ export declare class ToolConfig {
      * @type {string[]|undefined}
      */
     options: string[] | undefined;
+}
+
+export declare namespace toolList {
+        { WindowLevel };
+        { Scroll };
+        { ZoomAndPan };
+        { Opacity };
+        { Draw };
+        { Filter };
+        { Floodfill };
+        { Livewire };
 }
 
 /**
