@@ -131,8 +131,8 @@ export class FilesLoader {
   #addLoad = (_event) => {
     this.#nLoad++;
     // call onload when all is loaded
-    // (not using the input event since it is not the
-    //   general load)
+    // (not using the input event since it is
+    //   an individual load)
     if (this.#nLoad === this.#inputData.length) {
       this.onload({
         source: this.#inputData
@@ -149,10 +149,9 @@ export class FilesLoader {
   #addLoadend = (_event) => {
     this.#nLoadend++;
     // call onloadend when all is run
-    // (not using the input event since it is not the
-    //   general load end)
-    // x2 to count for reader + load
-    if (this.#nLoadend === 2 * this.#inputData.length) {
+    // (not using the input event since it is
+    //   an individual load end)
+    if (this.#nLoadend === this.#inputData.length) {
       this.onloadend({
         source: this.#inputData
       });
@@ -276,9 +275,19 @@ export class FilesLoader {
       reader.onprogress = this.#augmentCallbackEvent(
         mproghandler.getMonoProgressHandler(i, 0), dataElement);
       reader.onload = this.#getLoadHandler(loader, dataElement, i);
-      reader.onloadend = this.#addLoadend;
-      reader.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
-      reader.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
+      // reader.onloadend: nothing to do
+      const errorCallback =
+        this.#augmentCallbackEvent(this.onerror, dataElement);
+      reader.onerror = (event) => {
+        this.#addLoadend();
+        errorCallback(event);
+      };
+      const abortCallback =
+        this.#augmentCallbackEvent(this.onabort, dataElement);
+      reader.onabort = (event) => {
+        this.#addLoadend();
+        abortCallback(event);
+      };
       // read
       if (loader.loadFileAs() === fileContentTypes.Text) {
         reader.readAsText(dataElement);
