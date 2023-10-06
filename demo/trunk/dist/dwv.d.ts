@@ -946,6 +946,13 @@ export declare class DrawController {
      *  DeleteCommand has been executed.
      */
     deleteDraws(cmdCallback: Function, exeCallback: Function): void;
+    /**
+     * Get the total number of draws
+     * (at all positions).
+     *
+     * @returns {number} The total number of draws.
+     */
+    getNumberOfDraws(): number;
     #private;
 }
 
@@ -1143,6 +1150,13 @@ export declare class DrawLayer {
      *  DeleteCommand has been executed.
      */
     deleteDraws(exeCallback: object): void;
+    /**
+     * Get the total number of draws of this layer
+     * (at all positions).
+     *
+     * @returns {number|undefined} The total number of draws.
+     */
+    getNumberOfDraws(): number | undefined;
     /**
      * Enable and listen to container interaction events.
      */
