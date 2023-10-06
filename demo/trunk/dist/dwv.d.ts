@@ -229,8 +229,8 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
      * @function
      */
     loadFiles: (files: File[]) => void;
@@ -246,8 +246,8 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
      * @function
      */
     loadURLs: (urls: string[], options?: object) => void;
@@ -268,8 +268,8 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
      * @function
      */
     loadImageObject: (data: any[]) => void;
