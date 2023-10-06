@@ -3078,7 +3078,15 @@ export declare class ToolConfig {
     options: string[] | undefined;
 }
 
-export declare const toolList: {};
+/**
+ * List of client provided tools to be added to
+ * the default ones.
+ *
+ * @type {Object<string, any>}
+ */
+export declare const toolList: {
+    [x: string]: any;
+};
 
 /**
  * Immutable 3D vector.
