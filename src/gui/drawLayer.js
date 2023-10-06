@@ -93,7 +93,7 @@ export class DrawLayer {
    *
    * @type {object}
    */
-  #drawController = null;
+  #drawController;
 
   /**
    * The plane helper.
@@ -516,7 +516,9 @@ export class DrawLayer {
    *  DeleteCommand has been executed.
    */
   deleteDraw(id, exeCallback) {
-    this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
+    if (typeof this.#drawController !== 'undefined') {
+      this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
+    }
   }
 
   /**
@@ -526,17 +528,23 @@ export class DrawLayer {
    *  DeleteCommand has been executed.
    */
   deleteDraws(exeCallback) {
-    this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
+    if (typeof this.#drawController !== 'undefined') {
+      this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
+    }
   }
 
   /**
    * Get the total number of draws of this layer
    * (at all positions).
    *
-   * @returns {number} The total number of draws.
+   * @returns {number|undefined} The total number of draws.
    */
   getNumberOfDraws() {
-    return this.#drawController.getNumberOfDraws();
+    let res;
+    if (typeof this.#drawController !== 'undefined') {
+      res = this.#drawController.getNumberOfDraws();
+    }
+    return res;
   }
 
   /**
