@@ -524,7 +524,9 @@ export class DrawController {
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
     // callback
-    exeCallback(delcmd);
+    if (typeof exeCallback !== 'undefined') {
+      exeCallback(delcmd);
+    }
   }
 
   /**
@@ -556,14 +558,36 @@ export class DrawController {
    *  DeleteCommand has been executed.
    */
   deleteDraws(cmdCallback, exeCallback) {
-    const groups = this.#konvaLayer.getChildren();
-    while (groups.length) {
-      if (groups[0] instanceof Konva.Group) {
-        this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
+    const posGroups = this.#konvaLayer.getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        while (shapeGroups.length) {
+          if (shapeGroups[0] instanceof Konva.Group) {
+            this.deleteDrawGroup(shapeGroups[0], cmdCallback, exeCallback);
+          }
+        }
       } else {
         logger.warn('Found non group in layer while deleting');
       }
     }
+  }
+
+  /**
+   * Get the total number of draws
+   * (at all positions).
+   *
+   * @returns {number} The total number of draws.
+   */
+  getNumberOfDraws() {
+    const posGroups = this.#konvaLayer.getChildren();
+    let count = 0;
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        count += posGroup.getChildren().length;
+      }
+    }
+    return count;
   }
 
 } // class DrawController

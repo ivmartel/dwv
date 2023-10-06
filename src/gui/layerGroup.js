@@ -729,7 +729,18 @@ export class LayerGroup {
         this.#activeViewLayerIndex = undefined;
       }
     } else {
-      this.#unbindDrawLayer(layer);
+      // delete layer draws
+      const numberOfDraws = layer.getNumberOfDraws();
+      let count = 0;
+      layer.addEventListener('drawdelete', (_event) => {
+        ++count;
+        // unbind when all draw are deleted
+        if (count === numberOfDraws) {
+          this.#unbindDrawLayer(layer);
+        }
+      });
+      layer.deleteDraws();
+      // reset active index
       if (this.#activeDrawLayerIndex === index) {
         this.#activeDrawLayerIndex = undefined;
       }

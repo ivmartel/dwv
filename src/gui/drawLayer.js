@@ -530,6 +530,16 @@ export class DrawLayer {
   }
 
   /**
+   * Get the total number of draws of this layer
+   * (at all positions).
+   *
+   * @returns {number} The total number of draws.
+   */
+  getNumberOfDraws() {
+    return this.#drawController.getNumberOfDraws();
+  }
+
+  /**
    * Enable and listen to container interaction events.
    */
   bindInteraction() {
