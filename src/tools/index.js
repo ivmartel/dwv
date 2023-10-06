@@ -17,6 +17,12 @@ import {RulerFactory} from './ruler';
 
 import {Filter, Threshold, Sobel, Sharpen} from './filter';
 
+/**
+ * List of client provided tools to be added to
+ * the default ones.
+ *
+ * @type {Object<string, any>}
+ */
 export const toolList = {};
 
 export const defaultToolList = {
