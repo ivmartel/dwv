@@ -91,10 +91,10 @@ The user can listen to `loadstart` events. The event is fired when a load has st
 The user can listen to `loadprogress` events. The event is fired periodically when a request receives more data.
 
 #### DWV-URS-IO-052 DICOM load error event
-The user can listen to `loaderror` events. The event is fired when the load encountered an error.
+The user can listen to `error` events. The event is fired when the load encountered an error.
 
 #### DWV-URS-IO-053 DICOM load abort event
-The user can listen to `loadabort` events. The event is fired when a load has been aborted.
+The user can listen to `abort` events. The event is fired when a load has been aborted.
 
 #### DWV-URS-IO-054 DICOM load item event
 The user can listen to `loaditem` events. The event is fired when a DICOM file has been successfully loaded.
@@ -103,7 +103,7 @@ The user can listen to `loaditem` events. The event is fired when a DICOM file h
 The user can listen to `load` events. The event is fired when all the DICOM files have been successfully loaded.
 
 #### DWV-URS-IO-056 DICOM load end event
-The user can listen to `loadend` events. The event is fired when a request has completed, whether successfully (after `load`) or unsuccessfully (after `loadabort` or `loaderror`).
+The user can listen to `loadend` events. The event is fired when a request has completed, whether successfully (after `load`) or unsuccessfully (after `abort` or `error`).
 
 
 ### Write

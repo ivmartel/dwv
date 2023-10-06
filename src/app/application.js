@@ -655,8 +655,8 @@ export class App {
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
-   * @fires App#loaderror
-   * @fires App#loadabort
+   * @fires App#error
+   * @fires App#abort
    * @function
    */
   loadFiles = (files) => {
@@ -679,8 +679,8 @@ export class App {
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
-   * @fires App#loaderror
-   * @fires App#loadabort
+   * @fires App#error
+   * @fires App#abort
    * @function
    */
   loadURLs = (urls, options) => {
@@ -729,8 +729,8 @@ export class App {
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
-   * @fires App#loaderror
-   * @fires App#loadabort
+   * @fires App#error
+   * @fires App#abort
    * @function
    */
   loadImageObject = (data) => {
@@ -1527,7 +1527,7 @@ export class App {
     /**
      * Load error event.
      *
-     * @event App#loaderror
+     * @event App#error
      * @type {object}
      * @property {string} type The event type: error.
      * @property {string} loadType The load type: image or state.
@@ -1537,7 +1537,7 @@ export class App {
      * @property {object} target The event target.
      */
     if (typeof event.type === 'undefined') {
-      event.type = 'loaderror';
+      event.type = 'error';
     }
     this.#fireEvent(event);
   };
@@ -1551,7 +1551,7 @@ export class App {
     /**
      * Load abort event.
      *
-     * @event App#loadabort
+     * @event App#abort
      * @type {object}
      * @property {string} type The event type: abort.
      * @property {string} loadType The load type: image or state.
@@ -1559,7 +1559,7 @@ export class App {
      *   File for a file.
      */
     if (typeof event.type === 'undefined') {
-      event.type = 'loadabort';
+      event.type = 'abort';
     }
     this.#fireEvent(event);
   };

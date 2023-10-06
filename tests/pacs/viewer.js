@@ -93,7 +93,7 @@ function viewerSetup() {
   _app.init(options);
 
   // bind events
-  _app.addEventListener('loaderror', function (event) {
+  _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function (event) {
