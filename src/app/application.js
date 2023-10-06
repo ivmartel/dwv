@@ -1536,7 +1536,9 @@ export class App {
      * @property {object} error The error.
      * @property {object} target The event target.
      */
-    event.type = 'loaderror';
+    if (typeof event.type === 'undefined') {
+      event.type = 'loaderror';
+    }
     this.#fireEvent(event);
   };
 
@@ -1556,7 +1558,9 @@ export class App {
      * @property {*} source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'loadabort';
+    if (typeof event.type === 'undefined') {
+      event.type = 'loadabort';
+    }
     this.#fireEvent(event);
   };
 
