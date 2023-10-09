@@ -4,7 +4,10 @@ import {getMatrixFromName} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
 import {Style} from '../gui/style';
-import {getViewOrientation} from '../gui/layerGroup';
+import {
+  getViewOrientation,
+  getLayerDetailsFromLayerDivId
+} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
 import {State} from '../io/state';
 import {logger} from '../utils/logger';
@@ -775,12 +778,13 @@ export class App {
 
   /**
    * Get the layer group configuration from a data id.
-   * Defaults to div id 'layerGroup' if no association object has been set.
    *
    * @param {string} dataId The data id.
+   * @param {boolean} [excludeStarConfig] Exclude the star config
+   *  (default to false).
    * @returns {ViewConfig[]} The list of associated configs.
    */
-  #getViewConfigs(dataId) {
+  getViewConfigs(dataId, excludeStarConfig) {
     // check options
     if (this.#options.dataViewConfigs === null ||
       typeof this.#options.dataViewConfigs === 'undefined') {
@@ -789,10 +793,28 @@ export class App {
     let configs = [];
     if (typeof this.#options.dataViewConfigs[dataId] !== 'undefined') {
       configs = this.#options.dataViewConfigs[dataId];
-    } else if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
+    } else if (!excludeStarConfig &&
+      typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
       configs = this.#options.dataViewConfigs['*'];
     }
     return configs;
+  }
+
+  /**
+   * Get the layer group configuration for a data id and group
+   * div id.
+   *
+   * @param {string} dataId The data id.
+   * @param {string} groupDivId The layer group div id.
+   * @param {boolean} [excludeStarConfig] Exclude the star config
+   *  (default to false).
+   * @returns {ViewConfig|undefined} The associated config.
+   */
+  getViewConfig(dataId, groupDivId, excludeStarConfig) {
+    const configs = this.getViewConfigs(dataId, excludeStarConfig);
+    return configs.find(function (item) {
+      return item.divId === groupDivId;
+    });
   }
 
   /**
@@ -1018,7 +1040,7 @@ export class App {
 
     // use options list if non provided
     if (typeof viewConfigs === 'undefined') {
-      viewConfigs = this.#getViewConfigs(dataId);
+      viewConfigs = this.getViewConfigs(dataId);
     }
 
     // nothing to do if no view config
@@ -1473,7 +1495,7 @@ export class App {
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
-      this.#getViewConfigs(event.dataid).length !== 0 &&
+      this.getViewConfigs(event.dataid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
       this.render(event.dataid);
     }
@@ -1585,6 +1607,23 @@ export class App {
       group.addEventListener('drawcreate', this.#fireEvent);
       group.addEventListener('drawdelete', this.#fireEvent);
     }
+    // updata data view config
+    group.addEventListener('opacitychange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.opacity = event.value[0];
+      }
+    });
+    group.addEventListener('colourmapchange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.colourMap = event.value[0];
+      }
+    });
   }
 
   /**
