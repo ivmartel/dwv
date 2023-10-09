@@ -293,6 +293,26 @@ export declare class App {
      */
     setImageSmoothing(flag: boolean): void;
     /**
+     * Get the layer group configuration from a data id.
+     *
+     * @param {string} dataId The data id.
+     * @param {boolean} [excludeStarConfig] Exclude the star config
+     *  (default to false).
+     * @returns {ViewConfig[]} The list of associated configs.
+     */
+    getViewConfigs(dataId: string, excludeStarConfig?: boolean): ViewConfig[];
+    /**
+     * Get the layer group configuration for a data id and group
+     * div id.
+     *
+     * @param {string} dataId The data id.
+     * @param {string} groupDivId The layer group div id.
+     * @param {boolean} [excludeStarConfig] Exclude the star config
+     *  (default to false).
+     * @returns {ViewConfig|undefined} The associated config.
+     */
+    getViewConfig(dataId: string, groupDivId: string, excludeStarConfig?: boolean): ViewConfig | undefined;
+    /**
      * Get the data view config.
      * Carefull, returns a reference, do not modify without resetting.
      *

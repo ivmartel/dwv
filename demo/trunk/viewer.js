@@ -457,6 +457,30 @@ function getViewConfig(divId) {
 }
 
 /**
+ * Partially clone an existing config in the provided one.
+ *
+ * @param {string} dataId The data id.
+ * @param {object} config The view config.
+ * @returns {object} The update config.
+ */
+function partialCloneOldConfig(dataId, config) {
+  const oldConfigs = _app.getViewConfigs(dataId);
+  if (oldConfigs.length !== 0) {
+    // use first config as base
+    const oldConfig = oldConfigs[0];
+    // opacity
+    if (typeof oldConfig.opacity !== 'undefined') {
+      config.opacity = oldConfig.opacity;
+    }
+    // colour map
+    if (typeof oldConfig.colourMap !== 'undefined') {
+      config.colourMap = oldConfig.colourMap;
+    }
+  }
+  return config;
+}
+
+/**
  * Create 1*2 view config(s).
  *
  * @param {Array} dataIds The list of dataIds.
@@ -464,8 +488,9 @@ function getViewConfig(divId) {
  */
 function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
-  for (let i = 0; i < dataIds.length; ++i) {
-    configs[dataIds[i]] = [getViewConfig('layerGroup0')];
+  for (const dataId of dataIds) {
+    configs[dataId] =
+      [partialCloneOldConfig(dataId, getViewConfig('layerGroup0'))];
   }
   return configs;
 }
@@ -479,11 +504,14 @@ function getOnebyOneDataViewConfig(dataIds) {
 function getOnebyTwoDataViewConfig(dataIds) {
   const configs = {};
   for (let i = 0; i < dataIds.length; ++i) {
+    const dataId = dataIds[i];
+    let config;
     if (i % 2 === 0) {
-      configs[dataIds[i]] = [getViewConfig('layerGroup0')];
+      config = getViewConfig('layerGroup0');
     } else {
-      configs[dataIds[i]] = [getViewConfig('layerGroup1')];
+      config = getViewConfig('layerGroup1');
     }
+    configs[dataIds[i]] = [partialCloneOldConfig(dataId, config)];
   }
   return configs;
 }
@@ -496,11 +524,11 @@ function getOnebyTwoDataViewConfig(dataIds) {
  */
 function getMPRDataViewConfig(dataIds) {
   const configs = {};
-  for (let i = 0; i < dataIds.length; ++i) {
-    configs[dataIds[i]] = [
-      getViewConfig('layerGroup0'),
-      getViewConfig('layerGroup1'),
-      getViewConfig('layerGroup2')
+  for (const dataId of dataIds) {
+    configs[dataId] = [
+      partialCloneOldConfig(dataId, getViewConfig('layerGroup0')),
+      partialCloneOldConfig(dataId, getViewConfig('layerGroup1')),
+      partialCloneOldConfig(dataId, getViewConfig('layerGroup2'))
     ];
   }
   return configs;
