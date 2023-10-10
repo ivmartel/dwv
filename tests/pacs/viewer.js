@@ -468,6 +468,12 @@ function partialCloneOldConfig(dataId, config) {
   if (oldConfigs.length !== 0) {
     // use first config as base
     const oldConfig = oldConfigs[0];
+    // window/level
+    if (typeof oldConfig.windowCenter !== 'undefined' &&
+      typeof oldConfig.windowWidth !== 'undefined') {
+      config.windowCenter = oldConfig.windowCenter;
+      config.windowWidth = oldConfig.windowWidth;
+    }
     // opacity
     if (typeof oldConfig.opacity !== 'undefined') {
       config.opacity = oldConfig.opacity;

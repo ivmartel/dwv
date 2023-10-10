@@ -58,6 +58,18 @@ export class ViewConfig {
    * @type {number|undefined}
    */
   opacity;
+  /**
+   * Optional layer window center.
+   *
+   * @type {number|undefined}
+   */
+  windowCenter;
+  /**
+   * Optional layer window width.
+   *
+   * @type {number|undefined}
+   */
+  windowWidth;
 
   /**
    * @param {string} divId The associated HTML div id.
@@ -1613,6 +1625,15 @@ export class App {
       group.addEventListener('drawdelete', this.#fireEvent);
     }
     // updata data view config
+    group.addEventListener('wlchange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.windowCenter = event.value[0];
+        config.windowWidth = event.value[1];
+      }
+    });
     group.addEventListener('opacitychange', (event) => {
       const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
       const groupId = layerDetails.groupDivId;
@@ -1710,6 +1731,12 @@ export class App {
           viewController.setColourMap('rainbow');
         }
       }
+    }
+    // window/level
+    if (typeof viewConfig.windowCenter !== 'undefined' &&
+      typeof viewConfig.windowWidth !== 'undefined') {
+      viewController.setWindowLevel(
+        viewConfig.windowCenter, viewConfig.windowWidth);
     }
 
     // listen to controller events
