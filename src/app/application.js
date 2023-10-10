@@ -1720,6 +1720,12 @@ export class App {
 
     // view controller
     const viewController = viewLayer.getViewController();
+    // window/level
+    if (typeof viewConfig.windowCenter !== 'undefined' &&
+      typeof viewConfig.windowWidth !== 'undefined') {
+      viewController.setWindowLevel(
+        viewConfig.windowCenter, viewConfig.windowWidth);
+    }
     // colour map
     if (typeof viewConfig.colourMap !== 'undefined') {
       viewController.setColourMap(viewConfig.colourMap);
@@ -1731,12 +1737,6 @@ export class App {
           viewController.setColourMap('rainbow');
         }
       }
-    }
-    // window/level
-    if (typeof viewConfig.windowCenter !== 'undefined' &&
-      typeof viewConfig.windowWidth !== 'undefined') {
-      viewController.setWindowLevel(
-        viewConfig.windowCenter, viewConfig.windowWidth);
     }
 
     // listen to controller events
