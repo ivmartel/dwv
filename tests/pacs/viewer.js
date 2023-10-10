@@ -1068,8 +1068,9 @@ function addDataRow(dataId) {
     button.appendChild(document.createTextNode(letter));
     button.onclick = function () {
       // update app
-      const config = getViewConfig(divId);
-      config.orientation = orientation;
+      const config = {
+        orientation: orientation
+      };
       _app.updateDataViewConfig(dataId, divId, config);
     };
     return button;

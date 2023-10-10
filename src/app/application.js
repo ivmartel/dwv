@@ -924,7 +924,7 @@ export class App {
   }
 
   /**
-   * Update a data view config.
+   * Update an existing data view config.
    * Removes and re-creates the layer if found.
    *
    * @param {string} dataId The data id.
@@ -933,9 +933,11 @@ export class App {
    */
   updateDataViewConfig(dataId, divId, config) {
     const configs = this.#options.dataViewConfigs;
+    // check data id
     if (typeof configs[dataId] === 'undefined') {
       throw new Error('No config for dataId: ' + dataId);
     }
+    // check div id
     const equalDivId = function (item) {
       return item.divId === divId;
     };
@@ -944,11 +946,14 @@ export class App {
       throw new Error('No config for dataId: ' +
         dataId + ' and divId: ' + divId);
     }
-
-    configs[dataId][itemIndex] = config;
+    // update config
+    const configToUpdate = configs[dataId][itemIndex];
+    for (const prop in config) {
+      configToUpdate[prop] = config[prop];
+    }
 
     // remove previous layers
-    const lg = this.#stage.getLayerGroupByDivId(config.divId);
+    const lg = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
     if (typeof lg !== 'undefined') {
       const vls = lg.getViewLayersByDataId(dataId);
       if (vls.length === 1) {
@@ -965,7 +970,7 @@ export class App {
     }
 
     // render (will create layer)
-    this.render(dataId, [config]);
+    this.render(dataId, [configToUpdate]);
   }
 
   /**
