@@ -3519,6 +3519,18 @@ export declare class ViewConfig {
      * @type {number|undefined}
      */
     opacity: number | undefined;
+    /**
+     * Optional layer window center.
+     *
+     * @type {number|undefined}
+     */
+    windowCenter: number | undefined;
+    /**
+     * Optional layer window width.
+     *
+     * @type {number|undefined}
+     */
+    windowWidth: number | undefined;
 }
 
 /**
