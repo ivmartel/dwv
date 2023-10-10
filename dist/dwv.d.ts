@@ -229,8 +229,8 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
      * @function
      */
     loadFiles: (files: File[]) => void;
@@ -246,8 +246,8 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
      * @function
      */
     loadURLs: (urls: string[], options?: object) => void;
@@ -268,8 +268,8 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
      * @function
      */
     loadImageObject: (data: any[]) => void;
@@ -292,6 +292,26 @@ export declare class App {
      * @param {boolean} flag True to enable smoothing.
      */
     setImageSmoothing(flag: boolean): void;
+    /**
+     * Get the layer group configuration from a data id.
+     *
+     * @param {string} dataId The data id.
+     * @param {boolean} [excludeStarConfig] Exclude the star config
+     *  (default to false).
+     * @returns {ViewConfig[]} The list of associated configs.
+     */
+    getViewConfigs(dataId: string, excludeStarConfig?: boolean): ViewConfig[];
+    /**
+     * Get the layer group configuration for a data id and group
+     * div id.
+     *
+     * @param {string} dataId The data id.
+     * @param {string} groupDivId The layer group div id.
+     * @param {boolean} [excludeStarConfig] Exclude the star config
+     *  (default to false).
+     * @returns {ViewConfig|undefined} The associated config.
+     */
+    getViewConfig(dataId: string, groupDivId: string, excludeStarConfig?: boolean): ViewConfig | undefined;
     /**
      * Get the data view config.
      * Carefull, returns a reference, do not modify without resetting.
@@ -325,7 +345,7 @@ export declare class App {
      */
     removeDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
-     * Update a data view config.
+     * Update an existing data view config.
      * Removes and re-creates the layer if found.
      *
      * @param {string} dataId The data id.
@@ -946,6 +966,13 @@ export declare class DrawController {
      *  DeleteCommand has been executed.
      */
     deleteDraws(cmdCallback: Function, exeCallback: Function): void;
+    /**
+     * Get the total number of draws
+     * (at all positions).
+     *
+     * @returns {number} The total number of draws.
+     */
+    getNumberOfDraws(): number;
     #private;
 }
 
@@ -1143,6 +1170,13 @@ export declare class DrawLayer {
      *  DeleteCommand has been executed.
      */
     deleteDraws(exeCallback: object): void;
+    /**
+     * Get the total number of draws of this layer
+     * (at all positions).
+     *
+     * @returns {number|undefined} The total number of draws.
+     */
+    getNumberOfDraws(): number | undefined;
     /**
      * Enable and listen to container interaction events.
      */
@@ -3078,7 +3112,15 @@ export declare class ToolConfig {
     options: string[] | undefined;
 }
 
-export declare const toolList: {};
+/**
+ * List of client provided tools to be added to
+ * the default ones.
+ *
+ * @type {Object<string, any>}
+ */
+export declare const toolList: {
+    [x: string]: any;
+};
 
 /**
  * Immutable 3D vector.
@@ -3477,6 +3519,18 @@ export declare class ViewConfig {
      * @type {number|undefined}
      */
     opacity: number | undefined;
+    /**
+     * Optional layer window center.
+     *
+     * @type {number|undefined}
+     */
+    windowCenter: number | undefined;
+    /**
+     * Optional layer window width.
+     *
+     * @type {number|undefined}
+     */
+    windowWidth: number | undefined;
 }
 
 /**

@@ -41,6 +41,8 @@ export class App {
     getStackSize(): number;
     getStyle(): object;
     getToolboxController(): ToolboxController;
+    getViewConfig(dataId: string, groupDivId: string, excludeStarConfig?: boolean): ViewConfig | undefined;
+    getViewConfigs(dataId: string, excludeStarConfig?: boolean): ViewConfig[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     init(opt: AppOptions): void;
     initWLDisplay(): void;
@@ -197,6 +199,7 @@ export class DrawController {
     getDrawDisplayDetails(): DrawDetails[];
     getDrawStoreDetails(): object;
     getGroup(id: string): object | undefined;
+    getNumberOfDraws(): number;
     reset(): void;
     setDrawings(drawings: any[], drawingsDetails: DrawDetails[], cmdCallback: object, exeCallback: object): void;
     updateDraw(drawDetails: DrawDetails): void;
@@ -230,6 +233,7 @@ export class DrawLayer {
     getId(): string;
     getKonvaLayer(): Konva.Layer;
     getKonvaStage(): Konva.Stage;
+    getNumberOfDraws(): number | undefined;
     getOpacity(): number;
     initialise(size: object, spacing: object, dataId: string): void;
     isGroupVisible(id: string): boolean;
@@ -643,8 +647,10 @@ export class ToolConfig {
     options: string[] | undefined;
 }
 
-// @public (undocumented)
-export const toolList: {};
+// @public
+export const toolList: {
+    [x: string]: any;
+};
 
 // @public
 export class Vector3D {
@@ -707,6 +713,8 @@ export class ViewConfig {
     divId: string;
     opacity: number | undefined;
     orientation: string | undefined;
+    windowCenter: number | undefined;
+    windowWidth: number | undefined;
 }
 
 // @public
