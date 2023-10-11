@@ -32,7 +32,7 @@ QUnit.test('Test Tag.', function (assert) {
   assert.throws(function () {
     new Tag('12');
   },
-  new Error('Cannot create tag with badly sized group.'),
+  new Error('Cannot create tag with badly sized group: 12'),
   'tag with bad group #0.');
 
   assert.throws(function () {
@@ -48,7 +48,7 @@ QUnit.test('Test Tag.', function (assert) {
   assert.throws(function () {
     new Tag('1234', '12');
   },
-  new Error('Cannot create tag with badly sized element.'),
+  new Error('Cannot create tag with badly sized element: 12'),
   'tag with bad element #0.');
 
   const tag00 = new Tag('1111', '2222');
