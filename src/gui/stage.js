@@ -1,5 +1,6 @@
 import {Point, Point3D} from '../math/point';
 import {LayerGroup} from './layerGroup';
+import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -213,6 +214,20 @@ export class Stage {
    */
   getActiveLayerGroup() {
     return this.getLayerGroup(this.#activeLayerGroupIndex);
+  }
+
+  /**
+   * Set the active layer group.
+   *
+   * @param {number} index The layer group index.
+   */
+  setActiveLayerGroup(index) {
+    if (typeof this.getLayerGroup(index) !== 'undefined') {
+      this.#activeLayerGroupIndex = index;
+    } else {
+      logger.warn('No layer group to set as active with index: ' +
+        index);
+    }
   }
 
   /**

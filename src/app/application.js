@@ -417,6 +417,15 @@ export class App {
   }
 
   /**
+   * Set the active layer group.
+   *
+   * @param {number} index The layer group index.
+   */
+  setActiveLayerGroup(index) {
+    this.#stage.setActiveLayerGroup(index);
+  }
+
+  /**
    * Get the view layers associated to a data id.
    * The layer are available after the first loaded item.
    *
