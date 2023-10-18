@@ -907,6 +907,7 @@ export class Draw {
           this.#fireEvent({
             type: 'drawmove',
             id: group.id(),
+            srclayerid: drawLayer.getId(),
             dataid: drawLayer.getDataId()
           });
         }
@@ -952,6 +953,7 @@ export class Draw {
         this.#fireEvent({
           type: 'drawchange',
           id: groupId,
+          srclayerid: drawLayer.getId(),
           dataid: drawLayer.getDataId()
         });
         // draw

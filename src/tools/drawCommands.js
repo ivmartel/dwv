@@ -114,11 +114,13 @@ export class DrawGroupCommand {
        * @event DrawGroupCommand#drawcreate
        * @type {object}
        * @property {string} id The id of the created draw.
+       * @property {string} srclayerid The id of the layer of the draw.
        * @property {string} dataid The associated data id.
        */
       this.onExecute({
         type: 'drawcreate',
         id: this.#group.id(),
+        srclayerid: this.#layer.getId(),
         dataid: this.#layer.getDataId()
       });
     }
@@ -138,6 +140,7 @@ export class DrawGroupCommand {
     this.onUndo({
       type: 'drawdelete',
       id: this.#group.id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
@@ -235,11 +238,13 @@ export class MoveGroupCommand {
      * @event MoveGroupCommand#drawmove
      * @type {object}
      * @property {string} id The id of the create draw.
+     * @property {string} srclayerid The id of the layer of the draw.
      * @property {string} dataid The associated data id.
      */
     this.onExecute({
       type: 'drawmove',
       id: this.#group.id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
@@ -262,6 +267,7 @@ export class MoveGroupCommand {
     this.onUndo({
       type: 'drawmove',
       id: this.#group.id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
@@ -391,11 +397,13 @@ export class ChangeGroupCommand {
      * @event ChangeGroupCommand#drawchange
      * @type {object}
      * @property {string} id The id of the created draw.
+     * @property {string} srclayerid The id of the layer of the draw.
      * @property {string} dataid The associated data id.
      */
     this.onExecute({
       type: 'drawchange',
       id: this.#endAnchor.getParent().id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
@@ -418,6 +426,7 @@ export class ChangeGroupCommand {
     this.onUndo({
       type: 'drawchange',
       id: this.#startAnchor.getParent().id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
@@ -513,11 +522,13 @@ export class DeleteGroupCommand {
      * @event DeleteGroupCommand#drawdelete
      * @type {object}
      * @property {string} id The id of the created draw.
+     * @property {string} srclayerid The id of the layer of the draw.
      * @property {string} dataid The associated data id.
      */
     this.onExecute({
       type: 'drawdelete',
       id: this.#group.id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
@@ -536,6 +547,7 @@ export class DeleteGroupCommand {
     this.onUndo({
       type: 'drawcreate',
       id: this.#group.id(),
+      srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
   }
