@@ -1026,7 +1026,7 @@ export class Draw {
    */
   getEventNames() {
     return [
-      'drawcreate', 'drawchange', 'drawmove', 'drawdelete', 'drawlabelchange'
+      'drawcreate', 'drawchange', 'drawmove', 'drawdelete'
     ];
   }
 
