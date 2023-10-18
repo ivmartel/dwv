@@ -1393,11 +1393,13 @@ function getSimpleStats(array) {
  */
 function runRenderTest() {
   const numberOfRun = 20;
+  // default to first layer group
+  _app.setActiveLayerGroup(1);
 
   const vl = _app.getActiveLayerGroup().getActiveViewLayer();
   const vc = vl.getViewController();
   const runner = function () {
-    vc.incrementIndex(2);
+    vc.incrementScrollIndex();
   };
 
   let startTime;

@@ -121,6 +121,12 @@ export declare class App {
      */
     getActiveLayerGroup(): LayerGroup;
     /**
+     * Set the active layer group.
+     *
+     * @param {number} index The layer group index.
+     */
+    setActiveLayerGroup(index: number): void;
+    /**
      * Get the view layers associated to a data id.
      * The layer are available after the first loaded item.
      *
