@@ -60,6 +60,7 @@ export class App {
     resetDisplay(): void;
     resetLayout(): void;
     resetZoom(): void;
+    setActiveLayerGroup(index: number): void;
     setColourMap(name: string): void;
     setDataViewConfigs(configs: {
         [x: string]: ViewConfig[];
