@@ -1703,44 +1703,48 @@ export class App {
     const colAbsMax1 = imageGeometry.getOrientation().getColAbsMax(1).value;
 
     // flip flags
-    let flipOffsetX = false;
-    let flipOffsetY = false;
-    let flipScaleZ = false;
-    let flipScaleY = false;
-    let flipScaleX = false;
+    const flipOffset = {
+      x: false,
+      y: false
+    };
+    const flipScale = {
+      x: false,
+      y: false,
+      z: false
+    };
 
     if (major === 0) {
       // sagittal case
       if (typeof viewConfig.orientation === 'undefined' ||
         viewConfig.orientation === 'sagittal') {
-        flipScaleZ = true;
+        flipScale.z = true;
         if (colAbsMax0 < 0) {
-          flipOffsetX = true;
+          flipOffset.x = true;
         }
         if (colAbsMax1 > 0) {
-          flipOffsetY = true;
+          flipOffset.y = true;
         }
       } else {
         // common
         if (colAbsMax0 > 0 && colAbsMax1 < 0) {
-          flipOffsetX = true;
+          flipOffset.x = true;
         }
         if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-          flipOffsetX = true;
-          flipOffsetY = true;
+          flipOffset.x = true;
+          flipOffset.y = true;
         }
         // specific
         if (viewConfig.orientation === 'axial') {
           if (colAbsMax0 > 0) {
-            flipScaleZ = true;
+            flipScale.z = true;
           }
           if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-            flipOffsetY = true;
+            flipOffset.y = true;
           }
         } else if (viewConfig.orientation === 'coronal') {
-          flipScaleZ = true;
+          flipScale.z = true;
           if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-            flipOffsetY = true;
+            flipOffset.y = true;
           }
         }
       }
@@ -1749,48 +1753,48 @@ export class App {
       if (typeof viewConfig.orientation === 'undefined' ||
         viewConfig.orientation === 'coronal') {
         if (colAbsMax0 < 0) {
-          flipOffsetX = true;
-          flipScaleX = true;
+          flipOffset.x = true;
+          flipScale.x = true;
           if (colAbsMax1 > 0) {
-            flipOffsetY = true;
-            flipScaleZ = true;
+            flipOffset.y = true;
+            flipScale.z = true;
           }
         }
         if (colAbsMax1 > 0) {
-          flipOffsetY = true;
-          flipScaleZ = true;
+          flipOffset.y = true;
+          flipScale.z = true;
         }
       } else {
         // specific
         if (viewConfig.orientation === 'axial') {
           if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-            flipOffsetX = true;
-            flipScaleX = true;
+            flipOffset.x = true;
+            flipScale.x = true;
           }
           if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-            flipOffsetX = true;
-            flipScaleX = true;
-            flipOffsetY = true;
-            flipScaleY = true;
+            flipOffset.x = true;
+            flipScale.x = true;
+            flipOffset.y = true;
+            flipScale.y = true;
           }
           if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-            flipOffsetY = true;
-            flipScaleY = true;
+            flipOffset.y = true;
+            flipScale.y = true;
           }
         } else if (viewConfig.orientation === 'sagittal') {
           if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-            flipOffsetY = true;
-            flipScaleZ = true;
+            flipOffset.y = true;
+            flipScale.z = true;
           }
           if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-            flipOffsetX = true;
-            flipScaleY = true;
+            flipOffset.x = true;
+            flipScale.y = true;
           }
           if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-            flipOffsetX = true;
-            flipOffsetY = true;
-            flipScaleY = true;
-            flipScaleZ = true;
+            flipOffset.x = true;
+            flipOffset.y = true;
+            flipScale.y = true;
+            flipScale.z = true;
           }
         }
       }
@@ -1799,60 +1803,60 @@ export class App {
       if (typeof viewConfig.orientation === 'undefined' ||
         viewConfig.orientation === 'axial') {
         if (colAbsMax0 < 0) {
-          flipOffsetX = true;
+          flipOffset.x = true;
         }
         if (colAbsMax1 < 0) {
-          flipOffsetY = true;
+          flipOffset.y = true;
         }
       } else {
         // common
-        flipScaleZ = true;
+        flipScale.z = true;
         if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-          flipOffsetY = true;
+          flipOffset.y = true;
         }
         if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-          flipOffsetX = true;
-          flipOffsetY = true;
+          flipOffset.x = true;
+          flipOffset.y = true;
         }
         // specific
         if (viewConfig.orientation === 'coronal') {
           if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-            flipOffsetX = true;
+            flipOffset.x = true;
           }
         } else if (viewConfig.orientation === 'sagittal') {
           if (colAbsMax0 > 0 && colAbsMax1 < 0) {
-            flipOffsetX = true;
+            flipOffset.x = true;
           }
         }
       }
     }
 
     // apply flips
-    if (flipOffsetX) {
+    if (flipOffset.x) {
       viewLayer.addFlipOffsetX();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.addFlipOffsetX();
       }
     }
-    if (flipOffsetY) {
+    if (flipOffset.y) {
       viewLayer.addFlipOffsetY();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.addFlipOffsetY();
       }
     }
-    if (flipScaleX) {
+    if (flipScale.x) {
       viewLayer.flipScaleX();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.flipScaleX();
       }
     }
-    if (flipScaleY) {
+    if (flipScale.y) {
       viewLayer.flipScaleY();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.flipScaleY();
       }
     }
-    if (flipScaleZ) {
+    if (flipScale.z) {
       viewLayer.flipScaleZ();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.flipScaleZ();
