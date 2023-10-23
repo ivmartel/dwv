@@ -4,6 +4,7 @@ import {
   BIG_EPSILON,
   Matrix33,
   getIdentityMat33,
+  isIdentityMat33,
   getMatrixFromName,
   getOrientationStringLPS
 } from '../../src/math/matrix';
@@ -56,6 +57,23 @@ QUnit.test('Test Matrix33.', function (assert) {
   // equals with precision
   assert.equal(m3.equals(m4, 0.01), true, 'equals true');
   assert.equal(m3.equals(m4, 0.001), false, 'equals false');
+});
+
+/**
+ * Tests for {@link Matrix33} toString.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33.', function (assert) {
+  /* eslint-disable array-element-newline */
+  const m0 = new Matrix33([
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9
+  ]);
+  /* eslint-enable array-element-newline */
+  const str0 = '[1, 2, 3, \n 4, 5, 6, \n 7, 8, 9]';
+  assert.equal(m0.toString(), str0, 'Matrix toString');
 });
 
 /**
@@ -225,6 +243,8 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
     1, 0, 0, 0, 1, 0, 0, 0, 1
   ]);
   assert.ok(m00.equals(theo00), 'Matrix33 factory id');
+
+  assert.ok(isIdentityMat33(m00), 'Matrix33 factory id isIdentity');
 
   // test #01
   const m01 = getMatrixFromName('axial');
