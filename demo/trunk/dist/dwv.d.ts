@@ -1090,6 +1090,14 @@ export declare class DrawLayer {
      */
     addFlipOffsetY(): void;
     /**
+     * Flip the scale along the layer X axis.
+     */
+    flipScaleX(): void;
+    /**
+     * Flip the scale along the layer Y axis.
+     */
+    flipScaleY(): void;
+    /**
      * Flip the scale along the layer Z axis.
      */
     flipScaleZ(): void;
@@ -4002,6 +4010,14 @@ export declare class ViewLayer {
      * Add a flip offset along the layer Y axis.
      */
     addFlipOffsetY(): void;
+    /**
+     * Flip the scale along the layer X axis.
+     */
+    flipScaleX(): void;
+    /**
+     * Flip the scale along the layer Y axis.
+     */
+    flipScaleY(): void;
     /**
      * Flip the scale along the layer Z axis.
      */
