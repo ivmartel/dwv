@@ -4,7 +4,8 @@ import {
   BIG_EPSILON,
   Matrix33,
   getIdentityMat33,
-  getMatrixFromName
+  getMatrixFromName,
+  getOrientationStringLPS
 } from '../../src/math/matrix';
 
 /**
@@ -246,4 +247,23 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
   // test #04
   const m04 = getMatrixFromName('godo');
   assert.equal(m04, null, 'Matrix33 factory unknown name');
+});
+
+/**
+ * Tests for {@link Matrix33} getOrientationStringLPS.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33 getOrientationStringLPS.', function (assert) {
+  const m00 = getIdentityMat33();
+  const code00 = getOrientationStringLPS(m00);
+  assert.equal(code00, 'LPS', 'LPS matrix');
+
+  const m01 = getMatrixFromName('coronal');
+  const code01 = getOrientationStringLPS(m01);
+  assert.equal(code01, 'LIP', 'LIP matrix');
+
+  const m02 = getMatrixFromName('sagittal');
+  const code02 = getOrientationStringLPS(m02);
+  assert.equal(code02, 'PIR', 'PIR matrix');
 });

@@ -405,3 +405,79 @@ export function getMatrixFromName(name) {
   }
   return matrix;
 }
+
+/**
+ * Get the orientation code of an orientation matrix. Each letter defines
+ * the towards direction. Letters are: R (right), L (left),
+ * A (anterior), P (posterior), I (inferior) and S (superior).
+ *
+ * @param {Matrix33} matrix The orientation matrix.
+ * @returns {string} The orientation code.
+ */
+export function getOrientationStringLPS(matrix) {
+  const v0 = new Vector3D(
+    matrix.get(0, 0),
+    matrix.get(1, 0),
+    matrix.get(2, 0)
+  );
+  const v1 = new Vector3D(
+    matrix.get(0, 1),
+    matrix.get(1, 1),
+    matrix.get(2, 1)
+  );
+  const v2 = new Vector3D(
+    matrix.get(0, 2),
+    matrix.get(1, 2),
+    matrix.get(2, 2)
+  );
+  return getVectorStringLPS(v0) +
+    getVectorStringLPS(v1) +
+    getVectorStringLPS(v2);
+}
+
+/**
+ * Get the orientation code of an orientation vector.
+ * Credits: David Clunie, https://www.dclunie.com/medical-image-faq/html/part2.html
+ *
+ * @param {*} vector The orientation vector.
+ * @returns {string} The orientation code.
+ */
+function getVectorStringLPS(vector) {
+  let abs = new Vector3D(
+    Math.abs(vector.getX()),
+    Math.abs(vector.getY()),
+    Math.abs(vector.getZ())
+  );
+
+  let orientation = '';
+  const orientationX = vector.getX() < 0 ? 'R' : 'L';
+  const orientationY = vector.getY() < 0 ? 'A' : 'P';
+  // as defined in DICOM
+  //const orientationZ = vector.getZ() < 0 ? 'F' : 'H';
+  const orientationZ = vector.getZ() < 0 ? 'I' : 'S';
+
+  const threshold = 0.0001;
+
+  for (let i = 0; i < 3; i++) {
+    if (abs.getX() > threshold &&
+      abs.getX() > abs.getY() &&
+      abs.getX() > abs.getZ()) {
+      orientation += orientationX;
+      abs = new Vector3D(0, abs.getY(), abs.getZ());
+    } else if (abs.getY() > threshold &&
+      abs.getY() > abs.getX() &&
+      abs.getY() > abs.getZ()) {
+      orientation += orientationY;
+      abs = new Vector3D(abs.getX(), 0, abs.getZ());
+    } else if (abs.getZ() > threshold &&
+      abs.getZ() > abs.getX() &&
+      abs.getZ() > abs.getY()) {
+      orientation += orientationZ;
+      abs = new Vector3D(abs.getX(), abs.getY(), 0);
+    } else {
+      break;
+    }
+  }
+
+  return orientation;
+}

@@ -1,7 +1,10 @@
 import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
 import {luts} from '../image/luts';
-import {getMatrixFromName} from '../math/matrix';
+import {
+  getMatrixFromName,
+  getOrientationStringLPS
+} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
 import {Style} from '../gui/style';
@@ -25,6 +28,7 @@ import {ViewLayer} from '../gui/viewLayer';
 import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
 import {ColourMap} from '../image/luts';
+import {Matrix33} from '../math/matrix';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -1697,166 +1701,35 @@ export class App {
     // view layer offset (done before scale)
     viewLayer.setOffset(layerGroup.getOffset());
 
-    // major orientation axis
-    const major = imageGeometry.getOrientation().getThirdColMajorDirection();
-    const colAbsMax0 = imageGeometry.getOrientation().getColAbsMax(0).value;
-    const colAbsMax1 = imageGeometry.getOrientation().getColAbsMax(1).value;
-
-    // flip flags
-    const flipOffset = {
-      x: false,
-      y: false
-    };
-    const flipScale = {
-      x: false,
-      y: false,
-      z: false
-    };
-
-    if (major === 0) {
-      // sagittal case
-      if (typeof viewConfig.orientation === 'undefined' ||
-        viewConfig.orientation === 'sagittal') {
-        flipScale.z = true;
-        if (colAbsMax0 < 0) {
-          flipOffset.x = true;
-        }
-        if (colAbsMax1 > 0) {
-          flipOffset.y = true;
-        }
-      } else {
-        // common
-        if (colAbsMax0 > 0 && colAbsMax1 < 0) {
-          flipOffset.x = true;
-        }
-        if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-          flipOffset.x = true;
-          flipOffset.y = true;
-        }
-        // specific
-        if (viewConfig.orientation === 'axial') {
-          if (colAbsMax0 > 0) {
-            flipScale.z = true;
-          }
-          if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-            flipOffset.y = true;
-          }
-        } else if (viewConfig.orientation === 'coronal') {
-          flipScale.z = true;
-          if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-            flipOffset.y = true;
-          }
-        }
-      }
-    } else if (major === 1) {
-      // coronal case
-      if (typeof viewConfig.orientation === 'undefined' ||
-        viewConfig.orientation === 'coronal') {
-        if (colAbsMax0 < 0) {
-          flipOffset.x = true;
-          flipScale.x = true;
-          if (colAbsMax1 > 0) {
-            flipOffset.y = true;
-            flipScale.z = true;
-          }
-        }
-        if (colAbsMax1 > 0) {
-          flipOffset.y = true;
-          flipScale.z = true;
-        }
-      } else {
-        // specific
-        if (viewConfig.orientation === 'axial') {
-          if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-            flipOffset.x = true;
-            flipScale.x = true;
-          }
-          if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-            flipOffset.x = true;
-            flipScale.x = true;
-            flipOffset.y = true;
-            flipScale.y = true;
-          }
-          if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-            flipOffset.y = true;
-            flipScale.y = true;
-          }
-        } else if (viewConfig.orientation === 'sagittal') {
-          if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-            flipOffset.y = true;
-            flipScale.z = true;
-          }
-          if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-            flipOffset.x = true;
-            flipScale.y = true;
-          }
-          if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-            flipOffset.x = true;
-            flipOffset.y = true;
-            flipScale.y = true;
-            flipScale.z = true;
-          }
-        }
-      }
-    } else if (major === 2) {
-      // axial case
-      if (typeof viewConfig.orientation === 'undefined' ||
-        viewConfig.orientation === 'axial') {
-        if (colAbsMax0 < 0) {
-          flipOffset.x = true;
-        }
-        if (colAbsMax1 < 0) {
-          flipOffset.y = true;
-        }
-      } else {
-        // common
-        flipScale.z = true;
-        if (colAbsMax0 > 0 && colAbsMax1 > 0) {
-          flipOffset.y = true;
-        }
-        if (colAbsMax0 < 0 && colAbsMax1 < 0) {
-          flipOffset.x = true;
-          flipOffset.y = true;
-        }
-        // specific
-        if (viewConfig.orientation === 'coronal') {
-          if (colAbsMax0 < 0 && colAbsMax1 > 0) {
-            flipOffset.x = true;
-          }
-        } else if (viewConfig.orientation === 'sagittal') {
-          if (colAbsMax0 > 0 && colAbsMax1 < 0) {
-            flipOffset.x = true;
-          }
-        }
-      }
-    }
-
-    // apply flips
-    if (flipOffset.x) {
+    // get and apply flip flags
+    const flipFlags = this.#getViewFlipFlags(
+      imageGeometry.getOrientation(),
+      viewConfig.orientation);
+    if (flipFlags.offset.x) {
       viewLayer.addFlipOffsetX();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.addFlipOffsetX();
       }
     }
-    if (flipOffset.y) {
+    if (flipFlags.offset.y) {
       viewLayer.addFlipOffsetY();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.addFlipOffsetY();
       }
     }
-    if (flipScale.x) {
+    if (flipFlags.scale.x) {
       viewLayer.flipScaleX();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.flipScaleX();
       }
     }
-    if (flipScale.y) {
+    if (flipFlags.scale.y) {
       viewLayer.flipScaleY();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.flipScaleY();
       }
     }
-    if (flipScale.z) {
+    if (flipFlags.scale.z) {
       viewLayer.flipScaleZ();
       if (typeof drawLayer !== 'undefined') {
         drawLayer.flipScaleZ();
@@ -1881,7 +1754,157 @@ export class App {
         this.#toolboxController.init();
       }
     }
+  }
 
+  /**
+   * Get the view flip flags: offset (x, y) and scale (x, y, z) flags.
+   *
+   * @param {Matrix33} imageOrientation The image orientation.
+   * @param {string} viewConfigOrientation The view config orientation.
+   * @returns {object} Offset and scale flip flags.
+   */
+  #getViewFlipFlags(imageOrientation, viewConfigOrientation) {
+    // 'simple' orientation code (does not take into account angles)
+    const orientationCode =
+      getOrientationStringLPS(imageOrientation.asOneAndZeros());
+    if (typeof orientationCode === 'undefined') {
+      throw new Error('Unsupported undefined orientation code');
+    }
+
+    // view orientation flags
+    const isViewUndefined = typeof viewConfigOrientation === 'undefined';
+    const isViewAxial = !isViewUndefined &&
+      viewConfigOrientation === 'axial';
+    const isViewCoronal = !isViewUndefined &&
+      viewConfigOrientation === 'coronal';
+    const isViewSagittal = !isViewUndefined &&
+      viewConfigOrientation === 'sagittal';
+
+    // default flags
+    const flipOffset = {
+      x: false,
+      y: false
+    };
+    const flipScale = {
+      x: false,
+      y: false,
+      z: false
+    };
+
+    if (orientationCode === 'LPS') {
+      // axial
+      if (isViewCoronal || isViewSagittal) {
+        flipScale.z = true;
+        flipOffset.y = true;
+      }
+    } else if (orientationCode === 'LAI') {
+      // axial
+      if (isViewUndefined || isViewAxial) {
+        flipOffset.y = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+      } else if (isViewSagittal) {
+        flipScale.z = true;
+        flipOffset.x = true;
+      }
+    } else if (orientationCode === 'RPI') {
+      // axial
+      if (isViewUndefined || isViewAxial) {
+        flipOffset.x = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+        flipOffset.x = true;
+      } else if (isViewSagittal) {
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'RAS') {
+      // axial
+      flipOffset.x = true;
+      flipOffset.y = true;
+      if (isViewCoronal || isViewSagittal) {
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'LSA') {
+      // coronal
+      flipOffset.y = true;
+      if (isViewUndefined || isViewCoronal) {
+        flipScale.z = true;
+      } else if (isViewAxial) {
+        flipScale.y = true;
+      } else if (isViewSagittal) {
+        flipOffset.x = true;
+        flipScale.y = true;
+        flipScale.z = true;
+      }
+    // } else if (orientationCode === 'LIP') { // nothing to do
+    } else if (orientationCode === 'RSP') {
+      // coronal
+      if (isViewUndefined || isViewCoronal) {
+        flipOffset.x = true;
+        flipOffset.y = true;
+        flipScale.x = true;
+        flipScale.z = true;
+      } else if (isViewAxial) {
+        flipOffset.x = true;
+        flipScale.x = true;
+      } else if (isViewSagittal) {
+        flipOffset.y = true;
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'RIA') {
+      // coronal
+      flipOffset.x = true;
+      if (isViewUndefined || isViewCoronal) {
+        flipScale.x = true;
+      } else if (isViewAxial) {
+        flipOffset.y = true;
+        flipScale.x = true;
+        flipScale.y = true;
+      } else if (isViewSagittal) {
+        flipScale.y = true;
+      }
+    } else if (orientationCode === 'PSL') {
+      // sagittal
+      flipScale.z = true;
+      if (isViewUndefined || isViewSagittal) {
+        flipOffset.y = true;
+      } else if (isViewCoronal) {
+        flipOffset.y = true;
+      }
+    } else if (orientationCode === 'PIR') {
+      // sagittal
+      flipScale.z = true;
+      if (isViewAxial || isViewCoronal) {
+        flipOffset.x = true;
+      }
+    } else if (orientationCode === 'ASR') {
+      // sagittal
+      flipOffset.x = true;
+      flipOffset.y = true;
+      if (isViewUndefined || isViewSagittal) {
+        flipScale.z = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'AIL') {
+      // sagittal
+      if (isViewUndefined || isViewSagittal) {
+        flipOffset.x = true;
+        flipScale.z = true;
+      } else if (isViewAxial) {
+        flipOffset.y = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+      }
+    } else {
+      logger.warn('Unsupported orientation code: ' +
+        orientationCode + ', display could be incorrect');
+    }
+
+    return {
+      scale: flipScale,
+      offset: flipOffset
+    };
   }
 
 } // class App
