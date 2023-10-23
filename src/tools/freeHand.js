@@ -3,6 +3,13 @@ import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point2D} from '../math/point';
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * FreeHand factory.
  */
@@ -38,7 +45,7 @@ export class FreeHandFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -48,10 +55,10 @@ export class FreeHandFactory {
   /**
    * Create a roi shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the line.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // points stored the Konvajs way
@@ -118,9 +125,9 @@ export class FreeHandFactory {
   /**
    * Get anchors to update a free hand shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const points = shape.points();
@@ -140,9 +147,9 @@ export class FreeHandFactory {
   /**
    * Update a FreeHand shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} _viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The app style.
+   * @param {ViewController} _viewController The associated view controller.
    */
   update(anchor, style, _viewController) {
     // parent group
@@ -151,10 +158,16 @@ export class FreeHandFactory {
     const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated label
+    if (!(kline instanceof Konva.Line)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // update self
     const point = group.getChildren(function (node) {
@@ -165,14 +178,17 @@ export class FreeHandFactory {
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
     const points = kline.points();
-    points[anchor.id()] = anchor.x() - kline.x();
-    points[anchor.id() + 1] = anchor.y() - kline.y();
+    const index = parseInt(anchor.id(), 10);
+    points[index] = anchor.x() - kline.x();
+    points[index + 1] = anchor.y() - kline.y();
     // concat to make Konva think it is a new array
     kline.points(points.concat());
 
     // update text
     const ktext = klabel.getText();
-    ktext.setText(ktext.meta.textExpr);
+    // @ts-expect-error
+    const meta = ktext.meta;
+    ktext.setText(meta.textExpr);
     // update position
     const textPos = {
       x: points[0] + kline.x(),

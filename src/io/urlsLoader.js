@@ -141,8 +141,8 @@ export class UrlsLoader {
   #addLoad = (_event) => {
     this.#nLoad++;
     // call onload when all is loaded
-    // (not using the input event since it is not the
-    //   general load)
+    // (not using the input event since it is
+    //   an individual load)
     if (this.#nLoad === this.#inputData.length) {
       this.onload({
         source: this.#inputData
@@ -159,10 +159,9 @@ export class UrlsLoader {
   #addLoadend = (_event) => {
     this.#nLoadend++;
     // call onloadend when all is run
-    // (not using the input event since it is not the
-    //   general load end)
-    // x2 to count for request + load
-    if (this.#nLoadend === 2 * this.#inputData.length) {
+    // (not using the input event since it is
+    //   an individual load end)
+    if (this.#nLoadend === this.#inputData.length) {
       this.onloadend({
         source: this.#inputData
       });
@@ -301,7 +300,6 @@ export class UrlsLoader {
     // store last run request index
     let lastRunRequestIndex = 0;
     const requestOnLoadEnd = () => {
-      this.#addLoadend();
       // launch next in queue
       if (lastRunRequestIndex < this.#requests.length - 1 && !this.#aborting) {
         ++lastRunRequestIndex;
@@ -352,8 +350,18 @@ export class UrlsLoader {
         mproghandler.getMonoProgressHandler(i, 0), dataElement);
       request.onload = this.#getLoadHandler(loader, dataElement, i);
       request.onloadend = requestOnLoadEnd;
-      request.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
-      request.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
+      const errorCallback =
+        this.#augmentCallbackEvent(this.onerror, dataElement);
+      request.onerror = (event) => {
+        this.#addLoadend();
+        errorCallback(event);
+      };
+      const abortCallback =
+        this.#augmentCallbackEvent(this.onabort, dataElement);
+      request.onabort = (event) => {
+        this.#addLoadend();
+        abortCallback(event);
+      };
       // response type (default is 'text')
       if (loader.loadUrlAs() === urlContentTypes.ArrayBuffer) {
         request.responseType = 'arraybuffer';

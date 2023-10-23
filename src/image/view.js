@@ -27,12 +27,12 @@ import {
 /**
  * List of view event names.
  *
- * @type {Array}
+ * @type {string[]}
  */
 export const viewEventNames = [
   'wlchange',
   'wlpresetadd',
-  'colourchange',
+  'colourmapchange',
   'positionchange',
   'opacitychange',
   'alphafuncchange'
@@ -63,9 +63,9 @@ export function createView(elements, image) {
  *   const dicomParser = new dwv.DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = dwv.createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = createView(dicomParser.getDicomElements(), image);
+ *   const view = dwv.createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;
@@ -133,11 +133,11 @@ export class View {
   #currentWl = null;
 
   /**
-   * colour map.
+   * Colour map name.
    *
-   * @type {ColourMap}
+   * @type {string}
    */
-  #colourMap = luts.plain;
+  #colourMapName = 'plain';
 
   /**
    * Current position as a Point.
@@ -150,14 +150,14 @@ export class View {
   /**
    * View orientation. Undefined will use the original slice ordering.
    *
-   * @type {object}
+   * @type {Matrix33}
    */
   #orientation;
 
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
@@ -414,15 +414,6 @@ export class View {
   }
 
   /**
-   * Set the default colour map.
-   *
-   * @param {ColourMap} map The colour map.
-   */
-  setDefaultColourMap(map) {
-    this.#colourMap = map;
-  }
-
-  /**
    * Add window presets to the existing ones.
    *
    * @param {object} presets The window presets.
@@ -471,33 +462,45 @@ export class View {
   /**
    * Get the colour map of the image.
    *
-   * @returns {ColourMap} The colour map of the image.
+   * @returns {string} The colour map name.
    */
   getColourMap() {
-    return this.#colourMap;
+    return this.#colourMapName;
+  }
+
+  /**
+   * Get the colour map object.
+   *
+   * @returns {ColourMap} The colour map.
+   */
+  #getColourMapLut() {
+    return luts[this.#colourMapName];
   }
 
   /**
    * Set the colour map of the image.
    *
-   * @param {ColourMap} map The colour map of the image.
-   * @fires View#colourchange
+   * @param {string} name The colour map name.
+   * @fires View#colourmapchange
    */
-  setColourMap(map) {
-    this.#colourMap = map;
+  setColourMap(name) {
+    // check if we have it
+    if (!luts[name]) {
+      throw new Error('Unknown colour map: \'' + name + '\'');
+    }
+
+    this.#colourMapName = name;
+
     /**
      * Color change event.
      *
-     * @event View#colourchange
+     * @event View#colourmapchange
      * @type {object}
      * @property {Array} value The changed value.
-     * @property {number} wc The new window center value.
-     * @property {number} ww The new window wdth value.
      */
     this.#fireEvent({
-      type: 'colourchange',
-      wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
-      ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
+      type: 'colourmapchange',
+      value: [name]
     });
   }
 
@@ -541,9 +544,9 @@ export class View {
   }
 
   /**
-   * Get the origin at a given position.
+   * Get the first origin or at a given position.
    *
-   * @param {Point} position The position.
+   * @param {Point} [position] Optional position.
    * @returns {Point3D} The origin.
    */
   getOrigin(position) {
@@ -892,7 +895,7 @@ export class View {
         iterator,
         this.getAlphaFunction(),
         this.getCurrentWindowLut(),
-        this.getColourMap()
+        this.#getColourMapLut()
       );
       break;
 
@@ -901,7 +904,7 @@ export class View {
         data,
         iterator,
         this.getAlphaFunction(),
-        this.getColourMap(),
+        this.#getColourMapLut(),
         image.getMeta().BitsStored === 16
       );
       break;

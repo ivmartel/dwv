@@ -7,6 +7,12 @@ import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Protractor factory.
  */
@@ -41,7 +47,7 @@ export class ProtractorFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -51,10 +57,10 @@ export class ProtractorFactory {
   /**
    * Create a protractor shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the protractor.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the protractor.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -172,8 +178,8 @@ export class ProtractorFactory {
   /**
    * Get anchors to update a protractor shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
    * @returns {Array} A list of anchors.
    */
   getAnchors(shape, style) {
@@ -195,9 +201,9 @@ export class ProtractorFactory {
   /**
    * Update a protractor shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} _viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The app style.
+   * @param {ViewController} _viewController The associated view controller.
    */
   update(anchor, style, _viewController) {
     // parent group
@@ -206,15 +212,24 @@ export class ProtractorFactory {
     const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated label
+    if (!(kline instanceof Konva.Line)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
-      // associated arc
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // associated arc
     const karc = group.getChildren(function (node) {
       return node.name() === 'shape-arc';
     })[0];
-      // find special points
+    if (!(karc instanceof Konva.Arc)) {
+      return;
+    }
+    // find special points
     const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
@@ -224,7 +239,7 @@ export class ProtractorFactory {
     const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
-      // update special points
+    // update special points
     switch (anchor.id()) {
     case 'begin':
       begin.x(anchor.x());
@@ -272,12 +287,14 @@ export class ProtractorFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = {
       angle: {value: angle, unit: i18n.t('unit.degree')}
     };
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
     // update position
     const midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
     const midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;

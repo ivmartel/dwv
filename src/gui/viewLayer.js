@@ -162,7 +162,7 @@ export class ViewLayer {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
@@ -212,7 +212,7 @@ export class ViewLayer {
     this.#dataId = dataId;
     // local listeners
     view.addEventListener('wlchange', this.#onWLChange);
-    view.addEventListener('colourchange', this.#onColourChange);
+    view.addEventListener('colourmapchange', this.#onColourMapChange);
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
     // view events
@@ -530,13 +530,20 @@ export class ViewLayer {
    *
    * @param {number} x The X position.
    * @param {number} y The Y position.
-   * @returns {object} The display position as {x,y}.
+   * @returns {object} The display position as {x,y}, can be individually
+   *   undefined if out of bounds.
    */
   planePosToDisplay(x, y) {
-    return {
-      x: (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x,
-      y: (y - this.#offset.y + this.#baseOffset.y) * this.#scale.y
-    };
+    let posX = (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x;
+    let posY = (y - this.#offset.y + this.#baseOffset.y) * this.#scale.y;
+    // check if in bounds
+    if (posX < 0 || posX >= this.#canvas.width) {
+      posX = undefined;
+    }
+    if (posY < 0 || posY >= this.#canvas.height) {
+      posY = undefined;
+    }
+    return {x: posX, y: posY};
   }
 
   /**
@@ -886,7 +893,7 @@ export class ViewLayer {
    *
    * @param {object} event The event fired when changing the colour map.
    */
-  #onColourChange = (event) => {
+  #onColourMapChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {

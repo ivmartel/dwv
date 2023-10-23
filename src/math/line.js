@@ -1,6 +1,11 @@
 import {Point2D} from './point';
 import {i18n} from '../utils/i18n';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+/* eslint-enable no-unused-vars */
+
 /**
  * Line shape.
  */
@@ -157,7 +162,7 @@ export class Line {
   /**
    * Quantify a line according to view information.
    *
-   * @param {object} viewController The associated view controller.
+   * @param {ViewController} viewController The associated view controller.
    * @returns {object} A quantification object.
    */
   quantify(viewController) {

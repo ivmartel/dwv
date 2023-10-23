@@ -31,7 +31,7 @@ import {DataElement} from '../dicom/dataElement';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.33.0-beta.6';
+  return '0.33.0-beta.13';
 }
 
 /**
@@ -520,6 +520,18 @@ export function getDataElementPrefixByteSize(vr, isImplicit) {
 }
 
 /**
+ * Is the input VR a known VR.
+ *
+ * @param {string} vr The vr to test.
+ * @returns {boolean} True if known.
+ */
+function isKnownVR(vr) {
+  const extraVrTypes = ['NONE', 'ox', 'xx', 'xs'];
+  const knownTypes = Object.keys(vrTypes).concat(extraVrTypes);
+  return knownTypes.includes(vr);
+}
+
+/**
  * DicomParser class.
  *
  * @example
@@ -797,6 +809,13 @@ export class DicomParser {
     } else {
       vr = 'NONE';
       is32bitVL = true;
+    }
+
+    // check vr
+    if (!isKnownVR(vr)) {
+      logger.warn('Unknown VR: ' + vr +
+        ' (for tag ' + tag.getKey() + '), treating as \'UN\'');
+      vr = 'UN';
     }
 
     // Value Length (VL)

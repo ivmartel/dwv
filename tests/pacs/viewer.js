@@ -9,7 +9,6 @@ let _tools = null;
 
 // viewer options
 let _layout = 'one';
-const _dicomWeb = false;
 
 /**
  * Setup simple dwv app.
@@ -94,7 +93,7 @@ function viewerSetup() {
   _app.init(options);
 
   // bind events
-  _app.addEventListener('loaderror', function (event) {
+  _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function (event) {
@@ -158,7 +157,11 @@ function viewerSetup() {
         // init gui
         if (dataLoad === numberOfDataToLoad) {
           // select tool
-          _app.setTool(getSelectedTool());
+          const selectedTool = getSelectedTool();
+          _app.setTool(selectedTool.name);
+          if (selectedTool.name === 'Draw') {
+            _app.setToolFeatures({shapeName: selectedTool.option});
+          }
 
           const changeLayoutSelect = document.getElementById('changelayout');
           changeLayoutSelect.disabled = false;
@@ -264,12 +267,41 @@ function viewerSetup() {
   });
 
   const uriOptions = {};
-  // special dicom web request header
-  if (_dicomWeb) {
-    uriOptions.requestHeaders = [{
-      name: 'Accept',
-      value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
-    }];
+  // uriOptions.batchSize = 100;
+  // special dicom web cookie
+  if (document.cookie) {
+    const cookies = document.cookie.split('; ');
+    // accept
+    const acceptItem = cookies.find((item) => item.startsWith('accept='));
+    if (typeof acceptItem !== 'undefined') {
+      // accept is encoded in dcmweb.js (allows for ';')
+      const accept = decodeURIComponent(acceptItem.split('=')[1]);
+      if (typeof accept !== 'undefined' && accept.length !== 0) {
+        uriOptions.requestHeaders = [];
+        uriOptions.requestHeaders.push({
+          name: 'Accept',
+          value: accept
+        });
+      }
+      // clean up
+      document.cookie = 'accept=';
+    }
+    // token
+    const tokenItem = cookies.find((item) => item.startsWith('access_token='));
+    if (typeof tokenItem !== 'undefined') {
+      const token = tokenItem.split('=')[1];
+      if (typeof token !== 'undefined' && token.length !== 0) {
+        if (typeof uriOptions.requestHeaders === 'undefined') {
+          uriOptions.requestHeaders = [];
+        }
+        uriOptions.requestHeaders.push({
+          name: 'Authorization',
+          value: 'Bearer ' + token
+        });
+      }
+      // clean up
+      document.cookie = 'access_token=';
+    }
   }
   // load from window location
   _app.loadFromUri(window.location.href, uriOptions);
@@ -336,8 +368,22 @@ function onDOMContentLoaded() {
       addDataRow(dataIds[i]);
     }
 
+    // show crosshair depending on layout
+    if (layout !== 'one') {
+      const divIds = getLayerGroupDivIds(configs);
+      for (const divId of divIds) {
+        _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
+      }
+    }
+
     // need to set tool after config change
-    _app.setTool(getSelectedTool());
+    const selectedTool = getSelectedTool();
+    if (typeof selectedTool !== 'undefined') {
+      _app.setTool(selectedTool.name);
+      if (selectedTool.name === 'Draw') {
+        _app.setToolFeatures({shapeName: selectedTool.option});
+      }
+    }
   });
 
   const smoothingChk = document.getElementById('changesmoothing');
@@ -411,6 +457,36 @@ function getViewConfig(divId) {
 }
 
 /**
+ * Partially clone an existing config in the provided one.
+ *
+ * @param {string} dataId The data id.
+ * @param {object} config The view config.
+ * @returns {object} The update config.
+ */
+function partialCloneOldConfig(dataId, config) {
+  const oldConfigs = _app.getViewConfigs(dataId);
+  if (oldConfigs.length !== 0) {
+    // use first config as base
+    const oldConfig = oldConfigs[0];
+    // window/level
+    if (typeof oldConfig.windowCenter !== 'undefined' &&
+      typeof oldConfig.windowWidth !== 'undefined') {
+      config.windowCenter = oldConfig.windowCenter;
+      config.windowWidth = oldConfig.windowWidth;
+    }
+    // opacity
+    if (typeof oldConfig.opacity !== 'undefined') {
+      config.opacity = oldConfig.opacity;
+    }
+    // colour map
+    if (typeof oldConfig.colourMap !== 'undefined') {
+      config.colourMap = oldConfig.colourMap;
+    }
+  }
+  return config;
+}
+
+/**
  * Create 1*2 view config(s).
  *
  * @param {Array} dataIds The list of dataIds.
@@ -418,8 +494,9 @@ function getViewConfig(divId) {
  */
 function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
-  for (let i = 0; i < dataIds.length; ++i) {
-    configs[dataIds[i]] = [getViewConfig('layerGroup0')];
+  for (const dataId of dataIds) {
+    configs[dataId] =
+      [partialCloneOldConfig(dataId, getViewConfig('layerGroup0'))];
   }
   return configs;
 }
@@ -433,11 +510,14 @@ function getOnebyOneDataViewConfig(dataIds) {
 function getOnebyTwoDataViewConfig(dataIds) {
   const configs = {};
   for (let i = 0; i < dataIds.length; ++i) {
+    const dataId = dataIds[i];
+    let config;
     if (i % 2 === 0) {
-      configs[dataIds[i]] = [getViewConfig('layerGroup0')];
+      config = getViewConfig('layerGroup0');
     } else {
-      configs[dataIds[i]] = [getViewConfig('layerGroup1')];
+      config = getViewConfig('layerGroup1');
     }
+    configs[dataIds[i]] = [partialCloneOldConfig(dataId, config)];
   }
   return configs;
 }
@@ -450,11 +530,11 @@ function getOnebyTwoDataViewConfig(dataIds) {
  */
 function getMPRDataViewConfig(dataIds) {
   const configs = {};
-  for (let i = 0; i < dataIds.length; ++i) {
-    configs[dataIds[i]] = [
-      getViewConfig('layerGroup0'),
-      getViewConfig('layerGroup1'),
-      getViewConfig('layerGroup2')
+  for (const dataId of dataIds) {
+    configs[dataId] = [
+      partialCloneOldConfig(dataId, getViewConfig('layerGroup0')),
+      partialCloneOldConfig(dataId, getViewConfig('layerGroup1')),
+      partialCloneOldConfig(dataId, getViewConfig('layerGroup2'))
     ];
   }
   return configs;
@@ -520,7 +600,8 @@ function setupBindersCheckboxes() {
     'Position',
     'Zoom',
     'Offset',
-    'Opacity'
+    'Opacity',
+    'ColourMap'
   ];
   const binders = [];
   // add all binders at startup
@@ -672,18 +753,26 @@ function setupToolsCheckboxes() {
 /**
  * Get the selected tool
  *
- * @returns {string} The tool name.
+ * @returns {object|undefined} The tool name and possible option.
  */
 function getSelectedTool() {
+  let res;
   const toolsInput = document.getElementsByName('tools');
-  let toolIndex = null;
+  let toolName;
   for (let j = 0; j < toolsInput.length; ++j) {
     if (toolsInput[j].checked) {
-      toolIndex = j;
+      toolName = toolsInput[j].title;
       break;
     }
   }
-  return Object.keys(_tools)[toolIndex];
+  if (typeof toolName !== 'undefined') {
+    const split = toolName.split(':');
+    res = {
+      name: split[0],
+      option: split[1]
+    };
+  }
+  return res;
 }
 
 /**
@@ -985,8 +1074,9 @@ function addDataRow(dataId) {
     button.appendChild(document.createTextNode(letter));
     button.onclick = function () {
       // update app
-      const config = getViewConfig(divId);
-      config.orientation = orientation;
+      const config = {
+        orientation: orientation
+      };
       _app.updateDataViewConfig(dataId, divId, config);
     };
     return button;
@@ -1079,6 +1169,8 @@ function addDataRow(dataId) {
 
   // cell: presets
   cell = row.insertCell();
+
+  // window level preset
   // callback
   const changePreset = function (event) {
     // update selected layers
@@ -1089,17 +1181,52 @@ function addDataRow(dataId) {
       vc.setWindowLevelPreset(event.target.value);
     }
   };
-  const select = document.createElement('select');
-  select.id = 'preset-' + dataId + '-select';
+  const selectPreset = document.createElement('select');
+  selectPreset.id = 'preset-' + dataId + '-select';
   const presets = initialVc.getWindowLevelPresetsNames();
   for (const preset of presets) {
     const option = document.createElement('option');
     option.value = preset;
     option.appendChild(document.createTextNode(preset));
-    select.appendChild(option);
+    selectPreset.appendChild(option);
   }
-  select.onchange = changePreset;
-  cell.appendChild(select);
+  selectPreset.onchange = changePreset;
+  const labelPreset = document.createElement('label');
+  labelPreset.htmlFor = selectPreset.id;
+  labelPreset.appendChild(document.createTextNode('wl: '));
+  cell.appendChild(labelPreset);
+  cell.appendChild(selectPreset);
+
+  // break line
+  const br = document.createElement('br');
+  cell.appendChild(br);
+
+  // colour map
+  // callback
+  const changeColourMap = function (event) {
+    // update selected layers
+    const lgIds = getSelectedLayerGroupIds();
+    for (let i = 0; i < lgIds.length; ++i) {
+      const lg = _app.getLayerGroupByDivId(lgIds[i]);
+      const vc = lg.getActiveViewLayer().getViewController();
+      vc.setColourMap(event.target.value);
+    }
+  };
+  const selectColourMap = document.createElement('select');
+  selectColourMap.id = 'colourmap-' + dataId + '-select';
+  const colourMaps = Object.keys(dwv.luts);
+  for (const colourMap of colourMaps) {
+    const option = document.createElement('option');
+    option.value = colourMap;
+    option.appendChild(document.createTextNode(colourMap));
+    selectColourMap.appendChild(option);
+  }
+  selectColourMap.onchange = changeColourMap;
+  const labelColourMap = document.createElement('label');
+  labelColourMap.htmlFor = selectColourMap.id;
+  labelColourMap.appendChild(document.createTextNode('cm: '));
+  cell.appendChild(labelColourMap);
+  cell.appendChild(selectColourMap);
 
   // cell: opactiy
   cell = row.insertCell();
@@ -1266,11 +1393,13 @@ function getSimpleStats(array) {
  */
 function runRenderTest() {
   const numberOfRun = 20;
+  // default to first layer group
+  _app.setActiveLayerGroup(1);
 
   const vl = _app.getActiveLayerGroup().getActiveViewLayer();
   const vc = vl.getViewController();
   const runner = function () {
-    vc.incrementIndex(2);
+    vc.incrementScrollIndex();
   };
 
   let startTime;

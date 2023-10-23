@@ -3,6 +3,7 @@ import {Geometry} from './geometry';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {WindowCenterAndWidth} from './windowCenterAndWidth';
 import {Image} from './image';
+import {luts} from './luts';
 import {
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
@@ -194,23 +195,30 @@ export class ImageFactory {
     const meta = {
       numberOfFiles: numberOfFiles
     };
+
+    // Modality
     const modality = dataElements['00080060'];
     if (typeof modality !== 'undefined') {
       meta.Modality = modality.value[0];
     }
 
     // PET SUV
-    let intensityFactor = 1;
-    if (modality.value[0] === 'PT') {
+    let isPetWithSuv = false;
+    if (typeof meta.Modality !== 'undefined' &&
+      meta.Modality === 'PT') {
       const warn = canGetSuvFactor(dataElements);
       if (warn.length === 0) {
-        intensityFactor = getSuvFactor(dataElements);
-        logger.info('Applying PET SUV calibration: ' + intensityFactor);
-        slope *= intensityFactor;
-        intercept *= intensityFactor;
+        isPetWithSuv = true;
       } else {
         logger.warn(warn);
       }
+    }
+    let intensityFactor = 1;
+    if (isPetWithSuv) {
+      intensityFactor = getSuvFactor(dataElements);
+      logger.info('Applying PET SUV calibration: ' + intensityFactor);
+      slope *= intensityFactor;
+      intercept *= intensityFactor;
     }
     const rsi = new RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept(rsi);
@@ -238,9 +246,13 @@ export class ImageFactory {
     // PixelRepresentation -> is signed
     meta.IsSigned = meta.PixelRepresentation === 1;
     // local pixel unit
-    const pixelUnit = getPixelUnit(dataElements);
-    if (typeof pixelUnit !== 'undefined') {
-      meta.pixelUnit = pixelUnit;
+    if (isPetWithSuv) {
+      meta.pixelUnit = 'SUV';
+    } else {
+      const pixelUnit = getPixelUnit(dataElements);
+      if (typeof pixelUnit !== 'undefined') {
+        meta.pixelUnit = pixelUnit;
+      }
     }
     // FrameOfReferenceUID (optional)
     const frameOfReferenceUID = dataElements['00200052'];
@@ -287,13 +299,20 @@ export class ImageFactory {
 
     // PALETTE COLOR luts
     if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
+      // Red Palette Color Lookup Table Data
       const redLutElement = dataElements['00281201'];
+      // Green Palette Color Lookup Table Data
       const greenLutElement = dataElements['00281202'];
+      // Blue Palette Color Lookup Table Data
       const blueLutElement = dataElements['00281203'];
       let redLut;
       let greenLut;
       let blueLut;
       // check red palette descriptor (should all be equal)
+      // Red Palette Color Lookup Table Descriptor
+      // 0: number of entries in the lookup table
+      // 1: first input value mapped
+      // 2: number of bits for each entry in the Lookup Table Data (8 or 16)
       const descriptor = dataElements['00281101'];
       if (typeof descriptor !== 'undefined' &&
         descriptor.value.length === 3) {
@@ -311,6 +330,7 @@ export class ImageFactory {
             descSize = 65536;
           }
           // red palette VL
+          // TODO vl is undefined, find info elsewhere...
           const vlSize = redLutElement.vl;
           // check double size
           if (vlSize !== 2 * descSize) {
@@ -344,17 +364,17 @@ export class ImageFactory {
             'Scaling 16bits color lut since the lut descriptor is 8.');
           let clone = redLutElement.value.slice(0);
           // @ts-expect-error
-          redLut = new Uint8Array(clone.buffer);
+          redLut = Array.from(new Uint8Array(clone.buffer));
           clone = greenLutElement.value.slice(0);
           // @ts-expect-error
-          greenLut = new Uint8Array(clone.buffer);
+          greenLut = Array.from(new Uint8Array(clone.buffer));
           clone = blueLutElement.value.slice(0);
           // @ts-expect-error
-          blueLut = new Uint8Array(clone.buffer);
+          blueLut = Array.from(new Uint8Array(clone.buffer));
         }
       }
       // set the palette
-      meta.paletteLut = {
+      luts['palette'] = {
         red: redLut,
         green: greenLut,
         blue: blueLut

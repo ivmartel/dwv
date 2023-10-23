@@ -2,6 +2,11 @@ import {Point2D} from './point';
 import {getStats} from './stats';
 import {i18n} from '../utils/i18n';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+/* eslint-enable no-unused-vars */
+
 /**
  * Mulitply the three inputs if the last two are not null.
  *
@@ -160,8 +165,8 @@ export class Rectangle {
   /**
    * Quantify a rectangle according to view information.
    *
-   * @param {object} viewController The associated view controller.
-   * @param {Array} flags A list of stat values to calculate.
+   * @param {ViewController} viewController The associated view controller.
+   * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
@@ -185,19 +190,20 @@ export class Rectangle {
     if (viewController.canQuantifyImage()) {
       const round = this.getRound();
       const values = viewController.getImageRegionValues(round.min, round.max);
+      const unit = viewController.getPixelUnit();
       const quantif = getStats(values, flags);
-      quant.min = {value: quantif.min, unit: ''};
-      quant.max = {value: quantif.max, unit: ''};
-      quant.mean = {value: quantif.mean, unit: ''};
-      quant.stdDev = {value: quantif.stdDev, unit: ''};
+      quant.min = {value: quantif.min, unit: unit};
+      quant.max = {value: quantif.max, unit: unit};
+      quant.mean = {value: quantif.mean, unit: unit};
+      quant.stdDev = {value: quantif.stdDev, unit: unit};
       if (typeof quantif.median !== 'undefined') {
-        quant.median = {value: quantif.median, unit: ''};
+        quant.median = {value: quantif.median, unit: unit};
       }
       if (typeof quantif.p25 !== 'undefined') {
-        quant.p25 = {value: quantif.p25, unit: ''};
+        quant.p25 = {value: quantif.p25, unit: unit};
       }
       if (typeof quantif.p75 !== 'undefined') {
-        quant.p75 = {value: quantif.p75, unit: ''};
+        quant.p75 = {value: quantif.p75, unit: unit};
       }
     }
 

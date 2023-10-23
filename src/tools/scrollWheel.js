@@ -34,7 +34,7 @@ export class ScrollWheel {
   /**
    * Handle mouse wheel event.
    *
-   * @param {object} event The mouse wheel event.
+   * @param {WheelEvent} event The mouse wheel event.
    */
   wheel(event) {
     // deltaMode (deltaY values on my machine...):

@@ -6,6 +6,12 @@ import {getDefaultAnchor} from './editor';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Ruler factory.
  */
@@ -40,7 +46,7 @@ export class RulerFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -50,10 +56,10 @@ export class RulerFactory {
   /**
    * Create a ruler shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the line.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -165,9 +171,9 @@ export class RulerFactory {
   /**
    * Get anchors to update a ruler shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const points = shape.points();
@@ -185,9 +191,9 @@ export class RulerFactory {
   /**
    * Update a ruler shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, style, viewController) {
     // parent group
@@ -196,26 +202,39 @@ export class RulerFactory {
     const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated tick0
+    if (!(kline instanceof Konva.Line)) {
+      return;
+    }
+    // associated tick0
     const ktick0 = group.getChildren(function (node) {
       return node.name() === 'shape-tick0';
     })[0];
-      // associated tick1
+    if (!(ktick0 instanceof Konva.Line)) {
+      return;
+    }
+    // associated tick1
     const ktick1 = group.getChildren(function (node) {
       return node.name() === 'shape-tick1';
     })[0];
-      // associated label
+    if (!(ktick1 instanceof Konva.Line)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
-      // find special points
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // find special points
     const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
     const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
-      // update special points
+
+    // update special points
     switch (anchor.id()) {
     case 'begin':
       begin.x(anchor.x());
@@ -263,10 +282,12 @@ export class RulerFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = line.quantify(viewController);
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
     // update position
     const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;

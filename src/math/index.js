@@ -207,21 +207,6 @@ export function getZeroIndex(size) {
 }
 
 /**
- * Get an array sort callback.
- * f(a,b) > 0 -> b,a
- * f(a,b) < 0 -> a,b
- * f(a,b) = 0 -> original order
- *
- * @param {number} direction The direction to use to compare indices.
- * @returns {Function} A function that compares two Index.
- */
-export function getIndexCompareFunction(direction) {
-  return function (a, b) {
-    return a.get(direction) - b.get(direction);
-  };
-}
-
-/**
  * Get an index from an id string in the form of: '#0-1_#1-2'
  * (result of index.toStringId).
  *

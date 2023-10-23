@@ -1,5 +1,12 @@
 import {Point, Point3D} from '../math/point';
 import {LayerGroup} from './layerGroup';
+import {logger} from '../utils/logger';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
+/* eslint-enable no-unused-vars */
 
 /**
  * Window/level binder.
@@ -14,6 +21,24 @@ export class WindowLevelBinder {
       if (viewLayers.length !== 0) {
         const vc = viewLayers[0].getViewController();
         vc.setWindowLevel(event.value[0], event.value[1]);
+      }
+    };
+  };
+}
+
+/**
+ * Colour map binder.
+ */
+export class ColourMapBinder {
+  getEventType = function () {
+    return 'colourmapchange';
+  };
+  getCallback = function (layerGroup) {
+    return function (event) {
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
+      if (viewLayers.length !== 0) {
+        const vc = viewLayers[0].getViewController();
+        vc.setColourMap(event.value[0]);
       }
     };
   };
@@ -110,7 +135,8 @@ export class OpacityBinder {
       }
       // propagate to first view layer
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0) {
+      if (viewLayers.length !== 0 &&
+        layerGroup.getNumberOfViewLayers() > 1) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
       }
@@ -126,7 +152,8 @@ export const binderList = {
   PositionBinder,
   ZoomBinder,
   OffsetBinder,
-  OpacityBinder
+  OpacityBinder,
+  ColourMapBinder
 };
 
 /**
@@ -135,10 +162,26 @@ export const binderList = {
  */
 export class Stage {
 
-  // associated layer groups
+  /**
+   * Associated layer groups.
+   *
+   * @type {LayerGroup[]}
+   */
   #layerGroups = [];
-  // active layer group index
+
+  /**
+   * Active layer group index.
+   *
+   * @type {number}
+   */
   #activeLayerGroupIndex = null;
+
+  /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
 
   // layer group binders
   #binders = [];
@@ -174,10 +217,24 @@ export class Stage {
   }
 
   /**
+   * Set the active layer group.
+   *
+   * @param {number} index The layer group index.
+   */
+  setActiveLayerGroup(index) {
+    if (typeof this.getLayerGroup(index) !== 'undefined') {
+      this.#activeLayerGroupIndex = index;
+    } else {
+      logger.warn('No layer group to set as active with index: ' +
+        index);
+    }
+  }
+
+  /**
    * Get the view layers associated to a data id.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The layers.
+   * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataId(dataId) {
     let res = [];
@@ -191,7 +248,7 @@ export class Stage {
    * Get the draw layers associated to a data id.
    *
    * @param {string} dataId The data id.
-   * @returns {Array} The layers.
+   * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataId(dataId) {
     let res = [];
@@ -210,6 +267,7 @@ export class Stage {
   addLayerGroup(htmlElement) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
     const layerGroup = new LayerGroup(htmlElement);
+    layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;
     if (isBound) {
@@ -378,6 +436,8 @@ export class Stage {
    * @param {boolean} flag True to enable smoothing.
    */
   setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+    // set for existing layer groups
     for (let i = 0; i < this.#layerGroups.length; ++i) {
       this.#layerGroups[i].setImageSmoothing(flag);
     }

@@ -268,18 +268,24 @@ class DefaultTextEncoder {
  * DICOM writer.
  *
  * @example
+ * // add link to html
+ * const link = document.createElement("a");
+ * link.appendChild(document.createTextNode("download"));
+ * const div = document.getElementById("dwv");
+ * div.appendChild(link);
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   const parser = new DicomParser();
+ *   const parser = new dwv.DicomParser();
  *   parser.parse(event.target.response);
- *   // create writer with parser data elements
- *   const writer = new DicomWriter(parser.getDicomElements());
- *   // create modified buffer and put it in a Blol
- *   const blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *   // example download link
- *   const element = document.getElementById("download");
- *   element.href = URL.createObjectURL(blob);
- *   element.download = "anonym.dcm";
+ *   // create writer
+ *   const writer = new dwv.DicomWriter();
+ *   // get buffer using default rules
+ *   const dicomBuffer = writer.getBuffer(parser.getDicomElements());
+ *   // create blob
+ *   const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+ *   // add blob to download link
+ *   link.href = URL.createObjectURL(blob);
+ *   link.download = "anonym.dcm";
  * };
  * // DICOM file request
  * const request = new XMLHttpRequest();

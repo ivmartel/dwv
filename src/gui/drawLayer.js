@@ -93,7 +93,7 @@ export class DrawLayer {
    *
    * @type {object}
    */
-  #drawController = null;
+  #drawController;
 
   /**
    * The plane helper.
@@ -131,7 +131,7 @@ export class DrawLayer {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
@@ -452,6 +452,7 @@ export class DrawLayer {
       y: this.#konvaStage.scale().y / this.#fitScale.y
     };
     // update fit scale
+    const previousFitScale = this.#fitScale;
     this.#fitScale = {
       x: fitScale1D * this.#baseSpacing.x,
       y: fitScale1D * this.#baseSpacing.y
@@ -467,6 +468,11 @@ export class DrawLayer {
       x: fitOffset.x / this.#fitScale.x,
       y: fitOffset.y / this.#fitScale.y
     };
+    this.#flipOffset = {
+      x: this.#flipOffset.x * previousFitScale.x / this.#fitScale.x,
+      y: this.#flipOffset.y * previousFitScale.y / this.#fitScale.y
+    };
+
     this.#konvaStage.offset({
       x: this.#viewOffset.x +
         this.#baseOffset.x +
@@ -524,7 +530,9 @@ export class DrawLayer {
    *  DeleteCommand has been executed.
    */
   deleteDraw(id, exeCallback) {
-    this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
+    if (typeof this.#drawController !== 'undefined') {
+      this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
+    }
   }
 
   /**
@@ -534,7 +542,23 @@ export class DrawLayer {
    *  DeleteCommand has been executed.
    */
   deleteDraws(exeCallback) {
-    this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
+    if (typeof this.#drawController !== 'undefined') {
+      this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
+    }
+  }
+
+  /**
+   * Get the total number of draws of this layer
+   * (at all positions).
+   *
+   * @returns {number|undefined} The total number of draws.
+   */
+  getNumberOfDraws() {
+    let res;
+    if (typeof this.#drawController !== 'undefined') {
+      res = this.#drawController.getNumberOfDraws();
+    }
+    return res;
   }
 
   /**

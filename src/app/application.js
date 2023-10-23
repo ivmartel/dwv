@@ -1,6 +1,5 @@
 import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
-import {luts} from '../image/luts';
 import {
   getMatrixFromName,
   getOrientationStringLPS
@@ -8,7 +7,10 @@ import {
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
 import {Style} from '../gui/style';
-import {getViewOrientation} from '../gui/layerGroup';
+import {
+  getViewOrientation,
+  getLayerDetailsFromLayerDivId
+} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
 import {State} from '../io/state';
 import {logger} from '../utils/logger';
@@ -18,7 +20,7 @@ import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
 import {OverlayData} from '../gui/overlayData';
-import {toolList, toolOptions} from '../tools';
+import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 
 // doc imports
@@ -27,7 +29,6 @@ import {LayerGroup} from '../gui/layerGroup';
 import {ViewLayer} from '../gui/viewLayer';
 import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
-import {ColourMap} from '../image/luts';
 import {Matrix33} from '../math/matrix';
 /* eslint-enable no-unused-vars */
 
@@ -50,9 +51,9 @@ export class ViewConfig {
    */
   orientation;
   /**
-   * Optional view colour map.
+   * Optional view colour map name.
    *
-   * @type {ColourMap|undefined}
+   * @type {string|undefined}
    */
   colourMap;
   /**
@@ -61,6 +62,18 @@ export class ViewConfig {
    * @type {number|undefined}
    */
   opacity;
+  /**
+   * Optional layer window center.
+   *
+   * @type {number|undefined}
+   */
+  windowCenter;
+  /**
+   * Optional layer window width.
+   *
+   * @type {number|undefined}
+   */
+  windowWidth;
 
   /**
    * @param {string} divId The associated HTML div id.
@@ -157,9 +170,9 @@ export class AppOptions {
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new AppOptions(viewConfigs);
+ * const options = new dwv.AppOptions(viewConfigs);
  * app.init(options);
  * // load dicom data
  * app.loadURLs([
@@ -223,7 +236,7 @@ export class App {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
@@ -408,6 +421,15 @@ export class App {
   }
 
   /**
+   * Set the active layer group.
+   *
+   * @param {number} index The layer group index.
+   */
+  setActiveLayerGroup(index) {
+    this.#stage.setActiveLayerGroup(index);
+  }
+
+  /**
    * Get the view layers associated to a data id.
    * The layer are available after the first loaded item.
    *
@@ -479,9 +501,9 @@ export class App {
    * // create the dwv app
    * const app = new dwv.App();
    * // initialise
-   * const viewConfig0 = new ViewConfig('layerGroup0');
+   * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
    * const viewConfigs = {'*': [viewConfig0]};
-   * const options = new AppOptions(viewConfigs);
+   * const options = new dwv.AppOptions(viewConfigs);
    * options.viewOnFirstLoadItem = false;
    * app.init(options);
    * // render button
@@ -527,10 +549,15 @@ export class App {
       const keys = Object.keys(this.#options.tools);
       for (let t = 0; t < keys.length; ++t) {
         const toolName = keys[t];
-        // find the tool in the Tools list
-        if (typeof toolList[toolName] !== 'undefined') {
+        // find the tool in the default tool list
+        let toolConstructor = defaultToolList[toolName];
+        // or use external one
+        if (typeof toolConstructor === 'undefined') {
+          toolConstructor = toolList[toolName];
+        }
+        if (typeof toolConstructor !== 'undefined') {
           // create tool instance
-          appToolList[toolName] = new toolList[toolName](this);
+          appToolList[toolName] = new toolConstructor(this);
           // register listeners
           if (typeof appToolList[toolName].addEventListener !== 'undefined') {
             const names = appToolList[toolName].getEventNames();
@@ -656,8 +683,8 @@ export class App {
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
-   * @fires App#loaderror
-   * @fires App#loadabort
+   * @fires App#error
+   * @fires App#abort
    * @function
    */
   loadFiles = (files) => {
@@ -680,8 +707,8 @@ export class App {
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
-   * @fires App#loaderror
-   * @fires App#loadabort
+   * @fires App#error
+   * @fires App#abort
    * @function
    */
   loadURLs = (urls, options) => {
@@ -730,8 +757,8 @@ export class App {
    * @fires App#loadprogress
    * @fires App#loaditem
    * @fires App#loadend
-   * @fires App#loaderror
-   * @fires App#loadabort
+   * @fires App#error
+   * @fires App#abort
    * @function
    */
   loadImageObject = (data) => {
@@ -776,12 +803,13 @@ export class App {
 
   /**
    * Get the layer group configuration from a data id.
-   * Defaults to div id 'layerGroup' if no association object has been set.
    *
    * @param {string} dataId The data id.
+   * @param {boolean} [excludeStarConfig] Exclude the star config
+   *  (default to false).
    * @returns {ViewConfig[]} The list of associated configs.
    */
-  #getViewConfigs(dataId) {
+  getViewConfigs(dataId, excludeStarConfig) {
     // check options
     if (this.#options.dataViewConfigs === null ||
       typeof this.#options.dataViewConfigs === 'undefined') {
@@ -790,10 +818,28 @@ export class App {
     let configs = [];
     if (typeof this.#options.dataViewConfigs[dataId] !== 'undefined') {
       configs = this.#options.dataViewConfigs[dataId];
-    } else if (typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
+    } else if (!excludeStarConfig &&
+      typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
       configs = this.#options.dataViewConfigs['*'];
     }
     return configs;
+  }
+
+  /**
+   * Get the layer group configuration for a data id and group
+   * div id.
+   *
+   * @param {string} dataId The data id.
+   * @param {string} groupDivId The layer group div id.
+   * @param {boolean} [excludeStarConfig] Exclude the star config
+   *  (default to false).
+   * @returns {ViewConfig|undefined} The associated config.
+   */
+  getViewConfig(dataId, groupDivId, excludeStarConfig) {
+    const configs = this.getViewConfigs(dataId, excludeStarConfig);
+    return configs.find(function (item) {
+      return item.divId === groupDivId;
+    });
   }
 
   /**
@@ -903,7 +949,7 @@ export class App {
   }
 
   /**
-   * Update a data view config.
+   * Update an existing data view config.
    * Removes and re-creates the layer if found.
    *
    * @param {string} dataId The data id.
@@ -912,9 +958,11 @@ export class App {
    */
   updateDataViewConfig(dataId, divId, config) {
     const configs = this.#options.dataViewConfigs;
+    // check data id
     if (typeof configs[dataId] === 'undefined') {
       throw new Error('No config for dataId: ' + dataId);
     }
+    // check div id
     const equalDivId = function (item) {
       return item.divId === divId;
     };
@@ -923,11 +971,14 @@ export class App {
       throw new Error('No config for dataId: ' +
         dataId + ' and divId: ' + divId);
     }
-
-    configs[dataId][itemIndex] = config;
+    // update config
+    const configToUpdate = configs[dataId][itemIndex];
+    for (const prop in config) {
+      configToUpdate[prop] = config[prop];
+    }
 
     // remove previous layers
-    const lg = this.#stage.getLayerGroupByDivId(config.divId);
+    const lg = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
     if (typeof lg !== 'undefined') {
       const vls = lg.getViewLayersByDataId(dataId);
       if (vls.length === 1) {
@@ -944,7 +995,7 @@ export class App {
     }
 
     // render (will create layer)
-    this.render(dataId, [config]);
+    this.render(dataId, [configToUpdate]);
   }
 
   /**
@@ -1019,7 +1070,7 @@ export class App {
 
     // use options list if non provided
     if (typeof viewConfigs === 'undefined') {
-      viewConfigs = this.#getViewConfigs(dataId);
+      viewConfigs = this.getViewConfigs(dataId);
     }
 
     // nothing to do if no view config
@@ -1239,7 +1290,7 @@ export class App {
     const viewController =
       this.#stage.getActiveLayerGroup()
         .getActiveViewLayer().getViewController();
-    viewController.setColourMapFromName(name);
+    viewController.setColourMap(name);
   }
 
   /**
@@ -1474,7 +1525,7 @@ export class App {
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
-      this.#getViewConfigs(event.dataid).length !== 0 &&
+      this.getViewConfigs(event.dataid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
       this.render(event.dataid);
     }
@@ -1528,7 +1579,7 @@ export class App {
     /**
      * Load error event.
      *
-     * @event App#loaderror
+     * @event App#error
      * @type {object}
      * @property {string} type The event type: error.
      * @property {string} loadType The load type: image or state.
@@ -1537,7 +1588,9 @@ export class App {
      * @property {object} error The error.
      * @property {object} target The event target.
      */
-    event.type = 'loaderror';
+    if (typeof event.type === 'undefined') {
+      event.type = 'error';
+    }
     this.#fireEvent(event);
   };
 
@@ -1550,14 +1603,16 @@ export class App {
     /**
      * Load abort event.
      *
-     * @event App#loadabort
+     * @event App#abort
      * @type {object}
      * @property {string} type The event type: abort.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'loadabort';
+    if (typeof event.type === 'undefined') {
+      event.type = 'abort';
+    }
     this.#fireEvent(event);
   };
 
@@ -1582,6 +1637,32 @@ export class App {
       group.addEventListener('drawcreate', this.#fireEvent);
       group.addEventListener('drawdelete', this.#fireEvent);
     }
+    // updata data view config
+    group.addEventListener('wlchange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.windowCenter = event.value[0];
+        config.windowWidth = event.value[1];
+      }
+    });
+    group.addEventListener('opacitychange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.opacity = event.value[0];
+      }
+    });
+    group.addEventListener('colourmapchange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.colourMap = event.value[0];
+      }
+    });
   }
 
   /**
@@ -1633,19 +1714,6 @@ export class App {
     // (the layer has not been added to the layer group yet)
     const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
 
-    // colour map
-    if (typeof viewConfig.colourMap !== 'undefined') {
-      view.setColourMap(viewConfig.colourMap);
-    } else {
-      if (!isBaseLayer) {
-        if (data.image.getMeta().Modality === 'PT') {
-          view.setColourMap(luts.hot);
-        } else {
-          view.setColourMap(luts.rainbow);
-        }
-      }
-    }
-
     // opacity
     let opacity = 1;
     if (typeof viewConfig.opacity !== 'undefined') {
@@ -1662,7 +1730,27 @@ export class App {
     const size2D = imageGeometry.getSize(viewOrientation).get2D();
     const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, opacity);
+
+    // view controller
     const viewController = viewLayer.getViewController();
+    // window/level
+    if (typeof viewConfig.windowCenter !== 'undefined' &&
+      typeof viewConfig.windowWidth !== 'undefined') {
+      viewController.setWindowLevel(
+        viewConfig.windowCenter, viewConfig.windowWidth);
+    }
+    // colour map
+    if (typeof viewConfig.colourMap !== 'undefined') {
+      viewController.setColourMap(viewConfig.colourMap);
+    } else {
+      if (!isBaseLayer) {
+        if (data.image.getMeta().Modality === 'PT') {
+          viewController.setColourMap('hot');
+        } else {
+          viewController.setColourMap('rainbow');
+        }
+      }
+    }
 
     // listen to controller events
     if (data.image.getMeta().Modality === 'SEG') {

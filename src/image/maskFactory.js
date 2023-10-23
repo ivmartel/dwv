@@ -110,79 +110,79 @@ function checkTag(dataElements, tagDefinition) {
 const RequiredDicomSegTags = [
   {
     name: 'TransferSyntaxUID',
-    tag: 'x00020010',
+    tag: '00020010',
     type: '1',
     enum: ['1.2.840.10008.1.2.1']
   },
   {
     name: 'MediaStorageSOPClassUID',
-    tag: 'x00020002',
+    tag: '00020002',
     type: '1',
     enum: ['1.2.840.10008.5.1.4.1.1.66.4']
   },
   {
     name: 'SOPClassUID',
-    tag: 'x00020002',
+    tag: '00020002',
     type: '1',
     enum: ['1.2.840.10008.5.1.4.1.1.66.4']
   },
   {
     name: 'Modality',
-    tag: 'x00080060',
+    tag: '00080060',
     type: '1',
     enum: ['SEG']
   },
   {
     name: 'SegmentationType',
-    tag: 'x00620001',
+    tag: '00620001',
     type: '1',
     enum: ['BINARY']
   },
   {
     name: 'DimensionOrganizationType',
-    tag: 'x00209311',
+    tag: '00209311',
     type: '3',
     enum: ['3D']
   },
   {
     name: 'ImageType',
-    tag: 'x00080008',
+    tag: '00080008',
     type: '1',
     enum: [['DERIVED', 'PRIMARY']]
   },
   {
     name: 'SamplesPerPixel',
-    tag: 'x00280002',
+    tag: '00280002',
     type: '1',
     enum: [1]
   },
   {
     name: 'PhotometricInterpretation',
-    tag: 'x00280004',
+    tag: '00280004',
     type: '1',
     enum: ['MONOCHROME2']
   },
   {
     name: 'PixelRepresentation',
-    tag: 'x00280103',
+    tag: '00280103',
     type: '1',
     enum: [0]
   },
   {
     name: 'BitsAllocated',
-    tag: 'x00280100',
+    tag: '00280100',
     type: '1',
     enum: [1]
   },
   {
     name: 'BitsStored',
-    tag: 'x00280101',
+    tag: '00280101',
     type: '1',
     enum: [1]
   },
   {
     name: 'HighBit',
-    tag: 'x00280102',
+    tag: '00280102',
     type: '1',
     enum: [0]
   },
@@ -193,7 +193,7 @@ const RequiredDicomSegTags = [
  *
  * @returns {object} The default tags.
  */
-function getDefaultDicomSegJson() {
+export function getDefaultDicomSegJson() {
   const tags = {};
   for (let i = 0; i < RequiredDicomSegTags.length; ++i) {
     const reqTag = RequiredDicomSegTags[i];
@@ -881,26 +881,34 @@ export class MaskFactory {
     }
     // meta information
     const meta = getDefaultDicomSegJson();
+    const safeGet = function (key) {
+      let res;
+      const element = dataElements[key];
+      if (typeof element !== 'undefined') {
+        res = element.value[0];
+      }
+      return res;
+    };
     // Study
-    meta.StudyDate = dataElements['00080020'].value[0];
-    meta.StudyTime = dataElements['00080030'].value[0];
-    meta.StudyInstanceUID = dataElements['0020000D'].value[0];
-    meta.StudyID = dataElements['00200010'].value[0];
+    meta.StudyDate = safeGet('00080020');
+    meta.StudyTime = safeGet('00080030');
+    meta.StudyInstanceUID = safeGet('0020000D');
+    meta.StudyID = safeGet('00200010');
     // Series
     meta.SeriesInstanceUID = dataElements['0020000E'].value[0];
-    meta.SeriesNumber = dataElements['00200011'].value[0];
+    meta.SeriesNumber = safeGet('00200011');
     // ReferringPhysicianName
-    meta.ReferringPhysicianName = dataElements['00080090'].value[0];
+    meta.ReferringPhysicianName = safeGet('00080090');
     // patient info
-    meta.PatientName = dataElements['00100010'].value[0];
-    meta.PatientID = dataElements['00100020'].value[0];
-    meta.PatientBirthDate = dataElements['00100030'].value[0];
-    meta.PatientSex = dataElements['00100040'].value[0];
+    meta.PatientName = safeGet('00100010');
+    meta.PatientID = safeGet('00100020');
+    meta.PatientBirthDate = safeGet('00100030');
+    meta.PatientSex = safeGet('00100040');
     // Enhanced General Equipment Module
-    meta.Manufacturer = dataElements['00080070'].value[0];
-    meta.ManufacturerModelName = dataElements['00081090'].value[0];
-    meta.DeviceSerialNumber = dataElements['00181000'].value[0];
-    meta.SoftwareVersions = dataElements['00181020'].value[0];
+    meta.Manufacturer = safeGet('00080070');
+    meta.ManufacturerModelName = safeGet('00081090');
+    meta.DeviceSerialNumber = safeGet('00181000');
+    meta.SoftwareVersions = safeGet('00181020');
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
     meta.DimensionIndexSequence = dimension.indices;

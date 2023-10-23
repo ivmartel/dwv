@@ -1,4 +1,3 @@
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {logger} from '../utils/logger';
 import {getShapeDisplayName, ChangeGroupCommand} from './drawCommands';
 import {validateAnchorPosition} from './draw';
@@ -8,6 +7,9 @@ import Konva from 'konva';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {ViewController} from '../app/viewController';
+import {DrawLayer} from '../gui/drawLayer';
+import {Style} from '../gui/style';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -16,8 +18,8 @@ import {App} from '../app/application';
  * @param {number} x The X position.
  * @param {number} y The Y position.
  * @param {string} id The shape id.
- * @param {object} style The application style.
- * @returns {object} The default anchor shape.
+ * @param {Style} style The application style.
+ * @returns {Konva.Ellipse} The default anchor shape.
  */
 export function getDefaultAnchor(x, y, id, style) {
   const radius = style.applyZoomScale(3);
@@ -79,14 +81,21 @@ export class ShapeEditor {
   /**
    * Edited shape.
    *
-   * @type {object}
+   * @type {Konva.Shape}
    */
   #shape = null;
 
   /**
-   * Edited view controller. Used for quantification update.
+   * Associated draw layer. Used to bound anchor move.
    *
-   * @type {object}
+   * @type {DrawLayer}
+   */
+  #drawLayer;
+
+  /**
+   * Associated view controller. Used for quantification update.
+   *
+   * @type {ViewController}
    */
   #viewController = null;
 
@@ -121,10 +130,14 @@ export class ShapeEditor {
   /**
    * Set the shape to edit.
    *
-   * @param {object} inshape The shape to edit.
+   * @param {Konva.Shape} inshape The shape to edit.
+   * @param {DrawLayer} drawLayer The associated draw layer.
+   * @param {ViewController} viewController The associated view controller.
    */
-  setShape(inshape) {
+  setShape(inshape, drawLayer, viewController) {
     this.#shape = inshape;
+    this.#drawLayer = drawLayer;
+    this.#viewController = viewController;
     if (this.#shape) {
       // remove old anchors
       this.#removeAnchors();
@@ -149,18 +162,9 @@ export class ShapeEditor {
   }
 
   /**
-   * Set the associated image.
-   *
-   * @param {object} vc The associated view controller.
-   */
-  setViewController(vc) {
-    this.#viewController = vc;
-  }
-
-  /**
    * Get the edited shape.
    *
-   * @returns {object} The edited shape.
+   * @returns {Konva.Shape} The edited shape.
    */
   getShape() {
     return this.#shape;
@@ -178,7 +182,7 @@ export class ShapeEditor {
   /**
    * Set the draw event callback.
    *
-   * @param {object} callback The callback.
+   * @param {eventFn} callback The callback.
    */
   setDrawEventCallback(callback) {
     this.#drawEventCallback = callback;
@@ -215,6 +219,7 @@ export class ShapeEditor {
    */
   reset() {
     this.#shape = undefined;
+    this.#drawLayer = undefined;
     this.#viewController = undefined;
   }
 
@@ -306,7 +311,7 @@ export class ShapeEditor {
   /**
    * Get a simple clone of the input anchor.
    *
-   * @param {object} anchor The anchor to clone.
+   * @param {Konva.Shape} anchor The anchor to clone.
    * @returns {object} A clone of the input anchor.
    */
   #getClone(anchor) {
@@ -335,7 +340,7 @@ export class ShapeEditor {
   /**
    * Set the anchor on listeners.
    *
-   * @param {object} anchor The anchor to set on.
+   * @param {Konva.Ellipse} anchor The anchor to set on.
    */
   #setAnchorOn(anchor) {
     let startAnchor = null;
@@ -346,6 +351,9 @@ export class ShapeEditor {
     // drag start listener
     anchor.on('dragstart.edit', (event) => {
       const anchor = event.target;
+      if (!(anchor instanceof Konva.Shape)) {
+        return;
+      }
       startAnchor = this.#getClone(anchor);
       // prevent bubbling upwards
       event.cancelBubble = true;
@@ -353,12 +361,11 @@ export class ShapeEditor {
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
       const anchor = event.target;
-      const layerDetails = getLayerDetailsFromEvent(event.evt);
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (!(anchor instanceof Konva.Shape)) {
+        return;
+      }
       // validate the anchor position
-      validateAnchorPosition(drawLayer.getBaseSize(), anchor);
+      validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
       // update shape
       this.#currentFactory.update(
         anchor, this.#app.getStyle(), this.#viewController);
@@ -374,10 +381,9 @@ export class ShapeEditor {
     // drag end listener
     anchor.on('dragend.edit', (event) => {
       const anchor = event.target;
-      const layerDetails = getLayerDetailsFromEvent(event.evt);
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (!(anchor instanceof Konva.Shape)) {
+        return;
+      }
       const endAnchor = this.#getClone(anchor);
       // store the change command
       const chgcmd = new ChangeGroupCommand(
@@ -385,7 +391,7 @@ export class ShapeEditor {
         this.#currentFactory,
         startAnchor,
         endAnchor,
-        drawLayer,
+        this.#drawLayer,
         this.#viewController,
         this.#app.getStyle()
       );
@@ -406,6 +412,9 @@ export class ShapeEditor {
     // mouse over styling
     anchor.on('mouseover.edit', (event) => {
       const anchor = event.target;
+      if (!(anchor instanceof Konva.Shape)) {
+        return;
+      }
       // style is handled by the group
       anchor.stroke('#ddd');
       if (anchor.getLayer()) {
@@ -417,6 +426,9 @@ export class ShapeEditor {
     // mouse out styling
     anchor.on('mouseout.edit', (event) => {
       const anchor = event.target;
+      if (!(anchor instanceof Konva.Shape)) {
+        return;
+      }
       // style is handled by the group
       anchor.stroke('#999');
       if (anchor.getLayer()) {
@@ -430,7 +442,7 @@ export class ShapeEditor {
   /**
    * Set the anchor off listeners.
    *
-   * @param {object} anchor The anchor to set off.
+   * @param {Konva.Ellipse} anchor The anchor to set off.
    */
   #setAnchorOff(anchor) {
     anchor.off('dragstart.edit');

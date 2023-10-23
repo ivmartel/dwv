@@ -69,6 +69,9 @@ QUnit.test('Test Rectangle quantify.', function (assert) {
     },
     getImageRegionValues: function () {
       return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];
+    },
+    getPixelUnit: function () {
+      return '';
     }
   };
   const theoQuant0 = {

@@ -9,15 +9,21 @@ import Konva from 'konva';
 export declare function addTagsToDictionary(group: string, tags: object): void;
 
 /**
+ * List of ViewConfigs indexed by dataIds.
+ *
+ * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
+ */
+/**
  * Main application class.
  *
  * @example
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * app.init({
- *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
- * });
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * app.init(options);
  * // load dicom data
  * app.loadURLs([
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
@@ -104,9 +110,9 @@ export declare class App {
     /**
      * Get the toolbox controller.
      *
-     * @returns {object} The controller.
+     * @returns {ToolboxController} The controller.
      */
-    getToolboxController(): object;
+    getToolboxController(): ToolboxController;
     /**
      * Get the active layer group.
      * The layer is available after the first loaded item.
@@ -115,21 +121,27 @@ export declare class App {
      */
     getActiveLayerGroup(): LayerGroup;
     /**
+     * Set the active layer group.
+     *
+     * @param {number} index The layer group index.
+     */
+    setActiveLayerGroup(index: number): void;
+    /**
      * Get the view layers associated to a data id.
      * The layer are available after the first loaded item.
      *
      * @param {string} dataId The data id.
-     * @returns {Array} The layers.
+     * @returns {ViewLayer[]} The layers.
      */
-    getViewLayersByDataId(dataId: string): any[];
+    getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
      * Get the draw layers associated to a data id.
      * The layer are available after the first loaded item.
      *
      * @param {string} dataId The data id.
-     * @returns {Array} The layers.
+     * @returns {DrawLayer[]} The layers.
      */
-    getDrawLayersByDataId(dataId: string): any[];
+    getDrawLayersByDataId(dataId: string): DrawLayer[];
     /**
      * Get a layer group by div id.
      * The layer is available after the first loaded item.
@@ -155,34 +167,22 @@ export declare class App {
      *
      * @param {object} cmd The command to add.
      * @fires UndoStack#undoadd
+     * @function
      */
     addToUndoStack: (cmd: object) => void;
     /**
      * Initialise the application.
      *
-     * @param {object} opt The application option with:
-     * - `dataViewConfigs`: dataId indexed object containing the data view
-     *   configurations in the form of a list of objects containing:
-     *   - divId: the HTML div id
-     *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
-     *     string (default undefined keeps the original slice order)
-     * - `binders`: array of layerGroup binders
-     * - `tools`: tool name indexed object containing individual tool
-     *   configurations in the form of a list of objects containing:
-     *   - options: array of tool options
-     * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
-     *   after the first loaded data or not
-     * - `defaultCharacterSet`: the default chraracter set string used for DICOM
-     *   parsing
-     * - `overlayConfig`: list of tags / properties used as overlay information.
+     * @param {AppOptions} opt The application options
      * @example
      * // create the dwv app
      * const app = new dwv.App();
      * // initialise
-     * app.init({
-     *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
-     *   viewOnFirstLoadItem: false
-     * });
+     * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+     * const viewConfigs = {'*': [viewConfig0]};
+     * const options = new dwv.AppOptions(viewConfigs);
+     * options.viewOnFirstLoadItem = false;
+     * app.init(options);
      * // render button
      * const button = document.createElement('button');
      * button.id = 'render';
@@ -202,7 +202,7 @@ export declare class App {
      *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
      * ]);
      */
-    init(opt: object): void;
+    init(opt: AppOptions): void;
     /**
      * Reset the application.
      */
@@ -215,34 +215,35 @@ export declare class App {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Load a list of files. Can be image files or a state file.
      *
-     * @param {FileList} files The list of files to load.
+     * @param {File[]} files The list of files to load.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
+     * @function
      */
-    loadFiles: (files: FileList) => void;
+    loadFiles: (files: File[]) => void;
     /**
      * Load a list of URLs. Can be image files or a state file.
      *
-     * @param {Array} urls The list of urls to load.
+     * @param {string[]} urls The list of urls to load.
      * @param {object} [options] The options object, can contain:
      *  - requestHeaders: an array of {name, value} to use as request headers
      *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
@@ -251,15 +252,17 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
+     * @function
      */
-    loadURLs: (urls: any[], options?: object) => void;
+    loadURLs: (urls: string[], options?: object) => void;
     /**
      * Load from an input uri.
      *
      * @param {string} uri The input uri, for example: 'window.location.href'.
      * @param {object} [options] Optional url request options.
+     * @function
      */
     loadFromUri: (uri: string, options?: object) => void;
     /**
@@ -271,8 +274,9 @@ export declare class App {
      * @fires App#loadprogress
      * @fires App#loaditem
      * @fires App#loadend
-     * @fires App#loaderror
-     * @fires App#loadabort
+     * @fires App#error
+     * @fires App#abort
+     * @function
      */
     loadImageObject: (data: any[]) => void;
     /**
@@ -295,41 +299,66 @@ export declare class App {
      */
     setImageSmoothing(flag: boolean): void;
     /**
+     * Get the layer group configuration from a data id.
+     *
+     * @param {string} dataId The data id.
+     * @param {boolean} [excludeStarConfig] Exclude the star config
+     *  (default to false).
+     * @returns {ViewConfig[]} The list of associated configs.
+     */
+    getViewConfigs(dataId: string, excludeStarConfig?: boolean): ViewConfig[];
+    /**
+     * Get the layer group configuration for a data id and group
+     * div id.
+     *
+     * @param {string} dataId The data id.
+     * @param {string} groupDivId The layer group div id.
+     * @param {boolean} [excludeStarConfig] Exclude the star config
+     *  (default to false).
+     * @returns {ViewConfig|undefined} The associated config.
+     */
+    getViewConfig(dataId: string, groupDivId: string, excludeStarConfig?: boolean): ViewConfig | undefined;
+    /**
      * Get the data view config.
      * Carefull, returns a reference, do not modify without resetting.
      *
-     * @returns {object} The configuration list.
+     * @returns {Object<string, ViewConfig[]>} The configuration list.
      */
-    getDataViewConfig(): object;
+    getDataViewConfigs(): {
+        [x: string]: ViewConfig[];
+    };
     /**
-     * Set the data view configuration (see the init options for details).
+     * Set the data view configuration.
+     * Resets the stage and recreates all the views.
      *
-     * @param {object} configs The configuration list.
+     * @param {Object<string, ViewConfig[]>} configs The configuration list.
      */
-    setDataViewConfig(configs: object): void;
+    setDataViewConfigs(configs: {
+        [x: string]: ViewConfig[];
+    }): void;
     /**
      * Add a data view config.
      *
      * @param {string} dataId The data id.
-     * @param {object} config The view configuration.
+     * @param {ViewConfig} config The view configuration.
      */
-    addDataViewConfig(dataId: string, config: object): void;
+    addDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
      * Remove a data view config.
      *
      * @param {string} dataId The data id.
-     * @param {object} config The view configuration.
+     * @param {ViewConfig} config The view configuration.
      */
-    removeDataViewConfig(dataId: string, config: object): void;
+    removeDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
-     * Update a data view config.
+     * Update an existing data view config.
      * Removes and re-creates the layer if found.
      *
      * @param {string} dataId The data id.
      * @param {string} divId The div id.
-     * @param {object} config The view configuration.
+     * @param {ViewConfig} config The view configuration.
      */
-    updateDataViewConfig(dataId: string, divId: string, config: object): void;
+    updateDataViewConfig(dataId: string, divId: string, config: ViewConfig): void;
     /**
      * Set the layer groups binders.
      *
@@ -340,9 +369,9 @@ export declare class App {
      * Render the current data.
      *
      * @param {string} dataId The data id to render.
-     * @param {Array} [viewConfigs] The list of configs to render.
+     * @param {ViewConfig[]} [viewConfigs] The list of configs to render.
      */
-    render(dataId: string, viewConfigs?: any[]): void;
+    render(dataId: string, viewConfigs?: ViewConfig[]): void;
     /**
      * Zoom to the layers.
      *
@@ -387,6 +416,8 @@ export declare class App {
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
      * Can be connected to a window 'resize' event.
+     *
+     * @function
      */
     onResize: () => void;
     /**
@@ -394,6 +425,7 @@ export declare class App {
      *
      * @param {KeyboardEvent} event The key down event.
      * @fires App#keydown
+     * @function
      */
     onKeydown: (event: KeyboardEvent) => void;
     /**
@@ -408,6 +440,7 @@ export declare class App {
      * @param {KeyboardEvent} event The key down event.
      * @fires UndoStack#undo
      * @fires UndoStack#redo
+     * @function
      */
     defaultOnKeydown: (event: KeyboardEvent) => void;
     /**
@@ -421,9 +454,9 @@ export declare class App {
     /**
      * Set the colour map.
      *
-     * @param {string} colourMap The colour map name.
+     * @param {string} name The colour map name.
      */
-    setColourMap(colourMap: string): void;
+    setColourMap(name: string): void;
     /**
      * Set the window/level preset.
      *
@@ -483,6 +516,62 @@ export declare class App {
 }
 
 /**
+ * Application options.
+ */
+export declare class AppOptions {
+    /**
+     * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
+     *   indexed object containing the data view configurations.
+     */
+    constructor(dataViewConfigs?: {
+        [x: string]: ViewConfig[];
+    });
+    /**
+     * DataId indexed object containing the data view configurations.
+     *
+     * @type {Object<string, ViewConfig[]>|undefined}
+     */
+    dataViewConfigs: {
+        [x: string]: ViewConfig[];
+    } | undefined;
+    /**
+     * Tool name indexed object containing individual tool configurations.
+     *
+     * @type {Object<string, ToolConfig>|undefined}
+     */
+    tools: {
+        [x: string]: ToolConfig;
+    } | undefined;
+    /**
+     * Optional array of layerGroup binder names.
+     *
+     * @type {string[]|undefined}
+     */
+    binders: string[] | undefined;
+    /**
+     * Optional boolean flag to trigger the first data render
+     *   after the first loaded data or not. Defaults to true;
+     *
+     * @type {boolean|undefined}
+     */
+    viewOnFirstLoadItem: boolean | undefined;
+    /**
+     * Optional default chraracter set string used for DICOM parsing if
+     * not passed in DICOM file.
+     * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+     *
+     * @type {string|undefined}
+     */
+    defaultCharacterSet: string | undefined;
+    /**
+     * Optional overlay config.
+     *
+     * @type {object|undefined}
+     */
+    overlayConfig: object | undefined;
+}
+
+/**
  * Build a multipart message.
  * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
  * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
@@ -493,6 +582,37 @@ export declare class App {
  * @returns {Uint8Array} The full multipart message.
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+/**
+ * Colour map: red, green and blue components
+ * to associate with intensity values.
+ */
+export declare class ColourMap {
+    /**
+     * @param {number[]} red Red component.
+     * @param {number[]} green Green component.
+     * @param {number[]} blue Blue component.
+     */
+    constructor(red: number[], green: number[], blue: number[]);
+    /**
+     * Red component: 256 values in the [0, 255] range.
+     *
+     * @type {number[]}
+     */
+    red: number[];
+    /**
+     * Green component: 256 values in the [0, 255] range.
+     *
+     * @type {number[]}
+     */
+    green: number[];
+    /**
+     * Blue component: 256 values in the [0, 255] range.
+     *
+     * @type {number[]}
+     */
+    blue: number[];
+}
 
 /**
  * Create an Image from DICOM elements.
@@ -530,6 +650,68 @@ export declare namespace customUI {
 }
 
 /**
+ * DICOM data element.
+ */
+export declare class DataElement {
+    /**
+     * @param {string} vr The element VR (Value Representation).
+     */
+    constructor(vr: string);
+    /**
+     * The element Value Representation.
+     *
+     * @type {string}
+     */
+    vr: string;
+    /**
+     * The element value.
+     *
+     * @type {Array}
+     */
+    value: any[];
+    /**
+     * The element dicom tag.
+     *
+     * @type {Tag}
+     */
+    tag: Tag;
+    /**
+     * The element Value Length.
+     *
+     * @type {number}
+     */
+    vl: number;
+    /**
+     * Flag to know if defined or undefined sequence length.
+     *
+     * @type {boolean}
+     */
+    undefinedLength: boolean;
+    /**
+     * The element start offset.
+     *
+     * @type {number}
+     */
+    startOffset: number;
+    /**
+     * The element end offset.
+     *
+     * @type {number}
+     */
+    endOffset: number;
+    /**
+     * The sequence items.
+     *
+     * @type {Array}
+     */
+    items: any[];
+}
+
+declare type DataElements = {
+    [x: string]: DataElement;
+};
+
+/**
  * Decoder scripts to be passed to web workers for image decoding.
  */
 export declare const decoderScripts: {
@@ -554,7 +736,7 @@ export declare const defaultPresets: {
 };
 
 export declare namespace defaults {
-    const labelText: {
+    let labelText: {
         [x: string]: {
             [x: string]: string;
         };
@@ -607,14 +789,16 @@ export declare class DicomParser {
      */
     setDecoderCharacterSet(characterSet: string): void;
     /**
-     * Get the raw DICOM data elements.
+     * Get the DICOM data elements.
      *
-     * @returns {object} The raw DICOM elements.
+     * @returns {Object<string, DataElement>} The data elements.
      */
-    getDicomElements(): object;
+    getDicomElements(): {
+        [x: string]: DataElement;
+    };
     /**
      * Parse the complete DICOM file (given as input to the class).
-     * Fills in the member object 'dicomElements'.
+     * Fills in the member object 'dataElements'.
      *
      * @param {ArrayBuffer} buffer The input array buffer.
      */
@@ -625,16 +809,33 @@ export declare class DicomParser {
 /**
  * DICOM writer.
  *
- * Example usage:
- *   const parser = new DicomParser();
- *   parser.parse(this.response);
- *
- *   const writer = new DicomWriter(parser.getDicomElements());
- *   const blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *
- *   const element = document.getElementById("download");
- *   element.href = URL.createObjectURL(blob);
- *   element.download = "anonym.dcm";
+ * @example
+ * // add link to html
+ * const link = document.createElement("a");
+ * link.appendChild(document.createTextNode("download"));
+ * const div = document.getElementById("dwv");
+ * div.appendChild(link);
+ * // XMLHttpRequest onload callback
+ * const onload = function (event) {
+ *   const parser = new dwv.DicomParser();
+ *   parser.parse(event.target.response);
+ *   // create writer
+ *   const writer = new dwv.DicomWriter();
+ *   // get buffer using default rules
+ *   const dicomBuffer = writer.getBuffer(parser.getDicomElements());
+ *   // create blob
+ *   const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+ *   // add blob to download link
+ *   link.href = URL.createObjectURL(blob);
+ *   link.download = "anonym.dcm";
+ * };
+ * // DICOM file request
+ * const request = new XMLHttpRequest();
+ * const url = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm';
+ * request.open('GET', url);
+ * request.responseType = 'arraybuffer';
+ * request.onload = onload;
+ * request.send();
  */
 export declare class DicomWriter {
     /**
@@ -645,10 +846,16 @@ export declare class DicomWriter {
     setUseUnVrForPrivateSq(flag: boolean): void;
     /**
      * Set the writing rules.
+     * List of writer rules indexed by either `default`, tagName or groupName.
+     * Each DICOM element will be checked to see if a rule is applicable.
+     * First checked by tagName and then by groupName,
+     * if nothing is found the default rule is applied.
      *
-     * @param {object} rules The input rules.
+     * @param {Object<string, WriterRule>} rules The input rules.
      */
-    setRules(rules: object): void;
+    setRules(rules: {
+        [x: string]: WriterRule;
+    }): void;
     /**
      * Use a TextEncoder instead of the default text decoder.
      */
@@ -658,13 +865,157 @@ export declare class DicomWriter {
      */
     useDefaultAnonymisationRules(): void;
     /**
+     * Get the element to write according to the class rules.
+     * Priority order: tagName, groupName, default.
+     *
+     * @param {DataElement} element The element to check
+     * @returns {DataElement|null} The element to write, can be null.
+     */
+    getElementToWrite(element: DataElement): DataElement | null;
+    /**
      * Get the ArrayBuffer corresponding to input DICOM elements.
      *
-     * @param {Array} dicomElements The wrapped elements to write.
+     * @param {Object<string, DataElement>} dataElements The elements to write.
      * @returns {ArrayBuffer} The elements as a buffer.
      */
-    getBuffer(dicomElements: any[]): ArrayBuffer;
+    getBuffer(dataElements: {
+        [x: string]: DataElement;
+    }): ArrayBuffer;
     #private;
+}
+
+/**
+ * Draw controller.
+ */
+export declare class DrawController {
+    /**
+     * @param {DrawLayer} drawLayer The draw layer.
+     */
+    constructor(drawLayer: DrawLayer);
+    /**
+     * Get the current position group.
+     *
+     * @returns {Konva.Group|undefined} The Konva.Group.
+     */
+    getCurrentPosGroup(): Konva.Group | undefined;
+    /**
+     * Reset: clear the layers array.
+     */
+    reset(): void;
+    /**
+     * Get a Konva group using its id.
+     *
+     * @param {string} id The group id.
+     * @returns {object|undefined} The Konva group.
+     */
+    getGroup(id: string): object | undefined;
+    /**
+     * Activate the current draw layer.
+     *
+     * @param {Index} index The current position.
+     * @param {number} scrollIndex The scroll index.
+     */
+    activateDrawLayer(index: Index, scrollIndex: number): void;
+    /**
+     * Get a list of drawing display details.
+     *
+     * @returns {DrawDetails[]} A list of draw details.
+     */
+    getDrawDisplayDetails(): DrawDetails[];
+    /**
+     * Get a list of drawing store details. Used in state.
+     *
+     * @returns {object} A list of draw details including id, text, quant...
+     * TODO Unify with getDrawDisplayDetails?
+     */
+    getDrawStoreDetails(): object;
+    /**
+     * Set the drawings on the current stage.
+     *
+     * @param {Array} drawings An array of drawings.
+     * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+     * @param {object} cmdCallback The DrawCommand callback.
+     * @param {object} exeCallback The callback to call once the
+     *   DrawCommand has been executed.
+     */
+    setDrawings(drawings: any[], drawingsDetails: DrawDetails[], cmdCallback: object, exeCallback: object): void;
+    /**
+     * Update a drawing from its details.
+     *
+     * @param {DrawDetails} drawDetails Details of the drawing to update.
+     */
+    updateDraw(drawDetails: DrawDetails): void;
+    /**
+     * Delete a Draw from the stage.
+     *
+     * @param {Konva.Group} group The group to delete.
+     * @param {object} cmdCallback The DeleteCommand callback.
+     * @param {object} exeCallback The callback to call once the
+     *  DeleteCommand has been executed.
+     */
+    deleteDrawGroup(group: Konva.Group, cmdCallback: object, exeCallback: object): void;
+    /**
+     * Delete a Draw from the stage.
+     *
+     * @param {string} id The id of the group to delete.
+     * @param {Function} cmdCallback The DeleteCommand callback.
+     * @param {Function} exeCallback The callback to call once the
+     *  DeleteCommand has been executed.
+     * @returns {boolean} False if the group cannot be found.
+     */
+    deleteDraw(id: string, cmdCallback: Function, exeCallback: Function): boolean;
+    /**
+     * Delete all Draws from the stage.
+     *
+     * @param {Function} cmdCallback The DeleteCommand callback.
+     * @param {Function} exeCallback The callback to call once the
+     *  DeleteCommand has been executed.
+     */
+    deleteDraws(cmdCallback: Function, exeCallback: Function): void;
+    /**
+     * Get the total number of draws
+     * (at all positions).
+     *
+     * @returns {number} The total number of draws.
+     */
+    getNumberOfDraws(): number;
+    #private;
+}
+
+/**
+ * Draw details.
+ */
+export declare class DrawDetails {
+    /**
+     * The draw ID.
+     *
+     * @type {number}
+     */
+    id: number;
+    /**
+     * The draw position: an Index converted to string.
+     *
+     * @type {string}
+     */
+    position: string;
+    /**
+     * The draw type.
+     *
+     * @type {string}
+     */
+    type: string;
+    /**
+     * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+     *
+     * @type {string}
+     */
+    color: string;
+    /**
+     * The draw meta.
+     *
+     * @type {DrawMeta}
+     */
+    meta: DrawMeta;
 }
 
 /**
@@ -746,9 +1097,9 @@ export declare class DrawLayer {
      * Set the layer scale.
      *
      * @param {object} newScale The scale as {x,y}.
-     * @param {Point3D} center The scale center.
+     * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     /**
      * Set the layer offset.
      *
@@ -809,7 +1160,7 @@ export declare class DrawLayer {
      * @param {string} id The id of the group.
      * @returns {boolean} False if the group cannot be found.
      */
-    toogleGroupVisibility(id: string): boolean;
+    toggleGroupVisibility(id: string): boolean;
     /**
      * Delete a Draw from the stage.
      *
@@ -825,6 +1176,13 @@ export declare class DrawLayer {
      *  DeleteCommand has been executed.
      */
     deleteDraws(exeCallback: object): void;
+    /**
+     * Get the total number of draws of this layer
+     * (at all positions).
+     *
+     * @returns {number|undefined} The total number of draws.
+     */
+    getNumberOfDraws(): number | undefined;
     /**
      * Enable and listen to container interaction events.
      */
@@ -845,19 +1203,38 @@ export declare class DrawLayer {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     #private;
+}
+
+/**
+ * Draw meta data.
+ */
+export declare class DrawMeta {
+    /**
+     * Draw quantification.
+     *
+     * @type {object}
+     */
+    quantification: object;
+    /**
+     * Draw text expression. Can contain variables surrounded with '{}' that will
+     * be extracted from the quantification object.
+     *
+     * @type {string}
+     */
+    textExpr: string;
 }
 
 /**
@@ -912,9 +1289,9 @@ export declare class Geometry {
     /**
      * Get the object origins.
      *
-     * @returns {Array} The object origins.
+     * @returns {Point3D[]} The object origins.
      */
-    getOrigins(): any[];
+    getOrigins(): Point3D[];
     /**
      * Check if a point is in the origin list.
      *
@@ -1007,10 +1384,10 @@ export declare class Geometry {
      * Check that a index is within bounds.
      *
      * @param {Index} index The index to check.
-     * @param {Array} [dirs] Optional list of directions to check.
+     * @param {number[]} [dirs] Optional list of directions to check.
      * @returns {boolean} True if the given coordinates are within bounds.
      */
-    isIndexInBounds(index: Index, dirs?: any[]): boolean;
+    isIndexInBounds(index: Index, dirs?: number[]): boolean;
     /**
      * Convert an index into world coordinates.
      *
@@ -1043,6 +1420,19 @@ export declare class Geometry {
 }
 
 /**
+ * Get the default DICOM seg tags as an object.
+ *
+ * @returns {object} The default tags.
+ */
+export declare function getDefaultDicomSegJson(): object;
+
+/**
+ * List of DICOM data elements indexed via a 8 character string formed from
+ * the group and element numbers.
+ *
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+/**
  * Get the version of the library.
  *
  * @returns {string} The version of the library.
@@ -1050,15 +1440,40 @@ export declare class Geometry {
 export declare function getDwvVersion(): string;
 
 /**
- * Get the DICOM elements from a DICOM json tags object.
+ * Get the DICOM elements from a 'simple' DICOM json tags object.
  * The json is a simplified version of the oficial DICOM json with
  * tag names instead of keys and direct values (no value property) for
- * simple tags.
+ * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {object} jsonTags The DICOM json tags object.
- * @returns {object} The DICOM elements.
+ * @param {Object<string, any>} jsonTags The DICOM
+ *   json tags object.
+ * @returns {Object<string, DataElement>} The DICOM elements.
  */
-export declare function getElementsFromJSONTags(jsonTags: object): object;
+export declare function getElementsFromJSONTags(jsonTags: {
+    [x: string]: any;
+}): {
+    [x: string]: DataElement;
+};
+
+/**
+ * Get the indices that form a ellpise.
+ *
+ * @param {Index} center The ellipse center.
+ * @param {Array} radius The 2 ellipse radiuses.
+ * @param {Array} dir The 2 ellipse directions.
+ * @returns {Array} The indices of the ellipse.
+ */
+export declare function getEllipseIndices(center: Index, radius: any[], dir: any[]): any[];
+
+/**
+ * Get the layer details from a mouse event.
+ *
+ * @param {object} event The event to get the layer div id from. Expecting
+ * an event origininating from a canvas inside a layer HTML div
+ * with the 'layer' class and id generated with `getLayerDivId`.
+ * @returns {object} The layer details as {groupDivId, layerId}.
+ */
+export declare function getLayerDetailsFromEvent(event: object): object;
 
 /**
  * Get the name of an image orientation patient.
@@ -1115,6 +1530,16 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
  * @returns {string} The corresponding UID.
  */
 export declare function getUID(tagName: string): string;
+
+/**
+ * Check that an input buffer includes the DICOM prefix 'DICM'
+ * after the 128 bytes preamble.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *
+ * @param {ArrayBuffer} buffer The buffer to check.
+ * @returns {boolean} True if the buffer includes the prefix.
+ */
+export declare function hasDicomPrefix(buffer: ArrayBuffer): boolean;
 
 export declare namespace i18n {
     /**
@@ -1360,18 +1785,18 @@ declare class Image_2 {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Set the inner buffer values at given offsets.
      *
@@ -1513,9 +1938,9 @@ export { Image_2 as Image }
  */
 export declare class Index {
     /**
-     * @param {Array} values The index values.
+     * @param {number[]} values The index values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get the index value at the given array index.
      *
@@ -1538,9 +1963,9 @@ export declare class Index {
     /**
      * Get the values of this index.
      *
-     * @returns {Array} The array of values.
+     * @returns {number[]} The array of values.
      */
-    getValues(): any[];
+    getValues(): number[];
     /**
      * Check if the input index can be compared to this one.
      *
@@ -1559,9 +1984,9 @@ export declare class Index {
      * Compare indices and return different dimensions.
      *
      * @param {Index} rhs The index to compare to.
-     * @returns {Array} The list of different dimensions.
+     * @returns {number[]} The list of different dimensions.
      */
-    compare(rhs: Index): any[];
+    compare(rhs: Index): number[];
     /**
      * Add another index to this one.
      *
@@ -1580,12 +2005,21 @@ export declare class Index {
     /**
      * Get a string id from the index values in the form of: '#0-1_#1-2'.
      *
-     * @param {Array} [dims] Optional list of dimensions to use.
+     * @param {number[]} [dims] Optional list of dimensions to use.
      * @returns {string} The string id.
      */
-    toStringId(dims?: any[]): string;
+    toStringId(dims?: number[]): string;
     #private;
 }
+
+/**
+ * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
+ *   unsigned int CIE LAB ([0, 65535]).
+ *
+ * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
+ */
+export declare function labToUintLab(triplet: object): object;
 
 /**
  * Layer group.
@@ -1662,6 +2096,12 @@ export declare class LayerGroup {
      * @returns {number} The number of layers.
      */
     getNumberOfLayers(): number;
+    /**
+     * Get the number of view layers handled by this class.
+     *
+     * @returns {number} The number of layers.
+     */
+    getNumberOfViewLayers(): number;
     /**
      * Get the active image layer.
      *
@@ -1754,6 +2194,7 @@ export declare class LayerGroup {
      * Update layers (but not the active view layer) to a position change.
      *
      * @param {object} event The position change event.
+     * @function
      */
     updateLayersToPositionChange: (event: object) => void;
     /**
@@ -1824,30 +2265,30 @@ export declare class LayerGroup {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 
 export declare namespace logger {
     export namespace levels {
-        const TRACE: number;
-        const DEBUG: number;
-        const INFO: number;
-        const WARN: number;
-        const ERROR: number;
+        let TRACE: number;
+        let DEBUG: number;
+        let INFO: number;
+        let WARN: number;
+        let ERROR: number;
     }
-    const level: number;
+    let level: number;
     export function trace(msg: string): void;
     export function debug(msg: string): void;
     export function info(msg: string): void;
@@ -1858,32 +2299,45 @@ export declare namespace logger {
 /**
  * List of available lookup tables (lut).
  *
- * @type {Object<string, {red: number[], green: number[], blue: number[]}>}
+ * @type {Object<string, ColourMap>}
  */
-export declare const lut: {
-    [x: string]: {
-        red: number[];
-        green: number[];
-        blue: number[];
-    };
+export declare const luts: {
+    [x: string]: ColourMap;
 };
+
+/**
+ * Mask {@link Image} factory.
+ */
+export declare class MaskFactory {
+    checkElements(_dicomElements: any): void;
+    /**
+     * Get an {@link Image} object from the read DICOM file.
+     *
+     * @param {DataElements} dataElements The DICOM tags.
+     * @param {Uint8Array | Int8Array |
+         *   Uint16Array | Int16Array |
+         *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+     * @returns {Image} A new Image.
+     */
+    create(dataElements: DataElements, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+}
 
 /**
  * Immutable 3x3 Matrix.
  */
 export declare class Matrix33 {
     /**
-     * @param {Array} values row-major ordered 9 values.
+     * @param {number[]} values row-major ordered 9 values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get a value of the matrix.
      *
      * @param {number} row The row at wich to get the value.
      * @param {number} col The column at wich to get the value.
-     * @returns {number} The value at the position.
+     * @returns {number|undefined} The value at the position.
      */
-    get(row: number, col: number): number;
+    get(row: number, col: number): number | undefined;
     /**
      * Get the inverse of this matrix.
      *
@@ -1922,10 +2376,10 @@ export declare class Matrix33 {
     /**
      * Multiply this matrix by a 3D array.
      *
-     * @param {Array} array3D The input 3D array.
-     * @returns {Array} The result 3D array.
+     * @param {number[]} array3D The input 3D array.
+     * @returns {number[]} The result 3D array.
      */
-    multiplyArray3D(array3D: any[]): any[];
+    multiplyArray3D(array3D: number[]): number[];
     /**
      * Multiply this matrix by a 3D vector.
      *
@@ -2036,9 +2490,9 @@ export declare class OverlayData {
  */
 export declare class Point {
     /**
-     * @param {Array} values The point values.
+     * @param {number[]} values The point values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get the index value at the given array index.
      *
@@ -2061,9 +2515,9 @@ export declare class Point {
     /**
      * Get the values of this index.
      *
-     * @returns {Array} The array of values.
+     * @returns {number[]} The array of values.
      */
-    getValues(): any[];
+    getValues(): number[];
     /**
      * Check if the input point can be compared to this one.
      *
@@ -2082,9 +2536,9 @@ export declare class Point {
      * Compare points and return different dimensions.
      *
      * @param {Point} rhs The point to compare to.
-     * @returns {Array} The list of different dimensions.
+     * @returns {number[]} The list of different dimensions.
      */
-    compare(rhs: Point): any[];
+    compare(rhs: Point): number[];
     /**
      * Get the 3D part of this point.
      *
@@ -2478,6 +2932,14 @@ export declare class Spacing {
 }
 
 /**
+ * Convert sRGB to CIE LAB (standard illuminant D65).
+ *
+ * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @returns {object} CIE LAB triplet as {l,a,b}.
+ */
+export declare function srgbToCielab(triplet: object): object;
+
+/**
  * Immutable tag.
  */
 export declare class Tag {
@@ -2569,11 +3031,102 @@ export declare class TagValueExtractor {
     /**
      * Get the time.
      *
-     * @param {object} _elements The DICOM elements.
+     * @param {Object<string, DataElement>} _elements The DICOM elements.
      * @returns {number|undefined} The time value if available.
      */
-    getTime(_elements: object): number | undefined;
+    getTime(_elements: {
+        [x: string]: DataElement;
+    }): number | undefined;
 }
+
+/**
+ * Toolbox controller.
+ */
+export declare class ToolboxController {
+    /**
+     * @param {object} toolList The list of tool objects.
+     */
+    constructor(toolList: object);
+    /**
+     * Initialise.
+     */
+    init(): void;
+    /**
+     * Get the tool list.
+     *
+     * @returns {Array} The list of tool objects.
+     */
+    getToolList(): any[];
+    /**
+     * Check if a tool is in the tool list.
+     *
+     * @param {string} name The name to check.
+     * @returns {boolean} The tool list element for the given name.
+     */
+    hasTool(name: string): boolean;
+    /**
+     * Get the selected tool.
+     *
+     * @returns {object} The selected tool.
+     */
+    getSelectedTool(): object;
+    /**
+     * Get the selected tool event handler.
+     *
+     * @param {string} eventType The event type, for example
+     *   mousedown, touchstart...
+     * @returns {Function} The event handler.
+     */
+    getSelectedToolEventHandler(eventType: string): Function;
+    /**
+     * Set the selected tool.
+     *
+     * @param {string} name The name of the tool.
+     */
+    setSelectedTool(name: string): void;
+    /**
+     * Set the selected tool live features.
+     *
+     * @param {object} list The list of features.
+     */
+    setToolFeatures(list: object): void;
+    /**
+     * Listen to layer interaction events.
+     *
+     * @param {LayerGroup} layerGroup The associated layer group.
+     * @param {ViewLayer|DrawLayer} layer The layer to listen to.
+     */
+    bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
+    #private;
+}
+
+/**
+ * Tool configuration.
+ */
+export declare class ToolConfig {
+    /**
+     * @param {string[]} [options] Optional tool options.
+     */
+    constructor(options?: string[]);
+    /**
+     * Optional tool options.
+     * For Draw: list of shape names.
+     * For Filter: list of filter names.
+     *
+     * @type {string[]|undefined}
+     */
+    options: string[] | undefined;
+}
+
+/**
+ * List of client provided tools to be added to
+ * the default ones.
+ *
+ * @type {Object<string, any>}
+ */
+export declare const toolList: {
+    [x: string]: any;
+};
 
 /**
  * Immutable 3D vector.
@@ -2606,10 +3159,10 @@ export declare class Vector3D {
     /**
      * Check for Vector3D equality.
      *
-     * @param {object} rhs The other vector to compare to.
+     * @param {Vector3D} rhs The other vector to compare to.
      * @returns {boolean} True if both vectors are equal.
      */
-    equals(rhs: object): boolean;
+    equals(rhs: Vector3D): boolean;
     /**
      * Get a string representation of the Vector3D.
      *
@@ -2656,9 +3209,9 @@ export declare class Vector3D {
  *   const dicomParser = new dwv.DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = dwv.createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = createView(dicomParser.getDicomElements(), image);
+ *   const view = dwv.createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;
@@ -2770,12 +3323,6 @@ export declare class View {
      */
     setWindowPresets(presets: object): void;
     /**
-     * Set the default colour map.
-     *
-     * @param {object} map The colour map.
-     */
-    setDefaultColourMap(map: object): void;
-    /**
      * Add window presets to the existing ones.
      *
      * @param {object} presets The window presets.
@@ -2790,16 +3337,16 @@ export declare class View {
     /**
      * Get the colour map of the image.
      *
-     * @returns {object} The colour map of the image.
+     * @returns {string} The colour map name.
      */
-    getColourMap(): object;
+    getColourMap(): string;
     /**
      * Set the colour map of the image.
      *
-     * @param {object} map The colour map of the image.
-     * @fires View#colourchange
+     * @param {string} name The colour map name.
+     * @fires View#colourmapchange
      */
-    setColourMap(map: object): void;
+    setColourMap(name: string): void;
     /**
      * Get the current position.
      *
@@ -2820,12 +3367,12 @@ export declare class View {
      */
     canSetPosition(position: Point): boolean;
     /**
-     * Get the origin at a given position.
+     * Get the first origin or at a given position.
      *
-     * @param {Point} position The position.
-     * @returns {Point} The origin.
+     * @param {Point} [position] Optional position.
+     * @returns {Point3D} The origin.
      */
-    getOrigin(position: Point): Point;
+    getOrigin(position?: Point): Point3D;
     /**
      * Set the current position.
      *
@@ -2873,18 +3420,18 @@ export declare class View {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -2942,6 +3489,54 @@ export declare class View {
      */
     incrementScrollIndex(silent: boolean): boolean;
     #private;
+}
+
+/**
+ * View configuration: mainly defines the ´divId´
+ * of the associated HTML div.
+ */
+export declare class ViewConfig {
+    /**
+     * @param {string} divId The associated HTML div id.
+     */
+    constructor(divId: string);
+    /**
+     * Associated HTML div id.
+     *
+     * @type {string}
+     */
+    divId: string;
+    /**
+     * Optional orientation of the data; 'axial', 'coronal' or 'sagittal'.
+     * If undefined, will use the data aquisition plane.
+     *
+     * @type {string|undefined}
+     */
+    orientation: string | undefined;
+    /**
+     * Optional view colour map name.
+     *
+     * @type {string|undefined}
+     */
+    colourMap: string | undefined;
+    /**
+     * Optional layer opacity; in [0, 1] range.
+     *
+     * @type {number|undefined}
+     */
+    opacity: number | undefined;
+    /**
+     * Optional layer window center.
+     *
+     * @type {number|undefined}
+     */
+    windowCenter: number | undefined;
+    /**
+     * Optional layer window width.
+     *
+     * @type {number|undefined}
+     */
+    windowWidth: number | undefined;
 }
 
 /**
@@ -3055,12 +3650,12 @@ export declare class ViewController {
      */
     getCurrentScrollIndexValue(): object;
     /**
-     * Get the origin at a given posittion.
+     * Get the first origin or at a given position.
      *
-     * @param {Point} position The input position.
-     * @returns {Point} The origin.
+     * @param {Point} [position] Opitonal position.
+     * @returns {Point3D} The origin.
      */
-    getOrigin(position: Point): Point;
+    getOrigin(position?: Point): Point3D;
     /**
      * Get the current scroll position value.
      *
@@ -3275,15 +3870,15 @@ export declare class ViewController {
     /**
      * Get the colour map.
      *
-     * @returns {object} The colour map.
+     * @returns {string} The colour map name.
      */
-    getColourMap(): object;
+    getColourMap(): string;
     /**
      * Set the colour map.
      *
-     * @param {object} colourMap The colour map.
+     * @param {string} name The colour map name.
      */
-    setColourMap(colourMap: object): void;
+    setColourMap(name: string): void;
     /**
      * @callback alphaFn@callback alphaFn
      * @param {object} value The pixel value.
@@ -3297,27 +3892,21 @@ export declare class ViewController {
      */
     setViewAlphaFunction(func: (value: object, index: object) => number): void;
     /**
-     * Set the colour map from a name.
-     *
-     * @param {string} name The name of the colour map to set.
-     */
-    setColourMapFromName(name: string): void;
-    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 
@@ -3365,12 +3954,14 @@ export declare class ViewLayer {
      * Handle an image set event.
      *
      * @param {object} event The event.
+     * @function
      */
     onimageset: (event: object) => void;
     /**
      * Handle an image change event.
      *
      * @param {object} event The event.
+     * @function
      */
     onimagechange: (event: object) => void;
     /**
@@ -3419,9 +4010,9 @@ export declare class ViewLayer {
      * Set the layer scale.
      *
      * @param {object} newScale The scale as {x,y}.
-     * @param {Point3D} center The scale center.
+     * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center: Point3D): void;
+    setScale(newScale: object, center?: Point3D): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
@@ -3465,7 +4056,8 @@ export declare class ViewLayer {
      *
      * @param {number} x The X position.
      * @param {number} y The Y position.
-     * @returns {object} The display position as {x,y}.
+     * @returns {object} The display position as {x,y}, can be individually
+     *   undefined if out of bounds.
      */
     planePosToDisplay(x: number, y: number): object;
     /**
@@ -3524,18 +4116,18 @@ export declare class ViewLayer {
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type, will be called with the fired event.
      */
-    addEventListener(type: string, callback: object): void;
+    addEventListener(type: string, callback: Function): void;
     /**
      * Remove an event listener from this class.
      *
      * @param {string} type The event type.
-     * @param {object} callback The method associated with the provided
+     * @param {Function} callback The function associated with the provided
      *   event type.
      */
-    removeEventListener(type: string, callback: object): void;
+    removeEventListener(type: string, callback: Function): void;
     /**
      * Set the current position.
      *
@@ -3647,6 +4239,28 @@ export declare class WindowLut {
      */
     getValue(offset: number): number;
     #private;
+}
+
+/**
+ * Writer rule.
+ */
+export declare class WriterRule {
+    /**
+     * @param {string} action The rule action.
+     */
+    constructor(action: string);
+    /**
+     * Rule action: `copy`, `remove`, `clear` or `replace`.
+     *
+     * @type {string}
+     */
+    action: string;
+    /**
+     * Optional value to use for replace action.
+     *
+     * @type {any|undefined}
+     */
+    value: any | undefined;
 }
 
 export { }

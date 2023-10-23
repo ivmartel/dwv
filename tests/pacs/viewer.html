@@ -11,6 +11,9 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+html, body {
+  height: 100%;
+}
 table, td, th {
   margin: 5px 0;
   border: 1px solid #aaa;
@@ -34,6 +37,9 @@ button {
 input[type=number] {
   width: 75px;
 }
+select {
+  width: 90px;
+}
 input[type=range] {
   width: 100px;
   margin: 0px 10px;
@@ -46,10 +52,15 @@ input[type=range] {
   font-size: small;
   font-style: italic;
 }
+#dwv {
+  display: flex;
+  min-height: 200px;
+  height: 40%;
+  /* compensate for layer absolute position */
+  margin-bottom: 10px;
+}
 .layerGroup {
-  display:inline-block;
-  height: 350px;
-  width: max(30%, 350px);
+  flex: 1 1;
   margin: 5px 5px 5px 0;
   background-color: limeGreen;
   /* allow child centering */

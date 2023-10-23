@@ -8,6 +8,12 @@ import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Ellipse factory.
  */
@@ -42,7 +48,7 @@ export class EllipseFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -52,10 +58,10 @@ export class EllipseFactory {
   /**
    * Create an ellipse shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the ellipse.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the ellipse.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(
     points, style, viewController) {
@@ -139,9 +145,9 @@ export class EllipseFactory {
   /**
    * Get anchors to update an ellipse shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Ellipse} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const ellipseX = shape.x();
@@ -167,22 +173,28 @@ export class EllipseFactory {
   /**
    * Update an ellipse shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} _style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} _style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, _style, viewController) {
     // parent group
     const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
     const kellipse = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated label
+    if (!(kellipse instanceof Konva.Ellipse)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
-      // find special points
+    // find special points
     const topLeft = group.getChildren(function (node) {
       return node.id() === 'topLeft';
     })[0];
@@ -271,8 +283,8 @@ export class EllipseFactory {
   /**
    * Update the quantification of an Ellipse.
    *
-   * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Group} group The group with the shape.
+   * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
     this.#updateEllipseQuantification(group, viewController);
@@ -282,18 +294,24 @@ export class EllipseFactory {
    * Update the quantification of an Ellipse (as a static
    *   function to be used in update).
    *
-   * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Group} group The group with the shape.
+   * @param {ViewController} viewController The associated view controller.
    */
   #updateEllipseQuantification(group, viewController) {
     // associated shape
     const kellipse = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
+    if (!(kellipse instanceof Konva.Ellipse)) {
+      return;
+    }
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // positions: add possible group offset
     const centerPoint = new Point2D(
@@ -306,20 +324,22 @@ export class EllipseFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = ellipse.quantify(
       viewController,
-      getFlags(ktext.meta.textExpr));
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+      getFlags(meta.textExpr));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
   }
 
   /**
    * Get the debug shadow.
    *
    * @param {Ellipse} ellipse The ellipse to shadow.
-   * @param {object} group The associated group.
-   * @returns {object} The shadow konva group.
+   * @param {Konva.Group} [group] The associated group.
+   * @returns {Konva.Group} The shadow konva group.
    */
   #getShadowEllipse(ellipse, group) {
     // possible group offset

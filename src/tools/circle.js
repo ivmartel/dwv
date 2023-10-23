@@ -8,6 +8,12 @@ import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
+
 /**
  * Circle factory.
  */
@@ -42,7 +48,7 @@ export class CircleFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -52,10 +58,10 @@ export class CircleFactory {
   /**
    * Create a circle shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the circle.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the circle.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // calculate radius
@@ -96,7 +102,7 @@ export class CircleFactory {
       getFlags(textExpr));
     ktext.setText(replaceFlags(textExpr, quant));
     // augment text with meta data
-    // @ts-ignore
+    // @ts-expect-error
     ktext.meta = {
       textExpr: textExpr,
       quantification: quant
@@ -136,9 +142,9 @@ export class CircleFactory {
   /**
    * Get anchors to update a circle shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Circle} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const centerX = shape.x();
@@ -164,17 +170,23 @@ export class CircleFactory {
   /**
    * Update a circle shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} _style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} _style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, _style, viewController) {
     // parent group
     const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
     const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
+    if (!(kcircle instanceof Konva.Circle)) {
+      return;
+    }
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
@@ -279,8 +291,8 @@ export class CircleFactory {
   /**
    * Update the quantification of a Circle.
    *
-   * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Group} group The group with the shape.
+   * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
     this.#updateCircleQuantification(group, viewController);
@@ -290,8 +302,8 @@ export class CircleFactory {
    * Update the quantification of a Circle (as a static
    *   function to be used in update).
    *
-   * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Group} group The group with the shape.
+   * @param {ViewController} viewController The associated view controller.
    */
   #updateCircleQuantification(
     group, viewController) {
@@ -299,10 +311,16 @@ export class CircleFactory {
     const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
+    if (!(kcircle instanceof Konva.Circle)) {
+      return;
+    }
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // positions: add possible group offset
     const centerPoint = new Point2D(
@@ -314,20 +332,22 @@ export class CircleFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = circle.quantify(
       viewController,
-      getFlags(ktext.meta.textExpr));
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+      getFlags(meta.textExpr));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
   }
 
   /**
    * Get the debug shadow.
    *
    * @param {Circle} circle The circle to shadow.
-   * @param {object} group The associated group.
-   * @returns {object} The shadow konva group.
+   * @param {Konva.Group} [group] The associated group.
+   * @returns {Konva.Group} The shadow konva group.
    */
   #getShadowCircle(circle, group) {
     // possible group offset

@@ -31,13 +31,13 @@ export class Tag {
       throw new Error('Cannot create tag with no group.');
     }
     if (group.length !== 4) {
-      throw new Error('Cannot create tag with badly sized group.');
+      throw new Error('Cannot create tag with badly sized group: ' + group);
     }
     if (!element || typeof element === 'undefined') {
       throw new Error('Cannot create tag with no element.');
     }
     if (element.length !== 4) {
-      throw new Error('Cannot create tag with badly sized element.');
+      throw new Error('Cannot create tag with badly sized element: ' + element);
     }
     this.#group = group;
     this.#element = element;
@@ -202,7 +202,7 @@ export function getTagFromKey(key) {
     throw new Error('Cannot create tag with no key.');
   }
   if (key.length !== 8) {
-    throw new Error('Cannot create tag with badly sized key.');
+    throw new Error('Cannot create tag with badly sized key: ' + key);
   }
   return new Tag(key.substring(0, 4), key.substring(4, 8));
 }

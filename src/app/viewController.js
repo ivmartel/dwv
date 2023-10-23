@@ -14,7 +14,6 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {luts} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
 // doc imports
@@ -57,8 +56,20 @@ export class ViewController {
    */
   #maskSegmentHelper;
 
-  // third dimension player ID (created by setInterval)
-  #playerID = null;
+  /**
+   * Colour map name.
+   * Defaults to 'plain' as defined in Views' default.
+   *
+   * #type {string}
+   */
+  #colourMapName = 'plain';
+
+  /**
+   * Third dimension player ID (created by setInterval).
+   *
+   * @type {number|undefined}
+   */
+  #playerID;
 
   /**
    * @param {View} view The associated view.
@@ -90,7 +101,7 @@ export class ViewController {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
@@ -206,7 +217,7 @@ export class ViewController {
    * @returns {boolean} True if the controler is playing.
    */
   isPlaying() {
-    return (this.#playerID !== null);
+    return (typeof this.#playerID !== 'undefined');
   }
 
   /**
@@ -265,9 +276,9 @@ export class ViewController {
   }
 
   /**
-   * Get the origin at a given position.
+   * Get the first origin or at a given position.
    *
-   * @param {Point} position The input position.
+   * @param {Point} [position] Opitonal position.
    * @returns {Point3D} The origin.
    */
   getOrigin(position) {
@@ -666,7 +677,7 @@ export class ViewController {
       const size = image.getGeometry().getSize();
       const canScroll3D = size.canScroll3D();
 
-      this.#playerID = setInterval(() => {
+      this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
           canDoMore = this.incrementScrollIndex();
@@ -697,9 +708,9 @@ export class ViewController {
    * Stop scroll playing.
    */
   stop() {
-    if (this.#playerID !== null) {
+    if (typeof this.#playerID !== 'undefined') {
       clearInterval(this.#playerID);
-      this.#playerID = null;
+      this.#playerID = undefined;
     }
   }
 
@@ -737,7 +748,7 @@ export class ViewController {
   /**
    * Get the colour map.
    *
-   * @returns {ColourMap} The colour map.
+   * @returns {string} The colour map name.
    */
   getColourMap() {
     return this.#view.getColourMap();
@@ -746,10 +757,10 @@ export class ViewController {
   /**
    * Set the colour map.
    *
-   * @param {ColourMap} colourMap The colour map.
+   * @param {string} name The colour map name.
    */
-  setColourMap(colourMap) {
-    this.#view.setColourMap(colourMap);
+  setColourMap(name) {
+    this.#view.setColourMap(name);
   }
 
   /**
@@ -766,20 +777,6 @@ export class ViewController {
    */
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
-  }
-
-  /**
-   * Set the colour map from a name.
-   *
-   * @param {string} name The name of the colour map to set.
-   */
-  setColourMapFromName(name) {
-    // check if we have it
-    if (!luts[name]) {
-      throw new Error('Unknown colour map: \'' + name + '\'');
-    }
-    // enable it
-    this.setColourMap(luts[name]);
   }
 
   /**

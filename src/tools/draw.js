@@ -73,14 +73,14 @@ export class Draw {
   /**
    * Shape editor.
    *
-   * @type {object}
+   * @type {ShapeEditor}
    */
   #shapeEditor;
 
   /**
    * Trash draw: a cross.
    *
-   * @type {object}
+   * @type {Konva.Group}
    */
   #trash;
 
@@ -181,7 +181,7 @@ export class Draw {
   /**
    * Active shape, ie shape with mouse over.
    *
-   * @type {object}
+   * @type {Konva.Group}
    */
   #activeShapeGroup;
 
@@ -241,12 +241,13 @@ export class Draw {
       const selectedShape = group.find('.shape')[0];
       // reset editor if click on other shape
       // (and avoid anchors mouse down)
-      if (selectedShape && selectedShape !== this.#shapeEditor.getShape()) {
+      if (selectedShape &&
+        selectedShape instanceof Konva.Shape &&
+        selectedShape !== this.#shapeEditor.getShape()) {
         this.#shapeEditor.disable();
-        this.#shapeEditor.setShape(selectedShape);
         const viewController =
           layerGroup.getActiveViewLayer().getViewController();
-        this.#shapeEditor.setViewController(viewController);
+        this.#shapeEditor.setShape(selectedShape, drawLayer, viewController);
         this.#shapeEditor.enable();
       }
     } else {
@@ -432,7 +433,7 @@ export class Draw {
   /**
    * Handle mouse wheel event.
    *
-   * @param {object} event The mouse wheel event.
+   * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
     if (this.#withScroll) {
@@ -458,10 +459,16 @@ export class Draw {
       this.#shapeEditor.isActive()) {
       // get shape
       const shapeGroup = this.#shapeEditor.getShape().getParent();
-      const drawLayer = this.#app.getActiveLayerGroup().getActiveDrawLayer();
-      const shapeDisplayName = getShapeDisplayName(
-        shapeGroup.getChildren(isNodeNameShape)[0]);
+      if (!(shapeGroup instanceof Konva.Group)) {
+        return;
+      }
+      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+      if (!(shape instanceof Konva.Shape)) {
+        return;
+      }
+      const shapeDisplayName = getShapeDisplayName(shape);
       // delete command
+      const drawLayer = this.#app.getActiveLayerGroup().getActiveDrawLayer();
       const delcmd = new DeleteGroupCommand(
         shapeGroup,
         shapeDisplayName,
@@ -520,7 +527,7 @@ export class Draw {
   /**
    * Create the final shape from a point list.
    *
-   * @param {Array} finalPoints The array of points.
+   * @param {Point2D[]} finalPoints The array of points.
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #onFinalPoints(finalPoints, layerGroup) {
@@ -650,7 +657,7 @@ export class Draw {
   /**
    * Set shape group off properties.
    *
-   * @param {object} shapeGroup The shape group to set off.
+   * @param {Konva.Group} shapeGroup The shape group to set off.
    */
   #setShapeOff(shapeGroup) {
     // mouse styling
@@ -693,7 +700,9 @@ export class Draw {
       const colour = this.#style.getLineColour();
       this.#activeShapeGroup.getChildren(canNodeChangeColour).forEach(
         function (ashape) {
-          ashape.stroke(colour);
+          if (ashape instanceof Konva.Shape) {
+            ashape.stroke(colour);
+          }
         }
       );
     }
@@ -702,7 +711,7 @@ export class Draw {
   /**
    * Set shape group on properties.
    *
-   * @param {object} shapeGroup The shape group to set on.
+   * @param {Konva.Group} shapeGroup The shape group to set on.
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   setShapeOn(shapeGroup, layerGroup) {
@@ -735,15 +744,22 @@ export class Draw {
     let dragStartPos = {x: shapeGroup.x(), y: shapeGroup.y()};
 
     // command name based on shape type
-    const shapeDisplayName = getShapeDisplayName(
-      shapeGroup.getChildren(isNodeNameShape)[0]);
+    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+    if (!(shape instanceof Konva.Shape)) {
+      return;
+    }
+    const shapeDisplayName = getShapeDisplayName(shape);
 
     let colour = null;
 
     // drag start event handling
     shapeGroup.on('dragstart.draw', (/*event*/) => {
       // store colour
-      colour = shapeGroup.getChildren(isNodeNameShape)[0].stroke();
+      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+      if (!(shape instanceof Konva.Shape)) {
+        return;
+      }
+      colour = shape.stroke();
       // display trash
       const stage = drawLayer.getKonvaStage();
       const scale = stage.scale();
@@ -760,6 +776,9 @@ export class Draw {
     // drag move event handling
     shapeGroup.on('dragmove.draw', (event) => {
       const group = event.target;
+      if (!(group instanceof Konva.Group)) {
+        return;
+      }
       // validate the group position
       validateGroupPosition(drawLayer.getBaseSize(), group);
       // get appropriate factory
@@ -790,21 +809,28 @@ export class Draw {
       if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
         Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
         this.#trash.getChildren().forEach(function (tshape) {
-          tshape.stroke('orange');
+          if (tshape instanceof Konva.Shape) {
+            tshape.stroke('orange');
+          }
         });
         // change the group shapes colour
         shapeGroup.getChildren(canNodeChangeColour).forEach(
           function (ashape) {
-            ashape.stroke('red');
+            if (ashape instanceof Konva.Shape) {
+              ashape.stroke('red');
+            }
           });
       } else {
         this.#trash.getChildren().forEach(function (tshape) {
-          tshape.stroke('red');
+          if (tshape instanceof Konva.Shape) {
+            tshape.stroke('red');
+          }
         });
         // reset the group shapes colour
         shapeGroup.getChildren(canNodeChangeColour).forEach(
           function (ashape) {
-            if (typeof ashape.stroke !== 'undefined') {
+            if (ashape instanceof Konva.Shape &&
+              typeof ashape.stroke !== 'undefined') {
               ashape.stroke(colour);
             }
           });
@@ -815,6 +841,9 @@ export class Draw {
     // drag end event handling
     shapeGroup.on('dragend.draw', (event) => {
       const group = event.target;
+      if (!(group instanceof Konva.Group)) {
+        return;
+      }
       // remove trash
       this.#trash.remove();
       // activate(false) will also trigger a dragend.draw
@@ -841,7 +870,9 @@ export class Draw {
         // reset colour
         shapeGroup.getChildren(canNodeChangeColour).forEach(
           function (ashape) {
-            ashape.stroke(colour);
+            if (ashape instanceof Konva.Shape) {
+              ashape.stroke(colour);
+            }
           });
         // reset cursor
         document.body.style.cursor = this.#originalCursor;
@@ -876,6 +907,7 @@ export class Draw {
           this.#fireEvent({
             type: 'drawmove',
             id: group.id(),
+            srclayerid: drawLayer.getId(),
             dataid: drawLayer.getDataId()
           });
         }
@@ -891,8 +923,14 @@ export class Draw {
     // double click handling: update label
     shapeGroup.on('dblclick', (event) => {
       const group = event.currentTarget;
+      if (!(group instanceof Konva.Group)) {
+        return;
+      }
       // get the label object for this shape
       const label = group.findOne('Label');
+      if (!(label instanceof Konva.Label)) {
+        return;
+      }
       // should just be one
       if (typeof label === 'undefined') {
         throw new Error('Could not find the shape label.');
@@ -903,16 +941,19 @@ export class Draw {
 
       const onSaveCallback = (meta) => {
         // store meta
+        // @ts-expect-error
         ktext.meta = meta;
         // update text expression
         ktext.setText(replaceFlags(
-          ktext.meta.textExpr, ktext.meta.quantification));
-        label.setVisible(ktext.meta.textExpr.length !== 0);
+          meta.textExpr, meta.quantification));
+        // hide label if no text
+        label.visible(meta.textExpr.length !== 0);
 
         // trigger event
         this.#fireEvent({
           type: 'drawchange',
           id: groupId,
+          srclayerid: drawLayer.getId(),
           dataid: drawLayer.getDataId()
         });
         // draw
@@ -920,6 +961,7 @@ export class Draw {
       };
 
       // call roi dialog
+      // @ts-expect-error
       customUI.openRoiDialog(ktext.meta, onSaveCallback);
     });
   }
@@ -984,7 +1026,7 @@ export class Draw {
    */
   getEventNames() {
     return [
-      'drawcreate', 'drawchange', 'drawmove', 'drawdelete', 'drawlabelchange'
+      'drawcreate', 'drawchange', 'drawmove', 'drawdelete'
     ];
   }
 
@@ -1051,7 +1093,7 @@ export class Draw {
 /**
  * Get the minimum position in a groups' anchors.
  *
- * @param {object} group The group that contains anchors.
+ * @param {Konva.Group} group The group that contains anchors.
  * @returns {object|undefined} The minimum position as {x,y}.
  */
 function getAnchorMin(group) {
@@ -1072,7 +1114,7 @@ function getAnchorMin(group) {
 /**
  * Bound a node position.
  *
- * @param {object} node The node to bound the position.
+ * @param {Konva.Node} node The node to bound the position.
  * @param {object} min The minimum position as {x,y}.
  * @param {object} max The maximum position as {x,y}.
  * @returns {boolean} True if the position was corrected.
@@ -1100,7 +1142,7 @@ function boundNodePosition(node, min, max) {
  * Validate a group position.
  *
  * @param {object} stageSize The stage size {x,y}.
- * @param {object} group The group to evaluate.
+ * @param {Konva.Group} group The group to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
 function validateGroupPosition(stageSize, group) {
@@ -1131,7 +1173,7 @@ function validateGroupPosition(stageSize, group) {
  * Validate an anchor position.
  *
  * @param {object} stageSize The stage size {x,y}.
- * @param {object} anchor The anchor to evaluate.
+ * @param {Konva.Shape} anchor The anchor to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
 export function validateAnchorPosition(stageSize, anchor) {

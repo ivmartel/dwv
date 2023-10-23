@@ -23,9 +23,69 @@ import {DrawLayer} from '../gui/drawLayer';
 import Konva from 'konva';
 
 /**
+ * Draw meta data.
+ */
+export class DrawMeta {
+  /**
+   * Draw quantification.
+   *
+   * @type {object}
+   */
+  quantification;
+
+  /**
+   * Draw text expression. Can contain variables surrounded with '{}' that will
+   * be extracted from the quantification object.
+   *
+   * @type {string}
+   */
+  textExpr;
+}
+
+/**
+ * Draw details.
+ */
+export class DrawDetails {
+  /**
+   * The draw ID.
+   *
+   * @type {number}
+   */
+  id;
+
+  /**
+   * The draw position: an Index converted to string.
+   *
+   * @type {string}
+   */
+  position;
+
+  /**
+   * The draw type.
+   *
+   * @type {string}
+   */
+  type;
+
+  /**
+   * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   *
+   * @type {string}
+   */
+  color;
+
+  /**
+   * The draw meta.
+   *
+   * @type {DrawMeta}
+   */
+  meta;
+}
+
+/**
  * Is an input node's name 'shape'.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'shape'.
  */
 export function isNodeNameShape(node) {
@@ -35,7 +95,7 @@ export function isNodeNameShape(node) {
 /**
  * Is a node an extra shape associated with a main one.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name starts with 'shape-'.
  */
 export function isNodeNameShapeExtra(node) {
@@ -45,7 +105,7 @@ export function isNodeNameShapeExtra(node) {
 /**
  * Is an input node's name 'label'.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'label'.
  */
 export function isNodeNameLabel(node) {
@@ -55,7 +115,7 @@ export function isNodeNameLabel(node) {
 /**
  * Is an input node a position node.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'position-group'.
  */
 export function isPositionNode(node) {
@@ -64,7 +124,7 @@ export function isPositionNode(node) {
 
 /**
  * @callback testFn
- * @param {object} node The node.
+ * @param {Konva.Node} node The node.
  * @returns {boolean} True if the node passes the test.
  */
 
@@ -83,7 +143,7 @@ export function isNodeWithId(id) {
 /**
  * Is the input node a node that has the 'stroke' method.
  *
- * @param {object} node A Konva node.
+ * @param {Konva.Node} node A Konva node.
  * @returns {boolean} True if the node's name is 'anchor' and 'label'.
  */
 export function canNodeChangeColour(node) {
@@ -146,7 +206,7 @@ export class DrawController {
   /**
    * Get the current position group.
    *
-   * @returns {object} The Konva.Group.
+   * @returns {Konva.Group|undefined} The Konva.Group.
    */
   getCurrentPosGroup() {
     // get position groups
@@ -155,9 +215,11 @@ export class DrawController {
     });
     // if one group, use it
     // if no group, create one
-    let posGroup = null;
+    let posGroup;
     if (posGroups.length === 1) {
-      posGroup = posGroups[0];
+      if (posGroups[0] instanceof Konva.Group) {
+        posGroup = posGroups[0];
+      }
     } else if (posGroups.length === 0) {
       posGroup = new Konva.Group();
       posGroup.name('position-group');
@@ -229,8 +291,7 @@ export class DrawController {
   /**
    * Get a list of drawing display details.
    *
-   * @returns {Array} A list of draw details as
-   *   {id, position, type, color, meta}
+   * @returns {DrawDetails[]} A list of draw details.
    */
   getDrawDisplayDetails() {
     const list = [];
@@ -317,7 +378,7 @@ export class DrawController {
    * Set the drawings on the current stage.
    *
    * @param {Array} drawings An array of drawings.
-   * @param {Array} drawingsDetails An array of drawings details.
+   * @param {DrawDetails[]} drawingsDetails An array of drawings details.
    * @param {object} cmdCallback The DrawCommand callback.
    * @param {object} exeCallback The callback to call once the
    *   DrawCommand has been executed.
@@ -387,7 +448,7 @@ export class DrawController {
   /**
    * Update a drawing from its details.
    *
-   * @param {object} drawDetails Details of the drawing to update.
+   * @param {DrawDetails} drawDetails Details of the drawing to update.
    */
   updateDraw(drawDetails) {
     // get the group
@@ -443,13 +504,16 @@ export class DrawController {
   /**
    * Delete a Draw from the stage.
    *
-   * @param {object} group The group to delete.
+   * @param {Konva.Group} group The group to delete.
    * @param {object} cmdCallback The DeleteCommand callback.
    * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
   deleteDrawGroup(group, cmdCallback, exeCallback) {
     const shape = group.getChildren(isNodeNameShape)[0];
+    if (!(shape instanceof Konva.Shape)) {
+      return;
+    }
     const shapeDisplayName = getShapeDisplayName(shape);
     const delcmd = new DeleteGroupCommand(
       group,
@@ -460,7 +524,9 @@ export class DrawController {
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
     // callback
-    exeCallback(delcmd);
+    if (typeof exeCallback !== 'undefined') {
+      exeCallback(delcmd);
+    }
   }
 
   /**
@@ -492,10 +558,36 @@ export class DrawController {
    *  DeleteCommand has been executed.
    */
   deleteDraws(cmdCallback, exeCallback) {
-    const groups = this.#konvaLayer.getChildren();
-    while (groups.length) {
-      this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
+    const posGroups = this.#konvaLayer.getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        while (shapeGroups.length) {
+          if (shapeGroups[0] instanceof Konva.Group) {
+            this.deleteDrawGroup(shapeGroups[0], cmdCallback, exeCallback);
+          }
+        }
+      } else {
+        logger.warn('Found non group in layer while deleting');
+      }
     }
+  }
+
+  /**
+   * Get the total number of draws
+   * (at all positions).
+   *
+   * @returns {number} The total number of draws.
+   */
+  getNumberOfDraws() {
+    const posGroups = this.#konvaLayer.getChildren();
+    let count = 0;
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        count += posGroup.getChildren().length;
+      }
+    }
+    return count;
   }
 
 } // class DrawController
