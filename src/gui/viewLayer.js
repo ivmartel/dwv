@@ -350,6 +350,20 @@ export class ViewLayer {
   }
 
   /**
+   * Flip the scale along the layer X axis.
+   */
+  flipScaleX() {
+    this.#flipScale.x *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Y axis.
+   */
+  flipScaleY() {
+    this.#flipScale.y *= -1;
+  }
+
+  /**
    * Flip the scale along the layer Z axis.
    */
   flipScaleZ() {

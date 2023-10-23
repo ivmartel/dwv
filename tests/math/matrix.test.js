@@ -4,7 +4,9 @@ import {
   BIG_EPSILON,
   Matrix33,
   getIdentityMat33,
-  getMatrixFromName
+  isIdentityMat33,
+  getMatrixFromName,
+  getOrientationStringLPS
 } from '../../src/math/matrix';
 
 /**
@@ -55,6 +57,23 @@ QUnit.test('Test Matrix33.', function (assert) {
   // equals with precision
   assert.equal(m3.equals(m4, 0.01), true, 'equals true');
   assert.equal(m3.equals(m4, 0.001), false, 'equals false');
+});
+
+/**
+ * Tests for {@link Matrix33} toString.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33.', function (assert) {
+  /* eslint-disable array-element-newline */
+  const m0 = new Matrix33([
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9
+  ]);
+  /* eslint-enable array-element-newline */
+  const str0 = '[1, 2, 3, \n 4, 5, 6, \n 7, 8, 9]';
+  assert.equal(m0.toString(), str0, 'Matrix toString');
 });
 
 /**
@@ -225,6 +244,8 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
   ]);
   assert.ok(m00.equals(theo00), 'Matrix33 factory id');
 
+  assert.ok(isIdentityMat33(m00), 'Matrix33 factory id isIdentity');
+
   // test #01
   const m01 = getMatrixFromName('axial');
   assert.ok(m01.equals(theo00), 'Matrix33 factory axial');
@@ -246,4 +267,23 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
   // test #04
   const m04 = getMatrixFromName('godo');
   assert.equal(m04, null, 'Matrix33 factory unknown name');
+});
+
+/**
+ * Tests for {@link Matrix33} getOrientationStringLPS.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33 getOrientationStringLPS.', function (assert) {
+  const m00 = getIdentityMat33();
+  const code00 = getOrientationStringLPS(m00);
+  assert.equal(code00, 'LPS', 'LPS matrix');
+
+  const m01 = getMatrixFromName('coronal');
+  const code01 = getOrientationStringLPS(m01);
+  assert.equal(code01, 'LIP', 'LIP matrix');
+
+  const m02 = getMatrixFromName('sagittal');
+  const code02 = getOrientationStringLPS(m02);
+  assert.equal(code02, 'PIR', 'PIR matrix');
 });
