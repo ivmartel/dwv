@@ -28,7 +28,7 @@ export class DataController {
   /**
    * Get the list of ids in the data storage.
    *
-   * @returns {Array} The list of data ids.
+   * @returns {string[]} The list of data ids.
    */
   getDataIds() {
     return Object.keys(this.#data);
@@ -45,7 +45,7 @@ export class DataController {
    * Get a data at a given index.
    *
    * @param {string} dataId The data id.
-   * @returns {object} The data.
+   * @returns {object} The data as {image, meta}.
    */
   get(dataId) {
     return this.#data[dataId];
