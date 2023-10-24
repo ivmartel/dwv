@@ -3674,10 +3674,10 @@ export declare class ViewController {
      * Generate display image data to be given to a canvas.
      *
      * @param {ImageData} array The array to fill in.
-     * @param {Index} index Optional index at which to generate,
+     * @param {Index} [index] Optional index at which to generate,
      *   otherwise generates at current index.
      */
-    generateImageData(array: ImageData, index: Index): void;
+    generateImageData(array: ImageData, index?: Index): void;
     /**
      * Set the associated image.
      *
