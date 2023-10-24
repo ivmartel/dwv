@@ -29,7 +29,7 @@ export class ViewLayer {
   /**
    * The view controller.
    *
-   * @type {object}
+   * @type {ViewController}
    */
   #viewController = null;
 

@@ -299,7 +299,7 @@ export class ViewController {
    * Generate display image data to be given to a canvas.
    *
    * @param {ImageData} array The array to fill in.
-   * @param {Index} index Optional index at which to generate,
+   * @param {Index} [index] Optional index at which to generate,
    *   otherwise generates at current index.
    */
   generateImageData(array, index) {
