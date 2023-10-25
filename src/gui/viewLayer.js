@@ -725,36 +725,35 @@ export class ViewLayer {
   fitToContainer(fitScale1D, fitSize, fitOffset) {
     let needsDraw = false;
 
-    // update canvas size if needed (triggers canvas reset)
-    if (this.#canvas.width !== fitSize.x || this.#canvas.height !== fitSize.y) {
+    // set canvas size if different from previous
+    if (this.#canvas.width !== fitSize.x ||
+      this.#canvas.height !== fitSize.y) {
       if (!canCreateCanvas(fitSize.x, fitSize.y)) {
         throw new Error('Cannot resize canvas ' + fitSize.x + ', ' + fitSize.y);
       }
-      // canvas size  change triggers canvas reset
+      // canvas size change triggers canvas reset
       this.#canvas.width = fitSize.x;
       this.#canvas.height = fitSize.y;
       // update draw flag
       needsDraw = true;
     }
-    // previous fit scale
-    const previousFitScale = this.#fitScale;
-    // previous scale without fit
-    const previousScale = {
-      x: this.#scale.x / this.#fitScale.x,
-      y: this.#scale.y / this.#fitScale.y
-    };
+
     // fit scale
     const newFitScale = {
       x: fitScale1D * this.#baseSpacing.x,
       y: fitScale1D * this.#baseSpacing.y
     };
-    // scale
+    // #scale = inputScale * fitScale * flipScale
+    // flipScale does not change here, we can omit it
+    // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: previousScale.x * newFitScale.x,
-      y: previousScale.y * newFitScale.y
+      x: this.#scale.x * newFitScale.x / this.#fitScale.x,
+      y: this.#scale.y * newFitScale.y / this.#fitScale.y
     };
-    // check if different
-    if (previousScale.x !== newScale.x || previousScale.y !== newScale.y) {
+
+    // set scales if different from previous
+    if (this.#scale.x !== newScale.x ||
+      this.#scale.y !== newScale.y) {
       this.#fitScale = newFitScale;
       this.#scale = newScale;
       // update draw flag
@@ -766,29 +765,29 @@ export class ViewLayer {
       x: fitOffset.x / newFitScale.x,
       y: fitOffset.y / newFitScale.y
     };
+    // #flipOffset = canvas / #scale
     const newFlipOffset = {
-      x: this.#flipOffset.x * previousFitScale.x / newFitScale.x,
-      y: this.#flipOffset.y * previousFitScale.y / newFitScale.y
+      x: this.#flipOffset.x !== 0 ? fitSize.x / newFitScale.x : 0,
+      y: this.#flipOffset.y !== 0 ? fitSize.y / newFitScale.y : 0,
     };
-    // check if different
+
+    // set offsets if different from previous
     if (this.#viewOffset.x !== newViewOffset.x ||
       this.#viewOffset.y !== newViewOffset.y ||
       this.#flipOffset.x !== newFlipOffset.x ||
       this.#flipOffset.y !== newFlipOffset.y) {
+      // update global offset
+      this.#offset = {
+        x: this.#offset.x +
+          newViewOffset.x - this.#viewOffset.x +
+          newFlipOffset.x - this.#flipOffset.x,
+        y: this.#offset.y +
+          newViewOffset.y - this.#viewOffset.y +
+          newFlipOffset.y - this.#flipOffset.y,
+      };
       // update private local offsets
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
-      // update global offset
-      this.#offset = {
-        x: this.#viewOffset.x +
-          this.#baseOffset.x +
-          this.#zoomOffset.x +
-          this.#flipOffset.x,
-        y: this.#viewOffset.y +
-          this.#baseOffset.y +
-          this.#zoomOffset.y +
-          this.#flipOffset.y
-      };
       // update draw flag
       needsDraw = true;
     }
