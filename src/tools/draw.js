@@ -593,8 +593,6 @@ export class Draw {
       this.#app.addEventListener('positionchange', () => {
         this.#updateDrawLayer(layerGroup);
       });
-      // same for colour
-      this.setFeatures({lineColour: this.#style.getLineColour()});
     } else {
       // reset shape and cursor
       this.#resetActiveShapeGroup();
@@ -697,14 +695,6 @@ export class Draw {
     }
     if (typeof this.#activeShapeGroup !== 'undefined') {
       this.#activeShapeGroup.opacity(1);
-      const colour = this.#style.getLineColour();
-      this.#activeShapeGroup.getChildren(canNodeChangeColour).forEach(
-        function (ashape) {
-          if (ashape instanceof Konva.Shape) {
-            ashape.stroke(colour);
-          }
-        }
-      );
     }
   }
 
