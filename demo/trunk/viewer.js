@@ -156,12 +156,8 @@ function viewerSetup() {
         ++dataLoad;
         // init gui
         if (dataLoad === numberOfDataToLoad) {
-          // select tool
-          const selectedTool = getSelectedTool();
-          _app.setTool(selectedTool.name);
-          if (selectedTool.name === 'Draw') {
-            _app.setToolFeatures({shapeName: selectedTool.option});
-          }
+          // set app tool
+          setAppTool();
 
           const changeLayoutSelect = document.getElementById('changelayout');
           changeLayoutSelect.disabled = false;
@@ -377,13 +373,7 @@ function onDOMContentLoaded() {
     }
 
     // need to set tool after config change
-    const selectedTool = getSelectedTool();
-    if (typeof selectedTool !== 'undefined') {
-      _app.setTool(selectedTool.name);
-      if (selectedTool.name === 'Draw') {
-        _app.setToolFeatures({shapeName: selectedTool.option});
-      }
-    }
+    setAppTool();
   });
 
   const smoothingChk = document.getElementById('changesmoothing');
@@ -688,12 +678,9 @@ function setupToolsCheckboxes() {
   const toolsDiv = document.getElementById('tools');
   const keys = Object.keys(_tools);
 
-  const getChangeTool = function (tool, option) {
+  const getChangeTool = function (tool) {
     return function () {
-      _app.setTool(tool);
-      if (tool === 'Draw') {
-        _app.setToolFeatures({shapeName: option});
-      }
+      setAppTool(tool);
     };
   };
 
@@ -710,69 +697,139 @@ function setupToolsCheckboxes() {
 
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
-    const tool = _tools[key];
-    let options = [''];
-    if (typeof tool.options !== 'undefined') {
-      options = tool.options;
+
+    const input = document.createElement('input');
+    input.name = 'tools';
+    input.type = 'radio';
+    input.id = 'tool-' + i;
+    input.title = key;
+    input.onchange = getChangeTool(key);
+
+    if (key === 'Scroll') {
+      input.checked = true;
     }
 
-    for (let j = 0; j < options.length; ++j) {
-      const input = document.createElement('input');
-      input.name = 'tools';
-      input.type = 'radio';
-      input.id = 'tool-' + i;
-      input.title = key;
-      if (options[j] !== '') {
-        input.id += '-' + options[j];
-        input.title += ':' + options[j];
-      }
-      input.onchange = getChangeTool(key, options[j]);
+    const label = document.createElement('label');
+    label.htmlFor = input.id;
+    label.title = input.title;
+    label.appendChild(document.createTextNode(input.title));
 
-      if (key === 'Scroll') {
-        input.checked = true;
-      }
+    toolsDiv.appendChild(input);
+    toolsDiv.appendChild(label);
 
-      const label = document.createElement('label');
-      label.htmlFor = input.id;
-      label.title = input.title;
-      label.appendChild(document.createTextNode(input.title));
-
-      toolsDiv.appendChild(input);
-      toolsDiv.appendChild(label);
-
-      // keyboard shortcut
-      let shortcut = key[0].toLowerCase();
-      if (options[j] !== '') {
-        shortcut = options[j][0].toLowerCase();
-      }
-      window.addEventListener('keydown', getKeyCheck(shortcut, input));
+    const featuresHtml = getToolFeaturesHtml(key);
+    if (typeof featuresHtml !== 'undefined') {
+      toolsDiv.appendChild(featuresHtml);
     }
+
+    // keyboard shortcut
+    const shortcut = key[0].toLowerCase();
+    window.addEventListener('keydown', getKeyCheck(shortcut, input));
   }
 }
 
 /**
- * Get the selected tool
+ * Get the input tool features values from the UI.
  *
- * @returns {object|undefined} The tool name and possible option.
+ * @param {string} toolName The tool name.
+ * @returns {object} The features for the tool.
  */
-function getSelectedTool() {
+function getToolFeatures(toolName) {
   let res;
-  const toolsInput = document.getElementsByName('tools');
-  let toolName;
-  for (let j = 0; j < toolsInput.length; ++j) {
-    if (toolsInput[j].checked) {
-      toolName = toolsInput[j].title;
-      break;
-    }
-  }
-  if (typeof toolName !== 'undefined') {
-    const split = toolName.split(':');
+  if (toolName === 'Draw') {
+    const shapeSelect = document.getElementById('draw-shape-select');
     res = {
-      name: split[0],
-      option: split[1]
+      shapeName: shapeSelect.value
     };
   }
   return res;
+}
+
+/**
+ * Get the input tool features HTML.
+ *
+ * @param {string} toolName The tool name.
+ * @returns {HTMLElement} The element representing the tool features.
+ */
+function getToolFeaturesHtml(toolName) {
+  let res;
+  if (toolName === 'Draw') {
+    const shapeSelect = document.createElement('select');
+    shapeSelect.id = 'draw-shape-select';
+
+    const shapeNames = _tools.Draw.options;
+    for (const shapeName of shapeNames) {
+      const opt = document.createElement('option');
+      opt.id = 'shape-' + shapeName;
+      opt.value = shapeName;
+      opt.appendChild(document.createTextNode(shapeName));
+      shapeSelect.appendChild(opt);
+    }
+
+    shapeSelect.onchange = function (event) {
+      _app.setToolFeatures({shapeName: event.target.value});
+    };
+
+    const autoColourInput = document.createElement('input');
+    autoColourInput.type = 'checkbox';
+    autoColourInput.id = 'draw-auto-colour';
+    autoColourInput.checked = true;
+
+    const autoLabel = document.createElement('label');
+    autoLabel.htmlFor = autoColourInput.id;
+    autoLabel.appendChild(document.createTextNode('auto colour'));
+
+    const colourInput = document.createElement('input');
+    colourInput.type = 'color';
+    colourInput.id = 'draw-colour-chooser';
+    colourInput.value = '#ffff80';
+    colourInput.disabled = true;
+
+    autoColourInput.onchange = function (event) {
+      _app.setToolFeatures({autoShapeColour: event.target.checked});
+      colourInput.disabled = event.target.checked;
+    };
+
+    colourInput.onchange = function (event) {
+      _app.setToolFeatures({shapeColour: event.target.value});
+    };
+
+    res = document.createElement('span');
+    res.className = 'toolFeatures';
+    res.appendChild(shapeSelect);
+    res.appendChild(autoColourInput);
+    res.appendChild(autoLabel);
+    res.appendChild(colourInput);
+  }
+
+  return res;
+}
+
+/**
+ * Set the app tool.
+ *
+ * @param {string} toolName The tool to set.
+ */
+function setAppTool(toolName) {
+  // find the tool name if not provided
+  if (typeof toolName === 'undefined') {
+    const toolsInput = document.getElementsByName('tools');
+    for (let j = 0; j < toolsInput.length; ++j) {
+      if (toolsInput[j].checked) {
+        toolName = toolsInput[j].title;
+        break;
+      }
+    }
+    if (typeof toolName === 'undefined') {
+      console.warn('Cannot find tool to set the app with...');
+    }
+  }
+  _app.setTool(toolName);
+  // tool features
+  const features = getToolFeatures(toolName);
+  if (typeof features !== 'undefined') {
+    _app.setToolFeatures(features);
+  }
 }
 
 /**
