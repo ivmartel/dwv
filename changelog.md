@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add app options type  [#1481](https://github.com/ivmartel/dwv/issues/1481)
+- Add app options type [#1481](https://github.com/ivmartel/dwv/issues/1481)
 - Add data element type [#1474](https://github.com/ivmartel/dwv/issues/1474)
 - Export luts as plural not singular [#1478](https://github.com/ivmartel/dwv/issues/1478)
 - Add data view config type [#1475](https://github.com/ivmartel/dwv/issues/1475)
@@ -29,7 +29,7 @@
 
 - Make dwv importable as an es6 module [#399](https://github.com/ivmartel/dwv/issues/399)
 - typings [#669](https://github.com/ivmartel/dwv/issues/669)
-- Follow DICOM json standard  [#1071](https://github.com/ivmartel/dwv/issues/1071)
+- Follow DICOM json standard [#1071](https://github.com/ivmartel/dwv/issues/1071)
 
 ### Fixed
 
@@ -524,7 +524,7 @@
 
 ### Added
 
-- Make mouse-wheel and mouse-move coherent for scroll  [#427](https://github.com/ivmartel/dwv/issues/427)
+- Make mouse-wheel and mouse-move coherent for scroll [#427](https://github.com/ivmartel/dwv/issues/427)
 - Misprint in label [#426](https://github.com/ivmartel/dwv/issues/426)
 - Add folder support on file input [#424](https://github.com/ivmartel/dwv/issues/424)
 - Allow to cancel a file download and/or display [#412](https://github.com/ivmartel/dwv/issues/412)
@@ -573,7 +573,7 @@
 
 ### Added
 
-- Allow for easier file loader integration  [#337](https://github.com/ivmartel/dwv/issues/337)
+- Allow for easier file loader integration [#337](https://github.com/ivmartel/dwv/issues/337)
 - Use a top of page line progress for the mobile viewer [#333](https://github.com/ivmartel/dwv/issues/333)
 - Import data from video file [#328](https://github.com/ivmartel/dwv/issues/328)
 - Do not show mesures when no pixel spacing is set [#302](https://github.com/ivmartel/dwv/issues/302)
@@ -630,7 +630,7 @@
 
 ### Added
 
-- Allow for individual draw display toggle  [#293](https://github.com/ivmartel/dwv/issues/293)
+- Allow for individual draw display toggle [#293](https://github.com/ivmartel/dwv/issues/293)
 - Add a free-hand draw tool [#292](https://github.com/ivmartel/dwv/issues/292)
 - Add an annotation draw tool [#291](https://github.com/ivmartel/dwv/issues/291)
 - Change the line tool into a ruler [#290](https://github.com/ivmartel/dwv/issues/290)
@@ -718,7 +718,7 @@
 
 - Fix id generator [#201](https://github.com/ivmartel/dwv/issues/201)
 - Fix slice order glitch [#200](https://github.com/ivmartel/dwv/issues/200)
-- group.id argument for draw listener  [#198](https://github.com/ivmartel/dwv/issues/198)
+- group.id argument for draw listener [#198](https://github.com/ivmartel/dwv/issues/198)
 - Uncaught TypeError: Cannot read property 'add' of null [#197](https://github.com/ivmartel/dwv/issues/197)
 
 ---
@@ -740,7 +740,7 @@
 
 ### Added
 
-- Access GUI component per app  [#177](https://github.com/ivmartel/dwv/issues/177)
+- Access GUI component per app [#177](https://github.com/ivmartel/dwv/issues/177)
 
 ### Fixed
 
@@ -938,7 +938,7 @@
 - Adapt presets to modality [#37](https://github.com/ivmartel/dwv/issues/37)
 - MVC Design [#36](https://github.com/ivmartel/dwv/issues/36)
 - Safeguard zoom/pan [#35](https://github.com/ivmartel/dwv/issues/35)
-- Use the bits* DICOM tags [#30](https://github.com/ivmartel/dwv/issues/30)
+- Use the bits\* DICOM tags [#30](https://github.com/ivmartel/dwv/issues/30)
 - Load multiple local slices [#3](https://github.com/ivmartel/dwv/issues/3)
 
 ### Fixed
