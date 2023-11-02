@@ -207,6 +207,14 @@ export class Draw {
   #withScroll = true;
 
   /**
+   * Auto shape colour: will use defaults colours and
+   * vary them according to the layer.
+   *
+   * @type {boolean}
+   */
+  #autoShapeColour = true;
+
+  /**
    * Event listeners.
    */
   #listeners = {};
@@ -510,9 +518,26 @@ export class Draw {
       this.#tmpShapeGroup = null;
     }
 
+    const viewLayer = layerGroup.getActiveViewLayer();
+
+    // auto mode: vary shape colour with layer id
+    if (this.#autoShapeColour) {
+      const colours = [
+        '#ffff80', '#ff80ff', '#80ffff', '#80ff80', '8080ff', 'ff8080'
+      ];
+      // warning: depends on layer id nomenclature
+      const viewLayerId = viewLayer.getId();
+      const layerId = viewLayerId.substring(viewLayerId.length - 1);
+      // expecting one draw layer per view layer
+      const layerIndex = parseInt(layerId, 10) / 2;
+      const colour = colours[layerIndex];
+      if (typeof colour !== 'undefined') {
+        this.#style.setLineColour(colour);
+      }
+    }
+
     // create shape group
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const viewController = viewLayer.getViewController();
     this.#tmpShapeGroup = this.#currentFactory.create(
       tmpPoints, this.#style, viewController);
     // do not listen during creation
@@ -984,8 +1009,12 @@ export class Draw {
    * @param {object} features The list of features.
    */
   setFeatures(features) {
+    if (typeof features.autoShapeColour !== 'undefined') {
+      this.#autoShapeColour = features.autoShapeColour;
+    }
     if (typeof features.shapeColour !== 'undefined') {
       this.#style.setLineColour(features.shapeColour);
+      this.#autoShapeColour = false;
     }
     if (typeof features.shapeName !== 'undefined') {
       // check if we have it
