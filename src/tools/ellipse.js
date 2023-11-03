@@ -156,16 +156,16 @@ export class EllipseFactory {
 
     const anchors = [];
     anchors.push(getDefaultAnchor(
-      ellipseX - radius.x, ellipseY - radius.y, 'topLeft', style
+      ellipseX - radius.x, ellipseY, 'left', style
     ));
     anchors.push(getDefaultAnchor(
-      ellipseX + radius.x, ellipseY - radius.y, 'topRight', style
+      ellipseX + radius.x, ellipseY, 'right', style
     ));
     anchors.push(getDefaultAnchor(
-      ellipseX + radius.x, ellipseY + radius.y, 'bottomRight', style
+      ellipseX, ellipseY + radius.y, 'bottom', style
     ));
     anchors.push(getDefaultAnchor(
-      ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft', style
+      ellipseX, ellipseY - radius.y, 'top', style
     ));
     return anchors;
   }
@@ -195,17 +195,17 @@ export class EllipseFactory {
       return node.name() === 'label';
     })[0];
     // find special points
-    const topLeft = group.getChildren(function (node) {
-      return node.id() === 'topLeft';
+    const left = group.getChildren(function (node) {
+      return node.id() === 'left';
     })[0];
-    const topRight = group.getChildren(function (node) {
-      return node.id() === 'topRight';
+    const right = group.getChildren(function (node) {
+      return node.id() === 'right';
     })[0];
-    const bottomRight = group.getChildren(function (node) {
-      return node.id() === 'bottomRight';
+    const bottom = group.getChildren(function (node) {
+      return node.id() === 'bottom';
     })[0];
-    const bottomLeft = group.getChildren(function (node) {
-      return node.id() === 'bottomLeft';
+    const top = group.getChildren(function (node) {
+      return node.id() === 'top';
     })[0];
     // debug shadow
     let kshadow;
@@ -215,43 +215,58 @@ export class EllipseFactory {
       })[0];
     }
 
+    // ellipse center
+    const center = {
+      x: kellipse.x(),
+      y: kellipse.y()
+    };
+
+    let radiusX;
+    let radiusY;
+
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'topLeft':
-      topLeft.x(anchor.x());
-      topLeft.y(anchor.y());
-      topRight.y(anchor.y());
-      bottomLeft.x(anchor.x());
+    case 'left':
+      radiusX = center.x - anchor.x();
+      radiusY = top.y() - center.y;
+      // update self (while blocking y)
+      left.x(anchor.x());
+      left.y(right.y());
+      // update others
+      right.x(center.x + radiusX);
       break;
-    case 'topRight':
-      topRight.x(anchor.x());
-      topRight.y(anchor.y());
-      topLeft.y(anchor.y());
-      bottomRight.x(anchor.x());
+    case 'right':
+      radiusX = anchor.x() - center.x;
+      radiusY = top.y() - center.y;
+      // update self (while blocking y)
+      right.x(anchor.x());
+      right.y(left.y());
+      // update others
+      left.x(center.x - radiusX);
       break;
-    case 'bottomRight':
-      bottomRight.x(anchor.x());
-      bottomRight.y(anchor.y());
-      bottomLeft.y(anchor.y());
-      topRight.x(anchor.x());
+    case 'bottom':
+      radiusX = center.x - left.x();
+      radiusY = anchor.y() - center.y;
+      // update self (while blocking x)
+      bottom.x(top.x());
+      bottom.y(anchor.y());
+      // update others
+      top.y(center.y - radiusY);
       break;
-    case 'bottomLeft':
-      bottomLeft.x(anchor.x());
-      bottomLeft.y(anchor.y());
-      bottomRight.y(anchor.y());
-      topLeft.x(anchor.x());
+    case 'top':
+      radiusX = center.x - left.x();
+      radiusY = center.y - anchor.y();
+      // update self (while blocking x)
+      top.x(bottom.x());
+      top.y(anchor.y());
+      // update others
+      bottom.y(center.y + radiusY);
       break;
     default :
       logger.error('Unhandled anchor id: ' + anchor.id());
       break;
     }
     // update shape
-    const radiusX = (topRight.x() - topLeft.x()) / 2;
-    const radiusY = (bottomRight.y() - topRight.y()) / 2;
-    const center = {
-      x: topLeft.x() + radiusX,
-      y: topRight.y() + radiusY
-    };
     kellipse.position(center);
     const radiusAbs = {
       x: Math.abs(radiusX),
