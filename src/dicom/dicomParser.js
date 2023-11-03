@@ -43,6 +43,11 @@ export function getDwvVersion() {
  * @returns {boolean} True if the buffer includes the prefix.
  */
 export function hasDicomPrefix(buffer) {
+  // check size: typed array constructor will throw RangeError if
+  // byteOffset + length * TypedArray.BYTES_PER_ELEMENT > buffer.byteLength
+  if (buffer.byteLength < 132) {
+    return false;
+  }
   const prefixArray = new Uint8Array(buffer, 128, 4);
   const stringReducer = function (previous, current) {
     return previous += String.fromCharCode(current);
