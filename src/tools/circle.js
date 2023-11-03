@@ -159,10 +159,10 @@ export class CircleFactory {
       centerX + radius, centerY, 'right', style
     ));
     anchors.push(getDefaultAnchor(
-      centerX, centerY - radius, 'bottom', style
+      centerX, centerY + radius, 'bottom', style
     ));
     anchors.push(getDefaultAnchor(
-      centerX, centerY + radius, 'top', style
+      centerX, centerY - radius, 'top', style
     ));
     return anchors;
   }
@@ -224,39 +224,43 @@ export class CircleFactory {
     switch (anchor.id()) {
     case 'left':
       radius = center.x - anchor.x();
-      // force y
+      // update self (while blocking y)
+      left.x(anchor.x());
       left.y(right.y());
       // update others
       right.x(center.x + radius);
-      bottom.y(center.y - radius);
-      top.y(center.y + radius);
+      bottom.y(center.y + radius);
+      top.y(center.y - radius);
       break;
     case 'right':
       radius = anchor.x() - center.x;
-      // force y
+      // update self (while blocking y)
+      right.x(anchor.x());
       right.y(left.y());
       // update others
       left.x(center.x - radius);
-      bottom.y(center.y - radius);
-      top.y(center.y + radius);
+      bottom.y(center.y + radius);
+      top.y(center.y - radius);
       break;
     case 'bottom':
-      radius = center.y - anchor.y();
-      // force x
+      radius = anchor.y() - center.y;
+      // update self (while blocking x)
       bottom.x(top.x());
+      bottom.y(anchor.y());
       // update others
       left.x(center.x - radius);
       right.x(center.x + radius);
-      top.y(center.y + radius);
+      top.y(center.y - radius);
       break;
     case 'top':
-      radius = anchor.y() - center.y;
-      // force x
+      radius = center.y - anchor.y();
+      // update self (while blocking x)
       top.x(bottom.x());
+      top.y(anchor.y());
       // update others
       left.x(center.x - radius);
       right.x(center.x + radius);
-      bottom.y(center.y - radius);
+      bottom.y(center.y + radius);
       break;
     default :
       logger.error('Unhandled anchor id: ' + anchor.id());
