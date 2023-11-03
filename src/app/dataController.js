@@ -19,11 +19,28 @@ export class DataController {
   #data = {};
 
   /**
+   * Distinct data loaded counter.
+   *
+   * @type {number}
+   */
+  #dataIdCounter = -1;
+
+  /**
    * Listener handler.
    *
    * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
+
+  /**
+   * Get the next data id.
+   *
+   * @returns {string} The data id.
+   */
+  getNextDataId() {
+    ++this.#dataIdCounter;
+    return this.#dataIdCounter.toString();
+  }
 
   /**
    * Get the list of ids in the data storage.

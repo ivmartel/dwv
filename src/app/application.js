@@ -288,7 +288,7 @@ export class App {
    * @returns {string} The new image data id.
    */
   addNewImage(image, meta) {
-    const dataId = this.#dataController.getDataIds().length.toString();
+    const dataId = this.#dataController.getNextDataId();
 
     // load start event
     this.#fireEvent({
@@ -688,11 +688,13 @@ export class App {
    * @function
    */
   loadFiles = (files) => {
+    // Get new data id
+    const dataId = this.#dataController.getNextDataId();
     if (files.length === 0) {
       logger.warn('Ignoring empty input file list.');
       return;
     }
-    this.#loadController.loadFiles(files);
+    this.#loadController.loadFiles(files, dataId);
   };
 
   /**
@@ -712,11 +714,13 @@ export class App {
    * @function
    */
   loadURLs = (urls, options) => {
+    // Get new data id
+    const dataId = this.#dataController.getNextDataId();
     if (urls.length === 0) {
       logger.warn('Ignoring empty input url list.');
       return;
     }
-    this.#loadController.loadURLs(urls, options);
+    this.#loadController.loadURLs(urls, dataId, options);
   };
 
   /**
@@ -762,7 +766,9 @@ export class App {
    * @function
    */
   loadImageObject = (data) => {
-    this.#loadController.loadImageObject(data);
+    // Get new data id
+    const dataId = this.#dataController.getNextDataId();
+    this.#loadController.loadImageObject(data, dataId);
   };
 
   /**
