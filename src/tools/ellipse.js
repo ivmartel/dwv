@@ -112,8 +112,8 @@ export class EllipseFactory {
     };
     // label
     const klabel = new Konva.Label({
-      x: ellipse.getCenter().getX(),
-      y: ellipse.getCenter().getY(),
+      x: ellipse.getCenter().getX() - ellipse.getA(),
+      y: ellipse.getCenter().getY() + ellipse.getB(),
       scale: style.applyZoomScale(1),
       visible: textExpr.length !== 0,
       name: 'label'
@@ -253,7 +253,10 @@ export class EllipseFactory {
       y: topRight.y() + radiusY
     };
     kellipse.position(center);
-    const radiusAbs = {x: Math.abs(radiusX), y: Math.abs(radiusY)};
+    const radiusAbs = {
+      x: Math.abs(radiusX),
+      y: Math.abs(radiusY)
+    };
     if (radiusAbs) {
       kellipse.radius(radiusAbs);
     }
@@ -273,7 +276,10 @@ export class EllipseFactory {
     }
 
     // update label position
-    const textPos = {x: center.x, y: center.y};
+    const textPos = {
+      x: center.x - radiusAbs.x,
+      y: center.y + radiusAbs.y
+    };
     klabel.position(textPos);
 
     // update quantification

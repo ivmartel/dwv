@@ -109,8 +109,8 @@ export class CircleFactory {
     };
     // label
     const klabel = new Konva.Label({
-      x: circle.getCenter().getX(),
-      y: circle.getCenter().getY(),
+      x: circle.getCenter().getX() - circle.getRadius(),
+      y: circle.getCenter().getY() + circle.getRadius(),
       scale: style.applyZoomScale(1),
       visible: textExpr.length !== 0,
       name: 'label'
@@ -281,7 +281,10 @@ export class CircleFactory {
     }
 
     // update label position
-    const textPos = {x: center.x, y: center.y};
+    const textPos = {
+      x: center.x - Math.abs(radius),
+      y: center.y + Math.abs(radius)
+    };
     klabel.position(textPos);
 
     // update quantification
