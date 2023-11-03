@@ -227,6 +227,8 @@ export class DrawLayer {
     display(flag: boolean): void;
     draw(): void;
     fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
+    flipScaleX(): void;
+    flipScaleY(): void;
     flipScaleZ(): void;
     getBaseSize(): object;
     getDataId(): string;
@@ -732,7 +734,7 @@ export class ViewController {
     decrementScrollIndex(silent?: boolean): boolean;
     deleteSegment(segmentNumber: number, exeCallback: Function): void;
     equalImageMeta(meta: object): boolean;
-    generateImageData(array: ImageData, index: Index): void;
+    generateImageData(array: ImageData, index?: Index): void;
     get2DSpacing(): any[];
     getColourMap(): string;
     getCurrentIndex(): Index;
@@ -792,6 +794,8 @@ export class ViewLayer {
     displayToPlaneScale(x: number, y: number): object;
     draw(): void;
     fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
+    flipScaleX(): void;
+    flipScaleY(): void;
     flipScaleZ(): void;
     getBaseSize(): object;
     getDataId(): string;
