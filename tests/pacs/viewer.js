@@ -81,7 +81,7 @@ function viewerSetup() {
     WindowLevel: {},
     ZoomAndPan: {},
     Opacity: {},
-    Draw: {options: ['Ruler', 'Circle']}
+    Draw: {options: ['Ruler', 'Circle', 'Ellipse', 'Rectangle']}
   };
 
   // app config
