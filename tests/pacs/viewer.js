@@ -122,7 +122,8 @@ function viewerSetup() {
       event.lengthComputable) {
       dataLoadProgress[event.dataid] =
         Math.ceil((event.loaded / event.total) * 100);
-      document.getElementById('loadprogress').value =
+      const progressElement = document.getElementById('loadprogress');
+      progressElement.value =
         dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
     }
   });
@@ -169,9 +170,11 @@ function viewerSetup() {
       }
     }
 
+    const meta = _app.getMetaData(event.dataid);
+
     if (event.loadtype === 'image' &&
-      typeof _app.getMetaData(event.dataid)['00080060'] !== 'undefined' &&
-      _app.getMetaData(event.dataid)['00080060'].value[0] === 'SEG') {
+      typeof meta['00080060'] !== 'undefined' &&
+      meta['00080060'].value[0] === 'SEG') {
       // log SEG details
       logFramePosPats(_app.getMetaData(event.dataid));
 
@@ -193,20 +196,23 @@ function viewerSetup() {
           segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
         ]);
         const segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
-        const indexOffset = segOriginIndex.get(2) * sliceSize;
-        // set alpha function
-        vc.setViewAlphaFunction(function (value, index) {
-          // multiply by 3 since SEG is RGB
-          const segIndex = 3 * (index - indexOffset);
-          if (segIndex >= 0 &&
-            segImage.getValueAtOffset(segIndex) === 0 &&
-            segImage.getValueAtOffset(segIndex + 1) === 0 &&
-            segImage.getValueAtOffset(segIndex + 2) === 0) {
-            return 0;
-          } else {
-            return 0xff;
-          }
-        });
+        const z = segOriginIndex.get(2);
+        if (typeof z !== 'undefined') {
+          const indexOffset = z * sliceSize;
+          // set alpha function
+          vc.setViewAlphaFunction(function (value, index) {
+            // multiply by 3 since SEG is RGB
+            const segIndex = 3 * (index - indexOffset);
+            if (segIndex >= 0 &&
+              segImage.getValueAtOffset(segIndex) === 0 &&
+              segImage.getValueAtOffset(segIndex + 1) === 0 &&
+              segImage.getValueAtOffset(segIndex + 2) === 0) {
+              return 0;
+            } else {
+              return 0xff;
+            }
+          });
+        }
       }
     }
   });
@@ -221,7 +227,9 @@ function viewerSetup() {
     input.value = values.map(getPrecisionRound(2));
     // index as small text
     const span = document.getElementById('positionspan');
-    span.innerHTML = text;
+    if (span) {
+      span.innerHTML = text;
+    }
   });
 
   // default keyboard shortcuts
@@ -229,8 +237,12 @@ function viewerSetup() {
     _app.defaultOnKeydown(event);
     // mask segment related
     if (!isNaN(parseInt(event.key, 10))) {
-      const vc =
-        _app.getActiveLayerGroup().getActiveViewLayer().getViewController();
+      const lg = _app.getActiveLayerGroup();
+      const vl = lg.getActiveViewLayer();
+      if (typeof vl === 'undefined') {
+        return;
+      }
+      const vc = vl.getViewController();
       if (!vc.isMask()) {
         return;
       }
@@ -311,10 +323,11 @@ function onDOMContentLoaded() {
   viewerSetup();
 
   const positionInput = document.getElementById('position');
-  positionInput.addEventListener('change', function () {
+  positionInput.addEventListener('change', function (event) {
     const vls = _app.getViewLayersByDataId('0');
     const vc = vls[0].getViewController();
-    const values = this.value.split(',');
+    const element = event.target;
+    const values = element.value.split(',');
     vc.setCurrentPosition(new dwv.Point([
       parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
     ])
@@ -330,7 +343,8 @@ function onDOMContentLoaded() {
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.disabled = true;
   changeLayoutSelect.addEventListener('change', function (event) {
-    const layout = event.target.value;
+    const selectElement = event.target;
+    const layout = selectElement.value;
     if (layout !== 'one' &&
       layout !== 'side' &&
       layout !== 'mpr') {
@@ -349,6 +363,10 @@ function onDOMContentLoaded() {
     } else if (layout === 'mpr') {
       addLayerGroups(3);
       configs = getMPRDataViewConfig(dataIds);
+    }
+
+    if (typeof configs === 'undefined') {
+      return;
     }
 
     // unbind app to controls
@@ -380,7 +398,8 @@ function onDOMContentLoaded() {
   smoothingChk.checked = false;
   smoothingChk.disabled = true;
   smoothingChk.addEventListener('change', function (event) {
-    _app.setImageSmoothing(event.target.checked);
+    const inputElement = event.target;
+    _app.setImageSmoothing(inputElement.checked);
   });
 
   // setup
@@ -393,8 +412,9 @@ function onDOMContentLoaded() {
   const fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
     console.log('%c ----------------', 'color: teal;');
-    console.log(event.target.files);
-    _app.loadFiles(event.target.files);
+    const fileElement = event.target;
+    console.log(fileElement.files);
+    _app.loadFiles(fileElement.files);
   });
 }
 
@@ -419,7 +439,9 @@ function addLayerGroup(id) {
 function addLayerGroups(number) {
   // clean up
   const dwvDiv = document.getElementById('dwv');
-  dwvDiv.innerHTML = '';
+  if (dwvDiv) {
+    dwvDiv.innerHTML = '';
+  }
   // add div
   for (let i = 0; i < number; ++i) {
     addLayerGroup('layerGroup' + i);
@@ -629,7 +651,8 @@ function setupBindersCheckboxes() {
    */
   function getOnInputChange(propName) {
     return function (event) {
-      if (event.target.checked) {
+      const inputElement = event.target;
+      if (inputElement.checked) {
         addBinder(propName);
       } else {
         removeBinder(propName);
@@ -758,6 +781,10 @@ function getToolFeaturesHtml(toolName) {
     shapeSelect.id = 'draw-shape-select';
 
     const shapeNames = _tools.Draw.options;
+    if (typeof shapeNames === 'undefined') {
+      return;
+    }
+
     for (const shapeName of shapeNames) {
       const opt = document.createElement('option');
       opt.id = 'shape-' + shapeName;
@@ -767,7 +794,8 @@ function getToolFeaturesHtml(toolName) {
     }
 
     shapeSelect.onchange = function (event) {
-      _app.setToolFeatures({shapeName: event.target.value});
+      const element = event.target;
+      _app.setToolFeatures({shapeName: element.value});
     };
 
     const autoColourInput = document.createElement('input');
@@ -786,12 +814,14 @@ function getToolFeaturesHtml(toolName) {
     colourInput.disabled = true;
 
     autoColourInput.onchange = function (event) {
-      _app.setToolFeatures({autoShapeColour: event.target.checked});
-      colourInput.disabled = event.target.checked;
+      const element = event.target;
+      _app.setToolFeatures({autoShapeColour: element.checked});
+      colourInput.disabled = element.checked;
     };
 
     colourInput.onchange = function (event) {
-      _app.setToolFeatures({shapeColour: event.target.value});
+      const element = event.target;
+      _app.setToolFeatures({shapeColour: element.value});
     };
 
     res = document.createElement('span');
@@ -808,20 +838,22 @@ function getToolFeaturesHtml(toolName) {
 /**
  * Set the app tool.
  *
- * @param {string} toolName The tool to set.
+ * @param {string} [toolName] The tool to set.
  */
 function setAppTool(toolName) {
   // find the tool name if not provided
   if (typeof toolName === 'undefined') {
     const toolsInput = document.getElementsByName('tools');
     for (let j = 0; j < toolsInput.length; ++j) {
-      if (toolsInput[j].checked) {
-        toolName = toolsInput[j].title;
+      const toolInput = toolsInput[j];
+      if (toolInput.checked) {
+        toolName = toolInput.title;
         break;
       }
     }
     if (typeof toolName === 'undefined') {
       console.warn('Cannot find tool to set the app with...');
+      return;
     }
   }
   _app.setTool(toolName);
@@ -882,8 +914,8 @@ function onWLChange(event) {
   }
   // preset select
   elemId = 'preset-' + event.dataid + '-select';
-  elem = document.getElementById(elemId);
-  if (elem) {
+  const selectElem = document.getElementById(elemId);
+  if (selectElem) {
     const ids = getDataLayerGroupDivIds(event.dataid);
     const lg = _app.getLayerGroupByDivId(ids[0]);
     const vls = lg.getViewLayersByDataId(event.dataid);
@@ -893,7 +925,7 @@ function onWLChange(event) {
       const presetName = vc.getCurrentWindowPresetName();
       const optName = 'manual';
       if (presetName === optName) {
-        const options = elem.options;
+        const options = selectElem.options;
         const optId = 'preset-manual';
         let manualOpt = options.namedItem(optId);
         if (!manualOpt) {
@@ -901,9 +933,9 @@ function onWLChange(event) {
           opt.id = optId;
           opt.value = optName;
           opt.appendChild(document.createTextNode(optName));
-          manualOpt = elem.appendChild(opt);
+          manualOpt = selectElem.appendChild(opt);
         }
-        elem.selectedIndex = manualOpt.index;
+        selectElem.selectedIndex = manualOpt.index;
       }
     }
   }
@@ -937,7 +969,9 @@ function onOpacityChange(event) {
  */
 function clearDataTable() {
   const detailsDiv = document.getElementById('layersdetails');
-  detailsDiv.innerHTML = '';
+  if (detailsDiv) {
+    detailsDiv.innerHTML = '';
+  }
 }
 
 /**
@@ -952,7 +986,14 @@ function clearDataTable() {
  * @param {number} precision Optional number field float precision.
  * @returns {object} The control div.
  */
-function getControlDiv(id, name, min, max, value, callback, precision) {
+function getControlDiv(
+  id,
+  name,
+  min,
+  max,
+  value,
+  callback,
+  precision) {
   const range = document.createElement('input');
   range.id = id + '-range';
   range.className = 'ctrl-range';
@@ -960,7 +1001,7 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
   range.min = min.toPrecision(precision);
   range.max = max.toPrecision(precision);
   range.step = ((max - min) * 0.01).toPrecision(precision);
-  range.value = value;
+  range.value = value.toString();
 
   const label = document.createElement('label');
   label.id = id + '-label';
@@ -975,16 +1016,18 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
   number.min = range.min;
   number.max = range.max;
   number.step = range.step;
-  number.value = parseFloat(value).toPrecision(precision);
+  number.value = value.toPrecision(precision);
 
   // callback and bind range and number
-  number.oninput = function () {
-    range.value = this.value;
-    callback(this.value);
+  number.oninput = function (event) {
+    const element = event.target;
+    range.value = element.value;
+    callback(element.value);
   };
-  range.oninput = function () {
-    number.value = parseFloat(this.value).toPrecision(precision);
-    callback(this.value);
+  range.oninput = function (event) {
+    const element = event.target;
+    number.value = parseFloat(element.value).toPrecision(precision);
+    callback(element.value);
   };
 
   const div = document.createElement('div');
@@ -1070,7 +1113,8 @@ function addDataRow(dataId) {
     radio.id = 'layerselect-' + divId + '-' + dataId;
     radio.checked = true;
     radio.onchange = function (event) {
-      const fullId = event.target.id;
+      const element = event.target;
+      const fullId = element.id;
       const split = fullId.split('-');
       const groupDivId = split[1];
       const dataId = split[2];
@@ -1093,12 +1137,14 @@ function addDataRow(dataId) {
       _app.addDataViewConfig(dataId, getViewConfig(divId));
       // update html
       const parent = button.parentElement;
-      parent.replaceChildren();
-      parent.appendChild(getLayerRadio(index, divId));
-      parent.appendChild(getLayerRem(index, divId));
-      parent.appendChild(getLayerUpdate(index, divId, 'axial'));
-      parent.appendChild(getLayerUpdate(index, divId, 'coronal'));
-      parent.appendChild(getLayerUpdate(index, divId, 'sagittal'));
+      if (parent) {
+        parent.replaceChildren();
+        parent.appendChild(getLayerRadio(index, divId));
+        parent.appendChild(getLayerRem(index, divId));
+        parent.appendChild(getLayerUpdate(index, divId, 'axial'));
+        parent.appendChild(getLayerUpdate(index, divId, 'coronal'));
+        parent.appendChild(getLayerUpdate(index, divId, 'sagittal'));
+      }
     };
     return button;
   };
@@ -1131,9 +1177,8 @@ function addDataRow(dataId) {
     button.appendChild(document.createTextNode(letter));
     button.onclick = function () {
       // update app
-      const config = {
-        orientation: orientation
-      };
+      const config = getViewConfig(divId);
+      config.orientation = orientation;
       _app.updateDataViewConfig(dataId, divId, config);
     };
     return button;
@@ -1174,9 +1219,11 @@ function addDataRow(dataId) {
   const maxId = 'value-max-' + dataId;
   // callback
   const changeAlphaFunc = function () {
-    const min = parseFloat(document.getElementById(minId + '-number').value);
-    const max = parseFloat(document.getElementById(maxId + '-number').value);
-    const func = function (value) {
+    const minElement = document.getElementById(minId + '-number');
+    const min = parseFloat(minElement.value);
+    const maxElement = document.getElementById(maxId + '-number');
+    const max = parseFloat(maxElement.value);
+    const func = function (value, _index) {
       if (value >= min && value <= max) {
         return 255;
       }
@@ -1186,8 +1233,11 @@ function addDataRow(dataId) {
     const lgIds = getSelectedLayerGroupIds();
     for (let i = 0; i < lgIds.length; ++i) {
       const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vc = lg.getActiveViewLayer().getViewController();
-      vc.setViewAlphaFunction(func);
+      const vl = lg.getActiveViewLayer();
+      if (typeof vl !== 'undefined') {
+        const vc = vl.getViewController();
+        vc.setViewAlphaFunction(func);
+      }
     }
   };
   // add controls
@@ -1204,16 +1254,19 @@ function addDataRow(dataId) {
   const centerId = 'center-' + dataId;
   // callback
   const changeContrast = function () {
-    const width =
-      parseFloat(document.getElementById(widthId + '-number').value);
-    const center =
-      parseFloat(document.getElementById(centerId + '-number').value);
+    const wElement = document.getElementById(widthId + '-number');
+    const width = parseFloat(wElement.value);
+    const cElement = document.getElementById(centerId + '-number');
+    const center = parseFloat(cElement.value);
     // update selected layers
     const lgIds = getSelectedLayerGroupIds();
     for (let i = 0; i < lgIds.length; ++i) {
       const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vc = lg.getActiveViewLayer().getViewController();
-      vc.setWindowLevel(center, width);
+      const vl = lg.getActiveViewLayer();
+      if (typeof vl !== 'undefined') {
+        const vc = vl.getViewController();
+        vc.setWindowLevel(center, width);
+      }
     }
   };
   // add controls
@@ -1230,12 +1283,16 @@ function addDataRow(dataId) {
   // window level preset
   // callback
   const changePreset = function (event) {
+    const element = event.target;
     // update selected layers
     const lgIds = getSelectedLayerGroupIds();
     for (let i = 0; i < lgIds.length; ++i) {
       const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vc = lg.getActiveViewLayer().getViewController();
-      vc.setWindowLevelPreset(event.target.value);
+      const vl = lg.getActiveViewLayer();
+      if (typeof vl !== 'undefined') {
+        const vc = vl.getViewController();
+        vc.setWindowLevelPreset(element.value);
+      }
     }
   };
   const selectPreset = document.createElement('select');
@@ -1261,12 +1318,16 @@ function addDataRow(dataId) {
   // colour map
   // callback
   const changeColourMap = function (event) {
+    const element = event.target;
     // update selected layers
     const lgIds = getSelectedLayerGroupIds();
     for (let i = 0; i < lgIds.length; ++i) {
       const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vc = lg.getActiveViewLayer().getViewController();
-      vc.setColourMap(event.target.value);
+      const vl = lg.getActiveViewLayer();
+      if (typeof vl !== 'undefined') {
+        const vc = vl.getViewController();
+        vc.setColourMap(element.value);
+      }
     }
   };
   const selectColourMap = document.createElement('select');
@@ -1295,8 +1356,10 @@ function addDataRow(dataId) {
     for (let i = 0; i < lgIds.length; ++i) {
       const lg = _app.getLayerGroupByDivId(lgIds[i]);
       const vl = lg.getActiveViewLayer();
-      vl.setOpacity(value);
-      vl.draw();
+      if (typeof vl !== 'undefined') {
+        vl.setOpacity(value);
+        vl.draw();
+      }
     }
   };
   // add controls
@@ -1312,9 +1375,14 @@ function addDataRow(dataId) {
  * @returns {number} Negative if a<b, positive if a>b.
  */
 function comparePosPat(a, b) {
-  const za = parseFloat(a.split('\\').at(-1));
-  const zb = parseFloat(b.split('\\').at(-1));
-  return za - zb;
+  const za = a.split('\\').at(-1);
+  const zb = b.split('\\').at(-1);
+  let res = 0;
+  if (typeof za !== 'undefined' &&
+    typeof zb !== 'undefined') {
+    res = parseFloat(za) - parseFloat(zb);
+  }
+  return res;
 }
 
 /**
@@ -1454,6 +1522,9 @@ function runRenderTest() {
   _app.setActiveLayerGroup(1);
 
   const vl = _app.getActiveLayerGroup().getActiveViewLayer();
+  if (typeof vl === 'undefined') {
+    return;
+  }
   const vc = vl.getViewController();
   const runner = function () {
     vc.incrementScrollIndex();
@@ -1467,7 +1538,6 @@ function runRenderTest() {
   const onRenderEnd = function (/*event*/) {
     const endTime = performance.now();
     timings.push(endTime - startTime);
-    startTime = undefined;
 
     if (timings.length < numberOfRun) {
       setTimeout(() => {
