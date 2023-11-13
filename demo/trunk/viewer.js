@@ -772,7 +772,7 @@ function getToolFeatures(toolName) {
  * Get the input tool features HTML.
  *
  * @param {string} toolName The tool name.
- * @returns {HTMLElement} The element representing the tool features.
+ * @returns {HTMLElement|undefined} The element representing the tool features.
  */
 function getToolFeaturesHtml(toolName) {
   let res;
