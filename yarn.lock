@@ -2299,16 +2299,15 @@ clean-css@^5.2.2, clean-css@~5.3.2:
     source-map "~0.6.0"
 
 clean-jsdoc-theme@^4.2.14:
-  version "4.2.14"
-  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.14.tgz#e9719e908c1409dcc04f8fcd0eb7556db4e4ab8d"
-  integrity sha512-RtFKl0GKS9u3su2gnNH5L+k2g7AOZX1e8FH1zlFQf270LgSJsFFMkxTAR8/qeD0+r6jKTpvPq1JJSfhCtVnjVg==
+  version "4.2.17"
+  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.17.tgz#a815401d9d881076fddec0574f71ba732995dbe7"
+  integrity sha512-5SbJNXcQHUXd7N13g+3OpGFiBQdxz36xwEP3p1r1vbo/apLcDRtugaFdUZ56H6Rvlb68Q33EChoBkajSlnD11w==
   dependencies:
     "@jsdoc/salty" "^0.2.4"
     fs-extra "^10.1.0"
     html-minifier-terser "^7.2.0"
     klaw-sync "^6.0.0"
     lodash "^4.17.21"
-    nanoid "^3.3.4"
     showdown "^2.1.0"
 
 cli-boxes@^1.0.0:
@@ -5545,11 +5544,6 @@ mute-stream@~0.0.4:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
-
-nanoid@^3.3.4:
-  version "3.3.6"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.6.tgz#443380c856d6e9f9824267d960b4236ad583ea4c"
-  integrity sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==
 
 natural-compare@^1.4.0:
   version "1.4.0"
