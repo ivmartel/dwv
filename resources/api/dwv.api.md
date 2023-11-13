@@ -14,7 +14,7 @@ export class App {
     abortLoad(): void;
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
-    addNewImage(image: Image_2, meta: object): string;
+    addNewImage(image: Image_2, meta: object, source: string): string;
     addToUndoStack: (cmd: object) => void;
     applyJsonState(jsonState: string): void;
     canScroll(): boolean;

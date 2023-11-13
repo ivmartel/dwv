@@ -61,9 +61,11 @@ export declare class App {
      *
      * @param {Image} image The new image.
      * @param {object} meta The image meta.
+     * @param {string} source The source of the new image,
+     *   will be passed with load events.
      * @returns {string} The new image data id.
      */
-    addNewImage(image: Image_2, meta: object): string;
+    addNewImage(image: Image_2, meta: object, source: string): string;
     /**
      * Get the meta data.
      *
