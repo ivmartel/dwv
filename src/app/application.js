@@ -285,16 +285,18 @@ export class App {
    *
    * @param {Image} image The new image.
    * @param {object} meta The image meta.
+   * @param {string} source The source of the new image,
+   *   will be passed with load events.
    * @returns {string} The new image data id.
    */
-  addNewImage(image, meta) {
+  addNewImage(image, meta, source) {
     const dataId = this.#dataController.getNextDataId();
 
     // load start event
     this.#fireEvent({
       type: 'loadstart',
       loadtype: 'image',
-      source: 'internal',
+      source: source,
       dataid: dataId
     });
 
@@ -306,7 +308,7 @@ export class App {
       type: 'loaditem',
       loadtype: 'image',
       data: meta,
-      source: 'internal',
+      source: source,
       dataid: dataId,
       isfirstitem: true
     });
@@ -320,13 +322,13 @@ export class App {
     this.#fireEvent({
       type: 'load',
       loadtype: 'image',
-      source: 'internal',
+      source: source,
       dataid: dataId
     });
     this.#fireEvent({
       type: 'loadend',
       loadtype: 'image',
-      source: 'internal',
+      source: source,
       dataid: dataId
     });
 
