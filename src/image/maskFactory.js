@@ -499,7 +499,9 @@ function getSegmentFrameInfo(dataElements) {
           sourceImages.push(sourceImage);
         }
       }
-      derivationImages.push(sourceImages);
+      derivationImages.push({
+        sourceImages: sourceImages
+      });
     }
   }
   // Frame Content Sequence (required, only one)
