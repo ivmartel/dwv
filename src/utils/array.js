@@ -1,6 +1,36 @@
 import {stringToUint8Array} from './string';
 
 /**
+ * Check if the first input array contains all the
+ * elements of the second input array.
+ *
+ * @param {Array} arr0 The test array.
+ * @param {Array} arr1 The elements to check in the first array.
+ * @returns {boolean} True if all the elements of arr1 are included in arr0.
+ */
+export function arrayContains(arr0, arr1) {
+  // check input
+  if (arr0 === null ||
+    arr1 === null ||
+    typeof arr0 === 'undefined' ||
+    typeof arr1 === 'undefined') {
+    return false;
+  }
+  if (arr0.length === 0 ||
+    arr1.length === 0 ||
+    arr1.length > arr0.length) {
+    return false;
+  }
+  // check values
+  for (const itemArr1 of arr1) {
+    if (!arr0.includes(itemArr1)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Check for array equality after sorting.
  *
  * @param {Array} arr0 First array.

@@ -1,6 +1,7 @@
 import {Index} from '../math/index';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
+import {arrayContains} from '../utils/array';
 import {getTypedArray} from '../dicom/dicomParser';
 import {ListenerHandler} from '../utils/listen';
 import {colourRange} from './iterator';
@@ -250,6 +251,16 @@ export class Image {
       uid = this.#imageUids[this.getSecondaryOffset(index)];
     }
     return uid;
+  }
+
+  /**
+   * Check if this image includes the input uids.
+   *
+   * @param {string[]} uids UIDs to test for presence.
+   * @returns {boolean} True if all uids are in this image uids.
+   */
+  containsImageUids(uids) {
+    return arrayContains(this.#imageUids, uids);
   }
 
   /**

@@ -69,6 +69,23 @@ export class DataController {
   }
 
   /**
+   * Get the list of dataIds that contain the input UIDs.
+   *
+   * @param {string[]} uids A list of UIDs.
+   * @returns {string[]} The list of dataIds that contain the UIDs.
+   */
+  getDataIdsFromSopUids(uids) {
+    const res = [];
+    const keys = Object.keys(this.#data);
+    for (const key of keys) {
+      if (this.#data[key].image.containsImageUids(uids)) {
+        res.push(key);
+      }
+    }
+    return res;
+  }
+
+  /**
    * Set the image at a given index.
    *
    * @param {string} dataId The data id.

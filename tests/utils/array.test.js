@@ -1,5 +1,6 @@
 import {stringToUint8Array} from '../../src/utils/string';
 import {
+  arrayContains,
   arraySortEquals,
   parseMultipart,
   buildMultipart
@@ -12,6 +13,77 @@ import {
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('utils');
+
+/**
+ * Tests for {@link arrayContains}.
+ *
+ * @function module:tests/utils~arrayContains
+ */
+QUnit.test('Test arrayContains.', function (assert) {
+  let arr00;
+  let arrTest000;
+  assert.false(arrayContains(arr00, arrTest000), 'contains test #000');
+  const arrTest001 = null;
+  assert.false(arrayContains(arr00, arrTest001), 'contains test #001');
+  const arrTest002 = [];
+  assert.false(arrayContains(arr00, arrTest002), 'contains test #002');
+  const arrTest003 = [''];
+  assert.false(arrayContains(arr00, arrTest003), 'contains test #003');
+  const arrTest004 = ['a'];
+  assert.false(arrayContains(arr00, arrTest004), 'contains test #004');
+
+  const arr10 = null;
+  let arrTest100;
+  assert.false(arrayContains(arr10, arrTest100), 'contains test #100');
+  const arrTest101 = null;
+  assert.false(arrayContains(arr10, arrTest101), 'contains test #101');
+  const arrTest102 = [];
+  assert.false(arrayContains(arr10, arrTest102), 'contains test #102');
+  const arrTest103 = [''];
+  assert.false(arrayContains(arr10, arrTest103), 'contains test #103');
+  const arrTest104 = ['a'];
+  assert.false(arrayContains(arr10, arrTest104), 'contains test #104');
+
+  const arr20 = [];
+  let arrTest200;
+  assert.false(arrayContains(arr20, arrTest200), 'contains test #200');
+  const arrTest201 = null;
+  assert.false(arrayContains(arr20, arrTest201), 'contains test #201');
+  const arrTest202 = [];
+  assert.false(arrayContains(arr20, arrTest202), 'contains test #202');
+  const arrTest203 = [''];
+  assert.false(arrayContains(arr20, arrTest203), 'contains test #203');
+  const arrTest204 = ['a'];
+  assert.false(arrayContains(arr20, arrTest204), 'contains test #204');
+
+  const arr30 = ['a', 'b', 'c'];
+  const arrTest300 = ['a'];
+  assert.true(arrayContains(arr30, arrTest300), 'contains test #300');
+  const arrTest301 = ['a', 'b'];
+  assert.true(arrayContains(arr30, arrTest301), 'contains test #301');
+  const arrTest302 = ['b', 'a'];
+  assert.true(arrayContains(arr30, arrTest302), 'contains test #302');
+  const arrTest303 = ['a', 'b', 'c'];
+  assert.true(arrayContains(arr30, arrTest303), 'contains test #303');
+  let arrTest310;
+  assert.false(arrayContains(arr30, arrTest310), 'contains test #310');
+  const arrTest311 = null;
+  assert.false(arrayContains(arr30, arrTest311), 'contains test #311');
+  const arrTest312 = [];
+  assert.false(arrayContains(arr30, arrTest312), 'contains test #312');
+  const arrTest313 = [''];
+  assert.false(arrayContains(arr30, arrTest313), 'contains test #313');
+  const arrTest320 = ['d'];
+  assert.false(arrayContains(arr30, arrTest320), 'contains test #320');
+  const arrTest321 = ['a', 'd'];
+  assert.false(arrayContains(arr30, arrTest321), 'contains test #321');
+  const arrTest322 = ['d', 'a'];
+  assert.false(arrayContains(arr30, arrTest322), 'contains test #322');
+  const arrTest323 = [0, 'a'];
+  assert.false(arrayContains(arr30, arrTest323), 'contains test #323');
+  const arrTest324 = ['a', 'b', 'c', 0];
+  assert.false(arrayContains(arr30, arrTest324), 'contains test #324');
+});
 
 /**
  * Tests for {@link arraySortEquals}.

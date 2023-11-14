@@ -355,6 +355,16 @@ export class App {
   }
 
   /**
+   * Get the list of dataIds that contain the input UIDs.
+   *
+   * @param {string[]} uids A list of UIDs.
+   * @returns {string[]} The list of dataIds that contain the UIDs.
+   */
+  getDataIdsFromSopUids(uids) {
+    return this.#dataController.getDataIdsFromSopUids(uids);
+  }
+
+  /**
    * Can the data be scrolled?
    *
    * @returns {boolean} True if the data has a third dimension greater than one.
