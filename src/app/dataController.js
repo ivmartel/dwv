@@ -55,7 +55,7 @@ export class DataController {
    * Reset the class: empty the data storage.
    */
   reset() {
-    this.#data = [];
+    this.#data = {};
   }
 
   /**
