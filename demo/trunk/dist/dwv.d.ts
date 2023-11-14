@@ -80,6 +80,13 @@ export declare class App {
      */
     getDataIds(): any[];
     /**
+     * Get the list of dataIds that contain the input UIDs.
+     *
+     * @param {string[]} uids A list of UIDs.
+     * @returns {string[]} The list of dataIds that contain the UIDs.
+     */
+    getDataIdsFromSopUids(uids: string[]): string[];
+    /**
      * Can the data be scrolled?
      *
      * @returns {boolean} True if the data has a third dimension greater than one.
@@ -1613,6 +1620,13 @@ declare class Image_2 {
      * @returns {string} The UID.
      */
     getImageUid(index?: Index): string;
+    /**
+     * Check if this image includes the input uids.
+     *
+     * @param {string[]} uids UIDs to test for presence.
+     * @returns {boolean} True if all uids are in this image uids.
+     */
+    containsImageUids(uids: string[]): boolean;
     /**
      * Get the geometry of the image.
      *
