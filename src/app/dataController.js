@@ -6,6 +6,33 @@ import {mergeObjects} from '../utils/operator';
 import {Image} from '../image/image';
 /* eslint-enable no-unused-vars */
 
+/**
+ * Image and meta class.
+ */
+class ImageData {
+  /**
+   * Associated HTML div id.
+   *
+   * @type {Image}
+   */
+  image;
+  /**
+   * Associated HTML div id.
+   *
+   * @type {object}
+   */
+  meta;
+
+  /**
+   * @param {Image} image The image.
+   * @param {object} meta The image meta.
+   */
+  constructor(image, meta) {
+    this.image = image;
+    this.meta = meta;
+  }
+}
+
 /*
  * Data (list of {image, meta}) controller.
  */
@@ -14,9 +41,9 @@ export class DataController {
   /**
    * List of {image, meta}.
    *
-   * @type {object}
+   * @type {Object<string, ImageData>}
    */
-  #data = {};
+  #dataList = {};
 
   /**
    * Distinct data loaded counter.
@@ -48,24 +75,24 @@ export class DataController {
    * @returns {string[]} The list of data ids.
    */
   getDataIds() {
-    return Object.keys(this.#data);
+    return Object.keys(this.#dataList);
   }
 
   /**
    * Reset the class: empty the data storage.
    */
   reset() {
-    this.#data = {};
+    this.#dataList = {};
   }
 
   /**
    * Get a data at a given index.
    *
    * @param {string} dataId The data id.
-   * @returns {object} The data as {image, meta}.
+   * @returns {ImageData|undefined} The data as {image, meta}.
    */
   get(dataId) {
-    return this.#data[dataId];
+    return this.#dataList[dataId];
   }
 
   /**
@@ -76,9 +103,9 @@ export class DataController {
    */
   getDataIdsFromSopUids(uids) {
     const res = [];
-    const keys = Object.keys(this.#data);
+    const keys = Object.keys(this.#dataList);
     for (const key of keys) {
-      if (this.#data[key].image.containsImageUids(uids)) {
+      if (this.#dataList[key].image.containsImageUids(uids)) {
         res.push(key);
       }
     }
@@ -92,7 +119,7 @@ export class DataController {
    * @param {Image} image The image to set.
    */
   setImage(dataId, image) {
-    this.#data[dataId].image = image;
+    this.#dataList[dataId].image = image;
     // fire image set
     this.#fireEvent({
       type: 'imageset',
@@ -111,14 +138,11 @@ export class DataController {
    * @param {object} meta The image meta.
    */
   addNew(dataId, image, meta) {
-    if (typeof this.#data[dataId] !== 'undefined') {
+    if (typeof this.#dataList[dataId] !== 'undefined') {
       throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
-    this.#data[dataId] = {
-      image: image,
-      meta: meta
-    };
+    this.#dataList[dataId] = new ImageData(image, meta);
     // listen to image change
     image.addEventListener('imagechange', this.#getFireEvent(dataId));
   }
@@ -131,7 +155,10 @@ export class DataController {
    * @param {object} meta The image meta.
    */
   update(dataId, image, meta) {
-    const dataToUpdate = this.#data[dataId];
+    if (typeof this.#dataList[dataId] === 'undefined') {
+      throw new Error('Cannot find data to update: ' + dataId);
+    }
+    const dataToUpdate = this.#dataList[dataId];
 
     // add slice to current image
     dataToUpdate.image.appendSlice(image);
@@ -197,4 +224,4 @@ export class DataController {
     };
   }
 
-} // ImageController class
+} // DataController class

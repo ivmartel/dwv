@@ -244,20 +244,25 @@ export class App {
    * Get the image.
    *
    * @param {string} dataId The data id.
-   * @returns {Image} The associated image.
+   * @returns {Image|undefined} The associated image.
    */
   getImage(dataId) {
-    return this.#dataController.get(dataId).image;
+    let res;
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      res = this.#dataController.get(dataId).image;
+    }
+    return res;
   }
 
   /**
    * Get the last loaded image.
    *
-   * @returns {Image} The image.
+   * @returns {Image|undefined} The image.
    */
   getLastImage() {
     const dataIds = this.#dataController.getDataIds();
-    return this.#dataController.get(dataIds[dataIds.length - 1]).image;
+    const lastId = dataIds[dataIds.length - 1];
+    return this.getImage(lastId);
   }
 
   /**
@@ -277,7 +282,8 @@ export class App {
    */
   setLastImage(img) {
     const dataIds = this.#dataController.getDataIds();
-    this.#dataController.setImage(dataIds[dataIds.length - 1], img);
+    const lastId = dataIds[dataIds.length - 1];
+    this.#dataController.setImage(lastId, img);
   }
 
   /**
@@ -339,16 +345,20 @@ export class App {
    * Get the meta data.
    *
    * @param {string} dataId The data id.
-   * @returns {object} The list of meta data.
+   * @returns {object|undefined} The list of meta data.
    */
   getMetaData(dataId) {
-    return this.#dataController.get(dataId).meta;
+    let res;
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      res = this.#dataController.get(dataId).meta;
+    }
+    return res;
   }
 
   /**
    * Get the list of ids in the data storage.
    *
-   * @returns {Array} The list of data ids.
+   * @returns {string[]} The list of data ids.
    */
   getDataIds() {
     return this.#dataController.getDataIds();
