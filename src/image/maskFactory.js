@@ -316,7 +316,7 @@ function getSegment(dataElements) {
   // algorithmType -> SegmentAlgorithmType (type1)
   const segment = {
     number: dataElements['00620004'].value[0],
-    label: dataElements['00620005'].value[0],
+    label: dataElements['00620005'] ? dataElements['00620005'].value[0] : 'n/a',
     algorithmType: dataElements['00620008'].value[0]
   };
   // algorithmName -> SegmentAlgorithmName (type1C)
