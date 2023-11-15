@@ -363,11 +363,11 @@ export class View {
         isDiscrete);
     }
 
-    // update lut window level if not present or different from previous
-    const lutWl = this.#windowLut.getWindowLevel();
+    // update VOI lut if not present or different from previous
+    const lutWl = this.#windowLut.getVoiLut();
     if (typeof lutWl === 'undefined' || !wl.equals(lutWl)) {
       // set lut window level
-      this.#windowLut.setWindowLevel(wl);
+      this.#windowLut.setVoiLut(wl);
       // fire change event
       if (typeof lutWl === 'undefined' ||
         lutWl.getWidth() !== wl.getWidth() ||

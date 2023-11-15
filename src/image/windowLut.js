@@ -5,8 +5,7 @@ import {VoiLut} from './voiLut';
 /* eslint-enable no-unused-vars */
 
 /**
- * Window LUT class.
- * Typically converts from float to integer.
+ * Window LUT class: combines a modality LUT and a VOI LUT.
  */
 export class WindowLut {
 
@@ -18,11 +17,11 @@ export class WindowLut {
   #modalityLut;
 
   /**
-   * The window level.
+   * The VOI LUT.
    *
    * @type {VoiLut}
    */
-  #windowLevel;
+  #voiLut;
 
   /**
    * The internal LUT array: Uint8ClampedArray clamps between 0 and 255.
@@ -46,8 +45,8 @@ export class WindowLut {
   #isDiscrete = true;
 
   /**
-   * Construct a window LUT object, window level is set with
-   *   the 'setWindowLevel' method.
+   * Construct a window LUT object, VOI LUT is set with
+   *   the 'setVoiLut' method.
    *
    * @param {ModalityLut} modalityLut The associated rescale LUT.
    * @param {boolean} isSigned Flag to know if the data is signed or not.
@@ -67,34 +66,34 @@ export class WindowLut {
   }
 
   /**
-   * Get the window / level.
+   * Get the VOI LUT.
    *
-   * @returns {VoiLut} The window / level.
+   * @returns {VoiLut} The VOI LUT.
    */
-  getWindowLevel() {
-    return this.#windowLevel;
+  getVoiLut() {
+    return this.#voiLut;
   }
 
   /**
-   * Get the modality lut.
+   * Get the modality LUT.
    *
-   * @returns {ModalityLut} The modality lut.
+   * @returns {ModalityLut} The modality LUT.
    */
   getModalityLut() {
     return this.#modalityLut;
   }
 
   /**
-   * Set the window center and width.
+   * Set the VOI LUT.
    *
-   * @param {VoiLut} wl The window level.
+   * @param {VoiLut} lut The VOI LUT.
    */
-  setWindowLevel(wl) {
+  setVoiLut(lut) {
     // store the window values
-    this.#windowLevel = wl;
+    this.#voiLut = lut;
 
     // possible signed shift (LUT indices are positive)
-    this.#windowLevel.setSignedOffset(
+    this.#voiLut.setSignedOffset(
       this.#modalityLut.getRSI().getSlope() * this.#signedShift);
 
     // create lut if not continous
@@ -105,7 +104,7 @@ export class WindowLut {
       // by default WindowLevel returns a value in the [0,255] range
       // this is ok with regular Arrays and ClampedArray.
       for (let i = 0; i < size; ++i) {
-        this.#lut[i] = this.#windowLevel.apply(this.#modalityLut.getValue(i));
+        this.#lut[i] = this.#voiLut.apply(this.#modalityLut.getValue(i));
       }
     }
   }
@@ -122,7 +121,7 @@ export class WindowLut {
     if (this.#isDiscrete) {
       return this.#lut[offset + this.#signedShift];
     } else {
-      return Math.floor(this.#windowLevel.apply(offset + this.#signedShift));
+      return Math.floor(this.#voiLut.apply(offset + this.#signedShift));
     }
   }
 

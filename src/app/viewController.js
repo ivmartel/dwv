@@ -721,8 +721,8 @@ export class ViewController {
    */
   getWindowLevel() {
     return {
-      width: this.#view.getCurrentWindowLut().getWindowLevel().getWidth(),
-      center: this.#view.getCurrentWindowLut().getWindowLevel().getCenter()
+      width: this.#view.getCurrentWindowLut().getVoiLut().getWidth(),
+      center: this.#view.getCurrentWindowLut().getVoiLut().getCenter()
     };
   }
 
