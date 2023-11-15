@@ -2455,6 +2455,42 @@ export declare class Matrix33 {
 }
 
 /**
+ * Modality LUT class: compensates for any modality-specific presentation.
+ * Typically consists of a rescale slope and intercept to
+ * rescale the data range.
+ *
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html
+ */
+export declare class ModalityLut {
+    /**
+     * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
+     * @param {number} bitsStored The number of bits used to store the data.
+     */
+    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
+    /**
+     * Get the Rescale Slope and Intercept (RSI).
+     *
+     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
+     */
+    getRSI(): RescaleSlopeAndIntercept;
+    /**
+     * Get the length of the LUT array.
+     *
+     * @returns {number} The length of the LUT array.
+     */
+    getLength(): number;
+    /**
+     * Get the value of the LUT at the given offset.
+     *
+     * @param {number} offset The input offset in [0,2^bitsStored] range
+     *   or full range for ID rescale.
+     * @returns {number} The float32 value of the LUT at the given offset.
+     */
+    getValue(offset: number): number;
+    #private;
+}
+
+/**
  * DICOM Header overlay info.
  */
 export declare class OverlayData {
@@ -2715,39 +2751,6 @@ export declare class Point3D {
  * @returns {number} The rounded number.
  */
 export declare function precisionRound(number: number, precision: number): number;
-
-/**
- * Rescale LUT class.
- * Typically converts from integer to float.
- */
-export declare class RescaleLut {
-    /**
-     * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
-     * @param {number} bitsStored The number of bits used to store the data.
-     */
-    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
-    /**
-     * Get the Rescale Slope and Intercept (RSI).
-     *
-     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
-     */
-    getRSI(): RescaleSlopeAndIntercept;
-    /**
-     * Get the length of the LUT array.
-     *
-     * @returns {number} The length of the LUT array.
-     */
-    getLength(): number;
-    /**
-     * Get the value of the LUT at the given offset.
-     *
-     * @param {number} offset The input offset in [0,2^bitsStored] range
-     *   or full range for ID rescale.
-     * @returns {number} The float32 value of the LUT at the given offset.
-     */
-    getValue(offset: number): number;
-    #private;
-}
 
 /**
  * Rescale Slope and Intercept
@@ -4238,11 +4241,11 @@ export declare class WindowLut {
      * Construct a window LUT object, window level is set with
      *   the 'setWindowLevel' method.
      *
-     * @param {RescaleLut} rescaleLut The associated rescale LUT.
+     * @param {ModalityLut} modalityLut The associated rescale LUT.
      * @param {boolean} isSigned Flag to know if the data is signed or not.
      * @param {boolean} isDiscrete Flag to know if the input data is discrete.
      */
-    constructor(rescaleLut: RescaleLut, isSigned: boolean, isDiscrete: boolean);
+    constructor(modalityLut: ModalityLut, isSigned: boolean, isDiscrete: boolean);
     /**
      * Get the window / level.
      *
@@ -4250,11 +4253,11 @@ export declare class WindowLut {
      */
     getWindowLevel(): WindowCenterAndWidth;
     /**
-     * Get the rescale lut.
+     * Get the modality lut.
      *
-     * @returns {RescaleLut} The rescale lut.
+     * @returns {ModalityLut} The modality lut.
      */
-    getRescaleLut(): RescaleLut;
+    getModalityLut(): ModalityLut;
     /**
      * Set the window center and width.
      *
