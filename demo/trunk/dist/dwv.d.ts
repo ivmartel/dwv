@@ -3463,9 +3463,9 @@ export declare class View {
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
      *
-     * @returns {WindowCenterAndWidth} A min/max window level.
+     * @returns {VoiLut} A min/max window level.
      */
-    getWindowLevelMinMax(): WindowCenterAndWidth;
+    getWindowLevelMinMax(): VoiLut;
     /**
      * Set the image window/level to cover the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -4179,7 +4179,7 @@ export declare class ViewLayer {
 }
 
 /**
- * WindowCenterAndWidth class.
+ * VOI (Values of Interest) LUT class: apply window centre and width.
  * <br>Pseudo-code:
  * <pre>
  *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
@@ -4187,9 +4187,9 @@ export declare class ViewLayer {
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * </pre>
  *
- * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html
  */
-export declare class WindowCenterAndWidth {
+export declare class VoiLut {
     /**
      * @param {number} center The window center.
      * @param {number} width The window width.
@@ -4225,10 +4225,10 @@ export declare class WindowCenterAndWidth {
     /**
      * Check for window level equality.
      *
-     * @param {WindowCenterAndWidth} rhs The other window level to compare to.
+     * @param {VoiLut} rhs The other window level to compare to.
      * @returns {boolean} True if both window level are equal.
      */
-    equals(rhs: WindowCenterAndWidth): boolean;
+    equals(rhs: VoiLut): boolean;
     #private;
 }
 
@@ -4249,9 +4249,9 @@ export declare class WindowLut {
     /**
      * Get the window / level.
      *
-     * @returns {WindowCenterAndWidth} The window / level.
+     * @returns {VoiLut} The window / level.
      */
-    getWindowLevel(): WindowCenterAndWidth;
+    getWindowLevel(): VoiLut;
     /**
      * Get the modality lut.
      *
@@ -4261,9 +4261,9 @@ export declare class WindowLut {
     /**
      * Set the window center and width.
      *
-     * @param {WindowCenterAndWidth} wl The window level.
+     * @param {VoiLut} wl The window level.
      */
-    setWindowLevel(wl: WindowCenterAndWidth): void;
+    setWindowLevel(wl: VoiLut): void;
     /**
      * Get the value of the LUT at the given offset.
      *
