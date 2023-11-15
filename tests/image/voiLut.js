@@ -1,29 +1,29 @@
 import {
-  WindowCenterAndWidth,
+  VoiLut,
   validateWindowWidth
-} from '../../src/image/windowCenterAndWidth';
+} from '../../src/image/voiLut';
 
 /**
- * Tests for the 'image/WindowCenterAndWidth.js' file.
+ * Tests for the 'image/voiLut.js' file.
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 
 /**
- * Tests for {@link WindowCenterAndWidth}.
+ * Tests for {@link VoiLut}.
  *
- * @function module:tests/image~WindowCenterAndWidth
+ * @function module:tests/image~VoiLut
  */
-QUnit.test('Test WindowCenterAndWidth.', function (assert) {
-  const wcaw00 = new WindowCenterAndWidth(0, 2);
+QUnit.test('Test VoiLut.', function (assert) {
+  const wcaw00 = new VoiLut(0, 2);
   assert.equal(wcaw00.getCenter(), 0, 'Window level getCenter.');
   assert.equal(wcaw00.getWidth(), 2, 'Window level getWidth.');
 
   assert.throws(function () {
-    new WindowCenterAndWidth(0, 0);
+    new VoiLut(0, 0);
   },
   new Error('Window width shall always be greater than or equal to 1'),
-  'WindowCenterAndWidth with 0 width.');
+  'VoiLut with 0 width.');
 });
 
 /**

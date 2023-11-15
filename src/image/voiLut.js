@@ -31,7 +31,7 @@ export function validateWindowWidth(value) {
 }
 
 /**
- * WindowCenterAndWidth class.
+ * VOI (Values of Interest) LUT class: apply window centre and width.
  * <br>Pseudo-code:
  * <pre>
  *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
@@ -39,9 +39,9 @@ export function validateWindowWidth(value) {
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * </pre>
  *
- * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html
  */
-export class WindowCenterAndWidth {
+export class VoiLut {
 
   /**
    * The center.
@@ -190,7 +190,7 @@ export class WindowCenterAndWidth {
   /**
    * Check for window level equality.
    *
-   * @param {WindowCenterAndWidth} rhs The other window level to compare to.
+   * @param {VoiLut} rhs The other window level to compare to.
    * @returns {boolean} True if both window level are equal.
    */
   equals(rhs) {

@@ -1,6 +1,6 @@
 import {ScrollWheel} from './scrollWheel';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {validateWindowWidth} from '../image/windowCenterAndWidth';
+import {validateWindowWidth} from '../image/voiLut';
 
 // doc imports
 /* eslint-disable no-unused-vars */

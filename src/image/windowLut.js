@@ -1,7 +1,7 @@
 // doc imports
 /* eslint-disable no-unused-vars */
 import {ModalityLut} from './modalityLut';
-import {WindowCenterAndWidth} from './windowCenterAndWidth';
+import {VoiLut} from './voiLut';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -20,7 +20,7 @@ export class WindowLut {
   /**
    * The window level.
    *
-   * @type {WindowCenterAndWidth}
+   * @type {VoiLut}
    */
   #windowLevel;
 
@@ -69,7 +69,7 @@ export class WindowLut {
   /**
    * Get the window / level.
    *
-   * @returns {WindowCenterAndWidth} The window / level.
+   * @returns {VoiLut} The window / level.
    */
   getWindowLevel() {
     return this.#windowLevel;
@@ -87,7 +87,7 @@ export class WindowLut {
   /**
    * Set the window center and width.
    *
-   * @param {WindowCenterAndWidth} wl The window level.
+   * @param {VoiLut} wl The window level.
    */
   setWindowLevel(wl) {
     // store the window values
