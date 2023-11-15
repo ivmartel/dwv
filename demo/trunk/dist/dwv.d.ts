@@ -34,15 +34,15 @@ export declare class App {
      * Get the image.
      *
      * @param {string} dataId The data id.
-     * @returns {Image} The associated image.
+     * @returns {Image|undefined} The associated image.
      */
-    getImage(dataId: string): Image_2;
+    getImage(dataId: string): Image_2 | undefined;
     /**
      * Get the last loaded image.
      *
-     * @returns {Image} The image.
+     * @returns {Image|undefined} The image.
      */
-    getLastImage(): Image_2;
+    getLastImage(): Image_2 | undefined;
     /**
      * Set the image at the given id.
      *
@@ -70,15 +70,15 @@ export declare class App {
      * Get the meta data.
      *
      * @param {string} dataId The data id.
-     * @returns {object} The list of meta data.
+     * @returns {object|undefined} The list of meta data.
      */
-    getMetaData(dataId: string): object;
+    getMetaData(dataId: string): object | undefined;
     /**
      * Get the list of ids in the data storage.
      *
-     * @returns {Array} The list of data ids.
+     * @returns {string[]} The list of data ids.
      */
-    getDataIds(): any[];
+    getDataIds(): string[];
     /**
      * Get the list of dataIds that contain the input UIDs.
      *
