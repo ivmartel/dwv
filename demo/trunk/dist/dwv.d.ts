@@ -4233,13 +4233,12 @@ export declare class VoiLut {
 }
 
 /**
- * Window LUT class.
- * Typically converts from float to integer.
+ * Window LUT class: combines a modality LUT and a VOI LUT.
  */
 export declare class WindowLut {
     /**
-     * Construct a window LUT object, window level is set with
-     *   the 'setWindowLevel' method.
+     * Construct a window LUT object, VOI LUT is set with
+     *   the 'setVoiLut' method.
      *
      * @param {ModalityLut} modalityLut The associated rescale LUT.
      * @param {boolean} isSigned Flag to know if the data is signed or not.
@@ -4247,23 +4246,23 @@ export declare class WindowLut {
      */
     constructor(modalityLut: ModalityLut, isSigned: boolean, isDiscrete: boolean);
     /**
-     * Get the window / level.
+     * Get the VOI LUT.
      *
-     * @returns {VoiLut} The window / level.
+     * @returns {VoiLut} The VOI LUT.
      */
-    getWindowLevel(): VoiLut;
+    getVoiLut(): VoiLut;
     /**
-     * Get the modality lut.
+     * Get the modality LUT.
      *
-     * @returns {ModalityLut} The modality lut.
+     * @returns {ModalityLut} The modality LUT.
      */
     getModalityLut(): ModalityLut;
     /**
-     * Set the window center and width.
+     * Set the VOI LUT.
      *
-     * @param {VoiLut} wl The window level.
+     * @param {VoiLut} lut The VOI LUT.
      */
-    setWindowLevel(wl: VoiLut): void;
+    setVoiLut(lut: VoiLut): void;
     /**
      * Get the value of the LUT at the given offset.
      *
