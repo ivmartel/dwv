@@ -51,7 +51,7 @@ canvas array data:
    (see [image/iterator.js](./global.html#range))
 1. From stored type range to physical range using a [Modality LUT](http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html): rescale slope and intercept are used
    in the conversion equation: `y = slope * x + intercept`
-   (see [image/rescaleLut.js](./RescaleLut.html))
+   (see [image/modalityLut.js](./ModalityLut.html))
 1. Select part of the range using a [VOI LUT](http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html#table_C.11-2) (Value Of Interest): window width and level (or centre)
    allow to focus on a specific range (especially useful for normed data such
    as in CT)

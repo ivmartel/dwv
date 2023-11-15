@@ -1,5 +1,5 @@
 import {Index} from '../math/index';
-import {RescaleLut} from './rescaleLut';
+import {ModalityLut} from './modalityLut';
 import {WindowLut} from './windowLut';
 import {luts} from './luts';
 import {WindowCenterAndWidth} from './windowCenterAndWidth';
@@ -353,12 +353,12 @@ export class View {
         isDiscrete = false;
       }
       // create the rescale lookup table
-      const rescaleLut = new RescaleLut(
+      const modalityLut = new ModalityLut(
         rsi,
         this.#image.getMeta().BitsStored);
       // create the window lookup table
       this.#windowLut = new WindowLut(
-        rescaleLut,
+        modalityLut,
         this.#image.getMeta().IsSigned,
         isDiscrete);
     }

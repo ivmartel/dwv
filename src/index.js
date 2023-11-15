@@ -64,7 +64,7 @@ import {
   luts
 } from './image/luts';
 import {RescaleSlopeAndIntercept} from './image/rsi';
-import {RescaleLut} from './image/rescaleLut';
+import {ModalityLut} from './image/modalityLut';
 import {WindowLut} from './image/windowLut';
 import {
   defaultPresets,
@@ -119,7 +119,7 @@ export {
   Size,
   Spacing,
   RescaleSlopeAndIntercept,
-  RescaleLut,
+  ModalityLut,
   WindowLut,
   WindowCenterAndWidth,
   Index,

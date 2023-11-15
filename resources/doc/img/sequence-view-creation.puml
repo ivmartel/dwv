@@ -7,10 +7,10 @@ deactivate Image
 
 View -> WindowLut: get window lut
 activate WindowLut
-WindowLut --> RescaleLut: get rescale lut
-activate RescaleLut
-RescaleLut --> WindowLut: rescale lut
-deactivate RescaleLut
+WindowLut --> ModalityLut: get rescale lut
+activate ModalityLut
+ModalityLut --> WindowLut: rescale lut
+deactivate ModalityLut
 WindowLut -> View: window lut
 deactivate WindowLut
 

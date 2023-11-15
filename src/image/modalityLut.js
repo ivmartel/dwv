@@ -4,10 +4,13 @@ import {RescaleSlopeAndIntercept} from './rsi';
 /* eslint-enable no-unused-vars */
 
 /**
- * Rescale LUT class.
- * Typically converts from integer to float.
+ * Modality LUT class: compensates for any modality-specific presentation.
+ * Typically consists of a rescale slope and intercept to
+ * rescale the data range.
+ *
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html
  */
-export class RescaleLut {
+export class ModalityLut {
 
   /**
    * The rescale slope.
@@ -85,4 +88,4 @@ export class RescaleLut {
     return this.#isIdRsi ? offset : this.#lut[offset];
   }
 
-} // class RescaleLut
+} // class ModalityLut

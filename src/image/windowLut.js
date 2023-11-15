@@ -1,6 +1,6 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {RescaleLut} from './rescaleLut';
+import {ModalityLut} from './modalityLut';
 import {WindowCenterAndWidth} from './windowCenterAndWidth';
 /* eslint-enable no-unused-vars */
 
@@ -11,11 +11,11 @@ import {WindowCenterAndWidth} from './windowCenterAndWidth';
 export class WindowLut {
 
   /**
-   * The rescale LUT.
+   * The modality LUT.
    *
-   * @type {RescaleLut}
+   * @type {ModalityLut}
    */
-  #rescaleLut;
+  #modalityLut;
 
   /**
    * The window level.
@@ -49,15 +49,15 @@ export class WindowLut {
    * Construct a window LUT object, window level is set with
    *   the 'setWindowLevel' method.
    *
-   * @param {RescaleLut} rescaleLut The associated rescale LUT.
+   * @param {ModalityLut} modalityLut The associated rescale LUT.
    * @param {boolean} isSigned Flag to know if the data is signed or not.
    * @param {boolean} isDiscrete Flag to know if the input data is discrete.
    */
-  constructor(rescaleLut, isSigned, isDiscrete) {
-    this.#rescaleLut = rescaleLut;
+  constructor(modalityLut, isSigned, isDiscrete) {
+    this.#modalityLut = modalityLut;
 
     if (isSigned) {
-      const size = this.#rescaleLut.getLength();
+      const size = this.#modalityLut.getLength();
       this.#signedShift = size / 2;
     } else {
       this.#signedShift = 0;
@@ -76,12 +76,12 @@ export class WindowLut {
   }
 
   /**
-   * Get the rescale lut.
+   * Get the modality lut.
    *
-   * @returns {RescaleLut} The rescale lut.
+   * @returns {ModalityLut} The modality lut.
    */
-  getRescaleLut() {
-    return this.#rescaleLut;
+  getModalityLut() {
+    return this.#modalityLut;
   }
 
   /**
@@ -95,17 +95,17 @@ export class WindowLut {
 
     // possible signed shift (LUT indices are positive)
     this.#windowLevel.setSignedOffset(
-      this.#rescaleLut.getRSI().getSlope() * this.#signedShift);
+      this.#modalityLut.getRSI().getSlope() * this.#signedShift);
 
     // create lut if not continous
     if (this.#isDiscrete) {
-      const size = this.#rescaleLut.getLength();
+      const size = this.#modalityLut.getLength();
       // use clamped array (polyfilled in env.js)
       this.#lut = new Uint8ClampedArray(size);
       // by default WindowLevel returns a value in the [0,255] range
       // this is ok with regular Arrays and ClampedArray.
       for (let i = 0; i < size; ++i) {
-        this.#lut[i] = this.#windowLevel.apply(this.#rescaleLut.getValue(i));
+        this.#lut[i] = this.#windowLevel.apply(this.#modalityLut.getValue(i));
       }
     }
   }
