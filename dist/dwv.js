@@ -1,4 +1,4 @@
-/*! dwv 0.31.2 2023-05-07 12:03:47 */
+/*! dwv 0.31.3 2023-11-16 12:13:08 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -615,6 +615,16 @@ dwv.App = function () {
     var viewLayer = stage.getActiveLayerGroup().getActiveViewLayer();
     var controller = viewLayer.getViewController();
     controller.initialise();
+  };
+
+  /**
+   * Set the imageSmoothing flag value. Default is false.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.setImageSmoothing = function (flag) {
+    stage.setImageSmoothing(flag);
+    stage.draw();
   };
 
   /**
@@ -4749,7 +4759,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.2';
+  return '0.31.3';
 };
 
 /**
@@ -13820,6 +13830,13 @@ dwv.gui.LayerGroup = function (containerDiv) {
   var currentPosition;
 
   /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  var imageSmoothing = false;
+
+  /**
    * Get the target orientation.
    *
    * @returns {dwv.math.Matrix33} The orientation matrix.
@@ -13865,6 +13882,21 @@ dwv.gui.LayerGroup = function (containerDiv) {
       self.removeEventListener('zoomchange', updateCrosshairOnChange);
       // remove crosshair div
       removeCrosshairDiv();
+    }
+  };
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.setImageSmoothing = function (flag) {
+    imageSmoothing = flag;
+    // set for existing layers
+    for (let i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        layers[i].enableImageSmoothing(flag);
+      }
     }
   };
 
@@ -14080,6 +14112,7 @@ dwv.gui.LayerGroup = function (containerDiv) {
     containerDiv.append(div);
     // view layer
     var layer = new dwv.gui.ViewLayer(div);
+    layer.enableImageSmoothing(imageSmoothing);
     // add layer
     layers.push(layer);
     // mark it as active
@@ -14693,6 +14726,9 @@ dwv.gui.Stage = function () {
   // binder callbacks
   var callbackStore = null;
 
+  // image smoothing flag
+  var imageSmoothing = false;
+
   /**
    * Get the layer group at the given index.
    *
@@ -14758,6 +14794,7 @@ dwv.gui.Stage = function () {
   this.addLayerGroup = function (htmlElement) {
     activeLayerGroupIndex = layerGroups.length;
     var layerGroup = new dwv.gui.LayerGroup(htmlElement);
+    layerGroup.setImageSmoothing(imageSmoothing);
     // add to storage
     var isBound = callbackStore && callbackStore.length !== 0;
     if (isBound) {
@@ -14893,6 +14930,18 @@ dwv.gui.Stage = function () {
     }
     // clear callback store
     callbackStore = null;
+  };
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.setImageSmoothing = function (flag) {
+    imageSmoothing = flag;
+    for (let i = 0; i < layerGroups.length; ++i) {
+      layerGroups[i].setImageSmoothing(flag);
+    }
   };
 
   /**
