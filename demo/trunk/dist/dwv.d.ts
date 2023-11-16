@@ -733,14 +733,11 @@ export declare const decoderScripts: {
 /**
  * List of default window level presets.
  *
- * @type {Object.<string, Object.<string, {center: number, width: number}>>}
+ * @type {Object.<string, Object.<string, WindowLevel>>}
  */
 export declare const defaultPresets: {
     [x: string]: {
-        [x: string]: {
-            center: number;
-            width: number;
-        };
+        [x: string]: WindowLevel;
     };
 };
 
@@ -3421,14 +3418,13 @@ export declare class View {
     /**
      * Set the view window/level.
      *
-     * @param {number} center The window center.
-     * @param {number} width The window width.
+     * @param {WindowLevel} wl The window and level.
      * @param {string} [name] Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
      * @param {boolean} [silent] Flag to launch events with skipGenerate.
      * @fires View#wlchange
      */
-    setWindowLevel(center: number, width: number, name?: string, silent?: boolean): void;
+    setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
     /**
      * Set the window level to the preset with the input name.
      *
@@ -3463,9 +3459,9 @@ export declare class View {
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
      *
-     * @returns {VoiLut} A min/max window level.
+     * @returns {WindowLevel} A min/max window level.
      */
-    getWindowLevelMinMax(): VoiLut;
+    getWindowLevelMinMax(): WindowLevel;
     /**
      * Set the image window/level to cover the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -3878,9 +3874,9 @@ export declare class ViewController {
     /**
      * Get the window/level.
      *
-     * @returns {object} The window center and width.
+     * @returns {WindowLevel} The window and level.
      */
-    getWindowLevel(): object;
+    getWindowLevel(): WindowLevel;
     /**
      * Get the current window level preset name.
      *
@@ -3888,12 +3884,11 @@ export declare class ViewController {
      */
     getCurrentWindowPresetName(): string;
     /**
-     * Set the window/level.
+     * Set the window and level.
      *
-     * @param {number} wc The window center.
-     * @param {number} ww The window width.
+     * @param {WindowLevel} wl The window and level.
      */
-    setWindowLevel(wc: number, ww: number): void;
+    setWindowLevel(wl: WindowLevel): void;
     /**
      * Get the colour map.
      *
@@ -4191,22 +4186,15 @@ export declare class ViewLayer {
  */
 export declare class VoiLut {
     /**
-     * @param {number} center The window center.
-     * @param {number} width The window width.
+     * @param {WindowLevel} wl The window center and width.
      */
-    constructor(center: number, width: number);
+    constructor(wl: WindowLevel);
     /**
-     * Get the window center.
+     * Get the window and level.
      *
-     * @returns {number} The window center.
+     * @returns {WindowLevel} The window center and width.
      */
-    getCenter(): number;
-    /**
-     * Get the window width.
-     *
-     * @returns {number} The window width.
-     */
-    getWidth(): number;
+    getWindowLevel(): WindowLevel;
     /**
      * Set the signed offset.
      *
@@ -4222,14 +4210,37 @@ export declare class VoiLut {
      *  [ymin, ymax] range (default [0,255]).
      */
     apply(value: number): number;
-    /**
-     * Check for window level equality.
-     *
-     * @param {VoiLut} rhs The other window level to compare to.
-     * @returns {boolean} True if both window level are equal.
-     */
-    equals(rhs: VoiLut): boolean;
     #private;
+}
+
+/**
+ * Window and Level also known as window width and center.
+ */
+export declare class WindowLevel {
+    /**
+     * @param {number} center The window center.
+     * @param {number} width The window width.
+     */
+    constructor(center: number, width: number);
+    /**
+     * The window center.
+     *
+     * @type {number}
+     */
+    center: number;
+    /**
+     * The window width.
+     *
+     * @type {number}
+     */
+    width: number;
+    /**
+     * Check for equality.
+     *
+     * @param {WindowLevel} rhs The other object to compare to.
+     * @returns {boolean} True if both objects are equal.
+     */
+    equals(rhs: WindowLevel): boolean;
 }
 
 /**
