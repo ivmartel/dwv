@@ -226,6 +226,13 @@ dwv.gui.LayerGroup = function (containerDiv) {
   var currentPosition;
 
   /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  var imageSmoothing = false;
+
+  /**
    * Get the target orientation.
    *
    * @returns {dwv.math.Matrix33} The orientation matrix.
@@ -271,6 +278,21 @@ dwv.gui.LayerGroup = function (containerDiv) {
       self.removeEventListener('zoomchange', updateCrosshairOnChange);
       // remove crosshair div
       removeCrosshairDiv();
+    }
+  };
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.setImageSmoothing = function (flag) {
+    imageSmoothing = flag;
+    // set for existing layers
+    for (let i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        layers[i].enableImageSmoothing(flag);
+      }
     }
   };
 
@@ -486,6 +508,7 @@ dwv.gui.LayerGroup = function (containerDiv) {
     containerDiv.append(div);
     // view layer
     var layer = new dwv.gui.ViewLayer(div);
+    layer.enableImageSmoothing(imageSmoothing);
     // add layer
     layers.push(layer);
     // mark it as active

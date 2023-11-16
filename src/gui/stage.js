@@ -137,6 +137,9 @@ dwv.gui.Stage = function () {
   // binder callbacks
   var callbackStore = null;
 
+  // image smoothing flag
+  var imageSmoothing = false;
+
   /**
    * Get the layer group at the given index.
    *
@@ -202,6 +205,7 @@ dwv.gui.Stage = function () {
   this.addLayerGroup = function (htmlElement) {
     activeLayerGroupIndex = layerGroups.length;
     var layerGroup = new dwv.gui.LayerGroup(htmlElement);
+    layerGroup.setImageSmoothing(imageSmoothing);
     // add to storage
     var isBound = callbackStore && callbackStore.length !== 0;
     if (isBound) {
@@ -337,6 +341,18 @@ dwv.gui.Stage = function () {
     }
     // clear callback store
     callbackStore = null;
+  };
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.setImageSmoothing = function (flag) {
+    imageSmoothing = flag;
+    for (let i = 0; i < layerGroups.length; ++i) {
+      layerGroups[i].setImageSmoothing(flag);
+    }
   };
 
   /**

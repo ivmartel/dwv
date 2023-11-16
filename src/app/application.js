@@ -566,6 +566,16 @@ dwv.App = function () {
   };
 
   /**
+   * Set the imageSmoothing flag value. Default is false.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  this.setImageSmoothing = function (flag) {
+    stage.setImageSmoothing(flag);
+    stage.draw();
+  };
+
+  /**
    * Get the layer group configuration from a data index.
    * Defaults to div id 'layerGroup' if no association object has been set.
    *
