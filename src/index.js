@@ -66,10 +66,12 @@ import {
 import {RescaleSlopeAndIntercept} from './image/rsi';
 import {ModalityLut} from './image/modalityLut';
 import {WindowLut} from './image/windowLut';
+import {VoiLut} from './image/voiLut';
 import {
   defaultPresets,
-  VoiLut
-} from './image/voiLut';
+  WindowLevel
+} from './image/windowLevel';
+
 import {
   MaskFactory,
   getDefaultDicomSegJson
@@ -122,6 +124,7 @@ export {
   ModalityLut,
   WindowLut,
   VoiLut,
+  WindowLevel,
   Index,
   Point,
   Point2D,

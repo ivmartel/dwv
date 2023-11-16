@@ -1,4 +1,5 @@
 import {Point, Point3D} from '../math/point';
+import {WindowLevel} from '../image/windowLevel';
 import {LayerGroup} from './layerGroup';
 import {logger} from '../utils/logger';
 
@@ -20,7 +21,8 @@ export class WindowLevelBinder {
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
       if (viewLayers.length !== 0) {
         const vc = viewLayers[0].getViewController();
-        vc.setWindowLevel(event.value[0], event.value[1]);
+        const wl = new WindowLevel(event.value[0], event.value[1]);
+        vc.setWindowLevel(wl);
       }
     };
   };

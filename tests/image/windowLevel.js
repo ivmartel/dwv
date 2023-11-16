@@ -1,7 +1,7 @@
 import {
-  VoiLut,
-  validateWindowWidth
-} from '../../src/image/voiLut';
+  validateWindowWidth,
+  WindowLevel
+} from '../../src/image/windowLevel';
 
 /**
  * Tests for the 'image/voiLut.js' file.
@@ -10,20 +10,20 @@ import {
 /* global QUnit */
 
 /**
- * Tests for {@link VoiLut}.
+ * Tests for {@link WindowLevel}.
  *
- * @function module:tests/image~VoiLut
+ * @function module:tests/image~WindowLevel
  */
-QUnit.test('Test VoiLut.', function (assert) {
-  const wcaw00 = new VoiLut(0, 2);
-  assert.equal(wcaw00.getCenter(), 0, 'Window level getCenter.');
-  assert.equal(wcaw00.getWidth(), 2, 'Window level getWidth.');
+QUnit.test('Test WindowLevel.', function (assert) {
+  const wcaw00 = new WindowLevel(0, 2);
+  assert.equal(wcaw00.center, 0, 'Window level getCenter.');
+  assert.equal(wcaw00.width, 2, 'Window level getWidth.');
 
   assert.throws(function () {
-    new VoiLut(0, 0);
+    new WindowLevel(0, 0);
   },
   new Error('Window width shall always be greater than or equal to 1'),
-  'VoiLut with 0 width.');
+  'WindowLevel with 0 width.');
 });
 
 /**

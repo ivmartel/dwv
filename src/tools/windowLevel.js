@@ -1,6 +1,9 @@
 import {ScrollWheel} from './scrollWheel';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {validateWindowWidth} from '../image/voiLut';
+import {
+  validateWindowWidth,
+  WindowLevel as WindowLevelValues
+} from '../image/windowLevel';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -97,14 +100,15 @@ export class WindowLevel {
     const pixelToIntensity = (range.max - range.min) * 0.01;
 
     // calculate new window level
-    const center = parseInt(viewController.getWindowLevel().center, 10);
-    const width = parseInt(viewController.getWindowLevel().width, 10);
+    const center = viewController.getWindowLevel().center;
+    const width = viewController.getWindowLevel().width;
     const windowCenter = center + Math.round(diffY * pixelToIntensity);
     let windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
     windowWidth = validateWindowWidth(windowWidth);
     // set
-    viewController.setWindowLevel(windowCenter, windowWidth);
+    const wl = new WindowLevelValues(windowCenter, windowWidth);
+    viewController.setWindowLevel(wl);
 
     // store position
     this.x0 = event._x;
@@ -174,14 +178,16 @@ export class WindowLevel {
     const image = this.#app.getImage(viewLayer.getDataId());
 
     // update view controller
-    viewController.setWindowLevel(
+    const wl = new WindowLevelValues(
       image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(
           index.get(0),
           index.get(1)
         )
       ),
-      parseInt(viewController.getWindowLevel().width, 10));
+      viewController.getWindowLevel().width
+    );
+    viewController.setWindowLevel(wl);
   };
 
   /**

@@ -1,5 +1,6 @@
 import {Index} from '../math/index';
 import {colourNameToHex} from '../utils/colour';
+import {WindowLevel} from '../image/windowLevel';
 
 // external
 import Konva from 'konva';
@@ -48,11 +49,12 @@ export class State {
     const position = viewController.getCurrentIndex();
     const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
+    const wl = viewController.getWindowLevel();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
-      'window-center': viewController.getWindowLevel().center,
-      'window-width': viewController.getWindowLevel().width,
+      'window-center': wl.center,
+      'window-width': wl.width,
       position: position.getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
@@ -98,8 +100,8 @@ export class State {
     const viewController =
       layerGroup.getActiveViewLayer().getViewController();
     // display
-    viewController.setWindowLevel(
-      data['window-center'], data['window-width']);
+    const wl = new WindowLevel(data['window-center'], data['window-width']);
+    viewController.setWindowLevel(wl);
     // position is index...
     viewController.setCurrentIndex(new Index(data.position));
     // apply saved scale on top of current base one

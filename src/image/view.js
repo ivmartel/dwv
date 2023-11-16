@@ -3,6 +3,7 @@ import {ModalityLut} from './modalityLut';
 import {WindowLut} from './windowLut';
 import {luts} from './luts';
 import {VoiLut} from './voiLut';
+import {WindowLevel} from './windowLevel';
 import {generateImageDataMonochrome} from './viewMonochrome';
 import {generateImageDataPaletteColor} from './viewPaletteColor';
 import {generateImageDataRgb} from './viewRgb';
@@ -128,9 +129,9 @@ export class View {
   /**
    * Current window level.
    *
-   * @type {object}
+   * @type {WindowLevel}
    */
-  #currentWl = null;
+  #currentWl;
 
   /**
    * Colour map name.
@@ -330,7 +331,7 @@ export class View {
     // regular case
     if (typeof wl === 'undefined') {
       // if no current, use first id
-      if (!this.#currentWl) {
+      if (typeof this.#currentWl === 'undefined') {
         this.setWindowLevelPresetById(0, true);
       }
       wl = this.#currentWl;
@@ -364,22 +365,24 @@ export class View {
     }
 
     // update VOI lut if not present or different from previous
-    const lutWl = this.#windowLut.getVoiLut();
-    if (typeof lutWl === 'undefined' || !wl.equals(lutWl)) {
+    const voiLut = this.#windowLut.getVoiLut();
+    let voiLutWl;
+    if (typeof voiLut !== 'undefined') {
+      voiLutWl = voiLut.getWindowLevel();
+    }
+    if (typeof voiLut === 'undefined' ||
+      !wl.equals(voiLutWl)) {
       // set lut window level
-      this.#windowLut.setVoiLut(wl);
+      const voiLut = new VoiLut(wl);
+      this.#windowLut.setVoiLut(voiLut);
       // fire change event
-      if (typeof lutWl === 'undefined' ||
-        lutWl.getWidth() !== wl.getWidth() ||
-        lutWl.getCenter() !== wl.getCenter()) {
-        this.#fireEvent({
-          type: 'wlchange',
-          value: [wl.getCenter(), wl.getWidth()],
-          wc: wl.getCenter(),
-          ww: wl.getWidth(),
-          skipGenerate: true
-        });
-      }
+      this.#fireEvent({
+        type: 'wlchange',
+        value: [wl.center, wl.width],
+        wc: wl.center,
+        ww: wl.width,
+        skipGenerate: true
+      });
     }
 
     // return
@@ -690,19 +693,13 @@ export class View {
   /**
    * Set the view window/level.
    *
-   * @param {number} center The window center.
-   * @param {number} width The window width.
+   * @param {WindowLevel} wl The window and level.
    * @param {string} [name] Associated preset name, defaults to 'manual'.
    * Warning: uses the latest set rescale LUT or the default linear one.
    * @param {boolean} [silent] Flag to launch events with skipGenerate.
    * @fires View#wlchange
    */
-  setWindowLevel(center, width, name, silent) {
-    // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-    if (width < 1) {
-      return;
-    }
-
+  setWindowLevel(wl, name, silent) {
     // check input
     if (typeof name === 'undefined') {
       name = 'manual';
@@ -711,31 +708,28 @@ export class View {
       silent = false;
     }
 
-    // new window level
-    const newWl = new VoiLut(center, width);
-
     // check if new
-    const isNew = !newWl.equals(this.#currentWl);
+    const isNew = !wl.equals(this.#currentWl);
 
     // compare to previous if present
     if (isNew) {
       const isNewWidth = this.#currentWl
-        ? this.#currentWl.getWidth() !== width : true;
+        ? this.#currentWl.width !== wl.width : true;
       const isNewCenter = this.#currentWl
-        ? this.#currentWl.getCenter() !== center : true;
+        ? this.#currentWl.center !== wl.center : true;
       // assign
-      this.#currentWl = newWl;
+      this.#currentWl = wl;
       this.#currentPresetName = name;
 
       // update manual
       if (name === 'manual') {
         if (typeof this.#windowPresets[name] !== 'undefined') {
-          this.#windowPresets[name].wl[0] = newWl;
+          this.#windowPresets[name].wl[0] = wl;
         } else {
           // add if not present
           this.addWindowPresets({
             manual: {
-              wl: [newWl],
+              wl: [wl],
               name: 'manual'
             }
           });
@@ -755,9 +749,9 @@ export class View {
          */
         this.#fireEvent({
           type: 'wlchange',
-          value: [center, width],
-          wc: center,
-          ww: width,
+          value: [wl.center, wl.width],
+          wc: wl.center,
+          ww: wl.width,
           skipGenerate: silent
         });
       }
@@ -788,8 +782,7 @@ export class View {
       wl = preset.wl[offset];
     }
     // set w/l
-    this.setWindowLevel(
-      wl.getCenter(), wl.getWidth(), name, silent);
+    this.setWindowLevel(wl, name, silent);
   }
 
   /**
@@ -838,7 +831,7 @@ export class View {
    * Get the image window/level that covers the full data range.
    * Warning: uses the latest set rescale LUT or the default linear one.
    *
-   * @returns {VoiLut} A min/max window level.
+   * @returns {WindowLevel} A min/max window level.
    */
   getWindowLevelMinMax() {
     const range = this.getImage().getRescaledDataRange();
@@ -851,7 +844,7 @@ export class View {
       width = 1;
     }
     const center = min + width / 2;
-    return new VoiLut(center, width);
+    return new WindowLevel(center, width);
   }
 
   /**
@@ -862,7 +855,7 @@ export class View {
     // calculate center and width
     const wl = this.getWindowLevelMinMax();
     // set window level
-    this.setWindowLevel(wl.getCenter(), wl.getWidth(), 'minmax');
+    this.setWindowLevel(wl, 'minmax');
   }
 
   /**

@@ -5,6 +5,7 @@ import {Geometry} from '../../src/image/geometry';
 import {Image} from '../../src/image/image';
 import {View} from '../../src/image/view';
 import {RescaleSlopeAndIntercept} from '../../src/image/rsi';
+import {WindowLevel} from '../../src/image/windowLevel';
 
 /**
  * Tests for the 'image/view.js' file.
@@ -43,13 +44,13 @@ QUnit.test('Test listeners.', function (assert) {
     // with two listeners
   view0.addEventListener('wlchange', listener1);
   view0.addEventListener('wlchange', listener2);
-  view0.setWindowLevel(0, 1);
+  view0.setWindowLevel(new WindowLevel(0, 1));
   // without listener2
   view0.removeEventListener('wlchange', listener2);
-  view0.setWindowLevel(0, 2);
+  view0.setWindowLevel(new WindowLevel(0, 2));
   // without listener1
   view0.removeEventListener('wlchange', listener1);
-  view0.setWindowLevel(1, 1);
+  view0.setWindowLevel(new WindowLevel(1, 1));
 });
 
 /**
@@ -247,7 +248,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
   };
 
   // default window level
-  view0.setWindowLevel(127, 255);
+  view0.setWindowLevel(new WindowLevel(127, 255));
   // call generate data
   view0.generateImageData(imageData);
   // check data content
@@ -295,7 +296,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
   const view1 = new View(image1);
 
   // default window level
-  view1.setWindowLevel(127, 255);
+  view1.setWindowLevel(new WindowLevel(127, 255));
   // call generate data
   view1.generateImageData(imageData);
   // check data content
@@ -350,7 +351,7 @@ QUnit.test('Test generate data timing.', function (assert) {
   assert.ok(time0 < 90, 'First generateImageData: ' + time0 + 'ms.');
 
   // Change the window level
-  view0.setWindowLevel(4000, 200);
+  view0.setWindowLevel(new WindowLevel(4000, 200));
 
   // start time
   const start1 = (new Date()).getMilliseconds();

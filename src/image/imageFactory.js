@@ -1,7 +1,7 @@
 import {Size} from './size';
 import {Geometry} from './geometry';
 import {RescaleSlopeAndIntercept} from './rsi';
-import {VoiLut} from './voiLut';
+import {WindowLevel} from './windowLevel';
 import {Image} from './image';
 import {luts} from './luts';
 import {
@@ -283,7 +283,7 @@ export class ImageFactory {
             width = 1;
           }
           windowPresets[name] = {
-            wl: [new VoiLut(
+            wl: [new WindowLevel(
               center * intensityFactor,
               width
             )],

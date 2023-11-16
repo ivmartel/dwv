@@ -1,9 +1,9 @@
 import {View} from './view';
 import {luts} from './luts';
 import {
-  VoiLut,
+  WindowLevel,
   defaultPresets
-} from './voiLut';
+} from './windowLevel';
 import {logger} from '../utils/logger';
 
 // doc imports
@@ -57,7 +57,7 @@ export class ViewFactory {
       for (const key in defaultPresets[modality]) {
         const preset = defaultPresets[modality][key];
         windowPresets[key] = {
-          wl: [new VoiLut(preset.center, preset.width)],
+          wl: [new WindowLevel(preset.center, preset.width)],
           name: key
         };
       }

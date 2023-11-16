@@ -22,6 +22,7 @@ import {DataController} from './dataController';
 import {OverlayData} from '../gui/overlayData';
 import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
+import {WindowLevel} from '../image/windowLevel';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1764,8 +1765,9 @@ export class App {
     // window/level
     if (typeof viewConfig.windowCenter !== 'undefined' &&
       typeof viewConfig.windowWidth !== 'undefined') {
-      viewController.setWindowLevel(
+      const wl = new WindowLevel(
         viewConfig.windowCenter, viewConfig.windowWidth);
+      viewController.setWindowLevel(wl);
     }
     // colour map
     if (typeof viewConfig.colourMap !== 'undefined') {

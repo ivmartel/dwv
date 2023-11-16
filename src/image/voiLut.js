@@ -1,34 +1,7 @@
-/**
- * Minimum window width value.
- *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2
- */
-const minWindowWidth = 1;
-
-/**
- * List of default window level presets.
- *
- * @type {Object.<string, Object.<string, {center: number, width: number}>>}
- */
-export const defaultPresets = {
-  CT: {
-    mediastinum: {center: 40, width: 400},
-    lung: {center: -500, width: 1500},
-    bone: {center: 500, width: 2000},
-    brain: {center: 40, width: 80},
-    head: {center: 90, width: 350}
-  }
-};
-
-/**
- * Validate an input window width.
- *
- * @param {number} value The value to test.
- * @returns {number} A valid window width.
- */
-export function validateWindowWidth(value) {
-  return value < minWindowWidth ? minWindowWidth : value;
-}
+// doc imports
+/* eslint-disable no-unused-vars */
+import {WindowLevel} from './windowLevel';
+/* eslint-enable no-unused-vars */
 
 /**
  * VOI (Values of Interest) LUT class: apply window centre and width.
@@ -44,34 +17,11 @@ export function validateWindowWidth(value) {
 export class VoiLut {
 
   /**
-   * The center.
+   * The window and level.
    *
-   * @type {number}
+   * @type {WindowLevel}
    */
-  #center;
-
-  /**
-   * The width.
-   *
-   * @type {number}
-   */
-  #width;
-
-  /**
-   * @param {number} center The window center.
-   * @param {number} width The window width.
-   */
-  constructor(center, width) {
-    // check width
-    if (width < minWindowWidth) {
-      throw new Error('Window width shall always be greater than or equal to ' +
-        minWindowWidth);
-    }
-    this.#center = center;
-    this.#width = width;
-
-    this.#init();
-  }
+  #windowLevel;
 
   /**
    * Signed data offset. Defaults to 0.
@@ -123,39 +73,40 @@ export class VoiLut {
   #inter = null;
 
   /**
+   * @param {WindowLevel} wl The window center and width.
+   */
+  constructor(wl) {
+    this.#windowLevel = wl;
+    this.#init();
+  }
+
+  /**
+   * Get the window and level.
+   *
+   * @returns {WindowLevel} The window center and width.
+   */
+  getWindowLevel() {
+    return this.#windowLevel;
+  }
+
+  /**
    * Initialise members. Called at construction.
    *
    */
   #init() {
-    const c = this.#center + this.#signedOffset;
+    const center = this.#windowLevel.center;
+    const width = this.#windowLevel.width;
+    const c = center + this.#signedOffset;
     // from the standard
-    this.#xmin = c - 0.5 - ((this.#width - 1) / 2);
-    this.#xmax = c - 0.5 + ((this.#width - 1) / 2);
+    this.#xmin = c - 0.5 - ((width - 1) / 2);
+    this.#xmax = c - 0.5 + ((width - 1) / 2);
     // develop the equation:
     // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
     // y = ( x / (w-1) ) * (ymax - ymin) +
     //     ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
-    this.#slope = (this.#ymax - this.#ymin) / (this.#width - 1);
-    this.#inter = (-(c - 0.5) / (this.#width - 1) + 0.5) *
+    this.#slope = (this.#ymax - this.#ymin) / (width - 1);
+    this.#inter = (-(c - 0.5) / (width - 1) + 0.5) *
       (this.#ymax - this.#ymin) + this.#ymin;
-  }
-
-  /**
-   * Get the window center.
-   *
-   * @returns {number} The window center.
-   */
-  getCenter() {
-    return this.#center;
-  }
-
-  /**
-   * Get the window width.
-   *
-   * @returns {number} The window width.
-   */
-  getWidth() {
-    return this.#width;
   }
 
   /**
@@ -187,17 +138,4 @@ export class VoiLut {
     }
   }
 
-  /**
-   * Check for window level equality.
-   *
-   * @param {VoiLut} rhs The other window level to compare to.
-   * @returns {boolean} True if both window level are equal.
-   */
-  equals(rhs) {
-    return rhs !== null &&
-      typeof rhs !== 'undefined' &&
-      this.getCenter() === rhs.getCenter() &&
-      this.getWidth() === rhs.getWidth();
-  }
-
-} // class WindowLevel
+} // class VoiLut

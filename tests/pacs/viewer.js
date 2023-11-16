@@ -27,8 +27,8 @@ function viewerSetup() {
     '../../decoders/dwv/decode-rle.js';
 
   dwv.defaultPresets.PT = {
-    'suv5-10': {center: 5, width: 10},
-    'suv6-8': {center: 6, width: 8}
+    'suv5-10': new dwv.WindowLevel(5, 10),
+    'suv6-8': new dwv.WindowLevel(6, 8)
   };
 
   // // example private logic for roi dialog
@@ -1265,7 +1265,7 @@ function addDataRow(dataId) {
       const vl = lg.getActiveViewLayer();
       if (typeof vl !== 'undefined') {
         const vc = vl.getViewController();
-        vc.setWindowLevel(center, width);
+        vc.setWindowLevel(new dwv.WindowLevel(center, width));
       }
     }
   };

@@ -20,6 +20,7 @@ import {ListenerHandler} from '../utils/listen';
 /* eslint-disable no-unused-vars */
 import {View} from '../image/view';
 import {ColourMap} from '../image/luts';
+import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
@@ -717,13 +718,11 @@ export class ViewController {
   /**
    * Get the window/level.
    *
-   * @returns {object} The window center and width.
+   * @returns {WindowLevel} The window and level.
    */
   getWindowLevel() {
-    return {
-      width: this.#view.getCurrentWindowLut().getVoiLut().getWidth(),
-      center: this.#view.getCurrentWindowLut().getVoiLut().getCenter()
-    };
+    const windowLut = this.#view.getCurrentWindowLut();
+    return windowLut.getVoiLut().getWindowLevel();
   }
 
   /**
@@ -736,13 +735,12 @@ export class ViewController {
   }
 
   /**
-   * Set the window/level.
+   * Set the window and level.
    *
-   * @param {number} wc The window center.
-   * @param {number} ww The window width.
+   * @param {WindowLevel} wl The window and level.
    */
-  setWindowLevel(wc, ww) {
-    this.#view.setWindowLevel(wc, ww);
+  setWindowLevel(wl) {
+    this.#view.setWindowLevel(wl);
   }
 
   /**
