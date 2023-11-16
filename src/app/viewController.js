@@ -19,7 +19,6 @@ import {ListenerHandler} from '../utils/listen';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {View} from '../image/view';
-import {ColourMap} from '../image/luts';
 import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
