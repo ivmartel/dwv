@@ -1,3 +1,5 @@
+import {logger} from '../utils/logger';
+
 /**
  * Minimum window width value.
  *
@@ -40,8 +42,9 @@ export class WindowLevel {
   constructor(center, width) {
     // check width
     if (width < minWindowWidth) {
-      throw new Error('Window width shall always be greater than or equal to ' +
-        minWindowWidth);
+      logger.warn('Using minimum window width since input is not valid: ' +
+        width);
+      width = minWindowWidth;
     }
     this.center = center;
     this.width = width;
