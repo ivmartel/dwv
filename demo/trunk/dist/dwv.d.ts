@@ -2452,42 +2452,6 @@ export declare class Matrix33 {
 }
 
 /**
- * Modality LUT class: compensates for any modality-specific presentation.
- * Typically consists of a rescale slope and intercept to
- * rescale the data range.
- *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html
- */
-export declare class ModalityLut {
-    /**
-     * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
-     * @param {number} bitsStored The number of bits used to store the data.
-     */
-    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
-    /**
-     * Get the Rescale Slope and Intercept (RSI).
-     *
-     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
-     */
-    getRSI(): RescaleSlopeAndIntercept;
-    /**
-     * Get the length of the LUT array.
-     *
-     * @returns {number} The length of the LUT array.
-     */
-    getLength(): number;
-    /**
-     * Get the value of the LUT at the given offset.
-     *
-     * @param {number} offset The input offset in [0,2^bitsStored] range
-     *   or full range for ID rescale.
-     * @returns {number} The float32 value of the LUT at the given offset.
-     */
-    getValue(offset: number): number;
-    #private;
-}
-
-/**
  * DICOM Header overlay info.
  */
 export declare class OverlayData {
@@ -3321,14 +3285,6 @@ export declare class View {
      */
     setAlphaFunction(func: (value: object, index: object) => number): void;
     /**
-     * Get the window LUT of the image.
-     * Warning: can be undefined in no window/level was set.
-     *
-     * @returns {WindowLut} The window LUT of the image.
-     * @fires View#wlchange
-     */
-    getCurrentWindowLut(): WindowLut;
-    /**
      * Get the window presets.
      *
      * @returns {object} The window presets.
@@ -3425,6 +3381,12 @@ export declare class View {
      * @fires View#wlchange
      */
     setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
+    /**
+     * Get the window/level.
+     *
+     * @returns {WindowLevel} The window and level.
+     */
+    getWindowLevel(): WindowLevel;
     /**
      * Set the window level to the preset with the input name.
      *
@@ -4174,46 +4136,6 @@ export declare class ViewLayer {
 }
 
 /**
- * VOI (Values of Interest) LUT class: apply window centre and width.
- * <br>Pseudo-code:
- * <pre>
- *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
- *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
- *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
- * </pre>
- *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html
- */
-export declare class VoiLut {
-    /**
-     * @param {WindowLevel} wl The window center and width.
-     */
-    constructor(wl: WindowLevel);
-    /**
-     * Get the window and level.
-     *
-     * @returns {WindowLevel} The window center and width.
-     */
-    getWindowLevel(): WindowLevel;
-    /**
-     * Set the signed offset.
-     *
-     * @param {number} offset The signed data offset,
-     *   typically: slope * ( size / 2).
-     */
-    setSignedOffset(offset: number): void;
-    /**
-     * Apply the window level on an input value.
-     *
-     * @param {number} value The value to rescale as an integer.
-     * @returns {number} The leveled value, in the
-     *  [ymin, ymax] range (default [0,255]).
-     */
-    apply(value: number): number;
-    #private;
-}
-
-/**
  * Window and Level also known as window width and center.
  */
 export declare class WindowLevel {
@@ -4241,49 +4163,6 @@ export declare class WindowLevel {
      * @returns {boolean} True if both objects are equal.
      */
     equals(rhs: WindowLevel): boolean;
-}
-
-/**
- * Window LUT class: combines a modality LUT and a VOI LUT.
- */
-export declare class WindowLut {
-    /**
-     * Construct a window LUT object, VOI LUT is set with
-     *   the 'setVoiLut' method.
-     *
-     * @param {ModalityLut} modalityLut The associated rescale LUT.
-     * @param {boolean} isSigned Flag to know if the data is signed or not.
-     * @param {boolean} isDiscrete Flag to know if the input data is discrete.
-     */
-    constructor(modalityLut: ModalityLut, isSigned: boolean, isDiscrete: boolean);
-    /**
-     * Get the VOI LUT.
-     *
-     * @returns {VoiLut} The VOI LUT.
-     */
-    getVoiLut(): VoiLut;
-    /**
-     * Get the modality LUT.
-     *
-     * @returns {ModalityLut} The modality LUT.
-     */
-    getModalityLut(): ModalityLut;
-    /**
-     * Set the VOI LUT.
-     *
-     * @param {VoiLut} lut The VOI LUT.
-     */
-    setVoiLut(lut: VoiLut): void;
-    /**
-     * Get the value of the LUT at the given offset.
-     *
-     * @param {number} offset The input offset in [0,2^bitsStored] range
-     *   for discrete data or full range for non discrete.
-     * @returns {number} The integer value (default [0,255]) of the LUT
-     *   at the given offset.
-     */
-    getValue(offset: number): number;
-    #private;
 }
 
 /**
