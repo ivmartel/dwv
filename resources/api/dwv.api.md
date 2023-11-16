@@ -25,16 +25,17 @@ export class App {
     getAddedScale(): object;
     getBaseScale(): object;
     getCurrentStackIndex(): number;
-    getDataIds(): any[];
+    getDataIds(): string[];
+    getDataIdsFromSopUids(uids: string[]): string[];
     getDataViewConfigs(): {
         [x: string]: ViewConfig[];
     };
     getDrawLayersByDataId(dataId: string): DrawLayer[];
-    getImage(dataId: string): Image_2;
+    getImage(dataId: string): Image_2 | undefined;
     getJsonState(): string;
-    getLastImage(): Image_2;
+    getLastImage(): Image_2 | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup;
-    getMetaData(dataId: string): object;
+    getMetaData(dataId: string): object | undefined;
     getNumberOfLayerGroups(): number;
     getOffset(): object;
     getOverlayData(dataId: string): OverlayData | undefined;
@@ -147,10 +148,7 @@ export const decoderScripts: {
 // @public
 export const defaultPresets: {
     [x: string]: {
-        [x: string]: {
-            center: number;
-            width: number;
-        };
+        [x: string]: WindowLevel;
     };
 };
 
@@ -345,6 +343,7 @@ class Image_2 {
     canWindowLevel(): boolean;
     clone(): Image_2;
     compose(rhs: Image_2, operator: Function): Image_2;
+    containsImageUids(uids: string[]): boolean;
     convolute2D(weights: any[]): Image_2;
     convoluteBuffer(weights: any[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
@@ -558,14 +557,6 @@ export class Point3D {
 export function precisionRound(number: number, precision: number): number;
 
 // @public
-export class RescaleLut {
-    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
-    getLength(): number;
-    getRSI(): RescaleSlopeAndIntercept;
-    getValue(offset: number): number;
-}
-
-// @public
 export class RescaleSlopeAndIntercept {
     constructor(slope: number, intercept: number);
     apply(value: number): number;
@@ -681,14 +672,14 @@ export class View {
     getColourMap(): string;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
-    getCurrentWindowLut(): WindowLut;
     getCurrentWindowPresetName(): string;
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position?: Point): Point3D;
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
     getScrollIndex(): number;
-    getWindowLevelMinMax(): WindowCenterAndWidth;
+    getWindowLevel(): WindowLevel;
+    getWindowLevelMinMax(): WindowLevel;
     getWindowPresets(): object;
     getWindowPresetsNames(): object;
     incrementIndex(dim: number, silent: boolean): boolean;
@@ -702,7 +693,7 @@ export class View {
     setImage(inImage: Image_2): void;
     setInitialIndex(): void;
     setOrientation(mat33: Matrix33): void;
-    setWindowLevel(center: number, width: number, name?: string, silent?: boolean): void;
+    setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
     setWindowLevelMinMax(): void;
     setWindowLevelPreset(name: string, silent?: boolean): void;
     setWindowLevelPresetById(id: number, silent?: boolean): void;
@@ -759,7 +750,7 @@ export class ViewController {
     getPositionFromPlanePoint(x: number, y: number): Point;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
-    getWindowLevel(): object;
+    getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): any[];
     incrementIndex(dim: number, silent?: boolean): boolean;
     incrementScrollIndex(silent?: boolean): boolean;
@@ -773,7 +764,7 @@ export class ViewController {
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     setImage(img: Image_2, dataId: string): void;
     setViewAlphaFunction(func: (value: object, index: object) => number): void;
-    setWindowLevel(wc: number, ww: number): void;
+    setWindowLevel(wl: WindowLevel): void;
     setWindowLevelPreset(name: string): void;
     setWindowLevelPresetById(id: number): void;
     stop(): void;
@@ -821,22 +812,11 @@ export class ViewLayer {
 }
 
 // @public
-export class WindowCenterAndWidth {
+export class WindowLevel {
     constructor(center: number, width: number);
-    apply(value: number): number;
-    equals(rhs: WindowCenterAndWidth): boolean;
-    getCenter(): number;
-    getWidth(): number;
-    setSignedOffset(offset: number): void;
-}
-
-// @public
-export class WindowLut {
-    constructor(rescaleLut: RescaleLut, isSigned: boolean, isDiscrete: boolean);
-    getRescaleLut(): RescaleLut;
-    getValue(offset: number): number;
-    getWindowLevel(): WindowCenterAndWidth;
-    setWindowLevel(wl: WindowCenterAndWidth): void;
+    center: number;
+    equals(rhs: WindowLevel): boolean;
+    width: number;
 }
 
 // @public

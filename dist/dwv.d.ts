@@ -34,15 +34,15 @@ export declare class App {
      * Get the image.
      *
      * @param {string} dataId The data id.
-     * @returns {Image} The associated image.
+     * @returns {Image|undefined} The associated image.
      */
-    getImage(dataId: string): Image_2;
+    getImage(dataId: string): Image_2 | undefined;
     /**
      * Get the last loaded image.
      *
-     * @returns {Image} The image.
+     * @returns {Image|undefined} The image.
      */
-    getLastImage(): Image_2;
+    getLastImage(): Image_2 | undefined;
     /**
      * Set the image at the given id.
      *
@@ -70,15 +70,22 @@ export declare class App {
      * Get the meta data.
      *
      * @param {string} dataId The data id.
-     * @returns {object} The list of meta data.
+     * @returns {object|undefined} The list of meta data.
      */
-    getMetaData(dataId: string): object;
+    getMetaData(dataId: string): object | undefined;
     /**
      * Get the list of ids in the data storage.
      *
-     * @returns {Array} The list of data ids.
+     * @returns {string[]} The list of data ids.
      */
-    getDataIds(): any[];
+    getDataIds(): string[];
+    /**
+     * Get the list of dataIds that contain the input UIDs.
+     *
+     * @param {string[]} uids A list of UIDs.
+     * @returns {string[]} The list of dataIds that contain the UIDs.
+     */
+    getDataIdsFromSopUids(uids: string[]): string[];
     /**
      * Can the data be scrolled?
      *
@@ -726,14 +733,11 @@ export declare const decoderScripts: {
 /**
  * List of default window level presets.
  *
- * @type {Object.<string, Object.<string, {center: number, width: number}>>}
+ * @type {Object.<string, Object.<string, WindowLevel>>}
  */
 export declare const defaultPresets: {
     [x: string]: {
-        [x: string]: {
-            center: number;
-            width: number;
-        };
+        [x: string]: WindowLevel;
     };
 };
 
@@ -1613,6 +1617,13 @@ declare class Image_2 {
      * @returns {string} The UID.
      */
     getImageUid(index?: Index): string;
+    /**
+     * Check if this image includes the input uids.
+     *
+     * @param {string[]} uids UIDs to test for presence.
+     * @returns {boolean} True if all uids are in this image uids.
+     */
+    containsImageUids(uids: string[]): boolean;
     /**
      * Get the geometry of the image.
      *
@@ -2703,39 +2714,6 @@ export declare class Point3D {
 export declare function precisionRound(number: number, precision: number): number;
 
 /**
- * Rescale LUT class.
- * Typically converts from integer to float.
- */
-export declare class RescaleLut {
-    /**
-     * @param {RescaleSlopeAndIntercept} rsi The rescale slope and intercept.
-     * @param {number} bitsStored The number of bits used to store the data.
-     */
-    constructor(rsi: RescaleSlopeAndIntercept, bitsStored: number);
-    /**
-     * Get the Rescale Slope and Intercept (RSI).
-     *
-     * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept object.
-     */
-    getRSI(): RescaleSlopeAndIntercept;
-    /**
-     * Get the length of the LUT array.
-     *
-     * @returns {number} The length of the LUT array.
-     */
-    getLength(): number;
-    /**
-     * Get the value of the LUT at the given offset.
-     *
-     * @param {number} offset The input offset in [0,2^bitsStored] range
-     *   or full range for ID rescale.
-     * @returns {number} The float32 value of the LUT at the given offset.
-     */
-    getValue(offset: number): number;
-    #private;
-}
-
-/**
  * Rescale Slope and Intercept
  */
 export declare class RescaleSlopeAndIntercept {
@@ -3307,14 +3285,6 @@ export declare class View {
      */
     setAlphaFunction(func: (value: object, index: object) => number): void;
     /**
-     * Get the window LUT of the image.
-     * Warning: can be undefined in no window/level was set.
-     *
-     * @returns {WindowLut} The window LUT of the image.
-     * @fires View#wlchange
-     */
-    getCurrentWindowLut(): WindowLut;
-    /**
      * Get the window presets.
      *
      * @returns {object} The window presets.
@@ -3404,14 +3374,19 @@ export declare class View {
     /**
      * Set the view window/level.
      *
-     * @param {number} center The window center.
-     * @param {number} width The window width.
+     * @param {WindowLevel} wl The window and level.
      * @param {string} [name] Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
      * @param {boolean} [silent] Flag to launch events with skipGenerate.
      * @fires View#wlchange
      */
-    setWindowLevel(center: number, width: number, name?: string, silent?: boolean): void;
+    setWindowLevel(wl: WindowLevel, name?: string, silent?: boolean): void;
+    /**
+     * Get the window/level.
+     *
+     * @returns {WindowLevel} The window and level.
+     */
+    getWindowLevel(): WindowLevel;
     /**
      * Set the window level to the preset with the input name.
      *
@@ -3446,9 +3421,9 @@ export declare class View {
      * Get the image window/level that covers the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
      *
-     * @returns {WindowCenterAndWidth} A min/max window level.
+     * @returns {WindowLevel} A min/max window level.
      */
-    getWindowLevelMinMax(): WindowCenterAndWidth;
+    getWindowLevelMinMax(): WindowLevel;
     /**
      * Set the image window/level to cover the full data range.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -3861,9 +3836,9 @@ export declare class ViewController {
     /**
      * Get the window/level.
      *
-     * @returns {object} The window center and width.
+     * @returns {WindowLevel} The window and level.
      */
-    getWindowLevel(): object;
+    getWindowLevel(): WindowLevel;
     /**
      * Get the current window level preset name.
      *
@@ -3871,12 +3846,11 @@ export declare class ViewController {
      */
     getCurrentWindowPresetName(): string;
     /**
-     * Set the window/level.
+     * Set the window and level.
      *
-     * @param {number} wc The window center.
-     * @param {number} ww The window width.
+     * @param {WindowLevel} wl The window and level.
      */
-    setWindowLevel(wc: number, ww: number): void;
+    setWindowLevel(wl: WindowLevel): void;
     /**
      * Get the colour map.
      *
@@ -4162,101 +4136,33 @@ export declare class ViewLayer {
 }
 
 /**
- * WindowCenterAndWidth class.
- * <br>Pseudo-code:
- * <pre>
- *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
- *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
- *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
- * </pre>
- *
- * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ * Window and Level also known as window width and center.
  */
-export declare class WindowCenterAndWidth {
+export declare class WindowLevel {
     /**
      * @param {number} center The window center.
      * @param {number} width The window width.
      */
     constructor(center: number, width: number);
     /**
-     * Get the window center.
+     * The window center.
      *
-     * @returns {number} The window center.
+     * @type {number}
      */
-    getCenter(): number;
+    center: number;
     /**
-     * Get the window width.
+     * The window width.
      *
-     * @returns {number} The window width.
+     * @type {number}
      */
-    getWidth(): number;
+    width: number;
     /**
-     * Set the signed offset.
+     * Check for equality.
      *
-     * @param {number} offset The signed data offset,
-     *   typically: slope * ( size / 2).
+     * @param {WindowLevel} rhs The other object to compare to.
+     * @returns {boolean} True if both objects are equal.
      */
-    setSignedOffset(offset: number): void;
-    /**
-     * Apply the window level on an input value.
-     *
-     * @param {number} value The value to rescale as an integer.
-     * @returns {number} The leveled value, in the
-     *  [ymin, ymax] range (default [0,255]).
-     */
-    apply(value: number): number;
-    /**
-     * Check for window level equality.
-     *
-     * @param {WindowCenterAndWidth} rhs The other window level to compare to.
-     * @returns {boolean} True if both window level are equal.
-     */
-    equals(rhs: WindowCenterAndWidth): boolean;
-    #private;
-}
-
-/**
- * Window LUT class.
- * Typically converts from float to integer.
- */
-export declare class WindowLut {
-    /**
-     * Construct a window LUT object, window level is set with
-     *   the 'setWindowLevel' method.
-     *
-     * @param {RescaleLut} rescaleLut The associated rescale LUT.
-     * @param {boolean} isSigned Flag to know if the data is signed or not.
-     * @param {boolean} isDiscrete Flag to know if the input data is discrete.
-     */
-    constructor(rescaleLut: RescaleLut, isSigned: boolean, isDiscrete: boolean);
-    /**
-     * Get the window / level.
-     *
-     * @returns {WindowCenterAndWidth} The window / level.
-     */
-    getWindowLevel(): WindowCenterAndWidth;
-    /**
-     * Get the rescale lut.
-     *
-     * @returns {RescaleLut} The rescale lut.
-     */
-    getRescaleLut(): RescaleLut;
-    /**
-     * Set the window center and width.
-     *
-     * @param {WindowCenterAndWidth} wl The window level.
-     */
-    setWindowLevel(wl: WindowCenterAndWidth): void;
-    /**
-     * Get the value of the LUT at the given offset.
-     *
-     * @param {number} offset The input offset in [0,2^bitsStored] range
-     *   for discrete data or full range for non discrete.
-     * @returns {number} The integer value (default [0,255]) of the LUT
-     *   at the given offset.
-     */
-    getValue(offset: number): number;
-    #private;
+    equals(rhs: WindowLevel): boolean;
 }
 
 /**
