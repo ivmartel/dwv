@@ -100,7 +100,7 @@ export class View {
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
    *
-   * @type {object}
+   * @type {WindowLut}
    */
   #windowLut;
 
@@ -310,7 +310,7 @@ export class View {
    * @returns {WindowLut} The window LUT of the image.
    * @fires View#wlchange
    */
-  getCurrentWindowLut() {
+  #getCurrentWindowLut() {
     // get the current window level
     let wl;
     // special case for 'perslice' presets
@@ -759,6 +759,17 @@ export class View {
   }
 
   /**
+   * Get the window/level.
+   *
+   * @returns {WindowLevel} The window and level.
+   */
+  getWindowLevel() {
+    // same as #currentWl...
+    const windowLut = this.#getCurrentWindowLut();
+    return windowLut.getVoiLut().getWindowLevel();
+  }
+
+  /**
    * Set the window level to the preset with the input name.
    *
    * @param {string} name The name of the preset to activate.
@@ -887,7 +898,7 @@ export class View {
         data,
         iterator,
         this.getAlphaFunction(),
-        this.getCurrentWindowLut(),
+        this.#getCurrentWindowLut(),
         this.#getColourMapLut()
       );
       break;

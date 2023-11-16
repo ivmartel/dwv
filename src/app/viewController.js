@@ -721,8 +721,7 @@ export class ViewController {
    * @returns {WindowLevel} The window and level.
    */
   getWindowLevel() {
-    const windowLut = this.#view.getCurrentWindowLut();
-    return windowLut.getVoiLut().getWindowLevel();
+    return this.#view.getWindowLevel();
   }
 
   /**
