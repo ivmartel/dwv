@@ -23,6 +23,7 @@ import {
   Point,
   Point3D
 } from '../math/point';
+import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -42,7 +43,7 @@ export const viewEventNames = [
 /**
  * Create a View from DICOM elements and image.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @param {Image} image The associated image.
  * @returns {View} The View object.
  */
@@ -401,7 +402,7 @@ export class View {
   /**
    * Get the window presets names.
    *
-   * @returns {object} The list of window presets names.
+   * @returns {string[]} The list of window presets names.
    */
   getWindowPresetsNames() {
     return Object.keys(this.#windowPresets);

@@ -3,6 +3,7 @@ import {logger} from '../utils/logger';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from './image';
+import {MaskSegment} from './maskFactory';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -20,14 +21,14 @@ export class MaskSegmentHelper {
   /**
    * The segments: array of segment description.
    *
-   * @type {Array}
+   * @type {MaskSegment[]}
    */
   #segments;
 
   /**
    * List of ids of hidden segments.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #hiddenSegments = [];
 
@@ -52,8 +53,8 @@ export class MaskSegmentHelper {
   /**
    * Check if a segment is present in a mask image.
    *
-   * @param {Array} numbers Array of segment numbers.
-   * @returns {Array} Array of boolean set to true
+   * @param {number[]} numbers Array of segment numbers.
+   * @returns {boolean[]} Array of boolean set to true
    *   if the segment is present in the mask.
    */
   maskHasSegments(numbers) {
@@ -81,7 +82,7 @@ export class MaskSegmentHelper {
    * Get a segment from the inner segment list.
    *
    * @param {number} segmentNumber The segment number.
-   * @returns {object} The segment.
+   * @returns {MaskSegment|undefined} The segment.
    */
   getSegment(segmentNumber) {
     return this.#segments.find(function (item) {
@@ -92,7 +93,7 @@ export class MaskSegmentHelper {
   /**
    * Get the inner segment list.
    *
-   * @returns {Array} The list of segments.
+   * @returns {MaskSegment[]} The list of segments.
    */
   getSegments() {
     return this.#segments;
@@ -101,7 +102,7 @@ export class MaskSegmentHelper {
   /**
    * Set the inner segment list.
    *
-   * @param {Array} list The segment list.
+   * @param {MaskSegment[]} list The segment list.
    */
   setSegments(list) {
     this.#segments = list;
@@ -111,7 +112,7 @@ export class MaskSegmentHelper {
    * Set the hidden segment list.
    * TODO: not sure if needed...
    *
-   * @param {Array} list The list of hidden segment numbers.
+   * @param {number[]} list The list of hidden segment numbers.
    */
   setHiddenSegments(list) {
     this.#hiddenSegments = list;
@@ -248,7 +249,7 @@ export class DeleteSegmentCommand {
   /**
    * The segment to remove.
    *
-   * @type {object}
+   * @type {MaskSegment}
    */
   #segment;
 
@@ -268,7 +269,7 @@ export class DeleteSegmentCommand {
 
   /**
    * @param {Image} mask The mask image.
-   * @param {object} segment The segment to remove.
+   * @param {MaskSegment} segment The segment to remove.
    * @param {boolean} [silent] Whether to send a creation event or not.
    */
   constructor(mask, segment, silent) {

@@ -269,16 +269,57 @@ function getDimensionOrganization(dataElements) {
 }
 
 /**
+ * DICOM code.
+ */
+export class DicomCode {
+  /**
+   * Code meaning (0008,0104).
+   *
+   * @type {string}
+   */
+  meaning;
+  /**
+   * Code value (0008,0100).
+   *
+   * @type {string|undefined}
+   */
+  value;
+  /**
+   * Long code value (0008,0119).
+   *
+   * @type {string|undefined}
+   */
+  longValue;
+  /**
+   * URN code value (0008,0120).
+   *
+   * @type {string|undefined}
+   */
+  urnValue;
+  /**
+   * Coding scheme designator (0008,0102).
+   *
+   * @type {string|undefined}
+   */
+  schemeDesignator;
+
+  /**
+   * @param {string} meaning The code meaning.
+   */
+  constructor(meaning) {
+    this.meaning = meaning;
+  }
+}
+
+/**
  * Get a code object from a dicom element.
  *
  * @param {DataElements} dataElements The dicom element.
- * @returns {object} A code object.
+ * @returns {DicomCode} A code object.
  */
 function getCode(dataElements) {
   // meaning -> CodeMeaning (type1)
-  const code = {
-    meaning: dataElements['00080104'].value[0]
-  };
+  const code = new DicomCode(dataElements['00080104'].value[0]);
   // value -> CodeValue (type1C)
   // longValue -> LongCodeValue (type1C)
   // urnValue -> URNCodeValue (type1C)
@@ -305,20 +346,93 @@ function getCode(dataElements) {
 }
 
 /**
+ * DICOM (mask) segment.
+ */
+export class MaskSegment {
+  /**
+   * Segment number (0062,0004).
+   *
+   * @type {number}
+   */
+  number;
+  /**
+   * Segment label (0062,0005).
+   *
+   * @type {string}
+   */
+  label;
+  /**
+   * Segment algorithm type (0062,0008).
+   *
+   * @type {string}
+   */
+  algorithmType;
+  /**
+   * Segment algorithm name (0062,0009).
+   *
+   * @type {string|undefined}
+   */
+  algorithmName;
+  /**
+   * Segment display value as {r,g,b}.
+   *
+   * @type {object|undefined}
+   */
+  displayValue;
+  /**
+   * Segment property code: specific property
+   * the segment represents (0062,000F).
+   *
+   * @type {DicomCode|undefined}
+   */
+  propertyTypeCode;
+  /**
+   * Segment property category code: general category
+   * of the property the segment represents (0062,0003).
+   *
+   * @type {DicomCode|undefined}
+   */
+  propertyCategoryCode;
+  /**
+   * Segment tracking UID (0062,0021).
+   *
+   * @type {string|undefined}
+   */
+  trackingUid;
+  /**
+   * Segment tracking id: text label for the UID (0062,0020).
+   *
+   * @type {string|undefined}
+   */
+  trackingId;
+
+  /**
+   * @param {number} number The segment number.
+   * @param {string} label The segment label.
+   * @param {string} algorithmType The segment number.
+   */
+  constructor(number, label, algorithmType) {
+    this.number = number;
+    this.label = label;
+    this.algorithmType = algorithmType;
+  }
+}
+
+/**
  * Get a segment object from a dicom element.
  *
  * @param {DataElements} dataElements The dicom element.
- * @returns {object} A segment object.
+ * @returns {MaskSegment} A segment object.
  */
 function getSegment(dataElements) {
   // number -> SegmentNumber (type1)
   // label -> SegmentLabel (type1)
   // algorithmType -> SegmentAlgorithmType (type1)
-  const segment = {
-    number: dataElements['00620004'].value[0],
-    label: dataElements['00620005'] ? dataElements['00620005'].value[0] : 'n/a',
-    algorithmType: dataElements['00620008'].value[0]
-  };
+  const segment = new MaskSegment(
+    dataElements['00620004'].value[0],
+    dataElements['00620005'] ? dataElements['00620005'].value[0] : 'n/a',
+    dataElements['00620008'].value[0]
+  );
   // algorithmName -> SegmentAlgorithmName (type1C)
   if (dataElements['00620009']) {
     segment.algorithmName = dataElements['00620009'].value[0];
@@ -574,7 +688,7 @@ export class MaskFactory {
   /**
    * Get an {@link Image} object from the read DICOM file.
    *
-   * @param {DataElements} dataElements The DICOM tags.
+   * @param {Object<string, DataElement>} dataElements The DICOM tags.
    * @param {Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.

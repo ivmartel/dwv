@@ -108,7 +108,7 @@ export class ViewController {
   /**
    * Get the plane helper.
    *
-   * @returns {object} The helper.
+   * @returns {PlaneHelper} The helper.
    */
   getPlaneHelper() {
     return this.#planeHelper;
@@ -126,7 +126,7 @@ export class ViewController {
   /**
    * Get the mask segment helper.
    *
-   * @returns {object} The helper.
+   * @returns {MaskSegmentHelper} The helper.
    */
   getMaskSegmentHelper() {
     return this.#maskSegmentHelper;
@@ -177,7 +177,7 @@ export class ViewController {
   /**
    * Get the window/level presets names.
    *
-   * @returns {Array} The presets names.
+   * @returns {string[]} The presets names.
    */
   getWindowLevelPresetsNames() {
     return this.#view.getWindowPresetsNames();

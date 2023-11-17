@@ -68,11 +68,14 @@ import {
   defaultPresets,
   WindowLevel
 } from './image/windowLevel';
-
 import {
+  DicomCode,
+  MaskSegment,
   MaskFactory,
   getDefaultDicomSegJson
 } from './image/maskFactory';
+import {PlaneHelper} from './image/planeHelper';
+import {MaskSegmentHelper} from './image/maskSegmentHelper';
 // math
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
@@ -100,6 +103,8 @@ export {
   DrawDetails,
   DrawController,
   ViewController,
+  PlaneHelper,
+  MaskSegmentHelper,
   ToolboxController,
   DataElement,
   DicomParser,
@@ -126,6 +131,8 @@ export {
   Vector3D,
   Matrix33,
   MaskFactory,
+  DicomCode,
+  MaskSegment,
   defaults,
   logger,
   decoderScripts,

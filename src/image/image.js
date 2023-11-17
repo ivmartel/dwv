@@ -13,6 +13,7 @@ import {MaskFactory} from './maskFactory';
 /* eslint-disable no-unused-vars */
 import {Geometry} from './geometry';
 import {Matrix33} from '../math/matrix';
+import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -43,7 +44,7 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
 /**
  * Create an Image from DICOM elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The Image object.
  */
 export function createImage(elements) {
@@ -58,7 +59,7 @@ export function createImage(elements) {
 /**
  * Create a mask Image from DICOM elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The mask Image object.
  */
 export function createMaskImage(elements) {

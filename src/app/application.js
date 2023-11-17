@@ -31,6 +31,7 @@ import {ViewLayer} from '../gui/viewLayer';
 import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
 import {Matrix33} from '../math/matrix';
+import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -346,7 +347,7 @@ export class App {
    * Get the meta data.
    *
    * @param {string} dataId The data id.
-   * @returns {object|undefined} The list of meta data.
+   * @returns {Object<string, DataElement>|undefined} The list of meta data.
    */
   getMetaData(dataId) {
     let res;
@@ -1325,7 +1326,7 @@ export class App {
   /**
    * Set the window/level preset.
    *
-   * @param {object} preset The window/level preset.
+   * @param {string} preset The window/level preset.
    */
   setWindowLevelPreset(preset) {
     const viewController =
