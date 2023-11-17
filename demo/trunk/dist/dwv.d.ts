@@ -70,9 +70,11 @@ export declare class App {
      * Get the meta data.
      *
      * @param {string} dataId The data id.
-     * @returns {object|undefined} The list of meta data.
+     * @returns {Object<string, DataElement>|undefined} The list of meta data.
      */
-    getMetaData(dataId: string): object | undefined;
+    getMetaData(dataId: string): {
+        [x: string]: DataElement;
+    } | undefined;
     /**
      * Get the list of ids in the data storage.
      *
@@ -469,9 +471,9 @@ export declare class App {
     /**
      * Set the window/level preset.
      *
-     * @param {object} preset The window/level preset.
+     * @param {string} preset The window/level preset.
      */
-    setWindowLevelPreset(preset: object): void;
+    setWindowLevelPreset(preset: string): void;
     /**
      * Set the tool
      *
@@ -626,27 +628,33 @@ export declare class ColourMap {
 /**
  * Create an Image from DICOM elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The Image object.
  */
-export declare function createImage(elements: object): Image_2;
+export declare function createImage(elements: {
+    [x: string]: DataElement;
+}): Image_2;
 
 /**
  * Create a mask Image from DICOM elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The mask Image object.
  */
-export declare function createMaskImage(elements: object): Image_2;
+export declare function createMaskImage(elements: {
+    [x: string]: DataElement;
+}): Image_2;
 
 /**
  * Create a View from DICOM elements and image.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @param {Image} image The associated image.
  * @returns {View} The View object.
  */
-export declare function createView(elements: object, image: Image_2): View;
+export declare function createView(elements: {
+    [x: string]: DataElement;
+}, image: Image_2): View;
 
 export declare namespace customUI {
     /**
@@ -716,10 +724,6 @@ export declare class DataElement {
     items: any[];
 }
 
-declare type DataElements = {
-    [x: string]: DataElement;
-};
-
 /**
  * Decoder scripts to be passed to web workers for image decoding.
  */
@@ -747,6 +751,46 @@ export declare namespace defaults {
             [x: string]: string;
         };
     };
+}
+
+/**
+ * DICOM code.
+ */
+export declare class DicomCode {
+    /**
+     * @param {string} meaning The code meaning.
+     */
+    constructor(meaning: string);
+    /**
+     * Code meaning (0008,0104).
+     *
+     * @type {string}
+     */
+    meaning: string;
+    /**
+     * Code value (0008,0100).
+     *
+     * @type {string|undefined}
+     */
+    value: string | undefined;
+    /**
+     * Long code value (0008,0119).
+     *
+     * @type {string|undefined}
+     */
+    longValue: string | undefined;
+    /**
+     * URN code value (0008,0120).
+     *
+     * @type {string|undefined}
+     */
+    urnValue: string | undefined;
+    /**
+     * Coding scheme designator (0008,0102).
+     *
+     * @type {string|undefined}
+     */
+    schemeDesignator: string | undefined;
 }
 
 /**
@@ -2334,13 +2378,178 @@ export declare class MaskFactory {
     /**
      * Get an {@link Image} object from the read DICOM file.
      *
-     * @param {DataElements} dataElements The DICOM tags.
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
      * @param {Uint8Array | Int8Array |
          *   Uint16Array | Int16Array |
          *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
      * @returns {Image} A new Image.
      */
-    create(dataElements: DataElements, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    create(dataElements: {
+        [x: string]: DataElement;
+    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+}
+
+/**
+ * DICOM (mask) segment.
+ */
+export declare class MaskSegment {
+    /**
+     * @param {number} number The segment number.
+     * @param {string} label The segment label.
+     * @param {string} algorithmType The segment number.
+     */
+    constructor(number: number, label: string, algorithmType: string);
+    /**
+     * Segment number (0062,0004).
+     *
+     * @type {number}
+     */
+    number: number;
+    /**
+     * Segment label (0062,0005).
+     *
+     * @type {string}
+     */
+    label: string;
+    /**
+     * Segment algorithm type (0062,0008).
+     *
+     * @type {string}
+     */
+    algorithmType: string;
+    /**
+     * Segment algorithm name (0062,0009).
+     *
+     * @type {string|undefined}
+     */
+    algorithmName: string | undefined;
+    /**
+     * Segment display value as {r,g,b}.
+     *
+     * @type {object|undefined}
+     */
+    displayValue: object | undefined;
+    /**
+     * Segment property code: specific property
+     * the segment represents (0062,000F).
+     *
+     * @type {DicomCode|undefined}
+     */
+    propertyTypeCode: DicomCode | undefined;
+    /**
+     * Segment property category code: general category
+     * of the property the segment represents (0062,0003).
+     *
+     * @type {DicomCode|undefined}
+     */
+    propertyCategoryCode: DicomCode | undefined;
+    /**
+     * Segment tracking UID (0062,0021).
+     *
+     * @type {string|undefined}
+     */
+    trackingUid: string | undefined;
+    /**
+     * Segment tracking id: text label for the UID (0062,0020).
+     *
+     * @type {string|undefined}
+     */
+    trackingId: string | undefined;
+}
+
+/**
+ * Mask segment helper.
+ */
+export declare class MaskSegmentHelper {
+    /**
+     * @param {Image} mask The associated mask image.
+     */
+    constructor(mask: Image_2);
+    /**
+     * Check if a segment is part of the inner segment list.
+     *
+     * @param {number} segmentNumber The segment number.
+     * @returns {boolean} True if the segment is included.
+     */
+    hasSegment(segmentNumber: number): boolean;
+    /**
+     * Check if a segment is present in a mask image.
+     *
+     * @param {number[]} numbers Array of segment numbers.
+     * @returns {boolean[]} Array of boolean set to true
+     *   if the segment is present in the mask.
+     */
+    maskHasSegments(numbers: number[]): boolean[];
+    /**
+     * Get a segment from the inner segment list.
+     *
+     * @param {number} segmentNumber The segment number.
+     * @returns {MaskSegment|undefined} The segment.
+     */
+    getSegment(segmentNumber: number): MaskSegment | undefined;
+    /**
+     * Get the inner segment list.
+     *
+     * @returns {MaskSegment[]} The list of segments.
+     */
+    getSegments(): MaskSegment[];
+    /**
+     * Set the inner segment list.
+     *
+     * @param {MaskSegment[]} list The segment list.
+     */
+    setSegments(list: MaskSegment[]): void;
+    /**
+     * Set the hidden segment list.
+     * TODO: not sure if needed...
+     *
+     * @param {number[]} list The list of hidden segment numbers.
+     */
+    setHiddenSegments(list: number[]): void;
+    /**
+     * Check if a segment is in the hidden list.
+     *
+     * @param {number} segmentNumber The segment number.
+     * @returns {boolean} True if the segment is in the list.
+     */
+    isHidden(segmentNumber: number): boolean;
+    /**
+     * Add a segment to the hidden list.
+     *
+     * @param {number} segmentNumber The segment number.
+     */
+    addToHidden(segmentNumber: number): void;
+    /**
+     * Remove a segment from the hidden list.
+     *
+     * @param {number} segmentNumber The segment number.
+     */
+    removeFromHidden(segmentNumber: number): void;
+    /**
+     * @callback alphaFn@callback alphaFn
+     * @param {object} value The pixel value.
+     * @param {object} index The values' index.
+     * @returns {number} The value to display.
+     */
+    /**
+     * Get the alpha function to apply hidden colors.
+     *
+     * @returns {alphaFn} The corresponding alpha function.
+     */
+    getAlphaFunc(): (value: object, index: object) => number;
+    /**
+     * @callback eventFn@callback eventFn
+     * @param {object} event The event.
+     */
+    /**
+     * Delete a segment.
+     *
+     * @param {number} segmentNumber The segment number.
+     * @param {eventFn} cmdCallback The command event callback.
+     * @param {Function} exeCallback The post execution callback.
+     */
+    deleteSegment(segmentNumber: number, cmdCallback: (event: object) => any, exeCallback: Function): void;
+    #private;
 }
 
 /**
@@ -2501,6 +2710,101 @@ export declare class OverlayData {
      *   event type.
      */
     removeEventListener(type: string, callback: object): void;
+    #private;
+}
+
+/**
+ * Plane geometry helper.
+ */
+export declare class PlaneHelper {
+    /**
+     * @param {Spacing} spacing The spacing.
+     * @param {Matrix33} imageOrientation The image oientation.
+     * @param {Matrix33} viewOrientation The view orientation.
+     */
+    constructor(spacing: Spacing, imageOrientation: Matrix33, viewOrientation: Matrix33);
+    /**
+     * Get a 3D offset from a plane one.
+     *
+     * @param {object} offset2D The plane offset as {x,y}.
+     * @returns {Vector3D} The 3D world offset.
+     */
+    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    /**
+     * Get a plane offset from a 3D one.
+     *
+     * @param {object} offset3D The 3D offset as {x,y,z}.
+     * @returns {object} The plane offset as {x,y}.
+     */
+    getPlaneOffsetFromOffset3D(offset3D: object): object;
+    /**
+     * Orient an input vector from real to target space.
+     *
+     * @param {Vector3D} vector The input vector.
+     * @returns {Vector3D} The oriented vector.
+     */
+    getTargetOrientedVector3D(vector: Vector3D): Vector3D;
+    /**
+     * De-orient an input vector from target to real space.
+     *
+     * @param {Vector3D} planeVector The input vector.
+     * @returns {Vector3D} The de-orienteded vector.
+     */
+    getTargetDeOrientedVector3D(planeVector: Vector3D): Vector3D;
+    /**
+     * De-orient an input point from target to real space.
+     *
+     * @param {Point3D} planePoint The input point.
+     * @returns {Point3D} The de-orienteded point.
+     */
+    getTargetDeOrientedPoint3D(planePoint: Point3D): Point3D;
+    /**
+     * Orient an input vector from target to image space.
+     *
+     * @param {Vector3D} planeVector The input vector.
+     * @returns {Vector3D} The orienteded vector.
+     */
+    getImageOrientedVector3D(planeVector: Vector3D): Vector3D;
+    /**
+     * Orient an input point from target to image space.
+     *
+     * @param {Point3D} planePoint The input vector.
+     * @returns {Point3D} The orienteded vector.
+     */
+    getImageOrientedPoint3D(planePoint: Point3D): Point3D;
+    /**
+     * De-orient an input vector from image to target space.
+     *
+     * @param {Vector3D} vector The input vector.
+     * @returns {Vector3D} The de-orienteded vector.
+     */
+    getImageDeOrientedVector3D(vector: Vector3D): Vector3D;
+    /**
+     * De-orient an input point from image to target space.
+     *
+     * @param {Point3D} point The input point.
+     * @returns {Point3D} The de-orienteded point.
+     */
+    getImageDeOrientedPoint3D(point: Point3D): Point3D;
+    /**
+     * Reorder values to follow target orientation.
+     *
+     * @param {object} values Values as {x,y,z}.
+     * @returns {object} Reoriented values as {x,y,z}.
+     */
+    getTargetOrientedPositiveXYZ(values: object): object;
+    /**
+     * Get the (view) scroll dimension index.
+     *
+     * @returns {number} The index.
+     */
+    getScrollIndex(): number;
+    /**
+     * Get the native (image) scroll dimension index.
+     *
+     * @returns {number} The index.
+     */
+    getNativeScrollIndex(): number;
     #private;
 }
 
@@ -3293,9 +3597,9 @@ export declare class View {
     /**
      * Get the window presets names.
      *
-     * @returns {object} The list of window presets names.
+     * @returns {string[]} The list of window presets names.
      */
-    getWindowPresetsNames(): object;
+    getWindowPresetsNames(): string[];
     /**
      * Set the window presets.
      *
@@ -3536,9 +3840,9 @@ export declare class ViewController {
     /**
      * Get the plane helper.
      *
-     * @returns {object} The helper.
+     * @returns {PlaneHelper} The helper.
      */
-    getPlaneHelper(): object;
+    getPlaneHelper(): PlaneHelper;
     /**
      * Check is the associated image is a mask.
      *
@@ -3548,9 +3852,9 @@ export declare class ViewController {
     /**
      * Get the mask segment helper.
      *
-     * @returns {object} The helper.
+     * @returns {MaskSegmentHelper} The helper.
      */
-    getMaskSegmentHelper(): object;
+    getMaskSegmentHelper(): MaskSegmentHelper;
     /**
      * Apply the hidden segments list by setting
      * the corresponding alpha function.
@@ -3576,9 +3880,9 @@ export declare class ViewController {
     /**
      * Get the window/level presets names.
      *
-     * @returns {Array} The presets names.
+     * @returns {string[]} The presets names.
      */
-    getWindowLevelPresetsNames(): any[];
+    getWindowLevelPresetsNames(): string[];
     /**
      * Add window/level presets to the view.
      *
