@@ -2,10 +2,44 @@
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
 /**
+ * RGB colour class.
+ */
+export class RGB {
+  /**
+   * Red component.
+   *
+   * @type {number}
+   */
+  r;
+  /**
+   * Green component.
+   *
+   * @type {number}
+   */
+  g;
+  /**
+   * Blue component.
+   *
+   * @type {number}
+   */
+  b;
+  /**
+   * @param {number} r Red component.
+   * @param {number} g Green component.
+   * @param {number} b Blue component.
+   */
+  constructor(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+}
+
+/**
  * Check if two rgb objects are equal.
  *
- * @param {object} c1 The first colour.
- * @param {object} c2 The second colour.
+ * @param {RGB} c1 The first colour.
+ * @param {RGB} c2 The second colour.
  * @returns {boolean} True if both colour are equal.
  */
 export function isEqualRgb(c1, c2) {
@@ -26,7 +60,7 @@ export function isEqualRgb(c1, c2) {
  * @param {number} y The Y component.
  * @param {number} cb The Cb component.
  * @param {number} cr The Cr component.
- * @returns {object} RGB equivalent as {r,g,b}.
+ * @returns {RGB} RGB equivalent as {r,g,b}.
  */
 export function ybrToRgb(y, cb, cr) {
   return {
@@ -40,7 +74,7 @@ export function ybrToRgb(y, cb, cr) {
  * Convert a hex color into RGB.
  *
  * @param {string} hexStr The hex color as '#ab01ef'.
- * @returns {object} The RGB values as {r,g,b}.
+ * @returns {RGB} The RGB values as {r,g,b}.
  */
 export function hexToRgb(hexStr) {
   return {
@@ -53,7 +87,7 @@ export function hexToRgb(hexStr) {
 /**
  * Convert RGB to its hex equivalent.
  *
- * @param {object} rgb The RGB object as {r,g,b}.
+ * @param {RGB} rgb The RGB object as {r,g,b}.
  * @returns {string} A string representing the hex color as '#ab01ef'.
  */
 export function rgbToHex(rgb) {
@@ -66,16 +100,16 @@ export function rgbToHex(rgb) {
  * the luma (Y) of the YIQ colour space.
  *
  * @see https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ
- * @param {object} rgbTriplet RGB triplet.
+ * @param {RGB} rgb RGB triplet.
  * @returns {number} The brightness ([0,1]).
  */
-export function getBrightness(rgbTriplet) {
+export function getBrightness(rgb) {
   // 0.001172549 = 0.299 / 255
   // 0.002301961 = 0.587 / 255
   // 0.000447059 = 0.114 / 255
-  return rgbTriplet.r * 0.001172549 +
-    rgbTriplet.g * 0.002301961 +
-    rgbTriplet.b * 0.000447059;
+  return rgb.r * 0.001172549 +
+    rgb.g * 0.002301961 +
+    rgb.b * 0.000447059;
 }
 
 /**
@@ -225,7 +259,7 @@ export function ciexyzToCielab(triplet) {
  *
  * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
  * @param {object} triplet CIE XYZ triplet as {x,y,z}.
- * @returns {object} sRGB triplet as {r,g,b}.
+ * @returns {RGB} sRGB triplet as {r,g,b}.
  */
 export function ciexyzToSrgb(triplet) {
   /**
@@ -261,7 +295,7 @@ export function ciexyzToSrgb(triplet) {
  * Convert sRGB to CIE XYZ.
  *
  * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
- * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet sRGB triplet as {r,g,b}.
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */
 export function srgbToCiexyz(triplet) {
@@ -296,7 +330,7 @@ export function srgbToCiexyz(triplet) {
  * Convert CIE LAB to sRGB (standard illuminant D65).
  *
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
- * @returns {object} sRGB triplet as {r,g,b}.
+ * @returns {RGB} sRGB triplet as {r,g,b}.
  */
 export function cielabToSrgb(triplet) {
   return ciexyzToSrgb(cielabToCiexyz(triplet));
@@ -305,7 +339,7 @@ export function cielabToSrgb(triplet) {
 /**
  * Convert sRGB to CIE LAB (standard illuminant D65).
  *
- * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet sRGB triplet as {r,g,b}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export function srgbToCielab(triplet) {

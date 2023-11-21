@@ -64,7 +64,11 @@ export class MaskSegmentHelper {
     for (let i = 0; i < numbers.length; ++i) {
       const segment = this.getSegment(numbers[i]);
       if (typeof segment !== 'undefined') {
-        values.push(segment.displayValue);
+        if (typeof segment.displayValue !== 'undefined') {
+          values.push(segment.displayValue);
+        } else {
+          values.push(segment.displayRGBValue);
+        }
       } else {
         logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
         unknowns.push(i);
@@ -182,26 +186,50 @@ export class MaskSegmentHelper {
    */
   getAlphaFunc() {
     // get colours
-    const hiddenColours = [{r: 0, g: 0, b: 0}];
+    const hiddenColours = [];
+    const isMonochrome = this.#mask.isMonochrome();
+    if (isMonochrome) {
+      hiddenColours[0] = 0;
+    } else {
+      hiddenColours[0] = {r: 0, g: 0, b: 0};
+    }
     for (let i = 0; i < this.#hiddenSegments.length; ++i) {
       const segment = this.getSegment(this.#hiddenSegments[i]);
       if (typeof segment !== 'undefined') {
-        hiddenColours.push(segment.displayValue);
+        if (isMonochrome) {
+          hiddenColours.push(segment.displayValue);
+        } else {
+          hiddenColours.push(segment.displayRGBValue);
+        }
       }
     }
 
     // create alpha function
-    return function (value/*, index*/) {
-      for (let i = 0; i < hiddenColours.length; ++i) {
-        if (value[0] === hiddenColours[i].r &&
-          value[1] === hiddenColours[i].g &&
-          value[2] === hiddenColours[i].b) {
-          return 0;
+    let resultFn;
+    if (isMonochrome) {
+      resultFn = function (value/*, index*/) {
+        for (let i = 0; i < hiddenColours.length; ++i) {
+          if (value === hiddenColours[i]) {
+            return 0;
+          }
         }
-      }
-      // default
-      return 255;
-    };
+        // default
+        return 255;
+      };
+    } else {
+      resultFn = function (value/*, index*/) {
+        for (let i = 0; i < hiddenColours.length; ++i) {
+          if (value[0] === hiddenColours[i].r &&
+            value[1] === hiddenColours[i].g &&
+            value[2] === hiddenColours[i].b) {
+            return 0;
+          }
+        }
+        // default
+        return 255;
+      };
+    }
+    return resultFn;
   }
 
   /**
@@ -278,7 +306,11 @@ export class DeleteSegmentCommand {
 
     this.#isSilent = (typeof silent === 'undefined') ? false : silent;
     // list of offsets with the colour to delete
-    this.#offsets = mask.getOffsets(segment.displayValue);
+    if (typeof segment.displayRGBValue !== 'undefined') {
+      this.#offsets = mask.getOffsets(segment.displayRGBValue);
+    } else {
+      this.#offsets = mask.getOffsets(segment.displayValue);
+    }
   }
 
   /**
@@ -331,7 +363,11 @@ export class DeleteSegmentCommand {
    */
   undo() {
     // re-draw
-    this.#mask.setAtOffsets(this.#offsets, this.#segment.displayValue);
+    if (typeof this.#segment.displayRGBValue !== 'undefined') {
+      this.#mask.setAtOffsets(this.#offsets, this.#segment.displayRGBValue);
+    } else {
+      this.#mask.setAtOffsets(this.#offsets, this.#segment.displayValue);
+    }
 
     // callback
     /**

@@ -18,6 +18,7 @@ import {Size} from './size';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from '../dicom/dataElement';
+import {RGB} from '../utils/colour';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -374,11 +375,17 @@ export class MaskSegment {
    */
   algorithmName;
   /**
-   * Segment display value as {r,g,b}.
+   * Segment display value as simple value.
    *
-   * @type {object|undefined}
+   * @type {number|undefined}
    */
   displayValue;
+  /**
+   * Segment display value as RGB colour ({r,g,b}).
+   *
+   * @type {RGB|undefined}
+   */
+  displayRGBValue;
   /**
    * Segment property code: specific property
    * the segment represents (0062,000F).
@@ -447,7 +454,7 @@ function getSegment(dataElements) {
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
   if (typeof dataElements['0062000C'] !== 'undefined') {
-    segment.displayValue = dataElements['006200C'].value;
+    segment.displayValue = dataElements['006200C'].value[0];
   } else if (typeof dataElements['0062000D'] !== 'undefined') {
     const cielabElement = dataElements['0062000D'].value;
     const rgb = cielabToSrgb(uintLabToLab({
@@ -455,7 +462,7 @@ function getSegment(dataElements) {
       a: cielabElement[1],
       b: cielabElement[2]
     }));
-    segment.displayValue = rgb;
+    segment.displayRGBValue = rgb;
   }
   // Segmented Property Category Code Sequence (type1, only one)
   if (typeof dataElements['00620003'] !== 'undefined') {
@@ -498,17 +505,17 @@ export function isEqualSegment(seg1, seg2) {
   let isEqual = seg1.number === seg2.number &&
     seg1.label === seg2.label &&
     seg1.algorithmType === seg2.algorithmType;
-  // rgb
-  if (typeof seg1.displayValue.r !== 'undefined') {
-    if (typeof seg2.displayValue.r === 'undefined') {
-      isEqual = false;
-    } else {
-      isEqual = isEqual &&
-        isEqualRgb(seg1.displayValue, seg2.displayValue);
-    }
-  } else {
+  // display value
+  if (typeof seg1.displayRGBValue !== 'undefined' &&
+    typeof seg2.displayRGBValue !== 'undefined') {
+    isEqual = isEqual &&
+      isEqualRgb(seg1.displayRGBValue, seg2.displayRGBValue);
+  } else if (typeof seg1.displayValue !== 'undefined' &&
+    typeof seg2.displayValue !== 'undefined') {
     isEqual = isEqual &&
       seg1.displayValue === seg2.displayValue;
+  } else {
+    isEqual = false;
   }
   // algorithmName
   if (typeof seg1.algorithmName !== 'undefined') {
@@ -527,8 +534,8 @@ export function isEqualSegment(seg1, seg2) {
  * Check if two segment objects are similar: either the
  * number or the displayValue are equal.
  *
- * @param {object} seg1 The first segment.
- * @param {object} seg2 The second segment.
+ * @param {MaskSegment} seg1 The first segment.
+ * @param {MaskSegment} seg2 The second segment.
  * @returns {boolean} True if both segment are similar.
  */
 export function isSimilarSegment(seg1, seg2) {
@@ -540,17 +547,17 @@ export function isSimilarSegment(seg1, seg2) {
     return false;
   }
   let isSimilar = seg1.number === seg2.number;
-  // rgb
-  if (typeof seg1.displayValue.r !== 'undefined') {
-    if (typeof seg2.displayValue.r === 'undefined') {
-      isSimilar = false;
-    } else {
-      isSimilar = isSimilar ||
-        isEqualRgb(seg1.displayValue, seg2.displayValue);
-    }
-  } else {
+  // display value
+  if (typeof seg1.displayRGBValue !== 'undefined' &&
+    typeof seg2.displayRGBValue !== 'undefined') {
+    isSimilar = isSimilar ||
+      isEqualRgb(seg1.displayRGBValue, seg2.displayRGBValue);
+  } else if (typeof seg1.displayValue !== 'undefined' &&
+    typeof seg2.displayValue !== 'undefined') {
     isSimilar = isSimilar ||
       seg1.displayValue === seg2.displayValue;
+  } else {
+    isSimilar = false;
   }
 
   return isSimilar;
@@ -731,9 +738,7 @@ export class MaskFactory {
     let storeAsRGB = false;
     for (let i = 0; i < segSequence.value.length; ++i) {
       const segment = getSegment(segSequence.value[i]);
-      if (typeof segment.displayValue.r !== 'undefined' &&
-        typeof segment.displayValue.g !== 'undefined' &&
-        typeof segment.displayValue.b !== 'undefined') {
+      if (typeof segment.displayRGBValue !== 'undefined') {
         // create rgb image
         storeAsRGB = true;
       }
@@ -975,16 +980,15 @@ export class MaskFactory {
       const frameSegment = segments.find(
         getFindSegmentFunc(frameInfos[f].refSegmentNumber)
       );
-      const pixelValue = frameSegment.displayValue;
       for (let l = 0; l < sliceSize; ++l) {
         if (pixelBuffer[frameOffset + l] !== 0) {
           const offset = mul * (sliceOffset + l);
           if (storeAsRGB) {
-            buffer[offset] = pixelValue.r;
-            buffer[offset + 1] = pixelValue.g;
-            buffer[offset + 2] = pixelValue.b;
+            buffer[offset] = frameSegment.displayRGBValue.r;
+            buffer[offset + 1] = frameSegment.displayRGBValue.g;
+            buffer[offset + 2] = frameSegment.displayRGBValue.b;
           } else {
-            buffer[offset] = pixelValue;
+            buffer[offset] = frameSegment.displayValue;
           }
         }
       }

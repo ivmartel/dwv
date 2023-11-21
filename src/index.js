@@ -90,6 +90,7 @@ import {buildMultipart} from './utils/array';
 import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
 import {
+  RGB,
   labToUintLab,
   srgbToCielab
 } from './utils/colour';
@@ -133,6 +134,7 @@ export {
   MaskFactory,
   DicomCode,
   MaskSegment,
+  RGB,
   defaults,
   logger,
   decoderScripts,
