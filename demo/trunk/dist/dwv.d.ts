@@ -2441,11 +2441,17 @@ export declare class MaskSegment {
      */
     algorithmName: string | undefined;
     /**
-     * Segment display value as {r,g,b}.
+     * Segment display value as simple value.
      *
-     * @type {object|undefined}
+     * @type {number|undefined}
      */
-    displayValue: object | undefined;
+    displayValue: number | undefined;
+    /**
+     * Segment display value as RGB colour ({r,g,b}).
+     *
+     * @type {RGB|undefined}
+     */
+    displayRGBValue: RGB | undefined;
     /**
      * Segment property code: specific property
      * the segment represents (0062,000F).
@@ -3079,6 +3085,36 @@ export declare class RescaleSlopeAndIntercept {
 }
 
 /**
+ * RGB colour class.
+ */
+export declare class RGB {
+    /**
+     * @param {number} r Red component.
+     * @param {number} g Green component.
+     * @param {number} b Blue component.
+     */
+    constructor(r: number, g: number, b: number);
+    /**
+     * Red component.
+     *
+     * @type {number}
+     */
+    r: number;
+    /**
+     * Green component.
+     *
+     * @type {number}
+     */
+    g: number;
+    /**
+     * Blue component.
+     *
+     * @type {number}
+     */
+    b: number;
+}
+
+/**
  * Immutable Size class.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
@@ -3243,10 +3279,10 @@ export declare class Spacing {
 /**
  * Convert sRGB to CIE LAB (standard illuminant D65).
  *
- * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet sRGB triplet as {r,g,b}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
-export declare function srgbToCielab(triplet: object): object;
+export declare function srgbToCielab(triplet: RGB): object;
 
 /**
  * Immutable tag.
