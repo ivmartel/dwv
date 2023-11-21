@@ -296,8 +296,18 @@ export class Image {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if the data is monochrome.
+   * @deprecated Please use isMonochrome instead.
    */
   canWindowLevel() {
+    return this.isMonochrome();
+  }
+
+  /**
+   * Is the data monochrome.
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  isMonochrome() {
     return this.getPhotometricInterpretation()
       .match(/MONOCHROME/) !== null;
   }

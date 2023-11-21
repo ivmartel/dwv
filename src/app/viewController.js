@@ -443,9 +443,19 @@ export class ViewController {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if possible.
+   * @deprecated Please use isMonochrome instead.
    */
   canWindowLevel() {
-    return this.#view.getImage().canWindowLevel();
+    return this.isMonochrome();
+  }
+
+  /**
+   * Is the data monochrome.
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  isMonochrome() {
+    return this.#view.getImage().isMonochrome();
   }
 
   /**
