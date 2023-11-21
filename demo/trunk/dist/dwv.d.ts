@@ -89,31 +89,34 @@ export declare class App {
      */
     getDataIdsFromSopUids(uids: string[]): string[];
     /**
-     * Can the data be scrolled?
+     * Can the data (of the active view of the active layer) be scrolled?
      *
      * @returns {boolean} True if the data has a third dimension greater than one.
+     * @deprecated Please use the ViewController equivalent directly instead.
      */
     canScroll(): boolean;
     /**
-     * Can window and level be applied to the data?
+     * Can window and level be applied to the data
+     * (of the active view of the active layer)?
      *
      * @returns {boolean} True if the data is monochrome.
+     * @deprecated Please use the ViewController equivalent directly instead.
      */
     canWindowLevel(): boolean;
     /**
-     * Get the layer scale on top of the base scale.
+     * Get the active layer group scale on top of the base scale.
      *
      * @returns {object} The scale as {x,y}.
      */
     getAddedScale(): object;
     /**
-     * Get the base scale.
+     * Get the base scale of the active layer group.
      *
      * @returns {object} The scale as {x,y}.
      */
     getBaseScale(): object;
     /**
-     * Get the layer offset.
+     * Get the layer offset of the active layer group.
      *
      * @returns {object} The offset.
      */
@@ -301,6 +304,9 @@ export declare class App {
     fitToContainer(): void;
     /**
      * Init the Window/Level display
+     * (of the active layer of the active layer group).
+     *
+     * @deprecated Please set the opacity of the desired view layer directly.
      */
     initWLDisplay(): void;
     /**
@@ -384,7 +390,7 @@ export declare class App {
      */
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
     /**
-     * Zoom to the layers.
+     * Zoom the layers of the active layer group.
      *
      * @param {number} step The step to add to the current zoom.
      * @param {number} cx The zoom center X coordinate.
@@ -392,20 +398,21 @@ export declare class App {
      */
     zoom(step: number, cx: number, cy: number): void;
     /**
-     * Apply a translation to the layers.
+     * Apply a translation to the layers of the active layer group.
      *
      * @param {number} tx The translation along X.
      * @param {number} ty The translation along Y.
      */
     translate(tx: number, ty: number): void;
     /**
-     * Set the image layer opacity.
+     * Set the active view layer (of the active layer group) opacity.
      *
      * @param {number} alpha The opacity ([0:1] range).
+     * @deprecated Please set the opacity of the desired view layer directly.
      */
     setOpacity(alpha: number): void;
     /**
-     * Set the drawings on the current stage.
+     * Set the drawings of the active layer group.
      *
      * @param {Array} drawings An array of drawings.
      * @param {Array} drawingsDetails An array of drawings details.
@@ -447,6 +454,7 @@ export declare class App {
      * - CRTL-ARROW_UP: next element on third dim
      * - CRTL-ARROW_RIGHT: previous element on fourth dim
      * - CRTL-ARROW_DOWN: previous element on third dim
+     * (applies to the active view of the active layer group)
      *
      * @param {KeyboardEvent} event The key down event.
      * @fires UndoStack#undo
@@ -463,15 +471,17 @@ export declare class App {
      */
     resetZoom(): void;
     /**
-     * Set the colour map.
+     * Set the colour map of the active view of the active layer group.
      *
      * @param {string} name The colour map name.
+     * @deprecated Please use the ViewController equivalent directly instead.
      */
     setColourMap(name: string): void;
     /**
-     * Set the window/level preset.
+     * Set the window/level preset of the active view of the active layer group.
      *
      * @param {string} preset The window/level preset.
+     * @deprecated Please use the ViewController equivalent directly instead.
      */
     setWindowLevelPreset(preset: string): void;
     /**
@@ -1691,8 +1701,15 @@ declare class Image_2 {
      * Can window and level be applied to the data?
      *
      * @returns {boolean} True if the data is monochrome.
+     * @deprecated Please use isMonochrome instead.
      */
     canWindowLevel(): boolean;
+    /**
+     * Is the data monochrome.
+     *
+     * @returns {boolean} True if the data is monochrome.
+     */
+    isMonochrome(): boolean;
     /**
      * Can the data be scrolled?
      *
@@ -4011,8 +4028,15 @@ export declare class ViewController {
      * Can window and level be applied to the data?
      *
      * @returns {boolean} True if possible.
+     * @deprecated Please use isMonochrome instead.
      */
     canWindowLevel(): boolean;
+    /**
+     * Is the data monochrome.
+     *
+     * @returns {boolean} True if the data is monochrome.
+     */
+    isMonochrome(): boolean;
     /**
      * Can the data be scrolled?
      *
