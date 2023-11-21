@@ -377,9 +377,10 @@ export class App {
   }
 
   /**
-   * Can the data be scrolled?
+   * Can the data (of the active view of the active layer) be scrolled?
    *
    * @returns {boolean} True if the data has a third dimension greater than one.
+   * @deprecated Please use the ViewController equivalent directly instead.
    */
   canScroll() {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -388,9 +389,11 @@ export class App {
   }
 
   /**
-   * Can window and level be applied to the data?
+   * Can window and level be applied to the data
+   * (of the active view of the active layer)?
    *
    * @returns {boolean} True if the data is monochrome.
+   * @deprecated Please use the ViewController equivalent directly instead.
    */
   canWindowLevel() {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -399,7 +402,7 @@ export class App {
   }
 
   /**
-   * Get the layer scale on top of the base scale.
+   * Get the active layer group scale on top of the base scale.
    *
    * @returns {object} The scale as {x,y}.
    */
@@ -408,7 +411,7 @@ export class App {
   }
 
   /**
-   * Get the base scale.
+   * Get the base scale of the active layer group.
    *
    * @returns {object} The scale as {x,y}.
    */
@@ -417,7 +420,7 @@ export class App {
   }
 
   /**
-   * Get the layer offset.
+   * Get the layer offset of the active layer group.
    *
    * @returns {object} The offset.
    */
@@ -814,6 +817,9 @@ export class App {
 
   /**
    * Init the Window/Level display
+   * (of the active layer of the active layer group).
+   *
+   * @deprecated Please set the opacity of the desired view layer directly.
    */
   initWLDisplay() {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -1131,7 +1137,7 @@ export class App {
   }
 
   /**
-   * Zoom to the layers.
+   * Zoom the layers of the active layer group.
    *
    * @param {number} step The step to add to the current zoom.
    * @param {number} cx The zoom center X coordinate.
@@ -1147,7 +1153,7 @@ export class App {
   }
 
   /**
-   * Apply a translation to the layers.
+   * Apply a translation to the layers of the active layer group.
    *
    * @param {number} tx The translation along X.
    * @param {number} ty The translation along Y.
@@ -1159,9 +1165,10 @@ export class App {
   }
 
   /**
-   * Set the image layer opacity.
+   * Set the active view layer (of the active layer group) opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).
+   * @deprecated Please set the opacity of the desired view layer directly.
    */
   setOpacity(alpha) {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -1170,7 +1177,7 @@ export class App {
   }
 
   /**
-   * Set the drawings on the current stage.
+   * Set the drawings of the active layer group.
    *
    * @param {Array} drawings An array of drawings.
    * @param {Array} drawingsDetails An array of drawings details.
@@ -1250,6 +1257,7 @@ export class App {
    * - CRTL-ARROW_UP: next element on third dim
    * - CRTL-ARROW_RIGHT: previous element on fourth dim
    * - CRTL-ARROW_DOWN: previous element on third dim
+   * (applies to the active view of the active layer group)
    *
    * @param {KeyboardEvent} event The key down event.
    * @fires UndoStack#undo
@@ -1312,9 +1320,10 @@ export class App {
   }
 
   /**
-   * Set the colour map.
+   * Set the colour map of the active view of the active layer group.
    *
    * @param {string} name The colour map name.
+   * @deprecated Please use the ViewController equivalent directly instead.
    */
   setColourMap(name) {
     const viewController =
@@ -1324,9 +1333,10 @@ export class App {
   }
 
   /**
-   * Set the window/level preset.
+   * Set the window/level preset of the active view of the active layer group.
    *
    * @param {string} preset The window/level preset.
+   * @deprecated Please use the ViewController equivalent directly instead.
    */
   setWindowLevelPreset(preset) {
     const viewController =
