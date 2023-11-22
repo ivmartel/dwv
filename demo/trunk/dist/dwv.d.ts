@@ -2550,16 +2550,16 @@ export declare class MaskSegmentHelper {
     removeFromHidden(segmentNumber: number): void;
     /**
      * @callback alphaFn@callback alphaFn
-     * @param {object} value The pixel value.
-     * @param {object} index The values' index.
-     * @returns {number} The value to display.
+     * @param {number[]|number} value The pixel value.
+     * @param {number} index The values' index.
+     * @returns {number} The opacity of the input value.
      */
     /**
      * Get the alpha function to apply hidden colors.
      *
      * @returns {alphaFn} The corresponding alpha function.
      */
-    getAlphaFunc(): (value: object, index: object) => number;
+    getAlphaFunc(): (value: number[] | number, index: number) => number;
     /**
      * @callback eventFn@callback eventFn
      * @param {object} event The event.
@@ -3624,23 +3624,23 @@ export declare class View {
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
     /**
      * @callback alphaFn@callback alphaFn
-     * @param {object} value The pixel value.
-     * @param {object} index The values' index.
-     * @returns {number} The value to display.
+     * @param {number[]|number} value The pixel value.
+     * @param {number} index The values' index.
+     * @returns {number} The opacity of the input value.
      */
     /**
      * Get the alpha function.
      *
      * @returns {alphaFn} The function.
      */
-    getAlphaFunction(): (value: object, index: object) => number;
+    getAlphaFunction(): (value: number[] | number, index: number) => number;
     /**
      * Set alpha function.
      *
      * @param {alphaFn} func The function.
      * @fires View#alphafuncchange
      */
-    setAlphaFunction(func: (value: object, index: object) => number): void;
+    setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     /**
      * Get the window presets.
      *
@@ -4229,16 +4229,16 @@ export declare class ViewController {
     setColourMap(name: string): void;
     /**
      * @callback alphaFn@callback alphaFn
-     * @param {object} value The pixel value.
-     * @param {object} index The values' index.
-     * @returns {number} The value to display.
+     * @param {number[]|number} value The pixel value.
+     * @param {number} index The values' index.
+     * @returns {number} The opacity of the input value.
      */
     /**
      * Set the view per value alpha function.
      *
      * @param {alphaFn} func The function.
      */
-    setViewAlphaFunction(func: (value: object, index: object) => number): void;
+    setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     /**
      * Add an event listener to this class.
      *
