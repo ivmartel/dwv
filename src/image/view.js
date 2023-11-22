@@ -259,8 +259,8 @@ export class View {
   /**
    * Per value alpha function.
    *
-   * @param {*} _value The pixel value. Can be a number for monochrome
-   *  data or an array for RGB data.
+   * @param {number[]|number} _value The pixel value.
+   *   Can be a number for monochrome data or an array for RGB data.
    * @param {number} _index The index of the value.
    * @returns {number} The coresponding alpha [0,255].
    */
@@ -271,9 +271,9 @@ export class View {
 
   /**
    * @callback alphaFn
-   * @param {object} value The pixel value.
-   * @param {object} index The values' index.
-   * @returns {number} The value to display.
+   * @param {number[]|number} value The pixel value.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value.
    */
 
   /**

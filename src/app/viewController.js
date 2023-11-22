@@ -771,9 +771,9 @@ export class ViewController {
 
   /**
    * @callback alphaFn
-   * @param {object} value The pixel value.
-   * @param {object} index The values' index.
-   * @returns {number} The value to display.
+   * @param {number[]|number} value The pixel value.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value.
    */
 
   /**
