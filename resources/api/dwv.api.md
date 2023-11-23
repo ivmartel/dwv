@@ -314,7 +314,7 @@ export function getDefaultDicomSegJson(): object;
 export function getDwvVersion(): string;
 
 // @public
-export function getElementsFromJSONTags(jsonTags: {
+export function getElementsFromJSONTags(simpleTags: {
     [x: string]: any;
 }): {
     [x: string]: DataElement;
@@ -376,7 +376,9 @@ class Image_2 {
     getGeometry(): Geometry;
     getHistogram(): any[];
     getImageUid(index?: Index): string;
-    getMeta(): object;
+    getMeta(): {
+        [x: string]: any;
+    };
     getNumberOfComponents(): number;
     getOffsets(value: number | object): any[];
     getPhotometricInterpretation(): string;
@@ -398,7 +400,9 @@ class Image_2 {
     setAtOffsets(offsets: any[], value: object): void;
     setAtOffsetsAndGetOriginals(offsetsLists: any[], value: object): any[];
     setAtOffsetsWithIterator(offsetsLists: any[], value: object | any[]): void;
-    setMeta(rhs: object): void;
+    setMeta(rhs: {
+        [x: string]: any;
+    }): void;
     setPhotometricInterpretation(interp: string): void;
     setPlanarConfiguration(config: number): void;
     setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
@@ -530,7 +534,7 @@ export class MaskSegmentHelper {
     constructor(mask: Image_2);
     addToHidden(segmentNumber: number): void;
     deleteSegment(segmentNumber: number, cmdCallback: (event: object) => any, exeCallback: Function): void;
-    getAlphaFunc(): (value: object, index: object) => number;
+    getAlphaFunc(): (value: number[] | number, index: number) => number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
     getSegments(): MaskSegment[];
     hasSegment(segmentNumber: number): boolean;
@@ -751,7 +755,7 @@ export class View {
     decrementIndex(dim: number, silent: boolean): boolean;
     decrementScrollIndex(silent: boolean): boolean;
     generateImageData(data: ImageData, index: Index): void;
-    getAlphaFunction(): (value: object, index: object) => number;
+    getAlphaFunction(): (value: number[] | number, index: number) => number;
     getColourMap(): string;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
@@ -769,7 +773,7 @@ export class View {
     incrementScrollIndex(silent: boolean): boolean;
     init(): void;
     removeEventListener(type: string, callback: Function): void;
-    setAlphaFunction(func: (value: object, index: object) => number): void;
+    setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(position: Point, silent: boolean): boolean;
@@ -848,7 +852,7 @@ export class ViewController {
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     setImage(img: Image_2, dataId: string): void;
-    setViewAlphaFunction(func: (value: object, index: object) => number): void;
+    setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setWindowLevel(wl: WindowLevel): void;
     setWindowLevelPreset(name: string): void;
     setWindowLevelPresetById(id: number): void;
