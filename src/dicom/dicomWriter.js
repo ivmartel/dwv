@@ -1185,17 +1185,17 @@ function getBpeForVrType(vrType) {
 }
 
 /**
- * Get the DICOM elements from a 'simple' DICOM json tags object.
- * The json is a simplified version of the oficial DICOM json with
+ * Get the DICOM elements from a 'simple' DICOM tags object.
+ * The input object is a simplified version of the oficial DICOM json with
  * tag names instead of keys and direct values (no value property) for
  * simple tags. See synthetic test data (in tests/dicom) for examples.
  *
- * @param {Object<string, any>} jsonTags The DICOM
- *   json tags object.
+ * @param {Object<string, any>} simpleTags The 'simple' DICOM
+ *   tags object.
  * @returns {Object<string, DataElement>} The DICOM elements.
  */
-export function getElementsFromJSONTags(jsonTags) {
-  const keys = Object.keys(jsonTags);
+export function getElementsFromJSONTags(simpleTags) {
+  const keys = Object.keys(simpleTags);
   const dataElements = {};
   for (let k = 0, len = keys.length; k < len; ++k) {
     // get the DICOM element definition from its name
@@ -1207,26 +1207,26 @@ export function getElementsFromJSONTags(jsonTags) {
     // tag value
     let value;
     let undefinedLength = false;
-    const jsonTag = jsonTags[keys[k]];
+    const simpleTag = simpleTags[keys[k]];
     if (vr === 'SQ') {
       const items = [];
-      if (typeof jsonTag.undefinedLength !== 'undefined') {
-        undefinedLength = jsonTag.undefinedLength;
+      if (typeof simpleTag.undefinedLength !== 'undefined') {
+        undefinedLength = simpleTag.undefinedLength;
       }
-      if (typeof jsonTag.value !== 'undefined' &&
-        jsonTag.value !== null) {
-        for (let i = 0; i < jsonTag.value.length; ++i) {
-          items.push(getElementsFromJSONTags(jsonTag.value[i]));
+      if (typeof simpleTag.value !== 'undefined' &&
+        simpleTag.value !== null) {
+        for (let i = 0; i < simpleTag.value.length; ++i) {
+          items.push(getElementsFromJSONTags(simpleTag.value[i]));
         }
       } else {
-        logger.trace('Undefined or null jsonTag SQ value.');
+        logger.trace('Undefined or null simpleTag SQ value.');
       }
       value = items;
     } else {
-      if (Array.isArray(jsonTag)) {
-        value = jsonTag;
+      if (Array.isArray(simpleTag)) {
+        value = simpleTag;
       } else {
-        value = [jsonTag];
+        value = [simpleTag];
       }
     }
     // create element

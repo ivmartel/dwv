@@ -194,7 +194,7 @@ export class Image {
   /**
    * Meta information.
    *
-   * @type {object}
+   * @type {Object<string, any>}
    */
   #meta = {};
 
@@ -486,7 +486,7 @@ export class Image {
   /**
    * Get the meta information of the image.
    *
-   * @returns {object} The meta information of the image.
+   * @returns {Object<string, any>} The meta information of the image.
    */
   getMeta() {
     return this.#meta;
@@ -495,7 +495,7 @@ export class Image {
   /**
    * Set the meta information of the image.
    *
-   * @param {object} rhs The meta information of the image.
+   * @param {Object<string, any>} rhs The meta information of the image.
    */
   setMeta(rhs) {
     this.#meta = rhs;
