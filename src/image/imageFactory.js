@@ -223,26 +223,51 @@ export class ImageFactory {
     const rsi = new RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept(rsi);
 
-    const sopClassUID = dataElements['00080016'];
-    if (typeof sopClassUID !== 'undefined') {
-      meta.SOPClassUID = sopClassUID.value[0];
-    }
-    const studyUID = dataElements['0020000D'];
-    if (typeof studyUID !== 'undefined') {
-      meta.StudyInstanceUID = studyUID.value[0];
-    }
-    const seriesUID = dataElements['0020000E'];
-    if (typeof seriesUID !== 'undefined') {
-      meta.SeriesInstanceUID = seriesUID.value[0];
-    }
-    const bits = dataElements['00280101'];
-    if (typeof bits !== 'undefined') {
-      meta.BitsStored = bits.value[0];
-    }
-    const pixelRep = dataElements['00280103'];
-    if (typeof pixelRep !== 'undefined') {
-      meta.PixelRepresentation = pixelRep.value[0];
-    }
+    const safeGet = function (key) {
+      let res;
+      const element = dataElements[key];
+      if (typeof element !== 'undefined') {
+        res = element.value[0];
+      }
+      return res;
+    };
+
+    // defaults
+    meta.TransferSyntaxUID = safeGet('00020010');
+    meta.MediaStorageSOPClassUID = safeGet('00020002');
+    meta.SOPClassUID = safeGet('00080016');
+    meta.Modality = safeGet('00080060');
+    meta.ImageType = safeGet('00080008');
+    meta.SamplesPerPixel = safeGet('00280002');
+    meta.PhotometricInterpretation = safeGet('00280004');
+    meta.PixelRepresentation = safeGet('00280103');
+    meta.BitsAllocated = safeGet('00280100');
+    meta.BitsStored = safeGet('00280101');
+    meta.HighBit = safeGet('00280102');
+
+    // Study
+    meta.StudyDate = safeGet('00080020');
+    meta.StudyTime = safeGet('00080030');
+    meta.StudyInstanceUID = safeGet('0020000D');
+    meta.StudyID = safeGet('00200010');
+    // Series
+    meta.SeriesInstanceUID = safeGet('0020000E');
+    meta.SeriesNumber = safeGet('00200011');
+    // ReferringPhysicianName
+    meta.ReferringPhysicianName = safeGet('00080090');
+    // patient info
+    meta.PatientName = safeGet('00100010');
+    meta.PatientID = safeGet('00100020');
+    meta.PatientBirthDate = safeGet('00100030');
+    meta.PatientSex = safeGet('00100040');
+    // General Equipment Module
+    meta.Manufacturer = safeGet('00080070');
+    meta.ManufacturerModelName = safeGet('00081090');
+    meta.DeviceSerialNumber = safeGet('00181000');
+    meta.SoftwareVersions = safeGet('00181020');
+
+    meta.FrameOfReferenceUID = safeGet('00200052');
+
     // PixelRepresentation -> is signed
     meta.IsSigned = meta.PixelRepresentation === 1;
     // local pixel unit
@@ -253,11 +278,6 @@ export class ImageFactory {
       if (typeof pixelUnit !== 'undefined') {
         meta.pixelUnit = pixelUnit;
       }
-    }
-    // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dataElements['00200052'];
-    if (typeof frameOfReferenceUID !== 'undefined') {
-      meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
     }
     // window level presets
     const windowPresets = {};
