@@ -14,6 +14,7 @@ import {MaskFactory} from './maskFactory';
 import {Geometry} from './geometry';
 import {Matrix33} from '../math/matrix';
 import {DataElement} from '../dicom/dataElement';
+import {RGB} from '../utils/colour';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -137,7 +138,7 @@ export class Image {
   /**
    * Image UIDs.
    *
-   * @type {Array}
+   * @type {string[]}
    */
   #imageUids;
 
@@ -229,7 +230,7 @@ export class Image {
   /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
-   * @param {Array} [imageUids] An array of Uids indexed to slice number.
+   * @param {string[]} [imageUids] An array of Uids indexed to slice number.
    */
   constructor(geometry, buffer, imageUids) {
     this.#geometry = geometry;
@@ -515,24 +516,33 @@ export class Image {
    * Get the offsets where the buffer equals the input value.
    * Loops through the whole volume, can get long for big data...
    *
-   * @param {number|object} value The value to check.
-   * @returns {Array} The list of offsets.
+   * @param {number|RGB} value The value to check.
+   * @returns {number[]} The list of offsets.
    */
   getOffsets(value) {
     // value to array
-    if (this.#numberOfComponents === 1) {
-      value = [value];
-    } else if (this.#numberOfComponents === 3 &&
-      typeof value.r !== 'undefined') {
-      value = [value.r, value.g, value.b];
+    let bufferValue;
+    if (value instanceof RGB) {
+      if (this.#numberOfComponents !== 3) {
+        throw new Error(
+          'Number of components is not 3 for getting RGB value.');
+      }
+      bufferValue = [value.r, value.g, value.b];
+    } else {
+      if (this.#numberOfComponents !== 1) {
+        throw new Error(
+          'Number of components is not 1 for getting single value.');
+      }
+      bufferValue = [value];
     }
+
     // main loop
     const offsets = [];
     let equal;
     for (let i = 0; i < this.#buffer.length; i = i + this.#numberOfComponents) {
       equal = true;
       for (let j = 0; j < this.#numberOfComponents; ++j) {
-        if (this.#buffer[i + j] !== value[j]) {
+        if (this.#buffer[i + j] !== bufferValue[j]) {
           equal = false;
           break;
         }
@@ -549,7 +559,7 @@ export class Image {
    * Could loop through the whole volume, can get long for big data...
    *
    * @param {Array} values The values to check.
-   * @returns {Array} A list of booleans for each input value,
+   * @returns {boolean[]} A list of booleans for each input value,
    *   set to true if the value is present in the buffer.
    */
   hasValues(values) {
@@ -957,17 +967,33 @@ export class Image {
   /**
    * Set the inner buffer values at given offsets.
    *
-   * @param {Array} offsets List of offsets where to set the data.
-   * @param {object} value The value to set at the given offsets.
+   * @param {number[]} offsets List of offsets where to set the data.
+   * @param {number|RGB} value The value to set at the given offsets.
    * @fires Image#imagechange
    */
   setAtOffsets(offsets, value) {
+    // value to array
+    let bufferValue;
+    if (value instanceof RGB) {
+      if (this.#numberOfComponents !== 3) {
+        throw new Error(
+          'Number of components is not 3 for setting RGB value.');
+      }
+      bufferValue = [value.r, value.g, value.b];
+    } else {
+      if (this.#numberOfComponents !== 1) {
+        throw new Error(
+          'Number of components is not 1 for setting single value.');
+      }
+      bufferValue = [value];
+    }
+
     let offset;
     for (let i = 0, leni = offsets.length; i < leni; ++i) {
       offset = offsets[i];
-      this.#buffer[offset] = value.r;
-      this.#buffer[offset + 1] = value.g;
-      this.#buffer[offset + 2] = value.b;
+      for (let j = 0; j < this.#numberOfComponents; ++j) {
+        this.#buffer[offset + j] = bufferValue[j];
+      }
     }
     // fire imagechange
     this.#fireEvent({type: 'imagechange'});
@@ -976,8 +1002,9 @@ export class Image {
   /**
    * Set the inner buffer values at given offsets.
    *
-   * @param {Array} offsetsLists List of offset lists where to set the data.
-   * @param {object} value The value to set at the given offsets.
+   * @param {number[][]} offsetsLists List of offset lists where
+   *   to set the data.
+   * @param {RGB} value The value to set at the given offsets.
    * @returns {Array} A list of objects representing the original values before
    *  replacing them.
    * @fires Image#imagechange
@@ -1034,7 +1061,8 @@ export class Image {
   /**
    * Set the inner buffer values at given offsets.
    *
-   * @param {Array} offsetsLists List of offset lists where to set the data.
+   * @param {number[][]} offsetsLists List of offset lists
+   *   where to set the data.
    * @param {object|Array} value The value to set at the given offsets.
    * @fires Image#imagechange
    */
@@ -1284,7 +1312,7 @@ export class Image {
    *
    * Note: Uses raw buffer values.
    *
-   * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+   * @param {number[]} weights The weights of the 2D kernel as a 3x3 matrix.
    * @returns {Image} The convoluted image.
    */
   convolute2D(weights) {
@@ -1311,7 +1339,7 @@ export class Image {
    *
    * Note: Uses raw buffer values.
    *
-   * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+   * @param {number[]} weights The weights of the 2D kernel as a 3x3 matrix.
    * @param {TypedArray} buffer The buffer to convolute.
    * @param {number} startOffset The index to start at.
    */

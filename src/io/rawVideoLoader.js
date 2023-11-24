@@ -96,12 +96,12 @@ export class RawVideoLoader {
   /**
    * Check if the loader can load the provided file.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
     return (typeof file.type !== 'undefined' &&
-      file.type.match('video.*'));
+      file.type.match('video.*') !== null);
   }
 
   /**
@@ -138,7 +138,8 @@ export class RawVideoLoader {
    */
   canLoadMemory(mem) {
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

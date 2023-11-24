@@ -4,8 +4,8 @@ import {stringToUint8Array} from './string';
  * Check if the first input array contains all the
  * elements of the second input array.
  *
- * @param {Array} arr0 The test array.
- * @param {Array} arr1 The elements to check in the first array.
+ * @param {string[]} arr0 The test array.
+ * @param {string[]} arr1 The elements to check in the first array.
  * @returns {boolean} True if all the elements of arr1 are included in arr0.
  */
 export function arrayContains(arr0, arr1) {
@@ -34,7 +34,7 @@ export function arrayContains(arr0, arr1) {
  * Check for array equality after sorting.
  *
  * @param {Array} arr0 First array.
- * @param {*} arr1 Second array.
+ * @param {Array} arr1 Second array.
  * @returns {boolean} True if both array are defined and contain same values.
  */
 export function arraySortEquals(arr0, arr1) {
@@ -53,7 +53,7 @@ export function arraySortEquals(arr0, arr1) {
  * Check for array equality.
  *
  * @param {Array} arr0 First array.
- * @param {*} arr1 Second array.
+ * @param {Array} arr1 Second array.
  * @returns {boolean} True if both array are defined and contain same values.
  */
 export function arrayEquals(arr0, arr1) {

@@ -8,7 +8,7 @@ const lut_range_max = 256;
  * Build a LUT of size lut_range_max.
  *
  * @param {Function} func The i to lut function.
- * @returns {Array} The LUT.
+ * @returns {number[]} The LUT.
  */
 function buildLut(func) {
   const lut = [];

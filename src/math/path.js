@@ -9,9 +9,9 @@ import {Point2D} from '../math/point';
 export class Path {
 
   /**
-   * @param {Array} [inputPointArray] The list of Point2D that make
+   * @param {Point2D[]} [inputPointArray] The list of Point2D that make
    *   the path (optional).
-   * @param {Array} [inputControlPointIndexArray] The list of control
+   * @param {number[]} [inputControlPointIndexArray] The list of control
    *  point of path, as indexes (optional).
    * Note: first and last point do not need to be equal.
    */
@@ -19,13 +19,13 @@ export class Path {
     /**
      * List of points.
      *
-     * @type {Array}
+     * @type {Point2D[]}
      */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
     /**
      * List of control points.
      *
-     * @type {Array}
+     * @type {number[]}
      */
     this.controlPointIndexArray = inputControlPointIndexArray
       ? inputControlPointIndexArray.slice() : [];
@@ -93,7 +93,7 @@ export class Path {
   /**
    * Add points to the path.
    *
-   * @param {Array} newPointArray The list of Point2D to add.
+   * @param {Point2D[]} newPointArray The list of Point2D to add.
    */
   addPoints(newPointArray) {
     this.pointArray = this.pointArray.concat(newPointArray);

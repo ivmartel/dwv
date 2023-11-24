@@ -95,7 +95,7 @@ export function decodeQuery(query, callback, options) {
  *   - key (default): keep the key
  *   - other than key: do not use the key
  *   'file' is a special case where the '?' of the query is not kept.
- * @returns {Array} The list of input file urls.
+ * @returns {string[]} The list of input file urls.
  */
 export function decodeKeyValueUri(uri, replaceMode) {
   const result = [];
@@ -214,7 +214,7 @@ function decodeManifestQuery(query, callback) {
  *
  * @param {object} manifest The manifest to decode.
  * @param {number} nslices The number of slices to load.
- * @returns {Array} The decoded manifest.
+ * @returns {string[]} The decoded manifest.
  */
 export function decodeManifest(manifest, nslices) {
   const result = [];

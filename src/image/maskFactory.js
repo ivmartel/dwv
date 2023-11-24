@@ -682,10 +682,10 @@ function getSegmentFrameInfo(dataElements) {
  */
 export class MaskFactory {
 
-  /*
+  /**
    * Check dicom elements. Throws an error if not suitable.
    *
-   * @param {object} _dicomElements The DICOM tags.
+   * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
    * @returns {object|undefined} A possible warning.
    */
   checkElements(_dicomElements) {
@@ -950,10 +950,10 @@ export class MaskFactory {
     // final geometry
     const geometry = new Geometry(
       frameOrigins[0], size, newSpacing, orientationMatrix);
-    const uids = [0];
+    const uids = ['0'];
     for (let m = 1; m < numberOfSlices; ++m) {
       geometry.appendOrigin(point3DFromArray(posPats[m]), m);
-      uids.push(m);
+      uids.push(m.toString());
     }
 
     const getFindSegmentFunc = function (number) {

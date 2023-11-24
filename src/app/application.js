@@ -1073,7 +1073,7 @@ export class App {
   /**
    * Set the layer groups binders.
    *
-   * @param {Array} list The list of binder names.
+   * @param {string[]} list The list of binder names.
    */
   setLayerGroupsBinders(list) {
     // create instances

@@ -8,12 +8,12 @@ export class Spacing {
   /**
    * The spacing values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
   /**
-   * @param {Array} values The spacing values.
+   * @param {number[]} values The spacing values.
    */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
@@ -62,7 +62,7 @@ export class Spacing {
   /**
    * Get the values of this spacing.
    *
-   * @returns {Array} The array of values.
+   * @returns {number[]} The array of values.
    */
   getValues() {
     return this.#values.slice();

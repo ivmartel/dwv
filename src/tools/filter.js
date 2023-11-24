@@ -116,7 +116,7 @@ export class Filter {
   /**
    * Get the list of event names that this tool can fire.
    *
-   * @returns {Array} The list of event names.
+   * @returns {string[]} The list of event names.
    */
   getEventNames() {
     return ['filterrun', 'filterundo'];

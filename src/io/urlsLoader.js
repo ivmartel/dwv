@@ -17,14 +17,14 @@ export class UrlsLoader {
   /**
    * Input data.
    *
-   * @type {Array}
+   * @type {string[]}
    */
   #inputData = null;
 
   /**
    * Array of launched requests.
    *
-   * @type {Array}
+   * @type {XMLHttpRequest[]}
    */
   #requests = [];
 
@@ -84,7 +84,7 @@ export class UrlsLoader {
   /**
    * Store the current input.
    *
-   * @param {object} data The input data.
+   * @param {string[]} data The input data.
    */
   #storeInputData(data) {
     this.#inputData = data;
@@ -101,7 +101,7 @@ export class UrlsLoader {
   /**
    * Store a launched request.
    *
-   * @param {object} request The launched request.
+   * @param {XMLHttpRequest} request The launched request.
    */
   #storeRequest(request) {
     this.#requests.push(request);
@@ -190,7 +190,7 @@ export class UrlsLoader {
   /**
    * Load a list of URLs or a DICOMDIR.
    *
-   * @param {Array} data The list of urls to load.
+   * @param {string[]} data The list of urls to load.
    * @param {object} [options] Load options.
    */
   load(data, options) {
@@ -213,7 +213,7 @@ export class UrlsLoader {
    * Get a load handler for a data element.
    *
    * @param {object} loader The associated loader.
-   * @param {object} dataElement The data element.
+   * @param {string} dataElement The data element.
    * @param {number} i The index of the element.
    * @returns {eventFn} A load handler.
    */
@@ -241,7 +241,7 @@ export class UrlsLoader {
   /**
    * Load a list of urls.
    *
-   * @param {Array} data The list of urls to load.
+   * @param {string[]} data The list of urls to load.
    * @param {object} [options] The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass

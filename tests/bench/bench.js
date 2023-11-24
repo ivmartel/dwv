@@ -254,7 +254,7 @@ function onChangeTests(input) {
  * Handle change in the input file element.
  * - Updates the data list by calling updateDataList.
  *
- * @param {Array} files The new files.
+ * @param {File[]} files The new files.
  */
 dcmb.onChangeInput = function (files) {
   const inputData = [];

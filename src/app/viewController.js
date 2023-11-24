@@ -320,7 +320,7 @@ export class ViewController {
   /**
    * Get the current view (2D) spacing.
    *
-   * @returns {Array} The spacing as a 2D array.
+   * @returns {number[]} The spacing as a 2D array.
    */
   get2DSpacing() {
     const spacing = this.#view.getImage().getGeometry().getSpacing(

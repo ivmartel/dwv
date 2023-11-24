@@ -435,7 +435,7 @@ export class LayerGroup {
   /**
    * Get the view layers data indices.
    *
-   * @returns {Array} The list of indices.
+   * @returns {string[]} The list of indices.
    */
   getViewDataIndices() {
     const res = [];

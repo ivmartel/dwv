@@ -291,7 +291,7 @@ export class DeleteSegmentCommand {
   /**
    * List of offsets.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #offsets;
 

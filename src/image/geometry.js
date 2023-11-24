@@ -560,9 +560,9 @@ export class Geometry {
 /**
  * Get the oriented values of an input 3D array.
  *
- * @param {Array} array3D The 3D array.
+ * @param {number[]} array3D The 3D array.
  * @param {Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered according to the orientation.
+ * @returns {number[]} The values reordered according to the orientation.
  */
 export function getOrientedArray3D(array3D, orientation) {
   // values = orientation * orientedValues
@@ -573,9 +573,9 @@ export function getOrientedArray3D(array3D, orientation) {
 /**
  * Get the raw values of an oriented input 3D array.
  *
- * @param {Array} array3D The 3D array.
+ * @param {number[]} array3D The 3D array.
  * @param {Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered to compensate the orientation.
+ * @returns {number[]} The values reordered to compensate the orientation.
  */
 export function getDeOrientedArray3D(array3D, orientation) {
   // values = orientation * orientedValues

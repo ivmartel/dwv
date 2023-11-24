@@ -96,7 +96,7 @@ export class DicomDataLoader {
   /**
    * Check if the loader can load the provided file.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
@@ -157,7 +157,8 @@ export class DicomDataLoader {
       return true;
     }
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

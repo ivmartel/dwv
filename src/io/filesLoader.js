@@ -16,14 +16,14 @@ export class FilesLoader {
   /**
    * Input data.
    *
-   * @type {Array}
+   * @type {File[]}
    */
   #inputData = null;
 
   /**
    * Array of launched file readers.
    *
-   * @type {Array}
+   * @type {FileReader[]}
    */
   #readers = [];
 
@@ -76,7 +76,7 @@ export class FilesLoader {
   /**
    * Store the current input.
    *
-   * @param {object} data The input data.
+   * @param {File[]} data The input data.
    */
   #storeInputData(data) {
     this.#inputData = data;
@@ -91,7 +91,7 @@ export class FilesLoader {
   /**
    * Store a launched reader.
    *
-   * @param {object} reader The launched reader.
+   * @param {FileReader} reader The launched reader.
    */
   #storeReader(reader) {
     this.#readers.push(reader);
@@ -181,7 +181,7 @@ export class FilesLoader {
    * Get a load handler for a data element.
    *
    * @param {object} loader The associated loader.
-   * @param {object} dataElement The data element.
+   * @param {File} dataElement The data element.
    * @param {number} i The index of the element.
    * @returns {eventFn} A load handler.
    */
@@ -195,7 +195,7 @@ export class FilesLoader {
   /**
    * Load a list of files.
    *
-   * @param {Array} data The list of files to load.
+   * @param {File[]} data The list of files to load.
    */
   load(data) {
     // check input

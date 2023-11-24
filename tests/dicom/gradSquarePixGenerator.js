@@ -53,7 +53,7 @@ const GradSquarePixGenerator = function (options) {
    *
    * @param {number} i The column index.
    * @param {number} j The row index.
-   * @returns {Array} The grey value.
+   * @returns {number[]} The grey value.
    */
   function getGrey(i, j) {
     let value = background;
@@ -70,7 +70,7 @@ const GradSquarePixGenerator = function (options) {
    *
    * @param {number} i The column index.
    * @param {number} j The row index.
-   * @returns {Array} The [R,G,B] values.
+   * @returns {number[]} The [R,G,B] values.
    */
   function getRGB(i, j) {
     let value = 0;

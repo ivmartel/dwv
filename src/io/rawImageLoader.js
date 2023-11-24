@@ -113,12 +113,12 @@ export class RawImageLoader {
   /**
    * Check if the loader can load the provided file.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
     return (typeof file.type !== 'undefined' &&
-      file.type.match('image.*'));
+      file.type.match('image.*') !== null);
   }
 
   /**
@@ -164,7 +164,8 @@ export class RawImageLoader {
    */
   canLoadMemory(mem) {
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

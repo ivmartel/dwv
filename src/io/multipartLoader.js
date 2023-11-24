@@ -86,7 +86,7 @@ export class MultipartLoader {
   /**
    * Check if the loader can load the provided file.
    *
-   * @param {object} _file The file to check.
+   * @param {File} _file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(_file) {

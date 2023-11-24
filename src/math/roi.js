@@ -12,7 +12,7 @@ export class ROI {
   /**
    * List of points.
    *
-   * @type {Array}
+   * @type {Point2D[]}
    */
   #points = [];
 
@@ -48,7 +48,7 @@ export class ROI {
   /**
    * Add points to the ROI.
    *
-   * @param {Array} rhs The array of POints2D to add.
+   * @param {Point2D[]} rhs The array of POints2D to add.
    */
   addPoints(rhs) {
     this.#points = this.#points.concat(rhs);

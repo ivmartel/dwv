@@ -82,7 +82,7 @@ export function splitKeyValueString(inputStr) {
  * braces.
  *
  * @param {string} inputStr The input string.
- * @returns {Array} An array of found flags.
+ * @returns {string[]} An array of found flags.
  */
 export function getFlags(inputStr) {
   const flags = [];

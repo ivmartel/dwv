@@ -189,7 +189,7 @@ export function getReverseOrientation(ori) {
 /**
  * Get the name of an image orientation patient.
  *
- * @param {Array} orientation The image orientation patient.
+ * @param {number[]} orientation The image orientation patient.
  * @returns {string} The orientation name: axial, coronal or sagittal.
  */
 export function getOrientationName(orientation) {

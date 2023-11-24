@@ -663,7 +663,7 @@ export class View {
        * @event View#positionchange
        * @type {object}
        * @property {Array} value The changed value as [index, pixelValue].
-       * @property {Array} diffDims An array of modified indices.
+       * @property {number[]} diffDims An array of modified indices.
        */
       const posEvent = {
         type: 'positionchange',

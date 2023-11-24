@@ -220,9 +220,9 @@ export class Ellipse {
  * Get the indices that form a ellpise.
  *
  * @param {Index} center The ellipse center.
- * @param {Array} radius The 2 ellipse radiuses.
- * @param {Array} dir The 2 ellipse directions.
- * @returns {Array} The indices of the ellipse.
+ * @param {number[]} radius The 2 ellipse radiuses.
+ * @param {number[]} dir The 2 ellipse directions.
+ * @returns {Index[]} The indices of the ellipse.
  */
 export function getEllipseIndices(center, radius, dir) {
   const centerValues = center.getValues();

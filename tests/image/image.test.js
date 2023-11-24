@@ -184,8 +184,8 @@ QUnit.test('Test Image append slice.', function (assert) {
   /**
    * Compare two arrays of vectors.
    *
-   * @param {Array} arr0 The first array.
-   * @param {Array} arr1 The second array.
+   * @param {Point3D[]} arr0 The first array.
+   * @param {Point3D[]} arr1 The second array.
    * @returns {boolean} True if both arrays are equal.
    */
   function compareArrayOfVectors(arr0, arr1) {

@@ -41,7 +41,7 @@ function createDefaultReplaceFormat(length) {
  * braces in the form: '{v0}, {v1}'.
  *
  * @param {string} inputStr The input string.
- * @param {Array} values An array of strings.
+ * @param {string[]} values An array of strings.
  * @example
  *    var values = ["a", "b"];
  *    var str = "The length is: {v0}. The size is: {v1}";
@@ -86,7 +86,7 @@ export class OverlayData {
   /**
    * List of event used by the config.
    *
-   * @type {Array}
+   * @type {string[]}
    */
   #eventNames = [];
 
