@@ -379,9 +379,9 @@ export declare class App {
     /**
      * Set the layer groups binders.
      *
-     * @param {Array} list The list of binder names.
+     * @param {string[]} list The list of binder names.
      */
-    setLayerGroupsBinders(list: any[]): void;
+    setLayerGroupsBinders(list: string[]): void;
     /**
      * Render the current data.
      *
@@ -1527,11 +1527,11 @@ export declare function getElementsFromJSONTags(simpleTags: {
  * Get the indices that form a ellpise.
  *
  * @param {Index} center The ellipse center.
- * @param {Array} radius The 2 ellipse radiuses.
- * @param {Array} dir The 2 ellipse directions.
- * @returns {Array} The indices of the ellipse.
+ * @param {number[]} radius The 2 ellipse radiuses.
+ * @param {number[]} dir The 2 ellipse directions.
+ * @returns {Index[]} The indices of the ellipse.
  */
-export declare function getEllipseIndices(center: Index, radius: any[], dir: any[]): any[];
+export declare function getEllipseIndices(center: Index, radius: number[], dir: number[]): Index[];
 
 /**
  * Get the layer details from a mouse event.
@@ -1546,10 +1546,10 @@ export declare function getLayerDetailsFromEvent(event: object): object;
 /**
  * Get the name of an image orientation patient.
  *
- * @param {Array} orientation The image orientation patient.
+ * @param {number[]} orientation The image orientation patient.
  * @returns {string} The orientation name: axial, coronal or sagittal.
  */
-export declare function getOrientationName(orientation: any[]): string;
+export declare function getOrientationName(orientation: number[]): string;
 
 /**
  * Get the PixelData Tag.
@@ -1661,9 +1661,9 @@ declare class Image_2 {
     /**
      * @param {Geometry} geometry The geometry of the image.
      * @param {TypedArray} buffer The image data as a one dimensional buffer.
-     * @param {Array} [imageUids] An array of Uids indexed to slice number.
+     * @param {string[]} [imageUids] An array of Uids indexed to slice number.
      */
-    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: any[]);
+    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: string[]);
     /**
      * Get the image UID at a given index.
      *
@@ -1810,19 +1810,19 @@ declare class Image_2 {
      * Get the offsets where the buffer equals the input value.
      * Loops through the whole volume, can get long for big data...
      *
-     * @param {number|object} value The value to check.
-     * @returns {Array} The list of offsets.
+     * @param {number|RGB} value The value to check.
+     * @returns {number[]} The list of offsets.
      */
-    getOffsets(value: number | object): any[];
+    getOffsets(value: number | RGB): number[];
     /**
      * Check if the input values are in the buffer.
      * Could loop through the whole volume, can get long for big data...
      *
      * @param {Array} values The values to check.
-     * @returns {Array} A list of booleans for each input value,
+     * @returns {boolean[]} A list of booleans for each input value,
      *   set to true if the value is present in the buffer.
      */
-    hasValues(values: any[]): any[];
+    hasValues(values: any[]): boolean[];
     /**
      * Clone the image.
      *
@@ -1886,29 +1886,31 @@ declare class Image_2 {
     /**
      * Set the inner buffer values at given offsets.
      *
-     * @param {Array} offsets List of offsets where to set the data.
-     * @param {object} value The value to set at the given offsets.
+     * @param {number[]} offsets List of offsets where to set the data.
+     * @param {number|RGB} value The value to set at the given offsets.
      * @fires Image#imagechange
      */
-    setAtOffsets(offsets: any[], value: object): void;
+    setAtOffsets(offsets: number[], value: number | RGB): void;
     /**
      * Set the inner buffer values at given offsets.
      *
-     * @param {Array} offsetsLists List of offset lists where to set the data.
-     * @param {object} value The value to set at the given offsets.
+     * @param {number[][]} offsetsLists List of offset lists where
+     *   to set the data.
+     * @param {RGB} value The value to set at the given offsets.
      * @returns {Array} A list of objects representing the original values before
      *  replacing them.
      * @fires Image#imagechange
      */
-    setAtOffsetsAndGetOriginals(offsetsLists: any[], value: object): any[];
+    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
     /**
      * Set the inner buffer values at given offsets.
      *
-     * @param {Array} offsetsLists List of offset lists where to set the data.
+     * @param {number[][]} offsetsLists List of offset lists
+     *   where to set the data.
      * @param {object|Array} value The value to set at the given offsets.
      * @fires Image#imagechange
      */
-    setAtOffsetsWithIterator(offsetsLists: any[], value: object | any[]): void;
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: object | any[]): void;
     /**
      * Get the value of the image at a specific coordinate.
      *
@@ -1980,20 +1982,20 @@ declare class Image_2 {
      *
      * Note: Uses raw buffer values.
      *
-     * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+     * @param {number[]} weights The weights of the 2D kernel as a 3x3 matrix.
      * @returns {Image} The convoluted image.
      */
-    convolute2D(weights: any[]): Image_2;
+    convolute2D(weights: number[]): Image_2;
     /**
      * Convolute an image buffer with a given 2D kernel.
      *
      * Note: Uses raw buffer values.
      *
-     * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+     * @param {number[]} weights The weights of the 2D kernel as a 3x3 matrix.
      * @param {TypedArray} buffer The buffer to convolute.
      * @param {number} startOffset The index to start at.
      */
-    convoluteBuffer(weights: any[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
+    convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     /**
      * Transform an image using a specific operator.
      * WARNING: no size check!
@@ -2211,9 +2213,9 @@ export declare class LayerGroup {
     /**
      * Get the view layers data indices.
      *
-     * @returns {Array} The list of indices.
+     * @returns {string[]} The list of indices.
      */
-    getViewDataIndices(): any[];
+    getViewDataIndices(): string[];
     /**
      * Get the active draw layer.
      *
@@ -2395,7 +2397,15 @@ export declare const luts: {
  * Mask {@link Image} factory.
  */
 export declare class MaskFactory {
-    checkElements(_dicomElements: any): void;
+    /**
+     * Check dicom elements. Throws an error if not suitable.
+     *
+     * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
+     * @returns {object|undefined} A possible warning.
+     */
+    checkElements(_dicomElements: {
+        [x: string]: DataElement;
+    }): object | undefined;
     /**
      * Get an {@link Image} object from the read DICOM file.
      *
@@ -3125,9 +3135,9 @@ export declare class RGB {
  */
 export declare class Size {
     /**
-     * @param {Array} values The size values.
+     * @param {number[]} values The size values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get the size value at the given array index.
      *
@@ -3150,9 +3160,9 @@ export declare class Size {
     /**
      * Get the values of this index.
      *
-     * @returns {Array} The array of values.
+     * @returns {number[]} The array of values.
      */
-    getValues(): any[];
+    getValues(): number[];
     /**
      * Check if a dimension exists and has more than one element.
      *
@@ -3201,10 +3211,10 @@ export declare class Size {
      * Check that an index is within bounds.
      *
      * @param {Index} index The index to check.
-     * @param {Array} dirs Optional list of directions to check.
+     * @param {number[]} dirs Optional list of directions to check.
      * @returns {boolean} True if the given coordinates are within bounds.
      */
-    isInBounds(index: Index, dirs: any[]): boolean;
+    isInBounds(index: Index, dirs: number[]): boolean;
     /**
      * Convert an index to an offset in memory.
      *
@@ -3236,9 +3246,9 @@ export declare class Size {
  */
 export declare class Spacing {
     /**
-     * @param {Array} values The spacing values.
+     * @param {number[]} values The spacing values.
      */
-    constructor(values: any[]);
+    constructor(values: number[]);
     /**
      * Get the spacing value at the given array index.
      *
@@ -3261,9 +3271,9 @@ export declare class Spacing {
     /**
      * Get the values of this spacing.
      *
-     * @returns {Array} The array of values.
+     * @returns {number[]} The array of values.
      */
-    getValues(): any[];
+    getValues(): number[];
     /**
      * Check for equality.
      *
@@ -4026,9 +4036,9 @@ export declare class ViewController {
     /**
      * Get the current view (2D) spacing.
      *
-     * @returns {Array} The spacing as a 2D array.
+     * @returns {number[]} The spacing as a 2D array.
      */
-    get2DSpacing(): any[];
+    get2DSpacing(): number[];
     /**
      * Get the image rescaled value at the input position.
      *
