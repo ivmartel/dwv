@@ -167,14 +167,14 @@ export class Draw {
   /**
    * List of points.
    *
-   * @type {Array}
+   * @type {Point2D[]}
    */
   #points = [];
 
   /**
    * Last selected point.
    *
-   * @type {object}
+   * @type {Point2D}
    */
   #lastPoint = null;
 
@@ -218,6 +218,13 @@ export class Draw {
    * Event listeners.
    */
   #listeners = {};
+
+  /**
+   * Flag to know if the last added point was made by mouse move.
+   *
+   * @type {boolean}
+   */
+  #lastIsMouseMovePoint = false;
 
   /**
    * Handle mouse down event.
@@ -295,16 +302,14 @@ export class Draw {
     // draw line to current pos
     if (Math.abs(pos.x - this.#lastPoint.getX()) > 0 ||
       Math.abs(pos.y - this.#lastPoint.getY()) > 0) {
-      // clear last added point from the list (but not the first one)
-      // if it was marked as temporary
-      if (this.#points.length !== 1 &&
-        typeof this.#points[this.#points.length - 1].tmp !== 'undefined') {
+      // clear last mouse move point
+      if (this.#lastIsMouseMovePoint) {
         this.#points.pop();
       }
       // current point
       this.#lastPoint = new Point2D(pos.x, pos.y);
       // mark it as temporary
-      this.#lastPoint.tmp = true;
+      this.#lastIsMouseMovePoint = true;
       // add it to the list
       this.#points.push(this.#lastPoint);
       // update points
@@ -338,10 +343,8 @@ export class Draw {
       // reset flag
       this.#started = false;
     } else {
-      // remove temporary flag
-      if (typeof this.#points[this.#points.length - 1].tmp !== 'undefined') {
-        delete this.#points[this.#points.length - 1].tmp;
-      }
+      // reset mouse move point flag
+      this.#lastIsMouseMovePoint = false;
     }
   };
 
@@ -505,7 +508,7 @@ export class Draw {
   /**
    * Update the current draw with new points.
    *
-   * @param {Array} tmpPoints The array of new points.
+   * @param {Point2D[]} tmpPoints The array of new points.
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #onNewPoints(tmpPoints, layerGroup) {
@@ -1041,7 +1044,7 @@ export class Draw {
   /**
    * Get the list of event names that this tool can fire.
    *
-   * @returns {Array} The list of event names.
+   * @returns {string[]} The list of event names.
    */
   getEventNames() {
     return [
