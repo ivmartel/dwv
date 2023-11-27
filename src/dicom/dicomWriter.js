@@ -604,8 +604,14 @@ export class DicomWriter {
     if (element.vr !== 'SQ' && element.vr !== 'NONE') {
       const diff = byteOffset - startOffset;
       if (diff !== element.vl) {
-        logger.warn('Offset difference and VL are not equal: ' +
-          diff + ' != ' + element.vl + ', vr:' + element.vr);
+        let message = 'Offset difference and VL are not equal: ' +
+          diff + ' != ' + element.vl;
+        message += ' (';
+        if (typeof element.tag !== 'undefined') {
+          message += element.tag + ', ';
+        }
+        message += 'vr:' + element.vr + ')';
+        logger.warn(message);
       }
     }
 
