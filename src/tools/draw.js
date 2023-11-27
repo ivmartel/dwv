@@ -277,8 +277,9 @@ export class Draw {
       this.#points = [];
       // store point
       const viewLayer = layerGroup.getActiveViewLayer();
-      const pos = viewLayer.displayToPlanePos(event._x, event._y);
-      this.#lastPoint = new Point2D(pos.x, pos.y);
+      this.#lastPoint = viewLayer.displayToPlanePos(
+        new Point2D(event._x, event._y)
+      );
       this.#points.push(this.#lastPoint);
     }
   };
@@ -297,17 +298,19 @@ export class Draw {
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(event._x, event._y);
+    const pos = viewLayer.displayToPlanePos(
+      new Point2D(event._x, event._y)
+    );
 
     // draw line to current pos
-    if (Math.abs(pos.x - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.y - this.#lastPoint.getY()) > 0) {
+    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
+      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
       // clear last mouse move point
       if (this.#lastIsMouseMovePoint) {
         this.#points.pop();
       }
       // current point
-      this.#lastPoint = new Point2D(pos.x, pos.y);
+      this.#lastPoint = pos;
       // mark it as temporary
       this.#lastIsMouseMovePoint = true;
       // add it to the list
@@ -408,16 +411,18 @@ export class Draw {
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(event._x, event._y);
+    const pos = viewLayer.displayToPlanePos(
+      new Point2D(event._x, event._y)
+    );
 
-    if (Math.abs(pos.x - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.y - this.#lastPoint.getY()) > 0) {
+    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
+      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
       // clear last added point from the list (but not the first one)
       if (this.#points.length !== 1) {
         this.#points.pop();
       }
       // current point
-      this.#lastPoint = new Point2D(pos.x, pos.y);
+      this.#lastPoint = pos;
       // add current one to the list
       this.#points.push(this.#lastPoint);
       // allow for anchor points
@@ -1116,7 +1121,7 @@ export class Draw {
  * Get the minimum position in a groups' anchors.
  *
  * @param {Konva.Group} group The group that contains anchors.
- * @returns {object|undefined} The minimum position as {x,y}.
+ * @returns {Point2D|undefined} The minimum position.
  */
 function getAnchorMin(group) {
   const anchors = group.find('.anchor');
@@ -1130,31 +1135,31 @@ function getAnchorMin(group) {
     minY = Math.min(minY, anchors[i].y());
   }
 
-  return {x: minX, y: minY};
+  return new Point2D(minX, minY);
 }
 
 /**
  * Bound a node position.
  *
  * @param {Konva.Node} node The node to bound the position.
- * @param {object} min The minimum position as {x,y}.
- * @param {object} max The maximum position as {x,y}.
+ * @param {Point2D} min The minimum position.
+ * @param {Point2D} max The maximum position.
  * @returns {boolean} True if the position was corrected.
  */
 function boundNodePosition(node, min, max) {
   let changed = false;
-  if (node.x() < min.x) {
-    node.x(min.x);
+  if (node.x() < min.getX()) {
+    node.x(min.getX());
     changed = true;
-  } else if (node.x() > max.x) {
-    node.x(max.x);
+  } else if (node.x() > max.getX()) {
+    node.x(max.getX());
     changed = true;
   }
-  if (node.y() < min.y) {
-    node.y(min.y);
+  if (node.y() < min.getY()) {
+    node.y(min.getY());
     changed = true;
-  } else if (node.y() > max.y) {
-    node.y(max.y);
+  } else if (node.y() > max.getY()) {
+    node.y(max.getY());
     changed = true;
   }
   return changed;
@@ -1177,16 +1182,14 @@ function validateGroupPosition(stageSize, group) {
     return null;
   }
 
-  const min = {
-    x: -anchorMin.x,
-    y: -anchorMin.y
-  };
-  const max = {
-    x: stageSize.x -
-      (anchorMin.x + Math.abs(shape.width())),
-    y: stageSize.y -
-      (anchorMin.y + Math.abs(shape.height()))
-  };
+  const min = new Point2D(
+    -anchorMin.getX(),
+    -anchorMin.getY()
+  );
+  const max = new Point2D(
+    stageSize.x - (anchorMin.getX() + Math.abs(shape.width())),
+    stageSize.y - (anchorMin.getY() + Math.abs(shape.height()))
+  );
 
   return boundNodePosition(group, min, max);
 }
@@ -1201,14 +1204,14 @@ function validateGroupPosition(stageSize, group) {
 export function validateAnchorPosition(stageSize, anchor) {
   const group = anchor.getParent();
 
-  const min = {
-    x: -group.x(),
-    y: -group.y()
-  };
-  const max = {
-    x: stageSize.x - group.x(),
-    y: stageSize.y - group.y()
-  };
+  const min = new Point2D(
+    -group.x(),
+    -group.y()
+  );
+  const max = new Point2D(
+    stageSize.x - group.x(),
+    stageSize.y - group.y()
+  );
 
   return boundNodePosition(anchor, min, max);
 }

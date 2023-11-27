@@ -2,6 +2,7 @@ import {Index} from '../math/index';
 import {ListenerHandler} from '../utils/listen';
 import {viewEventNames} from '../image/view';
 import {ViewController} from '../app/viewController';
+import {Point2D} from '../math/point';
 import {
   canCreateCanvas,
   InteractionEventNames
@@ -482,60 +483,58 @@ export class ViewLayer {
   }
 
   /**
-   * Transform a display position to an index.
+   * Transform a display position to a 2D index.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {Index} The equivalent index.
+   * @param {Point2D} point2D The input point.
+   * @returns {Index} The equivalent 2D index.
    */
-  displayToPlaneIndex(x, y) {
-    const planePos = this.displayToPlanePos(x, y);
+  displayToPlaneIndex(point2D) {
+    const planePos = this.displayToPlanePos(point2D);
     return new Index([
-      Math.floor(planePos.x),
-      Math.floor(planePos.y)
+      Math.floor(planePos.getX()),
+      Math.floor(planePos.getY())
     ]);
   }
 
   /**
    * Remove scale from a display position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The de-scaled position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The de-scaled point.
    */
-  displayToPlaneScale(x, y) {
-    return {
-      x: x / this.#scale.x,
-      y: y / this.#scale.y
-    };
+  displayToPlaneScale(point2D) {
+    return new Point2D(
+      point2D.getX() / this.#scale.x,
+      point2D.getY() / this.#scale.y
+    );
   }
 
   /**
    * Get a plane position from a display position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The plane position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The plane position.
    */
-  displayToPlanePos(x, y) {
-    const deScaled = this.displayToPlaneScale(x, y);
-    return {
-      x: deScaled.x + this.#offset.x,
-      y: deScaled.y + this.#offset.y
-    };
+  displayToPlanePos(point2D) {
+    const deScaled = this.displayToPlaneScale(point2D);
+    return new Point2D(
+      deScaled.getX() + this.#offset.x,
+      deScaled.getY() + this.#offset.y
+    );
   }
 
   /**
    * Get a display position from a plane position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The display position as {x,y}, can be individually
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The display position, can be individually
    *   undefined if out of bounds.
    */
-  planePosToDisplay(x, y) {
-    let posX = (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x;
-    let posY = (y - this.#offset.y + this.#baseOffset.y) * this.#scale.y;
+  planePosToDisplay(point2D) {
+    let posX =
+      (point2D.getX() - this.#offset.x + this.#baseOffset.x) * this.#scale.x;
+    let posY =
+      (point2D.getY() - this.#offset.y + this.#baseOffset.y) * this.#scale.y;
     // check if in bounds
     if (posX < 0 || posX >= this.#canvas.width) {
       posX = undefined;
@@ -543,22 +542,21 @@ export class ViewLayer {
     if (posY < 0 || posY >= this.#canvas.height) {
       posY = undefined;
     }
-    return {x: posX, y: posY};
+    return new Point2D(posX, posY);
   }
 
   /**
    * Get a main plane position from a display position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The main plane position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The main plane position.
    */
-  displayToMainPlanePos(x, y) {
-    const planePos = this.displayToPlanePos(x, y);
-    return {
-      x: planePos.x - this.#baseOffset.x,
-      y: planePos.y - this.#baseOffset.y
-    };
+  displayToMainPlanePos(point2D) {
+    const planePos = this.displayToPlanePos(point2D);
+    return new Point2D(
+      planePos.getX() - this.#baseOffset.x,
+      planePos.getY() - this.#baseOffset.y
+    );
   }
 
   /**

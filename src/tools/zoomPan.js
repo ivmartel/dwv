@@ -97,8 +97,13 @@ export class ZoomAndPan {
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
-    const planeOffset = viewLayer.displayToPlaneScale(tx, ty);
-    const offset3D = viewController.getOffset3DFromPlaneOffset(planeOffset);
+    const planeOffset = viewLayer.displayToPlaneScale(
+      new Point2D(tx, ty)
+    );
+    const offset3D = viewController.getOffset3DFromPlaneOffset({
+      x: planeOffset.getX(),
+      y: planeOffset.getY()
+    });
     layerGroup.addTranslation({
       x: offset3D.getX(),
       y: offset3D.getY(),
@@ -148,9 +153,9 @@ export class ZoomAndPan {
     } else {
       // zoom mode
       const zoom = (lineRatio - 1) / 10;
-      if (Math.abs(zoom) % 0.1 <= 0.05) {
-        const planePos = viewLayer.displayToMainPlanePos(
-          this.midPoint.getX(), this.midPoint.getY());
+      if (Math.abs(zoom) % 0.1 <= 0.05 &&
+        typeof this.midPoint !== 'undefined') {
+        const planePos = viewLayer.displayToMainPlanePos(this.midPoint);
         const center = viewController.getPlanePositionFromPlanePoint(planePos);
         layerGroup.addScale(zoom, center);
         layerGroup.draw();
@@ -228,7 +233,9 @@ export class ZoomAndPan {
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
-    const planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
+    const planePos = viewLayer.displayToMainPlanePos(
+      new Point2D(event._x, event._y)
+    );
     const center = viewController.getPlanePositionFromPlanePoint(planePos);
     layerGroup.addScale(step, center);
     layerGroup.draw();

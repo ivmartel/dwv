@@ -1,4 +1,5 @@
 import {ScrollWheel} from './scrollWheel';
+import {Point2D} from '../math/point';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
   validateWindowWidth,
@@ -173,7 +174,9 @@ export class WindowLevel {
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(
+      new Point2D(event._x, event._y)
+    );
     const viewController = viewLayer.getViewController();
     const image = this.#app.getImage(viewLayer.getDataId());
 

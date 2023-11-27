@@ -1,5 +1,6 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {precisionRound} from '../utils/string';
+import {Point2D} from '../math/point';
 import {ScrollWheel} from './scrollWheel';
 
 // doc imports
@@ -140,9 +141,10 @@ export class Scroll {
     this.y0 = event._y;
 
     // update controller position
-    const planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    const position = viewController.getPositionFromPlanePoint(
-      planePos.x, planePos.y);
+    const planePos = viewLayer.displayToPlanePos(
+      new Point2D(event._x, event._y)
+    );
+    const position = viewController.getPositionFromPlanePoint(planePos);
     viewController.setCurrentPosition(position);
   };
 
@@ -314,9 +316,10 @@ export class Scroll {
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
-    const planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    const position = viewController.getPositionFromPlanePoint(
-      planePos.x, planePos.y);
+    const planePos = viewLayer.displayToPlanePos(
+      new Point2D(event._x, event._y)
+    );
+    const position = viewController.getPositionFromPlanePoint(planePos);
     const value = viewController.getRescaledImageValue(position);
 
     // create

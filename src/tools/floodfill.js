@@ -184,7 +184,9 @@ export class Floodfill {
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(
+      new Point2D(event._x, event._y)
+    );
     return {
       x: index.get(0),
       y: index.get(1)

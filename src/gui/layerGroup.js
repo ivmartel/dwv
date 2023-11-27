@@ -788,25 +788,25 @@ export class LayerGroup {
     }
 
     const vc = baseLayer.getViewController();
-    const p2D = vc.getPlanePositionFromPosition(position);
-    const displayPos = baseLayer.planePosToDisplay(p2D.x, p2D.y);
+    const planePos = vc.getPlanePositionFromPosition(position);
+    const displayPos = baseLayer.planePosToDisplay(planePos);
 
-    if (typeof displayPos.y !== 'undefined') {
+    if (typeof displayPos.getY() !== 'undefined') {
       const lineH = document.createElement('hr');
       lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
       lineH.className = 'horizontal';
       lineH.style.width = this.#containerDiv.offsetWidth + 'px';
       lineH.style.left = '0px';
-      lineH.style.top = displayPos.y + 'px';
+      lineH.style.top = displayPos.getY() + 'px';
       this.#containerDiv.appendChild(lineH);
     }
 
-    if (typeof displayPos.x !== 'undefined') {
+    if (typeof displayPos.getX() !== 'undefined') {
       const lineV = document.createElement('hr');
       lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
       lineV.className = 'vertical';
       lineV.style.width = this.#containerDiv.offsetHeight + 'px';
-      lineV.style.left = (displayPos.x) + 'px';
+      lineV.style.left = (displayPos.getX()) + 'px';
       lineV.style.top = '0px';
       this.#containerDiv.appendChild(lineV);
     }

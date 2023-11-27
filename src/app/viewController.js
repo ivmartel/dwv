@@ -162,7 +162,9 @@ export class ViewController {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition(this.getPositionFromPlanePoint(0, 0));
+    this.setCurrentPosition(this.getPositionFromPlanePoint(
+      new Point2D(0, 0)
+    ));
   }
 
   /**
@@ -547,16 +549,15 @@ export class ViewController {
   }
 
   /**
-   * Get a position from a 2D (x,y) position.
+   * Get a world position from a 2D plane position.
    *
-   * @param {number} x The column position.
-   * @param {number} y The row position.
+   * @param {Point2D} point2D The input point.
    * @returns {Point} The associated position.
    */
-  getPositionFromPlanePoint(x, y) {
+  getPositionFromPlanePoint(point2D) {
     // keep third direction
     const k = this.getCurrentScrollIndexValue();
-    const planePoint = new Point3D(x, y, k);
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
     // ~indexToWorld to not loose precision
@@ -567,10 +568,10 @@ export class ViewController {
   }
 
   /**
-   * Get a 2D (x,y) position from a position.
+   * Get a 2D plane position from a world position.
    *
    * @param {Point} point The 3D position.
-   * @returns {object} The 2D position.
+   * @returns {Point2D} The 2D position.
    */
   getPlanePositionFromPosition(point) {
     // orient
@@ -579,10 +580,10 @@ export class ViewController {
     const point3D = geometry.worldToPoint(point);
     const planePoint = this.#planeHelper.getImageDeOrientedPoint3D(point3D);
     // return
-    return {
-      x: planePoint.getX(),
-      y: planePoint.getY(),
-    };
+    return new Point2D(
+      planePoint.getX(),
+      planePoint.getY(),
+    );
   }
 
   /**
@@ -600,13 +601,13 @@ export class ViewController {
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
-   * @param {object} point2D The 2D position as {x,y}.
+   * @param {Point2D} point2D The 2D position.
    * @returns {Point3D} The 3D point.
    */
   getPlanePositionFromPlanePoint(point2D) {
     // keep third direction
     const k = this.getCurrentScrollIndexValue();
-    const planePoint = new Point3D(point2D.x, point2D.y, k);
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getTargetDeOrientedPoint3D(planePoint);
     // ~indexToWorld to not loose precision

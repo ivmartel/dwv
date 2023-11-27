@@ -149,7 +149,9 @@ export class Livewire {
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const imageSize = viewLayer.getViewController().getImageSize();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(
+      new Point2D(event._x, event._y)
+    );
 
     // first time
     if (!this.#started) {
@@ -200,7 +202,9 @@ export class Livewire {
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(
+      new Point2D(event._x, event._y)
+    );
 
     // set the point to find the path to
     let p = {x: index.get(0), y: index.get(1)};
