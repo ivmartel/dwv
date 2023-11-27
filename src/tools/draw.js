@@ -342,10 +342,10 @@ export class Draw {
       this.#onFinalPoints(this.#points, layerGroup);
       // reset flag
       this.#started = false;
-    } else {
+    }
+
       // reset mouse move point flag
       this.#lastIsMouseMovePoint = false;
-    }
   };
 
   /**
