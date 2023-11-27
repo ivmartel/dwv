@@ -2958,19 +2958,6 @@ export declare class Point2D {
      * @returns {string} The point as a string.
      */
     toString(): string;
-    /**
-     * Get the distance to another Point2D.
-     *
-     * @param {Point2D} point2D The input point.
-     * @returns {number} The distance to the input point.
-     */
-    getDistance(point2D: Point2D): number;
-    /**
-     * Round a Point2D.
-     *
-     * @returns {Point2D} The rounded point.
-     */
-    getRound(): Point2D;
     #private;
 }
 
