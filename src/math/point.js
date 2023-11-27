@@ -55,8 +55,9 @@ export class Point2D {
    */
   equals(rhs) {
     return rhs !== null &&
-      this.getX() === rhs.getX() &&
-      this.getY() === rhs.getY();
+      typeof rhs !== 'undefined' &&
+      this.#x === rhs.getX() &&
+      this.#y === rhs.getY();
   }
 
   /**
@@ -65,31 +66,7 @@ export class Point2D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.getX() + ', ' + this.getY() + ')';
-  }
-
-  /**
-   * Get the distance to another Point2D.
-   *
-   * @param {Point2D} point2D The input point.
-   * @returns {number} The distance to the input point.
-   */
-  getDistance(point2D) {
-    return Math.sqrt(
-      (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
-      (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()));
-  }
-
-  /**
-   * Round a Point2D.
-   *
-   * @returns {Point2D} The rounded point.
-   */
-  getRound() {
-    return new Point2D(
-      Math.round(this.getX()),
-      Math.round(this.getY())
-    );
+    return '(' + this.#x + ', ' + this.#y + ')';
   }
 
 } // Point2D class

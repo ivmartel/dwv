@@ -156,9 +156,17 @@ export class Rectangle {
    * @returns {object} The rounded limits.
    */
   getRound() {
+    const roundBegin = new Point2D(
+      Math.round(this.getBegin().getX()),
+      Math.round(this.getBegin().getY())
+    );
+    const roundEnd = new Point2D(
+      Math.round(this.getEnd().getX()),
+      Math.round(this.getEnd().getY())
+    );
     return {
-      min: this.getBegin().getRound(),
-      max: this.getEnd().getRound()
+      min: roundBegin,
+      max: roundEnd
     };
   }
 

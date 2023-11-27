@@ -37,16 +37,6 @@ QUnit.test('Test Point2D.', function (assert) {
   // to string
   assert.equal(p0.toString(), '(1, 2)', 'toString');
 
-  // distance
-  const p30 = new Point2D(1, 3);
-  assert.equal(p0.getDistance(p30), 1, 'getDistance #1');
-  const p31 = new Point2D(2, 2);
-  assert.equal(p0.getDistance(p31), 1, 'getDistance #2');
-  const p32 = new Point2D(2, 1);
-  assert.equal(p0.getDistance(p32), Math.sqrt(2), 'getDistance #3');
-  const p33 = new Point2D(0, 1);
-  assert.equal(p0.getDistance(p33), Math.sqrt(2), 'getDistance #4');
-
 });
 
 /**
