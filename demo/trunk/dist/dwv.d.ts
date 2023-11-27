@@ -4123,20 +4123,19 @@ export declare class ViewController {
      */
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
     /**
-     * Get a position from a 2D (x,y) position.
+     * Get a world position from a 2D plane position.
      *
-     * @param {number} x The column position.
-     * @param {number} y The row position.
+     * @param {Point2D} point2D The input point.
      * @returns {Point} The associated position.
      */
-    getPositionFromPlanePoint(x: number, y: number): Point;
+    getPositionFromPlanePoint(point2D: Point2D): Point;
     /**
-     * Get a 2D (x,y) position from a position.
+     * Get a 2D plane position from a world position.
      *
      * @param {Point} point The 3D position.
-     * @returns {object} The 2D position.
+     * @returns {Point2D} The 2D position.
      */
-    getPlanePositionFromPosition(point: Point): object;
+    getPlanePositionFromPosition(point: Point): Point2D;
     /**
      * Set the current index.
      *
@@ -4149,10 +4148,10 @@ export declare class ViewController {
      * Get a plane 3D position from a plane 2D position: does not compensate
      *   for the image origin. Needed for setting the scale center...
      *
-     * @param {object} point2D The 2D position as {x,y}.
+     * @param {Point2D} point2D The 2D position.
      * @returns {Point3D} The 3D point.
      */
-    getPlanePositionFromPlanePoint(point2D: object): Point3D;
+    getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
     /**
      * Get a 3D offset from a plane one.
      *
@@ -4385,46 +4384,41 @@ export declare class ViewLayer {
      */
     setOffset(newOffset: object): void;
     /**
-     * Transform a display position to an index.
+     * Transform a display position to a 2D index.
      *
-     * @param {number} x The X position.
-     * @param {number} y The Y position.
-     * @returns {Index} The equivalent index.
+     * @param {Point2D} point2D The input point.
+     * @returns {Index} The equivalent 2D index.
      */
-    displayToPlaneIndex(x: number, y: number): Index;
+    displayToPlaneIndex(point2D: Point2D): Index;
     /**
      * Remove scale from a display position.
      *
-     * @param {number} x The X position.
-     * @param {number} y The Y position.
-     * @returns {object} The de-scaled position as {x,y}.
+     * @param {Point2D} point2D The input point.
+     * @returns {Point2D} The de-scaled point.
      */
-    displayToPlaneScale(x: number, y: number): object;
+    displayToPlaneScale(point2D: Point2D): Point2D;
     /**
      * Get a plane position from a display position.
      *
-     * @param {number} x The X position.
-     * @param {number} y The Y position.
-     * @returns {object} The plane position as {x,y}.
+     * @param {Point2D} point2D The input point.
+     * @returns {Point2D} The plane position.
      */
-    displayToPlanePos(x: number, y: number): object;
+    displayToPlanePos(point2D: Point2D): Point2D;
     /**
      * Get a display position from a plane position.
      *
-     * @param {number} x The X position.
-     * @param {number} y The Y position.
-     * @returns {object} The display position as {x,y}, can be individually
+     * @param {Point2D} point2D The input point.
+     * @returns {Point2D} The display position, can be individually
      *   undefined if out of bounds.
      */
-    planePosToDisplay(x: number, y: number): object;
+    planePosToDisplay(point2D: Point2D): Point2D;
     /**
      * Get a main plane position from a display position.
      *
-     * @param {number} x The X position.
-     * @param {number} y The Y position.
-     * @returns {object} The main plane position as {x,y}.
+     * @param {Point2D} point2D The input point.
+     * @returns {Point2D} The main plane position.
      */
-    displayToMainPlanePos(x: number, y: number): object;
+    displayToMainPlanePos(point2D: Point2D): Point2D;
     /**
      * Display the layer.
      *
