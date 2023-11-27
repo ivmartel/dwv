@@ -344,8 +344,8 @@ export class Draw {
       this.#started = false;
     }
 
-      // reset mouse move point flag
-      this.#lastIsMouseMovePoint = false;
+    // reset mouse move point flag
+    this.#lastIsMouseMovePoint = false;
   };
 
   /**
