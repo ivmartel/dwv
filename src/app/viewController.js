@@ -679,7 +679,7 @@ export class ViewController {
     if (!this.canScroll()) {
       return;
     }
-    if (this.#playerID === null) {
+    if (typeof this.#playerID === 'undefined') {
       const image = this.#view.getImage();
       const recommendedDisplayFrameRate =
         image.getMeta().RecommendedDisplayFrameRate;
