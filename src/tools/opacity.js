@@ -1,9 +1,14 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ScrollWheel} from './scrollWheel';
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -43,6 +48,13 @@ export class Opacity {
   #started = false;
 
   /**
+   * Start point.
+   *
+   * @type {Point2D}
+   */
+  #startPoint;
+
+  /**
    * Scroll wheel handler.
    *
    * @type {ScrollWheel}
@@ -58,16 +70,59 @@ export class Opacity {
   }
 
   /**
+   * Start tool interaction.
+   *
+   * @param {Point2D} point The start point.
+   */
+  #start(point) {
+    this.#started = true;
+    this.#startPoint = point;
+  }
+
+  /**
+   * Update tool interaction.
+   *
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
+   */
+  #update(point, divId) {
+    if (!this.#started) {
+      return;
+    }
+
+    // difference to last X position
+    const diffX = point.getX() - this.#startPoint.getX();
+    const xMove = (Math.abs(diffX) > 15);
+    // do not trigger for small moves
+    if (xMove) {
+      const layerGroup = this.#app.getLayerGroupByDivId(divId);
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const op = viewLayer.getOpacity();
+      viewLayer.setOpacity(op + (diffX / 200));
+      viewLayer.draw();
+
+      // reset origin point
+      this.#startPoint = point;
+    }
+  }
+
+  /**
+   * Finish tool interaction.
+   */
+  #finish() {
+    if (this.#started) {
+      this.#started = false;
+    }
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
-    // start flag
-    this.#started = true;
-    // first position
-    this.x0 = event._x;
-    this.y0 = event._y;
+    const mousePoint = getMousePoint(event);
+    this.#start(mousePoint);
   };
 
   /**
@@ -76,26 +131,9 @@ export class Opacity {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    if (!this.#started) {
-      return;
-    }
-
-    // difference to last X position
-    const diffX = event._x - this.x0;
-    const xMove = (Math.abs(diffX) > 15);
-    // do not trigger for small moves
-    if (xMove) {
-      const layerDetails = getLayerDetailsFromEvent(event);
-      const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-      const viewLayer = layerGroup.getActiveViewLayer();
-      const op = viewLayer.getOpacity();
-      viewLayer.setOpacity(op + (diffX / 200));
-      viewLayer.draw();
-
-      // reset origin point
-      this.x0 = event._x;
-    }
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -104,19 +142,16 @@ export class Opacity {
    * @param {object} _event The mouse up event.
    */
   mouseup = (_event) => {
-    if (this.#started) {
-      // stop recording
-      this.#started = false;
-    }
+    this.#finish();
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    this.mouseup(event);
+  mouseout = (_event) => {
+    this.#finish();
   };
 
   /**
@@ -125,8 +160,8 @@ export class Opacity {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    // call mouse equivalent
-    this.mousedown(event);
+    const touchPoints = getTouchPoints(event);
+    this.#start(touchPoints[0]);
   };
 
   /**
@@ -135,18 +170,18 @@ export class Opacity {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    // call mouse equivalent
-    this.mousemove(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
-  touchend = (event) => {
-    // call mouse equivalent
-    this.mouseup(event);
+  touchend = (_event) => {
+    this.#finish();
   };
 
   /**

@@ -1,6 +1,7 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
-  getEventOffset,
+  getMousePoint,
+  getTouchPoints,
   customUI
 } from '../gui/generic';
 import {Point2D} from '../math/point';
@@ -227,25 +228,25 @@ export class Draw {
   #lastIsMouseMovePoint = false;
 
   /**
-   * Handle mouse down event.
+   * Start tool interaction.
    *
-   * @param {object} event The mouse down event.
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    */
-  mousedown = (event) => {
+  #start(point, divId) {
     // exit if a draw was started (handle at mouse move or up)
     if (this.#started) {
       return;
     }
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const drawLayer = layerGroup.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
     const stage = drawLayer.getKonvaStage();
     const kshape = stage.getIntersection({
-      x: event._x,
-      y: event._y
+      x: point.getX(),
+      y: point.getY()
     });
 
     // update scale
@@ -277,30 +278,26 @@ export class Draw {
       this.#points = [];
       // store point
       const viewLayer = layerGroup.getActiveViewLayer();
-      this.#lastPoint = viewLayer.displayToPlanePos(
-        new Point2D(event._x, event._y)
-      );
+      this.#lastPoint = viewLayer.displayToPlanePos(point);
       this.#points.push(this.#lastPoint);
     }
-  };
+  }
 
   /**
-   * Handle mouse move event.
+   * Update tool interaction.
    *
-   * @param {object} event The mouse move event.
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
    */
-  mousemove = (event) => {
+  #update(point, divId) {
     // exit if not started draw
     if (!this.#started) {
       return;
     }
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(
-      new Point2D(event._x, event._y)
-    );
+    const pos = viewLayer.displayToPlanePos(point);
 
     // draw line to current pos
     if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
@@ -318,14 +315,14 @@ export class Draw {
       // update points
       this.#onNewPoints(this.#points, layerGroup);
     }
-  };
+  }
 
   /**
-   * Handle mouse up event.
+   * Finish tool interaction.
    *
-   * @param {object} event The mouse up event.
+   * @param {string} divId The layer group divId.
    */
-  mouseup = (event) => {
+  #finish(divId) {
     // exit if not started draw
     if (!this.#started) {
       return;
@@ -339,9 +336,8 @@ export class Draw {
     // do we have all the needed points
     if (this.#points.length === this.#currentFactory.getNPoints()) {
       // store points
-      const layerDetails = getLayerDetailsFromEvent(event);
       const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+        this.#app.getLayerGroupByDivId(divId);
       this.#onFinalPoints(this.#points, layerGroup);
       // reset flag
       this.#started = false;
@@ -349,6 +345,38 @@ export class Draw {
 
     // reset mouse move point flag
     this.#lastIsMouseMovePoint = false;
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(mousePoint, layerDetails.groupDivId);
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  mousemove = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
+  };
+
+  /**
+   * Handle mouse up event.
+   *
+   * @param {object} event The mouse up event.
+   */
+  mouseup = (event) => {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#finish(layerDetails.groupDivId);
   };
 
   /**
@@ -385,7 +413,8 @@ export class Draw {
    * @param {object} event The mouse out event.
    */
   mouseout = (event) => {
-    this.mouseup(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#finish(layerDetails.groupDivId);
   };
 
   /**
@@ -394,7 +423,9 @@ export class Draw {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    this.mousedown(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -409,11 +440,11 @@ export class Draw {
     }
 
     const layerDetails = getLayerDetailsFromEvent(event);
+    const touchPoints = getTouchPoints(event);
+
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(
-      new Point2D(event._x, event._y)
-    );
+    const pos = viewLayer.displayToPlanePos(touchPoints[0]);
 
     if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
       Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
@@ -823,7 +854,11 @@ export class Draw {
         factory.updateQuantification(group, vc);
       }
       // highlight trash when on it
-      const offset = getEventOffset(event.evt)[0];
+      const mousePoint = getMousePoint(event.evt);
+      const offset = {
+        x: mousePoint.getX(),
+        y: mousePoint.getY()
+      };
       const eventPos = this.#getRealPosition(offset, layerGroup);
       const trashHalfWidth =
         this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
@@ -876,7 +911,11 @@ export class Draw {
       }
       const pos = {x: group.x(), y: group.y()};
       // delete case
-      const offset = getEventOffset(event.evt)[0];
+      const mousePoint = getMousePoint(event.evt);
+      const offset = {
+        x: mousePoint.getX(),
+        y: mousePoint.getY()
+      };
       const eventPos = this.#getRealPosition(offset, layerGroup);
       const trashHalfWidth =
         this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;

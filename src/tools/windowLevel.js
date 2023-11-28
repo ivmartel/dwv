@@ -1,5 +1,8 @@
 import {ScrollWheel} from './scrollWheel';
-import {Point2D} from '../math/point';
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
   validateWindowWidth,
@@ -9,6 +12,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -49,6 +53,13 @@ export class WindowLevel {
   #started = false;
 
   /**
+   * Start point.
+   *
+   * @type {Point2D}
+   */
+  #startPoint;
+
+  /**
    * Scroll wheel handler.
    *
    * @type {ScrollWheel}
@@ -64,37 +75,34 @@ export class WindowLevel {
   }
 
   /**
-   * Handle mouse down event.
+   * Start tool interaction.
    *
-   * @param {object} event The mouse down event.
+   * @param {Point2D} point The start point.
    */
-  mousedown = (event) => {
-    // set start flag
+  #start(point) {
     this.#started = true;
-    // store initial position
-    this.x0 = event._x;
-    this.y0 = event._y;
-  };
+    this.#startPoint = point;
+  }
 
   /**
-   * Handle mouse move event.
+   * Update tool interaction.
    *
-   * @param {object} event The mouse move event.
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
    */
-  mousemove = (event) => {
+  #update(point, divId) {
     // check start flag
     if (!this.#started) {
       return;
     }
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
     // difference to last position
-    const diffX = event._x - this.x0;
-    const diffY = this.y0 - event._y;
+    const diffX = point.getX() - this.#startPoint.getX();
+    const diffY = this.#startPoint.getY() - point.getY();
     // data range
     const range = viewController.getImageRescaledDataRange();
     // 1/1000 seems to give reasonable results...
@@ -112,8 +120,37 @@ export class WindowLevel {
     viewController.setWindowLevel(wl);
 
     // store position
-    this.x0 = event._x;
-    this.y0 = event._y;
+    this.#startPoint = point;
+  }
+
+  /**
+   * Finish tool interaction.
+   */
+  #finish() {
+    if (this.#started) {
+      this.#started = false;
+    }
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    const mousePoint = getMousePoint(event);
+    this.#start(mousePoint);
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  mousemove = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -122,20 +159,16 @@ export class WindowLevel {
    * @param {object} _event The mouse up event.
    */
   mouseup = (_event) => {
-    // set start flag
-    if (this.#started) {
-      this.#started = false;
-    }
+    this.#finish();
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    // treat as mouse up
-    this.mouseup(event);
+  mouseout = (_event) => {
+    this.#finish();
   };
 
   /**
@@ -144,7 +177,8 @@ export class WindowLevel {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    this.mousedown(event);
+    const touchPoints = getTouchPoints(event);
+    this.#start(touchPoints[0]);
   };
 
   /**
@@ -153,16 +187,18 @@ export class WindowLevel {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    this.mousemove(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
-  touchend = (event) => {
-    this.mouseup(event);
+  touchend = (_event) => {
+    this.#finish();
   };
 
   /**
@@ -172,11 +208,11 @@ export class WindowLevel {
    */
   dblclick = (event) => {
     const layerDetails = getLayerDetailsFromEvent(event);
+    const mousePoint = getMousePoint(event);
+
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(
-      new Point2D(event._x, event._y)
-    );
+    const index = viewLayer.displayToPlaneIndex(mousePoint);
     const viewController = viewLayer.getViewController();
     const image = this.#app.getImage(viewLayer.getDataId());
 

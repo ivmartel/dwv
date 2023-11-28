@@ -1,11 +1,15 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {precisionRound} from '../utils/string';
-import {Point2D} from '../math/point';
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic';
 import {ScrollWheel} from './scrollWheel';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -89,6 +93,13 @@ export class Scroll {
   #started = false;
 
   /**
+   * Start point.
+   *
+   * @type {Point2D}
+   */
+  #startPoint;
+
+  /**
    * Scroll wheel handler.
    *
    * @type {ScrollWheel}
@@ -103,6 +114,13 @@ export class Scroll {
   #touchTimerID;
 
   /**
+   * Option to show or not a value tooltip on mousemove.
+   *
+   * @type {boolean}
+   */
+  #displayTooltip = false;
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
@@ -111,64 +129,54 @@ export class Scroll {
   }
 
   /**
-   * Option to show or not a value tooltip on mousemove.
+   * Start tool interaction.
    *
-   * @type {boolean}
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    */
-  #displayTooltip = false;
-
-  /**
-   * Handle mouse down event.
-   *
-   * @param {object} event The mouse down event.
-   */
-  mousedown = (event) => {
+  #start(point, divId) {
     // optional tooltip
     this.#removeTooltipDiv();
 
     // stop viewer if playing
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
+
     // start flag
     this.#started = true;
-    // first position
-    this.x0 = event._x;
-    this.y0 = event._y;
+    this.#startPoint = point;
 
     // update controller position
-    const planePos = viewLayer.displayToPlanePos(
-      new Point2D(event._x, event._y)
-    );
+    const planePos = viewLayer.displayToPlanePos(point);
     const position = viewController.getPositionFromPlanePoint(planePos);
     viewController.setCurrentPosition(position);
-  };
+  }
 
   /**
-   * Handle mouse move event.
+   * Update tool interaction.
    *
-   * @param {object} event The mouse move event.
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
    */
-  mousemove = (event) => {
+  #update(point, divId) {
     if (!this.#started) {
       // optional tooltip
       if (this.#displayTooltip) {
-        this.#showTooltip(event);
+        this.#showTooltip(point, divId);
       }
       return;
     }
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
 
     // difference to last Y position
-    const diffY = event._y - this.y0;
+    const diffY = point.getY() - this.#startPoint.getY();
     const yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
     if (yMove && viewController.canScroll()) {
@@ -181,7 +189,7 @@ export class Scroll {
     }
 
     // difference to last X position
-    const diffX = event._x - this.x0;
+    const diffX = point.getX() - this.#startPoint.getX();
     const xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     const imageSize = viewController.getImageSize();
@@ -195,12 +203,40 @@ export class Scroll {
     }
 
     // reset origin point
-    if (xMove) {
-      this.x0 = event._x;
+    if (xMove || yMove) {
+      this.#startPoint = point;
     }
-    if (yMove) {
-      this.y0 = event._y;
+  }
+
+  /**
+   * Finish tool interaction.
+   */
+  #finish() {
+    if (this.#started) {
+      this.#started = false;
     }
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(mousePoint, layerDetails.groupDivId);
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  mousemove = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -209,19 +245,16 @@ export class Scroll {
    * @param {object} _event The mouse up event.
    */
   mouseup = (_event) => {
-    if (this.#started) {
-      // stop recording
-      this.#started = false;
-    }
+    this.#finish();
   };
 
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    this.mouseup(event);
+  mouseout = (_event) => {
+    this.#finish();
     // remove possible tooltip div
     this.#removeTooltipDiv();
   };
@@ -237,6 +270,10 @@ export class Scroll {
     this.#touchTimerID = setTimeout(() => {
       this.dblclick(event);
     }, 500);
+    // call start
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -250,23 +287,25 @@ export class Scroll {
       clearTimeout(this.#touchTimerID);
       this.#touchTimerID = null;
     }
-    // call mouse equivalent
-    this.mousemove(event);
+    // call update
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
-  touchend = (event) => {
+  touchend = (_event) => {
     // abort timer
     if (this.#touchTimerID !== null) {
       clearTimeout(this.#touchTimerID);
       this.#touchTimerID = null;
     }
     // call mouse equivalent
-    this.mouseup(event);
+    this.#finish();
   };
 
   /**
@@ -295,6 +334,7 @@ export class Scroll {
    */
   dblclick = (event) => {
     const layerDetails = getLayerDetailsFromEvent(event);
+
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -305,20 +345,18 @@ export class Scroll {
    * Displays a tooltip in a temparary `span`.
    * Works with css to hide/show the span only on mouse hover.
    *
-   * @param {object} event The mouse move event.
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
    */
-  #showTooltip(event) {
+  #showTooltip(point, divId) {
     // remove previous div
     this.#removeTooltipDiv();
 
     // get image value at position
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
-    const planePos = viewLayer.displayToPlanePos(
-      new Point2D(event._x, event._y)
-    );
+    const planePos = viewLayer.displayToPlanePos(point);
     const position = viewController.getPositionFromPlanePoint(planePos);
     const value = viewController.getRescaledImageValue(position);
 
@@ -330,8 +368,8 @@ export class Scroll {
       const layerDiv = document.getElementById(viewLayer.getId());
       layerDiv.parentElement.appendChild(span);
       // position tooltip
-      span.style.left = (event._x + 10) + 'px';
-      span.style.top = (event._y + 10) + 'px';
+      span.style.left = (point.getX() + 10) + 'px';
+      span.style.top = (point.getY() + 10) + 'px';
       let text = precisionRound(value, 3).toString();
       if (typeof viewController.getPixelUnit() !== 'undefined') {
         text += ' ' + viewController.getPixelUnit();

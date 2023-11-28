@@ -3,6 +3,10 @@ import {RoiFactory} from '../tools/roi';
 import {guid} from '../math/stats';
 import {Point2D} from '../math/point';
 import {Style} from '../gui/style';
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
@@ -177,16 +181,14 @@ export class Floodfill {
   /**
    * Get (x, y) coordinates referenced to the canvas
    *
-   * @param {object} event The original event.
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    * @returns {object} The coordinates as a {x,y}.
    */
-  #getCoord = (event) => {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  #getIndex = (point, divId) => {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(
-      new Point2D(event._x, event._y)
-    );
+    const index = viewLayer.displayToPlaneIndex(point);
     return {
       x: index.get(0),
       y: index.get(1)
@@ -369,13 +371,13 @@ export class Floodfill {
   }
 
   /**
-   * Handle mouse down event.
+   * Start tool interaction.
    *
-   * @param {object} event The mouse down event.
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    */
-  mousedown = (event) => {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  #start(point, divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const drawLayer = layerGroup.getActiveDrawLayer();
 
@@ -390,9 +392,50 @@ export class Floodfill {
       drawLayer.getKonvaLayer().getAbsoluteScale());
 
     this.#started = true;
-    this.#initialpoint = this.#getCoord(event);
+    this.#initialpoint = this.#getIndex(point, divId);
     this.#paintBorder(this.#initialpoint, this.#initialthreshold, layerGroup);
     this.onThresholdChange(this.#initialthreshold);
+  }
+
+  /**
+   * Update tool interaction.
+   *
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
+   */
+  #update(point, divId) {
+    if (!this.#started) {
+      return;
+    }
+
+    const movedpoint = this.#getIndex(point, divId);
+    this.#currentthreshold = Math.round(Math.sqrt(
+      Math.pow((this.#initialpoint.x - movedpoint.x), 2) +
+      Math.pow((this.#initialpoint.y - movedpoint.y), 2)) / 2);
+    this.#currentthreshold = this.#currentthreshold < this.#initialthreshold
+      ? this.#initialthreshold
+      : this.#currentthreshold - this.#initialthreshold;
+    this.modifyThreshold(this.#currentthreshold);
+  }
+
+  /**
+   * Finish tool interaction.
+   */
+  #finish() {
+    if (this.#started) {
+      this.#started = false;
+    }
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -401,17 +444,9 @@ export class Floodfill {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    if (!this.#started) {
-      return;
-    }
-    const movedpoint = this.#getCoord(event);
-    this.#currentthreshold = Math.round(Math.sqrt(
-      Math.pow((this.#initialpoint.x - movedpoint.x), 2) +
-      Math.pow((this.#initialpoint.y - movedpoint.y), 2)) / 2);
-    this.#currentthreshold = this.#currentthreshold < this.#initialthreshold
-      ? this.#initialthreshold
-      : this.#currentthreshold - this.#initialthreshold;
-    this.modifyThreshold(this.#currentthreshold);
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -420,7 +455,7 @@ export class Floodfill {
    * @param {object} _event The mouse up event.
    */
   mouseup = (_event) => {
-    this.#started = false;
+    this.#finish();
     // TODO: re-activate
     // if (this.#extender) {
     //   const layerDetails = getLayerDetailsFromEvent(event);
@@ -433,10 +468,10 @@ export class Floodfill {
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    this.mouseup(event);
+  mouseout = (_event) => {
+    this.#finish();
   };
 
   /**
@@ -445,8 +480,9 @@ export class Floodfill {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    // treat as mouse down
-    this.mousedown(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -455,18 +491,18 @@ export class Floodfill {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    // treat as mouse move
-    this.mousemove(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
-  touchend = (event) => {
-    // treat as mouse up
-    this.mouseup(event);
+  touchend = (_event) => {
+    this.#finish();
   };
 
   /**

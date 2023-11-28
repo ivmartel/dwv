@@ -1,4 +1,5 @@
 import {logger} from '../utils/logger';
+import {Point2D} from '../math/point';
 
 /**
  * List of interaction event names.
@@ -63,7 +64,7 @@ export const customUI = {
  * Get the positions (without the parent offset) of a list of touch events.
  *
  * @param {Array} touches The list of touch events.
- * @returns {Array} The list of positions of the touch events.
+ * @returns {Point2D[]} The list of positions of the touch events.
  */
 function getTouchesPositions(touches) {
   // get the touch offset from all its parents
@@ -87,21 +88,21 @@ function getTouchesPositions(touches) {
   // set its position
   const positions = [];
   for (let i = 0; i < touches.length; ++i) {
-    positions.push({
-      x: touches[i].pageX - offsetLeft,
-      y: touches[i].pageY - offsetTop
-    });
+    positions.push(new Point2D(
+      touches[i].pageX - offsetLeft,
+      touches[i].pageY - offsetTop
+    ));
   }
   return positions;
 }
 
 /**
- * Get the offset of an input event.
+ * Get the offsets of an input touch event.
  *
  * @param {object} event The event to get the offset from.
- * @returns {Array} The array of offsets.
+ * @returns {Point2D[]} The array of points.
  */
-export function getEventOffset(event) {
+export function getTouchPoints(event) {
   let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
@@ -111,17 +112,25 @@ export function getEventOffset(event) {
     event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
     positions = getTouchesPositions(event.changedTouches);
-  } else {
-    // offsetX/Y: the offset in the X coordinate of the mouse pointer
-    // between that event and the padding edge of the target node
-    // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/offsetX
-    // https://caniuse.com/mdn-api_mouseevent_offsetx
-    positions.push({
-      x: event.offsetX,
-      y: event.offsetY
-    });
   }
   return positions;
+}
+
+/**
+ * Get the offset of an input mouse event.
+ *
+ * @param {object} event The event to get the offset from.
+ * @returns {Point2D} The 2D point.
+ */
+export function getMousePoint(event) {
+  // offsetX/Y: the offset in the X coordinate of the mouse pointer
+  // between that event and the padding edge of the target node
+  // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/offsetX
+  // https://caniuse.com/mdn-api_mouseevent_offsetx
+  return new Point2D(
+    event.offsetX,
+    event.offsetY
+  );
 }
 
 /**
