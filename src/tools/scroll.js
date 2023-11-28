@@ -234,9 +234,9 @@ export class Scroll {
   touchstart = (event) => {
     // long touch triggers the dblclick
     // @ts-ignore
-    this.#touchTimerID = setTimeout(this.dblclick, 500);
-    // call mouse equivalent
-    this.mousedown(event);
+    this.#touchTimerID = setTimeout(() => {
+      this.dblclick(event);
+    }, 500);
   };
 
   /**
