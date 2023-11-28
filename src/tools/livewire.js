@@ -354,7 +354,7 @@ export class Livewire {
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
   touchend = (_event) => {
     // nothing to do
