@@ -143,42 +143,115 @@ QUnit.test('Test patient anonymisation', function (assert) {
   assert.equal(
     rawTags['00100010'].value[0].trim(),
     patientsName,
-    'patientsName');
+    'patientsName #0');
   assert.equal(
     rawTags['00100020'].value[0].trim(),
     patientID,
-    'patientID');
+    'patientID #0');
   assert.equal(
     rawTags['00100030'].value[0].trim(),
     patientsBirthDate,
-    'patientsBirthDate');
+    'patientsBirthDate #0');
   assert.equal(
     rawTags['00100040'].value[0].trim(),
     patientsSex,
-    'patientsSex');
+    'patientsSex #0');
+  assert.notOk(rawTags['00104000'], 'patientsComments #0');
 
+  // write buffer
   const dicomWriter = new DicomWriter();
   dicomWriter.setRules(rules);
   const buffer = dicomWriter.getBuffer(rawTags);
-
+  // parse new buffer
   dicomParser = new DicomParser();
-
   dicomParser.parse(buffer);
-
   rawTags = dicomParser.getDicomElements();
 
   // check values
   assert.equal(
     rawTags['00100010'].value[0],
     patientsNameAnonymised,
-    'patientName');
+    'patientName #1');
   assert.equal(
     rawTags['00100020'].value[0],
     patientsIdAnonymised,
-    'patientID');
-  assert.notOk(rawTags['00100030'], 'patientsBirthDate');
-  assert.notOk(rawTags['00100040'], 'patientsSex');
+    'patientID #1');
+  assert.notOk(rawTags['00100030'], 'patientsBirthDate #1');
+  assert.notOk(rawTags['00100040'], 'patientsSex #1');
+  assert.notOk(rawTags['00104000'], 'patientsComments #1');
 
+});
+
+/**
+ * Tests for {@link DicomWriter} anomnymisation and add tags.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~dicomWriterAnonymiseAddTags
+ */
+QUnit.test('Test patient anonymisation and add tags', function (assert) {
+
+  // parse test DICOM file
+  let dicomParser = new DicomParser();
+  dicomParser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+
+  const patientsName = 'dwv^PatientName';
+  const patientComments = '';
+  const issuerOfPatientID = 'dwv.org';
+  // rule with tagKey, tagName and non existing tag
+  const rules = {
+    default: {
+      action: 'copy', value: null
+    },
+    '00104000': {
+      action: 'replace', value: patientComments
+    },
+    IssuerOfPatientID: {
+      action: 'replace', value: issuerOfPatientID
+    },
+    PatientBirthDateInAlternativeCalendar: {
+      action: 'replace', value: null
+    },
+    BADKEY00: {
+      action: 'replace', value: ''
+    }
+  };
+
+
+  // initial tags
+  let rawTags = dicomParser.getDicomElements();
+
+  // check values
+  assert.equal(
+    rawTags['00100010'].value[0].trim(),
+    patientsName,
+    'patientsName #0');
+  assert.notOk(rawTags['00100033'], 'null replace #0');
+  assert.notOk(rawTags['00104000'], 'patientsComments #0');
+  assert.notOk(rawTags['00100021'], 'issuerOfPatientID #0');
+
+  // write buffer
+  const dicomWriter = new DicomWriter();
+  dicomWriter.setRules(rules, true);
+  const buffer = dicomWriter.getBuffer(rawTags);
+  // parse new buffer
+  dicomParser = new DicomParser();
+  dicomParser.parse(buffer);
+  rawTags = dicomParser.getDicomElements();
+
+  // check values
+  assert.equal(
+    rawTags['00100010'].value[0],
+    patientsName,
+    'patientName #1');
+  assert.notOk(rawTags['00100033'], 'null replace #1');
+  assert.equal(
+    rawTags['00104000'].value[0],
+    patientComments,
+    'patientComments #1');
+  assert.equal(
+    rawTags['00100021'].value[0],
+    issuerOfPatientID,
+    'issuerOfPatientID #1');
 });
 
 /**

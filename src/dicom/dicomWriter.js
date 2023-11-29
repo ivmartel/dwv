@@ -349,16 +349,63 @@ export class DicomWriter {
   #rules = this.#defaultRules;
 
   /**
+   * List of compulsory tags keys.
+   *
+   * @type {string[]}
+   */
+  #compulsoryTags = [];
+
+  /**
    * Set the writing rules.
-   * List of writer rules indexed by either `default`, tagName or groupName.
+   * List of writer rules indexed by either `default`,
+   *   tagKey, tagName or groupName.
    * Each DICOM element will be checked to see if a rule is applicable.
-   * First checked by tagName and then by groupName,
+   * First checked by tagKey, tagName and then by groupName,
    * if nothing is found the default rule is applied.
    *
    * @param {Object<string, WriterRule>} rules The input rules.
+   * @param {boolean} [addMissingTags] if true, explicit tags that
+   *   have replace rule and a value will be
+   *   added if missing. Defaults to false.
    */
-  setRules(rules) {
+  setRules(rules, addMissingTags) {
     this.#rules = rules;
+
+    // default compulsory list is empty
+    this.#compulsoryTags = [];
+
+    // use replace rule tags as compulsory tags
+    if (addMissingTags) {
+      const keys = Object.keys(rules);
+      for (const key of keys) {
+        const rule = rules[key];
+        if (rule.action === 'replace' &&
+          typeof rule.value !== 'undefined' &&
+          rule.value !== null) {
+          // check if key really exists
+          let isKey = false;
+          if (key.length === 8) {
+            const tag = getTagFromKey(key);
+            isKey = typeof tag.getNameFromDictionary() !== 'undefined';
+          }
+          // get tag key, rules can use key or tag name
+          let tagKey;
+          if (isKey) {
+            tagKey = key;
+          } else {
+            // try tag name
+            const tag = getTagFromDictionary(key);
+            if (typeof tag !== 'undefined') {
+              tagKey = tag.getKey();
+            }
+          }
+          // add to list
+          if (typeof tagKey !== 'undefined') {
+            this.#compulsoryTags.push(tagKey);
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -817,6 +864,9 @@ export class DicomWriter {
     // ImplementationVersionName
     const ivnTag = new Tag('0002', '0013');
 
+    // missing tag list: start as a copy of compulsory
+    const missingTags = this.#compulsoryTags.slice();
+
     // loop through elements to get the buffer size
     const keys = Object.keys(dataElements);
     for (let i = 0, leni = keys.length; i < leni; ++i) {
@@ -829,6 +879,12 @@ export class DicomWriter {
         !icUIDTag.equals(element.tag) &&
         !ivnTag.equals(element.tag)) {
         localSize = 0;
+
+        // check if compulsory tag, if present remove from missing list
+        const index = missingTags.indexOf(element.tag.getKey());
+        if (index !== -1) {
+          missingTags.splice(index, 1);
+        }
 
         // XB7 2020-04-17
         // Check if UN can be converted to correct VR.
@@ -866,6 +922,27 @@ export class DicomWriter {
         // add to total size
         totalSize += localSize;
       }
+    }
+
+    // add compulsory tags to output data if not present
+    for (const key of missingTags) {
+      const tag = getTagFromKey(key);
+      const info = tag.getInfoFromDictionary();
+      const dataElement = new DataElement(info[0]);
+      dataElement.tag = tag;
+      // rules are indexed by key or tag name
+      let value;
+      if (typeof this.#rules[key] !== 'undefined') {
+        value = this.#rules[key].value;
+      } else {
+        const name = info[2];
+        value = this.#rules[name].value;
+      }
+      // add element
+      let size = getDataElementPrefixByteSize(dataElement.vr, false);
+      size += this.#setElementValue(dataElement, [value], false);
+      rawElements.push(dataElement);
+      totalSize += size;
     }
 
     // FileMetaInformationVersion
