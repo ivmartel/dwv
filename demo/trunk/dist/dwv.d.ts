@@ -906,16 +906,20 @@ export declare class DicomWriter {
     setUseUnVrForPrivateSq(flag: boolean): void;
     /**
      * Set the writing rules.
-     * List of writer rules indexed by either `default`, tagName or groupName.
+     * List of writer rules indexed by either `default`,
+     *   tagKey, tagName or groupName.
      * Each DICOM element will be checked to see if a rule is applicable.
-     * First checked by tagName and then by groupName,
+     * First checked by tagKey, tagName and then by groupName,
      * if nothing is found the default rule is applied.
      *
      * @param {Object<string, WriterRule>} rules The input rules.
+     * @param {boolean} [addMissingTags] if true, explicit tags that
+     *   have replace rule and a value will be
+     *   added if missing. Defaults to false.
      */
     setRules(rules: {
         [x: string]: WriterRule;
-    }): void;
+    }, addMissingTags?: boolean): void;
     /**
      * Use a TextEncoder instead of the default text decoder.
      */
