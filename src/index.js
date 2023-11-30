@@ -37,7 +37,11 @@ import {
   getPixelDataTag
 } from './dicom/dicomTag';
 // gui
-import {customUI} from './gui/generic';
+import {
+  customUI,
+  getMousePoint,
+  getTouchPoints
+} from './gui/generic';
 import {
   LayerGroup,
   getLayerDetailsFromEvent
@@ -158,6 +162,8 @@ export {
   getPixelDataTag,
   getOrientationName,
   getReverseOrientation,
+  getMousePoint,
+  getTouchPoints,
   hasDicomPrefix,
   precisionRound,
   buildMultipart,
