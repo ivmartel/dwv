@@ -1472,8 +1472,18 @@ function setupTests() {
   renderTestButton.onclick = runRenderTest;
   renderTestButton.appendChild(document.createTextNode('render test'));
 
+  const saveState = document.createElement('a');
+  saveState.appendChild(document.createTextNode('save state'));
+  saveState.href = '';
+  saveState.onclick = function () {
+    const blob = new Blob([_app.getJsonState()], {type: 'application/json'});
+    saveState.href = window.URL.createObjectURL(blob);
+  };
+  saveState.download = 'state.json';
+
   const testsDiv = document.getElementById('tests');
   testsDiv.appendChild(renderTestButton);
+  testsDiv.appendChild(saveState);
 }
 
 /**
