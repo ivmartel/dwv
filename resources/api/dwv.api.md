@@ -76,7 +76,7 @@ export class App {
     setImage(dataId: string, img: Image_2): void;
     setImageSmoothing(flag: boolean): void;
     setLastImage(img: Image_2): void;
-    setLayerGroupsBinders(list: any[]): void;
+    setLayerGroupsBinders(list: string[]): void;
     // @deprecated
     setOpacity(alpha: number): void;
     setTool(tool: string): void;
@@ -205,7 +205,7 @@ export class DicomWriter {
     getElementToWrite(element: DataElement): DataElement | null;
     setRules(rules: {
         [x: string]: WriterRule;
-    }): void;
+    }, addMissingTags?: boolean): void;
     setUseUnVrForPrivateSq(flag: boolean): void;
     useDefaultAnonymisationRules(): void;
     useSpecialTextEncoder(): void;
@@ -321,13 +321,13 @@ export function getElementsFromJSONTags(simpleTags: {
 };
 
 // @public
-export function getEllipseIndices(center: Index, radius: any[], dir: any[]): any[];
+export function getEllipseIndices(center: Index, radius: number[], dir: number[]): Index[];
 
 // @public
 export function getLayerDetailsFromEvent(event: object): object;
 
 // @public
-export function getOrientationName(orientation: any[]): string;
+export function getOrientationName(orientation: number[]): string;
 
 // @public
 export function getPixelDataTag(): Tag;
@@ -354,7 +354,7 @@ export namespace i18n {
 
 // @public
 class Image_2 {
-    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: any[]);
+    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: string[]);
     addEventListener(type: string, callback: Function): void;
     appendFrame(time: number, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
@@ -369,8 +369,8 @@ class Image_2 {
     clone(): Image_2;
     compose(rhs: Image_2, operator: Function): Image_2;
     containsImageUids(uids: string[]): boolean;
-    convolute2D(weights: any[]): Image_2;
-    convoluteBuffer(weights: any[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
+    convolute2D(weights: number[]): Image_2;
+    convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
     getDataRange(): object;
     getGeometry(): Geometry;
@@ -380,7 +380,7 @@ class Image_2 {
         [x: string]: any;
     };
     getNumberOfComponents(): number;
-    getOffsets(value: number | object): any[];
+    getOffsets(value: number | RGB): number[];
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
     getRescaledDataRange(): object;
@@ -392,14 +392,14 @@ class Image_2 {
     getValue(i: number, j: number, k: number, f: number): number;
     getValueAtIndex(index: Index): number;
     getValueAtOffset(offset: number): number;
-    hasValues(values: any[]): any[];
+    hasValues(values: any[]): boolean[];
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
     isMonochrome(): boolean;
     removeEventListener(type: string, callback: Function): void;
-    setAtOffsets(offsets: any[], value: object): void;
-    setAtOffsetsAndGetOriginals(offsetsLists: any[], value: object): any[];
-    setAtOffsetsWithIterator(offsetsLists: any[], value: object | any[]): void;
+    setAtOffsets(offsets: number[], value: number | RGB): void;
+    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: object | any[]): void;
     setMeta(rhs: {
         [x: string]: any;
     }): void;
@@ -453,7 +453,7 @@ export class LayerGroup {
     getOffset(): object;
     getScale(): object;
     getShowCrosshair(): boolean;
-    getViewDataIndices(): any[];
+    getViewDataIndices(): string[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     removeEventListener(type: string, callback: Function): void;
     removeLayer(layer: ViewLayer | DrawLayer): void;
@@ -507,8 +507,9 @@ export const luts: {
 
 // @public
 export class MaskFactory {
-    // (undocumented)
-    checkElements(_dicomElements: any): void;
+    checkElements(_dicomElements: {
+        [x: string]: DataElement;
+    }): object | undefined;
     create(dataElements: {
         [x: string]: DataElement;
     }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
@@ -612,8 +613,6 @@ export class Point {
 export class Point2D {
     constructor(x: number, y: number);
     equals(rhs: Point2D): boolean;
-    getDistance(point2D: Point2D): number;
-    getRound(): Point2D;
     getX(): number;
     getY(): number;
     toString(): string;
@@ -655,7 +654,7 @@ export class RGB {
 
 // @public
 export class Size {
-    constructor(values: any[]);
+    constructor(values: number[]);
     canScroll(viewOrientation: Matrix33): boolean;
     canScroll3D(viewOrientation?: Matrix33): boolean;
     equals(rhs: Size): boolean;
@@ -663,9 +662,9 @@ export class Size {
     get2D(): object;
     getDimSize(dimension: number, start?: number): number;
     getTotalSize(start?: number): number;
-    getValues(): any[];
+    getValues(): number[];
     indexToOffset(index: Index, start?: number): number;
-    isInBounds(index: Index, dirs: any[]): boolean;
+    isInBounds(index: Index, dirs: number[]): boolean;
     length(): number;
     moreThanOne(dimension: number): boolean;
     offsetToIndex(offset: number): Index;
@@ -674,11 +673,11 @@ export class Size {
 
 // @public
 export class Spacing {
-    constructor(values: any[]);
+    constructor(values: number[]);
     equals(rhs: Spacing): boolean;
     get(i: number): number;
     get2D(): object;
-    getValues(): any[];
+    getValues(): number[];
     length(): number;
     toString(): string;
 }
@@ -814,7 +813,7 @@ export class ViewController {
     deleteSegment(segmentNumber: number, exeCallback: Function): void;
     equalImageMeta(meta: object): boolean;
     generateImageData(array: ImageData, index?: Index): void;
-    get2DSpacing(): any[];
+    get2DSpacing(): number[];
     getColourMap(): string;
     getCurrentIndex(): Index;
     getCurrentOrientedIndex(): Index;
@@ -833,9 +832,9 @@ export class ViewController {
     getOrigin(position?: Point): Point3D;
     getPixelUnit(): string;
     getPlaneHelper(): PlaneHelper;
-    getPlanePositionFromPlanePoint(point2D: object): Point3D;
-    getPlanePositionFromPosition(point: Point): object;
-    getPositionFromPlanePoint(x: number, y: number): Point;
+    getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
+    getPlanePositionFromPosition(point: Point): Point2D;
+    getPositionFromPlanePoint(point2D: Point2D): Point;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
     getWindowLevel(): WindowLevel;
@@ -868,10 +867,10 @@ export class ViewLayer {
     bindInteraction(): void;
     clear(): void;
     display(flag: boolean): void;
-    displayToMainPlanePos(x: number, y: number): object;
-    displayToPlaneIndex(x: number, y: number): Index;
-    displayToPlanePos(x: number, y: number): object;
-    displayToPlaneScale(x: number, y: number): object;
+    displayToMainPlanePos(point2D: Point2D): Point2D;
+    displayToPlaneIndex(point2D: Point2D): Index;
+    displayToPlanePos(point2D: Point2D): Point2D;
+    displayToPlaneScale(point2D: Point2D): Point2D;
     draw(): void;
     fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
     flipScaleX(): void;
@@ -888,7 +887,7 @@ export class ViewLayer {
     isVisible(): boolean;
     onimagechange: (event: object) => void;
     onimageset: (event: object) => void;
-    planePosToDisplay(x: number, y: number): object;
+    planePosToDisplay(point2D: Point2D): Point2D;
     removeEventListener(type: string, callback: Function): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
