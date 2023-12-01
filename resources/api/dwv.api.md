@@ -327,6 +327,9 @@ export function getEllipseIndices(center: Index, radius: number[], dir: number[]
 export function getLayerDetailsFromEvent(event: object): object;
 
 // @public
+export function getMousePoint(event: object): Point2D;
+
+// @public
 export function getOrientationName(orientation: number[]): string;
 
 // @public
@@ -337,6 +340,9 @@ export function getReverseOrientation(ori: string): string;
 
 // @public
 export function getTagFromKey(key: string): Tag;
+
+// @public
+export function getTouchPoints(event: object): Point2D[];
 
 // @public
 export function getTypedArray(bitsAllocated: number, pixelRepresentation: number, size: number): Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array;

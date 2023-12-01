@@ -1548,6 +1548,14 @@ export declare function getEllipseIndices(center: Index, radius: number[], dir: 
 export declare function getLayerDetailsFromEvent(event: object): object;
 
 /**
+ * Get the offset of an input mouse event.
+ *
+ * @param {object} event The event to get the offset from.
+ * @returns {Point2D} The 2D point.
+ */
+export declare function getMousePoint(event: object): Point2D;
+
+/**
  * Get the name of an image orientation patient.
  *
  * @param {number[]} orientation The image orientation patient.
@@ -1577,6 +1585,14 @@ export declare function getReverseOrientation(ori: string): string;
  * @returns {Tag} The DICOM tag.
  */
 export declare function getTagFromKey(key: string): Tag;
+
+/**
+ * Get the offsets of an input touch event.
+ *
+ * @param {object} event The event to get the offset from.
+ * @returns {Point2D[]} The array of points.
+ */
+export declare function getTouchPoints(event: object): Point2D[];
 
 /**
  * Get the appropriate TypedArray in function of arguments.
