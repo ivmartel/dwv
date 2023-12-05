@@ -1013,14 +1013,6 @@ export class DicomParser {
       data = Array.from(reader.readUint16Array(offset, vl));
     } else if (vr === 'ox') {
       // OB or OW
-      // check bits allocated and VR
-      // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
-      if (bitsAllocated > 8 && vr === 'OB') {
-        logger.warn(
-          'Reading DICOM data with bitsAllocated>8 and OB VR, treating as OW'
-        );
-        element.vr = 'OW';
-      }
       if (bitsAllocated === 8) {
         if (pixelRepresentation === 0) {
           data = Array.from(reader.readUint8Array(offset, vl));
