@@ -1054,11 +1054,23 @@ export class DicomParser {
         const item = element.items[k];
         const itemData = {};
         const keys = Object.keys(item);
+        let sqBitsAllocated = bitsAllocated;
+        let sqPixelRepresentation = pixelRepresentation;
         for (let l = 0; l < keys.length; ++l) {
+          // check if local bitsAllocated
+          if (typeof item['00280100'] !== 'undefined' &&
+            typeof item['00280100'].value !== 'undefined') {
+            sqBitsAllocated = item['00280100'].value[0];
+          }
+          // check if local pixelRepresentation
+          if (typeof item['00280103'] !== 'undefined' &&
+            typeof item['00280103'].value !== 'undefined') {
+            sqPixelRepresentation = item['00280103'].value[0];
+          }
           const subElement = item[keys[l]];
           subElement.value = this.#interpretElement(
             subElement, reader,
-            pixelRepresentation, bitsAllocated);
+            sqPixelRepresentation, sqBitsAllocated);
           delete subElement.tag;
           delete subElement.vl;
           delete subElement.startOffset;
