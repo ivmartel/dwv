@@ -1,5 +1,6 @@
 import {
   Tag,
+  getTransferSyntaxUIDTag,
   isSequenceDelimitationItemTag,
   isItemDelimitationItemTag,
   isPixelDataTag
@@ -445,7 +446,7 @@ function guessTransferSyntax(firstDataElement) {
   }
   // set transfer syntax data element
   const dataElement = new DataElement('UI');
-  dataElement.tag = new Tag('0002', '0010');
+  dataElement.tag = getTransferSyntaxUIDTag();
   dataElement.value = [syntax];
   dataElement.vl = dataElement.value[0].length;
   dataElement.startOffset = firstDataElement.startOffset;
@@ -535,6 +536,18 @@ function isKnownVR(vr) {
   const knownTypes = Object.keys(vrTypes).concat(extraVrTypes);
   return knownTypes.includes(vr);
 }
+
+/**
+ * Small list of used tag keys.
+ */
+const TagKeys = {
+  TransferSyntax: '00020010',
+  SpecificCharacterSet: '00080005',
+  NumberOfFrames: '00280008',
+  BitsAllocated: '00280100',
+  PixelRepresentation: '00280103',
+  PixelData: '7FE00010'
+};
 
 /**
  * DicomParser class.
@@ -1058,14 +1071,16 @@ export class DicomParser {
         let sqPixelRepresentation = pixelRepresentation;
         for (let l = 0; l < keys.length; ++l) {
           // check if local bitsAllocated
-          if (typeof item['00280100'] !== 'undefined' &&
-            typeof item['00280100'].value !== 'undefined') {
-            sqBitsAllocated = item['00280100'].value[0];
+          let dataElement = item[TagKeys.BitsAllocated];
+          if (typeof dataElement !== 'undefined' &&
+            typeof dataElement.value !== 'undefined') {
+            sqBitsAllocated = dataElement.value[0];
           }
           // check if local pixelRepresentation
-          if (typeof item['00280103'] !== 'undefined' &&
-            typeof item['00280103'].value !== 'undefined') {
-            sqPixelRepresentation = item['00280103'].value[0];
+          dataElement = item[TagKeys.PixelRepresentation];
+          if (typeof dataElement !== 'undefined' &&
+            typeof dataElement.value !== 'undefined') {
+            sqPixelRepresentation = dataElement.value[0];
           }
           const subElement = item[keys[l]];
           subElement.value = this.#interpretElement(
@@ -1162,7 +1177,7 @@ export class DicomParser {
       }
 
       // check the TransferSyntaxUID (has to be there!)
-      dataElement = this.#dataElements['00020010'];
+      dataElement = this.#dataElements[TagKeys.TransferSyntax];
       if (typeof dataElement === 'undefined') {
         throw new Error('Not a valid DICOM file (no TransferSyntaxUID found)');
       }
@@ -1229,9 +1244,9 @@ export class DicomParser {
     // pixel specific
     let pixelRepresentation = 0;
     let bitsAllocated = 16;
-    if (typeof this.#dataElements['7FE00010'] !== 'undefined') {
+    if (typeof this.#dataElements[TagKeys.PixelData] !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
-      dataElement = this.#dataElements['00280103'];
+      dataElement = this.#dataElements[TagKeys.PixelRepresentation];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.#interpretElement(dataElement, dataReader);
         pixelRepresentation = dataElement.value[0];
@@ -1241,7 +1256,7 @@ export class DicomParser {
       }
 
       // BitsAllocated
-      dataElement = this.#dataElements['00280100'];
+      dataElement = this.#dataElements[TagKeys.BitsAllocated];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.#interpretElement(dataElement, dataReader);
         bitsAllocated = dataElement.value[0];
@@ -1256,7 +1271,7 @@ export class DicomParser {
     }
 
     // SpecificCharacterSet
-    dataElement = this.#dataElements['00080005'];
+    dataElement = this.#dataElements[TagKeys.SpecificCharacterSet];
     if (typeof dataElement !== 'undefined') {
       dataElement.value = this.#interpretElement(dataElement, dataReader);
       let charSetTerm;
@@ -1279,12 +1294,14 @@ export class DicomParser {
     // handle fragmented pixel buffer
     // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
-    dataElement = this.#dataElements['7FE00010'];
+    dataElement = this.#dataElements[TagKeys.PixelData];
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
         let numberOfFrames = 1;
-        if (typeof this.#dataElements['00280008'] !== 'undefined') {
-          numberOfFrames = Number(this.#dataElements['00280008'].value[0]);
+        if (typeof this.#dataElements[TagKeys.NumberOfFrames] !== 'undefined') {
+          numberOfFrames = Number(
+            this.#dataElements[TagKeys.NumberOfFrames].value[0]
+          );
         }
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {
