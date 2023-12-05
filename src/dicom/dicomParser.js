@@ -1012,9 +1012,17 @@ export class DicomParser {
     } else if (vr === 'ox') {
       // OB or OW
       if (bitsAllocated === 8) {
-        data = Array.from(reader.readUint8Array(offset, vl));
+        if (pixelRepresentation === 0) {
+          data = Array.from(reader.readUint8Array(offset, vl));
+        } else {
+          data = Array.from(reader.readInt8Array(offset, vl));
+        }
       } else {
-        data = Array.from(reader.readUint16Array(offset, vl));
+        if (pixelRepresentation === 0) {
+          data = Array.from(reader.readUint16Array(offset, vl));
+        } else {
+          data = Array.from(reader.readInt16Array(offset, vl));
+        }
       }
     } else if (vr === 'xs') {
       // (US or SS) or (US or SS or OW)
