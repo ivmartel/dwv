@@ -643,6 +643,13 @@ export class DicomWriter {
           const atValue = [dec1, dec2];
           byteOffset = writer.writeUint16Array(byteOffset, atValue);
         }
+      } else if (element.vr === 'xs') {
+        // TODO would be better to use pixelRepresentation in if
+        if (value instanceof Int16Array) {
+          byteOffset = writer.writeInt16Array(byteOffset, value);
+        } else {
+          byteOffset = writer.writeUint16Array(byteOffset, value);
+        }
       } else {
         logger.warn('Unknown VR: ' + element.vr);
       }

@@ -298,7 +298,7 @@
 },
 {
     "name": "lee-08",
-    "description": "Little Endian Explicit test data with mulitple VRs.",
+    "description": "Little Endian Explicit test data with multiple VRs.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
@@ -313,6 +313,7 @@
         "BitsAllocated": 16,
         "BitsStored": 12,
         "HighBit": 11,
+        "SmallestImagePixelValue": 0,
         "PrivateSQ": {
             "value": [
                 {
