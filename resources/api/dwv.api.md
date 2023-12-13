@@ -11,7 +11,8 @@ export function addTagsToDictionary(group: string, tags: object): void;
 
 // @public
 export class App {
-    abortLoad(): void;
+    abortAllLoads(): void;
+    abortLoad(dataId: string): void;
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
     addNewImage(image: Image_2, meta: object, source: string): string;
@@ -59,7 +60,7 @@ export class App {
     onKeydown: (event: KeyboardEvent) => void;
     onResize: () => void;
     redo(): void;
-    removeDataViewConfig(dataId: string, config: ViewConfig): void;
+    removeDataViewConfig(dataId: string, divId: string): void;
     removeEventListener(type: string, callback: Function): void;
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
     reset(): void;

@@ -294,9 +294,15 @@ export declare class App {
      */
     loadImageObject: (data: any[]) => void;
     /**
-     * Abort the current load.
+     * Abort all the current loads.
      */
-    abortLoad(): void;
+    abortAllLoads(): void;
+    /**
+     * Abort an individual data load.
+     *
+     * @param {string} dataId The data to stop loading.
+     */
+    abortLoad(dataId: string): void;
     /**
      * Fit the display to the data of each layer group.
      * To be called once the image is loaded.
@@ -364,9 +370,9 @@ export declare class App {
      * Remove a data view config.
      *
      * @param {string} dataId The data id.
-     * @param {ViewConfig} config The view configuration.
+     * @param {string} divId The div id.
      */
-    removeDataViewConfig(dataId: string, config: ViewConfig): void;
+    removeDataViewConfig(dataId: string, divId: string): void;
     /**
      * Update an existing data view config.
      * Removes and re-creates the layer if found.
