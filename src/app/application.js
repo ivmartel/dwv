@@ -948,9 +948,9 @@ export class App {
    * Remove a data view config.
    *
    * @param {string} dataId The data id.
-   * @param {ViewConfig} config The view configuration.
+   * @param {string} divId The div id.
    */
-  removeDataViewConfig(dataId, config) {
+  removeDataViewConfig(dataId, divId) {
     // remove from list
     const configs = this.#options.dataViewConfigs;
     if (typeof configs[dataId] === 'undefined') {
@@ -958,7 +958,7 @@ export class App {
       return;
     }
     const equalDivId = function (item) {
-      return item.divId === config.divId;
+      return item.divId === divId;
     };
     const itemIndex = configs[dataId].findIndex(equalDivId);
     if (itemIndex === -1) {
@@ -972,7 +972,7 @@ export class App {
 
     // data is loaded, remove view
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      const lg = this.#stage.getLayerGroupByDivId(config.divId);
+      const lg = this.#stage.getLayerGroupByDivId(divId);
       if (typeof lg !== 'undefined') {
         const vls = lg.getViewLayersByDataId(dataId);
         if (vls.length === 1) {

@@ -1158,7 +1158,7 @@ function addDataRow(dataId) {
     button.appendChild(document.createTextNode('-'));
     button.onclick = function () {
       // update app
-      _app.removeDataViewConfig(dataId, getViewConfig(divId));
+      _app.removeDataViewConfig(dataId, divId);
       // update html
       const parent = button.parentElement;
       parent.replaceChildren();
