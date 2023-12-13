@@ -799,10 +799,19 @@ export class App {
   };
 
   /**
-   * Abort the current load.
+   * Abort all the current loads.
    */
-  abortLoad() {
-    this.#loadController.abort();
+  abortAllLoads() {
+    this.#loadController.abortAll();
+  }
+
+  /**
+   * Abort an individual data load.
+   *
+   * @param {string} dataId The data to stop loading.
+   */
+  abortLoad(dataId) {
+    this.#loadController.abort(dataId);
   }
 
   // load API [end] ---------------------------------------------------------

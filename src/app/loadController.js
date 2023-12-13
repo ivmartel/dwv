@@ -79,13 +79,24 @@ export class LoadController {
   }
 
   /**
-   * Abort the current loaders.
+   * Abort all the current loaders.
    */
-  abort() {
+  abortAll() {
     const keys = Object.keys(this.#currentLoaders);
     for (let i = 0; i < keys.length; ++i) {
-      this.#currentLoaders[i].loader.abort();
-      delete this.#currentLoaders[i];
+      this.abort(keys[i]);
+    }
+  }
+
+  /**
+   * Abort an individual current loader.
+   *
+   * @param {string} dataId The data to stop loading.
+   */
+  abort(dataId) {
+    if (typeof this.#currentLoaders[dataId] !== 'undefined') {
+      this.#currentLoaders[dataId].loader.abort();
+      delete this.#currentLoaders[dataId];
     }
   }
 
