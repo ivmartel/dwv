@@ -40,11 +40,23 @@ export class ImageFactory {
    * Check dicom elements. Throws an error if not suitable.
    *
    * @param {DataElements} dataElements The DICOM data elements.
-   * @returns {object|undefined} A possible warning.
+   * @returns {string|undefined} A possible warning.
    */
   checkElements(dataElements) {
+    let warn;
     // will throw if columns or rows is not defined
     getImage2DSize(dataElements);
+    // check PET SUV
+    let modality;
+    const element = dataElements['00080060'];
+    if (typeof element !== 'undefined') {
+      modality = element.value[0];
+      if (modality === 'PT') {
+        warn = canGetSuvFactor(dataElements);
+      }
+    }
+
+    return warn;
   }
 
   /**
