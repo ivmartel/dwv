@@ -79,13 +79,12 @@ export class LoadController {
   }
 
   /**
-   * Abort all the current loaders.
+   * Get the currently loaded data ids.
+   *
+   * @returns {string[]} The data ids.
    */
-  abortAll() {
-    const keys = Object.keys(this.#currentLoaders);
-    for (let i = 0; i < keys.length; ++i) {
-      this.abort(keys[i]);
-    }
+  getLoadingDataIds() {
+    return Object.keys(this.#currentLoaders);
   }
 
   /**
