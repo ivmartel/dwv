@@ -92,12 +92,23 @@ function viewerSetup() {
   _app = new dwv.App();
   _app.init(options);
 
+  // abort shortcut handler
+  const abortShortcut = function (event) {
+    if (event.key === 'a') {
+      _app.abortAllLoads();
+    }
+  };
+
   // bind events
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
+    // abort load
+    _app.abortLoad(event.dataid);
   });
   _app.addEventListener('loadstart', function (event) {
     console.time('load-data-' + event.dataid);
+    // add abort shortcut
+    window.addEventListener('keydown', abortShortcut);
     // update data view config
     const dataIds = [event.dataid];
     let configs;
@@ -139,6 +150,8 @@ function viewerSetup() {
   });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.dataid);
+    // remove abort shortcut
+    window.removeEventListener('keydown', abortShortcut);
   });
 
   let dataLoad = 0;
