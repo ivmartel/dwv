@@ -802,7 +802,10 @@ export class App {
    * Abort all the current loads.
    */
   abortAllLoads() {
-    this.#loadController.abortAll();
+    const ids = this.#loadController.getLoadingDataIds();
+    for (const id of ids) {
+      this.abortLoad(id);
+    }
   }
 
   /**
@@ -811,7 +814,12 @@ export class App {
    * @param {string} dataId The data to stop loading.
    */
   abortLoad(dataId) {
+    // abort load
     this.#loadController.abort(dataId);
+    // remove data
+    this.#dataController.remove(dataId);
+    // clean up stage
+    this.#stage.removeLayersByDataId(dataId);
   }
 
   // load API [end] ---------------------------------------------------------
