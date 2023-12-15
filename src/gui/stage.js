@@ -324,6 +324,17 @@ export class Stage {
   }
 
   /**
+   * Remove all layers for a specific data.
+   *
+   * @param {string} dataId The data to remove its layers.
+   */
+  removeLayersByDataId(dataId) {
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.removeLayersByDataId(dataId);
+    }
+  }
+
+  /**
    * Remove a layer group from this stage.
    *
    * @param {LayerGroup} layerGroup The layer group to remove.

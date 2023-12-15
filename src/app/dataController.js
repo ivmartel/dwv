@@ -148,6 +148,26 @@ export class DataController {
   }
 
   /**
+   * Remove a data from the list.
+   *
+   * @param {string} dataId The data id.
+   */
+  remove(dataId) {
+    if (typeof this.#dataList[dataId] !== 'undefined') {
+      // stop listeners
+      this.#dataList[dataId].image.removeEventListener(
+        'imagechange', this.#getFireEvent(dataId));
+      // fire an image remove event
+      this.#fireEvent({
+        type: 'imageremove',
+        dataid: dataId
+      });
+      // remove data from list
+      delete this.#dataList[dataId];
+    }
+  }
+
+  /**
    * Update the current data.
    *
    * @param {string} dataId The data id.

@@ -709,6 +709,20 @@ export class LayerGroup {
   }
 
   /**
+   * Remove all layers for a specific data.
+   *
+   * @param {string} dataId The data to remove its layers.
+   */
+  removeLayersByDataId(dataId) {
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer.getDataId() === dataId) {
+        this.removeLayer(layer);
+      }
+    }
+  }
+
+  /**
    * Remove a layer from this layer group.
    * Warning: if current active layer, the index will
    *   be set to `undefined`. Call one of the setActive
@@ -726,7 +740,11 @@ export class LayerGroup {
     if (layer instanceof ViewLayer) {
       this.#unbindViewLayer(layer);
       if (this.#activeViewLayerIndex === index) {
-        this.#activeViewLayerIndex = undefined;
+        if (index - 2 >= 0) {
+          this.setActiveViewLayer(index - 2);
+        } else {
+          this.#activeViewLayerIndex = undefined;
+        }
       }
     } else {
       // delete layer draws
@@ -747,7 +765,11 @@ export class LayerGroup {
       }
       // reset active index
       if (this.#activeDrawLayerIndex === index) {
-        this.#activeDrawLayerIndex = undefined;
+        if (index - 2 >= 0) {
+          this.setActiveDrawLayer(index - 2);
+        } else {
+          this.#activeDrawLayerIndex = undefined;
+        }
       }
     }
     // reset in storage
