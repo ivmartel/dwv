@@ -331,7 +331,8 @@ function getCode(dataElements) {
   } else if (dataElements['00080120']) {
     code.urnValue = dataElements['00080120'].value[0];
   } else {
-    throw Error('Invalid code with no value, no long value and no urn value.');
+    throw new Error(
+      'Invalid code with no value, no long value and no urn value.');
   }
   // schemeDesignator -> CodingSchemeDesignator (type1C)
   if (typeof code.value !== 'undefined' ||
@@ -339,7 +340,7 @@ function getCode(dataElements) {
     if (dataElements['00080102']) {
       code.schemeDesignator = dataElements['00080102'].value[0];
     } else {
-      throw Error(
+      throw new Error(
         'No coding sheme designator when code value or long value is present');
     }
   }
@@ -469,14 +470,14 @@ function getSegment(dataElements) {
     segment.propertyCategoryCode =
       getCode(dataElements['00620003'].value[0]);
   } else {
-    throw Error('Missing Segmented Property Category Code Sequence.');
+    throw new Error('Missing Segmented Property Category Code Sequence.');
   }
   // Segmented Property Type Code Sequence (type1)
   if (typeof dataElements['0062000F'] !== 'undefined') {
     segment.propertyTypeCode =
       getCode(dataElements['0062000F'].value[0]);
   } else {
-    throw Error('Missing Segmented Property Type Code Sequence.');
+    throw new Error('Missing Segmented Property Type Code Sequence.');
   }
   // tracking Id and UID (type1C)
   if (typeof dataElements['00620020'] !== 'undefined') {

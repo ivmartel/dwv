@@ -628,7 +628,7 @@ export class DicomWriter {
         } else if (vrType === 'string') {
           byteOffset = writer.writeUint8Array(byteOffset, value);
         } else {
-          throw Error('Unknown VR type: ' + vrType);
+          throw new Error('Unknown VR type: ' + vrType);
         }
       } else if (element.vr === 'SQ') {
         byteOffset = this.#writeDataElementItems(
@@ -1194,10 +1194,10 @@ export class DicomWriter {
           if (typeof bpe !== 'undefined') {
             size *= bpe;
           } else {
-            throw Error('Unknown bytes per element for VR type: ' + vrType);
+            throw new Error('Unknown bytes per element for VR type: ' + vrType);
           }
         } else {
-          throw Error('Unsupported element: ' + element.vr);
+          throw new Error('Unsupported element: ' + element.vr);
         }
       } else {
         size = value.length;

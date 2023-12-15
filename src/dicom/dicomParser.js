@@ -1019,7 +1019,7 @@ export class DicomParser {
         }
         data = cleanString(data).split('\\');
       } else {
-        throw Error('Unknown VR type: ' + vrType);
+        throw new Error('Unknown VR type: ' + vrType);
       }
     } else if (vr === 'xx') {
       // US or OW
