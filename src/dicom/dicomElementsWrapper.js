@@ -577,7 +577,8 @@ function checkTag(element, name, values) {
  * Do the input elements allow for PET SUV calculation.
  *
  * @param {object} elements The DICOM elements to check.
- * @returns {string} A warning if the elements are not as expected.
+ * @returns {string|undefined} A warning if the elements are not as expected,
+ *    undefined if all good.
  */
 export function canGetSuvFactor(elements) {
   let warning = '';
@@ -648,10 +649,11 @@ export function canGetSuvFactor(elements) {
     }
   }
 
+  let res;
   if (warning.length !== 0) {
-    warning = 'Cannot calculate PET SUV:' + warning;
+    res = 'Cannot calculate PET SUV:' + warning;
   }
-  return warning;
+  return res;
 }
 
 /**

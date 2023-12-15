@@ -219,7 +219,7 @@ export class ImageFactory {
     if (typeof meta.Modality !== 'undefined' &&
       meta.Modality === 'PT') {
       const warn = canGetSuvFactor(dataElements);
-      if (warn.length === 0) {
+      if (typeof warn === 'undefined') {
         isPetWithSuv = true;
       } else {
         logger.warn(warn);
