@@ -464,6 +464,7 @@ export class LayerGroup {
     getViewLayersByDataId(dataId: string): ViewLayer[];
     removeEventListener(type: string, callback: Function): void;
     removeLayer(layer: ViewLayer | DrawLayer): void;
+    removeLayersByDataId(dataId: string): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveDrawLayer(index: number): void;
