@@ -208,6 +208,13 @@ export class Draw {
   #withScroll = true;
 
   /**
+   * With shortcuts flag.
+   *
+   * @type {boolean}
+   */
+  #withShortcuts = true;
+
+  /**
    * Auto shape colour: will use defaults colours and
    * vary them according to the layer.
    *
@@ -498,6 +505,11 @@ export class Draw {
     if (!this.#started) {
       event.context = 'Draw';
       this.#app.onKeydown(event);
+    }
+
+    // escape if shortcuts are deactivated
+    if (!this.#withShortcuts) {
+      return;
     }
 
     // press delete or backspace key
@@ -1075,6 +1087,9 @@ export class Draw {
     }
     if (typeof features.withScroll !== 'undefined') {
       this.#withScroll = features.withScroll;
+    }
+    if (typeof features.withShortcuts !== 'undefined') {
+      this.#withShortcuts = features.withShortcuts;
     }
   }
 
