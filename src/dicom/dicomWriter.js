@@ -265,6 +265,15 @@ class DefaultTextEncoder {
 }
 
 /**
+ * Small list of used tag keys.
+ */
+const TagKeys = {
+  TransferSyntax: '00020010',
+  SpecificCharacterSet: '00080005',
+  BitsAllocated: '00280100',
+};
+
+/**
  * DICOM writer.
  *
  * @example
@@ -832,26 +841,23 @@ export class DicomWriter {
    */
   getBuffer(dataElements) {
     // Transfer Syntax
-    // const el = dataElements['00020010'];
-    // el.value = 1;
-    // el.vl = 'a';
-    const syntax = dataElements['00020010'].value[0];
+    const syntax = dataElements[TagKeys.TransferSyntax].value[0];
     const isImplicit = isImplicitTransferSyntax(syntax);
     const isBigEndian = isBigEndianTransferSyntax(syntax);
     // Specific CharacterSet
-    if (typeof dataElements['00080005'] !== 'undefined') {
-      const oldscs = dataElements['00080005'].value[0];
+    if (typeof dataElements[TagKeys.SpecificCharacterSet] !== 'undefined') {
+      const oldscs = dataElements[TagKeys.SpecificCharacterSet].value[0];
       // force UTF-8 if not default character set
       if (typeof oldscs !== 'undefined' && oldscs !== 'ISO-IR 6') {
         logger.debug('Change charset to UTF, was: ' + oldscs);
         this.useSpecialTextEncoder();
-        dataElements['00080005'].value = ['ISO_IR 192'];
+        dataElements[TagKeys.SpecificCharacterSet].value = ['ISO_IR 192'];
       }
     }
     // Bits Allocated (for image data)
     let bitsAllocated;
-    if (typeof dataElements['00280100'] !== 'undefined') {
-      bitsAllocated = dataElements['00280100'].value[0];
+    if (typeof dataElements[TagKeys.BitsAllocated] !== 'undefined') {
+      bitsAllocated = dataElements[TagKeys.BitsAllocated].value[0];
     }
 
     // calculate buffer size and split elements (meta and non meta)
