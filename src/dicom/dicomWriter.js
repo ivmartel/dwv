@@ -1075,6 +1075,14 @@ export class DicomWriter {
             continue;
           }
 
+          // possible local bitsAllocated
+          let sqBitsAllocated = bitsAllocated;
+          const dataElement = oldItemElements[TagKeys.BitsAllocated];
+          if (typeof dataElement !== 'undefined' &&
+            typeof dataElement.value !== 'undefined') {
+            sqBitsAllocated = dataElement.value[0];
+          }
+
           // elements
           const itemKeys = Object.keys(oldItemElements);
           for (let j = 0, lenj = itemKeys.length; j < lenj; ++j) {
@@ -1087,7 +1095,7 @@ export class DicomWriter {
             }
             // set item value
             subSize += this.#setElementValue(
-              subElement, subElement.value, isImplicit, bitsAllocated);
+              subElement, subElement.value, isImplicit, sqBitsAllocated);
             newItemElements[itemKey] = subElement;
             // add prefix size
             subSize += getDataElementPrefixByteSize(
