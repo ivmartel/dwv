@@ -1071,12 +1071,14 @@ export class DicomParser {
         let sqPixelRepresentation = pixelRepresentation;
         for (let l = 0; l < keys.length; ++l) {
           // check if local bitsAllocated
+          // (inside item loop to get interpreted value)
           let dataElement = item[TagKeys.BitsAllocated];
           if (typeof dataElement !== 'undefined' &&
             typeof dataElement.value !== 'undefined') {
             sqBitsAllocated = dataElement.value[0];
           }
           // check if local pixelRepresentation
+          // (inside item loop to get interpreted value)
           dataElement = item[TagKeys.PixelRepresentation];
           if (typeof dataElement !== 'undefined' &&
             typeof dataElement.value !== 'undefined') {
