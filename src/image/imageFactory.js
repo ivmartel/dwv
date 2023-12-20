@@ -221,8 +221,6 @@ export class ImageFactory {
       const warn = canGetSuvFactor(dataElements);
       if (typeof warn === 'undefined') {
         isPetWithSuv = true;
-      } else {
-        logger.warn(warn);
       }
     }
     let intensityFactor = 1;
