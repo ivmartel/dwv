@@ -446,43 +446,55 @@ export class DrawLayer {
     this.#konvaStage.width(fitSize.x);
     this.#konvaStage.height(fitSize.y);
 
-    // previous scale without fit
-    const previousScale = {
-      x: this.#konvaStage.scale().x / this.#fitScale.x,
-      y: this.#konvaStage.scale().y / this.#fitScale.y
-    };
-    // update fit scale
-    const previousFitScale = this.#fitScale;
-    this.#fitScale = {
+    // fit scale
+    const newFitScale = {
       x: fitScale1D * this.#baseSpacing.x,
       y: fitScale1D * this.#baseSpacing.y
     };
-    // update scale
-    this.#konvaStage.scale({
-      x: previousScale.x * this.#fitScale.x,
-      y: previousScale.y * this.#fitScale.y
-    });
-
-    // update offsets
-    this.#viewOffset = {
-      x: fitOffset.x / this.#fitScale.x,
-      y: fitOffset.y / this.#fitScale.y
-    };
-    this.#flipOffset = {
-      x: this.#flipOffset.x * previousFitScale.x / this.#fitScale.x,
-      y: this.#flipOffset.y * previousFitScale.y / this.#fitScale.y
+    // #scale = inputScale * fitScale * flipScale
+    // flipScale does not change here, we can omit it
+    // newScale = (#scale / fitScale) * newFitScale
+    const newScale = {
+      x: this.#konvaStage.scale().x * newFitScale.x / this.#fitScale.x,
+      y: this.#konvaStage.scale().y * newFitScale.y / this.#fitScale.y
     };
 
-    this.#konvaStage.offset({
-      x: this.#viewOffset.x +
-        this.#baseOffset.x +
-        this.#zoomOffset.x +
-        this.#flipOffset.x,
-      y: this.#viewOffset.y +
-        this.#baseOffset.y +
-        this.#zoomOffset.y +
-        this.#flipOffset.y
-    });
+    // set scales if different from previous
+    if (this.#konvaStage.scale().x !== newScale.x ||
+      this.#konvaStage.scale().y !== newScale.y) {
+      this.#fitScale = newFitScale;
+      this.#konvaStage.scale(newScale);
+    }
+
+    // view offset
+    const newViewOffset = {
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
+    };
+    // #flipOffset = canvas / #scale
+    const newFlipOffset = {
+      x: this.#flipOffset.x !== 0 ? fitSize.x / newFitScale.x : 0,
+      y: this.#flipOffset.y !== 0 ? fitSize.y / newFitScale.y : 0,
+    };
+
+    // set offsets if different from previous
+    if (this.#viewOffset.x !== newViewOffset.x ||
+      this.#viewOffset.y !== newViewOffset.y ||
+      this.#flipOffset.x !== newFlipOffset.x ||
+      this.#flipOffset.y !== newFlipOffset.y) {
+      // update global offset
+      this.#konvaStage.offset({
+        x: this.#konvaStage.offset().x +
+          newViewOffset.x - this.#viewOffset.x +
+          newFlipOffset.x - this.#flipOffset.x,
+        y: this.#konvaStage.offset().y +
+          newViewOffset.y - this.#viewOffset.y +
+          newFlipOffset.y - this.#flipOffset.y,
+      });
+      // update private local offsets
+      this.#flipOffset = newFlipOffset;
+      this.#viewOffset = newViewOffset;
+    }
   }
 
   /**
