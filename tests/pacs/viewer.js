@@ -471,11 +471,11 @@ function getViewConfig(divId) {
   const config = {divId: divId};
   if (_layout === 'mpr') {
     if (divId === 'layerGroup0') {
-      config.orientation = 'axial';
+      config.orientation = dwv.Orientation.Axial;
     } else if (divId === 'layerGroup1') {
-      config.orientation = 'coronal';
+      config.orientation = dwv.Orientation.Coronal;
     } else if (divId === 'layerGroup2') {
-      config.orientation = 'sagittal';
+      config.orientation = dwv.Orientation.Sagittal;
     }
   }
   return config;
@@ -1154,9 +1154,12 @@ function addDataRow(dataId) {
         parent.replaceChildren();
         parent.appendChild(getLayerRadio(index, divId));
         parent.appendChild(getLayerRem(index, divId));
-        parent.appendChild(getLayerUpdate(index, divId, 'axial'));
-        parent.appendChild(getLayerUpdate(index, divId, 'coronal'));
-        parent.appendChild(getLayerUpdate(index, divId, 'sagittal'));
+        parent.appendChild(
+          getLayerUpdate(index, divId, dwv.Orientation.Axial));
+        parent.appendChild(
+          getLayerUpdate(index, divId, dwv.Orientation.Coronal));
+        parent.appendChild(
+          getLayerUpdate(index, divId, dwv.Orientation.Sagittal));
       }
     };
     return button;
@@ -1213,9 +1216,12 @@ function addDataRow(dataId) {
     if (dataLayerGroupsIds.includes(layerGroupDivId)) {
       cell.appendChild(getLayerRadio(l, layerGroupDivId));
       cell.appendChild(getLayerRem(l, layerGroupDivId));
-      cell.appendChild(getLayerUpdate(l, layerGroupDivId, 'axial'));
-      cell.appendChild(getLayerUpdate(l, layerGroupDivId, 'coronal'));
-      cell.appendChild(getLayerUpdate(l, layerGroupDivId, 'sagittal'));
+      cell.appendChild(
+        getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Axial));
+      cell.appendChild(
+        getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Coronal));
+      cell.appendChild(
+        getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Sagittal));
     } else {
       cell.appendChild(getLayerAdd(l, layerGroupDivId));
     }

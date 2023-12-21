@@ -84,7 +84,10 @@ import {MaskSegmentHelper} from './image/maskSegmentHelper';
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
 import {Index} from './math/index';
-import {Matrix33} from './math/matrix';
+import {
+  Matrix33,
+  Orientation
+} from './math/matrix';
 import {getEllipseIndices} from './math/ellipse';
 // tools
 import {toolList} from './tools/index';
@@ -147,6 +150,7 @@ export {
   defaultPresets,
   i18n,
   toolList,
+  Orientation,
   addTagsToDictionary,
   createImage,
   createMaskImage,

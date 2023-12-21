@@ -146,11 +146,11 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   }
   const orientationName =
     dwv.getOrientationName(tags.ImageOrientationPatient);
-  if (orientationName === 'axial') {
+  if (orientationName === dwv.Orientation.Axial) {
     tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
-  } else if (orientationName === 'coronal') {
+  } else if (orientationName === dwv.Orientation.Coronal) {
     tags.ImagePositionPatient = [0, sliceNumber * spacing, 0];
-  } else if (orientationName === 'sagittal') {
+  } else if (orientationName === dwv.Orientation.Sagittal) {
     tags.ImagePositionPatient = [sliceNumber * spacing, 0, 0];
   }
   // instance number

@@ -389,6 +389,24 @@ export function getSagittalMat33() {
 }
 
 /**
+ * Default anatomical plane orientations.
+ */
+export const Orientation = {
+  /**
+   * Axial, also known as transverse.
+   */
+  Axial: 'axial',
+  /**
+   * Coronal, also known as frontal.
+   */
+  Coronal: 'coronal',
+  /**
+   * Sagittal, also known as anteroposterior.
+   */
+  Sagittal: 'sagittal'
+};
+
+/**
  * Get an orientation matrix from a name.
  *
  * @param {string} name The orientation name.
@@ -396,11 +414,11 @@ export function getSagittalMat33() {
  */
 export function getMatrixFromName(name) {
   let matrix;
-  if (name === 'axial') {
+  if (name === Orientation.Axial) {
     matrix = getIdentityMat33();
-  } else if (name === 'coronal') {
+  } else if (name === Orientation.Coronal) {
     matrix = getCoronalMat33();
-  } else if (name === 'sagittal') {
+  } else if (name === Orientation.Sagittal) {
     matrix = getSagittalMat33();
   }
   return matrix;

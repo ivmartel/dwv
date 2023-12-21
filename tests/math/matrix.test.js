@@ -6,7 +6,8 @@ import {
   getIdentityMat33,
   isIdentityMat33,
   getMatrixFromName,
-  getOrientationStringLPS
+  getOrientationStringLPS,
+  Orientation
 } from '../../src/math/matrix';
 
 /**
@@ -247,18 +248,18 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
   assert.ok(isIdentityMat33(m00), 'Matrix33 factory id isIdentity');
 
   // test #01
-  const m01 = getMatrixFromName('axial');
+  const m01 = getMatrixFromName(Orientation.Axial);
   assert.ok(m01.equals(theo00), 'Matrix33 factory axial');
 
   // test #02
-  const m02 = getMatrixFromName('coronal');
+  const m02 = getMatrixFromName(Orientation.Coronal);
   const theo02 = new Matrix33([
     1, 0, 0, 0, 0, 1, 0, -1, 0
   ]);
   assert.ok(m02.equals(theo02), 'Matrix33 factory coronal');
 
   // test #03
-  const m03 = getMatrixFromName('sagittal');
+  const m03 = getMatrixFromName(Orientation.Sagittal);
   const theo03 = new Matrix33([
     0, 0, -1, 1, 0, 0, 0, -1, 0
   ]);
@@ -279,11 +280,11 @@ QUnit.test('Test Matrix33 getOrientationStringLPS.', function (assert) {
   const code00 = getOrientationStringLPS(m00);
   assert.equal(code00, 'LPS', 'LPS matrix');
 
-  const m01 = getMatrixFromName('coronal');
+  const m01 = getMatrixFromName(Orientation.Coronal);
   const code01 = getOrientationStringLPS(m01);
   assert.equal(code01, 'LIP', 'LIP matrix');
 
-  const m02 = getMatrixFromName('sagittal');
+  const m02 = getMatrixFromName(Orientation.Sagittal);
   const code02 = getOrientationStringLPS(m02);
   assert.equal(code02, 'PIR', 'PIR matrix');
 });

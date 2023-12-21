@@ -2,7 +2,8 @@ import {viewEventNames} from '../image/view';
 import {ViewFactory} from '../image/viewFactory';
 import {
   getMatrixFromName,
-  getOrientationStringLPS
+  getOrientationStringLPS,
+  Orientation
 } from '../math/matrix';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
@@ -1920,11 +1921,11 @@ export class App {
     // view orientation flags
     const isViewUndefined = typeof viewConfigOrientation === 'undefined';
     const isViewAxial = !isViewUndefined &&
-      viewConfigOrientation === 'axial';
+      viewConfigOrientation === Orientation.Axial;
     const isViewCoronal = !isViewUndefined &&
-      viewConfigOrientation === 'coronal';
+      viewConfigOrientation === Orientation.Coronal;
     const isViewSagittal = !isViewUndefined &&
-      viewConfigOrientation === 'sagittal';
+      viewConfigOrientation === Orientation.Sagittal;
 
     // default flags
     const flipOffset = {

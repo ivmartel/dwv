@@ -13,6 +13,7 @@ import {
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
 import {arrayEquals} from '../utils/array';
+import {Orientation} from '../math/matrix';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -199,11 +200,11 @@ export function getOrientationName(orientation) {
   const sagittalOrientation = [0, 1, 0, 0, 0, -1];
   let name;
   if (arrayEquals(orientation, axialOrientation)) {
-    name = 'axial';
+    name = Orientation.Axial;
   } else if (arrayEquals(orientation, coronalOrientation)) {
-    name = 'coronal';
+    name = Orientation.Coronal;
   } else if (arrayEquals(orientation, sagittalOrientation)) {
-    name = 'sagittal';
+    name = Orientation.Sagittal;
   }
   return name;
 }

@@ -67,11 +67,11 @@ const MPRPixGenerator = function (options) {
     }
     const orientationName =
       dwv.getOrientationName(options.imageOrientationPatient);
-    if (orientationName === 'axial') {
+    if (orientationName === dwv.Orientation.Axial) {
       this.generateAsAxial(pixelBuffer, sliceNumber);
-    } else if (orientationName === 'coronal') {
+    } else if (orientationName === dwv.Orientation.Coronal) {
       this.generateAsCoronal(pixelBuffer, sliceNumber);
-    } else if (orientationName === 'sagittal') {
+    } else if (orientationName === dwv.Orientation.Sagittal) {
       this.generateAsSagittal(pixelBuffer, sliceNumber);
     }
   };
@@ -81,7 +81,7 @@ const MPRPixGenerator = function (options) {
     let offset = 0;
     for (let j0 = 0; j0 < halfNRows; ++j0) {
       for (let i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc('axial', i0, j0);
+        pixelBuffer[offset] = getFunc(dwv.Orientation.Axial, i0, j0);
         ++offset;
       }
       offset += halfNCols;
@@ -92,7 +92,7 @@ const MPRPixGenerator = function (options) {
       for (let j1 = 0; j1 < numberOfRows; ++j1) {
         for (let i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
-            'coronal', i1, (halfNSlices - 1 - sliceNumber));
+            dwv.Orientation.Coronal, i1, (halfNSlices - 1 - sliceNumber));
           ++offset;
         }
         offset += halfNCols;
@@ -103,7 +103,7 @@ const MPRPixGenerator = function (options) {
       for (let j2 = 0; j2 < halfNRows; ++j2) {
         for (let i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
-            'sagittal', j2, (numberOfSlices - 1 - sliceNumber));
+            dwv.Orientation.Sagittal, j2, (numberOfSlices - 1 - sliceNumber));
           ++offset;
         }
       }
@@ -115,7 +115,7 @@ const MPRPixGenerator = function (options) {
     let offset = numberOfColumns * halfNRows + halfNCols;
     for (let j0 = 0; j0 < halfNRows; ++j0) {
       for (let i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc('coronal', i0, j0);
+        pixelBuffer[offset] = getFunc(dwv.Orientation.Coronal, i0, j0);
         ++offset;
       }
       offset += halfNCols;
@@ -126,7 +126,7 @@ const MPRPixGenerator = function (options) {
       for (let j1 = 0; j1 < numberOfRows; ++j1) {
         for (let i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
-            'axial', i1, sliceNumber);
+            dwv.Orientation.Axial, i1, sliceNumber);
           ++offset;
         }
         offset += halfNCols;
@@ -138,7 +138,7 @@ const MPRPixGenerator = function (options) {
       for (let j2 = 0; j2 < halfNRows; ++j2) {
         for (let i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
-            'sagittal', sliceNumber, j2 - 1);
+            dwv.Orientation.Sagittal, sliceNumber, j2 - 1);
           ++offset;
         }
       }
@@ -150,7 +150,7 @@ const MPRPixGenerator = function (options) {
     let offset = halfNCols;
     for (let j0 = 0; j0 < halfNRows; ++j0) {
       for (let i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc('sagittal', i0, j0);
+        pixelBuffer[offset] = getFunc(dwv.Orientation.Sagittal, i0, j0);
         ++offset;
       }
       offset += halfNCols;
@@ -161,7 +161,7 @@ const MPRPixGenerator = function (options) {
       for (let j1 = 0; j1 < numberOfRows; ++j1) {
         for (let i1 = 0; i1 < halfNCols; ++i1) {
           pixelBuffer[offset] = getFunc(
-            'axial', sliceNumber, i1);
+            dwv.Orientation.Axial, sliceNumber, i1);
           ++offset;
         }
         offset += halfNCols;
@@ -173,7 +173,7 @@ const MPRPixGenerator = function (options) {
       for (let j2 = 0; j2 < halfNRows; ++j2) {
         for (let i2 = 0; i2 < numberOfColumns; ++i2) {
           pixelBuffer[offset] = getFunc(
-            'coronal', sliceNumber, j2 - 1);
+            dwv.Orientation.Coronal, sliceNumber, j2 - 1);
           ++offset;
         }
       }
@@ -197,11 +197,11 @@ const MPRPixGenerator = function (options) {
    */
   function getFunc(name, i, j) {
     let imgIdx = 0;
-    if (name === 'axial') {
+    if (name === dwv.Orientation.Axial) {
       imgIdx = 0;
-    } else if (name === 'coronal') {
+    } else if (name === dwv.Orientation.Coronal) {
       imgIdx = 1;
-    } else if (name === 'sagittal') {
+    } else if (name === dwv.Orientation.Sagittal) {
       imgIdx = 2;
     }
     return self.buffers[imgIdx][getOffset(i, j) * 4];
