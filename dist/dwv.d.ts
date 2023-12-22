@@ -2729,6 +2729,12 @@ export declare class Matrix33 {
     #private;
 }
 
+export declare namespace Orientation {
+    let Axial: string;
+    let Coronal: string;
+    let Sagittal: string;
+}
+
 /**
  * DICOM Header overlay info.
  */

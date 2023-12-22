@@ -573,6 +573,16 @@ export class Matrix33 {
     toString(): string;
 }
 
+// @public (undocumented)
+export namespace Orientation {
+    let // (undocumented)
+    Axial: string;
+    let // (undocumented)
+    Coronal: string;
+    let // (undocumented)
+    Sagittal: string;
+}
+
 // @public
 export class OverlayData {
     constructor(app: App, dataId: string, configs: object);
