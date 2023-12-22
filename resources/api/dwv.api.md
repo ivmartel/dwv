@@ -730,6 +730,7 @@ export class TagValueExtractor {
 export class ToolboxController {
     constructor(toolList: object);
     bindLayerGroup(layerGroup: LayerGroup, layer: ViewLayer | DrawLayer): void;
+    enableShortcuts(flag: boolean): void;
     getSelectedTool(): object;
     getSelectedToolEventHandler(eventType: string): Function;
     getToolList(): any[];
