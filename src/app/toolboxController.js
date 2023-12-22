@@ -54,9 +54,24 @@ export class ToolboxController {
     for (const key in this.#toolList) {
       this.#toolList[key].init();
     }
-    // keydown listener
-    window.addEventListener('keydown',
-      this.#getCallback('window', 'keydown'), true);
+    // enable shortcuts
+    this.enableShortcuts(true);
+  }
+
+  /**
+   * Enable or disable shortcuts. The 'init' methods enables shortcuts
+   *  by default. Call this method after init to disable shortcuts.
+   *
+   * @param {boolean} flag True to enable shortcuts.
+   */
+  enableShortcuts(flag) {
+    if (flag) {
+      window.addEventListener('keydown',
+        this.#getCallback('window', 'keydown'), true);
+    } else {
+      window.removeEventListener('keydown',
+        this.#getCallback('window', 'keydown'), true);
+    }
   }
 
   /**
