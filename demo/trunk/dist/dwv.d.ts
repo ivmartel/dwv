@@ -3436,6 +3436,13 @@ export declare class ToolboxController {
      */
     init(): void;
     /**
+     * Enable or disable shortcuts. The 'init' methods enables shortcuts
+     *  by default. Call this method after init to disable shortcuts.
+     *
+     * @param {boolean} flag True to enable shortcuts.
+     */
+    enableShortcuts(flag: boolean): void;
+    /**
      * Get the tool list.
      *
      * @returns {Array} The list of tool objects.
