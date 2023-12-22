@@ -264,4 +264,13 @@ export class WindowLevel {
     // does nothing
   }
 
+  /**
+   * Set the tool live features: does nothing.
+   *
+   * @param {object} _features The list of features.
+   */
+  setFeatures(_features) {
+    // does nothing
+  }
+
 } // WindowLevel class
