@@ -1,3 +1,4 @@
+import {RGB} from '../utils/colour';
 import {logger} from '../utils/logger';
 
 // doc imports
@@ -338,7 +339,7 @@ export class DeleteSegmentCommand {
    */
   execute() {
     // remove
-    this.#mask.setAtOffsets(this.#offsets, {r: 0, g: 0, b: 0});
+    this.#mask.setAtOffsets(this.#offsets, new RGB(0, 0, 0));
 
     // callback
     if (!this.#isSilent) {
