@@ -49,6 +49,12 @@ input[type=range] {
   width: 100px;
   margin: 0px 10px;
 }
+fieldset {
+  legend {
+    font-size: small;
+    font-style: italic;
+  }
+}
 #fileinput {
   width: 50%;
   border: 1px dotted gray;
@@ -156,9 +162,14 @@ hr.vertical {
 <label for="changesmoothing">Smoothing</label>
 </div>
 
-<div class="line" id="binders">Binders:</div>
-
-<div class="line" id="tools">Tools:</div>
+<div class="line">
+  <fieldset id="binders">
+    <legend>Binders</legend>
+  </fieldset>
+  <fieldset id="tools" disabled>
+    <legend>Tools</legend>
+  </fieldset>
+</div>
 
 <div id="layersdetails"></div>
 

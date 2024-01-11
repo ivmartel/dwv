@@ -7,6 +7,74 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 let _app = null;
 let _tools = null;
 
+// tool features
+const _toolFeaturesUI = {};
+_toolFeaturesUI.Draw = {
+  getValue() {
+    const shapeSelect = document.getElementById('draw-shape-select');
+    return {
+      shapeName: shapeSelect.value
+    };
+  },
+  getHtml() {
+    const shapeSelect = document.createElement('select');
+    shapeSelect.id = 'draw-shape-select';
+
+    const shapeNames = _tools.Draw.options;
+    if (typeof shapeNames === 'undefined') {
+      return;
+    }
+
+    for (const shapeName of shapeNames) {
+      const opt = document.createElement('option');
+      opt.id = 'shape-' + shapeName;
+      opt.value = shapeName;
+      opt.appendChild(document.createTextNode(shapeName));
+      shapeSelect.appendChild(opt);
+    }
+
+    shapeSelect.onchange = function (event) {
+      const element = event.target;
+      _app.setToolFeatures({shapeName: element.value});
+    };
+
+    const autoColourInput = document.createElement('input');
+    autoColourInput.type = 'checkbox';
+    autoColourInput.id = 'draw-auto-colour';
+    autoColourInput.checked = true;
+
+    const autoLabel = document.createElement('label');
+    autoLabel.htmlFor = autoColourInput.id;
+    autoLabel.appendChild(document.createTextNode('auto colour'));
+
+    const colourInput = document.createElement('input');
+    colourInput.type = 'color';
+    colourInput.id = 'draw-colour-chooser';
+    colourInput.value = '#ffff80';
+    colourInput.disabled = true;
+
+    autoColourInput.onchange = function (event) {
+      const element = event.target;
+      _app.setToolFeatures({autoShapeColour: element.checked});
+      colourInput.disabled = element.checked;
+    };
+
+    colourInput.onchange = function (event) {
+      const element = event.target;
+      _app.setToolFeatures({shapeColour: element.value});
+    };
+
+    const res = document.createElement('span');
+    res.id = 'toolFeatures';
+    res.className = 'toolFeatures';
+    res.appendChild(shapeSelect);
+    res.appendChild(autoColourInput);
+    res.appendChild(autoLabel);
+    res.appendChild(colourInput);
+    return res;
+  }
+};
+
 // viewer options
 let _layout = 'one';
 
@@ -173,6 +241,8 @@ function viewerSetup() {
           // set app tool
           setAppTool();
 
+          const toolsFieldset = document.getElementById('tools');
+          toolsFieldset.disabled = false;
           const changeLayoutSelect = document.getElementById('changelayout');
           changeLayoutSelect.disabled = false;
           const resetLayoutButton = document.getElementById('resetlayout');
@@ -619,7 +689,6 @@ function getDataLayerGroupDivIds(dataId) {
  * Setup the binders checkboxes
  */
 function setupBindersCheckboxes() {
-  const bindersDiv = document.getElementById('binders');
   const propList = [
     'WindowLevel',
     'Position',
@@ -672,6 +741,9 @@ function setupBindersCheckboxes() {
       }
     };
   }
+
+  const fieldset = document.getElementById('binders');
+
   // individual binders
   for (let i = 0; i < propList.length; ++i) {
     const propName = propList[i];
@@ -686,8 +758,8 @@ function setupBindersCheckboxes() {
     label.htmlFor = input.id;
     label.appendChild(document.createTextNode(propName));
 
-    bindersDiv.appendChild(input);
-    bindersDiv.appendChild(label);
+    fieldset.appendChild(input);
+    fieldset.appendChild(label);
   }
 
   // check all
@@ -703,17 +775,14 @@ function setupBindersCheckboxes() {
   const allLabel = document.createElement('label');
   allLabel.htmlFor = allInput.id;
   allLabel.appendChild(document.createTextNode('all'));
-  bindersDiv.appendChild(allInput);
-  bindersDiv.appendChild(allLabel);
+  fieldset.appendChild(allInput);
+  fieldset.appendChild(allLabel);
 }
 
 /**
  * Setup the tools checkboxes
  */
 function setupToolsCheckboxes() {
-  const toolsDiv = document.getElementById('tools');
-  const keys = Object.keys(_tools);
-
   const getChangeTool = function (tool) {
     return function () {
       setAppTool(tool);
@@ -731,6 +800,8 @@ function setupToolsCheckboxes() {
     };
   };
 
+  const fieldset = document.getElementById('tools');
+  const keys = Object.keys(_tools);
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
 
@@ -750,102 +821,18 @@ function setupToolsCheckboxes() {
     label.title = input.title;
     label.appendChild(document.createTextNode(input.title));
 
-    toolsDiv.appendChild(input);
-    toolsDiv.appendChild(label);
-
-    const featuresHtml = getToolFeaturesHtml(key);
-    if (typeof featuresHtml !== 'undefined') {
-      toolsDiv.appendChild(featuresHtml);
-    }
+    fieldset.appendChild(input);
+    fieldset.appendChild(label);
 
     // keyboard shortcut
     const shortcut = key[0].toLowerCase();
     window.addEventListener('keydown', getKeyCheck(shortcut, input));
   }
-}
 
-/**
- * Get the input tool features values from the UI.
- *
- * @param {string} toolName The tool name.
- * @returns {object} The features for the tool.
- */
-function getToolFeatures(toolName) {
-  let res;
-  if (toolName === 'Draw') {
-    const shapeSelect = document.getElementById('draw-shape-select');
-    res = {
-      shapeName: shapeSelect.value
-    };
-  }
-  return res;
-}
-
-/**
- * Get the input tool features HTML.
- *
- * @param {string} toolName The tool name.
- * @returns {HTMLElement|undefined} The element representing the tool features.
- */
-function getToolFeaturesHtml(toolName) {
-  let res;
-  if (toolName === 'Draw') {
-    const shapeSelect = document.createElement('select');
-    shapeSelect.id = 'draw-shape-select';
-
-    const shapeNames = _tools.Draw.options;
-    if (typeof shapeNames === 'undefined') {
-      return;
-    }
-
-    for (const shapeName of shapeNames) {
-      const opt = document.createElement('option');
-      opt.id = 'shape-' + shapeName;
-      opt.value = shapeName;
-      opt.appendChild(document.createTextNode(shapeName));
-      shapeSelect.appendChild(opt);
-    }
-
-    shapeSelect.onchange = function (event) {
-      const element = event.target;
-      _app.setToolFeatures({shapeName: element.value});
-    };
-
-    const autoColourInput = document.createElement('input');
-    autoColourInput.type = 'checkbox';
-    autoColourInput.id = 'draw-auto-colour';
-    autoColourInput.checked = true;
-
-    const autoLabel = document.createElement('label');
-    autoLabel.htmlFor = autoColourInput.id;
-    autoLabel.appendChild(document.createTextNode('auto colour'));
-
-    const colourInput = document.createElement('input');
-    colourInput.type = 'color';
-    colourInput.id = 'draw-colour-chooser';
-    colourInput.value = '#ffff80';
-    colourInput.disabled = true;
-
-    autoColourInput.onchange = function (event) {
-      const element = event.target;
-      _app.setToolFeatures({autoShapeColour: element.checked});
-      colourInput.disabled = element.checked;
-    };
-
-    colourInput.onchange = function (event) {
-      const element = event.target;
-      _app.setToolFeatures({shapeColour: element.value});
-    };
-
-    res = document.createElement('span');
-    res.className = 'toolFeatures';
-    res.appendChild(shapeSelect);
-    res.appendChild(autoColourInput);
-    res.appendChild(autoLabel);
-    res.appendChild(colourInput);
-  }
-
-  return res;
+  // tool options
+  const div = document.createElement('div');
+  div.id = 'toolOptions';
+  fieldset.appendChild(div);
 }
 
 /**
@@ -869,11 +856,29 @@ function setAppTool(toolName) {
       return;
     }
   }
+
+  // set tool for app
   _app.setTool(toolName);
+
+  // clear options html
+  const toolOptionsEl = document.getElementById('toolOptions');
+  if (toolOptionsEl !== null) {
+    toolOptionsEl.innerHTML = '';
+  }
   // tool features
-  const features = getToolFeatures(toolName);
-  if (typeof features !== 'undefined') {
-    _app.setToolFeatures(features);
+  const featuresUI = _toolFeaturesUI[toolName];
+  if (toolOptionsEl !== null &&
+    typeof featuresUI !== 'undefined') {
+    // setup html
+    const featuresHtml = featuresUI.getHtml();
+    if (typeof featuresHtml !== 'undefined') {
+      toolOptionsEl.appendChild(featuresHtml);
+    }
+    // pass value to app
+    const features = featuresUI.getValue();
+    if (typeof features !== 'undefined') {
+      _app.setToolFeatures(features);
+    }
   }
 }
 
