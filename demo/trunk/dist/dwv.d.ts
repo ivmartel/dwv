@@ -2223,6 +2223,12 @@ export declare class LayerGroup {
      */
     getActiveViewLayer(): ViewLayer | undefined;
     /**
+     * Get the base view layer.
+     *
+     * @returns {ViewLayer|undefined} The layer.
+     */
+    getBaseViewLayer(): ViewLayer | undefined;
+    /**
      * Get the view layers associated to a data id.
      *
      * @param {string} dataId The data id.
