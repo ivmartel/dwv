@@ -398,6 +398,19 @@ export class LayerGroup {
   }
 
   /**
+   * Get the base view layer.
+   *
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  getBaseViewLayer() {
+    let layer;
+    if (this.#layers[0] instanceof ViewLayer) {
+      layer = this.#layers[0];
+    }
+    return layer;
+  }
+
+  /**
    * Get the view layers associated to a data id.
    *
    * @param {string} dataId The data id.
