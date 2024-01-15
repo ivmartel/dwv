@@ -724,7 +724,8 @@ export class Image {
         continue;
       }
       if (this.#meta[key] !== rhs.getMeta()[key]) {
-        throw new Error('Cannot append a slice with different ' + key);
+        throw new Error('Cannot append a slice with different ' + key +
+          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
       }
     }
 
