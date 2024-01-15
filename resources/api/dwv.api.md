@@ -452,6 +452,7 @@ export class LayerGroup {
     getActiveViewLayer(): ViewLayer | undefined;
     getAddedScale(): object;
     getBaseScale(): object;
+    getBaseViewLayer(): ViewLayer | undefined;
     getDivId(): string;
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getMaxSize(): object | undefined;
