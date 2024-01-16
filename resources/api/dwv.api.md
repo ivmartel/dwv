@@ -406,7 +406,7 @@ class Image_2 {
     removeEventListener(type: string, callback: Function): void;
     setAtOffsets(offsets: number[], value: number | RGB): void;
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
-    setAtOffsetsWithIterator(offsetsLists: number[][], value: object | any[]): void;
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
     setMeta(rhs: {
         [x: string]: any;
     }): void;
