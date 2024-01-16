@@ -522,18 +522,20 @@ export class Image {
   getOffsets(value) {
     // value to array
     let bufferValue;
-    if (value instanceof RGB) {
-      if (this.#numberOfComponents !== 3) {
-        throw new Error(
-          'Number of components is not 3 for getting RGB value.');
-      }
-      bufferValue = [value.r, value.g, value.b];
-    } else {
+    if (typeof value === 'number') {
       if (this.#numberOfComponents !== 1) {
         throw new Error(
           'Number of components is not 1 for getting single value.');
       }
       bufferValue = [value];
+    } else if (typeof value.r !== 'undefined' &&
+      typeof value.g !== 'undefined' &&
+      typeof value.b !== 'undefined') {
+      if (this.#numberOfComponents !== 3) {
+        throw new Error(
+          'Number of components is not 3 for getting RGB value.');
+      }
+      bufferValue = [value.r, value.g, value.b];
     }
 
     // main loop
@@ -975,18 +977,20 @@ export class Image {
   setAtOffsets(offsets, value) {
     // value to array
     let bufferValue;
-    if (value instanceof RGB) {
-      if (this.#numberOfComponents !== 3) {
-        throw new Error(
-          'Number of components is not 3 for setting RGB value.');
-      }
-      bufferValue = [value.r, value.g, value.b];
-    } else {
+    if (typeof value === 'number') {
       if (this.#numberOfComponents !== 1) {
         throw new Error(
           'Number of components is not 1 for setting single value.');
       }
       bufferValue = [value];
+    } else if (typeof value.r !== 'undefined' &&
+      typeof value.g !== 'undefined' &&
+      typeof value.b !== 'undefined') {
+      if (this.#numberOfComponents !== 3) {
+        throw new Error(
+          'Number of components is not 3 for setting RGB value.');
+      }
+      bufferValue = [value.r, value.g, value.b];
     }
 
     let offset;
@@ -1064,23 +1068,24 @@ export class Image {
    *
    * @param {number[][]} offsetsLists List of offset lists
    *   where to set the data.
-   * @param {object|Array} value The value to set at the given offsets.
+   * @param {RGB|Array} value The value to set at the given offsets.
    * @fires Image#imagechange
    */
   setAtOffsetsWithIterator(offsetsLists, value) {
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
       let iterator;
-      if (typeof value !== 'undefined' &&
-        typeof value.r !== 'undefined') {
-        // input value is a simple color
-        iterator = colourRange(
-          [{index: 0, colour: value}], offsets.length);
-      } else {
+      if (Array.isArray(value)) {
         // input value is a list of iterators
         // created by setAtOffsetsAndGetOriginals
         iterator = colourRange(
           value[j], offsets.length);
+      } else if (typeof value.r !== 'undefined' &&
+        typeof value.g !== 'undefined' &&
+        typeof value.b !== 'undefined') {
+        // input value is a simple color
+        iterator = colourRange(
+          [{index: 0, colour: value}], offsets.length);
       }
 
       // set values
