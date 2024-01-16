@@ -1933,10 +1933,10 @@ declare class Image_2 {
      *
      * @param {number[][]} offsetsLists List of offset lists
      *   where to set the data.
-     * @param {object|Array} value The value to set at the given offsets.
+     * @param {RGB|Array} value The value to set at the given offsets.
      * @fires Image#imagechange
      */
-    setAtOffsetsWithIterator(offsetsLists: number[][], value: object | any[]): void;
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
     /**
      * Get the value of the image at a specific coordinate.
      *
