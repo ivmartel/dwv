@@ -1510,7 +1510,7 @@ function getTagKeysReducer(dataElements) {
  * @returns {Object<string, DataElement>} The meta data indexed by tag names.
  */
 function getMetaDataWithNames(metaData) {
-  let meta = metaData;
+  let meta = structuredClone(metaData);
   if (typeof meta['00020010'] !== 'undefined') {
     // replace tag key with tag name for dicom
     meta = Object.keys(meta).reduce(getTagKeysReducer(meta), {});
