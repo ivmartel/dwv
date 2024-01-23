@@ -1285,24 +1285,23 @@ export class App {
   defaultOnKeydown = (event) => {
     if (event.ctrlKey) {
       if (event.shiftKey) {
+        const layerGroup = this.#stage.getActiveLayerGroup();
         const viewController =
-          this.#stage.getActiveLayerGroup()
-            .getActiveViewLayer().getViewController();
-        const size = viewController.getImageSize();
+          layerGroup.getActiveViewLayer().getViewController();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
-          if (size.moreThanOne(3)) {
+          if (viewController.moreThanOne(3)) {
             viewController.decrementIndex(3);
           }
         } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
-          if (viewController.canScroll()) {
+          if (layerGroup.canScroll()) {
             viewController.incrementScrollIndex();
           }
         } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
-          if (size.moreThanOne(3)) {
+          if (layerGroup.moreThanOne(3)) {
             viewController.incrementIndex(3);
           }
         } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
-          if (viewController.canScroll()) {
+          if (layerGroup.canScroll()) {
             viewController.decrementScrollIndex();
           }
         }

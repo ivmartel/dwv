@@ -582,6 +582,7 @@ export class View {
     }
     if (!geometry.isIndexInBounds(index, dirs)) {
       if (!silent) {
+        this.#currentPosition = position;
         // fire event with valid: false
         this.#fireEvent({
           type: 'positionchange',
@@ -620,6 +621,19 @@ export class View {
       dirs.push(3);
     }
     if (!geometry.isIndexInBounds(index, dirs)) {
+      if (!silent) {
+        this.#currentPosition = position;
+        // fire event with valid: false
+        this.#fireEvent({
+          type: 'positionchange',
+          value: [
+            index.getValues(),
+            position.getValues(),
+          ],
+          valid: false
+        });
+      }
+
       // do no send invalid positionchange event: avoid empty repaint
       return false;
     }
@@ -937,48 +951,6 @@ export class View {
   }
 
   /**
-   * Increment the provided dimension.
-   *
-   * @param {number} dim The dimension to increment.
-   * @param {boolean} silent Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  incrementIndex(dim, silent) {
-    const index = this.getCurrentIndex();
-    const values = new Array(index.length());
-    values.fill(0);
-    if (dim < values.length) {
-      values[dim] = 1;
-    } else {
-      console.warn('Cannot increment given index: ', dim, values.length);
-    }
-    const incr = new Index(values);
-    const newIndex = index.add(incr);
-    return this.setCurrentIndex(newIndex, silent);
-  }
-
-  /**
-   * Decrement the provided dimension.
-   *
-   * @param {number} dim The dimension to increment.
-   * @param {boolean} silent Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  decrementIndex(dim, silent) {
-    const index = this.getCurrentIndex();
-    const values = new Array(index.length());
-    values.fill(0);
-    if (dim < values.length) {
-      values[dim] = -1;
-    } else {
-      console.warn('Cannot decrement given index: ', dim, values.length);
-    }
-    const incr = new Index(values);
-    const newIndex = index.add(incr);
-    return this.setCurrentIndex(newIndex, silent);
-  }
-
-  /**
    * Get the scroll dimension index.
    *
    * @returns {number} The index.
@@ -992,26 +964,6 @@ export class View {
       index = 2;
     }
     return index;
-  }
-
-  /**
-   * Decrement the scroll dimension index.
-   *
-   * @param {boolean} silent Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  decrementScrollIndex(silent) {
-    return this.decrementIndex(this.getScrollIndex(), silent);
-  }
-
-  /**
-   * Increment the scroll dimension index.
-   *
-   * @param {boolean} silent Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  incrementScrollIndex(silent) {
-    return this.incrementIndex(this.getScrollIndex(), silent);
   }
 
 } // class View

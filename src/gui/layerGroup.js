@@ -864,6 +864,61 @@ export class LayerGroup {
   }
 
   /**
+   * Test if one of the view layers satisfies an input callbackFn.
+   *
+   * @param {Function} callbackFn A function that takes a ViewLayer as input
+   *   and returns a boolean.
+   * @returns {boolean} True if one of the ViewLayers satisfies the callbackFn.
+   */
+  someViewLayer(callbackFn) {
+    let hasOne = false;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &&
+        callbackFn(layer)) {
+        hasOne = true;
+        break;
+      }
+    }
+    return hasOne;
+  }
+
+  /**
+   * Can the input position be set on one of the view layers.
+   *
+   * @param {Point} position The input position.
+   * @returns {boolean} True if one view layer accepts the input position.
+   */
+  canSetPosition(position) {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().canSetPosition(position);
+    });
+  }
+
+  /**
+   * Can one of the view layers be scrolled.
+   *
+   * @returns {boolean} True if one view layer can be scrolled.
+   */
+  canScroll() {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().canScroll();
+    });
+  }
+
+  /**
+   * Does one of the view layer have more than one slice in the
+   *   given dimension.
+   *
+   * @param {number} dim The input dimension.
+   * @returns {boolean} True if one view layer has more than one slice.
+   */
+  moreThanOne(dim) {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().moreThanOne(dim);
+    });
+  }
+
+  /**
    * Update layers (but not the active view layer) to a position change.
    *
    * @param {object} event The position change event.

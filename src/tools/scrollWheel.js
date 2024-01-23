@@ -59,19 +59,25 @@ export class ScrollWheel {
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    const imageSize = viewController.getImageSize();
-    if (imageSize.canScroll3D()) {
+    let newPosition;
+    if (layerGroup.canScroll()) {
       if (up) {
-        viewController.incrementScrollIndex();
+        newPosition = viewController.getIncrementScrollPosition();
       } else {
-        viewController.decrementScrollIndex();
+        newPosition = viewController.getDecrementScrollPosition();
       }
-    } else if (imageSize.moreThanOne(3)) {
+    } else if (layerGroup.moreThanOne(3)) {
       if (up) {
-        viewController.incrementIndex(3);
+        newPosition = viewController.getIncrementPosition(3);
       } else {
-        viewController.decrementIndex(3);
+        newPosition = viewController.getDecrementPosition(3);
       }
+    }
+
+    // set all layers if at least one can be set
+    if (typeof newPosition !== 'undefined' &&
+      layerGroup.canSetPosition(newPosition)) {
+      viewController.setCurrentPosition(newPosition);
     }
   }
 

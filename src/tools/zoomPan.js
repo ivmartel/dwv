@@ -161,11 +161,17 @@ export class ZoomAndPan {
         return;
       }
       // update view controller
-      if (viewController.canScroll()) {
+      if (layerGroup.canScroll()) {
+        let newPosition;
         if (diffY > 0) {
-          viewController.incrementScrollIndex();
+          newPosition = viewController.getIncrementScrollPosition();
         } else {
-          viewController.decrementScrollIndex();
+          newPosition = viewController.getDecrementScrollPosition();
+        }
+        // set all layers if at least one can be set
+        if (typeof newPosition !== 'undefined' &&
+          layerGroup.canSetPosition(newPosition)) {
+          viewController.setCurrentPosition(newPosition);
         }
       }
     } else {

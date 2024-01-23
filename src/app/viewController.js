@@ -480,6 +480,18 @@ export class ViewController {
       this.#view.getOrientation());
   }
 
+
+  /**
+   * Is the data size larger than one in the given dimension?
+   *
+   * @param {number} dim The dimension.
+   * @returns {boolean} True if the image size is larger than one
+   *   in the given dimension.
+   */
+  moreThanOne(dim) {
+    return this.getImageSize().moreThanOne(dim);
+  }
+
   /**
    * Get the image world (mm) 2D size.
    *
@@ -630,6 +642,104 @@ export class ViewController {
   }
 
   /**
+   * Get the current index incremented in the input direction.
+   *
+   * @param {number} dim The direction in which to increment.
+   * @returns {Index} The resulting index.
+   */
+  #getIncrementIndex(dim) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = 1;
+    } else {
+      console.warn('Cannot increment given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    return index.add(incr);
+  }
+
+  /**
+   * Get the current index decremented in the input direction.
+   *
+   * @param {number} dim The direction in which to decrement.
+   * @returns {Index} The resulting index.
+   */
+  #getDecrementIndex(dim) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = -1;
+    } else {
+      console.warn('Cannot decrement given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    return index.add(incr);
+  }
+
+  /**
+   * Get the current index incremented in the scroll direction.
+   *
+   * @returns {Index} The resulting index.
+   */
+  #getIncrementScrollIndex() {
+    return this.#getIncrementIndex(this.getScrollIndex());
+  }
+
+  /**
+   * Get the current index decremented in the scroll direction.
+   *
+   * @returns {Index} The resulting index.
+   */
+  #getDecrementScrollIndex() {
+    return this.#getDecrementIndex(this.getScrollIndex());
+  }
+
+  /**
+   * Get the current position incremented in the input direction.
+   *
+   * @param {number} dim The direction in which to increment.
+   * @returns {Point} The resulting point.
+   */
+  getIncrementPosition(dim) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getIncrementIndex(dim));
+  }
+
+  /**
+   * Get the current position decremented in the input direction.
+   *
+   * @param {number} dim The direction in which to decrement.
+   * @returns {Point} The resulting point.
+   */
+  getDecrementPosition(dim) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getDecrementIndex(dim));
+  }
+
+  /**
+   * Get the current position decremented in the scroll direction.
+   *
+   * @returns {Point} The resulting point.
+   */
+  getIncrementScrollPosition() {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getIncrementScrollIndex());
+  }
+
+  /**
+   * Get the current position decremented in the scroll direction.
+   *
+   * @returns {Point} The resulting point.
+   */
+  getDecrementScrollPosition() {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getDecrementScrollIndex());
+  }
+
+  /**
    * Increment the provided dimension.
    *
    * @param {number} dim The dimension to increment.
@@ -637,7 +747,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   incrementIndex(dim, silent) {
-    return this.#view.incrementIndex(dim, silent);
+    return this.setCurrentIndex(this.#getIncrementIndex(dim), silent);
   }
 
   /**
@@ -648,7 +758,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   decrementIndex(dim, silent) {
-    return this.#view.decrementIndex(dim, silent);
+    return this.setCurrentIndex(this.#getDecrementIndex(dim), silent);
   }
 
   /**
@@ -658,7 +768,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   decrementScrollIndex(silent) {
-    return this.#view.decrementScrollIndex(silent);
+    return this.setCurrentIndex(this.#getDecrementScrollIndex(), silent);
   }
 
   /**
@@ -668,7 +778,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   incrementScrollIndex(silent) {
-    return this.#view.incrementScrollIndex(silent);
+    return this.setCurrentIndex(this.#getIncrementScrollIndex(), silent);
   }
 
   /**

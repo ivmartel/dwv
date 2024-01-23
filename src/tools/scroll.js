@@ -175,16 +175,18 @@ export class Scroll {
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
 
+    let newPosition;
+
     // difference to last Y position
     const diffY = point.getY() - this.#startPoint.getY();
     const yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
-    if (yMove && viewController.canScroll()) {
+    if (yMove && layerGroup.canScroll()) {
       // update view controller
       if (diffY > 0) {
-        viewController.decrementScrollIndex();
+        newPosition = viewController.getDecrementScrollPosition();
       } else {
-        viewController.incrementScrollIndex();
+        newPosition = viewController.getIncrementScrollPosition();
       }
     }
 
@@ -192,14 +194,19 @@ export class Scroll {
     const diffX = point.getX() - this.#startPoint.getX();
     const xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
-    const imageSize = viewController.getImageSize();
-    if (xMove && imageSize.moreThanOne(3)) {
+    if (xMove && layerGroup.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
-        viewController.incrementIndex(3);
+        newPosition = viewController.getIncrementPosition(3);
       } else {
-        viewController.decrementIndex(3);
+        newPosition = viewController.getDecrementPosition(3);
       }
+    }
+
+    // set all layers if at least one can be set
+    if (typeof newPosition !== 'undefined' &&
+      layerGroup.canSetPosition(newPosition)) {
+      viewController.setCurrentPosition(newPosition);
     }
 
     // reset origin point
