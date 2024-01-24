@@ -3189,6 +3189,24 @@ export declare class RGB {
 }
 
 /**
+ * Scroll wheel class: provides a wheel event handler
+ *   that scroll the corresponding data.
+ */
+export declare class ScrollWheel {
+    /**
+     * @param {App} app The associated application.
+     */
+    constructor(app: App);
+    /**
+     * Handle mouse wheel event.
+     *
+     * @param {WheelEvent} event The mouse wheel event.
+     */
+    wheel(event: WheelEvent): void;
+    #private;
+}
+
+/**
  * Immutable Size class.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
