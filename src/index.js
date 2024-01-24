@@ -91,6 +91,7 @@ import {
 import {getEllipseIndices} from './math/ellipse';
 // tools
 import {toolList} from './tools/index';
+import {ScrollWheel} from './tools/scrollWheel';
 // utils
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
@@ -142,6 +143,7 @@ export {
   DicomCode,
   MaskSegment,
   RGB,
+  ScrollWheel,
   defaults,
   logger,
   decoderScripts,
