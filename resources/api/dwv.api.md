@@ -444,6 +444,7 @@ export class LayerGroup {
     addTranslation(translation: object): void;
     addViewLayer(): ViewLayer;
     calculateFitScale(): number | undefined;
+    canScroll(): boolean;
     display(flag: boolean): void;
     draw(): void;
     empty(): void;
@@ -463,6 +464,8 @@ export class LayerGroup {
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
+    isPositionInBounds(position: Point): boolean;
+    moreThanOne(dim: number): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeLayer(layer: ViewLayer | DrawLayer): void;
     removeLayersByDataId(dataId: string): void;
@@ -477,6 +480,7 @@ export class LayerGroup {
     setOffset(newOffset: object): void;
     setScale(newScale: object, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
+    someViewLayer(callbackFn: Function): boolean;
     updateLayersToPositionChange: (event: object) => void;
 }
 
@@ -672,6 +676,12 @@ export class RGB {
 }
 
 // @public
+export class ScrollWheel {
+    constructor(app: App);
+    wheel(event: WheelEvent): void;
+}
+
+// @public
 export class Size {
     constructor(values: number[]);
     canScroll(viewOrientation: Matrix33): boolean;
@@ -770,9 +780,6 @@ export class View {
     constructor(image: Image_2);
     addEventListener(type: string, callback: Function): void;
     addWindowPresets(presets: object): void;
-    canSetPosition(position: Point): boolean;
-    decrementIndex(dim: number, silent: boolean): boolean;
-    decrementScrollIndex(silent: boolean): boolean;
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: number[] | number, index: number) => number;
     getColourMap(): string;
@@ -788,9 +795,8 @@ export class View {
     getWindowLevelMinMax(): WindowLevel;
     getWindowPresets(): object;
     getWindowPresetsNames(): string[];
-    incrementIndex(dim: number, silent: boolean): boolean;
-    incrementScrollIndex(silent: boolean): boolean;
     init(): void;
+    isPositionInBounds(position?: Point): boolean;
     removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setColourMap(name: string): void;
@@ -825,7 +831,6 @@ export class ViewController {
     applyHiddenSegments(): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
-    canSetPosition(position: Point): boolean;
     // @deprecated
     canWindowLevel(): boolean;
     decrementIndex(dim: number, silent?: boolean): boolean;
@@ -841,11 +846,15 @@ export class ViewController {
     getCurrentScrollIndexValue(): object;
     getCurrentScrollPosition(): object;
     getCurrentWindowPresetName(): string;
+    getDecrementPosition(dim: number): Point;
+    getDecrementScrollPosition(): Point;
     getImageRegionValues(min: Point2D, max: Point2D): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
     getImageVariableRegionValues(regions: any[]): any[];
     getImageWorldSize(): object;
+    getIncrementPosition(dim: number): Point;
+    getIncrementScrollPosition(): Point;
     getMaskSegmentHelper(): MaskSegmentHelper;
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
@@ -865,6 +874,8 @@ export class ViewController {
     isMask(): boolean;
     isMonochrome(): boolean;
     isPlaying(): boolean;
+    isPositionInBounds(position?: Point): boolean;
+    moreThanOne(dim: number): boolean;
     play(): void;
     removeEventListener(type: string, callback: Function): void;
     setColourMap(name: string): void;

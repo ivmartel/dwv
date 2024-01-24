@@ -2317,6 +2317,35 @@ export declare class LayerGroup {
      */
     removeLayer(layer: ViewLayer | DrawLayer): void;
     /**
+     * Test if one of the view layers satisfies an input callbackFn.
+     *
+     * @param {Function} callbackFn A function that takes a ViewLayer as input
+     *   and returns a boolean.
+     * @returns {boolean} True if one of the ViewLayers satisfies the callbackFn.
+     */
+    someViewLayer(callbackFn: Function): boolean;
+    /**
+     * Can the input position be set on one of the view layers.
+     *
+     * @param {Point} position The input position.
+     * @returns {boolean} True if one view layer accepts the input position.
+     */
+    isPositionInBounds(position: Point): boolean;
+    /**
+     * Can one of the view layers be scrolled.
+     *
+     * @returns {boolean} True if one view layer can be scrolled.
+     */
+    canScroll(): boolean;
+    /**
+     * Does one of the view layer have more than one slice in the
+     *   given dimension.
+     *
+     * @param {number} dim The input dimension.
+     * @returns {boolean} True if one view layer has more than one slice.
+     */
+    moreThanOne(dim: number): boolean;
+    /**
      * Update layers (but not the active view layer) to a position change.
      *
      * @param {object} event The position change event.
@@ -3160,6 +3189,24 @@ export declare class RGB {
 }
 
 /**
+ * Scroll wheel class: provides a wheel event handler
+ *   that scroll the corresponding data.
+ */
+export declare class ScrollWheel {
+    /**
+     * @param {App} app The associated application.
+     */
+    constructor(app: App);
+    /**
+     * Handle mouse wheel event.
+     *
+     * @param {WheelEvent} event The mouse wheel event.
+     */
+    wheel(event: WheelEvent): void;
+    #private;
+}
+
+/**
  * Immutable Size class.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
@@ -3749,12 +3796,13 @@ export declare class View {
      */
     getCurrentIndex(): Index;
     /**
-     * Check is the provided position can be set.
+     * Check if the current position (default) or
+     * the provided position is in bounds.
      *
-     * @param {Point} position The position.
+     * @param {Point} [position] Optional position.
      * @returns {boolean} True is the position is in bounds.
      */
-    canSetPosition(position: Point): boolean;
+    isPositionInBounds(position?: Point): boolean;
     /**
      * Get the first origin or at a given position.
      *
@@ -3847,41 +3895,11 @@ export declare class View {
      */
     generateImageData(data: ImageData, index: Index): void;
     /**
-     * Increment the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} silent Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementIndex(dim: number, silent: boolean): boolean;
-    /**
-     * Decrement the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} silent Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementIndex(dim: number, silent: boolean): boolean;
-    /**
      * Get the scroll dimension index.
      *
      * @returns {number} The index.
      */
     getScrollIndex(): number;
-    /**
-     * Decrement the scroll dimension index.
-     *
-     * @param {boolean} silent Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementScrollIndex(silent: boolean): boolean;
-    /**
-     * Increment the scroll dimension index.
-     *
-     * @param {boolean} silent Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementScrollIndex(silent: boolean): boolean;
     #private;
 }
 
@@ -4139,6 +4157,14 @@ export declare class ViewController {
      */
     getImageSize(): Size;
     /**
+     * Is the data size larger than one in the given dimension?
+     *
+     * @param {number} dim The dimension.
+     * @returns {boolean} True if the image size is larger than one
+     *   in the given dimension.
+     */
+    moreThanOne(dim: number): boolean;
+    /**
      * Get the image world (mm) 2D size.
      *
      * @returns {object} The 2D size as {x,y}.
@@ -4158,12 +4184,13 @@ export declare class ViewController {
      */
     equalImageMeta(meta: object): boolean;
     /**
-     * Check is the provided position can be set.
+     * Check if the current position (default) or
+     * the provided position is in bounds.
      *
-     * @param {Point} position The position.
+     * @param {Point} [position] Optional position.
      * @returns {boolean} True is the position is in bounds.
      */
-    canSetPosition(position: Point): boolean;
+    isPositionInBounds(position?: Point): boolean;
     /**
      * Set the current position.
      *
@@ -4210,6 +4237,32 @@ export declare class ViewController {
      * @returns {Vector3D} The 3D world offset.
      */
     getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    /**
+     * Get the current position incremented in the input direction.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {Point} The resulting point.
+     */
+    getIncrementPosition(dim: number): Point;
+    /**
+     * Get the current position decremented in the input direction.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {Point} The resulting point.
+     */
+    getDecrementPosition(dim: number): Point;
+    /**
+     * Get the current position decremented in the scroll direction.
+     *
+     * @returns {Point} The resulting point.
+     */
+    getIncrementScrollPosition(): Point;
+    /**
+     * Get the current position decremented in the scroll direction.
+     *
+     * @returns {Point} The resulting point.
+     */
+    getDecrementScrollPosition(): Point;
     /**
      * Increment the provided dimension.
      *
