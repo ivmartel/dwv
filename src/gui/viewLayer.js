@@ -266,6 +266,7 @@ export class ViewLayer {
   onimagechange = (event) => {
     // event.value = [index]
     if (this.#dataId === event.dataid) {
+      this.#isValidPosition = this.#viewController.isPositionInBounds();
       this.#needsDataUpdate = true;
     }
   };
