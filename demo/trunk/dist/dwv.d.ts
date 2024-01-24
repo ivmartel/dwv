@@ -2330,7 +2330,7 @@ export declare class LayerGroup {
      * @param {Point} position The input position.
      * @returns {boolean} True if one view layer accepts the input position.
      */
-    canSetPosition(position: Point): boolean;
+    isPositionInBounds(position: Point): boolean;
     /**
      * Can one of the view layers be scrolled.
      *
@@ -3778,12 +3778,13 @@ export declare class View {
      */
     getCurrentIndex(): Index;
     /**
-     * Check is the provided position can be set.
+     * Check if the current position (default) or
+     * the provided position is in bounds.
      *
-     * @param {Point} position The position.
+     * @param {Point} [position] Optional position.
      * @returns {boolean} True is the position is in bounds.
      */
-    canSetPosition(position: Point): boolean;
+    isPositionInBounds(position?: Point): boolean;
     /**
      * Get the first origin or at a given position.
      *
@@ -4165,12 +4166,13 @@ export declare class ViewController {
      */
     equalImageMeta(meta: object): boolean;
     /**
-     * Check is the provided position can be set.
+     * Check if the current position (default) or
+     * the provided position is in bounds.
      *
-     * @param {Point} position The position.
+     * @param {Point} [position] Optional position.
      * @returns {boolean} True is the position is in bounds.
      */
-    canSetPosition(position: Point): boolean;
+    isPositionInBounds(position?: Point): boolean;
     /**
      * Set the current position.
      *
