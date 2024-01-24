@@ -888,9 +888,9 @@ export class LayerGroup {
    * @param {Point} position The input position.
    * @returns {boolean} True if one view layer accepts the input position.
    */
-  canSetPosition(position) {
+  isPositionInBounds(position) {
     return this.someViewLayer(function (layer) {
-      return layer.getViewController().canSetPosition(position);
+      return layer.getViewController().isPositionInBounds(position);
     });
   }
 
@@ -971,7 +971,7 @@ export class LayerGroup {
           hasSetOffset =
             layer.setBaseOffset(zeroOffset, zeroOffset);
         } else {
-          if (vc.canSetPosition(position) &&
+          if (vc.isPositionInBounds(position) &&
             typeof origin !== 'undefined') {
             // TODO: compensate for possible different orientation between views
             const scrollDiff = baseViewLayerOrigin0.minus(origin0);

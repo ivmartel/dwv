@@ -532,12 +532,16 @@ export class View {
   }
 
   /**
-   * Check is the provided position can be set.
+   * Check if the current position (default) or
+   * the provided position is in bounds.
    *
-   * @param {Point} position The position.
+   * @param {Point} [position] Optional position.
    * @returns {boolean} True is the position is in bounds.
    */
-  canSetPosition(position) {
+  isPositionInBounds(position) {
+    if (typeof position === 'undefined') {
+      position = this.#currentPosition;
+    }
     const geometry = this.#image.getGeometry();
     const index = geometry.worldToIndex(position);
     const dirs = [this.getScrollIndex()];

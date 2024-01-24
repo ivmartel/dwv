@@ -205,7 +205,7 @@ export class Scroll {
 
     // set all layers if at least one can be set
     if (typeof newPosition !== 'undefined' &&
-      layerGroup.canSetPosition(newPosition)) {
+      layerGroup.isPositionInBounds(newPosition)) {
       viewController.setCurrentPosition(newPosition);
     }
 
