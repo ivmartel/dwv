@@ -552,30 +552,23 @@ function getViewConfig(divId) {
 }
 
 /**
- * Partially clone an existing config in the provided one.
+ * Merge an app data config into the input one.
+ * Copies all but the divId and orientation property.
  *
  * @param {string} dataId The data id.
  * @param {object} config The view config.
  * @returns {object} The update config.
  */
-function partialCloneOldConfig(dataId, config) {
+function mergeDataConfig(dataId, config) {
   const oldConfigs = _app.getViewConfigs(dataId);
   if (oldConfigs.length !== 0) {
     // use first config as base
     const oldConfig = oldConfigs[0];
-    // window/level
-    if (typeof oldConfig.windowCenter !== 'undefined' &&
-      typeof oldConfig.windowWidth !== 'undefined') {
-      config.windowCenter = oldConfig.windowCenter;
-      config.windowWidth = oldConfig.windowWidth;
-    }
-    // opacity
-    if (typeof oldConfig.opacity !== 'undefined') {
-      config.opacity = oldConfig.opacity;
-    }
-    // colour map
-    if (typeof oldConfig.colourMap !== 'undefined') {
-      config.colourMap = oldConfig.colourMap;
+    for (const key in oldConfig) {
+      if (key !== 'divId' &&
+        key !== 'orientation') {
+        config[key] = oldConfig[key];
+      }
     }
   }
   return config;
@@ -591,7 +584,7 @@ function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
     configs[dataId] =
-      [partialCloneOldConfig(dataId, getViewConfig('layerGroup0'))];
+      [mergeDataConfig(dataId, getViewConfig('layerGroup0'))];
   }
   return configs;
 }
@@ -612,7 +605,7 @@ function getOnebyTwoDataViewConfig(dataIds) {
     } else {
       config = getViewConfig('layerGroup1');
     }
-    configs[dataIds[i]] = [partialCloneOldConfig(dataId, config)];
+    configs[dataIds[i]] = [mergeDataConfig(dataId, config)];
   }
   return configs;
 }
@@ -627,9 +620,9 @@ function getMPRDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
     configs[dataId] = [
-      partialCloneOldConfig(dataId, getViewConfig('layerGroup0')),
-      partialCloneOldConfig(dataId, getViewConfig('layerGroup1')),
-      partialCloneOldConfig(dataId, getViewConfig('layerGroup2'))
+      mergeDataConfig(dataId, getViewConfig('layerGroup0')),
+      mergeDataConfig(dataId, getViewConfig('layerGroup1')),
+      mergeDataConfig(dataId, getViewConfig('layerGroup2'))
     ];
   }
   return configs;
@@ -1322,9 +1315,13 @@ function addDataRow(dataId) {
   const selectPreset = document.createElement('select');
   selectPreset.id = 'preset-' + dataId + '-select';
   const presets = initialVc.getWindowLevelPresetsNames();
+  const currentPresetName = initialVc.getCurrentWindowPresetName();
   for (const preset of presets) {
     const option = document.createElement('option');
     option.value = preset;
+    if (preset === currentPresetName) {
+      option.selected = true;
+    }
     option.appendChild(document.createTextNode(preset));
     selectPreset.appendChild(option);
   }
@@ -1357,9 +1354,13 @@ function addDataRow(dataId) {
   const selectColourMap = document.createElement('select');
   selectColourMap.id = 'colourmap-' + dataId + '-select';
   const colourMaps = Object.keys(dwv.luts);
+  const currentColourMap = initialVc.getColourMap();
   for (const colourMap of colourMaps) {
     const option = document.createElement('option');
     option.value = colourMap;
+    if (colourMap === currentColourMap) {
+      option.selected = true;
+    }
     option.appendChild(document.createTextNode(colourMap));
     selectColourMap.appendChild(option);
   }
