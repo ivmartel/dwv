@@ -821,6 +821,7 @@ export class ViewConfig {
     orientation: string | undefined;
     windowCenter: number | undefined;
     windowWidth: number | undefined;
+    wlPresetName: string | undefined;
 }
 
 // @public

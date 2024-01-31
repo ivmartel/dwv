@@ -3938,6 +3938,14 @@ export declare class ViewConfig {
      */
     opacity: number | undefined;
     /**
+     * Optional layer window level preset name.
+     * If present, the preset name will be used and
+     * the window centre and width ignored.
+     *
+     * @type {string|undefined}
+     */
+    wlPresetName: string | undefined;
+    /**
      * Optional layer window center.
      *
      * @type {number|undefined}
