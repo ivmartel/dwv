@@ -723,19 +723,21 @@ export class View {
     if (typeof name === 'undefined') {
       name = 'manual';
     }
+    if (name !== 'manual' &&
+      typeof this.#windowPresets[name] === 'undefined') {
+      throw new Error('Unknown window level preset: \'' + name + '\'');
+    }
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
-    // check if new
-    const isNew = !wl.equals(this.#currentWl);
+    // check if new wl
+    const isNewWl = !wl.equals(this.#currentWl);
+    // check if new name
+    const isNewName = this.#currentPresetName !== name;
 
     // compare to previous if present
-    if (isNew) {
-      const isNewWidth = this.#currentWl
-        ? this.#currentWl.width !== wl.width : true;
-      const isNewCenter = this.#currentWl
-        ? this.#currentWl.center !== wl.center : true;
+    if (isNewWl || isNewName) {
       // assign
       this.#currentWl = wl;
       this.#currentPresetName = name;
@@ -755,25 +757,23 @@ export class View {
         }
       }
 
-      if (isNewWidth || isNewCenter) {
-        /**
-         * Window/level change event.
-         *
-         * @event View#wlchange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} wc The new window center value.
-         * @property {number} ww The new window wdth value.
-         * @property {boolean} skipGenerate Flag to skip view generation.
-         */
-        this.#fireEvent({
-          type: 'wlchange',
-          value: [wl.center, wl.width],
-          wc: wl.center,
-          ww: wl.width,
-          skipGenerate: silent
-        });
-      }
+      /**
+       * Window/level change event.
+       *
+       * @event View#wlchange
+       * @type {object}
+       * @property {Array} value The changed value.
+       * @property {number} wc The new window center value.
+       * @property {number} ww The new window wdth value.
+       * @property {boolean} skipGenerate Flag to skip view generation.
+       */
+      this.#fireEvent({
+        type: 'wlchange',
+        value: [wl.center, wl.width, name],
+        wc: wl.center,
+        ww: wl.width,
+        skipGenerate: silent
+      });
     }
   }
 
