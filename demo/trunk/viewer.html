@@ -14,15 +14,19 @@ body {
 html, body {
   height: 99%;
 }
-table, td, th {
-  margin: 5px 0;
-  border: 1px solid #aaa;
-}
 table {
-  border-collapse: collapse;
+  margin: 0 5px;
 }
 td, th {
+  border: 1px solid #aaa;
   padding: 10px;
+}
+th {
+  background: #ddd;
+}
+thead {
+  position: sticky;
+  top: 0;
 }
 progress {
   width: 40%;
@@ -63,6 +67,19 @@ fieldset {
   font-size: small;
   font-style: italic;
 }
+#layersdetails {
+  max-height: 200px;
+  overflow: auto;
+  background-color: #E8E8E8;
+}
+.line {
+  padding: 5px;
+  background-color: #E8E8E8;
+}
+.toolFeatures {
+  margin: 0 5px;
+}
+/* special dwv */
 #dwv {
   display: flex;
   min-height: 200px;
@@ -89,10 +106,6 @@ canvas {
   /* avoid parent auto-resize */
   vertical-align: middle;
 }
-.line {
-  padding: 5px;
-  background-color: #E8E8E8;
-}
 /** tooltip */
 .layerGroup span {
   display: none;
@@ -118,9 +131,6 @@ hr.vertical {
   border-top: 2px dashed lime;
   transform-origin: left;
   transform: rotate(90deg);
-}
-.toolFeatures {
-  margin: 0 5px;
 }
 </style>
 
@@ -172,6 +182,8 @@ hr.vertical {
 </div>
 
 <div id="layersdetails"></div>
+
+<br>
 
 <div class="line" id="tests">Tests:</div>
 
