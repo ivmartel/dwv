@@ -312,8 +312,6 @@ export class View {
    * @fires View#wlchange
    */
   #getCurrentWindowLut() {
-    // get the current window level
-    let wl;
     // special case for 'perslice' presets
     if (this.#currentPresetName &&
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
@@ -324,18 +322,19 @@ export class View {
       if (!this.getCurrentIndex()) {
         this.setInitialIndex();
       }
+      // get the slice window level
       const currentIndex = this.getCurrentIndex();
-      // get the preset for this slice
       const offset = this.#image.getSecondaryOffset(currentIndex);
-      wl = this.#windowPresets[this.#currentPresetName].wl[offset];
+      const currentPreset = this.#windowPresets[this.#currentPresetName];
+      const sliceWl = currentPreset.wl[offset];
+      // set window level: will send a change event, mark it as silent as
+      // this change is always triggered by a position change
+      this.setWindowLevel(sliceWl, currentPreset.name, true);
     }
-    // regular case
-    if (typeof wl === 'undefined') {
-      // if no current, use first id
-      if (typeof this.#currentWl === 'undefined') {
-        this.setWindowLevelPresetById(0, true);
-      }
-      wl = this.#currentWl;
+
+    // if no current, use first id
+    if (typeof this.#currentWl === 'undefined') {
+      this.setWindowLevelPresetById(0, true);
     }
 
     // get the window lut
@@ -365,25 +364,18 @@ export class View {
         isDiscrete);
     }
 
-    // update VOI lut if not present or different from previous
+    // update VOI lut if not present or its window level
+    // is different from the current one
     const voiLut = this.#windowLut.getVoiLut();
     let voiLutWl;
     if (typeof voiLut !== 'undefined') {
       voiLutWl = voiLut.getWindowLevel();
     }
     if (typeof voiLut === 'undefined' ||
-      !wl.equals(voiLutWl)) {
+      !this.#currentWl.equals(voiLutWl)) {
       // set lut window level
-      const voiLut = new VoiLut(wl);
+      const voiLut = new VoiLut(this.#currentWl);
       this.#windowLut.setVoiLut(voiLut);
-      // fire change event
-      this.#fireEvent({
-        type: 'wlchange',
-        value: [wl.center, wl.width],
-        wc: wl.center,
-        ww: wl.width,
-        skipGenerate: true
-      });
     }
 
     // return
