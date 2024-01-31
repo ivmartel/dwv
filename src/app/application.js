@@ -66,6 +66,14 @@ export class ViewConfig {
    */
   opacity;
   /**
+   * Optional layer window level preset name.
+   * If present, the preset name will be used and
+   * the window centre and width ignored.
+   *
+   * @type {string|undefined}
+   */
+  wlPresetName;
+  /**
    * Optional layer window center.
    *
    * @type {number|undefined}
@@ -1700,8 +1708,19 @@ export class App {
       const groupId = layerDetails.groupDivId;
       const config = this.getViewConfig(event.dataid, groupId, true);
       if (typeof config !== 'undefined') {
-        config.windowCenter = event.value[0];
-        config.windowWidth = event.value[1];
+        // reset previous values
+        config.windowCenter = undefined;
+        config.windowWidth = undefined;
+        config.wlPresetName = undefined;
+        // window width and center
+        if (event.value.length === 2) {
+          config.windowCenter = event.value[0];
+          config.windowWidth = event.value[1];
+        }
+        // window level preset name
+        if (event.value.length === 3) {
+          config.wlPresetName = event.value[2];
+        }
       }
     });
     group.addEventListener('opacitychange', (event) => {
@@ -1791,7 +1810,9 @@ export class App {
     // view controller
     const viewController = viewLayer.getViewController();
     // window/level
-    if (typeof viewConfig.windowCenter !== 'undefined' &&
+    if (typeof viewConfig.wlPresetName !== 'undefined') {
+      viewController.setWindowLevelPreset(viewConfig.wlPresetName);
+    } else if (typeof viewConfig.windowCenter !== 'undefined' &&
       typeof viewConfig.windowWidth !== 'undefined') {
       const wl = new WindowLevel(
         viewConfig.windowCenter, viewConfig.windowWidth);
