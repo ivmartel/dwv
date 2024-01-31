@@ -329,7 +329,7 @@ export class View {
       const sliceWl = currentPreset.wl[offset];
       // set window level: will send a change event, mark it as silent as
       // this change is always triggered by a position change
-      this.setWindowLevel(sliceWl, currentPreset.name, true);
+      this.setWindowLevel(sliceWl, this.#currentPresetName, true);
     }
 
     // if no current, use first id
