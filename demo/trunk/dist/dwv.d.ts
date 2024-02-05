@@ -770,6 +770,9 @@ export declare namespace defaults {
 }
 
 /**
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+/**
  * DICOM code.
  */
 export declare class DicomCode {
@@ -2487,6 +2490,9 @@ export declare class MaskFactory {
     }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
 }
 
+/**
+ * @typedef {Object<string, DataElement>} DataElements
+ */
 /**
  * DICOM (mask) segment.
  */
