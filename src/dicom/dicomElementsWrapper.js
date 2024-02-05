@@ -353,7 +353,7 @@ function getElementAsString(tag, dicomElement, prefix) {
  * Extract the 2D size from dicom elements.
  *
  * @param {object} elements The DICOM elements.
- * @returns {object} The size.
+ * @returns {number[]} The size.
  */
 export function getImage2DSize(elements) {
   // rows
@@ -379,7 +379,7 @@ export function getImage2DSize(elements) {
  * Get the pixel spacing from the different spacing tags.
  *
  * @param {object} elements The DICOM elements.
- * @returns {object} The read spacing or the default [1,1].
+ * @returns {Spacing} The read spacing or the default [1,1].
  */
 export function getPixelSpacing(elements) {
   // default
