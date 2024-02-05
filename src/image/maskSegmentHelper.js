@@ -3,7 +3,7 @@ import {logger} from '../utils/logger';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from './image';
-import {MaskSegment} from './maskFactory';
+import {MaskSegment} from '../dicom/dicomSegment';
 /* eslint-enable no-unused-vars */
 
 /**

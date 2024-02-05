@@ -23,6 +23,10 @@ import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
+ * @typedef {Object<string, DataElement>} DataElements
+ */
+
+/**
  * Dump the DICOM tags to a string in the same way as the
  * DCMTK `dcmdump` command (https://support.dcmtk.org/docs-dcmrt/dcmdump.html).
  *
@@ -545,6 +549,33 @@ export function getDateTime(element) {
     time: dtTime
   };
 }
+
+/**
+ * Get a spacing object from a dicom measure element.
+ *
+ * @param {DataElements} dataElements The dicom element.
+ * @returns {Spacing} A spacing object.
+ */
+export function getSpacingFromMeasure(dataElements) {
+  // Pixel Spacing
+  if (typeof dataElements['00280030'] === 'undefined') {
+    return null;
+  }
+  const pixelSpacing = dataElements['00280030'];
+  const spacingValues = [
+    parseFloat(pixelSpacing.value[0]),
+    parseFloat(pixelSpacing.value[1])
+  ];
+  // Slice Thickness
+  if (typeof dataElements['00180050'] !== 'undefined') {
+    spacingValues.push(parseFloat(dataElements['00180050'].value[0]));
+  } else if (typeof dataElements['00180088'] !== 'undefined') {
+    // Spacing Between Slices
+    spacingValues.push(parseFloat(dataElements['00180088'].value[0]));
+  }
+  return new Spacing(spacingValues);
+}
+
 
 /**
  * Check an input tag.

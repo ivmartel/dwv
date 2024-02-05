@@ -36,6 +36,8 @@ import {
   getTagFromKey,
   getPixelDataTag
 } from './dicom/dicomTag';
+import {DicomCode} from './dicom/dicomCode';
+import {MaskSegment} from './dicom/dicomSegment';
 // gui
 import {
   customUI,
@@ -73,8 +75,6 @@ import {
   WindowLevel
 } from './image/windowLevel';
 import {
-  DicomCode,
-  MaskSegment,
   MaskFactory,
   getDefaultDicomSegJson
 } from './image/maskFactory';
