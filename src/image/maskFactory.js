@@ -2,10 +2,8 @@ import {
   getImage2DSize,
   getSpacingFromMeasure
 } from '../dicom/dicomElementsWrapper';
-import {
-  getSegment,
-  getSegmentFrameInfo
-} from '../dicom/dicomSegment';
+import {getSegment} from '../dicom/dicomSegment';
+import {getSegmentFrameInfo} from '../dicom/dicomSegmentFrameInfo';
 import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
