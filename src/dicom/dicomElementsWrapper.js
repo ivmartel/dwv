@@ -398,6 +398,7 @@ export function getPixelSpacing(elements) {
   for (let k = 0; k < keys.length; ++k) {
     const spacing = elements[keys[k]];
     if (spacing && spacing.value.length === 2) {
+      // spacing order: [row, column]
       rowSpacing = parseFloat(spacing.value[0]);
       columnSpacing = parseFloat(spacing.value[1]);
       break;
@@ -562,9 +563,10 @@ export function getSpacingFromMeasure(dataElements) {
     return null;
   }
   const pixelSpacing = dataElements['00280030'];
+  // spacing order: [row, column]
   const spacingValues = [
+    parseFloat(pixelSpacing.value[1]),
     parseFloat(pixelSpacing.value[0]),
-    parseFloat(pixelSpacing.value[1])
   ];
   // Slice Thickness
   if (typeof dataElements['00180050'] !== 'undefined') {
