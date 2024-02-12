@@ -195,6 +195,15 @@ export class ViewLayer {
   }
 
   /**
+   * Get the layer zoom offset.
+   *
+   * @returns {object} The offset as {x,y}.
+   */
+  getZoomOffset() {
+    return this.#zoomOffset;
+  }
+
+  /**
    * Set the imageSmoothing flag value.
    *
    * @param {boolean} flag True to enable smoothing.
@@ -431,6 +440,33 @@ export class ViewLayer {
 
     // store new scale
     this.#scale = finalNewScale;
+  }
+
+  /**
+   * Initialise the layer scale. Works with a zoom offset that
+   * comes from a equal view layer (size, scale, offset...).
+   *
+   * @param {object} newScale The scale as {x,y}.
+   * @param {object} zoomOffset The zoom offset as {x,y}.
+   */
+  initScale(newScale, zoomOffset) {
+    const helper = this.#viewController.getPlaneHelper();
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#scale = finalNewScale;
+
+    this.#zoomOffset = zoomOffset;
+    this.#offset = {
+      x: this.#offset.x + zoomOffset.x,
+      y: this.#offset.y + zoomOffset.y
+    };
   }
 
   /**
