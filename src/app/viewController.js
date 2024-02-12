@@ -21,6 +21,7 @@ import {ListenerHandler} from '../utils/listen';
 import {View} from '../image/view';
 import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -322,12 +323,12 @@ export class ViewController {
   /**
    * Get the current view (2D) spacing.
    *
-   * @returns {number[]} The spacing as a 2D array.
+   * @returns {Scalar2D} The spacing as a 2D array.
    */
   get2DSpacing() {
     const spacing = this.#view.getImage().getGeometry().getSpacing(
       this.#view.getOrientation());
-    return [spacing.get(0), spacing.get(1)];
+    return spacing.get2D();
   }
 
   /**
@@ -495,7 +496,7 @@ export class ViewController {
   /**
    * Get the image world (mm) 2D size.
    *
-   * @returns {object} The 2D size as {x,y}.
+   * @returns {Scalar2D} The 2D size as {x,y}.
    */
   getImageWorldSize() {
     const geometry = this.#view.getImage().getGeometry();
@@ -635,7 +636,7 @@ export class ViewController {
   /**
    * Get a 3D offset from a plane one.
    *
-   * @param {object} offset2D The plane offset as {x,y}.
+   * @param {Scalar2D} offset2D The plane offset as {x,y}.
    * @returns {Vector3D} The 3D world offset.
    */
   getOffset3DFromPlaneOffset(offset2D) {

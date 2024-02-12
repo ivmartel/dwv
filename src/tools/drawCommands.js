@@ -6,6 +6,7 @@ import Konva from 'konva';
 import {Style} from '../gui/style';
 import {DrawLayer} from '../gui/drawLayer';
 import {ViewController} from '../app/viewController';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -188,7 +189,7 @@ export class MoveGroupCommand {
   /**
    * The 2D translation as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #translation;
 

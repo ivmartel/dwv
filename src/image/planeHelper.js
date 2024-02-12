@@ -7,6 +7,7 @@ import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
 import {Spacing} from './spacing';
+import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -59,7 +60,7 @@ export class PlaneHelper {
   /**
    * Get a 3D offset from a plane one.
    *
-   * @param {object} offset2D The plane offset as {x,y}.
+   * @param {Scalar2D} offset2D The plane offset as {x,y}.
    * @returns {Vector3D} The 3D world offset.
    */
   getOffset3DFromPlaneOffset(offset2D) {
@@ -78,8 +79,8 @@ export class PlaneHelper {
   /**
    * Get a plane offset from a 3D one.
    *
-   * @param {object} offset3D The 3D offset as {x,y,z}.
-   * @returns {object} The plane offset as {x,y}.
+   * @param {Scalar3D} offset3D The 3D offset as {x,y,z}.
+   * @returns {Scalar2D} The plane offset as {x,y}.
    */
   getPlaneOffsetFromOffset3D(offset3D) {
     // ~worldToIndex
@@ -246,8 +247,8 @@ export class PlaneHelper {
   /**
    * Reorder values to follow target orientation.
    *
-   * @param {object} values Values as {x,y,z}.
-   * @returns {object} Reoriented values as {x,y,z}.
+   * @param {Scalar3D} values Values as {x,y,z}.
+   * @returns {Scalar3D} Reoriented values as {x,y,z}.
    */
   getTargetOrientedPositiveXYZ(values) {
     const orientedValues = getOrientedArray3D(

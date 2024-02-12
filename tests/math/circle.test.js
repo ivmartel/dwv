@@ -35,7 +35,8 @@ QUnit.test('Test Circle.', function (assert) {
   // getSurface
   assert.equal(c0.getSurface(), Math.PI * 2 * 2, 'getSurface');
   // getWorldSurface
-  assert.equal(c0.getWorldSurface(0.5, 0.5), Math.PI, 'getWorldSurface');
+  const spacing2D = {x: 0.5, y: 0.5};
+  assert.equal(c0.getWorldSurface(spacing2D), Math.PI, 'getWorldSurface');
 });
 
 /**
@@ -52,7 +53,7 @@ QUnit.test('Test Circle quantify.', function (assert) {
       return true;
     },
     get2DSpacing: function () {
-      return [1, 1];
+      return {x: 1, y: 1};
     },
     getCurrentPosition: function () {
       return new Index([0, 0, 0]);

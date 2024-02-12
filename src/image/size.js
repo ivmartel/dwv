@@ -3,6 +3,7 @@ import {Index} from '../math/index';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -268,7 +269,7 @@ export class Size {
   /**
    * Get the 2D base of this size.
    *
-   * @returns {object} The 2D base [0,1] as {x,y}.
+   * @returns {Scalar2D} The 2D base [0,1] as {x,y}.
    */
   get2D() {
     return {

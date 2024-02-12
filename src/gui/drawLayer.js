@@ -11,6 +11,8 @@ import Konva from 'konva';
 import {Point, Point3D} from '../math/point';
 import {Index} from '../math/index';
 import {Vector3D} from '../math/vector';
+import {Scalar2D, Scalar3D} from '../math/scalar';
+import {PlaneHelper} from '../image/planeHelper';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -35,56 +37,56 @@ export class DrawLayer {
   /**
    * The layer base size as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseSize;
 
   /**
    * The layer base spacing as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseSpacing;
 
   /**
    * The layer fit scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #fitScale = {x: 1, y: 1};
 
   /**
    * The layer flip scale.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #flipScale = {x: 1, y: 1, z: 1};
 
   /**
    * The base layer offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseOffset = {x: 0, y: 0};
 
   /**
    * The view offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #viewOffset = {x: 0, y: 0};
 
   /**
    * The zoom offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #zoomOffset = {x: 0, y: 0};
 
   /**
    * The flip offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #flipOffset = {x: 0, y: 0};
 
@@ -98,7 +100,7 @@ export class DrawLayer {
   /**
    * The plane helper.
    *
-   * @type {object}
+   * @type {PlaneHelper}
    */
   #planeHelper;
 
@@ -166,7 +168,7 @@ export class DrawLayer {
   /**
    * Set the plane helper.
    *
-   * @param {object} helper The helper.
+   * @param {PlaneHelper} helper The helper.
    */
   setPlaneHelper(helper) {
     this.#planeHelper = helper;
@@ -186,7 +188,7 @@ export class DrawLayer {
   /**
    * Get the layer base size (without scale).
    *
-   * @returns {object} The size as {x,y}.
+   * @returns {Scalar2D} The size as {x,y}.
    */
   getBaseSize() {
     return this.#baseSize;
@@ -262,7 +264,7 @@ export class DrawLayer {
   /**
    * Set the layer scale.
    *
-   * @param {object} newScale The scale as {x,y}.
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
    * @param {Point3D} [center] The scale center.
    */
   setScale(newScale, center) {
@@ -326,7 +328,7 @@ export class DrawLayer {
   /**
    * Set the layer offset.
    *
-   * @param {object} newOffset The offset as {x,y}.
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
    */
   setOffset(newOffset) {
     const planeNewOffset =
@@ -402,8 +404,8 @@ export class DrawLayer {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} size The image size as {x,y}.
-   * @param {object} spacing The image spacing as {x,y}.
+   * @param {Scalar2D} size The image size as {x,y}.
+   * @param {Scalar2D} spacing The image spacing as {x,y}.
    * @param {string} dataId The associated data id.
    */
   initialise(size, spacing, dataId) {
@@ -438,8 +440,8 @@ export class DrawLayer {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
-   * @param {object} fitSize The fit size as {x,y}.
-   * @param {object} fitOffset The fit offset as {x,y}.
+   * @param {Scalar2D} fitSize The fit size as {x,y}.
+   * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
   fitToContainer(fitScale1D, fitSize, fitOffset) {
     // update konva
@@ -654,7 +656,7 @@ export class DrawLayer {
    * Update label scale: compensate for it so
    *   that label size stays visually the same.
    *
-   * @param {object} scale The scale to compensate for as {x,y}.
+   * @param {Scalar2D} scale The scale to compensate for as {x,y}.
    */
   #updateLabelScale(scale) {
     // same formula as in style::applyZoomScale:

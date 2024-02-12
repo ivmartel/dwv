@@ -33,6 +33,7 @@ import {DrawLayer} from '../gui/drawLayer';
 import {Image} from '../image/image';
 import {Matrix33} from '../math/matrix';
 import {DataElement} from '../dicom/dataElement';
+import {Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -413,7 +414,7 @@ export class App {
   /**
    * Get the active layer group scale on top of the base scale.
    *
-   * @returns {object} The scale as {x,y}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getAddedScale() {
     return this.#stage.getActiveLayerGroup().getAddedScale();
@@ -422,7 +423,7 @@ export class App {
   /**
    * Get the base scale of the active layer group.
    *
-   * @returns {object} The scale as {x,y}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getBaseScale() {
     return this.#stage.getActiveLayerGroup().getBaseScale();
@@ -431,7 +432,7 @@ export class App {
   /**
    * Get the layer offset of the active layer group.
    *
-   * @returns {object} The offset.
+   * @returns {Scalar3D} The offset as {x,y,z}.
    */
   getOffset() {
     return this.#stage.getActiveLayerGroup().getOffset();
@@ -1186,7 +1187,7 @@ export class App {
    */
   translate(tx, ty) {
     const layerGroup = this.#stage.getActiveLayerGroup();
-    layerGroup.addTranslation({x: tx, y: ty});
+    layerGroup.addTranslation({x: tx, y: ty, z: 0});
     layerGroup.draw();
   }
 

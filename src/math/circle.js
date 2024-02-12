@@ -5,6 +5,7 @@ import {getStats} from './stats';
 /* eslint-disable no-unused-vars */
 import {Point2D} from '../math/point';
 import {ViewController} from '../app/viewController';
+import {Scalar2D} from './scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -96,13 +97,12 @@ export class Circle {
   /**
    * Get the surface of the circle according to a spacing.
    *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
+   * @param {Scalar2D} spacing2D The 2D spacing.
    * @returns {number} The surface of the circle multiplied by the given
    *  spacing or null for null spacings.
    */
-  getWorldSurface(spacingX, spacingY) {
-    return mulABC(this.getSurface(), spacingX, spacingY);
+  getWorldSurface(spacing2D) {
+    return mulABC(this.getSurface(), spacing2D.x, spacing2D.y);
   }
 
   /**
@@ -152,12 +152,12 @@ export class Circle {
   quantify(viewController, flags) {
     const quant = {};
     // shape quantification
-    const spacing = viewController.get2DSpacing();
+    const spacing2D = viewController.get2DSpacing();
     quant.radius = {
-      value: this.getRadius() * spacing[0],
+      value: this.getRadius() * spacing2D.x,
       unit: i18n.t('unit.mm')
     };
-    const surface = this.getWorldSurface(spacing[0], spacing[1]);
+    const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }

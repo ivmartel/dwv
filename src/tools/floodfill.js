@@ -15,6 +15,7 @@ import {logger} from '../utils/logger';
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
 import {LayerGroup} from '../gui/layerGroup';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -183,7 +184,7 @@ export class Floodfill {
    *
    * @param {Point2D} point The start point.
    * @param {string} divId The layer group divId.
-   * @returns {object} The coordinates as a {x,y}.
+   * @returns {Scalar2D} The coordinates as a {x,y}.
    */
   #getIndex = (point, divId) => {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);

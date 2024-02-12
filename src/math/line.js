@@ -4,6 +4,7 @@ import {i18n} from '../utils/i18n';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController';
+import {Scalar2D} from './scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -98,16 +99,15 @@ export class Line {
   /**
    * Get the length of the line according to a  spacing.
    *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
+   * @param {Scalar2D} spacing2D The 2D spacing.
    * @returns {number} The length of the line with spacing
    *  or null for null spacings.
    */
-  getWorldLength(spacingX, spacingY) {
+  getWorldLength(spacing2D) {
     let wlen = null;
-    if (spacingX !== null && spacingY !== null) {
-      const dxs = this.getDeltaX() * spacingX;
-      const dys = this.getDeltaY() * spacingY;
+    if (spacing2D !== null) {
+      const dxs = this.getDeltaX() * spacing2D.x;
+      const dys = this.getDeltaY() * spacing2D.y;
       wlen = Math.sqrt(dxs * dxs + dys * dys);
     }
     return wlen;
@@ -168,8 +168,8 @@ export class Line {
   quantify(viewController) {
     const quant = {};
     // length
-    const spacing = viewController.get2DSpacing();
-    const length = this.getWorldLength(spacing[0], spacing[1]);
+    const spacing2D = viewController.get2DSpacing();
+    const length = this.getWorldLength(spacing2D);
     if (length !== null) {
       quant.length = {value: length, unit: i18n.t('unit.mm')};
     }

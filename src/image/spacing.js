@@ -1,3 +1,8 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Scalar2D} from '../math/scalar';
+/* eslint-enable no-unused-vars */
+
 /**
  * Immutable Spacing class.
  * Warning: the input array is NOT cloned, modifying it will
@@ -97,7 +102,7 @@ export class Spacing {
   /**
    * Get the 2D base of this size.
    *
-   * @returns {object} The 2D base [col,row] as {x,y}.
+   * @returns {Scalar2D} The 2D base [col,row] as {x,y}.
    */
   get2D() {
     return {

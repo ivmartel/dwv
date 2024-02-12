@@ -23,7 +23,8 @@ QUnit.test('Test Line.', function (assert) {
   // getLength
   assert.equal(l00.getLength(), 5, 'getLength');
   // getWorldLength
-  assert.equal(l00.getWorldLength(0.5, 0.5), 2.5, 'getWorldLength');
+  const spacing2D = {x: 0.5, y: 0.5};
+  assert.equal(l00.getWorldLength(spacing2D), 2.5, 'getWorldLength');
   // getMidpoint
   const pMid = new Point2D(0, -2.5); // rounded...
   assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');

@@ -6,6 +6,7 @@ import {Index} from './index';
 /* eslint-disable no-unused-vars */
 import {Point2D} from '../math/point';
 import {ViewController} from '../app/viewController';
+import {Scalar2D} from './scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -115,13 +116,12 @@ export class Ellipse {
   /**
    * Get the surface of the ellipse according to a spacing.
    *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
+   * @param {Scalar2D} spacing2D The 2D spacing.
    * @returns {number} The surface of the ellipse multiplied by the given
    *  spacing or null for null spacings.
    */
-  getWorldSurface(spacingX, spacingY) {
-    return mulABC(this.getSurface(), spacingX, spacingY);
+  getWorldSurface(spacing2D) {
+    return mulABC(this.getSurface(), spacing2D.x, spacing2D.y);
   }
 
   /**
@@ -173,16 +173,16 @@ export class Ellipse {
   quantify(viewController, flags) {
     const quant = {};
     // shape quantification
-    const spacing = viewController.get2DSpacing();
+    const spacing2D = viewController.get2DSpacing();
     quant.a = {
-      value: this.getA() * spacing[0],
+      value: this.getA() * spacing2D.x,
       unit: i18n.t('unit.mm')
     };
     quant.b = {
-      value: this.getB() * spacing[1],
+      value: this.getB() * spacing2D.y,
       unit: i18n.t('unit.mm')
     };
-    const surface = this.getWorldSurface(spacing[0], spacing[1]);
+    const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }

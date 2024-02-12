@@ -1,6 +1,11 @@
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Scalar3D} from '../math/scalar';
+/* eslint-enable no-unused-vars */
+
 /**
  * RGB colour class.
  */
@@ -153,7 +158,7 @@ export function uintLabToLab(triplet) {
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
  *   unsigned int CIE LAB ([0, 65535]).
  *
- * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @param {object} triplet CIE XYZ triplet as {l,a,b} with CIE LAB range.
  * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
  */
 export function labToUintLab(triplet) {
@@ -184,7 +189,7 @@ const d65 = {
  *
  * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
- * @returns {object} CIE XYZ triplet as {x,y,z}.
+ * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */
 export function cielabToCiexyz(triplet) {
   /**
@@ -220,7 +225,7 @@ export function cielabToCiexyz(triplet) {
  * Convert CIE XYZ to CIE LAB (standard illuminant D65, 2degree 1931).
  *
  * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB
- * @param {object} triplet CIE XYZ triplet as {x,y,z}.
+ * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export function ciexyzToCielab(triplet) {
@@ -258,7 +263,7 @@ export function ciexyzToCielab(triplet) {
  * Convert CIE XYZ to sRGB.
  *
  * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
- * @param {object} triplet CIE XYZ triplet as {x,y,z}.
+ * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {RGB} sRGB triplet as {r,g,b}.
  */
 export function ciexyzToSrgb(triplet) {
@@ -296,7 +301,7 @@ export function ciexyzToSrgb(triplet) {
  *
  * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
  * @param {RGB} triplet sRGB triplet as {r,g,b}.
- * @returns {object} CIE XYZ triplet as {x,y,z}.
+ * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */
 export function srgbToCiexyz(triplet) {
   /**

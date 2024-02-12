@@ -12,6 +12,7 @@ import {DrawLayer} from './drawLayer';
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
 import {Point3D} from '../math/point';
+import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -113,11 +114,11 @@ export function getTargetOrientation(imageOrientation, viewOrientation) {
  * Get a scaled offset to adapt to new scale and such as the input center
  * stays at the same position.
  *
- * @param {object} offset The previous offset as {x,y}.
- * @param {object} scale The previous scale as {x,y}.
- * @param {object} newScale The new scale as {x,y}.
- * @param {object} center The scale center as {x,y}.
- * @returns {object} The scaled offset as {x,y}.
+ * @param {Scalar2D} offset The previous offset as {x,y}.
+ * @param {Scalar2D} scale The previous scale as {x,y}.
+ * @param {Scalar2D} newScale The new scale as {x,y}.
+ * @param {Scalar2D} center The scale center as {x,y}.
+ * @returns {Scalar2D} The scaled offset as {x,y}.
  */
 export function getScaledOffset(offset, scale, newScale, center) {
   // worldPoint = indexPoint / scale + offset
@@ -175,23 +176,23 @@ export class LayerGroup {
   #layers = [];
 
   /**
-   * The layer scale as {x,y}.
+   * The layer scale as {x,y,z}.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #scale = {x: 1, y: 1, z: 1};
 
   /**
-   * The base scale as {x,y}: all posterior scale will be on top of this one.
+   * The base scale as {x,y,z}: all posterior scale will be on top of this one.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #baseScale = {x: 1, y: 1, z: 1};
 
   /**
-   * The layer offset as {x,y}.
+   * The layer offset as {x,y,z}.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #offset = {x: 0, y: 0, z: 0};
 
@@ -311,7 +312,7 @@ export class LayerGroup {
   /**
    * Get the layer scale.
    *
-   * @returns {object} The scale as {x,y,z}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getScale() {
     return this.#scale;
@@ -320,7 +321,7 @@ export class LayerGroup {
   /**
    * Get the base scale.
    *
-   * @returns {object} The scale as {x,y,z}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getBaseScale() {
     return this.#baseScale;
@@ -329,7 +330,7 @@ export class LayerGroup {
   /**
    * Get the added scale: the scale added to the base scale
    *
-   * @returns {object} The scale as {x,y,z}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getAddedScale() {
     return {
@@ -342,7 +343,7 @@ export class LayerGroup {
   /**
    * Get the layer offset.
    *
-   * @returns {object} The offset as {x,y,z}.
+   * @returns {Scalar3D} The offset as {x,y,z}.
    */
   getOffset() {
     return this.#offset;
@@ -1075,7 +1076,7 @@ export class LayerGroup {
   /**
    * Get the largest data size.
    *
-   * @returns {object|undefined} The largest size as {x,y}.
+   * @returns {Scalar2D|undefined} The largest size as {x,y}.
    */
   getMaxSize() {
     let maxSize = {x: 0, y: 0};
@@ -1122,7 +1123,7 @@ export class LayerGroup {
   /**
    * Set the layers' scale.
    *
-   * @param {object} newScale The scale to apply as {x,y,z}.
+   * @param {Scalar3D} newScale The scale to apply as {x,y,z}.
    * @param {Point3D} [center] The scale center Point3D.
    * @fires LayerGroup#zoomchange
    */
@@ -1163,7 +1164,7 @@ export class LayerGroup {
   /**
    * Add translation to the layers.
    *
-   * @param {object} translation The translation as {x,y,z}.
+   * @param {Scalar3D} translation The translation as {x,y,z}.
    */
   addTranslation(translation) {
     this.setOffset({
@@ -1176,7 +1177,7 @@ export class LayerGroup {
   /**
    * Set the layers' offset.
    *
-   * @param {object} newOffset The offset as {x,y,z}.
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
    * @fires LayerGroup#offsetchange
    */
   setOffset(newOffset) {

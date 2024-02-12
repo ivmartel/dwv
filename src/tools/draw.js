@@ -28,6 +28,7 @@ import Konva from 'konva';
 import {App} from '../app/application';
 import {Style} from '../gui/style';
 import {LayerGroup} from '../gui/layerGroup';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -737,9 +738,9 @@ export class Draw {
    * Get the real position from an event.
    * TODO: use layer method?
    *
-   * @param {object} index The input index as {x,y}.
+   * @param {Scalar2D} index The input index as {x,y}.
    * @param {LayerGroup} layerGroup The origin layer group.
-   * @returns {object} The real position in the image as {x,y}.
+   * @returns {Scalar2D} The real position in the image as {x,y}.
    */
   #getRealPosition(index, layerGroup) {
     const drawLayer = layerGroup.getActiveDrawLayer();
@@ -1207,7 +1208,7 @@ function boundNodePosition(node, min, max) {
 /**
  * Validate a group position.
  *
- * @param {object} stageSize The stage size {x,y}.
+ * @param {Scalar2D} stageSize The stage size {x,y}.
  * @param {Konva.Group} group The group to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
@@ -1236,7 +1237,7 @@ function validateGroupPosition(stageSize, group) {
 /**
  * Validate an anchor position.
  *
- * @param {object} stageSize The stage size {x,y}.
+ * @param {Scalar2D} stageSize The stage size {x,y}.
  * @param {Konva.Shape} anchor The anchor to evaluate.
  * @returns {boolean} True if the position was corrected.
  */

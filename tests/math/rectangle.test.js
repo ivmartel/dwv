@@ -44,7 +44,8 @@ QUnit.test('Test Rectangle.', function (assert) {
   // getSurface
   assert.equal(r00.getSurface(), 16, 'getSurface');
   // getWorldSurface
-  assert.equal(r00.getWorldSurface(0.5, 0.5), 4, 'getWorldSurface');
+  const spacing2D = {x: 0.5, y: 0.5};
+  assert.equal(r00.getWorldSurface(spacing2D), 4, 'getWorldSurface');
 });
 
 /**
@@ -62,7 +63,7 @@ QUnit.test('Test Rectangle quantify.', function (assert) {
       return true;
     },
     get2DSpacing: function () {
-      return [1, 1];
+      return {x: 1, y: 1};
     },
     getCurrentPosition: function () {
       return new Index([0, 0, 0]);

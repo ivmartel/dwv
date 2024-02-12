@@ -84,6 +84,7 @@ import {MaskSegmentHelper} from './image/maskSegmentHelper';
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
 import {Index} from './math/index';
+import {Scalar2D, Scalar3D} from './math/scalar';
 import {
   Matrix33,
   Orientation
@@ -139,6 +140,8 @@ export {
   Point3D,
   Vector3D,
   Matrix33,
+  Scalar2D,
+  Scalar3D,
   MaskFactory,
   DicomCode,
   MaskSegment,

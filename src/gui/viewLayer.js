@@ -13,6 +13,7 @@ import {getScaledOffset} from './layerGroup';
 /* eslint-disable no-unused-vars */
 import {Vector3D} from '../math/vector';
 import {Point, Point3D} from '../math/point';
+import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -72,14 +73,14 @@ export class ViewLayer {
   /**
    * The layer base size as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseSize;
 
   /**
    * The layer base spacing as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseSpacing;
 
@@ -93,56 +94,56 @@ export class ViewLayer {
   /**
    * The layer scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #scale = {x: 1, y: 1};
 
   /**
    * The layer fit scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #fitScale = {x: 1, y: 1};
 
   /**
    * The layer flip scale.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #flipScale = {x: 1, y: 1, z: 1};
 
   /**
    * The layer offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #offset = {x: 0, y: 0};
 
   /**
    * The base layer offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseOffset = {x: 0, y: 0};
 
   /**
    * The view offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #viewOffset = {x: 0, y: 0};
 
   /**
    * The zoom offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #zoomOffset = {x: 0, y: 0};
 
   /**
    * The flip offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #flipOffset = {x: 0, y: 0};
 
@@ -197,7 +198,7 @@ export class ViewLayer {
   /**
    * Get the layer zoom offset.
    *
-   * @returns {object} The offset as {x,y}.
+   * @returns {Scalar2D} The offset as {x,y}.
    */
   getZoomOffset() {
     return this.#zoomOffset;
@@ -294,7 +295,7 @@ export class ViewLayer {
   /**
    * Get the layer base size (without scale).
    *
-   * @returns {object} The size as {x,y}.
+   * @returns {Scalar2D} The size as {x,y}.
    */
   getBaseSize() {
     return this.#baseSize;
@@ -303,7 +304,7 @@ export class ViewLayer {
   /**
    * Get the image world (mm) 2D size.
    *
-   * @returns {object} The 2D size as {x,y}.
+   * @returns {Scalar2D} The 2D size as {x,y}.
    */
   getImageWorldSize() {
     return this.#viewController.getImageWorldSize();
@@ -384,7 +385,7 @@ export class ViewLayer {
   /**
    * Set the layer scale.
    *
-   * @param {object} newScale The scale as {x,y}.
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
    * @param {Point3D} [center] The scale center.
    */
   setScale(newScale, center) {
@@ -446,8 +447,8 @@ export class ViewLayer {
    * Initialise the layer scale. Works with a zoom offset that
    * comes from a equal view layer (size, scale, offset...).
    *
-   * @param {object} newScale The scale as {x,y}.
-   * @param {object} zoomOffset The zoom offset as {x,y}.
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} zoomOffset The zoom offset as {x,y}.
    */
   initScale(newScale, zoomOffset) {
     const helper = this.#viewController.getPlaneHelper();
@@ -485,7 +486,7 @@ export class ViewLayer {
       z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
-    this.#baseOffset.y !== newOffset.y;
+      this.#baseOffset.y !== newOffset.y;
     // reset offset if needed
     if (needsUpdate) {
       this.#offset = {
@@ -500,7 +501,7 @@ export class ViewLayer {
   /**
    * Set the layer offset.
    *
-   * @param {object} newOffset The offset as {x,y}.
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
    */
   setOffset(newOffset) {
     const helper = this.#viewController.getPlaneHelper();
@@ -690,8 +691,8 @@ export class ViewLayer {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} size The image size as {x,y}.
-   * @param {object} spacing The image spacing as {x,y}.
+   * @param {Scalar2D} size The image size as {x,y}.
+   * @param {Scalar2D} spacing The image spacing as {x,y}.
    * @param {number} alpha The initial data opacity.
    */
   initialise(size, spacing, alpha) {
@@ -729,7 +730,7 @@ export class ViewLayer {
   /**
    * Set the base size of the layer.
    *
-   * @param {object} size The size as {x,y}.
+   * @param {Scalar2D} size The size as {x,y}.
    */
   #setBaseSize(size) {
     // check canvas creation
@@ -754,8 +755,8 @@ export class ViewLayer {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
-   * @param {object} fitSize The fit size as {x,y}.
-   * @param {object} fitOffset The fit offset as {x,y}.
+   * @param {Scalar2D} fitSize The fit size as {x,y}.
+   * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
   fitToContainer(fitScale1D, fitSize, fitOffset) {
     let needsDraw = false;
