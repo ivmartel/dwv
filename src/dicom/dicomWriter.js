@@ -940,15 +940,14 @@ export class DicomWriter {
     // add compulsory tags to output data if not present
     for (const key of missingTags) {
       const tag = getTagFromKey(key);
-      const info = tag.getInfoFromDictionary();
-      const dataElement = new DataElement(info[0]);
+      const dataElement = new DataElement(tag.getVrFromDictionary());
       dataElement.tag = tag;
       // rules are indexed by key or tag name
       let value;
       if (typeof this.#rules[key] !== 'undefined') {
         value = this.#rules[key].value;
       } else {
-        const name = info[2];
+        const name = tag.getNameFromDictionary();
         value = this.#rules[name].value;
       }
       // add element

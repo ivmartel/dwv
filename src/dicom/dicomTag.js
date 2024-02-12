@@ -130,9 +130,9 @@ export class Tag {
   /**
    * Get the tag info from the dicom dictionary.
    *
-   * @returns {Array|undefined} The info as [vr, multiplicity, name].
+   * @returns {string[]|undefined} The info as [vr, multiplicity, name].
    */
-  getInfoFromDictionary() {
+  #getInfoFromDictionary() {
     let info;
     if (typeof dictionary[this.#group] !== 'undefined' &&
       typeof dictionary[this.#group][this.#element] !==
@@ -149,7 +149,7 @@ export class Tag {
    */
   getVrFromDictionary() {
     let vr;
-    const info = this.getInfoFromDictionary();
+    const info = this.#getInfoFromDictionary();
     if (typeof info !== 'undefined') {
       vr = info[0];
     }
@@ -163,7 +163,7 @@ export class Tag {
    */
   getNameFromDictionary() {
     let name;
-    const info = this.getInfoFromDictionary();
+    const info = this.#getInfoFromDictionary();
     if (typeof info !== 'undefined') {
       name = info[2];
     }
