@@ -106,21 +106,21 @@ export declare class App {
     /**
      * Get the active layer group scale on top of the base scale.
      *
-     * @returns {object} The scale as {x,y}.
+     * @returns {Scalar3D} The scale as {x,y,z}.
      */
-    getAddedScale(): object;
+    getAddedScale(): Scalar3D;
     /**
      * Get the base scale of the active layer group.
      *
-     * @returns {object} The scale as {x,y}.
+     * @returns {Scalar3D} The scale as {x,y,z}.
      */
-    getBaseScale(): object;
+    getBaseScale(): Scalar3D;
     /**
      * Get the layer offset of the active layer group.
      *
-     * @returns {object} The offset.
+     * @returns {Scalar3D} The offset as {x,y,z}.
      */
-    getOffset(): object;
+    getOffset(): Scalar3D;
     /**
      * Get the toolbox controller.
      *
@@ -1127,9 +1127,9 @@ export declare class DrawLayer {
     /**
      * Set the plane helper.
      *
-     * @param {object} helper The helper.
+     * @param {PlaneHelper} helper The helper.
      */
-    setPlaneHelper(helper: object): void;
+    setPlaneHelper(helper: PlaneHelper): void;
     /**
      * Get the id of the layer.
      *
@@ -1139,9 +1139,9 @@ export declare class DrawLayer {
     /**
      * Get the layer base size (without scale).
      *
-     * @returns {object} The size as {x,y}.
+     * @returns {Scalar2D} The size as {x,y}.
      */
-    getBaseSize(): object;
+    getBaseSize(): Scalar2D;
     /**
      * Get the layer opacity.
      *
@@ -1177,16 +1177,16 @@ export declare class DrawLayer {
     /**
      * Set the layer scale.
      *
-     * @param {object} newScale The scale as {x,y}.
+     * @param {Scalar3D} newScale The scale as {x,y,z}.
      * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center?: Point3D): void;
+    setScale(newScale: Scalar3D, center?: Point3D): void;
     /**
      * Set the layer offset.
      *
-     * @param {object} newOffset The offset as {x,y}.
+     * @param {Scalar3D} newOffset The offset as {x,y,z}.
      */
-    setOffset(newOffset: object): void;
+    setOffset(newOffset: Scalar3D): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
@@ -1215,19 +1215,19 @@ export declare class DrawLayer {
     /**
      * Initialise the layer: set the canvas and context
      *
-     * @param {object} size The image size as {x,y}.
-     * @param {object} spacing The image spacing as {x,y}.
+     * @param {Scalar2D} size The image size as {x,y}.
+     * @param {Scalar2D} spacing The image spacing as {x,y}.
      * @param {string} dataId The associated data id.
      */
-    initialise(size: object, spacing: object, dataId: string): void;
+    initialise(size: Scalar2D, spacing: Scalar2D, dataId: string): void;
     /**
      * Fit the layer to its parent container.
      *
      * @param {number} fitScale1D The 1D fit scale.
-     * @param {object} fitSize The fit size as {x,y}.
-     * @param {object} fitOffset The fit offset as {x,y}.
+     * @param {Scalar2D} fitSize The fit size as {x,y}.
+     * @param {Scalar2D} fitOffset The fit offset as {x,y}.
      */
-    fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
+    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     /**
      * Check the visibility of a given group.
      *
@@ -2133,7 +2133,7 @@ export declare class Index {
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
  *   unsigned int CIE LAB ([0, 65535]).
  *
- * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @param {object} triplet CIE XYZ triplet as {l,a,b} with CIE LAB range.
  * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
  */
 export declare function labToUintLab(triplet: object): object;
@@ -2186,27 +2186,27 @@ export declare class LayerGroup {
     /**
      * Get the layer scale.
      *
-     * @returns {object} The scale as {x,y,z}.
+     * @returns {Scalar3D} The scale as {x,y,z}.
      */
-    getScale(): object;
+    getScale(): Scalar3D;
     /**
      * Get the base scale.
      *
-     * @returns {object} The scale as {x,y,z}.
+     * @returns {Scalar3D} The scale as {x,y,z}.
      */
-    getBaseScale(): object;
+    getBaseScale(): Scalar3D;
     /**
      * Get the added scale: the scale added to the base scale
      *
-     * @returns {object} The scale as {x,y,z}.
+     * @returns {Scalar3D} The scale as {x,y,z}.
      */
-    getAddedScale(): object;
+    getAddedScale(): Scalar3D;
     /**
      * Get the layer offset.
      *
-     * @returns {object} The offset as {x,y,z}.
+     * @returns {Scalar3D} The offset as {x,y,z}.
      */
-    getOffset(): object;
+    getOffset(): Scalar3D;
     /**
      * Get the number of layers handled by this class.
      *
@@ -2370,9 +2370,9 @@ export declare class LayerGroup {
     /**
      * Get the largest data size.
      *
-     * @returns {object|undefined} The largest size as {x,y}.
+     * @returns {Scalar2D|undefined} The largest size as {x,y}.
      */
-    getMaxSize(): object | undefined;
+    getMaxSize(): Scalar2D | undefined;
     /**
      * Flip all layers along the Z axis without offset compensation.
      */
@@ -2387,24 +2387,24 @@ export declare class LayerGroup {
     /**
      * Set the layers' scale.
      *
-     * @param {object} newScale The scale to apply as {x,y,z}.
+     * @param {Scalar3D} newScale The scale to apply as {x,y,z}.
      * @param {Point3D} [center] The scale center Point3D.
      * @fires LayerGroup#zoomchange
      */
-    setScale(newScale: object, center?: Point3D): void;
+    setScale(newScale: Scalar3D, center?: Point3D): void;
     /**
      * Add translation to the layers.
      *
-     * @param {object} translation The translation as {x,y,z}.
+     * @param {Scalar3D} translation The translation as {x,y,z}.
      */
-    addTranslation(translation: object): void;
+    addTranslation(translation: Scalar3D): void;
     /**
      * Set the layers' offset.
      *
-     * @param {object} newOffset The offset as {x,y,z}.
+     * @param {Scalar3D} newOffset The offset as {x,y,z}.
      * @fires LayerGroup#offsetchange
      */
-    setOffset(newOffset: object): void;
+    setOffset(newOffset: Scalar3D): void;
     /**
      * Reset the stage to its initial scale and no offset.
      */
@@ -2842,17 +2842,17 @@ export declare class PlaneHelper {
     /**
      * Get a 3D offset from a plane one.
      *
-     * @param {object} offset2D The plane offset as {x,y}.
+     * @param {Scalar2D} offset2D The plane offset as {x,y}.
      * @returns {Vector3D} The 3D world offset.
      */
-    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     /**
      * Get a plane offset from a 3D one.
      *
-     * @param {object} offset3D The 3D offset as {x,y,z}.
-     * @returns {object} The plane offset as {x,y}.
+     * @param {Scalar3D} offset3D The 3D offset as {x,y,z}.
+     * @returns {Scalar2D} The plane offset as {x,y}.
      */
-    getPlaneOffsetFromOffset3D(offset3D: object): object;
+    getPlaneOffsetFromOffset3D(offset3D: Scalar3D): Scalar2D;
     /**
      * Orient an input vector from real to target space.
      *
@@ -2905,10 +2905,10 @@ export declare class PlaneHelper {
     /**
      * Reorder values to follow target orientation.
      *
-     * @param {object} values Values as {x,y,z}.
-     * @returns {object} Reoriented values as {x,y,z}.
+     * @param {Scalar3D} values Values as {x,y,z}.
+     * @returns {Scalar3D} Reoriented values as {x,y,z}.
      */
-    getTargetOrientedPositiveXYZ(values: object): object;
+    getTargetOrientedPositiveXYZ(values: Scalar3D): Scalar3D;
     /**
      * Get the (view) scroll dimension index.
      *
@@ -3195,6 +3195,48 @@ export declare class RGB {
 }
 
 /**
+ * Mutable 2D scalar ({x,y}).
+ */
+export declare class Scalar2D {
+    /**
+     * X value.
+     *
+     * @type {number}
+     */
+    x: number;
+    /**
+     * Y value.
+     *
+     * @type {number}
+     */
+    y: number;
+}
+
+/**
+ * Mutable 3D scalar ({x,y,z}).
+ */
+export declare class Scalar3D {
+    /**
+     * X value.
+     *
+     * @type {number}
+     */
+    x: number;
+    /**
+     * Y value.
+     *
+     * @type {number}
+     */
+    y: number;
+    /**
+     * Z value.
+     *
+     * @type {number}
+     */
+    z: number;
+}
+
+/**
  * Scroll wheel class: provides a wheel event handler
  *   that scroll the corresponding data.
  */
@@ -3317,9 +3359,9 @@ export declare class Size {
     /**
      * Get the 2D base of this size.
      *
-     * @returns {object} The 2D base [0,1] as {x,y}.
+     * @returns {Scalar2D} The 2D base [0,1] as {x,y}.
      */
-    get2D(): object;
+    get2D(): Scalar2D;
     #private;
 }
 
@@ -3368,9 +3410,9 @@ export declare class Spacing {
     /**
      * Get the 2D base of this size.
      *
-     * @returns {object} The 2D base [col,row] as {x,y}.
+     * @returns {Scalar2D} The 2D base [col,row] as {x,y}.
      */
-    get2D(): object;
+    get2D(): Scalar2D;
     #private;
 }
 
@@ -4106,9 +4148,9 @@ export declare class ViewController {
     /**
      * Get the current view (2D) spacing.
      *
-     * @returns {number[]} The spacing as a 2D array.
+     * @returns {Scalar2D} The spacing as a 2D array.
      */
-    get2DSpacing(): number[];
+    get2DSpacing(): Scalar2D;
     /**
      * Get the image rescaled value at the input position.
      *
@@ -4181,9 +4223,9 @@ export declare class ViewController {
     /**
      * Get the image world (mm) 2D size.
      *
-     * @returns {object} The 2D size as {x,y}.
+     * @returns {Scalar2D} The 2D size as {x,y}.
      */
-    getImageWorldSize(): object;
+    getImageWorldSize(): Scalar2D;
     /**
      * Get the image rescaled data range.
      *
@@ -4247,10 +4289,10 @@ export declare class ViewController {
     /**
      * Get a 3D offset from a plane one.
      *
-     * @param {object} offset2D The plane offset as {x,y}.
+     * @param {Scalar2D} offset2D The plane offset as {x,y}.
      * @returns {Vector3D} The 3D world offset.
      */
-    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     /**
      * Get the current position incremented in the input direction.
      *
@@ -4394,9 +4436,9 @@ export declare class ViewLayer {
     /**
      * Get the layer zoom offset.
      *
-     * @returns {object} The offset as {x,y}.
+     * @returns {Scalar2D} The offset as {x,y}.
      */
-    getZoomOffset(): object;
+    getZoomOffset(): Scalar2D;
     /**
      * Set the imageSmoothing flag value.
      *
@@ -4445,15 +4487,15 @@ export declare class ViewLayer {
     /**
      * Get the layer base size (without scale).
      *
-     * @returns {object} The size as {x,y}.
+     * @returns {Scalar2D} The size as {x,y}.
      */
-    getBaseSize(): object;
+    getBaseSize(): Scalar2D;
     /**
      * Get the image world (mm) 2D size.
      *
-     * @returns {object} The 2D size as {x,y}.
+     * @returns {Scalar2D} The 2D size as {x,y}.
      */
-    getImageWorldSize(): object;
+    getImageWorldSize(): Scalar2D;
     /**
      * Get the layer opacity.
      *
@@ -4489,18 +4531,18 @@ export declare class ViewLayer {
     /**
      * Set the layer scale.
      *
-     * @param {object} newScale The scale as {x,y}.
+     * @param {Scalar3D} newScale The scale as {x,y,z}.
      * @param {Point3D} [center] The scale center.
      */
-    setScale(newScale: object, center?: Point3D): void;
+    setScale(newScale: Scalar3D, center?: Point3D): void;
     /**
      * Initialise the layer scale. Works with a zoom offset that
      * comes from a equal view layer (size, scale, offset...).
      *
-     * @param {object} newScale The scale as {x,y}.
-     * @param {object} zoomOffset The zoom offset as {x,y}.
+     * @param {Scalar3D} newScale The scale as {x,y,z}.
+     * @param {Scalar2D} zoomOffset The zoom offset as {x,y}.
      */
-    initScale(newScale: object, zoomOffset: object): void;
+    initScale(newScale: Scalar3D, zoomOffset: Scalar2D): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
@@ -4512,9 +4554,9 @@ export declare class ViewLayer {
     /**
      * Set the layer offset.
      *
-     * @param {object} newOffset The offset as {x,y}.
+     * @param {Scalar3D} newOffset The offset as {x,y,z}.
      */
-    setOffset(newOffset: object): void;
+    setOffset(newOffset: Scalar3D): void;
     /**
      * Transform a display position to a 2D index.
      *
@@ -4574,19 +4616,19 @@ export declare class ViewLayer {
     /**
      * Initialise the layer: set the canvas and context
      *
-     * @param {object} size The image size as {x,y}.
-     * @param {object} spacing The image spacing as {x,y}.
+     * @param {Scalar2D} size The image size as {x,y}.
+     * @param {Scalar2D} spacing The image spacing as {x,y}.
      * @param {number} alpha The initial data opacity.
      */
-    initialise(size: object, spacing: object, alpha: number): void;
+    initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
     /**
      * Fit the layer to its parent container.
      *
      * @param {number} fitScale1D The 1D fit scale.
-     * @param {object} fitSize The fit size as {x,y}.
-     * @param {object} fitOffset The fit offset as {x,y}.
+     * @param {Scalar2D} fitSize The fit size as {x,y}.
+     * @param {Scalar2D} fitOffset The fit offset as {x,y}.
      */
-    fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
+    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     /**
      * Enable and listen to container interaction events.
      */
