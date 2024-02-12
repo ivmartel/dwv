@@ -915,7 +915,9 @@ export class ViewLayer {
     getImageWorldSize(): object;
     getOpacity(): number;
     getViewController(): ViewController;
+    getZoomOffset(): object;
     initialise(size: object, spacing: object, alpha: number): void;
+    initScale(newScale: object, zoomOffset: object): void;
     isVisible(): boolean;
     onimagechange: (event: object) => void;
     onimageset: (event: object) => void;
