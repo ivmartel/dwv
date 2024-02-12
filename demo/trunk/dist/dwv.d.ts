@@ -4392,6 +4392,12 @@ export declare class ViewLayer {
      */
     getDataId(): string;
     /**
+     * Get the layer zoom offset.
+     *
+     * @returns {object} The offset as {x,y}.
+     */
+    getZoomOffset(): object;
+    /**
      * Set the imageSmoothing flag value.
      *
      * @param {boolean} flag True to enable smoothing.
@@ -4487,6 +4493,14 @@ export declare class ViewLayer {
      * @param {Point3D} [center] The scale center.
      */
     setScale(newScale: object, center?: Point3D): void;
+    /**
+     * Initialise the layer scale. Works with a zoom offset that
+     * comes from a equal view layer (size, scale, offset...).
+     *
+     * @param {object} newScale The scale as {x,y}.
+     * @param {object} zoomOffset The zoom offset as {x,y}.
+     */
+    initScale(newScale: object, zoomOffset: object): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
