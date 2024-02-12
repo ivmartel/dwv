@@ -4,9 +4,13 @@ import Konva from 'konva';
  * Add tags to the dictionary.
  *
  * @param {string} group The group key.
- * @param {object} tags The tags to add.
+ * @param {Object<string, string[]>} tags The tags to add as an
+ *   object indexed by element key with values as:
+ *   [VR, multiplicity, TagName] (all strings).
  */
-export declare function addTagsToDictionary(group: string, tags: object): void;
+export declare function addTagsToDictionary(group: string, tags: {
+    [x: string]: string[];
+}): void;
 
 /**
  * List of ViewConfigs indexed by dataIds.
@@ -3486,12 +3490,6 @@ export declare class Tag {
      *   ie if its group is an odd number.
      */
     isPrivate(): boolean;
-    /**
-     * Get the tag info from the dicom dictionary.
-     *
-     * @returns {Array|undefined} The info as [vr, multiplicity, name].
-     */
-    getInfoFromDictionary(): any[] | undefined;
     /**
      * Get the tag Value Representation (VR) from the dicom dictionary.
      *
