@@ -938,10 +938,6 @@ export declare class DicomWriter {
      */
     useSpecialTextEncoder(): void;
     /**
-     * Use default anonymisation rules.
-     */
-    useDefaultAnonymisationRules(): void;
-    /**
      * Get the element to write according to the class rules.
      * Priority order: tagName, groupName, default.
      *
