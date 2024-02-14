@@ -7,7 +7,9 @@
 import Konva from 'konva';
 
 // @public
-export function addTagsToDictionary(group: string, tags: object): void;
+export function addTagsToDictionary(group: string, tags: {
+    [x: string]: string[];
+}): void;
 
 // @public
 export class App {
@@ -25,8 +27,8 @@ export class App {
     defaultOnKeydown: (event: KeyboardEvent) => void;
     fitToContainer(): void;
     getActiveLayerGroup(): LayerGroup;
-    getAddedScale(): object;
-    getBaseScale(): object;
+    getAddedScale(): Scalar3D;
+    getBaseScale(): Scalar3D;
     getCurrentStackIndex(): number;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
@@ -42,7 +44,7 @@ export class App {
         [x: string]: DataElement;
     } | undefined;
     getNumberOfLayerGroups(): number;
-    getOffset(): object;
+    getOffset(): Scalar3D;
     getOverlayData(dataId: string): OverlayData | undefined;
     getStackSize(): number;
     getStyle(): object;
@@ -208,7 +210,6 @@ export class DicomWriter {
         [x: string]: WriterRule;
     }, addMissingTags?: boolean): void;
     setUseUnVrForPrivateSq(flag: boolean): void;
-    useDefaultAnonymisationRules(): void;
     useSpecialTextEncoder(): void;
 }
 
@@ -249,11 +250,11 @@ export class DrawLayer {
     deleteDraws(exeCallback: object): void;
     display(flag: boolean): void;
     draw(): void;
-    fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
+    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
-    getBaseSize(): object;
+    getBaseSize(): Scalar2D;
     getDataId(): string;
     getDrawController(): object;
     getId(): string;
@@ -261,16 +262,16 @@ export class DrawLayer {
     getKonvaStage(): Konva.Stage;
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
-    initialise(size: object, spacing: object, dataId: string): void;
+    initialise(size: Scalar2D, spacing: Scalar2D, dataId: string): void;
     isGroupVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
-    setOffset(newOffset: object): void;
+    setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
-    setPlaneHelper(helper: object): void;
-    setScale(newScale: object, center?: Point3D): void;
+    setPlaneHelper(helper: PlaneHelper): void;
+    setScale(newScale: Scalar3D, center?: Point3D): void;
     toggleGroupVisibility(id: string): boolean;
     unbindInteraction(): void;
 }
@@ -441,7 +442,7 @@ export class LayerGroup {
     addDrawLayer(): DrawLayer;
     addEventListener(type: string, callback: Function): void;
     addScale(scaleStep: number, center: Point3D): void;
-    addTranslation(translation: object): void;
+    addTranslation(translation: Scalar3D): void;
     addViewLayer(): ViewLayer;
     calculateFitScale(): number | undefined;
     canScroll(): boolean;
@@ -451,16 +452,16 @@ export class LayerGroup {
     flipScaleZ(): void;
     getActiveDrawLayer(): DrawLayer | undefined;
     getActiveViewLayer(): ViewLayer | undefined;
-    getAddedScale(): object;
-    getBaseScale(): object;
+    getAddedScale(): Scalar3D;
+    getBaseScale(): Scalar3D;
     getBaseViewLayer(): ViewLayer | undefined;
     getDivId(): string;
     getDrawLayersByDataId(dataId: string): DrawLayer[];
-    getMaxSize(): object | undefined;
+    getMaxSize(): Scalar2D | undefined;
     getNumberOfLayers(): number;
     getNumberOfViewLayers(): number;
-    getOffset(): object;
-    getScale(): object;
+    getOffset(): Scalar3D;
+    getScale(): Scalar3D;
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
@@ -477,8 +478,8 @@ export class LayerGroup {
     setActiveViewLayerByDataId(dataId: string): void;
     setFitScale(scaleIn: number): void;
     setImageSmoothing(flag: boolean): void;
-    setOffset(newOffset: object): void;
-    setScale(newScale: object, center?: Point3D): void;
+    setOffset(newOffset: Scalar3D): void;
+    setScale(newScale: Scalar3D, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
     someViewLayer(callbackFn: Function): boolean;
     updateLayersToPositionChange: (event: object) => void;
@@ -608,12 +609,12 @@ export class PlaneHelper {
     getImageOrientedPoint3D(planePoint: Point3D): Point3D;
     getImageOrientedVector3D(planeVector: Vector3D): Vector3D;
     getNativeScrollIndex(): number;
-    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
-    getPlaneOffsetFromOffset3D(offset3D: object): object;
+    getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
+    getPlaneOffsetFromOffset3D(offset3D: Scalar3D): Scalar2D;
     getScrollIndex(): number;
     getTargetDeOrientedPoint3D(planePoint: Point3D): Point3D;
     getTargetDeOrientedVector3D(planeVector: Vector3D): Vector3D;
-    getTargetOrientedPositiveXYZ(values: object): object;
+    getTargetOrientedPositiveXYZ(values: Scalar3D): Scalar3D;
     getTargetOrientedVector3D(vector: Vector3D): Vector3D;
 }
 
@@ -676,6 +677,19 @@ export class RGB {
 }
 
 // @public
+export class Scalar2D {
+    x: number;
+    y: number;
+}
+
+// @public
+export class Scalar3D {
+    x: number;
+    y: number;
+    z: number;
+}
+
+// @public
 export class ScrollWheel {
     constructor(app: App);
     wheel(event: WheelEvent): void;
@@ -688,7 +702,7 @@ export class Size {
     canScroll3D(viewOrientation?: Matrix33): boolean;
     equals(rhs: Size): boolean;
     get(i: number): number;
-    get2D(): object;
+    get2D(): Scalar2D;
     getDimSize(dimension: number, start?: number): number;
     getTotalSize(start?: number): number;
     getValues(): number[];
@@ -705,7 +719,7 @@ export class Spacing {
     constructor(values: number[]);
     equals(rhs: Spacing): boolean;
     get(i: number): number;
-    get2D(): object;
+    get2D(): Scalar2D;
     getValues(): number[];
     length(): number;
     toString(): string;
@@ -721,7 +735,6 @@ export class Tag {
     getElement(): string;
     getGroup(): string;
     getGroupName(): string;
-    getInfoFromDictionary(): any[] | undefined;
     getKey(): string;
     getNameFromDictionary(): string | undefined;
     getVrFromDictionary(): string | undefined;
@@ -839,7 +852,7 @@ export class ViewController {
     deleteSegment(segmentNumber: number, exeCallback: Function): void;
     equalImageMeta(meta: object): boolean;
     generateImageData(array: ImageData, index?: Index): void;
-    get2DSpacing(): number[];
+    get2DSpacing(): Scalar2D;
     getColourMap(): string;
     getCurrentIndex(): Index;
     getCurrentOrientedIndex(): Index;
@@ -853,12 +866,12 @@ export class ViewController {
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
     getImageVariableRegionValues(regions: any[]): any[];
-    getImageWorldSize(): object;
+    getImageWorldSize(): Scalar2D;
     getIncrementPosition(dim: number): Point;
     getIncrementScrollPosition(): Point;
     getMaskSegmentHelper(): MaskSegmentHelper;
     getModality(): string;
-    getOffset3DFromPlaneOffset(offset2D: object): Vector3D;
+    getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
     getPixelUnit(): string;
     getPlaneHelper(): PlaneHelper;
@@ -904,20 +917,20 @@ export class ViewLayer {
     displayToPlanePos(point2D: Point2D): Point2D;
     displayToPlaneScale(point2D: Point2D): Point2D;
     draw(): void;
-    fitToContainer(fitScale1D: number, fitSize: object, fitOffset: object): void;
+    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
-    getBaseSize(): object;
+    getBaseSize(): Scalar2D;
     getDataId(): string;
     getId(): string;
     getImageData(): object;
-    getImageWorldSize(): object;
+    getImageWorldSize(): Scalar2D;
     getOpacity(): number;
     getViewController(): ViewController;
-    getZoomOffset(): object;
-    initialise(size: object, spacing: object, alpha: number): void;
-    initScale(newScale: object, zoomOffset: object): void;
+    getZoomOffset(): Scalar2D;
+    initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
+    initScale(newScale: Scalar3D, zoomOffset: Scalar2D): void;
     isVisible(): boolean;
     onimagechange: (event: object) => void;
     onimageset: (event: object) => void;
@@ -926,9 +939,9 @@ export class ViewLayer {
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
     setImageSmoothing(flag: boolean): void;
-    setOffset(newOffset: object): void;
+    setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
-    setScale(newScale: object, center?: Point3D): void;
+    setScale(newScale: Scalar3D, center?: Point3D): void;
     setView(view: object, dataId: string): void;
     unbindInteraction(): void;
 }
