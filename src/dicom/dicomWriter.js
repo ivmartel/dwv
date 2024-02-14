@@ -65,6 +65,45 @@ export class WriterRule {
 }
 
 /**
+ * Possible writer actions.
+ *
+ * @type {Object<string, Function>}
+ */
+const writerActions = {
+  copy: function (item) {
+    return item;
+  },
+  remove: function () {
+    return null;
+  },
+  clear: function (item) {
+    item.value = [];
+    return item;
+  },
+  replace: function (item, value) {
+    item.value = [value];
+    return item;
+  }
+};
+
+/**
+ * Get simple (non official) DICOM anonymisation rules.
+ *
+ * @returns {Object<string, WriterRule>} The rules.
+ */
+export function getDefaultAnonymisationRules() {
+  return {
+    default: {action: 'copy', value: null},
+    PatientName: {action: 'replace', value: 'Anonymized'}, // tag
+    'Meta Element': {action: 'copy', value: null}, // group '0002'
+    Acquisition: {action: 'copy', value: null}, // group '0018'
+    'Image Presentation': {action: 'copy', value: null}, // group '0028'
+    Procedure: {action: 'copy', value: null}, // group '0040'
+    'Pixel Data': {action: 'copy', value: null} // group '7fe0'
+  };
+}
+
+/**
  * Get a UID for a DICOM tag.
  * Note: Use https://github.com/uuidjs/uuid?
  *
@@ -320,28 +359,6 @@ export class DicomWriter {
   }
 
   /**
-   * Possible tag actions.
-   *
-   * @type {Object<string, Function>}
-   */
-  #actions = {
-    copy: function (item) {
-      return item;
-    },
-    remove: function () {
-      return null;
-    },
-    clear: function (item) {
-      item.value = [];
-      return item;
-    },
-    replace: function (item, value) {
-      item.value = [value];
-      return item;
-    }
-  };
-
-  /**
    * Default rules: just copy
    *
    * @type {Object<string, WriterRule>}
@@ -465,21 +482,6 @@ export class DicomWriter {
   }
 
   /**
-   * Use default anonymisation rules.
-   */
-  useDefaultAnonymisationRules() {
-    this.setRules({
-      default: {action: 'remove', value: null},
-      PatientName: {action: 'replace', value: 'Anonymized'}, // tag
-      'Meta Element': {action: 'copy', value: null}, // group '0002'
-      Acquisition: {action: 'copy', value: null}, // group '0018'
-      'Image Presentation': {action: 'copy', value: null}, // group '0028'
-      Procedure: {action: 'copy', value: null}, // group '0040'
-      'Pixel Data': {action: 'copy', value: null} // group '7fe0'
-    });
-  }
-
-  /**
    * Get the element to write according to the class rules.
    * Priority order: tagName, groupName, default.
    *
@@ -508,7 +510,7 @@ export class DicomWriter {
       rule = this.#rules['default'];
     }
     // apply action on element and return
-    return this.#actions[rule.action](element, rule.value);
+    return writerActions[rule.action](element, rule.value);
   }
 
   /**
