@@ -56,7 +56,10 @@ function generate() {
   }
   // create writer with textarea rules
   const writer = new dwv.DicomWriter();
-  writer.setRules(JSON.parse(document.getElementById('rules').value));
+  const addMissingTags = true;
+  writer.setRules(
+    JSON.parse(document.getElementById('rules').value),
+    addMissingTags);
   let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(_dicomElements);
