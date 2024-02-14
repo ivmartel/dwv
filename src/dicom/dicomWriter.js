@@ -953,8 +953,8 @@ export class DicomWriter {
         value = this.#rules[name].value;
       }
       // add element
-      let size = getDataElementPrefixByteSize(dataElement.vr, false);
-      size += this.#setElementValue(dataElement, [value], false);
+      let size = getDataElementPrefixByteSize(dataElement.vr, isImplicit);
+      size += this.#setElementValue(dataElement, [value], isImplicit);
       rawElements.push(dataElement);
       totalSize += size;
     }
