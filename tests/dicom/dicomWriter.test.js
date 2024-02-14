@@ -11,6 +11,12 @@ import {
 import {dictionary} from '../../src/dicom/dictionary';
 import {b64urlToArrayBuffer} from './utils';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {WriterRule} from '../../src/dicom/dicomWriter';
+/* eslint-enable no-unused-vars */
+
+// test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm';
 import syntheticDataExplicit from '/tests/dicom/synthetic-data_explicit.json';
@@ -413,8 +419,12 @@ function generateGradSquare(tags) {
  *
  * @param {object} config A JSON config representing DICOM tags.
  * @param {object} assert A Qunit assert.
+ * @param {Object<string, WriterRule>} [writerRules] Optional DICOM
+ *   writer rules.
+ * @param {object} [outConfig] Optional resulting JSON after
+ *   applying writer rules.
  */
-function testWriteReadDataFromConfig(config, assert) {
+function testWriteReadDataFromConfig(config, assert, writerRules, outConfig) {
   // add private tags to dict if present
   let useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
@@ -429,8 +439,7 @@ function testWriteReadDataFromConfig(config, assert) {
     }
   }
   // pass tags clone to avoid modifications (for ex by padElement)
-  // TODO: find another way
-  const jsonTags = JSON.parse(JSON.stringify(config.tags));
+  const jsonTags = structuredClone(config.tags);
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromJSONTags(jsonTags);
   // pixels (if possible): small gradient square
@@ -438,9 +447,14 @@ function testWriteReadDataFromConfig(config, assert) {
     dicomElements['7FE00010'] = generateGradSquare(config.tags);
   }
 
-  // create DICOM buffer
+  // create writer
   const writer = new DicomWriter();
   writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
+  if (typeof writerRules !== 'undefined') {
+    writer.setRules(writerRules, true);
+  }
+
+  // create DICOM buffer
   let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(dicomElements);
@@ -454,12 +468,61 @@ function testWriteReadDataFromConfig(config, assert) {
   dicomParser.parse(dicomBuffer);
   const elements = dicomParser.getDicomElements();
 
+  if (typeof outConfig === 'undefined') {
+    outConfig = config;
+  }
+
   // compare contents
-  compare(config.tags, elements, config.name, assert);
+  compare(outConfig.tags, elements, config.name, assert);
 }
 
 /**
- * Tests write/read DICOM data from config file: explicit encoding.
+ * Get writing rules #0 and resulting tags.
+ *
+ * @param {object} config A JSON config representing DICOM tags.
+ * @returns {object} Rules and resulting tags.
+ */
+function getRulesAndResult0(config) {
+  const result = structuredClone(config);
+  // action: remove
+  delete result.tags.OtherPatientNames;
+  // action: clear
+  result.tags.PatientID = '';
+  // action: replace
+  result.tags.PatientName = 'Anonymized';
+  // addMissingTags should be true for writer.setRules
+  // -> these tags will be added if not present in input config
+  result.tags.ReferringPhysicianName = 'Asclepius';
+  result.tags.ReferringPhysicianIdentificationSequence = '';
+
+  return {
+    rules: {
+      default: {
+        action: 'copy', value: null
+      },
+      OtherPatientNames: {
+        action: 'remove', value: null
+      },
+      PatientID: {
+        action: 'clear', value: null
+      },
+      PatientName: {
+        action: 'replace', value: result.tags.PatientName
+      },
+      ReferringPhysicianName: {
+        action: 'replace', value: result.tags.ReferringPhysicianName
+      },
+      ReferringPhysicianIdentificationSequence: {
+        action: 'replace',
+        value: result.tags.ReferringPhysicianIdentificationSequence
+      }
+    },
+    result: result
+  };
+}
+
+/**
+ * Tests write/read DICOM data with explicit encoding.
  * Using remote file for CI integration.
  *
  * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
@@ -472,7 +535,25 @@ QUnit.test('Test synthetic dicom explicit', function (assert) {
 });
 
 /**
- * Tests write/read DICOM data from config file: implicit encoding.
+ * Tests write with rules / read DICOM data with explicit encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
+ */
+QUnit.test('Test synthetic dicom explicit with writing rules #0',
+  function (assert) {
+    const configs = JSON.parse(syntheticDataExplicit);
+    for (let i = 0; i < configs.length; ++i) {
+      const r20 = getRulesAndResult0(configs[i]);
+      testWriteReadDataFromConfig(
+        configs[i], assert, r20.rules, r20.result
+      );
+    }
+  }
+);
+
+/**
+ * Tests write/read DICOM data with implicit encoding.
  * Using remote file for CI integration.
  *
  * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
@@ -485,7 +566,25 @@ QUnit.test('Test synthetic dicom implicit', function (assert) {
 });
 
 /**
- * Tests write/read DICOM data from config file: explicit big endian encoding.
+ * Tests write with rules / read DICOM data with implicit encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
+ */
+QUnit.test('Test synthetic dicom implicit with writing rules #0',
+  function (assert) {
+    const configs = JSON.parse(syntheticDataImplicit);
+    for (let i = 0; i < configs.length; ++i) {
+      const r20 = getRulesAndResult0(configs[i]);
+      testWriteReadDataFromConfig(
+        configs[i], assert, r20.rules, r20.result
+      );
+    }
+  }
+);
+
+/**
+ * Tests write/read DICOM data with explicit big endian encoding.
  * Using remote file for CI integration.
  *
  * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
@@ -496,3 +595,21 @@ QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
     testWriteReadDataFromConfig(configs[i], assert);
   }
 });
+
+/**
+ * Tests write with rules / read DICOM data with explicit big endian encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
+ */
+QUnit.test('Test synthetic dicom explicit big endian with writing rules #0',
+  function (assert) {
+    const configs = JSON.parse(syntheticDataExplicitBE);
+    for (let i = 0; i < configs.length; ++i) {
+      const r20 = getRulesAndResult0(configs[i]);
+      testWriteReadDataFromConfig(
+        configs[i], assert, r20.rules, r20.result
+      );
+    }
+  }
+);
