@@ -196,6 +196,15 @@ export class ViewLayer {
   }
 
   /**
+   * Get the layer scale.
+   *
+   * @returns {Scalar2D} The scale as {x,y}.
+   */
+  getScale() {
+    return this.#scale;
+  }
+
+  /**
    * Get the layer zoom offset.
    *
    * @returns {Scalar2D} The offset as {x,y}.
