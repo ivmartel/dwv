@@ -4428,6 +4428,12 @@ export declare class ViewLayer {
      */
     getDataId(): string;
     /**
+     * Get the layer scale.
+     *
+     * @returns {Scalar2D} The scale as {x,y}.
+     */
+    getScale(): Scalar2D;
+    /**
      * Get the layer zoom offset.
      *
      * @returns {Scalar2D} The offset as {x,y}.
