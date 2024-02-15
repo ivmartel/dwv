@@ -927,6 +927,7 @@ export class ViewLayer {
     getImageData(): object;
     getImageWorldSize(): Scalar2D;
     getOpacity(): number;
+    getScale(): Scalar2D;
     getViewController(): ViewController;
     getZoomOffset(): Scalar2D;
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
