@@ -1,4 +1,4 @@
-/*! dwv 0.31.3 2023-11-16 12:13:08 */
+/*! dwv 0.31.4 2024-02-20 12:23:37 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4759,7 +4759,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.3';
+  return '0.31.4';
 };
 
 /**
@@ -24130,16 +24130,18 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/dicom'
-    var isDicom = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/dicom') &&
-        element.value[18] !== '+';
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'application/dicom' and no '+'
+      return dwv.utils.startsWith(acceptHeader.value, 'application/dicom') &&
+        acceptHeader.value[18] !== '+';
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -24752,16 +24754,18 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeader, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/json' or 'application/dicom+json
-    var isJson = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/json') &&
-        dwv.utils.startsWith(element.value, 'application/dicom+json');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isJson) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'application/json' or 'application/dicom+json
+      return dwv.utils.startsWith(acceptHeader.value, 'application/json') ||
+        dwv.utils.startsWith(acceptHeader.value, 'application/dicom+json');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -25266,14 +25270,17 @@ dwv.io.MultipartLoader.prototype.canLoadFile = function (_file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.MultipartLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    var isMultipart = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'multipart/related');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isMultipart) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'multipart/related'
+      return dwv.utils.startsWith(acceptHeader.value, 'multipart/related');
+    }
   }
 
   return false;
@@ -25500,15 +25507,17 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.RawImageLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'image/'
-    var isImage = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'image/');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isImage) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'image/'
+      return dwv.utils.startsWith(acceptHeader.value, 'image/');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -25729,15 +25738,17 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'video/'
-    var isVideo = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'video/');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'video/'
+      return dwv.utils.startsWith(acceptHeader.value, 'video/');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -27062,15 +27073,17 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/zip'
-    var isZip = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/zip');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isZip) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'application/zip'
+      return dwv.utils.startsWith(acceptHeader.value, 'application/zip');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);

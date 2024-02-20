@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.31.4](https://github.com/ivmartel/dwv/releases/tag/v0.31.4) - 20/02/2024
+
+### Fixed
+
+- Relax Accept header test for canLoadUrl methods [#1613](https://github.com/ivmartel/dwv/issues/1613)
+
 ## [v0.31.3](https://github.com/ivmartel/dwv/releases/tag/v0.31.3) - 16/11/2023
 
 ### Added
