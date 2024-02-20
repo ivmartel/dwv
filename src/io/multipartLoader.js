@@ -101,14 +101,17 @@ export class MultipartLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
+    // check options.requestHeaders for 'Accept'
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      const isMultipart = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'multipart/related');
+      const isNameAccept = function (element) {
+        return element.name === 'Accept';
       };
-      return typeof options.requestHeaders.find(isMultipart) !== 'undefined';
+      const acceptHeader = options.requestHeaders.find(isNameAccept);
+      if (typeof acceptHeader !== 'undefined') {
+        // starts with 'multipart/related'
+        return startsWith(acceptHeader.value, 'multipart/related');
+      }
     }
 
     return false;

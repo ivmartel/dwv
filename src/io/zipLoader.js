@@ -160,15 +160,17 @@ export class ZipLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
+    // check options.requestHeaders for 'Accept'
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      // starts with 'application/zip'
-      const isZip = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'application/zip');
+      const isNameAccept = function (element) {
+        return element.name === 'Accept';
       };
-      return typeof options.requestHeaders.find(isZip) !== 'undefined';
+      const acceptHeader = options.requestHeaders.find(isNameAccept);
+      if (typeof acceptHeader !== 'undefined') {
+        // starts with 'application/zip'
+        return startsWith(acceptHeader.value, 'application/zip');
+      }
     }
 
     const urlObjext = getUrlFromUri(url);

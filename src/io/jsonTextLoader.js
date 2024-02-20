@@ -106,16 +106,18 @@ export class JSONTextLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeader, just base check on them
+    // check options.requestHeaders for 'Accept'
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      // starts with 'application/json' or 'application/dicom+json
-      const isJson = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'application/json') &&
-          startsWith(element.value, 'application/dicom+json');
+      const isNameAccept = function (element) {
+        return element.name === 'Accept';
       };
-      return typeof options.requestHeaders.find(isJson) !== 'undefined';
+      const acceptHeader = options.requestHeaders.find(isNameAccept);
+      if (typeof acceptHeader !== 'undefined') {
+        // starts with 'application/json' or 'application/dicom+json
+        return startsWith(acceptHeader.value, 'application/json') ||
+          startsWith(acceptHeader.value, 'application/dicom+json');
+      }
     }
 
     const urlObjext = getUrlFromUri(url);

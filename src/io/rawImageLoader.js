@@ -129,15 +129,17 @@ export class RawImageLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
+    // check options.requestHeaders for 'Accept'
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      // starts with 'image/'
-      const isImage = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'image/');
+      const isNameAccept = function (element) {
+        return element.name === 'Accept';
       };
-      return typeof options.requestHeaders.find(isImage) !== 'undefined';
+      const acceptHeader = options.requestHeaders.find(isNameAccept);
+      if (typeof acceptHeader !== 'undefined') {
+        // starts with 'image/'
+        return startsWith(acceptHeader.value, 'image/');
+      }
     }
 
     const urlObjext = getUrlFromUri(url);

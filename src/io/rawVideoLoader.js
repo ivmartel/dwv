@@ -112,15 +112,17 @@ export class RawVideoLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
+    // check options.requestHeaders for 'Accept'
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      // starts with 'video/'
-      const isVideo = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'video/');
+      const isNameAccept = function (element) {
+        return element.name === 'Accept';
       };
-      return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+      const acceptHeader = options.requestHeaders.find(isNameAccept);
+      if (typeof acceptHeader !== 'undefined') {
+        // starts with 'video/'
+        return startsWith(acceptHeader.value, 'video/');
+      }
     }
 
     const urlObjext = getUrlFromUri(url);

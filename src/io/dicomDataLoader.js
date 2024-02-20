@@ -118,16 +118,18 @@ export class DicomDataLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
+    // check options.requestHeaders for 'Accept'
     if (typeof options !== 'undefined' &&
       typeof options.requestHeaders !== 'undefined') {
-      // starts with 'application/dicom'
-      const isDicom = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'application/dicom') &&
-          element.value[18] !== '+';
+      const isNameAccept = function (element) {
+        return element.name === 'Accept';
       };
-      return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+      const acceptHeader = options.requestHeaders.find(isNameAccept);
+      if (typeof acceptHeader !== 'undefined') {
+        // starts with 'application/dicom' and no '+'
+        return startsWith(acceptHeader.value, 'application/dicom') &&
+          acceptHeader.value[18] !== '+';
+      }
     }
 
     const urlObjext = getUrlFromUri(url);
