@@ -165,15 +165,17 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/zip'
-    var isZip = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/zip');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isZip) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'application/zip'
+      return dwv.utils.startsWith(acceptHeader.value, 'application/zip');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);

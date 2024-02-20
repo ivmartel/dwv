@@ -109,16 +109,18 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeader, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/json' or 'application/dicom+json
-    var isJson = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/json') &&
-        dwv.utils.startsWith(element.value, 'application/dicom+json');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isJson) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'application/json' or 'application/dicom+json
+      return dwv.utils.startsWith(acceptHeader.value, 'application/json') ||
+        dwv.utils.startsWith(acceptHeader.value, 'application/dicom+json');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);

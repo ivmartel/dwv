@@ -118,15 +118,17 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'video/'
-    var isVideo = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'video/');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'video/'
+      return dwv.utils.startsWith(acceptHeader.value, 'video/');
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);

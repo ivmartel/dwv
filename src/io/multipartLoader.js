@@ -106,14 +106,17 @@ dwv.io.MultipartLoader.prototype.canLoadFile = function (_file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.MultipartLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    var isMultipart = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'multipart/related');
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isMultipart) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'multipart/related'
+      return dwv.utils.startsWith(acceptHeader.value, 'multipart/related');
+    }
   }
 
   return false;

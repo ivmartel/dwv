@@ -125,16 +125,18 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url, options) {
-  // if there are options.requestHeaders, just base check on them
+  // check options.requestHeaders for 'Accept'
   if (typeof options !== 'undefined' &&
     typeof options.requestHeaders !== 'undefined') {
-    // starts with 'application/dicom'
-    var isDicom = function (element) {
-      return element.name === 'Accept' &&
-        dwv.utils.startsWith(element.value, 'application/dicom') &&
-        element.value[18] !== '+';
+    var isNameAccept = function (element) {
+      return element.name === 'Accept';
     };
-    return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+    var acceptHeader = options.requestHeaders.find(isNameAccept);
+    if (typeof acceptHeader !== 'undefined') {
+      // starts with 'application/dicom' and no '+'
+      return dwv.utils.startsWith(acceptHeader.value, 'application/dicom') &&
+        acceptHeader.value[18] !== '+';
+    }
   }
 
   var urlObjext = dwv.utils.getUrlFromUri(url);
