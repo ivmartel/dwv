@@ -73,10 +73,13 @@ export class ImageFactory {
     const size2D = getImage2DSize(dataElements);
     const sizeValues = [size2D[0], size2D[1], 1];
 
-    // frames
-    const frames = dataElements['00280008'];
-    if (frames) {
-      sizeValues.push(frames.value[0]);
+    // NumberOfFrames
+    const numberOfFramesEl = dataElements['00280008'];
+    if (typeof numberOfFramesEl !== 'undefined') {
+      const number = parseInt(numberOfFramesEl.value[0], 10);
+      if (number > 1) {
+        sizeValues.push(number);
+      }
     }
 
     // image size
