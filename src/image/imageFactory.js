@@ -14,8 +14,7 @@ import {
   getPixelSpacing,
   getPixelUnit,
   TagValueExtractor,
-  getSuvFactor,
-  canGetSuvFactor
+  getSuvFactor
 } from '../dicom/dicomElementsWrapper';
 import {Vector3D} from '../math/vector';
 import {Matrix33} from '../math/matrix';
@@ -44,6 +43,13 @@ export class ImageFactory {
   #warning;
 
   /**
+   * The PET SUV factor.
+   *
+   * @type {number}
+   */
+  #suvFactor;
+
+  /**
    * Get a warning string if elements are not as expected.
    * Created by checkElements.
    *
@@ -70,7 +76,9 @@ export class ImageFactory {
     if (typeof element !== 'undefined') {
       modality = element.value[0];
       if (modality === 'PT') {
-        this.#warning = canGetSuvFactor(dataElements);
+        const suvFactor = getSuvFactor(dataElements);
+        this.#suvFactor = suvFactor.value;
+        this.#warning = suvFactor.warning;
       }
     }
 
@@ -237,16 +245,10 @@ export class ImageFactory {
 
     // PET SUV
     let isPetWithSuv = false;
-    if (typeof meta.Modality !== 'undefined' &&
-      meta.Modality === 'PT') {
-      const warn = canGetSuvFactor(dataElements);
-      if (typeof warn === 'undefined') {
-        isPetWithSuv = true;
-      }
-    }
     let intensityFactor = 1;
-    if (isPetWithSuv) {
-      intensityFactor = getSuvFactor(dataElements);
+    if (typeof this.#suvFactor !== 'undefined') {
+      isPetWithSuv = true;
+      intensityFactor = this.#suvFactor;
       logger.info('Applying PET SUV calibration: ' + intensityFactor);
       slope *= intensityFactor;
       intercept *= intensityFactor;

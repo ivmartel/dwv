@@ -607,33 +607,152 @@ function checkTag(element, name, values) {
 }
 
 /**
- * Do the input elements allow for PET SUV calculation.
+ * Get the decayed dose (Bq).
  *
  * @param {object} elements The DICOM elements to check.
- * @returns {string|undefined} A warning if the elements are not as expected,
- *    undefined if all good.
+ * @returns {object} The value and a warning if
+ *   the elements are not as expected.
  */
-export function canGetSuvFactor(elements) {
+function getDecayedDose(elements) {
   let warning = '';
+  let warn;
 
-  // RadiopharmaceuticalInformationSequence (type2)
+  // SeriesDate (type1)
+  const seriesDateEl = elements['00080021'];
+  const seriesDateObj = getDate(seriesDateEl);
+  // SeriesTime (type1)
+  const seriesTimeEl = elements['00080031'];
+  const seriesTimeObj = getTime(seriesTimeEl);
+  // Series date/time
+  let scanStart = new Date(
+    seriesDateObj.year,
+    seriesDateObj.monthIndex,
+    seriesDateObj.day,
+    seriesTimeObj.hours,
+    seriesTimeObj.minutes,
+    seriesTimeObj.seconds,
+    seriesTimeObj.milliseconds
+  );
+
+  // scanStart Date check
+  // AcquisitionDate (type3)
+  const acqDateEl = elements['00080022'];
+  // AcquisitionTime (type3)
+  const acqTimeEl = elements['00080032'];
+  if (typeof acqDateEl !== 'undefined' &&
+    typeof acqTimeEl !== 'undefined') {
+    const acqDateObj = getDate(acqDateEl);
+    const acqTimeObj = getTime(acqTimeEl);
+    const acqDate = new Date(
+      acqDateObj.year,
+      acqDateObj.monthIndex,
+      acqDateObj.day,
+      acqTimeObj.hours,
+      acqTimeObj.minutes,
+      acqTimeObj.seconds,
+      acqTimeObj.milliseconds
+    );
+
+    if (scanStart > acqDate) {
+      warning += ' Series date/time is after Aquisition date/time';
+      scanStart = undefined;
+    }
+  }
+
+  let totalDose;
+  let halfLife;
+  let radioStart;
+
   const radioInfoSqStr = 'RadiopharmaceuticalInformationSequence (00540016)';
   const radioInfoSq = elements['00540016'];
   warning += checkTag(radioInfoSq, radioInfoSqStr);
   if (typeof radioInfoSq !== 'undefined') {
+    if (radioInfoSq.value.length !== 1) {
+      console.warn(
+        'Found more than 1 istopes in RadiopharmaceuticalInformation Sequence.'
+      );
+    }
+
     // RadionuclideTotalDose (type3, Bq)
     const totalDoseStr = 'RadionuclideTotalDose (00181074)';
     const totalDoseEl = radioInfoSq.value[0]['00181074'];
-    warning += checkTag(totalDoseEl, totalDoseStr);
+    warn = checkTag(totalDoseEl, totalDoseStr);
+    if (warn.length === 0) {
+      totalDose = totalDoseEl.value[0];
+    } else {
+      warning += warn;
+    }
+
     // RadionuclideHalfLife (type3, seconds)
     const halfLifeStr = 'RadionuclideHalfLife (00181075)';
     const halfLifeEl = radioInfoSq.value[0]['00181075'];
-    warning += checkTag(halfLifeEl, halfLifeStr);
+    warn = checkTag(halfLifeEl, halfLifeStr);
+    if (warn.length === 0) {
+      halfLife = parseFloat(halfLifeEl.value[0]);
+    } else {
+      warning += warn;
+    }
+
+    // RadiopharmaceuticalStartDateTime (type3)
+    const radioStartDateTimeEl = radioInfoSq.value[0]['00181078'];
+    let radioStartDateObj;
+    let radioStartTimeObj;
+    if (typeof radioStartDateTimeEl === 'undefined') {
+      // use seriesDate as radioStartDate
+      radioStartDateObj = seriesDateObj;
+      // try RadiopharmaceuticalStartTime (type3)
+      const radioStartTimeEl = radioInfoSq.value[0]['00181072'];
+      radioStartTimeObj = getTime(radioStartTimeEl);
+    } else {
+      const radioStartDateTime = getDateTime(radioStartDateTimeEl);
+      radioStartDateObj = radioStartDateTime.date;
+      radioStartTimeObj = radioStartDateTime.time;
+    }
+    if (typeof radioStartTimeObj === 'undefined') {
+      radioStartTimeObj = {
+        hours: 0, minutes: 0, seconds: 0, milliseconds: 0
+      };
+    }
+    radioStart = new Date(
+      radioStartDateObj.year,
+      radioStartDateObj.monthIndex,
+      radioStartDateObj.day,
+      radioStartTimeObj.hours,
+      radioStartTimeObj.minutes,
+      radioStartTimeObj.seconds,
+      radioStartTimeObj.milliseconds
+    );
   }
-  // PatientWeight (type3, kilograms)
-  const patientWeightStr = ' PatientWeight (00101030)';
-  const patWeightEl = elements['00101030'];
-  warning += checkTag(patWeightEl, patientWeightStr);
+
+  // decayed dose (Bq)
+  let decayedDose;
+  if (typeof scanStart !== 'undefined' &&
+    typeof radioStart !== 'undefined' &&
+    typeof totalDose !== 'undefined' &&
+    typeof halfLife !== 'undefined') {
+    // decay time (s) (Date diff is in milliseconds)
+    const decayTime = (scanStart.getTime() - radioStart.getTime()) / 1000;
+    const decay = Math.pow(2, (-decayTime / halfLife));
+    decayedDose = totalDose * decay;
+  }
+
+  return {
+    value: decayedDose,
+    warning: warning
+  };
+}
+
+/**
+ * Get the PET SUV factor.
+ *
+ * @see https://qibawiki.rsna.org/images/6/62/SUV_vendorneutral_pseudocode_happypathonly_20180626_DAC.pdf
+ * (from https://qibawiki.rsna.org/index.php/Standardized_Uptake_Value_(SUV)#SUV_Calculation )
+ * @param {object} elements The DICOM elements.
+ * @returns {object} The value and a warning if
+ *   the elements are not as expected.
+ */
+export function getSuvFactor(elements) {
+  let warning = '';
 
   // CorrectedImage (type2): must contain ATTN and DECY
   const corrImageTagStr = 'Corrected Image (00280051)';
@@ -648,126 +767,30 @@ export function canGetSuvFactor(elements) {
   const unitEl = elements['00541001'];
   warning += checkTag(unitEl, unitTagStr, ['BQML']);
 
-  // series date/time must be before acquisition date/time
-
-  // AcquisitionDate (type3)
-  const acqDateEl = elements['00080022'];
-  // AcquisitionTime (type3)
-  const acqTimeEl = elements['00080032'];
-
-  if (typeof acqDateEl !== 'undefined' &&
-    typeof acqTimeEl !== 'undefined') {
-    const acqDateObj = getDate(acqDateEl);
-    const acqTimeObj = getTime(acqTimeEl);
-    const acqDate = new Date(
-      acqDateObj.year, acqDateObj.monthIndex, acqDateObj.day,
-      acqTimeObj.hours, acqTimeObj.minutes,
-      acqTimeObj.seconds, acqTimeObj.milliseconds
-    );
-
-    // SeriesDate (type1 for PET)
-    const seriesDateEl = elements['00080021'];
-    // SeriesTime (type1 for PET)
-    const seriesTimeEl = elements['00080031'];
-    const seriesDateObj = getDate(seriesDateEl);
-    const seriesTimeObj = getTime(seriesTimeEl);
-    const seriesDate = new Date(
-      seriesDateObj.year, seriesDateObj.monthIndex, seriesDateObj.day,
-      seriesTimeObj.hours, seriesTimeObj.minutes,
-      seriesTimeObj.seconds, seriesTimeObj.milliseconds
-    );
-
-    if (seriesDate > acqDate) {
-      warning += ' Series date/time is after Aquisition date/time';
-    }
-  }
-
-  let res;
-  if (warning.length !== 0) {
-    res = 'Cannot calculate PET SUV:' + warning;
-  }
-  return res;
-}
-
-/**
- * Get the PET SUV factor.
- *
- * @see https://qibawiki.rsna.org/images/6/62/SUV_vendorneutral_pseudocode_happypathonly_20180626_DAC.pdf
- * (from https://qibawiki.rsna.org/index.php/Standardized_Uptake_Value_(SUV)#SUV_Calculation )
- * @param {object} elements The DICOM elements.
- * @returns {number} The factor.
- */
-export function getSuvFactor(elements) {
-
-  // SeriesDate (type1 for PET)
-  const seriesDateEl = elements['00080021'];
-  const seriesDateObj = getDate(seriesDateEl);
-  // SeriesTime (type1 for PET)
-  const seriesTimeEl = elements['00080031'];
-  const seriesTimeObj = getTime(seriesTimeEl);
-
-  // RadiopharmaceuticalInformationSequence (type2)
-  const radioInfoSq = elements['00540016'];
-  if (radioInfoSq.value.length !== 1) {
-    console.warn(
-      'Found more than 1 istopes in RadiopharmaceuticalInformation Sequence.');
-  }
-  // RadiopharmaceuticalStartDateTime (type3)
-  const radioStartDateTimeEl = radioInfoSq.value[0]['00181078'];
-  let radioStartDateObj;
-  let radioStartTimeObj;
-  if (typeof radioStartDateTimeEl === 'undefined') {
-    radioStartDateObj = seriesDateObj;
-    // RadiopharmaceuticalStartTime (type3)
-    const radioStartTimeEl = radioInfoSq.value[0]['00181072'];
-    radioStartTimeObj = getTime(radioStartTimeEl);
-  } else {
-    const radioStartDateTime = getDateTime(radioStartDateTimeEl);
-    radioStartDateObj = radioStartDateTime.date;
-    radioStartTimeObj = radioStartDateTime.time;
-  }
-  if (typeof radioStartTimeObj === 'undefined') {
-    radioStartTimeObj = {
-      hours: 0, minutes: 0, seconds: 0, milliseconds: 0
-    };
-  }
-  const radioStart = new Date(
-    radioStartDateObj.year,
-    radioStartDateObj.monthIndex,
-    radioStartDateObj.day,
-    radioStartTimeObj.hours,
-    radioStartTimeObj.minutes,
-    radioStartTimeObj.seconds,
-    radioStartTimeObj.milliseconds
-  );
-
-  // RadionuclideTotalDose (type3, Bq)
-  const totalDoseEl = radioInfoSq.value[0]['00181074'];
-  // RadionuclideHalfLife (type3, seconds)
-  const halfLifeEl = radioInfoSq.value[0]['00181075'];
-  // PatientWeight (type3, kilograms)
+  // PatientWeight (type3, kg)
+  let patWeight;
+  const patientWeightStr = ' PatientWeight (00101030)';
   const patWeightEl = elements['00101030'];
+  const warn = checkTag(patWeightEl, patientWeightStr);
+  if (warn.length === 0) {
+    patWeight = patWeightEl.value[0];
+  } else {
+    warning += warn;
+  }
 
-  // Series date/time
-  const scanStart = new Date(
-    seriesDateObj.year,
-    seriesDateObj.monthIndex,
-    seriesDateObj.day,
-    seriesTimeObj.hours,
-    seriesTimeObj.minutes,
-    seriesTimeObj.seconds,
-    seriesTimeObj.milliseconds
-  );
-  // Date diff is in milliseconds
-  const decaySeconds = (scanStart.getTime() - radioStart.getTime()) / 1000;
-  const decay = Math.pow(2,
-    (-decaySeconds / parseFloat(halfLifeEl.value[0]))
-  );
-  const decayedDose = totalDoseEl.value[0] * decay;
-  // factor is grams / Bq
-  const suvFactor = (patWeightEl.value[0] * 1000) / decayedDose;
+  // Decayed dose (Bq)
+  const decayedDose = getDecayedDose(elements);
+  warning += decayedDose.warning;
 
-  return suvFactor;
+  const result = {};
+  if (warning.length !== 0) {
+    result.warning = 'Cannot calculate PET SUV:' + warning;
+  } else {
+    // SUV factor (grams/Bq)
+    result.value = (patWeight * 1000) / decayedDose.value;
+  }
+
+  return result;
 }
 
 /**
