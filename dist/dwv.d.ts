@@ -2468,14 +2468,21 @@ export declare const luts: {
  */
 export declare class MaskFactory {
     /**
+     * Get a warning string if elements are not as expected.
+     * Created by checkElements.
+     *
+     * @returns {string|undefined} The warning.
+     */
+    getWarning(): string | undefined;
+    /**
      * Check dicom elements. Throws an error if not suitable.
      *
      * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
-     * @returns {object|undefined} A possible warning.
+     * @returns {string|undefined} A possible warning.
      */
     checkElements(_dicomElements: {
         [x: string]: DataElement;
-    }): object | undefined;
+    }): string | undefined;
     /**
      * Get an {@link Image} object from the read DICOM file.
      *
@@ -2488,6 +2495,7 @@ export declare class MaskFactory {
     create(dataElements: {
         [x: string]: DataElement;
     }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    #private;
 }
 
 /**

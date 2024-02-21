@@ -523,10 +523,11 @@ export const luts: {
 export class MaskFactory {
     checkElements(_dicomElements: {
         [x: string]: DataElement;
-    }): object | undefined;
+    }): string | undefined;
     create(dataElements: {
         [x: string]: DataElement;
     }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    getWarning(): string | undefined;
 }
 
 // @public
