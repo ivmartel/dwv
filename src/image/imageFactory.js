@@ -38,14 +38,14 @@ export class ImageFactory {
   /**
    * Possible warning created by checkElements.
    *
-   * @type {string}
+   * @type {string|undefined}
    */
   #warning;
 
   /**
    * The PET SUV factor.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
   #suvFactor;
 
@@ -53,7 +53,7 @@ export class ImageFactory {
    * Get a warning string if elements are not as expected.
    * Created by checkElements.
    *
-   * @returns {string} The warning.
+   * @returns {string|undefined} The warning.
    */
   getWarning() {
     return this.#warning;
