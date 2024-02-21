@@ -37,13 +37,31 @@ import {DataElement} from '../dicom/dataElement';
 export class ImageFactory {
 
   /**
+   * Possible warning created by checkElements.
+   *
+   * @type {string}
+   */
+  #warning;
+
+  /**
+   * Get a warning string if elements are not as expected.
+   * Created by checkElements.
+   *
+   * @returns {string} The warning.
+   */
+  getWarning() {
+    return this.#warning;
+  }
+
+  /**
    * Check dicom elements. Throws an error if not suitable.
    *
    * @param {DataElements} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
    */
   checkElements(dataElements) {
-    let warn;
+    // reset
+    this.#warning = undefined;
     // will throw if columns or rows is not defined
     getImage2DSize(dataElements);
     // check PET SUV
@@ -52,11 +70,11 @@ export class ImageFactory {
     if (typeof element !== 'undefined') {
       modality = element.value[0];
       if (modality === 'PT') {
-        warn = canGetSuvFactor(dataElements);
+        this.#warning = canGetSuvFactor(dataElements);
       }
     }
 
-    return warn;
+    return this.#warning;
   }
 
   /**
