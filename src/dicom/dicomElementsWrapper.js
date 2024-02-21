@@ -654,7 +654,9 @@ function getDecayedDose(elements) {
     );
 
     if (scanStart > acqDate) {
-      warning += ' Series date/time is after Aquisition date/time';
+      const diff = scanStart.getTime() - acqDate.getTime();
+      warning += ' Series date/time is after Aquisition date/time (diff=' +
+        diff.toString() + 'ms) ';
       scanStart = undefined;
     }
   }
