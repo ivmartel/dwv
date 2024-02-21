@@ -274,13 +274,31 @@ function getDimensionOrganization(dataElements) {
 export class MaskFactory {
 
   /**
+   * Possible warning created by checkElements.
+   *
+   * @type {string|undefined}
+   */
+  #warning;
+
+  /**
+   * Get a warning string if elements are not as expected.
+   * Created by checkElements.
+   *
+   * @returns {string|undefined} The warning.
+   */
+  getWarning() {
+    return this.#warning;
+  }
+
+  /**
    * Check dicom elements. Throws an error if not suitable.
    *
    * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
-   * @returns {object|undefined} A possible warning.
+   * @returns {string|undefined} A possible warning.
    */
   checkElements(_dicomElements) {
     // does nothing
+    return;
   }
 
   /**
