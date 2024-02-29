@@ -415,6 +415,56 @@ function generateGradSquare(tags) {
 }
 
 /**
+ * Simple BinaryPixGenerator
+ *
+ * @param {object} tags The input tags.
+ * @returns {object} The pixel buffer
+ */
+function generateBinary(tags) {
+
+  const numberOfColumns = tags.Columns;
+  const numberOfRows = tags.Rows;
+  let numberOfFrames = 1;
+  if (typeof tags.NumberOfFrames !== 'undefined') {
+    numberOfFrames = tags.NumberOfFrames;
+  }
+  const dataLength = numberOfRows * numberOfColumns * numberOfFrames;
+  const pixelBuffer = new Uint8Array(dataLength);
+
+  const halfCols = numberOfRows * 0.5;
+  const halfRows = numberOfColumns * 0.5;
+
+  const getFunc = function (i, j) {
+    let value = 0;
+    const jc = Math.abs(j - halfRows);
+    const ic = Math.abs(i - halfCols);
+    if (jc < halfRows / 2 && ic < halfCols / 2) {
+      value = 1;
+    }
+    return value;
+  };
+
+  // main loop
+  let offset = 0;
+  for (let f = 0; f < numberOfFrames; ++f) {
+    for (let j = 0; j < numberOfRows; ++j) {
+      for (let i = 0; i < numberOfColumns; ++i) {
+        pixelBuffer[offset] = getFunc(i, j);
+        ++offset;
+      }
+    }
+  }
+
+  const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
+  return {
+    tag: getPixelDataTag(),
+    vr: 'OB',
+    vl: pixVL,
+    value: pixelBuffer
+  };
+}
+
+/**
  * Test a JSON config: write a DICOM file and read it back.
  *
  * @param {object} config A JSON config representing DICOM tags.
@@ -442,9 +492,15 @@ function testWriteReadDataFromConfig(config, assert, writerRules, outConfig) {
   const jsonTags = structuredClone(config.tags);
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromJSONTags(jsonTags);
-  // pixels (if possible): small gradient square
+  // pixels (if possible)
   if (config.tags.Modality !== 'KO') {
-    dicomElements['7FE00010'] = generateGradSquare(config.tags);
+    if (config.tags.Modality === 'SEG') {
+      // simple binary
+      dicomElements['7FE00010'] = generateBinary(config.tags);
+    } else {
+      // grad square
+      dicomElements['7FE00010'] = generateGradSquare(config.tags);
+    }
   }
 
   // create writer

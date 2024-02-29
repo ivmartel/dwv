@@ -4,11 +4,9 @@ import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
- */
-
-/**
- * DICOM code.
+ * DICOM code: item of a basic code sequence.
+ *
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
  */
 export class DicomCode {
   /**
@@ -51,9 +49,24 @@ export class DicomCode {
 }
 
 /**
+ * Check if two code objects are equal.
+ *
+ * @param {DicomCode} code1 The first code.
+ * @param {DicomCode} code2 The second code.
+ * @returns {boolean} True if both codes are equal.
+ */
+export function isEqualCode(code1, code2) {
+  return Object.keys(code1).length === Object.keys(code2).length &&
+  Object.keys(code1).every(key =>
+    Object.prototype.hasOwnProperty.call(code2, key) &&
+    code1[key] === code2[key]
+  );
+}
+
+/**
  * Get a code object from a dicom element.
  *
- * @param {DataElements} dataElements The dicom element.
+ * @param {Object<string, DataElement>} dataElements The dicom element.
  * @returns {DicomCode} A code object.
  */
 export function getCode(dataElements) {
@@ -85,3 +98,29 @@ export function getCode(dataElements) {
   return code;
 }
 
+/**
+ * Get a simple dicom element item from a code object.
+ *
+ * @param {DicomCode} code The code object.
+ * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ */
+export function getDicomCodeItem(code) {
+  // dicom item (tags are in group/element order)
+  const codeItem = {};
+  // value
+  if (code.value !== undefined) {
+    codeItem.CodeValue = code.value;
+  } else if (code.longValue !== undefined) {
+    codeItem.LongCodeValue = code.longValue;
+  } else if (code.urnValue !== undefined) {
+    codeItem.URNCodeValue = code.urnValue;
+  }
+  // CodingSchemeDesignator
+  if (code.schemeDesignator !== undefined) {
+    codeItem.CodingSchemeDesignator = code.schemeDesignator;
+  }
+  // CodeMeaning
+  codeItem.CodeMeaning = code.meaning;
+  // return
+  return codeItem;
+}

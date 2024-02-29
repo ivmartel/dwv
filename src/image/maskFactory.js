@@ -1,13 +1,26 @@
 import {
   getImage2DSize,
-  getSpacingFromMeasure
+  getSpacingFromMeasure,
+  getDimensionOrganization,
+  getDicomDate,
+  getDicomTime,
+  getDicomMeasureItem,
+  getDicomPlaneOrientationItem
 } from '../dicom/dicomElementsWrapper';
-import {getSegment} from '../dicom/dicomSegment';
-import {getSegmentFrameInfo} from '../dicom/dicomSegmentFrameInfo';
+import {Tag} from '../dicom/dicomTag';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter';
+import {
+  getSegment,
+  getDicomSegmentItem,
+} from '../dicom/dicomSegment';
+import {
+  getSegmentFrameInfo,
+  getDicomSegmentFrameInfoItem
+} from '../dicom/dicomSegmentFrameInfo';
 import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
-import {Point3D} from '../math/point';
+import {Point, Point3D} from '../math/point';
 import {Vector3D} from '../math/vector';
 import {Index} from '../math/index';
 import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix';
@@ -18,6 +31,7 @@ import {Size} from './size';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from '../dicom/dataElement';
+import {MaskSegment} from '../dicom/dicomSegment';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -57,6 +71,22 @@ function getComparePosPat(orientation) {
     const p2 = invOrientation.multiplyArray3D(pos2);
     return p1[2] - p2[2];
   };
+}
+
+/**
+ * Merge two tag lists.
+ *
+ * @param {object} tags1 Base list, will be modified.
+ * @param {object} tags2 List to merge.
+ */
+function mergeTags(tags1, tags2) {
+  const keys2 = Object.keys(tags2);
+  for (const tagName2 of keys2) {
+    if (tags1[tagName2] !== undefined) {
+      logger.trace('Overwritting tag: ' + tagName2);
+    }
+    tags1[tagName2] = tags2[tagName2];
+  }
 }
 
 /**
@@ -105,6 +135,101 @@ function checkTag(dataElements, tagDefinition) {
 }
 
 /**
+ * Create ROI slice buffers.
+ *
+ * @param {Image} image The mask image.
+ * @param {MaskSegment[]} segments The mask segments.
+ * @param {number} sliceOffset The slice offset.
+ * @returns {object} The ROI slice image buffers.
+ */
+function createRoiSliceBuffers(
+  image,
+  segments,
+  sliceOffset
+) {
+  // access functions
+  const numberOfComponents = image.getNumberOfComponents();
+  const isRGB = numberOfComponents === 3;
+  let getPixelValue;
+  let equalValues;
+  if (isRGB) {
+    getPixelValue = function (inputOffset) {
+      return {
+        r: image.getValueAtOffset(inputOffset),
+        g: image.getValueAtOffset(inputOffset + 1),
+        b: image.getValueAtOffset(inputOffset + 2)
+      };
+    };
+    equalValues = function (value, segment) {
+      return (
+        segment.displayRGBValue !== undefined &&
+        value.r === segment.displayRGBValue.r &&
+        value.g === segment.displayRGBValue.g &&
+        value.b === segment.displayRGBValue.b
+      );
+    };
+  } else {
+    getPixelValue = function (inputOffset) {
+      return image.getValueAtOffset(inputOffset);
+    };
+    equalValues = function (value, segment) {
+      return value === segment.displayValue;
+    };
+  }
+
+  // create binary mask buffers
+  const geometry = image.getGeometry();
+  const size = geometry.getSize();
+  const sliceSize = size.getDimSize(2);
+  const buffers = {};
+  for (let o = 0; o < sliceSize; ++o) {
+    const inputOffset = (sliceOffset + o) * numberOfComponents;
+    const pixelValue = getPixelValue(inputOffset);
+    for (const segment of segments) {
+      const number2 = segment.number - 1;
+      if (equalValues(pixelValue, segment)) {
+        if (buffers[number2] === undefined) {
+          buffers[number2] = new Uint8Array(sliceSize);
+        }
+        buffers[number2][o] = 1;
+      }
+    }
+  }
+  return buffers;
+}
+
+/**
+ * Create ROI buffers.
+ *
+ * @param {Image} image The mask image.
+ * @param {MaskSegment[]} segments The mask segments.
+ * @returns {object} The ROI buffers
+ */
+function createRoiBuffers(image, segments) {
+  const geometry = image.getGeometry();
+  const size = geometry.getSize();
+
+  // image buffer to multi frame
+  const sliceSize = size.getDimSize(2);
+  const roiBuffers = {};
+  for (let k = 0; k < size.get(2); ++k) {
+    const sliceOffset = k * sliceSize;
+    // create slice buffers
+    const buffers = createRoiSliceBuffers(image, segments, sliceOffset);
+    // store slice buffers
+    const keys0 = Object.keys(buffers);
+    for (const key0 of keys0) {
+      if (roiBuffers[key0] === undefined) {
+        roiBuffers[key0] = {};
+      }
+      // ordering by slice index (follows posPat)
+      roiBuffers[key0][k] = buffers[key0];
+    }
+  }
+  return roiBuffers;
+}
+
+/**
  * List of DICOM Seg required tags.
  */
 const RequiredDicomSegTags = [
@@ -112,7 +237,7 @@ const RequiredDicomSegTags = [
     name: 'TransferSyntaxUID',
     tag: '00020010',
     type: '1',
-    enum: ['1.2.840.10008.1.2.1']
+    enum: ['1.2.840.10008.1.2', '1.2.840.10008.1.2.1', '1.2.840.10008.1.2.2']
   },
   {
     name: 'MediaStorageSOPClassUID',
@@ -200,72 +325,6 @@ export function getDefaultDicomSegJson() {
     tags[reqTag.name] = reqTag.enum[0];
   }
   return tags;
-}
-
-/**
- * Check the dimension organization from a dicom element.
- *
- * @param {DataElements} dataElements The root dicom element.
- * @returns {object} The dimension organizations and indices.
- */
-function getDimensionOrganization(dataElements) {
-  // Dimension Organization Sequence (required)
-  const orgSq = dataElements['00209221'];
-  if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
-    throw new Error('Unsupported dimension organization sequence length');
-  }
-  // Dimension Organization UID
-  const orgUID = orgSq.value[0]['00209164'].value[0];
-
-  // Dimension Index Sequence (conditionally required)
-  const indices = [];
-  const indexSqElem = dataElements['00209222'];
-  if (typeof indexSqElem !== 'undefined') {
-    const indexSq = indexSqElem.value;
-    // expecting 2D index
-    if (indexSq.length !== 2) {
-      throw new Error('Unsupported dimension index sequence length');
-    }
-    let indexPointer;
-    for (let i = 0; i < indexSq.length; ++i) {
-      // Dimension Organization UID (required)
-      const indexOrg = indexSq[i]['00209164'].value[0];
-      if (indexOrg !== orgUID) {
-        throw new Error(
-          'Dimension Index Sequence contains a unknown Dimension Organization');
-      }
-      // Dimension Index Pointer (required)
-      indexPointer = indexSq[i]['00209165'].value[0];
-
-      const index = {
-        DimensionOrganizationUID: indexOrg,
-        DimensionIndexPointer: indexPointer
-      };
-      // Dimension Description Label (optional)
-      if (typeof indexSq[i]['00209421'] !== 'undefined') {
-        index.DimensionDescriptionLabel = indexSq[i]['00209421'].value[0];
-      }
-      // store
-      indices.push(index);
-    }
-    // expecting Image Position at last position
-    if (indexPointer !== '(0020,0032)') {
-      throw new Error('Unsupported non image position as last index');
-    }
-  }
-
-  return {
-    organizations: {
-      value: [
-        {
-          DimensionOrganizationUID: orgUID
-        }
-      ]
-    },
-    indices: {
-      value: indices
-    }
-  };
 }
 
 /**
@@ -665,6 +724,149 @@ export class MaskFactory {
     image.setMeta(meta);
 
     return image;
+  }
+
+  /**
+   * Convert a mask image into a DICOM segmentation object.
+   *
+   * @param {Image} image The mask image.
+   * @param {MaskSegment[]} segments The mask segments.
+   * @param {Image} sourceImage The source image.
+   * @param {object} [extraTags] Optional list of extra tags.
+   * @returns {object} A list of dicom elements.
+   */
+  toDicom(
+    image,
+    segments,
+    sourceImage,
+    extraTags
+  ) {
+    // original image tags
+    const tags = image.getMeta();
+
+    // use image segments if not provided as input
+    if (segments === undefined) {
+      segments = tags.segments;
+    }
+
+    const geometry = image.getGeometry();
+    const size = geometry.getSize();
+
+    // (not in meta)
+    tags.Rows = size.get(1);
+    tags.Columns = size.get(0);
+    // update content tags
+    const now = new Date();
+    tags.ContentDate = getDicomDate(now);
+    tags.ContentTime = getDicomTime(now);
+    tags.ContentLabel = 'PRO_MASK';
+    tags.ContentDescription = 'QUIBIM edited prostate segmentation';
+    tags.SeriesInstanceUID = undefined;
+    tags.SeriesNumber = 0;
+    tags.InstanceNumber = 0;
+
+    // segments
+    const segmentItems = [];
+    for (const segment of segments) {
+      segmentItems.push(getDicomSegmentItem(segment));
+    }
+    tags.SegmentSequence = {
+      value: segmentItems
+    };
+
+    // Shared Functional Groups Sequence
+    tags.SharedFunctionalGroupsSequence = {
+      value: [
+        {
+          PlaneOrientationSequence: {
+            value: [getDicomPlaneOrientationItem(geometry.getOrientation())]
+          },
+          PixelMeasuresSequence: {
+            value: [getDicomMeasureItem(geometry.getSpacing())]
+          }
+        }
+      ]
+    };
+
+    // image buffer to multi frame
+    const roiBuffers = createRoiBuffers(image, segments);
+
+    const frameInfos = [];
+
+    // flatten buffer array
+    const finalBuffers = [];
+    for (const segment of segments) {
+      const number40 = segment.number;
+      const number4 = number40 - 1;
+      // check if buffer has values
+      if (roiBuffers[number4] === undefined) {
+        continue;
+      }
+      const keys1 = Object.keys(roiBuffers[number4]);
+      // revert slice order
+      for (let k1 = keys1.length - 1; k1 >= 0; --k1) {
+        const key1 = Number.parseInt(keys1[k1], 10);
+        finalBuffers.push(roiBuffers[number4][key1]);
+        // frame info
+        const posPat = image.getGeometry().getOrigins()[key1];
+        const posPatArray = [posPat.getX(), posPat.getY(), posPat.getZ()];
+        const frameInfo = {
+          dimIndex: [number40, keys1.length - k1],
+          imagePosPat: posPatArray,
+          refSegmentNumber: number40
+        };
+        // derivation image info
+        if (sourceImage !== undefined) {
+          const sourceGeometry = sourceImage.getGeometry();
+          const sourceIndex = sourceGeometry.worldToIndex(
+            new Point([posPat.getX(), posPat.getY(), posPat.getZ()])
+          );
+          frameInfo.derivationImages = [
+            {
+              sourceImages: [
+                {
+                  referencedSOPInstanceUID:
+                    sourceImage.getImageUid(sourceIndex),
+                  referencedSOPClassUID:
+                    (sourceImage.getMeta()).SOPClassUID
+                }
+              ]
+            }
+          ];
+        }
+        frameInfos.push(frameInfo);
+      }
+    }
+
+    tags.NumberOfFrames = finalBuffers.length.toString();
+
+    // frame infos
+    const frameInfosTag = [];
+    for (const frameInfo of frameInfos) {
+      frameInfosTag.push(getDicomSegmentFrameInfoItem(frameInfo));
+    }
+    tags.PerFrameFunctionalGroupsSequence = {
+      value: frameInfosTag
+    };
+
+    // merge extra tags if provided
+    if (extraTags !== undefined) {
+      mergeTags(tags, extraTags);
+    }
+
+    // convert JSON to DICOM element object
+    const dicomElements = getElementsFromJSONTags(tags);
+
+    // pixel value length: divide by 8 to trigger binary write
+    const sliceSize = size.getDimSize(2);
+    const pixVl = (finalBuffers.length * sliceSize) / 8;
+    const de = new DataElement('OB');
+    de.tag = new Tag('7FE0', '0010');
+    de.vl = pixVl;
+    de.value = finalBuffers;
+    dicomElements['7FE00010'] = de;
+
+    return dicomElements;
   }
 
 } // class MaskFactory
