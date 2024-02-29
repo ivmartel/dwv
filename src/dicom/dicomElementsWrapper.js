@@ -20,6 +20,7 @@ import {logger} from '../utils/logger';
 /* eslint-disable no-unused-vars */
 import {Tag} from './dicomTag';
 import {DataElement} from './dataElement';
+import {Matrix33} from '../math/matrix';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -356,7 +357,7 @@ function getElementAsString(tag, dicomElement, prefix) {
 /**
  * Extract the 2D size from dicom elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {DataElements} elements The DICOM elements.
  * @returns {number[]} The size.
  */
 export function getImage2DSize(elements) {
@@ -382,7 +383,7 @@ export function getImage2DSize(elements) {
 /**
  * Get the pixel spacing from the different spacing tags.
  *
- * @param {object} elements The DICOM elements.
+ * @param {DataElements} elements The DICOM elements.
  * @returns {Spacing} The read spacing or the default [1,1].
  */
 export function getPixelSpacing(elements) {
@@ -423,7 +424,7 @@ export function getPixelSpacing(elements) {
 /**
  * Get the pixel data unit.
  *
- * @param {object} elements The DICOM elements.
+ * @param {DataElements} elements The DICOM elements.
  * @returns {string|null} The unit value if available.
  */
 export function getPixelUnit(elements) {
@@ -552,6 +553,112 @@ export function getDateTime(element) {
 }
 
 /**
+ * Pad an input string with a '0' to form a 2 digit one.
+ *
+ * @param {string} str The string to pad.
+ * @returns {string} The padded string.
+ */
+function padZeroTwoDigit(str) {
+  return ('0' + str).slice(-2);
+}
+
+/**
+ * Get a DICOM formated date.
+ *
+ * @param {Date} date The date to format.
+ * @returns {string} The formated date.
+ */
+export function getDicomDate(date) {
+  // YYYYMMDD
+  return (
+    date.getFullYear().toString() +
+    padZeroTwoDigit((date.getMonth() + 1).toString()) +
+    padZeroTwoDigit(date.getDate().toString())
+  );
+}
+
+/**
+ * Get a DICOM formated time.
+ *
+ * @param {Date} date The date to format.
+ * @returns {string} The formated time.
+ */
+export function getDicomTime(date) {
+  // HHMMSS
+  return (
+    padZeroTwoDigit(date.getHours().toString()) +
+    padZeroTwoDigit(date.getMinutes().toString()) +
+    padZeroTwoDigit(date.getSeconds().toString())
+  );
+}
+
+/**
+ * Check the dimension organization from a dicom element.
+ *
+ * @param {DataElements} dataElements The root dicom element.
+ * @returns {object} The dimension organizations and indices.
+ */
+export function getDimensionOrganization(dataElements) {
+  // Dimension Organization Sequence (required)
+  const orgSq = dataElements['00209221'];
+  if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
+    throw new Error('Unsupported dimension organization sequence length');
+  }
+  // Dimension Organization UID
+  const orgUID = orgSq.value[0]['00209164'].value[0];
+
+  // Dimension Index Sequence (conditionally required)
+  const indices = [];
+  const indexSqElem = dataElements['00209222'];
+  if (typeof indexSqElem !== 'undefined') {
+    const indexSq = indexSqElem.value;
+    // expecting 2D index
+    if (indexSq.length !== 2) {
+      throw new Error('Unsupported dimension index sequence length');
+    }
+    let indexPointer;
+    for (let i = 0; i < indexSq.length; ++i) {
+      // Dimension Organization UID (required)
+      const indexOrg = indexSq[i]['00209164'].value[0];
+      if (indexOrg !== orgUID) {
+        throw new Error(
+          'Dimension Index Sequence contains a unknown Dimension Organization');
+      }
+      // Dimension Index Pointer (required)
+      indexPointer = indexSq[i]['00209165'].value[0];
+
+      const index = {
+        DimensionOrganizationUID: indexOrg,
+        DimensionIndexPointer: indexPointer
+      };
+      // Dimension Description Label (optional)
+      if (typeof indexSq[i]['00209421'] !== 'undefined') {
+        index.DimensionDescriptionLabel = indexSq[i]['00209421'].value[0];
+      }
+      // store
+      indices.push(index);
+    }
+    // expecting Image Position at last position
+    if (indexPointer !== '(0020,0032)') {
+      throw new Error('Unsupported non image position as last index');
+    }
+  }
+
+  return {
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID
+        }
+      ]
+    },
+    indices: {
+      value: indices
+    }
+  };
+}
+
+/**
  * Get a spacing object from a dicom measure element.
  *
  * @param {DataElements} dataElements The dicom element.
@@ -578,6 +685,37 @@ export function getSpacingFromMeasure(dataElements) {
   return new Spacing(spacingValues);
 }
 
+/**
+ * Get a dicom item from a measure sequence.
+ *
+ * @param {Spacing} spacing The spacing object.
+ * @returns {object} The dicom item.
+ */
+export function getDicomMeasureItem(spacing) {
+  return {
+    SpacingBetweenSlices: spacing.get(2),
+    PixelSpacing: [spacing.get(1), spacing.get(0)]
+  };
+}
+
+/**
+ * Get a dicom element from a plane orientation sequence.
+ *
+ * @param {Matrix33} orientation The image orientation.
+ * @returns {object} The dicom element.
+ */
+export function getDicomPlaneOrientationItem(orientation) {
+  return {
+    ImageOrientationPatient: [
+      orientation.get(0, 0),
+      orientation.get(1, 0),
+      orientation.get(2, 0),
+      orientation.get(0, 1),
+      orientation.get(1, 1),
+      orientation.get(2, 1)
+    ]
+  };
+}
 
 /**
  * Check an input tag.
