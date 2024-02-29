@@ -470,7 +470,7 @@ function guessTransferSyntax(firstDataElement) {
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   let res = null;
   try {
-    if (bitsAllocated === 8) {
+    if (bitsAllocated === 1 || bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
         res = new Uint8Array(size);
       } else {
