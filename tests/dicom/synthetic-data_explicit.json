@@ -630,7 +630,7 @@
                         "value": [
                             {
                                 "CodeMeaning": "Segmentation",
-                                "CodeValue": "113_076",
+                                "CodeValue": "113076",
                                 "CodingSchemeDesignator": "DCM"
 
                             }
@@ -640,7 +640,7 @@
                         "value": [
                             {
                                 "CodeMeaning": "Segmentation",
-                                "CodeValue": "113_076",
+                                "CodeValue": "113076",
                                 "CodingSchemeDesignator": "DCM"
 
                             }
