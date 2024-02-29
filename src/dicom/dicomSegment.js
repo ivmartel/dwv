@@ -1,9 +1,14 @@
 import {
   isEqualRgb,
   cielabToSrgb,
-  uintLabToLab
+  uintLabToLab,
+  labToUintLab,
+  srgbToCielab
 } from '../utils/colour';
-import {getCode} from './dicomCode';
+import {
+  getCode,
+  getDicomCodeItem
+} from './dicomCode';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -11,10 +16,6 @@ import {RGB} from '../utils/colour';
 import {DataElement} from './dataElement';
 import {DicomCode} from './dicomCode';
 /* eslint-enable no-unused-vars */
-
-/**
- * @typedef {Object<string, DataElement>} DataElements
- */
 
 /**
  * DICOM (mask) segment.
@@ -98,7 +99,7 @@ export class MaskSegment {
 /**
  * Get a segment object from a dicom element.
  *
- * @param {DataElements} dataElements The dicom element.
+ * @param {Object<string, DataElement>} dataElements The dicom element.
  * @returns {MaskSegment} A segment object.
  */
 export function getSegment(dataElements) {
@@ -160,8 +161,8 @@ export function getSegment(dataElements) {
 /**
  * Check if two segment objects are equal.
  *
- * @param {object} seg1 The first segment.
- * @param {object} seg2 The second segment.
+ * @param {MaskSegment} seg1 The first segment.
+ * @param {MaskSegment} seg2 The second segment.
  * @returns {boolean} True if both segment are equal.
  */
 export function isEqualSegment(seg1, seg2) {
@@ -231,4 +232,57 @@ export function isSimilarSegment(seg1, seg2) {
   }
 
   return isSimilar;
+}
+
+/**
+ * Get a dicom simple tag from a segment object.
+ *
+ * @param {MaskSegment} segment The segment object.
+ * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ */
+export function getDicomSegmentItem(segment) {
+  let algoType = segment.algorithmType;
+  if (algoType === undefined) {
+    algoType = 'MANUAL';
+  }
+  // dicom item (tags are in group/element order)
+  const segmentItem = {
+    SegmentNumber: segment.number,
+    SegmentLabel: segment.label,
+    SegmentAlgorithmType: algoType
+  };
+  // SegmentAlgorithmName
+  if (algoType !== 'MANUAL' && segment.algorithmName !== undefined) {
+    segmentItem.SegmentAlgorithmName = segment.algorithmName;
+  }
+  // RecommendedDisplay value
+  if (segment.displayRGBValue) {
+    const cieLab = labToUintLab(srgbToCielab(segment.displayRGBValue));
+    segmentItem.RecommendedDisplayCIELabValue = [
+      Math.round(cieLab.l),
+      Math.round(cieLab.a),
+      Math.round(cieLab.b)
+    ];
+  } else {
+    segmentItem.RecommendedDisplayGrayscaleValue = segment.displayValue;
+  }
+  // SegmentedPropertyCategoryCodeSequence
+  if (segment.propertyCategoryCode) {
+    segmentItem.SegmentedPropertyCategoryCodeSequence = {
+      value: [getDicomCodeItem(segment.propertyCategoryCode)]
+    };
+  }
+  // SegmentedPropertyTypeCodeSequence
+  if (segment.propertyTypeCode) {
+    segmentItem.SegmentedPropertyTypeCodeSequence = {
+      value: [getDicomCodeItem(segment.propertyTypeCode)]
+    };
+  }
+  // tracking
+  if (segment.trackingId) {
+    segmentItem.TrackingID = segment.trackingId;
+    segmentItem.TrackingUID = segment.trackingUid;
+  }
+  // return
+  return segmentItem;
 }
