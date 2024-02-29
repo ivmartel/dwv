@@ -774,10 +774,9 @@ export declare namespace defaults {
 }
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
- */
-/**
- * DICOM code.
+ * DICOM code: item of a basic code sequence.
+ *
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
  */
 export declare class DicomCode {
     /**
@@ -2495,14 +2494,23 @@ export declare class MaskFactory {
     create(dataElements: {
         [x: string]: DataElement;
     }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    /**
+     * Convert a mask image into a DICOM segmentation object.
+     *
+     * @param {Image} image The mask image.
+     * @param {MaskSegment[]} segments The mask segments.
+     * @param {Image} sourceImage The source image.
+     * @param {object} [extraTags] Optional list of extra tags.
+     * @returns {object} A list of dicom elements.
+     */
+    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: object): object;
     #private;
 }
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
- */
-/**
- * DICOM (mask) segment.
+ * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
+ *
+ * @see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html
  */
 export declare class MaskSegment {
     /**
