@@ -18,7 +18,9 @@ import {DicomCode} from './dicomCode';
 /* eslint-enable no-unused-vars */
 
 /**
- * DICOM (mask) segment.
+ * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
+ *
+ * @see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html
  */
 export class MaskSegment {
   /**

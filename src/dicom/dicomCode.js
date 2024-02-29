@@ -4,9 +4,9 @@ import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
- * DICOM code.
+ * DICOM code: item of a basic code sequence.
  *
- * @see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/chapter_8.html
+ * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
  */
 export class DicomCode {
   /**
