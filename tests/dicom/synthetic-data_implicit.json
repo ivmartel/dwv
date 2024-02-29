@@ -589,5 +589,114 @@
             ]
         }
     }
+},
+{
+    "name": "lei-11",
+    "description": "Little Endian Implicit SEG test data.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "Modality": "SEG",
+        "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
+        "SOPInstanceUID": "1.0.0.0",
+        "PatientID": "0123456",
+        "PatientName": "dwv^PatientName",
+        "OtherPatientNames": "dwv^PatientOtherName",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 1,
+        "BitsStored": 1,
+        "HighBit": 0,
+        "NumberOfFrames": 1,
+        "SegmentationType": "BINARY",
+        "DimensionOrganizationType": "3D",
+        "DimensionOrganizationSequence": {
+            "value": [
+                {
+                    "DimensionOrganizationUID": "1.3.6.1.4.1.43046.3.8323329.8905.1436811188.866319"
+                }
+            ]
+        },
+        "SegmentSequence": {
+            "value": [
+                {
+                    "SegmentNumber": 1,
+                    "SegmentLabel": "Segment1",
+                    "SegmentAlgorithmType": "AUTOMATIC",
+                    "RecommendedDisplayCIELabValue": [34886, 53483, 50172],
+                    "SegmentedPropertyCategoryCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113_076",
+                                "CodingSchemeDesignator": "DCM"
+
+                            }
+                        ]
+                    },
+                    "SegmentedPropertyTypeCodeSequence": {
+                        "value": [
+                            {
+                                "CodeMeaning": "Segmentation",
+                                "CodeValue": "113_076",
+                                "CodingSchemeDesignator": "DCM"
+
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "SharedFunctionalGroupsSequence": {
+            "value": [
+                {
+                    "PixelMeasuresSequence": {
+                        "value": [
+                            {
+                                "PixelSpacing": [1, 1],
+                                "SpacingBetweenSlices": 1
+                            }
+                        ]
+                    },
+                    "PlaneOrientationSequence": {
+                        "value": [
+                            {
+                                "ImageOrientationPatient": [1, 0, 0, 0, 1, 0]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "PerFrameFunctionalGroupsSequence": {
+            "value": [
+                {
+                    "FrameContentSequence": {
+                        "value": [
+                            {
+                                "DimensionIndexValues": [1, 1]
+                            }
+                        ]
+                    },
+                    "PlanePositionSequence": {
+                        "value": [
+                            {
+                                "ImagePositionPatient": [0, 0, 0]
+                            }
+                        ]
+                    },
+                    "SegmentIdentificationSequence": {
+                        "value": [
+                            {
+                                "ReferencedSegmentNumber": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
 }
 ]

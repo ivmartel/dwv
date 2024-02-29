@@ -40,10 +40,17 @@ function getObjectUrlFromTags(config) {
   }
   // convert JSON to DICOM element object
   const dicomElements = dwv.getElementsFromJSONTags(config.tags);
-  // pixels: small gradient square
+  // pixels
   if (config.tags.Modality !== 'KO') {
-    dicomElements['7FE00010'] =
-      test.generatePixelDataFromJSONTags(config.tags);
+    if (config.tags.Modality === 'SEG') {
+      // simple binary
+      dicomElements['7FE00010'] =
+        test.generatePixelDataFromJSONTags(config.tags, 'binary');
+    } else {
+      // default to grad square
+      dicomElements['7FE00010'] =
+        test.generatePixelDataFromJSONTags(config.tags);
+    }
   }
 
   // create DICOM buffer
