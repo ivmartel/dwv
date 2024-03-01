@@ -23,7 +23,7 @@ import {DicomCode} from '../../src/dicom/dicomCode';
  * Get a dicom code from simple dicom elements.
  *
  * @param {Object<string, DataElement>} simpleElements DICOM simple elements.
- * @returns {DicomCode}
+ * @returns {DicomCode} The corresponding DICOM code.
  */
 function getCodeFromSimpleDicom(simpleElements) {
   return {
