@@ -1,9 +1,8 @@
 [
 {
-    "name": "beb-00",
-    "description": "Big Endian Explicit test data.",
+    "name": "test-00",
+    "description": "Simple test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -21,10 +20,9 @@
     }
 },
 {
-    "name": "beb-01",
-    "description": "Big Endian Explicit test data with PixelRepresentation=1.",
+    "name": "test-01",
+    "description": "PixelRepresentation=1 test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -42,10 +40,9 @@
     }
 },
 {
-    "name": "beb-02",
-    "description": "Big Endian Explicit 8bits RGB test data.",
+    "name": "test-02",
+    "description": "8bits RGB test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -64,10 +61,9 @@
     }
 },
 {
-    "name": "beb-03",
-    "description": "Big Endian Explicit test data with explicit length sequence.",
+    "name": "test-03",
+    "description": "Explicit length sequence test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -98,10 +94,9 @@
     }
 },
 {
-    "name": "beb-04",
-    "description": "Big Endian Explicit test data with implicit length sequence.",
+    "name": "test-04",
+    "description": "Implicit length sequence test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -132,10 +127,9 @@
     }
 },
 {
-    "name": "beb-05",
-    "description": "Big Endian Explicit test data with massive sequence.",
+    "name": "test-05",
+    "description": "Massive sequence test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -235,10 +229,10 @@
     }
 },
 {
-    "name": "beb-06",
-    "description": "Big Endian Explicit test data with private tags.",
+    "name": "test-06",
+    "description": "Private tags test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
+        "TransferSyntaxUID": "1.2.840.10008.1.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -274,10 +268,9 @@
     "useUnVrForPrivateSq": false
 },
 {
-    "name": "beb-07",
-    "description": "Big Endian Explicit test data with private tags and VR=UN for private SQ.",
+    "name": "test-07",
+    "description": "Private tags and VR=UN for private SQ test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -313,10 +306,9 @@
     "useUnVrForPrivateSq": true
 },
 {
-    "name": "beb-08",
-    "description": "Big Endian Explicit test data with multiple VRs.",
+    "name": "test-08",
+    "description": "All VRs test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "PatientID": "0123456",
@@ -413,10 +405,9 @@
     }
 },
 {
-    "name": "beb-09",
-    "description": "Big Endian Explicit test data data with UTF-8 charset.",
+    "name": "test-09",
+    "description": "UTF-8 charset test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
         "SpecificCharacterSet": "ISO_IR 192",
@@ -435,10 +426,9 @@
     }
 },
 {
-    "name": "beb-10",
-    "description": "Big Endian Explicit KOS test data (non image)",
+    "name": "test-10",
+    "description": "DICOM KOS test data (non image)",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "KO",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
         "MediaStorageSOPClassUID": "1.2.840.10008.5.1.4.1.1.88.59",
@@ -591,10 +581,9 @@
     }
 },
 {
-    "name": "beb-11",
-    "description": "Big Endian Explicit SEG test data.",
+    "name": "test-11",
+    "description": "DICOM SEG test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "SEG",
         "SOPClassUID": "1.2.840.10008.5.1.4.1.1.66.4",
         "SOPInstanceUID": "1.0.0.0",

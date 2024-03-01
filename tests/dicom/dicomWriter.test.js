@@ -19,10 +19,7 @@ import {WriterRule} from '../../src/dicom/dicomWriter';
 // test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm';
-import syntheticDataExplicit from '/tests/dicom/synthetic-data_explicit.json';
-import syntheticDataImplicit from '/tests/dicom/synthetic-data_implicit.json';
-import syntheticDataExplicitBE from
-  '/tests/dicom/synthetic-data_explicit_big-endian.json';
+import syntheticData from '/tests/dicom/synthetic-data.json';
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.
@@ -584,9 +581,10 @@ function getRulesAndResult0(config) {
  * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit', function (assert) {
-  const configs = JSON.parse(syntheticDataExplicit);
-  for (let i = 0; i < configs.length; ++i) {
-    testWriteReadDataFromConfig(configs[i], assert);
+  const configs = JSON.parse(syntheticData);
+  for (const config of configs) {
+    config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+    testWriteReadDataFromConfig(config, assert);
   }
 });
 
@@ -598,11 +596,12 @@ QUnit.test('Test synthetic dicom explicit', function (assert) {
  */
 QUnit.test('Test synthetic dicom explicit with writing rules #0',
   function (assert) {
-    const configs = JSON.parse(syntheticDataExplicit);
-    for (let i = 0; i < configs.length; ++i) {
-      const r20 = getRulesAndResult0(configs[i]);
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+      const r20 = getRulesAndResult0(config);
       testWriteReadDataFromConfig(
-        configs[i], assert, r20.rules, r20.result
+        config, assert, r20.rules, r20.result
       );
     }
   }
@@ -615,9 +614,10 @@ QUnit.test('Test synthetic dicom explicit with writing rules #0',
  * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom implicit', function (assert) {
-  const configs = JSON.parse(syntheticDataImplicit);
-  for (let i = 0; i < configs.length; ++i) {
-    testWriteReadDataFromConfig(configs[i], assert);
+  const configs = JSON.parse(syntheticData);
+  for (const config of configs) {
+    config.tags.TransferSyntaxUID = '1.2.840.10008.1.2';
+    testWriteReadDataFromConfig(config, assert);
   }
 });
 
@@ -629,11 +629,12 @@ QUnit.test('Test synthetic dicom implicit', function (assert) {
  */
 QUnit.test('Test synthetic dicom implicit with writing rules #0',
   function (assert) {
-    const configs = JSON.parse(syntheticDataImplicit);
-    for (let i = 0; i < configs.length; ++i) {
-      const r20 = getRulesAndResult0(configs[i]);
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID = '1.2.840.10008.1.2';
+      const r20 = getRulesAndResult0(config);
       testWriteReadDataFromConfig(
-        configs[i], assert, r20.rules, r20.result
+        config, assert, r20.rules, r20.result
       );
     }
   }
@@ -646,9 +647,10 @@ QUnit.test('Test synthetic dicom implicit with writing rules #0',
  * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
-  const configs = JSON.parse(syntheticDataExplicitBE);
-  for (let i = 0; i < configs.length; ++i) {
-    testWriteReadDataFromConfig(configs[i], assert);
+  const configs = JSON.parse(syntheticData);
+  for (const config of configs) {
+    config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.2';
+    testWriteReadDataFromConfig(config, assert);
   }
 });
 
@@ -660,11 +662,12 @@ QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
  */
 QUnit.test('Test synthetic dicom explicit big endian with writing rules #0',
   function (assert) {
-    const configs = JSON.parse(syntheticDataExplicitBE);
-    for (let i = 0; i < configs.length; ++i) {
-      const r20 = getRulesAndResult0(configs[i]);
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.2';
+      const r20 = getRulesAndResult0(config);
       testWriteReadDataFromConfig(
-        configs[i], assert, r20.rules, r20.result
+        config, assert, r20.rules, r20.result
       );
     }
   }

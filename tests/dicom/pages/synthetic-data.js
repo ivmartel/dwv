@@ -13,9 +13,7 @@ document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
  */
 function onDOMContentLoaded() {
   // create lists
-  getFileConfigsHtmlList('synthetic-data_explicit');
-  getFileConfigsHtmlList('synthetic-data_implicit');
-  getFileConfigsHtmlList('synthetic-data_explicit_big-endian');
+  getFileConfigsHtmlList('synthetic-data');
 }
 
 /**
@@ -106,12 +104,43 @@ function getFileConfigsHtmlList(fileName) {
     console.error(event);
   };
   request.onload = function (/*event*/) {
-    const content = document.getElementById('content');
-    const title = document.createElement('h2');
-    title.appendChild(document.createTextNode(fileName));
-    content.append(title);
     const configs = JSON.parse(this.responseText);
-    content.append(getConfigsHtmlList(configs));
+
+    const dataGroups = [
+      {
+        name: 'Synthetic data Implicit (Little Endian)',
+        short: 'sile',
+        syntax: '1.2.840.10008.1.2'
+      },
+      {
+        name: 'Synthetic data Explicit (Little Endian)',
+        short: 'sele',
+        syntax: '1.2.840.10008.1.2.1'
+      },
+      {
+        name: 'Synthetic data Explicit (Big Endian)',
+        short: 'sebe',
+        syntax: '1.2.840.10008.1.2.2'
+      }
+    ];
+
+    for (const dataGroup of dataGroups) {
+      const content = document.getElementById('content');
+      const title = document.createElement('h2');
+      title.appendChild(document.createTextNode(dataGroup.name));
+      content.append(title);
+
+      for (const config of configs) {
+        // name in json is 'test-##', replace test
+        //   with the short string of the group
+        config.name = dataGroup.short +
+          config.name.substring(config.name.length - 3);
+        // set transfer syntax
+        config.tags.TransferSyntaxUID = dataGroup.syntax;
+      }
+
+      content.append(getConfigsHtmlList(configs));
+    }
   };
   request.send(null);
 }
