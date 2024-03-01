@@ -8,6 +8,8 @@ import {
 import {
   is32bitVLVR,
   isCharSetStringVR,
+  transferSyntaxes,
+  transferSyntaxKeywords,
   vrTypes,
 } from './dictionary';
 import {DataReader} from './dataReader';
@@ -216,7 +218,7 @@ export function getOrientationName(orientation) {
  * @returns {boolean} True if an implicit syntax.
  */
 export function isImplicitTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2';
+  return syntax === transferSyntaxKeywords.ImplicitVRLittleEndian;
 }
 
 /**
@@ -226,7 +228,7 @@ export function isImplicitTransferSyntax(syntax) {
  * @returns {boolean} True if a big endian syntax.
  */
 export function isBigEndianTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2.2';
+  return syntax === transferSyntaxKeywords.ExplicitVRBigEndian;
 }
 
 /**
@@ -236,21 +238,8 @@ export function isBigEndianTransferSyntax(syntax) {
  * @returns {boolean} True if a jpeg baseline syntax.
  */
 export function isJpegBaselineTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2.4.50' ||
-    syntax === '1.2.840.10008.1.2.4.51';
-}
-
-/**
- * Tell if a given syntax is a retired JPEG one.
- *
- * @param {string} syntax The transfer syntax to test.
- * @returns {boolean} True if a retired jpeg syntax.
- */
-function isJpegRetiredTransferSyntax(syntax) {
-  return (syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
-    !isJpegBaselineTransferSyntax(syntax) &&
-    !isJpegLosslessTransferSyntax(syntax)) ||
-    syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
+  return syntax === transferSyntaxKeywords.JPEGBaseline8Bit ||
+    syntax === transferSyntaxKeywords.JPEGExtended12Bit;
 }
 
 /**
@@ -260,18 +249,8 @@ function isJpegRetiredTransferSyntax(syntax) {
  * @returns {boolean} True if a jpeg lossless syntax.
  */
 export function isJpegLosslessTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2.4.57' ||
-    syntax === '1.2.840.10008.1.2.4.70';
-}
-
-/**
- * Tell if a given syntax is a JPEG-LS one.
- *
- * @param {string} syntax The transfer syntax to test.
- * @returns {boolean} True if a jpeg-ls syntax.
- */
-function isJpeglsTransferSyntax(syntax) {
-  return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
+  return syntax === transferSyntaxKeywords.JPEGLossless ||
+    syntax === transferSyntaxKeywords.JPEGLosslessSV1;
 }
 
 /**
@@ -291,7 +270,7 @@ export function isJpeg2000TransferSyntax(syntax) {
  * @returns {boolean} True if a RLE syntax.
  */
 function isRleTransferSyntax(syntax) {
-  return syntax.match(/1.2.840.10008.1.2.5/) !== null;
+  return syntax === transferSyntaxKeywords.RLELossless;
 }
 
 /**
@@ -321,78 +300,26 @@ export function getSyntaxDecompressionName(syntax) {
  * @returns {boolean} True if a supported syntax.
  */
 function isReadSupportedTransferSyntax(syntax) {
-
-  // Unsupported:
-  // "1.2.840.10008.1.2.1.99": Deflated Explicit VR - Little Endian
-  // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
-  // isJpegRetiredTransferSyntax(syntax): non supported JPEG
-  // isJpeglsTransferSyntax(syntax): JPEG-LS
-
-  return (syntax === '1.2.840.10008.1.2' || // Implicit VR - Little Endian
-    syntax === '1.2.840.10008.1.2.1' || // Explicit VR - Little Endian
-    syntax === '1.2.840.10008.1.2.2' || // Explicit VR - Big Endian
-    isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
-    isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-    isJpeg2000TransferSyntax(syntax) || // JPEG 2000
-    isRleTransferSyntax(syntax)); // RLE
+  return (syntax === transferSyntaxKeywords.ImplicitVRLittleEndian ||
+    syntax === transferSyntaxKeywords.ExplicitVRLittleEndian ||
+    syntax === transferSyntaxKeywords.ExplicitVRBigEndian ||
+    isJpegBaselineTransferSyntax(syntax) ||
+    isJpegLosslessTransferSyntax(syntax) ||
+    isJpeg2000TransferSyntax(syntax) ||
+    isRleTransferSyntax(syntax));
 }
 
 /**
- * Get the transfer syntax name.
- * Reference: [UID Values]{@link http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html}.
+ * Get a transfer syntax name from its UID.
  *
- * @param {string} syntax The transfer syntax.
- * @returns {string} The name of the transfer syntax.
+ * @param {string} syntax The transfer syntax UID value.
+ * @returns {string} The transfer syntax name.
  */
 export function getTransferSyntaxName(syntax) {
   let name = 'Unknown';
-  if (syntax === '1.2.840.10008.1.2') {
-    // Implicit VR - Little Endian
-    name = 'Little Endian Implicit';
-  } else if (syntax === '1.2.840.10008.1.2.1') {
-    // Explicit VR - Little Endian
-    name = 'Little Endian Explicit';
-  } else if (syntax === '1.2.840.10008.1.2.1.99') {
-    // Deflated Explicit VR - Little Endian
-    name = 'Little Endian Deflated Explicit';
-  } else if (syntax === '1.2.840.10008.1.2.2') {
-    // Explicit VR - Big Endian
-    name = 'Big Endian Explicit';
-  } else if (isJpegBaselineTransferSyntax(syntax)) {
-    // JPEG baseline
-    if (syntax === '1.2.840.10008.1.2.4.50') {
-      name = 'JPEG Baseline';
-    } else { // *.51
-      name = 'JPEG Extended, Process 2+4';
-    }
-  } else if (isJpegLosslessTransferSyntax(syntax)) {
-    // JPEG Lossless
-    if (syntax === '1.2.840.10008.1.2.4.57') {
-      name = 'JPEG Lossless, Nonhierarchical (Processes 14)';
-    } else { // *.70
-      name = 'JPEG Lossless, Non-hierarchical, 1st Order Prediction';
-    }
-  } else if (isJpegRetiredTransferSyntax(syntax)) {
-    // Retired JPEG
-    name = 'Retired JPEG';
-  } else if (isJpeglsTransferSyntax(syntax)) {
-    // JPEG-LS
-    name = 'JPEG-LS';
-  } else if (isJpeg2000TransferSyntax(syntax)) {
-    // JPEG 2000
-    if (syntax === '1.2.840.10008.1.2.4.91') {
-      name = 'JPEG 2000 (Lossless or Lossy)';
-    } else { // *.90
-      name = 'JPEG 2000 (Lossless only)';
-    }
-  } else if (syntax === '1.2.840.10008.1.2.4.100') {
-    // MPEG2 Image Compression
-    name = 'MPEG2';
-  } else if (isRleTransferSyntax(syntax)) {
-    // RLE (lossless)
-    name = 'RLE';
+  if (typeof transferSyntaxes[syntax] !== 'undefined') {
+    name = transferSyntaxes[syntax];
   }
-  // return
   return name;
 }
 
@@ -427,11 +354,9 @@ function guessTransferSyntax(firstDataElement) {
   let syntax = null;
   if (group === oEightGroupLittleEndian) {
     if (implicit) {
-      // ImplicitVRLittleEndian
-      syntax = '1.2.840.10008.1.2';
+      syntax = transferSyntaxKeywords.ImplicitVRLittleEndian;
     } else {
-      // ExplicitVRLittleEndian
-      syntax = '1.2.840.10008.1.2.1';
+      syntax = transferSyntaxKeywords.ExplicitVRLittleEndian;
     }
   } else {
     if (implicit) {
@@ -441,8 +366,7 @@ function guessTransferSyntax(firstDataElement) {
         'and implicit VR big endian detected)'
       );
     } else {
-      // ExplicitVRBigEndian
-      syntax = '1.2.840.10008.1.2.2';
+      syntax = transferSyntaxKeywords.ExplicitVRBigEndian;
     }
   }
   // set transfer syntax data element

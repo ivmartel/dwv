@@ -17,6 +17,7 @@ import {
   getSegmentFrameInfo,
   getDicomSegmentFrameInfoItem
 } from '../dicom/dicomSegmentFrameInfo';
+import {transferSyntaxKeywords} from '../dicom/dictionary';
 import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
 import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
@@ -237,7 +238,11 @@ const RequiredDicomSegTags = [
     name: 'TransferSyntaxUID',
     tag: '00020010',
     type: '1',
-    enum: ['1.2.840.10008.1.2', '1.2.840.10008.1.2.1', '1.2.840.10008.1.2.2']
+    enum: [
+      transferSyntaxKeywords.ImplicitVRLittleEndian,
+      transferSyntaxKeywords.ExplicitVRLittleEndian,
+      transferSyntaxKeywords.ExplicitVRBigEndian
+    ]
   },
   {
     name: 'MediaStorageSOPClassUID',

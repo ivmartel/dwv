@@ -45,7 +45,7 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
 (0002,0013) SH [DWV_0.31.0]                             # undefined, 1 ImplementationVersionName\n\
 \n\
 # Dicom-Data-Set\n\
-# Used TransferSyntax: Little Endian Explicit\n\
+# Used TransferSyntax: Explicit VR Little Endian\n\
 (0008,0018) UI [1.2.3.0.1.11.111]                       # undefined, 1 SOPInstanceUID\n\
 (0008,0060) CS [MR]                                     # undefined, 1 Modality\n\
 (0008,1050) PN (no value available)                     # undefined, 0 PerformingPhysicianName\n\

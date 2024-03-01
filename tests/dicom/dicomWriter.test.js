@@ -8,7 +8,10 @@ import {
   getTagFromDictionary,
   getPixelDataTag
 } from '../../src/dicom/dicomTag';
-import {dictionary} from '../../src/dicom/dictionary';
+import {
+  dictionary,
+  transferSyntaxKeywords
+} from '../../src/dicom/dictionary';
 import {b64urlToArrayBuffer} from './utils';
 
 // doc imports
@@ -583,7 +586,8 @@ function getRulesAndResult0(config) {
 QUnit.test('Test synthetic dicom explicit', function (assert) {
   const configs = JSON.parse(syntheticData);
   for (const config of configs) {
-    config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+    config.tags.TransferSyntaxUID =
+      transferSyntaxKeywords.ExplicitVRLittleEndian;
     testWriteReadDataFromConfig(config, assert);
   }
 });
@@ -598,7 +602,8 @@ QUnit.test('Test synthetic dicom explicit with writing rules #0',
   function (assert) {
     const configs = JSON.parse(syntheticData);
     for (const config of configs) {
-      config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ExplicitVRLittleEndian;
       const r20 = getRulesAndResult0(config);
       testWriteReadDataFromConfig(
         config, assert, r20.rules, r20.result
@@ -616,7 +621,8 @@ QUnit.test('Test synthetic dicom explicit with writing rules #0',
 QUnit.test('Test synthetic dicom implicit', function (assert) {
   const configs = JSON.parse(syntheticData);
   for (const config of configs) {
-    config.tags.TransferSyntaxUID = '1.2.840.10008.1.2';
+    config.tags.TransferSyntaxUID =
+      transferSyntaxKeywords.ImplicitVRLittleEndian;
     testWriteReadDataFromConfig(config, assert);
   }
 });
@@ -631,7 +637,8 @@ QUnit.test('Test synthetic dicom implicit with writing rules #0',
   function (assert) {
     const configs = JSON.parse(syntheticData);
     for (const config of configs) {
-      config.tags.TransferSyntaxUID = '1.2.840.10008.1.2';
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ImplicitVRLittleEndian;
       const r20 = getRulesAndResult0(config);
       testWriteReadDataFromConfig(
         config, assert, r20.rules, r20.result
@@ -649,7 +656,8 @@ QUnit.test('Test synthetic dicom implicit with writing rules #0',
 QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
   const configs = JSON.parse(syntheticData);
   for (const config of configs) {
-    config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.2';
+    config.tags.TransferSyntaxUID =
+      transferSyntaxKeywords.ExplicitVRBigEndian;
     testWriteReadDataFromConfig(config, assert);
   }
 });
@@ -664,7 +672,8 @@ QUnit.test('Test synthetic dicom explicit big endian with writing rules #0',
   function (assert) {
     const configs = JSON.parse(syntheticData);
     for (const config of configs) {
-      config.tags.TransferSyntaxUID = '1.2.840.10008.1.2.2';
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ExplicitVRBigEndian;
       const r20 = getRulesAndResult0(config);
       testWriteReadDataFromConfig(
         config, assert, r20.rules, r20.result
