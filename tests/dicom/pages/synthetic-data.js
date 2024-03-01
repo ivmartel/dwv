@@ -108,17 +108,17 @@ function getFileConfigsHtmlList(fileName) {
 
     const dataGroups = [
       {
-        name: 'Synthetic data Implicit (Little Endian)',
+        name: 'Synthetic data Implicit VR Little Endian',
         short: 'sile',
         syntax: '1.2.840.10008.1.2'
       },
       {
-        name: 'Synthetic data Explicit (Little Endian)',
+        name: 'Synthetic data Explicit VR Little Endian',
         short: 'sele',
         syntax: '1.2.840.10008.1.2.1'
       },
       {
-        name: 'Synthetic data Explicit (Big Endian)',
+        name: 'Synthetic data Explicit VR Big Endian',
         short: 'sebe',
         syntax: '1.2.840.10008.1.2.2'
       }
