@@ -800,6 +800,7 @@ export class MaskFactory {
 
     // flatten buffer array
     const finalBuffers = [];
+    const referencedSOPs = [];
     for (const segment of segments) {
       const number40 = segment.number;
       const number4 = number40 - 1;
@@ -838,6 +839,13 @@ export class MaskFactory {
               ]
             }
           ];
+          // store as tag
+          referencedSOPs.push({
+            ReferencedSOPInstanceUID:
+              sourceImage.getImageUid(sourceIndex),
+            ReferencedSOPClassUID:
+              (sourceImage.getMeta()).SOPClassUID
+          });
         }
         frameInfos.push(frameInfo);
       }
@@ -853,6 +861,20 @@ export class MaskFactory {
     tags.PerFrameFunctionalGroupsSequence = {
       value: frameInfosTag
     };
+
+    // also store referenced SOPs in ReferencedSeriesSequence
+    if (sourceImage !== undefined) {
+      const refSeriesTag = [];
+      refSeriesTag.push({
+        ReferencedInstanceSequence: {
+          value: referencedSOPs
+        },
+        SeriesInstanceUID: (sourceImage.getMeta()).SeriesInstanceUID
+      });
+      tags.ReferencedSeriesSequence = {
+        value: refSeriesTag
+      };
+    }
 
     // merge extra tags if provided
     if (extraTags !== undefined) {
