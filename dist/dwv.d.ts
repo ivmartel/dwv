@@ -2500,10 +2500,14 @@ export declare class MaskFactory {
      * @param {Image} image The mask image.
      * @param {MaskSegment[]} segments The mask segments.
      * @param {Image} sourceImage The source image.
-     * @param {object} [extraTags] Optional list of extra tags.
-     * @returns {object} A list of dicom elements.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
      */
-    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: object): object;
+    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
     #private;
 }
 

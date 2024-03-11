@@ -528,7 +528,11 @@ export class MaskFactory {
         [x: string]: DataElement;
     }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
     getWarning(): string | undefined;
-    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: object): object;
+    toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
 }
 
 // @public
