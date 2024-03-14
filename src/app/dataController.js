@@ -103,6 +103,11 @@ export class DataController {
    */
   getDataIdsFromSopUids(uids) {
     const res = [];
+    // check input
+    if (typeof uids === 'undefined' ||
+      uids.length === 0) {
+      return res;
+    }
     const keys = Object.keys(this.#dataList);
     for (const key of keys) {
       if (this.#dataList[key].image.containsImageUids(uids)) {
