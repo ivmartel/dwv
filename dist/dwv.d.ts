@@ -602,6 +602,12 @@ export declare class AppOptions {
     overlayConfig: object | undefined;
 }
 
+export declare namespace BLACK {
+    let r: number;
+    let g: number;
+    let b: number;
+}
+
 /**
  * Build a multipart message.
  * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
@@ -613,6 +619,56 @@ export declare class AppOptions {
  * @returns {Uint8Array} The full multipart message.
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+/**
+ * Change segment colour command.
+ */
+export declare class ChangeSegmentColourCommand {
+    /**
+     * @param {Image} mask The mask image.
+     * @param {MaskSegment} segment The segment to modify.
+     * @param {RGB|number} newColour The new segment colour.
+     * @param {boolean} [silent] Whether to send a creation event or not.
+     */
+    constructor(mask: Image_2, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
+    /**
+     * Get the command name.
+     *
+     * @returns {string} The command name.
+     */
+    getName(): string;
+    /**
+     * Check if a command is valid and can be executed.
+     *
+     * @returns {boolean} True if the command is valid.
+     */
+    isValid(): boolean;
+    /**
+     * Execute the command.
+     *
+     * @fires ChangeSegmentColourCommand#changemasksegmentcolour
+     */
+    execute(): void;
+    /**
+     * Undo the command.
+     *
+     * @fires ChangeSegmentColourCommand#changemasksegmentcolour
+     */
+    undo(): void;
+    /**
+     * Handle an execute event.
+     *
+     * @param {object} _event The execute event with type and id.
+     */
+    onExecute(_event: object): void;
+    /**
+     * Handle an undo event.
+     *
+     * @param {object} _event The undo event with type and id.
+     */
+    onUndo(_event: object): void;
+    #private;
+}
 
 /**
  * Colour map: red, green and blue components
@@ -771,6 +827,55 @@ export declare namespace defaults {
             [x: string]: string;
         };
     };
+}
+
+/**
+ * Delete segment command.
+ */
+export declare class DeleteSegmentCommand {
+    /**
+     * @param {Image} mask The mask image.
+     * @param {MaskSegment} segment The segment to remove.
+     * @param {boolean} [silent] Whether to send a creation event or not.
+     */
+    constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
+    /**
+     * Get the command name.
+     *
+     * @returns {string} The command name.
+     */
+    getName(): string;
+    /**
+     * Check if a command is valid and can be executed.
+     *
+     * @returns {boolean} True if the command is valid.
+     */
+    isValid(): boolean;
+    /**
+     * Execute the command.
+     *
+     * @fires DeleteSegmentCommand#masksegmentdelete
+     */
+    execute(): void;
+    /**
+     * Undo the command.
+     *
+     * @fires DeleteSegmentCommand#masksegmentredraw
+     */
+    undo(): void;
+    /**
+     * Handle an execute event.
+     *
+     * @param {object} _event The execute event with type and id.
+     */
+    onExecute(_event: object): void;
+    /**
+     * Handle an undo event.
+     *
+     * @param {object} _event The undo event with type and id.
+     */
+    onUndo(_event: object): void;
+    #private;
 }
 
 /**
@@ -2129,6 +2234,15 @@ export declare class Index {
 }
 
 /**
+ * Check if two rgb objects are equal.
+ *
+ * @param {RGB} c1 The first colour.
+ * @param {RGB} c2 The second colour.
+ * @returns {boolean} True if both colour are equal.
+ */
+export declare function isEqualRgb(c1: RGB, c2: RGB): boolean;
+
+/**
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
  *   unsigned int CIE LAB ([0, 65535]).
  *
@@ -2588,7 +2702,9 @@ export declare class MaskSegment {
 }
 
 /**
- * Mask segment helper.
+ * Mask segment helper: helps handling the segments list,
+ *   but does *NOT* update the associated mask (use special commands
+ *   for that such as DeleteSegmentCommand, ChangeSegmentColourCommand...).
  */
 export declare class MaskSegmentHelper {
     /**
@@ -2596,7 +2712,7 @@ export declare class MaskSegmentHelper {
      */
     constructor(mask: Image_2);
     /**
-     * Check if a segment is part of the inner segment list.
+     * Check if a segment is part of the segments list.
      *
      * @param {number} segmentNumber The segment number.
      * @returns {boolean} True if the segment is included.
@@ -2614,28 +2730,34 @@ export declare class MaskSegmentHelper {
      * Get a segment from the inner segment list.
      *
      * @param {number} segmentNumber The segment number.
-     * @returns {MaskSegment|undefined} The segment.
+     * @returns {MaskSegment|undefined} The segment or undefined if not found.
      */
     getSegment(segmentNumber: number): MaskSegment | undefined;
     /**
-     * Get the inner segment list.
+     * Add a segment to the segments list.
      *
-     * @returns {MaskSegment[]} The list of segments.
+     * @param {MaskSegment} segment The segment to add.
      */
-    getSegments(): MaskSegment[];
+    addSegment(segment: MaskSegment): void;
     /**
-     * Set the inner segment list.
+     * Remove a segment from the segments list.
      *
-     * @param {MaskSegment[]} list The segment list.
+     * @param {number} segmentNumber The segment number.
      */
-    setSegments(list: MaskSegment[]): void;
+    removeSegment(segmentNumber: number): void;
     /**
-     * Set the hidden segment list.
-     * TODO: not sure if needed...
+     * Update a segment of the segments list.
      *
-     * @param {number[]} list The list of hidden segment numbers.
+     * @param {MaskSegment} segment The segment to update.
      */
-    setHiddenSegments(list: number[]): void;
+    updateSegment(segment: MaskSegment): void;
+    #private;
+}
+
+/**
+ * Mask segment view helper: handles hidden segments.
+ */
+export declare class MaskSegmentViewHelper {
     /**
      * Check if a segment is in the hidden list.
      *
@@ -2646,9 +2768,9 @@ export declare class MaskSegmentHelper {
     /**
      * Add a segment to the hidden list.
      *
-     * @param {number} segmentNumber The segment number.
+     * @param {MaskSegment} segment The segment to add.
      */
-    addToHidden(segmentNumber: number): void;
+    addToHidden(segment: MaskSegment): void;
     /**
      * Remove a segment from the hidden list.
      *
@@ -2667,18 +2789,6 @@ export declare class MaskSegmentHelper {
      * @returns {alphaFn} The corresponding alpha function.
      */
     getAlphaFunc(): (value: number[] | number, index: number) => number;
-    /**
-     * @callback eventFn@callback eventFn
-     * @param {object} event The event.
-     */
-    /**
-     * Delete a segment.
-     *
-     * @param {number} segmentNumber The segment number.
-     * @param {eventFn} cmdCallback The command event callback.
-     * @param {Function} exeCallback The post execution callback.
-     */
-    deleteSegment(segmentNumber: number, cmdCallback: (event: object) => any, exeCallback: Function): void;
     #private;
 }
 
@@ -4042,24 +4152,6 @@ export declare class ViewController {
      * @returns {boolean} True if the associated image is a mask.
      */
     isMask(): boolean;
-    /**
-     * Get the mask segment helper.
-     *
-     * @returns {MaskSegmentHelper} The helper.
-     */
-    getMaskSegmentHelper(): MaskSegmentHelper;
-    /**
-     * Apply the hidden segments list by setting
-     * the corresponding alpha function.
-     */
-    applyHiddenSegments(): void;
-    /**
-     * Delete a segment.
-     *
-     * @param {number} segmentNumber The segment number.
-     * @param {Function} exeCallback The post execution callback.
-     */
-    deleteSegment(segmentNumber: number, exeCallback: Function): void;
     /**
      * Initialise the controller.
      */

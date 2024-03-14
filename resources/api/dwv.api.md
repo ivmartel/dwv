@@ -110,8 +110,29 @@ export class AppOptions {
     viewOnFirstLoadItem: boolean | undefined;
 }
 
+// @public (undocumented)
+export namespace BLACK {
+    let // (undocumented)
+    r: number;
+    let // (undocumented)
+    g: number;
+    let // (undocumented)
+    b: number;
+}
+
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+// @public
+export class ChangeSegmentColourCommand {
+    constructor(mask: Image_2, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
+    execute(): void;
+    getName(): string;
+    isValid(): boolean;
+    onExecute(_event: object): void;
+    onUndo(_event: object): void;
+    undo(): void;
+}
 
 // @public
 export class ColourMap {
@@ -177,6 +198,17 @@ export namespace defaults {
             [x: string]: string;
         };
     };
+}
+
+// @public
+export class DeleteSegmentCommand {
+    constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
+    execute(): void;
+    getName(): string;
+    isValid(): boolean;
+    onExecute(_event: object): void;
+    onUndo(_event: object): void;
+    undo(): void;
 }
 
 // @public
@@ -434,6 +466,9 @@ export class Index {
 }
 
 // @public
+export function isEqualRgb(c1: RGB, c2: RGB): boolean;
+
+// @public
 export function labToUintLab(triplet: object): object;
 
 // @public
@@ -553,17 +588,20 @@ export class MaskSegment {
 // @public
 export class MaskSegmentHelper {
     constructor(mask: Image_2);
-    addToHidden(segmentNumber: number): void;
-    deleteSegment(segmentNumber: number, cmdCallback: (event: object) => any, exeCallback: Function): void;
-    getAlphaFunc(): (value: number[] | number, index: number) => number;
+    addSegment(segment: MaskSegment): void;
     getSegment(segmentNumber: number): MaskSegment | undefined;
-    getSegments(): MaskSegment[];
     hasSegment(segmentNumber: number): boolean;
-    isHidden(segmentNumber: number): boolean;
     maskHasSegments(numbers: number[]): boolean[];
+    removeSegment(segmentNumber: number): void;
+    updateSegment(segment: MaskSegment): void;
+}
+
+// @public
+export class MaskSegmentViewHelper {
+    addToHidden(segment: MaskSegment): void;
+    getAlphaFunc(): (value: number[] | number, index: number) => number;
+    isHidden(segmentNumber: number): boolean;
     removeFromHidden(segmentNumber: number): void;
-    setHiddenSegments(list: number[]): void;
-    setSegments(list: MaskSegment[]): void;
 }
 
 // @public
@@ -848,14 +886,12 @@ export class ViewController {
     constructor(view: View, dataId: string);
     addEventListener(type: string, callback: Function): void;
     addWindowLevelPresets(presets: object): object;
-    applyHiddenSegments(): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
     // @deprecated
     canWindowLevel(): boolean;
     decrementIndex(dim: number, silent?: boolean): boolean;
     decrementScrollIndex(silent?: boolean): boolean;
-    deleteSegment(segmentNumber: number, exeCallback: Function): void;
     equalImageMeta(meta: object): boolean;
     generateImageData(array: ImageData, index?: Index): void;
     get2DSpacing(): Scalar2D;
@@ -875,7 +911,6 @@ export class ViewController {
     getImageWorldSize(): Scalar2D;
     getIncrementPosition(dim: number): Point;
     getIncrementScrollPosition(): Point;
-    getMaskSegmentHelper(): MaskSegmentHelper;
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
