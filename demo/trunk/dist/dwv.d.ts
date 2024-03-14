@@ -4058,24 +4058,6 @@ export declare class ViewController {
      */
     isMask(): boolean;
     /**
-     * Get the mask segment helper.
-     *
-     * @returns {MaskSegmentHelper} The helper.
-     */
-    getMaskSegmentHelper(): MaskSegmentHelper;
-    /**
-     * Apply the hidden segments list by setting
-     * the corresponding alpha function.
-     */
-    applyHiddenSegments(): void;
-    /**
-     * Delete a segment.
-     *
-     * @param {number} segmentNumber The segment number.
-     * @param {Function} exeCallback The post execution callback.
-     */
-    deleteSegment(segmentNumber: number, exeCallback: Function): void;
-    /**
      * Initialise the controller.
      */
     initialise(): void;
