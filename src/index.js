@@ -80,6 +80,7 @@ import {
 } from './image/maskFactory';
 import {PlaneHelper} from './image/planeHelper';
 import {DeleteSegmentCommand} from './image/deleteSegmentCommand';
+import {ChangeSegmentColourCommand} from './image/changeSegmentColourCommand';
 import {MaskSegmentHelper} from './image/maskSegmentHelper';
 import {MaskSegmentViewHelper} from './image/maskSegmentViewHelper';
 // math
@@ -121,6 +122,7 @@ export {
   MaskSegmentHelper,
   MaskSegmentViewHelper,
   DeleteSegmentCommand,
+  ChangeSegmentColourCommand,
   ToolboxController,
   DataElement,
   DicomParser,
