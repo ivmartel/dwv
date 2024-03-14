@@ -621,6 +621,56 @@ export declare namespace BLACK {
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
 /**
+ * Change segment colour command.
+ */
+export declare class ChangeSegmentColourCommand {
+    /**
+     * @param {Image} mask The mask image.
+     * @param {MaskSegment} segment The segment to modify.
+     * @param {RGB|number} newColour The new segment colour.
+     * @param {boolean} [silent] Whether to send a creation event or not.
+     */
+    constructor(mask: Image_2, segment: MaskSegment, newColour: RGB | number, silent?: boolean);
+    /**
+     * Get the command name.
+     *
+     * @returns {string} The command name.
+     */
+    getName(): string;
+    /**
+     * Check if a command is valid and can be executed.
+     *
+     * @returns {boolean} True if the command is valid.
+     */
+    isValid(): boolean;
+    /**
+     * Execute the command.
+     *
+     * @fires ChangeSegmentColourCommand#changemasksegmentcolour
+     */
+    execute(): void;
+    /**
+     * Undo the command.
+     *
+     * @fires ChangeSegmentColourCommand#changemasksegmentcolour
+     */
+    undo(): void;
+    /**
+     * Handle an execute event.
+     *
+     * @param {object} _event The execute event with type and id.
+     */
+    onExecute(_event: object): void;
+    /**
+     * Handle an undo event.
+     *
+     * @param {object} _event The undo event with type and id.
+     */
+    onUndo(_event: object): void;
+    #private;
+}
+
+/**
  * Colour map: red, green and blue components
  * to associate with intensity values.
  */
