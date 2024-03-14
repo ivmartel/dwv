@@ -79,7 +79,9 @@ import {
   getDefaultDicomSegJson
 } from './image/maskFactory';
 import {PlaneHelper} from './image/planeHelper';
+import {DeleteSegmentCommand} from './image/deleteSegmentCommand';
 import {MaskSegmentHelper} from './image/maskSegmentHelper';
+import {MaskSegmentViewHelper} from './image/maskSegmentViewHelper';
 // math
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
@@ -117,6 +119,8 @@ export {
   ViewController,
   PlaneHelper,
   MaskSegmentHelper,
+  MaskSegmentViewHelper,
+  DeleteSegmentCommand,
   ToolboxController,
   DataElement,
   DicomParser,
