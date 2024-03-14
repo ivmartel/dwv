@@ -100,6 +100,8 @@ import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
 import {
   RGB,
+  BLACK,
+  isEqualRgb,
   labToUintLab,
   srgbToCielab
 } from './utils/colour';
@@ -156,6 +158,7 @@ export {
   i18n,
   toolList,
   Orientation,
+  BLACK,
   addTagsToDictionary,
   createImage,
   createMaskImage,
@@ -177,5 +180,6 @@ export {
   precisionRound,
   buildMultipart,
   labToUintLab,
-  srgbToCielab
+  srgbToCielab,
+  isEqualRgb
 };
