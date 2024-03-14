@@ -1832,12 +1832,6 @@ export class App {
       }
     }
 
-    // listen to controller events
-    if (data.image.getMeta().Modality === 'SEG') {
-      viewController.addEventListener('masksegmentdelete', this.#fireEvent);
-      viewController.addEventListener('masksegmentredraw', this.#fireEvent);
-    }
-
     // listen to image changes
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
     this.#dataController.addEventListener('imagechange', (event) => {

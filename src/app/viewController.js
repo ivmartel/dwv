@@ -7,7 +7,6 @@ import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
 import {Geometry} from '../image/geometry';
 import {PlaneHelper} from '../image/planeHelper';
-import {MaskSegmentHelper} from '../image/maskSegmentHelper';
 import {
   getSliceIterator,
   getIteratorValues,
@@ -51,13 +50,6 @@ export class ViewController {
   #planeHelper;
 
   /**
-   * Mask segment helper.
-   *
-   * @type {MaskSegmentHelper}
-   */
-  #maskSegmentHelper;
-
-  /**
    * Colour map name.
    * Defaults to 'plain' as defined in Views' default.
    *
@@ -71,6 +63,13 @@ export class ViewController {
    * @type {number|undefined}
    */
   #playerID;
+
+  /**
+   * Is DICOM seg mask flag.
+   *
+   * @type {boolean}
+   */
+  #isMask = false;
 
   /**
    * @param {View} view The associated view.
@@ -94,8 +93,7 @@ export class ViewController {
 
     // mask segment helper
     if (view.getImage().getMeta().Modality === 'SEG') {
-      this.#maskSegmentHelper =
-        new MaskSegmentHelper(view.getImage());
+      this.#isMask = true;
     }
   }
 
@@ -121,39 +119,7 @@ export class ViewController {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return typeof this.#maskSegmentHelper !== 'undefined';
-  }
-
-  /**
-   * Get the mask segment helper.
-   *
-   * @returns {MaskSegmentHelper} The helper.
-   */
-  getMaskSegmentHelper() {
-    return this.#maskSegmentHelper;
-  }
-
-  /**
-   * Apply the hidden segments list by setting
-   * the corresponding alpha function.
-   */
-  applyHiddenSegments() {
-    if (this.isMask) {
-      this.setViewAlphaFunction(this.#maskSegmentHelper.getAlphaFunc());
-    }
-  }
-
-  /**
-   * Delete a segment.
-   *
-   * @param {number} segmentNumber The segment number.
-   * @param {Function} exeCallback The post execution callback.
-   */
-  deleteSegment(segmentNumber, exeCallback) {
-    if (this.isMask) {
-      this.#maskSegmentHelper.deleteSegment(
-        segmentNumber, this.#fireEvent, exeCallback);
-    }
+    return this.#isMask;
   }
 
   /**
