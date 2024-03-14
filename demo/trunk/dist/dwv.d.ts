@@ -780,6 +780,55 @@ export declare namespace defaults {
 }
 
 /**
+ * Delete segment command.
+ */
+export declare class DeleteSegmentCommand {
+    /**
+     * @param {Image} mask The mask image.
+     * @param {MaskSegment} segment The segment to remove.
+     * @param {boolean} [silent] Whether to send a creation event or not.
+     */
+    constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
+    /**
+     * Get the command name.
+     *
+     * @returns {string} The command name.
+     */
+    getName(): string;
+    /**
+     * Check if a command is valid and can be executed.
+     *
+     * @returns {boolean} True if the command is valid.
+     */
+    isValid(): boolean;
+    /**
+     * Execute the command.
+     *
+     * @fires DeleteSegmentCommand#masksegmentdelete
+     */
+    execute(): void;
+    /**
+     * Undo the command.
+     *
+     * @fires DeleteSegmentCommand#masksegmentredraw
+     */
+    undo(): void;
+    /**
+     * Handle an execute event.
+     *
+     * @param {object} _event The execute event with type and id.
+     */
+    onExecute(_event: object): void;
+    /**
+     * Handle an undo event.
+     *
+     * @param {object} _event The undo event with type and id.
+     */
+    onUndo(_event: object): void;
+    #private;
+}
+
+/**
  * DICOM code: item of a basic code sequence.
  *
  * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
@@ -2603,7 +2652,9 @@ export declare class MaskSegment {
 }
 
 /**
- * Mask segment helper.
+ * Mask segment helper: helps handling the segments list,
+ *   but does *NOT* update the associated mask (use special commands
+ *   for that such as DeleteSegmentCommand, ChangeSegmentColourCommand...).
  */
 export declare class MaskSegmentHelper {
     /**
@@ -2611,7 +2662,7 @@ export declare class MaskSegmentHelper {
      */
     constructor(mask: Image_2);
     /**
-     * Check if a segment is part of the inner segment list.
+     * Check if a segment is part of the segments list.
      *
      * @param {number} segmentNumber The segment number.
      * @returns {boolean} True if the segment is included.
@@ -2629,28 +2680,34 @@ export declare class MaskSegmentHelper {
      * Get a segment from the inner segment list.
      *
      * @param {number} segmentNumber The segment number.
-     * @returns {MaskSegment|undefined} The segment.
+     * @returns {MaskSegment|undefined} The segment or undefined if not found.
      */
     getSegment(segmentNumber: number): MaskSegment | undefined;
     /**
-     * Get the inner segment list.
+     * Add a segment to the segments list.
      *
-     * @returns {MaskSegment[]} The list of segments.
+     * @param {MaskSegment} segment The segment to add.
      */
-    getSegments(): MaskSegment[];
+    addSegment(segment: MaskSegment): void;
     /**
-     * Set the inner segment list.
+     * Remove a segment from the segments list.
      *
-     * @param {MaskSegment[]} list The segment list.
+     * @param {number} segmentNumber The segment number.
      */
-    setSegments(list: MaskSegment[]): void;
+    removeSegment(segmentNumber: number): void;
     /**
-     * Set the hidden segment list.
-     * TODO: not sure if needed...
+     * Update a segment of the segments list.
      *
-     * @param {number[]} list The list of hidden segment numbers.
+     * @param {MaskSegment} segment The segment to update.
      */
-    setHiddenSegments(list: number[]): void;
+    updateSegment(segment: MaskSegment): void;
+    #private;
+}
+
+/**
+ * Mask segment view helper: handles hidden segments.
+ */
+export declare class MaskSegmentViewHelper {
     /**
      * Check if a segment is in the hidden list.
      *
@@ -2661,9 +2718,9 @@ export declare class MaskSegmentHelper {
     /**
      * Add a segment to the hidden list.
      *
-     * @param {number} segmentNumber The segment number.
+     * @param {MaskSegment} segment The segment to add.
      */
-    addToHidden(segmentNumber: number): void;
+    addToHidden(segment: MaskSegment): void;
     /**
      * Remove a segment from the hidden list.
      *
@@ -2682,18 +2739,6 @@ export declare class MaskSegmentHelper {
      * @returns {alphaFn} The corresponding alpha function.
      */
     getAlphaFunc(): (value: number[] | number, index: number) => number;
-    /**
-     * @callback eventFn@callback eventFn
-     * @param {object} event The event.
-     */
-    /**
-     * Delete a segment.
-     *
-     * @param {number} segmentNumber The segment number.
-     * @param {eventFn} cmdCallback The command event callback.
-     * @param {Function} exeCallback The post execution callback.
-     */
-    deleteSegment(segmentNumber: number, cmdCallback: (event: object) => any, exeCallback: Function): void;
     #private;
 }
 
