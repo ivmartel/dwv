@@ -602,6 +602,12 @@ export declare class AppOptions {
     overlayConfig: object | undefined;
 }
 
+export declare namespace BLACK {
+    let r: number;
+    let g: number;
+    let b: number;
+}
+
 /**
  * Build a multipart message.
  * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
@@ -2127,6 +2133,15 @@ export declare class Index {
     toStringId(dims?: number[]): string;
     #private;
 }
+
+/**
+ * Check if two rgb objects are equal.
+ *
+ * @param {RGB} c1 The first colour.
+ * @param {RGB} c2 The second colour.
+ * @returns {boolean} True if both colour are equal.
+ */
+export declare function isEqualRgb(c1: RGB, c2: RGB): boolean;
 
 /**
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
