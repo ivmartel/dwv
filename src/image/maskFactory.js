@@ -764,11 +764,6 @@ export class MaskFactory {
     const now = new Date();
     tags.ContentDate = getDicomDate(now);
     tags.ContentTime = getDicomTime(now);
-    tags.ContentLabel = 'PRO_MASK';
-    tags.ContentDescription = 'QUIBIM edited prostate segmentation';
-    tags.SeriesInstanceUID = undefined;
-    tags.SeriesNumber = 0;
-    tags.InstanceNumber = 0;
 
     // segments
     const segmentItems = [];
