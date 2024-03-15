@@ -112,16 +112,23 @@ export class RawVideoLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // check options.requestHeaders for 'Accept'
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      const isNameAccept = function (element) {
-        return element.name === 'Accept';
-      };
-      const acceptHeader = options.requestHeaders.find(isNameAccept);
-      if (typeof acceptHeader !== 'undefined') {
-        // starts with 'video/'
-        return startsWith(acceptHeader.value, 'video/');
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'rawvideo') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'video/'
+          return startsWith(acceptHeader.value, 'video/');
+        }
       }
     }
 

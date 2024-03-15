@@ -129,16 +129,23 @@ export class RawImageLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // check options.requestHeaders for 'Accept'
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      const isNameAccept = function (element) {
-        return element.name === 'Accept';
-      };
-      const acceptHeader = options.requestHeaders.find(isNameAccept);
-      if (typeof acceptHeader !== 'undefined') {
-        // starts with 'image/'
-        return startsWith(acceptHeader.value, 'image/');
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'rawimage') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'image/'
+          return startsWith(acceptHeader.value, 'image/');
+        }
       }
     }
 

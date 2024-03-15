@@ -160,16 +160,23 @@ export class ZipLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // check options.requestHeaders for 'Accept'
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      const isNameAccept = function (element) {
-        return element.name === 'Accept';
-      };
-      const acceptHeader = options.requestHeaders.find(isNameAccept);
-      if (typeof acceptHeader !== 'undefined') {
-        // starts with 'application/zip'
-        return startsWith(acceptHeader.value, 'application/zip');
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'zip') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'application/zip'
+          return startsWith(acceptHeader.value, 'application/zip');
+        }
       }
     }
 

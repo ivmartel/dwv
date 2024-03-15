@@ -97,20 +97,27 @@ export class MultipartLoader {
    * Check if the loader can load the provided url.
    *
    * @param {string} url The url to check.
-   * @param {object} [options] The url request options.
+   * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // check options.requestHeaders for 'Accept'
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      const isNameAccept = function (element) {
-        return element.name === 'Accept';
-      };
-      const acceptHeader = options.requestHeaders.find(isNameAccept);
-      if (typeof acceptHeader !== 'undefined') {
-        // starts with 'multipart/related'
-        return startsWith(acceptHeader.value, 'multipart/related');
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'multipart') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'multipart/related'
+          return startsWith(acceptHeader.value, 'multipart/related');
+        }
       }
     }
 

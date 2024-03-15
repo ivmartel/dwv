@@ -109,6 +109,8 @@ export class DicomDataLoader {
   /**
    * Check if the loader can load the provided url.
    * True if:
+   *  - the options.forceLoader is 'dicom'
+   *  - the options.requestHeaders contains a 'Accept: application/dicom'
    *  - the url has a 'contentType' and it is 'application/dicom'
    *    (as in wado urls)
    *  - the url has no 'contentType' and no extension or the extension is 'dcm'
@@ -118,17 +120,24 @@ export class DicomDataLoader {
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // check options.requestHeaders for 'Accept'
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      const isNameAccept = function (element) {
-        return element.name === 'Accept';
-      };
-      const acceptHeader = options.requestHeaders.find(isNameAccept);
-      if (typeof acceptHeader !== 'undefined') {
-        // starts with 'application/dicom' and no '+'
-        return startsWith(acceptHeader.value, 'application/dicom') &&
-          acceptHeader.value[18] !== '+';
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'dicom') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'application/dicom' and no '+'
+          return startsWith(acceptHeader.value, 'application/dicom') &&
+            acceptHeader.value[18] !== '+';
+        }
       }
     }
 
