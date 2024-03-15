@@ -765,6 +765,11 @@ export class MaskFactory {
     tags.ContentDate = getDicomDate(now);
     tags.ContentTime = getDicomTime(now);
 
+    // keep source image StudyInstanceUID
+    if (sourceImage !== undefined) {
+      tags.StudyInstanceUID = (sourceImage.getMeta()).StudyInstanceUID;
+    }
+
     // segments
     const segmentItems = [];
     for (const segment of segments) {
