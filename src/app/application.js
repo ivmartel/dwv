@@ -147,9 +147,9 @@ export class AppOptions {
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new AppOptions(viewConfigs);
+ * const options = new dwv.AppOptions(viewConfigs);
  * app.init(options);
  * // load dicom data
  * app.loadURLs([
@@ -464,9 +464,9 @@ export class App {
    * // create the dwv app
    * const app = new dwv.App();
    * // initialise
-   * const viewConfig0 = new ViewConfig('layerGroup0');
+   * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
    * const viewConfigs = {'*': [viewConfig0]};
-   * const options = new AppOptions(viewConfigs);
+   * const options = new dwv.AppOptions(viewConfigs);
    * options.viewOnFirstLoadItem = false;
    * app.init(options);
    * // render button

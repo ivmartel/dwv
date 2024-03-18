@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.32.4](https://github.com/ivmartel/dwv/releases/tag/v0.32.4) - 18/03/2024
+
+### Fixed
+
+- event.preventDefault for wheel events [#1632](https://github.com/ivmartel/dwv/issues/1632)
+
+## [v0.32.3](https://github.com/ivmartel/dwv/releases/tag/v0.32.3) - 22/09/2023
+
+### Added
+
+- Add support for writing DICOM with unknown VR [#1507](https://github.com/ivmartel/dwv/issues/1481)
+
 ## [v0.32.2](https://github.com/ivmartel/dwv/releases/tag/v0.32.2) - 04/09/2023
 
 ### Added

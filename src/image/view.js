@@ -59,9 +59,9 @@ export function createView(elements, image) {
  *   const dicomParser = new dwv.DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = createImage(dicomParser.getDicomElements());
+ *   const image = dwv.createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = createView(dicomParser.getDicomElements(), image);
+ *   const view = dwv.createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;

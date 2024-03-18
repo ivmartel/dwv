@@ -14,10 +14,10 @@ import {App} from '../app/application';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new AppOptions(viewConfigs);
- * options.tools = {Scroll: new ToolConfig()};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * options.tools = {Scroll: new dwv.ToolConfig()};
  * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
@@ -33,10 +33,10 @@ import {App} from '../app/application';
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
- * const viewConfig0 = new ViewConfig('layerGroup0');
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new AppOptions(viewConfigs);
- * options.tools = {Scroll: new ToolConfig()};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * options.tools = {Scroll: new dwv.ToolConfig()};
  * app.init(options);
  * // create range
  * const range = document.createElement('input');
@@ -51,7 +51,7 @@ import {App} from '../app/application';
  *   const index = vc.getCurrentIndex();
  *   const values = index.getValues();
  *   values[2] = this.value;
- *   vc.setCurrentIndex(new Index(values));
+ *   vc.setCurrentIndex(new dwv.Index(values));
  * }
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {
