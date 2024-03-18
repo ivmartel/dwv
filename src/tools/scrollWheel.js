@@ -53,6 +53,9 @@ export class ScrollWheel {
       this.#wheelDeltaY = 0;
     }
 
+    // prevent default page scroll
+    event.preventDefault();
+
     const up = event.deltaY < 0 ? true : false;
 
     const layerDetails = getLayerDetailsFromEvent(event);

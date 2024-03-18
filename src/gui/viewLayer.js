@@ -852,8 +852,10 @@ export class ViewLayer {
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
+      const eventName = names[i];
+      const passive = eventName !== 'wheel';
       this.#containerDiv.addEventListener(
-        names[i], this.#fireEvent, {passive: true});
+        eventName, this.#fireEvent, {passive: passive});
     }
   }
 
