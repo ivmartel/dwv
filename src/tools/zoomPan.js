@@ -222,6 +222,9 @@ export class ZoomAndPan {
    * @param {object} event The mouse wheel event.
    */
   wheel = (event) => {
+    // prevent default page scroll
+    event.preventDefault();
+
     const step = -event.deltaY / 500;
 
     const layerDetails = getLayerDetailsFromEvent(event);
