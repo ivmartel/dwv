@@ -30,9 +30,12 @@ function getSpinY(event) {
   // -> using wheelDelta for mouse wheel detection as
   //    it is consistently larger than trackpad scroll
 
+  // wheelDeltaY and deltaY do not go in the same direction,
+  // using -deltaY so that they do...
+
   if (typeof event.wheelDeltaY === 'undefined') {
     //logger.warn('No wheel delta, scroll could be tricky...);
-    return event.deltaY;
+    return -event.deltaY;
   } else {
     const threshold = 45;
     if (event.wheelDeltaY > threshold) {
@@ -40,7 +43,7 @@ function getSpinY(event) {
     } else if (event.wheelDeltaY < -threshold) {
       return -1;
     } else {
-      return event.deltaY / 60;
+      return -event.deltaY / 60;
     }
   }
 }
