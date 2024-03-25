@@ -354,6 +354,14 @@ export class DicomWriter {
   #useUnVrForPrivateSq = false;
 
   /**
+   * Flag to activate or not the vr=UN tag check and fix
+   * if present in the dictionary. Default to true.
+   *
+   * @type {boolean}
+   */
+  #fixUnknownVR = true;
+
+  /**
    * Default rules: just copy
    *
    * @type {Object<string, WriterRule>}
@@ -397,6 +405,15 @@ export class DicomWriter {
    */
   setUseUnVrForPrivateSq(flag) {
     this.#useUnVrForPrivateSq = flag;
+  }
+
+  /**
+   * Set the vr=UN check and fix flag.
+   *
+   * @param {boolean} flag True to activate the check and fix.
+   */
+  setFixUnknownVR(flag) {
+    this.#fixUnknownVR = flag;
   }
 
   /**
@@ -892,7 +909,9 @@ export class DicomWriter {
         // This check must be done BEFORE calculating totalSize,
         // otherwise there may be extra null bytes at the end of the file
         // (dcmdump may crash because of these bytes)
-        checkAndFixUnknownVR(element);
+        if (this.#fixUnknownVR) {
+          checkAndFixUnknownVR(element);
+        }
 
         // update value and vl
         this.#setElementValue(
