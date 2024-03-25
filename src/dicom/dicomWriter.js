@@ -536,12 +536,6 @@ export class DicomWriter {
       if (typeof item['FFFEE000'].undefinedLength !== 'undefined') {
         undefinedLength = item['FFFEE000'].undefinedLength;
       }
-      // const itemElement = {
-      //   tag: getItemTag(),
-      //   vr: 'NONE',
-      //   vl: undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
-      //   value: []
-      // };
       const itemElement = new DataElement('NONE');
       itemElement.vl = undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
       itemElement.tag = getItemTag();
@@ -557,12 +551,6 @@ export class DicomWriter {
       }
       // item delimitation
       if (undefinedLength) {
-        // const itemDelimElement = {
-        //   tag: getItemDelimitationItemTag(),
-        //   vr: 'NONE',
-        //   vl: 0,
-        //   value: []
-        // };
         const itemDelimElement = new DataElement('NONE');
         itemDelimElement.vl = 0;
         itemDelimElement.tag = getItemDelimitationItemTag();
@@ -817,12 +805,6 @@ export class DicomWriter {
 
     // sequence delimitation item for sequence with undefined length
     if (undefinedLengthSequence) {
-      // const seqDelimElement = {
-      //   tag: getSequenceDelimitationItemTag(),
-      //   vr: 'NONE',
-      //   vl: 0,
-      //   value: []
-      // };
       const seqDelimElement = new DataElement('NONE');
       seqDelimElement.vl = 0;
       seqDelimElement.tag = getSequenceDelimitationItemTag();
