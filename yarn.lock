@@ -2267,9 +2267,9 @@ clean-css@^5.2.2, clean-css@~5.3.2:
     source-map "~0.6.0"
 
 clean-jsdoc-theme@^4.2.14:
-  version "4.2.17"
-  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.17.tgz#a815401d9d881076fddec0574f71ba732995dbe7"
-  integrity sha512-5SbJNXcQHUXd7N13g+3OpGFiBQdxz36xwEP3p1r1vbo/apLcDRtugaFdUZ56H6Rvlb68Q33EChoBkajSlnD11w==
+  version "4.2.18"
+  resolved "https://registry.yarnpkg.com/clean-jsdoc-theme/-/clean-jsdoc-theme-4.2.18.tgz#805958915918917c281ed36717a38517a071ba33"
+  integrity sha512-iPz34GEhTZGW33Oi25IUgW1suGFuQZoDoCjn82BEI7Ck83CvJisrrxYv3WLjHA/wz8g82wy8WsUyRiTGajUZdw==
   dependencies:
     "@jsdoc/salty" "^0.2.4"
     fs-extra "^10.1.0"
