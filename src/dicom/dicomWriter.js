@@ -892,7 +892,7 @@ export class DicomWriter {
         // This check must be done BEFORE calculating totalSize,
         // otherwise there may be extra null bytes at the end of the file
         // (dcmdump may crash because of these bytes)
-        checkUnknownVR(element);
+        checkAndFixUnknownVR(element);
 
         // update value and vl
         this.#setElementValue(
@@ -1215,12 +1215,12 @@ export class DicomWriter {
 } // class DicomWriter
 
 /**
- * Fix for broken DICOM elements: Replace "UN" with correct VR if the
+ * Fix for broken DICOM elements: replace "UN" with correct VR if the
  * element exists in dictionary
  *
  * @param {DataElement} element The DICOM element.
  */
-function checkUnknownVR(element) {
+function checkAndFixUnknownVR(element) {
   if (element.vr === 'UN') {
     const dictVr = element.tag.getVrFromDictionary();
     if (typeof dictVr !== 'undefined' && element.vr !== dictVr) {
