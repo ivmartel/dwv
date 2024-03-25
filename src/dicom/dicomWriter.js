@@ -345,18 +345,13 @@ const TagKeys = {
  */
 export class DicomWriter {
 
-  // flag to use VR=UN for private sequences, default to false
-  // (mainly used in tests)
-  #useUnVrForPrivateSq = false;
-
   /**
-   * Set the use UN VR for private sequence flag.
+   * Flag to use VR=UN for private sequences, default to false
+   * (mainly used in tests)
    *
-   * @param {boolean} flag True to use UN VR.
+   * @type {boolean}
    */
-  setUseUnVrForPrivateSq(flag) {
-    this.#useUnVrForPrivateSq = flag;
-  }
+  #useUnVrForPrivateSq = false;
 
   /**
    * Default rules: just copy
@@ -380,6 +375,29 @@ export class DicomWriter {
    * @type {string[]}
    */
   #compulsoryTags = [];
+
+  /**
+   * Default text encoder.
+   *
+   * @type {DefaultTextEncoder}
+   */
+  #defaultTextEncoder = new DefaultTextEncoder();
+
+  /**
+   * Special text encoder.
+   *
+   * @type {DefaultTextEncoder|TextEncoder}
+   */
+  #textEncoder = this.#defaultTextEncoder;
+
+  /**
+   * Set the use UN VR for private sequence flag.
+   *
+   * @param {boolean} flag True to use UN VR.
+   */
+  setUseUnVrForPrivateSq(flag) {
+    this.#useUnVrForPrivateSq = flag;
+  }
 
   /**
    * Set the writing rules.
@@ -433,20 +451,6 @@ export class DicomWriter {
       }
     }
   }
-
-  /**
-   * Default text encoder.
-   *
-   * @type {DefaultTextEncoder}
-   */
-  #defaultTextEncoder = new DefaultTextEncoder();
-
-  /**
-   * Special text encoder.
-   *
-   * @type {DefaultTextEncoder|TextEncoder}
-   */
-  #textEncoder = this.#defaultTextEncoder;
 
   /**
    * Encode string data.
