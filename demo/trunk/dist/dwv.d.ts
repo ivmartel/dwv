@@ -1022,6 +1022,12 @@ export declare class DicomWriter {
      */
     setUseUnVrForPrivateSq(flag: boolean): void;
     /**
+     * Set the vr=UN check and fix flag.
+     *
+     * @param {boolean} flag True to activate the check and fix.
+     */
+    setFixUnknownVR(flag: boolean): void;
+    /**
      * Set the writing rules.
      * List of writer rules indexed by either `default`,
      *   tagKey, tagName or groupName.
