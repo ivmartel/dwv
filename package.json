@@ -1,7 +1,7 @@
 {
-  "name": "tcdwv1",
+  "name": "dwv",
   "version": "0.33.0-beta.38",
-  "description": "Test Custom DICOM Web Viewer.",
+  "description": "DICOM Web Viewer.",
   "keywords": [
     "DICOM",
     "medical",
