@@ -582,7 +582,7 @@ export class Draw {
       tmpPoints, this.#style, viewController);
 
     // skip if select draw
-    if (this.#tmpShapeGroup) {
+    if (!this.#tmpShapeGroup) {
       return;
     }
 
