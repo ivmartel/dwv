@@ -8,6 +8,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -71,7 +72,7 @@ export class ZoomOut {
   /**
    * Start tool interaction.
    *
-   * @param {Point2D} point The start point.
+   * @param {Point2D} _point The start point.
    */
   #start(_point) {
     this.#started = true;
@@ -92,8 +93,8 @@ export class ZoomOut {
   /**
    * Update tool interaction.
    *
-   * @param {Point2D} point The update point.
-   * @param {string} divId The layer group divId.
+   * @param {Point2D} _point The update point.
+   * @param {string} _divId The layer group divId.
    */
   #update(_point, _divId) {
     // does nothing

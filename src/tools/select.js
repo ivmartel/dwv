@@ -2,8 +2,10 @@
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import Konva from 'konva';
 import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -41,9 +43,9 @@ export class Select {
   /**
    * Create an arrow shape to be displayed.
    *
-   * @param {Point2D[]} points The points from which to extract the line.
-   * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Point2D[]} _points The points from which to extract the line.
+   * @param {Style} _style The drawing style.
+   * @param {ViewController} _viewController The associated view controller.
    * @returns {Konva.Group} The Konva group.
    */
   create(_points, _style, _viewController) {
@@ -56,8 +58,8 @@ export class Select {
   /**
    * Update an arrow shape.
    *
-   * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Style} style The app style.
+   * @param {Konva.Ellipse} _anchor The active anchor.
+   * @param {Style} _style The app style.
    * @param {ViewController} _viewController The associated view controller.
    */
   update(_anchor, _style, _viewController) {
