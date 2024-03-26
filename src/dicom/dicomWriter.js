@@ -23,6 +23,7 @@ import {
 } from './dicomParser';
 import {DataElement} from './dataElement';
 import {DataWriter} from './dataWriter';
+import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
 
 /**
@@ -910,7 +911,7 @@ export class DicomWriter {
         // otherwise there may be extra null bytes at the end of the file
         // (dcmdump may crash because of these bytes)
         if (this.#fixUnknownVR) {
-          checkAndFixUnknownVR(element);
+          checkAndFixUnknownVR(element, !isBigEndian);
         }
 
         // update value and vl
@@ -1238,17 +1239,68 @@ export class DicomWriter {
  * element exists in dictionary
  *
  * @param {DataElement} element The DICOM element.
+ * @param {boolean} [isLittleEndian] Flag to tell if the data is little
+ *   or big endian (default: true).
  */
-function checkAndFixUnknownVR(element) {
+function checkAndFixUnknownVR(element, isLittleEndian) {
   if (element.vr === 'UN') {
     const dictVr = element.tag.getVrFromDictionary();
     if (typeof dictVr !== 'undefined' && element.vr !== dictVr) {
       element.vr = dictVr;
+      // cast typed array value from Uint8 to vr type
+      const vrType = vrTypes[element.vr];
+      if (typeof vrType !== 'undefined' &&
+        vrType !== 'Uint8' &&
+        vrType !== 'string') {
+        const data = getUint8ToVrValue(
+          element.value, element.vr, isLittleEndian);
+        if (typeof data !== 'undefined') {
+          element.value = data;
+        }
+      }
       logger.info('Element ' + element.tag.getGroup() +
         ' ' + element.tag.getElement() +
         ' VR changed from UN to ' + element.vr);
     }
   }
+}
+
+/**
+ * Get the casted typed array value from Uint8 to vr type.
+ *
+ * @param {object} value The value to cast.
+ * @param {string} vr The DICOM element VR.
+ * @param {boolean} [isLittleEndian] Flag to tell if the data is little
+ *   or big endian (default: true).
+ * @returns {object} The element value casted to the vr type.
+ */
+function getUint8ToVrValue(value, vr, isLittleEndian) {
+  let data;
+  if (typeof value.buffer === 'undefined') {
+    return data;
+  }
+  const reader = new DataReader(value.buffer, isLittleEndian);
+  const offset = value.byteOffset;
+  const vl = value.length; // size before cast
+  const vrType = vrTypes[vr];
+  if (vrType === 'Uint16') {
+    data = reader.readUint16Array(offset, vl);
+  } else if (vrType === 'Uint32') {
+    data = reader.readUint32Array(offset, vl);
+  } else if (vrType === 'Uint64') {
+    data = reader.readUint64Array(offset, vl);
+  } else if (vrType === 'Int16') {
+    data = Array.from(reader.readInt16Array(offset, vl));
+  } else if (vrType === 'Int32') {
+    data = Array.from(reader.readInt32Array(offset, vl));
+  } else if (vrType === 'Int64') {
+    data = reader.readInt64Array(offset, vl);
+  } else if (vrType === 'Float32') {
+    data = Array.from(reader.readFloat32Array(offset, vl));
+  } else if (vrType === 'Float64') {
+    data = Array.from(reader.readFloat64Array(offset, vl));
+  }
+  return data;
 }
 
 /**
