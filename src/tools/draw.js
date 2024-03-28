@@ -580,6 +580,12 @@ export class Draw {
     const viewController = viewLayer.getViewController();
     this.#tmpShapeGroup = this.#currentFactory.create(
       tmpPoints, this.#style, viewController);
+
+    // skip if select draw
+    if (!this.#tmpShapeGroup) {
+      return;
+    }
+
     // do not listen during creation
     const shape = this.#tmpShapeGroup.getChildren(isNodeNameShape)[0];
     shape.listening(false);
@@ -612,6 +618,12 @@ export class Draw {
     // create final shape
     const finalShapeGroup = this.#currentFactory.create(
       finalPoints, this.#style, viewController);
+
+    // skip if select draw
+    if (!finalShapeGroup) {
+      return;
+    }
+
     finalShapeGroup.id(guid());
 
     // get the position group

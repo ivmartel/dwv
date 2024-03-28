@@ -343,6 +343,20 @@ export class Sharpen {
   }
 
   /**
+   * Associated filter.
+   *
+   * @type {object}
+   */
+  #filter = new SharpenFilter();
+
+  /**
+   * Flag to know wether to reset the image or not.
+   *
+   * @type {boolean}
+   */
+  #resetImage = true;
+
+  /**
    * Listener handler.
    *
    * @type {ListenerHandler}
@@ -371,12 +385,20 @@ export class Sharpen {
    * @param {*} _args The filter arguments.
    */
   run(_args) {
-    const filter = new SharpenFilter();
-    filter.setOriginalImage(this.#app.getLastImage());
-    const command = new RunFilterCommand(filter, this.#app);
+    const command = new RunFilterCommand(this.#filter, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
-    command.execute();
+
+    // reset the image if asked
+    if (this.#resetImage) {
+      this.#filter.setOriginalImage(this.#app.getLastImage());
+      this.#resetImage = false;
+      command.execute();
+    } else {
+      this.#resetImage = true;
+      command.undo();
+    }
+
     // save command in undo stack
     this.#app.addToUndoStack(command);
   }

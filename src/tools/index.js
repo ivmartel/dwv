@@ -5,7 +5,12 @@ import {Opacity} from './opacity';
 import {Draw} from './draw';
 import {Floodfill} from './floodfill';
 import {Livewire} from './livewire';
+import {ZoomIn} from './zoomIn';
+import {ZoomOut} from './zoomOut';
+import {Pan} from './pan';
 
+
+import {Select} from './select';
 import {ArrowFactory} from './arrow';
 import {CircleFactory} from './circle';
 import {EllipseFactory} from './ellipse';
@@ -33,7 +38,10 @@ export const defaultToolList = {
   Draw,
   Filter,
   Floodfill,
-  Livewire
+  Livewire,
+  ZoomIn,
+  ZoomOut,
+  Pan,
 };
 
 export const toolOptions = {
@@ -45,7 +53,8 @@ export const toolOptions = {
     ProtractorFactory,
     RectangleFactory,
     RoiFactory,
-    RulerFactory
+    RulerFactory,
+    SelectFactory: Select,
   },
   filter: {
     Threshold,

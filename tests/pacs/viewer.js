@@ -74,6 +74,45 @@ _toolFeaturesUI.Draw = {
     return res;
   }
 };
+_toolFeaturesUI.Filter = {
+  getValue() {
+    const shapeSelect = document.getElementById('filter-shape-select');
+    return {
+      filterName: shapeSelect.value,
+      run: true,
+      // undo: true
+    };
+  },
+  getHtml() {
+    const shapeSelect = document.createElement('select');
+    shapeSelect.id = 'filter-shape-select';
+
+    const shapeNames = _tools.Filter.options;
+    if (typeof shapeNames === 'undefined') {
+      return;
+    }
+
+    for (const filterName of shapeNames) {
+      const opt = document.createElement('option');
+      opt.id = 'shape-' + filterName;
+      opt.value = filterName;
+      opt.appendChild(document.createTextNode(filterName));
+      shapeSelect.appendChild(opt);
+    }
+
+    shapeSelect.onchange = function (event) {
+      const element = event.target;
+      console.log('a', element.value);
+      _app.setToolFeatures({filterName: element.value, run: true, undo: true});
+    };
+
+    const res = document.createElement('span');
+    res.id = 'toolFeatures';
+    res.className = 'toolFeatures';
+    res.appendChild(shapeSelect);
+    return res;
+  }
+};
 
 // viewer options
 let _layout = 'one';
@@ -148,8 +187,13 @@ function viewerSetup() {
     Scroll: {},
     WindowLevel: {},
     ZoomAndPan: {},
+    ZoomIn: {},
+    ZoomOut: {},
+    Pan: {},
     Opacity: {},
-    Draw: {options: ['Ruler', 'Circle', 'Ellipse', 'Rectangle']}
+    Draw: {options: ['Select', 'Ruler', 'Circle', 'Ellipse', 'Rectangle']},
+    // Sharpen: {},
+    Filter: {options: ['Sharpen', 'Sobel', 'Threshold']},
   };
 
   // app config
@@ -220,6 +264,16 @@ function viewerSetup() {
     console.timeEnd('load-data-' + event.dataid);
     // remove abort shortcut
     window.removeEventListener('keydown', abortShortcut);
+
+    // sharpen filter
+    // const sharpenFilter = new Sharpen(_app)
+
+    console.log('aap', _app);
+    // const sharpenFilter = new dwv.tool.Filter(_app);
+    // sharpenFilter.setOptions({type: 'Sharpen'});
+    // sharpenFilter.init();
+
+
   });
 
   let dataLoad = 0;
