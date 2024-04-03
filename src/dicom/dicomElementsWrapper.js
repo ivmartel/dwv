@@ -758,46 +758,6 @@ function getDecayedDose(elements) {
   // SeriesDate (type1)
   const seriesDateEl = elements['00080021'];
   const seriesDateObj = getDate(seriesDateEl);
-  // SeriesTime (type1)
-  const seriesTimeEl = elements['00080031'];
-  const seriesTimeObj = getTime(seriesTimeEl);
-  // Series date/time
-  let scanStart = new Date(
-    seriesDateObj.year,
-    seriesDateObj.monthIndex,
-    seriesDateObj.day,
-    seriesTimeObj.hours,
-    seriesTimeObj.minutes,
-    seriesTimeObj.seconds,
-    seriesTimeObj.milliseconds
-  );
-
-  // scanStart Date check
-  // AcquisitionDate (type3)
-  const acqDateEl = elements['00080022'];
-  // AcquisitionTime (type3)
-  const acqTimeEl = elements['00080032'];
-  if (typeof acqDateEl !== 'undefined' &&
-    typeof acqTimeEl !== 'undefined') {
-    const acqDateObj = getDate(acqDateEl);
-    const acqTimeObj = getTime(acqTimeEl);
-    const acqDate = new Date(
-      acqDateObj.year,
-      acqDateObj.monthIndex,
-      acqDateObj.day,
-      acqTimeObj.hours,
-      acqTimeObj.minutes,
-      acqTimeObj.seconds,
-      acqTimeObj.milliseconds
-    );
-
-    if (scanStart > acqDate) {
-      const diff = scanStart.getTime() - acqDate.getTime();
-      warning += ' Series date/time is after Aquisition date/time (diff=' +
-        diff.toString() + 'ms) ';
-      scanStart = undefined;
-    }
-  }
 
   let totalDose;
   let halfLife;
@@ -862,6 +822,47 @@ function getDecayedDose(elements) {
       radioStartTimeObj.seconds,
       radioStartTimeObj.milliseconds
     );
+  }
+
+  // SeriesTime (type1)
+  const seriesTimeEl = elements['00080031'];
+  const seriesTimeObj = getTime(seriesTimeEl);
+  // Series date/time
+  let scanStart = new Date(
+    seriesDateObj.year,
+    seriesDateObj.monthIndex,
+    seriesDateObj.day,
+    seriesTimeObj.hours,
+    seriesTimeObj.minutes,
+    seriesTimeObj.seconds,
+    seriesTimeObj.milliseconds
+  );
+
+  // scanStart Date check
+  // AcquisitionDate (type3)
+  const acqDateEl = elements['00080022'];
+  // AcquisitionTime (type3)
+  const acqTimeEl = elements['00080032'];
+  if (typeof acqDateEl !== 'undefined' &&
+    typeof acqTimeEl !== 'undefined') {
+    const acqDateObj = getDate(acqDateEl);
+    const acqTimeObj = getTime(acqTimeEl);
+    const acqDate = new Date(
+      acqDateObj.year,
+      acqDateObj.monthIndex,
+      acqDateObj.day,
+      acqTimeObj.hours,
+      acqTimeObj.minutes,
+      acqTimeObj.seconds,
+      acqTimeObj.milliseconds
+    );
+
+    if (scanStart > acqDate) {
+      const diff = scanStart.getTime() - acqDate.getTime();
+      warning += ' Series date/time is after Aquisition date/time (diff=' +
+        diff.toString() + 'ms) ';
+      scanStart = undefined;
+    }
   }
 
   // decayed dose (Bq)
