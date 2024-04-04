@@ -768,7 +768,7 @@ function getDecayedDose(elements) {
   warning += checkTag(radioInfoSq, radioInfoSqStr);
   if (typeof radioInfoSq !== 'undefined') {
     if (radioInfoSq.value.length !== 1) {
-      console.warn(
+      logger.warn(
         'Found more than 1 istopes in RadiopharmaceuticalInformation Sequence.'
       );
     }
@@ -859,9 +859,48 @@ function getDecayedDose(elements) {
 
     if (scanStart > acqDate) {
       const diff = scanStart.getTime() - acqDate.getTime();
-      warning += ' Series date/time is after Aquisition date/time (diff=' +
+      const warn = 'Series date/time is after Aquisition date/time (diff=' +
         diff.toString() + 'ms) ';
-      scanStart = undefined;
+      logger.debug(warn);
+
+      // back compute from center (average count rate) of time window
+      // for bed position (frame) in series (reliable in all cases)
+
+      let frameRefTime = 0;
+      const frameRefTimeElStr = 'FrameReferenceTime (00541300)';
+      const frameRefTimeEl = elements['00541300'];
+      warning += checkTag(frameRefTimeEl, frameRefTimeElStr);
+      if (typeof frameRefTimeEl !== 'undefined') {
+        frameRefTime = frameRefTimeEl.value[0];
+      }
+      let actualFrameDuration = 0;
+      const actualFrameDurationElStr = 'ActualFrameDuration (0018,1242)';
+      const actualFrameDurationEl = elements['00181242'];
+      warning += checkTag(actualFrameDurationEl, actualFrameDurationElStr);
+      if (typeof actualFrameDurationEl !== 'undefined') {
+        actualFrameDuration = actualFrameDurationEl.value[0];
+      }
+      if (frameRefTime > 0 && actualFrameDuration > 0) {
+        // convert to seconds
+        actualFrameDuration = actualFrameDuration / 1000;
+        frameRefTime = frameRefTime / 1000;
+        const decayConstant = Math.log(2) / halfLife;
+        const decayDuringFrame = decayConstant * actualFrameDuration;
+        const averageCountRateTimeWithinFrame =
+          1 /
+          decayConstant *
+          Math.log(decayDuringFrame / (1 - Math.exp(-decayDuringFrame)));
+        const offsetSeconds = averageCountRateTimeWithinFrame - frameRefTime;
+        scanStart = new Date(
+          acqDateObj.year,
+          acqDateObj.monthIndex,
+          acqDateObj.day,
+          acqTimeObj.hours,
+          acqTimeObj.minutes,
+          acqTimeObj.seconds + offsetSeconds,
+          acqTimeObj.milliseconds
+        );
+      }
     }
   }
 
@@ -887,6 +926,7 @@ function getDecayedDose(elements) {
  * Get the PET SUV factor.
  *
  * @see https://qibawiki.rsna.org/images/6/62/SUV_vendorneutral_pseudocode_happypathonly_20180626_DAC.pdf
+ * @see https://qibawiki.rsna.org/images/8/86/SUV_vendorneutral_pseudocode_20180626_DAC.pdf
  * (from https://qibawiki.rsna.org/index.php/Standardized_Uptake_Value_(SUV)#SUV_Calculation )
  * @param {object} elements The DICOM elements.
  * @returns {object} The value and a warning if
