@@ -144,9 +144,9 @@ export class Point3D {
    */
   equals(rhs) {
     return rhs !== null &&
-      this.getX() === rhs.getX() &&
-      this.getY() === rhs.getY() &&
-      this.getZ() === rhs.getZ();
+      this.#x === rhs.getX() &&
+      this.#y === rhs.getY() &&
+      this.#z === rhs.getZ();
   }
 
   /**
@@ -159,9 +159,9 @@ export class Point3D {
    */
   isSimilar(rhs, tol) {
     return rhs !== null &&
-      isSimilar(this.getX(), rhs.getX(), tol) &&
-      isSimilar(this.getY(), rhs.getY(), tol) &&
-      isSimilar(this.getZ(), rhs.getZ(), tol);
+      isSimilar(this.#x, rhs.getX(), tol) &&
+      isSimilar(this.#y, rhs.getY(), tol) &&
+      isSimilar(this.#z, rhs.getZ(), tol);
   }
 
   /**
@@ -170,9 +170,9 @@ export class Point3D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.getX() +
-      ', ' + this.getY() +
-      ', ' + this.getZ() + ')';
+    return '(' + this.#x +
+      ', ' + this.#y +
+      ', ' + this.#z + ')';
   }
 
   /**
@@ -182,10 +182,10 @@ export class Point3D {
    * @returns {number} Ths distance to the input point.
    */
   getDistance(point3D) {
-    return Math.sqrt(
-      (this.getX() - point3D.getX()) * (this.getX() - point3D.getX()) +
-      (this.getY() - point3D.getY()) * (this.getY() - point3D.getY()) +
-      (this.getZ() - point3D.getZ()) * (this.getZ() - point3D.getZ()));
+    const dx = this.#x - point3D.getX();
+    const dy = this.#y - point3D.getY();
+    const dz = this.#z - point3D.getZ();
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   /**
@@ -196,9 +196,9 @@ export class Point3D {
    */
   minus(point3D) {
     return new Vector3D(
-      (this.getX() - point3D.getX()),
-      (this.getY() - point3D.getY()),
-      (this.getZ() - point3D.getZ()));
+      (this.#x - point3D.getX()),
+      (this.#y - point3D.getY()),
+      (this.#z - point3D.getZ()));
   }
 
 } // Point3D class
