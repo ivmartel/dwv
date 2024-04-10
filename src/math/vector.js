@@ -70,9 +70,9 @@ export class Vector3D {
    */
   equals(rhs) {
     return rhs !== null &&
-      this.getX() === rhs.getX() &&
-      this.getY() === rhs.getY() &&
-      this.getZ() === rhs.getZ();
+      this.#x === rhs.getX() &&
+      this.#y === rhs.getY() &&
+      this.#z === rhs.getZ();
   }
 
   /**
@@ -81,9 +81,9 @@ export class Vector3D {
    * @returns {string} The vector as a string.
    */
   toString() {
-    return '(' + this.getX() +
-      ', ' + this.getY() +
-      ', ' + this.getZ() + ')';
+    return '(' + this.#x +
+      ', ' + this.#y +
+      ', ' + this.#z + ')';
   }
 
   /**
@@ -93,9 +93,9 @@ export class Vector3D {
    */
   norm() {
     return Math.sqrt(
-      (this.getX() * this.getX()) +
-      (this.getY() * this.getY()) +
-      (this.getZ() * this.getZ())
+      (this.#x * this.#x) +
+      (this.#y * this.#y) +
+      (this.#z * this.#z)
     );
   }
 
@@ -110,9 +110,9 @@ export class Vector3D {
    */
   crossProduct(vector3D) {
     return new Vector3D(
-      (this.getY() * vector3D.getZ()) - (vector3D.getY() * this.getZ()),
-      (this.getZ() * vector3D.getX()) - (vector3D.getZ() * this.getX()),
-      (this.getX() * vector3D.getY()) - (vector3D.getX() * this.getY()));
+      (this.#y * vector3D.getZ()) - (vector3D.getY() * this.#z),
+      (this.#z * vector3D.getX()) - (vector3D.getZ() * this.#x),
+      (this.#x * vector3D.getY()) - (vector3D.getX() * this.#y));
   }
 
   /**
@@ -123,9 +123,9 @@ export class Vector3D {
    * @returns {number} The dot product.
    */
   dotProduct(vector3D) {
-    return (this.getX() * vector3D.getX()) +
-      (this.getY() * vector3D.getY()) +
-      (this.getZ() * vector3D.getZ());
+    return (this.#x * vector3D.getX()) +
+      (this.#y * vector3D.getY()) +
+      (this.#z * vector3D.getZ());
   }
 
 } // Vector3D class
