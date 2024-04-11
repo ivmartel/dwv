@@ -128,4 +128,20 @@ export class Vector3D {
       (this.#z * vector3D.getZ());
   }
 
+  /**
+   * Is this vector codirectional to an input one.
+   *
+   * @param {Vector3D} vector3D The vector to test.
+   * @returns {boolean} True if codirectional, false is opposite.
+   */
+  isCodirectional(vector3D) {
+    // a.dot(b) = ||a|| * ||b|| * cos(theta)
+    // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
+    // -> the sign of the dot product depends on the cosinus of
+    //    the angle between the vectors
+    //   -> >0 => vectors are codirectional
+    //   -> <0 => vectors are opposite
+    return this.dotProduct(vector3D) > 0;
+  }
+
 } // Vector3D class

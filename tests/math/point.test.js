@@ -80,6 +80,60 @@ QUnit.test('Test Point3D.', function (assert) {
   assert.equal(p0.getDistance(p32), Math.sqrt(2), 'getDistance #3');
   const p33 = new Point3D(0, 1, 3);
   assert.equal(p0.getDistance(p33), Math.sqrt(2), 'getDistance #4');
+
+  // is closest
+  const p40 = new Point3D(0, 0, 0);
+  const pList40 = [
+    new Point3D(-2, 0, 0),
+    new Point3D(-1, 0, 0),
+    new Point3D(0, 0, 0),
+    new Point3D(1, 0, 0),
+    new Point3D(2, 0, 0)
+  ];
+  assert.equal(p40.getClosest(pList40), 2, 'getClosest #0');
+  const pList41 = [
+    new Point3D(-2, 0, 0),
+    new Point3D(-1, 0, 0),
+    new Point3D(0.1, 0, 0),
+    new Point3D(0.1, 0, 0),
+    new Point3D(1, 0, 0),
+    new Point3D(2, 0, 0)
+  ];
+  assert.equal(p40.getClosest(pList41), 2, 'getClosest #1');
+  const pList42 = [
+    new Point3D(0, -2, 0),
+    new Point3D(0, -1, 0),
+    new Point3D(0, 0, 0),
+    new Point3D(0, 1, 0),
+    new Point3D(0, 2, 0)
+  ];
+  assert.equal(p40.getClosest(pList42), 2, 'getClosest #2');
+  const pList43 = [
+    new Point3D(0, -2, 0),
+    new Point3D(0, -1, 0),
+    new Point3D(0, 0.1, 0),
+    new Point3D(0, 0.1, 0),
+    new Point3D(0, 1, 0),
+    new Point3D(0, 2, 0)
+  ];
+  assert.equal(p40.getClosest(pList43), 2, 'getClosest #3');
+  const pList44 = [
+    new Point3D(0, 0, -2),
+    new Point3D(0, 0, -1),
+    new Point3D(0, 0, 0),
+    new Point3D(0, 0, 1),
+    new Point3D(0, 0, 2)
+  ];
+  assert.equal(p40.getClosest(pList44), 2, 'getClosest #4');
+  const pList45 = [
+    new Point3D(0, 0, -2),
+    new Point3D(0, 0, -1),
+    new Point3D(0, 0, 0.1),
+    new Point3D(0, 0, 0.1),
+    new Point3D(0, 0, 1),
+    new Point3D(0, 0, 2)
+  ];
+  assert.equal(p40.getClosest(pList45), 2, 'getClosest #5');
 });
 
 /**

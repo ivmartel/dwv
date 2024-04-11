@@ -303,35 +303,26 @@ export class Geometry {
       localOrigins = this.#timeOrigins[time];
     }
 
-    // find the closest index
-    let closestSliceIndex = 0;
-    let minDist = point.getDistance(localOrigins[0]);
-    let dist = 0;
-    for (let i = 0; i < localOrigins.length; ++i) {
-      dist = point.getDistance(localOrigins[i]);
-      if (dist < minDist) {
-        minDist = dist;
-        closestSliceIndex = i;
-      }
-    }
+    // find the closest origin
+    const closestSliceIndex = point.getClosest(localOrigins);
     const closestOrigin = localOrigins[closestSliceIndex];
+
     // direction between the input point and the closest origin
     const pointDir = point.minus(closestOrigin);
-    // use third orientation matrix column as base plane vector
+
+    // use third orientation matrix column as plane normal vector
     const normal = new Vector3D(
       this.#orientation.get(0, 2),
       this.#orientation.get(1, 2),
       this.#orientation.get(2, 2)
     );
-    // a.dot(b) = ||a|| * ||b|| * cos(theta)
-    // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
-    // -> the sign of the dot product depends on the cosinus of
-    //    the angle between the vectors
-    //   -> >0 => vectors are codirectional
-    //   -> <0 => vectors are opposite
-    const dotProd = normal.dotProduct(pointDir);
-    // oposite vectors get higher index
-    const sliceIndex = dotProd > 0 ? closestSliceIndex + 1 : closestSliceIndex;
+
+    // codirectional vectors: above slice index
+    // oposite vectors: below slice index
+    const isCodirectional = normal.isCodirectional(pointDir);
+    const sliceIndex = isCodirectional
+      ? closestSliceIndex + 1 : closestSliceIndex;
+
     return sliceIndex;
   }
 

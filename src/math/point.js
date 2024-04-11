@@ -189,6 +189,25 @@ export class Point3D {
   }
 
   /**
+   * Get the closest point to this in a Point3D list.
+   *
+   * @param {Point3D[]} pointList The list to check.
+   * @returns {number} The index of the closest point in the input list.
+   */
+  getClosest(pointList) {
+    let minIndex = 0;
+    let minDist = this.getDistance(pointList[minIndex]);
+    for (let i = 0; i < pointList.length; ++i) {
+      const dist = this.getDistance(pointList[i]);
+      if (dist < minDist) {
+        minIndex = i;
+        minDist = dist;
+      }
+    }
+    return minIndex;
+  }
+
+  /**
    * Get the difference to another Point3D.
    *
    * @param {Point3D} point3D The input point.
