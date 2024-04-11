@@ -1,4 +1,8 @@
-import {getStats, guid} from '../../src/math/stats';
+import {
+  getStats,
+  getBasicStats,
+  guid
+} from '../../src/math/stats';
 
 /**
  * Tests for the 'math/stats.js' file.
@@ -7,13 +11,13 @@ import {getStats, guid} from '../../src/math/stats';
 /* global QUnit */
 
 /**
- * Tests for {@link getSimpleStats}.
+ * Tests for {@link getBasicStats}.
  *
- * @function module:tests/math~getSimpleStats
+ * @function module:tests/math~getBasicStats
  */
-QUnit.test('Test getSimpleStats.', function (assert) {
+QUnit.test('Test getBasicStats.', function (assert) {
   const arr0 = [1, 2, 3, 4, 5];
-  const q0 = getStats(arr0);
+  const q0 = getBasicStats(arr0);
   // min
   assert.equal(q0.min, 1, 'min.0');
   // max
@@ -24,7 +28,7 @@ QUnit.test('Test getSimpleStats.', function (assert) {
   assert.equal(q0.stdDev, 1.4142135623730951, 'stdDev.0');
 
   const arr1 = [9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4];
-  const q1 = getStats(arr1);
+  const q1 = getBasicStats(arr1);
   // min
   assert.equal(q1.min, 2, 'min.1');
   // max

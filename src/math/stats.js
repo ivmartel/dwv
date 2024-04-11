@@ -72,7 +72,7 @@ export function getStats(values, flags) {
   if (includesFullStatsFlags(flags)) {
     return getFullStats(values);
   } else {
-    return getSimpleStats(values);
+    return getBasicStats(values);
   }
 }
 
@@ -97,7 +97,7 @@ function includesFullStatsFlags(flags) {
  * @param {number[]} values The array of values to extract stats from.
  * @returns {Statistics} Simple statistics (no median, p25 nor p75).
  */
-function getSimpleStats(values) {
+export function getBasicStats(values) {
   let min = values[0];
   let max = min;
   let sum = 0;
@@ -131,8 +131,8 @@ function getSimpleStats(values) {
  * @returns {Statistics} Complete statistics (includes median, p25 and p75).
  */
 function getFullStats(values) {
-  // get simple stats
-  const stats = getSimpleStats(values);
+  // get basic stats
+  const stats = getBasicStats(values);
 
   // sort array... can get slow...
   values.sort(function (a, b) {

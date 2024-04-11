@@ -1542,12 +1542,12 @@ function setupTests() {
 }
 
 /**
- * Get simple stats for an array.
+ * Get basic stats for an array.
  *
  * @param {Array} array Input array.
  * @returns {object} min, max, mean and standard deviation.
  */
-function getSimpleStats(array) {
+function getBasicStats(array) {
   let min = array[0];
   let max = min;
   let sum = 0;
@@ -1609,7 +1609,7 @@ function runRenderTest() {
         runner();
       }, 100);
     } else {
-      console.log('Stats:', getSimpleStats(timings));
+      console.log('Stats:', getBasicStats(timings));
       // clean up
       _app.removeEventListener('renderstart', onRenderStart);
       _app.removeEventListener('renderend', onRenderEnd);
