@@ -1,11 +1,12 @@
 import {
-  BIG_EPSILON,
-  isSimilar,
-  getIdentityMat33
+  getIdentityMat33,
+  REAL_WORLD_EPSILON
 } from '../math/matrix';
 import {Point3D, Point} from '../math/point';
 import {Vector3D} from '../math/vector';
 import {Index} from '../math/index';
+import {getBasicStats} from '../math/stats';
+import {precisionRound} from '../utils/string';
 import {logger} from '../utils/logger';
 import {Size} from './size';
 import {Spacing} from './spacing';
@@ -217,14 +218,12 @@ export class Geometry {
    *   if needed.
    */
   #updateSliceSpacing() {
-    const geoSliceSpacing = getSliceGeometrySpacing(
-      this.#origins,
-      this.#orientation
-    );
+    const geoSliceSpacing = getSliceGeometrySpacing(this.#origins);
     // update local if needed
     if (typeof geoSliceSpacing !== 'undefined' &&
       this.#spacing.get(2) !== geoSliceSpacing) {
-      logger.trace('Updating slice spacing.');
+      logger.trace('Using geometric spacing ' + geoSliceSpacing +
+        ' instead of tag spacing ' + this.#spacing.get(2));
       const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
       this.#spacing = new Spacing(values);
@@ -578,57 +577,38 @@ export function getDeOrientedArray3D(array3D, orientation) {
  * of input origins.
  *
  * @param {Point3D[]} origins An array of Point3D.
- * @param {Matrix33} orientation The oritentation matrix.
- * @param {boolean} [withCheck] Flag to activate spacing variation check,
- *   default to true.
  * @returns {number|undefined} The spacing.
  */
-export function getSliceGeometrySpacing(origins, orientation, withCheck) {
-  if (typeof withCheck === 'undefined') {
-    withCheck = true;
-  }
+export function getSliceGeometrySpacing(origins) {
   // check origins
   if (origins.length <= 1) {
     return;
   }
-  // (x, y, z) = orientationMatrix * (i, j, k)
-  // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
-  // applied on the patient position, reorders indices
-  // so that Z is the slice direction
-  const invOrientation = orientation.getInverse();
-  let origin1 = invOrientation.multiplyPoint3D(origins[0]);
-  let origin2 = invOrientation.multiplyPoint3D(origins[1]);
-  let sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
-  const deltas = [];
+
+  const spacings = [];
   for (let i = 0; i < origins.length - 1; ++i) {
-    origin1 = invOrientation.multiplyPoint3D(origins[i]);
-    origin2 = invOrientation.multiplyPoint3D(origins[i + 1]);
-    const diff = Math.abs(origin1.getZ() - origin2.getZ());
-    if (diff === 0) {
-      throw new Error('Zero slice spacing.' +
+    const origin1 = origins[i];
+    const origin2 = origins[i + 1];
+    const sliceSpacing = origin1.getDistance(origin2);
+    if (sliceSpacing === 0) {
+      throw new Error('Zero slice spacing ' +
         origin1.toString() + ' ' + origin2.toString());
     }
-    // keep smallest
-    if (diff < sliceSpacing) {
-      sliceSpacing = diff;
-    }
-    if (withCheck) {
-      if (!isSimilar(sliceSpacing, diff, BIG_EPSILON)) {
-        deltas.push(Math.abs(sliceSpacing - diff));
-      }
-    }
-  }
-  // warn if non constant
-  if (withCheck && deltas.length !== 0) {
-    const sumReducer = function (sum, value) {
-      return sum + value;
-    };
-    const mean = deltas.reduce(sumReducer) / deltas.length;
-    if (mean > 1e-4) {
-      logger.warn('Varying slice spacing, mean delta: ' +
-        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
-    }
+    spacings.push(sliceSpacing);
   }
 
-  return sliceSpacing;
+  // use rounded mean value as spacing
+  const stats = getBasicStats(spacings);
+  const spacing = precisionRound(stats.mean, 4);
+
+  // warn if non constant
+  if (stats.stdDev > REAL_WORLD_EPSILON) {
+    logger.warn('Varying slice spacing, value: ' + spacing +
+      ' (mean: ' + stats.mean +
+      ', min: ' + stats.min +
+      ', max: ' + stats.max +
+      ', stdDev: ' + stats.stdDev + ')');
+  }
+
+  return spacing;
 }
