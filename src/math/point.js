@@ -182,10 +182,21 @@ export class Point3D {
    * @returns {number} Ths distance to the input point.
    */
   getDistance(point3D) {
+    return Math.sqrt(this.#getSquaredDistance(point3D));
+  }
+
+  /**
+   * Get the square of the distance between this and
+   * an input point. Used for sorting.
+   *
+   * @param {Point3D} point3D The input point.
+   * @returns {number} The square of the distance.
+   */
+  #getSquaredDistance(point3D) {
     const dx = this.#x - point3D.getX();
     const dy = this.#y - point3D.getY();
     const dz = this.#z - point3D.getZ();
-    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    return dx * dx + dy * dy + dz * dz;
   }
 
   /**
@@ -196,9 +207,10 @@ export class Point3D {
    */
   getClosest(pointList) {
     let minIndex = 0;
-    let minDist = this.getDistance(pointList[minIndex]);
+    // the order between squared distances and distances is the same
+    let minDist = this.#getSquaredDistance(pointList[minIndex]);
     for (let i = 0; i < pointList.length; ++i) {
-      const dist = this.getDistance(pointList[i]);
+      const dist = this.#getSquaredDistance(pointList[i]);
       if (dist < minDist) {
         minIndex = i;
         minDist = dist;
