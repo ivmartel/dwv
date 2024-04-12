@@ -18,9 +18,8 @@ import {
   getDicomSegmentFrameInfoItem
 } from '../dicom/dicomSegmentFrameInfo';
 import {transferSyntaxKeywords} from '../dicom/dictionary';
-import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
-import {Geometry, getSliceGeometrySpacing} from '../image/geometry';
+import {Geometry} from '../image/geometry';
 import {Point, Point3D} from '../math/point';
 import {Vector3D} from '../math/vector';
 import {Index} from '../math/index';
@@ -547,20 +546,9 @@ export class MaskFactory {
       frameOrigins.push(point3DFromArray(framePosPats[n]));
     }
 
-    // use calculated spacing
-    let newSpacing = spacing;
-    const geoSliceSpacing = getSliceGeometrySpacing(
-      frameOrigins, orientationMatrix, false);
-    const spacingValues = spacing.getValues();
-    if (typeof geoSliceSpacing !== 'undefined' &&
-      geoSliceSpacing !== spacingValues[2]) {
-      spacingValues[2] = geoSliceSpacing;
-      newSpacing = new Spacing(spacingValues);
-    }
-
     // tmp geometry with correct spacing but only one slice
     const tmpGeometry = new Geometry(
-      frameOrigins[0], size, newSpacing, orientationMatrix);
+      frameOrigins[0], size, spacing, orientationMatrix);
 
     // origin distance test
     // TODO: maybe use sliceSpacing / 10
@@ -622,7 +610,7 @@ export class MaskFactory {
 
     // final geometry
     const geometry = new Geometry(
-      frameOrigins[0], size, newSpacing, orientationMatrix);
+      frameOrigins[0], size, spacing, orientationMatrix);
     const uids = ['0'];
     for (let m = 1; m < numberOfSlices; ++m) {
       geometry.appendOrigin(point3DFromArray(posPats[m]), m);
