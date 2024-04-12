@@ -117,7 +117,10 @@ export function getBasicStats(values) {
 
   const mean = sum / length;
   // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-  const variance = sumSqr / length - mean * mean;
+  let variance = sumSqr / length - mean * mean;
+  if (variance < 0) {
+    variance = 0;
+  }
   const stdDev = Math.sqrt(variance);
 
   return new Statistics(min, max, mean, stdDev);
