@@ -552,7 +552,7 @@ export class MaskFactory {
 
     // origin distance test
     // TODO: maybe use sliceSpacing / 10
-    const isNotSmall = function (value) {
+    const isAboveEpsilon = function (value) {
       let res = value > REAL_WORLD_EPSILON;
       if (res) {
         // try larger epsilon
@@ -588,7 +588,7 @@ export class MaskFactory {
       let dist = frameOrigin.getDistance(point);
       const distPrevious = dist;
       // TODO: good threshold?
-      while (isNotSmall(dist)) {
+      while (isAboveEpsilon(dist)) {
         logger.debug('Adding intermediate pos pats for DICOM seg at ' +
           point.toString());
         posPats.push([point.getX(), point.getY(), point.getZ()]);
