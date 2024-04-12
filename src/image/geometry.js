@@ -303,8 +303,8 @@ export class Geometry {
     }
 
     // find the closest origin
-    const closestSliceIndex = point.getClosest(localOrigins);
-    const closestOrigin = localOrigins[closestSliceIndex];
+    const closestOriginIndex = point.getClosest(localOrigins);
+    const closestOrigin = localOrigins[closestOriginIndex];
 
     // direction between the input point and the closest origin
     const pointDir = point.minus(closestOrigin);
@@ -320,7 +320,7 @@ export class Geometry {
     // oposite vectors: below slice index
     const isCodirectional = normal.isCodirectional(pointDir);
     const sliceIndex = isCodirectional
-      ? closestSliceIndex + 1 : closestSliceIndex;
+      ? closestOriginIndex + 1 : closestOriginIndex;
 
     return sliceIndex;
   }
