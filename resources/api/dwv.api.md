@@ -238,6 +238,7 @@ export class DicomWriter {
         [x: string]: DataElement;
     }): ArrayBuffer;
     getElementToWrite(element: DataElement): DataElement | null;
+    setFixUnknownVR(flag: boolean): void;
     setRules(rules: {
         [x: string]: WriterRule;
     }, addMissingTags?: boolean): void;
@@ -690,6 +691,7 @@ export class Point2D {
 export class Point3D {
     constructor(x: number, y: number, z: number);
     equals(rhs: Point3D): boolean;
+    getClosest(pointList: Point3D[]): number;
     getDistance(point3D: Point3D): number;
     getX(): number;
     getY(): number;
@@ -828,6 +830,7 @@ export class Vector3D {
     getX(): number;
     getY(): number;
     getZ(): number;
+    isCodirectional(vector3D: Vector3D): boolean;
     norm(): number;
     toString(): string;
 }

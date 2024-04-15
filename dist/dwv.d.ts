@@ -1022,6 +1022,12 @@ export declare class DicomWriter {
      */
     setUseUnVrForPrivateSq(flag: boolean): void;
     /**
+     * Set the vr=UN check and fix flag.
+     *
+     * @param {boolean} flag True to activate the check and fix.
+     */
+    setFixUnknownVR(flag: boolean): void;
+    /**
      * Set the writing rules.
      * List of writer rules indexed by either `default`,
      *   tagKey, tagName or groupName.
@@ -3228,6 +3234,13 @@ export declare class Point3D {
      */
     getDistance(point3D: Point3D): number;
     /**
+     * Get the closest point to this in a Point3D list.
+     *
+     * @param {Point3D[]} pointList The list to check.
+     * @returns {number} The index of the closest point in the input list.
+     */
+    getClosest(pointList: Point3D[]): number;
+    /**
      * Get the difference to another Point3D.
      *
      * @param {Point3D} point3D The input point.
@@ -3809,6 +3822,13 @@ export declare class Vector3D {
      * @returns {number} The dot product.
      */
     dotProduct(vector3D: Vector3D): number;
+    /**
+     * Is this vector codirectional to an input one.
+     *
+     * @param {Vector3D} vector3D The vector to test.
+     * @returns {boolean} True if codirectional, false is opposite.
+     */
+    isCodirectional(vector3D: Vector3D): boolean;
     #private;
 }
 
