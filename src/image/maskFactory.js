@@ -676,6 +676,8 @@ export class MaskFactory {
     meta.StudyInstanceUID = safeGet('0020000D');
     meta.StudyID = safeGet('00200010');
     // Series
+    meta.SeriesDate = safeGet('00080021');
+    meta.SeriesTime = safeGet('00080031');
     meta.SeriesInstanceUID = safeGet('0020000E');
     meta.SeriesNumber = safeGet('00200011');
     // ReferringPhysicianName
