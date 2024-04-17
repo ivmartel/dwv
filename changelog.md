@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.32.5](https://github.com/ivmartel/dwv/releases/tag/v0.32.5) - 17/04/2024
+
+### Fixed
+
+- Image does not completely fill div [#1655](https://github.com/ivmartel/dwv/issues/1655)
+
 ## [v0.32.4](https://github.com/ivmartel/dwv/releases/tag/v0.32.4) - 18/03/2024
 
 ### Fixed
