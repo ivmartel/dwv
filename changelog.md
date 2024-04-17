@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.32.6](https://github.com/ivmartel/dwv/releases/tag/v0.32.6) - 17/04/2024
+
+### Fixed
+
+- Fix npm publish [#1656](https://github.com/ivmartel/dwv/issues/1656)
+
 ## [v0.32.5](https://github.com/ivmartel/dwv/releases/tag/v0.32.5) - 17/04/2024
 
 ### Fixed
