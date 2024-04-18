@@ -1030,6 +1030,14 @@ export class LayerGroup {
     if (typeof maxSize === 'undefined') {
       return undefined;
     }
+    // if the container has a width but no height,
+    // resize it to follow the same ratio to completely
+    // fill the div with the image
+    if (this.#containerDiv.offsetHeight === 0) {
+      const ratioX = this.#containerDiv.offsetWidth / maxSize.x;
+      const height = maxSize.y * ratioX;
+      this.#containerDiv.style.height = height + 'px';
+    }
     // return best fit
     return Math.min(
       this.#containerDiv.offsetWidth / maxSize.x,
