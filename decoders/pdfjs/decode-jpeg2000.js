@@ -4,15 +4,10 @@
 // Do not warn if these variables were not defined before.
 /* global importScripts, JpxImage */
 
-importScripts('jpx.js', 'util.js', 'arithmetic_decoder.js');
+import { JpxImage }  from "./jpx.js";
 
 self.addEventListener('message', function (event) {
-
-  // decode DICOM buffer
-  var decoder = new JpxImage();
-  decoder.parse(event.data.buffer);
+  let res = JpxImage.decode(event.data.buffer, /* ignoreColorSpace = */ false);
   // post decoded data
-  var res = decoder.tiles[0].items;
   self.postMessage([res]);
-
 }, false);
