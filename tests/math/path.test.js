@@ -2,17 +2,19 @@ import {Point2D} from '../../src/math/point';
 import {Path} from '../../src/math/path';
 
 /**
- * Tests for the 'math/shapes.js' file.
+ * Tests for the 'math/path.js' file.
  */
+
 // Do not warn if these variables were not defined before.
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Path}.
  *
- * @function module:tests/math~Path
+ * @function module:tests/math~path-shape
  */
-QUnit.test('Test Path.', function (assert) {
+QUnit.test('Path shape - #DWV-REQ-UI-07-004 Draw free hand', function (assert) {
   const path0 = new Path();
   // getLength
   assert.equal(path0.getLength(), 0, 'getLength');

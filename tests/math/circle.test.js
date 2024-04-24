@@ -3,17 +3,19 @@ import {Index} from '../../src/math/index';
 import {Circle} from '../../src/math/circle';
 
 /**
- * Tests for the 'math/shapes.js' file.
+ * Tests for the 'math/circle.js' file.
  */
+
 // Do not warn if these variables were not defined before.
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Circle}.
  *
- * @function module:tests/math~Circle
+ * @function module:tests/math~circle-shape
  */
-QUnit.test('Test Circle.', function (assert) {
+QUnit.test('Circle shape - #DWV-REQ-UI-07-002 Draw circle', function (assert) {
   const center0 = new Point2D(0, 0);
   const c0 = new Circle(center0, 2);
   // getCenter
@@ -42,41 +44,44 @@ QUnit.test('Test Circle.', function (assert) {
 /**
  * Tests for {@link Circle} quantification.
  *
- * @function module:tests/math~Circle
+ * @function module:tests/math~circle-quantification
  */
-QUnit.test('Test Circle quantify.', function (assert) {
-  const center0 = new Point2D(2, 2);
-  const c0 = new Circle(center0, 2);
-  // view controller
-  const mockVc0 = {
-    canQuantifyImage: function () {
-      return true;
-    },
-    get2DSpacing: function () {
-      return {x: 1, y: 1};
-    },
-    getCurrentPosition: function () {
-      return new Index([0, 0, 0]);
-    },
-    getImageVariableRegionValues: function () {
-      return [0, 1, 1, 0, 0, 1, 1, 0];
-    },
-    getPixelUnit: function () {
-      return '';
-    }
-  };
-  const theoQuant0 = {
-    min: {value: 0, unit: ''},
-    max: {value: 1, unit: ''},
-    mean: {value: 0.5, unit: ''},
-    stdDev: {value: 0.5, unit: ''},
-    surface: {value: 0.12566370614359174, unit: undefined}
-  };
-  const resQuant0 = c0.quantify(mockVc0);
-  assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
-  assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
-  assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');
-  assert.equal(resQuant0.stdDev.value, theoQuant0.stdDev.value, 'quant stdDev');
-  assert.equal(
-    resQuant0.surface.value, theoQuant0.surface.value, 'quant surface');
-});
+QUnit.test('Circle quantication - #DWV-REQ-UI-07-002 Draw circle',
+  function (assert) {
+    const center0 = new Point2D(2, 2);
+    const c0 = new Circle(center0, 2);
+    // view controller
+    const mockVc0 = {
+      canQuantifyImage: function () {
+        return true;
+      },
+      get2DSpacing: function () {
+        return {x: 1, y: 1};
+      },
+      getCurrentPosition: function () {
+        return new Index([0, 0, 0]);
+      },
+      getImageVariableRegionValues: function () {
+        return [0, 1, 1, 0, 0, 1, 1, 0];
+      },
+      getPixelUnit: function () {
+        return '';
+      }
+    };
+    const theoQuant0 = {
+      min: {value: 0, unit: ''},
+      max: {value: 1, unit: ''},
+      mean: {value: 0.5, unit: ''},
+      stdDev: {value: 0.5, unit: ''},
+      surface: {value: 0.12566370614359174, unit: undefined}
+    };
+    const resQuant0 = c0.quantify(mockVc0);
+    assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
+    assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
+    assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');
+    assert.equal(
+      resQuant0.stdDev.value, theoQuant0.stdDev.value, 'quant stdDev');
+    assert.equal(
+      resQuant0.surface.value, theoQuant0.surface.value, 'quant surface');
+  }
+);

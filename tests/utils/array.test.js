@@ -245,38 +245,40 @@ const compareBuffers = function (buf1, buf2) {
 /**
  * Tests for {@link parseMultipart}.
  *
- * @function module:tests/utils~parseMultipart
+ * @function module:tests/utils~parse-multipart
  */
-QUnit.test('Test parseMultipart.', function (assert) {
-  // empty
-  const res00 = parseMultipart(new Uint8Array(0).buffer);
-  assert.equal(res00.length, 0, 'Empty multipart length');
+QUnit.test('Parse multipart - #DWV-REQ-IO-02-002 Load DICOM multipart URL',
+  function (assert) {
+    // empty
+    const res00 = parseMultipart(new Uint8Array(0).buffer);
+    assert.equal(res00.length, 0, 'Empty multipart length');
 
-  // empty part
-  const u8Test01 = stringToUint8Array(multipart01);
-  const res01 = parseMultipart(u8Test01.buffer);
-  assert.equal(res01.length, 1, 'Empty multipart part length');
-  const keys01 = Object.keys(res01);
-  assert.equal(keys01.length, 1, 'Empty multipart part keys length');
-  assert.ok(typeof res01[0].data !== 'undefined',
-    'Empty multipart part has data');
-  assert.equal(res01[0].data.length, 0, 'Empty multipart part data length');
+    // empty part
+    const u8Test01 = stringToUint8Array(multipart01);
+    const res01 = parseMultipart(u8Test01.buffer);
+    assert.equal(res01.length, 1, 'Empty multipart part length');
+    const keys01 = Object.keys(res01);
+    assert.equal(keys01.length, 1, 'Empty multipart part keys length');
+    assert.ok(typeof res01[0].data !== 'undefined',
+      'Empty multipart part has data');
+    assert.equal(res01[0].data.length, 0, 'Empty multipart part data length');
 
-  // test #10
-  // parse multipart
-  const u8Test10 = stringToUint8Array(multipart10.str);
-  const resMulti10 = parseMultipart(u8Test10.buffer);
-  assert.ok(compareMultipartObjects(resMulti10, multipart10.parts),
-    'Compare multipart object #10');
-  // build multipart
-  const resBuff10 = buildMultipart(multipart10.parts,
-    '----WebKitFormBoundaryvef1fLxmoUdYZWXp');
-  assert.ok(compareBuffers(resBuff10, u8Test10),
-    'Compare multipart buffer #10');
+    // test #10
+    // parse multipart
+    const u8Test10 = stringToUint8Array(multipart10.str);
+    const resMulti10 = parseMultipart(u8Test10.buffer);
+    assert.ok(compareMultipartObjects(resMulti10, multipart10.parts),
+      'Compare multipart object #10');
+    // build multipart
+    const resBuff10 = buildMultipart(multipart10.parts,
+      '----WebKitFormBoundaryvef1fLxmoUdYZWXp');
+    assert.ok(compareBuffers(resBuff10, u8Test10),
+      'Compare multipart buffer #10');
 
-  // test #11: with preamble and epilogue
-  const u8Test11 = stringToUint8Array(multipart11.str);
-  const resMulti11 = parseMultipart(u8Test11.buffer);
-  assert.ok(compareMultipartObjects(resMulti11, multipart10.parts),
-    'Compare multipart object #11');
-});
+    // test #11: with preamble and epilogue
+    const u8Test11 = stringToUint8Array(multipart11.str);
+    const resMulti11 = parseMultipart(u8Test11.buffer);
+    assert.ok(compareMultipartObjects(resMulti11, multipart10.parts),
+      'Compare multipart object #11');
+  }
+);

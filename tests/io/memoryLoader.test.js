@@ -146,126 +146,138 @@ function checkLoad(assert, id, data, nData, nDataOk) {
 /**
  * Tests for {@link MemoryLoader} events with single frame data.
  *
- * @function module:tests/io~MemoryLoader0
+ * @function module:tests/io~memoryLoader-events-single-frame
  */
-QUnit.test('Test MemoryLoader events for single frame.', function (assert) {
-  // #0: 2 good dicom
-  const data0 = [
-    {
-      data: b64urlToArrayBuffer(bbmri53323131),
-      filename: 'bbmri-53323131.dcm'
-    },
-    {
-      data: b64urlToArrayBuffer(bbmri53323275),
-      filename: 'bbmri-53323275.dcm'
-    }
-  ];
-  const nData0 = data0.length;
-  const nDataOk0 = nData0;
-  checkLoad(assert, '0', data0, nData0, nDataOk0);
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'MemoryLoader events single frame - #DWV-REQ-IO-04-001 DICOM load start event',
+  function (assert) {
+    // #0: 2 good dicom
+    const data0 = [
+      {
+        data: b64urlToArrayBuffer(bbmri53323131),
+        filename: 'bbmri-53323131.dcm'
+      },
+      {
+        data: b64urlToArrayBuffer(bbmri53323275),
+        filename: 'bbmri-53323275.dcm'
+      }
+    ];
+    const nData0 = data0.length;
+    const nDataOk0 = nData0;
+    checkLoad(assert, '0', data0, nData0, nDataOk0);
 
-  // // #1: 2 not found (404) dicom
-  // const data1 = [
-  //   '/a.dcm',
-  //   '/b.dcm',
-  // ];
-  // const nData1 = data1.length;
-  // const nDataOk1 = 0;
-  // checkLoad(assert, '1', data1, nData1, nDataOk1);
+    // // #1: 2 not found (404) dicom
+    // const data1 = [
+    //   '/a.dcm',
+    //   '/b.dcm',
+    // ];
+    // const nData1 = data1.length;
+    // const nDataOk1 = 0;
+    // checkLoad(assert, '1', data1, nData1, nDataOk1);
 
-  // // #2: 2 dicom, 1 not found (404, error in XHR request)
-  // const data2 = [
-  //   '/tests/data/bbmri-53323131.dcm',
-  //   '/b.dcm',
-  // ];
-  // const nData2 = data2.length;
-  // const nDataOk2 = 1;
-  // checkLoad(assert, '2', data2, nData2, nDataOk2);
+    // // #2: 2 dicom, 1 not found (404, error in XHR request)
+    // const data2 = [
+    //   '/tests/data/bbmri-53323131.dcm',
+    //   '/b.dcm',
+    // ];
+    // const nData2 = data2.length;
+    // const nDataOk2 = 1;
+    // checkLoad(assert, '2', data2, nData2, nDataOk2);
 
-  // #3: 2 dicom, 1 bad (no rows, error in loader)
-  const data3 = [
-    {
-      data: b64urlToArrayBuffer(dwvTestSimple),
-      filename: 'dwv-test-simple.dcm'
-    },
-    {
-      data: b64urlToArrayBuffer(dwvTestNoNumberRows),
-      filename: 'dwv-test_no-number-rows.dcm',
-    }
-  ];
-  const nData3 = data3.length;
-  const nDataOk3 = 1;
-  checkLoad(assert, '3', data3, nData3, nDataOk3);
-});
+    // #3: 2 dicom, 1 bad (no rows, error in loader)
+    const data3 = [
+      {
+        data: b64urlToArrayBuffer(dwvTestSimple),
+        filename: 'dwv-test-simple.dcm'
+      },
+      {
+        data: b64urlToArrayBuffer(dwvTestNoNumberRows),
+        filename: 'dwv-test_no-number-rows.dcm',
+      }
+    ];
+    const nData3 = data3.length;
+    const nDataOk3 = 1;
+    checkLoad(assert, '3', data3, nData3, nDataOk3);
+  }
+);
 
 /**
  * Tests for {@link MemoryLoader} events with multi frame data.
  *
- * @function module:tests/io~MemoryLoader1
+ * @function module:tests/io~memoryLoader-events-multi-frame
  */
-QUnit.test('Test MemoryLoader events for multi frame.', function (assert) {
-  // #0: simple multi frame
-  const data0 = [
-    {
-      data: b64urlToArrayBuffer(multiframeTest1),
-      filename: 'multiframe-test1.dcm'
-    }
-  ];
-  const nData0 = data0.length;
-  const nDataOk0 = nData0;
-  checkLoad(assert, '0', data0, nData0, nDataOk0);
-
-  // #1: encoded multi frame
-  // TODO seems to cause problems to phantomjs...
-  /*const data1 = [
-        "/tests/data/multiframe-jpegloss-ge.dcm",
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'MemoryLoader events multi frame - #DWV-REQ-IO-04-001 DICOM load start event',
+  function (assert) {
+    // #0: simple multi frame
+    const data0 = [
+      {
+        data: b64urlToArrayBuffer(multiframeTest1),
+        filename: 'multiframe-test1.dcm'
+      }
     ];
-    const nData1 = data1.length;
-    const nDataOk1 = nData1;
-    checkLoad(assert, "1", data1, nData1, nDataOk1);*/
-});
+    const nData0 = data0.length;
+    const nDataOk0 = nData0;
+    checkLoad(assert, '0', data0, nData0, nDataOk0);
+
+    // #1: encoded multi frame
+    // TODO seems to cause problems to phantomjs...
+    /*const data1 = [
+          "/tests/data/multiframe-jpegloss-ge.dcm",
+      ];
+      const nData1 = data1.length;
+      const nDataOk1 = nData1;
+      checkLoad(assert, "1", data1, nData1, nDataOk1);*/
+  }
+);
 
 /**
  * Tests for {@link MemoryLoader} events with zipped data.
  *
- * @function module:tests/io~MemoryLoader2
+ * @function module:tests/io~memoryLoader-event-zip
  */
-QUnit.test('Test MemoryLoader events for zipped data.', function (assert) {
-  // #0: simple zip
-  const data0 = [
-    {
-      data: b64urlToArrayBuffer(bbmriZip),
-      filename: 'bbmri.zip'
-    }
-  ];
-  const nData0 = 2;
-  const nDataOk0 = 2;
-  checkLoad(assert, '0', data0, nData0, nDataOk0);
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'MemoryLoader events zip - #DWV-REQ-IO-04-001 DICOM load start event',
+  function (assert) {
+    // #0: simple zip
+    const data0 = [
+      {
+        data: b64urlToArrayBuffer(bbmriZip),
+        filename: 'bbmri.zip'
+      }
+    ];
+    const nData0 = 2;
+    const nDataOk0 = 2;
+    checkLoad(assert, '0', data0, nData0, nDataOk0);
 
-  // // #1: bad link to zip
-  // const data1 = [
-  //   '/tests/data/a.zip',
-  // ];
-  // const nData1 = 1;
-  // const nDataOk1 = 0;
-  // checkLoad(assert, '1', data1, nData1, nDataOk1);
+    // // #1: bad link to zip
+    // const data1 = [
+    //   '/tests/data/a.zip',
+    // ];
+    // const nData1 = 1;
+    // const nDataOk1 = 0;
+    // checkLoad(assert, '1', data1, nData1, nDataOk1);
 
-  // #2: zip with erroneus data
-  const data2 = [
-    {
-      data: b64urlToArrayBuffer(dwvTestBadZip),
-      filename: 'dwv-test_bad.zip'
-    }
-  ];
-  const nData2 = 2;
-  const nDataOk2 = 1;
-  checkLoad(assert, '2', data2, nData2, nDataOk2);
-});
+    // #2: zip with erroneus data
+    const data2 = [
+      {
+        data: b64urlToArrayBuffer(dwvTestBadZip),
+        filename: 'dwv-test_bad.zip'
+      }
+    ];
+    const nData2 = 2;
+    const nDataOk2 = 1;
+    checkLoad(assert, '2', data2, nData2, nDataOk2);
+  }
+);
 
 /**
  * Tests for {@link UrlsLoader} events with DCMDIR data.
  *
- * @function module:tests/io~UrlsLoader3
+ * @function module:tests/io~urlsLoader-events
  */
 // TODO...
 // QUnit.test('Test UrlsLoader events for DCMDIR data.', function (assert) {
