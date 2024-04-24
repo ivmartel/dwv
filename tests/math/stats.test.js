@@ -7,15 +7,16 @@ import {
 /**
  * Tests for the 'math/stats.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link getBasicStats}.
  *
- * @function module:tests/math~getBasicStats
+ * @function module:tests/math~getbasicstats
  */
-QUnit.test('Test getBasicStats.', function (assert) {
+QUnit.test('getBasicStats', function (assert) {
   const arr0 = [1, 2, 3, 4, 5];
   const q0 = getBasicStats(arr0);
   // min
@@ -42,9 +43,9 @@ QUnit.test('Test getBasicStats.', function (assert) {
 /**
  * Tests for {@link getFullStats}.
  *
- * @function module:tests/math~getFullStats
+ * @function module:tests/math~getfullstats
  */
-QUnit.test('Test getFullStats.', function (assert) {
+QUnit.test('getFullStats', function (assert) {
   const arr0 = [15, 20, 35, 40, 50];
   const q0 = getStats(arr0, ['median']);
   // median
@@ -69,7 +70,7 @@ QUnit.test('Test getFullStats.', function (assert) {
  *
  * @function module:tests/math~guid
  */
-QUnit.test('Test GUID.', function (assert) {
+QUnit.test('GUID', function (assert) {
   const id0 = guid();
   const id1 = guid();
   assert.equal((id0 === id1), false, 'Two GUids should not be equal.');

@@ -5,16 +5,15 @@ import {Line, getAngle, getPerpendicularLine} from '../../src/math/line';
  * Tests for the 'math/line.js' file.
  */
 
-// Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link Line}.
  *
- * @function module:tests/math~line-shape
+ * @function module:tests/math~line-class
  */
-QUnit.test('Line shape - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
+QUnit.test('Line class - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
   const p00 = new Point2D(0, 0);
   const p01 = new Point2D(0, -5);
   const l00 = new Line(p00, p01);

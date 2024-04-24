@@ -20,8 +20,9 @@ import {Image} from '../../src/image/image';
 /**
  * Tests for the 'image/iterator.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('image');
 
 /* eslint-disable array-element-newline */
 const dataIterator0 = {
@@ -196,9 +197,9 @@ function checkIterator(assert, getIter, theoValues, name) {
 /**
  * Tests for {@link simpleRange}.
  *
- * @function module:tests/image~simpleRange
+ * @function module:tests/image~simpleRange-iterator
  */
-QUnit.test('Test simpleRange iterator.', function (assert) {
+QUnit.test('simpleRange iterator', function (assert) {
   const dataAccessor = function (offset) {
     return offset;
   };
@@ -234,9 +235,9 @@ QUnit.test('Test simpleRange iterator.', function (assert) {
 /**
  * Tests for {@link range}.
  *
- * @function module:tests/image~range
+ * @function module:tests/image~range-iterator-axial
  */
-QUnit.test('Test range iterator: axial', function (assert) {
+QUnit.test('Range iterator axial', function (assert) {
   // test data
   const testData0 = dataIterator0;
   const ncols = testData0.ncols;
@@ -292,9 +293,9 @@ QUnit.test('Test range iterator: axial', function (assert) {
 /**
  * Tests for {@link range}.
  *
- * @function module:tests/image~range
+ * @function module:tests/image~range-iterator-coronal
  */
-QUnit.test('Test range iterator: coronal', function (assert) {
+QUnit.test('Range iterator coronal', function (assert) {
   // test data
   const testData0 = dataIterator0;
   const ncols = testData0.ncols;
@@ -351,9 +352,9 @@ QUnit.test('Test range iterator: coronal', function (assert) {
 /**
  * Tests for {@link range}.
  *
- * @function module:tests/image~range
+ * @function module:tests/image~range-iterator-sagittal
  */
-QUnit.test('Test range iterator: sagittal', function (assert) {
+QUnit.test('Range iterator sagittal', function (assert) {
   // test data
   const testData0 = dataIterator0;
   const ncols = testData0.ncols;
@@ -410,9 +411,9 @@ QUnit.test('Test range iterator: sagittal', function (assert) {
 /**
  * Tests for {@link simpleRange3d}.
  *
- * @function module:tests/image~simpleRange3d
+ * @function module:tests/image~rgb-iterator
  */
-QUnit.test('Test 3 components iterator.', function (assert) {
+QUnit.test('RGB iterator', function (assert) {
   const dataAccessor = function (offset) {
     return offset;
   };
@@ -494,7 +495,7 @@ QUnit.test('Test 3 components iterator.', function (assert) {
  *
  * @function module:tests/image~getSliceIterator
  */
-QUnit.test('Test getSliceIterator.', function (assert) {
+QUnit.test('getSliceIterator', function (assert) {
 
   // test data
   const testData0 = dataIterator0;
@@ -589,9 +590,9 @@ QUnit.test('Test getSliceIterator.', function (assert) {
 /**
  * Tests for {@link rangeRegion}.
  *
- * @function module:tests/image~rangeRegion
+ * @function module:tests/image~region-iterator
  */
-QUnit.test('Test region iterator.', function (assert) {
+QUnit.test('Region iterator', function (assert) {
   const dataAccessor = function (offset) {
     return offset;
   };

@@ -16,8 +16,9 @@ import {DicomCode} from '../../src/dicom/dicomCode';
 /**
  * Tests for the 'dicom/dicomSegment.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('dicom');
 
 /**
  * Get a dicom code from simple dicom elements.
@@ -79,9 +80,9 @@ function testSegment(segment, assert, testName) {
 /**
  * Tests for {@link MaskSegment} using simple DICOM data.
  *
- * @function module:tests/dicom~MaskSegment
+ * @function module:tests/dicom~dicom-segment-class
  */
-QUnit.test('Test dicom segment.', function (assert) {
+QUnit.test('DICOM segment class', function (assert) {
   const number0 = 0;
   const label0 = 'Segment0';
   const algorithmType0 = 'MANUAL';

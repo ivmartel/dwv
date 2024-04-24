@@ -5,16 +5,15 @@ import {ROI} from '../../src/math/roi';
  * Tests for the 'math/roi.js' file.
  */
 
-// Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link ROI}.
  *
- * @function module:tests/math~roi-shape
+ * @function module:tests/math~roi-class
  */
-QUnit.test('ROI shape - #DWV-REQ-UI-07-008 Draw ROI', function (assert) {
+QUnit.test('ROI class - #DWV-REQ-UI-07-008 Draw ROI', function (assert) {
   const r0 = new ROI();
   // getLength
   assert.equal(r0.getLength(), 0, 'getLength');

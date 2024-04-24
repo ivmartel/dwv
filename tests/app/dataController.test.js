@@ -8,15 +8,16 @@ import {Geometry} from '../../src/image/geometry';
 /**
  * Tests for the 'app/dataController.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('app');
 
 /**
  * Tests for {@link DataController} getValue.
  *
- * @function module:tests/app~dataController
+ * @function module:tests/app~datacontroller-class
  */
-QUnit.test('Test DataController.', function (assert) {
+QUnit.test('DataController class', function (assert) {
   const dc0 = new DataController();
 
   // ids before add

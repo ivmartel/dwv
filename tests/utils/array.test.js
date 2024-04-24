@@ -10,16 +10,16 @@ import {
  * Tests for the 'utils/array' file.
  */
 /** @module tests/utils */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('utils');
 
 /**
  * Tests for {@link arrayContains}.
  *
- * @function module:tests/utils~arrayContains
+ * @function module:tests/utils~arraycontains
  */
-QUnit.test('Test arrayContains.', function (assert) {
+QUnit.test('arrayContains', function (assert) {
   let arr00;
   let arrTest000;
   assert.false(arrayContains(arr00, arrTest000), 'contains test #000');
@@ -88,9 +88,9 @@ QUnit.test('Test arrayContains.', function (assert) {
 /**
  * Tests for {@link arraySortEquals}.
  *
- * @function module:tests/utils~arraySortEquals
+ * @function module:tests/utils~arraysortequals
  */
-QUnit.test('Test arraySortEquals.', function (assert) {
+QUnit.test('arraySortEquals', function (assert) {
   // null
   assert.notOk(arraySortEquals(null, null), '2 null arrays');
   assert.notOk(arraySortEquals(null, [1, 2, 3]), 'left null array');

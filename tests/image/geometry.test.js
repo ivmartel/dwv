@@ -8,16 +8,16 @@ import {Geometry} from '../../src/image/geometry';
  * Tests for the 'image/geometry.js' file.
  */
 /** @module tests/image */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('image');
 
 /**
  * Tests for {@link Geometry}.
  *
- * @function module:tests/image~geometry
+ * @function module:tests/image~geometry-class
  */
-QUnit.test('Test Geometry.', function (assert) {
+QUnit.test('Geometry class', function (assert) {
   // case #0: simple, index and points are equal
   const imgSize0 = new Size([3, 3, 2]);
   const imgSpacing0 = new Spacing([1, 1, 1]);

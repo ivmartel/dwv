@@ -6,16 +6,15 @@ import {Ellipse, getEllipseIndices} from '../../src/math/ellipse';
  * Tests for the 'math/ellipse.js' file.
  */
 
-// Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link Ellipse}.
  *
- * @function module:tests/math~ellipse-shape
+ * @function module:tests/math~ellipse-class
  */
-QUnit.test('Ellipse shape - #DWV-REQ-UI-07-003 Draw ellipse',
+QUnit.test('Ellipse class - #DWV-REQ-UI-07-003 Draw ellipse',
   function (assert) {
     const center0 = new Point2D(0, 0);
     const e0 = new Ellipse(center0, 2, 4);

@@ -5,16 +5,15 @@ import {Path} from '../../src/math/path';
  * Tests for the 'math/path.js' file.
  */
 
-// Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link Path}.
  *
- * @function module:tests/math~path-shape
+ * @function module:tests/math~path-class
  */
-QUnit.test('Path shape - #DWV-REQ-UI-07-004 Draw free hand', function (assert) {
+QUnit.test('Path class - #DWV-REQ-UI-07-004 Draw free hand', function (assert) {
   const path0 = new Path();
   // getLength
   assert.equal(path0.getLength(), 0, 'getLength');

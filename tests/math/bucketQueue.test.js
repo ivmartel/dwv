@@ -4,16 +4,16 @@ import {BucketQueue} from '../../src/math/bucketQueue';
  * Tests for the 'math/BucketQueue.js' file.
  */
 /** @module tests/math */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link BucketQueue}.
  *
- * @function module:tests/math~BucketQueue
+ * @function module:tests/math~bucketqueue-class
  */
-QUnit.test('Test BucketQueue.', function (assert) {
+QUnit.test('BucketQueue class', function (assert) {
   const queue00 = new BucketQueue();
   // isEmpty
   assert.equal(queue00.isEmpty(), true, 'create isEmpty');

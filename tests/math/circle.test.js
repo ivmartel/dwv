@@ -6,16 +6,15 @@ import {Circle} from '../../src/math/circle';
  * Tests for the 'math/circle.js' file.
  */
 
-// Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link Circle}.
  *
- * @function module:tests/math~circle-shape
+ * @function module:tests/math~circle-class
  */
-QUnit.test('Circle shape - #DWV-REQ-UI-07-002 Draw circle', function (assert) {
+QUnit.test('Circle class - #DWV-REQ-UI-07-002 Draw circle', function (assert) {
   const center0 = new Point2D(0, 0);
   const c0 = new Circle(center0, 2);
   // getCenter

@@ -7,15 +7,16 @@ import {
 /**
  * Tests for the 'math/point.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Point2D}.
  *
- * @function module:tests/math~Point2D
+ * @function module:tests/math~point2D-class
  */
-QUnit.test('Test Point2D.', function (assert) {
+QUnit.test('Point2D class', function (assert) {
   const p0 = new Point2D(1, 2);
   // getX
   assert.equal(p0.getX(), 1, 'getX');
@@ -42,9 +43,9 @@ QUnit.test('Test Point2D.', function (assert) {
 /**
  * Tests for {@link Point3D}.
  *
- * @function module:tests/math~Point3D
+ * @function module:tests/math~point3D-class
  */
-QUnit.test('Test Point3D.', function (assert) {
+QUnit.test('Point3D class', function (assert) {
   const p0 = new Point3D(1, 2, 3);
   // getX
   assert.equal(p0.getX(), 1, 'getX');
@@ -139,9 +140,9 @@ QUnit.test('Test Point3D.', function (assert) {
 /**
  * Tests for {@link Point}.
  *
- * @function module:tests/math~Point
+ * @function module:tests/math~point-class
  */
-QUnit.test('Test Point.', function (assert) {
+QUnit.test('Point class', function (assert) {
   const p0 = new Point([1, 2, 3]);
   // getX
   assert.equal(p0.get(0), 1, 'getX');

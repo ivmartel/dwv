@@ -6,16 +6,15 @@ import {Rectangle} from '../../src/math/rectangle';
  * Tests for the 'math/rectangle.js' file.
  */
 
-// Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('math');
 
 /**
  * Tests for {@link Rectangle}.
  *
- * @function module:tests/math~rectangle-shape
+ * @function module:tests/math~rectangle-class
  */
-QUnit.test('Rectangle shape - #DWV-REQ-UI-07-006 Draw rectangle',
+QUnit.test('Rectangle class - #DWV-REQ-UI-07-006 Draw rectangle',
   function (assert) {
     const p00 = new Point2D(0, 0);
     const p01 = new Point2D(-4, -4);

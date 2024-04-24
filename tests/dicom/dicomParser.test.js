@@ -22,7 +22,7 @@ QUnit.module('dicom');
  * Tests for {@link DicomParser} using simple DICOM data.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomParser-simple
+ * @function module:tests/dicom~simple-dicom-parsing
  */
 QUnit.test('Simple DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
   function (assert) {
@@ -78,9 +78,9 @@ QUnit.test('Simple DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
  * Tests for {@link DicomParser} using sequence test DICOM data.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomParser-sequence
+ * @function module:tests/dicom~dicom-sequence-parsing
  */
-QUnit.test('Sequence DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+QUnit.test('DICOM sequence parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
   function (assert) {
     const buffer = b64urlToArrayBuffer(dwvTestSequence);
 
@@ -162,9 +162,9 @@ QUnit.test('Sequence DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
 /**
  * Tests for {@link cleanString}.
  *
- * @function module:tests/dicom~cleanString
+ * @function module:tests/dicom~cleanstring
  */
-QUnit.test('Test cleanString.', function (assert) {
+QUnit.test('cleanString', function (assert) {
   // undefined
   assert.throws(function () {
     cleanString();
@@ -210,7 +210,7 @@ QUnit.test('Test cleanString.', function (assert) {
  * Tests for {@link DicomParser} using DICOMDIR data.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomParserDicomDir
+ * @function module:tests/dicom~dicomdir-parsing
  */
 QUnit.test('DICOMDIR parsing - #DWV-REQ-IO-02-004 Load DICOMDIR URL',
   function (assert) {

@@ -3,15 +3,16 @@ import {Vector3D} from '../../src/math/vector';
 /**
  * Tests for the 'math/point.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Vector3D}.
  *
- * @function module:tests/math~Vector3D
+ * @function module:tests/math~vector3D-class
  */
-QUnit.test('Test Vector3D.', function (assert) {
+QUnit.test('Vector3D class', function (assert) {
   const v0 = new Vector3D(1, 2, 3);
   // getX
   assert.equal(v0.getX(), 1, 'getX');
@@ -61,9 +62,9 @@ QUnit.test('Test Vector3D.', function (assert) {
 /**
  * Tests for {@link Vector3D}.
  *
- * @function module:tests/math~Vector3D
+ * @function module:tests/math~vector3D-crossproduct
  */
-QUnit.test('Test Vector3D crossProduct.', function (assert) {
+QUnit.test('Vector3D crossProduct', function (assert) {
   // test vectors
   const v0 = new Vector3D(0, 0, 0);
   const v0x = new Vector3D(1, 0, 0);
@@ -118,9 +119,9 @@ QUnit.test('Test Vector3D crossProduct.', function (assert) {
 /**
  * Tests for {@link Vector3D}.
  *
- * @function module:tests/math~Vector3D
+ * @function module:tests/math~vector3D-dotproduct
  */
-QUnit.test('Test Vector3D dotProduct.', function (assert) {
+QUnit.test('Vector3D dotProduct', function (assert) {
   // orthogonal
   const v00 = new Vector3D(1, 0, 0);
   const v01 = new Vector3D(0, 1, 0);

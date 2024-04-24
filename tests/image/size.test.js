@@ -4,15 +4,16 @@ import {Size} from '../../src/image/size';
 /**
  * Tests for the 'image/size.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('image');
 
 /**
  * Tests for {@link Size}.
  *
- * @function module:tests/image~size
+ * @function module:tests/image~size-class
  */
-QUnit.test('Test Size.', function (assert) {
+QUnit.test('Size class', function (assert) {
   // error cases
   assert.throws(function () {
     new Size();
@@ -114,9 +115,9 @@ QUnit.test('Test Size.', function (assert) {
 /**
  * Tests for {@link Size.indexToOffset}.
  *
- * @function module:tests/image~indexToOffset
+ * @function module:tests/image~index-to-and-from-offset
  */
-QUnit.test('Test index to and from offset.', function (assert) {
+QUnit.test('Index to and from offset', function (assert) {
   const size00 = new Size([4, 3, 2]);
   const testData00 = [
     {values: [0, 0, 0], offset: 0},

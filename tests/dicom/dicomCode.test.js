@@ -9,8 +9,10 @@ import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter';
 /**
  * Tests for the 'dicom/dicomCode.js' file.
  */
-// Do not warn if these variables were not defined before.
+/** @module tests/dicom */
+
 /* global QUnit */
+QUnit.module('dicom');
 
 /**
  * DicomCode test: translate to element and back.
@@ -46,9 +48,9 @@ function testCode(code, assert, testName) {
 /**
  * Tests for {@link DicomCode} using simple DICOM data.
  *
- * @function module:tests/dicom~DicomCode
+ * @function module:tests/dicom~dicom-code-class
  */
-QUnit.test('Test dicom code.', function (assert) {
+QUnit.test('DICOM code class', function (assert) {
   const meaning0 = 'code0';
   const code00 = new DicomCode(meaning0);
   assert.equal(code00.meaning, meaning0,
