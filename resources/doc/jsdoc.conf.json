@@ -46,7 +46,7 @@
             "target": "_blank"
           }
         ],
-        "create_style": "ul {list-style-type: disc !important;} ul ul {list-style-type: circle !important;}",
+        "create_style": "ul {list-style-type: disc !important;} ul ul {list-style-type: circle !important;} ul li {padding: .2rem 0 !important;}",
         "codepen": {
           "enable_for": ["examples"],
           "options": {
