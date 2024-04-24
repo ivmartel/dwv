@@ -4902,6 +4902,11 @@ karma-coverage@^2.2.1:
     istanbul-reports "^3.0.5"
     minimatch "^3.0.4"
 
+karma-json-reporter@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/karma-json-reporter/-/karma-json-reporter-1.2.1.tgz#7b4d6102d1ccaf573061ca76f11e9586948ecce3"
+  integrity sha512-ASmvranNhUN0ctSuAZKeWISW9Nf4AteMcVy8rJVjS7Qk+qWgssag/nw+yivHWKDROztVFn7TdamHOETMPCkvgA==
+
 karma-qunit@^4.1.2:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.2.0.tgz#fce4358642a6987f58df370e6bfc8d3da580443b"
@@ -4913,6 +4918,11 @@ karma-sourcemap-loader@^0.4.0:
   integrity sha512-xCRL3/pmhAYF3I6qOrcn0uhbQevitc2DERMPH82FMnG+4WReoGcGFZb1pURf2a5apyrOHRdvD+O6K7NljqKHyA==
   dependencies:
     graceful-fs "^4.2.10"
+
+karma-spec-json-reporter@0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/karma-spec-json-reporter/-/karma-spec-json-reporter-0.0.8.tgz#ee4c0b8b7baf9b538d42d5abd4d224a7a58de32d"
+  integrity sha512-G17B+s3CEtsga1K1HSQAXNtDrBAvd3mtlL+8GXUJtCSxFT6ZLhSc7Rb+n62FpErTFi4T2A/xObka7ZQXq86Tuw==
 
 karma-webpack@^5.0.0:
   version "5.0.1"

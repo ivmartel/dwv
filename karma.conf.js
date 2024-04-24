@@ -38,7 +38,11 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     browsers: ['Chrome'],
     restartOnFileChange: true,
-    webpack: webpackConfig()
+    webpack: webpackConfig(),
+    jsonReporter: {
+      stdout: false,
+      outputFile: './build/test-results.json'
+    },
   });
 };
 
