@@ -13,6 +13,8 @@ import {
   getTagFromKey
 } from './dicomTag';
 import {isNativeLittleEndian} from './dataReader';
+import {Vector3D} from '../math/vector';
+import {Matrix33} from '../math/matrix';
 import {Spacing} from '../image/spacing';
 import {logger} from '../utils/logger';
 
@@ -20,7 +22,6 @@ import {logger} from '../utils/logger';
 /* eslint-disable no-unused-vars */
 import {Tag} from './dicomTag';
 import {DataElement} from './dataElement';
-import {Matrix33} from '../math/matrix';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -683,6 +684,38 @@ export function getSpacingFromMeasure(dataElements) {
     spacingValues.push(parseFloat(dataElements['00180088'].value[0]));
   }
   return new Spacing(spacingValues);
+}
+
+/**
+ * Get an orientation matrix from a dicom orientation element.
+ *
+ * @param {DataElements} dataElements The dicom element.
+ * @returns {Matrix33|undefined} The orientation matrix.
+ */
+export function getOrientationMatrix(dataElements) {
+  const imageOrientationPatient = dataElements['00200037'];
+  let orientationMatrix;
+  // slice orientation (cosines are matrices' columns)
+  // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
+  if (typeof imageOrientationPatient !== 'undefined') {
+    const rowCosines = new Vector3D(
+      parseFloat(imageOrientationPatient.value[0]),
+      parseFloat(imageOrientationPatient.value[1]),
+      parseFloat(imageOrientationPatient.value[2]));
+    const colCosines = new Vector3D(
+      parseFloat(imageOrientationPatient.value[3]),
+      parseFloat(imageOrientationPatient.value[4]),
+      parseFloat(imageOrientationPatient.value[5]));
+    const normal = rowCosines.crossProduct(colCosines);
+    /* eslint-disable array-element-newline */
+    orientationMatrix = new Matrix33([
+      rowCosines.getX(), colCosines.getX(), normal.getX(),
+      rowCosines.getY(), colCosines.getY(), normal.getY(),
+      rowCosines.getZ(), colCosines.getZ(), normal.getZ()
+    ]);
+    /* eslint-enable array-element-newline */
+  }
+  return orientationMatrix;
 }
 
 /**

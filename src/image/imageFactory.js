@@ -14,10 +14,9 @@ import {
   getPixelSpacing,
   getPixelUnit,
   TagValueExtractor,
-  getSuvFactor
+  getSuvFactor,
+  getOrientationMatrix
 } from '../dicom/dicomElementsWrapper';
-import {Vector3D} from '../math/vector';
-import {Matrix33} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
 
@@ -132,28 +131,8 @@ export class ImageFactory {
       ];
     }
 
-    // slice orientation (cosines are matrices' columns)
-    // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
-    const imageOrientationPatient = dataElements['00200037'];
-    let orientationMatrix;
-    if (typeof imageOrientationPatient !== 'undefined') {
-      const rowCosines = new Vector3D(
-        parseFloat(imageOrientationPatient.value[0]),
-        parseFloat(imageOrientationPatient.value[1]),
-        parseFloat(imageOrientationPatient.value[2]));
-      const colCosines = new Vector3D(
-        parseFloat(imageOrientationPatient.value[3]),
-        parseFloat(imageOrientationPatient.value[4]),
-        parseFloat(imageOrientationPatient.value[5]));
-      const normal = rowCosines.crossProduct(colCosines);
-      /* eslint-disable array-element-newline */
-      orientationMatrix = new Matrix33([
-        rowCosines.getX(), colCosines.getX(), normal.getX(),
-        rowCosines.getY(), colCosines.getY(), normal.getY(),
-        rowCosines.getZ(), colCosines.getZ(), normal.getZ()
-      ]);
-      /* eslint-enable array-element-newline */
-    }
+    // Image orientation patient
+    const orientationMatrix = getOrientationMatrix(dataElements);
 
     // geometry
     const origin = new Point3D(
