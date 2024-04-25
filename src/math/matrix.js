@@ -502,7 +502,7 @@ function getVectorStringLPS(vector) {
 
 /**
  * Get the orientation matrix associated to the direction cosines.
- * *
+ *
  * @param {number[]} cosines The direction cosines.
  * @returns {Matrix33} The orientation matrix.
  */
