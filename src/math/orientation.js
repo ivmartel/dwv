@@ -147,6 +147,27 @@ function getVectorStringLPS(vector) {
 }
 
 /**
+ * Get the LPS 'group' (axial, coronal or sagittal) from a LPS code.
+ *
+ * @param {string} lps The LPS code string.
+ * @returns {string} The group.
+ */
+export function getLPSGroup(code) {
+  let orientStr;
+  const axialCodes = ['LPS', 'LAI', 'RPI', 'RAS'];
+  const coronalCodes = ['LSA', 'LIP', 'RSP', 'RIA'];
+  const sagittalCodes = ['PSL', 'PIR', 'ASR', 'AIL'];
+  if (axialCodes.includes(code)) {
+    orientStr = Orientation.Axial;
+  } else if (coronalCodes.includes(code)) {
+    orientStr = Orientation.Coronal;
+  } else if (sagittalCodes.includes(code)) {
+    orientStr = Orientation.Sagittal;
+  }
+  return orientStr;
+}
+
+/**
  * Get the orientation matrix associated to the direction cosines.
  *
  * @param {number[]} cosines The direction cosines.

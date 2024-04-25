@@ -14,8 +14,11 @@ import {
 } from './dictionary';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
-import {arrayEquals} from '../utils/array';
-import {Orientation} from '../math/orientation';
+import {
+  getOrientationFromCosines,
+  getOrientationStringLPS,
+  getLPSGroup
+} from '../math/orientation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -197,18 +200,9 @@ export function getReverseOrientation(ori) {
  * @returns {string} The orientation name: axial, coronal or sagittal.
  */
 export function getOrientationName(orientation) {
-  const axialOrientation = [1, 0, 0, 0, 1, 0];
-  const coronalOrientation = [1, 0, 0, 0, 0, -1];
-  const sagittalOrientation = [0, 1, 0, 0, 0, -1];
-  let name;
-  if (arrayEquals(orientation, axialOrientation)) {
-    name = Orientation.Axial;
-  } else if (arrayEquals(orientation, coronalOrientation)) {
-    name = Orientation.Coronal;
-  } else if (arrayEquals(orientation, sagittalOrientation)) {
-    name = Orientation.Sagittal;
-  }
-  return name;
+  const orientMatrix = getOrientationFromCosines(orientation);
+  const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
+  return getLPSGroup(lpsStr);
 }
 
 /**
