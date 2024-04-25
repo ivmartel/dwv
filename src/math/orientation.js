@@ -185,6 +185,7 @@ export function getOrientationFromCosines(cosines) {
       rowCosines.getY(), colCosines.getY(), normal.getY(),
       rowCosines.getZ(), colCosines.getZ(), normal.getZ()
     ]);
+    /* eslint-enable array-element-newline */
   }
   return orientationMatrix;
 }
