@@ -4,10 +4,7 @@ import {
   BIG_EPSILON,
   Matrix33,
   getIdentityMat33,
-  isIdentityMat33,
-  getMatrixFromName,
-  getOrientationStringLPS,
-  Orientation
+  isIdentityMat33
 } from '../../src/math/matrix';
 
 /**
@@ -246,45 +243,4 @@ QUnit.test('Matrix33 factories', function (assert) {
   assert.ok(m00.equals(theo00), 'Matrix33 factory id');
 
   assert.ok(isIdentityMat33(m00), 'Matrix33 factory id isIdentity');
-
-  // test #01
-  const m01 = getMatrixFromName(Orientation.Axial);
-  assert.ok(m01.equals(theo00), 'Matrix33 factory axial');
-
-  // test #02
-  const m02 = getMatrixFromName(Orientation.Coronal);
-  const theo02 = new Matrix33([
-    1, 0, 0, 0, 0, 1, 0, -1, 0
-  ]);
-  assert.ok(m02.equals(theo02), 'Matrix33 factory coronal');
-
-  // test #03
-  const m03 = getMatrixFromName(Orientation.Sagittal);
-  const theo03 = new Matrix33([
-    0, 0, -1, 1, 0, 0, 0, -1, 0
-  ]);
-  assert.ok(m03.equals(theo03), 'Matrix33 factory sagittal');
-
-  // test #04
-  const m04 = getMatrixFromName('godo');
-  assert.equal(m04, null, 'Matrix33 factory unknown name');
-});
-
-/**
- * Tests for {@link Matrix33} getOrientationStringLPS.
- *
- * @function module:tests/math~matrix33-getOrientationStringLPS
- */
-QUnit.test('Matrix33 getOrientationStringLPS', function (assert) {
-  const m00 = getIdentityMat33();
-  const code00 = getOrientationStringLPS(m00);
-  assert.equal(code00, 'LPS', 'LPS matrix');
-
-  const m01 = getMatrixFromName(Orientation.Coronal);
-  const code01 = getOrientationStringLPS(m01);
-  assert.equal(code01, 'LIP', 'LIP matrix');
-
-  const m02 = getMatrixFromName(Orientation.Sagittal);
-  const code02 = getOrientationStringLPS(m02);
-  assert.equal(code02, 'PIR', 'PIR matrix');
 });

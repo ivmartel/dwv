@@ -2,9 +2,9 @@ import {Point3D} from '../../src/math/point';
 import {Index} from '../../src/math/index';
 import {
   Matrix33,
-  getIdentityMat33,
-  getMatrixFromName
+  getIdentityMat33
 } from '../../src/math/matrix';
+import {getMatrixFromName} from '../../src/math/orientation';
 import {Size} from '../../src/image/size';
 import {Spacing} from '../../src/image/spacing';
 import {Geometry} from '../../src/image/geometry';

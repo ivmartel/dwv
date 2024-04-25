@@ -88,10 +88,8 @@ import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
 import {Index} from './math/index';
 import {Scalar2D, Scalar3D} from './math/scalar';
-import {
-  Matrix33,
-  Orientation
-} from './math/matrix';
+import {Matrix33} from './math/matrix';
+import {Orientation} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
 // tools
 import {toolList} from './tools/index';

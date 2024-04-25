@@ -15,7 +15,7 @@ import {
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
 import {arrayEquals} from '../utils/array';
-import {Orientation} from '../math/matrix';
+import {Orientation} from '../math/orientation';
 
 // doc imports
 /* eslint-disable no-unused-vars */

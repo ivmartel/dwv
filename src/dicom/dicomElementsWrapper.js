@@ -13,7 +13,7 @@ import {
   getTagFromKey
 } from './dicomTag';
 import {isNativeLittleEndian} from './dataReader';
-import {getOrientationFromCosines} from '../math/matrix';
+import {getOrientationFromCosines} from '../math/orientation';
 import {Spacing} from '../image/spacing';
 import {logger} from '../utils/logger';
 

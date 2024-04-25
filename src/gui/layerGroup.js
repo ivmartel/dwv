@@ -1,4 +1,5 @@
-import {getIdentityMat33, getCoronalMat33} from '../math/matrix';
+import {getIdentityMat33} from '../math/matrix';
+import {getCoronalMat33} from '../math/orientation';
 import {Index} from '../math/index';
 import {Point} from '../math/point';
 import {Vector3D} from '../math/vector';

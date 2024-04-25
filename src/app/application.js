@@ -4,7 +4,7 @@ import {
   getMatrixFromName,
   getOrientationStringLPS,
   Orientation
-} from '../math/matrix';
+} from '../math/orientation';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
 import {Style} from '../gui/style';
