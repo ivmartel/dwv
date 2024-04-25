@@ -509,14 +509,8 @@ function getVectorStringLPS(vector) {
 export function getOrientationFromCosines(cosines) {
   let orientationMatrix;
   if (typeof cosines !== 'undefined' && cosines.length === 6) {
-    const rowCosines = new Vector3D(
-      parseFloat(cosines[0]),
-      parseFloat(cosines[1]),
-      parseFloat(cosines[2]));
-    const colCosines = new Vector3D(
-      parseFloat(cosines[3]),
-      parseFloat(cosines[4]),
-      parseFloat(cosines[5]));
+    const rowCosines = new Vector3D(cosines[0], cosines[1], cosines[2]);
+    const colCosines = new Vector3D(cosines[3], cosines[4], cosines[5]);
     const normal = rowCosines.crossProduct(colCosines);
     /* eslint-disable array-element-newline */
     orientationMatrix = new Matrix33([

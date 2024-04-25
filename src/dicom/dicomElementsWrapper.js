@@ -21,6 +21,7 @@ import {logger} from '../utils/logger';
 /* eslint-disable no-unused-vars */
 import {Tag} from './dicomTag';
 import {DataElement} from './dataElement';
+import {Matrix33} from '../math/matrix';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -698,7 +699,9 @@ export function getOrientationMatrix(dataElements) {
   // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   if (typeof imageOrientationPatient !== 'undefined') {
     orientationMatrix =
-      getOrientationFromCosines(imageOrientationPatient.value);
+      getOrientationFromCosines(
+        imageOrientationPatient.value.map((item) => parseFloat(item))
+      );
   }
   return orientationMatrix;
 }
