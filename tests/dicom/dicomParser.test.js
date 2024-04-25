@@ -1,7 +1,8 @@
 import {
   cleanString,
   hasDicomPrefix,
-  DicomParser
+  DicomParser,
+  getOrientationName
 } from '../../src/dicom/dicomParser';
 import {getFileListFromDicomDir} from '../../src/dicom/dicomElementsWrapper';
 import {b64urlToArrayBuffer} from './utils';
@@ -264,3 +265,19 @@ QUnit.test('DICOMDIR parsing - #DWV-REQ-IO-02-004 Load DICOMDIR URL',
     assert.deepEqual(list[0][0], files00, 'Study#1:Series#0 file names');
   }
 );
+
+/**
+ * Tests for {@link getOrientationName}.
+ *
+ * @function module:tests/dicom~getorientationname
+ */
+QUnit.test('getOrientationName', function (assert) {
+  const test00 = [1, 0, 0, 0, 1, 0];
+  assert.equal(getOrientationName(test00), 'axial', 'test axial #0');
+
+  const test10 = [1, 0, 0, 0, 0, -1];
+  assert.equal(getOrientationName(test10), 'coronal', 'test coronal #0');
+
+  const test20 = [0, 1, 0, 0, 0, -1];
+  assert.equal(getOrientationName(test20), 'sagittal', 'test sagittal #0');
+});
