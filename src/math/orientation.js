@@ -149,7 +149,7 @@ function getVectorStringLPS(vector) {
 /**
  * Get the LPS 'group' (axial, coronal or sagittal) from a LPS code.
  *
- * @param {string} lps The LPS code string.
+ * @param {string} code The LPS code string.
  * @returns {string} The group.
  */
 export function getLPSGroup(code) {
