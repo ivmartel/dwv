@@ -958,252 +958,252 @@ function checkRectangleDrawing(
 /**
  * Tests for {@link State} v0.1 containing a line.
  *
- * @function module:tests/state~read-v0.1-state-line
+ * @function module:tests/state~read-v01-state-line
  */
-QUnit.test('Read v0.1 state line', function (assert) {
+QUnit.test('Read v01 state line', function (assert) {
   testState(v01Line, '0.1', 'line', assert);
 });
 
 /**
  * Tests for {@link State} v0.1 containing a roi.
  *
- * @function module:tests/state~read-v0.1-state-roi
+ * @function module:tests/state~read-v01-state-roi
  */
-QUnit.test('Read v0.1 state roi', function (assert) {
+QUnit.test('Read v01 state roi', function (assert) {
   testState(v01Roi, '0.1', 'roi', assert);
 });
 
 /**
  * Tests for {@link State} v0.1 containing an ellipse.
  *
- * @function module:tests/state~read-v0.1-state-ellipse
+ * @function module:tests/state~read-v01-state-ellipse
  */
-QUnit.test('Read v0.1 state ellipse', function (assert) {
+QUnit.test('Read v01 state ellipse', function (assert) {
   testState(v01Ellipse, '0.1', 'ellipse', assert);
 });
 
 /**
  * Tests for {@link State} v0.1 containing a protractor.
  *
- * @function module:tests/state~read-v0.1-state-protractor
+ * @function module:tests/state~read-v01-state-protractor
  */
-QUnit.test('Read v0.1 state protractor', function (assert) {
+QUnit.test('Read v01 state protractor', function (assert) {
   testState(v01Protractor, '0.1', 'protractor', assert);
 });
 
 /**
  * Tests for {@link State} v0.1 containing a rectangle.
  *
- * @function module:tests/state~read-v0.1-state-rectangle
+ * @function module:tests/state~read-v01-state-rectangle
  */
-QUnit.test('Read v0.1 state rectangle', function (assert) {
+QUnit.test('Read v01 state rectangle', function (assert) {
   testState(v01Rectangle, '0.1', 'rectangle', assert);
 });
 
 /**
  * Tests for {@link State} v0.1 containing a multi slice ruler.
  *
- * @function module:tests/state~read-v0.1-state-line-multi-slice
+ * @function module:tests/state~read-v01-state-line-multi-slice
  */
-QUnit.test('Read v0.1 state line multi-slice', function (assert) {
+QUnit.test('Read v01 state line multi-slice', function (assert) {
   testState(v01LineMulti, '0.1', 'line_multi-slice', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing an arrow.
  *
- * @function module:tests/state~read-v0.2-state-arrow
+ * @function module:tests/state~read-v02-state-arrow
  */
-QUnit.test('Read v0.2 state arrow', function (assert) {
+QUnit.test('Read v02 state arrow', function (assert) {
   testState(v02Arrow, '0.2', 'arrow', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing a ruler.
  *
- * @function module:tests/state~read-v0.2-state-ruler
+ * @function module:tests/state~read-v02-state-ruler
  */
-QUnit.test('Read v0.2 state ruler', function (assert) {
+QUnit.test('Read v02 state ruler', function (assert) {
   testState(v02Ruler, '0.2', 'ruler', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing a roi.
  *
- * @function module:tests/state~read-v0.2-state-roi
+ * @function module:tests/state~read-v02-state-roi
  */
-QUnit.test('Read v0.2 state roi', function (assert) {
+QUnit.test('Read v02 state roi', function (assert) {
   testState(v02Roi, '0.2', 'roi', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing a hand draw.
  *
- * @function module:tests/state~read-v0.2-state-hand
+ * @function module:tests/state~read-v02-state-hand
  */
-QUnit.test('Read v0.2 state hand', function (assert) {
+QUnit.test('Read v02 state hand', function (assert) {
   testState(v02Hand, '0.2', 'hand', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing an ellipse.
  *
- * @function module:tests/state~read-v0.2-state-ellipse
+ * @function module:tests/state~read-v02-state-ellipse
  */
-QUnit.test('Read v0.2 state ellipse', function (assert) {
+QUnit.test('Read v02 state ellipse', function (assert) {
   testState(v02Ellipse, '0.2', 'ellipse', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing a protractor.
  *
- * @function module:tests/state~read-v0.2-state-protractor
+ * @function module:tests/state~read-v02-state-protractor
  */
-QUnit.test('Read v0.2 state protractor', function (assert) {
+QUnit.test('Read v02 state protractor', function (assert) {
   testState(v02Protractor, '0.2', 'protractor', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing a rectangle.
  *
- * @function module:tests/state~read-v0.2-state-rectangle
+ * @function module:tests/state~read-v02-state-rectangle
  */
-QUnit.test('Read v0.2 state rectangle', function (assert) {
+QUnit.test('Read v02 state rectangle', function (assert) {
   testState(v02Rectangle, '0.2', 'rectangle', assert);
 });
 
 /**
  * Tests for {@link State} v0.2 containing a multi slice ruler.
  *
- * @function module:tests/state~read-v0.2-state-ruler-multi-slice
+ * @function module:tests/state~read-v02-state-ruler-multi-slice
  */
-QUnit.test('Read v0.2 state ruler multi-slice', function (assert) {
+QUnit.test('Read v02 state ruler multi-slice', function (assert) {
   testState(v02RulerMulti, '0.2', 'ruler_multi-slice', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing an arrow.
  *
- * @function module:tests/state~read-v0.3-state-arrow
+ * @function module:tests/state~read-v03-state-arrow
  */
-QUnit.test('Read v0.3 state arrow', function (assert) {
+QUnit.test('Read v03 state arrow', function (assert) {
   testState(v03Arrow, '0.3', 'arrow', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing a ruler.
  *
- * @function module:tests/state~read-v0.3-state-ruler
+ * @function module:tests/state~read-v03-state-ruler
  */
-QUnit.test('Read v0.3 state ruler', function (assert) {
+QUnit.test('Read v03 state ruler', function (assert) {
   testState(v03Ruler, '0.3', 'ruler', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing a roi.
  *
- * @function module:tests/state~read-v0.3-state-roi
+ * @function module:tests/state~read-v03-state-roi
  */
-QUnit.test('Read v0.3 state roi', function (assert) {
+QUnit.test('Read v03 state roi', function (assert) {
   testState(v03Roi, '0.3', 'roi', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing a hand draw.
  *
- * @function module:tests/state~read-v0.3-state-hand
+ * @function module:tests/state~read-v03-state-hand
  */
-QUnit.test('Read v0.3 state hand', function (assert) {
+QUnit.test('Read v03 state hand', function (assert) {
   testState(v03Hand, '0.3', 'hand', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing an ellipse.
  *
- * @function module:tests/state~read-v0.3-state-ellipse
+ * @function module:tests/state~read-v03-state-ellipse
  */
-QUnit.test('Read v0.3 state ellipse', function (assert) {
+QUnit.test('Read v03 state ellipse', function (assert) {
   testState(v03Ellipse, '0.3', 'ellipse', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing a protractor.
  *
- * @function module:tests/state~read-v0.3-state-protractor
+ * @function module:tests/state~read-v03-state-protractor
  */
-QUnit.test('Read v0.3 state protractor', function (assert) {
+QUnit.test('Read v03 state protractor', function (assert) {
   testState(v03Protractor, '0.3', 'protractor', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing a rectangle.
  *
- * @function module:tests/state~read-v0.3-state-rectangle
+ * @function module:tests/state~read-v03-state-rectangle
  */
-QUnit.test('Read v0.3 state rectangle', function (assert) {
+QUnit.test('Read v03 state rectangle', function (assert) {
   testState(v03Rectangle, '0.3', 'rectangle', assert);
 });
 
 /**
  * Tests for {@link State} v0.3 containing a multi slice ruler.
  *
- * @function module:tests/state~read-v0.3-state-ruler-multi-slice
+ * @function module:tests/state~read-v03-state-ruler-multi-slice
  */
-QUnit.test('Read v0.3 state ruler multi-slice', function (assert) {
+QUnit.test('Read v03 state ruler multi-slice', function (assert) {
   testState(v03RulerMulti, '0.3', 'ruler_multi-slice', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing an arrow.
  *
- * @function module:tests/state~read-v0.4-state-arrow
+ * @function module:tests/state~read-v04-state-arrow
  */
-QUnit.test('Read v0.4 state arrow', function (assert) {
+QUnit.test('Read v04 state arrow', function (assert) {
   testState(v04Arrow, '0.4', 'arrow', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing a ruler.
  *
- * @function module:tests/state~read-v0.4-state-ruler
+ * @function module:tests/state~read-v04-state-ruler
  */
-QUnit.test('Read v0.4 state ruler', function (assert) {
+QUnit.test('Read v04 state ruler', function (assert) {
   testState(v04Ruler, '0.4', 'ruler', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing a roi.
  *
- * @function module:tests/state~read-v0.4-state-roi
+ * @function module:tests/state~read-v04-state-roi
  */
-QUnit.test('Read v0.4 state roi', function (assert) {
+QUnit.test('Read v04 state roi', function (assert) {
   testState(v04Roi, '0.4', 'roi', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing a hand draw.
  *
- * @function module:tests/state~read-v0.4-state-hand
+ * @function module:tests/state~read-v04-state-hand
  */
-QUnit.test('Read v0.4 state hand', function (assert) {
+QUnit.test('Read v04 state hand', function (assert) {
   testState(v04Hand, '0.4', 'hand', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing an ellipse.
  *
- * @function module:tests/state~read-v0.4-state-ellipse
+ * @function module:tests/state~read-v04-state-ellipse
  */
-QUnit.test('Read v0.4 state ellipse', function (assert) {
+QUnit.test('Read v04 state ellipse', function (assert) {
   testState(v04Ellipse, '0.4', 'ellipse', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing a protractor.
  *
- * @function module:tests/state~read-v0.4-state-protractor
+ * @function module:tests/state~read-v04-state-protractor
  */
-QUnit.test('Read v0.4 state protractor', function (assert) {
+QUnit.test('Read v04 state protractor', function (assert) {
   testState(v04Protractor, '0.4', 'protractor', assert);
 });
 
@@ -1211,72 +1211,72 @@ QUnit.test('Read v0.4 state protractor', function (assert) {
 /**
  * Tests for {@link State} v0.4 containing a rectangle.
  *
- * @function module:tests/state~read-v0.4-state-rectangle
+ * @function module:tests/state~read-v04-state-rectangle
  */
-QUnit.test('Read v0.4 state rectangle', function (assert) {
+QUnit.test('Read v04 state rectangle', function (assert) {
   testState(v04Rectangle, '0.4', 'rectangle', assert);
 });
 
 /**
  * Tests for {@link State} v0.4 containing a multi slice ruler.
  *
- * @function module:tests/state~read-v0.4-state-ruler-multi-slice
+ * @function module:tests/state~read-v04-state-ruler-multi-slice
  */
-QUnit.test('Read v0.4 state ruler multi-slice', function (assert) {
+QUnit.test('Read v04 state ruler multi-slice', function (assert) {
   testState(v04RulerMulti, '0.4', 'ruler_multi-slice', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing an arrow.
  *
- * @function module:tests/state~read-v0.5-state-arrow
+ * @function module:tests/state~read-v05-state-arrow
  */
-QUnit.test('Read v0.5 state arrow', function (assert) {
+QUnit.test('Read v05 state arrow', function (assert) {
   testState(v05Arrow, '0.5', 'arrow', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing a ruler.
  *
- * @function module:tests/state~read-v0.5-state-ruler
+ * @function module:tests/state~read-v05-state-ruler
  */
-QUnit.test('Read v0.5 state ruler', function (assert) {
+QUnit.test('Read v05 state ruler', function (assert) {
   testState(v05Ruler, '0.5', 'ruler', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing a roi.
  *
- * @function module:tests/state~read-v0.5-state-roi
+ * @function module:tests/state~read-v05-state-roi
  */
-QUnit.test('Read v0.5 state roi', function (assert) {
+QUnit.test('Read v05 state roi', function (assert) {
   testState(v05Roi, '0.5', 'roi', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing a hand draw.
  *
- * @function module:tests/state~read-v0.5-state-hand
+ * @function module:tests/state~read-v05-state-hand
  */
-QUnit.test('Read v0.5 state hand', function (assert) {
+QUnit.test('Read v05 state hand', function (assert) {
   testState(v05Hand, '0.5', 'hand', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing an ellipse.
  *
- * @function module:tests/state~read-v0.5-state-ellipse
+ * @function module:tests/state~read-v05-state-ellipse
  */
-QUnit.test('Read v0.5 state ellipse', function (assert) {
+QUnit.test('Read v05 state ellipse', function (assert) {
   testState(v05Ellipse, '0.5', 'ellipse', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing a protractor.
  *
- * @function module:tests/state~read-v0.5-state-protractor
+ * @function module:tests/state~read-v05-state-protractor
  */
-QUnit.test('Read v0.5 state protractor', function (assert) {
+QUnit.test('Read v05 state protractor', function (assert) {
   testState(v05Protractor, '0.5', 'protractor', assert);
 });
 
@@ -1284,17 +1284,17 @@ QUnit.test('Read v0.5 state protractor', function (assert) {
 /**
  * Tests for {@link State} v0.5 containing a rectangle.
  *
- * @function module:tests/state~read-v0.5-state-rectangle
+ * @function module:tests/state~read-v05-state-rectangle
  */
-QUnit.test('Read v0.5 state rectangle', function (assert) {
+QUnit.test('Read v05 state rectangle', function (assert) {
   testState(v05Rectangle, '0.5', 'rectangle', assert);
 });
 
 /**
  * Tests for {@link State} v0.5 containing a multi slice ruler.
  *
- * @function module:tests/state~read-v0.5-state-ruler-multi-slice
+ * @function module:tests/state~read-v05-state-ruler-multi-slice
  */
-QUnit.test('Read v0.5 state ruler multi-slice', function (assert) {
+QUnit.test('Read v05 state ruler multi-slice', function (assert) {
   testState(v05RulerMulti, '0.5', 'ruler_multi-slice', assert);
 });
