@@ -438,7 +438,7 @@ export class ViewController {
   }
 
   /**
-   * Get the image size.
+   * Get the oriented image size.
    *
    * @returns {Size} The size.
    */
