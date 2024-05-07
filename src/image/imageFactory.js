@@ -278,6 +278,7 @@ export class ImageFactory {
     meta.DeviceSerialNumber = safeGet('00181000');
     meta.SoftwareVersions = safeGet('00181020');
 
+    meta.ImageOrientationPatient = safeGet('00200037');
     meta.FrameOfReferenceUID = safeGet('00200052');
 
     // PixelRepresentation -> is signed
