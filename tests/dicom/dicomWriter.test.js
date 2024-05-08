@@ -358,38 +358,42 @@ function generateGradSquare(tags) {
     }
   }
 
-  const halfCols = numberOfRows * 0.5;
-  const halfRows = numberOfColumns * 0.5;
+  // full grad square
+  // const borderI = 0;
+  // const borderJ = 0;
+  // ~centered grad square
+  const borderI = Math.ceil(numberOfColumns * 0.25);
+  const borderJ = Math.ceil(numberOfRows * 0.25);
+
+  const minI = borderI;
+  const minJ = borderJ;
+  const maxI = numberOfColumns - borderI;
+  const maxJ = numberOfRows - borderJ;
 
   const background = 0;
-  const maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
-  const max = 100;
+  const max = 255;
+  let maxNoBounds = 1;
 
-  let getFunc;
-  if (isRGB) {
-    getFunc = function (i, j) {
-      let value = background;
-      const jc = Math.abs(j - halfRows);
-      const ic = Math.abs(i - halfCols);
-      if (jc < halfRows / 2 && ic < halfCols / 2) {
-        value += (i * j) * (max / maxNoBounds);
-      }
-      if (value > 255) {
-        value = 200;
-      }
-      return [0, value, value];
-    };
-  } else {
-    getFunc = function (i, j) {
-      let value = 0;
-      const jc = Math.abs(j - halfRows);
-      const ic = Math.abs(i - halfCols);
-      if (jc < halfRows / 2 && ic < halfCols / 2) {
-        value += (i * j) * (max / maxNoBounds);
-      }
-      return [value];
-    };
-  }
+  const getValue = function (i, j) {
+    let value = background;
+    if (i >= minI && i <= maxI &&
+      j >= minJ && j <= maxJ) {
+      value += Math.round((i + j) * (max / maxNoBounds));
+    }
+    return [value];
+  };
+
+  const getRGB = function (i, j) {
+    let value = getValue(i, j);
+    if (value > 255) {
+      value = 200;
+    }
+    return [value, 0, 0];
+  };
+
+  maxNoBounds = getValue(maxI, maxJ) / max;
+
+  const getFunc = isRGB ? getRGB : getValue;
 
   // main loop
   let offset = 0;
