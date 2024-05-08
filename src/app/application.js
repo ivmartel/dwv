@@ -1835,8 +1835,10 @@ export class App {
     // listen to image changes
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
     this.#dataController.addEventListener('imagechange', (event) => {
-      viewLayer.onimagechange(event);
-      this.render(event.dataid);
+      if (event.dataid === dataId) {
+        viewLayer.onimagechange(event);
+        this.render(event.dataid, [viewConfig]);
+      }
     });
 
     // optional draw layer
