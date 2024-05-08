@@ -967,11 +967,12 @@ export class LayerGroup {
         const origin = vc.getOrigin(position);
 
         if (typeof baseViewLayerOrigin === 'undefined') {
+          // first view layer, store origins
           baseViewLayerOrigin0 = origin0;
           baseViewLayerOrigin = origin;
-          const zeroOffset = new Vector3D(0, 0, 0);
-          hasSetOffset =
-            layer.setBaseOffset(zeroOffset, zeroOffset);
+          // no offset
+          scrollOffset = new Vector3D(0, 0, 0);
+          planeOffset = new Vector3D(0, 0, 0);
         } else {
           if (vc.isPositionInBounds(position) &&
             typeof origin !== 'undefined') {
@@ -985,12 +986,20 @@ export class LayerGroup {
           }
         }
       }
+
       // also set for draw layers
       // (should be next after a view layer)
       if (typeof scrollOffset !== 'undefined' &&
         typeof planeOffset !== 'undefined') {
         hasSetOffset =
           layer.setBaseOffset(scrollOffset, planeOffset);
+      }
+
+      // reset to not propagate after draw layer
+      // TODO: revise, could be unstable...
+      if (layer instanceof DrawLayer) {
+        scrollOffset = undefined;
+        planeOffset = undefined;
       }
 
       // update position (triggers redraw)
