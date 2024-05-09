@@ -132,7 +132,7 @@ export class DataController {
       dataid: dataId
     });
     // listen to image change
-    image.addEventListener('imagechange', this.#getFireEvent(dataId));
+    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
   }
 
   /**
@@ -149,7 +149,7 @@ export class DataController {
     // store the new image
     this.#dataList[dataId] = new ImageData(image, meta);
     // listen to image change
-    image.addEventListener('imagechange', this.#getFireEvent(dataId));
+    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
   }
 
   /**
@@ -161,7 +161,7 @@ export class DataController {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       // stop listeners
       this.#dataList[dataId].image.removeEventListener(
-        'imagechange', this.#getFireEvent(dataId));
+        'imagecontentchange', this.#getFireEvent(dataId));
       // fire an image remove event
       this.#fireEvent({
         type: 'imageremove',

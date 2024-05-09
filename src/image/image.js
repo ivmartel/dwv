@@ -972,7 +972,7 @@ export class Image {
    *
    * @param {number[]} offsets List of offsets where to set the data.
    * @param {number|RGB} value The value to set at the given offsets.
-   * @fires Image#imagechange
+   * @fires Image#imagecontentchange
    */
   setAtOffsets(offsets, value) {
     // value to array
@@ -1000,8 +1000,8 @@ export class Image {
         this.#buffer[offset + j] = bufferValue[j];
       }
     }
-    // fire imagechange
-    this.#fireEvent({type: 'imagechange'});
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**
@@ -1012,7 +1012,7 @@ export class Image {
    * @param {RGB} value The value to set at the given offsets.
    * @returns {Array} A list of objects representing the original values before
    *  replacing them.
-   * @fires Image#imagechange
+   * @fires Image#imagecontentchange
    */
   setAtOffsetsAndGetOriginals(offsetsLists, value) {
     const originalColoursLists = [];
@@ -1058,8 +1058,8 @@ export class Image {
       }
       originalColoursLists.push(originalColours);
     }
-    // fire imagechange
-    this.#fireEvent({type: 'imagechange'});
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
     return originalColoursLists;
   }
 
@@ -1069,7 +1069,7 @@ export class Image {
    * @param {number[][]} offsetsLists List of offset lists
    *   where to set the data.
    * @param {RGB|Array} value The value to set at the given offsets.
-   * @fires Image#imagechange
+   * @fires Image#imagecontentchange
    */
   setAtOffsetsWithIterator(offsetsLists, value) {
     for (let j = 0; j < offsetsLists.length; ++j) {
@@ -1101,10 +1101,10 @@ export class Image {
     /**
      * Image change event.
      *
-     * @event Image#imagechange
+     * @event Image#imagecontentchange
      * @type {object}
      */
-    this.#fireEvent({type: 'imagechange'});
+    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**

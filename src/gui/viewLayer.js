@@ -277,12 +277,12 @@ export class ViewLayer {
   };
 
   /**
-   * Handle an image change event.
+   * Handle an image content change event.
    *
    * @param {object} event The event.
    * @function
    */
-  onimagechange = (event) => {
+  onimagecontentchange = (event) => {
     // event.value = [index]
     if (this.#dataId === event.dataid) {
       this.#isValidPosition = this.#viewController.isPositionInBounds();
