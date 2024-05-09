@@ -1972,6 +1972,7 @@ declare class Image_2 {
      * Append a slice to the image.
      *
      * @param {Image} rhs The slice to append.
+     * @fires Image#imagegeometrychange
      */
     appendSlice(rhs: Image_2): void;
     /**
@@ -4611,6 +4612,13 @@ export declare class ViewLayer {
      */
     onimagecontentchange: (event: object) => void;
     /**
+     * Handle an image change event.
+     *
+     * @param {object} event The event.
+     * @function
+     */
+    onimagegeometrychange: (event: object) => void;
+    /**
      * Get the id of the layer.
      *
      * @returns {string} The string id.
@@ -4680,9 +4688,11 @@ export declare class ViewLayer {
      *
      * @param {Vector3D} scrollOffset The scroll offset vector.
      * @param {Vector3D} planeOffset The plane offset vector.
+     * @param {Point3D} [layerGroupOrigin] The layer group origin.
+     * @param {Point3D} [layerGroupOrigin0] The layer group first origin.
      * @returns {boolean} True if the offset was updated.
      */
-    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
+    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
     /**
      * Set the layer offset.
      *
