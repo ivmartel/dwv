@@ -977,11 +977,12 @@ export class ViewLayer {
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
     initScale(newScale: Scalar3D, zoomOffset: Scalar2D): void;
     isVisible(): boolean;
-    onimagechange: (event: object) => void;
+    onimagecontentchange: (event: object) => void;
+    onimagegeometrychange: (event: object) => void;
     onimageset: (event: object) => void;
     planePosToDisplay(point2D: Point2D): Point2D;
     removeEventListener(type: string, callback: Function): void;
-    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
+    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;

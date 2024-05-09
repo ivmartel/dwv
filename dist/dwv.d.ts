@@ -1972,6 +1972,7 @@ declare class Image_2 {
      * Append a slice to the image.
      *
      * @param {Image} rhs The slice to append.
+     * @fires Image#imagegeometrychange
      */
     appendSlice(rhs: Image_2): void;
     /**
@@ -2027,7 +2028,7 @@ declare class Image_2 {
      *
      * @param {number[]} offsets List of offsets where to set the data.
      * @param {number|RGB} value The value to set at the given offsets.
-     * @fires Image#imagechange
+     * @fires Image#imagecontentchange
      */
     setAtOffsets(offsets: number[], value: number | RGB): void;
     /**
@@ -2038,7 +2039,7 @@ declare class Image_2 {
      * @param {RGB} value The value to set at the given offsets.
      * @returns {Array} A list of objects representing the original values before
      *  replacing them.
-     * @fires Image#imagechange
+     * @fires Image#imagecontentchange
      */
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
     /**
@@ -2047,7 +2048,7 @@ declare class Image_2 {
      * @param {number[][]} offsetsLists List of offset lists
      *   where to set the data.
      * @param {RGB|Array} value The value to set at the given offsets.
-     * @fires Image#imagechange
+     * @fires Image#imagecontentchange
      */
     setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
     /**
@@ -4333,7 +4334,7 @@ export declare class ViewController {
      */
     canScroll(): boolean;
     /**
-     * Get the image size.
+     * Get the oriented image size.
      *
      * @returns {Size} The size.
      */
@@ -4604,12 +4605,19 @@ export declare class ViewLayer {
      */
     onimageset: (event: object) => void;
     /**
+     * Handle an image content change event.
+     *
+     * @param {object} event The event.
+     * @function
+     */
+    onimagecontentchange: (event: object) => void;
+    /**
      * Handle an image change event.
      *
      * @param {object} event The event.
      * @function
      */
-    onimagechange: (event: object) => void;
+    onimagegeometrychange: (event: object) => void;
     /**
      * Get the id of the layer.
      *
@@ -4680,9 +4688,11 @@ export declare class ViewLayer {
      *
      * @param {Vector3D} scrollOffset The scroll offset vector.
      * @param {Vector3D} planeOffset The plane offset vector.
+     * @param {Point3D} [layerGroupOrigin] The layer group origin.
+     * @param {Point3D} [layerGroupOrigin0] The layer group first origin.
      * @returns {boolean} True if the offset was updated.
      */
-    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
+    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
     /**
      * Set the layer offset.
      *
