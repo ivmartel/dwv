@@ -992,7 +992,10 @@ export class LayerGroup {
       if (typeof scrollOffset !== 'undefined' &&
         typeof planeOffset !== 'undefined') {
         hasSetOffset =
-          layer.setBaseOffset(scrollOffset, planeOffset);
+          layer.setBaseOffset(
+            scrollOffset, planeOffset,
+            baseViewLayerOrigin, baseViewLayerOrigin0
+          );
       }
 
       // reset to not propagate after draw layer

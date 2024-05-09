@@ -693,6 +693,7 @@ export class Image {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
+   * @fires Image#imagegeometrychange
    */
   appendSlice(rhs) {
     // check input
@@ -850,6 +851,13 @@ export class Image {
         }
       }
     }
+    /**
+     * Image geometry change event.
+     *
+     * @event Image#imagegeometrychange
+     * @type {object}
+     */
+    this.#fireEvent({type: 'imagegeometrychange'});
   }
 
   /**

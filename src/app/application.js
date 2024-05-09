@@ -1840,6 +1840,15 @@ export class App {
         this.render(event.dataid, [viewConfig]);
       }
     });
+    this.#dataController.addEventListener('imagegeometrychange', (event) => {
+      if (event.dataid === dataId) {
+        viewLayer.onimagegeometrychange(event);
+        if (typeof event.rerender !== 'undefined' && event.rerender) {
+          this.render(event.dataid, [viewConfig]);
+          delete event.rerender;
+        }
+      }
+    });
 
     // optional draw layer
     let drawLayer;

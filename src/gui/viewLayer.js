@@ -177,6 +177,20 @@ export class ViewLayer {
   #imageSmoothing = false;
 
   /**
+   * Layer group origin.
+   *
+   * @type {Point3D}
+   */
+  #layerGroupOrigin;
+
+  /**
+   * Layer group first origin.
+   *
+   * @type {Point3D}
+   */
+  #layerGroupOrigin0;
+
+  /**
    * @param {HTMLElement} containerDiv The layer div, its id will be used
    *   as this layer id.
    */
@@ -287,6 +301,40 @@ export class ViewLayer {
     if (this.#dataId === event.dataid) {
       this.#isValidPosition = this.#viewController.isPositionInBounds();
       this.#needsDataUpdate = true;
+    }
+  };
+
+  /**
+   * Handle an image change event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimagegeometrychange = (event) => {
+    // event.value = [index]
+    if (this.#dataId === event.dataid) {
+      const vcSize = this.#viewController.getImageSize().get2D();
+      if (this.#baseSize.x !== vcSize.x ||
+        this.#baseSize.y !== vcSize.y) {
+        // size changed, recalculate base offset
+        // in case origin changed
+        if (typeof this.#layerGroupOrigin !== 'undefined' &&
+          typeof this.#layerGroupOrigin0 !== 'undefined') {
+          const origin0 = this.#viewController.getOrigin();
+          const scrollOffset = this.#layerGroupOrigin0.minus(origin0);
+          const origin = this.#viewController.getOrigin(
+            this.#viewController.getCurrentPosition()
+          );
+          const planeOffset = this.#layerGroupOrigin.minus(origin);
+          this.setBaseOffset(scrollOffset, planeOffset);
+        }
+        // update base size
+        this.#setBaseSize(vcSize);
+        // flag redraw
+        this.#needsDataUpdate = true;
+        // re-render flag
+        event.rerender = true;
+      }
     }
   };
 
@@ -484,9 +532,13 @@ export class ViewLayer {
    *
    * @param {Vector3D} scrollOffset The scroll offset vector.
    * @param {Vector3D} planeOffset The plane offset vector.
+   * @param {Point3D} [layerGroupOrigin] The layer group origin.
+   * @param {Point3D} [layerGroupOrigin0] The layer group first origin.
    * @returns {boolean} True if the offset was updated.
    */
-  setBaseOffset(scrollOffset, planeOffset) {
+  setBaseOffset(
+    scrollOffset, planeOffset,
+    layerGroupOrigin, layerGroupOrigin0) {
     const helper = this.#viewController.getPlaneHelper();
     const scrollIndex = helper.getNativeScrollIndex();
     const newOffset = helper.getPlaneOffsetFromOffset3D({
@@ -496,6 +548,12 @@ export class ViewLayer {
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
       this.#baseOffset.y !== newOffset.y;
+    // store layer group origins
+    if (typeof layerGroupOrigin !== 'undefined' &&
+      typeof layerGroupOrigin0 !== 'undefined') {
+      this.#layerGroupOrigin = layerGroupOrigin;
+      this.#layerGroupOrigin0 = layerGroupOrigin0;
+    }
     // reset offset if needed
     if (needsUpdate) {
       this.#offset = {

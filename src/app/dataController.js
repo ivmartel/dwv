@@ -133,6 +133,7 @@ export class DataController {
     });
     // listen to image change
     image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
+    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
   }
 
   /**
@@ -150,6 +151,7 @@ export class DataController {
     this.#dataList[dataId] = new ImageData(image, meta);
     // listen to image change
     image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
+    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
   }
 
   /**
@@ -162,6 +164,8 @@ export class DataController {
       // stop listeners
       this.#dataList[dataId].image.removeEventListener(
         'imagecontentchange', this.#getFireEvent(dataId));
+      this.#dataList[dataId].image.removeEventListener(
+        'imagegeometrychange', this.#getFireEvent(dataId));
       // fire an image remove event
       this.#fireEvent({
         type: 'imageremove',
