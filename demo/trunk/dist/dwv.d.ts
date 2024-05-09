@@ -2027,7 +2027,7 @@ declare class Image_2 {
      *
      * @param {number[]} offsets List of offsets where to set the data.
      * @param {number|RGB} value The value to set at the given offsets.
-     * @fires Image#imagechange
+     * @fires Image#imagecontentchange
      */
     setAtOffsets(offsets: number[], value: number | RGB): void;
     /**
@@ -2038,7 +2038,7 @@ declare class Image_2 {
      * @param {RGB} value The value to set at the given offsets.
      * @returns {Array} A list of objects representing the original values before
      *  replacing them.
-     * @fires Image#imagechange
+     * @fires Image#imagecontentchange
      */
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
     /**
@@ -2047,7 +2047,7 @@ declare class Image_2 {
      * @param {number[][]} offsetsLists List of offset lists
      *   where to set the data.
      * @param {RGB|Array} value The value to set at the given offsets.
-     * @fires Image#imagechange
+     * @fires Image#imagecontentchange
      */
     setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
     /**
@@ -4604,12 +4604,12 @@ export declare class ViewLayer {
      */
     onimageset: (event: object) => void;
     /**
-     * Handle an image change event.
+     * Handle an image content change event.
      *
      * @param {object} event The event.
      * @function
      */
-    onimagechange: (event: object) => void;
+    onimagecontentchange: (event: object) => void;
     /**
      * Get the id of the layer.
      *
