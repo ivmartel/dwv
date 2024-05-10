@@ -21,6 +21,7 @@ import {View} from '../image/view';
 import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
 import {Scalar2D} from '../math/scalar';
+import {Matrix33} from '../math/matrix';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -328,6 +329,41 @@ export class ViewController {
   }
 
   /**
+   * Extract a slice from an image at the given index and orientation.
+   *
+   * @param {Image} image The image to parse.
+   * @param {Index} index The current index.
+   * @param {boolean} isRescaled Flag for rescaled values (default false).
+   * @param {Matrix33} orientation The desired orientation.
+   * @returns {Image} The extracted slice.
+   */
+  #getSlice(image, index, isRescaled, orientation) {
+    // generate slice values
+    const sliceIter = getSliceIterator(
+      image,
+      index,
+      isRescaled,
+      orientation
+    );
+    const sliceValues = getIteratorValues(sliceIter);
+    // oriented geometry
+    const orientedSize = image.getGeometry().getSize(orientation);
+    const sizeValues = orientedSize.getValues();
+    sizeValues[2] = 1;
+    const sliceSize = new Size(sizeValues);
+    const orientedSpacing = image.getGeometry().getSpacing(orientation);
+    const spacingValues = orientedSpacing.getValues();
+    spacingValues[2] = 1;
+    const sliceSpacing = new Spacing(spacingValues);
+    const sliceOrigin = new Point3D(0, 0, 0);
+    const sliceGeometry =
+      new Geometry(sliceOrigin, sliceSize, sliceSpacing);
+    // slice image
+    // @ts-ignore
+    return new Image(sliceGeometry, sliceValues);
+  }
+
+  /**
    * Get some values from the associated image in a region.
    *
    * @param {Point2D} min Minimum point.
@@ -337,42 +373,20 @@ export class ViewController {
   getImageRegionValues(min, max) {
     let image = this.#view.getImage();
     const orientation = this.#view.getOrientation();
-    let position = this.getCurrentIndex();
+    let currentIndex = this.getCurrentIndex();
     let rescaled = true;
 
-    // created oriented slice if needed
+    // create oriented slice if needed
     if (!isIdentityMat33(orientation)) {
-      // generate slice values
-      const sliceIter = getSliceIterator(
-        image,
-        position,
-        rescaled,
-        orientation
-      );
-      const sliceValues = getIteratorValues(sliceIter);
-      // oriented geometry
-      const orientedSize = image.getGeometry().getSize(orientation);
-      const sizeValues = orientedSize.getValues();
-      sizeValues[2] = 1;
-      const sliceSize = new Size(sizeValues);
-      const orientedSpacing = image.getGeometry().getSpacing(orientation);
-      const spacingValues = orientedSpacing.getValues();
-      spacingValues[2] = 1;
-      const sliceSpacing = new Spacing(spacingValues);
-      const sliceOrigin = new Point3D(0, 0, 0);
-      const sliceGeometry =
-        new Geometry(sliceOrigin, sliceSize, sliceSpacing);
-      // slice image
-      // @ts-ignore
-      image = new Image(sliceGeometry, sliceValues);
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
       // update position
-      position = new Index([0, 0, 0]);
+      currentIndex = new Index([0, 0, 0]);
       rescaled = false;
     }
 
     // get region values
     const iter = getRegionSliceIterator(
-      image, position, rescaled, min, max);
+      image, currentIndex, rescaled, min, max);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
@@ -387,11 +401,22 @@ export class ViewController {
    * @returns {Array} A list of values.
    */
   getImageVariableRegionValues(regions) {
+    let image = this.#view.getImage();
+    const orientation = this.#view.getOrientation();
+    let currentIndex = this.getCurrentIndex();
+    let rescaled = true;
+
+    // create oriented slice if needed
+    if (!isIdentityMat33(orientation)) {
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      // update position
+      currentIndex = new Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
     const iter = getVariableRegionSliceIterator(
-      this.#view.getImage(),
-      this.getCurrentIndex(),
-      true, regions
-    );
+      image, currentIndex, rescaled, regions);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
