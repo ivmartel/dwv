@@ -15,18 +15,22 @@ const BinaryPixGenerator = function (options) {
   const numberOfRows = options.numberOfRows;
   const numberOfFrames = options.numberOfFrames;
 
-  const halfCols = numberOfColumns * 0.5;
-  const halfRows = numberOfRows * 0.5;
+  const borderI = Math.ceil(numberOfColumns * 0.5);
+  const borderJ = Math.ceil(numberOfRows * 0.5);
+
+  const minI = borderI;
+  const minJ = borderJ;
+  const maxI = numberOfColumns - borderI;
+  const maxJ = numberOfRows - borderJ;
+
+  const inRange = function (i, j) {
+    return i >= minI && i < maxI &&
+      j >= minJ && j < maxJ;
+  };
 
   this.generate = function (pixelBuffer /*, sliceNumber*/) {
     const getFunc = function (i, j) {
-      let value = 0;
-      const jc = Math.abs(j - halfRows);
-      const ic = Math.abs(i - halfCols);
-      if (jc < halfRows / 2 && ic < halfCols / 2) {
-        value = 1;
-      }
-      return value;
+      return inRange(i, j) ? 1 : 0;
     };
 
     // main loop
