@@ -3904,7 +3904,7 @@ export declare class View {
      */
     init(): void;
     /**
-     * Set the initial index to 0.
+     * Set the initial index to the middle position.
      */
     setInitialIndex(): void;
     /**
