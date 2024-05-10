@@ -153,7 +153,7 @@ export class Rectangle {
   /**
    * Get the rounded limits of the rectangle.
    *
-   * @returns {object} The rounded limits.
+   * @returns {object} The rounded limits as {min, max} (Point2D).
    */
   getRound() {
     const roundBegin = new Point2D(

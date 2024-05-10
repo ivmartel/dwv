@@ -397,7 +397,7 @@ export class ViewController {
   /**
    * Get some values from the associated image in variable regions.
    *
-   * @param {Array} regions A list of regions.
+   * @param {number[][][]} regions A list of [x, y] pairs (min, max).
    * @returns {Array} A list of values.
    */
   getImageVariableRegionValues(regions) {

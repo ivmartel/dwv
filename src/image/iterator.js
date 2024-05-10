@@ -169,7 +169,7 @@ export function rangeRegion(
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
  * @param {number} increment The increment between indicies.
- * @param {Array} regions An array of regions: [off0, size, off1].
+ * @param {number[][]} regions An array of regions: [off0, size, off1].
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
 export function rangeRegions(
@@ -556,7 +556,7 @@ export function getRegionSliceIterator(
  * @param {Image} image The image to parse.
  * @param {Index} index The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
- * @param {Array} regions An array of regions.
+ * @param {number[][][]} regions An array of [x, y] pairs (min, max).
  * @returns {object|undefined} The slice iterator.
  */
 export function getVariableRegionSliceIterator(

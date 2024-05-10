@@ -130,7 +130,8 @@ export class Ellipse {
    * Ellipse formula: x*x / a*a + y*y / b*b = 1
    * => y = (+-)(b/a) * sqrt(a*a - x*x)
    *
-   * @returns {Array} The rounded limits.
+   * @returns {number[][][]} The rounded limits:
+   *  list of [x, y] pairs (min, max).
    */
   getRound() {
     const centerX = this.getCenter().getX();

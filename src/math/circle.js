@@ -111,7 +111,8 @@ export class Circle {
    * Circle formula: x*x + y*y = r*r
    * => y = (+-) sqrt(r*r - x*x)
    *
-   * @returns {Array} The rounded limits.
+   * @returns {number[][][]} The rounded limits:
+   *  list of [x, y] pairs (min, max).
    */
   getRound() {
     const centerX = this.getCenter().getX();
