@@ -227,7 +227,7 @@ export class View {
   }
 
   /**
-   * Set the initial index to 0.
+   * Set the initial index to the middle position.
    */
   setInitialIndex() {
     const geometry = this.#image.getGeometry();
