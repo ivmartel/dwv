@@ -31,6 +31,11 @@ const GradSquarePixGenerator = function (options) {
   const maxJ = numberOfRows - borderJ;
   const maxK = maxI;
 
+  const inRange = function (i, j) {
+    return i >= minI && i <= maxI &&
+      j >= minJ && j <= maxJ;
+  };
+
   const background = 0;
   const max = 255;
   let maxNoBounds = 1;
@@ -66,8 +71,7 @@ const GradSquarePixGenerator = function (options) {
    */
   function getValue(i, j, k) {
     let value = background + k * 2;
-    if (i >= minI && i <= maxI &&
-      j >= minJ && j <= maxJ) {
+    if (inRange(i, j)) {
       value += Math.round((i + j) * (max / maxNoBounds));
     }
     return [value];
