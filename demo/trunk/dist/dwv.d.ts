@@ -2910,7 +2910,7 @@ export declare class Matrix33 {
 /**
  * Number range.
  */
-declare class NumberRange {
+export declare class NumberRange {
     /**
      * @param {number} min The minimum.
      * @param {number} max The maximum.
