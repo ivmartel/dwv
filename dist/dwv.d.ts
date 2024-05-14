@@ -1992,15 +1992,15 @@ declare class Image_2 {
     /**
      * Get the data range.
      *
-     * @returns {object} The data range.
+     * @returns {NumberRange} The data range.
      */
-    getDataRange(): object;
+    getDataRange(): NumberRange;
     /**
      * Get the rescaled data range.
      *
-     * @returns {object} The rescaled data range.
+     * @returns {NumberRange} The rescaled data range.
      */
-    getRescaledDataRange(): object;
+    getRescaledDataRange(): NumberRange;
     /**
      * Get the histogram.
      *
@@ -2905,6 +2905,25 @@ export declare class Matrix33 {
      */
     getThirdColMajorDirection(): number;
     #private;
+}
+
+/**
+ * Number range.
+ */
+export declare class NumberRange {
+    /**
+     * @param {number} min The minimum.
+     * @param {number} max The maximum.
+     */
+    constructor(min: number, max: number);
+    /**
+     * @type {number}
+     */
+    min: number;
+    /**
+     * @type {number}
+     */
+    max: number;
 }
 
 export declare namespace Orientation {
@@ -3904,7 +3923,7 @@ export declare class View {
      */
     init(): void;
     /**
-     * Set the initial index to 0.
+     * Set the initial index to the middle position.
      */
     setInitialIndex(): void;
     /**
@@ -4303,10 +4322,10 @@ export declare class ViewController {
     /**
      * Get some values from the associated image in variable regions.
      *
-     * @param {Array} regions A list of regions.
+     * @param {number[][][]} regions A list of [x, y] pairs (min, max).
      * @returns {Array} A list of values.
      */
-    getImageVariableRegionValues(regions: any[]): any[];
+    getImageVariableRegionValues(regions: number[][][]): any[];
     /**
      * Can the image values be quantified?
      *

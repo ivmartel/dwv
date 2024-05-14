@@ -413,7 +413,7 @@ class Image_2 {
     convolute2D(weights: number[]): Image_2;
     convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
-    getDataRange(): object;
+    getDataRange(): NumberRange;
     getGeometry(): Geometry;
     getHistogram(): any[];
     getImageUid(index?: Index): string;
@@ -424,7 +424,7 @@ class Image_2 {
     getOffsets(value: number | RGB): number[];
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
-    getRescaledDataRange(): object;
+    getRescaledDataRange(): NumberRange;
     getRescaledValue(i: number, j: number, k: number, f: number): number;
     getRescaledValueAtIndex(index: Index): number;
     getRescaledValueAtOffset(offset: number): number;
@@ -622,6 +622,13 @@ export class Matrix33 {
     multiplyPoint3D(point3D: Point3D): Point3D;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
+}
+
+// @public
+export class NumberRange {
+    constructor(min: number, max: number);
+    max: number;
+    min: number;
 }
 
 // @public (undocumented)
@@ -910,7 +917,7 @@ export class ViewController {
     getImageRegionValues(min: Point2D, max: Point2D): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
-    getImageVariableRegionValues(regions: any[]): any[];
+    getImageVariableRegionValues(regions: number[][][]): any[];
     getImageWorldSize(): Scalar2D;
     getIncrementPosition(dim: number): Point;
     getIncrementScrollPosition(): Point;
