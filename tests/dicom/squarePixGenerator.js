@@ -20,40 +20,46 @@ const SquarePixGenerator = function (options) {
 
   const borderI = Math.floor(numberOfColumns / 6);
   const borderJ = Math.floor(numberOfRows / 6);
+  // supposing as many slices as coloums
+  const numberOfSlices = numberOfColumns;
+  const borderK = Math.floor(numberOfSlices / 6);
 
-  const minI0 = borderI;
-  const maxI0 = 2 * borderI;
-  const minI1 = 4 * borderI;
-  const maxI1 = numberOfColumns - borderI;
+  const rangesI = [];
+  rangesI.push(
+    [borderI, 2 * borderI],
+    [4 * borderI, numberOfColumns - borderI]
+  );
 
-  const minJ0 = borderJ;
-  const maxJ0 = 2 * borderJ;
-  const minJ1 = 4 * borderJ;
-  const maxJ1 = numberOfRows - borderJ;
+  const rangesJ = [];
+  rangesJ.push(
+    [borderJ, 2 * borderJ],
+    [4 * borderJ, numberOfRows - borderJ]
+  );
+
+  const rangesK = [];
+  rangesK.push(
+    [borderK, 2 * borderK],
+    [4 * borderK, numberOfSlices - borderK]
+  );
 
   const inRange = [];
-  inRange.push(function (i, j) {
-    return i >= minI0 && i < maxI0 &&
-      j >= minJ0 && j < maxJ0;
-  });
-  inRange.push(function (i, j) {
-    return i >= minI0 && i < maxI0 &&
-      j >= minJ1 && j < maxJ1;
-  });
-  inRange.push(function (i, j) {
-    return i >= minI1 && i < maxI1 &&
-      j >= minJ0 && j < maxJ0;
-  });
-  inRange.push(function (i, j) {
-    return i >= minI1 && i < maxI1 &&
-      j >= minJ1 && j < maxJ1;
-  });
+  for (const rangeK of rangesK) {
+    for (const rangeJ of rangesJ) {
+      for (const rangeI of rangesI) {
+        inRange.push(function (i, j, k) {
+          return i >= rangeI[0] && i < rangeI[1] &&
+            j >= rangeJ[0] && j < rangeJ[1]&&
+            k >= rangeK[0] && k < rangeK[1];
+        });
+      }
+    }
+  }
 
+  const numberOfSquares = inRange.length;
   const background = 0;
-  const max = 255;
+  const max = 200;
 
   this.generate = function (pixelBuffer, sliceNumber) {
-
     // main loop
     let offset = 0;
     for (let c = 0; c < numberOfColourPlanes; ++c) {
@@ -77,14 +83,14 @@ const SquarePixGenerator = function (options) {
    *
    * @param {number} i The column index.
    * @param {number} j The row index.
-   * @param {number} _k The slice index.
+   * @param {number} k The slice index.
    * @returns {number[]} The grey value.
    */
-  function getValue(i, j, _k) {
+  function getValue(i, j, k) {
     let value = background;
     for (let f = 0; f < inRange.length; ++f) {
-      if (inRange[f](i, j)) {
-        value += Math.round(max * (f + 1) / 5);
+      if (inRange[f](i, j, k)) {
+        value += Math.round(max * (f + 1) / numberOfSquares);
         break;
       }
     }
