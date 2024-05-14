@@ -91,6 +91,7 @@ import {Scalar2D, Scalar3D} from './math/scalar';
 import {Matrix33} from './math/matrix';
 import {Orientation} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
+import {NumberRange} from './math/stats';
 // tools
 import {toolList} from './tools/index';
 import {ScrollWheel} from './tools/scrollWheel';
@@ -153,6 +154,7 @@ export {
   MaskSegment,
   RGB,
   ScrollWheel,
+  NumberRange,
   defaults,
   logger,
   decoderScripts,
