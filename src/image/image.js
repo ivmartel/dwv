@@ -13,6 +13,7 @@ import {MaskFactory} from './maskFactory';
 /* eslint-disable no-unused-vars */
 import {Geometry} from './geometry';
 import {Matrix33} from '../math/matrix';
+import {NumberRange} from '../math/stats';
 import {DataElement} from '../dicom/dataElement';
 import {RGB} from '../utils/colour';
 /* eslint-enable no-unused-vars */
@@ -202,14 +203,14 @@ export class Image {
   /**
    * Data range.
    *
-   * @type {object}
+   * @type {NumberRange}
    */
   #dataRange = null;
 
   /**
    * Rescaled data range.
    *
-   * @type {object}
+   * @type {NumberRange}
    */
   #rescaledDataRange = null;
 
@@ -904,7 +905,7 @@ export class Image {
   /**
    * Get the data range.
    *
-   * @returns {object} The data range.
+   * @returns {NumberRange} The data range.
    */
   getDataRange() {
     if (!this.#dataRange) {
@@ -916,7 +917,7 @@ export class Image {
   /**
    * Get the rescaled data range.
    *
-   * @returns {object} The rescaled data range.
+   * @returns {NumberRange} The rescaled data range.
    */
   getRescaledDataRange() {
     if (!this.#rescaledDataRange) {

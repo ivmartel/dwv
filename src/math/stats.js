@@ -191,3 +191,25 @@ function getPercentile(values, ratio) {
 export function guid() {
   return Math.random().toString(36).substring(2, 15);
 }
+
+/**
+ * Number range.
+ */
+export class NumberRange {
+  /**
+   * @type {number}
+   */
+  min;
+  /**
+   * @type {number}
+   */
+  max;
+  /**
+   * @param {number} min The minimum.
+   * @param {number} max The maximum.
+   */
+  constructor(min, max) {
+    this.min = min;
+    this.max = max;
+  }
+}
