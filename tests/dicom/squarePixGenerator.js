@@ -48,7 +48,7 @@ const SquarePixGenerator = function (options) {
       for (const rangeI of rangesI) {
         inRange.push(function (i, j, k) {
           return i >= rangeI[0] && i < rangeI[1] &&
-            j >= rangeJ[0] && j < rangeJ[1]&&
+            j >= rangeJ[0] && j < rangeJ[1] &&
             k >= rangeK[0] && k < rangeK[1];
         });
       }
