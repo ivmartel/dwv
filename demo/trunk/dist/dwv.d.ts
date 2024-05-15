@@ -1678,9 +1678,10 @@ export declare function getMousePoint(event: object): Point2D;
  * Get the name of an image orientation patient.
  *
  * @param {number[]} orientation The image orientation patient.
- * @returns {string} The orientation name: axial, coronal or sagittal.
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
  */
-export declare function getOrientationName(orientation: number[]): string;
+export declare function getOrientationName(orientation: number[]): string | undefined;
 
 /**
  * Get the PixelData Tag.
