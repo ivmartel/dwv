@@ -150,7 +150,7 @@ function getVectorStringLPS(vector) {
  * Get the LPS 'group' (axial, coronal or sagittal) from a LPS code.
  *
  * @param {string} code The LPS code string.
- * @returns {string} The group.
+ * @returns {string|undefined} The group.
  */
 export function getLPSGroup(code) {
   let orientStr;
@@ -171,7 +171,7 @@ export function getLPSGroup(code) {
  * Get the orientation matrix associated to the direction cosines.
  *
  * @param {number[]} cosines The direction cosines.
- * @returns {Matrix33} The orientation matrix.
+ * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationFromCosines(cosines) {
   let orientationMatrix;

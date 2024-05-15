@@ -197,12 +197,17 @@ export function getReverseOrientation(ori) {
  * Get the name of an image orientation patient.
  *
  * @param {number[]} orientation The image orientation patient.
- * @returns {string} The orientation name: axial, coronal or sagittal.
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
  */
 export function getOrientationName(orientation) {
+  let name;
   const orientMatrix = getOrientationFromCosines(orientation);
-  const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
-  return getLPSGroup(lpsStr);
+  if (typeof orientMatrix !== 'undefined') {
+    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
+    name = getLPSGroup(lpsStr);
+  }
+  return name;
 }
 
 /**
