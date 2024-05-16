@@ -366,6 +366,26 @@ export class LayerGroup {
   }
 
   /**
+   * Check if this layerGroup contains a layer with the input id.
+   *
+   * @param {string} id The layer id to look for.
+   * @returns {boolean} True if this group contains
+   *   a layer with the input id.
+   */
+  includes(id) {
+    if (typeof id === 'undefined') {
+      return false;
+    }
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer.getId() === id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Get the number of view layers handled by this class.
    *
    * @returns {number} The number of layers.
