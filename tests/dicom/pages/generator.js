@@ -254,53 +254,57 @@ function onInputImageFiles(event) {
   }
 
   /**
-   * Handle a reader load event.
+   * Get a reader load event handler.
    *
-   * @param {object} event The reader load event.
+   * @param {File} file The file that was loaded.
+   * @returns {Function} The load handler.
    */
-  function onReaderLoad(event) {
-    const image = new Image();
-    image.origin = event.target.file.name;
-    // check size
-    image.onload = function () {
-      if (_images.length === 0) {
-        // update tags if needed at first image load
-        const tags = JSON.parse(document.getElementById('tags').value);
-        if (checkTags(tags, this)) {
-          /* eslint-disable-next-line no-alert */
-          alert('Updating tags to input image meta data.');
-          document.getElementById('tags').value = JSON.stringify(tags, null, 2);
+  function getOnReaderLoad(file) {
+    return function (event) {
+      const image = new Image();
+      image.origin = file.name;
+      // check size
+      image.onload = function () {
+        if (_images.length === 0) {
+          // update tags if needed at first image load
+          const tags = JSON.parse(document.getElementById('tags').value);
+          if (checkTags(tags, this)) {
+            /* eslint-disable-next-line no-alert */
+            alert('Updating tags to input image meta data.');
+            document.getElementById('tags').value =
+              JSON.stringify(tags, null, 2);
+          }
+        } else {
+          // check all images have equal sizes
+          let message;
+          if (this.width !== _images[0].width) {
+            message = 'Image width mismatch between input files: ' +
+                this.width + ' != ' + _images[0].width;
+            console.error(message);
+            alert(message);
+            return;
+          }
+          if (this.height !== _images[0].height) {
+            message = 'Image height mismatch between input files: ' +
+                this.height + ' != ' + _images[0].height;
+            console.error(message);
+            alert(message);
+            return;
+          }
         }
-      } else {
-        // check all images have equal sizes
-        let message;
-        if (this.width !== _images[0].width) {
-          message = 'Image width mismatch between input files: ' +
-              this.width + ' != ' + _images[0].width;
-          console.error(message);
-          alert(message);
-          return;
-        }
-        if (this.height !== _images[0].height) {
-          message = 'Image height mismatch between input files: ' +
-              this.height + ' != ' + _images[0].height;
-          console.error(message);
-          alert(message);
-          return;
-        }
-      }
-      // save image
-      _images.push(this);
+        // save image
+        _images.push(this);
+      };
+      // set src (triggers load)
+      image.src = event.target.result;
     };
-    // set src (triggers load)
-    image.src = event.target.result;
   }
 
   _images = [];
   for (let i = 0; i < files.length; ++i) {
     const file = files[i];
     const reader = new FileReader();
-    reader.onload = onReaderLoad;
+    reader.onload = getOnReaderLoad(file);
     reader.readAsDataURL(file);
   }
 }
