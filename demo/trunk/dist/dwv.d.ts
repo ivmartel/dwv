@@ -2335,6 +2335,14 @@ export declare class LayerGroup {
      */
     getNumberOfLayers(): number;
     /**
+     * Check if this layerGroup contains a layer with the input id.
+     *
+     * @param {string} id The layer id to look for.
+     * @returns {boolean} True if this group contains
+     *   a layer with the input id.
+     */
+    includes(id: string): boolean;
+    /**
      * Get the number of view layers handled by this class.
      *
      * @returns {number} The number of layers.
