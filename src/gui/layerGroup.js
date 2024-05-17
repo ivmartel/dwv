@@ -6,13 +6,14 @@ import {Vector3D} from '../math/vector';
 import {viewEventNames} from '../image/view';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
+import {precisionRound} from '../utils/string';
 import {ViewLayer} from './viewLayer';
 import {DrawLayer} from './drawLayer';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
-import {Point3D} from '../math/point';
+import {Point2D, Point3D} from '../math/point';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
@@ -231,6 +232,13 @@ export class LayerGroup {
    * @type {HTMLElement[]}
    */
   #crosshairHtmlElements = [];
+
+  /**
+   * Tooltip HTML element.
+   *
+   * @type {HTMLElement}
+   */
+  #tooltipHtmlElement;
 
   /**
    * The current position used for the crosshair.
@@ -890,6 +898,52 @@ export class LayerGroup {
     }
     this.#crosshairHtmlElements = [];
   }
+
+  /**
+   * Displays a tooltip in a temporary `span`.
+   * Works with css to hide/show the span only on mouse hover.
+   *
+   * @param {Point2D} point The update point.
+   */
+  showTooltip(point) {
+    // remove previous div
+    this.removeTooltipDiv();
+
+    const viewLayer = this.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planePos = viewLayer.displayToPlanePos(point);
+    const position = viewController.getPositionFromPlanePoint(planePos);
+    const value = viewController.getRescaledImageValue(position);
+
+    // create
+    if (typeof value !== 'undefined') {
+      const span = document.createElement('span');
+      span.id = 'scroll-tooltip';
+      // tooltip position
+      span.style.left = (point.getX() + 10) + 'px';
+      span.style.top = (point.getY() + 10) + 'px';
+      let text = precisionRound(value, 3).toString();
+      if (typeof viewController.getPixelUnit() !== 'undefined') {
+        text += ' ' + viewController.getPixelUnit();
+      }
+      span.appendChild(document.createTextNode(text));
+      // add to local var
+      this.#tooltipHtmlElement = span;
+      // add to html
+      this.#containerDiv.appendChild(span);
+    }
+  }
+
+  /**
+   * Remove the tooltip html div.
+   */
+  removeTooltipDiv() {
+    if (typeof this.#tooltipHtmlElement !== 'undefined') {
+      this.#tooltipHtmlElement.remove();
+      this.#tooltipHtmlElement = undefined;
+    }
+  }
+
 
   /**
    * Test if one of the view layers satisfies an input callbackFn.

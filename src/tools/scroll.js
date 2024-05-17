@@ -1,5 +1,4 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {precisionRound} from '../utils/string';
 import {
   getMousePoint,
   getTouchPoints
@@ -119,6 +118,13 @@ export class Scroll {
    * @type {boolean}
    */
   #displayTooltip = false;
+
+  /**
+   * Current layer group div id.
+   *
+   * @type {string}
+   */
+  #currentDivId;
 
   /**
    * @param {App} app The associated application.
@@ -349,49 +355,27 @@ export class Scroll {
   };
 
   /**
-   * Displays a tooltip in a temparary `span`.
-   * Works with css to hide/show the span only on mouse hover.
+   * Display a tooltip at the given point.
    *
    * @param {Point2D} point The update point.
    * @param {string} divId The layer group divId.
    */
   #showTooltip(point, divId) {
-    // remove previous div
-    this.#removeTooltipDiv();
-
-    // get image value at position
+    // get layer group
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
-    const viewController = viewLayer.getViewController();
-    const planePos = viewLayer.displayToPlanePos(point);
-    const position = viewController.getPositionFromPlanePoint(planePos);
-    const value = viewController.getRescaledImageValue(position);
-
-    // create
-    if (typeof value !== 'undefined') {
-      const span = document.createElement('span');
-      span.id = 'scroll-tooltip';
-      // place span in layer group to avoid upper layer opacity
-      const layerDiv = document.getElementById(viewLayer.getId());
-      layerDiv.parentElement.appendChild(span);
-      // position tooltip
-      span.style.left = (point.getX() + 10) + 'px';
-      span.style.top = (point.getY() + 10) + 'px';
-      let text = precisionRound(value, 3).toString();
-      if (typeof viewController.getPixelUnit() !== 'undefined') {
-        text += ' ' + viewController.getPixelUnit();
-      }
-      span.appendChild(document.createTextNode(text));
-    }
+    this.#currentDivId = divId;
+    // show new tooltip
+    layerGroup.showTooltip(point);
   }
 
   /**
-   * Remove the tooltip html div.
+   * Remove the last tooltip html div.
    */
   #removeTooltipDiv() {
-    const div = document.getElementById('scroll-tooltip');
-    if (div) {
-      div.remove();
+    if (typeof this.#currentDivId !== 'undefined') {
+      const layerGroup = this.#app.getLayerGroupByDivId(this.#currentDivId);
+      layerGroup.removeTooltipDiv();
+      this.#currentDivId = undefined;
     }
   }
 
