@@ -810,10 +810,7 @@ export class LayerGroup {
     // reset in storage
     this.#layers[index] = undefined;
     // update html
-    const layerDiv = document.getElementById(layer.getId());
-    if (layerDiv) {
-      layerDiv.remove();
-    }
+    layer.removeFromDOM();
   }
 
   /**

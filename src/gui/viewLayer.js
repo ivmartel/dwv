@@ -350,6 +350,13 @@ export class ViewLayer {
   }
 
   /**
+   * Remove the HTML element from the DOM.
+   */
+  removeFromDOM() {
+    this.#containerDiv.remove();
+  }
+
+  /**
    * Get the layer base size (without scale).
    *
    * @returns {Scalar2D} The size as {x,y}.
