@@ -1247,6 +1247,10 @@ export declare class DrawLayer {
      */
     getId(): string;
     /**
+     * Remove the HTML element from the DOM.
+     */
+    removeFromDOM(): void;
+    /**
      * Get the layer base size (without scale).
      *
      * @returns {Scalar2D} The size as {x,y}.
@@ -4652,6 +4656,10 @@ export declare class ViewLayer {
      * @returns {string} The string id.
      */
     getId(): string;
+    /**
+     * Remove the HTML element from the DOM.
+     */
+    removeFromDOM(): void;
     /**
      * Get the layer base size (without scale).
      *
