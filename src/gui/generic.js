@@ -17,31 +17,6 @@ export const InteractionEventNames = [
 ];
 
 /**
- * Get a HTML element associated to a container div.
- *
- * @param {string} containerDivId The id of the container div.
- * @param {string} name The name or id to find.
- * @returns {object} The found element or null.
- * @deprecated
- */
-export function getElement(containerDivId, name) {
-  // get by class in the container div
-  const parent = document.getElementById(containerDivId);
-  if (!parent) {
-    return null;
-  }
-  const elements = parent.getElementsByClassName(name);
-  // getting the last element since some libraries (ie jquery-mobile) create
-  // span in front of regular tags (such as select)...
-  let element = elements[elements.length - 1];
-  // if not found get by id with 'containerDivId-className'
-  if (typeof element === 'undefined') {
-    element = document.getElementById(containerDivId + '-' + name);
-  }
-  return element;
-}
-
-/**
  * Overridalbe custom UI object for client defined UI.
  */
 export const customUI = {
