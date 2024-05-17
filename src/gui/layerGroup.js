@@ -226,6 +226,13 @@ export class LayerGroup {
   #showCrosshair = false;
 
   /**
+   * Crosshair HTML elements.
+   *
+   * @type {HTMLElement[]}
+   */
+  #crosshairHtmlElements = [];
+
+  /**
    * The current position used for the crosshair.
    *
    * @type {Point}
@@ -845,6 +852,7 @@ export class LayerGroup {
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
 
+    // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
       const lineH = document.createElement('hr');
       lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
@@ -852,9 +860,13 @@ export class LayerGroup {
       lineH.style.width = this.#containerDiv.offsetWidth + 'px';
       lineH.style.left = '0px';
       lineH.style.top = displayPos.getY() + 'px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineH);
+      // add to html
       this.#containerDiv.appendChild(lineH);
     }
 
+    // vertical line
     if (typeof displayPos.getX() !== 'undefined') {
       const lineV = document.createElement('hr');
       lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
@@ -862,6 +874,9 @@ export class LayerGroup {
       lineV.style.width = this.#containerDiv.offsetHeight + 'px';
       lineV.style.left = (displayPos.getX()) + 'px';
       lineV.style.top = '0px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineV);
+      // add to html
       this.#containerDiv.appendChild(lineV);
     }
   }
@@ -870,16 +885,10 @@ export class LayerGroup {
    * Remove crosshair divs.
    */
   #removeCrosshairDiv() {
-    let div = document.getElementById(
-      this.getDivId() + '-scroll-crosshair-horizontal');
-    if (div) {
-      div.remove();
+    for (const element of this.#crosshairHtmlElements) {
+      element.remove();
     }
-    div = document.getElementById(
-      this.getDivId() + '-scroll-crosshair-vertical');
-    if (div) {
-      div.remove();
-    }
+    this.#crosshairHtmlElements = [];
   }
 
   /**
