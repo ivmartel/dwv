@@ -2453,6 +2453,17 @@ export declare class LayerGroup {
      */
     removeLayer(layer: ViewLayer | DrawLayer): void;
     /**
+     * Displays a tooltip in a temporary `span`.
+     * Works with css to hide/show the span only on mouse hover.
+     *
+     * @param {Point2D} point The update point.
+     */
+    showTooltip(point: Point2D): void;
+    /**
+     * Remove the tooltip html div.
+     */
+    removeTooltipDiv(): void;
+    /**
      * Test if one of the view layers satisfies an input callbackFn.
      *
      * @param {Function} callbackFn A function that takes a ViewLayer as input
