@@ -761,7 +761,7 @@ export class Draw {
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach((group) => {
-        this.#setShapeListeners(group, layerGroup);
+        this.#setShapeListeners(layerGroup, group);
       });
     } else {
       // de-activate shape listeners
@@ -827,7 +827,7 @@ export class Draw {
    * Sets shape group mouse over listener
    * Changes shape group opacity when scroll is over it
    *
-   * @param {Konva.Shape} shapeGroup the shape group
+   * @param {Konva.Group} shapeGroup the shape group
    */
   #setMouseStylingListeners(shapeGroup) {
     // Remarks over which shape group is the mouse
@@ -849,7 +849,7 @@ export class Draw {
   /**
    * Get shape factory
    *
-   * @param {Konva.Shape} shapeGroup The shape group to set on.
+   * @param {Konva.Group} shapeGroup The shape group to set on.
    * @returns {object} The corresponding factory
    */
   #getShapeFactory(shapeGroup) {
