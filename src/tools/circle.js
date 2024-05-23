@@ -56,22 +56,29 @@ export class CircleFactory {
   }
 
   /**
-   * Create a circle shape to be displayed.
-   *
-   * @param {Point2D[]} points The points from which to extract the circle.
-   * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
-   * @returns {Konva.Group} The Konva group.
+   * Calculates the mathematical circle
+   * 
+   * @param {Point2D[]} points the points that define the circle
+   * @returns {Circle} the mathematical circle
    */
-  create(points, style, viewController) {
+  #calculateMathShape(points){
     // calculate radius
     const a = Math.abs(points[0].getX() - points[1].getX());
     const b = Math.abs(points[0].getY() - points[1].getY());
     const radius = Math.round(Math.sqrt(a * a + b * b));
-    // physical shape
-    const circle = new Circle(points[0], radius);
-    // draw shape
-    const kshape = new Konva.Circle({
+    // physical shape   
+    return new Circle(points[0], radius);
+  }
+
+  /**
+   * Creates the konva circle shape
+   * 
+   * @param {Circle} circle The mathematical circle
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Circle} The konva circle shape
+   */
+  #createShape( circle, style) {
+    return new Konva.Circle({
       x: circle.getCenter().getX(),
       y: circle.getCenter().getY(),
       radius: circle.getRadius(),
@@ -80,6 +87,17 @@ export class CircleFactory {
       strokeScaleEnabled: false,
       name: 'shape'
     });
+  }
+
+  /**
+   * Creates the konva label 
+   * 
+   * @param {Circle} circle The mathematical circle
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller
+   * @returns {Konva.Label} The Konva label
+   */
+  #createLabel( circle, style, viewController) {
     // quantification
     const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
@@ -120,22 +138,38 @@ export class CircleFactory {
       fill: style.getLineColour(),
       opacity: style.getTagOpacity()
     }));
+ 
+    return klabel
+  }
 
-    // debug shadow
+  /**
+   * Create a circle shape to be displayed.
+   *
+   * @param {Point2D[]} points The points from which to extract the circle.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
+   */
+  create(points, style, viewController) {
+    // Create group
+    const group = new Konva.Group();
+    group.name(this.getGroupName());
+    group.visible(true);     
+    
+    // Create and add shape
+    const mathShape = this.#calculateMathShape(points)    
+    const kShape = this.#createShape(mathShape, style);
+    group.add(kShape);
+    // Create and add label
+    const kLabel = this.#createLabel(mathShape, style, viewController);
+    group.add(kLabel);
+    // Add shadow (if debug)
     let kshadow;
     if (DRAW_DEBUG) {
       kshadow = this.#getShadowCircle(circle);
-    }
-
-    // return group
-    const group = new Konva.Group();
-    group.name(this.getGroupName());
-    if (kshadow) {
       group.add(kshadow);
-    }
-    group.add(klabel);
-    group.add(kshape);
-    group.visible(true); // dont inherit
+    }    
+    
     return group;
   }
 
