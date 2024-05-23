@@ -42,24 +42,12 @@ export declare class App {
      */
     getImage(dataId: string): Image_2 | undefined;
     /**
-     * Get the last loaded image.
-     *
-     * @returns {Image|undefined} The image.
-     */
-    getLastImage(): Image_2 | undefined;
-    /**
      * Set the image at the given id.
      *
      * @param {string} dataId The data id.
      * @param {Image} img The associated image.
      */
     setImage(dataId: string, img: Image_2): void;
-    /**
-     * Set the last image.
-     *
-     * @param {Image} img The associated image.
-     */
-    setLastImage(img: Image_2): void;
     /**
      * Add a new image.
      *
