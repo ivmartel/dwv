@@ -57,27 +57,27 @@ export class CircleFactory {
 
   /**
    * Calculates the mathematical circle
-   * 
+   *
    * @param {Point2D[]} points the points that define the circle
    * @returns {Circle} the mathematical circle
    */
-  #calculateMathShape(points){
+  #calculateMathShape(points) {
     // calculate radius
     const a = Math.abs(points[0].getX() - points[1].getX());
     const b = Math.abs(points[0].getY() - points[1].getY());
     const radius = Math.round(Math.sqrt(a * a + b * b));
-    // physical shape   
+    // physical shape
     return new Circle(points[0], radius);
   }
 
   /**
    * Creates the konva circle shape
-   * 
+   *
    * @param {Circle} circle The mathematical circle
    * @param {Style} style The drawing style.
    * @returns {Konva.Circle} The konva circle shape
    */
-  #createShape( circle, style) {
+  #createShape(circle, style) {
     return new Konva.Circle({
       x: circle.getCenter().getX(),
       y: circle.getCenter().getY(),
@@ -90,14 +90,14 @@ export class CircleFactory {
   }
 
   /**
-   * Creates the konva label 
-   * 
+   * Creates the konva label
+   *
    * @param {Circle} circle The mathematical circle
    * @param {Style} style The drawing style.
    * @param {ViewController} viewController The associated view controller
    * @returns {Konva.Label} The Konva label
    */
-  #createLabel( circle, style, viewController) {
+  #createLabel(circle, style, viewController) {
     // quantification
     const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
@@ -138,8 +138,8 @@ export class CircleFactory {
       fill: style.getLineColour(),
       opacity: style.getTagOpacity()
     }));
- 
-    return klabel
+
+    return klabel;
   }
 
   /**
@@ -154,10 +154,10 @@ export class CircleFactory {
     // Create group
     const group = new Konva.Group();
     group.name(this.getGroupName());
-    group.visible(true);     
-    
+    group.visible(true);
+
     // Create and add shape
-    const mathShape = this.#calculateMathShape(points)    
+    const mathShape = this.#calculateMathShape(points);
     const kShape = this.#createShape(mathShape, style);
     group.add(kShape);
     // Create and add label
@@ -168,8 +168,8 @@ export class CircleFactory {
     if (DRAW_DEBUG) {
       kshadow = this.#getShadowCircle(circle);
       group.add(kshadow);
-    }    
-    
+    }
+
     return group;
   }
 
