@@ -267,17 +267,6 @@ export class App {
   }
 
   /**
-   * Get the last loaded image.
-   *
-   * @returns {Image|undefined} The image.
-   */
-  getLastImage() {
-    const dataIds = this.#dataController.getDataIds();
-    const lastId = dataIds[dataIds.length - 1];
-    return this.getImage(lastId);
-  }
-
-  /**
    * Set the image at the given id.
    *
    * @param {string} dataId The data id.
@@ -285,17 +274,6 @@ export class App {
    */
   setImage(dataId, img) {
     this.#dataController.setImage(dataId, img);
-  }
-
-  /**
-   * Set the last image.
-   *
-   * @param {Image} img The associated image.
-   */
-  setLastImage(img) {
-    const dataIds = this.#dataController.getDataIds();
-    const lastId = dataIds[dataIds.length - 1];
-    this.#dataController.setImage(lastId, img);
   }
 
   /**
