@@ -166,7 +166,7 @@ export class CircleFactory {
     // Add shadow (if debug)
     let kshadow;
     if (DRAW_DEBUG) {
-      kshadow = this.#getShadowCircle(circle);
+      kshadow = this.#getShadowCircle(mathShape);
       group.add(kshadow);
     }
 

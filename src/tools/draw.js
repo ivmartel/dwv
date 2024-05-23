@@ -850,6 +850,7 @@ export class Draw {
    * Get shape factory
    *
    * @param {Konva.Shape} shapeGroup The shape group to set on.
+   * @returns {object} The corresponding factory
    */
   #getShapeFactory(shapeGroup) {
     let factory;
