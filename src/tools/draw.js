@@ -873,7 +873,6 @@ export class Draw {
    *
    * @param {LayerGroup} layerGroup The origin layer group.
    * @param {Konva.Group} shapeGroup The shape group to set on.
-   *
    */
   #setShapeListeners(layerGroup, shapeGroup) {
     this.#setMouseStylingListeners(shapeGroup);
