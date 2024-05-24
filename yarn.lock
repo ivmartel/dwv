@@ -4919,11 +4919,6 @@ karma-sourcemap-loader@^0.4.0:
   dependencies:
     graceful-fs "^4.2.10"
 
-karma-spec-json-reporter@0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/karma-spec-json-reporter/-/karma-spec-json-reporter-0.0.8.tgz#ee4c0b8b7baf9b538d42d5abd4d224a7a58de32d"
-  integrity sha512-G17B+s3CEtsga1K1HSQAXNtDrBAvd3mtlL+8GXUJtCSxFT6ZLhSc7Rb+n62FpErTFi4T2A/xObka7ZQXq86Tuw==
-
 karma-webpack@^5.0.0:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/karma-webpack/-/karma-webpack-5.0.1.tgz#4eafd31bbe684a747a6e8f3e4ad373e53979ced4"
