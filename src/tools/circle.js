@@ -12,6 +12,9 @@ import Konva from 'konva';
 /* eslint-disable no-unused-vars */
 import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {isNodeNameConnector, isNodeNameLabel, isNodeNameShape}
+  from '../app/drawController';
+import {DrawLayer} from '../gui/drawLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -85,7 +88,8 @@ export class CircleFactory {
       stroke: style.getLineColour(),
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
-      name: 'shape'
+      name: 'shape',
+      draggable: true
     });
   }
 
@@ -131,7 +135,8 @@ export class CircleFactory {
       y: circle.getCenter().getY() + circle.getRadius(),
       scale: style.applyZoomScale(1),
       visible: textExpr.length !== 0,
-      name: 'label'
+      name: 'label',
+      draggable: true
     });
     klabel.add(ktext);
     klabel.add(new Konva.Tag({
@@ -140,6 +145,55 @@ export class CircleFactory {
     }));
 
     return klabel;
+  }
+
+
+  /**
+   * Creates the konva connector
+   *
+   * @param {Konva.Shape} shape The Konva shape
+   * @param {Konva.Label} label The Konva label
+   * @param {Style} style The drawing style
+   * @returns {Konva.Line} The konva connector line
+   */
+  #createConnector(shape, label, style) {
+    const connector = new Konva.Line({
+      points: [
+        shape.x(),
+        shape.y() + shape.height() / 2,
+        label.x() + label.width() / 2,
+        label.y()
+      ],
+      stroke: style.getLineColour(),
+      strokeWidth: 1,
+      dash: [5, 5],
+      name: 'connector',
+    });
+    return connector;
+  }
+
+  updateConnector(drawLayer, group) {
+    const kConnector = group.getChildren(isNodeNameConnector)[0];
+    // If there is no connector because of legacy code
+    if (!kConnector) {
+      return;
+    }
+    const kShape = group.getChildren(isNodeNameShape)[0];
+    const kLabel = group.getChildren(isNodeNameLabel)[0];
+
+    this.#updateConnector(drawLayer, kConnector, kShape, kLabel);
+  }
+
+  #updateConnector(drawLayer, connector, shape, label) {
+    connector.setAttrs({
+      points: [
+        shape.x(),
+        shape.y() + (shape.height() / 2 * shape.scaleY()),
+        label.x() + label.width() / 2,
+        label.y()
+      ],
+    });
+    drawLayer.draw();
   }
 
   /**
@@ -163,6 +217,8 @@ export class CircleFactory {
     // Create and add label
     const kLabel = this.#createLabel(mathShape, style, viewController);
     group.add(kLabel);
+    const connector = this.#createConnector(kShape, kLabel, style);
+    group.add(connector);
     // Add shadow (if debug)
     let kshadow;
     if (DRAW_DEBUG) {
@@ -317,13 +373,15 @@ export class CircleFactory {
       // add new
       group.add(this.#getShadowCircle(circle, group));
     }
-
-    // update label position
-    const textPos = {
-      x: center.x - Math.abs(radius),
-      y: center.y + Math.abs(radius)
-    };
-    klabel.position(textPos);
+    const kConnector = group.getChildren(isNodeNameConnector)[0];
+    if (!kConnector) {
+      // update label position
+      const textPos = {
+        x: center.x - Math.abs(radius),
+        y: center.y + Math.abs(radius)
+      };
+      klabel.position(textPos);
+    }
 
     // update quantification
     this.#updateCircleQuantification(group, viewController);
@@ -422,4 +480,54 @@ export class CircleFactory {
     return kshadow;
   }
 
+  /**
+   * Limits the shape movevement to the image borders.
+   *
+   * @param {DrawLayer} drawLayer The draw layer to obtain the borders.
+   * @param {Konva.Shape} shape The to be limited.
+   */
+  limitShapeMove(drawLayer, shape) {
+    const layerWidth = drawLayer.getBaseSize().x;
+    const layerHeight = drawLayer.getBaseSize().y;
+    const borders = this.#getBorders(shape);
+
+    if (borders.leftBorder < 0) {
+      shape.x(shape.width() * shape.scaleX() / 2);
+    }
+
+    if (borders.rightBorder > layerWidth) {
+      shape.x(layerWidth - (shape.width() * shape.scaleX() / 2));
+    }
+
+    if (borders.topBorder < 0) {
+      shape.y(shape.height() * shape.scaleY() / 2);
+    }
+
+    if (borders.bottomBorder > layerHeight) {
+      shape.y(layerHeight - shape.height() * shape.scaleY() / 2);
+    }
+  }
+
+  /**
+   * Gets the borders of the shape.
+   *
+   * @param {Konva.Shape} shape The shape whose border are needed.
+   * @returns {object} The borders of the shape
+   */
+  #getBorders(shape) {
+    const halfShapeX = shape.width() / 2 * shape.scaleX();
+    const halfShapeY = shape.height() / 2 * shape.scaleY();
+    const leftBorder = shape.x() - halfShapeX;
+    const rightBorder = shape.x() + halfShapeX;
+    const bottomBorder = shape.y() + halfShapeY;
+    const topBorder = shape.y() - halfShapeY;
+
+    return {
+      leftBorder,
+      rightBorder,
+      topBorder,
+      bottomBorder,
+    };
+
+  }
 } // class CircleFactory
