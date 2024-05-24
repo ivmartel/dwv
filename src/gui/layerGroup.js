@@ -692,14 +692,14 @@ export class LayerGroup {
    * @param {ViewLayer} viewLayer The view layer to unbind.
    */
   #unbindViewLayer(viewLayer) {
-    // listen to position change to update other group layers
+    // stop listening to position change to update other group layers
     viewLayer.removeEventListener(
       'positionchange', this.updateLayersToPositionChange);
-    // propagate view viewLayer-layer events
+    // stop propagating view viewLayer-layer events
     for (const eventName of viewEventNames) {
       viewLayer.removeEventListener(eventName, this.#fireEvent);
     }
-    // propagate viewLayer events
+    // stop propagating viewLayer events
     viewLayer.removeEventListener('renderstart', this.#fireEvent);
     viewLayer.removeEventListener('renderend', this.#fireEvent);
   }
