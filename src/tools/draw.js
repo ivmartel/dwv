@@ -15,7 +15,6 @@ import {
   MoveGroupCommand
 } from './drawCommands';
 import {
-  canNodeChangeColour,
   isNodeNameShape
 } from '../app/drawController';
 import {ScrollWheel} from './scrollWheel';
@@ -30,6 +29,7 @@ import {Style} from '../gui/style';
 import {LayerGroup} from '../gui/layerGroup';
 import {Scalar2D} from '../math/scalar';
 import {DrawLayer} from '../gui/drawLayer';
+import {DrawTrash} from './drawTrash';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -83,7 +83,7 @@ export class Draw {
   /**
    * Trash draw: a cross.
    *
-   * @type {Konva.Group}
+   * @type {DrawTrash}
    */
   #trash;
 
@@ -106,23 +106,7 @@ export class Draw {
     this.#shapeEditor.setDrawEventCallback(this.#fireEvent);
 
     this.#style = app.getStyle();
-
-    // trash cross
-    this.#trash = new Konva.Group();
-    // first line of the cross
-    const trashLine1 = new Konva.Line({
-      points: [-10, -10, 10, 10],
-      stroke: 'red'
-    });
-    // second line of the cross
-    const trashLine2 = new Konva.Line({
-      points: [10, -10, -10, 10],
-      stroke: 'red'
-    });
-    this.#trash.width(20);
-    this.#trash.height(20);
-    this.#trash.add(trashLine1);
-    this.#trash.add(trashLine2);
+    this.#trash = new DrawTrash();
   }
 
   /**
@@ -902,13 +886,7 @@ export class Draw {
       }
       colour = shape.stroke();
       // display trash
-      const stage = drawLayer.getKonvaStage();
-      const scale = stage.scale();
-      const invscale = {x: 1 / scale.x, y: 1 / scale.y};
-      this.#trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
-      this.#trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
-      this.#trash.scale(invscale);
-      konvaLayer.add(this.#trash);
+      this.#trash.activate(drawLayer);
       // deactivate anchors to avoid events on null shape
       this.#shapeEditor.setAnchorsActive(false);
       // draw
@@ -936,39 +914,8 @@ export class Draw {
         y: mousePoint.getY()
       };
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      const trashHalfWidth =
-        this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
-      const trashHalfHeight =
-        this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
-      if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
-        Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
-        this.#trash.getChildren().forEach(function (tshape) {
-          if (tshape instanceof Konva.Shape) {
-            tshape.stroke('orange');
-          }
-        });
-        // change the group shapes colour
-        shapeGroup.getChildren(canNodeChangeColour).forEach(
-          function (ashape) {
-            if (ashape instanceof Konva.Shape) {
-              ashape.stroke('red');
-            }
-          });
-      } else {
-        this.#trash.getChildren().forEach(function (tshape) {
-          if (tshape instanceof Konva.Shape) {
-            tshape.stroke('red');
-          }
-        });
-        // reset the group shapes colour
-        shapeGroup.getChildren(canNodeChangeColour).forEach(
-          function (ashape) {
-            if (ashape instanceof Konva.Shape &&
-              typeof ashape.stroke !== 'undefined') {
-              ashape.stroke(colour);
-            }
-          });
-      }
+      this.#trash.changeChildrenColourOnTrashHover(eventPos,
+        shapeGroup, colour);
       // draw
       konvaLayer.draw();
     });
@@ -993,30 +940,18 @@ export class Draw {
         y: mousePoint.getY()
       };
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      const trashHalfWidth =
-        this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
-      const trashHalfHeight =
-        this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
-      if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
-        Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
+      if (this.#trash.isOverTrash(eventPos)) {
         // compensate for the drag translation
         group.x(dragStartPos.x);
         group.y(dragStartPos.y);
         // disable editor
         this.#shapeEditor.disable();
         this.#shapeEditor.reset();
-        // reset colour
-        shapeGroup.getChildren(canNodeChangeColour).forEach(
-          function (ashape) {
-            if (ashape instanceof Konva.Shape) {
-              ashape.stroke(colour);
-            }
-          });
+        this.#trash.changeGroupChildrenColour(shapeGroup, colour);
+        this.#emitDeleteCommand(drawLayer, shapeGroup, shape);
         // reset cursor
         document.body.style.cursor = this.#originalCursor;
-        this.#emitDeleteCommand(drawLayer, group, shape);
       } else {
-        // save drag move
         const translation = {
           x: pos.x - dragStartPos.x,
           y: pos.y - dragStartPos.y
