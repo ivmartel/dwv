@@ -1,5 +1,6 @@
 import Konva from 'konva';
-
+import { Scalar2D } from '../math/scalar';
+import { DrawLayer } from '../gui/drawLayer';
 
 export class DrawTrash {
   /**
