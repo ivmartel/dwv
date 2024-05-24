@@ -4558,6 +4558,18 @@ export declare class ViewController {
      */
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     /**
+     * Bind the view image to the provided layer.
+     *
+     * @param {ViewLayer} viewLayer The layer to bind.
+     */
+    bindImageAndLayer(viewLayer: ViewLayer): void;
+    /**
+     * Unbind the view image to the provided layer.
+     *
+     * @param {ViewLayer} viewLayer The layer to bind.
+     */
+    unbindImageAndLayer(viewLayer: ViewLayer): void;
+    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
@@ -4635,6 +4647,14 @@ export declare class ViewLayer {
      * @function
      */
     onimageset: (event: object) => void;
+    /**
+     * Bind this layer to the view image.
+     */
+    bindImage(): void;
+    /**
+     * Unbind this layer to the view image.
+     */
+    unbindImage(): void;
     /**
      * Handle an image content change event.
      *
