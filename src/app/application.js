@@ -159,6 +159,12 @@ export class AppOptions {
    * @type {object|undefined}
    */
   overlayConfig;
+  /**
+   * DOM root document.
+   *
+   * @type {DocumentFragment}
+   */
+  rootDocument;
 
   /**
    * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
@@ -549,6 +555,9 @@ export class App {
     }
     if (typeof this.#options.dataViewConfigs === 'undefined') {
       this.#options.dataViewConfigs = {};
+    }
+    if (typeof this.#options.rootDocument === 'undefined') {
+      this.#options.rootDocument = document;
     }
 
     // undo stack
@@ -1069,7 +1078,7 @@ export class App {
    */
   #createLayerGroup(viewConfig) {
     // create new layer group
-    const element = document.getElementById(viewConfig.divId);
+    const element = this.#options.rootDocument.getElementById(viewConfig.divId);
     const layerGroup = this.#stage.addLayerGroup(element);
     // bind events
     this.#bindLayerGroupToApp(layerGroup);
