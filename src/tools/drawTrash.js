@@ -1,118 +1,114 @@
-import Konva from "konva";
-import { DrawLayer } from "../gui/drawLayer";
-import { Point2D } from "../math/point";
-import { Scalar2D } from "../math/scalar";
+import Konva from 'konva';
 
-
- 
 
 export class DrawTrash {
-    /**
-     * Trash draw: a cross.
-     *
-     * @type {Konva.Group}
-     */
-    #trash;
- 
-    constructor() {
-        this.createTrashIcon();        
-        
-    }
+  /**
+   * Trash draw: a cross.
+   *
+   * @type {Konva.Group}
+   */
+  #trash;
 
-    /**
-     * Creates the trash icon o positionates it
-     */
-    createTrashIcon(){
-        this.#trash = new Konva.Group();
-        // first line of the cross
-        const trashLine1 = new Konva.Line({
-        points: [-10, -10, 10, 10],
-        stroke: 'red'
-        });
-        // second line of the cross
-        const trashLine2 = new Konva.Line({
-        points: [10, -10, -10, 10],
-        stroke: 'red'
-        });
-        this.#trash.width(20);
-        this.#trash.height(20);
-        this.#trash.add(trashLine1);
-        this.#trash.add(trashLine2);
-    }
+  constructor() {
+    this.createTrashIcon();
 
-    /** 
-     * 
-     * Activates the trash, by showing the icon into the layer draw layer
-     * 
-     * @param {DrawLayer} drawLayer the draw layer where to draw
-     * 
-     * */
-    activate(drawLayer){
-        const stage = drawLayer.getKonvaStage();
-        const scale = stage.scale();
-        const konvaLayer = drawLayer.getKonvaLayer();
-        const invscale = {x: 1 / scale.x, y: 1 / scale.y};
-        this.#trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
-        this.#trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
-        this.#trash.scale(invscale);
-        konvaLayer.add(this.#trash);
-        // draw
-        konvaLayer.draw();
-    }
+  }
 
-    /** 
-     * 
-     * Activates the trash, by showing the icon into the layer draw layer
-     * 
-     * @param {Scalar2D} eventPosition The event drag move position
-     * @param {Konva.Group} shapeGroup The shape group whose colour must be change
-     * @param {string} originalShapeColour The original shape colour
-     * */
-    changeChildrenColourOnTrashHover(eventPosition, shapeGroup, originalShapeColour){        
-        if (this.isOverTrash(eventPosition)) {
-                this.changeGroupChildrenColour(this.#trash, 'orange');
-                this.changeGroupChildrenColour(shapeGroup, 'red');     
-                return
-    
-        }
-        this.changeGroupChildrenColour(this.#trash, 'red'); 
-        this.changeGroupChildrenColour(shapeGroup, originalShapeColour);  
-    }
+  /**
+   * Creates the trash icon o positionates it
+   */
+  createTrashIcon() {
+    this.#trash = new Konva.Group();
+    // first line of the cross
+    const trashLine1 = new Konva.Line({
+      points: [-10, -10, 10, 10],
+      stroke: 'red'
+    });
+    // second line of the cross
+    const trashLine2 = new Konva.Line({
+      points: [10, -10, -10, 10],
+      stroke: 'red'
+    });
+    this.#trash.width(20);
+    this.#trash.height(20);
+    this.#trash.add(trashLine1);
+    this.#trash.add(trashLine2);
+  }
 
-    /**
-     * 
-     * @param {Konva.Group} group The group whose colour must be change
-     * @param {string} colour The new colour to be set
-     */
-    changeGroupChildrenColour(group, colour){
-        group.getChildren().forEach(function (tshape) {
-            if (tshape instanceof Konva.Shape && typeof tshape.stroke !== 'undefined') {
-                tshape.stroke(colour);
-            }
-        });
-    }
+  /**
+   *
+   * Activates the trash, by showing the icon into the layer draw layer
+   *
+   * @param {DrawLayer} drawLayer the draw layer where to draw
+   */
+  activate(drawLayer) {
+    const stage = drawLayer.getKonvaStage();
+    const scale = stage.scale();
+    const konvaLayer = drawLayer.getKonvaLayer();
+    const invscale = {x: 1 / scale.x, y: 1 / scale.y};
+    this.#trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
+    this.#trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
+    this.#trash.scale(invscale);
+    konvaLayer.add(this.#trash);
+    // draw
+    konvaLayer.draw();
+  }
 
-    /**
-     * Removes the trash from the draw layer
-     */
-    remove(){
-        this.#trash.remove();
-    }
+  /**
+   *
+   * Activates the trash, by showing the icon into the layer draw layer
+   *
+   * @param {Scalar2D} eventPosition The event drag move position
+   * @param {Konva.Group} shapeGroup The shape group whose colour must be change
+   * @param {string} originalShapeColour The original shape colour
+   */
+  changeChildrenColourOnTrashHover(eventPosition,
+    shapeGroup, originalShapeColour) {
+    if (this.isOverTrash(eventPosition)) {
+      this.changeGroupChildrenColour(this.#trash, 'orange');
+      this.changeGroupChildrenColour(shapeGroup, 'red');
+      return;
 
-    /**
-     * 
-     * Determines if the event is over trash
-     * 
-     * @param {Scalar2D} eventPosition The event position
-     * @returns true if the event is over trash
-     */
-    isOverTrash(eventPosition){
-        const trashHalfWidth =
+    }
+    this.changeGroupChildrenColour(this.#trash, 'red');
+    this.changeGroupChildrenColour(shapeGroup, originalShapeColour);
+  }
+
+  /**
+   *
+   * @param {Konva.Group} group The group whose colour must be change
+   * @param {string} colour The new colour to be set
+   */
+  changeGroupChildrenColour(group, colour) {
+    group.getChildren().forEach(function (tshape) {
+      if (tshape instanceof Konva.Shape &&
+        typeof tshape.stroke !== 'undefined') {
+        tshape.stroke(colour);
+      }
+    });
+  }
+
+  /**
+   * Removes the trash from the draw layer
+   */
+  remove() {
+    this.#trash.remove();
+  }
+
+  /**
+   *
+   * Determines if the event is over trash
+   *
+   * @param {Scalar2D} eventPosition The event position
+   * @returns {boolean} true if the event is over trash
+   */
+  isOverTrash(eventPosition) {
+    const trashHalfWidth =
         this.#trash.width() * Math.abs(this.#trash.scaleX()) / 2;
-        const trashHalfHeight =
+    const trashHalfHeight =
         this.#trash.height() * Math.abs(this.#trash.scaleY()) / 2;
-        return Math.abs(eventPosition.x - this.#trash.x()) < trashHalfWidth &&
+    return Math.abs(eventPosition.x - this.#trash.x()) < trashHalfWidth &&
         Math.abs(eventPosition.y - this.#trash.y()) < trashHalfHeight;
-    }
+  }
 
 }

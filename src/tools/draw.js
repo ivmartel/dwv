@@ -15,7 +15,6 @@ import {
   MoveGroupCommand
 } from './drawCommands';
 import {
-  canNodeChangeColour,
   isNodeNameShape
 } from '../app/drawController';
 import {ScrollWheel} from './scrollWheel';
@@ -30,7 +29,7 @@ import {Style} from '../gui/style';
 import {LayerGroup} from '../gui/layerGroup';
 import {Scalar2D} from '../math/scalar';
 import {DrawLayer} from '../gui/drawLayer';
-import { DrawTrash } from './drawTrash';
+import {DrawTrash} from './drawTrash';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -107,7 +106,7 @@ export class Draw {
     this.#shapeEditor.setDrawEventCallback(this.#fireEvent);
 
     this.#style = app.getStyle();
-    this.#trash = new DrawTrash(); 
+    this.#trash = new DrawTrash();
   }
 
   /**
@@ -887,7 +886,7 @@ export class Draw {
       }
       colour = shape.stroke();
       // display trash
-      this.#trash.activate(drawLayer); 
+      this.#trash.activate(drawLayer);
       // deactivate anchors to avoid events on null shape
       this.#shapeEditor.setAnchorsActive(false);
       // draw
@@ -915,7 +914,8 @@ export class Draw {
         y: mousePoint.getY()
       };
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      this.#trash.changeChildrenColourOnTrashHover(eventPos, shapeGroup, colour)
+      this.#trash.changeChildrenColourOnTrashHover(eventPos,
+        shapeGroup, colour);
       // draw
       konvaLayer.draw();
     });
@@ -940,19 +940,18 @@ export class Draw {
         y: mousePoint.getY()
       };
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      if(this.#trash.isOverTrash(eventPos)){
+      if (this.#trash.isOverTrash(eventPos)) {
         // compensate for the drag translation
         group.x(dragStartPos.x);
         group.y(dragStartPos.y);
         // disable editor
         this.#shapeEditor.disable();
         this.#shapeEditor.reset();
-        this.#trash.changeGroupChildrenColour(shapeGroup, colour);  
+        this.#trash.changeGroupChildrenColour(shapeGroup, colour);
         this.#emitDeleteCommand(drawLayer, shapeGroup, shape);
         // reset cursor
         document.body.style.cursor = this.#originalCursor;
-      }
-      else{
+      } else {
         const translation = {
           x: pos.x - dragStartPos.x,
           y: pos.y - dragStartPos.y
