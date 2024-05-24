@@ -4076,7 +4076,7 @@ html-minifier-terser@^7.2.0:
     relateurl "^0.2.7"
     terser "^5.15.1"
 
-html-webpack-plugin@^5.5.3:
+html-webpack-plugin@^5.6.0:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/html-webpack-plugin/-/html-webpack-plugin-5.6.0.tgz#50a8fa6709245608cb00e811eacecb8e0d7b7ea0"
   integrity sha512-iwaY4wzbe48AfKLZ/Cc8k0L+FKG6oSNRaZ8x5A/T/IVDGyXcbHncM9TdDa93wn0FsSm82FhTKW7f3vS61thXAw==
@@ -4907,7 +4907,7 @@ karma-json-reporter@1.2.1:
   resolved "https://registry.yarnpkg.com/karma-json-reporter/-/karma-json-reporter-1.2.1.tgz#7b4d6102d1ccaf573061ca76f11e9586948ecce3"
   integrity sha512-ASmvranNhUN0ctSuAZKeWISW9Nf4AteMcVy8rJVjS7Qk+qWgssag/nw+yivHWKDROztVFn7TdamHOETMPCkvgA==
 
-karma-qunit@^4.1.2:
+karma-qunit@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.2.0.tgz#fce4358642a6987f58df370e6bfc8d3da580443b"
   integrity sha512-DwHvcZkDH2HpxqYJ9V+h2Zxq/mjIzl1lIyq948niqn+i9j/EIq+2ViLFiaFZbDrs5cA36DfWgSOYyBpscvznMg==
@@ -4919,7 +4919,7 @@ karma-sourcemap-loader@^0.4.0:
   dependencies:
     graceful-fs "^4.2.10"
 
-karma-webpack@^5.0.0:
+karma-webpack@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/karma-webpack/-/karma-webpack-5.0.1.tgz#4eafd31bbe684a747a6e8f3e4ad373e53979ced4"
   integrity sha512-oo38O+P3W2mSPCSUrQdySSPv1LvPpXP+f+bBimNomS5sW+1V4SuhCuW8TfJzV+rDv921w2fDSDw0xJbPe6U+kQ==
@@ -4928,7 +4928,7 @@ karma-webpack@^5.0.0:
     minimatch "^9.0.3"
     webpack-merge "^4.1.5"
 
-karma@^6.4.2:
+karma@^6.4.3:
   version "6.4.3"
   resolved "https://registry.yarnpkg.com/karma/-/karma-6.4.3.tgz#763e500f99597218bbb536de1a14acc4ceea7ce8"
   integrity sha512-LuucC/RE92tJ8mlCwqEoRWXP38UMAqpnq98vktmS9SznSoUPPUJQbc91dHcxcunROvfQjdORVA/YFviH+Xci9Q==
@@ -6507,7 +6507,7 @@ queue-microtask@^1.2.2:
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
   integrity sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==
 
-qunit@^2.20.0:
+qunit@^2.20.1:
   version "2.20.1"
   resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.20.1.tgz#280da17c258535f2c14520f018d2eec1191b20cf"
   integrity sha512-scZfyhX8mmP3u/CN2y3CutQb+ppalbpqmm7g/X62M2yOt8ofzsxrRaC+MPmYm/tXxpzs9HGrVeCxZwLoP0tuAA==
@@ -8162,7 +8162,7 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack@^5.89.0:
+webpack@^5.91.0:
   version "5.91.0"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.91.0.tgz#ffa92c1c618d18c878f06892bbdc3373c71a01d9"
   integrity sha512-rzVwlLeBWHJbmgTC/8TvAcu5vpJNII+MelQpylD4jNERPwpBJOE2lEcko1zJX3QJeLjTTAnQxn/OJ8bjDzVQaw==
