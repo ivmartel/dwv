@@ -1810,27 +1810,8 @@ export class App {
       }
     }
 
-    // listen to image changes
+    // listen to image set
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
-    this.#dataController.addEventListener('imagecontentchange', (event) => {
-      if (event.dataid === dataId &&
-        layerGroup.includes(viewLayer.getId())
-      ) {
-        viewLayer.onimagecontentchange(event);
-        this.render(event.dataid, [viewConfig]);
-      }
-    });
-    this.#dataController.addEventListener('imagegeometrychange', (event) => {
-      if (event.dataid === dataId &&
-        layerGroup.includes(viewLayer.getId())
-      ) {
-        viewLayer.onimagegeometrychange(event);
-        if (typeof event.rerender !== 'undefined' && event.rerender) {
-          this.render(event.dataid, [viewConfig]);
-          delete event.rerender;
-        }
-      }
-    });
 
     // optional draw layer
     let drawLayer;

@@ -702,6 +702,10 @@ export class LayerGroup {
     // stop propagating viewLayer events
     viewLayer.removeEventListener('renderstart', this.#fireEvent);
     viewLayer.removeEventListener('renderend', this.#fireEvent);
+
+    // stop view layer - image binding
+    // (binding is done in layer.setView)
+    viewLayer.unbindImage();
   }
 
   /**

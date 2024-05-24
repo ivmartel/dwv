@@ -22,6 +22,7 @@ import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
 import {Scalar2D} from '../math/scalar';
 import {Matrix33} from '../math/matrix';
+import {ViewLayer} from '../gui/viewLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -887,6 +888,36 @@ export class ViewController {
    */
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
+  }
+
+  /**
+   * Bind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  bindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.addEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.addEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
+  }
+
+  /**
+   * Unbind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  unbindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.removeEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.removeEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
   }
 
   /**
