@@ -588,6 +588,12 @@ export declare class AppOptions {
      * @type {object|undefined}
      */
     overlayConfig: object | undefined;
+    /**
+     * DOM root document.
+     *
+     * @type {DocumentFragment}
+     */
+    rootDocument: DocumentFragment;
 }
 
 export declare namespace BLACK {
