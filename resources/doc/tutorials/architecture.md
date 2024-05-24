@@ -1,28 +1,8 @@
 This page lists details about the dwv architecture.
 
-- [Layers](#layers)
 - [Data load](#data-load)
 - [View creation](#view-creation)
-
-## Layers
-
-![classes-layers](classes-layers.png)
-
-The first level is the stage, this class handles a list of LayerGroups for optional synchronisation. A layerGroup is
-a group of layers associated to an HTML element, for now of type `View` and `Draw`. The configuration of the stage
-is done at the creation of the app. See [app::init](./App.html#init) method for details. Each layer class will
-create its own HTML div with an id created by [getLayerDivId](./global.html#getLayerDivId). Layers
-will typically contain a HTML canvas to display its content. Use the [getLayerDetailsFromEvent](./global.html#getLayerDetailsFromEvent) method to extract the layer details from an event generated from a layer canvas.
-You can then access the layer group object via the app `getLayerGroupByDivId` method.
-
-![classes-layers-view](classes-layers-view.png)
-
-The View class contains a 2D view of the image that could be 3D + t. Layers follow the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC) design. In the view case, the model is the View, the view the ViewLayer and the controller the ViewController.
-
-![classes-layers-draw](classes-layers-draw.png)
-
-In the case of the draw, the model is the KonvaShape, the view is the DrawLayer and the controller is the DrawController.
-The shape will use the ViewController for quantification when it needs to access the underlying pixel values.
+- [Layers](#layers)
 
 ## Data load
 
@@ -61,3 +41,23 @@ canvas array data:
 1. You now have the canvas data!
 
 All this is materialised in the `generateImageData*` functions.
+
+## Layers
+
+![classes-layers](classes-layers.png)
+
+The first level is the stage, this class handles a list of LayerGroups for optional synchronisation. A layerGroup is
+a group of layers associated to an HTML element, for now of type `View` and `Draw`. The configuration of the stage
+is done at the creation of the app. See [app::init](./App.html#init) method for details. Each layer class will
+create its own HTML div with an id created by [getLayerDivId](./global.html#getLayerDivId). Layers
+will typically contain a HTML canvas to display its content. Use the [getLayerDetailsFromEvent](./global.html#getLayerDetailsFromEvent) method to extract the layer details from an event generated from a layer canvas.
+You can then access the layer group object via the app `getLayerGroupByDivId` method.
+
+![classes-layers-view](classes-layers-view.png)
+
+The View class contains a 2D view of the image that could be 3D + t. Layers follow the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC) design. In the view case, the model is the View, the view the ViewLayer and the controller the ViewController.
+
+![classes-layers-draw](classes-layers-draw.png)
+
+In the case of the draw, the model is the KonvaShape, the view is the DrawLayer and the controller is the DrawController.
+The shape will use the ViewController for quantification when it needs to access the underlying pixel values.
