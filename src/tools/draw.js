@@ -1316,5 +1316,5 @@ export function getShapeClosestParentGroup(knode) {
     group = group.getParent();
     isGroup = group instanceof Konva.Group;
   }
-  return  group instanceof Konva.Group ? group : null;
+  return group instanceof Konva.Group ? group : null;
 }
