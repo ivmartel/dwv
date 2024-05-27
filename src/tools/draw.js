@@ -1304,17 +1304,17 @@ export function validateAnchorPosition(stageSize, anchor) {
 
 
 /**
- * Get the closest parent group of the received shape
+ * Get the closest parent group of the received node
  *
- * @param {Konva.Shape} kshape the shape that has been selected
- * @returns {Konva.Group} The konva parent group
+ * @param {Konva.Node} knode the node that has been selected
+ * @returns {Konva.Group | null} The konva parent group
  */
-export function getShapeClosestParentGroup(kshape) {
-  let group = kshape;
+export function getShapeClosestParentGroup(knode) {
+  let group = knode;
   let isGroup = group instanceof Konva.Group && !(group instanceof Konva.Label);
   while (!group || !isGroup) {
     group = group.getParent();
     isGroup = group instanceof Konva.Group;
   }
-  return group;
+  return  group instanceof Konva.Group ? group : null;
 }

@@ -484,7 +484,7 @@ export class CircleFactory {
    * Creates a simplified shape to get its limits
    *
    * @param {Circle} circle The mathematical circle.
-   * @returns {boolean} The fake shape.
+   * @returns {Konva.Circle} The fake shape.
    */
   #createFakeShape(circle) {
     const kshape = new Konva.Circle({
