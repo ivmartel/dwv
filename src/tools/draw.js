@@ -323,17 +323,30 @@ export class Draw {
   #updateShapeGroupCreation(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(point);
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const newPointPosition = viewLayer.displayToPlanePos(point);
+
+    let updatedPoints = [...this.#points];
+    if (this.#lastIsMouseMovePoint) {
+      updatedPoints = updatedPoints.slice(0, -1);
+    }
+
+    if (this.#currentFactory &&
+      typeof this.#currentFactory.creationOutOfLimits === 'function' &&
+      this.#currentFactory.creationOutOfLimits(
+        drawLayer, updatedPoints, newPointPosition)) {
+      return;
+    }
 
     // draw line to current pos
-    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
+    if (Math.abs(newPointPosition.getX() - this.#lastPoint.getX()) > 0 ||
+      Math.abs(newPointPosition.getY() - this.#lastPoint.getY()) > 0) {
       // clear last mouse move point
       if (this.#lastIsMouseMovePoint) {
         this.#points.pop();
       }
       // current point
-      this.#lastPoint = pos;
+      this.#lastPoint = newPointPosition;
       // mark it as temporary
       this.#lastIsMouseMovePoint = true;
       // add it to the list
@@ -931,11 +944,9 @@ export class Draw {
       if (factory && typeof factory.limitShapeMove === 'function') {
         factory.limitShapeMove(drawLayer, shape);
       }
-      
-        // validate the group position
-        validateGroupPosition(drawLayer.getBaseSize(), group);
-      
 
+      // validate the group position
+      validateGroupPosition(drawLayer.getBaseSize(), group);
 
       // update quantification if possible
       if (typeof factory.updateQuantification !== 'undefined') {

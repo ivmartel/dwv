@@ -481,6 +481,44 @@ export class CircleFactory {
   }
 
   /**
+   * Creates a simplified shape to get its limits
+   *
+   * @param {Circle} circle The mathematical circle.
+   * @returns {boolean} The fake shape.
+   */
+  #createFakeShape(circle) {
+    const kshape = new Konva.Circle({
+      x: circle.getCenter().getX(),
+      y: circle.getCenter().getY(),
+      radius: circle.getRadius(),
+    });
+    return kshape;
+  }
+
+  /**
+   * Decides wheter the new point is out of the limits
+   * of the draw layer, to avoid painting outside
+   *
+   * @param {DrawLayer} drawLayer The draw layer.
+   * @param {Point2D[]} currentPoints The already paint points
+   * @param {Point2D} newPoint The new point
+   * @returns {boolean} true if the new point is out of the limits
+   */
+  creationOutOfLimits(drawLayer, currentPoints, newPoint) {
+    const layerWidth = drawLayer.getBaseSize().x;
+    const layerHeight = drawLayer.getBaseSize().y;
+    const circle = this.#calculateMathShape([...currentPoints, newPoint]);
+    const shape = this.#createFakeShape(circle);
+    const borders = this.#getBorders(shape);
+
+    if (borders.leftBorder < 0 || borders.rightBorder > layerWidth ||
+       borders.topBorder < 0 || borders.bottomBorder > layerHeight) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Limits the shape movevement to the image borders.
    *
    * @param {DrawLayer} drawLayer The draw layer to obtain the borders.
