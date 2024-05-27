@@ -159,6 +159,12 @@ export class AppOptions {
    * @type {object|undefined}
    */
   overlayConfig;
+  /**
+   * DOM root document.
+   *
+   * @type {DocumentFragment}
+   */
+  rootDocument;
 
   /**
    * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
@@ -549,6 +555,9 @@ export class App {
     }
     if (typeof this.#options.dataViewConfigs === 'undefined') {
       this.#options.dataViewConfigs = {};
+    }
+    if (typeof this.#options.rootDocument === 'undefined') {
+      this.#options.rootDocument = document;
     }
 
     // undo stack
@@ -1069,7 +1078,7 @@ export class App {
    */
   #createLayerGroup(viewConfig) {
     // create new layer group
-    const element = document.getElementById(viewConfig.divId);
+    const element = this.#options.rootDocument.getElementById(viewConfig.divId);
     const layerGroup = this.#stage.addLayerGroup(element);
     // bind events
     this.#bindLayerGroupToApp(layerGroup);
@@ -1810,27 +1819,8 @@ export class App {
       }
     }
 
-    // listen to image changes
+    // listen to image set
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
-    this.#dataController.addEventListener('imagecontentchange', (event) => {
-      if (event.dataid === dataId &&
-        layerGroup.includes(viewLayer.getId())
-      ) {
-        viewLayer.onimagecontentchange(event);
-        this.render(event.dataid, [viewConfig]);
-      }
-    });
-    this.#dataController.addEventListener('imagegeometrychange', (event) => {
-      if (event.dataid === dataId &&
-        layerGroup.includes(viewLayer.getId())
-      ) {
-        viewLayer.onimagegeometrychange(event);
-        if (typeof event.rerender !== 'undefined' && event.rerender) {
-          this.render(event.dataid, [viewConfig]);
-          delete event.rerender;
-        }
-      }
-    });
 
     // optional draw layer
     let drawLayer;

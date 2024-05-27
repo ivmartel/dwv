@@ -38,7 +38,6 @@ export class App {
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getImage(dataId: string): Image_2 | undefined;
     getJsonState(): string;
-    getLastImage(): Image_2 | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(dataId: string): {
         [x: string]: DataElement;
@@ -78,7 +77,6 @@ export class App {
     setDrawings(drawings: any[], drawingsDetails: any[]): void;
     setImage(dataId: string, img: Image_2): void;
     setImageSmoothing(flag: boolean): void;
-    setLastImage(img: Image_2): void;
     setLayerGroupsBinders(list: string[]): void;
     // @deprecated
     setOpacity(alpha: number): void;
@@ -104,6 +102,7 @@ export class AppOptions {
     } | undefined;
     defaultCharacterSet: string | undefined;
     overlayConfig: object | undefined;
+    rootDocument: DocumentFragment;
     tools: {
         [x: string]: ToolConfig;
     } | undefined;
@@ -299,6 +298,7 @@ export class DrawLayer {
     isGroupVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
+    removeFromDOM(): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setOffset(newOffset: Scalar3D): void;
@@ -365,7 +365,7 @@ export function getLayerDetailsFromEvent(event: object): object;
 export function getMousePoint(event: object): Point2D;
 
 // @public
-export function getOrientationName(orientation: number[]): string;
+export function getOrientationName(orientation: number[]): string | undefined;
 
 // @public
 export function getPixelDataTag(): Tag;
@@ -501,11 +501,13 @@ export class LayerGroup {
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
+    includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
     moreThanOne(dim: number): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeLayer(layer: ViewLayer | DrawLayer): void;
     removeLayersByDataId(dataId: string): void;
+    removeTooltipDiv(): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveDrawLayer(index: number): void;
@@ -517,6 +519,7 @@ export class LayerGroup {
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
+    showTooltip(point: Point2D): void;
     someViewLayer(callbackFn: Function): boolean;
     updateLayersToPositionChange: (event: object) => void;
 }
@@ -896,6 +899,7 @@ export class ViewController {
     constructor(view: View, dataId: string);
     addEventListener(type: string, callback: Function): void;
     addWindowLevelPresets(presets: object): object;
+    bindImageAndLayer(viewLayer: ViewLayer): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
     // @deprecated
@@ -952,6 +956,7 @@ export class ViewController {
     setWindowLevelPreset(name: string): void;
     setWindowLevelPresetById(id: number): void;
     stop(): void;
+    unbindImageAndLayer(viewLayer: ViewLayer): void;
 }
 
 // @public
@@ -960,6 +965,7 @@ export class ViewLayer {
     addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
+    bindImage(): void;
     bindInteraction(): void;
     clear(): void;
     display(flag: boolean): void;
@@ -989,6 +995,7 @@ export class ViewLayer {
     onimageset: (event: object) => void;
     planePosToDisplay(point2D: Point2D): Point2D;
     removeEventListener(type: string, callback: Function): void;
+    removeFromDOM(): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
     setImageSmoothing(flag: boolean): void;
@@ -996,6 +1003,7 @@ export class ViewLayer {
     setOpacity(alpha: number): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setView(view: object, dataId: string): void;
+    unbindImage(): void;
     unbindInteraction(): void;
 }
 

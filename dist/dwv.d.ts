@@ -42,24 +42,12 @@ export declare class App {
      */
     getImage(dataId: string): Image_2 | undefined;
     /**
-     * Get the last loaded image.
-     *
-     * @returns {Image|undefined} The image.
-     */
-    getLastImage(): Image_2 | undefined;
-    /**
      * Set the image at the given id.
      *
      * @param {string} dataId The data id.
      * @param {Image} img The associated image.
      */
     setImage(dataId: string, img: Image_2): void;
-    /**
-     * Set the last image.
-     *
-     * @param {Image} img The associated image.
-     */
-    setLastImage(img: Image_2): void;
     /**
      * Add a new image.
      *
@@ -600,6 +588,12 @@ export declare class AppOptions {
      * @type {object|undefined}
      */
     overlayConfig: object | undefined;
+    /**
+     * DOM root document.
+     *
+     * @type {DocumentFragment}
+     */
+    rootDocument: DocumentFragment;
 }
 
 export declare namespace BLACK {
@@ -1247,6 +1241,10 @@ export declare class DrawLayer {
      */
     getId(): string;
     /**
+     * Remove the HTML element from the DOM.
+     */
+    removeFromDOM(): void;
+    /**
      * Get the layer base size (without scale).
      *
      * @returns {Scalar2D} The size as {x,y}.
@@ -1678,9 +1676,10 @@ export declare function getMousePoint(event: object): Point2D;
  * Get the name of an image orientation patient.
  *
  * @param {number[]} orientation The image orientation patient.
- * @returns {string} The orientation name: axial, coronal or sagittal.
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
  */
-export declare function getOrientationName(orientation: number[]): string;
+export declare function getOrientationName(orientation: number[]): string | undefined;
 
 /**
  * Get the PixelData Tag.
@@ -2334,6 +2333,14 @@ export declare class LayerGroup {
      */
     getNumberOfLayers(): number;
     /**
+     * Check if this layerGroup contains a layer with the input id.
+     *
+     * @param {string} id The layer id to look for.
+     * @returns {boolean} True if this group contains
+     *   a layer with the input id.
+     */
+    includes(id: string): boolean;
+    /**
      * Get the number of view layers handled by this class.
      *
      * @returns {number} The number of layers.
@@ -2439,6 +2446,17 @@ export declare class LayerGroup {
      * @param {ViewLayer | DrawLayer} layer The layer to remove.
      */
     removeLayer(layer: ViewLayer | DrawLayer): void;
+    /**
+     * Displays a tooltip in a temporary `span`.
+     * Works with css to hide/show the span only on mouse hover.
+     *
+     * @param {Point2D} point The update point.
+     */
+    showTooltip(point: Point2D): void;
+    /**
+     * Remove the tooltip html div.
+     */
+    removeTooltipDiv(): void;
     /**
      * Test if one of the view layers satisfies an input callbackFn.
      *
@@ -4546,6 +4564,18 @@ export declare class ViewController {
      */
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     /**
+     * Bind the view image to the provided layer.
+     *
+     * @param {ViewLayer} viewLayer The layer to bind.
+     */
+    bindImageAndLayer(viewLayer: ViewLayer): void;
+    /**
+     * Unbind the view image to the provided layer.
+     *
+     * @param {ViewLayer} viewLayer The layer to bind.
+     */
+    unbindImageAndLayer(viewLayer: ViewLayer): void;
+    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
@@ -4624,6 +4654,14 @@ export declare class ViewLayer {
      */
     onimageset: (event: object) => void;
     /**
+     * Bind this layer to the view image.
+     */
+    bindImage(): void;
+    /**
+     * Unbind this layer to the view image.
+     */
+    unbindImage(): void;
+    /**
      * Handle an image content change event.
      *
      * @param {object} event The event.
@@ -4643,6 +4681,10 @@ export declare class ViewLayer {
      * @returns {string} The string id.
      */
     getId(): string;
+    /**
+     * Remove the HTML element from the DOM.
+     */
+    removeFromDOM(): void;
     /**
      * Get the layer base size (without scale).
      *

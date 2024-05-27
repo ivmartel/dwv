@@ -255,6 +255,8 @@ export class ViewLayer {
     }
     // create view controller
     this.#viewController = new ViewController(view, dataId);
+    // bind layer and image
+    this.bindImage();
   }
 
   /**
@@ -291,6 +293,24 @@ export class ViewLayer {
   };
 
   /**
+   * Bind this layer to the view image.
+   */
+  bindImage() {
+    if (this.#viewController) {
+      this.#viewController.bindImageAndLayer(this);
+    }
+  }
+
+  /**
+   * Unbind this layer to the view image.
+   */
+  unbindImage() {
+    if (this.#viewController) {
+      this.#viewController.unbindImageAndLayer(this);
+    }
+  }
+
+  /**
    * Handle an image content change event.
    *
    * @param {object} event The event.
@@ -300,7 +320,9 @@ export class ViewLayer {
     // event.value = [index]
     if (this.#dataId === event.dataid) {
       this.#isValidPosition = this.#viewController.isPositionInBounds();
+      // flag update and draw
       this.#needsDataUpdate = true;
+      this.draw();
     }
   };
 
@@ -330,10 +352,9 @@ export class ViewLayer {
         }
         // update base size
         this.#setBaseSize(vcSize);
-        // flag redraw
+        // flag update and draw
         this.#needsDataUpdate = true;
-        // re-render flag
-        event.rerender = true;
+        this.draw();
       }
     }
   };
