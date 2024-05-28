@@ -281,10 +281,6 @@ export class Draw {
    * - Resets points
    */
   #setToNotDrawingState() {
-    if (this.#tmpShapeGroup) {
-      this.#tmpShapeGroup.destroy();
-      this.#tmpShapeGroup = null;
-    }
     this.#isDrawing = false;
     this.#points = [];
   }
@@ -555,6 +551,10 @@ export class Draw {
     // escape key: exit shape creation
     if (event.key === 'Escape' && this.#tmpShapeGroup !== null) {
       const konvaLayer = this.#tmpShapeGroup.getLayer();
+      // reset temporary shape group
+      this.#tmpShapeGroup.destroy();
+      this.#tmpShapeGroup = null;
+      // set state
       this.#setToNotDrawingState();
       // redraw
       konvaLayer.draw();
@@ -615,6 +615,13 @@ export class Draw {
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #onFinalPoints(finalPoints, layerGroup) {
+    // remove temporary shape draw
+    // (has to be done before sending drawcreate event)
+    if (this.#tmpShapeGroup) {
+      this.#tmpShapeGroup.destroy();
+      this.#tmpShapeGroup = null;
+    }
+
     const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
     const drawController = drawLayer.getDrawController();
