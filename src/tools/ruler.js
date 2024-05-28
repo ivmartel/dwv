@@ -76,7 +76,7 @@ export class RulerFactory {
       name: 'shape'
     });
 
-    const tickLen = style.scale(10);
+    const tickLen = style.applyZoomScale(10).x;
 
     // tick begin
     const linePerp0 = getPerpendicularLine(line, points[0], tickLen);
@@ -145,7 +145,7 @@ export class RulerFactory {
     const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
     const klabel = new Konva.Label({
-      x: line.getEnd().getX() + dX * ktext.width(),
+      x: line.getEnd().getX() + dX * style.applyZoomScale(ktext.width()).x,
       y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
       scale: style.applyZoomScale(1),
       visible: textExpr.length !== 0,
