@@ -140,15 +140,16 @@ export class AppOptions {
   binders;
   /**
    * Optional boolean flag to trigger the first data render
-   *     after the first loaded data or not. Defaults to true.
+   *   after the first loaded data or not. Defaults to true.
    *
    * @type {boolean|undefined}
    */
   viewOnFirstLoadItem;
   /**
    * Optional default chraracterset string used for DICOM parsing if
-   *     not passed in DICOM file.
-   * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+   *   not passed in DICOM file.
+   *
+   * Valid values: {@link https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings}.
    *
    * @type {string|undefined}
    */
@@ -726,9 +727,9 @@ export class App {
    *
    * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
-   *  - requestHeaders: an array of {name, value} to use as request headers
-   *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
-   *  - batchSize: the size of the request url batch
+   * - requestHeaders: an array of {name, value} to use as request headers,
+   * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
+   * - batchSize: the size of the request url batch.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -1265,13 +1266,14 @@ export class App {
 
   /**
    * Key down event handler example.
-   * - CRTL-Z: undo
-   * - CRTL-Y: redo
-   * - CRTL-ARROW_LEFT: next element on fourth dim
-   * - CRTL-ARROW_UP: next element on third dim
-   * - CRTL-ARROW_RIGHT: previous element on fourth dim
-   * - CRTL-ARROW_DOWN: previous element on third dim
-   * (applies to the active view of the active layer group)
+   * - CRTL-Z: undo,
+   * - CRTL-Y: redo,
+   * - CRTL-ARROW_LEFT: next element on fourth dim,
+   * - CRTL-ARROW_UP: next element on third dim,
+   * - CRTL-ARROW_RIGHT: previous element on fourth dim,
+   * - CRTL-ARROW_DOWN: previous element on third dim.
+   *
+   * Applies to the active view of the active layer group.
    *
    * @param {KeyboardEvent} event The key down event.
    * @fires UndoStack#undo

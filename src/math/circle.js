@@ -107,9 +107,11 @@ export class Circle {
 
   /**
    * Get the rounded limits of the circle.
-   * See: https://en.wikipedia.org/wiki/Circle#Equations).
-   * Circle formula: x*x + y*y = r*r
-   * => y = (+-) sqrt(r*r - x*x)
+   * See: {@link https://en.wikipedia.org/wiki/Circle#Equations}.
+   *
+   * Circle formula: `x*x + y*y = r*r`.
+   *
+   * Implies: `y = (+-) sqrt(r*r - x*x)`.
    *
    * @returns {number[][][]} The rounded limits:
    *  list of [x, y] pairs (min, max).

@@ -46,9 +46,8 @@ export function endsWith(str, search) {
 }
 
 /**
- * Split key/value string:
- *  key0=val00&key0=val01&key1=val10 returns
- *  { key0 : [val00, val01], key1 : val1 }
+ * Split key/value string: `key0=val00&key0=val01&key1=val10
+ *   will return `{key0 : [val00, val01], key1 : val1}`.
  *
  * @param {string} inputStr The string to split.
  * @returns {object} The split string.

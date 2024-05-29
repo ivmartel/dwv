@@ -109,11 +109,11 @@ export class DicomDataLoader {
   /**
    * Check if the loader can load the provided url.
    * True if:
-   *  - the options.forceLoader is 'dicom'
-   *  - the options.requestHeaders contains a 'Accept: application/dicom'
-   *  - the url has a 'contentType' and it is 'application/dicom'
-   *    (as in wado urls)
-   *  - the url has no 'contentType' and no extension or the extension is 'dcm'
+   * - the options.forceLoader is 'dicom',
+   * - the options.requestHeaders contains a 'Accept: application/dicom',
+   * - the url has a 'contentType' and it is 'application/dicom'
+   *   (as in wado urls),
+   * - the url has no 'contentType' and no extension or the extension is 'dcm'.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.

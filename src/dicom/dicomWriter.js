@@ -263,8 +263,8 @@ function padOBValue(value) {
 /**
  * Helper method to flatten an array of typed arrays to 2D typed array.
  *
- * @param {Array} initialArray array of typed arrays
- * @returns {object} a typed array containing all values
+ * @param {Array} initialArray Array of typed arrays.
+ * @returns {object} A typed array containing all values.
  */
 function flattenArrayOfTypedArrays(initialArray) {
   const initialArrayLength = initialArray.length;
@@ -426,7 +426,7 @@ export class DicomWriter {
    * if nothing is found the default rule is applied.
    *
    * @param {Object<string, WriterRule>} rules The input rules.
-   * @param {boolean} [addMissingTags] if true, explicit tags that
+   * @param {boolean} [addMissingTags] If true, explicit tags that
    *   have replace rule and a value will be
    *   added if missing. Defaults to false.
    */

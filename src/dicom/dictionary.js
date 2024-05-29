@@ -4,16 +4,18 @@
 /**
  * DICOM tag dictionary 2022a.
  * Generated using xml standard conversion from {@link https://github.com/ivmartel/dcmStdToJs} v0.1.0.
+ *
  * Conversion changes:
- * - (vr) 'See Note' -> 'NONE'
- * - (vr) 'OB or OW' -> 'ox'
- * - (vr) 'US or SS' -> 'xs'
- * - (vr) 'US or OW' -> 'xx'
- * - (vr) 'US or SS or OW' -> 'xs'
- * - added 'GenericGroupLength' element to each group
+ * - (vr) 'See Note' -> 'NONE',
+ * - (vr) 'OB or OW' -> 'ox',
+ * - (vr) 'US or SS' -> 'xs',
+ * - (vr) 'US or OW' -> 'xx',
+ * - (vr) 'US or SS or OW' -> 'xs',
+ * - added 'GenericGroupLength' element to each group.
+ *
  * Local changes:
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and
- *  'xxxx' with '0004'
+ *  'xxxx' with '0004'.
  *
  * @type {Object<string, Object<string, string[]>>}
  */

@@ -40,22 +40,24 @@ export const DRAW_DEBUG = false;
 /**
  * Drawing tool.
  *
- * This tool is responsible for the draw layer group structure. The layout is:
+ * This tool is responsible for the draw of layer group structure.
  *
+ * ```
  * drawLayer
- * |_ positionGroup: name="position-group", id="#2-0#_#3-1""
- *    |_ shapeGroup: name="{shape name}-group", id="#"
- *       |_ shape: name="shape"
- *       |_ label: name="label"
+ * |_ positionGroup: {name="position-group", id="#2-0#_#3-1"}
+ *    |_ shapeGroup: {name="{shape name}-group", id="#"}
+ *       |_ shape: {name="shape"},
+ *       |_ label: {name="label"},
  *       |_ extra: line tick, protractor arc...
+ * ```
  *
  * Discussion:
- * - posGroup > shapeGroup
- *    pro: slice/frame display: 1 loop
- *    cons: multi-slice shape splitted in positionGroups
- * - shapeGroup > posGroup
- *    pros: more logical
- *    cons: slice/frame display: 2 loops
+ * - posGroup > shapeGroup:
+ *   (pro) slice/frame display: 1 loop -
+ *   (cons) multi-slice shape splitted in positionGroups.
+ * - shapeGroup > posGroup:
+ *   (pros) more logical -
+ *   (cons) slice/frame display: 2 loops.
  */
 export class Draw {
 
@@ -236,11 +238,10 @@ export class Draw {
   }
 
   /**
-   * Initializes the new shape creation.
-   *
-   * - Updates the started variable
-   * - Gets the factory
-   * - Initializes the points array
+   * Initializes the new shape creation:
+   * - Updates the started variable,
+   * - Gets the factory,
+   * - Initializes the points array.
    *
    * @param {LayerGroup} layerGroup The layer group where the user clicks.
    * @param {Point2D} point The start point where the user clicks.
@@ -257,11 +258,10 @@ export class Draw {
   }
 
   /**
-   * Sets the variables to drawing state.
-   *
-   * - Updates is drawing variable
-   * - Initializes the current factory
-   * - Resets points
+   * Sets the variables to drawing state:
+   * - Updates is drawing variable,
+   * - Initializes the current factory,
+   * - Resets points.
    */
   #setToDrawingState() {
     // start storing points
@@ -273,11 +273,10 @@ export class Draw {
   }
 
   /**
-   * Resets the variables to not drawing state
-   *
-   * - Destroys tmp shape group
-   * - Updates is drawing variable
-   * - Resets points
+   * Resets the variables to not drawing state:
+   * - Destroys tmp shape group,
+   * - Updates is drawing variable,
+   * - Resets points.
    */
   #setToNotDrawingState() {
     this.#isDrawing = false;

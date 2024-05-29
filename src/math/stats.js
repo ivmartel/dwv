@@ -151,8 +151,8 @@ function getFullStats(values) {
 
 /**
  * Get an arrays' percentile. Uses linear interpolation for percentiles
- * that lie between data points.
- * see https://en.wikipedia.org/wiki/Percentile (second variant interpolation)
+ *   that lie between data points.
+ * See: {@link https://en.wikipedia.org/wiki/Percentile} (second variant interpolation).
  *
  * @param {number[]} values The sorted array of values.
  * @param {number} ratio The percentile ratio [0-1].

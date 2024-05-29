@@ -43,7 +43,8 @@ export function getDwvVersion() {
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- *     after the 128 bytes preamble.
+ *   after the 128 bytes preamble.
+ *
  * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
@@ -89,11 +90,12 @@ export function cleanString(inputStr) {
 }
 
 /**
- * Get the utfLabel (used by the TextDecoder) from a character set term
+ * Get the utfLabel (used by the TextDecoder) from a character set term.
+ *
  * References:
- * - DICOM [Value Encoding]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html}
- * - DICOM [Specific Character Set]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2}
- * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}
+ * - DICOM [Value Encoding]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html},
+ * - DICOM [Specific Character Set]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
+ * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}.
  *
  * @param {string} charSetTerm The DICOM character set.
  * @returns {string} The corresponding UTF label.
@@ -424,17 +426,16 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
 
 /**
  * Get the number of bytes occupied by a data element prefix,
- *   i.e. without its value.
+ *   (without its value).
  *
- * @param {string} vr The Value Representation of the element.
- * @param {boolean} isImplicit Does the data use implicit VR?
- * @returns {number} The size of the element prefix.
  * WARNING: this is valid for tags with a VR, if not sure use
  *   the 'isTagWithVR' function first.
+ *
  * Reference:
  * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
  * - [Data Element implicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1}.
  *
+ * ```
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
  * | 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
@@ -444,6 +445,11 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
  *
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
+ * ```
+ *
+ * @param {string} vr The Value Representation of the element.
+ * @param {boolean} isImplicit Does the data use implicit VR?
+ * @returns {number} The size of the element prefix.
  */
 export function getDataElementPrefixByteSize(vr, isImplicit) {
   return isImplicit ? 8 : is32bitVLVR(vr) ? 12 : 8;

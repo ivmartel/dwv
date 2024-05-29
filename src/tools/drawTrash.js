@@ -63,7 +63,7 @@ export class DrawTrash {
    *
    * @param {Scalar2D} eventPosition The event drag move position.
    * @param {Konva.Group} shapeGroup The shape group whose colour
-   *     must be change.
+   *   must be change.
    * @param {string} originalShapeColour The original shape colour.
    */
   changeChildrenColourOnTrashHover(eventPosition,

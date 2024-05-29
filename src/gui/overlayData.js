@@ -207,7 +207,7 @@ export class OverlayData {
    * Update the overlay data.
    *
    * @param {object} event An event defined by the overlay map and
-   *   registered in toggleListeners
+   *   registered in toggleListeners.
    */
   #updateData = (event) => {
     if (event.dataid !== this.#dataId) {

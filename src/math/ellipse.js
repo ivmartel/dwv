@@ -126,9 +126,11 @@ export class Ellipse {
 
   /**
    * Get the rounded limits of the ellipse.
-   * See: https://en.wikipedia.org/wiki/Ellipse#Standard_equation.
-   * Ellipse formula: x*x / a*a + y*y / b*b = 1
-   * => y = (+-)(b/a) * sqrt(a*a - x*x)
+   * See: {@link https://en.wikipedia.org/wiki/Ellipse#Standard_equation}.
+   *
+   * Ellipse formula: `x*x / a*a + y*y / b*b = 1`.
+   *
+   * Implies: `y = (+-)(b/a) * sqrt(a*a - x*x)`.
    *
    * @returns {number[][][]} The rounded limits:
    *  list of [x, y] pairs (min, max).

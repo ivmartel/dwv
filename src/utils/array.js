@@ -136,7 +136,7 @@ export function getFindArrayInArrayCallback(arr1) {
  *
  * @param {ArrayBuffer} arr The multipart array.
  * @returns {Array} The multipart parts as an array of object as
- *  {'Content-Type', ..., data} (depending on header tags)
+ *   {'Content-Type', ..., data} (depending on header tags).
  */
 export function parseMultipart(arr) {
   const u8Array = new Uint8Array(arr);
@@ -236,8 +236,8 @@ export function parseMultipart(arr) {
 
 /**
  * Build a multipart message.
- * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
- * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
+ * See: {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages}.
+ * See: {@link https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js}.
  *
  * @param {Array} parts The message parts as an array of object containing
  *   content headers and messages as the data property (as returned by parse).

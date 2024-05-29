@@ -179,8 +179,8 @@ export class Image {
   #photometricInterpretation = 'MONOCHROME2';
 
   /**
-   * Planar configuration for RGB data (0:RGBRGBRGBRGB... or
-   *   1:RRR...GGG...BBB...).
+   * Planar configuration for RGB data (`0:RGBRGBRGBRGB...` or
+   *   `1:RRR...GGG...BBB...`).
    *
    * @type {number}
    */
@@ -278,7 +278,7 @@ export class Image {
   /**
    * Get the data buffer of the image.
    *
-   * @todo dangerous...
+   * @todo Dangerous...
    * @returns {TypedArray} The data buffer of the image.
    */
   getBuffer() {
