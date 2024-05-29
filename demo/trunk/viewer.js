@@ -544,7 +544,7 @@ function addLayerGroups(number) {
  * Get a full view for a given div id.
  *
  * @param {string} divId The div id.
- * @returns {object} The config
+ * @returns {object} The config.
  */
 function getViewConfig(divId) {
   const config = {divId: divId};
@@ -688,7 +688,7 @@ function getDataLayerGroupDivIds(dataId) {
 }
 
 /**
- * Setup the binders checkboxes
+ * Setup the binders checkboxes.
  */
 function setupBindersCheckboxes() {
   const propList = [
@@ -782,7 +782,7 @@ function setupBindersCheckboxes() {
 }
 
 /**
- * Setup the tools checkboxes
+ * Setup the tools checkboxes.
  */
 function setupToolsCheckboxes() {
   const getChangeTool = function (tool) {
@@ -1422,7 +1422,7 @@ function comparePosPat(a, b) {
 /**
  * Sort an object with pos pat string keys.
  *
- * @param {object} obj The object to sort
+ * @param {object} obj The object to sort.
  * @returns {object} The sorted object.
  */
 function sortByPosPatKey(obj) {
@@ -1554,7 +1554,7 @@ function setupTests() {
  * Get basic stats for an array.
  *
  * @param {Array} array Input array.
- * @returns {object} min, max, mean and standard deviation.
+ * @returns {object} Min, max, mean and standard deviation.
  */
 function getBasicStats(array) {
   let min = array[0];

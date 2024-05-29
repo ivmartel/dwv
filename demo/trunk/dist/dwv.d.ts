@@ -179,7 +179,7 @@ export declare class App {
     /**
      * Initialise the application.
      *
-     * @param {AppOptions} opt The application options
+     * @param {AppOptions} opt The application options.
      * @example
      * // create the dwv app
      * const app = new dwv.App();
@@ -461,11 +461,11 @@ export declare class App {
      */
     defaultOnKeydown: (event: KeyboardEvent) => void;
     /**
-     * Reset the display
+     * Reset the display.
      */
     resetDisplay(): void;
     /**
-     * Reset the app zoom.s
+     * Reset the app zoom.
      */
     resetZoom(): void;
     /**
@@ -483,7 +483,7 @@ export declare class App {
      */
     setWindowLevelPreset(preset: string): void;
     /**
-     * Set the tool
+     * Set the tool.
      *
      * @param {string} tool The tool.
      */
@@ -495,13 +495,13 @@ export declare class App {
      */
     setToolFeatures(list: object): void;
     /**
-     * Undo the last action
+     * Undo the last action.
      *
      * @fires UndoStack#undo
      */
     undo(): void;
     /**
-     * Redo the last action
+     * Redo the last action.
      *
      * @fires UndoStack#redo
      */
@@ -569,14 +569,14 @@ export declare class AppOptions {
     binders: string[] | undefined;
     /**
      * Optional boolean flag to trigger the first data render
-     *   after the first loaded data or not. Defaults to true;
+     *     after the first loaded data or not. Defaults to true.
      *
      * @type {boolean|undefined}
      */
     viewOnFirstLoadItem: boolean | undefined;
     /**
-     * Optional default chraracter set string used for DICOM parsing if
-     * not passed in DICOM file.
+     * Optional default chraracterset string used for DICOM parsing if
+     *     not passed in DICOM file.
      * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
      *
      * @type {string|undefined}
@@ -1045,7 +1045,7 @@ export declare class DicomWriter {
      * Get the element to write according to the class rules.
      * Priority order: tagName, groupName, default.
      *
-     * @param {DataElement} element The element to check
+     * @param {DataElement} element The element to check.
      * @returns {DataElement|null} The element to write, can be null.
      */
     getElementToWrite(element: DataElement): DataElement | null;
@@ -1317,11 +1317,11 @@ export declare class DrawLayer {
     isVisible(): boolean;
     /**
      * Draw the content (imageData) of the layer.
-     * The imageData variable needs to be set
+     * The imageData variable needs to be set.
      */
     draw(): void;
     /**
-     * Initialise the layer: set the canvas and context
+     * Initialise the layer: set the canvas and context.
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
@@ -1495,7 +1495,7 @@ export declare class Geometry {
      * Warning: the size comes as stored in DICOM, meaning that it could
      * be oriented.
      *
-     * @param {Matrix33} [viewOrientation] The view orientation (optional)
+     * @param {Matrix33} [viewOrientation] The view orientation (optional).
      * @returns {Size} The object size.
      */
     getSize(viewOrientation?: Matrix33): Size;
@@ -1504,7 +1504,7 @@ export declare class Geometry {
      * Warning: the spacing comes as stored in DICOM, meaning that it could
      * be oriented.
      *
-     * @param {Matrix33} [viewOrientation] The view orientation (optional)
+     * @param {Matrix33} [viewOrientation] The view orientation (optional).
      * @returns {Spacing} The object spacing.
      */
     getSpacing(viewOrientation?: Matrix33): Spacing;
@@ -1739,8 +1739,8 @@ export declare function getUID(tagName: string): string;
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- * after the 128 bytes preamble.
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *     after the 128 bytes preamble.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -2315,7 +2315,7 @@ export declare class LayerGroup {
      */
     getBaseScale(): Scalar3D;
     /**
-     * Get the added scale: the scale added to the base scale
+     * Get the added scale: the scale added to the base scale.
      *
      * @returns {Scalar3D} The scale as {x,y,z}.
      */
@@ -2822,7 +2822,7 @@ export declare class MaskSegmentViewHelper {
  */
 export declare class Matrix33 {
     /**
-     * @param {number[]} values row-major ordered 9 values.
+     * @param {number[]} values Row-major ordered 9 values.
      */
     constructor(values: number[]);
     /**
@@ -2911,7 +2911,7 @@ export declare class Matrix33 {
      */
     getColAbsMax(col: number): object;
     /**
-     * Get this matrix with only zero and +/- ones instead of the maximum,
+     * Get this matrix with only zero and +/- ones instead of the maximum.
      *
      * @returns {Matrix33} The simplified matrix.
      */
@@ -3302,7 +3302,7 @@ export declare class Point3D {
 export declare function precisionRound(number: number, precision: number): number;
 
 /**
- * Rescale Slope and Intercept
+ * Rescale Slope and Intercept.
  */
 export declare class RescaleSlopeAndIntercept {
     /**
@@ -3600,7 +3600,7 @@ export declare class Spacing {
 /**
  * Convert sRGB to CIE LAB (standard illuminant D65).
  *
- * @param {RGB} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export declare function srgbToCielab(triplet: RGB): object;
@@ -3661,7 +3661,7 @@ export declare class Tag {
     isWithVR(): boolean;
     /**
      * Is the tag group a private tag group ?
-     * see: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8
+     * See: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8.
      *
      * @returns {boolean} True if the tag group is private,
      *   ie if its group is an odd number.
@@ -4045,7 +4045,7 @@ export declare class View {
      *
      * @param {Point} position The new position.
      * @param {boolean} silent Flag to fire event or not.
-     * @returns {boolean} False if not in bounds
+     * @returns {boolean} False if not in bounds.
      * @fires View#positionchange
      */
     setCurrentPosition(position: Point, silent: boolean): boolean;
@@ -4318,7 +4318,7 @@ export declare class ViewController {
     /**
      * Get the image rescaled value at the input position.
      *
-     * @param {Point} position the input position.
+     * @param {Point} position The input position.
      * @returns {number|undefined} The image value or undefined if out of bounds
      *   or no quantifiable (for ex RGB).
      */
@@ -4326,7 +4326,7 @@ export declare class ViewController {
     /**
      * Get the image pixel unit.
      *
-     * @returns {string} The unit
+     * @returns {string} The unit.
      */
     getPixelUnit(): string;
     /**
@@ -4810,14 +4810,14 @@ export declare class ViewLayer {
     isVisible(): boolean;
     /**
      * Draw the content (imageData) of the layer.
-     * The imageData variable needs to be set
+     * The imageData variable needs to be set.
      *
      * @fires App#renderstart
      * @fires App#renderend
      */
     draw(): void;
     /**
-     * Initialise the layer: set the canvas and context
+     * Initialise the layer: set the canvas and context.
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
