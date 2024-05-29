@@ -15,6 +15,7 @@ import {
   MoveGroupCommand
 } from './drawCommands';
 import {
+  isNodeNameLabel,
   isNodeNameShape
 } from '../app/drawController';
 import {ScrollWheel} from './scrollWheel';
@@ -316,17 +317,30 @@ export class Draw {
   #updateShapeGroupCreation(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(point);
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const newPointPosition = viewLayer.displayToPlanePos(point);
+
+    let updatedPoints = [...this.#points];
+    if (this.#lastIsMouseMovePoint) {
+      updatedPoints = updatedPoints.slice(0, -1);
+    }
+
+    if (this.#currentFactory &&
+      typeof this.#currentFactory.creationOutOfLimits === 'function' &&
+      this.#currentFactory.creationOutOfLimits(
+        drawLayer, updatedPoints, newPointPosition)) {
+      return;
+    }
 
     // draw line to current pos
-    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
+    if (Math.abs(newPointPosition.getX() - this.#lastPoint.getX()) > 0 ||
+      Math.abs(newPointPosition.getY() - this.#lastPoint.getY()) > 0) {
       // clear last mouse move point
       if (this.#lastIsMouseMovePoint) {
         this.#points.pop();
       }
       // current point
-      this.#lastPoint = pos;
+      this.#lastPoint = newPointPosition;
       // mark it as temporary
       this.#lastIsMouseMovePoint = true;
       // add it to the list
@@ -646,6 +660,7 @@ export class Draw {
 
     // activate shape listeners
     this.#setShapeListeners(layerGroup, finalShapeGroup);
+    this.#setLabelListeners(layerGroup, finalShapeGroup);
   }
 
   /**
@@ -781,6 +796,8 @@ export class Draw {
       // activate shape listeners
       shapeGroups.forEach((group) => {
         this.#setShapeListeners(layerGroup, group);
+        this.#setLabelListeners(layerGroup, group);
+
       });
     } else {
       // de-activate shape listeners
@@ -890,7 +907,28 @@ export class Draw {
   }
 
   /**
-   * Set shape group on properties.
+   * Set label listeners
+   *
+   * @param {LayerGroup} layerGroup The origin layer group.
+   * @param {Konva.Group} shapeGroup The shape group to set on.
+   */
+  #setLabelListeners(layerGroup, shapeGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    // command name based on shape type
+    const kLabel = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(kLabel instanceof Konva.Label)) {
+      return;
+    }
+    kLabel.on('dragmove.draw', () => {
+      const factory = this.#getShapeFactory(shapeGroup);
+      if (factory && typeof factory.updateConnector === 'function') {
+        factory.updateConnector(drawLayer, shapeGroup);
+      }
+    });
+  }
+
+  /**
+   * Set shape group listeners
    *
    * @param {LayerGroup} layerGroup The origin layer group.
    * @param {Konva.Group} shapeGroup The shape group to set on.
@@ -915,7 +953,7 @@ export class Draw {
     let colour = null;
 
     // drag start event handling
-    shapeGroup.on('dragstart.draw', (/*event*/) => {
+    shape.on('dragstart.draw', (/*event*/) => {
       // store colour
       const shape = shapeGroup.getChildren(isNodeNameShape)[0];
       if (!(shape instanceof Konva.Shape)) {
@@ -929,21 +967,34 @@ export class Draw {
       // draw
       konvaLayer.draw();
     });
+
     // drag move event handling
-    shapeGroup.on('dragmove.draw', (event) => {
-      const group = event.target;
+    shape.on('dragmove.draw', (event) => {
+      const group = getShapeClosestParentGroup(event.currentTarget);
       if (!(group instanceof Konva.Group)) {
         return;
       }
-      // validate the group position
-      validateGroupPosition(drawLayer.getBaseSize(), group);
       // get appropriate factory
       const factory = this.#getShapeFactory(shapeGroup);
+
+      // Limits the shape movement
+      if (factory && typeof factory.limitShapeMove === 'function') {
+        factory.limitShapeMove(drawLayer, shape);
+      }
+
+      // validate the group position
+      validateGroupPosition(drawLayer.getBaseSize(), group);
+
       // update quantification if possible
       if (typeof factory.updateQuantification !== 'undefined') {
         const vc = layerGroup.getActiveViewLayer().getViewController();
         factory.updateQuantification(group, vc);
       }
+      // Update the connector limits (if exist)
+      if (factory && typeof factory.updateConnector === 'function') {
+        factory.updateConnector(drawLayer, group);
+      }
+
       // highlight trash when on it
       const mousePoint = getMousePoint(event.evt);
       const offset = {
@@ -953,12 +1004,14 @@ export class Draw {
       const eventPos = this.#getRealPosition(offset, layerGroup);
       this.#trash.changeChildrenColourOnTrashHover(eventPos,
         shapeGroup, colour);
+      this.#shapeEditor.resetAnchors();
       // draw
       konvaLayer.draw();
     });
+
     // drag end event handling
-    shapeGroup.on('dragend.draw', (event) => {
-      const group = event.target;
+    shape.on('dragend.draw', (event) => {
+      const group = getShapeClosestParentGroup(event.currentTarget);
       if (!(group instanceof Konva.Group)) {
         return;
       }
@@ -1014,14 +1067,15 @@ export class Draw {
       // reset start position
       dragStartPos = {x: group.x(), y: group.y()};
     });
-    // double click handling: update label
+
+    // double click handling on all the shape group: update label
     shapeGroup.on('dblclick', (event) => {
-      const group = event.currentTarget;
+      const group = getShapeClosestParentGroup(event.currentTarget);
       if (!(group instanceof Konva.Group)) {
         return;
       }
       // get the label object for this shape
-      const label = group.findOne('Label');
+      const label = group.getChildren(isNodeNameLabel)[0];
       if (!(label instanceof Konva.Label)) {
         return;
       }
@@ -1285,4 +1339,21 @@ export function validateAnchorPosition(stageSize, anchor) {
   );
 
   return boundNodePosition(anchor, min, max);
+}
+
+
+/**
+ * Get the closest parent group of the received node
+ *
+ * @param {Konva.Node} knode the node that has been selected
+ * @returns {Konva.Group | null} The konva parent group
+ */
+export function getShapeClosestParentGroup(knode) {
+  let group = knode;
+  let isGroup = group instanceof Konva.Group && !(group instanceof Konva.Label);
+  while (!group || !isGroup) {
+    group = group.getParent();
+    isGroup = group instanceof Konva.Group;
+  }
+  return group instanceof Konva.Group ? group : null;
 }

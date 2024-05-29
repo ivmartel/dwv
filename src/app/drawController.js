@@ -93,6 +93,17 @@ export function isNodeNameShape(node) {
 }
 
 /**
+ * Is an input node's name 'connector'.
+ *
+ * @param {Konva.Node} node A Konva node.
+ * @returns {boolean} True if the node's name is 'connector'.
+ */
+export function isNodeNameConnector(node) {
+  return node.name() === 'connector';
+}
+
+
+/**
  * Is a node an extra shape associated with a main one.
  *
  * @param {Konva.Node} node A Konva node.

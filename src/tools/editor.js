@@ -1,6 +1,6 @@
 import {logger} from '../utils/logger';
 import {getShapeDisplayName, ChangeGroupCommand} from './drawCommands';
-import {validateAnchorPosition} from './draw';
+import {getShapeClosestParentGroup, validateAnchorPosition} from './draw';
 // external
 import Konva from 'konva';
 
@@ -367,6 +367,11 @@ export class ShapeEditor {
       // validate the anchor position
       validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
       // update shape
+      const group = getShapeClosestParentGroup(anchor);
+      if (this.#currentFactory &&
+        typeof this.#currentFactory.updateConnector === 'function') {
+        this.#currentFactory.updateConnector(this.#drawLayer, group);
+      }
       this.#currentFactory.update(
         anchor, this.#app.getStyle(), this.#viewController);
       // redraw
