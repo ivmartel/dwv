@@ -251,9 +251,9 @@ export declare class App {
      *
      * @param {string[]} urls The list of urls to load.
      * @param {object} [options] The options object, can contain:
-     *  - requestHeaders: an array of {name, value} to use as request headers
-     *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
-     *  - batchSize: the size of the request url batch
+     * - requestHeaders: an array of {name, value} to use as request headers,
+     * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
+     * - batchSize: the size of the request url batch.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -446,13 +446,14 @@ export declare class App {
     onKeydown: (event: KeyboardEvent) => void;
     /**
      * Key down event handler example.
-     * - CRTL-Z: undo
-     * - CRTL-Y: redo
-     * - CRTL-ARROW_LEFT: next element on fourth dim
-     * - CRTL-ARROW_UP: next element on third dim
-     * - CRTL-ARROW_RIGHT: previous element on fourth dim
-     * - CRTL-ARROW_DOWN: previous element on third dim
-     * (applies to the active view of the active layer group)
+     * - CRTL-Z: undo,
+     * - CRTL-Y: redo,
+     * - CRTL-ARROW_LEFT: next element on fourth dim,
+     * - CRTL-ARROW_UP: next element on third dim,
+     * - CRTL-ARROW_RIGHT: previous element on fourth dim,
+     * - CRTL-ARROW_DOWN: previous element on third dim.
+     *
+     * Applies to the active view of the active layer group.
      *
      * @param {KeyboardEvent} event The key down event.
      * @fires UndoStack#undo
@@ -569,15 +570,16 @@ export declare class AppOptions {
     binders: string[] | undefined;
     /**
      * Optional boolean flag to trigger the first data render
-     *     after the first loaded data or not. Defaults to true.
+     *   after the first loaded data or not. Defaults to true.
      *
      * @type {boolean|undefined}
      */
     viewOnFirstLoadItem: boolean | undefined;
     /**
      * Optional default chraracterset string used for DICOM parsing if
-     *     not passed in DICOM file.
-     * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+     *   not passed in DICOM file.
+     *
+     * Valid values: {@link https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings}.
      *
      * @type {string|undefined}
      */
@@ -604,8 +606,8 @@ export declare namespace BLACK {
 
 /**
  * Build a multipart message.
- * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
- * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
+ * See: {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages}.
+ * See: {@link https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js}.
  *
  * @param {Array} parts The message parts as an array of object containing
  *   content headers and messages as the data property (as returned by parse).
@@ -666,7 +668,7 @@ export declare class ChangeSegmentColourCommand {
 
 /**
  * Colour map: red, green and blue components
- * to associate with intensity values.
+ *   to associate with intensity values.
  */
 export declare class ColourMap {
     /**
@@ -1030,7 +1032,7 @@ export declare class DicomWriter {
      * if nothing is found the default rule is applied.
      *
      * @param {Object<string, WriterRule>} rules The input rules.
-     * @param {boolean} [addMissingTags] if true, explicit tags that
+     * @param {boolean} [addMissingTags] If true, explicit tags that
      *   have replace rule and a value will be
      *   added if missing. Defaults to false.
      */
@@ -1739,7 +1741,8 @@ export declare function getUID(tagName: string): string;
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- *     after the 128 bytes preamble.
+ *   after the 128 bytes preamble.
+ *
  * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
@@ -1825,7 +1828,7 @@ declare class Image_2 {
     /**
      * Get the data buffer of the image.
      *
-     * @todo dangerous...
+     * @todo Dangerous...
      * @returns {TypedArray} The data buffer of the image.
      */
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
@@ -2260,18 +2263,18 @@ export declare function labToUintLab(triplet: object): object;
 /**
  * Layer group.
  *
- * Display position: {x,y}
- * Plane position: Index (access: get(i))
- * (world) Position: Point3D (access: getX, getY, getZ)
+ * - Display position: {x,y},
+ * - Plane position: Index (access: get(i)),
+ * - (world) Position: Point3D (access: getX, getY, getZ).
  *
  * Display -> World:
- * planePos = viewLayer.displayToPlanePos(displayPos)
- * -> compensate for layer scale and offset
- * pos = viewController.getPositionFromPlanePoint(planePos)
+ * - planePos = viewLayer.displayToPlanePos(displayPos)
+ *   -> compensate for layer scale and offset,
+ * - pos = viewController.getPositionFromPlanePoint(planePos).
  *
- * World -> display
- * planePos = viewController.getOffset3DFromPlaneOffset(pos)
- * no need yet for a planePos to displayPos...
+ * World -> Display:
+ * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
+ *   no need yet for a planePos to displayPos...
  */
 export declare class LayerGroup {
     /**
