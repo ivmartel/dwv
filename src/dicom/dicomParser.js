@@ -326,7 +326,8 @@ export function getTransferSyntaxName(syntax) {
 
 /**
  * Guess the transfer syntax from the first data element.
- * See https://github.com/ivmartel/dwv/issues/188
+ *
+ * See {@link https://github.com/ivmartel/dwv/issues/188}
  *   (Allow to load DICOM with no DICM preamble) for more details.
  *
  * @param {DataElement} firstDataElement The first data element
@@ -582,8 +583,9 @@ export class DicomParser {
     /**
      * The text decoder.
      *
+     * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder}.
+     *
      * @external TextDecoder
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
      */
     this.#textDecoder = new TextDecoder(characterSet);
   }
@@ -721,6 +723,7 @@ export class DicomParser {
 
   /**
    * Read a DICOM data element.
+   *
    * Reference: [DICOM VRs]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1}.
    *
    * @param {DataReader} reader The raw data reader.

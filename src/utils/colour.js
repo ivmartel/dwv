@@ -63,8 +63,10 @@ export function isEqualRgb(c1, c2) {
 /**
  * Convert YBR to RGB.
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
- * @see https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
+ * Ref:
+ * - {@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2},
+ * - {@link https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion}.
+ *
  * @param {number} y The Y component.
  * @param {number} cb The Cb component.
  * @param {number} cr The Cr component.
@@ -107,7 +109,8 @@ export function rgbToHex(rgb) {
  * Get the brightness of a RGB colour: calculates
  * the luma (Y) of the YIQ colour space.
  *
- * @see https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ
+ * Ref: {@link https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ}.
+ *
  * @param {RGB} rgb RGB triplet.
  * @returns {number} The brightness ([0,1]).
  */
@@ -179,7 +182,7 @@ export function labToUintLab(triplet) {
 /**
  * CIE Standard Illuminant D65, standard 2° observer.
  *
- * @see https://en.wikipedia.org/wiki/Illuminant_D65
+ * Ref: {@link https://en.wikipedia.org/wiki/Illuminant_D65}.
  */
 const d65 = {
   x: 95.0489,
@@ -190,7 +193,8 @@ const d65 = {
 /**
  * Convert CIE LAB to CIE XYZ (standard illuminant D65, 2degree 1931).
  *
- * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ
+ * Ref: {@link https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ}.
+ *
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
  * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */
@@ -227,7 +231,8 @@ export function cielabToCiexyz(triplet) {
 /**
  * Convert CIE XYZ to CIE LAB (standard illuminant D65, 2degree 1931).
  *
- * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB
+ * Ref: {@link https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB}.
+ *
  * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
@@ -265,7 +270,8 @@ export function ciexyzToCielab(triplet) {
 /**
  * Convert CIE XYZ to sRGB.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
+ * Ref: {@link https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB}.
+ *
  * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {RGB} 'sRGB' triplet as {r,g,b}.
  */
@@ -302,7 +308,8 @@ export function ciexyzToSrgb(triplet) {
 /**
  * Convert sRGB to CIE XYZ.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
+ * Ref: {@link https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ}.
+ *
  * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
  * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */

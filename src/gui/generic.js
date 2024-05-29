@@ -111,8 +111,10 @@ export function getMousePoint(event) {
 /**
  * Test if a canvas with the input size can be created.
  *
- * @see https://github.com/ivmartel/dwv/issues/902
- * @see https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js
+ * Ref:
+ * - {@link https://github.com/ivmartel/dwv/issues/902},
+ * - {@link https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js}.
+ *
  * @param {number} width The canvas width.
  * @param {number} height The canvas height.
  * @returns {boolean} True is the canvas can be created.

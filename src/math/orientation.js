@@ -101,7 +101,7 @@ export function getOrientationStringLPS(matrix) {
 
 /**
  * Get the orientation code of an orientation vector.
- * Credits: David Clunie, https://www.dclunie.com/medical-image-faq/html/part2.html.
+ * Credits: David Clunie, {@link https://www.dclunie.com/medical-image-faq/html/part2.html}.
  *
  * @param {Vector3D} vector The orientation vector.
  * @returns {string} The orientation code.

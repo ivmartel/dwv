@@ -106,11 +106,14 @@ export function getDefaultAnonymisationRules() {
 
 /**
  * Get a UID for a DICOM tag.
- * Note: Use https://github.com/uuidjs/uuid?
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
- * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
- * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
+ * Note: Use {@link https://github.com/uuidjs/uuid}?
+ *
+ * Ref:
+ * - {@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html},
+ * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
+ * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
+ *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
@@ -184,7 +187,8 @@ function isStringVr(vr) {
 
 /**
  * Is the input VR a VR that could need padding.
- * See http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html.
+ *
+ * See {@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html}.
  *
  * @param {string} vr The element VR.
  * @returns {boolean} True if the VR needs padding.
@@ -497,8 +501,9 @@ export class DicomWriter {
     /**
      * The text encoder.
      *
+     * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder}.
+     *
      * @external TextEncoder
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder
      */
     this.#textEncoder = new TextEncoder();
   }

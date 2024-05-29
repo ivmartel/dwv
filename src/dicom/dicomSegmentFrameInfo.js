@@ -12,7 +12,7 @@ import {Spacing} from '../image/spacing';
  * DICOM segment frame info: item of a
  *  PerframeFunctionalGroupsSequence (5200,9230).
  *
- * @see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.16.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.16.html}.
  */
 export class DicomSegmentFrameInfo {
   /**

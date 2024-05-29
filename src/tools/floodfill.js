@@ -21,8 +21,9 @@ import {Scalar2D} from '../math/scalar';
 /**
  * The magic wand namespace.
  *
+ * Ref: {@link https://github.com/Tamersoul/magic-wand-js}.
+ *
  * @external MagicWand
- * @see https://github.com/Tamersoul/magic-wand-js
  */
 import MagicWand from 'magic-wand-tool';
 

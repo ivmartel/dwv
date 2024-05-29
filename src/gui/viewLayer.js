@@ -170,7 +170,8 @@ export class ViewLayer {
 
   /**
    * Image smoothing flag.
-   * See: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled.
+   *
+   * See: {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled}.
    *
    * @type {boolean}
    */

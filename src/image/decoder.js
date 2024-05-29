@@ -3,8 +3,9 @@ import {ThreadPool, WorkerTask} from '../utils/thread';
 /**
  * The JPEG baseline decoder.
  *
+ * Ref: {@link https://github.com/mozilla/pdf.js/blob/master/src/core/jpg.js}.
+ *
  * @external JpegImage
- * @see https://github.com/mozilla/pdf.js/blob/master/src/core/jpg.js
  */
 /* global JpegImage */
 // @ts-ignore
@@ -13,8 +14,9 @@ const hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
 /**
  * The JPEG decoder namespace.
  *
+ * Ref: {@link https://github.com/rii-mango/JPEGLosslessDecoderJS}.
+ *
  * @external jpeg
- * @see https://github.com/rii-mango/JPEGLosslessDecoderJS
  */
 /* global jpeg */
 const hasJpegLosslessDecoder =
@@ -24,8 +26,9 @@ const hasJpegLosslessDecoder =
 /**
  * The JPEG 2000 decoder.
  *
+ * Ref: {@link https://github.com/jpambrun/jpx-medical/blob/master/jpx.js}.
+ *
  * @external JpxImage
- * @see https://github.com/jpambrun/jpx-medical/blob/master/jpx.js
  */
 /* global JpxImage */
 // @ts-ignore

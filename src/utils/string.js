@@ -203,9 +203,11 @@ export function stringToUint8Array(str) {
 
 /**
  * Round a float number to a given precision.
- * Inspired from https://stackoverflow.com/a/49729715/3639892.
+ *
+ * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
+ *
  * Can be a solution to not have trailing zero as when
- * using toFixed or toPrecision.
+ *   using toFixed or toPrecision.
  * '+number.toFixed(precision)' does not pass all the tests...
  *
  * @param {number} number The number to round.

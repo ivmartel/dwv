@@ -1,7 +1,7 @@
 /**
  * ListenerHandler class: handles add/removing and firing listeners.
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget#example
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget#example}.
  */
 export class ListenerHandler {
   /**

@@ -318,8 +318,9 @@ export class UrlsLoader {
       /**
        * The http request.
        *
+       * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest}.
+       *
        * @external XMLHttpRequest
-       * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
        */
       const request = new XMLHttpRequest();
       request.open('GET', dataElement, true);

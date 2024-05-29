@@ -183,8 +183,9 @@ function getPercentile(values, ratio) {
 
 /**
  * Unique ID generator.
+ *
  * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
- * and this {@link http://stackoverflow.com/a/13403498 answer}.
+ *   and this {@link http://stackoverflow.com/a/13403498 answer}.
  *
  * @returns {string} A unique ID.
  */

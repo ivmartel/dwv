@@ -126,6 +126,7 @@ export class Ellipse {
 
   /**
    * Get the rounded limits of the ellipse.
+   *
    * See: {@link https://en.wikipedia.org/wiki/Ellipse#Standard_equation}.
    *
    * Ellipse formula: `x*x / a*a + y*y / b*b = 1`.

@@ -7,8 +7,9 @@ import {MemoryLoader} from './memoryLoader';
 /**
  * The zip library.
  *
+ * Ref: {@link https://github.com/Stuk/jszip}.
+ *
  * @external JSZip
- * @see https://github.com/Stuk/jszip
  */
 import JSZip from 'jszip';
 

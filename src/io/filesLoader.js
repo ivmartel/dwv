@@ -263,8 +263,9 @@ export class FilesLoader {
       /**
        * The file reader.
        *
+       * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/FileReader}.
+       *
        * @external FileReader
-       * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
        */
       const reader = new FileReader();
       // store reader

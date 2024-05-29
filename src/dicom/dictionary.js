@@ -5337,8 +5337,9 @@ export const tagGroups = {
 
 /**
  * List of Value Representation (VR) with 32bit Value Length (VL).
+ *
  * Added locally used 'ox'.
- * See http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1.
+ * See {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1}.
  *
  * @type {Object<string, boolean>}
  */
@@ -5371,8 +5372,9 @@ export function is32bitVLVR(vr) {
 
 /**
  * List of string VR with extended or replaced default character repertoire defined in
- * Specific Character Set (0008,0005)
- * See https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2.
+ *   Specific Character Set (0008,0005).
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2}.
  *
  * @type {Object<string, boolean>}
  */
@@ -5398,7 +5400,8 @@ export function isCharSetStringVR(vr) {
 
 /**
  * VR equivalent javascript types.
- * See https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1.
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  *
  * @type {Object<string, string>}
  */
@@ -5441,7 +5444,8 @@ export const vrTypes = {
 
 /**
  * Transfer syntaxes.
- * See https://dicom.nema.org/medical/dicom/2022a/output/chtml/part06/chapter_A.html#table_A-1.
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part06/chapter_A.html#table_A-1}.
  *
  * @type {Object<string, string>}
  */

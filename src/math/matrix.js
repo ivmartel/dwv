@@ -290,11 +290,13 @@ export class Matrix33 {
 /**
  * Get the inverse of an input 3*3 matrix.
  *
+ * Ref:
+ * - {@link https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices},
+ * - {@link https://github.com/willnode/N-Matrix-Programmer}.
+ *
  * @param {Matrix33} m The input matrix.
  * @returns {Matrix33|undefined} The inverse matrix or undefined
  *   if the determinant is zero.
- * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
- * @see https://github.com/willnode/N-Matrix-Programmer
  */
 function getMatrixInverse(m) {
   const m00 = m.get(0, 0);
