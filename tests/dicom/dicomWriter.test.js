@@ -264,10 +264,10 @@ QUnit.test(
 );
 
 /**
- * Compare JSON tags and DICOM elements
+ * Compare JSON tags and DICOM elements.
  *
  * @param {object} jsonTags The JSON tags.
- * @param {object} dicomElements The DICOM elements
+ * @param {object} dicomElements The DICOM elements.
  * @param {string} name The name of the test.
  * @param {object} comparator An object with an equal function (such as
  *   Qunit assert).
@@ -316,10 +316,10 @@ function compare(jsonTags, dicomElements, name, comparator) {
 }
 
 /**
- * Simple GradSquarePixGenerator
+ * Simple GradSquarePixGenerator.
  *
  * @param {object} tags The input tags.
- * @returns {object} The pixel buffer
+ * @returns {object} The pixel buffer.
  */
 function generateGradSquare(tags) {
 
@@ -422,10 +422,10 @@ function generateGradSquare(tags) {
 }
 
 /**
- * Simple BinaryPixGenerator
+ * Simple BinaryPixGenerator.
  *
  * @param {object} tags The input tags.
- * @returns {object} The pixel buffer
+ * @returns {object} The pixel buffer.
  */
 function generateBinary(tags) {
 

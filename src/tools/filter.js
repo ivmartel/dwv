@@ -30,7 +30,7 @@ export class Filter {
   }
 
   /**
-   * Filter list
+   * Filter list.
    *
    * @type {object}
    */

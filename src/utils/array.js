@@ -83,7 +83,7 @@ export function uint8ArrayToString(arr) {
 
 /**
  * Array find in a subset of the input array.
- * Equivalent to: arr.slice(start, end).find(callbackFn)
+ * Equivalent to: `arr.slice(start, end).find(callbackFn)`.
  *
  * @param {Uint8Array} arr The input array to search.
  * @param {Function} callbackFn The find function.
@@ -132,7 +132,7 @@ export function getFindArrayInArrayCallback(arr1) {
 
 /**
  * Extract each element of a multipart ArrayBuffer.
- * https://en.wikipedia.org/wiki/MIME#Multipart_messages
+ * Ref: https://en.wikipedia.org/wiki/MIME#Multipart_messages.
  *
  * @param {ArrayBuffer} arr The multipart array.
  * @returns {Array} The multipart parts as an array of object as

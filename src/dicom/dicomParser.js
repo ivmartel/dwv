@@ -43,8 +43,8 @@ export function getDwvVersion() {
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- * after the 128 bytes preamble.
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *     after the 128 bytes preamble.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -70,7 +70,7 @@ const ZWS = String.fromCharCode('u200B');
  * Clean string: remove zero-width space ending and trim.
  * Warning: no tests are done on the input, will fail if
  *   null or undefined or not string.
- * (exported for tests only)
+ * Exported for tests only.
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.
@@ -143,7 +143,7 @@ function getUtfLabel(charSetTerm) {
 }
 
 /**
- * Default text decoder
+ * Default text decoder.
  */
 class DefaultTextDecoder {
   /**

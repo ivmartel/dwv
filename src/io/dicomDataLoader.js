@@ -42,7 +42,7 @@ export class DicomDataLoader {
   }
 
   /**
-   * DICOM buffer to View (asynchronous)
+   * DICOM buffer to View (asynchronous).
    *
    */
   #db2v = new DicomBufferToView();

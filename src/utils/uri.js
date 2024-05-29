@@ -46,7 +46,7 @@ export function splitUri(uri) {
 
 /**
  * Get the query part, split into an array, of an input URI.
- * The URI scheme is: 'base?query#fragment'
+ * The URI scheme is: 'base?query#fragment'.
  *
  * @param {string} uri The input URI.
  * @returns {object} The query part, split into an array, of the input URI.

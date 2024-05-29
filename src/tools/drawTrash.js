@@ -18,7 +18,7 @@ export class DrawTrash {
   }
 
   /**
-   * Creates the trash icon o positionates it
+   * Creates the trash icon o positionates it.
    */
   createTrashIcon() {
     this.#trash = new Konva.Group();
@@ -40,9 +40,9 @@ export class DrawTrash {
 
   /**
    *
-   * Activates the trash, by showing the icon into the layer draw layer
+   * Activates the trash, by showing the icon into the layer draw layer.
    *
-   * @param {DrawLayer} drawLayer the draw layer where to draw
+   * @param {DrawLayer} drawLayer The draw layer where to draw.
    */
   activate(drawLayer) {
     const stage = drawLayer.getKonvaStage();
@@ -59,11 +59,12 @@ export class DrawTrash {
 
   /**
    *
-   * Activates the trash, by showing the icon into the layer draw layer
+   * Change colour on trash over.
    *
-   * @param {Scalar2D} eventPosition The event drag move position
-   * @param {Konva.Group} shapeGroup The shape group whose colour must be change
-   * @param {string} originalShapeColour The original shape colour
+   * @param {Scalar2D} eventPosition The event drag move position.
+   * @param {Konva.Group} shapeGroup The shape group whose colour
+   *     must be change.
+   * @param {string} originalShapeColour The original shape colour.
    */
   changeChildrenColourOnTrashHover(eventPosition,
     shapeGroup, originalShapeColour) {
@@ -78,9 +79,10 @@ export class DrawTrash {
   }
 
   /**
+   * Change colour on trash out.
    *
-   * @param {Konva.Group} group The group whose colour must be change
-   * @param {string} colour The new colour to be set
+   * @param {Konva.Group} group The group whose colour must be change.
+   * @param {string} colour The new colour to be set.
    */
   changeGroupChildrenColour(group, colour) {
     group.getChildren().forEach(function (tshape) {
@@ -92,18 +94,17 @@ export class DrawTrash {
   }
 
   /**
-   * Removes the trash from the draw layer
+   * Removes the trash from the draw layer.
    */
   remove() {
     this.#trash.remove();
   }
 
   /**
+   * Determines if the event is over trash.
    *
-   * Determines if the event is over trash
-   *
-   * @param {Scalar2D} eventPosition The event position
-   * @returns {boolean} true if the event is over trash
+   * @param {Scalar2D} eventPosition The event position.
+   * @returns {boolean} True if the event is over trash.
    */
   isOverTrash(eventPosition) {
     const trashHalfWidth =

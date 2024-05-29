@@ -64,7 +64,7 @@ export class Rectangle {
   /**
    * Get the begin point of the rectangle.
    *
-   * @returns {Point2D} The begin point of the rectangle
+   * @returns {Point2D} The begin point of the rectangle.
    */
   getBegin() {
     return this.#begin;
@@ -73,7 +73,7 @@ export class Rectangle {
   /**
    * Get the end point of the rectangle.
    *
-   * @returns {Point2D} The end point of the rectangle
+   * @returns {Point2D} The end point of the rectangle.
    */
   getEnd() {
     return this.#end;

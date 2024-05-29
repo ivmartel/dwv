@@ -55,7 +55,7 @@ export class ViewController {
    * Colour map name.
    * Defaults to 'plain' as defined in Views' default.
    *
-   * #type {string}
+   * @type {string}
    */
   #colourMapName = 'plain';
 
@@ -302,7 +302,7 @@ export class ViewController {
   /**
    * Get the image rescaled value at the input position.
    *
-   * @param {Point} position the input position.
+   * @param {Point} position The input position.
    * @returns {number|undefined} The image value or undefined if out of bounds
    *   or no quantifiable (for ex RGB).
    */
@@ -323,7 +323,7 @@ export class ViewController {
   /**
    * Get the image pixel unit.
    *
-   * @returns {string} The unit
+   * @returns {string} The unit.
    */
   getPixelUnit() {
     return this.#view.getImage().getMeta().pixelUnit;

@@ -47,7 +47,7 @@ export function simpleRange(dataAccessor, start, end, increment) {
  * Get an iterator for a given range for a one component data.
  *
  * Using 'maxIter' and not an 'end' index since it fails in some edge cases
- * (for ex coronal2, ie zxy)
+ * (for ex coronal2, ie zxy).
  *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start Zero-based index at which to start the iteration.
@@ -270,7 +270,7 @@ export function simpleRange3d(
  * Get an iterator for a given range for a 3 components data.
  *
  * Using 'maxIter' and not an 'end' index since it fails in some edge cases
- * (for ex coronal2, ie zxy)
+ * (for ex coronal2, ie zxy).
  *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start Zero-based index at which to start the iteration.

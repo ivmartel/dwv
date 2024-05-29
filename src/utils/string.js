@@ -155,7 +155,7 @@ export function replaceFlags(inputStr, values) {
  * Get the root of an input path.
  * Splits using `/` as separator.
  *
- * @param {string} path The input path
+ * @param {string} path The input path.
  * @returns {string} The input path without its last part.
  */
 export function getRootPath(path) {

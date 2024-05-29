@@ -47,9 +47,9 @@ export class ZipLoader {
   #zobjs = null;
 
   /**
-   * JSZip.async callback
+   * JSZip.async callback.
    *
-   * @param {ArrayBuffer} content unzipped file image
+   * @param {ArrayBuffer} content Unzipped file image.
    * @param {object} origin The origin of the file.
    * @param {number} index The data index.
    */

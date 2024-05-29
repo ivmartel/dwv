@@ -996,7 +996,7 @@ export function getSuvFactor(elements) {
 }
 
 /**
- * Get the file list from a DICOMDIR
+ * Get the file list from a DICOMDIR.
  *
  * @param {object} data The buffer data of the DICOMDIR
  * @returns {Array|undefined} The file list as an array ordered by

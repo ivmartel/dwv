@@ -74,7 +74,7 @@ function getPixelGeneratorName() {
 }
 
 /**
- * Generate DICOM data
+ * Generate DICOM data.
  */
 function onGenerate() {
   if (_generating) {
@@ -232,7 +232,7 @@ function onInputTagsFile(event) {
 }
 
 /**
- * Handle input image file
+ * Handle input image file.
  *
  * @param {object} event The input field event.
  */

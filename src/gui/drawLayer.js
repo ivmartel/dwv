@@ -402,14 +402,14 @@ export class DrawLayer {
 
   /**
    * Draw the content (imageData) of the layer.
-   * The imageData variable needs to be set
+   * The imageData variable needs to be set.
    */
   draw() {
     this.#konvaStage.draw();
   }
 
   /**
-   * Initialise the layer: set the canvas and context
+   * Initialise the layer: set the canvas and context.
    *
    * @param {Scalar2D} size The image size as {x,y}.
    * @param {Scalar2D} spacing The image spacing as {x,y}.

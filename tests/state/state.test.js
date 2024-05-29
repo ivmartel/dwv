@@ -106,8 +106,8 @@ function checkStateHeader(jsonData, version, assert) {
 /**
  * Check drawings.
  *
- * @param {object} drawings The drawing object to check
- * @param {object} details The drawing details
+ * @param {object} drawings The drawing object to check.
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {string} type The type of drawing.
  * @param {object} assert The qunit assert.
@@ -190,7 +190,7 @@ function checkDrawings(drawings, details, version, type, assert) {
  * Check an arrow drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
@@ -279,7 +279,7 @@ function checkArrowDrawing(posGroupKid, details, version, assert) {
  * Check a ruler drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {string} ref The reference data to compare to.
  * @param {object} assert The qunit assert.
@@ -378,7 +378,7 @@ function checkRulerDrawing(
  * Check a multi slice ruler drawing.
  *
  * @param {object} layerKids The draw layer.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
@@ -463,7 +463,7 @@ function checkRulerDrawings(layerKids, details, version, assert) {
  * Check a roi drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
@@ -560,7 +560,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
  * Check a hand drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
@@ -661,7 +661,7 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
  * Check an ellipse drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
@@ -758,7 +758,7 @@ function checkEllipseDrawing(
  * Check a protractor drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */
@@ -856,7 +856,7 @@ function checkProtractorDrawing(
  * Check a rectangle drawing.
  *
  * @param {object} posGroupKid The position group (only) kid.
- * @param {object} details The drawing details
+ * @param {object} details The drawing details.
  * @param {string} version The state format version.
  * @param {object} assert The qunit assert.
  */

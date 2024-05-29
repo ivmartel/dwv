@@ -206,7 +206,7 @@ class WorkerThread {
   }
 
   /**
-   * Run a worker task
+   * Run a worker task.
    *
    * @param {object} workerTask The task to run.
    */

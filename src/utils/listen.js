@@ -5,7 +5,7 @@
  */
 export class ListenerHandler {
   /**
-   * listeners.
+   * Listeners.
    *
    * @type {object}
    */

@@ -18,7 +18,7 @@ import dwvTestBadZip from '../data/dwv-test_bad.zip';
 QUnit.module('io');
 
 /**
- * Check the events of memory load
+ * Check the events of memory load.
  *
  * @param {object} assert The Qunit assert object.
  * @param {string} id An id for the test.

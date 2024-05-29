@@ -143,7 +143,7 @@ QUnit.test('isDarkColour', function (assert) {
 
 /**
  * Tests for {@link cielabToCiexyz}.
- * ref: https://www.easyrgb.com/en/convert.php
+ * Ref: https://www.easyrgb.com/en/convert.php.
  *
  * @function module:tests/utils~cielab-to-ciexyz
  */
@@ -163,7 +163,7 @@ QUnit.test('cielab to ciexyz', function (assert) {
 
 /**
  * Tests for {@link ciexyzToCielab}.
- * ref: https://www.easyrgb.com/en/convert.php
+ * Ref: https://www.easyrgb.com/en/convert.php.
  *
  * @function module:tests/utils~ciexyz-to-cielab
  */
@@ -183,7 +183,7 @@ QUnit.test('ciexyz to cielab', function (assert) {
 
 /**
  * Tests for {@link ciexyzToSrgb}.
- * ref: https://www.easyrgb.com/en/convert.php
+ * Ref: https://www.easyrgb.com/en/convert.php.
  *
  * @function module:tests/utils~ciexyz-to-srgb
  */
@@ -203,7 +203,7 @@ QUnit.test('ciexyz to srgb', function (assert) {
 
 /**
  * Tests for {@link srgbToCiexyz}.
- * ref: https://www.easyrgb.com/en/convert.php
+ * Ref: https://www.easyrgb.com/en/convert.php.
  *
  * @function module:tests/utils~srgb-to-ciexyz
  */
@@ -224,7 +224,7 @@ QUnit.test('srgb to ciexyz', function (assert) {
 
 /**
  * Tests for {@link cielabToSrgb}.
- * ref: https://www.easyrgb.com/en/convert.php
+ * Ref: https://www.easyrgb.com/en/convert.php.
  *
  * @function module:tests/utils~cielab-to-srgb
  */
@@ -244,7 +244,7 @@ QUnit.test('cielab to rgb', function (assert) {
 
 /**
  * Tests for {@link srgbToCielab}.
- * ref: https://www.easyrgb.com/en/convert.php
+ * Ref: https://www.easyrgb.com/en/convert.php.
  *
  * @function module:tests/utils~srgb-to-cielab
  */

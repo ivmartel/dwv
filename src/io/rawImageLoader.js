@@ -10,7 +10,7 @@ import {urlContentTypes} from './urlsLoader';
 export class RawImageLoader {
 
   /**
-   * if abort is triggered, all image.onload callbacks have to be cancelled
+   * If abort is triggered, all image.onload callbacks have to be cancelled.
    *
    * @type {boolean}
    */

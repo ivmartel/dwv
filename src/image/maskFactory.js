@@ -203,7 +203,7 @@ function createRoiSliceBuffers(
  *
  * @param {Image} image The mask image.
  * @param {MaskSegment[]} segments The mask segments.
- * @returns {object} The ROI buffers
+ * @returns {object} The ROI buffers.
  */
 function createRoiBuffers(image, segments) {
   const geometry = image.getGeometry();

@@ -344,7 +344,7 @@ export class LayerGroup {
   }
 
   /**
-   * Get the added scale: the scale added to the base scale
+   * Get the added scale: the scale added to the base scale.
    *
    * @returns {Scalar3D} The scale as {x,y,z}.
    */

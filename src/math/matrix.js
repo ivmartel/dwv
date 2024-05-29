@@ -40,14 +40,14 @@ export class Matrix33 {
   #values;
 
   /**
-   * Matrix inverse, calculated at first ask
+   * Matrix inverse, calculated at first ask.
    *
    * @type {Matrix33}
    */
   #inverse;
 
   /**
-   * @param {number[]} values row-major ordered 9 values.
+   * @param {number[]} values Row-major ordered 9 values.
    */
   constructor(values) {
     this.#values = values;
@@ -255,7 +255,7 @@ export class Matrix33 {
   }
 
   /**
-   * Get this matrix with only zero and +/- ones instead of the maximum,
+   * Get this matrix with only zero and +/- ones instead of the maximum.
    *
    * @returns {Matrix33} The simplified matrix.
    */

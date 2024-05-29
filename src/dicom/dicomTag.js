@@ -118,7 +118,7 @@ export class Tag {
 
   /**
    * Is the tag group a private tag group ?
-   * see: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8
+   * See: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8.
    *
    * @returns {boolean} True if the tag group is private,
    *   ie if its group is an odd number.

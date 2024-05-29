@@ -56,10 +56,10 @@ export class CircleFactory {
   }
 
   /**
-   * Calculates the mathematical circle
+   * Calculates the mathematical circle.
    *
-   * @param {Point2D[]} points the points that define the circle
-   * @returns {Circle} the mathematical circle
+   * @param {Point2D[]} points The points that define the circle.
+   * @returns {Circle} The mathematical circle.
    */
   #calculateMathShape(points) {
     // calculate radius
@@ -71,11 +71,11 @@ export class CircleFactory {
   }
 
   /**
-   * Creates the konva circle shape
+   * Creates the konva circle shape.
    *
-   * @param {Circle} circle The mathematical circle
+   * @param {Circle} circle The mathematical circle.
    * @param {Style} style The drawing style.
-   * @returns {Konva.Circle} The konva circle shape
+   * @returns {Konva.Circle} The konva circle shape.
    */
   #createShape(circle, style) {
     return new Konva.Circle({
@@ -90,12 +90,12 @@ export class CircleFactory {
   }
 
   /**
-   * Creates the konva label
+   * Creates the konva label.
    *
-   * @param {Circle} circle The mathematical circle
+   * @param {Circle} circle The mathematical circle.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller
-   * @returns {Konva.Label} The Konva label
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Label} The Konva label.
    */
   #createLabel(circle, style, viewController) {
     // quantification

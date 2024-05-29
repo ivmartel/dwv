@@ -140,14 +140,14 @@ export class AppOptions {
   binders;
   /**
    * Optional boolean flag to trigger the first data render
-   *   after the first loaded data or not. Defaults to true;
+   *     after the first loaded data or not. Defaults to true.
    *
    * @type {boolean|undefined}
    */
   viewOnFirstLoadItem;
   /**
-   * Optional default chraracter set string used for DICOM parsing if
-   * not passed in DICOM file.
+   * Optional default chraracterset string used for DICOM parsing if
+   *     not passed in DICOM file.
    * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
    *
    * @type {string|undefined}
@@ -517,7 +517,7 @@ export class App {
   /**
    * Initialise the application.
    *
-   * @param {AppOptions} opt The application options
+   * @param {AppOptions} opt The application options.
    * @example
    * // create the dwv app
    * const app = new dwv.App();
@@ -1318,7 +1318,7 @@ export class App {
   // Internal members shortcuts-----------------------------------------------
 
   /**
-   * Reset the display
+   * Reset the display.
    */
   resetDisplay() {
     this.resetLayout();
@@ -1326,7 +1326,7 @@ export class App {
   }
 
   /**
-   * Reset the app zoom.s
+   * Reset the app zoom.
    */
   resetZoom() {
     this.resetLayout();
@@ -1359,7 +1359,7 @@ export class App {
   }
 
   /**
-   * Set the tool
+   * Set the tool.
    *
    * @param {string} tool The tool.
    */
@@ -1395,7 +1395,7 @@ export class App {
   }
 
   /**
-   * Undo the last action
+   * Undo the last action.
    *
    * @fires UndoStack#undo
    */
@@ -1404,7 +1404,7 @@ export class App {
   }
 
   /**
-   * Redo the last action
+   * Redo the last action.
    *
    * @fires UndoStack#redo
    */

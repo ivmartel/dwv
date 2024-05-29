@@ -117,7 +117,7 @@ export class Draw {
   #isDrawing = false;
 
   /**
-   * Shape factory list
+   * Shape factory list.
    *
    * @type {object}
    */
@@ -289,7 +289,7 @@ export class Draw {
    *
    * @param {LayerGroup} layerGroup The layer group where the user clicks.
    * @param {DrawLayer} drawLayer The draw layer where to draw.
-   * @param {Konva.Shape} kshape the shape that has been selected
+   * @param {Konva.Shape} kshape The shape that has been selected.
    */
   #selectShapeGroup(layerGroup, drawLayer, kshape) {
     const group = kshape.getParent();
@@ -846,7 +846,7 @@ export class Draw {
    * Sets shape group mouse over and out listeners: updated
    *   shape group opacity and cursor.
    *
-   * @param {Konva.Group} shapeGroup the shape group.
+   * @param {Konva.Group} shapeGroup The shape group.
    */
   #setMouseStylingListeners(shapeGroup) {
     // handle mouse over

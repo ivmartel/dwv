@@ -199,7 +199,7 @@ export function cielabToCiexyz(triplet) {
    * Apply the inverse lab function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function invLabFunc(x) {
     let res = null;
@@ -236,7 +236,7 @@ export function ciexyzToCielab(triplet) {
    * Apply the lab function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function labFunc(x) {
     let res = null;
@@ -267,14 +267,14 @@ export function ciexyzToCielab(triplet) {
  *
  * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
  * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
- * @returns {RGB} sRGB triplet as {r,g,b}.
+ * @returns {RGB} 'sRGB' triplet as {r,g,b}.
  */
 export function ciexyzToSrgb(triplet) {
   /**
    * Apply the gamma function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function gammaFunc(x) {
     let res = null;
@@ -303,7 +303,7 @@ export function ciexyzToSrgb(triplet) {
  * Convert sRGB to CIE XYZ.
  *
  * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
- * @param {RGB} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
  * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */
 export function srgbToCiexyz(triplet) {
@@ -311,7 +311,7 @@ export function srgbToCiexyz(triplet) {
    * Apply the inverse gamma function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function invGammaFunc(x) {
     let res = null;
@@ -338,7 +338,7 @@ export function srgbToCiexyz(triplet) {
  * Convert CIE LAB to sRGB (standard illuminant D65).
  *
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
- * @returns {RGB} sRGB triplet as {r,g,b}.
+ * @returns {RGB} 'sRGB' triplet as {r,g,b}.
  */
 export function cielabToSrgb(triplet) {
   return ciexyzToSrgb(cielabToCiexyz(triplet));
@@ -347,7 +347,7 @@ export function cielabToSrgb(triplet) {
 /**
  * Convert sRGB to CIE LAB (standard illuminant D65).
  *
- * @param {RGB} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export function srgbToCielab(triplet) {
