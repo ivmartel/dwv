@@ -606,8 +606,10 @@ export declare namespace BLACK {
 
 /**
  * Build a multipart message.
- * See: {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages}.
- * See: {@link https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js}.
+ *
+ * Ref:
+ * - {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages},
+ * - {@link https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js}.
  *
  * @param {Array} parts The message parts as an array of object containing
  *   content headers and messages as the data property (as returned by parse).
@@ -877,7 +879,7 @@ export declare class DeleteSegmentCommand {
 /**
  * DICOM code: item of a basic code sequence.
  *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html}.
  */
 export declare class DicomCode {
     /**
@@ -1729,11 +1731,14 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
 
 /**
  * Get a UID for a DICOM tag.
- * Note: Use https://github.com/uuidjs/uuid?
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
- * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
- * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
+ * Note: Use {@link https://github.com/uuidjs/uuid}?
+ *
+ * Ref:
+ * - {@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html},
+ * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
+ * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
+ *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
@@ -2656,7 +2661,7 @@ export declare class MaskFactory {
 /**
  * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
  *
- * @see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html}.
  */
 export declare class MaskSegment {
     /**
@@ -3293,9 +3298,11 @@ export declare class Point3D {
 
 /**
  * Round a float number to a given precision.
- * Inspired from https://stackoverflow.com/a/49729715/3639892.
+ *
+ * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
+ *
  * Can be a solution to not have trailing zero as when
- * using toFixed or toPrecision.
+ *   using toFixed or toPrecision.
  * '+number.toFixed(precision)' does not pass all the tests...
  *
  * @param {number} number The number to round.
@@ -3664,7 +3671,8 @@ export declare class Tag {
     isWithVR(): boolean;
     /**
      * Is the tag group a private tag group ?
-     * See: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8.
+     *
+     * See: {@link http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8}.
      *
      * @returns {boolean} True if the tag group is private,
      *   ie if its group is an odd number.
@@ -3850,7 +3858,8 @@ export declare class Vector3D {
      * vector that is perpendicular to both a and b.
      * If both vectors are parallel, the cross product is a zero vector.
      *
-     * @see https://en.wikipedia.org/wiki/Cross_product
+     * Ref: {@link https://en.wikipedia.org/wiki/Cross_product}.
+     *
      * @param {Vector3D} vector3D The input vector.
      * @returns {Vector3D} The result vector.
      */
@@ -3858,7 +3867,8 @@ export declare class Vector3D {
     /**
      * Get the dot product with another Vector3D.
      *
-     * @see https://en.wikipedia.org/wiki/Dot_product
+     * Ref: {@link https://en.wikipedia.org/wiki/Dot_product}.
+     *
      * @param {Vector3D} vector3D The input vector.
      * @returns {number} The dot product.
      */
