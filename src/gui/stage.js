@@ -268,6 +268,8 @@ export class Stage {
   /**
    * Add a layer group to the list.
    *
+   * The new layer group will be marked as the active layer group.
+   *
    * @param {object} htmlElement The HTML element of the layer group.
    * @returns {LayerGroup} The newly created layer group.
    */

@@ -624,6 +624,8 @@ export class LayerGroup {
   /**
    * Add a view layer.
    *
+   * The new layer will be marked as the active view layer.
+   *
    * @returns {ViewLayer} The created layer.
    */
   addViewLayer() {
@@ -648,6 +650,8 @@ export class LayerGroup {
 
   /**
    * Add a draw layer.
+   *
+   * The new layer will be marked as the active draw layer.
    *
    * @returns {DrawLayer} The created layer.
    */
