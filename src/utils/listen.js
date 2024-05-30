@@ -1,3 +1,5 @@
+import {logger} from './logger';
+
 /**
  * ListenerHandler class: handles add/removing and firing listeners.
  *
@@ -40,10 +42,15 @@ export class ListenerHandler {
       return;
     }
     // remove from listeners array
+    let nFound = 0;
     for (let i = 0; i < this.#listeners[type].length; ++i) {
       if (this.#listeners[type][i] === callback) {
+        ++nFound;
         this.#listeners[type].splice(i, 1);
       }
+    }
+    if (nFound === 0) {
+      logger.debug('No callback found on remove listener for type ' + type);
     }
   }
 
