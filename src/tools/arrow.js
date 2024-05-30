@@ -94,7 +94,7 @@ export class ArrowFactory {
     const verticalLine = new Line(line.getBegin(), beginTy);
     const angle = getAngle(line, verticalLine);
     const angleRad = angle * Math.PI / 180;
-    const radius = style.applyZoomScale(8).x;
+    const radius = Math.abs(style.applyZoomScale(8).x);
     const kpoly = new Konva.RegularPolygon({
       x: line.getBegin().getX() + radius * Math.sin(angleRad),
       y: line.getBegin().getY() + radius * Math.cos(angleRad),
