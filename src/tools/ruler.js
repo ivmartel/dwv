@@ -293,7 +293,7 @@ export class RulerFactory {
     const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
     const textPos = {
-      x: line.getEnd().getX() + dX * ktext.width(),
+      x: line.getEnd().getX() + dX * style.applyZoomScale(ktext.width()).x,
       y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
     };
     klabel.position(textPos);
