@@ -83,7 +83,7 @@ let _layout = 'one';
  */
 function viewerSetup() {
   // logger level (optional)
-  dwv.logger.level = dwv.logger.levels.INFO;
+  dwv.logger.level = dwv.logger.levels.DEBUG;
 
   dwv.decoderScripts.jpeg2000 =
     '../../decoders/pdfjs/decode-jpeg2000.js';
