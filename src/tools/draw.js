@@ -801,9 +801,8 @@ export class Draw {
    * @param {Konva.Group} shapeGroup The shape group to set off.
    */
   #removeShapeListeners(shapeGroup) {
-    // mouse styling
-    shapeGroup.off('mouseover');
-    shapeGroup.off('mouseout');
+    // mouse over
+    this.#removeShapeOverListeners(shapeGroup);
     // drag
     shapeGroup.draggable(false);
     shapeGroup.off('dragstart.draw');
@@ -842,12 +841,12 @@ export class Draw {
   }
 
   /**
-   * Sets shape group mouse over and out listeners: updated
+   * Add shape group mouse over and out listeners: updates
    *   shape group opacity and cursor.
    *
    * @param {Konva.Group} shapeGroup The shape group.
    */
-  #setMouseStylingListeners(shapeGroup) {
+  #addShapeOverListeners(shapeGroup) {
     // handle mouse over
     shapeGroup.on('mouseover', () => {
       // store locally
@@ -864,6 +863,16 @@ export class Draw {
       // reset local var
       this.#activeShapeGroup = undefined;
     });
+  }
+
+  /**
+   * Remove shape group mouse over and out listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  #removeShapeOverListeners(shapeGroup) {
+    shapeGroup.off('mouseover');
+    shapeGroup.off('mouseout');
   }
 
   /**
@@ -895,7 +904,8 @@ export class Draw {
    * @param {Konva.Group} shapeGroup The shape group to set on.
    */
   #addShapeListeners(layerGroup, shapeGroup) {
-    this.#setMouseStylingListeners(shapeGroup);
+    // shape mouse over
+    this.#addShapeOverListeners(shapeGroup);
 
     const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
