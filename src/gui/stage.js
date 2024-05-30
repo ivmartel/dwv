@@ -179,9 +179,9 @@ export class Stage {
   /**
    * Active layer group index.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
-  #activeLayerGroupIndex = null;
+  #activeLayerGroupIndex;
 
   /**
    * Image smoothing flag.
@@ -199,7 +199,7 @@ export class Stage {
    * Get the layer group at the given index.
    *
    * @param {number} index The index.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroup(index) {
     return this.#layerGroups[index];
@@ -217,7 +217,7 @@ export class Stage {
   /**
    * Get the active layer group.
    *
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getActiveLayerGroup() {
     return this.getLayerGroup(this.#activeLayerGroupIndex);
@@ -327,7 +327,7 @@ export class Stage {
       this.#layerGroups[i].empty();
     }
     this.#layerGroups = [];
-    this.#activeLayerGroupIndex = null;
+    this.#activeLayerGroupIndex = undefined;
   }
 
   /**

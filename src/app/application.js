@@ -436,7 +436,7 @@ export class App {
    * Get the active layer group.
    * The layer is available after the first loaded item.
    *
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getActiveLayerGroup() {
     return this.#stage.getActiveLayerGroup();
