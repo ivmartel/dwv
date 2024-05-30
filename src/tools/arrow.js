@@ -239,8 +239,9 @@ export class ArrowFactory {
     // larger hitfunc
     const p2b = new Point2D(bx, by);
     const p2e = new Point2D(ex, ey);
-    const linePerp0 = getPerpendicularLine(line, p2b, 10);
-    const linePerp1 = getPerpendicularLine(line, p2e, 10);
+    const tickLen = style.applyZoomScale(10).x;
+    const linePerp0 = getPerpendicularLine(line, p2b, tickLen);
+    const linePerp1 = getPerpendicularLine(line, p2e, tickLen);
     kline.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());

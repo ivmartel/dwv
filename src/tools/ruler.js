@@ -257,14 +257,15 @@ export class RulerFactory {
     const p2d1 = new Point2D(end.x(), end.y());
     const line = new Line(p2d0, p2d1);
     // tick
+    const tickLen = style.applyZoomScale(10).x;
     const p2b = new Point2D(bx, by);
     const p2e = new Point2D(ex, ey);
-    const linePerp0 = getPerpendicularLine(line, p2b, style.scale(10));
+    const linePerp0 = getPerpendicularLine(line, p2b, tickLen);
     ktick0.points([linePerp0.getBegin().getX(),
       linePerp0.getBegin().getY(),
       linePerp0.getEnd().getX(),
       linePerp0.getEnd().getY()]);
-    const linePerp1 = getPerpendicularLine(line, p2e, style.scale(10));
+    const linePerp1 = getPerpendicularLine(line, p2e, tickLen);
     ktick1.points([linePerp1.getBegin().getX(),
       linePerp1.getBegin().getY(),
       linePerp1.getEnd().getX(),
