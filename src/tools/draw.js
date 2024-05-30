@@ -97,6 +97,13 @@ export class Draw {
   #style;
 
   /**
+   * Callback store to allow attach/detach.
+   *
+   * @type {Array}
+   */
+  #callbackStore = [];
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
@@ -717,6 +724,24 @@ export class Draw {
   }
 
   /**
+   * Get a layerGroup position callback.
+   *
+   * TODO: check needo for store item removal.
+   *
+   * @param {LayerGroup} layerGroup The origin layer group.
+   * @returns {Function} The layerGroup position callback.
+   */
+  #getPositionCallback(layerGroup) {
+    const divId = layerGroup.getDivId();
+    if (typeof this.#callbackStore[divId] === 'undefined') {
+      this.#callbackStore[divId] = () => {
+        this.#updateDrawLayer(layerGroup);
+      };
+    }
+    return this.#callbackStore[divId];
+  }
+
+  /**
    * Activate the tool.
    *
    * @param {boolean} flag The flag to activate or not.
@@ -736,18 +761,18 @@ export class Draw {
       // store cursor
       this.#originalCursor = document.body.style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
-      this.#app.addEventListener('positionchange', () => {
-        this.#updateDrawLayer(layerGroup);
-      });
+      this.#app.addEventListener('positionchange',
+        this.#getPositionCallback(layerGroup)
+      );
     } else {
       // reset shape and cursor
       this.#resetActiveShapeGroup();
       // reset local var
       this.#originalCursor = undefined;
       // remove listeners
-      this.#app.removeEventListener('positionchange', () => {
-        this.#updateDrawLayer(layerGroup);
-      });
+      this.#app.removeEventListener('positionchange',
+        this.#getPositionCallback(layerGroup)
+      );
     }
   }
 
