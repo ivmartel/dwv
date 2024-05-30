@@ -644,7 +644,7 @@ export class Draw {
     this.#emitDrawGroupCommand(drawLayer, finalShapeGroup);
 
     // activate shape listeners
-    this.#setShapeListeners(layerGroup, finalShapeGroup);
+    this.#addShapeListeners(layerGroup, finalShapeGroup);
   }
 
   /**
@@ -779,12 +779,12 @@ export class Draw {
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach((group) => {
-        this.#setShapeListeners(layerGroup, group);
+        this.#addShapeListeners(layerGroup, group);
       });
     } else {
       // de-activate shape listeners
       shapeGroups.forEach((group) => {
-        this.#setShapeOff(group);
+        this.#removeShapeListeners(group);
       });
     }
     // draw
@@ -796,11 +796,11 @@ export class Draw {
   }
 
   /**
-   * Set shape group off properties.
+   * Remove shape group listeners.
    *
    * @param {Konva.Group} shapeGroup The shape group to set off.
    */
-  #setShapeOff(shapeGroup) {
+  #removeShapeListeners(shapeGroup) {
     // mouse styling
     shapeGroup.off('mouseover');
     shapeGroup.off('mouseout');
@@ -889,12 +889,12 @@ export class Draw {
   }
 
   /**
-   * Set shape group on properties.
+   * Add shape group listeners.
    *
    * @param {LayerGroup} layerGroup The origin layer group.
    * @param {Konva.Group} shapeGroup The shape group to set on.
    */
-  #setShapeListeners(layerGroup, shapeGroup) {
+  #addShapeListeners(layerGroup, shapeGroup) {
     this.#setMouseStylingListeners(shapeGroup);
 
     const drawLayer = layerGroup.getActiveDrawLayer();
