@@ -2506,23 +2506,24 @@ export declare class LayerGroup {
      */
     updateLayersToPositionChange: (event: object) => void;
     /**
-     * Calculate the fit scale: the scale that fits the largest data.
+     * Calculate the div to world size ratio needed to fit
+     *   the largest data.
      *
-     * @returns {number|undefined} The fit scale.
+     * @returns {number|undefined} The ratio.
      */
-    calculateFitScale(): number | undefined;
+    getDivToWorldSizeRatio(): number | undefined;
     /**
-     * Set the layer group fit scale.
+     * Fit to container: set the layers div to world size ratio.
      *
-     * @param {number} scaleIn The fit scale.
+     * @param {number} divToWorldSizeRatio The ratio.
      */
-    setFitScale(scaleIn: number): void;
+    fitToContainer(divToWorldSizeRatio: number): void;
     /**
-     * Get the largest data size.
+     * Get the largest data world (mm) size.
      *
      * @returns {Scalar2D|undefined} The largest size as {x,y}.
      */
-    getMaxSize(): Scalar2D | undefined;
+    getMaxWorldSize(): Scalar2D | undefined;
     /**
      * Flip all layers along the Z axis without offset compensation.
      */
@@ -4844,11 +4845,11 @@ export declare class ViewLayer {
     /**
      * Fit the layer to its parent container.
      *
-     * @param {number} fitScale1D The 1D fit scale.
+     * @param {number} divToWorldSizeRatio The div to world size ratio.
      * @param {Scalar2D} fitSize The fit size as {x,y}.
      * @param {Scalar2D} fitOffset The fit offset as {x,y}.
      */
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(divToWorldSizeRatio: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     /**
      * Enable and listen to container interaction events.
      */
