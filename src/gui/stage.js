@@ -384,28 +384,30 @@ export class Stage {
   }
 
   /**
-   * Synchronise the fit scale of the group layers.
+   * Fit to container: synchronise the div to world size ratio
+   *   of the group layers.
    */
-  syncLayerGroupScale() {
-    let minScale;
-    const hasScale = [];
+  fitToContainer() {
+    // find the minimum ratio
+    let minRatio;
+    const hasRatio = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      const scale = this.#layerGroups[i].calculateFitScale();
-      if (typeof scale !== 'undefined') {
-        hasScale.push(i);
-        if (typeof minScale === 'undefined' || scale < minScale) {
-          minScale = scale;
+      const ratio = this.#layerGroups[i].getDivToWorldSizeRatio();
+      if (typeof ratio !== 'undefined') {
+        hasRatio.push(i);
+        if (typeof minRatio === 'undefined' || ratio < minRatio) {
+          minRatio = ratio;
         }
       }
     }
-    // exit if no scale
-    if (typeof minScale === 'undefined') {
+    // exit if no ratio
+    if (typeof minRatio === 'undefined') {
       return;
     }
-    // apply min scale to layers
+    // apply min ratio to layers
     for (let j = 0; j < this.#layerGroups.length; ++j) {
-      if (hasScale.includes(j)) {
-        this.#layerGroups[j].setFitScale(minScale);
+      if (hasRatio.includes(j)) {
+        this.#layerGroups[j].fitToContainer(minRatio);
       }
     }
   }

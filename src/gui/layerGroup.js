@@ -1116,46 +1116,47 @@ export class LayerGroup {
   };
 
   /**
-   * Calculate the fit scale: the scale that fits the largest data.
+   * Calculate the div to world size ratio needed to fit
+   *   the largest data.
    *
-   * @returns {number|undefined} The fit scale.
+   * @returns {number|undefined} The ratio.
    */
-  calculateFitScale() {
+  getDivToWorldSizeRatio() {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
-    // get max size
-    const maxSize = this.getMaxSize();
-    if (typeof maxSize === 'undefined') {
+    // get max world size
+    const maxWorldSize = this.getMaxWorldSize();
+    if (typeof maxWorldSize === 'undefined') {
       return undefined;
     }
     // if the container has a width but no height,
     // resize it to follow the same ratio to completely
     // fill the div with the image
     if (this.#containerDiv.offsetHeight === 0) {
-      const ratioX = this.#containerDiv.offsetWidth / maxSize.x;
-      const height = maxSize.y * ratioX;
+      const ratioX = this.#containerDiv.offsetWidth / maxWorldSize.x;
+      const height = maxWorldSize.y * ratioX;
       this.#containerDiv.style.height = height + 'px';
     }
     // return best fit
     return Math.min(
-      this.#containerDiv.offsetWidth / maxSize.x,
-      this.#containerDiv.offsetHeight / maxSize.y
+      this.#containerDiv.offsetWidth / maxWorldSize.x,
+      this.#containerDiv.offsetHeight / maxWorldSize.y
     );
   }
 
   /**
-   * Set the layer group fit scale.
+   * Fit to container: set the layers div to world size ratio.
    *
-   * @param {number} scaleIn The fit scale.
+   * @param {number} divToWorldSizeRatio The ratio.
    */
-  setFitScale(scaleIn) {
-    // get maximum size
-    const maxSize = this.getMaxSize();
+  fitToContainer(divToWorldSizeRatio) {
+    // get maximum world size
+    const maxWorldSize = this.getMaxWorldSize();
     // exit if none
-    if (typeof maxSize === 'undefined') {
+    if (typeof maxWorldSize === 'undefined') {
       return;
     }
 
@@ -1165,14 +1166,16 @@ export class LayerGroup {
     };
     // offset to keep data centered
     const fitOffset = {
-      x: -0.5 * (containerSize.x - Math.floor(maxSize.x * scaleIn)),
-      y: -0.5 * (containerSize.y - Math.floor(maxSize.y * scaleIn))
+      x: -0.5 *
+        (containerSize.x - Math.floor(maxWorldSize.x * divToWorldSizeRatio)),
+      y: -0.5 *
+        (containerSize.y - Math.floor(maxWorldSize.y * divToWorldSizeRatio))
     };
 
     // apply to layers
     for (const layer of this.#layers) {
       if (typeof layer !== 'undefined') {
-        layer.fitToContainer(scaleIn, containerSize, fitOffset);
+        layer.fitToContainer(divToWorldSizeRatio, containerSize, fitOffset);
       }
     }
 
@@ -1183,11 +1186,11 @@ export class LayerGroup {
   }
 
   /**
-   * Get the largest data size.
+   * Get the largest data world (mm) size.
    *
    * @returns {Scalar2D|undefined} The largest size as {x,y}.
    */
-  getMaxSize() {
+  getMaxWorldSize() {
     let maxSize = {x: 0, y: 0};
     for (const layer of this.#layers) {
       if (layer instanceof ViewLayer) {

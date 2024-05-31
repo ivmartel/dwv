@@ -850,11 +850,11 @@ export class ViewLayer {
   /**
    * Fit the layer to its parent container.
    *
-   * @param {number} fitScale1D The 1D fit scale.
+   * @param {number} divToWorldSizeRatio The div to world size ratio.
    * @param {Scalar2D} fitSize The fit size as {x,y}.
    * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
-  fitToContainer(fitScale1D, fitSize, fitOffset) {
+  fitToContainer(divToWorldSizeRatio, fitSize, fitOffset) {
     let needsDraw = false;
 
     // set canvas size if different from previous
@@ -871,22 +871,22 @@ export class ViewLayer {
     }
 
     // fit scale
-    const newFitScale = {
-      x: fitScale1D * this.#baseSpacing.x,
-      y: fitScale1D * this.#baseSpacing.y
+    const divToImageSizeRatio = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
     };
     // #scale = inputScale * fitScale * flipScale
     // flipScale does not change here, we can omit it
     // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: this.#scale.x * newFitScale.x / this.#fitScale.x,
-      y: this.#scale.y * newFitScale.y / this.#fitScale.y
+      x: this.#scale.x * divToImageSizeRatio.x / this.#fitScale.x,
+      y: this.#scale.y * divToImageSizeRatio.y / this.#fitScale.y
     };
 
     // set scales if different from previous
     if (this.#scale.x !== newScale.x ||
       this.#scale.y !== newScale.y) {
-      this.#fitScale = newFitScale;
+      this.#fitScale = divToImageSizeRatio;
       this.#scale = newScale;
       // update draw flag
       needsDraw = true;
@@ -894,13 +894,13 @@ export class ViewLayer {
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / newFitScale.x,
-      y: fitOffset.y / newFitScale.y
+      x: fitOffset.x / divToImageSizeRatio.x,
+      y: fitOffset.y / divToImageSizeRatio.y
     };
     // #flipOffset = canvas / #scale
     const newFlipOffset = {
-      x: this.#flipOffset.x !== 0 ? fitSize.x / newFitScale.x : 0,
-      y: this.#flipOffset.y !== 0 ? fitSize.y / newFitScale.y : 0,
+      x: this.#flipOffset.x !== 0 ? fitSize.x / divToImageSizeRatio.x : 0,
+      y: this.#flipOffset.y !== 0 ? fitSize.y / divToImageSizeRatio.y : 0,
     };
 
     // set offsets if different from previous

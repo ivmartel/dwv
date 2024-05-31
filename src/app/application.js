@@ -827,7 +827,7 @@ export class App {
    * To be called once the image is loaded.
    */
   fitToContainer() {
-    this.#stage.syncLayerGroupScale();
+    this.#stage.fitToContainer();
   }
 
   /**
@@ -1843,7 +1843,7 @@ export class App {
     });
 
     // sync layer groups
-    this.#stage.syncLayerGroupScale();
+    this.#stage.fitToContainer();
 
     // view layer offset (done before scale)
     viewLayer.setOffset(layerGroup.getOffset());
