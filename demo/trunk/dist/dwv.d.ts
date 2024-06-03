@@ -1335,11 +1335,11 @@ export declare class DrawLayer {
     /**
      * Fit the layer to its parent container.
      *
-     * @param {number} fitScale1D The 1D fit scale.
-     * @param {Scalar2D} fitSize The fit size as {x,y}.
+     * @param {Scalar2D} containerSize The container size as {x,y}.
+     * @param {number} divToWorldSizeRatio The div to world size ratio.
      * @param {Scalar2D} fitOffset The fit offset as {x,y}.
      */
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     /**
      * Check the visibility of a given group.
      *
@@ -4845,11 +4845,11 @@ export declare class ViewLayer {
     /**
      * Fit the layer to its parent container.
      *
+     * @param {Scalar2D} containerSize The fit size as {x,y}.
      * @param {number} divToWorldSizeRatio The div to world size ratio.
-     * @param {Scalar2D} fitSize The fit size as {x,y}.
      * @param {Scalar2D} fitOffset The fit offset as {x,y}.
      */
-    fitToContainer(divToWorldSizeRatio: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     /**
      * Enable and listen to container interaction events.
      */
