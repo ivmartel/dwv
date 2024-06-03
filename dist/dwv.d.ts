@@ -123,9 +123,9 @@ export declare class App {
      * Get the active layer group.
      * The layer is available after the first loaded item.
      *
-     * @returns {LayerGroup} The layer group.
+     * @returns {LayerGroup|undefined} The layer group.
      */
-    getActiveLayerGroup(): LayerGroup;
+    getActiveLayerGroup(): LayerGroup | undefined;
     /**
      * Set the active layer group.
      *
@@ -179,7 +179,7 @@ export declare class App {
     /**
      * Initialise the application.
      *
-     * @param {AppOptions} opt The application options
+     * @param {AppOptions} opt The application options.
      * @example
      * // create the dwv app
      * const app = new dwv.App();
@@ -251,9 +251,9 @@ export declare class App {
      *
      * @param {string[]} urls The list of urls to load.
      * @param {object} [options] The options object, can contain:
-     *  - requestHeaders: an array of {name, value} to use as request headers
-     *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
-     *  - batchSize: the size of the request url batch
+     * - requestHeaders: an array of {name, value} to use as request headers,
+     * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
+     * - batchSize: the size of the request url batch.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -446,13 +446,14 @@ export declare class App {
     onKeydown: (event: KeyboardEvent) => void;
     /**
      * Key down event handler example.
-     * - CRTL-Z: undo
-     * - CRTL-Y: redo
-     * - CRTL-ARROW_LEFT: next element on fourth dim
-     * - CRTL-ARROW_UP: next element on third dim
-     * - CRTL-ARROW_RIGHT: previous element on fourth dim
-     * - CRTL-ARROW_DOWN: previous element on third dim
-     * (applies to the active view of the active layer group)
+     * - CRTL-Z: undo,
+     * - CRTL-Y: redo,
+     * - CRTL-ARROW_LEFT: next element on fourth dim,
+     * - CRTL-ARROW_UP: next element on third dim,
+     * - CRTL-ARROW_RIGHT: previous element on fourth dim,
+     * - CRTL-ARROW_DOWN: previous element on third dim.
+     *
+     * Applies to the active view of the active layer group.
      *
      * @param {KeyboardEvent} event The key down event.
      * @fires UndoStack#undo
@@ -461,11 +462,11 @@ export declare class App {
      */
     defaultOnKeydown: (event: KeyboardEvent) => void;
     /**
-     * Reset the display
+     * Reset the display.
      */
     resetDisplay(): void;
     /**
-     * Reset the app zoom.s
+     * Reset the app zoom.
      */
     resetZoom(): void;
     /**
@@ -483,7 +484,7 @@ export declare class App {
      */
     setWindowLevelPreset(preset: string): void;
     /**
-     * Set the tool
+     * Set the tool.
      *
      * @param {string} tool The tool.
      */
@@ -495,13 +496,13 @@ export declare class App {
      */
     setToolFeatures(list: object): void;
     /**
-     * Undo the last action
+     * Undo the last action.
      *
      * @fires UndoStack#undo
      */
     undo(): void;
     /**
-     * Redo the last action
+     * Redo the last action.
      *
      * @fires UndoStack#redo
      */
@@ -569,15 +570,16 @@ export declare class AppOptions {
     binders: string[] | undefined;
     /**
      * Optional boolean flag to trigger the first data render
-     *   after the first loaded data or not. Defaults to true;
+     *   after the first loaded data or not. Defaults to true.
      *
      * @type {boolean|undefined}
      */
     viewOnFirstLoadItem: boolean | undefined;
     /**
-     * Optional default chraracter set string used for DICOM parsing if
-     * not passed in DICOM file.
-     * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+     * Optional default chraracterset string used for DICOM parsing if
+     *   not passed in DICOM file.
+     *
+     * Valid values: {@link https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings}.
      *
      * @type {string|undefined}
      */
@@ -604,8 +606,10 @@ export declare namespace BLACK {
 
 /**
  * Build a multipart message.
- * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
- * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
+ *
+ * Ref:
+ * - {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages},
+ * - {@link https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js}.
  *
  * @param {Array} parts The message parts as an array of object containing
  *   content headers and messages as the data property (as returned by parse).
@@ -666,7 +670,7 @@ export declare class ChangeSegmentColourCommand {
 
 /**
  * Colour map: red, green and blue components
- * to associate with intensity values.
+ *   to associate with intensity values.
  */
 export declare class ColourMap {
     /**
@@ -875,7 +879,7 @@ export declare class DeleteSegmentCommand {
 /**
  * DICOM code: item of a basic code sequence.
  *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html}.
  */
 export declare class DicomCode {
     /**
@@ -1030,7 +1034,7 @@ export declare class DicomWriter {
      * if nothing is found the default rule is applied.
      *
      * @param {Object<string, WriterRule>} rules The input rules.
-     * @param {boolean} [addMissingTags] if true, explicit tags that
+     * @param {boolean} [addMissingTags] If true, explicit tags that
      *   have replace rule and a value will be
      *   added if missing. Defaults to false.
      */
@@ -1045,7 +1049,7 @@ export declare class DicomWriter {
      * Get the element to write according to the class rules.
      * Priority order: tagName, groupName, default.
      *
-     * @param {DataElement} element The element to check
+     * @param {DataElement} element The element to check.
      * @returns {DataElement|null} The element to write, can be null.
      */
     getElementToWrite(element: DataElement): DataElement | null;
@@ -1317,11 +1321,11 @@ export declare class DrawLayer {
     isVisible(): boolean;
     /**
      * Draw the content (imageData) of the layer.
-     * The imageData variable needs to be set
+     * The imageData variable needs to be set.
      */
     draw(): void;
     /**
-     * Initialise the layer: set the canvas and context
+     * Initialise the layer: set the canvas and context.
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
@@ -1495,7 +1499,7 @@ export declare class Geometry {
      * Warning: the size comes as stored in DICOM, meaning that it could
      * be oriented.
      *
-     * @param {Matrix33} [viewOrientation] The view orientation (optional)
+     * @param {Matrix33} [viewOrientation] The view orientation (optional).
      * @returns {Size} The object size.
      */
     getSize(viewOrientation?: Matrix33): Size;
@@ -1504,7 +1508,7 @@ export declare class Geometry {
      * Warning: the spacing comes as stored in DICOM, meaning that it could
      * be oriented.
      *
-     * @param {Matrix33} [viewOrientation] The view orientation (optional)
+     * @param {Matrix33} [viewOrientation] The view orientation (optional).
      * @returns {Spacing} The object spacing.
      */
     getSpacing(viewOrientation?: Matrix33): Spacing;
@@ -1727,11 +1731,14 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
 
 /**
  * Get a UID for a DICOM tag.
- * Note: Use https://github.com/uuidjs/uuid?
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
- * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
- * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
+ * Note: Use {@link https://github.com/uuidjs/uuid}?
+ *
+ * Ref:
+ * - {@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html},
+ * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
+ * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
+ *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
@@ -1739,8 +1746,9 @@ export declare function getUID(tagName: string): string;
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- * after the 128 bytes preamble.
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *   after the 128 bytes preamble.
+ *
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -1825,7 +1833,7 @@ declare class Image_2 {
     /**
      * Get the data buffer of the image.
      *
-     * @todo dangerous...
+     * @todo Dangerous...
      * @returns {TypedArray} The data buffer of the image.
      */
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
@@ -2260,18 +2268,18 @@ export declare function labToUintLab(triplet: object): object;
 /**
  * Layer group.
  *
- * Display position: {x,y}
- * Plane position: Index (access: get(i))
- * (world) Position: Point3D (access: getX, getY, getZ)
+ * - Display position: {x,y},
+ * - Plane position: Index (access: get(i)),
+ * - (world) Position: Point3D (access: getX, getY, getZ).
  *
  * Display -> World:
- * planePos = viewLayer.displayToPlanePos(displayPos)
- * -> compensate for layer scale and offset
- * pos = viewController.getPositionFromPlanePoint(planePos)
+ * - planePos = viewLayer.displayToPlanePos(displayPos)
+ *   -> compensate for layer scale and offset,
+ * - pos = viewController.getPositionFromPlanePoint(planePos).
  *
- * World -> display
- * planePos = viewController.getOffset3DFromPlaneOffset(pos)
- * no need yet for a planePos to displayPos...
+ * World -> Display:
+ * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
+ *   no need yet for a planePos to displayPos...
  */
 export declare class LayerGroup {
     /**
@@ -2315,7 +2323,7 @@ export declare class LayerGroup {
      */
     getBaseScale(): Scalar3D;
     /**
-     * Get the added scale: the scale added to the base scale
+     * Get the added scale: the scale added to the base scale.
      *
      * @returns {Scalar3D} The scale as {x,y,z}.
      */
@@ -2418,11 +2426,15 @@ export declare class LayerGroup {
     /**
      * Add a view layer.
      *
+     * The new layer will be marked as the active view layer.
+     *
      * @returns {ViewLayer} The created layer.
      */
     addViewLayer(): ViewLayer;
     /**
      * Add a draw layer.
+     *
+     * The new layer will be marked as the active draw layer.
      *
      * @returns {DrawLayer} The created layer.
      */
@@ -2494,23 +2506,24 @@ export declare class LayerGroup {
      */
     updateLayersToPositionChange: (event: object) => void;
     /**
-     * Calculate the fit scale: the scale that fits the largest data.
+     * Calculate the div to world size ratio needed to fit
+     *   the largest data.
      *
-     * @returns {number|undefined} The fit scale.
+     * @returns {number|undefined} The ratio.
      */
-    calculateFitScale(): number | undefined;
+    getDivToWorldSizeRatio(): number | undefined;
     /**
-     * Set the layer group fit scale.
+     * Fit to container: set the layers div to world size ratio.
      *
-     * @param {number} scaleIn The fit scale.
+     * @param {number} divToWorldSizeRatio The ratio.
      */
-    setFitScale(scaleIn: number): void;
+    fitToContainer(divToWorldSizeRatio: number): void;
     /**
-     * Get the largest data size.
+     * Get the largest data world (mm) size.
      *
      * @returns {Scalar2D|undefined} The largest size as {x,y}.
      */
-    getMaxSize(): Scalar2D | undefined;
+    getMaxWorldSize(): Scalar2D | undefined;
     /**
      * Flip all layers along the Z axis without offset compensation.
      */
@@ -2653,7 +2666,7 @@ export declare class MaskFactory {
 /**
  * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
  *
- * @see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html}.
  */
 export declare class MaskSegment {
     /**
@@ -2822,7 +2835,7 @@ export declare class MaskSegmentViewHelper {
  */
 export declare class Matrix33 {
     /**
-     * @param {number[]} values row-major ordered 9 values.
+     * @param {number[]} values Row-major ordered 9 values.
      */
     constructor(values: number[]);
     /**
@@ -2911,7 +2924,7 @@ export declare class Matrix33 {
      */
     getColAbsMax(col: number): object;
     /**
-     * Get this matrix with only zero and +/- ones instead of the maximum,
+     * Get this matrix with only zero and +/- ones instead of the maximum.
      *
      * @returns {Matrix33} The simplified matrix.
      */
@@ -3290,9 +3303,11 @@ export declare class Point3D {
 
 /**
  * Round a float number to a given precision.
- * Inspired from https://stackoverflow.com/a/49729715/3639892.
+ *
+ * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
+ *
  * Can be a solution to not have trailing zero as when
- * using toFixed or toPrecision.
+ *   using toFixed or toPrecision.
  * '+number.toFixed(precision)' does not pass all the tests...
  *
  * @param {number} number The number to round.
@@ -3302,7 +3317,7 @@ export declare class Point3D {
 export declare function precisionRound(number: number, precision: number): number;
 
 /**
- * Rescale Slope and Intercept
+ * Rescale Slope and Intercept.
  */
 export declare class RescaleSlopeAndIntercept {
     /**
@@ -3600,7 +3615,7 @@ export declare class Spacing {
 /**
  * Convert sRGB to CIE LAB (standard illuminant D65).
  *
- * @param {RGB} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export declare function srgbToCielab(triplet: RGB): object;
@@ -3661,7 +3676,8 @@ export declare class Tag {
     isWithVR(): boolean;
     /**
      * Is the tag group a private tag group ?
-     * see: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8
+     *
+     * See: {@link http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8}.
      *
      * @returns {boolean} True if the tag group is private,
      *   ie if its group is an odd number.
@@ -3847,7 +3863,8 @@ export declare class Vector3D {
      * vector that is perpendicular to both a and b.
      * If both vectors are parallel, the cross product is a zero vector.
      *
-     * @see https://en.wikipedia.org/wiki/Cross_product
+     * Ref: {@link https://en.wikipedia.org/wiki/Cross_product}.
+     *
      * @param {Vector3D} vector3D The input vector.
      * @returns {Vector3D} The result vector.
      */
@@ -3855,7 +3872,8 @@ export declare class Vector3D {
     /**
      * Get the dot product with another Vector3D.
      *
-     * @see https://en.wikipedia.org/wiki/Dot_product
+     * Ref: {@link https://en.wikipedia.org/wiki/Dot_product}.
+     *
      * @param {Vector3D} vector3D The input vector.
      * @returns {number} The dot product.
      */
@@ -4045,7 +4063,7 @@ export declare class View {
      *
      * @param {Point} position The new position.
      * @param {boolean} silent Flag to fire event or not.
-     * @returns {boolean} False if not in bounds
+     * @returns {boolean} False if not in bounds.
      * @fires View#positionchange
      */
     setCurrentPosition(position: Point, silent: boolean): boolean;
@@ -4318,7 +4336,7 @@ export declare class ViewController {
     /**
      * Get the image rescaled value at the input position.
      *
-     * @param {Point} position the input position.
+     * @param {Point} position The input position.
      * @returns {number|undefined} The image value or undefined if out of bounds
      *   or no quantifiable (for ex RGB).
      */
@@ -4326,7 +4344,7 @@ export declare class ViewController {
     /**
      * Get the image pixel unit.
      *
-     * @returns {string} The unit
+     * @returns {string} The unit.
      */
     getPixelUnit(): string;
     /**
@@ -4810,14 +4828,14 @@ export declare class ViewLayer {
     isVisible(): boolean;
     /**
      * Draw the content (imageData) of the layer.
-     * The imageData variable needs to be set
+     * The imageData variable needs to be set.
      *
      * @fires App#renderstart
      * @fires App#renderend
      */
     draw(): void;
     /**
-     * Initialise the layer: set the canvas and context
+     * Initialise the layer: set the canvas and context.
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
@@ -4827,11 +4845,11 @@ export declare class ViewLayer {
     /**
      * Fit the layer to its parent container.
      *
-     * @param {number} fitScale1D The 1D fit scale.
+     * @param {number} divToWorldSizeRatio The div to world size ratio.
      * @param {Scalar2D} fitSize The fit size as {x,y}.
      * @param {Scalar2D} fitOffset The fit offset as {x,y}.
      */
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(divToWorldSizeRatio: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     /**
      * Enable and listen to container interaction events.
      */

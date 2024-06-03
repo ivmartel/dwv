@@ -26,7 +26,7 @@ export class App {
     canWindowLevel(): boolean;
     defaultOnKeydown: (event: KeyboardEvent) => void;
     fitToContainer(): void;
-    getActiveLayerGroup(): LayerGroup;
+    getActiveLayerGroup(): LayerGroup | undefined;
     getAddedScale(): Scalar3D;
     getBaseScale(): Scalar3D;
     getCurrentStackIndex(): number;
@@ -480,11 +480,11 @@ export class LayerGroup {
     addScale(scaleStep: number, center: Point3D): void;
     addTranslation(translation: Scalar3D): void;
     addViewLayer(): ViewLayer;
-    calculateFitScale(): number | undefined;
     canScroll(): boolean;
     display(flag: boolean): void;
     draw(): void;
     empty(): void;
+    fitToContainer(divToWorldSizeRatio: number): void;
     flipScaleZ(): void;
     getActiveDrawLayer(): DrawLayer | undefined;
     getActiveViewLayer(): ViewLayer | undefined;
@@ -492,8 +492,9 @@ export class LayerGroup {
     getBaseScale(): Scalar3D;
     getBaseViewLayer(): ViewLayer | undefined;
     getDivId(): string;
+    getDivToWorldSizeRatio(): number | undefined;
     getDrawLayersByDataId(dataId: string): DrawLayer[];
-    getMaxSize(): Scalar2D | undefined;
+    getMaxWorldSize(): Scalar2D | undefined;
     getNumberOfLayers(): number;
     getNumberOfViewLayers(): number;
     getOffset(): Scalar3D;
@@ -514,7 +515,6 @@ export class LayerGroup {
     setActiveDrawLayerByDataId(dataId: string): void;
     setActiveViewLayer(index: number): void;
     setActiveViewLayerByDataId(dataId: string): void;
-    setFitScale(scaleIn: number): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
@@ -974,7 +974,7 @@ export class ViewLayer {
     displayToPlanePos(point2D: Point2D): Point2D;
     displayToPlaneScale(point2D: Point2D): Point2D;
     draw(): void;
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(divToWorldSizeRatio: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
