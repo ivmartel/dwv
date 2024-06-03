@@ -1175,7 +1175,7 @@ export class LayerGroup {
     // apply to layers
     for (const layer of this.#layers) {
       if (typeof layer !== 'undefined') {
-        layer.fitToContainer(divToWorldSizeRatio, containerSize, fitOffset);
+        layer.fitToContainer(containerSize, divToWorldSizeRatio, fitOffset);
       }
     }
 

@@ -850,22 +850,23 @@ export class ViewLayer {
   /**
    * Fit the layer to its parent container.
    *
+   * @param {Scalar2D} containerSize The fit size as {x,y}.
    * @param {number} divToWorldSizeRatio The div to world size ratio.
-   * @param {Scalar2D} fitSize The fit size as {x,y}.
    * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
-  fitToContainer(divToWorldSizeRatio, fitSize, fitOffset) {
+  fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
     let needsDraw = false;
 
     // set canvas size if different from previous
-    if (this.#canvas.width !== fitSize.x ||
-      this.#canvas.height !== fitSize.y) {
-      if (!canCreateCanvas(fitSize.x, fitSize.y)) {
-        throw new Error('Cannot resize canvas ' + fitSize.x + ', ' + fitSize.y);
+    if (this.#canvas.width !== containerSize.x ||
+      this.#canvas.height !== containerSize.y) {
+      if (!canCreateCanvas(containerSize.x, containerSize.y)) {
+        throw new Error('Cannot resize canvas ' +
+          containerSize.x + ', ' + containerSize.y);
       }
       // canvas size change triggers canvas reset
-      this.#canvas.width = fitSize.x;
-      this.#canvas.height = fitSize.y;
+      this.#canvas.width = containerSize.x;
+      this.#canvas.height = containerSize.y;
       // update draw flag
       needsDraw = true;
     }
@@ -897,10 +898,14 @@ export class ViewLayer {
       x: fitOffset.x / divToImageSizeRatio.x,
       y: fitOffset.y / divToImageSizeRatio.y
     };
-    // #flipOffset = canvas / #scale
+    // flip offset
+    const scaledImageSize = {
+      x: containerSize.x / divToImageSizeRatio.x,
+      y: containerSize.y / divToImageSizeRatio.y
+    };
     const newFlipOffset = {
-      x: this.#flipOffset.x !== 0 ? fitSize.x / divToImageSizeRatio.x : 0,
-      y: this.#flipOffset.y !== 0 ? fitSize.y / divToImageSizeRatio.y : 0,
+      x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
+      y: this.#flipOffset.y !== 0 ? scaledImageSize.y : 0,
     };
 
     // set offsets if different from previous
