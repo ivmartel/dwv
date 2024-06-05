@@ -879,7 +879,7 @@ export declare class DeleteSegmentCommand {
 /**
  * DICOM code: item of a basic code sequence.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
  */
 export declare class DicomCode {
     /**
@@ -1735,7 +1735,7 @@ export declare function getTypedArray(bitsAllocated: number, pixelRepresentation
  * Note: Use {@link https://github.com/uuidjs/uuid}?
  *
  * Ref:
- * - {@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html},
+ * - {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_9.html},
  * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
  * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
  *
@@ -1748,7 +1748,7 @@ export declare function getUID(tagName: string): string;
  * Check that an input buffer includes the DICOM prefix 'DICM'
  *   after the 128 bytes preamble.
  *
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -3677,7 +3677,7 @@ export declare class Tag {
     /**
      * Is the tag group a private tag group ?
      *
-     * See: {@link http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8}.
+     * See: {@link http://dicom.nema.org/medical/dicom/2022a/output/html/part05.html#sect_7.8}.
      *
      * @returns {boolean} True if the tag group is private,
      *   ie if its group is an odd number.
