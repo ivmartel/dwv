@@ -64,7 +64,7 @@ export function isEqualRgb(c1, c2) {
  * Convert YBR to RGB.
  *
  * Ref:
- * - {@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2},
+ * - {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2},
  * - {@link https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion}.
  *
  * @param {number} y The Y component.
