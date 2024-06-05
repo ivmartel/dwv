@@ -95,6 +95,9 @@ export class DicomDataLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if one of the folowing conditions is true:
+   * - the file has a 'dcm' extension,
+   * - the file has no extension.
    *
    * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
@@ -108,9 +111,9 @@ export class DicomDataLoader {
 
   /**
    * Check if the loader can load the provided url.
-   * True if:
-   * - the options.forceLoader is 'dicom',
-   * - the options.requestHeaders contains a 'Accept: application/dicom',
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'dicom',
+   * - the `options.requestHeaders` contains a 'Accept: application/dicom',
    * - the url has a 'contentType' and it is 'application/dicom'
    *   (as in wado urls),
    * - the url has no 'contentType' and no extension or the extension is 'dcm'.
