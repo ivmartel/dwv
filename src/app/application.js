@@ -1886,9 +1886,11 @@ export class App {
     // layer scale (done after possible flip)
     if (!isBaseLayer) {
       // use zoom offset of base layer
-      // TODO: not robust, works for equal layers...
       const baseViewLayer = layerGroup.getBaseViewLayer();
-      viewLayer.initScale(layerGroup.getScale(), baseViewLayer.getZoomOffset());
+      viewLayer.initScale(
+        layerGroup.getScale(),
+        baseViewLayer.getAbsoluteZoomOffset()
+      );
     } else {
       viewLayer.setScale(layerGroup.getScale());
     }
