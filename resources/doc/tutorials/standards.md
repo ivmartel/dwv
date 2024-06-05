@@ -3,8 +3,6 @@ These are the standards that should be used when coding for this project.
 - Code:
   - Check with [ESlint](https://eslint.org/)
   - Follow [google](https://google.github.io/styleguide/jsguide.html) guide,
-  - No variables or functions should be defined in the global namespace, all should be in the `dwv` var,
-  - Favour function expression (`a=function()`) rather than function declaration (`function a()`), see [link](http://javascriptweblog.wordpress.com/2010/07/06/function-declarations-vs-function-expressions/). It allows to put them in the global `dwv` object,
   - Use design patterns from [dofactory](https://www.dofactory.com/javascript/design-patterns) and [addyosmani](http://www.addyosmani.com/resources/essentialjsdesignpatterns/book/)
 - Test: use of [QUnit](https://qunitjs.com/) via [Karma](https://karma-runner.github.io),
 - Documentation: use of [jsdoc](https://jsdoc.app/),
