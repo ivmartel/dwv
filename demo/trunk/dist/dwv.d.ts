@@ -4634,11 +4634,11 @@ export declare class ViewLayer {
      */
     getScale(): Scalar2D;
     /**
-     * Get the layer zoom offset.
+     * Get the layer zoom offset without the fit scale.
      *
      * @returns {Scalar2D} The offset as {x,y}.
      */
-    getZoomOffset(): Scalar2D;
+    getAbsoluteZoomOffset(): Scalar2D;
     /**
      * Set the imageSmoothing flag value.
      *
@@ -4755,13 +4755,13 @@ export declare class ViewLayer {
      */
     setScale(newScale: Scalar3D, center?: Point3D): void;
     /**
-     * Initialise the layer scale. Works with a zoom offset that
-     * comes from a equal view layer (size, scale, offset...).
+     * Initialise the layer scale.
      *
      * @param {Scalar3D} newScale The scale as {x,y,z}.
-     * @param {Scalar2D} zoomOffset The zoom offset as {x,y}.
+     * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+     *   without the fit scale (as provided by getAbsoluteZoomOffset).
      */
-    initScale(newScale: Scalar3D, zoomOffset: Scalar2D): void;
+    initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     /**
      * Set the base layer offset. Updates the layer offset.
      *
