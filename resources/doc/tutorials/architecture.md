@@ -25,7 +25,7 @@ Here are the events triggered during the load process (meaning the load of all t
 - `loadstart`: the load started!
 - `loaditem`: an item finished loading,
 - `load`: all items were loaded successfully,
-- `progress`: the progress of the complete load (all items),
+- `loadprogress`: the progress of the complete load (all items),
 - `error`: an error has occured during load,
 - `abort`: the load process has been aborted,
 - `loadend`: the process has completed, whether successfully (after `load`) or unsuccessfully (after `abort` or `error`).
