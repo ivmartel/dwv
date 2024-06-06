@@ -288,4 +288,4 @@ export class ZipLoader {
    */
   onabort(_event) {}
 
-} // class DicomDataLoader
+} // class ZipLoader
