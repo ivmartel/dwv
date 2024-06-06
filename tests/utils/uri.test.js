@@ -78,70 +78,72 @@ QUnit.test('getUrlFromUri', function (assert) {
  *
  * @function module:tests/utils~splituri
  */
-QUnit.test('splitUri', function (assert) {
-  // using JSON.stringify to compare objects
-  const strEmpty = JSON.stringify({});
+QUnit.test(
+  'splitUri - #DWV-REQ-IO-02-005 Window location URL scheme',
+  function (assert) {
+    // using JSON.stringify to compare objects
+    const strEmpty = JSON.stringify({});
 
-  // undefined
-  const res00 = splitUri();
-  assert.equal(JSON.stringify(res00), strEmpty, 'Split null');
-  // null
-  const res01 = splitUri(null);
-  assert.equal(JSON.stringify(res01), strEmpty, 'Split null');
-  // empty
-  const res02 = splitUri('');
-  assert.equal(JSON.stringify(res02), strEmpty, 'Split empty');
+    // undefined
+    const res00 = splitUri();
+    assert.equal(JSON.stringify(res00), strEmpty, 'Split null');
+    // null
+    const res01 = splitUri(null);
+    assert.equal(JSON.stringify(res01), strEmpty, 'Split null');
+    // empty
+    const res02 = splitUri('');
+    assert.equal(JSON.stringify(res02), strEmpty, 'Split empty');
 
-  // test10
-  const test10 = 'root?key0';
-  const res10 = splitUri(test10);
-  const ref10 = {base: 'root', query: {}};
-  assert.equal(JSON.stringify(res10), JSON.stringify(ref10), 'Split test10');
-  // test11
-  const test11 = 'root?key0=val00';
-  const res11 = splitUri(test11);
-  const ref11 = {base: 'root', query: {key0: 'val00'}};
-  assert.equal(JSON.stringify(res11), JSON.stringify(ref11), 'Split test11');
+    // test10
+    const test10 = 'root?key0';
+    const res10 = splitUri(test10);
+    const ref10 = {base: 'root', query: {}};
+    assert.equal(JSON.stringify(res10), JSON.stringify(ref10), 'Split test10');
+    // test11
+    const test11 = 'root?key0=val00';
+    const res11 = splitUri(test11);
+    const ref11 = {base: 'root', query: {key0: 'val00'}};
+    assert.equal(JSON.stringify(res11), JSON.stringify(ref11), 'Split test11');
 
-  // test20
-  const test20 = 'root?key0=val00&key1';
-  const res20 = splitUri(test20);
-  const ref20 = {base: 'root', query: {key0: 'val00'}};
-  assert.equal(JSON.stringify(res20), JSON.stringify(ref20), 'Split test20');
-  // test21
-  const test21 = 'root?key0=val00&key1=val10';
-  const res21 = splitUri(test21);
-  const ref21 = {base: 'root', query: {key0: 'val00', key1: 'val10'}};
-  assert.equal(JSON.stringify(res21), JSON.stringify(ref21), 'Split test21');
+    // test20
+    const test20 = 'root?key0=val00&key1';
+    const res20 = splitUri(test20);
+    const ref20 = {base: 'root', query: {key0: 'val00'}};
+    assert.equal(JSON.stringify(res20), JSON.stringify(ref20), 'Split test20');
+    // test21
+    const test21 = 'root?key0=val00&key1=val10';
+    const res21 = splitUri(test21);
+    const ref21 = {base: 'root', query: {key0: 'val00', key1: 'val10'}};
+    assert.equal(JSON.stringify(res21), JSON.stringify(ref21), 'Split test21');
 
-  // test30
-  const test30 = 'root?key0=val00&key0&key1=val10';
-  const res30 = splitUri(test30);
-  const ref30 = {
-    base: 'root',
-    query: {key0: ['val00', null], key1: 'val10'}
-  };
-  assert.equal(JSON.stringify(res30), JSON.stringify(ref30), 'Split test30');
-  // test31
-  const test31 = 'root?key0=val00&key0=val01&key1=val10';
-  const res31 = splitUri(test31);
-  const ref31 = {
-    base: 'root',
-    query: {key0: ['val00', 'val01'], key1: 'val10'}
-  };
-  assert.equal(JSON.stringify(res31), JSON.stringify(ref31), 'Split test31');
+    // test30
+    const test30 = 'root?key0=val00&key0&key1=val10';
+    const res30 = splitUri(test30);
+    const ref30 = {
+      base: 'root',
+      query: {key0: ['val00', null], key1: 'val10'}
+    };
+    assert.equal(JSON.stringify(res30), JSON.stringify(ref30), 'Split test30');
+    // test31
+    const test31 = 'root?key0=val00&key0=val01&key1=val10';
+    const res31 = splitUri(test31);
+    const ref31 = {
+      base: 'root',
+      query: {key0: ['val00', 'val01'], key1: 'val10'}
+    };
+    assert.equal(JSON.stringify(res31), JSON.stringify(ref31), 'Split test31');
 
-  // test40: no root
-  const test40 = '?key0=val00&key0&key1=val10';
-  const res40 = splitUri(test40);
-  const ref40 = {
-    base: '',
-    query: {key0: ['val00', null], key1: 'val10'}
-  };
-  assert.equal(JSON.stringify(res40), JSON.stringify(ref40),
-    'Split test40: no root');
-
-});
+    // test40: no root
+    const test40 = '?key0=val00&key0&key1=val10';
+    const res40 = splitUri(test40);
+    const ref40 = {
+      base: '',
+      query: {key0: ['val00', null], key1: 'val10'}
+    };
+    assert.equal(JSON.stringify(res40), JSON.stringify(ref40),
+      'Split test40: no root');
+  }
+);
 
 /**
  * Tests for {@link getUriQuery}.
