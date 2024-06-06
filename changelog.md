@@ -1,10 +1,34 @@
 # Changelog
 
+## [v0.32.6](https://github.com/ivmartel/dwv/releases/tag/v0.32.6) - 17/04/2024
+
+### Fixed
+
+- Fix npm publish [#1656](https://github.com/ivmartel/dwv/issues/1656)
+
+## [v0.32.5](https://github.com/ivmartel/dwv/releases/tag/v0.32.5) - 17/04/2024
+
+### Fixed
+
+- Image does not completely fill div [#1655](https://github.com/ivmartel/dwv/issues/1655)
+
+## [v0.32.4](https://github.com/ivmartel/dwv/releases/tag/v0.32.4) - 18/03/2024
+
+### Fixed
+
+- event.preventDefault for wheel events [#1632](https://github.com/ivmartel/dwv/issues/1632)
+
+## [v0.32.3](https://github.com/ivmartel/dwv/releases/tag/v0.32.3) - 22/09/2023
+
+### Added
+
+- Add support for writing DICOM with unknown VR [#1507](https://github.com/ivmartel/dwv/issues/1481)
+
 ## [v0.32.2](https://github.com/ivmartel/dwv/releases/tag/v0.32.2) - 04/09/2023
 
 ### Added
 
-- Add app options type [#1481](https://github.com/ivmartel/dwv/issues/1481)
+- Add app options type  [#1481](https://github.com/ivmartel/dwv/issues/1481)
 - Add data element type [#1474](https://github.com/ivmartel/dwv/issues/1474)
 - Export luts as plural not singular [#1478](https://github.com/ivmartel/dwv/issues/1478)
 - Add data view config type [#1475](https://github.com/ivmartel/dwv/issues/1475)
