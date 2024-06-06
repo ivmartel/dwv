@@ -6,8 +6,9 @@ import {urlContentTypes} from './urlsLoader';
 
 /**
  * Raw video loader.
- * url example (cors enabled):
- *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
+ *
+ * Url example (cors enabled):
+ *   {@link https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4}.
  */
 export class RawVideoLoader {
 
@@ -95,32 +96,47 @@ export class RawVideoLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True for files with type 'video.*'.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
     return (typeof file.type !== 'undefined' &&
-      file.type.match('video.*'));
+      file.type.match('video.*') !== null);
   }
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'rawvideo',
+   * - the `options.requestHeaders` contains an item
+   *   starting with 'Accept: video/'.
+   * - the url has a 'mp4', 'ogg' or 'webm' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      // starts with 'video/'
-      const isVideo = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'video/');
-      };
-      return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'rawvideo') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'video/'
+          return startsWith(acceptHeader.value, 'video/');
+        }
+      }
     }
 
     const urlObjext = getUrlFromUri(url);
@@ -138,7 +154,8 @@ export class RawVideoLoader {
    */
   canLoadMemory(mem) {
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

@@ -1,5 +1,6 @@
 import {Index} from '../math/index';
 import {colourNameToHex} from '../utils/colour';
+import {WindowLevel} from '../image/windowLevel';
 
 // external
 import Konva from 'konva';
@@ -14,25 +15,25 @@ import {App} from '../app/application';
  * Saves: data url/path, display info.
  *
  * History:
- * - v0.5 (dwv 0.30.0, 12/2021)
- *   - store position as array
- *   - new draw position group key
- * - v0.4 (dwv 0.29.0, 06/2021)
- *   - move drawing details into meta property
- *   - remove scale center and translation, add offset
- * - v0.3 (dwv v0.23.0, 03/2018)
+ * - v0.5 (dwv 0.30.0, 12/2021):
+ *   - store position as array,
+ *   - new draw position group key.
+ * - v0.4 (dwv 0.29.0, 06/2021):
+ *   - move drawing details into meta property,
+ *   - remove scale center and translation, add offset.
+ * - v0.3 (dwv v0.23.0, 03/2018):
  *   - new drawing structure, drawings are now the full layer object and
- *     using toObject to avoid saving a string representation
- *   - new details structure: simple array of objects referenced by draw ids
- * - v0.2 (dwv v0.17.0, 12/2016)
- *   - adds draw details: array [nslices][nframes] of detail objects
- * - v0.1 (dwv v0.15.0, 07/2016)
- *   - adds version
- *   - drawings: array [nslices][nframes] with all groups
- * - initial release (dwv v0.10.0, 05/2015), no version number...
+ *     using toObject to avoid saving a string representation,
+ *   - new details structure: simple array of objects referenced by draw ids.
+ * - v0.2 (dwv v0.17.0, 12/2016):
+ *   - adds draw details: array [nslices][nframes] of detail objects.
+ * - v0.1 (dwv v0.15.0, 07/2016):
+ *   - adds version,
+ *   - drawings: array [nslices][nframes] with all groups.
+ * - initial release (dwv v0.10.0, 05/2015), no version number:
  *   - content: window-center, window-width, position, scale,
- *       scaleCenter, translation, drawings
- *   - drawings: array [nslices] with all groups
+ *       scaleCenter, translation, drawings,
+ *   - drawings: array [nslices] with all groups.
  */
 export class State {
   /**
@@ -48,11 +49,12 @@ export class State {
     const position = viewController.getCurrentIndex();
     const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
+    const wl = viewController.getWindowLevel();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
-      'window-center': viewController.getWindowLevel().center,
-      'window-width': viewController.getWindowLevel().width,
+      'window-center': wl.center,
+      'window-width': wl.width,
       position: position.getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
@@ -98,8 +100,8 @@ export class State {
     const viewController =
       layerGroup.getActiveViewLayer().getViewController();
     // display
-    viewController.setWindowLevel(
-      data['window-center'], data['window-width']);
+    const wl = new WindowLevel(data['window-center'], data['window-width']);
+    viewController.setWindowLevel(wl);
     // position is index...
     viewController.setCurrentIndex(new Index(data.position));
     // apply saved scale on top of current base one
@@ -143,7 +145,7 @@ export class State {
     app.getActiveLayerGroup().setScale(scale);
     app.getActiveLayerGroup().setOffset(offset);
     // render to draw the view layer
-    app.render(0); //todo: fix
+    app.render(app.getDataIds()[0]); //todo: fix
     // drawings (will draw the draw layer)
     app.setDrawings(data.drawings, data.drawingsDetails);
   }
@@ -224,9 +226,9 @@ export class State {
 } // State class
 
 /**
- * Convert drawings from v0.2 to v0.3.
- * v0.2: one layer per slice/frame
- * v0.3: one layer, one group per slice. setDrawing expects the full stage
+ * Convert drawings from v0.2 to v0.3:
+ * - v0.2: one layer per slice/frame,
+ * - v0.3: one layer, one group per slice. `setDrawing` expects the full stage.
  *
  * @param {Array} drawings An array of drawings.
  * @returns {object} The layer with the converted drawings.
@@ -296,9 +298,9 @@ function v02Tov03Drawings(drawings) {
 }
 
 /**
- * Convert drawings from v0.1 to v0.2.
- * v0.1: text on its own
- * v0.2: text as part of label
+ * Convert drawings from v0.1 to v0.2:
+ * - v0.1: text on its own,
+ * - v0.2: text as part of label.
  *
  * @param {Array} inputDrawings An array of drawings.
  * @returns {object} The converted drawings.
@@ -443,9 +445,9 @@ function v01Tov02DrawingsAndDetails(inputDrawings) {
 }
 
 /**
- * Convert drawing details from v0.2 to v0.3.
- * - v0.2: array [nslices][nframes] with all
- * - v0.3: simple array of objects referenced by draw ids
+ * Convert drawing details from v0.2 to v0.3:
+ * - v0.2: array [nslices][nframes] with all,
+ * - v0.3: simple array of objects referenced by draw ids.
  *
  * @param {Array} details An array of drawing details.
  * @returns {object} The converted drawings.
@@ -474,9 +476,9 @@ function v02Tov03DrawingsDetails(details) {
 }
 
 /**
- * Convert drawing details from v0.3 to v0.4.
- * - v0.3: properties at group root
- * - v0.4: properties in group meta object
+ * Convert drawing details from v0.3 to v0.4:
+ * - v0.3: properties at group root,
+ * - v0.4: properties in group meta object.
  *
  * @param {Array} details An array of drawing details.
  * @returns {object} The converted drawings.
@@ -499,9 +501,9 @@ function v03Tov04DrawingsDetails(details) {
 }
 
 /**
- * Convert drawing from v0.4 to v0.5.
- * - v0.4: position as object
- * - v0.5: position as array
+ * Convert drawing from v0.4 to v0.5:
+ * - v0.4: position as object,
+ * - v0.5: position as array.
  *
  * @param {object} data An array of drawing.
  * @returns {object} The converted drawings.
@@ -513,9 +515,9 @@ function v04Tov05Data(data) {
 }
 
 /**
- * Convert drawing from v0.4 to v0.5.
- * - v0.4: draw id as 'slice-0_frame-1'
- * - v0.5: draw id as '#2-0_#3-1''
+ * Convert drawing from v0.4 to v0.5:
+ * - v0.4: draw id as 'slice-0_frame-1',
+ * - v0.5: draw id as '#2-0_#3-1'.
  *
  * @param {object} inputDrawings An array of drawing.
  * @returns {object} The converted drawings.

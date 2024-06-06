@@ -89,8 +89,9 @@ export class JSONTextLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if the file has a 'json' extension.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
@@ -100,22 +101,36 @@ export class JSONTextLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'json',
+   * - the `options.requestHeaders` contains a 'Accept: application/json' or
+   *   'Accept: application/dicom+json',
+   * - the url has a 'json' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeader, just base check on them
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      // starts with 'application/json' or 'application/dicom+json
-      const isJson = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'application/json') &&
-          startsWith(element.value, 'application/dicom+json');
-      };
-      return typeof options.requestHeaders.find(isJson) !== 'undefined';
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'json') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'application/json' or 'application/dicom+json
+          return startsWith(acceptHeader.value, 'application/json') ||
+            startsWith(acceptHeader.value, 'application/dicom+json');
+        }
+      }
     }
 
     const urlObjext = getUrlFromUri(url);
@@ -130,13 +145,14 @@ export class JSONTextLoader {
    * @returns {boolean} True if the object can be loaded.
    */
   canLoadMemory(mem) {
-    if (typeof mem['Content-Type'] !== 'undefined') {
-      if (mem['Content-Type'].includes('json')) {
-        return true;
-      }
+    const contentType = mem['Content-Type'];
+    if (typeof contentType !== 'undefined' &&
+      contentType.startsWith('application/json')) {
+      return true;
     }
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

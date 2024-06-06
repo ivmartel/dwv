@@ -46,7 +46,7 @@ export function splitUri(uri) {
 
 /**
  * Get the query part, split into an array, of an input URI.
- * The URI scheme is: 'base?query#fragment'
+ * The URI scheme is: `base?query#fragment`.
  *
  * @param {string} uri The input URI.
  * @returns {object} The query part, split into an array, of the input URI.
@@ -65,9 +65,9 @@ export function getUriQuery(uri) {
 /**
  * Generic URI query decoder.
  * Supports manifest:
- *   [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest
- * or encoded URI with base and key value/pairs:
- *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
+ *   `[dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest`.
+ * Or encoded URI with base and key value/pairs:
+ *   `[dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)`.
  *
  * @param {object} query The query part to the input URI.
  * @param {Function} callback The function to call with the decoded file urls.
@@ -87,15 +87,14 @@ export function decodeQuery(query, callback, options) {
 
 /**
  * Decode a Key/Value pair URI. If a key is repeated, the result
- * be an array of base + each key.
+ *   be an array of base + each key.
  *
  * @param {string} uri The URI to decode.
- * @param {string} replaceMode The key replace mode.
- *   replaceMode can be:
- *   - key (default): keep the key
- *   - other than key: do not use the key
+ * @param {string} replaceMode The key replace mode. Can be:
+ * - key (default): keep the key
+ * - other than key: do not use the key
  *   'file' is a special case where the '?' of the query is not kept.
- * @returns {Array} The list of input file urls.
+ * @returns {string[]} The list of input file urls.
  */
 export function decodeKeyValueUri(uri, replaceMode) {
   const result = [];
@@ -214,7 +213,7 @@ function decodeManifestQuery(query, callback) {
  *
  * @param {object} manifest The manifest to decode.
  * @param {number} nslices The number of slices to load.
- * @returns {Array} The decoded manifest.
+ * @returns {string[]} The decoded manifest.
  */
 export function decodeManifest(manifest, nslices) {
   const result = [];

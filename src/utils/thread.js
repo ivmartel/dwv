@@ -1,5 +1,6 @@
 /**
  * Thread Pool.
+ *
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
  */
 export class ThreadPool {
@@ -174,8 +175,9 @@ export class ThreadPool {
 /**
  * Worker background task.
  *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/Worker}.
+ *
  * @external Worker
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Worker
  */
 
 /**
@@ -206,7 +208,7 @@ class WorkerThread {
   }
 
   /**
-   * Run a worker task
+   * Run a worker task.
    *
    * @param {object} workerTask The task to run.
    */
@@ -247,7 +249,7 @@ class WorkerThread {
     // augment event
     event.itemNumber = this.runningTask.info.itemNumber;
     event.numberOfItems = this.runningTask.info.numberOfItems;
-    event.dataIndex = this.runningTask.info.dataIndex;
+    event.index = this.runningTask.info.index;
     // send event
     this.parentPool.onworkitem(event);
     // tell the parent pool the task is done
@@ -263,7 +265,7 @@ class WorkerThread {
     // augment event
     event.itemNumber = this.runningTask.info.itemNumber;
     event.numberOfItems = this.runningTask.info.numberOfItems;
-    event.dataIndex = this.runningTask.info.dataIndex;
+    event.index = this.runningTask.info.index;
     // pass to parent
     this.parentPool.handleWorkerError(event);
     // stop the worker and free the thread

@@ -1,5 +1,13 @@
 import {Point, Point3D} from '../math/point';
+import {WindowLevel} from '../image/windowLevel';
 import {LayerGroup} from './layerGroup';
+import {logger} from '../utils/logger';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
+/* eslint-enable no-unused-vars */
 
 /**
  * Window/level binder.
@@ -10,10 +18,34 @@ export class WindowLevelBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      const viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
       if (viewLayers.length !== 0) {
         const vc = viewLayers[0].getViewController();
-        vc.setWindowLevel(event.value[0], event.value[1]);
+        if (event.value.length === 2) {
+          const wl = new WindowLevel(event.value[0], event.value[1]);
+          vc.setWindowLevel(wl);
+        }
+        if (event.value.length === 3) {
+          vc.setWindowLevelPreset(event.value[2]);
+        }
+      }
+    };
+  };
+}
+
+/**
+ * Colour map binder.
+ */
+export class ColourMapBinder {
+  getEventType = function () {
+    return 'colourmapchange';
+  };
+  getCallback = function (layerGroup) {
+    return function (event) {
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
+      if (viewLayers.length !== 0) {
+        const vc = viewLayers[0].getViewController();
+        vc.setColourMap(event.value[0]);
       }
     };
   };
@@ -104,12 +136,12 @@ export class OpacityBinder {
   };
   getCallback = function (layerGroup) {
     return function (event) {
-      // exit if no data index
+      // exit if no data id
       if (typeof event.dataid === 'undefined') {
         return;
       }
       // propagate to first view layer
-      const viewLayers = layerGroup.getViewLayersByDataIndex(event.dataid);
+      const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
       if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
@@ -126,7 +158,8 @@ export const binderList = {
   PositionBinder,
   ZoomBinder,
   OffsetBinder,
-  OpacityBinder
+  OpacityBinder,
+  ColourMapBinder
 };
 
 /**
@@ -135,10 +168,26 @@ export const binderList = {
  */
 export class Stage {
 
-  // associated layer groups
+  /**
+   * Associated layer groups.
+   *
+   * @type {LayerGroup[]}
+   */
   #layerGroups = [];
-  // active layer group index
-  #activeLayerGroupIndex = null;
+
+  /**
+   * Active layer group index.
+   *
+   * @type {number|undefined}
+   */
+  #activeLayerGroupIndex;
+
+  /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
 
   // layer group binders
   #binders = [];
@@ -149,7 +198,7 @@ export class Stage {
    * Get the layer group at the given index.
    *
    * @param {number} index The index.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroup(index) {
     return this.#layerGroups[index];
@@ -167,36 +216,50 @@ export class Stage {
   /**
    * Get the active layer group.
    *
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getActiveLayerGroup() {
     return this.getLayerGroup(this.#activeLayerGroupIndex);
   }
 
   /**
-   * Get the view layers associated to a data index.
+   * Set the active layer group.
    *
-   * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @param {number} index The layer group index.
    */
-  getViewLayersByDataIndex(index) {
+  setActiveLayerGroup(index) {
+    if (typeof this.getLayerGroup(index) !== 'undefined') {
+      this.#activeLayerGroupIndex = index;
+    } else {
+      logger.warn('No layer group to set as active with index: ' +
+        index);
+    }
+  }
+
+  /**
+   * Get the view layers associated to a data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {ViewLayer[]} The layers.
+   */
+  getViewLayersByDataId(dataId) {
     let res = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getViewLayersByDataIndex(index));
+      res = res.concat(this.#layerGroups[i].getViewLayersByDataId(dataId));
     }
     return res;
   }
 
   /**
-   * Get the draw layers associated to a data index.
+   * Get the draw layers associated to a data id.
    *
-   * @param {number} index The data index.
-   * @returns {Array} The layers.
+   * @param {string} dataId The data id.
+   * @returns {DrawLayer[]} The layers.
    */
-  getDrawLayersByDataIndex(index) {
+  getDrawLayersByDataId(dataId) {
     let res = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getDrawLayersByDataIndex(index));
+      res = res.concat(this.#layerGroups[i].getDrawLayersByDataId(dataId));
     }
     return res;
   }
@@ -204,12 +267,15 @@ export class Stage {
   /**
    * Add a layer group to the list.
    *
+   * The new layer group will be marked as the active layer group.
+   *
    * @param {object} htmlElement The HTML element of the layer group.
    * @returns {LayerGroup} The newly created layer group.
    */
   addLayerGroup(htmlElement) {
     this.#activeLayerGroupIndex = this.#layerGroups.length;
     const layerGroup = new LayerGroup(htmlElement);
+    layerGroup.setImageSmoothing(this.#imageSmoothing);
     // add to storage
     const isBound = this.#callbackStore && this.#callbackStore.length !== 0;
     if (isBound) {
@@ -260,7 +326,43 @@ export class Stage {
       this.#layerGroups[i].empty();
     }
     this.#layerGroups = [];
-    this.#activeLayerGroupIndex = null;
+    this.#activeLayerGroupIndex = undefined;
+  }
+
+  /**
+   * Remove all layers for a specific data.
+   *
+   * @param {string} dataId The data to remove its layers.
+   */
+  removeLayersByDataId(dataId) {
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.removeLayersByDataId(dataId);
+    }
+  }
+
+  /**
+   * Remove a layer group from this stage.
+   *
+   * @param {LayerGroup} layerGroup The layer group to remove.
+   */
+  removeLayerGroup(layerGroup) {
+    // find layer
+    const index = this.#layerGroups.findIndex((item) => item === layerGroup);
+    if (index === -1) {
+      throw new Error('Cannot find layerGroup to remove');
+    }
+    // unbind
+    this.unbindLayerGroups();
+    // empty layer group
+    layerGroup.empty();
+    // remove from storage
+    this.#layerGroups.splice(index, 1);
+    // update active index
+    if (this.#activeLayerGroupIndex === index) {
+      this.#activeLayerGroupIndex = undefined;
+    }
+    // bind
+    this.bindLayerGroups();
   }
 
   /**
@@ -282,28 +384,30 @@ export class Stage {
   }
 
   /**
-   * Synchronise the fit scale of the group layers.
+   * Fit to container: synchronise the div to world size ratio
+   *   of the group layers.
    */
-  syncLayerGroupScale() {
-    let minScale;
-    const hasScale = [];
+  fitToContainer() {
+    // find the minimum ratio
+    let minRatio;
+    const hasRatio = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      const scale = this.#layerGroups[i].calculateFitScale();
-      if (typeof scale !== 'undefined') {
-        hasScale.push(i);
-        if (typeof minScale === 'undefined' || scale < minScale) {
-          minScale = scale;
+      const ratio = this.#layerGroups[i].getDivToWorldSizeRatio();
+      if (typeof ratio !== 'undefined') {
+        hasRatio.push(i);
+        if (typeof minRatio === 'undefined' || ratio < minRatio) {
+          minRatio = ratio;
         }
       }
     }
-    // exit if no scale
-    if (typeof minScale === 'undefined') {
+    // exit if no ratio
+    if (typeof minRatio === 'undefined') {
       return;
     }
-    // apply min scale to layers
+    // apply min ratio to layers
     for (let j = 0; j < this.#layerGroups.length; ++j) {
-      if (hasScale.includes(j)) {
-        this.#layerGroups[j].setFitScale(minScale);
+      if (hasRatio.includes(j)) {
+        this.#layerGroups[j].fitToContainer(minRatio);
       }
     }
   }
@@ -345,6 +449,19 @@ export class Stage {
     }
     // clear callback store
     this.#callbackStore = null;
+  }
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+    // set for existing layer groups
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      this.#layerGroups[i].setImageSmoothing(flag);
+    }
   }
 
   /**

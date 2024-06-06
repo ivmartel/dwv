@@ -35,19 +35,19 @@ export class Matrix33 {
   /**
    * Matrix values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
   /**
-   * Matrix inverse, calculated at first ask
+   * Matrix inverse, calculated at first ask.
    *
    * @type {Matrix33}
    */
   #inverse;
 
   /**
-   * @param {Array} values row-major ordered 9 values.
+   * @param {number[]} values Row-major ordered 9 values.
    */
   constructor(values) {
     this.#values = values;
@@ -58,7 +58,7 @@ export class Matrix33 {
    *
    * @param {number} row The row at wich to get the value.
    * @param {number} col The column at wich to get the value.
-   * @returns {number} The value at the position.
+   * @returns {number|undefined} The value at the position.
    */
   get(row, col) {
     return this.#values[row * 3 + col];
@@ -158,8 +158,8 @@ export class Matrix33 {
   /**
    * Multiply this matrix by a 3D array.
    *
-   * @param {Array} array3D The input 3D array.
-   * @returns {Array} The result 3D array.
+   * @param {number[]} array3D The input 3D array.
+   * @returns {number[]} The result 3D array.
    */
   multiplyArray3D(array3D) {
     if (array3D.length !== 3) {
@@ -255,7 +255,7 @@ export class Matrix33 {
   }
 
   /**
-   * Get this matrix with only zero and +/- ones instead of the maximum,
+   * Get this matrix with only zero and +/- ones instead of the maximum.
    *
    * @returns {Matrix33} The simplified matrix.
    */
@@ -290,11 +290,13 @@ export class Matrix33 {
 /**
  * Get the inverse of an input 3*3 matrix.
  *
+ * Ref:
+ * - {@link https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices},
+ * - {@link https://github.com/willnode/N-Matrix-Programmer}.
+ *
  * @param {Matrix33} m The input matrix.
  * @returns {Matrix33|undefined} The inverse matrix or undefined
  *   if the determinant is zero.
- * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
- * @see https://github.com/willnode/N-Matrix-Programmer
  */
 function getMatrixInverse(m) {
   const m00 = m.get(0, 0);
@@ -356,52 +358,4 @@ export function getIdentityMat33() {
  */
 export function isIdentityMat33(mat33) {
   return mat33.equals(getIdentityMat33());
-}
-
-/**
- * Create a 3x3 coronal (xzy) matrix.
- *
- * @returns {Matrix33} The coronal matrix.
- */
-export function getCoronalMat33() {
-  /* eslint-disable array-element-newline */
-  return new Matrix33([
-    1, 0, 0,
-    0, 0, 1,
-    0, -1, 0
-  ]);
-  /* eslint-enable array-element-newline */
-}
-
-/**
- * Create a 3x3 sagittal (yzx) matrix.
- *
- * @returns {Matrix33} The sagittal matrix.
- */
-export function getSagittalMat33() {
-  /* eslint-disable array-element-newline */
-  return new Matrix33([
-    0, 0, -1,
-    1, 0, 0,
-    0, -1, 0
-  ]);
-  /* eslint-enable array-element-newline */
-}
-
-/**
- * Get an orientation matrix from a name.
- *
- * @param {string} name The orientation name.
- * @returns {Matrix33} The orientation matrix.
- */
-export function getMatrixFromName(name) {
-  let matrix = null;
-  if (name === 'axial') {
-    matrix = getIdentityMat33();
-  } else if (name === 'coronal') {
-    matrix = getCoronalMat33();
-  } else if (name === 'sagittal') {
-    matrix = getSagittalMat33();
-  }
-  return matrix;
 }

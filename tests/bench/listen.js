@@ -10,7 +10,7 @@ dcmb.utils = dcmb.utils || {};
  */
 dcmb.utils.ListenerHandler = function () {
   /**
-   * listeners.
+   * Listeners.
    *
    * @private
    */

@@ -8,15 +8,16 @@ import {
 /**
  * Tests for the 'dicom/dicomTag.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('dicom');
 
 /**
  * Tests for {@link Tag}.
  *
- * @function module:tests/dicom~Tag
+ * @function module:tests/dicom~dicom-tag-class
  */
-QUnit.test('Test Tag.', function (assert) {
+QUnit.test('DICOM tag class', function (assert) {
   // error cases
   assert.throws(function () {
     new Tag();
@@ -32,7 +33,7 @@ QUnit.test('Test Tag.', function (assert) {
   assert.throws(function () {
     new Tag('12');
   },
-  new Error('Cannot create tag with badly sized group.'),
+  new Error('Cannot create tag with badly sized group: 12'),
   'tag with bad group #0.');
 
   assert.throws(function () {
@@ -48,7 +49,7 @@ QUnit.test('Test Tag.', function (assert) {
   assert.throws(function () {
     new Tag('1234', '12');
   },
-  new Error('Cannot create tag with badly sized element.'),
+  new Error('Cannot create tag with badly sized element: 12'),
   'tag with bad element #0.');
 
   const tag00 = new Tag('1111', '2222');
@@ -71,7 +72,7 @@ QUnit.test('Test Tag.', function (assert) {
  *
  * @function module:tests/dicom~getTagFromDictionary
  */
-QUnit.test('Test getTagFromDictionary.', function (assert) {
+QUnit.test('getTagFromDictionary', function (assert) {
   const tag00 = getTagFromDictionary();
   assert.equal(tag00, null, 'get undefined');
   const tag01 = getTagFromDictionary(null);

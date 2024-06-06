@@ -1,11 +1,53 @@
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Scalar3D} from '../math/scalar';
+/* eslint-enable no-unused-vars */
+
+/**
+ * RGB colour class.
+ */
+export class RGB {
+  /**
+   * Red component.
+   *
+   * @type {number}
+   */
+  r;
+  /**
+   * Green component.
+   *
+   * @type {number}
+   */
+  g;
+  /**
+   * Blue component.
+   *
+   * @type {number}
+   */
+  b;
+  /**
+   * @param {number} r Red component.
+   * @param {number} g Green component.
+   * @param {number} b Blue component.
+   */
+  constructor(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+}
+
+// black rgb
+export const BLACK = {r: 0, g: 0, b: 0};
+
 /**
  * Check if two rgb objects are equal.
  *
- * @param {object} c1 The first colour.
- * @param {object} c2 The second colour.
+ * @param {RGB} c1 The first colour.
+ * @param {RGB} c2 The second colour.
  * @returns {boolean} True if both colour are equal.
  */
 export function isEqualRgb(c1, c2) {
@@ -21,12 +63,14 @@ export function isEqualRgb(c1, c2) {
 /**
  * Convert YBR to RGB.
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
- * @see https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
+ * Ref:
+ * - {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2},
+ * - {@link https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion}.
+ *
  * @param {number} y The Y component.
  * @param {number} cb The Cb component.
  * @param {number} cr The Cr component.
- * @returns {object} RGB equivalent as {r,g,b}.
+ * @returns {RGB} RGB equivalent as {r,g,b}.
  */
 export function ybrToRgb(y, cb, cr) {
   return {
@@ -40,7 +84,7 @@ export function ybrToRgb(y, cb, cr) {
  * Convert a hex color into RGB.
  *
  * @param {string} hexStr The hex color as '#ab01ef'.
- * @returns {object} The RGB values as {r,g,b}.
+ * @returns {RGB} The RGB values as {r,g,b}.
  */
 export function hexToRgb(hexStr) {
   return {
@@ -53,7 +97,7 @@ export function hexToRgb(hexStr) {
 /**
  * Convert RGB to its hex equivalent.
  *
- * @param {object} rgb The RGB object as {r,g,b}.
+ * @param {RGB} rgb The RGB object as {r,g,b}.
  * @returns {string} A string representing the hex color as '#ab01ef'.
  */
 export function rgbToHex(rgb) {
@@ -65,17 +109,18 @@ export function rgbToHex(rgb) {
  * Get the brightness of a RGB colour: calculates
  * the luma (Y) of the YIQ colour space.
  *
- * @see https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ
- * @param {object} rgbTriplet RGB triplet.
+ * Ref: {@link https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ}.
+ *
+ * @param {RGB} rgb RGB triplet.
  * @returns {number} The brightness ([0,1]).
  */
-export function getBrightness(rgbTriplet) {
+export function getBrightness(rgb) {
   // 0.001172549 = 0.299 / 255
   // 0.002301961 = 0.587 / 255
   // 0.000447059 = 0.114 / 255
-  return rgbTriplet.r * 0.001172549 +
-    rgbTriplet.g * 0.002301961 +
-    rgbTriplet.b * 0.000447059;
+  return rgb.r * 0.001172549 +
+    rgb.g * 0.002301961 +
+    rgb.b * 0.000447059;
 }
 
 /**
@@ -119,7 +164,7 @@ export function uintLabToLab(triplet) {
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
  *   unsigned int CIE LAB ([0, 65535]).
  *
- * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @param {object} triplet CIE XYZ triplet as {l,a,b} with CIE LAB range.
  * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
  */
 export function labToUintLab(triplet) {
@@ -137,7 +182,7 @@ export function labToUintLab(triplet) {
 /**
  * CIE Standard Illuminant D65, standard 2° observer.
  *
- * @see https://en.wikipedia.org/wiki/Illuminant_D65
+ * Ref: {@link https://en.wikipedia.org/wiki/Illuminant_D65}.
  */
 const d65 = {
   x: 95.0489,
@@ -148,16 +193,17 @@ const d65 = {
 /**
  * Convert CIE LAB to CIE XYZ (standard illuminant D65, 2degree 1931).
  *
- * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ
+ * Ref: {@link https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ}.
+ *
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
- * @returns {object} CIE XYZ triplet as {x,y,z}.
+ * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */
 export function cielabToCiexyz(triplet) {
   /**
    * Apply the inverse lab function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function invLabFunc(x) {
     let res = null;
@@ -185,8 +231,9 @@ export function cielabToCiexyz(triplet) {
 /**
  * Convert CIE XYZ to CIE LAB (standard illuminant D65, 2degree 1931).
  *
- * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB
- * @param {object} triplet CIE XYZ triplet as {x,y,z}.
+ * Ref: {@link https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB}.
+ *
+ * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export function ciexyzToCielab(triplet) {
@@ -194,7 +241,7 @@ export function ciexyzToCielab(triplet) {
    * Apply the lab function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function labFunc(x) {
     let res = null;
@@ -223,16 +270,17 @@ export function ciexyzToCielab(triplet) {
 /**
  * Convert CIE XYZ to sRGB.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
- * @param {object} triplet CIE XYZ triplet as {x,y,z}.
- * @returns {object} sRGB triplet as {r,g,b}.
+ * Ref: {@link https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB}.
+ *
+ * @param {Scalar3D} triplet CIE XYZ triplet as {x,y,z}.
+ * @returns {RGB} 'sRGB' triplet as {r,g,b}.
  */
 export function ciexyzToSrgb(triplet) {
   /**
    * Apply the gamma function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function gammaFunc(x) {
     let res = null;
@@ -260,16 +308,17 @@ export function ciexyzToSrgb(triplet) {
 /**
  * Convert sRGB to CIE XYZ.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
- * @param {object} triplet sRGB triplet as {r,g,b}.
- * @returns {object} CIE XYZ triplet as {x,y,z}.
+ * Ref: {@link https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ}.
+ *
+ * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
+ * @returns {Scalar3D} CIE XYZ triplet as {x,y,z}.
  */
 export function srgbToCiexyz(triplet) {
   /**
    * Apply the inverse gamma function.
    *
    * @param {number} x The input value.
-   * @returns {number} The result
+   * @returns {number} The result.
    */
   function invGammaFunc(x) {
     let res = null;
@@ -296,7 +345,7 @@ export function srgbToCiexyz(triplet) {
  * Convert CIE LAB to sRGB (standard illuminant D65).
  *
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
- * @returns {object} sRGB triplet as {r,g,b}.
+ * @returns {RGB} 'sRGB' triplet as {r,g,b}.
  */
 export function cielabToSrgb(triplet) {
   return ciexyzToSrgb(cielabToCiexyz(triplet));
@@ -305,7 +354,7 @@ export function cielabToSrgb(triplet) {
 /**
  * Convert sRGB to CIE LAB (standard illuminant D65).
  *
- * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @param {RGB} triplet 'sRGB' triplet as {r,g,b}.
  * @returns {object} CIE LAB triplet as {l,a,b}.
  */
 export function srgbToCielab(triplet) {

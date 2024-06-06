@@ -5,6 +5,7 @@ import {getStats} from './stats';
 /* eslint-disable no-unused-vars */
 import {Point2D} from '../math/point';
 import {ViewController} from '../app/viewController';
+import {Scalar2D} from './scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -96,22 +97,25 @@ export class Circle {
   /**
    * Get the surface of the circle according to a spacing.
    *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
+   * @param {Scalar2D} spacing2D The 2D spacing.
    * @returns {number} The surface of the circle multiplied by the given
    *  spacing or null for null spacings.
    */
-  getWorldSurface(spacingX, spacingY) {
-    return mulABC(this.getSurface(), spacingX, spacingY);
+  getWorldSurface(spacing2D) {
+    return mulABC(this.getSurface(), spacing2D.x, spacing2D.y);
   }
 
   /**
    * Get the rounded limits of the circle.
-   * (see https://en.wikipedia.org/wiki/Circle#Equations)
-   * Circle formula: x*x + y*y = r*r
-   * => y = (+-) sqrt(r*r - x*x)
    *
-   * @returns {Array} The rounded limits.
+   * See: {@link https://en.wikipedia.org/wiki/Circle#Equations}.
+   *
+   * Circle formula: `x*x + y*y = r*r`.
+   *
+   * Implies: `y = (+-) sqrt(r*r - x*x)`.
+   *
+   * @returns {number[][][]} The rounded limits:
+   *  list of [x, y] pairs (min, max).
    */
   getRound() {
     const centerX = this.getCenter().getX();
@@ -145,38 +149,42 @@ export class Circle {
   /**
    * Quantify an circle according to view information.
    *
-   * @param {ViewController} viewController The associated view
-   *   controller.
-   * @param {Array} flags A list of stat values to calculate.
+   * @param {ViewController} viewController The associated view controller.
+   * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
     const quant = {};
-    // surface
-    const spacing = viewController.get2DSpacing();
-    const surface = this.getWorldSurface(spacing[0], spacing[1]);
+    // shape quantification
+    const spacing2D = viewController.get2DSpacing();
+    quant.radius = {
+      value: this.getRadius() * spacing2D.x,
+      unit: i18n.t('unit.mm')
+    };
+    const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }
 
-    // pixel quantification
+    // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const regions = this.getRound();
       if (regions.length !== 0) {
         const values = viewController.getImageVariableRegionValues(regions);
+        const unit = viewController.getPixelUnit();
         const quantif = getStats(values, flags);
-        quant.min = {value: quantif.min, unit: ''};
-        quant.max = {value: quantif.max, unit: ''};
-        quant.mean = {value: quantif.mean, unit: ''};
-        quant.stdDev = {value: quantif.stdDev, unit: ''};
+        quant.min = {value: quantif.min, unit: unit};
+        quant.max = {value: quantif.max, unit: unit};
+        quant.mean = {value: quantif.mean, unit: unit};
+        quant.stdDev = {value: quantif.stdDev, unit: unit};
         if (typeof quantif.median !== 'undefined') {
-          quant.median = {value: quantif.median, unit: ''};
+          quant.median = {value: quantif.median, unit: unit};
         }
         if (typeof quantif.p25 !== 'undefined') {
-          quant.p25 = {value: quantif.p25, unit: ''};
+          quant.p25 = {value: quantif.p25, unit: unit};
         }
         if (typeof quantif.p75 !== 'undefined') {
-          quant.p75 = {value: quantif.p75, unit: ''};
+          quant.p75 = {value: quantif.p75, unit: unit};
         }
       }
     }

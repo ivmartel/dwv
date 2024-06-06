@@ -55,8 +55,9 @@ export class Point2D {
    */
   equals(rhs) {
     return rhs !== null &&
-      this.getX() === rhs.getX() &&
-      this.getY() === rhs.getY();
+      typeof rhs !== 'undefined' &&
+      this.#x === rhs.getX() &&
+      this.#y === rhs.getY();
   }
 
   /**
@@ -65,31 +66,7 @@ export class Point2D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.getX() + ', ' + this.getY() + ')';
-  }
-
-  /**
-   * Get the distance to another Point2D.
-   *
-   * @param {Point2D} point2D The input point.
-   * @returns {number} The distance to the input point.
-   */
-  getDistance(point2D) {
-    return Math.sqrt(
-      (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
-      (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()));
-  }
-
-  /**
-   * Round a Point2D.
-   *
-   * @returns {Point2D} The rounded point.
-   */
-  getRound() {
-    return new Point2D(
-      Math.round(this.getX()),
-      Math.round(this.getY())
-    );
+    return '(' + this.#x + ', ' + this.#y + ')';
   }
 
 } // Point2D class
@@ -167,9 +144,9 @@ export class Point3D {
    */
   equals(rhs) {
     return rhs !== null &&
-      this.getX() === rhs.getX() &&
-      this.getY() === rhs.getY() &&
-      this.getZ() === rhs.getZ();
+      this.#x === rhs.getX() &&
+      this.#y === rhs.getY() &&
+      this.#z === rhs.getZ();
   }
 
   /**
@@ -182,9 +159,9 @@ export class Point3D {
    */
   isSimilar(rhs, tol) {
     return rhs !== null &&
-      isSimilar(this.getX(), rhs.getX(), tol) &&
-      isSimilar(this.getY(), rhs.getY(), tol) &&
-      isSimilar(this.getZ(), rhs.getZ(), tol);
+      isSimilar(this.#x, rhs.getX(), tol) &&
+      isSimilar(this.#y, rhs.getY(), tol) &&
+      isSimilar(this.#z, rhs.getZ(), tol);
   }
 
   /**
@@ -193,9 +170,9 @@ export class Point3D {
    * @returns {string} The point as a string.
    */
   toString() {
-    return '(' + this.getX() +
-      ', ' + this.getY() +
-      ', ' + this.getZ() + ')';
+    return '(' + this.#x +
+      ', ' + this.#y +
+      ', ' + this.#z + ')';
   }
 
   /**
@@ -205,10 +182,41 @@ export class Point3D {
    * @returns {number} Ths distance to the input point.
    */
   getDistance(point3D) {
-    return Math.sqrt(
-      (this.getX() - point3D.getX()) * (this.getX() - point3D.getX()) +
-      (this.getY() - point3D.getY()) * (this.getY() - point3D.getY()) +
-      (this.getZ() - point3D.getZ()) * (this.getZ() - point3D.getZ()));
+    return Math.sqrt(this.#getSquaredDistance(point3D));
+  }
+
+  /**
+   * Get the square of the distance between this and
+   * an input point. Used for sorting.
+   *
+   * @param {Point3D} point3D The input point.
+   * @returns {number} The square of the distance.
+   */
+  #getSquaredDistance(point3D) {
+    const dx = this.#x - point3D.getX();
+    const dy = this.#y - point3D.getY();
+    const dz = this.#z - point3D.getZ();
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  /**
+   * Get the closest point to this in a Point3D list.
+   *
+   * @param {Point3D[]} pointList The list to check.
+   * @returns {number} The index of the closest point in the input list.
+   */
+  getClosest(pointList) {
+    let minIndex = 0;
+    // the order between squared distances and distances is the same
+    let minDist = this.#getSquaredDistance(pointList[minIndex]);
+    for (let i = 0; i < pointList.length; ++i) {
+      const dist = this.#getSquaredDistance(pointList[i]);
+      if (dist < minDist) {
+        minIndex = i;
+        minDist = dist;
+      }
+    }
+    return minIndex;
   }
 
   /**
@@ -219,9 +227,9 @@ export class Point3D {
    */
   minus(point3D) {
     return new Vector3D(
-      (this.getX() - point3D.getX()),
-      (this.getY() - point3D.getY()),
-      (this.getZ() - point3D.getZ()));
+      (this.#x - point3D.getX()),
+      (this.#y - point3D.getY()),
+      (this.#z - point3D.getZ()));
   }
 
 } // Point3D class
@@ -236,21 +244,6 @@ export class Point3D {
 export function getEqualPoint3DFunction(point) {
   return function (element) {
     return element.equals(point);
-  };
-}
-
-/**
- * Get an array find callback for a similar input point.
- *
- * @param {Point3D} point The point to compare to.
- * @param {number} tol The comparison tolerance
- *   default to Number.EPSILON.
- * @returns {Function} A function that compares, using `isSimilar`,
- *   its input point to the one given as input to this function.
- */
-export function getSimilarPoint3DFunction(point, tol) {
-  return function (element) {
-    return element.isSimilar(point, tol);
   };
 }
 

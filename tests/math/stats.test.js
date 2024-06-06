@@ -1,19 +1,24 @@
-import {getStats, guid} from '../../src/math/stats';
+import {
+  getStats,
+  getBasicStats,
+  guid
+} from '../../src/math/stats';
 
 /**
  * Tests for the 'math/stats.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
- * Tests for {@link getSimpleStats}.
+ * Tests for {@link getBasicStats}.
  *
- * @function module:tests/math~getSimpleStats
+ * @function module:tests/math~getbasicstats
  */
-QUnit.test('Test getSimpleStats.', function (assert) {
+QUnit.test('getBasicStats', function (assert) {
   const arr0 = [1, 2, 3, 4, 5];
-  const q0 = getStats(arr0);
+  const q0 = getBasicStats(arr0);
   // min
   assert.equal(q0.min, 1, 'min.0');
   // max
@@ -24,7 +29,7 @@ QUnit.test('Test getSimpleStats.', function (assert) {
   assert.equal(q0.stdDev, 1.4142135623730951, 'stdDev.0');
 
   const arr1 = [9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4];
-  const q1 = getStats(arr1);
+  const q1 = getBasicStats(arr1);
   // min
   assert.equal(q1.min, 2, 'min.1');
   // max
@@ -38,9 +43,9 @@ QUnit.test('Test getSimpleStats.', function (assert) {
 /**
  * Tests for {@link getFullStats}.
  *
- * @function module:tests/math~getFullStats
+ * @function module:tests/math~getfullstats
  */
-QUnit.test('Test getFullStats.', function (assert) {
+QUnit.test('getFullStats', function (assert) {
   const arr0 = [15, 20, 35, 40, 50];
   const q0 = getStats(arr0, ['median']);
   // median
@@ -65,7 +70,7 @@ QUnit.test('Test getFullStats.', function (assert) {
  *
  * @function module:tests/math~guid
  */
-QUnit.test('Test GUID.', function (assert) {
+QUnit.test('GUID', function (assert) {
   const id0 = guid();
   const id1 = guid();
   assert.equal((id0 === id1), false, 'Two GUids should not be equal.');

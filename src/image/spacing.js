@@ -1,3 +1,8 @@
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Scalar2D} from '../math/scalar';
+/* eslint-enable no-unused-vars */
+
 /**
  * Immutable Spacing class.
  * Warning: the input array is NOT cloned, modifying it will
@@ -8,12 +13,12 @@ export class Spacing {
   /**
    * The spacing values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
   /**
-   * @param {Array} values The spacing values.
+   * @param {number[]} values The spacing values.
    */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
@@ -62,7 +67,7 @@ export class Spacing {
   /**
    * Get the values of this spacing.
    *
-   * @returns {Array} The array of values.
+   * @returns {number[]} The array of values.
    */
   getValues() {
     return this.#values.slice();
@@ -97,7 +102,7 @@ export class Spacing {
   /**
    * Get the 2D base of this size.
    *
-   * @returns {object} The 2D base [col,row] as {x,y}.
+   * @returns {Scalar2D} The 2D base [col,row] as {x,y}.
    */
   get2D() {
     return {

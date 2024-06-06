@@ -25,7 +25,7 @@
       "package": "package.json",
       "theme_opts": {
         "title": "DWV",
-        "footer": "<i>Documentation generated for dwv v0.32.6.</i>",
+        "footer": "<i>Documentation generated for dwv v0.33.0.</i>",
         "sections": [
           "Tutorials",
           "Namespaces",
@@ -46,11 +46,11 @@
             "target": "_blank"
           }
         ],
-        "create_style": "ul {list-style-type: disc !important;} ul ul {list-style-type: circle !important;}",
+        "create_style": "ul {list-style-type: disc !important;} ul ul {list-style-type: circle !important;} ul li {padding: .2rem 0 !important;}",
         "codepen": {
           "enable_for": ["examples"],
           "options": {
-            "js_external": "https://github.com/ivmartel/dwv/releases/download/v0.32.6/dwv-0.32.6.min.js",
+            "js_external": "https://github.com/ivmartel/dwv/releases/download/v0.33.0/dwv-0.33.0.min.js",
             "html": "<div id='dwv'><div id='layerGroup0'></div></div>"
           }
         }

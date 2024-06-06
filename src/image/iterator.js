@@ -11,7 +11,8 @@ import {Matrix33} from '../math/matrix';
 /**
  * Get an simple iterator for a given range for a one component data.
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
@@ -47,7 +48,7 @@ export function simpleRange(dataAccessor, start, end, increment) {
  * Get an iterator for a given range for a one component data.
  *
  * Using 'maxIter' and not an 'end' index since it fails in some edge cases
- * (for ex coronal2, ie zxy)
+ * (for ex coronal2, ie zxy).
  *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start Zero-based index at which to start the iteration.
@@ -123,7 +124,8 @@ export function range(dataAccessor, start, maxIter, increment,
 /**
  * Get an iterator for a given range with bounds (for a one component data).
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
@@ -164,12 +166,13 @@ export function rangeRegion(
 /**
  * Get an iterator for a given range with bounds (for a one component data).
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
  * @param {number} increment The increment between indicies.
- * @param {Array} regions An array of regions: [off0, size, off1].
+ * @param {number[][]} regions An array of regions: [off0, size, off1].
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
 export function rangeRegions(
@@ -211,7 +214,8 @@ export function rangeRegions(
 /**
  * Get an iterator for a given range for a 3 components data.
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
@@ -270,7 +274,7 @@ export function simpleRange3d(
  * Get an iterator for a given range for a 3 components data.
  *
  * Using 'maxIter' and not an 'end' index since it fails in some edge cases
- * (for ex coronal2, ie zxy)
+ * (for ex coronal2, ie zxy).
  *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start Zero-based index at which to start the iteration.
@@ -556,7 +560,7 @@ export function getRegionSliceIterator(
  * @param {Image} image The image to parse.
  * @param {Index} index The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
- * @param {Array} regions An array of regions.
+ * @param {number[][][]} regions An array of [x, y] pairs (min, max).
  * @returns {object|undefined} The slice iterator.
  */
 export function getVariableRegionSliceIterator(
@@ -628,7 +632,8 @@ export function getVariableRegionSliceIterator(
  * Get a colour iterator. The input array defines the colours and
  * their start index.
  *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
+ *
  * @param {Array} colours An array of {index, colour} pairs.
  * @param {number} end The end of the range (excluded).
  * @returns {object} An iterator folowing the iterator and iterable protocol.

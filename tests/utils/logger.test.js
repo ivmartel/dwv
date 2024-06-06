@@ -3,15 +3,16 @@ import {logger} from '../../src/utils/logger';
 /**
  * Tests for the 'utils/logger' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('utils');
 
 /**
  * Tests for {@link utils.logger}.
  *
- * @function module:tests/utils~logger
+ * @function module:tests/utils~logging
  */
-QUnit.test('Test logging.', function (assert) {
+QUnit.test('logging', function (assert) {
   // default console log level is WARN
   console.groupCollapsed('test log level WARN');
   logger.trace('[FAIL] logger.trace + level.WARN -> should NOT see');

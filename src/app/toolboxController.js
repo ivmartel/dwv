@@ -1,4 +1,11 @@
-import {InteractionEventNames, getEventOffset} from '../gui/generic';
+import {InteractionEventNames} from '../gui/generic';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../gui/layerGroup';
+import {ViewLayer} from '../gui/viewLayer';
+import {DrawLayer} from '../gui/drawLayer';
+/* eslint-enable no-unused-vars */
 
 /**
  * Toolbox controller.
@@ -47,9 +54,24 @@ export class ToolboxController {
     for (const key in this.#toolList) {
       this.#toolList[key].init();
     }
-    // keydown listener
-    window.addEventListener('keydown',
-      this.#getOnMouch('window', 'keydown'), true);
+    // enable shortcuts
+    this.enableShortcuts(true);
+  }
+
+  /**
+   * Enable or disable shortcuts. The 'init' methods enables shortcuts
+   *  by default. Call this method after init to disable shortcuts.
+   *
+   * @param {boolean} flag True to enable shortcuts.
+   */
+  enableShortcuts(flag) {
+    if (flag) {
+      window.addEventListener('keydown',
+        this.#getCallback('window', 'keydown'), true);
+    } else {
+      window.removeEventListener('keydown',
+        this.#getCallback('window', 'keydown'), true);
+    }
   }
 
   /**
@@ -125,28 +147,67 @@ export class ToolboxController {
   /**
    * Listen to layer interaction events.
    *
-   * @param {object} layer The layer to listen to.
-   * @param {string} layerGroupDivId The associated layer group div id.
+   * @param {LayerGroup} layerGroup The associated layer group.
+   * @param {ViewLayer|DrawLayer} layer The layer to listen to.
    */
-  bindLayer(layer, layerGroupDivId) {
+  bindLayerGroup(layerGroup, layer) {
+    const divId = layerGroup.getDivId();
+    // listen to active layer changes
+    layerGroup.addEventListener(
+      'activelayerchange', this.#getActiveLayerChangeHandler(divId));
+    // bind the layer
+    this.#internalBindLayerGroup(divId, layer);
+  }
+
+  /**
+   * Bind a layer group to this controller.
+   *
+   * @param {string} layerGroupDivId The layer group div id.
+   * @param {ViewLayer|DrawLayer} layer The layer.
+   */
+  #internalBindLayerGroup(layerGroupDivId, layer) {
+    // remove from local list if preset
     if (typeof this.#boundLayers[layerGroupDivId] !== 'undefined') {
       this.#unbindLayer(this.#boundLayers[layerGroupDivId]);
     }
+    // replace layer in local list
+    this.#boundLayers[layerGroupDivId] = layer;
+    // bind layer
+    this.#bindLayer(layer);
+  }
+
+  /**
+   * Get an active layer change handler.
+   *
+   * @param {string} divId The associated layer group div id.
+   * @returns {Function} The event handler.
+   */
+  #getActiveLayerChangeHandler(divId) {
+    return (event) => {
+      const layer = event.value[0];
+      this.#internalBindLayerGroup(divId, layer);
+    };
+  }
+
+  /**
+   * Add canvas mouse and touch listeners to a layer.
+   *
+   * @param {ViewLayer|DrawLayer} layer The layer to start listening to.
+   */
+  #bindLayer(layer) {
     layer.bindInteraction();
     // interaction events
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
       layer.addEventListener(names[i],
-        this.#getOnMouch(layer.getId(), names[i]));
+        this.#getCallback(layer.getId(), names[i]));
     }
-    // update class var
-    this.#boundLayers[layerGroupDivId] = layer;
   }
 
   /**
-   * Remove canvas mouse and touch listeners.
+   * Remove canvas mouse and touch listeners to a layer.
    *
-   * @param {object} layer The layer to stop listening to.
+   * @param {ViewLayer|DrawLayer} layer The layer to stop listening to.
    */
   #unbindLayer(layer) {
     layer.unbindInteraction();
@@ -154,7 +215,7 @@ export class ToolboxController {
     const names = InteractionEventNames;
     for (let i = 0; i < names.length; ++i) {
       layer.removeEventListener(names[i],
-        this.#getOnMouch(layer.getId(), names[i]));
+        this.#getCallback(layer.getId(), names[i]));
     }
   }
 
@@ -167,54 +228,23 @@ export class ToolboxController {
    * @param {string} eventType The event type.
    * @returns {object} A callback for the provided layer and event.
    */
-  #getOnMouch(layerId, eventType) {
-    // augment event with converted offsets
-    const augmentEventOffsets = function (event) {
-      // event offset(s)
-      const offsets = getEventOffset(event);
-      // should have at least one offset
-      event._x = offsets[0].x;
-      event._y = offsets[0].y;
-      // possible second
-      if (offsets.length === 2) {
-        event._x1 = offsets[1].x;
-        event._y1 = offsets[1].y;
-      }
-    };
-
-    const applySelectedTool = (event) => {
-      // make sure we have a tool
-      if (this.#selectedTool) {
-        const func = this.#selectedTool[event.type];
-        if (func) {
-          func(event);
-        }
-      }
-    };
-
+  #getCallback(layerId, eventType) {
     if (typeof this.#callbackStore[layerId] === 'undefined') {
       this.#callbackStore[layerId] = [];
     }
 
     if (typeof this.#callbackStore[layerId][eventType] === 'undefined') {
-      let callback = null;
-      if (eventType === 'keydown') {
-        callback = function (event) {
-          applySelectedTool(event);
-        };
-      } else if (eventType === 'touchend') {
-        callback = function (event) {
-          applySelectedTool(event);
-        };
-      } else {
-        // mouse or touch events
-        callback = function (event) {
-          augmentEventOffsets(event);
-          applySelectedTool(event);
-        };
-      }
+      const applySelectedTool = (event) => {
+        // make sure we have a tool
+        if (this.#selectedTool) {
+          const func = this.#selectedTool[event.type];
+          if (func) {
+            func(event);
+          }
+        }
+      };
       // store callback
-      this.#callbackStore[layerId][eventType] = callback;
+      this.#callbackStore[layerId][eventType] = applySelectedTool;
     }
 
     return this.#callbackStore[layerId][eventType];

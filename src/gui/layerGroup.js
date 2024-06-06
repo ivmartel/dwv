@@ -1,17 +1,20 @@
-import {getIdentityMat33, getCoronalMat33} from '../math/matrix';
+import {getIdentityMat33} from '../math/matrix';
+import {getCoronalMat33} from '../math/orientation';
 import {Index} from '../math/index';
 import {Point} from '../math/point';
 import {Vector3D} from '../math/vector';
 import {viewEventNames} from '../image/view';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
+import {precisionRound} from '../utils/string';
 import {ViewLayer} from './viewLayer';
 import {DrawLayer} from './drawLayer';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
-import {Point3D} from '../math/point';
+import {Point2D, Point3D} from '../math/point';
+import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -113,11 +116,11 @@ export function getTargetOrientation(imageOrientation, viewOrientation) {
  * Get a scaled offset to adapt to new scale and such as the input center
  * stays at the same position.
  *
- * @param {object} offset The previous offset as {x,y}.
- * @param {object} scale The previous scale as {x,y}.
- * @param {object} newScale The new scale as {x,y}.
- * @param {object} center The scale center as {x,y}.
- * @returns {object} The scaled offset as {x,y}.
+ * @param {Scalar2D} offset The previous offset as {x,y}.
+ * @param {Scalar2D} scale The previous scale as {x,y}.
+ * @param {Scalar2D} newScale The new scale as {x,y}.
+ * @param {Scalar2D} center The scale center as {x,y}.
+ * @returns {Scalar2D} The scaled offset as {x,y}.
  */
 export function getScaledOffset(offset, scale, newScale, center) {
   // worldPoint = indexPoint / scale + offset
@@ -142,18 +145,18 @@ export function getScaledOffset(offset, scale, newScale, center) {
 /**
  * Layer group.
  *
- * Display position: {x,y}
- * Plane position: Index (access: get(i))
- * (world) Position: Point3D (access: getX, getY, getZ)
+ * - Display position: {x,y},
+ * - Plane position: Index (access: get(i)),
+ * - (world) Position: Point3D (access: getX, getY, getZ).
  *
  * Display -> World:
- * planePos = viewLayer.displayToPlanePos(displayPos)
- * -> compensate for layer scale and offset
- * pos = viewController.getPositionFromPlanePoint(planePos)
+ * - planePos = viewLayer.displayToPlanePos(displayPos)
+ *   -> compensate for layer scale and offset,
+ * - pos = viewController.getPositionFromPlanePoint(planePos).
  *
- * World -> display
- * planePos = viewController.getOffset3DFromPlaneOffset(pos)
- * no need yet for a planePos to displayPos...
+ * World -> Display:
+ * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
+ *   no need yet for a planePos to displayPos...
  */
 export class LayerGroup {
 
@@ -164,31 +167,34 @@ export class LayerGroup {
    */
   #containerDiv;
 
+  // jsdoc does not like
+  // @type {(ViewLayer|DrawLayer)[]}
+
   /**
    * List of layers.
    *
-   * @type {Array}
+   * @type {Array<ViewLayer|DrawLayer>}
    */
   #layers = [];
 
   /**
-   * The layer scale as {x,y}.
+   * The layer scale as {x,y,z}.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #scale = {x: 1, y: 1, z: 1};
 
   /**
-   * The base scale as {x,y}: all posterior scale will be on top of this one.
+   * The base scale as {x,y,z}: all posterior scale will be on top of this one.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #baseScale = {x: 1, y: 1, z: 1};
 
   /**
-   * The layer offset as {x,y}.
+   * The layer offset as {x,y,z}.
    *
-   * @type {object}
+   * @type {Scalar3D}
    */
   #offset = {x: 0, y: 0, z: 0};
 
@@ -197,14 +203,14 @@ export class LayerGroup {
    *
    * @type {number}
    */
-  #activeViewLayerIndex = null;
+  #activeViewLayerIndex = undefined;
 
   /**
    * Active draw layer index.
    *
    * @type {number}
    */
-  #activeDrawLayerIndex = null;
+  #activeDrawLayerIndex = undefined;
 
   /**
    * Listener handler.
@@ -214,18 +220,25 @@ export class LayerGroup {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * The target orientation matrix.
-   *
-   * @type {Matrix33}
-   */
-  #targetOrientation;
-
-  /**
    * Flag to activate crosshair or not.
    *
    * @type {boolean}
    */
   #showCrosshair = false;
+
+  /**
+   * Crosshair HTML elements.
+   *
+   * @type {HTMLElement[]}
+   */
+  #crosshairHtmlElements = [];
+
+  /**
+   * Tooltip HTML element.
+   *
+   * @type {HTMLElement}
+   */
+  #tooltipHtmlElement;
 
   /**
    * The current position used for the crosshair.
@@ -235,28 +248,17 @@ export class LayerGroup {
   #currentPosition;
 
   /**
+   * Image smoothing flag.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
+
+  /**
    * @param {HTMLElement} containerDiv The associated HTML div.
    */
   constructor(containerDiv) {
     this.#containerDiv = containerDiv;
-  }
-
-  /**
-   * Get the target orientation.
-   *
-   * @returns {Matrix33} The orientation matrix.
-   */
-  getTargetOrientation() {
-    return this.#targetOrientation;
-  }
-
-  /**
-   * Set the target orientation.
-   *
-   * @param {Matrix33} orientation The orientation matrix.
-   */
-  setTargetOrientation(orientation) {
-    this.#targetOrientation = orientation;
   }
 
   /**
@@ -291,6 +293,21 @@ export class LayerGroup {
   }
 
   /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+    // set for existing layers
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        layer.setImageSmoothing(flag);
+      }
+    }
+  }
+
+  /**
    * Update crosshair on offset or zoom change.
    *
    * @param {object} _event The change event.
@@ -311,7 +328,7 @@ export class LayerGroup {
   /**
    * Get the layer scale.
    *
-   * @returns {object} The scale as {x,y,z}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getScale() {
     return this.#scale;
@@ -320,16 +337,16 @@ export class LayerGroup {
   /**
    * Get the base scale.
    *
-   * @returns {object} The scale as {x,y,z}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getBaseScale() {
     return this.#baseScale;
   }
 
   /**
-   * Get the added scale: the scale added to the base scale
+   * Get the added scale: the scale added to the base scale.
    *
-   * @returns {object} The scale as {x,y,z}.
+   * @returns {Scalar3D} The scale as {x,y,z}.
    */
   getAddedScale() {
     return {
@@ -342,7 +359,7 @@ export class LayerGroup {
   /**
    * Get the layer offset.
    *
-   * @returns {object} The offset as {x,y,z}.
+   * @returns {Scalar3D} The offset as {x,y,z}.
    */
   getOffset() {
     return this.#offset;
@@ -354,30 +371,94 @@ export class LayerGroup {
    * @returns {number} The number of layers.
    */
   getNumberOfLayers() {
-    return this.#layers.length;
+    let count = 0;
+    this.#layers.forEach(item => {
+      if (typeof item !== 'undefined') {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  /**
+   * Check if this layerGroup contains a layer with the input id.
+   *
+   * @param {string} id The layer id to look for.
+   * @returns {boolean} True if this group contains
+   *   a layer with the input id.
+   */
+  includes(id) {
+    if (typeof id === 'undefined') {
+      return false;
+    }
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer.getId() === id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get the number of view layers handled by this class.
+   *
+   * @returns {number} The number of layers.
+   */
+  getNumberOfViewLayers() {
+    let count = 0;
+    this.#layers.forEach(item => {
+      if (typeof item !== 'undefined' &&
+        item instanceof ViewLayer) {
+        count++;
+      }
+    });
+    return count;
   }
 
   /**
    * Get the active image layer.
    *
-   * @returns {ViewLayer} The layer.
+   * @returns {ViewLayer|undefined} The layer.
    */
   getActiveViewLayer() {
-    return this.#layers[this.#activeViewLayerIndex];
+    let layer;
+    if (typeof this.#activeViewLayerIndex !== 'undefined') {
+      const tmpLayer = this.#layers[this.#activeViewLayerIndex];
+      if (tmpLayer instanceof ViewLayer) {
+        layer = tmpLayer;
+      }
+    } else {
+      logger.info('No active view layer to return');
+    }
+    return layer;
   }
 
   /**
-   * Get the view layers associated to a data index.
+   * Get the base view layer.
    *
-   * @param {number} index The data index.
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  getBaseViewLayer() {
+    let layer;
+    if (this.#layers[0] instanceof ViewLayer) {
+      layer = this.#layers[0];
+    }
+    return layer;
+  }
+
+  /**
+   * Get the view layers associated to a data id.
+   *
+   * @param {string} dataId The data id.
    * @returns {ViewLayer[]} The layers.
    */
-  getViewLayersByDataIndex(index) {
+  getViewLayersByDataId(dataId) {
     const res = [];
-    for (let i = 0; i < this.#layers.length; ++i) {
-      if (this.#layers[i] instanceof ViewLayer &&
-        this.#layers[i].getDataIndex() === index) {
-        res.push(this.#layers[i]);
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &&
+        layer.getDataId() === dataId) {
+        res.push(layer);
       }
     }
     return res;
@@ -391,10 +472,10 @@ export class LayerGroup {
    */
   searchViewLayers(meta) {
     const res = [];
-    for (let i = 0; i < this.#layers.length; ++i) {
-      if (this.#layers[i] instanceof ViewLayer) {
-        if (this.#layers[i].getViewController().equalImageMeta(meta)) {
-          res.push(this.#layers[i]);
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        if (layer.getViewController().equalImageMeta(meta)) {
+          res.push(layer);
         }
       }
     }
@@ -404,13 +485,13 @@ export class LayerGroup {
   /**
    * Get the view layers data indices.
    *
-   * @returns {Array} The list of indices.
+   * @returns {string[]} The list of indices.
    */
   getViewDataIndices() {
     const res = [];
-    for (let i = 0; i < this.#layers.length; ++i) {
-      if (this.#layers[i] instanceof ViewLayer) {
-        res.push(this.#layers[i].getDataIndex());
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        res.push(layer.getDataId());
       }
     }
     return res;
@@ -419,24 +500,33 @@ export class LayerGroup {
   /**
    * Get the active draw layer.
    *
-   * @returns {DrawLayer} The layer.
+   * @returns {DrawLayer|undefined} The layer.
    */
   getActiveDrawLayer() {
-    return this.#layers[this.#activeDrawLayerIndex];
+    let layer;
+    if (typeof this.#activeDrawLayerIndex !== 'undefined') {
+      const tmpLayer = this.#layers[this.#activeDrawLayerIndex];
+      if (tmpLayer instanceof DrawLayer) {
+        layer = tmpLayer;
+      }
+    } else {
+      logger.info('No active draw layer to return');
+    }
+    return layer;
   }
 
   /**
-   * Get the draw layers associated to a data index.
+   * Get the draw layers associated to a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {DrawLayer[]} The layers.
    */
-  getDrawLayersByDataIndex(index) {
+  getDrawLayersByDataId(dataId) {
     const res = [];
-    for (let i = 0; i < this.#layers.length; ++i) {
-      if (this.#layers[i] instanceof DrawLayer &&
-        this.#layers[i].getDataIndex() === index) {
-        res.push(this.#layers[i]);
+    for (const layer of this.#layers) {
+      if (layer instanceof DrawLayer &&
+        layer.getDataId() === dataId) {
+        res.push(layer);
       }
     }
     return res;
@@ -448,21 +538,45 @@ export class LayerGroup {
    * @param {number} index The index of the layer to set as active.
    */
   setActiveViewLayer(index) {
-    this.#activeViewLayerIndex = index;
+    if (this.#layers[index] instanceof ViewLayer) {
+      this.#activeViewLayerIndex = index;
+      /**
+       * Active view layer change event.
+       *
+       * @event LayerGroup#activeviewlayerchange
+       * @type {object}
+       * @property {Array} value The changed value.
+       */
+      this.#fireEvent({
+        type: 'activelayerchange',
+        value: [this.#layers[index]]
+      });
+    } else {
+      logger.warn('No view layer to set as active with index: ' +
+        index);
+    }
   }
 
   /**
-   * Set the active view layer with a data index.
+   * Set the active view layer with a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    */
-  setActiveViewLayerByDataIndex(index) {
+  setActiveViewLayerByDataId(dataId) {
+    let index;
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof ViewLayer &&
-        this.#layers[i].getDataIndex() === index) {
-        this.setActiveViewLayer(i);
+        this.#layers[i].getDataId() === dataId) {
+        // stop at first one
+        index = i;
         break;
       }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveViewLayer(index);
+    } else {
+      logger.warn('No view layer to set as active with dataId: ' +
+        dataId);
     }
   }
 
@@ -472,26 +586,45 @@ export class LayerGroup {
    * @param {number} index The index of the layer to set as active.
    */
   setActiveDrawLayer(index) {
-    this.#activeDrawLayerIndex = index;
+    if (this.#layers[index] instanceof DrawLayer) {
+      this.#activeDrawLayerIndex = index;
+      this.#fireEvent({
+        type: 'activelayerchange',
+        value: [this.#layers[index]]
+      });
+    } else {
+      logger.warn('No draw layer to set as active with index: ' +
+        index);
+    }
   }
 
   /**
-   * Set the active draw layer with a data index.
+   * Set the active draw layer with a data id.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    */
-  setActiveDrawLayerByDataIndex(index) {
+  setActiveDrawLayerByDataId(dataId) {
+    let index;
     for (let i = 0; i < this.#layers.length; ++i) {
       if (this.#layers[i] instanceof DrawLayer &&
-        this.#layers[i].getDataIndex() === index) {
-        this.setActiveDrawLayer(i);
+        this.#layers[i].getDataId() === dataId) {
+        // stop at first one
+        index = i;
         break;
       }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveDrawLayer(index);
+    } else {
+      logger.warn('No draw layer to set as active with dataId: ' +
+        dataId);
     }
   }
 
   /**
    * Add a view layer.
+   *
+   * The new layer will be marked as the active view layer.
    *
    * @returns {ViewLayer} The created layer.
    */
@@ -504,6 +637,7 @@ export class LayerGroup {
     this.#containerDiv.append(div);
     // view layer
     const layer = new ViewLayer(div);
+    layer.setImageSmoothing(this.#imageSmoothing);
     // add layer
     this.#layers.push(layer);
     // mark it as active
@@ -516,6 +650,8 @@ export class LayerGroup {
 
   /**
    * Add a draw layer.
+   *
+   * The new layer will be marked as the active draw layer.
    *
    * @returns {DrawLayer} The created layer.
    */
@@ -546,12 +682,34 @@ export class LayerGroup {
     viewLayer.addEventListener(
       'positionchange', this.updateLayersToPositionChange);
     // propagate view viewLayer-layer events
-    for (let j = 0; j < viewEventNames.length; ++j) {
-      viewLayer.addEventListener(viewEventNames[j], this.#fireEvent);
+    for (const eventName of viewEventNames) {
+      viewLayer.addEventListener(eventName, this.#fireEvent);
     }
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', this.#fireEvent);
     viewLayer.addEventListener('renderend', this.#fireEvent);
+  }
+
+  /**
+   * Un-bind a view layer events to this.
+   *
+   * @param {ViewLayer} viewLayer The view layer to unbind.
+   */
+  #unbindViewLayer(viewLayer) {
+    // stop listening to position change to update other group layers
+    viewLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    // stop propagating view viewLayer-layer events
+    for (const eventName of viewEventNames) {
+      viewLayer.removeEventListener(eventName, this.#fireEvent);
+    }
+    // stop propagating viewLayer events
+    viewLayer.removeEventListener('renderstart', this.#fireEvent);
+    viewLayer.removeEventListener('renderend', this.#fireEvent);
+
+    // stop view layer - image binding
+    // (binding is done in layer.setView)
+    viewLayer.unbindImage();
   }
 
   /**
@@ -563,6 +721,17 @@ export class LayerGroup {
     // propagate drawLayer events
     drawLayer.addEventListener('drawcreate', this.#fireEvent);
     drawLayer.addEventListener('drawdelete', this.#fireEvent);
+  }
+
+  /**
+   * Un-bind a draw layer events to this.
+   *
+   * @param {DrawLayer} drawLayer The draw layer to unbind.
+   */
+  #unbindDrawLayer(drawLayer) {
+    // propagate drawLayer events
+    drawLayer.removeEventListener('drawcreate', this.#fireEvent);
+    drawLayer.removeEventListener('drawdelete', this.#fireEvent);
   }
 
   /**
@@ -584,8 +753,10 @@ export class LayerGroup {
   empty() {
     this.#layers = [];
     // reset active indices
-    this.#activeViewLayerIndex = null;
-    this.#activeDrawLayerIndex = null;
+    this.#activeViewLayerIndex = undefined;
+    this.#activeDrawLayerIndex = undefined;
+    // remove possible crosshair
+    this.#removeCrosshairDiv();
     // clean container div
     const previous = this.#containerDiv.getElementsByClassName('layer');
     if (previous) {
@@ -593,6 +764,76 @@ export class LayerGroup {
         previous[0].remove();
       }
     }
+  }
+
+  /**
+   * Remove all layers for a specific data.
+   *
+   * @param {string} dataId The data to remove its layers.
+   */
+  removeLayersByDataId(dataId) {
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer.getDataId() === dataId) {
+        this.removeLayer(layer);
+      }
+    }
+  }
+
+  /**
+   * Remove a layer from this layer group.
+   * Warning: if current active layer, the index will
+   *   be set to `undefined`. Call one of the setActive
+   *   methods to define the active index.
+   *
+   * @param {ViewLayer | DrawLayer} layer The layer to remove.
+   */
+  removeLayer(layer) {
+    // find layer
+    const index = this.#layers.findIndex((item) => item === layer);
+    if (index === -1) {
+      throw new Error('Cannot find layer to remove');
+    }
+    // unbind and update active index
+    if (layer instanceof ViewLayer) {
+      this.#unbindViewLayer(layer);
+      if (this.#activeViewLayerIndex === index) {
+        if (index - 2 >= 0) {
+          this.setActiveViewLayer(index - 2);
+        } else {
+          this.#activeViewLayerIndex = undefined;
+        }
+      }
+    } else {
+      // delete layer draws
+      const numberOfDraws = layer.getNumberOfDraws();
+      if (typeof numberOfDraws !== 'undefined') {
+        let count = 0;
+        layer.addEventListener('drawdelete', (_event) => {
+          ++count;
+          // unbind when all draw are deleted
+          if (count === numberOfDraws) {
+            this.#unbindDrawLayer(layer);
+          }
+        });
+      }
+      layer.deleteDraws();
+      if (typeof numberOfDraws === 'undefined') {
+        this.#unbindDrawLayer(layer);
+      }
+      // reset active index
+      if (this.#activeDrawLayerIndex === index) {
+        if (index - 2 >= 0) {
+          this.setActiveDrawLayer(index - 2);
+        } else {
+          this.#activeDrawLayerIndex = undefined;
+        }
+      }
+    }
+    // reset in storage
+    this.#layers[index] = undefined;
+    // update html
+    layer.removeFromDOM();
   }
 
   /**
@@ -611,43 +852,160 @@ export class LayerGroup {
 
     // use first layer as base for calculating position and
     // line sizes
-    const layer0 = this.#layers[0];
-    const vc = layer0.getViewController();
-    const p2D = vc.getPlanePositionFromPosition(position);
-    const displayPos = layer0.planePosToDisplay(p2D.x, p2D.y);
+    let baseLayer;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        baseLayer = layer;
+        break;
+      }
+    }
+    if (typeof baseLayer === 'undefined') {
+      logger.warn('No layer to show crosshair');
+      return;
+    }
 
-    const lineH = document.createElement('hr');
-    lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
-    lineH.className = 'horizontal';
-    lineH.style.width = this.#containerDiv.offsetWidth + 'px';
-    lineH.style.left = '0px';
-    lineH.style.top = displayPos.y + 'px';
+    const vc = baseLayer.getViewController();
+    const planePos = vc.getPlanePositionFromPosition(position);
+    const displayPos = baseLayer.planePosToDisplay(planePos);
 
-    const lineV = document.createElement('hr');
-    lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
-    lineV.className = 'vertical';
-    lineV.style.width = this.#containerDiv.offsetHeight + 'px';
-    lineV.style.left = (displayPos.x) + 'px';
-    lineV.style.top = '0px';
+    // horizontal line
+    if (typeof displayPos.getY() !== 'undefined') {
+      const lineH = document.createElement('hr');
+      lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
+      lineH.className = 'horizontal';
+      lineH.style.width = this.#containerDiv.offsetWidth + 'px';
+      lineH.style.left = '0px';
+      lineH.style.top = displayPos.getY() + 'px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineH);
+      // add to html
+      this.#containerDiv.appendChild(lineH);
+    }
 
-    this.#containerDiv.appendChild(lineH);
-    this.#containerDiv.appendChild(lineV);
+    // vertical line
+    if (typeof displayPos.getX() !== 'undefined') {
+      const lineV = document.createElement('hr');
+      lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
+      lineV.className = 'vertical';
+      lineV.style.width = this.#containerDiv.offsetHeight + 'px';
+      lineV.style.left = (displayPos.getX()) + 'px';
+      lineV.style.top = '0px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineV);
+      // add to html
+      this.#containerDiv.appendChild(lineV);
+    }
   }
 
   /**
    * Remove crosshair divs.
    */
   #removeCrosshairDiv() {
-    let div = document.getElementById(
-      this.getDivId() + '-scroll-crosshair-horizontal');
-    if (div) {
-      div.remove();
+    for (const element of this.#crosshairHtmlElements) {
+      element.remove();
     }
-    div = document.getElementById(
-      this.getDivId() + '-scroll-crosshair-vertical');
-    if (div) {
-      div.remove();
+    this.#crosshairHtmlElements = [];
+  }
+
+  /**
+   * Displays a tooltip in a temporary `span`.
+   * Works with css to hide/show the span only on mouse hover.
+   *
+   * @param {Point2D} point The update point.
+   */
+  showTooltip(point) {
+    // remove previous div
+    this.removeTooltipDiv();
+
+    const viewLayer = this.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planePos = viewLayer.displayToPlanePos(point);
+    const position = viewController.getPositionFromPlanePoint(planePos);
+    const value = viewController.getRescaledImageValue(position);
+
+    // create
+    if (typeof value !== 'undefined') {
+      const span = document.createElement('span');
+      span.id = 'scroll-tooltip';
+      // tooltip position
+      span.style.left = (point.getX() + 10) + 'px';
+      span.style.top = (point.getY() + 10) + 'px';
+      let text = precisionRound(value, 3).toString();
+      if (typeof viewController.getPixelUnit() !== 'undefined') {
+        text += ' ' + viewController.getPixelUnit();
+      }
+      span.appendChild(document.createTextNode(text));
+      // add to local var
+      this.#tooltipHtmlElement = span;
+      // add to html
+      this.#containerDiv.appendChild(span);
     }
+  }
+
+  /**
+   * Remove the tooltip html div.
+   */
+  removeTooltipDiv() {
+    if (typeof this.#tooltipHtmlElement !== 'undefined') {
+      this.#tooltipHtmlElement.remove();
+      this.#tooltipHtmlElement = undefined;
+    }
+  }
+
+
+  /**
+   * Test if one of the view layers satisfies an input callbackFn.
+   *
+   * @param {Function} callbackFn A function that takes a ViewLayer as input
+   *   and returns a boolean.
+   * @returns {boolean} True if one of the ViewLayers satisfies the callbackFn.
+   */
+  someViewLayer(callbackFn) {
+    let hasOne = false;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &&
+        callbackFn(layer)) {
+        hasOne = true;
+        break;
+      }
+    }
+    return hasOne;
+  }
+
+  /**
+   * Can the input position be set on one of the view layers.
+   *
+   * @param {Point} position The input position.
+   * @returns {boolean} True if one view layer accepts the input position.
+   */
+  isPositionInBounds(position) {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().isPositionInBounds(position);
+    });
+  }
+
+  /**
+   * Can one of the view layers be scrolled.
+   *
+   * @returns {boolean} True if one view layer can be scrolled.
+   */
+  canScroll() {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().canScroll();
+    });
+  }
+
+  /**
+   * Does one of the view layer have more than one slice in the
+   *   given dimension.
+   *
+   * @param {number} dim The input dimension.
+   * @returns {boolean} True if one view layer has more than one slice.
+   */
+  moreThanOne(dim) {
+    return this.someViewLayer(function (layer) {
+      return layer.getViewController().moreThanOne(dim);
+    });
   }
 
   /**
@@ -658,11 +1016,11 @@ export class LayerGroup {
    */
   updateLayersToPositionChange = (event) => {
     // pause positionchange listeners
-    for (let j = 0; j < this.#layers.length; ++j) {
-      if (this.#layers[j] instanceof ViewLayer) {
-        this.#layers[j].removeEventListener(
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        layer.removeEventListener(
           'positionchange', this.updateLayersToPositionChange);
-        this.#layers[j].removeEventListener('positionchange', this.#fireEvent);
+        layer.removeEventListener('positionchange', this.#fireEvent);
       }
     }
 
@@ -677,106 +1035,128 @@ export class LayerGroup {
     }
 
     // origin of the first view layer
-    let baseViewLayerOrigin0 = null;
-    let baseViewLayerOrigin = null;
+    let baseViewLayerOrigin0;
+    let baseViewLayerOrigin;
+    let scrollOffset;
+    let planeOffset;
     // update position for all layers except the source one
-    for (let i = 0; i < this.#layers.length; ++i) {
+    for (const layer of this.#layers) {
+      if (typeof layer === 'undefined') {
+        continue;
+      }
 
       // update base offset (does not trigger redraw)
-      // TODO check draw layers update
       let hasSetOffset = false;
-      if (this.#layers[i] instanceof ViewLayer) {
-        const vc = this.#layers[i].getViewController();
+      if (layer instanceof ViewLayer) {
+        const vc = layer.getViewController();
         // origin0 should always be there
         const origin0 = vc.getOrigin();
         // depending on position, origin could be undefined
         const origin = vc.getOrigin(position);
 
-        if (!baseViewLayerOrigin) {
+        if (typeof baseViewLayerOrigin === 'undefined') {
+          // first view layer, store origins
           baseViewLayerOrigin0 = origin0;
           baseViewLayerOrigin = origin;
+          // no offset
+          scrollOffset = new Vector3D(0, 0, 0);
+          planeOffset = new Vector3D(0, 0, 0);
         } else {
-          if (vc.canSetPosition(position) &&
+          if (vc.isPositionInBounds(position) &&
             typeof origin !== 'undefined') {
             // TODO: compensate for possible different orientation between views
-
             const scrollDiff = baseViewLayerOrigin0.minus(origin0);
-            const scrollOffset = new Vector3D(
+            scrollOffset = new Vector3D(
               scrollDiff.getX(), scrollDiff.getY(), scrollDiff.getZ());
-
             const planeDiff = baseViewLayerOrigin.minus(origin);
-            const planeOffset = new Vector3D(
+            planeOffset = new Vector3D(
               planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
-
-            hasSetOffset =
-              this.#layers[i].setBaseOffset(scrollOffset, planeOffset);
           }
         }
       }
 
+      // also set for draw layers
+      // (should be next after a view layer)
+      if (typeof scrollOffset !== 'undefined' &&
+        typeof planeOffset !== 'undefined') {
+        hasSetOffset =
+          layer.setBaseOffset(
+            scrollOffset, planeOffset,
+            baseViewLayerOrigin, baseViewLayerOrigin0
+          );
+      }
+
+      // reset to not propagate after draw layer
+      // TODO: revise, could be unstable...
+      if (layer instanceof DrawLayer) {
+        scrollOffset = undefined;
+        planeOffset = undefined;
+      }
+
       // update position (triggers redraw)
       let hasSetPos = false;
-      if (this.#layers[i].getId() !== event.srclayerid) {
-        hasSetPos = this.#layers[i].setCurrentPosition(position, index);
+      if (layer.getId() !== event.srclayerid) {
+        hasSetPos = layer.setCurrentPosition(position, index);
       }
 
       // force redraw if needed
       if (!hasSetPos && hasSetOffset) {
-        this.#layers[i].draw();
+        layer.draw();
       }
     }
 
     // re-start positionchange listeners
-    for (let k = 0; k < this.#layers.length; ++k) {
-      if (this.#layers[k] instanceof ViewLayer) {
-        this.#layers[k].addEventListener(
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        layer.addEventListener(
           'positionchange', this.updateLayersToPositionChange);
-        this.#layers[k].addEventListener('positionchange', this.#fireEvent);
+        layer.addEventListener('positionchange', this.#fireEvent);
       }
     }
   };
 
   /**
-   * Calculate the fit scale: the scale that fits the largest data.
+   * Calculate the div to world size ratio needed to fit
+   *   the largest data.
    *
-   * @returns {number|undefined} The fit scale.
+   * @returns {number|undefined} The ratio.
    */
-  calculateFitScale() {
+  getDivToWorldSizeRatio() {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
-    // get max size
-    const maxSize = this.getMaxSize();
-    if (typeof maxSize === 'undefined') {
+    // get max world size
+    const maxWorldSize = this.getMaxWorldSize();
+    if (typeof maxWorldSize === 'undefined') {
       return undefined;
     }
     // if the container has a width but no height,
     // resize it to follow the same ratio to completely
     // fill the div with the image
     if (this.#containerDiv.offsetHeight === 0) {
-      const ratioX = this.#containerDiv.offsetWidth / maxSize.x;
-      const height = maxSize.y * ratioX;
+      const ratioX = this.#containerDiv.offsetWidth / maxWorldSize.x;
+      const height = maxWorldSize.y * ratioX;
       this.#containerDiv.style.height = height + 'px';
     }
     // return best fit
     return Math.min(
-      this.#containerDiv.offsetWidth / maxSize.x,
-      this.#containerDiv.offsetHeight / maxSize.y
+      this.#containerDiv.offsetWidth / maxWorldSize.x,
+      this.#containerDiv.offsetHeight / maxWorldSize.y
     );
   }
 
   /**
-   * Set the layer group fit scale.
+   * Fit to container: set the layers div to world size ratio.
    *
-   * @param {number} scaleIn The fit scale.
+   * @param {number} divToWorldSizeRatio The ratio.
    */
-  setFitScale(scaleIn) {
-    // get maximum size
-    const maxSize = this.getMaxSize();
+  fitToContainer(divToWorldSizeRatio) {
+    // get maximum world size
+    const maxWorldSize = this.getMaxWorldSize();
     // exit if none
-    if (typeof maxSize === 'undefined') {
+    if (typeof maxWorldSize === 'undefined') {
       return;
     }
 
@@ -786,13 +1166,17 @@ export class LayerGroup {
     };
     // offset to keep data centered
     const fitOffset = {
-      x: -0.5 * (containerSize.x - Math.floor(maxSize.x * scaleIn)),
-      y: -0.5 * (containerSize.y - Math.floor(maxSize.y * scaleIn))
+      x: -0.5 *
+        (containerSize.x - Math.floor(maxWorldSize.x * divToWorldSizeRatio)),
+      y: -0.5 *
+        (containerSize.y - Math.floor(maxWorldSize.y * divToWorldSizeRatio))
     };
 
     // apply to layers
-    for (let j = 0; j < this.#layers.length; ++j) {
-      this.#layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.fitToContainer(containerSize, divToWorldSizeRatio, fitOffset);
+      }
     }
 
     // update crosshair
@@ -802,15 +1186,15 @@ export class LayerGroup {
   }
 
   /**
-   * Get the largest data size.
+   * Get the largest data world (mm) size.
    *
-   * @returns {object|undefined} The largest size as {x,y}.
+   * @returns {Scalar2D|undefined} The largest size as {x,y}.
    */
-  getMaxSize() {
+  getMaxWorldSize() {
     let maxSize = {x: 0, y: 0};
-    for (let j = 0; j < this.#layers.length; ++j) {
-      if (this.#layers[j] instanceof ViewLayer) {
-        const size = this.#layers[j].getImageWorldSize();
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        const size = layer.getImageWorldSize();
         if (size.x > maxSize.x) {
           maxSize.x = size.x;
         }
@@ -851,15 +1235,17 @@ export class LayerGroup {
   /**
    * Set the layers' scale.
    *
-   * @param {object} newScale The scale to apply as {x,y,z}.
+   * @param {Scalar3D} newScale The scale to apply as {x,y,z}.
    * @param {Point3D} [center] The scale center Point3D.
    * @fires LayerGroup#zoomchange
    */
   setScale(newScale, center) {
     this.#scale = newScale;
     // apply to layers
-    for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].setScale(this.#scale, center);
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.setScale(this.#scale, center);
+      }
     }
 
     // event value
@@ -890,7 +1276,7 @@ export class LayerGroup {
   /**
    * Add translation to the layers.
    *
-   * @param {object} translation The translation as {x,y,z}.
+   * @param {Scalar3D} translation The translation as {x,y,z}.
    */
   addTranslation(translation) {
     this.setOffset({
@@ -903,15 +1289,17 @@ export class LayerGroup {
   /**
    * Set the layers' offset.
    *
-   * @param {object} newOffset The offset as {x,y,z}.
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
    * @fires LayerGroup#offsetchange
    */
   setOffset(newOffset) {
     // store
     this.#offset = newOffset;
     // apply to layers
-    for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].setOffset(this.#offset);
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.setOffset(this.#offset);
+      }
     }
 
     /**
@@ -943,8 +1331,10 @@ export class LayerGroup {
    * Draw the layer.
    */
   draw() {
-    for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].draw();
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.draw();
+      }
     }
   }
 
@@ -954,8 +1344,10 @@ export class LayerGroup {
    * @param {boolean} flag Whether to display the layer or not.
    */
   display(flag) {
-    for (let i = 0; i < this.#layers.length; ++i) {
-      this.#layers[i].display(flag);
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        layer.display(flag);
+      }
     }
   }
 

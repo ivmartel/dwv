@@ -1,5 +1,6 @@
 import {stringToUint8Array} from '../../src/utils/string';
 import {
+  arrayContains,
   arraySortEquals,
   parseMultipart,
   buildMultipart
@@ -9,16 +10,87 @@ import {
  * Tests for the 'utils/array' file.
  */
 /** @module tests/utils */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('utils');
 
 /**
+ * Tests for {@link arrayContains}.
+ *
+ * @function module:tests/utils~arraycontains
+ */
+QUnit.test('arrayContains', function (assert) {
+  let arr00;
+  let arrTest000;
+  assert.false(arrayContains(arr00, arrTest000), 'contains test #000');
+  const arrTest001 = null;
+  assert.false(arrayContains(arr00, arrTest001), 'contains test #001');
+  const arrTest002 = [];
+  assert.false(arrayContains(arr00, arrTest002), 'contains test #002');
+  const arrTest003 = [''];
+  assert.false(arrayContains(arr00, arrTest003), 'contains test #003');
+  const arrTest004 = ['a'];
+  assert.false(arrayContains(arr00, arrTest004), 'contains test #004');
+
+  const arr10 = null;
+  let arrTest100;
+  assert.false(arrayContains(arr10, arrTest100), 'contains test #100');
+  const arrTest101 = null;
+  assert.false(arrayContains(arr10, arrTest101), 'contains test #101');
+  const arrTest102 = [];
+  assert.false(arrayContains(arr10, arrTest102), 'contains test #102');
+  const arrTest103 = [''];
+  assert.false(arrayContains(arr10, arrTest103), 'contains test #103');
+  const arrTest104 = ['a'];
+  assert.false(arrayContains(arr10, arrTest104), 'contains test #104');
+
+  const arr20 = [];
+  let arrTest200;
+  assert.false(arrayContains(arr20, arrTest200), 'contains test #200');
+  const arrTest201 = null;
+  assert.false(arrayContains(arr20, arrTest201), 'contains test #201');
+  const arrTest202 = [];
+  assert.false(arrayContains(arr20, arrTest202), 'contains test #202');
+  const arrTest203 = [''];
+  assert.false(arrayContains(arr20, arrTest203), 'contains test #203');
+  const arrTest204 = ['a'];
+  assert.false(arrayContains(arr20, arrTest204), 'contains test #204');
+
+  const arr30 = ['a', 'b', 'c'];
+  const arrTest300 = ['a'];
+  assert.true(arrayContains(arr30, arrTest300), 'contains test #300');
+  const arrTest301 = ['a', 'b'];
+  assert.true(arrayContains(arr30, arrTest301), 'contains test #301');
+  const arrTest302 = ['b', 'a'];
+  assert.true(arrayContains(arr30, arrTest302), 'contains test #302');
+  const arrTest303 = ['a', 'b', 'c'];
+  assert.true(arrayContains(arr30, arrTest303), 'contains test #303');
+  let arrTest310;
+  assert.false(arrayContains(arr30, arrTest310), 'contains test #310');
+  const arrTest311 = null;
+  assert.false(arrayContains(arr30, arrTest311), 'contains test #311');
+  const arrTest312 = [];
+  assert.false(arrayContains(arr30, arrTest312), 'contains test #312');
+  const arrTest313 = [''];
+  assert.false(arrayContains(arr30, arrTest313), 'contains test #313');
+  const arrTest320 = ['d'];
+  assert.false(arrayContains(arr30, arrTest320), 'contains test #320');
+  const arrTest321 = ['a', 'd'];
+  assert.false(arrayContains(arr30, arrTest321), 'contains test #321');
+  const arrTest322 = ['d', 'a'];
+  assert.false(arrayContains(arr30, arrTest322), 'contains test #322');
+  const arrTest323 = [0, 'a'];
+  assert.false(arrayContains(arr30, arrTest323), 'contains test #323');
+  const arrTest324 = ['a', 'b', 'c', 0];
+  assert.false(arrayContains(arr30, arrTest324), 'contains test #324');
+});
+
+/**
  * Tests for {@link arraySortEquals}.
  *
- * @function module:tests/utils~arraySortEquals
+ * @function module:tests/utils~arraysortequals
  */
-QUnit.test('Test arraySortEquals.', function (assert) {
+QUnit.test('arraySortEquals', function (assert) {
   // null
   assert.notOk(arraySortEquals(null, null), '2 null arrays');
   assert.notOk(arraySortEquals(null, [1, 2, 3]), 'left null array');
@@ -173,38 +245,40 @@ const compareBuffers = function (buf1, buf2) {
 /**
  * Tests for {@link parseMultipart}.
  *
- * @function module:tests/utils~parseMultipart
+ * @function module:tests/utils~parse-multipart
  */
-QUnit.test('Test parseMultipart.', function (assert) {
-  // empty
-  const res00 = parseMultipart(new Uint8Array(0).buffer);
-  assert.equal(res00.length, 0, 'Empty multipart length');
+QUnit.test('Parse multipart - #DWV-REQ-IO-02-002 Load DICOM multipart URL',
+  function (assert) {
+    // empty
+    const res00 = parseMultipart(new Uint8Array(0).buffer);
+    assert.equal(res00.length, 0, 'Empty multipart length');
 
-  // empty part
-  const u8Test01 = stringToUint8Array(multipart01);
-  const res01 = parseMultipart(u8Test01.buffer);
-  assert.equal(res01.length, 1, 'Empty multipart part length');
-  const keys01 = Object.keys(res01);
-  assert.equal(keys01.length, 1, 'Empty multipart part keys length');
-  assert.ok(typeof res01[0].data !== 'undefined',
-    'Empty multipart part has data');
-  assert.equal(res01[0].data.length, 0, 'Empty multipart part data length');
+    // empty part
+    const u8Test01 = stringToUint8Array(multipart01);
+    const res01 = parseMultipart(u8Test01.buffer);
+    assert.equal(res01.length, 1, 'Empty multipart part length');
+    const keys01 = Object.keys(res01);
+    assert.equal(keys01.length, 1, 'Empty multipart part keys length');
+    assert.ok(typeof res01[0].data !== 'undefined',
+      'Empty multipart part has data');
+    assert.equal(res01[0].data.length, 0, 'Empty multipart part data length');
 
-  // test #10
-  // parse multipart
-  const u8Test10 = stringToUint8Array(multipart10.str);
-  const resMulti10 = parseMultipart(u8Test10.buffer);
-  assert.ok(compareMultipartObjects(resMulti10, multipart10.parts),
-    'Compare multipart object #10');
-  // build multipart
-  const resBuff10 = buildMultipart(multipart10.parts,
-    '----WebKitFormBoundaryvef1fLxmoUdYZWXp');
-  assert.ok(compareBuffers(resBuff10, u8Test10),
-    'Compare multipart buffer #10');
+    // test #10
+    // parse multipart
+    const u8Test10 = stringToUint8Array(multipart10.str);
+    const resMulti10 = parseMultipart(u8Test10.buffer);
+    assert.ok(compareMultipartObjects(resMulti10, multipart10.parts),
+      'Compare multipart object #10');
+    // build multipart
+    const resBuff10 = buildMultipart(multipart10.parts,
+      '----WebKitFormBoundaryvef1fLxmoUdYZWXp');
+    assert.ok(compareBuffers(resBuff10, u8Test10),
+      'Compare multipart buffer #10');
 
-  // test #11: with preamble and epilogue
-  const u8Test11 = stringToUint8Array(multipart11.str);
-  const resMulti11 = parseMultipart(u8Test11.buffer);
-  assert.ok(compareMultipartObjects(resMulti11, multipart10.parts),
-    'Compare multipart object #11');
-});
+    // test #11: with preamble and epilogue
+    const u8Test11 = stringToUint8Array(multipart11.str);
+    const resMulti11 = parseMultipart(u8Test11.buffer);
+    assert.ok(compareMultipartObjects(resMulti11, multipart10.parts),
+      'Compare multipart object #11');
+  }
+);

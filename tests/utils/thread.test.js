@@ -6,15 +6,16 @@
 /**
  * Tests for the 'utils/thread' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('utils');
 
 /**
  * Tests for {@link ThreadPool}.
  *
- * @function module:tests/utils~threadPool
+ * @function module:tests/utils~threadpool
  */
-QUnit.test('Test ThreadPool.', function (assert) {
+QUnit.test('ThreadPool class', function (assert) {
 
   // TODO: fix this!
   assert.ok(true);

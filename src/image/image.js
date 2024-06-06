@@ -1,6 +1,7 @@
 import {Index} from '../math/index';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
+import {arrayContains} from '../utils/array';
 import {getTypedArray} from '../dicom/dicomParser';
 import {ListenerHandler} from '../utils/listen';
 import {colourRange} from './iterator';
@@ -12,6 +13,9 @@ import {MaskFactory} from './maskFactory';
 /* eslint-disable no-unused-vars */
 import {Geometry} from './geometry';
 import {Matrix33} from '../math/matrix';
+import {NumberRange} from '../math/stats';
+import {DataElement} from '../dicom/dataElement';
+import {RGB} from '../utils/colour';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -42,7 +46,7 @@ function getSliceIndex(volumeGeometry, sliceGeometry) {
 /**
  * Create an Image from DICOM elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The Image object.
  */
 export function createImage(elements) {
@@ -57,7 +61,7 @@ export function createImage(elements) {
 /**
  * Create a mask Image from DICOM elements.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {Image} The mask Image object.
  */
 export function createMaskImage(elements) {
@@ -135,21 +139,21 @@ export class Image {
   /**
    * Image UIDs.
    *
-   * @type {Array}
+   * @type {string[]}
    */
   #imageUids;
 
   /**
    * Constant rescale slope and intercept (default).
    *
-   * @type {object}
+   * @type {RescaleSlopeAndIntercept}
    */
   #rsi = new RescaleSlopeAndIntercept(1, 0);
 
   /**
    * Varying rescale slope and intercept.
    *
-   * @type {Array}
+   * @type {RescaleSlopeAndIntercept[]}
    */
   #rsis = null;
 
@@ -175,8 +179,8 @@ export class Image {
   #photometricInterpretation = 'MONOCHROME2';
 
   /**
-   * Planar configuration for RGB data (0:RGBRGBRGBRGB... or
-   *   1:RRR...GGG...BBB...).
+   * Planar configuration for RGB data (`0:RGBRGBRGBRGB...` or
+   *   `1:RRR...GGG...BBB...`).
    *
    * @type {number}
    */
@@ -192,21 +196,21 @@ export class Image {
   /**
    * Meta information.
    *
-   * @type {object}
+   * @type {Object<string, any>}
    */
   #meta = {};
 
   /**
    * Data range.
    *
-   * @type {object}
+   * @type {NumberRange}
    */
   #dataRange = null;
 
   /**
    * Rescaled data range.
    *
-   * @type {object}
+   * @type {NumberRange}
    */
   #rescaledDataRange = null;
 
@@ -220,14 +224,14 @@ export class Image {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
   /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
-   * @param {Array} [imageUids] An array of Uids indexed to slice number.
+   * @param {string[]} [imageUids] An array of Uids indexed to slice number.
    */
   constructor(geometry, buffer, imageUids) {
     this.#geometry = geometry;
@@ -253,6 +257,16 @@ export class Image {
   }
 
   /**
+   * Check if this image includes the input uids.
+   *
+   * @param {string[]} uids UIDs to test for presence.
+   * @returns {boolean} True if all uids are in this image uids.
+   */
+  containsImageUids(uids) {
+    return arrayContains(this.#imageUids, uids);
+  }
+
+  /**
    * Get the geometry of the image.
    *
    * @returns {Geometry} The geometry.
@@ -264,7 +278,7 @@ export class Image {
   /**
    * Get the data buffer of the image.
    *
-   * @todo dangerous...
+   * @todo Dangerous...
    * @returns {TypedArray} The data buffer of the image.
    */
   getBuffer() {
@@ -284,8 +298,18 @@ export class Image {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if the data is monochrome.
+   * @deprecated Please use isMonochrome instead.
    */
   canWindowLevel() {
+    return this.isMonochrome();
+  }
+
+  /**
+   * Is the data monochrome.
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  isMonochrome() {
     return this.getPhotometricInterpretation()
       .match(/MONOCHROME/) !== null;
   }
@@ -331,7 +355,7 @@ export class Image {
    * Get the rescale slope and intercept.
    *
    * @param {Index} [index] The index (only needed for non constant rsi).
-   * @returns {object} The rescale slope and intercept.
+   * @returns {RescaleSlopeAndIntercept} The rescale slope and intercept.
    */
   getRescaleSlopeAndIntercept(index) {
     let res = this.#rsi;
@@ -353,7 +377,7 @@ export class Image {
    * Get the rsi at a specified (secondary) offset.
    *
    * @param {number} offset The desired (secondary) offset.
-   * @returns {object} The coresponding rsi.
+   * @returns {RescaleSlopeAndIntercept} The coresponding rsi.
    */
   #getRescaleSlopeAndInterceptAtOffset(offset) {
     return this.#rsis[offset];
@@ -362,7 +386,8 @@ export class Image {
   /**
    * Set the rescale slope and intercept.
    *
-   * @param {object} inRsi The input rescale slope and intercept.
+   * @param {RescaleSlopeAndIntercept} inRsi The input rescale
+   *   slope and intercept.
    * @param {number} [offset] The rsi offset (only needed for non constant rsi).
    */
   setRescaleSlopeAndIntercept(inRsi, offset) {
@@ -387,7 +412,7 @@ export class Image {
           this.#rsis = [];
           // initialise RSIs
           for (let i = 0, leni = this.#getSecondaryOffsetMax(); i < leni; ++i) {
-            this.#rsis.push(i);
+            this.#rsis.push(this.#rsi);
           }
           // store
           this.#rsi = null;
@@ -463,7 +488,7 @@ export class Image {
   /**
    * Get the meta information of the image.
    *
-   * @returns {object} The meta information of the image.
+   * @returns {Object<string, any>} The meta information of the image.
    */
   getMeta() {
     return this.#meta;
@@ -472,7 +497,7 @@ export class Image {
   /**
    * Set the meta information of the image.
    *
-   * @param {object} rhs The meta information of the image.
+   * @param {Object<string, any>} rhs The meta information of the image.
    */
   setMeta(rhs) {
     this.#meta = rhs;
@@ -492,24 +517,35 @@ export class Image {
    * Get the offsets where the buffer equals the input value.
    * Loops through the whole volume, can get long for big data...
    *
-   * @param {number|object} value The value to check.
-   * @returns {Array} The list of offsets.
+   * @param {number|RGB} value The value to check.
+   * @returns {number[]} The list of offsets.
    */
   getOffsets(value) {
     // value to array
-    if (this.#numberOfComponents === 1) {
-      value = [value];
-    } else if (this.#numberOfComponents === 3 &&
-      typeof value.r !== 'undefined') {
-      value = [value.r, value.g, value.b];
+    let bufferValue;
+    if (typeof value === 'number') {
+      if (this.#numberOfComponents !== 1) {
+        throw new Error(
+          'Number of components is not 1 for getting single value.');
+      }
+      bufferValue = [value];
+    } else if (typeof value.r !== 'undefined' &&
+      typeof value.g !== 'undefined' &&
+      typeof value.b !== 'undefined') {
+      if (this.#numberOfComponents !== 3) {
+        throw new Error(
+          'Number of components is not 3 for getting RGB value.');
+      }
+      bufferValue = [value.r, value.g, value.b];
     }
+
     // main loop
     const offsets = [];
     let equal;
     for (let i = 0; i < this.#buffer.length; i = i + this.#numberOfComponents) {
       equal = true;
       for (let j = 0; j < this.#numberOfComponents; ++j) {
-        if (this.#buffer[i + j] !== value[j]) {
+        if (this.#buffer[i + j] !== bufferValue[j]) {
           equal = false;
           break;
         }
@@ -526,7 +562,7 @@ export class Image {
    * Could loop through the whole volume, can get long for big data...
    *
    * @param {Array} values The values to check.
-   * @returns {Array} A list of booleans for each input value,
+   * @returns {boolean[]} A list of booleans for each input value,
    *   set to true if the value is present in the buffer.
    */
   hasValues(values) {
@@ -658,6 +694,7 @@ export class Image {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
+   * @fires Image#imagegeometrychange
    */
   appendSlice(rhs) {
     // check input
@@ -691,9 +728,24 @@ export class Image {
         continue;
       }
       if (this.#meta[key] !== rhs.getMeta()[key]) {
-        throw new Error('Cannot append a slice with different ' + key);
+        throw new Error('Cannot append a slice with different ' + key +
+          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
       }
     }
+
+    // update ranges
+    const rhsRange = rhs.getDataRange();
+    const range = this.getDataRange();
+    this.#dataRange = {
+      min: Math.min(rhsRange.min, range.min),
+      max: Math.max(rhsRange.max, range.max),
+    };
+    const rhsResRange = rhs.getRescaledDataRange();
+    const resRange = this.getRescaledDataRange();
+    this.#rescaledDataRange = {
+      min: Math.min(rhsResRange.min, resRange.min),
+      max: Math.max(rhsResRange.max, resRange.max),
+    };
 
     // possible time
     const timeId = rhs.getGeometry().getInitialTime();
@@ -800,6 +852,13 @@ export class Image {
         }
       }
     }
+    /**
+     * Image geometry change event.
+     *
+     * @event Image#imagegeometrychange
+     * @type {object}
+     */
+    this.#fireEvent({type: 'imagegeometrychange'});
   }
 
   /**
@@ -846,7 +905,7 @@ export class Image {
   /**
    * Get the data range.
    *
-   * @returns {object} The data range.
+   * @returns {NumberRange} The data range.
    */
   getDataRange() {
     if (!this.#dataRange) {
@@ -858,7 +917,7 @@ export class Image {
   /**
    * Get the rescaled data range.
    *
-   * @returns {object} The rescaled data range.
+   * @returns {NumberRange} The rescaled data range.
    */
   getRescaledDataRange() {
     if (!this.#rescaledDataRange) {
@@ -920,30 +979,49 @@ export class Image {
   /**
    * Set the inner buffer values at given offsets.
    *
-   * @param {Array} offsets List of offsets where to set the data.
-   * @param {object} value The value to set at the given offsets.
-   * @fires Image#imagechange
+   * @param {number[]} offsets List of offsets where to set the data.
+   * @param {number|RGB} value The value to set at the given offsets.
+   * @fires Image#imagecontentchange
    */
   setAtOffsets(offsets, value) {
+    // value to array
+    let bufferValue;
+    if (typeof value === 'number') {
+      if (this.#numberOfComponents !== 1) {
+        throw new Error(
+          'Number of components is not 1 for setting single value.');
+      }
+      bufferValue = [value];
+    } else if (typeof value.r !== 'undefined' &&
+      typeof value.g !== 'undefined' &&
+      typeof value.b !== 'undefined') {
+      if (this.#numberOfComponents !== 3) {
+        throw new Error(
+          'Number of components is not 3 for setting RGB value.');
+      }
+      bufferValue = [value.r, value.g, value.b];
+    }
+
     let offset;
     for (let i = 0, leni = offsets.length; i < leni; ++i) {
       offset = offsets[i];
-      this.#buffer[offset] = value.r;
-      this.#buffer[offset + 1] = value.g;
-      this.#buffer[offset + 2] = value.b;
+      for (let j = 0; j < this.#numberOfComponents; ++j) {
+        this.#buffer[offset + j] = bufferValue[j];
+      }
     }
-    // fire imagechange
-    this.#fireEvent({type: 'imagechange'});
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**
    * Set the inner buffer values at given offsets.
    *
-   * @param {Array} offsetsLists List of offset lists where to set the data.
-   * @param {object} value The value to set at the given offsets.
+   * @param {number[][]} offsetsLists List of offset lists where
+   *   to set the data.
+   * @param {RGB} value The value to set at the given offsets.
    * @returns {Array} A list of objects representing the original values before
    *  replacing them.
-   * @fires Image#imagechange
+   * @fires Image#imagecontentchange
    */
   setAtOffsetsAndGetOriginals(offsetsLists, value) {
     const originalColoursLists = [];
@@ -989,32 +1067,34 @@ export class Image {
       }
       originalColoursLists.push(originalColours);
     }
-    // fire imagechange
-    this.#fireEvent({type: 'imagechange'});
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
     return originalColoursLists;
   }
 
   /**
    * Set the inner buffer values at given offsets.
    *
-   * @param {Array} offsetsLists List of offset lists where to set the data.
-   * @param {object|Array} value The value to set at the given offsets.
-   * @fires Image#imagechange
+   * @param {number[][]} offsetsLists List of offset lists
+   *   where to set the data.
+   * @param {RGB|Array} value The value to set at the given offsets.
+   * @fires Image#imagecontentchange
    */
   setAtOffsetsWithIterator(offsetsLists, value) {
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
       let iterator;
-      if (typeof value !== 'undefined' &&
-        typeof value.r !== 'undefined') {
-        // input value is a simple color
-        iterator = colourRange(
-          [{index: 0, colour: value}], offsets.length);
-      } else {
+      if (Array.isArray(value)) {
         // input value is a list of iterators
         // created by setAtOffsetsAndGetOriginals
         iterator = colourRange(
           value[j], offsets.length);
+      } else if (typeof value.r !== 'undefined' &&
+        typeof value.g !== 'undefined' &&
+        typeof value.b !== 'undefined') {
+        // input value is a simple color
+        iterator = colourRange(
+          [{index: 0, colour: value}], offsets.length);
       }
 
       // set values
@@ -1030,10 +1110,10 @@ export class Image {
     /**
      * Image change event.
      *
-     * @event Image#imagechange
+     * @event Image#imagecontentchange
      * @type {object}
      */
-    this.#fireEvent({type: 'imagechange'});
+    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**
@@ -1247,7 +1327,7 @@ export class Image {
    *
    * Note: Uses raw buffer values.
    *
-   * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+   * @param {number[]} weights The weights of the 2D kernel as a 3x3 matrix.
    * @returns {Image} The convoluted image.
    */
   convolute2D(weights) {
@@ -1274,7 +1354,7 @@ export class Image {
    *
    * Note: Uses raw buffer values.
    *
-   * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+   * @param {number[]} weights The weights of the 2D kernel as a 3x3 matrix.
    * @param {TypedArray} buffer The buffer to convolute.
    * @param {number} startOffset The index to start at.
    */

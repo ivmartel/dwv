@@ -8,15 +8,21 @@ import {
   getTagFromDictionary,
   getPixelDataTag
 } from '../../src/dicom/dicomTag';
-import {dictionary} from '../../src/dicom/dictionary';
+import {
+  dictionary,
+  transferSyntaxKeywords
+} from '../../src/dicom/dictionary';
 import {b64urlToArrayBuffer} from './utils';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {WriterRule} from '../../src/dicom/dicomWriter';
+/* eslint-enable no-unused-vars */
+
+// test data
 import multiframeTest from '/tests/data/multiframe-test1.dcm';
 import dwvTestAnonymise from '/tests/data/dwv-test-anonymise.dcm';
-import syntheticDataExplicit from '/tests/dicom/synthetic-data_explicit.json';
-import syntheticDataImplicit from '/tests/dicom/synthetic-data_implicit.json';
-import syntheticDataExplicitBE from
-  '/tests/dicom/synthetic-data_explicit_big-endian.json';
+import syntheticData from '/tests/dicom/synthetic-data.json';
 
 /**
  * Tests for the 'dicom/dicomWriter.js' file.
@@ -57,135 +63,211 @@ QUnit.test('Test getUID', function (assert) {
  * Tests for {@link DicomWriter} using simple DICOM data.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomWriterSimpleDicom
+ * @function module:tests/dicom~dicomWriter-multiframe
  */
-QUnit.test('Test multiframe writer support.', function (assert) {
+QUnit.test('Multiframe write - #DWV-REQ-IO-05-001 Write DICOM file',
+  function (assert) {
+    // parse DICOM
+    let dicomParser = new DicomParser();
+    dicomParser.parse(b64urlToArrayBuffer(multiframeTest));
 
-  // parse DICOM
-  let dicomParser = new DicomParser();
-  dicomParser.parse(b64urlToArrayBuffer(multiframeTest));
+    const numCols = 256;
+    const numRows = 256;
+    const numFrames = 16;
+    const bufferSize = numCols * numRows * numFrames;
 
-  const numCols = 256;
-  const numRows = 256;
-  const numFrames = 16;
-  const bufferSize = numCols * numRows * numFrames;
+    // raw tags
+    let rawTags = dicomParser.getDicomElements();
+    // check values
+    assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
+    assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
+    assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows');
+    // length of value array for pixel data
+    assert.equal(
+      rawTags['7FE00010'].value[0].length,
+      bufferSize,
+      'Length of value array for pixel data');
 
-  // raw tags
-  let rawTags = dicomParser.getDicomElements();
-  // check values
-  assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
-  assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
-  assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows');
-  // length of value array for pixel data
-  assert.equal(
-    rawTags['7FE00010'].value[0].length,
-    bufferSize,
-    'Length of value array for pixel data');
+    const dicomWriter = new DicomWriter();
+    const buffer = dicomWriter.getBuffer(rawTags);
 
-  const dicomWriter = new DicomWriter();
-  const buffer = dicomWriter.getBuffer(rawTags);
+    dicomParser = new DicomParser();
+    dicomParser.parse(buffer);
 
-  dicomParser = new DicomParser();
-  dicomParser.parse(buffer);
+    rawTags = dicomParser.getDicomElements();
 
-  rawTags = dicomParser.getDicomElements();
-
-  // check values
-  assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
-  assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
-  assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows');
-  // length of value array for pixel data
-  assert.equal(
-    rawTags['7FE00010'].value[0].length,
-    bufferSize,
-    'Length of value array for pixel data');
-
-});
+    // check values
+    assert.equal(rawTags['00280008'].value[0], numFrames, 'Number of frames');
+    assert.equal(rawTags['00280011'].value[0], numCols, 'Number of columns');
+    assert.equal(rawTags['00280010'].value[0], numRows, 'Number of rows');
+    // length of value array for pixel data
+    assert.equal(
+      rawTags['7FE00010'].value[0].length,
+      bufferSize,
+      'Length of value array for pixel data');
+  }
+);
 
 /**
  * Tests for {@link DicomWriter} anomnymisation.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomWriterAnonymise
+ * @function module:tests/dicom~dicomWriter-anonymise
  */
-QUnit.test('Test patient anonymisation', function (assert) {
+QUnit.test('Write anonymised - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
+  function (assert) {
+    // parse DICOM
+    let dicomParser = new DicomParser();
+    dicomParser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
 
-  // parse DICOM
-  let dicomParser = new DicomParser();
-  dicomParser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+    const patientsNameAnonymised = 'anonymise-name';
+    const patientsIdAnonymised = 'anonymise-id';
+    // rules with different levels: full tag, tag name and group name
+    const rules = {
+      default: {
+        action: 'copy', value: null
+      },
+      '00100010': {
+        action: 'replace', value: patientsNameAnonymised
+      },
+      PatientID: {
+        action: 'replace', value: patientsIdAnonymised
+      },
+      Patient: {
+        action: 'remove', value: null
+      }
+    };
 
-  const patientsNameAnonymised = 'anonymise-name';
-  const patientsIdAnonymised = 'anonymise-id';
-  // rules with different levels: full tag, tag name and group name
-  const rules = {
-    default: {
-      action: 'copy', value: null
-    },
-    '00100010': {
-      action: 'replace', value: patientsNameAnonymised
-    },
-    PatientID: {
-      action: 'replace', value: patientsIdAnonymised
-    },
-    Patient: {
-      action: 'remove', value: null
-    }
-  };
+    const patientsName = 'dwv^PatientName';
+    const patientID = 'dwv-patient-id123';
+    const patientsBirthDate = '19830101';
+    const patientsSex = 'M';
 
-  const patientsName = 'dwv^PatientName';
-  const patientID = 'dwv-patient-id123';
-  const patientsBirthDate = '19830101';
-  const patientsSex = 'M';
+    // raw tags
+    let rawTags = dicomParser.getDicomElements();
+    // check values
+    assert.equal(
+      rawTags['00100010'].value[0].trim(),
+      patientsName,
+      'patientsName #0');
+    assert.equal(
+      rawTags['00100020'].value[0].trim(),
+      patientID,
+      'patientID #0');
+    assert.equal(
+      rawTags['00100030'].value[0].trim(),
+      patientsBirthDate,
+      'patientsBirthDate #0');
+    assert.equal(
+      rawTags['00100040'].value[0].trim(),
+      patientsSex,
+      'patientsSex #0');
+    assert.notOk(rawTags['00104000'], 'patientsComments #0');
 
-  // raw tags
-  let rawTags = dicomParser.getDicomElements();
-  // check values
-  assert.equal(
-    rawTags['00100010'].value[0].trim(),
-    patientsName,
-    'patientsName');
-  assert.equal(
-    rawTags['00100020'].value[0].trim(),
-    patientID,
-    'patientID');
-  assert.equal(
-    rawTags['00100030'].value[0].trim(),
-    patientsBirthDate,
-    'patientsBirthDate');
-  assert.equal(
-    rawTags['00100040'].value[0].trim(),
-    patientsSex,
-    'patientsSex');
+    // write buffer
+    const dicomWriter = new DicomWriter();
+    dicomWriter.setRules(rules);
+    const buffer = dicomWriter.getBuffer(rawTags);
+    // parse new buffer
+    dicomParser = new DicomParser();
+    dicomParser.parse(buffer);
+    rawTags = dicomParser.getDicomElements();
 
-  const dicomWriter = new DicomWriter();
-  dicomWriter.setRules(rules);
-  const buffer = dicomWriter.getBuffer(rawTags);
-
-  dicomParser = new DicomParser();
-
-  dicomParser.parse(buffer);
-
-  rawTags = dicomParser.getDicomElements();
-
-  // check values
-  assert.equal(
-    rawTags['00100010'].value[0],
-    patientsNameAnonymised,
-    'patientName');
-  assert.equal(
-    rawTags['00100020'].value[0],
-    patientsIdAnonymised,
-    'patientID');
-  assert.notOk(rawTags['00100030'], 'patientsBirthDate');
-  assert.notOk(rawTags['00100040'], 'patientsSex');
-
-});
+    // check values
+    assert.equal(
+      rawTags['00100010'].value[0],
+      patientsNameAnonymised,
+      'patientName #1');
+    assert.equal(
+      rawTags['00100020'].value[0],
+      patientsIdAnonymised,
+      'patientID #1');
+    assert.notOk(rawTags['00100030'], 'patientsBirthDate #1');
+    assert.notOk(rawTags['00100040'], 'patientsSex #1');
+    assert.notOk(rawTags['00104000'], 'patientsComments #1');
+  }
+);
 
 /**
- * Compare JSON tags and DICOM elements
+ * Tests for {@link DicomWriter} anomnymisation and add tags.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~dicomWriterAnonymiseAddTags
+ */
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'Write anonymised and add tags - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
+  function (assert) {
+    // parse test DICOM file
+    let dicomParser = new DicomParser();
+    dicomParser.parse(b64urlToArrayBuffer(dwvTestAnonymise));
+
+    const patientsName = 'dwv^PatientName';
+    const patientComments = '';
+    const issuerOfPatientID = 'dwv.org';
+    // rule with tagKey, tagName and non existing tag
+    const rules = {
+      default: {
+        action: 'copy', value: null
+      },
+      '00104000': {
+        action: 'replace', value: patientComments
+      },
+      IssuerOfPatientID: {
+        action: 'replace', value: issuerOfPatientID
+      },
+      PatientBirthDateInAlternativeCalendar: {
+        action: 'replace', value: null
+      },
+      BADKEY00: {
+        action: 'replace', value: ''
+      }
+    };
+
+
+    // initial tags
+    let rawTags = dicomParser.getDicomElements();
+
+    // check values
+    assert.equal(
+      rawTags['00100010'].value[0].trim(),
+      patientsName,
+      'patientsName #0');
+    assert.notOk(rawTags['00100033'], 'null replace #0');
+    assert.notOk(rawTags['00104000'], 'patientsComments #0');
+    assert.notOk(rawTags['00100021'], 'issuerOfPatientID #0');
+
+    // write buffer
+    const dicomWriter = new DicomWriter();
+    dicomWriter.setRules(rules, true);
+    const buffer = dicomWriter.getBuffer(rawTags);
+    // parse new buffer
+    dicomParser = new DicomParser();
+    dicomParser.parse(buffer);
+    rawTags = dicomParser.getDicomElements();
+
+    // check values
+    assert.equal(
+      rawTags['00100010'].value[0],
+      patientsName,
+      'patientName #1');
+    assert.notOk(rawTags['00100033'], 'null replace #1');
+    assert.equal(
+      rawTags['00104000'].value[0],
+      patientComments,
+      'patientComments #1');
+    assert.equal(
+      rawTags['00100021'].value[0],
+      issuerOfPatientID,
+      'issuerOfPatientID #1');
+  }
+);
+
+/**
+ * Compare JSON tags and DICOM elements.
  *
  * @param {object} jsonTags The JSON tags.
- * @param {object} dicomElements The DICOM elements
+ * @param {object} dicomElements The DICOM elements.
  * @param {string} name The name of the test.
  * @param {object} comparator An object with an equal function (such as
  *   Qunit assert).
@@ -234,10 +316,10 @@ function compare(jsonTags, dicomElements, name, comparator) {
 }
 
 /**
- * Simple GradSquarePixGenerator
+ * Simple GradSquarePixGenerator.
  *
  * @param {object} tags The input tags.
- * @returns {object} The pixel buffer
+ * @returns {object} The pixel buffer.
  */
 function generateGradSquare(tags) {
 
@@ -276,38 +358,42 @@ function generateGradSquare(tags) {
     }
   }
 
-  const halfCols = numberOfRows * 0.5;
-  const halfRows = numberOfColumns * 0.5;
+  // full grad square
+  // const borderI = 0;
+  // const borderJ = 0;
+  // ~centered grad square
+  const borderI = Math.ceil(numberOfColumns * 0.25);
+  const borderJ = Math.ceil(numberOfRows * 0.25);
+
+  const minI = borderI;
+  const minJ = borderJ;
+  const maxI = numberOfColumns - borderI;
+  const maxJ = numberOfRows - borderJ;
 
   const background = 0;
-  const maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
-  const max = 100;
+  const max = 255;
+  let maxNoBounds = 1;
 
-  let getFunc;
-  if (isRGB) {
-    getFunc = function (i, j) {
-      let value = background;
-      const jc = Math.abs(j - halfRows);
-      const ic = Math.abs(i - halfCols);
-      if (jc < halfRows / 2 && ic < halfCols / 2) {
-        value += (i * j) * (max / maxNoBounds);
-      }
-      if (value > 255) {
-        value = 200;
-      }
-      return [0, value, value];
-    };
-  } else {
-    getFunc = function (i, j) {
-      let value = 0;
-      const jc = Math.abs(j - halfRows);
-      const ic = Math.abs(i - halfCols);
-      if (jc < halfRows / 2 && ic < halfCols / 2) {
-        value += (i * j) * (max / maxNoBounds);
-      }
-      return [value];
-    };
-  }
+  const getValue = function (i, j) {
+    let value = background;
+    if (i >= minI && i <= maxI &&
+      j >= minJ && j <= maxJ) {
+      value += Math.round((i + j) * (max / maxNoBounds));
+    }
+    return [value];
+  };
+
+  const getRGB = function (i, j) {
+    let value = getValue(i, j);
+    if (value > 255) {
+      value = 200;
+    }
+    return [value, 0, 0];
+  };
+
+  maxNoBounds = getValue(maxI, maxJ) / max;
+
+  const getFunc = isRGB ? getRGB : getValue;
 
   // main loop
   let offset = 0;
@@ -336,12 +422,66 @@ function generateGradSquare(tags) {
 }
 
 /**
+ * Simple BinaryPixGenerator.
+ *
+ * @param {object} tags The input tags.
+ * @returns {object} The pixel buffer.
+ */
+function generateBinary(tags) {
+
+  const numberOfColumns = tags.Columns;
+  const numberOfRows = tags.Rows;
+  let numberOfFrames = 1;
+  if (typeof tags.NumberOfFrames !== 'undefined') {
+    numberOfFrames = tags.NumberOfFrames;
+  }
+  const dataLength = numberOfRows * numberOfColumns * numberOfFrames;
+  const pixelBuffer = new Uint8Array(dataLength);
+
+  const halfCols = numberOfRows * 0.5;
+  const halfRows = numberOfColumns * 0.5;
+
+  const getFunc = function (i, j) {
+    let value = 0;
+    const jc = Math.abs(j - halfRows);
+    const ic = Math.abs(i - halfCols);
+    if (jc < halfRows / 2 && ic < halfCols / 2) {
+      value = 1;
+    }
+    return value;
+  };
+
+  // main loop
+  let offset = 0;
+  for (let f = 0; f < numberOfFrames; ++f) {
+    for (let j = 0; j < numberOfRows; ++j) {
+      for (let i = 0; i < numberOfColumns; ++i) {
+        pixelBuffer[offset] = getFunc(i, j);
+        ++offset;
+      }
+    }
+  }
+
+  const pixVL = pixelBuffer.BYTES_PER_ELEMENT * dataLength;
+  return {
+    tag: getPixelDataTag(),
+    vr: 'OB',
+    vl: pixVL,
+    value: pixelBuffer
+  };
+}
+
+/**
  * Test a JSON config: write a DICOM file and read it back.
  *
  * @param {object} config A JSON config representing DICOM tags.
  * @param {object} assert A Qunit assert.
+ * @param {Object<string, WriterRule>} [writerRules] Optional DICOM
+ *   writer rules.
+ * @param {object} [outConfig] Optional resulting JSON after
+ *   applying writer rules.
  */
-function testWriteReadDataFromConfig(config, assert) {
+function testWriteReadDataFromConfig(config, assert, writerRules, outConfig) {
   // add private tags to dict if present
   let useUnVrForPrivateSq = false;
   if (typeof config.privateDictionary !== 'undefined') {
@@ -356,18 +496,28 @@ function testWriteReadDataFromConfig(config, assert) {
     }
   }
   // pass tags clone to avoid modifications (for ex by padElement)
-  // TODO: find another way
-  const jsonTags = JSON.parse(JSON.stringify(config.tags));
+  const jsonTags = structuredClone(config.tags);
   // convert JSON to DICOM element object
   const dicomElements = getElementsFromJSONTags(jsonTags);
-  // pixels (if possible): small gradient square
+  // pixels (if possible)
   if (config.tags.Modality !== 'KO') {
-    dicomElements['7FE00010'] = generateGradSquare(config.tags);
+    if (config.tags.Modality === 'SEG') {
+      // simple binary
+      dicomElements['7FE00010'] = generateBinary(config.tags);
+    } else {
+      // grad square
+      dicomElements['7FE00010'] = generateGradSquare(config.tags);
+    }
+  }
+
+  // create writer
+  const writer = new DicomWriter();
+  writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
+  if (typeof writerRules !== 'undefined') {
+    writer.setRules(writerRules, true);
   }
 
   // create DICOM buffer
-  const writer = new DicomWriter();
-  writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
   let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(dicomElements);
@@ -381,45 +531,176 @@ function testWriteReadDataFromConfig(config, assert) {
   dicomParser.parse(dicomBuffer);
   const elements = dicomParser.getDicomElements();
 
+  if (typeof outConfig === 'undefined') {
+    outConfig = config;
+  }
+
   // compare contents
-  compare(config.tags, elements, config.name, assert);
+  compare(outConfig.tags, elements, config.name, assert);
 }
 
 /**
- * Tests write/read DICOM data from config file: explicit encoding.
- * Using remote file for CI integration.
+ * Get writing rules #0 and resulting tags.
  *
- * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
+ * @param {object} config A JSON config representing DICOM tags.
+ * @returns {object} Rules and resulting tags.
  */
-QUnit.test('Test synthetic dicom explicit', function (assert) {
-  const configs = JSON.parse(syntheticDataExplicit);
-  for (let i = 0; i < configs.length; ++i) {
-    testWriteReadDataFromConfig(configs[i], assert);
-  }
-});
+function getRulesAndResult0(config) {
+  const result = structuredClone(config);
+  // action: remove
+  delete result.tags.OtherPatientNames;
+  // action: clear
+  result.tags.PatientID = '';
+  // action: replace
+  result.tags.PatientName = 'Anonymized';
+  // addMissingTags should be true for writer.setRules
+  // -> these tags will be added if not present in input config
+  result.tags.ReferringPhysicianName = 'Asclepius';
+  result.tags.ReferringPhysicianIdentificationSequence = '';
+
+  return {
+    rules: {
+      default: {
+        action: 'copy', value: null
+      },
+      OtherPatientNames: {
+        action: 'remove', value: null
+      },
+      PatientID: {
+        action: 'clear', value: null
+      },
+      PatientName: {
+        action: 'replace', value: result.tags.PatientName
+      },
+      ReferringPhysicianName: {
+        action: 'replace', value: result.tags.ReferringPhysicianName
+      },
+      ReferringPhysicianIdentificationSequence: {
+        action: 'replace',
+        value: result.tags.ReferringPhysicianIdentificationSequence
+      }
+    },
+    result: result
+  };
+}
 
 /**
- * Tests write/read DICOM data from config file: implicit encoding.
+ * Tests write/read DICOM data with explicit encoding.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
+ * @function module:tests/dicom~readwrite-synthetic-explicit
  */
-QUnit.test('Test synthetic dicom implicit', function (assert) {
-  const configs = JSON.parse(syntheticDataImplicit);
-  for (let i = 0; i < configs.length; ++i) {
-    testWriteReadDataFromConfig(configs[i], assert);
+QUnit.test(
+  'Read/write synthetic explicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+  function (assert) {
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ExplicitVRLittleEndian;
+      testWriteReadDataFromConfig(config, assert);
+    }
   }
-});
+);
 
 /**
- * Tests write/read DICOM data from config file: explicit big endian encoding.
+ * Tests write with rules / read DICOM data with explicit encoding.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
+ * @function module:tests/dicom~readwrite-synthetic-explicit-with-rules
  */
-QUnit.test('Test synthetic dicom explicit big endian', function (assert) {
-  const configs = JSON.parse(syntheticDataExplicitBE);
-  for (let i = 0; i < configs.length; ++i) {
-    testWriteReadDataFromConfig(configs[i], assert);
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'Read/write synthetic explicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+  function (assert) {
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ExplicitVRLittleEndian;
+      const r20 = getRulesAndResult0(config);
+      testWriteReadDataFromConfig(
+        config, assert, r20.rules, r20.result
+      );
+    }
   }
-});
+);
+
+/**
+ * Tests write/read DICOM data with implicit encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~readwrite-synthetic-implicit
+ */
+QUnit.test(
+  'Read/write synthetic implicit - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+  function (assert) {
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ImplicitVRLittleEndian;
+      testWriteReadDataFromConfig(config, assert);
+    }
+  }
+);
+
+/**
+ * Tests write with rules / read DICOM data with implicit encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~readwrite-synthetic-implicit-with-rules
+ */
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'Read/write synthetic implicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+  function (assert) {
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ImplicitVRLittleEndian;
+      const r20 = getRulesAndResult0(config);
+      testWriteReadDataFromConfig(
+        config, assert, r20.rules, r20.result
+      );
+    }
+  }
+);
+
+/**
+ * Tests write/read DICOM data with explicit big endian encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~readwrite-synthetic-explicit-big-endian
+ */
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'Read/write synthetic explicit big endian - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+  function (assert) {
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ExplicitVRBigEndian;
+      testWriteReadDataFromConfig(config, assert);
+    }
+  }
+);
+
+/**
+ * Tests write with rules / read DICOM data with explicit big endian encoding.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~readwrite-synthetic-explicit-be-with-rules
+ */
+QUnit.test(
+  // eslint-disable-next-line max-len
+  'Read/write synthetic explicit big endian with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
+  function (assert) {
+    const configs = JSON.parse(syntheticData);
+    for (const config of configs) {
+      config.tags.TransferSyntaxUID =
+        transferSyntaxKeywords.ExplicitVRBigEndian;
+      const r20 = getRulesAndResult0(config);
+      testWriteReadDataFromConfig(
+        config, assert, r20.rules, r20.result
+      );
+    }
+  }
+);

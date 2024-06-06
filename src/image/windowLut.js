@@ -1,49 +1,34 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {RescaleLut} from './rescaleLut';
-import {WindowCenterAndWidth} from './windowCenterAndWidth';
+import {ModalityLut} from './modalityLut';
+import {VoiLut} from './voiLut';
 /* eslint-enable no-unused-vars */
 
 /**
- * Window LUT class.
- * Typically converts from float to integer.
+ * Window LUT class: combines a modality LUT and a VOI LUT.
  */
 export class WindowLut {
 
   /**
-   * The rescale LUT.
+   * The modality LUT.
    *
-   * @type {RescaleLut}
+   * @type {ModalityLut}
    */
-  #rescaleLut;
+  #modalityLut;
 
   /**
-   * Signed data flag.
+   * The VOI LUT.
    *
-   * @type {boolean}
+   * @type {VoiLut}
    */
-  #isSigned;
+  #voiLut;
 
   /**
-   * The internal array: Uint8ClampedArray clamps between 0 and 255.
+   * The internal LUT array: Uint8ClampedArray clamps between 0 and 255.
    *
    * @type {Uint8ClampedArray}
    */
-  #lut = null;
-
-  /**
-   * The window level.
-   *
-   * @type {WindowCenterAndWidth}
-   */
-  #windowLevel = null;
-
-  /**
-   * Flag to know if the lut is ready or not.
-   *
-   * @type {boolean}
-   */
-  #isReady = false;
+  #lut;
 
   /**
    * Shift for signed data.
@@ -53,119 +38,91 @@ export class WindowLut {
   #signedShift = 0;
 
   /**
-   * @param {RescaleLut} rescaleLut The associated rescale LUT.
+   * Is the RSI discrete.
+   *
+   * @type {boolean}
+   */
+  #isDiscrete = true;
+
+  /**
+   * Construct a window LUT object, VOI LUT is set with
+   *   the 'setVoiLut' method.
+   *
+   * @param {ModalityLut} modalityLut The associated rescale LUT.
    * @param {boolean} isSigned Flag to know if the data is signed or not.
+   * @param {boolean} isDiscrete Flag to know if the input data is discrete.
    */
-  constructor(rescaleLut, isSigned) {
-    this.#rescaleLut = rescaleLut;
-    this.#isSigned = isSigned;
-  }
+  constructor(modalityLut, isSigned, isDiscrete) {
+    this.#modalityLut = modalityLut;
 
-  /**
-   * Get the window / level.
-   *
-   * @returns {WindowCenterAndWidth} The window / level.
-   */
-  getWindowLevel() {
-    return this.#windowLevel;
-  }
-
-  /**
-   * Get the signed flag.
-   *
-   * @returns {boolean} The signed flag.
-   */
-  isSigned() {
-    return this.#isSigned;
-  }
-
-  /**
-   * Get the rescale lut.
-   *
-   * @returns {RescaleLut} The rescale lut.
-   */
-  getRescaleLut() {
-    return this.#rescaleLut;
-  }
-
-  /**
-   * Is the lut ready to use or not? If not, the user must
-   * call 'update'.
-   *
-   * @returns {boolean} True if the lut is ready to use.
-   */
-  isReady() {
-    return this.#isReady;
-  }
-
-  /**
-   * Set the window center and width.
-   *
-   * @param {WindowCenterAndWidth} wl The window level.
-   */
-  setWindowLevel(wl) {
-    // store the window values
-    this.#windowLevel = wl;
-    // possible signed shift
-    this.#signedShift = 0;
-    this.#windowLevel.setSignedOffset(0);
-    if (this.#isSigned) {
-      const size = this.#rescaleLut.getLength();
+    if (isSigned) {
+      const size = this.#modalityLut.getLength();
       this.#signedShift = size / 2;
-      this.#windowLevel.setSignedOffset(
-        this.#rescaleLut.getRSI().getSlope() * this.#signedShift);
+    } else {
+      this.#signedShift = 0;
     }
-    // update ready flag
-    this.#isReady = false;
+
+    this.#isDiscrete = isDiscrete;
   }
 
   /**
-   * Update the lut if needed..
+   * Get the VOI LUT.
+   *
+   * @returns {VoiLut} The VOI LUT.
    */
-  update() {
-    // check if we need to update
-    if (this.#isReady) {
-      return;
-    }
+  getVoiLut() {
+    return this.#voiLut;
+  }
 
-    // check rescale lut
-    if (!this.#rescaleLut.isReady()) {
-      this.#rescaleLut.initialise();
-    }
-    // create window lut
-    const size = this.#rescaleLut.getLength();
-    if (!this.#lut) {
+  /**
+   * Get the modality LUT.
+   *
+   * @returns {ModalityLut} The modality LUT.
+   */
+  getModalityLut() {
+    return this.#modalityLut;
+  }
+
+  /**
+   * Set the VOI LUT.
+   *
+   * @param {VoiLut} lut The VOI LUT.
+   */
+  setVoiLut(lut) {
+    // store the window values
+    this.#voiLut = lut;
+
+    // possible signed shift (LUT indices are positive)
+    this.#voiLut.setSignedOffset(
+      this.#modalityLut.getRSI().getSlope() * this.#signedShift);
+
+    // create lut if not continous
+    if (this.#isDiscrete) {
+      const size = this.#modalityLut.getLength();
       // use clamped array (polyfilled in env.js)
       this.#lut = new Uint8ClampedArray(size);
+      // by default WindowLevel returns a value in the [0,255] range
+      // this is ok with regular Arrays and ClampedArray.
+      for (let i = 0; i < size; ++i) {
+        this.#lut[i] = this.#voiLut.apply(this.#modalityLut.getValue(i));
+      }
     }
-    // by default WindowLevel returns a value in the [0,255] range
-    // this is ok with regular Arrays and ClampedArray.
-    for (let i = 0; i < size; ++i) {
-      this.#lut[i] = this.#windowLevel.apply(this.#rescaleLut.getValue(i));
-    }
-
-    // update ready flag
-    this.#isReady = true;
-  }
-
-  /**
-   * Get the length of the LUT array.
-   *
-   * @returns {number} The length of the LUT array.
-   */
-  getLength() {
-    return this.#lut.length;
   }
 
   /**
    * Get the value of the LUT at the given offset.
    *
-   * @param {number} offset The input offset in [0,2^bitsStored] range.
+   * @param {number} offset The input offset in [0,2^bitsStored] range
+   *   for discrete data or full range for non discrete.
    * @returns {number} The integer value (default [0,255]) of the LUT
    *   at the given offset.
    */
   getValue(offset) {
-    return this.#lut[offset + this.#signedShift];
+    if (this.#isDiscrete) {
+      return this.#lut[offset + this.#signedShift];
+    } else {
+      return Math.floor(this.#voiLut.apply(offset + this.#signedShift));
+    }
   }
 
 } // class WindowLut

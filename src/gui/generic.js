@@ -1,4 +1,5 @@
 import {logger} from '../utils/logger';
+import {Point2D} from '../math/point';
 
 /**
  * List of interaction event names.
@@ -14,31 +15,6 @@ export const InteractionEventNames = [
   'touchmove',
   'touchend'
 ];
-
-/**
- * Get a HTML element associated to a container div.
- *
- * @param {string} containerDivId The id of the container div.
- * @param {string} name The name or id to find.
- * @returns {object} The found element or null.
- * @deprecated
- */
-export function getElement(containerDivId, name) {
-  // get by class in the container div
-  const parent = document.getElementById(containerDivId);
-  if (!parent) {
-    return null;
-  }
-  const elements = parent.getElementsByClassName(name);
-  // getting the last element since some libraries (ie jquery-mobile) create
-  // span in front of regular tags (such as select)...
-  let element = elements[elements.length - 1];
-  // if not found get by id with 'containerDivId-className'
-  if (typeof element === 'undefined') {
-    element = document.getElementById(containerDivId + '-' + name);
-  }
-  return element;
-}
 
 /**
  * Overridalbe custom UI object for client defined UI.
@@ -63,7 +39,7 @@ export const customUI = {
  * Get the positions (without the parent offset) of a list of touch events.
  *
  * @param {Array} touches The list of touch events.
- * @returns {Array} The list of positions of the touch events.
+ * @returns {Point2D[]} The list of positions of the touch events.
  */
 function getTouchesPositions(touches) {
   // get the touch offset from all its parents
@@ -87,21 +63,21 @@ function getTouchesPositions(touches) {
   // set its position
   const positions = [];
   for (let i = 0; i < touches.length; ++i) {
-    positions.push({
-      x: touches[i].pageX - offsetLeft,
-      y: touches[i].pageY - offsetTop
-    });
+    positions.push(new Point2D(
+      touches[i].pageX - offsetLeft,
+      touches[i].pageY - offsetTop
+    ));
   }
   return positions;
 }
 
 /**
- * Get the offset of an input event.
+ * Get the offsets of an input touch event.
  *
  * @param {object} event The event to get the offset from.
- * @returns {Array} The array of offsets.
+ * @returns {Point2D[]} The array of points.
  */
-export function getEventOffset(event) {
+export function getTouchPoints(event) {
   let positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
@@ -111,24 +87,34 @@ export function getEventOffset(event) {
     event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
     positions = getTouchesPositions(event.changedTouches);
-  } else {
-    // offsetX/Y: the offset in the X coordinate of the mouse pointer
-    // between that event and the padding edge of the target node
-    // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/offsetX
-    // https://caniuse.com/mdn-api_mouseevent_offsetx
-    positions.push({
-      x: event.offsetX,
-      y: event.offsetY
-    });
   }
   return positions;
 }
 
 /**
+ * Get the offset of an input mouse event.
+ *
+ * @param {object} event The event to get the offset from.
+ * @returns {Point2D} The 2D point.
+ */
+export function getMousePoint(event) {
+  // offsetX/Y: the offset in the X coordinate of the mouse pointer
+  // between that event and the padding edge of the target node
+  // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/offsetX
+  // https://caniuse.com/mdn-api_mouseevent_offsetx
+  return new Point2D(
+    event.offsetX,
+    event.offsetY
+  );
+}
+
+/**
  * Test if a canvas with the input size can be created.
  *
- * @see https://github.com/ivmartel/dwv/issues/902
- * @see https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js
+ * Ref:
+ * - {@link https://github.com/ivmartel/dwv/issues/902},
+ * - {@link https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js}.
+ *
  * @param {number} width The canvas width.
  * @param {number} height The canvas height.
  * @returns {boolean} True is the canvas can be created.

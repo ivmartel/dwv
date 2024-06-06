@@ -4,22 +4,22 @@ import {
   BIG_EPSILON,
   Matrix33,
   getIdentityMat33,
-  getMatrixFromName
+  isIdentityMat33
 } from '../../src/math/matrix';
 
 /**
  * Tests for the 'math/point.js' file.
  */
-/** @module tests/math */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Matrix33}.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~matrix33-class
  */
-QUnit.test('Test Matrix33.', function (assert) {
+QUnit.test('Matrix33 class', function (assert) {
   const m0 = new getIdentityMat33();
   const m1 = new getIdentityMat33();
   /* eslint-disable array-element-newline */
@@ -58,11 +58,28 @@ QUnit.test('Test Matrix33.', function (assert) {
 });
 
 /**
+ * Tests for {@link Matrix33} toString.
+ *
+ * @function module:tests/math~matrix33-tostring
+ */
+QUnit.test('Matrix33 tostring', function (assert) {
+  /* eslint-disable array-element-newline */
+  const m0 = new Matrix33([
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9
+  ]);
+  /* eslint-enable array-element-newline */
+  const str0 = '[1, 2, 3, \n 4, 5, 6, \n 7, 8, 9]';
+  assert.equal(m0.toString(), str0, 'Matrix toString');
+});
+
+/**
  * Tests for {@link Matrix33} vector multiplication.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~matrix33-multiply-vector
  */
-QUnit.test('Test Matrix33 multiply vector.', function (assert) {
+QUnit.test('Matrix33 multiply vector', function (assert) {
   // id
   const id = getIdentityMat33();
   const arr00 = [1, 2, 3];
@@ -105,9 +122,9 @@ QUnit.test('Test Matrix33 multiply vector.', function (assert) {
 /**
  * Tests for {@link Matrix33} multiplication.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~Matrix33-multiply
  */
-QUnit.test('Test Matrix33 multiply.', function (assert) {
+QUnit.test('Matrix33 multiply', function (assert) {
   // id
   const id = getIdentityMat33();
   const idid = id.multiply(id);
@@ -137,9 +154,9 @@ QUnit.test('Test Matrix33 multiply.', function (assert) {
 /**
  * Tests for {@link Matrix33} inversion.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~matrix33-inverse
  */
-QUnit.test('Test Matrix33 inverse.', function (assert) {
+QUnit.test('Matrix33 inverse', function (assert) {
   // id
   const id = getIdentityMat33();
   const invid = id.getInverse();
@@ -175,9 +192,9 @@ QUnit.test('Test Matrix33 inverse.', function (assert) {
 /**
  * Tests for {@link Matrix33} getAbs.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~matrix33-abs
  */
-QUnit.test('Test Matrix33 abs.', function (assert) {
+QUnit.test('Matrix33 abs', function (assert) {
   const m00 = new Matrix33([
     -1, -2, -3, -4, -5, -6, -7, -8, -9
   ]);
@@ -190,9 +207,9 @@ QUnit.test('Test Matrix33 abs.', function (assert) {
 /**
  * Tests for {@link Matrix33} asOneAndZeros.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~matrix33-asoneandzeros
  */
-QUnit.test('Test Matrix33 asOneAndZeros.', function (assert) {
+QUnit.test('Matrix33 asOneAndZeros', function (assert) {
   // test #00
   const m00 = new Matrix33([
     1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -215,9 +232,9 @@ QUnit.test('Test Matrix33 asOneAndZeros.', function (assert) {
 /**
  * Tests for {@link Matrix33} factories.
  *
- * @function module:tests/math~Matrix33
+ * @function module:tests/math~matrix33-factories
  */
-QUnit.test('Test Matrix33 factories.', function (assert) {
+QUnit.test('Matrix33 factories', function (assert) {
   // test #00
   const m00 = getIdentityMat33();
   const theo00 = new Matrix33([
@@ -225,25 +242,5 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
   ]);
   assert.ok(m00.equals(theo00), 'Matrix33 factory id');
 
-  // test #01
-  const m01 = getMatrixFromName('axial');
-  assert.ok(m01.equals(theo00), 'Matrix33 factory axial');
-
-  // test #02
-  const m02 = getMatrixFromName('coronal');
-  const theo02 = new Matrix33([
-    1, 0, 0, 0, 0, 1, 0, -1, 0
-  ]);
-  assert.ok(m02.equals(theo02), 'Matrix33 factory coronal');
-
-  // test #03
-  const m03 = getMatrixFromName('sagittal');
-  const theo03 = new Matrix33([
-    0, 0, -1, 1, 0, 0, 0, -1, 0
-  ]);
-  assert.ok(m03.equals(theo03), 'Matrix33 factory sagittal');
-
-  // test #04
-  const m04 = getMatrixFromName('godo');
-  assert.equal(m04, null, 'Matrix33 factory unknown name');
+  assert.ok(isIdentityMat33(m00), 'Matrix33 factory id isIdentity');
 });

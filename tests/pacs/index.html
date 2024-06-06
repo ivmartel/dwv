@@ -10,6 +10,22 @@ body {
 }
 .listview img {float:left; padding:0px 10px 10px 0px;}
 .listview li {list-style-type: none; padding-top: 10px;}
+.line {
+    padding: 0px 10px 10px 0px;
+    display: flex;
+}
+.link {
+    font-style: italic;
+    text-decoration: underline;
+    cursor: auto;
+}
+.link:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+label, .label {
+    margin: 0px 5px;
+}
 ul li {clear:both;}
 ul li h2 {font-size:90%;}
 ul a {text-decoration:none;}
@@ -34,12 +50,35 @@ Test data:
 <label for="islocal">local</label>
 </div>
 
+<h2 id="dicom">DICOM data</h2>
+
 <ul class="listview" data-role="listview" data-inset="true" id="ul_datadicom"></ul>
 
 <br style="clear:both">
 
-<p>Non DICOM Image formats:</p>
+<h2 id="nondicom">Non DICOM</h2>
+
 <ul class="listview" data-role="listview" data-inset="true" id="ul_dataimg"></ul>
+
+<br style="clear:both">
+
+<h2 id="githubhosted">Github hosted</h2>
+
+<div class="line">
+    <label for="baseUrl">Base url: </label>
+    <input id="baseUrl" type="url" size="72" placeholder="https://example.com">
+</div>
+<div class="line">
+    <label for="fileList">File list: </label>
+    <textarea id="fileList" rows="4" cols="75" placeholder="Comma separated list of file names"></textarea>
+</div>
+<div class="line">
+    <span class='label'>Autofill:&nbsp;</span>
+    <a class="link" id="example0">example0</a>
+</div>
+<div class="line">
+    <button id="viewGithubHosted">View</button>
+</div>
 
 <br style="clear:both">
 

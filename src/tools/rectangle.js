@@ -2,15 +2,17 @@ import {Rectangle} from '../math/rectangle';
 import {Point2D} from '../math/point';
 import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
-import {DRAW_DEBUG} from './draw';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
+import {DRAW_DEBUG} from './draw';
 // external
 import Konva from 'konva';
 
-/**
- * Default draw label text.
- */
-const defaultRectangleLabelText = '{surface}';
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
 
 /**
  * Rectangle factory.
@@ -46,7 +48,7 @@ export class RectangleFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -56,10 +58,10 @@ export class RectangleFactory {
   /**
    * Create a rectangle shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the rectangle.
-   * @param {object} style The drawing style.
-   * @param {object} viewController The associated view controller.
-   * @returns {object} The Konva group.
+   * @param {Point2D[]} points The points from which to extract the rectangle.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
   create(points, style, viewController) {
     // physical shape
@@ -86,12 +88,12 @@ export class RectangleFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof rectangleLabelText !== 'undefined') {
-    //   textExpr = rectangleLabelText;
-    // } else {
-    textExpr = defaultRectangleLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.rectangle[modality] !== 'undefined') {
+      textExpr = defaults.labelText.rectangle[modality];
+    } else {
+      textExpr = defaults.labelText.rectangle['*'];
+    }
     const quant = rectangle.quantify(
       viewController,
       getFlags(textExpr));
@@ -137,9 +139,9 @@ export class RectangleFactory {
   /**
    * Get anchors to update a rectangle shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Shape} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const rectX = shape.x();
@@ -166,13 +168,16 @@ export class RectangleFactory {
   /**
    * Update a rectangle shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The app style.
+   * @param {ViewController} viewController The associated view controller.
    */
   update(anchor, style, viewController) {
     // parent group
     const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
     const krect = group.getChildren(function (node) {
       return node.name() === 'shape';
@@ -277,8 +282,8 @@ export class RectangleFactory {
   /**
    * Update the quantification of a Rectangle.
    *
-   * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Group} group The group with the shape.
+   * @param {ViewController} viewController The associated view controller.
    */
   updateQuantification(group, viewController) {
     this.#updateRectangleQuantification(group, viewController);
@@ -288,8 +293,8 @@ export class RectangleFactory {
    * Update the quantification of a Rectangle (as a static
    *   function to be used in update).
    *
-   * @param {object} group The group with the shape.
-   * @param {object} viewController The associated view controller.
+   * @param {Konva.Group} group The group with the shape.
+   * @param {ViewController} viewController The associated view controller.
    */
   #updateRectangleQuantification(group, viewController) {
     // associated shape
@@ -300,6 +305,9 @@ export class RectangleFactory {
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
 
     // positions: add possible group offset
     const p2d0 = new Point2D(
@@ -315,19 +323,21 @@ export class RectangleFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
+    const meta = ktext.meta;
     const quantification = rect.quantify(
       viewController,
-      getFlags(ktext.meta.textExpr));
-    ktext.setText(replaceFlags(ktext.meta.textExpr, quantification));
+      getFlags(meta.textExpr));
+    ktext.setText(replaceFlags(meta.textExpr, quantification));
     // update meta
-    ktext.meta.quantification = quantification;
+    meta.quantification = quantification;
   }
 
   /**
    * Get the debug shadow.
    *
-   * @param {object} rectangle The rectangle to shadow.
-   * @returns {object} The shadow konva shape.
+   * @param {Rectangle} rectangle The rectangle to shadow.
+   * @returns {Konva.Rect} The shadow konva shape.
    */
   #getShadowRectangle(rectangle) {
     const round = rectangle.getRound();

@@ -8,8 +8,23 @@ function onDOMContentLoaded() {
   createAndPutHtml(_dataDicom, 'datadicom');
   createAndPutHtml(_dataImg, 'dataimg');
 
+  // checkbox local data
   const localChk = document.getElementById('islocal');
   localChk.addEventListener('change', onLocalChkChange);
+
+  // view button for github hosted
+  const viewGithubHosted = document.getElementById('viewGithubHosted');
+  viewGithubHosted.addEventListener('click', onViewGithubHosted);
+
+  // fill gituhb hosted with example 0
+  const example0 = document.getElementById('example0');
+  example0.addEventListener('click', function () {
+    fillGithubHostedWithExample(
+      'https://github.com/ivmartel/dwv/blob/develop/tests/data/',
+      'bbmri-53323131.dcm, bbmri-53323275.dcm, bbmri-53323419.dcm, ' +
+      'bbmri-53323563.dcm, bbmri-53323707.dcm, bbmri-53323851.dcm'
+    );
+  });
 }
 
 const _githubRaw = 'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/';
@@ -225,4 +240,59 @@ function onLocalChkChange() {
   for (let i = 0; i < links.length; ++i) {
     links[i].href = getDwvUrl(_dataDicom[links[i].id].uri);
   }
+}
+
+/**
+ * Handle click on the view github hosted button.
+ */
+function onViewGithubHosted() {
+  // root url: https://github.com/ivmartel/dwv/blob/develop/tests/data
+  // -> https://raw.githubusercontent.com/ivmartel/dwv/develop/tests/data
+  const baseUrlInput = document.getElementById('baseUrl');
+  const url = new URL(baseUrlInput.value);
+  url.host = 'raw.githubusercontent.com';
+  url.pathname = url.pathname.replace('blob/', '');
+  url.pathname = url.pathname.replace('tree/', '');
+
+  // file list
+  const fileList = document.getElementById('fileList');
+  const value = fileList.value;
+  const separator = ',';
+  let files = value.split(separator);
+  // trim spaces
+  files = files.map(element => {
+    return element.trim();
+  });
+  // remove empty elements
+  files = files.filter(element => {
+    return element !== '';
+  });
+  const filesStr = '?file=' + files.join('&file=');
+
+  // dwv args
+  const args = '&dwvReplaceMode=void';
+
+  // final full uri
+  const uriStr = url.href + filesStr;
+  // add args since we pass an uri string and not object as
+  // for dwvtest
+  const fullUri = getDwvUrl(uriStr) + args;
+
+  // open test viewer
+  window.open(fullUri);
+}
+
+/**
+ * Fill github hosted inputs with preset strings.
+ *
+ * @param {string} base The base url href.
+ * @param {string} files The coma separated list of files.
+ */
+function fillGithubHostedWithExample(base, files) {
+  // base
+  const baseUrlInput = document.getElementById('baseUrl');
+  baseUrlInput.value = base;
+  // files
+  const fileList = document.getElementById('fileList');
+  fileList.value = files;
 }

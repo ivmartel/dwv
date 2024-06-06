@@ -1,8 +1,9 @@
 import {Size} from './size';
 import {Geometry} from './geometry';
 import {RescaleSlopeAndIntercept} from './rsi';
-import {WindowCenterAndWidth} from './windowCenterAndWidth';
+import {WindowLevel} from './windowLevel';
 import {Image} from './image';
+import {luts} from './luts';
 import {
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
@@ -12,10 +13,10 @@ import {
   getImage2DSize,
   getPixelSpacing,
   getPixelUnit,
-  TagValueExtractor
+  TagValueExtractor,
+  getSuvFactor,
+  getOrientationMatrix
 } from '../dicom/dicomElementsWrapper';
-import {Vector3D} from '../math/vector';
-import {Matrix33} from '../math/matrix';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
 
@@ -34,14 +35,53 @@ import {DataElement} from '../dicom/dataElement';
 export class ImageFactory {
 
   /**
+   * Possible warning created by checkElements.
+   *
+   * @type {string|undefined}
+   */
+  #warning;
+
+  /**
+   * The PET SUV factor.
+   *
+   * @type {number|undefined}
+   */
+  #suvFactor;
+
+  /**
+   * Get a warning string if elements are not as expected.
+   * Created by checkElements.
+   *
+   * @returns {string|undefined} The warning.
+   */
+  getWarning() {
+    return this.#warning;
+  }
+
+  /**
    * Check dicom elements. Throws an error if not suitable.
    *
    * @param {DataElements} dataElements The DICOM data elements.
-   * @returns {object|undefined} A possible warning.
+   * @returns {string|undefined} A possible warning.
    */
   checkElements(dataElements) {
+    // reset
+    this.#warning = undefined;
     // will throw if columns or rows is not defined
     getImage2DSize(dataElements);
+    // check PET SUV
+    let modality;
+    const element = dataElements['00080060'];
+    if (typeof element !== 'undefined') {
+      modality = element.value[0];
+      if (modality === 'PT') {
+        const suvFactor = getSuvFactor(dataElements);
+        this.#suvFactor = suvFactor.value;
+        this.#warning = suvFactor.warning;
+      }
+    }
+
+    return this.#warning;
   }
 
   /**
@@ -58,10 +98,13 @@ export class ImageFactory {
     const size2D = getImage2DSize(dataElements);
     const sizeValues = [size2D[0], size2D[1], 1];
 
-    // frames
-    const frames = dataElements['00280008'];
-    if (frames) {
-      sizeValues.push(frames.value[0]);
+    // NumberOfFrames
+    const numberOfFramesEl = dataElements['00280008'];
+    if (typeof numberOfFramesEl !== 'undefined') {
+      const number = parseInt(numberOfFramesEl.value[0], 10);
+      if (number > 1) {
+        sizeValues.push(number);
+      }
     }
 
     // image size
@@ -88,28 +131,8 @@ export class ImageFactory {
       ];
     }
 
-    // slice orientation (cosines are matrices' columns)
-    // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
-    const imageOrientationPatient = dataElements['00200037'];
-    let orientationMatrix;
-    if (typeof imageOrientationPatient !== 'undefined') {
-      const rowCosines = new Vector3D(
-        parseFloat(imageOrientationPatient.value[0]),
-        parseFloat(imageOrientationPatient.value[1]),
-        parseFloat(imageOrientationPatient.value[2]));
-      const colCosines = new Vector3D(
-        parseFloat(imageOrientationPatient.value[3]),
-        parseFloat(imageOrientationPatient.value[4]),
-        parseFloat(imageOrientationPatient.value[5]));
-      const normal = rowCosines.crossProduct(colCosines);
-      /* eslint-disable array-element-newline */
-      orientationMatrix = new Matrix33([
-        rowCosines.getX(), colCosines.getX(), normal.getX(),
-        rowCosines.getY(), colCosines.getY(), normal.getY(),
-        rowCosines.getZ(), colCosines.getZ(), normal.getZ()
-      ]);
-      /* eslint-enable array-element-newline */
-    }
+    // Image orientation patient
+    const orientationMatrix = getOrientationMatrix(dataElements);
 
     // geometry
     const origin = new Point3D(
@@ -187,48 +210,87 @@ export class ImageFactory {
         intercept = value;
       }
     }
-    const rsi = new RescaleSlopeAndIntercept(slope, intercept);
-    image.setRescaleSlopeAndIntercept(rsi);
 
     // meta information
     const meta = {
       numberOfFiles: numberOfFiles
     };
+
+    // Modality
     const modality = dataElements['00080060'];
     if (typeof modality !== 'undefined') {
       meta.Modality = modality.value[0];
     }
-    const sopClassUID = dataElements['00080016'];
-    if (typeof sopClassUID !== 'undefined') {
-      meta.SOPClassUID = sopClassUID.value[0];
+
+    // PET SUV
+    let isPetWithSuv = false;
+    let intensityFactor = 1;
+    if (typeof this.#suvFactor !== 'undefined') {
+      isPetWithSuv = true;
+      intensityFactor = this.#suvFactor;
+      logger.info('Applying PET SUV calibration: ' + intensityFactor);
+      slope *= intensityFactor;
+      intercept *= intensityFactor;
     }
-    const studyUID = dataElements['0020000D'];
-    if (typeof studyUID !== 'undefined') {
-      meta.StudyInstanceUID = studyUID.value[0];
-    }
-    const seriesUID = dataElements['0020000E'];
-    if (typeof seriesUID !== 'undefined') {
-      meta.SeriesInstanceUID = seriesUID.value[0];
-    }
-    const bits = dataElements['00280101'];
-    if (typeof bits !== 'undefined') {
-      meta.BitsStored = bits.value[0];
-    }
-    const pixelRep = dataElements['00280103'];
-    if (typeof pixelRep !== 'undefined') {
-      meta.PixelRepresentation = pixelRep.value[0];
-    }
+    const rsi = new RescaleSlopeAndIntercept(slope, intercept);
+    image.setRescaleSlopeAndIntercept(rsi);
+
+    const safeGet = function (key) {
+      let res;
+      const element = dataElements[key];
+      if (typeof element !== 'undefined') {
+        res = element.value[0];
+      }
+      return res;
+    };
+
+    // defaults
+    meta.TransferSyntaxUID = safeGet('00020010');
+    meta.MediaStorageSOPClassUID = safeGet('00020002');
+    meta.SOPClassUID = safeGet('00080016');
+    meta.Modality = safeGet('00080060');
+    meta.ImageType = safeGet('00080008');
+    meta.SamplesPerPixel = safeGet('00280002');
+    meta.PhotometricInterpretation = safeGet('00280004');
+    meta.PixelRepresentation = safeGet('00280103');
+    meta.BitsAllocated = safeGet('00280100');
+    meta.BitsStored = safeGet('00280101');
+    meta.HighBit = safeGet('00280102');
+
+    // Study
+    meta.StudyDate = safeGet('00080020');
+    meta.StudyTime = safeGet('00080030');
+    meta.StudyInstanceUID = safeGet('0020000D');
+    meta.StudyID = safeGet('00200010');
+    // Series
+    meta.SeriesInstanceUID = safeGet('0020000E');
+    meta.SeriesNumber = safeGet('00200011');
+    // ReferringPhysicianName
+    meta.ReferringPhysicianName = safeGet('00080090');
+    // patient info
+    meta.PatientName = safeGet('00100010');
+    meta.PatientID = safeGet('00100020');
+    meta.PatientBirthDate = safeGet('00100030');
+    meta.PatientSex = safeGet('00100040');
+    // General Equipment Module
+    meta.Manufacturer = safeGet('00080070');
+    meta.ManufacturerModelName = safeGet('00081090');
+    meta.DeviceSerialNumber = safeGet('00181000');
+    meta.SoftwareVersions = safeGet('00181020');
+
+    meta.ImageOrientationPatient = safeGet('00200037');
+    meta.FrameOfReferenceUID = safeGet('00200052');
+
     // PixelRepresentation -> is signed
     meta.IsSigned = meta.PixelRepresentation === 1;
     // local pixel unit
-    const pixelUnit = getPixelUnit(dataElements);
-    if (typeof pixelUnit !== 'undefined') {
-      meta.pixelUnit = pixelUnit;
-    }
-    // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dataElements['00200052'];
-    if (typeof frameOfReferenceUID !== 'undefined') {
-      meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
+    if (isPetWithSuv) {
+      meta.pixelUnit = 'SUV';
+    } else {
+      const pixelUnit = getPixelUnit(dataElements);
+      if (typeof pixelUnit !== 'undefined') {
+        meta.pixelUnit = pixelUnit;
+      }
     }
     // window level presets
     const windowPresets = {};
@@ -240,7 +302,7 @@ export class ImageFactory {
       let name;
       for (let j = 0; j < windowCenter.value.length; ++j) {
         const center = parseFloat(windowCenter.value[j]);
-        const width = parseFloat(windowWidth.value[j]);
+        let width = parseFloat(windowWidth.value[j]);
         if (center && width && width !== 0) {
           name = '';
           if (typeof windowCWExplanation !== 'undefined') {
@@ -249,8 +311,15 @@ export class ImageFactory {
           if (name === '') {
             name = 'Default' + j;
           }
+          width *= intensityFactor;
+          if (width < 1) {
+            width = 1;
+          }
           windowPresets[name] = {
-            wl: [new WindowCenterAndWidth(center, width)],
+            wl: [new WindowLevel(
+              center * intensityFactor,
+              width
+            )],
             name: name
           };
         }
@@ -263,13 +332,20 @@ export class ImageFactory {
 
     // PALETTE COLOR luts
     if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
+      // Red Palette Color Lookup Table Data
       const redLutElement = dataElements['00281201'];
+      // Green Palette Color Lookup Table Data
       const greenLutElement = dataElements['00281202'];
+      // Blue Palette Color Lookup Table Data
       const blueLutElement = dataElements['00281203'];
       let redLut;
       let greenLut;
       let blueLut;
       // check red palette descriptor (should all be equal)
+      // Red Palette Color Lookup Table Descriptor
+      // 0: number of entries in the lookup table
+      // 1: first input value mapped
+      // 2: number of bits for each entry in the Lookup Table Data (8 or 16)
       const descriptor = dataElements['00281101'];
       if (typeof descriptor !== 'undefined' &&
         descriptor.value.length === 3) {
@@ -287,6 +363,7 @@ export class ImageFactory {
             descSize = 65536;
           }
           // red palette VL
+          // TODO vl is undefined, find info elsewhere...
           const vlSize = redLutElement.vl;
           // check double size
           if (vlSize !== 2 * descSize) {
@@ -320,17 +397,17 @@ export class ImageFactory {
             'Scaling 16bits color lut since the lut descriptor is 8.');
           let clone = redLutElement.value.slice(0);
           // @ts-expect-error
-          redLut = new Uint8Array(clone.buffer);
+          redLut = Array.from(new Uint8Array(clone.buffer));
           clone = greenLutElement.value.slice(0);
           // @ts-expect-error
-          greenLut = new Uint8Array(clone.buffer);
+          greenLut = Array.from(new Uint8Array(clone.buffer));
           clone = blueLutElement.value.slice(0);
           // @ts-expect-error
-          blueLut = new Uint8Array(clone.buffer);
+          blueLut = Array.from(new Uint8Array(clone.buffer));
         }
       }
       // set the palette
-      meta.paletteLut = {
+      luts['palette'] = {
         red: redLut,
         green: greenLut,
         blue: blueLut

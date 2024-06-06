@@ -1,9 +1,10 @@
 import {View} from './view';
 import {luts} from './luts';
 import {
-  WindowCenterAndWidth,
+  WindowLevel,
   defaultPresets
-} from './windowCenterAndWidth';
+} from './windowLevel';
+import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -29,11 +30,12 @@ export class ViewFactory {
 
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
-      view.setDefaultColourMap(luts.invPlain);
+      view.setColourMap('invPlain');
     } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      const paletteLut = image.getMeta().paletteLut;
-      if (typeof (paletteLut) !== 'undefined') {
-        view.setDefaultColourMap(paletteLut);
+      if (typeof luts['palette'] !== 'undefined') {
+        view.setColourMap('palette');
+      } else {
+        logger.warn('Cannot find Palette lut');
       }
     }
 
@@ -55,7 +57,7 @@ export class ViewFactory {
       for (const key in defaultPresets[modality]) {
         const preset = defaultPresets[modality][key];
         windowPresets[key] = {
-          wl: [new WindowCenterAndWidth(preset.center, preset.width)],
+          wl: [new WindowLevel(preset.center, preset.width)],
           name: key
         };
       }

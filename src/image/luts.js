@@ -8,7 +8,7 @@ const lut_range_max = 256;
  * Build a LUT of size lut_range_max.
  *
  * @param {Function} func The i to lut function.
- * @returns {Array} The LUT.
+ * @returns {number[]} The LUT.
  */
 function buildLut(func) {
   const lut = [];
@@ -33,9 +33,9 @@ function toMaxFirstThird(i) {
 }
 
 /**
- * Ramp to lut_range_max minus one on the second third values.
- *  otherwise return 0 for the first third and
- *  lut_range_max minus one for the last third.
+ * Ramp to lut_range_max minus one on the second third values,
+ *   otherwise return 0 for the first third and
+ *   lut_range_max minus one for the last third.
  *
  * @param {number} i The input index.
  * @returns {number} The lut value.
@@ -53,8 +53,8 @@ function toMaxSecondThird(i) {
 }
 
 /**
- * Ramp to lut_range_max minus one on the last third values.
- *  otherwise return 0.
+ * Ramp to lut_range_max minus one on the last third values,
+ *   otherwise return 0.
  *
  * @param {number} i The input index.
  * @returns {number} The lut value.
@@ -93,7 +93,7 @@ function invId(i) {
 
 /**
  * Colour map: red, green and blue components
- * to associate with intensity values.
+ *   to associate with intensity values.
  */
 export class ColourMap {
   /**

@@ -17,14 +17,14 @@ export class UrlsLoader {
   /**
    * Input data.
    *
-   * @type {Array}
+   * @type {string[]}
    */
   #inputData = null;
 
   /**
    * Array of launched requests.
    *
-   * @type {Array}
+   * @type {XMLHttpRequest[]}
    */
   #requests = [];
 
@@ -84,7 +84,7 @@ export class UrlsLoader {
   /**
    * Store the current input.
    *
-   * @param {object} data The input data.
+   * @param {string[]} data The input data.
    */
   #storeInputData(data) {
     this.#inputData = data;
@@ -101,7 +101,7 @@ export class UrlsLoader {
   /**
    * Store a launched request.
    *
-   * @param {object} request The launched request.
+   * @param {XMLHttpRequest} request The launched request.
    */
   #storeRequest(request) {
     this.#requests.push(request);
@@ -141,8 +141,8 @@ export class UrlsLoader {
   #addLoad = (_event) => {
     this.#nLoad++;
     // call onload when all is loaded
-    // (not using the input event since it is not the
-    //   general load)
+    // (not using the input event since it is
+    //   an individual load)
     if (this.#nLoad === this.#inputData.length) {
       this.onload({
         source: this.#inputData
@@ -159,10 +159,9 @@ export class UrlsLoader {
   #addLoadend = (_event) => {
     this.#nLoadend++;
     // call onloadend when all is run
-    // (not using the input event since it is not the
-    //   general load end)
-    // x2 to count for request + load
-    if (this.#nLoadend === 2 * this.#inputData.length) {
+    // (not using the input event since it is
+    //   an individual load end)
+    if (this.#nLoadend === this.#inputData.length) {
       this.onloadend({
         source: this.#inputData
       });
@@ -191,7 +190,7 @@ export class UrlsLoader {
   /**
    * Load a list of URLs or a DICOMDIR.
    *
-   * @param {Array} data The list of urls to load.
+   * @param {string[]} data The list of urls to load.
    * @param {object} [options] Load options.
    */
   load(data, options) {
@@ -214,7 +213,7 @@ export class UrlsLoader {
    * Get a load handler for a data element.
    *
    * @param {object} loader The associated loader.
-   * @param {object} dataElement The data element.
+   * @param {string} dataElement The data element.
    * @param {number} i The index of the element.
    * @returns {eventFn} A load handler.
    */
@@ -242,12 +241,12 @@ export class UrlsLoader {
   /**
    * Load a list of urls.
    *
-   * @param {Array} data The list of urls to load.
+   * @param {string[]} data The list of urls to load.
    * @param {object} [options] The options object, can contain:
-   *  - requestHeaders: an array of {name, value} to use as request headers
-   *  - withCredentials: boolean xhr.withCredentials flag to pass
-   *    to the request
-   *  - batchSize: the size of the request url batch
+   * - requestHeaders: an array of {name, value} to use as request headers,
+   * - withCredentials: boolean xhr.withCredentials flag to pass
+   *   to the request,
+   * - batchSize: the size of the request url batch.
    */
   #loadUrls(data, options) {
     // check input
@@ -301,7 +300,6 @@ export class UrlsLoader {
     // store last run request index
     let lastRunRequestIndex = 0;
     const requestOnLoadEnd = () => {
-      this.#addLoadend();
       // launch next in queue
       if (lastRunRequestIndex < this.#requests.length - 1 && !this.#aborting) {
         ++lastRunRequestIndex;
@@ -320,8 +318,9 @@ export class UrlsLoader {
       /**
        * The http request.
        *
+       * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest}.
+       *
        * @external XMLHttpRequest
-       * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
        */
       const request = new XMLHttpRequest();
       request.open('GET', dataElement, true);
@@ -352,8 +351,18 @@ export class UrlsLoader {
         mproghandler.getMonoProgressHandler(i, 0), dataElement);
       request.onload = this.#getLoadHandler(loader, dataElement, i);
       request.onloadend = requestOnLoadEnd;
-      request.onerror = this.#augmentCallbackEvent(this.onerror, dataElement);
-      request.onabort = this.#augmentCallbackEvent(this.onabort, dataElement);
+      const errorCallback =
+        this.#augmentCallbackEvent(this.onerror, dataElement);
+      request.onerror = (event) => {
+        this.#addLoadend();
+        errorCallback(event);
+      };
+      const abortCallback =
+        this.#augmentCallbackEvent(this.onabort, dataElement);
+      request.onabort = (event) => {
+        this.#addLoadend();
+        abortCallback(event);
+      };
       // response type (default is 'text')
       if (loader.loadUrlAs() === urlContentTypes.ArrayBuffer) {
         request.responseType = 'arraybuffer';

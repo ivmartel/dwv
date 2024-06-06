@@ -31,7 +31,7 @@ let _dicomFile = null;
 let _dicomElements = null;
 
 /**
- * Handle DICOM file load
+ * Handle DICOM file load.
  *
  * @param {object} event The onload event.
  */
@@ -47,7 +47,7 @@ function onLoadDICOMFile(event) {
 }
 
 /**
- * Generate DICOM data
+ * Generate DICOM data.
  */
 function generate() {
   // check validity
@@ -56,7 +56,10 @@ function generate() {
   }
   // create writer with textarea rules
   const writer = new dwv.DicomWriter();
-  writer.setRules(JSON.parse(document.getElementById('rules').value));
+  const addMissingTags = true;
+  writer.setRules(
+    JSON.parse(document.getElementById('rules').value),
+    addMissingTags);
   let dicomBuffer = null;
   try {
     dicomBuffer = writer.getBuffer(_dicomElements);
@@ -106,7 +109,7 @@ function isValidRules() {
 }
 
 /**
- * open JSONLint to check the rules
+ * Open JSONLint to check the rules.
  */
 function launchJSONLint() {
   const text = document.getElementById('rules').value;
@@ -115,7 +118,7 @@ function launchJSONLint() {
 }
 
 /**
- * handle input DICOM file
+ * Handle input DICOM file.
  *
  * @param {object} event The input field event.
  */
@@ -130,7 +133,7 @@ function onInputDICOMFile(event) {
 }
 
 /**
- *  handle input rules file
+ * Handle input rules file.
  *
  * @param {object} event The input field event.
  */

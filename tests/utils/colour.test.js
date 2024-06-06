@@ -15,8 +15,7 @@ import {
 /**
  * Tests for the 'utils/colour' file.
  */
-/** @module tests/utils */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('utils');
 
@@ -34,9 +33,9 @@ const isSimilar = function (a, b, tol) {
 /**
  * Tests for {@link isEqualRgb}.
  *
- * @function module:tests/utils~isEqualRgb
+ * @function module:tests/utils~isequalrgb
  */
-QUnit.test('Test isEqualRgb.', function (assert) {
+QUnit.test('isEqualRgb', function (assert) {
   const rgb00 = {r: 0, g: 0, b: 0};
   let rgb01;
   assert.ok(!isEqualRgb(rgb00, rgb01), 'equal undefined #0');
@@ -66,9 +65,9 @@ QUnit.test('Test isEqualRgb.', function (assert) {
 /**
  * Tests for {@link ybrToRgb}.
  *
- * @function module:tests/utils~ybrToRgb
+ * @function module:tests/utils~ybrtorgb
  */
-QUnit.test('Test ybrToRgb.', function (assert) {
+QUnit.test('ybrToRgb', function (assert) {
   const rgb00 = ybrToRgb(0, 0, 0);
   assert.equal(rgb00.r, -179.456, 'ybr 0,0,0: red');
   assert.ok(isSimilar(rgb00.g, 135.459839), 'ybr 0,0,0: green');
@@ -88,9 +87,9 @@ QUnit.test('Test ybrToRgb.', function (assert) {
 /**
  * Tests for {@link hexToRgb}.
  *
- * @function module:tests/utils~hexToRgb
+ * @function module:tests/utils~hextorgb
  */
-QUnit.test('Test hexToRgb.', function (assert) {
+QUnit.test('hexToRgb', function (assert) {
   const hex00 = '#000000';
   const rgb00 = hexToRgb(hex00);
   assert.equal(rgb00.r, 0, 'hexToRgb #00: r');
@@ -123,9 +122,9 @@ QUnit.test('Test hexToRgb.', function (assert) {
 /**
  * Tests for {@link isDarkColour}.
  *
- * @function module:tests/utils~isDarkColour
+ * @function module:tests/utils~isdarkcolour
  */
-QUnit.test('Test isDarkColour.', function (assert) {
+QUnit.test('isDarkColour', function (assert) {
   const test00 = isDarkColour('#000000');
   assert.equal(test00, true, 'isDarkColour black');
 
@@ -144,11 +143,12 @@ QUnit.test('Test isDarkColour.', function (assert) {
 
 /**
  * Tests for {@link cielabToCiexyz}.
- * ref: https://www.easyrgb.com/en/convert.php
  *
- * @function module:tests/utils~cielabToCiexyz
+ * Ref: {@link https://www.easyrgb.com/en/convert.php}.
+ *
+ * @function module:tests/utils~cielab-to-ciexyz
  */
-QUnit.test('Test cielab to ciexyz.', function (assert) {
+QUnit.test('cielab to ciexyz', function (assert) {
   const lab00 = {l: 0, a: 0, b: 0};
   const xyz00 = cielabToCiexyz(lab00);
   assert.ok(isSimilar(xyz00.x, 0), 'lab 0,0,0: x');
@@ -164,11 +164,12 @@ QUnit.test('Test cielab to ciexyz.', function (assert) {
 
 /**
  * Tests for {@link ciexyzToCielab}.
- * ref: https://www.easyrgb.com/en/convert.php
  *
- * @function module:tests/utils~ciexyzToCielab
+ * Ref: {@link https://www.easyrgb.com/en/convert.php}.
+ *
+ * @function module:tests/utils~ciexyz-to-cielab
  */
-QUnit.test('Test ciexyz to cielab.', function (assert) {
+QUnit.test('ciexyz to cielab', function (assert) {
   const xyz00 = {x: 0, y: 0, z: 0};
   const lab00 = ciexyzToCielab(xyz00);
   assert.ok(isSimilar(lab00.l, 0), 'xyz 0,0,0: l');
@@ -184,11 +185,12 @@ QUnit.test('Test ciexyz to cielab.', function (assert) {
 
 /**
  * Tests for {@link ciexyzToSrgb}.
- * ref: https://www.easyrgb.com/en/convert.php
  *
- * @function module:tests/utils~ciexyzToSrgb
+ * Ref: {@link https://www.easyrgb.com/en/convert.php}.
+ *
+ * @function module:tests/utils~ciexyz-to-srgb
  */
-QUnit.test('Test ciexyz to srgb.', function (assert) {
+QUnit.test('ciexyz to srgb', function (assert) {
   const xyz00 = {x: 0, y: 0, z: 0};
   const rgb00 = ciexyzToSrgb(xyz00);
   assert.equal(rgb00.r, 0, 'xyz 0,0,0: r');
@@ -204,11 +206,12 @@ QUnit.test('Test ciexyz to srgb.', function (assert) {
 
 /**
  * Tests for {@link srgbToCiexyz}.
- * ref: https://www.easyrgb.com/en/convert.php
  *
- * @function module:tests/utils~srgbToCiexyz
+ * Ref: {@link https://www.easyrgb.com/en/convert.php}.
+ *
+ * @function module:tests/utils~srgb-to-ciexyz
  */
-QUnit.test('Test srgb to ciexyz.', function (assert) {
+QUnit.test('srgb to ciexyz', function (assert) {
   const rgb00 = {r: 0, g: 0, b: 0};
   const xyz00 = srgbToCiexyz(rgb00);
   assert.equal(xyz00.x, 0, 'rgb 0,0,0: x');
@@ -225,11 +228,12 @@ QUnit.test('Test srgb to ciexyz.', function (assert) {
 
 /**
  * Tests for {@link cielabToSrgb}.
- * ref: https://www.easyrgb.com/en/convert.php
  *
- * @function module:tests/utils~cielabToSrgb
+ * Ref: {@link https://www.easyrgb.com/en/convert.php}.
+ *
+ * @function module:tests/utils~cielab-to-srgb
  */
-QUnit.test('Test cielab to rgb.', function (assert) {
+QUnit.test('cielab to rgb', function (assert) {
   const lab00 = {l: 0, a: 0, b: 0};
   const rgb00 = cielabToSrgb(lab00);
   assert.equal(rgb00.r, 0, 'lab 0,0,0: r');
@@ -245,11 +249,12 @@ QUnit.test('Test cielab to rgb.', function (assert) {
 
 /**
  * Tests for {@link srgbToCielab}.
- * ref: https://www.easyrgb.com/en/convert.php
  *
- * @function module:tests/utils~srgbToCielab
+ * Ref: {@link https://www.easyrgb.com/en/convert.php}.
+ *
+ * @function module:tests/utils~srgb-to-cielab
  */
-QUnit.test('Test rgb to cielab.', function (assert) {
+QUnit.test('srgb to cielab', function (assert) {
   const rgb00 = {r: 0, g: 0, b: 0};
   const lab00 = srgbToCielab(rgb00);
   assert.ok(isSimilar(lab00.l, 0), 'rgb 0,0,0: l');

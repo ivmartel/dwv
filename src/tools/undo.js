@@ -21,7 +21,7 @@ export class UndoStack {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 

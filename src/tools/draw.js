@@ -1,6 +1,7 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
-  getEventOffset,
+  getMousePoint,
+  getTouchPoints,
   customUI
 } from '../gui/generic';
 import {Point2D} from '../math/point';
@@ -14,7 +15,6 @@ import {
   MoveGroupCommand
 } from './drawCommands';
 import {
-  canNodeChangeColour,
   isNodeNameShape
 } from '../app/drawController';
 import {ScrollWheel} from './scrollWheel';
@@ -27,6 +27,9 @@ import Konva from 'konva';
 import {App} from '../app/application';
 import {Style} from '../gui/style';
 import {LayerGroup} from '../gui/layerGroup';
+import {Scalar2D} from '../math/scalar';
+import {DrawLayer} from '../gui/drawLayer';
+import {DrawTrash} from './drawTrash';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -37,22 +40,24 @@ export const DRAW_DEBUG = false;
 /**
  * Drawing tool.
  *
- * This tool is responsible for the draw layer group structure. The layout is:
+ * This tool is responsible for the draw of layer group structure.
  *
+ * ```
  * drawLayer
- * |_ positionGroup: name="position-group", id="#2-0#_#3-1""
- *    |_ shapeGroup: name="{shape name}-group", id="#"
- *       |_ shape: name="shape"
- *       |_ label: name="label"
+ * |_ positionGroup: {name="position-group", id="#2-0#_#3-1"}
+ *    |_ shapeGroup: {name="{shape name}-group", id="#"}
+ *       |_ shape: {name="shape"},
+ *       |_ label: {name="label"},
  *       |_ extra: line tick, protractor arc...
+ * ```
  *
  * Discussion:
- * - posGroup > shapeGroup
- *    pro: slice/frame display: 1 loop
- *    cons: multi-slice shape splitted in positionGroups
- * - shapeGroup > posGroup
- *    pros: more logical
- *    cons: slice/frame display: 2 loops
+ * - posGroup > shapeGroup:
+ *   (pro) slice/frame display: 1 loop -
+ *   (cons) multi-slice shape splitted in positionGroups.
+ * - shapeGroup > posGroup:
+ *   (pros) more logical -
+ *   (cons) slice/frame display: 2 loops.
  */
 export class Draw {
 
@@ -73,14 +78,14 @@ export class Draw {
   /**
    * Shape editor.
    *
-   * @type {object}
+   * @type {ShapeEditor}
    */
   #shapeEditor;
 
   /**
    * Trash draw: a cross.
    *
-   * @type {object}
+   * @type {DrawTrash}
    */
   #trash;
 
@@ -90,6 +95,13 @@ export class Draw {
    * @type {Style}
    */
   #style;
+
+  /**
+   * Callback store to allow attach/detach.
+   *
+   * @type {Array}
+   */
+  #callbackStore = [];
 
   /**
    * @param {App} app The associated application.
@@ -103,23 +115,7 @@ export class Draw {
     this.#shapeEditor.setDrawEventCallback(this.#fireEvent);
 
     this.#style = app.getStyle();
-
-    // trash cross
-    this.#trash = new Konva.Group();
-    // first line of the cross
-    const trashLine1 = new Konva.Line({
-      points: [-10, -10, 10, 10],
-      stroke: 'red'
-    });
-    // second line of the cross
-    const trashLine2 = new Konva.Line({
-      points: [10, -10, -10, 10],
-      stroke: 'red'
-    });
-    this.#trash.width(20);
-    this.#trash.height(20);
-    this.#trash.add(trashLine1);
-    this.#trash.add(trashLine2);
+    this.#trash = new DrawTrash();
   }
 
   /**
@@ -127,10 +123,10 @@ export class Draw {
    *
    * @type {boolean}
    */
-  #started = false;
+  #isDrawing = false;
 
   /**
-   * Shape factory list
+   * Shape factory list.
    *
    * @type {object}
    */
@@ -142,13 +138,6 @@ export class Draw {
    * @type {object}
    */
   #currentFactory = null;
-
-  /**
-   * Draw command.
-   *
-   * @type {object}
-   */
-  #command = null;
 
   /**
    * Current shape group.
@@ -167,21 +156,21 @@ export class Draw {
   /**
    * List of points.
    *
-   * @type {Array}
+   * @type {Point2D[]}
    */
   #points = [];
 
   /**
    * Last selected point.
    *
-   * @type {object}
+   * @type {Point2D}
    */
   #lastPoint = null;
 
   /**
    * Active shape, ie shape with mouse over.
    *
-   * @type {object}
+   * @type {Konva.Group}
    */
   #activeShapeGroup;
 
@@ -200,113 +189,165 @@ export class Draw {
   #mouseOverCursor = 'pointer';
 
   /**
+   * With scroll flag.
+   *
+   * @type {boolean}
+   */
+  #withScroll = true;
+
+  /**
+   * Auto shape colour: will use defaults colours and
+   * vary them according to the layer.
+   *
+   * @type {boolean}
+   */
+  #autoShapeColour = true;
+
+  /**
    * Event listeners.
    */
   #listeners = {};
 
   /**
-   * Handle mouse down event.
+   * Flag to know if the last added point was made by mouse move.
    *
-   * @param {object} event The mouse down event.
+   * @type {boolean}
    */
-  mousedown = (event) => {
-    // exit if a draw was started (handle at mouse move or up)
-    if (this.#started) {
-      return;
-    }
+  #lastIsMouseMovePoint = false;
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  /**
+   * Start tool interaction.
+   *
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
+   */
+  #switchEditOrCreateShapeGroup(point, divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const drawLayer = layerGroup.getActiveDrawLayer();
+    const stage = drawLayer.getKonvaStage();
 
     // determine if the click happened in an existing shape
-    const stage = drawLayer.getKonvaStage();
     const kshape = stage.getIntersection({
-      x: event._x,
-      y: event._y
+      x: point.getX(),
+      y: point.getY()
     });
 
     // update scale
     this.#style.setZoomScale(stage.scale());
 
+    // If shape exists, let user to edit
     if (kshape) {
-      const group = kshape.getParent();
-      const selectedShape = group.find('.shape')[0];
-      // reset editor if click on other shape
-      // (and avoid anchors mouse down)
-      if (selectedShape && selectedShape !== this.#shapeEditor.getShape()) {
-        this.#shapeEditor.disable();
-        this.#shapeEditor.setShape(selectedShape);
-        const viewController =
-          layerGroup.getActiveViewLayer().getViewController();
-        this.#shapeEditor.setViewController(viewController);
-        this.#shapeEditor.enable();
-      }
-    } else {
-      // disable edition
-      this.#shapeEditor.disable();
-      this.#shapeEditor.setShape(null);
-      this.#shapeEditor.setViewController(null);
-      // start storing points
-      this.#started = true;
-      // set factory
-      this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
-      // clear array
-      this.#points = [];
-      // store point
-      const viewLayer = layerGroup.getActiveViewLayer();
-      const pos = viewLayer.displayToPlanePos(event._x, event._y);
-      this.#lastPoint = new Point2D(pos.x, pos.y);
-      this.#points.push(this.#lastPoint);
-    }
-  };
-
-  /**
-   * Handle mouse move event.
-   *
-   * @param {object} event The mouse move event.
-   */
-  mousemove = (event) => {
-    // exit if not started draw
-    if (!this.#started) {
+      this.#selectShapeGroup(layerGroup, drawLayer, kshape);
       return;
     }
+    // Else, is a new shape creation
+    this.#startShapeGroupCreation(layerGroup, point);
+  }
 
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  /**
+   * Initializes the new shape creation:
+   * - Updates the started variable,
+   * - Gets the factory,
+   * - Initializes the points array.
+   *
+   * @param {LayerGroup} layerGroup The layer group where the user clicks.
+   * @param {Point2D} point The start point where the user clicks.
+   */
+  #startShapeGroupCreation(layerGroup, point) {
+    // disable edition
+    this.#shapeEditor.disable();
+    this.#shapeEditor.reset();
+    this.#setToDrawingState();
+    // store point
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(event._x, event._y);
+    this.#lastPoint = viewLayer.displayToPlanePos(point);
+    this.#points.push(this.#lastPoint);
+  }
+
+  /**
+   * Sets the variables to drawing state:
+   * - Updates is drawing variable,
+   * - Initializes the current factory,
+   * - Resets points.
+   */
+  #setToDrawingState() {
+    // start storing points
+    this.#isDrawing = true;
+    // set factory
+    this.#currentFactory = new this.#shapeFactoryList[this.#shapeName]();
+    // clear array
+    this.#points = [];
+  }
+
+  /**
+   * Resets the variables to not drawing state:
+   * - Destroys tmp shape group,
+   * - Updates is drawing variable,
+   * - Resets points.
+   */
+  #setToNotDrawingState() {
+    this.#isDrawing = false;
+    this.#points = [];
+  }
+
+  /**
+   * Selects a shape group.
+   *
+   * @param {LayerGroup} layerGroup The layer group where the user clicks.
+   * @param {DrawLayer} drawLayer The draw layer where to draw.
+   * @param {Konva.Shape} kshape The shape that has been selected.
+   */
+  #selectShapeGroup(layerGroup, drawLayer, kshape) {
+    const group = kshape.getParent();
+    const selectedShape = group.find('.shape')[0];
+    // reset editor if click on other shape
+    // (and avoid anchors mouse down)
+    if (selectedShape &&
+        selectedShape instanceof Konva.Shape &&
+        selectedShape !== this.#shapeEditor.getShape()) {
+      this.#shapeEditor.disable();
+      const viewController =
+          layerGroup.getActiveViewLayer().getViewController();
+      this.#shapeEditor.setShape(selectedShape, drawLayer, viewController);
+      this.#shapeEditor.enable();
+    }
+  }
+
+  /**
+   * Update tool interaction.
+   *
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
+   */
+  #updateShapeGroupCreation(point, divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const pos = viewLayer.displayToPlanePos(point);
 
     // draw line to current pos
-    if (Math.abs(pos.x - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.y - this.#lastPoint.getY()) > 0) {
-      // clear last added point from the list (but not the first one)
-      // if it was marked as temporary
-      if (this.#points.length !== 1 &&
-        typeof this.#points[this.#points.length - 1].tmp !== 'undefined') {
+    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
+      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
+      // clear last mouse move point
+      if (this.#lastIsMouseMovePoint) {
         this.#points.pop();
       }
       // current point
-      this.#lastPoint = new Point2D(pos.x, pos.y);
+      this.#lastPoint = pos;
       // mark it as temporary
-      this.#lastPoint.tmp = true;
+      this.#lastIsMouseMovePoint = true;
       // add it to the list
       this.#points.push(this.#lastPoint);
       // update points
       this.#onNewPoints(this.#points, layerGroup);
     }
-  };
+  }
 
   /**
-   * Handle mouse up event.
+   * Finish tool interaction.
    *
-   * @param {object} event The mouse up event.
+   * @param {string} divId The layer group divId.
    */
-  mouseup = (event) => {
-    // exit if not started draw
-    if (!this.#started) {
-      return;
-    }
+  #finishShapeGroupCreation(divId) {
     // exit if no points
     if (this.#points.length === 0) {
       logger.warn('Draw mouseup but no points...');
@@ -316,18 +357,58 @@ export class Draw {
     // do we have all the needed points
     if (this.#points.length === this.#currentFactory.getNPoints()) {
       // store points
-      const layerDetails = getLayerDetailsFromEvent(event);
       const layerGroup =
-        this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+        this.#app.getLayerGroupByDivId(divId);
       this.#onFinalPoints(this.#points, layerGroup);
-      // reset flag
-      this.#started = false;
-    } else {
-      // remove temporary flag
-      if (typeof this.#points[this.#points.length - 1].tmp !== 'undefined') {
-        delete this.#points[this.#points.length - 1].tmp;
-      }
+      this.#setToNotDrawingState();
     }
+
+    // reset mouse move point flag
+    this.#lastIsMouseMovePoint = false;
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    // exit if not started draw
+    if (this.#isDrawing) {
+      return;
+    }
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#switchEditOrCreateShapeGroup(mousePoint, layerDetails.groupDivId);
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  mousemove = (event) => {
+    // exit if not started draw
+    if (!this.#isDrawing) {
+      return;
+    }
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#updateShapeGroupCreation(mousePoint, layerDetails.groupDivId);
+  };
+
+  /**
+   * Handle mouse up event.
+   *
+   * @param {object} event The mouse up event.
+   */
+  mouseup = (event) => {
+    // exit if not started draw
+    if (!this.#isDrawing) {
+      return;
+    }
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#finishShapeGroupCreation(layerDetails.groupDivId);
   };
 
   /**
@@ -341,7 +422,7 @@ export class Draw {
       return;
     }
     // exit if not started draw
-    if (!this.#started) {
+    if (!this.#isDrawing) {
       return;
     }
     // exit if no points
@@ -354,8 +435,7 @@ export class Draw {
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     this.#onFinalPoints(this.#points, layerGroup);
-    // reset flag
-    this.#started = false;
+    this.#setToNotDrawingState();
   };
 
   /**
@@ -364,7 +444,12 @@ export class Draw {
    * @param {object} event The mouse out event.
    */
   mouseout = (event) => {
-    this.mouseup(event);
+    // exit if not started draw
+    if (!this.#isDrawing) {
+      return;
+    }
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#finishShapeGroupCreation(layerDetails.groupDivId);
   };
 
   /**
@@ -373,7 +458,13 @@ export class Draw {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    this.mousedown(event);
+    // exit if not started draw
+    if (this.#isDrawing) {
+      return;
+    }
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#switchEditOrCreateShapeGroup(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -383,23 +474,25 @@ export class Draw {
    */
   touchmove = (event) => {
     // exit if not started draw
-    if (!this.#started) {
+    if (!this.#isDrawing) {
       return;
     }
 
     const layerDetails = getLayerDetailsFromEvent(event);
+    const touchPoints = getTouchPoints(event);
+
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const pos = viewLayer.displayToPlanePos(event._x, event._y);
+    const pos = viewLayer.displayToPlanePos(touchPoints[0]);
 
-    if (Math.abs(pos.x - this.#lastPoint.getX()) > 0 ||
-      Math.abs(pos.y - this.#lastPoint.getY()) > 0) {
+    if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
+      Math.abs(pos.getY() - this.#lastPoint.getY()) > 0) {
       // clear last added point from the list (but not the first one)
       if (this.#points.length !== 1) {
         this.#points.pop();
       }
       // current point
-      this.#lastPoint = new Point2D(pos.x, pos.y);
+      this.#lastPoint = pos;
       // add current one to the list
       this.#points.push(this.#lastPoint);
       // allow for anchor points
@@ -426,10 +519,12 @@ export class Draw {
   /**
    * Handle mouse wheel event.
    *
-   * @param {object} event The mouse wheel event.
+   * @param {WheelEvent} event The mouse wheel event.
    */
   wheel = (event) => {
-    this.#scrollWhell.wheel(event);
+    if (this.#withScroll) {
+      this.#scrollWhell.wheel(event);
+    }
   };
 
   /**
@@ -439,11 +534,10 @@ export class Draw {
    */
   keydown = (event) => {
     // call app handler if we are not in the middle of a draw
-    if (!this.#started) {
+    if (!this.#isDrawing) {
       event.context = 'Draw';
       this.#app.onKeydown(event);
     }
-    let konvaLayer;
 
     // press delete or backspace key
     if ((event.key === 'Delete' ||
@@ -451,27 +545,26 @@ export class Draw {
       this.#shapeEditor.isActive()) {
       // get shape
       const shapeGroup = this.#shapeEditor.getShape().getParent();
-      konvaLayer = shapeGroup.getLayer();
-      const shapeDisplayName = getShapeDisplayName(
-        shapeGroup.getChildren(isNodeNameShape)[0]);
+      if (!(shapeGroup instanceof Konva.Group)) {
+        return;
+      }
+      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+      if (!(shape instanceof Konva.Shape)) {
+        return;
+      }
       // delete command
-      const delcmd = new DeleteGroupCommand(shapeGroup,
-        shapeDisplayName, konvaLayer);
-      delcmd.onExecute = this.#fireEvent;
-      delcmd.onUndo = this.#fireEvent;
-      delcmd.execute();
-      this.#app.addToUndoStack(delcmd);
+      const drawLayer = this.#app.getActiveLayerGroup().getActiveDrawLayer();
+      this.#emitDeleteCommand(drawLayer, shapeGroup, shape);
     }
 
     // escape key: exit shape creation
     if (event.key === 'Escape' && this.#tmpShapeGroup !== null) {
-      konvaLayer = this.#tmpShapeGroup.getLayer();
+      const konvaLayer = this.#tmpShapeGroup.getLayer();
       // reset temporary shape group
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
-      // reset flag and points
-      this.#started = false;
-      this.#points = [];
+      // set state
+      this.#setToNotDrawingState();
       // redraw
       konvaLayer.draw();
     }
@@ -480,22 +573,38 @@ export class Draw {
   /**
    * Update the current draw with new points.
    *
-   * @param {Array} tmpPoints The array of new points.
+   * @param {Point2D[]} tmpPoints The array of new points.
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #onNewPoints(tmpPoints, layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const konvaLayer = drawLayer.getKonvaLayer();
-
     // remove temporary shape draw
     if (this.#tmpShapeGroup) {
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
     }
 
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const konvaLayer = drawLayer.getKonvaLayer();
+    const viewLayer = layerGroup.getActiveViewLayer();
+
+    // auto mode: vary shape colour with layer id
+    if (this.#autoShapeColour) {
+      const colours = [
+        '#ffff80', '#ff80ff', '#80ffff', '#80ff80', '8080ff', 'ff8080'
+      ];
+      // warning: depends on layer id nomenclature
+      const viewLayerId = viewLayer.getId();
+      const layerId = viewLayerId.substring(viewLayerId.length - 1);
+      // expecting one draw layer per view layer
+      const layerIndex = parseInt(layerId, 10) / 2;
+      const colour = colours[layerIndex];
+      if (typeof colour !== 'undefined') {
+        this.#style.setLineColour(colour);
+      }
+    }
+
     // create shape group
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const viewController = viewLayer.getViewController();
     this.#tmpShapeGroup = this.#currentFactory.create(
       tmpPoints, this.#style, viewController);
     // do not listen during creation
@@ -510,23 +619,22 @@ export class Draw {
   /**
    * Create the final shape from a point list.
    *
-   * @param {Array} finalPoints The array of points.
+   * @param {Point2D[]} finalPoints The array of points.
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #onFinalPoints(finalPoints, layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const konvaLayer = drawLayer.getKonvaLayer();
-
-    // reset temporary shape group
+    // remove temporary shape draw
+    // (has to be done before sending drawcreate event)
     if (this.#tmpShapeGroup) {
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
     }
 
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    const drawController =
-      layerGroup.getActiveDrawLayer().getDrawController();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const konvaLayer = drawLayer.getKonvaLayer();
+    const drawController = drawLayer.getDrawController();
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
 
     // create final shape
     const finalShapeGroup = this.#currentFactory.create(
@@ -540,18 +648,97 @@ export class Draw {
 
     // re-activate layer
     konvaLayer.listening(true);
-    // draw shape command
-    this.#command = new DrawGroupCommand(
-      finalShapeGroup, this.#shapeName, konvaLayer);
-    this.#command.onExecute = this.#fireEvent;
-    this.#command.onUndo = this.#fireEvent;
-    // execute it
-    this.#command.execute();
-    // save it in undo stack
-    this.#app.addToUndoStack(this.#command);
+    this.#emitDrawGroupCommand(drawLayer, finalShapeGroup);
 
     // activate shape listeners
-    this.setShapeOn(finalShapeGroup, layerGroup);
+    this.#addShapeListeners(layerGroup, finalShapeGroup);
+  }
+
+  /**
+   * Create a draw group command, execute it and add
+   *   it to the undo stack.
+   *
+   * @param {DrawLayer} drawLayer The associated layer.
+   * @param {Konva.Group} shapeGroup The shape group to draw.
+   */
+  #emitDrawGroupCommand(drawLayer, shapeGroup) {
+    // draw shape command
+    const command = new DrawGroupCommand(
+      shapeGroup,
+      this.#shapeName,
+      drawLayer
+    );
+    command.onExecute = this.#fireEvent;
+    command.onUndo = this.#fireEvent;
+    // execute it
+    command.execute();
+    // add it to undo stack
+    this.#app.addToUndoStack(command);
+  }
+
+  /**
+   * Create a delete group command, execute it and add
+   *   it to the undo stack.
+   *
+   * @param {DrawLayer} drawLayer The associated layer.
+   * @param {Konva.Group} shapeGroup The shape group to delete.
+   * @param {Konva.Shape} shape The shape to delete.
+   */
+  #emitDeleteCommand(drawLayer, shapeGroup, shape) {
+    const shapeDisplayName = getShapeDisplayName(shape);
+    // delete command
+    const delcmd = new DeleteGroupCommand(
+      shapeGroup,
+      shapeDisplayName,
+      drawLayer
+    );
+    delcmd.onExecute = this.#fireEvent;
+    delcmd.onUndo = this.#fireEvent;
+    // execute it
+    delcmd.execute();
+    // add it to undo stack
+    this.#app.addToUndoStack(delcmd);
+  }
+
+  /**
+   * Create a move group command and add
+   *   it to the undo stack. To no execute it.
+   *
+   * @param {DrawLayer} drawLayer The associated layer.
+   * @param {Konva.Group} shapeGroup The shape group to move.
+   * @param {Konva.Shape} shape The shape to move.
+   * @param {object} translation The move translation as {x,y}.
+   */
+  #storeMoveCommand(drawLayer, shapeGroup, shape, translation) {
+    const shapeDisplayName = getShapeDisplayName(shape);
+    const mvcmd = new MoveGroupCommand(
+      shapeGroup,
+      shapeDisplayName,
+      translation,
+      drawLayer
+    );
+    mvcmd.onExecute = this.#fireEvent;
+    mvcmd.onUndo = this.#fireEvent;
+    // add it to undo stack
+    this.#app.addToUndoStack(mvcmd);
+  }
+
+  /**
+   * Get a layerGroup position callback.
+   *
+   * TODO: check needo for store item removal.
+   *
+   * @param {LayerGroup} layerGroup The origin layer group.
+   * @returns {Function} The layerGroup position callback.
+   */
+  #getPositionCallback(layerGroup) {
+    const divId = layerGroup.getDivId();
+    if (typeof this.#callbackStore[divId] === 'undefined') {
+      this.#callbackStore[divId] = () => {
+        this.#updateDrawLayer(layerGroup);
+      };
+    }
+    return this.#callbackStore[divId];
   }
 
   /**
@@ -562,30 +749,30 @@ export class Draw {
   activate(flag) {
     // reset shape display properties
     this.#shapeEditor.disable();
-    this.#shapeEditor.setShape(null);
-    this.#shapeEditor.setViewController(null);
+    this.#shapeEditor.reset();
     // get the current draw layer
     const layerGroup = this.#app.getActiveLayerGroup();
+    if (typeof layerGroup === 'undefined') {
+      throw new Error('No active layerGroup to activate draw on');
+    }
     this.#activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
       // store cursor
       this.#originalCursor = document.body.style.cursor;
       // TODO: merge with drawController.activateDrawLayer?
-      this.#app.addEventListener('positionchange', () => {
-        this.#updateDrawLayer(layerGroup);
-      });
-      // same for colour
-      this.setFeatures({lineColour: this.#style.getLineColour()});
+      this.#app.addEventListener('positionchange',
+        this.#getPositionCallback(layerGroup)
+      );
     } else {
       // reset shape and cursor
       this.#resetActiveShapeGroup();
       // reset local var
       this.#originalCursor = undefined;
       // remove listeners
-      this.#app.removeEventListener('positionchange', () => {
-        this.#updateDrawLayer(layerGroup);
-      });
+      this.#app.removeEventListener('positionchange',
+        this.#getPositionCallback(layerGroup)
+      );
     }
   }
 
@@ -606,8 +793,11 @@ export class Draw {
    * @param {LayerGroup} layerGroup The origin layer group.
    */
   #activateCurrentPositionShapes(visible, layerGroup) {
-    const drawController =
-      layerGroup.getActiveDrawLayer().getDrawController();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      return;
+    }
+    const drawController = drawLayer.getDrawController();
 
     // get shape groups at the current position
     const shapeGroups =
@@ -617,16 +807,15 @@ export class Draw {
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach((group) => {
-        this.setShapeOn(group, layerGroup);
+        this.#addShapeListeners(layerGroup, group);
       });
     } else {
       // de-activate shape listeners
       shapeGroups.forEach((group) => {
-        this.#setShapeOff(group);
+        this.#removeShapeListeners(group);
       });
     }
     // draw
-    const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
     if (shapeGroups.length !== 0) {
       konvaLayer.listening(true);
@@ -635,14 +824,13 @@ export class Draw {
   }
 
   /**
-   * Set shape group off properties.
+   * Remove shape group listeners.
    *
-   * @param {object} shapeGroup The shape group to set off.
+   * @param {Konva.Group} shapeGroup The shape group to set off.
    */
-  #setShapeOff(shapeGroup) {
-    // mouse styling
-    shapeGroup.off('mouseover');
-    shapeGroup.off('mouseout');
+  #removeShapeListeners(shapeGroup) {
+    // mouse over
+    this.#removeShapeOverListeners(shapeGroup);
     // drag
     shapeGroup.draggable(false);
     shapeGroup.off('dragstart.draw');
@@ -655,9 +843,9 @@ export class Draw {
    * Get the real position from an event.
    * TODO: use layer method?
    *
-   * @param {object} index The input index as {x,y}.
+   * @param {Scalar2D} index The input index as {x,y}.
    * @param {LayerGroup} layerGroup The origin layer group.
-   * @returns {object} The real position in the image as {x,y}.
+   * @returns {Scalar2D} The real position in the image as {x,y}.
    */
   #getRealPosition(index, layerGroup) {
     const drawLayer = layerGroup.getActiveDrawLayer();
@@ -677,41 +865,75 @@ export class Draw {
     }
     if (typeof this.#activeShapeGroup !== 'undefined') {
       this.#activeShapeGroup.opacity(1);
-      const colour = this.#style.getLineColour();
-      this.#activeShapeGroup.getChildren(canNodeChangeColour).forEach(
-        function (ashape) {
-          ashape.stroke(colour);
-        }
-      );
     }
   }
 
   /**
-   * Set shape group on properties.
+   * Add shape group mouse over and out listeners: updates
+   *   shape group opacity and cursor.
    *
-   * @param {object} shapeGroup The shape group to set on.
-   * @param {LayerGroup} layerGroup The origin layer group.
+   * @param {Konva.Group} shapeGroup The shape group.
    */
-  setShapeOn(shapeGroup, layerGroup) {
-    // adapt shape and cursor when mouse over
-    const mouseOnShape = () => {
+  #addShapeOverListeners(shapeGroup) {
+    // handle mouse over
+    shapeGroup.on('mouseover', () => {
+      // store locally
+      this.#activeShapeGroup = shapeGroup;
+      // change cursor and opacity
       document.body.style.cursor = this.#mouseOverCursor;
       shapeGroup.opacity(0.75);
-    };
-    // mouse over event hanlding
-    shapeGroup.on('mouseover', () => {
-      // save local vars
-      this.#activeShapeGroup = shapeGroup;
-      // adapt shape
-      mouseOnShape();
     });
-    // mouse out event hanlding
+
+    // handle mouse out
     shapeGroup.on('mouseout', () => {
-      // reset shape
+      // reset cursor and opacity
       this.#resetActiveShapeGroup();
-      // reset local vars
+      // reset local var
       this.#activeShapeGroup = undefined;
     });
+  }
+
+  /**
+   * Remove shape group mouse over and out listeners.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  #removeShapeOverListeners(shapeGroup) {
+    shapeGroup.off('mouseover');
+    shapeGroup.off('mouseout');
+  }
+
+  /**
+   * Get a groups' shape factory.
+   *
+   * @param {Konva.Group} shapeGroup The shape group to set on.
+   * @returns {object} The corresponding factory.
+   */
+  #getShapeFactory(shapeGroup) {
+    let factory;
+    const keys = Object.keys(this.#shapeFactoryList);
+    for (let i = 0; i < keys.length; ++i) {
+      factory = new this.#shapeFactoryList[keys[i]];
+      if (factory.isFactoryGroup(shapeGroup)) {
+        // stop at first find
+        break;
+      }
+    }
+    if (typeof factory === 'undefined') {
+      throw new Error('Cannot find factory to update quantification.');
+    }
+    return factory;
+  }
+
+  /**
+   * Add shape group listeners.
+   *
+   * @param {LayerGroup} layerGroup The origin layer group.
+   * @param {Konva.Group} shapeGroup The shape group to set on.
+   */
+  #addShapeListeners(layerGroup, shapeGroup) {
+    // shape mouse over
+    this.#addShapeOverListeners(shapeGroup);
 
     const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
@@ -722,24 +944,23 @@ export class Draw {
     let dragStartPos = {x: shapeGroup.x(), y: shapeGroup.y()};
 
     // command name based on shape type
-    const shapeDisplayName = getShapeDisplayName(
-      shapeGroup.getChildren(isNodeNameShape)[0]);
+    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+    if (!(shape instanceof Konva.Shape)) {
+      return;
+    }
 
     let colour = null;
 
     // drag start event handling
     shapeGroup.on('dragstart.draw', (/*event*/) => {
       // store colour
-      colour = shapeGroup.getChildren(isNodeNameShape)[0].stroke();
+      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+      if (!(shape instanceof Konva.Shape)) {
+        return;
+      }
+      colour = shape.stroke();
       // display trash
-      const drawLayer = layerGroup.getActiveDrawLayer();
-      const stage = drawLayer.getKonvaStage();
-      const scale = stage.scale();
-      const invscale = {x: 1 / scale.x, y: 1 / scale.y};
-      this.#trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
-      this.#trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
-      this.#trash.scale(invscale);
-      konvaLayer.add(this.#trash);
+      this.#trash.activate(drawLayer);
       // deactivate anchors to avoid events on null shape
       this.#shapeEditor.setAnchorsActive(false);
       // draw
@@ -748,60 +969,36 @@ export class Draw {
     // drag move event handling
     shapeGroup.on('dragmove.draw', (event) => {
       const group = event.target;
-      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (!(group instanceof Konva.Group)) {
+        return;
+      }
       // validate the group position
       validateGroupPosition(drawLayer.getBaseSize(), group);
       // get appropriate factory
-      let factory;
-      const keys = Object.keys(this.#shapeFactoryList);
-      for (let i = 0; i < keys.length; ++i) {
-        factory = new this.#shapeFactoryList[keys[i]];
-        if (factory.isFactoryGroup(shapeGroup)) {
-          // stop at first find
-          break;
-        }
-      }
-      if (typeof factory === 'undefined') {
-        throw new Error('Cannot find factory to update quantification.');
-      }
+      const factory = this.#getShapeFactory(shapeGroup);
       // update quantification if possible
       if (typeof factory.updateQuantification !== 'undefined') {
         const vc = layerGroup.getActiveViewLayer().getViewController();
         factory.updateQuantification(group, vc);
       }
       // highlight trash when on it
-      const offset = getEventOffset(event.evt)[0];
+      const mousePoint = getMousePoint(event.evt);
+      const offset = {
+        x: mousePoint.getX(),
+        y: mousePoint.getY()
+      };
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      const trashHalfWidth = this.#trash.width() * this.#trash.scaleX() / 2;
-      const trashHalfHeight = this.#trash.height() * this.#trash.scaleY() / 2;
-      if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
-        Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
-        this.#trash.getChildren().forEach(function (tshape) {
-          tshape.stroke('orange');
-        });
-        // change the group shapes colour
-        shapeGroup.getChildren(canNodeChangeColour).forEach(
-          function (ashape) {
-            ashape.stroke('red');
-          });
-      } else {
-        this.#trash.getChildren().forEach(function (tshape) {
-          tshape.stroke('red');
-        });
-        // reset the group shapes colour
-        shapeGroup.getChildren(canNodeChangeColour).forEach(
-          function (ashape) {
-            if (typeof ashape.stroke !== 'undefined') {
-              ashape.stroke(colour);
-            }
-          });
-      }
+      this.#trash.changeChildrenColourOnTrashHover(eventPos,
+        shapeGroup, colour);
       // draw
       konvaLayer.draw();
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', (event) => {
       const group = event.target;
+      if (!(group instanceof Konva.Group)) {
+        return;
+      }
       // remove trash
       this.#trash.remove();
       // activate(false) will also trigger a dragend.draw
@@ -811,50 +1008,38 @@ export class Draw {
       }
       const pos = {x: group.x(), y: group.y()};
       // delete case
-      const offset = getEventOffset(event.evt)[0];
+      const mousePoint = getMousePoint(event.evt);
+      const offset = {
+        x: mousePoint.getX(),
+        y: mousePoint.getY()
+      };
       const eventPos = this.#getRealPosition(offset, layerGroup);
-      const trashHalfWidth = this.#trash.width() * this.#trash.scaleX() / 2;
-      const trashHalfHeight = this.#trash.height() * this.#trash.scaleY() / 2;
-      if (Math.abs(eventPos.x - this.#trash.x()) < trashHalfWidth &&
-        Math.abs(eventPos.y - this.#trash.y()) < trashHalfHeight) {
+      if (this.#trash.isOverTrash(eventPos)) {
         // compensate for the drag translation
         group.x(dragStartPos.x);
         group.y(dragStartPos.y);
         // disable editor
         this.#shapeEditor.disable();
-        this.#shapeEditor.setShape(null);
-        this.#shapeEditor.setViewController(null);
-        // reset colour
-        shapeGroup.getChildren(canNodeChangeColour).forEach(
-          function (ashape) {
-            ashape.stroke(colour);
-          });
+        this.#shapeEditor.reset();
+        this.#trash.changeGroupChildrenColour(shapeGroup, colour);
+        this.#emitDeleteCommand(drawLayer, shapeGroup, shape);
         // reset cursor
         document.body.style.cursor = this.#originalCursor;
-        // delete command
-        const delcmd = new DeleteGroupCommand(group,
-          shapeDisplayName, konvaLayer);
-        delcmd.onExecute = this.#fireEvent;
-        delcmd.onUndo = this.#fireEvent;
-        delcmd.execute();
-        this.#app.addToUndoStack(delcmd);
       } else {
-        // save drag move
         const translation = {
           x: pos.x - dragStartPos.x,
           y: pos.y - dragStartPos.y
         };
         if (translation.x !== 0 || translation.y !== 0) {
-          const mvcmd = new MoveGroupCommand(group,
-            shapeDisplayName, translation, konvaLayer);
-          mvcmd.onExecute = this.#fireEvent;
-          mvcmd.onUndo = this.#fireEvent;
-          this.#app.addToUndoStack(mvcmd);
-
-          // the move is handled by Konva, trigger an event manually
+          // the move is handled by Konva, create a command but
+          // do not execute it
+          this.#storeMoveCommand(drawLayer, group, shape, translation);
+          // manually trigger a move event
           this.#fireEvent({
             type: 'drawmove',
-            id: group.id()
+            id: group.id(),
+            srclayerid: drawLayer.getId(),
+            dataid: drawLayer.getDataId()
           });
         }
         // reset anchors
@@ -869,8 +1054,14 @@ export class Draw {
     // double click handling: update label
     shapeGroup.on('dblclick', (event) => {
       const group = event.currentTarget;
+      if (!(group instanceof Konva.Group)) {
+        return;
+      }
       // get the label object for this shape
       const label = group.findOne('Label');
+      if (!(label instanceof Konva.Label)) {
+        return;
+      }
       // should just be one
       if (typeof label === 'undefined') {
         throw new Error('Could not find the shape label.');
@@ -881,22 +1072,27 @@ export class Draw {
 
       const onSaveCallback = (meta) => {
         // store meta
+        // @ts-expect-error
         ktext.meta = meta;
         // update text expression
         ktext.setText(replaceFlags(
-          ktext.meta.textExpr, ktext.meta.quantification));
-        label.setVisible(ktext.meta.textExpr.length !== 0);
+          meta.textExpr, meta.quantification));
+        // hide label if no text
+        label.visible(meta.textExpr.length !== 0);
 
         // trigger event
         this.#fireEvent({
           type: 'drawchange',
-          id: groupId
+          id: groupId,
+          srclayerid: drawLayer.getId(),
+          dataid: drawLayer.getDataId()
         });
         // draw
         konvaLayer.draw();
       };
 
       // call roi dialog
+      // @ts-expect-error
       customUI.openRoiDialog(ktext.meta, onSaveCallback);
     });
   }
@@ -929,8 +1125,12 @@ export class Draw {
    * @param {object} features The list of features.
    */
   setFeatures(features) {
+    if (typeof features.autoShapeColour !== 'undefined') {
+      this.#autoShapeColour = features.autoShapeColour;
+    }
     if (typeof features.shapeColour !== 'undefined') {
       this.#style.setLineColour(features.shapeColour);
+      this.#autoShapeColour = false;
     }
     if (typeof features.shapeName !== 'undefined') {
       // check if we have it
@@ -941,6 +1141,9 @@ export class Draw {
     }
     if (typeof features.mouseOverCursor !== 'undefined') {
       this.#mouseOverCursor = features.mouseOverCursor;
+    }
+    if (typeof features.withScroll !== 'undefined') {
+      this.#withScroll = features.withScroll;
     }
   }
 
@@ -954,11 +1157,11 @@ export class Draw {
   /**
    * Get the list of event names that this tool can fire.
    *
-   * @returns {Array} The list of event names.
+   * @returns {string[]} The list of event names.
    */
   getEventNames() {
     return [
-      'drawcreate', 'drawchange', 'drawmove', 'drawdelete', 'drawlabelchange'
+      'drawcreate', 'drawchange', 'drawmove', 'drawdelete'
     ];
   }
 
@@ -1025,8 +1228,8 @@ export class Draw {
 /**
  * Get the minimum position in a groups' anchors.
  *
- * @param {object} group The group that contains anchors.
- * @returns {object|undefined} The minimum position as {x,y}.
+ * @param {Konva.Group} group The group that contains anchors.
+ * @returns {Point2D|undefined} The minimum position.
  */
 function getAnchorMin(group) {
   const anchors = group.find('.anchor');
@@ -1040,31 +1243,31 @@ function getAnchorMin(group) {
     minY = Math.min(minY, anchors[i].y());
   }
 
-  return {x: minX, y: minY};
+  return new Point2D(minX, minY);
 }
 
 /**
  * Bound a node position.
  *
- * @param {object} node The node to bound the position.
- * @param {object} min The minimum position as {x,y}.
- * @param {object} max The maximum position as {x,y}.
+ * @param {Konva.Node} node The node to bound the position.
+ * @param {Point2D} min The minimum position.
+ * @param {Point2D} max The maximum position.
  * @returns {boolean} True if the position was corrected.
  */
 function boundNodePosition(node, min, max) {
   let changed = false;
-  if (node.x() < min.x) {
-    node.x(min.x);
+  if (node.x() < min.getX()) {
+    node.x(min.getX());
     changed = true;
-  } else if (node.x() > max.x) {
-    node.x(max.x);
+  } else if (node.x() > max.getX()) {
+    node.x(max.getX());
     changed = true;
   }
-  if (node.y() < min.y) {
-    node.y(min.y);
+  if (node.y() < min.getY()) {
+    node.y(min.getY());
     changed = true;
-  } else if (node.y() > max.y) {
-    node.y(max.y);
+  } else if (node.y() > max.getY()) {
+    node.y(max.getY());
     changed = true;
   }
   return changed;
@@ -1073,8 +1276,8 @@ function boundNodePosition(node, min, max) {
 /**
  * Validate a group position.
  *
- * @param {object} stageSize The stage size {x,y}.
- * @param {object} group The group to evaluate.
+ * @param {Scalar2D} stageSize The stage size {x,y}.
+ * @param {Konva.Group} group The group to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
 function validateGroupPosition(stageSize, group) {
@@ -1087,16 +1290,14 @@ function validateGroupPosition(stageSize, group) {
     return null;
   }
 
-  const min = {
-    x: -anchorMin.x,
-    y: -anchorMin.y
-  };
-  const max = {
-    x: stageSize.x -
-      (anchorMin.x + Math.abs(shape.width())),
-    y: stageSize.y -
-      (anchorMin.y + Math.abs(shape.height()))
-  };
+  const min = new Point2D(
+    -anchorMin.getX(),
+    -anchorMin.getY()
+  );
+  const max = new Point2D(
+    stageSize.x - (anchorMin.getX() + Math.abs(shape.width())),
+    stageSize.y - (anchorMin.getY() + Math.abs(shape.height()))
+  );
 
   return boundNodePosition(group, min, max);
 }
@@ -1104,21 +1305,21 @@ function validateGroupPosition(stageSize, group) {
 /**
  * Validate an anchor position.
  *
- * @param {object} stageSize The stage size {x,y}.
- * @param {object} anchor The anchor to evaluate.
+ * @param {Scalar2D} stageSize The stage size {x,y}.
+ * @param {Konva.Shape} anchor The anchor to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
 export function validateAnchorPosition(stageSize, anchor) {
   const group = anchor.getParent();
 
-  const min = {
-    x: -group.x(),
-    y: -group.y()
-  };
-  const max = {
-    x: stageSize.x - group.x(),
-    y: stageSize.y - group.y()
-  };
+  const min = new Point2D(
+    -group.x(),
+    -group.y()
+  );
+  const max = new Point2D(
+    stageSize.x - group.x(),
+    stageSize.y - group.y()
+  );
 
   return boundNodePosition(anchor, min, max);
 }

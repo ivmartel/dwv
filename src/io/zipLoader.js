@@ -7,8 +7,9 @@ import {MemoryLoader} from './memoryLoader';
 /**
  * The zip library.
  *
+ * Ref: {@link https://github.com/Stuk/jszip}.
+ *
  * @external JSZip
- * @see https://github.com/Stuk/jszip
  */
 import JSZip from 'jszip';
 
@@ -47,9 +48,9 @@ export class ZipLoader {
   #zobjs = null;
 
   /**
-   * JSZip.async callback
+   * JSZip.async callback.
    *
-   * @param {ArrayBuffer} content unzipped file image
+   * @param {ArrayBuffer} content Unzipped file image.
    * @param {object} origin The origin of the file.
    * @param {number} index The data index.
    */
@@ -143,8 +144,9 @@ export class ZipLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if the file has a 'zip' extension.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
@@ -154,21 +156,35 @@ export class ZipLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'zip',
+   * - the `options.requestHeaders` contains an item
+   *   starting with 'Accept: application/zip'.
+   * - the url has a 'zip' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      // starts with 'application/zip'
-      const isZip = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'application/zip');
-      };
-      return typeof options.requestHeaders.find(isZip) !== 'undefined';
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'zip') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'application/zip'
+          return startsWith(acceptHeader.value, 'application/zip');
+        }
+      }
     }
 
     const urlObjext = getUrlFromUri(url);
@@ -183,13 +199,14 @@ export class ZipLoader {
    * @returns {boolean} True if the object can be loaded.
    */
   canLoadMemory(mem) {
-    if (typeof mem['Content-Type'] !== 'undefined') {
-      if (mem['Content-Type'].includes('zip')) {
-        return true;
-      }
+    const contentType = mem['Content-Type'];
+    if (typeof contentType !== 'undefined' &&
+      contentType.startsWith('application/zip')) {
+      return true;
     }
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }
@@ -271,4 +288,4 @@ export class ZipLoader {
    */
   onabort(_event) {}
 
-} // class DicomDataLoader
+} // class ZipLoader

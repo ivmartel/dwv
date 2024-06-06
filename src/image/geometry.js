@@ -1,11 +1,12 @@
 import {
-  BIG_EPSILON,
-  isSimilar,
-  getIdentityMat33
+  getIdentityMat33,
+  REAL_WORLD_EPSILON
 } from '../math/matrix';
 import {Point3D, Point} from '../math/point';
 import {Vector3D} from '../math/vector';
 import {Index} from '../math/index';
+import {getBasicStats} from '../math/stats';
+import {precisionRound} from '../utils/string';
 import {logger} from '../utils/logger';
 import {Size} from './size';
 import {Spacing} from './spacing';
@@ -23,7 +24,7 @@ export class Geometry {
   /**
    * Array of origins.
    *
-   * @type {Array}
+   * @type {Point3D[]}
    */
   #origins;
 
@@ -44,7 +45,7 @@ export class Geometry {
   /**
    * Local helper object for time points.
    *
-   * @type {object}
+   * @type {Object<string, Point3D[]>}
    */
   #timeOrigins = {};
 
@@ -165,7 +166,7 @@ export class Geometry {
   /**
    * Get the object origins.
    *
-   * @returns {Array} The object origins.
+   * @returns {Point3D[]} The object origins.
    */
   getOrigins() {
     return this.#origins;
@@ -193,7 +194,7 @@ export class Geometry {
    * Warning: the size comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {Matrix33} [viewOrientation] The view orientation (optional)
+   * @param {Matrix33} [viewOrientation] The view orientation (optional).
    * @returns {Size} The object size.
    */
   getSize(viewOrientation) {
@@ -217,14 +218,12 @@ export class Geometry {
    *   if needed.
    */
   #updateSliceSpacing() {
-    const geoSliceSpacing = getSliceGeometrySpacing(
-      this.#origins,
-      this.#orientation
-    );
+    const geoSliceSpacing = getSliceGeometrySpacing(this.#origins);
     // update local if needed
     if (typeof geoSliceSpacing !== 'undefined' &&
       this.#spacing.get(2) !== geoSliceSpacing) {
-      logger.trace('Updating slice spacing.');
+      logger.trace('Using geometric spacing ' + geoSliceSpacing +
+        ' instead of tag spacing ' + this.#spacing.get(2));
       const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
       this.#spacing = new Spacing(values);
@@ -236,7 +235,7 @@ export class Geometry {
    * Warning: the spacing comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {Matrix33} [viewOrientation] The view orientation (optional)
+   * @param {Matrix33} [viewOrientation] The view orientation (optional).
    * @returns {Spacing} The object spacing.
    */
   getSpacing(viewOrientation) {
@@ -303,35 +302,26 @@ export class Geometry {
       localOrigins = this.#timeOrigins[time];
     }
 
-    // find the closest index
-    let closestSliceIndex = 0;
-    let minDist = point.getDistance(localOrigins[0]);
-    let dist = 0;
-    for (let i = 0; i < localOrigins.length; ++i) {
-      dist = point.getDistance(localOrigins[i]);
-      if (dist < minDist) {
-        minDist = dist;
-        closestSliceIndex = i;
-      }
-    }
-    const closestOrigin = localOrigins[closestSliceIndex];
+    // find the closest origin
+    const closestOriginIndex = point.getClosest(localOrigins);
+    const closestOrigin = localOrigins[closestOriginIndex];
+
     // direction between the input point and the closest origin
     const pointDir = point.minus(closestOrigin);
-    // use third orientation matrix column as base plane vector
+
+    // use third orientation matrix column as plane normal vector
     const normal = new Vector3D(
       this.#orientation.get(0, 2),
       this.#orientation.get(1, 2),
       this.#orientation.get(2, 2)
     );
-    // a.dot(b) = ||a|| * ||b|| * cos(theta)
-    // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
-    // -> the sign of the dot product depends on the cosinus of
-    //    the angle between the vectors
-    //   -> >0 => vectors are codirectional
-    //   -> <0 => vectors are opposite
-    const dotProd = normal.dotProduct(pointDir);
-    // oposite vectors get higher index
-    const sliceIndex = dotProd > 0 ? closestSliceIndex + 1 : closestSliceIndex;
+
+    // codirectional vectors: above slice index
+    // oposite vectors: below slice index
+    const isCodirectional = normal.isCodirectional(pointDir);
+    const sliceIndex = isCodirectional
+      ? closestOriginIndex + 1 : closestOriginIndex;
+
     return sliceIndex;
   }
 
@@ -343,10 +333,26 @@ export class Geometry {
    * @param {number} [time] Optional time index.
    */
   appendOrigin(origin, index, time) {
+    // equal callback
+    const equalToOrigin = function (element) {
+      return element.equals(origin);
+    };
     if (typeof time !== 'undefined') {
+      // check if not already in list
+      const found = this.#timeOrigins[time].find(equalToOrigin);
+      if (typeof found !== 'undefined') {
+        throw new Error('Cannot append same time origin twice');
+      }
+      // add in origin array
       this.#timeOrigins[time].splice(index, 0, origin);
     }
     if (typeof time === 'undefined' || time === this.#initialTime) {
+      // check if not already in list
+      const found = this.#origins.find(equalToOrigin);
+      if (typeof found !== 'undefined') {
+        throw new Error('Cannot append same origin twice');
+      }
+      // update flag
       this.#newOrigins = true;
       // add in origin array
       this.#origins.splice(index, 0, origin);
@@ -418,7 +424,7 @@ export class Geometry {
    * Check that a index is within bounds.
    *
    * @param {Index} index The index to check.
-   * @param {Array} [dirs] Optional list of directions to check.
+   * @param {number[]} [dirs] Optional list of directions to check.
    * @returns {boolean} True if the given coordinates are within bounds.
    */
   isIndexInBounds(index, dirs) {
@@ -544,9 +550,9 @@ export class Geometry {
 /**
  * Get the oriented values of an input 3D array.
  *
- * @param {Array} array3D The 3D array.
+ * @param {number[]} array3D The 3D array.
  * @param {Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered according to the orientation.
+ * @returns {number[]} The values reordered according to the orientation.
  */
 export function getOrientedArray3D(array3D, orientation) {
   // values = orientation * orientedValues
@@ -557,9 +563,9 @@ export function getOrientedArray3D(array3D, orientation) {
 /**
  * Get the raw values of an oriented input 3D array.
  *
- * @param {Array} array3D The 3D array.
+ * @param {number[]} array3D The 3D array.
  * @param {Matrix33} orientation The orientation 3D matrix.
- * @returns {Array} The values reordered to compensate the orientation.
+ * @returns {number[]} The values reordered to compensate the orientation.
  */
 export function getDeOrientedArray3D(array3D, orientation) {
   // values = orientation * orientedValues
@@ -570,58 +576,39 @@ export function getDeOrientedArray3D(array3D, orientation) {
  * Get the slice spacing from the difference in the Z directions
  * of input origins.
  *
- * @param {Array} origins An array of Point3D.
- * @param {Matrix33} orientation The oritentation matrix.
- * @param {boolean} [withCheck] Flag to activate spacing variation check,
- *   default to true.
+ * @param {Point3D[]} origins An array of Point3D.
  * @returns {number|undefined} The spacing.
  */
-export function getSliceGeometrySpacing(origins, orientation, withCheck) {
-  if (typeof withCheck === 'undefined') {
-    withCheck = true;
-  }
+export function getSliceGeometrySpacing(origins) {
   // check origins
   if (origins.length <= 1) {
     return;
   }
-  // (x, y, z) = orientationMatrix * (i, j, k)
-  // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
-  // applied on the patient position, reorders indices
-  // so that Z is the slice direction
-  const invOrientation = orientation.getInverse();
-  let origin1 = invOrientation.multiplyVector3D(origins[0]);
-  let origin2 = invOrientation.multiplyVector3D(origins[1]);
-  let sliceSpacing = Math.abs(origin1.getZ() - origin2.getZ());
-  const deltas = [];
+
+  const spacings = [];
   for (let i = 0; i < origins.length - 1; ++i) {
-    origin1 = invOrientation.multiplyVector3D(origins[i]);
-    origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
-    const diff = Math.abs(origin1.getZ() - origin2.getZ());
-    if (diff === 0) {
-      throw new Error('Zero slice spacing.' +
+    const origin1 = origins[i];
+    const origin2 = origins[i + 1];
+    const sliceSpacing = origin1.getDistance(origin2);
+    if (sliceSpacing === 0) {
+      throw new Error('Zero slice spacing ' +
         origin1.toString() + ' ' + origin2.toString());
     }
-    // keep smallest
-    if (diff < sliceSpacing) {
-      sliceSpacing = diff;
-    }
-    if (withCheck) {
-      if (!isSimilar(sliceSpacing, diff, BIG_EPSILON)) {
-        deltas.push(Math.abs(sliceSpacing - diff));
-      }
-    }
-  }
-  // warn if non constant
-  if (withCheck && deltas.length !== 0) {
-    const sumReducer = function (sum, value) {
-      return sum + value;
-    };
-    const mean = deltas.reduce(sumReducer) / deltas.length;
-    if (mean > 1e-4) {
-      logger.warn('Varying slice spacing, mean delta: ' +
-        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
-    }
+    spacings.push(sliceSpacing);
   }
 
-  return sliceSpacing;
+  // use rounded mean value as spacing
+  const stats = getBasicStats(spacings);
+  const spacing = precisionRound(stats.mean, 4);
+
+  // warn if non constant
+  if (stats.stdDev > REAL_WORLD_EPSILON) {
+    logger.warn('Varying slice spacing, value: ' + spacing +
+      ' (mean: ' + stats.mean +
+      ', min: ' + stats.min +
+      ', max: ' + stats.max +
+      ', stdDev: ' + stats.stdDev + ')');
+  }
+
+  return spacing;
 }

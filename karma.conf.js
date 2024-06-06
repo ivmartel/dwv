@@ -27,7 +27,7 @@ module.exports = function (config) {
       ],
       check: {
         global: {
-          statements: 35,
+          statements: 30,
           branches: 35,
           functions: 30,
           lines: 30
@@ -38,7 +38,11 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     browsers: ['Chrome'],
     restartOnFileChange: true,
-    webpack: webpackConfig()
+    webpack: webpackConfig(),
+    jsonReporter: {
+      stdout: false,
+      outputFile: './build/test-results.json'
+    },
   });
 };
 

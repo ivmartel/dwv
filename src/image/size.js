@@ -3,6 +3,7 @@ import {Index} from '../math/index';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -15,12 +16,12 @@ export class Size {
   /**
    * The size values.
    *
-   * @type {Array}
+   * @type {number[]}
    */
   #values;
 
   /**
-   * @param {Array} values The size values.
+   * @param {number[]} values The size values.
    */
   constructor(values) {
     if (!values || typeof values === 'undefined') {
@@ -69,7 +70,7 @@ export class Size {
   /**
    * Get the values of this index.
    *
-   * @returns {Array} The array of values.
+   * @returns {number[]} The array of values.
    */
   getValues() {
     return this.#values.slice();
@@ -180,7 +181,7 @@ export class Size {
    * Check that an index is within bounds.
    *
    * @param {Index} index The index to check.
-   * @param {Array} dirs Optional list of directions to check.
+   * @param {number[]} dirs Optional list of directions to check.
    * @returns {boolean} True if the given coordinates are within bounds.
    */
   isInBounds(index, dirs) {
@@ -268,7 +269,7 @@ export class Size {
   /**
    * Get the 2D base of this size.
    *
-   * @returns {object} The 2D base [0,1] as {x,y}.
+   * @returns {Scalar2D} The 2D base [0,1] as {x,y}.
    */
   get2D() {
     return {

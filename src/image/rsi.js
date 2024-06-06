@@ -1,5 +1,5 @@
 /**
- * Rescale Slope and Intercept
+ * Rescale Slope and Intercept.
  */
 export class RescaleSlopeAndIntercept {
 
@@ -70,17 +70,9 @@ export class RescaleSlopeAndIntercept {
    */
   equals(rhs) {
     return rhs !== null &&
-          this.getSlope() === rhs.getSlope() &&
-          this.getIntercept() === rhs.getIntercept();
-  }
-
-  /**
-   * Get a string representation of the RSI.
-   *
-   * @returns {string} The RSI as a string.
-   */
-  toString() {
-    return (this.getSlope() + ', ' + this.getIntercept());
+      typeof rhs !== 'undefined' &&
+      this.getSlope() === rhs.getSlope() &&
+      this.getIntercept() === rhs.getIntercept();
   }
 
   /**

@@ -1,5 +1,10 @@
 import {getShadowColour} from '../utils/colour';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Scalar2D} from '../math/scalar';
+/* eslint-enable no-unused-vars */
+
 /**
  * Style class.
  */
@@ -35,14 +40,14 @@ export class Style {
   /**
    * Base scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseScale = {x: 1, y: 1};
 
   /**
    * Zoom scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #zoomScale = {x: 1, y: 1};
 
@@ -56,7 +61,7 @@ export class Style {
   /**
    * Shadow offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #shadowOffset = {x: 0.25, y: 0.25};
 
@@ -131,7 +136,7 @@ export class Style {
   /**
    * Set the base scale.
    *
-   * @param {number} scale The scale as {x,y}.
+   * @param {Scalar2D} scale The scale as {x,y}.
    */
   setBaseScale(scale) {
     this.#baseScale = scale;
@@ -140,7 +145,7 @@ export class Style {
   /**
    * Set the zoom scale.
    *
-   * @param {object} scale The scale as {x,y}.
+   * @param {Scalar2D} scale The scale as {x,y}.
    */
   setZoomScale(scale) {
     this.#zoomScale = scale;
@@ -149,7 +154,7 @@ export class Style {
   /**
    * Get the base scale.
    *
-   * @returns {number} The scale as {x,y}.
+   * @returns {Scalar2D} The scale as {x,y}.
    */
   getBaseScale() {
     return this.#baseScale;
@@ -158,7 +163,7 @@ export class Style {
   /**
    * Get the zoom scale.
    *
-   * @returns {object} The scale as {x,y}.
+   * @returns {Scalar2D} The scale as {x,y}.
    */
   getZoomScale() {
     return this.#zoomScale;
@@ -179,7 +184,7 @@ export class Style {
    * Apply zoom scale on an input value.
    *
    * @param {number} value The value to scale.
-   * @returns {object} The scaled value as {x,y}.
+   * @returns {Scalar2D} The scaled value as {x,y}.
    */
   applyZoomScale(value) {
     // times 2 so that the font size 10 looks like a 10...
@@ -193,7 +198,7 @@ export class Style {
   /**
    * Get the shadow offset.
    *
-   * @returns {object} The offset as {x,y}.
+   * @returns {Scalar2D} The offset as {x,y}.
    */
   getShadowOffset() {
     return this.#shadowOffset;

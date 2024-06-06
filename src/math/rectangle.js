@@ -2,6 +2,12 @@ import {Point2D} from './point';
 import {getStats} from './stats';
 import {i18n} from '../utils/i18n';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Scalar2D} from './scalar';
+/* eslint-enable no-unused-vars */
+
 /**
  * Mulitply the three inputs if the last two are not null.
  *
@@ -58,7 +64,7 @@ export class Rectangle {
   /**
    * Get the begin point of the rectangle.
    *
-   * @returns {Point2D} The begin point of the rectangle
+   * @returns {Point2D} The begin point of the rectangle.
    */
   getBegin() {
     return this.#begin;
@@ -67,7 +73,7 @@ export class Rectangle {
   /**
    * Get the end point of the rectangle.
    *
-   * @returns {Point2D} The end point of the rectangle
+   * @returns {Point2D} The end point of the rectangle.
    */
   getEnd() {
     return this.#end;
@@ -100,13 +106,12 @@ export class Rectangle {
   /**
    * Get the surface of the rectangle according to a spacing.
    *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
+   * @param {Scalar2D} spacing2D The 2D spacing.
    * @returns {number} The surface of the rectangle multiplied by the given
    *  spacing or null for null spacings.
    */
-  getWorldSurface(spacingX, spacingY) {
-    return mulABC(this.getSurface(), spacingX, spacingY);
+  getWorldSurface(spacing2D) {
+    return mulABC(this.getSurface(), spacing2D.x, spacing2D.y);
   }
 
   /**
@@ -148,48 +153,65 @@ export class Rectangle {
   /**
    * Get the rounded limits of the rectangle.
    *
-   * @returns {object} The rounded limits.
+   * @returns {object} The rounded limits as {min, max} (Point2D).
    */
   getRound() {
+    const roundBegin = new Point2D(
+      Math.round(this.getBegin().getX()),
+      Math.round(this.getBegin().getY())
+    );
+    const roundEnd = new Point2D(
+      Math.round(this.getEnd().getX()),
+      Math.round(this.getEnd().getY())
+    );
     return {
-      min: this.getBegin().getRound(),
-      max: this.getEnd().getRound()
+      min: roundBegin,
+      max: roundEnd
     };
   }
 
   /**
    * Quantify a rectangle according to view information.
    *
-   * @param {object} viewController The associated view controller.
-   * @param {Array} flags A list of stat values to calculate.
+   * @param {ViewController} viewController The associated view controller.
+   * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
   quantify(viewController, flags) {
     const quant = {};
-    // surface
-    const spacing = viewController.get2DSpacing();
-    const surface = this.getWorldSurface(spacing[0], spacing[1]);
+    // shape quantification
+    const spacing2D = viewController.get2DSpacing();
+    quant.width = {
+      value: this.getWidth() * spacing2D.x,
+      unit: i18n.t('unit.mm')
+    };
+    quant.height = {
+      value: this.getHeight() * spacing2D.y,
+      unit: i18n.t('unit.mm')
+    };
+    const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
       quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
     }
 
-    // pixel quantification
+    // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const round = this.getRound();
       const values = viewController.getImageRegionValues(round.min, round.max);
+      const unit = viewController.getPixelUnit();
       const quantif = getStats(values, flags);
-      quant.min = {value: quantif.min, unit: ''};
-      quant.max = {value: quantif.max, unit: ''};
-      quant.mean = {value: quantif.mean, unit: ''};
-      quant.stdDev = {value: quantif.stdDev, unit: ''};
+      quant.min = {value: quantif.min, unit: unit};
+      quant.max = {value: quantif.max, unit: unit};
+      quant.mean = {value: quantif.mean, unit: unit};
+      quant.stdDev = {value: quantif.stdDev, unit: unit};
       if (typeof quantif.median !== 'undefined') {
-        quant.median = {value: quantif.median, unit: ''};
+        quant.median = {value: quantif.median, unit: unit};
       }
       if (typeof quantif.p25 !== 'undefined') {
-        quant.p25 = {value: quantif.p25, unit: ''};
+        quant.p25 = {value: quantif.p25, unit: unit};
       }
       if (typeof quantif.p75 !== 'undefined') {
-        quant.p75 = {value: quantif.p75, unit: ''};
+        quant.p75 = {value: quantif.p75, unit: unit};
       }
     }
 

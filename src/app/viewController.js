@@ -7,21 +7,22 @@ import {Spacing} from '../image/spacing';
 import {Image} from '../image/image';
 import {Geometry} from '../image/geometry';
 import {PlaneHelper} from '../image/planeHelper';
-import {MaskSegmentHelper} from '../image/maskSegmentHelper';
 import {
   getSliceIterator,
   getIteratorValues,
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {luts} from '../image/luts';
 import {ListenerHandler} from '../utils/listen';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {View} from '../image/view';
-import {ColourMap} from '../image/luts';
+import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
+import {Scalar2D} from '../math/scalar';
+import {Matrix33} from '../math/matrix';
+import {ViewLayer} from '../gui/viewLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -37,11 +38,11 @@ export class ViewController {
   #view;
 
   /**
-   * Associated data index.
+   * Associated data id.
    *
-   * @type {number}
+   * @type {string}
    */
-  #index;
+  #dataId;
 
   /**
    * Plane helper.
@@ -51,29 +52,39 @@ export class ViewController {
   #planeHelper;
 
   /**
-   * Mask segment helper.
+   * Colour map name.
+   * Defaults to 'plain' as defined in Views' default.
    *
-   * @type {MaskSegmentHelper}
+   * @type {string}
    */
-  #maskSegmentHelper;
+  #colourMapName = 'plain';
 
-  // third dimension player ID (created by setInterval)
-  #playerID = null;
-  // associated data index
-  #dataIndex;
+  /**
+   * Third dimension player ID (created by setInterval).
+   *
+   * @type {number|undefined}
+   */
+  #playerID;
+
+  /**
+   * Is DICOM seg mask flag.
+   *
+   * @type {boolean}
+   */
+  #isMask = false;
 
   /**
    * @param {View} view The associated view.
-   * @param {number} index The associated data index.
+   * @param {string} dataId The associated data id.
    */
-  constructor(view, index) {
+  constructor(view, dataId) {
     // check view
     if (typeof view.getImage() === 'undefined') {
       throw new Error('View does not have an image, cannot setup controller');
     }
 
     this.#view = view;
-    this.#index = index;
+    this.#dataId = dataId;
 
     // setup the plane helper
     this.#planeHelper = new PlaneHelper(
@@ -84,22 +95,21 @@ export class ViewController {
 
     // mask segment helper
     if (view.getImage().getMeta().Modality === 'SEG') {
-      this.#maskSegmentHelper =
-        new MaskSegmentHelper(view.getImage());
+      this.#isMask = true;
     }
   }
 
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
   /**
    * Get the plane helper.
    *
-   * @returns {object} The helper.
+   * @returns {PlaneHelper} The helper.
    */
   getPlaneHelper() {
     return this.#planeHelper;
@@ -111,39 +121,7 @@ export class ViewController {
    * @returns {boolean} True if the associated image is a mask.
    */
   isMask() {
-    return typeof this.#maskSegmentHelper !== 'undefined';
-  }
-
-  /**
-   * Get the mask segment helper.
-   *
-   * @returns {object} The helper.
-   */
-  getMaskSegmentHelper() {
-    return this.#maskSegmentHelper;
-  }
-
-  /**
-   * Apply the hidden segments list by setting
-   * the corresponding alpha function.
-   */
-  applyHiddenSegments() {
-    if (this.isMask) {
-      this.setViewAlphaFunction(this.#maskSegmentHelper.getAlphaFunc());
-    }
-  }
-
-  /**
-   * Delete a segment.
-   *
-   * @param {number} segmentNumber The segment number.
-   * @param {Function} exeCallback The post execution callback.
-   */
-  deleteSegment(segmentNumber, exeCallback) {
-    if (this.isMask) {
-      this.#maskSegmentHelper.deleteSegment(
-        segmentNumber, this.#fireEvent, exeCallback);
-    }
+    return this.#isMask;
   }
 
   /**
@@ -153,13 +131,24 @@ export class ViewController {
     // set window/level to first preset
     this.setWindowLevelPresetById(0);
     // default position
-    this.setCurrentPosition(this.getPositionFromPlanePoint(0, 0));
+    this.setCurrentPosition(this.getPositionFromPlanePoint(
+      new Point2D(0, 0)
+    ));
+  }
+
+  /**
+   * Get the image modality.
+   *
+   * @returns {string} The modality.
+   */
+  getModality() {
+    return this.#view.getImage().getMeta().Modality;
   }
 
   /**
    * Get the window/level presets names.
    *
-   * @returns {Array} The presets names.
+   * @returns {string[]} The presets names.
    */
   getWindowLevelPresetsNames() {
     return this.#view.getWindowPresetsNames();
@@ -199,7 +188,7 @@ export class ViewController {
    * @returns {boolean} True if the controler is playing.
    */
   isPlaying() {
-    return (this.#playerID !== null);
+    return (typeof this.#playerID !== 'undefined');
   }
 
   /**
@@ -258,10 +247,10 @@ export class ViewController {
   }
 
   /**
-   * Get the origin at a given posittion.
+   * Get the first origin or at a given position.
    *
-   * @param {Point} position The input position.
-   * @returns {Point} The origin.
+   * @param {Point} [position] Opitonal position.
+   * @returns {Point3D} The origin.
    */
   getOrigin(position) {
     return this.#view.getOrigin(position);
@@ -281,7 +270,7 @@ export class ViewController {
    * Generate display image data to be given to a canvas.
    *
    * @param {ImageData} array The array to fill in.
-   * @param {Index} index Optional index at which to generate,
+   * @param {Index} [index] Optional index at which to generate,
    *   otherwise generates at current index.
    */
   generateImageData(array, index) {
@@ -292,27 +281,28 @@ export class ViewController {
    * Set the associated image.
    *
    * @param {Image} img The associated image.
-   * @param {number} index The data index of the image.
+   * @param {string} dataId The data id of the image.
    */
-  setImage(img, index) {
+  setImage(img, dataId) {
     this.#view.setImage(img);
-    this.#dataIndex = index;
+    this.#dataId = dataId;
   }
 
   /**
-   * Get the current spacing.
+   * Get the current view (2D) spacing.
    *
-   * @returns {Array} The 2D spacing.
+   * @returns {Scalar2D} The spacing as a 2D array.
    */
   get2DSpacing() {
-    const spacing = this.#view.getImage().getGeometry().getSpacing();
-    return [spacing.get(0), spacing.get(1)];
+    const spacing = this.#view.getImage().getGeometry().getSpacing(
+      this.#view.getOrientation());
+    return spacing.get2D();
   }
 
   /**
    * Get the image rescaled value at the input position.
    *
-   * @param {Point} position the input position.
+   * @param {Point} position The input position.
    * @returns {number|undefined} The image value or undefined if out of bounds
    *   or no quantifiable (for ex RGB).
    */
@@ -333,10 +323,45 @@ export class ViewController {
   /**
    * Get the image pixel unit.
    *
-   * @returns {string} The unit
+   * @returns {string} The unit.
    */
   getPixelUnit() {
     return this.#view.getImage().getMeta().pixelUnit;
+  }
+
+  /**
+   * Extract a slice from an image at the given index and orientation.
+   *
+   * @param {Image} image The image to parse.
+   * @param {Index} index The current index.
+   * @param {boolean} isRescaled Flag for rescaled values (default false).
+   * @param {Matrix33} orientation The desired orientation.
+   * @returns {Image} The extracted slice.
+   */
+  #getSlice(image, index, isRescaled, orientation) {
+    // generate slice values
+    const sliceIter = getSliceIterator(
+      image,
+      index,
+      isRescaled,
+      orientation
+    );
+    const sliceValues = getIteratorValues(sliceIter);
+    // oriented geometry
+    const orientedSize = image.getGeometry().getSize(orientation);
+    const sizeValues = orientedSize.getValues();
+    sizeValues[2] = 1;
+    const sliceSize = new Size(sizeValues);
+    const orientedSpacing = image.getGeometry().getSpacing(orientation);
+    const spacingValues = orientedSpacing.getValues();
+    spacingValues[2] = 1;
+    const sliceSpacing = new Spacing(spacingValues);
+    const sliceOrigin = new Point3D(0, 0, 0);
+    const sliceGeometry =
+      new Geometry(sliceOrigin, sliceSize, sliceSpacing);
+    // slice image
+    // @ts-ignore
+    return new Image(sliceGeometry, sliceValues);
   }
 
   /**
@@ -349,42 +374,20 @@ export class ViewController {
   getImageRegionValues(min, max) {
     let image = this.#view.getImage();
     const orientation = this.#view.getOrientation();
-    let position = this.getCurrentIndex();
+    let currentIndex = this.getCurrentIndex();
     let rescaled = true;
 
-    // created oriented slice if needed
+    // create oriented slice if needed
     if (!isIdentityMat33(orientation)) {
-      // generate slice values
-      const sliceIter = getSliceIterator(
-        image,
-        position,
-        rescaled,
-        orientation
-      );
-      const sliceValues = getIteratorValues(sliceIter);
-      // oriented geometry
-      const orientedSize = image.getGeometry().getSize(orientation);
-      const sizeValues = orientedSize.getValues();
-      sizeValues[2] = 1;
-      const sliceSize = new Size(sizeValues);
-      const orientedSpacing = image.getGeometry().getSpacing(orientation);
-      const spacingValues = orientedSpacing.getValues();
-      spacingValues[2] = 1;
-      const sliceSpacing = new Spacing(spacingValues);
-      const sliceOrigin = new Point3D(0, 0, 0);
-      const sliceGeometry =
-        new Geometry(sliceOrigin, sliceSize, sliceSpacing);
-      // slice image
-      // @ts-ignore
-      image = new Image(sliceGeometry, sliceValues);
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
       // update position
-      position = new Index([0, 0, 0]);
+      currentIndex = new Index([0, 0, 0]);
       rescaled = false;
     }
 
     // get region values
     const iter = getRegionSliceIterator(
-      image, position, rescaled, min, max);
+      image, currentIndex, rescaled, min, max);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
@@ -395,15 +398,26 @@ export class ViewController {
   /**
    * Get some values from the associated image in variable regions.
    *
-   * @param {Array} regions A list of regions.
+   * @param {number[][][]} regions A list of [x, y] pairs (min, max).
    * @returns {Array} A list of values.
    */
   getImageVariableRegionValues(regions) {
+    let image = this.#view.getImage();
+    const orientation = this.#view.getOrientation();
+    let currentIndex = this.getCurrentIndex();
+    let rescaled = true;
+
+    // create oriented slice if needed
+    if (!isIdentityMat33(orientation)) {
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      // update position
+      currentIndex = new Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
     const iter = getVariableRegionSliceIterator(
-      this.#view.getImage(),
-      this.getCurrentIndex(),
-      true, regions
-    );
+      image, currentIndex, rescaled, regions);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
@@ -424,9 +438,19 @@ export class ViewController {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if possible.
+   * @deprecated Please use isMonochrome instead.
    */
   canWindowLevel() {
-    return this.#view.getImage().canWindowLevel();
+    return this.isMonochrome();
+  }
+
+  /**
+   * Is the data monochrome.
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  isMonochrome() {
+    return this.#view.getImage().isMonochrome();
   }
 
   /**
@@ -440,7 +464,7 @@ export class ViewController {
   }
 
   /**
-   * Get the image size.
+   * Get the oriented image size.
    *
    * @returns {Size} The size.
    */
@@ -449,10 +473,22 @@ export class ViewController {
       this.#view.getOrientation());
   }
 
+
+  /**
+   * Is the data size larger than one in the given dimension?
+   *
+   * @param {number} dim The dimension.
+   * @returns {boolean} True if the image size is larger than one
+   *   in the given dimension.
+   */
+  moreThanOne(dim) {
+    return this.getImageSize().moreThanOne(dim);
+  }
+
   /**
    * Get the image world (mm) 2D size.
    *
-   * @returns {object} The 2D size as {x,y}.
+   * @returns {Scalar2D} The 2D size as {x,y}.
    */
   getImageWorldSize() {
     const geometry = this.#view.getImage().getGeometry();
@@ -496,13 +532,14 @@ export class ViewController {
   }
 
   /**
-   * Check is the provided position can be set.
+   * Check if the current position (default) or
+   * the provided position is in bounds.
    *
-   * @param {Point} position The position.
+   * @param {Point} [position] Optional position.
    * @returns {boolean} True is the position is in bounds.
    */
-  canSetPosition(position) {
-    return this.#view.canSetPosition(position);
+  isPositionInBounds(position) {
+    return this.#view.isPositionInBounds(position);
   }
 
   /**
@@ -518,16 +555,15 @@ export class ViewController {
   }
 
   /**
-   * Get a position from a 2D (x,y) position.
+   * Get a world position from a 2D plane position.
    *
-   * @param {number} x The column position.
-   * @param {number} y The row position.
+   * @param {Point2D} point2D The input point.
    * @returns {Point} The associated position.
    */
-  getPositionFromPlanePoint(x, y) {
+  getPositionFromPlanePoint(point2D) {
     // keep third direction
     const k = this.getCurrentScrollIndexValue();
-    const planePoint = new Point3D(x, y, k);
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
     // ~indexToWorld to not loose precision
@@ -538,10 +574,10 @@ export class ViewController {
   }
 
   /**
-   * Get a 2D (x,y) position from a position.
+   * Get a 2D plane position from a world position.
    *
    * @param {Point} point The 3D position.
-   * @returns {object} The 2D position.
+   * @returns {Point2D} The 2D position.
    */
   getPlanePositionFromPosition(point) {
     // orient
@@ -550,10 +586,10 @@ export class ViewController {
     const point3D = geometry.worldToPoint(point);
     const planePoint = this.#planeHelper.getImageDeOrientedPoint3D(point3D);
     // return
-    return {
-      x: planePoint.getX(),
-      y: planePoint.getY(),
-    };
+    return new Point2D(
+      planePoint.getX(),
+      planePoint.getY(),
+    );
   }
 
   /**
@@ -571,13 +607,13 @@ export class ViewController {
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
-   * @param {object} point2D The 2D position as {x,y}.
+   * @param {Point2D} point2D The 2D position.
    * @returns {Point3D} The 3D point.
    */
   getPlanePositionFromPlanePoint(point2D) {
     // keep third direction
     const k = this.getCurrentScrollIndexValue();
-    const planePoint = new Point3D(point2D.x, point2D.y, k);
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getTargetDeOrientedPoint3D(planePoint);
     // ~indexToWorld to not loose precision
@@ -592,11 +628,109 @@ export class ViewController {
   /**
    * Get a 3D offset from a plane one.
    *
-   * @param {object} offset2D The plane offset as {x,y}.
+   * @param {Scalar2D} offset2D The plane offset as {x,y}.
    * @returns {Vector3D} The 3D world offset.
    */
   getOffset3DFromPlaneOffset(offset2D) {
     return this.#planeHelper.getOffset3DFromPlaneOffset(offset2D);
+  }
+
+  /**
+   * Get the current index incremented in the input direction.
+   *
+   * @param {number} dim The direction in which to increment.
+   * @returns {Index} The resulting index.
+   */
+  #getIncrementIndex(dim) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = 1;
+    } else {
+      console.warn('Cannot increment given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    return index.add(incr);
+  }
+
+  /**
+   * Get the current index decremented in the input direction.
+   *
+   * @param {number} dim The direction in which to decrement.
+   * @returns {Index} The resulting index.
+   */
+  #getDecrementIndex(dim) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = -1;
+    } else {
+      console.warn('Cannot decrement given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    return index.add(incr);
+  }
+
+  /**
+   * Get the current index incremented in the scroll direction.
+   *
+   * @returns {Index} The resulting index.
+   */
+  #getIncrementScrollIndex() {
+    return this.#getIncrementIndex(this.getScrollIndex());
+  }
+
+  /**
+   * Get the current index decremented in the scroll direction.
+   *
+   * @returns {Index} The resulting index.
+   */
+  #getDecrementScrollIndex() {
+    return this.#getDecrementIndex(this.getScrollIndex());
+  }
+
+  /**
+   * Get the current position incremented in the input direction.
+   *
+   * @param {number} dim The direction in which to increment.
+   * @returns {Point} The resulting point.
+   */
+  getIncrementPosition(dim) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getIncrementIndex(dim));
+  }
+
+  /**
+   * Get the current position decremented in the input direction.
+   *
+   * @param {number} dim The direction in which to decrement.
+   * @returns {Point} The resulting point.
+   */
+  getDecrementPosition(dim) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getDecrementIndex(dim));
+  }
+
+  /**
+   * Get the current position decremented in the scroll direction.
+   *
+   * @returns {Point} The resulting point.
+   */
+  getIncrementScrollPosition() {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getIncrementScrollIndex());
+  }
+
+  /**
+   * Get the current position decremented in the scroll direction.
+   *
+   * @returns {Point} The resulting point.
+   */
+  getDecrementScrollPosition() {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getDecrementScrollIndex());
   }
 
   /**
@@ -607,7 +741,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   incrementIndex(dim, silent) {
-    return this.#view.incrementIndex(dim, silent);
+    return this.setCurrentIndex(this.#getIncrementIndex(dim), silent);
   }
 
   /**
@@ -618,7 +752,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   decrementIndex(dim, silent) {
-    return this.#view.decrementIndex(dim, silent);
+    return this.setCurrentIndex(this.#getDecrementIndex(dim), silent);
   }
 
   /**
@@ -628,7 +762,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   decrementScrollIndex(silent) {
-    return this.#view.decrementScrollIndex(silent);
+    return this.setCurrentIndex(this.#getDecrementScrollIndex(), silent);
   }
 
   /**
@@ -638,7 +772,7 @@ export class ViewController {
    * @returns {boolean} False if not in bounds.
    */
   incrementScrollIndex(silent) {
-    return this.#view.incrementScrollIndex(silent);
+    return this.setCurrentIndex(this.#getIncrementScrollIndex(), silent);
   }
 
   /**
@@ -649,7 +783,7 @@ export class ViewController {
     if (!this.canScroll()) {
       return;
     }
-    if (this.#playerID === null) {
+    if (typeof this.#playerID === 'undefined') {
       const image = this.#view.getImage();
       const recommendedDisplayFrameRate =
         image.getMeta().RecommendedDisplayFrameRate;
@@ -658,7 +792,7 @@ export class ViewController {
       const size = image.getGeometry().getSize();
       const canScroll3D = size.canScroll3D();
 
-      this.#playerID = setInterval(() => {
+      this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
           canDoMore = this.incrementScrollIndex();
@@ -689,38 +823,43 @@ export class ViewController {
    * Stop scroll playing.
    */
   stop() {
-    if (this.#playerID !== null) {
+    if (typeof this.#playerID !== 'undefined') {
       clearInterval(this.#playerID);
-      this.#playerID = null;
+      this.#playerID = undefined;
     }
   }
 
   /**
    * Get the window/level.
    *
-   * @returns {object} The window center and width.
+   * @returns {WindowLevel} The window and level.
    */
   getWindowLevel() {
-    return {
-      width: this.#view.getCurrentWindowLut().getWindowLevel().getWidth(),
-      center: this.#view.getCurrentWindowLut().getWindowLevel().getCenter()
-    };
+    return this.#view.getWindowLevel();
   }
 
   /**
-   * Set the window/level.
+   * Get the current window level preset name.
    *
-   * @param {number} wc The window center.
-   * @param {number} ww The window width.
+   * @returns {string} The preset name.
    */
-  setWindowLevel(wc, ww) {
-    this.#view.setWindowLevel(wc, ww);
+  getCurrentWindowPresetName() {
+    return this.#view.getCurrentWindowPresetName();
+  }
+
+  /**
+   * Set the window and level.
+   *
+   * @param {WindowLevel} wl The window and level.
+   */
+  setWindowLevel(wl) {
+    this.#view.setWindowLevel(wl);
   }
 
   /**
    * Get the colour map.
    *
-   * @returns {ColourMap} The colour map.
+   * @returns {string} The colour map name.
    */
   getColourMap() {
     return this.#view.getColourMap();
@@ -729,17 +868,17 @@ export class ViewController {
   /**
    * Set the colour map.
    *
-   * @param {ColourMap} colourMap The colour map.
+   * @param {string} name The colour map name.
    */
-  setColourMap(colourMap) {
-    this.#view.setColourMap(colourMap);
+  setColourMap(name) {
+    this.#view.setColourMap(name);
   }
 
   /**
    * @callback alphaFn
-   * @param {object} value The pixel value.
-   * @param {object} index The values' index.
-   * @returns {number} The value to display.
+   * @param {number[]|number} value The pixel value.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value.
    */
 
   /**
@@ -752,17 +891,33 @@ export class ViewController {
   }
 
   /**
-   * Set the colour map from a name.
+   * Bind the view image to the provided layer.
    *
-   * @param {string} name The name of the colour map to set.
+   * @param {ViewLayer} viewLayer The layer to bind.
    */
-  setColourMapFromName(name) {
-    // check if we have it
-    if (!luts[name]) {
-      throw new Error('Unknown colour map: \'' + name + '\'');
-    }
-    // enable it
-    this.setColourMap(luts[name]);
+  bindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.addEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.addEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
+  }
+
+  /**
+   * Unbind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  unbindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.removeEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.removeEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
   }
 
   /**
@@ -793,7 +948,7 @@ export class ViewController {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
-    event.dataid = this.#dataIndex;
+    event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);
   };
 

@@ -21,6 +21,15 @@ thead {
 .negative {
   color: red;
 }
+.data-item {
+  display: inline-block;
+  background-color: #efefef;
+  margin: 2px;
+  padding: 1px;
+}
+.data-item:has(> input:checked) {
+  background-color: lavender;
+}
 </style>
 <!-- Third party -->
 <script src="../../node_modules/lodash/lodash.min.js"></script>
@@ -61,6 +70,12 @@ thead {
   <div id="parsers">
     <fieldset>
       <legend>Parsers</legend>
+    </fieldset>
+  </div>
+
+  <div id="tests">
+    <fieldset>
+      <legend>Tests</legend>
     </fieldset>
   </div>
 

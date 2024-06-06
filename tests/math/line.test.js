@@ -2,17 +2,18 @@ import {Point2D} from '../../src/math/point';
 import {Line, getAngle, getPerpendicularLine} from '../../src/math/line';
 
 /**
- * Tests for the 'math/shapes.js' file.
+ * Tests for the 'math/line.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Line}.
  *
- * @function module:tests/math~Line
+ * @function module:tests/math~line-class
  */
-QUnit.test('Test Line.', function (assert) {
+QUnit.test('Line class - #DWV-REQ-UI-07-007 Draw ruler', function (assert) {
   const p00 = new Point2D(0, 0);
   const p01 = new Point2D(0, -5);
   const l00 = new Line(p00, p01);
@@ -23,7 +24,8 @@ QUnit.test('Test Line.', function (assert) {
   // getLength
   assert.equal(l00.getLength(), 5, 'getLength');
   // getWorldLength
-  assert.equal(l00.getWorldLength(0.5, 0.5), 2.5, 'getWorldLength');
+  const spacing2D = {x: 0.5, y: 0.5};
+  assert.equal(l00.getWorldLength(spacing2D), 2.5, 'getWorldLength');
   // getMidpoint
   const pMid = new Point2D(0, -2.5); // rounded...
   assert.equal(l00.getMidpoint().equals(pMid), true, 'getMidpoint');
@@ -80,48 +82,50 @@ QUnit.test('Test Line.', function (assert) {
 /**
  * Tests for {@link Line}.
  *
- * @function module:tests/math~Line
+ * @function module:tests/math~line-angle
  */
-QUnit.test('Test angle between lines.', function (assert) {
-  const p00 = new Point2D(0, 0);
-  const p02 = new Point2D(1, -1);
+QUnit.test('Angle between lines - #DWV-REQ-UI-07-005 Draw protractor',
+  function (assert) {
+    const p00 = new Point2D(0, 0);
+    const p02 = new Point2D(1, -1);
 
-  // test #0
-  const p01 = new Point2D(1, 1);
-  const l00 = new Line(p00, p01);
-  const l01 = new Line(p00, p02);
-  assert.equal(
-    getAngle(l00, l01),
-    90,
-    'getAngle');
+    // test #0
+    const p01 = new Point2D(1, 1);
+    const l00 = new Line(p00, p01);
+    const l01 = new Line(p00, p02);
+    assert.equal(
+      getAngle(l00, l01),
+      90,
+      'getAngle');
 
-  // test #1
-  const p11 = new Point2D(1, 0);
-  const l10 = new Line(p00, p11);
-  const p12 = new Point2D(0, -1);
-  const p13 = new Point2D(1, -1);
-  const l11 = new Line(p12, p13);
-  assert.equal(
-    getAngle(l10, l11),
-    180,
-    'getAngle (horizontal parallel)');
+    // test #1
+    const p11 = new Point2D(1, 0);
+    const l10 = new Line(p00, p11);
+    const p12 = new Point2D(0, -1);
+    const p13 = new Point2D(1, -1);
+    const l11 = new Line(p12, p13);
+    assert.equal(
+      getAngle(l10, l11),
+      180,
+      'getAngle (horizontal parallel)');
 
-  // test #2
-  const p20 = new Point2D(0, -5);
-  const l20 = new Line(p00, p20);
-  const l21 = new Line(p11, p02);
-  assert.equal(
-    getAngle(l20, l21),
-    180,
-    'getAngle (vertical parallel)');
-});
+    // test #2
+    const p20 = new Point2D(0, -5);
+    const l20 = new Line(p00, p20);
+    const l21 = new Line(p11, p02);
+    assert.equal(
+      getAngle(l20, l21),
+      180,
+      'getAngle (vertical parallel)');
+  }
+);
 
 /**
  * Tests for {@link Line}.
  *
- * @function module:tests/math~Line
+ * @function module:tests/math~line-perpendicular
  */
-QUnit.test('Test perpendicular line.', function (assert) {
+QUnit.test('Perpendicular line', function (assert) {
   const p00 = new Point2D(0, 0);
   const p01 = new Point2D(0, -5);
   const l00 = new Line(p00, p01);
@@ -148,7 +152,7 @@ QUnit.test('Test perpendicular line.', function (assert) {
   };
   const isSimilarPoint2D = function (p0, p1) {
     return isSimilar(p0.getX(), p1.getX()) &&
-            isSimilar(p0.getY(), p1.getY());
+      isSimilar(p0.getY(), p1.getY());
   };
 
   const p6 = new Point2D(0, 1);

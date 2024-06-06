@@ -1,14 +1,15 @@
 import {Point2D} from '../math/point';
 import {Line, getPerpendicularLine, getAngle} from '../math/line';
+import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
-
 // external
 import Konva from 'konva';
 
-/**
- * Default draw label text.
- */
-const defaultArrowLabelText = '';
+// doc imports
+/* eslint-disable no-unused-vars */
+import {ViewController} from '../app/viewController';
+import {Style} from '../gui/style';
+/* eslint-enable no-unused-vars */
 
 /**
  * Arrow factory.
@@ -44,7 +45,7 @@ export class ArrowFactory {
   /**
    * Is the input group a group of this factory?
    *
-   * @param {object} group The group to test.
+   * @param {Konva.Group} group The group to test.
    * @returns {boolean} True if the group is from this fcatory.
    */
   isFactoryGroup(group) {
@@ -54,12 +55,12 @@ export class ArrowFactory {
   /**
    * Create an arrow shape to be displayed.
    *
-   * @param {Array} points The points from which to extract the line.
-   * @param {object} style The drawing style.
-   * @param {object} _viewController The associated view controller.
-   * @returns {object} The Konva object.
+   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Style} style The drawing style.
+   * @param {ViewController} viewController The associated view controller.
+   * @returns {Konva.Group} The Konva group.
    */
-  create(points, style, _viewController) {
+  create(points, style, viewController) {
     // physical shape
     const line = new Line(points[0], points[1]);
     // draw shape
@@ -74,10 +75,9 @@ export class ArrowFactory {
       name: 'shape'
     });
     // larger hitfunc
-    const linePerp0 = getPerpendicularLine(
-      line, points[0], style.scale(10));
-    const linePerp1 = getPerpendicularLine(
-      line, points[1], style.scale(10));
+    const tickLen = style.applyZoomScale(10).x;
+    const linePerp0 = getPerpendicularLine(line, points[0], tickLen);
+    const linePerp1 = getPerpendicularLine(line, points[1], tickLen);
     kshape.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -94,7 +94,7 @@ export class ArrowFactory {
     const verticalLine = new Line(line.getBegin(), beginTy);
     const angle = getAngle(line, verticalLine);
     const angleRad = angle * Math.PI / 180;
-    const radius = 5 * style.getScaledStrokeWidth();
+    const radius = Math.abs(style.applyZoomScale(8).x);
     const kpoly = new Konva.RegularPolygon({
       x: line.getBegin().getX() + radius * Math.sin(angleRad),
       y: line.getBegin().getY() + radius * Math.cos(angleRad),
@@ -117,12 +117,12 @@ export class ArrowFactory {
       name: 'text'
     });
     let textExpr = '';
-    // TODO: allow override?
-    // if (typeof arrowLabelText !== 'undefined') {
-    //   textExpr = arrowLabelText;
-    // } else {
-    textExpr = defaultArrowLabelText;
-    // }
+    const modality = viewController.getModality();
+    if (typeof defaults.labelText.arrow[modality] !== 'undefined') {
+      textExpr = defaults.labelText.arrow[modality];
+    } else {
+      textExpr = defaults.labelText.arrow['*'];
+    }
     ktext.setText(textExpr);
     // augment text with meta data
     // @ts-ignore
@@ -159,9 +159,9 @@ export class ArrowFactory {
   /**
    * Get anchors to update an arrow shape.
    *
-   * @param {object} shape The associated shape.
-   * @param {object} style The application style.
-   * @returns {Array} A list of anchors.
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const points = shape.points();
@@ -179,9 +179,9 @@ export class ArrowFactory {
   /**
    * Update an arrow shape.
    *
-   * @param {object} anchor The active anchor.
-   * @param {object} style The app style.
-   * @param {object} _viewController The associated view controller.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The app style.
+   * @param {ViewController} _viewController The associated view controller.
    */
   update(anchor, style, _viewController) {
     // parent group
@@ -190,22 +190,31 @@ export class ArrowFactory {
     const kline = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-      // associated triangle shape
+    if (!(kline instanceof Konva.Line)) {
+      return;
+    }
+    // associated triangle shape
     const ktriangle = group.getChildren(function (node) {
       return node.name() === 'shape-triangle';
     })[0];
-      // associated label
+    if (!(ktriangle instanceof Konva.RegularPolygon)) {
+      return;
+    }
+    // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
     })[0];
-      // find special points
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // find special points
     const begin = group.getChildren(function (node) {
       return node.id() === 'begin';
     })[0];
     const end = group.getChildren(function (node) {
       return node.id() === 'end';
     })[0];
-      // update special points
+    // update special points
     switch (anchor.id()) {
     case 'begin':
       begin.x(anchor.x());
@@ -230,8 +239,9 @@ export class ArrowFactory {
     // larger hitfunc
     const p2b = new Point2D(bx, by);
     const p2e = new Point2D(ex, ey);
-    const linePerp0 = getPerpendicularLine(line, p2b, 10);
-    const linePerp1 = getPerpendicularLine(line, p2e, 10);
+    const tickLen = style.applyZoomScale(10).x;
+    const linePerp0 = getPerpendicularLine(line, p2b, tickLen);
+    const linePerp1 = getPerpendicularLine(line, p2e, tickLen);
     kline.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -256,6 +266,7 @@ export class ArrowFactory {
 
     // update text
     const ktext = klabel.getText();
+    // @ts-expect-error
     ktext.setText(ktext.meta.textExpr);
     // update position
     const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;

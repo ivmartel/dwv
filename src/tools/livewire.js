@@ -1,4 +1,8 @@
 import {Style} from '../gui/style';
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic';
 import {Point2D} from '../math/point';
 import {Path} from '../math/path';
 import {Scissors} from '../math/scissors';
@@ -37,6 +41,13 @@ export class Livewire {
    * @type {boolean}
    */
   #started = false;
+
+  /**
+   * Start point.
+   *
+   * @type {Point2D}
+   */
+  #startPoint;
 
   /**
    * Draw command.
@@ -90,7 +101,7 @@ export class Livewire {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
@@ -122,40 +133,21 @@ export class Livewire {
   #scissors = new Scissors();
 
   /**
-   * Finish a livewire (roi) shape.
-   */
-  #finishShape() {
-    // fire creation event (was not propagated during draw)
-    this.#fireEvent({
-      type: 'drawcreate',
-      id: this.#shapeGroup.id()
-    });
-    // listen
-    this.#command.onExecute = this.#fireEvent;
-    this.#command.onUndo = this.#fireEvent;
-    // save command in undo stack
-    this.#app.addToUndoStack(this.#command);
-    // set flag
-    this.#started = false;
-  }
-
-  /**
-   * Handle mouse down event.
+   * Start tool interaction.
    *
-   * @param {object} event The mouse down event.
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    */
-  mousedown = (event) => {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  #start(point, divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const imageSize = viewLayer.getViewController().getImageSize();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(point);
 
     // first time
     if (!this.#started) {
       this.#started = true;
-      this.x0 = index.get(0);
-      this.y0 = index.get(1);
+      this.#startPoint = new Point2D(index.get(0), index.get(1));
       // clear vars
       this.#clearPaths();
       this.#clearParentPoints(imageSize);
@@ -172,9 +164,11 @@ export class Livewire {
       this.#path.addPoint(p0);
       this.#path.addControlPoint(p0);
     } else {
+      const diffX = Math.abs(index.get(0) - this.#startPoint.getX());
+      const diffY = Math.abs(index.get(1) - this.#startPoint.getY());
       // final point: at 'tolerance' of the initial point
-      if ((Math.abs(index.get(0) - this.x0) < this.#tolerance) &&
-        (Math.abs(index.get(1) - this.y0) < this.#tolerance)) {
+      if (diffX < this.#tolerance &&
+        diffY < this.#tolerance) {
         // finish
         this.#finishShape();
       } else {
@@ -186,21 +180,21 @@ export class Livewire {
         this.#path.addControlPoint(this.#currentPath.getPoint(0));
       }
     }
-  };
+  }
 
   /**
-   * Handle mouse move event.
+   * Update tool interaction.
    *
-   * @param {object} event The mouse move event.
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
    */
-  mousemove = (event) => {
+  #update(point, divId) {
     if (!this.#started) {
       return;
     }
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(point);
 
     // set the point to find the path to
     let p = {x: index.get(0), y: index.get(1)};
@@ -259,10 +253,53 @@ export class Livewire {
     posGroup.add(this.#shapeGroup);
 
     // draw shape command
-    this.#command = new DrawGroupCommand(this.#shapeGroup, 'livewire',
-      drawLayer.getKonvaLayer());
+    this.#command = new DrawGroupCommand(
+      this.#shapeGroup,
+      'livewire',
+      drawLayer
+    );
     // draw
     this.#command.execute();
+  }
+
+  /**
+   * Finish a livewire (roi) shape.
+   */
+  #finishShape() {
+    // fire creation event (was not propagated during draw)
+    this.#fireEvent({
+      type: 'drawcreate',
+      id: this.#shapeGroup.id()
+    });
+    // listen
+    this.#command.onExecute = this.#fireEvent;
+    this.#command.onUndo = this.#fireEvent;
+    // save command in undo stack
+    this.#app.addToUndoStack(this.#command);
+    // set flag
+    this.#started = false;
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(mousePoint, layerDetails.groupDivId);
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  mousemove = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -277,11 +314,10 @@ export class Livewire {
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    // treat as mouse up
-    this.mouseup(event);
+  mouseout = (_event) => {
+    // nothing to do
   };
 
   /**
@@ -299,8 +335,9 @@ export class Livewire {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    // treat as mouse down
-    this.mousedown(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -309,18 +346,18 @@ export class Livewire {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    // treat as mouse move
-    this.mousemove(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
-  touchend = (event) => {
-    // treat as mouse up
-    this.mouseup(event);
+  touchend = (_event) => {
+    // nothing to do
   };
 
   /**

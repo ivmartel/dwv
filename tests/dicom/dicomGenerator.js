@@ -77,6 +77,7 @@ test.generatePixelDataFromJSONTags = function (
   // extract info from tags
   const numberOfRows = tags.Rows;
   const numberOfColumns = tags.Columns;
+  const numberOfFrames = tags.NumberOfFrames;
   const bitsAllocated = tags.BitsAllocated;
   const pixelRepresentation = tags.PixelRepresentation;
   const samplesPerPixel = tags.SamplesPerPixel;
@@ -131,6 +132,7 @@ test.generatePixelDataFromJSONTags = function (
   const generator = new GeneratorClass({
     numberOfColumns: numberOfColumns,
     numberOfRows: numberOfRows,
+    numberOfFrames: numberOfFrames,
     numberOfSamples: numberOfSamples,
     numberOfColourPlanes: numberOfColourPlanes,
     photometricInterpretation: photometricInterpretation,

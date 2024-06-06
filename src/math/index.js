@@ -207,50 +207,36 @@ export function getZeroIndex(size) {
 }
 
 /**
- * Get an array sort callback.
- * f(a,b) > 0 -> b,a
- * f(a,b) < 0 -> a,b
- * f(a,b) = 0 -> original order
- *
- * @param {number} direction The direction to use to compare indices.
- * @returns {Function} A function that compares two Index.
- */
-export function getIndexCompareFunction(direction) {
-  return function (a, b) {
-    return a.get(direction) - b.get(direction);
-  };
-}
-
-/**
  * Get an index from an id string in the form of: '#0-1_#1-2'
  * (result of index.toStringId).
  *
  * @param {string} inputStr The input string.
- * @returns {Index} The corresponding index.
+ * @returns {Index} The corresponding index (minimum size is 3D).
  */
 export function getIndexFromStringId(inputStr) {
   // split ids
   const strIds = inputStr.split('_');
-  // get the size of the index
-  let pointLength = 0;
+  // get the size of the index (minimum 3)
+  let numberOfDims = 3;
   let dim;
   for (let i = 0; i < strIds.length; ++i) {
+    // expecting dim < 10
     dim = parseInt(strIds[i].substring(1, 2), 10);
-    if (dim > pointLength) {
-      pointLength = dim;
+    // dim is zero based
+    if (dim + 1 > numberOfDims) {
+      numberOfDims = dim + 1;
     }
   }
-  if (pointLength === 0) {
-    throw new Error('No dimension found in point stringId');
-  }
   // default values
-  const values = new Array(pointLength);
+  const values = new Array(numberOfDims);
   values.fill(0);
   // get other values from the input string
   for (let j = 0; j < strIds.length; ++j) {
-    dim = parseInt(strIds[j].substring(1, 3), 10);
+    // expecting dim < 10
+    dim = parseInt(strIds[j].substring(1, 2), 10);
     const value = parseInt(strIds[j].substring(3), 10);
     values[dim] = value;
   }
+
   return new Index(values);
 }

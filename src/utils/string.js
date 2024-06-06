@@ -46,9 +46,8 @@ export function endsWith(str, search) {
 }
 
 /**
- * Split key/value string:
- *  key0=val00&key0=val01&key1=val10 returns
- *  { key0 : [val00, val01], key1 : val1 }
+ * Split key/value string: `key0=val00&key0=val01&key1=val10
+ *   will return `{key0 : [val00, val01], key1 : val1}`.
  *
  * @param {string} inputStr The string to split.
  * @returns {object} The split string.
@@ -82,7 +81,7 @@ export function splitKeyValueString(inputStr) {
  * braces.
  *
  * @param {string} inputStr The input string.
- * @returns {Array} An array of found flags.
+ * @returns {string[]} An array of found flags.
  */
 export function getFlags(inputStr) {
   const flags = [];
@@ -155,7 +154,7 @@ export function replaceFlags(inputStr, values) {
  * Get the root of an input path.
  * Splits using `/` as separator.
  *
- * @param {string} path The input path
+ * @param {string} path The input path.
  * @returns {string} The input path without its last part.
  */
 export function getRootPath(path) {
@@ -204,9 +203,11 @@ export function stringToUint8Array(str) {
 
 /**
  * Round a float number to a given precision.
- * Inspired from https://stackoverflow.com/a/49729715/3639892.
+ *
+ * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
+ *
  * Can be a solution to not have trailing zero as when
- * using toFixed or toPrecision.
+ *   using toFixed or toPrecision.
  * '+number.toFixed(precision)' does not pass all the tests...
  *
  * @param {number} number The number to round.

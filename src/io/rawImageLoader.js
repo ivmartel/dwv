@@ -10,7 +10,7 @@ import {urlContentTypes} from './urlsLoader';
 export class RawImageLoader {
 
   /**
-   * if abort is triggered, all image.onload callbacks have to be cancelled
+   * If abort is triggered, all image.onload callbacks have to be cancelled.
    *
    * @type {boolean}
    */
@@ -112,32 +112,50 @@ export class RawImageLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True for files with type 'image.*'.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
     return (typeof file.type !== 'undefined' &&
-      file.type.match('image.*'));
+      file.type.match('image.*') !== null);
   }
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'rawimage',
+   * - the `options.requestHeaders` contains an item
+   *   starting with 'Accept: image/'.
+   * - the url has a 'contentType' and it is 'image/jpeg', 'image/png'
+   *   or 'image/gif' (as in wado urls),
+   * - the url has no 'contentType' and the extension is 'jpeg', 'jpg',
+   *   'png' or 'gif'.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      // starts with 'image/'
-      const isImage = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'image/');
-      };
-      return typeof options.requestHeaders.find(isImage) !== 'undefined';
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'rawimage') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'image/'
+          return startsWith(acceptHeader.value, 'image/');
+        }
+      }
     }
 
     const urlObjext = getUrlFromUri(url);
@@ -164,7 +182,8 @@ export class RawImageLoader {
    */
   canLoadMemory(mem) {
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

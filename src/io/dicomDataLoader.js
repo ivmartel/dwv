@@ -42,7 +42,7 @@ export class DicomDataLoader {
   }
 
   /**
-   * DICOM buffer to View (asynchronous)
+   * DICOM buffer to View (asynchronous).
    *
    */
   #db2v = new DicomBufferToView();
@@ -95,8 +95,11 @@ export class DicomDataLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if one of the folowing conditions is true:
+   * - the file has a 'dcm' extension,
+   * - the file has no extension.
    *
-   * @param {object} file The file to check.
+   * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
    */
   canLoadFile(file) {
@@ -108,26 +111,38 @@ export class DicomDataLoader {
 
   /**
    * Check if the loader can load the provided url.
-   * True if:
-   *  - the url has a 'contentType' and it is 'application/dicom'
-   *    (as in wado urls)
-   *  - the url has no 'contentType' and no extension or the extension is 'dcm'
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'dicom',
+   * - the `options.requestHeaders` contains a 'Accept: application/dicom',
+   * - the url has a 'contentType' and it is 'application/dicom'
+   *   (as in wado urls),
+   * - the url has no 'contentType' and no extension or the extension is 'dcm'.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
    * @returns {boolean} True if the url can be loaded.
    */
   canLoadUrl(url, options) {
-    // if there are options.requestHeaders, just base check on them
-    if (typeof options !== 'undefined' &&
-      typeof options.requestHeaders !== 'undefined') {
-      // starts with 'application/dicom'
-      const isDicom = function (element) {
-        return element.name === 'Accept' &&
-          startsWith(element.value, 'application/dicom') &&
-          element.value[18] !== '+';
-      };
-      return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+    // check options
+    if (typeof options !== 'undefined') {
+      // check options.forceLoader
+      if (typeof options.forceLoader !== 'undefined' &&
+        options.forceLoader === 'dicom') {
+        return true;
+      }
+      // check options.requestHeaders for 'Accept'
+      if (typeof options.requestHeaders !== 'undefined') {
+        const isNameAccept = function (element) {
+          return element.name === 'Accept';
+        };
+        const acceptHeader = options.requestHeaders.find(isNameAccept);
+        if (typeof acceptHeader !== 'undefined') {
+          // starts with 'application/dicom' and no '+'
+          const acceptValue = 'application/dicom';
+          return startsWith(acceptHeader.value, acceptValue) &&
+            acceptHeader.value[acceptValue.length] !== '+';
+        }
+      }
     }
 
     const urlObjext = getUrlFromUri(url);
@@ -151,12 +166,14 @@ export class DicomDataLoader {
    * @returns {boolean} True if the object can be loaded.
    */
   canLoadMemory(mem) {
-    if (typeof mem['Content-Type'] !== 'undefined' &&
-      mem['Content-Type'] === 'application/dicom') {
+    const contentType = mem['Content-Type'];
+    if (typeof contentType !== 'undefined' &&
+      contentType.startsWith('application/dicom')) {
       return true;
     }
     if (typeof mem.filename !== 'undefined') {
-      return this.canLoadFile({name: mem.filename});
+      const tmpFile = new File(['from memory'], mem.filename);
+      return this.canLoadFile(tmpFile);
     }
     return false;
   }

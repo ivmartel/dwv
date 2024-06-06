@@ -6,6 +6,33 @@ import {mergeObjects} from '../utils/operator';
 import {Image} from '../image/image';
 /* eslint-enable no-unused-vars */
 
+/**
+ * Image and meta class.
+ */
+class ImageData {
+  /**
+   * Associated HTML div id.
+   *
+   * @type {Image}
+   */
+  image;
+  /**
+   * Associated HTML div id.
+   *
+   * @type {object}
+   */
+  meta;
+
+  /**
+   * @param {Image} image The image.
+   * @param {object} meta The image meta.
+   */
+  constructor(image, meta) {
+    this.image = image;
+    this.meta = meta;
+  }
+}
+
 /*
  * Data (list of {image, meta}) controller.
  */
@@ -14,9 +41,16 @@ export class DataController {
   /**
    * List of {image, meta}.
    *
-   * @type {object}
+   * @type {Object<string, ImageData>}
    */
-  #data = {};
+  #dataList = {};
+
+  /**
+   * Distinct data loaded counter.
+   *
+   * @type {number}
+   */
+  #dataIdCounter = -1;
 
   /**
    * Listener handler.
@@ -26,78 +60,134 @@ export class DataController {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * Get the length of the data storage.
+   * Get the next data id.
    *
-   * @returns {number} The length.
+   * @returns {string} The data id.
    */
-  length() {
-    return Object.keys(this.#data).length;
+  getNextDataId() {
+    ++this.#dataIdCounter;
+    return this.#dataIdCounter.toString();
+  }
+
+  /**
+   * Get the list of ids in the data storage.
+   *
+   * @returns {string[]} The list of data ids.
+   */
+  getDataIds() {
+    return Object.keys(this.#dataList);
   }
 
   /**
    * Reset the class: empty the data storage.
    */
   reset() {
-    this.#data = [];
+    this.#dataList = {};
   }
 
   /**
    * Get a data at a given index.
    *
-   * @param {number} index The index of the data.
-   * @returns {object} The data.
+   * @param {string} dataId The data id.
+   * @returns {ImageData|undefined} The data as {image, meta}.
    */
-  get(index) {
-    return this.#data[index];
+  get(dataId) {
+    return this.#dataList[dataId];
+  }
+
+  /**
+   * Get the list of dataIds that contain the input UIDs.
+   *
+   * @param {string[]} uids A list of UIDs.
+   * @returns {string[]} The list of dataIds that contain the UIDs.
+   */
+  getDataIdsFromSopUids(uids) {
+    const res = [];
+    // check input
+    if (typeof uids === 'undefined' ||
+      uids.length === 0) {
+      return res;
+    }
+    const keys = Object.keys(this.#dataList);
+    for (const key of keys) {
+      if (this.#dataList[key].image.containsImageUids(uids)) {
+        res.push(key);
+      }
+    }
+    return res;
   }
 
   /**
    * Set the image at a given index.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @param {Image} image The image to set.
    */
-  setImage(index, image) {
-    this.#data[index].image = image;
+  setImage(dataId, image) {
+    this.#dataList[dataId].image = image;
     // fire image set
     this.#fireEvent({
       type: 'imageset',
       value: [image],
-      dataid: index
+      dataid: dataId
     });
     // listen to image change
-    image.addEventListener('imagechange', this.#getFireEvent(index));
+    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
+    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
   }
 
   /**
    * Add a new data.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @param {Image} image The image.
    * @param {object} meta The image meta.
    */
-  addNew(index, image, meta) {
-    if (typeof this.#data[index] !== 'undefined') {
-      throw new Error('Index already used in storage: ' + index);
+  addNew(dataId, image, meta) {
+    if (typeof this.#dataList[dataId] !== 'undefined') {
+      throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
-    this.#data[index] = {
-      image: image,
-      meta: meta
-    };
+    this.#dataList[dataId] = new ImageData(image, meta);
     // listen to image change
-    image.addEventListener('imagechange', this.#getFireEvent(index));
+    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
+    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+  }
+
+  /**
+   * Remove a data from the list.
+   *
+   * @param {string} dataId The data id.
+   */
+  remove(dataId) {
+    if (typeof this.#dataList[dataId] !== 'undefined') {
+      // stop listeners
+      this.#dataList[dataId].image.removeEventListener(
+        'imagecontentchange', this.#getFireEvent(dataId));
+      this.#dataList[dataId].image.removeEventListener(
+        'imagegeometrychange', this.#getFireEvent(dataId));
+      // fire an image remove event
+      this.#fireEvent({
+        type: 'imageremove',
+        dataid: dataId
+      });
+      // remove data from list
+      delete this.#dataList[dataId];
+    }
   }
 
   /**
    * Update the current data.
    *
-   * @param {number} index The index of the data.
+   * @param {string} dataId The data id.
    * @param {Image} image The image.
    * @param {object} meta The image meta.
    */
-  update(index, image, meta) {
-    const dataToUpdate = this.#data[index];
+  update(dataId, image, meta) {
+    if (typeof this.#dataList[dataId] === 'undefined') {
+      throw new Error('Cannot find data to update: ' + dataId);
+    }
+    const dataToUpdate = this.#dataList[dataId];
 
     // add slice to current image
     dataToUpdate.image.appendSlice(image);
@@ -150,17 +240,17 @@ export class DataController {
   };
 
   /**
-   * Get a fireEvent function that adds the input index
+   * Get a fireEvent function that adds the input data id
    * to the event value.
    *
-   * @param {number} index The data index.
+   * @param {string} dataId The data id.
    * @returns {Function} A fireEvent function.
    */
-  #getFireEvent(index) {
+  #getFireEvent(dataId) {
     return (event) => {
-      event.dataid = index;
+      event.dataid = dataId;
       this.#fireEvent(event);
     };
   }
 
-} // ImageController class
+} // DataController class

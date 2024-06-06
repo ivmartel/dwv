@@ -3,6 +3,10 @@ import {RoiFactory} from '../tools/roi';
 import {guid} from '../math/stats';
 import {Point2D} from '../math/point';
 import {Style} from '../gui/style';
+import {
+  getMousePoint,
+  getTouchPoints
+} from '../gui/generic';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
@@ -10,13 +14,16 @@ import {logger} from '../utils/logger';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {LayerGroup} from '../gui/layerGroup';
+import {Scalar2D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
  * The magic wand namespace.
  *
+ * Ref: {@link https://github.com/Tamersoul/magic-wand-js}.
+ *
  * @external MagicWand
- * @see https://github.com/Tamersoul/magic-wand-js
  */
 import MagicWand from 'magic-wand-tool';
 
@@ -59,28 +66,28 @@ export class Floodfill {
   #simplifyCount = 2000;
 
   /**
-   * Canvas info
+   * Canvas info.
    *
    * @type {object}
    */
   #imageInfo = null;
 
   /**
-   * Object created by MagicWand lib containing border points
+   * Object created by MagicWand lib containing border points.
    *
    * @type {object}
    */
   #mask = null;
 
   /**
-   * threshold default tolerance of the tool border
+   * Threshold default tolerance of the tool border.
    *
    * @type {number}
    */
   #initialthreshold = 10;
 
   /**
-   * threshold tolerance of the tool border
+   * Threshold tolerance of the tool border.
    *
    * @type {number}
    */
@@ -150,14 +157,14 @@ export class Floodfill {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
   /**
    * Set extend option for painting border on all slices.
    *
-   * @param {boolean} bool The option to set
+   * @param {boolean} bool The option to set.
    */
   setExtend(bool) {
     this.#extender = bool;
@@ -174,16 +181,16 @@ export class Floodfill {
   }
 
   /**
-   * Get (x, y) coordinates referenced to the canvas
+   * Get (x, y) coordinates referenced to the canvas.
    *
-   * @param {object} event The original event.
-   * @returns {object} The coordinates as a {x,y}.
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
+   * @returns {Scalar2D} The coordinates as a {x,y}.
    */
-  #getCoord = (event) => {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  #getIndex = (point, divId) => {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    const index = viewLayer.displayToPlaneIndex(point);
     return {
       x: index.get(0),
       y: index.get(1)
@@ -236,7 +243,7 @@ export class Floodfill {
    *
    * @param {object} point The start point.
    * @param {number} threshold The border threshold.
-   * @param {object} layerGroup The origin layer group.
+   * @param {LayerGroup} layerGroup The origin layer group.
    * @returns {boolean} False if no border.
    */
   #paintBorder(point, threshold, layerGroup) {
@@ -257,8 +264,11 @@ export class Floodfill {
       posGroup.add(this.#shapeGroup);
 
       // draw shape command
-      this.#command = new DrawGroupCommand(this.#shapeGroup, 'floodfill',
-        drawLayer.getKonvaLayer());
+      this.#command = new DrawGroupCommand(
+        this.#shapeGroup,
+        'floodfill',
+        drawLayer
+      );
       this.#command.onExecute = this.#fireEvent;
       this.#command.onUndo = this.#fireEvent;
       // // draw
@@ -273,7 +283,7 @@ export class Floodfill {
   }
 
   /**
-   * Create Floodfill in all the prev and next slices while border is found
+   * Create Floodfill in all the prev and next slices while border is found.
    *
    * @param {number} ini The first slice to extend to.
    * @param {number} end The last slice to extend to.
@@ -354,22 +364,22 @@ export class Floodfill {
   }
 
   /**
-   * Event fired when threshold change
+   * Event fired when threshold change.
    *
-   * @param {number} _value Current threshold
+   * @param {number} _value Current threshold.
    */
   onThresholdChange(_value) {
     // Defaults do nothing
   }
 
   /**
-   * Handle mouse down event.
+   * Start tool interaction.
    *
-   * @param {object} event The mouse down event.
+   * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    */
-  mousedown = (event) => {
-    const layerDetails = getLayerDetailsFromEvent(event);
-    const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
+  #start(point, divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     const drawLayer = layerGroup.getActiveDrawLayer();
 
@@ -384,9 +394,50 @@ export class Floodfill {
       drawLayer.getKonvaLayer().getAbsoluteScale());
 
     this.#started = true;
-    this.#initialpoint = this.#getCoord(event);
+    this.#initialpoint = this.#getIndex(point, divId);
     this.#paintBorder(this.#initialpoint, this.#initialthreshold, layerGroup);
     this.onThresholdChange(this.#initialthreshold);
+  }
+
+  /**
+   * Update tool interaction.
+   *
+   * @param {Point2D} point The update point.
+   * @param {string} divId The layer group divId.
+   */
+  #update(point, divId) {
+    if (!this.#started) {
+      return;
+    }
+
+    const movedpoint = this.#getIndex(point, divId);
+    this.#currentthreshold = Math.round(Math.sqrt(
+      Math.pow((this.#initialpoint.x - movedpoint.x), 2) +
+      Math.pow((this.#initialpoint.y - movedpoint.y), 2)) / 2);
+    this.#currentthreshold = this.#currentthreshold < this.#initialthreshold
+      ? this.#initialthreshold
+      : this.#currentthreshold - this.#initialthreshold;
+    this.modifyThreshold(this.#currentthreshold);
+  }
+
+  /**
+   * Finish tool interaction.
+   */
+  #finish() {
+    if (this.#started) {
+      this.#started = false;
+    }
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  mousedown = (event) => {
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -395,17 +446,9 @@ export class Floodfill {
    * @param {object} event The mouse move event.
    */
   mousemove = (event) => {
-    if (!this.#started) {
-      return;
-    }
-    const movedpoint = this.#getCoord(event);
-    this.#currentthreshold = Math.round(Math.sqrt(
-      Math.pow((this.#initialpoint.x - movedpoint.x), 2) +
-      Math.pow((this.#initialpoint.y - movedpoint.y), 2)) / 2);
-    this.#currentthreshold = this.#currentthreshold < this.#initialthreshold
-      ? this.#initialthreshold
-      : this.#currentthreshold - this.#initialthreshold;
-    this.modifyThreshold(this.#currentthreshold);
+    const mousePoint = getMousePoint(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -414,7 +457,7 @@ export class Floodfill {
    * @param {object} _event The mouse up event.
    */
   mouseup = (_event) => {
-    this.#started = false;
+    this.#finish();
     // TODO: re-activate
     // if (this.#extender) {
     //   const layerDetails = getLayerDetailsFromEvent(event);
@@ -427,10 +470,10 @@ export class Floodfill {
   /**
    * Handle mouse out event.
    *
-   * @param {object} event The mouse out event.
+   * @param {object} _event The mouse out event.
    */
-  mouseout = (event) => {
-    this.mouseup(event);
+  mouseout = (_event) => {
+    this.#finish();
   };
 
   /**
@@ -439,8 +482,9 @@ export class Floodfill {
    * @param {object} event The touch start event.
    */
   touchstart = (event) => {
-    // treat as mouse down
-    this.mousedown(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -449,18 +493,18 @@ export class Floodfill {
    * @param {object} event The touch move event.
    */
   touchmove = (event) => {
-    // treat as mouse move
-    this.mousemove(event);
+    const touchPoints = getTouchPoints(event);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#update(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
    * Handle touch end event.
    *
-   * @param {object} event The touch end event.
+   * @param {object} _event The touch end event.
    */
-  touchend = (event) => {
-    // treat as mouse up
-    this.mouseup(event);
+  touchend = (_event) => {
+    this.#finish();
   };
 
   /**

@@ -2,6 +2,7 @@ import {Index} from '../math/index';
 import {ListenerHandler} from '../utils/listen';
 import {viewEventNames} from '../image/view';
 import {ViewController} from '../app/viewController';
+import {Point2D} from '../math/point';
 import {
   canCreateCanvas,
   InteractionEventNames
@@ -12,6 +13,7 @@ import {getScaledOffset} from './layerGroup';
 /* eslint-disable no-unused-vars */
 import {Vector3D} from '../math/vector';
 import {Point, Point3D} from '../math/point';
+import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -29,7 +31,7 @@ export class ViewLayer {
   /**
    * The view controller.
    *
-   * @type {object}
+   * @type {ViewController}
    */
   #viewController = null;
 
@@ -71,14 +73,14 @@ export class ViewLayer {
   /**
    * The layer base size as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseSize;
 
   /**
    * The layer base spacing as {x,y}.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseSpacing;
 
@@ -92,49 +94,56 @@ export class ViewLayer {
   /**
    * The layer scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #scale = {x: 1, y: 1};
 
   /**
    * The layer fit scale.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #fitScale = {x: 1, y: 1};
 
   /**
+   * The layer flip scale.
+   *
+   * @type {Scalar3D}
+   */
+  #flipScale = {x: 1, y: 1, z: 1};
+
+  /**
    * The layer offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #offset = {x: 0, y: 0};
 
   /**
    * The base layer offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #baseOffset = {x: 0, y: 0};
 
   /**
    * The view offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #viewOffset = {x: 0, y: 0};
 
   /**
    * The zoom offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #zoomOffset = {x: 0, y: 0};
 
   /**
    * The flip offset.
    *
-   * @type {object}
+   * @type {Scalar2D}
    */
   #flipOffset = {x: 0, y: 0};
 
@@ -146,26 +155,41 @@ export class ViewLayer {
   #needsDataUpdate = null;
 
   /**
-   * The associated data index.
+   * The associated data id.
    *
-   * @type {number}
+   * @type {string}
    */
-  #dataIndex = null;
+  #dataId;
 
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
 
   /**
    * Image smoothing flag.
-   * see: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled
+   *
+   * See: {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled}.
    *
    * @type {boolean}
    */
-  #imageSmoothingEnabled = false;
+  #imageSmoothing = false;
+
+  /**
+   * Layer group origin.
+   *
+   * @type {Point3D}
+   */
+  #layerGroupOrigin;
+
+  /**
+   * Layer group first origin.
+   *
+   * @type {Point3D}
+   */
+  #layerGroupOrigin0;
 
   /**
    * @param {HTMLElement} containerDiv The layer div, its id will be used
@@ -178,34 +202,55 @@ export class ViewLayer {
   }
 
   /**
-   * Get the associated data index.
+   * Get the associated data id.
    *
-   * @returns {number} The index.
+   * @returns {string} The data id.
    */
-  getDataIndex() {
-    return this.#dataIndex;
+  getDataId() {
+    return this.#dataId;
   }
 
   /**
-   * Set the imageSmoothingEnabled flag value.
+   * Get the layer scale.
+   *
+   * @returns {Scalar2D} The scale as {x,y}.
+   */
+  getScale() {
+    return this.#scale;
+  }
+
+  /**
+   * Get the layer zoom offset without the fit scale.
+   *
+   * @returns {Scalar2D} The offset as {x,y}.
+   */
+  getAbsoluteZoomOffset() {
+    return {
+      x: this.#zoomOffset.x * this.#fitScale.x,
+      y: this.#zoomOffset.y * this.#fitScale.y
+    };
+  }
+
+  /**
+   * Set the imageSmoothing flag value.
    *
    * @param {boolean} flag True to enable smoothing.
    */
-  enableImageSmoothing(flag) {
-    this.#imageSmoothingEnabled = flag;
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
   }
 
   /**
    * Set the associated view.
    *
    * @param {object} view The view.
-   * @param {number} index The associated data index.
+   * @param {string} dataId The associated data id.
    */
-  setView(view, index) {
-    this.#dataIndex = index;
+  setView(view, dataId) {
+    this.#dataId = dataId;
     // local listeners
     view.addEventListener('wlchange', this.#onWLChange);
-    view.addEventListener('colourchange', this.#onColourChange);
+    view.addEventListener('colourmapchange', this.#onColourMapChange);
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
     // view events
@@ -213,7 +258,9 @@ export class ViewLayer {
       view.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // create view controller
-    this.#viewController = new ViewController(view, index);
+    this.#viewController = new ViewController(view, dataId);
+    // bind layer and image
+    this.bindImage();
   }
 
   /**
@@ -242,10 +289,44 @@ export class ViewLayer {
    */
   onimageset = (event) => {
     // event.value = [index, image]
-    if (this.#dataIndex === event.dataid) {
-      this.#viewController.setImage(event.value[0], this.#dataIndex);
+    if (this.#dataId === event.dataid) {
+      this.#viewController.setImage(event.value[0], this.#dataId);
       this.#setBaseSize(this.#viewController.getImageSize().get2D());
       this.#needsDataUpdate = true;
+    }
+  };
+
+  /**
+   * Bind this layer to the view image.
+   */
+  bindImage() {
+    if (this.#viewController) {
+      this.#viewController.bindImageAndLayer(this);
+    }
+  }
+
+  /**
+   * Unbind this layer to the view image.
+   */
+  unbindImage() {
+    if (this.#viewController) {
+      this.#viewController.unbindImageAndLayer(this);
+    }
+  }
+
+  /**
+   * Handle an image content change event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimagecontentchange = (event) => {
+    // event.value = [index]
+    if (this.#dataId === event.dataid) {
+      this.#isValidPosition = this.#viewController.isPositionInBounds();
+      // flag update and draw
+      this.#needsDataUpdate = true;
+      this.draw();
     }
   };
 
@@ -255,10 +336,30 @@ export class ViewLayer {
    * @param {object} event The event.
    * @function
    */
-  onimagechange = (event) => {
+  onimagegeometrychange = (event) => {
     // event.value = [index]
-    if (this.#dataIndex === event.dataid) {
-      this.#needsDataUpdate = true;
+    if (this.#dataId === event.dataid) {
+      const vcSize = this.#viewController.getImageSize().get2D();
+      if (this.#baseSize.x !== vcSize.x ||
+        this.#baseSize.y !== vcSize.y) {
+        // size changed, recalculate base offset
+        // in case origin changed
+        if (typeof this.#layerGroupOrigin !== 'undefined' &&
+          typeof this.#layerGroupOrigin0 !== 'undefined') {
+          const origin0 = this.#viewController.getOrigin();
+          const scrollOffset = this.#layerGroupOrigin0.minus(origin0);
+          const origin = this.#viewController.getOrigin(
+            this.#viewController.getCurrentPosition()
+          );
+          const planeOffset = this.#layerGroupOrigin.minus(origin);
+          this.setBaseOffset(scrollOffset, planeOffset);
+        }
+        // update base size
+        this.#setBaseSize(vcSize);
+        // flag update and draw
+        this.#needsDataUpdate = true;
+        this.draw();
+      }
     }
   };
 
@@ -274,9 +375,16 @@ export class ViewLayer {
   }
 
   /**
+   * Remove the HTML element from the DOM.
+   */
+  removeFromDOM() {
+    this.#containerDiv.remove();
+  }
+
+  /**
    * Get the layer base size (without scale).
    *
-   * @returns {object} The size as {x,y}.
+   * @returns {Scalar2D} The size as {x,y}.
    */
   getBaseSize() {
     return this.#baseSize;
@@ -285,7 +393,7 @@ export class ViewLayer {
   /**
    * Get the image world (mm) 2D size.
    *
-   * @returns {object} The 2D size as {x,y}.
+   * @returns {Scalar2D} The 2D size as {x,y}.
    */
   getImageWorldSize() {
     return this.#viewController.getImageWorldSize();
@@ -330,8 +438,6 @@ export class ViewLayer {
    * Add a flip offset along the layer X axis.
    */
   addFlipOffsetX() {
-    // flip scale is handled by layer group
-    // flip offset
     this.#flipOffset.x += this.#canvas.width / this.#scale.x;
     this.#offset.x += this.#flipOffset.x;
   }
@@ -340,21 +446,44 @@ export class ViewLayer {
    * Add a flip offset along the layer Y axis.
    */
   addFlipOffsetY() {
-    // flip scale is handled by layer group
-    // flip offset
     this.#flipOffset.y += this.#canvas.height / this.#scale.y;
     this.#offset.y += this.#flipOffset.y;
   }
 
   /**
+   * Flip the scale along the layer X axis.
+   */
+  flipScaleX() {
+    this.#flipScale.x *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Y axis.
+   */
+  flipScaleY() {
+    this.#flipScale.y *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Z axis.
+   */
+  flipScaleZ() {
+    this.#flipScale.z *= -1;
+  }
+
+  /**
    * Set the layer scale.
    *
-   * @param {object} newScale The scale as {x,y}.
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
    * @param {Point3D} [center] The scale center.
    */
   setScale(newScale, center) {
     const helper = this.#viewController.getPlaneHelper();
-    const orientedNewScale = helper.getTargetOrientedPositiveXYZ(newScale);
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
     const finalNewScale = {
       x: this.#fitScale.x * orientedNewScale.x,
       y: this.#fitScale.y * orientedNewScale.y
@@ -404,13 +533,47 @@ export class ViewLayer {
   }
 
   /**
+   * Initialise the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
+   */
+  initScale(newScale, absoluteZoomOffset) {
+    const helper = this.#viewController.getPlaneHelper();
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#scale = finalNewScale;
+
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
+    this.#offset = {
+      x: this.#offset.x + this.#zoomOffset.x,
+      y: this.#offset.y + this.#zoomOffset.y
+    };
+  }
+
+  /**
    * Set the base layer offset. Updates the layer offset.
    *
    * @param {Vector3D} scrollOffset The scroll offset vector.
    * @param {Vector3D} planeOffset The plane offset vector.
+   * @param {Point3D} [layerGroupOrigin] The layer group origin.
+   * @param {Point3D} [layerGroupOrigin0] The layer group first origin.
    * @returns {boolean} True if the offset was updated.
    */
-  setBaseOffset(scrollOffset, planeOffset) {
+  setBaseOffset(
+    scrollOffset, planeOffset,
+    layerGroupOrigin, layerGroupOrigin0) {
     const helper = this.#viewController.getPlaneHelper();
     const scrollIndex = helper.getNativeScrollIndex();
     const newOffset = helper.getPlaneOffsetFromOffset3D({
@@ -419,7 +582,13 @@ export class ViewLayer {
       z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
-    this.#baseOffset.y !== newOffset.y;
+      this.#baseOffset.y !== newOffset.y;
+    // store layer group origins
+    if (typeof layerGroupOrigin !== 'undefined' &&
+      typeof layerGroupOrigin0 !== 'undefined') {
+      this.#layerGroupOrigin = layerGroupOrigin;
+      this.#layerGroupOrigin0 = layerGroupOrigin0;
+    }
     // reset offset if needed
     if (needsUpdate) {
       this.#offset = {
@@ -434,7 +603,7 @@ export class ViewLayer {
   /**
    * Set the layer offset.
    *
-   * @param {object} newOffset The offset as {x,y}.
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
    */
   setOffset(newOffset) {
     const helper = this.#viewController.getPlaneHelper();
@@ -454,76 +623,80 @@ export class ViewLayer {
   }
 
   /**
-   * Transform a display position to an index.
+   * Transform a display position to a 2D index.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {Index} The equivalent index.
+   * @param {Point2D} point2D The input point.
+   * @returns {Index} The equivalent 2D index.
    */
-  displayToPlaneIndex(x, y) {
-    const planePos = this.displayToPlanePos(x, y);
+  displayToPlaneIndex(point2D) {
+    const planePos = this.displayToPlanePos(point2D);
     return new Index([
-      Math.floor(planePos.x),
-      Math.floor(planePos.y)
+      Math.floor(planePos.getX()),
+      Math.floor(planePos.getY())
     ]);
   }
 
   /**
    * Remove scale from a display position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The de-scaled position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The de-scaled point.
    */
-  displayToPlaneScale(x, y) {
-    return {
-      x: x / this.#scale.x,
-      y: y / this.#scale.y
-    };
+  displayToPlaneScale(point2D) {
+    return new Point2D(
+      point2D.getX() / this.#scale.x,
+      point2D.getY() / this.#scale.y
+    );
   }
 
   /**
    * Get a plane position from a display position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The plane position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The plane position.
    */
-  displayToPlanePos(x, y) {
-    const deScaled = this.displayToPlaneScale(x, y);
-    return {
-      x: deScaled.x + this.#offset.x,
-      y: deScaled.y + this.#offset.y
-    };
+  displayToPlanePos(point2D) {
+    const deScaled = this.displayToPlaneScale(point2D);
+    return new Point2D(
+      deScaled.getX() + this.#offset.x,
+      deScaled.getY() + this.#offset.y
+    );
   }
 
   /**
    * Get a display position from a plane position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The display position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The display position, can be individually
+   *   undefined if out of bounds.
    */
-  planePosToDisplay(x, y) {
-    return {
-      x: (x - this.#offset.x + this.#baseOffset.x) * this.#scale.x,
-      y: (y - this.#offset.y + this.#baseOffset.y) * this.#scale.y
-    };
+  planePosToDisplay(point2D) {
+    let posX =
+      (point2D.getX() - this.#offset.x + this.#baseOffset.x) * this.#scale.x;
+    let posY =
+      (point2D.getY() - this.#offset.y + this.#baseOffset.y) * this.#scale.y;
+    // check if in bounds
+    if (posX < 0 || posX >= this.#canvas.width) {
+      posX = undefined;
+    }
+    if (posY < 0 || posY >= this.#canvas.height) {
+      posY = undefined;
+    }
+    return new Point2D(posX, posY);
   }
 
   /**
    * Get a main plane position from a display position.
    *
-   * @param {number} x The X position.
-   * @param {number} y The Y position.
-   * @returns {object} The main plane position as {x,y}.
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The main plane position.
    */
-  displayToMainPlanePos(x, y) {
-    const planePos = this.displayToPlanePos(x, y);
-    return {
-      x: planePos.x - this.#baseOffset.x,
-      y: planePos.y - this.#baseOffset.y
-    };
+  displayToMainPlanePos(point2D) {
+    const planePos = this.displayToPlanePos(point2D);
+    return new Point2D(
+      planePos.getX() - this.#baseOffset.x,
+      planePos.getY() - this.#baseOffset.y
+    );
   }
 
   /**
@@ -546,7 +719,7 @@ export class ViewLayer {
 
   /**
    * Draw the content (imageData) of the layer.
-   * The imageData variable needs to be set
+   * The imageData variable needs to be set.
    *
    * @fires App#renderstart
    * @fires App#renderend
@@ -567,7 +740,7 @@ export class ViewLayer {
     let event = {
       type: 'renderstart',
       layerid: this.getId(),
-      dataid: this.getDataIndex()
+      dataid: this.getDataId()
     };
     this.#fireEvent(event);
 
@@ -598,7 +771,7 @@ export class ViewLayer {
     );
 
     // disable smoothing (set just before draw, could be reset by resize)
-    this.#context.imageSmoothingEnabled = this.#imageSmoothingEnabled;
+    this.#context.imageSmoothingEnabled = this.#imageSmoothing;
     // draw image
     this.#context.drawImage(this.#offscreenCanvas, 0, 0);
 
@@ -612,16 +785,16 @@ export class ViewLayer {
     event = {
       type: 'renderend',
       layerid: this.getId(),
-      dataid: this.getDataIndex()
+      dataid: this.getDataId()
     };
     this.#fireEvent(event);
   }
 
   /**
-   * Initialise the layer: set the canvas and context
+   * Initialise the layer: set the canvas and context.
    *
-   * @param {object} size The image size as {x,y}.
-   * @param {object} spacing The image spacing as {x,y}.
+   * @param {Scalar2D} size The image size as {x,y}.
+   * @param {Scalar2D} spacing The image spacing as {x,y}.
    * @param {number} alpha The initial data opacity.
    */
   initialise(size, spacing, alpha) {
@@ -659,7 +832,7 @@ export class ViewLayer {
   /**
    * Set the base size of the layer.
    *
-   * @param {object} size The size as {x,y}.
+   * @param {Scalar2D} size The size as {x,y}.
    */
   #setBaseSize(size) {
     // check canvas creation
@@ -683,44 +856,44 @@ export class ViewLayer {
   /**
    * Fit the layer to its parent container.
    *
-   * @param {number} fitScale1D The 1D fit scale.
-   * @param {object} fitSize The fit size as {x,y}.
-   * @param {object} fitOffset The fit offset as {x,y}.
+   * @param {Scalar2D} containerSize The fit size as {x,y}.
+   * @param {number} divToWorldSizeRatio The div to world size ratio.
+   * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
-  fitToContainer(fitScale1D, fitSize, fitOffset) {
+  fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
     let needsDraw = false;
 
-    // update canvas size if needed (triggers canvas reset)
-    if (this.#canvas.width !== fitSize.x || this.#canvas.height !== fitSize.y) {
-      if (!canCreateCanvas(fitSize.x, fitSize.y)) {
-        throw new Error('Cannot resize canvas ' + fitSize.x + ', ' + fitSize.y);
+    // set canvas size if different from previous
+    if (this.#canvas.width !== containerSize.x ||
+      this.#canvas.height !== containerSize.y) {
+      if (!canCreateCanvas(containerSize.x, containerSize.y)) {
+        throw new Error('Cannot resize canvas ' +
+          containerSize.x + ', ' + containerSize.y);
       }
-      // canvas size  change triggers canvas reset
-      this.#canvas.width = fitSize.x;
-      this.#canvas.height = fitSize.y;
+      // canvas size change triggers canvas reset
+      this.#canvas.width = containerSize.x;
+      this.#canvas.height = containerSize.y;
       // update draw flag
       needsDraw = true;
     }
-    // previous fit scale
-    const previousFitScale = this.#fitScale;
-    // previous scale without fit
-    const previousScale = {
-      x: this.#scale.x / this.#fitScale.x,
-      y: this.#scale.y / this.#fitScale.y
-    };
+
     // fit scale
-    const newFitScale = {
-      x: fitScale1D * this.#baseSpacing.x,
-      y: fitScale1D * this.#baseSpacing.y
+    const divToImageSizeRatio = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
     };
-    // scale
+    // #scale = inputScale * fitScale * flipScale
+    // flipScale does not change here, we can omit it
+    // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: previousScale.x * newFitScale.x,
-      y: previousScale.y * newFitScale.y
+      x: this.#scale.x * divToImageSizeRatio.x / this.#fitScale.x,
+      y: this.#scale.y * divToImageSizeRatio.y / this.#fitScale.y
     };
-    // check if different
-    if (previousScale.x !== newScale.x || previousScale.y !== newScale.y) {
-      this.#fitScale = newFitScale;
+
+    // set scales if different from previous
+    if (this.#scale.x !== newScale.x ||
+      this.#scale.y !== newScale.y) {
+      this.#fitScale = divToImageSizeRatio;
       this.#scale = newScale;
       // update draw flag
       needsDraw = true;
@@ -728,32 +901,36 @@ export class ViewLayer {
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / newFitScale.x,
-      y: fitOffset.y / newFitScale.y
+      x: fitOffset.x / divToImageSizeRatio.x,
+      y: fitOffset.y / divToImageSizeRatio.y
+    };
+    // flip offset
+    const scaledImageSize = {
+      x: containerSize.x / divToImageSizeRatio.x,
+      y: containerSize.y / divToImageSizeRatio.y
     };
     const newFlipOffset = {
-      x: this.#flipOffset.x * previousFitScale.x / newFitScale.x,
-      y: this.#flipOffset.y * previousFitScale.y / newFitScale.y
+      x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
+      y: this.#flipOffset.y !== 0 ? scaledImageSize.y : 0,
     };
-    // check if different
+
+    // set offsets if different from previous
     if (this.#viewOffset.x !== newViewOffset.x ||
       this.#viewOffset.y !== newViewOffset.y ||
       this.#flipOffset.x !== newFlipOffset.x ||
       this.#flipOffset.y !== newFlipOffset.y) {
+      // update global offset
+      this.#offset = {
+        x: this.#offset.x +
+          newViewOffset.x - this.#viewOffset.x +
+          newFlipOffset.x - this.#flipOffset.x,
+        y: this.#offset.y +
+          newViewOffset.y - this.#viewOffset.y +
+          newFlipOffset.y - this.#flipOffset.y,
+      };
       // update private local offsets
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
-      // update global offset
-      this.#offset = {
-        x: this.#viewOffset.x +
-          this.#baseOffset.x +
-          this.#zoomOffset.x +
-          this.#flipOffset.x,
-        y: this.#viewOffset.y +
-          this.#baseOffset.y +
-          this.#zoomOffset.y +
-          this.#flipOffset.y
-      };
       // update draw flag
       needsDraw = true;
     }
@@ -776,7 +953,7 @@ export class ViewLayer {
       const eventName = names[i];
       const passive = eventName !== 'wheel';
       this.#containerDiv.addEventListener(
-        names[i], this.#fireEvent, {passive: passive});
+        eventName, this.#fireEvent, {passive: passive});
     }
   }
 
@@ -822,7 +999,7 @@ export class ViewLayer {
    */
   #fireEvent = (event) => {
     event.srclayerid = this.getId();
-    event.dataid = this.#dataIndex;
+    event.dataid = this.#dataId;
     this.#listenerHandler.fireEvent(event);
   };
 
@@ -860,7 +1037,7 @@ export class ViewLayer {
    *
    * @param {object} event The event fired when changing the colour map.
    */
-  #onColourChange = (event) => {
+  #onColourMapChange = (event) => {
     const skip = typeof event.skipGenerate !== 'undefined' &&
       event.skipGenerate === true;
     if (!skip) {

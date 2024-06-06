@@ -18,7 +18,7 @@ dcmb.BenchFunctionRunner = function () {
    * Set the runner functions.
    *
    * @param {Array} funcs An array of functions in the form:
-   * {name: string, func: Object}
+   *   {name: string, func: Object}.
    */
   this.setFunctions = function (funcs) {
     functions = funcs;
@@ -29,7 +29,7 @@ dcmb.BenchFunctionRunner = function () {
    *
    * @param {object} buffer The data buffer.
    * @returns {Array} An array of memory measures in the form:
-   * {count: number, added: boolean, removed: boolean, value: string}
+   *   {count: number, added: boolean, removed: boolean, value: string}.
    */
   this.run = function (buffer) {
     const results = [];
@@ -58,7 +58,8 @@ dcmb.BenchFunctionRunner = function () {
     };
     // add parsers to suite
     for (let i = 0; i < functions.length; ++i) {
-      suite.add(functions[i].name, getFunc(functions[i].func, buffer));
+      const input = functions[i].test.setup(buffer);
+      suite.add(functions[i].name, getFunc(functions[i].test.run, input));
     }
     // run async
     suite.run({async: false});

@@ -12,8 +12,9 @@ import {ImageFactory} from '../../src/image/imageFactory';
 /**
  * Tests for the 'image/image.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('image');
 
 /**
  * Compare an image and a buffer.
@@ -67,9 +68,9 @@ function compareImageAndBuffer(image, size, buffer, rsi) {
 /**
  * Tests for {@link Image} getValue.
  *
- * @function module:tests/image~getvalue
+ * @function module:tests/image~image-getvalue
  */
-QUnit.test('Test Image getValue.', function (assert) {
+QUnit.test('Image getValue', function (assert) {
   const zeroStats = {min: 0, max: 0, mean: 0, stdDev: 0};
 
   // create a simple image
@@ -143,9 +144,9 @@ QUnit.test('Test Image getValue.', function (assert) {
 /**
  * Tests for {@link Image} histogram.
  *
- * @function module:tests/image~histogram
+ * @function module:tests/image~image-histogram
  */
-QUnit.test('Test Image histogram.', function (assert) {
+QUnit.test('Image histogram', function (assert) {
   // create a simple image
   const size0 = 4;
   const imgSize0 = new Size([size0, size0, 1]);
@@ -178,14 +179,14 @@ QUnit.test('Test Image histogram.', function (assert) {
 /**
  * Tests for {@link Image} append.
  *
- * @function module:tests/image~append
+ * @function module:tests/image~image-append-slice
  */
-QUnit.test('Test Image append slice.', function (assert) {
+QUnit.test('Image append slice', function (assert) {
   /**
    * Compare two arrays of vectors.
    *
-   * @param {Array} arr0 The first array.
-   * @param {Array} arr1 The second array.
+   * @param {Point3D[]} arr0 The first array.
+   * @param {Point3D[]} arr1 The second array.
    * @returns {boolean} True if both arrays are equal.
    */
   function compareArrayOfVectors(arr0, arr1) {
@@ -312,9 +313,9 @@ QUnit.test('Test Image append slice.', function (assert) {
 /**
  * Tests for {@link Image} convolute2D.
  *
- * @function module:tests/image~convolute2D
+ * @function module:tests/image~image-convolute2D
  */
-QUnit.test('Test Image convolute2D.', function (assert) {
+QUnit.test('Image convolute2D', function (assert) {
   // create a simple image
   const size0 = 3;
   const imgSize0 = new Size([size0, size0, 1]);
@@ -354,9 +355,9 @@ QUnit.test('Test Image convolute2D.', function (assert) {
 /**
  * Tests for {@link Image} transform.
  *
- * @function module:tests/image~transform
+ * @function module:tests/image~image-transform
  */
-QUnit.test('Test Image transform.', function (assert) {
+QUnit.test('Image transform', function (assert) {
   // create a simple image
   const size0 = 3;
   const imgSize0 = new Size([size0, size0, 1]);
@@ -410,9 +411,9 @@ QUnit.test('Test Image transform.', function (assert) {
 /**
  * Tests for {@link Image} compose.
  *
- * @function module:tests/image~compose
+ * @function module:tests/image~image-compose
  */
-QUnit.test('Test Image compose.', function (assert) {
+QUnit.test('Image compose', function (assert) {
   // create two simple images
   const size0 = 3;
   const imgSize0 = new Size([size0, size0, 1]);
@@ -449,9 +450,9 @@ QUnit.test('Test Image compose.', function (assert) {
 /**
  * Tests for {@link ImageFactory}.
  *
- * @function module:tests/image~ImageFactory
+ * @function module:tests/image~imageFactory
  */
-QUnit.test('Test ImageFactory.', function (assert) {
+QUnit.test('ImageFactory', function (assert) {
   const zeroStats = {min: 0, max: 0, mean: 0, stdDev: 0};
 
   const size0 = 3;
@@ -505,9 +506,9 @@ QUnit.test('Test ImageFactory.', function (assert) {
 /**
  * Tests for {@link Image} hasValues and getOffsets.
  *
- * @function module:tests/image~getOffsets
+ * @function module:tests/image~hasValues-getOffsets
  */
-QUnit.test('Test hasValues and getOffsets.', function (assert) {
+QUnit.test('hasValues getOffsets', function (assert) {
   const size0 = 3;
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);

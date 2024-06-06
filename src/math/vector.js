@@ -70,9 +70,9 @@ export class Vector3D {
    */
   equals(rhs) {
     return rhs !== null &&
-      this.getX() === rhs.getX() &&
-      this.getY() === rhs.getY() &&
-      this.getZ() === rhs.getZ();
+      this.#x === rhs.getX() &&
+      this.#y === rhs.getY() &&
+      this.#z === rhs.getZ();
   }
 
   /**
@@ -81,9 +81,9 @@ export class Vector3D {
    * @returns {string} The vector as a string.
    */
   toString() {
-    return '(' + this.getX() +
-      ', ' + this.getY() +
-      ', ' + this.getZ() + ')';
+    return '(' + this.#x +
+      ', ' + this.#y +
+      ', ' + this.#z + ')';
   }
 
   /**
@@ -93,9 +93,9 @@ export class Vector3D {
    */
   norm() {
     return Math.sqrt(
-      (this.getX() * this.getX()) +
-      (this.getY() * this.getY()) +
-      (this.getZ() * this.getZ())
+      (this.#x * this.#x) +
+      (this.#y * this.#y) +
+      (this.#z * this.#z)
     );
   }
 
@@ -104,28 +104,46 @@ export class Vector3D {
    * vector that is perpendicular to both a and b.
    * If both vectors are parallel, the cross product is a zero vector.
    *
-   * @see https://en.wikipedia.org/wiki/Cross_product
+   * Ref: {@link https://en.wikipedia.org/wiki/Cross_product}.
+   *
    * @param {Vector3D} vector3D The input vector.
    * @returns {Vector3D} The result vector.
    */
   crossProduct(vector3D) {
     return new Vector3D(
-      (this.getY() * vector3D.getZ()) - (vector3D.getY() * this.getZ()),
-      (this.getZ() * vector3D.getX()) - (vector3D.getZ() * this.getX()),
-      (this.getX() * vector3D.getY()) - (vector3D.getX() * this.getY()));
+      (this.#y * vector3D.getZ()) - (vector3D.getY() * this.#z),
+      (this.#z * vector3D.getX()) - (vector3D.getZ() * this.#x),
+      (this.#x * vector3D.getY()) - (vector3D.getX() * this.#y));
   }
 
   /**
    * Get the dot product with another Vector3D.
    *
-   * @see https://en.wikipedia.org/wiki/Dot_product
+   * Ref: {@link https://en.wikipedia.org/wiki/Dot_product}.
+   *
    * @param {Vector3D} vector3D The input vector.
    * @returns {number} The dot product.
    */
   dotProduct(vector3D) {
-    return (this.getX() * vector3D.getX()) +
-      (this.getY() * vector3D.getY()) +
-      (this.getZ() * vector3D.getZ());
+    return (this.#x * vector3D.getX()) +
+      (this.#y * vector3D.getY()) +
+      (this.#z * vector3D.getZ());
+  }
+
+  /**
+   * Is this vector codirectional to an input one.
+   *
+   * @param {Vector3D} vector3D The vector to test.
+   * @returns {boolean} True if codirectional, false is opposite.
+   */
+  isCodirectional(vector3D) {
+    // a.dot(b) = ||a|| * ||b|| * cos(theta)
+    // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
+    // -> the sign of the dot product depends on the cosinus of
+    //    the angle between the vectors
+    //   -> >0 => vectors are codirectional
+    //   -> <0 => vectors are opposite
+    return this.dotProduct(vector3D) > 0;
   }
 
 } // Vector3D class

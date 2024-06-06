@@ -1,5 +1,6 @@
 import {
   Tag,
+  getTransferSyntaxUIDTag,
   isSequenceDelimitationItemTag,
   isItemDelimitationItemTag,
   isPixelDataTag
@@ -7,11 +8,17 @@ import {
 import {
   is32bitVLVR,
   isCharSetStringVR,
+  transferSyntaxes,
+  transferSyntaxKeywords,
   vrTypes,
 } from './dictionary';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
-import {arrayEquals} from '../utils/array';
+import {
+  getOrientationFromCosines,
+  getOrientationStringLPS,
+  getLPSGroup
+} from '../math/orientation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -31,18 +38,24 @@ import {DataElement} from '../dicom/dataElement';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.32.6';
+  return '0.33.0';
 }
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- * after the 128 bytes preamble.
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *   after the 128 bytes preamble.
+ *
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
  */
 export function hasDicomPrefix(buffer) {
+  // check size: typed array constructor will throw RangeError if
+  // byteOffset + length * TypedArray.BYTES_PER_ELEMENT > buffer.byteLength
+  if (buffer.byteLength < 132) {
+    return false;
+  }
   const prefixArray = new Uint8Array(buffer, 128, 4);
   const stringReducer = function (previous, current) {
     return previous += String.fromCharCode(current);
@@ -58,7 +71,7 @@ const ZWS = String.fromCharCode('u200B');
  * Clean string: remove zero-width space ending and trim.
  * Warning: no tests are done on the input, will fail if
  *   null or undefined or not string.
- * (exported for tests only)
+ * Exported for tests only.
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.
@@ -77,11 +90,12 @@ export function cleanString(inputStr) {
 }
 
 /**
- * Get the utfLabel (used by the TextDecoder) from a character set term
+ * Get the utfLabel (used by the TextDecoder) from a character set term.
+ *
  * References:
- * - DICOM [Value Encoding]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html}
- * - DICOM [Specific Character Set]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2}
- * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}
+ * - DICOM [Value Encoding]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html},
+ * - DICOM [Specific Character Set]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
+ * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}.
  *
  * @param {string} charSetTerm The DICOM character set.
  * @returns {string} The corresponding UTF label.
@@ -131,7 +145,7 @@ function getUtfLabel(charSetTerm) {
 }
 
 /**
- * Default text decoder
+ * Default text decoder.
  */
 class DefaultTextDecoder {
   /**
@@ -184,20 +198,16 @@ export function getReverseOrientation(ori) {
 /**
  * Get the name of an image orientation patient.
  *
- * @param {Array} orientation The image orientation patient.
- * @returns {string} The orientation name: axial, coronal or sagittal.
+ * @param {number[]} orientation The image orientation patient.
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
  */
 export function getOrientationName(orientation) {
-  const axialOrientation = [1, 0, 0, 0, 1, 0];
-  const coronalOrientation = [1, 0, 0, 0, 0, -1];
-  const sagittalOrientation = [0, 1, 0, 0, 0, -1];
   let name;
-  if (arrayEquals(orientation, axialOrientation)) {
-    name = 'axial';
-  } else if (arrayEquals(orientation, coronalOrientation)) {
-    name = 'coronal';
-  } else if (arrayEquals(orientation, sagittalOrientation)) {
-    name = 'sagittal';
+  const orientMatrix = getOrientationFromCosines(orientation);
+  if (typeof orientMatrix !== 'undefined') {
+    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
+    name = getLPSGroup(lpsStr);
   }
   return name;
 }
@@ -209,7 +219,7 @@ export function getOrientationName(orientation) {
  * @returns {boolean} True if an implicit syntax.
  */
 export function isImplicitTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2';
+  return syntax === transferSyntaxKeywords.ImplicitVRLittleEndian;
 }
 
 /**
@@ -219,7 +229,7 @@ export function isImplicitTransferSyntax(syntax) {
  * @returns {boolean} True if a big endian syntax.
  */
 export function isBigEndianTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2.2';
+  return syntax === transferSyntaxKeywords.ExplicitVRBigEndian;
 }
 
 /**
@@ -229,21 +239,8 @@ export function isBigEndianTransferSyntax(syntax) {
  * @returns {boolean} True if a jpeg baseline syntax.
  */
 export function isJpegBaselineTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2.4.50' ||
-    syntax === '1.2.840.10008.1.2.4.51';
-}
-
-/**
- * Tell if a given syntax is a retired JPEG one.
- *
- * @param {string} syntax The transfer syntax to test.
- * @returns {boolean} True if a retired jpeg syntax.
- */
-function isJpegRetiredTransferSyntax(syntax) {
-  return (syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
-    !isJpegBaselineTransferSyntax(syntax) &&
-    !isJpegLosslessTransferSyntax(syntax)) ||
-    syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
+  return syntax === transferSyntaxKeywords.JPEGBaseline8Bit ||
+    syntax === transferSyntaxKeywords.JPEGExtended12Bit;
 }
 
 /**
@@ -253,18 +250,8 @@ function isJpegRetiredTransferSyntax(syntax) {
  * @returns {boolean} True if a jpeg lossless syntax.
  */
 export function isJpegLosslessTransferSyntax(syntax) {
-  return syntax === '1.2.840.10008.1.2.4.57' ||
-    syntax === '1.2.840.10008.1.2.4.70';
-}
-
-/**
- * Tell if a given syntax is a JPEG-LS one.
- *
- * @param {string} syntax The transfer syntax to test.
- * @returns {boolean} True if a jpeg-ls syntax.
- */
-function isJpeglsTransferSyntax(syntax) {
-  return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
+  return syntax === transferSyntaxKeywords.JPEGLossless ||
+    syntax === transferSyntaxKeywords.JPEGLosslessSV1;
 }
 
 /**
@@ -284,7 +271,7 @@ export function isJpeg2000TransferSyntax(syntax) {
  * @returns {boolean} True if a RLE syntax.
  */
 function isRleTransferSyntax(syntax) {
-  return syntax.match(/1.2.840.10008.1.2.5/) !== null;
+  return syntax === transferSyntaxKeywords.RLELossless;
 }
 
 /**
@@ -314,84 +301,33 @@ export function getSyntaxDecompressionName(syntax) {
  * @returns {boolean} True if a supported syntax.
  */
 function isReadSupportedTransferSyntax(syntax) {
-
-  // Unsupported:
-  // "1.2.840.10008.1.2.1.99": Deflated Explicit VR - Little Endian
-  // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
-  // isJpegRetiredTransferSyntax(syntax): non supported JPEG
-  // isJpeglsTransferSyntax(syntax): JPEG-LS
-
-  return (syntax === '1.2.840.10008.1.2' || // Implicit VR - Little Endian
-    syntax === '1.2.840.10008.1.2.1' || // Explicit VR - Little Endian
-    syntax === '1.2.840.10008.1.2.2' || // Explicit VR - Big Endian
-    isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
-    isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-    isJpeg2000TransferSyntax(syntax) || // JPEG 2000
-    isRleTransferSyntax(syntax)); // RLE
+  return (syntax === transferSyntaxKeywords.ImplicitVRLittleEndian ||
+    syntax === transferSyntaxKeywords.ExplicitVRLittleEndian ||
+    syntax === transferSyntaxKeywords.ExplicitVRBigEndian ||
+    isJpegBaselineTransferSyntax(syntax) ||
+    isJpegLosslessTransferSyntax(syntax) ||
+    isJpeg2000TransferSyntax(syntax) ||
+    isRleTransferSyntax(syntax));
 }
 
 /**
- * Get the transfer syntax name.
- * Reference: [UID Values]{@link http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html}.
+ * Get a transfer syntax name from its UID.
  *
- * @param {string} syntax The transfer syntax.
- * @returns {string} The name of the transfer syntax.
+ * @param {string} syntax The transfer syntax UID value.
+ * @returns {string} The transfer syntax name.
  */
 export function getTransferSyntaxName(syntax) {
   let name = 'Unknown';
-  if (syntax === '1.2.840.10008.1.2') {
-    // Implicit VR - Little Endian
-    name = 'Little Endian Implicit';
-  } else if (syntax === '1.2.840.10008.1.2.1') {
-    // Explicit VR - Little Endian
-    name = 'Little Endian Explicit';
-  } else if (syntax === '1.2.840.10008.1.2.1.99') {
-    // Deflated Explicit VR - Little Endian
-    name = 'Little Endian Deflated Explicit';
-  } else if (syntax === '1.2.840.10008.1.2.2') {
-    // Explicit VR - Big Endian
-    name = 'Big Endian Explicit';
-  } else if (isJpegBaselineTransferSyntax(syntax)) {
-    // JPEG baseline
-    if (syntax === '1.2.840.10008.1.2.4.50') {
-      name = 'JPEG Baseline';
-    } else { // *.51
-      name = 'JPEG Extended, Process 2+4';
-    }
-  } else if (isJpegLosslessTransferSyntax(syntax)) {
-    // JPEG Lossless
-    if (syntax === '1.2.840.10008.1.2.4.57') {
-      name = 'JPEG Lossless, Nonhierarchical (Processes 14)';
-    } else { // *.70
-      name = 'JPEG Lossless, Non-hierarchical, 1st Order Prediction';
-    }
-  } else if (isJpegRetiredTransferSyntax(syntax)) {
-    // Retired JPEG
-    name = 'Retired JPEG';
-  } else if (isJpeglsTransferSyntax(syntax)) {
-    // JPEG-LS
-    name = 'JPEG-LS';
-  } else if (isJpeg2000TransferSyntax(syntax)) {
-    // JPEG 2000
-    if (syntax === '1.2.840.10008.1.2.4.91') {
-      name = 'JPEG 2000 (Lossless or Lossy)';
-    } else { // *.90
-      name = 'JPEG 2000 (Lossless only)';
-    }
-  } else if (syntax === '1.2.840.10008.1.2.4.100') {
-    // MPEG2 Image Compression
-    name = 'MPEG2';
-  } else if (isRleTransferSyntax(syntax)) {
-    // RLE (lossless)
-    name = 'RLE';
+  if (typeof transferSyntaxes[syntax] !== 'undefined') {
+    name = transferSyntaxes[syntax];
   }
-  // return
   return name;
 }
 
 /**
  * Guess the transfer syntax from the first data element.
- * See https://github.com/ivmartel/dwv/issues/188
+ *
+ * See {@link https://github.com/ivmartel/dwv/issues/188}
  *   (Allow to load DICOM with no DICM preamble) for more details.
  *
  * @param {DataElement} firstDataElement The first data element
@@ -420,11 +356,9 @@ function guessTransferSyntax(firstDataElement) {
   let syntax = null;
   if (group === oEightGroupLittleEndian) {
     if (implicit) {
-      // ImplicitVRLittleEndian
-      syntax = '1.2.840.10008.1.2';
+      syntax = transferSyntaxKeywords.ImplicitVRLittleEndian;
     } else {
-      // ExplicitVRLittleEndian
-      syntax = '1.2.840.10008.1.2.1';
+      syntax = transferSyntaxKeywords.ExplicitVRLittleEndian;
     }
   } else {
     if (implicit) {
@@ -434,14 +368,13 @@ function guessTransferSyntax(firstDataElement) {
         'and implicit VR big endian detected)'
       );
     } else {
-      // ExplicitVRBigEndian
-      syntax = '1.2.840.10008.1.2.2';
+      syntax = transferSyntaxKeywords.ExplicitVRBigEndian;
     }
   }
   // set transfer syntax data element
   const dataElement = new DataElement('UI');
-  dataElement.tag = new Tag('0002', '0010');
-  dataElement.value = [syntax + ' ']; // even length
+  dataElement.tag = getTransferSyntaxUIDTag();
+  dataElement.value = [syntax];
   dataElement.vl = dataElement.value[0].length;
   dataElement.startOffset = firstDataElement.startOffset;
   dataElement.endOffset = dataElement.startOffset + dataElement.vl;
@@ -463,7 +396,7 @@ function guessTransferSyntax(firstDataElement) {
 export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
   let res = null;
   try {
-    if (bitsAllocated === 8) {
+    if (bitsAllocated === 1 || bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
         res = new Uint8Array(size);
       } else {
@@ -494,17 +427,16 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
 
 /**
  * Get the number of bytes occupied by a data element prefix,
- *   i.e. without its value.
+ *   (without its value).
  *
- * @param {string} vr The Value Representation of the element.
- * @param {boolean} isImplicit Does the data use implicit VR?
- * @returns {number} The size of the element prefix.
  * WARNING: this is valid for tags with a VR, if not sure use
  *   the 'isTagWithVR' function first.
- * Reference:
- * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
- * - [Data Element implicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1}.
  *
+ * Reference:
+ * - [Data Element explicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1},
+ * - [Data Element implicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_7.5.2.html#table_7.5-1}.
+ *
+ * ```
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
  * | 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
@@ -514,6 +446,11 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
  *
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
+ * ```
+ *
+ * @param {string} vr The Value Representation of the element.
+ * @param {boolean} isImplicit Does the data use implicit VR?
+ * @returns {number} The size of the element prefix.
  */
 export function getDataElementPrefixByteSize(vr, isImplicit) {
   return isImplicit ? 8 : is32bitVLVR(vr) ? 12 : 8;
@@ -530,6 +467,18 @@ function isKnownVR(vr) {
   const knownTypes = Object.keys(vrTypes).concat(extraVrTypes);
   return knownTypes.includes(vr);
 }
+
+/**
+ * Small list of used tag keys.
+ */
+const TagKeys = {
+  TransferSyntax: '00020010',
+  SpecificCharacterSet: '00080005',
+  NumberOfFrames: '00280008',
+  BitsAllocated: '00280100',
+  PixelRepresentation: '00280103',
+  PixelData: '7FE00010'
+};
 
 /**
  * DicomParser class.
@@ -634,8 +583,9 @@ export class DicomParser {
     /**
      * The text decoder.
      *
+     * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder}.
+     *
      * @external TextDecoder
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
      */
     this.#textDecoder = new TextDecoder(characterSet);
   }
@@ -735,7 +685,7 @@ export class DicomParser {
 
   /**
    * Read the pixel item data element.
-   * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
+   * Ref: [Single frame fragments]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.4.html#table_A.4-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -773,7 +723,8 @@ export class DicomParser {
 
   /**
    * Read a DICOM data element.
-   * Reference: [DICOM VRs]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+   *
+   * Reference: [DICOM VRs]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -940,8 +891,10 @@ export class DicomParser {
         // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.2.html
         if (bitsAllocated > 8 && vr === 'OB') {
           logger.warn(
-            'Reading DICOM pixel data with bitsAllocated>8 and OB VR.'
+            'Reading DICOM pixel data with bitsAllocated>8 and OB VR' +
+            ', treating as OW'
           );
+          element.vr = 'OW';
         }
         // read
         data = [];
@@ -999,7 +952,7 @@ export class DicomParser {
         }
         data = cleanString(data).split('\\');
       } else {
-        throw Error('Unknown VR type: ' + vrType);
+        throw new Error('Unknown VR type: ' + vrType);
       }
     } else if (vr === 'xx') {
       // US or OW
@@ -1007,9 +960,17 @@ export class DicomParser {
     } else if (vr === 'ox') {
       // OB or OW
       if (bitsAllocated === 8) {
-        data = Array.from(reader.readUint8Array(offset, vl));
+        if (pixelRepresentation === 0) {
+          data = Array.from(reader.readUint8Array(offset, vl));
+        } else {
+          data = Array.from(reader.readInt8Array(offset, vl));
+        }
       } else {
-        data = Array.from(reader.readUint16Array(offset, vl));
+        if (pixelRepresentation === 0) {
+          data = Array.from(reader.readUint16Array(offset, vl));
+        } else {
+          data = Array.from(reader.readInt16Array(offset, vl));
+        }
       }
     } else if (vr === 'xs') {
       // (US or SS) or (US or SS or OW)
@@ -1039,11 +1000,27 @@ export class DicomParser {
         const item = element.items[k];
         const itemData = {};
         const keys = Object.keys(item);
+        let sqBitsAllocated = bitsAllocated;
+        let sqPixelRepresentation = pixelRepresentation;
         for (let l = 0; l < keys.length; ++l) {
+          // check if local bitsAllocated
+          // (inside item loop to get interpreted value)
+          let dataElement = item[TagKeys.BitsAllocated];
+          if (typeof dataElement !== 'undefined' &&
+            typeof dataElement.value !== 'undefined') {
+            sqBitsAllocated = dataElement.value[0];
+          }
+          // check if local pixelRepresentation
+          // (inside item loop to get interpreted value)
+          dataElement = item[TagKeys.PixelRepresentation];
+          if (typeof dataElement !== 'undefined' &&
+            typeof dataElement.value !== 'undefined') {
+            sqPixelRepresentation = dataElement.value[0];
+          }
           const subElement = item[keys[l]];
           subElement.value = this.#interpretElement(
             subElement, reader,
-            pixelRepresentation, bitsAllocated);
+            sqPixelRepresentation, sqBitsAllocated);
           delete subElement.tag;
           delete subElement.vl;
           delete subElement.startOffset;
@@ -1135,7 +1112,7 @@ export class DicomParser {
       }
 
       // check the TransferSyntaxUID (has to be there!)
-      dataElement = this.#dataElements['00020010'];
+      dataElement = this.#dataElements[TagKeys.TransferSyntax];
       if (typeof dataElement === 'undefined') {
         throw new Error('Not a valid DICOM file (no TransferSyntaxUID found)');
       }
@@ -1202,9 +1179,9 @@ export class DicomParser {
     // pixel specific
     let pixelRepresentation = 0;
     let bitsAllocated = 16;
-    if (typeof this.#dataElements['7FE00010'] !== 'undefined') {
+    if (typeof this.#dataElements[TagKeys.PixelData] !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
-      dataElement = this.#dataElements['00280103'];
+      dataElement = this.#dataElements[TagKeys.PixelRepresentation];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.#interpretElement(dataElement, dataReader);
         pixelRepresentation = dataElement.value[0];
@@ -1214,7 +1191,7 @@ export class DicomParser {
       }
 
       // BitsAllocated
-      dataElement = this.#dataElements['00280100'];
+      dataElement = this.#dataElements[TagKeys.BitsAllocated];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.#interpretElement(dataElement, dataReader);
         bitsAllocated = dataElement.value[0];
@@ -1229,7 +1206,7 @@ export class DicomParser {
     }
 
     // SpecificCharacterSet
-    dataElement = this.#dataElements['00080005'];
+    dataElement = this.#dataElements[TagKeys.SpecificCharacterSet];
     if (typeof dataElement !== 'undefined') {
       dataElement.value = this.#interpretElement(dataElement, dataReader);
       let charSetTerm;
@@ -1250,14 +1227,16 @@ export class DicomParser {
     );
 
     // handle fragmented pixel buffer
-    // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
+    // Reference: http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
-    dataElement = this.#dataElements['7FE00010'];
+    dataElement = this.#dataElements[TagKeys.PixelData];
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
         let numberOfFrames = 1;
-        if (typeof this.#dataElements['00280008'] !== 'undefined') {
-          numberOfFrames = Number(this.#dataElements['00280008'].value[0]);
+        if (typeof this.#dataElements[TagKeys.NumberOfFrames] !== 'undefined') {
+          numberOfFrames = Number(
+            this.#dataElements[TagKeys.NumberOfFrames].value[0]
+          );
         }
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {

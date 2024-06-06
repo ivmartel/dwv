@@ -3,15 +3,16 @@ import {Vector3D} from '../../src/math/vector';
 /**
  * Tests for the 'math/point.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Vector3D}.
  *
- * @function module:tests/math~Vector3D
+ * @function module:tests/math~vector3D-class
  */
-QUnit.test('Test Vector3D.', function (assert) {
+QUnit.test('Vector3D class', function (assert) {
   const v0 = new Vector3D(1, 2, 3);
   // getX
   assert.equal(v0.getX(), 1, 'getX');
@@ -61,9 +62,9 @@ QUnit.test('Test Vector3D.', function (assert) {
 /**
  * Tests for {@link Vector3D}.
  *
- * @function module:tests/math~Vector3D
+ * @function module:tests/math~vector3D-crossproduct
  */
-QUnit.test('Test Vector3D crossProduct.', function (assert) {
+QUnit.test('Vector3D crossProduct', function (assert) {
   // test vectors
   const v0 = new Vector3D(0, 0, 0);
   const v0x = new Vector3D(1, 0, 0);
@@ -118,9 +119,9 @@ QUnit.test('Test Vector3D crossProduct.', function (assert) {
 /**
  * Tests for {@link Vector3D}.
  *
- * @function module:tests/math~Vector3D
+ * @function module:tests/math~vector3D-dotproduct
  */
-QUnit.test('Test Vector3D dotProduct.', function (assert) {
+QUnit.test('Vector3D dotProduct', function (assert) {
   // orthogonal
   const v00 = new Vector3D(1, 0, 0);
   const v01 = new Vector3D(0, 1, 0);
@@ -151,4 +152,59 @@ QUnit.test('Test Vector3D dotProduct.', function (assert) {
     simiFunc(v20.dotProduct(v21), dot21),
     true,
     'dotProduct regular #1');
+
+  // isCodirectional
+  const v30 = new Vector3D(1, 0, 0);
+  const tv300 = new Vector3D(2, 0, 0);
+  assert.equal(v30.isCodirectional(tv300), true, 'isCodirectional #00');
+  const tv301 = new Vector3D(0.1, 1, 0);
+  assert.equal(v30.isCodirectional(tv301), true, 'isCodirectional #01');
+  const tv302 = new Vector3D(0, 1, 0);
+  assert.equal(v30.isCodirectional(tv302), false, 'isCodirectional #02');
+  const tv303 = new Vector3D(-0.1, 1, 0);
+  assert.equal(v30.isCodirectional(tv303), false, 'isCodirectional #03');
+  const tv304 = new Vector3D(-1, 0, 0);
+  assert.equal(v30.isCodirectional(tv304), false, 'isCodirectional #04');
+  const tv305 = new Vector3D(-0.1, -1, 0);
+  assert.equal(v30.isCodirectional(tv305), false, 'isCodirectional #05');
+  const tv306 = new Vector3D(0, -1, 0);
+  assert.equal(v30.isCodirectional(tv306), false, 'isCodirectional #06');
+  const tv307 = new Vector3D(0.1, -1, 0);
+  assert.equal(v30.isCodirectional(tv307), true, 'isCodirectional #07');
+
+  const v31 = new Vector3D(0, 1, 0);
+  const tv310 = new Vector3D(0, 2, 0);
+  assert.equal(v31.isCodirectional(tv310), true, 'isCodirectional #10');
+  const tv311 = new Vector3D(1, 0.1, 0);
+  assert.equal(v31.isCodirectional(tv311), true, 'isCodirectional #11');
+  const tv312 = new Vector3D(1, 0, 0);
+  assert.equal(v31.isCodirectional(tv312), false, 'isCodirectional #12');
+  const tv313 = new Vector3D(1, -0.1, 0);
+  assert.equal(v31.isCodirectional(tv313), false, 'isCodirectional #13');
+  const tv314 = new Vector3D(0, -1, 0);
+  assert.equal(v31.isCodirectional(tv314), false, 'isCodirectional #14');
+  const tv315 = new Vector3D(-1, -0.1, 0);
+  assert.equal(v31.isCodirectional(tv315), false, 'isCodirectional #15');
+  const tv316 = new Vector3D(-1, 0, 0);
+  assert.equal(v31.isCodirectional(tv316), false, 'isCodirectional #16');
+  const tv317 = new Vector3D(-1, 0.1, 0);
+  assert.equal(v31.isCodirectional(tv317), true, 'isCodirectional #17');
+
+  const v32 = new Vector3D(0, 0, 1);
+  const tv320 = new Vector3D(0, 0, 2);
+  assert.equal(v32.isCodirectional(tv320), true, 'isCodirectional #20');
+  const tv321 = new Vector3D(1, 0, 0.1);
+  assert.equal(v32.isCodirectional(tv321), true, 'isCodirectional #21');
+  const tv322 = new Vector3D(1, 0, 0);
+  assert.equal(v32.isCodirectional(tv322), false, 'isCodirectional #22');
+  const tv323 = new Vector3D(1, 0, -0.1);
+  assert.equal(v32.isCodirectional(tv323), false, 'isCodirectional #23');
+  const tv324 = new Vector3D(0, 0, -1);
+  assert.equal(v32.isCodirectional(tv324), false, 'isCodirectional #24');
+  const tv325 = new Vector3D(-1, 0, -0.1);
+  assert.equal(v32.isCodirectional(tv325), false, 'isCodirectional #25');
+  const tv326 = new Vector3D(-1, 0, 0);
+  assert.equal(v32.isCodirectional(tv326), false, 'isCodirectional #26');
+  const tv327 = new Vector3D(-1, 0, 0.1);
+  assert.equal(v32.isCodirectional(tv327), true, 'isCodirectional #27');
 });
