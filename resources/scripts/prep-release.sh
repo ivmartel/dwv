@@ -10,7 +10,7 @@ usage() {
   echo "Usage: $0 -r releaseVersion -p previousVersion"
   echo -e "  -r The release version, format 'm.n.p'"
   echo -e "  -p The previous version for issue gathering in changelog, format 'm.n.p'"
-  echo -e "  -s The step at which to start (optional, [1,4])"
+  echo -e "  -s The step at which to start (optional, [1,5])"
   echo -e "Warning: the command needs to be run from the root of the repository."
   echo -e "Example:"
   echo -e "> prep-release -r 0.28.0 -p 0.27.0"
