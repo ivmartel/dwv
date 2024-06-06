@@ -11,14 +11,22 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
-table, td, th {
-  border: 1px solid #aaa;
+html, body {
+  height: 99%;
 }
 table {
-  border-collapse: collapse;
+  margin: 0 5px;
 }
 td, th {
+  border: 1px solid #aaa;
   padding: 10px;
+}
+th {
+  background: #ddd;
+}
+thead {
+  position: sticky;
+  top: 0;
 }
 progress {
   width: 40%;
@@ -27,20 +35,61 @@ span {
   font-size: small;
   font-style: italic;
 }
-.input {
-  margin-bottom: 10px;
-  padding: 5px;
-  background-color: gainsboro;
+button {
+  margin: 0 5px;
+}
+input[type=number] {
+  width: 75px;
+}
+input[type=color] {
+  margin: 0 5px;
+  width: 25px;
+  height: 25px;
+}
+select {
+  width: 90px;
+}
+input[type=range] {
+  width: 100px;
+  margin: 0px 10px;
+}
+fieldset {
+  legend {
+    font-size: small;
+    font-style: italic;
+  }
 }
 #fileinput {
   width: 50%;
   border: 1px dotted gray;
 }
+#about {
+  font-size: small;
+  font-style: italic;
+}
+#layersdetails {
+  max-height: 200px;
+  overflow: auto;
+  background-color: #E8E8E8;
+}
+.line {
+  padding: 5px;
+  background-color: #E8E8E8;
+}
+.toolFeatures {
+  margin: 0 5px;
+}
+/* special dwv */
+#dwv {
+  display: flex;
+  min-height: 200px;
+  height: 40%;
+  /* compensate for layer absolute position */
+  margin-bottom: 10px;
+}
 .layerGroup {
-  display:inline-block;
-  height: 350px;
-  width: max(30%, 350px);
-  margin: 5px;
+  flex: 1 1;
+  margin: 5px 5px 5px 0;
   background-color: limeGreen;
   /* allow child centering */
   position: relative;
@@ -56,9 +105,6 @@ span {
 canvas {
   /* avoid parent auto-resize */
   vertical-align: middle;
-}
-.line {
-  padding: 5px;
 }
 /** tooltip */
 .layerGroup span {
@@ -99,7 +145,7 @@ hr.vertical {
 
 <body>
 
-<div class="input">
+<div class="line">
 <label for="fileinput">Input:</label>
 <input type="file" id="fileinput" multiple>
 <progress id="loadprogress" max="100" value="0"></progress>
@@ -110,24 +156,38 @@ hr.vertical {
 
 <div class="line">
 <label for="position">Position:</label>
-<input type="text" id="position">
+<input type="text" id="position" autocomplete="off" >
 <span id="positionspan"></span>
 </div>
 
 <div class="line">
 <label for="changelayout">Layout:</label>
-<select name="layout" id="changelayout" disabled>
- <option value="single">Single</option>
+<select name="layout" id="changelayout" autocomplete="off" disabled>
+ <option value="one">One</option>
+ <option value="side">Side by side</option>
  <option value="mpr">MPR</option>
 </select>
-<button id="resetlayout" disabled>Reset Layout</button>
+<button id="resetlayout" disabled>Reset views</button>
+<input type="checkbox" id="changesmoothing">
+<label for="changesmoothing">Smoothing</label>
 </div>
 
-<div class="line" id="binders">Binders:</div>
-
-<div class="line" id="tools">Tools:</div>
+<div class="line">
+  <fieldset id="binders">
+    <legend>Binders</legend>
+  </fieldset>
+  <fieldset id="tools" disabled>
+    <legend>Tools</legend>
+  </fieldset>
+</div>
 
 <div id="layersdetails"></div>
+
+<br>
+
+<div class="line" id="tests">Tests:</div>
+
+<div class="line" id="about">About: </div>
 
 </body>
 </html>
