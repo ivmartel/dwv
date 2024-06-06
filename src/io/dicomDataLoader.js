@@ -138,8 +138,9 @@ export class DicomDataLoader {
         const acceptHeader = options.requestHeaders.find(isNameAccept);
         if (typeof acceptHeader !== 'undefined') {
           // starts with 'application/dicom' and no '+'
-          return startsWith(acceptHeader.value, 'application/dicom') &&
-            acceptHeader.value[18] !== '+';
+          const acceptValue = 'application/dicom';
+          return startsWith(acceptHeader.value, acceptValue) &&
+            acceptHeader.value[acceptValue.length] !== '+';
         }
       }
     }
