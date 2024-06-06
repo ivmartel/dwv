@@ -140,9 +140,6 @@ export class ScrollWheel {
     // prevent default page scroll
     event.preventDefault();
 
-    // prevent default page scroll
-    event.preventDefault();
-
     const layerDetails = getLayerDetailsFromEvent(event);
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewController =
