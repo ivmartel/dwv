@@ -4213,9 +4213,8 @@ export declare class ViewConfig {
 export declare class ViewController {
     /**
      * @param {View} view The associated view.
-     * @param {string} dataId The associated data id.
      */
-    constructor(view: View, dataId: string);
+    constructor(view: View);
     /**
      * Get the plane helper.
      *
@@ -4324,9 +4323,8 @@ export declare class ViewController {
      * Set the associated image.
      *
      * @param {Image} img The associated image.
-     * @param {string} dataId The data id of the image.
      */
-    setImage(img: Image_2, dataId: string): void;
+    setImage(img: Image_2): void;
     /**
      * Get the current view (2D) spacing.
      *
@@ -4593,22 +4591,6 @@ export declare class ViewController {
      * @param {ViewLayer} viewLayer The layer to bind.
      */
     unbindImageAndLayer(viewLayer: ViewLayer): void;
-    /**
-     * Add an event listener to this class.
-     *
-     * @param {string} type The event type.
-     * @param {Function} callback The function associated with the provided
-     *   event type, will be called with the fired event.
-     */
-    addEventListener(type: string, callback: Function): void;
-    /**
-     * Remove an event listener from this class.
-     *
-     * @param {string} type The event type.
-     * @param {Function} callback The function associated with the provided
-     *   event type.
-     */
-    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 
