@@ -258,7 +258,7 @@ export class ViewLayer {
       view.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // create view controller
-    this.#viewController = new ViewController(view, dataId);
+    this.#viewController = new ViewController(view);
     // bind layer and image
     this.bindImage();
   }
@@ -290,7 +290,7 @@ export class ViewLayer {
   onimageset = (event) => {
     // event.value = [index, image]
     if (this.#dataId === event.dataid) {
-      this.#viewController.setImage(event.value[0], this.#dataId);
+      this.#viewController.setImage(event.value[0]);
       this.#setBaseSize(this.#viewController.getImageSize().get2D());
       this.#needsDataUpdate = true;
     }
