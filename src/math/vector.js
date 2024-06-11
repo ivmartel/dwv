@@ -104,7 +104,8 @@ export class Vector3D {
    * vector that is perpendicular to both a and b.
    * If both vectors are parallel, the cross product is a zero vector.
    *
-   * @see https://en.wikipedia.org/wiki/Cross_product
+   * Ref: {@link https://en.wikipedia.org/wiki/Cross_product}.
+   *
    * @param {Vector3D} vector3D The input vector.
    * @returns {Vector3D} The result vector.
    */
@@ -118,7 +119,8 @@ export class Vector3D {
   /**
    * Get the dot product with another Vector3D.
    *
-   * @see https://en.wikipedia.org/wiki/Dot_product
+   * Ref: {@link https://en.wikipedia.org/wiki/Dot_product}.
+   *
    * @param {Vector3D} vector3D The input vector.
    * @returns {number} The dot product.
    */

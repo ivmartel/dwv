@@ -1,6 +1,6 @@
 /**
- * Namespace for translation function.
- * (in a namespace to allow for override from client)
+ * Namespace for translation function
+ *   (in a namespace to allow for override from client).
  */
 export const i18n = {
 

@@ -2,6 +2,7 @@ import {arrayEquals} from './array';
 
 /**
  * Merge two similar objects.
+ *
  * Objects need to be in the form of:
  * <code>
  * {
@@ -9,7 +10,8 @@ import {arrayEquals} from './array';
  *   key0: {valueKey: ["abc"]},
  *   key1: {valueKey: [33]}
  * }
- * </code>
+ * </code>.
+ *
  * Merged objects will be in the form of:
  * <code>
  * {
@@ -25,7 +27,7 @@ import {arrayEquals} from './array';
  *     2: [55]
  *   }}
  * }
- * </code>
+ * </code>.
  *
  * @param {object} obj1 The first object, can be the result of a previous merge.
  * @param {object} obj2 The second object.

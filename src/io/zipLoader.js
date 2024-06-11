@@ -7,8 +7,9 @@ import {MemoryLoader} from './memoryLoader';
 /**
  * The zip library.
  *
+ * Ref: {@link https://github.com/Stuk/jszip}.
+ *
  * @external JSZip
- * @see https://github.com/Stuk/jszip
  */
 import JSZip from 'jszip';
 
@@ -47,9 +48,9 @@ export class ZipLoader {
   #zobjs = null;
 
   /**
-   * JSZip.async callback
+   * JSZip.async callback.
    *
-   * @param {ArrayBuffer} content unzipped file image
+   * @param {ArrayBuffer} content Unzipped file image.
    * @param {object} origin The origin of the file.
    * @param {number} index The data index.
    */
@@ -143,6 +144,7 @@ export class ZipLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if the file has a 'zip' extension.
    *
    * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
@@ -154,6 +156,11 @@ export class ZipLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'zip',
+   * - the `options.requestHeaders` contains an item
+   *   starting with 'Accept: application/zip'.
+   * - the url has a 'zip' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
@@ -281,4 +288,4 @@ export class ZipLoader {
    */
   onabort(_event) {}
 
-} // class DicomDataLoader
+} // class ZipLoader

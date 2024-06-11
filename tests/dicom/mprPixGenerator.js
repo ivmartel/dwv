@@ -190,7 +190,7 @@ const MPRPixGenerator = function (options) {
   }
 
   /**
-   * @param {string} name The image orientation
+   * @param {string} name The image orientation.
    * @param {number} i The column index.
    * @param {number} j The row index.
    * @returns {number} The value at the given position.

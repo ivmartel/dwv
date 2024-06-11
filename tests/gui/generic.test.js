@@ -4,7 +4,7 @@ import {canCreateCanvas} from '../../src/gui/generic';
  * Tests for the 'gui/generic.js' file.
  */
 /** @module tests/gui */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('gui');
 
@@ -13,7 +13,7 @@ QUnit.module('gui');
  *
  * @function module:tests/gui~canCreateCanvas
  */
-QUnit.test('Test canCreateCanvas.', function (assert) {
+QUnit.test('canCreateCanvas', function (assert) {
   assert.equal(canCreateCanvas(1, 1), true,
     'Can create 1*1 canvas');
 

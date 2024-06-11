@@ -8,7 +8,7 @@ import {ColourMap} from './luts';
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
- * @param {ImageData} array The array to store the outut data
+ * @param {ImageData} array The array to store the outut data.
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  * @param {ColourMap} colourMap The colour map.

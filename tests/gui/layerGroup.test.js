@@ -7,15 +7,16 @@ import {
 /**
  * Tests for the 'gui/LayerGroup.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('gui');
 
 /**
  * Tests for {@link LayerGroup} string id.
  *
- * @function module:tests/gui~LayerGroup
+ * @function module:tests/gui~layergroup-string-id
  */
-QUnit.test('Test LayerGroup string id.', function (assert) {
+QUnit.test('LayerGroup string id', function (assert) {
   // test #00
   const theoId00 = 'layerGroupA-layer-0';
   const theoDetails00 = {groupDivId: 'layerGroupA', layerId: 0};
@@ -44,9 +45,9 @@ QUnit.test('Test LayerGroup string id.', function (assert) {
 /**
  * Tests for {@link LayerGroup} creation.
  *
- * @function module:tests/gui~LayerGroup
+ * @function module:tests/gui~layergroup-creation
  */
-QUnit.test('Test LayerGroup.', function (assert) {
+QUnit.test('LayerGroup creation', function (assert) {
   const element00 = document.createElement('div');
   element00.id = 'layerGroup00';
   const layerGroup00 = new LayerGroup(element00);
@@ -56,13 +57,12 @@ QUnit.test('Test LayerGroup.', function (assert) {
     'new layerGroup div id');
 });
 
-
 /**
  * Tests for {@link LayerGroup} add/remove view layer.
  *
- * @function module:tests/gui~LayerGroup
+ * @function module:tests/gui~layergroup-add-remove-view-layer
  */
-QUnit.test('Test LayerGroup add/remove view layer.', function (assert) {
+QUnit.test('LayerGroup add remove view layer', function (assert) {
   const element00 = document.createElement('div');
   element00.id = 'layerGroup00';
   const layerGroup00 = new LayerGroup(element00);
@@ -87,9 +87,9 @@ QUnit.test('Test LayerGroup add/remove view layer.', function (assert) {
 /**
  * Tests for {@link LayerGroup} add/remove draw layer.
  *
- * @function module:tests/gui~LayerGroup
+ * @function module:tests/gui~layergroup-add-remove-draw-layer
  */
-QUnit.test('Test LayerGroup add/remove draw layer.', function (assert) {
+QUnit.test('LayerGroup add remove draw layer', function (assert) {
   const element00 = document.createElement('div');
   element00.id = 'layerGroup00';
   const layerGroup00 = new LayerGroup(element00);

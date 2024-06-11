@@ -55,7 +55,7 @@ function showProgress(text) {
 /**
  * Get the optional token.
  *
- * @returns {string|undefined} The token
+ * @returns {string|undefined} The token.
  */
 function getToken() {
   let token = document.getElementById('token').value;
@@ -388,8 +388,8 @@ function launchStowInstances() {
 /**
  * Get a common prefix from a list of strings.
  *
- * @param {string[]} values The values to extract the prefix from
- * @returns {string|undefined} The common prefix
+ * @param {string[]} values The values to extract the prefix from.
+ * @returns {string|undefined} The common prefix.
  */
 function getCommonPrefix(values) {
   const size = values.length;

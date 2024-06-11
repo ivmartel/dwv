@@ -186,6 +186,13 @@ export class DrawLayer {
   }
 
   /**
+   * Remove the HTML element from the DOM.
+   */
+  removeFromDOM() {
+    this.#containerDiv.remove();
+  }
+
+  /**
    * Get the layer base size (without scale).
    *
    * @returns {Scalar2D} The size as {x,y}.
@@ -395,14 +402,14 @@ export class DrawLayer {
 
   /**
    * Draw the content (imageData) of the layer.
-   * The imageData variable needs to be set
+   * The imageData variable needs to be set.
    */
   draw() {
     this.#konvaStage.draw();
   }
 
   /**
-   * Initialise the layer: set the canvas and context
+   * Initialise the layer: set the canvas and context.
    *
    * @param {Scalar2D} size The image size as {x,y}.
    * @param {Scalar2D} spacing The image spacing as {x,y}.
@@ -439,44 +446,48 @@ export class DrawLayer {
   /**
    * Fit the layer to its parent container.
    *
-   * @param {number} fitScale1D The 1D fit scale.
-   * @param {Scalar2D} fitSize The fit size as {x,y}.
+   * @param {Scalar2D} containerSize The container size as {x,y}.
+   * @param {number} divToWorldSizeRatio The div to world size ratio.
    * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
-  fitToContainer(fitScale1D, fitSize, fitOffset) {
+  fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
     // update konva
-    this.#konvaStage.width(fitSize.x);
-    this.#konvaStage.height(fitSize.y);
+    this.#konvaStage.width(containerSize.x);
+    this.#konvaStage.height(containerSize.y);
 
     // fit scale
-    const newFitScale = {
-      x: fitScale1D * this.#baseSpacing.x,
-      y: fitScale1D * this.#baseSpacing.y
+    const divToImageSizeRatio = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
     };
     // #scale = inputScale * fitScale * flipScale
     // flipScale does not change here, we can omit it
     // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: this.#konvaStage.scale().x * newFitScale.x / this.#fitScale.x,
-      y: this.#konvaStage.scale().y * newFitScale.y / this.#fitScale.y
+      x: this.#konvaStage.scale().x * divToImageSizeRatio.x / this.#fitScale.x,
+      y: this.#konvaStage.scale().y * divToImageSizeRatio.y / this.#fitScale.y
     };
 
     // set scales if different from previous
     if (this.#konvaStage.scale().x !== newScale.x ||
       this.#konvaStage.scale().y !== newScale.y) {
-      this.#fitScale = newFitScale;
+      this.#fitScale = divToImageSizeRatio;
       this.#konvaStage.scale(newScale);
     }
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / newFitScale.x,
-      y: fitOffset.y / newFitScale.y
+      x: fitOffset.x / divToImageSizeRatio.x,
+      y: fitOffset.y / divToImageSizeRatio.y
     };
-    // #flipOffset = canvas / #scale
+    // flip offset
+    const scaledImageSize = {
+      x: containerSize.x / divToImageSizeRatio.x,
+      y: containerSize.y / divToImageSizeRatio.y
+    };
     const newFlipOffset = {
-      x: this.#flipOffset.x !== 0 ? fitSize.x / newFitScale.x : 0,
-      y: this.#flipOffset.y !== 0 ? fitSize.y / newFitScale.y : 0,
+      x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
+      y: this.#flipOffset.y !== 0 ? scaledImageSize.y : 0,
     };
 
     // set offsets if different from previous

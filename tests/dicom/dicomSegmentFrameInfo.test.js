@@ -9,8 +9,9 @@ import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter';
 /**
  * Tests for the 'dicom/dicomSegmentFrameInfo.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('dicom');
 
 /**
  * SegmentFrameInfo test: translate to element and back.
@@ -56,9 +57,9 @@ function testSegmentFrameInfo(frameInfo, assert, testName) {
 /**
  * Tests for {@link DicomSegmentFrameInfo} using simple DICOM data.
  *
- * @function module:tests/dicom~DicomSegmentFrameInfo
+ * @function module:tests/dicom~dicom-segment-frame-info-class
  */
-QUnit.test('Test dicom segment frame info.', function (assert) {
+QUnit.test('DICOM segment frame info class', function (assert) {
   const dimIndex0 = [1, 1];
   const imagePosPat0 = [0.5, 0.5, 0.5];
   // tests only supports simple 1D arrays of objects

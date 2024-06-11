@@ -14,8 +14,11 @@ import {
 } from './dictionary';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
-import {arrayEquals} from '../utils/array';
-import {Orientation} from '../math/matrix';
+import {
+  getOrientationFromCosines,
+  getOrientationStringLPS,
+  getLPSGroup
+} from '../math/orientation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -35,13 +38,14 @@ import {DataElement} from '../dicom/dataElement';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.33.0-beta.39';
+  return '0.34.0-beta.0';
 }
 
 /**
  * Check that an input buffer includes the DICOM prefix 'DICM'
- * after the 128 bytes preamble.
- * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *   after the 128 bytes preamble.
+ *
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part10/chapter_7.html#sect_7.1}.
  *
  * @param {ArrayBuffer} buffer The buffer to check.
  * @returns {boolean} True if the buffer includes the prefix.
@@ -67,7 +71,7 @@ const ZWS = String.fromCharCode('u200B');
  * Clean string: remove zero-width space ending and trim.
  * Warning: no tests are done on the input, will fail if
  *   null or undefined or not string.
- * (exported for tests only)
+ * Exported for tests only.
  *
  * @param {string} inputStr The string to clean.
  * @returns {string} The cleaned string.
@@ -86,11 +90,12 @@ export function cleanString(inputStr) {
 }
 
 /**
- * Get the utfLabel (used by the TextDecoder) from a character set term
+ * Get the utfLabel (used by the TextDecoder) from a character set term.
+ *
  * References:
- * - DICOM [Value Encoding]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html}
- * - DICOM [Specific Character Set]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2}
- * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}
+ * - DICOM [Value Encoding]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html},
+ * - DICOM [Specific Character Set]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2},
+ * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}.
  *
  * @param {string} charSetTerm The DICOM character set.
  * @returns {string} The corresponding UTF label.
@@ -140,7 +145,7 @@ function getUtfLabel(charSetTerm) {
 }
 
 /**
- * Default text decoder
+ * Default text decoder.
  */
 class DefaultTextDecoder {
   /**
@@ -194,19 +199,15 @@ export function getReverseOrientation(ori) {
  * Get the name of an image orientation patient.
  *
  * @param {number[]} orientation The image orientation patient.
- * @returns {string} The orientation name: axial, coronal or sagittal.
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
  */
 export function getOrientationName(orientation) {
-  const axialOrientation = [1, 0, 0, 0, 1, 0];
-  const coronalOrientation = [1, 0, 0, 0, 0, -1];
-  const sagittalOrientation = [0, 1, 0, 0, 0, -1];
   let name;
-  if (arrayEquals(orientation, axialOrientation)) {
-    name = Orientation.Axial;
-  } else if (arrayEquals(orientation, coronalOrientation)) {
-    name = Orientation.Coronal;
-  } else if (arrayEquals(orientation, sagittalOrientation)) {
-    name = Orientation.Sagittal;
+  const orientMatrix = getOrientationFromCosines(orientation);
+  if (typeof orientMatrix !== 'undefined') {
+    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
+    name = getLPSGroup(lpsStr);
   }
   return name;
 }
@@ -325,7 +326,8 @@ export function getTransferSyntaxName(syntax) {
 
 /**
  * Guess the transfer syntax from the first data element.
- * See https://github.com/ivmartel/dwv/issues/188
+ *
+ * See {@link https://github.com/ivmartel/dwv/issues/188}
  *   (Allow to load DICOM with no DICM preamble) for more details.
  *
  * @param {DataElement} firstDataElement The first data element
@@ -425,17 +427,16 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
 
 /**
  * Get the number of bytes occupied by a data element prefix,
- *   i.e. without its value.
+ *   (without its value).
  *
- * @param {string} vr The Value Representation of the element.
- * @param {boolean} isImplicit Does the data use implicit VR?
- * @returns {number} The size of the element prefix.
  * WARNING: this is valid for tags with a VR, if not sure use
  *   the 'isTagWithVR' function first.
- * Reference:
- * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
- * - [Data Element implicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1}.
  *
+ * Reference:
+ * - [Data Element explicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1},
+ * - [Data Element implicit]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_7.5.2.html#table_7.5-1}.
+ *
+ * ```
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
  * | 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
@@ -445,6 +446,11 @@ export function getTypedArray(bitsAllocated, pixelRepresentation, size) {
  *
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
+ * ```
+ *
+ * @param {string} vr The Value Representation of the element.
+ * @param {boolean} isImplicit Does the data use implicit VR?
+ * @returns {number} The size of the element prefix.
  */
 export function getDataElementPrefixByteSize(vr, isImplicit) {
   return isImplicit ? 8 : is32bitVLVR(vr) ? 12 : 8;
@@ -577,8 +583,9 @@ export class DicomParser {
     /**
      * The text decoder.
      *
+     * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder}.
+     *
      * @external TextDecoder
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
      */
     this.#textDecoder = new TextDecoder(characterSet);
   }
@@ -678,7 +685,7 @@ export class DicomParser {
 
   /**
    * Read the pixel item data element.
-   * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
+   * Ref: [Single frame fragments]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_A.4.html#table_A.4-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -716,7 +723,8 @@ export class DicomParser {
 
   /**
    * Read a DICOM data element.
-   * Reference: [DICOM VRs]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1}.
+   *
+   * Reference: [DICOM VRs]{@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
    *
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
@@ -1219,7 +1227,7 @@ export class DicomParser {
     );
 
     // handle fragmented pixel buffer
-    // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
+    // Reference: http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_8.2.html
     // (third note, "Depending on the transfer syntax...")
     dataElement = this.#dataElements[TagKeys.PixelData];
     if (typeof dataElement !== 'undefined') {

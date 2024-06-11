@@ -3,15 +3,16 @@ import {mergeObjects} from '../../src/utils/operator';
 /**
  * Tests for the 'utils/operator.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('utils');
 
 /**
  * Tests for {@link mergeObjects}.
  *
- * @function module:tests/utils~mergeObjects
+ * @function module:tests/utils~mergeobjects
  */
-QUnit.test('Test merge objects.', function (assert) {
+QUnit.test('Merge objects', function (assert) {
   const obj001 = {id: {value: [0]}, a: {value: [1]}, b: {value: [1]}};
   const obj002 = {id: {value: [1]}, a: {value: [1]}, b: {value: [2]}};
 

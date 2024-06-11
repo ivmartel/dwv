@@ -65,7 +65,7 @@ export class ShapeEditor {
   }
 
   /**
-   * Shape factory list
+   * Shape factory list.
    *
    * @type {object}
    */

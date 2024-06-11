@@ -75,10 +75,9 @@ export class ArrowFactory {
       name: 'shape'
     });
     // larger hitfunc
-    const linePerp0 = getPerpendicularLine(
-      line, points[0], style.scale(10));
-    const linePerp1 = getPerpendicularLine(
-      line, points[1], style.scale(10));
+    const tickLen = style.applyZoomScale(10).x;
+    const linePerp0 = getPerpendicularLine(line, points[0], tickLen);
+    const linePerp1 = getPerpendicularLine(line, points[1], tickLen);
     kshape.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -95,7 +94,7 @@ export class ArrowFactory {
     const verticalLine = new Line(line.getBegin(), beginTy);
     const angle = getAngle(line, verticalLine);
     const angleRad = angle * Math.PI / 180;
-    const radius = 5 * style.getScaledStrokeWidth();
+    const radius = Math.abs(style.applyZoomScale(8).x);
     const kpoly = new Konva.RegularPolygon({
       x: line.getBegin().getX() + radius * Math.sin(angleRad),
       y: line.getBegin().getY() + radius * Math.cos(angleRad),
@@ -240,8 +239,9 @@ export class ArrowFactory {
     // larger hitfunc
     const p2b = new Point2D(bx, by);
     const p2e = new Point2D(ex, ey);
-    const linePerp0 = getPerpendicularLine(line, p2b, 10);
-    const linePerp1 = getPerpendicularLine(line, p2e, 10);
+    const tickLen = style.applyZoomScale(10).x;
+    const linePerp0 = getPerpendicularLine(line, p2b, tickLen);
+    const linePerp1 = getPerpendicularLine(line, p2e, tickLen);
     kline.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());

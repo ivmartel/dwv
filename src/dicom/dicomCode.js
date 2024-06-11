@@ -6,7 +6,7 @@ import {DataElement} from './dataElement';
 /**
  * DICOM code: item of a basic code sequence.
  *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_8.8.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
  */
 export class DicomCode {
   /**

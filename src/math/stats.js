@@ -151,8 +151,8 @@ function getFullStats(values) {
 
 /**
  * Get an arrays' percentile. Uses linear interpolation for percentiles
- * that lie between data points.
- * see https://en.wikipedia.org/wiki/Percentile (second variant interpolation)
+ *   that lie between data points.
+ * See: {@link https://en.wikipedia.org/wiki/Percentile} (second variant interpolation).
  *
  * @param {number[]} values The sorted array of values.
  * @param {number} ratio The percentile ratio [0-1].
@@ -183,11 +183,34 @@ function getPercentile(values, ratio) {
 
 /**
  * Unique ID generator.
+ *
  * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
- * and this {@link http://stackoverflow.com/a/13403498 answer}.
+ *   and this {@link http://stackoverflow.com/a/13403498 answer}.
  *
  * @returns {string} A unique ID.
  */
 export function guid() {
   return Math.random().toString(36).substring(2, 15);
+}
+
+/**
+ * Number range.
+ */
+export class NumberRange {
+  /**
+   * @type {number}
+   */
+  min;
+  /**
+   * @type {number}
+   */
+  max;
+  /**
+   * @param {number} min The minimum.
+   * @param {number} max The maximum.
+   */
+  constructor(min, max) {
+    this.min = min;
+    this.max = max;
+  }
 }

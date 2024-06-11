@@ -21,6 +21,8 @@ import {View} from '../image/view';
 import {WindowLevel} from '../image/windowLevel';
 import {Point, Point2D} from '../math/point';
 import {Scalar2D} from '../math/scalar';
+import {Matrix33} from '../math/matrix';
+import {ViewLayer} from '../gui/viewLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -53,7 +55,7 @@ export class ViewController {
    * Colour map name.
    * Defaults to 'plain' as defined in Views' default.
    *
-   * #type {string}
+   * @type {string}
    */
   #colourMapName = 'plain';
 
@@ -300,7 +302,7 @@ export class ViewController {
   /**
    * Get the image rescaled value at the input position.
    *
-   * @param {Point} position the input position.
+   * @param {Point} position The input position.
    * @returns {number|undefined} The image value or undefined if out of bounds
    *   or no quantifiable (for ex RGB).
    */
@@ -321,10 +323,45 @@ export class ViewController {
   /**
    * Get the image pixel unit.
    *
-   * @returns {string} The unit
+   * @returns {string} The unit.
    */
   getPixelUnit() {
     return this.#view.getImage().getMeta().pixelUnit;
+  }
+
+  /**
+   * Extract a slice from an image at the given index and orientation.
+   *
+   * @param {Image} image The image to parse.
+   * @param {Index} index The current index.
+   * @param {boolean} isRescaled Flag for rescaled values (default false).
+   * @param {Matrix33} orientation The desired orientation.
+   * @returns {Image} The extracted slice.
+   */
+  #getSlice(image, index, isRescaled, orientation) {
+    // generate slice values
+    const sliceIter = getSliceIterator(
+      image,
+      index,
+      isRescaled,
+      orientation
+    );
+    const sliceValues = getIteratorValues(sliceIter);
+    // oriented geometry
+    const orientedSize = image.getGeometry().getSize(orientation);
+    const sizeValues = orientedSize.getValues();
+    sizeValues[2] = 1;
+    const sliceSize = new Size(sizeValues);
+    const orientedSpacing = image.getGeometry().getSpacing(orientation);
+    const spacingValues = orientedSpacing.getValues();
+    spacingValues[2] = 1;
+    const sliceSpacing = new Spacing(spacingValues);
+    const sliceOrigin = new Point3D(0, 0, 0);
+    const sliceGeometry =
+      new Geometry(sliceOrigin, sliceSize, sliceSpacing);
+    // slice image
+    // @ts-ignore
+    return new Image(sliceGeometry, sliceValues);
   }
 
   /**
@@ -337,42 +374,20 @@ export class ViewController {
   getImageRegionValues(min, max) {
     let image = this.#view.getImage();
     const orientation = this.#view.getOrientation();
-    let position = this.getCurrentIndex();
+    let currentIndex = this.getCurrentIndex();
     let rescaled = true;
 
-    // created oriented slice if needed
+    // create oriented slice if needed
     if (!isIdentityMat33(orientation)) {
-      // generate slice values
-      const sliceIter = getSliceIterator(
-        image,
-        position,
-        rescaled,
-        orientation
-      );
-      const sliceValues = getIteratorValues(sliceIter);
-      // oriented geometry
-      const orientedSize = image.getGeometry().getSize(orientation);
-      const sizeValues = orientedSize.getValues();
-      sizeValues[2] = 1;
-      const sliceSize = new Size(sizeValues);
-      const orientedSpacing = image.getGeometry().getSpacing(orientation);
-      const spacingValues = orientedSpacing.getValues();
-      spacingValues[2] = 1;
-      const sliceSpacing = new Spacing(spacingValues);
-      const sliceOrigin = new Point3D(0, 0, 0);
-      const sliceGeometry =
-        new Geometry(sliceOrigin, sliceSize, sliceSpacing);
-      // slice image
-      // @ts-ignore
-      image = new Image(sliceGeometry, sliceValues);
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
       // update position
-      position = new Index([0, 0, 0]);
+      currentIndex = new Index([0, 0, 0]);
       rescaled = false;
     }
 
     // get region values
     const iter = getRegionSliceIterator(
-      image, position, rescaled, min, max);
+      image, currentIndex, rescaled, min, max);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
@@ -383,15 +398,26 @@ export class ViewController {
   /**
    * Get some values from the associated image in variable regions.
    *
-   * @param {Array} regions A list of regions.
+   * @param {number[][][]} regions A list of [x, y] pairs (min, max).
    * @returns {Array} A list of values.
    */
   getImageVariableRegionValues(regions) {
+    let image = this.#view.getImage();
+    const orientation = this.#view.getOrientation();
+    let currentIndex = this.getCurrentIndex();
+    let rescaled = true;
+
+    // create oriented slice if needed
+    if (!isIdentityMat33(orientation)) {
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      // update position
+      currentIndex = new Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
     const iter = getVariableRegionSliceIterator(
-      this.#view.getImage(),
-      this.getCurrentIndex(),
-      true, regions
-    );
+      image, currentIndex, rescaled, regions);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
@@ -438,7 +464,7 @@ export class ViewController {
   }
 
   /**
-   * Get the image size.
+   * Get the oriented image size.
    *
    * @returns {Size} The size.
    */
@@ -862,6 +888,36 @@ export class ViewController {
    */
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
+  }
+
+  /**
+   * Bind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  bindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.addEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.addEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
+  }
+
+  /**
+   * Unbind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  unbindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.removeEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.removeEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
   }
 
   /**

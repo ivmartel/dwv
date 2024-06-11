@@ -4,16 +4,18 @@
 /**
  * DICOM tag dictionary 2022a.
  * Generated using xml standard conversion from {@link https://github.com/ivmartel/dcmStdToJs} v0.1.0.
+ *
  * Conversion changes:
- * - (vr) 'See Note' -> 'NONE'
- * - (vr) 'OB or OW' -> 'ox'
- * - (vr) 'US or SS' -> 'xs'
- * - (vr) 'US or OW' -> 'xx'
- * - (vr) 'US or SS or OW' -> 'xs'
- * - added 'GenericGroupLength' element to each group
+ * - (vr) 'See Note' -> 'NONE',
+ * - (vr) 'OB or OW' -> 'ox',
+ * - (vr) 'US or SS' -> 'xs',
+ * - (vr) 'US or OW' -> 'xx',
+ * - (vr) 'US or SS or OW' -> 'xs',
+ * - added 'GenericGroupLength' element to each group.
+ *
  * Local changes:
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and
- *  'xxxx' with '0004'
+ *  'xxxx' with '0004'.
  *
  * @type {Object<string, Object<string, string[]>>}
  */
@@ -5254,7 +5256,7 @@ export function addTagsToDictionary(group, tags) {
 /**
  * Tag groups: key to name pairs.
  * Copied from gdcm-2.6.1\Source\DataDictionary\GroupName.dic
- * -> removed duplicates (commented)
+ * -> removed duplicates (commented).
  *
  * @type {Object<string, string>}
  */
@@ -5335,8 +5337,9 @@ export const tagGroups = {
 
 /**
  * List of Value Representation (VR) with 32bit Value Length (VL).
+ *
  * Added locally used 'ox'.
- * see http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1
+ * See {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_7.html#table_7.1-1}.
  *
  * @type {Object<string, boolean>}
  */
@@ -5369,8 +5372,9 @@ export function is32bitVLVR(vr) {
 
 /**
  * List of string VR with extended or replaced default character repertoire defined in
- * Specific Character Set (0008,0005)
- * see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2
+ *   Specific Character Set (0008,0005).
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_6.html#sect_6.1.2.2}.
  *
  * @type {Object<string, boolean>}
  */
@@ -5396,7 +5400,8 @@ export function isCharSetStringVR(vr) {
 
 /**
  * VR equivalent javascript types.
- * see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  *
  * @type {Object<string, string>}
  */
@@ -5439,7 +5444,8 @@ export const vrTypes = {
 
 /**
  * Transfer syntaxes.
- * see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part06/chapter_A.html#table_A-1
+ *
+ * See {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part06/chapter_A.html#table_A-1}.
  *
  * @type {Object<string, string>}
  */

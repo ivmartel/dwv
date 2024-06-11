@@ -243,10 +243,10 @@ export class UrlsLoader {
    *
    * @param {string[]} data The list of urls to load.
    * @param {object} [options] The options object, can contain:
-   *  - requestHeaders: an array of {name, value} to use as request headers
-   *  - withCredentials: boolean xhr.withCredentials flag to pass
-   *    to the request
-   *  - batchSize: the size of the request url batch
+   * - requestHeaders: an array of {name, value} to use as request headers,
+   * - withCredentials: boolean xhr.withCredentials flag to pass
+   *   to the request,
+   * - batchSize: the size of the request url batch.
    */
   #loadUrls(data, options) {
     // check input
@@ -318,8 +318,9 @@ export class UrlsLoader {
       /**
        * The http request.
        *
+       * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest}.
+       *
        * @external XMLHttpRequest
-       * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
        */
       const request = new XMLHttpRequest();
       request.open('GET', dataElement, true);

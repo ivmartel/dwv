@@ -6,8 +6,9 @@ import {urlContentTypes} from './urlsLoader';
 
 /**
  * Raw video loader.
- * url example (cors enabled):
- *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
+ *
+ * Url example (cors enabled):
+ *   {@link https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4}.
  */
 export class RawVideoLoader {
 
@@ -95,6 +96,7 @@ export class RawVideoLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True for files with type 'video.*'.
    *
    * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
@@ -106,6 +108,11 @@ export class RawVideoLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'rawvideo',
+   * - the `options.requestHeaders` contains an item
+   *   starting with 'Accept: video/'.
+   * - the url has a 'mp4', 'ogg' or 'webm' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.

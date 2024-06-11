@@ -26,7 +26,7 @@ export class App {
     canWindowLevel(): boolean;
     defaultOnKeydown: (event: KeyboardEvent) => void;
     fitToContainer(): void;
-    getActiveLayerGroup(): LayerGroup;
+    getActiveLayerGroup(): LayerGroup | undefined;
     getAddedScale(): Scalar3D;
     getBaseScale(): Scalar3D;
     getCurrentStackIndex(): number;
@@ -38,7 +38,6 @@ export class App {
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getImage(dataId: string): Image_2 | undefined;
     getJsonState(): string;
-    getLastImage(): Image_2 | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(dataId: string): {
         [x: string]: DataElement;
@@ -78,7 +77,6 @@ export class App {
     setDrawings(drawings: any[], drawingsDetails: any[]): void;
     setImage(dataId: string, img: Image_2): void;
     setImageSmoothing(flag: boolean): void;
-    setLastImage(img: Image_2): void;
     setLayerGroupsBinders(list: string[]): void;
     // @deprecated
     setOpacity(alpha: number): void;
@@ -104,6 +102,7 @@ export class AppOptions {
     } | undefined;
     defaultCharacterSet: string | undefined;
     overlayConfig: object | undefined;
+    rootDocument: DocumentFragment;
     tools: {
         [x: string]: ToolConfig;
     } | undefined;
@@ -283,7 +282,7 @@ export class DrawLayer {
     deleteDraws(exeCallback: object): void;
     display(flag: boolean): void;
     draw(): void;
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
@@ -299,6 +298,7 @@ export class DrawLayer {
     isGroupVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
+    removeFromDOM(): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setOffset(newOffset: Scalar3D): void;
@@ -365,7 +365,7 @@ export function getLayerDetailsFromEvent(event: object): object;
 export function getMousePoint(event: object): Point2D;
 
 // @public
-export function getOrientationName(orientation: number[]): string;
+export function getOrientationName(orientation: number[]): string | undefined;
 
 // @public
 export function getPixelDataTag(): Tag;
@@ -413,7 +413,7 @@ class Image_2 {
     convolute2D(weights: number[]): Image_2;
     convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
     getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
-    getDataRange(): object;
+    getDataRange(): NumberRange;
     getGeometry(): Geometry;
     getHistogram(): any[];
     getImageUid(index?: Index): string;
@@ -424,7 +424,7 @@ class Image_2 {
     getOffsets(value: number | RGB): number[];
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
-    getRescaledDataRange(): object;
+    getRescaledDataRange(): NumberRange;
     getRescaledValue(i: number, j: number, k: number, f: number): number;
     getRescaledValueAtIndex(index: Index): number;
     getRescaledValueAtOffset(offset: number): number;
@@ -480,11 +480,11 @@ export class LayerGroup {
     addScale(scaleStep: number, center: Point3D): void;
     addTranslation(translation: Scalar3D): void;
     addViewLayer(): ViewLayer;
-    calculateFitScale(): number | undefined;
     canScroll(): boolean;
     display(flag: boolean): void;
     draw(): void;
     empty(): void;
+    fitToContainer(divToWorldSizeRatio: number): void;
     flipScaleZ(): void;
     getActiveDrawLayer(): DrawLayer | undefined;
     getActiveViewLayer(): ViewLayer | undefined;
@@ -492,8 +492,9 @@ export class LayerGroup {
     getBaseScale(): Scalar3D;
     getBaseViewLayer(): ViewLayer | undefined;
     getDivId(): string;
+    getDivToWorldSizeRatio(): number | undefined;
     getDrawLayersByDataId(dataId: string): DrawLayer[];
-    getMaxSize(): Scalar2D | undefined;
+    getMaxWorldSize(): Scalar2D | undefined;
     getNumberOfLayers(): number;
     getNumberOfViewLayers(): number;
     getOffset(): Scalar3D;
@@ -501,22 +502,24 @@ export class LayerGroup {
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
+    includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
     moreThanOne(dim: number): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeLayer(layer: ViewLayer | DrawLayer): void;
     removeLayersByDataId(dataId: string): void;
+    removeTooltipDiv(): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveDrawLayer(index: number): void;
     setActiveDrawLayerByDataId(dataId: string): void;
     setActiveViewLayer(index: number): void;
     setActiveViewLayerByDataId(dataId: string): void;
-    setFitScale(scaleIn: number): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setShowCrosshair(flag: boolean): void;
+    showTooltip(point: Point2D): void;
     someViewLayer(callbackFn: Function): boolean;
     updateLayersToPositionChange: (event: object) => void;
 }
@@ -622,6 +625,13 @@ export class Matrix33 {
     multiplyPoint3D(point3D: Point3D): Point3D;
     multiplyVector3D(vector3D: Vector3D): Vector3D;
     toString(): string;
+}
+
+// @public
+export class NumberRange {
+    constructor(min: number, max: number);
+    max: number;
+    min: number;
 }
 
 // @public (undocumented)
@@ -889,6 +899,7 @@ export class ViewController {
     constructor(view: View, dataId: string);
     addEventListener(type: string, callback: Function): void;
     addWindowLevelPresets(presets: object): object;
+    bindImageAndLayer(viewLayer: ViewLayer): void;
     canQuantifyImage(): boolean;
     canScroll(): boolean;
     // @deprecated
@@ -910,7 +921,7 @@ export class ViewController {
     getImageRegionValues(min: Point2D, max: Point2D): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
-    getImageVariableRegionValues(regions: any[]): any[];
+    getImageVariableRegionValues(regions: number[][][]): any[];
     getImageWorldSize(): Scalar2D;
     getIncrementPosition(dim: number): Point;
     getIncrementScrollPosition(): Point;
@@ -945,6 +956,7 @@ export class ViewController {
     setWindowLevelPreset(name: string): void;
     setWindowLevelPresetById(id: number): void;
     stop(): void;
+    unbindImageAndLayer(viewLayer: ViewLayer): void;
 }
 
 // @public
@@ -953,6 +965,7 @@ export class ViewLayer {
     addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
+    bindImage(): void;
     bindInteraction(): void;
     clear(): void;
     display(flag: boolean): void;
@@ -961,10 +974,11 @@ export class ViewLayer {
     displayToPlanePos(point2D: Point2D): Point2D;
     displayToPlaneScale(point2D: Point2D): Point2D;
     draw(): void;
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
+    getAbsoluteZoomOffset(): Scalar2D;
     getBaseSize(): Scalar2D;
     getDataId(): string;
     getId(): string;
@@ -973,21 +987,23 @@ export class ViewLayer {
     getOpacity(): number;
     getScale(): Scalar2D;
     getViewController(): ViewController;
-    getZoomOffset(): Scalar2D;
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
-    initScale(newScale: Scalar3D, zoomOffset: Scalar2D): void;
+    initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     isVisible(): boolean;
-    onimagechange: (event: object) => void;
+    onimagecontentchange: (event: object) => void;
+    onimagegeometrychange: (event: object) => void;
     onimageset: (event: object) => void;
     planePosToDisplay(point2D: Point2D): Point2D;
     removeEventListener(type: string, callback: Function): void;
-    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
+    removeFromDOM(): void;
+    setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D, layerGroupOrigin?: Point3D, layerGroupOrigin0?: Point3D): boolean;
     setCurrentPosition(position: Point, _index: Index): boolean;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setView(view: object, dataId: string): void;
+    unbindImage(): void;
     unbindInteraction(): void;
 }
 

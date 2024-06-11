@@ -7,7 +7,7 @@ import {ColourMap} from './luts';
 /**
  * Generate image data for 'MONOCHROME*' photometric interpretation.
  *
- * @param {ImageData} array The array to store the outut data
+ * @param {ImageData} array The array to store the outut data.
  * @param {object} iterator Position iterator.
  * @param {Function} alphaFunc The alpha function.
  * @param {WindowLut} windowLut The window/level LUT.

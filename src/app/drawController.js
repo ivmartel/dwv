@@ -17,8 +17,9 @@ import {DrawLayer} from '../gui/drawLayer';
 /**
  * Konva.
  *
+ * Ref: {@link https://konvajs.org/}.
+ *
  * @external Konva
- * @see https://konvajs.org/
  */
 import Konva from 'konva';
 

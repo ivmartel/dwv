@@ -3,15 +3,16 @@ import {Spacing} from '../../src/image/spacing';
 /**
  * Tests for the 'image/spacing.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('image');
 
 /**
  * Tests for {@link Spacing}.
  *
- * @function module:tests/image~spacing
+ * @function module:tests/image~spacing-class
  */
-QUnit.test('Test Spacing.', function (assert) {
+QUnit.test('Spacing class', function (assert) {
   // bad input
   assert.throws(function () {
     new Spacing();

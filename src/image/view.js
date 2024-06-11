@@ -227,7 +227,7 @@ export class View {
   }
 
   /**
-   * Set the initial index to 0.
+   * Set the initial index to the middle position.
    */
   setInitialIndex() {
     const geometry = this.#image.getGeometry();
@@ -565,7 +565,7 @@ export class View {
    *
    * @param {Point} position The new position.
    * @param {boolean} silent Flag to fire event or not.
-   * @returns {boolean} False if not in bounds
+   * @returns {boolean} False if not in bounds.
    * @fires View#positionchange
    */
   setCurrentPosition(position, silent) {

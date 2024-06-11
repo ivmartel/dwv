@@ -223,7 +223,7 @@ function getData() {
 }
 
 /**
- * Handle a parser change,
+ * Handle a parser change.
  *
  * @param {object} input The new parser.
  */
@@ -238,7 +238,7 @@ function onChangeParsers(input) {
 }
 
 /**
- * Handle a parser test change,
+ * Handle a parser test change.
  *
  * @param {object} input The new test.
  */

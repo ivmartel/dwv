@@ -142,8 +142,7 @@ export class OpacityBinder {
       }
       // propagate to first view layer
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0 &&
-        layerGroup.getNumberOfViewLayers() > 1) {
+      if (viewLayers.length !== 0) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
       }
@@ -179,9 +178,9 @@ export class Stage {
   /**
    * Active layer group index.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
-  #activeLayerGroupIndex = null;
+  #activeLayerGroupIndex;
 
   /**
    * Image smoothing flag.
@@ -199,7 +198,7 @@ export class Stage {
    * Get the layer group at the given index.
    *
    * @param {number} index The index.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroup(index) {
     return this.#layerGroups[index];
@@ -217,7 +216,7 @@ export class Stage {
   /**
    * Get the active layer group.
    *
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getActiveLayerGroup() {
     return this.getLayerGroup(this.#activeLayerGroupIndex);
@@ -267,6 +266,8 @@ export class Stage {
 
   /**
    * Add a layer group to the list.
+   *
+   * The new layer group will be marked as the active layer group.
    *
    * @param {object} htmlElement The HTML element of the layer group.
    * @returns {LayerGroup} The newly created layer group.
@@ -325,7 +326,7 @@ export class Stage {
       this.#layerGroups[i].empty();
     }
     this.#layerGroups = [];
-    this.#activeLayerGroupIndex = null;
+    this.#activeLayerGroupIndex = undefined;
   }
 
   /**
@@ -383,28 +384,30 @@ export class Stage {
   }
 
   /**
-   * Synchronise the fit scale of the group layers.
+   * Fit to container: synchronise the div to world size ratio
+   *   of the group layers.
    */
-  syncLayerGroupScale() {
-    let minScale;
-    const hasScale = [];
+  fitToContainer() {
+    // find the minimum ratio
+    let minRatio;
+    const hasRatio = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      const scale = this.#layerGroups[i].calculateFitScale();
-      if (typeof scale !== 'undefined') {
-        hasScale.push(i);
-        if (typeof minScale === 'undefined' || scale < minScale) {
-          minScale = scale;
+      const ratio = this.#layerGroups[i].getDivToWorldSizeRatio();
+      if (typeof ratio !== 'undefined') {
+        hasRatio.push(i);
+        if (typeof minRatio === 'undefined' || ratio < minRatio) {
+          minRatio = ratio;
         }
       }
     }
-    // exit if no scale
-    if (typeof minScale === 'undefined') {
+    // exit if no ratio
+    if (typeof minRatio === 'undefined') {
       return;
     }
-    // apply min scale to layers
+    // apply min ratio to layers
     for (let j = 0; j < this.#layerGroups.length; ++j) {
-      if (hasScale.includes(j)) {
-        this.#layerGroups[j].setFitScale(minScale);
+      if (hasRatio.includes(j)) {
+        this.#layerGroups[j].fitToContainer(minRatio);
       }
     }
   }

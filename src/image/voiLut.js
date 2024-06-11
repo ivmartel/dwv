@@ -5,14 +5,14 @@ import {WindowLevel} from './windowLevel';
 
 /**
  * VOI (Values of Interest) LUT class: apply window centre and width.
- * <br>Pseudo-code:
- * <pre>
- *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
- *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
- *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
- * </pre>
  *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html
+ * ```
+ * if (x <= c - 0.5 - (w-1)/2) then y = ymin
+ * else if (x > c - 0.5 + (w-1)/2) then y = ymax
+ * else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
+ * ```
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html}.
  */
 export class VoiLut {
 

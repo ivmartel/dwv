@@ -85,7 +85,7 @@ export class Threshold {
   /**
    * Get the original image.
    *
-   * @returns {Image} image The original image.
+   * @returns {Image} The original image.
    */
   getOriginalImage() {
     return this.#originalImage;
@@ -143,7 +143,7 @@ export class Sharpen {
   /**
    * Get the original image.
    *
-   * @returns {Image} image The original image.
+   * @returns {Image} The original image.
    */
   getOriginalImage() {
     return this.#originalImage;
@@ -199,7 +199,7 @@ export class Sobel {
   /**
    * Get the original image.
    *
-   * @returns {Image} image The original image.
+   * @returns {Image} The original image.
    */
   getOriginalImage() {
     return this.#originalImage;

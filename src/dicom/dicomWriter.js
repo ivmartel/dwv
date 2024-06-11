@@ -106,11 +106,14 @@ export function getDefaultAnonymisationRules() {
 
 /**
  * Get a UID for a DICOM tag.
- * Note: Use https://github.com/uuidjs/uuid?
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
- * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
- * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
+ * Note: Use {@link https://github.com/uuidjs/uuid}?
+ *
+ * Ref:
+ * - {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/chapter_9.html},
+ * - {@link http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html},
+ * - {@link https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid}.
+ *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
@@ -184,7 +187,8 @@ function isStringVr(vr) {
 
 /**
  * Is the input VR a VR that could need padding.
- * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
+ *
+ * See {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_6.2.html}.
  *
  * @param {string} vr The element VR.
  * @returns {boolean} True if the VR needs padding.
@@ -261,10 +265,10 @@ function padOBValue(value) {
 }
 
 /**
- * Helper method to flatten an array of typed arrays to 2D typed array
+ * Helper method to flatten an array of typed arrays to 2D typed array.
  *
- * @param {Array} initialArray array of typed arrays
- * @returns {object} a typed array containing all values
+ * @param {Array} initialArray Array of typed arrays.
+ * @returns {object} A typed array containing all values.
  */
 function flattenArrayOfTypedArrays(initialArray) {
   const initialArrayLength = initialArray.length;
@@ -348,7 +352,7 @@ export class DicomWriter {
 
   /**
    * Flag to use VR=UN for private sequences, default to false
-   * (mainly used in tests)
+   * (mainly used in tests).
    *
    * @type {boolean}
    */
@@ -363,7 +367,7 @@ export class DicomWriter {
   #fixUnknownVR = true;
 
   /**
-   * Default rules: just copy
+   * Default rules: just copy.
    *
    * @type {Object<string, WriterRule>}
    */
@@ -426,7 +430,7 @@ export class DicomWriter {
    * if nothing is found the default rule is applied.
    *
    * @param {Object<string, WriterRule>} rules The input rules.
-   * @param {boolean} [addMissingTags] if true, explicit tags that
+   * @param {boolean} [addMissingTags] If true, explicit tags that
    *   have replace rule and a value will be
    *   added if missing. Defaults to false.
    */
@@ -497,8 +501,9 @@ export class DicomWriter {
     /**
      * The text encoder.
      *
+     * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder}.
+     *
      * @external TextEncoder
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder
      */
     this.#textEncoder = new TextEncoder();
   }
@@ -507,7 +512,7 @@ export class DicomWriter {
    * Get the element to write according to the class rules.
    * Priority order: tagName, groupName, default.
    *
-   * @param {DataElement} element The element to check
+   * @param {DataElement} element The element to check.
    * @returns {DataElement|null} The element to write, can be null.
    */
   getElementToWrite(element) {
@@ -1236,7 +1241,7 @@ export class DicomWriter {
 
 /**
  * Fix for broken DICOM elements: replace "UN" with correct VR if the
- * element exists in dictionary
+ * element exists in dictionary.
  *
  * @param {DataElement} element The DICOM element.
  * @param {boolean} [isLittleEndian] Flag to tell if the data is little

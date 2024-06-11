@@ -64,7 +64,7 @@ export class Rectangle {
   /**
    * Get the begin point of the rectangle.
    *
-   * @returns {Point2D} The begin point of the rectangle
+   * @returns {Point2D} The begin point of the rectangle.
    */
   getBegin() {
     return this.#begin;
@@ -73,7 +73,7 @@ export class Rectangle {
   /**
    * Get the end point of the rectangle.
    *
-   * @returns {Point2D} The end point of the rectangle
+   * @returns {Point2D} The end point of the rectangle.
    */
   getEnd() {
     return this.#end;
@@ -153,7 +153,7 @@ export class Rectangle {
   /**
    * Get the rounded limits of the rectangle.
    *
-   * @returns {object} The rounded limits.
+   * @returns {object} The rounded limits as {min, max} (Point2D).
    */
   getRound() {
     const roundBegin = new Point2D(

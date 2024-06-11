@@ -1,17 +1,19 @@
-import {getIdentityMat33, getCoronalMat33} from '../math/matrix';
+import {getIdentityMat33} from '../math/matrix';
+import {getCoronalMat33} from '../math/orientation';
 import {Index} from '../math/index';
 import {Point} from '../math/point';
 import {Vector3D} from '../math/vector';
 import {viewEventNames} from '../image/view';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
+import {precisionRound} from '../utils/string';
 import {ViewLayer} from './viewLayer';
 import {DrawLayer} from './drawLayer';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix';
-import {Point3D} from '../math/point';
+import {Point2D, Point3D} from '../math/point';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 /* eslint-enable no-unused-vars */
 
@@ -143,18 +145,18 @@ export function getScaledOffset(offset, scale, newScale, center) {
 /**
  * Layer group.
  *
- * Display position: {x,y}
- * Plane position: Index (access: get(i))
- * (world) Position: Point3D (access: getX, getY, getZ)
+ * - Display position: {x,y},
+ * - Plane position: Index (access: get(i)),
+ * - (world) Position: Point3D (access: getX, getY, getZ).
  *
  * Display -> World:
- * planePos = viewLayer.displayToPlanePos(displayPos)
- * -> compensate for layer scale and offset
- * pos = viewController.getPositionFromPlanePoint(planePos)
+ * - planePos = viewLayer.displayToPlanePos(displayPos)
+ *   -> compensate for layer scale and offset,
+ * - pos = viewController.getPositionFromPlanePoint(planePos).
  *
- * World -> display
- * planePos = viewController.getOffset3DFromPlaneOffset(pos)
- * no need yet for a planePos to displayPos...
+ * World -> Display:
+ * - planePos = viewController.getOffset3DFromPlaneOffset(pos)
+ *   no need yet for a planePos to displayPos...
  */
 export class LayerGroup {
 
@@ -223,6 +225,20 @@ export class LayerGroup {
    * @type {boolean}
    */
   #showCrosshair = false;
+
+  /**
+   * Crosshair HTML elements.
+   *
+   * @type {HTMLElement[]}
+   */
+  #crosshairHtmlElements = [];
+
+  /**
+   * Tooltip HTML element.
+   *
+   * @type {HTMLElement}
+   */
+  #tooltipHtmlElement;
 
   /**
    * The current position used for the crosshair.
@@ -328,7 +344,7 @@ export class LayerGroup {
   }
 
   /**
-   * Get the added scale: the scale added to the base scale
+   * Get the added scale: the scale added to the base scale.
    *
    * @returns {Scalar3D} The scale as {x,y,z}.
    */
@@ -362,6 +378,26 @@ export class LayerGroup {
       }
     });
     return count;
+  }
+
+  /**
+   * Check if this layerGroup contains a layer with the input id.
+   *
+   * @param {string} id The layer id to look for.
+   * @returns {boolean} True if this group contains
+   *   a layer with the input id.
+   */
+  includes(id) {
+    if (typeof id === 'undefined') {
+      return false;
+    }
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer.getId() === id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -588,6 +624,8 @@ export class LayerGroup {
   /**
    * Add a view layer.
    *
+   * The new layer will be marked as the active view layer.
+   *
    * @returns {ViewLayer} The created layer.
    */
   addViewLayer() {
@@ -612,6 +650,8 @@ export class LayerGroup {
 
   /**
    * Add a draw layer.
+   *
+   * The new layer will be marked as the active draw layer.
    *
    * @returns {DrawLayer} The created layer.
    */
@@ -656,16 +696,20 @@ export class LayerGroup {
    * @param {ViewLayer} viewLayer The view layer to unbind.
    */
   #unbindViewLayer(viewLayer) {
-    // listen to position change to update other group layers
+    // stop listening to position change to update other group layers
     viewLayer.removeEventListener(
       'positionchange', this.updateLayersToPositionChange);
-    // propagate view viewLayer-layer events
+    // stop propagating view viewLayer-layer events
     for (const eventName of viewEventNames) {
       viewLayer.removeEventListener(eventName, this.#fireEvent);
     }
-    // propagate viewLayer events
+    // stop propagating viewLayer events
     viewLayer.removeEventListener('renderstart', this.#fireEvent);
     viewLayer.removeEventListener('renderend', this.#fireEvent);
+
+    // stop view layer - image binding
+    // (binding is done in layer.setView)
+    viewLayer.unbindImage();
   }
 
   /**
@@ -789,10 +833,7 @@ export class LayerGroup {
     // reset in storage
     this.#layers[index] = undefined;
     // update html
-    const layerDiv = document.getElementById(layer.getId());
-    if (layerDiv) {
-      layerDiv.remove();
-    }
+    layer.removeFromDOM();
   }
 
   /**
@@ -827,6 +868,7 @@ export class LayerGroup {
     const planePos = vc.getPlanePositionFromPosition(position);
     const displayPos = baseLayer.planePosToDisplay(planePos);
 
+    // horizontal line
     if (typeof displayPos.getY() !== 'undefined') {
       const lineH = document.createElement('hr');
       lineH.id = this.getDivId() + '-scroll-crosshair-horizontal';
@@ -834,9 +876,13 @@ export class LayerGroup {
       lineH.style.width = this.#containerDiv.offsetWidth + 'px';
       lineH.style.left = '0px';
       lineH.style.top = displayPos.getY() + 'px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineH);
+      // add to html
       this.#containerDiv.appendChild(lineH);
     }
 
+    // vertical line
     if (typeof displayPos.getX() !== 'undefined') {
       const lineV = document.createElement('hr');
       lineV.id = this.getDivId() + '-scroll-crosshair-vertical';
@@ -844,6 +890,9 @@ export class LayerGroup {
       lineV.style.width = this.#containerDiv.offsetHeight + 'px';
       lineV.style.left = (displayPos.getX()) + 'px';
       lineV.style.top = '0px';
+      // add to local array
+      this.#crosshairHtmlElements.push(lineV);
+      // add to html
       this.#containerDiv.appendChild(lineV);
     }
   }
@@ -852,17 +901,57 @@ export class LayerGroup {
    * Remove crosshair divs.
    */
   #removeCrosshairDiv() {
-    let div = document.getElementById(
-      this.getDivId() + '-scroll-crosshair-horizontal');
-    if (div) {
-      div.remove();
+    for (const element of this.#crosshairHtmlElements) {
+      element.remove();
     }
-    div = document.getElementById(
-      this.getDivId() + '-scroll-crosshair-vertical');
-    if (div) {
-      div.remove();
+    this.#crosshairHtmlElements = [];
+  }
+
+  /**
+   * Displays a tooltip in a temporary `span`.
+   * Works with css to hide/show the span only on mouse hover.
+   *
+   * @param {Point2D} point The update point.
+   */
+  showTooltip(point) {
+    // remove previous div
+    this.removeTooltipDiv();
+
+    const viewLayer = this.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
+    const planePos = viewLayer.displayToPlanePos(point);
+    const position = viewController.getPositionFromPlanePoint(planePos);
+    const value = viewController.getRescaledImageValue(position);
+
+    // create
+    if (typeof value !== 'undefined') {
+      const span = document.createElement('span');
+      span.id = 'scroll-tooltip';
+      // tooltip position
+      span.style.left = (point.getX() + 10) + 'px';
+      span.style.top = (point.getY() + 10) + 'px';
+      let text = precisionRound(value, 3).toString();
+      if (typeof viewController.getPixelUnit() !== 'undefined') {
+        text += ' ' + viewController.getPixelUnit();
+      }
+      span.appendChild(document.createTextNode(text));
+      // add to local var
+      this.#tooltipHtmlElement = span;
+      // add to html
+      this.#containerDiv.appendChild(span);
     }
   }
+
+  /**
+   * Remove the tooltip html div.
+   */
+  removeTooltipDiv() {
+    if (typeof this.#tooltipHtmlElement !== 'undefined') {
+      this.#tooltipHtmlElement.remove();
+      this.#tooltipHtmlElement = undefined;
+    }
+  }
+
 
   /**
    * Test if one of the view layers satisfies an input callbackFn.
@@ -966,11 +1055,12 @@ export class LayerGroup {
         const origin = vc.getOrigin(position);
 
         if (typeof baseViewLayerOrigin === 'undefined') {
+          // first view layer, store origins
           baseViewLayerOrigin0 = origin0;
           baseViewLayerOrigin = origin;
-          const zeroOffset = new Vector3D(0, 0, 0);
-          hasSetOffset =
-            layer.setBaseOffset(zeroOffset, zeroOffset);
+          // no offset
+          scrollOffset = new Vector3D(0, 0, 0);
+          planeOffset = new Vector3D(0, 0, 0);
         } else {
           if (vc.isPositionInBounds(position) &&
             typeof origin !== 'undefined') {
@@ -984,12 +1074,23 @@ export class LayerGroup {
           }
         }
       }
+
       // also set for draw layers
       // (should be next after a view layer)
       if (typeof scrollOffset !== 'undefined' &&
         typeof planeOffset !== 'undefined') {
         hasSetOffset =
-          layer.setBaseOffset(scrollOffset, planeOffset);
+          layer.setBaseOffset(
+            scrollOffset, planeOffset,
+            baseViewLayerOrigin, baseViewLayerOrigin0
+          );
+      }
+
+      // reset to not propagate after draw layer
+      // TODO: revise, could be unstable...
+      if (layer instanceof DrawLayer) {
+        scrollOffset = undefined;
+        planeOffset = undefined;
       }
 
       // update position (triggers redraw)
@@ -1015,38 +1116,47 @@ export class LayerGroup {
   };
 
   /**
-   * Calculate the fit scale: the scale that fits the largest data.
+   * Calculate the div to world size ratio needed to fit
+   *   the largest data.
    *
-   * @returns {number|undefined} The fit scale.
+   * @returns {number|undefined} The ratio.
    */
-  calculateFitScale() {
+  getDivToWorldSizeRatio() {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
-    // get max size
-    const maxSize = this.getMaxSize();
-    if (typeof maxSize === 'undefined') {
+    // get max world size
+    const maxWorldSize = this.getMaxWorldSize();
+    if (typeof maxWorldSize === 'undefined') {
       return undefined;
+    }
+    // if the container has a width but no height,
+    // resize it to follow the same ratio to completely
+    // fill the div with the image
+    if (this.#containerDiv.offsetHeight === 0) {
+      const ratioX = this.#containerDiv.offsetWidth / maxWorldSize.x;
+      const height = maxWorldSize.y * ratioX;
+      this.#containerDiv.style.height = height + 'px';
     }
     // return best fit
     return Math.min(
-      this.#containerDiv.offsetWidth / maxSize.x,
-      this.#containerDiv.offsetHeight / maxSize.y
+      this.#containerDiv.offsetWidth / maxWorldSize.x,
+      this.#containerDiv.offsetHeight / maxWorldSize.y
     );
   }
 
   /**
-   * Set the layer group fit scale.
+   * Fit to container: set the layers div to world size ratio.
    *
-   * @param {number} scaleIn The fit scale.
+   * @param {number} divToWorldSizeRatio The ratio.
    */
-  setFitScale(scaleIn) {
-    // get maximum size
-    const maxSize = this.getMaxSize();
+  fitToContainer(divToWorldSizeRatio) {
+    // get maximum world size
+    const maxWorldSize = this.getMaxWorldSize();
     // exit if none
-    if (typeof maxSize === 'undefined') {
+    if (typeof maxWorldSize === 'undefined') {
       return;
     }
 
@@ -1056,14 +1166,16 @@ export class LayerGroup {
     };
     // offset to keep data centered
     const fitOffset = {
-      x: -0.5 * (containerSize.x - Math.floor(maxSize.x * scaleIn)),
-      y: -0.5 * (containerSize.y - Math.floor(maxSize.y * scaleIn))
+      x: -0.5 *
+        (containerSize.x - Math.floor(maxWorldSize.x * divToWorldSizeRatio)),
+      y: -0.5 *
+        (containerSize.y - Math.floor(maxWorldSize.y * divToWorldSizeRatio))
     };
 
     // apply to layers
     for (const layer of this.#layers) {
       if (typeof layer !== 'undefined') {
-        layer.fitToContainer(scaleIn, containerSize, fitOffset);
+        layer.fitToContainer(containerSize, divToWorldSizeRatio, fitOffset);
       }
     }
 
@@ -1074,11 +1186,11 @@ export class LayerGroup {
   }
 
   /**
-   * Get the largest data size.
+   * Get the largest data world (mm) size.
    *
    * @returns {Scalar2D|undefined} The largest size as {x,y}.
    */
-  getMaxSize() {
+  getMaxWorldSize() {
     let maxSize = {x: 0, y: 0};
     for (const layer of this.#layers) {
       if (layer instanceof ViewLayer) {

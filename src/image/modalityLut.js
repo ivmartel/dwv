@@ -8,7 +8,7 @@ import {RescaleSlopeAndIntercept} from './rsi';
  * Typically consists of a rescale slope and intercept to
  * rescale the data range.
  *
- * @see https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html}.
  */
 export class ModalityLut {
 

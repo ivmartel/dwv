@@ -1,7 +1,7 @@
 /**
  * Application GUI.
  *
- * Snapshots were created using synedra View Personal (http://www.synedra.com),
+ * Snapshots were created using synedra View Personal ({@link http://www.synedra.com}),
  *  version 14 for Microsoft Windows:
  * - Right click on the thumbnail in the left 'Document tree area',
  * - Choose 'Convert to JPEG'.

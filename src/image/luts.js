@@ -33,9 +33,9 @@ function toMaxFirstThird(i) {
 }
 
 /**
- * Ramp to lut_range_max minus one on the second third values.
- *  otherwise return 0 for the first third and
- *  lut_range_max minus one for the last third.
+ * Ramp to lut_range_max minus one on the second third values,
+ *   otherwise return 0 for the first third and
+ *   lut_range_max minus one for the last third.
  *
  * @param {number} i The input index.
  * @returns {number} The lut value.
@@ -53,8 +53,8 @@ function toMaxSecondThird(i) {
 }
 
 /**
- * Ramp to lut_range_max minus one on the last third values.
- *  otherwise return 0.
+ * Ramp to lut_range_max minus one on the last third values,
+ *   otherwise return 0.
  *
  * @param {number} i The input index.
  * @returns {number} The lut value.
@@ -93,7 +93,7 @@ function invId(i) {
 
 /**
  * Colour map: red, green and blue components
- * to associate with intensity values.
+ *   to associate with intensity values.
  */
 export class ColourMap {
   /**

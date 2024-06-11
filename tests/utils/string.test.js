@@ -11,15 +11,16 @@ import {
 /**
  * Tests for the 'utils/string' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('utils');
 
 /**
  * Tests for {@link capitaliseFirstLetter}.
  *
- * @function module:tests/utils~capitaliseFirstLetter
+ * @function module:tests/utils~capitalisefirstletter
  */
-QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
+QUnit.test('CapitaliseFirstLetter', function (assert) {
   // undefined
   assert.equal(capitaliseFirstLetter(), null, 'Capitalise undefined');
   // null
@@ -48,9 +49,9 @@ QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
 /**
  * Tests for {@link startsWith}.
  *
- * @function module:tests/utils~startsWith
+ * @function module:tests/utils~startswith
  */
-QUnit.test('Test StartsWith.', function (assert) {
+QUnit.test('StartsWith', function (assert) {
   // undefined
   assert.equal(startsWith(), false, 'StartsWith undefined');
   assert.equal(
@@ -103,9 +104,9 @@ QUnit.test('Test StartsWith.', function (assert) {
 /**
  * Tests for {@link endsWith}.
  *
- * @function module:tests/utils~endsWith
+ * @function module:tests/utils~endswith
  */
-QUnit.test('Test EndsWith.', function (assert) {
+QUnit.test('EndsWith', function (assert) {
   // undefined
   assert.equal(endsWith(), false, 'EndsWith undefined');
   assert.equal(endsWith('test'), false, 'EndsWith end undefined');
@@ -146,9 +147,9 @@ QUnit.test('Test EndsWith.', function (assert) {
 /**
  * Tests for {@link getFlags}.
  *
- * @function module:tests/utils~getFlags
+ * @function module:tests/utils~getflags
  */
-QUnit.test('Test getFlags.', function (assert) {
+QUnit.test('getFlags', function (assert) {
   // empty
   assert.equal(
     getFlags('').length, 0, 'getFlags empty');
@@ -190,9 +191,9 @@ QUnit.test('Test getFlags.', function (assert) {
 /**
  * Tests for {@link replaceFlags}.
  *
- * @function module:tests/utils~replaceFlags
+ * @function module:tests/utils~replaceflags
  */
-QUnit.test('Test ReplaceFlags.', function (assert) {
+QUnit.test('ReplaceFlags', function (assert) {
   // empty/null
   assert.equal(replaceFlags('', null), '', 'ReplaceFlags empty/null');
   // null/null
@@ -244,9 +245,9 @@ QUnit.test('Test ReplaceFlags.', function (assert) {
 /**
  * Tests for {@link getFileExtension}.
  *
- * @function module:tests/utils~getFileExtension
+ * @function module:tests/utils~getfileextension
  */
-QUnit.test('Test getFileExtension.', function (assert) {
+QUnit.test('getFileExtension', function (assert) {
   // undefined
   assert.equal(
     getFileExtension(), null, 'getFileExtension undefined');
@@ -310,9 +311,9 @@ QUnit.test('Test getFileExtension.', function (assert) {
 /**
  * Tests for {@link precisionRound}.
  *
- * @function module:tests/utils~precisionRound
+ * @function module:tests/utils~precisionround
  */
-QUnit.test('Test precisionRound.', function (assert) {
+QUnit.test('precisionRound', function (assert) {
   // just to be sure...
   assert.equal(Math.round(-0.6), -1, 'test round #00');
   assert.equal(Math.round(-0.5), 0, 'test round #01');

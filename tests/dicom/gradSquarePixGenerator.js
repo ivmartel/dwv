@@ -16,19 +16,32 @@ const GradSquarePixGenerator = function (options) {
   const numberOfSamples = options.numberOfSamples;
   const numberOfColourPlanes = options.numberOfColourPlanes;
   const isRGB = options.photometricInterpretation === 'RGB';
+  const getFunc = isRGB ? getRGB : getValue;
 
-  const halfCols = numberOfColumns * 0.5;
-  const halfRows = numberOfRows * 0.5;
+  // full grad square
+  const borderI = 0;
+  const borderJ = 0;
+  // ~centered grad square
+  // const borderI = Math.ceil(numberOfColumns * 0.25);
+  // const borderJ = Math.ceil(numberOfRows * 0.25);
+
+  const minI = borderI;
+  const minJ = borderJ;
+  const maxI = numberOfColumns - borderI;
+  const maxJ = numberOfRows - borderJ;
+  const maxK = maxI;
+
+  const inRange = function (i, j) {
+    return i >= minI && i <= maxI &&
+      j >= minJ && j <= maxJ;
+  };
 
   const background = 0;
-  const maxNoBounds = (halfCols + halfCols / 2) * (halfRows + halfRows / 2);
-  let max = 100;
+  const max = 255;
+  let maxNoBounds = 1;
+  maxNoBounds = getValue(maxI, maxJ, maxK) / max;
 
   this.generate = function (pixelBuffer, sliceNumber) {
-    const getFunc = isRGB ? getRGB : getGrey;
-
-    // slice dependent max
-    max = 100 + sliceNumber * 100;
 
     // main loop
     let offset = 0;
@@ -37,9 +50,9 @@ const GradSquarePixGenerator = function (options) {
         for (let i = 0; i < numberOfColumns; ++i) {
           for (let s = 0; s < numberOfSamples; ++s) {
             if (numberOfColourPlanes !== 1) {
-              pixelBuffer[offset] = getFunc(i, j)[c];
+              pixelBuffer[offset] = getFunc(i, j, sliceNumber)[c];
             } else {
-              pixelBuffer[offset] = getFunc(i, j)[s];
+              pixelBuffer[offset] = getFunc(i, j, sliceNumber)[s];
             }
             ++offset;
           }
@@ -49,18 +62,17 @@ const GradSquarePixGenerator = function (options) {
   };
 
   /**
-   * Get a grey value.
+   * Get a simple value.
    *
    * @param {number} i The column index.
    * @param {number} j The row index.
+   * @param {number} k The slice index.
    * @returns {number[]} The grey value.
    */
-  function getGrey(i, j) {
-    let value = background;
-    const jc = Math.abs(j - halfRows);
-    const ic = Math.abs(i - halfCols);
-    if (jc < halfRows / 2 && ic < halfCols / 2) {
-      value += (i * j) * (max / maxNoBounds);
+  function getValue(i, j, k) {
+    let value = background + k * 2;
+    if (inRange(i, j)) {
+      value += Math.round((i + j) * (max / maxNoBounds));
     }
     return [value];
   }
@@ -70,19 +82,15 @@ const GradSquarePixGenerator = function (options) {
    *
    * @param {number} i The column index.
    * @param {number} j The row index.
+   * @param {number} k The slice index.
    * @returns {number[]} The [R,G,B] values.
    */
-  function getRGB(i, j) {
-    let value = 0;
-    const jc = Math.abs(j - halfRows);
-    const ic = Math.abs(i - halfCols);
-    if (jc < halfRows / 2 && ic < halfCols / 2) {
-      value += (i * j) * (max / maxNoBounds);
-    }
+  function getRGB(i, j, k) {
+    let value = getValue(i, j, k);
     if (value > 255) {
       value = 200;
     }
-    return [0, value, value];
+    return [value, 0, 0];
   }
 };
 

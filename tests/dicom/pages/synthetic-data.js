@@ -62,7 +62,7 @@ function getObjectUrlFromTags(config) {
 }
 
 /**
- * Create list from configs
+ * Create list from configs.
  *
  * @param {Array} configs An array of data cofiguration.
  * @returns {object} The html list element.

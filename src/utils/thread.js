@@ -1,5 +1,6 @@
 /**
  * Thread Pool.
+ *
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
  */
 export class ThreadPool {
@@ -174,8 +175,9 @@ export class ThreadPool {
 /**
  * Worker background task.
  *
+ * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/API/Worker}.
+ *
  * @external Worker
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Worker
  */
 
 /**
@@ -206,7 +208,7 @@ class WorkerThread {
   }
 
   /**
-   * Run a worker task
+   * Run a worker task.
    *
    * @param {object} workerTask The task to run.
    */

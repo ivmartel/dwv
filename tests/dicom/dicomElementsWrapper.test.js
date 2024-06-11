@@ -12,8 +12,7 @@ import dwvTestSimple from '../data/dwv-test-simple.dcm';
 /**
  * Tests for the 'dicom/dicomElementsWrapper.js' file.
  */
-/** @module tests/dicom */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
 QUnit.module('dicom');
 
@@ -21,9 +20,9 @@ QUnit.module('dicom');
  * Tests for dcmdump using simple DICOM data.
  * Using remote file for CI integration.
  *
- * @function module:tests/dicom~dicomElementsWrapper
+ * @function module:tests/dicom~dicom-dump
  */
-QUnit.test('Test simple DICOM wrapping.', function (assert) {
+QUnit.test('DICOM dump', function (assert) {
 
   // parse DICOM
   const dicomParser = new DicomParser();
@@ -80,9 +79,9 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
 /**
  * Tests for getDate.
  *
- * @function module:tests/dicom~dicomElementsWrapper
+ * @function module:tests/dicom~get-dicom-date
  */
-QUnit.test('Test getDate.', function (assert) {
+QUnit.test('Get DICOM Date', function (assert) {
   const da00 = getDate(undefined);
   const daTheo00 = undefined;
   assert.equal(da00, daTheo00, 'test date #00');
@@ -97,11 +96,11 @@ QUnit.test('Test getDate.', function (assert) {
 });
 
 /**
- * Tests for getDate.
+ * Tests for getTime.
  *
- * @function module:tests/dicom~dicomElementsWrapper
+ * @function module:tests/dicom~get-dicom-time
  */
-QUnit.test('Test getTime.', function (assert) {
+QUnit.test('Get DICOM Time', function (assert) {
   const tm00 = getTime(undefined);
   const tmTheo00 = undefined;
   assert.equal(tm00, tmTheo00, 'test time #00');
@@ -126,9 +125,9 @@ QUnit.test('Test getTime.', function (assert) {
 /**
  * Tests for getDateTime.
  *
- * @function module:tests/dicom~dicomElementsWrapper
+ * @function module:tests/dicom~get-dicom-datetime
  */
-QUnit.test('Test getDateTime.', function (assert) {
+QUnit.test('Get DICOM datetime', function (assert) {
   const dt00 = getDateTime(undefined);
   const dtTheo00 = undefined;
   assert.equal(dt00, dtTheo00, 'test date-time #00');

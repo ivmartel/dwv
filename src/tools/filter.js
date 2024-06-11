@@ -30,7 +30,7 @@ export class Filter {
   }
 
   /**
-   * Filter list
+   * Filter list.
    *
    * @type {object}
    */
@@ -276,14 +276,17 @@ export class Threshold {
    * @param {*} args The filter arguments.
    */
   run(args) {
+    if (typeof args.dataId === 'undefined') {
+      throw new Error('No dataId to run threshod filter on.');
+    }
     this.#filter.setMin(args.min);
     this.#filter.setMax(args.max);
     // reset the image if asked
     if (this.#resetImage) {
-      this.#filter.setOriginalImage(this.#app.getLastImage());
+      this.#filter.setOriginalImage(this.#app.getImage(args.dataId));
       this.#resetImage = false;
     }
-    const command = new RunFilterCommand(this.#filter, this.#app);
+    const command = new RunFilterCommand(this.#filter, args.dataId, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
@@ -368,12 +371,15 @@ export class Sharpen {
   /**
    * Run the filter.
    *
-   * @param {*} _args The filter arguments.
+   * @param {*} args The filter arguments.
    */
-  run(_args) {
+  run(args) {
+    if (typeof args.dataId === 'undefined') {
+      throw new Error('No dataId to run sharpen filter on.');
+    }
     const filter = new SharpenFilter();
-    filter.setOriginalImage(this.#app.getLastImage());
-    const command = new RunFilterCommand(filter, this.#app);
+    filter.setOriginalImage(this.#app.getImage(args.dataId));
+    const command = new RunFilterCommand(filter, args.dataId, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
@@ -458,12 +464,15 @@ export class Sobel {
   /**
    * Run the filter.
    *
-   * @param {*} _args The filter arguments.
+   * @param {*} args The filter arguments.
    */
-  run(_args) {
+  run(args) {
+    if (typeof args.dataId === 'undefined') {
+      throw new Error('No dataId to run sobel filter on.');
+    }
     const filter = new SobelFilter();
-    filter.setOriginalImage(this.#app.getLastImage());
-    const command = new RunFilterCommand(filter, this.#app);
+    filter.setOriginalImage(this.#app.getImage(args.dataId));
+    const command = new RunFilterCommand(filter, args.dataId, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
     command.execute();
@@ -517,6 +526,13 @@ export class RunFilterCommand {
   #filter;
 
   /**
+   * Data id.
+   *
+   * @type {string}
+   */
+  #dataId;
+
+  /**
    * Associated app.
    *
    * @type {App}
@@ -525,10 +541,12 @@ export class RunFilterCommand {
 
   /**
    * @param {object} filter The filter to run.
+   * @param {string} dataId The data to filter.
    * @param {App} app The associated application.
    */
-  constructor(filter, app) {
+  constructor(filter, dataId, app) {
     this.#filter = filter;
+    this.#dataId = dataId;
     this.#app = app;
   }
 
@@ -548,9 +566,9 @@ export class RunFilterCommand {
    */
   execute() {
     // run filter and set app image
-    this.#app.setLastImage(this.#filter.update());
+    this.#app.setImage(this.#dataId, this.#filter.update());
     // update display
-    this.#app.render(this.#app.getDataIds()[0]); //todo: fix
+    this.#app.render(this.#dataId);
     /**
      * Filter run event.
      *
@@ -561,7 +579,8 @@ export class RunFilterCommand {
      */
     const event = {
       type: 'filterrun',
-      id: this.getName()
+      id: this.getName(),
+      dataId: this.#dataId
     };
     // callback
     this.onExecute(event);
@@ -574,9 +593,9 @@ export class RunFilterCommand {
    */
   undo() {
     // reset the image
-    this.#app.setLastImage(this.#filter.getOriginalImage());
+    this.#app.setImage(this.#dataId, this.#filter.getOriginalImage());
     // update display
-    this.#app.render(this.#app.getDataIds()[0]); //todo: fix
+    this.#app.render(this.#dataId);
     /**
      * Filter undo event.
      *
@@ -587,7 +606,8 @@ export class RunFilterCommand {
      */
     const event = {
       type: 'filterundo',
-      id: this.getName()
+      id: this.getName(),
+      dataid: this.#dataId
     }; // callback
     this.onUndo(event);
   }

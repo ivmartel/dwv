@@ -3,7 +3,7 @@ import {logger} from '../utils/logger';
 /**
  * Minimum window width value.
  *
- * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2
+ * Ref: {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
  */
 const minWindowWidth = 1;
 

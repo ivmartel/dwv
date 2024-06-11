@@ -1,0 +1,311 @@
+{
+  "introduction": "`dwv` is a DICOM Web Viewer library. Here is an intent at listing its User Stories or Requirements Specification.",
+  "groups": [
+    {
+      "name": "io",
+      "description": "Definitions:\n- _HTML File_: represents file data typically obtained from the underlying file system. It is provided via an HTML input field with the 'file' type or via drag and drop (see W3C [FileAPI](https://www.w3.org/TR/FileAPI/)).\n- _URL_: the data is accessed via a URL which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS). A _discrete_ URL is a URL that represents a single file or medium. A _multipart_ URL represents a document that's comprised of multiple component parts (see wikipedia [MIME#Multipart_messages](https://en.wikipedia.org/wiki/MIME#Multipart_messages)).\n- _ZIP_: archive file format that supports lossless data compression. A ZIP file may contain one or more files or directories that may have been compressed (see wikipedia [ZIP](<https://en.wikipedia.org/wiki/ZIP_(file_format)>)).\n\nNote: for more details about which parts of the DICOM standard are supported, see the DICOM [conformance](./tutorial-conformance.html) page."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "DWV-REQ-IO-01-001",
+      "name": "Load DICOM file(s)",
+      "group": "io",
+      "description": "The user can load DICOM data provided as one or multiple HTML File(s) representing DICOM files."
+    },
+    {
+      "id": "DWV-REQ-IO-01-002",
+      "name": "Load DICOM ZIP file",
+      "group": "io",
+      "description": "The user can load DICOM data provided as one HTML file representing a ZIP file containing one or multiple DICOM file(s)."
+    },
+    {
+      "id": "DWV-REQ-IO-02-001",
+      "name": "Load DICOM discrete URL(s)",
+      "group": "io",
+      "description": "The user can load DICOM data provided as one or multiple discrete URL(s) representing DICOM files."
+    },
+    {
+      "id": "DWV-REQ-IO-02-002",
+      "name": "Load DICOM multipart URL",
+      "group": "io",
+      "description": "The user can load DICOM data provided as one multipart URL representing one or multiple DICOM file(s)."
+    },
+    {
+      "id": "DWV-REQ-IO-02-003",
+      "name": "Load DICOM ZIP URL",
+      "group": "io",
+      "description": "The user can load DICOM data provided as one discrete URL representing a ZIP file containing one or multiple DICOM file(s)."
+    },
+    {
+      "id": "DWV-REQ-IO-02-004",
+      "name": "Load DICOMDIR URL",
+      "group": "io",
+      "description": "The user can load DICOM data provided as one discrete URL representing a DICOMDIR file. A DICOMDIR file is a file containing references to one or multiple DICOM file(s)."
+    },
+    {
+      "id": "DWV-REQ-IO-02-005",
+      "name": "Window location URL scheme",
+      "group": "io",
+      "description": "The user can load data from the window location using the `input` keyword. The scheme is:\n\n`[dwv root]?input=[data url]`\n\nThe data url must be URI encoded if it includes special query parameters such as `&`, `?` and `/`. This can be done with the `encodeURIComponent` javascript function.\n\nMultiple data can be loaded via a key/value pair mechanism on the data URL. The scheme is:\n\n`[url root]?key0=value00&key0=value01&key1=value10`\n\nThe `[url root]` part can either be a query (`root?key=value`) or a direct link (`root/file.dcm`). If a key is repeated (`key0` in the example above), the URL will be split and resolve to the following list:\n- `[url root]?key0=value00&key1=value10`\n- `[url root]?key0=value01&key1=value10`\n\nIn the case of local files, the `[url root]` needs to contain the final `/`. The repeated key needs to be named `file` for file links (removes the question mark).\n\nParameters:\n- `dwvReplaceMode`: replacement for the repeated key, the (default) value `key` keeping it. Example: `[dwv root]?input=[multiple urls]&dwvReplaceMode=void`\n- `type`: the URL type, for now only `manifest` is accepted (see Data Manifest URL). Example: `[dwv root]?input=[manifest url]&type=manifest`\n\nNote that the current URL size limit of modern browsers is around 2000 characters (see [ref](http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers))."
+    },
+    {
+      "id": "DWV-REQ-IO-02-006",
+      "name": "Load Data Manifest URL",
+      "group": "io",
+      "description": "The user can load multiple data via an XML manifest file passed via the window location URL. The scheme is:\n\n`[dwv root]?input=[manifest file]&type=manifest`\n\nThe manifest structure is the one used by the Weasis PACS connector of dcm4chee (see [link](http://www.dcm4che.org/confluence/display/WEA/How+to+launch+Weasis+from+any+environments) and [schema](https://github.com/nroduit/Weasis/blob/master/weasis-dicom/weasis-dicom-explorer/src/main/resources/config/wado_query.xsd)). The minimum information needed is:\n\n```xml\n<wado_query wadoURL=\"http://localhost:8080/wado\">\n  <Patient PatientID=\"VafMYPDf\">\n    <Study StudyInstanceUID=\"2.16.840.1.113669.632.20.1211.10000322126\">\n      <Series SeriesInstanceUID=\"1.3.12.2.1107.5.2.31.30222.6100606325120300005943\">\n        <Instance SOPInstanceUID=\"1.3.12.2.1107.5.2.31.30222.6100606325120300006058\" />\n        <Instance SOPInstanceUID=\"1.3.12.2.1107.5.2.31.30222.6100606325120300006176\" />\n      </Series>\n    </Study>\n  </Patient>\n</wado_query>\n```\n\nOnly the first series of the first study of the first patient will be loaded."
+    },
+    {
+      "id": "DWV-REQ-IO-03-001",
+      "name": "DICOM data load output",
+      "group": "io",
+      "description": "Once loaded, the user can programmatically access the loaded data: the image and its meta data. The meta data will follow the DICOM JSON model defined with the DICOM standard."
+    },
+    {
+      "id": "DWV-REQ-IO-04-001",
+      "name": "DICOM load start event",
+      "group": "io",
+      "description": "The user can listen to `loadstart` events. The event is fired when a load has started."
+    },
+    {
+      "id": "DWV-REQ-IO-04-002",
+      "name": "DICOM load progress event",
+      "group": "io",
+      "description": "The user can listen to `loadprogress` events. The event is fired periodically when a request receives more data."
+    },
+    {
+      "id": "DWV-REQ-IO-04-003",
+      "name": "DICOM load error event",
+      "group": "io",
+      "description": "The user can listen to `error` events. The event is fired when the load encountered an error."
+    },
+    {
+      "id": "DWV-REQ-IO-04-004",
+      "name": "DICOM load abort event",
+      "group": "io",
+      "description": "The user can listen to `abort` events. The event is fired when a load has been aborted."
+    },
+    {
+      "id": "DWV-REQ-IO-04-005",
+      "name": "DICOM load item event",
+      "group": "io",
+      "description": "The user can listen to `loaditem` events. The event is fired when a DICOM file has been successfully loaded."
+    },
+    {
+      "id": "DWV-REQ-IO-04-006",
+      "name": "DICOM load event",
+      "group": "io",
+      "description": "The user can listen to `load` events. The event is fired when all the DICOM files have been successfully loaded."
+    },
+    {
+      "id": "DWV-REQ-IO-04-007",
+      "name": "DICOM load end event",
+      "group": "io",
+      "description": "The user can listen to `loadend` events. The event is fired when a request has completed, whether successfully (after `load`) or unsuccessfully (after `abort` or `error`)."
+    },
+    {
+      "id": "DWV-REQ-IO-05-001",
+      "name": "Write DICOM file",
+      "group": "io",
+      "description": "The user can save image and meta data to a DICOM file."
+    },
+    {
+      "id": "DWV-REQ-IO-05-002",
+      "name": "Write anonymised DICOM file",
+      "group": "io",
+      "description": "The user can save image and anonymised meta data to a DICOM file."
+    },
+    {
+      "id": "DWV-REQ-UI-01-001",
+      "name": "Integration in web application",
+      "group": "ui",
+      "description": "The library can be integrated in a web application, a browser without any extensions must be sufficient to run the application. The supported browsers are the last two versions of browsers that have more than 1% audience worldwide (at the time of the dwv package creation)."
+    },
+    {
+      "id": "DWV-REQ-UI-02-001",
+      "name": "Display image",
+      "group": "ui",
+      "description": "The user can generate a view of the image data according to properties set in the DICOM data. The image will be created in a `<canvas>` HTML element inside an HTML element provided by the user (via its `id`)."
+    },
+    {
+      "id": "DWV-REQ-UI-02-002",
+      "name": "Image reorientation",
+      "group": "ui",
+      "description": "The user can decide which orientation the displayed image should use: the acquisition orientation, 'axial', 'coronal' or 'sagittal'. Axial uses `z` as main axis, coronal uses `y` and sagittal uses `x`."
+    },
+    {
+      "id": "DWV-REQ-UI-02-003",
+      "name": "Image overlay",
+      "group": "ui",
+      "description": "The user can load multiple data in a single HTML div. This will result in multiple HTML `<canvas>` aligned with each other by using the Image Position Patient DICOM tag."
+    },
+    {
+      "id": "DWV-REQ-UI-03-001",
+      "name": "Change image window/level",
+      "group": "ui",
+      "description": "The user can change the window/level of the displayed image. On change, a `wlchange` event will be fired containing the changed values."
+    },
+    {
+      "id": "DWV-REQ-UI-03-002",
+      "name": "Change image position",
+      "group": "ui",
+      "description": "The user can change the current position of the displayed image. On change, a `positionchange` event will be fired containing the changed values."
+    },
+    {
+      "id": "DWV-REQ-UI-03-003",
+      "name": "Change image zoom/pan",
+      "group": "ui",
+      "description": "The user can change the zoom and pan of the displayed image. On zoom change, a `zoomchange` event will be fired containing the changed values. On pan change, an `offsetchange` event will be fired containing the changed values."
+    },
+    {
+      "id": "DWV-REQ-UI-03-004",
+      "name": "Change image opacity",
+      "group": "ui",
+      "description": "The user can change the opacity of the displayed image. On change, a `opacitychange` event will be fired containing the changed values."
+    },
+    {
+      "id": "DWV-REQ-UI-04-001",
+      "name": "Views window/level synchronisation",
+      "group": "ui",
+      "description": "The user can decide to synchronise or not the window/level between different views of the same data."
+    },
+    {
+      "id": "DWV-REQ-UI-04-002",
+      "name": "Views position synchronisation",
+      "group": "ui",
+      "description": "The user can decide to synchronise or not the position between different views."
+    },
+    {
+      "id": "DWV-REQ-UI-04-003",
+      "name": "Views zoom/pan synchronisation",
+      "group": "ui",
+      "description": "The user can decide to synchronise or not the window/level between different views."
+    },
+    {
+      "id": "DWV-REQ-UI-04-004",
+      "name": "Views opacity synchronisation",
+      "group": "ui",
+      "description": "The user can decide to synchronise or not the opacity between different views of the same data."
+    },
+    {
+      "id": "DWV-REQ-UI-05-001",
+      "name": "Window/Level tool",
+      "group": "ui",
+      "description": "The user can change the window/level of the displayed data via specific interaction on the image `<canvas>`:\n- `left click drag up/down` or `one touch drag up/down` changes the window,\n- `left click drag left/right` or `one touch drag up/down` changes the level,\n- `double left click` or `double touch` centre's the window/level on the clicked intensity,\n- `left click` or `touch` shows the position and intensity.\n\nThe user must be able to reset the window/level to their original values."
+    },
+    {
+      "id": "DWV-REQ-UI-05-002",
+      "name": "Window/Level presets",
+      "group": "ui",
+      "description": "Specific window/level data pre-sets must be made available. Only data with CT modality will provide some. They are ['name' (window center, window width)]:\n- 'mediastinum' (40, 400),\n- 'lung' (-500, 1500),\n- 'bone' (500, 2000),\n- 'brain' (40, 80),\n- 'head' (90, 350)."
+    },
+    {
+      "id": "DWV-REQ-UI-05-003",
+      "name": "Slice scroll tool",
+      "group": "ui",
+      "description": "The user can change the current position via specific interaction on the image `<canvas>`:\n- `left click drag` or `one touch drag` to change the scroll index,\n- `mouse wheel` to change the scroll index."
+    },
+    {
+      "id": "DWV-REQ-UI-05-004",
+      "name": "Zoom/Pan tool",
+      "group": "ui",
+      "description": "The user can zoom/pan the displayed data via specific interaction on the image `<canvas>`:\n- `left click drag` or `one touch drag` for panning,\n- `mouse scroll` or `pinch` for zooming.\n\nThe user must be able to reset the zoom/pan value to their original values."
+    },
+    {
+      "id": "DWV-REQ-UI-05-005",
+      "name": "Opacity tool",
+      "group": "ui",
+      "description": "The user can change the image opacity via specific interaction on the image `<canvas>`:\n- `left click drag` or `one touch drag` to change the opacity."
+    },
+    {
+      "id": "DWV-REQ-UI-06-001",
+      "name": "Image thresholding",
+      "group": "ui",
+      "description": "The user can filter the input image using a thresholding filter."
+    },
+    {
+      "id": "DWV-REQ-UI-06-002",
+      "name": "Image contrast enhancement",
+      "group": "ui",
+      "description": "The user can filter the input image using a contrast enhancement filter."
+    },
+    {
+      "id": "DWV-REQ-UI-06-003",
+      "name": "Image contour extraction",
+      "group": "ui",
+      "description": "The user can filter the input image using a contour extraction filter."
+    },
+    {
+      "id": "DWV-REQ-UI-07-001",
+      "name": "Draw arrow",
+      "group": "ui",
+      "description": "The user can draw an arrow shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. A label can be associated to the shape. No measures nor quantifications are provided with the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-002",
+      "name": "Draw circle",
+      "group": "ui",
+      "description": "The user can draw a circle shape on the displayed data. A circle is characterised by a center point and a radius. The center can be changed when moving the complete shape, the radius via control points on the shape. A label can be associated to the shape. The following measures are provided with the shape: radius and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-003",
+      "name": "Draw ellipse",
+      "group": "ui",
+      "description": "The user can draw an ellipse shape on the displayed data. An ellipse is characterised by a center point and two radiuses. The center can be changed when moving the complete shape, the radiuses via control points on the shape. The following measures are provided with the shape: radius a, radius b and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-004",
+      "name": "Draw free hand",
+      "group": "ui",
+      "description": "The user can draw a free hand shape on the displayed data. A free hand shape is a non closed shape charaterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-005",
+      "name": "Draw protractor",
+      "group": "ui",
+      "description": "The user can draw a protractor shape on the displayed data. A protractor is charaterised by three modifiable anchor points. The shape can be moved in its entirety. The following measure are provided with the shape: the angle between the two lines that form the protractor. No quantifications are provided with the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-006",
+      "name": "Draw rectangle",
+      "group": "ui",
+      "description": "The user can draw a rectangle shape on the displayed data. A rectangle is charaterised by four modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measures are provided with the shape: width, height and surface. The following quantifications are provided with the shape: minimum, maximum, mean, standard deviation, median, 25th and 75th percentiles of the intensities covered by the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-007",
+      "name": "Draw ruler",
+      "group": "ui",
+      "description": "The user can draw a ruler shape on the displayed data. An arrow is characterised by two modifiable anchor points situated at the extremities of the shape. The shape can be moved in its entirety. The following measure are provided with the shape: the length of the line. No quantifications are provided with the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-07-008",
+      "name": "Draw ROI",
+      "group": "ui",
+      "description": "The user can draw a Region Of Interest (ROI) shape on the displayed data. A ROI is a closed shape characterised by multiple modifiable anchor points. The shape can be moved in its entirety. No measures nor quantifications are provided with the shape."
+    },
+    {
+      "id": "DWV-REQ-UI-08-001",
+      "name": "Draw delete",
+      "group": "ui",
+      "description": "The user can delete draws."
+    },
+    {
+      "id": "DWV-REQ-UI-08-002",
+      "name": "Draw action undo/redo",
+      "group": "ui",
+      "description": "The user can undo/redo all actions of the draw tool using `CRTL-Z` and `CRTL-Y` or special buttons on touch enabled devices. The actions are: anchor move, shape move, shape creation and shape deletion."
+    },
+    {
+      "id": "DWV-REQ-UI-09-001",
+      "name": "Livewire",
+      "group": "ui",
+      "description": "The user can draw a region of interest while guided with a [livewire segmentation technique](https://en.wikipedia.org/wiki/Livewire_Segmentation_Technique)."
+    },
+    {
+      "id": "DWV-REQ-UI-09-002",
+      "name": "Floodfill",
+      "group": "ui",
+      "description": "The user can draw a region of interest based on [floodfill](https://en.wikipedia.org/wiki/Flood_fill) technique."
+    }
+  ]
+}

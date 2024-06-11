@@ -167,7 +167,7 @@ export function getViewFromDOMVideo(
   let image = null;
 
   /**
-   * Draw the context and store it as a frame
+   * Draw the context and store it as a frame.
    */
   function storeFrame() {
     // send progress
@@ -205,7 +205,7 @@ export function getViewFromDOMVideo(
   let nextTime = 0;
 
   /**
-   * Handle seeked event
+   * Handle seeked event.
    *
    * @param {object} event The seeked event.
    */

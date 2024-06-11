@@ -83,7 +83,7 @@ export function uint8ArrayToString(arr) {
 
 /**
  * Array find in a subset of the input array.
- * Equivalent to: arr.slice(start, end).find(callbackFn)
+ * Equivalent to: `arr.slice(start, end).find(callbackFn)`.
  *
  * @param {Uint8Array} arr The input array to search.
  * @param {Function} callbackFn The find function.
@@ -132,11 +132,12 @@ export function getFindArrayInArrayCallback(arr1) {
 
 /**
  * Extract each element of a multipart ArrayBuffer.
- * https://en.wikipedia.org/wiki/MIME#Multipart_messages
+ *
+ * Ref: {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages}.
  *
  * @param {ArrayBuffer} arr The multipart array.
  * @returns {Array} The multipart parts as an array of object as
- *  {'Content-Type', ..., data} (depending on header tags)
+ *   {'Content-Type', ..., data} (depending on header tags).
  */
 export function parseMultipart(arr) {
   const u8Array = new Uint8Array(arr);
@@ -236,8 +237,10 @@ export function parseMultipart(arr) {
 
 /**
  * Build a multipart message.
- * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
- * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
+ *
+ * Ref:
+ * - {@link https://en.wikipedia.org/wiki/MIME#Multipart_messages},
+ * - {@link https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js}.
  *
  * @param {Array} parts The message parts as an array of object containing
  *   content headers and messages as the data property (as returned by parse).

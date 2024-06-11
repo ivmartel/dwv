@@ -4,15 +4,16 @@ import {Point} from '../../src/math/point';
 /**
  * Tests for the 'math/index.js' file.
  */
-// Do not warn if these variables were not defined before.
+
 /* global QUnit */
+QUnit.module('math');
 
 /**
  * Tests for {@link Index}.
  *
- * @function module:tests/math~Index
+ * @function module:tests/math~index-class
  */
-QUnit.test('Test Index.', function (assert) {
+QUnit.test('Index class', function (assert) {
   // error cases
   assert.throws(function () {
     new Index();
@@ -96,9 +97,9 @@ QUnit.test('Test Index.', function (assert) {
 /**
  * Tests for {@link Index} to and from stringId conversion.
  *
- * @function module:tests/math~Index
+ * @function module:tests/math~index-stringid
  */
-QUnit.test('Test Index stringId.', function (assert) {
+QUnit.test('Index stringId', function (assert) {
   // test #00: all dims
   const i00 = new Index([1, 2, 3]);
   const i00strId = '#0-1_#1-2_#2-3';

@@ -10,7 +10,7 @@ usage() {
   echo "Usage: $0 -r releaseVersion -p previousVersion"
   echo -e "  -r The release version, format 'm.n.p'"
   echo -e "  -p The previous version for issue gathering in changelog, format 'm.n.p'"
-  echo -e "  -s The step at which to start (optional, [1,4])"
+  echo -e "  -s The step at which to start (optional, [1,5])"
   echo -e "Warning: the command needs to be run from the root of the repository."
   echo -e "Example:"
   echo -e "> prep-release -r 0.28.0 -p 0.27.0"
@@ -76,7 +76,7 @@ releaseBranch="v${releaseVersion}"
 ###################
 if [ $step -eq 1 ]
 then
-  info "(1/4) create release branch"
+  info "(1/5) create release branch"
 
   git checkout develop
   git pull
@@ -88,7 +88,7 @@ fi
 ###################
 if [ $step -eq 2 ]
 then
-  info "(2/4) update version number in files"
+  info "(2/5) update version number in files"
 
   a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)\.[0-9]+\","
   b0="  \"version\": \"${releaseVersion}\","
@@ -106,7 +106,7 @@ fi
 ###################
 if [ $step -eq 3 ]
 then
-  info "(3/4) create build"
+  info "(3/5) create build"
 
   yarn run build
 
@@ -116,7 +116,7 @@ fi
 ###################
 if [ $step -eq 4 ]
 then
-  info "(4/4) update changelog"
+  info "(4/5) update changelog"
 
   # gren wants an existing tag...
   git tag v$releaseVersion
@@ -137,6 +137,19 @@ then
   rm new.md
   rm line.md
   rm old.md
+
+  ((step++))
+fi
+
+###################
+if [ $step -eq 5 ]
+then
+  info "(5/5) update test results"
+
+  # run tests
+  yarn run test-ci
+  # convert json to md
+  node ../jsonqa2md/jsonqa2md
 
   ((step++))
 fi

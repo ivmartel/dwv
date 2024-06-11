@@ -194,7 +194,7 @@ export class Geometry {
    * Warning: the size comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {Matrix33} [viewOrientation] The view orientation (optional)
+   * @param {Matrix33} [viewOrientation] The view orientation (optional).
    * @returns {Size} The object size.
    */
   getSize(viewOrientation) {
@@ -235,7 +235,7 @@ export class Geometry {
    * Warning: the spacing comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {Matrix33} [viewOrientation] The view orientation (optional)
+   * @param {Matrix33} [viewOrientation] The view orientation (optional).
    * @returns {Spacing} The object spacing.
    */
   getSpacing(viewOrientation) {

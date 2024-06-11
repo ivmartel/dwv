@@ -1,5 +1,5 @@
 /**
- * Rescale Slope and Intercept
+ * Rescale Slope and Intercept.
  */
 export class RescaleSlopeAndIntercept {
 

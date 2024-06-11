@@ -4,7 +4,7 @@ import {
   getMatrixFromName,
   getOrientationStringLPS,
   Orientation
-} from '../math/matrix';
+} from '../math/orientation';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
 import {Style} from '../gui/style';
@@ -140,15 +140,16 @@ export class AppOptions {
   binders;
   /**
    * Optional boolean flag to trigger the first data render
-   *   after the first loaded data or not. Defaults to true;
+   *   after the first loaded data or not. Defaults to true.
    *
    * @type {boolean|undefined}
    */
   viewOnFirstLoadItem;
   /**
-   * Optional default chraracter set string used for DICOM parsing if
-   * not passed in DICOM file.
-   * Valid values: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings
+   * Optional default chraracterset string used for DICOM parsing if
+   *   not passed in DICOM file.
+   *
+   * Valid values: {@link https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings}.
    *
    * @type {string|undefined}
    */
@@ -159,6 +160,12 @@ export class AppOptions {
    * @type {object|undefined}
    */
   overlayConfig;
+  /**
+   * DOM root document.
+   *
+   * @type {DocumentFragment}
+   */
+  rootDocument;
 
   /**
    * @param {Object<string, ViewConfig[]>} [dataViewConfigs] Optional dataId
@@ -267,17 +274,6 @@ export class App {
   }
 
   /**
-   * Get the last loaded image.
-   *
-   * @returns {Image|undefined} The image.
-   */
-  getLastImage() {
-    const dataIds = this.#dataController.getDataIds();
-    const lastId = dataIds[dataIds.length - 1];
-    return this.getImage(lastId);
-  }
-
-  /**
    * Set the image at the given id.
    *
    * @param {string} dataId The data id.
@@ -285,17 +281,6 @@ export class App {
    */
   setImage(dataId, img) {
     this.#dataController.setImage(dataId, img);
-  }
-
-  /**
-   * Set the last image.
-   *
-   * @param {Image} img The associated image.
-   */
-  setLastImage(img) {
-    const dataIds = this.#dataController.getDataIds();
-    const lastId = dataIds[dataIds.length - 1];
-    this.#dataController.setImage(lastId, img);
   }
 
   /**
@@ -451,7 +436,7 @@ export class App {
    * Get the active layer group.
    * The layer is available after the first loaded item.
    *
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getActiveLayerGroup() {
     return this.#stage.getActiveLayerGroup();
@@ -533,7 +518,7 @@ export class App {
   /**
    * Initialise the application.
    *
-   * @param {AppOptions} opt The application options
+   * @param {AppOptions} opt The application options.
    * @example
    * // create the dwv app
    * const app = new dwv.App();
@@ -571,6 +556,9 @@ export class App {
     }
     if (typeof this.#options.dataViewConfigs === 'undefined') {
       this.#options.dataViewConfigs = {};
+    }
+    if (typeof this.#options.rootDocument === 'undefined') {
+      this.#options.rootDocument = document;
     }
 
     // undo stack
@@ -739,9 +727,9 @@ export class App {
    *
    * @param {string[]} urls The list of urls to load.
    * @param {object} [options] The options object, can contain:
-   *  - requestHeaders: an array of {name, value} to use as request headers
-   *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
-   *  - batchSize: the size of the request url batch
+   * - requestHeaders: an array of {name, value} to use as request headers,
+   * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
+   * - batchSize: the size of the request url batch.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -839,7 +827,7 @@ export class App {
    * To be called once the image is loaded.
    */
   fitToContainer() {
-    this.#stage.syncLayerGroupScale();
+    this.#stage.fitToContainer();
   }
 
   /**
@@ -1091,7 +1079,7 @@ export class App {
    */
   #createLayerGroup(viewConfig) {
     // create new layer group
-    const element = document.getElementById(viewConfig.divId);
+    const element = this.#options.rootDocument.getElementById(viewConfig.divId);
     const layerGroup = this.#stage.addLayerGroup(element);
     // bind events
     this.#bindLayerGroupToApp(layerGroup);
@@ -1278,13 +1266,14 @@ export class App {
 
   /**
    * Key down event handler example.
-   * - CRTL-Z: undo
-   * - CRTL-Y: redo
-   * - CRTL-ARROW_LEFT: next element on fourth dim
-   * - CRTL-ARROW_UP: next element on third dim
-   * - CRTL-ARROW_RIGHT: previous element on fourth dim
-   * - CRTL-ARROW_DOWN: previous element on third dim
-   * (applies to the active view of the active layer group)
+   * - CRTL-Z: undo,
+   * - CRTL-Y: redo,
+   * - CRTL-ARROW_LEFT: next element on fourth dim,
+   * - CRTL-ARROW_UP: next element on third dim,
+   * - CRTL-ARROW_RIGHT: previous element on fourth dim,
+   * - CRTL-ARROW_DOWN: previous element on third dim.
+   *
+   * Applies to the active view of the active layer group.
    *
    * @param {KeyboardEvent} event The key down event.
    * @fires UndoStack#undo
@@ -1331,7 +1320,7 @@ export class App {
   // Internal members shortcuts-----------------------------------------------
 
   /**
-   * Reset the display
+   * Reset the display.
    */
   resetDisplay() {
     this.resetLayout();
@@ -1339,7 +1328,7 @@ export class App {
   }
 
   /**
-   * Reset the app zoom.s
+   * Reset the app zoom.
    */
   resetZoom() {
     this.resetLayout();
@@ -1372,7 +1361,7 @@ export class App {
   }
 
   /**
-   * Set the tool
+   * Set the tool.
    *
    * @param {string} tool The tool.
    */
@@ -1408,7 +1397,7 @@ export class App {
   }
 
   /**
-   * Undo the last action
+   * Undo the last action.
    *
    * @fires UndoStack#undo
    */
@@ -1417,7 +1406,7 @@ export class App {
   }
 
   /**
-   * Redo the last action
+   * Redo the last action.
    *
    * @fires UndoStack#redo
    */
@@ -1832,12 +1821,8 @@ export class App {
       }
     }
 
-    // listen to image changes
+    // listen to image set
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
-    this.#dataController.addEventListener('imagechange', (event) => {
-      viewLayer.onimagechange(event);
-      this.render(event.dataid);
-    });
 
     // optional draw layer
     let drawLayer;
@@ -1858,7 +1843,7 @@ export class App {
     });
 
     // sync layer groups
-    this.#stage.syncLayerGroupScale();
+    this.#stage.fitToContainer();
 
     // view layer offset (done before scale)
     viewLayer.setOffset(layerGroup.getOffset());
@@ -1901,9 +1886,11 @@ export class App {
     // layer scale (done after possible flip)
     if (!isBaseLayer) {
       // use zoom offset of base layer
-      // TODO: not robust, works for equal layers...
       const baseViewLayer = layerGroup.getBaseViewLayer();
-      viewLayer.initScale(layerGroup.getScale(), baseViewLayer.getZoomOffset());
+      viewLayer.initScale(
+        layerGroup.getScale(),
+        baseViewLayer.getAbsoluteZoomOffset()
+      );
     } else {
       viewLayer.setScale(layerGroup.getScale());
     }
