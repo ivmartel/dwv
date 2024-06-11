@@ -46,6 +46,8 @@
     "karma-json-reporter": "1.2.1",
     "karma-qunit": "^4.2.0",
     "karma-sourcemap-loader": "^0.4.0",
+    "karma-webpack": "^5.0.1",
+    "qunit": "^2.20.1",
     "typescript": "~5.4.5",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4",
