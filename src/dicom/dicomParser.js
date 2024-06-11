@@ -12,6 +12,7 @@ import {
   transferSyntaxKeywords,
   vrTypes,
 } from './dictionary';
+import {DataElement} from './dataElement';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
 import {
@@ -19,11 +20,6 @@ import {
   getOrientationStringLPS,
   getLPSGroup
 } from '../math/orientation';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
-/* eslint-enable no-unused-vars */
 
 /**
  * List of DICOM data elements indexed via a 8 character string formed from

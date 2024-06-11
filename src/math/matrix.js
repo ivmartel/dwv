@@ -341,13 +341,13 @@ function getMatrixInverse(m) {
  * @returns {Matrix33} The identity matrix.
  */
 export function getIdentityMat33() {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   return new Matrix33([
     1, 0, 0,
     0, 1, 0,
     0, 0, 1
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 }
 
 /**

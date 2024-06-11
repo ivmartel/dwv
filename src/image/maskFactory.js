@@ -526,12 +526,13 @@ export class MaskFactory {
       parseFloat(imageOrientationPatient[4]),
       parseFloat(imageOrientationPatient[5]));
     const normal = rowCosines.crossProduct(colCosines);
-    /* eslint-disable array-element-newline */
+    /* eslint-disable @stylistic/js/array-element-newline */
     const orientationMatrix = new Matrix33([
       rowCosines.getX(), colCosines.getX(), normal.getX(),
       rowCosines.getY(), colCosines.getY(), normal.getY(),
       rowCosines.getZ(), colCosines.getZ(), normal.getZ()
     ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
 
     // sort positions patient
     framePosPats.sort(getComparePosPat(orientationMatrix));

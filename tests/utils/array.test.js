@@ -162,7 +162,7 @@ str10 += 'value1\r\n';
 str10 += '\r\n';
 str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp--\r\n';
 
-/* eslint-disable array-element-newline */
+/* eslint-disable @stylistic/js/array-element-newline */
 const multipart10 = {
   str: str10,
   parts: [
@@ -192,7 +192,7 @@ const multipart10 = {
     }
   ]
 };
-/* eslint-enable array-element-newline */
+/* eslint-enable @stylistic/js/array-element-newline */
 
 // with preamble and epilogue
 let str11 = 'preamble\r\n';

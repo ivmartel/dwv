@@ -32,7 +32,7 @@ QUnit.test('DICOM dump', function (assert) {
   const tags = dicomParser.getDicomElements();
   const dump = dcmdump(tags);
 
-  /* eslint-disable max-len */
+  /* eslint-disable @stylistic/js/max-len */
   const theoDump = '\n\
 # Dicom-File-Format\n\
 \n\
@@ -71,7 +71,7 @@ QUnit.test('DICOM dump', function (assert) {
 (0028,0102) US 11                                       # undefined, 1 HighBit\n\
 (0028,0103) US 0                                        # undefined, 1 PixelRepresentation\n\
 (7fe0,0010) OW ...                                      # undefined, 1 PixelData\n';
-  /* eslint-enable max-len */
+  /* eslint-enable @stylistic/js/max-len */
 
   assert.equal(dump, theoDump, 'dump');
 });

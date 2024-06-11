@@ -24,7 +24,7 @@ import {Image} from '../../src/image/image';
 /* global QUnit */
 QUnit.module('image');
 
-/* eslint-disable array-element-newline */
+/* eslint-disable @stylistic/js/array-element-newline */
 const dataIterator0 = {
   ncols: 3,
   nrows: 2,
@@ -160,7 +160,7 @@ const dataIterator0 = {
     [5, 15, 25, 35, 2, 12, 22, 32]
   ]
 };
-/* eslint-enable array-element-newline */
+/* eslint-enable @stylistic/js/array-element-newline */
 
 /**
  * Run an input iterator and store values.
@@ -528,13 +528,13 @@ QUnit.test('getSliceIterator', function (assert) {
   checkIterator(assert,
     getAxIter(viewOrientation), testData0.valuesAx, 'axial');
   // axial: yxz
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   viewOrientation = new Matrix33([
     0, 1, 0,
     1, 0, 0,
     0, 0, 1
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
   checkIterator(assert,
     getAxIter(viewOrientation), testData0.valuesAx2, 'axial2');
 
@@ -552,13 +552,13 @@ QUnit.test('getSliceIterator', function (assert) {
   checkIterator(assert,
     getCoroIter(viewOrientation), testData0.valuesCo, 'coronal');
   // coronal: zxy
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   viewOrientation = new Matrix33([
     0, 1, 0,
     0, 0, 1,
     1, 0, 0
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
   checkIterator(assert,
     getCoroIter(viewOrientation), testData0.valuesCo2, 'coronal2');
 
@@ -576,13 +576,13 @@ QUnit.test('getSliceIterator', function (assert) {
   checkIterator(assert,
     getSagIter(viewOrientation), testData0.valuesSa, 'sagittal');
   // sagittal: zyx
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   viewOrientation = new Matrix33([
     0, 0, 1,
     0, 1, 0,
     1, 0, 0
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
   checkIterator(assert,
     getSagIter(viewOrientation), testData0.valuesSa2, 'sagittal2');
 });
