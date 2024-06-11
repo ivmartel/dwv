@@ -101,7 +101,7 @@ function saveRules() {
 function isValidRules() {
   try {
     JSON.parse(document.getElementById('rules').value);
-  } catch (error) {
+  } catch {
     alert('The JSON is not valid, please check it with JSONLint.');
     return false;
   }

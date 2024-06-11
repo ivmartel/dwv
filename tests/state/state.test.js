@@ -498,7 +498,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
       assert.notOk(
         shapeGroupKid.attrs.draggable,
         'Shape group \'shape\' must not be draggable.');
-      /* eslint-disable array-element-newline */
+      /* eslint-disable @stylistic/js/array-element-newline */
       assert.deepEqual(
         shapeGroupKid.attrs.points,
         [
@@ -507,7 +507,7 @@ function checkRoiDrawing(posGroupKid, details, version, assert) {
           56, 182, 56, 182, 56
         ],
         'Line has the proper points.');
-      /* eslint-enable array-element-newline */
+      /* eslint-enable @stylistic/js/array-element-newline */
       const colour = (version === '0.1' ? '#ffff00' : '#ffff80');
       assert.equal(
         shapeGroupKid.attrs.stroke,
@@ -595,7 +595,7 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
       assert.notOk(
         shapeGroupKid.attrs.draggable,
         'Shape group \'shape\' must not be draggable.');
-      /* eslint-disable array-element-newline */
+      /* eslint-disable @stylistic/js/array-element-newline */
       assert.deepEqual(
         shapeGroupKid.attrs.points,
         [
@@ -613,7 +613,7 @@ function checkHandDrawing(posGroupKid, details, version, assert) {
           49, 100, 49, 97, 49, 93, 50, 92, 50, 92, 50
         ],
         'Line has the proper points.');
-      /* eslint-enablearray-element-newline */
+      /* eslint-enable @stylistic/js/array-element-newline */
       assert.equal(
         shapeGroupKid.attrs.stroke,
         '#ffff80',

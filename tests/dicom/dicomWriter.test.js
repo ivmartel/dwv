@@ -195,7 +195,7 @@ QUnit.test('Write anonymised - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
  * @function module:tests/dicom~dicomWriterAnonymiseAddTags
  */
 QUnit.test(
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line @stylistic/js/max-len
   'Write anonymised and add tags - #DWV-REQ-IO-05-002 Write anonymised DICOM file',
   function (assert) {
     // parse test DICOM file
@@ -609,7 +609,7 @@ QUnit.test(
  * @function module:tests/dicom~readwrite-synthetic-explicit-with-rules
  */
 QUnit.test(
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line @stylistic/js/max-len
   'Read/write synthetic explicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
   function (assert) {
     const configs = JSON.parse(syntheticData);
@@ -649,7 +649,7 @@ QUnit.test(
  * @function module:tests/dicom~readwrite-synthetic-implicit-with-rules
  */
 QUnit.test(
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line @stylistic/js/max-len
   'Read/write synthetic implicit with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
   function (assert) {
     const configs = JSON.parse(syntheticData);
@@ -671,7 +671,7 @@ QUnit.test(
  * @function module:tests/dicom~readwrite-synthetic-explicit-big-endian
  */
 QUnit.test(
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line @stylistic/js/max-len
   'Read/write synthetic explicit big endian - #DWV-REQ-IO-01-001 Load DICOM file(s)',
   function (assert) {
     const configs = JSON.parse(syntheticData);
@@ -690,7 +690,7 @@ QUnit.test(
  * @function module:tests/dicom~readwrite-synthetic-explicit-be-with-rules
  */
 QUnit.test(
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line @stylistic/js/max-len
   'Read/write synthetic explicit big endian with rules - #DWV-REQ-IO-01-001 Load DICOM file(s)',
   function (assert) {
     const configs = JSON.parse(syntheticData);

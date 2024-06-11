@@ -10,13 +10,13 @@ import {
  * @returns {Matrix33} The coronal matrix.
  */
 export function getCoronalMat33() {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   return new Matrix33([
     1, 0, 0,
     0, 0, 1,
     0, -1, 0
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 }
 
 /**
@@ -25,13 +25,13 @@ export function getCoronalMat33() {
  * @returns {Matrix33} The sagittal matrix.
  */
 export function getSagittalMat33() {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   return new Matrix33([
     0, 0, -1,
     1, 0, 0,
     0, -1, 0
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 }
 
 /**
@@ -179,13 +179,13 @@ export function getOrientationFromCosines(cosines) {
     const rowCosines = new Vector3D(cosines[0], cosines[1], cosines[2]);
     const colCosines = new Vector3D(cosines[3], cosines[4], cosines[5]);
     const normal = rowCosines.crossProduct(colCosines);
-    /* eslint-disable array-element-newline */
+    /* eslint-disable @stylistic/js/array-element-newline */
     orientationMatrix = new Matrix33([
       rowCosines.getX(), colCosines.getX(), normal.getX(),
       rowCosines.getY(), colCosines.getY(), normal.getY(),
       rowCosines.getZ(), colCosines.getZ(), normal.getZ()
     ]);
-    /* eslint-enable array-element-newline */
+    /* eslint-enable @stylistic/js/array-element-newline */
   }
   return orientationMatrix;
 }

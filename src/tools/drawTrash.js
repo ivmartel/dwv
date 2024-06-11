@@ -1,9 +1,10 @@
-
 import Konva from 'konva';
+
 /* eslint-disable no-unused-vars */
 import {Scalar2D} from '../math/scalar';
 import {DrawLayer} from '../gui/drawLayer';
-/* eslint-disable no-unused-vars */
+/* eslint-enable no-unused-vars */
+
 export class DrawTrash {
   /**
    * Trash draw: a cross.
