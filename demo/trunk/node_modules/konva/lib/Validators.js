@@ -1,18 +1,21 @@
-import { Konva } from './Global.js';
-import { Util } from './Util.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getComponentValidator = exports.getBooleanValidator = exports.getNumberArrayValidator = exports.getFunctionValidator = exports.getStringOrGradientValidator = exports.getStringValidator = exports.getNumberOrAutoValidator = exports.getNumberOrArrayOfNumbersValidator = exports.getNumberValidator = exports.alphaComponent = exports.RGBComponent = void 0;
+const Global_1 = require("./Global");
+const Util_1 = require("./Util");
 function _formatValue(val) {
-    if (Util._isString(val)) {
+    if (Util_1.Util._isString(val)) {
         return '"' + val + '"';
     }
     if (Object.prototype.toString.call(val) === '[object Number]') {
         return val;
     }
-    if (Util._isBoolean(val)) {
+    if (Util_1.Util._isBoolean(val)) {
         return val;
     }
     return Object.prototype.toString.call(val);
 }
-export function RGBComponent(val) {
+function RGBComponent(val) {
     if (val > 255) {
         return 255;
     }
@@ -21,7 +24,8 @@ export function RGBComponent(val) {
     }
     return Math.round(val);
 }
-export function alphaComponent(val) {
+exports.RGBComponent = RGBComponent;
+function alphaComponent(val) {
     if (val > 1) {
         return 1;
     }
@@ -30,11 +34,12 @@ export function alphaComponent(val) {
     }
     return val;
 }
-export function getNumberValidator() {
-    if (Konva.isUnminified) {
+exports.alphaComponent = alphaComponent;
+function getNumberValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
-            if (!Util._isNumber(val)) {
-                Util.warn(_formatValue(val) +
+            if (!Util_1.Util._isNumber(val)) {
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a number.');
@@ -43,13 +48,14 @@ export function getNumberValidator() {
         };
     }
 }
-export function getNumberOrArrayOfNumbersValidator(noOfElements) {
-    if (Konva.isUnminified) {
+exports.getNumberValidator = getNumberValidator;
+function getNumberOrArrayOfNumbersValidator(noOfElements) {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
-            let isNumber = Util._isNumber(val);
-            let isValidArray = Util._isArray(val) && val.length == noOfElements;
+            let isNumber = Util_1.Util._isNumber(val);
+            let isValidArray = Util_1.Util._isArray(val) && val.length == noOfElements;
             if (!isNumber && !isValidArray) {
-                Util.warn(_formatValue(val) +
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a number or Array<number>(' +
@@ -60,13 +66,14 @@ export function getNumberOrArrayOfNumbersValidator(noOfElements) {
         };
     }
 }
-export function getNumberOrAutoValidator() {
-    if (Konva.isUnminified) {
+exports.getNumberOrArrayOfNumbersValidator = getNumberOrArrayOfNumbersValidator;
+function getNumberOrAutoValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
-            var isNumber = Util._isNumber(val);
+            var isNumber = Util_1.Util._isNumber(val);
             var isAuto = val === 'auto';
             if (!(isNumber || isAuto)) {
-                Util.warn(_formatValue(val) +
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a number or "auto".');
@@ -75,11 +82,12 @@ export function getNumberOrAutoValidator() {
         };
     }
 }
-export function getStringValidator() {
-    if (Konva.isUnminified) {
+exports.getNumberOrAutoValidator = getNumberOrAutoValidator;
+function getStringValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
-            if (!Util._isString(val)) {
-                Util.warn(_formatValue(val) +
+            if (!Util_1.Util._isString(val)) {
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a string.');
@@ -88,14 +96,15 @@ export function getStringValidator() {
         };
     }
 }
-export function getStringOrGradientValidator() {
-    if (Konva.isUnminified) {
+exports.getStringValidator = getStringValidator;
+function getStringOrGradientValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
-            const isString = Util._isString(val);
+            const isString = Util_1.Util._isString(val);
             const isGradient = Object.prototype.toString.call(val) === '[object CanvasGradient]' ||
                 (val && val.addColorStop);
             if (!(isString || isGradient)) {
-                Util.warn(_formatValue(val) +
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a string or a native gradient.');
@@ -104,11 +113,12 @@ export function getStringOrGradientValidator() {
         };
     }
 }
-export function getFunctionValidator() {
-    if (Konva.isUnminified) {
+exports.getStringOrGradientValidator = getStringOrGradientValidator;
+function getFunctionValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
-            if (!Util._isFunction(val)) {
-                Util.warn(_formatValue(val) +
+            if (!Util_1.Util._isFunction(val)) {
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a function.');
@@ -117,23 +127,24 @@ export function getFunctionValidator() {
         };
     }
 }
-export function getNumberArrayValidator() {
-    if (Konva.isUnminified) {
+exports.getFunctionValidator = getFunctionValidator;
+function getNumberArrayValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
             const TypedArray = Int8Array ? Object.getPrototypeOf(Int8Array) : null;
             if (TypedArray && val instanceof TypedArray) {
                 return val;
             }
-            if (!Util._isArray(val)) {
-                Util.warn(_formatValue(val) +
+            if (!Util_1.Util._isArray(val)) {
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a array of numbers.');
             }
             else {
                 val.forEach(function (item) {
-                    if (!Util._isNumber(item)) {
-                        Util.warn('"' +
+                    if (!Util_1.Util._isNumber(item)) {
+                        Util_1.Util.warn('"' +
                             attr +
                             '" attribute has non numeric element ' +
                             item +
@@ -145,12 +156,13 @@ export function getNumberArrayValidator() {
         };
     }
 }
-export function getBooleanValidator() {
-    if (Konva.isUnminified) {
+exports.getNumberArrayValidator = getNumberArrayValidator;
+function getBooleanValidator() {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
             var isBool = val === true || val === false;
             if (!isBool) {
-                Util.warn(_formatValue(val) +
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be a boolean.');
@@ -159,14 +171,15 @@ export function getBooleanValidator() {
         };
     }
 }
-export function getComponentValidator(components) {
-    if (Konva.isUnminified) {
+exports.getBooleanValidator = getBooleanValidator;
+function getComponentValidator(components) {
+    if (Global_1.Konva.isUnminified) {
         return function (val, attr) {
             if (val === undefined || val === null) {
                 return val;
             }
-            if (!Util.isObject(val)) {
-                Util.warn(_formatValue(val) +
+            if (!Util_1.Util.isObject(val)) {
+                Util_1.Util.warn(_formatValue(val) +
                     ' is a not valid value for "' +
                     attr +
                     '" attribute. The value should be an object with properties ' +
@@ -176,3 +189,4 @@ export function getComponentValidator(components) {
         };
     }
 }
+exports.getComponentValidator = getComponentValidator;

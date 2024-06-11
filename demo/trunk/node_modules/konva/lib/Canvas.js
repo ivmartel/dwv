@@ -1,17 +1,20 @@
-import { Util } from './Util.js';
-import { SceneContext, HitContext } from './Context.js';
-import { Konva } from './Global.js';
-import { Factory } from './Factory.js';
-import { getNumberValidator } from './Validators.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HitCanvas = exports.SceneCanvas = exports.Canvas = void 0;
+const Util_1 = require("./Util");
+const Context_1 = require("./Context");
+const Global_1 = require("./Global");
+const Factory_1 = require("./Factory");
+const Validators_1 = require("./Validators");
 var _pixelRatio;
 function getDevicePixelRatio() {
     if (_pixelRatio) {
         return _pixelRatio;
     }
-    var canvas = Util.createCanvasElement();
+    var canvas = Util_1.Util.createCanvasElement();
     var context = canvas.getContext('2d');
     _pixelRatio = (function () {
-        var devicePixelRatio = Konva._global.devicePixelRatio || 1, backingStoreRatio = context.webkitBackingStorePixelRatio ||
+        var devicePixelRatio = Global_1.Konva._global.devicePixelRatio || 1, backingStoreRatio = context.webkitBackingStorePixelRatio ||
             context.mozBackingStorePixelRatio ||
             context.msBackingStorePixelRatio ||
             context.oBackingStorePixelRatio ||
@@ -19,19 +22,19 @@ function getDevicePixelRatio() {
             1;
         return devicePixelRatio / backingStoreRatio;
     })();
-    Util.releaseCanvas(canvas);
+    Util_1.Util.releaseCanvas(canvas);
     return _pixelRatio;
 }
-export class Canvas {
+class Canvas {
     constructor(config) {
         this.pixelRatio = 1;
         this.width = 0;
         this.height = 0;
         this.isCache = false;
         var conf = config || {};
-        var pixelRatio = conf.pixelRatio || Konva.pixelRatio || getDevicePixelRatio();
+        var pixelRatio = conf.pixelRatio || Global_1.Konva.pixelRatio || getDevicePixelRatio();
         this.pixelRatio = pixelRatio;
-        this._canvas = Util.createCanvasElement();
+        this._canvas = Util_1.Util.createCanvasElement();
         this._canvas.style.padding = '0';
         this._canvas.style.margin = '0';
         this._canvas.style.border = '0';
@@ -82,7 +85,7 @@ export class Canvas {
                 return this._canvas.toDataURL();
             }
             catch (err) {
-                Util.error('Unable to get data URL. ' +
+                Util_1.Util.error('Unable to get data URL. ' +
                     err.message +
                     ' For more info read https://konvajs.org/docs/posts/Tainted_Canvas.html.');
                 return '';
@@ -90,19 +93,24 @@ export class Canvas {
         }
     }
 }
-Factory.addGetterSetter(Canvas, 'pixelRatio', undefined, getNumberValidator());
-export class SceneCanvas extends Canvas {
-    constructor(config = { width: 0, height: 0 }) {
+exports.Canvas = Canvas;
+Factory_1.Factory.addGetterSetter(Canvas, 'pixelRatio', undefined, (0, Validators_1.getNumberValidator)());
+class SceneCanvas extends Canvas {
+    constructor(config = { width: 0, height: 0, willReadFrequently: false }) {
         super(config);
-        this.context = new SceneContext(this);
+        this.context = new Context_1.SceneContext(this, {
+            willReadFrequently: config.willReadFrequently,
+        });
         this.setSize(config.width, config.height);
     }
 }
-export class HitCanvas extends Canvas {
+exports.SceneCanvas = SceneCanvas;
+class HitCanvas extends Canvas {
     constructor(config = { width: 0, height: 0 }) {
         super(config);
         this.hitCanvas = true;
-        this.context = new HitContext(this);
+        this.context = new Context_1.HitContext(this);
         this.setSize(config.width, config.height);
     }
 }
+exports.HitCanvas = HitCanvas;

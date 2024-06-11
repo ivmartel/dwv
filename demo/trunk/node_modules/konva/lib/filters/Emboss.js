@@ -1,8 +1,11 @@
-import { Factory } from '../Factory.js';
-import { Node } from '../Node.js';
-import { Util } from '../Util.js';
-import { getNumberValidator } from '../Validators.js';
-export const Emboss = function (imageData) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Emboss = void 0;
+const Factory_1 = require("../Factory");
+const Node_1 = require("../Node");
+const Util_1 = require("../Util");
+const Validators_1 = require("../Validators");
+const Emboss = function (imageData) {
     var strength = this.embossStrength() * 10, greyLevel = this.embossWhiteLevel() * 255, direction = this.embossDirection(), blend = this.embossBlend(), dirY = 0, dirX = 0, data = imageData.data, w = imageData.width, h = imageData.height, w4 = w * 4, y = h;
     switch (direction) {
         case 'top-left':
@@ -38,7 +41,7 @@ export const Emboss = function (imageData) {
             dirX = -1;
             break;
         default:
-            Util.error('Unknown emboss direction: ' + direction);
+            Util_1.Util.error('Unknown emboss direction: ' + direction);
     }
     do {
         var offsetY = (y - 1) * w4;
@@ -96,7 +99,8 @@ export const Emboss = function (imageData) {
         } while (--x);
     } while (--y);
 };
-Factory.addGetterSetter(Node, 'embossStrength', 0.5, getNumberValidator(), Factory.afterSetFilter);
-Factory.addGetterSetter(Node, 'embossWhiteLevel', 0.5, getNumberValidator(), Factory.afterSetFilter);
-Factory.addGetterSetter(Node, 'embossDirection', 'top-left', null, Factory.afterSetFilter);
-Factory.addGetterSetter(Node, 'embossBlend', false, null, Factory.afterSetFilter);
+exports.Emboss = Emboss;
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'embossStrength', 0.5, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'embossWhiteLevel', 0.5, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'embossDirection', 'top-left', null, Factory_1.Factory.afterSetFilter);
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'embossBlend', false, null, Factory_1.Factory.afterSetFilter);

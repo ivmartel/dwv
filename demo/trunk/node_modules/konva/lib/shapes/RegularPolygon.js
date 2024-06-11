@@ -1,8 +1,11 @@
-import { Factory } from '../Factory.js';
-import { Shape } from '../Shape.js';
-import { getNumberValidator } from '../Validators.js';
-import { _registerNode } from '../Global.js';
-export class RegularPolygon extends Shape {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RegularPolygon = void 0;
+const Factory_1 = require("../Factory");
+const Shape_1 = require("../Shape");
+const Validators_1 = require("../Validators");
+const Global_1 = require("../Global");
+class RegularPolygon extends Shape_1.Shape {
     _sceneFunc(context) {
         const points = this._getPoints();
         context.beginPath();
@@ -57,9 +60,10 @@ export class RegularPolygon extends Shape {
         this.radius(height / 2);
     }
 }
+exports.RegularPolygon = RegularPolygon;
 RegularPolygon.prototype.className = 'RegularPolygon';
 RegularPolygon.prototype._centroid = true;
 RegularPolygon.prototype._attrsAffectingSize = ['radius'];
-_registerNode(RegularPolygon);
-Factory.addGetterSetter(RegularPolygon, 'radius', 0, getNumberValidator());
-Factory.addGetterSetter(RegularPolygon, 'sides', 0, getNumberValidator());
+(0, Global_1._registerNode)(RegularPolygon);
+Factory_1.Factory.addGetterSetter(RegularPolygon, 'radius', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(RegularPolygon, 'sides', 0, (0, Validators_1.getNumberValidator)());

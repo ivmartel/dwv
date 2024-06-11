@@ -1,8 +1,11 @@
-import { Factory } from '../Factory.js';
-import { Shape } from '../Shape.js';
-import { Group } from '../Group.js';
-import { getNumberOrArrayOfNumbersValidator, getNumberValidator, } from '../Validators.js';
-import { _registerNode } from '../Global.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Tag = exports.Label = void 0;
+const Factory_1 = require("../Factory");
+const Shape_1 = require("../Shape");
+const Group_1 = require("../Group");
+const Validators_1 = require("../Validators");
+const Global_1 = require("../Global");
 var ATTR_CHANGE_LIST = [
     'fontFamily',
     'fontSize',
@@ -16,7 +19,7 @@ var ATTR_CHANGE_LIST = [
     'pointerWidth',
     'pointerHeight',
 ], CHANGE_KONVA = 'Change.konva', NONE = 'none', UP = 'up', RIGHT = 'right', DOWN = 'down', LEFT = 'left', attrChangeListLen = ATTR_CHANGE_LIST.length;
-export class Label extends Group {
+class Label extends Group_1.Group {
     constructor(config) {
         super(config);
         this.on('add.konva', function (evt) {
@@ -86,9 +89,10 @@ export class Label extends Group {
         }
     }
 }
+exports.Label = Label;
 Label.prototype.className = 'Label';
-_registerNode(Label);
-export class Tag extends Shape {
+(0, Global_1._registerNode)(Label);
+class Tag extends Shape_1.Shape {
     _sceneFunc(context) {
         var width = this.width(), height = this.height(), pointerDirection = this.pointerDirection(), pointerWidth = this.pointerWidth(), pointerHeight = this.pointerHeight(), cornerRadius = this.cornerRadius();
         let topLeft = 0;
@@ -165,9 +169,10 @@ export class Tag extends Shape {
         };
     }
 }
+exports.Tag = Tag;
 Tag.prototype.className = 'Tag';
-_registerNode(Tag);
-Factory.addGetterSetter(Tag, 'pointerDirection', NONE);
-Factory.addGetterSetter(Tag, 'pointerWidth', 0, getNumberValidator());
-Factory.addGetterSetter(Tag, 'pointerHeight', 0, getNumberValidator());
-Factory.addGetterSetter(Tag, 'cornerRadius', 0, getNumberOrArrayOfNumbersValidator(4));
+(0, Global_1._registerNode)(Tag);
+Factory_1.Factory.addGetterSetter(Tag, 'pointerDirection', NONE);
+Factory_1.Factory.addGetterSetter(Tag, 'pointerWidth', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Tag, 'pointerHeight', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Tag, 'cornerRadius', 0, (0, Validators_1.getNumberOrArrayOfNumbersValidator)(4));

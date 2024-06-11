@@ -1,7 +1,10 @@
-import { Util } from './Util.js';
-import { Animation } from './Animation.js';
-import { Node } from './Node.js';
-import { Konva } from './Global.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Easings = exports.Tween = void 0;
+const Util_1 = require("./Util");
+const Animation_1 = require("./Animation");
+const Node_1 = require("./Node");
+const Global_1 = require("./Global");
 var blacklist = {
     node: 1,
     duration: 1,
@@ -123,9 +126,9 @@ class TweenEngine {
         return new Date().getTime();
     }
 }
-export class Tween {
+class Tween {
     constructor(config) {
-        var that = this, node = config.node, nodeId = node._id, duration, easing = config.easing || Easings.Linear, yoyo = !!config.yoyo, key;
+        var that = this, node = config.node, nodeId = node._id, duration, easing = config.easing || exports.Easings.Linear, yoyo = !!config.yoyo, key;
         if (typeof config.duration === 'undefined') {
             duration = 0.3;
         }
@@ -138,11 +141,11 @@ export class Tween {
         this.node = node;
         this._id = idCounter++;
         var layers = node.getLayer() ||
-            (node instanceof Konva['Stage'] ? node.getLayers() : null);
+            (node instanceof Global_1.Konva['Stage'] ? node.getLayers() : null);
         if (!layers) {
-            Util.error('Tween constructor have `node` that is not in a layer. Please add node into layer first.');
+            Util_1.Util.error('Tween constructor have `node` that is not in a layer. Please add node into layer first.');
         }
-        this.anim = new Animation(function () {
+        this.anim = new Animation_1.Animation(function () {
             that.tween.onEnterFrame();
         }, layers);
         this.tween = new TweenEngine(key, function (i) {
@@ -175,17 +178,17 @@ export class Tween {
             delete Tween.attrs[nodeId][tweenId][key];
         }
         start = node.getAttr(key);
-        if (Util._isArray(end)) {
+        if (Util_1.Util._isArray(end)) {
             diff = [];
             len = Math.max(end.length, start.length);
             if (key === 'points' && end.length !== start.length) {
                 if (end.length > start.length) {
                     trueStart = start;
-                    start = Util._prepareArrayForTween(start, end, node.closed());
+                    start = Util_1.Util._prepareArrayForTween(start, end, node.closed());
                 }
                 else {
                     trueEnd = end;
-                    end = Util._prepareArrayForTween(end, start, node.closed());
+                    end = Util_1.Util._prepareArrayForTween(end, start, node.closed());
                 }
             }
             if (key.indexOf('fill') === 0) {
@@ -194,8 +197,8 @@ export class Tween {
                         diff.push(end[n] - start[n]);
                     }
                     else {
-                        var startRGBA = Util.colorToRGBA(start[n]);
-                        endRGBA = Util.colorToRGBA(end[n]);
+                        var startRGBA = Util_1.Util.colorToRGBA(start[n]);
+                        endRGBA = Util_1.Util.colorToRGBA(end[n]);
                         start[n] = startRGBA;
                         diff.push({
                             r: endRGBA.r - startRGBA.r,
@@ -213,8 +216,8 @@ export class Tween {
             }
         }
         else if (colorAttrs.indexOf(key) !== -1) {
-            start = Util.colorToRGBA(start);
-            endRGBA = Util.colorToRGBA(end);
+            start = Util_1.Util.colorToRGBA(start);
+            endRGBA = Util_1.Util.colorToRGBA(end);
             diff = {
                 r: endRGBA.r - start.r,
                 g: endRGBA.g - start.g,
@@ -241,7 +244,7 @@ export class Tween {
             start = attr.start;
             diff = attr.diff;
             end = attr.end;
-            if (Util._isArray(start)) {
+            if (Util_1.Util._isArray(start)) {
                 newVal = [];
                 len = Math.max(start.length, end.length);
                 if (key.indexOf('fill') === 0) {
@@ -355,9 +358,10 @@ export class Tween {
         delete Tween.attrs[nodeId][thisId];
     }
 }
+exports.Tween = Tween;
 Tween.attrs = {};
 Tween.tweens = {};
-Node.prototype.to = function (params) {
+Node_1.Node.prototype.to = function (params) {
     var onFinish = params.onFinish;
     params.node = this;
     params.onFinish = function () {
@@ -369,7 +373,7 @@ Node.prototype.to = function (params) {
     var tween = new Tween(params);
     tween.play();
 };
-export const Easings = {
+exports.Easings = {
     BackEaseIn(t, b, c, d) {
         var s = 1.70158;
         return c * (t /= d) * t * ((s + 1) * t - s) + b;
@@ -476,14 +480,14 @@ export const Easings = {
         }
     },
     BounceEaseIn(t, b, c, d) {
-        return c - Easings.BounceEaseOut(d - t, 0, c, d) + b;
+        return c - exports.Easings.BounceEaseOut(d - t, 0, c, d) + b;
     },
     BounceEaseInOut(t, b, c, d) {
         if (t < d / 2) {
-            return Easings.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+            return exports.Easings.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
         }
         else {
-            return Easings.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+            return exports.Easings.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
         }
     },
     EaseIn(t, b, c, d) {

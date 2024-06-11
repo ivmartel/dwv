@@ -1,9 +1,12 @@
-import { Factory } from '../Factory.js';
-import { Line } from './Line.js';
-import { getNumberValidator } from '../Validators.js';
-import { _registerNode } from '../Global.js';
-import { Path } from './Path.js';
-export class Arrow extends Line {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Arrow = void 0;
+const Factory_1 = require("../Factory");
+const Line_1 = require("./Line");
+const Validators_1 = require("../Validators");
+const Global_1 = require("../Global");
+const Path_1 = require("./Path");
+class Arrow extends Line_1.Line {
     _sceneFunc(ctx) {
         super._sceneFunc(ctx);
         var PI2 = Math.PI * 2;
@@ -25,8 +28,8 @@ export class Arrow extends Line {
                 points[n - 2],
                 points[n - 1],
             ];
-            const lastLength = Path.calcLength(tp[tp.length - 4], tp[tp.length - 3], 'C', lp);
-            const previous = Path.getPointOnQuadraticBezier(Math.min(1, 1 - length / lastLength), lp[0], lp[1], lp[2], lp[3], lp[4], lp[5]);
+            const lastLength = Path_1.Path.calcLength(tp[tp.length - 4], tp[tp.length - 3], 'C', lp);
+            const previous = Path_1.Path.getPointOnQuadraticBezier(Math.min(1, 1 - length / lastLength), lp[0], lp[1], lp[2], lp[3], lp[4], lp[5]);
             dx = points[n - 2] - previous.x;
             dy = points[n - 1] - previous.y;
         }
@@ -91,9 +94,10 @@ export class Arrow extends Line {
         };
     }
 }
+exports.Arrow = Arrow;
 Arrow.prototype.className = 'Arrow';
-_registerNode(Arrow);
-Factory.addGetterSetter(Arrow, 'pointerLength', 10, getNumberValidator());
-Factory.addGetterSetter(Arrow, 'pointerWidth', 10, getNumberValidator());
-Factory.addGetterSetter(Arrow, 'pointerAtBeginning', false);
-Factory.addGetterSetter(Arrow, 'pointerAtEnding', true);
+(0, Global_1._registerNode)(Arrow);
+Factory_1.Factory.addGetterSetter(Arrow, 'pointerLength', 10, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Arrow, 'pointerWidth', 10, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Arrow, 'pointerAtBeginning', false);
+Factory_1.Factory.addGetterSetter(Arrow, 'pointerAtEnding', true);

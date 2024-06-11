@@ -1,19 +1,21 @@
-import { Konva } from './_FullInternals.js';
-import * as Canvas from 'canvas';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const _FullInternals_1 = require("./_FullInternals");
+const Canvas = require("canvas");
 const canvas = Canvas['default'] || Canvas;
 global.DOMMatrix = canvas.DOMMatrix;
 const isNode = typeof global.document === 'undefined';
 if (isNode) {
-    Konva.Util['createCanvasElement'] = () => {
+    _FullInternals_1.Konva.Util['createCanvasElement'] = () => {
         const node = canvas.createCanvas(300, 300);
         if (!node['style']) {
             node['style'] = {};
         }
         return node;
     };
-    Konva.Util.createImageElement = () => {
+    _FullInternals_1.Konva.Util.createImageElement = () => {
         const node = new canvas.Image();
         return node;
     };
 }
-export default Konva;
+module.exports = _FullInternals_1.Konva;

@@ -1,11 +1,14 @@
-import { Util } from './Util.js';
-import { Container } from './Container.js';
-import { Node } from './Node.js';
-import { Factory } from './Factory.js';
-import { SceneCanvas, HitCanvas } from './Canvas.js';
-import { getBooleanValidator } from './Validators.js';
-import { shapes } from './Shape.js';
-import { _registerNode } from './Global.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Layer = void 0;
+const Util_1 = require("./Util");
+const Container_1 = require("./Container");
+const Node_1 = require("./Node");
+const Factory_1 = require("./Factory");
+const Canvas_1 = require("./Canvas");
+const Validators_1 = require("./Validators");
+const Shape_1 = require("./Shape");
+const Global_1 = require("./Global");
 var HASH = '#', BEFORE_DRAW = 'beforeDraw', DRAW = 'draw', INTERSECTION_OFFSETS = [
     { x: 0, y: 0 },
     { x: -1, y: -1 },
@@ -13,11 +16,11 @@ var HASH = '#', BEFORE_DRAW = 'beforeDraw', DRAW = 'draw', INTERSECTION_OFFSETS 
     { x: 1, y: 1 },
     { x: -1, y: 1 },
 ], INTERSECTION_OFFSETS_LEN = INTERSECTION_OFFSETS.length;
-export class Layer extends Container {
+class Layer extends Container_1.Container {
     constructor(config) {
         super(config);
-        this.canvas = new SceneCanvas();
-        this.hitCanvas = new HitCanvas({
+        this.canvas = new Canvas_1.SceneCanvas();
+        this.hitCanvas = new Canvas_1.HitCanvas({
             pixelRatio: 1,
         });
         this._waitingForDraw = false;
@@ -62,7 +65,7 @@ export class Layer extends Container {
         return this;
     }
     moveToTop() {
-        Node.prototype.moveToTop.call(this);
+        Node_1.Node.prototype.moveToTop.call(this);
         var stage = this.getStage();
         if (stage && stage.content) {
             stage.content.removeChild(this.getNativeCanvasElement());
@@ -71,7 +74,7 @@ export class Layer extends Container {
         return true;
     }
     moveUp() {
-        var moved = Node.prototype.moveUp.call(this);
+        var moved = Node_1.Node.prototype.moveUp.call(this);
         if (!moved) {
             return false;
         }
@@ -89,7 +92,7 @@ export class Layer extends Container {
         return true;
     }
     moveDown() {
-        if (Node.prototype.moveDown.call(this)) {
+        if (Node_1.Node.prototype.moveDown.call(this)) {
             var stage = this.getStage();
             if (stage) {
                 var children = stage.children;
@@ -103,7 +106,7 @@ export class Layer extends Container {
         return false;
     }
     moveToBottom() {
-        if (Node.prototype.moveToBottom.call(this)) {
+        if (Node_1.Node.prototype.moveToBottom.call(this)) {
             var stage = this.getStage();
             if (stage) {
                 var children = stage.children;
@@ -121,8 +124,8 @@ export class Layer extends Container {
     }
     remove() {
         var _canvas = this.getNativeCanvasElement();
-        Node.prototype.remove.call(this);
-        if (_canvas && _canvas.parentNode && Util._isInDocument(_canvas)) {
+        Node_1.Node.prototype.remove.call(this);
+        if (_canvas && _canvas.parentNode && Util_1.Util._isInDocument(_canvas)) {
             _canvas.parentNode.removeChild(_canvas);
         }
         return this;
@@ -139,7 +142,7 @@ export class Layer extends Container {
     _validateAdd(child) {
         var type = child.getType();
         if (type !== 'Group' && type !== 'Shape') {
-            Util.throw('You may only add groups and shapes to a layer.');
+            Util_1.Util.throw('You may only add groups and shapes to a layer.');
         }
     }
     _toKonvaCanvas(config) {
@@ -148,7 +151,7 @@ export class Layer extends Container {
         config.height = config.height || this.getHeight();
         config.x = config.x !== undefined ? config.x : this.x();
         config.y = config.y !== undefined ? config.y : this.y();
-        return Node.prototype._toKonvaCanvas.call(this, config);
+        return Node_1.Node.prototype._toKonvaCanvas.call(this, config);
     }
     _checkVisibility() {
         const visible = this.visible();
@@ -169,7 +172,7 @@ export class Layer extends Container {
         }
     }
     setWidth() {
-        Util.warn('Can not change width of layer. Use "stage.width(value)" function instead.');
+        Util_1.Util.warn('Can not change width of layer. Use "stage.width(value)" function instead.');
     }
     getHeight() {
         if (this.parent) {
@@ -177,12 +180,12 @@ export class Layer extends Container {
         }
     }
     setHeight() {
-        Util.warn('Can not change height of layer. Use "stage.height(value)" function instead.');
+        Util_1.Util.warn('Can not change height of layer. Use "stage.height(value)" function instead.');
     }
     batchDraw() {
         if (!this._waitingForDraw) {
             this._waitingForDraw = true;
-            Util.requestAnimFrame(() => {
+            Util_1.Util.requestAnimFrame(() => {
                 this.draw();
                 this._waitingForDraw = false;
             });
@@ -224,8 +227,8 @@ export class Layer extends Container {
         const p = this.hitCanvas.context.getImageData(Math.round(pos.x * ratio), Math.round(pos.y * ratio), 1, 1).data;
         const p3 = p[3];
         if (p3 === 255) {
-            const colorKey = Util._rgbToHex(p[0], p[1], p[2]);
-            const shape = shapes[HASH + colorKey];
+            const colorKey = Util_1.Util._rgbToHex(p[0], p[1], p[2]);
+            const shape = Shape_1.shapes[HASH + colorKey];
             if (shape) {
                 return {
                     shape: shape,
@@ -250,7 +253,7 @@ export class Layer extends Container {
         if (this.clearBeforeDraw()) {
             canvas.getContext().clear();
         }
-        Container.prototype.drawScene.call(this, canvas, top);
+        Container_1.Container.prototype.drawScene.call(this, canvas, top);
         this._fire(DRAW, {
             node: this,
         });
@@ -261,7 +264,7 @@ export class Layer extends Container {
         if (layer && layer.clearBeforeDraw()) {
             layer.getHitCanvas().getContext().clear();
         }
-        Container.prototype.drawHit.call(this, canvas, top);
+        Container_1.Container.prototype.drawHit.call(this, canvas, top);
         return this;
     }
     enableHitGraph() {
@@ -273,11 +276,11 @@ export class Layer extends Container {
         return this;
     }
     setHitGraphEnabled(val) {
-        Util.warn('hitGraphEnabled method is deprecated. Please use layer.listening() instead.');
+        Util_1.Util.warn('hitGraphEnabled method is deprecated. Please use layer.listening() instead.');
         this.listening(val);
     }
     getHitGraphEnabled(val) {
-        Util.warn('hitGraphEnabled method is deprecated. Please use layer.listening() instead.');
+        Util_1.Util.warn('hitGraphEnabled method is deprecated. Please use layer.listening() instead.');
         return this.listening();
     }
     toggleHitCanvas() {
@@ -294,12 +297,13 @@ export class Layer extends Container {
         }
     }
     destroy() {
-        Util.releaseCanvas(this.getNativeCanvasElement(), this.getHitCanvas()._canvas);
+        Util_1.Util.releaseCanvas(this.getNativeCanvasElement(), this.getHitCanvas()._canvas);
         return super.destroy();
     }
 }
+exports.Layer = Layer;
 Layer.prototype.nodeType = 'Layer';
-_registerNode(Layer);
-Factory.addGetterSetter(Layer, 'imageSmoothingEnabled', true);
-Factory.addGetterSetter(Layer, 'clearBeforeDraw', true);
-Factory.addGetterSetter(Layer, 'hitGraphEnabled', true, getBooleanValidator());
+(0, Global_1._registerNode)(Layer);
+Factory_1.Factory.addGetterSetter(Layer, 'imageSmoothingEnabled', true);
+Factory_1.Factory.addGetterSetter(Layer, 'clearBeforeDraw', true);
+Factory_1.Factory.addGetterSetter(Layer, 'hitGraphEnabled', true, (0, Validators_1.getBooleanValidator)());

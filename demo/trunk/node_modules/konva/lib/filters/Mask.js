@@ -1,6 +1,9 @@
-import { Factory } from '../Factory.js';
-import { Node } from '../Node.js';
-import { getNumberValidator } from '../Validators.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Mask = void 0;
+const Factory_1 = require("../Factory");
+const Node_1 = require("../Node");
+const Validators_1 = require("../Validators");
 function pixelAt(idata, x, y) {
     var idx = (y * idata.width + x) * 4;
     var d = [];
@@ -127,7 +130,7 @@ function smoothEdgeMask(mask, sw, sh) {
     }
     return maskResult;
 }
-export const Mask = function (imageData) {
+const Mask = function (imageData) {
     var threshold = this.threshold(), mask = backgroundMask(imageData, threshold);
     if (mask) {
         mask = erodeMask(mask, imageData.width, imageData.height);
@@ -137,4 +140,5 @@ export const Mask = function (imageData) {
     }
     return imageData;
 };
-Factory.addGetterSetter(Node, 'threshold', 0, getNumberValidator(), Factory.afterSetFilter);
+exports.Mask = Mask;
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'threshold', 0, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);

@@ -1,7 +1,10 @@
-import { Factory } from '../Factory.js';
-import { Shape } from '../Shape.js';
-import { getNumberValidator, getNumberArrayValidator } from '../Validators.js';
-import { _registerNode } from '../Global.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Line = void 0;
+const Factory_1 = require("../Factory");
+const Shape_1 = require("../Shape");
+const Validators_1 = require("../Validators");
+const Global_1 = require("../Global");
 function getControlPoints(x0, y0, x1, y1, x2, y2, t) {
     var d01 = Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(y1 - y0, 2)), d12 = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)), fa = (t * d01) / (d01 + d12), fb = (t * d12) / (d01 + d12), p1x = x1 - fa * (x2 - x0), p1y = y1 - fa * (y2 - y0), p2x = x1 + fb * (x2 - x0), p2y = y1 + fb * (y2 - y0);
     return [p1x, p1y, p2x, p2y];
@@ -22,7 +25,7 @@ function expandPoints(p, tension) {
     }
     return allPoints;
 }
-export class Line extends Shape {
+class Line extends Shape_1.Shape {
     constructor(config) {
         super(config);
         this.on('pointsChange.konva tensionChange.konva closedChange.konva bezierChange.konva', function () {
@@ -146,10 +149,11 @@ export class Line extends Shape {
         };
     }
 }
+exports.Line = Line;
 Line.prototype.className = 'Line';
 Line.prototype._attrsAffectingSize = ['points', 'bezier', 'tension'];
-_registerNode(Line);
-Factory.addGetterSetter(Line, 'closed', false);
-Factory.addGetterSetter(Line, 'bezier', false);
-Factory.addGetterSetter(Line, 'tension', 0, getNumberValidator());
-Factory.addGetterSetter(Line, 'points', [], getNumberArrayValidator());
+(0, Global_1._registerNode)(Line);
+Factory_1.Factory.addGetterSetter(Line, 'closed', false);
+Factory_1.Factory.addGetterSetter(Line, 'bezier', false);
+Factory_1.Factory.addGetterSetter(Line, 'tension', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Line, 'points', [], (0, Validators_1.getNumberArrayValidator)());

@@ -1,13 +1,16 @@
-import { Factory } from '../Factory.js';
-import { Shape } from '../Shape.js';
-import { Animation } from '../Animation.js';
-import { getNumberValidator } from '../Validators.js';
-import { _registerNode } from '../Global.js';
-export class Sprite extends Shape {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Sprite = void 0;
+const Factory_1 = require("../Factory");
+const Shape_1 = require("../Shape");
+const Animation_1 = require("../Animation");
+const Validators_1 = require("../Validators");
+const Global_1 = require("../Global");
+class Sprite extends Shape_1.Shape {
     constructor(config) {
         super(config);
         this._updated = true;
-        this.anim = new Animation(() => {
+        this.anim = new Animation_1.Animation(() => {
             var updated = this._updated;
             this._updated = false;
             return updated;
@@ -93,15 +96,16 @@ export class Sprite extends Shape {
         }
     }
 }
+exports.Sprite = Sprite;
 Sprite.prototype.className = 'Sprite';
-_registerNode(Sprite);
-Factory.addGetterSetter(Sprite, 'animation');
-Factory.addGetterSetter(Sprite, 'animations');
-Factory.addGetterSetter(Sprite, 'frameOffsets');
-Factory.addGetterSetter(Sprite, 'image');
-Factory.addGetterSetter(Sprite, 'frameIndex', 0, getNumberValidator());
-Factory.addGetterSetter(Sprite, 'frameRate', 17, getNumberValidator());
-Factory.backCompat(Sprite, {
+(0, Global_1._registerNode)(Sprite);
+Factory_1.Factory.addGetterSetter(Sprite, 'animation');
+Factory_1.Factory.addGetterSetter(Sprite, 'animations');
+Factory_1.Factory.addGetterSetter(Sprite, 'frameOffsets');
+Factory_1.Factory.addGetterSetter(Sprite, 'image');
+Factory_1.Factory.addGetterSetter(Sprite, 'frameIndex', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Sprite, 'frameRate', 17, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.backCompat(Sprite, {
     index: 'frameIndex',
     getIndex: 'getFrameIndex',
     setIndex: 'setFrameIndex',

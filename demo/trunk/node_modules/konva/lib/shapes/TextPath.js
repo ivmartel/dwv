@@ -1,10 +1,13 @@
-import { Util } from '../Util.js';
-import { Factory } from '../Factory.js';
-import { Shape } from '../Shape.js';
-import { Path } from './Path.js';
-import { Text, stringToArray } from './Text.js';
-import { getNumberValidator } from '../Validators.js';
-import { _registerNode } from '../Global.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextPath = void 0;
+const Util_1 = require("../Util");
+const Factory_1 = require("../Factory");
+const Shape_1 = require("../Shape");
+const Path_1 = require("./Path");
+const Text_1 = require("./Text");
+const Validators_1 = require("../Validators");
+const Global_1 = require("../Global");
 var EMPTY_STRING = '', NORMAL = 'normal';
 function _fillFunc(context) {
     context.fillText(this.partialText, 0, 0);
@@ -12,18 +15,35 @@ function _fillFunc(context) {
 function _strokeFunc(context) {
     context.strokeText(this.partialText, 0, 0);
 }
-export class TextPath extends Shape {
+class TextPath extends Shape_1.Shape {
     constructor(config) {
         super(config);
-        this.dummyCanvas = Util.createCanvasElement();
+        this.dummyCanvas = Util_1.Util.createCanvasElement();
         this.dataArray = [];
-        this.dataArray = Path.parsePathData(this.attrs.data);
+        this._readDataAttribute();
         this.on('dataChange.konva', function () {
-            this.dataArray = Path.parsePathData(this.attrs.data);
+            this._readDataAttribute();
             this._setTextData();
         });
         this.on('textChange.konva alignChange.konva letterSpacingChange.konva kerningFuncChange.konva fontSizeChange.konva fontFamilyChange.konva', this._setTextData);
         this._setTextData();
+    }
+    _getTextPathLength() {
+        return Path_1.Path.getPathLength(this.dataArray);
+    }
+    _getPointAtLength(length) {
+        if (!this.attrs.data) {
+            return null;
+        }
+        const totalLength = this.pathLength;
+        if (length - 1 > totalLength) {
+            return null;
+        }
+        return Path_1.Path.getPointAtLengthOfDataArray(length, this.dataArray);
+    }
+    _readDataAttribute() {
+        this.dataArray = Path_1.Path.parsePathData(this.attrs.data);
+        this.pathLength = this._getTextPathLength();
     }
     _sceneFunc(context) {
         context.setAttr('font', this._getContextFont());
@@ -78,14 +98,14 @@ export class TextPath extends Shape {
         return this.textWidth;
     }
     getTextHeight() {
-        Util.warn('text.getTextHeight() method is deprecated. Use text.height() - for full height and text.fontSize() - for one line height.');
+        Util_1.Util.warn('text.getTextHeight() method is deprecated. Use text.height() - for full height and text.fontSize() - for one line height.');
         return this.textHeight;
     }
     setText(text) {
-        return Text.prototype.setText.call(this, text);
+        return Text_1.Text.prototype.setText.call(this, text);
     }
     _getContextFont() {
-        return Text.prototype._getContextFont.call(this);
+        return Text_1.Text.prototype._getContextFont.call(this);
     }
     _getTextSize(text) {
         var dummyCanvas = this.dummyCanvas;
@@ -96,171 +116,44 @@ export class TextPath extends Shape {
         _context.restore();
         return {
             width: metrics.width,
-            height: parseInt(this.attrs.fontSize, 10),
+            height: parseInt(`${this.fontSize()}`, 10),
         };
     }
     _setTextData() {
-        var that = this;
-        var size = this._getTextSize(this.attrs.text);
-        var letterSpacing = this.letterSpacing();
-        var align = this.align();
-        var kerningFunc = this.kerningFunc();
-        this.textWidth = size.width;
-        this.textHeight = size.height;
-        var textFullWidth = Math.max(this.textWidth + ((this.attrs.text || '').length - 1) * letterSpacing, 0);
+        const { width, height } = this._getTextSize(this.attrs.text);
+        this.textWidth = width;
+        this.textHeight = height;
         this.glyphInfo = [];
-        var fullPathWidth = 0;
-        for (var l = 0; l < that.dataArray.length; l++) {
-            if (that.dataArray[l].pathLength > 0) {
-                fullPathWidth += that.dataArray[l].pathLength;
-            }
+        if (!this.attrs.data) {
+            return null;
         }
-        var offset = 0;
+        const letterSpacing = this.letterSpacing();
+        const align = this.align();
+        const kerningFunc = this.kerningFunc();
+        const textWidth = Math.max(this.textWidth + ((this.attrs.text || '').length - 1) * letterSpacing, 0);
+        let offset = 0;
         if (align === 'center') {
-            offset = Math.max(0, fullPathWidth / 2 - textFullWidth / 2);
+            offset = Math.max(0, this.pathLength / 2 - textWidth / 2);
         }
         if (align === 'right') {
-            offset = Math.max(0, fullPathWidth - textFullWidth);
+            offset = Math.max(0, this.pathLength - textWidth);
         }
-        var charArr = stringToArray(this.text());
-        var spacesNumber = this.text().split(' ').length - 1;
-        var p0, p1, pathCmd;
-        var pIndex = -1;
-        var currentT = 0;
-        var getNextPathSegment = function () {
-            currentT = 0;
-            var pathData = that.dataArray;
-            for (var j = pIndex + 1; j < pathData.length; j++) {
-                if (pathData[j].pathLength > 0) {
-                    pIndex = j;
-                    return pathData[j];
-                }
-                else if (pathData[j].command === 'M') {
-                    p0 = {
-                        x: pathData[j].points[0],
-                        y: pathData[j].points[1],
-                    };
-                }
-            }
-            return {};
-        };
-        var findSegmentToFitCharacter = function (c) {
-            var glyphWidth = that._getTextSize(c).width + letterSpacing;
-            if (c === ' ' && align === 'justify') {
-                glyphWidth += (fullPathWidth - textFullWidth) / spacesNumber;
-            }
-            var currLen = 0;
-            var attempts = 0;
-            p1 = undefined;
-            while (Math.abs(glyphWidth - currLen) / glyphWidth > 0.01 &&
-                attempts < 20) {
-                attempts++;
-                var cumulativePathLength = currLen;
-                while (pathCmd === undefined) {
-                    pathCmd = getNextPathSegment();
-                    if (pathCmd &&
-                        cumulativePathLength + pathCmd.pathLength < glyphWidth) {
-                        cumulativePathLength += pathCmd.pathLength;
-                        pathCmd = undefined;
-                    }
-                }
-                if (Object.keys(pathCmd).length === 0 || p0 === undefined) {
-                    return undefined;
-                }
-                var needNewSegment = false;
-                switch (pathCmd.command) {
-                    case 'L':
-                        if (Path.getLineLength(p0.x, p0.y, pathCmd.points[0], pathCmd.points[1]) > glyphWidth) {
-                            p1 = Path.getPointOnLine(glyphWidth, p0.x, p0.y, pathCmd.points[0], pathCmd.points[1], p0.x, p0.y);
-                        }
-                        else {
-                            pathCmd = undefined;
-                        }
-                        break;
-                    case 'A':
-                        var start = pathCmd.points[4];
-                        var dTheta = pathCmd.points[5];
-                        var end = pathCmd.points[4] + dTheta;
-                        if (currentT === 0) {
-                            currentT = start + 0.00000001;
-                        }
-                        else if (glyphWidth > currLen) {
-                            currentT += ((Math.PI / 180.0) * dTheta) / Math.abs(dTheta);
-                        }
-                        else {
-                            currentT -= ((Math.PI / 360.0) * dTheta) / Math.abs(dTheta);
-                        }
-                        if ((dTheta < 0 && currentT < end) ||
-                            (dTheta >= 0 && currentT > end)) {
-                            currentT = end;
-                            needNewSegment = true;
-                        }
-                        p1 = Path.getPointOnEllipticalArc(pathCmd.points[0], pathCmd.points[1], pathCmd.points[2], pathCmd.points[3], currentT, pathCmd.points[6]);
-                        break;
-                    case 'C':
-                        if (currentT === 0) {
-                            if (glyphWidth > pathCmd.pathLength) {
-                                currentT = 0.00000001;
-                            }
-                            else {
-                                currentT = glyphWidth / pathCmd.pathLength;
-                            }
-                        }
-                        else if (glyphWidth > currLen) {
-                            currentT += (glyphWidth - currLen) / pathCmd.pathLength / 2;
-                        }
-                        else {
-                            currentT = Math.max(currentT - (currLen - glyphWidth) / pathCmd.pathLength / 2, 0);
-                        }
-                        if (currentT > 1.0) {
-                            currentT = 1.0;
-                            needNewSegment = true;
-                        }
-                        p1 = Path.getPointOnCubicBezier(currentT, pathCmd.start.x, pathCmd.start.y, pathCmd.points[0], pathCmd.points[1], pathCmd.points[2], pathCmd.points[3], pathCmd.points[4], pathCmd.points[5]);
-                        break;
-                    case 'Q':
-                        if (currentT === 0) {
-                            currentT = glyphWidth / pathCmd.pathLength;
-                        }
-                        else if (glyphWidth > currLen) {
-                            currentT += (glyphWidth - currLen) / pathCmd.pathLength;
-                        }
-                        else {
-                            currentT -= (currLen - glyphWidth) / pathCmd.pathLength;
-                        }
-                        if (currentT > 1.0) {
-                            currentT = 1.0;
-                            needNewSegment = true;
-                        }
-                        p1 = Path.getPointOnQuadraticBezier(currentT, pathCmd.start.x, pathCmd.start.y, pathCmd.points[0], pathCmd.points[1], pathCmd.points[2], pathCmd.points[3]);
-                        break;
-                }
-                if (p1 !== undefined) {
-                    currLen = Path.getLineLength(p0.x, p0.y, p1.x, p1.y);
-                }
-                if (needNewSegment) {
-                    needNewSegment = false;
-                    pathCmd = undefined;
-                }
-            }
-        };
-        var testChar = 'C';
-        var glyphWidth = that._getTextSize(testChar).width + letterSpacing;
-        var lettersInOffset = offset / glyphWidth - 1;
-        for (var k = 0; k < lettersInOffset; k++) {
-            findSegmentToFitCharacter(testChar);
-            if (p0 === undefined || p1 === undefined) {
-                break;
-            }
-            p0 = p1;
-        }
+        const charArr = (0, Text_1.stringToArray)(this.text());
+        let offsetToGlyph = offset;
         for (var i = 0; i < charArr.length; i++) {
-            findSegmentToFitCharacter(charArr[i]);
-            if (p0 === undefined || p1 === undefined) {
-                break;
+            const charStartPoint = this._getPointAtLength(offsetToGlyph);
+            if (!charStartPoint)
+                return;
+            let glyphWidth = this._getTextSize(charArr[i]).width + letterSpacing;
+            if (charArr[i] === ' ' && align === 'justify') {
+                const numberOfSpaces = this.text().split(' ').length - 1;
+                glyphWidth += (this.pathLength - textWidth) / numberOfSpaces;
             }
-            var width = Path.getLineLength(p0.x, p0.y, p1.x, p1.y);
-            var kern = 0;
+            const charEndPoint = this._getPointAtLength(offsetToGlyph + glyphWidth);
+            if (!charEndPoint)
+                return;
+            const width = Path_1.Path.getLineLength(charStartPoint.x, charStartPoint.y, charEndPoint.x, charEndPoint.y);
+            let kern = 0;
             if (kerningFunc) {
                 try {
                     kern = kerningFunc(charArr[i - 1], charArr[i]) * this.fontSize();
@@ -269,20 +162,20 @@ export class TextPath extends Shape {
                     kern = 0;
                 }
             }
-            p0.x += kern;
-            p1.x += kern;
+            charStartPoint.x += kern;
+            charEndPoint.x += kern;
             this.textWidth += kern;
-            var midpoint = Path.getPointOnLine(kern + width / 2.0, p0.x, p0.y, p1.x, p1.y);
-            var rotation = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+            const midpoint = Path_1.Path.getPointOnLine(kern + width / 2.0, charStartPoint.x, charStartPoint.y, charEndPoint.x, charEndPoint.y);
+            const rotation = Math.atan2(charEndPoint.y - charStartPoint.y, charEndPoint.x - charStartPoint.x);
             this.glyphInfo.push({
                 transposeX: midpoint.x,
                 transposeY: midpoint.y,
                 text: charArr[i],
                 rotation: rotation,
-                p0: p0,
-                p1: p1,
+                p0: charStartPoint,
+                p1: charEndPoint,
             });
-            p0 = p1;
+            offsetToGlyph += glyphWidth;
         }
     }
     getSelfRect() {
@@ -323,25 +216,26 @@ export class TextPath extends Shape {
         };
     }
     destroy() {
-        Util.releaseCanvas(this.dummyCanvas);
+        Util_1.Util.releaseCanvas(this.dummyCanvas);
         return super.destroy();
     }
 }
+exports.TextPath = TextPath;
 TextPath.prototype._fillFunc = _fillFunc;
 TextPath.prototype._strokeFunc = _strokeFunc;
 TextPath.prototype._fillFuncHit = _fillFunc;
 TextPath.prototype._strokeFuncHit = _strokeFunc;
 TextPath.prototype.className = 'TextPath';
 TextPath.prototype._attrsAffectingSize = ['text', 'fontSize', 'data'];
-_registerNode(TextPath);
-Factory.addGetterSetter(TextPath, 'data');
-Factory.addGetterSetter(TextPath, 'fontFamily', 'Arial');
-Factory.addGetterSetter(TextPath, 'fontSize', 12, getNumberValidator());
-Factory.addGetterSetter(TextPath, 'fontStyle', NORMAL);
-Factory.addGetterSetter(TextPath, 'align', 'left');
-Factory.addGetterSetter(TextPath, 'letterSpacing', 0, getNumberValidator());
-Factory.addGetterSetter(TextPath, 'textBaseline', 'middle');
-Factory.addGetterSetter(TextPath, 'fontVariant', NORMAL);
-Factory.addGetterSetter(TextPath, 'text', EMPTY_STRING);
-Factory.addGetterSetter(TextPath, 'textDecoration', null);
-Factory.addGetterSetter(TextPath, 'kerningFunc', null);
+(0, Global_1._registerNode)(TextPath);
+Factory_1.Factory.addGetterSetter(TextPath, 'data');
+Factory_1.Factory.addGetterSetter(TextPath, 'fontFamily', 'Arial');
+Factory_1.Factory.addGetterSetter(TextPath, 'fontSize', 12, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(TextPath, 'fontStyle', NORMAL);
+Factory_1.Factory.addGetterSetter(TextPath, 'align', 'left');
+Factory_1.Factory.addGetterSetter(TextPath, 'letterSpacing', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(TextPath, 'textBaseline', 'middle');
+Factory_1.Factory.addGetterSetter(TextPath, 'fontVariant', NORMAL);
+Factory_1.Factory.addGetterSetter(TextPath, 'text', EMPTY_STRING);
+Factory_1.Factory.addGetterSetter(TextPath, 'textDecoration', null);
+Factory_1.Factory.addGetterSetter(TextPath, 'kerningFunc', null);

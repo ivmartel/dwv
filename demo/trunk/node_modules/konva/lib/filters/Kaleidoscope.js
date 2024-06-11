@@ -1,7 +1,10 @@
-import { Factory } from '../Factory.js';
-import { Node } from '../Node.js';
-import { Util } from '../Util.js';
-import { getNumberValidator } from '../Validators.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Kaleidoscope = void 0;
+const Factory_1 = require("../Factory");
+const Node_1 = require("../Node");
+const Util_1 = require("../Util");
+const Validators_1 = require("../Validators");
 var ToPolar = function (src, dst, opt) {
     var srcPixels = src.data, dstPixels = dst.data, xSize = src.width, ySize = src.height, xMid = opt.polarCenterX || xSize / 2, yMid = opt.polarCenterY || ySize / 2, i, x, y, r = 0, g = 0, b = 0, a = 0;
     var rad, rMax = Math.sqrt(xMid * xMid + yMid * yMid);
@@ -61,7 +64,7 @@ var FromPolar = function (src, dst, opt) {
         }
     }
 };
-export const Kaleidoscope = function (imageData) {
+const Kaleidoscope = function (imageData) {
     var xSize = imageData.width, ySize = imageData.height;
     var x, y, xoff, i, r, g, b, a, srcPos, dstPos;
     var power = Math.round(this.kaleidoscopePower());
@@ -70,13 +73,13 @@ export const Kaleidoscope = function (imageData) {
     if (power < 1) {
         return;
     }
-    var tempCanvas = Util.createCanvasElement();
+    var tempCanvas = Util_1.Util.createCanvasElement();
     tempCanvas.width = xSize;
     tempCanvas.height = ySize;
     var scratchData = tempCanvas
         .getContext('2d')
         .getImageData(0, 0, xSize, ySize);
-    Util.releaseCanvas(tempCanvas);
+    Util_1.Util.releaseCanvas(tempCanvas);
     ToPolar(imageData, scratchData, {
         polarCenterX: xSize / 2,
         polarCenterY: ySize / 2,
@@ -129,5 +132,6 @@ export const Kaleidoscope = function (imageData) {
     }
     FromPolar(scratchData, imageData, { polarRotation: 0 });
 };
-Factory.addGetterSetter(Node, 'kaleidoscopePower', 2, getNumberValidator(), Factory.afterSetFilter);
-Factory.addGetterSetter(Node, 'kaleidoscopeAngle', 0, getNumberValidator(), Factory.afterSetFilter);
+exports.Kaleidoscope = Kaleidoscope;
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'kaleidoscopePower', 2, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'kaleidoscopeAngle', 0, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);

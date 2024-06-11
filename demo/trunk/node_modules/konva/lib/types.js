@@ -1,4 +1,7 @@
-export var KonvaNodeEvent;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KonvaNodeEvent = void 0;
+var KonvaNodeEvent;
 (function (KonvaNodeEvent) {
     KonvaNodeEvent["mouseover"] = "mouseover";
     KonvaNodeEvent["mouseout"] = "mouseout";
@@ -19,4 +22,4 @@ export var KonvaNodeEvent;
     KonvaNodeEvent["dragstart"] = "dragstart";
     KonvaNodeEvent["dragmove"] = "dragmove";
     KonvaNodeEvent["dragend"] = "dragend";
-})(KonvaNodeEvent || (KonvaNodeEvent = {}));
+})(KonvaNodeEvent || (exports.KonvaNodeEvent = KonvaNodeEvent = {}));

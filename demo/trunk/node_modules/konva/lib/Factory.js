@@ -1,14 +1,17 @@
-import { Util } from './Util.js';
-import { getComponentValidator } from './Validators.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Factory = void 0;
+const Util_1 = require("./Util");
+const Validators_1 = require("./Validators");
 var GET = 'get', SET = 'set';
-export const Factory = {
+exports.Factory = {
     addGetterSetter(constructor, attr, def, validator, after) {
-        Factory.addGetter(constructor, attr, def);
-        Factory.addSetter(constructor, attr, validator, after);
-        Factory.addOverloadedGetterSetter(constructor, attr);
+        exports.Factory.addGetter(constructor, attr, def);
+        exports.Factory.addSetter(constructor, attr, validator, after);
+        exports.Factory.addOverloadedGetterSetter(constructor, attr);
     },
     addGetter(constructor, attr, def) {
-        var method = GET + Util._capitalize(attr);
+        var method = GET + Util_1.Util._capitalize(attr);
         constructor.prototype[method] =
             constructor.prototype[method] ||
                 function () {
@@ -17,13 +20,13 @@ export const Factory = {
                 };
     },
     addSetter(constructor, attr, validator, after) {
-        var method = SET + Util._capitalize(attr);
+        var method = SET + Util_1.Util._capitalize(attr);
         if (!constructor.prototype[method]) {
-            Factory.overWriteSetter(constructor, attr, validator, after);
+            exports.Factory.overWriteSetter(constructor, attr, validator, after);
         }
     },
     overWriteSetter(constructor, attr, validator, after) {
-        var method = SET + Util._capitalize(attr);
+        var method = SET + Util_1.Util._capitalize(attr);
         constructor.prototype[method] = function (val) {
             if (validator && val !== undefined && val !== null) {
                 val = validator.call(this, val, attr);
@@ -36,7 +39,7 @@ export const Factory = {
         };
     },
     addComponentsGetterSetter(constructor, attr, components, validator, after) {
-        var len = components.length, capitalize = Util._capitalize, getter = GET + capitalize(attr), setter = SET + capitalize(attr), n, component;
+        var len = components.length, capitalize = Util_1.Util._capitalize, getter = GET + capitalize(attr), setter = SET + capitalize(attr), n, component;
         constructor.prototype[getter] = function () {
             var ret = {};
             for (n = 0; n < len; n++) {
@@ -45,7 +48,7 @@ export const Factory = {
             }
             return ret;
         };
-        var basicValidator = getComponentValidator(components);
+        var basicValidator = (0, Validators_1.getComponentValidator)(components);
         constructor.prototype[setter] = function (val) {
             var oldVal = this.attrs[attr], key;
             if (validator) {
@@ -71,10 +74,10 @@ export const Factory = {
             }
             return this;
         };
-        Factory.addOverloadedGetterSetter(constructor, attr);
+        exports.Factory.addOverloadedGetterSetter(constructor, attr);
     },
     addOverloadedGetterSetter(constructor, attr) {
-        var capitalizedAttr = Util._capitalize(attr), setter = SET + capitalizedAttr, getter = GET + capitalizedAttr;
+        var capitalizedAttr = Util_1.Util._capitalize(attr), setter = SET + capitalizedAttr, getter = GET + capitalizedAttr;
         constructor.prototype[attr] = function () {
             if (arguments.length) {
                 this[setter](arguments[0]);
@@ -84,28 +87,28 @@ export const Factory = {
         };
     },
     addDeprecatedGetterSetter(constructor, attr, def, validator) {
-        Util.error('Adding deprecated ' + attr);
-        var method = GET + Util._capitalize(attr);
+        Util_1.Util.error('Adding deprecated ' + attr);
+        var method = GET + Util_1.Util._capitalize(attr);
         var message = attr +
             ' property is deprecated and will be removed soon. Look at Konva change log for more information.';
         constructor.prototype[method] = function () {
-            Util.error(message);
+            Util_1.Util.error(message);
             var val = this.attrs[attr];
             return val === undefined ? def : val;
         };
-        Factory.addSetter(constructor, attr, validator, function () {
-            Util.error(message);
+        exports.Factory.addSetter(constructor, attr, validator, function () {
+            Util_1.Util.error(message);
         });
-        Factory.addOverloadedGetterSetter(constructor, attr);
+        exports.Factory.addOverloadedGetterSetter(constructor, attr);
     },
     backCompat(constructor, methods) {
-        Util.each(methods, function (oldMethodName, newMethodName) {
+        Util_1.Util.each(methods, function (oldMethodName, newMethodName) {
             var method = constructor.prototype[newMethodName];
-            var oldGetter = GET + Util._capitalize(oldMethodName);
-            var oldSetter = SET + Util._capitalize(oldMethodName);
+            var oldGetter = GET + Util_1.Util._capitalize(oldMethodName);
+            var oldSetter = SET + Util_1.Util._capitalize(oldMethodName);
             function deprecated() {
                 method.apply(this, arguments);
-                Util.error('"' +
+                Util_1.Util.error('"' +
                     oldMethodName +
                     '" method is deprecated and will be removed soon. Use ""' +
                     newMethodName +

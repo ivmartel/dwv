@@ -1,10 +1,13 @@
-import { Factory } from '../Factory.js';
-import { Node } from '../Node.js';
-import { getNumberValidator } from '../Validators.js';
-Factory.addGetterSetter(Node, 'hue', 0, getNumberValidator(), Factory.afterSetFilter);
-Factory.addGetterSetter(Node, 'saturation', 0, getNumberValidator(), Factory.afterSetFilter);
-Factory.addGetterSetter(Node, 'luminance', 0, getNumberValidator(), Factory.afterSetFilter);
-export const HSL = function (imageData) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HSL = void 0;
+const Factory_1 = require("../Factory");
+const Node_1 = require("../Node");
+const Validators_1 = require("../Validators");
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'hue', 0, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'saturation', 0, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);
+Factory_1.Factory.addGetterSetter(Node_1.Node, 'luminance', 0, (0, Validators_1.getNumberValidator)(), Factory_1.Factory.afterSetFilter);
+const HSL = function (imageData) {
     var data = imageData.data, nPixels = data.length, v = 1, s = Math.pow(2, this.saturation()), h = Math.abs(this.hue() + 360) % 360, l = this.luminance() * 127, i;
     var vsu = v * s * Math.cos((h * Math.PI) / 180), vsw = v * s * Math.sin((h * Math.PI) / 180);
     var rr = 0.299 * v + 0.701 * vsu + 0.167 * vsw, rg = 0.587 * v - 0.587 * vsu + 0.33 * vsw, rb = 0.114 * v - 0.114 * vsu - 0.497 * vsw;
@@ -22,3 +25,4 @@ export const HSL = function (imageData) {
         data[i + 3] = a;
     }
 };
+exports.HSL = HSL;

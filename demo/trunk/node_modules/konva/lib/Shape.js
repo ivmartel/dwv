@@ -1,10 +1,13 @@
-import { Konva } from './Global.js';
-import { Transform, Util } from './Util.js';
-import { Factory } from './Factory.js';
-import { Node } from './Node.js';
-import { getNumberValidator, getNumberOrAutoValidator, getStringValidator, getBooleanValidator, getStringOrGradientValidator, } from './Validators.js';
-import { _registerNode } from './Global.js';
-import * as PointerEvents from './PointerEvents.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Shape = exports.shapes = void 0;
+const Global_1 = require("./Global");
+const Util_1 = require("./Util");
+const Factory_1 = require("./Factory");
+const Node_1 = require("./Node");
+const Validators_1 = require("./Validators");
+const Global_2 = require("./Global");
+const PointerEvents = require("./PointerEvents");
 var HAS_SHADOW = 'hasShadow';
 var SHADOW_RGBA = 'shadowRGBA';
 var patternImage = 'patternImage';
@@ -15,12 +18,18 @@ function getDummyContext() {
     if (dummyContext) {
         return dummyContext;
     }
-    dummyContext = Util.createCanvasElement().getContext('2d');
+    dummyContext = Util_1.Util.createCanvasElement().getContext('2d');
     return dummyContext;
 }
-export const shapes = {};
+exports.shapes = {};
 function _fillFunc(context) {
-    context.fill();
+    const fillRule = this.attrs.fillRule;
+    if (fillRule) {
+        context.fill(fillRule);
+    }
+    else {
+        context.fill();
+    }
 }
 function _strokeFunc(context) {
     context.stroke();
@@ -46,25 +55,25 @@ function _clearLinearGradientCache() {
 function _clearRadialGradientCache() {
     this._clearCache(radialGradient);
 }
-export class Shape extends Node {
+class Shape extends Node_1.Node {
     constructor(config) {
         super(config);
         let key;
         while (true) {
-            key = Util.getRandomColor();
-            if (key && !(key in shapes)) {
+            key = Util_1.Util.getRandomColor();
+            if (key && !(key in exports.shapes)) {
                 break;
             }
         }
         this.colorKey = key;
-        shapes[key] = this;
+        exports.shapes[key] = this;
     }
     getContext() {
-        Util.warn('shape.getContext() method is deprecated. Please do not use it.');
+        Util_1.Util.warn('shape.getContext() method is deprecated. Please do not use it.');
         return this.getLayer().getContext();
     }
     getCanvas() {
-        Util.warn('shape.getCanvas() method is deprecated. Please do not use it.');
+        Util_1.Util.warn('shape.getCanvas() method is deprecated. Please do not use it.');
         return this.getLayer().getCanvas();
     }
     getSceneFunc() {
@@ -92,9 +101,9 @@ export class Shape extends Node {
             var ctx = getDummyContext();
             const pattern = ctx.createPattern(this.fillPatternImage(), this.fillPatternRepeat() || 'repeat');
             if (pattern && pattern.setTransform) {
-                const tr = new Transform();
+                const tr = new Util_1.Transform();
                 tr.translate(this.fillPatternX(), this.fillPatternY());
-                tr.rotate(Konva.getAngle(this.fillPatternRotation()));
+                tr.rotate(Global_1.Konva.getAngle(this.fillPatternRotation()));
                 tr.scale(this.fillPatternScaleX(), this.fillPatternScaleY());
                 tr.translate(-1 * this.fillPatternOffsetX(), -1 * this.fillPatternOffsetY());
                 const m = tr.getMatrix();
@@ -152,7 +161,7 @@ export class Shape extends Node {
         if (!this.hasShadow()) {
             return;
         }
-        var rgba = Util.colorToRGBA(this.shadowColor());
+        var rgba = Util_1.Util.colorToRGBA(this.shadowColor());
         if (rgba) {
             return ('rgba(' +
                 rgba.r +
@@ -200,23 +209,24 @@ export class Shape extends Node {
         return this.strokeEnabled() && !!width;
     }
     intersects(point) {
-        var stage = this.getStage(), bufferHitCanvas = stage.bufferHitCanvas, p;
+        var stage = this.getStage();
+        if (!stage) {
+            return false;
+        }
+        const bufferHitCanvas = stage.bufferHitCanvas;
         bufferHitCanvas.getContext().clear();
-        this.drawHit(bufferHitCanvas, null, true);
-        p = bufferHitCanvas.context.getImageData(Math.round(point.x), Math.round(point.y), 1, 1).data;
+        this.drawHit(bufferHitCanvas, undefined, true);
+        const p = bufferHitCanvas.context.getImageData(Math.round(point.x), Math.round(point.y), 1, 1).data;
         return p[3] > 0;
     }
     destroy() {
-        Node.prototype.destroy.call(this);
-        delete shapes[this.colorKey];
+        Node_1.Node.prototype.destroy.call(this);
+        delete exports.shapes[this.colorKey];
         delete this.colorKey;
         return this;
     }
     _useBufferCanvas(forceFill) {
         var _a;
-        if (!this.getStage()) {
-            return false;
-        }
         const perfectDrawEnabled = (_a = this.attrs.perfectDrawEnabled) !== null && _a !== void 0 ? _a : true;
         if (!perfectDrawEnabled) {
             return false;
@@ -235,7 +245,7 @@ export class Shape extends Node {
         return false;
     }
     setStrokeHitEnabled(val) {
-        Util.warn('strokeHitEnabled property is deprecated. Please use hitStrokeWidth instead.');
+        Util_1.Util.warn('strokeHitEnabled property is deprecated. Please use hitStrokeWidth instead.');
         if (val) {
             this.hitStrokeWidth('auto');
         }
@@ -291,8 +301,9 @@ export class Shape extends Node {
         }
         return rect;
     }
-    drawScene(can, top) {
-        var layer = this.getLayer(), canvas = can || layer.getCanvas(), context = canvas.getContext(), cachedCanvas = this._getCanvasCache(), drawFunc = this.getSceneFunc(), hasShadow = this.hasShadow(), stage, bufferCanvas, bufferContext;
+    drawScene(can, top, bufferCanvas) {
+        var layer = this.getLayer();
+        var canvas = can || layer.getCanvas(), context = canvas.getContext(), cachedCanvas = this._getCanvasCache(), drawFunc = this.getSceneFunc(), hasShadow = this.hasShadow(), stage, bufferContext;
         var skipBuffer = canvas.isCache;
         var cachingSelf = top === this;
         if (!this.isVisible() && !cachingSelf) {
@@ -312,8 +323,8 @@ export class Shape extends Node {
         context.save();
         if (this._useBufferCanvas() && !skipBuffer) {
             stage = this.getStage();
-            bufferCanvas = stage.bufferCanvas;
-            bufferContext = bufferCanvas.getContext();
+            const bc = bufferCanvas || stage.bufferCanvas;
+            bufferContext = bc.getContext();
             bufferContext.clear();
             bufferContext.save();
             bufferContext._applyLineJoin(this);
@@ -321,13 +332,13 @@ export class Shape extends Node {
             bufferContext.transform(o[0], o[1], o[2], o[3], o[4], o[5]);
             drawFunc.call(this, bufferContext, this);
             bufferContext.restore();
-            var ratio = bufferCanvas.pixelRatio;
+            var ratio = bc.pixelRatio;
             if (hasShadow) {
                 context._applyShadow(this);
             }
             context._applyOpacity(this);
             context._applyGlobalCompositeOperation(this);
-            context.drawImage(bufferCanvas._canvas, 0, 0, bufferCanvas.width / ratio, bufferCanvas.height / ratio);
+            context.drawImage(bc._canvas, 0, 0, bc.width / ratio, bc.height / ratio);
         }
         else {
             context._applyLineJoin(this);
@@ -351,7 +362,7 @@ export class Shape extends Node {
         }
         var layer = this.getLayer(), canvas = can || layer.hitCanvas, context = canvas && canvas.getContext(), drawFunc = this.hitFunc() || this.sceneFunc(), cachedCanvas = this._getCanvasCache(), cachedHitCanvas = cachedCanvas && cachedCanvas.hit;
         if (!this.colorKey) {
-            Util.warn('Looks like your canvas has a destroyed shape in it. Do not reuse shape after you destroyed it. If you want to reuse shape you should call remove() instead of destroy()');
+            Util_1.Util.warn('Looks like your canvas has a destroyed shape in it. Do not reuse shape after you destroyed it. If you want to reuse shape you should call remove() instead of destroy()');
         }
         if (cachedHitCanvas) {
             context.save();
@@ -383,7 +394,7 @@ export class Shape extends Node {
             hitImageData = hitContext.getImageData(0, 0, hitWidth, hitHeight);
             hitData = hitImageData.data;
             len = hitData.length;
-            rgbColorKey = Util._hexToRgb(this.colorKey);
+            rgbColorKey = Util_1.Util._hexToRgb(this.colorKey);
             for (i = 0; i < len; i += 4) {
                 alpha = hitData[i + 3];
                 if (alpha > alphaThreshold) {
@@ -399,7 +410,7 @@ export class Shape extends Node {
             hitContext.putImageData(hitImageData, 0, 0);
         }
         catch (e) {
-            Util.error('Unable to draw hit graph from cached scene canvas. ' + e.message);
+            Util_1.Util.error('Unable to draw hit graph from cached scene canvas. ' + e.message);
         }
         return this;
     }
@@ -413,98 +424,100 @@ export class Shape extends Node {
         PointerEvents.releaseCapture(pointerId, this);
     }
 }
+exports.Shape = Shape;
 Shape.prototype._fillFunc = _fillFunc;
 Shape.prototype._strokeFunc = _strokeFunc;
 Shape.prototype._fillFuncHit = _fillFuncHit;
 Shape.prototype._strokeFuncHit = _strokeFuncHit;
 Shape.prototype._centroid = false;
 Shape.prototype.nodeType = 'Shape';
-_registerNode(Shape);
+(0, Global_2._registerNode)(Shape);
 Shape.prototype.eventListeners = {};
 Shape.prototype.on.call(Shape.prototype, 'shadowColorChange.konva shadowBlurChange.konva shadowOffsetChange.konva shadowOpacityChange.konva shadowEnabledChange.konva', _clearHasShadowCache);
 Shape.prototype.on.call(Shape.prototype, 'shadowColorChange.konva shadowOpacityChange.konva shadowEnabledChange.konva', _clearGetShadowRGBACache);
 Shape.prototype.on.call(Shape.prototype, 'fillPriorityChange.konva fillPatternImageChange.konva fillPatternRepeatChange.konva fillPatternScaleXChange.konva fillPatternScaleYChange.konva fillPatternOffsetXChange.konva fillPatternOffsetYChange.konva fillPatternXChange.konva fillPatternYChange.konva fillPatternRotationChange.konva', _clearFillPatternCache);
 Shape.prototype.on.call(Shape.prototype, 'fillPriorityChange.konva fillLinearGradientColorStopsChange.konva fillLinearGradientStartPointXChange.konva fillLinearGradientStartPointYChange.konva fillLinearGradientEndPointXChange.konva fillLinearGradientEndPointYChange.konva', _clearLinearGradientCache);
 Shape.prototype.on.call(Shape.prototype, 'fillPriorityChange.konva fillRadialGradientColorStopsChange.konva fillRadialGradientStartPointXChange.konva fillRadialGradientStartPointYChange.konva fillRadialGradientEndPointXChange.konva fillRadialGradientEndPointYChange.konva fillRadialGradientStartRadiusChange.konva fillRadialGradientEndRadiusChange.konva', _clearRadialGradientCache);
-Factory.addGetterSetter(Shape, 'stroke', undefined, getStringOrGradientValidator());
-Factory.addGetterSetter(Shape, 'strokeWidth', 2, getNumberValidator());
-Factory.addGetterSetter(Shape, 'fillAfterStrokeEnabled', false);
-Factory.addGetterSetter(Shape, 'hitStrokeWidth', 'auto', getNumberOrAutoValidator());
-Factory.addGetterSetter(Shape, 'strokeHitEnabled', true, getBooleanValidator());
-Factory.addGetterSetter(Shape, 'perfectDrawEnabled', true, getBooleanValidator());
-Factory.addGetterSetter(Shape, 'shadowForStrokeEnabled', true, getBooleanValidator());
-Factory.addGetterSetter(Shape, 'lineJoin');
-Factory.addGetterSetter(Shape, 'lineCap');
-Factory.addGetterSetter(Shape, 'sceneFunc');
-Factory.addGetterSetter(Shape, 'hitFunc');
-Factory.addGetterSetter(Shape, 'dash');
-Factory.addGetterSetter(Shape, 'dashOffset', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'shadowColor', undefined, getStringValidator());
-Factory.addGetterSetter(Shape, 'shadowBlur', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'shadowOpacity', 1, getNumberValidator());
-Factory.addComponentsGetterSetter(Shape, 'shadowOffset', ['x', 'y']);
-Factory.addGetterSetter(Shape, 'shadowOffsetX', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'shadowOffsetY', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'fillPatternImage');
-Factory.addGetterSetter(Shape, 'fill', undefined, getStringOrGradientValidator());
-Factory.addGetterSetter(Shape, 'fillPatternX', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'fillPatternY', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'fillLinearGradientColorStops');
-Factory.addGetterSetter(Shape, 'strokeLinearGradientColorStops');
-Factory.addGetterSetter(Shape, 'fillRadialGradientStartRadius', 0);
-Factory.addGetterSetter(Shape, 'fillRadialGradientEndRadius', 0);
-Factory.addGetterSetter(Shape, 'fillRadialGradientColorStops');
-Factory.addGetterSetter(Shape, 'fillPatternRepeat', 'repeat');
-Factory.addGetterSetter(Shape, 'fillEnabled', true);
-Factory.addGetterSetter(Shape, 'strokeEnabled', true);
-Factory.addGetterSetter(Shape, 'shadowEnabled', true);
-Factory.addGetterSetter(Shape, 'dashEnabled', true);
-Factory.addGetterSetter(Shape, 'strokeScaleEnabled', true);
-Factory.addGetterSetter(Shape, 'fillPriority', 'color');
-Factory.addComponentsGetterSetter(Shape, 'fillPatternOffset', ['x', 'y']);
-Factory.addGetterSetter(Shape, 'fillPatternOffsetX', 0, getNumberValidator());
-Factory.addGetterSetter(Shape, 'fillPatternOffsetY', 0, getNumberValidator());
-Factory.addComponentsGetterSetter(Shape, 'fillPatternScale', ['x', 'y']);
-Factory.addGetterSetter(Shape, 'fillPatternScaleX', 1, getNumberValidator());
-Factory.addGetterSetter(Shape, 'fillPatternScaleY', 1, getNumberValidator());
-Factory.addComponentsGetterSetter(Shape, 'fillLinearGradientStartPoint', [
+Factory_1.Factory.addGetterSetter(Shape, 'stroke', undefined, (0, Validators_1.getStringOrGradientValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'strokeWidth', 2, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillAfterStrokeEnabled', false);
+Factory_1.Factory.addGetterSetter(Shape, 'hitStrokeWidth', 'auto', (0, Validators_1.getNumberOrAutoValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'strokeHitEnabled', true, (0, Validators_1.getBooleanValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'perfectDrawEnabled', true, (0, Validators_1.getBooleanValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'shadowForStrokeEnabled', true, (0, Validators_1.getBooleanValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'lineJoin');
+Factory_1.Factory.addGetterSetter(Shape, 'lineCap');
+Factory_1.Factory.addGetterSetter(Shape, 'sceneFunc');
+Factory_1.Factory.addGetterSetter(Shape, 'hitFunc');
+Factory_1.Factory.addGetterSetter(Shape, 'dash');
+Factory_1.Factory.addGetterSetter(Shape, 'dashOffset', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'shadowColor', undefined, (0, Validators_1.getStringValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'shadowBlur', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'shadowOpacity', 1, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'shadowOffset', ['x', 'y']);
+Factory_1.Factory.addGetterSetter(Shape, 'shadowOffsetX', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'shadowOffsetY', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternImage');
+Factory_1.Factory.addGetterSetter(Shape, 'fill', undefined, (0, Validators_1.getStringOrGradientValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternX', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternY', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillLinearGradientColorStops');
+Factory_1.Factory.addGetterSetter(Shape, 'strokeLinearGradientColorStops');
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientStartRadius', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientEndRadius', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientColorStops');
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternRepeat', 'repeat');
+Factory_1.Factory.addGetterSetter(Shape, 'fillEnabled', true);
+Factory_1.Factory.addGetterSetter(Shape, 'strokeEnabled', true);
+Factory_1.Factory.addGetterSetter(Shape, 'shadowEnabled', true);
+Factory_1.Factory.addGetterSetter(Shape, 'dashEnabled', true);
+Factory_1.Factory.addGetterSetter(Shape, 'strokeScaleEnabled', true);
+Factory_1.Factory.addGetterSetter(Shape, 'fillPriority', 'color');
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'fillPatternOffset', ['x', 'y']);
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternOffsetX', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternOffsetY', 0, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'fillPatternScale', ['x', 'y']);
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternScaleX', 1, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternScaleY', 1, (0, Validators_1.getNumberValidator)());
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'fillLinearGradientStartPoint', [
     'x',
     'y',
 ]);
-Factory.addComponentsGetterSetter(Shape, 'strokeLinearGradientStartPoint', [
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'strokeLinearGradientStartPoint', [
     'x',
     'y',
 ]);
-Factory.addGetterSetter(Shape, 'fillLinearGradientStartPointX', 0);
-Factory.addGetterSetter(Shape, 'strokeLinearGradientStartPointX', 0);
-Factory.addGetterSetter(Shape, 'fillLinearGradientStartPointY', 0);
-Factory.addGetterSetter(Shape, 'strokeLinearGradientStartPointY', 0);
-Factory.addComponentsGetterSetter(Shape, 'fillLinearGradientEndPoint', [
+Factory_1.Factory.addGetterSetter(Shape, 'fillLinearGradientStartPointX', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'strokeLinearGradientStartPointX', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillLinearGradientStartPointY', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'strokeLinearGradientStartPointY', 0);
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'fillLinearGradientEndPoint', [
     'x',
     'y',
 ]);
-Factory.addComponentsGetterSetter(Shape, 'strokeLinearGradientEndPoint', [
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'strokeLinearGradientEndPoint', [
     'x',
     'y',
 ]);
-Factory.addGetterSetter(Shape, 'fillLinearGradientEndPointX', 0);
-Factory.addGetterSetter(Shape, 'strokeLinearGradientEndPointX', 0);
-Factory.addGetterSetter(Shape, 'fillLinearGradientEndPointY', 0);
-Factory.addGetterSetter(Shape, 'strokeLinearGradientEndPointY', 0);
-Factory.addComponentsGetterSetter(Shape, 'fillRadialGradientStartPoint', [
+Factory_1.Factory.addGetterSetter(Shape, 'fillLinearGradientEndPointX', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'strokeLinearGradientEndPointX', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillLinearGradientEndPointY', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'strokeLinearGradientEndPointY', 0);
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'fillRadialGradientStartPoint', [
     'x',
     'y',
 ]);
-Factory.addGetterSetter(Shape, 'fillRadialGradientStartPointX', 0);
-Factory.addGetterSetter(Shape, 'fillRadialGradientStartPointY', 0);
-Factory.addComponentsGetterSetter(Shape, 'fillRadialGradientEndPoint', [
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientStartPointX', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientStartPointY', 0);
+Factory_1.Factory.addComponentsGetterSetter(Shape, 'fillRadialGradientEndPoint', [
     'x',
     'y',
 ]);
-Factory.addGetterSetter(Shape, 'fillRadialGradientEndPointX', 0);
-Factory.addGetterSetter(Shape, 'fillRadialGradientEndPointY', 0);
-Factory.addGetterSetter(Shape, 'fillPatternRotation', 0);
-Factory.backCompat(Shape, {
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientEndPointX', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillRadialGradientEndPointY', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillPatternRotation', 0);
+Factory_1.Factory.addGetterSetter(Shape, 'fillRule', undefined, (0, Validators_1.getStringValidator)());
+Factory_1.Factory.backCompat(Shape, {
     dashArray: 'dash',
     getDashArray: 'getDash',
     setDashArray: 'getDash',

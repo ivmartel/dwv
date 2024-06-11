@@ -1,19 +1,25 @@
-import { Konva } from './Global.js';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.releaseCapture = exports.setPointerCapture = exports.hasPointerCapture = exports.createEvent = exports.getCapturedShape = void 0;
+const Global_1 = require("./Global");
 const Captures = new Map();
-const SUPPORT_POINTER_EVENTS = Konva._global['PointerEvent'] !== undefined;
-export function getCapturedShape(pointerId) {
+const SUPPORT_POINTER_EVENTS = Global_1.Konva._global['PointerEvent'] !== undefined;
+function getCapturedShape(pointerId) {
     return Captures.get(pointerId);
 }
-export function createEvent(evt) {
+exports.getCapturedShape = getCapturedShape;
+function createEvent(evt) {
     return {
         evt,
         pointerId: evt.pointerId,
     };
 }
-export function hasPointerCapture(pointerId, shape) {
+exports.createEvent = createEvent;
+function hasPointerCapture(pointerId, shape) {
     return Captures.get(pointerId) === shape;
 }
-export function setPointerCapture(pointerId, shape) {
+exports.hasPointerCapture = hasPointerCapture;
+function setPointerCapture(pointerId, shape) {
     releaseCapture(pointerId);
     const stage = shape.getStage();
     if (!stage)
@@ -23,7 +29,8 @@ export function setPointerCapture(pointerId, shape) {
         shape._fire('gotpointercapture', createEvent(new PointerEvent('gotpointercapture')));
     }
 }
-export function releaseCapture(pointerId, target) {
+exports.setPointerCapture = setPointerCapture;
+function releaseCapture(pointerId, target) {
     const shape = Captures.get(pointerId);
     if (!shape)
         return;
@@ -35,3 +42,4 @@ export function releaseCapture(pointerId, target) {
         shape._fire('lostpointercapture', createEvent(new PointerEvent('lostpointercapture')));
     }
 }
+exports.releaseCapture = releaseCapture;

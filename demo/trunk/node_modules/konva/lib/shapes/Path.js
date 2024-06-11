@@ -1,23 +1,23 @@
-import { Factory } from '../Factory.js';
-import { Shape } from '../Shape.js';
-import { _registerNode } from '../Global.js';
-export class Path extends Shape {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Path = void 0;
+const Factory_1 = require("../Factory");
+const Shape_1 = require("../Shape");
+const Global_1 = require("../Global");
+const BezierFunctions_1 = require("../BezierFunctions");
+class Path extends Shape_1.Shape {
     constructor(config) {
         super(config);
         this.dataArray = [];
         this.pathLength = 0;
-        this.dataArray = Path.parsePathData(this.data());
-        this.pathLength = 0;
-        for (var i = 0; i < this.dataArray.length; ++i) {
-            this.pathLength += this.dataArray[i].pathLength;
-        }
+        this._readDataAttribute();
         this.on('dataChange.konva', function () {
-            this.dataArray = Path.parsePathData(this.data());
-            this.pathLength = 0;
-            for (var i = 0; i < this.dataArray.length; ++i) {
-                this.pathLength += this.dataArray[i].pathLength;
-            }
+            this._readDataAttribute();
         });
+    }
+    _readDataAttribute() {
+        this.dataArray = Path.parsePathData(this.data());
+        this.pathLength = Path.getPathLength(this.dataArray);
     }
     _sceneFunc(context) {
         var ca = this.dataArray;
@@ -127,46 +127,60 @@ export class Path extends Shape {
         return this.pathLength;
     }
     getPointAtLength(length) {
-        var point, i = 0, ii = this.dataArray.length;
+        return Path.getPointAtLengthOfDataArray(length, this.dataArray);
+    }
+    static getLineLength(x1, y1, x2, y2) {
+        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    }
+    static getPathLength(dataArray) {
+        let pathLength = 0;
+        for (var i = 0; i < dataArray.length; ++i) {
+            pathLength += dataArray[i].pathLength;
+        }
+        return pathLength;
+    }
+    static getPointAtLengthOfDataArray(length, dataArray) {
+        var point, i = 0, ii = dataArray.length;
         if (!ii) {
             return null;
         }
-        while (i < ii && length > this.dataArray[i].pathLength) {
-            length -= this.dataArray[i].pathLength;
+        while (i < ii && length > dataArray[i].pathLength) {
+            length -= dataArray[i].pathLength;
             ++i;
         }
         if (i === ii) {
-            point = this.dataArray[i - 1].points.slice(-2);
+            point = dataArray[i - 1].points.slice(-2);
             return {
                 x: point[0],
                 y: point[1],
             };
         }
         if (length < 0.01) {
-            point = this.dataArray[i].points.slice(0, 2);
+            point = dataArray[i].points.slice(0, 2);
             return {
                 x: point[0],
                 y: point[1],
             };
         }
-        var cp = this.dataArray[i];
+        var cp = dataArray[i];
         var p = cp.points;
         switch (cp.command) {
             case 'L':
                 return Path.getPointOnLine(length, cp.start.x, cp.start.y, p[0], p[1]);
             case 'C':
-                return Path.getPointOnCubicBezier(length / cp.pathLength, cp.start.x, cp.start.y, p[0], p[1], p[2], p[3], p[4], p[5]);
+                return Path.getPointOnCubicBezier((0, BezierFunctions_1.t2length)(length, Path.getPathLength(dataArray), (i) => {
+                    return (0, BezierFunctions_1.getCubicArcLength)([cp.start.x, p[0], p[2], p[4]], [cp.start.y, p[1], p[3], p[5]], i);
+                }), cp.start.x, cp.start.y, p[0], p[1], p[2], p[3], p[4], p[5]);
             case 'Q':
-                return Path.getPointOnQuadraticBezier(length / cp.pathLength, cp.start.x, cp.start.y, p[0], p[1], p[2], p[3]);
+                return Path.getPointOnQuadraticBezier((0, BezierFunctions_1.t2length)(length, Path.getPathLength(dataArray), (i) => {
+                    return (0, BezierFunctions_1.getQuadraticArcLength)([cp.start.x, p[0], p[2]], [cp.start.y, p[1], p[3]], i);
+                }), cp.start.x, cp.start.y, p[0], p[1], p[2], p[3]);
             case 'A':
                 var cx = p[0], cy = p[1], rx = p[2], ry = p[3], theta = p[4], dTheta = p[5], psi = p[6];
                 theta += (dTheta * length) / cp.pathLength;
                 return Path.getPointOnEllipticalArc(cx, cy, rx, ry, theta, psi);
         }
         return null;
-    }
-    static getLineLength(x1, y1, x2, y2) {
-        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
     static getPointOnLine(dist, P1x, P1y, P2x, P2y, fromX, fromY) {
         if (fromX === undefined) {
@@ -327,7 +341,7 @@ export class Path extends Shape {
                 if (isNaN(p[0])) {
                     break;
                 }
-                var cmd = null;
+                var cmd = '';
                 var points = [];
                 var startX = cpx, startY = cpy;
                 var prevCmd, ctlPtx, ctlPty;
@@ -524,23 +538,9 @@ export class Path extends Shape {
             case 'L':
                 return path.getLineLength(x, y, points[0], points[1]);
             case 'C':
-                len = 0.0;
-                p1 = path.getPointOnCubicBezier(0, x, y, points[0], points[1], points[2], points[3], points[4], points[5]);
-                for (t = 0.01; t <= 1; t += 0.01) {
-                    p2 = path.getPointOnCubicBezier(t, x, y, points[0], points[1], points[2], points[3], points[4], points[5]);
-                    len += path.getLineLength(p1.x, p1.y, p2.x, p2.y);
-                    p1 = p2;
-                }
-                return len;
+                return (0, BezierFunctions_1.getCubicArcLength)([x, points[0], points[2], points[4]], [y, points[1], points[3], points[5]], 1);
             case 'Q':
-                len = 0.0;
-                p1 = path.getPointOnQuadraticBezier(0, x, y, points[0], points[1], points[2], points[3]);
-                for (t = 0.01; t <= 1; t += 0.01) {
-                    p2 = path.getPointOnQuadraticBezier(t, x, y, points[0], points[1], points[2], points[3]);
-                    len += path.getLineLength(p1.x, p1.y, p2.x, p2.y);
-                    p1 = p2;
-                }
-                return len;
+                return (0, BezierFunctions_1.getQuadraticArcLength)([x, points[0], points[2]], [y, points[1], points[3]], 1);
             case 'A':
                 len = 0.0;
                 var start = points[4];
@@ -621,7 +621,8 @@ export class Path extends Shape {
         return [cx, cy, rx, ry, theta, dTheta, psi, fs];
     }
 }
+exports.Path = Path;
 Path.prototype.className = 'Path';
 Path.prototype._attrsAffectingSize = ['data'];
-_registerNode(Path);
-Factory.addGetterSetter(Path, 'data');
+(0, Global_1._registerNode)(Path);
+Factory_1.Factory.addGetterSetter(Path, 'data');
