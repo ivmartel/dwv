@@ -89,6 +89,7 @@ export class JSONTextLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if the file has a 'json' extension.
    *
    * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
@@ -100,6 +101,11 @@ export class JSONTextLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'json',
+   * - the `options.requestHeaders` contains a 'Accept: application/json' or
+   *   'Accept: application/dicom+json',
+   * - the url has a 'json' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.

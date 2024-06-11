@@ -12,7 +12,7 @@ import {WindowLevel} from './windowLevel';
  * else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * ```
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html}.
  */
 export class VoiLut {
 

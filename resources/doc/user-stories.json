@@ -197,7 +197,7 @@
       "id": "DWV-REQ-UI-05-002",
       "name": "Window/Level presets",
       "group": "ui",
-      "description": "Specific window/level data pre-sets must be made available. They are modality specific. For examples see: [radiantviewer](http://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.htm) or this [thread](http://forum.dicom-cd.de/viewtopic.php?p=9998&sid=28bfed23e680aae327c66d5ab7d28396)."
+      "description": "Specific window/level data pre-sets must be made available. Only data with CT modality will provide some. They are ['name' (window center, window width)]:\n- 'mediastinum' (40, 400),\n- 'lung' (-500, 1500),\n- 'bone' (500, 2000),\n- 'brain' (40, 80),\n- 'head' (90, 350)."
     },
     {
       "id": "DWV-REQ-UI-05-003",

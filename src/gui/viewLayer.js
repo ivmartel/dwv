@@ -220,12 +220,15 @@ export class ViewLayer {
   }
 
   /**
-   * Get the layer zoom offset.
+   * Get the layer zoom offset without the fit scale.
    *
    * @returns {Scalar2D} The offset as {x,y}.
    */
-  getZoomOffset() {
-    return this.#zoomOffset;
+  getAbsoluteZoomOffset() {
+    return {
+      x: this.#zoomOffset.x * this.#fitScale.x,
+      y: this.#zoomOffset.y * this.#fitScale.y
+    };
   }
 
   /**
@@ -255,7 +258,7 @@ export class ViewLayer {
       view.addEventListener(viewEventNames[j], this.#fireEvent);
     }
     // create view controller
-    this.#viewController = new ViewController(view, dataId);
+    this.#viewController = new ViewController(view);
     // bind layer and image
     this.bindImage();
   }
@@ -287,7 +290,7 @@ export class ViewLayer {
   onimageset = (event) => {
     // event.value = [index, image]
     if (this.#dataId === event.dataid) {
-      this.#viewController.setImage(event.value[0], this.#dataId);
+      this.#viewController.setImage(event.value[0]);
       this.#setBaseSize(this.#viewController.getImageSize().get2D());
       this.#needsDataUpdate = true;
     }
@@ -530,13 +533,13 @@ export class ViewLayer {
   }
 
   /**
-   * Initialise the layer scale. Works with a zoom offset that
-   * comes from a equal view layer (size, scale, offset...).
+   * Initialise the layer scale.
    *
    * @param {Scalar3D} newScale The scale as {x,y,z}.
-   * @param {Scalar2D} zoomOffset The zoom offset as {x,y}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
    */
-  initScale(newScale, zoomOffset) {
+  initScale(newScale, absoluteZoomOffset) {
     const helper = this.#viewController.getPlaneHelper();
     const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
       x: newScale.x * this.#flipScale.x,
@@ -549,10 +552,13 @@ export class ViewLayer {
     };
     this.#scale = finalNewScale;
 
-    this.#zoomOffset = zoomOffset;
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
     this.#offset = {
-      x: this.#offset.x + zoomOffset.x,
-      y: this.#offset.y + zoomOffset.y
+      x: this.#offset.x + this.#zoomOffset.x,
+      y: this.#offset.y + this.#zoomOffset.y
     };
   }
 

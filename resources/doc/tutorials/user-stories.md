@@ -152,7 +152,12 @@ The user can change the window/level of the displayed data via specific interact
 The user must be able to reset the window/level to their original values.
 
 ### DWV-REQ-UI-05-002 Window/Level presets
-Specific window/level data pre-sets must be made available. They are modality specific. For examples see: [radiantviewer](http://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.htm) or this [thread](http://forum.dicom-cd.de/viewtopic.php?p=9998&sid=28bfed23e680aae327c66d5ab7d28396).
+Specific window/level data pre-sets must be made available. Only data with CT modality will provide some. They are ['name' (window center, window width)]:
+- 'mediastinum' (40, 400),
+- 'lung' (-500, 1500),
+- 'bone' (500, 2000),
+- 'brain' (40, 80),
+- 'head' (90, 350).
 
 ### DWV-REQ-UI-05-003 Slice scroll tool
 The user can change the current position via specific interaction on the image `<canvas>`:

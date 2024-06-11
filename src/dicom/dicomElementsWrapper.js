@@ -696,7 +696,7 @@ export function getOrientationMatrix(dataElements) {
   const imageOrientationPatient = dataElements['00200037'];
   let orientationMatrix;
   // slice orientation (cosines are matrices' columns)
-  // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
+  // http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   if (typeof imageOrientationPatient !== 'undefined') {
     orientationMatrix =
       getOrientationFromCosines(

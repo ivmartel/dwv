@@ -144,6 +144,7 @@ export class ZipLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * True if the file has a 'zip' extension.
    *
    * @param {File} file The file to check.
    * @returns {boolean} True if the file can be loaded.
@@ -155,6 +156,11 @@ export class ZipLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'zip',
+   * - the `options.requestHeaders` contains an item
+   *   starting with 'Accept: application/zip'.
+   * - the url has a 'zip' extension.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.
@@ -282,4 +288,4 @@ export class ZipLoader {
    */
   onabort(_event) {}
 
-} // class DicomDataLoader
+} // class ZipLoader

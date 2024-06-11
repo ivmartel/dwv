@@ -2,22 +2,22 @@
 
 ## Context
 
-Date: Wed Apr 24 2024 18:53:30 GMT+0200 (Central European Summer Time)
+Date: Thu Jun 06 2024 18:05:34 GMT+0200 (Central European Summer Time)
 
-Commit: [391c7b6](git://github.com/ivmartel/dwv.git/commit/391c7b6ec2bdcb6dd61effb44be7bc4b5a422498)
+Commit: [677e076](git://github.com/ivmartel/dwv.git/commit/677e076a81724d1e2b659aca942d899175d203ea)
 
-Browser: Chrome Headless 124.0.6367.60 (Linux x86_64)
+Browser: Chrome Headless 125.0.6422.112 (Linux x86_64)
 
 ## Summary
-Success: 155 ✅
+Success: 163 ✅
 
 Failed: 0 ❌
 
-(total: 155, skipped: 0, total time: 1591ms)
+(total: 163, skipped: 0, total time: 1650ms)
 
 ## Tests details
 
-(33 / 155 tests with requirement(s), 122 tests with no requirement)
+(37 / 163 tests with requirement(s), 126 tests with no requirement)
 
 ### utils
 
@@ -94,7 +94,7 @@ Failed: 0 ❌
 (⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~geturlfromuri))
 
 - splitUri: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~splituri))
+(URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~splituri))
 
 - getURIQuery: ✅ 
 (URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme), [jsdoc](module-tests_utils.html#~geturiquery))
@@ -160,8 +160,11 @@ Failed: 0 ❌
 - Matrix33 factories: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-factories))
 
-- Matrix33 getOrientationStringLPS: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~matrix33-getorientationstringlps))
+- orientation matrix factories: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~orientation-matrix-factories))
+
+- getOrientationStringLPS: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationstringlps))
 
 - Path class: ✅ 
 (URS [#DWV-REQ-UI-07-004 (Draw free hand)](tutorial-user-stories.html#dwv-req-ui-07-004-draw-free-hand), [jsdoc](module-tests_math.html#~path-class))
@@ -234,6 +237,9 @@ Failed: 0 ❌
 - DICOMDIR parsing: ✅ 
 (URS [#DWV-REQ-IO-02-004 (Load DICOMDIR URL)](tutorial-user-stories.html#dwv-req-io-02-004-load-dicomdir-url), [jsdoc](module-tests_dicom.html#~dicomdir-parsing))
 
+- getOrientationName: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getorientationname))
+
 - DICOM segment class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-segment-class))
 
@@ -275,6 +281,34 @@ Failed: 0 ❌
 
 - Read/write synthetic explicit big endian with rules: ✅ 
 (URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~read%2Fwrite-synthetic-explicit-big-endian-with-rules))
+### io
+
+- DICOM loader canloadurl: ✅ 
+(URS [#DWV-REQ-IO-02-001 (Load DICOM discrete URL(s))](tutorial-user-stories.html#dwv-req-io-02-001-load-dicom-discrete-url(s)), [jsdoc](module-tests_io.html#~dicom-loader-canloadurl))
+
+- JSON loader canloadurl: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~json-loader-canloadurl))
+
+- MemoryLoader events single frame: ✅ 
+(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-single-frame))
+
+- MemoryLoader events multi frame: ✅ 
+(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-multi-frame))
+
+- MemoryLoader events zip: ✅ 
+(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-zip))
+
+- Multipart loader canloadurl: ✅ 
+(URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url), [jsdoc](module-tests_io.html#~multipart-loader-canloadurl))
+
+- RAW image loader canloadurl: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~raw-image-loader-canloadurl))
+
+- RAW image loader canloadurl: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_io.html#~raw-image-loader-canloadurl))
+
+- ZIP loader canloadurl: ✅ 
+(URS [#DWV-REQ-IO-02-003 (Load DICOM ZIP URL)](tutorial-user-stories.html#dwv-req-io-02-003-load-dicom-zip-url), [jsdoc](module-tests_io.html#~zip-loader-canloadurl))
 ### gui
 
 - canCreateCanvas: ✅ 
@@ -367,135 +401,125 @@ Failed: 0 ❌
 
 - Generate data timing: ✅ 
 (URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image), [jsdoc](module-tests_image.html#~generate-data-timing))
-### io
-
-- MemoryLoader events single frame: ✅ 
-(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-single-frame))
-
-- MemoryLoader events multi frame: ✅ 
-(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-multi-frame))
-
-- MemoryLoader events zip: ✅ 
-(URS [#DWV-REQ-IO-04-001 (DICOM load start event)](tutorial-user-stories.html#dwv-req-io-04-001-dicom-load-start-event), [jsdoc](module-tests_io.html#~memoryloader-events-zip))
 ### state
 
-- Read v0.1 state line: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.1-state-line))
+- Read v01 state line: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-line))
 
-- Read v0.1 state roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.1-state-roi))
+- Read v01 state roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-roi))
 
-- Read v0.1 state ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.1-state-ellipse))
+- Read v01 state ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-ellipse))
 
-- Read v0.1 state protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.1-state-protractor))
+- Read v01 state protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-protractor))
 
-- Read v0.1 state rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.1-state-rectangle))
+- Read v01 state rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-rectangle))
 
-- Read v0.1 state line multi-slice: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.1-state-line-multi-slice))
+- Read v01 state line multi-slice: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v01-state-line-multi-slice))
 
-- Read v0.2 state arrow: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-arrow))
+- Read v02 state arrow: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-arrow))
 
-- Read v0.2 state ruler: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-ruler))
+- Read v02 state ruler: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-ruler))
 
-- Read v0.2 state roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-roi))
+- Read v02 state roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-roi))
 
-- Read v0.2 state hand: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-hand))
+- Read v02 state hand: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-hand))
 
-- Read v0.2 state ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-ellipse))
+- Read v02 state ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-ellipse))
 
-- Read v0.2 state protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-protractor))
+- Read v02 state protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-protractor))
 
-- Read v0.2 state rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-rectangle))
+- Read v02 state rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-rectangle))
 
-- Read v0.2 state ruler multi-slice: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.2-state-ruler-multi-slice))
+- Read v02 state ruler multi-slice: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v02-state-ruler-multi-slice))
 
-- Read v0.3 state arrow: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-arrow))
+- Read v03 state arrow: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-arrow))
 
-- Read v0.3 state ruler: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-ruler))
+- Read v03 state ruler: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-ruler))
 
-- Read v0.3 state roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-roi))
+- Read v03 state roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-roi))
 
-- Read v0.3 state hand: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-hand))
+- Read v03 state hand: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-hand))
 
-- Read v0.3 state ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-ellipse))
+- Read v03 state ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-ellipse))
 
-- Read v0.3 state protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-protractor))
+- Read v03 state protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-protractor))
 
-- Read v0.3 state rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-rectangle))
+- Read v03 state rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-rectangle))
 
-- Read v0.3 state ruler multi-slice: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.3-state-ruler-multi-slice))
+- Read v03 state ruler multi-slice: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v03-state-ruler-multi-slice))
 
-- Read v0.4 state arrow: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-arrow))
+- Read v04 state arrow: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-arrow))
 
-- Read v0.4 state ruler: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-ruler))
+- Read v04 state ruler: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-ruler))
 
-- Read v0.4 state roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-roi))
+- Read v04 state roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-roi))
 
-- Read v0.4 state hand: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-hand))
+- Read v04 state hand: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-hand))
 
-- Read v0.4 state ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-ellipse))
+- Read v04 state ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-ellipse))
 
-- Read v0.4 state protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-protractor))
+- Read v04 state protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-protractor))
 
-- Read v0.4 state rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-rectangle))
+- Read v04 state rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-rectangle))
 
-- Read v0.4 state ruler multi-slice: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.4-state-ruler-multi-slice))
+- Read v04 state ruler multi-slice: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v04-state-ruler-multi-slice))
 
-- Read v0.5 state arrow: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-arrow))
+- Read v05 state arrow: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-arrow))
 
-- Read v0.5 state ruler: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-ruler))
+- Read v05 state ruler: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ruler))
 
-- Read v0.5 state roi: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-roi))
+- Read v05 state roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-roi))
 
-- Read v0.5 state hand: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-hand))
+- Read v05 state hand: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-hand))
 
-- Read v0.5 state ellipse: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-ellipse))
+- Read v05 state ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ellipse))
 
-- Read v0.5 state protractor: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-protractor))
+- Read v05 state protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-protractor))
 
-- Read v0.5 state rectangle: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-rectangle))
+- Read v05 state rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-rectangle))
 
-- Read v0.5 state ruler multi-slice: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v0.5-state-ruler-multi-slice))
+- Read v05 state ruler multi-slice: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_state.html#~read-v05-state-ruler-multi-slice))
 
 ## Traceability
 
-(17 / 50 tested requirements)
+(19 / 50 tested requirements)
 
 ### io
 
@@ -513,18 +537,20 @@ URS [#DWV-REQ-IO-01-002 (Load DICOM ZIP file)](tutorial-user-stories.html#dwv-re
  ⚠️ No tests
 
 URS [#DWV-REQ-IO-02-001 (Load DICOM discrete URL(s))](tutorial-user-stories.html#dwv-req-io-02-001-load-dicom-discrete-url(s)):
- ⚠️ No tests
+ ✅ DICOM loader canloadurl 
 
 URS [#DWV-REQ-IO-02-002 (Load DICOM multipart URL)](tutorial-user-stories.html#dwv-req-io-02-002-load-dicom-multipart-url):
  ✅ Parse multipart 
+ ✅ Multipart loader canloadurl 
 
 URS [#DWV-REQ-IO-02-003 (Load DICOM ZIP URL)](tutorial-user-stories.html#dwv-req-io-02-003-load-dicom-zip-url):
- ⚠️ No tests
+ ✅ ZIP loader canloadurl 
 
 URS [#DWV-REQ-IO-02-004 (Load DICOMDIR URL)](tutorial-user-stories.html#dwv-req-io-02-004-load-dicomdir-url):
  ✅ DICOMDIR parsing 
 
 URS [#DWV-REQ-IO-02-005 (Window location URL scheme)](tutorial-user-stories.html#dwv-req-io-02-005-window-location-url-scheme):
+ ✅ splitUri 
  ✅ getURIQuery 
 
 URS [#DWV-REQ-IO-02-006 (Load Data Manifest URL)](tutorial-user-stories.html#dwv-req-io-02-006-load-data-manifest-url):

@@ -13,7 +13,6 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {ListenerHandler} from '../utils/listen';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -38,26 +37,11 @@ export class ViewController {
   #view;
 
   /**
-   * Associated data id.
-   *
-   * @type {string}
-   */
-  #dataId;
-
-  /**
    * Plane helper.
    *
    * @type {PlaneHelper}
    */
   #planeHelper;
-
-  /**
-   * Colour map name.
-   * Defaults to 'plain' as defined in Views' default.
-   *
-   * @type {string}
-   */
-  #colourMapName = 'plain';
 
   /**
    * Third dimension player ID (created by setInterval).
@@ -75,16 +59,14 @@ export class ViewController {
 
   /**
    * @param {View} view The associated view.
-   * @param {string} dataId The associated data id.
    */
-  constructor(view, dataId) {
+  constructor(view) {
     // check view
     if (typeof view.getImage() === 'undefined') {
       throw new Error('View does not have an image, cannot setup controller');
     }
 
     this.#view = view;
-    this.#dataId = dataId;
 
     // setup the plane helper
     this.#planeHelper = new PlaneHelper(
@@ -98,13 +80,6 @@ export class ViewController {
       this.#isMask = true;
     }
   }
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the plane helper.
@@ -281,11 +256,9 @@ export class ViewController {
    * Set the associated image.
    *
    * @param {Image} img The associated image.
-   * @param {string} dataId The data id of the image.
    */
-  setImage(img, dataId) {
+  setImage(img) {
     this.#view.setImage(img);
-    this.#dataId = dataId;
   }
 
   /**
@@ -919,37 +892,5 @@ export class ViewController {
       viewLayer.onimagegeometrychange
     );
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    event.dataid = this.#dataId;
-    this.#listenerHandler.fireEvent(event);
-  };
 
 } // class ViewController

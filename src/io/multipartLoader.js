@@ -85,6 +85,7 @@ export class MultipartLoader {
 
   /**
    * Check if the loader can load the provided file.
+   * Always returns false.
    *
    * @param {File} _file The file to check.
    * @returns {boolean} True if the file can be loaded.
@@ -95,6 +96,9 @@ export class MultipartLoader {
 
   /**
    * Check if the loader can load the provided url.
+   * True if one of the folowing conditions is true:
+   * - the `options.forceLoader` is 'multipart',
+   * - the `options.requestHeaders` contains a 'Accept: multipart/related'.
    *
    * @param {string} url The url to check.
    * @param {object} [options] Optional url request options.

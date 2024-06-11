@@ -12,7 +12,7 @@ import dwvTestBadZip from '../data/dwv-test_bad.zip';
 /**
  * Tests for the 'io/memoryLoader.js' file.
  */
-/** @module tests/io */
+
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('io');

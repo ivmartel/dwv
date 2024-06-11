@@ -282,7 +282,7 @@ export class DrawLayer {
     deleteDraws(exeCallback: object): void;
     display(flag: boolean): void;
     draw(): void;
-    fitToContainer(fitScale1D: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
@@ -974,10 +974,11 @@ export class ViewLayer {
     displayToPlanePos(point2D: Point2D): Point2D;
     displayToPlaneScale(point2D: Point2D): Point2D;
     draw(): void;
-    fitToContainer(divToWorldSizeRatio: number, fitSize: Scalar2D, fitOffset: Scalar2D): void;
+    fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     flipScaleX(): void;
     flipScaleY(): void;
     flipScaleZ(): void;
+    getAbsoluteZoomOffset(): Scalar2D;
     getBaseSize(): Scalar2D;
     getDataId(): string;
     getId(): string;
@@ -986,9 +987,8 @@ export class ViewLayer {
     getOpacity(): number;
     getScale(): Scalar2D;
     getViewController(): ViewController;
-    getZoomOffset(): Scalar2D;
     initialise(size: Scalar2D, spacing: Scalar2D, alpha: number): void;
-    initScale(newScale: Scalar3D, zoomOffset: Scalar2D): void;
+    initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     isVisible(): boolean;
     onimagecontentchange: (event: object) => void;
     onimagegeometrychange: (event: object) => void;
