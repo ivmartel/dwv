@@ -676,11 +676,8 @@ export function getSpacingFromMeasure(dataElements) {
     parseFloat(pixelSpacing.value[1]),
     parseFloat(pixelSpacing.value[0]),
   ];
-  // Slice Thickness
-  if (typeof dataElements['00180050'] !== 'undefined') {
-    spacingValues.push(parseFloat(dataElements['00180050'].value[0]));
-  } else if (typeof dataElements['00180088'] !== 'undefined') {
-    // Spacing Between Slices
+  // Spacing Between Slices
+  if (typeof dataElements['00180088'] !== 'undefined') {
     spacingValues.push(parseFloat(dataElements['00180088'].value[0]));
   }
   return new Spacing(spacingValues);
