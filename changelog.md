@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.33.1](https://github.com/ivmartel/dwv/releases/tag/v0.33.1) - 13/06/2024
+
+### Fixed
+
+- Wrong slice spacing for DICOM Seg [#1677](https://github.com/ivmartel/dwv/issues/1677)
+
 ## [v0.33.0](https://github.com/ivmartel/dwv/releases/tag/v0.33.0) - 06/06/2024
 
 ### Added
