@@ -512,8 +512,14 @@ export class MaskFactory {
     if (typeof spacing === 'undefined') {
       throw new Error('No spacing found for DICOM SEG');
     }
+    if (spacing.length() !== 3) {
+      throw new Error('Incomplete spacing found for DICOM SEG');
+    }
     if (typeof imageOrientationPatient === 'undefined') {
       throw new Error('No imageOrientationPatient found for DICOM SEG');
+    }
+    if (imageOrientationPatient.length !== 6) {
+      throw new Error('Incomplete imageOrientationPatient found for DICOM SEG');
     }
 
     // orientation
