@@ -71,6 +71,102 @@ export class DicomBufferToView {
   }
 
   /**
+   * Generate the image object from an uncompressed buffer.
+   *
+   * @param {number} index The data index.
+   * @param {string} origin The data origin.
+   */
+  #generateImageUncompressed(index, origin) {
+    // send progress
+    this.onprogress({
+      lengthComputable: true,
+      loaded: 100,
+      total: 100,
+      index: index,
+      source: origin
+    });
+    // generate image
+    this.#generateImage(index, origin);
+    // send load events
+    this.onload({
+      source: origin
+    });
+    this.onloadend({
+      source: origin
+    });
+  }
+
+  /**
+   * Generate the image object from an compressed buffer.
+   *
+   * @param {number} index The data index.
+   * @param {Array} pixelBuffer The dicom parser.
+   * @param {string} algoName The compression algorithm name.
+   */
+  #generateImageCompressed(index, pixelBuffer, algoName) {
+    const dicomParser = this.#dicomParserStore[index];
+
+    // gather pixel buffer meta data
+    const bitsAllocated =
+      dicomParser.getDicomElements()['00280100'].value[0];
+    const pixelRepresentation =
+      dicomParser.getDicomElements()['00280103'].value[0];
+    const pixelMeta = {
+      bitsAllocated: bitsAllocated,
+      isSigned: (pixelRepresentation === 1)
+    };
+    const columnsElement = dicomParser.getDicomElements()['00280011'];
+    const rowsElement = dicomParser.getDicomElements()['00280010'];
+    if (typeof columnsElement !== 'undefined' &&
+      typeof rowsElement !== 'undefined') {
+      pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
+    }
+    const samplesPerPixelElement =
+      dicomParser.getDicomElements()['00280002'];
+    if (typeof samplesPerPixelElement !== 'undefined') {
+      pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
+    }
+    const planarConfigurationElement =
+      dicomParser.getDicomElements()['00280006'];
+    if (typeof planarConfigurationElement !== 'undefined') {
+      pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
+    }
+
+    const numberOfItems = pixelBuffer.length;
+
+    // setup the decoder (one decoder per all converts)
+    if (this.#pixelDecoder === null) {
+      this.#pixelDecoder = new PixelBufferDecoder(
+        algoName, numberOfItems);
+      // callbacks
+      // pixelDecoder.ondecodestart: nothing to do
+      this.#pixelDecoder.ondecodeditem = (event) => {
+        this.#onDecodedItem(event);
+        // send onload and onloadend when all items have been decoded
+        if (event.itemNumber + 1 === event.numberOfItems) {
+          this.onload(event);
+          this.onloadend(event);
+        }
+      };
+      // pixelDecoder.ondecoded: nothing to do
+      // pixelDecoder.ondecodeend: nothing to do
+      this.#pixelDecoder.onerror = this.onerror;
+      this.#pixelDecoder.onabort = this.onabort;
+    }
+
+    // launch decode
+    for (let i = 0; i < numberOfItems; ++i) {
+      this.#pixelDecoder.decode(pixelBuffer[i], pixelMeta,
+        {
+          itemNumber: i,
+          numberOfItems: numberOfItems,
+          index: index
+        }
+      );
+    }
+  }
+
+  /**
    * Generate the image object.
    *
    * @param {number} index The data index.
@@ -225,84 +321,12 @@ export class DicomBufferToView {
     this.#factories[dataIndex] = factory;
 
     if (needDecompression) {
-      // gather pixel buffer meta data
-      const bitsAllocated =
-        dicomParser.getDicomElements()['00280100'].value[0];
-      const pixelRepresentation =
-        dicomParser.getDicomElements()['00280103'].value[0];
-      const pixelMeta = {
-        bitsAllocated: bitsAllocated,
-        isSigned: (pixelRepresentation === 1)
-      };
-      const columnsElement = dicomParser.getDicomElements()['00280011'];
-      const rowsElement = dicomParser.getDicomElements()['00280010'];
-      if (typeof columnsElement !== 'undefined' &&
-        typeof rowsElement !== 'undefined') {
-        pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
-      }
-      const samplesPerPixelElement =
-        dicomParser.getDicomElements()['00280002'];
-      if (typeof samplesPerPixelElement !== 'undefined') {
-        pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
-      }
-      const planarConfigurationElement =
-        dicomParser.getDicomElements()['00280006'];
-      if (typeof planarConfigurationElement !== 'undefined') {
-        pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
-      }
-
-      // number of items
-      const numberOfItems = pixelBuffer.length;
-
-      // setup the decoder (one decoder per all converts)
-      if (this.#pixelDecoder === null) {
-        this.#pixelDecoder = new PixelBufferDecoder(
-          algoName, numberOfItems);
-        // callbacks
-        // pixelDecoder.ondecodestart: nothing to do
-        this.#pixelDecoder.ondecodeditem = (event) => {
-          this.#onDecodedItem(event);
-          // send onload and onloadend when all items have been decoded
-          if (event.itemNumber + 1 === event.numberOfItems) {
-            this.onload(event);
-            this.onloadend(event);
-          }
-        };
-        // pixelDecoder.ondecoded: nothing to do
-        // pixelDecoder.ondecodeend: nothing to do
-        this.#pixelDecoder.onerror = this.onerror;
-        this.#pixelDecoder.onabort = this.onabort;
-      }
-
-      // launch decode
-      for (let i = 0; i < numberOfItems; ++i) {
-        this.#pixelDecoder.decode(pixelBuffer[i], pixelMeta,
-          {
-            itemNumber: i,
-            numberOfItems: numberOfItems,
-            index: dataIndex
-          }
-        );
-      }
+      this.#generateImageCompressed(
+        dataIndex,
+        pixelBuffer,
+        algoName);
     } else {
-      // no decompression
-      // send progress
-      this.onprogress({
-        lengthComputable: true,
-        loaded: 100,
-        total: 100,
-        index: dataIndex,
-        source: origin
-      });
-      // generate image
-      this.#generateImage(dataIndex, origin);
-      // send load events
-      this.onload({
-        source: origin
-      });
-      this.onloadend({
-        source: origin
-      });
+      this.#generateImageUncompressed(dataIndex, origin);
     }
   }
 
