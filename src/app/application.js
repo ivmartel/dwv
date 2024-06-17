@@ -1741,7 +1741,7 @@ export class App {
     const data = this.#dataController.get(dataId);
     if (!data) {
       throw new Error('Cannot initialise layer with missing data, id: ' +
-      dataId);
+        dataId);
     }
     const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
     if (!layerGroup) {
