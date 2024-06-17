@@ -72,6 +72,45 @@ export class DicomBufferToView {
   }
 
   /**
+   * Generate the image object.
+   *
+   * @param {number} index The data index.
+   * @param {string} origin The data origin.
+   */
+  #generateImage(index, origin) {
+    const dataElements = this.#dicomParserStore[index].getDicomElements();
+    const factory = this.#factories[index];
+    // exit if no factory
+    if (typeof factory === 'undefined') {
+      return;
+    }
+    // create the image
+    try {
+      const image = factory.create(
+        dataElements,
+        this.#finalBufferStore[index],
+        this.#options.numberOfFiles);
+      // call onloaditem
+      this.onloaditem({
+        data: {
+          image: image,
+          info: dataElements
+        },
+        source: origin,
+        warn: factory.getWarning()
+      });
+    } catch (error) {
+      this.onerror({
+        error: error,
+        source: origin
+      });
+      this.onloadend({
+        source: origin
+      });
+    }
+  }
+
+  /**
    * Generate the image object from an uncompressed buffer.
    *
    * @param {number} index The data index.
@@ -168,45 +207,6 @@ export class DicomBufferToView {
   }
 
   /**
-   * Generate the image object.
-   *
-   * @param {number} index The data index.
-   * @param {string} origin The data origin.
-   */
-  #generateImage(index, origin) {
-    const dataElements = this.#dicomParserStore[index].getDicomElements();
-    const factory = this.#factories[index];
-    // exit if no factory
-    if (typeof factory === 'undefined') {
-      return;
-    }
-    // create the image
-    try {
-      const image = factory.create(
-        dataElements,
-        this.#finalBufferStore[index],
-        this.#options.numberOfFiles);
-      // call onloaditem
-      this.onloaditem({
-        data: {
-          image: image,
-          info: dataElements
-        },
-        source: origin,
-        warn: factory.getWarning()
-      });
-    } catch (error) {
-      this.onerror({
-        error: error,
-        source: origin
-      });
-      this.onloadend({
-        source: origin
-      });
-    }
-  }
-
-  /**
    * Handle a decoded item event.
    *
    * @param {object} event The decoded item event.
@@ -282,7 +282,6 @@ export class DicomBufferToView {
    */
   #handleNonImageData(index, origin) {
     const dicomParser = this.#dicomParserStore[index];
-
     this.onloaditem({
       data: {
         info: dicomParser.getDicomElements()
@@ -296,7 +295,6 @@ export class DicomBufferToView {
     this.onloadend({
       source: origin
     });
-
   }
 
   /**
