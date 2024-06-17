@@ -274,10 +274,10 @@ function isRleTransferSyntax(syntax) {
  * Tell if a given syntax needs decompression.
  *
  * @param {string} syntax The transfer syntax to test.
- * @returns {string} The name of the decompression algorithm.
+ * @returns {string|undefined} The name of the decompression algorithm.
  */
 export function getSyntaxDecompressionName(syntax) {
-  let algo = null;
+  let algo;
   if (isJpeg2000TransferSyntax(syntax)) {
     algo = 'jpeg2000';
   } else if (isJpegBaselineTransferSyntax(syntax)) {

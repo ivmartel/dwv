@@ -217,7 +217,7 @@ export class DicomBufferToView {
     dicomParser.getDicomElements()['7FE00010'].value = [];
     const syntax = dicomParser.getDicomElements()['00020010'].value[0];
     const algoName = getSyntaxDecompressionName(syntax);
-    const needDecompression = (algoName !== null);
+    const needDecompression = typeof algoName !== 'undefined';
 
     // store
     this.#dicomParserStore[dataIndex] = dicomParser;
