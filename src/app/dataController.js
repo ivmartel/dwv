@@ -166,8 +166,10 @@ export class DataController {
       // stop listeners
       const image = this.#dataList[dataId].image;
       if (typeof image !== 'undefined') {
-        image.removeEventListener('imagecontentchange', this.#getFireEvent(dataId));
-        image.removeEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+        image.removeEventListener(
+          'imagecontentchange', this.#getFireEvent(dataId));
+        image.removeEventListener(
+          'imagegeometrychange', this.#getFireEvent(dataId));
       }
       // fire a data remove event
       this.#fireEvent({
