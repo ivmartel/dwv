@@ -7,29 +7,29 @@ import {Image} from '../image/image';
 /* eslint-enable no-unused-vars */
 
 /**
- * Image and meta class.
+ * DICOM data: meta and possible image.
  */
-class ImageData {
+class DicomData {
   /**
-   * Associated HTML div id.
-   *
-   * @type {Image}
-   */
-  image;
-  /**
-   * Associated HTML div id.
+   * DICOM meta data.
    *
    * @type {object}
    */
   meta;
+  /**
+   * DICOM image.
+   *
+   * @type {Image|undefined}
+   */
+  image;
 
   /**
-   * @param {Image} image The image.
-   * @param {object} meta The image meta.
+   * @param {object} meta The DICOM meta data.
+   * @param {Image} image The DICOM image.
    */
-  constructor(image, meta) {
-    this.image = image;
+  constructor(meta, image) {
     this.meta = meta;
+    this.image = image;
   }
 }
 
@@ -39,9 +39,9 @@ class ImageData {
 export class DataController {
 
   /**
-   * List of {image, meta}.
+   * List of DICOM data.
    *
-   * @type {Object<string, ImageData>}
+   * @type {Object<string, DicomData>}
    */
   #dataList = {};
 
@@ -89,7 +89,7 @@ export class DataController {
    * Get a data at a given index.
    *
    * @param {string} dataId The data id.
-   * @returns {ImageData|undefined} The data as {image, meta}.
+   * @returns {DicomData|undefined} The DICOM data.
    */
   get(dataId) {
     return this.#dataList[dataId];
@@ -148,10 +148,12 @@ export class DataController {
       throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
-    this.#dataList[dataId] = new ImageData(image, meta);
+    this.#dataList[dataId] = new DicomData(meta, image);
     // listen to image change
-    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
-    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+    if (typeof image !== 'undefined') {
+      image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
+      image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+    }
   }
 
   /**
@@ -162,11 +164,12 @@ export class DataController {
   remove(dataId) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       // stop listeners
-      this.#dataList[dataId].image.removeEventListener(
-        'imagecontentchange', this.#getFireEvent(dataId));
-      this.#dataList[dataId].image.removeEventListener(
-        'imagegeometrychange', this.#getFireEvent(dataId));
-      // fire an image remove event
+      const image = this.#dataList[dataId].image;
+      if (typeof image !== 'undefined') {
+        image.removeEventListener('imagecontentchange', this.#getFireEvent(dataId));
+        image.removeEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+      }
+      // fire a data remove event
       this.#fireEvent({
         type: 'imageremove',
         dataid: dataId
@@ -190,7 +193,11 @@ export class DataController {
     const dataToUpdate = this.#dataList[dataId];
 
     // add slice to current image
-    dataToUpdate.image.appendSlice(image);
+    if (typeof dataToUpdate.image !== 'undefined' &&
+      typeof image !== 'undefined'
+    ) {
+      dataToUpdate.image.appendSlice(image);
+    }
 
     // update meta data
     // TODO add time support
