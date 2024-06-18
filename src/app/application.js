@@ -947,7 +947,9 @@ export class App {
     }
 
     // render (will create layers)
-    this.render(dataId, [config]);
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      this.render(dataId, [config]);
+    }
   }
 
   /**
@@ -1046,7 +1048,9 @@ export class App {
     }
 
     // render (will create layer)
-    this.render(dataId, [configToUpdate]);
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      this.render(dataId, [configToUpdate]);
+    }
   }
 
   /**
@@ -1111,6 +1115,10 @@ export class App {
   render(dataId, viewConfigs) {
     if (typeof dataId === 'undefined' || dataId === null) {
       throw new Error('Cannot render without data id');
+    }
+    if (typeof this.getImage(dataId) === 'undefined') {
+      logger.warn('Not rendering non image data, id: ' + dataId);
+      return;
     }
 
     // create layer groups if not done yet
