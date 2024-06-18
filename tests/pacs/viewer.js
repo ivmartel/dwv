@@ -242,6 +242,12 @@ function viewerSetup() {
       if (event.loadtype === 'image') {
         console.log('metadata',
           getMetaDataWithNames(_app.getMetaData(event.dataid)));
+
+        // exit if no image
+        if (typeof _app.getImage(event.dataid) === 'undefined') {
+          return;
+        }
+
         // add data row
         addDataRow(event.dataid);
         ++dataLoad;
