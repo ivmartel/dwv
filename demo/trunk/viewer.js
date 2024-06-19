@@ -234,19 +234,18 @@ function viewerSetup() {
   let dataLoad = 0;
   const firstRender = [];
   _app.addEventListener('load', function (event) {
+    const meta = _app.getMetaData(event.dataid);
+
     // update UI at first render
     if (!firstRender.includes(event.dataid)) {
       // store data id
       firstRender.push(event.dataid);
       // log meta data
-      if (event.loadtype === 'image') {
-        console.log('metadata',
-          getMetaDataWithNames(_app.getMetaData(event.dataid)));
-
-        // exit if no image
-        if (typeof _app.getImage(event.dataid) === 'undefined') {
-          return;
-        }
+      if (event.loadtype === 'image' &&
+        typeof _app.getImage(event.dataid) !== 'undefined'
+      ) {
+        // log meta data
+        console.log('metadata', getMetaDataWithNames(meta));
 
         // add data row
         addDataRow(event.dataid);
@@ -268,8 +267,7 @@ function viewerSetup() {
       }
     }
 
-    const meta = _app.getMetaData(event.dataid);
-
+    // Special DICOM SEG
     if (event.loadtype === 'image' &&
       typeof meta['00080060'] !== 'undefined' &&
       meta['00080060'].value[0] === 'SEG') {
