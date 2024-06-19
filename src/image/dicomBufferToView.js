@@ -64,9 +64,11 @@ export class DicomBufferToView {
       }
     }
     // image factory for pixel data
-    const pixelElement = elements['7FE00010'];
-    if (typeof pixelElement !== 'undefined') {
-      factory = new ImageFactory();
+    if (typeof factory === 'undefined') {
+      const pixelElement = elements['7FE00010'];
+      if (typeof pixelElement !== 'undefined') {
+        factory = new ImageFactory();
+      }
     }
     return factory;
   }
