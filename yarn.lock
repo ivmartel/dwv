@@ -5110,9 +5110,9 @@ klaw@^3.0.0:
     graceful-fs "^4.1.9"
 
 konva@~9.3.11:
-  version "9.3.11"
-  resolved "https://registry.yarnpkg.com/konva/-/konva-9.3.11.tgz#742263389b4ad16fc2c202f1d6317ae85b837f04"
-  integrity sha512-ZkFF4CXKZCDd2+6sBPA0y3hQ+X4uTqIS6JxTl3BEOFJzKr1tId+rxxJgtsk1FQIH3auuvnMj/rkbatUcf9C2Wg==
+  version "9.3.12"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-9.3.12.tgz#214bb3c9fcc76b6900203dffcadff56cf0d596aa"
+  integrity sha512-IxX+ka+gVGm63APkB/taepMxpbUdjfLBUA1OIqx7nbH3126Df6eAuVWasH3qh3vg4ctRseops031sZO0b2O33A==
 
 latest-version@^3.0.0:
   version "3.1.0"
