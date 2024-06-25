@@ -13,6 +13,7 @@ import {
   getFileMetaInformationGroupLengthTag,
   isPixelDataTag,
   isItemTag,
+  isItemDelimitationItemTag,
   tagCompareFunction
 } from './dicomTag';
 import {
@@ -551,29 +552,31 @@ export class DicomWriter {
    */
   #writeDataElementItems(
     writer, byteOffset, items, isImplicit) {
-    let item = null;
+    let item;
     for (let i = 0; i < items.length; ++i) {
       item = items[i];
-      const itemKeys = Object.keys(item);
-      if (itemKeys.length === 0) {
+      if (item.length === 0) {
         continue;
       }
       // item element (create new to not modify original)
       let undefinedLength = false;
-      if (typeof item['FFFEE000'].undefinedLength !== 'undefined') {
-        undefinedLength = item['FFFEE000'].undefinedLength;
+      const itemTag = item.find((subItem) => isItemTag(subItem.tag));
+      if (typeof itemTag !== 'undefined' &&
+        typeof itemTag.undefinedLength !== 'undefined') {
+        undefinedLength = itemTag.undefinedLength;
       }
       const itemElement = new DataElement('NONE');
-      itemElement.vl = undefinedLength ? 0xffffffff : item['FFFEE000'].vl,
+      itemElement.vl = undefinedLength ? 0xffffffff : itemTag.vl,
       itemElement.tag = getItemTag();
       itemElement.value = [];
       byteOffset = this.#writeDataElement(
         writer, itemElement, byteOffset, isImplicit);
       // write rest
-      for (let m = 0; m < itemKeys.length; ++m) {
-        if (itemKeys[m] !== 'FFFEE000' && itemKeys[m] !== 'FFFEE00D') {
+      for (const subItem of item) {
+        if (!isItemTag(subItem.tag) &&
+          !isItemDelimitationItemTag(subItem.tag)) {
           byteOffset = this.#writeDataElement(
-            writer, item[itemKeys[m]], byteOffset, isImplicit);
+            writer, subItem, byteOffset, isImplicit);
         }
       }
       // item delimitation
@@ -1069,7 +1072,6 @@ export class DicomWriter {
 
       if (value !== null && value !== 0) {
         const newItems = [];
-        let name;
 
         // explicit or undefined length sequence
         let undefinedLength = false;
@@ -1081,7 +1083,7 @@ export class DicomWriter {
         // items
         for (let i = 0; i < value.length; ++i) {
           const oldItemElements = value[i];
-          const newItemElements = {};
+          const newItemElements = [];
           let subSize = 0;
 
           // check data
@@ -1110,7 +1112,7 @@ export class DicomWriter {
             // set item value
             subSize += this.#setElementValue(
               subElement, subElement.value, isImplicit, sqBitsAllocated);
-            newItemElements[itemKey] = subElement;
+            newItemElements.push(subElement);
             // add prefix size
             subSize += getDataElementPrefixByteSize(
               subElement.vr, isImplicit);
@@ -1126,8 +1128,7 @@ export class DicomWriter {
           if (undefinedLength) {
             itemElement.undefinedLength = undefinedLength;
           }
-          name = itemElement.tag.getKey();
-          newItemElements[name] = itemElement;
+          newItemElements.push(itemElement);
           subSize += getDataElementPrefixByteSize(
             itemElement.vr, isImplicit);
 
@@ -1136,6 +1137,12 @@ export class DicomWriter {
             subSize += getDataElementPrefixByteSize(
               'NONE', isImplicit);
           }
+
+          // sort
+          const elemSortFunc = function (a, b) {
+            return tagCompareFunction(a.tag, b.tag);
+          };
+          newItemElements.sort(elemSortFunc);
 
           size += subSize;
           newItems.push(newItemElements);
