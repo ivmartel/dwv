@@ -444,6 +444,9 @@ class Transformer extends Group_1.Group {
         });
     }
     _handleMouseDown(e) {
+        if (this._transforming) {
+            return;
+        }
         this._movingAnchorName = e.target.name().split(' ')[0];
         var attrs = this._getNodeRect();
         var width = attrs.width;

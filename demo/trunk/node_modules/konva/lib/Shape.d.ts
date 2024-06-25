@@ -8,7 +8,7 @@ export type ShapeConfigHandler<TTarget> = {
 export type LineJoin = 'round' | 'bevel' | 'miter';
 export type LineCap = 'butt' | 'round' | 'square';
 export interface ShapeConfig extends NodeConfig {
-    fill?: string;
+    fill?: string | CanvasGradient;
     fillPatternImage?: HTMLImageElement;
     fillPatternX?: number;
     fillPatternY?: number;
@@ -126,7 +126,7 @@ export declare class Shape<Config extends ShapeConfig = ShapeConfig> extends Nod
     dash: GetSet<number[], this>;
     dashEnabled: GetSet<boolean, this>;
     dashOffset: GetSet<number, this>;
-    fill: GetSet<string, this>;
+    fill: GetSet<string | CanvasGradient, this>;
     fillEnabled: GetSet<boolean, this>;
     fillLinearGradientColorStops: GetSet<Array<number | string>, this>;
     fillLinearGradientStartPoint: GetSet<Vector2d, this>;
@@ -175,7 +175,7 @@ export declare class Shape<Config extends ShapeConfig = ShapeConfig> extends Nod
     shadowOffsetY: GetSet<number, this>;
     shadowOpacity: GetSet<number, this>;
     shadowBlur: GetSet<number, this>;
-    stroke: GetSet<string, this>;
+    stroke: GetSet<string | CanvasGradient, this>;
     strokeEnabled: GetSet<boolean, this>;
     fillAfterStrokeEnabled: GetSet<boolean, this>;
     strokeScaleEnabled: GetSet<boolean, this>;

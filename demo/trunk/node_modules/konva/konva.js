@@ -5,10 +5,10 @@
 })(this, (function () { 'use strict';
 
   /*
-   * Konva JavaScript Framework v9.3.11
+   * Konva JavaScript Framework v9.3.12
    * http://konvajs.org/
    * Licensed under the MIT
-   * Date: Thu May 23 2024
+   * Date: Thu Jun 20 2024
    *
    * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
    * Modified work Copyright (C) 2014 - present by Anton Lavrenov (Konva)
@@ -35,7 +35,7 @@
               : {};
   const Konva$2 = {
       _global: glob,
-      version: '9.3.11',
+      version: '9.3.12',
       isBrowser: detectBrowser(),
       isUnminified: /param/.test(function (param) { }.toString()),
       dblClickWindow: 400,
@@ -7147,8 +7147,20 @@
           };
       }
       getClientRect(config = {}) {
+          // if we have a cached parent, it will use cached transform matrix
+          // but we don't want to that
+          let hasCachedParent = false;
+          let parent = this.getParent();
+          while (parent) {
+              if (parent.isCached()) {
+                  hasCachedParent = true;
+                  break;
+              }
+              parent = parent.getParent();
+          }
           const skipTransform = config.skipTransform;
-          const relativeTo = config.relativeTo;
+          // force relative to stage if we have a cached parent
+          const relativeTo = config.relativeTo || (hasCachedParent && this.getStage()) || undefined;
           const fillRect = this.getSelfRect();
           const applyStroke = !config.skipStroke && this.hasStroke();
           const strokeWidth = (applyStroke && this.strokeWidth()) || 0;
@@ -11458,58 +11470,30 @@
           return null;
       }
       static getPointOnLine(dist, P1x, P1y, P2x, P2y, fromX, fromY) {
-          if (fromX === undefined) {
-              fromX = P1x;
+          fromX = fromX !== null && fromX !== void 0 ? fromX : P1x;
+          fromY = fromY !== null && fromY !== void 0 ? fromY : P1y;
+          const len = this.getLineLength(P1x, P1y, P2x, P2y);
+          if (len < 1e-10) {
+              return { x: P1x, y: P1y };
           }
-          if (fromY === undefined) {
-              fromY = P1y;
-          }
-          var m = (P2y - P1y) / (P2x - P1x + 0.00000001);
-          var run = Math.sqrt((dist * dist) / (1 + m * m));
-          if (P2x < P1x) {
-              run *= -1;
-          }
-          var rise = m * run;
-          var pt;
           if (P2x === P1x) {
-              // vertical line
-              pt = {
-                  x: fromX,
-                  y: fromY + rise,
-              };
+              // Vertical line
+              return { x: fromX, y: fromY + (P2y > P1y ? dist : -dist) };
           }
-          else if ((fromY - P1y) / (fromX - P1x + 0.00000001) === m) {
-              pt = {
-                  x: fromX + run,
-                  y: fromY + rise,
-              };
+          const m = (P2y - P1y) / (P2x - P1x);
+          const run = Math.sqrt((dist * dist) / (1 + m * m)) * (P2x < P1x ? -1 : 1);
+          const rise = m * run;
+          if (Math.abs(fromY - P1y - m * (fromX - P1x)) < 1e-10) {
+              return { x: fromX + run, y: fromY + rise };
           }
-          else {
-              var ix, iy;
-              var len = this.getLineLength(P1x, P1y, P2x, P2y);
-              // if (len < 0.00000001) {
-              //   return {
-              //     x: P1x,
-              //     y: P1y,
-              //   };
-              // }
-              var u = (fromX - P1x) * (P2x - P1x) + (fromY - P1y) * (P2y - P1y);
-              u = u / (len * len);
-              ix = P1x + u * (P2x - P1x);
-              iy = P1y + u * (P2y - P1y);
-              var pRise = this.getLineLength(fromX, fromY, ix, iy);
-              var pRun = Math.sqrt(dist * dist - pRise * pRise);
-              run = Math.sqrt((pRun * pRun) / (1 + m * m));
-              if (P2x < P1x) {
-                  run *= -1;
-              }
-              rise = m * run;
-              pt = {
-                  x: ix + run,
-                  y: iy + rise,
-              };
-          }
-          return pt;
+          const u = ((fromX - P1x) * (P2x - P1x) + (fromY - P1y) * (P2y - P1y)) / (len * len);
+          const ix = P1x + u * (P2x - P1x);
+          const iy = P1y + u * (P2y - P1y);
+          const pRise = this.getLineLength(fromX, fromY, ix, iy);
+          const pRun = Math.sqrt(dist * dist - pRise * pRise);
+          const adjustedRun = Math.sqrt((pRun * pRun) / (1 + m * m)) * (P2x < P1x ? -1 : 1);
+          const adjustedRise = m * adjustedRun;
+          return { x: ix + adjustedRun, y: iy + adjustedRise };
       }
       static getPointOnCubicBezier(pct, P1x, P1y, P2x, P2y, P3x, P3y, P4x, P4y) {
           function CB1(t) {
@@ -16027,6 +16011,11 @@
           });
       }
       _handleMouseDown(e) {
+          // do nothing if we already transforming
+          // that is possible to trigger with multitouch
+          if (this._transforming) {
+              return;
+          }
           this._movingAnchorName = e.target.name().split(' ')[0];
           var attrs = this._getNodeRect();
           var width = attrs.width;
