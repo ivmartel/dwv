@@ -4,37 +4,48 @@ import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
+ * DICOM code tag keys.
+ */
+const TagKeys = {
+  CodeValue: '00080100',
+  CodingSchemeDesignator: '00080102',
+  CodeMeaning: '00080104',
+  LongCodeValue: '00080119',
+  URNCodeValue: '00080120'
+};
+
+/**
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
  */
 export class DicomCode {
   /**
-   * Code meaning (0008,0104).
+   * Code meaning.
    *
    * @type {string}
    */
   meaning;
   /**
-   * Code value (0008,0100).
+   * Code value.
    *
    * @type {string|undefined}
    */
   value;
   /**
-   * Long code value (0008,0119).
+   * Long code value.
    *
    * @type {string|undefined}
    */
   longValue;
   /**
-   * URN code value (0008,0120).
+   * URN code value.
    *
    * @type {string|undefined}
    */
   urnValue;
   /**
-   * Coding scheme designator (0008,0102).
+   * Coding scheme designator.
    *
    * @type {string|undefined}
    */
@@ -45,6 +56,17 @@ export class DicomCode {
    */
   constructor(meaning) {
     this.meaning = meaning;
+  }
+
+  /**
+   * Get a string representation of this object.
+   *
+   * @returns {string} The code as string.
+   */
+  toString() {
+    return '(' + this.value + ', ' +
+      this.schemeDesignator + ', \'' +
+      this.meaning + '\')';
   }
 }
 
@@ -71,16 +93,16 @@ export function isEqualCode(code1, code2) {
  */
 export function getCode(dataElements) {
   // meaning -> CodeMeaning (type1)
-  const code = new DicomCode(dataElements['00080104'].value[0]);
+  const code = new DicomCode(dataElements[TagKeys.CodeMeaning].value[0]);
   // value -> CodeValue (type1C)
   // longValue -> LongCodeValue (type1C)
   // urnValue -> URNCodeValue (type1C)
-  if (dataElements['00080100']) {
-    code.value = dataElements['00080100'].value[0];
-  } else if (dataElements['00080119']) {
-    code.longValue = dataElements['00080119'].value[0];
-  } else if (dataElements['00080120']) {
-    code.urnValue = dataElements['00080120'].value[0];
+  if (typeof dataElements[TagKeys.CodeValue] !== 'undefined') {
+    code.value = dataElements[TagKeys.CodeValue].value[0];
+  } else if (typeof dataElements[TagKeys.LongCodeValue] !== 'undefined') {
+    code.longValue = dataElements[TagKeys.LongCodeValue].value[0];
+  } else if (typeof dataElements[TagKeys.URNCodeValue] !== 'undefined') {
+    code.urnValue = dataElements[TagKeys.URNCodeValue].value[0];
   } else {
     throw new Error(
       'Invalid code with no value, no long value and no urn value.');
@@ -88,8 +110,9 @@ export function getCode(dataElements) {
   // schemeDesignator -> CodingSchemeDesignator (type1C)
   if (typeof code.value !== 'undefined' ||
     typeof code.longValue !== 'undefined') {
-    if (dataElements['00080102']) {
-      code.schemeDesignator = dataElements['00080102'].value[0];
+    if (typeof dataElements[TagKeys.CodingSchemeDesignator] !== 'undefined') {
+      code.schemeDesignator =
+        dataElements[TagKeys.CodingSchemeDesignator].value[0];
     } else {
       throw new Error(
         'No coding sheme designator when code value or long value is present');
@@ -108,15 +131,15 @@ export function getDicomCodeItem(code) {
   // dicom item (tags are in group/element order)
   const codeItem = {};
   // value
-  if (code.value !== undefined) {
+  if (typeof code.value !== 'undefined') {
     codeItem.CodeValue = code.value;
-  } else if (code.longValue !== undefined) {
+  } else if (typeof code.longValue !== 'undefined') {
     codeItem.LongCodeValue = code.longValue;
-  } else if (code.urnValue !== undefined) {
+  } else if (typeof code.urnValue !== 'undefined') {
     codeItem.URNCodeValue = code.urnValue;
   }
   // CodingSchemeDesignator
-  if (code.schemeDesignator !== undefined) {
+  if (typeof code.schemeDesignator !== 'undefined') {
     codeItem.CodingSchemeDesignator = code.schemeDesignator;
   }
   // CodeMeaning
