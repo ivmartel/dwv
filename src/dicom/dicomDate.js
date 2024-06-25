@@ -1,7 +1,4 @@
-// doc imports
-/* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
-/* eslint-enable no-unused-vars */
 
 /**
  * Pad an input string with a '0' to form a 2 digit one.
