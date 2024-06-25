@@ -980,15 +980,17 @@ export class DicomWriter {
     // ImplementationClassUID
     const icUID = getDataElement('ImplementationClassUID');
     let icUIDSize = getDataElementPrefixByteSize(icUID.vr, false);
-    icUIDSize += this.#setElementValue(
-      icUID, [getUID('ImplementationClassUID')], false);
+    const icUIDValue =
+      getUID('ImplementationClassUID').replace('-beta', '.00');
+    icUIDSize += this.#setElementValue(icUID, [icUIDValue], false);
     metaElements.push(icUID);
     metaLength += icUIDSize;
     totalSize += icUIDSize;
     // ImplementationVersionName
     const ivn = getDataElement('ImplementationVersionName');
     let ivnSize = getDataElementPrefixByteSize(ivn.vr, false);
-    const ivnValue = 'DWV_' + getDwvVersion();
+    const dwvVersion = getDwvVersion().replace('-beta', '.00');
+    const ivnValue = 'DWV_' + dwvVersion;
     ivnSize += this.#setElementValue(ivn, [ivnValue], false);
     metaElements.push(ivn);
     metaLength += ivnSize;
