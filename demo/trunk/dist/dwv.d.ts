@@ -887,35 +887,41 @@ export declare class DicomCode {
      */
     constructor(meaning: string);
     /**
-     * Code meaning (0008,0104).
+     * Code meaning.
      *
      * @type {string}
      */
     meaning: string;
     /**
-     * Code value (0008,0100).
+     * Code value.
      *
      * @type {string|undefined}
      */
     value: string | undefined;
     /**
-     * Long code value (0008,0119).
+     * Long code value.
      *
      * @type {string|undefined}
      */
     longValue: string | undefined;
     /**
-     * URN code value (0008,0120).
+     * URN code value.
      *
      * @type {string|undefined}
      */
     urnValue: string | undefined;
     /**
-     * Coding scheme designator (0008,0102).
+     * Coding scheme designator.
      *
      * @type {string|undefined}
      */
     schemeDesignator: string | undefined;
+    /**
+     * Get a string representation of this object.
+     *
+     * @returns {string} The code as string.
+     */
+    toString(): string;
 }
 
 /**
