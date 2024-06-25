@@ -1,9 +1,13 @@
 import {
+  dateToDateObj,
+  getDicomDate,
+  dateToTimeObj,
+  getDicomTime,
+} from '../dicom/dicomDate';
+import {
   getImage2DSize,
   getSpacingFromMeasure,
   getDimensionOrganization,
-  getDicomDate,
-  getDicomTime,
   getDicomMeasureItem,
   getDicomPlaneOrientationItem
 } from '../dicom/dicomElementsWrapper';
@@ -759,8 +763,8 @@ export class MaskFactory {
     tags.Columns = size.get(0);
     // update content tags
     const now = new Date();
-    tags.ContentDate = getDicomDate(now);
-    tags.ContentTime = getDicomTime(now);
+    tags.ContentDate = getDicomDate(dateToDateObj(now));
+    tags.ContentTime = getDicomTime(dateToTimeObj(now));
 
     // keep source image StudyInstanceUID
     if (sourceImage !== undefined) {
