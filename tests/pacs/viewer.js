@@ -235,6 +235,8 @@ function viewerSetup() {
   const firstRender = [];
   _app.addEventListener('load', function (event) {
     const meta = _app.getMetaData(event.dataid);
+    // log meta data
+    console.log('metadata', getMetaDataWithNames(meta));
 
     // update UI at first render
     if (!firstRender.includes(event.dataid)) {
@@ -244,9 +246,6 @@ function viewerSetup() {
       if (event.loadtype === 'image' &&
         typeof _app.getImage(event.dataid) !== 'undefined'
       ) {
-        // log meta data
-        console.log('metadata', getMetaDataWithNames(meta));
-
         // add data row
         addDataRow(event.dataid);
         ++dataLoad;
