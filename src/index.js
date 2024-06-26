@@ -37,6 +37,11 @@ import {
   getPixelDataTag
 } from './dicom/dicomTag';
 import {DicomCode} from './dicom/dicomCode';
+import {
+  DicomSRContent,
+  getSRContent,
+  getDicomSRContentItem
+} from './dicom/dicomSRContent';
 import {MaskSegment} from './dicom/dicomSegment';
 // gui
 import {
@@ -155,6 +160,7 @@ export {
   RGB,
   ScrollWheel,
   NumberRange,
+  DicomSRContent,
   defaults,
   logger,
   decoderScripts,
@@ -182,6 +188,8 @@ export {
   getReverseOrientation,
   getMousePoint,
   getTouchPoints,
+  getSRContent,
+  getDicomSRContentItem,
   hasDicomPrefix,
   precisionRound,
   buildMultipart,
