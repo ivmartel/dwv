@@ -311,6 +311,16 @@ function viewerSetup() {
         }
       }
     }
+
+    // DICOM SR specific
+    if (event.loadtype === 'image' &&
+      typeof meta['00080060'] !== 'undefined' &&
+      meta['00080060'].value[0] === 'SR') {
+
+      console.log('DICOM SR');
+      const srContent = dwv.getSRContent(meta);
+      console.log(srContent.toString());
+    }
   });
 
   _app.addEventListener('positionchange', function (event) {

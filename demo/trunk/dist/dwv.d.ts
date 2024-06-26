@@ -988,6 +988,55 @@ export declare class DicomParser {
 }
 
 /**
+ * DICOM SR content: item of a SR content sequence.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.html}.
+ */
+export declare class DicomSRContent {
+    /**
+     * @param {string} valueType The content item value type.
+     */
+    constructor(valueType: string);
+    /**
+     * Value type.
+     *
+     * @type {string}
+     */
+    valueType: string;
+    /**
+     * Concept name code.
+     *
+     * @type {DicomCode|undefined}
+     */
+    conceptNameCode: DicomCode | undefined;
+    /**
+     * Relationship Type.
+     *
+     * @type {string}
+     */
+    relationshipType: string;
+    /**
+     * Content sequence (0040,A730).
+     *
+     * @type {DicomSRContent[]|undefined}
+     */
+    contentSequence: DicomSRContent[] | undefined;
+    /**
+     * Value.
+     *
+     * @type {object}
+     */
+    value: object;
+    /**
+     * Get a string representation of this object.
+     *
+     * @param {string} [prefix] An optional prefix for recursive content.
+     * @returns {string} The object as string.
+     */
+    toString(prefix?: string): string;
+}
+
+/**
  * DICOM writer.
  *
  * @example
@@ -1626,6 +1675,16 @@ export declare class Geometry {
 export declare function getDefaultDicomSegJson(): object;
 
 /**
+ * Get a simple dicom element item from a content item object.
+ *
+ * @param {DicomSRContent} content The content item object.
+ * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ */
+export declare function getDicomSRContentItem(content: DicomSRContent): {
+    [x: string]: any;
+};
+
+/**
  * List of DICOM data elements indexed via a 8 character string formed from
  * the group and element numbers.
  *
@@ -1705,6 +1764,16 @@ export declare function getPixelDataTag(): Tag;
  * @returns {string} Reverse Orientation Label.
  */
 export declare function getReverseOrientation(ori: string): string;
+
+/**
+ * Get a content item object from a dicom element.
+ *
+ * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @returns {DicomSRContent} A content item object.
+ */
+export declare function getSRContent(dataElements: {
+    [x: string]: DataElement;
+}): DicomSRContent;
 
 /**
  * Split a group-element key used to store DICOM elements.
