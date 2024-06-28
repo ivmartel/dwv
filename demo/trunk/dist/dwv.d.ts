@@ -1135,6 +1135,12 @@ export declare class DrawController {
      */
     getCurrentPosGroup(): Konva.Group | undefined;
     /**
+     * Get the non current position groups. Used to stop listeners.
+     *
+     * @returns {object[]} The groups that do not have the current position id.
+     */
+    getNonCurrentPosGroup(): object[];
+    /**
      * Reset: clear the layers array.
      */
     reset(): void;
