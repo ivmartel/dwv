@@ -168,16 +168,16 @@ export class DrawGroupCommand {
 
 
 /**
- * Move group command.
+ * Move shape command.
  */
-export class MoveGroupCommand {
+export class MoveShapeCommand {
 
   /**
-   * The group to move.
+   * The shape to move.
    *
-   * @type {Konva.Group}
+   * @type {Konva.Shape}
    */
-  #group;
+  #shape;
 
   /**
    * The shape display name.
@@ -201,16 +201,24 @@ export class MoveGroupCommand {
   #layer;
 
   /**
-   * @param {Konva.Group} group The group draw.
-   * @param {string} name The shape display name.
+   * Flag for linked label.
+   *
+   * @type {boolean}
+   */
+  #isLabelLinked;
+
+  /**
+   * @param {Konva.Shape} shape The group draw.
    * @param {object} translation A 2D translation to move the group by.
    * @param {DrawLayer} layer The layer where to move the group.
+   * @param {boolean} isLabelLinked Flag for shape-label link.
    */
-  constructor(group, name, translation, layer) {
-    this.#group = group;
-    this.#name = name;
+  constructor(shape, translation, layer, isLabelLinked) {
+    this.#shape = shape;
+    this.#name = getShapeDisplayName(shape);
     this.#translation = translation;
     this.#layer = layer;
+    this.#isLabelLinked = isLabelLinked;
   }
 
   /**
@@ -228,8 +236,21 @@ export class MoveGroupCommand {
    * @fires MoveGroupCommand#drawmove
    */
   execute() {
-    // translate group
-    this.#group.move(this.#translation);
+    // apply translation
+    if (this.#shape.name() === 'shape') {
+      const children = this.#shape.getParent().getChildren();
+      for (const child of children) {
+        // move all but label if not linked
+        if (!this.#isLabelLinked && child.name() === 'label') {
+          continue;
+        }
+        child.move(this.#translation);
+      }
+    } else {
+      // translate group
+      this.#shape.move(this.#translation);
+    }
+
     // draw
     this.#layer.getKonvaLayer().draw();
     // callback
@@ -244,7 +265,7 @@ export class MoveGroupCommand {
      */
     this.onExecute({
       type: 'drawmove',
-      id: this.#group.id(),
+      id: this.#shape.id(),
       srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
@@ -261,13 +282,26 @@ export class MoveGroupCommand {
       x: -this.#translation.x,
       y: -this.#translation.y
     };
-    this.#group.move(minusTrans);
+    // remove translation
+    if (this.#shape.name() === 'shape') {
+      const children = this.#shape.getParent().getChildren();
+      for (const child of children) {
+        // move all but label if not linked
+        if (!this.#isLabelLinked && child.name() === 'label') {
+          continue;
+        }
+        child.move(minusTrans);
+      }
+    } else {
+      this.#shape.move(minusTrans);
+    }
+
     // draw
     this.#layer.getKonvaLayer().draw();
     // callback
     this.onUndo({
       type: 'drawmove',
-      id: this.#group.id(),
+      id: this.#shape.id(),
       srclayerid: this.#layer.getId(),
       dataid: this.#layer.getDataId()
     });
@@ -291,7 +325,7 @@ export class MoveGroupCommand {
     // default does nothing.
   }
 
-} // MoveGroupCommand class
+} // MoveShapeCommand class
 
 
 /**

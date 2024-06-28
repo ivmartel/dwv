@@ -236,6 +236,18 @@ export class DrawController {
   }
 
   /**
+   * Get the non current position groups. Used to stop listeners.
+   *
+   * @returns {object[]} The groups that do not have the current position id.
+   */
+  getNonCurrentPosGroup() {
+    // get position groups
+    return this.#konvaLayer.getChildren((node) => {
+      return node.id() !== this.#currentPosGroupId;
+    });
+  }
+
+  /**
    * Reset: clear the layers array.
    */
   reset() {

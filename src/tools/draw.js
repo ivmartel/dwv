@@ -12,10 +12,11 @@ import {
   getShapeDisplayName,
   DrawGroupCommand,
   DeleteGroupCommand,
-  MoveGroupCommand
+  MoveShapeCommand
 } from './drawCommands';
 import {
-  isNodeNameShape
+  isNodeNameShape,
+  isNodeNameLabel
 } from '../app/drawController';
 import {ScrollWheel} from './scrollWheel';
 import {ShapeEditor} from './editor';
@@ -705,17 +706,16 @@ export class Draw {
    *   it to the undo stack. To no execute it.
    *
    * @param {DrawLayer} drawLayer The associated layer.
-   * @param {Konva.Group} shapeGroup The shape group to move.
    * @param {Konva.Shape} shape The shape to move.
    * @param {object} translation The move translation as {x,y}.
+   * @param {boolean} isLabelLinked Flag for shape-label link.
    */
-  #storeMoveCommand(drawLayer, shapeGroup, shape, translation) {
-    const shapeDisplayName = getShapeDisplayName(shape);
-    const mvcmd = new MoveGroupCommand(
-      shapeGroup,
-      shapeDisplayName,
+  #storeMoveCommand(drawLayer, shape, translation, isLabelLinked) {
+    const mvcmd = new MoveShapeCommand(
+      shape,
       translation,
-      drawLayer
+      drawLayer,
+      isLabelLinked
     );
     mvcmd.onExecute = this.#fireEvent;
     mvcmd.onUndo = this.#fireEvent;
@@ -815,6 +815,15 @@ export class Draw {
         this.#removeShapeListeners(group);
       });
     }
+
+    const notCurrentPosGroup =
+      drawController.getNonCurrentPosGroup();
+    for (const posGroup of notCurrentPosGroup) {
+      posGroup.getChildren().forEach((group) => {
+        this.#removeShapeListeners(group);
+      });
+    }
+
     // draw
     const konvaLayer = drawLayer.getKonvaLayer();
     if (shapeGroups.length !== 0) {
@@ -831,12 +840,22 @@ export class Draw {
   #removeShapeListeners(shapeGroup) {
     // mouse over
     this.#removeShapeOverListeners(shapeGroup);
-    // drag
-    shapeGroup.draggable(false);
-    shapeGroup.off('dragstart.draw');
-    shapeGroup.off('dragmove.draw');
-    shapeGroup.off('dragend.draw');
-    shapeGroup.off('dblclick');
+    // remove listeners from shape
+    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+    if (shape instanceof Konva.Shape) {
+      shape.draggable(false);
+      shape.off('dragstart.draw');
+      shape.off('dragmove.draw');
+      shape.off('dragend.draw');
+      shape.off('dblclick');
+    }
+    // remove listeners from label
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (label instanceof Konva.Label) {
+      label.draggable(false);
+      label.off('dragstart.draw');
+      label.off('dragend.draw');
+    }
   }
 
   /**
@@ -938,27 +957,44 @@ export class Draw {
     const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
 
-    // make it draggable
-    shapeGroup.draggable(true);
-    // cache drag start position
-    let dragStartPos = {x: shapeGroup.x(), y: shapeGroup.y()};
-
-    // command name based on shape type
+    // make shape draggable
     const shape = shapeGroup.getChildren(isNodeNameShape)[0];
     if (!(shape instanceof Konva.Shape)) {
       return;
     }
+    shape.draggable(true);
 
-    let colour = null;
+    // make label draggable
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
+    label.draggable(true);
+
+    let isShapeLabelLinked = true;
+
+    // cache position
+    let dragStartPos;
+    let previousPos;
+
+    let colour;
+
+    // shape listeners ------------------------------------------
 
     // drag start event handling
-    shapeGroup.on('dragstart.draw', (/*event*/) => {
+    shape.on('dragstart.draw', (event) => {
       // store colour
-      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
-      if (!(shape instanceof Konva.Shape)) {
-        return;
-      }
       colour = shape.stroke();
+      // store pos
+      dragStartPos = {
+        x: shape.x(),
+        y: shape.y()
+      };
+      previousPos = {
+        x: event.target.x(),
+        y: event.target.y()
+      };
+
       // display trash
       this.#trash.activate(drawLayer);
       // deactivate anchors to avoid events on null shape
@@ -967,19 +1003,38 @@ export class Draw {
       konvaLayer.draw();
     });
     // drag move event handling
-    shapeGroup.on('dragmove.draw', (event) => {
-      const group = event.target;
-      if (!(group instanceof Konva.Group)) {
-        return;
+    shape.on('dragmove.draw', (event) => {
+      // move associated shapes (but not label)
+      const diff = {
+        x: event.target.x() - previousPos.x,
+        y: event.target.y() - previousPos.y
+      };
+      const children = shapeGroup.getChildren();
+      for (const child of children) {
+        // skip shape and label
+        if (child === event.target ||
+          (child.name() === 'label' && !isShapeLabelLinked)
+        ) {
+          continue;
+        }
+        // move other nodes
+        child.move(diff);
       }
+
+      // store pos
+      previousPos = {
+        x: event.target.x(),
+        y: event.target.y()
+      };
+
       // validate the group position
-      validateGroupPosition(drawLayer.getBaseSize(), group);
+      validateGroupPosition(drawLayer.getBaseSize(), shapeGroup);
       // get appropriate factory
       const factory = this.#getShapeFactory(shapeGroup);
       // update quantification if possible
       if (typeof factory.updateQuantification !== 'undefined') {
         const vc = layerGroup.getActiveViewLayer().getViewController();
-        factory.updateQuantification(group, vc);
+        factory.updateQuantification(shapeGroup, vc);
       }
       // highlight trash when on it
       const mousePoint = getMousePoint(event.evt);
@@ -994,11 +1049,7 @@ export class Draw {
       konvaLayer.draw();
     });
     // drag end event handling
-    shapeGroup.on('dragend.draw', (event) => {
-      const group = event.target;
-      if (!(group instanceof Konva.Group)) {
-        return;
-      }
+    shape.on('dragend.draw', (event) => {
       // remove trash
       this.#trash.remove();
       // activate(false) will also trigger a dragend.draw
@@ -1006,7 +1057,7 @@ export class Draw {
         typeof event.evt === 'undefined') {
         return;
       }
-      const pos = {x: group.x(), y: group.y()};
+      const pos = {x: shape.x(), y: shape.y()};
       // delete case
       const mousePoint = getMousePoint(event.evt);
       const offset = {
@@ -1016,8 +1067,8 @@ export class Draw {
       const eventPos = this.#getRealPosition(offset, layerGroup);
       if (this.#trash.isOverTrash(eventPos)) {
         // compensate for the drag translation
-        group.x(dragStartPos.x);
-        group.y(dragStartPos.y);
+        shapeGroup.x(dragStartPos.x);
+        shapeGroup.y(dragStartPos.y);
         // disable editor
         this.#shapeEditor.disable();
         this.#shapeEditor.reset();
@@ -1033,11 +1084,12 @@ export class Draw {
         if (translation.x !== 0 || translation.y !== 0) {
           // the move is handled by Konva, create a command but
           // do not execute it
-          this.#storeMoveCommand(drawLayer, group, shape, translation);
+          this.#storeMoveCommand(
+            drawLayer, shape, translation, isShapeLabelLinked);
           // manually trigger a move event
           this.#fireEvent({
             type: 'drawmove',
-            id: group.id(),
+            id: shapeGroup.id(),
             srclayerid: drawLayer.getId(),
             dataid: drawLayer.getDataId()
           });
@@ -1049,8 +1101,44 @@ export class Draw {
       // draw
       konvaLayer.draw();
       // reset start position
-      dragStartPos = {x: group.x(), y: group.y()};
+      dragStartPos = {
+        x: shape.x(),
+        y: shape.y()
+      };
     });
+
+    // label listeners ------------------------------------------
+
+    // drag start event handling
+    label.on('dragstart.draw', (/*event*/) => {
+      // unlink shape and label at first label move
+      isShapeLabelLinked = false;
+      // store pos
+      dragStartPos = {
+        x: label.x(),
+        y: label.y()
+      };
+    });
+    // drag end event handling
+    label.on('dragend.draw', (/*event*/) => {
+      const translation = {
+        x: label.x() - dragStartPos.x,
+        y: label.y() - dragStartPos.y
+      };
+      if (translation.x !== 0 || translation.y !== 0) {
+        this.#storeMoveCommand(
+          drawLayer, label, translation, isShapeLabelLinked);
+        // the move is handled by Konva, trigger an event manually
+        this.#fireEvent({
+          type: 'drawmove',
+          id: shapeGroup.id(),
+          srclayerid: drawLayer.getId(),
+          dataid: drawLayer.getDataId()
+        });
+      }
+      dragStartPos = {x: shape.x(), y: shape.y()};
+    });
+
     // double click handling: update label
     shapeGroup.on('dblclick', (event) => {
       const group = event.currentTarget;
