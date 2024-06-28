@@ -706,7 +706,7 @@ export class Draw {
    *   it to the undo stack. To no execute it.
    *
    * @param {DrawLayer} drawLayer The associated layer.
-   * @param {Konva.Shape} shape The shape to move.
+   * @param {Konva.Shape|Konva.Label} shape The shape to move.
    * @param {object} translation The move translation as {x,y}.
    * @param {boolean} isLabelLinked Flag for shape-label link.
    */

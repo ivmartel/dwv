@@ -175,7 +175,7 @@ export class MoveShapeCommand {
   /**
    * The shape to move.
    *
-   * @type {Konva.Shape}
+   * @type {Konva.Shape|Konva.Label}
    */
   #shape;
 
@@ -208,14 +208,19 @@ export class MoveShapeCommand {
   #isLabelLinked;
 
   /**
-   * @param {Konva.Shape} shape The group draw.
+   * @param {Konva.Shape|Konva.Label} shape The group draw.
    * @param {object} translation A 2D translation to move the group by.
    * @param {DrawLayer} layer The layer where to move the group.
    * @param {boolean} isLabelLinked Flag for shape-label link.
    */
   constructor(shape, translation, layer, isLabelLinked) {
     this.#shape = shape;
-    this.#name = getShapeDisplayName(shape);
+    if (shape instanceof Konva.Shape) {
+      this.#name = getShapeDisplayName(shape);
+    }
+    if (shape instanceof Konva.Label) {
+      this.#name = 'Label';
+    }
     this.#translation = translation;
     this.#layer = layer;
     this.#isLabelLinked = isLabelLinked;
@@ -237,7 +242,7 @@ export class MoveShapeCommand {
    */
   execute() {
     // apply translation
-    if (this.#shape.name() === 'shape') {
+    if (this.#shape instanceof Konva.Shape) {
       const children = this.#shape.getParent().getChildren();
       for (const child of children) {
         // move all but label if not linked
@@ -246,8 +251,8 @@ export class MoveShapeCommand {
         }
         child.move(this.#translation);
       }
-    } else {
-      // translate group
+    }
+    if (this.#shape instanceof Konva.Label) {
       this.#shape.move(this.#translation);
     }
 
@@ -283,7 +288,7 @@ export class MoveShapeCommand {
       y: -this.#translation.y
     };
     // remove translation
-    if (this.#shape.name() === 'shape') {
+    if (this.#shape instanceof Konva.Shape) {
       const children = this.#shape.getParent().getChildren();
       for (const child of children) {
         // move all but label if not linked
@@ -292,7 +297,8 @@ export class MoveShapeCommand {
         }
         child.move(minusTrans);
       }
-    } else {
+    }
+    if (this.#shape instanceof Konva.Label) {
       this.#shape.move(minusTrans);
     }
 
