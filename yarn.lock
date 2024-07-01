@@ -1269,9 +1269,9 @@
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
 "@stylistic/eslint-plugin-js@^2.1.0":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.2.2.tgz#7e4e7e7572e1409712d569205976bfbc7a4f3735"
-  integrity sha512-Vj2Q1YHVvJw+ThtOvmk5Yx7wZanVrIBRUTT89horLDb4xdP9GA1um9XOYQC6j67VeUC2gjZQnz5/RVJMzaOhtw==
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.3.0.tgz#a3faee05863c50c0bb6f879db72b7ee895bfa74e"
+  integrity sha512-lQwoiYb0Fs6Yc5QS3uT8+T9CPKK2Eoxc3H8EnYJgM26v/DgtW+1lvy2WNgyBflU+ThShZaHm3a6CdD9QeKx23w==
   dependencies:
     "@types/eslint" "^8.56.10"
     acorn "^8.11.3"
