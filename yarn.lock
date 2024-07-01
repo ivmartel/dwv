@@ -3303,9 +3303,9 @@ escape-string-regexp@^4.0.0:
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
 eslint-plugin-jsdoc@^48.2.9:
-  version "48.4.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-48.4.0.tgz#746a30b8d01a9aa7894e52f8a273a49ca681ef78"
-  integrity sha512-xBUxuAx03cKoEA7y+MYSUdwyN8AJyZHbAJ257sOFXgVgCScm574S4zEYJpBoARwaCu4chhCbvA+gdm+00whlxA==
+  version "48.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-48.5.0.tgz#24e2026d1e7ba97214ee21bb16fd5162cd6487c8"
+  integrity sha512-ukXPNpGby3KjCveCizIS8t1EbuJEHYEu/tBg8GCbn/YbHcXwphyvYCdvRZ/oMRfTscGSSzfsWoZ+ZkAP0/6YMQ==
   dependencies:
     "@es-joy/jsdoccomment" "~0.43.1"
     are-docs-informative "^0.0.2"
