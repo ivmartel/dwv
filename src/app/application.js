@@ -19,7 +19,10 @@ import {getUriQuery, decodeQuery} from '../utils/uri';
 import {UndoStack} from '../tools/undo';
 import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
-import {DataController} from './dataController';
+import {
+  DicomData,
+  DataController
+} from './dataController';
 import {OverlayData} from '../gui/overlayData';
 import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
@@ -304,7 +307,10 @@ export class App {
     });
 
     // add image to data controller
-    this.#dataController.addNew(dataId, image, meta);
+    this.#dataController.addNew(
+      dataId,
+      new DicomData(meta, image)
+    );
 
     // load item event
     this.#fireEvent({
@@ -1547,13 +1553,11 @@ export class App {
     let eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
-        this.#dataController.addNew(
-          event.dataid, event.data.image, event.data.info);
+        this.#dataController.addNew(event.dataid, event.data);
       } else {
-        this.#dataController.update(
-          event.dataid, event.data.image, event.data.info);
+        this.#dataController.update(event.dataid, event.data);
       }
-      eventMetaData = event.data.info;
+      eventMetaData = event.data.meta;
     } else if (event.loadtype === 'state') {
       this.applyJsonState(event.data);
       eventMetaData = 'state';

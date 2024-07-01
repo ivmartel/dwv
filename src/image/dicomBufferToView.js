@@ -10,6 +10,7 @@ import {PixelBufferDecoder} from './decoder';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from '../dicom/dataElement';
+import {DicomData} from '../app/dataController';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -94,10 +95,7 @@ export class DicomBufferToView {
         this.#options.numberOfFiles);
       // call onloaditem
       this.onloaditem({
-        data: {
-          image: image,
-          info: dataElements
-        },
+        data: new DicomData(dataElements, image),
         source: origin,
         warn: factory.getWarning()
       });
@@ -285,9 +283,7 @@ export class DicomBufferToView {
   #handleNonImageData(index, origin) {
     const dicomParser = this.#dicomParserStore[index];
     this.onloaditem({
-      data: {
-        info: dicomParser.getDicomElements()
-      },
+      data: new DicomData(dicomParser.getDicomElements()),
       source: origin,
     });
     // send load events

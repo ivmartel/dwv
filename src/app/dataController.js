@@ -9,7 +9,7 @@ import {Image} from '../image/image';
 /**
  * DICOM data: meta and possible image.
  */
-class DicomData {
+export class DicomData {
   /**
    * DICOM meta data.
    *
@@ -25,7 +25,7 @@ class DicomData {
 
   /**
    * @param {object} meta The DICOM meta data.
-   * @param {Image} image The DICOM image.
+   * @param {Image} [image] Optional DICOM image.
    */
   constructor(meta, image) {
     this.meta = meta;
@@ -140,19 +140,20 @@ export class DataController {
    * Add a new data.
    *
    * @param {string} dataId The data id.
-   * @param {Image} image The image.
-   * @param {object} meta The image meta.
+   * @param {DicomData} data The data.
    */
-  addNew(dataId, image, meta) {
+  addNew(dataId, data) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
-    this.#dataList[dataId] = new DicomData(meta, image);
+    this.#dataList[dataId] = data;
     // listen to image change
-    if (typeof image !== 'undefined') {
-      image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
-      image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+    if (typeof data.image !== 'undefined') {
+      data.image.addEventListener(
+        'imagecontentchange', this.#getFireEvent(dataId));
+      data.image.addEventListener(
+        'imagegeometrychange', this.#getFireEvent(dataId));
     }
   }
 
@@ -185,10 +186,9 @@ export class DataController {
    * Update the current data.
    *
    * @param {string} dataId The data id.
-   * @param {Image} image The image.
-   * @param {object} meta The image meta.
+   * @param {DicomData} data The data.
    */
-  update(dataId, image, meta) {
+  update(dataId, data) {
     if (typeof this.#dataList[dataId] === 'undefined') {
       throw new Error('Cannot find data to update: ' + dataId);
     }
@@ -196,15 +196,15 @@ export class DataController {
 
     // add slice to current image
     if (typeof dataToUpdate.image !== 'undefined' &&
-      typeof image !== 'undefined'
+      typeof data.image !== 'undefined'
     ) {
-      dataToUpdate.image.appendSlice(image);
+      dataToUpdate.image.appendSlice(data.image);
     }
 
     // update meta data
     // TODO add time support
     let idKey = '';
-    if (typeof meta['00020010'] !== 'undefined') {
+    if (typeof data.meta['00020010'] !== 'undefined') {
       // dicom case, use 'InstanceNumber'
       idKey = '00200013';
     } else {
@@ -212,7 +212,7 @@ export class DataController {
     }
     dataToUpdate.meta = mergeObjects(
       dataToUpdate.meta,
-      meta,
+      data.meta,
       idKey,
       'value');
   }
