@@ -3306,6 +3306,13 @@ export declare class Point2D {
      * @returns {string} The point as a string.
      */
     toString(): string;
+    /**
+     * Get the distance to another Point2D.
+     *
+     * @param {Point2D} point2D The input point.
+     * @returns {number} Ths distance to the input point.
+     */
+    getDistance(point2D: Point2D): number;
     #private;
 }
 
@@ -4126,6 +4133,12 @@ export declare class View {
      */
     getCurrentIndex(): Index;
     /**
+     * Get the SOP image UID of the current image.
+     *
+     * @returns {string} The UID.
+     */
+    getCurrentImageUid(): string;
+    /**
      * Check if the current position (default) or
      * the provided position is in bounds.
      *
@@ -4362,6 +4375,12 @@ export declare class ViewController {
      * @returns {Index} The current index.
      */
     getCurrentIndex(): Index;
+    /**
+     * Get the SOP image UID of the current image.
+     *
+     * @returns {string} The UID.
+     */
+    getCurrentImageUid(): string;
     /**
      * Get the current oriented index.
      *
