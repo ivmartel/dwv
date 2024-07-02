@@ -18,6 +18,22 @@ import {DicomCode} from './dicomCode';
 /* eslint-enable no-unused-vars */
 
 /**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  SegmentNumber: '00620004',
+  SegmentLabel: '00620005',
+  SegmentAlgorithmType: '00620008',
+  SegmentAlgorithmName: '00620009',
+  RecommendedDisplayGrayscaleValue: '0062000C',
+  RecommendedDisplayCIELabValue: '0062000D',
+  SegmentedPropertyCategoryCodeSequence: '00620003',
+  SegmentedPropertyTypeCodeSequence: '0062000F',
+  TrackingID: '00620020',
+  TrackingUID: '00620021'
+};
+
+/**
  * DICOM (mask) segment: item of a SegmentSequence (0062,0002).
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.20.4.html}.
@@ -109,13 +125,14 @@ export function getSegment(dataElements) {
   // label -> SegmentLabel (type1)
   // algorithmType -> SegmentAlgorithmType (type1)
   const segment = new MaskSegment(
-    dataElements['00620004'].value[0],
-    dataElements['00620005'] ? dataElements['00620005'].value[0] : 'n/a',
-    dataElements['00620008'].value[0]
+    dataElements[TagKeys.SegmentNumber].value[0],
+    dataElements[TagKeys.SegmentLabel]
+      ? dataElements[TagKeys.SegmentLabel].value[0] : 'n/a',
+    dataElements[TagKeys.SegmentAlgorithmType].value[0]
   );
   // algorithmName -> SegmentAlgorithmName (type1C)
-  if (dataElements['00620009']) {
-    segment.algorithmName = dataElements['00620009'].value[0];
+  if (typeof dataElements[TagKeys.SegmentAlgorithmName] !== 'undefined') {
+    segment.algorithmName = dataElements[TagKeys.SegmentAlgorithmName].value[0];
   }
   // // required if type is not MANUAL
   // if (segment.algorithmType !== 'MANUAL' &&
@@ -126,10 +143,14 @@ export function getSegment(dataElements) {
   // displayValue ->
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
-  if (typeof dataElements['0062000C'] !== 'undefined') {
-    segment.displayValue = dataElements['006200C'].value[0];
-  } else if (typeof dataElements['0062000D'] !== 'undefined') {
-    const cielabElement = dataElements['0062000D'].value;
+  if (typeof dataElements[TagKeys.RecommendedDisplayGrayscaleValue] !==
+    'undefined') {
+    segment.displayValue =
+      dataElements[TagKeys.RecommendedDisplayGrayscaleValue].value[0];
+  } else if (typeof dataElements[TagKeys.RecommendedDisplayCIELabValue] !==
+    'undefined') {
+    const cielabElement =
+      dataElements[TagKeys.RecommendedDisplayCIELabValue].value;
     const rgb = cielabToSrgb(uintLabToLab({
       l: cielabElement[0],
       a: cielabElement[1],
@@ -138,23 +159,27 @@ export function getSegment(dataElements) {
     segment.displayRGBValue = rgb;
   }
   // Segmented Property Category Code Sequence (type1, only one)
-  if (typeof dataElements['00620003'] !== 'undefined') {
+  if (typeof dataElements[TagKeys.SegmentedPropertyCategoryCodeSequence] !==
+    'undefined') {
     segment.propertyCategoryCode =
-      getCode(dataElements['00620003'].value[0]);
+      getCode(
+        dataElements[TagKeys.SegmentedPropertyCategoryCodeSequence].value[0]
+      );
   } else {
     throw new Error('Missing Segmented Property Category Code Sequence.');
   }
   // Segmented Property Type Code Sequence (type1)
-  if (typeof dataElements['0062000F'] !== 'undefined') {
+  if (typeof dataElements[TagKeys.SegmentedPropertyTypeCodeSequence] !==
+    'undefined') {
     segment.propertyTypeCode =
-      getCode(dataElements['0062000F'].value[0]);
+      getCode(dataElements[TagKeys.SegmentedPropertyTypeCodeSequence].value[0]);
   } else {
     throw new Error('Missing Segmented Property Type Code Sequence.');
   }
   // tracking Id and UID (type1C)
-  if (typeof dataElements['00620020'] !== 'undefined') {
-    segment.trackingId = dataElements['00620020'].value[0];
-    segment.trackingUid = dataElements['00620021'].value[0];
+  if (typeof dataElements[TagKeys.TrackingID] !== 'undefined') {
+    segment.trackingId = dataElements[TagKeys.TrackingID].value[0];
+    segment.trackingUid = dataElements[TagKeys.TrackingUID].value[0];
   }
 
   return segment;

@@ -1,12 +1,36 @@
 import {getSpacingFromMeasure} from './dicomElementsWrapper';
 import {logger} from '../utils/logger';
 import {arrayEquals} from '../utils/array';
+import {
+  getDicomCodeItem,
+  getSegmentationCode,
+  getSourceImageForProcessingCode
+} from './dicomCode';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
 import {Spacing} from '../image/spacing';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  DerivationImageSequence: '00089124',
+  SourceImageSequence: '00082112',
+  ReferencedSOPClassUID: '00081150',
+  ReferencedSOPInstanceUID: '00081155',
+  FrameContentSequence: '00209111',
+  DimensionIndexValue: '00209157',
+  SegmentIdentificationSequence: '0062000A',
+  ReferencedSegmentNumber: '0062000B',
+  PlanePositionSequence: '00209113',
+  ImagePosition: '00200032',
+  PlaneOrientationSequence: '00209116',
+  ImageOrientation: '00200037',
+  PixelMeasuresSequence: '00289110'
+};
 
 /**
  * DICOM segment frame info: item of a
@@ -76,24 +100,29 @@ export class DicomSegmentFrameInfo {
 export function getSegmentFrameInfo(dataElements) {
   // Derivation Image Sequence
   const derivationImages = [];
-  if (typeof dataElements['00089124'] !== 'undefined') {
-    const derivationImageSq = dataElements['00089124'].value;
+  if (typeof dataElements[TagKeys.DerivationImageSequence] !== 'undefined') {
+    const derivationImageSq =
+      dataElements[TagKeys.DerivationImageSequence].value;
     // Source Image Sequence
     for (let i = 0; i < derivationImageSq.length; ++i) {
       const sourceImages = [];
-      if (typeof derivationImageSq[i]['00082112'] !== 'undefined') {
-        const sourceImageSq = derivationImageSq[i]['00082112'].value;
+      if (typeof derivationImageSq[i][TagKeys.SourceImageSequence] !==
+        'undefined') {
+        const sourceImageSq =
+          derivationImageSq[i][TagKeys.SourceImageSequence].value;
         for (let j = 0; j < sourceImageSq.length; ++j) {
           const sourceImage = {};
           // Referenced SOP Class UID
-          if (typeof sourceImageSq[j]['00081150'] !== 'undefined') {
+          if (typeof sourceImageSq[j][TagKeys.ReferencedSOPClassUID] !==
+            'undefined') {
             sourceImage.referencedSOPClassUID =
-              sourceImageSq[j]['00081150'].value[0];
+              sourceImageSq[j][TagKeys.ReferencedSOPClassUID].value[0];
           }
           // Referenced SOP Instance UID
-          if (typeof sourceImageSq[j]['00081155'] !== 'undefined') {
+          if (typeof sourceImageSq[j][TagKeys.ReferencedSOPInstanceUID] !==
+            'undefined') {
             sourceImage.referencedSOPInstanceUID =
-              sourceImageSq[j]['00081155'].value[0];
+              sourceImageSq[j][TagKeys.ReferencedSOPInstanceUID].value[0];
           }
           sourceImages.push(sourceImage);
         }
@@ -104,17 +133,18 @@ export function getSegmentFrameInfo(dataElements) {
     }
   }
   // Frame Content Sequence (required, only one)
-  const frameContentSq = dataElements['00209111'].value;
+  const frameContentSq = dataElements[TagKeys.FrameContentSequence].value;
   // Dimension Index Value
-  const dimIndex = frameContentSq[0]['00209157'].value;
+  const dimIndex = frameContentSq[0][TagKeys.DimensionIndexValue].value;
   // Segment Identification Sequence (required, only one)
-  const segmentIdSq = dataElements['0062000A'].value;
+  const segmentIdSq = dataElements[TagKeys.SegmentIdentificationSequence].value;
   // Referenced Segment Number
-  const refSegmentNumber = parseInt(segmentIdSq[0]['0062000B'].value[0], 0);
+  const refSegmentNumber =
+    parseInt(segmentIdSq[0][TagKeys.ReferencedSegmentNumber].value[0], 0);
   // Plane Position Sequence (required, only one)
-  const planePosSq = dataElements['00209113'].value;
+  const planePosSq = dataElements[TagKeys.PlanePositionSequence].value;
   // Image Position (Patient) (conditionally required)
-  const imagePosPat = planePosSq[0]['00200032'].value;
+  const imagePosPat = planePosSq[0][TagKeys.ImagePosition].value;
   for (let p = 0; p < imagePosPat.length; ++p) {
     imagePosPat[p] = parseFloat(imagePosPat[p]);
   }
@@ -125,20 +155,21 @@ export function getSegmentFrameInfo(dataElements) {
     refSegmentNumber
   );
   // Plane Orientation Sequence
-  if (typeof dataElements['00209116'] !== 'undefined') {
-    const framePlaneOrientationSeq = dataElements['00209116'];
+  if (typeof dataElements[TagKeys.PlaneOrientationSequence] !== 'undefined') {
+    const framePlaneOrientationSeq =
+      dataElements[TagKeys.PlaneOrientationSequence];
     if (framePlaneOrientationSeq.value.length !== 0) {
       // should only be one Image Orientation (Patient)
       const frameImageOrientation =
-        framePlaneOrientationSeq.value[0]['00200037'].value;
+        framePlaneOrientationSeq.value[0][TagKeys.ImageOrientation].value;
       if (typeof frameImageOrientation !== 'undefined') {
         frameInfo.imageOrientationPatient = frameImageOrientation;
       }
     }
   }
   // Pixel Measures Sequence
-  if (typeof dataElements['00289110'] !== 'undefined') {
-    const framePixelMeasuresSeq = dataElements['00289110'];
+  if (typeof dataElements[TagKeys.PixelMeasuresSequence] !== 'undefined') {
+    const framePixelMeasuresSeq = dataElements[TagKeys.PixelMeasuresSequence];
     if (framePixelMeasuresSeq.value.length !== 0) {
       // should only be one
       const frameSpacing =
@@ -229,16 +260,10 @@ export function getDicomSegmentFrameInfoItem(frameInfo) {
   };
   // optional DerivationImageSequence
   if (frameInfo.derivationImages !== undefined) {
-    const sourceImgPurposeOfReferenceCode = {
-      CodeMeaning: 'Source image for image processing operation',
-      CodeValue: 121_322,
-      CodingSchemeDesignator: 'DCM'
-    };
-    const segDerivationCode = {
-      CodeMeaning: 'Segmentation',
-      CodeValue: 113_076,
-      CodingSchemeDesignator: 'DCM'
-    };
+    const sourceImgPurposeOfReferenceCode =
+      getDicomCodeItem(getSourceImageForProcessingCode());
+    const segDerivationCode =
+      getDicomCodeItem(getSegmentationCode());
 
     const derivationImageItems = [];
     for (const derivationImage of frameInfo.derivationImages) {
