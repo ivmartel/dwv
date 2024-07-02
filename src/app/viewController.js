@@ -185,6 +185,15 @@ export class ViewController {
   }
 
   /**
+   * Get the SOP image UID of the current image.
+   *
+   * @returns {string} The UID.
+   */
+  getCurrentImageUid() {
+    return this.#view.getCurrentImageUid();
+  }
+
+  /**
    * Get the current oriented index.
    *
    * @returns {Index} The index.

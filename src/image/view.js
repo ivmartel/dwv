@@ -524,6 +524,15 @@ export class View {
   }
 
   /**
+   * Get the SOP image UID of the current image.
+   *
+   * @returns {string} The UID.
+   */
+  getCurrentImageUid() {
+    return this.#image.getImageUid(this.getCurrentIndex());
+  }
+
+  /**
    * Check if the current position (default) or
    * the provided position is in bounds.
    *
