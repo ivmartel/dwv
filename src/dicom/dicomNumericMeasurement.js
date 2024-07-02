@@ -15,7 +15,7 @@ import {DataElement} from './dataElement';
 /**
  * Related DICOM tag keys.
  */
-const tagKeys = {
+const TagKeys = {
   MeasuredValueSequence: '0040A300',
   NumericValueQualifierCodeSequence: '0040A301'
 };
@@ -59,14 +59,14 @@ export class NumericMeasurement {
 export function getNumericMeasurement(dataElements) {
   const measurement = new NumericMeasurement();
 
-  if (typeof dataElements[tagKeys.MeasuredValueSequence] !== 'undefined') {
+  if (typeof dataElements[TagKeys.MeasuredValueSequence] !== 'undefined') {
     measurement.measuredValue = getMeasuredValue(
-      dataElements[tagKeys.MeasuredValueSequence].value[0]);
+      dataElements[TagKeys.MeasuredValueSequence].value[0]);
   }
-  if (typeof dataElements[tagKeys.NumericValueQualifierCodeSequence] !==
+  if (typeof dataElements[TagKeys.NumericValueQualifierCodeSequence] !==
     'undefined') {
     measurement.numericValueQualifierCode = getCode(
-      dataElements[tagKeys.NumericValueQualifierCodeSequence].value[0]);
+      dataElements[TagKeys.NumericValueQualifierCodeSequence].value[0]);
   }
 
   return measurement;

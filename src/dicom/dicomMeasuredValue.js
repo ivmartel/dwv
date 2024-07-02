@@ -11,7 +11,7 @@ import {DataElement} from './dataElement';
 /**
  * Related DICOM tag keys.
  */
-const tagKeys = {
+const TagKeys = {
   NumericValue: '0040A30A',
   FloatingPointValue: '0040A161',
   RationalNumeratorValue: '0040A162',
@@ -71,25 +71,25 @@ export class MeasuredValue {
 export function getMeasuredValue(dataElements) {
   const value = new MeasuredValue();
 
-  if (typeof dataElements[tagKeys.NumericValue] !== 'undefined') {
-    value.numericValue = dataElements[tagKeys.NumericValue].value[0];
+  if (typeof dataElements[TagKeys.NumericValue] !== 'undefined') {
+    value.numericValue = dataElements[TagKeys.NumericValue].value[0];
   }
-  if (typeof dataElements[tagKeys.FloatingPointValue] !== 'undefined') {
+  if (typeof dataElements[TagKeys.FloatingPointValue] !== 'undefined') {
     value.floatingPointValue =
-      dataElements[tagKeys.FloatingPointValue].value[0];
+      dataElements[TagKeys.FloatingPointValue].value[0];
   }
-  if (typeof dataElements[tagKeys.RationalNumeratorValue] !== 'undefined') {
+  if (typeof dataElements[TagKeys.RationalNumeratorValue] !== 'undefined') {
     value.rationalNumeratorValue =
-      dataElements[tagKeys.RationalNumeratorValue].value[0];
+      dataElements[TagKeys.RationalNumeratorValue].value[0];
   }
-  if (typeof dataElements[tagKeys.RationalDenominatorValue] !== 'undefined') {
+  if (typeof dataElements[TagKeys.RationalDenominatorValue] !== 'undefined') {
     value.rationalDenominatorValue =
-      dataElements[tagKeys.RationalDenominatorValue].value[0];
+      dataElements[TagKeys.RationalDenominatorValue].value[0];
   }
-  if (typeof dataElements[tagKeys.MeasurementUnitsCodeSequence] !==
+  if (typeof dataElements[TagKeys.MeasurementUnitsCodeSequence] !==
     'undefined') {
     value.measurementUnitsCode = getCode(
-      dataElements[tagKeys.MeasurementUnitsCodeSequence].value[0]);
+      dataElements[TagKeys.MeasurementUnitsCodeSequence].value[0]);
   }
 
   return value;

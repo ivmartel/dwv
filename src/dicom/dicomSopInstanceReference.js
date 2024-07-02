@@ -6,7 +6,7 @@ import {DataElement} from './dataElement';
 /**
  * Related DICOM tag keys.
  */
-const tagKeys = {
+const TagKeys = {
   ReferencedSOPClassUID: '00081150',
   ReferencedSOPInstanceUID: '00081155'
 };
@@ -47,13 +47,13 @@ export class SopInstanceReference {
 export function getSopInstanceReference(dataElements) {
   const ref = new SopInstanceReference();
 
-  if (typeof dataElements[tagKeys.ReferencedSOPClassUID] !== 'undefined') {
+  if (typeof dataElements[TagKeys.ReferencedSOPClassUID] !== 'undefined') {
     ref.referencedSOPClassUID =
-      dataElements[tagKeys.ReferencedSOPClassUID].value[0];
+      dataElements[TagKeys.ReferencedSOPClassUID].value[0];
   }
-  if (typeof dataElements[tagKeys.ReferencedSOPInstanceUID] !== 'undefined') {
+  if (typeof dataElements[TagKeys.ReferencedSOPInstanceUID] !== 'undefined') {
     ref.referencedSOPInstanceUID =
-      dataElements[tagKeys.ReferencedSOPInstanceUID].value[0];
+      dataElements[TagKeys.ReferencedSOPInstanceUID].value[0];
   }
 
   return ref;

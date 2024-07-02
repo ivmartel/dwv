@@ -11,7 +11,7 @@ import {DataElement} from './dataElement';
 /**
  * Related DICOM tag keys.
  */
-const tagKeys = {
+const TagKeys = {
   ReferencedFrameNumber: '00081160',
   ReferencedSOPSequence: '00081199',
   ReferencedSegmentNumber: '0062000B'
@@ -62,17 +62,17 @@ export class ImageReference {
 export function getImageReference(dataElements) {
   const ref = new ImageReference();
 
-  if (typeof dataElements[tagKeys.ReferencedFrameNumber] !== 'undefined') {
+  if (typeof dataElements[TagKeys.ReferencedFrameNumber] !== 'undefined') {
     ref.referencedFrameNumber =
-      dataElements[tagKeys.ReferencedFrameNumber].value[0];
+      dataElements[TagKeys.ReferencedFrameNumber].value[0];
   }
-  if (typeof dataElements[tagKeys.ReferencedSOPSequence] !== 'undefined') {
+  if (typeof dataElements[TagKeys.ReferencedSOPSequence] !== 'undefined') {
     ref.referencedSOPSequence = getSopInstanceReference(
-      dataElements[tagKeys.ReferencedSOPSequence].value[0]);
+      dataElements[TagKeys.ReferencedSOPSequence].value[0]);
   }
-  if (typeof dataElements[tagKeys.ReferencedSegmentNumber] !== 'undefined') {
+  if (typeof dataElements[TagKeys.ReferencedSegmentNumber] !== 'undefined') {
     ref.referencedSegmentNumber =
-      dataElements[tagKeys.ReferencedSegmentNumber].value[0];
+      dataElements[TagKeys.ReferencedSegmentNumber].value[0];
   }
 
   return ref;

@@ -6,7 +6,7 @@ import {DataElement} from './dataElement';
 /**
  * Related DICOM tag keys.
  */
-const tagKeys = {
+const TagKeys = {
   PixelOriginInterpretation: '00480301',
   GraphicData: '00700022',
   GraphicType: '00700023',
@@ -59,18 +59,18 @@ export class SpatialCoordinate {
 export function getSpatialCoordinate(dataElements) {
   const scoord = new SpatialCoordinate();
 
-  if (typeof dataElements[tagKeys.GraphicData] !== 'undefined') {
-    scoord.graphicData = dataElements[tagKeys.GraphicData].value;
+  if (typeof dataElements[TagKeys.GraphicData] !== 'undefined') {
+    scoord.graphicData = dataElements[TagKeys.GraphicData].value;
   }
-  if (typeof dataElements[tagKeys.GraphicType] !== 'undefined') {
-    scoord.graphicType = dataElements[tagKeys.GraphicType].value[0];
+  if (typeof dataElements[TagKeys.GraphicType] !== 'undefined') {
+    scoord.graphicType = dataElements[TagKeys.GraphicType].value[0];
   }
-  if (typeof dataElements[tagKeys.PixelOriginInterpretation] !== 'undefined') {
+  if (typeof dataElements[TagKeys.PixelOriginInterpretation] !== 'undefined') {
     scoord.pixelOriginInterpretation =
-      dataElements[tagKeys.PixelOriginInterpretation].value[0];
+      dataElements[TagKeys.PixelOriginInterpretation].value[0];
   }
-  if (typeof dataElements[tagKeys.FiducialUID] !== 'undefined') {
-    scoord.fiducialUID = dataElements[tagKeys.FiducialUID].value[0];
+  if (typeof dataElements[TagKeys.FiducialUID] !== 'undefined') {
+    scoord.fiducialUID = dataElements[TagKeys.FiducialUID].value[0];
   }
   return scoord;
 };
