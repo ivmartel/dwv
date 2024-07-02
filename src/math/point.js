@@ -69,6 +69,18 @@ export class Point2D {
     return '(' + this.#x + ', ' + this.#y + ')';
   }
 
+  /**
+   * Get the distance to another Point2D.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {number} Ths distance to the input point.
+   */
+  getDistance(point2D) {
+    const dx = this.#x - point2D.getX();
+    const dy = this.#y - point2D.getY();
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
 } // Point2D class
 
 /**
