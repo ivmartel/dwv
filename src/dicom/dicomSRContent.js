@@ -48,23 +48,52 @@ const TagKeys = {
   ContinuityOfContent: '0040A050'
 };
 
-export const valueTypeValueTagName = {
+/**
+ * DICOM relationship types.
+ */
+export const RelationshipTypes = {
+  contains: 'CONTAINS',
+  hasProperties: 'HAS PROPERTIES',
+  hasObsContext: 'HAS OBS CONTEXT',
+  hasAcqContext: 'HAS ACQ CONTEXT',
+  inferredFrom: 'INFERRED FROM',
+  selectedFrom: 'SELECTED FROM',
+  hasConceptMod: 'HAS CONCEPT MOD'
+};
+
+/**
+ * DICOM value types.
+ */
+export const ValueTypes = {
+  text: 'TEXT',
+  num: 'NUM',
+  code: 'CODE',
+  date: 'DATE',
+  time: 'TIME',
+  datetime: 'DATETIME',
+  uidref: 'UIDREF',
+  pname: 'PNAME',
+  composite: 'COMPOSITE',
+  image: 'IMAGE',
+  waveform: 'WAVEFORM',
+  scoord: 'SCOORD',
+  scoord3d: 'SCOORD3D',
+  tcoord: 'TCOORD',
+  container: 'CONTAINER',
+  table: 'TABLE',
+};
+
+/**
+ * DICOM value type to associated tag name.
+ */
+export const ValueTypeValueTagName = {
   TEXT: 'TextValue',
-  // NUM: '',
-  // CODE: '',
   DATE: 'Date',
   TIME: 'Time',
   DATETIME: 'DateTime',
   UIDREF: 'UID',
   PNAME: 'PersonName',
-  // COMPOSITE: '',
-  // IMAGE: '',
-  // WAVEFORM: '',
-  // SCOORD: '',
-  // SCOORD3D: '',
-  // TCOORD: '',
   CONTAINER: 'ContinuityOfContent',
-  // TABLE: ''
 };
 
 /**
@@ -191,23 +220,23 @@ export function getSRContent(dataElements) {
 
   // set value acording to valueType
   // (date and time are stored as string)
-  if (valueType === 'CODE') {
+  if (valueType === ValueTypes.code) {
     content.value = getCode(
       dataElements[TagKeys.ConceptCodeSequence].value[0]);
-  } else if (valueType === 'NUM') {
+  } else if (valueType === ValueTypes.num) {
     content.value = getNumericMeasurement(dataElements);
-  } else if (valueType === 'IMAGE') {
+  } else if (valueType === ValueTypes.image) {
     content.value = getImageReference(dataElements);
-  } else if (valueType === 'COMPOSITE') {
+  } else if (valueType === ValueTypes.composite) {
     content.value = getSopInstanceReference(
       dataElements[TagKeys.ReferencedSOPSequence].value[0]
     );
-  } else if (valueType === 'SCOORD') {
+  } else if (valueType === ValueTypes.scoord) {
     content.value = getSpatialCoordinate(dataElements);
-  } else if (valueType === 'SCOORD3D') {
+  } else if (valueType === ValueTypes.scoord3d) {
     content.value = getSpatialCoordinate3D(dataElements);
   } else {
-    const valueTagName = valueTypeValueTagName[valueType];
+    const valueTagName = ValueTypeValueTagName[valueType];
     if (typeof valueTagName !== 'undefined') {
       content.value = dataElements[TagKeys[valueTagName]].value[0];
     } else {
@@ -257,33 +286,33 @@ export function getDicomSRContentItem(content) {
     contentItem.ConceptCodeSequence = {
       value: [getDicomCodeItem(content.value)]
     };
-  } else if (content.valueType === 'NUM') {
+  } else if (content.valueType === ValueTypes.num) {
     contentItem = {
       ...contentItem,
       ...getDicomNumericMeasurementItem(content.value)
     };
-  } else if (content.valueType === 'IMAGE') {
+  } else if (content.valueType === ValueTypes.image) {
     contentItem = {
       ...contentItem,
       ...getDicomImageReferenceItem(content.value)
     };
-  } else if (content.valueType === 'COMPOSITE') {
+  } else if (content.valueType === ValueTypes.composite) {
     contentItem = {
       ...contentItem,
       ...getDicomSopInstanceReferenceItem(content.value)
     };
-  } else if (content.valueType === 'SCOORD') {
+  } else if (content.valueType === ValueTypes.scoord) {
     contentItem = {
       ...contentItem,
       ...getDicomSpatialCoordinateItem(content.value)
     };
-  } else if (content.valueType === 'SCOORD3D') {
+  } else if (content.valueType === ValueTypes.scoord3d) {
     contentItem = {
       ...contentItem,
       ...getDicomSpatialCoordinate3DItem(content.value)
     };
   } else {
-    const valueTagName = valueTypeValueTagName[content.valueType];
+    const valueTagName = ValueTypeValueTagName[content.valueType];
     if (typeof valueTagName !== 'undefined') {
       contentItem[valueTagName] = content.value;
     } else {
