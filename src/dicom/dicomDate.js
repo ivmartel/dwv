@@ -14,7 +14,7 @@ function padZeroTwoDigit(str) {
  * Get a 'date' object with {year, monthIndex, day} ready for the
  *   Date constructor from a DICOM element with vr=DA.
  *
- * @param {object} element The DICOM element with date information.
+ * @param {DataElement} element The DICOM element with date information.
  * @returns {{year, monthIndex, day}|undefined} The 'date' object.
  */
 export function getDate(element) {
