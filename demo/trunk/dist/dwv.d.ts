@@ -880,6 +880,7 @@ export declare class DeleteSegmentCommand {
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
+ * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 export declare class DicomCode {
     /**
