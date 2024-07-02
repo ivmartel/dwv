@@ -18,6 +18,7 @@ const TagKeys = {
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
+ * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 export class DicomCode {
   /**
@@ -129,21 +130,101 @@ export function getCode(dataElements) {
  */
 export function getDicomCodeItem(code) {
   // dicom item (tags are in group/element order)
-  const codeItem = {};
+  const item = {};
   // value
   if (typeof code.value !== 'undefined') {
-    codeItem.CodeValue = code.value;
+    item.CodeValue = code.value;
   } else if (typeof code.longValue !== 'undefined') {
-    codeItem.LongCodeValue = code.longValue;
+    item.LongCodeValue = code.longValue;
   } else if (typeof code.urnValue !== 'undefined') {
-    codeItem.URNCodeValue = code.urnValue;
+    item.URNCodeValue = code.urnValue;
   }
   // CodingSchemeDesignator
   if (typeof code.schemeDesignator !== 'undefined') {
-    codeItem.CodingSchemeDesignator = code.schemeDesignator;
+    item.CodingSchemeDesignator = code.schemeDesignator;
   }
   // CodeMeaning
-  codeItem.CodeMeaning = code.meaning;
+  item.CodeMeaning = code.meaning;
   // return
-  return codeItem;
+  return item;
+}
+
+/**
+ * DICOM codes.
+ */
+const DcmCodes = {
+  111030: 'Image Region',
+  112039: 'Tracking Identifier',
+  112040: 'Tracking Unique Identifier',
+  113076: 'Segmentation',
+  121322: 'Source image for image processing operation',
+  121324: 'Source Image',
+  125007: 'Measurement Group'
+};
+
+/**
+ * Get a DICOM code from a value (~id).
+ *
+ * @param {string} value The code value.
+ * @returns {DicomCode} The DICOM code.
+ */
+function getDicomCode(value) {
+  const code = new DicomCode(DcmCodes[value]);
+  code.schemeDesignator = 'DCM';
+  code.value = value;
+  return code;
+}
+
+/**
+ * Get a measurement group DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getMeasurementGroupCode() {
+  return getDicomCode('125007');
+}
+
+/**
+ * Get an image region DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getImageRegionCode() {
+  return getDicomCode('111030');
+}
+
+/**
+ * Get a source image DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getSourceImageCode() {
+  return getDicomCode('121324');
+}
+
+/**
+ * Get a tracking identifier DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getTrackingIdentifierCode() {
+  return getDicomCode('112039');
+}
+
+/**
+ * Get a segmentation DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getSegmentationCode() {
+  return getDicomCode('113076');
+}
+
+/**
+ * Get a source image for processing DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getSourceImageForProcessingCode() {
+  return getDicomCode('121322');
 }
