@@ -1,6 +1,6 @@
 import {ROI} from '../math/roi';
 import {defaults} from '../app/defaults';
-import {getDefaultAnchor} from './editor';
+import {getDefaultAnchor} from './drawBounds';
 // external
 import Konva from 'konva';
 

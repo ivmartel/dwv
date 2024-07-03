@@ -1,7 +1,7 @@
 import {Point2D} from '../math/point';
 import {Line, getPerpendicularLine, getAngle} from '../math/line';
 import {defaults} from '../app/defaults';
-import {getDefaultAnchor} from './editor';
+import {getDefaultAnchor} from './drawBounds';
 // external
 import Konva from 'konva';
 

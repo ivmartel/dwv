@@ -9,41 +9,7 @@ import Konva from 'konva';
 import {App} from '../app/application';
 import {ViewController} from '../app/viewController';
 import {DrawLayer} from '../gui/drawLayer';
-import {Style} from '../gui/style';
 /* eslint-enable no-unused-vars */
-
-/**
- * Get the default anchor shape.
- *
- * @param {number} x The X position.
- * @param {number} y The Y position.
- * @param {string} id The shape id.
- * @param {Style} style The application style.
- * @returns {Konva.Ellipse} The default anchor shape.
- */
-export function getDefaultAnchor(x, y, id, style) {
-  const radius = style.applyZoomScale(3);
-  const absRadius = {
-    x: Math.abs(radius.x),
-    y: Math.abs(radius.y)
-  };
-  return new Konva.Ellipse({
-    x: x,
-    y: y,
-    stroke: '#999',
-    fill: 'rgba(100,100,100,0.7',
-    strokeWidth: style.getStrokeWidth(),
-    strokeScaleEnabled: false,
-    radius: absRadius,
-    radiusX: absRadius.x,
-    radiusY: absRadius.y,
-    name: 'anchor',
-    id: id.toString(),
-    dragOnTop: false,
-    draggable: true,
-    visible: false
-  });
-}
 
 /**
  * Shape editor.

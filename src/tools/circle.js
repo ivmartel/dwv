@@ -3,8 +3,7 @@ import {Point2D} from '../math/point';
 import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
-import {getDefaultAnchor} from './editor';
-import {DRAW_DEBUG} from './drawBounds';
+import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
 // external
 import Konva from 'konva';
 

@@ -2,7 +2,7 @@ import {Line, getPerpendicularLine} from '../math/line';
 import {Point2D} from '../math/point';
 import {replaceFlags} from '../utils/string';
 import {defaults} from '../app/defaults';
-import {getDefaultAnchor} from './editor';
+import {getDefaultAnchor} from './drawBounds';
 // external
 import Konva from 'konva';
 
