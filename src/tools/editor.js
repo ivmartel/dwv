@@ -1,6 +1,6 @@
 import {logger} from '../utils/logger';
 import {getShapeDisplayName, ChangeGroupCommand} from './drawCommands';
-import {validateAnchorPosition} from './draw';
+import {validateAnchorPosition} from './drawBounds';
 // external
 import Konva from 'konva';
 

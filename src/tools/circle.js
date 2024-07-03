@@ -4,7 +4,7 @@ import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
 import {getDefaultAnchor} from './editor';
-import {DRAW_DEBUG} from './draw';
+import {DRAW_DEBUG} from './drawBounds';
 // external
 import Konva from 'konva';
 
