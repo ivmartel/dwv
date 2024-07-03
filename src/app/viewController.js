@@ -194,6 +194,16 @@ export class ViewController {
   }
 
   /**
+   * Get the image origin index for a image UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {Index|undefined} The origin index.
+   */
+  getOriginIndexForImageUid(uid) {
+    return this.#view.getOriginIndexForImageUid(uid);
+  }
+
+  /**
    * Get the current oriented index.
    *
    * @returns {Index} The index.

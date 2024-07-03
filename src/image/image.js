@@ -257,6 +257,22 @@ export class Image {
   }
 
   /**
+   * Get the image origin for a image UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {Point3D|undefined} The origin.
+   */
+  getOriginForImageUid(uid) {
+    let origin;
+    const uidIndex = this.#imageUids.indexOf(uid);
+    if (uidIndex !== -1) {
+      const origins = this.getGeometry().getOrigins();
+      origin = origins[uidIndex];
+    }
+    return origin;
+  }
+
+  /**
    * Check if this image includes the input uids.
    *
    * @param {string[]} uids UIDs to test for presence.
