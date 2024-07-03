@@ -159,7 +159,8 @@ const DcmCodes = {
   113076: 'Segmentation',
   121322: 'Source image for image processing operation',
   121324: 'Source Image',
-  125007: 'Measurement Group'
+  125007: 'Measurement Group',
+  125309: 'Short label'
 };
 
 /**
@@ -227,4 +228,13 @@ export function getSegmentationCode() {
  */
 export function getSourceImageForProcessingCode() {
   return getDicomCode('121322');
+}
+
+/**
+ * Get a short label DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getShortLabelCode() {
+  return getDicomCode('125309');
 }
