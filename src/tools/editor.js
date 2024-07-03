@@ -7,8 +7,8 @@ import Konva from 'konva';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
-import {ViewController} from '../app/viewController';
 import {DrawLayer} from '../gui/drawLayer';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -59,11 +59,11 @@ export class ShapeEditor {
   #drawLayer;
 
   /**
-   * Associated view controller. Used for quantification update.
+   * The associated annotation.
    *
-   * @type {ViewController}
+   * @type {Annotation}
    */
-  #viewController = null;
+  #annotation;
 
   /**
    * Active flag.
@@ -98,12 +98,13 @@ export class ShapeEditor {
    *
    * @param {Konva.Shape} inshape The shape to edit.
    * @param {DrawLayer} drawLayer The associated draw layer.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Annotation} annotation The associated annotation.
    */
-  setShape(inshape, drawLayer, viewController) {
+  setShape(inshape, drawLayer, annotation) {
     this.#shape = inshape;
     this.#drawLayer = drawLayer;
-    this.#viewController = viewController;
+    this.#annotation = annotation;
+
     if (this.#shape) {
       // remove old anchors
       this.#removeAnchors();
@@ -186,7 +187,7 @@ export class ShapeEditor {
   reset() {
     this.#shape = undefined;
     this.#drawLayer = undefined;
-    this.#viewController = undefined;
+    this.#annotation = undefined;
   }
 
   /**
@@ -332,9 +333,17 @@ export class ShapeEditor {
       }
       // validate the anchor position
       validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
-      // update shape
-      this.#currentFactory.update(
-        anchor, this.#app.getStyle(), this.#viewController);
+      if (typeof this.#currentFactory.constrainAnchorMove !== 'undefined') {
+        this.#currentFactory.constrainAnchorMove(anchor);
+      }
+
+      // udpate annotation
+      this.#currentFactory.updateAnnotationOnAnchorMove(
+        this.#annotation, anchor);
+      // udpate shape
+      this.#currentFactory.updateShapeGroupOnAnchorMove(
+        this.#annotation, anchor, this.#app.getStyle());
+
       // redraw
       if (anchor.getLayer()) {
         anchor.getLayer().draw();
@@ -357,8 +366,8 @@ export class ShapeEditor {
         this.#currentFactory,
         startAnchor,
         endAnchor,
+        this.#annotation,
         this.#drawLayer,
-        this.#viewController,
         this.#app.getStyle()
       );
       chgcmd.onExecute = this.#drawEventCallback;

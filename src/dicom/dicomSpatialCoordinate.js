@@ -1,3 +1,6 @@
+import {Point2D} from '../math/point';
+import {Circle} from '../math/circle';
+
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
@@ -11,6 +14,17 @@ const TagKeys = {
   GraphicData: '00700022',
   GraphicType: '00700023',
   FiducialUID: '0070031A'
+};
+
+/**
+ * DICOM graphic types.
+ */
+const GraphicTypes = {
+  point: 'POINT',
+  multipoint: 'MULTIPOINT',
+  polyline: 'POLYLINE',
+  circle: 'CIRCLE',
+  ellipse: 'ELLIPSE'
 };
 
 /**
@@ -101,3 +115,54 @@ export function getDicomSpatialCoordinateItem(scoord) {
   // return
   return item;
 }
+
+/**
+ * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
+ *
+ * @param {object} shape The math shape.
+ * @returns {SpatialCoordinate} The DICOM scoord.
+ */
+export function getScoordFromShape(shape) {
+  const scoord = new SpatialCoordinate();
+
+  if (shape instanceof Circle) {
+    const center = shape.getCenter();
+    const pointPerimeter = new Point2D(
+      center.getX() + shape.getRadius(), center.getY()
+    );
+    scoord.graphicData = [
+      center.getX().toString(),
+      center.getY().toString(),
+      pointPerimeter.getX().toString(),
+      pointPerimeter.getY().toString(),
+    ];
+    scoord.graphicType = GraphicTypes.circle;
+  }
+
+  return scoord;
+};
+
+/**
+ * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
+ *
+ * @param {SpatialCoordinate} scoord The DICOM scoord.
+ * @returns {object} The math shape.
+ */
+export function getShapeFromScoord(scoord) {
+  let shape;
+  if (scoord.graphicType === GraphicTypes.circle) {
+    const center = new Point2D(
+      parseFloat(scoord.graphicData[0]),
+      parseFloat(scoord.graphicData[1])
+    );
+    const pointPerimeter = new Point2D(
+      parseFloat(scoord.graphicData[2]),
+      parseFloat(scoord.graphicData[3])
+    );
+    const radius = pointPerimeter.getDistance(center);
+
+    shape = new Circle(center, radius);
+  }
+
+  return shape;
+};

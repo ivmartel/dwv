@@ -1,6 +1,5 @@
 import {Circle} from '../math/circle';
 import {Point2D} from '../math/point';
-import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
 import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
@@ -9,8 +8,8 @@ import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -69,14 +68,46 @@ export class CircleFactory {
     return new Circle(points[0], radius);
   }
 
+  setAnnotationMathShape(annotation, points) {
+    annotation.mathShape = this.#calculateMathShape(points);
+    annotation.setTextExpr(this.#getDefaultLabel());
+    annotation.updateQuantification();
+  }
+
+  updateAnnotationOnTranslation(annotation, translation) {
+    const circle = annotation.mathShape;
+    const center = circle.getCenter();
+    const newCenter = new Point2D(
+      center.getX() + translation.x,
+      center.getY() + translation.y
+    );
+    annotation.mathShape = new Circle(newCenter, circle.getRadius());
+    annotation.updateQuantification();
+  }
+
+  updateAnnotationOnAnchorMove(annotation, anchor) {
+    const circle = annotation.mathShape;
+    const center = circle.getCenter();
+    const anchorPoint = new Point2D(anchor.x(), anchor.y());
+    const newRadius = center.getDistance(anchorPoint);
+    annotation.mathShape = new Circle(center, newRadius);
+    annotation.updateQuantification();
+  }
+
+  #getDefaultLabel() {
+    return defaults.labelText.circle;
+  }
+
   /**
    * Creates the konva circle shape.
    *
-   * @param {Circle} circle The mathematical circle.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
    * @returns {Konva.Circle} The konva circle shape.
    */
-  #createShape(circle, style) {
+  #createShape(annotation, style) {
+    const circle = annotation.mathShape;
+    // konva circle
     return new Konva.Circle({
       x: circle.getCenter().getX(),
       y: circle.getCenter().getY(),
@@ -88,16 +119,25 @@ export class CircleFactory {
     });
   }
 
+  #getLabelPosition(annotation) {
+    const circle = annotation.mathShape;
+    const center = circle.getCenter();
+    const radius = circle.getRadius();
+    return new Point2D(
+      center.getX() - radius,
+      center.getY() + radius,
+    );
+  }
+
   /**
    * Creates the konva label.
    *
-   * @param {Circle} circle The mathematical circle.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
    * @returns {Konva.Label} The Konva label.
    */
-  #createLabel(circle, style, viewController) {
-    // quantification
+  #createLabel(annotation, style) {
+    // konva text
     const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
@@ -107,29 +147,16 @@ export class CircleFactory {
       shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
-    let textExpr = '';
-    const modality = viewController.getModality();
-    if (typeof defaults.labelText.circle[modality] !== 'undefined') {
-      textExpr = defaults.labelText.circle[modality];
-    } else {
-      textExpr = defaults.labelText.circle['*'];
-    }
-    const quant = circle.quantify(
-      viewController,
-      getFlags(textExpr));
-    ktext.setText(replaceFlags(textExpr, quant));
-    // augment text with meta data
-    // @ts-expect-error
-    ktext.meta = {
-      textExpr: textExpr,
-      quantification: quant
-    };
-    // label
+    const labelText = annotation.getText();
+    ktext.setText(labelText);
+
+    // konva label
+    const labelPosition = this.#getLabelPosition(annotation);
     const klabel = new Konva.Label({
-      x: circle.getCenter().getX() - circle.getRadius(),
-      y: circle.getCenter().getY() + circle.getRadius(),
+      x: labelPosition.getX(),
+      y: labelPosition.getY(),
       scale: style.applyZoomScale(1),
-      visible: textExpr.length !== 0,
+      visible: labelText.length !== 0,
       name: 'label'
     });
     klabel.add(ktext);
@@ -144,31 +171,24 @@ export class CircleFactory {
   /**
    * Create a circle shape to be displayed.
    *
-   * @param {Point2D[]} points The points from which to extract the circle.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
    * @returns {Konva.Group} The Konva group.
    */
-  create(points, style, viewController) {
-    // Create group
+  createShapeGroup(annotation, style) {
+    // konva group
     const group = new Konva.Group();
     group.name(this.getGroupName());
     group.visible(true);
-
-    // Create and add shape
-    const mathShape = this.#calculateMathShape(points);
-    const kShape = this.#createShape(mathShape, style);
-    group.add(kShape);
-    // Create and add label
-    const kLabel = this.#createLabel(mathShape, style, viewController);
-    group.add(kLabel);
-    // Add shadow (if debug)
-    let kshadow;
+    group.id(annotation.id);
+    // konva shape
+    group.add(this.#createShape(annotation, style));
+    // konva label
+    group.add(this.#createLabel(annotation, style));
+    // konva shadow (if debug)
     if (DRAW_DEBUG) {
-      kshadow = this.#getShadowCircle(mathShape);
-      group.add(kshadow);
+      group.add(this.#getDebugShadow(annotation));
     }
-
     return group;
   }
 
@@ -201,29 +221,17 @@ export class CircleFactory {
   }
 
   /**
-   * Update a circle shape.
+   * Constrain anchor movement.
    *
    * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Style} _style The app style.
-   * @param {ViewController} viewController The associated view controller.
    */
-  update(anchor, _style, viewController) {
+  constrainAnchorMove(anchor) {
     // parent group
     const group = anchor.getParent();
     if (!(group instanceof Konva.Group)) {
       return;
     }
-    // associated shape
-    const kcircle = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kcircle instanceof Konva.Circle)) {
-      return;
-    }
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
+
     // find special points
     const left = group.getChildren(function (node) {
       return node.id() === 'left';
@@ -237,116 +245,74 @@ export class CircleFactory {
     const top = group.getChildren(function (node) {
       return node.id() === 'top';
     })[0];
-    // debug shadow
-    let kshadow;
-    if (DRAW_DEBUG) {
-      kshadow = group.getChildren(function (node) {
-        return node.name() === 'shadow';
-      })[0];
-    }
-
-    // circle center
-    const center = {
-      x: kcircle.x(),
-      y: kcircle.y()
-    };
-
-    let radius;
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
     case 'left':
-      radius = center.x - anchor.x();
-      // update self (while blocking y)
-      left.x(anchor.x());
+      // block y
       left.y(right.y());
-      // update others
-      right.x(center.x + radius);
-      bottom.y(center.y + radius);
-      top.y(center.y - radius);
       break;
     case 'right':
-      radius = anchor.x() - center.x;
-      // update self (while blocking y)
-      right.x(anchor.x());
+      // block y
       right.y(left.y());
-      // update others
-      left.x(center.x - radius);
-      bottom.y(center.y + radius);
-      top.y(center.y - radius);
       break;
     case 'bottom':
-      radius = anchor.y() - center.y;
-      // update self (while blocking x)
+      // block x
       bottom.x(top.x());
-      bottom.y(anchor.y());
-      // update others
-      left.x(center.x - radius);
-      right.x(center.x + radius);
-      top.y(center.y - radius);
       break;
     case 'top':
-      radius = center.y - anchor.y();
-      // update self (while blocking x)
+      // block x
       top.x(bottom.x());
-      top.y(anchor.y());
-      // update others
-      left.x(center.x - radius);
-      right.x(center.x + radius);
-      bottom.y(center.y + radius);
       break;
     default :
       logger.error('Unhandled anchor id: ' + anchor.id());
       break;
     }
+  }
 
-    // update shape: just update the radius
-    kcircle.radius(Math.abs(radius));
-    // new circle
-    const centerPoint = new Point2D(
-      group.x() + center.x,
-      group.y() + center.y
-    );
-    const circle = new Circle(centerPoint, radius);
-
-    // debug shadow
-    if (kshadow) {
-      // remove previous
-      kshadow.destroy();
-      // add new
-      group.add(this.#getShadowCircle(circle, group));
+  /**
+   * Update shape and label on anchor move.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The application style.
+   */
+  updateShapeGroupOnAnchorMove(annotation, anchor, style) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
     }
 
-    // update label position
-    const textPos = {
-      x: center.x - Math.abs(radius),
-      y: center.y + Math.abs(radius)
-    };
-    klabel.position(textPos);
-
-    // update quantification
-    this.#updateCircleQuantification(group, viewController);
+    // update shape and anchors
+    this.#updateShape(annotation, anchor, style);
+    // update label
+    this.updateLabelContent(annotation, group, style);
+    // TODO check if linked label...
+    this.updateLabelPosition(annotation, group, style);
+    // update shadow
+    if (DRAW_DEBUG) {
+      this.#updateDebugShadow(annotation, group);
+    }
   }
 
   /**
-   * Update the quantification of a Circle.
+   * Update shape on anchor move.
    *
-   * @param {Konva.Group} group The group with the shape.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} _style The application style.
    */
-  updateQuantification(group, viewController) {
-    this.#updateCircleQuantification(group, viewController);
-  }
+  #updateShape(annotation, anchor, _style) {
+    const circle = annotation.mathShape;
+    const center = circle.getCenter();
+    const radius = circle.getRadius();
 
-  /**
-   * Update the quantification of a Circle (as a static
-   *   function to be used in update).
-   *
-   * @param {Konva.Group} group The group with the shape.
-   * @param {ViewController} viewController The associated view controller.
-   */
-  #updateCircleQuantification(
-    group, viewController) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
     const kcircle = group.getChildren(function (node) {
       return node.name() === 'shape';
@@ -354,6 +320,74 @@ export class CircleFactory {
     if (!(kcircle instanceof Konva.Circle)) {
       return;
     }
+    // update shape: just update the radius
+    kcircle.radius(radius);
+
+    // find anchors
+    const left = group.getChildren(function (node) {
+      return node.id() === 'left';
+    })[0];
+    const right = group.getChildren(function (node) {
+      return node.id() === 'right';
+    })[0];
+    const bottom = group.getChildren(function (node) {
+      return node.id() === 'bottom';
+    })[0];
+    const top = group.getChildren(function (node) {
+      return node.id() === 'top';
+    })[0];
+
+    const swapX = right.x() < left.x() ? -1 : 1;
+    const swapY = top.y() < bottom.y() ? 1 : -1;
+
+    // update 'self' (undo case) and other anchors
+    switch (anchor.id()) {
+    case 'left':
+      // update self
+      left.x(anchor.x());
+      // update others
+      right.x(center.getX() + swapX * radius);
+      bottom.y(center.getY() + radius);
+      top.y(center.getY() - radius);
+      break;
+    case 'right':
+      // update self
+      right.x(anchor.x());
+      // update others
+      left.x(center.getX() - swapX * radius);
+      bottom.y(center.getY() + radius);
+      top.y(center.getY() - radius);
+      break;
+    case 'bottom':
+      // update self
+      bottom.y(anchor.y());
+      // update others
+      left.x(center.getX() - radius);
+      right.x(center.getX() + radius);
+      top.y(center.getY() - swapY * radius);
+      break;
+    case 'top':
+      // update self
+      top.y(anchor.y());
+      // update others
+      left.x(center.getX() - radius);
+      right.x(center.getX() + radius);
+      bottom.y(center.getY() + swapY * radius);
+      break;
+    default :
+      logger.error('Unhandled anchor id: ' + anchor.id());
+      break;
+    }
+  }
+
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelPosition(annotation, group, _style) {
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
@@ -361,35 +395,44 @@ export class CircleFactory {
     if (!(klabel instanceof Konva.Label)) {
       return;
     }
+    // update position
+    const labelPosition = this.#getLabelPosition(annotation);
+    klabel.position({
+      x: labelPosition.getX(),
+      y: labelPosition.getY()
+    });
+  }
 
-    // positions: add possible group offset
-    const centerPoint = new Point2D(
-      group.x() + kcircle.x(),
-      group.y() + kcircle.y()
-    );
-    // circle
-    const circle = new Circle(centerPoint, kcircle.radius());
-
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelContent(annotation, group, _style) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
     // update text
     const ktext = klabel.getText();
-    // @ts-expect-error
-    const meta = ktext.meta;
-    const quantification = circle.quantify(
-      viewController,
-      getFlags(meta.textExpr));
-    ktext.setText(replaceFlags(meta.textExpr, quantification));
-    // update meta
-    meta.quantification = quantification;
+    ktext.setText(annotation.getText());
   }
 
   /**
    * Get the debug shadow.
    *
-   * @param {Circle} circle The circle to shadow.
+   * @param {Annotation} annotation The circle to shadow.
    * @param {Konva.Group} [group] The associated group.
    * @returns {Konva.Group} The shadow konva group.
    */
-  #getShadowCircle(circle, group) {
+  #getDebugShadow(annotation, group) {
+    const circle = annotation.mathShape;
+
     // possible group offset
     let offsetX = 0;
     let offsetY = 0;
@@ -419,6 +462,19 @@ export class CircleFactory {
       kshadow.add(pixelLine);
     }
     return kshadow;
+  }
+
+  #updateDebugShadow(group, annotation) {
+    const kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+    if (typeof kshadow !== 'undefined') {
+      // remove previous
+      kshadow.destroy();
+      // add new
+      group.add(this.#getDebugShadow(
+        annotation.mathShape, group));
+    }
   }
 
 } // class CircleFactory

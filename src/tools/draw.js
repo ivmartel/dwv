@@ -6,7 +6,6 @@ import {
 } from '../gui/generic';
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
-import {replaceFlags} from '../utils/string';
 import {
   getShapeDisplayName,
   DrawGroupCommand,
@@ -17,6 +16,7 @@ import {
   isNodeNameShape,
   isNodeNameLabel
 } from '../app/drawController';
+import {Annotation} from '../image/annotation';
 import {ScrollWheel} from './scrollWheel';
 import {ShapeEditor} from './editor';
 import {validateGroupPosition} from './drawBounds';
@@ -33,11 +33,6 @@ import {Point2D} from '../math/point';
 import {DrawLayer} from '../gui/drawLayer';
 import {DrawTrash} from './drawTrash';
 /* eslint-enable no-unused-vars */
-
-/**
- * Draw Debug flag.
- */
-export const DRAW_DEBUG = false;
 
 /**
  * Drawing tool.
@@ -308,9 +303,12 @@ export class Draw {
         selectedShape instanceof Konva.Shape &&
         selectedShape !== this.#shapeEditor.getShape()) {
       this.#shapeEditor.disable();
-      const viewController =
-          layerGroup.getActiveViewLayer().getViewController();
-      this.#shapeEditor.setShape(selectedShape, drawLayer, viewController);
+      const drawController =
+        layerGroup.getActiveDrawLayer().getDrawController();
+      this.#shapeEditor.setShape(
+        selectedShape,
+        drawLayer,
+        drawController.getAnnotation(group.id()));
       this.#shapeEditor.enable();
     }
   }
@@ -588,6 +586,7 @@ export class Draw {
     const drawLayer = layerGroup.getActiveDrawLayer();
     const konvaLayer = drawLayer.getKonvaLayer();
     const viewLayer = layerGroup.getActiveViewLayer();
+    const viewController = viewLayer.getViewController();
 
     // auto mode: vary shape colour with layer id
     if (this.#autoShapeColour) {
@@ -605,10 +604,15 @@ export class Draw {
       }
     }
 
+    // create tmp annotation
+    const annotation = new Annotation(viewController);
+    annotation.colour = this.#style.getLineColour();
+    // set annotation shape
+    this.#currentFactory.setAnnotationMathShape(annotation, tmpPoints);
     // create shape group
-    const viewController = viewLayer.getViewController();
-    this.#tmpShapeGroup = this.#currentFactory.create(
-      tmpPoints, this.#style, viewController);
+    this.#tmpShapeGroup =
+      this.#currentFactory.createShapeGroup(annotation, this.#style);
+
     // do not listen during creation
     const shape = this.#tmpShapeGroup.getChildren(isNodeNameShape)[0];
     shape.listening(false);
@@ -638,10 +642,16 @@ export class Draw {
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
 
-    // create final shape
-    const finalShapeGroup = this.#currentFactory.create(
-      finalPoints, this.#style, viewController);
-    finalShapeGroup.id(guid());
+    // create final annotation
+    const annotation = new Annotation(viewController);
+    annotation.colour = this.#style.getLineColour();
+    annotation.id = guid();
+    drawController.addAnnotation(annotation);
+    // set annotation shape
+    this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
+    // create shape group
+    const finalShapeGroup =
+      this.#currentFactory.createShapeGroup(annotation, this.#style);
 
     // get the position group
     const posGroup = drawController.getCurrentPosGroup();
@@ -653,7 +663,7 @@ export class Draw {
     this.#emitDrawGroupCommand(drawLayer, finalShapeGroup);
 
     // activate shape listeners
-    this.#addShapeListeners(layerGroup, finalShapeGroup);
+    this.#addShapeListeners(layerGroup, finalShapeGroup, annotation);
   }
 
   /**
@@ -808,7 +818,8 @@ export class Draw {
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach((group) => {
-        this.#addShapeListeners(layerGroup, group);
+        const annotation = drawController.getAnnotation(group.id());
+        this.#addShapeListeners(layerGroup, group, annotation);
       });
     } else {
       // de-activate shape listeners
@@ -950,8 +961,9 @@ export class Draw {
    *
    * @param {LayerGroup} layerGroup The origin layer group.
    * @param {Konva.Group} shapeGroup The shape group to set on.
+   * @param {Annotation} annotation The associated annnotation.
    */
-  #addShapeListeners(layerGroup, shapeGroup) {
+  #addShapeListeners(layerGroup, shapeGroup, annotation) {
     // shape mouse over
     this.#addShapeOverListeners(shapeGroup);
 
@@ -1032,11 +1044,12 @@ export class Draw {
       validateGroupPosition(drawLayer.getBaseSize(), shapeGroup);
       // get appropriate factory
       const factory = this.#getShapeFactory(shapeGroup);
-      // update quantification if possible
-      if (typeof factory.updateQuantification !== 'undefined') {
-        const vc = layerGroup.getActiveViewLayer().getViewController();
-        factory.updateQuantification(shapeGroup, vc);
-      }
+
+      // update annotation
+      factory.updateAnnotationOnTranslation(annotation, diff);
+      // update label
+      factory.updateLabelContent(annotation, shapeGroup, this.#style);
+
       // highlight trash when on it
       const mousePoint = getMousePoint(event.evt);
       const offset = {
@@ -1159,15 +1172,12 @@ export class Draw {
       // id for event
       const groupId = group.id();
 
-      const onSaveCallback = (meta) => {
-        // store meta
-        // @ts-expect-error
-        ktext.meta = meta;
+      const onSaveCallback = (annotation) => {
         // update text expression
-        ktext.setText(replaceFlags(
-          meta.textExpr, meta.quantification));
+        const text = annotation.getText();
+        ktext.setText(text);
         // hide label if no text
-        label.visible(meta.textExpr.length !== 0);
+        label.visible(text.length !== 0);
 
         // trigger event
         this.#fireEvent({
@@ -1181,8 +1191,7 @@ export class Draw {
       };
 
       // call roi dialog
-      // @ts-expect-error
-      customUI.openRoiDialog(ktext.meta, onSaveCallback);
+      customUI.openRoiDialog(annotation, onSaveCallback);
     });
   }
 

@@ -11,6 +11,8 @@ import {
   DrawDetails,
   DrawController
 } from './app/drawController';
+import {Annotation} from './image/annotation';
+import {AnnotationFactory} from './image/annotationFactory';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
 // dicom
@@ -120,6 +122,8 @@ export {
   ToolConfig,
   DrawMeta,
   DrawDetails,
+  Annotation,
+  AnnotationFactory,
   DrawController,
   ViewController,
   PlaneHelper,

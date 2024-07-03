@@ -1552,11 +1552,32 @@ function setupTests() {
   const saveState = document.createElement('a');
   saveState.appendChild(document.createTextNode('save state'));
   saveState.href = '';
+  // saveState.onclick = function () {
+  //   const blob = new Blob([_app.getJsonState()], {type: 'application/json'});
+  //   saveState.href = window.URL.createObjectURL(blob);
+  // };
+  // saveState.download = 'state.json';
   saveState.onclick = function () {
-    const blob = new Blob([_app.getJsonState()], {type: 'application/json'});
+
+    const layerGroup = _app.getActiveLayerGroup();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    const drawController = drawLayer.getDrawController();
+    const annotationList = drawController.getAnnotationList();
+    const factory = new dwv.AnnotationFactory();
+    const dicomElements = factory.toDicom(annotationList.getList());
+    // write
+    const writer = new dwv.DicomWriter();
+    let dicomBuffer = null;
+    try {
+      dicomBuffer = writer.getBuffer(dicomElements);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
     saveState.href = window.URL.createObjectURL(blob);
   };
-  saveState.download = 'state.json';
+  saveState.download = 'dicom-sr-0.dcm';
 
   const testsDiv = document.getElementById('tests');
   testsDiv.appendChild(renderTestButton);

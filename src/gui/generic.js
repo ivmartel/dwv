@@ -1,6 +1,11 @@
 import {logger} from '../utils/logger';
 import {Point2D} from '../math/point';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Annotation} from '../image/annotation';
+/* eslint-enable no-unused-vars */
+
 /**
  * List of interaction event names.
  */
@@ -23,14 +28,14 @@ export const customUI = {
   /**
    * Open a dialogue to edit roi data. Defaults to window.prompt.
    *
-   * @param {object} data The roi data.
+   * @param {Annotation} annotation The roi data.
    * @param {Function} callback The callback to launch on dialogue exit.
    */
-  openRoiDialog(data, callback) {
-    const textExpr = prompt('Label', data.textExpr);
+  openRoiDialog(annotation, callback) {
+    const textExpr = prompt('Label', annotation.textExpr);
     if (textExpr !== null) {
-      data.textExpr = textExpr;
-      callback(data);
+      annotation.textExpr = textExpr;
+      callback(annotation);
     }
   }
 };

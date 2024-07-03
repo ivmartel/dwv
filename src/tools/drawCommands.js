@@ -5,8 +5,8 @@ import Konva from 'konva';
 /* eslint-disable no-unused-vars */
 import {Style} from '../gui/style';
 import {DrawLayer} from '../gui/drawLayer';
-import {ViewController} from '../app/viewController';
 import {Scalar2D} from '../math/scalar';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -375,11 +375,11 @@ export class ChangeGroupCommand {
   #layer;
 
   /**
-   * The associated view controller.
+   * The associated annotation.
    *
-   * @type {ViewController}
+   * @type {Annotation}
    */
-  #viewController;
+  #annotation;
 
   /**
    * The app style.
@@ -393,18 +393,24 @@ export class ChangeGroupCommand {
    * @param {object} factory The shape factory.
    * @param {object} startAnchor The anchor that starts the change.
    * @param {object} endAnchor The anchor that ends the change.
+   * @param {Annotation} annotation The annotation.
    * @param {DrawLayer} layer The layer where to change the group.
-   * @param {ViewController} viewController The associated viewController.
    * @param {Style} style The app style.
    */
   constructor(
-    name, factory, startAnchor, endAnchor, layer, viewController, style) {
+    name,
+    factory,
+    startAnchor,
+    endAnchor,
+    annotation,
+    layer,
+    style) {
     this.#name = name;
     this.#factory = factory;
     this.#startAnchor = startAnchor;
     this.#endAnchor = endAnchor;
+    this.#annotation = annotation;
     this.#layer = layer;
-    this.#viewController = viewController;
     this.#style = style;
   }
 
@@ -423,12 +429,12 @@ export class ChangeGroupCommand {
    * @fires ChangeGroupCommand#drawchange
    */
   execute() {
-    // change shape
-    this.#factory.update(
-      this.#endAnchor,
-      this.#style,
-      this.#viewController
-    );
+    // udpate annotation
+    this.#factory.updateAnnotationOnAnchorMove(
+      this.#annotation, this.#endAnchor);
+    // udpate shape
+    this.#factory.updateShapeGroupOnAnchorMove(
+      this.#annotation, this.#endAnchor, this.#style);
     // draw
     this.#layer.getKonvaLayer().draw();
     // callback
@@ -455,12 +461,12 @@ export class ChangeGroupCommand {
    * @fires ChangeGroupCommand#drawchange
    */
   undo() {
-    // invert change shape
-    this.#factory.update(
-      this.#startAnchor,
-      this.#style,
-      this.#viewController
-    );
+    // udpate annotation
+    this.#factory.updateAnnotationOnAnchorMove(
+      this.#annotation, this.#startAnchor);
+    // udpate shape
+    this.#factory.updateShapeGroupOnAnchorMove(
+      this.#annotation, this.#startAnchor, this.#style);
     // draw
     this.#layer.getKonvaLayer().draw();
     // callback

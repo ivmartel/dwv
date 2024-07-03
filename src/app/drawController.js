@@ -7,12 +7,18 @@ import {
   DrawGroupCommand,
   DeleteGroupCommand
 } from '../tools/drawCommands';
+import {AnnotationList} from '../image/annotation';
+
+import {Style} from '../gui/style';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Index} from '../math/index';
 import {DrawLayer} from '../gui/drawLayer';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
+
+import {CircleFactory} from '../tools/circle';
 
 /**
  * Konva.
@@ -195,6 +201,108 @@ export class DrawController {
    * @type {string}
    */
   #currentPosGroupId = null;
+
+  /**
+   * The annotation list.
+   *
+   * @type {AnnotationList}
+   */
+  #annotationList = new AnnotationList();
+
+  /**
+   * Add an annotation.
+   *
+   * @param {Annotation} annotation The annotation to add.
+   */
+  addAnnotation(annotation) {
+    this.#annotationList.add(annotation);
+  }
+
+  /**
+   * Get an annotation.
+   *
+   * @param {string} id The annotation id.
+   * @returns {Annotation} The annotation.
+   */
+  getAnnotation(id) {
+    return this.#annotationList.find(id);
+  }
+
+  /**
+   * Get the annotation list.
+   *
+   * @returns {AnnotationList} The list.
+   */
+  getAnnotationList() {
+    return this.#annotationList;
+  }
+
+  /**
+   * Set the annotation.
+   *
+   * @param {Annotation[]} annotations A list of annotations.
+   * @param {object} cmdCallback The command callback.
+   * @param {object} exeCallback The exe callback.
+   */
+  setAnnotations(annotations, cmdCallback, exeCallback) {
+
+    const stage = this.#drawLayer.getKonvaStage();
+
+    for (const annotation of annotations) {
+      // add to local storage
+      this.addAnnotation(annotation);
+
+      const originIndex = annotation.getOriginIndex();
+      if (typeof originIndex === 'undefined') {
+        console.log('Unknown reference origin for annotation: ' +
+          annotation.referenceSopUID);
+        continue;
+      }
+      const posGroupId = originIndex.toStringId([2]);
+
+      // Get or create position-group if it does not exist and
+      // append it to konvaLayer
+      let posGroup = this.#konvaLayer.getChildren(
+        isNodeWithId(posGroupId))[0];
+      if (typeof posGroup === 'undefined') {
+        posGroup = new Konva.Group({
+          id: posGroupId,
+          name: 'position-group',
+          visible: false
+        });
+        this.#konvaLayer.add(posGroup);
+      }
+
+      // TODO...
+      const factory = new CircleFactory();
+
+      const style = new Style();
+      style.setZoomScale(stage.scale());
+
+      // shape group (use first one since it will be removed from
+      // the group when we change it)
+      const stateGroup = factory.createShapeGroup(annotation, style);
+      // add group to posGroup (switches its parent)
+      // @ts-ignore
+      posGroup.add(stateGroup);
+
+      // shape
+      const shape = stateGroup.getChildren(isNodeNameShape)[0];
+      // create the draw command
+      const cmd = new DrawGroupCommand(
+        stateGroup,
+        shape.className,
+        this.#drawLayer
+      );
+      // draw command callbacks
+      cmd.onExecute = cmdCallback;
+      cmd.onUndo = cmdCallback;
+
+      // execute
+      cmd.execute();
+      exeCallback(cmd);
+    }
+  }
 
   /**
    * @param {DrawLayer} drawLayer The draw layer.

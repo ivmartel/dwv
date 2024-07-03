@@ -27,6 +27,7 @@ import {OverlayData} from '../gui/overlayData';
 import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
+import {AnnotationFactory} from '../image/annotationFactory';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -37,6 +38,7 @@ import {Image} from '../image/image';
 import {Matrix33} from '../math/matrix';
 import {DataElement} from '../dicom/dataElement';
 import {Scalar3D} from '../math/scalar';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -1227,6 +1229,28 @@ export class App {
   }
 
   /**
+   * Set the annotations of the active layer group.
+   *
+   * @param {Annotation[]} annotations An array of drawings.
+   */
+  setAnnotations(annotations) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewController =
+      layerGroup.getActiveViewLayer().getViewController();
+    const drawController =
+      layerGroup.getActiveDrawLayer().getDrawController();
+
+    if (annotations.length !== 0) {
+      drawController.setAnnotations(
+        annotations, this.#fireEvent, this.addToUndoStack
+      );
+      drawController.activateDrawLayer(
+        viewController.getCurrentOrientedIndex(),
+        viewController.getScrollIndex());
+    }
+  }
+
+  /**
    * Get the JSON state of the app.
    *
    * @returns {string} The state of the app as a JSON string.
@@ -1594,7 +1618,18 @@ export class App {
     if (event.loadtype === 'image' &&
       this.getViewConfigs(event.dataid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
-      this.render(event.dataid);
+      if (typeof event.data.image !== 'undefined') {
+        this.render(event.dataid);
+      } else {
+        const layerGroup = this.#stage.getActiveLayerGroup();
+        const viewController =
+          layerGroup.getActiveViewLayer().getViewController();
+
+        const factory = new AnnotationFactory();
+        const annotations = factory.create(event.data.meta, viewController);
+
+        this.setAnnotations(annotations);
+      }
     }
   };
 
