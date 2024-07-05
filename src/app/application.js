@@ -28,6 +28,7 @@ import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
 import {AnnotationFactory} from '../image/annotationFactory';
+import {AnnotationList} from '../image/annotation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -664,7 +665,6 @@ export class App {
    */
   reset() {
     // clear objects
-    this.#dataController.reset();
     this.#stage.empty();
     this.#overlayDatas = {};
     // reset undo/redo
@@ -1210,22 +1210,12 @@ export class App {
   /**
    * Set the drawings of the active layer group.
    *
-   * @param {Array} drawings An array of drawings.
-   * @param {Array} drawingsDetails An array of drawings details.
+   * @deprecated
+   * @param {Array} _drawings An array of drawings.
+   * @param {Array} _drawingsDetails An array of drawings details.
    */
-  setDrawings(drawings, drawingsDetails) {
-    const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    const drawController =
-      layerGroup.getActiveDrawLayer().getDrawController();
-
-    drawController.setDrawings(
-      drawings, drawingsDetails, this.#fireEvent, this.addToUndoStack);
-
-    drawController.activateDrawLayer(
-      viewController.getCurrentOrientedIndex(),
-      viewController.getScrollIndex());
+  setDrawings(_drawings, _drawingsDetails) {
+    // does nothing
   }
 
   /**
@@ -1237,14 +1227,13 @@ export class App {
     const layerGroup = this.#stage.getActiveLayerGroup();
     const viewController =
       layerGroup.getActiveViewLayer().getViewController();
-    const drawController =
-      layerGroup.getActiveDrawLayer().getDrawController();
+    const drawLayer = layerGroup.getActiveDrawLayer();
 
     if (annotations.length !== 0) {
-      drawController.setAnnotations(
+      drawLayer.setAnnotations(
         annotations, this.#fireEvent, this.addToUndoStack
       );
-      drawController.activateDrawLayer(
+      drawLayer.activateDrawLayer(
         viewController.getCurrentOrientedIndex(),
         viewController.getScrollIndex());
     }
@@ -1875,7 +1864,8 @@ export class App {
     let drawLayer;
     if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
       drawLayer = layerGroup.addDrawLayer();
-      drawLayer.initialise(size2D, spacing2D, dataId);
+      drawLayer.initialise(size2D, spacing2D);
+      drawLayer.setAnnotationList(new AnnotationList(), dataId);
       drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
     }
 

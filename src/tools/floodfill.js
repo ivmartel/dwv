@@ -256,10 +256,9 @@ export class Floodfill {
       this.#shapeGroup.id(guid());
 
       const drawLayer = layerGroup.getActiveDrawLayer();
-      const drawController = drawLayer.getDrawController();
 
       // get the position group
-      const posGroup = drawController.getCurrentPosGroup();
+      const posGroup = drawLayer.getCurrentPosGroup();
       // add shape group to position group
       posGroup.add(this.#shapeGroup);
 

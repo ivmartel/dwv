@@ -1,5 +1,7 @@
 import {ListenerHandler} from '../utils/listen';
 import {getFlags, replaceFlags} from '../utils/string';
+import {CircleFactory} from '../tools/circle';
+import {Circle} from '../math/circle';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -102,6 +104,13 @@ export class Annotation {
       getFlags(this.textExpr));
   }
 
+  getFactory() {
+    let fac;
+    if (this.mathShape instanceof Circle) {
+      fac = new CircleFactory();
+    }
+    return fac;
+  }
 }
 
 export class AnnotationList {
@@ -117,15 +126,79 @@ export class AnnotationList {
    */
   #listenerHandler = new ListenerHandler();
 
+  /**
+   * Get the annotation list as an array.
+   *
+   * @returns {Annotation[]} The array.
+   */
   getList() {
     return this.#list;
   }
 
-  add(details) {
-    this.#list.push(details);
-    this.#fireEvent({type: 'adddraw'});
+  /**
+   * Get the number of annotations of this list.
+   *
+   * @returns {number} The number of annotations.
+   */
+  getLength() {
+    return this.#list.length;
   }
 
+  /**
+   * Add a new annotation.
+   *
+   * @param {Annotation} annotation The annotation to add.
+   */
+  add(annotation) {
+    this.#list.push(annotation);
+    this.#fireEvent({
+      type: 'addannotation',
+      data: annotation
+    });
+  }
+
+  /**
+   * Update an existing annotation.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   */
+  update(annotation) {
+    const index = this.#list.findIndex((item) => item.id === annotation.id);
+    if (index !== -1) {
+      this.#list[index] = annotation;
+      this.#fireEvent({
+        type: 'updateannotation',
+        data: annotation
+      });
+    } else {
+      console.log('Cannot find annotation to update');
+    }
+  }
+
+  /**
+   * Remoave an annotation.
+   *
+   * @param {string} id The id of the annotation to remove.
+   */
+  remove(id) {
+    const index = this.#list.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      const annotation = this.#list.splice(index, 1)[0];
+      this.#fireEvent({
+        type: 'removeannotation',
+        data: annotation
+      });
+    } else {
+      console.log('Cannot find annotation to remove');
+    }
+  }
+
+  /**
+   * Find an annotation.
+   *
+   * @param {string} id The id of the annotation to find.
+   * @returns {Annotation|undefined} The found annotation.
+   */
   find(id) {
     return this.#list.find((item) => item.id === id);
   }

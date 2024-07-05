@@ -7,8 +7,6 @@ import {
 } from './app/application';
 import {defaults} from './app/defaults';
 import {
-  DrawMeta,
-  DrawDetails,
   DrawController
 } from './app/drawController';
 import {Annotation} from './image/annotation';
@@ -120,8 +118,6 @@ export {
   App,
   ViewConfig,
   ToolConfig,
-  DrawMeta,
-  DrawDetails,
   Annotation,
   AnnotationFactory,
   DrawController,

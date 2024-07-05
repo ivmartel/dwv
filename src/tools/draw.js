@@ -14,12 +14,13 @@ import {
 } from './drawCommands';
 import {
   isNodeNameShape,
-  isNodeNameLabel
-} from '../app/drawController';
+  isNodeNameLabel,
+  validateGroupPosition
+} from './drawBounds';
 import {Annotation} from '../image/annotation';
 import {ScrollWheel} from './scrollWheel';
 import {ShapeEditor} from './editor';
-import {validateGroupPosition} from './drawBounds';
+
 // external
 import Konva from 'konva';
 
@@ -654,7 +655,7 @@ export class Draw {
       this.#currentFactory.createShapeGroup(annotation, this.#style);
 
     // get the position group
-    const posGroup = drawController.getCurrentPosGroup();
+    const posGroup = drawLayer.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(finalShapeGroup);
 
@@ -771,7 +772,7 @@ export class Draw {
     if (flag) {
       // store cursor
       this.#originalCursor = document.body.style.cursor;
-      // TODO: merge with drawController.activateDrawLayer?
+      // TODO: merge with drawLayer.activateDrawLayer?
       this.#app.addEventListener('positionchange',
         this.#getPositionCallback(layerGroup)
       );
@@ -812,24 +813,28 @@ export class Draw {
 
     // get shape groups at the current position
     const shapeGroups =
-      drawController.getCurrentPosGroup().getChildren();
+      drawLayer.getCurrentPosGroup().getChildren();
 
     // set shape display properties
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach((group) => {
-        const annotation = drawController.getAnnotation(group.id());
-        this.#addShapeListeners(layerGroup, group, annotation);
+        if (group instanceof Konva.Group) {
+          const annotation = drawController.getAnnotation(group.id());
+          this.#addShapeListeners(layerGroup, group, annotation);
+        }
       });
     } else {
       // de-activate shape listeners
       shapeGroups.forEach((group) => {
-        this.#removeShapeListeners(group);
+        if (group instanceof Konva.Group) {
+          this.#removeShapeListeners(group);
+        }
       });
     }
 
     const notCurrentPosGroup =
-      drawController.getNonCurrentPosGroup();
+      drawLayer.getNonCurrentPosGroup();
     for (const posGroup of notCurrentPosGroup) {
       posGroup.getChildren().forEach((group) => {
         this.#removeShapeListeners(group);

@@ -2,6 +2,18 @@ import {ListenerHandler} from '../utils/listen';
 import {DrawController} from '../app/drawController';
 import {getScaledOffset} from './layerGroup';
 import {InteractionEventNames} from './generic';
+import {logger} from '../utils/logger';
+import {
+  DrawGroupCommand,
+  DeleteGroupCommand,
+  getShapeDisplayName
+} from '../tools/drawCommands';
+import {
+  isNodeNameShape,
+  isNodeWithId,
+  isPositionNode
+} from '../tools/drawBounds';
+import {Style} from '../gui/style';
 
 // external
 import Konva from 'konva';
@@ -13,7 +25,27 @@ import {Index} from '../math/index';
 import {Vector3D} from '../math/vector';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 import {PlaneHelper} from '../image/planeHelper';
+import {Annotation, AnnotationList} from '../image/annotation';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Debug function to output the layer hierarchy as text.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
+ */
+// function getHierarchyLog(layer, prefix) {
+//   if (typeof prefix === 'undefined') {
+//     prefix = '';
+//   }
+//   const kids = layer.getChildren();
+//   let log = prefix + '|__ ' + layer.name() + ': ' + layer.id() + '\n';
+//   for (let i = 0; i < kids.length; ++i) {
+//     log += getHierarchyLog(kids[i], prefix + '    ');
+//   }
+//   return log;
+// }
 
 /**
  * Draw layer.
@@ -110,6 +142,13 @@ export class DrawLayer {
    * @type {string}
    */
   #dataId;
+
+  /**
+   * Current position group id.
+   *
+   * @type {string}
+   */
+  #currentPosGroupId = null;
 
   /**
    * @param {HTMLDivElement} containerDiv The layer div, its id will be used
@@ -413,13 +452,11 @@ export class DrawLayer {
    *
    * @param {Scalar2D} size The image size as {x,y}.
    * @param {Scalar2D} spacing The image spacing as {x,y}.
-   * @param {string} dataId The associated data id.
    */
-  initialise(size, spacing, dataId) {
+  initialise(size, spacing) {
     // set locals
     this.#baseSize = size;
     this.#baseSpacing = spacing;
-    this.#dataId = dataId;
 
     // create stage
     this.#konvaStage = new Konva.Stage({
@@ -438,11 +475,91 @@ export class DrawLayer {
       visible: true
     });
     this.#konvaStage.add(konvaLayer);
-
-    // create draw controller
-    this.#drawController = new DrawController(this);
   }
 
+  /**
+   * Set the annotation list.
+   *
+   * @param {AnnotationList} list The annotation list.
+   * @param {string} dataId The associated data id.
+   */
+  setAnnotationList(list, dataId) {
+    this.#dataId = dataId;
+    // local listeners
+    list.addEventListener('addannotation', function () {
+      // TODO create konva related
+    });
+    list.addEventListener('removeannotation', function () {
+      // TODO delete konva related
+    });
+    // create view controller
+    this.#drawController = new DrawController(list);
+  }
+
+  /**
+   * Set the annotation.
+   *
+   * @param {Annotation[]} annotations A list of annotations.
+   * @param {object} cmdCallback The command callback.
+   * @param {object} exeCallback The exe callback.
+   */
+  setAnnotations(annotations, cmdCallback, exeCallback) {
+
+    const stage = this.getKonvaStage();
+
+    for (const annotation of annotations) {
+      // add to controller
+      this.getDrawController().addAnnotation(annotation);
+
+      const originIndex = annotation.getOriginIndex();
+      if (typeof originIndex === 'undefined') {
+        console.log('Unknown reference origin for annotation: ' +
+          annotation.referenceSopUID);
+        continue;
+      }
+      const posGroupId = originIndex.toStringId([2]);
+
+      // Get or create position-group if it does not exist and
+      // append it to konvaLayer
+      let posGroup = this.getKonvaLayer().getChildren(
+        isNodeWithId(posGroupId))[0];
+      if (typeof posGroup === 'undefined') {
+        posGroup = new Konva.Group({
+          id: posGroupId,
+          name: 'position-group',
+          visible: false
+        });
+        this.getKonvaLayer().add(posGroup);
+      }
+
+      const style = new Style();
+      style.setZoomScale(stage.scale());
+
+      // shape group (use first one since it will be removed from
+      // the group when we change it)
+      const factory = annotation.getFactory();
+      const stateGroup = factory.createShapeGroup(annotation, style);
+      // add group to posGroup (switches its parent)
+      // @ts-ignore
+      posGroup.add(stateGroup);
+
+      // shape
+      const shape = stateGroup.getChildren(isNodeNameShape)[0];
+      // create the draw command
+      const cmd = new DrawGroupCommand(
+        stateGroup,
+        shape.className,
+        this
+      );
+      // draw command callbacks
+      cmd.onExecute = cmdCallback;
+      cmd.onUndo = cmdCallback;
+
+      // execute
+      cmd.execute();
+      exeCallback(cmd);
+    }
+  }
   /**
    * Fit the layer to its parent container.
    *
@@ -518,7 +635,7 @@ export class DrawLayer {
    */
   isGroupVisible(id) {
     // get the group
-    const group = this.#drawController.getGroup(id);
+    const group = this.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -534,7 +651,7 @@ export class DrawLayer {
    */
   toggleGroupVisibility(id) {
     // get the group
-    const group = this.#drawController.getGroup(id);
+    const group = this.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -550,25 +667,64 @@ export class DrawLayer {
   /**
    * Delete a Draw from the stage.
    *
-   * @param {string} id The id of the group to delete.
+   * @param {Konva.Group} group The group to delete.
+   * @param {object} cmdCallback The DeleteCommand callback.
    * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
+  #deleteDrawGroup(group, cmdCallback, exeCallback) {
+    const shape = group.getChildren(isNodeNameShape)[0];
+    if (shape instanceof Konva.Shape) {
+      const shapeDisplayName = getShapeDisplayName(shape);
+      const delcmd = new DeleteGroupCommand(
+        group,
+        shapeDisplayName,
+        this
+      );
+      delcmd.onExecute = cmdCallback;
+      delcmd.onUndo = cmdCallback;
+      delcmd.execute();
+      // callback
+      if (typeof exeCallback !== 'undefined') {
+        exeCallback(delcmd);
+      }
+    }
+  }
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @param {string} id The id of the group to delete.
+   * @param {Function} exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
   deleteDraw(id, exeCallback) {
-    if (typeof this.#drawController !== 'undefined') {
-      this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
+    // get the group
+    const group = this.getGroup(id);
+    if (typeof group !== 'undefined') {
+      this.#deleteDrawGroup(group, this.#fireEvent, exeCallback);
     }
   }
 
   /**
    * Delete all Draws from the stage.
    *
-   * @param {object} exeCallback The callback to call once the
+   * @param {Function} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
   deleteDraws(exeCallback) {
-    if (typeof this.#drawController !== 'undefined') {
-      this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
+    const posGroups = this.getKonvaLayer().getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        while (shapeGroups.length) {
+          if (shapeGroups[0] instanceof Konva.Group) {
+            this.#deleteDrawGroup(shapeGroups[0], this.#fireEvent, exeCallback);
+          }
+        }
+      } else {
+        logger.warn('Found non group in layer while deleting');
+      }
     }
   }
 
@@ -579,11 +735,14 @@ export class DrawLayer {
    * @returns {number|undefined} The total number of draws.
    */
   getNumberOfDraws() {
-    let res;
-    if (typeof this.#drawController !== 'undefined') {
-      res = this.#drawController.getNumberOfDraws();
+    const posGroups = this.getKonvaLayer().getChildren();
+    let count = 0;
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        count += posGroup.getChildren().length;
+      }
     }
-    return res;
+    return count;
   }
 
   /**
@@ -622,10 +781,100 @@ export class DrawLayer {
    * @returns {boolean} True if the position was updated.
    */
   setCurrentPosition(position, index) {
-    this.getDrawController().activateDrawLayer(
+    this.activateDrawLayer(
       index, this.#planeHelper.getScrollIndex());
     // TODO: add check
     return true;
+  }
+
+  /**
+   * Activate the current draw layer.
+   *
+   * @param {Index} index The current position.
+   * @param {number} scrollIndex The scroll index.
+   */
+  activateDrawLayer(index, scrollIndex) {
+    // TODO: add layer info
+    // get and store the position group id
+    const dims = [scrollIndex];
+    for (let j = 3; j < index.length(); ++j) {
+      dims.push(j);
+    }
+    this.#currentPosGroupId = index.toStringId(dims);
+
+    // get all position groups
+    const posGroups = this.getKonvaLayer().getChildren(isPositionNode);
+    // reset or set the visible property
+    let visible;
+    for (let i = 0, leni = posGroups.length; i < leni; ++i) {
+      visible = false;
+      if (posGroups[i].id() === this.#currentPosGroupId) {
+        visible = true;
+      }
+      // group members inherit the visible property
+      posGroups[i].visible(visible);
+    }
+
+    // show current draw layer
+    this.getKonvaLayer().draw();
+  }
+
+  /**
+   * Get the current position group.
+   *
+   * @returns {Konva.Group|undefined} The Konva.Group.
+   */
+  getCurrentPosGroup() {
+    // get position groups
+    const posGroups = this.getKonvaLayer().getChildren((node) => {
+      return node.id() === this.#currentPosGroupId;
+    });
+    // if one group, use it
+    // if no group, create one
+    let posGroup;
+    if (posGroups.length === 1) {
+      if (posGroups[0] instanceof Konva.Group) {
+        posGroup = posGroups[0];
+      }
+    } else if (posGroups.length === 0) {
+      posGroup = new Konva.Group();
+      posGroup.name('position-group');
+      posGroup.id(this.#currentPosGroupId);
+      posGroup.visible(true); // dont inherit
+      // add new group to layer
+      this.getKonvaLayer().add(posGroup);
+    } else {
+      logger.warn('Unexpected number of draw position groups.');
+    }
+    // return
+    return posGroup;
+  }
+
+  /**
+   * Get the non current position groups. Used to stop listeners.
+   *
+   * @returns {object[]} The groups that do not have the current position id.
+   */
+  getNonCurrentPosGroup() {
+    // get position groups
+    return this.getKonvaLayer().getChildren((node) => {
+      return node.id() !== this.#currentPosGroupId;
+    });
+  }
+
+  /**
+   * Get a Konva group using its id.
+   *
+   * @param {string} id The group id.
+   * @returns {object|undefined} The Konva group.
+   */
+  getGroup(id) {
+    const group = this.getKonvaLayer().findOne('#' + id);
+    if (typeof group === 'undefined') {
+      logger.warn('Cannot find node with id: ' + id
+      );
+    }
+    return group;
   }
 
   /**
