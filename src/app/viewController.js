@@ -322,6 +322,15 @@ export class ViewController {
   }
 
   /**
+   * Get the image study instance UID.
+   *
+   * @returns {string} The UID.
+   */
+  getStudyInstanceUID() {
+    return this.#view.getImage().getMeta().StudyInstanceUID;
+  }
+
+  /**
    * Extract a slice from an image at the given index and orientation.
    *
    * @param {Image} image The image to parse.

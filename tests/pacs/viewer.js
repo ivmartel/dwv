@@ -1564,7 +1564,7 @@ function setupTests() {
     const drawController = drawLayer.getDrawController();
     const annotationList = drawController.getAnnotationList();
     const factory = new dwv.AnnotationFactory();
-    const dicomElements = factory.toDicom(annotationList.getList());
+    const dicomElements = factory.toDicom(annotationList);
     // write
     const writer = new dwv.DicomWriter();
     let dicomBuffer = null;

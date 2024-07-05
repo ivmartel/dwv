@@ -1,4 +1,10 @@
 import {
+  dateToDateObj,
+  getDicomDate,
+  dateToTimeObj,
+  getDicomTime,
+} from '../dicom/dicomDate';
+import {
   ValueTypes,
   RelationshipTypes,
   getSRContent,
@@ -20,7 +26,8 @@ import {
   getShapeFromScoord
 } from '../dicom/dicomSpatialCoordinate';
 import {guid} from '../math/stats';
-import {Annotation} from './annotation';
+import {logger} from '../utils/logger';
+import {Annotation, AnnotationList} from './annotation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -31,6 +38,22 @@ import {ViewController} from '../app/viewController';
 /**
  * @typedef {Object<string, DataElement>} DataElements
  */
+
+/**
+ * Merge two tag lists.
+ *
+ * @param {object} tags1 Base list, will be modified.
+ * @param {object} tags2 List to merge.
+ */
+function mergeTags(tags1, tags2) {
+  const keys2 = Object.keys(tags2);
+  for (const tagName2 of keys2) {
+    if (tags1[tagName2] !== undefined) {
+      logger.trace('Overwritting tag: ' + tagName2);
+    }
+    tags1[tagName2] = tags2[tagName2];
+  }
+}
 
 /**
  * {@link Annotation} factory.
@@ -57,12 +80,21 @@ export class AnnotationFactory {
   /**
    * Check dicom elements. Throws an error if not suitable.
    *
-   * @param {DataElements} _dataElements The DICOM data elements.
+   * @param {DataElements} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
    */
-  checkElements(_dataElements) {
+  checkElements(dataElements) {
     // reset
     this.#warning = undefined;
+
+    const srContent = getSRContent(dataElements);
+    if (typeof srContent.conceptNameCode !== 'undefined') {
+      if (srContent.conceptNameCode.value !== getMeasurementGroupCode().value) {
+        this.#warning = 'Not a measurement group';
+      }
+    } else {
+      this.#warning = 'No root concept name code';
+    }
 
     return this.#warning;
   }
@@ -72,7 +104,7 @@ export class AnnotationFactory {
    *
    * @param {DataElements} dataElements The DICOM tags.
    * @param {ViewController} viewController The associated view controller.
-   * @returns {Annotation[]} A new annotation list.
+   * @returns {AnnotationList} A new annotation list.
    */
   create(dataElements, viewController) {
     const srContent = getSRContent(dataElements);
@@ -108,38 +140,46 @@ export class AnnotationFactory {
       }
     }
 
-    return annotations;
+    const annotationList = new AnnotationList(annotations);
+
+    annotationList.setMeta(
+      'StudyInstanceUID',
+      dataElements['0020000D'].value[0]
+    );
+
+    return annotationList;
   }
 
   /**
    * Convert an annotation list into a DICOM SR object.
    *
-   * @param {Annotation[]} annotations The annotation list.
-   * @param {Object<string, any>} [_extraTags] Optional list of extra tags.
+   * @param {AnnotationList} annotationList The annotation list.
+   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
    * @returns {Object<string, DataElement>} A list of dicom elements.
    */
-  toDicom(annotations, _extraTags) {
+  toDicom(annotationList, extraTags) {
     let tags = {};
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.71';
     tags.SOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.71.0';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.71';
     tags.MediaStorageSOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.71.0';
-    tags.StudyInstanceUID = '1.2.3.4.5';
+
+    tags.StudyInstanceUID = annotationList.getMeta('StudyInstanceUID');
+
     tags.SeriesInstanceUID = '1.2.3.4.5.6';
 
     tags.Modality = 'SR';
-    tags.PatientName = 'dwv^PatientName';
-    tags.SeriesNumber = '0';
-    tags.InstanceNumber = '1';
-    tags.ContentDate = '20240619';
-    tags.ContentTime = '164500';
     tags.CompletionFlag = 'PARTIAL';
     tags.VerificationFlag = 'UNVERIFIED';
 
+    const now = new Date();
+    tags.ContentDate = getDicomDate(dateToDateObj(now));
+    tags.ContentTime = getDicomTime(dateToTimeObj(now));
+
     const contentSequence = [];
 
-    for (const annotation of annotations) {
+    for (const annotation of annotationList.getList()) {
       const srImage = new DicomSRContent(ValueTypes.image);
       srImage.relationshipType = RelationshipTypes.selectedFrom;
       srImage.conceptNameCode = getSourceImageCode();
@@ -178,6 +218,11 @@ export class AnnotationFactory {
         ...tags,
         ...getDicomSRContentItem(srContent)
       };
+    }
+
+    // merge extra tags if provided
+    if (extraTags !== undefined) {
+      mergeTags(tags, extraTags);
     }
 
     return getElementsFromJSONTags(tags);

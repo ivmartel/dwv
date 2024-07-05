@@ -648,6 +648,12 @@ export class Draw {
     annotation.colour = this.#style.getLineColour();
     annotation.id = guid();
     drawController.addAnnotation(annotation);
+
+    if (!drawController.hasAnnotationMeta('StudyInstanceUID')) {
+      drawController.setAnnotationMeta(
+        'StudyInstanceUID', viewController.getStudyInstanceUID());
+    }
+
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
     // create shape group

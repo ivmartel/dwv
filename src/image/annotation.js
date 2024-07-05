@@ -117,7 +117,14 @@ export class AnnotationList {
   /**
    * @type {Annotation[]}
    */
-  #list = [];
+  #list;
+
+  /**
+   * Annotation meta data.
+   *
+   * @type {Object<string, string>}
+   */
+  #meta = {};
 
   /**
    * Listener handler.
@@ -125,6 +132,18 @@ export class AnnotationList {
    * @type {ListenerHandler}
    */
   #listenerHandler = new ListenerHandler();
+
+  /**
+   *
+   * @param {Annotation[]} [list] Optional list.
+   */
+  constructor(list) {
+    if (typeof list !== 'undefined') {
+      this.#list = list;
+    } else {
+      this.#list = [];
+    }
+  }
 
   /**
    * Get the annotation list as an array.
@@ -201,6 +220,36 @@ export class AnnotationList {
    */
   find(id) {
     return this.#list.find((item) => item.id === id);
+  }
+
+  /**
+   * Check if this list contains a meta data value.
+   *
+   * @param {string} key The key to check.
+   * @returns {boolean} True if the meta data is present.
+   */
+  hasMeta(key) {
+    return typeof this.#meta[key] !== 'undefined';
+  }
+
+  /**
+   * Get a meta data value.
+   *
+   * @param {string} key The meta data key.
+   * @returns {string} The meta data value.
+   */
+  getMeta(key) {
+    return this.#meta[key];
+  }
+
+  /**
+   * Set a meta data.
+   *
+   * @param {string} key The meta data key.
+   * @param {string} value The value of the meta data.
+   */
+  setMeta(key, value) {
+    this.#meta[key] = value;
   }
 
   /**

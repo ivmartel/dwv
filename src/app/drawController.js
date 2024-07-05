@@ -73,6 +73,26 @@ export class DrawController {
   }
 
   /**
+   * Check if the annotation list contains a meta data value.
+   *
+   * @param {string} key The key to check.
+   * @returns {boolean} True if the meta data is present.
+   */
+  hasAnnotationMeta(key) {
+    return this.#annotationList.hasMeta(key);
+  }
+
+  /**
+   * Set an annotation meta data.
+   *
+   * @param {string} key The meta data to set.
+   * @param {string} value The value of the meta data.
+   */
+  setAnnotationMeta(key, value) {
+    this.#annotationList.setMeta(key, value);
+  }
+
+  /**
    * Get draw store details.
    *
    * @deprecated

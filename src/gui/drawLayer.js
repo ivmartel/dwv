@@ -482,8 +482,10 @@ export class DrawLayer {
    *
    * @param {AnnotationList} list The annotation list.
    * @param {string} dataId The associated data id.
+   * @param {object} cmdCallback The command callback.
+   * @param {object} exeCallback The exe callback.
    */
-  setAnnotationList(list, dataId) {
+  setAnnotationList(list, dataId, cmdCallback, exeCallback) {
     this.#dataId = dataId;
     // local listeners
     list.addEventListener('addannotation', function () {
@@ -494,6 +496,10 @@ export class DrawLayer {
     });
     // create view controller
     this.#drawController = new DrawController(list);
+
+    if (list.getLength() !== 0) {
+      this.#setAnnotations(list.getList(), cmdCallback, exeCallback);
+    }
   }
 
   /**
@@ -503,13 +509,11 @@ export class DrawLayer {
    * @param {object} cmdCallback The command callback.
    * @param {object} exeCallback The exe callback.
    */
-  setAnnotations(annotations, cmdCallback, exeCallback) {
+  #setAnnotations(annotations, cmdCallback, exeCallback) {
 
     const stage = this.getKonvaStage();
 
     for (const annotation of annotations) {
-      // add to controller
-      this.getDrawController().addAnnotation(annotation);
 
       const originIndex = annotation.getOriginIndex();
       if (typeof originIndex === 'undefined') {
@@ -560,6 +564,7 @@ export class DrawLayer {
       exeCallback(cmd);
     }
   }
+
   /**
    * Fit the layer to its parent container.
    *

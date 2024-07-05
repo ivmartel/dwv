@@ -27,8 +27,9 @@ import {OverlayData} from '../gui/overlayData';
 import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
-import {AnnotationFactory} from '../image/annotationFactory';
+import {PlaneHelper} from '../image/planeHelper';
 import {AnnotationList} from '../image/annotation';
+import {AnnotationFactory} from '../image/annotationFactory';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -993,14 +994,13 @@ export class App {
         const vls = lg.getViewLayersByDataId(dataId);
         if (vls.length === 1) {
           lg.removeLayer(vls[0]);
-        } else {
-          throw new Error('Expected one view layer, got ' + vls.length);
         }
         const dls = lg.getDrawLayersByDataId(dataId);
         if (dls.length === 1) {
           lg.removeLayer(dls[0]);
-        } else {
-          throw new Error('Expected one draw layer, got ' + dls.length);
+        }
+        if (vls.length === 0 && dls.length === 0) {
+          throw new Error('Expected one layer, got none');
         }
         if (lg.getNumberOfLayers() === 0) {
           this.#stage.removeLayerGroup(lg);
@@ -1044,14 +1044,13 @@ export class App {
       const vls = lg.getViewLayersByDataId(dataId);
       if (vls.length === 1) {
         lg.removeLayer(vls[0]);
-      } else {
-        throw new Error('Expected one view layer, got ' + vls.length);
       }
       const dls = lg.getDrawLayersByDataId(dataId);
       if (dls.length === 1) {
         lg.removeLayer(dls[0]);
-      } else {
-        throw new Error('Expected one draw layer, got ' + dls.length);
+      }
+      if (vls.length === 0 && dls.length === 0) {
+        throw new Error('Expected one layer, got none');
       }
     }
 
@@ -1124,9 +1123,15 @@ export class App {
     if (typeof dataId === 'undefined' || dataId === null) {
       throw new Error('Cannot render without data id');
     }
-    if (typeof this.getImage(dataId) === 'undefined') {
-      logger.warn('Not rendering non image data, id: ' + dataId);
-      return;
+    // guess data type
+    const isImage = typeof this.getImage(dataId) !== 'undefined';
+    let isMeasurement = false;
+    if (!isImage) {
+      const fac = new AnnotationFactory();
+      const warn = fac.checkElements(this.#dataController.get(dataId).meta);
+      if (typeof warn === 'undefined') {
+        isMeasurement = true;
+      }
     }
 
     // create layer groups if not done yet
@@ -1160,7 +1165,11 @@ export class App {
       // warn: needs a loaded DOM
       if (typeof this.#dataController.get(dataId) !== 'undefined' &&
         layerGroup.getViewLayersByDataId(dataId).length === 0) {
-        this.#addViewLayer(dataId, config);
+        if (isImage) {
+          this.#addViewLayer(dataId, config);
+        } else if (isMeasurement) {
+          this.addDrawLayer(dataId, config);
+        }
       }
       // draw
       layerGroup.draw();
@@ -1219,29 +1228,9 @@ export class App {
   }
 
   /**
-   * Set the annotations of the active layer group.
-   *
-   * @param {Annotation[]} annotations An array of drawings.
-   */
-  setAnnotations(annotations) {
-    const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    const drawLayer = layerGroup.getActiveDrawLayer();
-
-    if (annotations.length !== 0) {
-      drawLayer.setAnnotations(
-        annotations, this.#fireEvent, this.addToUndoStack
-      );
-      drawLayer.activateDrawLayer(
-        viewController.getCurrentOrientedIndex(),
-        viewController.getScrollIndex());
-    }
-  }
-
-  /**
    * Get the JSON state of the app.
    *
+   * @deprecated
    * @returns {string} The state of the app as a JSON string.
    */
   getJsonState() {
@@ -1252,6 +1241,7 @@ export class App {
   /**
    * Apply a JSON state to this app.
    *
+   * @deprecated
    * @param {string} jsonState The state of the app as a JSON string.
    */
   applyJsonState(jsonState) {
@@ -1401,6 +1391,12 @@ export class App {
       if (tool === 'Draw' ||
         tool === 'Livewire' ||
         tool === 'Floodfill') {
+        if (typeof layerGroup.getActiveDrawLayer() === 'undefined') {
+          const viewLayer = layerGroup.getActiveViewLayer();
+          const viewConfig = this.getViewConfig(
+            viewLayer.getDataId(), layerGroup.getDivId());
+          this.addDrawLayer(undefined, viewConfig);
+        }
         layer = layerGroup.getActiveDrawLayer();
       } else {
         layer = layerGroup.getActiveViewLayer();
@@ -1607,18 +1603,7 @@ export class App {
     if (event.loadtype === 'image' &&
       this.getViewConfigs(event.dataid).length !== 0 &&
       isFirstLoadItem && this.#options.viewOnFirstLoadItem) {
-      if (typeof event.data.image !== 'undefined') {
-        this.render(event.dataid);
-      } else {
-        const layerGroup = this.#stage.getActiveLayerGroup();
-        const viewController =
-          layerGroup.getActiveViewLayer().getViewController();
-
-        const factory = new AnnotationFactory();
-        const annotations = factory.create(event.data.meta, viewController);
-
-        this.setAnnotations(annotations);
-      }
+      this.render(event.dataid);
     }
   };
 
@@ -1860,15 +1845,6 @@ export class App {
     // listen to image set
     this.#dataController.addEventListener('imageset', viewLayer.onimageset);
 
-    // optional draw layer
-    let drawLayer;
-    if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
-      drawLayer = layerGroup.addDrawLayer();
-      drawLayer.initialise(size2D, spacing2D);
-      drawLayer.setAnnotationList(new AnnotationList(), dataId);
-      drawLayer.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
-    }
-
     // sync layers position
     const value = [
       viewController.getCurrentIndex().getValues(),
@@ -1889,36 +1865,7 @@ export class App {
     const flipFlags = this.#getViewFlipFlags(
       imageGeometry.getOrientation(),
       viewConfig.orientation);
-    if (flipFlags.offset.x) {
-      viewLayer.addFlipOffsetX();
-      if (typeof drawLayer !== 'undefined') {
-        drawLayer.addFlipOffsetX();
-      }
-    }
-    if (flipFlags.offset.y) {
-      viewLayer.addFlipOffsetY();
-      if (typeof drawLayer !== 'undefined') {
-        drawLayer.addFlipOffsetY();
-      }
-    }
-    if (flipFlags.scale.x) {
-      viewLayer.flipScaleX();
-      if (typeof drawLayer !== 'undefined') {
-        drawLayer.flipScaleX();
-      }
-    }
-    if (flipFlags.scale.y) {
-      viewLayer.flipScaleY();
-      if (typeof drawLayer !== 'undefined') {
-        drawLayer.flipScaleY();
-      }
-    }
-    if (flipFlags.scale.z) {
-      viewLayer.flipScaleZ();
-      if (typeof drawLayer !== 'undefined') {
-        drawLayer.flipScaleZ();
-      }
-    }
+    this.#applyFlipFlags(flipFlags, viewLayer);
 
     // layer scale (done after possible flip)
     if (!isBaseLayer) {
@@ -1930,9 +1877,6 @@ export class App {
       );
     } else {
       viewLayer.setScale(layerGroup.getScale());
-    }
-    if (typeof drawLayer !== 'undefined') {
-      drawLayer.setScale(layerGroup.getScale());
     }
 
     // bind
@@ -1946,6 +1890,108 @@ export class App {
       if (this.#toolboxController) {
         this.#toolboxController.init();
       }
+    }
+  }
+
+  /**
+   * Add a draw layer.
+   *
+   * @param {string} dataId The data id.
+   * @param {ViewConfig} viewConfig The data view config.
+   */
+  addDrawLayer(dataId, viewConfig) {
+    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
+    if (!layerGroup) {
+      throw new Error('Cannot initialise layer with missing group, id: ' +
+        viewConfig.divId);
+    }
+
+    //
+    let refDataId;
+    let data;
+    if (typeof dataId === 'undefined') {
+      // annotation creation case
+      // reference is the current active view layer
+      refDataId = layerGroup.getActiveViewLayer().getDataId();
+    } else {
+      // annotation load case
+      // reference is the data of the view layer with the
+      //   same StudyInstanceUID
+      data = this.#dataController.get(dataId);
+      if (!data) {
+        throw new Error('Cannot initialise layer with missing data, id: ' +
+          dataId);
+      }
+      const studyInstanceUID = data.meta['0020000D'].value[0];
+      const viewLayers = layerGroup.searchViewLayers({
+        StudyInstanceUID: studyInstanceUID
+      });
+      if (viewLayers.length === 0) {
+        console.warn(
+          'No loaded data that matches the measurement study UID');
+        return;
+      }
+      refDataId = viewLayers[0].getDataId();
+    }
+
+    // reference data to use as base for layer properties
+    const refData = this.#dataController.get(refDataId);
+    if (!refData) {
+      throw new Error(
+        'Cannot initialise layer with missing reference data, id: ' +
+        refDataId);
+    }
+    const imageGeometry = refData.image.getGeometry();
+
+    const viewOrientation = getViewOrientation(
+      imageGeometry.getOrientation(),
+      getMatrixFromName(viewConfig.orientation)
+    );
+    const size2D = imageGeometry.getSize(viewOrientation).get2D();
+    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
+
+    const drawLayer = layerGroup.addDrawLayer();
+    drawLayer.initialise(size2D, spacing2D);
+
+    const planeHelper = new PlaneHelper(
+      imageGeometry.getRealSpacing(),
+      imageGeometry.getOrientation(),
+      viewOrientation
+    );
+    drawLayer.setPlaneHelper(planeHelper);
+
+    // sync layer groups
+    this.#stage.fitToContainer();
+
+    // get and apply flip flags
+    const flipFlags = this.#getViewFlipFlags(
+      imageGeometry.getOrientation(),
+      viewConfig.orientation);
+    this.#applyFlipFlags(flipFlags, drawLayer);
+
+    drawLayer.setScale(layerGroup.getScale());
+
+    // set layer data
+    if (typeof data !== 'undefined') {
+      const annotationFactory = new AnnotationFactory();
+      const viewLayer = layerGroup.getViewLayersByDataId(refDataId)[0];
+      const viewController = viewLayer.getViewController();
+      const annnotationList =
+        annotationFactory.create(data.meta, viewController);
+
+      drawLayer.setAnnotationList(
+        annnotationList,
+        dataId,
+        this.#fireEvent,
+        this.addToUndoStack);
+
+      drawLayer.setCurrentPosition(
+        viewController.getCurrentPosition(),
+        viewController.getCurrentIndex()
+      );
+    } else {
+      const annotDataId = this.#dataController.getNextDataId();
+      drawLayer.setAnnotationList(new AnnotationList(), annotDataId);
     }
   }
 
@@ -2098,6 +2144,24 @@ export class App {
       scale: flipScale,
       offset: flipOffset
     };
+  }
+
+  #applyFlipFlags(flipFlags, layer) {
+    if (flipFlags.offset.x) {
+      layer.addFlipOffsetX();
+    }
+    if (flipFlags.offset.y) {
+      layer.addFlipOffsetY();
+    }
+    if (flipFlags.scale.x) {
+      layer.flipScaleX();
+    }
+    if (flipFlags.scale.y) {
+      layer.flipScaleY();
+    }
+    if (flipFlags.scale.z) {
+      layer.flipScaleZ();
+    }
   }
 
 } // class App
