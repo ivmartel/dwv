@@ -5,10 +5,10 @@
 })(this, (function () { 'use strict';
 
   /*
-   * Konva JavaScript Framework v9.3.12
+   * Konva JavaScript Framework v9.3.13
    * http://konvajs.org/
    * Licensed under the MIT
-   * Date: Thu Jun 20 2024
+   * Date: Fri Jul 05 2024
    *
    * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
    * Modified work Copyright (C) 2014 - present by Anton Lavrenov (Konva)
@@ -35,7 +35,7 @@
               : {};
   const Konva$2 = {
       _global: glob,
-      version: '9.3.12',
+      version: '9.3.13',
       isBrowser: detectBrowser(),
       isUnminified: /param/.test(function (param) { }.toString()),
       dblClickWindow: 400,
@@ -14482,26 +14482,29 @@
        * @returns {Object} { width , height} of measured text
        */
       measureSize(text) {
+          var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
           var _context = getDummyContext(), fontSize = this.fontSize(), metrics;
           _context.save();
           _context.font = this._getContextFont();
           metrics = _context.measureText(text);
           _context.restore();
+          // Scale the fallback values based on the provided fontSize compared to the sample size (100 in your new case)
+          const scaleFactor = fontSize / 100;
+          // Note, fallback values are from chrome browser with 100px font size and font-family "Arial"
           return {
-              // copy all text metrics data:
-              actualBoundingBoxAscent: metrics.actualBoundingBoxAscent,
-              actualBoundingBoxDescent: metrics.actualBoundingBoxDescent,
-              actualBoundingBoxLeft: metrics.actualBoundingBoxLeft,
-              actualBoundingBoxRight: metrics.actualBoundingBoxRight,
-              alphabeticBaseline: metrics.alphabeticBaseline,
-              emHeightAscent: metrics.emHeightAscent,
-              emHeightDescent: metrics.emHeightDescent,
-              fontBoundingBoxAscent: metrics.fontBoundingBoxAscent,
-              fontBoundingBoxDescent: metrics.fontBoundingBoxDescent,
-              hangingBaseline: metrics.hangingBaseline,
-              ideographicBaseline: metrics.ideographicBaseline,
+              actualBoundingBoxAscent: (_a = metrics.actualBoundingBoxAscent) !== null && _a !== void 0 ? _a : 71.58203125 * scaleFactor,
+              actualBoundingBoxDescent: (_b = metrics.actualBoundingBoxDescent) !== null && _b !== void 0 ? _b : 0, // Remains zero as there is no descent in the provided metrics
+              actualBoundingBoxLeft: (_c = metrics.actualBoundingBoxLeft) !== null && _c !== void 0 ? _c : -7.421875 * scaleFactor,
+              actualBoundingBoxRight: (_d = metrics.actualBoundingBoxRight) !== null && _d !== void 0 ? _d : 75.732421875 * scaleFactor,
+              alphabeticBaseline: (_e = metrics.alphabeticBaseline) !== null && _e !== void 0 ? _e : 0, // Remains zero as it's typically relative to the baseline itself
+              emHeightAscent: (_f = metrics.emHeightAscent) !== null && _f !== void 0 ? _f : 100 * scaleFactor,
+              emHeightDescent: (_g = metrics.emHeightDescent) !== null && _g !== void 0 ? _g : -20 * scaleFactor,
+              fontBoundingBoxAscent: (_h = metrics.fontBoundingBoxAscent) !== null && _h !== void 0 ? _h : 91 * scaleFactor,
+              fontBoundingBoxDescent: (_j = metrics.fontBoundingBoxDescent) !== null && _j !== void 0 ? _j : 21 * scaleFactor,
+              hangingBaseline: (_k = metrics.hangingBaseline) !== null && _k !== void 0 ? _k : 72.80000305175781 * scaleFactor,
+              ideographicBaseline: (_l = metrics.ideographicBaseline) !== null && _l !== void 0 ? _l : -21 * scaleFactor,
               width: metrics.width,
-              height: fontSize,
+              height: fontSize, // Typically set to the font size
           };
       }
       _getContextFont() {
