@@ -46,6 +46,7 @@ export class DrawController {
   }
 
   /**
+   * Update an anotation from the list.
    *
    * @param {Annotation} annotation The annotation to update.
    */
@@ -54,6 +55,7 @@ export class DrawController {
   }
 
   /**
+   * Remove an anotation for the list.
    *
    * @param {string} id The id of the annotation to remove.
    */

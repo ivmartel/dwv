@@ -36,10 +36,6 @@ import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
 /**
- * @typedef {Object<string, DataElement>} DataElements
- */
-
-/**
  * Merge two tag lists.
  *
  * @param {object} tags1 Base list, will be modified.
@@ -80,7 +76,7 @@ export class AnnotationFactory {
   /**
    * Check dicom elements. Throws an error if not suitable.
    *
-   * @param {DataElements} dataElements The DICOM data elements.
+   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
    * @returns {string|undefined} A possible warning.
    */
   checkElements(dataElements) {
@@ -102,7 +98,7 @@ export class AnnotationFactory {
   /**
    * Get an {@link Annotation} object from the read DICOM file.
    *
-   * @param {DataElements} dataElements The DICOM tags.
+   * @param {Object<string, DataElement>} dataElements The DICOM tags.
    * @param {ViewController} viewController The associated view controller.
    * @returns {AnnotationList} A new annotation list.
    */

@@ -6,6 +6,7 @@ import {Circle} from '../math/circle';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Index} from '../math/index';
+import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -68,8 +69,16 @@ export class Annotation {
    */
   textExpr;
 
+  /**
+   * Associated view controller.
+   *
+   * @type {ViewController}
+   */
   #viewController;
 
+  /**
+   * @param {ViewController} viewController The associated view controller.
+   */
   constructor(viewController) {
     this.#viewController = viewController;
     this.referenceSopUID = viewController.getCurrentImageUid();
@@ -84,6 +93,12 @@ export class Annotation {
     return this.#viewController.getOriginIndexForImageUid(this.referenceSopUID);
   }
 
+  /**
+   * Set the annotation text expression.
+   *
+   * @param {Object.<string, string>} labelText The list of label
+   *   texts indexed by modality.
+   */
   setTextExpr(labelText) {
     const modality = this.#viewController.getModality();
 
@@ -94,16 +109,30 @@ export class Annotation {
     }
   }
 
+  /**
+   * Get the annotation label text by applying the
+   *   text expression on the current quantification.
+   *
+   * @returns {string} The resulting text.
+   */
   getText() {
     return replaceFlags(this.textExpr, this.quantification);
   }
 
+  /**
+   * Update the annotation quantification.
+   */
   updateQuantification() {
     this.quantification = this.mathShape.quantify(
       this.#viewController,
       getFlags(this.textExpr));
   }
 
+  /**
+   * Get the math shape associated factory.
+   *
+   * @returns {object} The factory.
+   */
   getFactory() {
     let fac;
     if (this.mathShape instanceof Circle) {
@@ -113,6 +142,9 @@ export class Annotation {
   }
 }
 
+/**
+ * Annotation list.
+ */
 export class AnnotationList {
   /**
    * @type {Annotation[]}
@@ -134,8 +166,8 @@ export class AnnotationList {
   #listenerHandler = new ListenerHandler();
 
   /**
-   *
-   * @param {Annotation[]} [list] Optional list.
+   * @param {Annotation[]} [list] Optional list, will
+   *   create new if not provided.
    */
   constructor(list) {
     if (typeof list !== 'undefined') {
