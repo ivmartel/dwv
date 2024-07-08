@@ -1799,7 +1799,7 @@ export class App {
 
     // do we have more than one layer
     // (the layer has not been added to the layer group yet)
-    const isBaseLayer = layerGroup.getNumberOfLayers() === 0;
+    const isBaseLayer = layerGroup.getNumberOfViewLayers() === 0;
 
     // opacity
     let opacity = 1;
