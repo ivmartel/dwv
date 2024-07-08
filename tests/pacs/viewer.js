@@ -242,27 +242,22 @@ function viewerSetup() {
     if (!firstRender.includes(event.dataid)) {
       // store data id
       firstRender.push(event.dataid);
-      // log meta data
-      if (event.loadtype === 'image' &&
-        typeof _app.getImage(event.dataid) !== 'undefined'
-      ) {
-        // add data row
-        addDataRow(event.dataid);
-        ++dataLoad;
-        // init gui
-        if (dataLoad === numberOfDataToLoad) {
-          // set app tool
-          setAppTool();
+      // add data row
+      addDataRow(event.dataid);
+      ++dataLoad;
+      // init gui
+      if (dataLoad === numberOfDataToLoad) {
+        // set app tool
+        setAppTool();
 
-          const toolsFieldset = document.getElementById('tools');
-          toolsFieldset.disabled = false;
-          const changeLayoutSelect = document.getElementById('changelayout');
-          changeLayoutSelect.disabled = false;
-          const resetLayoutButton = document.getElementById('resetlayout');
-          resetLayoutButton.disabled = false;
-          const smoothingChk = document.getElementById('changesmoothing');
-          smoothingChk.disabled = false;
-        }
+        const toolsFieldset = document.getElementById('tools');
+        toolsFieldset.disabled = false;
+        const changeLayoutSelect = document.getElementById('changelayout');
+        changeLayoutSelect.disabled = false;
+        const resetLayoutButton = document.getElementById('resetlayout');
+        resetLayoutButton.disabled = false;
+        const smoothingChk = document.getElementById('changesmoothing');
+        smoothingChk.disabled = false;
       }
     }
 
@@ -1017,7 +1012,7 @@ function clearDataTable() {
  * @param {number} value The control value.
  * @param {Function} callback The callback on control value change.
  * @param {number} precision Optional number field float precision.
- * @returns {object} The control div.
+ * @returns {HTMLDivElement} The control div.
  */
 function getControlDiv(
   id,
@@ -1074,26 +1069,13 @@ function getControlDiv(
 }
 
 /**
- * Add a data row.
  *
- * @param {string} dataId The data id.
+ * @param {number} [numberOfLayerGroups] The number of layer groups
+ *   used to create the table.
+ * @returns {HTMLTableElement} The table element.
  */
-function addDataRow(dataId) {
-  // bind app to controls on first id
-  if (dataId === '0') {
-    bindAppToControls();
-  }
-
-  const dataViewConfigs = _app.getDataViewConfigs();
-  const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
-  // use first view layer
-  const initialVls = _app.getViewLayersByDataId(dataId);
-  const initialVl = initialVls[0];
-  const initialVc = initialVl.getViewController();
-  const initialWl = initialVc.getWindowLevel();
-
+function getLayersTable(numberOfLayerGroups) {
   let table = document.getElementById('layerstable');
-  let body;
   // create table if not present
   if (!table) {
     table = document.createElement('table');
@@ -1106,19 +1088,36 @@ function addDataRow(dataId) {
       trow.appendChild(th);
     };
     insertTCell('Id');
-    for (let j = 0; j < allLayerGroupDivIds.length; ++j) {
+    for (let j = 0; j < numberOfLayerGroups; ++j) {
       insertTCell('LG' + j);
     }
     insertTCell('Alpha Range');
     insertTCell('Contrast');
     insertTCell('Preset');
     insertTCell('Alpha');
-    body = table.createTBody();
+    table.createTBody();
     const div = document.getElementById('layersdetails');
     div.appendChild(table);
-  } else {
-    body = table.getElementsByTagName('tbody')[0];
   }
+  return table;
+}
+
+/**
+ * Add a data row.
+ *
+ * @param {string} dataId The data id.
+ */
+function addDataRow(dataId) {
+  // bind app to controls on first id
+  if (dataId === '0') {
+    bindAppToControls();
+  }
+
+  const dataViewConfigs = _app.getDataViewConfigs();
+  const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
+
+  const table = getLayersTable(allLayerGroupDivIds.length);
+  const body = table.tBodies[0];
 
   // add new layer row
   const row = body.insertRow();
@@ -1247,9 +1246,21 @@ function addDataRow(dataId) {
     }
   }
 
-  const image = _app.getImage(initialVl.getDataId());
-  const dataRange = image.getDataRange();
-  const rescaledDataRange = image.getRescaledDataRange();
+  const image = _app.getImage(dataId);
+  const dataIsImage = typeof image !== 'undefined';
+  const canAlpha = dataIsImage;
+  const isMonochrome = dataIsImage && image.isMonochrome();
+
+  // use first layer
+  const initialVls = _app.getViewLayersByDataId(dataId);
+  const initialDls = _app.getDrawLayersByDataId(dataId);
+  let initialLayer;
+  if (initialVls.length !== 0) {
+    initialLayer = initialVls[0];
+  } else if (initialDls.length !== 0) {
+    initialLayer = initialDls[0];
+  }
+
   const floatPrecision = 4;
 
   // cell: alpha range
@@ -1280,12 +1291,15 @@ function addDataRow(dataId) {
     }
   };
   // add controls
-  cell.appendChild(getControlDiv(minId, 'min',
-    dataRange.min, dataRange.max, dataRange.min,
-    changeAlphaFunc, floatPrecision));
-  cell.appendChild(getControlDiv(maxId, 'max',
-    dataRange.min, dataRange.max, dataRange.max,
-    changeAlphaFunc, floatPrecision));
+  if (canAlpha) {
+    const dataRange = image.getDataRange();
+    cell.appendChild(getControlDiv(minId, 'min',
+      dataRange.min, dataRange.max, dataRange.min,
+      changeAlphaFunc, floatPrecision));
+    cell.appendChild(getControlDiv(maxId, 'max',
+      dataRange.min, dataRange.max, dataRange.max,
+      changeAlphaFunc, floatPrecision));
+  }
 
   // cell: contrast
   cell = row.insertCell();
@@ -1309,12 +1323,20 @@ function addDataRow(dataId) {
     }
   };
   // add controls
-  cell.appendChild(getControlDiv(widthId, 'width',
-    0, rescaledDataRange.max - rescaledDataRange.min, initialWl.width,
-    changeContrast, floatPrecision));
-  cell.appendChild(getControlDiv(centerId, 'center',
-    rescaledDataRange.min, rescaledDataRange.max, initialWl.center,
-    changeContrast, floatPrecision));
+  if (isMonochrome) {
+    const initialVc = initialLayer.getViewController();
+    const rescaledDataRange = image.getRescaledDataRange();
+    cell.appendChild(getControlDiv(widthId, 'width',
+      0,
+      rescaledDataRange.max - rescaledDataRange.min,
+      initialVc.getWindowLevel().width,
+      changeContrast, floatPrecision));
+    cell.appendChild(getControlDiv(centerId, 'center',
+      rescaledDataRange.min,
+      rescaledDataRange.max,
+      initialVc.getWindowLevel().center,
+      changeContrast, floatPrecision));
+  }
 
   // cell: presets
   cell = row.insertCell();
@@ -1334,25 +1356,28 @@ function addDataRow(dataId) {
       }
     }
   };
-  const selectPreset = document.createElement('select');
-  selectPreset.id = 'preset-' + dataId + '-select';
-  const presets = initialVc.getWindowLevelPresetsNames();
-  const currentPresetName = initialVc.getCurrentWindowPresetName();
-  for (const preset of presets) {
-    const option = document.createElement('option');
-    option.value = preset;
-    if (preset === currentPresetName) {
-      option.selected = true;
+  if (isMonochrome) {
+    const selectPreset = document.createElement('select');
+    selectPreset.id = 'preset-' + dataId + '-select';
+    const initialVc = initialLayer.getViewController();
+    const presets = initialVc.getWindowLevelPresetsNames();
+    const currentPresetName = initialVc.getCurrentWindowPresetName();
+    for (const preset of presets) {
+      const option = document.createElement('option');
+      option.value = preset;
+      if (preset === currentPresetName) {
+        option.selected = true;
+      }
+      option.appendChild(document.createTextNode(preset));
+      selectPreset.appendChild(option);
     }
-    option.appendChild(document.createTextNode(preset));
-    selectPreset.appendChild(option);
+    selectPreset.onchange = changePreset;
+    const labelPreset = document.createElement('label');
+    labelPreset.htmlFor = selectPreset.id;
+    labelPreset.appendChild(document.createTextNode('wl: '));
+    cell.appendChild(labelPreset);
+    cell.appendChild(selectPreset);
   }
-  selectPreset.onchange = changePreset;
-  const labelPreset = document.createElement('label');
-  labelPreset.htmlFor = selectPreset.id;
-  labelPreset.appendChild(document.createTextNode('wl: '));
-  cell.appendChild(labelPreset);
-  cell.appendChild(selectPreset);
 
   // break line
   const br = document.createElement('br');
@@ -1373,25 +1398,28 @@ function addDataRow(dataId) {
       }
     }
   };
-  const selectColourMap = document.createElement('select');
-  selectColourMap.id = 'colourmap-' + dataId + '-select';
-  const colourMaps = Object.keys(dwv.luts);
-  const currentColourMap = initialVc.getColourMap();
-  for (const colourMap of colourMaps) {
-    const option = document.createElement('option');
-    option.value = colourMap;
-    if (colourMap === currentColourMap) {
-      option.selected = true;
+  if (isMonochrome) {
+    const selectColourMap = document.createElement('select');
+    selectColourMap.id = 'colourmap-' + dataId + '-select';
+    const initialVc = initialLayer.getViewController();
+    const colourMaps = Object.keys(dwv.luts);
+    const currentColourMap = initialVc.getColourMap();
+    for (const colourMap of colourMaps) {
+      const option = document.createElement('option');
+      option.value = colourMap;
+      if (colourMap === currentColourMap) {
+        option.selected = true;
+      }
+      option.appendChild(document.createTextNode(colourMap));
+      selectColourMap.appendChild(option);
     }
-    option.appendChild(document.createTextNode(colourMap));
-    selectColourMap.appendChild(option);
+    selectColourMap.onchange = changeColourMap;
+    const labelColourMap = document.createElement('label');
+    labelColourMap.htmlFor = selectColourMap.id;
+    labelColourMap.appendChild(document.createTextNode('cm: '));
+    cell.appendChild(labelColourMap);
+    cell.appendChild(selectColourMap);
   }
-  selectColourMap.onchange = changeColourMap;
-  const labelColourMap = document.createElement('label');
-  labelColourMap.htmlFor = selectColourMap.id;
-  labelColourMap.appendChild(document.createTextNode('cm: '));
-  cell.appendChild(labelColourMap);
-  cell.appendChild(selectColourMap);
 
   // cell: opactiy
   cell = row.insertCell();
@@ -1402,16 +1430,21 @@ function addDataRow(dataId) {
     const lgIds = getSelectedLayerGroupIds();
     for (let i = 0; i < lgIds.length; ++i) {
       const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vl = lg.getActiveViewLayer();
-      if (typeof vl !== 'undefined') {
-        vl.setOpacity(value);
-        vl.draw();
+      let layer;
+      if (dataIsImage) {
+        layer = lg.getActiveViewLayer();
+      } else {
+        layer = lg.getActiveDrawLayer();
+      }
+      if (typeof layer !== 'undefined') {
+        layer.setOpacity(value);
+        layer.draw();
       }
     }
   };
   // add controls
   cell.appendChild(getControlDiv(opacityId, 'opacity',
-    0, 1, initialVl.getOpacity(), changeOpacity, floatPrecision));
+    0, 1, initialLayer.getOpacity(), changeOpacity, floatPrecision));
 }
 
 /**
