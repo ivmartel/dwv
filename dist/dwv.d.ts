@@ -13,6 +13,229 @@ export declare function addTagsToDictionary(group: string, tags: {
 }): void;
 
 /**
+ * Image annotation.
+ */
+export declare class Annotation {
+    /**
+     * @param {ViewController} viewController The associated view controller.
+     */
+    constructor(viewController: ViewController);
+    /**
+     * The ID.
+     *
+     * 'Tracking Unique Identifier', 112040, DCM.
+     *
+     * @type {string}
+     */
+    id: string;
+    /**
+     * The reference image SOP UID.
+     *
+     * @type {string}
+     */
+    referenceSopUID: string;
+    /**
+     * The position: an Index converted to string.
+     *
+     * @type {string}
+     */
+    position: string;
+    /**
+     * The mathematical shape.
+     *
+     * @type {object}
+     */
+    mathShape: object;
+    /**
+     * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+     *
+     * 'RGB R Component', 110834, DCM...
+     *
+     * @type {string}
+     */
+    colour: string;
+    /**
+     * Annotation quantification.
+     *
+     * @type {object}
+     */
+    quantification: object;
+    /**
+     * Text expression. Can contain variables surrounded with '{}' that will
+     * be extracted from the quantification object.
+     *
+     * 'Short label', 125309, DCM.
+     *
+     * @type {string}
+     */
+    textExpr: string;
+    /**
+     * Get the image origin for a image UID.
+     *
+     * @returns {Index|undefined} The origin index.
+     */
+    getOriginIndex(): Index | undefined;
+    /**
+     * Set the annotation text expression.
+     *
+     * @param {Object.<string, string>} labelText The list of label
+     *   texts indexed by modality.
+     */
+    setTextExpr(labelText: {
+        [x: string]: string;
+    }): void;
+    /**
+     * Get the annotation label text by applying the
+     *   text expression on the current quantification.
+     *
+     * @returns {string} The resulting text.
+     */
+    getText(): string;
+    /**
+     * Update the annotation quantification.
+     */
+    updateQuantification(): void;
+    /**
+     * Get the math shape associated factory.
+     *
+     * @returns {object} The factory.
+     */
+    getFactory(): object;
+    #private;
+}
+
+/**
+ * {@link Annotation} factory.
+ */
+export declare class AnnotationFactory {
+    /**
+     * Get a warning string if elements are not as expected.
+     * Created by checkElements.
+     *
+     * @returns {string|undefined} The warning.
+     */
+    getWarning(): string | undefined;
+    /**
+     * Check dicom elements. Throws an error if not suitable.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+     * @returns {string|undefined} A possible warning.
+     */
+    checkElements(dataElements: {
+        [x: string]: DataElement;
+    }): string | undefined;
+    /**
+     * Get an {@link Annotation} object from the read DICOM file.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
+     * @param {ViewController} viewController The associated view controller.
+     * @returns {AnnotationList} A new annotation list.
+     */
+    create(dataElements: {
+        [x: string]: DataElement;
+    }, viewController: ViewController): AnnotationList;
+    /**
+     * Convert an annotation list into a DICOM SR object.
+     *
+     * @param {AnnotationList} annotationList The annotation list.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
+     */
+    toDicom(annotationList: AnnotationList, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
+    #private;
+}
+
+/**
+ * Annotation list.
+ */
+export declare class AnnotationList {
+    /**
+     * @param {Annotation[]} [list] Optional list, will
+     *   create new if not provided.
+     */
+    constructor(list?: Annotation[]);
+    /**
+     * Get the annotation list as an array.
+     *
+     * @returns {Annotation[]} The array.
+     */
+    getList(): Annotation[];
+    /**
+     * Get the number of annotations of this list.
+     *
+     * @returns {number} The number of annotations.
+     */
+    getLength(): number;
+    /**
+     * Add a new annotation.
+     *
+     * @param {Annotation} annotation The annotation to add.
+     */
+    add(annotation: Annotation): void;
+    /**
+     * Update an existing annotation.
+     *
+     * @param {Annotation} annotation The annotation to update.
+     */
+    update(annotation: Annotation): void;
+    /**
+     * Remoave an annotation.
+     *
+     * @param {string} id The id of the annotation to remove.
+     */
+    remove(id: string): void;
+    /**
+     * Find an annotation.
+     *
+     * @param {string} id The id of the annotation to find.
+     * @returns {Annotation|undefined} The found annotation.
+     */
+    find(id: string): Annotation | undefined;
+    /**
+     * Check if this list contains a meta data value.
+     *
+     * @param {string} key The key to check.
+     * @returns {boolean} True if the meta data is present.
+     */
+    hasMeta(key: string): boolean;
+    /**
+     * Get a meta data value.
+     *
+     * @param {string} key The meta data key.
+     * @returns {string} The meta data value.
+     */
+    getMeta(key: string): string;
+    /**
+     * Set a meta data.
+     *
+     * @param {string} key The meta data key.
+     * @param {string} value The value of the meta data.
+     */
+    setMeta(key: string, value: string): void;
+    /**
+     * Add an event listener to this class.
+     *
+     * @param {string} type The event type.
+     * @param {Function} callback The function associated with the provided
+     *   event type, will be called with the fired event.
+     */
+    addEventListener(type: string, callback: Function): void;
+    /**
+     * Remove an event listener from this class.
+     *
+     * @param {string} type The event type.
+     * @param {Function} callback The function associated with the provided
+     *   event type.
+     */
+    removeEventListener(type: string, callback: Function): void;
+    #private;
+}
+
+/**
  * List of ViewConfigs indexed by dataIds.
  *
  * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
@@ -412,19 +635,22 @@ export declare class App {
     /**
      * Set the drawings of the active layer group.
      *
-     * @param {Array} drawings An array of drawings.
-     * @param {Array} drawingsDetails An array of drawings details.
+     * @deprecated
+     * @param {Array} _drawings An array of drawings.
+     * @param {Array} _drawingsDetails An array of drawings details.
      */
-    setDrawings(drawings: any[], drawingsDetails: any[]): void;
+    setDrawings(_drawings: any[], _drawingsDetails: any[]): void;
     /**
      * Get the JSON state of the app.
      *
+     * @deprecated
      * @returns {string} The state of the app as a JSON string.
      */
     getJsonState(): string;
     /**
      * Apply a JSON state to this app.
      *
+     * @deprecated
      * @param {string} jsonState The state of the app as a JSON string.
      */
     applyJsonState(jsonState: string): void;
@@ -532,6 +758,13 @@ export declare class App {
      * @param {string} dataId The data id.
      */
     toggleOverlayListeners(dataId: string): void;
+    /**
+     * Add a draw layer.
+     *
+     * @param {string} dataId The data id.
+     * @param {ViewConfig} viewConfig The data view config.
+     */
+    addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     #private;
 }
 
@@ -734,10 +967,10 @@ export declare namespace customUI {
     /**
      * Open a dialogue to edit roi data. Defaults to window.prompt.
      *
-     * @param {object} data The roi data.
+     * @param {Annotation} annotation The roi data.
      * @param {Function} callback The callback to launch on dialogue exit.
      */
-    export function openRoiDialog(data: any, callback: Function): void;
+    export function openRoiDialog(annotation: Annotation, callback: Function): void;
 }
 
 /**
@@ -880,6 +1113,7 @@ export declare class DeleteSegmentCommand {
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
+ * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 export declare class DicomCode {
     /**
@@ -887,35 +1121,41 @@ export declare class DicomCode {
      */
     constructor(meaning: string);
     /**
-     * Code meaning (0008,0104).
+     * Code meaning.
      *
      * @type {string}
      */
     meaning: string;
     /**
-     * Code value (0008,0100).
+     * Code value.
      *
      * @type {string|undefined}
      */
     value: string | undefined;
     /**
-     * Long code value (0008,0119).
+     * Long code value.
      *
      * @type {string|undefined}
      */
     longValue: string | undefined;
     /**
-     * URN code value (0008,0120).
+     * URN code value.
      *
      * @type {string|undefined}
      */
     urnValue: string | undefined;
     /**
-     * Coding scheme designator (0008,0102).
+     * Coding scheme designator.
      *
      * @type {string|undefined}
      */
     schemeDesignator: string | undefined;
+    /**
+     * Get a string representation of this object.
+     *
+     * @returns {string} The code as string.
+     */
+    toString(): string;
 }
 
 /**
@@ -979,6 +1219,55 @@ export declare class DicomParser {
      */
     parse(buffer: ArrayBuffer): void;
     #private;
+}
+
+/**
+ * DICOM SR content: item of a SR content sequence.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.html}.
+ */
+export declare class DicomSRContent {
+    /**
+     * @param {string} valueType The content item value type.
+     */
+    constructor(valueType: string);
+    /**
+     * Value type.
+     *
+     * @type {string}
+     */
+    valueType: string;
+    /**
+     * Concept name code.
+     *
+     * @type {DicomCode|undefined}
+     */
+    conceptNameCode: DicomCode | undefined;
+    /**
+     * Relationship Type.
+     *
+     * @type {string}
+     */
+    relationshipType: string;
+    /**
+     * Content sequence (0040,A730).
+     *
+     * @type {DicomSRContent[]|undefined}
+     */
+    contentSequence: DicomSRContent[] | undefined;
+    /**
+     * Value.
+     *
+     * @type {object}
+     */
+    value: object;
+    /**
+     * Get a string representation of this object.
+     *
+     * @param {string} [prefix] An optional prefix for recursive content.
+     * @returns {string} The object as string.
+     */
+    toString(prefix?: string): string;
 }
 
 /**
@@ -1070,135 +1359,70 @@ export declare class DicomWriter {
  */
 export declare class DrawController {
     /**
-     * @param {DrawLayer} drawLayer The draw layer.
+     * @param {AnnotationList} [list] Optional annotation list.
      */
-    constructor(drawLayer: DrawLayer);
+    constructor(list?: AnnotationList);
     /**
-     * Get the current position group.
+     * Get an annotation.
      *
-     * @returns {Konva.Group|undefined} The Konva.Group.
+     * @param {string} id The annotation id.
+     * @returns {Annotation|undefined} The annotation.
      */
-    getCurrentPosGroup(): Konva.Group | undefined;
+    getAnnotation(id: string): Annotation | undefined;
     /**
-     * Reset: clear the layers array.
-     */
-    reset(): void;
-    /**
-     * Get a Konva group using its id.
+     * Get the annotation list.
      *
-     * @param {string} id The group id.
-     * @returns {object|undefined} The Konva group.
+     * @returns {AnnotationList} The list.
      */
-    getGroup(id: string): object | undefined;
+    getAnnotationList(): AnnotationList;
     /**
-     * Activate the current draw layer.
+     * Add an annotation.
      *
-     * @param {Index} index The current position.
-     * @param {number} scrollIndex The scroll index.
+     * @param {Annotation} annotation The annotation to add.
      */
-    activateDrawLayer(index: Index, scrollIndex: number): void;
+    addAnnotation(annotation: Annotation): void;
     /**
-     * Get a list of drawing display details.
+     * Update an anotation from the list.
      *
-     * @returns {DrawDetails[]} A list of draw details.
+     * @param {Annotation} annotation The annotation to update.
      */
-    getDrawDisplayDetails(): DrawDetails[];
+    updateAnnotation(annotation: Annotation): void;
     /**
-     * Get a list of drawing store details. Used in state.
+     * Remove an anotation for the list.
      *
-     * @returns {object} A list of draw details including id, text, quant...
-     * TODO Unify with getDrawDisplayDetails?
+     * @param {string} id The id of the annotation to remove.
      */
-    getDrawStoreDetails(): object;
+    removeAnnotation(id: string): void;
     /**
-     * Set the drawings on the current stage.
+     * Check if the annotation list contains a meta data value.
      *
-     * @param {Array} drawings An array of drawings.
-     * @param {DrawDetails[]} drawingsDetails An array of drawings details.
-     * @param {object} cmdCallback The DrawCommand callback.
-     * @param {object} exeCallback The callback to call once the
-     *   DrawCommand has been executed.
+     * @param {string} key The key to check.
+     * @returns {boolean} True if the meta data is present.
      */
-    setDrawings(drawings: any[], drawingsDetails: DrawDetails[], cmdCallback: object, exeCallback: object): void;
+    hasAnnotationMeta(key: string): boolean;
     /**
-     * Update a drawing from its details.
+     * Set an annotation meta data.
      *
-     * @param {DrawDetails} drawDetails Details of the drawing to update.
+     * @param {string} key The meta data to set.
+     * @param {string} value The value of the meta data.
      */
-    updateDraw(drawDetails: DrawDetails): void;
+    setAnnotationMeta(key: string, value: string): void;
     /**
-     * Delete a Draw from the stage.
+     * Get draw store details.
      *
-     * @param {Konva.Group} group The group to delete.
-     * @param {object} cmdCallback The DeleteCommand callback.
-     * @param {object} exeCallback The callback to call once the
-     *  DeleteCommand has been executed.
+     * @deprecated
      */
-    deleteDrawGroup(group: Konva.Group, cmdCallback: object, exeCallback: object): void;
-    /**
-     * Delete a Draw from the stage.
-     *
-     * @param {string} id The id of the group to delete.
-     * @param {Function} cmdCallback The DeleteCommand callback.
-     * @param {Function} exeCallback The callback to call once the
-     *  DeleteCommand has been executed.
-     * @returns {boolean} False if the group cannot be found.
-     */
-    deleteDraw(id: string, cmdCallback: Function, exeCallback: Function): boolean;
-    /**
-     * Delete all Draws from the stage.
-     *
-     * @param {Function} cmdCallback The DeleteCommand callback.
-     * @param {Function} exeCallback The callback to call once the
-     *  DeleteCommand has been executed.
-     */
-    deleteDraws(cmdCallback: Function, exeCallback: Function): void;
-    /**
-     * Get the total number of draws
-     * (at all positions).
-     *
-     * @returns {number} The total number of draws.
-     */
-    getNumberOfDraws(): number;
+    getDrawStoreDetails(): void;
     #private;
 }
 
 /**
- * Draw details.
+ * Debug function to output the layer hierarchy as text.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
  */
-export declare class DrawDetails {
-    /**
-     * The draw ID.
-     *
-     * @type {number}
-     */
-    id: number;
-    /**
-     * The draw position: an Index converted to string.
-     *
-     * @type {string}
-     */
-    position: string;
-    /**
-     * The draw type.
-     *
-     * @type {string}
-     */
-    type: string;
-    /**
-     * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
-     *
-     * @type {string}
-     */
-    color: string;
-    /**
-     * The draw meta.
-     *
-     * @type {DrawMeta}
-     */
-    meta: DrawMeta;
-}
-
 /**
  * Draw layer.
  */
@@ -1329,9 +1553,17 @@ export declare class DrawLayer {
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
-     * @param {string} dataId The associated data id.
      */
-    initialise(size: Scalar2D, spacing: Scalar2D, dataId: string): void;
+    initialise(size: Scalar2D, spacing: Scalar2D): void;
+    /**
+     * Set the annotation list.
+     *
+     * @param {AnnotationList} list The annotation list.
+     * @param {string} dataId The associated data id.
+     * @param {object} cmdCallback The command callback.
+     * @param {object} exeCallback The exe callback.
+     */
+    setAnnotationList(list: AnnotationList, dataId: string, cmdCallback: object, exeCallback: object): void;
     /**
      * Fit the layer to its parent container.
      *
@@ -1358,17 +1590,17 @@ export declare class DrawLayer {
      * Delete a Draw from the stage.
      *
      * @param {string} id The id of the group to delete.
-     * @param {object} exeCallback The callback to call once the
+     * @param {Function} exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDraw(id: string, exeCallback: object): void;
+    deleteDraw(id: string, exeCallback: Function): void;
     /**
      * Delete all Draws from the stage.
      *
-     * @param {object} exeCallback The callback to call once the
+     * @param {Function} exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDraws(exeCallback: object): void;
+    deleteDraws(exeCallback: Function): void;
     /**
      * Get the total number of draws of this layer
      * (at all positions).
@@ -1393,6 +1625,32 @@ export declare class DrawLayer {
      */
     setCurrentPosition(position: Point, index: Index): boolean;
     /**
+     * Activate the current draw layer.
+     *
+     * @param {Index} index The current position.
+     * @param {number} scrollIndex The scroll index.
+     */
+    activateDrawLayer(index: Index, scrollIndex: number): void;
+    /**
+     * Get the current position group.
+     *
+     * @returns {Konva.Group|undefined} The Konva.Group.
+     */
+    getCurrentPosGroup(): Konva.Group | undefined;
+    /**
+     * Get the non current position groups. Used to stop listeners.
+     *
+     * @returns {object[]} The groups that do not have the current position id.
+     */
+    getNonCurrentPosGroup(): object[];
+    /**
+     * Get a Konva group using its id.
+     *
+     * @param {string} id The group id.
+     * @returns {object|undefined} The Konva group.
+     */
+    getGroup(id: string): object | undefined;
+    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
@@ -1409,25 +1667,6 @@ export declare class DrawLayer {
      */
     removeEventListener(type: string, callback: Function): void;
     #private;
-}
-
-/**
- * Draw meta data.
- */
-export declare class DrawMeta {
-    /**
-     * Draw quantification.
-     *
-     * @type {object}
-     */
-    quantification: object;
-    /**
-     * Draw text expression. Can contain variables surrounded with '{}' that will
-     * be extracted from the quantification object.
-     *
-     * @type {string}
-     */
-    textExpr: string;
 }
 
 /**
@@ -1620,6 +1859,16 @@ export declare class Geometry {
 export declare function getDefaultDicomSegJson(): object;
 
 /**
+ * Get a simple dicom element item from a content item object.
+ *
+ * @param {DicomSRContent} content The content item object.
+ * @returns {Object<string, any>} The item as a list of (key, value) pairs.
+ */
+export declare function getDicomSRContentItem(content: DicomSRContent): {
+    [x: string]: any;
+};
+
+/**
  * List of DICOM data elements indexed via a 8 character string formed from
  * the group and element numbers.
  *
@@ -1699,6 +1948,16 @@ export declare function getPixelDataTag(): Tag;
  * @returns {string} Reverse Orientation Label.
  */
 export declare function getReverseOrientation(ori: string): string;
+
+/**
+ * Get a content item object from a dicom element.
+ *
+ * @param {Object<string, DataElement>} dataElements The dicom element.
+ * @returns {DicomSRContent} A content item object.
+ */
+export declare function getSRContent(dataElements: {
+    [x: string]: DataElement;
+}): DicomSRContent;
 
 /**
  * Split a group-element key used to store DICOM elements.
@@ -1817,6 +2076,13 @@ declare class Image_2 {
      * @returns {string} The UID.
      */
     getImageUid(index?: Index): string;
+    /**
+     * Get the image origin for a image UID.
+     *
+     * @param {string} uid The UID.
+     * @returns {Point3D|undefined} The origin.
+     */
+    getOriginForImageUid(uid: string): Point3D | undefined;
     /**
      * Check if this image includes the input uids.
      *
@@ -3224,6 +3490,13 @@ export declare class Point2D {
      * @returns {string} The point as a string.
      */
     toString(): string;
+    /**
+     * Get the distance to another Point2D.
+     *
+     * @param {Point2D} point2D The input point.
+     * @returns {number} Ths distance to the input point.
+     */
+    getDistance(point2D: Point2D): number;
     #private;
 }
 
@@ -4044,6 +4317,19 @@ export declare class View {
      */
     getCurrentIndex(): Index;
     /**
+     * Get the SOP image UID of the current image.
+     *
+     * @returns {string} The UID.
+     */
+    getCurrentImageUid(): string;
+    /**
+     * Get the image origin for a image UID.
+     *
+     * @param {string} uid The UID.
+     * @returns {Index|undefined} The origin index.
+     */
+    getOriginIndexForImageUid(uid: string): Index | undefined;
+    /**
      * Check if the current position (default) or
      * the provided position is in bounds.
      *
@@ -4213,9 +4499,8 @@ export declare class ViewConfig {
 export declare class ViewController {
     /**
      * @param {View} view The associated view.
-     * @param {string} dataId The associated data id.
      */
-    constructor(view: View, dataId: string);
+    constructor(view: View);
     /**
      * Get the plane helper.
      *
@@ -4282,6 +4567,19 @@ export declare class ViewController {
      */
     getCurrentIndex(): Index;
     /**
+     * Get the SOP image UID of the current image.
+     *
+     * @returns {string} The UID.
+     */
+    getCurrentImageUid(): string;
+    /**
+     * Get the image origin index for a image UID.
+     *
+     * @param {string} uid The UID.
+     * @returns {Index|undefined} The origin index.
+     */
+    getOriginIndexForImageUid(uid: string): Index | undefined;
+    /**
      * Get the current oriented index.
      *
      * @returns {Index} The index.
@@ -4324,9 +4622,8 @@ export declare class ViewController {
      * Set the associated image.
      *
      * @param {Image} img The associated image.
-     * @param {string} dataId The data id of the image.
      */
-    setImage(img: Image_2, dataId: string): void;
+    setImage(img: Image_2): void;
     /**
      * Get the current view (2D) spacing.
      *
@@ -4347,6 +4644,12 @@ export declare class ViewController {
      * @returns {string} The unit.
      */
     getPixelUnit(): string;
+    /**
+     * Get the image study instance UID.
+     *
+     * @returns {string} The UID.
+     */
+    getStudyInstanceUID(): string;
     /**
      * Get some values from the associated image in a region.
      *
@@ -4593,22 +4896,6 @@ export declare class ViewController {
      * @param {ViewLayer} viewLayer The layer to bind.
      */
     unbindImageAndLayer(viewLayer: ViewLayer): void;
-    /**
-     * Add an event listener to this class.
-     *
-     * @param {string} type The event type.
-     * @param {Function} callback The function associated with the provided
-     *   event type, will be called with the fired event.
-     */
-    addEventListener(type: string, callback: Function): void;
-    /**
-     * Remove an event listener from this class.
-     *
-     * @param {string} type The event type.
-     * @param {Function} callback The function associated with the provided
-     *   event type.
-     */
-    removeEventListener(type: string, callback: Function): void;
     #private;
 }
 

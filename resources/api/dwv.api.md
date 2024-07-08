@@ -12,13 +12,66 @@ export function addTagsToDictionary(group: string, tags: {
 }): void;
 
 // @public
+export class Annotation {
+    constructor(viewController: ViewController);
+    colour: string;
+    getFactory(): object;
+    getOriginIndex(): Index | undefined;
+    getText(): string;
+    id: string;
+    mathShape: object;
+    position: string;
+    quantification: object;
+    referenceSopUID: string;
+    setTextExpr(labelText: {
+        [x: string]: string;
+    }): void;
+    textExpr: string;
+    updateQuantification(): void;
+}
+
+// @public
+export class AnnotationFactory {
+    checkElements(dataElements: {
+        [x: string]: DataElement;
+    }): string | undefined;
+    create(dataElements: {
+        [x: string]: DataElement;
+    }, viewController: ViewController): AnnotationList;
+    getWarning(): string | undefined;
+    toDicom(annotationList: AnnotationList, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
+}
+
+// @public
+export class AnnotationList {
+    constructor(list?: Annotation[]);
+    add(annotation: Annotation): void;
+    addEventListener(type: string, callback: Function): void;
+    find(id: string): Annotation | undefined;
+    getLength(): number;
+    getList(): Annotation[];
+    getMeta(key: string): string;
+    hasMeta(key: string): boolean;
+    remove(id: string): void;
+    removeEventListener(type: string, callback: Function): void;
+    setMeta(key: string, value: string): void;
+    update(annotation: Annotation): void;
+}
+
+// @public
 export class App {
     abortAllLoads(): void;
     abortLoad(dataId: string): void;
     addDataViewConfig(dataId: string, config: ViewConfig): void;
+    addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
     addNewImage(image: Image_2, meta: object, source: string): string;
     addToUndoStack: (cmd: object) => void;
+    // @deprecated
     applyJsonState(jsonState: string): void;
     // @deprecated
     canScroll(): boolean;
@@ -37,6 +90,7 @@ export class App {
     };
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getImage(dataId: string): Image_2 | undefined;
+    // @deprecated
     getJsonState(): string;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(dataId: string): {
@@ -74,7 +128,8 @@ export class App {
     setDataViewConfigs(configs: {
         [x: string]: ViewConfig[];
     }): void;
-    setDrawings(drawings: any[], drawingsDetails: any[]): void;
+    // @deprecated
+    setDrawings(_drawings: any[], _drawingsDetails: any[]): void;
     setImage(dataId: string, img: Image_2): void;
     setImageSmoothing(flag: boolean): void;
     setLayerGroupsBinders(list: string[]): void;
@@ -158,7 +213,7 @@ export function createView(elements: {
 
 // @public (undocumented)
 export namespace customUI {
-    export function openRoiDialog(data: any, callback: Function): void;
+    export function openRoiDialog(annotation: Annotation, callback: Function): void;
 }
 
 // @public
@@ -216,6 +271,7 @@ export class DicomCode {
     longValue: string | undefined;
     meaning: string;
     schemeDesignator: string | undefined;
+    toString(): string;
     urnValue: string | undefined;
     value: string | undefined;
 }
@@ -229,6 +285,17 @@ export class DicomParser {
     parse(buffer: ArrayBuffer): void;
     setDecoderCharacterSet(characterSet: string): void;
     setDefaultCharacterSet(characterSet: string): void;
+}
+
+// @public
+export class DicomSRContent {
+    constructor(valueType: string);
+    conceptNameCode: DicomCode | undefined;
+    contentSequence: DicomSRContent[] | undefined;
+    relationshipType: string;
+    toString(prefix?: string): string;
+    value: object;
+    valueType: string;
 }
 
 // @public
@@ -247,39 +314,28 @@ export class DicomWriter {
 
 // @public
 export class DrawController {
-    constructor(drawLayer: DrawLayer);
-    activateDrawLayer(index: Index, scrollIndex: number): void;
-    deleteDraw(id: string, cmdCallback: Function, exeCallback: Function): boolean;
-    deleteDrawGroup(group: Konva.Group, cmdCallback: object, exeCallback: object): void;
-    deleteDraws(cmdCallback: Function, exeCallback: Function): void;
-    getCurrentPosGroup(): Konva.Group | undefined;
-    getDrawDisplayDetails(): DrawDetails[];
-    getDrawStoreDetails(): object;
-    getGroup(id: string): object | undefined;
-    getNumberOfDraws(): number;
-    reset(): void;
-    setDrawings(drawings: any[], drawingsDetails: DrawDetails[], cmdCallback: object, exeCallback: object): void;
-    updateDraw(drawDetails: DrawDetails): void;
-}
-
-// @public
-export class DrawDetails {
-    color: string;
-    id: number;
-    meta: DrawMeta;
-    position: string;
-    type: string;
+    constructor(list?: AnnotationList);
+    addAnnotation(annotation: Annotation): void;
+    getAnnotation(id: string): Annotation | undefined;
+    getAnnotationList(): AnnotationList;
+    // @deprecated
+    getDrawStoreDetails(): void;
+    hasAnnotationMeta(key: string): boolean;
+    removeAnnotation(id: string): void;
+    setAnnotationMeta(key: string, value: string): void;
+    updateAnnotation(annotation: Annotation): void;
 }
 
 // @public
 export class DrawLayer {
     constructor(containerDiv: HTMLDivElement);
+    activateDrawLayer(index: Index, scrollIndex: number): void;
     addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
     bindInteraction(): void;
-    deleteDraw(id: string, exeCallback: object): void;
-    deleteDraws(exeCallback: object): void;
+    deleteDraw(id: string, exeCallback: Function): void;
+    deleteDraws(exeCallback: Function): void;
     display(flag: boolean): void;
     draw(): void;
     fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
@@ -287,18 +343,22 @@ export class DrawLayer {
     flipScaleY(): void;
     flipScaleZ(): void;
     getBaseSize(): Scalar2D;
+    getCurrentPosGroup(): Konva.Group | undefined;
     getDataId(): string;
     getDrawController(): object;
+    getGroup(id: string): object | undefined;
     getId(): string;
     getKonvaLayer(): Konva.Layer;
     getKonvaStage(): Konva.Stage;
+    getNonCurrentPosGroup(): object[];
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
-    initialise(size: Scalar2D, spacing: Scalar2D, dataId: string): void;
+    initialise(size: Scalar2D, spacing: Scalar2D): void;
     isGroupVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
+    setAnnotationList(list: AnnotationList, dataId: string, cmdCallback: object, exeCallback: object): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setOffset(newOffset: Scalar3D): void;
@@ -307,12 +367,6 @@ export class DrawLayer {
     setScale(newScale: Scalar3D, center?: Point3D): void;
     toggleGroupVisibility(id: string): boolean;
     unbindInteraction(): void;
-}
-
-// @public
-export class DrawMeta {
-    quantification: object;
-    textExpr: string;
 }
 
 // @public
@@ -346,6 +400,11 @@ export class Geometry {
 export function getDefaultDicomSegJson(): object;
 
 // @public
+export function getDicomSRContentItem(content: DicomSRContent): {
+    [x: string]: any;
+};
+
+// @public
 export function getDwvVersion(): string;
 
 // @public
@@ -372,6 +431,11 @@ export function getPixelDataTag(): Tag;
 
 // @public
 export function getReverseOrientation(ori: string): string;
+
+// @public
+export function getSRContent(dataElements: {
+    [x: string]: DataElement;
+}): DicomSRContent;
 
 // @public
 export function getTagFromKey(key: string): Tag;
@@ -422,6 +486,7 @@ class Image_2 {
     };
     getNumberOfComponents(): number;
     getOffsets(value: number | RGB): number[];
+    getOriginForImageUid(uid: string): Point3D | undefined;
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
     getRescaledDataRange(): NumberRange;
@@ -692,6 +757,7 @@ export class Point {
 export class Point2D {
     constructor(x: number, y: number);
     equals(rhs: Point2D): boolean;
+    getDistance(point2D: Point2D): number;
     getX(): number;
     getY(): number;
     toString(): string;
@@ -853,12 +919,14 @@ export class View {
     generateImageData(data: ImageData, index: Index): void;
     getAlphaFunction(): (value: number[] | number, index: number) => number;
     getColourMap(): string;
+    getCurrentImageUid(): string;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
     getCurrentWindowPresetName(): string;
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position?: Point): Point3D;
+    getOriginIndexForImageUid(uid: string): Index | undefined;
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
     getScrollIndex(): number;
     getWindowLevel(): WindowLevel;
@@ -896,8 +964,7 @@ export class ViewConfig {
 
 // @public
 export class ViewController {
-    constructor(view: View, dataId: string);
-    addEventListener(type: string, callback: Function): void;
+    constructor(view: View);
     addWindowLevelPresets(presets: object): object;
     bindImageAndLayer(viewLayer: ViewLayer): void;
     canQuantifyImage(): boolean;
@@ -910,6 +977,7 @@ export class ViewController {
     generateImageData(array: ImageData, index?: Index): void;
     get2DSpacing(): Scalar2D;
     getColourMap(): string;
+    getCurrentImageUid(): string;
     getCurrentIndex(): Index;
     getCurrentOrientedIndex(): Index;
     getCurrentPosition(): Point;
@@ -928,6 +996,7 @@ export class ViewController {
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
+    getOriginIndexForImageUid(uid: string): Index | undefined;
     getPixelUnit(): string;
     getPlaneHelper(): PlaneHelper;
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
@@ -935,6 +1004,7 @@ export class ViewController {
     getPositionFromPlanePoint(point2D: Point2D): Point;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
+    getStudyInstanceUID(): string;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
     incrementIndex(dim: number, silent?: boolean): boolean;
@@ -946,11 +1016,10 @@ export class ViewController {
     isPositionInBounds(position?: Point): boolean;
     moreThanOne(dim: number): boolean;
     play(): void;
-    removeEventListener(type: string, callback: Function): void;
     setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;
-    setImage(img: Image_2, dataId: string): void;
+    setImage(img: Image_2): void;
     setViewAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setWindowLevel(wl: WindowLevel): void;
     setWindowLevelPreset(name: string): void;
