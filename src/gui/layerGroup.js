@@ -798,21 +798,12 @@ export class LayerGroup {
     if (layer instanceof ViewLayer) {
       this.#unbindViewLayer(layer);
       if (this.#activeViewLayerIndex === index) {
-        if (index - 2 >= 0) {
-          this.setActiveViewLayer(index - 2);
-        } else {
-          this.#activeViewLayerIndex = undefined;
-        }
+        this.#activeViewLayerIndex = undefined;
       }
     } else {
-      // unbind and update active index
       this.#unbindDrawLayer(layer);
       if (this.#activeDrawLayerIndex === index) {
-        if (index - 2 >= 0) {
-          this.setActiveDrawLayer(index - 2);
-        } else {
-          this.#activeDrawLayerIndex = undefined;
-        }
+        this.#activeDrawLayerIndex = undefined;
       }
     }
     // reset in storage
