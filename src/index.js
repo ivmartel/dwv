@@ -9,7 +9,10 @@ import {defaults} from './app/defaults';
 import {
   DrawController
 } from './app/drawController';
-import {Annotation} from './image/annotation';
+import {
+  Annotation,
+  AnnotationList
+} from './image/annotation';
 import {AnnotationFactory} from './image/annotationFactory';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
@@ -119,6 +122,7 @@ export {
   ViewConfig,
   ToolConfig,
   Annotation,
+  AnnotationList,
   AnnotationFactory,
   DrawController,
   ViewController,
