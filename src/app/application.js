@@ -311,7 +311,7 @@ export class App {
     });
 
     // add image to data controller
-    this.#dataController.addNew(
+    this.#dataController.add(
       dataId,
       new DicomData(meta, image)
     );
@@ -654,6 +654,10 @@ export class App {
 
     // create data controller
     this.#dataController = new DataController();
+    this.#dataController.addEventListener('dataadd', this.#fireEvent);
+    this.#dataController.addEventListener('dataremove', this.#fireEvent);
+    this.#dataController.addEventListener('dataimageset', this.#fireEvent);
+    this.#dataController.addEventListener('dataupdate', this.#fireEvent);
     // create stage
     this.#stage = new Stage();
     if (typeof this.#options.binders !== 'undefined') {
@@ -1562,7 +1566,7 @@ export class App {
     let eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
-        this.#dataController.addNew(event.dataid, event.data);
+        this.#dataController.add(event.dataid, event.data);
       } else {
         this.#dataController.update(event.dataid, event.data);
       }
@@ -1843,7 +1847,8 @@ export class App {
     }
 
     // listen to image set
-    this.#dataController.addEventListener('imageset', viewLayer.onimageset);
+    this.#dataController.addEventListener(
+      'dataimageset', viewLayer.onimageset);
 
     // sync layers position
     const value = [

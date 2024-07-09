@@ -127,7 +127,7 @@ export class DataController {
     this.#dataList[dataId].image = image;
     // fire image set
     this.#fireEvent({
-      type: 'imageset',
+      type: 'dataimageset',
       value: [image],
       dataid: dataId
     });
@@ -142,12 +142,17 @@ export class DataController {
    * @param {string} dataId The data id.
    * @param {DicomData} data The data.
    */
-  addNew(dataId, data) {
+  add(dataId, data) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
     this.#dataList[dataId] = data;
+    // fire a data add event
+    this.#fireEvent({
+      type: 'dataadd',
+      dataid: dataId
+    });
     // listen to image change
     if (typeof data.image !== 'undefined') {
       data.image.addEventListener(
@@ -172,13 +177,13 @@ export class DataController {
         image.removeEventListener(
           'imagegeometrychange', this.#getFireEvent(dataId));
       }
-      // fire a data remove event
-      this.#fireEvent({
-        type: 'imageremove',
-        dataid: dataId
-      });
       // remove data from list
       delete this.#dataList[dataId];
+      // fire a data remove event
+      this.#fireEvent({
+        type: 'dataremove',
+        dataid: dataId
+      });
     }
   }
 
@@ -215,6 +220,12 @@ export class DataController {
       data.meta,
       idKey,
       'value');
+
+    // fire a data add event
+    this.#fireEvent({
+      type: 'dataupdate',
+      dataid: dataId
+    });
   }
 
   /**
