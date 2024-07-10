@@ -214,7 +214,7 @@ export class WindowLevel {
     const viewLayer = layerGroup.getActiveViewLayer();
     const index = viewLayer.displayToPlaneIndex(mousePoint);
     const viewController = viewLayer.getViewController();
-    const image = this.#app.getImage(viewLayer.getDataId());
+    const image = this.#app.getData(viewLayer.getDataId()).image;
 
     // update view controller
     const wl = new WindowLevelValues(

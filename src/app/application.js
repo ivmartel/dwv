@@ -19,10 +19,7 @@ import {getUriQuery, decodeQuery} from '../utils/uri';
 import {UndoStack} from '../tools/undo';
 import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
-import {
-  DicomData,
-  DataController
-} from './dataController';
+import {DataController} from './dataController';
 import {OverlayData} from '../gui/overlayData';
 import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
@@ -41,6 +38,7 @@ import {Matrix33} from '../math/matrix';
 import {DataElement} from '../dicom/dataElement';
 import {Scalar3D} from '../math/scalar';
 import {Annotation} from '../image/annotation';
+import {DicomData} from './dataController';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -267,17 +265,13 @@ export class App {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * Get the image.
+   * Get a DicomData.
    *
    * @param {string} dataId The data id.
-   * @returns {Image|undefined} The associated image.
+   * @returns {DicomData|undefined} The data.
    */
-  getImage(dataId) {
-    let res;
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      res = this.#dataController.get(dataId).image;
-    }
-    return res;
+  getData(dataId) {
+    return this.#dataController.get(dataId);
   }
 
   /**
@@ -291,60 +285,24 @@ export class App {
   }
 
   /**
-   * Add a new image.
+   * Add a new DicomData.
    *
-   * @param {Image} image The new image.
-   * @param {object} meta The image meta.
-   * @param {string} source The source of the new image,
-   *   will be passed with load events.
-   * @returns {string} The new image data id.
+   * @param {DicomData} data The new data.
+   * @returns {string} The data id.
    */
-  addNewImage(image, meta, source) {
+  addData(data) {
+    // get a new dataId
     const dataId = this.#dataController.getNextDataId();
-
-    // load start event
-    this.#fireEvent({
-      type: 'loadstart',
-      loadtype: 'image',
-      source: source,
-      dataid: dataId
-    });
-
     // add image to data controller
     this.#dataController.add(
       dataId,
-      new DicomData(meta, image)
+      data
     );
-
-    // load item event
-    this.#fireEvent({
-      type: 'loaditem',
-      loadtype: 'image',
-      data: meta,
-      source: source,
-      dataid: dataId,
-      isfirstitem: true
-    });
-
     // optional render
     if (this.#options.viewOnFirstLoadItem) {
       this.render(dataId);
     }
-
-    // load events
-    this.#fireEvent({
-      type: 'load',
-      loadtype: 'image',
-      source: source,
-      dataid: dataId
-    });
-    this.#fireEvent({
-      type: 'loadend',
-      loadtype: 'image',
-      source: source,
-      dataid: dataId
-    });
-
+    // return
     return dataId;
   }
 

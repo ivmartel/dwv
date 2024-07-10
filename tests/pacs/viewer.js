@@ -275,11 +275,11 @@ function viewerSetup() {
         const dataId = 0;
         const vls = _app.getViewLayersByDataId(dataId);
         const vc = vls[0].getViewController();
-        const img = _app.getImage(dataId);
+        const img = _app.getData(dataId).image;
         const imgGeometry = img.getGeometry();
         const sliceSize = imgGeometry.getSize().getDimSize(2);
         // SEG image
-        const segImage = _app.getImage(event.dataid);
+        const segImage = _app.getData(event.dataid).image;
         // calculate slice difference
         const segOrigin0 = segImage.getGeometry().getOrigins()[0];
         const segOrigin0Point = new dwv.Point([
@@ -1113,6 +1113,11 @@ function addDataRow(dataId) {
     bindAppToControls();
   }
 
+  const image = _app.getData(dataId).image;
+  const dataIsImage = typeof image !== 'undefined';
+  const canAlpha = dataIsImage;
+  const isMonochrome = dataIsImage && image.isMonochrome();
+
   const dataViewConfigs = _app.getDataViewConfigs();
   const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
 
@@ -1245,11 +1250,6 @@ function addDataRow(dataId) {
       cell.appendChild(getLayerAdd(l, layerGroupDivId));
     }
   }
-
-  const image = _app.getImage(dataId);
-  const dataIsImage = typeof image !== 'undefined';
-  const canAlpha = dataIsImage;
-  const isMonochrome = dataIsImage && image.isMonochrome();
 
   // use first layer
   const initialVls = _app.getViewLayersByDataId(dataId);
