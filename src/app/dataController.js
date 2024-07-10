@@ -34,7 +34,7 @@ export class DicomData {
 }
 
 /*
- * Data (list of {image, meta}) controller.
+ * DicomData controller.
  */
 export class DataController {
 
