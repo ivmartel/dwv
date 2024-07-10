@@ -31,13 +31,6 @@ export class ShapeEditor {
   }
 
   /**
-   * Shape factory list.
-   *
-   * @type {object}
-   */
-  #shapeFactoryList = null;
-
-  /**
    * Current shape factory.
    *
    * @type {object}
@@ -85,15 +78,6 @@ export class ShapeEditor {
   #drawEventCallback = null;
 
   /**
-   * Set the tool options.
-   *
-   * @param {Array} list The list of shape classes.
-   */
-  setFactoryList(list) {
-    this.#shapeFactoryList = list;
-  }
-
-  /**
    * Set the shape to edit.
    *
    * @param {Konva.Shape} inshape The shape to edit.
@@ -108,21 +92,12 @@ export class ShapeEditor {
     if (this.#shape) {
       // remove old anchors
       this.#removeAnchors();
-      // find a factory for the input shape
-      const group = this.#shape.getParent();
-      const keys = Object.keys(this.#shapeFactoryList);
-      this.#currentFactory = null;
-      for (let i = 0; i < keys.length; ++i) {
-        const factory = new this.#shapeFactoryList[keys[i]];
-        if (factory.isFactoryGroup(group)) {
-          this.#currentFactory = factory;
-          // stop at first find
-          break;
-        }
-      }
+
+      this.#currentFactory = annotation.getFactory();
       if (this.#currentFactory === null) {
         throw new Error('Could not find a factory to update shape.');
       }
+
       // add new anchors
       this.#addAnchors();
     }
