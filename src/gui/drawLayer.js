@@ -198,7 +198,7 @@ export class DrawLayer {
   /**
    * Get the draw controller.
    *
-   * @returns {object} The controller.
+   * @returns {DrawController} The controller.
    */
   getDrawController() {
     return this.#drawController;
