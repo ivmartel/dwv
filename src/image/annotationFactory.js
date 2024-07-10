@@ -27,7 +27,7 @@ import {
 } from '../dicom/dicomSpatialCoordinate';
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
-import {Annotation, AnnotationList} from './annotation';
+import {Annotation, AnnotationGroup} from './annotation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -99,7 +99,7 @@ export class AnnotationFactory {
    * Get an {@link Annotation} object from the read DICOM file.
    *
    * @param {Object<string, DataElement>} dataElements The DICOM tags.
-   * @returns {AnnotationList} A new annotation list.
+   * @returns {AnnotationGroup} A new annotation group.
    */
   create(dataElements) {
     const srContent = getSRContent(dataElements);
@@ -134,24 +134,24 @@ export class AnnotationFactory {
       }
     }
 
-    const annotationList = new AnnotationList(annotations);
+    const annotationGroup = new AnnotationGroup(annotations);
 
-    annotationList.setMeta(
+    annotationGroup.setMeta(
       'StudyInstanceUID',
       dataElements['0020000D'].value[0]
     );
 
-    return annotationList;
+    return annotationGroup;
   }
 
   /**
-   * Convert an annotation list into a DICOM SR object.
+   * Convert an annotation group into a DICOM SR object.
    *
-   * @param {AnnotationList} annotationList The annotation list.
+   * @param {AnnotationGroup} annotationGroup The annotation group.
    * @param {Object<string, any>} [extraTags] Optional list of extra tags.
    * @returns {Object<string, DataElement>} A list of dicom elements.
    */
-  toDicom(annotationList, extraTags) {
+  toDicom(annotationGroup, extraTags) {
     let tags = {};
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.71';
@@ -159,7 +159,7 @@ export class AnnotationFactory {
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.71';
     tags.MediaStorageSOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.71.0';
 
-    tags.StudyInstanceUID = annotationList.getMeta('StudyInstanceUID');
+    tags.StudyInstanceUID = annotationGroup.getMeta('StudyInstanceUID');
 
     tags.SeriesInstanceUID = '1.2.3.4.5.6';
 
@@ -173,7 +173,7 @@ export class AnnotationFactory {
 
     const contentSequence = [];
 
-    for (const annotation of annotationList.getList()) {
+    for (const annotation of annotationGroup.getList()) {
       const srImage = new DicomSRContent(ValueTypes.image);
       srImage.relationshipType = RelationshipTypes.selectedFrom;
       srImage.conceptNameCode = getSourceImageCode();

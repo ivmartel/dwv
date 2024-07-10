@@ -96,7 +96,7 @@ export class DicomBufferToView {
     try {
       const data = new DicomData(dataElements);
       if (factory instanceof AnnotationFactory) {
-        data.annotationList = factory.create(dataElements);
+        data.annotationGroup = factory.create(dataElements);
       } else {
         data.image = factory.create(
           dataElements,

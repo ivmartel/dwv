@@ -4,7 +4,7 @@ import {mergeObjects} from '../utils/operator';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from '../image/image';
-import {AnnotationList} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -25,11 +25,11 @@ export class DicomData {
    */
   image;
   /**
-   * Annotattion list extracted from meta data.
+   * Annotattion group extracted from meta data.
    *
-   * @type {AnnotationList|undefined}
+   * @type {AnnotationGroup|undefined}
    */
-  annotationList;
+  annotationGroup;
 
   /**
    * @param {object} meta The DICOM meta data.

@@ -14,7 +14,7 @@ import {
 } from './app/dataController';
 import {
   Annotation,
-  AnnotationList
+  AnnotationGroup
 } from './image/annotation';
 import {AnnotationFactory} from './image/annotationFactory';
 import {ViewController} from './app/viewController';
@@ -125,7 +125,7 @@ export {
   ViewConfig,
   ToolConfig,
   Annotation,
-  AnnotationList,
+  AnnotationGroup,
   AnnotationFactory,
   DrawController,
   ViewController,

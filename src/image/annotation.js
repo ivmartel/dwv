@@ -165,9 +165,9 @@ export class Annotation {
 }
 
 /**
- * Annotation list.
+ * Annotation group.
  */
-export class AnnotationList {
+export class AnnotationGroup {
   /**
    * @type {Annotation[]}
    */
@@ -200,7 +200,7 @@ export class AnnotationList {
   }
 
   /**
-   * Get the annotation list as an array.
+   * Get the annotation group as an array.
    *
    * @returns {Annotation[]} The array.
    */
@@ -249,7 +249,7 @@ export class AnnotationList {
   }
 
   /**
-   * Remoave an annotation.
+   * Remove an annotation.
    *
    * @param {string} id The id of the annotation to remove.
    */

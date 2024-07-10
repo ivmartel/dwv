@@ -1087,7 +1087,7 @@ export class App {
     const isImage =
       typeof this.getData(dataId).image !== 'undefined';
     const isMeasurement =
-      typeof this.getData(dataId).annotationList !== 'undefined';
+      typeof this.getData(dataId).annotationGroup !== 'undefined';
 
     // create layer groups if not done yet
     // (create all to allow for ratio sync)
@@ -1895,7 +1895,7 @@ export class App {
 
     // set annotation view controller (allows quantification)
     const refViewController = refViewLayer.getViewController();
-    data.annotationList.setViewController(refViewController);
+    data.annotationGroup.setViewController(refViewController);
 
     // reference data to use as base for layer properties
     const refData = this.#dataController.get(refDataId);
@@ -1934,8 +1934,8 @@ export class App {
 
     drawLayer.setScale(layerGroup.getScale());
 
-    drawLayer.setAnnotationList(
-      data.annotationList,
+    drawLayer.setAnnotationGroup(
+      data.annotationGroup,
       dataId,
       this.#fireEvent,
       this.addToUndoStack);

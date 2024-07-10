@@ -7,6 +7,7 @@ import {Style} from '../gui/style';
 import {DrawLayer} from '../gui/drawLayer';
 import {Scalar2D} from '../math/scalar';
 import {Annotation} from '../image/annotation';
+import {DrawController} from '../app/drawController';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -32,6 +33,35 @@ export function getShapeDisplayName(shape) {
   }
   // return
   return displayName;
+}
+
+export class AddAnnotationCommand {
+  /**
+   * @type {Annotation}
+   */
+  #annotation;
+
+  /**
+   * @type {DrawController}
+   */
+  #drawController;
+
+  /**
+   * @param {Annotation} annotation The group draw.
+   * @param {DrawController} drawController The layer where to draw the group.
+   */
+  constructor(annotation, drawController) {
+    this.#annotation = annotation;
+    this.#drawController = drawController;
+  }
+
+  execute() {
+    this.#drawController.addAnnotation(this.#annotation);
+  }
+
+  undo() {
+    this.#drawController.removeAnnotation(this.#annotation.id);
+  }
 }
 
 /**

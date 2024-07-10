@@ -19,7 +19,7 @@ import {
   isNodeNameLabel,
   validateGroupPosition
 } from './drawBounds';
-import {Annotation, AnnotationList} from '../image/annotation';
+import {Annotation, AnnotationGroup} from '../image/annotation';
 import {ScrollWheel} from './scrollWheel';
 import {ShapeEditor} from './editor';
 
@@ -233,7 +233,7 @@ export class Draw {
       const data = new DicomData({
         '0020000D': {value: [vc.getStudyInstanceUID()]}
       });
-      data.annotationList = new AnnotationList();
+      data.annotationGroup = new AnnotationGroup();
       const dataId = this.#app.addData(data);
       // render (will create draw layer)
       this.#app.addDataViewConfig(dataId, new ViewConfig(divId));

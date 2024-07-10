@@ -25,7 +25,7 @@ import {Index} from '../math/index';
 import {Vector3D} from '../math/vector';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 import {PlaneHelper} from '../image/planeHelper';
-import {Annotation, AnnotationList} from '../image/annotation';
+import {Annotation, AnnotationGroup} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -478,27 +478,27 @@ export class DrawLayer {
   }
 
   /**
-   * Set the annotation list.
+   * Set the annotation group.
    *
-   * @param {AnnotationList} list The annotation list.
+   * @param {AnnotationGroup} group The annotation group.
    * @param {string} dataId The associated data id.
    * @param {object} cmdCallback The command callback.
    * @param {object} exeCallback The exe callback.
    */
-  setAnnotationList(list, dataId, cmdCallback, exeCallback) {
+  setAnnotationGroup(group, dataId, cmdCallback, exeCallback) {
     this.#dataId = dataId;
     // local listeners
-    list.addEventListener('addannotation', function () {
+    group.addEventListener('addannotation', function () {
       // TODO create konva related
     });
-    list.addEventListener('removeannotation', function () {
+    group.addEventListener('removeannotation', function () {
       // TODO delete konva related
     });
     // create view controller
-    this.#drawController = new DrawController(list);
+    this.#drawController = new DrawController(group);
 
-    if (list.getLength() !== 0) {
-      this.#setAnnotations(list.getList(), cmdCallback, exeCallback);
+    if (group.getLength() !== 0) {
+      this.#setAnnotations(group.getList(), cmdCallback, exeCallback);
     }
   }
 

@@ -1620,9 +1620,9 @@ function setupTests() {
     const layerGroup = _app.getActiveLayerGroup();
     const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
-    const annotationList = drawController.getAnnotationList();
+    const annotationGroup = drawController.getAnnotationGroup();
     const factory = new dwv.AnnotationFactory();
-    const dicomElements = factory.toDicom(annotationList);
+    const dicomElements = factory.toDicom(annotationGroup);
     // write
     const writer = new dwv.DicomWriter();
     let dicomBuffer = null;

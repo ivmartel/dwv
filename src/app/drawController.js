@@ -1,4 +1,4 @@
-import {AnnotationList} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -11,11 +11,11 @@ import {Annotation} from '../image/annotation';
 export class DrawController {
 
   /**
-   * The annotation list.
+   * The annotation group.
    *
-   * @type {AnnotationList}
+   * @type {AnnotationGroup}
    */
-  #annotationList;
+  #annotationGroup;
 
   /**
    * Get an annotation.
@@ -24,16 +24,16 @@ export class DrawController {
    * @returns {Annotation|undefined} The annotation.
    */
   getAnnotation(id) {
-    return this.#annotationList.find(id);
+    return this.#annotationGroup.find(id);
   }
 
   /**
-   * Get the annotation list.
+   * Get the annotation group.
    *
-   * @returns {AnnotationList} The list.
+   * @returns {AnnotationGroup} The list.
    */
-  getAnnotationList() {
-    return this.#annotationList;
+  getAnnotationGroup() {
+    return this.#annotationGroup;
   }
 
   /**
@@ -42,7 +42,7 @@ export class DrawController {
    * @param {Annotation} annotation The annotation to add.
    */
   addAnnotation(annotation) {
-    this.#annotationList.add(annotation);
+    this.#annotationGroup.add(annotation);
   }
 
   /**
@@ -51,7 +51,7 @@ export class DrawController {
    * @param {Annotation} annotation The annotation to update.
    */
   updateAnnotation(annotation) {
-    this.#annotationList.update(annotation);
+    this.#annotationGroup.update(annotation);
   }
 
   /**
@@ -60,28 +60,28 @@ export class DrawController {
    * @param {string} id The id of the annotation to remove.
    */
   removeAnnotation(id) {
-    this.#annotationList.remove(id);
+    this.#annotationGroup.remove(id);
   }
 
   /**
-   * @param {AnnotationList} [list] Optional annotation list.
+   * @param {AnnotationGroup} [group] Optional annotation group.
    */
-  constructor(list) {
-    if (typeof list !== 'undefined') {
-      this.#annotationList = list;
+  constructor(group) {
+    if (typeof group !== 'undefined') {
+      this.#annotationGroup = group;
     } else {
-      this.#annotationList = new AnnotationList();
+      this.#annotationGroup = new AnnotationGroup();
     }
   }
 
   /**
-   * Check if the annotation list contains a meta data value.
+   * Check if the annotation group contains a meta data value.
    *
    * @param {string} key The key to check.
    * @returns {boolean} True if the meta data is present.
    */
   hasAnnotationMeta(key) {
-    return this.#annotationList.hasMeta(key);
+    return this.#annotationGroup.hasMeta(key);
   }
 
   /**
@@ -91,7 +91,7 @@ export class DrawController {
    * @param {string} value The value of the meta data.
    */
   setAnnotationMeta(key, value) {
-    this.#annotationList.setMeta(key, value);
+    this.#annotationGroup.setMeta(key, value);
   }
 
   /**
