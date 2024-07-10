@@ -12,7 +12,7 @@ import {
   isNodeNameLabel,
   validateGroupPosition
 } from './drawBounds';
-import {ShapeEditor} from './drawShapeEditor';
+import {DrawShapeEditor} from './drawShapeEditor';
 import {DrawTrash} from './drawTrash';
 
 // external
@@ -42,7 +42,7 @@ export class DrawShapeHandler {
   /**
    * Shape editor.
    *
-   * @type {ShapeEditor}
+   * @type {DrawShapeEditor}
    */
   #shapeEditor;
 
@@ -94,7 +94,7 @@ export class DrawShapeHandler {
     this.#app = app;
     this.#drawEventCallback = callback;
 
-    this.#shapeEditor = new ShapeEditor(app);
+    this.#shapeEditor = new DrawShapeEditor(app);
     this.#shapeEditor.setDrawEventCallback(callback);
 
     this.#trash = new DrawTrash();

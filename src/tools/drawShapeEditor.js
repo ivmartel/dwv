@@ -12,9 +12,9 @@ import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
- * Shape editor.
+ * Draw shape editor.
  */
-export class ShapeEditor {
+export class DrawShapeEditor {
 
   /**
    * Associated app.
