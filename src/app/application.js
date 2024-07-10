@@ -1086,7 +1086,7 @@ export class App {
       throw new Error('Cannot render without data id');
     }
     // guess data type
-    const isImage = typeof this.getImage(dataId) !== 'undefined';
+    const isImage = typeof this.getData(dataId).image !== 'undefined';
     let isMeasurement = false;
     if (!isImage) {
       const fac = new AnnotationFactory();
