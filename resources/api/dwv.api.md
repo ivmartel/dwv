@@ -13,7 +13,6 @@ export function addTagsToDictionary(group: string, tags: {
 
 // @public
 export class Annotation {
-    constructor(viewController: ViewController);
     colour: string;
     getFactory(): object;
     getOriginIndex(): Index | undefined;
@@ -26,6 +25,7 @@ export class Annotation {
     setTextExpr(labelText: {
         [x: string]: string;
     }): void;
+    setViewController(viewController: ViewController): void;
     textExpr: string;
     updateQuantification(): void;
 }
@@ -37,9 +37,9 @@ export class AnnotationFactory {
     }): string | undefined;
     create(dataElements: {
         [x: string]: DataElement;
-    }, viewController: ViewController): AnnotationList;
+    }): AnnotationGroup;
     getWarning(): string | undefined;
-    toDicom(annotationList: AnnotationList, extraTags?: {
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -47,7 +47,7 @@ export class AnnotationFactory {
 }
 
 // @public
-export class AnnotationList {
+export class AnnotationGroup {
     constructor(list?: Annotation[]);
     add(annotation: Annotation): void;
     addEventListener(type: string, callback: Function): void;
@@ -59,6 +59,7 @@ export class AnnotationList {
     remove(id: string): void;
     removeEventListener(type: string, callback: Function): void;
     setMeta(key: string, value: string): void;
+    setViewController(viewController: ViewController): void;
     update(annotation: Annotation): void;
 }
 
@@ -66,10 +67,10 @@ export class AnnotationList {
 export class App {
     abortAllLoads(): void;
     abortLoad(dataId: string): void;
+    addData(data: DicomData): string;
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     addEventListener(type: string, callback: Function): void;
-    addNewImage(image: Image_2, meta: object, source: string): string;
     addToUndoStack: (cmd: object) => void;
     // @deprecated
     applyJsonState(jsonState: string): void;
@@ -83,13 +84,13 @@ export class App {
     getAddedScale(): Scalar3D;
     getBaseScale(): Scalar3D;
     getCurrentStackIndex(): number;
+    getData(dataId: string): DicomData | undefined;
     getDataIds(): string[];
     getDataIdsFromSopUids(uids: string[]): string[];
     getDataViewConfigs(): {
         [x: string]: ViewConfig[];
     };
     getDrawLayersByDataId(dataId: string): DrawLayer[];
-    getImage(dataId: string): Image_2 | undefined;
     // @deprecated
     getJsonState(): string;
     getLayerGroupByDivId(divId: string): LayerGroup;
@@ -277,6 +278,14 @@ export class DicomCode {
 }
 
 // @public
+export class DicomData {
+    constructor(meta: object);
+    annotationGroup: AnnotationGroup | undefined;
+    image: Image_2 | undefined;
+    meta: object;
+}
+
+// @public
 export class DicomParser {
     getDefaultCharacterSet(): string;
     getDicomElements(): {
@@ -314,10 +323,10 @@ export class DicomWriter {
 
 // @public
 export class DrawController {
-    constructor(list?: AnnotationList);
+    constructor(group?: AnnotationGroup);
     addAnnotation(annotation: Annotation): void;
     getAnnotation(id: string): Annotation | undefined;
-    getAnnotationList(): AnnotationList;
+    getAnnotationGroup(): AnnotationGroup;
     // @deprecated
     getDrawStoreDetails(): void;
     hasAnnotationMeta(key: string): boolean;
@@ -345,7 +354,7 @@ export class DrawLayer {
     getBaseSize(): Scalar2D;
     getCurrentPosGroup(): Konva.Group | undefined;
     getDataId(): string;
-    getDrawController(): object;
+    getDrawController(): DrawController;
     getGroup(id: string): object | undefined;
     getId(): string;
     getKonvaLayer(): Konva.Layer;
@@ -358,7 +367,7 @@ export class DrawLayer {
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
-    setAnnotationList(list: AnnotationList, dataId: string, cmdCallback: object, exeCallback: object): void;
+    setAnnotationGroup(group: AnnotationGroup, dataId: string, cmdCallback: object, exeCallback: object): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setOffset(newOffset: Scalar3D): void;

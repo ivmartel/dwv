@@ -17,10 +17,6 @@ export declare function addTagsToDictionary(group: string, tags: {
  */
 export declare class Annotation {
     /**
-     * @param {ViewController} viewController The associated view controller.
-     */
-    constructor(viewController: ViewController);
-    /**
      * The ID.
      *
      * 'Tracking Unique Identifier', 112040, DCM.
@@ -69,6 +65,12 @@ export declare class Annotation {
      * @type {string}
      */
     textExpr: string;
+    /**
+     * Set the associated view controller.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     */
+    setViewController(viewController: ViewController): void;
     /**
      * Get the image origin for a image UID.
      *
@@ -128,20 +130,19 @@ export declare class AnnotationFactory {
      * Get an {@link Annotation} object from the read DICOM file.
      *
      * @param {Object<string, DataElement>} dataElements The DICOM tags.
-     * @param {ViewController} viewController The associated view controller.
-     * @returns {AnnotationList} A new annotation list.
+     * @returns {AnnotationGroup} A new annotation group.
      */
     create(dataElements: {
         [x: string]: DataElement;
-    }, viewController: ViewController): AnnotationList;
+    }): AnnotationGroup;
     /**
-     * Convert an annotation list into a DICOM SR object.
+     * Convert an annotation group into a DICOM SR object.
      *
-     * @param {AnnotationList} annotationList The annotation list.
+     * @param {AnnotationGroup} annotationGroup The annotation group.
      * @param {Object<string, any>} [extraTags] Optional list of extra tags.
      * @returns {Object<string, DataElement>} A list of dicom elements.
      */
-    toDicom(annotationList: AnnotationList, extraTags?: {
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -150,16 +151,16 @@ export declare class AnnotationFactory {
 }
 
 /**
- * Annotation list.
+ * Annotation group.
  */
-export declare class AnnotationList {
+export declare class AnnotationGroup {
     /**
      * @param {Annotation[]} [list] Optional list, will
      *   create new if not provided.
      */
     constructor(list?: Annotation[]);
     /**
-     * Get the annotation list as an array.
+     * Get the annotation group as an array.
      *
      * @returns {Annotation[]} The array.
      */
@@ -183,11 +184,17 @@ export declare class AnnotationList {
      */
     update(annotation: Annotation): void;
     /**
-     * Remoave an annotation.
+     * Remove an annotation.
      *
      * @param {string} id The id of the annotation to remove.
      */
     remove(id: string): void;
+    /**
+     * Set the associated view controller.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     */
+    setViewController(viewController: ViewController): void;
     /**
      * Find an annotation.
      *
@@ -258,12 +265,12 @@ export declare class AnnotationList {
  */
 export declare class App {
     /**
-     * Get the image.
+     * Get a DicomData.
      *
      * @param {string} dataId The data id.
-     * @returns {Image|undefined} The associated image.
+     * @returns {DicomData|undefined} The data.
      */
-    getImage(dataId: string): Image_2 | undefined;
+    getData(dataId: string): DicomData | undefined;
     /**
      * Set the image at the given id.
      *
@@ -272,15 +279,12 @@ export declare class App {
      */
     setImage(dataId: string, img: Image_2): void;
     /**
-     * Add a new image.
+     * Add a new DicomData.
      *
-     * @param {Image} image The new image.
-     * @param {object} meta The image meta.
-     * @param {string} source The source of the new image,
-     *   will be passed with load events.
-     * @returns {string} The new image data id.
+     * @param {DicomData} data The new data.
+     * @returns {string} The data id.
      */
-    addNewImage(image: Image_2, meta: object, source: string): string;
+    addData(data: DicomData): string;
     /**
      * Get the meta data.
      *
@@ -1159,6 +1163,34 @@ export declare class DicomCode {
 }
 
 /**
+ * DICOM data: meta and possible image.
+ */
+export declare class DicomData {
+    /**
+     * @param {object} meta The DICOM meta data.
+     */
+    constructor(meta: object);
+    /**
+     * DICOM meta data.
+     *
+     * @type {object}
+     */
+    meta: object;
+    /**
+     * Image extracted from meta data.
+     *
+     * @type {Image|undefined}
+     */
+    image: Image_2 | undefined;
+    /**
+     * Annotattion group extracted from meta data.
+     *
+     * @type {AnnotationGroup|undefined}
+     */
+    annotationGroup: AnnotationGroup | undefined;
+}
+
+/**
  * DicomParser class.
  *
  * @example
@@ -1359,9 +1391,9 @@ export declare class DicomWriter {
  */
 export declare class DrawController {
     /**
-     * @param {AnnotationList} [list] Optional annotation list.
+     * @param {AnnotationGroup} [group] Optional annotation group.
      */
-    constructor(list?: AnnotationList);
+    constructor(group?: AnnotationGroup);
     /**
      * Get an annotation.
      *
@@ -1370,11 +1402,11 @@ export declare class DrawController {
      */
     getAnnotation(id: string): Annotation | undefined;
     /**
-     * Get the annotation list.
+     * Get the annotation group.
      *
-     * @returns {AnnotationList} The list.
+     * @returns {AnnotationGroup} The list.
      */
-    getAnnotationList(): AnnotationList;
+    getAnnotationGroup(): AnnotationGroup;
     /**
      * Add an annotation.
      *
@@ -1394,7 +1426,7 @@ export declare class DrawController {
      */
     removeAnnotation(id: string): void;
     /**
-     * Check if the annotation list contains a meta data value.
+     * Check if the annotation group contains a meta data value.
      *
      * @param {string} key The key to check.
      * @returns {boolean} True if the meta data is present.
@@ -1453,9 +1485,9 @@ export declare class DrawLayer {
     /**
      * Get the draw controller.
      *
-     * @returns {object} The controller.
+     * @returns {DrawController} The controller.
      */
-    getDrawController(): object;
+    getDrawController(): DrawController;
     /**
      * Set the plane helper.
      *
@@ -1556,14 +1588,14 @@ export declare class DrawLayer {
      */
     initialise(size: Scalar2D, spacing: Scalar2D): void;
     /**
-     * Set the annotation list.
+     * Set the annotation group.
      *
-     * @param {AnnotationList} list The annotation list.
+     * @param {AnnotationGroup} group The annotation group.
      * @param {string} dataId The associated data id.
      * @param {object} cmdCallback The command callback.
      * @param {object} exeCallback The exe callback.
      */
-    setAnnotationList(list: AnnotationList, dataId: string, cmdCallback: object, exeCallback: object): void;
+    setAnnotationGroup(group: AnnotationGroup, dataId: string, cmdCallback: object, exeCallback: object): void;
     /**
      * Fit the layer to its parent container.
      *
