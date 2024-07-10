@@ -12,7 +12,7 @@ import {
   isNodeNameLabel,
   validateGroupPosition
 } from './drawBounds';
-import {ShapeEditor} from './editor';
+import {ShapeEditor} from './drawShapeEditor';
 import {DrawTrash} from './drawTrash';
 
 // external
