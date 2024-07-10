@@ -77,11 +77,20 @@ export class Annotation {
   #viewController;
 
   /**
+   * Set the associated view controller.
+   *
    * @param {ViewController} viewController The associated view controller.
    */
-  constructor(viewController) {
-    this.#viewController = viewController;
-    this.referenceSopUID = viewController.getCurrentImageUid();
+  setViewController(viewController) {
+    if (typeof this.#viewController === 'undefined') {
+      this.#viewController = viewController;
+      // set UID if empty
+      if (typeof this.referenceSopUID === 'undefined') {
+        this.referenceSopUID = viewController.getCurrentImageUid();
+      }
+    } else {
+      console.log('Cannot override previous view controller');
+    }
   }
 
   /**
@@ -90,7 +99,12 @@ export class Annotation {
    * @returns {Index|undefined} The origin index.
    */
   getOriginIndex() {
-    return this.#viewController.getOriginIndexForImageUid(this.referenceSopUID);
+    let res;
+    if (typeof this.#viewController !== 'undefined') {
+      res =
+        this.#viewController.getOriginIndexForImageUid(this.referenceSopUID);
+    }
+    return res;
   }
 
   /**
@@ -100,12 +114,16 @@ export class Annotation {
    *   texts indexed by modality.
    */
   setTextExpr(labelText) {
-    const modality = this.#viewController.getModality();
+    if (typeof this.#viewController !== 'undefined') {
+      const modality = this.#viewController.getModality();
 
-    if (typeof labelText[modality] !== 'undefined') {
-      this.textExpr = labelText[modality];
+      if (typeof labelText[modality] !== 'undefined') {
+        this.textExpr = labelText[modality];
+      } else {
+        this.textExpr = labelText['*'];
+      }
     } else {
-      this.textExpr = labelText['*'];
+      console.log('Cannot set text expr without a view controller');
     }
   }
 
@@ -123,9 +141,13 @@ export class Annotation {
    * Update the annotation quantification.
    */
   updateQuantification() {
-    this.quantification = this.mathShape.quantify(
-      this.#viewController,
-      getFlags(this.textExpr));
+    if (typeof this.#viewController !== 'undefined') {
+      this.quantification = this.mathShape.quantify(
+        this.#viewController,
+        getFlags(this.textExpr));
+    } else {
+      console.log('Cannot update quantification without a view controller');
+    }
   }
 
   /**
@@ -241,6 +263,18 @@ export class AnnotationList {
       });
     } else {
       console.log('Cannot find annotation to remove');
+    }
+  }
+
+  /**
+   * Set the associated view controller.
+   *
+   * @param {ViewController} viewController The associated view controller.
+   */
+  setViewController(viewController) {
+    for (const item of this.#list) {
+      item.setViewController(viewController);
+      item.updateQuantification();
     }
   }
 

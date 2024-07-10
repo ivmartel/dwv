@@ -25,8 +25,6 @@ import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
 import {PlaneHelper} from '../image/planeHelper';
-import {AnnotationList} from '../image/annotation';
-import {AnnotationFactory} from '../image/annotationFactory';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -37,7 +35,6 @@ import {Image} from '../image/image';
 import {Matrix33} from '../math/matrix';
 import {DataElement} from '../dicom/dataElement';
 import {Scalar3D} from '../math/scalar';
-import {Annotation} from '../image/annotation';
 import {DicomData} from './dataController';
 /* eslint-enable no-unused-vars */
 
@@ -299,9 +296,9 @@ export class App {
       data
     );
     // optional render
-    if (this.#options.viewOnFirstLoadItem) {
-      this.render(dataId);
-    }
+    // if (this.#options.viewOnFirstLoadItem) {
+    //   this.render(dataId);
+    // }
     // return
     return dataId;
   }
@@ -612,6 +609,7 @@ export class App {
 
     // create data controller
     this.#dataController = new DataController();
+    // propagate data events
     this.#dataController.addEventListener('dataadd', this.#fireEvent);
     this.#dataController.addEventListener('dataremove', this.#fireEvent);
     this.#dataController.addEventListener('dataimageset', this.#fireEvent);
@@ -1086,15 +1084,10 @@ export class App {
       throw new Error('Cannot render without data id');
     }
     // guess data type
-    const isImage = typeof this.getData(dataId).image !== 'undefined';
-    let isMeasurement = false;
-    if (!isImage) {
-      const fac = new AnnotationFactory();
-      const warn = fac.checkElements(this.#dataController.get(dataId).meta);
-      if (typeof warn === 'undefined') {
-        isMeasurement = true;
-      }
-    }
+    const isImage =
+      typeof this.getData(dataId).image !== 'undefined';
+    const isMeasurement =
+      typeof this.getData(dataId).annotationList !== 'undefined';
 
     // create layer groups if not done yet
     // (create all to allow for ratio sync)
@@ -1123,13 +1116,16 @@ export class App {
       if (!layerGroup) {
         throw new Error('No layer group for ' + config.divId);
       }
-      // add view
+      // create layer if needed
       // warn: needs a loaded DOM
-      if (typeof this.#dataController.get(dataId) !== 'undefined' &&
-        layerGroup.getViewLayersByDataId(dataId).length === 0) {
-        if (isImage) {
+      if (typeof this.#dataController.get(dataId) !== 'undefined') {
+        if (isImage &&
+          layerGroup.getViewLayersByDataId(dataId).length === 0
+        ) {
           this.#addViewLayer(dataId, config);
-        } else if (isMeasurement) {
+        } else if (isMeasurement &&
+          layerGroup.getDrawLayersByDataId(dataId).length === 0
+        ) {
           this.addDrawLayer(dataId, config);
         }
       }
@@ -1349,21 +1345,17 @@ export class App {
     for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
       const layerGroup = this.#stage.getLayerGroup(i);
       // draw or view layer
-      let layer = null;
-      if (tool === 'Draw' ||
+      const isDrawTool = tool === 'Draw' ||
         tool === 'Livewire' ||
-        tool === 'Floodfill') {
-        if (typeof layerGroup.getActiveDrawLayer() === 'undefined') {
-          const viewLayer = layerGroup.getActiveViewLayer();
-          const viewConfig = this.getViewConfig(
-            viewLayer.getDataId(), layerGroup.getDivId());
-          this.addDrawLayer(undefined, viewConfig);
-        }
+        tool === 'Floodfill';
+      let layer;
+      if (isDrawTool &&
+        typeof layerGroup.getActiveDrawLayer() !== 'undefined') {
         layer = layerGroup.getActiveDrawLayer();
       } else {
         layer = layerGroup.getActiveViewLayer();
       }
-      if (layer) {
+      if (typeof layer !== 'undefined') {
         this.#toolboxController.bindLayerGroup(layerGroup, layer);
       }
     }
@@ -1869,33 +1861,28 @@ export class App {
         viewConfig.divId);
     }
 
-    //
-    let refDataId;
-    let data;
-    if (typeof dataId === 'undefined') {
-      // annotation creation case
-      // reference is the current active view layer
-      refDataId = layerGroup.getActiveViewLayer().getDataId();
-    } else {
-      // annotation load case
-      // reference is the data of the view layer with the
-      //   same StudyInstanceUID
-      data = this.#dataController.get(dataId);
-      if (!data) {
-        throw new Error('Cannot initialise layer with missing data, id: ' +
-          dataId);
-      }
-      const studyInstanceUID = data.meta['0020000D'].value[0];
-      const viewLayers = layerGroup.searchViewLayers({
-        StudyInstanceUID: studyInstanceUID
-      });
-      if (viewLayers.length === 0) {
-        console.warn(
-          'No loaded data that matches the measurement study UID');
-        return;
-      }
-      refDataId = viewLayers[0].getDataId();
+    // reference is the data of the view layer with the
+    //   same StudyInstanceUID
+    const data = this.#dataController.get(dataId);
+    if (!data) {
+      throw new Error('Cannot initialise layer with missing data, id: ' +
+        dataId);
     }
+    const studyInstanceUID = data.meta['0020000D'].value[0];
+    const viewLayers = layerGroup.searchViewLayers({
+      StudyInstanceUID: studyInstanceUID
+    });
+    if (viewLayers.length === 0) {
+      console.warn(
+        'No loaded data that matches the measurement study UID');
+      return;
+    }
+    const refViewLayer = viewLayers[0];
+    const refDataId = refViewLayer.getDataId();
+
+    // set annotation view controller (allows quantification)
+    const refViewController = refViewLayer.getViewController();
+    data.annotationList.setViewController(refViewController);
 
     // reference data to use as base for layer properties
     const refData = this.#dataController.get(refDataId);
@@ -1934,28 +1921,16 @@ export class App {
 
     drawLayer.setScale(layerGroup.getScale());
 
-    // set layer data
-    if (typeof data !== 'undefined') {
-      const annotationFactory = new AnnotationFactory();
-      const viewLayer = layerGroup.getViewLayersByDataId(refDataId)[0];
-      const viewController = viewLayer.getViewController();
-      const annnotationList =
-        annotationFactory.create(data.meta, viewController);
+    drawLayer.setAnnotationList(
+      data.annotationList,
+      dataId,
+      this.#fireEvent,
+      this.addToUndoStack);
 
-      drawLayer.setAnnotationList(
-        annnotationList,
-        dataId,
-        this.#fireEvent,
-        this.addToUndoStack);
-
-      drawLayer.setCurrentPosition(
-        viewController.getCurrentPosition(),
-        viewController.getCurrentIndex()
-      );
-    } else {
-      const annotDataId = this.#dataController.getNextDataId();
-      drawLayer.setAnnotationList(new AnnotationList(), annotDataId);
-    }
+    drawLayer.setCurrentPosition(
+      refViewController.getCurrentPosition(),
+      refViewController.getCurrentIndex()
+    );
   }
 
   /**

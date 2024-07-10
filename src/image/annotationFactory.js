@@ -99,17 +99,16 @@ export class AnnotationFactory {
    * Get an {@link Annotation} object from the read DICOM file.
    *
    * @param {Object<string, DataElement>} dataElements The DICOM tags.
-   * @param {ViewController} viewController The associated view controller.
    * @returns {AnnotationList} A new annotation list.
    */
-  create(dataElements, viewController) {
+  create(dataElements) {
     const srContent = getSRContent(dataElements);
 
     const annotations = [];
 
     for (const item of srContent.contentSequence) {
       if (item.valueType === ValueTypes.scoord) {
-        const annotation = new Annotation(viewController);
+        const annotation = new Annotation();
         annotation.mathShape = getShapeFromScoord(item.value);
         // default
         annotation.id = guid();
@@ -128,7 +127,6 @@ export class AnnotationFactory {
           if (subItem.valueType === ValueTypes.text &&
             subItem.relationshipType === RelationshipTypes.hasProperties) {
             annotation.textExpr = subItem.value;
-            annotation.updateQuantification();
           }
         }
 

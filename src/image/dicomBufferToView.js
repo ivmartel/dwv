@@ -6,6 +6,7 @@ import {
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
 import {PixelBufferDecoder} from './decoder';
+import {AnnotationFactory} from './annotationFactory';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -52,16 +53,20 @@ export class DicomBufferToView {
    * Get the factory associated to input DICOM elements.
    *
    * @param {Object<string, DataElement>} elements The DICOM elements.
-   * @returns {ImageFactory|MaskFactory|undefined} The associated factory.
+   * @returns {ImageFactory|MaskFactory|AnnotationFactory|undefined}
+   *   The associated factory.
    */
   #getFactory(elements) {
     let factory;
-    // mask factory for DICOM SEG
     const modalityElement = elements['00080060'];
     if (typeof modalityElement !== 'undefined') {
       const modality = modalityElement.value[0];
       if (modality === 'SEG') {
+        // mask factory for DICOM SEG
         factory = new MaskFactory();
+      } else if (modality === 'SR') {
+        // annotation factory for DICOM SR
+        factory = new AnnotationFactory();
       }
     }
     // image factory for pixel data
@@ -75,27 +80,32 @@ export class DicomBufferToView {
   }
 
   /**
-   * Generate the image object.
+   * Generate the data object.
    *
    * @param {number} index The data index.
    * @param {string} origin The data origin.
    */
-  #generateImage(index, origin) {
+  #generateData(index, origin) {
     const dataElements = this.#dicomParserStore[index].getDicomElements();
     const factory = this.#factories[index];
     // exit if no factory
     if (typeof factory === 'undefined') {
       return;
     }
-    // create the image
+    // create data
     try {
-      const image = factory.create(
-        dataElements,
-        this.#finalBufferStore[index],
-        this.#options.numberOfFiles);
+      const data = new DicomData(dataElements);
+      if (factory instanceof AnnotationFactory) {
+        data.annotationList = factory.create(dataElements);
+      } else {
+        data.image = factory.create(
+          dataElements,
+          this.#finalBufferStore[index],
+          this.#options.numberOfFiles);
+      }
       // call onloaditem
       this.onloaditem({
-        data: new DicomData(dataElements, image),
+        data: data,
         source: origin,
         warn: factory.getWarning()
       });
@@ -126,7 +136,7 @@ export class DicomBufferToView {
       source: origin
     });
     // generate image
-    this.#generateImage(index, origin);
+    this.#generateData(index, origin);
     // send load events
     this.onload({
       source: origin
@@ -270,7 +280,7 @@ export class DicomBufferToView {
 
     // create image for the first item
     if (event.itemNumber === 0) {
-      this.#generateImage(dataIndex, origin);
+      this.#generateData(dataIndex, origin);
     }
   }
 
@@ -281,11 +291,7 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #handleNonImageData(index, origin) {
-    const dicomParser = this.#dicomParserStore[index];
-    this.onloaditem({
-      data: new DicomData(dicomParser.getDicomElements()),
-      source: origin,
-    });
+    this.#generateData(index, origin);
     // send load events
     this.onload({
       source: origin
@@ -370,7 +376,7 @@ export class DicomBufferToView {
     this.#factories[dataIndex] = factory;
 
     // handle parsed data
-    if (typeof factory === 'undefined') {
+    if (factory instanceof AnnotationFactory) {
       this.#handleNonImageData(dataIndex, origin);
     } else {
       this.#handleImageData(dataIndex, origin);

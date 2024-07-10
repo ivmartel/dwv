@@ -40,7 +40,8 @@ QUnit.test('DataController class', function (assert) {
 
   // add image
   const dataId0 = 'img0';
-  const dicomData0 = new DicomData({}, image0);
+  const dicomData0 = new DicomData({});
+  dicomData0.image = image0;
   dc0.add(dataId0, dicomData0);
   assert.deepEqual(dc0.getDataIds(), [dataId0], 'dataIds after add');
 

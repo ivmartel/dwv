@@ -1,4 +1,6 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {DicomData} from '../app/dataController';
+import {ViewConfig} from '../app/application';
 import {
   getMousePoint,
   getTouchPoints,
@@ -17,7 +19,7 @@ import {
   isNodeNameLabel,
   validateGroupPosition
 } from './drawBounds';
-import {Annotation} from '../image/annotation';
+import {Annotation, AnnotationList} from '../image/annotation';
 import {ScrollWheel} from './scrollWheel';
 import {ShapeEditor} from './editor';
 
@@ -32,6 +34,7 @@ import {LayerGroup} from '../gui/layerGroup';
 import {Scalar2D} from '../math/scalar';
 import {Point2D} from '../math/point';
 import {DrawLayer} from '../gui/drawLayer';
+import {ViewLayer} from '../gui/viewLayer';
 import {DrawTrash} from './drawTrash';
 /* eslint-enable no-unused-vars */
 
@@ -221,7 +224,26 @@ export class Draw {
    */
   #switchEditOrCreateShapeGroup(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const drawLayer = layerGroup.getActiveDrawLayer();
+    let drawLayer = layerGroup.getActiveDrawLayer();
+
+    if (typeof drawLayer === 'undefined') {
+      // create new data
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const vc = viewLayer.getViewController();
+      const data = new DicomData({
+        '0020000D': {value: [vc.getStudyInstanceUID()]}
+      });
+      data.annotationList = new AnnotationList();
+      const dataId = this.#app.addData(data);
+      // render (will create draw layer)
+      this.#app.addDataViewConfig(dataId, new ViewConfig(divId));
+      this.#app.render(dataId);
+
+      drawLayer = layerGroup.getActiveDrawLayer();
+      // set active to bind to toolboxController
+      layerGroup.setActiveDrawLayerByDataId(dataId);
+    }
+
     const stage = drawLayer.getKonvaStage();
 
     // determine if the click happened in an existing shape
@@ -606,8 +628,9 @@ export class Draw {
     }
 
     // create tmp annotation
-    const annotation = new Annotation(viewController);
+    const annotation = new Annotation();
     annotation.colour = this.#style.getLineColour();
+    annotation.setViewController(viewController);
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, tmpPoints);
     // create shape group
@@ -644,9 +667,10 @@ export class Draw {
     const viewController = viewLayer.getViewController();
 
     // create final annotation
-    const annotation = new Annotation(viewController);
+    const annotation = new Annotation();
     annotation.colour = this.#style.getLineColour();
     annotation.id = guid();
+    annotation.setViewController(viewController);
     drawController.addAnnotation(annotation);
 
     if (!drawController.hasAnnotationMeta('StudyInstanceUID')) {

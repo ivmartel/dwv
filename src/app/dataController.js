@@ -4,6 +4,7 @@ import {mergeObjects} from '../utils/operator';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from '../image/image';
+import {AnnotationList} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -16,20 +17,25 @@ export class DicomData {
    * @type {object}
    */
   meta;
+
   /**
-   * DICOM image.
+   * Image extracted from meta data.
    *
    * @type {Image|undefined}
    */
   image;
+  /**
+   * Annotattion list extracted from meta data.
+   *
+   * @type {AnnotationList|undefined}
+   */
+  annotationList;
 
   /**
    * @param {object} meta The DICOM meta data.
-   * @param {Image} [image] Optional DICOM image.
    */
-  constructor(meta, image) {
+  constructor(meta) {
     this.meta = meta;
-    this.image = image;
   }
 }
 
