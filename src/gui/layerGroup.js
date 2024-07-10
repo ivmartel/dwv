@@ -428,8 +428,6 @@ export class LayerGroup {
       if (tmpLayer instanceof ViewLayer) {
         layer = tmpLayer;
       }
-    } else {
-      logger.info('No active view layer to return');
     }
     return layer;
   }
@@ -509,8 +507,6 @@ export class LayerGroup {
       if (tmpLayer instanceof DrawLayer) {
         layer = tmpLayer;
       }
-    } else {
-      logger.info('No active draw layer to return');
     }
     return layer;
   }
