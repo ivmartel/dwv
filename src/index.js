@@ -10,6 +10,9 @@ import {
   DrawController
 } from './app/drawController';
 import {
+  DicomData
+} from './app/dataController';
+import {
   Annotation,
   AnnotationList
 } from './image/annotation';
@@ -133,6 +136,7 @@ export {
   ChangeSegmentColourCommand,
   ToolboxController,
   DataElement,
+  DicomData,
   DicomParser,
   DicomWriter,
   WriterRule,
