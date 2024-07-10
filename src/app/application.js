@@ -1840,6 +1840,19 @@ export class App {
       this.#toolboxController.bindLayerGroup(layerGroup, viewLayer);
     }
 
+    /**
+     * Add view layer event.
+     *
+     * @event Application#viewlayeradd
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'viewlayeradd',
+      layerid: viewLayer.getId(),
+      dataid: dataId
+    });
+
     // initialise the toolbox for base
     if (isBaseLayer) {
       if (this.#toolboxController) {
@@ -1931,6 +1944,19 @@ export class App {
       refViewController.getCurrentPosition(),
       refViewController.getCurrentIndex()
     );
+
+    /**
+     * Add draw layer event.
+     *
+     * @event Application#drawlayeradd
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'drawlayeradd',
+      layerid: drawLayer.getId(),
+      dataid: dataId
+    });
   }
 
   /**

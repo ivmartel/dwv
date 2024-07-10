@@ -231,6 +231,16 @@ function viewerSetup() {
     window.removeEventListener('keydown', abortShortcut);
   });
 
+  // add data row on layer creation
+  _app.addEventListener('viewlayeradd', function (event) {
+    clearDataTableRow(event.dataid);
+    addDataRow(event.dataid);
+  });
+  _app.addEventListener('drawlayeradd', function (event) {
+    clearDataTableRow(event.dataid);
+    addDataRow(event.dataid);
+  });
+
   let dataLoad = 0;
   const firstRender = [];
   _app.addEventListener('load', function (event) {
@@ -242,8 +252,6 @@ function viewerSetup() {
     if (!firstRender.includes(event.dataid)) {
       // store data id
       firstRender.push(event.dataid);
-      // add data row
-      addDataRow(event.dataid);
       ++dataLoad;
       // init gui
       if (dataLoad === numberOfDataToLoad) {
@@ -472,14 +480,14 @@ function onDOMContentLoaded() {
     // unbind app to controls
     unbindAppToControls();
 
-    // set config
+    // set config (deletes previous layers)
     _app.setDataViewConfigs(configs);
 
     clearDataTable();
+
+    // render data (creates layers)
     for (let i = 0; i < dataIds.length; ++i) {
       _app.render(dataIds[i]);
-      // add data row (will bind controls)
-      addDataRow(dataIds[i]);
     }
 
     // show crosshair depending on layout
@@ -1003,6 +1011,18 @@ function clearDataTable() {
 }
 
 /**
+ * Clear a layer details table row.
+ *
+ * @param {string} dataId The associated data id.
+ */
+function clearDataTableRow(dataId) {
+  const row = document.getElementById('data-' + dataId);
+  if (row) {
+    row.remove();
+  }
+}
+
+/**
  * Get a control div: label, range and number field.
  *
  * @param {string} id The control id.
@@ -1126,6 +1146,8 @@ function addDataRow(dataId) {
 
   // add new layer row
   const row = body.insertRow();
+  row.id = 'data-' + dataId;
+
   let cell;
 
   // get the selected layer group ids
@@ -1156,8 +1178,11 @@ function addDataRow(dataId) {
       const groupDivId = split[1];
       const dataId = split[2];
       const lg = _app.getLayerGroupByDivId(groupDivId);
-      lg.setActiveDrawLayerByDataId(dataId);
-      lg.setActiveViewLayerByDataId(dataId);
+      if (dataIsImage) {
+        lg.setActiveViewLayerByDataId(dataId);
+      } else {
+        lg.setActiveDrawLayerByDataId(dataId);
+      }
     };
     return radio;
   };
