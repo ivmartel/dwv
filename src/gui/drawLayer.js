@@ -503,6 +503,52 @@ export class DrawLayer {
   }
 
   /**
+   * Draw an annotation: create the shape group and add it to
+   *   the Konva layer.
+   *
+   * @param {Annotation} annotation The annotation to draw.
+   * @returns {Konva.Shape|undefined} The created shape group.
+   */
+  #drawAnnnotation(annotation) {
+    const originIndex = annotation.getOriginIndex();
+    if (typeof originIndex === 'undefined') {
+      console.log('Unknown reference origin for annotation: ' +
+        annotation.referenceSopUID);
+      return;
+    }
+    const posGroupId = originIndex.toStringId([2]);
+
+    // Get or create position-group if it does not exist and
+    // append it to konvaLayer
+    let posGroup = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId))[0];
+    if (typeof posGroup === 'undefined') {
+      posGroup = new Konva.Group({
+        id: posGroupId,
+        name: 'position-group',
+        visible: false
+      });
+      this.getKonvaLayer().add(posGroup);
+    }
+    if (!(posGroup instanceof Konva.Group)) {
+      return;
+    };
+
+    const style = new Style();
+    const stage = this.getKonvaStage();
+    style.setZoomScale(stage.scale());
+
+    // shape group (use first one since it will be removed from
+    // the group when we change it)
+    const factory = annotation.getFactory();
+    const shapeGroup = factory.createShapeGroup(annotation, style);
+    // add group to posGroup (switches its parent)
+    posGroup.add(shapeGroup);
+
+    return shapeGroup;
+  }
+
+  /**
    * Set the annotation.
    *
    * @param {Annotation[]} annotations A list of annotations.
@@ -511,47 +557,18 @@ export class DrawLayer {
    */
   #setAnnotations(annotations, cmdCallback, exeCallback) {
 
-    const stage = this.getKonvaStage();
-
     for (const annotation of annotations) {
 
-      const originIndex = annotation.getOriginIndex();
-      if (typeof originIndex === 'undefined') {
-        console.log('Unknown reference origin for annotation: ' +
-          annotation.referenceSopUID);
+      const shapeGroup = this.#drawAnnnotation(annotation);
+      if (!(shapeGroup instanceof Konva.Group)) {
         continue;
-      }
-      const posGroupId = originIndex.toStringId([2]);
-
-      // Get or create position-group if it does not exist and
-      // append it to konvaLayer
-      let posGroup = this.getKonvaLayer().getChildren(
-        isNodeWithId(posGroupId))[0];
-      if (typeof posGroup === 'undefined') {
-        posGroup = new Konva.Group({
-          id: posGroupId,
-          name: 'position-group',
-          visible: false
-        });
-        this.getKonvaLayer().add(posGroup);
-      }
-
-      const style = new Style();
-      style.setZoomScale(stage.scale());
-
-      // shape group (use first one since it will be removed from
-      // the group when we change it)
-      const factory = annotation.getFactory();
-      const stateGroup = factory.createShapeGroup(annotation, style);
-      // add group to posGroup (switches its parent)
-      // @ts-ignore
-      posGroup.add(stateGroup);
+      };
 
       // shape
-      const shape = stateGroup.getChildren(isNodeNameShape)[0];
+      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
       // create the draw command
       const cmd = new DrawGroupCommand(
-        stateGroup,
+        shapeGroup,
         shape.className,
         this
       );
