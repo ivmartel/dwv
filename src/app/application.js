@@ -1850,6 +1850,7 @@ export class App {
     this.#fireEvent({
       type: 'viewlayeradd',
       layerid: viewLayer.getId(),
+      layergroupid: layerGroup.getId(),
       dataid: dataId
     });
 
@@ -1955,6 +1956,7 @@ export class App {
     this.#fireEvent({
       type: 'drawlayeradd',
       layerid: drawLayer.getId(),
+      layergroupid: layerGroup.getId(),
       dataid: dataId
     });
   }
