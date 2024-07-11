@@ -98,7 +98,7 @@ export declare class Annotation {
      */
     updateQuantification(): void;
     /**
-     * Get the math shape associated factory.
+     * Get the math shape associated draw factory.
      *
      * @returns {object} The factory.
      */
