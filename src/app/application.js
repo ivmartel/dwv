@@ -1935,10 +1935,10 @@ export class App {
 
     drawLayer.setScale(layerGroup.getScale());
 
+    // add possible existing data
     drawLayer.setAnnotationGroup(
       data.annotationGroup,
       dataId,
-      this.#fireEvent,
       this.addToUndoStack);
 
     drawLayer.setCurrentPosition(

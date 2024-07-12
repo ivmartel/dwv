@@ -1,5 +1,5 @@
 import {logger} from '../utils/logger';
-import {getShapeDisplayName, ChangeGroupCommand} from './drawCommands';
+import {UpdateAnnotationCommand} from './drawCommands';
 import {validateAnchorPosition} from './drawBounds';
 // external
 import Konva from 'konva';
@@ -71,13 +71,6 @@ export class DrawShapeEditor {
    */
 
   /**
-   * Draw event callback.
-   *
-   * @type {eventFn}
-   */
-  #drawEventCallback = null;
-
-  /**
    * Set the shape to edit.
    *
    * @param {Konva.Shape} inshape The shape to edit.
@@ -113,21 +106,21 @@ export class DrawShapeEditor {
   }
 
   /**
+   * Get the edited annotation.
+   *
+   * @returns {Annotation} The annotation.
+   */
+  getAnnotation() {
+    return this.#annotation;
+  }
+
+  /**
    * Get the active flag.
    *
    * @returns {boolean} The active flag.
    */
   isActive() {
     return this.#isActive;
-  }
-
-  /**
-   * Set the draw event callback.
-   *
-   * @param {eventFn} callback The callback.
-   */
-  setDrawEventCallback(callback) {
-    this.#drawEventCallback = callback;
   }
 
   /**
@@ -256,28 +249,28 @@ export class DrawShapeEditor {
    * @param {Konva.Shape} anchor The anchor to clone.
    * @returns {object} A clone of the input anchor.
    */
-  #getClone(anchor) {
-    // create closure to properties
-    const parent = anchor.getParent();
-    const id = anchor.id();
-    const x = anchor.x();
-    const y = anchor.y();
-    // create clone object
-    const clone = {};
-    clone.getParent = function () {
-      return parent;
-    };
-    clone.id = function () {
-      return id;
-    };
-    clone.x = function () {
-      return x;
-    };
-    clone.y = function () {
-      return y;
-    };
-    return clone;
-  }
+  // #getClone(anchor) {
+  //   // create closure to properties
+  //   const parent = anchor.getParent();
+  //   const id = anchor.id();
+  //   const x = anchor.x();
+  //   const y = anchor.y();
+  //   // create clone object
+  //   const clone = {};
+  //   clone.getParent = function () {
+  //     return parent;
+  //   };
+  //   clone.id = function () {
+  //     return id;
+  //   };
+  //   clone.x = function () {
+  //     return x;
+  //   };
+  //   clone.y = function () {
+  //     return y;
+  //   };
+  //   return clone;
+  // }
 
   /**
    * Set the anchor on listeners.
@@ -285,20 +278,14 @@ export class DrawShapeEditor {
    * @param {Konva.Ellipse} anchor The anchor to set on.
    */
   #setAnchorOn(anchor) {
-    let startAnchor = null;
-
-    // command name based on shape type
-    const shapeDisplayName = getShapeDisplayName(this.#shape);
+    let originaMathShape;
 
     // drag start listener
     anchor.on('dragstart.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
-        return;
-      }
-      startAnchor = this.#getClone(anchor);
       // prevent bubbling upwards
       event.cancelBubble = true;
+      // store original math shape
+      originaMathShape = this.#annotation.mathShape;
     });
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
@@ -330,27 +317,18 @@ export class DrawShapeEditor {
     });
     // drag end listener
     anchor.on('dragend.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
-        return;
-      }
-      const endAnchor = this.#getClone(anchor);
-      // store the change command
-      const chgcmd = new ChangeGroupCommand(
-        shapeDisplayName,
-        this.#currentFactory,
-        startAnchor,
-        endAnchor,
+      // update annotation command
+      const newMathShape = this.#annotation.mathShape;
+      const command = new UpdateAnnotationCommand(
         this.#annotation,
-        this.#drawLayer,
-        this.#app.getStyle()
+        {mathShape: originaMathShape},
+        {mathShape: newMathShape},
+        this.#drawLayer.getDrawController()
       );
-      chgcmd.onExecute = this.#drawEventCallback;
-      chgcmd.onUndo = this.#drawEventCallback;
-      chgcmd.execute();
-      this.#app.addToUndoStack(chgcmd);
-      // reset start anchor
-      startAnchor = endAnchor;
+      this.#app.addToUndoStack(command);
+      // update original shape
+      originaMathShape = newMathShape;
+
       // prevent bubbling upwards
       event.cancelBubble = true;
     });

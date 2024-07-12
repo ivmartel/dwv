@@ -1,4 +1,5 @@
 import {AnnotationGroup} from '../image/annotation';
+import {RemoveAnnotationCommand} from '../tools/drawCommands';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -61,6 +62,33 @@ export class DrawController {
    */
   removeAnnotation(id) {
     this.#annotationGroup.remove(id);
+  }
+
+  /**
+   * Remove an annotation via a remove command (triggers draw actions).
+   *
+   * @param {string} id The annotation id.
+   * @param {Function} exeCallback The undo stack callback.
+   */
+  removeAnnotationWithCommand(id, exeCallback) {
+    const annotation = this.getAnnotation(id);
+    // create remove annotation command
+    const command = new RemoveAnnotationCommand(annotation, this);
+    // add command to undo stack
+    exeCallback(command);
+    // execute command: triggers draw remove
+    command.execute();
+  }
+
+  /**
+   * Remove all annotations via remove commands (triggers draw actions).
+   *
+   * @param {Function} exeCallback The undo stack callback.
+   */
+  removeAllAnnotationsWithCommand(exeCallback) {
+    for (const annotation of this.#annotationGroup.getList()) {
+      this.removeAnnotationWithCommand(annotation.id, exeCallback);
+    }
   }
 
   /**

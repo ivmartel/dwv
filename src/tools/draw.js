@@ -8,9 +8,8 @@ import {
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {
-  getShapeDisplayName,
-  DrawGroupCommand,
-  DeleteGroupCommand
+  AddAnnotationCommand,
+  RemoveAnnotationCommand
 } from './drawCommands';
 import {
   isNodeNameShape,
@@ -173,7 +172,7 @@ export class Draw {
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);
-    this.#shapeHandler = new DrawShapeHandler(app, this.#fireEvent);
+    this.#shapeHandler = new DrawShapeHandler(app);
 
     this.#style = app.getStyle();
   }
@@ -195,6 +194,8 @@ export class Draw {
       const data = new DicomData({
         '0020000D': {value: [vc.getStudyInstanceUID()]}
       });
+      // add modality
+      // add series reference
       data.annotationGroup = new AnnotationGroup();
       const dataId = this.#app.addData(data);
       // render (will create draw layer)
@@ -205,6 +206,9 @@ export class Draw {
       // set active to bind to toolboxController
       layerGroup.setActiveDrawLayerByDataId(dataId);
     }
+
+    // set the layer shape handler
+    drawLayer.setShapeHandler(this.#shapeHandler);
 
     const stage = drawLayer.getKonvaStage();
 
@@ -513,19 +517,22 @@ export class Draw {
     }
 
     // press delete or backspace key
-    const shapeGroup = this.#shapeHandler.getEditorShapeGroup();
+    const annotation = this.#shapeHandler.getEditorAnnotation();
     if ((event.key === 'Delete' ||
       event.key === 'Backspace') &&
-      typeof shapeGroup !== 'undefined') {
-      // get shape
-      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
-      if (!(shape instanceof Konva.Shape)) {
-        return;
-      }
-      // delete command
-      const drawLayer = this.#app.getActiveLayerGroup().getActiveDrawLayer();
-      this.#emitDeleteCommand(drawLayer, shapeGroup, shape);
+      typeof annotation !== 'undefined') {
+      const layerGroup = this.#app.getActiveLayerGroup();
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      const drawController = drawLayer.getDrawController();
 
+      // create remove annotation command
+      const command = new RemoveAnnotationCommand(annotation, drawController);
+      // add command to undo stack
+      this.#app.addToUndoStack(command);
+      // execute command: triggers draw remove
+      command.execute();
+
+      // reset cursor
       this.#shapeHandler.onMouseOutShapeGroup();
     }
 
@@ -620,84 +627,25 @@ export class Draw {
     annotation.colour = this.#style.getLineColour();
     annotation.id = guid();
     annotation.setViewController(viewController);
+    // set annotation shape
+    this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
 
     if (!drawController.hasAnnotationMeta('StudyInstanceUID')) {
       drawController.setAnnotationMeta(
         'StudyInstanceUID', viewController.getStudyInstanceUID());
     }
 
-    // set annotation shape
-    this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
-
-    drawController.addAnnotation(annotation);
-
-    // create shape group
-    const finalShapeGroup =
-      this.#currentFactory.createShapeGroup(annotation, this.#style);
-    // get the position group
-    const posGroup = drawLayer.getCurrentPosGroup();
-    // add shape group to position group
-    posGroup.add(finalShapeGroup);
+    // create add annotation command
+    const command = new AddAnnotationCommand(annotation, drawController);
+    // add command to undo stack
+    this.#app.addToUndoStack(command);
+    // execute command: triggers draw creation
+    command.execute();
 
     // re-activate layer
     konvaLayer.listening(true);
-
-    this.#emitDrawGroupCommand(drawLayer, finalShapeGroup);
-
-    // activate shape listeners
-    this.#shapeHandler.addShapeListeners(
-      layerGroup, finalShapeGroup, annotation);
   }
 
-  /**
-   * Create a draw group command, execute it and add
-   *   it to the undo stack.
-   *
-   * @param {DrawLayer} drawLayer The associated layer.
-   * @param {Konva.Group} shapeGroup The shape group to draw.
-   */
-  #emitDrawGroupCommand(drawLayer, shapeGroup) {
-    // draw shape command
-    const command = new DrawGroupCommand(
-      shapeGroup,
-      this.#shapeName,
-      drawLayer
-    );
-    command.onExecute = this.#fireEvent;
-    command.onUndo = this.#fireEvent;
-    // execute it
-    command.execute();
-    // add it to undo stack
-    this.#app.addToUndoStack(command);
-  }
-
-  /**
-   * Create a delete group command, execute it and add
-   *   it to the undo stack.
-   *
-   * @param {DrawLayer} drawLayer The associated layer.
-   * @param {Konva.Group} shapeGroup The shape group to delete.
-   * @param {Konva.Shape} shape The shape to delete.
-   */
-  #emitDeleteCommand(drawLayer, shapeGroup, shape) {
-    if (!(shape instanceof Konva.Shape)) {
-      return;
-    }
-
-    const shapeDisplayName = getShapeDisplayName(shape);
-    // delete command
-    const delcmd = new DeleteGroupCommand(
-      shapeGroup,
-      shapeDisplayName,
-      drawLayer
-    );
-    delcmd.onExecute = this.#fireEvent;
-    delcmd.onUndo = this.#fireEvent;
-    // execute it
-    delcmd.execute();
-    // add it to undo stack
-    this.#app.addToUndoStack(delcmd);
-  }
 
   /**
    * Get a layerGroup position callback.
@@ -739,6 +687,12 @@ export class Draw {
         this.#getPositionCallback(layerGroup)
       );
     } else {
+      // reset layer shape handler
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.setShapeHandler(undefined);
+      }
+
       // reset shape and cursor
       this.#shapeHandler.onMouseOutShapeGroup();
       // remove listeners
@@ -781,7 +735,7 @@ export class Draw {
       shapeGroups.forEach((group) => {
         if (group instanceof Konva.Group) {
           const annotation = drawController.getAnnotation(group.id());
-          this.#shapeHandler.addShapeListeners(layerGroup, group, annotation);
+          this.#shapeHandler.addShapeListeners(drawLayer, group, annotation);
         }
       });
     } else {
@@ -914,14 +868,14 @@ export class Draw {
    *
    * @param {object} event The event to fire.
    */
-  #fireEvent = (event) => {
-    if (typeof this.#listeners[event.type] === 'undefined') {
-      return;
-    }
-    for (let i = 0; i < this.#listeners[event.type].length; ++i) {
-      this.#listeners[event.type][i](event);
-    }
-  };
+  // #fireEvent = (event) => {
+  //   if (typeof this.#listeners[event.type] === 'undefined') {
+  //     return;
+  //   }
+  //   for (let i = 0; i < this.#listeners[event.type].length; ++i) {
+  //     this.#listeners[event.type][i](event);
+  //   }
+  // };
 
   /**
    * Check if the shape is in the shape list.

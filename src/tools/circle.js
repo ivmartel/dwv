@@ -3,6 +3,7 @@ import {Point2D} from '../math/point';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
 import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+
 // external
 import Konva from 'konva';
 
@@ -68,13 +69,26 @@ export class CircleFactory {
     return new Circle(points[0], radius);
   }
 
+  /**
+   * Set an annotation math shape from input points.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Point2D[]} points The points.
+   */
   setAnnotationMathShape(annotation, points) {
     annotation.mathShape = this.#calculateMathShape(points);
     annotation.setTextExpr(this.#getDefaultLabel());
     annotation.updateQuantification();
   }
 
+  /**
+   * Update an annotation on translation (shape move).
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {object} translation The translation.
+   */
   updateAnnotationOnTranslation(annotation, translation) {
+    // math shape
     const circle = annotation.mathShape;
     const center = circle.getCenter();
     const newCenter = new Point2D(
@@ -82,18 +96,46 @@ export class CircleFactory {
       center.getY() + translation.y
     );
     annotation.mathShape = new Circle(newCenter, circle.getRadius());
+    // label position
+    const labelPos = annotation.labelPosition;
+    if (typeof labelPos !== 'undefined') {
+      const newPos = new Point2D(
+        labelPos.getX() + translation.x,
+        labelPos.getY() + translation.y
+      );
+      annotation.labelPosition = newPos;
+    }
+    // quantification
     annotation.updateQuantification();
   }
 
+  /**
+   * Update an annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
   updateAnnotationOnAnchorMove(annotation, anchor) {
+    // math shape
     const circle = annotation.mathShape;
-    const center = circle.getCenter();
+    const center = new Point2D(
+      circle.getCenter().getX(),
+      circle.getCenter().getY()
+    );
     const anchorPoint = new Point2D(anchor.x(), anchor.y());
     const newRadius = center.getDistance(anchorPoint);
     annotation.mathShape = new Circle(center, newRadius);
+    // label position
+    // TODO...
+    // quantification
     annotation.updateQuantification();
   }
 
+  /**
+   * Get the default labels.
+   *
+   * @returns {object} The label list.
+   */
   #getDefaultLabel() {
     return defaults.labelText.circle;
   }
@@ -119,7 +161,13 @@ export class CircleFactory {
     });
   }
 
-  #getLabelPosition(annotation) {
+  /**
+   * Get the default annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getDefaultLabelPosition(annotation) {
     const circle = annotation.mathShape;
     const center = circle.getCenter();
     const radius = circle.getRadius();
@@ -127,6 +175,20 @@ export class CircleFactory {
       center.getX() - radius,
       center.getY() + radius,
     );
+  }
+
+  /**
+   * Get the annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getLabelPosition(annotation) {
+    let res = annotation.labelPosition;
+    if (typeof res === 'undefined') {
+      res = this.#getDefaultLabelPosition(annotation);
+    }
+    return res;
   }
 
   /**
@@ -381,7 +443,7 @@ export class CircleFactory {
   }
 
   /**
-   * Update the shape label.
+   * Update the shape label position.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Group} group The shape group.
@@ -419,8 +481,11 @@ export class CircleFactory {
       return;
     }
     // update text
+    const text = annotation.getText();
     const ktext = klabel.getText();
-    ktext.setText(annotation.getText());
+    ktext.setText(text);
+    // hide if empty
+    klabel.visible(text.length !== 0);
   }
 
   /**

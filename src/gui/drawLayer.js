@@ -3,13 +3,8 @@ import {DrawController} from '../app/drawController';
 import {getScaledOffset} from './layerGroup';
 import {InteractionEventNames} from './generic';
 import {logger} from '../utils/logger';
+import {AddAnnotationCommand} from '../tools/drawCommands';
 import {
-  DrawGroupCommand,
-  DeleteGroupCommand,
-  getShapeDisplayName
-} from '../tools/drawCommands';
-import {
-  isNodeNameShape,
   isNodeWithId,
   isPositionNode
 } from '../tools/drawBounds';
@@ -26,6 +21,7 @@ import {Vector3D} from '../math/vector';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 import {PlaneHelper} from '../image/planeHelper';
 import {Annotation, AnnotationGroup} from '../image/annotation';
+import {DrawShapeHandler} from '../tools/drawShapeHandler';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -151,6 +147,13 @@ export class DrawLayer {
   #currentPosGroupId = null;
 
   /**
+   * Draw shape handler.
+   *
+   * @type {DrawShapeHandler|undefined}
+   */
+  #shapeHandler;
+
+  /**
    * @param {HTMLDivElement} containerDiv The layer div, its id will be used
    *   as this layer id.
    */
@@ -158,6 +161,15 @@ export class DrawLayer {
     this.#containerDiv = containerDiv;
     // specific css class name
     this.#containerDiv.className += ' drawLayer';
+  }
+
+  /**
+   * Set the draw shape handler.
+   *
+   * @param {DrawShapeHandler|undefined} handler The shape handler.
+   */
+  setShapeHandler(handler) {
+    this.#shapeHandler = handler;
   }
 
   /**
@@ -480,26 +492,88 @@ export class DrawLayer {
   /**
    * Set the annotation group.
    *
-   * @param {AnnotationGroup} group The annotation group.
+   * @param {AnnotationGroup} annotationGroup The annotation group.
    * @param {string} dataId The associated data id.
-   * @param {object} cmdCallback The command callback.
-   * @param {object} exeCallback The exe callback.
+   * @param {object} exeCallback The undo stack callback.
    */
-  setAnnotationGroup(group, dataId, cmdCallback, exeCallback) {
+  setAnnotationGroup(annotationGroup, dataId, exeCallback) {
     this.#dataId = dataId;
     // local listeners
-    group.addEventListener('addannotation', function () {
-      // TODO create konva related
+    annotationGroup.addEventListener('addannotation', (event) => {
+      // draw annotation
+      this.#addAnnnotationDraw(event.data, true);
+      this.getKonvaLayer().draw();
     });
-    group.addEventListener('removeannotation', function () {
-      // TODO delete konva related
+    annotationGroup.addEventListener('updateannotation', (event) => {
+      // update annotation draw
+      this.#updateAnnotationDraw(event.data);
+      this.getKonvaLayer().draw();
     });
-    // create view controller
-    this.#drawController = new DrawController(group);
+    annotationGroup.addEventListener('removeannotation', (event) => {
+      // remove annotation draw
+      this.#removeAnnotationDraw(event.data);
+      this.getKonvaLayer().draw();
+    });
 
-    if (group.getLength() !== 0) {
-      this.#setAnnotations(group.getList(), cmdCallback, exeCallback);
+    // create draw controller
+    this.#drawController = new DrawController(annotationGroup);
+
+    // annotations are allready in the annotation list,
+    // -> no need to add them, just draw and save command
+    if (annotationGroup.getLength() !== 0) {
+      for (const annotation of annotationGroup.getList()) {
+        // draw annnotation
+        this.#addAnnnotationDraw(annotation, false);
+        // create the draw command
+        const command = new AddAnnotationCommand(
+          annotation, this.getDrawController());
+        // add command to undo stack
+        exeCallback(command);
+      }
     }
+  }
+
+  /**
+   * Get the position group id for an annotation.
+   *
+   * @param {Annotation} annotation The target annotation.
+   * @returns {string|undefined} The group id.
+   */
+  #getPosGroupId(annotation) {
+    const originIndex = annotation.getOriginIndex();
+    if (typeof originIndex === 'undefined') {
+      console.log('Unknown reference origin for annotation: ' +
+        annotation.referenceSopUID);
+      return;
+    }
+    return originIndex.toStringId([2]);
+  }
+
+  /**
+   * Find the shape group associated to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Konva.Group|undefined} The shape group.
+   */
+  #findShapeGroup(annotation) {
+    let res;
+
+    const posGroupId = this.#getPosGroupId(annotation);
+    const layerChildren = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId));
+    if (layerChildren.length !== 0) {
+      const posGroup = layerChildren[0];
+      if (!(posGroup instanceof Konva.Group)) {
+        return;
+      }
+      const posChildren = posGroup.getChildren(
+        isNodeWithId(annotation.id));
+      if (posChildren.length !== 0 &&
+        posChildren[0] instanceof Konva.Group) {
+        res = posChildren[0];
+      }
+    }
+    return res;
   }
 
   /**
@@ -507,17 +581,10 @@ export class DrawLayer {
    *   the Konva layer.
    *
    * @param {Annotation} annotation The annotation to draw.
-   * @returns {Konva.Shape|undefined} The created shape group.
+   * @param {boolean} visible The position group visibility.
    */
-  #drawAnnnotation(annotation) {
-    const originIndex = annotation.getOriginIndex();
-    if (typeof originIndex === 'undefined') {
-      console.log('Unknown reference origin for annotation: ' +
-        annotation.referenceSopUID);
-      return;
-    }
-    const posGroupId = originIndex.toStringId([2]);
-
+  #addAnnnotationDraw(annotation, visible) {
+    const posGroupId = this.#getPosGroupId(annotation);
     // Get or create position-group if it does not exist and
     // append it to konvaLayer
     let posGroup = this.getKonvaLayer().getChildren(
@@ -526,7 +593,7 @@ export class DrawLayer {
       posGroup = new Konva.Group({
         id: posGroupId,
         name: 'position-group',
-        visible: false
+        visible: visible
       });
       this.getKonvaLayer().add(posGroup);
     }
@@ -545,41 +612,38 @@ export class DrawLayer {
     // add group to posGroup (switches its parent)
     posGroup.add(shapeGroup);
 
-    return shapeGroup;
+    // activate shape if possible
+    if (visible &&
+      typeof this.#shapeHandler !== 'undefined'
+    ) {
+      this.#shapeHandler.addShapeListeners(this, shapeGroup, annotation);
+    }
   }
 
   /**
-   * Set the annotation.
+   * Remove an annotation draw.
    *
-   * @param {Annotation[]} annotations A list of annotations.
-   * @param {object} cmdCallback The command callback.
-   * @param {object} exeCallback The exe callback.
+   * @param {Annotation} annotation The annotation to remove.
    */
-  #setAnnotations(annotations, cmdCallback, exeCallback) {
+  #removeAnnotationDraw(annotation) {
+    const shapeGroup = this.#findShapeGroup(annotation);
+    if (!(shapeGroup instanceof Konva.Group)) {
+      return;
+    };
+    shapeGroup.remove();
+  }
 
-    for (const annotation of annotations) {
-
-      const shapeGroup = this.#drawAnnnotation(annotation);
-      if (!(shapeGroup instanceof Konva.Group)) {
-        continue;
-      };
-
-      // shape
-      const shape = shapeGroup.getChildren(isNodeNameShape)[0];
-      // create the draw command
-      const cmd = new DrawGroupCommand(
-        shapeGroup,
-        shape.className,
-        this
-      );
-      // draw command callbacks
-      cmd.onExecute = cmdCallback;
-      cmd.onUndo = cmdCallback;
-
-      // execute
-      cmd.execute();
-      exeCallback(cmd);
-    }
+  /**
+   * Update an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   */
+  #updateAnnotationDraw(annotation) {
+    // update quantification after math shape update
+    annotation.updateQuantification();
+    // update draw
+    this.#removeAnnotationDraw(annotation);
+    this.#addAnnnotationDraw(annotation, true);
   }
 
   /**
@@ -689,65 +753,24 @@ export class DrawLayer {
   /**
    * Delete a Draw from the stage.
    *
-   * @param {Konva.Group} group The group to delete.
-   * @param {object} cmdCallback The DeleteCommand callback.
-   * @param {object} exeCallback The callback to call once the
+   * @deprecated
+   * @param {string} _id The id of the group to delete.
+   * @param {Function} _exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
-  #deleteDrawGroup(group, cmdCallback, exeCallback) {
-    const shape = group.getChildren(isNodeNameShape)[0];
-    if (shape instanceof Konva.Shape) {
-      const shapeDisplayName = getShapeDisplayName(shape);
-      const delcmd = new DeleteGroupCommand(
-        group,
-        shapeDisplayName,
-        this
-      );
-      delcmd.onExecute = cmdCallback;
-      delcmd.onUndo = cmdCallback;
-      delcmd.execute();
-      // callback
-      if (typeof exeCallback !== 'undefined') {
-        exeCallback(delcmd);
-      }
-    }
-  }
-
-  /**
-   * Delete a Draw from the stage.
-   *
-   * @param {string} id The id of the group to delete.
-   * @param {Function} exeCallback The callback to call once the
-   *  DeleteCommand has been executed.
-   */
-  deleteDraw(id, exeCallback) {
-    // get the group
-    const group = this.getGroup(id);
-    if (typeof group !== 'undefined') {
-      this.#deleteDrawGroup(group, this.#fireEvent, exeCallback);
-    }
+  deleteDraw(_id, _exeCallback) {
+    // does nothing
   }
 
   /**
    * Delete all Draws from the stage.
    *
-   * @param {Function} exeCallback The callback to call once the
+   * @deprecated
+   * @param {Function} _exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
-  deleteDraws(exeCallback) {
-    const posGroups = this.getKonvaLayer().getChildren();
-    for (const posGroup of posGroups) {
-      if (posGroup instanceof Konva.Group) {
-        const shapeGroups = posGroup.getChildren();
-        while (shapeGroups.length) {
-          if (shapeGroups[0] instanceof Konva.Group) {
-            this.#deleteDrawGroup(shapeGroups[0], this.#fireEvent, exeCallback);
-          }
-        }
-      } else {
-        logger.warn('Found non group in layer while deleting');
-      }
-    }
+  deleteDraws(_exeCallback) {
+    // does nothing
   }
 
   /**

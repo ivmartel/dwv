@@ -6,6 +6,7 @@ import {Circle} from '../math/circle';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Index} from '../math/index';
+import {Point2D} from '../math/point';
 import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
@@ -68,6 +69,13 @@ export class Annotation {
    * @type {string}
    */
   textExpr;
+
+  /**
+   * Label position.
+   *
+   * @type {Point2D}
+   */
+  labelPosition;
 
   /**
    * Associated view controller.
