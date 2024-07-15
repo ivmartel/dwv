@@ -55,21 +55,6 @@ export class CircleFactory {
   }
 
   /**
-   * Calculates the mathematical circle.
-   *
-   * @param {Point2D[]} points The points that define the circle.
-   * @returns {Circle} The mathematical circle.
-   */
-  #calculateMathShape(points) {
-    // calculate radius
-    const a = Math.abs(points[0].getX() - points[1].getX());
-    const b = Math.abs(points[0].getY() - points[1].getY());
-    const radius = Math.round(Math.sqrt(a * a + b * b));
-    // physical shape
-    return new Circle(points[0], radius);
-  }
-
-  /**
    * Set an annotation math shape from input points.
    *
    * @param {Annotation} annotation The annotation.
@@ -79,155 +64,6 @@ export class CircleFactory {
     annotation.mathShape = this.#calculateMathShape(points);
     annotation.setTextExpr(this.#getDefaultLabel());
     annotation.updateQuantification();
-  }
-
-  /**
-   * Update an annotation on translation (shape move).
-   *
-   * @param {Annotation} annotation The annotation.
-   * @param {object} translation The translation.
-   */
-  updateAnnotationOnTranslation(annotation, translation) {
-    // math shape
-    const circle = annotation.mathShape;
-    const center = circle.getCenter();
-    const newCenter = new Point2D(
-      center.getX() + translation.x,
-      center.getY() + translation.y
-    );
-    annotation.mathShape = new Circle(newCenter, circle.getRadius());
-    // label position
-    const labelPos = annotation.labelPosition;
-    if (typeof labelPos !== 'undefined') {
-      const newPos = new Point2D(
-        labelPos.getX() + translation.x,
-        labelPos.getY() + translation.y
-      );
-      annotation.labelPosition = newPos;
-    }
-    // quantification
-    annotation.updateQuantification();
-  }
-
-  /**
-   * Update an annotation on anchor move.
-   *
-   * @param {Annotation} annotation The annotation.
-   * @param {Konva.Shape} anchor The anchor.
-   */
-  updateAnnotationOnAnchorMove(annotation, anchor) {
-    // math shape
-    const circle = annotation.mathShape;
-    const center = new Point2D(
-      circle.getCenter().getX(),
-      circle.getCenter().getY()
-    );
-    const anchorPoint = new Point2D(anchor.x(), anchor.y());
-    const newRadius = center.getDistance(anchorPoint);
-    annotation.mathShape = new Circle(center, newRadius);
-    // label position
-    // TODO...
-    // quantification
-    annotation.updateQuantification();
-  }
-
-  /**
-   * Get the default labels.
-   *
-   * @returns {object} The label list.
-   */
-  #getDefaultLabel() {
-    return defaults.labelText.circle;
-  }
-
-  /**
-   * Creates the konva circle shape.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Style} style The drawing style.
-   * @returns {Konva.Circle} The konva circle shape.
-   */
-  #createShape(annotation, style) {
-    const circle = annotation.mathShape;
-    // konva circle
-    return new Konva.Circle({
-      x: circle.getCenter().getX(),
-      y: circle.getCenter().getY(),
-      radius: circle.getRadius(),
-      stroke: style.getLineColour(),
-      strokeWidth: style.getStrokeWidth(),
-      strokeScaleEnabled: false,
-      name: 'shape'
-    });
-  }
-
-  /**
-   * Get the default annotation label position.
-   *
-   * @param {Annotation} annotation The annotation.
-   * @returns {Point2D} The position.
-   */
-  #getDefaultLabelPosition(annotation) {
-    const circle = annotation.mathShape;
-    const center = circle.getCenter();
-    const radius = circle.getRadius();
-    return new Point2D(
-      center.getX() - radius,
-      center.getY() + radius,
-    );
-  }
-
-  /**
-   * Get the annotation label position.
-   *
-   * @param {Annotation} annotation The annotation.
-   * @returns {Point2D} The position.
-   */
-  #getLabelPosition(annotation) {
-    let res = annotation.labelPosition;
-    if (typeof res === 'undefined') {
-      res = this.#getDefaultLabelPosition(annotation);
-    }
-    return res;
-  }
-
-  /**
-   * Creates the konva label.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Style} style The drawing style.
-   * @returns {Konva.Label} The Konva label.
-   */
-  #createLabel(annotation, style) {
-    // konva text
-    const ktext = new Konva.Text({
-      fontSize: style.getFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      padding: style.getTextPadding(),
-      shadowColor: style.getShadowLineColour(),
-      shadowOffset: style.getShadowOffset(),
-      name: 'text'
-    });
-    const labelText = annotation.getText();
-    ktext.setText(labelText);
-
-    // konva label
-    const labelPosition = this.#getLabelPosition(annotation);
-    const klabel = new Konva.Label({
-      x: labelPosition.getX(),
-      y: labelPosition.getY(),
-      scale: style.applyZoomScale(1),
-      visible: labelText.length !== 0,
-      name: 'label'
-    });
-    klabel.add(ktext);
-    klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
-      opacity: style.getTagOpacity()
-    }));
-
-    return klabel;
   }
 
   /**
@@ -359,6 +195,217 @@ export class CircleFactory {
   }
 
   /**
+   * Update an annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
+  updateAnnotationOnAnchorMove(annotation, anchor) {
+    // math shape
+    const circle = annotation.mathShape;
+    const center = new Point2D(
+      circle.getCenter().getX(),
+      circle.getCenter().getY()
+    );
+    const anchorPoint = new Point2D(anchor.x(), anchor.y());
+    const newRadius = center.getDistance(anchorPoint);
+    annotation.mathShape = new Circle(center, newRadius);
+    // label position
+    // TODO...
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update an annotation on translation (shape move).
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {object} translation The translation.
+   */
+  updateAnnotationOnTranslation(annotation, translation) {
+    // math shape
+    const circle = annotation.mathShape;
+    const center = circle.getCenter();
+    const newCenter = new Point2D(
+      center.getX() + translation.x,
+      center.getY() + translation.y
+    );
+    annotation.mathShape = new Circle(newCenter, circle.getRadius());
+    // label position
+    const labelPos = annotation.labelPosition;
+    if (typeof labelPos !== 'undefined') {
+      const newPos = new Point2D(
+        labelPos.getX() + translation.x,
+        labelPos.getY() + translation.y
+      );
+      annotation.labelPosition = newPos;
+    }
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update the shape label position.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelPosition(annotation, group, _style) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // update position
+    const labelPosition = this.#getLabelPosition(annotation);
+    klabel.position({
+      x: labelPosition.getX(),
+      y: labelPosition.getY()
+    });
+  }
+
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelContent(annotation, group, _style) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // update text
+    const text = annotation.getText();
+    const ktext = klabel.getText();
+    ktext.setText(text);
+    // hide if empty
+    klabel.visible(text.length !== 0);
+  }
+
+
+  /**
+   * Calculates the mathematical circle.
+   *
+   * @param {Point2D[]} points The points that define the circle.
+   * @returns {Circle} The mathematical circle.
+   */
+  #calculateMathShape(points) {
+    // calculate radius
+    const a = Math.abs(points[0].getX() - points[1].getX());
+    const b = Math.abs(points[0].getY() - points[1].getY());
+    const radius = Math.round(Math.sqrt(a * a + b * b));
+    // physical shape
+    return new Circle(points[0], radius);
+  }
+
+  /**
+   * Get the default labels.
+   *
+   * @returns {object} The label list.
+   */
+  #getDefaultLabel() {
+    return defaults.labelText.circle;
+  }
+
+  /**
+   * Creates the konva circle shape.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Circle} The konva circle shape.
+   */
+  #createShape(annotation, style) {
+    const circle = annotation.mathShape;
+    // konva circle
+    return new Konva.Circle({
+      x: circle.getCenter().getX(),
+      y: circle.getCenter().getY(),
+      radius: circle.getRadius(),
+      stroke: style.getLineColour(),
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      name: 'shape'
+    });
+  }
+
+  /**
+   * Get the default annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getDefaultLabelPosition(annotation) {
+    const circle = annotation.mathShape;
+    const center = circle.getCenter();
+    const radius = circle.getRadius();
+    return new Point2D(
+      center.getX() - radius,
+      center.getY() + radius,
+    );
+  }
+
+  /**
+   * Get the annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getLabelPosition(annotation) {
+    let res = annotation.labelPosition;
+    if (typeof res === 'undefined') {
+      res = this.#getDefaultLabelPosition(annotation);
+    }
+    return res;
+  }
+
+  /**
+   * Creates the konva label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Label} The Konva label.
+   */
+  #createLabel(annotation, style) {
+    // konva text
+    const ktext = new Konva.Text({
+      fontSize: style.getFontSize(),
+      fontFamily: style.getFontFamily(),
+      fill: style.getLineColour(),
+      padding: style.getTextPadding(),
+      shadowColor: style.getShadowLineColour(),
+      shadowOffset: style.getShadowOffset(),
+      name: 'text'
+    });
+    const labelText = annotation.getText();
+    ktext.setText(labelText);
+
+    // konva label
+    const labelPosition = this.#getLabelPosition(annotation);
+    const klabel = new Konva.Label({
+      x: labelPosition.getX(),
+      y: labelPosition.getY(),
+      scale: style.applyZoomScale(1),
+      visible: labelText.length !== 0,
+      name: 'label'
+    });
+    klabel.add(ktext);
+    klabel.add(new Konva.Tag({
+      fill: style.getLineColour(),
+      opacity: style.getTagOpacity()
+    }));
+
+    return klabel;
+  }
+
+  /**
    * Update shape on anchor move.
    *
    * @param {Annotation} annotation The associated annotation.
@@ -440,52 +487,6 @@ export class CircleFactory {
       logger.error('Unhandled anchor id: ' + anchor.id());
       break;
     }
-  }
-
-  /**
-   * Update the shape label position.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Group} group The shape group.
-   * @param {Style} _style The application style.
-   */
-  updateLabelPosition(annotation, group, _style) {
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
-    // update position
-    const labelPosition = this.#getLabelPosition(annotation);
-    klabel.position({
-      x: labelPosition.getX(),
-      y: labelPosition.getY()
-    });
-  }
-
-  /**
-   * Update the shape label.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Group} group The shape group.
-   * @param {Style} _style The application style.
-   */
-  updateLabelContent(annotation, group, _style) {
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
-    // update text
-    const text = annotation.getText();
-    const ktext = klabel.getText();
-    ktext.setText(text);
-    // hide if empty
-    klabel.visible(text.length !== 0);
   }
 
   /**
