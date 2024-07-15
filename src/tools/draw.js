@@ -190,13 +190,18 @@ export class Draw {
     if (typeof drawLayer === 'undefined') {
       // create new data
       const viewLayer = layerGroup.getActiveViewLayer();
-      const vc = viewLayer.getViewController();
-      const data = new DicomData({
-        '0020000D': {value: [vc.getStudyInstanceUID()]}
-      });
-      // add modality
-      // add series reference
+      const viewController = viewLayer.getViewController();
+      const data = new DicomData({});
       data.annotationGroup = new AnnotationGroup();
+      data.annotationGroup.setMeta('Modality', 'SR');
+      data.annotationGroup.setMeta(
+        'StudyInstanceUID', viewController.getStudyInstanceUID());
+      data.annotationGroup.setMeta(
+        'ReferencedSeriesSequence', {
+          value: [{
+            SeriesInstanceUID: viewController.getSeriesInstanceUID()
+          }]
+        });
       const dataId = this.#app.addData(data);
       // render (will create draw layer)
       this.#app.addDataViewConfig(dataId, new ViewConfig(divId));

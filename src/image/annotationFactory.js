@@ -136,9 +136,27 @@ export class AnnotationFactory {
 
     const annotationGroup = new AnnotationGroup(annotations);
 
+    // Modality
     annotationGroup.setMeta(
-      'StudyInstanceUID',
-      dataElements['0020000D'].value[0]
+      'Modality', dataElements['00080060'].value[0]
+    );
+    // ReferencedSeriesSequence
+    const element = dataElements['00081115'];
+    if (typeof element !== 'undefined') {
+      const seriesElement = element.value[0]['0020000E'];
+      if (typeof seriesElement !== 'undefined') {
+        annotationGroup.setMeta(
+          'ReferencedSeriesSequence', {
+            value: [{
+              SeriesInstanceUID: seriesElement.value[0]
+            }]
+          }
+        );
+      }
+    }
+    // StudyInstanceUID
+    annotationGroup.setMeta(
+      'StudyInstanceUID', dataElements['0020000D'].value[0]
     );
 
     return annotationGroup;
@@ -153,17 +171,21 @@ export class AnnotationFactory {
    */
   toDicom(annotationGroup, extraTags) {
     let tags = {};
+    // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-    tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.71';
-    tags.SOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.71.0';
-    tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.71';
-    tags.MediaStorageSOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.71.0';
+    // class: Basic Text SR Storage
+    tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11';
+    tags.SOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.11.0';
+    tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11';
+    tags.MediaStorageSOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.11.0';
 
+    tags.Modality = annotationGroup.getMeta('Modality');
     tags.StudyInstanceUID = annotationGroup.getMeta('StudyInstanceUID');
+    tags.ReferencedSeriesSequence =
+      annotationGroup.getMeta('ReferencedSeriesSequence');
 
     tags.SeriesInstanceUID = '1.2.3.4.5.6';
 
-    tags.Modality = 'SR';
     tags.CompletionFlag = 'PARTIAL';
     tags.VerificationFlag = 'UNVERIFIED';
 
