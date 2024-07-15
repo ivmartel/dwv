@@ -1,5 +1,6 @@
 import {Point2D} from '../math/point';
 import {Circle} from '../math/circle';
+import {Rectangle} from '../math/rectangle';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -119,7 +120,7 @@ export function getDicomSpatialCoordinateItem(scoord) {
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
  *
- * @param {object} shape The math shape.
+ * @param {Circle|Rectangle} shape The math shape.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
 export function getScoordFromShape(shape) {
@@ -137,6 +138,20 @@ export function getScoordFromShape(shape) {
       pointPerimeter.getY().toString(),
     ];
     scoord.graphicType = GraphicTypes.circle;
+  } else if (shape instanceof Rectangle) {
+    const begin = shape.getBegin();
+    const end = shape.getEnd();
+    scoord.graphicData = [
+      begin.getX().toString(),
+      begin.getY().toString(),
+      begin.getX().toString(),
+      end.getY().toString(),
+      end.getX().toString(),
+      end.getY().toString(),
+      end.getX().toString(),
+      begin.getY().toString(),
+    ];
+    scoord.graphicType = GraphicTypes.polyline;
   }
 
   return scoord;
@@ -146,22 +161,37 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {object} The math shape.
+ * @returns {Circle|Rectangle} The math shape.
  */
 export function getShapeFromScoord(scoord) {
+  // extract points
+  const numberOfPoints = scoord.graphicData.length;
+  if (numberOfPoints % 2 !== 0) {
+    throw new Error('Expecting even number of coordinates in scroord data');
+  }
+  const points = [];
+  for (let i = 0; i < scoord.graphicData.length; i += 2) {
+    points.push(new Point2D(
+      parseFloat(scoord.graphicData[i]),
+      parseFloat(scoord.graphicData[i + 1])
+    ));
+  }
+
+  // create math shape
   let shape;
   if (scoord.graphicType === GraphicTypes.circle) {
-    const center = new Point2D(
-      parseFloat(scoord.graphicData[0]),
-      parseFloat(scoord.graphicData[1])
-    );
-    const pointPerimeter = new Point2D(
-      parseFloat(scoord.graphicData[2]),
-      parseFloat(scoord.graphicData[3])
-    );
+    if (points.length !== 2) {
+      throw new Error('Expecting 2 points for circles');
+    }
+    const center = points[0];
+    const pointPerimeter = points[1];
     const radius = pointPerimeter.getDistance(center);
-
     shape = new Circle(center, radius);
+  } else if (scoord.graphicType === GraphicTypes.polyline) {
+    if (points.length !== 4) {
+      throw new Error('Expecting 4 points for rectangles');
+    }
+    shape = new Rectangle(points[0], points[2]);
   }
 
   return shape;

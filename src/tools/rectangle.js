@@ -1,16 +1,16 @@
 import {Rectangle} from '../math/rectangle';
 import {Point2D} from '../math/point';
-import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
 import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -54,91 +54,47 @@ export class RectangleFactory {
     return this.getGroupName() === group.name();
   }
 
+
+  /**
+   * Set an annotation math shape from input points.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Point2D[]} points The points.
+   */
+  setAnnotationMathShape(annotation, points) {
+    annotation.mathShape = this.#calculateMathShape(points);
+    annotation.setTextExpr(this.#getDefaultLabel());
+    annotation.updateQuantification();
+  }
+
   /**
    * Create a rectangle shape to be displayed.
    *
-   * @param {Point2D[]} points The points from which to extract the rectangle.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
    * @returns {Konva.Group} The Konva group.
    */
-  create(points, style, viewController) {
-    // physical shape
-    const rectangle = new Rectangle(points[0], points[1]);
-    // draw shape
-    const kshape = new Konva.Rect({
-      x: rectangle.getBegin().getX(),
-      y: rectangle.getBegin().getY(),
-      width: rectangle.getWidth(),
-      height: rectangle.getHeight(),
-      stroke: style.getLineColour(),
-      strokeWidth: style.getStrokeWidth(),
-      strokeScaleEnabled: false,
-      name: 'shape'
-    });
-    // label text
-    const ktext = new Konva.Text({
-      fontSize: style.getFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      padding: style.getTextPadding(),
-      shadowColor: style.getShadowLineColour(),
-      shadowOffset: style.getShadowOffset(),
-      name: 'text'
-    });
-    let textExpr = '';
-    const modality = viewController.getModality();
-    if (typeof defaults.labelText.rectangle[modality] !== 'undefined') {
-      textExpr = defaults.labelText.rectangle[modality];
-    } else {
-      textExpr = defaults.labelText.rectangle['*'];
-    }
-    const quant = rectangle.quantify(
-      viewController,
-      getFlags(textExpr));
-    ktext.setText(replaceFlags(textExpr, quant));
-    // augment text with meta
-    // @ts-ignore
-    ktext.meta = {
-      textExpr: textExpr,
-      quantification: quant
-    };
-    // label
-    const klabel = new Konva.Label({
-      x: rectangle.getBegin().getX(),
-      y: rectangle.getEnd().getY(),
-      scale: style.applyZoomScale(1),
-      visible: textExpr.length !== 0,
-      name: 'label'
-    });
-    klabel.add(ktext);
-    klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
-      opacity: style.getTagOpacity()
-    }));
-
-    // debug shadow
-    let kshadow;
-    if (DRAW_DEBUG) {
-      kshadow = this.#getShadowRectangle(rectangle);
-    }
-
-    // return group
+  createShapeGroup(annotation, style) {
+    // konva group
     const group = new Konva.Group();
     group.name(this.getGroupName());
-    if (kshadow) {
-      group.add(kshadow);
+    group.visible(true);
+    group.id(annotation.id);
+    // konva shape
+    group.add(this.#createShape(annotation, style));
+    // konva label
+    group.add(this.#createLabel(annotation, style));
+    // konva shadow (if debug)
+    if (DRAW_DEBUG) {
+      group.add(this.#getDebugShadow(annotation));
     }
-    group.add(klabel);
-    group.add(kshape);
-    group.visible(true); // dont inherit
     return group;
   }
 
   /**
    * Get anchors to update a rectangle shape.
    *
-   * @param {Konva.Shape} shape The associated shape.
+   * @param {Konva.Rect} shape The associated shape.
    * @param {Style} style The application style.
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
@@ -165,13 +121,316 @@ export class RectangleFactory {
   }
 
   /**
-   * Update a rectangle shape.
+   * Constrain anchor movement.
    *
-   * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Style} style The app style.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Konva.Ellipse} _anchor The active anchor.
    */
-  update(anchor, style, viewController) {
+  constrainAnchorMove(_anchor) {
+    // // parent group
+    // const group = anchor.getParent();
+    // if (!(group instanceof Konva.Group)) {
+    //   return;
+    // }
+
+    // // find special points
+    // const left = group.getChildren(function (node) {
+    //   return node.id() === 'left';
+    // })[0];
+    // const right = group.getChildren(function (node) {
+    //   return node.id() === 'right';
+    // })[0];
+    // const bottom = group.getChildren(function (node) {
+    //   return node.id() === 'bottom';
+    // })[0];
+    // const top = group.getChildren(function (node) {
+    //   return node.id() === 'top';
+    // })[0];
+
+    // // update 'self' (undo case) and special points
+    // switch (anchor.id()) {
+    // case 'left':
+    //   // block y
+    //   left.y(right.y());
+    //   break;
+    // case 'right':
+    //   // block y
+    //   right.y(left.y());
+    //   break;
+    // case 'bottom':
+    //   // block x
+    //   bottom.x(top.x());
+    //   break;
+    // case 'top':
+    //   // block x
+    //   top.x(bottom.x());
+    //   break;
+    // default :
+    //   logger.error('Unhandled anchor id: ' + anchor.id());
+    //   break;
+    // }
+  }
+
+  /**
+   * Update shape and label on anchor move.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The application style.
+   */
+  updateShapeGroupOnAnchorMove(annotation, anchor, style) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+
+    // update shape and anchors
+    this.#updateShape(annotation, anchor, style);
+    // update label
+    this.updateLabelContent(annotation, group, style);
+    // TODO check if linked label...
+    this.updateLabelPosition(annotation, group, style);
+    // update shadow
+    if (DRAW_DEBUG) {
+      this.#updateDebugShadow(annotation, group);
+    }
+  }
+
+  /**
+   * Update an annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
+  updateAnnotationOnAnchorMove(annotation, anchor) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+    // find anchors
+    const topLeft = group.getChildren(function (node) {
+      return node.id() === 'topLeft';
+    })[0];
+    const bottomRight = group.getChildren(function (node) {
+      return node.id() === 'bottomRight';
+    })[0];
+
+    const p2d0 = new Point2D(
+      group.x() + topLeft.x(),
+      group.y() + topLeft.y()
+    );
+    const p2d1 = new Point2D(
+      group.x() + bottomRight.x(),
+      group.y() + bottomRight.y()
+    );
+    // new rect
+    annotation.mathShape = new Rectangle(p2d0, p2d1);
+    // label position
+    // TODO...
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update an annotation on translation (shape move).
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {object} translation The translation.
+   */
+  updateAnnotationOnTranslation(annotation, translation) {
+    // math shape
+    const rectangle = annotation.mathShape;
+    const begin = rectangle.getBegin();
+    const newBegin = new Point2D(
+      begin.getX() + translation.x,
+      begin.getY() + translation.y
+    );
+    const end = rectangle.getEnd();
+    const newEnd = new Point2D(
+      end.getX() + translation.x,
+      end.getY() + translation.y
+    );
+    annotation.mathShape = new Rectangle(newBegin, newEnd);
+    // label position
+    const labelPos = annotation.labelPosition;
+    if (typeof labelPos !== 'undefined') {
+      const newPos = new Point2D(
+        labelPos.getX() + translation.x,
+        labelPos.getY() + translation.y
+      );
+      annotation.labelPosition = newPos;
+    }
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update the shape label position.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelPosition(annotation, group, _style) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // update position
+    const labelPosition = this.#getLabelPosition(annotation);
+    klabel.position({
+      x: labelPosition.getX(),
+      y: labelPosition.getY()
+    });
+  }
+
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelContent(annotation, group, _style) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+    // update text
+    const text = annotation.getText();
+    const ktext = klabel.getText();
+    ktext.setText(text);
+    // hide if empty
+    klabel.visible(text.length !== 0);
+  }
+
+
+  /**
+   * Calculates the mathematical rectangle.
+   *
+   * @param {Point2D[]} points The points that define the rectangle.
+   * @returns {Rectangle} The mathematical shape.
+   */
+  #calculateMathShape(points) {
+    return new Rectangle(points[0], points[1]);
+  }
+
+  /**
+   * Get the default labels.
+   *
+   * @returns {object} The label list.
+   */
+  #getDefaultLabel() {
+    return defaults.labelText.rectangle;
+  }
+
+  /**
+   * Creates the konva rect shape.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Rect} The konva rect shape.
+   */
+  #createShape(annotation, style) {
+    const rectangle = annotation.mathShape;
+    // konva rect
+    return new Konva.Rect({
+      x: rectangle.getBegin().getX(),
+      y: rectangle.getBegin().getY(),
+      width: rectangle.getWidth(),
+      height: rectangle.getHeight(),
+      stroke: style.getLineColour(),
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      name: 'shape'
+    });
+  }
+
+  /**
+   * Get the default annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getDefaultLabelPosition(annotation) {
+    const rectangle = annotation.mathShape;
+    return new Point2D(
+      rectangle.getBegin().getX(),
+      rectangle.getEnd().getY(),
+    );
+  }
+
+  /**
+   * Get the annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getLabelPosition(annotation) {
+    let res = annotation.labelPosition;
+    if (typeof res === 'undefined') {
+      res = this.#getDefaultLabelPosition(annotation);
+    }
+    return res;
+  }
+
+  /**
+   * Creates the konva label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Label} The Konva label.
+   */
+  #createLabel(annotation, style) {
+    // konva text
+    const ktext = new Konva.Text({
+      fontSize: style.getFontSize(),
+      fontFamily: style.getFontFamily(),
+      fill: style.getLineColour(),
+      padding: style.getTextPadding(),
+      shadowColor: style.getShadowLineColour(),
+      shadowOffset: style.getShadowOffset(),
+      name: 'text'
+    });
+    const labelText = annotation.getText();
+    ktext.setText(labelText);
+
+    // konva label
+    const labelPosition = this.#getLabelPosition(annotation);
+    const klabel = new Konva.Label({
+      x: labelPosition.getX(),
+      y: labelPosition.getY(),
+      scale: style.applyZoomScale(1),
+      visible: labelText.length !== 0,
+      name: 'label'
+    });
+    klabel.add(ktext);
+    klabel.add(new Konva.Tag({
+      fill: style.getLineColour(),
+      opacity: style.getTagOpacity()
+    }));
+
+    return klabel;
+  }
+
+  /**
+   * Update shape on anchor move.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} _style The application style.
+   */
+  #updateShape(annotation, anchor, _style) {
+    const rectangle = annotation.mathShape;
+    const begin = rectangle.getBegin();
+
     // parent group
     const group = anchor.getParent();
     if (!(group instanceof Konva.Group)) {
@@ -181,11 +440,20 @@ export class RectangleFactory {
     const krect = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-      // find special points
+    if (!(krect instanceof Konva.Rect)) {
+      return;
+    }
+    // update shape: just update the radius
+    krect.position({
+      x: begin.getX(),
+      y: begin.getY()
+    });
+    krect.size({
+      width: rectangle.getWidth(),
+      height: rectangle.getHeight()
+    });
+
+    // find anchors
     const topLeft = group.getChildren(function (node) {
       return node.id() === 'topLeft';
     })[0];
@@ -198,37 +466,38 @@ export class RectangleFactory {
     const bottomLeft = group.getChildren(function (node) {
       return node.id() === 'bottomLeft';
     })[0];
-    // debug shadow
-    let kshadow;
-    if (DRAW_DEBUG) {
-      kshadow = group.getChildren(function (node) {
-        return node.name() === 'shadow';
-      })[0];
-    }
 
-    // update 'self' (undo case) and special points
+    // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
     case 'topLeft':
+      // update self
       topLeft.x(anchor.x());
       topLeft.y(anchor.y());
+      // update others
       topRight.y(anchor.y());
       bottomLeft.x(anchor.x());
       break;
     case 'topRight':
+      // update self
       topRight.x(anchor.x());
       topRight.y(anchor.y());
+      // update others
       topLeft.y(anchor.y());
       bottomRight.x(anchor.x());
       break;
     case 'bottomRight':
+      // update self
       bottomRight.x(anchor.x());
       bottomRight.y(anchor.y());
+      // update others
       bottomLeft.y(anchor.y());
       topRight.x(anchor.x());
       break;
     case 'bottomLeft':
+      // update self
       bottomLeft.x(anchor.x());
       bottomLeft.y(anchor.y());
+      // update others
       bottomRight.y(anchor.y());
       topLeft.x(anchor.x());
       break;
@@ -236,109 +505,17 @@ export class RectangleFactory {
       logger.error('Unhandled anchor id: ' + anchor.id());
       break;
     }
-    // update shape
-    krect.position(topLeft.position());
-    const width = topRight.x() - topLeft.x();
-    const height = bottomLeft.y() - topLeft.y();
-    if (width && height) {
-      krect.size({width: width, height: height});
-    }
-    // positions: add possible group offset
-    const p2d0 = new Point2D(
-      group.x() + topLeft.x(),
-      group.y() + topLeft.y()
-    );
-    const p2d1 = new Point2D(
-      group.x() + bottomRight.x(),
-      group.y() + bottomRight.y()
-    );
-    // new rect
-    const rect = new Rectangle(p2d0, p2d1);
-
-    // debug shadow based on round (used in quantification)
-    if (kshadow) {
-      const round = rect.getRound();
-      const rWidth = round.max.getX() - round.min.getX();
-      const rHeight = round.max.getY() - round.min.getY();
-      kshadow.position({
-        x: round.min.getX() - group.x(),
-        y: round.min.getY() - group.y()
-      });
-      kshadow.size({width: rWidth, height: rHeight});
-    }
-
-    // update label position
-    const textPos = {
-      x: rect.getBegin().getX() - group.x(),
-      y: rect.getEnd().getY() - group.y()
-    };
-    klabel.position(textPos);
-
-    // update quantification
-    this.#updateRectangleQuantification(group, viewController);
-  }
-
-  /**
-   * Update the quantification of a Rectangle.
-   *
-   * @param {Konva.Group} group The group with the shape.
-   * @param {ViewController} viewController The associated view controller.
-   */
-  updateQuantification(group, viewController) {
-    this.#updateRectangleQuantification(group, viewController);
-  }
-
-  /**
-   * Update the quantification of a Rectangle (as a static
-   *   function to be used in update).
-   *
-   * @param {Konva.Group} group The group with the shape.
-   * @param {ViewController} viewController The associated view controller.
-   */
-  #updateRectangleQuantification(group, viewController) {
-    // associated shape
-    const krect = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
-
-    // positions: add possible group offset
-    const p2d0 = new Point2D(
-      group.x() + krect.x(),
-      group.y() + krect.y()
-    );
-    const p2d1 = new Point2D(
-      p2d0.getX() + krect.width(),
-      p2d0.getY() + krect.height()
-    );
-    // rectangle
-    const rect = new Rectangle(p2d0, p2d1);
-
-    // update text
-    const ktext = klabel.getText();
-    // @ts-expect-error
-    const meta = ktext.meta;
-    const quantification = rect.quantify(
-      viewController,
-      getFlags(meta.textExpr));
-    ktext.setText(replaceFlags(meta.textExpr, quantification));
-    // update meta
-    meta.quantification = quantification;
   }
 
   /**
    * Get the debug shadow.
    *
-   * @param {Rectangle} rectangle The rectangle to shadow.
-   * @returns {Konva.Rect} The shadow konva shape.
+   * @param {Annotation} annotation The anootation to shadow.
+   * @param {Konva.Group} [_group] The associated group.
+   * @returns {Konva.Rect} The shadow konva rect.
    */
-  #getShadowRectangle(rectangle) {
+  #getDebugShadow(annotation, _group) {
+    const rectangle = annotation.mathShape;
     const round = rectangle.getRound();
     const rWidth = round.max.getX() - round.min.getX();
     const rHeight = round.max.getY() - round.min.getY();
@@ -353,6 +530,19 @@ export class RectangleFactory {
       opacity: 0.3,
       name: 'shadow'
     });
+  }
+
+  #updateDebugShadow(group, annotation) {
+    const kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+    if (typeof kshadow !== 'undefined') {
+      // remove previous
+      kshadow.destroy();
+      // add new
+      group.add(this.#getDebugShadow(
+        annotation.mathShape, group));
+    }
   }
 
 } // class RectangleFactory

@@ -2,6 +2,8 @@ import {ListenerHandler} from '../utils/listen';
 import {getFlags, replaceFlags} from '../utils/string';
 import {CircleFactory} from '../tools/circle';
 import {Circle} from '../math/circle';
+import {RectangleFactory} from '../tools/rectangle';
+import {Rectangle} from '../math/rectangle';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -167,7 +169,10 @@ export class Annotation {
     let fac;
     if (this.mathShape instanceof Circle) {
       fac = new CircleFactory();
+    } else if (this.mathShape instanceof Rectangle) {
+      fac = new RectangleFactory();
     }
+
     return fac;
   }
 }
