@@ -18,6 +18,7 @@ export class Annotation {
     getOriginIndex(): Index | undefined;
     getText(): string;
     id: string;
+    labelPosition: Point2D;
     mathShape: object;
     position: string;
     quantification: object;
@@ -54,11 +55,11 @@ export class AnnotationGroup {
     find(id: string): Annotation | undefined;
     getLength(): number;
     getList(): Annotation[];
-    getMeta(key: string): string;
+    getMeta(key: string): object;
     hasMeta(key: string): boolean;
     remove(id: string): void;
     removeEventListener(type: string, callback: Function): void;
-    setMeta(key: string, value: string): void;
+    setMeta(key: string, value: object): void;
     setViewController(viewController: ViewController): void;
     update(annotation: Annotation): void;
 }
@@ -330,7 +331,9 @@ export class DrawController {
     // @deprecated
     getDrawStoreDetails(): void;
     hasAnnotationMeta(key: string): boolean;
+    removeAllAnnotationsWithCommand(exeCallback: Function): void;
     removeAnnotation(id: string): void;
+    removeAnnotationWithCommand(id: string, exeCallback: Function): void;
     setAnnotationMeta(key: string, value: string): void;
     updateAnnotation(annotation: Annotation): void;
 }
@@ -343,8 +346,10 @@ export class DrawLayer {
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
     bindInteraction(): void;
-    deleteDraw(id: string, exeCallback: Function): void;
-    deleteDraws(exeCallback: Function): void;
+    // @deprecated
+    deleteDraw(_id: string, _exeCallback: Function): void;
+    // @deprecated
+    deleteDraws(_exeCallback: Function): void;
     display(flag: boolean): void;
     draw(): void;
     fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
@@ -367,15 +372,29 @@ export class DrawLayer {
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
-    setAnnotationGroup(group: AnnotationGroup, dataId: string, cmdCallback: object, exeCallback: object): void;
+    setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
     setPlaneHelper(helper: PlaneHelper): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
+    setShapeHandler(handler: DrawShapeHandler | undefined): void;
     toggleGroupVisibility(id: string): boolean;
     unbindInteraction(): void;
+}
+
+// @public
+export class DrawShapeHandler {
+    constructor(app: App);
+    addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
+    disableAndResetEditor(): void;
+    getEditorAnnotation(): Annotation | undefined;
+    getEditorShapeGroup(): Konva.Group | undefined;
+    onMouseOutShapeGroup(): void;
+    removeShapeListeners(shapeGroup: Konva.Group): void;
+    setEditorShape(shape: Konva.Shape, drawLayer: DrawLayer): void;
+    storeMouseOverCursor(cursor: string): void;
 }
 
 // @public
@@ -1013,6 +1032,7 @@ export class ViewController {
     getPositionFromPlanePoint(point2D: Point2D): Point;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
+    getSeriesInstanceUID(): string;
     getStudyInstanceUID(): string;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];

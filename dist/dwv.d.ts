@@ -66,6 +66,12 @@ export declare class Annotation {
      */
     textExpr: string;
     /**
+     * Label position.
+     *
+     * @type {Point2D}
+     */
+    labelPosition: Point2D;
+    /**
      * Set the associated view controller.
      *
      * @param {ViewController} viewController The associated view controller.
@@ -213,16 +219,16 @@ export declare class AnnotationGroup {
      * Get a meta data value.
      *
      * @param {string} key The meta data key.
-     * @returns {string} The meta data value.
+     * @returns {object} The meta data value.
      */
-    getMeta(key: string): string;
+    getMeta(key: string): object;
     /**
      * Set a meta data.
      *
      * @param {string} key The meta data key.
-     * @param {string} value The value of the meta data.
+     * @param {object} value The value of the meta data.
      */
-    setMeta(key: string, value: string): void;
+    setMeta(key: string, value: object): void;
     /**
      * Add an event listener to this class.
      *
@@ -1426,6 +1432,19 @@ export declare class DrawController {
      */
     removeAnnotation(id: string): void;
     /**
+     * Remove an annotation via a remove command (triggers draw actions).
+     *
+     * @param {string} id The annotation id.
+     * @param {Function} exeCallback The undo stack callback.
+     */
+    removeAnnotationWithCommand(id: string, exeCallback: Function): void;
+    /**
+     * Remove all annotations via remove commands (triggers draw actions).
+     *
+     * @param {Function} exeCallback The undo stack callback.
+     */
+    removeAllAnnotationsWithCommand(exeCallback: Function): void;
+    /**
      * Check if the annotation group contains a meta data value.
      *
      * @param {string} key The key to check.
@@ -1464,6 +1483,12 @@ export declare class DrawLayer {
      *   as this layer id.
      */
     constructor(containerDiv: HTMLDivElement);
+    /**
+     * Set the draw shape handler.
+     *
+     * @param {DrawShapeHandler|undefined} handler The shape handler.
+     */
+    setShapeHandler(handler: DrawShapeHandler | undefined): void;
     /**
      * Get the associated data id.
      *
@@ -1590,12 +1615,11 @@ export declare class DrawLayer {
     /**
      * Set the annotation group.
      *
-     * @param {AnnotationGroup} group The annotation group.
+     * @param {AnnotationGroup} annotationGroup The annotation group.
      * @param {string} dataId The associated data id.
-     * @param {object} cmdCallback The command callback.
-     * @param {object} exeCallback The exe callback.
+     * @param {object} exeCallback The undo stack callback.
      */
-    setAnnotationGroup(group: AnnotationGroup, dataId: string, cmdCallback: object, exeCallback: object): void;
+    setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
     /**
      * Fit the layer to its parent container.
      *
@@ -1621,18 +1645,20 @@ export declare class DrawLayer {
     /**
      * Delete a Draw from the stage.
      *
-     * @param {string} id The id of the group to delete.
-     * @param {Function} exeCallback The callback to call once the
+     * @deprecated
+     * @param {string} _id The id of the group to delete.
+     * @param {Function} _exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDraw(id: string, exeCallback: Function): void;
+    deleteDraw(_id: string, _exeCallback: Function): void;
     /**
      * Delete all Draws from the stage.
      *
-     * @param {Function} exeCallback The callback to call once the
+     * @deprecated
+     * @param {Function} _exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDraws(exeCallback: Function): void;
+    deleteDraws(_exeCallback: Function): void;
     /**
      * Get the total number of draws of this layer
      * (at all positions).
@@ -1698,6 +1724,68 @@ export declare class DrawLayer {
      *   event type.
      */
     removeEventListener(type: string, callback: Function): void;
+    #private;
+}
+
+/**
+ * Draw shape handler: handle action on existing shapes.
+ */
+export declare class DrawShapeHandler {
+    /**
+     * @callback eventFn@callback eventFn
+     * @param {object} event The event.
+     */
+    /**
+     * @param {App} app The associated application.
+     */
+    constructor(app: App);
+    /**
+     * Set the draw editor shape.
+     *
+     * @param {Konva.Shape} shape The shape to edit.
+     * @param {DrawLayer} drawLayer The layer the shape belongs to.
+     */
+    setEditorShape(shape: Konva.Shape, drawLayer: DrawLayer): void;
+    /**
+     * Get the currently edited shape group.
+     *
+     * @returns {Konva.Group|undefined} The edited group.
+     */
+    getEditorShapeGroup(): Konva.Group | undefined;
+    /**
+     * Get the currently edited annotation.
+     *
+     * @returns {Annotation|undefined} The edited annotation.
+     */
+    getEditorAnnotation(): Annotation | undefined;
+    /**
+     * Disable and reset the shape editor.
+     */
+    disableAndResetEditor(): void;
+    /**
+     * Store specific mouse over cursor.
+     *
+     * @param {string} cursor The cursor name.
+     */
+    storeMouseOverCursor(cursor: string): void;
+    /**
+     * Handle shape group mouseout.
+     */
+    onMouseOutShapeGroup(): void;
+    /**
+     * Add shape group listeners.
+     *
+     * @param {DrawLayer} drawLayer The origin draw layer.
+     * @param {Konva.Group} shapeGroup The shape group to set on.
+     * @param {Annotation} annotation The associated annnotation.
+     */
+    addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
+    /**
+     * Remove shape group listeners.
+     *
+     * @param {Konva.Group} shapeGroup The shape group to set off.
+     */
+    removeShapeListeners(shapeGroup: Konva.Group): void;
     #private;
 }
 
@@ -4682,6 +4770,12 @@ export declare class ViewController {
      * @returns {string} The UID.
      */
     getStudyInstanceUID(): string;
+    /**
+     * Get the image series instance UID.
+     *
+     * @returns {string} The UID.
+     */
+    getSeriesInstanceUID(): string;
     /**
      * Get some values from the associated image in a region.
      *

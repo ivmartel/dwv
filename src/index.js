@@ -106,6 +106,7 @@ import {NumberRange} from './math/stats';
 // tools
 import {toolList} from './tools/index';
 import {ScrollWheel} from './tools/scrollWheel';
+import {DrawShapeHandler} from './tools/drawShapeHandler';
 // utils
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
@@ -144,6 +145,7 @@ export {
   Tag,
   LayerGroup,
   DrawLayer,
+  DrawShapeHandler,
   OverlayData,
   ViewLayer,
   Image,
