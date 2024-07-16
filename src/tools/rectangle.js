@@ -126,52 +126,12 @@ export class RectangleFactory {
    * @param {Konva.Ellipse} _anchor The active anchor.
    */
   constrainAnchorMove(_anchor) {
-    // // parent group
-    // const group = anchor.getParent();
-    // if (!(group instanceof Konva.Group)) {
-    //   return;
-    // }
-
-    // // find special points
-    // const left = group.getChildren(function (node) {
-    //   return node.id() === 'left';
-    // })[0];
-    // const right = group.getChildren(function (node) {
-    //   return node.id() === 'right';
-    // })[0];
-    // const bottom = group.getChildren(function (node) {
-    //   return node.id() === 'bottom';
-    // })[0];
-    // const top = group.getChildren(function (node) {
-    //   return node.id() === 'top';
-    // })[0];
-
-    // // update 'self' (undo case) and special points
-    // switch (anchor.id()) {
-    // case 'left':
-    //   // block y
-    //   left.y(right.y());
-    //   break;
-    // case 'right':
-    //   // block y
-    //   right.y(left.y());
-    //   break;
-    // case 'bottom':
-    //   // block x
-    //   bottom.x(top.x());
-    //   break;
-    // case 'top':
-    //   // block x
-    //   top.x(bottom.x());
-    //   break;
-    // default :
-    //   logger.error('Unhandled anchor id: ' + anchor.id());
-    //   break;
-    // }
+    // no constraints
   }
 
   /**
-   * Update shape and label on anchor move.
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
@@ -313,9 +273,9 @@ export class RectangleFactory {
 
 
   /**
-   * Calculates the mathematical rectangle.
+   * Calculates the mathematical rectangle: a rectangle.
    *
-   * @param {Point2D[]} points The points that define the rectangle.
+   * @param {Point2D[]} points The points that define the shape.
    * @returns {Rectangle} The mathematical shape.
    */
   #calculateMathShape(points) {
@@ -332,11 +292,11 @@ export class RectangleFactory {
   }
 
   /**
-   * Creates the konva rect shape.
+   * Creates the konva shape.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @returns {Konva.Rect} The konva rect shape.
+   * @returns {Konva.Rect} The konva shape.
    */
   #createShape(annotation, style) {
     const rectangle = annotation.mathShape;

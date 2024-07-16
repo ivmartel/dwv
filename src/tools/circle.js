@@ -169,7 +169,8 @@ export class CircleFactory {
   }
 
   /**
-   * Update shape and label on anchor move.
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
@@ -292,10 +293,10 @@ export class CircleFactory {
 
 
   /**
-   * Calculates the mathematical circle.
+   * Calculates the mathematical shape: a circle.
    *
-   * @param {Point2D[]} points The points that define the circle.
-   * @returns {Circle} The mathematical circle.
+   * @param {Point2D[]} points The points that define the shape.
+   * @returns {Circle} The mathematical shape.
    */
   #calculateMathShape(points) {
     // calculate radius
@@ -316,11 +317,11 @@ export class CircleFactory {
   }
 
   /**
-   * Creates the konva circle shape.
+   * Creates the konva shape.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @returns {Konva.Circle} The konva circle shape.
+   * @returns {Konva.Circle} The konva shape.
    */
   #createShape(annotation, style) {
     const circle = annotation.mathShape;
