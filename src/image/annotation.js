@@ -6,6 +6,8 @@ import {EllipseFactory} from '../tools/ellipse';
 import {Ellipse} from '../math/ellipse';
 import {RectangleFactory} from '../tools/rectangle';
 import {Rectangle} from '../math/rectangle';
+import {RulerFactory} from '../tools/ruler';
+import {Line} from '../math/line';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -169,7 +171,9 @@ export class Annotation {
    */
   getFactory() {
     let fac;
-    if (this.mathShape instanceof Circle) {
+    if (this.mathShape instanceof Line) {
+      fac = new RulerFactory();
+    } else if (this.mathShape instanceof Circle) {
       fac = new CircleFactory();
     } else if (this.mathShape instanceof Ellipse) {
       fac = new EllipseFactory();
