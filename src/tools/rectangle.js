@@ -495,10 +495,10 @@ export class RectangleFactory {
   /**
    * Update the debug shadow.
    *
-   * @param {Konva.Group} group The associated group.
    * @param {Annotation} annotation The annotation to shadow.
+   * @param {Konva.Group} group The associated group.
    */
-  #updateDebugShadow(group, annotation) {
+  #updateDebugShadow(annotation, group) {
     const kshadow = group.getChildren(function (node) {
       return node.name() === 'shadow';
     })[0];
@@ -506,8 +506,7 @@ export class RectangleFactory {
       // remove previous
       kshadow.destroy();
       // add new
-      group.add(this.#getDebugShadow(
-        annotation.mathShape, group));
+      group.add(this.#getDebugShadow(annotation, group));
     }
   }
 
