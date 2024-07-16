@@ -2,6 +2,8 @@ import {ListenerHandler} from '../utils/listen';
 import {getFlags, replaceFlags} from '../utils/string';
 import {CircleFactory} from '../tools/circle';
 import {Circle} from '../math/circle';
+import {EllipseFactory} from '../tools/ellipse';
+import {Ellipse} from '../math/ellipse';
 import {RectangleFactory} from '../tools/rectangle';
 import {Rectangle} from '../math/rectangle';
 
@@ -169,6 +171,8 @@ export class Annotation {
     let fac;
     if (this.mathShape instanceof Circle) {
       fac = new CircleFactory();
+    } else if (this.mathShape instanceof Ellipse) {
+      fac = new EllipseFactory();
     } else if (this.mathShape instanceof Rectangle) {
       fac = new RectangleFactory();
     }

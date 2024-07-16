@@ -1,5 +1,6 @@
 import {Point2D} from '../math/point';
 import {Circle} from '../math/circle';
+import {Ellipse} from '../math/ellipse';
 import {Rectangle} from '../math/rectangle';
 
 // doc imports
@@ -120,7 +121,7 @@ export function getDicomSpatialCoordinateItem(scoord) {
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
  *
- * @param {Circle|Rectangle} shape The math shape.
+ * @param {Circle|Ellipse|Rectangle} shape The math shape.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
 export function getScoordFromShape(shape) {
@@ -138,6 +139,21 @@ export function getScoordFromShape(shape) {
       pointPerimeter.getY().toString(),
     ];
     scoord.graphicType = GraphicTypes.circle;
+  } else if (shape instanceof Ellipse) {
+    const center = shape.getCenter();
+    const radiusX = shape.getA();
+    const radiusY = shape.getB();
+    scoord.graphicData = [
+      (center.getX() - radiusX).toString(),
+      center.getY().toString(),
+      (center.getX() + radiusX).toString(),
+      center.getY().toString(),
+      center.getX().toString(),
+      (center.getY() - radiusY).toString(),
+      center.getX().toString(),
+      (center.getY() + radiusY).toString()
+    ];
+    scoord.graphicType = GraphicTypes.ellipse;
   } else if (shape instanceof Rectangle) {
     const begin = shape.getBegin();
     const end = shape.getEnd();
@@ -161,7 +177,7 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Circle|Rectangle} The math shape.
+ * @returns {Circle|Ellipse|Rectangle} The math shape.
  */
 export function getShapeFromScoord(scoord) {
   // extract points
@@ -187,6 +203,18 @@ export function getShapeFromScoord(scoord) {
     const pointPerimeter = points[1];
     const radius = pointPerimeter.getDistance(center);
     shape = new Circle(center, radius);
+  } else if (scoord.graphicType === GraphicTypes.ellipse) {
+    if (points.length !== 4) {
+      throw new Error('Expecting 4 points for ellipses');
+    }
+    // TODO: make more generic
+    const radiusX = points[0].getDistance(points[1]) / 2;
+    const radiusY = points[2].getDistance(points[3]) / 2;
+    const center = new Point2D(
+      points[0].getX() + radiusX,
+      points[0].getY()
+    );
+    shape = new Ellipse(center, radiusX, radiusY);
   } else if (scoord.graphicType === GraphicTypes.polyline) {
     if (points.length !== 4) {
       throw new Error('Expecting 4 points for rectangles');
