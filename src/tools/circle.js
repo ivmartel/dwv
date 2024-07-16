@@ -407,7 +407,8 @@ export class CircleFactory {
   }
 
   /**
-   * Update shape on anchor move.
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
@@ -493,9 +494,9 @@ export class CircleFactory {
   /**
    * Get the debug shadow.
    *
-   * @param {Annotation} annotation The circle to shadow.
+   * @param {Annotation} annotation The annotation to shadow.
    * @param {Konva.Group} [group] The associated group.
-   * @returns {Konva.Group} The shadow konva group.
+   * @returns {Konva.Group|undefined} The shadow konva group.
    */
   #getDebugShadow(annotation, group) {
     const circle = annotation.mathShape;
@@ -531,6 +532,12 @@ export class CircleFactory {
     return kshadow;
   }
 
+  /**
+   * Update the debug shadow.
+   *
+   * @param {Konva.Group} group The associated group.
+   * @param {Annotation} annotation The annotation to shadow.
+   */
   #updateDebugShadow(group, annotation) {
     const kshadow = group.getChildren(function (node) {
       return node.name() === 'shadow';

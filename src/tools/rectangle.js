@@ -176,16 +176,16 @@ export class RectangleFactory {
       return node.id() === 'bottomRight';
     })[0];
 
-    const p2d0 = new Point2D(
-      group.x() + topLeft.x(),
-      group.y() + topLeft.y()
+    const pointTopLeft = new Point2D(
+      topLeft.x(),
+      topLeft.y()
     );
-    const p2d1 = new Point2D(
-      group.x() + bottomRight.x(),
-      group.y() + bottomRight.y()
+    const pointBottomRight = new Point2D(
+      bottomRight.x(),
+      bottomRight.y()
     );
     // new rect
-    annotation.mathShape = new Rectangle(p2d0, p2d1);
+    annotation.mathShape = new Rectangle(pointTopLeft, pointBottomRight);
     // label position
     // TODO...
     // quantification
@@ -403,7 +403,7 @@ export class RectangleFactory {
     if (!(krect instanceof Konva.Rect)) {
       return;
     }
-    // update shape: just update the radius
+    // update shape
     krect.position({
       x: begin.getX(),
       y: begin.getY()
@@ -492,6 +492,12 @@ export class RectangleFactory {
     });
   }
 
+  /**
+   * Update the debug shadow.
+   *
+   * @param {Konva.Group} group The associated group.
+   * @param {Annotation} annotation The annotation to shadow.
+   */
   #updateDebugShadow(group, annotation) {
     const kshadow = group.getChildren(function (node) {
       return node.name() === 'shadow';

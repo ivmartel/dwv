@@ -310,7 +310,6 @@ export class EllipseFactory {
     klabel.visible(text.length !== 0);
   }
 
-
   /**
    * Calculates the mathematical shape: an ellipse.
    *
@@ -455,14 +454,10 @@ export class EllipseFactory {
     if (!(kellipse instanceof Konva.Ellipse)) {
       return;
     }
-    // update shape
+    // update shape: just update radius
     kellipse.radius({
       x: radiusX,
       y: radiusY
-    });
-    kellipse.position({
-      x: center.getX(),
-      y: center.getY()
     });
 
     // find anchors
@@ -525,9 +520,9 @@ export class EllipseFactory {
   /**
    * Get the debug shadow.
    *
-   * @param {Annotation} annotation The circle to shadow.
+   * @param {Annotation} annotation The annotation to shadow.
    * @param {Konva.Group} [group] The associated group.
-   * @returns {Konva.Group} The shadow konva group.
+   * @returns {Konva.Group|undefined} The shadow konva group.
    */
   #getDebugShadow(annotation, group) {
     const ellipse = annotation.mathShape;
@@ -563,6 +558,12 @@ export class EllipseFactory {
     return kshadow;
   }
 
+  /**
+   * Update the debug shadow.
+   *
+   * @param {Konva.Group} group The associated group.
+   * @param {Annotation} annotation The annotation to shadow.
+   */
   #updateDebugShadow(group, annotation) {
     const kshadow = group.getChildren(function (node) {
       return node.name() === 'shadow';
