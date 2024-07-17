@@ -172,7 +172,7 @@ export class Draw {
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);
-    this.#shapeHandler = new DrawShapeHandler(app);
+    this.#shapeHandler = new DrawShapeHandler(app, this.#fireEvent);
 
     this.#style = app.getStyle();
   }
@@ -615,7 +615,7 @@ export class Draw {
    */
   #onFinalPoints(finalPoints, layerGroup) {
     // remove temporary shape draw
-    // (has to be done before sending drawcreate event)
+    // (has to be done before sending add event)
     if (this.#tmpShapeGroup) {
       this.#tmpShapeGroup.destroy();
       this.#tmpShapeGroup = null;
@@ -830,7 +830,7 @@ export class Draw {
    */
   getEventNames() {
     return [
-      'drawcreate', 'drawchange', 'drawmove', 'drawdelete'
+      'annotationupdate'
     ];
   }
 
@@ -873,14 +873,14 @@ export class Draw {
    *
    * @param {object} event The event to fire.
    */
-  // #fireEvent = (event) => {
-  //   if (typeof this.#listeners[event.type] === 'undefined') {
-  //     return;
-  //   }
-  //   for (let i = 0; i < this.#listeners[event.type].length; ++i) {
-  //     this.#listeners[event.type][i](event);
-  //   }
-  // };
+  #fireEvent = (event) => {
+    if (typeof this.#listeners[event.type] === 'undefined') {
+      return;
+    }
+    for (let i = 0; i < this.#listeners[event.type].length; ++i) {
+      this.#listeners[event.type][i](event);
+    }
+  };
 
   /**
    * Check if the shape is in the shape list.

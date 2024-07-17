@@ -20,7 +20,6 @@ import Konva from 'konva';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
-import {LayerGroup} from '../gui/layerGroup';
 import {Scalar2D} from '../math/scalar';
 import {DrawLayer} from '../gui/drawLayer';
 import {Annotation} from '../image/annotation';
@@ -75,16 +74,25 @@ export class DrawShapeHandler {
   #mouseOverShapeGroup;
 
   /**
+   * Event callback.
+   *
+   * @type {Function}
+   */
+  #eventCallback;
+
+  /**
    * @callback eventFn
    * @param {object} event The event.
    */
 
   /**
    * @param {App} app The associated application.
+   * @param {Function} eventCallback Event callback.
    */
-  constructor(app) {
+  constructor(app, eventCallback) {
     this.#app = app;
-    this.#shapeEditor = new DrawShapeEditor(app);
+    this.#eventCallback = eventCallback;
+    this.#shapeEditor = new DrawShapeEditor(app, eventCallback);
     this.#trash = new DrawTrash();
   }
 
@@ -389,7 +397,13 @@ export class DrawShapeHandler {
             {mathShape: newMathShape},
             drawLayer.getDrawController()
           );
+          // add command to undo stack
           this.#app.addToUndoStack(command);
+          // fire event manually since command is not executed
+          this.#eventCallback({
+            type: 'annotationupdate',
+            data: annotation
+          });
           // update original shape
           originaMathShape = newMathShape;
         }
@@ -436,7 +450,13 @@ export class DrawShapeHandler {
           {labelPosition: newLabelPosition},
           drawLayer.getDrawController()
         );
+        // add command to undo stack
         this.#app.addToUndoStack(command);
+        // fire event manually since command is not executed
+        this.#eventCallback({
+          type: 'annotationupdate',
+          data: annotation
+        });
         // update original position
         originalLabelPosition = newLabelPosition;
       }
