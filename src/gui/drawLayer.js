@@ -121,7 +121,7 @@ export class DrawLayer {
   /**
    * The draw controller.
    *
-   * @type {object}
+   * @type {DrawController}
    */
   #drawController;
 

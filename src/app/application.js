@@ -1649,7 +1649,7 @@ export class App {
   /**
    * Bind layer group events to app.
    *
-   * @param {object} group The layer group.
+   * @param {LayerGroup} group The layer group.
    */
   #bindLayerGroupToApp(group) {
     // propagate layer group events
