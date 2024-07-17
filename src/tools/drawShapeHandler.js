@@ -268,7 +268,7 @@ export class DrawShapeHandler {
     // cache vars
     let dragStartPos;
     let previousPos;
-    let originaMathShape;
+    let originalProps;
     let colour;
 
     // shape listeners ------------------------------------------
@@ -286,8 +286,11 @@ export class DrawShapeHandler {
         x: event.target.x(),
         y: event.target.y()
       };
-      // store the original math shape
-      originaMathShape = annotation.mathShape;
+      // store original properties
+      originalProps = {
+        mathShape: annotation.mathShape,
+        referencePoints: annotation.referencePoints
+      };
 
       // display trash
       this.#trash.activate(drawLayer);
@@ -369,7 +372,8 @@ export class DrawShapeHandler {
         this.#shapeEditor.reset();
         this.#trash.changeGroupChildrenColour(shapeGroup, colour);
         // reset math shape (for undo)
-        annotation.mathShape = originaMathShape;
+        annotation.mathShape = originalProps.mathShape;
+        annotation.referencePoints = originalProps.referencePoints;
 
         // create remove annotation command
         const command = new RemoveAnnotationCommand(
@@ -390,11 +394,14 @@ export class DrawShapeHandler {
         };
         if (translation.x !== 0 || translation.y !== 0) {
           // update annotation command
-          const newMathShape = annotation.mathShape;
+          const newProps = {
+            mathShape: annotation.mathShape,
+            referencePoints: annotation.referencePoints
+          };
           const command = new UpdateAnnotationCommand(
             annotation,
-            {mathShape: originaMathShape},
-            {mathShape: newMathShape},
+            originalProps,
+            newProps,
             drawLayer.getDrawController()
           );
           // add command to undo stack
@@ -405,7 +412,10 @@ export class DrawShapeHandler {
             data: annotation
           });
           // update original shape
-          originaMathShape = newMathShape;
+          originalProps = {
+            mathShape: newProps.mathShape,
+            referencePoints: newProps.referencePoints
+          };
         }
         // reset anchors
         this.#shapeEditor.setAnchorsActive(true);

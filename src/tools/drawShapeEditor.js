@@ -287,14 +287,17 @@ export class DrawShapeEditor {
    * @param {Konva.Ellipse} anchor The anchor to set on.
    */
   #setAnchorOn(anchor) {
-    let originaMathShape;
+    let originalProps;
 
     // drag start listener
     anchor.on('dragstart.edit', (event) => {
       // prevent bubbling upwards
       event.cancelBubble = true;
-      // store original math shape
-      originaMathShape = this.#annotation.mathShape;
+      // store original properties
+      originalProps = {
+        mathShape: this.#annotation.mathShape,
+        referencePoints: this.#annotation.referencePoints
+      };
     });
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
@@ -327,11 +330,14 @@ export class DrawShapeEditor {
     // drag end listener
     anchor.on('dragend.edit', (event) => {
       // update annotation command
-      const newMathShape = this.#annotation.mathShape;
+      const newProps = {
+        mathShape: this.#annotation.mathShape,
+        referencePoints: this.#annotation.referencePoints
+      };
       const command = new UpdateAnnotationCommand(
         this.#annotation,
-        {mathShape: originaMathShape},
-        {mathShape: newMathShape},
+        originalProps,
+        newProps,
         this.#drawLayer.getDrawController()
       );
       // add command to undo stack
@@ -341,8 +347,11 @@ export class DrawShapeEditor {
         type: 'annotationupdate',
         data: this.#annotation
       });
-      // update original shape
-      originaMathShape = newMathShape;
+      // update original properties
+      originalProps = {
+        mathShape: newProps.mathShape,
+        referencePoints: newProps.referencePoints
+      }
 
       // prevent bubbling upwards
       event.cancelBubble = true;
