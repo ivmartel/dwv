@@ -351,7 +351,7 @@ export class DrawShapeEditor {
       originalProps = {
         mathShape: newProps.mathShape,
         referencePoints: newProps.referencePoints
-      }
+      };
 
       // prevent bubbling upwards
       event.cancelBubble = true;
