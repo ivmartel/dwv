@@ -183,6 +183,25 @@ export class Annotation {
 
     return fac;
   }
+
+  /**
+   * Get the string type of this annotation.
+   *
+   * @returns {string} The type.
+   */
+  getType() {
+    let res;
+    if (this.mathShape instanceof Line) {
+      res = 'ruler';
+    } else if (this.mathShape instanceof Circle) {
+      res = 'circle';
+    } else if (this.mathShape instanceof Ellipse) {
+      res = 'ellipse';
+    } else if (this.mathShape instanceof Rectangle) {
+      res = 'rectangle';
+    }
+    return res;
+  }
 }
 
 /**
