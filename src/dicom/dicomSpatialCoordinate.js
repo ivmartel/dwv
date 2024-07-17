@@ -122,13 +122,19 @@ export function getDicomSpatialCoordinateItem(scoord) {
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
  *
- * @param {Line|Circle|Ellipse|Rectangle} shape The math shape.
+ * @param {Point2D|Line|Circle|Ellipse|Rectangle} shape The math shape.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
 export function getScoordFromShape(shape) {
   const scoord = new SpatialCoordinate();
 
-  if (shape instanceof Line) {
+  if (shape instanceof Point2D) {
+    scoord.graphicData = [
+      shape.getX().toString(),
+      shape.getY().toString(),
+    ];
+    scoord.graphicType = GraphicTypes.point;
+  } else if (shape instanceof Line) {
     scoord.graphicData = [
       shape.getBegin().getX().toString(),
       shape.getBegin().getY().toString(),
@@ -186,7 +192,7 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Line|Circle|Ellipse|Rectangle} The math shape.
+ * @returns {Point2D|Line|Circle|Ellipse|Rectangle} The math shape.
  */
 export function getShapeFromScoord(scoord) {
   // extract points
@@ -204,7 +210,12 @@ export function getShapeFromScoord(scoord) {
 
   // create math shape
   let shape;
-  if (scoord.graphicType === GraphicTypes.circle) {
+  if (scoord.graphicType === GraphicTypes.point) {
+    if (points.length !== 1) {
+      throw new Error('Expecting 1 point for point');
+    }
+    shape = points[0];
+  } else if (scoord.graphicType === GraphicTypes.circle) {
     if (points.length !== 2) {
       throw new Error('Expecting 2 points for circles');
     }

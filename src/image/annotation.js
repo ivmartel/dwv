@@ -8,11 +8,12 @@ import {RectangleFactory} from '../tools/rectangle';
 import {Rectangle} from '../math/rectangle';
 import {RulerFactory} from '../tools/ruler';
 import {Line} from '../math/line';
+import {ArrowFactory} from '../tools/arrow';
+import {Point2D} from '../math/point';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Index} from '../math/index';
-import {Point2D} from '../math/point';
 import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
@@ -163,9 +164,11 @@ export class Annotation {
    */
   updateQuantification() {
     if (typeof this.#viewController !== 'undefined') {
-      this.quantification = this.mathShape.quantify(
-        this.#viewController,
-        getFlags(this.textExpr));
+      if (typeof this.mathShape.quantify !== 'undefined') {
+        this.quantification = this.mathShape.quantify(
+          this.#viewController,
+          getFlags(this.textExpr));
+      }
     } else {
       console.log('Cannot update quantification without a view controller');
     }
@@ -178,7 +181,9 @@ export class Annotation {
    */
   getFactory() {
     let fac;
-    if (this.mathShape instanceof Line) {
+    if (this.mathShape instanceof Point2D) {
+      fac = new ArrowFactory();
+    } else if (this.mathShape instanceof Line) {
       fac = new RulerFactory();
     } else if (this.mathShape instanceof Circle) {
       fac = new CircleFactory();
@@ -198,7 +203,9 @@ export class Annotation {
    */
   getType() {
     let res;
-    if (this.mathShape instanceof Line) {
+    if (this.mathShape instanceof Point2D) {
+      res = 'arrow';
+    } else if (this.mathShape instanceof Line) {
       res = 'ruler';
     } else if (this.mathShape instanceof Circle) {
       res = 'circle';
