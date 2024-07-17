@@ -166,6 +166,14 @@ export class DataController {
       data.image.addEventListener(
         'imagegeometrychange', this.#getFireEvent(dataId));
     }
+    if (typeof data.annotationGroup !== 'undefined') {
+      data.annotationGroup.addEventListener(
+        'annotationadd', this.#getFireEvent(dataId));
+      data.annotationGroup.addEventListener(
+        'annotationupdate', this.#getFireEvent(dataId));
+      data.annotationGroup.addEventListener(
+        'annotationremove', this.#getFireEvent(dataId));
+    }
   }
 
   /**
@@ -182,6 +190,15 @@ export class DataController {
           'imagecontentchange', this.#getFireEvent(dataId));
         image.removeEventListener(
           'imagegeometrychange', this.#getFireEvent(dataId));
+      }
+      const annotationGroup = this.#dataList[dataId].annotationGroup;
+      if (typeof annotationGroup !== 'undefined') {
+        annotationGroup.removeEventListener(
+          'annotationadd', this.#getFireEvent(dataId));
+        annotationGroup.removeEventListener(
+          'annotationupdate', this.#getFireEvent(dataId));
+        annotationGroup.removeEventListener(
+          'annotationremove', this.#getFireEvent(dataId));
       }
       // remove data from list
       delete this.#dataList[dataId];

@@ -615,50 +615,17 @@ export class App {
     this.#dataController.addEventListener('dataimageset', this.#fireEvent);
     this.#dataController.addEventListener('dataupdate', this.#fireEvent);
     // propage individual data events
-    this.#dataController.addEventListener('dataadd', (event) => {
-      this.#bindDataEvents(event.dataid);
-    });
-    this.#dataController.addEventListener('dataremove', (event) => {
-      this.#unbindDataEvents(event.dataid);
-    });
+    this.#dataController.addEventListener(
+      'imagecontentchange', this.#fireEvent);
+    this.#dataController.addEventListener(
+      'imagegeometrychange', this.#fireEvent);
+    this.#dataController.addEventListener('annotationadd', this.#fireEvent);
+    this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
+    this.#dataController.addEventListener('annotationremove', this.#fireEvent);
     // create stage
     this.#stage = new Stage();
     if (typeof this.#options.binders !== 'undefined') {
       this.#stage.setBinders(this.#options.binders);
-    }
-  }
-
-  /**
-   * Propagate data events.
-   *
-   * @param {string} dataId The data to bind.
-   */
-  #bindDataEvents(dataId) {
-    const data = this.getData(dataId);
-    if (typeof data.annotationGroup !== 'undefined') {
-      data.annotationGroup.addEventListener(
-        'annotationadd', this.#fireEvent);
-      data.annotationGroup.addEventListener(
-        'annotationupdate', this.#fireEvent);
-      data.annotationGroup.addEventListener(
-        'annotationremove', this.#fireEvent);
-    }
-  }
-
-  /**
-   * Stop propagating data events.
-   *
-   * @param {string} dataId The data to unbind.
-   */
-  #unbindDataEvents(dataId) {
-    const data = this.getData(dataId);
-    if (typeof data.annotationGroup !== 'undefined') {
-      data.annotationGroup.removeEventListener(
-        'annotationadd', this.#fireEvent);
-      data.annotationGroup.removeEventListener(
-        'annotationupdate', this.#fireEvent);
-      data.annotationGroup.removeEventListener(
-        'annotationremove', this.#fireEvent);
     }
   }
 
