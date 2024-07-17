@@ -1,3 +1,4 @@
+import {logger} from '../utils/logger';
 import {ListenerHandler} from '../utils/listen';
 import {getFlags, replaceFlags} from '../utils/string';
 import {CircleFactory} from '../tools/circle';
@@ -111,7 +112,7 @@ export class Annotation {
         this.referenceSopUID = viewController.getCurrentImageUid();
       }
     } else {
-      console.log('Cannot override previous view controller');
+      logger.warn('Cannot override previous view controller');
     }
   }
 
@@ -145,7 +146,7 @@ export class Annotation {
         this.textExpr = labelText['*'];
       }
     } else {
-      console.log('Cannot set text expr without a view controller');
+      logger.warn('Cannot set text expr without a view controller');
     }
   }
 
@@ -170,7 +171,7 @@ export class Annotation {
           getFlags(this.textExpr));
       }
     } else {
-      console.log('Cannot update quantification without a view controller');
+      logger.warn('Cannot update quantification without a view controller');
     }
   }
 
@@ -298,7 +299,7 @@ export class AnnotationGroup {
         data: annotation
       });
     } else {
-      console.log('Cannot find annotation to update');
+      logger.warn('Cannot find annotation to update');
     }
   }
 
@@ -316,7 +317,7 @@ export class AnnotationGroup {
         data: annotation
       });
     } else {
-      console.log('Cannot find annotation to remove');
+      logger.warn('Cannot find annotation to remove');
     }
   }
 
