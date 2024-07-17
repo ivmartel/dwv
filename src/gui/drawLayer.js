@@ -501,7 +501,7 @@ export class DrawLayer {
     // local listeners
     annotationGroup.addEventListener('addannotation', (event) => {
       // draw annotation
-      this.#addAnnnotationDraw(event.data, true);
+      this.#addAnnotationDraw(event.data, true);
       this.getKonvaLayer().draw();
     });
     annotationGroup.addEventListener('updateannotation', (event) => {
@@ -522,8 +522,8 @@ export class DrawLayer {
     // -> no need to add them, just draw and save command
     if (annotationGroup.getLength() !== 0) {
       for (const annotation of annotationGroup.getList()) {
-        // draw annnotation
-        this.#addAnnnotationDraw(annotation, false);
+        // draw annotation
+        this.#addAnnotationDraw(annotation, false);
         // create the draw command
         const command = new AddAnnotationCommand(
           annotation, this.getDrawController());
@@ -583,7 +583,7 @@ export class DrawLayer {
    * @param {Annotation} annotation The annotation to draw.
    * @param {boolean} visible The position group visibility.
    */
-  #addAnnnotationDraw(annotation, visible) {
+  #addAnnotationDraw(annotation, visible) {
     const posGroupId = this.#getPosGroupId(annotation);
     // Get or create position-group if it does not exist and
     // append it to konvaLayer
@@ -643,7 +643,7 @@ export class DrawLayer {
     annotation.updateQuantification();
     // update draw
     this.#removeAnnotationDraw(annotation);
-    this.#addAnnnotationDraw(annotation, true);
+    this.#addAnnotationDraw(annotation, true);
   }
 
   /**

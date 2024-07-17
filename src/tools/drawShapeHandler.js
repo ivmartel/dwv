@@ -233,7 +233,7 @@ export class DrawShapeHandler {
    *
    * @param {DrawLayer} drawLayer The origin draw layer.
    * @param {Konva.Group} shapeGroup The shape group to set on.
-   * @param {Annotation} annotation The associated annnotation.
+   * @param {Annotation} annotation The associated annotation.
    */
   addShapeListeners(drawLayer, shapeGroup, annotation) {
     // shape mouse over

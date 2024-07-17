@@ -142,7 +142,7 @@ export class UpdateAnnotationCommand {
   #drawController;
 
   /**
-   * Original annnotation properties.
+   * Original annotation properties.
    *
    * @type {object}
    */
