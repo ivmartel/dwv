@@ -12,6 +12,7 @@ import {
   DicomSRContent
 } from '../dicom/dicomSRContent';
 import {
+  getPathCode,
   getMeasurementGroupCode,
   getImageRegionCode,
   getSourceImageCode,
@@ -28,6 +29,7 @@ import {
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {Annotation, AnnotationGroup} from './annotation';
+import {Line} from '../math/line';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -218,7 +220,11 @@ export class AnnotationFactory {
 
       const srScoord = new DicomSRContent(ValueTypes.scoord);
       srScoord.relationshipType = RelationshipTypes.contains;
-      srScoord.conceptNameCode = getImageRegionCode();
+      if (annotation.mathShape instanceof Line) {
+        srScoord.conceptNameCode = getPathCode();
+      } else {
+        srScoord.conceptNameCode = getImageRegionCode();
+      }
       srScoord.value = getScoordFromShape(annotation.mathShape);
       srScoord.contentSequence = [srImage, srUid, shortLabel];
 

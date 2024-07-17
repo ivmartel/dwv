@@ -157,6 +157,7 @@ const DcmCodes = {
   112039: 'Tracking Identifier',
   112040: 'Tracking Unique Identifier',
   113076: 'Segmentation',
+  121055: 'Path',
   121322: 'Source image for image processing operation',
   121324: 'Source Image',
   125007: 'Measurement Group',
@@ -192,6 +193,15 @@ export function getMeasurementGroupCode() {
  */
 export function getImageRegionCode() {
   return getDicomCode('111030');
+}
+
+/**
+ * Get a path DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getPathCode() {
+  return getDicomCode('121055');
 }
 
 /**
