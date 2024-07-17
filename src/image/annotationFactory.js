@@ -138,16 +138,31 @@ export class AnnotationFactory {
 
     const annotationGroup = new AnnotationGroup(annotations);
 
+    const safeGet = function (key) {
+      let res;
+      const element = dataElements[key];
+      if (typeof element !== 'undefined') {
+        res = element.value[0];
+      }
+      return res;
+    };
+
+    // StudyInstanceUID
+    annotationGroup.setMetaValue('StudyInstanceUID', safeGet('0020000D'));
     // Modality
-    annotationGroup.setMeta(
-      'Modality', dataElements['00080060'].value[0]
-    );
+    annotationGroup.setMetaValue('Modality', safeGet('00080060'));
+    // patient info
+    annotationGroup.setMetaValue('PatientName', safeGet('00100010'));
+    annotationGroup.setMetaValue('PatientID', safeGet('00100020'));
+    annotationGroup.setMetaValue('PatientBirthDate', safeGet('00100030'));
+    annotationGroup.setMetaValue('PatientSex', safeGet('00100040'));
+
     // ReferencedSeriesSequence
     const element = dataElements['00081115'];
     if (typeof element !== 'undefined') {
       const seriesElement = element.value[0]['0020000E'];
       if (typeof seriesElement !== 'undefined') {
-        annotationGroup.setMeta(
+        annotationGroup.setMetaValue(
           'ReferencedSeriesSequence', {
             value: [{
               SeriesInstanceUID: seriesElement.value[0]
@@ -156,10 +171,6 @@ export class AnnotationFactory {
         );
       }
     }
-    // StudyInstanceUID
-    annotationGroup.setMeta(
-      'StudyInstanceUID', dataElements['0020000D'].value[0]
-    );
 
     return annotationGroup;
   }
@@ -172,22 +183,13 @@ export class AnnotationFactory {
    * @returns {Object<string, DataElement>} A list of dicom elements.
    */
   toDicom(annotationGroup, extraTags) {
-    let tags = {};
+    let tags = annotationGroup.getMeta();
+
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     // class: Basic Text SR Storage
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11';
-    tags.SOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.11.0';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11';
-    tags.MediaStorageSOPInstanceUID = '1.2.840.10008.5.1.4.1.1.88.11.0';
-
-    tags.Modality = annotationGroup.getMeta('Modality');
-    tags.StudyInstanceUID = annotationGroup.getMeta('StudyInstanceUID');
-    tags.ReferencedSeriesSequence =
-      annotationGroup.getMeta('ReferencedSeriesSequence');
-
-    tags.SeriesInstanceUID = '1.2.3.4.5.6';
-
     tags.CompletionFlag = 'PARTIAL';
     tags.VerificationFlag = 'UNVERIFIED';
 
@@ -243,7 +245,7 @@ export class AnnotationFactory {
     }
 
     // merge extra tags if provided
-    if (extraTags !== undefined) {
+    if (typeof extraTags !== 'undefined') {
       mergeTags(tags, extraTags);
     }
 
