@@ -190,16 +190,19 @@ export class Draw {
     if (typeof drawLayer === 'undefined') {
       // create new data
       const viewLayer = layerGroup.getActiveViewLayer();
-      const viewController = viewLayer.getViewController();
+      const refData = this.#app.getData(viewLayer.getDataId());
+      const refMeta = refData.image.getMeta();
       const data = new DicomData({});
       data.annotationGroup = new AnnotationGroup();
       data.annotationGroup.setMetaValue('Modality', 'SR');
       data.annotationGroup.setMetaValue(
-        'StudyInstanceUID', viewController.getStudyInstanceUID());
+        'PatientID', refMeta.PatientID);
+      data.annotationGroup.setMetaValue(
+        'StudyInstanceUID', refMeta.StudyInstanceUID);
       data.annotationGroup.setMetaValue(
         'ReferencedSeriesSequence', {
           value: [{
-            SeriesInstanceUID: viewController.getSeriesInstanceUID()
+            SeriesInstanceUID: refMeta.SeriesInstanceUID
           }]
         });
       const dataId = this.#app.addData(data);
@@ -634,11 +637,6 @@ export class Draw {
     annotation.setViewController(viewController);
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
-
-    if (!drawController.hasAnnotationMeta('StudyInstanceUID')) {
-      drawController.setAnnotationMeta(
-        'StudyInstanceUID', viewController.getStudyInstanceUID());
-    }
 
     // create add annotation command
     const command = new AddAnnotationCommand(annotation, drawController);
