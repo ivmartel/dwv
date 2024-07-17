@@ -246,7 +246,7 @@ export class AnnotationGroup {
   add(annotation) {
     this.#list.push(annotation);
     this.#fireEvent({
-      type: 'addannotation',
+      type: 'annotationadd',
       data: annotation
     });
   }
@@ -261,7 +261,7 @@ export class AnnotationGroup {
     if (index !== -1) {
       this.#list[index] = annotation;
       this.#fireEvent({
-        type: 'updateannotation',
+        type: 'annotationupdate',
         data: annotation
       });
     } else {
@@ -279,7 +279,7 @@ export class AnnotationGroup {
     if (index !== -1) {
       const annotation = this.#list.splice(index, 1)[0];
       this.#fireEvent({
-        type: 'removeannotation',
+        type: 'annotationremove',
         data: annotation
       });
     } else {

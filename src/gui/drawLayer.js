@@ -499,17 +499,17 @@ export class DrawLayer {
   setAnnotationGroup(annotationGroup, dataId, exeCallback) {
     this.#dataId = dataId;
     // local listeners
-    annotationGroup.addEventListener('addannotation', (event) => {
+    annotationGroup.addEventListener('annotationadd', (event) => {
       // draw annotation
       this.#addAnnotationDraw(event.data, true);
       this.getKonvaLayer().draw();
     });
-    annotationGroup.addEventListener('updateannotation', (event) => {
+    annotationGroup.addEventListener('annotationupdate', (event) => {
       // update annotation draw
       this.#updateAnnotationDraw(event.data);
       this.getKonvaLayer().draw();
     });
-    annotationGroup.addEventListener('removeannotation', (event) => {
+    annotationGroup.addEventListener('annotationremove', (event) => {
       // remove annotation draw
       this.#removeAnnotationDraw(event.data);
       this.getKonvaLayer().draw();
