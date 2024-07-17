@@ -1923,7 +1923,8 @@ export class App {
       throw new Error('Cannot initialise layer with missing data, id: ' +
         dataId);
     }
-    const studyInstanceUID = data.annotationGroup.getMeta('StudyInstanceUID');
+    const studyInstanceUID =
+      data.annotationGroup.getMetaValue('StudyInstanceUID');
     const viewLayers = layerGroup.searchViewLayers({
       StudyInstanceUID: studyInstanceUID
     });

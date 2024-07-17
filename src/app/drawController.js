@@ -119,7 +119,7 @@ export class DrawController {
    * @param {string} value The value of the meta data.
    */
   setAnnotationMeta(key, value) {
-    this.#annotationGroup.setMeta(key, value);
+    this.#annotationGroup.setMetaValue(key, value);
   }
 
   /**

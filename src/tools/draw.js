@@ -193,10 +193,10 @@ export class Draw {
       const viewController = viewLayer.getViewController();
       const data = new DicomData({});
       data.annotationGroup = new AnnotationGroup();
-      data.annotationGroup.setMeta('Modality', 'SR');
-      data.annotationGroup.setMeta(
+      data.annotationGroup.setMetaValue('Modality', 'SR');
+      data.annotationGroup.setMetaValue(
         'StudyInstanceUID', viewController.getStudyInstanceUID());
-      data.annotationGroup.setMeta(
+      data.annotationGroup.setMetaValue(
         'ReferencedSeriesSequence', {
           value: [{
             SeriesInstanceUID: viewController.getSeriesInstanceUID()

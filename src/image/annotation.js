@@ -216,7 +216,7 @@ export class AnnotationGroup {
   /**
    * Annotation meta data.
    *
-   * @type {Object<string, string>}
+   * @type {Object<string, any>}
    */
   #meta = {};
 
@@ -329,6 +329,15 @@ export class AnnotationGroup {
   }
 
   /**
+   * Get the meta data.
+   *
+   * @returns {Object<string, any>} The meta data.
+   */
+  getMeta() {
+    return this.#meta;
+  }
+
+  /**
    * Check if this list contains a meta data value.
    *
    * @param {string} key The key to check.
@@ -344,7 +353,7 @@ export class AnnotationGroup {
    * @param {string} key The meta data key.
    * @returns {object} The meta data value.
    */
-  getMeta(key) {
+  getMetaValue(key) {
     return this.#meta[key];
   }
 
@@ -354,7 +363,7 @@ export class AnnotationGroup {
    * @param {string} key The meta data key.
    * @param {object} value The value of the meta data.
    */
-  setMeta(key, value) {
+  setMetaValue(key, value) {
     this.#meta[key] = value;
   }
 
