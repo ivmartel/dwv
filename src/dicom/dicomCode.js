@@ -160,6 +160,7 @@ const DcmCodes = {
   121055: 'Path',
   121322: 'Source image for image processing operation',
   121324: 'Source Image',
+  122438: 'Reference Points',
   125007: 'Measurement Group',
   125309: 'Short label'
 };
@@ -247,4 +248,13 @@ export function getSourceImageForProcessingCode() {
  */
 export function getShortLabelCode() {
   return getDicomCode('125309');
+}
+
+/**
+ * Get a reference points DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getReferencePointsCode() {
+  return getDicomCode('122438');
 }

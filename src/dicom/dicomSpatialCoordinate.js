@@ -22,7 +22,7 @@ const TagKeys = {
 /**
  * DICOM graphic types.
  */
-const GraphicTypes = {
+export const GraphicTypes = {
   point: 'POINT',
   multipoint: 'MULTIPOINT',
   polyline: 'POLYLINE',

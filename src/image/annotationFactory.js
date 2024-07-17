@@ -12,29 +12,33 @@ import {
   DicomSRContent
 } from '../dicom/dicomSRContent';
 import {
+  isEqualCode,
   getPathCode,
   getMeasurementGroupCode,
   getImageRegionCode,
   getSourceImageCode,
   getTrackingIdentifierCode,
-  getShortLabelCode
+  getShortLabelCode,
+  getReferencePointsCode
 } from '../dicom/dicomCode';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {ImageReference} from '../dicom/dicomImageReference';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference';
 import {
+  GraphicTypes,
   getScoordFromShape,
-  getShapeFromScoord
+  getShapeFromScoord,
+  SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate';
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {Annotation, AnnotationGroup} from './annotation';
 import {Line} from '../math/line';
+import {Point2D} from '../math/point';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from '../dicom/dataElement';
-import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -118,17 +122,33 @@ export class AnnotationFactory {
 
         for (const subItem of item.contentSequence) {
           if (subItem.valueType === ValueTypes.image &&
-            subItem.relationshipType === RelationshipTypes.selectedFrom) {
+            subItem.relationshipType === RelationshipTypes.selectedFrom &&
+            isEqualCode(subItem.conceptNameCode, getSourceImageCode())) {
             annotation.referenceSopUID =
               subItem.value.referencedSOPSequence.referencedSOPInstanceUID;
           }
           if (subItem.valueType === ValueTypes.uidref &&
-            subItem.relationshipType === RelationshipTypes.hasProperties) {
+            subItem.relationshipType === RelationshipTypes.hasProperties &&
+            isEqualCode(subItem.conceptNameCode, getTrackingIdentifierCode())) {
             annotation.id = subItem.value;
           }
           if (subItem.valueType === ValueTypes.text &&
-            subItem.relationshipType === RelationshipTypes.hasProperties) {
+            subItem.relationshipType === RelationshipTypes.hasProperties &&
+            isEqualCode(subItem.conceptNameCode, getShortLabelCode())) {
             annotation.textExpr = subItem.value;
+          }
+          if (subItem.valueType === ValueTypes.scoord &&
+            subItem.relationshipType === RelationshipTypes.hasProperties &&
+            isEqualCode(subItem.conceptNameCode, getReferencePointsCode()) &&
+            subItem.value.graphicType === GraphicTypes.multipoint) {
+            const points = [];
+            for (let i = 0; i < subItem.value.graphicData.length; i += 2) {
+              points.push(new Point2D(
+                subItem.value.graphicData[i],
+                subItem.value.graphicData[i + 1]
+              ));
+            }
+            annotation.referencePoints = points;
           }
         }
 
@@ -200,6 +220,17 @@ export class AnnotationFactory {
     const contentSequence = [];
 
     for (const annotation of annotationGroup.getList()) {
+      const srScoord = new DicomSRContent(ValueTypes.scoord);
+      srScoord.relationshipType = RelationshipTypes.contains;
+      if (annotation.mathShape instanceof Line) {
+        srScoord.conceptNameCode = getPathCode();
+      } else {
+        srScoord.conceptNameCode = getImageRegionCode();
+      }
+      srScoord.value = getScoordFromShape(annotation.mathShape);
+
+      const itemContentSequence = [];
+
       const srImage = new DicomSRContent(ValueTypes.image);
       srImage.relationshipType = RelationshipTypes.selectedFrom;
       srImage.conceptNameCode = getSourceImageCode();
@@ -209,27 +240,38 @@ export class AnnotationFactory {
       const imageRef = new ImageReference();
       imageRef.referencedSOPSequence = sopRef;
       srImage.value = imageRef;
+      itemContentSequence.push(srImage);
 
       const srUid = new DicomSRContent(ValueTypes.uidref);
       srUid.relationshipType = RelationshipTypes.hasProperties;
       srUid.conceptNameCode = getTrackingIdentifierCode();
       srUid.value = annotation.id;
+      itemContentSequence.push(srUid);
 
       const shortLabel = new DicomSRContent(ValueTypes.text);
       shortLabel.relationshipType = RelationshipTypes.hasProperties;
       shortLabel.conceptNameCode = getShortLabelCode();
       shortLabel.value = annotation.textExpr;
+      itemContentSequence.push(shortLabel);
 
-      const srScoord = new DicomSRContent(ValueTypes.scoord);
-      srScoord.relationshipType = RelationshipTypes.contains;
-      if (annotation.mathShape instanceof Line) {
-        srScoord.conceptNameCode = getPathCode();
-      } else {
-        srScoord.conceptNameCode = getImageRegionCode();
+      if (typeof annotation.referencePoints !== 'undefined') {
+        const referencePoints = new DicomSRContent(ValueTypes.scoord);
+        referencePoints.relationshipType = RelationshipTypes.hasProperties;
+        referencePoints.conceptNameCode = getReferencePointsCode();
+        const refPointsScoord = new SpatialCoordinate();
+        refPointsScoord.graphicType = GraphicTypes.multipoint;
+        const graphicData = [];
+        for (const point of annotation.referencePoints) {
+          graphicData.push(point.getX().toString());
+          graphicData.push(point.getY().toString());
+        }
+        refPointsScoord.graphicData = graphicData;
+
+        referencePoints.value = refPointsScoord;
+        itemContentSequence.push(referencePoints);
       }
-      srScoord.value = getScoordFromShape(annotation.mathShape);
-      srScoord.contentSequence = [srImage, srUid, shortLabel];
 
+      srScoord.contentSequence = itemContentSequence;
       contentSequence.push(srScoord);
     }
 

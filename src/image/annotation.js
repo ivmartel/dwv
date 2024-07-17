@@ -51,6 +51,13 @@ export class Annotation {
   mathShape;
 
   /**
+   * Additional points used to define the annotation.
+   *
+   * @type {Point2D[]}
+   */
+  referencePoints;
+
+  /**
    * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
    *
    * 'RGB R Component', 110834, DCM...
