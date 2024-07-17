@@ -109,6 +109,12 @@ export declare class Annotation {
      * @returns {object} The factory.
      */
     getFactory(): object;
+    /**
+     * Get the string type of this annotation.
+     *
+     * @returns {string} The type.
+     */
+    getType(): string;
     #private;
 }
 
@@ -209,6 +215,14 @@ export declare class AnnotationGroup {
      */
     find(id: string): Annotation | undefined;
     /**
+     * Get the meta data.
+     *
+     * @returns {Object<string, any>} The meta data.
+     */
+    getMeta(): {
+        [x: string]: any;
+    };
+    /**
      * Check if this list contains a meta data value.
      *
      * @param {string} key The key to check.
@@ -221,14 +235,14 @@ export declare class AnnotationGroup {
      * @param {string} key The meta data key.
      * @returns {object} The meta data value.
      */
-    getMeta(key: string): object;
+    getMetaValue(key: string): object;
     /**
      * Set a meta data.
      *
      * @param {string} key The meta data key.
      * @param {object} value The value of the meta data.
      */
-    setMeta(key: string, value: object): void;
+    setMetaValue(key: string, value: object): void;
     /**
      * Add an event listener to this class.
      *
@@ -1737,8 +1751,9 @@ export declare class DrawShapeHandler {
      */
     /**
      * @param {App} app The associated application.
+     * @param {Function} eventCallback Event callback.
      */
-    constructor(app: App);
+    constructor(app: App, eventCallback: Function);
     /**
      * Set the draw editor shape.
      *
@@ -1777,7 +1792,7 @@ export declare class DrawShapeHandler {
      *
      * @param {DrawLayer} drawLayer The origin draw layer.
      * @param {Konva.Group} shapeGroup The shape group to set on.
-     * @param {Annotation} annotation The associated annnotation.
+     * @param {Annotation} annotation The associated annotation.
      */
     addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
     /**
@@ -4764,18 +4779,6 @@ export declare class ViewController {
      * @returns {string} The unit.
      */
     getPixelUnit(): string;
-    /**
-     * Get the image study instance UID.
-     *
-     * @returns {string} The UID.
-     */
-    getStudyInstanceUID(): string;
-    /**
-     * Get the image series instance UID.
-     *
-     * @returns {string} The UID.
-     */
-    getSeriesInstanceUID(): string;
     /**
      * Get some values from the associated image in a region.
      *

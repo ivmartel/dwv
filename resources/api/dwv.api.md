@@ -17,6 +17,7 @@ export class Annotation {
     getFactory(): object;
     getOriginIndex(): Index | undefined;
     getText(): string;
+    getType(): string;
     id: string;
     labelPosition: Point2D;
     mathShape: object;
@@ -55,11 +56,14 @@ export class AnnotationGroup {
     find(id: string): Annotation | undefined;
     getLength(): number;
     getList(): Annotation[];
-    getMeta(key: string): object;
+    getMeta(): {
+        [x: string]: any;
+    };
+    getMetaValue(key: string): object;
     hasMeta(key: string): boolean;
     remove(id: string): void;
     removeEventListener(type: string, callback: Function): void;
-    setMeta(key: string, value: object): void;
+    setMetaValue(key: string, value: object): void;
     setViewController(viewController: ViewController): void;
     update(annotation: Annotation): void;
 }
@@ -386,7 +390,7 @@ export class DrawLayer {
 
 // @public
 export class DrawShapeHandler {
-    constructor(app: App);
+    constructor(app: App, eventCallback: Function);
     addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
     disableAndResetEditor(): void;
     getEditorAnnotation(): Annotation | undefined;
@@ -1032,8 +1036,6 @@ export class ViewController {
     getPositionFromPlanePoint(point2D: Point2D): Point;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
-    getSeriesInstanceUID(): string;
-    getStudyInstanceUID(): string;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
     incrementIndex(dim: number, silent?: boolean): boolean;
