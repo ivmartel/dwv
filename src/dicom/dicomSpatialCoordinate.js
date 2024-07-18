@@ -145,11 +145,10 @@ export function getScoordFromShape(shape) {
     ];
     scoord.graphicType = GraphicTypes.polyline;
   } else if (shape instanceof Protractor) {
-    const pointList = shape.getPointList();
     scoord.graphicData = [];
-    for (const point of pointList) {
-      scoord.graphicData.push(point.getX().toString());
-      scoord.graphicData.push(point.getY().toString());
+    for (let i = 0; i < 3; ++i) {
+      scoord.graphicData.push(shape.getPoint(i).getX().toString());
+      scoord.graphicData.push(shape.getPoint(i).getY().toString());
     }
     scoord.graphicType = GraphicTypes.polyline;
   } else if (shape instanceof Circle) {

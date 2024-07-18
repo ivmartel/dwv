@@ -17,26 +17,17 @@ export class Protractor {
    *
    * @type {Point2D[]}
    */
-  #pointArray;
+  #points;
 
   /**
-   * @param {Point2D[]} pointArray The list of Point2D that make
+   * @param {Point2D[]} points The list of Point2D that make
    *   the protractor.
    */
-  constructor(pointArray) {
-    if (pointArray.length > 3) {
+  constructor(points) {
+    if (points.length > 3) {
       throw new Error('Too many points for a protractor');
     }
-    this.#pointArray = pointArray.slice(0, 3);
-  }
-
-  /**
-   * Get the point list.
-   *
-   * @returns {Point2D[]} The list.
-   */
-  getPointList() {
-    return this.#pointArray;
+    this.#points = points.slice(0, 3);
   }
 
   /**
@@ -47,7 +38,7 @@ export class Protractor {
    * @returns {Point2D|undefined} The Point2D at the given index.
    */
   getPoint(index) {
-    return this.#pointArray[index];
+    return this.#points[index];
   }
 
   /**
@@ -56,7 +47,7 @@ export class Protractor {
    * @returns {number} The length of the path.
    */
   getLength() {
-    return this.#pointArray.length;
+    return this.#points.length;
   }
 
   /**
@@ -68,9 +59,9 @@ export class Protractor {
    */
   quantify(_viewController, _flags) {
     const quant = {};
-    if (this.#pointArray.length === 3) {
-      const line0 = new Line(this.#pointArray[0], this.#pointArray[1]);
-      const line1 = new Line(this.#pointArray[1], this.#pointArray[2]);
+    if (this.#points.length === 3) {
+      const line0 = new Line(this.#points[0], this.#points[1]);
+      const line1 = new Line(this.#points[1], this.#points[2]);
       let angle = getAngle(line0, line1);
       if (angle > 180) {
         angle = 360 - angle;

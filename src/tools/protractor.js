@@ -74,7 +74,7 @@ export class ProtractorFactory {
    * @returns {Konva.Group} The Konva group.
    */
   createShapeGroup(annotation, style) {
-    const path = annotation.mathShape;
+    const protractor = annotation.mathShape;
 
     // konva group
     const group = new Konva.Group();
@@ -84,7 +84,7 @@ export class ProtractorFactory {
     // konva shape
     group.add(this.#createShape(annotation, style));
 
-    if (path.getLength() === this.getNPoints()) {
+    if (protractor.getLength() === this.getNPoints()) {
       // extras
       const extras = this.#createShapeExtras(annotation, style);
       for (const extra of extras) {
@@ -219,13 +219,12 @@ export class ProtractorFactory {
    */
   updateAnnotationOnTranslation(annotation, translation) {
     // math shape
-    const path = annotation.mathShape;
-    const pointList = path.getPointList();
+    const protractor = annotation.mathShape;
     const newPointList = [];
-    for (const point of pointList) {
+    for (let i = 0; i < 3; ++i) {
       newPointList.push(new Point2D(
-        point.getX() + translation.x,
-        point.getY() + translation.y
+        protractor.getPoint(i).getX() + translation.x,
+        protractor.getPoint(i).getY() + translation.y
       ));
     }
     annotation.mathShape = new Protractor(newPointList);
@@ -315,12 +314,11 @@ export class ProtractorFactory {
    * @returns {Konva.Line} The konva shape.
    */
   #createShape(annotation, style) {
-    const path = annotation.mathShape;
-    const pointList = path.getPointList();
+    const protractor = annotation.mathShape;
     const points = [];
-    for (const point of pointList) {
-      points.push(point.getX());
-      points.push(point.getY());
+    for (let i = 0; i < 3; ++i) {
+      points.push(protractor.getPoint(i).getX());
+      points.push(protractor.getPoint(i).getY());
     }
 
     // konva line
@@ -332,13 +330,16 @@ export class ProtractorFactory {
       name: 'shape'
     });
 
-    if (path.getLength() === this.getNPoints()) {
+    if (protractor.getLength() === this.getNPoints()) {
       // larger hitfunc
       kshape.hitFunc(function (context) {
         context.beginPath();
-        context.moveTo(pointList[0].getX(), pointList[0].getY());
-        context.lineTo(pointList[1].getX(), pointList[1].getY());
-        context.lineTo(pointList[2].getX(), pointList[2].getY());
+        context.moveTo(
+          protractor.getPoint(0).getX(), protractor.getPoint(0).getY());
+        context.lineTo(
+          protractor.getPoint(1).getX(), protractor.getPoint(1).getY());
+        context.lineTo(
+          protractor.getPoint(2).getX(), protractor.getPoint(2).getY());
         context.closePath();
         context.fillStrokeShape(kshape);
       });
@@ -355,10 +356,11 @@ export class ProtractorFactory {
    * @returns {Array} The konva shape extras.
    */
   #createShapeExtras(annotation, style) {
-    const path = annotation.mathShape;
-    const pointList = path.getPointList();
-    const line0 = new Line(pointList[0], pointList[1]);
-    const line1 = new Line(pointList[1], pointList[2]);
+    const protractor = annotation.mathShape;
+    const line0 = new Line(
+      protractor.getPoint(0), protractor.getPoint(1));
+    const line1 = new Line(
+      protractor.getPoint(1), protractor.getPoint(2));
 
     let angle = getAngle(line0, line1);
     let inclination = line0.getInclination();
@@ -376,8 +378,8 @@ export class ProtractorFactory {
       strokeScaleEnabled: false,
       angle: angle,
       rotation: -inclination,
-      x: pointList[1].getX(),
-      y: pointList[1].getY(),
+      x: protractor.getPoint(1).getX(),
+      y: protractor.getPoint(1).getY(),
       name: 'shape-arc'
     });
 
@@ -391,10 +393,11 @@ export class ProtractorFactory {
    * @returns {Point2D} The position.
    */
   #getDefaultLabelPosition(annotation) {
-    const path = annotation.mathShape;
-    const pointList = path.getPointList();
-    const line0 = new Line(pointList[0], pointList[1]);
-    const line1 = new Line(pointList[1], pointList[2]);
+    const protractor = annotation.mathShape;
+    const line0 = new Line(
+      protractor.getPoint(0), protractor.getPoint(1));
+    const line1 = new Line(
+      protractor.getPoint(1), protractor.getPoint(2));
 
     const midX =
       (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
@@ -469,10 +472,11 @@ export class ProtractorFactory {
    * @param {Style} _style The application style.
    */
   #updateShape(annotation, anchor, _style) {
-    const path = annotation.mathShape;
-    const pointList = path.getPointList();
-    const line0 = new Line(pointList[0], pointList[1]);
-    const line1 = new Line(pointList[1], pointList[2]);
+    const protractor = annotation.mathShape;
+    const line0 = new Line(
+      protractor.getPoint(0), protractor.getPoint(1));
+    const line1 = new Line(
+      protractor.getPoint(1), protractor.getPoint(2));
 
     // parent group
     const group = anchor.getParent();
@@ -491,12 +495,12 @@ export class ProtractorFactory {
     kline.position({x: 0, y: 0});
     // update shape
     kline.points([
-      pointList[0].getX(),
-      pointList[0].getY(),
-      pointList[1].getX(),
-      pointList[1].getY(),
-      pointList[2].getX(),
-      pointList[2].getY()
+      protractor.getPoint(0).getX(),
+      protractor.getPoint(0).getY(),
+      protractor.getPoint(1).getX(),
+      protractor.getPoint(1).getY(),
+      protractor.getPoint(2).getX(),
+      protractor.getPoint(2).getY()
     ]);
 
     // associated arc
@@ -554,9 +558,12 @@ export class ProtractorFactory {
     // larger hitfunc
     kline.hitFunc(function (context) {
       context.beginPath();
-      context.moveTo(pointList[0].getX(), pointList[0].getY());
-      context.lineTo(pointList[1].getX(), pointList[1].getY());
-      context.lineTo(pointList[2].getX(), pointList[2].getY());
+      context.moveTo(
+        protractor.getPoint(0).getX(), protractor.getPoint(0).getY());
+      context.lineTo(
+        protractor.getPoint(1).getX(), protractor.getPoint(1).getY());
+      context.lineTo(
+        protractor.getPoint(2).getX(), protractor.getPoint(2).getY());
       context.closePath();
       context.fillStrokeShape(kline);
     });
