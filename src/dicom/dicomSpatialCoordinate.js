@@ -1,5 +1,6 @@
 import {Point2D} from '../math/point';
 import {Line} from '../math/line';
+import {Protractor} from '../math/protractor';
 import {Circle} from '../math/circle';
 import {Ellipse} from '../math/ellipse';
 import {Rectangle} from '../math/rectangle';
@@ -122,7 +123,8 @@ export function getDicomSpatialCoordinateItem(scoord) {
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
  *
- * @param {Point2D|Line|Circle|Ellipse|Rectangle} shape The math shape.
+ * @param {Point2D|Line|Protractor|Circle|Ellipse|Rectangle} shape
+ *   The math shape.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
 export function getScoordFromShape(shape) {
@@ -141,6 +143,14 @@ export function getScoordFromShape(shape) {
       shape.getEnd().getX().toString(),
       shape.getEnd().getY().toString(),
     ];
+    scoord.graphicType = GraphicTypes.polyline;
+  } else if (shape instanceof Protractor) {
+    const pointList = shape.getPointList();
+    scoord.graphicData = [];
+    for (const point of pointList) {
+      scoord.graphicData.push(point.getX().toString());
+      scoord.graphicData.push(point.getY().toString());
+    }
     scoord.graphicType = GraphicTypes.polyline;
   } else if (shape instanceof Circle) {
     const center = shape.getCenter();
@@ -192,7 +202,7 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Point2D|Line|Circle|Ellipse|Rectangle} The math shape.
+ * @returns {Point2D|Line|Protractor|Circle|Ellipse|Rectangle} The math shape.
  */
 export function getShapeFromScoord(scoord) {
   // extract points
@@ -238,6 +248,8 @@ export function getShapeFromScoord(scoord) {
   } else if (scoord.graphicType === GraphicTypes.polyline) {
     if (points.length === 2) {
       shape = new Line(points[0], points[1]);
+    } else if (points.length === 3) {
+      shape = new Protractor([points[0], points[1], points[2]]);
     } else if (points.length === 4) {
       shape = new Rectangle(points[0], points[2]);
     }
