@@ -1,5 +1,6 @@
 import {AnnotationGroup} from '../image/annotation';
 import {RemoveAnnotationCommand} from '../tools/drawCommands';
+import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -72,6 +73,10 @@ export class DrawController {
    */
   removeAnnotationWithCommand(id, exeCallback) {
     const annotation = this.getAnnotation(id);
+    if (typeof annotation === 'undefined') {
+      logger.warn('Cannot create remove command for undefined annotation: ' + id);
+      return;
+    }
     // create remove annotation command
     const command = new RemoveAnnotationCommand(annotation, this);
     // add command to undo stack
