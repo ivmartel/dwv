@@ -23,6 +23,7 @@ export class Annotation {
     mathShape: object;
     position: string;
     quantification: object;
+    referencePoints: Point2D[];
     referenceSopUID: string;
     setTextExpr(labelText: {
         [x: string]: string;
