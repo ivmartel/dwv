@@ -74,7 +74,8 @@ export class DrawController {
   removeAnnotationWithCommand(id, exeCallback) {
     const annotation = this.getAnnotation(id);
     if (typeof annotation === 'undefined') {
-      logger.warn('Cannot create remove command for undefined annotation: ' + id);
+      logger.warn(
+        'Cannot create remove command for undefined annotation: ' + id);
       return;
     }
     // create remove annotation command
