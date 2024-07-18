@@ -366,7 +366,7 @@ export class AnnotationGroup {
    * Get a meta data value.
    *
    * @param {string} key The meta data key.
-   * @returns {object} The meta data value.
+   * @returns {string|object} The meta data value.
    */
   getMetaValue(key) {
     return this.#meta[key];
@@ -376,7 +376,7 @@ export class AnnotationGroup {
    * Set a meta data.
    *
    * @param {string} key The meta data key.
-   * @param {object} value The value of the meta data.
+   * @param {string|object} value The value of the meta data.
    */
   setMetaValue(key, value) {
     this.#meta[key] = value;
