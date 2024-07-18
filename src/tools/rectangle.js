@@ -54,7 +54,6 @@ export class RectangleFactory {
     return this.getGroupName() === group.name();
   }
 
-
   /**
    * Set an annotation math shape from input points.
    *
