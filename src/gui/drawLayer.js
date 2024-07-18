@@ -628,6 +628,7 @@ export class DrawLayer {
   #removeAnnotationDraw(annotation) {
     const shapeGroup = this.#findShapeGroup(annotation);
     if (!(shapeGroup instanceof Konva.Group)) {
+      logger.warn('Cannot find shape group to remove');
       return;
     };
     shapeGroup.remove();
@@ -889,7 +890,7 @@ export class DrawLayer {
       // add new group to layer
       this.getKonvaLayer().add(posGroup);
     } else {
-      logger.warn('Unexpected number of draw position groups.');
+      logger.warn('Unexpected number of draw position groups');
     }
     // return
     return posGroup;
@@ -916,8 +917,7 @@ export class DrawLayer {
   getGroup(id) {
     const group = this.getKonvaLayer().findOne('#' + id);
     if (typeof group === 'undefined') {
-      logger.warn('Cannot find node with id: ' + id
-      );
+      logger.warn('Cannot find node with id: ' + id);
     }
     return group;
   }
