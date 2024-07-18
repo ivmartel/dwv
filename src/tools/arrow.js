@@ -1,5 +1,6 @@
 import {Line, getPerpendicularLine, getAngle} from '../math/line';
 import {Point2D} from '../math/point';
+import {defaults} from '../app/defaults';
 import {logger} from '../utils/logger';
 import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
 
@@ -296,7 +297,7 @@ export class ArrowFactory {
    * @returns {object} The label list.
    */
   #getDefaultLabel() {
-    return {'*': ''};
+    return defaults.labelText.arrow;
   }
 
   /**
