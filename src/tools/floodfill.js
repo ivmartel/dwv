@@ -1,5 +1,10 @@
-import {DrawGroupCommand} from '../tools/drawCommands';
-import {RoiFactory} from '../tools/roi';
+import {Annotation} from '../image/annotation';
+import {
+  AddAnnotationCommand,
+  UpdateAnnotationCommand
+} from '../tools/drawCommands';
+//import {RoiFactory} from '../tools/roi';
+import {ROI} from '../math/roi';
 import {guid} from '../math/stats';
 import {Point2D} from '../math/point';
 import {Style} from '../gui/style';
@@ -99,19 +104,13 @@ export class Floodfill {
    * @type {boolean}
    */
   #started = false;
-  /**
-   * Draw command.
-   *
-   * @type {object}
-   */
-  #command = null;
 
   /**
-   * Current shape group.
+   * Current annotation.
    *
-   * @type {object}
+   * @type {Annotation}
    */
-  #shapeGroup = null;
+  #annotation;
 
   /**
    * Coordinates of the fist mousedown event.
@@ -130,7 +129,7 @@ export class Floodfill {
   /**
    * List of parent points.
    *
-   * @type {Array}
+   * @type {Point2D[]}
    */
   #parentPoints = [];
 
@@ -140,12 +139,6 @@ export class Floodfill {
    * @type {boolean}
    */
   #extender = false;
-
-  /**
-   * Timeout for painting on mousemove.
-   *
-   */
-  #painterTimeout;
 
   /**
    * Drawing style.
@@ -203,7 +196,7 @@ export class Floodfill {
    * @param {object} points The input points.
    * @param {number} threshold The threshold of the floodfill.
    * @param {boolean} simple Return first points or a list.
-   * @returns {Array} The parent points.
+   * @returns {Point2D[]} The parent points.
    */
   #calcBorder(points, threshold, simple) {
 
@@ -250,35 +243,46 @@ export class Floodfill {
     // Calculate the border
     this.#border = this.#calcBorder(point, threshold, false);
     // Paint the border
-    if (this.#border) {
-      const factory = new RoiFactory();
-      this.#shapeGroup = factory.create(this.#border, this.#style);
-      this.#shapeGroup.id(guid());
-
+    if (this.#border.length !== 0) {
       const drawLayer = layerGroup.getActiveDrawLayer();
+      const drawController = drawLayer.getDrawController();
 
-      // get the position group
-      const posGroup = drawLayer.getCurrentPosGroup();
-      // add shape group to position group
-      posGroup.add(this.#shapeGroup);
+      const newMathShape = new ROI(this.#border);
 
-      // draw shape command
-      this.#command = new DrawGroupCommand(
-        this.#shapeGroup,
-        'floodfill',
-        drawLayer
-      );
-      this.#command.onExecute = this.#fireEvent;
-      this.#command.onUndo = this.#fireEvent;
-      // // draw
-      this.#command.execute();
-      // save it in undo stack
-      this.#app.addToUndoStack(this.#command);
+      let command;
+      if (typeof this.#annotation === 'undefined') {
+        // create annotation
+        this.#annotation = new Annotation();
+        this.#annotation.colour = this.#style.getLineColour();
+        this.#annotation.id = guid();
 
-      return true;
-    } else {
-      return false;
+        const viewLayer = layerGroup.getActiveViewLayer();
+        const viewController = viewLayer.getViewController();
+        this.#annotation.setViewController(viewController);
+
+        this.#annotation.mathShape = newMathShape;
+        command = new AddAnnotationCommand(
+          this.#annotation,
+          drawController
+        );
+      } else {
+        // update annotation
+        const originalMathShape = this.#annotation.mathShape;
+        command = new UpdateAnnotationCommand(
+          this.#annotation,
+          {mathShape: originalMathShape},
+          {mathShape: newMathShape},
+          drawController
+        );
+      }
+
+      // add command to undo stack
+      this.#app.addToUndoStack(command);
+      // execute command: triggers draw creation
+      command.execute();
     }
+
+    return this.#border.length !== 0;
   }
 
   /**
@@ -292,10 +296,6 @@ export class Floodfill {
     //avoid errors
     if (!this.#initialpoint) {
       throw '\'initialpoint\' not found. User must click before use extend!';
-    }
-    // remove previous draw
-    if (this.#shapeGroup) {
-      this.#shapeGroup.destroy();
     }
 
     const viewController =
@@ -328,41 +328,6 @@ export class Floodfill {
   }
 
   /**
-   * Modify tolerance threshold and redraw ROI.
-   *
-   * @param {number} modifyThreshold The new threshold.
-   * @param {object} shape The shape to update.
-   */
-  modifyThreshold(modifyThreshold, shape) {
-
-    if (!shape && this.#shapeGroup) {
-      shape = this.#shapeGroup.getChildren(function (node) {
-        return node.name() === 'shape';
-      })[0];
-    } else {
-      throw 'No shape found';
-    }
-
-    clearTimeout(this.#painterTimeout);
-    this.#painterTimeout = setTimeout(() => {
-      this.#border = this.#calcBorder(
-        this.#initialpoint, modifyThreshold, true);
-      if (!this.#border) {
-        return false;
-      }
-      const arr = [];
-      for (let i = 0, bl = this.#border.length; i < bl; ++i) {
-        arr.push(this.#border[i].x);
-        arr.push(this.#border[i].y);
-      }
-      shape.setPoints(arr);
-      const shapeLayer = shape.getLayer();
-      shapeLayer.draw();
-      this.onThresholdChange(modifyThreshold);
-    }, 100);
-  }
-
-  /**
    * Event fired when threshold change.
    *
    * @param {number} _value Current threshold.
@@ -380,7 +345,18 @@ export class Floodfill {
   #start(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
-    const drawLayer = layerGroup.getActiveDrawLayer();
+    let drawLayer = layerGroup.getActiveDrawLayer();
+
+    if (typeof drawLayer === 'undefined') {
+      // create new data
+      const data = this.#app.createAnnotationData(layerGroup);
+      // render (will create draw layer)
+      this.#app.addAndRenderAnnotationData(data, divId);
+      // get draw layer
+      drawLayer = layerGroup.getActiveDrawLayer();
+      // set active to bind to toolboxController
+      layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
+    }
 
     this.#imageInfo = viewLayer.getImageData();
     if (!this.#imageInfo) {
@@ -416,7 +392,14 @@ export class Floodfill {
     this.#currentthreshold = this.#currentthreshold < this.#initialthreshold
       ? this.#initialthreshold
       : this.#currentthreshold - this.#initialthreshold;
-    this.modifyThreshold(this.#currentthreshold);
+
+    this.#paintBorder(
+      this.#initialpoint,
+      this.#currentthreshold,
+      this.#app.getLayerGroupByDivId(divId)
+    );
+
+    this.onThresholdChange(this.#currentthreshold);
   }
 
   /**
@@ -573,9 +556,9 @@ export class Floodfill {
    *
    * @param {object} event The event to fire.
    */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
+  // #fireEvent = (event) => {
+  //   this.#listenerHandler.fireEvent(event);
+  // };
 
   /**
    * Set the tool live features: shape colour.

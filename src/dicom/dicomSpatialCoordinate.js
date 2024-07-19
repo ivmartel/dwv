@@ -1,6 +1,7 @@
 import {Point2D} from '../math/point';
-import {Line} from '../math/line';
+import {Line, areOrthogonal} from '../math/line';
 import {Protractor} from '../math/protractor';
+import {ROI} from '../math/roi';
 import {Circle} from '../math/circle';
 import {Ellipse} from '../math/ellipse';
 import {Rectangle} from '../math/rectangle';
@@ -123,7 +124,7 @@ export function getDicomSpatialCoordinateItem(scoord) {
 /**
  * Get a DICOM spatial coordinate (SCOORD) from a mathematical shape.
  *
- * @param {Point2D|Line|Protractor|Circle|Ellipse|Rectangle} shape
+ * @param {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle} shape
  *   The math shape.
  * @returns {SpatialCoordinate} The DICOM scoord.
  */
@@ -150,6 +151,18 @@ export function getScoordFromShape(shape) {
       scoord.graphicData.push(shape.getPoint(i).getX().toString());
       scoord.graphicData.push(shape.getPoint(i).getY().toString());
     }
+    scoord.graphicType = GraphicTypes.polyline;
+  } else if (shape instanceof ROI) {
+    scoord.graphicData = [];
+    for (let i = 0; i < shape.getLength(); ++i) {
+      scoord.graphicData.push(shape.getPoint(i).getX().toString());
+      scoord.graphicData.push(shape.getPoint(i).getY().toString());
+    }
+    // repeat first point to close shape
+    const firstPoint = shape.getPoint(0);
+    scoord.graphicData.push(firstPoint.getX().toString());
+    scoord.graphicData.push(firstPoint.getY().toString());
+
     scoord.graphicType = GraphicTypes.polyline;
   } else if (shape instanceof Circle) {
     const center = shape.getCenter();
@@ -181,6 +194,7 @@ export function getScoordFromShape(shape) {
   } else if (shape instanceof Rectangle) {
     const begin = shape.getBegin();
     const end = shape.getEnd();
+    // begin as first and last point to close shape
     scoord.graphicData = [
       begin.getX().toString(),
       begin.getY().toString(),
@@ -190,6 +204,8 @@ export function getScoordFromShape(shape) {
       end.getY().toString(),
       end.getX().toString(),
       begin.getY().toString(),
+      begin.getX().toString(),
+      begin.getY().toString()
     ];
     scoord.graphicType = GraphicTypes.polyline;
   }
@@ -201,20 +217,28 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Point2D|Line|Protractor|Circle|Ellipse|Rectangle} The math shape.
+ * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle}
+ *   The math shape.
  */
 export function getShapeFromScoord(scoord) {
   // extract points
-  const numberOfPoints = scoord.graphicData.length;
-  if (numberOfPoints % 2 !== 0) {
+  const dataLength = scoord.graphicData.length;
+  if (dataLength % 2 !== 0) {
     throw new Error('Expecting even number of coordinates in scroord data');
   }
   const points = [];
-  for (let i = 0; i < scoord.graphicData.length; i += 2) {
+  for (let i = 0; i < dataLength; i += 2) {
     points.push(new Point2D(
       parseFloat(scoord.graphicData[i]),
       parseFloat(scoord.graphicData[i + 1])
     ));
+  }
+  let isClosed = false;
+  const numberOfPoints = points.length;
+  if (numberOfPoints > 2) {
+    const firstPoint = points[0];
+    const lastPoint = points[numberOfPoints - 1];
+    isClosed = firstPoint.equals(lastPoint);
   }
 
   // create math shape
@@ -245,12 +269,30 @@ export function getShapeFromScoord(scoord) {
     );
     shape = new Ellipse(center, radiusX, radiusY);
   } else if (scoord.graphicType === GraphicTypes.polyline) {
-    if (points.length === 2) {
-      shape = new Line(points[0], points[1]);
-    } else if (points.length === 3) {
-      shape = new Protractor([points[0], points[1], points[2]]);
-    } else if (points.length === 4) {
-      shape = new Rectangle(points[0], points[2]);
+    if (!isClosed) {
+      if (points.length === 2) {
+        shape = new Line(points[0], points[1]);
+      } else if (points.length === 3) {
+        shape = new Protractor([points[0], points[1], points[2]]);
+      }
+    } else {
+      if (points.length === 5) {
+        const line0 = new Line(points[0], points[1]);
+        const line1 = new Line(points[1], points[2]);
+        const line2 = new Line(points[2], points[3]);
+        const line3 = new Line(points[3], points[4]);
+        if (areOrthogonal(line0, line1) &&
+          areOrthogonal(line1, line2) &&
+          areOrthogonal(line2, line3)) {
+          shape = new Rectangle(points[0], points[2]);
+        } else {
+          // remove last=first point for closed shape
+          shape = new ROI(points.slice(0, -1));
+        }
+      } else {
+        // remove last=first point for closed shape
+        shape = new ROI(points.slice(0, -1));
+      }
     }
   }
 

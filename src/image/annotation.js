@@ -13,6 +13,8 @@ import {ArrowFactory} from '../tools/arrow';
 import {Point2D} from '../math/point';
 import {ProtractorFactory} from '../tools/protractor';
 import {Protractor} from '../math/protractor';
+import {RoiFactory} from '../tools/roi';
+import {ROI} from '../math/roi';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -190,6 +192,8 @@ export class Annotation {
       fac = new RulerFactory();
     } else if (this.mathShape instanceof Protractor) {
       fac = new ProtractorFactory();
+    } else if (this.mathShape instanceof ROI) {
+      fac = new RoiFactory();
     } else if (this.mathShape instanceof Circle) {
       fac = new CircleFactory();
     } else if (this.mathShape instanceof Ellipse) {
@@ -214,6 +218,8 @@ export class Annotation {
       res = 'ruler';
     } else if (this.mathShape instanceof Protractor) {
       res = 'protractor';
+    } else if (this.mathShape instanceof ROI) {
+      res = 'roi';
     } else if (this.mathShape instanceof Circle) {
       res = 'circle';
     } else if (this.mathShape instanceof Ellipse) {

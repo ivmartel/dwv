@@ -17,14 +17,32 @@ export class ROI {
   #points = [];
 
   /**
+   * @param {Point2D[]} [points] Optional initial point list.
+   */
+  constructor(points) {
+    if (typeof points !== 'undefined') {
+      this.#points = points;
+    }
+  }
+
+  /**
    * Get a point of the list at a given index.
    *
    * @param {number} index The index of the point to get
    *   (beware, no size check).
-   * @returns {Point2D} The Point2D at the given index.
+   * @returns {Point2D|undefined} The Point2D at the given index.
    */
   getPoint(index) {
     return this.#points[index];
+  }
+
+  /**
+   * Get the point list.
+   *
+   * @returns {Point2D[]} The list.
+   */
+  getPoints() {
+    return this.#points;
   }
 
   /**
