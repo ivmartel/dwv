@@ -25,6 +25,7 @@ import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
 import {PlaneHelper} from '../image/planeHelper';
+import {AnnotationGroup} from '../image/annotation';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1445,6 +1446,50 @@ export class App {
         data.addAppListeners();
       }
     }
+  }
+
+  /**
+   * Create new annotation data based on the data of
+   *   the active view layer.
+   *
+   * @param {LayerGroup} layerGroup The layerGroup with the data to associate
+   *   to the annotation.
+   * @returns {DicomData} The new data.
+   */
+  createAnnotationData(layerGroup) {
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const refData = this.getData(viewLayer.getDataId());
+    const refMeta = refData.image.getMeta();
+
+    const data = new DicomData({});
+    data.annotationGroup = new AnnotationGroup();
+    data.annotationGroup.setMetaValue('Modality', 'SR');
+    data.annotationGroup.setMetaValue(
+      'PatientID', refMeta.PatientID);
+    data.annotationGroup.setMetaValue(
+      'StudyInstanceUID', refMeta.StudyInstanceUID);
+    data.annotationGroup.setMetaValue(
+      'ReferencedSeriesSequence', {
+        value: [{
+          SeriesInstanceUID: refMeta.SeriesInstanceUID
+        }]
+      });
+    return data;
+  }
+
+  /**
+   * Add new data and render it with a simple new data view config.
+   *
+   * @param {DicomData} data The data to add.
+   * @param {string} divId The div where to draw.
+   */
+  addAndRenderAnnotationData(data, divId) {
+    // add new data
+    const dataId = this.addData(data);
+    // add simple data view config
+    this.addDataViewConfig(dataId, new ViewConfig(divId));
+    // render (will create draw layer)
+    this.render(dataId);
   }
 
   // Private Methods -----------------------------------------------------------

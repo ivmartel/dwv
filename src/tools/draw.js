@@ -1,6 +1,4 @@
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {DicomData} from '../app/dataController';
-import {ViewConfig} from '../app/application';
 import {
   getMousePoint,
   getTouchPoints
@@ -14,7 +12,7 @@ import {
 import {
   isNodeNameShape,
 } from './drawBounds';
-import {Annotation, AnnotationGroup} from '../image/annotation';
+import {Annotation} from '../image/annotation';
 import {ScrollWheel} from './scrollWheel';
 
 // external
@@ -177,6 +175,7 @@ export class Draw {
     this.#style = app.getStyle();
   }
 
+
   /**
    * Start tool interaction.
    *
@@ -189,30 +188,13 @@ export class Draw {
 
     if (typeof drawLayer === 'undefined') {
       // create new data
-      const viewLayer = layerGroup.getActiveViewLayer();
-      const refData = this.#app.getData(viewLayer.getDataId());
-      const refMeta = refData.image.getMeta();
-      const data = new DicomData({});
-      data.annotationGroup = new AnnotationGroup();
-      data.annotationGroup.setMetaValue('Modality', 'SR');
-      data.annotationGroup.setMetaValue(
-        'PatientID', refMeta.PatientID);
-      data.annotationGroup.setMetaValue(
-        'StudyInstanceUID', refMeta.StudyInstanceUID);
-      data.annotationGroup.setMetaValue(
-        'ReferencedSeriesSequence', {
-          value: [{
-            SeriesInstanceUID: refMeta.SeriesInstanceUID
-          }]
-        });
-      const dataId = this.#app.addData(data);
+      const data = this.#app.createAnnotationData(layerGroup);
       // render (will create draw layer)
-      this.#app.addDataViewConfig(dataId, new ViewConfig(divId));
-      this.#app.render(dataId);
-
+      this.#app.addAndRenderAnnotationData(data, divId);
+      // get draw layer
       drawLayer = layerGroup.getActiveDrawLayer();
       // set active to bind to toolboxController
-      layerGroup.setActiveDrawLayerByDataId(dataId);
+      layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
     }
 
     // set the layer shape handler
