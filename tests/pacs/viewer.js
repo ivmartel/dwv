@@ -158,7 +158,9 @@ function viewerSetup() {
       'Protractor',
       'Roi',
       'FreeHand'
-    ]}
+    ]},
+    Floodfill: {},
+    Livewire: {}
   };
 
   // app config
