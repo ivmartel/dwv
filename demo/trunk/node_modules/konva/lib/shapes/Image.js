@@ -29,6 +29,11 @@ class Image extends Shape_1.Shape {
         }
     }
     _useBufferCanvas() {
+        const hasCornerRadius = !!this.cornerRadius();
+        const hasShadow = this.hasShadow();
+        if (hasCornerRadius && hasShadow) {
+            return true;
+        }
         return super._useBufferCanvas(true);
     }
     _sceneFunc(context) {
