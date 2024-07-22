@@ -1,5 +1,4 @@
 import {Point2D} from './point';
-import {i18n} from '../utils/i18n';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -171,7 +170,7 @@ export class Line {
     const spacing2D = viewController.get2DSpacing();
     const length = this.getWorldLength(spacing2D);
     if (length !== null) {
-      quant.length = {value: length, unit: i18n.t('unit.mm')};
+      quant.length = {value: length, unit: 'unit.mm'};
     }
     // return
     return quant;

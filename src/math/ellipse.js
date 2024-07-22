@@ -1,4 +1,3 @@
-import {i18n} from '../utils/i18n';
 import {getStats} from './stats';
 import {Index} from './index';
 
@@ -180,15 +179,18 @@ export class Ellipse {
     const spacing2D = viewController.get2DSpacing();
     quant.a = {
       value: this.getA() * spacing2D.x,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     quant.b = {
       value: this.getB() * spacing2D.y,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
+      quant.surface = {
+        value: surface / 100,
+        unit: 'unit.cm2'
+      };
     }
 
     // pixel values quantification

@@ -1,5 +1,4 @@
 import {Line, getAngle} from './line';
-import {i18n} from '../utils/i18n';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -68,7 +67,7 @@ export class Protractor {
       }
       quant.angle = {
         value: angle,
-        unit: i18n.t('unit.degree')
+        unit: 'unit.degree'
       };
     }
     return quant;
