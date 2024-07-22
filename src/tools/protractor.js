@@ -316,7 +316,7 @@ export class ProtractorFactory {
   #createShape(annotation, style) {
     const protractor = annotation.mathShape;
     const points = [];
-    for (let i = 0; i < 3; ++i) {
+    for (let i = 0; i < protractor.getLength(); ++i) {
       points.push(protractor.getPoint(i).getX());
       points.push(protractor.getPoint(i).getY());
     }
