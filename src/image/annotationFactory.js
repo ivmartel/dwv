@@ -9,7 +9,8 @@ import {
   RelationshipTypes,
   getSRContent,
   getDicomSRContentItem,
-  DicomSRContent
+  DicomSRContent,
+  getSRContentFromValue
 } from '../dicom/dicomSRContent';
 import {
   isEqualCode,
@@ -19,7 +20,9 @@ import {
   getSourceImageCode,
   getTrackingIdentifierCode,
   getShortLabelCode,
-  getReferencePointsCode
+  getReferencePointsCode,
+  getQuantificationName,
+  getQuantificationUnit
 } from '../dicom/dicomCode';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {ImageReference} from '../dicom/dicomImageReference';
@@ -150,6 +153,25 @@ export class AnnotationFactory {
             }
             annotation.referencePoints = points;
           }
+          if (subItem.valueType === ValueTypes.num &&
+            subItem.relationshipType === RelationshipTypes.contains) {
+            const quantifName =
+              getQuantificationName(subItem.conceptNameCode);
+            if (typeof quantifName === 'undefined') {
+              continue;
+            }
+            const measuredValue = subItem.value.measuredValue;
+            const quantifUnit = getQuantificationUnit(
+              measuredValue.measurementUnitsCode);
+            if (typeof annotation.quantification === 'undefined') {
+              annotation.quantification = {};
+            }
+            annotation.quantification[quantifName] = {
+              value: measuredValue.numericValue,
+              unit: quantifUnit
+            };
+          }
+
         }
 
         annotations.push(annotation);
@@ -269,6 +291,20 @@ export class AnnotationFactory {
 
         referencePoints.value = refPointsScoord;
         itemContentSequence.push(referencePoints);
+      }
+
+      if (typeof annotation.quantification !== 'undefined') {
+        console.log(annotation.quantification);
+        for (const key in annotation.quantification) {
+          const quatifContent = getSRContentFromValue(
+            key,
+            annotation.quantification[key].value,
+            annotation.quantification[key].unit
+          );
+          if (typeof quatifContent !== 'undefined') {
+            itemContentSequence.push(quatifContent);
+          }
+        }
       }
 
       srScoord.contentSequence = itemContentSequence;

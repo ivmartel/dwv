@@ -18,7 +18,6 @@ const TagKeys = {
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
- * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 export class DicomCode {
   /**
@@ -151,6 +150,7 @@ export function getDicomCodeItem(code) {
 
 /**
  * DICOM codes.
+ * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 const DcmCodes = {
   111030: 'Image Region',
@@ -158,23 +158,86 @@ const DcmCodes = {
   112040: 'Tracking Unique Identifier',
   113076: 'Segmentation',
   121055: 'Path',
+  121207: 'Height',
   121322: 'Source image for image processing operation',
   121324: 'Source Image',
   122438: 'Reference Points',
   125007: 'Measurement Group',
-  125309: 'Short label'
+  125309: 'Short label',
+  113048: 'Pixel by pixel Maximum',
+  113049: 'Pixel by pixel mean',
+  113051: 'Pixel by pixel Minimum',
+  113061: 'Standard Deviation'
+};
+
+/**
+ * SNOMED-CT codes.
+ * List: {@link https://browser.ihtsdotools.org}.
+ */
+const SctCodes = {
+  1483009: 'Angle',
+  42798000: 'Area',
+  103355008: 'Width',
+  103339001: 'Long axis',
+  103340004: 'Short axis',
+  131190003: 'Radius',
+  261665006: 'Unknown',
+  410668003: 'Length',
+};
+
+/**
+ * UCUM codes.
+ * Definition: {@link https://unitsofmeasure.org/ucum}.
+ * List: {@link https://ucum.nlm.nih.gov/ucum-lhc/demo.html}.
+ */
+const UcumCodes = {
+  1: 'No units',
+  mm: 'Millimeter',
+  deg: 'Degree - plane angle',
+  cm2: 'Square centimeter',
+  'cm2/ml': 'Square centimeter per milliliter',
+  '/cm': 'Per centimeter',
+  'g/ml': 'Gram per milliliter',
+  'mg/ml': 'Milligram per milliliter',
+  'umol/ml': 'Micromole per milliliter',
+  'Bq/ml': 'Becquerels per milliliter',
+  'mg/min/ml': 'Milligrams per minute per milliliter',
+  'umol/min/ml': 'Micromole per minute per milliliter',
+  'ml/min/g': 'Milliliter per minute per gram',
+  'ml/g': 'Milliliter per gram',
+  'ml/min/ml': 'Milliliter per minute per milliliter',
+  'ml/ml': 'Milliliter per milliliter',
+  '%': 'Percentage',
+  '[hnsf\'U]': 'Hounsfield unit',
+  '10*23/ml': 'Electron density',
+  '{counts}': 'Counts',
+  '{counts}/s': 'Counts per second',
+  '{propcounts}': 'Proportional to counts',
+  '{propcounts}/s': 'Proportional to counts per second',
 };
 
 /**
  * Get a DICOM code from a value (~id).
  *
  * @param {string} value The code value.
- * @returns {DicomCode} The DICOM code.
+ * @param {string} scheme The scheme designator.
+ * @returns {DicomCode|undefined} The DICOM code.
  */
-function getDicomCode(value) {
-  const code = new DicomCode(DcmCodes[value]);
-  code.schemeDesignator = 'DCM';
-  code.value = value;
+function getDicomCode(value, scheme) {
+  let meaning;
+  if (scheme === 'DCM') {
+    meaning = DcmCodes[value];
+  } else if (scheme === 'SCT') {
+    meaning = SctCodes[value];
+  } else if (scheme === 'UCUM') {
+    meaning = UcumCodes[value];
+  }
+  let code;
+  if (typeof meaning !== 'undefined') {
+    code = new DicomCode(meaning);
+    code.schemeDesignator = scheme;
+    code.value = value;
+  }
   return code;
 }
 
@@ -184,7 +247,7 @@ function getDicomCode(value) {
  * @returns {DicomCode} The code.
  */
 export function getMeasurementGroupCode() {
-  return getDicomCode('125007');
+  return getDicomCode('125007', 'DCM');
 }
 
 /**
@@ -193,7 +256,7 @@ export function getMeasurementGroupCode() {
  * @returns {DicomCode} The code.
  */
 export function getImageRegionCode() {
-  return getDicomCode('111030');
+  return getDicomCode('111030', 'DCM');
 }
 
 /**
@@ -202,7 +265,7 @@ export function getImageRegionCode() {
  * @returns {DicomCode} The code.
  */
 export function getPathCode() {
-  return getDicomCode('121055');
+  return getDicomCode('121055', 'DCM');
 }
 
 /**
@@ -211,7 +274,7 @@ export function getPathCode() {
  * @returns {DicomCode} The code.
  */
 export function getSourceImageCode() {
-  return getDicomCode('121324');
+  return getDicomCode('121324', 'DCM');
 }
 
 /**
@@ -220,7 +283,7 @@ export function getSourceImageCode() {
  * @returns {DicomCode} The code.
  */
 export function getTrackingIdentifierCode() {
-  return getDicomCode('112039');
+  return getDicomCode('112039', 'DCM');
 }
 
 /**
@@ -229,7 +292,7 @@ export function getTrackingIdentifierCode() {
  * @returns {DicomCode} The code.
  */
 export function getSegmentationCode() {
-  return getDicomCode('113076');
+  return getDicomCode('113076', 'DCM');
 }
 
 /**
@@ -238,7 +301,7 @@ export function getSegmentationCode() {
  * @returns {DicomCode} The code.
  */
 export function getSourceImageForProcessingCode() {
-  return getDicomCode('121322');
+  return getDicomCode('121322', 'DCM');
 }
 
 /**
@@ -247,7 +310,7 @@ export function getSourceImageForProcessingCode() {
  * @returns {DicomCode} The code.
  */
 export function getShortLabelCode() {
-  return getDicomCode('125309');
+  return getDicomCode('125309', 'DCM');
 }
 
 /**
@@ -256,5 +319,138 @@ export function getShortLabelCode() {
  * @returns {DicomCode} The code.
  */
 export function getReferencePointsCode() {
-  return getDicomCode('122438');
+  return getDicomCode('122438', 'DCM');
+}
+
+/**
+ * Quantification name to dictionary item.
+ */
+const QuantificationName2DictItem = {
+  angle: {key: '1483009', scheme: 'SCT'},
+  length: {key: '410668003', scheme: 'SCT'},
+  surface: {key: '42798000', scheme: 'SCT'},
+  height: {key: '121207', scheme: 'DCM'},
+  width: {key: '103355008', scheme: 'SCT'},
+  radius: {key: '131190003', scheme: 'SCT'},
+  a: {key: '103339001', scheme: 'SCT'},
+  b: {key: '103340004', scheme: 'SCT'},
+  min: {key: '113051', scheme: 'DCM'},
+  max: {key: '113048', scheme: 'DCM'},
+  mean: {key: '113049', scheme: 'DCM'},
+  stddev: {key: '113061', scheme: 'DCM'},
+  // median
+  // 25th percentile
+  // 75th percentile
+};
+
+/**
+ * Get a concept name DICOM code.
+ *
+ * @param {string} name The measurment name as defined
+ *   in a quantification object.
+ * @returns {DicomCode|undefined} The code.
+ */
+export function getConceptNameCode(name) {
+  const item = QuantificationName2DictItem[name];
+  let code;
+  if (typeof item !== 'undefined') {
+    code = getDicomCode(item.key, item.scheme);
+  }
+  return code;
+}
+
+/**
+ * Get the DICOM code for a quantification name.
+ *
+ * @param {DicomCode} code The Dicom code.
+ * @returns {string|undefined} The quantification name.
+ */
+export function getQuantificationName(code) {
+  let name;
+  for (const propKey in QuantificationName2DictItem) {
+    const item = QuantificationName2DictItem[propKey];
+    if (item.scheme === code.schemeDesignator &&
+      item.key === code.value) {
+      name = propKey;
+      break;
+    }
+  }
+  return name;
+}
+
+/**
+ * Quantification unit to UCUM key. Associated tags:
+ * - Rescale type {@link https://dicom.innolitics.com/ciods/computed-radiography-image/modality-lut/00281054},
+ * - Units {@link https://dicom.innolitics.com/ciods/positron-emission-tomography-image/pet-series/00541001}.
+ */
+const QuantificationUnit2UcumKey = {
+  'unit.mm': 'mm',
+  'unit.cm2': 'cm2',
+  'unit.degree': 'deg',
+  // OD optical density
+  HU: '[hnsf\'U]',
+  US: '1',
+  MGML: 'mg/ml',
+  // Z_EFF Effective Atomic Number (i.e., Effective-Z)
+  ED: '10*23/ml',
+  // EDW Electron density normalized
+  // HU_MOD Modified Hounsfield Unit
+  PCT: '%',
+  CNTS: '{counts}',
+  NONE: '1',
+  CM2: 'cm2',
+  CM2ML: 'cm2/ml',
+  PCNT: '%',
+  CPS: '{counts}/s',
+  BQML: 'Bq/ml',
+  MGMINML: 'mg/min/ml',
+  UMOLMINML: 'umol/min/ml',
+  MLMING: 'ml/min/g',
+  MLG: 'ml/g',
+  '1CM': '/cm',
+  UMOLML: 'umol/ml',
+  PROPCNTS: '{propcounts}',
+  PROPCPS: '{propcounts}/s',
+  MLMINML: 'ml/min/ml',
+  MLML: 'ml/ml',
+  GML: 'g/ml',
+  //STDDEV
+  SUV: 'g/ml',
+};
+
+/**
+ * Get a measurement units DICOM code.
+ *
+ * @param {string} name The unit name as defined in a quantification object.
+ * @returns {DicomCode|undefined} The code.
+ */
+export function getMeasurementUnitsCode(name) {
+  const key = QuantificationUnit2UcumKey[name];
+  let code;
+  if (typeof key !== 'undefined') {
+    code = getDicomCode(key, 'UCUM');
+  } else if (typeof key === 'undefined') {
+    // no unit
+    code = getDicomCode('1', 'UCUM');
+  }
+  return code;
+}
+
+/**
+ * Get a quantification unit name.
+ *
+ * @param {DicomCode} code The code to get the unit from.
+ * @returns {string} The quantification unit.
+ */
+export function getQuantificationUnit(code) {
+  let unit;
+  for (const propKey in QuantificationUnit2UcumKey) {
+    const item = QuantificationUnit2UcumKey[propKey];
+    if (code.schemeDesignator === 'UCUM' &&
+      item.key === code.value) {
+      unit = propKey;
+      break;
+    }
+  }
+  return unit;
 }
