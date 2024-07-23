@@ -243,6 +243,26 @@ function viewerSetup() {
     addDataRow(event.dataid);
   });
 
+  _app.addEventListener('dataadd', function (event) {
+    console.log('dataadd', event);
+    const data = _app.getData(event.dataid);
+    const ag = data.annotationGroup;
+    if (typeof ag !== 'undefined') {
+      const alist = ag.getList();
+      for (const a of alist) {
+        console.log('annotation', a);
+        console.log('quantification', a.quantification);
+      }
+    }
+  });
+
+  _app.addEventListener('annotationupdate', function (event) {
+    console.log('annotationupdate', event);
+  });
+  _app.addEventListener('annotationremove', function (event) {
+    console.log('annotationremove', event);
+  });
+
   let dataLoad = 0;
   const firstRender = [];
   _app.addEventListener('load', function (event) {

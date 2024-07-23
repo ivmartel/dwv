@@ -239,16 +239,16 @@ export declare class AnnotationGroup {
      * Get a meta data value.
      *
      * @param {string} key The meta data key.
-     * @returns {object} The meta data value.
+     * @returns {string|object} The meta data value.
      */
-    getMetaValue(key: string): object;
+    getMetaValue(key: string): string | object;
     /**
      * Set a meta data.
      *
      * @param {string} key The meta data key.
-     * @param {object} value The value of the meta data.
+     * @param {string|object} value The value of the meta data.
      */
-    setMetaValue(key: string, value: object): void;
+    setMetaValue(key: string, value: string | object): void;
     /**
      * Add an event listener to this class.
      *
@@ -789,6 +789,22 @@ export declare class App {
      */
     toggleOverlayListeners(dataId: string): void;
     /**
+     * Create new annotation data based on the data of
+     *   the active view layer.
+     *
+     * @param {LayerGroup} layerGroup The layerGroup with the data to associate
+     *   to the annotation.
+     * @returns {DicomData} The new data.
+     */
+    createAnnotationData(layerGroup: LayerGroup): DicomData;
+    /**
+     * Add new data and render it with a simple new data view config.
+     *
+     * @param {DicomData} data The data to add.
+     * @param {string} divId The div where to draw.
+     */
+    addAndRenderAnnotationData(data: DicomData, divId: string): void;
+    /**
      * Add a draw layer.
      *
      * @param {string} dataId The data id.
@@ -1143,7 +1159,6 @@ export declare class DeleteSegmentCommand {
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
- * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 export declare class DicomCode {
     /**

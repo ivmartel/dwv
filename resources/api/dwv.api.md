@@ -60,11 +60,11 @@ export class AnnotationGroup {
     getMeta(): {
         [x: string]: any;
     };
-    getMetaValue(key: string): object;
+    getMetaValue(key: string): string | object;
     hasMeta(key: string): boolean;
     remove(id: string): void;
     removeEventListener(type: string, callback: Function): void;
-    setMetaValue(key: string, value: object): void;
+    setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
     update(annotation: Annotation): void;
 }
@@ -73,6 +73,7 @@ export class AnnotationGroup {
 export class App {
     abortAllLoads(): void;
     abortLoad(dataId: string): void;
+    addAndRenderAnnotationData(data: DicomData, divId: string): void;
     addData(data: DicomData): string;
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
@@ -84,6 +85,7 @@ export class App {
     canScroll(): boolean;
     // @deprecated
     canWindowLevel(): boolean;
+    createAnnotationData(layerGroup: LayerGroup): DicomData;
     defaultOnKeydown: (event: KeyboardEvent) => void;
     fitToContainer(): void;
     getActiveLayerGroup(): LayerGroup | undefined;
