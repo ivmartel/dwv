@@ -542,7 +542,7 @@ export class DrawLayer {
   #getPosGroupId(annotation) {
     const originIndex = annotation.getOriginIndex();
     if (typeof originIndex === 'undefined') {
-      console.log('Unknown reference origin for annotation: ' +
+      logger.warn('Unknown reference origin for annotation: ' +
         annotation.referenceSopUID);
       return;
     }

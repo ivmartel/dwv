@@ -294,7 +294,6 @@ export class AnnotationFactory {
       }
 
       if (typeof annotation.quantification !== 'undefined') {
-        console.log(annotation.quantification);
         for (const key in annotation.quantification) {
           const quatifContent = getSRContentFromValue(
             key,

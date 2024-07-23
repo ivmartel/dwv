@@ -256,10 +256,6 @@ export function getSRContent(dataElements) {
     }
   }
 
-  if (typeof content.value === 'undefined') {
-    console.log('valueType', valueType);
-  }
-
   return content;
 }
 
