@@ -6,7 +6,8 @@ import {logger} from '../utils/logger';
 import {AddAnnotationCommand} from '../tools/drawCommands';
 import {
   isNodeWithId,
-  isPositionNode
+  isPositionNode,
+  isNodeNameLabel
 } from '../tools/drawBounds';
 import {Style} from '../gui/style';
 
@@ -715,13 +716,13 @@ export class DrawLayer {
   }
 
   /**
-   * Check the visibility of a given group.
+   * Check the visibility of an annotation.
    *
-   * @param {string} id The id of the group.
-   * @returns {boolean} True if the group is visible.
+   * @param {string} id The id of the annotation.
+   * @returns {boolean} True if the annotation is visible.
    */
-  isGroupVisible(id) {
-    // get the group
+  isAnnotationVisible(id) {
+    // get the group (annotation and group have same id)
     const group = this.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
@@ -731,24 +732,54 @@ export class DrawLayer {
   }
 
   /**
-   * Toggle the visibility of a given group.
+   * Set the visibility of an annotation.
    *
-   * @param {string} id The id of the group.
-   * @returns {boolean} False if the group cannot be found.
+   * @param {string} id The id of the annotation.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   * @returns {boolean} False if the annotation shape cannot be found.
    */
-  toggleGroupVisibility(id) {
-    // get the group
+  setAnnotationVisibility(id, visible) {
+    // get the group (annotation and group have same id)
     const group = this.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
-    // toggle visible
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !group.isVisible();
+    }
     group.visible(!group.isVisible());
 
     // udpate
     this.draw();
 
     return true;
+  }
+
+  /**
+   * Set the visibility of all labels.
+   *
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  setLabelsVisibility(visible) {
+    const posGroups = this.getKonvaLayer().getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        for (const shapeGroup of shapeGroups) {
+          if (shapeGroup instanceof Konva.Group) {
+            const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+            // if not set, toggle visibility
+            if (typeof visible === 'undefined') {
+              visible = !label.isVisible();
+            }
+            label.visible(visible);
+          }
+        }
+      }
+    }
   }
 
   /**
