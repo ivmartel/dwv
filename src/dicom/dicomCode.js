@@ -156,6 +156,10 @@ const DcmCodes = {
   111030: 'Image Region',
   112039: 'Tracking Identifier',
   112040: 'Tracking Unique Identifier',
+  113048: 'Pixel by pixel Maximum',
+  113049: 'Pixel by pixel mean',
+  113051: 'Pixel by pixel Minimum',
+  113061: 'Standard Deviation',
   113076: 'Segmentation',
   121055: 'Path',
   121207: 'Height',
@@ -164,10 +168,6 @@ const DcmCodes = {
   122438: 'Reference Points',
   125007: 'Measurement Group',
   125309: 'Short label',
-  113048: 'Pixel by pixel Maximum',
-  113049: 'Pixel by pixel mean',
-  113051: 'Pixel by pixel Minimum',
-  113061: 'Standard Deviation'
 };
 
 /**
