@@ -266,8 +266,10 @@ export class RectangleFactory {
     const text = annotation.getText();
     const ktext = klabel.getText();
     ktext.setText(text);
-    // hide if empty
-    klabel.visible(text.length !== 0);
+    // hide if visible and empty
+    if (klabel.visible()) {
+      klabel.visible(text.length !== 0);
+    }
   }
 
 
