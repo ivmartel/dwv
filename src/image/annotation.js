@@ -29,8 +29,6 @@ export class Annotation {
   /**
    * The ID.
    *
-   * 'Tracking Unique Identifier', 112040, DCM.
-   *
    * @type {string}
    */
   id;
@@ -59,23 +57,21 @@ export class Annotation {
   /**
    * Additional points used to define the annotation.
    *
-   * @type {Point2D[]}
+   * @type {Point2D[]|undefined}
    */
   referencePoints;
 
   /**
    * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
    *
-   * 'RGB R Component', 110834, DCM...
-   *
-   * @type {string}
+   * @type {string|undefined}
    */
   colour;
 
   /**
    * Annotation quantification.
    *
-   * @type {object}
+   * @type {object|undefined}
    */
   quantification;
 
@@ -83,23 +79,21 @@ export class Annotation {
    * Text expression. Can contain variables surrounded with '{}' that will
    * be extracted from the quantification object.
    *
-   * 'Short label', 125309, DCM.
-   *
-   * @type {string}
+   * @type {string|undefined}
    */
   textExpr;
 
   /**
    * Label position.
    *
-   * @type {Point2D}
+   * @type {Point2D|undefined}
    */
   labelPosition;
 
   /**
    * Associated view controller.
    *
-   * @type {ViewController}
+   * @type {ViewController|undefined}
    */
   #viewController;
 
