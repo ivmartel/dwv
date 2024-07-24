@@ -445,9 +445,9 @@ export function getMeasurementUnitsCode(name) {
 export function getQuantificationUnit(code) {
   let unit;
   for (const propKey in QuantificationUnit2UcumKey) {
-    const item = QuantificationUnit2UcumKey[propKey];
+    const ucumKey = QuantificationUnit2UcumKey[propKey];
     if (code.schemeDesignator === 'UCUM' &&
-      item.key === code.value) {
+      ucumKey === code.value) {
       unit = propKey;
       break;
     }
