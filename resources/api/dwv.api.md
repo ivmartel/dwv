@@ -13,23 +13,23 @@ export function addTagsToDictionary(group: string, tags: {
 
 // @public
 export class Annotation {
-    colour: string;
+    colour: string | undefined;
     getFactory(): object;
     getOriginIndex(): Index | undefined;
     getText(): string;
     getType(): string;
     id: string;
-    labelPosition: Point2D;
+    labelPosition: Point2D | undefined;
     mathShape: object;
     position: string;
-    quantification: object;
-    referencePoints: Point2D[];
+    quantification: object | undefined;
+    referencePoints: Point2D[] | undefined;
     referenceSopUID: string;
     setTextExpr(labelText: {
         [x: string]: string;
     }): void;
     setViewController(viewController: ViewController): void;
-    textExpr: string;
+    textExpr: string | undefined;
     updateQuantification(): void;
 }
 
@@ -62,11 +62,13 @@ export class AnnotationGroup {
     };
     getMetaValue(key: string): string | object;
     hasMeta(key: string): boolean;
+    isEditable(): boolean;
     remove(id: string): void;
     removeEventListener(type: string, callback: Function): void;
+    setEditable(flag: boolean): void;
     setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
-    update(annotation: Annotation): void;
+    update(annotation: Annotation, propKeys?: string[]): void;
 }
 
 // @public
@@ -338,11 +340,14 @@ export class DrawController {
     // @deprecated
     getDrawStoreDetails(): void;
     hasAnnotationMeta(key: string): boolean;
+    isAnnotationGroupEditable(): boolean;
     removeAllAnnotationsWithCommand(exeCallback: Function): void;
     removeAnnotation(id: string): void;
     removeAnnotationWithCommand(id: string, exeCallback: Function): void;
+    setAnnotationGroupEditable(flag: boolean): void;
     setAnnotationMeta(key: string, value: string): void;
-    updateAnnotation(annotation: Annotation): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
+    updateAnnotationWithCommand(id: string, originalProps: object, newProps: object, exeCallback: Function): void;
 }
 
 // @public
@@ -375,19 +380,20 @@ export class DrawLayer {
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
     initialise(size: Scalar2D, spacing: Scalar2D): void;
-    isGroupVisible(id: string): boolean;
+    isAnnotationVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
     removeFromDOM(): void;
     setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
+    setAnnotationVisibility(id: string, visible?: boolean): boolean;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
+    setLabelsVisibility(visible?: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
     setPlaneHelper(helper: PlaneHelper): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
     setShapeHandler(handler: DrawShapeHandler | undefined): void;
-    toggleGroupVisibility(id: string): boolean;
     unbindInteraction(): void;
 }
 

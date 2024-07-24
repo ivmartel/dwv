@@ -19,8 +19,6 @@ export declare class Annotation {
     /**
      * The ID.
      *
-     * 'Tracking Unique Identifier', 112040, DCM.
-     *
      * @type {string}
      */
     id: string;
@@ -45,38 +43,34 @@ export declare class Annotation {
     /**
      * Additional points used to define the annotation.
      *
-     * @type {Point2D[]}
+     * @type {Point2D[]|undefined}
      */
-    referencePoints: Point2D[];
+    referencePoints: Point2D[] | undefined;
     /**
      * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
      *
-     * 'RGB R Component', 110834, DCM...
-     *
-     * @type {string}
+     * @type {string|undefined}
      */
-    colour: string;
+    colour: string | undefined;
     /**
      * Annotation quantification.
      *
-     * @type {object}
+     * @type {object|undefined}
      */
-    quantification: object;
+    quantification: object | undefined;
     /**
      * Text expression. Can contain variables surrounded with '{}' that will
      * be extracted from the quantification object.
      *
-     * 'Short label', 125309, DCM.
-     *
-     * @type {string}
+     * @type {string|undefined}
      */
-    textExpr: string;
+    textExpr: string | undefined;
     /**
      * Label position.
      *
-     * @type {Point2D}
+     * @type {Point2D|undefined}
      */
-    labelPosition: Point2D;
+    labelPosition: Point2D | undefined;
     /**
      * Set the associated view controller.
      *
@@ -190,6 +184,18 @@ export declare class AnnotationGroup {
      */
     getLength(): number;
     /**
+     * Check if the annotation group is editable.
+     *
+     * @returns {boolean} True if editable.
+     */
+    isEditable(): boolean;
+    /**
+     * Set the annotation group editability.
+     *
+     * @param {boolean} flag True to make the annotation group editable.
+     */
+    setEditable(flag: boolean): void;
+    /**
      * Add a new annotation.
      *
      * @param {Annotation} annotation The annotation to add.
@@ -199,8 +205,9 @@ export declare class AnnotationGroup {
      * Update an existing annotation.
      *
      * @param {Annotation} annotation The annotation to update.
+     * @param {string[]} [propKeys] Optional properties that got updated.
      */
-    update(annotation: Annotation): void;
+    update(annotation: Annotation, propKeys?: string[]): void;
     /**
      * Remove an annotation.
      *
@@ -1449,6 +1456,18 @@ export declare class DrawController {
      */
     getAnnotationGroup(): AnnotationGroup;
     /**
+     * Check if the annotation group is editable.
+     *
+     * @returns {boolean} True if editable.
+     */
+    isAnnotationGroupEditable(): boolean;
+    /**
+     * Set the annotation group editability.
+     *
+     * @param {boolean} flag True to make the annotation group editable.
+     */
+    setAnnotationGroupEditable(flag: boolean): void;
+    /**
      * Add an annotation.
      *
      * @param {Annotation} annotation The annotation to add.
@@ -1458,8 +1477,9 @@ export declare class DrawController {
      * Update an anotation from the list.
      *
      * @param {Annotation} annotation The annotation to update.
+     * @param {string[]} [propKeys] Optional properties that got updated.
      */
-    updateAnnotation(annotation: Annotation): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
     /**
      * Remove an anotation for the list.
      *
@@ -1473,6 +1493,17 @@ export declare class DrawController {
      * @param {Function} exeCallback The undo stack callback.
      */
     removeAnnotationWithCommand(id: string, exeCallback: Function): void;
+    /**
+     * Update an annotation via an update command (triggers draw actions).
+     *
+     * @param {string} id The annotation id.
+     * @param {object} originalProps The original annotation properties
+     *   that will be updated.
+     * @param {object} newProps The new annotation properties
+     *   that will replace the original ones.
+     * @param {Function} exeCallback The undo stack callback.
+     */
+    updateAnnotationWithCommand(id: string, originalProps: object, newProps: object, exeCallback: Function): void;
     /**
      * Remove all annotations via remove commands (triggers draw actions).
      *
@@ -1664,19 +1695,28 @@ export declare class DrawLayer {
      */
     fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     /**
-     * Check the visibility of a given group.
+     * Check the visibility of an annotation.
      *
-     * @param {string} id The id of the group.
-     * @returns {boolean} True if the group is visible.
+     * @param {string} id The id of the annotation.
+     * @returns {boolean} True if the annotation is visible.
      */
-    isGroupVisible(id: string): boolean;
+    isAnnotationVisible(id: string): boolean;
     /**
-     * Toggle the visibility of a given group.
+     * Set the visibility of an annotation.
      *
-     * @param {string} id The id of the group.
-     * @returns {boolean} False if the group cannot be found.
+     * @param {string} id The id of the annotation.
+     * @param {boolean} [visible] True to set to visible,
+     *   will toggle visibility if not defined.
+     * @returns {boolean} False if the annotation shape cannot be found.
      */
-    toggleGroupVisibility(id: string): boolean;
+    setAnnotationVisibility(id: string, visible?: boolean): boolean;
+    /**
+     * Set the visibility of all labels.
+     *
+     * @param {boolean} [visible] True to set to visible,
+     *   will toggle visibility if not defined.
+     */
+    setLabelsVisibility(visible?: boolean): void;
     /**
      * Delete a Draw from the stage.
      *
