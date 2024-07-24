@@ -1,5 +1,8 @@
 import {AnnotationGroup} from '../image/annotation';
-import {RemoveAnnotationCommand} from '../tools/drawCommands';
+import {
+  RemoveAnnotationCommand,
+  UpdateAnnotationCommand
+} from '../tools/drawCommands';
 import {logger} from '../utils/logger';
 
 // doc imports
@@ -81,6 +84,32 @@ export class DrawController {
     }
     // create remove annotation command
     const command = new RemoveAnnotationCommand(annotation, this);
+    // add command to undo stack
+    exeCallback(command);
+    // execute command: triggers draw remove
+    command.execute();
+  }
+
+  /**
+   * Update an annotation via an update command (triggers draw actions).
+   *
+   * @param {string} id The annotation id.
+   * @param {object} originalProps The original annotation properties
+   *   that will be updated.
+   * @param {object} newProps The new annotation properties
+   *   that will replace the original ones.
+   * @param {Function} exeCallback The undo stack callback.
+   */
+  updateAnnotationWithCommand(id, originalProps, newProps, exeCallback) {
+    const annotation = this.getAnnotation(id);
+    if (typeof annotation === 'undefined') {
+      logger.warn(
+        'Cannot create update command for undefined annotation: ' + id);
+      return;
+    }
+    // create remove annotation command
+    const command = new UpdateAnnotationCommand(
+      annotation, originalProps, newProps, this);
     // add command to undo stack
     exeCallback(command);
     // execute command: triggers draw remove
