@@ -21,6 +21,7 @@ import {
   getTrackingIdentifierCode,
   getShortLabelCode,
   getReferencePointsCode,
+  getColourCode,
   getQuantificationName,
   getQuantificationUnit
 } from '../dicom/dicomCode';
@@ -124,22 +125,32 @@ export class AnnotationFactory {
         annotation.textExpr = '';
 
         for (const subItem of item.contentSequence) {
+          // reference image UID
           if (subItem.valueType === ValueTypes.image &&
             subItem.relationshipType === RelationshipTypes.selectedFrom &&
             isEqualCode(subItem.conceptNameCode, getSourceImageCode())) {
             annotation.referenceSopUID =
               subItem.value.referencedSOPSequence.referencedSOPInstanceUID;
           }
+          // annotation id
           if (subItem.valueType === ValueTypes.uidref &&
             subItem.relationshipType === RelationshipTypes.hasProperties &&
             isEqualCode(subItem.conceptNameCode, getTrackingIdentifierCode())) {
             annotation.id = subItem.value;
           }
+          // text expr
           if (subItem.valueType === ValueTypes.text &&
             subItem.relationshipType === RelationshipTypes.hasProperties &&
             isEqualCode(subItem.conceptNameCode, getShortLabelCode())) {
             annotation.textExpr = subItem.value;
           }
+          // color
+          if (subItem.valueType === ValueTypes.text &&
+            subItem.relationshipType === RelationshipTypes.hasProperties &&
+            isEqualCode(subItem.conceptNameCode, getColourCode())) {
+            annotation.colour = subItem.value;
+          }
+          // reference points
           if (subItem.valueType === ValueTypes.scoord &&
             subItem.relationshipType === RelationshipTypes.hasProperties &&
             isEqualCode(subItem.conceptNameCode, getReferencePointsCode()) &&
@@ -153,6 +164,7 @@ export class AnnotationFactory {
             }
             annotation.referencePoints = points;
           }
+          // quantification
           if (subItem.valueType === ValueTypes.num &&
             subItem.relationshipType === RelationshipTypes.contains) {
             const quantifName =
@@ -171,7 +183,6 @@ export class AnnotationFactory {
               unit: quantifUnit
             };
           }
-
         }
 
         annotations.push(annotation);
@@ -253,6 +264,7 @@ export class AnnotationFactory {
 
       const itemContentSequence = [];
 
+      // reference image UID
       const srImage = new DicomSRContent(ValueTypes.image);
       srImage.relationshipType = RelationshipTypes.selectedFrom;
       srImage.conceptNameCode = getSourceImageCode();
@@ -264,18 +276,28 @@ export class AnnotationFactory {
       srImage.value = imageRef;
       itemContentSequence.push(srImage);
 
+      // annotation id
       const srUid = new DicomSRContent(ValueTypes.uidref);
       srUid.relationshipType = RelationshipTypes.hasProperties;
       srUid.conceptNameCode = getTrackingIdentifierCode();
       srUid.value = annotation.id;
       itemContentSequence.push(srUid);
 
+      // text expr
       const shortLabel = new DicomSRContent(ValueTypes.text);
       shortLabel.relationshipType = RelationshipTypes.hasProperties;
       shortLabel.conceptNameCode = getShortLabelCode();
       shortLabel.value = annotation.textExpr;
       itemContentSequence.push(shortLabel);
 
+      // colour
+      const colour = new DicomSRContent(ValueTypes.text);
+      colour.relationshipType = RelationshipTypes.hasProperties;
+      colour.conceptNameCode = getColourCode();
+      colour.value = annotation.colour;
+      itemContentSequence.push(colour);
+
+      // reference points
       if (typeof annotation.referencePoints !== 'undefined') {
         const referencePoints = new DicomSRContent(ValueTypes.scoord);
         referencePoints.relationshipType = RelationshipTypes.hasProperties;
@@ -293,6 +315,7 @@ export class AnnotationFactory {
         itemContentSequence.push(referencePoints);
       }
 
+      // quantification
       if (typeof annotation.quantification !== 'undefined') {
         for (const key in annotation.quantification) {
           const quatifContent = getSRContentFromValue(
@@ -310,6 +333,7 @@ export class AnnotationFactory {
       contentSequence.push(srScoord);
     }
 
+    // main
     if (contentSequence.length !== 0) {
       const srContent = new DicomSRContent(ValueTypes.container);
       srContent.conceptNameCode = getMeasurementGroupCode();

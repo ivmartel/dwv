@@ -183,6 +183,7 @@ const SctCodes = {
   131190003: 'Radius',
   261665006: 'Unknown',
   410668003: 'Length',
+  718499004: 'Color'
 };
 
 /**
@@ -320,6 +321,15 @@ export function getShortLabelCode() {
  */
 export function getReferencePointsCode() {
   return getDicomCode('122438', 'DCM');
+}
+
+/**
+ * Get a colour DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getColourCode() {
+  return getDicomCode('718499004', 'SCT');
 }
 
 /**
