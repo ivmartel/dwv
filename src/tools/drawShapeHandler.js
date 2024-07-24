@@ -511,6 +511,8 @@ export class DrawShapeHandler {
   removeShapeListeners(shapeGroup) {
     // mouse over
     this.#removeShapeOverListeners(shapeGroup);
+    // double click
+    shapeGroup.off('dblclick');
     // remove listeners from shape
     const shape = shapeGroup.getChildren(isNodeNameShape)[0];
     if (shape instanceof Konva.Shape) {
@@ -518,7 +520,6 @@ export class DrawShapeHandler {
       shape.off('dragstart.draw');
       shape.off('dragmove.draw');
       shape.off('dragend.draw');
-      shape.off('dblclick');
     }
     // remove listeners from label
     const label = shapeGroup.getChildren(isNodeNameLabel)[0];
