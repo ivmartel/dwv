@@ -42,6 +42,24 @@ export class DrawController {
   }
 
   /**
+   * Check if the annotation group is editable.
+   *
+   * @returns {boolean} True if editable.
+   */
+  isAnnotationGroupEditable() {
+    return this.#annotationGroup.isEditable();
+  }
+
+  /**
+   * Set the annotation group editability.
+   *
+   * @param {boolean} flag True to make the annotation group editable.
+   */
+  setAnnotationGroupEditable(flag) {
+    this.#annotationGroup.setEditable(flag);
+  }
+
+  /**
    * Add an annotation.
    *
    * @param {Annotation} annotation The annotation to add.

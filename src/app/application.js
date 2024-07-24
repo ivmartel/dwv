@@ -623,6 +623,8 @@ export class App {
     this.#dataController.addEventListener('annotationadd', this.#fireEvent);
     this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
     this.#dataController.addEventListener('annotationremove', this.#fireEvent);
+    this.#dataController.addEventListener(
+      'annotationgroupeditablechange', this.#fireEvent);
     // create stage
     this.#stage = new Stage();
     if (typeof this.#options.binders !== 'undefined') {

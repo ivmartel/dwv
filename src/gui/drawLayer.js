@@ -515,6 +515,29 @@ export class DrawLayer {
       this.#removeAnnotationDraw(event.data);
       this.getKonvaLayer().draw();
     });
+    annotationGroup.addEventListener(
+      'annotationgroupeditablechange',
+      (event) => {
+        this.#shapeHandler.disableAndResetEditor();
+        const shapeGroups =
+          this.getCurrentPosGroup().getChildren();
+
+        if (event.data) {
+          shapeGroups.forEach((group) => {
+            if (group instanceof Konva.Group) {
+              const annotation = annotationGroup.find(group.id());
+              this.#shapeHandler.addShapeListeners(this, group, annotation);
+            }
+          });
+        } else {
+          shapeGroups.forEach((group) => {
+            if (group instanceof Konva.Group) {
+              this.#shapeHandler.removeShapeListeners(group);
+            }
+          });
+        }
+      }
+    );
 
     // create draw controller
     this.#drawController = new DrawController(annotationGroup);

@@ -249,6 +249,13 @@ export class AnnotationGroup {
   #listenerHandler = new ListenerHandler();
 
   /**
+   * Editable flag.
+   *
+   * @type {boolean}
+   */
+  #editable;
+
+  /**
    * @param {Annotation[]} [list] Optional list, will
    *   create new if not provided.
    */
@@ -258,6 +265,7 @@ export class AnnotationGroup {
     } else {
       this.#list = [];
     }
+    this.#editable = true;
   }
 
   /**
@@ -276,6 +284,28 @@ export class AnnotationGroup {
    */
   getLength() {
     return this.#list.length;
+  }
+
+  /**
+   * Check if the annotation group is editable.
+   *
+   * @returns {boolean} True if editable.
+   */
+  isEditable() {
+    return this.#editable;
+  }
+
+  /**
+   * Set the annotation group editability.
+   *
+   * @param {boolean} flag True to make the annotation group editable.
+   */
+  setEditable(flag) {
+    this.#editable = flag;
+    this.#fireEvent({
+      type: 'annotationgroupeditablechange',
+      data: flag
+    });
   }
 
   /**

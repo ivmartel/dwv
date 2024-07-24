@@ -103,9 +103,11 @@ export class DrawShapeHandler {
    * @param {DrawLayer} drawLayer The layer the shape belongs to.
    */
   setEditorShape(shape, drawLayer) {
+    const drawController = drawLayer.getDrawController();
     if (shape &&
       shape instanceof Konva.Shape &&
-      shape !== this.#shapeEditor.getShape()) {
+      shape !== this.#shapeEditor.getShape() &&
+      drawController.isAnnotationGroupEditable()) {
       // disable
       this.#shapeEditor.disable();
       // set shape
