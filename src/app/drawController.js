@@ -51,9 +51,10 @@ export class DrawController {
    * Update an anotation from the list.
    *
    * @param {Annotation} annotation The annotation to update.
+   * @param {string[]} [propKeys] Optional properties that got updated.
    */
-  updateAnnotation(annotation) {
-    this.#annotationGroup.update(annotation);
+  updateAnnotation(annotation, propKeys) {
+    this.#annotationGroup.update(annotation, propKeys);
   }
 
   /**

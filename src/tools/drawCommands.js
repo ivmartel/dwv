@@ -181,20 +181,22 @@ export class UpdateAnnotationCommand {
    * Execute the command.
    */
   execute() {
-    for (const prop in this.#newProps) {
-      this.#annotation[prop] = this.#newProps[prop];
+    const keys = Object.keys(this.#newProps);
+    for (const key of keys) {
+      this.#annotation[key] = this.#newProps[key];
     }
-    this.#drawController.updateAnnotation(this.#annotation);
+    this.#drawController.updateAnnotation(this.#annotation, keys);
   }
 
   /**
    * Undo the command.
    */
   undo() {
-    for (const prop in this.#originalProps) {
-      this.#annotation[prop] = this.#originalProps[prop];
+    const keys = Object.keys(this.#originalProps);
+    for (const key of keys) {
+      this.#annotation[key] = this.#originalProps[key];
     }
-    this.#drawController.updateAnnotation(this.#annotation);
+    this.#drawController.updateAnnotation(this.#annotation, keys);
   }
 }
 /**

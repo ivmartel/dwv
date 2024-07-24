@@ -410,7 +410,8 @@ export class DrawShapeHandler {
           this.#eventCallback({
             type: 'annotationupdate',
             data: annotation,
-            dataid: drawLayer.getDataId()
+            dataid: drawLayer.getDataId(),
+            keys: Object.keys(newProps)
           });
           // update original shape
           originalProps = {
@@ -467,7 +468,8 @@ export class DrawShapeHandler {
         this.#eventCallback({
           type: 'annotationupdate',
           data: annotation,
-          dataid: drawLayer.getDataId()
+          dataid: drawLayer.getDataId(),
+          keys: ['labelPosition']
         });
         // update original position
         originalLabelPosition = newLabelPosition;

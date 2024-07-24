@@ -346,7 +346,8 @@ export class DrawShapeEditor {
       this.#eventCallback({
         type: 'annotationupdate',
         data: this.#annotation,
-        dataid: this.#drawLayer.getDataId()
+        dataid: this.#drawLayer.getDataId(),
+        keys: Object.keys(newProps)
       });
       // update original properties
       originalProps = {

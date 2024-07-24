@@ -295,14 +295,16 @@ export class AnnotationGroup {
    * Update an existing annotation.
    *
    * @param {Annotation} annotation The annotation to update.
+   * @param {string[]} [propKeys] Optional properties that got updated.
    */
-  update(annotation) {
+  update(annotation, propKeys) {
     const index = this.#list.findIndex((item) => item.id === annotation.id);
     if (index !== -1) {
       this.#list[index] = annotation;
       this.#fireEvent({
         type: 'annotationupdate',
-        data: annotation
+        data: annotation,
+        keys: propKeys
       });
     } else {
       logger.warn('Cannot find annotation to update');
