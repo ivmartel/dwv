@@ -324,7 +324,7 @@ export class ProtractorFactory {
     // konva line
     const kshape = new Konva.Line({
       points: points,
-      stroke: style.getLineColour(),
+      stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
       name: 'shape'
@@ -373,7 +373,7 @@ export class ProtractorFactory {
     const karc = new Konva.Arc({
       innerRadius: radius,
       outerRadius: radius,
-      stroke: style.getLineColour(),
+      stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
       angle: angle,
@@ -436,7 +436,7 @@ export class ProtractorFactory {
     const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
+      fill: annotation.colour,
       padding: style.getTextPadding(),
       shadowColor: style.getShadowLineColour(),
       shadowOffset: style.getShadowOffset(),
@@ -456,7 +456,7 @@ export class ProtractorFactory {
     });
     klabel.add(ktext);
     klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
+      fill: annotation.colour,
       opacity: style.getTagOpacity()
     }));
 

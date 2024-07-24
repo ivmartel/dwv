@@ -330,7 +330,7 @@ export class CircleFactory {
       x: circle.getCenter().getX(),
       y: circle.getCenter().getY(),
       radius: circle.getRadius(),
-      stroke: style.getLineColour(),
+      stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
       name: 'shape'
@@ -379,7 +379,7 @@ export class CircleFactory {
     const ktext = new Konva.Text({
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
+      fill: annotation.colour,
       padding: style.getTextPadding(),
       shadowColor: style.getShadowLineColour(),
       shadowOffset: style.getShadowOffset(),
@@ -399,7 +399,7 @@ export class CircleFactory {
     });
     klabel.add(ktext);
     klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
+      fill: annotation.colour,
       opacity: style.getTagOpacity()
     }));
 
