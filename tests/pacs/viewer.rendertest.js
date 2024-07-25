@@ -29,7 +29,7 @@ test.setupRenderTests = function (app) {
     const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
     const annotationGroup = drawController.getAnnotationGroup();
-    const factory = new dwv.AnnotationFactory();
+    const factory = new dwv.AnnotationGroupFactory();
     const dicomElements = factory.toDicom(annotationGroup);
     // write
     const writer = new dwv.DicomWriter();

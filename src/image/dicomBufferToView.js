@@ -6,7 +6,7 @@ import {
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
 import {PixelBufferDecoder} from './decoder';
-import {AnnotationFactory} from './annotationFactory';
+import {AnnotationGroupFactory} from './annotationGroupFactory';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -53,7 +53,7 @@ export class DicomBufferToView {
    * Get the factory associated to input DICOM elements.
    *
    * @param {Object<string, DataElement>} elements The DICOM elements.
-   * @returns {ImageFactory|MaskFactory|AnnotationFactory|undefined}
+   * @returns {ImageFactory|MaskFactory|AnnotationGroupFactory|undefined}
    *   The associated factory.
    */
   #getFactory(elements) {
@@ -66,7 +66,7 @@ export class DicomBufferToView {
         factory = new MaskFactory();
       } else if (modality === 'SR') {
         // annotation factory for DICOM SR
-        factory = new AnnotationFactory();
+        factory = new AnnotationGroupFactory();
       }
     }
     // image factory for pixel data
@@ -95,7 +95,7 @@ export class DicomBufferToView {
     // create data
     try {
       const data = new DicomData(dataElements);
-      if (factory instanceof AnnotationFactory) {
+      if (factory instanceof AnnotationGroupFactory) {
         data.annotationGroup = factory.create(dataElements);
       } else {
         data.image = factory.create(
@@ -376,7 +376,7 @@ export class DicomBufferToView {
     this.#factories[dataIndex] = factory;
 
     // handle parsed data
-    if (factory instanceof AnnotationFactory) {
+    if (factory instanceof AnnotationGroupFactory) {
       this.#handleNonImageData(dataIndex, origin);
     } else {
       this.#handleImageData(dataIndex, origin);

@@ -63,9 +63,9 @@ function mergeTags(tags1, tags2) {
 }
 
 /**
- * {@link Annotation} factory.
+ * {@link AnnotationGroup} factory.
  */
-export class AnnotationFactory {
+export class AnnotationGroupFactory {
 
   /**
    * Possible warning created by checkElements.

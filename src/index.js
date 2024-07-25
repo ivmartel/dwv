@@ -14,7 +14,7 @@ import {
 } from './app/dataController';
 import {Annotation} from './image/annotation';
 import {AnnotationGroup} from './image/annotationGroup';
-import {AnnotationFactory} from './image/annotationFactory';
+import {AnnotationGroupFactory} from './image/annotationGroupFactory';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
 // dicom
@@ -125,7 +125,7 @@ export {
   ToolConfig,
   Annotation,
   AnnotationGroup,
-  AnnotationFactory,
+  AnnotationGroupFactory,
   DrawController,
   ViewController,
   PlaneHelper,
