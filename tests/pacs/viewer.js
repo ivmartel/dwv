@@ -1,81 +1,17 @@
 // Do not warn if these variables were not defined before.
 /* global dwv */
 
+// namespace
+// eslint-disable-next-line no-var
+var test = test || {};
+
 // call setup on DOM loaded
 document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
 
+// globals
 let _app = null;
 let _tools = null;
-
-// tool features
 const _toolFeaturesUI = {};
-_toolFeaturesUI.Draw = {
-  getValue() {
-    const shapeSelect = document.getElementById('draw-shape-select');
-    return {
-      shapeName: shapeSelect.value
-    };
-  },
-  getHtml() {
-    const shapeSelect = document.createElement('select');
-    shapeSelect.id = 'draw-shape-select';
-
-    const shapeNames = _tools.Draw.options;
-    if (typeof shapeNames === 'undefined') {
-      return;
-    }
-
-    for (const shapeName of shapeNames) {
-      const opt = document.createElement('option');
-      opt.id = 'shape-' + shapeName;
-      opt.value = shapeName;
-      opt.appendChild(document.createTextNode(shapeName));
-      shapeSelect.appendChild(opt);
-    }
-
-    shapeSelect.onchange = function (event) {
-      const element = event.target;
-      _app.setToolFeatures({shapeName: element.value});
-    };
-
-    const autoColourInput = document.createElement('input');
-    autoColourInput.type = 'checkbox';
-    autoColourInput.id = 'draw-auto-colour';
-    autoColourInput.checked = true;
-
-    const autoLabel = document.createElement('label');
-    autoLabel.htmlFor = autoColourInput.id;
-    autoLabel.appendChild(document.createTextNode('auto colour'));
-
-    const colourInput = document.createElement('input');
-    colourInput.type = 'color';
-    colourInput.id = 'draw-colour-chooser';
-    colourInput.value = '#ffff80';
-    colourInput.disabled = true;
-
-    autoColourInput.onchange = function (event) {
-      const element = event.target;
-      _app.setToolFeatures({autoShapeColour: element.checked});
-      colourInput.disabled = element.checked;
-    };
-
-    colourInput.onchange = function (event) {
-      const element = event.target;
-      _app.setToolFeatures({shapeColour: element.value});
-    };
-
-    const res = document.createElement('span');
-    res.id = 'toolFeatures';
-    res.className = 'toolFeatures';
-    res.appendChild(shapeSelect);
-    res.appendChild(autoColourInput);
-    res.appendChild(autoLabel);
-    res.appendChild(colourInput);
-    return res;
-  }
-};
-
-// viewer options
 let _layout = 'one';
 
 /**
@@ -233,36 +169,6 @@ function viewerSetup() {
     window.removeEventListener('keydown', abortShortcut);
   });
 
-  // add data row on layer creation
-  _app.addEventListener('viewlayeradd', function (event) {
-    clearDataTableRow(event.dataid);
-    addDataRow(event.dataid);
-  });
-  _app.addEventListener('drawlayeradd', function (event) {
-    clearDataTableRow(event.dataid);
-    addDataRow(event.dataid);
-  });
-
-  _app.addEventListener('dataadd', function (event) {
-    console.log('dataadd', event);
-    const data = _app.getData(event.dataid);
-    const ag = data.annotationGroup;
-    if (typeof ag !== 'undefined') {
-      const alist = ag.getList();
-      for (const a of alist) {
-        console.log('annotation', a);
-        console.log('quantification', a.quantification);
-      }
-    }
-  });
-
-  _app.addEventListener('annotationupdate', function (event) {
-    console.log('annotationupdate', event);
-  });
-  _app.addEventListener('annotationremove', function (event) {
-    console.log('annotationremove', event);
-  });
-
   let dataLoad = 0;
   const firstRender = [];
   _app.addEventListener('load', function (event) {
@@ -291,10 +197,14 @@ function viewerSetup() {
       }
     }
 
-    // Special DICOM SEG
+    let modality;
     if (event.loadtype === 'image' &&
-      typeof meta['00080060'] !== 'undefined' &&
-      meta['00080060'].value[0] === 'SEG') {
+      typeof meta['00080060'] !== 'undefined') {
+      modality = meta['00080060'].value[0];
+    }
+
+    // Special DICOM SEG
+    if (modality === 'SEG') {
       // log SEG details
       logFramePosPats(_app.getMetaData(event.dataid));
 
@@ -337,10 +247,7 @@ function viewerSetup() {
     }
 
     // DICOM SR specific
-    if (event.loadtype === 'image' &&
-      typeof meta['00080060'] !== 'undefined' &&
-      meta['00080060'].value[0] === 'SR') {
-
+    if (modality === 'SR') {
       console.log('DICOM SR');
       const srContent = dwv.getSRContent(meta);
       console.log(srContent.toString());
@@ -404,6 +311,15 @@ function viewerSetup() {
     _app.onResize();
   });
 
+  // tool features UI
+  for (const toolName in _tools) {
+    if (typeof test.toolFeaturesUI[toolName] !== 'undefined') {
+      const toolUI = new test.toolFeaturesUI[toolName](_app, _tools[toolName]);
+      toolUI.registerListeners();
+      _toolFeaturesUI[toolName] = toolUI;
+    }
+  }
+
   const uriOptions = {};
   // uriOptions.batchSize = 100;
   // special dicom web cookie
@@ -452,6 +368,9 @@ function onDOMContentLoaded() {
   // setup
   viewerSetup();
 
+  const dataTable = new test.DataTable(_app);
+  dataTable.registerListeners();
+
   const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function (event) {
     const vls = _app.getViewLayersByDataId('0');
@@ -499,13 +418,11 @@ function onDOMContentLoaded() {
       return;
     }
 
-    // unbind app to controls
-    unbindAppToControls();
+    // clear data table
+    dataTable.clearDataTable();
 
     // set config (deletes previous layers)
     _app.setDataViewConfigs(configs);
-
-    clearDataTable();
 
     // render data (creates layers)
     for (let i = 0; i < dataIds.length; ++i) {
@@ -514,7 +431,7 @@ function onDOMContentLoaded() {
 
     // show crosshair depending on layout
     if (layout !== 'one') {
-      const divIds = getLayerGroupDivIds(configs);
+      const divIds = test.getLayerGroupDivIds(configs);
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
@@ -535,7 +452,7 @@ function onDOMContentLoaded() {
   // setup
   setupBindersCheckboxes();
   setupToolsCheckboxes();
-  setupTests();
+  test.setupRenderTests(_app);
   setupAbout();
 
   // bind app to input files
@@ -584,7 +501,7 @@ function addLayerGroups(number) {
  * @param {string} divId The div id.
  * @returns {object} The config.
  */
-function getViewConfig(divId) {
+test.getViewConfig = function (divId) {
   const config = {divId: divId};
   if (_layout === 'mpr') {
     if (divId === 'layerGroup0') {
@@ -596,7 +513,7 @@ function getViewConfig(divId) {
     }
   }
   return config;
-}
+};
 
 /**
  * Merge an app data config into the input one.
@@ -631,7 +548,7 @@ function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
     configs[dataId] =
-      [mergeDataConfig(dataId, getViewConfig('layerGroup0'))];
+      [mergeDataConfig(dataId, test.getViewConfig('layerGroup0'))];
   }
   return configs;
 }
@@ -648,9 +565,9 @@ function getOnebyTwoDataViewConfig(dataIds) {
     const dataId = dataIds[i];
     let config;
     if (i % 2 === 0) {
-      config = getViewConfig('layerGroup0');
+      config = test.getViewConfig('layerGroup0');
     } else {
-      config = getViewConfig('layerGroup1');
+      config = test.getViewConfig('layerGroup1');
     }
     configs[dataIds[i]] = [mergeDataConfig(dataId, config)];
   }
@@ -667,62 +584,12 @@ function getMPRDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
     configs[dataId] = [
-      mergeDataConfig(dataId, getViewConfig('layerGroup0')),
-      mergeDataConfig(dataId, getViewConfig('layerGroup1')),
-      mergeDataConfig(dataId, getViewConfig('layerGroup2'))
+      mergeDataConfig(dataId, test.getViewConfig('layerGroup0')),
+      mergeDataConfig(dataId, test.getViewConfig('layerGroup1')),
+      mergeDataConfig(dataId, test.getViewConfig('layerGroup2'))
     ];
   }
   return configs;
-}
-
-/**
- * Get the layer groups div ids from the data view configs.
- *
- * @param {object} dataViewConfigs The configs.
- * @returns {Array} The list of ids.
- */
-function getLayerGroupDivIds(dataViewConfigs) {
-  const divIds = [];
-  const keys = Object.keys(dataViewConfigs);
-  for (let i = 0; i < keys.length; ++i) {
-    const dataViewConfig = dataViewConfigs[keys[i]];
-    for (let j = 0; j < dataViewConfig.length; ++j) {
-      const divId = dataViewConfig[j].divId;
-      if (!divIds.includes(divId)) {
-        divIds.push(divId);
-      }
-    }
-  }
-  return divIds;
-}
-
-/**
- * Get the layer group div ids associated to a view config.
- *
- * @param {Array} dataViewConfig The data view config.
- * @returns {Array} The list of div ids.
- */
-function getDivIds(dataViewConfig) {
-  const divIds = [];
-  for (let j = 0; j < dataViewConfig.length; ++j) {
-    divIds.push(dataViewConfig[j].divId);
-  }
-  return divIds;
-}
-
-/**
- * Get the layer group div ids associated to a data id.
- *
- * @param {string} dataId The data id.
- * @returns {Array} The list of div ids.
- */
-function getDataLayerGroupDivIds(dataId) {
-  const dataViewConfigs = _app.getDataViewConfigs();
-  let viewConfig = dataViewConfigs[dataId];
-  if (typeof viewConfig === 'undefined') {
-    viewConfig = dataViewConfigs['*'];
-  }
-  return getDivIds(viewConfig);
 }
 
 /**
@@ -923,578 +790,6 @@ function setAppTool(toolName) {
 }
 
 /**
- * Bind app to controls.
- */
-function bindAppToControls() {
-  _app.addEventListener('wlchange', onWLChange);
-  _app.addEventListener('opacitychange', onOpacityChange);
-}
-
-/**
- * Unbind app to controls.
- */
-function unbindAppToControls() {
-  _app.removeEventListener('wlchange', onWLChange);
-  _app.removeEventListener('opacitychange', onOpacityChange);
-}
-
-/**
- * Handle app wl change.
- *
- * @param {object} event The change event.
- */
-function onWLChange(event) {
-  // width number
-  let elemId = 'width-' + event.dataid + '-number';
-  let elem = document.getElementById(elemId);
-  if (elem) {
-    elem.value = event.value[1];
-  } else {
-    console.warn('wl change: HTML not ready?');
-  }
-  // width range
-  elemId = 'width-' + event.dataid + '-range';
-  elem = document.getElementById(elemId);
-  if (elem) {
-    elem.value = event.value[1];
-  }
-  // center number
-  elemId = 'center-' + event.dataid + '-number';
-  elem = document.getElementById(elemId);
-  if (elem) {
-    elem.value = event.value[0];
-  }
-  // center range
-  elemId = 'center-' + event.dataid + '-range';
-  elem = document.getElementById(elemId);
-  if (elem) {
-    elem.value = event.value[0];
-  }
-  // preset select
-  elemId = 'preset-' + event.dataid + '-select';
-  const selectElem = document.getElementById(elemId);
-  if (selectElem) {
-    const ids = getDataLayerGroupDivIds(event.dataid);
-    const lg = _app.getLayerGroupByDivId(ids[0]);
-    const vls = lg.getViewLayersByDataId(event.dataid);
-    if (typeof vls !== 'undefined' && vls.length !== 0) {
-      const vl = vls[0];
-      const vc = vl.getViewController();
-      const presetName = vc.getCurrentWindowPresetName();
-      const optName = 'manual';
-      if (presetName === optName) {
-        const options = selectElem.options;
-        const optId = 'preset-manual';
-        let manualOpt = options.namedItem(optId);
-        if (!manualOpt) {
-          const opt = document.createElement('option');
-          opt.id = optId;
-          opt.value = optName;
-          opt.appendChild(document.createTextNode(optName));
-          manualOpt = selectElem.appendChild(opt);
-        }
-        selectElem.selectedIndex = manualOpt.index;
-      }
-    }
-  }
-}
-
-/**
- * Handle app opacity change.
- *
- * @param {object} event The change event.
- */
-function onOpacityChange(event) {
-  const value = parseFloat(event.value[0]).toPrecision(3);
-  // number
-  let elemId = 'opacity-' + event.dataid + '-number';
-  let elem = document.getElementById(elemId);
-  if (elem) {
-    elem.value = value;
-  } else {
-    console.warn('opacity change: HTML not ready?');
-  }
-  // range
-  elemId = 'opacity-' + event.dataid + '-range';
-  elem = document.getElementById(elemId);
-  if (elem) {
-    elem.value = value;
-  }
-}
-
-/**
- * Clear the data table.
- */
-function clearDataTable() {
-  const detailsDiv = document.getElementById('layersdetails');
-  if (detailsDiv) {
-    detailsDiv.innerHTML = '';
-  }
-}
-
-/**
- * Clear a layer details table row.
- *
- * @param {string} dataId The associated data id.
- */
-function clearDataTableRow(dataId) {
-  const row = document.getElementById('data-' + dataId);
-  if (row) {
-    row.remove();
-  }
-}
-
-/**
- * Get a control div: label, range and number field.
- *
- * @param {string} id The control id.
- * @param {string} name The control name.
- * @param {number} min The control minimum value.
- * @param {number} max The control maximum value.
- * @param {number} value The control value.
- * @param {Function} callback The callback on control value change.
- * @param {number} precision Optional number field float precision.
- * @returns {HTMLDivElement} The control div.
- */
-function getControlDiv(
-  id,
-  name,
-  min,
-  max,
-  value,
-  callback,
-  precision) {
-  const range = document.createElement('input');
-  range.id = id + '-range';
-  range.className = 'ctrl-range';
-  range.type = 'range';
-  range.min = min.toPrecision(precision);
-  range.max = max.toPrecision(precision);
-  range.step = ((max - min) * 0.01).toPrecision(precision);
-  range.value = value.toString();
-
-  const label = document.createElement('label');
-  label.id = id + '-label';
-  label.className = 'ctrl-label';
-  label.htmlFor = range.id;
-  label.appendChild(document.createTextNode(name));
-
-  const number = document.createElement('input');
-  number.id = id + '-number';
-  number.className = 'ctrl-number';
-  number.type = 'number';
-  number.min = range.min;
-  number.max = range.max;
-  number.step = range.step;
-  number.value = value.toPrecision(precision);
-
-  // callback and bind range and number
-  number.oninput = function (event) {
-    const element = event.target;
-    range.value = element.value;
-    callback(element.value);
-  };
-  range.oninput = function (event) {
-    const element = event.target;
-    number.value = parseFloat(element.value).toPrecision(precision);
-    callback(element.value);
-  };
-
-  const div = document.createElement('div');
-  div.id = id + '-ctrl';
-  div.className = 'ctrl';
-  div.appendChild(label);
-  div.appendChild(range);
-  div.appendChild(number);
-
-  return div;
-}
-
-/**
- *
- * @param {number} [numberOfLayerGroups] The number of layer groups
- *   used to create the table.
- * @returns {HTMLTableElement} The table element.
- */
-function getLayersTable(numberOfLayerGroups) {
-  let table = document.getElementById('layerstable');
-  // create table if not present
-  if (!table) {
-    table = document.createElement('table');
-    table.id = 'layerstable';
-    const header = table.createTHead();
-    const trow = header.insertRow(0);
-    const insertTCell = function (text) {
-      const th = document.createElement('th');
-      th.innerHTML = text;
-      trow.appendChild(th);
-    };
-    insertTCell('Id');
-    for (let j = 0; j < numberOfLayerGroups; ++j) {
-      insertTCell('LG' + j);
-    }
-    insertTCell('Alpha Range');
-    insertTCell('Contrast');
-    insertTCell('Preset');
-    insertTCell('Alpha');
-    table.createTBody();
-    const div = document.getElementById('layersdetails');
-    div.appendChild(table);
-  }
-  return table;
-}
-
-/**
- * Add a data row.
- *
- * @param {string} dataId The data id.
- */
-function addDataRow(dataId) {
-  // bind app to controls on first id
-  if (dataId === '0') {
-    bindAppToControls();
-  }
-
-  const image = _app.getData(dataId).image;
-  const dataIsImage = typeof image !== 'undefined';
-  const canAlpha = dataIsImage;
-  const isMonochrome = dataIsImage && image.isMonochrome();
-
-  const dataViewConfigs = _app.getDataViewConfigs();
-  const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
-
-  const table = getLayersTable(allLayerGroupDivIds.length);
-  const body = table.tBodies[0];
-
-  // add new layer row
-  const row = body.insertRow();
-  row.id = 'data-' + dataId;
-
-  let cell;
-
-  // get the selected layer group ids
-  const getSelectedLayerGroupIds = function () {
-    const res = [];
-    for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
-      const layerGroupDivId = allLayerGroupDivIds[l];
-      const elemId = 'layerselect-' + layerGroupDivId + '-' + dataId;
-      const elem = document.getElementById(elemId);
-      if (elem && elem.checked) {
-        res.push(layerGroupDivId);
-      }
-    }
-    return res;
-  };
-
-  // get a layer radio button
-  const getLayerRadio = function (index, divId) {
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = 'layerselect-' + index;
-    radio.id = 'layerselect-' + divId + '-' + dataId;
-    radio.checked = true;
-    radio.onchange = function (event) {
-      const element = event.target;
-      const fullId = element.id;
-      const split = fullId.split('-');
-      const groupDivId = split[1];
-      const dataId = split[2];
-      const lg = _app.getLayerGroupByDivId(groupDivId);
-      if (dataIsImage) {
-        lg.setActiveViewLayerByDataId(dataId);
-      } else {
-        lg.setActiveDrawLayerByDataId(dataId);
-      }
-    };
-    return radio;
-  };
-
-  // get a layer add button
-  const getLayerAdd = function (index, divId) {
-    const button = document.createElement('button');
-    button.name = 'layeradd-' + index;
-    button.id = 'layeradd-' + divId + '-' + dataId;
-    button.title = 'Add layer';
-    button.appendChild(document.createTextNode('+'));
-    button.onclick = function () {
-      // update app
-      _app.addDataViewConfig(dataId, getViewConfig(divId));
-      // update html
-      const parent = button.parentElement;
-      if (parent) {
-        parent.replaceChildren();
-        parent.appendChild(getLayerRadio(index, divId));
-        parent.appendChild(getLayerRem(index, divId));
-        parent.appendChild(
-          getLayerUpdate(index, divId, dwv.Orientation.Axial));
-        parent.appendChild(
-          getLayerUpdate(index, divId, dwv.Orientation.Coronal));
-        parent.appendChild(
-          getLayerUpdate(index, divId, dwv.Orientation.Sagittal));
-      }
-    };
-    return button;
-  };
-
-  // get a layer remove button
-  const getLayerRem = function (index, divId) {
-    const button = document.createElement('button');
-    button.name = 'layerrem-' + index;
-    button.id = 'layerrem-' + divId + '-' + dataId;
-    button.title = 'Remove layer';
-    button.appendChild(document.createTextNode('-'));
-    button.onclick = function () {
-      // update app
-      _app.removeDataViewConfig(dataId, divId);
-      // update html
-      const parent = button.parentElement;
-      parent.replaceChildren();
-      parent.appendChild(getLayerAdd(index, divId));
-    };
-    return button;
-  };
-
-  // get a layer update button
-  const getLayerUpdate = function (index, divId, orientation) {
-    const button = document.createElement('button');
-    const letter = orientation[0].toUpperCase();
-    button.name = 'layerupd-' + index + '_' + letter;
-    button.id = 'layerupd-' + divId + '-' + dataId + '_' + letter;
-    button.title = 'Change layer orientation to ' + orientation;
-    button.appendChild(document.createTextNode(letter));
-    button.onclick = function () {
-      // update app
-      const config = getViewConfig(divId);
-      config.orientation = orientation;
-      _app.updateDataViewConfig(dataId, divId, config);
-    };
-    return button;
-  };
-
-  // cell: id
-  cell = row.insertCell();
-  cell.appendChild(document.createTextNode(dataId));
-
-  // cell: radio
-  let viewConfig = dataViewConfigs[dataId];
-  if (typeof viewConfig === 'undefined') {
-    viewConfig = dataViewConfigs['*'];
-  }
-  const dataLayerGroupsIds = getDivIds(viewConfig);
-  for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
-    const layerGroupDivId = allLayerGroupDivIds[l];
-    cell = row.insertCell();
-    if (dataLayerGroupsIds.includes(layerGroupDivId)) {
-      cell.appendChild(getLayerRadio(l, layerGroupDivId));
-      cell.appendChild(getLayerRem(l, layerGroupDivId));
-      cell.appendChild(
-        getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Axial));
-      cell.appendChild(
-        getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Coronal));
-      cell.appendChild(
-        getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Sagittal));
-    } else {
-      cell.appendChild(getLayerAdd(l, layerGroupDivId));
-    }
-  }
-
-  // use first layer
-  const initialVls = _app.getViewLayersByDataId(dataId);
-  const initialDls = _app.getDrawLayersByDataId(dataId);
-  let initialLayer;
-  if (initialVls.length !== 0) {
-    initialLayer = initialVls[0];
-  } else if (initialDls.length !== 0) {
-    initialLayer = initialDls[0];
-  }
-
-  const floatPrecision = 4;
-
-  // cell: alpha range
-  cell = row.insertCell();
-  const minId = 'value-min-' + dataId;
-  const maxId = 'value-max-' + dataId;
-  // callback
-  const changeAlphaFunc = function () {
-    const minElement = document.getElementById(minId + '-number');
-    const min = parseFloat(minElement.value);
-    const maxElement = document.getElementById(maxId + '-number');
-    const max = parseFloat(maxElement.value);
-    const func = function (value, _index) {
-      if (value >= min && value <= max) {
-        return 255;
-      }
-      return 0;
-    };
-    // update selected layers
-    const lgIds = getSelectedLayerGroupIds();
-    for (let i = 0; i < lgIds.length; ++i) {
-      const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vl = lg.getActiveViewLayer();
-      if (typeof vl !== 'undefined') {
-        const vc = vl.getViewController();
-        vc.setViewAlphaFunction(func);
-      }
-    }
-  };
-  // add controls
-  if (canAlpha) {
-    const dataRange = image.getDataRange();
-    cell.appendChild(getControlDiv(minId, 'min',
-      dataRange.min, dataRange.max, dataRange.min,
-      changeAlphaFunc, floatPrecision));
-    cell.appendChild(getControlDiv(maxId, 'max',
-      dataRange.min, dataRange.max, dataRange.max,
-      changeAlphaFunc, floatPrecision));
-  }
-
-  // cell: contrast
-  cell = row.insertCell();
-  const widthId = 'width-' + dataId;
-  const centerId = 'center-' + dataId;
-  // callback
-  const changeContrast = function () {
-    const wElement = document.getElementById(widthId + '-number');
-    const width = parseFloat(wElement.value);
-    const cElement = document.getElementById(centerId + '-number');
-    const center = parseFloat(cElement.value);
-    // update selected layers
-    const lgIds = getSelectedLayerGroupIds();
-    for (let i = 0; i < lgIds.length; ++i) {
-      const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vl = lg.getActiveViewLayer();
-      if (typeof vl !== 'undefined') {
-        const vc = vl.getViewController();
-        vc.setWindowLevel(new dwv.WindowLevel(center, width));
-      }
-    }
-  };
-  // add controls
-  if (isMonochrome) {
-    const initialVc = initialLayer.getViewController();
-    const rescaledDataRange = image.getRescaledDataRange();
-    cell.appendChild(getControlDiv(widthId, 'width',
-      0,
-      rescaledDataRange.max - rescaledDataRange.min,
-      initialVc.getWindowLevel().width,
-      changeContrast, floatPrecision));
-    cell.appendChild(getControlDiv(centerId, 'center',
-      rescaledDataRange.min,
-      rescaledDataRange.max,
-      initialVc.getWindowLevel().center,
-      changeContrast, floatPrecision));
-  }
-
-  // cell: presets
-  cell = row.insertCell();
-
-  // window level preset
-  // callback
-  const changePreset = function (event) {
-    const element = event.target;
-    // update selected layers
-    const lgIds = getSelectedLayerGroupIds();
-    for (let i = 0; i < lgIds.length; ++i) {
-      const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vl = lg.getActiveViewLayer();
-      if (typeof vl !== 'undefined') {
-        const vc = vl.getViewController();
-        vc.setWindowLevelPreset(element.value);
-      }
-    }
-  };
-  if (isMonochrome) {
-    const selectPreset = document.createElement('select');
-    selectPreset.id = 'preset-' + dataId + '-select';
-    const initialVc = initialLayer.getViewController();
-    const presets = initialVc.getWindowLevelPresetsNames();
-    const currentPresetName = initialVc.getCurrentWindowPresetName();
-    for (const preset of presets) {
-      const option = document.createElement('option');
-      option.value = preset;
-      if (preset === currentPresetName) {
-        option.selected = true;
-      }
-      option.appendChild(document.createTextNode(preset));
-      selectPreset.appendChild(option);
-    }
-    selectPreset.onchange = changePreset;
-    const labelPreset = document.createElement('label');
-    labelPreset.htmlFor = selectPreset.id;
-    labelPreset.appendChild(document.createTextNode('wl: '));
-    cell.appendChild(labelPreset);
-    cell.appendChild(selectPreset);
-  }
-
-  // break line
-  const br = document.createElement('br');
-  cell.appendChild(br);
-
-  // colour map
-  // callback
-  const changeColourMap = function (event) {
-    const element = event.target;
-    // update selected layers
-    const lgIds = getSelectedLayerGroupIds();
-    for (let i = 0; i < lgIds.length; ++i) {
-      const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      const vl = lg.getActiveViewLayer();
-      if (typeof vl !== 'undefined') {
-        const vc = vl.getViewController();
-        vc.setColourMap(element.value);
-      }
-    }
-  };
-  if (isMonochrome) {
-    const selectColourMap = document.createElement('select');
-    selectColourMap.id = 'colourmap-' + dataId + '-select';
-    const initialVc = initialLayer.getViewController();
-    const colourMaps = Object.keys(dwv.luts);
-    const currentColourMap = initialVc.getColourMap();
-    for (const colourMap of colourMaps) {
-      const option = document.createElement('option');
-      option.value = colourMap;
-      if (colourMap === currentColourMap) {
-        option.selected = true;
-      }
-      option.appendChild(document.createTextNode(colourMap));
-      selectColourMap.appendChild(option);
-    }
-    selectColourMap.onchange = changeColourMap;
-    const labelColourMap = document.createElement('label');
-    labelColourMap.htmlFor = selectColourMap.id;
-    labelColourMap.appendChild(document.createTextNode('cm: '));
-    cell.appendChild(labelColourMap);
-    cell.appendChild(selectColourMap);
-  }
-
-  // cell: opactiy
-  cell = row.insertCell();
-  const opacityId = 'opacity-' + dataId;
-  // callback
-  const changeOpacity = function (value) {
-    // update selected layers
-    const lgIds = getSelectedLayerGroupIds();
-    for (let i = 0; i < lgIds.length; ++i) {
-      const lg = _app.getLayerGroupByDivId(lgIds[i]);
-      let layer;
-      if (dataIsImage) {
-        layer = lg.getActiveViewLayer();
-      } else {
-        layer = lg.getActiveDrawLayer();
-      }
-      if (typeof layer !== 'undefined') {
-        layer.setOpacity(value);
-        layer.draw();
-      }
-    }
-  };
-  // add controls
-  cell.appendChild(getControlDiv(opacityId, 'opacity',
-    0, 1, initialLayer.getOpacity(), changeOpacity, floatPrecision));
-}
-
-/**
  * Compare two pos pat keys.
  *
  * @param {string} a The key of the first item.
@@ -1619,132 +914,6 @@ function getMetaDataWithNames(metaData) {
     meta = Object.keys(meta).reduce(getTagKeysReducer(meta), {});
   }
   return meta;
-}
-
-/**
- * Setup test line.
- */
-function setupTests() {
-  const renderTestButton = document.createElement('button');
-  renderTestButton.onclick = runRenderTest;
-  renderTestButton.appendChild(document.createTextNode('render test'));
-
-  const saveState = document.createElement('a');
-  saveState.appendChild(document.createTextNode('save state'));
-  saveState.href = '';
-  // saveState.onclick = function () {
-  //   const blob = new Blob([_app.getJsonState()], {type: 'application/json'});
-  //   saveState.href = window.URL.createObjectURL(blob);
-  // };
-  // saveState.download = 'state.json';
-  saveState.onclick = function () {
-
-    const layerGroup = _app.getActiveLayerGroup();
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const drawController = drawLayer.getDrawController();
-    const annotationGroup = drawController.getAnnotationGroup();
-    const factory = new dwv.AnnotationFactory();
-    const dicomElements = factory.toDicom(annotationGroup);
-    // write
-    const writer = new dwv.DicomWriter();
-    let dicomBuffer = null;
-    try {
-      dicomBuffer = writer.getBuffer(dicomElements);
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
-    }
-    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-    saveState.href = window.URL.createObjectURL(blob);
-  };
-  saveState.download = 'dicom-sr-0.dcm';
-
-  const testsDiv = document.getElementById('tests');
-  testsDiv.appendChild(renderTestButton);
-  testsDiv.appendChild(saveState);
-}
-
-/**
- * Get basic stats for an array.
- *
- * @param {Array} array Input array.
- * @returns {object} Min, max, mean and standard deviation.
- */
-function getBasicStats(array) {
-  let min = array[0];
-  let max = min;
-  let sum = 0;
-  let sumSqr = 0;
-  let val = 0;
-  const length = array.length;
-  for (let i = 0; i < length; ++i) {
-    val = array[i];
-    if (val < min) {
-      min = val;
-    } else if (val > max) {
-      max = val;
-    }
-    sum += val;
-    sumSqr += val * val;
-  }
-
-  const mean = sum / length;
-  // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-  const variance = sumSqr / length - mean * mean;
-  const stdDev = Math.sqrt(variance);
-
-  return {
-    min: min,
-    max: max,
-    mean: mean,
-    stdDev: stdDev
-  };
-}
-
-/**
- * Run render tests.
- */
-function runRenderTest() {
-  const numberOfRun = 20;
-  // default to first layer group
-  _app.setActiveLayerGroup(1);
-
-  const vl = _app.getActiveLayerGroup().getActiveViewLayer();
-  if (typeof vl === 'undefined') {
-    return;
-  }
-  const vc = vl.getViewController();
-  const runner = function () {
-    vc.incrementScrollIndex();
-  };
-
-  let startTime;
-  const timings = [];
-  const onRenderStart = function (/*event*/) {
-    startTime = performance.now();
-  };
-  const onRenderEnd = function (/*event*/) {
-    const endTime = performance.now();
-    timings.push(endTime - startTime);
-
-    if (timings.length < numberOfRun) {
-      setTimeout(() => {
-        runner();
-      }, 100);
-    } else {
-      console.log('Stats:', getBasicStats(timings));
-      // clean up
-      _app.removeEventListener('renderstart', onRenderStart);
-      _app.removeEventListener('renderend', onRenderEnd);
-    }
-  };
-
-  // setup
-  _app.addEventListener('renderstart', onRenderStart);
-  _app.addEventListener('renderend', onRenderEnd);
-
-  // start
-  runner();
 }
 
 /**
