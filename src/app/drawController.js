@@ -1,4 +1,4 @@
-import {AnnotationGroup} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotationGroup';
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand

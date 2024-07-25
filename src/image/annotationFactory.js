@@ -36,7 +36,8 @@ import {
 } from '../dicom/dicomSpatialCoordinate';
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
-import {Annotation, AnnotationGroup} from './annotation';
+import {Annotation} from './annotation';
+import {AnnotationGroup} from './annotationGroup';
 import {Line} from '../math/line';
 import {Point2D} from '../math/point';
 

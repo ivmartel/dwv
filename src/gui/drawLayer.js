@@ -21,7 +21,8 @@ import {Index} from '../math/index';
 import {Vector3D} from '../math/vector';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 import {PlaneHelper} from '../image/planeHelper';
-import {Annotation, AnnotationGroup} from '../image/annotation';
+import {Annotation} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotationGroup';
 import {DrawShapeHandler} from '../tools/drawShapeHandler';
 /* eslint-enable no-unused-vars */
 

@@ -25,7 +25,7 @@ import {toolList, defaultToolList, toolOptions} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
 import {PlaneHelper} from '../image/planeHelper';
-import {AnnotationGroup} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotationGroup';
 
 // doc imports
 /* eslint-disable no-unused-vars */

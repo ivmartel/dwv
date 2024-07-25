@@ -4,7 +4,7 @@ import {mergeObjects} from '../utils/operator';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from '../image/image';
-import {AnnotationGroup} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotationGroup';
 /* eslint-enable no-unused-vars */
 
 /**

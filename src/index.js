@@ -12,10 +12,8 @@ import {
 import {
   DicomData
 } from './app/dataController';
-import {
-  Annotation,
-  AnnotationGroup
-} from './image/annotation';
+import {Annotation} from './image/annotation';
+import {AnnotationGroup} from './image/annotationGroup';
 import {AnnotationFactory} from './image/annotationFactory';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
