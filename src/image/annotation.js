@@ -40,13 +40,6 @@ export class Annotation {
   referenceSopUID;
 
   /**
-   * The position: an Index converted to string.
-   *
-   * @type {string}
-   */
-  position;
-
-  /**
    * The mathematical shape.
    *
    * @type {object}
@@ -83,7 +76,8 @@ export class Annotation {
   textExpr;
 
   /**
-   * Label position.
+   * Label position. If undefined, the default shape
+   *   label position will be used.
    *
    * @type {Point2D|undefined}
    */
