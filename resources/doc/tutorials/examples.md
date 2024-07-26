@@ -25,6 +25,10 @@ Displays:
 - [display example #2.3](./Opacity.html#Opacity): with opacity
 - [display example #3](./Scroll.html#Scroll): with multiple slices with or without a slider
 
+Extending dwv:
+
+- [custom tool example #1](./global.html#toolList): add a custom tool
+
 All the ones of jsfiddle: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
 
 ## Module

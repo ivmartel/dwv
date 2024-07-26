@@ -21,6 +21,32 @@ import {Filter, Threshold, Sobel, Sharpen} from './filter';
  * List of client provided tools to be added to
  * the default ones.
  *
+ * @example
+ * // custom tool
+ * class AlertTool {
+ *   mousedown() {alert('AlertTool mousedown');}
+ *   init() {}
+ *   activate() {}
+ * }
+ * // pass it to dwv tool list
+ * dwv.toolList['AlertTool'] = AlertTool;
+ * // create the dwv app
+ * const app = new dwv.App();
+ * // initialise
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * options.tools = {AlertTool: {}};
+ * app.init(options);
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('AlertTool');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
+ *
  * @type {Object<string, any>}
  */
 export const toolList = {};
