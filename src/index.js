@@ -98,7 +98,7 @@ import {Orientation} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
 import {NumberRange} from './math/stats';
 // tools
-import {toolList} from './tools/index';
+import {toolList, toolOptions} from './tools/index';
 import {ScrollWheel} from './tools/scrollWheel';
 // utils
 import {precisionRound} from './utils/string';
@@ -169,6 +169,7 @@ export {
   defaultPresets,
   i18n,
   toolList,
+  toolOptions,
   Orientation,
   BLACK,
   addTagsToDictionary,
