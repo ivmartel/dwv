@@ -10,7 +10,11 @@ import {splitKeyValueString} from './string';
 export function getUrlFromUri(uri) {
   // add base to allow for relative urls
   // (base is not used for absolute urls)
-  return new URL(uri, window.location.origin);
+  let base;
+  if (window.location.origin !== 'null') {
+    base = window.location.origin;
+  }
+  return new URL(uri, base);
 }
 
 /**
