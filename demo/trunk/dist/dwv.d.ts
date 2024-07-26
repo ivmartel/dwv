@@ -3909,18 +3909,18 @@ export declare class ToolConfig {
  *   activate() {}
  * }
  * // pass it to dwv tool list
- * dwv.toolList['AlertTool'] = AlertTool;
+ * dwv.toolList['Alert'] = AlertTool;
  * // create the dwv app
  * const app = new dwv.App();
  * // initialise
  * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
  * const options = new dwv.AppOptions(viewConfigs);
- * options.tools = {AlertTool: {}};
+ * options.tools = {Alert: {}};
  * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
- *   app.setTool('AlertTool');
+ *   app.setTool('Alert');
  * });
  * // load dicom data
  * app.loadURLs([
