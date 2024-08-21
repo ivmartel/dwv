@@ -29,12 +29,6 @@ export declare class Annotation {
      */
     referenceSopUID: string;
     /**
-     * The position: an Index converted to string.
-     *
-     * @type {string}
-     */
-    position: string;
-    /**
      * The mathematical shape.
      *
      * @type {object}
@@ -66,7 +60,8 @@ export declare class Annotation {
      */
     textExpr: string | undefined;
     /**
-     * Label position.
+     * Label position. If undefined, the default shape
+     *   label position will be used.
      *
      * @type {Point2D|undefined}
      */
@@ -115,50 +110,6 @@ export declare class Annotation {
      * @returns {string} The type.
      */
     getType(): string;
-    #private;
-}
-
-/**
- * {@link Annotation} factory.
- */
-export declare class AnnotationFactory {
-    /**
-     * Get a warning string if elements are not as expected.
-     * Created by checkElements.
-     *
-     * @returns {string|undefined} The warning.
-     */
-    getWarning(): string | undefined;
-    /**
-     * Check dicom elements. Throws an error if not suitable.
-     *
-     * @param {Object<string, DataElement>} dataElements The DICOM data elements.
-     * @returns {string|undefined} A possible warning.
-     */
-    checkElements(dataElements: {
-        [x: string]: DataElement;
-    }): string | undefined;
-    /**
-     * Get an {@link Annotation} object from the read DICOM file.
-     *
-     * @param {Object<string, DataElement>} dataElements The DICOM tags.
-     * @returns {AnnotationGroup} A new annotation group.
-     */
-    create(dataElements: {
-        [x: string]: DataElement;
-    }): AnnotationGroup;
-    /**
-     * Convert an annotation group into a DICOM SR object.
-     *
-     * @param {AnnotationGroup} annotationGroup The annotation group.
-     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
-     * @returns {Object<string, DataElement>} A list of dicom elements.
-     */
-    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
-        [x: string]: any;
-    }): {
-        [x: string]: DataElement;
-    };
     #private;
 }
 
@@ -272,6 +223,50 @@ export declare class AnnotationGroup {
      *   event type.
      */
     removeEventListener(type: string, callback: Function): void;
+    #private;
+}
+
+/**
+ * {@link AnnotationGroup} factory.
+ */
+export declare class AnnotationGroupFactory {
+    /**
+     * Get a warning string if elements are not as expected.
+     * Created by checkElements.
+     *
+     * @returns {string|undefined} The warning.
+     */
+    getWarning(): string | undefined;
+    /**
+     * Check dicom elements. Throws an error if not suitable.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+     * @returns {string|undefined} A possible warning.
+     */
+    checkElements(dataElements: {
+        [x: string]: DataElement;
+    }): string | undefined;
+    /**
+     * Get an {@link Annotation} object from the read DICOM file.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
+     * @returns {AnnotationGroup} A new annotation group.
+     */
+    create(dataElements: {
+        [x: string]: DataElement;
+    }): AnnotationGroup;
+    /**
+     * Convert an annotation group into a DICOM SR object.
+     *
+     * @param {AnnotationGroup} annotationGroup The annotation group.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
+     */
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
     #private;
 }
 

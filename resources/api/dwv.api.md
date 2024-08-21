@@ -21,7 +21,6 @@ export class Annotation {
     id: string;
     labelPosition: Point2D | undefined;
     mathShape: object;
-    position: string;
     quantification: object | undefined;
     referencePoints: Point2D[] | undefined;
     referenceSopUID: string;
@@ -31,22 +30,6 @@ export class Annotation {
     setViewController(viewController: ViewController): void;
     textExpr: string | undefined;
     updateQuantification(): void;
-}
-
-// @public
-export class AnnotationFactory {
-    checkElements(dataElements: {
-        [x: string]: DataElement;
-    }): string | undefined;
-    create(dataElements: {
-        [x: string]: DataElement;
-    }): AnnotationGroup;
-    getWarning(): string | undefined;
-    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
-        [x: string]: any;
-    }): {
-        [x: string]: DataElement;
-    };
 }
 
 // @public
@@ -69,6 +52,22 @@ export class AnnotationGroup {
     setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
     update(annotation: Annotation, propKeys?: string[]): void;
+}
+
+// @public
+export class AnnotationGroupFactory {
+    checkElements(dataElements: {
+        [x: string]: DataElement;
+    }): string | undefined;
+    create(dataElements: {
+        [x: string]: DataElement;
+    }): AnnotationGroup;
+    getWarning(): string | undefined;
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
 }
 
 // @public
