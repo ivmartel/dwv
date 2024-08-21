@@ -197,27 +197,30 @@ export class Draw {
       layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
     }
 
+    // data should exist / be created
+    const data = drawLayer.getDrawController().getAnnotationGroup();
+
     // set the layer shape handler
     drawLayer.setShapeHandler(this.#shapeHandler);
 
     const stage = drawLayer.getKonvaStage();
 
-    // determine if the click happened in an existing shape
+    // update scale
+    this.#style.setZoomScale(stage.scale());
+
+    // determine if the click happened on an existing shape
     const kshape = stage.getIntersection({
       x: point.getX(),
       y: point.getY()
     });
 
-    // update scale
-    this.#style.setZoomScale(stage.scale());
-
-    // If shape exists, let user to edit
     if (kshape) {
+      // select shape for edition
       this.#selectShapeGroup(drawLayer, kshape);
-      return;
+    } else if (data.isEditable()) {
+      // create new shape
+      this.#startShapeGroupCreation(layerGroup, point);
     }
-    // Else, is a new shape creation
-    this.#startShapeGroupCreation(layerGroup, point);
   }
 
   /**
