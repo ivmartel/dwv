@@ -85,7 +85,7 @@ export class UndoStack {
     const index = this.#stack.findIndex(hasInputName);
     if (index !== -1) {
       // remove command
-      const del = this.#stack.splice(index, 1);
+      this.#stack.splice(index, 1);
       // decrement index
       --this.#curCmdIndex;
       // result
