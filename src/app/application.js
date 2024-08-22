@@ -482,6 +482,22 @@ export class App {
   };
 
   /**
+   * Remove a command from the undo stack.
+   *
+   * @param {string} name The name of the command to remove.
+   * @returns {boolean} True if the command was found and removed.
+   * @fires UndoStack#undoremove
+   * @function
+   */
+  removeFromUndoStack = (name) => {
+    let res = false;
+    if (this.#undoStack !== null) {
+      res = this.#undoStack.remove(name);
+    }
+    return res;
+  };
+
+  /**
    * Initialise the application.
    *
    * @param {AppOptions} opt The application options.

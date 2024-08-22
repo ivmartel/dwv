@@ -71,6 +71,42 @@ export class UndoStack {
   }
 
   /**
+   * Remove a command to the stack.
+   *
+   * @param {string} name The name of the command to remove.
+   * @returns {boolean} True if the command was found and removed.
+   * @fires UndoStack#undoremove
+   */
+  remove(name) {
+    let res = false;
+    const hasInputName = function (element) {
+      return element.getName() === name;
+    };
+    const index = this.#stack.findIndex(hasInputName);
+    if (index !== -1) {
+      // remove command
+      const del = this.#stack.splice(index, 1);
+      // decrement index
+      --this.#curCmdIndex;
+      // result
+      res = true;
+      /**
+       * Command remove from undo stack event.
+       *
+       * @event UndoStack#undoremove
+       * @type {object}
+       * @property {string} command The name of the command added to the
+       *   undo stack.
+       */
+      this.#fireEvent({
+        type: 'undoremove',
+        command: name
+      });
+    }
+    return res;
+  }
+
+  /**
    * Undo the last command.
    *
    * @fires UndoStack#undo
