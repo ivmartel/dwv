@@ -16,7 +16,7 @@ import {ListenerHandler} from '../utils/listen';
 import {State} from '../io/state';
 import {logger} from '../utils/logger';
 import {getUriQuery, decodeQuery} from '../utils/uri';
-import {UndoStack} from '../utils/undo';
+import {UndoStack} from '../utils/undoStack';
 import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
