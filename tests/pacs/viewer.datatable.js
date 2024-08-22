@@ -19,41 +19,22 @@ function getDivIds(dataViewConfig) {
   return divIds;
 }
 
-/**
- * Get the layer groups div ids from the data view configs.
- *
- * @param {object} dataViewConfigs The configs.
- * @returns {Array} The list of ids.
- */
-test.getLayerGroupDivIds = function (dataViewConfigs) {
-  const divIds = [];
-  const keys = Object.keys(dataViewConfigs);
-  for (let i = 0; i < keys.length; ++i) {
-    const dataViewConfig = dataViewConfigs[keys[i]];
-    for (let j = 0; j < dataViewConfig.length; ++j) {
-      const divId = dataViewConfig[j].divId;
-      if (!divIds.includes(divId)) {
-        divIds.push(divId);
-      }
-    }
-  }
-  return divIds;
-};
-
 test.DataTable = function (app) {
 
   /**
    * Bind app to controls.
+   *
+   * @param {string} layout The layout.
    */
-  this.registerListeners = function () {
+  this.registerListeners = function (layout) {
     // add data row on layer creation
     app.addEventListener('viewlayeradd', function (event) {
       clearDataTableRow(event.dataid);
-      addDataRow(event.dataid);
+      addDataRow(event.dataid, layout);
     });
     app.addEventListener('drawlayeradd', function (event) {
       clearDataTableRow(event.dataid);
-      addDataRow(event.dataid);
+      addDataRow(event.dataid, layout);
     });
 
     app.addEventListener('wlchange', onWLChange);
@@ -190,72 +171,6 @@ test.DataTable = function (app) {
   }
 
   /**
-   * Get a control div: label, range and number field.
-   *
-   * @param {string} id The control id.
-   * @param {string} name The control name.
-   * @param {number} min The control minimum value.
-   * @param {number} max The control maximum value.
-   * @param {number} value The control value.
-   * @param {Function} callback The callback on control value change.
-   * @param {number} precision Optional number field float precision.
-   * @returns {HTMLDivElement} The control div.
-   */
-  function getControlDiv(
-    id,
-    name,
-    min,
-    max,
-    value,
-    callback,
-    precision) {
-    const range = document.createElement('input');
-    range.id = id + '-range';
-    range.className = 'ctrl-range';
-    range.type = 'range';
-    range.min = min.toPrecision(precision);
-    range.max = max.toPrecision(precision);
-    range.step = ((max - min) * 0.01).toPrecision(precision);
-    range.value = value.toString();
-
-    const label = document.createElement('label');
-    label.id = id + '-label';
-    label.className = 'ctrl-label';
-    label.htmlFor = range.id;
-    label.appendChild(document.createTextNode(name));
-
-    const number = document.createElement('input');
-    number.id = id + '-number';
-    number.className = 'ctrl-number';
-    number.type = 'number';
-    number.min = range.min;
-    number.max = range.max;
-    number.step = range.step;
-    number.value = value.toPrecision(precision);
-
-    // callback and bind range and number
-    number.oninput = function (event) {
-      const element = event.target;
-      range.value = element.value;
-      callback(element.value);
-    };
-    range.oninput = function (event) {
-      const element = event.target;
-      number.value = parseFloat(element.value).toPrecision(precision);
-      callback(element.value);
-    };
-
-    const div = document.createElement('div');
-    div.id = id + '-ctrl';
-    div.className = 'ctrl';
-    div.appendChild(label);
-    div.appendChild(range);
-    div.appendChild(number);
-
-    return div;
-  }
-
-  /**
    *
    * @param {number} [numberOfLayerGroups] The number of layer groups
    *   used to create the table.
@@ -293,8 +208,9 @@ test.DataTable = function (app) {
    * Add a data row.
    *
    * @param {string} dataId The data id.
+   * @param {string} layout The layout.
    */
-  function addDataRow(dataId) {
+  function addDataRow(dataId, layout) {
     // bind app to controls on first id
     // if (dataId === '0') {
     //   this.registerListeners();
@@ -363,7 +279,7 @@ test.DataTable = function (app) {
       button.appendChild(document.createTextNode('+'));
       button.onclick = function () {
         // update app
-        app.addDataViewConfig(dataId, test.getViewConfig(divId));
+        app.addDataViewConfig(dataId, test.getViewConfig(layout, divId));
         // update html
         const parent = button.parentElement;
         if (parent) {
@@ -409,7 +325,7 @@ test.DataTable = function (app) {
       button.appendChild(document.createTextNode(letter));
       button.onclick = function () {
         // update app
-        const config = test.getViewConfig(divId);
+        const config = test.getViewConfig(layout, divId);
         config.orientation = orientation;
         app.updateDataViewConfig(dataId, divId, config);
       };
@@ -485,10 +401,10 @@ test.DataTable = function (app) {
     // add controls
     if (canAlpha) {
       const dataRange = image.getDataRange();
-      cell.appendChild(getControlDiv(minId, 'min',
+      cell.appendChild(test.getControlDiv(minId, 'min',
         dataRange.min, dataRange.max, dataRange.min,
         changeAlphaFunc, floatPrecision));
-      cell.appendChild(getControlDiv(maxId, 'max',
+      cell.appendChild(test.getControlDiv(maxId, 'max',
         dataRange.min, dataRange.max, dataRange.max,
         changeAlphaFunc, floatPrecision));
     }
@@ -518,12 +434,12 @@ test.DataTable = function (app) {
     if (isMonochrome) {
       const initialVc = initialLayer.getViewController();
       const rescaledDataRange = image.getRescaledDataRange();
-      cell.appendChild(getControlDiv(widthId, 'width',
+      cell.appendChild(test.getControlDiv(widthId, 'width',
         0,
         rescaledDataRange.max - rescaledDataRange.min,
         initialVc.getWindowLevel().width,
         changeContrast, floatPrecision));
-      cell.appendChild(getControlDiv(centerId, 'center',
+      cell.appendChild(test.getControlDiv(centerId, 'center',
         rescaledDataRange.min,
         rescaledDataRange.max,
         initialVc.getWindowLevel().center,
@@ -635,7 +551,7 @@ test.DataTable = function (app) {
       }
     };
     // add controls
-    cell.appendChild(getControlDiv(opacityId, 'opacity',
+    cell.appendChild(test.getControlDiv(opacityId, 'opacity',
       0, 1, initialLayer.getOpacity(), changeOpacity, floatPrecision));
   }
 

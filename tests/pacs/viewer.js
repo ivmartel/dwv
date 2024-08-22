@@ -369,7 +369,7 @@ function onDOMContentLoaded() {
   viewerSetup();
 
   const dataTable = new test.DataTable(_app);
-  dataTable.registerListeners();
+  dataTable.registerListeners(_layout);
 
   const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function (event) {
@@ -496,26 +496,6 @@ function addLayerGroups(number) {
 }
 
 /**
- * Get a full view for a given div id.
- *
- * @param {string} divId The div id.
- * @returns {object} The config.
- */
-test.getViewConfig = function (divId) {
-  const config = {divId: divId};
-  if (_layout === 'mpr') {
-    if (divId === 'layerGroup0') {
-      config.orientation = dwv.Orientation.Axial;
-    } else if (divId === 'layerGroup1') {
-      config.orientation = dwv.Orientation.Coronal;
-    } else if (divId === 'layerGroup2') {
-      config.orientation = dwv.Orientation.Sagittal;
-    }
-  }
-  return config;
-};
-
-/**
  * Merge an app data config into the input one.
  * Copies all but the divId and orientation property.
  *
@@ -524,7 +504,7 @@ test.getViewConfig = function (divId) {
  * @returns {object} The update config.
  */
 function mergeDataConfig(dataId, config) {
-  const oldConfigs = _app.getViewConfigs(dataId);
+  const oldConfigs = _app.getViewConfigs(_layout, dataId);
   if (oldConfigs.length !== 0) {
     // use first config as base
     const oldConfig = oldConfigs[0];
@@ -548,7 +528,7 @@ function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
     configs[dataId] =
-      [mergeDataConfig(dataId, test.getViewConfig('layerGroup0'))];
+      [mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup0'))];
   }
   return configs;
 }
@@ -565,9 +545,9 @@ function getOnebyTwoDataViewConfig(dataIds) {
     const dataId = dataIds[i];
     let config;
     if (i % 2 === 0) {
-      config = test.getViewConfig('layerGroup0');
+      config = test.getViewConfig(_layout, 'layerGroup0');
     } else {
-      config = test.getViewConfig('layerGroup1');
+      config = test.getViewConfig(_layout, 'layerGroup1');
     }
     configs[dataIds[i]] = [mergeDataConfig(dataId, config)];
   }
@@ -584,9 +564,9 @@ function getMPRDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
     configs[dataId] = [
-      mergeDataConfig(dataId, test.getViewConfig('layerGroup0')),
-      mergeDataConfig(dataId, test.getViewConfig('layerGroup1')),
-      mergeDataConfig(dataId, test.getViewConfig('layerGroup2'))
+      mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup0')),
+      mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup1')),
+      mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup2'))
     ];
   }
   return configs;
