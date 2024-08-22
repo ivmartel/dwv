@@ -1,4 +1,4 @@
-import {ListenerHandler} from '../utils/listen';
+import {ListenerHandler} from './listen';
 
 /**
  * UndoStack class.
