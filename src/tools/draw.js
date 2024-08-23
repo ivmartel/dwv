@@ -566,10 +566,9 @@ export class Draw {
         '#ffff80', '#ff80ff', '#80ffff', '#80ff80', '8080ff', 'ff8080'
       ];
       // warning: depends on layer id nomenclature
-      const viewLayerId = viewLayer.getId();
-      const layerId = viewLayerId.substring(viewLayerId.length - 1);
-      // expecting one draw layer per view layer
-      const layerIndex = parseInt(layerId, 10) / 2;
+      const drawLayerId = drawLayer.getId();
+      const layerId = drawLayerId.substring(drawLayerId.length - 1);
+      const layerIndex = parseInt(layerId, 10) - 1;
       const colour = colours[layerIndex];
       if (typeof colour !== 'undefined') {
         this.#style.setLineColour(colour);
@@ -675,12 +674,6 @@ export class Draw {
         this.#getPositionCallback(layerGroup)
       );
     } else {
-      // reset layer shape handler
-      const drawLayer = layerGroup.getActiveDrawLayer();
-      if (typeof drawLayer !== 'undefined') {
-        drawLayer.setShapeHandler(undefined);
-      }
-
       // reset shape and cursor
       this.#shapeHandler.onMouseOutShapeGroup();
       // remove listeners
