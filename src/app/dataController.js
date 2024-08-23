@@ -116,7 +116,8 @@ export class DataController {
     }
     const keys = Object.keys(this.#dataList);
     for (const key of keys) {
-      if (this.#dataList[key].image.containsImageUids(uids)) {
+      if (typeof this.#dataList[key].image !== 'undefined' &&
+        this.#dataList[key].image.containsImageUids(uids)) {
         res.push(key);
       }
     }
