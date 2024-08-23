@@ -147,16 +147,43 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
         annotDataids.push(dataId);
       }
     }
+    const annotList = document.createElement('ul');
+    annotList.id = 'annotation-list';
+
     if (annotDataids.length !== 0) {
-      const annotList = document.createElement('ul');
-      annotList.id = 'annotation-list';
       for (const dataId of annotDataids) {
         const segmentationItem = getAnnotationGroupHtml(
           app.getData(dataId).annotationGroup, dataId);
         annotList.appendChild(segmentationItem);
       }
-      res.appendChild(annotList);
     }
+
+    // extra item for add annotation group button
+    const addItem = document.createElement('li');
+    const addAnnotationGroupButton = document.createElement('button');
+    addAnnotationGroupButton.appendChild(
+      document.createTextNode('Add annotation group'));
+    addAnnotationGroupButton.onclick = function (event) {
+      // remove list item
+      event.target.parentElement.remove();
+
+      const divId = 'layerGroup0';
+      const layerGroup = app.getLayerGroupByDivId(divId);
+
+      // add annotation group
+      const data = app.createAnnotationData(layerGroup);
+      // render (will create draw layer)
+      app.addAndRenderAnnotationData(data, divId);
+
+      // update UI
+      // item is added by the 'dataadd' listener
+      // put back list item
+      annotList.appendChild(event.target.parentElement);
+    };
+    addItem.appendChild(addAnnotationGroupButton);
+    annotList.appendChild(addItem);
+
+    res.appendChild(annotList);
 
     return res;
   };
@@ -342,13 +369,9 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
   function addNewAnnotationGroupHtml(annotationGroup, dataId) {
     const spanFeatures = document.getElementById('toolFeatures');
     if (spanFeatures) {
-      const annotList = document.createElement('ul');
-      annotList.id = 'annotation-list';
-
+      const annotList = document.getElementById('annotation-list');
       const item = getAnnotationGroupHtmlItem(annotationGroup, dataId);
-
       annotList.appendChild(item);
-
       spanFeatures.appendChild(annotList);
     }
   };
