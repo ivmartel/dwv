@@ -127,6 +127,7 @@ export class App {
     redo(): void;
     removeDataViewConfig(dataId: string, divId: string): void;
     removeEventListener(type: string, callback: Function): void;
+    removeFromUndoStack: (name: string) => boolean;
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
     reset(): void;
     resetDisplay(): void;
