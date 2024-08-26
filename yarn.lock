@@ -5114,9 +5114,9 @@ karma-json-reporter@1.2.1:
   integrity sha512-ASmvranNhUN0ctSuAZKeWISW9Nf4AteMcVy8rJVjS7Qk+qWgssag/nw+yivHWKDROztVFn7TdamHOETMPCkvgA==
 
 karma-qunit@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.2.0.tgz#fce4358642a6987f58df370e6bfc8d3da580443b"
-  integrity sha512-DwHvcZkDH2HpxqYJ9V+h2Zxq/mjIzl1lIyq948niqn+i9j/EIq+2ViLFiaFZbDrs5cA36DfWgSOYyBpscvznMg==
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.2.1.tgz#f8cbbc40f34e21ac9997d0c13b02ddc6b92cf882"
+  integrity sha512-bd4TXH8L7i3hYelRo/5OTlyRiMrSyUpgI94pzkASaD/qjlc1j8liuZeroRS4aA5B7AmnCYQILEsKcSfuaQgcPA==
 
 karma-sourcemap-loader@^0.4.0:
   version "0.4.0"
