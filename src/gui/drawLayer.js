@@ -649,14 +649,16 @@ export class DrawLayer {
    * Remove an annotation draw.
    *
    * @param {Annotation} annotation The annotation to remove.
+   * @returns {boolean} True if the shape group has been found and removed.
    */
   #removeAnnotationDraw(annotation) {
     const shapeGroup = this.#findShapeGroup(annotation);
     if (!(shapeGroup instanceof Konva.Group)) {
-      logger.warn('Cannot find shape group to remove');
-      return;
+      logger.debug('No shape group to remove');
+      return false;
     };
     shapeGroup.remove();
+    return true;
   }
 
   /**
@@ -667,9 +669,10 @@ export class DrawLayer {
   #updateAnnotationDraw(annotation) {
     // update quantification after math shape update
     annotation.updateQuantification();
-    // update draw
-    this.#removeAnnotationDraw(annotation);
-    this.#addAnnotationDraw(annotation, true);
+    // update draw if needed
+    if (this.#removeAnnotationDraw(annotation)) {
+      this.#addAnnotationDraw(annotation, true);
+    }
   }
 
   /**
