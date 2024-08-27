@@ -776,7 +776,7 @@ export class DrawLayer {
     if (typeof visible === 'undefined') {
       visible = !group.isVisible();
     }
-    group.visible(!group.isVisible());
+    group.visible(visible);
 
     // udpate
     this.draw();
