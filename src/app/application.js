@@ -1470,13 +1470,11 @@ export class App {
    * Create new annotation data based on the data of
    *   the active view layer.
    *
-   * @param {LayerGroup} layerGroup The layerGroup with the data to associate
-   *   to the annotation.
+   * @param {string} refDataId The reference data id.
    * @returns {DicomData} The new data.
    */
-  createAnnotationData(layerGroup) {
-    const viewLayer = layerGroup.getActiveViewLayer();
-    const refData = this.getData(viewLayer.getDataId());
+  createAnnotationData(refDataId) {
+    const refData = this.getData(refDataId);
     const refMeta = refData.image.getMeta();
 
     const data = new DicomData({});
@@ -1500,12 +1498,21 @@ export class App {
    *
    * @param {DicomData} data The data to add.
    * @param {string} divId The div where to draw.
+   * @param {string} refDataId The reference data id.
    */
-  addAndRenderAnnotationData(data, divId) {
+  addAndRenderAnnotationData(data, divId, refDataId) {
     // add new data
     const dataId = this.addData(data);
-    // add simple data view config
-    this.addDataViewConfig(dataId, new ViewConfig(divId));
+    // add data view config based on reference data
+    const refDataViewConfigs = this.getViewConfigs(refDataId);
+    const refDataViewConfig = refDataViewConfigs.find(
+      element => element.divId === divId);
+    if (typeof refDataViewConfig === 'undefined') {
+      throw new Error('No reference data view config for draw');
+    }
+    const drawDataViewConfig = new ViewConfig(divId);
+    drawDataViewConfig.orientation = refDataViewConfig.orientation;
+    this.addDataViewConfig(dataId, drawDataViewConfig);
     // render (will create draw layer)
     this.render(dataId);
   }

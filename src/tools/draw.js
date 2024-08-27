@@ -187,10 +187,12 @@ export class Draw {
     let drawLayer = layerGroup.getActiveDrawLayer();
 
     if (typeof drawLayer === 'undefined') {
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const refDataId = viewLayer.getDataId();
       // create new data
-      const data = this.#app.createAnnotationData(layerGroup);
+      const data = this.#app.createAnnotationData(refDataId);
       // render (will create draw layer)
-      this.#app.addAndRenderAnnotationData(data, divId);
+      this.#app.addAndRenderAnnotationData(data, divId, refDataId);
       // get draw layer
       drawLayer = layerGroup.getActiveDrawLayer();
       // set active to bind to toolboxController

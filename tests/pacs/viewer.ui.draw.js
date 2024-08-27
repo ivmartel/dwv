@@ -171,9 +171,11 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
       const layerGroup = app.getLayerGroupByDivId(divId);
 
       // add annotation group
-      const data = app.createAnnotationData(layerGroup);
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const refDataId = viewLayer.getDataId();
+      const data = app.createAnnotationData(refDataId);
       // render (will create draw layer)
-      app.addAndRenderAnnotationData(data, divId);
+      app.addAndRenderAnnotationData(data, divId, refDataId);
 
       // update UI
       // item is added by the 'dataadd' listener
