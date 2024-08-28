@@ -4,6 +4,7 @@
 // namespace
 // eslint-disable-next-line no-var
 var test = test || {};
+test.ui = test.ui || {};
 
 /**
  * Get the layer group div ids associated to a view config.
@@ -19,10 +20,15 @@ function getDivIds(dataViewConfig) {
   return divIds;
 }
 
-test.DataTable = function (app) {
+/**
+ * Data table UI.
+ *
+ * @param {object} app The associated application.
+ */
+test.ui.DataTable = function (app) {
 
   /**
-   * Bind app to controls.
+   * Bind app to ui.
    *
    * @param {string} layout The layout.
    */

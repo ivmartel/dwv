@@ -52,6 +52,9 @@ function splitAnnotationDivId(divId) {
  */
 test.ui.Annotation = function (app) {
 
+  /**
+   * Bind app to ui.
+   */
   this.registerListeners = function () {
     app.addEventListener('dataadd', onDataAdd);
     app.addEventListener('annotationadd', onAnnotationAdd);

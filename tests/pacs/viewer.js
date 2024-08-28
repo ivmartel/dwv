@@ -373,7 +373,7 @@ function onDOMContentLoaded() {
   // setup
   viewerSetup();
 
-  const dataTable = new test.DataTable(_app);
+  const dataTable = new test.ui.DataTable(_app);
   dataTable.registerListeners(_layout);
 
   const positionInput = document.getElementById('position');
