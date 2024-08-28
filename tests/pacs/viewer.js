@@ -315,9 +315,14 @@ function viewerSetup() {
   for (const toolName in _tools) {
     if (typeof test.toolFeaturesUI[toolName] !== 'undefined') {
       const toolUI = new test.toolFeaturesUI[toolName](_app, _tools[toolName]);
-      toolUI.registerListeners();
       _toolFeaturesUI[toolName] = toolUI;
     }
+  }
+
+  // annotation UI
+  if (typeof test.ui.Annotation !== 'undefined') {
+    const annotUI = new test.ui.Annotation(_app);
+    annotUI.registerListeners();
   }
 
   const uriOptions = {};
