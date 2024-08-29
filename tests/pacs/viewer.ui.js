@@ -4,7 +4,6 @@
 // namespace
 // eslint-disable-next-line no-var
 var test = test || {};
-test.toolFeaturesUI = test.toolFeaturesUI || {};
 
 /**
  * Get the layer groups div ids from the data view configs.

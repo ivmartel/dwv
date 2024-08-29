@@ -4,7 +4,7 @@
 // namespace
 // eslint-disable-next-line no-var
 var test = test || {};
-test.ui = test.ui || {};
+test.dataModelUI = test.dataModelUI || {};
 
 /**
  * Get the annotation group divId.
@@ -50,7 +50,7 @@ function splitAnnotationDivId(divId) {
  *
  * @param {object} app The associated application.
  */
-test.ui.Annotation = function (app) {
+test.dataModelUI.Annotation = function (app) {
 
   /**
    * Bind app to ui.
@@ -345,4 +345,4 @@ test.ui.Annotation = function (app) {
     item.remove();
   };
 
-}; // test.ui.Annotation
+}; // test.dataModelUI.Annotation

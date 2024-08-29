@@ -319,10 +319,10 @@ function viewerSetup() {
     }
   }
 
-  // annotation UI
-  if (typeof test.ui.Annotation !== 'undefined') {
-    const annotUI = new test.ui.Annotation(_app);
-    annotUI.registerListeners();
+  // data model UI
+  for (const dmName in test.dataModelUI) {
+    const dmUI = new test.dataModelUI[dmName](_app);
+    dmUI.registerListeners();
   }
 
   const uriOptions = {};
