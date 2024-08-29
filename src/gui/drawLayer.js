@@ -519,10 +519,14 @@ export class DrawLayer {
     annotationGroup.addEventListener(
       'annotationgroupeditablechange',
       (event) => {
+        // exit if not listening, ie draw tool is not activated on this layer
+        if (!this.#konvaStage.listening()) {
+          return;
+        }
+
         this.#shapeHandler.disableAndResetEditor();
         const shapeGroups =
           this.getCurrentPosGroup().getChildren();
-
         if (event.data) {
           shapeGroups.forEach((group) => {
             if (group instanceof Konva.Group) {
