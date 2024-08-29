@@ -639,16 +639,17 @@ export class Draw {
   /**
    * Get a layerGroup position callback.
    *
-   * TODO: check needo for store item removal.
+   * TODO: check need for store item removal.
    *
    * @param {LayerGroup} layerGroup The origin layer group.
    * @returns {Function} The layerGroup position callback.
    */
   #getPositionCallback(layerGroup) {
     const divId = layerGroup.getDivId();
+    const drawLayer = layerGroup.getActiveDrawLayer();
     if (typeof this.#callbackStore[divId] === 'undefined') {
       this.#callbackStore[divId] = () => {
-        this.#updateDrawLayer(layerGroup);
+        this.#activateCurrentPositionShapes(true, drawLayer);
       };
     }
     return this.#callbackStore[divId];
@@ -668,7 +669,12 @@ export class Draw {
     if (typeof layerGroup === 'undefined') {
       throw new Error('No active layerGroup to activate draw on');
     }
-    this.#activateCurrentPositionShapes(flag, layerGroup);
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      throw new Error('No active drawLayer to activate draw on');
+    }
+    this.#activateCurrentPositionShapes(flag, drawLayer);
+
     // listen to app change to update the draw layer
     if (flag) {
       // TODO: merge with drawLayer.activateDrawLayer?
@@ -686,26 +692,12 @@ export class Draw {
   }
 
   /**
-   * Update the draw layer.
-   *
-   * @param {LayerGroup} layerGroup The origin layer group.
-   */
-  #updateDrawLayer(layerGroup) {
-    // activate the shape at current position
-    this.#activateCurrentPositionShapes(true, layerGroup);
-  }
-
-  /**
    * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
-   * @param {LayerGroup} layerGroup The origin layer group.
+   * @param {DrawLayer} drawLayer The origin layer group.
    */
-  #activateCurrentPositionShapes(visible, layerGroup) {
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    if (typeof drawLayer === 'undefined') {
-      return;
-    }
+  #activateCurrentPositionShapes(visible, drawLayer) {
     const drawController = drawLayer.getDrawController();
 
     // get shape groups at the current position
