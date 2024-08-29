@@ -811,7 +811,9 @@ export class DrawLayer {
       if (posGroup instanceof Konva.Group) {
         const shapeGroups = posGroup.getChildren();
         for (const shapeGroup of shapeGroups) {
-          this.#setLabelVisibility(shapeGroup, visible);
+          if (shapeGroup instanceof Konva.Group) {
+            this.#setLabelVisibility(shapeGroup, visible);
+          }
         }
       }
     }
@@ -825,14 +827,12 @@ export class DrawLayer {
    *   will toggle visibility if not defined.
    */
   #setLabelVisibility(shapeGroup, visible) {
-    if (shapeGroup instanceof Konva.Group) {
-      const label = shapeGroup.getChildren(isNodeNameLabel)[0];
-      // if not set, toggle visibility
-      if (typeof visible === 'undefined') {
-        visible = !label.isVisible();
-      }
-      label.visible(visible);
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !label.isVisible();
     }
+    label.visible(visible);
   }
 
   /**
