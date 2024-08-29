@@ -664,16 +664,16 @@ export class Draw {
     // reset shape editor
     this.#shapeHandler.disableAndResetEditor();
 
-    // get the current draw layer
+    // get the current layer group
     const layerGroup = this.#app.getActiveLayerGroup();
     if (typeof layerGroup === 'undefined') {
       throw new Error('No active layerGroup to activate draw on');
     }
+    // activate draw layer if available
     const drawLayer = layerGroup.getActiveDrawLayer();
-    if (typeof drawLayer === 'undefined') {
-      throw new Error('No active drawLayer to activate draw on');
+    if (typeof drawLayer !== 'undefined') {
+      this.#activateCurrentPositionShapes(flag, drawLayer);
     }
-    this.#activateCurrentPositionShapes(flag, drawLayer);
 
     // listen to app change to update the draw layer
     if (flag) {
