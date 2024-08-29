@@ -112,34 +112,6 @@ test.dataModelUI.Annotation = function (app) {
   function getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
 
-    const inputColour = document.createElement('input');
-    inputColour.type = 'color';
-    inputColour.title = 'Change annotation colour';
-    const inputColourPrefix = 'cb-';
-    inputColour.id = inputColourPrefix + annotationDivId;
-    inputColour.value = annotation.colour;
-    inputColour.onchange = function (event) {
-      const target = event.target;
-      const newColour = target.value;
-      // get annotatio
-      const indices =
-        splitAnnotationDivId(target.id.substring(inputColourPrefix.length));
-      const dataId = indices.dataId;
-      const annotationId = indices.annotationId;
-      const annotationGroup = app.getData(dataId).annotationGroup;
-      const annotation = annotationGroup.find(annotationId);
-      // update
-      if (newColour !== annotation.colour) {
-        const drawController = new dwv.DrawController(annotationGroup);
-        drawController.updateAnnotationWithCommand(
-          annotationId,
-          {colour: annotation.colour},
-          {colour: newColour},
-          app.addToUndoStack
-        );
-      }
-    };
-
     const viewButton = document.createElement('button');
     viewButton.style.borderStyle = 'outset';
     const vbIdPrefix = 'vb-';
@@ -169,6 +141,34 @@ test.dataModelUI.Annotation = function (app) {
       }
     };
 
+    const inputColour = document.createElement('input');
+    inputColour.type = 'color';
+    inputColour.title = 'Change annotation colour';
+    const inputColourPrefix = 'cb-';
+    inputColour.id = inputColourPrefix + annotationDivId;
+    inputColour.value = annotation.colour;
+    inputColour.onchange = function (event) {
+      const target = event.target;
+      const newColour = target.value;
+      // get annotatio
+      const indices =
+        splitAnnotationDivId(target.id.substring(inputColourPrefix.length));
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const annotationGroup = app.getData(dataId).annotationGroup;
+      const annotation = annotationGroup.find(annotationId);
+      // update
+      if (newColour !== annotation.colour) {
+        const drawController = new dwv.DrawController(annotationGroup);
+        drawController.updateAnnotationWithCommand(
+          annotationId,
+          {colour: annotation.colour},
+          {colour: newColour},
+          app.addToUndoStack
+        );
+      }
+    };
+
     const deleteButton = document.createElement('button');
     const dbIdPrefix = 'db-';
     deleteButton.id = dbIdPrefix + annotationDivId;
@@ -190,12 +190,22 @@ test.dataModelUI.Annotation = function (app) {
       );
     };
 
+    // disable/enable buttons if group is editable or not
+    const annotationGroup = app.getData(dataId).annotationGroup;
+    annotationGroup.addEventListener(
+      'annotationgroupeditablechange', function (event) {
+        const disabled = !event.data;
+        inputColour.disabled = disabled;
+        deleteButton.disabled = disabled;
+      }
+    );
+
     const span = document.createElement('span');
     span.id = 'span-' + annotationDivId;
     span.appendChild(document.createTextNode(
       annotation.id + ' (' + annotation.getType() + ')'));
-    span.appendChild(inputColour);
     span.appendChild(viewButton);
+    span.appendChild(inputColour);
     span.appendChild(deleteButton);
 
     return span;
