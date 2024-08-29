@@ -66,6 +66,15 @@ export class MaskSegmentHelper {
   }
 
   /**
+   * Get the number of segments of the segmentation.
+   *
+   * @returns {number} The number of segments.
+   */
+  getNumberOfSegments() {
+    return this.#segments.length;
+  }
+
+  /**
    * Check if a segment is present in a mask image.
    *
    * @param {number[]} numbers Array of segment numbers.
