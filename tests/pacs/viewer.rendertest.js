@@ -1,6 +1,3 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
-
 // namespace
 // eslint-disable-next-line no-var
 var test = test || {};
