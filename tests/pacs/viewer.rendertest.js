@@ -15,39 +15,8 @@ test.setupRenderTests = function (app) {
   renderTestButton.onclick = getRunRenderTest(app);
   renderTestButton.appendChild(document.createTextNode('render test'));
 
-  const saveState = document.createElement('a');
-  saveState.appendChild(document.createTextNode('save state'));
-  saveState.href = '';
-  // saveState.onclick = function () {
-  //   const blob = new Blob([_app.getJsonState()], {type: 'application/json'});
-  //   saveState.href = window.URL.createObjectURL(blob);
-  // };
-  // saveState.download = 'state.json';
-  saveState.onclick = function () {
-
-    const layerGroup = app.getActiveLayerGroup();
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const drawController = drawLayer.getDrawController();
-    const annotationGroup = drawController.getAnnotationGroup();
-    const factory = new dwv.AnnotationGroupFactory();
-    const dicomElements = factory.toDicom(annotationGroup);
-    // write
-    const writer = new dwv.DicomWriter();
-    let dicomBuffer = null;
-    try {
-      dicomBuffer = writer.getBuffer(dicomElements);
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
-    }
-    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-    saveState.href = window.URL.createObjectURL(blob);
-  };
-  saveState.download = 'dicom-sr-0.dcm';
-
   const testsDiv = document.getElementById('tests');
   testsDiv.appendChild(renderTestButton);
-  testsDiv.appendChild(saveState);
 };
 
 /**

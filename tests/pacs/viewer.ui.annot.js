@@ -244,11 +244,44 @@ test.dataModelUI.Annotation = function (app) {
     };
     item.appendChild(lockButton);
 
+    // save segment button
+    const saveButton = document.createElement('button');
+    saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
+    saveButton.title = 'Save annnotation group';
+    saveButton.onclick = function () {
+      const layerGroup = app.getActiveLayerGroup();
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      const drawController = drawLayer.getDrawController();
+      const annotationGroup = drawController.getAnnotationGroup();
+      const factory = new dwv.AnnotationGroupFactory();
+      const dicomElements = factory.toDicom(annotationGroup);
+      // write
+      const writer = new dwv.DicomWriter();
+      let dicomBuffer = null;
+      try {
+        dicomBuffer = writer.getBuffer(dicomElements);
+      } catch (error) {
+        console.error(error);
+        alert(error.message);
+      }
+      const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+      saveButton.href = window.URL.createObjectURL(blob);
+
+      // temporary link to download
+      const element = document.createElement('a');
+      element.href = window.URL.createObjectURL(blob);
+      element.download = 'dicom-sr-' + dataId + '.dcm';
+      // trigger download
+      element.click();
+      URL.revokeObjectURL(element.href);
+    };
+    item.appendChild(saveButton);
+
     const hideLabelsButton = document.createElement('button');
     hideLabelsButton.style.borderStyle = 'outset';
     hideLabelsButton.id = 'b-hidelabels';
     hideLabelsButton.title = 'Show/hide annotation labels';
-    hideLabelsButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
+    hideLabelsButton.appendChild(document.createTextNode('\u{1F3F7}\u{FE0F}'));
     hideLabelsButton.onclick = function (event) {
       const target = event.target;
       const drawLayer = app.getDrawLayersByDataId(dataId)[0];
