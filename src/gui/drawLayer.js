@@ -156,7 +156,7 @@ export class DrawLayer {
   #shapeHandler;
 
   /**
-   * Visible labels flag
+   * Visible labels flag.
    *
    * @type {boolean}
    */
