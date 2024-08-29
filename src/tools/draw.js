@@ -586,6 +586,8 @@ export class Draw {
     // create shape group
     this.#tmpShapeGroup =
       this.#currentFactory.createShapeGroup(annotation, this.#style);
+    // set the label visibility
+    drawLayer.setLabelVisibility(this.#tmpShapeGroup);
 
     // do not listen during creation
     const shape = this.#tmpShapeGroup.getChildren(isNodeNameShape)[0];

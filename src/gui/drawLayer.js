@@ -156,6 +156,13 @@ export class DrawLayer {
   #shapeHandler;
 
   /**
+   * Visible labels flag
+   *
+   * @type {boolean}
+   */
+  #visibleLabels = true;
+
+  /**
    * @param {HTMLDivElement} containerDiv The layer div, its id will be used
    *   as this layer id.
    */
@@ -647,6 +654,8 @@ export class DrawLayer {
     ) {
       this.#shapeHandler.addShapeListeners(this, shapeGroup, annotation);
     }
+    // set label visibility
+    this.setLabelVisibility(shapeGroup);
   }
 
   /**
@@ -795,22 +804,45 @@ export class DrawLayer {
    *   will toggle visibility if not defined.
    */
   setLabelsVisibility(visible) {
+    this.#visibleLabels = visible;
+
     const posGroups = this.getKonvaLayer().getChildren();
     for (const posGroup of posGroups) {
       if (posGroup instanceof Konva.Group) {
         const shapeGroups = posGroup.getChildren();
         for (const shapeGroup of shapeGroups) {
-          if (shapeGroup instanceof Konva.Group) {
-            const label = shapeGroup.getChildren(isNodeNameLabel)[0];
-            // if not set, toggle visibility
-            if (typeof visible === 'undefined') {
-              visible = !label.isVisible();
-            }
-            label.visible(visible);
-          }
+          this.#setLabelVisibility(shapeGroup, visible);
         }
       }
     }
+  }
+
+  /**
+   * Set a shape group label visibility.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  #setLabelVisibility(shapeGroup, visible) {
+    if (shapeGroup instanceof Konva.Group) {
+      const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+      // if not set, toggle visibility
+      if (typeof visible === 'undefined') {
+        visible = !label.isVisible();
+      }
+      label.visible(visible);
+    }
+  }
+
+  /**
+   * Set a shape group label visibility according to
+   *  this layer setting.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  setLabelVisibility(shapeGroup) {
+    this.#setLabelVisibility(shapeGroup, this.#visibleLabels);
   }
 
   /**
