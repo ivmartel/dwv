@@ -74,7 +74,7 @@ export class AnnotationGroupFactory {
 export class App {
     abortAllLoads(): void;
     abortLoad(dataId: string): void;
-    addAndRenderAnnotationData(data: DicomData, divId: string): void;
+    addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
     addData(data: DicomData): string;
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
@@ -86,7 +86,7 @@ export class App {
     canScroll(): boolean;
     // @deprecated
     canWindowLevel(): boolean;
-    createAnnotationData(layerGroup: LayerGroup): DicomData;
+    createAnnotationData(refDataId: string): DicomData;
     defaultOnKeydown: (event: KeyboardEvent) => void;
     fitToContainer(): void;
     getActiveLayerGroup(): LayerGroup | undefined;
@@ -389,6 +389,7 @@ export class DrawLayer {
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
     setCurrentPosition(position: Point, index: Index): boolean;
     setLabelsVisibility(visible?: boolean): void;
+    setLabelVisibility(shapeGroup: Konva.Group): void;
     setOffset(newOffset: Scalar3D): void;
     setOpacity(alpha: number): void;
     setPlaneHelper(helper: PlaneHelper): void;
@@ -699,6 +700,7 @@ export class MaskSegment {
 export class MaskSegmentHelper {
     constructor(mask: Image_2);
     addSegment(segment: MaskSegment): void;
+    getNumberOfSegments(): number;
     getSegment(segmentNumber: number): MaskSegment | undefined;
     hasSegment(segmentNumber: number): boolean;
     maskHasSegments(numbers: number[]): boolean[];

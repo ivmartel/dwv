@@ -803,18 +803,18 @@ export declare class App {
      * Create new annotation data based on the data of
      *   the active view layer.
      *
-     * @param {LayerGroup} layerGroup The layerGroup with the data to associate
-     *   to the annotation.
+     * @param {string} refDataId The reference data id.
      * @returns {DicomData} The new data.
      */
-    createAnnotationData(layerGroup: LayerGroup): DicomData;
+    createAnnotationData(refDataId: string): DicomData;
     /**
      * Add new data and render it with a simple new data view config.
      *
      * @param {DicomData} data The data to add.
      * @param {string} divId The div where to draw.
+     * @param {string} refDataId The reference data id.
      */
-    addAndRenderAnnotationData(data: DicomData, divId: string): void;
+    addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
     /**
      * Add a draw layer.
      *
@@ -1721,6 +1721,13 @@ export declare class DrawLayer {
      *   will toggle visibility if not defined.
      */
     setLabelsVisibility(visible?: boolean): void;
+    /**
+     * Set a shape group label visibility according to
+     *  this layer setting.
+     *
+     * @param {Konva.Group} shapeGroup The shape group.
+     */
+    setLabelVisibility(shapeGroup: Konva.Group): void;
     /**
      * Delete a Draw from the stage.
      *
@@ -3222,6 +3229,12 @@ export declare class MaskSegmentHelper {
      * @returns {boolean} True if the segment is included.
      */
     hasSegment(segmentNumber: number): boolean;
+    /**
+     * Get the number of segments of the segmentation.
+     *
+     * @returns {number} The number of segments.
+     */
+    getNumberOfSegments(): number;
     /**
      * Check if a segment is present in a mask image.
      *
