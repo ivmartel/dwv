@@ -828,6 +828,9 @@ export class DrawLayer {
    */
   #setLabelVisibility(shapeGroup, visible) {
     const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
     // if not set, toggle visibility
     if (typeof visible === 'undefined') {
       visible = !label.isVisible();
