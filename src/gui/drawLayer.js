@@ -526,28 +526,7 @@ export class DrawLayer {
     annotationGroup.addEventListener(
       'annotationgroupeditablechange',
       (event) => {
-        // exit if not listening, ie draw tool is not activated on this layer
-        if (!this.#konvaStage.listening()) {
-          return;
-        }
-
-        this.#shapeHandler.disableAndResetEditor();
-        const shapeGroups =
-          this.getCurrentPosGroup().getChildren();
-        if (event.data) {
-          shapeGroups.forEach((group) => {
-            if (group instanceof Konva.Group) {
-              const annotation = annotationGroup.find(group.id());
-              this.#shapeHandler.addShapeListeners(this, group, annotation);
-            }
-          });
-        } else {
-          shapeGroups.forEach((group) => {
-            if (group instanceof Konva.Group) {
-              this.#shapeHandler.removeShapeListeners(group);
-            }
-          });
-        }
+        this.activateCurrentPositionShapes(event.data);
       }
     );
 
@@ -567,6 +546,59 @@ export class DrawLayer {
         exeCallback(command);
       }
     }
+  }
+
+  /**
+   * Activate shapes at current position.
+   *
+   * @param {boolean} flag The flag to activate or not.
+   */
+  activateCurrentPositionShapes(flag) {
+    const konvaLayer = this.getKonvaLayer();
+
+    // stop listening
+    this.#konvaStage.listening(false);
+
+    if (typeof this.#shapeHandler !== 'undefined') {
+      // reset shape editor (remove anchors)
+      this.#shapeHandler.disableAndResetEditor();
+      // remove listeners for all position groups
+      const allPosGroups = konvaLayer.getChildren();
+      for (const posGroup of allPosGroups) {
+        if (posGroup instanceof Konva.Group) {
+          posGroup.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+              this.#shapeHandler.removeShapeListeners(group);
+            }
+          });
+        }
+      }
+    }
+
+    // activate shape listeners if possible
+    const drawController = this.getDrawController();
+    if (flag &&
+      drawController.getAnnotationGroup().isEditable()) {
+      // shape groups at the current position
+      const shapeGroups =
+        this.getCurrentPosGroup().getChildren();
+      // listen if we have shapes
+      if (shapeGroups.length !== 0) {
+        this.#konvaStage.listening(true);
+        konvaLayer.listening(true);
+      }
+      // add listeners for position group
+      if (typeof this.#shapeHandler !== 'undefined') {
+        shapeGroups.forEach((group) => {
+          if (group instanceof Konva.Group) {
+            const annotation = drawController.getAnnotation(group.id());
+            this.#shapeHandler.addShapeListeners(this, group, annotation);
+          }
+        });
+      }
+    }
+
+    konvaLayer.draw();
   }
 
   /**
@@ -995,18 +1027,6 @@ export class DrawLayer {
     }
     // return
     return posGroup;
-  }
-
-  /**
-   * Get the non current position groups. Used to stop listeners.
-   *
-   * @returns {object[]} The groups that do not have the current position id.
-   */
-  getNonCurrentPosGroup() {
-    // get position groups
-    return this.getKonvaLayer().getChildren((node) => {
-      return node.id() !== this.#currentPosGroupId;
-    });
   }
 
   /**

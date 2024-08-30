@@ -74,13 +74,6 @@ export class Draw {
   #style;
 
   /**
-   * Callback store to allow attach/detach.
-   *
-   * @type {Array}
-   */
-  #callbackStore = [];
-
-  /**
    * Interaction start flag.
    *
    * @type {boolean}
@@ -195,6 +188,8 @@ export class Draw {
       this.#app.addAndRenderAnnotationData(data, divId, refDataId);
       // get draw layer
       drawLayer = layerGroup.getActiveDrawLayer();
+      // set the layer shape handler
+      drawLayer.setShapeHandler(this.#shapeHandler);
       // set active to bind to toolboxController
       layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
     }
@@ -202,26 +197,24 @@ export class Draw {
     // data should exist / be created
     const data = drawLayer.getDrawController().getAnnotationGroup();
 
-    // set the layer shape handler
-    drawLayer.setShapeHandler(this.#shapeHandler);
-
     const stage = drawLayer.getKonvaStage();
 
     // update scale
     this.#style.setZoomScale(stage.scale());
 
-    // determine if the click happened on an existing shape
-    const kshape = stage.getIntersection({
-      x: point.getX(),
-      y: point.getY()
-    });
-
-    if (kshape) {
-      // select shape for edition
-      this.#selectShapeGroup(drawLayer, kshape);
-    } else if (data.isEditable()) {
-      // create new shape
-      this.#startShapeGroupCreation(layerGroup, point);
+    if (data.isEditable()) {
+      // determine if the click happened on an existing shape or not
+      const kshape = stage.getIntersection({
+        x: point.getX(),
+        y: point.getY()
+      });
+      if (kshape) {
+        // select shape for edition
+        this.#selectShapeGroup(drawLayer, kshape);
+      } else {
+        // create new shape
+        this.#startShapeGroupCreation(layerGroup, point);
+      }
     }
   }
 
@@ -638,36 +631,13 @@ export class Draw {
     konvaLayer.listening(true);
   }
 
-
-  /**
-   * Get a layerGroup position callback.
-   *
-   * TODO: check need for store item removal.
-   *
-   * @param {LayerGroup} layerGroup The origin layer group.
-   * @returns {Function} The layerGroup position callback.
-   */
-  #getPositionCallback(layerGroup) {
-    const divId = layerGroup.getDivId();
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    if (typeof this.#callbackStore[divId] === 'undefined') {
-      this.#callbackStore[divId] = () => {
-        this.#activateCurrentPositionShapes(true, drawLayer);
-      };
-    }
-    return this.#callbackStore[divId];
-  }
-
   /**
    * Activate the tool.
    *
    * @param {boolean} flag The flag to activate or not.
    */
   activate(flag) {
-    // reset shape editor
-    this.#shapeHandler.disableAndResetEditor();
-
-    // get the current layer group
+    // check layer group
     const layerGroup = this.#app.getActiveLayerGroup();
     if (typeof layerGroup === 'undefined') {
       throw new Error('No active layerGroup to activate draw on');
@@ -675,70 +645,9 @@ export class Draw {
     // activate draw layer if available
     const drawLayer = layerGroup.getActiveDrawLayer();
     if (typeof drawLayer !== 'undefined') {
-      this.#activateCurrentPositionShapes(flag, drawLayer);
+      drawLayer.setShapeHandler(this.#shapeHandler);
+      drawLayer.activateCurrentPositionShapes(flag);
     }
-
-    // listen to app change to update the draw layer
-    if (flag) {
-      // TODO: merge with drawLayer.activateDrawLayer?
-      this.#app.addEventListener('positionchange',
-        this.#getPositionCallback(layerGroup)
-      );
-    } else {
-      // reset shape and cursor
-      this.#shapeHandler.onMouseOutShapeGroup();
-      // remove listeners
-      this.#app.removeEventListener('positionchange',
-        this.#getPositionCallback(layerGroup)
-      );
-    }
-  }
-
-  /**
-   * Activate shapes at current position.
-   *
-   * @param {boolean} visible Set the draw layer visible or not.
-   * @param {DrawLayer} drawLayer The origin layer group.
-   */
-  #activateCurrentPositionShapes(visible, drawLayer) {
-    const drawController = drawLayer.getDrawController();
-
-    // get shape groups at the current position
-    const shapeGroups =
-      drawLayer.getCurrentPosGroup().getChildren();
-
-    // set shape display properties
-    if (visible) {
-      // activate shape listeners
-      shapeGroups.forEach((group) => {
-        if (group instanceof Konva.Group) {
-          const annotation = drawController.getAnnotation(group.id());
-          this.#shapeHandler.addShapeListeners(drawLayer, group, annotation);
-        }
-      });
-    } else {
-      // de-activate shape listeners
-      shapeGroups.forEach((group) => {
-        if (group instanceof Konva.Group) {
-          this.#shapeHandler.removeShapeListeners(group);
-        }
-      });
-    }
-
-    const notCurrentPosGroup =
-      drawLayer.getNonCurrentPosGroup();
-    for (const posGroup of notCurrentPosGroup) {
-      posGroup.getChildren().forEach((group) => {
-        this.#shapeHandler.removeShapeListeners(group);
-      });
-    }
-
-    // draw
-    const konvaLayer = drawLayer.getKonvaLayer();
-    if (shapeGroups.length !== 0) {
-      konvaLayer.listening(true);
-    }
-    konvaLayer.draw();
   }
 
   /**
