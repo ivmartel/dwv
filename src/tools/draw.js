@@ -390,7 +390,8 @@ export class Draw {
    */
   dblclick = (event) => {
     // only end by double click undefined NPoints
-    if (typeof this.#currentFactory.getNPoints() !== 'undefined') {
+    if (this.#currentFactory &&
+      typeof this.#currentFactory.getNPoints() !== 'undefined') {
       return;
     }
     // exit if not started draw
