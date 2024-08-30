@@ -832,7 +832,11 @@ export class DrawLayer {
     if (typeof visible === 'undefined') {
       visible = !label.isVisible();
     }
-    label.visible(visible);
+    // set visible only for non empty text
+    if (typeof label.getText() !== 'undefined' &&
+      label.getText().text().length !== 0) {
+      label.visible(visible);
+    }
   }
 
   /**
