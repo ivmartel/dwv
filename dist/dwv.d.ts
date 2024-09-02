@@ -75,9 +75,9 @@ export declare class Annotation {
     /**
      * Get the image origin for a image UID.
      *
-     * @returns {Index|undefined} The origin index.
+     * @returns {Point3D|undefined} The origin.
      */
-    getOriginIndex(): Index | undefined;
+    getOrigin(): Point3D | undefined;
     /**
      * Set the annotation text expression.
      *
@@ -1691,6 +1691,12 @@ export declare class DrawLayer {
      */
     setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
     /**
+     * Activate shapes at current position.
+     *
+     * @param {boolean} flag The flag to activate or not.
+     */
+    activateCurrentPositionShapes(flag: boolean): void;
+    /**
      * Fit the layer to its parent container.
      *
      * @param {Scalar2D} containerSize The container size as {x,y}.
@@ -1764,29 +1770,23 @@ export declare class DrawLayer {
      * Set the current position.
      *
      * @param {Point} position The new position.
-     * @param {Index} index The new index.
+     * @param {Index} _index The new index.
      * @returns {boolean} True if the position was updated.
      */
-    setCurrentPosition(position: Point, index: Index): boolean;
+    setCurrentPosition(position: Point, _index: Index): boolean;
     /**
      * Activate the current draw layer.
      *
-     * @param {Index} index The current position.
+     * @param {Point} position The current position.
      * @param {number} scrollIndex The scroll index.
      */
-    activateDrawLayer(index: Index, scrollIndex: number): void;
+    activateDrawLayer(position: Point, scrollIndex: number): void;
     /**
      * Get the current position group.
      *
      * @returns {Konva.Group|undefined} The Konva.Group.
      */
     getCurrentPosGroup(): Konva.Group | undefined;
-    /**
-     * Get the non current position groups. Used to stop listeners.
-     *
-     * @returns {object[]} The groups that do not have the current position id.
-     */
-    getNonCurrentPosGroup(): object[];
     /**
      * Get a Konva group using its id.
      *
@@ -2710,13 +2710,6 @@ export declare class Index {
      * @returns {Index} The new index.
      */
     getWithNew2D(i: number, j: number): Index;
-    /**
-     * Get a string id from the index values in the form of: '#0-1_#1-2'.
-     *
-     * @param {number[]} [dims] Optional list of dimensions to use.
-     * @returns {string} The string id.
-     */
-    toStringId(dims?: number[]): string;
     #private;
 }
 
@@ -4539,9 +4532,9 @@ export declare class View {
      * Get the image origin for a image UID.
      *
      * @param {string} uid The UID.
-     * @returns {Index|undefined} The origin index.
+     * @returns {Point3D|undefined} The origin.
      */
-    getOriginIndexForImageUid(uid: string): Index | undefined;
+    getOriginForImageUid(uid: string): Point3D | undefined;
     /**
      * Check if the current position (default) or
      * the provided position is in bounds.
@@ -4786,12 +4779,12 @@ export declare class ViewController {
      */
     getCurrentImageUid(): string;
     /**
-     * Get the image origin index for a image UID.
+     * Get the image origin for a image UID.
      *
      * @param {string} uid The UID.
-     * @returns {Index|undefined} The origin index.
+     * @returns {Point3D|undefined} The origin.
      */
-    getOriginIndexForImageUid(uid: string): Index | undefined;
+    getOriginForImageUid(uid: string): Point3D | undefined;
     /**
      * Get the current oriented index.
      *

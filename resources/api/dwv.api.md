@@ -15,7 +15,7 @@ export function addTagsToDictionary(group: string, tags: {
 export class Annotation {
     colour: string | undefined;
     getFactory(): object;
-    getOriginIndex(): Index | undefined;
+    getOrigin(): Point3D | undefined;
     getText(): string;
     getType(): string;
     id: string;
@@ -353,7 +353,8 @@ export class DrawController {
 // @public
 export class DrawLayer {
     constructor(containerDiv: HTMLDivElement);
-    activateDrawLayer(index: Index, scrollIndex: number): void;
+    activateCurrentPositionShapes(flag: boolean): void;
+    activateDrawLayer(position: Point, scrollIndex: number): void;
     addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
@@ -376,7 +377,6 @@ export class DrawLayer {
     getId(): string;
     getKonvaLayer(): Konva.Layer;
     getKonvaStage(): Konva.Stage;
-    getNonCurrentPosGroup(): object[];
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
     initialise(size: Scalar2D, spacing: Scalar2D): void;
@@ -387,7 +387,7 @@ export class DrawLayer {
     setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
     setAnnotationVisibility(id: string, visible?: boolean): boolean;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
-    setCurrentPosition(position: Point, index: Index): boolean;
+    setCurrentPosition(position: Point, _index: Index): boolean;
     setLabelsVisibility(visible?: boolean): void;
     setLabelVisibility(shapeGroup: Konva.Group): void;
     setOffset(newOffset: Scalar3D): void;
@@ -570,7 +570,6 @@ export class Index {
     getWithNew2D(i: number, j: number): Index;
     length(): number;
     toString(): string;
-    toStringId(dims?: number[]): string;
 }
 
 // @public
@@ -969,7 +968,7 @@ export class View {
     getImage(): Image_2;
     getOrientation(): Matrix33;
     getOrigin(position?: Point): Point3D;
-    getOriginIndexForImageUid(uid: string): Index | undefined;
+    getOriginForImageUid(uid: string): Point3D | undefined;
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
     getScrollIndex(): number;
     getWindowLevel(): WindowLevel;
@@ -1039,7 +1038,7 @@ export class ViewController {
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
-    getOriginIndexForImageUid(uid: string): Index | undefined;
+    getOriginForImageUid(uid: string): Point3D | undefined;
     getPixelUnit(): string;
     getPlaneHelper(): PlaneHelper;
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
