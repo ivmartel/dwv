@@ -3,6 +3,8 @@ import {DrawController} from '../app/drawController';
 import {getScaledOffset} from './layerGroup';
 import {InteractionEventNames} from './generic';
 import {logger} from '../utils/logger';
+import {toStringId} from '../utils/array';
+import {precisionRound} from '../utils/string';
 import {AddAnnotationCommand} from '../tools/drawCommands';
 import {
   isNodeWithId,
@@ -607,14 +609,31 @@ export class DrawLayer {
    * @param {Annotation} annotation The target annotation.
    * @returns {string|undefined} The group id.
    */
-  #getPosGroupId(annotation) {
-    const originIndex = annotation.getOriginIndex();
-    if (typeof originIndex === 'undefined') {
+  #getAnnotationPosGroupId(annotation) {
+    const origin = annotation.getOrigin();
+    if (typeof origin === 'undefined') {
       logger.warn('Unknown reference origin for annotation: ' +
         annotation.referenceSopUID);
       return;
     }
-    return originIndex.toStringId([2]);
+    const scrollIndex = this.#planeHelper.getScrollIndex();
+    return this.#getPositionId(origin, [scrollIndex]);
+  }
+
+  /**
+   * Get a string id from an input position.
+   *
+   * @param {Point3D} position The input position.
+   * @param {number[]} [dims] Optional list of dimensions.
+   * @returns {string} The string id.
+   */
+  #getPositionId(position, dims) {
+    const posValues = [
+      precisionRound(position.getX(), 2),
+      precisionRound(position.getY(), 2),
+      precisionRound(position.getZ(), 2),
+    ];
+    return toStringId(posValues, dims);
   }
 
   /**
@@ -626,7 +645,7 @@ export class DrawLayer {
   #findShapeGroup(annotation) {
     let res;
 
-    const posGroupId = this.#getPosGroupId(annotation);
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
     const layerChildren = this.getKonvaLayer().getChildren(
       isNodeWithId(posGroupId));
     if (layerChildren.length !== 0) {
@@ -652,7 +671,7 @@ export class DrawLayer {
    * @param {boolean} visible The position group visibility.
    */
   #addAnnotationDraw(annotation, visible) {
-    const posGroupId = this.#getPosGroupId(annotation);
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
     // Get or create position-group if it does not exist and
     // append it to konvaLayer
     let posGroup = this.getKonvaLayer().getChildren(
@@ -956,12 +975,12 @@ export class DrawLayer {
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {Index} index The new index.
+   * @param {Index} _index The new index.
    * @returns {boolean} True if the position was updated.
    */
-  setCurrentPosition(position, index) {
+  setCurrentPosition(position, _index) {
     this.activateDrawLayer(
-      index, this.#planeHelper.getScrollIndex());
+      position, this.#planeHelper.getScrollIndex());
     // TODO: add check
     return true;
   }
@@ -969,17 +988,18 @@ export class DrawLayer {
   /**
    * Activate the current draw layer.
    *
-   * @param {Index} index The current position.
+   * @param {Point} position The current position.
    * @param {number} scrollIndex The scroll index.
    */
-  activateDrawLayer(index, scrollIndex) {
+  activateDrawLayer(position, scrollIndex) {
     // TODO: add layer info
     // get and store the position group id
     const dims = [scrollIndex];
-    for (let j = 3; j < index.length(); ++j) {
-      dims.push(j);
-    }
-    this.#currentPosGroupId = index.toStringId(dims);
+    // TODO: handle more dims
+    // for (let j = 3; j < position.length(); ++j) {
+    //   dims.push(j);
+    // }
+    this.#currentPosGroupId = this.#getPositionId(position.get3D(), dims);
 
     // get all position groups
     const posGroups = this.getKonvaLayer().getChildren(isPositionNode);

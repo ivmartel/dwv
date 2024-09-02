@@ -194,13 +194,13 @@ export class ViewController {
   }
 
   /**
-   * Get the image origin index for a image UID.
+   * Get the image origin for a image UID.
    *
    * @param {string} uid The UID.
-   * @returns {Index|undefined} The origin index.
+   * @returns {Point3D|undefined} The origin.
    */
-  getOriginIndexForImageUid(uid) {
-    return this.#view.getOriginIndexForImageUid(uid);
+  getOriginForImageUid(uid) {
+    return this.#view.getOriginForImageUid(uid);
   }
 
   /**

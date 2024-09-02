@@ -17,7 +17,7 @@ import {ROI} from '../math/roi';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Index} from '../math/index';
+import {Point3D} from '../math/point';
 import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
@@ -110,13 +110,13 @@ export class Annotation {
   /**
    * Get the image origin for a image UID.
    *
-   * @returns {Index|undefined} The origin index.
+   * @returns {Point3D|undefined} The origin.
    */
-  getOriginIndex() {
+  getOrigin() {
     let res;
     if (typeof this.#viewController !== 'undefined') {
       res =
-        this.#viewController.getOriginIndexForImageUid(this.referenceSopUID);
+        this.#viewController.getOriginForImageUid(this.referenceSopUID);
     }
     return res;
   }
