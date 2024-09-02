@@ -1368,12 +1368,11 @@
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
 "@stylistic/eslint-plugin-js@^2.1.0":
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.6.4.tgz#52e2b89e1f0878aaeeca3be832287bc060d3a422"
-  integrity sha512-kx1hS3xTvzxZLdr/DCU/dLBE++vcP97sHeEFX2QXhk1Ipa4K1rzPOLw1HCbf4mU3s+7kHP5eYpDe+QteEOFLug==
+  version "2.7.2"
+  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.7.2.tgz#cf21cc843cd3011e9848072505bf61c491a415e7"
+  integrity sha512-PkwTDduCY6+ILlHNEfVT3BtShrtqrDJmyW3BW53PvCb+SHu7z88iReXbN+/uCr39fcP6qH49RA7RFsKRlpyMEQ==
   dependencies:
-    "@types/eslint" "^9.6.0"
-    acorn "^8.12.1"
+    "@types/eslint" "^9.6.1"
     eslint-visitor-keys "^4.0.0"
     espree "^10.1.0"
 
@@ -1424,10 +1423,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/eslint@^9.6.0":
-  version "9.6.0"
-  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-9.6.0.tgz#51d4fe4d0316da9e9f2c80884f2c20ed5fb022ff"
-  integrity sha512-gi6WQJ7cHRgZxtkQEoyHMppPjq9Kxo5Tjn2prSKDSmZrCz8TZ3jSRCeTJm+WoM+oB0WG37bRqLzaaU3q7JypGg==
+"@types/eslint@^9.6.1":
+  version "9.6.1"
+  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-9.6.1.tgz#d5795ad732ce81715f27f75da913004a56751584"
+  integrity sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==
   dependencies:
     "@types/estree" "*"
     "@types/json-schema" "*"
@@ -1751,7 +1750,7 @@ acorn-jsx@^5.3.2:
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
   integrity sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==
 
-acorn@^8.12.0, acorn@^8.12.1, acorn@^8.7.1, acorn@^8.8.2:
+acorn@^8.12.0, acorn@^8.7.1, acorn@^8.8.2:
   version "8.12.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.12.1.tgz#71616bdccbe25e27a54439e0046e89ca76df2248"
   integrity sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==
