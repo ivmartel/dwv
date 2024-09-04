@@ -395,6 +395,36 @@ export class DrawLayer {
   }
 
   /**
+   * Initialise the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
+   */
+  initScale(newScale, absoluteZoomOffset) {
+    const orientedNewScale = this.#planeHelper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#konvaStage.scale(finalNewScale);
+
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
+    const offset = this.#konvaStage.offset();
+    this.#konvaStage.offset({
+      x: offset.x + this.#zoomOffset.x,
+      y: offset.y + this.#zoomOffset.y
+    });
+  }
+
+  /**
    * Set the layer offset.
    *
    * @param {Scalar3D} newOffset The offset as {x,y,z}.
