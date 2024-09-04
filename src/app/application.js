@@ -2016,19 +2016,12 @@ export class App {
       viewConfig.orientation);
     this.#applyFlipFlags(flipFlags, drawLayer);
 
-    // do we have more than one layer
-    const noViewLayers = layerGroup.getNumberOfViewLayers() === 0;
     // layer scale (done after possible flip)
-    if (!noViewLayers) {
-      // use zoom offset of base layer
-      const baseViewLayer = layerGroup.getBaseViewLayer();
-      drawLayer.initScale(
-        layerGroup.getScale(),
-        baseViewLayer.getAbsoluteZoomOffset()
-      );
-    } else {
-      drawLayer.setScale(layerGroup.getScale());
-    }
+    // use zoom offset of ref layer
+    drawLayer.initScale(
+      layerGroup.getScale(),
+      refViewLayer.getAbsoluteZoomOffset()
+    );
 
     // add possible existing data
     drawLayer.setAnnotationGroup(
