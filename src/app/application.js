@@ -1960,14 +1960,15 @@ export class App {
       throw new Error('Cannot initialise layer with missing data, id: ' +
         dataId);
     }
-    const studyInstanceUID =
-      data.annotationGroup.getMetaValue('StudyInstanceUID');
+    const refSeriesSeq =
+      data.annotationGroup.getMetaValue('ReferencedSeriesSequence');
+    const refSeriesInstanceUID = refSeriesSeq.value[0].SeriesInstanceUID;
     const viewLayers = layerGroup.searchViewLayers({
-      StudyInstanceUID: studyInstanceUID
+      SeriesInstanceUID: refSeriesInstanceUID
     });
     if (viewLayers.length === 0) {
       console.warn(
-        'No loaded data that matches the measurement study UID');
+        'No loaded data that matches the measurement reference series UID');
       return;
     }
     const refViewLayer = viewLayers[0];
