@@ -2004,6 +2004,16 @@ export class App {
     );
     drawLayer.setPlaneHelper(planeHelper);
 
+    // sync layers position
+    const value = [
+      refViewController.getCurrentIndex().getValues(),
+      refViewController.getCurrentPosition().getValues()
+    ];
+    layerGroup.updateLayersToPositionChange({
+      value: value,
+      srclayerid: drawLayer.getId()
+    });
+
     // sync layer groups
     this.#stage.fitToContainer();
 
