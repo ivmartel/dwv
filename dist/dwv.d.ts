@@ -1645,6 +1645,14 @@ export declare class DrawLayer {
      */
     setScale(newScale: Scalar3D, center?: Point3D): void;
     /**
+     * Initialise the layer scale.
+     *
+     * @param {Scalar3D} newScale The scale as {x,y,z}.
+     * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+     *   without the fit scale (as provided by getAbsoluteZoomOffset).
+     */
+    initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
+    /**
      * Set the layer offset.
      *
      * @param {Scalar3D} newOffset The offset as {x,y,z}.

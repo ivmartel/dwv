@@ -380,6 +380,7 @@ export class DrawLayer {
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
     initialise(size: Scalar2D, spacing: Scalar2D): void;
+    initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     isAnnotationVisible(id: string): boolean;
     isVisible(): boolean;
     removeEventListener(type: string, callback: Function): void;
