@@ -243,7 +243,7 @@ export class ViewController {
   /**
    * Get the first origin or at a given position.
    *
-   * @param {Point} [position] Opitonal position.
+   * @param {Point} [position] Optional position.
    * @returns {Point3D} The origin.
    */
   getOrigin(position) {
