@@ -70,8 +70,7 @@ export class ViewController {
 
     // setup the plane helper
     this.#planeHelper = new PlaneHelper(
-      view.getImage().getGeometry().getRealSpacing(),
-      view.getImage().getGeometry().getOrientation(),
+      view.getImage().getGeometry(),
       view.getOrientation()
     );
 

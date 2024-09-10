@@ -1998,8 +1998,7 @@ export class App {
     drawLayer.initialise(size2D, spacing2D);
 
     const planeHelper = new PlaneHelper(
-      imageGeometry.getRealSpacing(),
-      imageGeometry.getOrientation(),
+      imageGeometry,
       viewOrientation
     );
     drawLayer.setPlaneHelper(planeHelper);

@@ -5,6 +5,7 @@ import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import {Geometry} from '../image/geometry';
 import {Matrix33} from '../math/matrix';
 import {Spacing} from './spacing';
 import {Scalar2D, Scalar3D} from '../math/scalar';
@@ -44,17 +45,16 @@ export class PlaneHelper {
   #targetOrientation;
 
   /**
-   * @param {Spacing} spacing The spacing.
-   * @param {Matrix33} imageOrientation The image oientation.
+   * @param {Geometry} imageGeometry The image geometry.
    * @param {Matrix33} viewOrientation The view orientation.
    */
-  constructor(spacing, imageOrientation, viewOrientation) {
-    this.#spacing = spacing;
-    this.#imageOrientation = imageOrientation;
+  constructor(imageGeometry, viewOrientation) {
+    this.#spacing = imageGeometry.getRealSpacing();
+    this.#imageOrientation = imageGeometry.getOrientation();
     this.#viewOrientation = viewOrientation;
 
     this.#targetOrientation = getTargetOrientation(
-      imageOrientation, viewOrientation);
+      this.#imageOrientation, viewOrientation);
   }
 
   /**
