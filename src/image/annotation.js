@@ -84,7 +84,14 @@ export class Annotation {
   labelPosition;
 
   /**
-   * Associated view controller.
+   * A couple of points that define the annotation plane.
+   *
+   * @type {Point3D[]|undefined}
+   */
+  planePoints;
+
+  /**
+   * Associated view controller: needed for quantification and label.
    *
    * @type {ViewController|undefined}
    */
@@ -96,29 +103,17 @@ export class Annotation {
    * @param {ViewController} viewController The associated view controller.
    */
   setViewController(viewController) {
-    if (typeof this.#viewController === 'undefined') {
-      this.#viewController = viewController;
-      // set UID if empty
-      if (typeof this.referenceSopUID === 'undefined') {
-        this.referenceSopUID = viewController.getCurrentImageUid();
-      }
-    } else {
-      logger.warn('Cannot override previous view controller');
+    this.#viewController = viewController;
+    // set UID if empty
+    if (typeof this.referenceSopUID === 'undefined') {
+      this.referenceSopUID = viewController.getCurrentImageUid();
     }
-  }
-
-  /**
-   * Get the image origin for a image UID.
-   *
-   * @returns {Point3D|undefined} The origin.
-   */
-  getOrigin() {
-    let res;
-    if (typeof this.#viewController !== 'undefined') {
-      res =
-        this.#viewController.getOriginForImageUid(this.referenceSopUID);
+    // set plane points if empty
+    if (typeof this.planePoints === 'undefined') {
+      this.planePoints = viewController.getPlanePoints(
+        viewController.getCurrentScrollIndexValue()
+      );
     }
-    return res;
   }
 
   /**

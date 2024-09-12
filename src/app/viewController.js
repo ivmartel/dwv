@@ -250,6 +250,16 @@ export class ViewController {
   }
 
   /**
+   * Get a list of points that define the plane at position k.
+   *
+   * @param {number} k The slice index value.
+   * @returns {Point3D[]} A couple of 3D points.
+   */
+  getPlanePoints(k) {
+    return this.#planeHelper.getPlanePoints(k);
+  }
+
+  /**
    * Get the current scroll position value.
    *
    * @returns {object} The value.

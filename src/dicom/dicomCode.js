@@ -168,6 +168,7 @@ const DcmCodes = {
   122438: 'Reference Points',
   125007: 'Measurement Group',
   125309: 'Short label',
+  128773: 'Reference Geometry'
 };
 
 /**
@@ -258,6 +259,15 @@ export function getMeasurementGroupCode() {
  */
 export function getImageRegionCode() {
   return getDicomCode('111030', 'DCM');
+}
+
+/**
+ * Get a reference geometry DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getReferenceGeometryCode() {
+  return getDicomCode('128773', 'DCM');
 }
 
 /**

@@ -640,30 +640,33 @@ export class DrawLayer {
    * @returns {string|undefined} The group id.
    */
   #getAnnotationPosGroupId(annotation) {
-    const origin = annotation.getOrigin();
-    if (typeof origin === 'undefined') {
-      logger.warn('Unknown reference origin for annotation: ' +
+    const planePoints = annotation.planePoints;
+    if (typeof planePoints === 'undefined') {
+      logger.warn('Unknown reference plane points for annotation: ' +
         annotation.referenceSopUID);
       return;
     }
-    const scrollIndex = this.#planeHelper.getScrollIndex();
-    return this.#getPositionId(origin, [scrollIndex]);
+    return this.#getPositionId(planePoints);
   }
 
   /**
-   * Get a string id from an input position.
+   * Get a string id from an input couple of plane points.
    *
-   * @param {Point3D} position The input position.
-   * @param {number[]} [dims] Optional list of dimensions.
+   * @param {Point3D[]} planePoints A couple of points that defined a plane.
    * @returns {string} The string id.
    */
-  #getPositionId(position, dims) {
-    const posValues = [
-      precisionRound(position.getX(), 2),
-      precisionRound(position.getY(), 2),
-      precisionRound(position.getZ(), 2),
+  #getPositionId(planePoints) {
+    const posValues0 = [
+      precisionRound(planePoints[0].getX(), 2),
+      precisionRound(planePoints[0].getY(), 2),
+      precisionRound(planePoints[0].getZ(), 2),
     ];
-    return toStringId(posValues, dims);
+    const posValues1 = [
+      precisionRound(planePoints[1].getX(), 2),
+      precisionRound(planePoints[1].getY(), 2),
+      precisionRound(planePoints[1].getZ(), 2),
+    ];
+    return toStringId(posValues0) + '-' + toStringId(posValues1);
   }
 
   /**
@@ -1005,12 +1008,19 @@ export class DrawLayer {
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {Index} _index The new index.
+   * @param {Index} index The new index.
    * @returns {boolean} True if the position was updated.
    */
-  setCurrentPosition(position, _index) {
-    this.activateDrawLayer(
-      position, this.#planeHelper.getScrollIndex());
+  setCurrentPosition(position, index) {
+    if (typeof index === 'undefined') {
+      index = this.#planeHelper.worldToIndex(position);
+    }
+    const scrollIndex = this.#planeHelper.getScrollIndex();
+    const scrollIndexValue = index.get(scrollIndex);
+    const planePoints =
+      this.#planeHelper.getPlanePoints(scrollIndexValue);
+    const posGroupId = this.#getPositionId(planePoints);
+    this.activateDrawLayer(posGroupId);
     // TODO: add check
     return true;
   }
@@ -1018,18 +1028,10 @@ export class DrawLayer {
   /**
    * Activate the current draw layer.
    *
-   * @param {Point} position The current position.
-   * @param {number} scrollIndex The scroll index.
+   * @param {string} posGroupId The position group ID.
    */
-  activateDrawLayer(position, scrollIndex) {
-    // TODO: add layer info
-    // get and store the position group id
-    const dims = [scrollIndex];
-    // TODO: handle more dims
-    // for (let j = 3; j < position.length(); ++j) {
-    //   dims.push(j);
-    // }
-    this.#currentPosGroupId = this.#getPositionId(position.get3D(), dims);
+  activateDrawLayer(posGroupId) {
+    this.#currentPosGroupId = posGroupId;
 
     // get all position groups
     const posGroups = this.getKonvaLayer().getChildren(isPositionNode);

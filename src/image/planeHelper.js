@@ -1,5 +1,5 @@
 import {Vector3D} from '../math/vector';
-import {Point3D} from '../math/point';
+import {Point3D, Point2D} from '../math/point';
 import {getTargetOrientation} from '../gui/layerGroup';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
@@ -15,6 +15,13 @@ import {Scalar2D, Scalar3D} from '../math/scalar';
  * Plane geometry helper.
  */
 export class PlaneHelper {
+
+  /**
+   * The image geometry.
+   *
+   * @type {Geometry}
+   */
+  #imageGeometry;
 
   /**
    * The associated spacing.
@@ -49,6 +56,7 @@ export class PlaneHelper {
    * @param {Matrix33} viewOrientation The view orientation.
    */
   constructor(imageGeometry, viewOrientation) {
+    this.#imageGeometry = imageGeometry;
     this.#spacing = imageGeometry.getRealSpacing();
     this.#imageOrientation = imageGeometry.getOrientation();
     this.#viewOrientation = viewOrientation;
@@ -242,6 +250,38 @@ export class PlaneHelper {
       );
     }
     return planePoint;
+  }
+
+  /**
+   * Get a world position from a 2D plane position.
+   *
+   * @param {Point2D} point2D The input point.
+   * @param {number} k The slice index.
+   * @returns {Point3D} The associated position.
+   */
+  getPositionFromPlanePoint(point2D, k) {
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
+    // de-orient
+    const point = this.getImageOrientedPoint3D(planePoint);
+    // ~indexToWorld to not loose precision
+    return this.#imageGeometry.pointToWorld(point);
+  }
+
+  /**
+   * Get a list of points that define the plane at position k.
+   *
+   * @param {number} k The slice index value.
+   * @returns {Point3D[]} A couple of 3D points.
+   */
+  getPlanePoints(k) {
+    return [
+      this.getPositionFromPlanePoint(new Point2D(0, 0), k),
+      this.getPositionFromPlanePoint(new Point2D(1, 1), k)
+    ];
+  }
+
+  worldToIndex(point) {
+    return this.#imageGeometry.worldToIndex(point);
   }
 
   /**

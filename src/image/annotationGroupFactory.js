@@ -17,6 +17,7 @@ import {
   getPathCode,
   getMeasurementGroupCode,
   getImageRegionCode,
+  getReferenceGeometryCode,
   getSourceImageCode,
   getTrackingIdentifierCode,
   getShortLabelCode,
@@ -34,12 +35,13 @@ import {
   getShapeFromScoord,
   SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate';
+import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D';
 import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {Annotation} from './annotation';
 import {AnnotationGroup} from './annotationGroup';
 import {Line} from '../math/line';
-import {Point2D} from '../math/point';
+import {Point2D, Point3D} from '../math/point';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -164,6 +166,17 @@ export class AnnotationGroupFactory {
               ));
             }
             annotation.referencePoints = points;
+          }
+          // plane points
+          if (subItem.valueType === ValueTypes.scoord3d &&
+            subItem.relationshipType === RelationshipTypes.hasProperties &&
+            isEqualCode(
+              subItem.conceptNameCode, getReferenceGeometryCode()) &&
+            subItem.value.graphicType === GraphicTypes.multipoint) {
+            const data = subItem.value.graphicData;
+            const point0 = new Point3D(data[0], data[1], data[2]);
+            const point1 = new Point3D(data[3], data[4], data[5]);
+            annotation.planePoints = [point0, point1];
           }
           // quantification
           if (subItem.valueType === ValueTypes.num &&
@@ -314,6 +327,25 @@ export class AnnotationGroupFactory {
 
         referencePoints.value = refPointsScoord;
         itemContentSequence.push(referencePoints);
+      }
+
+      // plane points
+      if (typeof annotation.planePoints !== 'undefined') {
+        const planePoints = new DicomSRContent(ValueTypes.scoord3d);
+        planePoints.relationshipType = RelationshipTypes.hasProperties;
+        planePoints.conceptNameCode = getReferenceGeometryCode();
+        const pointsScoord = new SpatialCoordinate3D();
+        pointsScoord.graphicType = GraphicTypes.multipoint;
+        const graphicData = [];
+        for (const planePoint of annotation.planePoints) {
+          graphicData.push(planePoint.getX().toString());
+          graphicData.push(planePoint.getY().toString());
+          graphicData.push(planePoint.getZ().toString());
+        }
+        pointsScoord.graphicData = graphicData;
+
+        planePoints.value = pointsScoord;
+        itemContentSequence.push(planePoints);
       }
 
       // quantification
