@@ -249,10 +249,6 @@ test.dataModelUI.Annotation = function (app) {
     saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
-      const layerGroup = app.getActiveLayerGroup();
-      const drawLayer = layerGroup.getActiveDrawLayer();
-      const drawController = drawLayer.getDrawController();
-      const annotationGroup = drawController.getAnnotationGroup();
       const factory = new dwv.AnnotationGroupFactory();
       const dicomElements = factory.toDicom(annotationGroup);
       // write
