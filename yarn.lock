@@ -2060,9 +2060,9 @@ axios@^0.21.1:
     follow-redirects "^1.14.0"
 
 babel-loader@^9.1.3:
-  version "9.1.3"
-  resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-9.1.3.tgz#3d0e01b4e69760cc694ee306fe16d358aa1c6f9a"
-  integrity sha512-xG3ST4DglodGf8qSwv0MdeWLhrDsw/32QMdTO5T1ZIp9gQur0HkCyFs7Awskr10JKXFXwpAhiCuYX5oGXnRGbw==
+  version "9.2.0"
+  resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-9.2.0.tgz#e1c6fae52e0715962819ec45aed1eb4f84c23144"
+  integrity sha512-s4qfbvr85H17Rk7ozQJBIIMcVVjX8eu6NjJHzkPRswOzZcE5h+XSKAgT4KElsdkvywaWezwlu0BptTQivZ6eMQ==
   dependencies:
     find-cache-dir "^4.0.0"
     schema-utils "^4.0.0"
