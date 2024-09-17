@@ -250,6 +250,15 @@ export class ViewController {
   }
 
   /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return this.#view.isAquisitionOrientation();
+  }
+
+  /**
    * Get a list of points that define the plane at position k.
    *
    * @param {number} k The slice index value.

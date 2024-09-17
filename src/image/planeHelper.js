@@ -1,5 +1,6 @@
 import {Vector3D} from '../math/vector';
 import {Point3D, Point2D} from '../math/point';
+import {isIdentityMat33} from '../math/matrix';
 import {getTargetOrientation} from '../gui/layerGroup';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
@@ -290,6 +291,15 @@ export class PlaneHelper {
    */
   worldToIndex(point) {
     return this.#imageGeometry.worldToIndex(point);
+  }
+
+  /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return isIdentityMat33(this.#viewOrientation);
   }
 
   /**
