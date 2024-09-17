@@ -9,7 +9,7 @@ var test = test || {};
  * Get the layer groups div ids from the data view configs.
  *
  * @param {object} dataViewConfigs The configs.
- * @returns {Array} The list of ids.
+ * @returns {string[]} The list of ids.
  */
 test.getLayerGroupDivIds = function (dataViewConfigs) {
   const divIds = [];
