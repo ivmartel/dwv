@@ -84,7 +84,14 @@ export class Annotation {
   labelPosition;
 
   /**
-   * A couple of points that define the annotation plane.
+   * The plane origin, the 3D position of index [0, 0, k].
+   *
+   * @type {Point3D|undefined}
+   */
+  planeOrigin;
+
+  /**
+   * A couple of points that help define the annotation plane.
    *
    * @type {Point3D[]|undefined}
    */
@@ -108,8 +115,16 @@ export class Annotation {
     if (typeof this.referenceSopUID === 'undefined') {
       this.referenceSopUID = viewController.getCurrentImageUid();
     }
-    // set plane points if empty
-    if (typeof this.planePoints === 'undefined') {
+    // set plane origin if empty
+    // (planeOrigin is not saved with file)
+    if (typeof this.planeOrigin === 'undefined') {
+      this.planeOrigin =
+        viewController.getOriginForImageUid(this.referenceSopUID);
+    }
+    // set plane points if not aquisition orientation and empty
+    // (planePoints are saved with file if present)
+    if (!viewController.isAquisitionOrientation() &&
+      typeof this.planePoints === 'undefined') {
       this.planePoints = viewController.getPlanePoints(
         viewController.getCurrentScrollIndexValue()
       );

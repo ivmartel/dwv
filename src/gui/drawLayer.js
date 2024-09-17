@@ -640,33 +640,39 @@ export class DrawLayer {
    * @returns {string|undefined} The group id.
    */
   #getAnnotationPosGroupId(annotation) {
-    const planePoints = annotation.planePoints;
-    if (typeof planePoints === 'undefined') {
-      logger.warn('Unknown reference plane points for annotation: ' +
-        annotation.referenceSopUID);
-      return;
+    let points;
+    // annotation planePoints are only present
+    // for non aquisition plane
+    if (typeof annotation.planePoints !== 'undefined') {
+      // use plane points without the plane origin
+      points = annotation.planePoints.slice(1);
+    } else {
+      // just use plane origin
+      points = [annotation.planeOrigin];
     }
-    return this.#getPositionId(planePoints);
+    return this.#getPositionId(points);
   }
 
   /**
-   * Get a string id from an input couple of plane points.
+   * Get a string id from input plane points.
    *
-   * @param {Point3D[]} planePoints A couple of points that defined a plane.
+   * @param {Point3D[]} points A list of points that defined a plane.
    * @returns {string} The string id.
    */
-  #getPositionId(planePoints) {
-    const posValues0 = [
-      precisionRound(planePoints[0].getX(), 2),
-      precisionRound(planePoints[0].getY(), 2),
-      precisionRound(planePoints[0].getZ(), 2),
-    ];
-    const posValues1 = [
-      precisionRound(planePoints[1].getX(), 2),
-      precisionRound(planePoints[1].getY(), 2),
-      precisionRound(planePoints[1].getZ(), 2),
-    ];
-    return toStringId(posValues0) + '-' + toStringId(posValues1);
+  #getPositionId(points) {
+    let res = '';
+    for (const point of points) {
+      if (res.length !== 0) {
+        res += '-';
+      }
+      const posValues = [
+        precisionRound(point.getX(), 2),
+        precisionRound(point.getY(), 2),
+        precisionRound(point.getZ(), 2),
+      ];
+      res += toStringId(posValues);
+    }
+    return res;
   }
 
   /**
@@ -1017,10 +1023,18 @@ export class DrawLayer {
     }
     const scrollIndex = this.#planeHelper.getScrollIndex();
     const scrollIndexValue = index.get(scrollIndex);
-    const planePoints =
-      this.#planeHelper.getPlanePoints(scrollIndexValue);
-    const posGroupId = this.#getPositionId(planePoints);
-    this.activateDrawLayer(posGroupId);
+    const planePoints = this.#planeHelper.getPlanePoints(scrollIndexValue);
+    let points;
+    if (this.#planeHelper.isAquisitionOrientation()) {
+      // just use plane origin
+      points = [planePoints[0]];
+    } else {
+      // use plane points without the plane origin
+      points = planePoints.slice(1);
+    }
+    const posGroupId = this.#getPositionId(points);
+
+    this.#activateDrawLayer(posGroupId);
     // TODO: add check
     return true;
   }
@@ -1030,7 +1044,7 @@ export class DrawLayer {
    *
    * @param {string} posGroupId The position group ID.
    */
-  activateDrawLayer(posGroupId) {
+  #activateDrawLayer(posGroupId) {
     this.#currentPosGroupId = posGroupId;
 
     // get all position groups
