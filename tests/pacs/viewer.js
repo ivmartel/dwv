@@ -501,27 +501,38 @@ function addLayerGroups(number) {
 }
 
 /**
- * Merge an app data config into the input one.
+ * Merge a data config into the first input one.
  * Copies all but the divId and orientation property.
  *
- * @param {string} dataId The data id.
- * @param {object} config The view config.
- * @returns {object} The update config.
+ * @param {object} config The config where to merge.
+ * @param {object} configToMerge The config to merge.
+ * @returns {object} The updated config.
  */
-function mergeDataConfig(dataId, config) {
-  const oldConfigs = _app.getViewConfigs(_layout, dataId);
-  if (oldConfigs.length !== 0) {
-    // use first config as base
-    const oldConfig = oldConfigs[0];
-    for (const key in oldConfig) {
-      if (key !== 'divId' &&
-        key !== 'orientation') {
-        config[key] = oldConfig[key];
-      }
+function mergeConfigs(config, configToMerge) {
+  for (const key in configToMerge) {
+    if (key !== 'divId' &&
+      key !== 'orientation') {
+      config[key] = configToMerge[key];
     }
   }
   return config;
 }
+
+/**
+ * Get the first view config for a data id.
+ *
+ * @param {string} dataId The data id.
+ * @returns {object} The view config.
+ */
+function getAppViewConfig(dataId) {
+  let res;
+  const appConfigs = _app.getViewConfigs(dataId);
+  if (appConfigs.length !== 0) {
+    res = appConfigs[0];
+  }
+  return res;
+}
+
 
 /**
  * Create 1*2 view config(s).
@@ -532,8 +543,15 @@ function mergeDataConfig(dataId, config) {
 function getOnebyOneDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
-    configs[dataId] =
-      [mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup0'))];
+    const newConfig = test.getViewConfig('one', 'layerGroup0');
+    // merge possibly existing app config with the new one to
+    // keed window level for example
+    const appConfig = getAppViewConfig(dataId);
+    if (typeof appConfig !== 'undefined') {
+      mergeConfigs(newConfig, appConfig);
+    }
+    // store
+    configs[dataId] = [newConfig];
   }
   return configs;
 }
@@ -548,13 +566,20 @@ function getOnebyTwoDataViewConfig(dataIds) {
   const configs = {};
   for (let i = 0; i < dataIds.length; ++i) {
     const dataId = dataIds[i];
-    let config;
+    let newConfig;
     if (i % 2 === 0) {
-      config = test.getViewConfig(_layout, 'layerGroup0');
+      newConfig = test.getViewConfig('side', 'layerGroup0');
     } else {
-      config = test.getViewConfig(_layout, 'layerGroup1');
+      newConfig = test.getViewConfig('side', 'layerGroup1');
     }
-    configs[dataIds[i]] = [mergeDataConfig(dataId, config)];
+    // merge possibly existing app config with the new one to
+    // keed window level for example
+    const appConfig = getAppViewConfig(dataId);
+    if (typeof appConfig !== 'undefined') {
+      mergeConfigs(newConfig, appConfig);
+    }
+    // store
+    configs[dataIds[i]] = [newConfig];
   }
   return configs;
 }
@@ -568,11 +593,19 @@ function getOnebyTwoDataViewConfig(dataIds) {
 function getMPRDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
-    configs[dataId] = [
-      mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup0')),
-      mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup1')),
-      mergeDataConfig(dataId, test.getViewConfig(_layout, 'layerGroup2'))
-    ];
+    const newConfig0 = test.getViewConfig('mpr', 'layerGroup0');
+    const newConfig1 = test.getViewConfig('mpr', 'layerGroup1');
+    const newConfig2 = test.getViewConfig('mpr', 'layerGroup2');
+    // merge possibly existing app config with the new one to
+    // keed window level for example
+    const appConfig = getAppViewConfig(dataId);
+    if (typeof appConfig !== 'undefined') {
+      mergeConfigs(newConfig0, appConfig);
+      mergeConfigs(newConfig1, appConfig);
+      mergeConfigs(newConfig2, appConfig);
+    }
+    // store
+    configs[dataId] = [newConfig0, newConfig1, newConfig2];
   }
   return configs;
 }
