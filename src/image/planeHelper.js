@@ -279,7 +279,8 @@ export class PlaneHelper {
   getPlanePoints(k) {
     return [
       this.getPositionFromPlanePoint(new Point2D(0, 0), k),
-      this.getPositionFromPlanePoint(new Point2D(1, 1), k)
+      this.getPositionFromPlanePoint(new Point2D(0, 1), k),
+      this.getPositionFromPlanePoint(new Point2D(1, 0), k)
     ];
   }
 
