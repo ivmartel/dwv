@@ -533,6 +533,28 @@ function getAppViewConfig(dataId) {
   return res;
 }
 
+/**
+ * Get the orientation of the first view config for a div id.
+ *
+ * @param {string} divId The div id.
+ * @returns {object} The orientation.
+ */
+function getAppViewConfigOrientation(divId) {
+  let orientation;
+  const appDataViewConfigs = _app.getDataViewConfigs();
+  let appDivIdConfig;
+  for (const key in appDataViewConfigs) {
+    const dataViewConfigs = appDataViewConfigs[key];
+    appDivIdConfig = dataViewConfigs.find(function (item) {
+      return item.divId === divId;
+    });
+    if (typeof appDivIdConfig !== 'undefined') {
+      orientation = appDivIdConfig.orientation;
+      break;
+    }
+  }
+  return orientation;
+}
 
 /**
  * Create 1*2 view config(s).
@@ -541,6 +563,7 @@ function getAppViewConfig(dataId) {
  * @returns {object} The view config.
  */
 function getOnebyOneDataViewConfig(dataIds) {
+  const orientation = getAppViewConfigOrientation('layerGroup0');
   const configs = {};
   for (const dataId of dataIds) {
     const newConfig = test.getViewConfig('one', 'layerGroup0');
@@ -549,6 +572,10 @@ function getOnebyOneDataViewConfig(dataIds) {
     const appConfig = getAppViewConfig(dataId);
     if (typeof appConfig !== 'undefined') {
       mergeConfigs(newConfig, appConfig);
+    }
+    // if available use first orientation for all
+    if (typeof orientation !== 'undefined') {
+      newConfig.orientation = orientation;
     }
     // store
     configs[dataId] = [newConfig];
