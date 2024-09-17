@@ -242,12 +242,11 @@ test.ui.DataTable = function (app) {
     // get the selected layer group ids
     const getSelectedLayerGroupIds = function () {
       const res = [];
-      for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
-        const layerGroupDivId = allLayerGroupDivIds[l];
-        const elemId = 'layerselect-' + layerGroupDivId + '-' + dataId;
+      for (const divId of allLayerGroupDivIds) {
+        const elemId = 'layerselect-' + divId + '-' + dataId;
         const elem = document.getElementById(elemId);
         if (elem && elem.checked) {
-          res.push(layerGroupDivId);
+          res.push(divId);
         }
       }
       return res;
@@ -328,6 +327,7 @@ test.ui.DataTable = function (app) {
       button.name = 'layerupd-' + index + '_' + letter;
       button.id = 'layerupd-' + divId + '-' + dataId + '_' + letter;
       button.title = 'Change layer orientation to ' + orientation;
+      button.style.borderStyle = 'outset';
       button.appendChild(document.createTextNode(letter));
       button.onclick = function () {
         // update app
@@ -342,26 +342,36 @@ test.ui.DataTable = function (app) {
     cell = row.insertCell();
     cell.appendChild(document.createTextNode(dataId));
 
+    const orientations = [
+      dwv.Orientation.Axial,
+      dwv.Orientation.Coronal,
+      dwv.Orientation.Sagittal
+    ];
+
     // cell: radio
-    let viewConfig = dataViewConfigs[dataId];
-    if (typeof viewConfig === 'undefined') {
-      viewConfig = dataViewConfigs['*'];
+    let viewConfigs = dataViewConfigs[dataId];
+    if (typeof viewConfigs === 'undefined') {
+      viewConfigs = dataViewConfigs['*'];
     }
-    const dataLayerGroupsIds = getDivIds(viewConfig);
-    for (let l = 0; l < allLayerGroupDivIds.length; ++l) {
-      const layerGroupDivId = allLayerGroupDivIds[l];
+
+    const dataLayerGroupsIds = getDivIds(viewConfigs);
+    for (let i = 0; i < allLayerGroupDivIds.length; ++i) {
+      const layerGroupDivId = allLayerGroupDivIds[i];
+      const viewConfig =
+        viewConfigs.find(element => element.divId === layerGroupDivId);
       cell = row.insertCell();
       if (dataLayerGroupsIds.includes(layerGroupDivId)) {
-        cell.appendChild(getLayerRadio(l, layerGroupDivId));
-        cell.appendChild(getLayerRem(l, layerGroupDivId));
-        cell.appendChild(
-          getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Axial));
-        cell.appendChild(
-          getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Coronal));
-        cell.appendChild(
-          getLayerUpdate(l, layerGroupDivId, dwv.Orientation.Sagittal));
+        cell.appendChild(getLayerRadio(i, layerGroupDivId));
+        cell.appendChild(getLayerRem(i, layerGroupDivId));
+        for (const orientation of orientations) {
+          const button = getLayerUpdate(i, layerGroupDivId, orientation);
+          if (orientation === viewConfig.orientation) {
+            button.style.borderStyle = 'inset';
+          }
+          cell.appendChild(button);
+        }
       } else {
-        cell.appendChild(getLayerAdd(l, layerGroupDivId));
+        cell.appendChild(getLayerAdd(i, layerGroupDivId));
       }
     }
 
