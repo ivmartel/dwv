@@ -5,6 +5,8 @@ import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import {Point} from '../math/point';
+import {Index} from '../math/index';
 import {Geometry} from '../image/geometry';
 import {Matrix33} from '../math/matrix';
 import {Spacing} from './spacing';
@@ -280,6 +282,12 @@ export class PlaneHelper {
     ];
   }
 
+  /**
+   * Image world to index.
+   *
+   * @param {Point} point The input point.
+   * @returns {Index} The corresponding index.
+   */
   worldToIndex(point) {
     return this.#imageGeometry.worldToIndex(point);
   }
