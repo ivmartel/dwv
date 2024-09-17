@@ -174,9 +174,13 @@ export class AnnotationGroupFactory {
               subItem.conceptNameCode, getReferenceGeometryCode()) &&
             subItem.value.graphicType === GraphicTypes.multipoint) {
             const data = subItem.value.graphicData;
-            const point0 = new Point3D(data[0], data[1], data[2]);
-            const point1 = new Point3D(data[3], data[4], data[5]);
-            annotation.planePoints = [point0, point1];
+            const points = [];
+            const nPoints = Math.floor(data.length / 3);
+            for (let i = 0; i < nPoints; ++i) {
+              const j = i * 3;
+              points.push(new Point3D(data[j], data[j + 1], data[j + 2]));
+            }
+            annotation.planePoints = points;
           }
           // quantification
           if (subItem.valueType === ValueTypes.num &&
