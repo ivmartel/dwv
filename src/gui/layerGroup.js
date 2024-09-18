@@ -1007,24 +1007,26 @@ export class LayerGroup {
     }
 
     // origin of the first view layer
+    const viewLayerOffsets = {};
     let baseViewLayerOrigin0;
     let baseViewLayerOrigin;
-    let scrollOffset;
-    let planeOffset;
     // update position for all layers except the source one
     for (const layer of this.#layers) {
       if (typeof layer === 'undefined') {
         continue;
       }
-
-      // update base offset (does not trigger redraw)
       let hasSetOffset = false;
+
+      // view layer case: define and set offsets
       if (layer instanceof ViewLayer) {
         const vc = layer.getViewController();
         // origin0 should always be there
         const origin0 = vc.getOrigin();
         // depending on position, origin could be undefined
         const origin = vc.getOrigin(position);
+
+        let scrollOffset;
+        let planeOffset;
 
         if (typeof baseViewLayerOrigin === 'undefined') {
           // first view layer, store origins
@@ -1045,24 +1047,30 @@ export class LayerGroup {
               planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
           }
         }
+
+        // set and store offsets
+        if (typeof scrollOffset !== 'undefined' &&
+          typeof planeOffset !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(
+              scrollOffset, planeOffset,
+              baseViewLayerOrigin, baseViewLayerOrigin0
+            );
+          // store
+          viewLayerOffsets[layer.getId()] = {
+            scroll: scrollOffset,
+            plane: planeOffset
+          };
+        }
       }
 
-      // also set for draw layers
-      // (should be next after a view layer)
-      if (typeof scrollOffset !== 'undefined' &&
-        typeof planeOffset !== 'undefined') {
-        hasSetOffset =
-          layer.setBaseOffset(
-            scrollOffset, planeOffset,
-            baseViewLayerOrigin, baseViewLayerOrigin0
-          );
-      }
-
-      // reset to not propagate after draw layer
-      // TODO: revise, could be unstable...
+      // draw layer case: use associated view layer offsets
       if (layer instanceof DrawLayer) {
-        scrollOffset = undefined;
-        planeOffset = undefined;
+        const refOffsets = viewLayerOffsets[layer.getReferenceLayerId()];
+        if (typeof refOffsets !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(refOffsets.scroll, refOffsets.plane);
+        }
       }
 
       // update position (triggers redraw)
