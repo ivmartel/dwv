@@ -1755,13 +1755,10 @@ export class App {
         config.windowCenter = undefined;
         config.windowWidth = undefined;
         config.wlPresetName = undefined;
-        // window width and center
-        if (event.value.length === 2) {
+        // window width, center and name
+        if (event.value.length === 3) {
           config.windowCenter = event.value[0];
           config.windowWidth = event.value[1];
-        }
-        // window level preset name
-        if (event.value.length === 3) {
           config.wlPresetName = event.value[2];
         }
       }
