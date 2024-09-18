@@ -200,6 +200,7 @@ const UcumCodes = {
   'cm2/ml': 'Square centimeter per milliliter',
   '/cm': 'Per centimeter',
   'g/ml': 'Gram per milliliter',
+  'g/ml{SUVbw}': 'Standardized Uptake Value body weight',
   'mg/ml': 'Milligram per milliliter',
   'umol/ml': 'Micromole per milliliter',
   'Bq/ml': 'Becquerels per milliliter',
@@ -402,6 +403,7 @@ export function getQuantificationName(code) {
  * Quantification unit to UCUM key. Associated tags:
  * - Rescale type {@link https://dicom.innolitics.com/ciods/computed-radiography-image/modality-lut/00281054},
  * - Units {@link https://dicom.innolitics.com/ciods/positron-emission-tomography-image/pet-series/00541001}.
+ * - SUV {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_85.html}.
  */
 const QuantificationUnit2UcumKey = {
   'unit.mm': 'mm',
@@ -435,7 +437,7 @@ const QuantificationUnit2UcumKey = {
   MLML: 'ml/ml',
   GML: 'g/ml',
   //STDDEV
-  SUV: 'g/ml',
+  SUV: 'g/ml{SUVbw}',
 };
 
 /**
