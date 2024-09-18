@@ -1982,7 +1982,7 @@ export class App {
     const refData = this.#dataController.get(refDataId);
     if (!refData) {
       throw new Error(
-        'Cannot initialise layer with missing reference data, id: ' +
+        'Cannot initialise layer without reference data, id: ' +
         refDataId);
     }
     const imageGeometry = refData.image.getGeometry();
