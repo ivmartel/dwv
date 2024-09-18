@@ -144,6 +144,13 @@ export class DrawLayer {
   #dataId;
 
   /**
+   * The reference layer id.
+   *
+   * @type {string}
+   */
+  #referenceLayerId;
+
+  /**
    * Current position group id.
    *
    * @type {string}
@@ -190,6 +197,15 @@ export class DrawLayer {
    */
   getDataId() {
     return this.#dataId;
+  }
+
+  /**
+   * Get the reference data id.
+   *
+   * @returns {string} The id.
+   */
+  getReferenceLayerId() {
+    return this.#referenceLayerId;
   }
 
   /**
@@ -505,11 +521,13 @@ export class DrawLayer {
    *
    * @param {Scalar2D} size The image size as {x,y}.
    * @param {Scalar2D} spacing The image spacing as {x,y}.
+   * @param {string} refLayerId The reference image dataId.
    */
-  initialise(size, spacing) {
+  initialise(size, spacing, refLayerId) {
     // set locals
     this.#baseSize = size;
     this.#baseSpacing = spacing;
+    this.#referenceLayerId = refLayerId;
 
     // create stage
     this.#konvaStage = new Konva.Stage({

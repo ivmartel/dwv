@@ -1995,7 +1995,7 @@ export class App {
     const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
 
     const drawLayer = layerGroup.addDrawLayer();
-    drawLayer.initialise(size2D, spacing2D);
+    drawLayer.initialise(size2D, spacing2D, refViewLayer.getId());
 
     const planeHelper = new PlaneHelper(
       imageGeometry,
