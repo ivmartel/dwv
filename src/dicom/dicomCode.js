@@ -411,7 +411,7 @@ const QuantificationUnit2UcumKey = {
   'unit.degree': 'deg',
   // OD optical density
   HU: '[hnsf\'U]',
-  US: '1',
+  // US: '1', // duplicates 'NONE'
   MGML: 'mg/ml',
   // Z_EFF Effective Atomic Number (i.e., Effective-Z)
   ED: '10*23/ml',
