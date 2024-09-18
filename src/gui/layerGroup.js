@@ -21,18 +21,18 @@ import {Scalar2D, Scalar3D} from '../math/scalar';
  * Get the layer div id.
  *
  * @param {string} groupDivId The layer group div id.
- * @param {number} layerId The lyaer id.
+ * @param {number} layerIndex The layer index.
  * @returns {string} A string id.
  */
-export function getLayerDivId(groupDivId, layerId) {
-  return groupDivId + '-layer-' + layerId;
+export function getLayerDivId(groupDivId, layerIndex) {
+  return groupDivId + '-layer-' + layerIndex;
 }
 
 /**
  * Get the layer details from a div id.
  *
  * @param {string} idString The layer div id.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export function getLayerDetailsFromLayerDivId(idString) {
   const split = idString.split('-layer-');
@@ -41,7 +41,8 @@ export function getLayerDetailsFromLayerDivId(idString) {
   }
   return {
     groupDivId: split[0],
-    layerId: split[1]
+    layerIndex: split[1],
+    layerId: idString,
   };
 }
 
