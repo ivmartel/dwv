@@ -268,6 +268,7 @@ test.ui.DataTable = function (app) {
         const lg = app.getLayerGroupByDivId(groupDivId);
         if (dataIsImage) {
           lg.setActiveViewLayerByDataId(dataId);
+          lg.setActiveDrawLayer(undefined);
         } else {
           lg.setActiveDrawLayerByDataId(dataId);
         }

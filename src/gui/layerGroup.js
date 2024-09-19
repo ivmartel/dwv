@@ -580,19 +580,15 @@ export class LayerGroup {
   /**
    * Set the active draw layer.
    *
-   * @param {number} index The index of the layer to set as active.
+   * @param {number|undefined} index The index of the layer to set as active
+   *   or undefined to not set any.
    */
   setActiveDrawLayer(index) {
-    if (this.#layers[index] instanceof DrawLayer) {
-      this.#activeDrawLayerIndex = index;
-      this.#fireEvent({
-        type: 'activelayerchange',
-        value: [this.#layers[index]]
-      });
-    } else {
-      logger.warn('No draw layer to set as active with index: ' +
-        index);
-    }
+    this.#activeDrawLayerIndex = index;
+    this.#fireEvent({
+      type: 'activelayerchange',
+      value: [this.#layers[index]]
+    });
   }
 
   /**

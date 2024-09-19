@@ -185,7 +185,9 @@ export class ToolboxController {
   #getActiveLayerChangeHandler(divId) {
     return (event) => {
       const layer = event.value[0];
-      this.#internalBindLayerGroup(divId, layer);
+      if (typeof layer !== 'undefined') {
+        this.#internalBindLayerGroup(divId, layer);
+      }
     };
   }
 
