@@ -129,6 +129,11 @@ export class Draw {
    */
   #withScroll = true;
 
+  /**
+   * Black list: list of dataIds for which draw layer creation
+   *   is forbidden.
+   */
+  #blacklist = [];
 
   /**
    * Shape handler: activate listeners on existing shape.
@@ -182,6 +187,14 @@ export class Draw {
     if (typeof drawLayer === 'undefined') {
       const viewLayer = layerGroup.getActiveViewLayer();
       const refDataId = viewLayer.getDataId();
+      // check black list
+      if (this.#blacklist.includes(refDataId)) {
+        this.#fireEvent({
+          type: 'warn',
+          message: 'Cannot create draw layer, data is in black list'
+        });
+        return;
+      }
       // create new data
       const data = this.#app.createAnnotationData(refDataId);
       // render (will create draw layer)
@@ -696,6 +709,9 @@ export class Draw {
     if (typeof features.withScroll !== 'undefined') {
       this.#withScroll = features.withScroll;
     }
+    if (typeof features.blacklist !== 'undefined') {
+      this.#blacklist = features.blacklist;
+    }
   }
 
   /**
@@ -712,7 +728,7 @@ export class Draw {
    */
   getEventNames() {
     return [
-      'annotationupdate'
+      'annotationupdate', 'warn'
     ];
   }
 
