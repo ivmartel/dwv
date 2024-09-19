@@ -52,7 +52,7 @@ export function getLayerDetailsFromLayerDivId(idString) {
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
  * with the 'layer' class and id generated with `getLayerDivId`.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export function getLayerDetailsFromEvent(event) {
   let res = null;
