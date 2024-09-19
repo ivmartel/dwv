@@ -15,12 +15,13 @@ export function addTagsToDictionary(group: string, tags: {
 export class Annotation {
     colour: string | undefined;
     getFactory(): object;
-    getOrigin(): Point3D | undefined;
     getText(): string;
     getType(): string;
     id: string;
     labelPosition: Point2D | undefined;
     mathShape: object;
+    planeOrigin: Point3D | undefined;
+    planePoints: Point3D[] | undefined;
     quantification: object | undefined;
     referencePoints: Point2D[] | undefined;
     referenceSopUID: string;
@@ -354,7 +355,6 @@ export class DrawController {
 export class DrawLayer {
     constructor(containerDiv: HTMLDivElement);
     activateCurrentPositionShapes(flag: boolean): void;
-    activateDrawLayer(position: Point, scrollIndex: number): void;
     addEventListener(type: string, callback: Function): void;
     addFlipOffsetX(): void;
     addFlipOffsetY(): void;
@@ -379,7 +379,8 @@ export class DrawLayer {
     getKonvaStage(): Konva.Stage;
     getNumberOfDraws(): number | undefined;
     getOpacity(): number;
-    initialise(size: Scalar2D, spacing: Scalar2D): void;
+    getReferenceLayerId(): string;
+    initialise(size: Scalar2D, spacing: Scalar2D, refLayerId: string): void;
     initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
     isAnnotationVisible(id: string): boolean;
     isVisible(): boolean;
@@ -388,7 +389,7 @@ export class DrawLayer {
     setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
     setAnnotationVisibility(id: string, visible?: boolean): boolean;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
-    setCurrentPosition(position: Point, _index: Index): boolean;
+    setCurrentPosition(position: Point, index: Index): boolean;
     setLabelsVisibility(visible?: boolean): void;
     setLabelVisibility(shapeGroup: Konva.Group): void;
     setOffset(newOffset: Scalar3D): void;
@@ -618,7 +619,7 @@ export class LayerGroup {
     removeTooltipDiv(): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
-    setActiveDrawLayer(index: number): void;
+    setActiveDrawLayer(index: number | undefined): void;
     setActiveDrawLayerByDataId(dataId: string): void;
     setActiveViewLayer(index: number): void;
     setActiveViewLayerByDataId(dataId: string): void;
@@ -766,7 +767,7 @@ export class OverlayData {
 
 // @public
 export class PlaneHelper {
-    constructor(spacing: Spacing, imageOrientation: Matrix33, viewOrientation: Matrix33);
+    constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
     getImageDeOrientedPoint3D(point: Point3D): Point3D;
     getImageDeOrientedVector3D(vector: Vector3D): Vector3D;
     getImageOrientedPoint3D(planePoint: Point3D): Point3D;
@@ -774,11 +775,15 @@ export class PlaneHelper {
     getNativeScrollIndex(): number;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getPlaneOffsetFromOffset3D(offset3D: Scalar3D): Scalar2D;
+    getPlanePoints(k: number): Point3D[];
+    getPositionFromPlanePoint(point2D: Point2D, k: number): Point3D;
     getScrollIndex(): number;
     getTargetDeOrientedPoint3D(planePoint: Point3D): Point3D;
     getTargetDeOrientedVector3D(planeVector: Vector3D): Vector3D;
     getTargetOrientedPositiveXYZ(values: Scalar3D): Scalar3D;
     getTargetOrientedVector3D(vector: Vector3D): Vector3D;
+    isAquisitionOrientation(): boolean;
+    worldToIndex(point: Point): Index;
 }
 
 // @public
@@ -977,6 +982,7 @@ export class View {
     getWindowPresets(): object;
     getWindowPresetsNames(): string[];
     init(): void;
+    isAquisitionOrientation(): boolean;
     isPositionInBounds(position?: Point): boolean;
     removeEventListener(type: string, callback: Function): void;
     setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
@@ -1042,6 +1048,7 @@ export class ViewController {
     getOriginForImageUid(uid: string): Point3D | undefined;
     getPixelUnit(): string;
     getPlaneHelper(): PlaneHelper;
+    getPlanePoints(k: number): Point3D[];
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
     getPlanePositionFromPosition(point: Point): Point2D;
     getPositionFromPlanePoint(point2D: Point2D): Point;
@@ -1052,6 +1059,7 @@ export class ViewController {
     incrementIndex(dim: number, silent?: boolean): boolean;
     incrementScrollIndex(silent?: boolean): boolean;
     initialise(): void;
+    isAquisitionOrientation(): boolean;
     isMask(): boolean;
     isMonochrome(): boolean;
     isPlaying(): boolean;

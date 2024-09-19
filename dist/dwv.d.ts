@@ -67,17 +67,23 @@ export declare class Annotation {
      */
     labelPosition: Point2D | undefined;
     /**
+     * The plane origin, the 3D position of index [0, 0, k].
+     *
+     * @type {Point3D|undefined}
+     */
+    planeOrigin: Point3D | undefined;
+    /**
+     * A couple of points that help define the annotation plane.
+     *
+     * @type {Point3D[]|undefined}
+     */
+    planePoints: Point3D[] | undefined;
+    /**
      * Set the associated view controller.
      *
      * @param {ViewController} viewController The associated view controller.
      */
     setViewController(viewController: ViewController): void;
-    /**
-     * Get the image origin for a image UID.
-     *
-     * @returns {Point3D|undefined} The origin.
-     */
-    getOrigin(): Point3D | undefined;
     /**
      * Set the annotation text expression.
      *
@@ -1566,6 +1572,12 @@ export declare class DrawLayer {
      */
     getDataId(): string;
     /**
+     * Get the reference data id.
+     *
+     * @returns {string} The id.
+     */
+    getReferenceLayerId(): string;
+    /**
      * Get the Konva stage.
      *
      * @returns {Konva.Stage} The stage.
@@ -1688,8 +1700,9 @@ export declare class DrawLayer {
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
+     * @param {string} refLayerId The reference image dataId.
      */
-    initialise(size: Scalar2D, spacing: Scalar2D): void;
+    initialise(size: Scalar2D, spacing: Scalar2D, refLayerId: string): void;
     /**
      * Set the annotation group.
      *
@@ -1778,17 +1791,10 @@ export declare class DrawLayer {
      * Set the current position.
      *
      * @param {Point} position The new position.
-     * @param {Index} _index The new index.
+     * @param {Index} index The new index.
      * @returns {boolean} True if the position was updated.
      */
-    setCurrentPosition(position: Point, _index: Index): boolean;
-    /**
-     * Activate the current draw layer.
-     *
-     * @param {Point} position The current position.
-     * @param {number} scrollIndex The scroll index.
-     */
-    activateDrawLayer(position: Point, scrollIndex: number): void;
+    setCurrentPosition(position: Point, index: Index): boolean;
     /**
      * Get the current position group.
      *
@@ -2128,7 +2134,7 @@ export declare function getEllipseIndices(center: Index, radius: number[], dir: 
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
  * with the 'layer' class and id generated with `getLayerDivId`.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export declare function getLayerDetailsFromEvent(event: object): object;
 
@@ -2888,9 +2894,10 @@ export declare class LayerGroup {
     /**
      * Set the active draw layer.
      *
-     * @param {number} index The index of the layer to set as active.
+     * @param {number|undefined} index The index of the layer to set as active
+     *   or undefined to not set any.
      */
-    setActiveDrawLayer(index: number): void;
+    setActiveDrawLayer(index: number | undefined): void;
     /**
      * Set the active draw layer with a data id.
      *
@@ -3501,11 +3508,10 @@ export declare class OverlayData {
  */
 export declare class PlaneHelper {
     /**
-     * @param {Spacing} spacing The spacing.
-     * @param {Matrix33} imageOrientation The image oientation.
+     * @param {Geometry} imageGeometry The image geometry.
      * @param {Matrix33} viewOrientation The view orientation.
      */
-    constructor(spacing: Spacing, imageOrientation: Matrix33, viewOrientation: Matrix33);
+    constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
     /**
      * Get a 3D offset from a plane one.
      *
@@ -3569,6 +3575,34 @@ export declare class PlaneHelper {
      * @returns {Point3D} The de-orienteded point.
      */
     getImageDeOrientedPoint3D(point: Point3D): Point3D;
+    /**
+     * Get a world position from a 2D plane position.
+     *
+     * @param {Point2D} point2D The input point.
+     * @param {number} k The slice index.
+     * @returns {Point3D} The associated position.
+     */
+    getPositionFromPlanePoint(point2D: Point2D, k: number): Point3D;
+    /**
+     * Get a list of points that define the plane at position k.
+     *
+     * @param {number} k The slice index value.
+     * @returns {Point3D[]} A couple of 3D points.
+     */
+    getPlanePoints(k: number): Point3D[];
+    /**
+     * Image world to index.
+     *
+     * @param {Point} point The input point.
+     * @returns {Index} The corresponding index.
+     */
+    worldToIndex(point: Point): Index;
+    /**
+     * Is this view in the same orientation as the image aquisition.
+     *
+     * @returns {boolean} True if in aquisition plane.
+     */
+    isAquisitionOrientation(): boolean;
     /**
      * Reorder values to follow target orientation.
      *
@@ -4648,6 +4682,12 @@ export declare class View {
      * @returns {number} The index.
      */
     getScrollIndex(): number;
+    /**
+     * Is this view in the same orientation as the image aquisition.
+     *
+     * @returns {boolean} True if in aquisition plane.
+     */
+    isAquisitionOrientation(): boolean;
     #private;
 }
 
@@ -4814,10 +4854,23 @@ export declare class ViewController {
     /**
      * Get the first origin or at a given position.
      *
-     * @param {Point} [position] Opitonal position.
+     * @param {Point} [position] Optional position.
      * @returns {Point3D} The origin.
      */
     getOrigin(position?: Point): Point3D;
+    /**
+     * Is this view in the same orientation as the image aquisition.
+     *
+     * @returns {boolean} True if in aquisition plane.
+     */
+    isAquisitionOrientation(): boolean;
+    /**
+     * Get a list of points that define the plane at position k.
+     *
+     * @param {number} k The slice index value.
+     * @returns {Point3D[]} A couple of 3D points.
+     */
+    getPlanePoints(k: number): Point3D[];
     /**
      * Get the current scroll position value.
      *
