@@ -150,7 +150,7 @@ test.dataModelUI.Annotation = function (app) {
     inputColour.onchange = function (event) {
       const target = event.target;
       const newColour = target.value;
-      // get annotatio
+      // get annotation
       const indices =
         splitAnnotationDivId(target.id.substring(inputColourPrefix.length));
       const dataId = indices.dataId;
