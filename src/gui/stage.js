@@ -140,9 +140,10 @@ export class OpacityBinder {
       if (typeof event.dataid === 'undefined') {
         return;
       }
-      // propagate to first view layer
+      // propagate to first view layer if it is not base layer
       const viewLayers = layerGroup.getViewLayersByDataId(event.dataid);
-      if (viewLayers.length !== 0) {
+      const baseLayer = layerGroup.getBaseLayer();
+      if (viewLayers.length !== 0 && baseLayer !== viewLayers[0]) {
         viewLayers[0].setOpacity(event.value);
         viewLayers[0].draw();
       }
