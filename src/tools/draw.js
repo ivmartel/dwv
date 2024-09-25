@@ -187,8 +187,11 @@ export class Draw {
     if (typeof drawLayer === 'undefined') {
       const viewLayer = layerGroup.getActiveViewLayer();
       const refDataId = viewLayer.getDataId();
+      const refData = this.#app.getData(refDataId);
+      const refMeta = refData.image.getMeta();
+      const seriesInstanceUID = refMeta.SeriesInstanceUID;
       // check black list
-      if (this.#blacklist.includes(refDataId)) {
+      if (this.#blacklist.includes(seriesInstanceUID)) {
         this.#fireEvent({
           type: 'warn',
           message: 'Cannot create draw layer, data is in black list'
