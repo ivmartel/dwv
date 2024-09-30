@@ -48,6 +48,15 @@ export class Point2D {
   }
 
   /**
+   * Get the center of the point, ie itself.
+   *
+   * @returns {Point2D} The center point.
+   */
+  getCenter() {
+    return this;
+  }
+
+  /**
    * Check for Point2D equality.
    *
    * @param {Point2D} rhs The other point to compare to.

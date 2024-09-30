@@ -125,6 +125,15 @@ export class Line {
   }
 
   /**
+   * Get the center of the rectangle.
+   *
+   * @returns {Point2D} Center point.
+   */
+  getCenter() {
+    return this.getMidpoint();
+  }
+
+  /**
    * Get the slope of the line.
    *
    * @returns {number} The slope of the line.
