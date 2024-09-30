@@ -125,11 +125,11 @@ export class Line {
   }
 
   /**
-   * Get the center of the rectangle.
+   * Get the centroid of the line.
    *
-   * @returns {Point2D} Center point.
+   * @returns {Point2D} THe centroid point.
    */
-  getCenter() {
+  getCentroid() {
     return this.getMidpoint();
   }
 

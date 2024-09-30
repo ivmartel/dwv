@@ -183,11 +183,11 @@ test.dataModelUI.Annotation = function (app) {
       const annotationId = indices.annotationId;
       const annotationGroup = app.getData(dataId).annotationGroup;
       const annotation = annotationGroup.find(annotationId);
-      const annotCenter = annotation.getCenter();
-      if (typeof annotCenter !== 'undefined') {
+      const annotCentroid = annotation.getCentroid();
+      if (typeof annotCentroid !== 'undefined') {
         const drawLayers = app.getDrawLayersByDataId(dataId);
         for (const layer of drawLayers) {
-          layer.setCurrentPosition(annotCenter);
+          layer.setCurrentPosition(annotCentroid);
         }
       }
     };

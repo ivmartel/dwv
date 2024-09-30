@@ -73,6 +73,15 @@ export class Ellipse {
   }
 
   /**
+   * Get the centroid of the ellipse.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
+    return this.#centre;
+  }
+
+  /**
    * Get the radius of the ellipse on the horizontal axe.
    *
    * @returns {number} The radius of the ellipse on the horizontal axe.

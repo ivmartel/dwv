@@ -48,11 +48,11 @@ export class Point2D {
   }
 
   /**
-   * Get the center of the point, ie itself.
+   * Get the centroid of the point, ie itself.
    *
-   * @returns {Point2D} The center point.
+   * @returns {Point2D} The centroid point.
    */
-  getCenter() {
+  getCentroid() {
     return this;
   }
 

@@ -133,13 +133,13 @@ export class Annotation {
   }
 
   /**
-   * Get the center of the math shape.
+   * Get the centroid of the math shape.
    *
-   * @returns {Point|undefined} The 3D center point.
+   * @returns {Point|undefined} The 3D centroid point.
    */
-  getCenter() {
+  getCentroid() {
     let res;
-    if (typeof this.mathShape.getCenter !== 'undefined') {
+    if (typeof this.mathShape.getCentroid !== 'undefined') {
       // find the slice index of the annotation origin
       let origin = this.planeOrigin;
       if (typeof this.planePoints !== 'undefined') {
@@ -153,7 +153,7 @@ export class Annotation {
       const k = originIndex.getValues()[scrollIndex];
 
       // shape center converted to 3D
-      const planePoint = this.mathShape.getCenter();
+      const planePoint = this.mathShape.getCentroid();
       res = this.#viewController.getPositionFromPlanePoint(planePoint, k);
     }
     return res;

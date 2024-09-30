@@ -63,6 +63,15 @@ export class Circle {
   }
 
   /**
+   * Get the centroid of the circle.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
+    return this.#centre;
+  }
+
+  /**
    * Get the radius of the circle.
    *
    * @returns {number} The radius of the circle.

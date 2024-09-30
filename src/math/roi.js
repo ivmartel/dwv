@@ -70,13 +70,13 @@ export class ROI {
   }
 
   /**
-   * Get the center of the roi. Only valid for
+   * Get the centroid of the roi. Only valid for
    * a non-self-intersecting closed polygon.
    * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
    *
-   * @returns {Point2D} The center point.
+   * @returns {Point2D} The centroid point.
    */
-  getCenter() {
+  getCentroid() {
     let a = 0;
     let cx = 0;
     let cy = 0;
