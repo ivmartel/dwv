@@ -139,7 +139,7 @@ export class Annotation {
    */
   getCenter() {
     let res;
-    if (typeof this.mathShape.getCenter() !== 'undefined') {
+    if (typeof this.mathShape.getCenter !== 'undefined') {
       // find the slice index of the annotation origin
       let origin = this.planeOrigin;
       if (typeof this.planePoints !== 'undefined') {
