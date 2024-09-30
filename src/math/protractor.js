@@ -50,6 +50,15 @@ export class Protractor {
   }
 
   /**
+   * Get the centroid of the protractor.
+   *
+   * @returns {Point2D} THe centroid point.
+   */
+  getCentroid() {
+    return this.#points[1];
+  }
+
+  /**
    * Quantify a path according to view information.
    *
    * @param {ViewController} _viewController The associated view controller.
