@@ -711,6 +711,11 @@ export class LayerGroup {
    * @param {DrawLayer} drawLayer The draw layer to bind.
    */
   #bindDrawLayer(drawLayer) {
+    // listen to position change to update other group layers
+    drawLayer.addEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.addEventListener(
+      'positionchange', this.#fireEvent);
     // propagate drawLayer events
     drawLayer.addEventListener('drawcreate', this.#fireEvent);
     drawLayer.addEventListener('drawdelete', this.#fireEvent);
@@ -722,6 +727,11 @@ export class LayerGroup {
    * @param {DrawLayer} drawLayer The draw layer to unbind.
    */
   #unbindDrawLayer(drawLayer) {
+    // stop listening to position change to update other group layers
+    drawLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.removeEventListener(
+      'positionchange', this.#fireEvent);
     // propagate drawLayer events
     drawLayer.removeEventListener('drawcreate', this.#fireEvent);
     drawLayer.removeEventListener('drawdelete', this.#fireEvent);
@@ -986,7 +996,7 @@ export class LayerGroup {
   updateLayersToPositionChange = (event) => {
     // pause positionchange listeners
     for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer) {
+      if (typeof layer !== 'undefined') {
         layer.removeEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.removeEventListener('positionchange', this.#fireEvent);
@@ -1084,7 +1094,7 @@ export class LayerGroup {
 
     // re-start positionchange listeners
     for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer) {
+      if (typeof layer !== 'undefined') {
         layer.addEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.addEventListener('positionchange', this.#fireEvent);

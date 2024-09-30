@@ -1054,6 +1054,15 @@ export class DrawLayer {
 
     this.#activateDrawLayer(posGroupId);
     // TODO: add check
+    this.#fireEvent({
+      type: 'positionchange',
+      value: [
+        index.getValues(),
+        position.getValues(),
+      ],
+      valid: true
+    });
+
     return true;
   }
 
