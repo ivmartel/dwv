@@ -170,6 +170,18 @@ export class Rectangle {
   }
 
   /**
+   * Get the center of the rectangle.
+   *
+   * @returns {Point2D} Center point.
+   */
+  getCenter() {
+    return new Point2D(
+      this.getBegin().getX() + this.getWidth() / 2,
+      this.getBegin().getY() + this.getHeight() / 2
+    );
+  }
+
+  /**
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.

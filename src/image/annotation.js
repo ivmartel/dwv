@@ -10,6 +10,7 @@ import {RulerFactory} from '../tools/ruler';
 import {Line} from '../math/line';
 import {ArrowFactory} from '../tools/arrow';
 import {Point2D} from '../math/point';
+import {Point} from '../math/point';
 import {ProtractorFactory} from '../tools/protractor';
 import {Protractor} from '../math/protractor';
 import {RoiFactory} from '../tools/roi';
@@ -129,6 +130,33 @@ export class Annotation {
         viewController.getCurrentScrollIndexValue()
       );
     }
+  }
+
+  /**
+   * Get the center of the math shape.
+   *
+   * @returns {Point|undefined} The 3D center point.
+   */
+  getCenter() {
+    let res;
+    if (typeof this.mathShape.getCenter() !== 'undefined') {
+      // find the slice index of the annotation origin
+      let origin = this.planeOrigin;
+      if (typeof this.planePoints !== 'undefined') {
+        origin = this.planePoints[0];
+      }
+      const originPoint =
+        new Point([origin.getX(), origin.getY(), origin.getZ()]);
+      const originIndex =
+        this.#viewController.getIndexFromPosition(originPoint);
+      const scrollIndex = this.#viewController.getScrollIndex();
+      const k = originIndex.getValues()[scrollIndex];
+
+      // shape center converted to 3D
+      const planePoint = this.mathShape.getCenter();
+      res = this.#viewController.getPositionFromPlanePoint(planePoint, k);
+    }
+    return res;
   }
 
   /**

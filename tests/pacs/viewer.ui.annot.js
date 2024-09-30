@@ -169,6 +169,29 @@ test.dataModelUI.Annotation = function (app) {
       }
     };
 
+    const gotoButton = document.createElement('button');
+    const gbIdPrefix = 'gotob-';
+    gotoButton.id = gbIdPrefix + annotationDivId;
+    gotoButton.title = 'Goto annotation';
+    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
+    gotoButton.onclick = function (event) {
+      const target = event.target;
+      // get annotation
+      const indices =
+        splitAnnotationDivId(target.id.substring(gbIdPrefix.length));
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const annotationGroup = app.getData(dataId).annotationGroup;
+      const annotation = annotationGroup.find(annotationId);
+      const annotCenter = annotation.getCenter();
+      if (typeof annotCenter !== 'undefined') {
+        const drawLayers = app.getDrawLayersByDataId(dataId);
+        for (const layer of drawLayers) {
+          layer.setCurrentPosition(annotCenter);
+        }
+      }
+    };
+
     const deleteButton = document.createElement('button');
     const dbIdPrefix = 'db-';
     deleteButton.id = dbIdPrefix + annotationDivId;
@@ -206,6 +229,7 @@ test.dataModelUI.Annotation = function (app) {
       annotation.id + ' (' + annotation.getType() + ')'));
     span.appendChild(viewButton);
     span.appendChild(inputColour);
+    span.appendChild(gotoButton);
     span.appendChild(deleteButton);
 
     return span;

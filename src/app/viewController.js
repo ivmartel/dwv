@@ -568,11 +568,15 @@ export class ViewController {
    * Get a world position from a 2D plane position.
    *
    * @param {Point2D} point2D The input point.
+   * @param {number} [k] Optional slice index,
+   *   if undefined, uses the current one.
    * @returns {Point} The associated position.
    */
-  getPositionFromPlanePoint(point2D) {
+  getPositionFromPlanePoint(point2D, k) {
     // keep third direction
-    const k = this.getCurrentScrollIndexValue();
+    if (typeof k === 'undefined') {
+      k = this.getCurrentScrollIndexValue();
+    }
     const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
@@ -600,6 +604,19 @@ export class ViewController {
       planePoint.getX(),
       planePoint.getY(),
     );
+  }
+
+  /**
+   * Get the index of a world position.
+   *
+   * @param {Point} point The 3D position.
+   * @returns {Index} The index.
+   */
+  getIndexFromPosition(point) {
+    // orient
+    const geometry = this.#view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    return geometry.worldToIndex(point);
   }
 
   /**
