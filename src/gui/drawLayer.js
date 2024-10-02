@@ -9,9 +9,17 @@ import {AddAnnotationCommand} from '../tools/drawCommands';
 import {
   isNodeWithId,
   isPositionNode,
+  isNodeNameShape,
   isNodeNameLabel
 } from '../tools/drawBounds';
 import {Style} from '../gui/style';
+import {Line} from '../math/line';
+import {Rectangle} from '../math/rectangle';
+import {ROI} from '../math/roi';
+import {Protractor} from '../math/protractor';
+import {Ellipse} from '../math/ellipse';
+import {Circle} from '../math/circle';
+import {Point2D} from '../math/point';
 
 // external
 import Konva from 'konva';
@@ -1190,3 +1198,169 @@ export class DrawLayer {
   }
 
 } // DrawLayer class
+
+// *************************
+// legacy code to allow to convert old state into annotation
+// *************************
+
+/**
+ * Draw meta data.
+ */
+export class DrawMeta {
+  /**
+   * Draw quantification.
+   *
+   * @type {object}
+   */
+  quantification;
+
+  /**
+   * Draw text expression. Can contain variables surrounded with '{}' that will
+   * be extracted from the quantification object.
+   *
+   * @type {string}
+   */
+  textExpr;
+}
+
+/**
+ * Draw details.
+ */
+export class DrawDetails {
+  /**
+   * The draw ID.
+   *
+   * @type {number}
+   */
+  id;
+
+  /**
+   * The draw position: an Index converted to string.
+   *
+   * @type {string}
+   */
+  position;
+
+  /**
+   * The draw type.
+   *
+   * @type {string}
+   */
+  type;
+
+  /**
+   * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   *
+   * @type {string}
+   */
+  color;
+
+  /**
+   * The draw meta.
+   *
+   * @type {DrawMeta}
+   */
+  meta;
+}
+
+/**
+ * Convert a KonvaLayer object to a list of annotations.
+ *
+ * @param {Array} drawings An array of drawings stored
+ *   with 'KonvaLayer().toObject()'.
+ * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+ * @returns {Annotation[]} The associated list of annotations.
+ */
+export function konvaToAnnotation(drawings, drawingsDetails) {
+  const annotations = [];
+
+  // regular Konva deserialize
+  const stateLayer = Konva.Node.create(drawings);
+
+  // get all position groups
+  const statePosGroups = stateLayer.getChildren(isPositionNode);
+
+  for (let i = 0, leni = statePosGroups.length; i < leni; ++i) {
+    const statePosGroup = statePosGroups[i];
+    const statePosKids = statePosGroup.getChildren();
+    for (let j = 0, lenj = statePosKids.length; j < lenj; ++j) {
+      const annotation = new Annotation();
+
+      // shape group (use first one since it will be removed from
+      // the group when we change it)
+      const stateGroup = statePosKids[0];
+      // annotation id
+      annotation.id = stateGroup.id();
+
+      // shape
+      const shape = stateGroup.getChildren(isNodeNameShape)[0];
+      // annotation colour
+      annotation.colour = shape.stroke();
+
+      if (stateGroup.name() === 'line-group') {
+        const points = shape.points();
+        annotation.mathShape = new Point2D(points[0], points[1]);
+        annotation.referencePoints = [
+          new Point2D(points[2], points[3])
+        ];
+      } else if (stateGroup.name() === 'ruler-group') {
+        const points = shape.points();
+        annotation.mathShape = new Line(
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3])
+        );
+      } else if (stateGroup.name() === 'rectangle-group') {
+        annotation.mathShape = new Rectangle(
+          new Point2D(shape.x(), shape.y()),
+          new Point2D(shape.x() + shape.width(), shape.y() + shape.height())
+        );
+      } else if (stateGroup.name() === 'roi-group') {
+        const points = shape.points();
+        const pointsArray = [];
+        for (let i = 0; i < points.length; i = i + 2) {
+          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        }
+        annotation.mathShape = new ROI(pointsArray);
+      } else if (stateGroup.name() === 'freeHand-group') {
+        logger.warn('Converting freehand into ROI shape');
+        const points = shape.points();
+        const pointsArray = [];
+        for (let i = 0; i < points.length; i = i + 2) {
+          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        }
+        annotation.mathShape = new ROI(pointsArray);
+      } else if (stateGroup.name() === 'protractor-group') {
+        const points = shape.points();
+        annotation.mathShape = new Protractor([
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3]),
+          new Point2D(points[4], points[5])
+        ]);
+      } else if (stateGroup.name() === 'ellipse-group') {
+        const absPosition = shape.absolutePosition();
+        annotation.mathShape = new Ellipse(
+          new Point2D(absPosition.x, absPosition.y),
+          shape.radiusX(),
+          shape.radiusY()
+        );
+      } else if (stateGroup.name() === 'circle-group') {
+        const absPosition = shape.absolutePosition();
+        annotation.mathShape = new Circle(
+          new Point2D(absPosition.x, absPosition.y),
+          shape.radius()
+        );
+      }
+
+      // details
+      if (drawingsDetails) {
+        const details = drawingsDetails[stateGroup.id()];
+        annotation.textExpr = details.meta.textExpr;
+        annotation.quantification = details.meta.quantification;
+      }
+
+      annotations.push(annotation);
+    }
+  }
+
+  return annotations;
+}

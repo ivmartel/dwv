@@ -26,6 +26,7 @@ import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
 import {PlaneHelper} from '../image/planeHelper';
 import {AnnotationGroup} from '../image/annotationGroup';
+import {konvaToAnnotation} from '../gui/drawLayer';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1204,12 +1205,30 @@ export class App {
   /**
    * Set the drawings of the active layer group.
    *
-   * @deprecated
-   * @param {Array} _drawings An array of drawings.
-   * @param {Array} _drawingsDetails An array of drawings details.
+   * @deprecated Please switch to DICOM SR annotations.
+   * @param {Array} drawings An array of drawings.
+   * @param {Array} drawingsDetails An array of drawings details.
+   * @param {string} dataId The converted data id.
    */
-  setDrawings(_drawings, _drawingsDetails) {
-    // does nothing
+  setDrawings(drawings, drawingsDetails, dataId) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewLayer = layerGroup.getActiveViewLayer();
+    const refDataId = viewLayer.getDataId();
+    const viewController = viewLayer.getViewController();
+
+    // convert konva to annotation
+    const annotations = konvaToAnnotation(drawings, drawingsDetails);
+    // create data
+    const data = this.createAnnotationData(refDataId);
+    // add annotations to data
+    for (const annotation of annotations) {
+      annotation.setViewController(viewController);
+      data.annotationGroup.add(annotation);
+    }
+    // add to data controller
+    this.#dataController.add(dataId, data);
+    // render
+    this.render(dataId);
   }
 
   /**
@@ -1217,9 +1236,10 @@ export class App {
    *
    * @deprecated
    * @param {string} jsonState The state of the app as a JSON string.
+   * @param {string} dataId The state data id.
    */
-  applyJsonState(jsonState) {
-    const state = new State();
+  applyJsonState(jsonState, dataId) {
+    const state = new State(dataId);
     state.apply(this, state.fromJSON(jsonState));
   }
 
@@ -1589,7 +1609,7 @@ export class App {
       }
       eventMetaData = event.data.meta;
     } else if (event.loadtype === 'state') {
-      this.applyJsonState(event.data);
+      this.applyJsonState(event.data, event.dataid);
       eventMetaData = 'state';
     }
 

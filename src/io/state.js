@@ -37,6 +37,20 @@ import {App} from '../app/application';
  */
 export class State {
   /**
+   * The state data id.
+   *
+   * @type {string}
+   */
+  #dataId;
+
+  /**
+   * @param {string} dataId The associated data id.
+   */
+  constructor(dataId) {
+    this.#dataId = dataId;
+  }
+
+  /**
    * Load an application state from JSON.
    *
    * @param {string} json The state as a JSON string.
@@ -117,10 +131,8 @@ export class State {
     }
     app.getActiveLayerGroup().setScale(scale);
     app.getActiveLayerGroup().setOffset(offset);
-    // render to draw the view layer
-    app.render(app.getDataIds()[0]); //todo: fix
     // drawings (will draw the draw layer)
-    app.setDrawings(data.drawings, data.drawingsDetails);
+    app.setDrawings(data.drawings, data.drawingsDetails, this.#dataId);
   }
 
   /**
