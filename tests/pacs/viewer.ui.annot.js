@@ -332,7 +332,6 @@ test.dataModelUI.Annotation = function (app) {
    * @param {object} event The event.
    */
   function onDataAdd(event) {
-    console.log('dataadd', event);
     const data = app.getData(event.dataid);
     const ag = data.annotationGroup;
     if (typeof ag !== 'undefined') {
@@ -351,12 +350,6 @@ test.dataModelUI.Annotation = function (app) {
       const annotList = document.getElementById('annotationgroup-list');
       annotList.appendChild(item);
       annotList.appendChild(addItem);
-
-      const alist = ag.getList();
-      for (const a of alist) {
-        console.log('annotation', a);
-        console.log('quantification', a.quantification);
-      }
     }
   };
 
