@@ -37,33 +37,6 @@ import {App} from '../app/application';
  */
 export class State {
   /**
-   * Save the application state as JSON.
-   *
-   * @param {App} app The associated application.
-   * @returns {string} The state as a JSON string.
-   */
-  toJSON(app) {
-    const layerGroup = app.getActiveLayerGroup();
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    const position = viewController.getCurrentIndex();
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const drawController = drawLayer.getDrawController();
-    const wl = viewController.getWindowLevel();
-    // return a JSON string
-    return JSON.stringify({
-      version: '0.5',
-      'window-center': wl.center,
-      'window-width': wl.width,
-      position: position.getValues(),
-      scale: app.getAddedScale(),
-      offset: app.getOffset(),
-      drawings: drawLayer.getKonvaLayer().toObject(),
-      drawingsDetails: drawController.getDrawStoreDetails()
-    });
-  }
-
-  /**
    * Load an application state from JSON.
    *
    * @param {string} json The state as a JSON string.

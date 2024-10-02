@@ -176,13 +176,4 @@ export class DrawController {
     this.#annotationGroup.setMetaValue(key, value);
   }
 
-  /**
-   * Get draw store details.
-   *
-   * @deprecated
-   */
-  getDrawStoreDetails() {
-    // does nothing
-  }
-
 } // class DrawController
