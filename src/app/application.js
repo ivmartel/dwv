@@ -1213,17 +1213,6 @@ export class App {
   }
 
   /**
-   * Get the JSON state of the app.
-   *
-   * @deprecated
-   * @returns {string} The state of the app as a JSON string.
-   */
-  getJsonState() {
-    const state = new State();
-    return state.toJSON(this);
-  }
-
-  /**
    * Apply a JSON state to this app.
    *
    * @deprecated
