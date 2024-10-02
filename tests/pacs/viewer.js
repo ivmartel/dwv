@@ -92,8 +92,7 @@ function viewerSetup() {
       'Ellipse',
       'Rectangle',
       'Protractor',
-      'Roi',
-      'FreeHand'
+      'Roi'
     ]},
     Floodfill: {},
     Livewire: {}
