@@ -286,7 +286,6 @@ export class CircleFactory {
     }
   }
 
-
   /**
    * Calculates the mathematical shape: a circle.
    *

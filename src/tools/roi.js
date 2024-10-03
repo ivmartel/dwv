@@ -259,7 +259,6 @@ export class RoiFactory {
     }
   }
 
-
   /**
    * Calculates the mathematical shape: a roi.
    *

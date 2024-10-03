@@ -270,7 +270,6 @@ export class RulerFactory {
     }
   }
 
-
   /**
    * Calculates the mathematical shape: a line.
    *

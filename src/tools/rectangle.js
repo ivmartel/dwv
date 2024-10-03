@@ -265,7 +265,6 @@ export class RectangleFactory {
     }
   }
 
-
   /**
    * Calculates the mathematical rectangle: a rectangle.
    *
