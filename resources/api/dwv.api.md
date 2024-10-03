@@ -14,6 +14,7 @@ export function addTagsToDictionary(group: string, tags: {
 // @public
 export class Annotation {
     colour: string | undefined;
+    getCentroid(): Point | undefined;
     getFactory(): object;
     getText(): string;
     getType(): string;
@@ -82,7 +83,7 @@ export class App {
     addEventListener(type: string, callback: Function): void;
     addToUndoStack: (cmd: object) => void;
     // @deprecated
-    applyJsonState(jsonState: string): void;
+    applyJsonState(jsonState: string, dataId: string): void;
     // @deprecated
     canScroll(): boolean;
     // @deprecated
@@ -101,8 +102,6 @@ export class App {
         [x: string]: ViewConfig[];
     };
     getDrawLayersByDataId(dataId: string): DrawLayer[];
-    // @deprecated
-    getJsonState(): string;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(dataId: string): {
         [x: string]: DataElement;
@@ -141,7 +140,7 @@ export class App {
         [x: string]: ViewConfig[];
     }): void;
     // @deprecated
-    setDrawings(_drawings: any[], _drawingsDetails: any[]): void;
+    setDrawings(drawings: any[], drawingsDetails: any[], dataId: string): void;
     setImage(dataId: string, img: Image_2): void;
     setImageSmoothing(flag: boolean): void;
     setLayerGroupsBinders(list: string[]): void;
@@ -338,8 +337,6 @@ export class DrawController {
     addAnnotation(annotation: Annotation): void;
     getAnnotation(id: string): Annotation | undefined;
     getAnnotationGroup(): AnnotationGroup;
-    // @deprecated
-    getDrawStoreDetails(): void;
     hasAnnotationMeta(key: string): boolean;
     isAnnotationGroupEditable(): boolean;
     removeAllAnnotationsWithCommand(exeCallback: Function): void;
@@ -805,6 +802,7 @@ export class Point {
 export class Point2D {
     constructor(x: number, y: number);
     equals(rhs: Point2D): boolean;
+    getCentroid(): Point2D;
     getDistance(point2D: Point2D): number;
     getX(): number;
     getY(): number;
@@ -945,6 +943,26 @@ export const toolList: {
     [x: string]: any;
 };
 
+// @public (undocumented)
+export namespace toolOptions {
+    // (undocumented)
+    export namespace draw {
+            { ArrowFactory };
+            { CircleFactory };
+            { EllipseFactory };
+            { ProtractorFactory };
+            { RectangleFactory };
+            { RoiFactory };
+            { RulerFactory };
+    }
+    // (undocumented)
+    export namespace filter {
+            { Threshold };
+            { Sobel };
+            { Sharpen };
+    }
+}
+
 // @public
 export class Vector3D {
     constructor(x: number, y: number, z: number);
@@ -1042,6 +1060,7 @@ export class ViewController {
     getImageWorldSize(): Scalar2D;
     getIncrementPosition(dim: number): Point;
     getIncrementScrollPosition(): Point;
+    getIndexFromPosition(point: Point): Index;
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
@@ -1051,7 +1070,7 @@ export class ViewController {
     getPlanePoints(k: number): Point3D[];
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
     getPlanePositionFromPosition(point: Point): Point2D;
-    getPositionFromPlanePoint(point2D: Point2D): Point;
+    getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
     getWindowLevel(): WindowLevel;

@@ -85,6 +85,12 @@ export declare class Annotation {
      */
     setViewController(viewController: ViewController): void;
     /**
+     * Get the centroid of the math shape.
+     *
+     * @returns {Point|undefined} The 3D centroid point.
+     */
+    getCentroid(): Point | undefined;
+    /**
      * Set the annotation text expression.
      *
      * @param {Object.<string, string>} labelText The list of label
@@ -682,25 +688,20 @@ export declare class App {
     /**
      * Set the drawings of the active layer group.
      *
-     * @deprecated
-     * @param {Array} _drawings An array of drawings.
-     * @param {Array} _drawingsDetails An array of drawings details.
+     * @deprecated Please switch to DICOM SR annotations.
+     * @param {Array} drawings An array of drawings.
+     * @param {Array} drawingsDetails An array of drawings details.
+     * @param {string} dataId The converted data id.
      */
-    setDrawings(_drawings: any[], _drawingsDetails: any[]): void;
-    /**
-     * Get the JSON state of the app.
-     *
-     * @deprecated
-     * @returns {string} The state of the app as a JSON string.
-     */
-    getJsonState(): string;
+    setDrawings(drawings: any[], drawingsDetails: any[], dataId: string): void;
     /**
      * Apply a JSON state to this app.
      *
      * @deprecated
      * @param {string} jsonState The state of the app as a JSON string.
+     * @param {string} dataId The state data id.
      */
-    applyJsonState(jsonState: string): void;
+    applyJsonState(jsonState: string, dataId: string): void;
     /**
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
@@ -1534,12 +1535,6 @@ export declare class DrawController {
      * @param {string} value The value of the meta data.
      */
     setAnnotationMeta(key: string, value: string): void;
-    /**
-     * Get draw store details.
-     *
-     * @deprecated
-     */
-    getDrawStoreDetails(): void;
     #private;
 }
 
@@ -3726,6 +3721,12 @@ export declare class Point2D {
      */
     getY(): number;
     /**
+     * Get the centroid of the point, ie itself.
+     *
+     * @returns {Point2D} The centroid point.
+     */
+    getCentroid(): Point2D;
+    /**
      * Check for Point2D equality.
      *
      * @param {Point2D} rhs The other point to compare to.
@@ -4326,11 +4327,54 @@ export declare class ToolConfig {
  * List of client provided tools to be added to
  * the default ones.
  *
+ * @example
+ * // custom tool
+ * class AlertTool {
+ *   mousedown() {alert('AlertTool mousedown');}
+ *   init() {}
+ *   activate() {}
+ * }
+ * // pass it to dwv tool list
+ * dwv.toolList['Alert'] = AlertTool;
+ * // create the dwv app
+ * const app = new dwv.App();
+ * // initialise
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * options.tools = {Alert: {}};
+ * app.init(options);
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('Alert');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
+ *
  * @type {Object<string, any>}
  */
 export declare const toolList: {
     [x: string]: any;
 };
+
+export declare namespace toolOptions {
+    export namespace draw {
+            { ArrowFactory };
+            { CircleFactory };
+            { EllipseFactory };
+            { ProtractorFactory };
+            { RectangleFactory };
+            { RoiFactory };
+            { RulerFactory };
+    }
+    export namespace filter {
+            { Threshold };
+            { Sobel };
+            { Sharpen };
+    }
+}
 
 /**
  * Immutable 3D vector.
@@ -5006,9 +5050,11 @@ export declare class ViewController {
      * Get a world position from a 2D plane position.
      *
      * @param {Point2D} point2D The input point.
+     * @param {number} [k] Optional slice index,
+     *   if undefined, uses the current one.
      * @returns {Point} The associated position.
      */
-    getPositionFromPlanePoint(point2D: Point2D): Point;
+    getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     /**
      * Get a 2D plane position from a world position.
      *
@@ -5016,6 +5062,13 @@ export declare class ViewController {
      * @returns {Point2D} The 2D position.
      */
     getPlanePositionFromPosition(point: Point): Point2D;
+    /**
+     * Get the index of a world position.
+     *
+     * @param {Point} point The 3D position.
+     * @returns {Index} The index.
+     */
+    getIndexFromPosition(point: Point): Index;
     /**
      * Set the current index.
      *

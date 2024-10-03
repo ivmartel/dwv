@@ -34,7 +34,7 @@ import {
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.34.0-beta.15';
+  return '0.34.0-beta.16';
 }
 
 /**
