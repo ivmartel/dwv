@@ -5,10 +5,10 @@
 })(this, (function () { 'use strict';
 
   /*
-   * Konva JavaScript Framework v9.3.14
+   * Konva JavaScript Framework v9.3.15
    * http://konvajs.org/
    * Licensed under the MIT
-   * Date: Tue Jul 16 2024
+   * Date: Mon Sep 09 2024
    *
    * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
    * Modified work Copyright (C) 2014 - present by Anton Lavrenov (Konva)
@@ -35,7 +35,7 @@
               : {};
   const Konva$2 = {
       _global: glob,
-      version: '9.3.14',
+      version: '9.3.15',
       isBrowser: detectBrowser(),
       isUnminified: /param/.test(function (param) { }.toString()),
       dblClickWindow: 400,
@@ -11438,7 +11438,7 @@
           return pathLength;
       }
       static getPointAtLengthOfDataArray(length, dataArray) {
-          var point, i = 0, ii = dataArray.length;
+          var points, i = 0, ii = dataArray.length;
           if (!ii) {
               return null;
           }
@@ -11447,17 +11447,17 @@
               ++i;
           }
           if (i === ii) {
-              point = dataArray[i - 1].points.slice(-2);
+              points = dataArray[i - 1].points.slice(-2);
               return {
-                  x: point[0],
-                  y: point[1],
+                  x: points[0],
+                  y: points[1],
               };
           }
           if (length < 0.01) {
-              point = dataArray[i].points.slice(0, 2);
+              points = dataArray[i].points.slice(0, 2);
               return {
-                  x: point[0],
-                  y: point[1],
+                  x: points[0],
+                  y: points[1],
               };
           }
           var cp = dataArray[i];
@@ -14144,11 +14144,26 @@
   Factory.addGetterSetter(Star, 'outerRadius', 0, getNumberValidator());
 
   function stringToArray(string) {
-      // we need to use `Array.from` because it can split unicode string correctly
-      // we also can use some regexp magic from lodash:
-      // https://github.com/lodash/lodash/blob/fb1f99d9d90ad177560d771bc5953a435b2dc119/lodash.toarray/index.js#L256
-      // but I decided it is too much code for that small fix
-      return Array.from(string);
+      // Use Unicode-aware splitting
+      return [...string].reduce((acc, char, index, array) => {
+          // Handle emoji sequences (including ZWJ sequences)
+          if (/\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?(?:\u200D\p{Emoji_Presentation})+/u.test(char)) {
+              acc.push(char);
+          }
+          // Handle regional indicator symbols (flags)
+          else if (/\p{Regional_Indicator}{2}/u.test(char + (array[index + 1] || ''))) {
+              acc.push(char + array[index + 1]);
+          }
+          // Handle Indic scripts and other combining characters
+          else if (index > 0 && /\p{Mn}|\p{Me}|\p{Mc}/u.test(char)) {
+              acc[acc.length - 1] += char;
+          }
+          // Handle other characters
+          else {
+              acc.push(char);
+          }
+          return acc;
+      }, []);
   }
   // constants
   var AUTO = 'auto', 
@@ -14494,8 +14509,8 @@
        * That method can't handle multiline text.
        * @method
        * @name Konva.Text#measureSize
-       * @param {String} [text] text to measure
-       * @returns {Object} { width , height} of measured text
+       * @param {String} text text to measure
+       * @returns {Object} { width , height } of measured text
        */
       measureSize(text) {
           var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;

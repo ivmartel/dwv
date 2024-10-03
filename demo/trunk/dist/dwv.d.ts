@@ -13,6 +13,276 @@ export declare function addTagsToDictionary(group: string, tags: {
 }): void;
 
 /**
+ * Image annotation.
+ */
+export declare class Annotation {
+    /**
+     * The ID.
+     *
+     * @type {string}
+     */
+    id: string;
+    /**
+     * The reference image SOP UID.
+     *
+     * @type {string}
+     */
+    referenceSopUID: string;
+    /**
+     * The mathematical shape.
+     *
+     * @type {object}
+     */
+    mathShape: object;
+    /**
+     * Additional points used to define the annotation.
+     *
+     * @type {Point2D[]|undefined}
+     */
+    referencePoints: Point2D[] | undefined;
+    /**
+     * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+     *
+     * @type {string|undefined}
+     */
+    colour: string | undefined;
+    /**
+     * Annotation quantification.
+     *
+     * @type {object|undefined}
+     */
+    quantification: object | undefined;
+    /**
+     * Text expression. Can contain variables surrounded with '{}' that will
+     * be extracted from the quantification object.
+     *
+     * @type {string|undefined}
+     */
+    textExpr: string | undefined;
+    /**
+     * Label position. If undefined, the default shape
+     *   label position will be used.
+     *
+     * @type {Point2D|undefined}
+     */
+    labelPosition: Point2D | undefined;
+    /**
+     * The plane origin, the 3D position of index [0, 0, k].
+     *
+     * @type {Point3D|undefined}
+     */
+    planeOrigin: Point3D | undefined;
+    /**
+     * A couple of points that help define the annotation plane.
+     *
+     * @type {Point3D[]|undefined}
+     */
+    planePoints: Point3D[] | undefined;
+    /**
+     * Set the associated view controller.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     */
+    setViewController(viewController: ViewController): void;
+    /**
+     * Get the centroid of the math shape.
+     *
+     * @returns {Point|undefined} The 3D centroid point.
+     */
+    getCentroid(): Point | undefined;
+    /**
+     * Set the annotation text expression.
+     *
+     * @param {Object.<string, string>} labelText The list of label
+     *   texts indexed by modality.
+     */
+    setTextExpr(labelText: {
+        [x: string]: string;
+    }): void;
+    /**
+     * Get the annotation label text by applying the
+     *   text expression on the current quantification.
+     *
+     * @returns {string} The resulting text.
+     */
+    getText(): string;
+    /**
+     * Update the annotation quantification.
+     */
+    updateQuantification(): void;
+    /**
+     * Get the math shape associated draw factory.
+     *
+     * @returns {object} The factory.
+     */
+    getFactory(): object;
+    /**
+     * Get the string type of this annotation.
+     *
+     * @returns {string} The type.
+     */
+    getType(): string;
+    #private;
+}
+
+/**
+ * Annotation group.
+ */
+export declare class AnnotationGroup {
+    /**
+     * @param {Annotation[]} [list] Optional list, will
+     *   create new if not provided.
+     */
+    constructor(list?: Annotation[]);
+    /**
+     * Get the annotation group as an array.
+     *
+     * @returns {Annotation[]} The array.
+     */
+    getList(): Annotation[];
+    /**
+     * Get the number of annotations of this list.
+     *
+     * @returns {number} The number of annotations.
+     */
+    getLength(): number;
+    /**
+     * Check if the annotation group is editable.
+     *
+     * @returns {boolean} True if editable.
+     */
+    isEditable(): boolean;
+    /**
+     * Set the annotation group editability.
+     *
+     * @param {boolean} flag True to make the annotation group editable.
+     */
+    setEditable(flag: boolean): void;
+    /**
+     * Add a new annotation.
+     *
+     * @param {Annotation} annotation The annotation to add.
+     */
+    add(annotation: Annotation): void;
+    /**
+     * Update an existing annotation.
+     *
+     * @param {Annotation} annotation The annotation to update.
+     * @param {string[]} [propKeys] Optional properties that got updated.
+     */
+    update(annotation: Annotation, propKeys?: string[]): void;
+    /**
+     * Remove an annotation.
+     *
+     * @param {string} id The id of the annotation to remove.
+     */
+    remove(id: string): void;
+    /**
+     * Set the associated view controller.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     */
+    setViewController(viewController: ViewController): void;
+    /**
+     * Find an annotation.
+     *
+     * @param {string} id The id of the annotation to find.
+     * @returns {Annotation|undefined} The found annotation.
+     */
+    find(id: string): Annotation | undefined;
+    /**
+     * Get the meta data.
+     *
+     * @returns {Object<string, any>} The meta data.
+     */
+    getMeta(): {
+        [x: string]: any;
+    };
+    /**
+     * Check if this list contains a meta data value.
+     *
+     * @param {string} key The key to check.
+     * @returns {boolean} True if the meta data is present.
+     */
+    hasMeta(key: string): boolean;
+    /**
+     * Get a meta data value.
+     *
+     * @param {string} key The meta data key.
+     * @returns {string|object} The meta data value.
+     */
+    getMetaValue(key: string): string | object;
+    /**
+     * Set a meta data.
+     *
+     * @param {string} key The meta data key.
+     * @param {string|object} value The value of the meta data.
+     */
+    setMetaValue(key: string, value: string | object): void;
+    /**
+     * Add an event listener to this class.
+     *
+     * @param {string} type The event type.
+     * @param {Function} callback The function associated with the provided
+     *   event type, will be called with the fired event.
+     */
+    addEventListener(type: string, callback: Function): void;
+    /**
+     * Remove an event listener from this class.
+     *
+     * @param {string} type The event type.
+     * @param {Function} callback The function associated with the provided
+     *   event type.
+     */
+    removeEventListener(type: string, callback: Function): void;
+    #private;
+}
+
+/**
+ * {@link AnnotationGroup} factory.
+ */
+export declare class AnnotationGroupFactory {
+    /**
+     * Get a warning string if elements are not as expected.
+     * Created by checkElements.
+     *
+     * @returns {string|undefined} The warning.
+     */
+    getWarning(): string | undefined;
+    /**
+     * Check dicom elements. Throws an error if not suitable.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+     * @returns {string|undefined} A possible warning.
+     */
+    checkElements(dataElements: {
+        [x: string]: DataElement;
+    }): string | undefined;
+    /**
+     * Get an {@link Annotation} object from the read DICOM file.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
+     * @returns {AnnotationGroup} A new annotation group.
+     */
+    create(dataElements: {
+        [x: string]: DataElement;
+    }): AnnotationGroup;
+    /**
+     * Convert an annotation group into a DICOM SR object.
+     *
+     * @param {AnnotationGroup} annotationGroup The annotation group.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
+     */
+    toDicom(annotationGroup: AnnotationGroup, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
+    #private;
+}
+
+/**
  * List of ViewConfigs indexed by dataIds.
  *
  * @typedef {Object<string, ViewConfig[]>} DataViewConfigs
@@ -35,12 +305,12 @@ export declare function addTagsToDictionary(group: string, tags: {
  */
 export declare class App {
     /**
-     * Get the image.
+     * Get a DicomData.
      *
      * @param {string} dataId The data id.
-     * @returns {Image|undefined} The associated image.
+     * @returns {DicomData|undefined} The data.
      */
-    getImage(dataId: string): Image_2 | undefined;
+    getData(dataId: string): DicomData | undefined;
     /**
      * Set the image at the given id.
      *
@@ -49,15 +319,12 @@ export declare class App {
      */
     setImage(dataId: string, img: Image_2): void;
     /**
-     * Add a new image.
+     * Add a new DicomData.
      *
-     * @param {Image} image The new image.
-     * @param {object} meta The image meta.
-     * @param {string} source The source of the new image,
-     *   will be passed with load events.
-     * @returns {string} The new image data id.
+     * @param {DicomData} data The new data.
+     * @returns {string} The data id.
      */
-    addNewImage(image: Image_2, meta: object, source: string): string;
+    addData(data: DicomData): string;
     /**
      * Get the meta data.
      *
@@ -176,6 +443,15 @@ export declare class App {
      * @function
      */
     addToUndoStack: (cmd: object) => void;
+    /**
+     * Remove a command from the undo stack.
+     *
+     * @param {string} name The name of the command to remove.
+     * @returns {boolean} True if the command was found and removed.
+     * @fires UndoStack#undoremove
+     * @function
+     */
+    removeFromUndoStack: (name: string) => boolean;
     /**
      * Initialise the application.
      *
@@ -412,22 +688,20 @@ export declare class App {
     /**
      * Set the drawings of the active layer group.
      *
+     * @deprecated Please switch to DICOM SR annotations.
      * @param {Array} drawings An array of drawings.
      * @param {Array} drawingsDetails An array of drawings details.
+     * @param {string} dataId The converted data id.
      */
-    setDrawings(drawings: any[], drawingsDetails: any[]): void;
-    /**
-     * Get the JSON state of the app.
-     *
-     * @returns {string} The state of the app as a JSON string.
-     */
-    getJsonState(): string;
+    setDrawings(drawings: any[], drawingsDetails: any[], dataId: string): void;
     /**
      * Apply a JSON state to this app.
      *
+     * @deprecated
      * @param {string} jsonState The state of the app as a JSON string.
+     * @param {string} dataId The state data id.
      */
-    applyJsonState(jsonState: string): void;
+    applyJsonState(jsonState: string, dataId: string): void;
     /**
      * Handle resize: fit the display to the window.
      * To be called once the image is loaded.
@@ -532,6 +806,29 @@ export declare class App {
      * @param {string} dataId The data id.
      */
     toggleOverlayListeners(dataId: string): void;
+    /**
+     * Create new annotation data based on the data of
+     *   the active view layer.
+     *
+     * @param {string} refDataId The reference data id.
+     * @returns {DicomData} The new data.
+     */
+    createAnnotationData(refDataId: string): DicomData;
+    /**
+     * Add new data and render it with a simple new data view config.
+     *
+     * @param {DicomData} data The data to add.
+     * @param {string} divId The div where to draw.
+     * @param {string} refDataId The reference data id.
+     */
+    addAndRenderAnnotationData(data: DicomData, divId: string, refDataId: string): void;
+    /**
+     * Add a draw layer.
+     *
+     * @param {string} dataId The data id.
+     * @param {ViewConfig} viewConfig The data view config.
+     */
+    addDrawLayer(dataId: string, viewConfig: ViewConfig): void;
     #private;
 }
 
@@ -734,10 +1031,10 @@ export declare namespace customUI {
     /**
      * Open a dialogue to edit roi data. Defaults to window.prompt.
      *
-     * @param {object} data The roi data.
+     * @param {Annotation} annotation The roi data.
      * @param {Function} callback The callback to launch on dialogue exit.
      */
-    export function openRoiDialog(data: any, callback: Function): void;
+    export function openRoiDialog(annotation: Annotation, callback: Function): void;
 }
 
 /**
@@ -880,7 +1177,6 @@ export declare class DeleteSegmentCommand {
  * DICOM code: item of a basic code sequence.
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_8.8.html}.
- * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 export declare class DicomCode {
     /**
@@ -923,6 +1219,34 @@ export declare class DicomCode {
      * @returns {string} The code as string.
      */
     toString(): string;
+}
+
+/**
+ * DICOM data: meta and possible image.
+ */
+export declare class DicomData {
+    /**
+     * @param {object} meta The DICOM meta data.
+     */
+    constructor(meta: object);
+    /**
+     * DICOM meta data.
+     *
+     * @type {object}
+     */
+    meta: object;
+    /**
+     * Image extracted from meta data.
+     *
+     * @type {Image|undefined}
+     */
+    image: Image_2 | undefined;
+    /**
+     * Annotattion group extracted from meta data.
+     *
+     * @type {AnnotationGroup|undefined}
+     */
+    annotationGroup: AnnotationGroup | undefined;
 }
 
 /**
@@ -1126,141 +1450,101 @@ export declare class DicomWriter {
  */
 export declare class DrawController {
     /**
-     * @param {DrawLayer} drawLayer The draw layer.
+     * @param {AnnotationGroup} [group] Optional annotation group.
      */
-    constructor(drawLayer: DrawLayer);
+    constructor(group?: AnnotationGroup);
     /**
-     * Get the current position group.
+     * Get an annotation.
      *
-     * @returns {Konva.Group|undefined} The Konva.Group.
+     * @param {string} id The annotation id.
+     * @returns {Annotation|undefined} The annotation.
      */
-    getCurrentPosGroup(): Konva.Group | undefined;
+    getAnnotation(id: string): Annotation | undefined;
     /**
-     * Get the non current position groups. Used to stop listeners.
+     * Get the annotation group.
      *
-     * @returns {object[]} The groups that do not have the current position id.
+     * @returns {AnnotationGroup} The list.
      */
-    getNonCurrentPosGroup(): object[];
+    getAnnotationGroup(): AnnotationGroup;
     /**
-     * Reset: clear the layers array.
-     */
-    reset(): void;
-    /**
-     * Get a Konva group using its id.
+     * Check if the annotation group is editable.
      *
-     * @param {string} id The group id.
-     * @returns {object|undefined} The Konva group.
+     * @returns {boolean} True if editable.
      */
-    getGroup(id: string): object | undefined;
+    isAnnotationGroupEditable(): boolean;
     /**
-     * Activate the current draw layer.
+     * Set the annotation group editability.
      *
-     * @param {Index} index The current position.
-     * @param {number} scrollIndex The scroll index.
+     * @param {boolean} flag True to make the annotation group editable.
      */
-    activateDrawLayer(index: Index, scrollIndex: number): void;
+    setAnnotationGroupEditable(flag: boolean): void;
     /**
-     * Get a list of drawing display details.
+     * Add an annotation.
      *
-     * @returns {DrawDetails[]} A list of draw details.
+     * @param {Annotation} annotation The annotation to add.
      */
-    getDrawDisplayDetails(): DrawDetails[];
+    addAnnotation(annotation: Annotation): void;
     /**
-     * Get a list of drawing store details. Used in state.
+     * Update an anotation from the list.
      *
-     * @returns {object} A list of draw details including id, text, quant...
-     * TODO Unify with getDrawDisplayDetails?
+     * @param {Annotation} annotation The annotation to update.
+     * @param {string[]} [propKeys] Optional properties that got updated.
      */
-    getDrawStoreDetails(): object;
+    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
     /**
-     * Set the drawings on the current stage.
+     * Remove an anotation for the list.
      *
-     * @param {Array} drawings An array of drawings.
-     * @param {DrawDetails[]} drawingsDetails An array of drawings details.
-     * @param {object} cmdCallback The DrawCommand callback.
-     * @param {object} exeCallback The callback to call once the
-     *   DrawCommand has been executed.
+     * @param {string} id The id of the annotation to remove.
      */
-    setDrawings(drawings: any[], drawingsDetails: DrawDetails[], cmdCallback: object, exeCallback: object): void;
+    removeAnnotation(id: string): void;
     /**
-     * Update a drawing from its details.
+     * Remove an annotation via a remove command (triggers draw actions).
      *
-     * @param {DrawDetails} drawDetails Details of the drawing to update.
+     * @param {string} id The annotation id.
+     * @param {Function} exeCallback The undo stack callback.
      */
-    updateDraw(drawDetails: DrawDetails): void;
+    removeAnnotationWithCommand(id: string, exeCallback: Function): void;
     /**
-     * Delete a Draw from the stage.
+     * Update an annotation via an update command (triggers draw actions).
      *
-     * @param {Konva.Group} group The group to delete.
-     * @param {object} cmdCallback The DeleteCommand callback.
-     * @param {object} exeCallback The callback to call once the
-     *  DeleteCommand has been executed.
+     * @param {string} id The annotation id.
+     * @param {object} originalProps The original annotation properties
+     *   that will be updated.
+     * @param {object} newProps The new annotation properties
+     *   that will replace the original ones.
+     * @param {Function} exeCallback The undo stack callback.
      */
-    deleteDrawGroup(group: Konva.Group, cmdCallback: object, exeCallback: object): void;
+    updateAnnotationWithCommand(id: string, originalProps: object, newProps: object, exeCallback: Function): void;
     /**
-     * Delete a Draw from the stage.
+     * Remove all annotations via remove commands (triggers draw actions).
      *
-     * @param {string} id The id of the group to delete.
-     * @param {Function} cmdCallback The DeleteCommand callback.
-     * @param {Function} exeCallback The callback to call once the
-     *  DeleteCommand has been executed.
-     * @returns {boolean} False if the group cannot be found.
+     * @param {Function} exeCallback The undo stack callback.
      */
-    deleteDraw(id: string, cmdCallback: Function, exeCallback: Function): boolean;
+    removeAllAnnotationsWithCommand(exeCallback: Function): void;
     /**
-     * Delete all Draws from the stage.
+     * Check if the annotation group contains a meta data value.
      *
-     * @param {Function} cmdCallback The DeleteCommand callback.
-     * @param {Function} exeCallback The callback to call once the
-     *  DeleteCommand has been executed.
+     * @param {string} key The key to check.
+     * @returns {boolean} True if the meta data is present.
      */
-    deleteDraws(cmdCallback: Function, exeCallback: Function): void;
+    hasAnnotationMeta(key: string): boolean;
     /**
-     * Get the total number of draws
-     * (at all positions).
+     * Set an annotation meta data.
      *
-     * @returns {number} The total number of draws.
+     * @param {string} key The meta data to set.
+     * @param {string} value The value of the meta data.
      */
-    getNumberOfDraws(): number;
+    setAnnotationMeta(key: string, value: string): void;
     #private;
 }
 
 /**
- * Draw details.
+ * Debug function to output the layer hierarchy as text.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
  */
-export declare class DrawDetails {
-    /**
-     * The draw ID.
-     *
-     * @type {number}
-     */
-    id: number;
-    /**
-     * The draw position: an Index converted to string.
-     *
-     * @type {string}
-     */
-    position: string;
-    /**
-     * The draw type.
-     *
-     * @type {string}
-     */
-    type: string;
-    /**
-     * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
-     *
-     * @type {string}
-     */
-    color: string;
-    /**
-     * The draw meta.
-     *
-     * @type {DrawMeta}
-     */
-    meta: DrawMeta;
-}
-
 /**
  * Draw layer.
  */
@@ -1271,11 +1555,23 @@ export declare class DrawLayer {
      */
     constructor(containerDiv: HTMLDivElement);
     /**
+     * Set the draw shape handler.
+     *
+     * @param {DrawShapeHandler|undefined} handler The shape handler.
+     */
+    setShapeHandler(handler: DrawShapeHandler | undefined): void;
+    /**
      * Get the associated data id.
      *
      * @returns {string} The id.
      */
     getDataId(): string;
+    /**
+     * Get the reference data id.
+     *
+     * @returns {string} The id.
+     */
+    getReferenceLayerId(): string;
     /**
      * Get the Konva stage.
      *
@@ -1291,9 +1587,9 @@ export declare class DrawLayer {
     /**
      * Get the draw controller.
      *
-     * @returns {object} The controller.
+     * @returns {DrawController} The controller.
      */
-    getDrawController(): object;
+    getDrawController(): DrawController;
     /**
      * Set the plane helper.
      *
@@ -1356,6 +1652,14 @@ export declare class DrawLayer {
      */
     setScale(newScale: Scalar3D, center?: Point3D): void;
     /**
+     * Initialise the layer scale.
+     *
+     * @param {Scalar3D} newScale The scale as {x,y,z}.
+     * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+     *   without the fit scale (as provided by getAbsoluteZoomOffset).
+     */
+    initScale(newScale: Scalar3D, absoluteZoomOffset: Scalar2D): void;
+    /**
      * Set the layer offset.
      *
      * @param {Scalar3D} newOffset The offset as {x,y,z}.
@@ -1391,9 +1695,23 @@ export declare class DrawLayer {
      *
      * @param {Scalar2D} size The image size as {x,y}.
      * @param {Scalar2D} spacing The image spacing as {x,y}.
-     * @param {string} dataId The associated data id.
+     * @param {string} refLayerId The reference image dataId.
      */
-    initialise(size: Scalar2D, spacing: Scalar2D, dataId: string): void;
+    initialise(size: Scalar2D, spacing: Scalar2D, refLayerId: string): void;
+    /**
+     * Set the annotation group.
+     *
+     * @param {AnnotationGroup} annotationGroup The annotation group.
+     * @param {string} dataId The associated data id.
+     * @param {object} exeCallback The undo stack callback.
+     */
+    setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
+    /**
+     * Activate shapes at current position.
+     *
+     * @param {boolean} flag The flag to activate or not.
+     */
+    activateCurrentPositionShapes(flag: boolean): void;
     /**
      * Fit the layer to its parent container.
      *
@@ -1403,34 +1721,52 @@ export declare class DrawLayer {
      */
     fitToContainer(containerSize: Scalar2D, divToWorldSizeRatio: number, fitOffset: Scalar2D): void;
     /**
-     * Check the visibility of a given group.
+     * Check the visibility of an annotation.
      *
-     * @param {string} id The id of the group.
-     * @returns {boolean} True if the group is visible.
+     * @param {string} id The id of the annotation.
+     * @returns {boolean} True if the annotation is visible.
      */
-    isGroupVisible(id: string): boolean;
+    isAnnotationVisible(id: string): boolean;
     /**
-     * Toggle the visibility of a given group.
+     * Set the visibility of an annotation.
      *
-     * @param {string} id The id of the group.
-     * @returns {boolean} False if the group cannot be found.
+     * @param {string} id The id of the annotation.
+     * @param {boolean} [visible] True to set to visible,
+     *   will toggle visibility if not defined.
+     * @returns {boolean} False if the annotation shape cannot be found.
      */
-    toggleGroupVisibility(id: string): boolean;
+    setAnnotationVisibility(id: string, visible?: boolean): boolean;
+    /**
+     * Set the visibility of all labels.
+     *
+     * @param {boolean} [visible] True to set to visible,
+     *   will toggle visibility if not defined.
+     */
+    setLabelsVisibility(visible?: boolean): void;
+    /**
+     * Set a shape group label visibility according to
+     *  this layer setting.
+     *
+     * @param {Konva.Group} shapeGroup The shape group.
+     */
+    setLabelVisibility(shapeGroup: Konva.Group): void;
     /**
      * Delete a Draw from the stage.
      *
-     * @param {string} id The id of the group to delete.
-     * @param {object} exeCallback The callback to call once the
+     * @deprecated
+     * @param {string} _id The id of the group to delete.
+     * @param {Function} _exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDraw(id: string, exeCallback: object): void;
+    deleteDraw(_id: string, _exeCallback: Function): void;
     /**
      * Delete all Draws from the stage.
      *
-     * @param {object} exeCallback The callback to call once the
+     * @deprecated
+     * @param {Function} _exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
-    deleteDraws(exeCallback: object): void;
+    deleteDraws(_exeCallback: Function): void;
     /**
      * Get the total number of draws of this layer
      * (at all positions).
@@ -1455,6 +1791,19 @@ export declare class DrawLayer {
      */
     setCurrentPosition(position: Point, index: Index): boolean;
     /**
+     * Get the current position group.
+     *
+     * @returns {Konva.Group|undefined} The Konva.Group.
+     */
+    getCurrentPosGroup(): Konva.Group | undefined;
+    /**
+     * Get a Konva group using its id.
+     *
+     * @param {string} id The group id.
+     * @returns {object|undefined} The Konva group.
+     */
+    getGroup(id: string): object | undefined;
+    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
@@ -1474,22 +1823,66 @@ export declare class DrawLayer {
 }
 
 /**
- * Draw meta data.
+ * Draw shape handler: handle action on existing shapes.
  */
-export declare class DrawMeta {
+export declare class DrawShapeHandler {
     /**
-     * Draw quantification.
-     *
-     * @type {object}
+     * @callback eventFn@callback eventFn
+     * @param {object} event The event.
      */
-    quantification: object;
     /**
-     * Draw text expression. Can contain variables surrounded with '{}' that will
-     * be extracted from the quantification object.
-     *
-     * @type {string}
+     * @param {App} app The associated application.
+     * @param {Function} eventCallback Event callback.
      */
-    textExpr: string;
+    constructor(app: App, eventCallback: Function);
+    /**
+     * Set the draw editor shape.
+     *
+     * @param {Konva.Shape} shape The shape to edit.
+     * @param {DrawLayer} drawLayer The layer the shape belongs to.
+     */
+    setEditorShape(shape: Konva.Shape, drawLayer: DrawLayer): void;
+    /**
+     * Get the currently edited shape group.
+     *
+     * @returns {Konva.Group|undefined} The edited group.
+     */
+    getEditorShapeGroup(): Konva.Group | undefined;
+    /**
+     * Get the currently edited annotation.
+     *
+     * @returns {Annotation|undefined} The edited annotation.
+     */
+    getEditorAnnotation(): Annotation | undefined;
+    /**
+     * Disable and reset the shape editor.
+     */
+    disableAndResetEditor(): void;
+    /**
+     * Store specific mouse over cursor.
+     *
+     * @param {string} cursor The cursor name.
+     */
+    storeMouseOverCursor(cursor: string): void;
+    /**
+     * Handle shape group mouseout.
+     */
+    onMouseOutShapeGroup(): void;
+    /**
+     * Add shape group listeners.
+     *
+     * @param {DrawLayer} drawLayer The origin draw layer.
+     * @param {Konva.Group} shapeGroup The shape group to set on.
+     * @param {Annotation} annotation The associated annotation.
+     */
+    addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
+    /**
+     * Remove shape group listeners.
+     *
+     * @param {Konva.Group} shapeGroup The shape group to set off.
+     */
+    removeShapeListeners(shapeGroup: Konva.Group): void;
+    #private;
 }
 
 /**
@@ -1736,7 +2129,7 @@ export declare function getEllipseIndices(center: Index, radius: number[], dir: 
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
  * with the 'layer' class and id generated with `getLayerDivId`.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export declare function getLayerDetailsFromEvent(event: object): object;
 
@@ -2326,13 +2719,6 @@ export declare class Index {
      * @returns {Index} The new index.
      */
     getWithNew2D(i: number, j: number): Index;
-    /**
-     * Get a string id from the index values in the form of: '#0-1_#1-2'.
-     *
-     * @param {number[]} [dims] Optional list of dimensions to use.
-     * @returns {string} The string id.
-     */
-    toStringId(dims?: number[]): string;
     #private;
 }
 
@@ -2503,9 +2889,10 @@ export declare class LayerGroup {
     /**
      * Set the active draw layer.
      *
-     * @param {number} index The index of the layer to set as active.
+     * @param {number|undefined} index The index of the layer to set as active
+     *   or undefined to not set any.
      */
-    setActiveDrawLayer(index: number): void;
+    setActiveDrawLayer(index: number | undefined): void;
     /**
      * Set the active draw layer with a data id.
      *
@@ -2846,6 +3233,12 @@ export declare class MaskSegmentHelper {
      */
     hasSegment(segmentNumber: number): boolean;
     /**
+     * Get the number of segments of the segmentation.
+     *
+     * @returns {number} The number of segments.
+     */
+    getNumberOfSegments(): number;
+    /**
      * Check if a segment is present in a mask image.
      *
      * @param {number[]} numbers Array of segment numbers.
@@ -3110,11 +3503,10 @@ export declare class OverlayData {
  */
 export declare class PlaneHelper {
     /**
-     * @param {Spacing} spacing The spacing.
-     * @param {Matrix33} imageOrientation The image oientation.
+     * @param {Geometry} imageGeometry The image geometry.
      * @param {Matrix33} viewOrientation The view orientation.
      */
-    constructor(spacing: Spacing, imageOrientation: Matrix33, viewOrientation: Matrix33);
+    constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
     /**
      * Get a 3D offset from a plane one.
      *
@@ -3178,6 +3570,34 @@ export declare class PlaneHelper {
      * @returns {Point3D} The de-orienteded point.
      */
     getImageDeOrientedPoint3D(point: Point3D): Point3D;
+    /**
+     * Get a world position from a 2D plane position.
+     *
+     * @param {Point2D} point2D The input point.
+     * @param {number} k The slice index.
+     * @returns {Point3D} The associated position.
+     */
+    getPositionFromPlanePoint(point2D: Point2D, k: number): Point3D;
+    /**
+     * Get a list of points that define the plane at position k.
+     *
+     * @param {number} k The slice index value.
+     * @returns {Point3D[]} A couple of 3D points.
+     */
+    getPlanePoints(k: number): Point3D[];
+    /**
+     * Image world to index.
+     *
+     * @param {Point} point The input point.
+     * @returns {Index} The corresponding index.
+     */
+    worldToIndex(point: Point): Index;
+    /**
+     * Is this view in the same orientation as the image aquisition.
+     *
+     * @returns {boolean} True if in aquisition plane.
+     */
+    isAquisitionOrientation(): boolean;
     /**
      * Reorder values to follow target orientation.
      *
@@ -3300,6 +3720,12 @@ export declare class Point2D {
      * @returns {number} The Y position of the point.
      */
     getY(): number;
+    /**
+     * Get the centroid of the point, ie itself.
+     *
+     * @returns {Point2D} The centroid point.
+     */
+    getCentroid(): Point2D;
     /**
      * Check for Point2D equality.
      *
@@ -3938,7 +4364,6 @@ export declare namespace toolOptions {
             { ArrowFactory };
             { CircleFactory };
             { EllipseFactory };
-            { FreeHandFactory };
             { ProtractorFactory };
             { RectangleFactory };
             { RoiFactory };
@@ -4193,9 +4618,9 @@ export declare class View {
      * Get the image origin for a image UID.
      *
      * @param {string} uid The UID.
-     * @returns {Index|undefined} The origin index.
+     * @returns {Point3D|undefined} The origin.
      */
-    getOriginIndexForImageUid(uid: string): Index | undefined;
+    getOriginForImageUid(uid: string): Point3D | undefined;
     /**
      * Check if the current position (default) or
      * the provided position is in bounds.
@@ -4301,6 +4726,12 @@ export declare class View {
      * @returns {number} The index.
      */
     getScrollIndex(): number;
+    /**
+     * Is this view in the same orientation as the image aquisition.
+     *
+     * @returns {boolean} True if in aquisition plane.
+     */
+    isAquisitionOrientation(): boolean;
     #private;
 }
 
@@ -4440,12 +4871,12 @@ export declare class ViewController {
      */
     getCurrentImageUid(): string;
     /**
-     * Get the image origin index for a image UID.
+     * Get the image origin for a image UID.
      *
      * @param {string} uid The UID.
-     * @returns {Index|undefined} The origin index.
+     * @returns {Point3D|undefined} The origin.
      */
-    getOriginIndexForImageUid(uid: string): Index | undefined;
+    getOriginForImageUid(uid: string): Point3D | undefined;
     /**
      * Get the current oriented index.
      *
@@ -4467,10 +4898,23 @@ export declare class ViewController {
     /**
      * Get the first origin or at a given position.
      *
-     * @param {Point} [position] Opitonal position.
+     * @param {Point} [position] Optional position.
      * @returns {Point3D} The origin.
      */
     getOrigin(position?: Point): Point3D;
+    /**
+     * Is this view in the same orientation as the image aquisition.
+     *
+     * @returns {boolean} True if in aquisition plane.
+     */
+    isAquisitionOrientation(): boolean;
+    /**
+     * Get a list of points that define the plane at position k.
+     *
+     * @param {number} k The slice index value.
+     * @returns {Point3D[]} A couple of 3D points.
+     */
+    getPlanePoints(k: number): Point3D[];
     /**
      * Get the current scroll position value.
      *
@@ -4606,9 +5050,11 @@ export declare class ViewController {
      * Get a world position from a 2D plane position.
      *
      * @param {Point2D} point2D The input point.
+     * @param {number} [k] Optional slice index,
+     *   if undefined, uses the current one.
      * @returns {Point} The associated position.
      */
-    getPositionFromPlanePoint(point2D: Point2D): Point;
+    getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     /**
      * Get a 2D plane position from a world position.
      *
@@ -4616,6 +5062,13 @@ export declare class ViewController {
      * @returns {Point2D} The 2D position.
      */
     getPlanePositionFromPosition(point: Point): Point2D;
+    /**
+     * Get the index of a world position.
+     *
+     * @param {Point} point The 3D position.
+     * @returns {Index} The index.
+     */
+    getIndexFromPosition(point: Point): Index;
     /**
      * Set the current index.
      *
