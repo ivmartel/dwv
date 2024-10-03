@@ -344,6 +344,7 @@ export class LayerGroup {
     return this.#baseScale;
   }
 
+
   /**
    * Get the added scale: the scale added to the base scale.
    *
@@ -439,11 +440,20 @@ export class LayerGroup {
    * @returns {ViewLayer|undefined} The layer.
    */
   getBaseViewLayer() {
-    let layer;
-    if (this.#layers[0] instanceof ViewLayer) {
-      layer = this.#layers[0];
+    // use first layer as base for calculating position and
+    // line sizes
+    let baseLayer;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        baseLayer = layer;
+        break;
+      }
     }
-    return layer;
+    if (typeof baseLayer === 'undefined') {
+      logger.warn('No layer found');
+      return;
+    }
+    return baseLayer;
   }
 
   /**
