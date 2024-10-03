@@ -6,6 +6,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
+import {DicomCode} from './dicomCode';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -46,7 +47,7 @@ export class MeasuredValue {
   rationalDenominatorValue;
 
   /**
-   * @type {object}
+   * @type {DicomCode}
    */
   measurementUnitsCode;
 

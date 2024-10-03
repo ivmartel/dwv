@@ -1,16 +1,16 @@
 import {Ellipse} from '../math/ellipse';
 import {Point2D} from '../math/point';
-import {getFlags, replaceFlags} from '../utils/string';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
 import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -55,144 +55,81 @@ export class EllipseFactory {
   }
 
   /**
+   * Set an annotation math shape from input points.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Point2D[]} points The points.
+   */
+  setAnnotationMathShape(annotation, points) {
+    annotation.mathShape = this.#calculateMathShape(points);
+    annotation.setTextExpr(this.#getDefaultLabel());
+    annotation.updateQuantification();
+  }
+
+  /**
    * Create an ellipse shape to be displayed.
    *
-   * @param {Point2D[]} points The points from which to extract the ellipse.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
    * @returns {Konva.Group} The Konva group.
    */
-  create(
-    points, style, viewController) {
-    // calculate radius
-    const a = Math.abs(points[0].getX() - points[1].getX());
-    const b = Math.abs(points[0].getY() - points[1].getY());
-    // physical shape
-    const ellipse = new Ellipse(points[0], a, b);
-    // draw shape
-    const radius = {x: ellipse.getA(), y: ellipse.getB()};
-    const kshape = new Konva.Ellipse({
-      x: ellipse.getCenter().getX(),
-      y: ellipse.getCenter().getY(),
-      radius: radius,
-      radiusX: radius.x,
-      radiusY: radius.y,
-      stroke: style.getLineColour(),
-      strokeWidth: style.getStrokeWidth(),
-      strokeScaleEnabled: false,
-      name: 'shape'
-    });
-    // quantification
-    const ktext = new Konva.Text({
-      fontSize: style.getFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      padding: style.getTextPadding(),
-      shadowColor: style.getShadowLineColour(),
-      shadowOffset: style.getShadowOffset(),
-      name: 'text'
-    });
-    let textExpr = '';
-    const modality = viewController.getModality();
-    if (typeof defaults.labelText.ellipse[modality] !== 'undefined') {
-      textExpr = defaults.labelText.ellipse[modality];
-    } else {
-      textExpr = defaults.labelText.ellipse['*'];
-    }
-    const quant = ellipse.quantify(
-      viewController,
-      getFlags(textExpr));
-    ktext.setText(replaceFlags(textExpr, quant));
-    // augment text with meta
-    // @ts-ignore
-    ktext.meta = {
-      textExpr: textExpr,
-      quantification: quant
-    };
-    // label
-    const klabel = new Konva.Label({
-      x: ellipse.getCenter().getX() - ellipse.getA(),
-      y: ellipse.getCenter().getY() + ellipse.getB(),
-      scale: style.applyZoomScale(1),
-      visible: textExpr.length !== 0,
-      name: 'label'
-    });
-    klabel.add(ktext);
-    klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
-      opacity: style.getTagOpacity()
-    }));
-
-    // debug shadow
-    let kshadow;
-    if (DRAW_DEBUG) {
-      kshadow = this.#getShadowEllipse(ellipse);
-    }
-
-    // return group
+  createShapeGroup(annotation, style) {
+    // konva group
     const group = new Konva.Group();
     group.name(this.getGroupName());
-    if (kshadow) {
-      group.add(kshadow);
+    group.visible(true);
+    group.id(annotation.id);
+    // konva shape
+    group.add(this.#createShape(annotation, style));
+    // konva label
+    group.add(this.#createLabel(annotation, style));
+    // konva shadow (if debug)
+    if (DRAW_DEBUG) {
+      group.add(this.#getDebugShadow(annotation));
     }
-    group.add(klabel);
-    group.add(kshape);
-    group.visible(true); // dont inherit
     return group;
   }
 
   /**
-   * Get anchors to update an ellipse shape.
+   * Get anchors to update a ellipse shape.
    *
    * @param {Konva.Ellipse} shape The associated shape.
    * @param {Style} style The application style.
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
-    const ellipseX = shape.x();
-    const ellipseY = shape.y();
+    const centerX = shape.x();
+    const centerY = shape.y();
     const radius = shape.radius();
 
     const anchors = [];
     anchors.push(getDefaultAnchor(
-      ellipseX - radius.x, ellipseY, 'left', style
+      centerX - radius.x, centerY, 'left', style
     ));
     anchors.push(getDefaultAnchor(
-      ellipseX + radius.x, ellipseY, 'right', style
+      centerX + radius.x, centerY, 'right', style
     ));
     anchors.push(getDefaultAnchor(
-      ellipseX, ellipseY + radius.y, 'bottom', style
+      centerX, centerY + radius.y, 'bottom', style
     ));
     anchors.push(getDefaultAnchor(
-      ellipseX, ellipseY - radius.y, 'top', style
+      centerX, centerY - radius.y, 'top', style
     ));
     return anchors;
   }
 
   /**
-   * Update an ellipse shape.
+   * Constrain anchor movement.
    *
    * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Style} _style The app style.
-   * @param {ViewController} viewController The associated view controller.
    */
-  update(anchor, _style, viewController) {
+  constrainAnchorMove(anchor) {
     // parent group
     const group = anchor.getParent();
     if (!(group instanceof Konva.Group)) {
       return;
     }
-    // associated shape
-    const kellipse = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kellipse instanceof Konva.Ellipse)) {
-      return;
-    }
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
+
     // find special points
     const left = group.getChildren(function (node) {
       return node.id() === 'left';
@@ -206,125 +143,135 @@ export class EllipseFactory {
     const top = group.getChildren(function (node) {
       return node.id() === 'top';
     })[0];
-    // debug shadow
-    let kshadow;
-    if (DRAW_DEBUG) {
-      kshadow = group.getChildren(function (node) {
-        return node.name() === 'shadow';
-      })[0];
-    }
-
-    // ellipse center
-    const center = {
-      x: kellipse.x(),
-      y: kellipse.y()
-    };
-
-    let radiusX;
-    let radiusY;
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
     case 'left':
-      radiusX = center.x - anchor.x();
-      radiusY = top.y() - center.y;
-      // update self (while blocking y)
-      left.x(anchor.x());
+      // block y
       left.y(right.y());
-      // update others
-      right.x(center.x + radiusX);
       break;
     case 'right':
-      radiusX = anchor.x() - center.x;
-      radiusY = top.y() - center.y;
-      // update self (while blocking y)
-      right.x(anchor.x());
+      // block y
       right.y(left.y());
-      // update others
-      left.x(center.x - radiusX);
       break;
     case 'bottom':
-      radiusX = center.x - left.x();
-      radiusY = anchor.y() - center.y;
-      // update self (while blocking x)
+      // block x
       bottom.x(top.x());
-      bottom.y(anchor.y());
-      // update others
-      top.y(center.y - radiusY);
       break;
     case 'top':
-      radiusX = center.x - left.x();
-      radiusY = center.y - anchor.y();
-      // update self (while blocking x)
+      // block x
       top.x(bottom.x());
-      top.y(anchor.y());
-      // update others
-      bottom.y(center.y + radiusY);
       break;
     default :
       logger.error('Unhandled anchor id: ' + anchor.id());
       break;
     }
-    // update shape
-    kellipse.position(center);
-    const radiusAbs = {
-      x: Math.abs(radiusX),
-      y: Math.abs(radiusY)
-    };
-    if (radiusAbs) {
-      kellipse.radius(radiusAbs);
-    }
-    // new ellipse
-    const centerPoint = new Point2D(
-      group.x() + center.x,
-      group.y() + center.y
-    );
-    const ellipse = new Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
-
-    // debug shadow
-    if (kshadow) {
-      // remove previous
-      kshadow.destroy();
-      // add new
-      group.add(this.#getShadowEllipse(ellipse, group));
-    }
-
-    // update label position
-    const textPos = {
-      x: center.x - radiusAbs.x,
-      y: center.y + radiusAbs.y
-    };
-    klabel.position(textPos);
-
-    // update quantification
-    this.#updateEllipseQuantification(group, viewController);
   }
 
   /**
-   * Update the quantification of an Ellipse.
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
    *
-   * @param {Konva.Group} group The group with the shape.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The application style.
    */
-  updateQuantification(group, viewController) {
-    this.#updateEllipseQuantification(group, viewController);
-  }
-
-  /**
-   * Update the quantification of an Ellipse (as a static
-   *   function to be used in update).
-   *
-   * @param {Konva.Group} group The group with the shape.
-   * @param {ViewController} viewController The associated view controller.
-   */
-  #updateEllipseQuantification(group, viewController) {
-    // associated shape
-    const kellipse = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kellipse instanceof Konva.Ellipse)) {
+  updateShapeGroupOnAnchorMove(annotation, anchor, style) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
       return;
     }
+
+    // update shape and anchors
+    this.#updateShape(annotation, anchor, style);
+    // update label
+    this.updateLabelContent(annotation, group, style);
+    // TODO check if linked label...
+    this.updateLabelPosition(annotation, group, style);
+    // update shadow
+    if (DRAW_DEBUG) {
+      this.#updateDebugShadow(annotation, group);
+    }
+  }
+
+  /**
+   * Update an annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
+  updateAnnotationOnAnchorMove(annotation, anchor) {
+    // math shape
+    const ellipse = annotation.mathShape;
+    const center = ellipse.getCenter();
+    let radiusX = ellipse.getA();
+    let radiusY = ellipse.getB();
+
+    // update 'self' (undo case) and special points
+    switch (anchor.id()) {
+    case 'left':
+      radiusX = center.getX() - anchor.x();
+      break;
+    case 'right':
+      radiusX = anchor.x() - center.getX();
+      break;
+    case 'bottom':
+      radiusY = anchor.y() - center.getY();
+      break;
+    case 'top':
+      radiusY = center.getY() - anchor.y();
+      break;
+    default :
+      logger.error('Unhandled anchor id: ' + anchor.id());
+      break;
+    }
+
+    annotation.mathShape = new Ellipse(
+      center, Math.abs(radiusX), Math.abs(radiusY));
+    // label position
+    // TODO...
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update an annotation on translation (shape move).
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {object} translation The translation.
+   */
+  updateAnnotationOnTranslation(annotation, translation) {
+    // math shape
+    const ellipse = annotation.mathShape;
+    const center = ellipse.getCenter();
+    const newCenter = new Point2D(
+      center.getX() + translation.x,
+      center.getY() + translation.y
+    );
+    annotation.mathShape = new Ellipse(
+      newCenter, ellipse.getA(), ellipse.getB());
+    // label position
+    const labelPos = annotation.labelPosition;
+    if (typeof labelPos !== 'undefined') {
+      const newPos = new Point2D(
+        labelPos.getX() + translation.x,
+        labelPos.getY() + translation.y
+      );
+      annotation.labelPosition = newPos;
+    }
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update the shape label position.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelPosition(annotation, group, _style) {
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
@@ -332,36 +279,256 @@ export class EllipseFactory {
     if (!(klabel instanceof Konva.Label)) {
       return;
     }
+    // update position
+    const labelPosition = this.#getLabelPosition(annotation);
+    klabel.position({
+      x: labelPosition.getX(),
+      y: labelPosition.getY()
+    });
+  }
 
-    // positions: add possible group offset
-    const centerPoint = new Point2D(
-      group.x() + kellipse.x(),
-      group.y() + kellipse.y()
-    );
-    // circle
-    const ellipse = new Ellipse(
-      centerPoint, kellipse.radius().x, kellipse.radius().y);
-
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelContent(annotation, group, _style) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
     // update text
+    const text = annotation.getText();
     const ktext = klabel.getText();
-    // @ts-expect-error
-    const meta = ktext.meta;
-    const quantification = ellipse.quantify(
-      viewController,
-      getFlags(meta.textExpr));
-    ktext.setText(replaceFlags(meta.textExpr, quantification));
-    // update meta
-    meta.quantification = quantification;
+    ktext.setText(text);
+    // hide if visible and empty
+    if (klabel.visible()) {
+      klabel.visible(text.length !== 0);
+    }
+  }
+
+  /**
+   * Calculates the mathematical shape: an ellipse.
+   *
+   * @param {Point2D[]} points The points that define the shape.
+   * @returns {Ellipse} The mathematical shape.
+   */
+  #calculateMathShape(points) {
+    // calculate radius
+    const a = Math.abs(points[0].getX() - points[1].getX());
+    const b = Math.abs(points[0].getY() - points[1].getY());
+    // physical shape
+    return new Ellipse(points[0], a, b);
+  }
+
+  /**
+   * Get the default labels.
+   *
+   * @returns {object} The label list.
+   */
+  #getDefaultLabel() {
+    return defaults.labelText.ellipse;
+  }
+
+  /**
+   * Creates the konva shape.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Ellipse} The konva shape.
+   */
+  #createShape(annotation, style) {
+    const ellipse = annotation.mathShape;
+    const center = ellipse.getCenter();
+    const radius = {
+      x: ellipse.getA(),
+      y: ellipse.getB()
+    };
+    // konva circle
+    return new Konva.Ellipse({
+      x: center.getX(),
+      y: center.getY(),
+      radius: radius,
+      radiusX: radius.x,
+      radiusY: radius.y,
+      stroke: annotation.colour,
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      name: 'shape'
+    });
+  }
+
+  /**
+   * Get the default annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getDefaultLabelPosition(annotation) {
+    const ellipse = annotation.mathShape;
+    const center = ellipse.getCenter();
+    return new Point2D(
+      center.getX() - ellipse.getA(),
+      center.getY() + ellipse.getB()
+    );
+  }
+
+  /**
+   * Get the annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getLabelPosition(annotation) {
+    let res = annotation.labelPosition;
+    if (typeof res === 'undefined') {
+      res = this.#getDefaultLabelPosition(annotation);
+    }
+    return res;
+  }
+
+  /**
+   * Creates the konva label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Label} The Konva label.
+   */
+  #createLabel(annotation, style) {
+    // konva text
+    const ktext = new Konva.Text({
+      fontSize: style.getFontSize(),
+      fontFamily: style.getFontFamily(),
+      fill: annotation.colour,
+      padding: style.getTextPadding(),
+      shadowColor: style.getShadowLineColour(),
+      shadowOffset: style.getShadowOffset(),
+      name: 'text'
+    });
+    const labelText = annotation.getText();
+    ktext.setText(labelText);
+
+    // konva label
+    const labelPosition = this.#getLabelPosition(annotation);
+    const klabel = new Konva.Label({
+      x: labelPosition.getX(),
+      y: labelPosition.getY(),
+      scale: style.applyZoomScale(1),
+      visible: labelText.length !== 0,
+      name: 'label'
+    });
+    klabel.add(ktext);
+    klabel.add(new Konva.Tag({
+      fill: annotation.colour,
+      opacity: style.getTagOpacity()
+    }));
+
+    return klabel;
+  }
+
+  /**
+   * Update shape on anchor move.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} _style The application style.
+   */
+  #updateShape(annotation, anchor, _style) {
+    const ellipse = annotation.mathShape;
+    const center = ellipse.getCenter();
+    const radiusX = ellipse.getA();
+    const radiusY = ellipse.getB();
+
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+    // associated shape
+    const kellipse = group.getChildren(function (node) {
+      return node.name() === 'shape';
+    })[0];
+    if (!(kellipse instanceof Konva.Ellipse)) {
+      return;
+    }
+    // update shape: just update radius
+    kellipse.radius({
+      x: radiusX,
+      y: radiusY
+    });
+
+    // find anchors
+    const left = group.getChildren(function (node) {
+      return node.id() === 'left';
+    })[0];
+    const right = group.getChildren(function (node) {
+      return node.id() === 'right';
+    })[0];
+    const bottom = group.getChildren(function (node) {
+      return node.id() === 'bottom';
+    })[0];
+    const top = group.getChildren(function (node) {
+      return node.id() === 'top';
+    })[0];
+
+    const swapX = right.x() < left.x() ? -1 : 1;
+    const swapY = top.y() < bottom.y() ? 1 : -1;
+
+    // update 'self' (undo case) and other anchors
+    switch (anchor.id()) {
+    case 'left':
+      // update self
+      left.x(anchor.x());
+      // update others
+      right.x(center.getX() + swapX * radiusX);
+      bottom.y(center.getY() + radiusY);
+      top.y(center.getY() - radiusY);
+      break;
+    case 'right':
+      // update self
+      right.x(anchor.x());
+      // update others
+      left.x(center.getX() - swapX * radiusX);
+      bottom.y(center.getY() + radiusY);
+      top.y(center.getY() - radiusY);
+      break;
+    case 'bottom':
+      // update self
+      bottom.y(anchor.y());
+      // update others
+      left.x(center.getX() - radiusX);
+      right.x(center.getX() + radiusX);
+      top.y(center.getY() - swapY * radiusY);
+      break;
+    case 'top':
+      // update self
+      top.y(anchor.y());
+      // update others
+      left.x(center.getX() - radiusX);
+      right.x(center.getX() + radiusX);
+      bottom.y(center.getY() + swapY * radiusY);
+      break;
+    default :
+      logger.error('Unhandled anchor id: ' + anchor.id());
+      break;
+    }
   }
 
   /**
    * Get the debug shadow.
    *
-   * @param {Ellipse} ellipse The ellipse to shadow.
+   * @param {Annotation} annotation The annotation to shadow.
    * @param {Konva.Group} [group] The associated group.
-   * @returns {Konva.Group} The shadow konva group.
+   * @returns {Konva.Group|undefined} The shadow konva group.
    */
-  #getShadowEllipse(ellipse, group) {
+  #getDebugShadow(annotation, group) {
+    const ellipse = annotation.mathShape;
+
     // possible group offset
     let offsetX = 0;
     let offsetY = 0;
@@ -391,6 +558,24 @@ export class EllipseFactory {
       kshadow.add(pixelLine);
     }
     return kshadow;
+  }
+
+  /**
+   * Update the debug shadow.
+   *
+   * @param {Annotation} annotation The annotation to shadow.
+   * @param {Konva.Group} group The associated group.
+   */
+  #updateDebugShadow(annotation, group) {
+    const kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+    if (typeof kshadow !== 'undefined') {
+      // remove previous
+      kshadow.destroy();
+      // add new
+      group.add(this.#getDebugShadow(annotation, group));
+    }
   }
 
 } // class EllipseFactory

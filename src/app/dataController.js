@@ -4,6 +4,7 @@ import {mergeObjects} from '../utils/operator';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from '../image/image';
+import {AnnotationGroup} from '../image/annotationGroup';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -16,25 +17,30 @@ export class DicomData {
    * @type {object}
    */
   meta;
+
   /**
-   * DICOM image.
+   * Image extracted from meta data.
    *
    * @type {Image|undefined}
    */
   image;
+  /**
+   * Annotattion group extracted from meta data.
+   *
+   * @type {AnnotationGroup|undefined}
+   */
+  annotationGroup;
 
   /**
    * @param {object} meta The DICOM meta data.
-   * @param {Image} [image] Optional DICOM image.
    */
-  constructor(meta, image) {
+  constructor(meta) {
     this.meta = meta;
-    this.image = image;
   }
 }
 
 /*
- * Data (list of {image, meta}) controller.
+ * DicomData controller.
  */
 export class DataController {
 
@@ -110,7 +116,8 @@ export class DataController {
     }
     const keys = Object.keys(this.#dataList);
     for (const key of keys) {
-      if (this.#dataList[key].image.containsImageUids(uids)) {
+      if (typeof this.#dataList[key].image !== 'undefined' &&
+        this.#dataList[key].image.containsImageUids(uids)) {
         res.push(key);
       }
     }
@@ -127,7 +134,7 @@ export class DataController {
     this.#dataList[dataId].image = image;
     // fire image set
     this.#fireEvent({
-      type: 'imageset',
+      type: 'dataimageset',
       value: [image],
       dataid: dataId
     });
@@ -142,18 +149,31 @@ export class DataController {
    * @param {string} dataId The data id.
    * @param {DicomData} data The data.
    */
-  addNew(dataId, data) {
+  add(dataId, data) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
     this.#dataList[dataId] = data;
+    // fire a data add event
+    this.#fireEvent({
+      type: 'dataadd',
+      dataid: dataId
+    });
     // listen to image change
     if (typeof data.image !== 'undefined') {
       data.image.addEventListener(
         'imagecontentchange', this.#getFireEvent(dataId));
       data.image.addEventListener(
         'imagegeometrychange', this.#getFireEvent(dataId));
+    }
+    if (typeof data.annotationGroup !== 'undefined') {
+      data.annotationGroup.addEventListener(
+        'annotationadd', this.#getFireEvent(dataId));
+      data.annotationGroup.addEventListener(
+        'annotationupdate', this.#getFireEvent(dataId));
+      data.annotationGroup.addEventListener(
+        'annotationremove', this.#getFireEvent(dataId));
     }
   }
 
@@ -172,13 +192,22 @@ export class DataController {
         image.removeEventListener(
           'imagegeometrychange', this.#getFireEvent(dataId));
       }
-      // fire a data remove event
-      this.#fireEvent({
-        type: 'imageremove',
-        dataid: dataId
-      });
+      const annotationGroup = this.#dataList[dataId].annotationGroup;
+      if (typeof annotationGroup !== 'undefined') {
+        annotationGroup.removeEventListener(
+          'annotationadd', this.#getFireEvent(dataId));
+        annotationGroup.removeEventListener(
+          'annotationupdate', this.#getFireEvent(dataId));
+        annotationGroup.removeEventListener(
+          'annotationremove', this.#getFireEvent(dataId));
+      }
       // remove data from list
       delete this.#dataList[dataId];
+      // fire a data remove event
+      this.#fireEvent({
+        type: 'dataremove',
+        dataid: dataId
+      });
     }
   }
 
@@ -215,6 +244,12 @@ export class DataController {
       data.meta,
       idKey,
       'value');
+
+    // fire a data add event
+    this.#fireEvent({
+      type: 'dataupdate',
+      dataid: dataId
+    });
   }
 
   /**

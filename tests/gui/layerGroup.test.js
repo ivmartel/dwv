@@ -19,26 +19,26 @@ QUnit.module('gui');
 QUnit.test('LayerGroup string id', function (assert) {
   // test #00
   const theoId00 = 'layerGroupA-layer-0';
-  const theoDetails00 = {groupDivId: 'layerGroupA', layerId: 0};
+  const theoDetails00 = {groupDivId: 'layerGroupA', layerIndex: 0};
   const id00 = getLayerDivId(
-    theoDetails00.groupDivId, theoDetails00.layerId);
+    theoDetails00.groupDivId, theoDetails00.layerIndex);
   const details00 = getLayerDetailsFromLayerDivId(theoId00);
   assert.equal(id00, theoId00, 'getLayerDivId #00');
   assert.equal(details00.groupDivId, theoDetails00.groupDivId,
     'getLayerDetailsFromLayerDivId groupId #00');
-  assert.equal(details00.layerId, theoDetails00.layerId,
+  assert.equal(details00.layerIndex, theoDetails00.layerIndex,
     'getLayerDetailsFromLayerDivId layerId #00');
 
   // test #01
   const theoId01 = 'layerGroupB-layer-1';
-  const theoDetails01 = {groupDivId: 'layerGroupB', layerId: 1};
+  const theoDetails01 = {groupDivId: 'layerGroupB', layerIndex: 1};
   const id01 = getLayerDivId(
-    theoDetails01.groupDivId, theoDetails01.layerId);
+    theoDetails01.groupDivId, theoDetails01.layerIndex);
   const details01 = getLayerDetailsFromLayerDivId(theoId01);
   assert.equal(id01, theoId01, 'getLayerDivId #01');
   assert.equal(details01.groupDivId, theoDetails01.groupDivId,
     'getLayerDetailsFromLayerDivId groupId #01');
-  assert.equal(details01.layerId, theoDetails01.layerId,
+  assert.equal(details01.layerIndex, theoDetails01.layerIndex,
     'getLayerDetailsFromLayerDivId layerId #01');
 });
 

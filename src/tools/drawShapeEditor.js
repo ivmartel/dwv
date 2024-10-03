@@ -1,5 +1,5 @@
 import {logger} from '../utils/logger';
-import {getShapeDisplayName, ChangeGroupCommand} from './drawCommands';
+import {UpdateAnnotationCommand} from './drawCommands';
 import {validateAnchorPosition} from './drawBounds';
 // external
 import Konva from 'konva';
@@ -7,14 +7,14 @@ import Konva from 'konva';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
-import {ViewController} from '../app/viewController';
 import {DrawLayer} from '../gui/drawLayer';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
- * Shape editor.
+ * Draw shape editor.
  */
-export class ShapeEditor {
+export class DrawShapeEditor {
 
   /**
    * Associated app.
@@ -24,18 +24,20 @@ export class ShapeEditor {
   #app;
 
   /**
-   * @param {App} app The associated application.
+   * Event callback.
+   *
+   * @type {Function}
    */
-  constructor(app) {
-    this.#app = app;
-  }
+  #eventCallback;
 
   /**
-   * Shape factory list.
-   *
-   * @type {object}
+   * @param {App} app The associated application.
+   * @param {Function} eventCallback Event callback.
    */
-  #shapeFactoryList = null;
+  constructor(app, eventCallback) {
+    this.#app = app;
+    this.#eventCallback = eventCallback;
+  }
 
   /**
    * Current shape factory.
@@ -59,11 +61,11 @@ export class ShapeEditor {
   #drawLayer;
 
   /**
-   * Associated view controller. Used for quantification update.
+   * The associated annotation.
    *
-   * @type {ViewController}
+   * @type {Annotation}
    */
-  #viewController = null;
+  #annotation;
 
   /**
    * Active flag.
@@ -78,50 +80,26 @@ export class ShapeEditor {
    */
 
   /**
-   * Draw event callback.
-   *
-   * @type {eventFn}
-   */
-  #drawEventCallback = null;
-
-  /**
-   * Set the tool options.
-   *
-   * @param {Array} list The list of shape classes.
-   */
-  setFactoryList(list) {
-    this.#shapeFactoryList = list;
-  }
-
-  /**
    * Set the shape to edit.
    *
    * @param {Konva.Shape} inshape The shape to edit.
    * @param {DrawLayer} drawLayer The associated draw layer.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Annotation} annotation The associated annotation.
    */
-  setShape(inshape, drawLayer, viewController) {
+  setShape(inshape, drawLayer, annotation) {
     this.#shape = inshape;
     this.#drawLayer = drawLayer;
-    this.#viewController = viewController;
+    this.#annotation = annotation;
+
     if (this.#shape) {
       // remove old anchors
       this.#removeAnchors();
-      // find a factory for the input shape
-      const group = this.#shape.getParent();
-      const keys = Object.keys(this.#shapeFactoryList);
-      this.#currentFactory = null;
-      for (let i = 0; i < keys.length; ++i) {
-        const factory = new this.#shapeFactoryList[keys[i]];
-        if (factory.isFactoryGroup(group)) {
-          this.#currentFactory = factory;
-          // stop at first find
-          break;
-        }
-      }
+
+      this.#currentFactory = annotation.getFactory();
       if (this.#currentFactory === null) {
         throw new Error('Could not find a factory to update shape.');
       }
+
       // add new anchors
       this.#addAnchors();
     }
@@ -137,21 +115,21 @@ export class ShapeEditor {
   }
 
   /**
+   * Get the edited annotation.
+   *
+   * @returns {Annotation} The annotation.
+   */
+  getAnnotation() {
+    return this.#annotation;
+  }
+
+  /**
    * Get the active flag.
    *
    * @returns {boolean} The active flag.
    */
   isActive() {
     return this.#isActive;
-  }
-
-  /**
-   * Set the draw event callback.
-   *
-   * @param {eventFn} callback The callback.
-   */
-  setDrawEventCallback(callback) {
-    this.#drawEventCallback = callback;
   }
 
   /**
@@ -186,7 +164,7 @@ export class ShapeEditor {
   reset() {
     this.#shape = undefined;
     this.#drawLayer = undefined;
-    this.#viewController = undefined;
+    this.#annotation = undefined;
   }
 
   /**
@@ -280,28 +258,28 @@ export class ShapeEditor {
    * @param {Konva.Shape} anchor The anchor to clone.
    * @returns {object} A clone of the input anchor.
    */
-  #getClone(anchor) {
-    // create closure to properties
-    const parent = anchor.getParent();
-    const id = anchor.id();
-    const x = anchor.x();
-    const y = anchor.y();
-    // create clone object
-    const clone = {};
-    clone.getParent = function () {
-      return parent;
-    };
-    clone.id = function () {
-      return id;
-    };
-    clone.x = function () {
-      return x;
-    };
-    clone.y = function () {
-      return y;
-    };
-    return clone;
-  }
+  // #getClone(anchor) {
+  //   // create closure to properties
+  //   const parent = anchor.getParent();
+  //   const id = anchor.id();
+  //   const x = anchor.x();
+  //   const y = anchor.y();
+  //   // create clone object
+  //   const clone = {};
+  //   clone.getParent = function () {
+  //     return parent;
+  //   };
+  //   clone.id = function () {
+  //     return id;
+  //   };
+  //   clone.x = function () {
+  //     return x;
+  //   };
+  //   clone.y = function () {
+  //     return y;
+  //   };
+  //   return clone;
+  // }
 
   /**
    * Set the anchor on listeners.
@@ -309,20 +287,17 @@ export class ShapeEditor {
    * @param {Konva.Ellipse} anchor The anchor to set on.
    */
   #setAnchorOn(anchor) {
-    let startAnchor = null;
-
-    // command name based on shape type
-    const shapeDisplayName = getShapeDisplayName(this.#shape);
+    let originalProps;
 
     // drag start listener
     anchor.on('dragstart.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
-        return;
-      }
-      startAnchor = this.#getClone(anchor);
       // prevent bubbling upwards
       event.cancelBubble = true;
+      // store original properties
+      originalProps = {
+        mathShape: this.#annotation.mathShape,
+        referencePoints: this.#annotation.referencePoints
+      };
     });
     // drag move listener
     anchor.on('dragmove.edit', (event) => {
@@ -332,9 +307,17 @@ export class ShapeEditor {
       }
       // validate the anchor position
       validateAnchorPosition(this.#drawLayer.getBaseSize(), anchor);
-      // update shape
-      this.#currentFactory.update(
-        anchor, this.#app.getStyle(), this.#viewController);
+      if (typeof this.#currentFactory.constrainAnchorMove !== 'undefined') {
+        this.#currentFactory.constrainAnchorMove(anchor);
+      }
+
+      // udpate annotation
+      this.#currentFactory.updateAnnotationOnAnchorMove(
+        this.#annotation, anchor);
+      // udpate shape
+      this.#currentFactory.updateShapeGroupOnAnchorMove(
+        this.#annotation, anchor, this.#app.getStyle());
+
       // redraw
       if (anchor.getLayer()) {
         anchor.getLayer().draw();
@@ -346,27 +329,32 @@ export class ShapeEditor {
     });
     // drag end listener
     anchor.on('dragend.edit', (event) => {
-      const anchor = event.target;
-      if (!(anchor instanceof Konva.Shape)) {
-        return;
-      }
-      const endAnchor = this.#getClone(anchor);
-      // store the change command
-      const chgcmd = new ChangeGroupCommand(
-        shapeDisplayName,
-        this.#currentFactory,
-        startAnchor,
-        endAnchor,
-        this.#drawLayer,
-        this.#viewController,
-        this.#app.getStyle()
+      // update annotation command
+      const newProps = {
+        mathShape: this.#annotation.mathShape,
+        referencePoints: this.#annotation.referencePoints
+      };
+      const command = new UpdateAnnotationCommand(
+        this.#annotation,
+        originalProps,
+        newProps,
+        this.#drawLayer.getDrawController()
       );
-      chgcmd.onExecute = this.#drawEventCallback;
-      chgcmd.onUndo = this.#drawEventCallback;
-      chgcmd.execute();
-      this.#app.addToUndoStack(chgcmd);
-      // reset start anchor
-      startAnchor = endAnchor;
+      // add command to undo stack
+      this.#app.addToUndoStack(command);
+      // fire event manually since command is not executed
+      this.#eventCallback({
+        type: 'annotationupdate',
+        data: this.#annotation,
+        dataid: this.#drawLayer.getDataId(),
+        keys: Object.keys(newProps)
+      });
+      // update original properties
+      originalProps = {
+        mathShape: newProps.mathShape,
+        referencePoints: newProps.referencePoints
+      };
+
       // prevent bubbling upwards
       event.cancelBubble = true;
     });

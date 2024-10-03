@@ -40,8 +40,9 @@ QUnit.test('DataController class', function (assert) {
 
   // add image
   const dataId0 = 'img0';
-  const dicomData0 = new DicomData({}, image0);
-  dc0.addNew(dataId0, dicomData0);
+  const dicomData0 = new DicomData({});
+  dicomData0.image = image0;
+  dc0.add(dataId0, dicomData0);
   assert.deepEqual(dc0.getDataIds(), [dataId0], 'dataIds after add');
 
   // get image
@@ -51,14 +52,14 @@ QUnit.test('DataController class', function (assert) {
 
   // add again should throw
   assert.throws(function () {
-    dc0.addNew(dataId0, dicomData0);
+    dc0.add(dataId0, dicomData0);
   },
   new Error('Data id already used in storage: ' + dataId0),
   'add already existing.');
 
   // set image
   let receivedImageSet = false;
-  dc0.addEventListener('imageset', function () {
+  dc0.addEventListener('dataimageset', function () {
     receivedImageSet = true;
   });
   dc0.setImage(dataId0, image0);

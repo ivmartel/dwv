@@ -1,3 +1,6 @@
+
+import {i18n} from './i18n';
+
 /**
  * Capitalise the first letter of a string.
  *
@@ -135,10 +138,10 @@ export function replaceFlags(inputStr, values) {
       if (valueObj.unit !== null &&
         typeof valueObj.unit !== 'undefined' &&
         valueObj.unit.length !== 0) {
-        if (valueObj.unit !== 'degree') {
+        if (valueObj.unit !== 'unit.degree') {
           valueStr += ' ';
         }
-        valueStr += valueObj.unit;
+        valueStr += i18n.t(valueObj.unit);
       }
       // flag to replace
       const flag = '{' + keys[i] + '}';

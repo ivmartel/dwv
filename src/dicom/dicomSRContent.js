@@ -1,10 +1,13 @@
 import {
+  NumericMeasurement,
   getNumericMeasurement,
   getDicomNumericMeasurementItem
 } from './dicomNumericMeasurement';
 import {
   getCode,
-  getDicomCodeItem
+  getDicomCodeItem,
+  getConceptNameCode,
+  getMeasurementUnitsCode
 } from './dicomCode';
 import {
   getImageReference,
@@ -27,6 +30,7 @@ import {
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
 import {DicomCode} from './dicomCode';
+import {MeasuredValue} from './dicomMeasuredValue';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -252,10 +256,6 @@ export function getSRContent(dataElements) {
     }
   }
 
-  if (typeof content.value === 'undefined') {
-    console.log('valueType', valueType);
-  }
-
   return content;
 }
 
@@ -330,4 +330,34 @@ export function getDicomSRContentItem(content) {
   }
 
   return contentItem;
+}
+
+/**
+ * Get a DicomSRContent from a value.
+ *
+ * @param {string} name The value name.
+ * @param {object} value The value.
+ * @param {string} unit The values' unit.
+ * @returns {DicomSRContent|undefined} The SR content.
+ */
+export function getSRContentFromValue(name, value, unit) {
+  const conceptNameCode = getConceptNameCode(name);
+
+  if (typeof conceptNameCode === 'undefined') {
+    return undefined;
+  }
+
+  const content = new DicomSRContent(ValueTypes.num);
+  content.relationshipType = RelationshipTypes.contains;
+  content.conceptNameCode = conceptNameCode;
+
+  const measure = new MeasuredValue();
+  measure.numericValue = value;
+  measure.measurementUnitsCode = getMeasurementUnitsCode(unit);
+  const numMeasure = new NumericMeasurement();
+  numMeasure.measuredValue = measure;
+
+  content.value = numMeasure;
+
+  return content;
 }

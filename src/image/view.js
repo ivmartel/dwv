@@ -9,6 +9,7 @@ import {generateImageDataPaletteColor} from './viewPaletteColor';
 import {generateImageDataRgb} from './viewRgb';
 import {generateImageDataYbrFull} from './viewYbrFull';
 import {ViewFactory} from './viewFactory';
+import {isIdentityMat33} from '../math/matrix';
 import {getSliceIterator} from '../image/iterator';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
@@ -536,17 +537,10 @@ export class View {
    * Get the image origin for a image UID.
    *
    * @param {string} uid The UID.
-   * @returns {Index|undefined} The origin index.
+   * @returns {Point3D|undefined} The origin.
    */
-  getOriginIndexForImageUid(uid) {
-    let index;
-    const geometry = this.getImage().getGeometry();
-    const origin = this.#image.getOriginForImageUid(uid);
-    if (typeof origin !== 'undefined') {
-      const point = new Point([origin.getX(), origin.getY(), origin.getZ()]);
-      index = geometry.worldToIndex(point);
-    }
-    return index;
+  getOriginForImageUid(uid) {
+    return this.#image.getOriginForImageUid(uid);
   }
 
   /**
@@ -986,6 +980,15 @@ export class View {
       index = 2;
     }
     return index;
+  }
+
+  /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return isIdentityMat33(this.#orientation);
   }
 
 } // class View

@@ -1,5 +1,4 @@
 import {Point2D} from '../math/point';
-import {isNodeNameShape} from '../app/drawController';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -8,6 +7,54 @@ import {Style} from '../gui/style';
 // external
 import Konva from 'konva';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Is an input node's name 'label'.
+ *
+ * @param {Konva.Node} node A Konva node.
+ * @returns {boolean} True if the node's name is 'label'.
+ */
+export function isNodeNameLabel(node) {
+  return node.name() === 'label';
+}
+
+/**
+ * Is an input node's name 'shape'.
+ *
+ * @param {Konva.Node} node A Konva node.
+ * @returns {boolean} True if the node's name is 'shape'.
+ */
+export function isNodeNameShape(node) {
+  return node.name() === 'shape';
+}
+
+/**
+ * Is an input node a position node.
+ *
+ * @param {Konva.Node} node A Konva node.
+ * @returns {boolean} True if the node's name is 'position-group'.
+ */
+export function isPositionNode(node) {
+  return node.name() === 'position-group';
+}
+
+/**
+ * @callback testFn
+ * @param {Konva.Node} node The node.
+ * @returns {boolean} True if the node passes the test.
+ */
+
+/**
+ * Get a lambda to check a node's id.
+ *
+ * @param {string} id The id to check.
+ * @returns {testFn} A function to check a node's id.
+ */
+export function isNodeWithId(id) {
+  return function (node) {
+    return node.id() === id;
+  };
+}
 
 /**
  * Draw Debug flag.

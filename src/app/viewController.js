@@ -70,8 +70,7 @@ export class ViewController {
 
     // setup the plane helper
     this.#planeHelper = new PlaneHelper(
-      view.getImage().getGeometry().getRealSpacing(),
-      view.getImage().getGeometry().getOrientation(),
+      view.getImage().getGeometry(),
       view.getOrientation()
     );
 
@@ -194,13 +193,13 @@ export class ViewController {
   }
 
   /**
-   * Get the image origin index for a image UID.
+   * Get the image origin for a image UID.
    *
    * @param {string} uid The UID.
-   * @returns {Index|undefined} The origin index.
+   * @returns {Point3D|undefined} The origin.
    */
-  getOriginIndexForImageUid(uid) {
-    return this.#view.getOriginIndexForImageUid(uid);
+  getOriginForImageUid(uid) {
+    return this.#view.getOriginForImageUid(uid);
   }
 
   /**
@@ -243,11 +242,30 @@ export class ViewController {
   /**
    * Get the first origin or at a given position.
    *
-   * @param {Point} [position] Opitonal position.
+   * @param {Point} [position] Optional position.
    * @returns {Point3D} The origin.
    */
   getOrigin(position) {
     return this.#view.getOrigin(position);
+  }
+
+  /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return this.#view.isAquisitionOrientation();
+  }
+
+  /**
+   * Get a list of points that define the plane at position k.
+   *
+   * @param {number} k The slice index value.
+   * @returns {Point3D[]} A couple of 3D points.
+   */
+  getPlanePoints(k) {
+    return this.#planeHelper.getPlanePoints(k);
   }
 
   /**
@@ -550,11 +568,15 @@ export class ViewController {
    * Get a world position from a 2D plane position.
    *
    * @param {Point2D} point2D The input point.
+   * @param {number} [k] Optional slice index,
+   *   if undefined, uses the current one.
    * @returns {Point} The associated position.
    */
-  getPositionFromPlanePoint(point2D) {
+  getPositionFromPlanePoint(point2D, k) {
     // keep third direction
-    const k = this.getCurrentScrollIndexValue();
+    if (typeof k === 'undefined') {
+      k = this.getCurrentScrollIndexValue();
+    }
     const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
@@ -582,6 +604,19 @@ export class ViewController {
       planePoint.getX(),
       planePoint.getY(),
     );
+  }
+
+  /**
+   * Get the index of a world position.
+   *
+   * @param {Point} point The 3D position.
+   * @returns {Index} The index.
+   */
+  getIndexFromPosition(point) {
+    // orient
+    const geometry = this.#view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    return geometry.worldToIndex(point);
   }
 
   /**

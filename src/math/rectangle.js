@@ -1,6 +1,5 @@
 import {Point2D} from './point';
 import {getStats} from './stats';
-import {i18n} from '../utils/i18n';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -171,6 +170,18 @@ export class Rectangle {
   }
 
   /**
+   * Get the centroid of the rectangle.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
+    return new Point2D(
+      this.getBegin().getX() + this.getWidth() / 2,
+      this.getBegin().getY() + this.getHeight() / 2
+    );
+  }
+
+  /**
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
@@ -183,15 +194,18 @@ export class Rectangle {
     const spacing2D = viewController.get2DSpacing();
     quant.width = {
       value: this.getWidth() * spacing2D.x,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     quant.height = {
       value: this.getHeight() * spacing2D.y,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
+      quant.surface = {
+        value: surface / 100,
+        unit: 'unit.cm2'
+      };
     }
 
     // pixel values quantification

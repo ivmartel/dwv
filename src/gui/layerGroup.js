@@ -21,18 +21,18 @@ import {Scalar2D, Scalar3D} from '../math/scalar';
  * Get the layer div id.
  *
  * @param {string} groupDivId The layer group div id.
- * @param {number} layerId The lyaer id.
+ * @param {number} layerIndex The layer index.
  * @returns {string} A string id.
  */
-export function getLayerDivId(groupDivId, layerId) {
-  return groupDivId + '-layer-' + layerId;
+export function getLayerDivId(groupDivId, layerIndex) {
+  return groupDivId + '-layer-' + layerIndex;
 }
 
 /**
  * Get the layer details from a div id.
  *
  * @param {string} idString The layer div id.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export function getLayerDetailsFromLayerDivId(idString) {
   const split = idString.split('-layer-');
@@ -41,7 +41,8 @@ export function getLayerDetailsFromLayerDivId(idString) {
   }
   return {
     groupDivId: split[0],
-    layerId: split[1]
+    layerIndex: split[1],
+    layerId: idString,
   };
 }
 
@@ -51,7 +52,7 @@ export function getLayerDetailsFromLayerDivId(idString) {
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
  * with the 'layer' class and id generated with `getLayerDivId`.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export function getLayerDetailsFromEvent(event) {
   let res = null;
@@ -428,8 +429,6 @@ export class LayerGroup {
       if (tmpLayer instanceof ViewLayer) {
         layer = tmpLayer;
       }
-    } else {
-      logger.info('No active view layer to return');
     }
     return layer;
   }
@@ -509,8 +508,6 @@ export class LayerGroup {
       if (tmpLayer instanceof DrawLayer) {
         layer = tmpLayer;
       }
-    } else {
-      logger.info('No active draw layer to return');
     }
     return layer;
   }
@@ -583,19 +580,15 @@ export class LayerGroup {
   /**
    * Set the active draw layer.
    *
-   * @param {number} index The index of the layer to set as active.
+   * @param {number|undefined} index The index of the layer to set as active
+   *   or undefined to not set any.
    */
   setActiveDrawLayer(index) {
-    if (this.#layers[index] instanceof DrawLayer) {
-      this.#activeDrawLayerIndex = index;
-      this.#fireEvent({
-        type: 'activelayerchange',
-        value: [this.#layers[index]]
-      });
-    } else {
-      logger.warn('No draw layer to set as active with index: ' +
-        index);
-    }
+    this.#activeDrawLayerIndex = index;
+    this.#fireEvent({
+      type: 'activelayerchange',
+      value: [this.#layers[index]]
+    });
   }
 
   /**
@@ -718,6 +711,11 @@ export class LayerGroup {
    * @param {DrawLayer} drawLayer The draw layer to bind.
    */
   #bindDrawLayer(drawLayer) {
+    // listen to position change to update other group layers
+    drawLayer.addEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.addEventListener(
+      'positionchange', this.#fireEvent);
     // propagate drawLayer events
     drawLayer.addEventListener('drawcreate', this.#fireEvent);
     drawLayer.addEventListener('drawdelete', this.#fireEvent);
@@ -729,6 +727,11 @@ export class LayerGroup {
    * @param {DrawLayer} drawLayer The draw layer to unbind.
    */
   #unbindDrawLayer(drawLayer) {
+    // stop listening to position change to update other group layers
+    drawLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.removeEventListener(
+      'positionchange', this.#fireEvent);
     // propagate drawLayer events
     drawLayer.removeEventListener('drawcreate', this.#fireEvent);
     drawLayer.removeEventListener('drawdelete', this.#fireEvent);
@@ -798,36 +801,12 @@ export class LayerGroup {
     if (layer instanceof ViewLayer) {
       this.#unbindViewLayer(layer);
       if (this.#activeViewLayerIndex === index) {
-        if (index - 2 >= 0) {
-          this.setActiveViewLayer(index - 2);
-        } else {
-          this.#activeViewLayerIndex = undefined;
-        }
+        this.#activeViewLayerIndex = undefined;
       }
     } else {
-      // delete layer draws
-      const numberOfDraws = layer.getNumberOfDraws();
-      if (typeof numberOfDraws !== 'undefined') {
-        let count = 0;
-        layer.addEventListener('drawdelete', (_event) => {
-          ++count;
-          // unbind when all draw are deleted
-          if (count === numberOfDraws) {
-            this.#unbindDrawLayer(layer);
-          }
-        });
-      }
-      layer.deleteDraws();
-      if (typeof numberOfDraws === 'undefined') {
-        this.#unbindDrawLayer(layer);
-      }
-      // reset active index
+      this.#unbindDrawLayer(layer);
       if (this.#activeDrawLayerIndex === index) {
-        if (index - 2 >= 0) {
-          this.setActiveDrawLayer(index - 2);
-        } else {
-          this.#activeDrawLayerIndex = undefined;
-        }
+        this.#activeDrawLayerIndex = undefined;
       }
     }
     // reset in storage
@@ -1017,7 +996,7 @@ export class LayerGroup {
   updateLayersToPositionChange = (event) => {
     // pause positionchange listeners
     for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer) {
+      if (typeof layer !== 'undefined') {
         layer.removeEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.removeEventListener('positionchange', this.#fireEvent);
@@ -1035,24 +1014,26 @@ export class LayerGroup {
     }
 
     // origin of the first view layer
+    const viewLayerOffsets = {};
     let baseViewLayerOrigin0;
     let baseViewLayerOrigin;
-    let scrollOffset;
-    let planeOffset;
     // update position for all layers except the source one
     for (const layer of this.#layers) {
       if (typeof layer === 'undefined') {
         continue;
       }
-
-      // update base offset (does not trigger redraw)
       let hasSetOffset = false;
+
+      // view layer case: define and set offsets
       if (layer instanceof ViewLayer) {
         const vc = layer.getViewController();
         // origin0 should always be there
         const origin0 = vc.getOrigin();
         // depending on position, origin could be undefined
         const origin = vc.getOrigin(position);
+
+        let scrollOffset;
+        let planeOffset;
 
         if (typeof baseViewLayerOrigin === 'undefined') {
           // first view layer, store origins
@@ -1073,24 +1054,30 @@ export class LayerGroup {
               planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
           }
         }
+
+        // set and store offsets
+        if (typeof scrollOffset !== 'undefined' &&
+          typeof planeOffset !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(
+              scrollOffset, planeOffset,
+              baseViewLayerOrigin, baseViewLayerOrigin0
+            );
+          // store
+          viewLayerOffsets[layer.getId()] = {
+            scroll: scrollOffset,
+            plane: planeOffset
+          };
+        }
       }
 
-      // also set for draw layers
-      // (should be next after a view layer)
-      if (typeof scrollOffset !== 'undefined' &&
-        typeof planeOffset !== 'undefined') {
-        hasSetOffset =
-          layer.setBaseOffset(
-            scrollOffset, planeOffset,
-            baseViewLayerOrigin, baseViewLayerOrigin0
-          );
-      }
-
-      // reset to not propagate after draw layer
-      // TODO: revise, could be unstable...
+      // draw layer case: use associated view layer offsets
       if (layer instanceof DrawLayer) {
-        scrollOffset = undefined;
-        planeOffset = undefined;
+        const refOffsets = viewLayerOffsets[layer.getReferenceLayerId()];
+        if (typeof refOffsets !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(refOffsets.scroll, refOffsets.plane);
+        }
       }
 
       // update position (triggers redraw)
@@ -1107,7 +1094,7 @@ export class LayerGroup {
 
     // re-start positionchange listeners
     for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer) {
+      if (typeof layer !== 'undefined') {
         layer.addEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.addEventListener('positionchange', this.#fireEvent);

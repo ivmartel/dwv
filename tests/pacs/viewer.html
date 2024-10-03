@@ -36,7 +36,7 @@ span {
   font-style: italic;
 }
 button {
-  margin: 0 5px;
+  margin: 0 3px;
 }
 input[type=number] {
   width: 75px;
@@ -58,6 +58,10 @@ fieldset {
     font-size: small;
     font-style: italic;
   }
+}
+fieldset ul {
+  padding-left: 20px;
+  margin: 0;
 }
 #fileinput {
   width: 50%;
@@ -139,6 +143,11 @@ hr.vertical {
 <script type="text/javascript" src="./node_modules/konva/konva.min.js"></script>
 <script type="text/javascript" src="./dist/dwv.min.js"></script>
 --><!-- local -->
+<script type="text/javascript" src="./viewer.ui.js"></script>
+<script type="text/javascript" src="./viewer.ui.annot.js"></script>
+<script type="text/javascript" src="./viewer.ui.draw.js"></script>
+<script type="text/javascript" src="./viewer.ui.datatable.js"></script>
+<script type="text/javascript" src="./viewer.rendertest.js"></script>
 <script type="text/javascript" src="./viewer.js"></script>
 
 </head>
@@ -180,6 +189,8 @@ hr.vertical {
     <legend>Tools</legend>
   </fieldset>
 </div>
+
+<div id='annotationgroups-panel' class="line"></div>
 
 <div id="layersdetails"></div>
 

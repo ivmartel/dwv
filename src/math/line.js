@@ -1,5 +1,4 @@
 import {Point2D} from './point';
-import {i18n} from '../utils/i18n';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -126,6 +125,15 @@ export class Line {
   }
 
   /**
+   * Get the centroid of the line.
+   *
+   * @returns {Point2D} THe centroid point.
+   */
+  getCentroid() {
+    return this.getMidpoint();
+  }
+
+  /**
    * Get the slope of the line.
    *
    * @returns {number} The slope of the line.
@@ -171,7 +179,7 @@ export class Line {
     const spacing2D = viewController.get2DSpacing();
     const length = this.getWorldLength(spacing2D);
     if (length !== null) {
-      quant.length = {value: length, unit: i18n.t('unit.mm')};
+      quant.length = {value: length, unit: 'unit.mm'};
     }
     // return
     return quant;
@@ -203,12 +211,28 @@ export function getAngle(line0, line1) {
 }
 
 /**
+ * Check if two lines are orthogonal.
+ *
+ * @param {Line} line0 The first line.
+ * @param {Line} line1 The second line.
+ * @returns {boolean} True if both lines are orthogonal.
+ */
+export function areOrthogonal(line0, line1) {
+  const dx0 = line0.getDeltaX();
+  const dy0 = line0.getDeltaY();
+  const dx1 = line1.getDeltaX();
+  const dy1 = line1.getDeltaY();
+  // dot = ||a||*||b||*cos(theta)
+  return (dx0 * dx1 + dy0 * dy1) === 0;
+}
+
+/**
  * Get a perpendicular line to an input one.
  *
  * @param {Line} line The line to be perpendicular to.
  * @param {Point2D} point The middle point of the perpendicular line.
  * @param {number} length The length of the perpendicular line.
- * @returns {object} A perpendicular line.
+ * @returns {Line} A perpendicular line.
  */
 export function getPerpendicularLine(line, point, length) {
   // begin point

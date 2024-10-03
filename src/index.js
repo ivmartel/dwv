@@ -7,10 +7,14 @@ import {
 } from './app/application';
 import {defaults} from './app/defaults';
 import {
-  DrawMeta,
-  DrawDetails,
   DrawController
 } from './app/drawController';
+import {
+  DicomData
+} from './app/dataController';
+import {Annotation} from './image/annotation';
+import {AnnotationGroup} from './image/annotationGroup';
+import {AnnotationGroupFactory} from './image/annotationGroupFactory';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
 // dicom
@@ -100,6 +104,7 @@ import {NumberRange} from './math/stats';
 // tools
 import {toolList, toolOptions} from './tools/index';
 import {ScrollWheel} from './tools/scrollWheel';
+import {DrawShapeHandler} from './tools/drawShapeHandler';
 // utils
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
@@ -118,8 +123,9 @@ export {
   App,
   ViewConfig,
   ToolConfig,
-  DrawMeta,
-  DrawDetails,
+  Annotation,
+  AnnotationGroup,
+  AnnotationGroupFactory,
   DrawController,
   ViewController,
   PlaneHelper,
@@ -129,6 +135,7 @@ export {
   ChangeSegmentColourCommand,
   ToolboxController,
   DataElement,
+  DicomData,
   DicomParser,
   DicomWriter,
   WriterRule,
@@ -136,6 +143,7 @@ export {
   Tag,
   LayerGroup,
   DrawLayer,
+  DrawShapeHandler,
   OverlayData,
   ViewLayer,
   Image,

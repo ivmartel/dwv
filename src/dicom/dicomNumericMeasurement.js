@@ -10,6 +10,8 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
+import {MeasuredValue} from './dicomMeasuredValue';
+import {DicomCode} from './dicomCode';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -27,12 +29,12 @@ const TagKeys = {
  */
 export class NumericMeasurement {
   /**
-   * @type {object}
+   * @type {MeasuredValue}
    */
   measuredValue;
 
   /**
-   * @type {object}
+   * @type {DicomCode}
    */
   numericValueQualifierCode;
 

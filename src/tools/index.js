@@ -9,7 +9,6 @@ import {Livewire} from './livewire';
 import {ArrowFactory} from './arrow';
 import {CircleFactory} from './circle';
 import {EllipseFactory} from './ellipse';
-import {FreeHandFactory} from './freeHand';
 import {ProtractorFactory} from './protractor';
 import {RectangleFactory} from './rectangle';
 import {RoiFactory} from './roi';
@@ -67,7 +66,6 @@ export const toolOptions = {
     ArrowFactory,
     CircleFactory,
     EllipseFactory,
-    FreeHandFactory,
     ProtractorFactory,
     RectangleFactory,
     RoiFactory,

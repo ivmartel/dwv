@@ -22,9 +22,6 @@ export const defaults = {
     ellipse: {
       '*': '{surface}'
     },
-    freeHand: {
-      '*': ''
-    },
     protractor: {
       '*': '{angle}'
     },

@@ -1,4 +1,3 @@
-import {i18n} from '../utils/i18n';
 import {getStats} from './stats';
 
 // doc imports
@@ -60,6 +59,15 @@ export class Circle {
    * @returns {Point2D} The center (point) of the circle.
    */
   getCenter() {
+    return this.#centre;
+  }
+
+  /**
+   * Get the centroid of the circle.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
     return this.#centre;
   }
 
@@ -159,11 +167,14 @@ export class Circle {
     const spacing2D = viewController.get2DSpacing();
     quant.radius = {
       value: this.getRadius() * spacing2D.x,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
+      quant.surface = {
+        value: surface / 100,
+        unit: 'unit.cm2'
+      };
     }
 
     // pixel values quantification

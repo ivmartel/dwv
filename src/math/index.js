@@ -164,34 +164,6 @@ export class Index {
     return new Index(values);
   }
 
-  /**
-   * Get a string id from the index values in the form of: '#0-1_#1-2'.
-   *
-   * @param {number[]} [dims] Optional list of dimensions to use.
-   * @returns {string} The string id.
-   */
-  toStringId(dims) {
-    if (typeof dims === 'undefined') {
-      dims = [];
-      for (let j = 0; j < this.length(); ++j) {
-        dims.push(j);
-      }
-    }
-    for (let ii = 0; ii < dims.length; ++ii) {
-      if (dims[ii] >= this.length()) {
-        throw new Error('Non valid dimension for toStringId.');
-      }
-    }
-    let res = '';
-    for (let i = 0; i < dims.length; ++i) {
-      if (i !== 0) {
-        res += '_';
-      }
-      res += '#' + dims[i] + '-' + this.get(dims[i]);
-    }
-    return res;
-  }
-
 } // Index class
 
 /**
@@ -203,40 +175,5 @@ export class Index {
 export function getZeroIndex(size) {
   const values = new Array(size);
   values.fill(0);
-  return new Index(values);
-}
-
-/**
- * Get an index from an id string in the form of: '#0-1_#1-2'
- * (result of index.toStringId).
- *
- * @param {string} inputStr The input string.
- * @returns {Index} The corresponding index (minimum size is 3D).
- */
-export function getIndexFromStringId(inputStr) {
-  // split ids
-  const strIds = inputStr.split('_');
-  // get the size of the index (minimum 3)
-  let numberOfDims = 3;
-  let dim;
-  for (let i = 0; i < strIds.length; ++i) {
-    // expecting dim < 10
-    dim = parseInt(strIds[i].substring(1, 2), 10);
-    // dim is zero based
-    if (dim + 1 > numberOfDims) {
-      numberOfDims = dim + 1;
-    }
-  }
-  // default values
-  const values = new Array(numberOfDims);
-  values.fill(0);
-  // get other values from the input string
-  for (let j = 0; j < strIds.length; ++j) {
-    // expecting dim < 10
-    dim = parseInt(strIds[j].substring(1, 2), 10);
-    const value = parseInt(strIds[j].substring(3), 10);
-    values[dim] = value;
-  }
-
   return new Index(values);
 }

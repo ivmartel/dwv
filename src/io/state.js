@@ -37,30 +37,17 @@ import {App} from '../app/application';
  */
 export class State {
   /**
-   * Save the application state as JSON.
+   * The state data id.
    *
-   * @param {App} app The associated application.
-   * @returns {string} The state as a JSON string.
+   * @type {string}
    */
-  toJSON(app) {
-    const layerGroup = app.getActiveLayerGroup();
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    const position = viewController.getCurrentIndex();
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    const drawController = drawLayer.getDrawController();
-    const wl = viewController.getWindowLevel();
-    // return a JSON string
-    return JSON.stringify({
-      version: '0.5',
-      'window-center': wl.center,
-      'window-width': wl.width,
-      position: position.getValues(),
-      scale: app.getAddedScale(),
-      offset: app.getOffset(),
-      drawings: drawLayer.getKonvaLayer().toObject(),
-      drawingsDetails: drawController.getDrawStoreDetails()
-    });
+  #dataId;
+
+  /**
+   * @param {string} dataId The associated data id.
+   */
+  constructor(dataId) {
+    this.#dataId = dataId;
   }
 
   /**
@@ -144,10 +131,8 @@ export class State {
     }
     app.getActiveLayerGroup().setScale(scale);
     app.getActiveLayerGroup().setOffset(offset);
-    // render to draw the view layer
-    app.render(app.getDataIds()[0]); //todo: fix
     // drawings (will draw the draw layer)
-    app.setDrawings(data.drawings, data.drawingsDetails);
+    app.setDrawings(data.drawings, data.drawingsDetails, this.#dataId);
   }
 
   /**
