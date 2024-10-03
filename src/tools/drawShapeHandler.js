@@ -265,8 +265,6 @@ export class DrawShapeHandler {
     }
     label.draggable(true);
 
-    let isShapeLabelLinked = true;
-
     // cache vars
     let dragStartPos;
     let previousPos;
@@ -309,10 +307,12 @@ export class DrawShapeHandler {
         y: event.target.y() - previousPos.y
       };
       const children = shapeGroup.getChildren();
+      const labelWithDefaultPosition =
+        typeof annotation.labelPosition === 'undefined';
       for (const child of children) {
-        // skip shape and label
+        // skip shape and label with defined position
         if (child === event.target ||
-          (child.name() === 'label' && !isShapeLabelLinked)
+          (child.name() === 'label' && !labelWithDefaultPosition)
         ) {
           continue;
         }
@@ -439,8 +439,6 @@ export class DrawShapeHandler {
 
     // drag start event handling
     label.on('dragstart.draw', (/*event*/) => {
-      // unlink shape and label at first label move
-      isShapeLabelLinked = false;
       // store pos
       dragStartPos = {
         x: label.x(),
@@ -456,8 +454,10 @@ export class DrawShapeHandler {
         y: label.y() - dragStartPos.y
       };
       if (translation.x !== 0 || translation.y !== 0) {
-        // update annotation command
         const newLabelPosition = new Point2D(label.x(), label.y());
+        // set label position
+        annotation.labelPosition = newLabelPosition;
+        // update annotation command
         const command = new UpdateAnnotationCommand(
           annotation,
           {labelPosition: originalLabelPosition},

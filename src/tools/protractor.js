@@ -152,8 +152,10 @@ export class ProtractorFactory {
     this.#updateShape(annotation, anchor, style);
     // update label
     this.updateLabelContent(annotation, group, style);
-    // TODO check if linked label...
-    this.updateLabelPosition(annotation, group, style);
+    // update label position if default position
+    if (typeof annotation.labelPosition === 'undefined') {
+      this.updateLabelPosition(annotation, group, style);
+    }
     // update shadow
     if (DRAW_DEBUG) {
       this.#updateDebugShadow(annotation, group);
@@ -228,15 +230,6 @@ export class ProtractorFactory {
       ));
     }
     annotation.mathShape = new Protractor(newPointList);
-    // label position
-    const labelPos = annotation.labelPosition;
-    if (typeof labelPos !== 'undefined') {
-      const newPos = new Point2D(
-        labelPos.getX() + translation.x,
-        labelPos.getY() + translation.y
-      );
-      annotation.labelPosition = newPos;
-    }
     // quantification
     annotation.updateQuantification();
   }

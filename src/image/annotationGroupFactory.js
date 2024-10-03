@@ -140,6 +140,20 @@ export class AnnotationGroupFactory {
         subItem.relationshipType === RelationshipTypes.hasProperties &&
         isEqualCode(subItem.conceptNameCode, getShortLabelCode())) {
         annotation.textExpr = subItem.value;
+        console.log('sub', subItem.contentSequence);
+        if (typeof subItem.contentSequence !== 'undefined') {
+          for (const subsubItem of subItem.contentSequence) {
+            if (subsubItem.valueType === ValueTypes.scoord &&
+              subsubItem.relationshipType === RelationshipTypes.hasProperties &&
+              isEqualCode(
+                subsubItem.conceptNameCode, getReferencePointsCode())) {
+              annotation.labelPosition = new Point2D(
+                subsubItem.value.graphicData[0],
+                subsubItem.value.graphicData[1]
+              );
+            }
+          }
+        }
       }
       // color
       if (subItem.valueType === ValueTypes.text &&
@@ -294,6 +308,23 @@ export class AnnotationGroupFactory {
     shortLabel.relationshipType = RelationshipTypes.hasProperties;
     shortLabel.conceptNameCode = getShortLabelCode();
     shortLabel.value = annotation.textExpr;
+    // label position
+    if (typeof annotation.labelPosition !== 'undefined') {
+      const labelPosition = new DicomSRContent(ValueTypes.scoord);
+      labelPosition.relationshipType = RelationshipTypes.hasProperties;
+      labelPosition.conceptNameCode = getReferencePointsCode();
+      const labelPosScoord = new SpatialCoordinate();
+      labelPosScoord.graphicType = GraphicTypes.point;
+      const graphicData = [
+        annotation.labelPosition.getX().toString(),
+        annotation.labelPosition.getY().toString()
+      ];
+      labelPosScoord.graphicData = graphicData;
+      labelPosition.value = labelPosScoord;
+
+      // add position to label sequence
+      shortLabel.contentSequence = [labelPosition];
+    }
     itemContentSequence.push(shortLabel);
 
     // colour
