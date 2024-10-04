@@ -2824,6 +2824,24 @@ export declare class LayerGroup {
      */
     includes(id: string): boolean;
     /**
+     * Get a list of view layers according to an input callback function.
+     *
+     * @param {Function} callbackFn A function that takes
+     *   a view layer as input and returns a boolean.
+     * @returns {ViewLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getViewLayers(callbackFn: Function): ViewLayer[];
+    /**
+     * Get a list of draw layers according to an input callback function.
+     *
+     * @param {Function} callbackFn A function that takes
+     *   a draw layer as input and returns a boolean.
+     * @returns {DrawLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getDrawLayers(callbackFn: Function): DrawLayer[];
+    /**
      * Get the number of view layers handled by this class.
      *
      * @returns {number} The number of layers.
