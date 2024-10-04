@@ -148,7 +148,7 @@ export class Draw {
    *
    * @type {boolean}
    */
-  #autoShapeColour = true;
+  #autoShapeColour = false;
 
   /**
    * Event listeners.
