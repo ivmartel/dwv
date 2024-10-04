@@ -406,7 +406,7 @@ export class LayerGroup {
    * Get a list of view layers according to an input callback function.
    *
    * @param {Function} callbackFn A function that takes
-   *   a view layer as input and returns a boolean.
+   *   a ViewLayer as input and returns a boolean.
    * @returns {ViewLayer[]} The layers that
    *   satisfy the callbackFn.
    */
@@ -419,6 +419,26 @@ export class LayerGroup {
       }
     }
     return res;
+  }
+
+  /**
+   * Test if one of the view layers satisfies an input callbackFn.
+   *
+   * @param {Function} callbackFn A function that takes
+   *   a ViewLayer as input and returns a boolean.
+   * @returns {boolean} True if one of the ViewLayers
+   *   satisfies the callbackFn.
+   */
+  someViewLayer(callbackFn) {
+    let hasOne = false;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &&
+        callbackFn(layer)) {
+        hasOne = true;
+        break;
+      }
+    }
+    return hasOne;
   }
 
   /**
@@ -969,26 +989,6 @@ export class LayerGroup {
       this.#tooltipHtmlElement.remove();
       this.#tooltipHtmlElement = undefined;
     }
-  }
-
-
-  /**
-   * Test if one of the view layers satisfies an input callbackFn.
-   *
-   * @param {Function} callbackFn A function that takes a ViewLayer as input
-   *   and returns a boolean.
-   * @returns {boolean} True if one of the ViewLayers satisfies the callbackFn.
-   */
-  someViewLayer(callbackFn) {
-    let hasOne = false;
-    for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer &&
-        callbackFn(layer)) {
-        hasOne = true;
-        break;
-      }
-    }
-    return hasOne;
   }
 
   /**
