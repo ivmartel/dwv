@@ -38,6 +38,14 @@ export class AnnotationGroup {
   #editable;
 
   /**
+   * Group colour as hex string. If defined, it will be used as
+   *   default colour for new annotations in draw tool.
+   *
+   * @type {string|undefined}
+   */
+  #colour;
+
+  /**
    * @param {Annotation[]} [list] Optional list, will
    *   create new if not provided.
    */
@@ -88,6 +96,24 @@ export class AnnotationGroup {
       type: 'annotationgroupeditablechange',
       data: flag
     });
+  }
+
+  /**
+   * Get the group colour.
+   *
+   * @returns {string} The colour as hex string.
+   */
+  getColour() {
+    return this.#colour;
+  }
+
+  /**
+   * Set the group colour.
+   *
+   * @param {string} colour The colour as hex string.
+   */
+  setColour(colour) {
+    this.#colour = colour;
   }
 
   /**

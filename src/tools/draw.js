@@ -568,6 +568,7 @@ export class Draw {
     }
 
     const drawLayer = layerGroup.getActiveDrawLayer();
+    const drawController = drawLayer.getDrawController();
     const konvaLayer = drawLayer.getKonvaLayer();
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
@@ -589,7 +590,13 @@ export class Draw {
 
     // create tmp annotation
     const annotation = new Annotation();
-    annotation.colour = this.#style.getLineColour();
+    // use group colour if defined
+    const groupColour = drawController.getAnnotationGroup().getColour();
+    if (typeof groupColour !== 'undefined') {
+      annotation.colour = groupColour;
+    } else {
+      annotation.colour = this.#style.getLineColour();
+    }
     annotation.setViewController(viewController);
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, tmpPoints);
@@ -630,7 +637,13 @@ export class Draw {
 
     // create final annotation
     const annotation = new Annotation();
-    annotation.colour = this.#style.getLineColour();
+    // use group colour if defined
+    const groupColour = drawController.getAnnotationGroup().getColour();
+    if (typeof groupColour !== 'undefined') {
+      annotation.colour = groupColour;
+    } else {
+      annotation.colour = this.#style.getLineColour();
+    }
     annotation.id = guid();
     annotation.setViewController(viewController);
     // set annotation shape
