@@ -89,7 +89,7 @@ export class EllipseFactory {
     // konva shape
     group.add(this.#createShape(annotation, style));
     // konva label
-    group.add(this.#createLabel(annotation, style));
+    group.add(this.#labelFactory.create(annotation, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
       group.add(this.#getDebugShadow(annotation));
@@ -196,7 +196,7 @@ export class EllipseFactory {
     this.updateLabelContent(annotation, group, style);
     // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      this.updateLabelPosition(annotation, group, style);
+      this.#labelFactory.updatePosition(annotation, group);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -238,8 +238,6 @@ export class EllipseFactory {
 
     annotation.mathShape = new Ellipse(
       center, Math.abs(radiusX), Math.abs(radiusY));
-    // label position
-    // TODO...
     // quantification
     annotation.updateQuantification();
   }
@@ -265,17 +263,6 @@ export class EllipseFactory {
   }
 
   /**
-   * Update the shape label position.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Group} group The shape group.
-   * @param {Style} _style The application style.
-   */
-  updateLabelPosition(annotation, group, _style) {
-    this.#labelFactory.updatePosition(annotation, group);
-  }
-
-  /**
    * Update the shape label.
    *
    * @param {Annotation} annotation The associated annotation.
@@ -287,7 +274,7 @@ export class EllipseFactory {
   }
 
   /**
-   * Calculates the mathematical shape: an ellipse.
+   * Calculate the mathematical shape from a list of points.
    *
    * @param {Point2D[]} points The points that define the shape.
    * @returns {Ellipse} The mathematical shape.
@@ -350,17 +337,6 @@ export class EllipseFactory {
       center.getX() - ellipse.getA(),
       center.getY() + ellipse.getB()
     );
-  }
-
-  /**
-   * Creates the konva label.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Style} style The drawing style.
-   * @returns {Konva.Label} The Konva label.
-   */
-  #createLabel(annotation, style) {
-    return this.#labelFactory.create(annotation, style);
   }
 
   /**

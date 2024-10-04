@@ -94,7 +94,7 @@ export class RulerFactory {
       group.add(extra);
     }
     // konva label
-    group.add(this.#createLabel(annotation, style));
+    group.add(this.#labelFactory.create(annotation, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
       group.add(this.#getDebugShadow(annotation));
@@ -153,7 +153,7 @@ export class RulerFactory {
     this.updateLabelContent(annotation, group, style);
     // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      this.updateLabelPosition(annotation, group, style);
+      this.#labelFactory.updatePosition(annotation, group);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -199,8 +199,6 @@ export class RulerFactory {
       end.y() - kline.y()
     );
     annotation.mathShape = new Line(pointBegin, pointEnd);
-    // label position
-    // TODO...
     // quantification
     annotation.updateQuantification();
   }
@@ -230,17 +228,6 @@ export class RulerFactory {
   }
 
   /**
-   * Update the shape label position.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Group} group The shape group.
-   * @param {Style} _style The application style.
-   */
-  updateLabelPosition(annotation, group, _style) {
-    this.#labelFactory.updatePosition(annotation, group);
-  }
-
-  /**
    * Update the shape label.
    *
    * @param {Annotation} annotation The associated annotation.
@@ -252,7 +239,7 @@ export class RulerFactory {
   }
 
   /**
-   * Calculates the mathematical shape: a line.
+   * Calculate the mathematical shape from a list of points.
    *
    * @param {Point2D[]} points The points that define the shape.
    * @returns {Line} The mathematical shape.
@@ -372,17 +359,6 @@ export class RulerFactory {
       res = end;
     }
     return res;
-  }
-
-  /**
-   * Creates the konva label.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Style} style The drawing style.
-   * @returns {Konva.Label} The Konva label.
-   */
-  #createLabel(annotation, style) {
-    return this.#labelFactory.create(annotation, style);
   }
 
   /**

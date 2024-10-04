@@ -98,7 +98,7 @@ export class ProtractorFactory {
         group.add(extra);
       }
       // konva label
-      group.add(this.#createLabel(annotation, style));
+      group.add(this.#labelFactory.create(annotation, style));
       // konva shadow (if debug)
       if (DRAW_DEBUG) {
         group.add(this.#getDebugShadow(annotation));
@@ -161,7 +161,7 @@ export class ProtractorFactory {
     this.updateLabelContent(annotation, group, style);
     // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      this.updateLabelPosition(annotation, group, style);
+      this.#labelFactory.updatePosition(annotation, group);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -214,8 +214,6 @@ export class ProtractorFactory {
       end.y() - kline.y()
     );
     annotation.mathShape = new Protractor([pointBegin, pointMid, pointEnd]);
-    // label position
-    // TODO...
     // quantification
     annotation.updateQuantification();
   }
@@ -242,17 +240,6 @@ export class ProtractorFactory {
   }
 
   /**
-   * Update the shape label position.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Group} group The shape group.
-   * @param {Style} _style The application style.
-   */
-  updateLabelPosition(annotation, group, _style) {
-    this.#labelFactory.updatePosition(annotation, group);
-  }
-
-  /**
    * Update the shape label.
    *
    * @param {Annotation} annotation The associated annotation.
@@ -264,7 +251,7 @@ export class ProtractorFactory {
   }
 
   /**
-   * Calculates the mathematical shape: a path.
+   * Calculate the mathematical shape from a list of points.
    *
    * @param {Point2D[]} points The points that define the shape.
    * @returns {Protractor} The mathematical shape.
@@ -384,17 +371,6 @@ export class ProtractorFactory {
       midX,
       midY
     );
-  }
-
-  /**
-   * Creates the konva label.
-   *
-   * @param {Annotation} annotation The associated annotation.
-   * @param {Style} style The drawing style.
-   * @returns {Konva.Label} The Konva label.
-   */
-  #createLabel(annotation, style) {
-    return this.#labelFactory.create(annotation, style);
   }
 
   /**
