@@ -2827,11 +2827,20 @@ export declare class LayerGroup {
      * Get a list of view layers according to an input callback function.
      *
      * @param {Function} callbackFn A function that takes
-     *   a view layer as input and returns a boolean.
+     *   a ViewLayer as input and returns a boolean.
      * @returns {ViewLayer[]} The layers that
      *   satisfy the callbackFn.
      */
     getViewLayers(callbackFn: Function): ViewLayer[];
+    /**
+     * Test if one of the view layers satisfies an input callbackFn.
+     *
+     * @param {Function} callbackFn A function that takes
+     *   a ViewLayer as input and returns a boolean.
+     * @returns {boolean} True if one of the ViewLayers
+     *   satisfies the callbackFn.
+     */
+    someViewLayer(callbackFn: Function): boolean;
     /**
      * Get a list of draw layers according to an input callback function.
      *
@@ -2963,14 +2972,6 @@ export declare class LayerGroup {
      * Remove the tooltip html div.
      */
     removeTooltipDiv(): void;
-    /**
-     * Test if one of the view layers satisfies an input callbackFn.
-     *
-     * @param {Function} callbackFn A function that takes a ViewLayer as input
-     *   and returns a boolean.
-     * @returns {boolean} True if one of the ViewLayers satisfies the callbackFn.
-     */
-    someViewLayer(callbackFn: Function): boolean;
     /**
      * Can the input position be set on one of the view layers.
      *
