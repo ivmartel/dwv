@@ -45,7 +45,7 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
     const autoColourInput = document.createElement('input');
     autoColourInput.type = 'checkbox';
     autoColourInput.id = 'draw-auto-colour';
-    autoColourInput.checked = true;
+    autoColourInput.checked = false;
 
     const autoLabel = document.createElement('label');
     autoLabel.htmlFor = autoColourInput.id;
@@ -55,7 +55,6 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
     colourInput.type = 'color';
     colourInput.id = 'draw-colour-chooser';
     colourInput.value = '#ffff80';
-    colourInput.disabled = true;
 
     autoColourInput.onchange = function (event) {
       const element = event.target;
