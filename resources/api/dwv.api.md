@@ -943,26 +943,6 @@ export const toolList: {
     [x: string]: any;
 };
 
-// @public (undocumented)
-export namespace toolOptions {
-    // (undocumented)
-    export namespace draw {
-            { ArrowFactory };
-            { CircleFactory };
-            { EllipseFactory };
-            { ProtractorFactory };
-            { RectangleFactory };
-            { RoiFactory };
-            { RulerFactory };
-    }
-    // (undocumented)
-    export namespace filter {
-            { Threshold };
-            { Sobel };
-            { Sharpen };
-    }
-}
-
 // @public
 export class Vector3D {
     constructor(x: number, y: number, z: number);
