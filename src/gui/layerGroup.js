@@ -403,17 +403,37 @@ export class LayerGroup {
   }
 
   /**
-   * Get a list of layers according to an input callback function.
+   * Get a list of view layers according to an input callback function.
    *
    * @param {Function} callbackFn A function that takes
-   *   a layer as input and that returns true/false.
-   * @returns {(ViewLayer|DrawLayer)[]} The layers that
-   *   satisfied the callbackFn.
+   *   a view layer as input and returns a boolean.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
    */
-  getLayers(callbackFn) {
+  getViewLayers(callbackFn) {
     const res = [];
     for (const layer of this.#layers) {
-      if (callbackFn(layer)) {
+      if (layer instanceof ViewLayer &&
+        callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Get a list of draw layers according to an input callback function.
+   *
+   * @param {Function} callbackFn A function that takes
+   *   a draw layer as input and returns a boolean.
+   * @returns {DrawLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getDrawLayers(callbackFn) {
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof DrawLayer &&
+        callbackFn(layer)) {
         res.push(layer);
       }
     }
@@ -482,10 +502,9 @@ export class LayerGroup {
    */
   getViewLayersByDataId(dataId) {
     const callbackFn = function (layer) {
-      return layer instanceof ViewLayer &&
-        layer.getDataId() === dataId;
+      return layer.getDataId() === dataId;
     };
-    return this.getLayers(callbackFn);
+    return this.getViewLayers(callbackFn);
   }
 
   /**
@@ -545,10 +564,9 @@ export class LayerGroup {
    */
   getDrawLayersByDataId(dataId) {
     const callbackFn = function (layer) {
-      return layer instanceof DrawLayer &&
-        layer.getDataId() === dataId;
+      return layer.getDataId() === dataId;
     };
-    return this.getLayers(callbackFn);
+    return this.getDrawLayers(callbackFn);
   }
 
   /**
