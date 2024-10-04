@@ -3,6 +3,7 @@ import {Point2D} from '../math/point';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
 import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+import {LabelFactory} from './labelFactory';
 
 // external
 import Konva from 'konva';
@@ -17,6 +18,12 @@ import {Annotation} from '../image/annotation';
  * Rectangle factory.
  */
 export class RectangleFactory {
+
+  /**
+   * @type {LabelFactory}
+   */
+  #labelFactory = new LabelFactory(this.#getDefaultLabelPosition);
+
   /**
    * Get the name of the shape group.
    *
@@ -225,19 +232,7 @@ export class RectangleFactory {
    * @param {Style} _style The application style.
    */
   updateLabelPosition(annotation, group, _style) {
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
-    // update position
-    const labelPosition = this.#getLabelPosition(annotation);
-    klabel.position({
-      x: labelPosition.getX(),
-      y: labelPosition.getY()
-    });
+    this.#labelFactory.updatePosition(annotation, group);
   }
 
   /**
@@ -248,21 +243,7 @@ export class RectangleFactory {
    * @param {Style} _style The application style.
    */
   updateLabelContent(annotation, group, _style) {
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
-    // update text
-    const text = annotation.getText();
-    const ktext = klabel.getText();
-    ktext.setText(text);
-    // hide if visible and empty
-    if (klabel.visible()) {
-      klabel.visible(text.length !== 0);
-    }
+    this.#labelFactory.updateContent(annotation, group);
   }
 
   /**
@@ -321,20 +302,6 @@ export class RectangleFactory {
   }
 
   /**
-   * Get the annotation label position.
-   *
-   * @param {Annotation} annotation The annotation.
-   * @returns {Point2D} The position.
-   */
-  #getLabelPosition(annotation) {
-    let res = annotation.labelPosition;
-    if (typeof res === 'undefined') {
-      res = this.#getDefaultLabelPosition(annotation);
-    }
-    return res;
-  }
-
-  /**
    * Creates the konva label.
    *
    * @param {Annotation} annotation The associated annotation.
@@ -342,35 +309,7 @@ export class RectangleFactory {
    * @returns {Konva.Label} The Konva label.
    */
   #createLabel(annotation, style) {
-    // konva text
-    const ktext = new Konva.Text({
-      fontSize: style.getFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: annotation.colour,
-      padding: style.getTextPadding(),
-      shadowColor: style.getShadowLineColour(),
-      shadowOffset: style.getShadowOffset(),
-      name: 'text'
-    });
-    const labelText = annotation.getText();
-    ktext.setText(labelText);
-
-    // konva label
-    const labelPosition = this.#getLabelPosition(annotation);
-    const klabel = new Konva.Label({
-      x: labelPosition.getX(),
-      y: labelPosition.getY(),
-      scale: style.applyZoomScale(1),
-      visible: labelText.length !== 0,
-      name: 'label'
-    });
-    klabel.add(ktext);
-    klabel.add(new Konva.Tag({
-      fill: annotation.colour,
-      opacity: style.getTagOpacity()
-    }));
-
-    return klabel;
+    return this.#labelFactory.create(annotation, style);
   }
 
   /**
