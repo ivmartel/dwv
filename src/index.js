@@ -102,7 +102,8 @@ import {Orientation} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
 import {NumberRange} from './math/stats';
 // tools
-import {toolList, toolOptions} from './tools/index';
+import {toolList} from './tools/index';
+//import {toolList, toolOptions} from './tools/index';
 import {ScrollWheel} from './tools/scrollWheel';
 import {DrawShapeHandler} from './tools/drawShapeHandler';
 // utils
@@ -177,7 +178,7 @@ export {
   defaultPresets,
   i18n,
   toolList,
-  toolOptions,
+  //toolOptions,
   Orientation,
   BLACK,
   addTagsToDictionary,
