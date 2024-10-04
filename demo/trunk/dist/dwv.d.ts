@@ -4359,23 +4359,6 @@ export declare const toolList: {
     [x: string]: any;
 };
 
-export declare namespace toolOptions {
-    export namespace draw {
-            { ArrowFactory };
-            { CircleFactory };
-            { EllipseFactory };
-            { ProtractorFactory };
-            { RectangleFactory };
-            { RoiFactory };
-            { RulerFactory };
-    }
-    export namespace filter {
-            { Threshold };
-            { Sobel };
-            { Sharpen };
-    }
-}
-
 /**
  * Immutable 3D vector.
  */
