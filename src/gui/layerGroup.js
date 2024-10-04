@@ -403,6 +403,24 @@ export class LayerGroup {
   }
 
   /**
+   * Get a list of layers according to an input callback function.
+   *
+   * @param {Function} callbackFn A function that takes
+   *   a layer as input and that returns true/false.
+   * @returns {(ViewLayer|DrawLayer)[]} The layers that
+   *   satisfied the callbackFn.
+   */
+  getLayers(callbackFn) {
+    const res = [];
+    for (const layer of this.#layers) {
+      if (callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+    return res;
+  }
+
+  /**
    * Get the number of view layers handled by this class.
    *
    * @returns {number} The number of layers.
@@ -463,14 +481,11 @@ export class LayerGroup {
    * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataId(dataId) {
-    const res = [];
-    for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer &&
-        layer.getDataId() === dataId) {
-        res.push(layer);
-      }
-    }
-    return res;
+    const callbackFn = function (layer) {
+      return layer instanceof ViewLayer &&
+        layer.getDataId() === dataId;
+    };
+    return this.getLayers(callbackFn);
   }
 
   /**
@@ -529,14 +544,11 @@ export class LayerGroup {
    * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataId(dataId) {
-    const res = [];
-    for (const layer of this.#layers) {
-      if (layer instanceof DrawLayer &&
-        layer.getDataId() === dataId) {
-        res.push(layer);
-      }
-    }
-    return res;
+    const callbackFn = function (layer) {
+      return layer instanceof DrawLayer &&
+        layer.getDataId() === dataId;
+    };
+    return this.getLayers(callbackFn);
   }
 
   /**
