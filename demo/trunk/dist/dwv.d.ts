@@ -159,6 +159,18 @@ export declare class AnnotationGroup {
      */
     setEditable(flag: boolean): void;
     /**
+     * Get the group colour.
+     *
+     * @returns {string} The colour as hex string.
+     */
+    getColour(): string;
+    /**
+     * Set the group colour.
+     *
+     * @param {string} colour The colour as hex string.
+     */
+    setColour(colour: string): void;
+    /**
      * Add a new annotation.
      *
      * @param {Annotation} annotation The annotation to add.
