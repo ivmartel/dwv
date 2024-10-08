@@ -116,12 +116,6 @@ export declare class Annotation {
      * @returns {object} The factory.
      */
     getFactory(): object;
-    /**
-     * Get the string type of this annotation.
-     *
-     * @returns {string} The type.
-     */
-    getType(): string;
     #private;
 }
 
