@@ -600,12 +600,10 @@ export class App {
                 // find the option in the default tool list
                 let optionClass =
                   defaultToolOptions[toolNamespace][optionClassName];
-                console.log('optionClass0', optionClass);
                 // or use external one
                 if (typeof optionClass === 'undefined') {
                   optionClass = toolOptions[toolNamespace][optionClassName];
                 }
-                console.log('optionClass1', optionClass);
                 if (typeof optionClass !== 'undefined') {
                   appToolOptions[optionName] = optionClass;
                 } else {
