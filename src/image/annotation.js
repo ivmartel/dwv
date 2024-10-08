@@ -1,24 +1,11 @@
 import {logger} from '../utils/logger';
 import {getFlags, replaceFlags} from '../utils/string';
-import {CircleFactory} from '../tools/circle';
-import {Circle} from '../math/circle';
-import {EllipseFactory} from '../tools/ellipse';
-import {Ellipse} from '../math/ellipse';
-import {RectangleFactory} from '../tools/rectangle';
-import {Rectangle} from '../math/rectangle';
-import {RulerFactory} from '../tools/ruler';
-import {Line} from '../math/line';
-import {ArrowFactory} from '../tools/arrow';
-import {Point2D} from '../math/point';
 import {Point} from '../math/point';
-import {ProtractorFactory} from '../tools/protractor';
-import {Protractor} from '../math/protractor';
-import {RoiFactory} from '../tools/roi';
-import {ROI} from '../math/roi';
+import {defaultToolOptions, toolOptions} from '../tools/index';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point3D} from '../math/point';
+import {Point2D, Point3D} from '../math/point';
 import {ViewController} from '../app/viewController';
 /* eslint-enable no-unused-vars */
 
@@ -211,47 +198,29 @@ export class Annotation {
    */
   getFactory() {
     let fac;
-    if (this.mathShape instanceof Point2D) {
-      fac = new ArrowFactory();
-    } else if (this.mathShape instanceof Line) {
-      fac = new RulerFactory();
-    } else if (this.mathShape instanceof Protractor) {
-      fac = new ProtractorFactory();
-    } else if (this.mathShape instanceof ROI) {
-      fac = new RoiFactory();
-    } else if (this.mathShape instanceof Circle) {
-      fac = new CircleFactory();
-    } else if (this.mathShape instanceof Ellipse) {
-      fac = new EllipseFactory();
-    } else if (this.mathShape instanceof Rectangle) {
-      fac = new RectangleFactory();
+    // check in user provided factories
+    if (typeof toolOptions.draw !== 'undefined') {
+      for (const factoryName in toolOptions.draw) {
+        const factory = toolOptions.draw[factoryName];
+        if (factory.supports(this.mathShape)) {
+          fac = new factory();
+          break;
+        }
+      }
     }
-
+    // check in default factories
+    if (typeof fac === 'undefined') {
+      for (const factoryName in defaultToolOptions.draw) {
+        const factory = defaultToolOptions.draw[factoryName];
+        if (factory.supports(this.mathShape)) {
+          fac = new factory();
+          break;
+        }
+      }
+    }
+    if (typeof fac === 'undefined') {
+      logger.warn('No shape factory found for math shape');
+    }
     return fac;
-  }
-
-  /**
-   * Get the string type of this annotation.
-   *
-   * @returns {string} The type.
-   */
-  getType() {
-    let res;
-    if (this.mathShape instanceof Point2D) {
-      res = 'arrow';
-    } else if (this.mathShape instanceof Line) {
-      res = 'ruler';
-    } else if (this.mathShape instanceof Protractor) {
-      res = 'protractor';
-    } else if (this.mathShape instanceof ROI) {
-      res = 'roi';
-    } else if (this.mathShape instanceof Circle) {
-      res = 'circle';
-    } else if (this.mathShape instanceof Ellipse) {
-      res = 'ellipse';
-    } else if (this.mathShape instanceof Rectangle) {
-      res = 'rectangle';
-    }
-    return res;
   }
 }

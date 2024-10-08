@@ -20,9 +20,37 @@ import {Annotation} from '../image/annotation';
 export class CircleFactory {
 
   /**
+   * The name of the factory.
+   *
+   * @type {string}
+   */
+  #name = 'circle';
+
+  /**
+   * The associated label factory.
+   *
    * @type {LabelFactory}
    */
   #labelFactory = new LabelFactory(this.#getDefaultLabelPosition);
+
+  /**
+   * Does this factory support the input math shape.
+   *
+   * @param {object} mathShape The mathematical shape.
+   * @returns {boolean} True if supported.
+   */
+  static supports(mathShape) {
+    return mathShape instanceof Circle;
+  }
+
+  /**
+   * Get the name of the factory.
+   *
+   * @returns {string} The name.
+   */
+  getName() {
+    return this.#name;
+  }
 
   /**
    * Get the name of the shape group.
@@ -30,7 +58,7 @@ export class CircleFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return 'circle-group';
+    return this.#name + '-group';
   }
 
   /**
@@ -49,16 +77,6 @@ export class CircleFactory {
    */
   getTimeout() {
     return 0;
-  }
-
-  /**
-   * Is the input group a group of this factory?
-   *
-   * @param {Konva.Group} group The group to test.
-   * @returns {boolean} True if the group is from this fcatory.
-   */
-  isFactoryGroup(group) {
-    return this.getGroupName() === group.name();
   }
 
   /**

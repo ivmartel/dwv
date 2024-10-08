@@ -19,9 +19,37 @@ import {Annotation} from '../image/annotation';
 export class RoiFactory {
 
   /**
+   * The name of the factory.
+   *
+   * @type {string}
+   */
+  #name = 'roi';
+
+  /**
+   * The associated label factory.
+   *
    * @type {LabelFactory}
    */
   #labelFactory = new LabelFactory(this.#getDefaultLabelPosition);
+
+  /**
+   * Does this factory support the input math shape.
+   *
+   * @param {object} mathShape The mathematical shape.
+   * @returns {boolean} True if supported.
+   */
+  static supports(mathShape) {
+    return mathShape instanceof ROI;
+  }
+
+  /**
+   * Get the name of the factory.
+   *
+   * @returns {string} The name.
+   */
+  getName() {
+    return this.#name;
+  }
 
   /**
    * Get the name of the shape group.
@@ -29,7 +57,7 @@ export class RoiFactory {
    * @returns {string} The name.
    */
   getGroupName() {
-    return 'roi-group';
+    return this.#name + '-group';
   }
 
   /**
@@ -49,16 +77,6 @@ export class RoiFactory {
    */
   getTimeout() {
     return 100;
-  }
-
-  /**
-   * Is the input group a group of this factory?
-   *
-   * @param {Konva.Group} group The group to test.
-   * @returns {boolean} True if the group is from this fcatory.
-   */
-  isFactoryGroup(group) {
-    return this.getGroupName() === group.name();
   }
 
   /**
