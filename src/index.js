@@ -98,6 +98,11 @@ import {Vector3D} from './math/vector';
 import {Index} from './math/index';
 import {Scalar2D, Scalar3D} from './math/scalar';
 import {Matrix33} from './math/matrix';
+import {Circle} from './math/circle';
+import {Ellipse} from './math/ellipse';
+import {Protractor} from './math/protractor';
+import {Rectangle} from './math/rectangle';
+import {ROI} from './math/roi';
 import {Orientation} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
 import {NumberRange} from './math/stats';
@@ -162,6 +167,11 @@ export {
   Matrix33,
   Scalar2D,
   Scalar3D,
+  Circle,
+  Ellipse,
+  Protractor,
+  Rectangle,
+  ROI,
   MaskFactory,
   DicomCode,
   MaskSegment,
