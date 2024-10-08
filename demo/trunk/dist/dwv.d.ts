@@ -4391,6 +4391,18 @@ export declare const toolList: {
 };
 
 /**
+ * List of client provided tool options to be added to
+ * the default ones.
+ *
+ * @type {Object<string, Object<string, any>>}
+ */
+export declare const toolOptions: {
+    [x: string]: {
+        [x: string]: any;
+    };
+};
+
+/**
  * Immutable 3D vector.
  */
 export declare class Vector3D {
