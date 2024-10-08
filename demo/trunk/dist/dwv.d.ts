@@ -972,6 +972,79 @@ export declare class ChangeSegmentColourCommand {
 }
 
 /**
+ * Circle shape.
+ */
+export declare class Circle {
+    /**
+     * @param {Point2D} centre A Point2D representing the centre
+     *   of the circle.
+     * @param {number} radius The radius of the circle.
+     */
+    constructor(centre: Point2D, radius: number);
+    /**
+     * Get the centre (point) of the circle.
+     *
+     * @returns {Point2D} The center (point) of the circle.
+     */
+    getCenter(): Point2D;
+    /**
+     * Get the centroid of the circle.
+     *
+     * @returns {Point2D} The centroid point.
+     */
+    getCentroid(): Point2D;
+    /**
+     * Get the radius of the circle.
+     *
+     * @returns {number} The radius of the circle.
+     */
+    getRadius(): number;
+    /**
+     * Check for equality.
+     *
+     * @param {Circle} rhs The object to compare to.
+     * @returns {boolean} True if both objects are equal.
+     */
+    equals(rhs: Circle): boolean;
+    /**
+     * Get the surface of the circle.
+     *
+     * @returns {number} The surface of the circle.
+     */
+    getSurface(): number;
+    /**
+     * Get the surface of the circle according to a spacing.
+     *
+     * @param {Scalar2D} spacing2D The 2D spacing.
+     * @returns {number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
+     */
+    getWorldSurface(spacing2D: Scalar2D): number;
+    /**
+     * Get the rounded limits of the circle.
+     *
+     * See: {@link https://en.wikipedia.org/wiki/Circle#Equations}.
+     *
+     * Circle formula: `x*x + y*y = r*r`.
+     *
+     * Implies: `y = (+-) sqrt(r*r - x*x)`.
+     *
+     * @returns {number[][][]} The rounded limits:
+     *  list of [x, y] pairs (min, max).
+     */
+    getRound(): number[][][];
+    /**
+     * Quantify an circle according to view information.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     * @param {string[]} flags A list of stat values to calculate.
+     * @returns {object} A quantification object.
+     */
+    quantify(viewController: ViewController, flags: string[]): object;
+    #private;
+}
+
+/**
  * Colour map: red, green and blue components
  *   to associate with intensity values.
  */
@@ -1888,6 +1961,86 @@ export declare class DrawShapeHandler {
      * @param {Konva.Group} shapeGroup The shape group to set off.
      */
     removeShapeListeners(shapeGroup: Konva.Group): void;
+    #private;
+}
+
+/**
+ * Ellipse shape.
+ */
+export declare class Ellipse {
+    /**
+     * @param {Point2D} centre A Point2D representing the centre
+     *   of the ellipse.
+     * @param {number} a The radius of the ellipse on the horizontal axe.
+     * @param {number} b The radius of the ellipse on the vertical axe.
+     */
+    constructor(centre: Point2D, a: number, b: number);
+    /**
+     * Get the centre (point) of the ellipse.
+     *
+     * @returns {Point2D} The center (point) of the ellipse.
+     */
+    getCenter(): Point2D;
+    /**
+     * Get the centroid of the ellipse.
+     *
+     * @returns {Point2D} The centroid point.
+     */
+    getCentroid(): Point2D;
+    /**
+     * Get the radius of the ellipse on the horizontal axe.
+     *
+     * @returns {number} The radius of the ellipse on the horizontal axe.
+     */
+    getA(): number;
+    /**
+     * Get the radius of the ellipse on the vertical axe.
+     *
+     * @returns {number} The radius of the ellipse on the vertical axe.
+     */
+    getB(): number;
+    /**
+     * Check for equality.
+     *
+     * @param {Ellipse} rhs The object to compare to.
+     * @returns {boolean} True if both objects are equal.
+     */
+    equals(rhs: Ellipse): boolean;
+    /**
+     * Get the surface of the ellipse.
+     *
+     * @returns {number} The surface of the ellipse.
+     */
+    getSurface(): number;
+    /**
+     * Get the surface of the ellipse according to a spacing.
+     *
+     * @param {Scalar2D} spacing2D The 2D spacing.
+     * @returns {number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
+     */
+    getWorldSurface(spacing2D: Scalar2D): number;
+    /**
+     * Get the rounded limits of the ellipse.
+     *
+     * See: {@link https://en.wikipedia.org/wiki/Ellipse#Standard_equation}.
+     *
+     * Ellipse formula: `x*x / a*a + y*y / b*b = 1`.
+     *
+     * Implies: `y = (+-)(b/a) * sqrt(a*a - x*x)`.
+     *
+     * @returns {number[][][]} The rounded limits:
+     *  list of [x, y] pairs (min, max).
+     */
+    getRound(): number[][][];
+    /**
+     * Quantify an ellipse according to view information.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     * @param {string[]} flags A list of stat values to calculate.
+     * @returns {object} A quantification object.
+     */
+    quantify(viewController: ViewController, flags: string[]): object;
     #private;
 }
 
@@ -3866,6 +4019,137 @@ export declare class Point3D {
 export declare function precisionRound(number: number, precision: number): number;
 
 /**
+ * Protractor shape: 3 points from which to calculate an angle.
+ */
+export declare class Protractor {
+    /**
+     * @param {Point2D[]} points The list of Point2D that make
+     *   the protractor.
+     */
+    constructor(points: Point2D[]);
+    /**
+     * Get a point of the list.
+     *
+     * @param {number} index The index of the point
+     *   to get (beware, no size check).
+     * @returns {Point2D|undefined} The Point2D at the given index.
+     */
+    getPoint(index: number): Point2D | undefined;
+    /**
+     * Get the length of the path (should be 3).
+     *
+     * @returns {number} The length of the path.
+     */
+    getLength(): number;
+    /**
+     * Get the centroid of the protractor.
+     *
+     * @returns {Point2D} THe centroid point.
+     */
+    getCentroid(): Point2D;
+    /**
+     * Quantify a path according to view information.
+     *
+     * @param {ViewController} _viewController The associated view controller.
+     * @param {string[]} _flags A list of stat values to calculate.
+     * @returns {object} A quantification object.
+     */
+    quantify(_viewController: ViewController, _flags: string[]): object;
+    #private;
+}
+
+/**
+ * Rectangle shape.
+ */
+export declare class Rectangle {
+    /**
+     * @param {Point2D} begin A Point2D representing the beginning
+     *   of the rectangle.
+     * @param {Point2D} end A Point2D representing the end
+     *   of the rectangle.
+     */
+    constructor(begin: Point2D, end: Point2D);
+    /**
+     * Get the begin point of the rectangle.
+     *
+     * @returns {Point2D} The begin point of the rectangle.
+     */
+    getBegin(): Point2D;
+    /**
+     * Get the end point of the rectangle.
+     *
+     * @returns {Point2D} The end point of the rectangle.
+     */
+    getEnd(): Point2D;
+    /**
+     * Check for equality.
+     *
+     * @param {Rectangle} rhs The object to compare to.
+     * @returns {boolean} True if both objects are equal.
+     */
+    equals(rhs: Rectangle): boolean;
+    /**
+     * Get the surface of the rectangle.
+     *
+     * @returns {number} The surface of the rectangle.
+     */
+    getSurface(): number;
+    /**
+     * Get the surface of the rectangle according to a spacing.
+     *
+     * @param {Scalar2D} spacing2D The 2D spacing.
+     * @returns {number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
+     */
+    getWorldSurface(spacing2D: Scalar2D): number;
+    /**
+     * Get the real width of the rectangle.
+     *
+     * @returns {number} The real width of the rectangle.
+     */
+    getRealWidth(): number;
+    /**
+     * Get the real height of the rectangle.
+     *
+     * @returns {number} The real height of the rectangle.
+     */
+    getRealHeight(): number;
+    /**
+     * Get the width of the rectangle.
+     *
+     * @returns {number} The width of the rectangle.
+     */
+    getWidth(): number;
+    /**
+     * Get the height of the rectangle.
+     *
+     * @returns {number} The height of the rectangle.
+     */
+    getHeight(): number;
+    /**
+     * Get the rounded limits of the rectangle.
+     *
+     * @returns {object} The rounded limits as {min, max} (Point2D).
+     */
+    getRound(): object;
+    /**
+     * Get the centroid of the rectangle.
+     *
+     * @returns {Point2D} The centroid point.
+     */
+    getCentroid(): Point2D;
+    /**
+     * Quantify a rectangle according to view information.
+     *
+     * @param {ViewController} viewController The associated view controller.
+     * @param {string[]} flags A list of stat values to calculate.
+     * @returns {object} A quantification object.
+     */
+    quantify(viewController: ViewController, flags: string[]): object;
+    #private;
+}
+
+/**
  * Rescale Slope and Intercept.
  */
 export declare class RescaleSlopeAndIntercept {
@@ -3937,6 +4221,58 @@ export declare class RGB {
      * @type {number}
      */
     b: number;
+}
+
+/**
+ * Region Of Interest shape.
+ * Note: should be a closed path.
+ */
+export declare class ROI {
+    /**
+     * @param {Point2D[]} [points] Optional initial point list.
+     */
+    constructor(points?: Point2D[]);
+    /**
+     * Get a point of the list at a given index.
+     *
+     * @param {number} index The index of the point to get
+     *   (beware, no size check).
+     * @returns {Point2D|undefined} The Point2D at the given index.
+     */
+    getPoint(index: number): Point2D | undefined;
+    /**
+     * Get the point list.
+     *
+     * @returns {Point2D[]} The list.
+     */
+    getPoints(): Point2D[];
+    /**
+     * Get the length of the point list.
+     *
+     * @returns {number} The length of the point list.
+     */
+    getLength(): number;
+    /**
+     * Add a point to the ROI.
+     *
+     * @param {Point2D} point The Point2D to add.
+     */
+    addPoint(point: Point2D): void;
+    /**
+     * Add points to the ROI.
+     *
+     * @param {Point2D[]} rhs The array of POints2D to add.
+     */
+    addPoints(rhs: Point2D[]): void;
+    /**
+     * Get the centroid of the roi. Only valid for
+     * a non-self-intersecting closed polygon.
+     * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
+     *
+     * @returns {Point2D} The centroid point.
+     */
+    getCentroid(): Point2D;
+    #private;
 }
 
 /**
