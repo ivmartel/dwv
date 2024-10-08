@@ -21,7 +21,12 @@ import {ToolboxController} from './toolboxController';
 import {LoadController} from './loadController';
 import {DataController} from './dataController';
 import {OverlayData} from '../gui/overlayData';
-import {toolList, defaultToolList, toolOptions} from '../tools';
+import {
+  toolList,
+  defaultToolList,
+  toolOptions,
+  defaultToolOptions
+} from '../tools';
 import {binderList} from '../gui/stage';
 import {WindowLevel} from '../image/windowLevel';
 import {PlaneHelper} from '../image/planeHelper';
@@ -558,14 +563,14 @@ export class App {
       for (let t = 0; t < keys.length; ++t) {
         const toolName = keys[t];
         // find the tool in the default tool list
-        let toolConstructor = defaultToolList[toolName];
+        let toolClass = defaultToolList[toolName];
         // or use external one
-        if (typeof toolConstructor === 'undefined') {
-          toolConstructor = toolList[toolName];
+        if (typeof toolClass === 'undefined') {
+          toolClass = toolList[toolName];
         }
-        if (typeof toolConstructor !== 'undefined') {
+        if (typeof toolClass !== 'undefined') {
           // create tool instance
-          appToolList[toolName] = new toolConstructor(this);
+          appToolList[toolName] = new toolClass(this);
           // register listeners
           if (typeof appToolList[toolName].addEventListener !== 'undefined') {
             const names = appToolList[toolName].getEventNames();
@@ -592,10 +597,17 @@ export class App {
                 }
                 const toolNamespace = toolName.charAt(0).toLowerCase() +
                   toolName.slice(1);
-                if (typeof toolOptions[toolNamespace][optionClassName] !==
-                  'undefined') {
-                  appToolOptions[optionName] =
-                    toolOptions[toolNamespace][optionClassName];
+                // find the option in the default tool list
+                let optionClass =
+                  defaultToolOptions[toolNamespace][optionClassName];
+                console.log('optionClass0', optionClass);
+                // or use external one
+                if (typeof optionClass === 'undefined') {
+                  optionClass = toolOptions[toolNamespace][optionClassName];
+                }
+                console.log('optionClass1', optionClass);
+                if (typeof optionClass !== 'undefined') {
+                  appToolOptions[optionName] = optionClass;
                 } else {
                   logger.warn('Could not find option class for: ' +
                     optionName);

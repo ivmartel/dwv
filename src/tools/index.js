@@ -50,6 +50,19 @@ import {Filter, Threshold, Sobel, Sharpen} from './filter';
  */
 export const toolList = {};
 
+/**
+ * List of client provided tool options to be added to
+ * the default ones.
+ *
+ * @type {Object<string, Object<string, any>>}
+ */
+export const toolOptions = {};
+
+/**
+ * Default tool list.
+ *
+ * @type {Object<string, any>}
+ */
 export const defaultToolList = {
   WindowLevel,
   Scroll,
@@ -61,7 +74,12 @@ export const defaultToolList = {
   Livewire
 };
 
-export const toolOptions = {
+/**
+ * Default tool options.
+ *
+ * @type {Object<string, Object<string, any>>}
+ */
+export const defaultToolOptions = {
   draw: {
     ArrowFactory,
     CircleFactory,
