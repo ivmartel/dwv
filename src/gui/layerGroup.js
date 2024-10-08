@@ -405,12 +405,18 @@ export class LayerGroup {
   /**
    * Get a list of view layers according to an input callback function.
    *
-   * @param {Function} callbackFn A function that takes
-   *   a ViewLayer as input and returns a boolean.
+   * @param {Function|undefined} callbackFn A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
    * @returns {ViewLayer[]} The layers that
    *   satisfy the callbackFn.
    */
   getViewLayers(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
     const res = [];
     for (const layer of this.#layers) {
       if (layer instanceof ViewLayer &&
@@ -444,12 +450,18 @@ export class LayerGroup {
   /**
    * Get a list of draw layers according to an input callback function.
    *
-   * @param {Function} callbackFn A function that takes
-   *   a draw layer as input and returns a boolean.
+   * @param {Function|undefined} callbackFn A function that takes
+   *   a draw layer as input and returns a boolean. If undefined,
+   *   returns all draw layers.
    * @returns {DrawLayer[]} The layers that
    *   satisfy the callbackFn.
    */
   getDrawLayers(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
     const res = [];
     for (const layer of this.#layers) {
       if (layer instanceof DrawLayer &&
