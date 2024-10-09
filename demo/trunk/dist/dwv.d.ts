@@ -414,6 +414,16 @@ export declare class App {
      */
     getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
+     * Get a list of view layers according to an input callback function.
+     *
+     * @param {Function} [callbackFn] A function that takes
+     *   a ViewLayer as input and returns a boolean. If undefined,
+     *   returns all view layers.
+     * @returns {ViewLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getViewLayers(callbackFn?: Function): ViewLayer[];
+    /**
      * Get the draw layers associated to a data id.
      * The layer are available after the first loaded item.
      *
@@ -421,6 +431,16 @@ export declare class App {
      * @returns {DrawLayer[]} The layers.
      */
     getDrawLayersByDataId(dataId: string): DrawLayer[];
+    /**
+     * Get a list of draw layers according to an input callback function.
+     *
+     * @param {Function} [callbackFn] A function that takes
+     *   a DrawLayer as input and returns a boolean. If undefined,
+     *   returns all draw layers.
+     * @returns {DrawLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getDrawLayers(callbackFn?: Function): DrawLayer[];
     /**
      * Get a layer group by div id.
      * The layer is available after the first loaded item.
