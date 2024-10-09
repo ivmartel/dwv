@@ -79,9 +79,22 @@ export declare class Annotation {
      */
     planePoints: Point3D[] | undefined;
     /**
-     * Set the associated view controller.
+     * Initialise the annotation.
      *
      * @param {ViewController} viewController The associated view controller.
+     */
+    init(viewController: ViewController): void;
+    /**
+     * Check if an input view is compatible with the annotation.
+     *
+     * @param {PlaneHelper} planeHelper The input view to check.
+     * @returns {boolean} True if compatible view.
+     */
+    isCompatibleView(planeHelper: PlaneHelper): boolean;
+    /**
+     * Set the associated view controller if it is compatible.
+     *
+     * @param {ViewController} viewController The view controller.
      */
     setViewController(viewController: ViewController): void;
     /**
@@ -3782,7 +3795,7 @@ export declare class PlaneHelper {
      * Get a list of points that define the plane at position k.
      *
      * @param {number} k The slice index value.
-     * @returns {Point3D[]} A couple of 3D points.
+     * @returns {Point3D[]} An origin and 2 cosines vectors.
      */
     getPlanePoints(k: number): Point3D[];
     /**
