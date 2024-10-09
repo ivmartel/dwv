@@ -266,7 +266,6 @@ export class Matrix33 {
       const sign = max.value > 0 ? 1 : -1;
       for (let i = 0; i < 3; ++i) {
         if (i === max.index) {
-          //res.push(1);
           res.push(1 * sign);
         } else {
           res.push(0);
