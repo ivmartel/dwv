@@ -140,7 +140,6 @@ export class AnnotationGroupFactory {
         subItem.relationshipType === RelationshipTypes.hasProperties &&
         isEqualCode(subItem.conceptNameCode, getShortLabelCode())) {
         annotation.textExpr = subItem.value;
-        console.log('sub', subItem.contentSequence);
         if (typeof subItem.contentSequence !== 'undefined') {
           for (const subsubItem of subItem.contentSequence) {
             if (subsubItem.valueType === ValueTypes.scoord &&
