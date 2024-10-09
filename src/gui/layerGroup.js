@@ -405,7 +405,7 @@ export class LayerGroup {
   /**
    * Get a list of view layers according to an input callback function.
    *
-   * @param {Function|undefined} callbackFn A function that takes
+   * @param {Function} [callbackFn] A function that takes
    *   a ViewLayer as input and returns a boolean. If undefined,
    *   returns all view layers.
    * @returns {ViewLayer[]} The layers that
@@ -450,8 +450,8 @@ export class LayerGroup {
   /**
    * Get a list of draw layers according to an input callback function.
    *
-   * @param {Function|undefined} callbackFn A function that takes
-   *   a draw layer as input and returns a boolean. If undefined,
+   * @param {Function} [callbackFn] A function that takes
+   *   a DrawLayer as input and returns a boolean. If undefined,
    *   returns all draw layers.
    * @returns {DrawLayer[]} The layers that
    *   satisfy the callbackFn.
