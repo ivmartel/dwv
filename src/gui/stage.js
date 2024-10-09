@@ -252,6 +252,23 @@ export class Stage {
   }
 
   /**
+   * Get a list of view layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayers(callbackFn) {
+    let res = [];
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      res = res.concat(this.#layerGroups[i].getViewLayers(callbackFn));
+    }
+    return res;
+  }
+
+  /**
    * Get the draw layers associated to a data id.
    *
    * @param {string} dataId The data id.
@@ -261,6 +278,23 @@ export class Stage {
     let res = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
       res = res.concat(this.#layerGroups[i].getDrawLayersByDataId(dataId));
+    }
+    return res;
+  }
+
+  /**
+   * Get a list of draw layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a DrawLayer as input and returns a boolean. If undefined,
+   *   returns all draw layers.
+   * @returns {DrawLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getDrawLayers(callbackFn) {
+    let res = [];
+    for (let i = 0; i < this.#layerGroups.length; ++i) {
+      res = res.concat(this.#layerGroups[i].getDrawLayers(callbackFn));
     }
     return res;
   }

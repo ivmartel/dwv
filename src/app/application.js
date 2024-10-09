@@ -435,6 +435,19 @@ export class App {
   }
 
   /**
+   * Get a list of view layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayers(callbackFn) {
+    return this.#stage.getViewLayers(callbackFn);
+  }
+
+  /**
    * Get the draw layers associated to a data id.
    * The layer are available after the first loaded item.
    *
@@ -443,6 +456,19 @@ export class App {
    */
   getDrawLayersByDataId(dataId) {
     return this.#stage.getDrawLayersByDataId(dataId);
+  }
+
+  /**
+   * Get a list of draw layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a DrawLayer as input and returns a boolean. If undefined,
+   *   returns all draw layers.
+   * @returns {DrawLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getDrawLayers(callbackFn) {
+    return this.#stage.getDrawLayers(callbackFn);
   }
 
   /**
