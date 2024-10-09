@@ -6,7 +6,8 @@ import {
   getMatrixFromName,
   getOrientationStringLPS,
   Orientation,
-  getOrientationFromCosines
+  getOrientationFromCosines,
+  getCosinesFromOrientation
 } from '../../src/math/orientation';
 
 /**
@@ -47,6 +48,33 @@ QUnit.test('orientation matrix factories', function (assert) {
   // test #04
   const m04 = getMatrixFromName('godo');
   assert.equal(m04, null, 'Matrix33 factory unknown name');
+});
+
+/**
+ * Tests for {@link Matrix33} getOrientationFromCosines.
+ *
+ * @function module:tests/math~getOrientationFromCosines
+ */
+QUnit.test('getOrientationFromCosines', function (assert) {
+  // axial
+  const m00 = getIdentityMat33();
+  const cos00 = [1, 0, 0, 0, 1, 0];
+  assert.ok(getOrientationFromCosines(cos00).equals(m00), 'ID matrix');
+  assert.deepEqual(getCosinesFromOrientation(m00), cos00, 'ID matrix cosines');
+
+  // coronal
+  const m10 = getMatrixFromName(Orientation.Coronal);
+  const cos10 = [1, 0, 0, 0, 0, -1];
+  assert.ok(getOrientationFromCosines(cos10).equals(m10), 'coronal matrix');
+  assert.deepEqual(getCosinesFromOrientation(m10), cos10,
+    'coronal matrix cosines');
+
+  // sagittal
+  const m20 = getMatrixFromName(Orientation.Sagittal);
+  const cos20 = [0, 1, 0, 0, 0, -1];
+  assert.ok(getOrientationFromCosines(cos20).equals(m20), 'sagittal matrix');
+  assert.deepEqual(getCosinesFromOrientation(m20), cos20,
+    'sagittal matrix cosines');
 });
 
 /**

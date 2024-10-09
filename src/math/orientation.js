@@ -170,7 +170,7 @@ export function getLPSGroup(code) {
 /**
  * Get the orientation matrix associated to the direction cosines.
  *
- * @param {number[]} cosines The direction cosines.
+ * @param {number[]} cosines The direction cosines (6 values).
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationFromCosines(cosines) {
@@ -188,4 +188,21 @@ export function getOrientationFromCosines(cosines) {
     /* eslint-enable @stylistic/js/array-element-newline */
   }
   return orientationMatrix;
+}
+
+/**
+ * Get the direction cosines from an orientation matrix.
+ *
+ * @param {Matrix33} matrix The input matrix.
+ * @returns {number[]} The direction cosines (6 values).
+ */
+export function getCosinesFromOrientation(matrix) {
+  return [
+    matrix.get(0, 0),
+    matrix.get(1, 0),
+    matrix.get(2, 0),
+    matrix.get(0, 1),
+    matrix.get(1, 1),
+    matrix.get(2, 1)
+  ];
 }
