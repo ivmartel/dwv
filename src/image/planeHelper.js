@@ -1,6 +1,7 @@
 import {Vector3D} from '../math/vector';
 import {Point3D, Point2D} from '../math/point';
 import {isIdentityMat33} from '../math/matrix';
+import {getCosinesFromOrientation} from '../math/orientation';
 import {getTargetOrientation} from '../gui/layerGroup';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
@@ -274,13 +275,14 @@ export class PlaneHelper {
    * Get a list of points that define the plane at position k.
    *
    * @param {number} k The slice index value.
-   * @returns {Point3D[]} A couple of 3D points.
+   * @returns {Point3D[]} An origin and 2 cosines vectors.
    */
   getPlanePoints(k) {
+    const cosines = getCosinesFromOrientation(this.#viewOrientation);
     return [
       this.getPositionFromPlanePoint(new Point2D(0, 0), k),
-      this.getPositionFromPlanePoint(new Point2D(0, 1), k),
-      this.getPositionFromPlanePoint(new Point2D(1, 0), k)
+      new Point3D(cosines[0], cosines[1], cosines[2]),
+      new Point3D(cosines[3], cosines[4], cosines[5])
     ];
   }
 

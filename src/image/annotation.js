@@ -7,6 +7,7 @@ import {defaultToolOptions, toolOptions} from '../tools/index';
 /* eslint-disable no-unused-vars */
 import {Point2D, Point3D} from '../math/point';
 import {ViewController} from '../app/viewController';
+import {PlaneHelper} from './planeHelper';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -93,30 +94,74 @@ export class Annotation {
   #viewController;
 
   /**
-   * Set the associated view controller.
+   * Initialise the annotation.
    *
    * @param {ViewController} viewController The associated view controller.
    */
-  setViewController(viewController) {
+  init(viewController) {
+    if (typeof this.referenceSopUID !== 'undefined') {
+      logger.debug('Cannot initialise annotation twice');
+      return;
+    }
+
     this.#viewController = viewController;
-    // set UID if empty
-    if (typeof this.referenceSopUID === 'undefined') {
-      this.referenceSopUID = viewController.getCurrentImageUid();
-    }
-    // set plane origin if empty
-    // (planeOrigin is not saved with file)
-    if (typeof this.planeOrigin === 'undefined') {
-      this.planeOrigin =
-        viewController.getOriginForImageUid(this.referenceSopUID);
-    }
-    // set plane points if not aquisition orientation and empty
+    // set UID
+    this.referenceSopUID = viewController.getCurrentImageUid();
+    // set plane origin (not saved with file)
+    this.planeOrigin =
+      viewController.getOriginForImageUid(this.referenceSopUID);
+    // set plane points if not aquisition orientation
     // (planePoints are saved with file if present)
-    if (!viewController.isAquisitionOrientation() &&
-      typeof this.planePoints === 'undefined') {
+    if (!viewController.isAquisitionOrientation()) {
       this.planePoints = viewController.getPlanePoints(
         viewController.getCurrentScrollIndexValue()
       );
     }
+  }
+
+  /**
+   * Check if an input view is compatible with the annotation.
+   *
+   * @param {PlaneHelper} planeHelper The input view to check.
+   * @returns {boolean} True if compatible view.
+   */
+  isCompatibleView(planeHelper) {
+    let res = false;
+
+    // TODO: add check for referenceSopUID
+
+    if (typeof this.planePoints === 'undefined') {
+      // non oriented view
+      if (planeHelper.isAquisitionOrientation()) {
+        res = true;
+      }
+    } else {
+      // oriented view: compare cosines (independent of slice index)
+      const inputPlanePoints = planeHelper.getPlanePoints(0);
+      if (inputPlanePoints[1].equals(this.planePoints[1]) &&
+        inputPlanePoints[2].equals(this.planePoints[2])) {
+        res = true;
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Set the associated view controller if it is compatible.
+   *
+   * @param {ViewController} viewController The view controller.
+   */
+  setViewController(viewController) {
+    // check if same view
+    if (!this.isCompatibleView(viewController.getPlaneHelper())) {
+      return;
+    }
+
+    this.#viewController = viewController;
+
+    // set plane origin (not saved with file)
+    this.planeOrigin =
+      viewController.getOriginForImageUid(this.referenceSopUID);
   }
 
   /**
@@ -126,7 +171,8 @@ export class Annotation {
    */
   getCentroid() {
     let res;
-    if (typeof this.mathShape.getCentroid !== 'undefined') {
+    if (typeof this.#viewController !== 'undefined' &&
+      typeof this.mathShape.getCentroid !== 'undefined') {
       // find the slice index of the annotation origin
       let origin = this.planeOrigin;
       if (typeof this.planePoints !== 'undefined') {
@@ -180,14 +226,11 @@ export class Annotation {
    * Update the annotation quantification.
    */
   updateQuantification() {
-    if (typeof this.#viewController !== 'undefined') {
-      if (typeof this.mathShape.quantify !== 'undefined') {
-        this.quantification = this.mathShape.quantify(
-          this.#viewController,
-          getFlags(this.textExpr));
-      }
-    } else {
-      logger.warn('Cannot update quantification without a view controller');
+    if (typeof this.#viewController !== 'undefined' &&
+      typeof this.mathShape.quantify !== 'undefined') {
+      this.quantification = this.mathShape.quantify(
+        this.#viewController,
+        getFlags(this.textExpr));
     }
   }
 

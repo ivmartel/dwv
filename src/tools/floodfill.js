@@ -258,7 +258,7 @@ export class Floodfill {
 
         const viewLayer = layerGroup.getActiveViewLayer();
         const viewController = viewLayer.getViewController();
-        this.#annotation.setViewController(viewController);
+        this.#annotation.init(viewController);
 
         this.#annotation.mathShape = newMathShape;
         command = new AddAnnotationCommand(

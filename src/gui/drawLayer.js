@@ -670,8 +670,8 @@ export class DrawLayer {
     // annotation planePoints are only present
     // for non aquisition plane
     if (typeof annotation.planePoints !== 'undefined') {
-      // use plane points without the plane origin
-      points = annotation.planePoints.slice(1);
+      // use plane points
+      points = annotation.planePoints;
     } else {
       // just use plane origin
       points = [annotation.planeOrigin];
@@ -736,6 +736,9 @@ export class DrawLayer {
    * @param {boolean} visible The position group visibility.
    */
   #addAnnotationDraw(annotation, visible) {
+    if (!annotation.isCompatibleView(this.#planeHelper)) {
+      return;
+    }
     const posGroupId = this.#getAnnotationPosGroupId(annotation);
     // Get or create position-group if it does not exist and
     // append it to konvaLayer
@@ -1055,8 +1058,8 @@ export class DrawLayer {
       // just use plane origin
       points = [planePoints[0]];
     } else {
-      // use plane points without the plane origin
-      points = planePoints.slice(1);
+      // use plane points
+      points = planePoints;
     }
     const posGroupId = this.#getPositionId(points);
 

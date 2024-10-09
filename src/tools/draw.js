@@ -597,7 +597,7 @@ export class Draw {
     } else {
       annotation.colour = this.#style.getLineColour();
     }
-    annotation.setViewController(viewController);
+    annotation.init(viewController);
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, tmpPoints);
     // create shape group
@@ -645,7 +645,7 @@ export class Draw {
       annotation.colour = this.#style.getLineColour();
     }
     annotation.id = guid();
-    annotation.setViewController(viewController);
+    annotation.init(viewController);
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
 
