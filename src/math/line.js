@@ -251,10 +251,10 @@ export function getPerpendicularLine(line, point, length) {
     // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
     const intercept = point.getY() - slope * point.getX();
 
-    // 1. (x - x0)^2 + (y - y0)^2 = d^2
-    // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
-    // ->  (x - x0)^2 + m^2 * (x - x0)^2 = d^2
-    // -> x = x0 +- d / sqrt(1+m^2)
+    // 1. [length] (x - x0)^2 + (y - y0)^2 = d^2
+    // 2. [slope] a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
+    // ->  (x - x0)^2 + a^2 * (x - x0)^2 = d^2
+    // -> x = x0 +- d / sqrt(1+a^2)
 
     // length is the distance between begin and end,
     // point is half way between both -> d = length / 2
