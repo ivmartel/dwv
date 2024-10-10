@@ -189,6 +189,8 @@ test.dataModelUI.Annotation = function (app) {
         for (const layer of drawLayers) {
           layer.setCurrentPosition(annotCentroid);
         }
+      } else {
+        console.log('No centroid for annotation');
       }
     };
 
