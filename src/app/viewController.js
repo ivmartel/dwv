@@ -203,6 +203,16 @@ export class ViewController {
   }
 
   /**
+   * Check if the image includes an UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {boolean} True if present.
+   */
+  includesImageUid(uid) {
+    return this.#view.includesImageUid(uid);
+  }
+
+  /**
    * Get the current oriented index.
    *
    * @returns {Index} The index.

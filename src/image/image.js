@@ -273,6 +273,16 @@ export class Image {
   }
 
   /**
+   * Check if the image includes an UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {boolean} True if present.
+   */
+  includesImageUid(uid) {
+    return this.#imageUids.includes(uid);
+  }
+
+  /**
    * Check if this image includes the input uids.
    *
    * @param {string[]} uids UIDs to test for presence.
