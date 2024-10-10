@@ -163,6 +163,13 @@ export class Draw {
   #lastIsMouseMovePoint = false;
 
   /**
+   * Callback store to allow attach/detach.
+   *
+   * @type {Array}
+   */
+  #callbackStore = [];
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
@@ -661,21 +668,50 @@ export class Draw {
   }
 
   /**
+   * Get a DrawLayer position callback.
+   *
+   * TODO: check need for store item removal.
+   *
+   * @param {DrawLayer} layer The layer to update.
+   * @returns {Function} The callback.
+   */
+  #getPositionCallback(layer) {
+    const layerId = layer.getId();
+    if (typeof this.#callbackStore[layerId] === 'undefined') {
+      this.#callbackStore[layerId] = () => {
+        layer.activateCurrentPositionShapes(true);
+      };
+    }
+    return this.#callbackStore[layerId];
+  }
+
+  /**
    * Activate the tool.
    *
    * @param {boolean} flag The flag to activate or not.
    */
   activate(flag) {
-    // check layer group
-    const layerGroup = this.#app.getActiveLayerGroup();
-    if (typeof layerGroup === 'undefined') {
-      throw new Error('No active layerGroup to activate draw on');
+    // force cursor if deactivate
+    if (!flag) {
+      this.#shapeHandler.onMouseOutShapeGroup();
     }
-    // activate draw layer if available
-    const drawLayer = layerGroup.getActiveDrawLayer();
-    if (typeof drawLayer !== 'undefined') {
-      drawLayer.setShapeHandler(this.#shapeHandler);
-      drawLayer.activateCurrentPositionShapes(flag);
+    // update draw layers
+    const drawLayers = this.#app.getDrawLayers();
+    for (const drawLayer of drawLayers) {
+      if (typeof drawLayer !== 'undefined') {
+        drawLayer.setShapeHandler(this.#shapeHandler);
+        drawLayer.activateCurrentPositionShapes(flag);
+        // update on position change
+        if (flag) {
+          this.#app.addEventListener('positionchange',
+            this.#getPositionCallback(drawLayer)
+          );
+        } else {
+          this.#app.removeEventListener('positionchange',
+            this.#getPositionCallback(drawLayer)
+          );
+        }
+      }
     }
   }
 
