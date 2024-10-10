@@ -736,6 +736,7 @@ export class DrawLayer {
    * @param {boolean} visible The position group visibility.
    */
   #addAnnotationDraw(annotation, visible) {
+    // check for compatible view
     if (!annotation.isCompatibleView(this.#planeHelper)) {
       return;
     }
