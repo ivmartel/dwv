@@ -2492,6 +2492,13 @@ declare class Image_2 {
      */
     getOriginForImageUid(uid: string): Point3D | undefined;
     /**
+     * Check if the image includes an UID.
+     *
+     * @param {string} uid The UID.
+     * @returns {boolean} True if present.
+     */
+    includesImageUid(uid: string): boolean;
+    /**
      * Check if this image includes the input uids.
      *
      * @param {string[]} uids UIDs to test for presence.
@@ -5072,6 +5079,13 @@ export declare class View {
      */
     getOriginForImageUid(uid: string): Point3D | undefined;
     /**
+     * Check if the image includes an UID.
+     *
+     * @param {string} uid The UID.
+     * @returns {boolean} True if present.
+     */
+    includesImageUid(uid: string): boolean;
+    /**
      * Check if the current position (default) or
      * the provided position is in bounds.
      *
@@ -5327,6 +5341,13 @@ export declare class ViewController {
      * @returns {Point3D|undefined} The origin.
      */
     getOriginForImageUid(uid: string): Point3D | undefined;
+    /**
+     * Check if the image includes an UID.
+     *
+     * @param {string} uid The UID.
+     * @returns {boolean} True if present.
+     */
+    includesImageUid(uid: string): boolean;
     /**
      * Get the current oriented index.
      *
