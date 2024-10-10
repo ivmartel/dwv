@@ -152,11 +152,14 @@ export class Annotation {
    * @param {ViewController} viewController The view controller.
    */
   setViewController(viewController) {
+    // check uid
+    if (!viewController.includesImageUid(this.referenceSopUID)) {
+      return;
+    }
     // check if same view
     if (!this.isCompatibleView(viewController.getPlaneHelper())) {
       return;
     }
-
     this.#viewController = viewController;
 
     // set plane origin (not saved with file)
