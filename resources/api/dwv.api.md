@@ -17,8 +17,9 @@ export class Annotation {
     getCentroid(): Point | undefined;
     getFactory(): object;
     getText(): string;
-    getType(): string;
     id: string;
+    init(viewController: ViewController): void;
+    isCompatibleView(planeHelper: PlaneHelper): boolean;
     labelPosition: Point2D | undefined;
     mathShape: object;
     planeOrigin: Point3D | undefined;
@@ -40,6 +41,7 @@ export class AnnotationGroup {
     add(annotation: Annotation): void;
     addEventListener(type: string, callback: Function): void;
     find(id: string): Annotation | undefined;
+    getColour(): string;
     getLength(): number;
     getList(): Annotation[];
     getMeta(): {
@@ -50,6 +52,7 @@ export class AnnotationGroup {
     isEditable(): boolean;
     remove(id: string): void;
     removeEventListener(type: string, callback: Function): void;
+    setColour(colour: string): void;
     setEditable(flag: boolean): void;
     setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
@@ -101,6 +104,7 @@ export class App {
     getDataViewConfigs(): {
         [x: string]: ViewConfig[];
     };
+    getDrawLayers(callbackFn?: Function): DrawLayer[];
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(dataId: string): {
@@ -114,6 +118,7 @@ export class App {
     getToolboxController(): ToolboxController;
     getViewConfig(dataId: string, groupDivId: string, excludeStarConfig?: boolean): ViewConfig | undefined;
     getViewConfigs(dataId: string, excludeStarConfig?: boolean): ViewConfig[];
+    getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     init(opt: AppOptions): void;
     // @deprecated
@@ -197,6 +202,19 @@ export class ChangeSegmentColourCommand {
     onExecute(_event: object): void;
     onUndo(_event: object): void;
     undo(): void;
+}
+
+// @public
+export class Circle {
+    constructor(centre: Point2D, radius: number);
+    equals(rhs: Circle): boolean;
+    getCenter(): Point2D;
+    getCentroid(): Point2D;
+    getRadius(): number;
+    getRound(): number[][][];
+    getSurface(): number;
+    getWorldSurface(spacing2D: Scalar2D): number;
+    quantify(viewController: ViewController, flags: string[]): object;
 }
 
 // @public
@@ -411,6 +429,20 @@ export class DrawShapeHandler {
 }
 
 // @public
+export class Ellipse {
+    constructor(centre: Point2D, a: number, b: number);
+    equals(rhs: Ellipse): boolean;
+    getA(): number;
+    getB(): number;
+    getCenter(): Point2D;
+    getCentroid(): Point2D;
+    getRound(): number[][][];
+    getSurface(): number;
+    getWorldSurface(spacing2D: Scalar2D): number;
+    quantify(viewController: ViewController, flags: string[]): object;
+}
+
+// @public
 export class Geometry {
     constructor(origin: Point3D, size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     appendFrame(origin: Point3D, time: number): void;
@@ -540,6 +572,7 @@ class Image_2 {
     getValueAtIndex(index: Index): number;
     getValueAtOffset(offset: number): number;
     hasValues(values: any[]): boolean[];
+    includesImageUid(uid: string): boolean;
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
     isMonochrome(): boolean;
@@ -598,6 +631,7 @@ export class LayerGroup {
     getBaseViewLayer(): ViewLayer | undefined;
     getDivId(): string;
     getDivToWorldSizeRatio(): number | undefined;
+    getDrawLayers(callbackFn?: Function): DrawLayer[];
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getMaxWorldSize(): Scalar2D | undefined;
     getNumberOfLayers(): number;
@@ -606,6 +640,7 @@ export class LayerGroup {
     getScale(): Scalar3D;
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
+    getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
@@ -827,6 +862,32 @@ export class Point3D {
 export function precisionRound(number: number, precision: number): number;
 
 // @public
+export class Protractor {
+    constructor(points: Point2D[]);
+    getCentroid(): Point2D;
+    getLength(): number;
+    getPoint(index: number): Point2D | undefined;
+    quantify(_viewController: ViewController, _flags: string[]): object;
+}
+
+// @public
+export class Rectangle {
+    constructor(begin: Point2D, end: Point2D);
+    equals(rhs: Rectangle): boolean;
+    getBegin(): Point2D;
+    getCentroid(): Point2D;
+    getEnd(): Point2D;
+    getHeight(): number;
+    getRealHeight(): number;
+    getRealWidth(): number;
+    getRound(): object;
+    getSurface(): number;
+    getWidth(): number;
+    getWorldSurface(spacing2D: Scalar2D): number;
+    quantify(viewController: ViewController, flags: string[]): object;
+}
+
+// @public
 export class RescaleSlopeAndIntercept {
     constructor(slope: number, intercept: number);
     apply(value: number): number;
@@ -842,6 +903,17 @@ export class RGB {
     b: number;
     g: number;
     r: number;
+}
+
+// @public
+export class ROI {
+    constructor(points?: Point2D[]);
+    addPoint(point: Point2D): void;
+    addPoints(rhs: Point2D[]): void;
+    getCentroid(): Point2D;
+    getLength(): number;
+    getPoint(index: number): Point2D | undefined;
+    getPoints(): Point2D[];
 }
 
 // @public
@@ -944,6 +1016,13 @@ export const toolList: {
 };
 
 // @public
+export const toolOptions: {
+    [x: string]: {
+        [x: string]: any;
+    };
+};
+
+// @public
 export class Vector3D {
     constructor(x: number, y: number, z: number);
     crossProduct(vector3D: Vector3D): Vector3D;
@@ -979,6 +1058,7 @@ export class View {
     getWindowLevelMinMax(): WindowLevel;
     getWindowPresets(): object;
     getWindowPresetsNames(): string[];
+    includesImageUid(uid: string): boolean;
     init(): void;
     isAquisitionOrientation(): boolean;
     isPositionInBounds(position?: Point): boolean;
@@ -1055,6 +1135,7 @@ export class ViewController {
     getScrollIndex(): number;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
+    includesImageUid(uid: string): boolean;
     incrementIndex(dim: number, silent?: boolean): boolean;
     incrementScrollIndex(silent?: boolean): boolean;
     initialise(): void;
