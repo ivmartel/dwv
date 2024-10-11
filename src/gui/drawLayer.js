@@ -1190,7 +1190,7 @@ export class DrawLayer {
    * @param {Scalar2D} scale The scale to compensate for as {x,y}.
    */
   #updateLabelScale(scale) {
-    // same formula as in style::applyZoomScale:
+    // same formula as in labelFactory::create
     // compensate for scale and times 2 so that font 10 looks like a 10
     const ratioX = 2 / scale.x;
     const ratioY = 2 / scale.y;

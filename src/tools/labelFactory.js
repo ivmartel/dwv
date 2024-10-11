@@ -62,12 +62,20 @@ export class LabelFactory {
     const labelText = annotation.getText();
     ktext.setText(labelText);
 
+    // times 2 so that the font size 10 looks like a 10...
+    // (same logic as in the DrawController::updateLabelScale)
+    const zoomScale = style.applyZoomScale(1);
+    const labelScale = {
+      x: 2 * zoomScale.x,
+      y: 2 * zoomScale.y
+    };
+
     // konva label
     const labelPosition = this.getPosition(annotation);
     const klabel = new Konva.Label({
       x: labelPosition.getX(),
       y: labelPosition.getY(),
-      scale: style.applyZoomScale(1),
+      scale: labelScale,
       visible: labelText.length !== 0,
       name: 'label'
     });

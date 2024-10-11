@@ -71,7 +71,7 @@ export const DRAW_DEBUG = false;
  * @returns {Konva.Ellipse} The default anchor shape.
  */
 export function getDefaultAnchor(x, y, id, style) {
-  const radius = style.applyZoomScale(3);
+  const radius = style.applyZoomScale(6);
   const absRadius = {
     x: Math.abs(radius.x),
     y: Math.abs(radius.y)
