@@ -256,7 +256,9 @@ export function getPerpendicularLine(line, point, length) {
     // ->  (x - x0)^2 + a^2 * (x - x0)^2 = d^2
     // -> x = x0 +- d / sqrt(1+a^2)
 
-    const dx = length / (Math.sqrt(1 + slope * slope));
+    // length is the distance between begin and end,
+    // point is half way between both -> d = length / 2
+    const dx = length / (2 * Math.sqrt(1 + slope * slope));
 
     // begin point
     beginX = point.getX() - dx;

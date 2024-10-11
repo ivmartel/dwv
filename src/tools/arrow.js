@@ -308,7 +308,7 @@ export class ArrowFactory {
     });
 
     // larger hitfunc
-    const tickLen = style.applyZoomScale(10).x;
+    const tickLen = style.applyZoomScale(20).x;
     const linePerp0 = getPerpendicularLine(line, point, tickLen);
     const linePerp1 = getPerpendicularLine(line, endPoint, tickLen);
     kshape.hitFunc(function (context) {

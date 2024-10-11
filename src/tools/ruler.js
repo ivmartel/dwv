@@ -300,7 +300,7 @@ export class RulerFactory {
     });
 
     // larger hitfunc
-    const tickLen = style.applyZoomScale(10).x;
+    const tickLen = style.applyZoomScale(20).x;
     const linePerp0 = getPerpendicularLine(line, line.getBegin(), tickLen);
     const linePerp1 = getPerpendicularLine(line, line.getEnd(), tickLen);
     kshape.hitFunc(function (context) {
@@ -326,7 +326,7 @@ export class RulerFactory {
   #createShapeExtras(annotation, style) {
     const line = annotation.mathShape;
 
-    const tickLen = style.applyZoomScale(10).x;
+    const tickLen = style.applyZoomScale(20).x;
 
     // tick begin
     const linePerp0 = getPerpendicularLine(line, line.getBegin(), tickLen);
@@ -451,7 +451,7 @@ export class RulerFactory {
     }
 
     // tick
-    const tickLen = style.applyZoomScale(10).x;
+    const tickLen = style.applyZoomScale(20).x;
     const linePerp0 = getPerpendicularLine(line, line.getBegin(), tickLen);
     ktick0.position({x: 0, y: 0});
     ktick0.points([linePerp0.getBegin().getX(),
