@@ -232,7 +232,7 @@ export function areOrthogonal(line0, line1) {
  * @param {Line} line The line to be perpendicular to.
  * @param {Point2D} point The middle point of the perpendicular line.
  * @param {number} length The length of the perpendicular line.
- * @returns {Line} A perpendicular line.
+ * @returns {Line} The perpendicular line.
  */
 export function getPerpendicularLine(line, point, length) {
   // begin point
@@ -256,9 +256,7 @@ export function getPerpendicularLine(line, point, length) {
     // ->  (x - x0)^2 + a^2 * (x - x0)^2 = d^2
     // -> x = x0 +- d / sqrt(1+a^2)
 
-    // length is the distance between begin and end,
-    // point is half way between both -> d = length / 2
-    const dx = length / (2 * Math.sqrt(1 + slope * slope));
+    const dx = length / (Math.sqrt(1 + slope * slope));
 
     // begin point
     beginX = point.getX() - dx;
