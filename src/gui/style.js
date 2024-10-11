@@ -194,6 +194,16 @@ export class Style {
   }
 
   /**
+   * Multiply an input value by the zoom ratio (zx/zy).
+   *
+   * @param {number} value The value to scale.
+   * @returns {number} The scaled value.
+   */
+  applyZoomRatio(value) {
+    return value * this.#zoomScale.x / this.#zoomScale.y;
+  }
+
+  /**
    * Get the shadow offset.
    *
    * @returns {Scalar2D} The offset as {x,y}.
