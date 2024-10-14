@@ -301,8 +301,10 @@ export class RulerFactory {
 
     // larger hitfunc
     const tickLen = style.applyZoomRatio(20);
-    const linePerp0 = getPerpendicularLine(line, line.getBegin(), tickLen);
-    const linePerp1 = getPerpendicularLine(line, line.getEnd(), tickLen);
+    const linePerp0 = getPerpendicularLine(
+      line, line.getBegin(), tickLen, style.getZoomScale());
+    const linePerp1 = getPerpendicularLine(
+      line, line.getEnd(), tickLen, style.getZoomScale());
     kshape.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -329,7 +331,8 @@ export class RulerFactory {
     const tickLen = style.applyZoomRatio(20);
 
     // tick begin
-    const linePerp0 = getPerpendicularLine(line, line.getBegin(), tickLen);
+    const linePerp0 = getPerpendicularLine(
+      line, line.getBegin(), tickLen, style.getZoomScale());
     const ktick0 = new Konva.Line({
       points: [
         linePerp0.getBegin().getX(),
@@ -344,7 +347,8 @@ export class RulerFactory {
     });
 
     // tick end
-    const linePerp1 = getPerpendicularLine(line, line.getEnd(), tickLen);
+    const linePerp1 = getPerpendicularLine(
+      line, line.getEnd(), tickLen, style.getZoomScale());
     const ktick1 = new Konva.Line({
       points: [
         linePerp1.getBegin().getX(),
@@ -452,13 +456,15 @@ export class RulerFactory {
 
     // tick
     const tickLen = style.applyZoomRatio(20);
-    const linePerp0 = getPerpendicularLine(line, line.getBegin(), tickLen);
+    const linePerp0 = getPerpendicularLine(
+      line, line.getBegin(), tickLen, style.getZoomScale());
     ktick0.position({x: 0, y: 0});
     ktick0.points([linePerp0.getBegin().getX(),
       linePerp0.getBegin().getY(),
       linePerp0.getEnd().getX(),
       linePerp0.getEnd().getY()]);
-    const linePerp1 = getPerpendicularLine(line, line.getEnd(), tickLen);
+    const linePerp1 = getPerpendicularLine(
+      line, line.getEnd(), tickLen, style.getZoomScale());
     ktick1.position({x: 0, y: 0});
     ktick1.points([linePerp1.getBegin().getX(),
       linePerp1.getBegin().getY(),

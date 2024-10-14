@@ -232,9 +232,13 @@ export function areOrthogonal(line0, line1) {
  * @param {Line} line The line to be perpendicular to.
  * @param {Point2D} point The middle point of the perpendicular line.
  * @param {number} length The length of the perpendicular line.
+ * @param {Scalar2D} [spacing] The image spacing.
  * @returns {Line} The perpendicular line.
  */
-export function getPerpendicularLine(line, point, length) {
+export function getPerpendicularLine(line, point, length, spacing) {
+  if (typeof spacing === 'undefined') {
+    spacing = {x: 1, y: 1};
+  }
   // begin point
   let beginX = 0;
   let beginY = 0;
@@ -246,14 +250,16 @@ export function getPerpendicularLine(line, point, length) {
   // 0 -> horizontal
   // Infinite -> vertical (a/Infinite = 0)
   if (line.getSlope() !== 0) {
-    // a0 * a1 = -1
-    const slope = -1 / line.getSlope();
+    // a0 * a1 = -1 (in square space)
+    const spacingRatio = spacing.x * spacing.x / (spacing.y * spacing.y);
+    const slope = -spacingRatio / line.getSlope();
     // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
     const intercept = point.getY() - slope * point.getX();
 
     // 1. [length] (x - x0)^2 + (y - y0)^2 = d^2
-    // 2. [slope] a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
+    // 2. [slope] a = (y - y0) / (x - x0) -> y - y0 = a*(x - x0)
     // ->  (x - x0)^2 + a^2 * (x - x0)^2 = d^2
+    // ->  (x - x0)^2 = d^2 / (1 + a^2)
     // -> x = x0 +- d / sqrt(1+a^2)
 
     // length is the distance between begin and end,

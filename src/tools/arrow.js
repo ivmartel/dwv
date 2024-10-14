@@ -309,8 +309,10 @@ export class ArrowFactory {
 
     // larger hitfunc
     const tickLen = style.applyZoomRatio(20);
-    const linePerp0 = getPerpendicularLine(line, point, tickLen);
-    const linePerp1 = getPerpendicularLine(line, endPoint, tickLen);
+    const linePerp0 = getPerpendicularLine(
+      line, point, tickLen, style.getZoomScale());
+    const linePerp1 = getPerpendicularLine(
+      line, endPoint, tickLen, style.getZoomScale());
     kshape.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -450,8 +452,10 @@ export class ArrowFactory {
 
     // larger hitfunc
     const tickLen = style.applyZoomRatio(20);
-    const linePerp0 = getPerpendicularLine(line, point, tickLen);
-    const linePerp1 = getPerpendicularLine(line, endPoint, tickLen);
+    const linePerp0 = getPerpendicularLine(
+      line, point, tickLen, style.getZoomScale());
+    const linePerp1 = getPerpendicularLine(
+      line, endPoint, tickLen, style.getZoomScale());
     kline.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
