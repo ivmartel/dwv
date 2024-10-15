@@ -143,6 +143,40 @@ function boundNodePosition(node, min, max) {
 }
 
 /**
+ * Get a shape top left position range.
+ *
+ * @param {Scalar2D} stageSize The stage size as {x,y}.
+ * @param {Konva.Shape} shape The shape to evaluate.
+ * @returns {object} The range as {min, max}.
+ */
+export function getShapePositionRange(stageSize, shape) {
+  const min = new Point2D(0, 0);
+  const max = new Point2D(
+    stageSize.x - Math.abs(shape.width()),
+    stageSize.y - Math.abs(shape.height())
+  );
+
+  return {min: min, max: max};
+}
+
+/**
+ * Is an input shape top left position in the input range.
+ *
+ * @param {Konva.Shape} shape The shape to evaluate.
+ * @param {Point2D} min The minimum top left position.
+ * @param {Point2D} max The maximum top left position.
+ * @returns {boolean} True if in range.
+ */
+export function isShapeInRange(shape, min, max) {
+  // use client rect to get the shape's top left position
+  const boundRect = shape.getClientRect({relativeTo: shape.getParent()});
+  return boundRect.x > min.getX() &&
+    boundRect.x < max.getX() &&
+    boundRect.y > min.getY() &&
+    boundRect.y < max.getY();
+}
+
+/**
  * Validate a group position.
  *
  * @param {Scalar2D} stageSize The stage size {x,y}.

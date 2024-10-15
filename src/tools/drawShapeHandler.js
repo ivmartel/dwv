@@ -9,7 +9,8 @@ import {
 import {
   isNodeNameShape,
   isNodeNameLabel,
-  validateGroupPosition
+  getShapePositionRange,
+  isShapeInRange
 } from './drawBounds';
 import {DrawShapeEditor} from './drawShapeEditor';
 import {DrawTrash} from './drawTrash';
@@ -301,6 +302,14 @@ export class DrawShapeHandler {
     });
     // drag move event handling
     shape.on('dragmove.draw', (event) => {
+      // if out of range, reset shape position and exit
+      const range = getShapePositionRange(drawLayer.getBaseSize(), shape);
+      if (range && !isShapeInRange(shape, range.min, range.max)) {
+        shape.x(previousPos.x);
+        shape.y(previousPos.y);
+        return;
+      }
+
       // move associated shapes (but not label)
       const diff = {
         x: event.target.x() - previousPos.x,
@@ -325,9 +334,6 @@ export class DrawShapeHandler {
         x: event.target.x(),
         y: event.target.y()
       };
-
-      // validate the group position
-      validateGroupPosition(drawLayer.getBaseSize(), shapeGroup);
 
       // get appropriate factory
       const factory = annotation.getFactory();
