@@ -95,27 +95,6 @@ export function getDefaultAnchor(x, y, id, style) {
 }
 
 /**
- * Get the minimum position in a groups' anchors.
- *
- * @param {Konva.Group} group The group that contains anchors.
- * @returns {Point2D|undefined} The minimum position.
- */
-function getAnchorMin(group) {
-  const anchors = group.find('.anchor');
-  if (anchors.length === 0) {
-    return undefined;
-  }
-  let minX = anchors[0].x();
-  let minY = anchors[0].y();
-  for (let i = 0; i < anchors.length; ++i) {
-    minX = Math.min(minX, anchors[i].x());
-    minY = Math.min(minY, anchors[i].y());
-  }
-
-  return new Point2D(minX, minY);
-}
-
-/**
  * Bound a node position.
  *
  * @param {Konva.Node} node The node to bound the position.
@@ -174,35 +153,6 @@ export function isShapeInRange(shape, min, max) {
     boundRect.x < max.getX() &&
     boundRect.y > min.getY() &&
     boundRect.y < max.getY();
-}
-
-/**
- * Validate a group position.
- *
- * @param {Scalar2D} stageSize The stage size {x,y}.
- * @param {Konva.Group} group The group to evaluate.
- * @returns {boolean} True if the position was corrected.
- */
-export function validateGroupPosition(stageSize, group) {
-  // if anchors get mixed, width/height can be negative
-  const shape = group.getChildren(isNodeNameShape)[0];
-  const anchorMin = getAnchorMin(group);
-  // handle no anchor: when dragging the label, the editor does
-  //   not activate
-  if (typeof anchorMin === 'undefined') {
-    return null;
-  }
-
-  const min = new Point2D(
-    -anchorMin.getX(),
-    -anchorMin.getY()
-  );
-  const max = new Point2D(
-    stageSize.x - (anchorMin.getX() + Math.abs(shape.width())),
-    stageSize.y - (anchorMin.getY() + Math.abs(shape.height()))
-  );
-
-  return boundNodePosition(group, min, max);
 }
 
 /**
