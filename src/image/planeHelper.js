@@ -1,8 +1,10 @@
 import {Vector3D} from '../math/vector';
 import {Point3D, Point2D} from '../math/point';
 import {isIdentityMat33} from '../math/matrix';
-import {getCosinesFromOrientation} from '../math/orientation';
-import {getTargetOrientation} from '../gui/layerGroup';
+import {
+  getCosinesFromOrientation,
+  getTargetOrientation
+} from '../math/orientation';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
 // doc imports

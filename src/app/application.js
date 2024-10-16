@@ -3,15 +3,13 @@ import {ViewFactory} from '../image/viewFactory';
 import {
   getMatrixFromName,
   getOrientationStringLPS,
-  Orientation
+  Orientation,
+  getViewOrientation
 } from '../math/orientation';
 import {Point3D} from '../math/point';
 import {Stage} from '../gui/stage';
 import {Style} from '../gui/style';
-import {
-  getViewOrientation,
-  getLayerDetailsFromLayerDivId
-} from '../gui/layerGroup';
+import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
 import {State} from '../io/state';
 import {logger} from '../utils/logger';

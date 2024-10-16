@@ -1,5 +1,3 @@
-import {getIdentityMat33} from '../math/matrix';
-import {getCoronalMat33} from '../math/orientation';
 import {Index} from '../math/index';
 import {Point} from '../math/point';
 import {Vector3D} from '../math/vector';
@@ -62,55 +60,6 @@ export function getLayerDetailsFromEvent(event) {
     res = getLayerDetailsFromLayerDivId(layerDiv.id);
   }
   return res;
-}
-
-/**
- * Get the view orientation according to an image and target orientation.
- * The view orientation is used to go from target to image space.
- *
- * @param {Matrix33} imageOrientation The image geometry.
- * @param {Matrix33} targetOrientation The target orientation.
- * @returns {Matrix33} The view orientation.
- */
-export function getViewOrientation(imageOrientation, targetOrientation) {
-  let viewOrientation = getIdentityMat33();
-  if (typeof targetOrientation !== 'undefined') {
-    // i: image, v: view, t: target, O: orientation, P: point
-    // [Img] -- Oi --> [Real] <-- Ot -- [Target]
-    // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
-    // -> Ov = (Oi)-1 * Ot
-    // TODO: asOneAndZeros simplifies but not nice...
-    viewOrientation =
-      imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
-  }
-  // TODO: why abs???
-  return viewOrientation.getAbs();
-}
-
-/**
- * Get the target orientation according to an image and view orientation.
- * The target orientation is used to go from target to real space.
- *
- * @param {Matrix33} imageOrientation The image geometry.
- * @param {Matrix33} viewOrientation The view orientation.
- * @returns {Matrix33} The target orientation.
- */
-export function getTargetOrientation(imageOrientation, viewOrientation) {
-  // i: image, v: view, t: target, O: orientation, P: point
-  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
-  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
-  // -> Ot = Oi * Ov
-  // note: asOneAndZeros as in getViewOrientation...
-  let targetOrientation =
-    imageOrientation.asOneAndZeros().multiply(viewOrientation);
-
-  // TODO: why abs???
-  const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
-  if (simpleImageOrientation.equals(getCoronalMat33().getAbs())) {
-    targetOrientation = targetOrientation.getAbs();
-  }
-
-  return targetOrientation;
 }
 
 /**
