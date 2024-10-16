@@ -288,7 +288,7 @@ export function getEqualPoint3DFunction(point) {
 /**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
- *  modify the index values.
+ *  modify the point values.
  */
 export class Point {
 
@@ -319,7 +319,7 @@ export class Point {
   }
 
   /**
-   * Get the index value at the given array index.
+   * Get the point value at the given array index.
    *
    * @param {number} i The index to get.
    * @returns {number} The value.
@@ -329,7 +329,7 @@ export class Point {
   }
 
   /**
-   * Get the length of the index.
+   * Get the length of the point.
    *
    * @returns {number} The length.
    */
@@ -338,16 +338,16 @@ export class Point {
   }
 
   /**
-   * Get a string representation of the Index.
+   * Get a string representation of the point.
    *
-   * @returns {string} The Index as a string.
+   * @returns {string} The point as a string.
    */
   toString() {
     return '(' + this.#values.toString() + ')';
   }
 
   /**
-   * Get the values of this index.
+   * Get the values of this point.
    *
    * @returns {number[]} The array of values.
    */
