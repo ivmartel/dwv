@@ -48,6 +48,15 @@ export class Point2D {
   }
 
   /**
+   * Get the values of this point.
+   *
+   * @returns {number[]} The array of values.
+   */
+  getValues() {
+    return [this.#x, this.#y];
+  }
+
+  /**
    * Get the centroid of the point, ie itself.
    *
    * @returns {Point2D} The centroid point.
@@ -156,6 +165,14 @@ export class Point3D {
     return this.#z;
   }
 
+  /**
+   * Get the values of this point.
+   *
+   * @returns {number[]} The array of values.
+   */
+  getValues() {
+    return [this.#x, this.#y, this.#z];
+  }
 
   /**
    * Check for Point3D equality.
