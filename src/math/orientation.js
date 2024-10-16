@@ -152,7 +152,7 @@ function getVectorStringLPS(vector) {
  * @param {string} code The LPS code string.
  * @returns {string|undefined} The group.
  */
-export function getLPSGroup(code) {
+function getLPSGroup(code) {
   let orientStr;
   const axialCodes = ['LPS', 'LAI', 'RPI', 'RAS'];
   const coronalCodes = ['LSA', 'LIP', 'RSP', 'RIA'];
@@ -165,6 +165,23 @@ export function getLPSGroup(code) {
     orientStr = Orientation.Sagittal;
   }
   return orientStr;
+}
+
+/**
+ * Get the name of an image orientation patient.
+ *
+ * @param {number[]} orientation The image orientation patient.
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
+ */
+export function getOrientationName(orientation) {
+  let name;
+  const orientMatrix = getOrientationFromCosines(orientation);
+  if (typeof orientMatrix !== 'undefined') {
+    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
+    name = getLPSGroup(lpsStr);
+  }
+  return name;
 }
 
 /**

@@ -21,7 +21,6 @@ import {ToolboxController} from './app/toolboxController';
 import {
   getDwvVersion,
   getTypedArray,
-  getOrientationName,
   getReverseOrientation,
   hasDicomPrefix,
   DicomParser
@@ -103,7 +102,10 @@ import {Ellipse} from './math/ellipse';
 import {Protractor} from './math/protractor';
 import {Rectangle} from './math/rectangle';
 import {ROI} from './math/roi';
-import {Orientation} from './math/orientation';
+import {
+  Orientation,
+  getOrientationName
+} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
 import {NumberRange} from './math/stats';
 // tools

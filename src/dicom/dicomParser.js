@@ -15,11 +15,6 @@ import {
 import {DataElement} from './dataElement';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
-import {
-  getOrientationFromCosines,
-  getOrientationStringLPS,
-  getLPSGroup
-} from '../math/orientation';
 
 /**
  * List of DICOM data elements indexed via a 8 character string formed from
@@ -189,23 +184,6 @@ export function getReverseOrientation(ori) {
   }
   // return
   return rori;
-}
-
-/**
- * Get the name of an image orientation patient.
- *
- * @param {number[]} orientation The image orientation patient.
- * @returns {string|undefined} The orientation
- *   name: axial, coronal or sagittal.
- */
-export function getOrientationName(orientation) {
-  let name;
-  const orientMatrix = getOrientationFromCosines(orientation);
-  if (typeof orientMatrix !== 'undefined') {
-    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
-    name = getLPSGroup(lpsStr);
-  }
-  return name;
 }
 
 /**
