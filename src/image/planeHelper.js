@@ -72,6 +72,24 @@ export class PlaneHelper {
   }
 
   /**
+   * Get the view orientation.
+   *
+   * @returns {Matrix33} The orientation matrix.
+   */
+  getViewOrientation() {
+    return this.#viewOrientation;
+  }
+
+  /**
+   * Get the target orientation.
+   *
+   * @returns {Matrix33} The orientation matrix.
+   */
+  getTargetOrientation() {
+    return this.#targetOrientation;
+  }
+
+  /**
    * Get a 3D offset from a plane one.
    *
    * @param {Scalar2D} offset2D The plane offset as {x,y}.
@@ -280,7 +298,8 @@ export class PlaneHelper {
    * @returns {Point3D[]} An origin and 2 cosines vectors.
    */
   getPlanePoints(k) {
-    const cosines = getCosinesFromOrientation(this.#viewOrientation);
+    // use target orientation
+    const cosines = getCosinesFromOrientation(this.#targetOrientation);
     return [
       this.getPositionFromPlanePoint(new Point2D(0, 0), k),
       new Point3D(cosines[0], cosines[1], cosines[2]),
