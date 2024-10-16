@@ -154,9 +154,12 @@ function getVectorStringLPS(vector) {
  */
 function getLPSGroup(code) {
   let orientStr;
-  const axialCodes = ['LPS', 'LAI', 'RPI', 'RAS'];
-  const coronalCodes = ['LSA', 'LIP', 'RSP', 'RIA'];
-  const sagittalCodes = ['PSL', 'PIR', 'ASR', 'AIL'];
+  const axialCodes =
+    ['LPS', 'LAI', 'RPI', 'RAS', 'ALS', 'ARI', 'PLI', 'PRS'];
+  const coronalCodes =
+    ['LSA', 'LIP', 'RSP', 'RIA', 'ILA', 'IRP', 'SLP', 'SRA'];
+  const sagittalCodes =
+    ['PSL', 'PIR', 'ASR', 'AIL', 'IAR', 'IPL', 'SAL', 'SPR'];
   if (axialCodes.includes(code)) {
     orientStr = Orientation.Axial;
   } else if (coronalCodes.includes(code)) {
