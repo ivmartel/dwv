@@ -170,13 +170,14 @@ function getLPSGroup(code) {
 /**
  * Get the name of an image orientation patient.
  *
- * @param {number[]} orientation The image orientation patient.
+ * @param {number[]} cosines The image orientation
+ *   patient cosines (6 values).
  * @returns {string|undefined} The orientation
  *   name: axial, coronal or sagittal.
  */
-export function getOrientationName(orientation) {
+export function getOrientationName(cosines) {
   let name;
-  const orientMatrix = getOrientationFromCosines(orientation);
+  const orientMatrix = getOrientationFromCosines(cosines);
   if (typeof orientMatrix !== 'undefined') {
     const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
     name = getLPSGroup(lpsStr);
@@ -187,7 +188,8 @@ export function getOrientationName(orientation) {
 /**
  * Get the orientation matrix associated to the direction cosines.
  *
- * @param {number[]} cosines The direction cosines (6 values).
+ * @param {number[]} cosines The image orientation
+ *   patient cosines (6 values).
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationFromCosines(cosines) {
@@ -211,7 +213,8 @@ export function getOrientationFromCosines(cosines) {
  * Get the direction cosines from an orientation matrix.
  *
  * @param {Matrix33} matrix The input matrix.
- * @returns {number[]} The direction cosines (6 values).
+ * @returns {number[]} The image orientation
+ *   patient cosines (6 values).
  */
 export function getCosinesFromOrientation(matrix) {
   return [
