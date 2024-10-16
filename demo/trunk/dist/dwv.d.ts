@@ -3941,6 +3941,12 @@ export declare class Point2D {
      */
     getY(): number;
     /**
+     * Get the values of this point.
+     *
+     * @returns {number[]} The array of values.
+     */
+    getValues(): number[];
+    /**
      * Get the centroid of the point, ie itself.
      *
      * @returns {Point2D} The centroid point.
@@ -3997,6 +4003,12 @@ export declare class Point3D {
      * @returns {number} The Z position of the point.
      */
     getZ(): number;
+    /**
+     * Get the values of this point.
+     *
+     * @returns {number[]} The array of values.
+     */
+    getValues(): number[];
     /**
      * Check for Point3D equality.
      *
