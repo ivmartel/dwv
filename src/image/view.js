@@ -594,7 +594,7 @@ export class View {
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {boolean} silent Flag to fire event or not.
+   * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
    * @fires View#positionchange
    */

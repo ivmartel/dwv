@@ -1044,7 +1044,7 @@ export class DrawLayer {
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {Index} index The new index.
+   * @param {Index} [index] Optional coresponding index.
    * @returns {boolean} True if the position was updated.
    */
   setCurrentPosition(position, index) {
