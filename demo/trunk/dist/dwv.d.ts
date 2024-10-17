@@ -79,6 +79,13 @@ export declare class Annotation {
      */
     planePoints: Point3D[] | undefined;
     /**
+     * Get the orientation name for this annotation.
+     *
+     * @returns {string|undefined} The orientation name,
+     *   undefined if same as reference data.
+     */
+    getOrientationName(): string | undefined;
+    /**
      * Initialise the annotation.
      *
      * @param {ViewController} viewController The associated view controller.
@@ -3728,6 +3735,18 @@ export declare class PlaneHelper {
      * @param {Matrix33} viewOrientation The view orientation.
      */
     constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
+    /**
+     * Get the view orientation.
+     *
+     * @returns {Matrix33} The orientation matrix.
+     */
+    getViewOrientation(): Matrix33;
+    /**
+     * Get the target orientation.
+     *
+     * @returns {Matrix33} The orientation matrix.
+     */
+    getTargetOrientation(): Matrix33;
     /**
      * Get a 3D offset from a plane one.
      *
