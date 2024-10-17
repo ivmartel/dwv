@@ -16,6 +16,7 @@ export class Annotation {
     colour: string | undefined;
     getCentroid(): Point | undefined;
     getFactory(): object;
+    getOrientationName(): string | undefined;
     getText(): string;
     id: string;
     init(viewController: ViewController): void;
@@ -497,7 +498,7 @@ export function getLayerDetailsFromEvent(event: object): object;
 export function getMousePoint(event: object): Point2D;
 
 // @public
-export function getOrientationName(orientation: number[]): string | undefined;
+export function getOrientationName(cosines: number[]): string | undefined;
 
 // @public
 export function getPixelDataTag(): Tag;
@@ -812,8 +813,10 @@ export class PlaneHelper {
     getScrollIndex(): number;
     getTargetDeOrientedPoint3D(planePoint: Point3D): Point3D;
     getTargetDeOrientedVector3D(planeVector: Vector3D): Vector3D;
+    getTargetOrientation(): Matrix33;
     getTargetOrientedPositiveXYZ(values: Scalar3D): Scalar3D;
     getTargetOrientedVector3D(vector: Vector3D): Vector3D;
+    getViewOrientation(): Matrix33;
     isAquisitionOrientation(): boolean;
     worldToIndex(point: Point): Index;
 }
@@ -839,6 +842,7 @@ export class Point2D {
     equals(rhs: Point2D): boolean;
     getCentroid(): Point2D;
     getDistance(point2D: Point2D): number;
+    getValues(): number[];
     getX(): number;
     getY(): number;
     toString(): string;
@@ -850,6 +854,7 @@ export class Point3D {
     equals(rhs: Point3D): boolean;
     getClosest(pointList: Point3D[]): number;
     getDistance(point3D: Point3D): number;
+    getValues(): number[];
     getX(): number;
     getY(): number;
     getZ(): number;

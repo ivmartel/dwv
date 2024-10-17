@@ -79,6 +79,13 @@ export declare class Annotation {
      */
     planePoints: Point3D[] | undefined;
     /**
+     * Get the orientation name for this annotation.
+     *
+     * @returns {string|undefined} The orientation name,
+     *   undefined if same as reference data.
+     */
+    getOrientationName(): string | undefined;
+    /**
      * Initialise the annotation.
      *
      * @param {ViewController} viewController The associated view controller.
@@ -2336,11 +2343,12 @@ export declare function getMousePoint(event: object): Point2D;
 /**
  * Get the name of an image orientation patient.
  *
- * @param {number[]} orientation The image orientation patient.
+ * @param {number[]} cosines The image orientation
+ *   patient cosines (6 values).
  * @returns {string|undefined} The orientation
  *   name: axial, coronal or sagittal.
  */
-export declare function getOrientationName(orientation: number[]): string | undefined;
+export declare function getOrientationName(cosines: number[]): string | undefined;
 
 /**
  * Get the PixelData Tag.
@@ -3728,6 +3736,18 @@ export declare class PlaneHelper {
      */
     constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
     /**
+     * Get the view orientation.
+     *
+     * @returns {Matrix33} The orientation matrix.
+     */
+    getViewOrientation(): Matrix33;
+    /**
+     * Get the target orientation.
+     *
+     * @returns {Matrix33} The orientation matrix.
+     */
+    getTargetOrientation(): Matrix33;
+    /**
      * Get a 3D offset from a plane one.
      *
      * @param {Scalar2D} offset2D The plane offset as {x,y}.
@@ -3843,7 +3863,7 @@ export declare class PlaneHelper {
 /**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
- *  modify the index values.
+ *  modify the point values.
  */
 export declare class Point {
     /**
@@ -3851,26 +3871,26 @@ export declare class Point {
      */
     constructor(values: number[]);
     /**
-     * Get the index value at the given array index.
+     * Get the point value at the given array index.
      *
      * @param {number} i The index to get.
      * @returns {number} The value.
      */
     get(i: number): number;
     /**
-     * Get the length of the index.
+     * Get the length of the point.
      *
      * @returns {number} The length.
      */
     length(): number;
     /**
-     * Get a string representation of the Index.
+     * Get a string representation of the point.
      *
-     * @returns {string} The Index as a string.
+     * @returns {string} The point as a string.
      */
     toString(): string;
     /**
-     * Get the values of this index.
+     * Get the values of this point.
      *
      * @returns {number[]} The array of values.
      */
@@ -3941,6 +3961,12 @@ export declare class Point2D {
      */
     getY(): number;
     /**
+     * Get the values of this point.
+     *
+     * @returns {number[]} The array of values.
+     */
+    getValues(): number[];
+    /**
      * Get the centroid of the point, ie itself.
      *
      * @returns {Point2D} The centroid point.
@@ -3997,6 +4023,12 @@ export declare class Point3D {
      * @returns {number} The Z position of the point.
      */
     getZ(): number;
+    /**
+     * Get the values of this point.
+     *
+     * @returns {number[]} The array of values.
+     */
+    getValues(): number[];
     /**
      * Check for Point3D equality.
      *
