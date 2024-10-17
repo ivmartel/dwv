@@ -1,6 +1,7 @@
 import {logger} from '../utils/logger';
 import {getFlags, replaceFlags} from '../utils/string';
 import {Point} from '../math/point';
+import {getOrientationName} from '../math/orientation';
 import {defaultToolOptions, toolOptions} from '../tools/index';
 
 // doc imports
@@ -92,6 +93,23 @@ export class Annotation {
    * @type {ViewController|undefined}
    */
   #viewController;
+
+  /**
+   * Get the orientation name for this annotation.
+   *
+   * @returns {string|undefined} The orientation name,
+   *   undefined if same as reference data.
+   */
+  getOrientationName() {
+    let res;
+    if (typeof this.planePoints !== 'undefined') {
+      const cosines = this.planePoints[1].getValues().concat(
+        this.planePoints[2].getValues()
+      );
+      res = getOrientationName(cosines);
+    }
+    return res;
+  }
 
   /**
    * Initialise the annotation.
