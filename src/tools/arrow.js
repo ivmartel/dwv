@@ -308,7 +308,7 @@ export class ArrowFactory {
     });
 
     // larger hitfunc
-    const tickLen = style.applyZoomRatio(20);
+    const tickLen = 20;
     const linePerp0 = getPerpendicularLine(
       line, point, tickLen, style.getZoomScale());
     const linePerp1 = getPerpendicularLine(
@@ -451,7 +451,7 @@ export class ArrowFactory {
     ktriangle.rotation(-angle);
 
     // larger hitfunc
-    const tickLen = style.applyZoomRatio(20);
+    const tickLen = 20;
     const linePerp0 = getPerpendicularLine(
       line, point, tickLen, style.getZoomScale());
     const linePerp1 = getPerpendicularLine(

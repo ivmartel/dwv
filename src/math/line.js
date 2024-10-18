@@ -250,21 +250,24 @@ export function getPerpendicularLine(line, point, length, spacing) {
   // 0 -> horizontal
   // Infinite -> vertical (a/Infinite = 0)
   if (line.getSlope() !== 0) {
+    const sx2 = spacing.x * spacing.x;
+    const sy2 = spacing.y * spacing.y;
+
     // a0 * a1 = -1 (in square space)
-    const spacingRatio = spacing.x * spacing.x / (spacing.y * spacing.y);
-    const slope = -spacingRatio / line.getSlope();
+    const slope = -sx2 / (sy2 * line.getSlope());
+
     // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
     const intercept = point.getY() - slope * point.getX();
 
-    // 1. [length] (x - x0)^2 + (y - y0)^2 = d^2
+    // 1. [length] sx^2 * (x - x0)^2 + sy^2 * (y - y0)^2 = d^2
     // 2. [slope] a = (y - y0) / (x - x0) -> y - y0 = a*(x - x0)
-    // ->  (x - x0)^2 + a^2 * (x - x0)^2 = d^2
-    // ->  (x - x0)^2 = d^2 / (1 + a^2)
-    // -> x = x0 +- d / sqrt(1+a^2)
+    // ->  sx^2 * (x - x0)^2 + sy^2 * a^2 * (x - x0)^2 = d^2
+    // ->  (x - x0)^2 = d^2 / (sx^2 + sy^2 * a^2)
+    // -> x = x0 +- d / sqrt(sx^2 + sy^2 * a^2)
 
     // length is the distance between begin and end,
     // point is half way between both -> d = length / 2
-    const dx = length / (2 * Math.sqrt(1 + slope * slope));
+    const dx = length / (2 * Math.sqrt(sx2 + sy2 * slope * slope));
 
     // begin point
     beginX = point.getX() - dx;
@@ -276,10 +279,10 @@ export function getPerpendicularLine(line, point, length, spacing) {
     // horizontal input line -> perpendicular is vertical!
     // begin point
     beginX = point.getX();
-    beginY = point.getY() - length / 2;
+    beginY = point.getY() - length / (2 * spacing.y);
     // end point
     endX = point.getX();
-    endY = point.getY() + length / 2;
+    endY = point.getY() + length / (2 * spacing.y);
   }
   // perpendicalar line
   return new Line(

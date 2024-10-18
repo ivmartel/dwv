@@ -300,7 +300,7 @@ export class RulerFactory {
     });
 
     // larger hitfunc
-    const tickLen = style.applyZoomRatio(20);
+    const tickLen = 20;
     const linePerp0 = getPerpendicularLine(
       line, line.getBegin(), tickLen, style.getZoomScale());
     const linePerp1 = getPerpendicularLine(
@@ -328,7 +328,7 @@ export class RulerFactory {
   #createShapeExtras(annotation, style) {
     const line = annotation.mathShape;
 
-    const tickLen = style.applyZoomRatio(20);
+    const tickLen = 20;
 
     // tick begin
     const linePerp0 = getPerpendicularLine(
@@ -455,7 +455,7 @@ export class RulerFactory {
     }
 
     // tick
-    const tickLen = style.applyZoomRatio(20);
+    const tickLen = 20;
     const linePerp0 = getPerpendicularLine(
       line, line.getBegin(), tickLen, style.getZoomScale());
     ktick0.position({x: 0, y: 0});
