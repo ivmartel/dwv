@@ -256,10 +256,8 @@ class SynchPixelBufferDecoder {
       }
       // decompress pixel buffer into Int16 image
       // @ts-ignore
-      decoder = new JpxImage();
-      decoder.parse(pixelBuffer);
       // set the pixel buffer
-      decodedBuffer = decoder.tiles[0].items;
+      decodedBuffer = JpxImage.decode(pixelBuffer, false);
     } else if (this.#algoName === 'rle') {
       // decode DICOM buffer
       // @ts-ignore
