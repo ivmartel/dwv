@@ -253,35 +253,6 @@ export class DrawShapeEditor {
   }
 
   /**
-   * Get a simple clone of the input anchor.
-   *
-   * @param {Konva.Shape} anchor The anchor to clone.
-   * @returns {object} A clone of the input anchor.
-   */
-  // #getClone(anchor) {
-  //   // create closure to properties
-  //   const parent = anchor.getParent();
-  //   const id = anchor.id();
-  //   const x = anchor.x();
-  //   const y = anchor.y();
-  //   // create clone object
-  //   const clone = {};
-  //   clone.getParent = function () {
-  //     return parent;
-  //   };
-  //   clone.id = function () {
-  //     return id;
-  //   };
-  //   clone.x = function () {
-  //     return x;
-  //   };
-  //   clone.y = function () {
-  //     return y;
-  //   };
-  //   return clone;
-  // }
-
-  /**
    * Set the anchor on listeners.
    *
    * @param {Konva.Ellipse} anchor The anchor to set on.
