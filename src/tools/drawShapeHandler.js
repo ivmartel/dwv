@@ -251,20 +251,10 @@ export class DrawShapeHandler {
     this.#addShapeOverListeners(shapeGroup);
 
     // make shape draggable
-    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
-    if (!(shape instanceof Konva.Shape)) {
-      return;
-    }
-    shape.draggable(true);
-    this.#addShapeListeners(shape, annotation, drawLayer);
+    this.#addShapeListeners(shapeGroup, annotation, drawLayer);
 
     // make label draggable
-    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
-    if (!(label instanceof Konva.Label)) {
-      return;
-    }
-    label.draggable(true);
-    this.#addLabelListeners(label, annotation, drawLayer);
+    this.#addLabelListeners(shapeGroup, annotation, drawLayer);
 
     // double click handling: update annotation text
     shapeGroup.on('dblclick', () => {
@@ -295,17 +285,18 @@ export class DrawShapeHandler {
   /**
    * Add shape listeners.
    *
-   * @param {Konva.Shape} shape The shape to set on.
+   * @param {Konva.Group} shapeGroup The shape group to get the shape from.
    * @param {Annotation} annotation The associated annotation.
    * @param {DrawLayer} drawLayer The origin draw layer.
    */
-  #addShapeListeners(shape, annotation, drawLayer) {
+  #addShapeListeners(shapeGroup, annotation, drawLayer) {
     const konvaLayer = drawLayer.getKonvaLayer();
 
-    const shapeGroup = shape.getParent();
-    if (!(shapeGroup instanceof Konva.Group)) {
+    const shape = shapeGroup.getChildren(isNodeNameShape)[0];
+    if (!(shape instanceof Konva.Shape)) {
       return;
     }
+    shape.draggable(true);
 
     // cache vars
     let dragStartPos;
@@ -485,11 +476,17 @@ export class DrawShapeHandler {
   /**
    * Add label listeners.
    *
-   * @param {Konva.Label} label The label to set on.
+   * @param {Konva.Group} shapeGroup The shape group to get the label from.
    * @param {Annotation} annotation The associated annotation.
    * @param {DrawLayer} drawLayer The origin draw layer.
    */
-  #addLabelListeners(label, annotation, drawLayer) {
+  #addLabelListeners(shapeGroup, annotation, drawLayer) {
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
+    label.draggable(true);
+
     // cache vars
     let dragStartPos;
     let originalLabelPosition;
