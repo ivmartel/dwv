@@ -1990,11 +1990,11 @@ export declare class DrawShapeHandler {
     /**
      * Add shape group listeners.
      *
-     * @param {DrawLayer} drawLayer The origin draw layer.
      * @param {Konva.Group} shapeGroup The shape group to set on.
      * @param {Annotation} annotation The associated annotation.
+     * @param {DrawLayer} drawLayer The origin draw layer.
      */
-    addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
+    addShapeGroupListeners(shapeGroup: Konva.Group, annotation: Annotation, drawLayer: DrawLayer): void;
     /**
      * Remove shape group listeners.
      *
