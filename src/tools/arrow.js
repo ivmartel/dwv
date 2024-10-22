@@ -1,4 +1,8 @@
-import {Line, getPerpendicularLine, getAngle} from '../math/line';
+import {
+  Line,
+  getPerpendicularLine,
+  getPerpendicularLineAtDistance
+} from '../math/line';
 import {Point2D} from '../math/point';
 import {defaults} from '../app/defaults';
 import {logger} from '../utils/logger';
@@ -338,26 +342,29 @@ export class ArrowFactory {
     const endPoint = annotation.referencePoints[0];
     const line = new Line(point, endPoint);
 
-    const beginTy = new Point2D(
-      point.getX(),
-      point.getY() - 10);
-    const verticalLine = new Line(point, beginTy);
-    const angle = getAngle(line, verticalLine);
-    const angleRad = angle * Math.PI / 180;
-    const radius = Math.abs(style.applyZoomRatio(16));
-    const kpoly = new Konva.RegularPolygon({
-      x: point.getX() + radius * Math.sin(angleRad),
-      y: point.getY() + radius * Math.cos(angleRad),
-      sides: 3,
-      radius: radius,
-      rotation: -angle,
+    const tickLen = 20;
+    // perpendicular line at 2*tickLen
+    const perpLine = getPerpendicularLineAtDistance(
+      line, 2 * tickLen, tickLen, style.getZoomScale());
+
+    // triangle
+    const ktriangle = new Konva.Line({
+      points: [
+        line.getBegin().getX(),
+        line.getBegin().getY(),
+        perpLine.getBegin().getX(),
+        perpLine.getBegin().getY(),
+        perpLine.getEnd().getX(),
+        perpLine.getEnd().getY(),
+      ],
       fill: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
+      closed: true,
       name: 'shape-triangle'
     });
 
-    return [kpoly];
+    return [ktriangle];
   }
 
   /**
@@ -411,7 +418,7 @@ export class ArrowFactory {
     const ktriangle = group.getChildren(function (node) {
       return node.name() === 'shape-triangle';
     })[0];
-    if (!(ktriangle instanceof Konva.RegularPolygon)) {
+    if (!(ktriangle instanceof Konva.Line)) {
       return;
     }
     // find anchors
@@ -437,21 +444,22 @@ export class ArrowFactory {
       break;
     }
 
+    const tickLen = 20;
+
     // triangle
-    const beginTy = new Point2D(
+    const perpLine = getPerpendicularLineAtDistance(
+      line, 2 * tickLen, tickLen, style.getZoomScale());
+    ktriangle.position({x: 0, y: 0});
+    ktriangle.points([
       line.getBegin().getX(),
-      line.getBegin().getY() - 10);
-    const verticalLine = new Line(line.getBegin(), beginTy);
-    const angle = getAngle(line, verticalLine);
-    const angleRad = angle * Math.PI / 180;
-    ktriangle.x(
-      line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
-    ktriangle.y(
-      line.getBegin().getY() + ktriangle.radius() * Math.cos(angleRad));
-    ktriangle.rotation(-angle);
+      line.getBegin().getY(),
+      perpLine.getBegin().getX(),
+      perpLine.getBegin().getY(),
+      perpLine.getEnd().getX(),
+      perpLine.getEnd().getY(),
+    ]);
 
     // larger hitfunc
-    const tickLen = 20;
     const linePerp0 = getPerpendicularLine(
       line, point, tickLen, style.getZoomScale());
     const linePerp1 = getPerpendicularLine(
