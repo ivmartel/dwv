@@ -650,7 +650,7 @@ export class DrawLayer {
         shapeGroups.forEach((group) => {
           if (group instanceof Konva.Group) {
             const annotation = drawController.getAnnotation(group.id());
-            this.#shapeHandler.addShapeListeners(this, group, annotation);
+            this.#shapeHandler.addShapeGroupListeners(group, annotation, this);
           }
         });
       }
@@ -772,7 +772,7 @@ export class DrawLayer {
     if (visible &&
       typeof this.#shapeHandler !== 'undefined'
     ) {
-      this.#shapeHandler.addShapeListeners(this, shapeGroup, annotation);
+      this.#shapeHandler.addShapeGroupListeners(shapeGroup, annotation, this);
     }
     // set label visibility
     this.setLabelVisibility(shapeGroup);

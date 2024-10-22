@@ -242,15 +242,13 @@ export class DrawShapeHandler {
   /**
    * Add shape group listeners.
    *
-   * @param {DrawLayer} drawLayer The origin draw layer.
    * @param {Konva.Group} shapeGroup The shape group to set on.
    * @param {Annotation} annotation The associated annotation.
+   * @param {DrawLayer} drawLayer The origin draw layer.
    */
-  addShapeListeners(drawLayer, shapeGroup, annotation) {
+  addShapeGroupListeners(shapeGroup, annotation, drawLayer) {
     // shape mouse over
     this.#addShapeOverListeners(shapeGroup);
-
-    const konvaLayer = drawLayer.getKonvaLayer();
 
     // make shape draggable
     const shape = shapeGroup.getChildren(isNodeNameShape)[0];
@@ -258,6 +256,7 @@ export class DrawShapeHandler {
       return;
     }
     shape.draggable(true);
+    this.#addShapeListeners(shape, annotation, drawLayer);
 
     // make label draggable
     const label = shapeGroup.getChildren(isNodeNameLabel)[0];
@@ -265,14 +264,54 @@ export class DrawShapeHandler {
       return;
     }
     label.draggable(true);
+    this.#addLabelListeners(label, annotation, drawLayer);
+
+    // double click handling: update annotation text
+    shapeGroup.on('dblclick', () => {
+      // original text expr
+      const originalTextExpr = annotation.textExpr;
+
+      const onSaveCallback = (annotation) => {
+        // new text expr
+        const newTextExpr = annotation.textExpr;
+        // create annotation update command
+        const command = new UpdateAnnotationCommand(
+          annotation,
+          {textExpr: originalTextExpr},
+          {textExpr: newTextExpr},
+          drawLayer.getDrawController()
+        );
+        // add command to undo stack
+        this.#app.addToUndoStack(command);
+        // execute command
+        command.execute();
+      };
+
+      // call roi dialog
+      customUI.openRoiDialog(annotation, onSaveCallback);
+    });
+  }
+
+  /**
+   * Add shape listeners.
+   *
+   * @param {Konva.Shape} shape The shape to set on.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {DrawLayer} drawLayer The origin draw layer.
+   */
+  #addShapeListeners(shape, annotation, drawLayer) {
+    const konvaLayer = drawLayer.getKonvaLayer();
+
+    const shapeGroup = shape.getParent();
+    if (!(shapeGroup instanceof Konva.Group)) {
+      return;
+    }
 
     // cache vars
     let dragStartPos;
     let previousPos;
     let originalProps;
     let colour;
-
-    // shape listeners ------------------------------------------
 
     // drag start event handling
     shape.on('dragstart.draw', (event) => {
@@ -300,6 +339,7 @@ export class DrawShapeHandler {
       // draw
       konvaLayer.draw();
     });
+
     // drag move event handling
     shape.on('dragmove.draw', (event) => {
       // if out of range, reset shape position and exit
@@ -354,6 +394,7 @@ export class DrawShapeHandler {
       // draw
       konvaLayer.draw();
     });
+
     // drag end event handling
     shape.on('dragend.draw', (event) => {
       // remove trash
@@ -439,8 +480,18 @@ export class DrawShapeHandler {
         y: shape.y()
       };
     });
+  }
 
-    // label listeners ------------------------------------------
+  /**
+   * Add label listeners.
+   *
+   * @param {Konva.Label} label The label to set on.
+   * @param {Annotation} annotation The associated annotation.
+   * @param {DrawLayer} drawLayer The origin draw layer.
+   */
+  #addLabelListeners(label, annotation, drawLayer) {
+    // cache vars
+    let dragStartPos;
     let originalLabelPosition;
 
     // drag start event handling
@@ -453,6 +504,7 @@ export class DrawShapeHandler {
       // store original position
       originalLabelPosition = annotation.labelPosition;
     });
+
     // drag end event handling
     label.on('dragend.draw', (/*event*/) => {
       const translation = {
@@ -482,32 +534,7 @@ export class DrawShapeHandler {
         // update original position
         originalLabelPosition = newLabelPosition;
       }
-      dragStartPos = {x: shape.x(), y: shape.y()};
-    });
-
-    // double click handling: update label
-    shapeGroup.on('dblclick', () => {
-      // original text expr
-      const originalTextExpr = annotation.textExpr;
-
-      const onSaveCallback = (annotation) => {
-        // new text expr
-        const newTextExpr = annotation.textExpr;
-        // create annotation update command
-        const command = new UpdateAnnotationCommand(
-          annotation,
-          {textExpr: originalTextExpr},
-          {textExpr: newTextExpr},
-          drawLayer.getDrawController()
-        );
-        // add command to undo stack
-        this.#app.addToUndoStack(command);
-        // execute command
-        command.execute();
-      };
-
-      // call roi dialog
-      customUI.openRoiDialog(annotation, onSaveCallback);
+      dragStartPos = {x: label.x(), y: label.y()};
     });
   }
 
