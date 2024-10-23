@@ -1905,10 +1905,10 @@ export declare class DrawLayer {
      * Set the current position.
      *
      * @param {Point} position The new position.
-     * @param {Index} index The new index.
+     * @param {Index} [index] Optional coresponding index.
      * @returns {boolean} True if the position was updated.
      */
-    setCurrentPosition(position: Point, index: Index): boolean;
+    setCurrentPosition(position: Point, index?: Index): boolean;
     /**
      * Get the current position group.
      *
@@ -1990,11 +1990,11 @@ export declare class DrawShapeHandler {
     /**
      * Add shape group listeners.
      *
-     * @param {DrawLayer} drawLayer The origin draw layer.
      * @param {Konva.Group} shapeGroup The shape group to set on.
      * @param {Annotation} annotation The associated annotation.
+     * @param {DrawLayer} drawLayer The origin draw layer.
      */
-    addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
+    addShapeGroupListeners(shapeGroup: Konva.Group, annotation: Annotation, drawLayer: DrawLayer): void;
     /**
      * Remove shape group listeners.
      *
@@ -5136,11 +5136,11 @@ export declare class View {
      * Set the current position.
      *
      * @param {Point} position The new position.
-     * @param {boolean} silent Flag to fire event or not.
+     * @param {boolean} [silent] Flag to fire event or not.
      * @returns {boolean} False if not in bounds.
      * @fires View#positionchange
      */
-    setCurrentPosition(position: Point, silent: boolean): boolean;
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     /**
      * Set the current index.
      *

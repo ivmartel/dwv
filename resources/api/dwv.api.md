@@ -405,7 +405,7 @@ export class DrawLayer {
     setAnnotationGroup(annotationGroup: AnnotationGroup, dataId: string, exeCallback: object): void;
     setAnnotationVisibility(id: string, visible?: boolean): boolean;
     setBaseOffset(scrollOffset: Vector3D, planeOffset: Vector3D): boolean;
-    setCurrentPosition(position: Point, index: Index): boolean;
+    setCurrentPosition(position: Point, index?: Index): boolean;
     setLabelsVisibility(visible?: boolean): void;
     setLabelVisibility(shapeGroup: Konva.Group): void;
     setOffset(newOffset: Scalar3D): void;
@@ -419,7 +419,7 @@ export class DrawLayer {
 // @public
 export class DrawShapeHandler {
     constructor(app: App, eventCallback: Function);
-    addShapeListeners(drawLayer: DrawLayer, shapeGroup: Konva.Group, annotation: Annotation): void;
+    addShapeGroupListeners(shapeGroup: Konva.Group, annotation: Annotation, drawLayer: DrawLayer): void;
     disableAndResetEditor(): void;
     getEditorAnnotation(): Annotation | undefined;
     getEditorShapeGroup(): Konva.Group | undefined;
@@ -1071,7 +1071,7 @@ export class View {
     setAlphaFunction(func: (value: number[] | number, index: number) => number): void;
     setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
-    setCurrentPosition(position: Point, silent: boolean): boolean;
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     setImage(inImage: Image_2): void;
     setInitialIndex(): void;
     setOrientation(mat33: Matrix33): void;
