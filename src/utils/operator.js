@@ -147,6 +147,10 @@ export function mergeObjects(obj1, obj2, idKey, valueKey) {
           } else {
             value[valueKey] = subValue1;
           }
+          // undefined subValue1
+          if (typeof value[valueKey] === 'undefined') {
+            value[valueKey] = {};
+          }
           // add obj2 value
           value[valueKey][id2] = subValue2;
         } else {
