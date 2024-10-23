@@ -2014,6 +2014,9 @@ export class App {
     const refViewLayer = viewLayers[0];
     const refDataId = refViewLayer.getDataId();
 
+    // un-bind
+    this.#stage.unbindLayerGroups();
+
     // set annotation view controller (allows quantification)
     const refViewController = refViewLayer.getViewController();
     data.annotationGroup.setViewController(refViewController);
@@ -2082,6 +2085,12 @@ export class App {
       refViewController.getCurrentPosition(),
       refViewController.getCurrentIndex()
     );
+
+    // bind
+    this.#stage.bindLayerGroups();
+    if (this.#toolboxController) {
+      this.#toolboxController.bindLayerGroup(layerGroup, drawLayer);
+    }
 
     /**
      * Add draw layer event.
