@@ -686,6 +686,27 @@ export class Draw {
   }
 
   /**
+   * Activate a draw layer.
+   *
+   * @param {DrawLayer} drawLayer The layer to update.
+   * @param {boolean} flag The flag to activate or not.
+   */
+  #activateLayer(drawLayer, flag) {
+    drawLayer.setShapeHandler(this.#shapeHandler);
+    drawLayer.activateCurrentPositionShapes(flag);
+    // update on position change
+    if (flag) {
+      this.#app.addEventListener('positionchange',
+        this.#getPositionCallback(drawLayer)
+      );
+    } else {
+      this.#app.removeEventListener('positionchange',
+        this.#getPositionCallback(drawLayer)
+      );
+    }
+  }
+
+  /**
    * Activate the tool.
    *
    * @param {boolean} flag The flag to activate or not.
@@ -699,20 +720,20 @@ export class Draw {
     const drawLayers = this.#app.getDrawLayers();
     for (const drawLayer of drawLayers) {
       if (typeof drawLayer !== 'undefined') {
-        drawLayer.setShapeHandler(this.#shapeHandler);
-        drawLayer.activateCurrentPositionShapes(flag);
-        // update on position change
-        if (flag) {
-          this.#app.addEventListener('positionchange',
-            this.#getPositionCallback(drawLayer)
-          );
-        } else {
-          this.#app.removeEventListener('positionchange',
-            this.#getPositionCallback(drawLayer)
-          );
-        }
+        this.#activateLayer(drawLayer, flag);
       }
     }
+    // activate newly added layers
+    this.#app.addEventListener('drawlayeradd', (event) => {
+      const drawLayers = this.#app.getDrawLayers(function (item) {
+        return item.getId() === event.layerid;
+      });
+      // should be just one
+      if (drawLayers.length === 1) {
+        this.#activateLayer(drawLayers[0], flag);
+      }
+    });
+
   }
 
   /**
