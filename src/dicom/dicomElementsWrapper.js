@@ -661,7 +661,12 @@ function getDecayedDose(elements) {
     const totalDoseEl = radioInfoSq.value[0]['00181074'];
     warn = checkTag(totalDoseEl, totalDoseStr);
     if (warn.length === 0) {
-      totalDose = totalDoseEl.value[0];
+      const dose = parseFloat(totalDoseEl.value[0]);
+      if (!isNaN(dose)) {
+        totalDose = dose;
+      } else {
+        warning += ' TotalDose is not a number';
+      }
     } else {
       warning += warn;
     }
@@ -671,7 +676,12 @@ function getDecayedDose(elements) {
     const halfLifeEl = radioInfoSq.value[0]['00181075'];
     warn = checkTag(halfLifeEl, halfLifeStr);
     if (warn.length === 0) {
-      halfLife = parseFloat(halfLifeEl.value[0]);
+      const hl = parseFloat(halfLifeEl.value[0]);
+      if (!isNaN(hl)) {
+        halfLife = hl;
+      } else {
+        warning += ' HalfLife is not a number';
+      }
     } else {
       warning += warn;
     }
@@ -839,7 +849,12 @@ export function getSuvFactor(elements) {
   const patWeightEl = elements['00101030'];
   const warn = checkTag(patWeightEl, patientWeightStr);
   if (warn.length === 0) {
-    patWeight = patWeightEl.value[0];
+    const weight = parseFloat(patWeightEl.value[0]);
+    if (!isNaN(weight)) {
+      patWeight = weight;
+    } else {
+      warning += ' PatientWeight is not a number';
+    }
   } else {
     warning += warn;
   }
