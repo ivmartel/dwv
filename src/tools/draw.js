@@ -849,8 +849,6 @@ export class Draw {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
-    console.log(this.#listeners);
-    console.log(this.#listeners[event.type]);
     if (typeof this.#listeners[event.type] === 'undefined') {
       return;
     }
