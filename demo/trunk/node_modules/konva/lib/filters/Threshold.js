@@ -5,8 +5,8 @@ const Factory_1 = require("../Factory");
 const Node_1 = require("../Node");
 const Validators_1 = require("../Validators");
 const Threshold = function (imageData) {
-    var level = this.threshold() * 255, data = imageData.data, len = data.length, i;
-    for (i = 0; i < len; i += 1) {
+    const level = this.threshold() * 255, data = imageData.data, len = data.length;
+    for (let i = 0; i < len; i += 1) {
         data[i] = data[i] < level ? 0 : 255;
     }
 };

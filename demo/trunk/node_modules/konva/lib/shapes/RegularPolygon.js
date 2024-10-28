@@ -10,7 +10,7 @@ class RegularPolygon extends Shape_1.Shape {
         const points = this._getPoints();
         context.beginPath();
         context.moveTo(points[0].x, points[0].y);
-        for (var n = 1; n < points.length; n++) {
+        for (let n = 1; n < points.length; n++) {
             context.lineTo(points[n].x, points[n].y);
         }
         context.closePath();
@@ -20,7 +20,7 @@ class RegularPolygon extends Shape_1.Shape {
         const sides = this.attrs.sides;
         const radius = this.attrs.radius || 0;
         const points = [];
-        for (var n = 0; n < sides; n++) {
+        for (let n = 0; n < sides; n++) {
             points.push({
                 x: radius * Math.sin((n * 2 * Math.PI) / sides),
                 y: -1 * radius * Math.cos((n * 2 * Math.PI) / sides),
@@ -30,10 +30,10 @@ class RegularPolygon extends Shape_1.Shape {
     }
     getSelfRect() {
         const points = this._getPoints();
-        var minX = points[0].x;
-        var maxX = points[0].y;
-        var minY = points[0].x;
-        var maxY = points[0].y;
+        let minX = points[0].x;
+        let maxX = points[0].y;
+        let minY = points[0].x;
+        let maxY = points[0].y;
         points.forEach((point) => {
             minX = Math.min(minX, point.x);
             maxX = Math.max(maxX, point.x);

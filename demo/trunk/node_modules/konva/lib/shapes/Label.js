@@ -6,7 +6,7 @@ const Shape_1 = require("../Shape");
 const Group_1 = require("../Group");
 const Validators_1 = require("../Validators");
 const Global_1 = require("../Global");
-var ATTR_CHANGE_LIST = [
+const ATTR_CHANGE_LIST = [
     'fontFamily',
     'fontSize',
     'fontStyle',
@@ -34,8 +34,8 @@ class Label extends Group_1.Group {
         return this.find('Tag')[0];
     }
     _addListeners(text) {
-        var that = this, n;
-        var func = function () {
+        let that = this, n;
+        const func = function () {
             that._sync();
         };
         for (n = 0; n < attrChangeListLen; n++) {
@@ -49,7 +49,7 @@ class Label extends Group_1.Group {
         return this.getText().height();
     }
     _sync() {
-        var text = this.getText(), tag = this.getTag(), width, height, pointerDirection, pointerWidth, x, y, pointerHeight;
+        let text = this.getText(), tag = this.getTag(), width, height, pointerDirection, pointerWidth, x, y, pointerHeight;
         if (text && tag) {
             width = text.width();
             height = text.height();
@@ -94,7 +94,7 @@ Label.prototype.className = 'Label';
 (0, Global_1._registerNode)(Label);
 class Tag extends Shape_1.Shape {
     _sceneFunc(context) {
-        var width = this.width(), height = this.height(), pointerDirection = this.pointerDirection(), pointerWidth = this.pointerWidth(), pointerHeight = this.pointerHeight(), cornerRadius = this.cornerRadius();
+        const width = this.width(), height = this.height(), pointerDirection = this.pointerDirection(), pointerWidth = this.pointerWidth(), pointerHeight = this.pointerHeight(), cornerRadius = this.cornerRadius();
         let topLeft = 0;
         let topRight = 0;
         let bottomLeft = 0;
@@ -146,7 +146,7 @@ class Tag extends Shape_1.Shape {
         context.fillStrokeShape(this);
     }
     getSelfRect() {
-        var x = 0, y = 0, pointerWidth = this.pointerWidth(), pointerHeight = this.pointerHeight(), direction = this.pointerDirection(), width = this.width(), height = this.height();
+        let x = 0, y = 0, pointerWidth = this.pointerWidth(), pointerHeight = this.pointerHeight(), direction = this.pointerDirection(), width = this.width(), height = this.height();
         if (direction === UP) {
             y -= pointerHeight;
             height += pointerHeight;

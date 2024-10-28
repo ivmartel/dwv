@@ -2,14 +2,14 @@ import { Canvas } from './Canvas.js';
 import { Shape } from './Shape.js';
 import { IRect } from './types.js';
 import type { Node } from './Node.js';
-declare var CONTEXT_PROPERTIES: readonly ["fillStyle", "strokeStyle", "shadowColor", "shadowBlur", "shadowOffsetX", "shadowOffsetY", "letterSpacing", "lineCap", "lineDashOffset", "lineJoin", "lineWidth", "miterLimit", "direction", "font", "textAlign", "textBaseline", "globalAlpha", "globalCompositeOperation", "imageSmoothingEnabled"];
+declare const CONTEXT_PROPERTIES: readonly ["fillStyle", "strokeStyle", "shadowColor", "shadowBlur", "shadowOffsetX", "shadowOffsetY", "letterSpacing", "lineCap", "lineDashOffset", "lineJoin", "lineWidth", "miterLimit", "direction", "font", "textAlign", "textBaseline", "globalAlpha", "globalCompositeOperation", "imageSmoothingEnabled"];
 interface ExtendedCanvasRenderingContext2D extends CanvasRenderingContext2D {
     letterSpacing: string;
 }
 export declare class Context {
     canvas: Canvas;
     _context: CanvasRenderingContext2D;
-    traceArr: Array<String>;
+    traceArr: Array<string>;
     constructor(canvas: Canvas);
     fillShape(shape: Shape): void;
     _fill(shape: Shape): void;

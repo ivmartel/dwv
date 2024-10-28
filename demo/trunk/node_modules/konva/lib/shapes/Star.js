@@ -7,13 +7,13 @@ const Validators_1 = require("../Validators");
 const Global_1 = require("../Global");
 class Star extends Shape_1.Shape {
     _sceneFunc(context) {
-        var innerRadius = this.innerRadius(), outerRadius = this.outerRadius(), numPoints = this.numPoints();
+        const innerRadius = this.innerRadius(), outerRadius = this.outerRadius(), numPoints = this.numPoints();
         context.beginPath();
         context.moveTo(0, 0 - outerRadius);
-        for (var n = 1; n < numPoints * 2; n++) {
-            var radius = n % 2 === 0 ? outerRadius : innerRadius;
-            var x = radius * Math.sin((n * Math.PI) / numPoints);
-            var y = -1 * radius * Math.cos((n * Math.PI) / numPoints);
+        for (let n = 1; n < numPoints * 2; n++) {
+            const radius = n % 2 === 0 ? outerRadius : innerRadius;
+            const x = radius * Math.sin((n * Math.PI) / numPoints);
+            const y = -1 * radius * Math.cos((n * Math.PI) / numPoints);
             context.lineTo(x, y);
         }
         context.closePath();

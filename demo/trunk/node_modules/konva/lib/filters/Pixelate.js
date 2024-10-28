@@ -6,7 +6,7 @@ const Util_1 = require("../Util");
 const Node_1 = require("../Node");
 const Validators_1 = require("../Validators");
 const Pixelate = function (imageData) {
-    var pixelSize = Math.ceil(this.pixelSize()), width = imageData.width, height = imageData.height, x, y, i, red, green, blue, alpha, nBinsX = Math.ceil(width / pixelSize), nBinsY = Math.ceil(height / pixelSize), xBinStart, xBinEnd, yBinStart, yBinEnd, xBin, yBin, pixelsInBin, data = imageData.data;
+    let pixelSize = Math.ceil(this.pixelSize()), width = imageData.width, height = imageData.height, x, y, i, red, green, blue, alpha, nBinsX = Math.ceil(width / pixelSize), nBinsY = Math.ceil(height / pixelSize), xBinStart, xBinEnd, yBinStart, yBinEnd, xBin, yBin, pixelsInBin, data = imageData.data;
     if (pixelSize <= 0) {
         Util_1.Util.error('pixelSize value can not be <= 0');
         return;

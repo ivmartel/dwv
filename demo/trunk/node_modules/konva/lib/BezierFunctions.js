@@ -687,11 +687,10 @@ exports.cValues = [
 ];
 exports.binomialCoefficients = [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1]];
 const getCubicArcLength = (xs, ys, t) => {
-    let z;
     let sum;
     let correctedT;
     const n = 20;
-    z = t / 2;
+    const z = t / 2;
     sum = 0;
     for (let i = 0; i < n; i++) {
         correctedT = z * exports.tValues[n][i] + z;

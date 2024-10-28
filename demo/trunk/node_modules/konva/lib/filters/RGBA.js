@@ -5,9 +5,9 @@ const Factory_1 = require("../Factory");
 const Node_1 = require("../Node");
 const Validators_1 = require("../Validators");
 const RGBA = function (imageData) {
-    var data = imageData.data, nPixels = data.length, red = this.red(), green = this.green(), blue = this.blue(), alpha = this.alpha(), i, ia;
-    for (i = 0; i < nPixels; i += 4) {
-        ia = 1 - alpha;
+    const data = imageData.data, nPixels = data.length, red = this.red(), green = this.green(), blue = this.blue(), alpha = this.alpha();
+    for (let i = 0; i < nPixels; i += 4) {
+        const ia = 1 - alpha;
         data[i] = red * alpha + data[i] * ia;
         data[i + 1] = green * alpha + data[i + 1] * ia;
         data[i + 2] = blue * alpha + data[i + 2] * ia;

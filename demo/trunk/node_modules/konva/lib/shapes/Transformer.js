@@ -10,8 +10,8 @@ const Group_1 = require("../Group");
 const Global_1 = require("../Global");
 const Validators_1 = require("../Validators");
 const Global_2 = require("../Global");
-var EVENTS_NAME = 'tr-konva';
-var ATTR_CHANGE_LIST = [
+const EVENTS_NAME = 'tr-konva';
+const ATTR_CHANGE_LIST = [
     'resizeEnabledChange',
     'rotateAnchorOffsetChange',
     'rotateEnabledChange',
@@ -30,8 +30,8 @@ var ATTR_CHANGE_LIST = [
 ]
     .map((e) => e + `.${EVENTS_NAME}`)
     .join(' ');
-var NODES_RECT = 'nodesRect';
-var TRANSFORM_CHANGE_STR = [
+const NODES_RECT = 'nodesRect';
+const TRANSFORM_CHANGE_STR = [
     'widthChange',
     'heightChange',
     'scaleXChange',
@@ -44,7 +44,7 @@ var TRANSFORM_CHANGE_STR = [
     'transformsEnabledChange',
     'strokeWidthChange',
 ];
-var ANGLES = {
+const ANGLES = {
     'top-left': -45,
     'top-center': 0,
     'top-right': 45,
@@ -60,7 +60,7 @@ function getCursor(anchorName, rad, rotateCursor) {
         return rotateCursor;
     }
     rad += Util_1.Util.degToRad(ANGLES[anchorName] || 0);
-    var angle = ((Util_1.Util.radToDeg(rad) % 360) + 360) % 360;
+    const angle = ((Util_1.Util.radToDeg(rad) % 360) + 360) % 360;
     if (Util_1.Util._inRange(angle, 315 + 22.5, 360) || Util_1.Util._inRange(angle, 0, 22.5)) {
         return 'ns-resize';
     }
@@ -90,7 +90,7 @@ function getCursor(anchorName, rad, rotateCursor) {
         return 'pointer';
     }
 }
-var ANCHORS_NAMES = [
+const ANCHORS_NAMES = [
     'top-left',
     'top-center',
     'top-right',
@@ -100,7 +100,7 @@ var ANCHORS_NAMES = [
     'bottom-center',
     'bottom-right',
 ];
-var MAX_SAFE_INTEGER = 100000000;
+const MAX_SAFE_INTEGER = 100000000;
 function getCenter(shape) {
     return {
         x: shape.x +
@@ -207,7 +207,7 @@ class Transformer extends Group_1.Group {
             this._proxyDrag(node);
         });
         this._resetTransformCache();
-        var elementsCreated = !!this.findOne('.top-left');
+        const elementsCreated = !!this.findOne('.top-left');
         if (elementsCreated) {
             this.update();
         }
@@ -269,15 +269,15 @@ class Transformer extends Group_1.Group {
         return this._getCache(NODES_RECT, this.__getNodeRect);
     }
     __getNodeShape(node, rot = this.rotation(), relative) {
-        var rect = node.getClientRect({
+        const rect = node.getClientRect({
             skipTransform: true,
             skipShadow: true,
             skipStroke: this.ignoreStroke(),
         });
-        var absScale = node.getAbsoluteScale(relative);
-        var absPos = node.getAbsolutePosition(relative);
-        var dx = rect.x * absScale.x - node.offsetX() * absScale.x;
-        var dy = rect.y * absScale.y - node.offsetY() * absScale.y;
+        const absScale = node.getAbsoluteScale(relative);
+        const absPos = node.getAbsolutePosition(relative);
+        const dx = rect.x * absScale.x - node.offsetX() * absScale.x;
+        const dy = rect.y * absScale.y - node.offsetY() * absScale.y;
         const rotation = (Global_1.Konva.getAngle(node.getAbsoluteRotation()) + Math.PI * 2) %
             (Math.PI * 2);
         const box = {
@@ -293,7 +293,7 @@ class Transformer extends Group_1.Group {
         });
     }
     __getNodeRect() {
-        var node = this.getNode();
+        const node = this.getNode();
         if (!node) {
             return {
                 x: -MAX_SAFE_INTEGER,
@@ -310,23 +310,23 @@ class Transformer extends Group_1.Group {
                 skipShadow: true,
                 skipStroke: this.ignoreStroke(),
             });
-            var points = [
+            const points = [
                 { x: box.x, y: box.y },
                 { x: box.x + box.width, y: box.y },
                 { x: box.x + box.width, y: box.y + box.height },
                 { x: box.x, y: box.y + box.height },
             ];
-            var trans = node.getAbsoluteTransform();
+            const trans = node.getAbsoluteTransform();
             points.forEach(function (point) {
-                var transformed = trans.point(point);
+                const transformed = trans.point(point);
                 totalPoints.push(transformed);
             });
         });
         const tr = new Util_1.Transform();
         tr.rotate(-Global_1.Konva.getAngle(this.rotation()));
-        var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         totalPoints.forEach(function (point) {
-            var transformed = tr.point(point);
+            const transformed = tr.point(point);
             if (minX === undefined) {
                 minX = maxX = transformed.x;
                 minY = maxY = transformed.y;
@@ -366,7 +366,7 @@ class Transformer extends Group_1.Group {
         this._createAnchor('rotater');
     }
     _createAnchor(name) {
-        var anchor = new Rect_1.Rect({
+        const anchor = new Rect_1.Rect({
             stroke: 'rgb(0, 161, 255)',
             fill: 'white',
             strokeWidth: 1,
@@ -375,7 +375,7 @@ class Transformer extends Group_1.Group {
             draggable: true,
             hitStrokeWidth: TOUCH_DEVICE ? 10 : 'auto',
         });
-        var self = this;
+        const self = this;
         anchor.on('mousedown touchstart', function (e) {
             self._handleMouseDown(e);
         });
@@ -387,9 +387,9 @@ class Transformer extends Group_1.Group {
             e.cancelBubble = true;
         });
         anchor.on('mouseenter', () => {
-            var rad = Global_1.Konva.getAngle(this.rotation());
-            var rotateCursor = this.rotateAnchorCursor();
-            var cursor = getCursor(name, rad, rotateCursor);
+            const rad = Global_1.Konva.getAngle(this.rotation());
+            const rotateCursor = this.rotateAnchorCursor();
+            const cursor = getCursor(name, rad, rotateCursor);
             anchor.getStage().content &&
                 (anchor.getStage().content.style.cursor = cursor);
             this._cursorChange = true;
@@ -402,14 +402,14 @@ class Transformer extends Group_1.Group {
         this.add(anchor);
     }
     _createBack() {
-        var back = new Shape_1.Shape({
+        const back = new Shape_1.Shape({
             name: 'back',
             width: 0,
             height: 0,
             draggable: true,
             sceneFunc(ctx, shape) {
-                var tr = shape.getParent();
-                var padding = tr.padding();
+                const tr = shape.getParent();
+                const padding = tr.padding();
                 ctx.beginPath();
                 ctx.rect(-padding, -padding, shape.width() + padding * 2, shape.height() + padding * 2);
                 ctx.moveTo(shape.width() / 2, -padding);
@@ -422,7 +422,7 @@ class Transformer extends Group_1.Group {
                 if (!this.shouldOverdrawWholeArea()) {
                     return;
                 }
-                var padding = this.padding();
+                const padding = this.padding();
                 ctx.beginPath();
                 ctx.rect(-padding, -padding, shape.width() + padding * 2, shape.height() + padding * 2);
                 ctx.fillStrokeShape(shape);
@@ -448,10 +448,10 @@ class Transformer extends Group_1.Group {
             return;
         }
         this._movingAnchorName = e.target.name().split(' ')[0];
-        var attrs = this._getNodeRect();
-        var width = attrs.width;
-        var height = attrs.height;
-        var hypotenuse = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+        const attrs = this._getNodeRect();
+        const width = attrs.width;
+        const height = attrs.height;
+        const hypotenuse = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
         this.sin = Math.abs(height / hypotenuse);
         this.cos = Math.abs(width / hypotenuse);
         if (typeof window !== 'undefined') {
@@ -461,8 +461,8 @@ class Transformer extends Group_1.Group {
             window.addEventListener('touchend', this._handleMouseUp, true);
         }
         this._transforming = true;
-        var ap = e.target.getAbsolutePosition();
-        var pos = e.target.getStage().getPointerPosition();
+        const ap = e.target.getAbsolutePosition();
+        const pos = e.target.getStage().getPointerPosition();
         this._anchorDragOffset = {
             x: pos.x - ap.x,
             y: pos.y - ap.y,
@@ -474,9 +474,9 @@ class Transformer extends Group_1.Group {
         });
     }
     _handleMouseMove(e) {
-        var x, y, newHypotenuse;
-        var anchorNode = this.findOne('.' + this._movingAnchorName);
-        var stage = anchorNode.getStage();
+        let x, y, newHypotenuse;
+        const anchorNode = this.findOne('.' + this._movingAnchorName);
+        const stage = anchorNode.getStage();
         stage.setPointersPositions(e);
         const pp = stage.getPointerPosition();
         let newNodePos = {
@@ -493,14 +493,14 @@ class Transformer extends Group_1.Group {
             return;
         }
         if (this._movingAnchorName === 'rotater') {
-            var attrs = this._getNodeRect();
+            const attrs = this._getNodeRect();
             x = anchorNode.x() - attrs.width / 2;
             y = -anchorNode.y() + attrs.height / 2;
             let delta = Math.atan2(-y, x) + Math.PI / 2;
             if (attrs.height < 0) {
                 delta -= Math.PI;
             }
-            var oldRotation = Global_1.Konva.getAngle(this.rotation());
+            const oldRotation = Global_1.Konva.getAngle(this.rotation());
             const newRotation = oldRotation + delta;
             const tol = Global_1.Konva.getAngle(this.rotationSnapTolerance());
             const snappedRot = getSnap(this.rotationSnaps(), newRotation, tol);
@@ -509,8 +509,8 @@ class Transformer extends Group_1.Group {
             this._fitNodesInto(shape, e);
             return;
         }
-        var shiftBehavior = this.shiftBehavior();
-        var keepProportion;
+        const shiftBehavior = this.shiftBehavior();
+        let keepProportion;
         if (shiftBehavior === 'inverted') {
             keepProportion = this.keepRatio() && !e.shiftKey;
         }
@@ -629,12 +629,12 @@ class Transformer extends Group_1.Group {
         }
         var centeredScaling = this.centeredScaling() || e.altKey;
         if (centeredScaling) {
-            var topLeft = this.findOne('.top-left');
-            var bottomRight = this.findOne('.bottom-right');
-            var topOffsetX = topLeft.x();
-            var topOffsetY = topLeft.y();
-            var bottomOffsetX = this.getWidth() - bottomRight.x();
-            var bottomOffsetY = this.getHeight() - bottomRight.y();
+            const topLeft = this.findOne('.top-left');
+            const bottomRight = this.findOne('.bottom-right');
+            const topOffsetX = topLeft.x();
+            const topOffsetY = topLeft.y();
+            const bottomOffsetX = this.getWidth() - bottomRight.x();
+            const bottomOffsetY = this.getHeight() - bottomRight.y();
             bottomRight.move({
                 x: -topOffsetX,
                 y: -topOffsetY,
@@ -644,11 +644,11 @@ class Transformer extends Group_1.Group {
                 y: bottomOffsetY,
             });
         }
-        var absPos = this.findOne('.top-left').getAbsolutePosition();
+        const absPos = this.findOne('.top-left').getAbsolutePosition();
         x = absPos.x;
         y = absPos.y;
-        var width = this.findOne('.bottom-right').x() - this.findOne('.top-left').x();
-        var height = this.findOne('.bottom-right').y() - this.findOne('.top-left').y();
+        const width = this.findOne('.bottom-right').x() - this.findOne('.top-left').x();
+        const height = this.findOne('.bottom-right').y() - this.findOne('.top-left').y();
         this._fitNodesInto({
             x: x,
             y: y,
@@ -673,7 +673,7 @@ class Transformer extends Group_1.Group {
                 window.removeEventListener('mouseup', this._handleMouseUp, true);
                 window.removeEventListener('touchend', this._handleMouseUp, true);
             }
-            var node = this.getNode();
+            const node = this.getNode();
             activeTransformersCount--;
             this._fire('transformend', { evt: e, target: node });
             (_a = this.getLayer()) === null || _a === void 0 ? void 0 : _a.batchDraw();
@@ -688,7 +688,7 @@ class Transformer extends Group_1.Group {
         }
     }
     _fitNodesInto(newAttrs, evt) {
-        var oldAttrs = this._getNodeRect();
+        const oldAttrs = this._getNodeRect();
         const minSize = 1;
         if (Util_1.Util._inRange(newAttrs.width, -this.padding() * 2 - minSize, minSize)) {
             this.update();
@@ -698,7 +698,7 @@ class Transformer extends Group_1.Group {
             this.update();
             return;
         }
-        var t = new Util_1.Transform();
+        const t = new Util_1.Transform();
         t.rotate(Global_1.Konva.getAngle(this.rotation()));
         if (this._movingAnchorName &&
             newAttrs.width < 0 &&
@@ -815,14 +815,14 @@ class Transformer extends Group_1.Group {
     }
     update() {
         var _a;
-        var attrs = this._getNodeRect();
+        const attrs = this._getNodeRect();
         this.rotation(Util_1.Util._getRotation(attrs.rotation));
-        var width = attrs.width;
-        var height = attrs.height;
-        var enabledAnchors = this.enabledAnchors();
-        var resizeEnabled = this.resizeEnabled();
-        var padding = this.padding();
-        var anchorSize = this.anchorSize();
+        const width = attrs.width;
+        const height = attrs.height;
+        const enabledAnchors = this.enabledAnchors();
+        const resizeEnabled = this.resizeEnabled();
+        const padding = this.padding();
+        const anchorSize = this.anchorSize();
         const anchors = this.find('._anchor');
         anchors.forEach((node) => {
             node.setAttrs({
@@ -917,7 +917,7 @@ class Transformer extends Group_1.Group {
     stopTransform() {
         if (this._transforming) {
             this._removeEvents();
-            var anchorNode = this.findOne('.' + this._movingAnchorName);
+            const anchorNode = this.findOne('.' + this._movingAnchorName);
             if (anchorNode) {
                 anchorNode.stopDrag();
             }
@@ -936,7 +936,7 @@ class Transformer extends Group_1.Group {
         return Node_1.Node.prototype.toObject.call(this);
     }
     clone(obj) {
-        var node = Node_1.Node.prototype.clone.call(this, obj);
+        const node = Node_1.Node.prototype.clone.call(this, obj);
         return node;
     }
     getClientRect() {

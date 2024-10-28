@@ -7,7 +7,7 @@ const Canvas_1 = require("./Canvas");
 const Global_1 = require("./Global");
 const DragAndDrop_1 = require("./DragAndDrop");
 const Validators_1 = require("./Validators");
-var ABSOLUTE_OPACITY = 'absoluteOpacity', ALL_LISTENERS = 'allEventListeners', ABSOLUTE_TRANSFORM = 'absoluteTransform', ABSOLUTE_SCALE = 'absoluteScale', CANVAS = 'canvas', CHANGE = 'Change', CHILDREN = 'children', KONVA = 'konva', LISTENING = 'listening', MOUSEENTER = 'mouseenter', MOUSELEAVE = 'mouseleave', NAME = 'name', SET = 'set', SHAPE = 'Shape', SPACE = ' ', STAGE = 'stage', TRANSFORM = 'transform', UPPER_STAGE = 'Stage', VISIBLE = 'visible', TRANSFORM_CHANGE_STR = [
+const ABSOLUTE_OPACITY = 'absoluteOpacity', ALL_LISTENERS = 'allEventListeners', ABSOLUTE_TRANSFORM = 'absoluteTransform', ABSOLUTE_SCALE = 'absoluteScale', CANVAS = 'canvas', CHANGE = 'Change', CHILDREN = 'children', KONVA = 'konva', LISTENING = 'listening', MOUSEENTER = 'mouseenter', MOUSELEAVE = 'mouseleave', NAME = 'name', SET = 'set', SHAPE = 'Shape', SPACE = ' ', STAGE = 'stage', TRANSFORM = 'transform', UPPER_STAGE = 'Stage', VISIBLE = 'visible', TRANSFORM_CHANGE_STR = [
     'xChange.konva',
     'yChange.konva',
     'scaleXChange.konva',
@@ -56,9 +56,9 @@ class Node {
         }
     }
     _getCache(attr, privateGetter) {
-        var cache = this._cache.get(attr);
-        var isTransform = attr === TRANSFORM || attr === ABSOLUTE_TRANSFORM;
-        var invalid = cache === undefined || (isTransform && cache.dirty === true);
+        let cache = this._cache.get(attr);
+        const isTransform = attr === TRANSFORM || attr === ABSOLUTE_TRANSFORM;
+        const invalid = cache === undefined || (isTransform && cache.dirty === true);
         if (invalid) {
             cache = privateGetter.call(this);
             this._cache.set(attr, cache);
@@ -95,8 +95,8 @@ class Node {
         return this;
     }
     cache(config) {
-        var conf = config || {};
-        var rect = {};
+        const conf = config || {};
+        let rect = {};
         if (conf.x === undefined ||
             conf.y === undefined ||
             conf.width === undefined ||
@@ -106,7 +106,7 @@ class Node {
                 relativeTo: this.getParent() || undefined,
             });
         }
-        var width = Math.ceil(conf.width || rect.width), height = Math.ceil(conf.height || rect.height), pixelRatio = conf.pixelRatio, x = conf.x === undefined ? Math.floor(rect.x) : conf.x, y = conf.y === undefined ? Math.floor(rect.y) : conf.y, offset = conf.offset || 0, drawBorder = conf.drawBorder || false, hitCanvasPixelRatio = conf.hitCanvasPixelRatio || 1;
+        let width = Math.ceil(conf.width || rect.width), height = Math.ceil(conf.height || rect.height), pixelRatio = conf.pixelRatio, x = conf.x === undefined ? Math.floor(rect.x) : conf.x, y = conf.y === undefined ? Math.floor(rect.y) : conf.y, offset = conf.offset || 0, drawBorder = conf.drawBorder || false, hitCanvasPixelRatio = conf.hitCanvasPixelRatio || 1;
         if (!width || !height) {
             Util_1.Util.error('Can not cache the node. Width or height of the node equals 0. Caching is skipped.');
             return;
@@ -117,7 +117,7 @@ class Node {
         height += offset * 2 + extraPaddingY;
         x -= offset;
         y -= offset;
-        var cachedSceneCanvas = new Canvas_1.SceneCanvas({
+        const cachedSceneCanvas = new Canvas_1.SceneCanvas({
             pixelRatio: pixelRatio,
             width: width,
             height: height,
@@ -178,16 +178,16 @@ class Node {
         throw new Error('abstract "getClientRect" method call');
     }
     _transformedRect(rect, top) {
-        var points = [
+        const points = [
             { x: rect.x, y: rect.y },
             { x: rect.x + rect.width, y: rect.y },
             { x: rect.x + rect.width, y: rect.y + rect.height },
             { x: rect.x, y: rect.y + rect.height },
         ];
-        var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        var trans = this.getAbsoluteTransform(top);
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        const trans = this.getAbsoluteTransform(top);
         points.forEach(function (point) {
-            var transformed = trans.point(point);
+            const transformed = trans.point(point);
             if (minX === undefined) {
                 minX = maxX = transformed.x;
                 minY = maxY = transformed.y;
@@ -210,23 +210,23 @@ class Node {
         context._applyGlobalCompositeOperation(this);
         const canvasCache = this._getCanvasCache();
         context.translate(canvasCache.x, canvasCache.y);
-        var cacheCanvas = this._getCachedSceneCanvas();
-        var ratio = cacheCanvas.pixelRatio;
+        const cacheCanvas = this._getCachedSceneCanvas();
+        const ratio = cacheCanvas.pixelRatio;
         context.drawImage(cacheCanvas._canvas, 0, 0, cacheCanvas.width / ratio, cacheCanvas.height / ratio);
         context.restore();
     }
     _drawCachedHitCanvas(context) {
-        var canvasCache = this._getCanvasCache(), hitCanvas = canvasCache.hit;
+        const canvasCache = this._getCanvasCache(), hitCanvas = canvasCache.hit;
         context.save();
         context.translate(canvasCache.x, canvasCache.y);
         context.drawImage(hitCanvas._canvas, 0, 0, hitCanvas.width / hitCanvas.pixelRatio, hitCanvas.height / hitCanvas.pixelRatio);
         context.restore();
     }
     _getCachedSceneCanvas() {
-        var filters = this.filters(), cachedCanvas = this._getCanvasCache(), sceneCanvas = cachedCanvas.scene, filterCanvas = cachedCanvas.filter, filterContext = filterCanvas.getContext(), len, imageData, n, filter;
+        let filters = this.filters(), cachedCanvas = this._getCanvasCache(), sceneCanvas = cachedCanvas.scene, filterCanvas = cachedCanvas.filter, filterContext = filterCanvas.getContext(), len, imageData, n, filter;
         if (filters) {
             if (!this._filterUpToDate) {
-                var ratio = sceneCanvas.pixelRatio;
+                const ratio = sceneCanvas.pixelRatio;
                 filterCanvas.setSize(sceneCanvas.width / sceneCanvas.pixelRatio, sceneCanvas.height / sceneCanvas.pixelRatio);
                 try {
                     len = filters.length;
@@ -261,7 +261,7 @@ class Node {
         if (arguments.length === 3) {
             return this._delegate.apply(this, arguments);
         }
-        var events = evtStr.split(SPACE), len = events.length, n, event, parts, baseEvent, name;
+        let events = evtStr.split(SPACE), len = events.length, n, event, parts, baseEvent, name;
         for (n = 0; n < len; n++) {
             event = events[n];
             parts = event.split('.');
@@ -278,7 +278,7 @@ class Node {
         return this;
     }
     off(evtStr, callback) {
-        var events = (evtStr || '').split(SPACE), len = events.length, n, t, event, parts, baseEvent, name;
+        let events = (evtStr || '').split(SPACE), len = events.length, n, t, event, parts, baseEvent, name;
         this._cache && this._cache.delete(ALL_LISTENERS);
         if (!evtStr) {
             for (t in this.eventListeners) {
@@ -304,7 +304,7 @@ class Node {
         return this;
     }
     dispatchEvent(evt) {
-        var e = {
+        const e = {
             target: this,
             type: evt.type,
             evt: evt,
@@ -323,10 +323,10 @@ class Node {
         return this;
     }
     _delegate(event, selector, handler) {
-        var stopNode = this;
+        const stopNode = this;
         this.on(event, function (evt) {
-            var targets = evt.target.findAncestors(selector, true, stopNode);
-            for (var i = 0; i < targets.length; i++) {
+            const targets = evt.target.findAncestors(selector, true, stopNode);
+            for (let i = 0; i < targets.length; i++) {
                 evt = Util_1.Util.cloneObject(evt);
                 evt.currentTarget = targets[i];
                 handler.call(targets[i], evt);
@@ -351,7 +351,7 @@ class Node {
     }
     _remove() {
         this._clearCaches();
-        var parent = this.getParent();
+        const parent = this.getParent();
         if (parent && parent.children) {
             parent.children.splice(this.index, 1);
             parent._setChildrenIndices();
@@ -364,14 +364,14 @@ class Node {
         return this;
     }
     getAttr(attr) {
-        var method = 'get' + Util_1.Util._capitalize(attr);
+        const method = 'get' + Util_1.Util._capitalize(attr);
         if (Util_1.Util._isFunction(this[method])) {
             return this[method]();
         }
         return this.attrs[attr];
     }
     getAncestors() {
-        var parent = this.getParent(), ancestors = [];
+        let parent = this.getParent(), ancestors = [];
         while (parent) {
             ancestors.push(parent);
             parent = parent.getParent();
@@ -383,7 +383,7 @@ class Node {
     }
     setAttrs(config) {
         this._batchTransformChanges(() => {
-            var key, method;
+            let key, method;
             if (!config) {
                 return this;
             }
@@ -438,8 +438,8 @@ class Node {
         if (top) {
             return this._isVisible(top) && this._isListening(top);
         }
-        var layer = this.getLayer();
-        var layerUnderDrag = false;
+        const layer = this.getLayer();
+        let layerUnderDrag = false;
         DragAndDrop_1.DD._dragElements.forEach((elem) => {
             if (elem.dragStatus !== 'dragging') {
                 return;
@@ -451,7 +451,7 @@ class Node {
                 layerUnderDrag = true;
             }
         });
-        var dragSkip = !skipDragCheck &&
+        const dragSkip = !skipDragCheck &&
             !Global_1.Konva.hitOnDragEnabled &&
             (layerUnderDrag || Global_1.Konva.isTransforming());
         return this.isListening() && this.isVisible() && !dragSkip;
@@ -468,7 +468,7 @@ class Node {
         return this.index || 0;
     }
     getAbsoluteZIndex() {
-        var depth = this.getDepth(), that = this, index = 0, nodes, len, n, child;
+        let depth = this.getDepth(), that = this, index = 0, nodes, len, n, child;
         function addChildren(children) {
             nodes = [];
             len = children.length;
@@ -493,7 +493,7 @@ class Node {
         return index;
     }
     getDepth() {
-        var depth = 0, parent = this.parent;
+        let depth = 0, parent = this.parent;
         while (parent) {
             depth++;
             parent = parent.parent;
@@ -528,11 +528,11 @@ class Node {
         if (!stage) {
             return null;
         }
-        var pos = stage.getPointerPosition();
+        const pos = stage.getPointerPosition();
         if (!pos) {
             return null;
         }
-        var transform = this.getAbsoluteTransform().copy();
+        const transform = this.getAbsoluteTransform().copy();
         transform.invert();
         return transform.point(pos);
     }
@@ -549,7 +549,7 @@ class Node {
         if (haveCachedParent && !top) {
             top = true;
         }
-        var absoluteMatrix = this.getAbsoluteTransform(top).getMatrix(), absoluteTransform = new Util_1.Transform(), offset = this.offset();
+        const absoluteMatrix = this.getAbsoluteTransform(top).getMatrix(), absoluteTransform = new Util_1.Transform(), offset = this.offset();
         absoluteTransform.m = absoluteMatrix.slice();
         absoluteTransform.translate(offset.x, offset.y);
         return absoluteTransform.getTranslation();
@@ -559,7 +559,7 @@ class Node {
         this.attrs.x = x;
         this.attrs.y = y;
         this._clearCache(TRANSFORM);
-        var it = this._getAbsoluteTransform().copy();
+        const it = this._getAbsoluteTransform().copy();
         it.invert();
         it.translate(pos.x, pos.y);
         pos = {
@@ -573,13 +573,13 @@ class Node {
         return this;
     }
     _setTransform(trans) {
-        var key;
+        let key;
         for (key in trans) {
             this.attrs[key] = trans[key];
         }
     }
     _clearTransform() {
-        var trans = {
+        const trans = {
             x: this.x(),
             y: this.y(),
             rotation: this.rotation(),
@@ -602,7 +602,7 @@ class Node {
         return trans;
     }
     move(change) {
-        var changeX = change.x, changeY = change.y, x = this.x(), y = this.y();
+        let changeX = change.x, changeY = change.y, x = this.x(), y = this.y();
         if (changeX !== undefined) {
             x += changeX;
         }
@@ -613,7 +613,7 @@ class Node {
         return this;
     }
     _eachAncestorReverse(func, top) {
-        var family = [], parent = this.getParent(), len, n;
+        let family = [], parent = this.getParent(), len, n;
         if (top && top._id === this._id) {
             return;
         }
@@ -636,7 +636,7 @@ class Node {
             Util_1.Util.warn('Node has no parent. moveToTop function is ignored.');
             return false;
         }
-        var index = this.index, len = this.parent.getChildren().length;
+        const index = this.index, len = this.parent.getChildren().length;
         if (index < len - 1) {
             this.parent.children.splice(index, 1);
             this.parent.children.push(this);
@@ -650,7 +650,7 @@ class Node {
             Util_1.Util.warn('Node has no parent. moveUp function is ignored.');
             return false;
         }
-        var index = this.index, len = this.parent.getChildren().length;
+        const index = this.index, len = this.parent.getChildren().length;
         if (index < len - 1) {
             this.parent.children.splice(index, 1);
             this.parent.children.splice(index + 1, 0, this);
@@ -664,7 +664,7 @@ class Node {
             Util_1.Util.warn('Node has no parent. moveDown function is ignored.');
             return false;
         }
-        var index = this.index;
+        const index = this.index;
         if (index > 0) {
             this.parent.children.splice(index, 1);
             this.parent.children.splice(index - 1, 0, this);
@@ -678,7 +678,7 @@ class Node {
             Util_1.Util.warn('Node has no parent. moveToBottom function is ignored.');
             return false;
         }
-        var index = this.index;
+        const index = this.index;
         if (index > 0) {
             this.parent.children.splice(index, 1);
             this.parent.children.unshift(this);
@@ -699,7 +699,7 @@ class Node {
                 (this.parent.children.length - 1) +
                 '.');
         }
-        var index = this.index;
+        const index = this.index;
         this.parent.children.splice(index, 1);
         this.parent.children.splice(zIndex, 0, this);
         this.parent._setChildrenIndices();
@@ -709,8 +709,8 @@ class Node {
         return this._getCache(ABSOLUTE_OPACITY, this._getAbsoluteOpacity);
     }
     _getAbsoluteOpacity() {
-        var absOpacity = this.opacity();
-        var parent = this.getParent();
+        let absOpacity = this.opacity();
+        const parent = this.getParent();
         if (parent && !parent._isUnderCache) {
             absOpacity *= parent.getAbsoluteOpacity();
         }
@@ -724,7 +724,7 @@ class Node {
         return this;
     }
     toObject() {
-        var attrs = this.getAttrs(), key, val, getter, defaultValue, nonPlainObject;
+        let attrs = this.getAttrs(), key, val, getter, defaultValue, nonPlainObject;
         const obj = {
             attrs: {},
             className: this.getClassName(),
@@ -753,11 +753,11 @@ class Node {
         return this.parent;
     }
     findAncestors(selector, includeSelf, stopNode) {
-        var res = [];
+        const res = [];
         if (includeSelf && this._isMatch(selector)) {
             res.push(this);
         }
-        var ancestor = this.parent;
+        let ancestor = this.parent;
         while (ancestor) {
             if (ancestor === stopNode) {
                 return res;
@@ -782,7 +782,7 @@ class Node {
         if (typeof selector === 'function') {
             return selector(this);
         }
-        var selectorArr = selector.replace(/ /g, '').split(','), len = selectorArr.length, n, sel;
+        let selectorArr = selector.replace(/ /g, '').split(','), len = selectorArr.length, n, sel;
         for (n = 0; n < len; n++) {
             sel = selectorArr[n];
             if (!Util_1.Util.isValidSelector(sel)) {
@@ -809,14 +809,14 @@ class Node {
         return false;
     }
     getLayer() {
-        var parent = this.getParent();
+        const parent = this.getParent();
         return parent ? parent.getLayer() : null;
     }
     getStage() {
         return this._getCache(STAGE, this._getStage);
     }
     _getStage() {
-        var parent = this.getParent();
+        const parent = this.getParent();
         if (parent) {
             return parent.getStage();
         }
@@ -843,11 +843,11 @@ class Node {
         }
     }
     _getAbsoluteTransform(top) {
-        var at;
+        let at;
         if (top) {
             at = new Util_1.Transform();
             this._eachAncestorReverse(function (node) {
-                var transformsEnabled = node.transformsEnabled();
+                const transformsEnabled = node.transformsEnabled();
                 if (transformsEnabled === 'all') {
                     at.multiply(node.getTransform());
                 }
@@ -865,7 +865,7 @@ class Node {
             else {
                 at.reset();
             }
-            var transformsEnabled = this.transformsEnabled();
+            const transformsEnabled = this.transformsEnabled();
             if (transformsEnabled === 'all') {
                 at.multiply(this.getTransform());
             }
@@ -881,7 +881,7 @@ class Node {
         }
     }
     getAbsoluteScale(top) {
-        var parent = this;
+        let parent = this;
         while (parent) {
             if (parent._isUnderCache) {
                 top = parent;
@@ -903,9 +903,9 @@ class Node {
     }
     _getTransform() {
         var _a, _b;
-        var m = this._cache.get(TRANSFORM) || new Util_1.Transform();
+        const m = this._cache.get(TRANSFORM) || new Util_1.Transform();
         m.reset();
-        var x = this.x(), y = this.y(), rotation = Global_1.Konva.getAngle(this.rotation()), scaleX = (_a = this.attrs.scaleX) !== null && _a !== void 0 ? _a : 1, scaleY = (_b = this.attrs.scaleY) !== null && _b !== void 0 ? _b : 1, skewX = this.attrs.skewX || 0, skewY = this.attrs.skewY || 0, offsetX = this.attrs.offsetX || 0, offsetY = this.attrs.offsetY || 0;
+        const x = this.x(), y = this.y(), rotation = Global_1.Konva.getAngle(this.rotation()), scaleX = (_a = this.attrs.scaleX) !== null && _a !== void 0 ? _a : 1, scaleY = (_b = this.attrs.scaleY) !== null && _b !== void 0 ? _b : 1, skewX = this.attrs.skewX || 0, skewY = this.attrs.skewY || 0, offsetX = this.attrs.offsetX || 0, offsetY = this.attrs.offsetY || 0;
         if (x !== 0 || y !== 0) {
             m.translate(x, y);
         }
@@ -925,11 +925,11 @@ class Node {
         return m;
     }
     clone(obj) {
-        var attrs = Util_1.Util.cloneObject(this.attrs), key, allListeners, len, n, listener;
+        let attrs = Util_1.Util.cloneObject(this.attrs), key, allListeners, len, n, listener;
         for (key in obj) {
             attrs[key] = obj[key];
         }
-        var node = new this.constructor(attrs);
+        const node = new this.constructor(attrs);
         for (key in this.eventListeners) {
             allListeners = this.eventListeners[key];
             len = allListeners.length;
@@ -947,8 +947,8 @@ class Node {
     }
     _toKonvaCanvas(config) {
         config = config || {};
-        var box = this.getClientRect();
-        var stage = this.getStage(), x = config.x !== undefined ? config.x : Math.floor(box.x), y = config.y !== undefined ? config.y : Math.floor(box.y), pixelRatio = config.pixelRatio || 1, canvas = new Canvas_1.SceneCanvas({
+        const box = this.getClientRect();
+        const stage = this.getStage(), x = config.x !== undefined ? config.x : Math.floor(box.x), y = config.y !== undefined ? config.y : Math.floor(box.y), pixelRatio = config.pixelRatio || 1, canvas = new Canvas_1.SceneCanvas({
             width: config.width || Math.ceil(box.width) || (stage ? stage.width() : 0),
             height: config.height ||
                 Math.ceil(box.height) ||
@@ -976,8 +976,8 @@ class Node {
     }
     toDataURL(config) {
         config = config || {};
-        var mimeType = config.mimeType || null, quality = config.quality || null;
-        var url = this._toKonvaCanvas(config).toDataURL(mimeType, quality);
+        const mimeType = config.mimeType || null, quality = config.quality || null;
+        const url = this._toKonvaCanvas(config).toDataURL(mimeType, quality);
         if (config.callback) {
             config.callback(url);
         }
@@ -1044,7 +1044,7 @@ class Node {
         }
     }
     _off(type, name, callback) {
-        var evtListeners = this.eventListeners[type], i, evtName, handler;
+        let evtListeners = this.eventListeners[type], i, evtName, handler;
         for (i = 0; i < evtListeners.length; i++) {
             evtName = evtListeners[i].name;
             handler = evtListeners[i].handler;
@@ -1068,8 +1068,8 @@ class Node {
     }
     addName(name) {
         if (!this.hasName(name)) {
-            var oldName = this.name();
-            var newName = oldName ? oldName + ' ' + name : name;
+            const oldName = this.name();
+            const newName = oldName ? oldName + ' ' + name : name;
             this.name(newName);
         }
         return this;
@@ -1082,12 +1082,12 @@ class Node {
         if (!fullName) {
             return false;
         }
-        var names = (fullName || '').split(/\s/g);
+        const names = (fullName || '').split(/\s/g);
         return names.indexOf(name) !== -1;
     }
     removeName(name) {
-        var names = (this.name() || '').split(/\s/g);
-        var index = names.indexOf(name);
+        const names = (this.name() || '').split(/\s/g);
+        const index = names.indexOf(name);
         if (index !== -1) {
             names.splice(index, 1);
             this.name(names.join(' '));
@@ -1095,7 +1095,7 @@ class Node {
         return this;
     }
     setAttr(attr, val) {
-        var func = this[SET + Util_1.Util._capitalize(attr)];
+        const func = this[SET + Util_1.Util._capitalize(attr)];
         if (Util_1.Util._isFunction(func)) {
             func.call(this, val);
         }
@@ -1111,7 +1111,7 @@ class Node {
         }
     }
     _setAttr(key, val) {
-        var oldVal = this.attrs[key];
+        const oldVal = this.attrs[key];
         if (oldVal === val && !Util_1.Util.isObject(val)) {
             return;
         }
@@ -1127,7 +1127,7 @@ class Node {
         this._requestDraw();
     }
     _setComponentAttr(key, component, val) {
-        var oldVal;
+        let oldVal;
         if (val !== undefined) {
             oldVal = this.attrs[key];
             if (!oldVal) {
@@ -1141,14 +1141,14 @@ class Node {
         if (evt && this.nodeType === SHAPE) {
             evt.target = this;
         }
-        var shouldStop = (eventType === MOUSEENTER || eventType === MOUSELEAVE) &&
+        const shouldStop = (eventType === MOUSEENTER || eventType === MOUSELEAVE) &&
             ((compareShape &&
                 (this === compareShape ||
                     (this.isAncestorOf && this.isAncestorOf(compareShape)))) ||
                 (this.nodeType === 'Stage' && !compareShape));
         if (!shouldStop) {
             this._fire(eventType, evt);
-            var stopBubble = (eventType === MOUSEENTER || eventType === MOUSELEAVE) &&
+            const stopBubble = (eventType === MOUSEENTER || eventType === MOUSELEAVE) &&
                 compareShape &&
                 compareShape.isAncestorOf &&
                 compareShape.isAncestorOf(this) &&
@@ -1206,13 +1206,13 @@ class Node {
         return this;
     }
     _createDragElement(evt) {
-        var pointerId = evt ? evt.pointerId : undefined;
-        var stage = this.getStage();
-        var ap = this.getAbsolutePosition();
+        const pointerId = evt ? evt.pointerId : undefined;
+        const stage = this.getStage();
+        const ap = this.getAbsolutePosition();
         if (!stage) {
             return;
         }
-        var pos = stage._getPointerById(pointerId) ||
+        const pos = stage._getPointerById(pointerId) ||
             stage._changedPointerPositions[0] ||
             ap;
         DragAndDrop_1.DD._dragElements.set(this._id, {
@@ -1243,11 +1243,11 @@ class Node {
         if (!pos) {
             return;
         }
-        var newNodePos = {
+        let newNodePos = {
             x: pos.x - elem.offset.x,
             y: pos.y - elem.offset.y,
         };
-        var dbf = this.dragBoundFunc();
+        const dbf = this.dragBoundFunc();
         if (dbf !== undefined) {
             const bounded = dbf.call(this, newNodePos, evt);
             if (!bounded) {
@@ -1284,15 +1284,15 @@ class Node {
     _listenDrag() {
         this._dragCleanup();
         this.on('mousedown.konva touchstart.konva', function (evt) {
-            var shouldCheckButton = evt.evt['button'] !== undefined;
-            var canDrag = !shouldCheckButton || Global_1.Konva.dragButtons.indexOf(evt.evt['button']) >= 0;
+            const shouldCheckButton = evt.evt['button'] !== undefined;
+            const canDrag = !shouldCheckButton || Global_1.Konva.dragButtons.indexOf(evt.evt['button']) >= 0;
             if (!canDrag) {
                 return;
             }
             if (this.isDragging()) {
                 return;
             }
-            var hasDraggingChild = false;
+            let hasDraggingChild = false;
             DragAndDrop_1.DD._dragElements.forEach((elem) => {
                 if (this.isAncestorOf(elem.node)) {
                     hasDraggingChild = true;
@@ -1309,7 +1309,7 @@ class Node {
         }
         else {
             this._dragCleanup();
-            var stage = this.getStage();
+            const stage = this.getStage();
             if (!stage) {
                 return;
             }
@@ -1348,7 +1348,7 @@ class Node {
         return this._createNode(data, container);
     }
     static _createNode(obj, container) {
-        var className = Node.prototype.getClassName.call(obj), children = obj.children, no, len, n;
+        let className = Node.prototype.getClassName.call(obj), children = obj.children, no, len, n;
         if (container) {
             obj.attrs.container = container;
         }

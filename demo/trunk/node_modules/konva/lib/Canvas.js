@@ -6,15 +6,15 @@ const Context_1 = require("./Context");
 const Global_1 = require("./Global");
 const Factory_1 = require("./Factory");
 const Validators_1 = require("./Validators");
-var _pixelRatio;
+let _pixelRatio;
 function getDevicePixelRatio() {
     if (_pixelRatio) {
         return _pixelRatio;
     }
-    var canvas = Util_1.Util.createCanvasElement();
-    var context = canvas.getContext('2d');
+    const canvas = Util_1.Util.createCanvasElement();
+    const context = canvas.getContext('2d');
     _pixelRatio = (function () {
-        var devicePixelRatio = Global_1.Konva._global.devicePixelRatio || 1, backingStoreRatio = context.webkitBackingStorePixelRatio ||
+        const devicePixelRatio = Global_1.Konva._global.devicePixelRatio || 1, backingStoreRatio = context.webkitBackingStorePixelRatio ||
             context.mozBackingStorePixelRatio ||
             context.msBackingStorePixelRatio ||
             context.oBackingStorePixelRatio ||
@@ -31,8 +31,8 @@ class Canvas {
         this.width = 0;
         this.height = 0;
         this.isCache = false;
-        var conf = config || {};
-        var pixelRatio = conf.pixelRatio || Global_1.Konva.pixelRatio || getDevicePixelRatio();
+        const conf = config || {};
+        const pixelRatio = conf.pixelRatio || Global_1.Konva.pixelRatio || getDevicePixelRatio();
         this.pixelRatio = pixelRatio;
         this._canvas = Util_1.Util.createCanvasElement();
         this._canvas.style.padding = '0';
@@ -50,20 +50,20 @@ class Canvas {
         return this.pixelRatio;
     }
     setPixelRatio(pixelRatio) {
-        var previousRatio = this.pixelRatio;
+        const previousRatio = this.pixelRatio;
         this.pixelRatio = pixelRatio;
         this.setSize(this.getWidth() / previousRatio, this.getHeight() / previousRatio);
     }
     setWidth(width) {
         this.width = this._canvas.width = width * this.pixelRatio;
         this._canvas.style.width = width + 'px';
-        var pixelRatio = this.pixelRatio, _context = this.getContext()._context;
+        const pixelRatio = this.pixelRatio, _context = this.getContext()._context;
         _context.scale(pixelRatio, pixelRatio);
     }
     setHeight(height) {
         this.height = this._canvas.height = height * this.pixelRatio;
         this._canvas.style.height = height + 'px';
-        var pixelRatio = this.pixelRatio, _context = this.getContext()._context;
+        const pixelRatio = this.pixelRatio, _context = this.getContext()._context;
         _context.scale(pixelRatio, pixelRatio);
     }
     getWidth() {

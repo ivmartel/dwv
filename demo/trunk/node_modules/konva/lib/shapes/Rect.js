@@ -8,7 +8,7 @@ const Util_1 = require("../Util");
 const Validators_1 = require("../Validators");
 class Rect extends Shape_1.Shape {
     _sceneFunc(context) {
-        var cornerRadius = this.cornerRadius(), width = this.width(), height = this.height();
+        const cornerRadius = this.cornerRadius(), width = this.width(), height = this.height();
         context.beginPath();
         if (!cornerRadius) {
             context.rect(0, 0, width, height);

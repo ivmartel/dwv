@@ -11,7 +11,7 @@ class Sprite extends Shape_1.Shape {
         super(config);
         this._updated = true;
         this.anim = new Animation_1.Animation(() => {
-            var updated = this._updated;
+            const updated = this._updated;
             this._updated = false;
             return updated;
         });
@@ -30,7 +30,7 @@ class Sprite extends Shape_1.Shape {
         });
     }
     _sceneFunc(context) {
-        var anim = this.animation(), index = this.frameIndex(), ix4 = index * 4, set = this.animations()[anim], offsets = this.frameOffsets(), x = set[ix4 + 0], y = set[ix4 + 1], width = set[ix4 + 2], height = set[ix4 + 3], image = this.image();
+        const anim = this.animation(), index = this.frameIndex(), ix4 = index * 4, set = this.animations()[anim], offsets = this.frameOffsets(), x = set[ix4 + 0], y = set[ix4 + 1], width = set[ix4 + 2], height = set[ix4 + 3], image = this.image();
         if (this.hasFill() || this.hasStroke()) {
             context.beginPath();
             context.rect(0, 0, width, height);
@@ -39,7 +39,7 @@ class Sprite extends Shape_1.Shape {
         }
         if (image) {
             if (offsets) {
-                var offset = offsets[anim], ix2 = index * 2;
+                const offset = offsets[anim], ix2 = index * 2;
                 context.drawImage(image, x, y, width, height, offset[ix2 + 0], offset[ix2 + 1], width, height);
             }
             else {
@@ -48,11 +48,11 @@ class Sprite extends Shape_1.Shape {
         }
     }
     _hitFunc(context) {
-        var anim = this.animation(), index = this.frameIndex(), ix4 = index * 4, set = this.animations()[anim], offsets = this.frameOffsets(), width = set[ix4 + 2], height = set[ix4 + 3];
+        const anim = this.animation(), index = this.frameIndex(), ix4 = index * 4, set = this.animations()[anim], offsets = this.frameOffsets(), width = set[ix4 + 2], height = set[ix4 + 3];
         context.beginPath();
         if (offsets) {
-            var offset = offsets[anim];
-            var ix2 = index * 2;
+            const offset = offsets[anim];
+            const ix2 = index * 2;
             context.rect(offset[ix2 + 0], offset[ix2 + 1], width, height);
         }
         else {
@@ -65,7 +65,7 @@ class Sprite extends Shape_1.Shape {
         return super._useBufferCanvas(true);
     }
     _setInterval() {
-        var that = this;
+        const that = this;
         this.interval = setInterval(function () {
             that._updateIndex();
         }, 1000 / this.frameRate());
@@ -74,7 +74,7 @@ class Sprite extends Shape_1.Shape {
         if (this.isRunning()) {
             return;
         }
-        var layer = this.getLayer();
+        const layer = this.getLayer();
         this.anim.setLayers(layer);
         this._setInterval();
         this.anim.start();
@@ -87,7 +87,7 @@ class Sprite extends Shape_1.Shape {
         return this.anim.isRunning();
     }
     _updateIndex() {
-        var index = this.frameIndex(), animation = this.animation(), animations = this.animations(), anim = animations[animation], len = anim.length / 4;
+        const index = this.frameIndex(), animation = this.animation(), animations = this.animations(), anim = animations[animation], len = anim.length / 4;
         if (index < len - 1) {
             this.frameIndex(index + 1);
         }

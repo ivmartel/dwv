@@ -1,24 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.releaseCapture = exports.setPointerCapture = exports.hasPointerCapture = exports.createEvent = exports.getCapturedShape = void 0;
+exports.getCapturedShape = getCapturedShape;
+exports.createEvent = createEvent;
+exports.hasPointerCapture = hasPointerCapture;
+exports.setPointerCapture = setPointerCapture;
+exports.releaseCapture = releaseCapture;
 const Global_1 = require("./Global");
 const Captures = new Map();
 const SUPPORT_POINTER_EVENTS = Global_1.Konva._global['PointerEvent'] !== undefined;
 function getCapturedShape(pointerId) {
     return Captures.get(pointerId);
 }
-exports.getCapturedShape = getCapturedShape;
 function createEvent(evt) {
     return {
         evt,
         pointerId: evt.pointerId,
     };
 }
-exports.createEvent = createEvent;
 function hasPointerCapture(pointerId, shape) {
     return Captures.get(pointerId) === shape;
 }
-exports.hasPointerCapture = hasPointerCapture;
 function setPointerCapture(pointerId, shape) {
     releaseCapture(pointerId);
     const stage = shape.getStage();
@@ -29,7 +30,6 @@ function setPointerCapture(pointerId, shape) {
         shape._fire('gotpointercapture', createEvent(new PointerEvent('gotpointercapture')));
     }
 }
-exports.setPointerCapture = setPointerCapture;
 function releaseCapture(pointerId, target) {
     const shape = Captures.get(pointerId);
     if (!shape)
@@ -42,4 +42,3 @@ function releaseCapture(pointerId, target) {
         shape._fire('lostpointercapture', createEvent(new PointerEvent('lostpointercapture')));
     }
 }
-exports.releaseCapture = releaseCapture;

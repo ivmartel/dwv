@@ -14,7 +14,7 @@ class Container extends Node_1.Node {
             return this.children || [];
         }
         const children = this.children || [];
-        var results = [];
+        const results = [];
         children.forEach(function (child) {
             if (filterFunc(child)) {
                 results.push(child);
@@ -50,7 +50,7 @@ class Container extends Node_1.Node {
             return this;
         }
         if (children.length > 1) {
-            for (var i = 0; i < children.length; i++) {
+            for (let i = 0; i < children.length; i++) {
                 this.add(children[i]);
             }
             return this;
@@ -82,11 +82,11 @@ class Container extends Node_1.Node {
         return this._generalFind(selector, false);
     }
     findOne(selector) {
-        var result = this._generalFind(selector, true);
+        const result = this._generalFind(selector, true);
         return result.length > 0 ? result[0] : undefined;
     }
     _generalFind(selector, findOne) {
-        var retArr = [];
+        const retArr = [];
         this._descendants((node) => {
             const valid = node._isMatch(selector);
             if (valid) {
@@ -118,7 +118,7 @@ class Container extends Node_1.Node {
         return false;
     }
     toObject() {
-        var obj = Node_1.Node.prototype.toObject.call(this);
+        const obj = Node_1.Node.prototype.toObject.call(this);
         obj.children = [];
         this.getChildren().forEach((child) => {
             obj.children.push(child.toObject());
@@ -126,7 +126,7 @@ class Container extends Node_1.Node {
         return obj;
     }
     isAncestorOf(node) {
-        var parent = node.getParent();
+        let parent = node.getParent();
         while (parent) {
             if (parent._id === this._id) {
                 return true;
@@ -136,14 +136,14 @@ class Container extends Node_1.Node {
         return false;
     }
     clone(obj) {
-        var node = Node_1.Node.prototype.clone.call(this, obj);
+        const node = Node_1.Node.prototype.clone.call(this, obj);
         this.getChildren().forEach(function (no) {
             node.add(no.clone());
         });
         return node;
     }
     getAllIntersections(pos) {
-        var arr = [];
+        const arr = [];
         this.find('Shape').forEach((shape) => {
             if (shape.isVisible() && shape.intersects(pos)) {
                 arr.push(shape);
@@ -169,14 +169,14 @@ class Container extends Node_1.Node {
         this._requestDraw();
     }
     drawScene(can, top, bufferCanvas) {
-        var layer = this.getLayer(), canvas = can || (layer && layer.getCanvas()), context = canvas && canvas.getContext(), cachedCanvas = this._getCanvasCache(), cachedSceneCanvas = cachedCanvas && cachedCanvas.scene;
-        var caching = canvas && canvas.isCache;
+        const layer = this.getLayer(), canvas = can || (layer && layer.getCanvas()), context = canvas && canvas.getContext(), cachedCanvas = this._getCanvasCache(), cachedSceneCanvas = cachedCanvas && cachedCanvas.scene;
+        const caching = canvas && canvas.isCache;
         if (!this.isVisible() && !caching) {
             return this;
         }
         if (cachedSceneCanvas) {
             context.save();
-            var m = this.getAbsoluteTransform(top).getMatrix();
+            const m = this.getAbsoluteTransform(top).getMatrix();
             context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
             this._drawCachedSceneCanvas(context);
             context.restore();
@@ -190,10 +190,10 @@ class Container extends Node_1.Node {
         if (!this.shouldDrawHit(top)) {
             return this;
         }
-        var layer = this.getLayer(), canvas = can || (layer && layer.hitCanvas), context = canvas && canvas.getContext(), cachedCanvas = this._getCanvasCache(), cachedHitCanvas = cachedCanvas && cachedCanvas.hit;
+        const layer = this.getLayer(), canvas = can || (layer && layer.hitCanvas), context = canvas && canvas.getContext(), cachedCanvas = this._getCanvasCache(), cachedHitCanvas = cachedCanvas && cachedCanvas.hit;
         if (cachedHitCanvas) {
             context.save();
-            var m = this.getAbsoluteTransform(top).getMatrix();
+            const m = this.getAbsoluteTransform(top).getMatrix();
             context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
             this._drawCachedHitCanvas(context);
             context.restore();
@@ -205,13 +205,13 @@ class Container extends Node_1.Node {
     }
     _drawChildren(drawMethod, canvas, top, bufferCanvas) {
         var _a;
-        var context = canvas && canvas.getContext(), clipWidth = this.clipWidth(), clipHeight = this.clipHeight(), clipFunc = this.clipFunc(), hasClip = (typeof clipWidth === 'number' && typeof clipHeight === 'number') ||
+        const context = canvas && canvas.getContext(), clipWidth = this.clipWidth(), clipHeight = this.clipHeight(), clipFunc = this.clipFunc(), hasClip = (typeof clipWidth === 'number' && typeof clipHeight === 'number') ||
             clipFunc;
         const selfCache = top === this;
         if (hasClip) {
             context.save();
-            var transform = this.getAbsoluteTransform(top);
-            var m = transform.getMatrix();
+            const transform = this.getAbsoluteTransform(top);
+            let m = transform.getMatrix();
             context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
             context.beginPath();
             let clipArgs;
@@ -219,15 +219,15 @@ class Container extends Node_1.Node {
                 clipArgs = clipFunc.call(this, context, this);
             }
             else {
-                var clipX = this.clipX();
-                var clipY = this.clipY();
+                const clipX = this.clipX();
+                const clipY = this.clipY();
                 context.rect(clipX || 0, clipY || 0, clipWidth, clipHeight);
             }
             context.clip.apply(context, clipArgs);
             m = transform.copy().invert().getMatrix();
             context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         }
-        var hasComposition = !selfCache &&
+        const hasComposition = !selfCache &&
             this.globalCompositeOperation() !== 'source-over' &&
             drawMethod === 'drawScene';
         if (hasComposition) {
@@ -246,21 +246,21 @@ class Container extends Node_1.Node {
     }
     getClientRect(config = {}) {
         var _a;
-        var skipTransform = config.skipTransform;
-        var relativeTo = config.relativeTo;
-        var minX, minY, maxX, maxY;
-        var selfRect = {
+        const skipTransform = config.skipTransform;
+        const relativeTo = config.relativeTo;
+        let minX, minY, maxX, maxY;
+        let selfRect = {
             x: Infinity,
             y: Infinity,
             width: 0,
             height: 0,
         };
-        var that = this;
+        const that = this;
         (_a = this.children) === null || _a === void 0 ? void 0 : _a.forEach(function (child) {
             if (!child.visible()) {
                 return;
             }
-            var rect = child.getClientRect({
+            const rect = child.getClientRect({
                 relativeTo: that,
                 skipShadow: config.skipShadow,
                 skipStroke: config.skipStroke,
@@ -281,10 +281,10 @@ class Container extends Node_1.Node {
                 maxY = Math.max(maxY, rect.y + rect.height);
             }
         });
-        var shapes = this.find('Shape');
-        var hasVisible = false;
-        for (var i = 0; i < shapes.length; i++) {
-            var shape = shapes[i];
+        const shapes = this.find('Shape');
+        let hasVisible = false;
+        for (let i = 0; i < shapes.length; i++) {
+            const shape = shapes[i];
             if (shape._isVisible(this)) {
                 hasVisible = true;
                 break;

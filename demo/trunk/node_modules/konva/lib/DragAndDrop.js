@@ -5,7 +5,7 @@ const Global_1 = require("./Global");
 const Util_1 = require("./Util");
 exports.DD = {
     get isDragging() {
-        var flag = false;
+        let flag = false;
         exports.DD._dragElements.forEach((elem) => {
             if (elem.dragStatus === 'dragging') {
                 flag = true;
@@ -15,7 +15,7 @@ exports.DD = {
     },
     justDragged: false,
     get node() {
-        var node;
+        let node;
         exports.DD._dragElements.forEach((elem) => {
             node = elem.node;
         });
@@ -36,8 +36,8 @@ exports.DD = {
                 return;
             }
             if (elem.dragStatus !== 'dragging') {
-                var dragDistance = node.dragDistance();
-                var distance = Math.max(Math.abs(pos.x - elem.startPointerPos.x), Math.abs(pos.y - elem.startPointerPos.y));
+                const dragDistance = node.dragDistance();
+                const distance = Math.max(Math.abs(pos.x - elem.startPointerPos.x), Math.abs(pos.y - elem.startPointerPos.y));
                 if (distance < dragDistance) {
                     return;
                 }
@@ -104,8 +104,10 @@ exports.DD = {
 if (Global_1.Konva.isBrowser) {
     window.addEventListener('mouseup', exports.DD._endDragBefore, true);
     window.addEventListener('touchend', exports.DD._endDragBefore, true);
+    window.addEventListener('touchcancel', exports.DD._endDragBefore, true);
     window.addEventListener('mousemove', exports.DD._drag);
     window.addEventListener('touchmove', exports.DD._drag);
     window.addEventListener('mouseup', exports.DD._endDragAfter, false);
     window.addEventListener('touchend', exports.DD._endDragAfter, false);
+    window.addEventListener('touchcancel', exports.DD._endDragAfter, false);
 }

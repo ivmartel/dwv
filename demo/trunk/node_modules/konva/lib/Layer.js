@@ -9,7 +9,7 @@ const Canvas_1 = require("./Canvas");
 const Validators_1 = require("./Validators");
 const Shape_1 = require("./Shape");
 const Global_1 = require("./Global");
-var HASH = '#', BEFORE_DRAW = 'beforeDraw', DRAW = 'draw', INTERSECTION_OFFSETS = [
+const HASH = '#', BEFORE_DRAW = 'beforeDraw', DRAW = 'draw', INTERSECTION_OFFSETS = [
     { x: 0, y: 0 },
     { x: -1, y: -1 },
     { x: 1, y: -1 },
@@ -52,7 +52,7 @@ class Layer extends Container_1.Container {
     }
     setZIndex(index) {
         super.setZIndex(index);
-        var stage = this.getStage();
+        const stage = this.getStage();
         if (stage && stage.content) {
             stage.content.removeChild(this.getNativeCanvasElement());
             if (index < stage.children.length - 1) {
@@ -66,7 +66,7 @@ class Layer extends Container_1.Container {
     }
     moveToTop() {
         Node_1.Node.prototype.moveToTop.call(this);
-        var stage = this.getStage();
+        const stage = this.getStage();
         if (stage && stage.content) {
             stage.content.removeChild(this.getNativeCanvasElement());
             stage.content.appendChild(this.getNativeCanvasElement());
@@ -74,11 +74,11 @@ class Layer extends Container_1.Container {
         return true;
     }
     moveUp() {
-        var moved = Node_1.Node.prototype.moveUp.call(this);
+        const moved = Node_1.Node.prototype.moveUp.call(this);
         if (!moved) {
             return false;
         }
-        var stage = this.getStage();
+        const stage = this.getStage();
         if (!stage || !stage.content) {
             return false;
         }
@@ -93,9 +93,9 @@ class Layer extends Container_1.Container {
     }
     moveDown() {
         if (Node_1.Node.prototype.moveDown.call(this)) {
-            var stage = this.getStage();
+            const stage = this.getStage();
             if (stage) {
-                var children = stage.children;
+                const children = stage.children;
                 if (stage.content) {
                     stage.content.removeChild(this.getNativeCanvasElement());
                     stage.content.insertBefore(this.getNativeCanvasElement(), children[this.index + 1].getCanvas()._canvas);
@@ -107,9 +107,9 @@ class Layer extends Container_1.Container {
     }
     moveToBottom() {
         if (Node_1.Node.prototype.moveToBottom.call(this)) {
-            var stage = this.getStage();
+            const stage = this.getStage();
             if (stage) {
-                var children = stage.children;
+                const children = stage.children;
                 if (stage.content) {
                     stage.content.removeChild(this.getNativeCanvasElement());
                     stage.content.insertBefore(this.getNativeCanvasElement(), children[1].getCanvas()._canvas);
@@ -123,7 +123,7 @@ class Layer extends Container_1.Container {
         return this;
     }
     remove() {
-        var _canvas = this.getNativeCanvasElement();
+        const _canvas = this.getNativeCanvasElement();
         Node_1.Node.prototype.remove.call(this);
         if (_canvas && _canvas.parentNode && Util_1.Util._isInDocument(_canvas)) {
             _canvas.parentNode.removeChild(_canvas);
@@ -140,7 +140,7 @@ class Layer extends Container_1.Container {
         return this;
     }
     _validateAdd(child) {
-        var type = child.getType();
+        const type = child.getType();
         if (type !== 'Group' && type !== 'Shape') {
             Util_1.Util.throw('You may only add groups and shapes to a layer.');
         }
@@ -196,8 +196,8 @@ class Layer extends Container_1.Container {
         if (!this.isListening() || !this.isVisible()) {
             return null;
         }
-        var spiralSearchDistance = 1;
-        var continueSearch = false;
+        let spiralSearchDistance = 1;
+        let continueSearch = false;
         while (true) {
             for (let i = 0; i < INTERSECTION_OFFSETS_LEN; i++) {
                 const intersectionOffset = INTERSECTION_OFFSETS[i];
@@ -246,7 +246,7 @@ class Layer extends Container_1.Container {
         return {};
     }
     drawScene(can, top) {
-        var layer = this.getLayer(), canvas = can || (layer && layer.getCanvas());
+        const layer = this.getLayer(), canvas = can || (layer && layer.getCanvas());
         this._fire(BEFORE_DRAW, {
             node: this,
         });
@@ -260,7 +260,7 @@ class Layer extends Container_1.Container {
         return this;
     }
     drawHit(can, top) {
-        var layer = this.getLayer(), canvas = can || (layer && layer.hitCanvas);
+        const layer = this.getLayer(), canvas = can || (layer && layer.hitCanvas);
         if (layer && layer.clearBeforeDraw()) {
             layer.getHitCanvas().getContext().clear();
         }
@@ -287,8 +287,8 @@ class Layer extends Container_1.Container {
         if (!this.parent || !this.parent['content']) {
             return;
         }
-        var parent = this.parent;
-        var added = !!this.hitCanvas._canvas.parentNode;
+        const parent = this.parent;
+        const added = !!this.hitCanvas._canvas.parentNode;
         if (added) {
             parent.content.removeChild(this.hitCanvas._canvas);
         }

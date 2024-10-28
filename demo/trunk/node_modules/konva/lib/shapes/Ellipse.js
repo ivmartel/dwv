@@ -7,7 +7,7 @@ const Validators_1 = require("../Validators");
 const Global_1 = require("../Global");
 class Ellipse extends Shape_1.Shape {
     _sceneFunc(context) {
-        var rx = this.radiusX(), ry = this.radiusY();
+        const rx = this.radiusX(), ry = this.radiusY();
         context.beginPath();
         context.save();
         if (rx !== ry) {

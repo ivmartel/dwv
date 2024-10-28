@@ -78,7 +78,7 @@ class Image extends Shape_1.Shape {
         }
     }
     _hitFunc(context) {
-        var width = this.width(), height = this.height(), cornerRadius = this.cornerRadius();
+        const width = this.width(), height = this.height(), cornerRadius = this.cornerRadius();
         context.beginPath();
         if (!cornerRadius) {
             context.rect(0, 0, width, height);
@@ -98,9 +98,9 @@ class Image extends Shape_1.Shape {
         return (_a = this.attrs.height) !== null && _a !== void 0 ? _a : (_b = this.image()) === null || _b === void 0 ? void 0 : _b.height;
     }
     static fromURL(url, callback, onError = null) {
-        var img = Util_1.Util.createImageElement();
+        const img = Util_1.Util.createImageElement();
         img.onload = function () {
-            var image = new Image({
+            const image = new Image({
                 image: img,
             });
             callback(image);

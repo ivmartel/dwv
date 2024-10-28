@@ -116,7 +116,7 @@ class Animation {
                 }
             }
         }
-        for (let key in layerHash) {
+        for (const key in layerHash) {
             if (!layerHash.hasOwnProperty(key)) {
                 continue;
             }

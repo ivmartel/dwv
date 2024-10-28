@@ -8,7 +8,7 @@ const Validators_1 = require("../Validators");
 const Global_2 = require("../Global");
 class Arc extends Shape_1.Shape {
     _sceneFunc(context) {
-        var angle = Global_1.Konva.getAngle(this.angle()), clockwise = this.clockwise();
+        const angle = Global_1.Konva.getAngle(this.angle()), clockwise = this.clockwise();
         context.beginPath();
         context.arc(0, 0, this.outerRadius(), 0, angle, clockwise);
         context.arc(0, 0, this.innerRadius(), angle, 0, !clockwise);

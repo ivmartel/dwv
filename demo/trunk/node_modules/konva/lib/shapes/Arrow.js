@@ -9,16 +9,16 @@ const Path_1 = require("./Path");
 class Arrow extends Line_1.Line {
     _sceneFunc(ctx) {
         super._sceneFunc(ctx);
-        var PI2 = Math.PI * 2;
-        var points = this.points();
-        var tp = points;
-        var fromTension = this.tension() !== 0 && points.length > 4;
+        const PI2 = Math.PI * 2;
+        const points = this.points();
+        let tp = points;
+        const fromTension = this.tension() !== 0 && points.length > 4;
         if (fromTension) {
             tp = this.getTensionPoints();
         }
-        var length = this.pointerLength();
-        var n = points.length;
-        var dx, dy;
+        const length = this.pointerLength();
+        const n = points.length;
+        let dx, dy;
         if (fromTension) {
             const lp = [
                 tp[tp.length - 4],
@@ -37,8 +37,8 @@ class Arrow extends Line_1.Line {
             dx = points[n - 2] - points[n - 4];
             dy = points[n - 1] - points[n - 3];
         }
-        var radians = (Math.atan2(dy, dx) + PI2) % PI2;
-        var width = this.pointerWidth();
+        const radians = (Math.atan2(dy, dx) + PI2) % PI2;
+        const width = this.pointerWidth();
         if (this.pointerAtEnding()) {
             ctx.save();
             ctx.beginPath();
@@ -73,7 +73,7 @@ class Arrow extends Line_1.Line {
         }
     }
     __fillStroke(ctx) {
-        var isDashEnabled = this.dashEnabled();
+        const isDashEnabled = this.dashEnabled();
         if (isDashEnabled) {
             this.attrs.dashEnabled = false;
             ctx.setLineDash([]);

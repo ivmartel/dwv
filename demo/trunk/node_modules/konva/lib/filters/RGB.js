@@ -5,7 +5,7 @@ const Factory_1 = require("../Factory");
 const Node_1 = require("../Node");
 const Validators_1 = require("../Validators");
 const RGB = function (imageData) {
-    var data = imageData.data, nPixels = data.length, red = this.red(), green = this.green(), blue = this.blue(), i, brightness;
+    let data = imageData.data, nPixels = data.length, red = this.red(), green = this.green(), blue = this.blue(), i, brightness;
     for (i = 0; i < nPixels; i += 4) {
         brightness =
             (0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]) / 255;

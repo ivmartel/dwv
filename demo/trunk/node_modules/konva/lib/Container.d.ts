@@ -28,7 +28,7 @@ export declare abstract class Container<ChildType extends Node = Node> extends N
     toObject(): {
         attrs: any;
         className: string;
-        children?: any[] | undefined;
+        children?: Array<any>;
     };
     isAncestorOf(node: Node): boolean;
     clone(obj?: any): this;

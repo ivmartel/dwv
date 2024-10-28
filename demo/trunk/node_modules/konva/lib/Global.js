@@ -16,7 +16,7 @@ exports.glob = typeof global !== 'undefined'
             : {};
 exports.Konva = {
     _global: exports.glob,
-    version: '9.3.15',
+    version: '9.3.16',
     isBrowser: detectBrowser(),
     isUnminified: /param/.test(function (param) { }.toString()),
     dblClickWindow: 400,

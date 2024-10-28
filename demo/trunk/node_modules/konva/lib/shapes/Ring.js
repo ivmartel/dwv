@@ -5,7 +5,7 @@ const Factory_1 = require("../Factory");
 const Shape_1 = require("../Shape");
 const Validators_1 = require("../Validators");
 const Global_1 = require("../Global");
-var PIx2 = Math.PI * 2;
+const PIx2 = Math.PI * 2;
 class Ring extends Shape_1.Shape {
     _sceneFunc(context) {
         context.beginPath();

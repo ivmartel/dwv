@@ -5,7 +5,7 @@ const Util_1 = require("./Util");
 const Animation_1 = require("./Animation");
 const Node_1 = require("./Node");
 const Global_1 = require("./Global");
-var blacklist = {
+let blacklist = {
     node: 1,
     duration: 1,
     easing: 1,
@@ -31,7 +31,7 @@ class TweenEngine {
         this.pause();
     }
     fire(str) {
-        var handler = this[str];
+        const handler = this[str];
         if (handler) {
             handler();
         }
@@ -110,7 +110,7 @@ class TweenEngine {
         this.fire('onUpdate');
     }
     onEnterFrame() {
-        var t = this.getTimer() - this._startTime;
+        const t = this.getTimer() - this._startTime;
         if (this.state === PLAYING) {
             this.setTime(t);
         }
@@ -128,7 +128,7 @@ class TweenEngine {
 }
 class Tween {
     constructor(config) {
-        var that = this, node = config.node, nodeId = node._id, duration, easing = config.easing || exports.Easings.Linear, yoyo = !!config.yoyo, key;
+        let that = this, node = config.node, nodeId = node._id, duration, easing = config.easing || exports.Easings.Linear, yoyo = !!config.yoyo, key;
         if (typeof config.duration === 'undefined') {
             duration = 0.3;
         }
@@ -140,7 +140,7 @@ class Tween {
         }
         this.node = node;
         this._id = idCounter++;
-        var layers = node.getLayer() ||
+        const layers = node.getLayer() ||
             (node instanceof Global_1.Konva['Stage'] ? node.getLayers() : null);
         if (!layers) {
             Util_1.Util.error('Tween constructor have `node` that is not in a layer. Please add node into layer first.');
@@ -172,7 +172,7 @@ class Tween {
         this.onUpdate = config.onUpdate;
     }
     _addAttr(key, end) {
-        var node = this.node, nodeId = node._id, start, diff, tweenId, n, len, trueEnd, trueStart, endRGBA;
+        let node = this.node, nodeId = node._id, start, diff, tweenId, n, len, trueEnd, trueStart, endRGBA;
         tweenId = Tween.tweens[nodeId][key];
         if (tweenId) {
             delete Tween.attrs[nodeId][tweenId][key];
@@ -197,7 +197,7 @@ class Tween {
                         diff.push(end[n] - start[n]);
                     }
                     else {
-                        var startRGBA = Util_1.Util.colorToRGBA(start[n]);
+                        const startRGBA = Util_1.Util.colorToRGBA(start[n]);
                         endRGBA = Util_1.Util.colorToRGBA(end[n]);
                         start[n] = startRGBA;
                         diff.push({
@@ -238,7 +238,7 @@ class Tween {
         Tween.tweens[nodeId][key] = this._id;
     }
     _tweenFunc(i) {
-        var node = this.node, attrs = Tween.attrs[node._id][this._id], key, attr, start, diff, newVal, n, len, end;
+        let node = this.node, attrs = Tween.attrs[node._id][this._id], key, attr, start, diff, newVal, n, len, end;
         for (key in attrs) {
             attr = attrs[key];
             start = attr.start;
@@ -300,8 +300,8 @@ class Tween {
             this.anim.stop();
         };
         this.tween.onFinish = () => {
-            var node = this.node;
-            var attrs = Tween.attrs[node._id][this._id];
+            const node = this.node;
+            const attrs = Tween.attrs[node._id][this._id];
             if (attrs.points && attrs.points.trueEnd) {
                 node.setAttr('points', attrs.points.trueEnd);
             }
@@ -310,8 +310,8 @@ class Tween {
             }
         };
         this.tween.onReset = () => {
-            var node = this.node;
-            var attrs = Tween.attrs[node._id][this._id];
+            const node = this.node;
+            const attrs = Tween.attrs[node._id][this._id];
             if (attrs.points && attrs.points.trueStart) {
                 node.points(attrs.points.trueStart);
             }
@@ -350,7 +350,7 @@ class Tween {
         return this;
     }
     destroy() {
-        var nodeId = this.node._id, thisId = this._id, attrs = Tween.tweens[nodeId], key;
+        let nodeId = this.node._id, thisId = this._id, attrs = Tween.tweens[nodeId], key;
         this.pause();
         for (key in attrs) {
             delete Tween.tweens[nodeId][key];
@@ -362,7 +362,7 @@ exports.Tween = Tween;
 Tween.attrs = {};
 Tween.tweens = {};
 Node_1.Node.prototype.to = function (params) {
-    var onFinish = params.onFinish;
+    const onFinish = params.onFinish;
     params.node = this;
     params.onFinish = function () {
         this.destroy();
@@ -370,27 +370,27 @@ Node_1.Node.prototype.to = function (params) {
             onFinish();
         }
     };
-    var tween = new Tween(params);
+    const tween = new Tween(params);
     tween.play();
 };
 exports.Easings = {
     BackEaseIn(t, b, c, d) {
-        var s = 1.70158;
+        const s = 1.70158;
         return c * (t /= d) * t * ((s + 1) * t - s) + b;
     },
     BackEaseOut(t, b, c, d) {
-        var s = 1.70158;
+        const s = 1.70158;
         return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
     },
     BackEaseInOut(t, b, c, d) {
-        var s = 1.70158;
+        let s = 1.70158;
         if ((t /= d / 2) < 1) {
             return (c / 2) * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
         }
         return (c / 2) * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
     },
     ElasticEaseIn(t, b, c, d, a, p) {
-        var s = 0;
+        let s = 0;
         if (t === 0) {
             return b;
         }
@@ -412,7 +412,7 @@ exports.Easings = {
             Math.sin(((t * d - s) * (2 * Math.PI)) / p)) + b);
     },
     ElasticEaseOut(t, b, c, d, a, p) {
-        var s = 0;
+        let s = 0;
         if (t === 0) {
             return b;
         }
@@ -434,7 +434,7 @@ exports.Easings = {
             b);
     },
     ElasticEaseInOut(t, b, c, d, a, p) {
-        var s = 0;
+        let s = 0;
         if (t === 0) {
             return b;
         }

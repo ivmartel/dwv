@@ -1,6 +1,6 @@
 {
   "name": "konva",
-  "version": "9.3.15",
+  "version": "9.3.16",
   "author": "Anton Lavrenov",
   "files": [
     "README.md",
@@ -20,7 +20,7 @@
     "test": "npm run test:browser && npm run test:node",
     "test:build": "parcel build ./test/unit-tests.html --dist-dir ./test-build --target none --public-url ./ --no-source-maps",
     "test:browser": "npm run test:build && mocha-headless-chrome -f ./test-build/unit-tests.html -a disable-web-security",
-    "test:watch": "rm -rf ./.parcel-cache && parcel serve ./test/unit-tests.html ./test/manual-tests.html ./test/sandbox.html ./test/text-paths.html ./test/bunnies.html",
+    "test:watch": "rm -rf ./.parcel-cache && PARCEL_WORKERS=0  parcel serve ./test/unit-tests.html ./test/manual-tests.html ./test/sandbox.html ./test/text-paths.html ./test/bunnies.html",
     "test:node": "ts-mocha -r ./test/node-global-setup.mjs -p ./test/tsconfig.json test/unit/**/*.ts --exit && npm run test:import",
     "tsc": "tsc --removeComments",
     "rollup": "rollup -c --bundleConfigAsCjs",
@@ -81,9 +81,6 @@
     "parcel": "2.10.1",
     "process": "^0.11.10",
     "rollup": "^4.9.1",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-typescript2": "^0.36.0",
     "size-limit": "^11.0.1",
     "ts-mocha": "^10.0.0",

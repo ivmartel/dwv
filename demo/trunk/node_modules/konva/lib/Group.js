@@ -6,7 +6,7 @@ const Container_1 = require("./Container");
 const Global_1 = require("./Global");
 class Group extends Container_1.Container {
     _validateAdd(child) {
-        var type = child.getType();
+        const type = child.getType();
         if (type !== 'Group' && type !== 'Shape') {
             Util_1.Util.throw('You may only add groups and shapes to groups.');
         }
