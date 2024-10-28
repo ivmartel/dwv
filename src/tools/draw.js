@@ -298,6 +298,10 @@ export class Draw {
     if (!(selectedShape instanceof Konva.Shape)) {
       return;
     }
+    this.#fireEvent({
+      type: 'annotationselect',
+      annotationId: group.id()
+    });
     this.#shapeHandler.setEditorShape(selectedShape, drawLayer);
   }
 
@@ -801,7 +805,7 @@ export class Draw {
    */
   getEventNames() {
     return [
-      'annotationupdate', 'warn'
+      'annotationupdate', 'annotationselect', 'warn'
     ];
   }
 
@@ -845,6 +849,8 @@ export class Draw {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
+    console.log(this.#listeners);
+    console.log(this.#listeners[event.type]);
     if (typeof this.#listeners[event.type] === 'undefined') {
       return;
     }
