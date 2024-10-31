@@ -140,18 +140,20 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   // remove extra
   delete tags.PixelData;
   // image position
-  let spacing = 1;
-  if (typeof tags.PixelSpacing !== 'undefined') {
-    spacing = tags.PixelSpacing[0];
+  let sliceSpacing = 1;
+  if (typeof tags.SliceThickness !== 'undefined') {
+    sliceSpacing = tags.SliceThickness;
+  } else if (typeof tags.PixelSpacing !== 'undefined') {
+    sliceSpacing = tags.PixelSpacing[0];
   }
   const orientationName =
     dwv.getOrientationName(tags.ImageOrientationPatient);
   if (orientationName === dwv.Orientation.Axial) {
-    tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
+    tags.ImagePositionPatient = [0, 0, sliceNumber * sliceSpacing];
   } else if (orientationName === dwv.Orientation.Coronal) {
-    tags.ImagePositionPatient = [0, sliceNumber * spacing, 0];
+    tags.ImagePositionPatient = [0, sliceNumber * sliceSpacing, 0];
   } else if (orientationName === dwv.Orientation.Sagittal) {
-    tags.ImagePositionPatient = [sliceNumber * spacing, 0, 0];
+    tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
   }
   // instance number
   tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
