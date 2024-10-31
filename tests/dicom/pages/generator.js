@@ -167,8 +167,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   const dicomBuffer = writer.getBuffer(dicomElements);
 
   // view as Blob to allow download
-  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-  return blob;
+  return new Blob([dicomBuffer], {type: 'application/dicom'});
 }
 
 /**
