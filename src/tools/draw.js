@@ -300,7 +300,8 @@ export class Draw {
     }
     this.#fireEvent({
       type: 'annotationselect',
-      annotationId: group.id()
+      annotationId: group.id(),
+      dataId: drawLayer.getDataId()
     });
     this.#shapeHandler.setEditorShape(selectedShape, drawLayer);
   }
