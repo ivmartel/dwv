@@ -132,6 +132,7 @@ test.generatePixelDataFromJSONTags = function (
   const generator = new GeneratorClass({
     numberOfColumns: numberOfColumns,
     numberOfRows: numberOfRows,
+    numberOfSlices: numberOfSlices,
     numberOfFrames: numberOfFrames,
     numberOfSamples: numberOfSamples,
     numberOfColourPlanes: numberOfColourPlanes,
