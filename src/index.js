@@ -107,6 +107,7 @@ import {
   getOrientationName
 } from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
+import {getRectangleIndices} from './math/rectangle';
 import {NumberRange} from './math/stats';
 // tools
 import {toolList, toolOptions} from './tools/index';
@@ -201,6 +202,7 @@ export {
   getUID,
   getElementsFromJSONTags,
   getEllipseIndices,
+  getRectangleIndices,
   getLayerDetailsFromEvent,
   getTypedArray,
   getTagFromKey,

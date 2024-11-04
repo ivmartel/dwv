@@ -1,5 +1,6 @@
 import {Point2D} from './point';
 import {getStats} from './stats';
+import {Index} from './index';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -234,3 +235,32 @@ export class Rectangle {
   }
 
 } // Rectangle class
+
+/**
+ * Get the indices that form a rectangle.
+ *
+ * @param {Index} center The rectangle center.
+ * @param {number[]} size The 2 rectangle sizes.
+ * @param {number[]} dir The 2 rectangle directions.
+ * @returns {Index[]} The indices of the rectangle.
+ */
+export function getRectangleIndices(center, size, dir) {
+  const centerValues = center.getValues();
+  // keep all values for possible extra dimensions
+  const values = centerValues.slice();
+  const indices = [];
+  const sizeI = size[0];
+  const halfSizeI = Math.floor(sizeI / 2);
+  const sizeJ = size[1];
+  const halfSizeJ = Math.floor(sizeJ / 2);
+  const di = dir[0];
+  const dj = dir[1];
+  for (let j = 0; j < sizeJ; ++j) {
+    values[dj] = centerValues[dj] - halfSizeJ + j;
+    for (let i = 0; i < sizeI; ++i) {
+      values[di] = centerValues[di] - halfSizeI + i;
+      indices.push(new Index(values.slice()));
+    }
+  }
+  return indices;
+}
