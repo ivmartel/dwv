@@ -504,6 +504,9 @@ export function getOrientationName(cosines: number[]): string | undefined;
 export function getPixelDataTag(): Tag;
 
 // @public
+export function getRectangleIndices(center: Index, size: number[], dir: number[]): Index[];
+
+// @public
 export function getReverseOrientation(ori: string): string;
 
 // @public
