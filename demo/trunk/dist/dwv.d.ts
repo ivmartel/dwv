@@ -2358,6 +2358,16 @@ export declare function getOrientationName(cosines: number[]): string | undefine
 export declare function getPixelDataTag(): Tag;
 
 /**
+ * Get the indices that form a rectangle.
+ *
+ * @param {Index} center The rectangle center.
+ * @param {number[]} size The 2 rectangle sizes.
+ * @param {number[]} dir The 2 rectangle directions.
+ * @returns {Index[]} The indices of the rectangle.
+ */
+export declare function getRectangleIndices(center: Index, size: number[], dir: number[]): Index[];
+
+/**
  * Get patient orientation label in the reverse direction.
  *
  * @param {string} ori Patient Orientation value.
