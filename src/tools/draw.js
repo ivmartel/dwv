@@ -294,6 +294,7 @@ export class Draw {
    */
   #selectShapeGroup(drawLayer, kshape) {
     let group = kshape.getParent();
+    // kshape: Konva.Tag -> parent: Konva.Label -> parent: Konva.Group
     if (kshape instanceof Konva.Tag) {
       group = group.getParent();
     }
