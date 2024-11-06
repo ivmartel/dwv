@@ -293,7 +293,10 @@ export class Draw {
    * @param {Konva.Shape} kshape The shape that has been selected.
    */
   #selectShapeGroup(drawLayer, kshape) {
-    const group = kshape.getParent();
+    let group = kshape.getParent();
+    if (kshape instanceof Konva.Tag) {
+      group = group.getParent();
+    }
     const selectedShape = group.find('.shape')[0];
     if (!(selectedShape instanceof Konva.Shape)) {
       return;
