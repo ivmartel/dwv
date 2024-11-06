@@ -161,9 +161,9 @@ export class DrawLayer {
   /**
    * Current position group id.
    *
-   * @type {string}
+   * @type {string|undefined}
    */
-  #currentPosGroupId = null;
+  #currentPosGroupId;
 
   /**
    * Draw shape handler.
@@ -1092,7 +1092,8 @@ export class DrawLayer {
     let visible;
     for (let i = 0, leni = posGroups.length; i < leni; ++i) {
       visible = false;
-      if (posGroups[i].id() === this.#currentPosGroupId) {
+      if (typeof posGroupId !== 'undefined' &&
+        posGroups[i].id() === posGroupId) {
         visible = true;
       }
       // group members inherit the visible property
@@ -1109,6 +1110,9 @@ export class DrawLayer {
    * @returns {Konva.Group|undefined} The Konva.Group.
    */
   getCurrentPosGroup() {
+    if (typeof this.#currentPosGroupId === 'undefined') {
+      return;
+    }
     // get position groups
     const posGroups = this.getKonvaLayer().getChildren((node) => {
       return node.id() === this.#currentPosGroupId;
