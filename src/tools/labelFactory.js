@@ -156,15 +156,15 @@ export class LabelFactory {
   /**
    * Get the connector between this label and its shape.
    *
-   * @param {Point2D[]} shapeAnchorsPos The shape anchors positions.
+   * @param {Point2D[]} connectorsPos The shape connectors positions.
    * @param {Konva.Label} label The label.
    * @param {Style} style The drawing style.
    * @returns {Konva.Line} The connector.
    */
-  getConnector(shapeAnchorsPos, label, style) {
+  getConnector(connectorsPos, label, style) {
     const labelAnchorsPos = this.getLabelAnchorsPosition(label);
     const anchorPoints = this.getClosestPoints(
-      shapeAnchorsPos, labelAnchorsPos);
+      connectorsPos, labelAnchorsPos);
     return new Konva.Line({
       points: [
         anchorPoints[0].getX(),
@@ -183,9 +183,9 @@ export class LabelFactory {
    * Update the connector between a label and its shape.
    *
    * @param {Konva.Group} group The associated shape group.
-   * @param {Point2D[]} shapeAnchorsPos The shape anchors positions.
+   * @param {Point2D[]} connectorsPos The shape connectors positions.
    */
-  updateConnector(group, shapeAnchorsPos) {
+  updateConnector(group, connectorsPos) {
     // associated label
     const klabel = group.getChildren(function (node) {
       return node.name() === 'label';
@@ -196,7 +196,7 @@ export class LabelFactory {
 
     const labelAnchorsPos = this.getLabelAnchorsPosition(klabel);
 
-    const anchors = this.getClosestPoints(shapeAnchorsPos, labelAnchorsPos);
+    const anchors = this.getClosestPoints(connectorsPos, labelAnchorsPos);
 
     const kconnect = group.getChildren(function (node) {
       return node.name() === 'connector';
