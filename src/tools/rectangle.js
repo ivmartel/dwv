@@ -218,6 +218,9 @@ export class RectangleFactory {
       const krect = group.getChildren(function (node) {
         return node.name() === 'shape';
       })[0];
+      if (!(krect instanceof Konva.Rect)) {
+        return;
+      }
       const shapeAnchorsPos = this.getConnectorsPositions(krect);
       this.#labelFactory.updateConnector(group, shapeAnchorsPos);
     }
@@ -305,6 +308,9 @@ export class RectangleFactory {
     const kshape = group.getChildren(function (node) {
       return node.name() === 'shape';
     })[0];
+    if (!(kshape instanceof Konva.Rect)) {
+      return;
+    }
     const shapeAnchorsPos = this.getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, shapeAnchorsPos);
   }
