@@ -112,8 +112,8 @@ export class RectangleFactory {
     group.add(label);
 
     // label-shape connector
-    const shapeAnchorsPos = this.#getAnchorsPositions(shape);
-    group.add(this.#labelFactory.getConnector(shapeAnchorsPos, label, style));
+    const connectorsPos = this.getConnectorsPositions(shape);
+    group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
 
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
@@ -215,14 +215,7 @@ export class RectangleFactory {
       this.#labelFactory.updatePosition(annotation, group);
     } else {
       // update connector if not default position
-      const krect = group.getChildren(function (node) {
-        return node.name() === 'shape';
-      })[0];
-      if (!(krect instanceof Konva.Rect)) {
-        return;
-      }
-      const shapeAnchorsPos = this.getConnectorsPositions(krect);
-      this.#labelFactory.updateConnector(group, shapeAnchorsPos);
+      this.updateConnector(group);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -311,8 +304,8 @@ export class RectangleFactory {
     if (!(kshape instanceof Konva.Rect)) {
       return;
     }
-    const shapeAnchorsPos = this.getConnectorsPositions(kshape);
-    this.#labelFactory.updateConnector(group, shapeAnchorsPos);
+    const connectorsPos = this.getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, connectorsPos);
   }
 
   /**
