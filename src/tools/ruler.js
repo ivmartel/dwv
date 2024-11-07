@@ -105,6 +105,7 @@ export class RulerFactory {
     group.visible(true);
     group.id(annotation.id);
     // konva shape
+    const shape = this.#createShape(annotation, style);
     group.add(this.#createShape(annotation, style));
     // extras
     const extras = this.#createShapeExtras(annotation, style);
@@ -112,12 +113,31 @@ export class RulerFactory {
       group.add(extra);
     }
     // konva label
+    const label = this.#labelFactory.create(annotation, style);
     group.add(this.#labelFactory.create(annotation, style));
+    // label-shape connector
+    const shapeAnchorsPos = this.getConnectorsPositions(shape);
+    group.add(this.#labelFactory.getConnector(shapeAnchorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
       group.add(this.#getDebugShadow(annotation));
     }
     return group;
+  }
+
+  /**
+   * Get the connectors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The connectors positions.
+   */
+  getConnectorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    const centerX = (points[0] + points[2]) / 2 + sx;
+    const centerY = (points[1] + points[3]) / 2 + sy;
+    return [new Point2D(centerX, centerY)];
   }
 
   /**
@@ -141,7 +161,7 @@ export class RulerFactory {
    *
    * @param {Konva.Line} shape The associated shape.
    * @param {Style} style The application style.
-   * @returns {Konva.Ellipse[]} A list of anchors.
+   * @returns {Konva.Line[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const positions = this.#getAnchorsPositions(shape);
@@ -160,7 +180,7 @@ export class RulerFactory {
   /**
    * Constrain anchor movement.
    *
-   * @param {Konva.Ellipse} _anchor The active anchor.
+   * @param {Konva.Line} _anchor The active anchor.
    */
   constrainAnchorMove(_anchor) {
     // no constraints
@@ -171,7 +191,7 @@ export class RulerFactory {
    *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Konva.Line} anchor The active anchor.
    * @param {Style} style The application style.
    */
   updateShapeGroupOnAnchorMove(annotation, anchor, style) {
@@ -188,6 +208,16 @@ export class RulerFactory {
     // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
       this.#labelFactory.updatePosition(annotation, group);
+    } else {
+      // update connector if not default position
+      const kruler = group.getChildren(function (node) {
+        return node.name() === 'shape';
+      })[0];
+      if (!(kruler instanceof Konva.Line)) {
+        return;
+      }
+      const shapeAnchorsPos = this.getConnectorsPositions(kruler);
+      this.#labelFactory.updateConnector(group, shapeAnchorsPos);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -270,6 +300,22 @@ export class RulerFactory {
    */
   updateLabelContent(annotation, group, _style) {
     this.#labelFactory.updateContent(annotation, group);
+  }
+
+  /**
+   * Update the shape connector.
+   *
+   * @param {Konva.Group} group The shape group.
+   */
+  updateConnector(group) {
+    const kshape = group.getChildren(function (node) {
+      return node.name() === 'shape';
+    })[0];
+    if (!(kshape instanceof Konva.Line)) {
+      return;
+    }
+    const shapeAnchorsPos = this.getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, shapeAnchorsPos);
   }
 
   /**
@@ -404,7 +450,7 @@ export class RulerFactory {
    *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Konva.Line} anchor The active anchor.
    * @param {Style} style The application style.
    */
   #updateShape(annotation, anchor, style) {
