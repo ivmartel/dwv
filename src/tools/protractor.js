@@ -126,6 +126,23 @@ export class ProtractorFactory {
   }
 
   /**
+   * Get the anchors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The anchor positions.
+   */
+  #getAnchorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    return [
+      new Point2D(points[0] + sx, points[1] + sy),
+      new Point2D(points[2] + sx, points[3] + sy),
+      new Point2D(points[4] + sx, points[5] + sy)
+    ];
+  }
+
+  /**
    * Get anchors to update a line shape.
    *
    * @param {Konva.Line} shape The associated shape.
@@ -133,19 +150,16 @@ export class ProtractorFactory {
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
-    const points = shape.points();
-
-    // compensate for possible shape drag
+    const positions = this.#getAnchorsPositions(shape);
     const anchors = [];
-    anchors.push(getDefaultAnchor(
-      points[0] + shape.x(), points[1] + shape.y(), 'begin', style
-    ));
-    anchors.push(getDefaultAnchor(
-      points[2] + shape.x(), points[3] + shape.y(), 'mid', style
-    ));
-    anchors.push(getDefaultAnchor(
-      points[4] + shape.x(), points[5] + shape.y(), 'end', style
-    ));
+    for (let i = 0; i < positions.length; ++i) {
+      anchors.push(getDefaultAnchor(
+        positions[i].getX(),
+        positions[i].getY(),
+        'anchor' + i,
+        style
+      ));
+    }
     return anchors;
   }
 
@@ -208,13 +222,13 @@ export class ProtractorFactory {
     }
     // find special points
     const begin = group.getChildren(function (node) {
-      return node.id() === 'begin';
+      return node.id() === 'anchor0';
     })[0];
     const mid = group.getChildren(function (node) {
-      return node.id() === 'mid';
+      return node.id() === 'anchor1';
     })[0];
     const end = group.getChildren(function (node) {
-      return node.id() === 'end';
+      return node.id() === 'anchor2';
     })[0];
 
     // math shape
@@ -441,26 +455,26 @@ export class ProtractorFactory {
 
     // find special points
     const begin = group.getChildren(function (node) {
-      return node.id() === 'begin';
+      return node.id() === 'anchor0';
     })[0];
     const mid = group.getChildren(function (node) {
-      return node.id() === 'mid';
+      return node.id() === 'anchor1';
     })[0];
     const end = group.getChildren(function (node) {
-      return node.id() === 'end';
+      return node.id() === 'anchor2';
     })[0];
 
     // update special points
     switch (anchor.id()) {
-    case 'begin':
+    case 'anchor0':
       begin.x(anchor.x());
       begin.y(anchor.y());
       break;
-    case 'mid':
+    case 'anchor1':
       mid.x(anchor.x());
       mid.y(anchor.y());
       break;
-    case 'end':
+    case 'anchor2':
       end.x(anchor.x());
       end.y(anchor.y());
       break;

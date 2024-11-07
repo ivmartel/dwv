@@ -116,6 +116,24 @@ export class CircleFactory {
   }
 
   /**
+   * Get the anchors positions for the shape.
+   *
+   * @param {Konva.Circle} shape The associated shape.
+   * @returns {Point2D[]} The anchor positions.
+   */
+  #getAnchorsPositions(shape) {
+    const centerX = shape.x();
+    const centerY = shape.y();
+    const radius = shape.radius();
+    return [
+      new Point2D(centerX - radius, centerY),
+      new Point2D(centerX + radius, centerY),
+      new Point2D(centerX, centerY + radius),
+      new Point2D(centerX, centerY - radius),
+    ];
+  }
+
+  /**
    * Get anchors to update a circle shape.
    *
    * @param {Konva.Circle} shape The associated shape.
@@ -123,23 +141,16 @@ export class CircleFactory {
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
-    const centerX = shape.x();
-    const centerY = shape.y();
-    const radius = shape.radius();
-
+    const positions = this.#getAnchorsPositions(shape);
     const anchors = [];
-    anchors.push(getDefaultAnchor(
-      centerX - radius, centerY, 'left', style
-    ));
-    anchors.push(getDefaultAnchor(
-      centerX + radius, centerY, 'right', style
-    ));
-    anchors.push(getDefaultAnchor(
-      centerX, centerY + radius, 'bottom', style
-    ));
-    anchors.push(getDefaultAnchor(
-      centerX, centerY - radius, 'top', style
-    ));
+    for (let i = 0; i < positions.length; ++i) {
+      anchors.push(getDefaultAnchor(
+        positions[i].getX(),
+        positions[i].getY(),
+        'anchor' + i,
+        style
+      ));
+    }
     return anchors;
   }
 
@@ -157,33 +168,33 @@ export class CircleFactory {
 
     // find special points
     const left = group.getChildren(function (node) {
-      return node.id() === 'left';
+      return node.id() === 'anchor0';
     })[0];
     const right = group.getChildren(function (node) {
-      return node.id() === 'right';
+      return node.id() === 'anchor1';
     })[0];
     const bottom = group.getChildren(function (node) {
-      return node.id() === 'bottom';
+      return node.id() === 'anchor2';
     })[0];
     const top = group.getChildren(function (node) {
-      return node.id() === 'top';
+      return node.id() === 'anchor3';
     })[0];
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'left':
+    case 'anchor0':
       // block y
       left.y(right.y());
       break;
-    case 'right':
+    case 'anchor1':
       // block y
       right.y(left.y());
       break;
-    case 'bottom':
+    case 'anchor2':
       // block x
       bottom.x(top.x());
       break;
-    case 'top':
+    case 'anchor3':
       // block x
       top.x(bottom.x());
       break;
@@ -363,16 +374,16 @@ export class CircleFactory {
 
     // find anchors
     const left = group.getChildren(function (node) {
-      return node.id() === 'left';
+      return node.id() === 'anchor0';
     })[0];
     const right = group.getChildren(function (node) {
-      return node.id() === 'right';
+      return node.id() === 'anchor1';
     })[0];
     const bottom = group.getChildren(function (node) {
-      return node.id() === 'bottom';
+      return node.id() === 'anchor2';
     })[0];
     const top = group.getChildren(function (node) {
-      return node.id() === 'top';
+      return node.id() === 'anchor3';
     })[0];
 
     const swapX = right.x() < left.x() ? -1 : 1;
@@ -380,7 +391,7 @@ export class CircleFactory {
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'left':
+    case 'anchor0':
       // update self
       left.x(anchor.x());
       // update others
@@ -388,7 +399,7 @@ export class CircleFactory {
       bottom.y(center.getY() + radius);
       top.y(center.getY() - radius);
       break;
-    case 'right':
+    case 'anchor1':
       // update self
       right.x(anchor.x());
       // update others
@@ -396,7 +407,7 @@ export class CircleFactory {
       bottom.y(center.getY() + radius);
       top.y(center.getY() - radius);
       break;
-    case 'bottom':
+    case 'anchor2':
       // update self
       bottom.y(anchor.y());
       // update others
@@ -404,7 +415,7 @@ export class CircleFactory {
       right.x(center.getX() + radius);
       top.y(center.getY() - swapY * radius);
       break;
-    case 'top':
+    case 'anchor3':
       // update self
       top.y(anchor.y());
       // update others

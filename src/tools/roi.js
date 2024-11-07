@@ -1,7 +1,11 @@
 import {ROI} from '../math/roi';
 import {Point2D} from '../math/point';
 import {defaults} from '../app/defaults';
-import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+import {
+  DRAW_DEBUG,
+  getDefaultAnchor,
+  getAnchorIndex
+} from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
 // external
@@ -116,6 +120,26 @@ export class RoiFactory {
   }
 
   /**
+   * Get the anchors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The anchor positions.
+   */
+  #getAnchorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    const positions = [];
+    for (let i = 0; i < points.length; i = i + 2) {
+      positions.push(new Point2D(
+        points[i] + sx,
+        points[i + 1] + sy
+      ));
+    }
+    return positions;
+  }
+
+  /**
    * Get anchors to update a roi shape.
    *
    * @param {Konva.Line} shape The associated shape.
@@ -123,17 +147,15 @@ export class RoiFactory {
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
-    const points = shape.points();
-
+    const positions = this.#getAnchorsPositions(shape);
     const anchors = [];
-    let index = 0;
-    for (let i = 0; i < points.length; i = i + 2) {
-      const px = points[i] + shape.x();
-      const py = points[i + 1] + shape.y();
+    for (let i = 0; i < positions.length; ++i) {
       anchors.push(getDefaultAnchor(
-        px, py, index.toString(), style
+        positions[i].getX(),
+        positions[i].getY(),
+        'anchor' + i,
+        style
       ));
-      ++index;
     }
     return anchors;
   }
@@ -204,7 +226,7 @@ export class RoiFactory {
       anchor.x() - kroi.x(),
       anchor.y() - kroi.y()
     );
-    const index = parseInt(anchor.id(), 10);
+    const index = getAnchorIndex(anchor.id());
     points[index] = newPoint;
 
     // new math shape
@@ -327,7 +349,7 @@ export class RoiFactory {
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the main list)
     const points = kroi.points();
-    const index = parseInt(anchor.id(), 10) * 2;
+    const index = getAnchorIndex(anchor.id()) * 2;
     points[index] = anchor.x() - kroi.x();
     points[index + 1] = anchor.y() - kroi.y();
     kroi.points(points);

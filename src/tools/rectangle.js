@@ -116,6 +116,25 @@ export class RectangleFactory {
   }
 
   /**
+   * Get the anchors positions for the shape.
+   *
+   * @param {Konva.Rect} shape The associated shape.
+   * @returns {Point2D[]} The anchor positions.
+   */
+  #getAnchorsPositions(shape) {
+    const sx = shape.x();
+    const sy = shape.y();
+    const width = shape.width();
+    const height = shape.height();
+    return [
+      new Point2D(sx, sy),
+      new Point2D(sx + width, sy),
+      new Point2D(sx + width, sy + height),
+      new Point2D(sx, sy + height),
+    ];
+  }
+
+  /**
    * Get anchors to update a rectangle shape.
    *
    * @param {Konva.Rect} shape The associated shape.
@@ -123,24 +142,16 @@ export class RectangleFactory {
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
-    const rectX = shape.x();
-    const rectY = shape.y();
-    const rectWidth = shape.width();
-    const rectHeight = shape.height();
-
+    const positions = this.#getAnchorsPositions(shape);
     const anchors = [];
-    anchors.push(getDefaultAnchor(
-      rectX, rectY, 'topLeft', style
-    ));
-    anchors.push(getDefaultAnchor(
-      rectX + rectWidth, rectY, 'topRight', style
-    ));
-    anchors.push(getDefaultAnchor(
-      rectX + rectWidth, rectY + rectHeight, 'bottomRight', style
-    ));
-    anchors.push(getDefaultAnchor(
-      rectX, rectY + rectHeight, 'bottomLeft', style
-    ));
+    for (let i = 0; i < positions.length; ++i) {
+      anchors.push(getDefaultAnchor(
+        positions[i].getX(),
+        positions[i].getY(),
+        'anchor' + i,
+        style
+      ));
+    }
     return anchors;
   }
 
@@ -196,10 +207,10 @@ export class RectangleFactory {
     }
     // find anchors
     const topLeft = group.getChildren(function (node) {
-      return node.id() === 'topLeft';
+      return node.id() === 'anchor0';
     })[0];
     const bottomRight = group.getChildren(function (node) {
-      return node.id() === 'bottomRight';
+      return node.id() === 'anchor2';
     })[0];
 
     const pointTopLeft = new Point2D(
@@ -341,21 +352,21 @@ export class RectangleFactory {
 
     // find anchors
     const topLeft = group.getChildren(function (node) {
-      return node.id() === 'topLeft';
+      return node.id() === 'anchor0';
     })[0];
     const topRight = group.getChildren(function (node) {
-      return node.id() === 'topRight';
+      return node.id() === 'anchor1';
     })[0];
     const bottomRight = group.getChildren(function (node) {
-      return node.id() === 'bottomRight';
+      return node.id() === 'anchor2';
     })[0];
     const bottomLeft = group.getChildren(function (node) {
-      return node.id() === 'bottomLeft';
+      return node.id() === 'anchor3';
     })[0];
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'topLeft':
+    case 'anchor0':
       // update self
       topLeft.x(anchor.x());
       topLeft.y(anchor.y());
@@ -363,7 +374,7 @@ export class RectangleFactory {
       topRight.y(anchor.y());
       bottomLeft.x(anchor.x());
       break;
-    case 'topRight':
+    case 'anchor1':
       // update self
       topRight.x(anchor.x());
       topRight.y(anchor.y());
@@ -371,7 +382,7 @@ export class RectangleFactory {
       topLeft.y(anchor.y());
       bottomRight.x(anchor.x());
       break;
-    case 'bottomRight':
+    case 'anchor2':
       // update self
       bottomRight.x(anchor.x());
       bottomRight.y(anchor.y());
@@ -379,7 +390,7 @@ export class RectangleFactory {
       bottomLeft.y(anchor.y());
       topRight.x(anchor.x());
       break;
-    case 'bottomLeft':
+    case 'anchor3':
       // update self
       bottomLeft.x(anchor.x());
       bottomLeft.y(anchor.y());

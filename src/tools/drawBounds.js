@@ -95,6 +95,17 @@ export function getDefaultAnchor(x, y, id, style) {
 }
 
 /**
+ * Get an anchor index from its id.
+ *
+ * @param {string} id The anchor id as 'anchor#'.
+ * @returns {number} The anchor index.
+ */
+export function getAnchorIndex(id) {
+  // 'anchor'.length = 6
+  return parseInt(id.substring(6), 10);
+}
+
+/**
  * Bound a node position.
  *
  * @param {Konva.Node} node The node to bound the position.
