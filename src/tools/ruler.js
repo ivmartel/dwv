@@ -161,7 +161,7 @@ export class RulerFactory {
    *
    * @param {Konva.Line} shape The associated shape.
    * @param {Style} style The application style.
-   * @returns {Konva.Line[]} A list of anchors.
+   * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
     const positions = this.#getAnchorsPositions(shape);
@@ -180,7 +180,7 @@ export class RulerFactory {
   /**
    * Constrain anchor movement.
    *
-   * @param {Konva.Line} _anchor The active anchor.
+   * @param {Konva.Ellipse} _anchor The active anchor.
    */
   constrainAnchorMove(_anchor) {
     // no constraints
@@ -191,7 +191,7 @@ export class RulerFactory {
    *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Line} anchor The active anchor.
+   * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The application style.
    */
   updateShapeGroupOnAnchorMove(annotation, anchor, style) {
@@ -450,7 +450,7 @@ export class RulerFactory {
    *   annotation as input.
    *
    * @param {Annotation} annotation The associated annotation.
-   * @param {Konva.Line} anchor The active anchor.
+   * @param {Konva.Ellipse} anchor The active anchor.
    * @param {Style} style The application style.
    */
   #updateShape(annotation, anchor, style) {
