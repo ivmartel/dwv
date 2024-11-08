@@ -933,6 +933,11 @@ export class DrawLayer {
         for (const shapeGroup of shapeGroups) {
           if (shapeGroup instanceof Konva.Group) {
             this.#setLabelVisibility(shapeGroup, visible);
+            const connector = shapeGroup.getChildren(node =>
+              (node.className === 'Line') && node.name() === 'connector')[0];
+            if (connector) {
+              connector.visible(visible);
+            }
           }
         }
       }
