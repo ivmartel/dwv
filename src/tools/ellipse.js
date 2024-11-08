@@ -111,8 +111,8 @@ export class EllipseFactory {
     const label = this.#labelFactory.create(annotation, style);
     group.add(this.#labelFactory.create(annotation, style));
     // label-shape connector
-    const shapeAnchorsPos = this.getConnectorsPositions(shape);
-    group.add(this.#labelFactory.getConnector(shapeAnchorsPos, label, style));
+    const connectorsPos = this.getConnectorsPositions(shape);
+    group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
       group.add(this.#getDebugShadow(annotation));
@@ -247,19 +247,13 @@ export class EllipseFactory {
     this.#updateShape(annotation, anchor, style);
     // update label
     this.updateLabelContent(annotation, group, style);
-    // update label position if default position
+    // label position
     if (typeof annotation.labelPosition === 'undefined') {
+      // update label position if default position
       this.#labelFactory.updatePosition(annotation, group);
     } else {
       // update connector if not default position
-      const kellipse = group.getChildren(function (node) {
-        return node.name() === 'shape';
-      })[0];
-      if (!(kellipse instanceof Konva.Ellipse)) {
-        return;
-      }
-      const shapeAnchorsPos = this.getConnectorsPositions(kellipse);
-      this.#labelFactory.updateConnector(group, shapeAnchorsPos);
+      this.updateConnector(group);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -348,8 +342,8 @@ export class EllipseFactory {
     if (!(kshape instanceof Konva.Ellipse)) {
       return;
     }
-    const shapeAnchorsPos = this.getConnectorsPositions(kshape);
-    this.#labelFactory.updateConnector(group, shapeAnchorsPos);
+    const connectorsPos = this.getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, connectorsPos);
   }
 
   /**
