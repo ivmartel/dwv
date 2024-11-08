@@ -111,7 +111,7 @@ export class CircleFactory {
     const label = this.#labelFactory.create(annotation, style);
     group.add(this.#labelFactory.create(annotation, style));
     // label-shape connector
-    const connectorsPos = this.getConnectorsPositions(shape);
+    const connectorsPos = this.#getConnectorsPositions(shape);
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
@@ -126,7 +126,7 @@ export class CircleFactory {
    * @param {Konva.Circle} shape The associated shape.
    * @returns {Point2D[]} The connectors positions.
    */
-  getConnectorsPositions(shape) {
+  #getConnectorsPositions(shape) {
     const centerX = shape.x();
     const centerY = shape.y();
     const radius = shape.radius() * Math.sqrt(2) / 2;
@@ -322,7 +322,7 @@ export class CircleFactory {
     if (!(kshape instanceof Konva.Circle)) {
       return;
     }
-    const connectorsPos = this.getConnectorsPositions(kshape);
+    const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
 

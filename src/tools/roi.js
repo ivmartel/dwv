@@ -115,7 +115,7 @@ export class RoiFactory {
     const label = this.#labelFactory.create(annotation, style);
     group.add(this.#labelFactory.create(annotation, style));
     // label-shape connector
-    const connectorsPos = this.getConnectorsPositions(shape);
+    const connectorsPos = this.#getConnectorsPositions(shape);
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
 
     // konva shadow (if debug)
@@ -151,7 +151,7 @@ export class RoiFactory {
    * @param {Konva.Line} shape The associated shape.
    * @returns {Point2D[]} The connectors positions.
    */
-  getConnectorsPositions(shape) {
+  #getConnectorsPositions(shape) {
     const points = shape.points();
     const sx = shape.x();
     const sy = shape.y();
@@ -309,7 +309,7 @@ export class RoiFactory {
     if (!(kshape instanceof Konva.Line)) {
       return;
     }
-    const connectorsPos = this.getConnectorsPositions(kshape);
+    const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
 

@@ -111,7 +111,7 @@ export class EllipseFactory {
     const label = this.#labelFactory.create(annotation, style);
     group.add(this.#labelFactory.create(annotation, style));
     // label-shape connector
-    const connectorsPos = this.getConnectorsPositions(shape);
+    const connectorsPos = this.#getConnectorsPositions(shape);
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
@@ -126,7 +126,7 @@ export class EllipseFactory {
    * @param {Konva.Ellipse} shape The associated shape.
    * @returns {Point2D[]} The connectors positions.
    */
-  getConnectorsPositions(shape) {
+  #getConnectorsPositions(shape) {
     const centerX = shape.x();
     const centerY = shape.y();
     const radiusX = shape.radiusX() * Math.sqrt(2) / 2;
@@ -342,7 +342,7 @@ export class EllipseFactory {
     if (!(kshape instanceof Konva.Ellipse)) {
       return;
     }
-    const connectorsPos = this.getConnectorsPositions(kshape);
+    const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
 
