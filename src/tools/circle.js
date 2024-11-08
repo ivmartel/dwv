@@ -105,14 +105,37 @@ export class CircleFactory {
     group.visible(true);
     group.id(annotation.id);
     // konva shape
+    const shape = this.#createShape(annotation, style);
     group.add(this.#createShape(annotation, style));
     // konva label
+    const label = this.#labelFactory.create(annotation, style);
     group.add(this.#labelFactory.create(annotation, style));
+    // label-shape connector
+    const shapeAnchorsPos = this.getConnectorsPositions(shape);
+    group.add(this.#labelFactory.getConnector(shapeAnchorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
       group.add(this.#getDebugShadow(annotation));
     }
     return group;
+  }
+
+  /**
+   * Get the connectors positions for the shape.
+   *
+   * @param {Konva.Circle} shape The associated shape.
+   * @returns {Point2D[]} The connectors positions.
+   */
+  getConnectorsPositions(shape) {
+    const centerX = shape.x();
+    const centerY = shape.y();
+    const radius = shape.radius() * Math.sqrt(2) / 2;
+    return [
+      new Point2D(centerX - radius, centerY - radius),
+      new Point2D(centerX + radius, centerY - radius),
+      new Point2D(centerX - radius, centerY + radius),
+      new Point2D(centerX + radius, centerY + radius),
+    ];
   }
 
   /**
@@ -226,6 +249,16 @@ export class CircleFactory {
     // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
       this.#labelFactory.updatePosition(annotation, group);
+    } else {
+      // update connector if not default position
+      const kcircle = group.getChildren(function (node) {
+        return node.name() === 'shape';
+      })[0];
+      if (!(kcircle instanceof Konva.Circle)) {
+        return;
+      }
+      const shapeAnchorsPos = this.getConnectorsPositions(kcircle);
+      this.#labelFactory.updateConnector(group, shapeAnchorsPos);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -282,6 +315,23 @@ export class CircleFactory {
   updateLabelContent(annotation, group, _style) {
     this.#labelFactory.updateContent(annotation, group);
   }
+
+  /**
+   * Update the shape connector.
+   *
+   * @param {Konva.Group} group The shape group.
+   */
+  updateConnector(group) {
+    const kshape = group.getChildren(function (node) {
+      return node.name() === 'shape';
+    })[0];
+    if (!(kshape instanceof Konva.Circle)) {
+      return;
+    }
+    const shapeAnchorsPos = this.getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, shapeAnchorsPos);
+  }
+
 
   /**
    * Calculate the mathematical shape from a list of points.

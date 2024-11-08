@@ -111,6 +111,110 @@ export class LabelFactory {
   }
 
   /**
+   * Get the anchors positions for the label.
+   *
+   * @param {Konva.Label} label The label.
+   * @returns {Point2D[]} The connectors positions.
+   */
+  getLabelAnchorsPosition(label) {
+    const lx = label.x();
+    const ly = label.y();
+    const dx = label.width() * label.scale().x;
+    const dy = label.height() * label.scale().y;
+    return [
+      new Point2D(lx + dx / 2, ly),
+      new Point2D(lx, ly + dy / 2),
+      new Point2D(lx + dx / 2, ly + dy),
+      new Point2D(lx + dx, ly + dy / 2),
+    ];
+  }
+
+  /**
+   * Get the two closest points of two points lists.
+   *
+   * @param {Point2D[]} points1 The first point list.
+   * @param {Point2D[]} points2 The second point list.
+   * @returns {Point2D[]} The closests points.
+   */
+  getClosestPoints(points1, points2) {
+    let minDist = points1[0].getDistance(points2[0]);
+    let p1 = points1[0];
+    let p2 = points2[0];
+    for (const point1 of points1) {
+      for (const point2 of points2) {
+        const dist = point1.getDistance(point2);
+        if (dist < minDist) {
+          minDist = dist;
+          p1 = point1;
+          p2 = point2;
+        }
+      }
+    }
+    return [p1, p2];
+  }
+
+  /**
+   * Get the connector between this label and its shape.
+   *
+   * @param {Point2D[]} connectorsPos The shape connectors positions.
+   * @param {Konva.Label} label The label.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Line} The connector.
+   */
+  getConnector(connectorsPos, label, style) {
+    const labelAnchorsPos = this.getLabelAnchorsPosition(label);
+    const anchorPoints = this.getClosestPoints(
+      connectorsPos, labelAnchorsPos);
+    return new Konva.Line({
+      points: [
+        anchorPoints[0].getX(),
+        anchorPoints[0].getY(),
+        anchorPoints[1].getX(),
+        anchorPoints[1].getY()
+      ],
+      stroke: label.getText().fill(),
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      dash: [3, 1],
+      name: 'connector'
+    });
+  }
+
+  /**
+   * Update the connector between a label and its shape.
+   *
+   * @param {Konva.Group} group The associated shape group.
+   * @param {Point2D[]} connectorsPos The shape connectors positions.
+   */
+  updateConnector(group, connectorsPos) {
+    // associated label
+    const klabel = group.getChildren(function (node) {
+      return node.name() === 'label';
+    })[0];
+    if (!(klabel instanceof Konva.Label)) {
+      return;
+    }
+
+    const labelAnchorsPos = this.getLabelAnchorsPosition(klabel);
+
+    const anchors = this.getClosestPoints(connectorsPos, labelAnchorsPos);
+
+    const kconnect = group.getChildren(function (node) {
+      return node.name() === 'connector';
+    })[0];
+    if (!(kconnect instanceof Konva.Line)) {
+      return;
+    }
+
+    kconnect.points([
+      anchors[0].getX(),
+      anchors[0].getY(),
+      anchors[1].getX(),
+      anchors[1].getY()
+    ]);
+  }
+
+  /**
    * Update the shape label.
    *
    * @param {Annotation} annotation The associated annotation.

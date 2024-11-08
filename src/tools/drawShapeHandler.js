@@ -352,7 +352,8 @@ export class DrawShapeHandler {
       for (const child of children) {
         // skip shape and label with defined position
         if (child === event.target ||
-          (child.name() === 'label' && !labelWithDefaultPosition)
+          (child.name() === 'label' && !labelWithDefaultPosition) ||
+          child.name() === 'connector'
         ) {
           continue;
         }
@@ -372,7 +373,8 @@ export class DrawShapeHandler {
       factory.updateAnnotationOnTranslation(annotation, diff);
       // update label
       factory.updateLabelContent(annotation, shapeGroup, this.#app.getStyle());
-
+      // update connector
+      factory.updateConnector(shapeGroup);
       // highlight trash when on it
       const mousePoint = getMousePoint(event.evt);
       const offset = {
@@ -500,6 +502,14 @@ export class DrawShapeHandler {
       };
       // store original position
       originalLabelPosition = annotation.labelPosition;
+    });
+
+    // drag move event handling
+    label.on('dragmove.draw', (/*event*/) => {
+      // get factory
+      const factory = annotation.getFactory();
+      // update label
+      factory.updateConnector(shapeGroup);
     });
 
     // drag end event handling
