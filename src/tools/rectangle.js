@@ -2,7 +2,11 @@ import {Rectangle} from '../math/rectangle';
 import {Point2D} from '../math/point';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
-import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+import {
+  isNodeNameShape,
+  DRAW_DEBUG,
+  getDefaultAnchor
+} from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
 // external
@@ -296,12 +300,7 @@ export class RectangleFactory {
    * @param {Konva.Group} group The shape group.
    */
   updateConnector(group) {
-    const kshape = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kshape instanceof Konva.Rect)) {
-      return;
-    }
+    const kshape = this.#getShape(group);
     const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
@@ -348,6 +347,20 @@ export class RectangleFactory {
   }
 
   /**
+   * Get the associated shape from a group.
+   *
+   * @param {Konva.Group} group The group to look into.
+   * @returns {Konva.Rect|undefined} The shape.
+   */
+  #getShape(group) {
+    const kshape = group.getChildren(isNodeNameShape)[0];
+    if (!(kshape instanceof Konva.Rect)) {
+      return;
+    }
+    return kshape;
+  }
+
+  /**
    * Get the default annotation label position.
    *
    * @param {Annotation} annotation The annotation.
@@ -378,12 +391,7 @@ export class RectangleFactory {
       return;
     }
     // associated shape
-    const krect = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(krect instanceof Konva.Rect)) {
-      return;
-    }
+    const krect = this.#getShape(group);
     // update shape
     krect.position({
       x: begin.getX(),

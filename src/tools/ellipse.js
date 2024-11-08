@@ -2,7 +2,11 @@ import {Ellipse} from '../math/ellipse';
 import {Point2D} from '../math/point';
 import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
-import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+import {
+  isNodeNameShape,
+  DRAW_DEBUG,
+  getDefaultAnchor
+} from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
 // external
@@ -336,12 +340,7 @@ export class EllipseFactory {
    * @param {Konva.Group} group The shape group.
    */
   updateConnector(group) {
-    const kshape = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kshape instanceof Konva.Ellipse)) {
-      return;
-    }
+    const kshape = this.#getShape(group);
     const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
@@ -398,6 +397,20 @@ export class EllipseFactory {
   }
 
   /**
+   * Get the associated shape from a group.
+   *
+   * @param {Konva.Group} group The group to look into.
+   * @returns {Konva.Ellipse|undefined} The shape.
+   */
+  #getShape(group) {
+    const kshape = group.getChildren(isNodeNameShape)[0];
+    if (!(kshape instanceof Konva.Ellipse)) {
+      return;
+    }
+    return kshape;
+  }
+
+  /**
    * Get the default annotation label position.
    *
    * @param {Annotation} annotation The annotation.
@@ -431,12 +444,7 @@ export class EllipseFactory {
       return;
     }
     // associated shape
-    const kellipse = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kellipse instanceof Konva.Ellipse)) {
-      return;
-    }
+    const kellipse = this.#getShape(group);
     // update shape: just update radius
     kellipse.radius({
       x: radiusX,

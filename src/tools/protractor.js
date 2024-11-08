@@ -2,7 +2,11 @@ import {Line, getAngle} from '../math/line';
 import {Protractor} from '../math/protractor';
 import {Point2D} from '../math/point';
 import {defaults} from '../app/defaults';
-import {DRAW_DEBUG, getDefaultAnchor} from './drawBounds';
+import {
+  getLineShape,
+  DRAW_DEBUG,
+  getDefaultAnchor
+} from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
 // external
@@ -239,12 +243,7 @@ export class ProtractorFactory {
       return;
     }
     // associated shape
-    const kline = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kline instanceof Konva.Line)) {
-      return;
-    }
+    const kline = this.#getShape(group);
     // find special points
     const begin = group.getChildren(function (node) {
       return node.id() === 'anchor0';
@@ -313,12 +312,7 @@ export class ProtractorFactory {
    * @param {Konva.Group} group The shape group.
    */
   updateConnector(group) {
-    const kshape = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kshape instanceof Konva.Line)) {
-      return;
-    }
+    const kshape = this.#getShape(group);
     const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
@@ -382,6 +376,16 @@ export class ProtractorFactory {
     }
 
     return kshape;
+  }
+
+  /**
+   * Get the associated shape from a group.
+   *
+   * @param {Konva.Group} group The group to look into.
+   * @returns {Konva.Line|undefined} The shape.
+   */
+  #getShape(group) {
+    return getLineShape(group);
   }
 
   /**
@@ -467,12 +471,7 @@ export class ProtractorFactory {
       return;
     }
     // associated shape
-    const kline = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kline instanceof Konva.Line)) {
-      return;
-    }
+    const kline = this.#getShape(group);
 
     // reset position after possible shape drag
     kline.position({x: 0, y: 0});

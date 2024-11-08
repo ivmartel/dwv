@@ -39,6 +39,20 @@ export function isPositionNode(node) {
 }
 
 /**
+ * Get a Konva.Line shape from a group.
+ *
+ * @param {Konva.Group} group The group to look into.
+ * @returns {Konva.Line|undefined} The shape.
+ */
+export function getLineShape(group) {
+  const kshape = group.getChildren(isNodeNameShape)[0];
+  if (!(kshape instanceof Konva.Line)) {
+    return;
+  }
+  return kshape;
+}
+
+/**
  * @callback testFn
  * @param {Konva.Node} node The node.
  * @returns {boolean} True if the node passes the test.

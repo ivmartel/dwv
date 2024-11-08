@@ -2,6 +2,7 @@ import {ROI} from '../math/roi';
 import {Point2D} from '../math/point';
 import {defaults} from '../app/defaults';
 import {
+  getLineShape,
   DRAW_DEBUG,
   getDefaultAnchor,
   getAnchorIndex
@@ -241,12 +242,7 @@ export class RoiFactory {
       return;
     }
     // associated shape
-    const kroi = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kroi instanceof Konva.Line)) {
-      return;
-    }
+    const kroi = this.#getShape(group);
 
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the main list)
@@ -303,12 +299,7 @@ export class RoiFactory {
    * @param {Konva.Group} group The shape group.
    */
   updateConnector(group) {
-    const kshape = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kshape instanceof Konva.Line)) {
-      return;
-    }
+    const kshape = this.#getShape(group);
     const connectorsPos = this.#getConnectorsPositions(kshape);
     this.#labelFactory.updateConnector(group, connectorsPos);
   }
@@ -358,6 +349,16 @@ export class RoiFactory {
   }
 
   /**
+   * Get the associated shape from a group.
+   *
+   * @param {Konva.Group} group The group to look into.
+   * @returns {Konva.Line|undefined} The shape.
+   */
+  #getShape(group) {
+    return getLineShape(group);
+  }
+
+  /**
    * Get the default annotation label position.
    *
    * @param {Annotation} annotation The annotation.
@@ -386,12 +387,7 @@ export class RoiFactory {
       return;
     }
     // associated shape
-    const kroi = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kroi instanceof Konva.Line)) {
-      return;
-    }
+    const kroi = this.#getShape(group);
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the main list)
     const points = kroi.points();
