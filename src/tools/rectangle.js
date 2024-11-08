@@ -5,7 +5,8 @@ import {defaults} from '../app/defaults';
 import {
   isNodeNameShape,
   DRAW_DEBUG,
-  getDefaultAnchor
+  getDefaultAnchor,
+  getAnchorShape
 } from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
@@ -238,12 +239,8 @@ export class RectangleFactory {
       return;
     }
     // find anchors
-    const topLeft = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const bottomRight = group.getChildren(function (node) {
-      return node.id() === 'anchor2';
-    })[0];
+    const topLeft = getAnchorShape(group, 0);
+    const bottomRight = getAnchorShape(group, 2);
 
     const pointTopLeft = new Point2D(
       topLeft.x(),
@@ -403,18 +400,10 @@ export class RectangleFactory {
     });
 
     // find anchors
-    const topLeft = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const topRight = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
-    const bottomRight = group.getChildren(function (node) {
-      return node.id() === 'anchor2';
-    })[0];
-    const bottomLeft = group.getChildren(function (node) {
-      return node.id() === 'anchor3';
-    })[0];
+    const topLeft = getAnchorShape(group, 0);
+    const topRight = getAnchorShape(group, 1);
+    const bottomRight = getAnchorShape(group, 2);
+    const bottomLeft = getAnchorShape(group, 3);
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {

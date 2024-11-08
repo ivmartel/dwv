@@ -53,6 +53,23 @@ export function getLineShape(group) {
 }
 
 /**
+ * Get a Konva.Ellipse anchor shape from a group.
+ *
+ * @param {Konva.Group} group The group to look into.
+ * @param {number} index The anchor index.
+ * @returns {Konva.Ellipse|undefined} The anchor shape.
+ */
+export function getAnchorShape(group, index) {
+  const kshape = group.getChildren(function (node) {
+    return node.id() === 'anchor' + index;
+  })[0];
+  if (!(kshape instanceof Konva.Ellipse)) {
+    return;
+  }
+  return kshape;
+}
+
+/**
  * @callback testFn
  * @param {Konva.Node} node The node.
  * @returns {boolean} True if the node passes the test.

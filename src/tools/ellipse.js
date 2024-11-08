@@ -5,7 +5,8 @@ import {defaults} from '../app/defaults';
 import {
   isNodeNameShape,
   DRAW_DEBUG,
-  getDefaultAnchor
+  getDefaultAnchor,
+  getAnchorShape
 } from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
@@ -195,18 +196,10 @@ export class EllipseFactory {
     }
 
     // find special points
-    const left = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const right = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
-    const bottom = group.getChildren(function (node) {
-      return node.id() === 'anchor2';
-    })[0];
-    const top = group.getChildren(function (node) {
-      return node.id() === 'anchor3';
-    })[0];
+    const left = getAnchorShape(group, 0);
+    const right = getAnchorShape(group, 1);
+    const bottom = getAnchorShape(group, 2);
+    const top = getAnchorShape(group, 3);
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
@@ -452,18 +445,10 @@ export class EllipseFactory {
     });
 
     // find anchors
-    const left = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const right = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
-    const bottom = group.getChildren(function (node) {
-      return node.id() === 'anchor2';
-    })[0];
-    const top = group.getChildren(function (node) {
-      return node.id() === 'anchor3';
-    })[0];
+    const left = getAnchorShape(group, 0);
+    const right = getAnchorShape(group, 1);
+    const bottom = getAnchorShape(group, 2);
+    const top = getAnchorShape(group, 3);
 
     const swapX = right.x() < left.x() ? -1 : 1;
     const swapY = top.y() < bottom.y() ? 1 : -1;

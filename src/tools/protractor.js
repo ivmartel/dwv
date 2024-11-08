@@ -5,7 +5,8 @@ import {defaults} from '../app/defaults';
 import {
   getLineShape,
   DRAW_DEBUG,
-  getDefaultAnchor
+  getDefaultAnchor,
+  getAnchorShape
 } from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
@@ -245,15 +246,9 @@ export class ProtractorFactory {
     // associated shape
     const kline = this.#getShape(group);
     // find special points
-    const begin = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const mid = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
-    const end = group.getChildren(function (node) {
-      return node.id() === 'anchor2';
-    })[0];
+    const begin = getAnchorShape(group, 0);
+    const mid = getAnchorShape(group, 1);
+    const end = getAnchorShape(group, 2);
 
     // math shape
     // compensate for possible shape drag
@@ -494,15 +489,9 @@ export class ProtractorFactory {
     }
 
     // find special points
-    const begin = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const mid = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
-    const end = group.getChildren(function (node) {
-      return node.id() === 'anchor2';
-    })[0];
+    const begin = getAnchorShape(group, 0);
+    const mid = getAnchorShape(group, 1);
+    const end = getAnchorShape(group, 2);
 
     // update special points
     switch (anchor.id()) {

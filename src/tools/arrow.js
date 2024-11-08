@@ -9,7 +9,8 @@ import {logger} from '../utils/logger';
 import {
   getLineShape,
   DRAW_DEBUG,
-  getDefaultAnchor
+  getDefaultAnchor,
+  getAnchorShape
 } from './drawBounds';
 import {LabelFactory} from './labelFactory';
 
@@ -243,12 +244,8 @@ export class ArrowFactory {
     // associated shape
     const kline = this.#getShape(group);
     // find anchors
-    const begin = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const end = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
+    const begin = getAnchorShape(group, 0);
+    const end = getAnchorShape(group, 1);
 
     // math shape
     // compensate for possible shape drag
@@ -477,12 +474,8 @@ export class ArrowFactory {
       return;
     }
     // find anchors
-    const begin = group.getChildren(function (node) {
-      return node.id() === 'anchor0';
-    })[0];
-    const end = group.getChildren(function (node) {
-      return node.id() === 'anchor1';
-    })[0];
+    const begin = getAnchorShape(group, 0);
+    const end = getAnchorShape(group, 1);
 
     // update 'self' (undo case)
     switch (anchor.id()) {
