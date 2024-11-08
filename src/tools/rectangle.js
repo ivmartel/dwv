@@ -110,11 +110,9 @@ export class RectangleFactory {
     // konva label
     const label = this.#labelFactory.create(annotation, style);
     group.add(label);
-
     // label-shape connector
     const connectorsPos = this.getConnectorsPositions(shape);
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
-
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
       group.add(this.#getDebugShadow(annotation));
