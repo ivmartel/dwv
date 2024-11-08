@@ -175,6 +175,7 @@ export class LabelFactory {
       stroke: label.getText().fill(),
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
+      visible: label.visible(),
       dash: [3, 1],
       name: 'connector'
     });
