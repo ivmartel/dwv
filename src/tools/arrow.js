@@ -133,7 +133,7 @@ export class ArrowFactory {
   /**
    * Get the connectors positions for the shape.
    *
-   * @param {Konva.Rect} shape The associated shape.
+   * @param {Konva.Line} shape The associated shape.
    * @returns {Point2D[]} The connectors positions.
    */
   getConnectorsPositions(shape) {
