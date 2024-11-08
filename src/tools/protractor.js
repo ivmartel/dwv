@@ -107,6 +107,7 @@ export class ProtractorFactory {
     group.visible(true);
     group.id(annotation.id);
     // konva shape
+    const shape = this.#createShape(annotation, style);
     group.add(this.#createShape(annotation, style));
 
     if (protractor.getLength() === this.getNPoints()) {
@@ -116,13 +117,33 @@ export class ProtractorFactory {
         group.add(extra);
       }
       // konva label
+      const label = this.#labelFactory.create(annotation, style);
       group.add(this.#labelFactory.create(annotation, style));
+      // label-shape connector
+      const shapeAnchorsPos = this.getConnectorsPositions(shape);
+      group.add(this.#labelFactory.getConnector(shapeAnchorsPos, label, style));
       // konva shadow (if debug)
       if (DRAW_DEBUG) {
         group.add(this.#getDebugShadow(annotation));
       }
     }
     return group;
+  }
+
+
+  /**
+   * Get the connectors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The connectors positions.
+   */
+  getConnectorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    return [
+      new Point2D(points[2] + sx, points[3] + sy)
+    ];
   }
 
   /**
@@ -194,6 +215,16 @@ export class ProtractorFactory {
     // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
       this.#labelFactory.updatePosition(annotation, group);
+    } else {
+      // update connector if not default position
+      const kprotractor = group.getChildren(function (node) {
+        return node.name() === 'shape';
+      })[0];
+      if (!(kprotractor instanceof Konva.Line)) {
+        return;
+      }
+      const shapeAnchorsPos = this.getConnectorsPositions(kprotractor);
+      this.#labelFactory.updateConnector(group, shapeAnchorsPos);
     }
     // update shadow
     if (DRAW_DEBUG) {
@@ -280,6 +311,22 @@ export class ProtractorFactory {
    */
   updateLabelContent(annotation, group, _style) {
     this.#labelFactory.updateContent(annotation, group);
+  }
+
+  /**
+   * Update the shape connector.
+   *
+   * @param {Konva.Group} group The shape group.
+   */
+  updateConnector(group) {
+    const kshape = group.getChildren(function (node) {
+      return node.name() === 'shape';
+    })[0];
+    if (!(kshape instanceof Konva.Line)) {
+      return;
+    }
+    const shapeAnchorsPos = this.getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, shapeAnchorsPos);
   }
 
   /**
