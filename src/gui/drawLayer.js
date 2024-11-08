@@ -959,6 +959,11 @@ export class DrawLayer {
     if (typeof label.getText() !== 'undefined' &&
       label.getText().text().length !== 0) {
       label.visible(visible);
+      const connector = shapeGroup.getChildren(node =>
+        (node.className === 'Line') && node.name() === 'connector')[0];
+      if (connector) {
+        connector.visible(visible);
+      }
     }
   }
 
