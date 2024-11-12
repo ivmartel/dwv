@@ -3823,18 +3823,32 @@ export declare class PlaneHelper {
     /**
      * Get a world position from a 2D plane position.
      *
-     * @param {Point2D} point2D The input point.
+     * @param {Point2D} point2D The plane point.
      * @param {number} k The slice index.
-     * @returns {Point3D} The associated position.
+     * @returns {Point3D} The world position.
      */
     getPositionFromPlanePoint(point2D: Point2D, k: number): Point3D;
     /**
-     * Get a list of points that define the plane at position k.
+     * Get a 2D plane position from a world position.
      *
-     * @param {number} k The slice index value.
+     * @param {Point} point The world position.
+     * @returns {Point3D} The plane point.
+     */
+    getPlanePointFromPosition(point: Point): Point3D;
+    /**
+     * Get the cosines of this plane.
+     *
+     * @returns {number[]} The 2 cosines vectors (3D).
+     */
+    getCosines(): number[];
+    /**
+     * Get a list of points that define the plane at input position,
+     *   given this classes orientation.
+     *
+     * @param {Point} position The position.
      * @returns {Point3D[]} An origin and 2 cosines vectors.
      */
-    getPlanePoints(k: number): Point3D[];
+    getPlanePoints(position: Point): Point3D[];
     /**
      * Image world to index.
      *
@@ -5422,12 +5436,13 @@ export declare class ViewController {
      */
     isAquisitionOrientation(): boolean;
     /**
-     * Get a list of points that define the plane at position k.
+     * Get a list of points that define the plane at input position,
+     *   given this classes orientation.
      *
-     * @param {number} k The slice index value.
-     * @returns {Point3D[]} A couple of 3D points.
+     * @param {Point} position The position.
+     * @returns {Point3D[]} An origin and 2 cosines vectors.
      */
-    getPlanePoints(k: number): Point3D[];
+    getPlanePoints(position: Point): Point3D[];
     /**
      * Get the current scroll position value.
      *
