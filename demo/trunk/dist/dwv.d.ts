@@ -5431,9 +5431,9 @@ export declare class ViewController {
     /**
      * Get the current scroll position value.
      *
-     * @returns {object} The value.
+     * @returns {number} The value.
      */
-    getCurrentScrollPosition(): object;
+    getCurrentScrollPosition(): number;
     /**
      * Generate display image data to be given to a canvas.
      *
