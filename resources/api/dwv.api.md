@@ -804,6 +804,7 @@ export class OverlayData {
 // @public
 export class PlaneHelper {
     constructor(imageGeometry: Geometry, viewOrientation: Matrix33);
+    getCosines(): number[];
     getImageDeOrientedPoint3D(point: Point3D): Point3D;
     getImageDeOrientedVector3D(vector: Vector3D): Vector3D;
     getImageOrientedPoint3D(planePoint: Point3D): Point3D;
@@ -811,7 +812,8 @@ export class PlaneHelper {
     getNativeScrollIndex(): number;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getPlaneOffsetFromOffset3D(offset3D: Scalar3D): Scalar2D;
-    getPlanePoints(k: number): Point3D[];
+    getPlanePointFromPosition(point: Point): Point3D;
+    getPlanePoints(position: Point): Point3D[];
     getPositionFromPlanePoint(point2D: Point2D, k: number): Point3D;
     getScrollIndex(): number;
     getTargetDeOrientedPoint3D(planePoint: Point3D): Point3D;
@@ -1117,7 +1119,7 @@ export class ViewController {
     getCurrentOrientedIndex(): Index;
     getCurrentPosition(): Point;
     getCurrentScrollIndexValue(): object;
-    getCurrentScrollPosition(): object;
+    getCurrentScrollPosition(): number;
     getCurrentWindowPresetName(): string;
     getDecrementPosition(dim: number): Point;
     getDecrementScrollPosition(): Point;
@@ -1135,7 +1137,7 @@ export class ViewController {
     getOriginForImageUid(uid: string): Point3D | undefined;
     getPixelUnit(): string;
     getPlaneHelper(): PlaneHelper;
-    getPlanePoints(k: number): Point3D[];
+    getPlanePoints(position: Point): Point3D[];
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
     getPlanePositionFromPosition(point: Point): Point2D;
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
