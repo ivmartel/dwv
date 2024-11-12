@@ -279,9 +279,9 @@ export class PlaneHelper {
   /**
    * Get a world position from a 2D plane position.
    *
-   * @param {Point2D} point2D The input point.
+   * @param {Point2D} point2D The plane point.
    * @param {number} k The slice index.
-   * @returns {Point3D} The associated position.
+   * @returns {Point3D} The world position.
    */
   getPositionFromPlanePoint(point2D, k) {
     const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
@@ -292,16 +292,44 @@ export class PlaneHelper {
   }
 
   /**
-   * Get a list of points that define the plane at position k.
+   * Get a 2D plane position from a world position.
    *
-   * @param {number} k The slice index value.
+   * @param {Point} point The world position.
+   * @returns {Point3D} The plane point.
+   */
+  getPlanePointFromPosition(point) {
+    const point3D = this.#imageGeometry.worldToPoint(point);
+    return this.getImageDeOrientedPoint3D(point3D);
+  }
+
+  /**
+   * Get the cosines of this plane.
+   *
+   * @returns {number[]} The 2 cosines vectors (3D).
+   */
+  getCosines() {
+    return getCosinesFromOrientation(this.#targetOrientation);
+  }
+
+  /**
+   * Get a list of points that define the plane at input position,
+   *   given this classes orientation.
+   *
+   * @param {Point} position The position.
    * @returns {Point3D[]} An origin and 2 cosines vectors.
    */
-  getPlanePoints(k) {
-    // use target orientation
-    const cosines = getCosinesFromOrientation(this.#targetOrientation);
+  getPlanePoints(position) {
+    // get plane point
+    const planePoint = this.getPlanePointFromPosition(position);
+    // get origin
+    const planeOrigin = this.getPositionFromPlanePoint(
+      new Point2D(0, 0), planePoint.getZ());
+
+    // plane cosines
+    const cosines = this.getCosines();
+
     return [
-      this.getPositionFromPlanePoint(new Point2D(0, 0), k),
+      planeOrigin,
       new Point3D(cosines[0], cosines[1], cosines[2]),
       new Point3D(cosines[3], cosines[4], cosines[5])
     ];

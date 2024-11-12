@@ -132,7 +132,7 @@ export class Annotation {
     // (planePoints are saved with file if present)
     if (!viewController.isAquisitionOrientation()) {
       this.planePoints = viewController.getPlanePoints(
-        viewController.getCurrentScrollIndexValue()
+        viewController.getCurrentPosition()
       );
     }
   }
@@ -155,9 +155,12 @@ export class Annotation {
       }
     } else {
       // oriented view: compare cosines (independent of slice index)
-      const inputPlanePoints = planeHelper.getPlanePoints(0);
-      if (inputPlanePoints[1].equals(this.planePoints[1]) &&
-        inputPlanePoints[2].equals(this.planePoints[2])) {
+      const cosines = planeHelper.getCosines();
+      const cosine1 = new Point3D(cosines[0], cosines[1], cosines[2]);
+      const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
+
+      if (cosine1.equals(this.planePoints[1]) &&
+      cosine2.equals(this.planePoints[2])) {
         res = true;
       }
     }

@@ -269,13 +269,14 @@ export class ViewController {
   }
 
   /**
-   * Get a list of points that define the plane at position k.
+   * Get a list of points that define the plane at input position,
+   *   given this classes orientation.
    *
-   * @param {number} k The slice index value.
-   * @returns {Point3D[]} A couple of 3D points.
+   * @param {Point} position The position.
+   * @returns {Point3D[]} An origin and 2 cosines vectors.
    */
-  getPlanePoints(k) {
-    return this.#planeHelper.getPlanePoints(k);
+  getPlanePoints(position) {
+    return this.#planeHelper.getPlanePoints(position);
   }
 
   /**

@@ -1056,9 +1056,7 @@ export class DrawLayer {
     if (typeof index === 'undefined') {
       index = this.#planeHelper.worldToIndex(position);
     }
-    const scrollIndex = this.#planeHelper.getScrollIndex();
-    const scrollIndexValue = index.get(scrollIndex);
-    const planePoints = this.#planeHelper.getPlanePoints(scrollIndexValue);
+    const planePoints = this.#planeHelper.getPlanePoints(position);
     let points;
     if (this.#planeHelper.isAquisitionOrientation()) {
       // just use plane origin
