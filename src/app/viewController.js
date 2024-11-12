@@ -281,7 +281,7 @@ export class ViewController {
   /**
    * Get the current scroll position value.
    *
-   * @returns {object} The value.
+   * @returns {number} The value.
    */
   getCurrentScrollPosition() {
     const scrollIndex = this.#view.getScrollIndex();
