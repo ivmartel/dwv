@@ -621,12 +621,18 @@ export class App {
                 }
                 const toolNamespace = toolName.charAt(0).toLowerCase() +
                   toolName.slice(1);
-                // find the option in the default tool list
-                let optionClass =
-                  defaultToolOptions[toolNamespace][optionClassName];
-                // or use external one
+                // find the option in the external tool list
+                let tOptions = toolOptions[toolNamespace];
+                let optionClass;
+                if (typeof tOptions !== 'undefined') {
+                  optionClass = tOptions[optionClassName];
+                }
+                // or use the default one
                 if (typeof optionClass === 'undefined') {
-                  optionClass = toolOptions[toolNamespace][optionClassName];
+                  tOptions = defaultToolOptions[toolNamespace];
+                  if (typeof tOptions !== 'undefined') {
+                    optionClass = tOptions[optionClassName];
+                  }
                 }
                 if (typeof optionClass !== 'undefined') {
                   appToolOptions[optionName] = optionClass;
