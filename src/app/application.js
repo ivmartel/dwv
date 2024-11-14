@@ -1680,7 +1680,7 @@ export class App {
      *
      * @event App#loaditem
      * @type {object}
-     * @property {string} type The event type: loaditem.
+     * @property {string} type The event type.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
@@ -1989,9 +1989,12 @@ export class App {
     /**
      * Add view layer event.
      *
-     * @event Application#viewlayeradd
+     * @event App#viewlayeradd
      * @type {object}
      * @property {string} type The event type.
+     * @property {string} layerid The layer id.
+     * @property {string} layergroupid The layer group id.
+     * @property {string} dataid The data id.
      */
     this.#fireEvent({
       type: 'viewlayeradd',
@@ -2123,9 +2126,12 @@ export class App {
     /**
      * Add draw layer event.
      *
-     * @event Application#drawlayeradd
+     * @event App#drawlayeradd
      * @type {object}
      * @property {string} type The event type.
+     * @property {string} layerid The layer id.
+     * @property {string} layergroupid The layer group id.
+     * @property {string} dataid The data id.
      */
     this.#fireEvent({
       type: 'drawlayeradd',

@@ -559,10 +559,11 @@ export class LayerGroup {
     if (this.#layers[index] instanceof ViewLayer) {
       this.#activeViewLayerIndex = index;
       /**
-       * Active view layer change event.
+       * Active layer change event.
        *
-       * @event LayerGroup#activeviewlayerchange
+       * @event LayerGroup#activelayerchange
        * @type {object}
+       * @property {string} type The event type.
        * @property {Array} value The changed value.
        */
       this.#fireEvent({
@@ -1253,6 +1254,7 @@ export class LayerGroup {
      *
      * @event LayerGroup#zoomchange
      * @type {object}
+     * @property {string} type The event type.
      * @property {Array} value The changed value.
      */
     this.#fireEvent({
@@ -1295,6 +1297,7 @@ export class LayerGroup {
      *
      * @event LayerGroup#offsetchange
      * @type {object}
+     * @property {string} type The event type.
      * @property {Array} value The changed value.
      */
     this.#fireEvent({

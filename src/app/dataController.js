@@ -132,7 +132,15 @@ export class DataController {
    */
   setImage(dataId, image) {
     this.#dataList[dataId].image = image;
-    // fire image set
+    /**
+     * Data image set event.
+     *
+     * @event DataController#dataimageset
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {Array} value The event value, first element is the image.
+     * @property {string} dataid The data id.
+     */
     this.#fireEvent({
       type: 'dataimageset',
       value: [image],
@@ -155,7 +163,14 @@ export class DataController {
     }
     // store the new image
     this.#dataList[dataId] = data;
-    // fire a data add event
+    /**
+     * Data add event.
+     *
+     * @event DataController#dataadd
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} dataid The data id.
+     */
     this.#fireEvent({
       type: 'dataadd',
       dataid: dataId
@@ -203,7 +218,14 @@ export class DataController {
       }
       // remove data from list
       delete this.#dataList[dataId];
-      // fire a data remove event
+      /**
+       * Data remove event.
+       *
+       * @event DataController#dataremove
+       * @type {object}
+       * @property {string} type The event type.
+       * @property {string} dataid The data id.
+       */
       this.#fireEvent({
         type: 'dataremove',
         dataid: dataId
@@ -245,7 +267,14 @@ export class DataController {
       idKey,
       'value');
 
-    // fire a data add event
+    /**
+     * Data udpate event.
+     *
+     * @event DataController#dataupdate
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} dataid The data id.
+     */
     this.#fireEvent({
       type: 'dataupdate',
       dataid: dataId

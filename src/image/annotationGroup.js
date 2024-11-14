@@ -92,6 +92,14 @@ export class AnnotationGroup {
    */
   setEditable(flag) {
     this.#editable = flag;
+    /**
+     * Annotation group editable flag change event.
+     *
+     * @event AnnotationGroup#annotationgroupeditablechange
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {boolean} data The value of the editable flag.
+     */
     this.#fireEvent({
       type: 'annotationgroupeditablechange',
       data: flag
@@ -123,6 +131,14 @@ export class AnnotationGroup {
    */
   add(annotation) {
     this.#list.push(annotation);
+    /**
+     * Annotation add event.
+     *
+     * @event AnnotationGroup#annotationadd
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {Annotation} data The added annnotation.
+     */
     this.#fireEvent({
       type: 'annotationadd',
       data: annotation
@@ -139,6 +155,15 @@ export class AnnotationGroup {
     const index = this.#list.findIndex((item) => item.id === annotation.id);
     if (index !== -1) {
       this.#list[index] = annotation;
+      /**
+       * Annotation update event.
+       *
+       * @event AnnotationGroup#annotationupdate
+       * @type {object}
+       * @property {string} type The event type.
+       * @property {Annotation} data The added annnotation.
+       * @property {string[]} keys The properties that were updated.
+       */
       this.#fireEvent({
         type: 'annotationupdate',
         data: annotation,
@@ -158,6 +183,15 @@ export class AnnotationGroup {
     const index = this.#list.findIndex((item) => item.id === id);
     if (index !== -1) {
       const annotation = this.#list.splice(index, 1)[0];
+      /**
+       * Annotation update event.
+       *
+       * @event AnnotationGroup#annotationremove
+       * @type {object}
+       * @property {string} type The event type.
+       * @property {Annotation} data The added annnotation.
+       * @property {string[]} keys The properties that were updated.
+       */
       this.#fireEvent({
         type: 'annotationremove',
         data: annotation

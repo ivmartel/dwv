@@ -299,6 +299,7 @@ export class View {
      *
      * @event View#alphafuncchange
      * @type {object}
+     * @property {string} type The event type.
      */
     this.#fireEvent({
       type: 'alphafuncchange'
@@ -437,6 +438,7 @@ export class View {
          *
          * @event View#wlpresetadd
          * @type {object}
+         * @property {string} type The event type.
          * @property {string} name The name of the preset.
          */
         this.#fireEvent({
@@ -493,6 +495,7 @@ export class View {
      *
      * @event View#colourmapchange
      * @type {object}
+     * @property {string} type The event type.
      * @property {Array} value The changed value.
      */
     this.#fireEvent({
@@ -784,6 +787,7 @@ export class View {
        *
        * @event View#wlchange
        * @type {object}
+       * @property {string} type The event type.
        * @property {Array} value The changed value.
        * @property {number} wc The new window center value.
        * @property {number} ww The new window wdth value.

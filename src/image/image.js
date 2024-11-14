@@ -883,8 +883,11 @@ export class Image {
      *
      * @event Image#imagegeometrychange
      * @type {object}
+     * @property {string} type The event type.
      */
-    this.#fireEvent({type: 'imagegeometrychange'});
+    this.#fireEvent({
+      type: 'imagegeometrychange'
+    });
   }
 
   /**
@@ -924,7 +927,16 @@ export class Image {
    */
   appendFrame(time, origin) {
     this.#geometry.appendFrame(origin, time);
-    this.#fireEvent({type: 'appendframe'});
+    /**
+     * Append frame event.
+     *
+     * @event Image#appendframe
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'appendframe'
+    });
     // memory will be updated at the first appendSlice or appendFrameBuffer
   }
 
@@ -1134,10 +1146,11 @@ export class Image {
       }
     }
     /**
-     * Image change event.
+     * Image content change event.
      *
      * @event Image#imagecontentchange
      * @type {object}
+     * @property {string} type The event type.
      */
     this.#fireEvent({type: 'imagecontentchange'});
   }

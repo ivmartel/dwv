@@ -61,6 +61,7 @@ export class UndoStack {
      *
      * @event UndoStack#undoadd
      * @type {object}
+     * @property {string} type The event type.
      * @property {string} command The name of the command added to the
      *   undo stack.
      */
@@ -95,6 +96,7 @@ export class UndoStack {
        *
        * @event UndoStack#undoremove
        * @type {object}
+       * @property {string} type The event type.
        * @property {string} command The name of the command added to the
        *   undo stack.
        */
@@ -123,6 +125,7 @@ export class UndoStack {
        *
        * @event UndoStack#undo
        * @type {object}
+       * @property {string} type The event type.
        * @property {string} command The name of the undone command.
        */
       this.#fireEvent({
@@ -146,6 +149,7 @@ export class UndoStack {
        *
        * @event UndoStack#redo
        * @type {object}
+       * @property {string} type The event type.
        * @property {string} command The name of the redone command.
        */
       this.#fireEvent({

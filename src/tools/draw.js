@@ -199,6 +199,14 @@ export class Draw {
       const seriesInstanceUID = refMeta.SeriesInstanceUID;
       // check black list
       if (this.#blacklist.includes(seriesInstanceUID)) {
+        /**
+         * Warn event.
+         *
+         * @event Draw#warn
+         * @type {object}
+         * @property {string} type The event type.
+         * @property {string} message The warning message.
+         */
         this.#fireEvent({
           type: 'warn',
           message: 'Cannot create draw layer, data is in black list'
@@ -302,6 +310,15 @@ export class Draw {
     if (!(selectedShape instanceof Konva.Shape)) {
       return;
     }
+    /**
+     * Annotation select event.
+     *
+     * @event Draw#annotationselect
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} annotationid The annotation id.
+     * @property {string} dataid The data id.
+     */
     this.#fireEvent({
       type: 'annotationselect',
       annotationid: group.id(),
