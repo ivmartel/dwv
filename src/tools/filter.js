@@ -1,8 +1,8 @@
 import {ListenerHandler} from '../utils/listen';
 import {
-  Threshold as ThresholdFilter,
-  Sobel as SobelFilter,
-  Sharpen as SharpenFilter
+  ThresholdFilter,
+  SobelFilter,
+  SharpenFilter
 } from '../image/filter';
 
 // doc imports

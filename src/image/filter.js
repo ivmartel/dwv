@@ -6,7 +6,7 @@ import {Image} from './image';
 /**
  * Threshold an image between an input minimum and maximum.
  */
-export class Threshold {
+export class ThresholdFilter {
   /**
    * Threshold minimum.
    *
@@ -114,7 +114,7 @@ export class Threshold {
 /**
  * Sharpen an image using a sharpen convolution matrix.
  */
-export class Sharpen {
+export class SharpenFilter {
   /**
    * Get the name of the filter.
    *
@@ -170,7 +170,7 @@ export class Sharpen {
 /**
  * Apply a Sobel filter to an image.
  */
-export class Sobel {
+export class SobelFilter {
   /**
    * Get the name of the filter.
    *
