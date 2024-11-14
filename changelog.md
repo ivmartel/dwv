@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.34.0](https://github.com/ivmartel/dwv/releases/tag/v0.34.0) - 14/11/2024
+
+### Added
+
+- Add connector between shape and label [#1795](https://github.com/ivmartel/dwv/issues/1795)
+- Default draw auto shape color to false [#1768](https://github.com/ivmartel/dwv/issues/1768)
+- Export toolOptions to allow for custom tool options [#1718](https://github.com/ivmartel/dwv/issues/1718)
+- Allow to move roi label independently [#1690](https://github.com/ivmartel/dwv/issues/1690)
+- Add DICOM SR parsing [#1689](https://github.com/ivmartel/dwv/issues/1689)
+- Add missing position to draw display details [#1521](https://github.com/ivmartel/dwv/issues/1521)
+- Use DICOM to store annotations [#1020](https://github.com/ivmartel/dwv/issues/1020)
+
+### Fixed
+
+- Fixed label moves on drag out of bounds [#1770](https://github.com/ivmartel/dwv/issues/1770)
+- Wrong display if adding data after zoom [#1606](https://github.com/ivmartel/dwv/issues/1606)
+
+---
+
 ## [v0.33.1](https://github.com/ivmartel/dwv/releases/tag/v0.33.1) - 13/06/2024
 
 ### Fixed
