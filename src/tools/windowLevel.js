@@ -78,8 +78,17 @@ export class WindowLevel {
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
+   * @param {string} divId The layer group divId.
    */
-  #start(point) {
+  #start(point, divId) {
+    // check if possible
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+    const viewController =
+      layerGroup.getActiveViewLayer().getViewController();
+    if (!viewController.isMonochrome()) {
+      return;
+    }
+
     this.#started = true;
     this.#startPoint = point;
   }
@@ -139,7 +148,8 @@ export class WindowLevel {
    */
   mousedown = (event) => {
     const mousePoint = getMousePoint(event);
-    this.#start(mousePoint);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(mousePoint, layerDetails.groupDivId);
   };
 
   /**
@@ -178,7 +188,8 @@ export class WindowLevel {
    */
   touchstart = (event) => {
     const touchPoints = getTouchPoints(event);
-    this.#start(touchPoints[0]);
+    const layerDetails = getLayerDetailsFromEvent(event);
+    this.#start(touchPoints[0], layerDetails.groupDivId);
   };
 
   /**
@@ -214,9 +225,13 @@ export class WindowLevel {
     const viewLayer = layerGroup.getActiveViewLayer();
     const index = viewLayer.displayToPlaneIndex(mousePoint);
     const viewController = viewLayer.getViewController();
-    const image = this.#app.getImage(viewLayer.getDataId());
+    // exit if not possible
+    if (!viewController.isMonochrome()) {
+      return;
+    }
 
     // update view controller
+    const image = this.#app.getData(viewLayer.getDataId()).image;
     const wl = new WindowLevelValues(
       image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(

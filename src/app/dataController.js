@@ -4,44 +4,50 @@ import {mergeObjects} from '../utils/operator';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from '../image/image';
+import {AnnotationGroup} from '../image/annotationGroup';
 /* eslint-enable no-unused-vars */
 
 /**
- * Image and meta class.
+ * DICOM data: meta and possible image.
  */
-class ImageData {
+export class DicomData {
   /**
-   * Associated HTML div id.
-   *
-   * @type {Image}
-   */
-  image;
-  /**
-   * Associated HTML div id.
+   * DICOM meta data.
    *
    * @type {object}
    */
   meta;
 
   /**
-   * @param {Image} image The image.
-   * @param {object} meta The image meta.
+   * Image extracted from meta data.
+   *
+   * @type {Image|undefined}
    */
-  constructor(image, meta) {
-    this.image = image;
+  image;
+  /**
+   * Annotattion group extracted from meta data.
+   *
+   * @type {AnnotationGroup|undefined}
+   */
+  annotationGroup;
+
+  /**
+   * @param {object} meta The DICOM meta data.
+   */
+  constructor(meta) {
     this.meta = meta;
   }
 }
 
 /*
- * Data (list of {image, meta}) controller.
+ * DicomData controller.
  */
 export class DataController {
 
   /**
-   * List of {image, meta}.
+   * List of DICOM data.
    *
-   * @type {Object<string, ImageData>}
+   * @type {Object<string, DicomData>}
    */
   #dataList = {};
 
@@ -89,7 +95,7 @@ export class DataController {
    * Get a data at a given index.
    *
    * @param {string} dataId The data id.
-   * @returns {ImageData|undefined} The data as {image, meta}.
+   * @returns {DicomData|undefined} The DICOM data.
    */
   get(dataId) {
     return this.#dataList[dataId];
@@ -110,7 +116,8 @@ export class DataController {
     }
     const keys = Object.keys(this.#dataList);
     for (const key of keys) {
-      if (this.#dataList[key].image.containsImageUids(uids)) {
+      if (typeof this.#dataList[key].image !== 'undefined' &&
+        this.#dataList[key].image.containsImageUids(uids)) {
         res.push(key);
       }
     }
@@ -125,9 +132,17 @@ export class DataController {
    */
   setImage(dataId, image) {
     this.#dataList[dataId].image = image;
-    // fire image set
+    /**
+     * Data image set event.
+     *
+     * @event DataController#dataimageset
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {Array} value The event value, first element is the image.
+     * @property {string} dataid The data id.
+     */
     this.#fireEvent({
-      type: 'imageset',
+      type: 'dataimageset',
       value: [image],
       dataid: dataId
     });
@@ -140,18 +155,41 @@ export class DataController {
    * Add a new data.
    *
    * @param {string} dataId The data id.
-   * @param {Image} image The image.
-   * @param {object} meta The image meta.
+   * @param {DicomData} data The data.
    */
-  addNew(dataId, image, meta) {
+  add(dataId, data) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       throw new Error('Data id already used in storage: ' + dataId);
     }
     // store the new image
-    this.#dataList[dataId] = new ImageData(image, meta);
+    this.#dataList[dataId] = data;
+    /**
+     * Data add event.
+     *
+     * @event DataController#dataadd
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} dataid The data id.
+     */
+    this.#fireEvent({
+      type: 'dataadd',
+      dataid: dataId
+    });
     // listen to image change
-    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
-    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+    if (typeof data.image !== 'undefined') {
+      data.image.addEventListener(
+        'imagecontentchange', this.#getFireEvent(dataId));
+      data.image.addEventListener(
+        'imagegeometrychange', this.#getFireEvent(dataId));
+    }
+    if (typeof data.annotationGroup !== 'undefined') {
+      data.annotationGroup.addEventListener(
+        'annotationadd', this.#getFireEvent(dataId));
+      data.annotationGroup.addEventListener(
+        'annotationupdate', this.#getFireEvent(dataId));
+      data.annotationGroup.addEventListener(
+        'annotationremove', this.#getFireEvent(dataId));
+    }
   }
 
   /**
@@ -162,17 +200,36 @@ export class DataController {
   remove(dataId) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
       // stop listeners
-      this.#dataList[dataId].image.removeEventListener(
-        'imagecontentchange', this.#getFireEvent(dataId));
-      this.#dataList[dataId].image.removeEventListener(
-        'imagegeometrychange', this.#getFireEvent(dataId));
-      // fire an image remove event
-      this.#fireEvent({
-        type: 'imageremove',
-        dataid: dataId
-      });
+      const image = this.#dataList[dataId].image;
+      if (typeof image !== 'undefined') {
+        image.removeEventListener(
+          'imagecontentchange', this.#getFireEvent(dataId));
+        image.removeEventListener(
+          'imagegeometrychange', this.#getFireEvent(dataId));
+      }
+      const annotationGroup = this.#dataList[dataId].annotationGroup;
+      if (typeof annotationGroup !== 'undefined') {
+        annotationGroup.removeEventListener(
+          'annotationadd', this.#getFireEvent(dataId));
+        annotationGroup.removeEventListener(
+          'annotationupdate', this.#getFireEvent(dataId));
+        annotationGroup.removeEventListener(
+          'annotationremove', this.#getFireEvent(dataId));
+      }
       // remove data from list
       delete this.#dataList[dataId];
+      /**
+       * Data remove event.
+       *
+       * @event DataController#dataremove
+       * @type {object}
+       * @property {string} type The event type.
+       * @property {string} dataid The data id.
+       */
+      this.#fireEvent({
+        type: 'dataremove',
+        dataid: dataId
+      });
     }
   }
 
@@ -180,22 +237,25 @@ export class DataController {
    * Update the current data.
    *
    * @param {string} dataId The data id.
-   * @param {Image} image The image.
-   * @param {object} meta The image meta.
+   * @param {DicomData} data The data.
    */
-  update(dataId, image, meta) {
+  update(dataId, data) {
     if (typeof this.#dataList[dataId] === 'undefined') {
       throw new Error('Cannot find data to update: ' + dataId);
     }
     const dataToUpdate = this.#dataList[dataId];
 
     // add slice to current image
-    dataToUpdate.image.appendSlice(image);
+    if (typeof dataToUpdate.image !== 'undefined' &&
+      typeof data.image !== 'undefined'
+    ) {
+      dataToUpdate.image.appendSlice(data.image);
+    }
 
     // update meta data
     // TODO add time support
     let idKey = '';
-    if (typeof meta['00020010'] !== 'undefined') {
+    if (typeof data.meta['00020010'] !== 'undefined') {
       // dicom case, use 'InstanceNumber'
       idKey = '00200013';
     } else {
@@ -203,9 +263,22 @@ export class DataController {
     }
     dataToUpdate.meta = mergeObjects(
       dataToUpdate.meta,
-      meta,
+      data.meta,
       idKey,
       'value');
+
+    /**
+     * Data udpate event.
+     *
+     * @event DataController#dataupdate
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} dataid The data id.
+     */
+    this.#fireEvent({
+      type: 'dataupdate',
+      dataid: dataId
+    });
   }
 
   /**

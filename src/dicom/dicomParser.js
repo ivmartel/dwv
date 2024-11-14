@@ -12,18 +12,9 @@ import {
   transferSyntaxKeywords,
   vrTypes,
 } from './dictionary';
+import {DataElement} from './dataElement';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
-import {
-  getOrientationFromCosines,
-  getOrientationStringLPS,
-  getLPSGroup
-} from '../math/orientation';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
-/* eslint-enable no-unused-vars */
 
 /**
  * List of DICOM data elements indexed via a 8 character string formed from
@@ -38,7 +29,7 @@ import {DataElement} from '../dicom/dataElement';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.33.1';
+  return '0.34.0';
 }
 
 /**
@@ -196,23 +187,6 @@ export function getReverseOrientation(ori) {
 }
 
 /**
- * Get the name of an image orientation patient.
- *
- * @param {number[]} orientation The image orientation patient.
- * @returns {string|undefined} The orientation
- *   name: axial, coronal or sagittal.
- */
-export function getOrientationName(orientation) {
-  let name;
-  const orientMatrix = getOrientationFromCosines(orientation);
-  if (typeof orientMatrix !== 'undefined') {
-    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
-    name = getLPSGroup(lpsStr);
-  }
-  return name;
-}
-
-/**
  * Tell if a given syntax is an implicit one (element with no VR).
  *
  * @param {string} syntax The transfer syntax to test.
@@ -278,10 +252,10 @@ function isRleTransferSyntax(syntax) {
  * Tell if a given syntax needs decompression.
  *
  * @param {string} syntax The transfer syntax to test.
- * @returns {string} The name of the decompression algorithm.
+ * @returns {string|undefined} The name of the decompression algorithm.
  */
 export function getSyntaxDecompressionName(syntax) {
-  let algo = null;
+  let algo;
   if (isJpeg2000TransferSyntax(syntax)) {
     algo = 'jpeg2000';
   } else if (isJpegBaselineTransferSyntax(syntax)) {

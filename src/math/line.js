@@ -1,5 +1,8 @@
 import {Point2D} from './point';
-import {i18n} from '../utils/i18n';
+import {
+  isSimilar,
+  REAL_WORLD_EPSILON,
+} from './matrix';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -126,6 +129,15 @@ export class Line {
   }
 
   /**
+   * Get the centroid of the line.
+   *
+   * @returns {Point2D} THe centroid point.
+   */
+  getCentroid() {
+    return this.getMidpoint();
+  }
+
+  /**
    * Get the slope of the line.
    *
    * @returns {number} The slope of the line.
@@ -171,7 +183,7 @@ export class Line {
     const spacing2D = viewController.get2DSpacing();
     const length = this.getWorldLength(spacing2D);
     if (length !== null) {
-      quant.length = {value: length, unit: i18n.t('unit.mm')};
+      quant.length = {value: length, unit: 'unit.mm'};
     }
     // return
     return quant;
@@ -203,14 +215,107 @@ export function getAngle(line0, line1) {
 }
 
 /**
- * Get a perpendicular line to an input one.
+ * Check if two lines are orthogonal.
+ *
+ * @param {Line} line0 The first line.
+ * @param {Line} line1 The second line.
+ * @returns {boolean} True if both lines are orthogonal.
+ */
+export function areOrthogonal(line0, line1) {
+  const dx0 = line0.getDeltaX();
+  const dy0 = line0.getDeltaY();
+  const dx1 = line1.getDeltaX();
+  const dy1 = line1.getDeltaY();
+  // dot = ||a||*||b||*cos(theta)
+  return (dx0 * dx1 + dy0 * dy1) === 0;
+}
+
+/**
+ * Check if a point is in a line coordinate range.
+ *
+ * @param {Point2D} point The input point.
+ * @param {Line} line The input line.
+ * @returns {boolean} True if the input point is in the line coordinate range.
+ */
+export function isPointInLineRange(point, line) {
+  const minX = Math.min(line.getBegin().getX(), line.getEnd().getX());
+  const maxX = Math.max(line.getBegin().getX(), line.getEnd().getX());
+  const minY = Math.min(line.getBegin().getY(), line.getEnd().getY());
+  const maxY = Math.max(line.getBegin().getY(), line.getEnd().getY());
+  return point.getX() >= minX &&
+    point.getX() <= maxX &&
+    point.getY() >= minY &&
+    point.getY() <= maxY;
+}
+
+/**
+ * Get a perpendicular line to an input one at a given point.
  *
  * @param {Line} line The line to be perpendicular to.
  * @param {Point2D} point The middle point of the perpendicular line.
  * @param {number} length The length of the perpendicular line.
- * @returns {object} A perpendicular line.
+ * @param {Scalar2D} [spacing] Optional image spacing, default to [1,1].
+ * @returns {Line} The perpendicular line.
  */
-export function getPerpendicularLine(line, point, length) {
+export function getPerpendicularLine(line, point, length, spacing) {
+  if (typeof spacing === 'undefined') {
+    spacing = {x: 1, y: 1};
+  }
+  const sx2 = spacing.x * spacing.x;
+  const sy2 = spacing.y * spacing.y;
+  // a0 * a1 = -1 (in square space)
+  const perpSlope = -sx2 / (sy2 * line.getSlope());
+  // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
+  const prepIntercept = point.getY() - perpSlope * point.getX();
+  // return
+  return getLineFromEquation(perpSlope, prepIntercept, point, length, spacing);
+}
+
+/**
+ * Get a perpendicular line to an input one at a given distance
+ *   of its begin point.
+ *
+ * @param {Line} line The line to be perpendicular to.
+ * @param {number} distance The distance to the input line begin point.
+ * @param {number} length The length of the perpendicular line.
+ * @param {Scalar2D} [spacing] Optional image spacing, default to [1,1].
+ * @returns {Line} The perpendicular line.
+ */
+export function getPerpendicularLineAtDistance(
+  line, distance, length, spacing) {
+  // get a line along the input one and centered on begin point
+  const lineFromEq = getLineFromEquation(
+    line.getSlope(),
+    line.getIntercept(),
+    line.getBegin(),
+    distance,
+    spacing
+  );
+  // select the point on the input line
+  let startPoint;
+  if (isPointInLineRange(lineFromEq.getBegin(), line)) {
+    startPoint = lineFromEq.getBegin();
+  } else {
+    startPoint = lineFromEq.getEnd();
+  }
+  // use it as base for a perpendicular line
+  return getPerpendicularLine(line, startPoint, length, spacing);
+}
+
+/**
+ * Get a line from an equation, a middle point and a length.
+ *
+ * @param {number} slope The line slope.
+ * @param {number} intercept The line intercept.
+ * @param {Point2D} point The middle point of the line.
+ * @param {number} length The line length.
+ * @param {Scalar2D} [spacing] Optional image spacing, default to [1,1].
+ * @returns {Line} The resulting line.
+ */
+export function getLineFromEquation(slope, intercept, point, length, spacing) {
+  if (typeof spacing === 'undefined') {
+    spacing = {x: 1, y: 1};
+  }
   // begin point
   let beginX = 0;
   let beginY = 0;
@@ -218,23 +323,31 @@ export function getPerpendicularLine(line, point, length) {
   let endX = 0;
   let endY = 0;
 
-  // check slope:
-  // 0 -> horizontal
-  // Infinite -> vertical (a/Infinite = 0)
-  if (line.getSlope() !== 0) {
-    // a0 * a1 = -1
-    const slope = -1 / line.getSlope();
-    // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
-    const intercept = point.getY() - slope * point.getX();
+  if (isSimilar(slope, 0, REAL_WORLD_EPSILON)) {
+    // slope = ~0 -> horizontal input line
+    beginX = point.getX() - length / (2 * spacing.x);
+    beginY = point.getY();
+    endX = point.getX() + length / (2 * spacing.x);
+    endY = point.getY();
+  } else if (Math.abs(slope) > 1e6) {
+    // slope = ~(+/-)Infinity -> vertical input line
+    beginX = point.getX();
+    beginY = point.getY() - length / (2 * spacing.y);
+    endX = point.getX();
+    endY = point.getY() + length / (2 * spacing.y);
+  } else {
+    const sx2 = spacing.x * spacing.x;
+    const sy2 = spacing.y * spacing.y;
 
-    // 1. (x - x0)^2 + (y - y0)^2 = d^2
-    // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
-    // ->  (x - x0)^2 + m^2 * (x - x0)^2 = d^2
-    // -> x = x0 +- d / sqrt(1+m^2)
+    // 1. [length] sx^2 * (x - x0)^2 + sy^2 * (y - y0)^2 = d^2
+    // 2. [slope] a = (y - y0) / (x - x0) -> y - y0 = a*(x - x0)
+    // ->  sx^2 * (x - x0)^2 + sy^2 * a^2 * (x - x0)^2 = d^2
+    // ->  (x - x0)^2 = d^2 / (sx^2 + sy^2 * a^2)
+    // -> x = x0 +- d / sqrt(sx^2 + sy^2 * a^2)
 
     // length is the distance between begin and end,
     // point is half way between both -> d = length / 2
-    const dx = length / (2 * Math.sqrt(1 + slope * slope));
+    const dx = length / (2 * Math.sqrt(sx2 + sy2 * slope * slope));
 
     // begin point
     beginX = point.getX() - dx;
@@ -242,16 +355,7 @@ export function getPerpendicularLine(line, point, length) {
     // end point
     endX = point.getX() + dx;
     endY = slope * endX + intercept;
-  } else {
-    // horizontal input line -> perpendicular is vertical!
-    // begin point
-    beginX = point.getX();
-    beginY = point.getY() - length / 2;
-    // end point
-    endX = point.getX();
-    endY = point.getY() + length / 2;
   }
-  // perpendicalar line
   return new Line(
     new Point2D(beginX, beginY),
     new Point2D(endX, endY));

@@ -7,17 +7,20 @@ import {
 } from './app/application';
 import {defaults} from './app/defaults';
 import {
-  DrawMeta,
-  DrawDetails,
   DrawController
 } from './app/drawController';
+import {
+  DicomData
+} from './app/dataController';
+import {Annotation} from './image/annotation';
+import {AnnotationGroup} from './image/annotationGroup';
+import {AnnotationGroupFactory} from './image/annotationGroupFactory';
 import {ViewController} from './app/viewController';
 import {ToolboxController} from './app/toolboxController';
 // dicom
 import {
   getDwvVersion,
   getTypedArray,
-  getOrientationName,
   getReverseOrientation,
   hasDicomPrefix,
   DicomParser
@@ -37,6 +40,11 @@ import {
   getPixelDataTag
 } from './dicom/dicomTag';
 import {DicomCode} from './dicom/dicomCode';
+import {
+  DicomSRContent,
+  getSRContent,
+  getDicomSRContentItem
+} from './dicom/dicomSRContent';
 import {MaskSegment} from './dicom/dicomSegment';
 // gui
 import {
@@ -89,12 +97,22 @@ import {Vector3D} from './math/vector';
 import {Index} from './math/index';
 import {Scalar2D, Scalar3D} from './math/scalar';
 import {Matrix33} from './math/matrix';
-import {Orientation} from './math/orientation';
+import {Circle} from './math/circle';
+import {Ellipse} from './math/ellipse';
+import {Protractor} from './math/protractor';
+import {Rectangle} from './math/rectangle';
+import {ROI} from './math/roi';
+import {
+  Orientation,
+  getOrientationName
+} from './math/orientation';
 import {getEllipseIndices} from './math/ellipse';
+import {getRectangleIndices} from './math/rectangle';
 import {NumberRange} from './math/stats';
 // tools
-import {toolList} from './tools/index';
+import {toolList, toolOptions} from './tools/index';
 import {ScrollWheel} from './tools/scrollWheel';
+import {DrawShapeHandler} from './tools/drawShapeHandler';
 // utils
 import {precisionRound} from './utils/string';
 import {buildMultipart} from './utils/array';
@@ -113,8 +131,9 @@ export {
   App,
   ViewConfig,
   ToolConfig,
-  DrawMeta,
-  DrawDetails,
+  Annotation,
+  AnnotationGroup,
+  AnnotationGroupFactory,
   DrawController,
   ViewController,
   PlaneHelper,
@@ -124,6 +143,7 @@ export {
   ChangeSegmentColourCommand,
   ToolboxController,
   DataElement,
+  DicomData,
   DicomParser,
   DicomWriter,
   WriterRule,
@@ -131,6 +151,7 @@ export {
   Tag,
   LayerGroup,
   DrawLayer,
+  DrawShapeHandler,
   OverlayData,
   ViewLayer,
   Image,
@@ -149,12 +170,18 @@ export {
   Matrix33,
   Scalar2D,
   Scalar3D,
+  Circle,
+  Ellipse,
+  Protractor,
+  Rectangle,
+  ROI,
   MaskFactory,
   DicomCode,
   MaskSegment,
   RGB,
   ScrollWheel,
   NumberRange,
+  DicomSRContent,
   defaults,
   logger,
   decoderScripts,
@@ -163,6 +190,7 @@ export {
   defaultPresets,
   i18n,
   toolList,
+  toolOptions,
   Orientation,
   BLACK,
   addTagsToDictionary,
@@ -174,6 +202,7 @@ export {
   getUID,
   getElementsFromJSONTags,
   getEllipseIndices,
+  getRectangleIndices,
   getLayerDetailsFromEvent,
   getTypedArray,
   getTagFromKey,
@@ -182,6 +211,8 @@ export {
   getReverseOrientation,
   getMousePoint,
   getTouchPoints,
+  getSRContent,
+  getDicomSRContentItem,
   hasDicomPrefix,
   precisionRound,
   buildMultipart,

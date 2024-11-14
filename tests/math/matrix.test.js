@@ -22,7 +22,7 @@ QUnit.module('math');
 QUnit.test('Matrix33 class', function (assert) {
   const m0 = new getIdentityMat33();
   const m1 = new getIdentityMat33();
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   const m2 = new Matrix33([
     1, 2, 3,
     4, 5, 6,
@@ -38,7 +38,7 @@ QUnit.test('Matrix33 class', function (assert) {
     4.002, 5.002, 6.002,
     7.002, 8.002, 9.002
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 
   // equals
   assert.equal(m0.equals(m1), true, 'equals true');
@@ -63,13 +63,13 @@ QUnit.test('Matrix33 class', function (assert) {
  * @function module:tests/math~matrix33-tostring
  */
 QUnit.test('Matrix33 tostring', function (assert) {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   const m0 = new Matrix33([
     1, 2, 3,
     4, 5, 6,
     7, 8, 9
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
   const str0 = '[1, 2, 3, \n 4, 5, 6, \n 7, 8, 9]';
   assert.equal(m0.toString(), str0, 'Matrix toString');
 });

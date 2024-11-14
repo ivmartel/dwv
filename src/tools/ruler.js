@@ -1,28 +1,69 @@
 import {Line, getPerpendicularLine} from '../math/line';
 import {Point2D} from '../math/point';
-import {replaceFlags} from '../utils/string';
+import {logger} from '../utils/logger';
 import {defaults} from '../app/defaults';
-import {getDefaultAnchor} from './editor';
+import {
+  getLineShape,
+  DRAW_DEBUG,
+  getDefaultAnchor,
+  getAnchorShape
+} from './drawBounds';
+import {LabelFactory} from './labelFactory';
+
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
  * Ruler factory.
  */
 export class RulerFactory {
+
+  /**
+   * The name of the factory.
+   *
+   * @type {string}
+   */
+  #name = 'ruler';
+
+  /**
+   * The associated label factory.
+   *
+   * @type {LabelFactory}
+   */
+  #labelFactory = new LabelFactory(this.#getDefaultLabelPosition);
+
+  /**
+   * Does this factory support the input math shape.
+   *
+   * @param {object} mathShape The mathematical shape.
+   * @returns {boolean} True if supported.
+   */
+  static supports(mathShape) {
+    return mathShape instanceof Line;
+  }
+
+  /**
+   * Get the name of the factory.
+   *
+   * @returns {string} The name.
+   */
+  getName() {
+    return this.#name;
+  }
+
   /**
    * Get the name of the shape group.
    *
    * @returns {string} The name.
    */
   getGroupName() {
-    return 'ruler-group';
+    return this.#name + '-group';
   }
 
   /**
@@ -44,67 +85,273 @@ export class RulerFactory {
   }
 
   /**
-   * Is the input group a group of this factory?
+   * Set an annotation math shape from input points.
    *
-   * @param {Konva.Group} group The group to test.
-   * @returns {boolean} True if the group is from this fcatory.
+   * @param {Annotation} annotation The annotation.
+   * @param {Point2D[]} points The points.
    */
-  isFactoryGroup(group) {
-    return this.getGroupName() === group.name();
+  setAnnotationMathShape(annotation, points) {
+    annotation.mathShape = this.#calculateMathShape(points);
+    annotation.setTextExpr(this.#getDefaultLabel());
+    annotation.updateQuantification();
   }
 
   /**
-   * Create a ruler shape to be displayed.
+   * Create a line shape to be displayed.
    *
-   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @param {ViewController} viewController The associated view controller.
    * @returns {Konva.Group} The Konva group.
    */
-  create(points, style, viewController) {
-    // physical shape
-    const line = new Line(points[0], points[1]);
-    // draw shape
+  createShapeGroup(annotation, style) {
+    // konva group
+    const group = new Konva.Group();
+    group.name(this.getGroupName());
+    group.visible(true);
+    group.id(annotation.id);
+    // konva shape
+    const shape = this.#createShape(annotation, style);
+    group.add(this.#createShape(annotation, style));
+    // extras
+    const extras = this.#createShapeExtras(annotation, style);
+    for (const extra of extras) {
+      group.add(extra);
+    }
+    // konva label
+    const label = this.#labelFactory.create(annotation, style);
+    group.add(this.#labelFactory.create(annotation, style));
+    // label-shape connector
+    const connectorsPos = this.#getConnectorsPositions(shape);
+    group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
+    // konva shadow (if debug)
+    if (DRAW_DEBUG) {
+      group.add(this.#getDebugShadow(annotation));
+    }
+    return group;
+  }
+
+  /**
+   * Get the connectors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The connectors positions.
+   */
+  #getConnectorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    const centerX = (points[0] + points[2]) / 2 + sx;
+    const centerY = (points[1] + points[3]) / 2 + sy;
+    return [new Point2D(centerX, centerY)];
+  }
+
+  /**
+   * Get the anchors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The anchor positions.
+   */
+  #getAnchorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    return [
+      new Point2D(points[0] + sx, points[1] + sy),
+      new Point2D(points[2] + sx, points[3] + sy)
+    ];
+  }
+
+  /**
+   * Get anchors to update a line shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @param {Style} style The application style.
+   * @returns {Konva.Ellipse[]} A list of anchors.
+   */
+  getAnchors(shape, style) {
+    const positions = this.#getAnchorsPositions(shape);
+    const anchors = [];
+    for (let i = 0; i < positions.length; ++i) {
+      anchors.push(getDefaultAnchor(
+        positions[i].getX(),
+        positions[i].getY(),
+        'anchor' + i,
+        style
+      ));
+    }
+    return anchors;
+  }
+
+  /**
+   * Constrain anchor movement.
+   *
+   * @param {Konva.Ellipse} _anchor The active anchor.
+   */
+  constrainAnchorMove(_anchor) {
+    // no constraints
+  }
+
+  /**
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The application style.
+   */
+  updateShapeGroupOnAnchorMove(annotation, anchor, style) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+
+    // update shape and anchors
+    this.#updateShape(annotation, anchor, style);
+    // update label
+    this.updateLabelContent(annotation, group, style);
+    // label position
+    if (typeof annotation.labelPosition === 'undefined') {
+      // update label position if default position
+      this.#labelFactory.updatePosition(annotation, group);
+    } else {
+      // update connector if not default position
+      this.updateConnector(group);
+    }
+    // update shadow
+    if (DRAW_DEBUG) {
+      this.#updateDebugShadow(annotation, group);
+    }
+  }
+
+  /**
+   * Update an annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
+  updateAnnotationOnAnchorMove(annotation, anchor) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+    // associated shape
+    const kline = this.#getShape(group);
+    // find anchors
+    const begin = getAnchorShape(group, 0);
+    const end = getAnchorShape(group, 1);
+
+    // math shape
+    // compensate for possible shape drag
+    const pointBegin = new Point2D(
+      begin.x() - kline.x(),
+      begin.y() - kline.y()
+    );
+    const pointEnd = new Point2D(
+      end.x() - kline.x(),
+      end.y() - kline.y()
+    );
+    annotation.mathShape = new Line(pointBegin, pointEnd);
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update an annotation on translation (shape move).
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {object} translation The translation.
+   */
+  updateAnnotationOnTranslation(annotation, translation) {
+    // math shape
+    const line = annotation.mathShape;
+    const begin = line.getBegin();
+    const newBegin = new Point2D(
+      begin.getX() + translation.x,
+      begin.getY() + translation.y
+    );
+    const end = line.getEnd();
+    const newEnd = new Point2D(
+      end.getX() + translation.x,
+      end.getY() + translation.y
+    );
+    annotation.mathShape = new Line(newBegin, newEnd);
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelContent(annotation, group, _style) {
+    this.#labelFactory.updateContent(annotation, group);
+  }
+
+  /**
+   * Update the shape connector.
+   *
+   * @param {Konva.Group} group The shape group.
+   */
+  updateConnector(group) {
+    const kshape = this.#getShape(group);
+    const connectorsPos = this.#getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, connectorsPos);
+  }
+
+  /**
+   * Calculate the mathematical shape from a list of points.
+   *
+   * @param {Point2D[]} points The points that define the shape.
+   * @returns {Line} The mathematical shape.
+   */
+  #calculateMathShape(points) {
+    return new Line(points[0], points[1]);
+  }
+
+  /**
+   * Get the default labels.
+   *
+   * @returns {object} The label list.
+   */
+  #getDefaultLabel() {
+    return defaults.labelText.ruler;
+  }
+
+  /**
+   * Creates the konva shape.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Line} The konva shape.
+   */
+  #createShape(annotation, style) {
+    const line = annotation.mathShape;
+
+    // konva line
     const kshape = new Konva.Line({
-      points: [line.getBegin().getX(),
+      points: [
+        line.getBegin().getX(),
         line.getBegin().getY(),
         line.getEnd().getX(),
-        line.getEnd().getY()],
-      stroke: style.getLineColour(),
+        line.getEnd().getY()
+      ],
+      stroke: annotation.colour,
       strokeWidth: style.getStrokeWidth(),
       strokeScaleEnabled: false,
       name: 'shape'
     });
 
-    const tickLen = style.applyZoomScale(10).x;
-
-    // tick begin
-    const linePerp0 = getPerpendicularLine(line, points[0], tickLen);
-    const ktick0 = new Konva.Line({
-      points: [linePerp0.getBegin().getX(),
-        linePerp0.getBegin().getY(),
-        linePerp0.getEnd().getX(),
-        linePerp0.getEnd().getY()],
-      stroke: style.getLineColour(),
-      strokeWidth: style.getStrokeWidth(),
-      strokeScaleEnabled: false,
-      name: 'shape-tick0'
-    });
-
-    // tick end
-    const linePerp1 = getPerpendicularLine(line, points[1], tickLen);
-    const ktick1 = new Konva.Line({
-      points: [linePerp1.getBegin().getX(),
-        linePerp1.getBegin().getY(),
-        linePerp1.getEnd().getX(),
-        linePerp1.getEnd().getY()],
-      stroke: style.getLineColour(),
-      strokeWidth: style.getStrokeWidth(),
-      strokeScaleEnabled: false,
-      name: 'shape-tick1'
-    });
-
     // larger hitfunc
+    const tickLen = 20;
+    const linePerp0 = getPerpendicularLine(
+      line, line.getBegin(), tickLen, style.getZoomScale());
+    const linePerp1 = getPerpendicularLine(
+      line, line.getEnd(), tickLen, style.getZoomScale());
     kshape.hitFunc(function (context) {
       context.beginPath();
       context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -115,96 +362,113 @@ export class RulerFactory {
       context.fillStrokeShape(kshape);
     });
 
-    // quantification
-    const ktext = new Konva.Text({
-      fontSize: style.getFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      padding: style.getTextPadding(),
-      shadowColor: style.getShadowLineColour(),
-      shadowOffset: style.getShadowOffset(),
-      name: 'text'
+    return kshape;
+  }
+
+  /**
+   * Get the associated shape from a group.
+   *
+   * @param {Konva.Group} group The group to look into.
+   * @returns {Konva.Line|undefined} The shape.
+   */
+  #getShape(group) {
+    return getLineShape(group);
+  }
+
+  /**
+   * Creates the konva shape extras.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Array} The konva shape extras.
+   */
+  #createShapeExtras(annotation, style) {
+    const line = annotation.mathShape;
+
+    const tickLen = 20;
+
+    // tick begin
+    const linePerp0 = getPerpendicularLine(
+      line, line.getBegin(), tickLen, style.getZoomScale());
+    const ktick0 = new Konva.Line({
+      points: [
+        linePerp0.getBegin().getX(),
+        linePerp0.getBegin().getY(),
+        linePerp0.getEnd().getX(),
+        linePerp0.getEnd().getY()
+      ],
+      stroke: annotation.colour,
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      name: 'shape-tick0'
     });
-    let textExpr = '';
-    const modality = viewController.getModality();
-    if (typeof defaults.labelText.ruler[modality] !== 'undefined') {
-      textExpr = defaults.labelText.ruler[modality];
-    } else {
-      textExpr = defaults.labelText.ruler['*'];
+
+    // tick end
+    const linePerp1 = getPerpendicularLine(
+      line, line.getEnd(), tickLen, style.getZoomScale());
+    const ktick1 = new Konva.Line({
+      points: [
+        linePerp1.getBegin().getX(),
+        linePerp1.getBegin().getY(),
+        linePerp1.getEnd().getX(),
+        linePerp1.getEnd().getY()
+      ],
+      stroke: annotation.colour,
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      name: 'shape-tick1'
+    });
+
+    return [ktick0, ktick1];
+  }
+
+  /**
+   * Get the default annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getDefaultLabelPosition(annotation) {
+    const line = annotation.mathShape;
+    const begin = line.getBegin();
+    const end = line.getEnd();
+    // lowest point
+    let res = begin;
+    if (begin.getY() < end.getY()) {
+      res = end;
     }
-    const quant = line.quantify(viewController);
-    ktext.setText(replaceFlags(textExpr, quant));
-    // augment text with meta
-    // @ts-ignore
-    ktext.meta = {
-      textExpr: textExpr,
-      quantification: quant
-    };
-
-    // label
-    const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
-    const klabel = new Konva.Label({
-      x: line.getEnd().getX() + dX * style.applyZoomScale(ktext.width()).x,
-      y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
-      scale: style.applyZoomScale(1),
-      visible: textExpr.length !== 0,
-      name: 'label'
-    });
-    klabel.add(ktext);
-    klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
-      opacity: style.getTagOpacity()
-    }));
-
-    // return group
-    const group = new Konva.Group();
-    group.name(this.getGroupName());
-    group.add(klabel);
-    group.add(ktick0);
-    group.add(ktick1);
-    group.add(kshape);
-    group.visible(true); // dont inherit
-    return group;
+    return res;
   }
 
   /**
-   * Get anchors to update a ruler shape.
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
    *
-   * @param {Konva.Line} shape The associated shape.
-   * @param {Style} style The application style.
-   * @returns {Konva.Ellipse[]} A list of anchors.
-   */
-  getAnchors(shape, style) {
-    const points = shape.points();
-
-    const anchors = [];
-    anchors.push(getDefaultAnchor(
-      points[0] + shape.x(), points[1] + shape.y(), 'begin', style
-    ));
-    anchors.push(getDefaultAnchor(
-      points[2] + shape.x(), points[3] + shape.y(), 'end', style
-    ));
-    return anchors;
-  }
-
-  /**
-   * Update a ruler shape.
-   *
+   * @param {Annotation} annotation The associated annotation.
    * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Style} style The app style.
-   * @param {ViewController} viewController The associated view controller.
+   * @param {Style} style The application style.
    */
-  update(anchor, style, viewController) {
+  #updateShape(annotation, anchor, style) {
+    const line = annotation.mathShape;
+
     // parent group
     const group = anchor.getParent();
-    // associated shape
-    const kline = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kline instanceof Konva.Line)) {
+    if (!(group instanceof Konva.Group)) {
       return;
     }
+    // associated shape
+    const kline = this.#getShape(group);
+
+    // reset position after possible shape drag
+    kline.position({x: 0, y: 0});
+    // update shape
+    kline.points([
+      line.getBegin().getX(),
+      line.getBegin().getY(),
+      line.getEnd().getX(),
+      line.getEnd().getY(),
+    ]);
+
     // associated tick0
     const ktick0 = group.getChildren(function (node) {
       return node.name() === 'shape-tick0';
@@ -219,57 +483,42 @@ export class RulerFactory {
     if (!(ktick1 instanceof Konva.Line)) {
       return;
     }
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
-    // find special points
-    const begin = group.getChildren(function (node) {
-      return node.id() === 'begin';
-    })[0];
-    const end = group.getChildren(function (node) {
-      return node.id() === 'end';
-    })[0];
+    // find anchors
+    const begin = getAnchorShape(group, 0);
+    const end = getAnchorShape(group, 1);
 
-    // update special points
+    // update 'self' (undo case)
     switch (anchor.id()) {
-    case 'begin':
+    case 'anchor0':
       begin.x(anchor.x());
       begin.y(anchor.y());
       break;
-    case 'end':
+    case 'anchor1':
       end.x(anchor.x());
       end.y(anchor.y());
       break;
+    default:
+      logger.error('Unhandled anchor id: ' + anchor.id());
+      break;
     }
-    // update shape and compensate for possible drag
-    // note: shape.position() and shape.size() won't work...
-    const bx = begin.x() - kline.x();
-    const by = begin.y() - kline.y();
-    const ex = end.x() - kline.x();
-    const ey = end.y() - kline.y();
-    kline.points([bx, by, ex, ey]);
-    // new line
-    const p2d0 = new Point2D(begin.x(), begin.y());
-    const p2d1 = new Point2D(end.x(), end.y());
-    const line = new Line(p2d0, p2d1);
+
     // tick
-    const tickLen = style.applyZoomScale(10).x;
-    const p2b = new Point2D(bx, by);
-    const p2e = new Point2D(ex, ey);
-    const linePerp0 = getPerpendicularLine(line, p2b, tickLen);
+    const tickLen = 20;
+    const linePerp0 = getPerpendicularLine(
+      line, line.getBegin(), tickLen, style.getZoomScale());
+    ktick0.position({x: 0, y: 0});
     ktick0.points([linePerp0.getBegin().getX(),
       linePerp0.getBegin().getY(),
       linePerp0.getEnd().getX(),
       linePerp0.getEnd().getY()]);
-    const linePerp1 = getPerpendicularLine(line, p2e, tickLen);
+    const linePerp1 = getPerpendicularLine(
+      line, line.getEnd(), tickLen, style.getZoomScale());
+    ktick1.position({x: 0, y: 0});
     ktick1.points([linePerp1.getBegin().getX(),
       linePerp1.getBegin().getY(),
       linePerp1.getEnd().getX(),
       linePerp1.getEnd().getY()]);
+
     // larger hitfunc
     kline.hitFunc(function (context) {
       context.beginPath();
@@ -280,23 +529,27 @@ export class RulerFactory {
       context.closePath();
       context.fillStrokeShape(kline);
     });
+  }
 
-    // update text
-    const ktext = klabel.getText();
-    // @ts-expect-error
-    const meta = ktext.meta;
-    const quantification = line.quantify(viewController);
-    ktext.setText(replaceFlags(meta.textExpr, quantification));
-    // update meta
-    meta.quantification = quantification;
-    // update position
-    const dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    const dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
-    const textPos = {
-      x: line.getEnd().getX() + dX * style.applyZoomScale(ktext.width()).x,
-      y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
-    };
-    klabel.position(textPos);
+  /**
+   * Get the debug shadow.
+   *
+   * @param {Annotation} _annotation The annotation to shadow.
+   * @param {Konva.Group} [_group] The associated group.
+   * @returns {Konva.Group|undefined} The shadow konva group.
+   */
+  #getDebugShadow(_annotation, _group) {
+    return;
+  }
+
+  /**
+   * Update the debug shadow.
+   *
+   * @param {Annotation} _annotation The annotation to shadow.
+   * @param {Konva.Group} _group The associated group.
+   */
+  #updateDebugShadow(_annotation, _group) {
+    // does nothing
   }
 
 } // class RulerFactory

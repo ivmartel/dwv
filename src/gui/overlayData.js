@@ -251,8 +251,18 @@ export class OverlayData {
       }
     }
 
-    // fire valuechange for listeners
-    this.#fireEvent({type: 'valuechange', data: sliceOverlayData});
+    /**
+     * Value change event.
+     *
+     * @event OverlayData#valuechange
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {Array} data The value of the overlay data.
+     */
+    this.#fireEvent({
+      type: 'valuechange',
+      data: sliceOverlayData
+    });
   };
 
   /**

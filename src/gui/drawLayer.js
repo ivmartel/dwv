@@ -2,6 +2,24 @@ import {ListenerHandler} from '../utils/listen';
 import {DrawController} from '../app/drawController';
 import {getScaledOffset} from './layerGroup';
 import {InteractionEventNames} from './generic';
+import {logger} from '../utils/logger';
+import {toStringId} from '../utils/array';
+import {precisionRound} from '../utils/string';
+import {AddAnnotationCommand} from '../tools/drawCommands';
+import {
+  isNodeWithId,
+  isPositionNode,
+  isNodeNameShape,
+  isNodeNameLabel
+} from '../tools/drawBounds';
+import {Style} from '../gui/style';
+import {Line} from '../math/line';
+import {Rectangle} from '../math/rectangle';
+import {ROI} from '../math/roi';
+import {Protractor} from '../math/protractor';
+import {Ellipse} from '../math/ellipse';
+import {Circle} from '../math/circle';
+import {Point2D} from '../math/point';
 
 // external
 import Konva from 'konva';
@@ -13,7 +31,29 @@ import {Index} from '../math/index';
 import {Vector3D} from '../math/vector';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 import {PlaneHelper} from '../image/planeHelper';
+import {Annotation} from '../image/annotation';
+import {AnnotationGroup} from '../image/annotationGroup';
+import {DrawShapeHandler} from '../tools/drawShapeHandler';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Debug function to output the layer hierarchy as text.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
+ */
+// function getHierarchyLog(layer, prefix) {
+//   if (typeof prefix === 'undefined') {
+//     prefix = '';
+//   }
+//   const kids = layer.getChildren();
+//   let log = prefix + '|__ ' + layer.name() + ': ' + layer.id() + '\n';
+//   for (let i = 0; i < kids.length; ++i) {
+//     log += getHierarchyLog(kids[i], prefix + '    ');
+//   }
+//   return log;
+// }
 
 /**
  * Draw layer.
@@ -93,7 +133,7 @@ export class DrawLayer {
   /**
    * The draw controller.
    *
-   * @type {object}
+   * @type {DrawController}
    */
   #drawController;
 
@@ -112,6 +152,34 @@ export class DrawLayer {
   #dataId;
 
   /**
+   * The reference layer id.
+   *
+   * @type {string}
+   */
+  #referenceLayerId;
+
+  /**
+   * Current position group id.
+   *
+   * @type {string|undefined}
+   */
+  #currentPosGroupId;
+
+  /**
+   * Draw shape handler.
+   *
+   * @type {DrawShapeHandler|undefined}
+   */
+  #shapeHandler;
+
+  /**
+   * Visible labels flag.
+   *
+   * @type {boolean}
+   */
+  #visibleLabels = true;
+
+  /**
    * @param {HTMLDivElement} containerDiv The layer div, its id will be used
    *   as this layer id.
    */
@@ -122,12 +190,30 @@ export class DrawLayer {
   }
 
   /**
+   * Set the draw shape handler.
+   *
+   * @param {DrawShapeHandler|undefined} handler The shape handler.
+   */
+  setShapeHandler(handler) {
+    this.#shapeHandler = handler;
+  }
+
+  /**
    * Get the associated data id.
    *
    * @returns {string} The id.
    */
   getDataId() {
     return this.#dataId;
+  }
+
+  /**
+   * Get the reference data id.
+   *
+   * @returns {string} The id.
+   */
+  getReferenceLayerId() {
+    return this.#referenceLayerId;
   }
 
   /**
@@ -159,7 +245,7 @@ export class DrawLayer {
   /**
    * Get the draw controller.
    *
-   * @returns {object} The controller.
+   * @returns {DrawController} The controller.
    */
   getDrawController() {
     return this.#drawController;
@@ -333,6 +419,36 @@ export class DrawLayer {
   }
 
   /**
+   * Initialise the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
+   */
+  initScale(newScale, absoluteZoomOffset) {
+    const orientedNewScale = this.#planeHelper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#konvaStage.scale(finalNewScale);
+
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
+    const offset = this.#konvaStage.offset();
+    this.#konvaStage.offset({
+      x: offset.x + this.#zoomOffset.x,
+      y: offset.y + this.#zoomOffset.y
+    });
+  }
+
+  /**
    * Set the layer offset.
    *
    * @param {Scalar3D} newOffset The offset as {x,y,z}.
@@ -413,13 +529,13 @@ export class DrawLayer {
    *
    * @param {Scalar2D} size The image size as {x,y}.
    * @param {Scalar2D} spacing The image spacing as {x,y}.
-   * @param {string} dataId The associated data id.
+   * @param {string} refLayerId The reference image dataId.
    */
-  initialise(size, spacing, dataId) {
+  initialise(size, spacing, refLayerId) {
     // set locals
     this.#baseSize = size;
     this.#baseSpacing = spacing;
-    this.#dataId = dataId;
+    this.#referenceLayerId = refLayerId;
 
     // create stage
     this.#konvaStage = new Konva.Stage({
@@ -438,9 +554,258 @@ export class DrawLayer {
       visible: true
     });
     this.#konvaStage.add(konvaLayer);
+  }
+
+  /**
+   * Set the annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The annotation group.
+   * @param {string} dataId The associated data id.
+   * @param {object} exeCallback The undo stack callback.
+   */
+  setAnnotationGroup(annotationGroup, dataId, exeCallback) {
+    this.#dataId = dataId;
+    // local listeners
+    annotationGroup.addEventListener('annotationadd', (event) => {
+      // draw annotation
+      this.#addAnnotationDraw(event.data, true);
+      this.getKonvaLayer().draw();
+    });
+    annotationGroup.addEventListener('annotationupdate', (event) => {
+      // update annotation draw
+      this.#updateAnnotationDraw(event.data);
+      this.getKonvaLayer().draw();
+    });
+    annotationGroup.addEventListener('annotationremove', (event) => {
+      // remove annotation draw
+      this.#removeAnnotationDraw(event.data);
+      this.getKonvaLayer().draw();
+    });
+    annotationGroup.addEventListener(
+      'annotationgroupeditablechange',
+      (event) => {
+        this.activateCurrentPositionShapes(event.data);
+      }
+    );
 
     // create draw controller
-    this.#drawController = new DrawController(this);
+    this.#drawController = new DrawController(annotationGroup);
+
+    // annotations are allready in the annotation list,
+    // -> no need to add them, just draw and save command
+    if (annotationGroup.getLength() !== 0) {
+      for (const annotation of annotationGroup.getList()) {
+        // draw annotation
+        this.#addAnnotationDraw(annotation, false);
+        // create the draw command
+        const command = new AddAnnotationCommand(
+          annotation, this.getDrawController());
+        // add command to undo stack
+        exeCallback(command);
+      }
+    }
+  }
+
+  /**
+   * Activate shapes at current position.
+   *
+   * @param {boolean} flag The flag to activate or not.
+   */
+  activateCurrentPositionShapes(flag) {
+    const konvaLayer = this.getKonvaLayer();
+
+    // stop listening
+    this.#konvaStage.listening(false);
+
+    if (typeof this.#shapeHandler !== 'undefined') {
+      // reset shape editor (remove anchors)
+      this.#shapeHandler.disableAndResetEditor();
+      // remove listeners for all position groups
+      const allPosGroups = konvaLayer.getChildren();
+      for (const posGroup of allPosGroups) {
+        if (posGroup instanceof Konva.Group) {
+          posGroup.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+              this.#shapeHandler.removeShapeListeners(group);
+            }
+          });
+        }
+      }
+    }
+
+    // activate shape listeners if possible
+    const drawController = this.getDrawController();
+    if (flag &&
+      drawController.getAnnotationGroup().isEditable()) {
+      // shape groups at the current position
+      const shapeGroups =
+        this.getCurrentPosGroup().getChildren();
+      // listen if we have shapes
+      if (shapeGroups.length !== 0) {
+        this.#konvaStage.listening(true);
+        konvaLayer.listening(true);
+      }
+      // add listeners for position group
+      if (typeof this.#shapeHandler !== 'undefined') {
+        shapeGroups.forEach((group) => {
+          if (group instanceof Konva.Group) {
+            const annotation = drawController.getAnnotation(group.id());
+            this.#shapeHandler.addShapeGroupListeners(group, annotation, this);
+          }
+        });
+      }
+    }
+
+    konvaLayer.draw();
+  }
+
+  /**
+   * Get the position group id for an annotation.
+   *
+   * @param {Annotation} annotation The target annotation.
+   * @returns {string|undefined} The group id.
+   */
+  #getAnnotationPosGroupId(annotation) {
+    let points;
+    // annotation planePoints are only present
+    // for non aquisition plane
+    if (typeof annotation.planePoints !== 'undefined') {
+      // use plane points
+      points = annotation.planePoints;
+    } else {
+      // just use plane origin
+      points = [annotation.planeOrigin];
+    }
+    return this.#getPositionId(points);
+  }
+
+  /**
+   * Get a string id from input plane points.
+   *
+   * @param {Point3D[]} points A list of points that defined a plane.
+   * @returns {string} The string id.
+   */
+  #getPositionId(points) {
+    let res = '';
+    for (const point of points) {
+      if (res.length !== 0) {
+        res += '-';
+      }
+      const posValues = [
+        precisionRound(point.getX(), 2),
+        precisionRound(point.getY(), 2),
+        precisionRound(point.getZ(), 2),
+      ];
+      res += toStringId(posValues);
+    }
+    return res;
+  }
+
+  /**
+   * Find the shape group associated to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Konva.Group|undefined} The shape group.
+   */
+  #findShapeGroup(annotation) {
+    let res;
+
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
+    const layerChildren = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId));
+    if (layerChildren.length !== 0) {
+      const posGroup = layerChildren[0];
+      if (!(posGroup instanceof Konva.Group)) {
+        return;
+      }
+      const posChildren = posGroup.getChildren(
+        isNodeWithId(annotation.id));
+      if (posChildren.length !== 0 &&
+        posChildren[0] instanceof Konva.Group) {
+        res = posChildren[0];
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Draw an annotation: create the shape group and add it to
+   *   the Konva layer.
+   *
+   * @param {Annotation} annotation The annotation to draw.
+   * @param {boolean} visible The position group visibility.
+   */
+  #addAnnotationDraw(annotation, visible) {
+    // check for compatible view
+    if (!annotation.isCompatibleView(this.#planeHelper)) {
+      return;
+    }
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
+    // Get or create position-group if it does not exist and
+    // append it to konvaLayer
+    let posGroup = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId))[0];
+    if (typeof posGroup === 'undefined') {
+      posGroup = new Konva.Group({
+        id: posGroupId,
+        name: 'position-group',
+        visible: visible
+      });
+      this.getKonvaLayer().add(posGroup);
+    }
+    if (!(posGroup instanceof Konva.Group)) {
+      return;
+    };
+
+    const style = new Style();
+    const stage = this.getKonvaStage();
+    style.setZoomScale(stage.scale());
+
+    // shape group (use first one since it will be removed from
+    // the group when we change it)
+    const factory = annotation.getFactory();
+    const shapeGroup = factory.createShapeGroup(annotation, style);
+    // add group to posGroup (switches its parent)
+    posGroup.add(shapeGroup);
+
+    // activate shape if possible
+    if (visible &&
+      typeof this.#shapeHandler !== 'undefined'
+    ) {
+      this.#shapeHandler.addShapeGroupListeners(shapeGroup, annotation, this);
+    }
+    // set label visibility
+    this.setLabelVisibility(shapeGroup);
+  }
+
+  /**
+   * Remove an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to remove.
+   * @returns {boolean} True if the shape group has been found and removed.
+   */
+  #removeAnnotationDraw(annotation) {
+    const shapeGroup = this.#findShapeGroup(annotation);
+    if (!(shapeGroup instanceof Konva.Group)) {
+      logger.debug('No shape group to remove');
+      return false;
+    };
+    shapeGroup.remove();
+    return true;
+  }
+
+  /**
+   * Update an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   */
+  #updateAnnotationDraw(annotation) {
+    // update quantification after math shape update
+    annotation.updateQuantification();
+    // update draw if needed
+    if (this.#removeAnnotationDraw(annotation)) {
+      this.#addAnnotationDraw(annotation, true);
+    }
   }
 
   /**
@@ -511,14 +876,14 @@ export class DrawLayer {
   }
 
   /**
-   * Check the visibility of a given group.
+   * Check the visibility of an annotation.
    *
-   * @param {string} id The id of the group.
-   * @returns {boolean} True if the group is visible.
+   * @param {string} id The id of the annotation.
+   * @returns {boolean} True if the annotation is visible.
    */
-  isGroupVisible(id) {
-    // get the group
-    const group = this.#drawController.getGroup(id);
+  isAnnotationVisible(id) {
+    // get the group (annotation and group have same id)
+    const group = this.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -527,19 +892,24 @@ export class DrawLayer {
   }
 
   /**
-   * Toggle the visibility of a given group.
+   * Set the visibility of an annotation.
    *
-   * @param {string} id The id of the group.
-   * @returns {boolean} False if the group cannot be found.
+   * @param {string} id The id of the annotation.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   * @returns {boolean} False if the annotation shape cannot be found.
    */
-  toggleGroupVisibility(id) {
-    // get the group
-    const group = this.#drawController.getGroup(id);
+  setAnnotationVisibility(id, visible) {
+    // get the group (annotation and group have same id)
+    const group = this.getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
-    // toggle visible
-    group.visible(!group.isVisible());
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !group.isVisible();
+    }
+    group.visible(visible);
 
     // udpate
     this.draw();
@@ -548,28 +918,86 @@ export class DrawLayer {
   }
 
   /**
+   * Set the visibility of all labels.
+   *
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  setLabelsVisibility(visible) {
+    this.#visibleLabels = visible;
+
+    const posGroups = this.getKonvaLayer().getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        for (const shapeGroup of shapeGroups) {
+          if (shapeGroup instanceof Konva.Group) {
+            this.#setLabelVisibility(shapeGroup, visible);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Set a shape group label visibility.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  #setLabelVisibility(shapeGroup, visible) {
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !label.isVisible();
+    }
+    // set visible only for non empty text
+    if (typeof label.getText() !== 'undefined' &&
+      label.getText().text().length !== 0) {
+      label.visible(visible);
+      const connector = shapeGroup.getChildren(node =>
+        (node.className === 'Line') && node.name() === 'connector')[0];
+      if (connector) {
+        connector.visible(visible);
+      }
+    }
+  }
+
+  /**
+   * Set a shape group label visibility according to
+   *  this layer setting.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  setLabelVisibility(shapeGroup) {
+    this.#setLabelVisibility(shapeGroup, this.#visibleLabels);
+  }
+
+  /**
    * Delete a Draw from the stage.
    *
-   * @param {string} id The id of the group to delete.
-   * @param {object} exeCallback The callback to call once the
+   * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
+   * @param {string} _id The id of the group to delete.
+   * @param {Function} _exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
-  deleteDraw(id, exeCallback) {
-    if (typeof this.#drawController !== 'undefined') {
-      this.#drawController.deleteDraw(id, this.#fireEvent, exeCallback);
-    }
+  deleteDraw(_id, _exeCallback) {
+    // does nothing
   }
 
   /**
    * Delete all Draws from the stage.
    *
-   * @param {object} exeCallback The callback to call once the
+   * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
+   * @param {Function} _exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
-  deleteDraws(exeCallback) {
-    if (typeof this.#drawController !== 'undefined') {
-      this.#drawController.deleteDraws(this.#fireEvent, exeCallback);
-    }
+  deleteDraws(_exeCallback) {
+    // does nothing
   }
 
   /**
@@ -579,11 +1007,14 @@ export class DrawLayer {
    * @returns {number|undefined} The total number of draws.
    */
   getNumberOfDraws() {
-    let res;
-    if (typeof this.#drawController !== 'undefined') {
-      res = this.#drawController.getNumberOfDraws();
+    const posGroups = this.getKonvaLayer().getChildren();
+    let count = 0;
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        count += posGroup.getChildren().length;
+      }
     }
-    return res;
+    return count;
   }
 
   /**
@@ -618,14 +1049,110 @@ export class DrawLayer {
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {Index} index The new index.
+   * @param {Index} [index] Optional coresponding index.
    * @returns {boolean} True if the position was updated.
    */
   setCurrentPosition(position, index) {
-    this.getDrawController().activateDrawLayer(
-      index, this.#planeHelper.getScrollIndex());
+    if (typeof index === 'undefined') {
+      index = this.#planeHelper.worldToIndex(position);
+    }
+    const planePoints = this.#planeHelper.getPlanePoints(position);
+    let points;
+    if (this.#planeHelper.isAquisitionOrientation()) {
+      // just use plane origin
+      points = [planePoints[0]];
+    } else {
+      // use plane points
+      points = planePoints;
+    }
+    const posGroupId = this.#getPositionId(points);
+
+    this.#activateDrawLayer(posGroupId);
     // TODO: add check
+    this.#fireEvent({
+      type: 'positionchange',
+      value: [
+        index.getValues(),
+        position.getValues(),
+      ],
+      valid: true
+    });
+
     return true;
+  }
+
+  /**
+   * Activate the current draw layer.
+   *
+   * @param {string} posGroupId The position group ID.
+   */
+  #activateDrawLayer(posGroupId) {
+    this.#currentPosGroupId = posGroupId;
+
+    // get all position groups
+    const posGroups = this.getKonvaLayer().getChildren(isPositionNode);
+    // reset or set the visible property
+    let visible;
+    for (let i = 0, leni = posGroups.length; i < leni; ++i) {
+      visible = false;
+      if (typeof posGroupId !== 'undefined' &&
+        posGroups[i].id() === posGroupId) {
+        visible = true;
+      }
+      // group members inherit the visible property
+      posGroups[i].visible(visible);
+    }
+
+    // show current draw layer
+    this.getKonvaLayer().draw();
+  }
+
+  /**
+   * Get the current position group.
+   *
+   * @returns {Konva.Group|undefined} The Konva.Group.
+   */
+  getCurrentPosGroup() {
+    if (typeof this.#currentPosGroupId === 'undefined') {
+      return;
+    }
+    // get position groups
+    const posGroups = this.getKonvaLayer().getChildren((node) => {
+      return node.id() === this.#currentPosGroupId;
+    });
+    // if one group, use it
+    // if no group, create one
+    let posGroup;
+    if (posGroups.length === 1) {
+      if (posGroups[0] instanceof Konva.Group) {
+        posGroup = posGroups[0];
+      }
+    } else if (posGroups.length === 0) {
+      posGroup = new Konva.Group();
+      posGroup.name('position-group');
+      posGroup.id(this.#currentPosGroupId);
+      posGroup.visible(true); // dont inherit
+      // add new group to layer
+      this.getKonvaLayer().add(posGroup);
+    } else {
+      logger.warn('Unexpected number of draw position groups');
+    }
+    // return
+    return posGroup;
+  }
+
+  /**
+   * Get a Konva group using its id.
+   *
+   * @param {string} id The group id.
+   * @returns {object|undefined} The Konva group.
+   */
+  getGroup(id) {
+    const group = this.getKonvaLayer().findOne('#' + id);
+    if (typeof group === 'undefined') {
+      logger.warn('Cannot find node with id: ' + id);
+    }
+    return group;
   }
 
   /**
@@ -670,7 +1197,7 @@ export class DrawLayer {
    * @param {Scalar2D} scale The scale to compensate for as {x,y}.
    */
   #updateLabelScale(scale) {
-    // same formula as in style::applyZoomScale:
+    // same formula as in labelFactory::create
     // compensate for scale and times 2 so that font 10 looks like a 10
     const ratioX = 2 / scale.x;
     const ratioY = 2 / scale.y;
@@ -682,3 +1209,169 @@ export class DrawLayer {
   }
 
 } // DrawLayer class
+
+// *************************
+// legacy code to allow to convert old state into annotation
+// *************************
+
+/**
+ * Draw meta data.
+ */
+export class DrawMeta {
+  /**
+   * Draw quantification.
+   *
+   * @type {object}
+   */
+  quantification;
+
+  /**
+   * Draw text expression. Can contain variables surrounded with '{}' that will
+   * be extracted from the quantification object.
+   *
+   * @type {string}
+   */
+  textExpr;
+}
+
+/**
+ * Draw details.
+ */
+export class DrawDetails {
+  /**
+   * The draw ID.
+   *
+   * @type {number}
+   */
+  id;
+
+  /**
+   * The draw position: an Index converted to string.
+   *
+   * @type {string}
+   */
+  position;
+
+  /**
+   * The draw type.
+   *
+   * @type {string}
+   */
+  type;
+
+  /**
+   * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   *
+   * @type {string}
+   */
+  color;
+
+  /**
+   * The draw meta.
+   *
+   * @type {DrawMeta}
+   */
+  meta;
+}
+
+/**
+ * Convert a KonvaLayer object to a list of annotations.
+ *
+ * @param {Array} drawings An array of drawings stored
+ *   with 'KonvaLayer().toObject()'.
+ * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+ * @returns {Annotation[]} The associated list of annotations.
+ */
+export function konvaToAnnotation(drawings, drawingsDetails) {
+  const annotations = [];
+
+  // regular Konva deserialize
+  const stateLayer = Konva.Node.create(drawings);
+
+  // get all position groups
+  const statePosGroups = stateLayer.getChildren(isPositionNode);
+
+  for (let i = 0, leni = statePosGroups.length; i < leni; ++i) {
+    const statePosGroup = statePosGroups[i];
+    const statePosKids = statePosGroup.getChildren();
+    for (let j = 0, lenj = statePosKids.length; j < lenj; ++j) {
+      const annotation = new Annotation();
+
+      // shape group (use first one since it will be removed from
+      // the group when we change it)
+      const stateGroup = statePosKids[0];
+      // annotation id
+      annotation.id = stateGroup.id();
+
+      // shape
+      const shape = stateGroup.getChildren(isNodeNameShape)[0];
+      // annotation colour
+      annotation.colour = shape.stroke();
+
+      if (stateGroup.name() === 'line-group') {
+        const points = shape.points();
+        annotation.mathShape = new Point2D(points[0], points[1]);
+        annotation.referencePoints = [
+          new Point2D(points[2], points[3])
+        ];
+      } else if (stateGroup.name() === 'ruler-group') {
+        const points = shape.points();
+        annotation.mathShape = new Line(
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3])
+        );
+      } else if (stateGroup.name() === 'rectangle-group') {
+        annotation.mathShape = new Rectangle(
+          new Point2D(shape.x(), shape.y()),
+          new Point2D(shape.x() + shape.width(), shape.y() + shape.height())
+        );
+      } else if (stateGroup.name() === 'roi-group') {
+        const points = shape.points();
+        const pointsArray = [];
+        for (let i = 0; i < points.length; i = i + 2) {
+          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        }
+        annotation.mathShape = new ROI(pointsArray);
+      } else if (stateGroup.name() === 'freeHand-group') {
+        logger.warn('Converting freehand into ROI shape');
+        const points = shape.points();
+        const pointsArray = [];
+        for (let i = 0; i < points.length; i = i + 2) {
+          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        }
+        annotation.mathShape = new ROI(pointsArray);
+      } else if (stateGroup.name() === 'protractor-group') {
+        const points = shape.points();
+        annotation.mathShape = new Protractor([
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3]),
+          new Point2D(points[4], points[5])
+        ]);
+      } else if (stateGroup.name() === 'ellipse-group') {
+        const absPosition = shape.absolutePosition();
+        annotation.mathShape = new Ellipse(
+          new Point2D(absPosition.x, absPosition.y),
+          shape.radiusX(),
+          shape.radiusY()
+        );
+      } else if (stateGroup.name() === 'circle-group') {
+        const absPosition = shape.absolutePosition();
+        annotation.mathShape = new Circle(
+          new Point2D(absPosition.x, absPosition.y),
+          shape.radius()
+        );
+      }
+
+      // details
+      if (drawingsDetails) {
+        const details = drawingsDetails[stateGroup.id()];
+        annotation.textExpr = details.meta.textExpr;
+        annotation.quantification = details.meta.quantification;
+      }
+
+      annotations.push(annotation);
+    }
+  }
+
+  return annotations;
+}

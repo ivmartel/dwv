@@ -1,8 +1,8 @@
 import {ListenerHandler} from '../utils/listen';
 import {
-  Threshold as ThresholdFilter,
-  Sobel as SobelFilter,
-  Sharpen as SharpenFilter
+  ThresholdFilter,
+  SobelFilter,
+  SharpenFilter
 } from '../image/filter';
 
 // doc imports
@@ -283,7 +283,8 @@ export class Threshold {
     this.#filter.setMax(args.max);
     // reset the image if asked
     if (this.#resetImage) {
-      this.#filter.setOriginalImage(this.#app.getImage(args.dataId));
+      const image = this.#app.getData(args.dataId).image;
+      this.#filter.setOriginalImage(image);
       this.#resetImage = false;
     }
     const command = new RunFilterCommand(this.#filter, args.dataId, this.#app);
@@ -378,7 +379,8 @@ export class Sharpen {
       throw new Error('No dataId to run sharpen filter on.');
     }
     const filter = new SharpenFilter();
-    filter.setOriginalImage(this.#app.getImage(args.dataId));
+    const image = this.#app.getData(args.dataId).image;
+    filter.setOriginalImage(image);
     const command = new RunFilterCommand(filter, args.dataId, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;
@@ -471,7 +473,8 @@ export class Sobel {
       throw new Error('No dataId to run sobel filter on.');
     }
     const filter = new SobelFilter();
-    filter.setOriginalImage(this.#app.getImage(args.dataId));
+    const image = this.#app.getData(args.dataId).image;
+    filter.setOriginalImage(image);
     const command = new RunFilterCommand(filter, args.dataId, this.#app);
     command.onExecute = this.#fireEvent;
     command.onUndo = this.#fireEvent;

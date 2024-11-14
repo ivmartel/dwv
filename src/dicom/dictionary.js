@@ -1,5 +1,5 @@
-/* eslint-disable quote-props */
-/* eslint max-len:0 */
+/* eslint-disable @stylistic/js/quote-props */
+/* eslint @stylistic/js/max-len:0 */
 
 /**
  * DICOM tag dictionary 2022a.

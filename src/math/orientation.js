@@ -10,13 +10,13 @@ import {
  * @returns {Matrix33} The coronal matrix.
  */
 export function getCoronalMat33() {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   return new Matrix33([
     1, 0, 0,
     0, 0, 1,
     0, -1, 0
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 }
 
 /**
@@ -25,13 +25,13 @@ export function getCoronalMat33() {
  * @returns {Matrix33} The sagittal matrix.
  */
 export function getSagittalMat33() {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   return new Matrix33([
     0, 0, -1,
     1, 0, 0,
     0, -1, 0
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 }
 
 /**
@@ -152,11 +152,14 @@ function getVectorStringLPS(vector) {
  * @param {string} code The LPS code string.
  * @returns {string|undefined} The group.
  */
-export function getLPSGroup(code) {
+function getLPSGroup(code) {
   let orientStr;
-  const axialCodes = ['LPS', 'LAI', 'RPI', 'RAS'];
-  const coronalCodes = ['LSA', 'LIP', 'RSP', 'RIA'];
-  const sagittalCodes = ['PSL', 'PIR', 'ASR', 'AIL'];
+  const axialCodes =
+    ['LPS', 'LAI', 'RPI', 'RAS', 'ALS', 'ARI', 'PLI', 'PRS'];
+  const coronalCodes =
+    ['LSA', 'LIP', 'RSP', 'RIA', 'ILA', 'IRP', 'SLP', 'SRA'];
+  const sagittalCodes =
+    ['PSL', 'PIR', 'ASR', 'AIL', 'IAR', 'IPL', 'SAL', 'SPR'];
   if (axialCodes.includes(code)) {
     orientStr = Orientation.Axial;
   } else if (coronalCodes.includes(code)) {
@@ -168,9 +171,28 @@ export function getLPSGroup(code) {
 }
 
 /**
+ * Get the name of an image orientation patient.
+ *
+ * @param {number[]} cosines The image orientation
+ *   patient cosines (6 values).
+ * @returns {string|undefined} The orientation
+ *   name: axial, coronal or sagittal.
+ */
+export function getOrientationName(cosines) {
+  let name;
+  const orientMatrix = getOrientationFromCosines(cosines);
+  if (typeof orientMatrix !== 'undefined') {
+    const lpsStr = getOrientationStringLPS(orientMatrix.asOneAndZeros());
+    name = getLPSGroup(lpsStr);
+  }
+  return name;
+}
+
+/**
  * Get the orientation matrix associated to the direction cosines.
  *
- * @param {number[]} cosines The direction cosines.
+ * @param {number[]} cosines The image orientation
+ *   patient cosines (6 values).
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationFromCosines(cosines) {
@@ -179,13 +201,80 @@ export function getOrientationFromCosines(cosines) {
     const rowCosines = new Vector3D(cosines[0], cosines[1], cosines[2]);
     const colCosines = new Vector3D(cosines[3], cosines[4], cosines[5]);
     const normal = rowCosines.crossProduct(colCosines);
-    /* eslint-disable array-element-newline */
+    /* eslint-disable @stylistic/js/array-element-newline */
     orientationMatrix = new Matrix33([
       rowCosines.getX(), colCosines.getX(), normal.getX(),
       rowCosines.getY(), colCosines.getY(), normal.getY(),
       rowCosines.getZ(), colCosines.getZ(), normal.getZ()
     ]);
-    /* eslint-enable array-element-newline */
+    /* eslint-enable @stylistic/js/array-element-newline */
   }
   return orientationMatrix;
+}
+
+/**
+ * Get the direction cosines from an orientation matrix.
+ *
+ * @param {Matrix33} matrix The input matrix.
+ * @returns {number[]} The image orientation
+ *   patient cosines (6 values).
+ */
+export function getCosinesFromOrientation(matrix) {
+  return [
+    matrix.get(0, 0),
+    matrix.get(1, 0),
+    matrix.get(2, 0),
+    matrix.get(0, 1),
+    matrix.get(1, 1),
+    matrix.get(2, 1)
+  ];
+}
+
+/**
+ * Get the view orientation according to an image and target orientation.
+ * The view orientation is used to go from target to image space.
+ *
+ * @param {Matrix33} imageOrientation The image geometry.
+ * @param {Matrix33} targetOrientation The target orientation.
+ * @returns {Matrix33} The view orientation.
+ */
+export function getViewOrientation(imageOrientation, targetOrientation) {
+  let viewOrientation = getIdentityMat33();
+  if (typeof targetOrientation !== 'undefined') {
+    // i: image, v: view, t: target, O: orientation, P: point
+    // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+    // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+    // -> Ov = (Oi)-1 * Ot
+    // TODO: asOneAndZeros simplifies but not nice...
+    viewOrientation =
+      imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
+  }
+  // TODO: why abs???
+  return viewOrientation.getAbs();
+}
+
+/**
+ * Get the target orientation according to an image and view orientation.
+ * The target orientation is used to go from target to real space.
+ *
+ * @param {Matrix33} imageOrientation The image geometry.
+ * @param {Matrix33} viewOrientation The view orientation.
+ * @returns {Matrix33} The target orientation.
+ */
+export function getTargetOrientation(imageOrientation, viewOrientation) {
+  // i: image, v: view, t: target, O: orientation, P: point
+  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+  // -> Ot = Oi * Ov
+  // note: asOneAndZeros as in getViewOrientation...
+  let targetOrientation =
+    imageOrientation.asOneAndZeros().multiply(viewOrientation);
+
+  // TODO: why abs???
+  const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
+  if (simpleImageOrientation.equals(getCoronalMat33().getAbs())) {
+    targetOrientation = targetOrientation.getAbs();
+  }
+
+  return targetOrientation;
 }

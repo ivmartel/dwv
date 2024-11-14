@@ -1,27 +1,68 @@
 import {ROI} from '../math/roi';
+import {Point2D} from '../math/point';
 import {defaults} from '../app/defaults';
-import {getDefaultAnchor} from './editor';
+import {
+  getLineShape,
+  DRAW_DEBUG,
+  getDefaultAnchor,
+  getAnchorIndex
+} from './drawBounds';
+import {LabelFactory} from './labelFactory';
+
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point';
-import {ViewController} from '../app/viewController';
 import {Style} from '../gui/style';
+import {Annotation} from '../image/annotation';
 /* eslint-enable no-unused-vars */
 
 /**
  * ROI factory.
  */
 export class RoiFactory {
+
+  /**
+   * The name of the factory.
+   *
+   * @type {string}
+   */
+  #name = 'roi';
+
+  /**
+   * The associated label factory.
+   *
+   * @type {LabelFactory}
+   */
+  #labelFactory = new LabelFactory(this.#getDefaultLabelPosition);
+
+  /**
+   * Does this factory support the input math shape.
+   *
+   * @param {object} mathShape The mathematical shape.
+   * @returns {boolean} True if supported.
+   */
+  static supports(mathShape) {
+    return mathShape instanceof ROI;
+  }
+
+  /**
+   * Get the name of the factory.
+   *
+   * @returns {string} The name.
+   */
+  getName() {
+    return this.#name;
+  }
+
   /**
    * Get the name of the shape group.
    *
    * @returns {string} The name.
    */
   getGroupName() {
-    return 'roi-group';
+    return this.#name + '-group';
   }
 
   /**
@@ -44,89 +85,85 @@ export class RoiFactory {
   }
 
   /**
-   * Is the input group a group of this factory?
+   * Set an annotation math shape from input points.
    *
-   * @param {Konva.Group} group The group to test.
-   * @returns {boolean} True if the group is from this fcatory.
+   * @param {Annotation} annotation The annotation.
+   * @param {Point2D[]} points The points.
    */
-  isFactoryGroup(group) {
-    return this.getGroupName() === group.name();
+  setAnnotationMathShape(annotation, points) {
+    annotation.mathShape = this.#calculateMathShape(points);
+    annotation.setTextExpr(this.#getDefaultLabel());
+    annotation.updateQuantification();
   }
 
   /**
    * Create a roi shape to be displayed.
    *
-   * @param {Point2D[]} points The points from which to extract the line.
+   * @param {Annotation} annotation The associated annotation.
    * @param {Style} style The drawing style.
-   * @param {ViewController} [viewController] The associated view controller.
    * @returns {Konva.Group} The Konva group.
    */
-  create(points, style, viewController) {
-    // physical shape
-    const roi = new ROI();
-    // add input points to the ROI
-    roi.addPoints(points);
-    // points stored the Konvajs way
-    const arr = [];
-    for (let i = 0; i < roi.getLength(); ++i) {
-      arr.push(roi.getPoint(i).getX());
-      arr.push(roi.getPoint(i).getY());
-    }
-    // draw shape
-    const kshape = new Konva.Line({
-      points: arr,
-      stroke: style.getLineColour(),
-      strokeWidth: style.getStrokeWidth(),
-      strokeScaleEnabled: false,
-      name: 'shape',
-      closed: true
-    });
-
-    // text
-    const ktext = new Konva.Text({
-      fontSize: style.getFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      name: 'text'
-    });
-    let textExpr = '';
-    if (typeof viewController !== 'undefined') {
-      const modality = viewController.getModality();
-      if (typeof defaults.labelText.roi[modality] !== 'undefined') {
-        textExpr = defaults.labelText.roi[modality];
-      } else {
-        textExpr = defaults.labelText.roi['*'];
-      }
-    }
-    ktext.setText(textExpr);
-    // augment text with meta
-    // @ts-ignore
-    ktext.meta = {
-      textExpr: textExpr,
-      quantification: {}
-    };
-
-    // label
-    const klabel = new Konva.Label({
-      x: roi.getPoint(0).getX(),
-      y: roi.getPoint(0).getY() + style.scale(10),
-      scale: style.applyZoomScale(1),
-      visible: textExpr.length !== 0,
-      name: 'label'
-    });
-    klabel.add(ktext);
-    klabel.add(new Konva.Tag({
-      fill: style.getLineColour(),
-      opacity: style.getTagOpacity()
-    }));
-
-    // return group
+  createShapeGroup(annotation, style) {
+    // konva group
     const group = new Konva.Group();
     group.name(this.getGroupName());
-    group.add(klabel);
-    group.add(kshape);
-    group.visible(true); // dont inherit
+    group.visible(true);
+    group.id(annotation.id);
+    // konva shape
+    const shape = this.#createShape(annotation, style);
+    group.add(this.#createShape(annotation, style));
+    // konva label
+    const label = this.#labelFactory.create(annotation, style);
+    group.add(this.#labelFactory.create(annotation, style));
+    // label-shape connector
+    const connectorsPos = this.#getConnectorsPositions(shape);
+    group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
+
+    // konva shadow (if debug)
+    if (DRAW_DEBUG) {
+      group.add(this.#getDebugShadow(annotation));
+    }
     return group;
+  }
+
+  /**
+   * Get the anchors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The anchor positions.
+   */
+  #getAnchorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    const positions = [];
+    for (let i = 0; i < points.length; i = i + 2) {
+      positions.push(new Point2D(
+        points[i] + sx,
+        points[i + 1] + sy
+      ));
+    }
+    return positions;
+  }
+
+  /**
+   * Get the connectors positions for the shape.
+   *
+   * @param {Konva.Line} shape The associated shape.
+   * @returns {Point2D[]} The connectors positions.
+   */
+  #getConnectorsPositions(shape) {
+    const points = shape.points();
+    const sx = shape.x();
+    const sy = shape.y();
+    const positions = [];
+    for (let i = 0; i < points.length; i += 2) {
+      const nextIndex = (i + 2) % points.length;
+      const midX = (points[i] + points[nextIndex]) / 2 + sx;
+      const midY = (points[i + 1] + points[nextIndex + 1]) / 2 + sy;
+      positions.push(new Point2D(midX, midY));
+    }
+    return positions;
   }
 
   /**
@@ -137,70 +174,257 @@ export class RoiFactory {
    * @returns {Konva.Ellipse[]} A list of anchors.
    */
   getAnchors(shape, style) {
-    const points = shape.points();
-
+    const positions = this.#getAnchorsPositions(shape);
     const anchors = [];
-    for (let i = 0; i < points.length; i = i + 2) {
-      const px = points[i] + shape.x();
-      const py = points[i + 1] + shape.y();
-      const name = i.toString();
+    for (let i = 0; i < positions.length; ++i) {
       anchors.push(getDefaultAnchor(
-        px, py, name, style
+        positions[i].getX(),
+        positions[i].getY(),
+        'anchor' + i,
+        style
       ));
     }
     return anchors;
   }
 
   /**
-   * Update a roi shape.
+   * Constrain anchor movement.
    *
-   * @param {Konva.Ellipse} anchor The active anchor.
-   * @param {Style} style The app style.
-   * @param {ViewController} _viewController The associated view controller.
+   * @param {Konva.Ellipse} _anchor The active anchor.
    */
-  update(anchor, style, _viewController) {
+  constrainAnchorMove(_anchor) {
+    // no constraints
+  }
+
+  /**
+   * Update shape and label on anchor move taking the updated
+   *   annotation as input.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} style The application style.
+   */
+  updateShapeGroupOnAnchorMove(annotation, anchor, style) {
     // parent group
     const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
+
+    // update shape and anchors
+    this.#updateShape(annotation, anchor, style);
+    // update label
+    this.updateLabelContent(annotation, group, style);
+    // label position
+    if (typeof annotation.labelPosition === 'undefined') {
+      // update label position if default position
+      this.#labelFactory.updatePosition(annotation, group);
+    } else {
+      // update connector if not default position
+      this.updateConnector(group);
+    }
+    // update shadow
+    if (DRAW_DEBUG) {
+      this.#updateDebugShadow(annotation, group);
+    }
+  }
+
+  /**
+   * Update an annotation on anchor move.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {Konva.Shape} anchor The anchor.
+   */
+  updateAnnotationOnAnchorMove(annotation, anchor) {
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
+      return;
+    }
     // associated shape
-    const kroi = group.getChildren(function (node) {
-      return node.name() === 'shape';
-    })[0];
-    if (!(kroi instanceof Konva.Line)) {
+    const kroi = this.#getShape(group);
+
+    // update the roi point and compensate for possible drag
+    // (the anchor id is the index of the point in the main list)
+    const roi = annotation.mathShape;
+    const points = roi.getPoints().slice();
+    const newPoint = new Point2D(
+      anchor.x() - kroi.x(),
+      anchor.y() - kroi.y()
+    );
+    const index = getAnchorIndex(anchor.id());
+    points[index] = newPoint;
+
+    // new math shape
+    annotation.mathShape = new ROI(points);
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update an annotation on translation (shape move).
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {object} translation The translation.
+   */
+  updateAnnotationOnTranslation(annotation, translation) {
+    // math shape
+    const roi = annotation.mathShape;
+    const newPoints = [];
+    for (let i = 0; i < roi.getLength(); ++i) {
+      newPoints.push(new Point2D(
+        roi.getPoint(i).getX() + translation.x,
+        roi.getPoint(i).getY() + translation.y
+      ));
+    }
+    annotation.mathShape = new ROI(newPoints);
+    // quantification
+    annotation.updateQuantification();
+  }
+
+  /**
+   * Update the shape label.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Group} group The shape group.
+   * @param {Style} _style The application style.
+   */
+  updateLabelContent(annotation, group, _style) {
+    this.#labelFactory.updateContent(annotation, group);
+  }
+
+  /**
+   * Update the shape connector.
+   *
+   * @param {Konva.Group} group The shape group.
+   */
+  updateConnector(group) {
+    const kshape = this.#getShape(group);
+    const connectorsPos = this.#getConnectorsPositions(kshape);
+    this.#labelFactory.updateConnector(group, connectorsPos);
+  }
+
+  /**
+   * Calculate the mathematical shape from a list of points.
+   *
+   * @param {Point2D[]} points The points that define the shape.
+   * @returns {ROI} The mathematical shape.
+   */
+  #calculateMathShape(points) {
+    return new ROI(points);
+  }
+
+  /**
+   * Get the default labels.
+   *
+   * @returns {object} The label list.
+   */
+  #getDefaultLabel() {
+    return defaults.labelText.roi;
+  }
+
+  /**
+   * Creates the konva shape.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Style} style The drawing style.
+   * @returns {Konva.Line} The konva shape.
+   */
+  #createShape(annotation, style) {
+    const roi = annotation.mathShape;
+    // konva line
+    const arr = [];
+    for (let i = 0; i < roi.getLength(); ++i) {
+      arr.push(roi.getPoint(i).getX());
+      arr.push(roi.getPoint(i).getY());
+    }
+    return new Konva.Line({
+      points: arr,
+      stroke: annotation.colour,
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
+      name: 'shape',
+      closed: true
+    });
+  }
+
+  /**
+   * Get the associated shape from a group.
+   *
+   * @param {Konva.Group} group The group to look into.
+   * @returns {Konva.Line|undefined} The shape.
+   */
+  #getShape(group) {
+    return getLineShape(group);
+  }
+
+  /**
+   * Get the default annotation label position.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Point2D} The position.
+   */
+  #getDefaultLabelPosition(annotation) {
+    const roi = annotation.mathShape;
+    return new Point2D(
+      roi.getPoint(0).getX(),
+      roi.getPoint(0).getY()
+    );
+  }
+
+  /**
+   * Update shape on anchor move.
+   *
+   * @param {Annotation} annotation The associated annotation.
+   * @param {Konva.Ellipse} anchor The active anchor.
+   * @param {Style} _style The application style.
+   */
+  #updateShape(annotation, anchor, _style) {
+
+    // parent group
+    const group = anchor.getParent();
+    if (!(group instanceof Konva.Group)) {
       return;
     }
-    // associated label
-    const klabel = group.getChildren(function (node) {
-      return node.name() === 'label';
-    })[0];
-    if (!(klabel instanceof Konva.Label)) {
-      return;
-    }
+    // associated shape
+    const kroi = this.#getShape(group);
+    // update the roi point and compensate for possible drag
+    // (the anchor id is the index of the point in the main list)
+    const points = kroi.points();
+    const index = getAnchorIndex(anchor.id()) * 2;
+    points[index] = anchor.x() - kroi.x();
+    points[index + 1] = anchor.y() - kroi.y();
+    kroi.points(points);
 
     // update self
     const point = group.getChildren(function (node) {
       return node.id() === anchor.id();
     })[0];
+
     point.x(anchor.x());
     point.y(anchor.y());
-    // update the roi point and compensate for possible drag
-    // (the anchor id is the index of the point in the list)
-    const points = kroi.points();
-    const index = parseInt(anchor.id(), 10);
-    points[index] = anchor.x() - kroi.x();
-    points[index + 1] = anchor.y() - kroi.y();
-    kroi.points(points);
+  }
 
-    // update text
-    const ktext = klabel.getText();
-    // @ts-expect-error
-    const meta = ktext.meta;
-    ktext.setText(meta.textExpr);
-    // update position
-    const textPos = {
-      x: points[0] + kroi.x(),
-      y: points[1] + kroi.y() + style.scale(10)
-    };
-    klabel.position(textPos);
+  /**
+   * Get the debug shadow.
+   *
+   * @param {Annotation} _annotation The anootation to shadow.
+   * @param {Konva.Group} [_group] The associated group.
+   * @returns {Konva.Line} The shadow konva line.
+   */
+  #getDebugShadow(_annotation, _group) {
+    // does nothing
+    return undefined;
+  }
+
+  /**
+   * Update the debug shadow.
+   *
+   * @param {Annotation} _annotation The annotation to shadow.
+   * @param {Konva.Group} _group The associated group.
+   */
+  #updateDebugShadow(_annotation, _group) {
+    // does nothing
   }
 
 } // class RoiFactory

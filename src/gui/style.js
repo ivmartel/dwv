@@ -187,12 +187,20 @@ export class Style {
    * @returns {Scalar2D} The scaled value as {x,y}.
    */
   applyZoomScale(value) {
-    // times 2 so that the font size 10 looks like a 10...
-    // (same logic as in the DrawController::updateLabelScale)
     return {
-      x: 2 * value / this.#zoomScale.x,
-      y: 2 * value / this.#zoomScale.y
+      x: value / this.#zoomScale.x,
+      y: value / this.#zoomScale.y
     };
+  }
+
+  /**
+   * Multiply an input value by the zoom ratio (zx/zy).
+   *
+   * @param {number} value The value to scale.
+   * @returns {number} The scaled value.
+   */
+  applyZoomRatio(value) {
+    return value * this.#zoomScale.x / this.#zoomScale.y;
   }
 
   /**

@@ -1,7 +1,4 @@
-// doc imports
-/* eslint-disable no-unused-vars */
 import {Point2D} from '../math/point';
-/* eslint-enable no-unused-vars */
 
 /**
  * Region Of Interest shape.
@@ -17,14 +14,32 @@ export class ROI {
   #points = [];
 
   /**
+   * @param {Point2D[]} [points] Optional initial point list.
+   */
+  constructor(points) {
+    if (typeof points !== 'undefined') {
+      this.#points = points;
+    }
+  }
+
+  /**
    * Get a point of the list at a given index.
    *
    * @param {number} index The index of the point to get
    *   (beware, no size check).
-   * @returns {Point2D} The Point2D at the given index.
+   * @returns {Point2D|undefined} The Point2D at the given index.
    */
   getPoint(index) {
     return this.#points[index];
+  }
+
+  /**
+   * Get the point list.
+   *
+   * @returns {Point2D[]} The list.
+   */
+  getPoints() {
+    return this.#points;
   }
 
   /**
@@ -52,6 +67,38 @@ export class ROI {
    */
   addPoints(rhs) {
     this.#points = this.#points.concat(rhs);
+  }
+
+  /**
+   * Get the centroid of the roi. Only valid for
+   * a non-self-intersecting closed polygon.
+   * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
+    let a = 0;
+    let cx = 0;
+    let cy = 0;
+    for (let i = 0; i < this.#points.length; ++i) {
+      const pi = this.#points[i];
+      let pi1;
+      if (i === this.#points.length - 1) {
+        pi1 = this.#points[0];
+      } else {
+        pi1 = this.#points[i + 1];
+      }
+      const ai = pi.getX() * pi1.getY() - pi1.getX() * pi.getY();
+      a += ai;
+      cx += (pi.getX() + pi1.getX()) * ai;
+      cy += (pi.getY() + pi1.getY()) * ai;
+    }
+    a *= 0.5;
+    const a1 = 1 / (6 * a);
+    cx *= a1;
+    cy *= a1;
+
+    return new Point2D(cx, cy);
   }
 
 } // ROI class

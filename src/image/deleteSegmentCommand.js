@@ -48,7 +48,6 @@ export class DeleteSegmentCommand {
   constructor(mask, segment, silent) {
     this.#mask = mask;
     this.#segment = segment;
-
     this.#isSilent = (typeof silent === 'undefined') ? false : silent;
     // list of offsets with the colour to delete
     if (typeof segment.displayRGBValue !== 'undefined') {
@@ -73,7 +72,10 @@ export class DeleteSegmentCommand {
    * @returns {boolean} True if the command is valid.
    */
   isValid() {
-    return this.#offsets.length !== 0;
+    const segments = this.#mask.getMeta().custom.segments;
+    return segments.some(segmentItem =>
+      segmentItem.number === this.#segment.number
+    );
   }
 
   /**
@@ -82,12 +84,15 @@ export class DeleteSegmentCommand {
    * @fires DeleteSegmentCommand#masksegmentdelete
    */
   execute() {
-    // remove from image
-    if (typeof this.#segment.displayRGBValue !== 'undefined') {
-      this.#mask.setAtOffsets(this.#offsets, BLACK);
-    } else {
-      this.#mask.setAtOffsets(this.#offsets, 0);
+    if (this.#offsets.length !== 0) {
+      // remove from image
+      if (typeof this.#segment.displayRGBValue !== 'undefined') {
+        this.#mask.setAtOffsets(this.#offsets, BLACK);
+      } else {
+        this.#mask.setAtOffsets(this.#offsets, 0);
+      }
     }
+
     // remove from segments
     const segHelper = new MaskSegmentHelper(this.#mask);
     segHelper.removeSegment(this.#segment.number);
@@ -114,11 +119,13 @@ export class DeleteSegmentCommand {
    * @fires DeleteSegmentCommand#masksegmentredraw
    */
   undo() {
-    // re-draw in image
-    if (typeof this.#segment.displayRGBValue !== 'undefined') {
-      this.#mask.setAtOffsets(this.#offsets, this.#segment.displayRGBValue);
-    } else {
-      this.#mask.setAtOffsets(this.#offsets, this.#segment.displayValue);
+    if (this.#offsets.length !== 0) {
+      // re-draw in image
+      if (typeof this.#segment.displayRGBValue !== 'undefined') {
+        this.#mask.setAtOffsets(this.#offsets, this.#segment.displayRGBValue);
+      } else {
+        this.#mask.setAtOffsets(this.#offsets, this.#segment.displayValue);
+      }
     }
     // add back to segments
     const segHelper = new MaskSegmentHelper(this.#mask);

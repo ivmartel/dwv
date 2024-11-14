@@ -1,5 +1,10 @@
 import {Point2D} from '../../src/math/point';
-import {Line, getAngle, getPerpendicularLine} from '../../src/math/line';
+import {
+  Line,
+  getAngle,
+  areOrthogonal,
+  getPerpendicularLine
+} from '../../src/math/line';
 
 /**
  * Tests for the 'math/line.js' file.
@@ -119,6 +124,37 @@ QUnit.test('Angle between lines - #DWV-REQ-UI-07-005 Draw protractor',
       'getAngle (vertical parallel)');
   }
 );
+
+/**
+ * Tests for {@link Line} areOrthogonal.
+ *
+ * @function module:tests/math~line-areOrthogonal
+ */
+QUnit.test('areOrthogonal', function (assert) {
+  const p00 = new Point2D(0, 0);
+  const p01 = new Point2D(1, 0);
+  const l00 = new Line(p00, p01);
+
+  const p10 = new Point2D(0, 0);
+  const p11 = new Point2D(0, 1);
+  const l10 = new Line(p10, p11);
+  assert.ok(areOrthogonal(l00, l10), 'areOrthogonal #00');
+
+  const p20 = new Point2D(1, 0);
+  const p21 = new Point2D(1, 1);
+  const l20 = new Line(p20, p21);
+  assert.ok(areOrthogonal(l00, l20), 'areOrthogonal #01');
+
+  const p30 = new Point2D(0, 0);
+  const p31 = new Point2D(1, 1);
+  const l30 = new Line(p30, p31);
+  assert.notOk(areOrthogonal(l00, l30), 'areOrthogonal #02');
+
+  const p40 = new Point2D(0, 0);
+  const p41 = new Point2D(-1, 1);
+  const l40 = new Line(p40, p41);
+  assert.ok(areOrthogonal(l30, l40), 'areOrthogonal #03');
+});
 
 /**
  * Tests for {@link Line}.

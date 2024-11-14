@@ -13,7 +13,6 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
-import {ListenerHandler} from '../utils/listen';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -38,26 +37,11 @@ export class ViewController {
   #view;
 
   /**
-   * Associated data id.
-   *
-   * @type {string}
-   */
-  #dataId;
-
-  /**
    * Plane helper.
    *
    * @type {PlaneHelper}
    */
   #planeHelper;
-
-  /**
-   * Colour map name.
-   * Defaults to 'plain' as defined in Views' default.
-   *
-   * @type {string}
-   */
-  #colourMapName = 'plain';
 
   /**
    * Third dimension player ID (created by setInterval).
@@ -75,21 +59,18 @@ export class ViewController {
 
   /**
    * @param {View} view The associated view.
-   * @param {string} dataId The associated data id.
    */
-  constructor(view, dataId) {
+  constructor(view) {
     // check view
     if (typeof view.getImage() === 'undefined') {
       throw new Error('View does not have an image, cannot setup controller');
     }
 
     this.#view = view;
-    this.#dataId = dataId;
 
     // setup the plane helper
     this.#planeHelper = new PlaneHelper(
-      view.getImage().getGeometry().getRealSpacing(),
-      view.getImage().getGeometry().getOrientation(),
+      view.getImage().getGeometry(),
       view.getOrientation()
     );
 
@@ -98,13 +79,6 @@ export class ViewController {
       this.#isMask = true;
     }
   }
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the plane helper.
@@ -210,6 +184,35 @@ export class ViewController {
   }
 
   /**
+   * Get the SOP image UID of the current image.
+   *
+   * @returns {string} The UID.
+   */
+  getCurrentImageUid() {
+    return this.#view.getCurrentImageUid();
+  }
+
+  /**
+   * Get the image origin for a image UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {Point3D|undefined} The origin.
+   */
+  getOriginForImageUid(uid) {
+    return this.#view.getOriginForImageUid(uid);
+  }
+
+  /**
+   * Check if the image includes an UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {boolean} True if present.
+   */
+  includesImageUid(uid) {
+    return this.#view.includesImageUid(uid);
+  }
+
+  /**
    * Get the current oriented index.
    *
    * @returns {Index} The index.
@@ -249,7 +252,7 @@ export class ViewController {
   /**
    * Get the first origin or at a given position.
    *
-   * @param {Point} [position] Opitonal position.
+   * @param {Point} [position] Optional position.
    * @returns {Point3D} The origin.
    */
   getOrigin(position) {
@@ -257,9 +260,29 @@ export class ViewController {
   }
 
   /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return this.#view.isAquisitionOrientation();
+  }
+
+  /**
+   * Get a list of points that define the plane at input position,
+   *   given this classes orientation.
+   *
+   * @param {Point} position The position.
+   * @returns {Point3D[]} An origin and 2 cosines vectors.
+   */
+  getPlanePoints(position) {
+    return this.#planeHelper.getPlanePoints(position);
+  }
+
+  /**
    * Get the current scroll position value.
    *
-   * @returns {object} The value.
+   * @returns {number} The value.
    */
   getCurrentScrollPosition() {
     const scrollIndex = this.#view.getScrollIndex();
@@ -281,11 +304,9 @@ export class ViewController {
    * Set the associated image.
    *
    * @param {Image} img The associated image.
-   * @param {string} dataId The data id of the image.
    */
-  setImage(img, dataId) {
+  setImage(img) {
     this.#view.setImage(img);
-    this.#dataId = dataId;
   }
 
   /**
@@ -438,7 +459,7 @@ export class ViewController {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if possible.
-   * @deprecated Please use isMonochrome instead.
+   * @deprecated Since v0.33, please use isMonochrome instead.
    */
   canWindowLevel() {
     return this.isMonochrome();
@@ -558,11 +579,15 @@ export class ViewController {
    * Get a world position from a 2D plane position.
    *
    * @param {Point2D} point2D The input point.
+   * @param {number} [k] Optional slice index,
+   *   if undefined, uses the current one.
    * @returns {Point} The associated position.
    */
-  getPositionFromPlanePoint(point2D) {
+  getPositionFromPlanePoint(point2D, k) {
     // keep third direction
-    const k = this.getCurrentScrollIndexValue();
+    if (typeof k === 'undefined') {
+      k = this.getCurrentScrollIndexValue();
+    }
     const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
@@ -590,6 +615,19 @@ export class ViewController {
       planePoint.getX(),
       planePoint.getY(),
     );
+  }
+
+  /**
+   * Get the index of a world position.
+   *
+   * @param {Point} point The 3D position.
+   * @returns {Index} The index.
+   */
+  getIndexFromPosition(point) {
+    // orient
+    const geometry = this.#view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    return geometry.worldToIndex(point);
   }
 
   /**
@@ -919,37 +957,5 @@ export class ViewController {
       viewLayer.onimagegeometrychange
     );
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    event.dataid = this.#dataId;
-    this.#listenerHandler.fireEvent(event);
-  };
 
 } // class ViewController

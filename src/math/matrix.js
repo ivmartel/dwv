@@ -266,7 +266,6 @@ export class Matrix33 {
       const sign = max.value > 0 ? 1 : -1;
       for (let i = 0; i < 3; ++i) {
         if (i === max.index) {
-          //res.push(1);
           res.push(1 * sign);
         } else {
           res.push(0);
@@ -341,13 +340,13 @@ function getMatrixInverse(m) {
  * @returns {Matrix33} The identity matrix.
  */
 export function getIdentityMat33() {
-  /* eslint-disable array-element-newline */
+  /* eslint-disable @stylistic/js/array-element-newline */
   return new Matrix33([
     1, 0, 0,
     0, 1, 0,
     0, 0, 1
   ]);
-  /* eslint-enable array-element-newline */
+  /* eslint-enable @stylistic/js/array-element-newline */
 }
 
 /**

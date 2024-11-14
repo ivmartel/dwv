@@ -48,6 +48,24 @@ export class Point2D {
   }
 
   /**
+   * Get the values of this point.
+   *
+   * @returns {number[]} The array of values.
+   */
+  getValues() {
+    return [this.#x, this.#y];
+  }
+
+  /**
+   * Get the centroid of the point, ie itself.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
+    return this;
+  }
+
+  /**
    * Check for Point2D equality.
    *
    * @param {Point2D} rhs The other point to compare to.
@@ -67,6 +85,18 @@ export class Point2D {
    */
   toString() {
     return '(' + this.#x + ', ' + this.#y + ')';
+  }
+
+  /**
+   * Get the distance to another Point2D.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {number} Ths distance to the input point.
+   */
+  getDistance(point2D) {
+    const dx = this.#x - point2D.getX();
+    const dy = this.#y - point2D.getY();
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
 } // Point2D class
@@ -135,6 +165,14 @@ export class Point3D {
     return this.#z;
   }
 
+  /**
+   * Get the values of this point.
+   *
+   * @returns {number[]} The array of values.
+   */
+  getValues() {
+    return [this.#x, this.#y, this.#z];
+  }
 
   /**
    * Check for Point3D equality.
@@ -250,7 +288,7 @@ export function getEqualPoint3DFunction(point) {
 /**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
- *  modify the index values.
+ *  modify the point values.
  */
 export class Point {
 
@@ -281,7 +319,7 @@ export class Point {
   }
 
   /**
-   * Get the index value at the given array index.
+   * Get the point value at the given array index.
    *
    * @param {number} i The index to get.
    * @returns {number} The value.
@@ -291,7 +329,7 @@ export class Point {
   }
 
   /**
-   * Get the length of the index.
+   * Get the length of the point.
    *
    * @returns {number} The length.
    */
@@ -300,16 +338,16 @@ export class Point {
   }
 
   /**
-   * Get a string representation of the Index.
+   * Get a string representation of the point.
    *
-   * @returns {string} The Index as a string.
+   * @returns {string} The point as a string.
    */
   toString() {
     return '(' + this.#values.toString() + ')';
   }
 
   /**
-   * Get the values of this index.
+   * Get the values of this point.
    *
    * @returns {number[]} The array of values.
    */

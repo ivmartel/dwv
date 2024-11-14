@@ -9,8 +9,12 @@ import {Scissors} from '../math/scissors';
 import {guid} from '../math/stats';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
-import {RoiFactory} from '../tools/roi';
-import {DrawGroupCommand} from '../tools/drawCommands';
+import {ROI} from '../math/roi';
+import {Annotation} from '../image/annotation';
+import {
+  AddAnnotationCommand,
+  UpdateAnnotationCommand
+} from '../tools/drawCommands';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -50,18 +54,11 @@ export class Livewire {
   #startPoint;
 
   /**
-   * Draw command.
+   * Current annotation.
    *
-   * @type {object}
+   * @type {Annotation}
    */
-  #command = null;
-
-  /**
-   * Current shape group.
-   *
-   * @type {object}
-   */
-  #shapeGroup = null;
+  #annotation;
 
   /**
    * Drawing style.
@@ -151,9 +148,21 @@ export class Livewire {
       // clear vars
       this.#clearPaths();
       this.#clearParentPoints(imageSize);
-      this.#shapeGroup = null;
+      // get draw layer
+      let drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer === 'undefined') {
+        const viewLayer = layerGroup.getActiveViewLayer();
+        const refDataId = viewLayer.getDataId();
+        // create new data
+        const data = this.#app.createAnnotationData(refDataId);
+        // render (will create draw layer)
+        this.#app.addAndRenderAnnotationData(data, divId, refDataId);
+        // get draw layer
+        drawLayer = layerGroup.getActiveDrawLayer();
+        // set active to bind to toolboxController
+        layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
+      }
       // update zoom scale
-      const drawLayer = layerGroup.getActiveDrawLayer();
       this.#style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
@@ -234,48 +243,48 @@ export class Livewire {
     }
     this.#currentPath.appenPath(this.#path);
 
-    // remove previous draw
-    if (this.#shapeGroup) {
-      this.#shapeGroup.destroy();
-    }
-    // create shape
-    const factory = new RoiFactory();
-    this.#shapeGroup = factory.create(
-      this.#currentPath.pointArray, this.#style);
-    this.#shapeGroup.id(guid());
-
     const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
 
-    // get the position group
-    const posGroup = drawController.getCurrentPosGroup();
-    // add shape group to position group
-    posGroup.add(this.#shapeGroup);
+    const newMathShape = new ROI(this.#currentPath.pointArray);
 
-    // draw shape command
-    this.#command = new DrawGroupCommand(
-      this.#shapeGroup,
-      'livewire',
-      drawLayer
-    );
-    // draw
-    this.#command.execute();
+    let command;
+    if (typeof this.#annotation === 'undefined') {
+      // create annotation
+      this.#annotation = new Annotation();
+      this.#annotation.colour = this.#style.getLineColour();
+      this.#annotation.id = guid();
+
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const viewController = viewLayer.getViewController();
+      this.#annotation.init(viewController);
+
+      this.#annotation.mathShape = newMathShape;
+      command = new AddAnnotationCommand(
+        this.#annotation,
+        drawController
+      );
+    } else {
+      // update annotation
+      const originalMathShape = this.#annotation.mathShape;
+      command = new UpdateAnnotationCommand(
+        this.#annotation,
+        {mathShape: originalMathShape},
+        {mathShape: newMathShape},
+        drawController
+      );
+    }
+
+    // add command to undo stack
+    this.#app.addToUndoStack(command);
+    // execute command: triggers draw creation
+    command.execute();
   }
 
   /**
    * Finish a livewire (roi) shape.
    */
   #finishShape() {
-    // fire creation event (was not propagated during draw)
-    this.#fireEvent({
-      type: 'drawcreate',
-      id: this.#shapeGroup.id()
-    });
-    // listen
-    this.#command.onExecute = this.#fireEvent;
-    this.#command.onUndo = this.#fireEvent;
-    // save command in undo stack
-    this.#app.addToUndoStack(this.#command);
     // set flag
     this.#started = false;
   }
@@ -438,9 +447,9 @@ export class Livewire {
    *
    * @param {object} event The event to fire.
    */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
+  // #fireEvent = (event) => {
+  //   this.#listenerHandler.fireEvent(event);
+  // };
 
   /**
    * Set the tool live features: shape colour.

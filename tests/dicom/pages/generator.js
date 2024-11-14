@@ -140,18 +140,20 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   // remove extra
   delete tags.PixelData;
   // image position
-  let spacing = 1;
-  if (typeof tags.PixelSpacing !== 'undefined') {
-    spacing = tags.PixelSpacing[0];
+  let sliceSpacing = 1;
+  if (typeof tags.SliceThickness !== 'undefined') {
+    sliceSpacing = tags.SliceThickness;
+  } else if (typeof tags.PixelSpacing !== 'undefined') {
+    sliceSpacing = tags.PixelSpacing[0];
   }
   const orientationName =
     dwv.getOrientationName(tags.ImageOrientationPatient);
   if (orientationName === dwv.Orientation.Axial) {
-    tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
+    tags.ImagePositionPatient = [0, 0, sliceNumber * sliceSpacing];
   } else if (orientationName === dwv.Orientation.Coronal) {
-    tags.ImagePositionPatient = [0, sliceNumber * spacing, 0];
+    tags.ImagePositionPatient = [0, sliceNumber * sliceSpacing, 0];
   } else if (orientationName === dwv.Orientation.Sagittal) {
-    tags.ImagePositionPatient = [sliceNumber * spacing, 0, 0];
+    tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
   }
   // instance number
   tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
@@ -167,8 +169,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   const dicomBuffer = writer.getBuffer(dicomElements);
 
   // view as Blob to allow download
-  const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-  return blob;
+  return new Blob([dicomBuffer], {type: 'application/dicom'});
 }
 
 /**
@@ -197,8 +198,7 @@ function onSaveTags() {
 function isValidTags() {
   try {
     JSON.parse(document.getElementById('tags').value);
-  } catch (error) {
-    /* eslint-disable-next-line no-alert */
+  } catch {
     alert('The JSON is not valid, please check it with JSONLint.');
     return false;
   }
@@ -269,7 +269,6 @@ function onInputImageFiles(event) {
           // update tags if needed at first image load
           const tags = JSON.parse(document.getElementById('tags').value);
           if (checkTags(tags, this)) {
-            /* eslint-disable-next-line no-alert */
             alert('Updating tags to input image meta data.');
             document.getElementById('tags').value =
               JSON.stringify(tags, null, 2);

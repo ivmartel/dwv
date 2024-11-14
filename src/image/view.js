@@ -9,6 +9,7 @@ import {generateImageDataPaletteColor} from './viewPaletteColor';
 import {generateImageDataRgb} from './viewRgb';
 import {generateImageDataYbrFull} from './viewYbrFull';
 import {ViewFactory} from './viewFactory';
+import {isIdentityMat33} from '../math/matrix';
 import {getSliceIterator} from '../image/iterator';
 import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
@@ -298,6 +299,7 @@ export class View {
      *
      * @event View#alphafuncchange
      * @type {object}
+     * @property {string} type The event type.
      */
     this.#fireEvent({
       type: 'alphafuncchange'
@@ -436,6 +438,7 @@ export class View {
          *
          * @event View#wlpresetadd
          * @type {object}
+         * @property {string} type The event type.
          * @property {string} name The name of the preset.
          */
         this.#fireEvent({
@@ -492,6 +495,7 @@ export class View {
      *
      * @event View#colourmapchange
      * @type {object}
+     * @property {string} type The event type.
      * @property {Array} value The changed value.
      */
     this.#fireEvent({
@@ -521,6 +525,35 @@ export class View {
     }
     const geometry = this.getImage().getGeometry();
     return geometry.worldToIndex(position);
+  }
+
+  /**
+   * Get the SOP image UID of the current image.
+   *
+   * @returns {string} The UID.
+   */
+  getCurrentImageUid() {
+    return this.#image.getImageUid(this.getCurrentIndex());
+  }
+
+  /**
+   * Get the image origin for a image UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {Point3D|undefined} The origin.
+   */
+  getOriginForImageUid(uid) {
+    return this.#image.getOriginForImageUid(uid);
+  }
+
+  /**
+   * Check if the image includes an UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {boolean} True if present.
+   */
+  includesImageUid(uid) {
+    return this.#image.includesImageUid(uid);
   }
 
   /**
@@ -564,7 +597,7 @@ export class View {
    * Set the current position.
    *
    * @param {Point} position The new position.
-   * @param {boolean} silent Flag to fire event or not.
+   * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} False if not in bounds.
    * @fires View#positionchange
    */
@@ -754,6 +787,7 @@ export class View {
        *
        * @event View#wlchange
        * @type {object}
+       * @property {string} type The event type.
        * @property {Array} value The changed value.
        * @property {number} wc The new window center value.
        * @property {number} ww The new window wdth value.
@@ -960,6 +994,15 @@ export class View {
       index = 2;
     }
     return index;
+  }
+
+  /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return isIdentityMat33(this.#orientation);
   }
 
 } // class View

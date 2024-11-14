@@ -1,5 +1,3 @@
-import {getIdentityMat33} from '../math/matrix';
-import {getCoronalMat33} from '../math/orientation';
 import {Index} from '../math/index';
 import {Point} from '../math/point';
 import {Vector3D} from '../math/vector';
@@ -21,18 +19,18 @@ import {Scalar2D, Scalar3D} from '../math/scalar';
  * Get the layer div id.
  *
  * @param {string} groupDivId The layer group div id.
- * @param {number} layerId The lyaer id.
+ * @param {number} layerIndex The layer index.
  * @returns {string} A string id.
  */
-export function getLayerDivId(groupDivId, layerId) {
-  return groupDivId + '-layer-' + layerId;
+export function getLayerDivId(groupDivId, layerIndex) {
+  return groupDivId + '-layer-' + layerIndex;
 }
 
 /**
  * Get the layer details from a div id.
  *
  * @param {string} idString The layer div id.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export function getLayerDetailsFromLayerDivId(idString) {
   const split = idString.split('-layer-');
@@ -41,7 +39,8 @@ export function getLayerDetailsFromLayerDivId(idString) {
   }
   return {
     groupDivId: split[0],
-    layerId: split[1]
+    layerIndex: split[1],
+    layerId: idString,
   };
 }
 
@@ -51,7 +50,7 @@ export function getLayerDetailsFromLayerDivId(idString) {
  * @param {object} event The event to get the layer div id from. Expecting
  * an event origininating from a canvas inside a layer HTML div
  * with the 'layer' class and id generated with `getLayerDivId`.
- * @returns {object} The layer details as {groupDivId, layerId}.
+ * @returns {object} The layer details as {groupDivId, layerIndex, layerId}.
  */
 export function getLayerDetailsFromEvent(event) {
   let res = null;
@@ -61,55 +60,6 @@ export function getLayerDetailsFromEvent(event) {
     res = getLayerDetailsFromLayerDivId(layerDiv.id);
   }
   return res;
-}
-
-/**
- * Get the view orientation according to an image and target orientation.
- * The view orientation is used to go from target to image space.
- *
- * @param {Matrix33} imageOrientation The image geometry.
- * @param {Matrix33} targetOrientation The target orientation.
- * @returns {Matrix33} The view orientation.
- */
-export function getViewOrientation(imageOrientation, targetOrientation) {
-  let viewOrientation = getIdentityMat33();
-  if (typeof targetOrientation !== 'undefined') {
-    // i: image, v: view, t: target, O: orientation, P: point
-    // [Img] -- Oi --> [Real] <-- Ot -- [Target]
-    // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
-    // -> Ov = (Oi)-1 * Ot
-    // TODO: asOneAndZeros simplifies but not nice...
-    viewOrientation =
-      imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
-  }
-  // TODO: why abs???
-  return viewOrientation.getAbs();
-}
-
-/**
- * Get the target orientation according to an image and view orientation.
- * The target orientation is used to go from target to real space.
- *
- * @param {Matrix33} imageOrientation The image geometry.
- * @param {Matrix33} viewOrientation The view orientation.
- * @returns {Matrix33} The target orientation.
- */
-export function getTargetOrientation(imageOrientation, viewOrientation) {
-  // i: image, v: view, t: target, O: orientation, P: point
-  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
-  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
-  // -> Ot = Oi * Ov
-  // note: asOneAndZeros as in getViewOrientation...
-  let targetOrientation =
-    imageOrientation.asOneAndZeros().multiply(viewOrientation);
-
-  // TODO: why abs???
-  const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
-  if (simpleImageOrientation.equals(getCoronalMat33().getAbs())) {
-    targetOrientation = targetOrientation.getAbs();
-  }
-
-  return targetOrientation;
 }
 
 /**
@@ -343,6 +293,7 @@ export class LayerGroup {
     return this.#baseScale;
   }
 
+
   /**
    * Get the added scale: the scale added to the base scale.
    *
@@ -401,6 +352,76 @@ export class LayerGroup {
   }
 
   /**
+   * Get a list of view layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayers(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &&
+        callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Test if one of the view layers satisfies an input callbackFn.
+   *
+   * @param {Function} callbackFn A function that takes
+   *   a ViewLayer as input and returns a boolean.
+   * @returns {boolean} True if one of the ViewLayers
+   *   satisfies the callbackFn.
+   */
+  someViewLayer(callbackFn) {
+    let hasOne = false;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer &&
+        callbackFn(layer)) {
+        hasOne = true;
+        break;
+      }
+    }
+    return hasOne;
+  }
+
+  /**
+   * Get a list of draw layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a DrawLayer as input and returns a boolean. If undefined,
+   *   returns all draw layers.
+   * @returns {DrawLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getDrawLayers(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+    const res = [];
+    for (const layer of this.#layers) {
+      if (layer instanceof DrawLayer &&
+        callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+    return res;
+  }
+
+  /**
    * Get the number of view layers handled by this class.
    *
    * @returns {number} The number of layers.
@@ -428,8 +449,6 @@ export class LayerGroup {
       if (tmpLayer instanceof ViewLayer) {
         layer = tmpLayer;
       }
-    } else {
-      logger.info('No active view layer to return');
     }
     return layer;
   }
@@ -440,11 +459,20 @@ export class LayerGroup {
    * @returns {ViewLayer|undefined} The layer.
    */
   getBaseViewLayer() {
-    let layer;
-    if (this.#layers[0] instanceof ViewLayer) {
-      layer = this.#layers[0];
+    // use first layer as base for calculating position and
+    // line sizes
+    let baseLayer;
+    for (const layer of this.#layers) {
+      if (layer instanceof ViewLayer) {
+        baseLayer = layer;
+        break;
+      }
     }
-    return layer;
+    if (typeof baseLayer === 'undefined') {
+      logger.warn('No layer found');
+      return;
+    }
+    return baseLayer;
   }
 
   /**
@@ -454,14 +482,10 @@ export class LayerGroup {
    * @returns {ViewLayer[]} The layers.
    */
   getViewLayersByDataId(dataId) {
-    const res = [];
-    for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer &&
-        layer.getDataId() === dataId) {
-        res.push(layer);
-      }
-    }
-    return res;
+    const callbackFn = function (layer) {
+      return layer.getDataId() === dataId;
+    };
+    return this.getViewLayers(callbackFn);
   }
 
   /**
@@ -509,8 +533,6 @@ export class LayerGroup {
       if (tmpLayer instanceof DrawLayer) {
         layer = tmpLayer;
       }
-    } else {
-      logger.info('No active draw layer to return');
     }
     return layer;
   }
@@ -522,14 +544,10 @@ export class LayerGroup {
    * @returns {DrawLayer[]} The layers.
    */
   getDrawLayersByDataId(dataId) {
-    const res = [];
-    for (const layer of this.#layers) {
-      if (layer instanceof DrawLayer &&
-        layer.getDataId() === dataId) {
-        res.push(layer);
-      }
-    }
-    return res;
+    const callbackFn = function (layer) {
+      return layer.getDataId() === dataId;
+    };
+    return this.getDrawLayers(callbackFn);
   }
 
   /**
@@ -541,10 +559,11 @@ export class LayerGroup {
     if (this.#layers[index] instanceof ViewLayer) {
       this.#activeViewLayerIndex = index;
       /**
-       * Active view layer change event.
+       * Active layer change event.
        *
-       * @event LayerGroup#activeviewlayerchange
+       * @event LayerGroup#activelayerchange
        * @type {object}
+       * @property {string} type The event type.
        * @property {Array} value The changed value.
        */
       this.#fireEvent({
@@ -583,19 +602,15 @@ export class LayerGroup {
   /**
    * Set the active draw layer.
    *
-   * @param {number} index The index of the layer to set as active.
+   * @param {number|undefined} index The index of the layer to set as active
+   *   or undefined to not set any.
    */
   setActiveDrawLayer(index) {
-    if (this.#layers[index] instanceof DrawLayer) {
-      this.#activeDrawLayerIndex = index;
-      this.#fireEvent({
-        type: 'activelayerchange',
-        value: [this.#layers[index]]
-      });
-    } else {
-      logger.warn('No draw layer to set as active with index: ' +
-        index);
-    }
+    this.#activeDrawLayerIndex = index;
+    this.#fireEvent({
+      type: 'activelayerchange',
+      value: [this.#layers[index]]
+    });
   }
 
   /**
@@ -718,6 +733,11 @@ export class LayerGroup {
    * @param {DrawLayer} drawLayer The draw layer to bind.
    */
   #bindDrawLayer(drawLayer) {
+    // listen to position change to update other group layers
+    drawLayer.addEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.addEventListener(
+      'positionchange', this.#fireEvent);
     // propagate drawLayer events
     drawLayer.addEventListener('drawcreate', this.#fireEvent);
     drawLayer.addEventListener('drawdelete', this.#fireEvent);
@@ -729,6 +749,11 @@ export class LayerGroup {
    * @param {DrawLayer} drawLayer The draw layer to unbind.
    */
   #unbindDrawLayer(drawLayer) {
+    // stop listening to position change to update other group layers
+    drawLayer.removeEventListener(
+      'positionchange', this.updateLayersToPositionChange);
+    drawLayer.removeEventListener(
+      'positionchange', this.#fireEvent);
     // propagate drawLayer events
     drawLayer.removeEventListener('drawcreate', this.#fireEvent);
     drawLayer.removeEventListener('drawdelete', this.#fireEvent);
@@ -798,36 +823,12 @@ export class LayerGroup {
     if (layer instanceof ViewLayer) {
       this.#unbindViewLayer(layer);
       if (this.#activeViewLayerIndex === index) {
-        if (index - 2 >= 0) {
-          this.setActiveViewLayer(index - 2);
-        } else {
-          this.#activeViewLayerIndex = undefined;
-        }
+        this.#activeViewLayerIndex = undefined;
       }
     } else {
-      // delete layer draws
-      const numberOfDraws = layer.getNumberOfDraws();
-      if (typeof numberOfDraws !== 'undefined') {
-        let count = 0;
-        layer.addEventListener('drawdelete', (_event) => {
-          ++count;
-          // unbind when all draw are deleted
-          if (count === numberOfDraws) {
-            this.#unbindDrawLayer(layer);
-          }
-        });
-      }
-      layer.deleteDraws();
-      if (typeof numberOfDraws === 'undefined') {
-        this.#unbindDrawLayer(layer);
-      }
-      // reset active index
+      this.#unbindDrawLayer(layer);
       if (this.#activeDrawLayerIndex === index) {
-        if (index - 2 >= 0) {
-          this.setActiveDrawLayer(index - 2);
-        } else {
-          this.#activeDrawLayerIndex = undefined;
-        }
+        this.#activeDrawLayerIndex = undefined;
       }
     }
     // reset in storage
@@ -952,26 +953,6 @@ export class LayerGroup {
     }
   }
 
-
-  /**
-   * Test if one of the view layers satisfies an input callbackFn.
-   *
-   * @param {Function} callbackFn A function that takes a ViewLayer as input
-   *   and returns a boolean.
-   * @returns {boolean} True if one of the ViewLayers satisfies the callbackFn.
-   */
-  someViewLayer(callbackFn) {
-    let hasOne = false;
-    for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer &&
-        callbackFn(layer)) {
-        hasOne = true;
-        break;
-      }
-    }
-    return hasOne;
-  }
-
   /**
    * Can the input position be set on one of the view layers.
    *
@@ -1017,7 +998,7 @@ export class LayerGroup {
   updateLayersToPositionChange = (event) => {
     // pause positionchange listeners
     for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer) {
+      if (typeof layer !== 'undefined') {
         layer.removeEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.removeEventListener('positionchange', this.#fireEvent);
@@ -1035,24 +1016,26 @@ export class LayerGroup {
     }
 
     // origin of the first view layer
+    const viewLayerOffsets = {};
     let baseViewLayerOrigin0;
     let baseViewLayerOrigin;
-    let scrollOffset;
-    let planeOffset;
     // update position for all layers except the source one
     for (const layer of this.#layers) {
       if (typeof layer === 'undefined') {
         continue;
       }
-
-      // update base offset (does not trigger redraw)
       let hasSetOffset = false;
+
+      // view layer case: define and set offsets
       if (layer instanceof ViewLayer) {
         const vc = layer.getViewController();
         // origin0 should always be there
         const origin0 = vc.getOrigin();
         // depending on position, origin could be undefined
         const origin = vc.getOrigin(position);
+
+        let scrollOffset;
+        let planeOffset;
 
         if (typeof baseViewLayerOrigin === 'undefined') {
           // first view layer, store origins
@@ -1073,24 +1056,30 @@ export class LayerGroup {
               planeDiff.getX(), planeDiff.getY(), planeDiff.getZ());
           }
         }
+
+        // set and store offsets
+        if (typeof scrollOffset !== 'undefined' &&
+          typeof planeOffset !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(
+              scrollOffset, planeOffset,
+              baseViewLayerOrigin, baseViewLayerOrigin0
+            );
+          // store
+          viewLayerOffsets[layer.getId()] = {
+            scroll: scrollOffset,
+            plane: planeOffset
+          };
+        }
       }
 
-      // also set for draw layers
-      // (should be next after a view layer)
-      if (typeof scrollOffset !== 'undefined' &&
-        typeof planeOffset !== 'undefined') {
-        hasSetOffset =
-          layer.setBaseOffset(
-            scrollOffset, planeOffset,
-            baseViewLayerOrigin, baseViewLayerOrigin0
-          );
-      }
-
-      // reset to not propagate after draw layer
-      // TODO: revise, could be unstable...
+      // draw layer case: use associated view layer offsets
       if (layer instanceof DrawLayer) {
-        scrollOffset = undefined;
-        planeOffset = undefined;
+        const refOffsets = viewLayerOffsets[layer.getReferenceLayerId()];
+        if (typeof refOffsets !== 'undefined') {
+          hasSetOffset =
+            layer.setBaseOffset(refOffsets.scroll, refOffsets.plane);
+        }
       }
 
       // update position (triggers redraw)
@@ -1107,7 +1096,7 @@ export class LayerGroup {
 
     // re-start positionchange listeners
     for (const layer of this.#layers) {
-      if (layer instanceof ViewLayer) {
+      if (typeof layer !== 'undefined') {
         layer.addEventListener(
           'positionchange', this.updateLayersToPositionChange);
         layer.addEventListener('positionchange', this.#fireEvent);
@@ -1265,6 +1254,7 @@ export class LayerGroup {
      *
      * @event LayerGroup#zoomchange
      * @type {object}
+     * @property {string} type The event type.
      * @property {Array} value The changed value.
      */
     this.#fireEvent({
@@ -1307,6 +1297,7 @@ export class LayerGroup {
      *
      * @event LayerGroup#offsetchange
      * @type {object}
+     * @property {string} type The event type.
      * @property {Array} value The changed value.
      */
     this.#fireEvent({

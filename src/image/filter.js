@@ -6,7 +6,7 @@ import {Image} from './image';
 /**
  * Threshold an image between an input minimum and maximum.
  */
-export class Threshold {
+export class ThresholdFilter {
   /**
    * Threshold minimum.
    *
@@ -114,7 +114,7 @@ export class Threshold {
 /**
  * Sharpen an image using a sharpen convolution matrix.
  */
-export class Sharpen {
+export class SharpenFilter {
   /**
    * Get the name of the filter.
    *
@@ -156,13 +156,13 @@ export class Sharpen {
    */
   update() {
     const image = this.getOriginalImage();
-    /* eslint-disable array-element-newline */
+    /* eslint-disable @stylistic/js/array-element-newline */
     return image.convolute2D([
       0, -1, 0,
       -1, 5, -1,
       0, -1, 0
     ]);
-    /* eslint-enable array-element-newline */
+    /* eslint-enable @stylistic/js/array-element-newline */
   }
 
 } // class Sharpen
@@ -170,7 +170,7 @@ export class Sharpen {
 /**
  * Apply a Sobel filter to an image.
  */
-export class Sobel {
+export class SobelFilter {
   /**
    * Get the name of the filter.
    *
@@ -212,7 +212,7 @@ export class Sobel {
    */
   update() {
     const image = this.getOriginalImage();
-    /* eslint-disable array-element-newline */
+    /* eslint-disable @stylistic/js/array-element-newline */
     const gradX = image.convolute2D([
       1, 0, -1,
       2, 0, -2,
@@ -223,7 +223,7 @@ export class Sobel {
       0, 0, 0,
       -1, -2, -1
     ]);
-    /* eslint-enable array-element-newline */
+    /* eslint-enable @stylistic/js/array-element-newline */
     return gradX.compose(gradY, function (x, y) {
       return Math.sqrt(x * x + y * y);
     });

@@ -3,6 +3,11 @@ import {
   getTransferSyntaxName
 } from './dicomParser';
 import {
+  getDate,
+  getTime,
+  getDateTime
+} from './dicomDate';
+import {
   isPixelDataTag,
   isItemDelimitationItemTag,
   isSequenceDelimitationItemTag,
@@ -454,146 +459,6 @@ export function getPixelUnit(elements) {
 }
 
 /**
- * Get a 'date' object with {year, monthIndex, day} ready for the
- *   Date constructor from a DICOM element with vr=DA.
- *
- * @param {object} element The DICOM element with date information.
- * @returns {{year, monthIndex, day}|undefined} The 'date' object.
- */
-export function getDate(element) {
-  if (typeof element === 'undefined') {
-    return undefined;
-  }
-  if (element.value.length !== 1) {
-    return undefined;
-  }
-  const daValue = element.value[0];
-  // Two possible formats:
-  // - standard 'YYYYMMDD'
-  // - non-standard 'YYYY.MM.DD' (previous ACR-NEMA)
-  let monthBeginIndex = 4;
-  let dayBeginIndex = 6;
-  if (daValue.length === 10) {
-    monthBeginIndex = 5;
-    dayBeginIndex = 8;
-  }
-  const daYears = parseInt(daValue.substring(0, 4), 10);
-  // 0-11 range
-  const daMonthIndex = daValue.length >= monthBeginIndex + 2
-    ? parseInt(daValue.substring(
-      monthBeginIndex, monthBeginIndex + 2), 10) - 1 : 0;
-  const daDay = daValue.length === dayBeginIndex + 2
-    ? parseInt(daValue.substring(
-      dayBeginIndex, dayBeginIndex + 2), 10) : 0;
-  return {
-    year: daYears,
-    monthIndex: daMonthIndex,
-    day: daDay
-  };
-}
-
-/**
- * Get a time object with {hours, minutes, seconds} ready for the
- *   Date constructor from a DICOM element with vr=TM.
- *
- * @param {object} element The DICOM element with date information.
- * @returns {{hours, minutes, seconds, milliseconds}|undefined} The time object.
- */
-export function getTime(element) {
-  if (typeof element === 'undefined') {
-    return undefined;
-  }
-  if (element.value.length !== 1) {
-    return undefined;
-  }
-  // format: HH[MMSS.FFFFFF]
-  const tmValue = element.value[0];
-  const tmHours = parseInt(tmValue.substring(0, 2), 10);
-  const tmMinutes = tmValue.length >= 4
-    ? parseInt(tmValue.substring(2, 4), 10) : 0;
-  const tmSeconds = tmValue.length >= 6
-    ? parseInt(tmValue.substring(4, 6), 10) : 0;
-  const tmFracSecondsStr = tmValue.length >= 8
-    ? tmValue.substring(7, 10) : 0;
-  const tmMilliSeconds = tmFracSecondsStr === 0 ? 0
-    : parseInt(tmFracSecondsStr, 10) *
-      Math.pow(10, 3 - tmFracSecondsStr.length);
-  return {
-    hours: tmHours,
-    minutes: tmMinutes,
-    seconds: tmSeconds,
-    milliseconds: tmMilliSeconds
-  };
-}
-
-/**
- * Get a 'dateTime' object with {date, time} ready for the
- *   Date constructor from a DICOM element with vr=DT.
- *
- * @param {object} element The DICOM element with date-time information.
- * @returns {{date, time}|undefined} The time object.
- */
-export function getDateTime(element) {
-  if (typeof element === 'undefined') {
-    return undefined;
-  }
-  if (element.value.length !== 1) {
-    return undefined;
-  }
-  // format: YYYYMMDDHHMMSS.FFFFFF&ZZXX
-  const dtFullValue = element.value[0];
-  // remove offset (&ZZXX)
-  const dtValue = dtFullValue.split('&')[0];
-  const dtDate = getDate({value: [dtValue.substring(0, 8)]});
-  const dtTime = dtValue.length >= 9
-    ? getTime({value: [dtValue.substring(8)]}) : undefined;
-  return {
-    date: dtDate,
-    time: dtTime
-  };
-}
-
-/**
- * Pad an input string with a '0' to form a 2 digit one.
- *
- * @param {string} str The string to pad.
- * @returns {string} The padded string.
- */
-function padZeroTwoDigit(str) {
-  return ('0' + str).slice(-2);
-}
-
-/**
- * Get a DICOM formated date.
- *
- * @param {Date} date The date to format.
- * @returns {string} The formated date.
- */
-export function getDicomDate(date) {
-  // YYYYMMDD
-  return (
-    date.getFullYear().toString() +
-    padZeroTwoDigit((date.getMonth() + 1).toString()) +
-    padZeroTwoDigit(date.getDate().toString())
-  );
-}
-
-/**
- * Get a DICOM formated time.
- *
- * @param {Date} date The date to format.
- * @returns {string} The formated time.
- */
-export function getDicomTime(date) {
-  // HHMMSS
-  return (
-    padZeroTwoDigit(date.getHours().toString()) +
-    padZeroTwoDigit(date.getMinutes().toString()) +
-    padZeroTwoDigit(date.getSeconds().toString())
-  );
-}
-
-/**
  * Check the dimension organization from a dicom element.
  *
  * @param {DataElements} dataElements The root dicom element.
@@ -796,7 +661,12 @@ function getDecayedDose(elements) {
     const totalDoseEl = radioInfoSq.value[0]['00181074'];
     warn = checkTag(totalDoseEl, totalDoseStr);
     if (warn.length === 0) {
-      totalDose = totalDoseEl.value[0];
+      const dose = parseFloat(totalDoseEl.value[0]);
+      if (!isNaN(dose)) {
+        totalDose = dose;
+      } else {
+        warning += ' TotalDose is not a number';
+      }
     } else {
       warning += warn;
     }
@@ -806,7 +676,12 @@ function getDecayedDose(elements) {
     const halfLifeEl = radioInfoSq.value[0]['00181075'];
     warn = checkTag(halfLifeEl, halfLifeStr);
     if (warn.length === 0) {
-      halfLife = parseFloat(halfLifeEl.value[0]);
+      const hl = parseFloat(halfLifeEl.value[0]);
+      if (!isNaN(hl)) {
+        halfLife = hl;
+      } else {
+        warning += ' HalfLife is not a number';
+      }
     } else {
       warning += warn;
     }
@@ -974,7 +849,12 @@ export function getSuvFactor(elements) {
   const patWeightEl = elements['00101030'];
   const warn = checkTag(patWeightEl, patientWeightStr);
   if (warn.length === 0) {
-    patWeight = patWeightEl.value[0];
+    const weight = parseFloat(patWeightEl.value[0]);
+    if (!isNaN(weight)) {
+      patWeight = weight;
+    } else {
+      warning += ' PatientWeight is not a number';
+    }
   } else {
     warning += warn;
   }

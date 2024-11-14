@@ -1,6 +1,6 @@
 import {Point2D} from './point';
 import {getStats} from './stats';
-import {i18n} from '../utils/i18n';
+import {Index} from './index';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -171,6 +171,18 @@ export class Rectangle {
   }
 
   /**
+   * Get the centroid of the rectangle.
+   *
+   * @returns {Point2D} The centroid point.
+   */
+  getCentroid() {
+    return new Point2D(
+      this.getBegin().getX() + this.getWidth() / 2,
+      this.getBegin().getY() + this.getHeight() / 2
+    );
+  }
+
+  /**
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
@@ -183,15 +195,18 @@ export class Rectangle {
     const spacing2D = viewController.get2DSpacing();
     quant.width = {
       value: this.getWidth() * spacing2D.x,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     quant.height = {
       value: this.getHeight() * spacing2D.y,
-      unit: i18n.t('unit.mm')
+      unit: 'unit.mm'
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {value: surface / 100, unit: i18n.t('unit.cm2')};
+      quant.surface = {
+        value: surface / 100,
+        unit: 'unit.cm2'
+      };
     }
 
     // pixel values quantification
@@ -220,3 +235,32 @@ export class Rectangle {
   }
 
 } // Rectangle class
+
+/**
+ * Get the indices that form a rectangle.
+ *
+ * @param {Index} center The rectangle center.
+ * @param {number[]} size The 2 rectangle sizes.
+ * @param {number[]} dir The 2 rectangle directions.
+ * @returns {Index[]} The indices of the rectangle.
+ */
+export function getRectangleIndices(center, size, dir) {
+  const centerValues = center.getValues();
+  // keep all values for possible extra dimensions
+  const values = centerValues.slice();
+  const indices = [];
+  const sizeI = size[0];
+  const halfSizeI = Math.floor(sizeI / 2);
+  const sizeJ = size[1];
+  const halfSizeJ = Math.floor(sizeJ / 2);
+  const di = dir[0];
+  const dj = dir[1];
+  for (let j = 0; j < sizeJ; ++j) {
+    values[dj] = centerValues[dj] - halfSizeJ + j;
+    for (let i = 0; i < sizeI; ++i) {
+      values[di] = centerValues[di] - halfSizeI + i;
+      indices.push(new Index(values.slice()));
+    }
+  }
+  return indices;
+}

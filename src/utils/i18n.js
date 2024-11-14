@@ -11,20 +11,19 @@ export const i18n = {
    * @returns {string|undefined} The translated text.
    */
   t(key) {
-    // defaut expects something like 'unit.cm2'
-    const unit = {
-      mm: 'mm',
-      cm2: 'cm²',
-      degree: '°'
-    };
+    let res = key;
     const props = key.split('.');
-    if (props.length !== 2) {
-      throw new Error('Unexpected translation key length.');
+    // defaut units look like 'unit.cm2'
+    if (props.length === 2 &&
+      props[0] === 'unit') {
+      const units = {
+        mm: 'mm',
+        cm2: 'cm²',
+        degree: '°'
+      };
+      res = units[props[1]];
     }
-    if (props[0] !== 'unit') {
-      throw new Error('Unexpected translation key prefix.');
-    }
-    return unit[props[1]];
+    return res;
   }
 
 };

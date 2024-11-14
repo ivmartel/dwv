@@ -1,10 +1,17 @@
 import {Vector3D} from '../math/vector';
-import {Point3D} from '../math/point';
-import {getTargetOrientation} from '../gui/layerGroup';
+import {Point3D, Point2D} from '../math/point';
+import {isIdentityMat33} from '../math/matrix';
+import {
+  getCosinesFromOrientation,
+  getTargetOrientation
+} from '../math/orientation';
 import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import {Point} from '../math/point';
+import {Index} from '../math/index';
+import {Geometry} from '../image/geometry';
 import {Matrix33} from '../math/matrix';
 import {Spacing} from './spacing';
 import {Scalar2D, Scalar3D} from '../math/scalar';
@@ -14,6 +21,13 @@ import {Scalar2D, Scalar3D} from '../math/scalar';
  * Plane geometry helper.
  */
 export class PlaneHelper {
+
+  /**
+   * The image geometry.
+   *
+   * @type {Geometry}
+   */
+  #imageGeometry;
 
   /**
    * The associated spacing.
@@ -44,17 +58,35 @@ export class PlaneHelper {
   #targetOrientation;
 
   /**
-   * @param {Spacing} spacing The spacing.
-   * @param {Matrix33} imageOrientation The image oientation.
+   * @param {Geometry} imageGeometry The image geometry.
    * @param {Matrix33} viewOrientation The view orientation.
    */
-  constructor(spacing, imageOrientation, viewOrientation) {
-    this.#spacing = spacing;
-    this.#imageOrientation = imageOrientation;
+  constructor(imageGeometry, viewOrientation) {
+    this.#imageGeometry = imageGeometry;
+    this.#spacing = imageGeometry.getRealSpacing();
+    this.#imageOrientation = imageGeometry.getOrientation();
     this.#viewOrientation = viewOrientation;
 
     this.#targetOrientation = getTargetOrientation(
-      imageOrientation, viewOrientation);
+      this.#imageOrientation, viewOrientation);
+  }
+
+  /**
+   * Get the view orientation.
+   *
+   * @returns {Matrix33} The orientation matrix.
+   */
+  getViewOrientation() {
+    return this.#viewOrientation;
+  }
+
+  /**
+   * Get the target orientation.
+   *
+   * @returns {Matrix33} The orientation matrix.
+   */
+  getTargetOrientation() {
+    return this.#targetOrientation;
   }
 
   /**
@@ -242,6 +274,84 @@ export class PlaneHelper {
       );
     }
     return planePoint;
+  }
+
+  /**
+   * Get a world position from a 2D plane position.
+   *
+   * @param {Point2D} point2D The plane point.
+   * @param {number} k The slice index.
+   * @returns {Point3D} The world position.
+   */
+  getPositionFromPlanePoint(point2D, k) {
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
+    // de-orient
+    const point = this.getImageOrientedPoint3D(planePoint);
+    // ~indexToWorld to not loose precision
+    return this.#imageGeometry.pointToWorld(point);
+  }
+
+  /**
+   * Get a 2D plane position from a world position.
+   *
+   * @param {Point} point The world position.
+   * @returns {Point3D} The plane point.
+   */
+  getPlanePointFromPosition(point) {
+    const point3D = this.#imageGeometry.worldToPoint(point);
+    return this.getImageDeOrientedPoint3D(point3D);
+  }
+
+  /**
+   * Get the cosines of this plane.
+   *
+   * @returns {number[]} The 2 cosines vectors (3D).
+   */
+  getCosines() {
+    return getCosinesFromOrientation(this.#targetOrientation);
+  }
+
+  /**
+   * Get a list of points that define the plane at input position,
+   *   given this classes orientation.
+   *
+   * @param {Point} position The position.
+   * @returns {Point3D[]} An origin and 2 cosines vectors.
+   */
+  getPlanePoints(position) {
+    // get plane point
+    const planePoint = this.getPlanePointFromPosition(position);
+    // get origin
+    const planeOrigin = this.getPositionFromPlanePoint(
+      new Point2D(0, 0), planePoint.getZ());
+
+    // plane cosines
+    const cosines = this.getCosines();
+
+    return [
+      planeOrigin,
+      new Point3D(cosines[0], cosines[1], cosines[2]),
+      new Point3D(cosines[3], cosines[4], cosines[5])
+    ];
+  }
+
+  /**
+   * Image world to index.
+   *
+   * @param {Point} point The input point.
+   * @returns {Index} The corresponding index.
+   */
+  worldToIndex(point) {
+    return this.#imageGeometry.worldToIndex(point);
+  }
+
+  /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return isIdentityMat33(this.#viewOrientation);
   }
 
   /**

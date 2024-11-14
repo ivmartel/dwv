@@ -257,6 +257,32 @@ export class Image {
   }
 
   /**
+   * Get the image origin for a image UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {Point3D|undefined} The origin.
+   */
+  getOriginForImageUid(uid) {
+    let origin;
+    const uidIndex = this.#imageUids.indexOf(uid);
+    if (uidIndex !== -1) {
+      const origins = this.getGeometry().getOrigins();
+      origin = origins[uidIndex];
+    }
+    return origin;
+  }
+
+  /**
+   * Check if the image includes an UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {boolean} True if present.
+   */
+  includesImageUid(uid) {
+    return this.#imageUids.includes(uid);
+  }
+
+  /**
    * Check if this image includes the input uids.
    *
    * @param {string[]} uids UIDs to test for presence.
@@ -298,7 +324,7 @@ export class Image {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if the data is monochrome.
-   * @deprecated Please use isMonochrome instead.
+   * @deprecated Since v0.33, please use isMonochrome instead.
    */
   canWindowLevel() {
     return this.isMonochrome();
@@ -857,8 +883,11 @@ export class Image {
      *
      * @event Image#imagegeometrychange
      * @type {object}
+     * @property {string} type The event type.
      */
-    this.#fireEvent({type: 'imagegeometrychange'});
+    this.#fireEvent({
+      type: 'imagegeometrychange'
+    });
   }
 
   /**
@@ -898,7 +927,16 @@ export class Image {
    */
   appendFrame(time, origin) {
     this.#geometry.appendFrame(origin, time);
-    this.#fireEvent({type: 'appendframe'});
+    /**
+     * Append frame event.
+     *
+     * @event Image#appendframe
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    this.#fireEvent({
+      type: 'appendframe'
+    });
     // memory will be updated at the first appendSlice or appendFrameBuffer
   }
 
@@ -1108,10 +1146,11 @@ export class Image {
       }
     }
     /**
-     * Image change event.
+     * Image content change event.
      *
      * @event Image#imagecontentchange
      * @type {object}
+     * @property {string} type The event type.
      */
     this.#fireEvent({type: 'imagecontentchange'});
   }

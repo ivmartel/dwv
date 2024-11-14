@@ -1,7 +1,10 @@
 import {stringToUint8Array} from '../../src/utils/string';
 import {
+  toStringId,
+  getArrayFromStringId,
   arrayContains,
   arraySortEquals,
+  arrayEquals,
   parseMultipart,
   buildMultipart
 } from '../../src/utils/array';
@@ -13,6 +16,70 @@ import {
 
 /* global QUnit */
 QUnit.module('utils');
+
+/**
+ * Tests for {@link toStringId}.
+ *
+ * @function module:tests/utils~toStringId
+ */
+QUnit.test('Index stringId', function (assert) {
+  // test #00: all dims
+  const i00 = [1, 2, 3];
+  const i00strId = '#0-1_#1-2_#2-3';
+  assert.equal(toStringId(i00), i00strId, 'toStringId #00');
+  assert.ok(arrayEquals(getArrayFromStringId(i00strId), i00),
+    'getFromStringId #00');
+
+  // test #01: 2 dims
+  const i01 = [0, 2, 3];
+  const i01strId = '#1-2_#2-3';
+  assert.equal(toStringId(i01, [1, 2]), i01strId, 'toStringId #01');
+  assert.ok(arrayEquals(getArrayFromStringId(i01strId), i01),
+    'getFromStringId #01');
+
+  // test #01: 1 dim -> X
+  const i02 = [1, 0, 0];
+  const i02strId = '#0-1';
+  assert.equal(toStringId(i02, [0]), i02strId, 'toStringId #02');
+  assert.ok(arrayEquals(getArrayFromStringId(i02strId), i02),
+    'getFromStringId #02');
+
+  // test #03: 1 dim -> Y
+  const i03 = [0, 2, 0];
+  const i03strId = '#1-2';
+  assert.equal(toStringId(i03, [1]), i03strId, 'toStringId #03');
+  assert.ok(arrayEquals(getArrayFromStringId(i03strId), i03),
+    'getFromStringId #03');
+
+  // test #04: 1 dim -> Z
+  const i04 = [0, 0, 3];
+  const i04strId = '#2-3';
+  assert.equal(toStringId(i04, [2]), i04strId, 'toStringId #04');
+  assert.ok(arrayEquals(getArrayFromStringId(i04strId), i04),
+    'getFromStringId #04');
+
+  // test #05: 4 dims
+  const i05 = [1, 2, 3, 4];
+  const i05strId = '#0-1_#1-2_#2-3_#3-4';
+  assert.equal(toStringId(i05), i05strId, 'toStringId #05');
+  assert.ok(arrayEquals(getArrayFromStringId(i05strId), i05),
+    'getFromStringId #05');
+
+  // test #06: 5 dims
+  const i06 = [0, 0, 0, 0, 1];
+  const i06strId = '#4-1';
+  assert.equal(toStringId(i06, [4]), i06strId, 'toStringId #06');
+  assert.ok(arrayEquals(getArrayFromStringId(i06strId), i06),
+    'getFromStringId #06');
+
+  // error case
+  const i10 = [0, 0, 0];
+  assert.throws(function () {
+    toStringId(i10, [3]);
+  },
+  new Error('Non valid dimension for toStringId'),
+  'toStringId error');
+});
 
 /**
  * Tests for {@link arrayContains}.
@@ -162,7 +229,7 @@ str10 += 'value1\r\n';
 str10 += '\r\n';
 str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp--\r\n';
 
-/* eslint-disable array-element-newline */
+/* eslint-disable @stylistic/js/array-element-newline */
 const multipart10 = {
   str: str10,
   parts: [
@@ -192,7 +259,7 @@ const multipart10 = {
     }
   ]
 };
-/* eslint-enable array-element-newline */
+/* eslint-enable @stylistic/js/array-element-newline */
 
 // with preamble and epilogue
 let str11 = 'preamble\r\n';
