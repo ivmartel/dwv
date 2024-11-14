@@ -1,3 +1,4 @@
+import { Node } from './Node.js';
 export declare const Factory: {
     addGetterSetter(constructor: any, attr: any, def?: any, validator?: any, after?: any): void;
     addGetter(constructor: any, attr: any, def?: any): void;
@@ -7,5 +8,5 @@ export declare const Factory: {
     addOverloadedGetterSetter(constructor: any, attr: any): void;
     addDeprecatedGetterSetter(constructor: any, attr: any, def: any, validator: any): void;
     backCompat(constructor: any, methods: any): void;
-    afterSetFilter(): void;
+    afterSetFilter(this: Node): void;
 };

@@ -6,6 +6,12 @@ export interface Vector2d {
     x: number;
     y: number;
 }
+export interface PathSegment {
+    command: 'm' | 'M' | 'l' | 'L' | 'v' | 'V' | 'h' | 'H' | 'z' | 'Z' | 'c' | 'C' | 'q' | 'Q' | 't' | 'T' | 's' | 'S' | 'a' | 'A';
+    start: Vector2d;
+    points: number[];
+    pathLength: number;
+}
 export interface IRect {
     x: number;
     y: number;

@@ -1,78 +1,81 @@
-import { Konva as Core } from './_CoreInternals.js';
-import { Arc } from './shapes/Arc.js';
-import { Arrow } from './shapes/Arrow.js';
-import { Circle } from './shapes/Circle.js';
-import { Ellipse } from './shapes/Ellipse.js';
-import { Image } from './shapes/Image.js';
-import { Label, Tag } from './shapes/Label.js';
-import { Line } from './shapes/Line.js';
-import { Path } from './shapes/Path.js';
-import { Rect } from './shapes/Rect.js';
-import { RegularPolygon } from './shapes/RegularPolygon.js';
-import { Ring } from './shapes/Ring.js';
-import { Sprite } from './shapes/Sprite.js';
-import { Star } from './shapes/Star.js';
-import { Text } from './shapes/Text.js';
-import { TextPath } from './shapes/TextPath.js';
-import { Transformer } from './shapes/Transformer.js';
-import { Wedge } from './shapes/Wedge.js';
-import { Blur } from './filters/Blur.js';
-import { Brighten } from './filters/Brighten.js';
-import { Contrast } from './filters/Contrast.js';
-import { Emboss } from './filters/Emboss.js';
-import { Enhance } from './filters/Enhance.js';
-import { Grayscale } from './filters/Grayscale.js';
-import { HSL } from './filters/HSL.js';
-import { HSV } from './filters/HSV.js';
-import { Invert } from './filters/Invert.js';
-import { Kaleidoscope } from './filters/Kaleidoscope.js';
-import { Mask } from './filters/Mask.js';
-import { Noise } from './filters/Noise.js';
-import { Pixelate } from './filters/Pixelate.js';
-import { Posterize } from './filters/Posterize.js';
-import { RGB } from './filters/RGB.js';
-import { RGBA } from './filters/RGBA.js';
-import { Sepia } from './filters/Sepia.js';
-import { Solarize } from './filters/Solarize.js';
-import { Threshold } from './filters/Threshold.js';
-export const Konva = Core.Util._assign(Core, {
-    Arc,
-    Arrow,
-    Circle,
-    Ellipse,
-    Image,
-    Label,
-    Tag,
-    Line,
-    Path,
-    Rect,
-    RegularPolygon,
-    Ring,
-    Sprite,
-    Star,
-    Text,
-    TextPath,
-    Transformer,
-    Wedge,
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Konva = void 0;
+const _CoreInternals_1 = require("./_CoreInternals");
+const Arc_1 = require("./shapes/Arc");
+const Arrow_1 = require("./shapes/Arrow");
+const Circle_1 = require("./shapes/Circle");
+const Ellipse_1 = require("./shapes/Ellipse");
+const Image_1 = require("./shapes/Image");
+const Label_1 = require("./shapes/Label");
+const Line_1 = require("./shapes/Line");
+const Path_1 = require("./shapes/Path");
+const Rect_1 = require("./shapes/Rect");
+const RegularPolygon_1 = require("./shapes/RegularPolygon");
+const Ring_1 = require("./shapes/Ring");
+const Sprite_1 = require("./shapes/Sprite");
+const Star_1 = require("./shapes/Star");
+const Text_1 = require("./shapes/Text");
+const TextPath_1 = require("./shapes/TextPath");
+const Transformer_1 = require("./shapes/Transformer");
+const Wedge_1 = require("./shapes/Wedge");
+const Blur_1 = require("./filters/Blur");
+const Brighten_1 = require("./filters/Brighten");
+const Contrast_1 = require("./filters/Contrast");
+const Emboss_1 = require("./filters/Emboss");
+const Enhance_1 = require("./filters/Enhance");
+const Grayscale_1 = require("./filters/Grayscale");
+const HSL_1 = require("./filters/HSL");
+const HSV_1 = require("./filters/HSV");
+const Invert_1 = require("./filters/Invert");
+const Kaleidoscope_1 = require("./filters/Kaleidoscope");
+const Mask_1 = require("./filters/Mask");
+const Noise_1 = require("./filters/Noise");
+const Pixelate_1 = require("./filters/Pixelate");
+const Posterize_1 = require("./filters/Posterize");
+const RGB_1 = require("./filters/RGB");
+const RGBA_1 = require("./filters/RGBA");
+const Sepia_1 = require("./filters/Sepia");
+const Solarize_1 = require("./filters/Solarize");
+const Threshold_1 = require("./filters/Threshold");
+exports.Konva = _CoreInternals_1.Konva.Util._assign(_CoreInternals_1.Konva, {
+    Arc: Arc_1.Arc,
+    Arrow: Arrow_1.Arrow,
+    Circle: Circle_1.Circle,
+    Ellipse: Ellipse_1.Ellipse,
+    Image: Image_1.Image,
+    Label: Label_1.Label,
+    Tag: Label_1.Tag,
+    Line: Line_1.Line,
+    Path: Path_1.Path,
+    Rect: Rect_1.Rect,
+    RegularPolygon: RegularPolygon_1.RegularPolygon,
+    Ring: Ring_1.Ring,
+    Sprite: Sprite_1.Sprite,
+    Star: Star_1.Star,
+    Text: Text_1.Text,
+    TextPath: TextPath_1.TextPath,
+    Transformer: Transformer_1.Transformer,
+    Wedge: Wedge_1.Wedge,
     Filters: {
-        Blur,
-        Brighten,
-        Contrast,
-        Emboss,
-        Enhance,
-        Grayscale,
-        HSL,
-        HSV,
-        Invert,
-        Kaleidoscope,
-        Mask,
-        Noise,
-        Pixelate,
-        Posterize,
-        RGB,
-        RGBA,
-        Sepia,
-        Solarize,
-        Threshold,
+        Blur: Blur_1.Blur,
+        Brighten: Brighten_1.Brighten,
+        Contrast: Contrast_1.Contrast,
+        Emboss: Emboss_1.Emboss,
+        Enhance: Enhance_1.Enhance,
+        Grayscale: Grayscale_1.Grayscale,
+        HSL: HSL_1.HSL,
+        HSV: HSV_1.HSV,
+        Invert: Invert_1.Invert,
+        Kaleidoscope: Kaleidoscope_1.Kaleidoscope,
+        Mask: Mask_1.Mask,
+        Noise: Noise_1.Noise,
+        Pixelate: Pixelate_1.Pixelate,
+        Posterize: Posterize_1.Posterize,
+        RGB: RGB_1.RGB,
+        RGBA: RGBA_1.RGBA,
+        Sepia: Sepia_1.Sepia,
+        Solarize: Solarize_1.Solarize,
+        Threshold: Threshold_1.Threshold,
     },
 });

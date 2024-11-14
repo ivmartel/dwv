@@ -29,7 +29,7 @@ export declare class Tag extends Shape<TagConfig> {
         width: number;
         height: number;
     };
-    pointerDirection: GetSet<'left' | 'top' | 'right' | 'bottom', this>;
+    pointerDirection: GetSet<'left' | 'top' | 'right' | 'bottom' | 'up' | 'down', this>;
     pointerWidth: GetSet<number, this>;
     pointerHeight: GetSet<number, this>;
     cornerRadius: GetSet<number, this>;
