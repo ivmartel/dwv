@@ -324,7 +324,7 @@ export class Image {
    * Can window and level be applied to the data?
    *
    * @returns {boolean} True if the data is monochrome.
-   * @deprecated Please use isMonochrome instead.
+   * @deprecated Since v0.33, please use isMonochrome instead.
    */
   canWindowLevel() {
     return this.isMonochrome();

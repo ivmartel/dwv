@@ -360,7 +360,8 @@ export class App {
    * Can the data (of the active view of the active layer) be scrolled?
    *
    * @returns {boolean} True if the data has a third dimension greater than one.
-   * @deprecated Please use the ViewController equivalent directly instead.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
    */
   canScroll() {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -373,7 +374,8 @@ export class App {
    * (of the active view of the active layer)?
    *
    * @returns {boolean} True if the data is monochrome.
-   * @deprecated Please use the ViewController equivalent directly instead.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
    */
   canWindowLevel() {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -886,7 +888,8 @@ export class App {
    * Init the Window/Level display
    * (of the active layer of the active layer group).
    *
-   * @deprecated Please set the opacity of the desired view layer directly.
+   * @deprecated Since v0.33, please set the opacity
+   *   of the desired view layer directly.
    */
   initWLDisplay() {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -1249,7 +1252,8 @@ export class App {
    * Set the active view layer (of the active layer group) opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).
-   * @deprecated Please set the opacity of the desired view layer directly.
+   * @deprecated Since v0.33, pplease set the opacity
+   *   of the desired view layer directly.
    */
   setOpacity(alpha) {
     const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
@@ -1260,7 +1264,7 @@ export class App {
   /**
    * Set the drawings of the active layer group.
    *
-   * @deprecated Please switch to DICOM SR annotations.
+   * @deprecated Since v0.34, please switch to DICOM SR annotations.
    * @param {Array} drawings An array of drawings.
    * @param {Array} drawingsDetails An array of drawings details.
    * @param {string} dataId The converted data id.
@@ -1289,7 +1293,8 @@ export class App {
   /**
    * Apply a JSON state to this app.
    *
-   * @deprecated
+   * @deprecated Since v0.34, please switch to DICOM SR
+   *   for annotations.
    * @param {string} jsonState The state of the app as a JSON string.
    * @param {string} dataId The state data id.
    */
@@ -1404,7 +1409,8 @@ export class App {
    * Set the colour map of the active view of the active layer group.
    *
    * @param {string} name The colour map name.
-   * @deprecated Please use the ViewController equivalent directly instead.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
    */
   setColourMap(name) {
     const viewController =
@@ -1417,7 +1423,8 @@ export class App {
    * Set the window/level preset of the active view of the active layer group.
    *
    * @param {string} preset The window/level preset.
-   * @deprecated Please use the ViewController equivalent directly instead.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
    */
   setWindowLevelPreset(preset) {
     const viewController =
