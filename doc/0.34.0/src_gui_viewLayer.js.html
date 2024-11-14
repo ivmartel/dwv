@@ -1,0 +1,1134 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/gui/viewLayer.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}ul li{padding:.2rem 0!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_gui_viewLayer.js</h1></header><article><pre class="prettyprint source lang-js"><code>import {Index} from '../math/index';
+import {ListenerHandler} from '../utils/listen';
+import {viewEventNames} from '../image/view';
+import {ViewController} from '../app/viewController';
+import {Point2D} from '../math/point';
+import {
+  canCreateCanvas,
+  InteractionEventNames
+} from './generic';
+import {getScaledOffset} from './layerGroup';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Vector3D} from '../math/vector';
+import {Point, Point3D} from '../math/point';
+import {Scalar2D, Scalar3D} from '../math/scalar';
+/* eslint-enable no-unused-vars */
+
+/**
+ * View layer.
+ */
+export class ViewLayer {
+
+  /**
+   * Container div.
+   *
+   * @type {HTMLElement}
+   */
+  #containerDiv;
+
+  /**
+   * The view controller.
+   *
+   * @type {ViewController}
+   */
+  #viewController = null;
+
+  /**
+   * The main display canvas.
+   *
+   * @type {object}
+   */
+  #canvas = null;
+
+  /**
+   * The offscreen canvas: used to store the raw, unscaled pixel data.
+   *
+   * @type {object}
+   */
+  #offscreenCanvas = null;
+
+  /**
+   * The associated CanvasRenderingContext2D.
+   *
+   * @type {object}
+   */
+  #context = null;
+
+  /**
+   * Flag to know if the current position is valid.
+   *
+   * @type {boolean}
+   */
+  #isValidPosition = true;
+
+  /**
+   * The image data array.
+   *
+   * @type {ImageData}
+   */
+  #imageData = null;
+
+  /**
+   * The layer base size as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #baseSize;
+
+  /**
+   * The layer base spacing as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #baseSpacing;
+
+  /**
+   * The layer opacity.
+   *
+   * @type {number}
+   */
+  #opacity = 1;
+
+  /**
+   * The layer scale.
+   *
+   * @type {Scalar2D}
+   */
+  #scale = {x: 1, y: 1};
+
+  /**
+   * The layer fit scale.
+   *
+   * @type {Scalar2D}
+   */
+  #fitScale = {x: 1, y: 1};
+
+  /**
+   * The layer flip scale.
+   *
+   * @type {Scalar3D}
+   */
+  #flipScale = {x: 1, y: 1, z: 1};
+
+  /**
+   * The layer offset.
+   *
+   * @type {Scalar2D}
+   */
+  #offset = {x: 0, y: 0};
+
+  /**
+   * The base layer offset.
+   *
+   * @type {Scalar2D}
+   */
+  #baseOffset = {x: 0, y: 0};
+
+  /**
+   * The view offset.
+   *
+   * @type {Scalar2D}
+   */
+  #viewOffset = {x: 0, y: 0};
+
+  /**
+   * The zoom offset.
+   *
+   * @type {Scalar2D}
+   */
+  #zoomOffset = {x: 0, y: 0};
+
+  /**
+   * The flip offset.
+   *
+   * @type {Scalar2D}
+   */
+  #flipOffset = {x: 0, y: 0};
+
+  /**
+   * Data update flag.
+   *
+   * @type {boolean}
+   */
+  #needsDataUpdate = null;
+
+  /**
+   * The associated data id.
+   *
+   * @type {string}
+   */
+  #dataId;
+
+  /**
+   * Listener handler.
+   *
+   * @type {ListenerHandler}
+   */
+  #listenerHandler = new ListenerHandler();
+
+  /**
+   * Image smoothing flag.
+   *
+   * See: {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled}.
+   *
+   * @type {boolean}
+   */
+  #imageSmoothing = false;
+
+  /**
+   * Layer group origin.
+   *
+   * @type {Point3D}
+   */
+  #layerGroupOrigin;
+
+  /**
+   * Layer group first origin.
+   *
+   * @type {Point3D}
+   */
+  #layerGroupOrigin0;
+
+  /**
+   * @param {HTMLElement} containerDiv The layer div, its id will be used
+   *   as this layer id.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+    // specific css class name
+    this.#containerDiv.className += ' viewLayer';
+  }
+
+  /**
+   * Get the associated data id.
+   *
+   * @returns {string} The data id.
+   */
+  getDataId() {
+    return this.#dataId;
+  }
+
+  /**
+   * Get the layer scale.
+   *
+   * @returns {Scalar2D} The scale as {x,y}.
+   */
+  getScale() {
+    return this.#scale;
+  }
+
+  /**
+   * Get the layer zoom offset without the fit scale.
+   *
+   * @returns {Scalar2D} The offset as {x,y}.
+   */
+  getAbsoluteZoomOffset() {
+    return {
+      x: this.#zoomOffset.x * this.#fitScale.x,
+      y: this.#zoomOffset.y * this.#fitScale.y
+    };
+  }
+
+  /**
+   * Set the imageSmoothing flag value.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#imageSmoothing = flag;
+  }
+
+  /**
+   * Set the associated view.
+   *
+   * @param {object} view The view.
+   * @param {string} dataId The associated data id.
+   */
+  setView(view, dataId) {
+    this.#dataId = dataId;
+    // local listeners
+    view.addEventListener('wlchange', this.#onWLChange);
+    view.addEventListener('colourmapchange', this.#onColourMapChange);
+    view.addEventListener('positionchange', this.#onPositionChange);
+    view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
+    // view events
+    for (let j = 0; j &lt; viewEventNames.length; ++j) {
+      view.addEventListener(viewEventNames[j], this.#fireEvent);
+    }
+    // create view controller
+    this.#viewController = new ViewController(view);
+    // bind layer and image
+    this.bindImage();
+  }
+
+  /**
+   * Get the view controller.
+   *
+   * @returns {ViewController} The controller.
+   */
+  getViewController() {
+    return this.#viewController;
+  }
+
+  /**
+   * Get the canvas image data.
+   *
+   * @returns {object} The image data.
+   */
+  getImageData() {
+    return this.#imageData;
+  }
+
+  /**
+   * Handle an image set event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimageset = (event) => {
+    // event.value = [index, image]
+    if (this.#dataId === event.dataid) {
+      this.#viewController.setImage(event.value[0]);
+      this.#setBaseSize(this.#viewController.getImageSize().get2D());
+      this.#needsDataUpdate = true;
+    }
+  };
+
+  /**
+   * Bind this layer to the view image.
+   */
+  bindImage() {
+    if (this.#viewController) {
+      this.#viewController.bindImageAndLayer(this);
+    }
+  }
+
+  /**
+   * Unbind this layer to the view image.
+   */
+  unbindImage() {
+    if (this.#viewController) {
+      this.#viewController.unbindImageAndLayer(this);
+    }
+  }
+
+  /**
+   * Handle an image content change event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimagecontentchange = (event) => {
+    // event.value = [index]
+    if (this.#dataId === event.dataid) {
+      this.#isValidPosition = this.#viewController.isPositionInBounds();
+      // flag update and draw
+      this.#needsDataUpdate = true;
+      this.draw();
+    }
+  };
+
+  /**
+   * Handle an image change event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimagegeometrychange = (event) => {
+    // event.value = [index]
+    if (this.#dataId === event.dataid) {
+      const vcSize = this.#viewController.getImageSize().get2D();
+      if (this.#baseSize.x !== vcSize.x ||
+        this.#baseSize.y !== vcSize.y) {
+        // size changed, recalculate base offset
+        // in case origin changed
+        if (typeof this.#layerGroupOrigin !== 'undefined' &amp;&amp;
+          typeof this.#layerGroupOrigin0 !== 'undefined') {
+          const origin0 = this.#viewController.getOrigin();
+          const scrollOffset = this.#layerGroupOrigin0.minus(origin0);
+          const origin = this.#viewController.getOrigin(
+            this.#viewController.getCurrentPosition()
+          );
+          const planeOffset = this.#layerGroupOrigin.minus(origin);
+          this.setBaseOffset(scrollOffset, planeOffset);
+        }
+        // update base size
+        this.#setBaseSize(vcSize);
+        // flag update and draw
+        this.#needsDataUpdate = true;
+        this.draw();
+      }
+    }
+  };
+
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  getId() {
+    return this.#containerDiv.id;
+  }
+
+  /**
+   * Remove the HTML element from the DOM.
+   */
+  removeFromDOM() {
+    this.#containerDiv.remove();
+  }
+
+  /**
+   * Get the layer base size (without scale).
+   *
+   * @returns {Scalar2D} The size as {x,y}.
+   */
+  getBaseSize() {
+    return this.#baseSize;
+  }
+
+  /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {Scalar2D} The 2D size as {x,y}.
+   */
+  getImageWorldSize() {
+    return this.#viewController.getImageWorldSize();
+  }
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  getOpacity() {
+    return this.#opacity;
+  }
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  setOpacity(alpha) {
+    if (alpha === this.#opacity) {
+      return;
+    }
+
+    this.#opacity = Math.min(Math.max(alpha, 0), 1);
+
+    /**
+     * Opacity change event.
+     *
+     * @event App#opacitychange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    const event = {
+      type: 'opacitychange',
+      value: [this.#opacity]
+    };
+    this.#fireEvent(event);
+  }
+
+  /**
+   * Add a flip offset along the layer X axis.
+   */
+  addFlipOffsetX() {
+    this.#flipOffset.x += this.#canvas.width / this.#scale.x;
+    this.#offset.x += this.#flipOffset.x;
+  }
+
+  /**
+   * Add a flip offset along the layer Y axis.
+   */
+  addFlipOffsetY() {
+    this.#flipOffset.y += this.#canvas.height / this.#scale.y;
+    this.#offset.y += this.#flipOffset.y;
+  }
+
+  /**
+   * Flip the scale along the layer X axis.
+   */
+  flipScaleX() {
+    this.#flipScale.x *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Y axis.
+   */
+  flipScaleY() {
+    this.#flipScale.y *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Z axis.
+   */
+  flipScaleZ() {
+    this.#flipScale.z *= -1;
+  }
+
+  /**
+   * Set the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Point3D} [center] The scale center.
+   */
+  setScale(newScale, center) {
+    const helper = this.#viewController.getPlaneHelper();
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+
+    if (Math.abs(newScale.x) === 1 &amp;&amp;
+      Math.abs(newScale.y) === 1 &amp;&amp;
+      Math.abs(newScale.z) === 1) {
+      // reset zoom offset for scale=1
+      const resetOffset = {
+        x: this.#offset.x - this.#zoomOffset.x,
+        y: this.#offset.y - this.#zoomOffset.y
+      };
+      // store new offset
+      this.#zoomOffset = {x: 0, y: 0};
+      this.#offset = resetOffset;
+    } else {
+      if (typeof center !== 'undefined') {
+        let worldCenter = helper.getPlaneOffsetFromOffset3D({
+          x: center.getX(),
+          y: center.getY(),
+          z: center.getZ()
+        });
+        // center was obtained with viewLayer.displayToMainPlanePos
+        // compensated for baseOffset
+        // TODO: justify...
+        worldCenter = {
+          x: worldCenter.x + this.#baseOffset.x,
+          y: worldCenter.y + this.#baseOffset.y
+        };
+
+        const newOffset = getScaledOffset(
+          this.#offset, this.#scale, finalNewScale, worldCenter);
+
+        const newZoomOffset = {
+          x: this.#zoomOffset.x + newOffset.x - this.#offset.x,
+          y: this.#zoomOffset.y + newOffset.y - this.#offset.y
+        };
+        // store new offset
+        this.#zoomOffset = newZoomOffset;
+        this.#offset = newOffset;
+      }
+    }
+
+    // store new scale
+    this.#scale = finalNewScale;
+  }
+
+  /**
+   * Initialise the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
+   */
+  initScale(newScale, absoluteZoomOffset) {
+    const helper = this.#viewController.getPlaneHelper();
+    const orientedNewScale = helper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#scale = finalNewScale;
+
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
+    this.#offset = {
+      x: this.#offset.x + this.#zoomOffset.x,
+      y: this.#offset.y + this.#zoomOffset.y
+    };
+  }
+
+  /**
+   * Set the base layer offset. Updates the layer offset.
+   *
+   * @param {Vector3D} scrollOffset The scroll offset vector.
+   * @param {Vector3D} planeOffset The plane offset vector.
+   * @param {Point3D} [layerGroupOrigin] The layer group origin.
+   * @param {Point3D} [layerGroupOrigin0] The layer group first origin.
+   * @returns {boolean} True if the offset was updated.
+   */
+  setBaseOffset(
+    scrollOffset, planeOffset,
+    layerGroupOrigin, layerGroupOrigin0) {
+    const helper = this.#viewController.getPlaneHelper();
+    const scrollIndex = helper.getNativeScrollIndex();
+    const newOffset = helper.getPlaneOffsetFromOffset3D({
+      x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+    });
+    const needsUpdate = this.#baseOffset.x !== newOffset.x ||
+      this.#baseOffset.y !== newOffset.y;
+    // store layer group origins
+    if (typeof layerGroupOrigin !== 'undefined' &amp;&amp;
+      typeof layerGroupOrigin0 !== 'undefined') {
+      this.#layerGroupOrigin = layerGroupOrigin;
+      this.#layerGroupOrigin0 = layerGroupOrigin0;
+    }
+    // reset offset if needed
+    if (needsUpdate) {
+      this.#offset = {
+        x: this.#offset.x - this.#baseOffset.x + newOffset.x,
+        y: this.#offset.y - this.#baseOffset.y + newOffset.y
+      };
+      this.#baseOffset = newOffset;
+    }
+    return needsUpdate;
+  }
+
+  /**
+   * Set the layer offset.
+   *
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
+   */
+  setOffset(newOffset) {
+    const helper = this.#viewController.getPlaneHelper();
+    const planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
+    this.#offset = {
+      x: planeNewOffset.x +
+        this.#viewOffset.x +
+        this.#baseOffset.x +
+        this.#zoomOffset.x +
+        this.#flipOffset.x,
+      y: planeNewOffset.y +
+        this.#viewOffset.y +
+        this.#baseOffset.y +
+        this.#zoomOffset.y +
+        this.#flipOffset.y
+    };
+  }
+
+  /**
+   * Transform a display position to a 2D index.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {Index} The equivalent 2D index.
+   */
+  displayToPlaneIndex(point2D) {
+    const planePos = this.displayToPlanePos(point2D);
+    return new Index([
+      Math.floor(planePos.getX()),
+      Math.floor(planePos.getY())
+    ]);
+  }
+
+  /**
+   * Remove scale from a display position.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The de-scaled point.
+   */
+  displayToPlaneScale(point2D) {
+    return new Point2D(
+      point2D.getX() / this.#scale.x,
+      point2D.getY() / this.#scale.y
+    );
+  }
+
+  /**
+   * Get a plane position from a display position.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The plane position.
+   */
+  displayToPlanePos(point2D) {
+    const deScaled = this.displayToPlaneScale(point2D);
+    return new Point2D(
+      deScaled.getX() + this.#offset.x,
+      deScaled.getY() + this.#offset.y
+    );
+  }
+
+  /**
+   * Get a display position from a plane position.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The display position, can be individually
+   *   undefined if out of bounds.
+   */
+  planePosToDisplay(point2D) {
+    let posX =
+      (point2D.getX() - this.#offset.x + this.#baseOffset.x) * this.#scale.x;
+    let posY =
+      (point2D.getY() - this.#offset.y + this.#baseOffset.y) * this.#scale.y;
+    // check if in bounds
+    if (posX &lt; 0 || posX >= this.#canvas.width) {
+      posX = undefined;
+    }
+    if (posY &lt; 0 || posY >= this.#canvas.height) {
+      posY = undefined;
+    }
+    return new Point2D(posX, posY);
+  }
+
+  /**
+   * Get a main plane position from a display position.
+   *
+   * @param {Point2D} point2D The input point.
+   * @returns {Point2D} The main plane position.
+   */
+  displayToMainPlanePos(point2D) {
+    const planePos = this.displayToPlanePos(point2D);
+    return new Point2D(
+      planePos.getX() - this.#baseOffset.x,
+      planePos.getY() - this.#baseOffset.y
+    );
+  }
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  display(flag) {
+    this.#containerDiv.style.display = flag ? '' : 'none';
+  }
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  isVisible() {
+    return this.#containerDiv.style.display === '';
+  }
+
+  /**
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set.
+   *
+   * @fires App#renderstart
+   * @fires App#renderend
+   */
+  draw() {
+    // skip for non valid position
+    if (!this.#isValidPosition) {
+      return;
+    }
+
+    /**
+     * Render start event.
+     *
+     * @event App#renderstart
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    let event = {
+      type: 'renderstart',
+      layerid: this.getId(),
+      dataid: this.getDataId()
+    };
+    this.#fireEvent(event);
+
+    // update data if needed
+    if (this.#needsDataUpdate) {
+      this.#updateImageData();
+    }
+
+    // context opacity
+    this.#context.globalAlpha = this.#opacity;
+
+    // clear context
+    this.clear();
+
+    // draw the cached canvas on the context
+    // transform takes as input a, b, c, d, e, f to create
+    // the transform matrix (column-major order):
+    // [ a c e ]
+    // [ b d f ]
+    // [ 0 0 1 ]
+    this.#context.setTransform(
+      this.#scale.x,
+      0,
+      0,
+      this.#scale.y,
+      -1 * this.#offset.x * this.#scale.x,
+      -1 * this.#offset.y * this.#scale.y
+    );
+
+    // disable smoothing (set just before draw, could be reset by resize)
+    this.#context.imageSmoothingEnabled = this.#imageSmoothing;
+    // draw image
+    this.#context.drawImage(this.#offscreenCanvas, 0, 0);
+
+    /**
+     * Render end event.
+     *
+     * @event App#renderend
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    event = {
+      type: 'renderend',
+      layerid: this.getId(),
+      dataid: this.getDataId()
+    };
+    this.#fireEvent(event);
+  }
+
+  /**
+   * Initialise the layer: set the canvas and context.
+   *
+   * @param {Scalar2D} size The image size as {x,y}.
+   * @param {Scalar2D} spacing The image spacing as {x,y}.
+   * @param {number} alpha The initial data opacity.
+   */
+  initialise(size, spacing, alpha) {
+    // set locals
+    this.#baseSpacing = spacing;
+    this.#opacity = Math.min(Math.max(alpha, 0), 1);
+
+    // create canvas
+    // (canvas size is set in fitToContainer)
+    this.#canvas = document.createElement('canvas');
+    this.#containerDiv.appendChild(this.#canvas);
+
+    // check that the getContext method exists
+    if (!this.#canvas.getContext) {
+      alert('Error: no canvas.getContext method.');
+      return;
+    }
+    // get the 2D context
+    this.#context = this.#canvas.getContext('2d');
+    if (!this.#context) {
+      alert('Error: failed to get the 2D context.');
+      return;
+    }
+
+    // off screen canvas
+    this.#offscreenCanvas = document.createElement('canvas');
+
+    // set base size: needs an existing context and off screen canvas
+    this.#setBaseSize(size);
+
+    // update data on first draw
+    this.#needsDataUpdate = true;
+  }
+
+  /**
+   * Set the base size of the layer.
+   *
+   * @param {Scalar2D} size The size as {x,y}.
+   */
+  #setBaseSize(size) {
+    // check canvas creation
+    if (!canCreateCanvas(size.x, size.y)) {
+      throw new Error('Cannot create canvas with size ' +
+        size.x + ', ' + size.y);
+    }
+
+    // set local
+    this.#baseSize = size;
+
+    // off screen canvas
+    this.#offscreenCanvas.width = this.#baseSize.x;
+    this.#offscreenCanvas.height = this.#baseSize.y;
+    // original empty image data array
+    this.#context.clearRect(0, 0, this.#baseSize.x, this.#baseSize.y);
+    this.#imageData = this.#context.createImageData(
+      this.#baseSize.x, this.#baseSize.y);
+  }
+
+  /**
+   * Fit the layer to its parent container.
+   *
+   * @param {Scalar2D} containerSize The fit size as {x,y}.
+   * @param {number} divToWorldSizeRatio The div to world size ratio.
+   * @param {Scalar2D} fitOffset The fit offset as {x,y}.
+   */
+  fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
+    let needsDraw = false;
+
+    // set canvas size if different from previous
+    if (this.#canvas.width !== containerSize.x ||
+      this.#canvas.height !== containerSize.y) {
+      if (!canCreateCanvas(containerSize.x, containerSize.y)) {
+        throw new Error('Cannot resize canvas ' +
+          containerSize.x + ', ' + containerSize.y);
+      }
+      // canvas size change triggers canvas reset
+      this.#canvas.width = containerSize.x;
+      this.#canvas.height = containerSize.y;
+      // update draw flag
+      needsDraw = true;
+    }
+
+    // fit scale
+    const divToImageSizeRatio = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
+    };
+    // #scale = inputScale * fitScale * flipScale
+    // flipScale does not change here, we can omit it
+    // newScale = (#scale / fitScale) * newFitScale
+    const newScale = {
+      x: this.#scale.x * divToImageSizeRatio.x / this.#fitScale.x,
+      y: this.#scale.y * divToImageSizeRatio.y / this.#fitScale.y
+    };
+
+    // set scales if different from previous
+    if (this.#scale.x !== newScale.x ||
+      this.#scale.y !== newScale.y) {
+      this.#fitScale = divToImageSizeRatio;
+      this.#scale = newScale;
+      // update draw flag
+      needsDraw = true;
+    }
+
+    // view offset
+    const newViewOffset = {
+      x: fitOffset.x / divToImageSizeRatio.x,
+      y: fitOffset.y / divToImageSizeRatio.y
+    };
+    // flip offset
+    const scaledImageSize = {
+      x: containerSize.x / divToImageSizeRatio.x,
+      y: containerSize.y / divToImageSizeRatio.y
+    };
+    const newFlipOffset = {
+      x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
+      y: this.#flipOffset.y !== 0 ? scaledImageSize.y : 0,
+    };
+
+    // set offsets if different from previous
+    if (this.#viewOffset.x !== newViewOffset.x ||
+      this.#viewOffset.y !== newViewOffset.y ||
+      this.#flipOffset.x !== newFlipOffset.x ||
+      this.#flipOffset.y !== newFlipOffset.y) {
+      // update global offset
+      this.#offset = {
+        x: this.#offset.x +
+          newViewOffset.x - this.#viewOffset.x +
+          newFlipOffset.x - this.#flipOffset.x,
+        y: this.#offset.y +
+          newViewOffset.y - this.#viewOffset.y +
+          newFlipOffset.y - this.#flipOffset.y,
+      };
+      // update private local offsets
+      this.#flipOffset = newFlipOffset;
+      this.#viewOffset = newViewOffset;
+      // update draw flag
+      needsDraw = true;
+    }
+
+    // draw if needed
+    if (needsDraw) {
+      this.draw();
+    }
+  }
+
+  /**
+   * Enable and listen to container interaction events.
+   */
+  bindInteraction() {
+    // allow pointer events
+    this.#containerDiv.style.pointerEvents = 'auto';
+    // interaction events
+    const names = InteractionEventNames;
+    for (let i = 0; i &lt; names.length; ++i) {
+      const eventName = names[i];
+      const passive = eventName !== 'wheel';
+      this.#containerDiv.addEventListener(
+        eventName, this.#fireEvent, {passive: passive});
+    }
+  }
+
+  /**
+   * Disable and stop listening to container interaction events.
+   */
+  unbindInteraction() {
+    // disable pointer events
+    this.#containerDiv.style.pointerEvents = 'none';
+    // interaction events
+    const names = InteractionEventNames;
+    for (let i = 0; i &lt; names.length; ++i) {
+      this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
+    }
+  }
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type.
+   */
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   */
+  #fireEvent = (event) => {
+    event.srclayerid = this.getId();
+    event.dataid = this.#dataId;
+    this.#listenerHandler.fireEvent(event);
+  };
+
+  // common layer methods [end] ---------------
+
+  /**
+   * Update the canvas image data.
+   */
+  #updateImageData() {
+    // generate image data
+    this.#viewController.generateImageData(this.#imageData);
+    // pass the data to the off screen canvas
+    this.#offscreenCanvas.getContext('2d').putImageData(this.#imageData, 0, 0);
+    // update data flag
+    this.#needsDataUpdate = false;
+  }
+
+  /**
+   * Handle window/level change.
+   *
+   * @param {object} event The event fired when changing the window/level.
+   */
+  #onWLChange = (event) => {
+    // generate and draw if no skip flag
+    const skip = typeof event.skipGenerate !== 'undefined' &amp;&amp;
+      event.skipGenerate === true;
+    if (!skip) {
+      this.#needsDataUpdate = true;
+      this.draw();
+    }
+  };
+
+  /**
+   * Handle colour map change.
+   *
+   * @param {object} event The event fired when changing the colour map.
+   */
+  #onColourMapChange = (event) => {
+    const skip = typeof event.skipGenerate !== 'undefined' &amp;&amp;
+      event.skipGenerate === true;
+    if (!skip) {
+      this.#needsDataUpdate = true;
+      this.draw();
+    }
+  };
+
+  /**
+   * Handle position change.
+   *
+   * @param {object} event The event fired when changing the position.
+   */
+  #onPositionChange = (event) => {
+    const skip = typeof event.skipGenerate !== 'undefined' &amp;&amp;
+      event.skipGenerate === true;
+    if (!skip) {
+      let valid = true;
+      if (typeof event.valid !== 'undefined') {
+        valid = event.valid;
+      }
+      // clear for non valid events
+      if (!valid) {
+        // clear only once
+        if (this.#isValidPosition) {
+          this.#isValidPosition = false;
+          this.clear();
+        }
+      } else {
+        // 3D dimensions
+        const dims3D = [0, 1, 2];
+        // remove scroll index
+        const indexScrollIndex =
+          dims3D.indexOf(this.#viewController.getScrollIndex());
+        dims3D.splice(indexScrollIndex, 1);
+        // remove non scroll index from diff dims
+        const diffDims = event.diffDims.filter(function (item) {
+          return dims3D.indexOf(item) === -1;
+        });
+        // update if we have something left
+        if (diffDims.length !== 0 || !this.#isValidPosition) {
+          // reset valid flag
+          this.#isValidPosition = true;
+          // reset update flag
+          this.#needsDataUpdate = true;
+          this.draw();
+        }
+      }
+    }
+  };
+
+  /**
+   * Handle alpha function change.
+   *
+   * @param {object} event The event fired when changing the function.
+   */
+  #onAlphaFuncChange = (event) => {
+    const skip = typeof event.skipGenerate !== 'undefined' &amp;&amp;
+      event.skipGenerate === true;
+    if (!skip) {
+      this.#needsDataUpdate = true;
+      this.draw();
+    }
+  };
+
+  /**
+   * Set the current position.
+   *
+   * @param {Point} position The new position.
+   * @param {Index} _index The new index.
+   * @returns {boolean} True if the position was updated.
+   */
+  setCurrentPosition(position, _index) {
+    return this.#viewController.setCurrentPosition(position);
+  }
+
+  /**
+   * Clear the context.
+   */
+  clear() {
+    // clear the context: reset the transform first
+    // store the current transformation matrix
+    this.#context.save();
+    // use the identity matrix while clearing the canvas
+    this.#context.setTransform(1, 0, 0, 1, 0, 0);
+    this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+    // restore the transform
+    this.#context.restore();
+  }
+
+} // ViewLayer class
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.34.0.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

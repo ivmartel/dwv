@@ -1,0 +1,964 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/app/viewController.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}ul li{padding:.2rem 0!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_app_viewController.js</h1></header><article><pre class="prettyprint source lang-js"><code>import {Index} from '../math/index';
+import {Vector3D} from '../math/vector';
+import {Point3D} from '../math/point';
+import {isIdentityMat33} from '../math/matrix';
+import {Size} from '../image/size';
+import {Spacing} from '../image/spacing';
+import {Image} from '../image/image';
+import {Geometry} from '../image/geometry';
+import {PlaneHelper} from '../image/planeHelper';
+import {
+  getSliceIterator,
+  getIteratorValues,
+  getRegionSliceIterator,
+  getVariableRegionSliceIterator
+} from '../image/iterator';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {View} from '../image/view';
+import {WindowLevel} from '../image/windowLevel';
+import {Point, Point2D} from '../math/point';
+import {Scalar2D} from '../math/scalar';
+import {Matrix33} from '../math/matrix';
+import {ViewLayer} from '../gui/viewLayer';
+/* eslint-enable no-unused-vars */
+
+/**
+ * View controller.
+ */
+export class ViewController {
+
+  /**
+   * Associated View.
+   *
+   * @type {View}
+   */
+  #view;
+
+  /**
+   * Plane helper.
+   *
+   * @type {PlaneHelper}
+   */
+  #planeHelper;
+
+  /**
+   * Third dimension player ID (created by setInterval).
+   *
+   * @type {number|undefined}
+   */
+  #playerID;
+
+  /**
+   * Is DICOM seg mask flag.
+   *
+   * @type {boolean}
+   */
+  #isMask = false;
+
+  /**
+   * @param {View} view The associated view.
+   */
+  constructor(view) {
+    // check view
+    if (typeof view.getImage() === 'undefined') {
+      throw new Error('View does not have an image, cannot setup controller');
+    }
+
+    this.#view = view;
+
+    // setup the plane helper
+    this.#planeHelper = new PlaneHelper(
+      view.getImage().getGeometry(),
+      view.getOrientation()
+    );
+
+    // mask segment helper
+    if (view.getImage().getMeta().Modality === 'SEG') {
+      this.#isMask = true;
+    }
+  }
+
+  /**
+   * Get the plane helper.
+   *
+   * @returns {PlaneHelper} The helper.
+   */
+  getPlaneHelper() {
+    return this.#planeHelper;
+  }
+
+  /**
+   * Check is the associated image is a mask.
+   *
+   * @returns {boolean} True if the associated image is a mask.
+   */
+  isMask() {
+    return this.#isMask;
+  }
+
+  /**
+   * Initialise the controller.
+   */
+  initialise() {
+    // set window/level to first preset
+    this.setWindowLevelPresetById(0);
+    // default position
+    this.setCurrentPosition(this.getPositionFromPlanePoint(
+      new Point2D(0, 0)
+    ));
+  }
+
+  /**
+   * Get the image modality.
+   *
+   * @returns {string} The modality.
+   */
+  getModality() {
+    return this.#view.getImage().getMeta().Modality;
+  }
+
+  /**
+   * Get the window/level presets names.
+   *
+   * @returns {string[]} The presets names.
+   */
+  getWindowLevelPresetsNames() {
+    return this.#view.getWindowPresetsNames();
+  }
+
+  /**
+   * Add window/level presets to the view.
+   *
+   * @param {object} presets A preset object.
+   * @returns {object} The list of presets.
+   */
+  addWindowLevelPresets(presets) {
+    return this.#view.addWindowPresets(presets);
+  }
+
+  /**
+   * Set the window level to the preset with the input name.
+   *
+   * @param {string} name The name of the preset to activate.
+   */
+  setWindowLevelPreset(name) {
+    this.#view.setWindowLevelPreset(name);
+  }
+
+  /**
+   * Set the window level to the preset with the input id.
+   *
+   * @param {number} id The id of the preset to activate.
+   */
+  setWindowLevelPresetById(id) {
+    this.#view.setWindowLevelPresetById(id);
+  }
+
+  /**
+   * Check if the controller is playing.
+   *
+   * @returns {boolean} True if the controler is playing.
+   */
+  isPlaying() {
+    return (typeof this.#playerID !== 'undefined');
+  }
+
+  /**
+   * Get the current position.
+   *
+   * @returns {Point} The position.
+   */
+  getCurrentPosition() {
+    return this.#view.getCurrentPosition();
+  }
+
+  /**
+   * Get the current index.
+   *
+   * @returns {Index} The current index.
+   */
+  getCurrentIndex() {
+    return this.#view.getCurrentIndex();
+  }
+
+  /**
+   * Get the SOP image UID of the current image.
+   *
+   * @returns {string} The UID.
+   */
+  getCurrentImageUid() {
+    return this.#view.getCurrentImageUid();
+  }
+
+  /**
+   * Get the image origin for a image UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {Point3D|undefined} The origin.
+   */
+  getOriginForImageUid(uid) {
+    return this.#view.getOriginForImageUid(uid);
+  }
+
+  /**
+   * Check if the image includes an UID.
+   *
+   * @param {string} uid The UID.
+   * @returns {boolean} True if present.
+   */
+  includesImageUid(uid) {
+    return this.#view.includesImageUid(uid);
+  }
+
+  /**
+   * Get the current oriented index.
+   *
+   * @returns {Index} The index.
+   */
+  getCurrentOrientedIndex() {
+    let res = this.#view.getCurrentIndex();
+    if (typeof this.#view.getOrientation() !== 'undefined') {
+      // view oriented => image de-oriented
+      const vector = this.#planeHelper.getImageDeOrientedVector3D(
+        new Vector3D(res.get(0), res.get(1), res.get(2))
+      );
+      res = new Index([
+        vector.getX(), vector.getY(), vector.getZ()
+      ]);
+    }
+    return res;
+  }
+
+  /**
+   * Get the scroll index.
+   *
+   * @returns {number} The index.
+   */
+  getScrollIndex() {
+    return this.#view.getScrollIndex();
+  }
+
+  /**
+   * Get the current scroll index value.
+   *
+   * @returns {object} The value.
+   */
+  getCurrentScrollIndexValue() {
+    return this.#view.getCurrentIndex().get(this.#view.getScrollIndex());
+  }
+
+  /**
+   * Get the first origin or at a given position.
+   *
+   * @param {Point} [position] Optional position.
+   * @returns {Point3D} The origin.
+   */
+  getOrigin(position) {
+    return this.#view.getOrigin(position);
+  }
+
+  /**
+   * Is this view in the same orientation as the image aquisition.
+   *
+   * @returns {boolean} True if in aquisition plane.
+   */
+  isAquisitionOrientation() {
+    return this.#view.isAquisitionOrientation();
+  }
+
+  /**
+   * Get a list of points that define the plane at input position,
+   *   given this classes orientation.
+   *
+   * @param {Point} position The position.
+   * @returns {Point3D[]} An origin and 2 cosines vectors.
+   */
+  getPlanePoints(position) {
+    return this.#planeHelper.getPlanePoints(position);
+  }
+
+  /**
+   * Get the current scroll position value.
+   *
+   * @returns {number} The value.
+   */
+  getCurrentScrollPosition() {
+    const scrollIndex = this.#view.getScrollIndex();
+    return this.#view.getCurrentPosition().get(scrollIndex);
+  }
+
+  /**
+   * Generate display image data to be given to a canvas.
+   *
+   * @param {ImageData} array The array to fill in.
+   * @param {Index} [index] Optional index at which to generate,
+   *   otherwise generates at current index.
+   */
+  generateImageData(array, index) {
+    this.#view.generateImageData(array, index);
+  }
+
+  /**
+   * Set the associated image.
+   *
+   * @param {Image} img The associated image.
+   */
+  setImage(img) {
+    this.#view.setImage(img);
+  }
+
+  /**
+   * Get the current view (2D) spacing.
+   *
+   * @returns {Scalar2D} The spacing as a 2D array.
+   */
+  get2DSpacing() {
+    const spacing = this.#view.getImage().getGeometry().getSpacing(
+      this.#view.getOrientation());
+    return spacing.get2D();
+  }
+
+  /**
+   * Get the image rescaled value at the input position.
+   *
+   * @param {Point} position The input position.
+   * @returns {number|undefined} The image value or undefined if out of bounds
+   *   or no quantifiable (for ex RGB).
+   */
+  getRescaledImageValue(position) {
+    const image = this.#view.getImage();
+    if (!image.canQuantify()) {
+      return;
+    }
+    const geometry = image.getGeometry();
+    const index = geometry.worldToIndex(position);
+    let value;
+    if (geometry.isIndexInBounds(index)) {
+      value = image.getRescaledValueAtIndex(index);
+    }
+    return value;
+  }
+
+  /**
+   * Get the image pixel unit.
+   *
+   * @returns {string} The unit.
+   */
+  getPixelUnit() {
+    return this.#view.getImage().getMeta().pixelUnit;
+  }
+
+  /**
+   * Extract a slice from an image at the given index and orientation.
+   *
+   * @param {Image} image The image to parse.
+   * @param {Index} index The current index.
+   * @param {boolean} isRescaled Flag for rescaled values (default false).
+   * @param {Matrix33} orientation The desired orientation.
+   * @returns {Image} The extracted slice.
+   */
+  #getSlice(image, index, isRescaled, orientation) {
+    // generate slice values
+    const sliceIter = getSliceIterator(
+      image,
+      index,
+      isRescaled,
+      orientation
+    );
+    const sliceValues = getIteratorValues(sliceIter);
+    // oriented geometry
+    const orientedSize = image.getGeometry().getSize(orientation);
+    const sizeValues = orientedSize.getValues();
+    sizeValues[2] = 1;
+    const sliceSize = new Size(sizeValues);
+    const orientedSpacing = image.getGeometry().getSpacing(orientation);
+    const spacingValues = orientedSpacing.getValues();
+    spacingValues[2] = 1;
+    const sliceSpacing = new Spacing(spacingValues);
+    const sliceOrigin = new Point3D(0, 0, 0);
+    const sliceGeometry =
+      new Geometry(sliceOrigin, sliceSize, sliceSpacing);
+    // slice image
+    // @ts-ignore
+    return new Image(sliceGeometry, sliceValues);
+  }
+
+  /**
+   * Get some values from the associated image in a region.
+   *
+   * @param {Point2D} min Minimum point.
+   * @param {Point2D} max Maximum point.
+   * @returns {Array} A list of values.
+   */
+  getImageRegionValues(min, max) {
+    let image = this.#view.getImage();
+    const orientation = this.#view.getOrientation();
+    let currentIndex = this.getCurrentIndex();
+    let rescaled = true;
+
+    // create oriented slice if needed
+    if (!isIdentityMat33(orientation)) {
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      // update position
+      currentIndex = new Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
+    const iter = getRegionSliceIterator(
+      image, currentIndex, rescaled, min, max);
+    let values = [];
+    if (iter) {
+      values = getIteratorValues(iter);
+    }
+    return values;
+  }
+
+  /**
+   * Get some values from the associated image in variable regions.
+   *
+   * @param {number[][][]} regions A list of [x, y] pairs (min, max).
+   * @returns {Array} A list of values.
+   */
+  getImageVariableRegionValues(regions) {
+    let image = this.#view.getImage();
+    const orientation = this.#view.getOrientation();
+    let currentIndex = this.getCurrentIndex();
+    let rescaled = true;
+
+    // create oriented slice if needed
+    if (!isIdentityMat33(orientation)) {
+      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      // update position
+      currentIndex = new Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
+    const iter = getVariableRegionSliceIterator(
+      image, currentIndex, rescaled, regions);
+    let values = [];
+    if (iter) {
+      values = getIteratorValues(iter);
+    }
+    return values;
+  }
+
+  /**
+   * Can the image values be quantified?
+   *
+   * @returns {boolean} True if possible.
+   */
+  canQuantifyImage() {
+    return this.#view.getImage().canQuantify();
+  }
+
+  /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if possible.
+   * @deprecated Since v0.33, please use isMonochrome instead.
+   */
+  canWindowLevel() {
+    return this.isMonochrome();
+  }
+
+  /**
+   * Is the data monochrome.
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  isMonochrome() {
+    return this.#view.getImage().isMonochrome();
+  }
+
+  /**
+   * Can the data be scrolled?
+   *
+   * @returns {boolean} True if the data has either the third dimension
+   * or above greater than one.
+   */
+  canScroll() {
+    return this.#view.getImage().canScroll(this.#view.getOrientation());
+  }
+
+  /**
+   * Get the oriented image size.
+   *
+   * @returns {Size} The size.
+   */
+  getImageSize() {
+    return this.#view.getImage().getGeometry().getSize(
+      this.#view.getOrientation());
+  }
+
+
+  /**
+   * Is the data size larger than one in the given dimension?
+   *
+   * @param {number} dim The dimension.
+   * @returns {boolean} True if the image size is larger than one
+   *   in the given dimension.
+   */
+  moreThanOne(dim) {
+    return this.getImageSize().moreThanOne(dim);
+  }
+
+  /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {Scalar2D} The 2D size as {x,y}.
+   */
+  getImageWorldSize() {
+    const geometry = this.#view.getImage().getGeometry();
+    const size = geometry.getSize(this.#view.getOrientation()).get2D();
+    const spacing = geometry.getSpacing(this.#view.getOrientation()).get2D();
+    return {
+      x: size.x * spacing.x,
+      y: size.y * spacing.y
+    };
+  }
+
+  /**
+   * Get the image rescaled data range.
+   *
+   * @returns {object} The range as {min, max}.
+   */
+  getImageRescaledDataRange() {
+    return this.#view.getImage().getRescaledDataRange();
+  }
+
+  /**
+   * Compare the input meta data to the associated image one.
+   *
+   * @param {object} meta The meta data.
+   * @returns {boolean} True if the associated image has equal meta data.
+   */
+  equalImageMeta(meta) {
+    const imageMeta = this.#view.getImage().getMeta();
+    // loop through input meta keys
+    const metaKeys = Object.keys(meta);
+    for (let i = 0; i &lt; metaKeys.length; ++i) {
+      const metaKey = metaKeys[i];
+      if (typeof imageMeta[metaKey] === 'undefined') {
+        return false;
+      }
+      if (imageMeta[metaKey] !== meta[metaKey]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Check if the current position (default) or
+   * the provided position is in bounds.
+   *
+   * @param {Point} [position] Optional position.
+   * @returns {boolean} True is the position is in bounds.
+   */
+  isPositionInBounds(position) {
+    return this.#view.isPositionInBounds(position);
+  }
+
+  /**
+   * Set the current position.
+   *
+   * @param {Point} pos The position.
+   * @param {boolean} [silent] If true, does not fire a
+   *   positionchange event.
+   * @returns {boolean} False if not in bounds.
+   */
+  setCurrentPosition(pos, silent) {
+    return this.#view.setCurrentPosition(pos, silent);
+  }
+
+  /**
+   * Get a world position from a 2D plane position.
+   *
+   * @param {Point2D} point2D The input point.
+   * @param {number} [k] Optional slice index,
+   *   if undefined, uses the current one.
+   * @returns {Point} The associated position.
+   */
+  getPositionFromPlanePoint(point2D, k) {
+    // keep third direction
+    if (typeof k === 'undefined') {
+      k = this.getCurrentScrollIndexValue();
+    }
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
+    // de-orient
+    const point = this.#planeHelper.getImageOrientedPoint3D(planePoint);
+    // ~indexToWorld to not loose precision
+    const geometry = this.#view.getImage().getGeometry();
+    const point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
+    return this.getCurrentPosition().mergeWith3D(point3D);
+  }
+
+  /**
+   * Get a 2D plane position from a world position.
+   *
+   * @param {Point} point The 3D position.
+   * @returns {Point2D} The 2D position.
+   */
+  getPlanePositionFromPosition(point) {
+    // orient
+    const geometry = this.#view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    const point3D = geometry.worldToPoint(point);
+    const planePoint = this.#planeHelper.getImageDeOrientedPoint3D(point3D);
+    // return
+    return new Point2D(
+      planePoint.getX(),
+      planePoint.getY(),
+    );
+  }
+
+  /**
+   * Get the index of a world position.
+   *
+   * @param {Point} point The 3D position.
+   * @returns {Index} The index.
+   */
+  getIndexFromPosition(point) {
+    // orient
+    const geometry = this.#view.getImage().getGeometry();
+    // ~worldToIndex to not loose precision
+    return geometry.worldToIndex(point);
+  }
+
+  /**
+   * Set the current index.
+   *
+   * @param {Index} index The index.
+   * @param {boolean} [silent] If true, does not fire a positionchange event.
+   * @returns {boolean} False if not in bounds.
+   */
+  setCurrentIndex(index, silent) {
+    return this.#view.setCurrentIndex(index, silent);
+  }
+
+  /**
+   * Get a plane 3D position from a plane 2D position: does not compensate
+   *   for the image origin. Needed for setting the scale center...
+   *
+   * @param {Point2D} point2D The 2D position.
+   * @returns {Point3D} The 3D point.
+   */
+  getPlanePositionFromPlanePoint(point2D) {
+    // keep third direction
+    const k = this.getCurrentScrollIndexValue();
+    const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
+    // de-orient
+    const point = this.#planeHelper.getTargetDeOrientedPoint3D(planePoint);
+    // ~indexToWorld to not loose precision
+    const geometry = this.#view.getImage().getGeometry();
+    const spacing = geometry.getRealSpacing();
+    return new Point3D(
+      point.getX() * spacing.get(0),
+      point.getY() * spacing.get(1),
+      point.getZ() * spacing.get(2));
+  }
+
+  /**
+   * Get a 3D offset from a plane one.
+   *
+   * @param {Scalar2D} offset2D The plane offset as {x,y}.
+   * @returns {Vector3D} The 3D world offset.
+   */
+  getOffset3DFromPlaneOffset(offset2D) {
+    return this.#planeHelper.getOffset3DFromPlaneOffset(offset2D);
+  }
+
+  /**
+   * Get the current index incremented in the input direction.
+   *
+   * @param {number} dim The direction in which to increment.
+   * @returns {Index} The resulting index.
+   */
+  #getIncrementIndex(dim) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim &lt; values.length) {
+      values[dim] = 1;
+    } else {
+      console.warn('Cannot increment given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    return index.add(incr);
+  }
+
+  /**
+   * Get the current index decremented in the input direction.
+   *
+   * @param {number} dim The direction in which to decrement.
+   * @returns {Index} The resulting index.
+   */
+  #getDecrementIndex(dim) {
+    const index = this.getCurrentIndex();
+    const values = new Array(index.length());
+    values.fill(0);
+    if (dim &lt; values.length) {
+      values[dim] = -1;
+    } else {
+      console.warn('Cannot decrement given index: ', dim, values.length);
+    }
+    const incr = new Index(values);
+    return index.add(incr);
+  }
+
+  /**
+   * Get the current index incremented in the scroll direction.
+   *
+   * @returns {Index} The resulting index.
+   */
+  #getIncrementScrollIndex() {
+    return this.#getIncrementIndex(this.getScrollIndex());
+  }
+
+  /**
+   * Get the current index decremented in the scroll direction.
+   *
+   * @returns {Index} The resulting index.
+   */
+  #getDecrementScrollIndex() {
+    return this.#getDecrementIndex(this.getScrollIndex());
+  }
+
+  /**
+   * Get the current position incremented in the input direction.
+   *
+   * @param {number} dim The direction in which to increment.
+   * @returns {Point} The resulting point.
+   */
+  getIncrementPosition(dim) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getIncrementIndex(dim));
+  }
+
+  /**
+   * Get the current position decremented in the input direction.
+   *
+   * @param {number} dim The direction in which to decrement.
+   * @returns {Point} The resulting point.
+   */
+  getDecrementPosition(dim) {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getDecrementIndex(dim));
+  }
+
+  /**
+   * Get the current position decremented in the scroll direction.
+   *
+   * @returns {Point} The resulting point.
+   */
+  getIncrementScrollPosition() {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getIncrementScrollIndex());
+  }
+
+  /**
+   * Get the current position decremented in the scroll direction.
+   *
+   * @returns {Point} The resulting point.
+   */
+  getDecrementScrollPosition() {
+    const geometry = this.#view.getImage().getGeometry();
+    return geometry.indexToWorld(this.#getDecrementScrollIndex());
+  }
+
+  /**
+   * Increment the provided dimension.
+   *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} [silent] Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  incrementIndex(dim, silent) {
+    return this.setCurrentIndex(this.#getIncrementIndex(dim), silent);
+  }
+
+  /**
+   * Decrement the provided dimension.
+   *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} [silent] Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  decrementIndex(dim, silent) {
+    return this.setCurrentIndex(this.#getDecrementIndex(dim), silent);
+  }
+
+  /**
+   * Decrement the scroll dimension index.
+   *
+   * @param {boolean} [silent] Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  decrementScrollIndex(silent) {
+    return this.setCurrentIndex(this.#getDecrementScrollIndex(), silent);
+  }
+
+  /**
+   * Increment the scroll dimension index.
+   *
+   * @param {boolean} [silent] Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  incrementScrollIndex(silent) {
+    return this.setCurrentIndex(this.#getIncrementScrollIndex(), silent);
+  }
+
+  /**
+   * Scroll play: loop through all slices.
+   */
+  play() {
+    // ensure data is scrollable: dim >= 3
+    if (!this.canScroll()) {
+      return;
+    }
+    if (typeof this.#playerID === 'undefined') {
+      const image = this.#view.getImage();
+      const recommendedDisplayFrameRate =
+        image.getMeta().RecommendedDisplayFrameRate;
+      const milliseconds = this.#view.getPlaybackMilliseconds(
+        recommendedDisplayFrameRate);
+      const size = image.getGeometry().getSize();
+      const canScroll3D = size.canScroll3D();
+
+      this.#playerID = window.setInterval(() => {
+        let canDoMore = false;
+        if (canScroll3D) {
+          canDoMore = this.incrementScrollIndex();
+        } else {
+          canDoMore = this.incrementIndex(3);
+        }
+        // end of scroll, loop back
+        if (!canDoMore) {
+          const pos1 = this.getCurrentIndex();
+          const values = pos1.getValues();
+          const orientation = this.#view.getOrientation();
+          if (canScroll3D) {
+            values[orientation.getThirdColMajorDirection()] = 0;
+          } else {
+            values[3] = 0;
+          }
+          const index = new Index(values);
+          const geometry = this.#view.getImage().getGeometry();
+          this.setCurrentPosition(geometry.indexToWorld(index));
+        }
+      }, milliseconds);
+    } else {
+      this.stop();
+    }
+  }
+
+  /**
+   * Stop scroll playing.
+   */
+  stop() {
+    if (typeof this.#playerID !== 'undefined') {
+      clearInterval(this.#playerID);
+      this.#playerID = undefined;
+    }
+  }
+
+  /**
+   * Get the window/level.
+   *
+   * @returns {WindowLevel} The window and level.
+   */
+  getWindowLevel() {
+    return this.#view.getWindowLevel();
+  }
+
+  /**
+   * Get the current window level preset name.
+   *
+   * @returns {string} The preset name.
+   */
+  getCurrentWindowPresetName() {
+    return this.#view.getCurrentWindowPresetName();
+  }
+
+  /**
+   * Set the window and level.
+   *
+   * @param {WindowLevel} wl The window and level.
+   */
+  setWindowLevel(wl) {
+    this.#view.setWindowLevel(wl);
+  }
+
+  /**
+   * Get the colour map.
+   *
+   * @returns {string} The colour map name.
+   */
+  getColourMap() {
+    return this.#view.getColourMap();
+  }
+
+  /**
+   * Set the colour map.
+   *
+   * @param {string} name The colour map name.
+   */
+  setColourMap(name) {
+    this.#view.setColourMap(name);
+  }
+
+  /**
+   * @callback alphaFn
+   * @param {number[]|number} value The pixel value.
+   * @param {number} index The values' index.
+   * @returns {number} The opacity of the input value.
+   */
+
+  /**
+   * Set the view per value alpha function.
+   *
+   * @param {alphaFn} func The function.
+   */
+  setViewAlphaFunction(func) {
+    this.#view.setAlphaFunction(func);
+  }
+
+  /**
+   * Bind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  bindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.addEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.addEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
+  }
+
+  /**
+   * Unbind the view image to the provided layer.
+   *
+   * @param {ViewLayer} viewLayer The layer to bind.
+   */
+  unbindImageAndLayer(viewLayer) {
+    const image = this.#view.getImage();
+    image.removeEventListener('imagecontentchange',
+      viewLayer.onimagecontentchange
+    );
+    image.removeEventListener('imagegeometrychange',
+      viewLayer.onimagegeometrychange
+    );
+  }
+
+} // class ViewController
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.34.0.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html#event:drawcreate">drawcreate</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="AsynchPixelBufferDecoder.html">AsynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawGroupCommand.html">DrawGroupCommand</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="SynchPixelBufferDecoder.html">SynchPixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="TagValueExtractor.html">TagValueExtractor</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-JpegImage.html">JpegImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-JpxImage.html">JpxImage</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-jpeg.html">jpeg</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>
