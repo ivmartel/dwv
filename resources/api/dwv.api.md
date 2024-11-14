@@ -107,6 +107,8 @@ export class App {
     };
     getDrawLayers(callbackFn?: Function): DrawLayer[];
     getDrawLayersByDataId(dataId: string): DrawLayer[];
+    // @deprecated
+    getImage(dataId: string): Image_2 | undefined;
     getLayerGroupByDivId(divId: string): LayerGroup;
     getMetaData(dataId: string): {
         [x: string]: DataElement;

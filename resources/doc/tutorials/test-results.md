@@ -2,24 +2,27 @@
 
 ## Context
 
-Date: Thu Jun 13 2024 11:56:35 GMT+0200 (Central European Summer Time)
+Date: Thu Nov 14 2024 18:36:05 GMT+0100 (Central European Standard Time)
 
-Commit: [5909e54](git://github.com/ivmartel/dwv.git/commit/5909e54fa860694e4867a83d0a3446704373db3c)
+Commit: [166d5ed](git://github.com/ivmartel/dwv.git/commit/166d5edd4ac03e0fcdee6eefe8974770eda6ea74)
 
-Browser: Chrome Headless 125.0.6422.141 (Linux x86_64)
+Browser: Chrome Headless 130.0.0.0 (Linux x86_64)
 
 ## Summary
-Success: 163 ✅
+Success: 166 ✅
 
 Failed: 0 ❌
 
-(total: 163, skipped: 0, total time: 1600ms)
+(total: 166, skipped: 0, total time: 1644ms)
 
 ## Tests details
 
-(37 / 163 tests with requirement(s), 126 tests with no requirement)
+(38 / 166 tests with requirement(s), 128 tests with no requirement)
 
 ### utils
+
+- Index stringId: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~index-stringid))
 
 - arrayContains: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~arraycontains))
@@ -90,6 +93,9 @@ Failed: 0 ❌
 - ThreadPool class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~threadpool-class))
 
+- UndoStack: ✅ 
+(URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo), [jsdoc](module-tests_utils.html#~undostack))
+
 - getUrlFromUri: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_utils.html#~geturlfromuri))
 
@@ -124,14 +130,14 @@ Failed: 0 ❌
 - Index class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_math.html#~index-class))
 
-- Index stringId: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~index-stringid))
-
 - Line class: ✅ 
 (URS [#DWV-REQ-UI-07-007 (Draw ruler)](tutorial-user-stories.html#dwv-req-ui-07-007-draw-ruler), [jsdoc](module-tests_math.html#~line-class))
 
 - Angle between lines: ✅ 
 (URS [#DWV-REQ-UI-07-005 (Draw protractor)](tutorial-user-stories.html#dwv-req-ui-07-005-draw-protractor), [jsdoc](module-tests_math.html#~angle-between-lines))
+
+- areOrthogonal: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~areorthogonal))
 
 - Perpendicular line: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_math.html#~perpendicular-line))
@@ -163,8 +169,14 @@ Failed: 0 ❌
 - orientation matrix factories: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_math.html#~orientation-matrix-factories))
 
+- getOrientationFromCosines: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationfromcosines))
+
 - getOrientationStringLPS: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationstringlps))
+
+- getOrientationName: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_math.html#~getorientationname))
 
 - Path class: ✅ 
 (URS [#DWV-REQ-UI-07-004 (Draw free hand)](tutorial-user-stories.html#dwv-req-ui-07-004-draw-free-hand), [jsdoc](module-tests_math.html#~path-class))
@@ -213,9 +225,6 @@ Failed: 0 ❌
 - DICOM code class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-code-class))
 
-- DICOM dump: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-dump))
-
 - Get DICOM Date: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~get-dicom-date))
 
@@ -224,6 +233,9 @@ Failed: 0 ❌
 
 - Get DICOM datetime: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~get-dicom-datetime))
+
+- DICOM dump: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-dump))
 
 - Simple DICOM parsing: ✅ 
 (URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~simple-dicom-parsing))
@@ -236,9 +248,6 @@ Failed: 0 ❌
 
 - DICOMDIR parsing: ✅ 
 (URS [#DWV-REQ-IO-02-004 (Load DICOMDIR URL)](tutorial-user-stories.html#dwv-req-io-02-004-load-dicomdir-url), [jsdoc](module-tests_dicom.html#~dicomdir-parsing))
-
-- getOrientationName: ✅ 
-(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~getorientationname))
 
 - DICOM segment class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-segment-class))
@@ -519,7 +528,7 @@ Failed: 0 ❌
 
 ## Traceability
 
-(19 / 50 tested requirements)
+(20 / 50 tested requirements)
 
 ### io
 
@@ -685,7 +694,7 @@ URS [#DWV-REQ-UI-08-001 (Draw delete)](tutorial-user-stories.html#dwv-req-ui-08-
  ⚠️ No tests
 
 URS [#DWV-REQ-UI-08-002 (Draw action undo/redo)](tutorial-user-stories.html#dwv-req-ui-08-002-draw-action-undo%2Fredo):
- ⚠️ No tests
+ ✅ UndoStack 
 
 URS [#DWV-REQ-UI-09-001 (Livewire)](tutorial-user-stories.html#dwv-req-ui-09-001-livewire):
  ⚠️ No tests
