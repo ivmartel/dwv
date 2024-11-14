@@ -277,6 +277,21 @@ export class App {
   }
 
   /**
+   * Get the image.
+   *
+   * @param {string} dataId The data id.
+   * @returns {Image|undefined} The associated image.
+   * @deprecated Since v0.34, please use the getData method.
+   */
+  getImage(dataId) {
+    let res;
+    if (typeof this.getData(dataId) !== 'undefined') {
+      res = this.getData(dataId).image;
+    }
+    return res;
+  }
+
+  /**
    * Set the image at the given id.
    *
    * @param {string} dataId The data id.
@@ -287,7 +302,8 @@ export class App {
   }
 
   /**
-   * Add a new DicomData.
+   * Add a new DicomData. The data will
+   *   not be automatically rendered.
    *
    * @param {DicomData} data The new data.
    * @returns {string} The data id.
@@ -300,10 +316,6 @@ export class App {
       dataId,
       data
     );
-    // optional render
-    // if (this.#options.viewOnFirstLoadItem) {
-    //   this.render(dataId);
-    // }
     // return
     return dataId;
   }

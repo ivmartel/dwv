@@ -980,7 +980,7 @@ export class DrawLayer {
   /**
    * Delete a Draw from the stage.
    *
-   * @deprecated
+   * @deprecated since v0.34.
    * @param {string} _id The id of the group to delete.
    * @param {Function} _exeCallback The callback to call once the
    *  DeleteCommand has been executed.
@@ -992,7 +992,7 @@ export class DrawLayer {
   /**
    * Delete all Draws from the stage.
    *
-   * @deprecated
+   * @deprecated since v0.34.
    * @param {Function} _exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
