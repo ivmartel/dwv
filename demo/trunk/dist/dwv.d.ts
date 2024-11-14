@@ -385,7 +385,8 @@ export declare class App {
      * Can the data (of the active view of the active layer) be scrolled?
      *
      * @returns {boolean} True if the data has a third dimension greater than one.
-     * @deprecated Please use the ViewController equivalent directly instead.
+     * @deprecated Since v0.33, please use the ViewController
+     *   equivalent directly instead.
      */
     canScroll(): boolean;
     /**
@@ -393,7 +394,8 @@ export declare class App {
      * (of the active view of the active layer)?
      *
      * @returns {boolean} True if the data is monochrome.
-     * @deprecated Please use the ViewController equivalent directly instead.
+     * @deprecated Since v0.33, please use the ViewController
+     *   equivalent directly instead.
      */
     canWindowLevel(): boolean;
     /**
@@ -634,7 +636,8 @@ export declare class App {
      * Init the Window/Level display
      * (of the active layer of the active layer group).
      *
-     * @deprecated Please set the opacity of the desired view layer directly.
+     * @deprecated Since v0.33, please set the opacity
+     *   of the desired view layer directly.
      */
     initWLDisplay(): void;
     /**
@@ -736,13 +739,14 @@ export declare class App {
      * Set the active view layer (of the active layer group) opacity.
      *
      * @param {number} alpha The opacity ([0:1] range).
-     * @deprecated Please set the opacity of the desired view layer directly.
+     * @deprecated Since v0.33, pplease set the opacity
+     *   of the desired view layer directly.
      */
     setOpacity(alpha: number): void;
     /**
      * Set the drawings of the active layer group.
      *
-     * @deprecated Please switch to DICOM SR annotations.
+     * @deprecated Since v0.34, please switch to DICOM SR annotations.
      * @param {Array} drawings An array of drawings.
      * @param {Array} drawingsDetails An array of drawings details.
      * @param {string} dataId The converted data id.
@@ -751,7 +755,8 @@ export declare class App {
     /**
      * Apply a JSON state to this app.
      *
-     * @deprecated
+     * @deprecated Since v0.34, please switch to DICOM SR
+     *   for annotations.
      * @param {string} jsonState The state of the app as a JSON string.
      * @param {string} dataId The state data id.
      */
@@ -801,14 +806,16 @@ export declare class App {
      * Set the colour map of the active view of the active layer group.
      *
      * @param {string} name The colour map name.
-     * @deprecated Please use the ViewController equivalent directly instead.
+     * @deprecated Since v0.33, please use the ViewController
+     *   equivalent directly instead.
      */
     setColourMap(name: string): void;
     /**
      * Set the window/level preset of the active view of the active layer group.
      *
      * @param {string} preset The window/level preset.
-     * @deprecated Please use the ViewController equivalent directly instead.
+     * @deprecated Since v0.33, please use the ViewController
+     *   equivalent directly instead.
      */
     setWindowLevelPreset(preset: string): void;
     /**
@@ -1880,7 +1887,7 @@ export declare class DrawLayer {
     /**
      * Delete a Draw from the stage.
      *
-     * @deprecated
+     * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
      * @param {string} _id The id of the group to delete.
      * @param {Function} _exeCallback The callback to call once the
      *  DeleteCommand has been executed.
@@ -1889,7 +1896,7 @@ export declare class DrawLayer {
     /**
      * Delete all Draws from the stage.
      *
-     * @deprecated
+     * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
      * @param {Function} _exeCallback The callback to call once the
      *  DeleteCommand has been executed.
      */
@@ -2554,7 +2561,7 @@ declare class Image_2 {
      * Can window and level be applied to the data?
      *
      * @returns {boolean} True if the data is monochrome.
-     * @deprecated Please use isMonochrome instead.
+     * @deprecated Since v0.33, please use isMonochrome instead.
      */
     canWindowLevel(): boolean;
     /**
@@ -5516,7 +5523,7 @@ export declare class ViewController {
      * Can window and level be applied to the data?
      *
      * @returns {boolean} True if possible.
-     * @deprecated Please use isMonochrome instead.
+     * @deprecated Since v0.33, please use isMonochrome instead.
      */
     canWindowLevel(): boolean;
     /**
