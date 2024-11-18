@@ -1,10 +1,8 @@
 import {View} from './view';
-import {luts} from './luts';
 import {
   WindowLevel,
   defaultPresets
 } from './windowLevel';
-import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -31,12 +29,6 @@ export class ViewFactory {
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
       view.setColourMap('invPlain');
-    } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      if (typeof luts['palette'] !== 'undefined') {
-        view.setColourMap('palette');
-      } else {
-        logger.warn('Cannot find Palette lut');
-      }
     }
 
     // window level presets

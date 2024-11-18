@@ -3,7 +3,7 @@ import {Geometry} from './geometry';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {WindowLevel} from './windowLevel';
 import {Image} from './image';
-import {luts} from './luts';
+import {ColourMap} from './luts';
 import {
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
@@ -407,11 +407,7 @@ export class ImageFactory {
         }
       }
       // set the palette
-      luts['palette'] = {
-        red: redLut,
-        green: greenLut,
-        blue: blueLut
-      };
+      image.setPaletteColourMap(new ColourMap(redLut, greenLut, blueLut));
     }
 
     // RecommendedDisplayFrameRate

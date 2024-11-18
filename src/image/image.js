@@ -16,6 +16,7 @@ import {Matrix33} from '../math/matrix';
 import {NumberRange} from '../math/stats';
 import {DataElement} from '../dicom/dataElement';
 import {RGB} from '../utils/colour';
+import {ColourMap} from './luts';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -177,6 +178,13 @@ export class Image {
    * @type {string}
    */
   #photometricInterpretation = 'MONOCHROME2';
+
+  /**
+   * Palette colour map.
+   *
+   * @type {ColourMap}
+   */
+  #paletteColourMap;
 
   /**
    * Planar configuration for RGB data (`0:RGBRGBRGBRGB...` or
@@ -482,6 +490,24 @@ export class Image {
    */
   setPhotometricInterpretation(interp) {
     this.#photometricInterpretation = interp;
+  }
+
+  /**
+   * Set the palette colour map.
+   *
+   * @param {ColourMap} map The colour map.
+   */
+  setPaletteColourMap(map) {
+    this.#paletteColourMap = map;
+  }
+
+  /**
+   * Get the palette colour map.
+   *
+   * @returns {ColourMap} The colour map.
+   */
+  getPaletteColourMap() {
+    return this.#paletteColourMap;
   }
 
   /**
