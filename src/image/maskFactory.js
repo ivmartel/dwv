@@ -31,6 +31,7 @@ import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix';
 import {logger} from '../utils/logger';
 import {arraySortEquals} from '../utils/array';
 import {Size} from './size';
+import {ColourMap} from './luts';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -151,51 +152,21 @@ function createRoiSliceBuffers(
   segments,
   sliceOffset
 ) {
-  // access functions
-  const numberOfComponents = image.getNumberOfComponents();
-  const isRGB = numberOfComponents === 3;
-  let getPixelValue;
-  let equalValues;
-  if (isRGB) {
-    getPixelValue = function (inputOffset) {
-      return {
-        r: image.getValueAtOffset(inputOffset),
-        g: image.getValueAtOffset(inputOffset + 1),
-        b: image.getValueAtOffset(inputOffset + 2)
-      };
-    };
-    equalValues = function (value, segment) {
-      return (
-        segment.displayRGBValue !== undefined &&
-        value.r === segment.displayRGBValue.r &&
-        value.g === segment.displayRGBValue.g &&
-        value.b === segment.displayRGBValue.b
-      );
-    };
-  } else {
-    getPixelValue = function (inputOffset) {
-      return image.getValueAtOffset(inputOffset);
-    };
-    equalValues = function (value, segment) {
-      return value === segment.displayValue;
-    };
-  }
-
   // create binary mask buffers
   const geometry = image.getGeometry();
   const size = geometry.getSize();
   const sliceSize = size.getDimSize(2);
   const buffers = {};
   for (let o = 0; o < sliceSize; ++o) {
-    const inputOffset = (sliceOffset + o) * numberOfComponents;
-    const pixelValue = getPixelValue(inputOffset);
+    const inputOffset = sliceOffset + o;
+    const pixelValue = image.getValueAtOffset(inputOffset);
     for (const segment of segments) {
-      const number2 = segment.number - 1;
-      if (equalValues(pixelValue, segment)) {
-        if (buffers[number2] === undefined) {
-          buffers[number2] = new Uint8Array(sliceSize);
+      const segmentIndex = segment.number - 1;
+      if (pixelValue === segment.number) {
+        if (buffers[segmentIndex] === undefined) {
+          buffers[segmentIndex] = new Uint8Array(sliceSize);
         }
-        buffers[number2][o] = 1;
+        buffers[segmentIndex][o] = 1;
       }
     }
   }
@@ -411,17 +382,28 @@ export class MaskFactory {
       throw new Error('Missing or empty segmentation sequence');
     }
     const segments = [];
-    let storeAsRGB = false;
+    // segment number is unique and starts at 1, use 0 as background
+    const redLut = [0];
+    const greenLut = [0];
+    const blueLut = [0];
     for (let i = 0; i < segSequence.value.length; ++i) {
       const segment = getSegment(segSequence.value[i]);
       if (typeof segment.displayRGBValue !== 'undefined') {
-        // create rgb image
-        storeAsRGB = true;
+        // add palette colour
+        redLut[segment.number] = segment.displayRGBValue.r;
+        greenLut[segment.number] = segment.displayRGBValue.g;
+        blueLut[segment.number] = segment.displayRGBValue.b;
       }
       // store
       segments.push(segment);
     }
 
+    let hasDisplayRGBValue = false;
+    let paletteColourMap;
+    if (redLut.length > 1) {
+      hasDisplayRGBValue = true;
+      paletteColourMap = new ColourMap(redLut, greenLut, blueLut);
+    }
 
     // Shared Functional Groups Sequence
     let spacing;
@@ -635,10 +617,9 @@ export class MaskFactory {
     };
 
     // create output buffer
-    const mul = storeAsRGB ? 3 : 1;
     const buffer =
       // @ts-ignore
-      new pixelBuffer.constructor(mul * sliceSize * numberOfSlices);
+      new pixelBuffer.constructor(sliceSize * numberOfSlices);
     buffer.fill(0);
     // merge frame buffers
     let sliceOffset = null;
@@ -654,11 +635,9 @@ export class MaskFactory {
       );
       for (let l = 0; l < sliceSize; ++l) {
         if (pixelBuffer[frameOffset + l] !== 0) {
-          const offset = mul * (sliceOffset + l);
-          if (storeAsRGB) {
-            buffer[offset] = frameSegment.displayRGBValue.r;
-            buffer[offset + 1] = frameSegment.displayRGBValue.g;
-            buffer[offset + 2] = frameSegment.displayRGBValue.b;
+          const offset = sliceOffset + l;
+          if (hasDisplayRGBValue) {
+            buffer[offset] = frameSegment.number;
           } else {
             buffer[offset] = frameSegment.displayValue;
           }
@@ -668,8 +647,9 @@ export class MaskFactory {
 
     // create image
     const image = new Image(geometry, buffer, uids);
-    if (storeAsRGB) {
-      image.setPhotometricInterpretation('RGB');
+    if (hasDisplayRGBValue) {
+      image.setPhotometricInterpretation('PALETTE COLOR');
+      image.setPaletteColourMap(paletteColourMap);
     }
     // meta information
     const meta = getDefaultDicomSegJson();

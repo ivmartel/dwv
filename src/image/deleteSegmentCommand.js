@@ -1,5 +1,4 @@
 import {MaskSegmentHelper} from './maskSegmentHelper';
-import {BLACK} from '../utils/colour';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -51,7 +50,7 @@ export class DeleteSegmentCommand {
     this.#isSilent = (typeof silent === 'undefined') ? false : silent;
     // list of offsets with the colour to delete
     if (typeof segment.displayRGBValue !== 'undefined') {
-      this.#offsets = mask.getOffsets(segment.displayRGBValue);
+      this.#offsets = mask.getOffsets(segment.number);
     } else {
       this.#offsets = mask.getOffsets(segment.displayValue);
     }
@@ -72,6 +71,7 @@ export class DeleteSegmentCommand {
    * @returns {boolean} True if the command is valid.
    */
   isValid() {
+    // check that input segment is still there
     const segments = this.#mask.getMeta().custom.segments;
     return segments.some(segmentItem =>
       segmentItem.number === this.#segment.number
@@ -86,11 +86,7 @@ export class DeleteSegmentCommand {
   execute() {
     if (this.#offsets.length !== 0) {
       // remove from image
-      if (typeof this.#segment.displayRGBValue !== 'undefined') {
-        this.#mask.setAtOffsets(this.#offsets, BLACK);
-      } else {
-        this.#mask.setAtOffsets(this.#offsets, 0);
-      }
+      this.#mask.setAtOffsets(this.#offsets, 0);
     }
 
     // remove from segments
@@ -122,7 +118,7 @@ export class DeleteSegmentCommand {
     if (this.#offsets.length !== 0) {
       // re-draw in image
       if (typeof this.#segment.displayRGBValue !== 'undefined') {
-        this.#mask.setAtOffsets(this.#offsets, this.#segment.displayRGBValue);
+        this.#mask.setAtOffsets(this.#offsets, this.#segment.number);
       } else {
         this.#mask.setAtOffsets(this.#offsets, this.#segment.displayValue);
       }

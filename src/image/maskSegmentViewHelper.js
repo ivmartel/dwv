@@ -17,8 +17,6 @@ export class MaskSegmentViewHelper {
    */
   #hiddenSegments = [];
 
-  #isMonochrome;
-
   /**
    * Get the index of a segment in the hidden list.
    *
@@ -49,8 +47,6 @@ export class MaskSegmentViewHelper {
   addToHidden(segment) {
     if (!this.isHidden(segment.number)) {
       this.#hiddenSegments.push(segment);
-      // base flag on latest added
-      this.#isMonochrome = typeof segment.displayValue !== 'undefined';
     } else {
       logger.warn(
         'Not hidding segment, it is allready in the hidden list: ' +
@@ -89,44 +85,21 @@ export class MaskSegmentViewHelper {
   getAlphaFunc() {
     // get colours
     const hiddenColours = [];
-    if (this.#isMonochrome) {
-      hiddenColours[0] = 0;
-    } else {
-      hiddenColours[0] = {r: 0, g: 0, b: 0};
-    }
+    // zero is hidden by default
+    hiddenColours[0] = 0;
     for (const segment of this.#hiddenSegments) {
-      if (this.#isMonochrome) {
-        hiddenColours.push(segment.displayValue);
-      } else {
-        hiddenColours.push(segment.displayRGBValue);
-      }
+      hiddenColours.push(segment.number);
     }
 
     // create alpha function
-    let resultFn;
-    if (this.#isMonochrome) {
-      resultFn = function (value/*, index*/) {
-        for (let i = 0; i < hiddenColours.length; ++i) {
-          if (value === hiddenColours[i]) {
-            return 0;
-          }
+    return function (value/*, index*/) {
+      for (let i = 0; i < hiddenColours.length; ++i) {
+        if (value === hiddenColours[i]) {
+          return 0;
         }
-        // default
-        return 255;
-      };
-    } else {
-      resultFn = function (value/*, index*/) {
-        for (let i = 0; i < hiddenColours.length; ++i) {
-          if (value[0] === hiddenColours[i].r &&
-            value[1] === hiddenColours[i].g &&
-            value[2] === hiddenColours[i].b) {
-            return 0;
-          }
-        }
-        // default
-        return 255;
-      };
-    }
-    return resultFn;
+      }
+      // default
+      return 255;
+    };
   }
 }
