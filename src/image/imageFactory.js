@@ -83,8 +83,8 @@ export class ImageFactory {
         const photometricInterpretation =
         getPhotometricInterpretation(dataElements);
         const SOPClassUID = getSopClassUid(dataElements);
-        if (isSecondatyCapture(SOPClassUID) || 
-        !isMonochrome(photometricInterpretation)) {
+        if (isSecondatyCapture(SOPClassUID) ||
+                !isMonochrome(photometricInterpretation)) {
           return this.#warning;
         }
         const suvFactor = getSuvFactor(dataElements);
