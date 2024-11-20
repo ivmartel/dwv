@@ -16,6 +16,7 @@ import {Matrix33} from '../math/matrix';
 import {NumberRange} from '../math/stats';
 import {DataElement} from '../dicom/dataElement';
 import {RGB} from '../utils/colour';
+import {isMonochrome} from '../dicom/dicomElementsWrapper';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -336,8 +337,7 @@ export class Image {
    * @returns {boolean} True if the data is monochrome.
    */
   isMonochrome() {
-    return this.getPhotometricInterpretation()
-      .match(/MONOCHROME/) !== null;
+    return isMonochrome(this.getPhotometricInterpretation());
   }
 
   /**
