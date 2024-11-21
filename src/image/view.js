@@ -953,7 +953,7 @@ export class View {
         data,
         iterator,
         this.getAlphaFunction(),
-        this.#getColourMapLut(),
+        image.getPaletteColourMap(),
         image.getMeta().BitsStored === 16
       );
       break;

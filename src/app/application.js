@@ -1887,9 +1887,7 @@ export class App {
     // (assuming RGB data)
     if (data.image.getMeta().Modality === 'SEG') {
       view.setAlphaFunction(function (value /*, index*/) {
-        if (value[0] === 0 &&
-          value[1] === 0 &&
-          value[2] === 0) {
+        if (value === 0) {
           return 0;
         } else {
           return 0xff;
