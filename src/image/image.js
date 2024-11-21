@@ -4,7 +4,7 @@ import {logger} from '../utils/logger';
 import {arrayContains} from '../utils/array';
 import {getTypedArray} from '../dicom/dicomParser';
 import {ListenerHandler} from '../utils/listen';
-import {colourRange} from './iterator';
+import {valueRange} from './iterator';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
@@ -1104,40 +1104,40 @@ export class Image {
    * @fires Image#imagecontentchange
    */
   setAtOffsetsAndGetOriginals(offsetsLists, value) {
-    const originalColoursLists = [];
+    const originalValuesLists = [];
 
     // update and store
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
-      // first colour
+      // first value
       let offset = offsets[0];
-      let previousColour = this.#buffer[offset];
+      let previousValue = this.#buffer[offset];
       // original value storage
-      const originalColours = [];
-      originalColours.push({
+      const originalValues = [];
+      originalValues.push({
         index: 0,
-        colour: previousColour
+        value: previousValue
       });
       for (let i = 0; i < offsets.length; ++i) {
         offset = offsets[i];
-        const currentColour = this.#buffer[offset];
-        // check if new colour
-        if (previousColour !== currentColour) {
-          // store new colour
-          originalColours.push({
+        const currentValue = this.#buffer[offset];
+        // check if new value
+        if (previousValue !== currentValue) {
+          // store new value
+          originalValues.push({
             index: i,
-            colour: currentColour
+            value: currentValue
           });
-          previousColour = currentColour;
+          previousValue = currentValue;
         }
-        // write update colour
+        // write update value
         this.#buffer[offset] = value;
       }
-      originalColoursLists.push(originalColours);
+      originalValuesLists.push(originalValues);
     }
     // fire imagecontentchange
     this.#fireEvent({type: 'imagecontentchange'});
-    return originalColoursLists;
+    return originalValuesLists;
   }
 
   /**
@@ -1157,12 +1157,12 @@ export class Image {
       if (isValueArray) {
         // input value is a list of iterators
         // created by setAtOffsetsAndGetOriginals
-        iterator = colourRange(
+        iterator = valueRange(
           value[j], offsets.length);
       } else {
         // input value is a simple color
-        iterator = colourRange(
-          [{index: 0, colour: value}], offsets.length);
+        iterator = valueRange(
+          [{index: 0, value: value}], offsets.length);
       }
 
       // set values
