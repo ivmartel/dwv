@@ -1,6 +1,9 @@
 import {
   DicomParser,
-  getTransferSyntaxName
+  getTransferSyntaxName,
+  isJpeg2000TransferSyntax,
+  isJpegBaselineTransferSyntax,
+  isJpegLosslessTransferSyntax
 } from './dicomParser';
 import {
   getDate,
@@ -601,6 +604,79 @@ export function getDicomPlaneOrientationItem(orientation) {
 }
 
 /**
+ * Gets the sop class uid from the data elements.
+ *
+ * @param {object} dataElements The data elements. *.
+ * @returns {string | undefined} The sop class uid value.
+ */
+export function getSopClassUid(dataElements) {
+  const SOPClassUID = dataElements['00080016'];
+  if (typeof SOPClassUID !== 'undefined') {
+    return SOPClassUID.value[0];
+  }
+  return;
+}
+
+/**
+ * Check if the received string represents a secondary capture.
+ *
+ * @param {string} SOPClassUID The sop class uid.
+ * @returns {boolean} True if it is secondary capture.
+ */
+export function isSecondatyCapture(SOPClassUID) {
+  const pattern = /^1\.2\.840\.10008\.5\.1\.4\.1\.1\.7/;
+  return !SOPClassUID && pattern.test(SOPClassUID);
+}
+
+/**
+ * Gets the photometric interpretation from the data elements.
+ *
+ * @param {object} dataElements The data elements.
+ * @returns {string | undefined} The photometric interpretation value.
+ */
+export function getPhotometricInterpretation(dataElements) {
+  const photometricInterpretation = dataElements['00280004'];
+  const syntaxElement = dataElements['00020010'];
+  const spp = dataElements['00280002'];
+  // samplesPerPixel
+  let samplesPerPixel = 1;
+  if (typeof spp !== 'undefined') {
+    samplesPerPixel = spp.value[0];
+  }
+
+  if (typeof photometricInterpretation !== 'undefined' &&
+  typeof syntaxElement !== 'undefined') {
+    let photo = photometricInterpretation.value[0].toUpperCase();
+    // TransferSyntaxUID
+    const syntax = syntaxElement.value[0];
+    const jpeg2000 = isJpeg2000TransferSyntax(syntax);
+    const jpegBase = isJpegBaselineTransferSyntax(syntax);
+    const jpegLoss = isJpegLosslessTransferSyntax(syntax);
+    // jpeg decoders output RGB data
+    if ((jpeg2000 || jpegBase || jpegLoss) &&
+      (photo !== 'MONOCHROME1' && photo !== 'MONOCHROME2')) {
+      photo = 'RGB';
+    }
+    // check samples per pixels
+    if (photo === 'RGB' && samplesPerPixel === 1) {
+      photo = 'PALETTE COLOR';
+    }
+    return photo;
+  }
+}
+
+/**
+ * Check if the received string is monochrome.
+ *
+ * @param {string} photometricInterpretation The photometric interpretation.
+ * @returns {boolean} True if it is monochrome.
+ */
+export function isMonochrome(photometricInterpretation) {
+  return !photometricInterpretation && photometricInterpretation.match(/MONOCHROME/) !== null;
+}
+
+
+/**
  * Check an input tag.
  *
  * @param {object} element The element to check.
@@ -617,6 +693,7 @@ function checkTag(element, name, values) {
   } else {
     if (typeof values !== 'undefined') {
       for (let i = 0; i < values.length; ++i) {
+
         if (!element.value.includes(values[i])) {
           warning += ' ' + name + ' does not contain ' + values[i] +
             ' (value: ' + element.value + '),';
@@ -829,6 +906,8 @@ function getDecayedDose(elements) {
  */
 export function getSuvFactor(elements) {
   let warning = '';
+  const result = {};
+
 
   // CorrectedImage (type2): must contain ATTN and DECY
   const corrImageTagStr = 'Corrected Image (00280051)';
@@ -863,7 +942,7 @@ export function getSuvFactor(elements) {
   const decayedDose = getDecayedDose(elements);
   warning += decayedDose.warning;
 
-  const result = {};
+
   if (warning.length !== 0) {
     result.warning = 'Cannot calculate PET SUV:' + warning;
   } else {
@@ -873,6 +952,7 @@ export function getSuvFactor(elements) {
 
   return result;
 }
+
 
 /**
  * Get the file list from a DICOMDIR.

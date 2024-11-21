@@ -15,7 +15,11 @@ import {
   getPixelUnit,
   TagValueExtractor,
   getSuvFactor,
-  getOrientationMatrix
+  getOrientationMatrix,
+  isSecondatyCapture,
+  getPhotometricInterpretation,
+  getSopClassUid,
+  isMonochrome
 } from '../dicom/dicomElementsWrapper';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
@@ -74,7 +78,15 @@ export class ImageFactory {
     const element = dataElements['00080060'];
     if (typeof element !== 'undefined') {
       modality = element.value[0];
+
       if (modality === 'PT') {
+        const photometricInterpretation =
+        getPhotometricInterpretation(dataElements);
+        const SOPClassUID = getSopClassUid(dataElements);
+        if (isSecondatyCapture(SOPClassUID) ||
+                !isMonochrome(photometricInterpretation)) {
+          return this.#warning;
+        }
         const suvFactor = getSuvFactor(dataElements);
         this.#suvFactor = suvFactor.value;
         this.#warning = suvFactor.warning;

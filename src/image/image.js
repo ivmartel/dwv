@@ -8,6 +8,7 @@ import {valueRange} from './iterator';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
+import {isMonochrome} from '../dicom/dicomElementsWrapper';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -344,8 +345,7 @@ export class Image {
    * @returns {boolean} True if the data is monochrome.
    */
   isMonochrome() {
-    return this.getPhotometricInterpretation()
-      .match(/MONOCHROME/) !== null;
+    return isMonochrome(this.getPhotometricInterpretation());
   }
 
   /**
