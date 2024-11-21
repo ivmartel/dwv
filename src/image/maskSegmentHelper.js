@@ -130,6 +130,11 @@ export class MaskSegmentHelper {
     const index = this.#findSegmentIndex(segment.number);
     if (index === -1) {
       this.#segments.push(segment);
+      // update palette colour map
+      if (typeof segment.displayRGBValue !== 'undefined') {
+        this.#mask.updatePaletteColourMap(
+          segment.number, segment.displayRGBValue);
+      }
     } else {
       logger.warn(
         'Not adding segment, it is allready in the segments list: ' +

@@ -629,28 +629,28 @@ export function getVariableRegionSliceIterator(
 }
 
 /**
- * Get a colour iterator. The input array defines the colours and
+ * Get a multiple value iterator. The input array defines the values and
  * their start index.
  *
  * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
  *
- * @param {Array} colours An array of {index, colour} pairs.
+ * @param {Array} values An array of {index, value} pairs.
  * @param {number} end The end of the range (excluded).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-export function colourRange(colours, end) {
+export function valueRange(values, end) {
   let nextIndex = 0;
-  let nextColourIndex = 0;
+  let nextValueIndex = 0;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        if (nextColourIndex + 1 < colours.length &&
-          nextIndex >= colours[nextColourIndex + 1].index) {
-          ++nextColourIndex;
+        if (nextValueIndex + 1 < values.length &&
+          nextIndex >= values[nextValueIndex + 1].index) {
+          ++nextValueIndex;
         }
         const result = {
-          value: colours[nextColourIndex].colour,
+          value: values[nextValueIndex].value,
           done: false,
           index: nextIndex
         };

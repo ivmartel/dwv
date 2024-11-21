@@ -4,7 +4,7 @@ import {logger} from '../utils/logger';
 import {arrayContains} from '../utils/array';
 import {getTypedArray} from '../dicom/dicomParser';
 import {ListenerHandler} from '../utils/listen';
-import {colourRange} from './iterator';
+import {valueRange} from './iterator';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
@@ -16,6 +16,7 @@ import {Matrix33} from '../math/matrix';
 import {NumberRange} from '../math/stats';
 import {DataElement} from '../dicom/dataElement';
 import {RGB} from '../utils/colour';
+import {ColourMap} from './luts';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -177,6 +178,13 @@ export class Image {
    * @type {string}
    */
   #photometricInterpretation = 'MONOCHROME2';
+
+  /**
+   * Palette colour map.
+   *
+   * @type {ColourMap}
+   */
+  #paletteColourMap;
 
   /**
    * Planar configuration for RGB data (`0:RGBRGBRGBRGB...` or
@@ -482,6 +490,40 @@ export class Image {
    */
   setPhotometricInterpretation(interp) {
     this.#photometricInterpretation = interp;
+  }
+
+  /**
+   * Set the palette colour map.
+   *
+   * @param {ColourMap} map The colour map.
+   */
+  setPaletteColourMap(map) {
+    this.#paletteColourMap = map;
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
+  }
+
+  /**
+   * Get the palette colour map.
+   *
+   * @returns {ColourMap} The colour map.
+   */
+  getPaletteColourMap() {
+    return this.#paletteColourMap;
+  }
+
+  /**
+   * Update the palette colour map.
+   *
+   * @param {number} index The index to change the colour of.
+   * @param {RGB} colour The colour to use at index.
+   */
+  updatePaletteColourMap(index, colour) {
+    this.#paletteColourMap.red[index] = colour.r;
+    this.#paletteColourMap.green[index] = colour.g;
+    this.#paletteColourMap.blue[index] = colour.b;
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**
@@ -1056,58 +1098,46 @@ export class Image {
    *
    * @param {number[][]} offsetsLists List of offset lists where
    *   to set the data.
-   * @param {RGB} value The value to set at the given offsets.
+   * @param {number} value The value to set at the given offsets.
    * @returns {Array} A list of objects representing the original values before
    *  replacing them.
    * @fires Image#imagecontentchange
    */
   setAtOffsetsAndGetOriginals(offsetsLists, value) {
-    const originalColoursLists = [];
+    const originalValuesLists = [];
 
     // update and store
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
-      // first colour
-      let offset = offsets[0] * 3;
-      let previousColour = {
-        r: this.#buffer[offset],
-        g: this.#buffer[offset + 1],
-        b: this.#buffer[offset + 2]
-      };
+      // first value
+      let offset = offsets[0];
+      let previousValue = this.#buffer[offset];
       // original value storage
-      const originalColours = [];
-      originalColours.push({
+      const originalValues = [];
+      originalValues.push({
         index: 0,
-        colour: previousColour
+        value: previousValue
       });
       for (let i = 0; i < offsets.length; ++i) {
-        offset = offsets[i] * 3;
-        const currentColour = {
-          r: this.#buffer[offset],
-          g: this.#buffer[offset + 1],
-          b: this.#buffer[offset + 2]
-        };
-        // check if new colour
-        if (previousColour.r !== currentColour.r ||
-          previousColour.g !== currentColour.g ||
-          previousColour.b !== currentColour.b) {
-          // store new colour
-          originalColours.push({
+        offset = offsets[i];
+        const currentValue = this.#buffer[offset];
+        // check if new value
+        if (previousValue !== currentValue) {
+          // store new value
+          originalValues.push({
             index: i,
-            colour: currentColour
+            value: currentValue
           });
-          previousColour = currentColour;
+          previousValue = currentValue;
         }
-        // write update colour
-        this.#buffer[offset] = value.r;
-        this.#buffer[offset + 1] = value.g;
-        this.#buffer[offset + 2] = value.b;
+        // write update value
+        this.#buffer[offset] = value;
       }
-      originalColoursLists.push(originalColours);
+      originalValuesLists.push(originalValues);
     }
     // fire imagecontentchange
     this.#fireEvent({type: 'imagecontentchange'});
-    return originalColoursLists;
+    return originalValuesLists;
   }
 
   /**
@@ -1115,33 +1145,31 @@ export class Image {
    *
    * @param {number[][]} offsetsLists List of offset lists
    *   where to set the data.
-   * @param {RGB|Array} value The value to set at the given offsets.
+   * @param {number|Array} value The value to set at the given offsets.
    * @fires Image#imagecontentchange
    */
   setAtOffsetsWithIterator(offsetsLists, value) {
+    const isValueArray = Array.isArray(value);
+
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
       let iterator;
-      if (Array.isArray(value)) {
+      if (isValueArray) {
         // input value is a list of iterators
         // created by setAtOffsetsAndGetOriginals
-        iterator = colourRange(
+        iterator = valueRange(
           value[j], offsets.length);
-      } else if (typeof value.r !== 'undefined' &&
-        typeof value.g !== 'undefined' &&
-        typeof value.b !== 'undefined') {
+      } else {
         // input value is a simple color
-        iterator = colourRange(
-          [{index: 0, colour: value}], offsets.length);
+        iterator = valueRange(
+          [{index: 0, value: value}], offsets.length);
       }
 
       // set values
       let ival = iterator.next();
       while (!ival.done) {
-        const offset = offsets[ival.index] * 3;
-        this.#buffer[offset] = ival.value.r;
-        this.#buffer[offset + 1] = ival.value.g;
-        this.#buffer[offset + 2] = ival.value.b;
+        const offset = offsets[ival.index];
+        this.#buffer[offset] = ival.value;
         ival = iterator.next();
       }
     }
