@@ -1,21 +1,16 @@
 import {logger} from '../utils/logger';
 
-// doc imports
-/* eslint-disable no-unused-vars */
-import {MaskSegment} from '../dicom/dicomSegment';
-/* eslint-enable no-unused-vars */
-
 /**
  * Mask segment view helper: handles hidden segments.
  */
 export class MaskSegmentViewHelper {
 
   /**
-   * List of hidden segments.
+   * List of hidden segment numbers.
    *
-   * @type {MaskSegment[]}
+   * @type {number[]}
    */
-  #hiddenSegments = [];
+  #hiddenNumbers = [];
 
   /**
    * Get the index of a segment in the hidden list.
@@ -24,9 +19,7 @@ export class MaskSegmentViewHelper {
    * @returns {number} The index in the array, -1 if not found.
    */
   #findHiddenIndex(segmentNumber) {
-    return this.#hiddenSegments.findIndex(function (item) {
-      return item.number === segmentNumber;
-    });
+    return this.#hiddenNumbers.indexOf(segmentNumber);
   }
 
   /**
@@ -42,15 +35,15 @@ export class MaskSegmentViewHelper {
   /**
    * Add a segment to the hidden list.
    *
-   * @param {MaskSegment} segment The segment to add.
+   * @param {number} segmentNumber The segment number.
    */
-  addToHidden(segment) {
-    if (!this.isHidden(segment.number)) {
-      this.#hiddenSegments.push(segment);
+  addToHidden(segmentNumber) {
+    if (!this.isHidden(segmentNumber)) {
+      this.#hiddenNumbers.push(segmentNumber);
     } else {
       logger.warn(
         'Not hidding segment, it is allready in the hidden list: ' +
-          segment.number);
+          segmentNumber);
     }
   }
 
@@ -62,7 +55,7 @@ export class MaskSegmentViewHelper {
   removeFromHidden(segmentNumber) {
     const index = this.#findHiddenIndex(segmentNumber);
     if (index !== -1) {
-      this.#hiddenSegments.splice(index, 1);
+      this.#hiddenNumbers.splice(index, 1);
     } else {
       logger.warn(
         'Cannot remove segment, it is not in the hidden list: ' +
@@ -72,7 +65,7 @@ export class MaskSegmentViewHelper {
 
   /**
    * @callback alphaFn
-   * @param {number[]|number} value The pixel value.
+   * @param {number} value The pixel value.
    * @param {number} index The values' index.
    * @returns {number} The opacity of the input value.
    */
@@ -83,20 +76,12 @@ export class MaskSegmentViewHelper {
    * @returns {alphaFn} The corresponding alpha function.
    */
   getAlphaFunc() {
-    // get colours
-    const hiddenColours = [];
-    // zero is hidden by default
-    hiddenColours[0] = 0;
-    for (const segment of this.#hiddenSegments) {
-      hiddenColours.push(segment.number);
-    }
-
     // create alpha function
-    return function (value/*, index*/) {
-      for (let i = 0; i < hiddenColours.length; ++i) {
-        if (value === hiddenColours[i]) {
-          return 0;
-        }
+    // (zero is hidden by default)
+    return (value/*, index*/) => {
+      if (value === 0 ||
+        this.#hiddenNumbers.includes(value)) {
+        return 0;
       }
       // default
       return 255;
