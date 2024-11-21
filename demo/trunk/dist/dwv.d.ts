@@ -956,12 +956,6 @@ export declare class AppOptions {
     rootDocument: DocumentFragment;
 }
 
-export declare namespace BLACK {
-    let r: number;
-    let g: number;
-    let b: number;
-}
-
 /**
  * Build a multipart message.
  *
@@ -2626,6 +2620,25 @@ declare class Image_2 {
      */
     setPhotometricInterpretation(interp: string): void;
     /**
+     * Set the palette colour map.
+     *
+     * @param {ColourMap} map The colour map.
+     */
+    setPaletteColourMap(map: ColourMap): void;
+    /**
+     * Get the palette colour map.
+     *
+     * @returns {ColourMap} The colour map.
+     */
+    getPaletteColourMap(): ColourMap;
+    /**
+     * Update the palette colour map.
+     *
+     * @param {number} index The index to change the colour of.
+     * @param {RGB} colour The colour to use at index.
+     */
+    updatePaletteColourMap(index: number, colour: RGB): void;
+    /**
      * Get the planarConfiguration of the image.
      *
      * @returns {number} The planarConfiguration of the image.
@@ -2757,21 +2770,21 @@ declare class Image_2 {
      *
      * @param {number[][]} offsetsLists List of offset lists where
      *   to set the data.
-     * @param {RGB} value The value to set at the given offsets.
+     * @param {number} value The value to set at the given offsets.
      * @returns {Array} A list of objects representing the original values before
      *  replacing them.
      * @fires Image#imagecontentchange
      */
-    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
+    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
     /**
      * Set the inner buffer values at given offsets.
      *
      * @param {number[][]} offsetsLists List of offset lists
      *   where to set the data.
-     * @param {RGB|Array} value The value to set at the given offsets.
+     * @param {number|Array} value The value to set at the given offsets.
      * @fires Image#imagecontentchange
      */
-    setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
     /**
      * Get the value of the image at a specific coordinate.
      *
@@ -3541,9 +3554,9 @@ export declare class MaskSegmentViewHelper {
     /**
      * Add a segment to the hidden list.
      *
-     * @param {MaskSegment} segment The segment to add.
+     * @param {number} segmentNumber The segment number.
      */
-    addToHidden(segment: MaskSegment): void;
+    addToHidden(segmentNumber: number): void;
     /**
      * Remove a segment from the hidden list.
      *
@@ -3552,7 +3565,7 @@ export declare class MaskSegmentViewHelper {
     removeFromHidden(segmentNumber: number): void;
     /**
      * @callback alphaFn@callback alphaFn
-     * @param {number[]|number} value The pixel value.
+     * @param {number} value The pixel value.
      * @param {number} index The values' index.
      * @returns {number} The opacity of the input value.
      */
@@ -3561,7 +3574,7 @@ export declare class MaskSegmentViewHelper {
      *
      * @returns {alphaFn} The corresponding alpha function.
      */
-    getAlphaFunc(): (value: number[] | number, index: number) => number;
+    getAlphaFunc(): (value: number, index: number) => number;
     #private;
 }
 

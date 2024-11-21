@@ -206,43 +206,6 @@ function viewerSetup() {
     if (modality === 'SEG') {
       // log SEG details
       logFramePosPats(_app.getMetaData(event.dataid));
-
-      // example usage of a dicom SEG as data mask
-      const useSegAsMask = false;
-      if (useSegAsMask) {
-        // image to filter
-        const dataId = 0;
-        const vls = _app.getViewLayersByDataId(dataId);
-        const vc = vls[0].getViewController();
-        const img = _app.getData(dataId).image;
-        const imgGeometry = img.getGeometry();
-        const sliceSize = imgGeometry.getSize().getDimSize(2);
-        // SEG image
-        const segImage = _app.getData(event.dataid).image;
-        // calculate slice difference
-        const segOrigin0 = segImage.getGeometry().getOrigins()[0];
-        const segOrigin0Point = new dwv.Point([
-          segOrigin0.getX(), segOrigin0.getY(), segOrigin0.getZ()
-        ]);
-        const segOriginIndex = imgGeometry.worldToIndex(segOrigin0Point);
-        const z = segOriginIndex.get(2);
-        if (typeof z !== 'undefined') {
-          const indexOffset = z * sliceSize;
-          // set alpha function
-          vc.setViewAlphaFunction(function (value, index) {
-            // multiply by 3 since SEG is RGB
-            const segIndex = 3 * (index - indexOffset);
-            if (segIndex >= 0 &&
-              segImage.getValueAtOffset(segIndex) === 0 &&
-              segImage.getValueAtOffset(segIndex + 1) === 0 &&
-              segImage.getValueAtOffset(segIndex + 2) === 0) {
-              return 0;
-            } else {
-              return 0xff;
-            }
-          });
-        }
-      }
     }
 
     // DICOM SR specific
