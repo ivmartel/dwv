@@ -40,9 +40,6 @@ export class RGB {
   }
 }
 
-// black rgb
-export const BLACK = {r: 0, g: 0, b: 0};
-
 /**
  * Check if two rgb objects are equal.
  *

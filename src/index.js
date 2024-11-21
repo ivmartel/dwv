@@ -120,7 +120,6 @@ import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
 import {
   RGB,
-  BLACK,
   isEqualRgb,
   labToUintLab,
   srgbToCielab
@@ -192,7 +191,6 @@ export {
   toolList,
   toolOptions,
   Orientation,
-  BLACK,
   addTagsToDictionary,
   createImage,
   createMaskImage,
