@@ -639,7 +639,7 @@ export class DrawLayer {
       drawController.getAnnotationGroup().isEditable()) {
       // shape groups at the current position
       const shapeGroups =
-        this.getCurrentPosGroup().getChildren();
+        this.#getCurrentPosGroup().getChildren();
       // listen if we have shapes
       if (shapeGroups.length !== 0) {
         this.#konvaStage.listening(true);
@@ -883,7 +883,7 @@ export class DrawLayer {
    */
   isAnnotationVisible(id) {
     // get the group (annotation and group have same id)
-    const group = this.getGroup(id);
+    const group = this.#getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -901,7 +901,7 @@ export class DrawLayer {
    */
   setAnnotationVisibility(id, visible) {
     // get the group (annotation and group have same id)
-    const group = this.getGroup(id);
+    const group = this.#getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -1110,9 +1110,9 @@ export class DrawLayer {
   /**
    * Get the current position group.
    *
-   * @returns {Konva.Group|undefined} The Konva.Group.
+   * @returns {Konva.Group|undefined} The Konva group.
    */
-  getCurrentPosGroup() {
+  #getCurrentPosGroup() {
     if (typeof this.#currentPosGroupId === 'undefined') {
       return;
     }
@@ -1145,14 +1145,10 @@ export class DrawLayer {
    * Get a Konva group using its id.
    *
    * @param {string} id The group id.
-   * @returns {object|undefined} The Konva group.
+   * @returns {Konva.Group|undefined} The Konva group.
    */
-  getGroup(id) {
-    const group = this.getKonvaLayer().findOne('#' + id);
-    if (typeof group === 'undefined') {
-      logger.warn('Cannot find node with id: ' + id);
-    }
-    return group;
+  #getGroup(id) {
+    return this.getKonvaLayer().findOne('#' + id);
   }
 
   /**
