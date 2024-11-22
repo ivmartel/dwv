@@ -3565,7 +3565,7 @@ export declare class MaskSegmentViewHelper {
     removeFromHidden(segmentNumber: number): void;
     /**
      * @callback alphaFn@callback alphaFn
-     * @param {number} value The pixel value.
+     * @param {number|number[]} value The pixel value.
      * @param {number} index The values' index.
      * @returns {number} The opacity of the input value.
      */
@@ -3574,7 +3574,7 @@ export declare class MaskSegmentViewHelper {
      *
      * @returns {alphaFn} The corresponding alpha function.
      */
-    getAlphaFunc(): (value: number, index: number) => number;
+    getAlphaFunc(): (value: number | number[], index: number) => number;
     #private;
 }
 
