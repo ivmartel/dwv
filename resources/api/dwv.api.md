@@ -183,16 +183,6 @@ export class AppOptions {
     viewOnFirstLoadItem: boolean | undefined;
 }
 
-// @public (undocumented)
-export namespace BLACK {
-    let // (undocumented)
-    r: number;
-    let // (undocumented)
-    g: number;
-    let // (undocumented)
-    b: number;
-}
-
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
 
@@ -566,6 +556,7 @@ class Image_2 {
     getNumberOfComponents(): number;
     getOffsets(value: number | RGB): number[];
     getOriginForImageUid(uid: string): Point3D | undefined;
+    getPaletteColourMap(): ColourMap;
     getPhotometricInterpretation(): string;
     getPlanarConfiguration(): number;
     getRescaledDataRange(): NumberRange;
@@ -584,15 +575,17 @@ class Image_2 {
     isMonochrome(): boolean;
     removeEventListener(type: string, callback: Function): void;
     setAtOffsets(offsets: number[], value: number | RGB): void;
-    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
-    setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
+    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
     setMeta(rhs: {
         [x: string]: any;
     }): void;
+    setPaletteColourMap(map: ColourMap): void;
     setPhotometricInterpretation(interp: string): void;
     setPlanarConfiguration(config: number): void;
     setRescaleSlopeAndIntercept(inRsi: RescaleSlopeAndIntercept, offset?: number): void;
     transform(operator: Function): Image_2;
+    updatePaletteColourMap(index: number, colour: RGB): void;
 }
 export { Image_2 as Image }
 
@@ -749,8 +742,8 @@ export class MaskSegmentHelper {
 
 // @public
 export class MaskSegmentViewHelper {
-    addToHidden(segment: MaskSegment): void;
-    getAlphaFunc(): (value: number[] | number, index: number) => number;
+    addToHidden(segmentNumber: number): void;
+    getAlphaFunc(): (value: number, index: number) => number;
     isHidden(segmentNumber: number): boolean;
     removeFromHidden(segmentNumber: number): void;
 }
