@@ -743,7 +743,7 @@ export class MaskSegmentHelper {
 // @public
 export class MaskSegmentViewHelper {
     addToHidden(segmentNumber: number): void;
-    getAlphaFunc(): (value: number, index: number) => number;
+    getAlphaFunc(): (value: number | number[], index: number) => number;
     isHidden(segmentNumber: number): boolean;
     removeFromHidden(segmentNumber: number): void;
 }
