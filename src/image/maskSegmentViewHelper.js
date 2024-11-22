@@ -65,7 +65,7 @@ export class MaskSegmentViewHelper {
 
   /**
    * @callback alphaFn
-   * @param {number} value The pixel value.
+   * @param {number|number[]} value The pixel value.
    * @param {number} index The values' index.
    * @returns {number} The opacity of the input value.
    */
@@ -79,8 +79,9 @@ export class MaskSegmentViewHelper {
     // create alpha function
     // (zero is hidden by default)
     return (value/*, index*/) => {
-      if (value === 0 ||
-        this.#hiddenNumbers.includes(value)) {
+      if (!Array.isArray(value) && (
+        value === 0 ||
+        this.#hiddenNumbers.includes(value))) {
         return 0;
       }
       // default
