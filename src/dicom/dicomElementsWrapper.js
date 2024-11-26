@@ -666,15 +666,15 @@ export function getPhotometricInterpretation(dataElements) {
 }
 
 /**
- * Check if the received string is monochrome.
+ * Check if an input photometricInterpretation is monochrome.
  *
  * @param {string} photometricInterpretation The photometric interpretation.
- * @returns {boolean} True if it is monochrome.
+ * @returns {boolean} True if the input string starts with 'MONOCHROME'.
  */
 export function isMonochrome(photometricInterpretation) {
-  return !photometricInterpretation && photometricInterpretation.match(/MONOCHROME/) !== null;
+  return typeof photometricInterpretation !== 'undefined' &&
+    photometricInterpretation.match(/MONOCHROME/) !== null;
 }
-
 
 /**
  * Check an input tag.
