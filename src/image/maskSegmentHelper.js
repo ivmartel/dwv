@@ -91,7 +91,7 @@ export class MaskSegmentHelper {
         if (typeof segment.displayValue !== 'undefined') {
           values.push(segment.displayValue);
         } else {
-          values.push(segment.displayRGBValue);
+          values.push(segment.number);
         }
       } else {
         logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
