@@ -1919,19 +1919,6 @@ export declare class DrawLayer {
      */
     setCurrentPosition(position: Point, index?: Index): boolean;
     /**
-     * Get the current position group.
-     *
-     * @returns {Konva.Group|undefined} The Konva.Group.
-     */
-    getCurrentPosGroup(): Konva.Group | undefined;
-    /**
-     * Get a Konva group using its id.
-     *
-     * @param {string} id The group id.
-     * @returns {object|undefined} The Konva group.
-     */
-    getGroup(id: string): object | undefined;
-    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.

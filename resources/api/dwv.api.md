@@ -378,10 +378,8 @@ export class DrawLayer {
     flipScaleY(): void;
     flipScaleZ(): void;
     getBaseSize(): Scalar2D;
-    getCurrentPosGroup(): Konva.Group | undefined;
     getDataId(): string;
     getDrawController(): DrawController;
-    getGroup(id: string): object | undefined;
     getId(): string;
     getKonvaLayer(): Konva.Layer;
     getKonvaStage(): Konva.Stage;
