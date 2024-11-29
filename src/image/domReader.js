@@ -10,7 +10,7 @@ import {Point3D} from '../math/point';
  * @param {string} str The input string.
  * @returns {string} The input string converted to numbers
  *   using parseInt with a 36 radix
- *   (10 digits from 0 to 9 + 26 digits from a to z)
+ *   (10 digits from 0 to 9 + 26 digits from a to z).
  */
 function toUID(str) {
   return parseInt(str, 36).toString();
