@@ -1431,12 +1431,13 @@ export declare class DicomParser {
         [x: string]: DataElement;
     };
     /**
-     * Parse the complete DICOM file (given as input to the class).
+     * Parse a DICOM buffer.
      * Fills in the member object 'dataElements'.
      *
      * @param {ArrayBuffer} buffer The input array buffer.
+     * @param {Tag} [untilTag] Optional tag to stop the parsing once reached.
      */
-    parse(buffer: ArrayBuffer): void;
+    parse(buffer: ArrayBuffer, untilTag?: Tag): void;
     #private;
 }
 
