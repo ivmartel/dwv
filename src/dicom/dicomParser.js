@@ -714,7 +714,7 @@ export class DicomParser {
 
     if (typeof untilTag !== 'undefined' &&
       tag.equals(untilTag)) {
-      const element = new DataElement();
+      const element = new DataElement('');
       element.tag = tag;
       return element;
     }
