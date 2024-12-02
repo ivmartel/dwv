@@ -703,12 +703,22 @@ export class DicomParser {
    * @param {DataReader} reader The raw data reader.
    * @param {number} offset The offset where to start to read.
    * @param {boolean} implicit Is the DICOM VR implicit?
+   * @param {Tag} [untilTag] Optional tag to stop the reading once reached,
+   *   the returned element will only contain the tag.
    * @returns {DataElement} The data element.
    */
-  #readDataElement(reader, offset, implicit) {
+  #readDataElement(reader, offset, implicit, untilTag) {
     // Tag: group, element
     const readTagRes = this.#readTag(reader, offset);
     const tag = readTagRes.tag;
+
+    if (typeof untilTag !== 'undefined' &&
+      tag.equals(untilTag)) {
+      const element = new DataElement();
+      element.tag = tag;
+      return element;
+    }
+
     offset = readTagRes.endOffset;
 
     // Value Representation (VR)
@@ -1047,12 +1057,13 @@ export class DicomParser {
   }
 
   /**
-   * Parse the complete DICOM file (given as input to the class).
+   * Parse a DICOM buffer.
    * Fills in the member object 'dataElements'.
    *
    * @param {ArrayBuffer} buffer The input array buffer.
+   * @param {Tag} [untilTag] Optional tag to stop the parsing once reached.
    */
-  parse(buffer) {
+  parse(buffer, untilTag) {
     let offset = 0;
     let syntax = '';
     let dataElement = null;
@@ -1123,10 +1134,19 @@ export class DicomParser {
       dataReader = new DataReader(buffer, false);
     }
 
+    let reachedUntilTag = false;
+
     // DICOM data elements
     while (offset < buffer.byteLength) {
       // get the data element
-      dataElement = this.#readDataElement(dataReader, offset, implicit);
+      dataElement = this.#readDataElement(
+        dataReader, offset, implicit, untilTag);
+      // until tag
+      if (typeof untilTag !== 'undefined' &&
+        dataElement.tag.equals(untilTag)) {
+        reachedUntilTag = true;
+        break;
+      }
       // increment offset
       offset = dataElement.endOffset;
       // store the data element
@@ -1142,7 +1162,7 @@ export class DicomParser {
     if (isNaN(offset)) {
       throw new Error('Problem while parsing, bad offset');
     }
-    if (buffer.byteLength !== offset) {
+    if (!reachedUntilTag && buffer.byteLength !== offset) {
       logger.warn('Did not reach the end of the buffer: ' +
         offset + ' != ' + buffer.byteLength);
     }
