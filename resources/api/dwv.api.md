@@ -312,7 +312,8 @@ export class DicomParser {
     getDicomElements(): {
         [x: string]: DataElement;
     };
-    parse(buffer: ArrayBuffer): void;
+    parse(buffer: ArrayBuffer, untilTag?: Tag): void;
+    safeGet(key: string): any | undefined;
     setDecoderCharacterSet(characterSet: string): void;
     setDefaultCharacterSet(characterSet: string): void;
 }
