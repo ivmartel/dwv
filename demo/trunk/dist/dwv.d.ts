@@ -1431,6 +1431,13 @@ export declare class DicomParser {
         [x: string]: DataElement;
     };
     /**
+     * Safely get an elements' first value from the parsed elements.
+     *
+     * @param {string} key The tag key as for example '00100020'.
+     * @returns {any|undefined} The elements' value or undefined.
+     */
+    safeGet(key: string): any | undefined;
+    /**
      * Parse a DICOM buffer.
      * Fills in the member object 'dataElements'.
      *
