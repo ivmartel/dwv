@@ -1,3 +1,4 @@
+import {safeGet} from '../../src/dicom/dataElement';
 import {
   cleanString,
   hasDicomPrefix,
@@ -90,28 +91,14 @@ QUnit.test('Simple DICOM parsing - until tag',
 
     assert.ok(hasDicomPrefix(buffer), 'Response has DICOM prefix.');
 
-    function safeGet(tags, key) {
-      let res;
-      if (typeof tags[key] !== 'undefined') {
-        res = tags[key].value[0];
-      }
-      return res;
-    }
-    function getPatientName(tags) {
-      return safeGet(tags, '00100010');
-    };
-    function getPatientId(tags) {
-      return safeGet(tags, '00100020');
-    };
-    function getRows(tags) {
-      return safeGet(tags, '00280010');
-    };
-    function getCols(tags) {
-      return safeGet(tags, '00280011');
-    };
     function getRefUID(tags) {
       return safeGet(safeGet(tags, '00081140'), '00081155');
     };
+
+    const patientNameKey = '00100010';
+    const patientIdKey = '00100020';
+    const rowsKey = '00280010';
+    const colsKey = '00280011';
 
     const patientName = 'dwv^PatientName';
     const patientId = 'dwv-patient-id123';
@@ -125,11 +112,15 @@ QUnit.test('Simple DICOM parsing - until tag',
     dicomParser0.parse(buffer, untilTag0);
     const tags0 = dicomParser0.getDicomElements();
     // check values
-    assert.equal(getPatientName(tags0), patientName, '#0 Patient name');
-    assert.ok(typeof tags0[untilTag0.getKey()] === 'undefined',
+    assert.equal(
+      dicomParser0.safeGet(patientNameKey), patientName, '#0 Patient name');
+    assert.ok(
+      typeof tags0[untilTag0.getKey()] === 'undefined',
       '#0 Until tag is not defined');
-    assert.ok(typeof getCols(tags0) === 'undefined',
-      '#0 Number of columns');
+    assert.ok(
+      typeof tags0[rowsKey] === 'undefined', '#0 Number of rows');
+    assert.ok(
+      typeof tags0[colsKey] === 'undefined', '#0 Number of columns');
 
     // test #1: parse until pixel data
     const dicomParser1 = new DicomParser();
@@ -137,13 +128,18 @@ QUnit.test('Simple DICOM parsing - until tag',
     dicomParser1.parse(buffer, untilTag1);
     const tags1 = dicomParser1.getDicomElements();
     // check values
-    assert.equal(getPatientName(tags1), patientName, '#1 Patient name');
-    assert.equal(getPatientId(tags1), patientId, '#1 Patient id');
-    assert.equal(getCols(tags1), numCols, '#1 Number of columns');
-    assert.equal(getRows(tags1), numRows, '#1 Number of rows');
-    assert.equal(getCols(tags1), numCols, '#1 Number of columns');
-    assert.equal(getRefUID(tags1), refUID, '#1 ReferencedImageSequence SQ');
-    assert.ok(typeof tags1[untilTag1.getKey()] === 'undefined',
+    assert.equal(
+      dicomParser1.safeGet(patientNameKey), patientName, '#1 Patient name');
+    assert.equal(
+      dicomParser1.safeGet(patientIdKey), patientId, '#1 Patient id');
+    assert.equal(
+      dicomParser1.safeGet(rowsKey), numRows, '#1 Number of rows');
+    assert.equal(
+      dicomParser1.safeGet(colsKey), numCols, '#1 Number of columns');
+    assert.equal(
+      getRefUID(tags1), refUID, '#1 ReferencedImageSequence SQ');
+    assert.ok(
+      typeof tags1[untilTag1.getKey()] === 'undefined',
       '#1 Until tag is not defined');
   }
 );

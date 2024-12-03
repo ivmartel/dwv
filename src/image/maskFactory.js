@@ -4,6 +4,7 @@ import {
   dateToTimeObj,
   getDicomTime,
 } from '../dicom/dicomDate';
+import {safeGet} from '../dicom/dataElement';
 import {
   getImage2DSize,
   getSpacingFromMeasure,
@@ -653,36 +654,31 @@ export class MaskFactory {
     }
     // meta information
     const meta = getDefaultDicomSegJson();
-    const safeGet = function (key) {
-      let res;
-      const element = dataElements[key];
-      if (typeof element !== 'undefined') {
-        res = element.value[0];
-      }
-      return res;
+    const safeGetLocal = function (key) {
+      return safeGet(dataElements, key);
     };
     // Study
-    meta.StudyDate = safeGet('00080020');
-    meta.StudyTime = safeGet('00080030');
-    meta.StudyInstanceUID = safeGet('0020000D');
-    meta.StudyID = safeGet('00200010');
+    meta.StudyDate = safeGetLocal('00080020');
+    meta.StudyTime = safeGetLocal('00080030');
+    meta.StudyInstanceUID = safeGetLocal('0020000D');
+    meta.StudyID = safeGetLocal('00200010');
     // Series
-    meta.SeriesDate = safeGet('00080021');
-    meta.SeriesTime = safeGet('00080031');
-    meta.SeriesInstanceUID = safeGet('0020000E');
-    meta.SeriesNumber = safeGet('00200011');
+    meta.SeriesDate = safeGetLocal('00080021');
+    meta.SeriesTime = safeGetLocal('00080031');
+    meta.SeriesInstanceUID = safeGetLocal('0020000E');
+    meta.SeriesNumber = safeGetLocal('00200011');
     // ReferringPhysicianName
-    meta.ReferringPhysicianName = safeGet('00080090');
+    meta.ReferringPhysicianName = safeGetLocal('00080090');
     // patient info
-    meta.PatientName = safeGet('00100010');
-    meta.PatientID = safeGet('00100020');
-    meta.PatientBirthDate = safeGet('00100030');
-    meta.PatientSex = safeGet('00100040');
+    meta.PatientName = safeGetLocal('00100010');
+    meta.PatientID = safeGetLocal('00100020');
+    meta.PatientBirthDate = safeGetLocal('00100030');
+    meta.PatientSex = safeGetLocal('00100040');
     // Enhanced General Equipment Module
-    meta.Manufacturer = safeGet('00080070');
-    meta.ManufacturerModelName = safeGet('00081090');
-    meta.DeviceSerialNumber = safeGet('00181000');
-    meta.SoftwareVersions = safeGet('00181020');
+    meta.Manufacturer = safeGetLocal('00080070');
+    meta.ManufacturerModelName = safeGetLocal('00081090');
+    meta.DeviceSerialNumber = safeGetLocal('00181000');
+    meta.SoftwareVersions = safeGetLocal('00181020');
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
     meta.DimensionIndexSequence = dimension.indices;

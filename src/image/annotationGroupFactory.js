@@ -4,6 +4,7 @@ import {
   dateToTimeObj,
   getDicomTime,
 } from '../dicom/dicomDate';
+import {safeGet} from '../dicom/dataElement';
 import {
   ValueTypes,
   RelationshipTypes,
@@ -228,24 +229,19 @@ export class AnnotationGroupFactory {
     }
     const annotationGroup = new AnnotationGroup(annotations);
 
-    const safeGet = function (key) {
-      let res;
-      const element = dataElements[key];
-      if (typeof element !== 'undefined') {
-        res = element.value[0];
-      }
-      return res;
+    const safeGetLocal = function (key) {
+      return safeGet(dataElements, key);
     };
 
     // StudyInstanceUID
-    annotationGroup.setMetaValue('StudyInstanceUID', safeGet('0020000D'));
+    annotationGroup.setMetaValue('StudyInstanceUID', safeGetLocal('0020000D'));
     // Modality
-    annotationGroup.setMetaValue('Modality', safeGet('00080060'));
+    annotationGroup.setMetaValue('Modality', safeGetLocal('00080060'));
     // patient info
-    annotationGroup.setMetaValue('PatientName', safeGet('00100010'));
-    annotationGroup.setMetaValue('PatientID', safeGet('00100020'));
-    annotationGroup.setMetaValue('PatientBirthDate', safeGet('00100030'));
-    annotationGroup.setMetaValue('PatientSex', safeGet('00100040'));
+    annotationGroup.setMetaValue('PatientName', safeGetLocal('00100010'));
+    annotationGroup.setMetaValue('PatientID', safeGetLocal('00100020'));
+    annotationGroup.setMetaValue('PatientBirthDate', safeGetLocal('00100030'));
+    annotationGroup.setMetaValue('PatientSex', safeGetLocal('00100040'));
 
     // ReferencedSeriesSequence
     const element = dataElements['00081115'];

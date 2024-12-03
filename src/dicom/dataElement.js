@@ -74,3 +74,18 @@ export class DataElement {
     this.vr = vr;
   }
 }
+
+/**
+ * Safely get an elements' first value from a list of elements.
+ *
+ * @param {Object<string, DataElement>} tags The list of tags.
+ * @param {string} key The tag key as for example '00100020'.
+ * @returns {any|undefined} The elements' value or undefined.
+ */
+export function safeGet(tags, key) {
+  let res;
+  if (typeof tags[key] !== 'undefined') {
+    res = tags[key].value[0];
+  }
+  return res;
+};

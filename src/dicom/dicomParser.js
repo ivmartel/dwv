@@ -12,7 +12,10 @@ import {
   transferSyntaxKeywords,
   vrTypes,
 } from './dictionary';
-import {DataElement} from './dataElement';
+import {
+  safeGet,
+  DataElement
+} from './dataElement';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
 
@@ -573,6 +576,16 @@ export class DicomParser {
    */
   getDicomElements() {
     return this.#dataElements;
+  }
+
+  /**
+   * Safely get an elements' first value from the parsed elements.
+   *
+   * @param {string} key The tag key as for example '00100020'.
+   * @returns {any|undefined} The elements' value or undefined.
+   */
+  safeGet(key) {
+    return safeGet(this.#dataElements, key);
   }
 
   /**
