@@ -1086,10 +1086,12 @@ export declare class Circle {
      * Quantify an circle according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -2081,10 +2083,12 @@ export declare class Ellipse {
      * Quantify an ellipse according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -4261,10 +4265,12 @@ export declare class Rectangle {
      * Quantify a rectangle according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -5511,16 +5517,20 @@ export declare class ViewController {
      *
      * @param {Point2D} min Minimum point.
      * @param {Point2D} max Maximum point.
+     * @param {Index} index The index at which to get the
+     *   image values (combined with min/max).
      * @returns {Array} A list of values.
      */
-    getImageRegionValues(min: Point2D, max: Point2D): any[];
+    getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     /**
      * Get some values from the associated image in variable regions.
      *
      * @param {number[][][]} regions A list of [x, y] pairs (min, max).
+     * @param {Index} index The index at which to get the
+     *   image values (combined with regions min/max).
      * @returns {Array} A list of values.
      */
-    getImageVariableRegionValues(regions: number[][][]): any[];
+    getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     /**
      * Can the image values be quantified?
      *
