@@ -614,7 +614,7 @@ export class DrawLayer {
   activateCurrentPositionShapes(flag) {
     const konvaLayer = this.getKonvaLayer();
 
-    // stop listening
+    // stop stage listening
     this.#konvaStage.listening(false);
 
     if (typeof this.#shapeHandler !== 'undefined') {
@@ -637,12 +637,13 @@ export class DrawLayer {
     const drawController = this.getDrawController();
     if (flag &&
       drawController.getAnnotationGroup().isEditable()) {
+      // start stage listening
+      this.#konvaStage.listening(true);
       // shape groups at the current position
       const shapeGroups =
         this.getCurrentPosGroup().getChildren();
       // listen if we have shapes
       if (shapeGroups.length !== 0) {
-        this.#konvaStage.listening(true);
         konvaLayer.listening(true);
       }
       // add listeners for position group
