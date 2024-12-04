@@ -91,7 +91,7 @@ QUnit.test('Simple DICOM parsing - until tag',
 
     assert.ok(hasDicomPrefix(buffer), 'Response has DICOM prefix.');
 
-    function getRefUID(tags) {
+    const getRefUID = function (tags) {
       return safeGet(safeGet(tags, '00081140'), '00081155');
     };
 
