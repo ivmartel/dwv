@@ -64,9 +64,6 @@ QUnit.test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
       get2DSpacing: function () {
         return {x: 1, y: 1};
       },
-      getCurrentPosition: function () {
-        return new Index([0, 0, 0]);
-      },
       getImageVariableRegionValues: function () {
         return [0, 1, 1, 0, 0, 1, 1, 0];
       },
@@ -81,7 +78,8 @@ QUnit.test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
       stdDev: {value: 0.5, unit: ''},
       surface: {value: 0.06283185307179587, unit: undefined}
     };
-    const resQuant0 = e0.quantify(mockVc0);
+    const index0 = new Index([0, 0, 0]);
+    const resQuant0 = e0.quantify(mockVc0, index0);
     assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
     assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
     assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');

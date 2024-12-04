@@ -2,6 +2,7 @@ import {getStats} from './stats';
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import {Index} from './index';
 import {Point2D} from '../math/point';
 import {ViewController} from '../app/viewController';
 import {Scalar2D} from './scalar';
@@ -158,10 +159,12 @@ export class Circle {
    * Quantify an circle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
+   * @param {Index} index The index at which to get the
+   *   image values.
    * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
-  quantify(viewController, flags) {
+  quantify(viewController, index, flags) {
     const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
@@ -181,7 +184,8 @@ export class Circle {
     if (viewController.canQuantifyImage()) {
       const regions = this.getRound();
       if (regions.length !== 0) {
-        const values = viewController.getImageVariableRegionValues(regions);
+        const values = viewController.getImageVariableRegionValues(
+          regions, index);
         const unit = viewController.getPixelUnit();
         const quantif = getStats(values, flags);
         quant.min = {value: quantif.min, unit: unit};

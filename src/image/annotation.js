@@ -254,7 +254,9 @@ export class Annotation {
       typeof this.mathShape.quantify !== 'undefined') {
       this.quantification = this.mathShape.quantify(
         this.#viewController,
-        getFlags(this.textExpr));
+        this.#viewController.getCurrentIndex(),
+        getFlags(this.textExpr)
+      );
     }
   }
 

@@ -186,10 +186,12 @@ export class Rectangle {
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
+   * @param {Index} index The index at which to get the
+   *   image values.
    * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
-  quantify(viewController, flags) {
+  quantify(viewController, index, flags) {
     const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
@@ -212,7 +214,8 @@ export class Rectangle {
     // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const round = this.getRound();
-      const values = viewController.getImageRegionValues(round.min, round.max);
+      const values = viewController.getImageRegionValues(
+        round.min, round.max, index);
       const unit = viewController.getPixelUnit();
       const quantif = getStats(values, flags);
       quant.min = {value: quantif.min, unit: unit};

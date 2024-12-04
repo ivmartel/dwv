@@ -354,7 +354,8 @@ export class ViewController {
    * Extract a slice from an image at the given index and orientation.
    *
    * @param {Image} image The image to parse.
-   * @param {Index} index The current index.
+   * @param {Index} index The index at which to get the
+   *   image values.
    * @param {boolean} isRescaled Flag for rescaled values (default false).
    * @param {Matrix33} orientation The desired orientation.
    * @returns {Image} The extracted slice.
@@ -390,25 +391,27 @@ export class ViewController {
    *
    * @param {Point2D} min Minimum point.
    * @param {Point2D} max Maximum point.
+   * @param {Index} index The index at which to get the
+   *   image values (combined with min/max).
    * @returns {Array} A list of values.
    */
-  getImageRegionValues(min, max) {
+  getImageRegionValues(min, max, index) {
     let image = this.#view.getImage();
     const orientation = this.#view.getOrientation();
-    let currentIndex = this.getCurrentIndex();
+    let imageIndex = index;
     let rescaled = true;
 
     // create oriented slice if needed
     if (!isIdentityMat33(orientation)) {
-      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      image = this.#getSlice(image, imageIndex, rescaled, orientation);
       // update position
-      currentIndex = new Index([0, 0, 0]);
+      imageIndex = new Index([0, 0, 0]);
       rescaled = false;
     }
 
     // get region values
     const iter = getRegionSliceIterator(
-      image, currentIndex, rescaled, min, max);
+      image, imageIndex, rescaled, min, max);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
@@ -420,25 +423,27 @@ export class ViewController {
    * Get some values from the associated image in variable regions.
    *
    * @param {number[][][]} regions A list of [x, y] pairs (min, max).
+   * @param {Index} index The index at which to get the
+   *   image values (combined with regions min/max).
    * @returns {Array} A list of values.
    */
-  getImageVariableRegionValues(regions) {
+  getImageVariableRegionValues(regions, index) {
     let image = this.#view.getImage();
     const orientation = this.#view.getOrientation();
-    let currentIndex = this.getCurrentIndex();
+    let imageIndex = index;
     let rescaled = true;
 
     // create oriented slice if needed
     if (!isIdentityMat33(orientation)) {
-      image = this.#getSlice(image, currentIndex, rescaled, orientation);
+      image = this.#getSlice(image, imageIndex, rescaled, orientation);
       // update position
-      currentIndex = new Index([0, 0, 0]);
+      imageIndex = new Index([0, 0, 0]);
       rescaled = false;
     }
 
     // get region values
     const iter = getVariableRegionSliceIterator(
-      image, currentIndex, rescaled, regions);
+      image, imageIndex, rescaled, regions);
     let values = [];
     if (iter) {
       values = getIteratorValues(iter);
