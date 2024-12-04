@@ -801,9 +801,6 @@ export class DrawLayer {
    * @param {Annotation} annotation The annotation to update.
    */
   #updateAnnotationDraw(annotation) {
-    // update quantification after math shape update
-    annotation.updateQuantification();
-    // update draw if needed
     if (this.#removeAnnotationDraw(annotation)) {
       this.#addAnnotationDraw(annotation, true);
     }
