@@ -154,6 +154,12 @@ export class AnnotationGroup {
   update(annotation, propKeys) {
     const index = this.#list.findIndex((item) => item.id === annotation.id);
     if (index !== -1) {
+      // update quantification if needed
+      if (propKeys.includes('mathShape') ||
+        propKeys.includes('textExpr')) {
+        annotation.updateQuantification();
+      }
+      // update list
       this.#list[index] = annotation;
       /**
        * Annotation update event.
