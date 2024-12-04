@@ -5,6 +5,18 @@ import {Image} from '../image/image';
 import {Point3D} from '../math/point';
 
 /**
+ * Convert a string into an UID.
+ *
+ * @param {string} str The input string.
+ * @returns {string} The input string converted to numbers
+ *   using parseInt with a 36 radix
+ *   (10 digits from 0 to 9 + 26 digits from a to z).
+ */
+function toUID(str) {
+  return parseInt(str, 36).toString();
+}
+
+/**
  * Create a simple array buffer from an ImageData buffer.
  *
  * @param {object} imageData The ImageData taken from a context.
@@ -87,29 +99,40 @@ export function getViewFromDOMImage(domImage, origin, index) {
 
   // image properties
   const info = {};
+  let seriesUID;
   if (typeof origin === 'string') {
     info['origin'] = {value: origin};
+    seriesUID = toUID(origin);
   } else {
     info['fileName'] = {value: origin.name};
+    seriesUID = toUID(origin.name);
     info['fileType'] = {value: origin.type};
     info['fileLastModifiedDate'] = {value: origin.lastModified};
   }
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
 
+  // image identifier (~UID like)
   const sliceIndex = index ? index : 0;
   info['imageUid'] = {value: sliceIndex};
+  // series identifier (~UID like)
+  info['seriesUid'] = {value: seriesUID};
 
   // create view
   const imageBuffer = imageDataToBuffer(imageData);
   const image = getDefaultImage(
     width, height, sliceIndex, imageBuffer, 1, sliceIndex.toString());
 
+  // add seriesUID to meta
+  const meta = image.getMeta();
+  meta.SeriesInstanceUID = seriesUID;
+  image.setMeta(meta);
+
   // return
   return {
     data: {
       image: image,
-      info: info
+      meta: info
     },
     source: origin
   };
@@ -140,17 +163,24 @@ export function getViewFromDOMVideo(
 
   // video properties
   const info = {};
+  let seriesUID;
   if (typeof origin === 'string') {
     info['origin'] = {value: origin};
+    seriesUID = toUID(origin);
   } else {
     info['fileName'] = {value: origin.name};
+    seriesUID = toUID(origin.name);
     info['fileType'] = {value: origin.type};
     info['fileLastModifiedDate'] = {value: origin.lastModified};
   }
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
   info['numberOfFrames'] = {value: numberOfFrames};
+
+  // image identifier (~UID like)
   info['imageUid'] = {value: 0};
+  // series identifier (~UID like)
+  info['seriesUid'] = {value: seriesUID};
 
   // draw the image in the canvas in order to get its data
   const canvas = document.createElement('canvas');
@@ -187,11 +217,15 @@ export function getViewFromDOMVideo(
       // create view
       image = getDefaultImage(
         width, height, 1, imgBuffer, numberOfFrames, dataIndex.toString());
+      // add seriesUID to meta
+      const meta = image.getMeta();
+      meta.SeriesInstanceUID = seriesUID;
+      image.setMeta(meta);
       // call callback
       onloaditem({
         data: {
           image: image,
-          info: info
+          meta: info
         },
         source: origin
       });
