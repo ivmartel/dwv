@@ -269,10 +269,15 @@ export class LayerGroup {
   /**
    * Get the Id of the container div.
    *
-   * @returns {string} The id of the div.
+   * @returns {string|undefined} The id of the div.
    */
   getDivId() {
-    return this.#containerDiv.id;
+    let divId;
+    // could be null if html changed
+    if (this.#containerDiv !== null) {
+      divId = this.#containerDiv.id;
+    }
+    return divId;
   }
 
   /**

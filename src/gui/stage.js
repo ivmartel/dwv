@@ -328,7 +328,7 @@ export class Stage {
    * Get a layer group from an HTML element id.
    *
    * @param {string} id The element id to find.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroupByDivId(id) {
     return this.#layerGroups.find(function (item) {

@@ -491,7 +491,7 @@ export class App {
    * The layer is available after the first loaded item.
    *
    * @param {string} divId The div id.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroupByDivId(divId) {
     return this.#stage.getLayerGroupByDivId(divId);
