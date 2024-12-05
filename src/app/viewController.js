@@ -380,7 +380,7 @@ export class ViewController {
     const sliceSpacing = new Spacing(spacingValues);
     const sliceOrigin = new Point3D(0, 0, 0);
     const sliceGeometry =
-      new Geometry(sliceOrigin, sliceSize, sliceSpacing);
+      new Geometry([sliceOrigin], sliceSize, sliceSpacing);
     // slice image
     // @ts-ignore
     return new Image(sliceGeometry, sliceValues);

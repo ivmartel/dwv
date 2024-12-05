@@ -71,20 +71,20 @@ export class Geometry {
   #newOrigins = false;
 
   /**
-   * @param {Point3D} origin The object origin (a 3D point).
+   * @param {Point3D[]} origins The object origins.
    * @param {Size} size The object size.
    * @param {Spacing} spacing The object spacing.
    * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
    *   default to 3*3 identity).
    * @param {number} [time] Optional time index.
    */
-  constructor(origin, size, spacing, orientation, time) {
-    this.#origins = [origin];
+  constructor(origins, size, spacing, orientation, time) {
+    this.#origins = origins;
     this.#size = size;
     this.#spacing = spacing;
     if (typeof time !== 'undefined') {
       this.#initialTime = time;
-      this.#timeOrigins[time] = [origin];
+      this.#timeOrigins[time] = origins;
     }
     // check input orientation
     if (typeof orientation !== 'undefined') {

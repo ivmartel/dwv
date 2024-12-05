@@ -153,7 +153,7 @@ export class ImageFactory {
     const extractor = new TagValueExtractor();
     const time = extractor.getTime(dataElements);
     const geometry = new Geometry(
-      origin, size, spacing, orientationMatrix, time);
+      [origin], size, spacing, orientationMatrix, time);
 
     // SOP Instance UID
     let sopInstanceUid;
