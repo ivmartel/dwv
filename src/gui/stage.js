@@ -245,8 +245,8 @@ export class Stage {
    */
   getViewLayersByDataId(dataId) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getViewLayersByDataId(dataId));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getViewLayersByDataId(dataId));
     }
     return res;
   }
@@ -262,8 +262,8 @@ export class Stage {
    */
   getViewLayers(callbackFn) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getViewLayers(callbackFn));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getViewLayers(callbackFn));
     }
     return res;
   }
@@ -276,8 +276,8 @@ export class Stage {
    */
   getDrawLayersByDataId(dataId) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getDrawLayersByDataId(dataId));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getDrawLayersByDataId(dataId));
     }
     return res;
   }
@@ -293,8 +293,8 @@ export class Stage {
    */
   getDrawLayers(callbackFn) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getDrawLayers(callbackFn));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getDrawLayers(callbackFn));
     }
     return res;
   }
@@ -357,8 +357,8 @@ export class Stage {
    */
   empty() {
     this.unbindLayerGroups();
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].empty();
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.empty();
     }
     this.#layerGroups = [];
     this.#activeLayerGroupIndex = undefined;
@@ -404,8 +404,8 @@ export class Stage {
    * Reset the stage: calls reset on all layer groups.
    */
   reset() {
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].reset();
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.reset();
     }
   }
 
@@ -413,8 +413,8 @@ export class Stage {
    * Draw the stage: calls draw on all layer groups.
    */
   draw() {
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].draw();
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.draw();
     }
   }
 
@@ -494,8 +494,8 @@ export class Stage {
   setImageSmoothing(flag) {
     this.#imageSmoothing = flag;
     // set for existing layer groups
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].setImageSmoothing(flag);
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.setImageSmoothing(flag);
     }
   }
 
