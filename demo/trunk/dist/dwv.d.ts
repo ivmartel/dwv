@@ -476,9 +476,9 @@ export declare class App {
      * The layer is available after the first loaded item.
      *
      * @param {string} divId The div id.
-     * @returns {LayerGroup} The layer group.
+     * @returns {LayerGroup|undefined} The layer group.
      */
-    getLayerGroupByDivId(divId: string): LayerGroup;
+    getLayerGroupByDivId(divId: string): LayerGroup | undefined;
     /**
      * Get the number of layer groups.
      *
@@ -3026,9 +3026,9 @@ export declare class LayerGroup {
     /**
      * Get the Id of the container div.
      *
-     * @returns {string} The id of the div.
+     * @returns {string|undefined} The id of the div.
      */
-    getDivId(): string;
+    getDivId(): string | undefined;
     /**
      * Get the layer scale.
      *
