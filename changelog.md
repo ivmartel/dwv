@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.34.1](https://github.com/ivmartel/dwv/releases/tag/v0.34.1) - 05/12/2024
+
+### Fixed
+
+- Annotation update always updates quantification [#1820](https://github.com/ivmartel/dwv/issues/1820)
+- New annotation cannot be moved after loading another [#1819](https://github.com/ivmartel/dwv/issues/1819)
+- Cannot annotate on raw image (jpg, png...) [#1813](https://github.com/ivmartel/dwv/issues/1813)
+
+---
+
 ## [v0.34.0](https://github.com/ivmartel/dwv/releases/tag/v0.34.0) - 14/11/2024
 
 ### Added
