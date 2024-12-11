@@ -95,6 +95,7 @@ export class ThreadPool {
    * @param {object} event The error event.
    */
   handleWorkerError = (event) => {
+    console.log("worker error", event, event.message);
     // stop all threads
     this.#stop();
     // callback
@@ -217,7 +218,7 @@ class WorkerThread {
     this.runningTask = workerTask;
     // create a new web worker if not done yet
     if (typeof this.worker === 'undefined') {
-      this.worker = new Worker(this.runningTask.script);
+      this.worker = new Worker(this.runningTask.script, { type: "module" });
       // set callbacks
       this.worker.onmessage = this.onmessage;
       this.worker.onerror = this.onerror;
