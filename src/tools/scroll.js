@@ -178,41 +178,30 @@ export class Scroll {
     }
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
-    const viewController = viewLayer.getViewController();
-
-    let newPosition;
+    const positionHelper = layerGroup.getPositionHelper();
 
     // difference to last Y position
     const diffY = point.getY() - this.#startPoint.getY();
     const yMove = (Math.abs(diffY) > 15);
+    // difference to last X position
+    const diffX = point.getX() - this.#startPoint.getX();
+    const xMove = (Math.abs(diffX) > 15);
+
     // do not trigger for small moves
     if (yMove && layerGroup.canScroll()) {
       // update view controller
       if (diffY > 0) {
-        newPosition = viewController.getDecrementScrollPosition();
+        positionHelper.decrementScrollPosition();
       } else {
-        newPosition = viewController.getIncrementScrollPosition();
+        positionHelper.incrementScrollPosition();
       }
-    }
-
-    // difference to last X position
-    const diffX = point.getX() - this.#startPoint.getX();
-    const xMove = (Math.abs(diffX) > 15);
-    // do not trigger for small moves
-    if (xMove && layerGroup.moreThanOne(3)) {
+    } else if (xMove && layerGroup.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
-        newPosition = viewController.getIncrementPosition(3);
+        positionHelper.incrementPosition(3);
       } else {
-        newPosition = viewController.getDecrementPosition(3);
+        positionHelper.decrementPosition(3);
       }
-    }
-
-    // set all layers if at least one can be set
-    if (typeof newPosition !== 'undefined' &&
-      layerGroup.isPositionInBounds(newPosition)) {
-      viewController.setCurrentPosition(newPosition);
     }
 
     // reset origin point

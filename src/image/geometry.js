@@ -432,6 +432,24 @@ export class Geometry {
   }
 
   /**
+   * Get the geometrical range, ie the minimum and maximum
+   *   positions.
+   *
+   * @returns {Point[]} The min and max positions.
+   */
+  getRange() {
+    const nDims = this.getSize().length();
+    const minValues = new Array(nDims);
+    minValues.fill(0);
+    const minIndex = new Index(minValues);
+    const maxIndex = new Index(this.getSize().getValues());
+    return [
+      this.indexToWorld(minIndex),
+      this.indexToWorld(maxIndex)
+    ];
+  }
+
+  /**
    * Convert an index into world coordinates.
    *
    * @param {Index} index The index to convert.
@@ -611,4 +629,52 @@ export function getSliceGeometrySpacing(origins) {
   }
 
   return spacing;
+}
+
+/**
+ * Merge two geometries into one using the largest size and
+ *   smallest resolution.
+ *
+ * @param {Geometry} geometry1 The first geometry.
+ * @param {Geometry} geometry2 The second geometry.
+ * @returns {Geometry} The merged geometry.
+ */
+export function mergeGeometries(geometry1, geometry2) {
+  const minByIndex = function (array1, array2) {
+    return array1.map((v, i) => Math.min(v, array2[i]));
+  };
+  const maxByIndex = function (array1, array2) {
+    return array1.map((v, i) => Math.max(v, array2[i]));
+  };
+
+  const newSize = new Size(maxByIndex(
+    geometry1.getSize().getValues(),
+    geometry2.getSize().getValues()
+  ));
+  const newSpacing = new Spacing(minByIndex(
+    geometry1.getSpacing().getValues(),
+    geometry2.getSpacing().getValues()
+  ));
+
+  const range1 = geometry1.getRange();
+  const range2 = geometry2.getRange();
+  const minValues = minByIndex(
+    range1[0].getValues(),
+    range2[0].getValues()
+  );
+  const newOrigins = [];
+  for (let i = 0; i < newSize.get(2); ++i) {
+    const values = minValues.slice();
+    values[2] = minValues[2] + i * newSpacing.get(2);
+    newOrigins.push(new Point3D(
+      values[0], values[1], values[2]
+    ));
+  }
+
+  return new Geometry(
+    newOrigins,
+    newSize,
+    newSpacing,
+    geometry1.getOrientation()
+  );
 }

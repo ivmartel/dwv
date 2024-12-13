@@ -313,7 +313,7 @@ export class Floodfill {
       if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
-      viewController.incrementIndex(2);
+      viewController.incrementPosition(2);
     }
     viewController.setCurrentPosition(pos);
 
@@ -322,7 +322,7 @@ export class Floodfill {
       if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
-      viewController.decrementIndex(2);
+      viewController.decrementPosition(2);
     }
     viewController.setCurrentPosition(pos);
   }

@@ -160,6 +160,8 @@ export class ZoomAndPan {
     const lineRatio = newLine.getLength() / this.#pointsLine.getLength();
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
+    const positionHelper = layerGroup.getPositionHelper();
+
     const viewLayer = layerGroup.getActiveViewLayer();
     const viewController = viewLayer.getViewController();
 
@@ -173,16 +175,10 @@ export class ZoomAndPan {
       }
       // update view controller
       if (layerGroup.canScroll()) {
-        let newPosition;
         if (diffY > 0) {
-          newPosition = viewController.getIncrementScrollPosition();
+          positionHelper.incrementScrollPosition();
         } else {
-          newPosition = viewController.getDecrementScrollPosition();
-        }
-        // set all layers if at least one can be set
-        if (typeof newPosition !== 'undefined' &&
-          layerGroup.isPositionInBounds(newPosition)) {
-          viewController.setCurrentPosition(newPosition);
+          positionHelper.decrementScrollPosition();
         }
       }
     } else {
