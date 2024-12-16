@@ -64,18 +64,3 @@ export class WindowLevel {
   }
 
 } // WindowLevel class
-
-/**
- * List of default window level presets.
- *
- * @type {Object.<string, Object.<string, WindowLevel>>}
- */
-export const defaultPresets = {
-  CT: {
-    mediastinum: new WindowLevel(40, 400),
-    lung: new WindowLevel(-500, 1500),
-    bone: new WindowLevel(500, 2000),
-    brain: new WindowLevel(40, 80),
-    head: new WindowLevel(90, 350)
-  }
-};

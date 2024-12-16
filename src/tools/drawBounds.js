@@ -9,6 +9,35 @@ import Konva from 'konva';
 /* eslint-enable no-unused-vars */
 
 /**
+ * List of default label texts.
+ *
+ * @type {Object.<string, Object.<string, string>>}
+ */
+export const defaultLabelTexts = {
+  arrow: {
+    '*': ''
+  },
+  circle: {
+    '*': '{surface}'
+  },
+  ellipse: {
+    '*': '{surface}'
+  },
+  protractor: {
+    '*': '{angle}'
+  },
+  rectangle: {
+    '*': '{surface}'
+  },
+  roi: {
+    '*': ''
+  },
+  ruler: {
+    '*': '{length}'
+  }
+};
+
+/**
  * Is an input node's name 'label'.
  *
  * @param {Konva.Node} node A Konva node.

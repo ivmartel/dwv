@@ -1,7 +1,8 @@
 import {ROI} from '../math/roi';
 import {Point2D} from '../math/point';
-import {defaults} from '../app/defaults';
+import {custom} from '../app/custom';
 import {
+  defaultLabelTexts,
   getLineShape,
   DRAW_DEBUG,
   getDefaultAnchor,
@@ -320,7 +321,13 @@ export class RoiFactory {
    * @returns {object} The label list.
    */
   #getDefaultLabel() {
-    return defaults.labelText.roi;
+    if (typeof custom.labelTexts !== 'undefined' &&
+      typeof custom.labelTexts[this.#name] !== 'undefined'
+    ) {
+      return custom.labelTexts[this.#name];
+    } else {
+      return defaultLabelTexts[this.#name];
+    }
   }
 
   /**
