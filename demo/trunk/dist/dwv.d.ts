@@ -2084,14 +2084,14 @@ export declare class Ellipse {
  */
 export declare class Geometry {
     /**
-     * @param {Point3D} origin The object origin (a 3D point).
+     * @param {Point3D[]} origins The object origins.
      * @param {Size} size The object size.
      * @param {Spacing} spacing The object spacing.
      * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
      *   default to 3*3 identity).
      * @param {number} [time] Optional time index.
      */
-    constructor(origin: Point3D, size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
+    constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     /**
      * Get the time value that was passed at construction.
      *
@@ -2230,6 +2230,13 @@ export declare class Geometry {
      * @returns {boolean} True if the given coordinates are within bounds.
      */
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
+    /**
+     * Get the geometrical range, ie the minimum and maximum
+     *   positions.
+     *
+     * @returns {Point[]} The min and max positions.
+     */
+    getRange(): Point[];
     /**
      * Convert an index into world coordinates.
      *
@@ -2936,14 +2943,32 @@ export declare class Index {
      */
     compare(rhs: Index): number[];
     /**
-     * Add another index to this one.
+     * Add another index to this one and return
+     *   the result as a new index.
      *
      * @param {Index} rhs The index to add.
      * @returns {Index} The index representing the sum of both indices.
      */
     add(rhs: Index): Index;
     /**
-     * Get the current index with a new 2D base.
+     * Increment this index by 1 at the given dimension
+     *   and return the result as a new index.
+     *
+     * @param {number} dim The dimension number.
+     * @returns {Index} The result index.
+     */
+    next(dim: number): Index;
+    /**
+     * Decrement this index by 1 at the given dimension
+     *   and return the result as a new index.
+     *
+     * @param {number} dim The dimension number.
+     * @returns {Index} The result index.
+     */
+    previous(dim: number): Index;
+    /**
+     * Get the current index with a new 2D base
+     *   and return the result as a new index.
      *
      * @param {number} i The new 0 index.
      * @param {number} j The new 1 index.
@@ -2992,6 +3017,12 @@ export declare class LayerGroup {
      * @param {HTMLElement} containerDiv The associated HTML div.
      */
     constructor(containerDiv: HTMLElement);
+    /**
+     * Get the position helper.
+     *
+     * @returns {PositionHelper} The position helper.
+     */
+    getPositionHelper(): PositionHelper;
     /**
      * Get the showCrosshair flag.
      *
@@ -3227,7 +3258,7 @@ export declare class LayerGroup {
      */
     moreThanOne(dim: number): boolean;
     /**
-     * Update layers (but not the active view layer) to a position change.
+     * Update layers (but not the event source layer) to a position change.
      *
      * @param {object} event The position change event.
      * @function
@@ -4110,6 +4141,111 @@ export declare class Point3D {
      * @returns {Vector3D} The 3D vector from the input point to this one.
      */
     minus(point3D: Point3D): Vector3D;
+    #private;
+}
+
+/**
+ * Position helper.
+ */
+declare class PositionHelper {
+    /**
+     * @param {View} view The associated view.
+     */
+    constructor(view: View);
+    /**
+     * Get the geometry.
+     *
+     * @returns {Geometry} The geometry.
+     */
+    getGeometry(): Geometry;
+    /**
+     * Get the scroll index.
+     *
+     * @returns {number} The scroll index.
+     */
+    getScrollIndex(): number;
+    /**
+     * Get the current position.
+     *
+     * @returns {Point} The current position.
+     */
+    getCurrentPositon(): Point;
+    /**
+     * Set the current position.
+     *
+     * @param {Point} position The position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    setCurrentPositon(position: Point, silent?: boolean): boolean;
+    /**
+     * Set the current position only if it is in the geometry bounds.
+     *
+     * @param {Point} position The position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    setCurrentPositonSafe(position: Point, silent?: boolean): boolean;
+    /**
+     * Merge with another helper.
+     *
+     * @param {PositionHelper} rhs The helper to merge with this one.
+     */
+    merge(rhs: PositionHelper): void;
+    /**
+     * Check if the current position (default) or
+     * the provided position is in bounds.
+     *
+     * @param {Point} position Optional position.
+     * @returns {boolean} True is the position is in bounds.
+     */
+    isPositionInBounds(position: Point): boolean;
+    /**
+     * Get the current index.
+     *
+     * @returns {Index} The current index.
+     */
+    getCurrentIndex(): Index;
+    /**
+     * Get the current position incremented in the input direction.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {Point} The resulting point.
+     */
+    getIncrementPosition(dim: number): Point;
+    /**
+     * Get the current position decremented in the input direction.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {Point} The resulting point.
+     */
+    getDecrementPosition(dim: number): Point;
+    /**
+     * Increment the current position along the provided dim.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    incrementPosition(dim: number): boolean;
+    /**
+     * Decrement the current position along the provided dim.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    decrementPosition(dim: number): boolean;
+    /**
+     * Increment the current position along the scroll dimension.
+     *
+     * @returns {boolean} True if possible and in bounds.
+     */
+    incrementScrollPosition(): boolean;
+    /**
+     * Decrement the current position along the scroll dimension.
+     *
+     * @returns {boolean} True if possible and in bounds.
+     */
+    decrementScrollPosition(): boolean;
     #private;
 }
 
@@ -5372,6 +5508,12 @@ export declare class ViewController {
      */
     isPlaying(): boolean;
     /**
+     * Get the position helper.
+     *
+     * @returns {PositionHelper} The helper.
+     */
+    getPositionHelper(): PositionHelper;
+    /**
      * Get the current position.
      *
      * @returns {Point} The position.
@@ -5418,9 +5560,9 @@ export declare class ViewController {
     /**
      * Get the current scroll index value.
      *
-     * @returns {object} The value.
+     * @returns {number} The value.
      */
-    getCurrentScrollIndexValue(): object;
+    getCurrentScrollIndexValue(): number;
     /**
      * Get the first origin or at a given position.
      *
@@ -5623,62 +5765,6 @@ export declare class ViewController {
      * @returns {Vector3D} The 3D world offset.
      */
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
-    /**
-     * Get the current position incremented in the input direction.
-     *
-     * @param {number} dim The direction in which to increment.
-     * @returns {Point} The resulting point.
-     */
-    getIncrementPosition(dim: number): Point;
-    /**
-     * Get the current position decremented in the input direction.
-     *
-     * @param {number} dim The direction in which to decrement.
-     * @returns {Point} The resulting point.
-     */
-    getDecrementPosition(dim: number): Point;
-    /**
-     * Get the current position decremented in the scroll direction.
-     *
-     * @returns {Point} The resulting point.
-     */
-    getIncrementScrollPosition(): Point;
-    /**
-     * Get the current position decremented in the scroll direction.
-     *
-     * @returns {Point} The resulting point.
-     */
-    getDecrementScrollPosition(): Point;
-    /**
-     * Increment the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementIndex(dim: number, silent?: boolean): boolean;
-    /**
-     * Decrement the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementIndex(dim: number, silent?: boolean): boolean;
-    /**
-     * Decrement the scroll dimension index.
-     *
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementScrollIndex(silent?: boolean): boolean;
-    /**
-     * Increment the scroll dimension index.
-     *
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementScrollIndex(silent?: boolean): boolean;
     /**
      * Scroll play: loop through all slices.
      */
