@@ -1157,14 +1157,20 @@ export declare function createView(elements: {
     [x: string]: DataElement;
 }, image: Image_2): View;
 
-export declare namespace customUI {
-    /**
-     * Open a dialogue to edit roi data. Defaults to window.prompt.
-     *
-     * @param {Annotation} annotation The roi data.
-     * @param {Function} callback The callback to launch on dialogue exit.
-     */
-    export function openRoiDialog(annotation: Annotation, callback: Function): void;
+export declare namespace custom {
+    let wlPresets: {
+        [x: string]: {
+            [x: string]: WindowLevel;
+        };
+    };
+    let labelTexts: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+    let openRoiDialog: any;
+    let getTagTime: any;
+    let getTagPixelUnit: any;
 }
 
 /**
@@ -1234,25 +1240,6 @@ export declare const decoderScripts: {
     'jpeg-baseline': string;
     rle: string;
 };
-
-/**
- * List of default window level presets.
- *
- * @type {Object.<string, Object.<string, WindowLevel>>}
- */
-export declare const defaultPresets: {
-    [x: string]: {
-        [x: string]: WindowLevel;
-    };
-};
-
-export declare namespace defaults {
-    let labelText: {
-        [x: string]: {
-            [x: string]: string;
-        };
-    };
-}
 
 /**
  * Delete segment command.
@@ -4706,32 +4693,6 @@ export declare class Tag {
      */
     getNameFromDictionary(): string | undefined;
     #private;
-}
-
-/**
- * Methods used to extract values from DICOM elements.
- *
- * Implemented as class and method to allow for override via its prototype.
- */
-export declare class TagValueExtractor {
-    /**
-     * Get the time.
-     *
-     * @param {Object<string, DataElement>} _elements The DICOM elements.
-     * @returns {number|undefined} The time value if available.
-     */
-    getTime(_elements: {
-        [x: string]: DataElement;
-    }): number | undefined;
-    /**
-     * Get the pixel unit.
-     *
-     * @param {Object<string, DataElement>} elements The DICOM elements.
-     * @returns {string|undefined} The unit value if available.
-     */
-    getPixelUnit(elements: {
-        [x: string]: DataElement;
-    }): string | undefined;
 }
 
 /**

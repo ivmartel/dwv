@@ -30,13 +30,24 @@ function viewerSetup() {
   dwv.decoderScripts.rle =
     './decoders/dwv/decode-rle.js';
 
-  dwv.defaultPresets.PT = {
-    'suv5-10': new dwv.WindowLevel(5, 10),
-    'suv6-8': new dwv.WindowLevel(6, 8)
+  // example wl preset override
+  dwv.custom.wlPresets = {
+    PT: {
+      'suv5-10': new dwv.WindowLevel(5, 10),
+      'suv6-8': new dwv.WindowLevel(6, 8)
+    }
   };
 
+  // // example labelText override
+  // dwv.custom.labelTexts = {
+  //   rectangle: {
+  //     '*': '{surface}!',
+  //     MR: '{surface}!!'
+  //   }
+  // };
+
   // // example private logic for roi dialog
-  // dwv.customUI.openRoiDialog = function (meta, cb) {
+  // dwv.custom.openRoiDialog = function (meta, cb) {
   //   console.log('roi dialog', meta);
   //   const textExpr = prompt('[Custom dialog] Label', meta.textExpr);
   //   if (textExpr !== null) {
@@ -46,7 +57,7 @@ function viewerSetup() {
   // };
 
   // // example private logic for time value retrieval
-  // dwv.TagValueExtractor.prototype.getTime = function (elements) {
+  // dwv.custom.getTagTime = function (elements) {
   //   let value;
   //   const element = elements['ABCD0123'];
   //   if (typeof element !== 'undefined') {
@@ -56,14 +67,8 @@ function viewerSetup() {
   // };
 
   // // example private logic for pixel unit value retrieval
-  // dwv.TagValueExtractor.prototype.getPixelUnit = function (elements) {
+  // dwv.custom.getTagPixelUnit = function (/*elements*/) {
   //   return 'MyPixelUnit';
-  // };
-
-  // // example labelText override
-  // dwv.defaults.labelText.rectangle = {
-  //   '*': '{surface}!',
-  //   MR: '{surface}!!'
   // };
 
   // stage options
