@@ -4723,6 +4723,15 @@ export declare class TagValueExtractor {
     getTime(_elements: {
         [x: string]: DataElement;
     }): number | undefined;
+    /**
+     * Get the pixel unit.
+     *
+     * @param {Object<string, DataElement>} elements The DICOM elements.
+     * @returns {string|undefined} The unit value if available.
+     */
+    getPixelUnit(elements: {
+        [x: string]: DataElement;
+    }): string | undefined;
 }
 
 /**
