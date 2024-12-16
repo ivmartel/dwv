@@ -48,11 +48,16 @@ function viewerSetup() {
   // // example private logic for time value retrieval
   // dwv.TagValueExtractor.prototype.getTime = function (elements) {
   //   let value;
-  //   const time = elements['ABCD0123'];
-  //   if (typeof time !== 'undefined') {
-  //     value = parseInt(time.value[0], 10);
+  //   const element = elements['ABCD0123'];
+  //   if (typeof element !== 'undefined') {
+  //     value = parseInt(element.value[0], 10);
   //   }
   //   return value;
+  // };
+
+  // // example private logic for pixel unit value retrieval
+  // dwv.TagValueExtractor.prototype.getPixelUnit = function (elements) {
+  //   return 'MyPixelUnit';
   // };
 
   // // example labelText override
