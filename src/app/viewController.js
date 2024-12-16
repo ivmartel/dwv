@@ -13,6 +13,7 @@ import {
   getRegionSliceIterator,
   getVariableRegionSliceIterator
 } from '../image/iterator';
+import {PositionHelper} from '../image/positionHelper';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -44,6 +45,13 @@ export class ViewController {
   #planeHelper;
 
   /**
+   * Position helper.
+   *
+   * @type {PositionHelper}
+   */
+  #positionHelper;
+
+  /**
    * Third dimension player ID (created by setInterval).
    *
    * @type {number|undefined}
@@ -73,6 +81,9 @@ export class ViewController {
       view.getImage().getGeometry(),
       view.getOrientation()
     );
+
+    // position helper
+    this.#positionHelper = new PositionHelper(view);
 
     // mask segment helper
     if (view.getImage().getMeta().Modality === 'SEG') {
@@ -166,12 +177,21 @@ export class ViewController {
   }
 
   /**
+   * Get the position helper.
+   *
+   * @returns {PositionHelper} The helper.
+   */
+  getPositionHelper() {
+    return this.#positionHelper;
+  }
+
+  /**
    * Get the current position.
    *
    * @returns {Point} The position.
    */
   getCurrentPosition() {
-    return this.#view.getCurrentPosition();
+    return this.#positionHelper.getCurrentPositon();
   }
 
   /**
@@ -180,7 +200,7 @@ export class ViewController {
    * @returns {Index} The current index.
    */
   getCurrentIndex() {
-    return this.#view.getCurrentIndex();
+    return this.#positionHelper.getCurrentIndex();
   }
 
   /**
@@ -218,7 +238,7 @@ export class ViewController {
    * @returns {Index} The index.
    */
   getCurrentOrientedIndex() {
-    let res = this.#view.getCurrentIndex();
+    let res = this.getCurrentIndex();
     if (typeof this.#view.getOrientation() !== 'undefined') {
       // view oriented => image de-oriented
       const vector = this.#planeHelper.getImageDeOrientedVector3D(
@@ -243,10 +263,10 @@ export class ViewController {
   /**
    * Get the current scroll index value.
    *
-   * @returns {object} The value.
+   * @returns {number} The value.
    */
   getCurrentScrollIndexValue() {
-    return this.#view.getCurrentIndex().get(this.#view.getScrollIndex());
+    return this.getCurrentIndex().get(this.#view.getScrollIndex());
   }
 
   /**
@@ -380,7 +400,7 @@ export class ViewController {
     const sliceSpacing = new Spacing(spacingValues);
     const sliceOrigin = new Point3D(0, 0, 0);
     const sliceGeometry =
-      new Geometry(sliceOrigin, sliceSize, sliceSpacing);
+      new Geometry([sliceOrigin], sliceSize, sliceSpacing);
     // slice image
     // @ts-ignore
     return new Image(sliceGeometry, sliceValues);
@@ -679,146 +699,6 @@ export class ViewController {
   }
 
   /**
-   * Get the current index incremented in the input direction.
-   *
-   * @param {number} dim The direction in which to increment.
-   * @returns {Index} The resulting index.
-   */
-  #getIncrementIndex(dim) {
-    const index = this.getCurrentIndex();
-    const values = new Array(index.length());
-    values.fill(0);
-    if (dim < values.length) {
-      values[dim] = 1;
-    } else {
-      console.warn('Cannot increment given index: ', dim, values.length);
-    }
-    const incr = new Index(values);
-    return index.add(incr);
-  }
-
-  /**
-   * Get the current index decremented in the input direction.
-   *
-   * @param {number} dim The direction in which to decrement.
-   * @returns {Index} The resulting index.
-   */
-  #getDecrementIndex(dim) {
-    const index = this.getCurrentIndex();
-    const values = new Array(index.length());
-    values.fill(0);
-    if (dim < values.length) {
-      values[dim] = -1;
-    } else {
-      console.warn('Cannot decrement given index: ', dim, values.length);
-    }
-    const incr = new Index(values);
-    return index.add(incr);
-  }
-
-  /**
-   * Get the current index incremented in the scroll direction.
-   *
-   * @returns {Index} The resulting index.
-   */
-  #getIncrementScrollIndex() {
-    return this.#getIncrementIndex(this.getScrollIndex());
-  }
-
-  /**
-   * Get the current index decremented in the scroll direction.
-   *
-   * @returns {Index} The resulting index.
-   */
-  #getDecrementScrollIndex() {
-    return this.#getDecrementIndex(this.getScrollIndex());
-  }
-
-  /**
-   * Get the current position incremented in the input direction.
-   *
-   * @param {number} dim The direction in which to increment.
-   * @returns {Point} The resulting point.
-   */
-  getIncrementPosition(dim) {
-    const geometry = this.#view.getImage().getGeometry();
-    return geometry.indexToWorld(this.#getIncrementIndex(dim));
-  }
-
-  /**
-   * Get the current position decremented in the input direction.
-   *
-   * @param {number} dim The direction in which to decrement.
-   * @returns {Point} The resulting point.
-   */
-  getDecrementPosition(dim) {
-    const geometry = this.#view.getImage().getGeometry();
-    return geometry.indexToWorld(this.#getDecrementIndex(dim));
-  }
-
-  /**
-   * Get the current position decremented in the scroll direction.
-   *
-   * @returns {Point} The resulting point.
-   */
-  getIncrementScrollPosition() {
-    const geometry = this.#view.getImage().getGeometry();
-    return geometry.indexToWorld(this.#getIncrementScrollIndex());
-  }
-
-  /**
-   * Get the current position decremented in the scroll direction.
-   *
-   * @returns {Point} The resulting point.
-   */
-  getDecrementScrollPosition() {
-    const geometry = this.#view.getImage().getGeometry();
-    return geometry.indexToWorld(this.#getDecrementScrollIndex());
-  }
-
-  /**
-   * Increment the provided dimension.
-   *
-   * @param {number} dim The dimension to increment.
-   * @param {boolean} [silent] Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  incrementIndex(dim, silent) {
-    return this.setCurrentIndex(this.#getIncrementIndex(dim), silent);
-  }
-
-  /**
-   * Decrement the provided dimension.
-   *
-   * @param {number} dim The dimension to increment.
-   * @param {boolean} [silent] Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  decrementIndex(dim, silent) {
-    return this.setCurrentIndex(this.#getDecrementIndex(dim), silent);
-  }
-
-  /**
-   * Decrement the scroll dimension index.
-   *
-   * @param {boolean} [silent] Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  decrementScrollIndex(silent) {
-    return this.setCurrentIndex(this.#getDecrementScrollIndex(), silent);
-  }
-
-  /**
-   * Increment the scroll dimension index.
-   *
-   * @param {boolean} [silent] Do not send event.
-   * @returns {boolean} False if not in bounds.
-   */
-  incrementScrollIndex(silent) {
-    return this.setCurrentIndex(this.#getIncrementScrollIndex(), silent);
-  }
-
-  /**
    * Scroll play: loop through all slices.
    */
   play() {
@@ -838,9 +718,9 @@ export class ViewController {
       this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
-          canDoMore = this.incrementScrollIndex();
+          canDoMore = this.#positionHelper.incrementScrollPosition();
         } else {
-          canDoMore = this.incrementIndex(3);
+          canDoMore = this.#positionHelper.incrementPosition(3);
         }
         // end of scroll, loop back
         if (!canDoMore) {

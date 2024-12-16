@@ -26,7 +26,7 @@ QUnit.test('View wlchange event - #DWV-REQ-UI-03-001 Change image window/level',
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
     const imgOrigin0 = new Point3D(0, 0, 0);
-    const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
     const buffer0 = [];
     for (let i = 0; i < size0 * size0; ++i) {
       buffer0[i] = i;
@@ -67,7 +67,7 @@ QUnit.test('Playback milliseconds', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -109,7 +109,7 @@ QUnit.test('Generate data MONO - #DWV-REQ-UI-02-001 Display image',
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
     const imgOrigin0 = new Point3D(0, 0, 0);
-    const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
     const buffer0 = [];
     for (let i = 0; i < size0 * size0; ++i) {
       buffer0[i] = i;
@@ -169,7 +169,7 @@ QUnit.test('Generate data MONO with RSI - #DWV-REQ-UI-02-001 Display image',
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
     const imgOrigin0 = new Point3D(0, 0, 0);
-    const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
     const buffer0 = [];
     for (let i = 0; i < size0 * size0; ++i) {
       buffer0[i] = i;
@@ -231,7 +231,7 @@ QUnit.test('Generate data RGB - #DWV-REQ-UI-02-001 Display image',
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
     const imgOrigin0 = new Point3D(0, 0, 0);
-    const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
     const buffer0 = [];
     let index = 0;
     let value = 0;
@@ -332,7 +332,7 @@ QUnit.test('Generate data timing - #DWV-REQ-UI-02-001 Display image',
     const imgSize0 = new Size([size0, size0, 1]);
     const imgSpacing0 = new Spacing([1, 1, 1]);
     const imgOrigin0 = new Point3D(0, 0, 0);
-    const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
     const buffer0 = [];
     for (let i = 0; i < size0 * size0; ++i) {
       buffer0[i] = i;

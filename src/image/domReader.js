@@ -60,7 +60,7 @@ function getDefaultImage(
   // default origin
   const origin = new Point3D(0, 0, sliceIndex);
   // create image
-  const geometry = new Geometry(origin, imageSize, imageSpacing);
+  const geometry = new Geometry([origin], imageSize, imageSpacing);
   const image = new Image(geometry, imageBuffer, [imageUid]);
   image.setPhotometricInterpretation('RGB');
   // meta information

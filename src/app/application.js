@@ -1355,23 +1355,22 @@ export class App {
     if (event.ctrlKey) {
       if (event.shiftKey) {
         const layerGroup = this.#stage.getActiveLayerGroup();
-        const viewController =
-          layerGroup.getActiveViewLayer().getViewController();
+        const positionHelper = layerGroup.getPositionHelper();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
-          if (viewController.moreThanOne(3)) {
-            viewController.decrementIndex(3);
+          if (layerGroup.moreThanOne(3)) {
+            positionHelper.decrementPosition(3);
           }
         } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
           if (layerGroup.canScroll()) {
-            viewController.incrementScrollIndex();
+            positionHelper.incrementScrollPosition();
           }
         } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
           if (layerGroup.moreThanOne(3)) {
-            viewController.incrementIndex(3);
+            positionHelper.incrementPosition(3);
           }
         } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
           if (layerGroup.canScroll()) {
-            viewController.decrementScrollIndex();
+            positionHelper.decrementScrollPosition();
           }
         }
       } else if (event.key === 'y') { // crtl-y

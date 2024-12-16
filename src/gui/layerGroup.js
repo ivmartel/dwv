@@ -13,6 +13,7 @@ import {DrawLayer} from './drawLayer';
 import {Matrix33} from '../math/matrix';
 import {Point2D, Point3D} from '../math/point';
 import {Scalar2D, Scalar3D} from '../math/scalar';
+import {PositionHelper} from '../image/positionHelper';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -203,6 +204,44 @@ export class LayerGroup {
    * @type {boolean}
    */
   #imageSmoothing = false;
+
+  /**
+   * Position helper.
+   *
+   * @type {PositionHelper}
+   */
+  #positionHelper;
+
+  /**
+   * Flag to update the position helper or not.
+   *
+   * @type {boolean}
+   */
+  #positionHelperNeedsUpdate = false;
+
+  /**
+   * Get the position helper.
+   *
+   * @returns {PositionHelper} The position helper.
+   */
+  getPositionHelper() {
+    if (typeof this.#positionHelper === 'undefined' ||
+      this.#positionHelperNeedsUpdate) {
+      for (const layer of this.#layers) {
+        if (layer instanceof ViewLayer) {
+          const controller = layer.getViewController();
+          const helper = controller.getPositionHelper();
+          if (typeof this.#positionHelper === 'undefined') {
+            this.#positionHelper = helper;
+          } else {
+            this.#positionHelper.merge(helper);
+          }
+        }
+      }
+      this.#positionHelperNeedsUpdate = false;
+    }
+    return this.#positionHelper;
+  }
 
   /**
    * @param {HTMLElement} containerDiv The associated HTML div.
@@ -664,6 +703,10 @@ export class LayerGroup {
     this.setActiveViewLayer(viewLayerIndex);
     // bind view layer events
     this.#bindViewLayer(layer);
+
+    // update flag
+    this.#positionHelperNeedsUpdate = true;
+
     // return
     return layer;
   }
@@ -995,7 +1038,7 @@ export class LayerGroup {
   }
 
   /**
-   * Update layers (but not the active view layer) to a position change.
+   * Update layers (but not the event source layer) to a position change.
    *
    * @param {object} event The position change event.
    * @function

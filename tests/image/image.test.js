@@ -78,7 +78,7 @@ QUnit.test('Image getValue', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -152,7 +152,7 @@ QUnit.test('Image histogram', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -219,7 +219,7 @@ QUnit.test('Image append slice', function (assert) {
 
   // image 0
   const imgGeometry0 = new Geometry(
-    imgOrigin, imgSizeMinusOne, imgSpacing);
+    [imgOrigin], imgSizeMinusOne, imgSpacing);
   imgGeometry0.appendOrigin(new Point3D(0, 0, 1), 1);
   const image0 = new Image(imgGeometry0, buffer, ['0']);
   image0.setMeta({numberOfFiles: 3});
@@ -230,7 +230,7 @@ QUnit.test('Image append slice', function (assert) {
   // real slice
   const sliceOrigin = new Point3D(0, 0, -1);
   const sliceGeometry = new Geometry(
-    sliceOrigin, sliceSize, imgSpacing);
+    [sliceOrigin], sliceSize, imgSpacing);
   const slice0 = new Image(sliceGeometry, sliceBuffer, ['1']);
   slice0.setMeta({numberOfFiles: 3});
   // append slice before
@@ -253,13 +253,13 @@ QUnit.test('Image append slice', function (assert) {
 
   // image 1
   const imgGeometry1 = new Geometry(
-    imgOrigin, imgSizeMinusOne, imgSpacing);
+    [imgOrigin], imgSizeMinusOne, imgSpacing);
   imgGeometry1.appendOrigin(new Point3D(0, 0, 1), 1);
   const image1 = new Image(imgGeometry1, buffer, ['0']);
   image1.setMeta({numberOfFiles: 3});
   const sliceOrigin1 = new Point3D(0, 0, 2);
   const sliceGeometry1 = new Geometry(
-    sliceOrigin1, sliceSize, imgSpacing);
+    [sliceOrigin1], sliceSize, imgSpacing);
   const slice1 = new Image(sliceGeometry1, sliceBuffer, ['1']);
   slice1.setMeta({numberOfFiles: 3});
   // append slice before
@@ -282,13 +282,13 @@ QUnit.test('Image append slice', function (assert) {
 
   // image 2
   const imgGeometry2 = new Geometry(
-    imgOrigin, imgSizeMinusOne, imgSpacing);
+    [imgOrigin], imgSizeMinusOne, imgSpacing);
   imgGeometry2.appendOrigin(new Point3D(0, 0, 1), 1);
   const image2 = new Image(imgGeometry2, buffer, ['0']);
   image2.setMeta({numberOfFiles: 3});
   const sliceOrigin2 = new Point3D(0, 0, 0.4);
   const sliceGeometry2 = new Geometry(
-    sliceOrigin2, sliceSize, imgSpacing);
+    [sliceOrigin2], sliceSize, imgSpacing);
   const slice2 = new Image(sliceGeometry2, sliceBuffer, ['1']);
   slice2.setMeta({numberOfFiles: 3});
   // append slice before
@@ -321,7 +321,7 @@ QUnit.test('Image convolute2D', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -363,7 +363,7 @@ QUnit.test('Image transform', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -419,7 +419,7 @@ QUnit.test('Image compose', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -459,7 +459,7 @@ QUnit.test('ImageFactory', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
@@ -513,7 +513,7 @@ QUnit.test('hasValues getOffsets', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   buffer0[0] = 1;
   for (let i0 = 1; i0 < 2 * size0; ++i0) {

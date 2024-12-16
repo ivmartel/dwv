@@ -505,7 +505,7 @@ QUnit.test('getSliceIterator', function (assert) {
   ]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize00, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize00, imgSpacing0);
   imgGeometry0.appendOrigin(new Point3D(0, 0, 1), 1);
   imgGeometry0.appendOrigin(new Point3D(0, 0, 2), 2);
   imgGeometry0.appendOrigin(new Point3D(0, 0, 3), 3);

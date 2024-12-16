@@ -22,7 +22,7 @@ QUnit.test('Geometry class', function (assert) {
   const imgSize0 = new Size([3, 3, 2]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
 
   const testData0 = [
     {vals: [0, 0, 0], offset: 0},
@@ -60,7 +60,7 @@ QUnit.test('Geometry class', function (assert) {
   const imgSize1 = new Size([3, 3, 2]);
   const imgSpacing1 = new Spacing([0.5, 0.5, 2]);
   const imgOrigin1 = new Point3D(10.25, 10.25, 20);
-  const imgGeometry1 = new Geometry(imgOrigin1, imgSize1, imgSpacing1);
+  const imgGeometry1 = new Geometry([imgOrigin1], imgSize1, imgSpacing1);
 
   const testData1 = [
     {vals: [0, 0, 0], pvals: [10.25, 10.25, 20], offset: 0},

@@ -130,7 +130,8 @@ export class Index {
   }
 
   /**
-   * Add another index to this one.
+   * Add another index to this one and return
+   *   the result as a new index.
    *
    * @param {Index} rhs The index to add.
    * @returns {Index} The index representing the sum of both indices.
@@ -150,7 +151,49 @@ export class Index {
   }
 
   /**
-   * Get the current index with a new 2D base.
+   * Add the input value to this index at the given
+   *   dimension number and return the result
+   *   as a new index.
+   *
+   * @param {number} dim The dimension number.
+   * @param {number} value The value to add.
+   * @returns {Index} The result index.
+   */
+  #addToDim(dim, value) {
+    const values = this.#values.slice();
+    if (dim < values.length) {
+      values[dim] += value;
+    } else {
+      console.warn('Cannot add to given dimension: ', dim, values.length);
+    }
+    return new Index(values);
+  }
+
+  /**
+   * Increment this index by 1 at the given dimension
+   *   and return the result as a new index.
+   *
+   * @param {number} dim The dimension number.
+   * @returns {Index} The result index.
+   */
+  next(dim) {
+    return this.#addToDim(dim, 1);
+  }
+
+  /**
+   * Decrement this index by 1 at the given dimension
+   *   and return the result as a new index.
+   *
+   * @param {number} dim The dimension number.
+   * @returns {Index} The result index.
+   */
+  previous(dim) {
+    return this.#addToDim(dim, -1);
+  }
+
+  /**
+   * Get the current index with a new 2D base
+   *   and return the result as a new index.
    *
    * @param {number} i The new 0 index.
    * @param {number} j The new 1 index.

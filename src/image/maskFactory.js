@@ -542,7 +542,7 @@ export class MaskFactory {
 
     // tmp geometry with correct spacing but only one slice
     const tmpGeometry = new Geometry(
-      frameOrigins[0], size, spacing, orientationMatrix);
+      [frameOrigins[0]], size, spacing, orientationMatrix);
 
     // origin distance test
     // TODO: maybe use sliceSpacing / 10
@@ -604,7 +604,7 @@ export class MaskFactory {
 
     // final geometry
     const geometry = new Geometry(
-      frameOrigins[0], size, spacing, orientationMatrix);
+      [frameOrigins[0]], size, spacing, orientationMatrix);
     const uids = ['0'];
     for (let m = 1; m < numberOfSlices; ++m) {
       geometry.appendOrigin(point3DFromArray(posPats[m]), m);
