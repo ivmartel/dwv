@@ -1032,8 +1032,8 @@ export class TagValueExtractor {
   /**
    * Get the pixel unit.
    *
-   * @param {Object<string, DataElement>} _elements The DICOM elements.
-   * @returns {number|undefined} The unit value if available.
+   * @param {Object<string, DataElement>} elements The DICOM elements.
+   * @returns {string|undefined} The unit value if available.
    */
   getPixelUnit(elements) {
     return getPixelUnit(elements);
