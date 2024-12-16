@@ -5,7 +5,7 @@ import {
   ViewConfig,
   ToolConfig
 } from './app/application';
-import {defaults} from './app/defaults';
+import {custom} from './app/custom';
 import {
   DrawController
 } from './app/drawController';
@@ -32,7 +32,6 @@ import {
   WriterRule
 } from './dicom/dicomWriter';
 import {DataElement} from './dicom/dataElement';
-import {TagValueExtractor} from './dicom/dicomElementsWrapper';
 import {addTagsToDictionary} from './dicom/dictionary';
 import {
   Tag,
@@ -48,7 +47,6 @@ import {
 import {MaskSegment} from './dicom/dicomSegment';
 // gui
 import {
-  customUI,
   getMousePoint,
   getTouchPoints
 } from './gui/generic';
@@ -78,10 +76,7 @@ import {
   luts
 } from './image/luts';
 import {RescaleSlopeAndIntercept} from './image/rsi';
-import {
-  defaultPresets,
-  WindowLevel
-} from './image/windowLevel';
+import {WindowLevel} from './image/windowLevel';
 import {
   MaskFactory,
   getDefaultDicomSegJson
@@ -146,7 +141,6 @@ export {
   DicomParser,
   DicomWriter,
   WriterRule,
-  TagValueExtractor,
   Tag,
   LayerGroup,
   DrawLayer,
@@ -181,12 +175,10 @@ export {
   ScrollWheel,
   NumberRange,
   DicomSRContent,
-  defaults,
   logger,
   decoderScripts,
-  customUI,
+  custom,
   luts,
-  defaultPresets,
   i18n,
   toolList,
   toolOptions,

@@ -882,10 +882,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@eslint/js@9.16.0", "@eslint/js@^9.14.0":
-  version "9.16.0"
-  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-9.16.0.tgz#3df2b2dd3b9163056616886c86e4082f45dbf3f4"
-  integrity sha512-tw2HxzQkrbeuvyj1tG2Yqq+0H9wGoI2IMk4EOsQeX+vmd75FtJAzf+gTA69WF+baUKRYQ3x2kbLE08js5OsTVg==
+"@eslint/js@9.17.0", "@eslint/js@^9.14.0":
+  version "9.17.0"
+  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-9.17.0.tgz#1523e586791f80376a6f8398a3964455ecc651ec"
+  integrity sha512-Sxc4hqcs1kTu0iID3kcZDW3JHq2a77HO9P8CP6YEA/FpH3Ll8UXE2r/86Rz9YJLKme39S9vU5OWNjC6Xl0Cr3w==
 
 "@eslint/object-schema@^2.1.4":
   version "2.1.4"
@@ -1035,27 +1035,27 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.5.tgz#4fc56c15c580b9adb7dc3c333a134e540b44bfb1"
   integrity sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==
 
-"@microsoft/api-extractor-model@7.30.0":
-  version "7.30.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.30.0.tgz#18a0528350124015b2c08397474e9309a8b3c807"
-  integrity sha512-26/LJZBrsWDKAkOWRiQbdVgcfd1F3nyJnAiJzsAgpouPk7LtOIj7PK9aJtBaw/pUXrkotEg27RrT+Jm/q0bbug==
+"@microsoft/api-extractor-model@7.30.1":
+  version "7.30.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.30.1.tgz#719e2ab8afe8fe3a5dd65aaa8783dbba90f7c802"
+  integrity sha512-CTS2PlASJHxVY8hqHORVb1HdECWOEMcMnM6/kDkPr0RZapAFSIHhg9D4jxuE8g+OWYHtPc10LCpmde5pylTRlA==
   dependencies:
     "@microsoft/tsdoc" "~0.15.1"
     "@microsoft/tsdoc-config" "~0.17.1"
-    "@rushstack/node-core-library" "5.10.0"
+    "@rushstack/node-core-library" "5.10.1"
 
 "@microsoft/api-extractor@^7.47.11":
-  version "7.48.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.48.0.tgz#d87243bdafbfadcf87b336b2b4e5de71ecc7caab"
-  integrity sha512-FMFgPjoilMUWeZXqYRlJ3gCVRhB7WU/HN88n8OLqEsmsG4zBdX/KQdtJfhq95LQTQ++zfu0Em1LLb73NqRCLYQ==
+  version "7.48.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.48.1.tgz#792197cfc5113cd2efc04524c065d682ef58d2ba"
+  integrity sha512-HN9Osa1WxqLM66RaqB5nPAadx+nTIQmY/XtkFdaJvusjG8Tus++QqZtD7KPZDSkhEMGHsYeSyeU8qUzCDUXPjg==
   dependencies:
-    "@microsoft/api-extractor-model" "7.30.0"
+    "@microsoft/api-extractor-model" "7.30.1"
     "@microsoft/tsdoc" "~0.15.1"
     "@microsoft/tsdoc-config" "~0.17.1"
-    "@rushstack/node-core-library" "5.10.0"
+    "@rushstack/node-core-library" "5.10.1"
     "@rushstack/rig-package" "0.5.3"
-    "@rushstack/terminal" "0.14.3"
-    "@rushstack/ts-command-line" "4.23.1"
+    "@rushstack/terminal" "0.14.4"
+    "@rushstack/ts-command-line" "4.23.2"
     lodash "~4.17.15"
     minimatch "~3.0.3"
     resolve "~1.22.1"
@@ -1093,10 +1093,10 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.1.1.tgz#1ec17e2edbec25c8306d424ecfbf13c7de1aaa31"
   integrity sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
 
-"@rushstack/node-core-library@5.10.0":
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-5.10.0.tgz#84173c913761a7d1edef5c818ce03d9e22cab9d7"
-  integrity sha512-2pPLCuS/3x7DCd7liZkqOewGM0OzLyCacdvOe8j6Yrx9LkETGnxul1t7603bIaB8nUAooORcct9fFDOQMbWAgw==
+"@rushstack/node-core-library@5.10.1":
+  version "5.10.1"
+  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-5.10.1.tgz#14c10c918ed12da003c21af9d5bf0e76633215d2"
+  integrity sha512-BSb/KcyBHmUQwINrgtzo6jiH0HlGFmrUy33vO6unmceuVKTEyL2q+P0fQq2oB5hvXVWOEUhxB2QvlkZluvUEmg==
   dependencies:
     ajv "~8.13.0"
     ajv-draft-04 "~1.0.0"
@@ -1115,20 +1115,20 @@
     resolve "~1.22.1"
     strip-json-comments "~3.1.1"
 
-"@rushstack/terminal@0.14.3":
-  version "0.14.3"
-  resolved "https://registry.yarnpkg.com/@rushstack/terminal/-/terminal-0.14.3.tgz#eae0198e73eac56c901f6e00d0d4254c50a3f655"
-  integrity sha512-csXbZsAdab/v8DbU1sz7WC2aNaKArcdS/FPmXMOXEj/JBBZMvDK0+1b4Qao0kkG0ciB1Qe86/Mb68GjH6/TnMw==
+"@rushstack/terminal@0.14.4":
+  version "0.14.4"
+  resolved "https://registry.yarnpkg.com/@rushstack/terminal/-/terminal-0.14.4.tgz#37e160b0878a324cf3e0fecab25fe48a030e29ed"
+  integrity sha512-NxACqERW0PHq8Rpq1V6v5iTHEwkRGxenjEW+VWqRYQ8T9puUzgmGHmEZUaUEDHAe9Qyvp0/Ew04sAiQw9XjhJg==
   dependencies:
-    "@rushstack/node-core-library" "5.10.0"
+    "@rushstack/node-core-library" "5.10.1"
     supports-color "~8.1.1"
 
-"@rushstack/ts-command-line@4.23.1":
-  version "4.23.1"
-  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.23.1.tgz#d5e33dbb1a016d9440b3a20010b82ccfe9abd34a"
-  integrity sha512-40jTmYoiu/xlIpkkRsVfENtBq4CW3R4azbL0Vmda+fMwHWqss6wwf/Cy/UJmMqIzpfYc2OTnjYP1ZLD3CmyeCA==
+"@rushstack/ts-command-line@4.23.2":
+  version "4.23.2"
+  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.23.2.tgz#37b28a418db84d04f6a1c787390dd02ad8dfadf0"
+  integrity sha512-JJ7XZX5K3ThBBva38aomgsPv1L7FV6XmSOcR6HtM7HDFZJkepqT65imw26h9ggGqMjsY0R9jcl30tzKcVj9aOQ==
   dependencies:
-    "@rushstack/terminal" "0.14.3"
+    "@rushstack/terminal" "0.14.4"
     "@types/argparse" "1.0.38"
     argparse "~1.0.9"
     string-argv "~0.3.1"
@@ -1139,9 +1139,9 @@
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
 "@stylistic/eslint-plugin-js@^2.12.0":
-  version "2.12.0"
-  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.12.0.tgz#5eee69b3f733acab5b0a63a0f707e5510d937497"
-  integrity sha512-HMA+qhlDLmLiYC0nyLPEJT4CBq3BP9ri51WECRKmEjO6RZm41MVZCJl+IfUcp2sUvGSl3/FSK5gzgBKcVv8S3w==
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.12.1.tgz#93ff844df0ed699e1f4b2ff7010ed9508dc87b0d"
+  integrity sha512-5ybogtEgWIGCR6dMnaabztbWyVdAPDsf/5XOk6jBonWug875Q9/a6gm9QxnU3rhdyDEnckWKX7dduwYJMOWrVA==
   dependencies:
     eslint-visitor-keys "^4.2.0"
     espree "^10.3.0"
@@ -2552,10 +2552,10 @@ cross-spawn@^5.0.1:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-cross-spawn@^7.0.0, cross-spawn@^7.0.3, cross-spawn@^7.0.5:
-  version "7.0.5"
-  resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.5.tgz#910aac880ff5243da96b728bc6521a5f6c2f2f82"
-  integrity sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==
+cross-spawn@^7.0.0, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
+  version "7.0.6"
+  resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.6.tgz#8a58fe78f00dcd70c370451759dfbfaf03e8ee9f"
+  integrity sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==
   dependencies:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
@@ -3149,9 +3149,9 @@ escape-string-regexp@^4.0.0:
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
 eslint-plugin-jsdoc@^50.3.1:
-  version "50.6.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-50.6.0.tgz#2c6049a40305313174a30212bc360e775b797a0a"
-  integrity sha512-tCNp4fR79Le3dYTPB0dKEv7yFyvGkUCa+Z3yuTrrNGGOxBlXo9Pn0PEgroOZikUQOGjxoGMVKNjrOHcYEdfszg==
+  version "50.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-50.6.1.tgz#791a668fd4b0700a759e9a16a741a6a805f5b95c"
+  integrity sha512-UWyaYi6iURdSfdVVqvfOs2vdCVz0J40O/z/HTsv2sFjdjmdlUI/qlKLOTmwbPQ2tAfQnE5F9vqx+B+poF71DBQ==
   dependencies:
     "@es-joy/jsdoccomment" "~0.49.0"
     are-docs-informative "^0.0.2"
@@ -3192,16 +3192,16 @@ eslint-visitor-keys@^4.2.0:
   integrity sha512-UyLnSehNt62FFhSwjZlHmeokpRK59rcz29j+F1/aDgbkbRTk7wIc9XzdoasMUbRNKDM0qQt/+BJ4BrpFeABemw==
 
 eslint@^9.14.0:
-  version "9.16.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-9.16.0.tgz#66832e66258922ac0a626f803a9273e37747f2a6"
-  integrity sha512-whp8mSQI4C8VXd+fLgSM0lh3UlmcFtVwUQjyKCFfsp+2ItAIYhlq/hqGahGqHE6cv9unM41VlqKk2VtKYR2TaA==
+  version "9.17.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-9.17.0.tgz#faa1facb5dd042172fdc520106984b5c2421bb0c"
+  integrity sha512-evtlNcpJg+cZLcnVKwsai8fExnqjGPicK7gnUtlNuzu+Fv9bI0aLpND5T44VLQtoMEnI57LoXO9XAkIXwohKrA==
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
     "@eslint-community/regexpp" "^4.12.1"
     "@eslint/config-array" "^0.19.0"
     "@eslint/core" "^0.9.0"
     "@eslint/eslintrc" "^3.2.0"
-    "@eslint/js" "9.16.0"
+    "@eslint/js" "9.17.0"
     "@eslint/plugin-kit" "^0.2.3"
     "@humanfs/node" "^0.16.6"
     "@humanwhocodes/module-importer" "^1.0.1"
@@ -3210,7 +3210,7 @@ eslint@^9.14.0:
     "@types/json-schema" "^7.0.15"
     ajv "^6.12.4"
     chalk "^4.0.0"
-    cross-spawn "^7.0.5"
+    cross-spawn "^7.0.6"
     debug "^4.3.2"
     escape-string-regexp "^4.0.0"
     eslint-scope "^8.2.0"

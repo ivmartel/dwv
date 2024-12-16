@@ -1,3 +1,4 @@
+import {custom} from '../app/custom';
 import {
   DicomParser,
   getTransferSyntaxName,
@@ -431,12 +432,41 @@ export function getPixelSpacing(elements) {
 }
 
 /**
- * Get the pixel data unit.
+ * Get the time from a list of tags. Defaults
+ *   does nohting.
  *
  * @param {DataElements} elements The DICOM elements.
- * @returns {string|null} The unit value if available.
+ * @returns {number|undefined} The time value if available.
  */
-export function getPixelUnit(elements) {
+export function getTagTime(elements) {
+  if (typeof custom.getTagTime !== 'undefined') {
+    return custom.getTagTime(elements);
+  } else {
+    return;
+  }
+}
+
+/**
+ * Get pixel data unit from a list of tags.
+ *
+ * @param {DataElements} elements The DICOM elements.
+ * @returns {string|undefined} The unit value if available.
+ */
+export function getTagPixelUnit(elements) {
+  if (typeof custom.getTagPixelUnit !== 'undefined') {
+    return custom.getTagPixelUnit(elements);
+  } else {
+    return defaultGetTagPixelUnit(elements);
+  }
+}
+
+/**
+ * Default get pixel data unit.
+ *
+ * @param {DataElements} elements The DICOM elements.
+ * @returns {string|undefined} The unit value if available.
+ */
+function defaultGetTagPixelUnit(elements) {
   let unit;
   // 1. RescaleType
   // 2. Units (for PET)
@@ -1010,22 +1040,4 @@ export function getFileListFromDicomDir(data) {
     }
   }
   return records;
-}
-
-/**
- * Methods used to extract values from DICOM elements.
- *
- * Implemented as class and method to allow for override via its prototype.
- */
-export class TagValueExtractor {
-  /**
-   * Get the time.
-   *
-   * @param {Object<string, DataElement>} _elements The DICOM elements.
-   * @returns {number|undefined} The time value if available.
-   */
-  getTime(_elements) {
-    // default returns undefined
-    return undefined;
-  }
 }

@@ -1,6 +1,6 @@
+import {custom} from '../app/custom';
 import {
   getMousePoint,
-  customUI
 } from '../gui/generic';
 import {
   RemoveAnnotationCommand,
@@ -26,6 +26,20 @@ import {DrawLayer} from '../gui/drawLayer';
 import {Annotation} from '../image/annotation';
 import {Point2D} from '../math/point';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Open a dialogue to edit roi data. Defaults to window.prompt.
+ *
+ * @param {Annotation} annotation The roi data.
+ * @param {Function} callback The callback to launch on dialogue exit.
+ */
+function defaultOpenRoiDialog(annotation, callback) {
+  const textExpr = prompt('Label', annotation.textExpr);
+  if (textExpr !== null) {
+    annotation.textExpr = textExpr;
+    callback(annotation);
+  }
+}
 
 /**
  * Draw shape handler: handle action on existing shapes.
@@ -278,7 +292,11 @@ export class DrawShapeHandler {
       };
 
       // call roi dialog
-      customUI.openRoiDialog(annotation, onSaveCallback);
+      if (typeof custom.openRoiDialog !== 'undefined') {
+        custom.openRoiDialog(annotation, onSaveCallback);
+      } else {
+        defaultOpenRoiDialog(annotation, onSaveCallback);
+      }
     });
   }
 

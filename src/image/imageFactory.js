@@ -13,8 +13,8 @@ import {
 import {
   getImage2DSize,
   getPixelSpacing,
-  getPixelUnit,
-  TagValueExtractor,
+  getTagPixelUnit,
+  getTagTime,
   getSuvFactor,
   getOrientationMatrix,
   isSecondatyCapture,
@@ -150,8 +150,7 @@ export class ImageFactory {
     // geometry
     const origin = new Point3D(
       slicePosition[0], slicePosition[1], slicePosition[2]);
-    const extractor = new TagValueExtractor();
-    const time = extractor.getTime(dataElements);
+    const time = getTagTime(dataElements);
     const geometry = new Geometry(
       [origin], size, spacing, orientationMatrix, time);
 
@@ -295,7 +294,7 @@ export class ImageFactory {
     if (isPetWithSuv) {
       meta.pixelUnit = 'SUV';
     } else {
-      const pixelUnit = getPixelUnit(dataElements);
+      const pixelUnit = getTagPixelUnit(dataElements);
       if (typeof pixelUnit !== 'undefined') {
         meta.pixelUnit = pixelUnit;
       }
