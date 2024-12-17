@@ -81,6 +81,7 @@ import {
   MaskFactory,
   getDefaultDicomSegJson
 } from './image/maskFactory';
+import {PositionHelper} from './image/positionHelper';
 import {PlaneHelper} from './image/planeHelper';
 import {DeleteSegmentCommand} from './image/deleteSegmentCommand';
 import {ChangeSegmentColourCommand} from './image/changeSegmentColourCommand';
@@ -131,6 +132,7 @@ export {
   DrawController,
   ViewController,
   PlaneHelper,
+  PositionHelper,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
   DeleteSegmentCommand,
