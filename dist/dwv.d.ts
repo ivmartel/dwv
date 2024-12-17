@@ -476,9 +476,9 @@ export declare class App {
      * The layer is available after the first loaded item.
      *
      * @param {string} divId The div id.
-     * @returns {LayerGroup} The layer group.
+     * @returns {LayerGroup|undefined} The layer group.
      */
-    getLayerGroupByDivId(divId: string): LayerGroup;
+    getLayerGroupByDivId(divId: string): LayerGroup | undefined;
     /**
      * Get the number of layer groups.
      *
@@ -1086,10 +1086,12 @@ export declare class Circle {
      * Quantify an circle according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -1155,14 +1157,20 @@ export declare function createView(elements: {
     [x: string]: DataElement;
 }, image: Image_2): View;
 
-export declare namespace customUI {
-    /**
-     * Open a dialogue to edit roi data. Defaults to window.prompt.
-     *
-     * @param {Annotation} annotation The roi data.
-     * @param {Function} callback The callback to launch on dialogue exit.
-     */
-    export function openRoiDialog(annotation: Annotation, callback: Function): void;
+export declare namespace custom {
+    let wlPresets: {
+        [x: string]: {
+            [x: string]: WindowLevel;
+        };
+    };
+    let labelTexts: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+    let openRoiDialog: any;
+    let getTagTime: any;
+    let getTagPixelUnit: any;
 }
 
 /**
@@ -1232,25 +1240,6 @@ export declare const decoderScripts: {
     'jpeg-baseline': string;
     rle: string;
 };
-
-/**
- * List of default window level presets.
- *
- * @type {Object.<string, Object.<string, WindowLevel>>}
- */
-export declare const defaultPresets: {
-    [x: string]: {
-        [x: string]: WindowLevel;
-    };
-};
-
-export declare namespace defaults {
-    let labelText: {
-        [x: string]: {
-            [x: string]: string;
-        };
-    };
-}
 
 /**
  * Delete segment command.
@@ -2081,10 +2070,12 @@ export declare class Ellipse {
      * Quantify an ellipse according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -2093,14 +2084,14 @@ export declare class Ellipse {
  */
 export declare class Geometry {
     /**
-     * @param {Point3D} origin The object origin (a 3D point).
+     * @param {Point3D[]} origins The object origins.
      * @param {Size} size The object size.
      * @param {Spacing} spacing The object spacing.
      * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
      *   default to 3*3 identity).
      * @param {number} [time] Optional time index.
      */
-    constructor(origin: Point3D, size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
+    constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     /**
      * Get the time value that was passed at construction.
      *
@@ -2239,6 +2230,13 @@ export declare class Geometry {
      * @returns {boolean} True if the given coordinates are within bounds.
      */
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
+    /**
+     * Get the geometrical range, ie the minimum and maximum
+     *   positions.
+     *
+     * @returns {Point[]} The min and max positions.
+     */
+    getRange(): Point[];
     /**
      * Convert an index into world coordinates.
      *
@@ -2945,14 +2943,32 @@ export declare class Index {
      */
     compare(rhs: Index): number[];
     /**
-     * Add another index to this one.
+     * Add another index to this one and return
+     *   the result as a new index.
      *
      * @param {Index} rhs The index to add.
      * @returns {Index} The index representing the sum of both indices.
      */
     add(rhs: Index): Index;
     /**
-     * Get the current index with a new 2D base.
+     * Increment this index by 1 at the given dimension
+     *   and return the result as a new index.
+     *
+     * @param {number} dim The dimension number.
+     * @returns {Index} The result index.
+     */
+    next(dim: number): Index;
+    /**
+     * Decrement this index by 1 at the given dimension
+     *   and return the result as a new index.
+     *
+     * @param {number} dim The dimension number.
+     * @returns {Index} The result index.
+     */
+    previous(dim: number): Index;
+    /**
+     * Get the current index with a new 2D base
+     *   and return the result as a new index.
      *
      * @param {number} i The new 0 index.
      * @param {number} j The new 1 index.
@@ -3002,6 +3018,12 @@ export declare class LayerGroup {
      */
     constructor(containerDiv: HTMLElement);
     /**
+     * Get the position helper.
+     *
+     * @returns {PositionHelper} The position helper.
+     */
+    getPositionHelper(): PositionHelper;
+    /**
      * Get the showCrosshair flag.
      *
      * @returns {boolean} True to display the crosshair.
@@ -3022,9 +3044,9 @@ export declare class LayerGroup {
     /**
      * Get the Id of the container div.
      *
-     * @returns {string} The id of the div.
+     * @returns {string|undefined} The id of the div.
      */
-    getDivId(): string;
+    getDivId(): string | undefined;
     /**
      * Get the layer scale.
      *
@@ -3236,7 +3258,7 @@ export declare class LayerGroup {
      */
     moreThanOne(dim: number): boolean;
     /**
-     * Update layers (but not the active view layer) to a position change.
+     * Update layers (but not the event source layer) to a position change.
      *
      * @param {object} event The position change event.
      * @function
@@ -4123,6 +4145,111 @@ export declare class Point3D {
 }
 
 /**
+ * Position helper.
+ */
+export declare class PositionHelper {
+    /**
+     * @param {View} view The associated view.
+     */
+    constructor(view: View);
+    /**
+     * Get the geometry.
+     *
+     * @returns {Geometry} The geometry.
+     */
+    getGeometry(): Geometry;
+    /**
+     * Get the scroll index.
+     *
+     * @returns {number} The scroll index.
+     */
+    getScrollIndex(): number;
+    /**
+     * Get the current position.
+     *
+     * @returns {Point} The current position.
+     */
+    getCurrentPositon(): Point;
+    /**
+     * Set the current position.
+     *
+     * @param {Point} position The position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    setCurrentPositon(position: Point, silent?: boolean): boolean;
+    /**
+     * Set the current position only if it is in the geometry bounds.
+     *
+     * @param {Point} position The position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    setCurrentPositonSafe(position: Point, silent?: boolean): boolean;
+    /**
+     * Merge with another helper.
+     *
+     * @param {PositionHelper} rhs The helper to merge with this one.
+     */
+    merge(rhs: PositionHelper): void;
+    /**
+     * Check if the current position (default) or
+     * the provided position is in bounds.
+     *
+     * @param {Point} position Optional position.
+     * @returns {boolean} True is the position is in bounds.
+     */
+    isPositionInBounds(position: Point): boolean;
+    /**
+     * Get the current index.
+     *
+     * @returns {Index} The current index.
+     */
+    getCurrentIndex(): Index;
+    /**
+     * Get the current position incremented in the input direction.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {Point} The resulting point.
+     */
+    getIncrementPosition(dim: number): Point;
+    /**
+     * Get the current position decremented in the input direction.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {Point} The resulting point.
+     */
+    getDecrementPosition(dim: number): Point;
+    /**
+     * Increment the current position along the provided dim.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    incrementPosition(dim: number): boolean;
+    /**
+     * Decrement the current position along the provided dim.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    decrementPosition(dim: number): boolean;
+    /**
+     * Increment the current position along the scroll dimension.
+     *
+     * @returns {boolean} True if possible and in bounds.
+     */
+    incrementScrollPosition(): boolean;
+    /**
+     * Decrement the current position along the scroll dimension.
+     *
+     * @returns {boolean} True if possible and in bounds.
+     */
+    decrementScrollPosition(): boolean;
+    #private;
+}
+
+/**
  * Round a float number to a given precision.
  *
  * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
@@ -4261,10 +4388,12 @@ export declare class Rectangle {
      * Quantify a rectangle according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -4700,23 +4829,6 @@ export declare class Tag {
      */
     getNameFromDictionary(): string | undefined;
     #private;
-}
-
-/**
- * Methods used to extract values from DICOM elements.
- *
- * Implemented as class and method to allow for override via its prototype.
- */
-export declare class TagValueExtractor {
-    /**
-     * Get the time.
-     *
-     * @param {Object<string, DataElement>} _elements The DICOM elements.
-     * @returns {number|undefined} The time value if available.
-     */
-    getTime(_elements: {
-        [x: string]: DataElement;
-    }): number | undefined;
 }
 
 /**
@@ -5396,6 +5508,12 @@ export declare class ViewController {
      */
     isPlaying(): boolean;
     /**
+     * Get the position helper.
+     *
+     * @returns {PositionHelper} The helper.
+     */
+    getPositionHelper(): PositionHelper;
+    /**
      * Get the current position.
      *
      * @returns {Point} The position.
@@ -5442,9 +5560,9 @@ export declare class ViewController {
     /**
      * Get the current scroll index value.
      *
-     * @returns {object} The value.
+     * @returns {number} The value.
      */
-    getCurrentScrollIndexValue(): object;
+    getCurrentScrollIndexValue(): number;
     /**
      * Get the first origin or at a given position.
      *
@@ -5511,16 +5629,20 @@ export declare class ViewController {
      *
      * @param {Point2D} min Minimum point.
      * @param {Point2D} max Maximum point.
+     * @param {Index} index The index at which to get the
+     *   image values (combined with min/max).
      * @returns {Array} A list of values.
      */
-    getImageRegionValues(min: Point2D, max: Point2D): any[];
+    getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     /**
      * Get some values from the associated image in variable regions.
      *
      * @param {number[][][]} regions A list of [x, y] pairs (min, max).
+     * @param {Index} index The index at which to get the
+     *   image values (combined with regions min/max).
      * @returns {Array} A list of values.
      */
-    getImageVariableRegionValues(regions: number[][][]): any[];
+    getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     /**
      * Can the image values be quantified?
      *
@@ -5643,62 +5765,6 @@ export declare class ViewController {
      * @returns {Vector3D} The 3D world offset.
      */
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
-    /**
-     * Get the current position incremented in the input direction.
-     *
-     * @param {number} dim The direction in which to increment.
-     * @returns {Point} The resulting point.
-     */
-    getIncrementPosition(dim: number): Point;
-    /**
-     * Get the current position decremented in the input direction.
-     *
-     * @param {number} dim The direction in which to decrement.
-     * @returns {Point} The resulting point.
-     */
-    getDecrementPosition(dim: number): Point;
-    /**
-     * Get the current position decremented in the scroll direction.
-     *
-     * @returns {Point} The resulting point.
-     */
-    getIncrementScrollPosition(): Point;
-    /**
-     * Get the current position decremented in the scroll direction.
-     *
-     * @returns {Point} The resulting point.
-     */
-    getDecrementScrollPosition(): Point;
-    /**
-     * Increment the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementIndex(dim: number, silent?: boolean): boolean;
-    /**
-     * Decrement the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementIndex(dim: number, silent?: boolean): boolean;
-    /**
-     * Decrement the scroll dimension index.
-     *
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementScrollIndex(silent?: boolean): boolean;
-    /**
-     * Increment the scroll dimension index.
-     *
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementScrollIndex(silent?: boolean): boolean;
     /**
      * Scroll play: loop through all slices.
      */

@@ -109,7 +109,7 @@ export class App {
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     // @deprecated
     getImage(dataId: string): Image_2 | undefined;
-    getLayerGroupByDivId(divId: string): LayerGroup;
+    getLayerGroupByDivId(divId: string): LayerGroup | undefined;
     getMetaData(dataId: string): {
         [x: string]: DataElement;
     } | undefined;
@@ -207,7 +207,7 @@ export class Circle {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
 }
 
 // @public
@@ -234,8 +234,25 @@ export function createView(elements: {
 }, image: Image_2): View;
 
 // @public (undocumented)
-export namespace customUI {
-    export function openRoiDialog(annotation: Annotation, callback: Function): void;
+export namespace custom {
+    let // (undocumented)
+    wlPresets: {
+        [x: string]: {
+            [x: string]: WindowLevel;
+        };
+    };
+    let // (undocumented)
+    labelTexts: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+    let // (undocumented)
+    openRoiDialog: any;
+    let // (undocumented)
+    getTagTime: any;
+    let // (undocumented)
+    getTagPixelUnit: any;
 }
 
 // @public
@@ -258,23 +275,6 @@ export const decoderScripts: {
     'jpeg-baseline': string;
     rle: string;
 };
-
-// @public
-export const defaultPresets: {
-    [x: string]: {
-        [x: string]: WindowLevel;
-    };
-};
-
-// @public (undocumented)
-export namespace defaults {
-    let // (undocumented)
-    labelText: {
-        [x: string]: {
-            [x: string]: string;
-        };
-    };
-}
 
 // @public
 export class DeleteSegmentCommand {
@@ -431,12 +431,12 @@ export class Ellipse {
     getRound(): number[][][];
     getSurface(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
 }
 
 // @public
 export class Geometry {
-    constructor(origin: Point3D, size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
+    constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     appendFrame(origin: Point3D, time: number): void;
     appendOrigin(origin: Point3D, index: number, time?: number): void;
     equals(rhs: Geometry): boolean;
@@ -446,6 +446,7 @@ export class Geometry {
     getOrientation(): Matrix33;
     getOrigin(): Point3D;
     getOrigins(): Point3D[];
+    getRange(): Point[];
     getRealSpacing(): Spacing;
     getSize(viewOrientation?: Matrix33): Size;
     getSliceIndex(point: Point3D, time: number): number;
@@ -599,6 +600,8 @@ export class Index {
     getValues(): number[];
     getWithNew2D(i: number, j: number): Index;
     length(): number;
+    next(dim: number): Index;
+    previous(dim: number): Index;
     toString(): string;
 }
 
@@ -627,7 +630,7 @@ export class LayerGroup {
     getAddedScale(): Scalar3D;
     getBaseScale(): Scalar3D;
     getBaseViewLayer(): ViewLayer | undefined;
-    getDivId(): string;
+    getDivId(): string | undefined;
     getDivToWorldSizeRatio(): number | undefined;
     getDrawLayers(callbackFn?: Function): DrawLayer[];
     getDrawLayersByDataId(dataId: string): DrawLayer[];
@@ -635,6 +638,7 @@ export class LayerGroup {
     getNumberOfLayers(): number;
     getNumberOfViewLayers(): number;
     getOffset(): Scalar3D;
+    getPositionHelper(): PositionHelper;
     getScale(): Scalar3D;
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
@@ -863,6 +867,25 @@ export class Point3D {
 }
 
 // @public
+export class PositionHelper {
+    constructor(view: View);
+    decrementPosition(dim: number): boolean;
+    decrementScrollPosition(): boolean;
+    getCurrentIndex(): Index;
+    getCurrentPositon(): Point;
+    getDecrementPosition(dim: number): Point;
+    getGeometry(): Geometry;
+    getIncrementPosition(dim: number): Point;
+    getScrollIndex(): number;
+    incrementPosition(dim: number): boolean;
+    incrementScrollPosition(): boolean;
+    isPositionInBounds(position: Point): boolean;
+    merge(rhs: PositionHelper): void;
+    setCurrentPositon(position: Point, silent?: boolean): boolean;
+    setCurrentPositonSafe(position: Point, silent?: boolean): boolean;
+}
+
+// @public
 export function precisionRound(number: number, precision: number): number;
 
 // @public
@@ -888,7 +911,7 @@ export class Rectangle {
     getSurface(): number;
     getWidth(): number;
     getWorldSurface(spacing2D: Scalar2D): number;
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
 }
 
 // @public
@@ -985,13 +1008,6 @@ export class Tag {
     isPrivate(): boolean;
     isWithVR(): boolean;
     toString(): string;
-}
-
-// @public
-export class TagValueExtractor {
-    getTime(_elements: {
-        [x: string]: DataElement;
-    }): number | undefined;
 }
 
 // @public
@@ -1102,8 +1118,6 @@ export class ViewController {
     canScroll(): boolean;
     // @deprecated
     canWindowLevel(): boolean;
-    decrementIndex(dim: number, silent?: boolean): boolean;
-    decrementScrollIndex(silent?: boolean): boolean;
     equalImageMeta(meta: object): boolean;
     generateImageData(array: ImageData, index?: Index): void;
     get2DSpacing(): Scalar2D;
@@ -1112,18 +1126,14 @@ export class ViewController {
     getCurrentIndex(): Index;
     getCurrentOrientedIndex(): Index;
     getCurrentPosition(): Point;
-    getCurrentScrollIndexValue(): object;
+    getCurrentScrollIndexValue(): number;
     getCurrentScrollPosition(): number;
     getCurrentWindowPresetName(): string;
-    getDecrementPosition(dim: number): Point;
-    getDecrementScrollPosition(): Point;
-    getImageRegionValues(min: Point2D, max: Point2D): any[];
+    getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     getImageRescaledDataRange(): object;
     getImageSize(): Size;
-    getImageVariableRegionValues(regions: number[][][]): any[];
+    getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     getImageWorldSize(): Scalar2D;
-    getIncrementPosition(dim: number): Point;
-    getIncrementScrollPosition(): Point;
     getIndexFromPosition(point: Point): Index;
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
@@ -1135,13 +1145,12 @@ export class ViewController {
     getPlanePositionFromPlanePoint(point2D: Point2D): Point3D;
     getPlanePositionFromPosition(point: Point): Point2D;
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
+    getPositionHelper(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollIndex(): number;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
     includesImageUid(uid: string): boolean;
-    incrementIndex(dim: number, silent?: boolean): boolean;
-    incrementScrollIndex(silent?: boolean): boolean;
     initialise(): void;
     isAquisitionOrientation(): boolean;
     isMask(): boolean;
