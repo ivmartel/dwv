@@ -4147,7 +4147,7 @@ export declare class Point3D {
 /**
  * Position helper.
  */
-declare class PositionHelper {
+export declare class PositionHelper {
     /**
      * @param {View} view The associated view.
      */
