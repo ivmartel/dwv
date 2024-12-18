@@ -1780,9 +1780,9 @@ export class App {
    */
   #onloadtimeout = (event) => {
     /**
-     * Load error event.
+     * Load timeout event.
      *
-     * @event App#error
+     * @event App#timeout
      * @type {object}
      * @property {string} type The event type: timeout.
      * @property {string} loadType The load type: image or state.
