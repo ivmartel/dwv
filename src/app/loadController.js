@@ -213,6 +213,9 @@ export class LoadController {
     };
     loader.onerror = this.#augmentCallbackEvent(this.onerror, eventInfo);
     loader.onabort = this.#augmentCallbackEvent(this.onabort, eventInfo);
+    if (typeof loader.ontimeout !== 'undefined') {
+      loader.ontimeout = this.#augmentCallbackEvent(this.ontimeout, eventInfo);
+    }
     // launch load
     try {
       loader.load(data, options);
@@ -297,6 +300,14 @@ export class LoadController {
    * @param {object} _event The error event.
    */
   onerror(_event) {}
+
+  /**
+   * Handle a timeout event.
+   * Default does nothing.
+   *
+   * @param {object} _event The timeout event.
+   */
+  ontimeout(_event) {}
 
   /**
    * Handle an abort event.

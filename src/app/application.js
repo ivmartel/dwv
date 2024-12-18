@@ -680,6 +680,7 @@ export class App {
     this.#loadController.onload = this.#onload;
     this.#loadController.onloadend = this.#onloadend;
     this.#loadController.onerror = this.#onloaderror;
+    this.#loadController.ontimeout = this.#onloadtimeout;
     this.#loadController.onabort = this.#onloadabort;
 
     // create data controller
@@ -1768,6 +1769,28 @@ export class App {
      */
     if (typeof event.type === 'undefined') {
       event.type = 'error';
+    }
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load timeout callback.
+   *
+   * @param {object} event The timeout event.
+   */
+  #onloadtimeout = (event) => {
+    /**
+     * Load error event.
+     *
+     * @event App#error
+     * @type {object}
+     * @property {string} type The event type: timeout.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: an url as a string.
+     * @property {object} target The event target.
+     */
+    if (typeof event.type === 'undefined') {
+      event.type = 'timeout';
     }
     this.#fireEvent(event);
   };
