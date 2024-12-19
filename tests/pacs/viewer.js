@@ -521,7 +521,6 @@ function updateSliders() {
   }
 }
 
-
 /**
  * Append a layer div in the root 'dwv' one.
  *
