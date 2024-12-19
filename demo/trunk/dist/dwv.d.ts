@@ -4169,7 +4169,13 @@ export declare class PositionHelper {
      *
      * @returns {Point} The current position.
      */
-    getCurrentPositon(): Point;
+    getCurrentPosition(): Point;
+    /**
+     * Get the current index.
+     *
+     * @returns {Index} The current index.
+     */
+    getCurrentIndex(): Index;
     /**
      * Set the current position.
      *
@@ -4200,12 +4206,6 @@ export declare class PositionHelper {
      * @returns {boolean} True is the position is in bounds.
      */
     isPositionInBounds(position: Point): boolean;
-    /**
-     * Get the current index.
-     *
-     * @returns {Index} The current index.
-     */
-    getCurrentIndex(): Index;
     /**
      * Get the current position incremented in the input direction.
      *
