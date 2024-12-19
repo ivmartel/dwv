@@ -95,8 +95,17 @@ export class PositionHelper {
    *
    * @returns {Point} The current position.
    */
-  getCurrentPositon() {
+  getCurrentPosition() {
     return this.#positionAccessor.getCurrentPosition();
+  }
+
+  /**
+   * Get the current index.
+   *
+   * @returns {Index} The current index.
+   */
+  getCurrentIndex() {
+    return this.#geometry.worldToIndex(this.getCurrentPosition());
   }
 
   /**
@@ -159,15 +168,6 @@ export class PositionHelper {
       dirs.push(3);
     }
     return this.#geometry.isIndexInBounds(index, dirs);
-  }
-
-  /**
-   * Get the current index.
-   *
-   * @returns {Index} The current index.
-   */
-  getCurrentIndex() {
-    return this.#geometry.worldToIndex(this.getCurrentPositon());
   }
 
   /**

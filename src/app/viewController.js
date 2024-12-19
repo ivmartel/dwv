@@ -191,7 +191,7 @@ export class ViewController {
    * @returns {Point} The position.
    */
   getCurrentPosition() {
-    return this.#positionHelper.getCurrentPositon();
+    return this.#positionHelper.getCurrentPosition();
   }
 
   /**
