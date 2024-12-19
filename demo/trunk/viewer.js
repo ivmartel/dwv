@@ -497,10 +497,13 @@ function initSliders() {
     const lgId = 'layerGroup' + i;
     const slider = document.getElementById(lgId + '-slider');
     if (slider) {
-      slider.style.display = '';
       const lg = _app.getLayerGroupByDivId(lgId);
       const ph = lg.getPositionHelper();
-      slider.max = ph.getMaximumScrollIndex();
+      const maxIndex = ph.getMaximumScrollIndex();
+      if (maxIndex !== 0) {
+        slider.max = maxIndex;
+        slider.style.display = '';
+      }
     }
   }
 }
