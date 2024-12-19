@@ -4165,11 +4165,30 @@ export declare class PositionHelper {
      */
     getScrollDimIndex(): number;
     /**
+     * Get the maximum scroll index.
+     *
+     * @returns {number} The maximum index.
+     */
+    getMaximumScrollIndex(): number;
+    /**
      * Get the current position.
      *
      * @returns {Point} The current position.
      */
     getCurrentPosition(): Point;
+    /**
+     * Get the scroll index for the current position.
+     *
+     * @returns {number} The index.
+     */
+    getCurrentPositionScrollIndex(): number;
+    /**
+     * Get the current position updated at the provided scroll index.
+     *
+     * @param {number} index The scroll index.
+     * @returns {Point} The position.
+     */
+    getCurrentPositionAtScrollIndex(index: number): Point;
     /**
      * Get the current index.
      *
