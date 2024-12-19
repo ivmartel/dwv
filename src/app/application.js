@@ -1363,7 +1363,7 @@ export class App {
           }
         } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
           if (layerGroup.canScroll()) {
-            positionHelper.incrementScrollPosition();
+            positionHelper.incrementPositionAlongScroll();
           }
         } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
           if (layerGroup.moreThanOne(3)) {
@@ -1371,7 +1371,7 @@ export class App {
           }
         } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
           if (layerGroup.canScroll()) {
-            positionHelper.decrementScrollPosition();
+            positionHelper.decrementPositionAlongScroll();
           }
         }
       } else if (event.key === 'y') { // crtl-y

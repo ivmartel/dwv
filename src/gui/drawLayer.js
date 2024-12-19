@@ -478,11 +478,11 @@ export class DrawLayer {
    * @returns {boolean} True if the offset was updated.
    */
   setBaseOffset(scrollOffset, planeOffset) {
-    const scrollIndex = this.#planeHelper.getNativeScrollIndex();
+    const scrollDimIndex = this.#planeHelper.getNativeScrollDimIndex();
     const newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
-      x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
-      y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
-      z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+      x: scrollDimIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollDimIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollDimIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
       this.#baseOffset.y !== newOffset.y;

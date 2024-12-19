@@ -61,7 +61,7 @@ export class PositionHelper {
   /**
    * @type {number}
    */
-  #scrollIndex;
+  #scrollDimIndex;
 
   /**
    * @param {View} view The associated view.
@@ -69,7 +69,7 @@ export class PositionHelper {
   constructor(view) {
     this.#positionAccessor = new ViewPositionAccessor(view);
     this.#geometry = view.getImage().getGeometry();
-    this.#scrollIndex = view.getScrollIndex();
+    this.#scrollDimIndex = view.getScrollDimIndex();
   }
 
   /**
@@ -86,8 +86,8 @@ export class PositionHelper {
    *
    * @returns {number} The scroll index.
    */
-  getScrollIndex() {
-    return this.#scrollIndex;
+  getScrollDimIndex() {
+    return this.#scrollDimIndex;
   }
 
   /**
@@ -136,7 +136,7 @@ export class PositionHelper {
    */
   merge(rhs) {
     // check compatibility
-    if (this.#scrollIndex !== rhs.getScrollIndex()) {
+    if (this.#scrollDimIndex !== rhs.getScrollDimIndex()) {
       throw new Error(
         'Cannot merge helper of a view with different orientation'
       );
@@ -154,7 +154,7 @@ export class PositionHelper {
    */
   isPositionInBounds(position) {
     const index = this.#geometry.worldToIndex(position);
-    const dirs = [this.#scrollIndex];
+    const dirs = [this.#scrollDimIndex];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -217,8 +217,8 @@ export class PositionHelper {
    *
    * @returns {boolean} True if possible and in bounds.
    */
-  incrementScrollPosition() {
-    return this.incrementPosition(this.#scrollIndex);
+  incrementPositionAlongScroll() {
+    return this.incrementPosition(this.#scrollDimIndex);
   }
 
   /**
@@ -226,8 +226,8 @@ export class PositionHelper {
    *
    * @returns {boolean} True if possible and in bounds.
    */
-  decrementScrollPosition() {
-    return this.decrementPosition(this.#scrollIndex);
+  decrementPositionAlongScroll() {
+    return this.decrementPosition(this.#scrollDimIndex);
   }
 
 }

@@ -575,11 +575,11 @@ export class ViewLayer {
     scrollOffset, planeOffset,
     layerGroupOrigin, layerGroupOrigin0) {
     const helper = this.#viewController.getPlaneHelper();
-    const scrollIndex = helper.getNativeScrollIndex();
+    const scrollDimIndex = helper.getNativeScrollDimIndex();
     const newOffset = helper.getPlaneOffsetFromOffset3D({
-      x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
-      y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
-      z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+      x: scrollDimIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollDimIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollDimIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
       this.#baseOffset.y !== newOffset.y;
@@ -1070,9 +1070,9 @@ export class ViewLayer {
         // 3D dimensions
         const dims3D = [0, 1, 2];
         // remove scroll index
-        const indexScrollIndex =
-          dims3D.indexOf(this.#viewController.getScrollIndex());
-        dims3D.splice(indexScrollIndex, 1);
+        const indexScrollDimIndex =
+          dims3D.indexOf(this.#viewController.getScrollDimIndex());
+        dims3D.splice(indexScrollDimIndex, 1);
         // remove non scroll index from diff dims
         const diffDims = event.diffDims.filter(function (item) {
           return dims3D.indexOf(item) === -1;

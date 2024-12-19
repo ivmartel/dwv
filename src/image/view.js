@@ -569,7 +569,7 @@ export class View {
     }
     const geometry = this.#image.getGeometry();
     const index = geometry.worldToIndex(position);
-    const dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollDimIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -605,7 +605,7 @@ export class View {
     // send invalid event if not in bounds
     const geometry = this.#image.getGeometry();
     const index = geometry.worldToIndex(position);
-    const dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollDimIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -645,7 +645,7 @@ export class View {
     const position = geometry.indexToWorld(index);
 
     // check if possible
-    const dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollDimIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -985,7 +985,7 @@ export class View {
    *
    * @returns {number} The index.
    */
-  getScrollIndex() {
+  getScrollDimIndex() {
     let index = null;
     const orientation = this.getOrientation();
     if (typeof orientation !== 'undefined') {

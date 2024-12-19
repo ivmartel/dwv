@@ -176,9 +176,9 @@ export class ZoomAndPan {
       // update view controller
       if (layerGroup.canScroll()) {
         if (diffY > 0) {
-          positionHelper.incrementScrollPosition();
+          positionHelper.incrementPositionAlongScroll();
         } else {
-          positionHelper.decrementScrollPosition();
+          positionHelper.decrementPositionAlongScroll();
         }
       }
     } else {

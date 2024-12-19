@@ -34,7 +34,7 @@ function getRunRenderTest(app) {
     }
     const vc = vl.getViewController();
     const runner = function () {
-      vc.incrementScrollIndex();
+      vc.getPositionHelper().incrementPositionAlongScroll();
     };
 
     let startTime;

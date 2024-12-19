@@ -206,8 +206,8 @@ export class Annotation {
         new Point([origin.getX(), origin.getY(), origin.getZ()]);
       const originIndex =
         this.#viewController.getIndexFromPosition(originPoint);
-      const scrollIndex = this.#viewController.getScrollIndex();
-      const k = originIndex.getValues()[scrollIndex];
+      const scrollDimIndex = this.#viewController.getScrollDimIndex();
+      const k = originIndex.getValues()[scrollDimIndex];
 
       // shape center converted to 3D
       const planePoint = this.mathShape.getCentroid();

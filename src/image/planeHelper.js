@@ -380,7 +380,7 @@ export class PlaneHelper {
    *
    * @returns {number} The index.
    */
-  getScrollIndex() {
+  getScrollDimIndex() {
     let index = null;
     if (typeof this.#viewOrientation !== 'undefined') {
       index = this.#viewOrientation.getThirdColMajorDirection();
@@ -395,7 +395,7 @@ export class PlaneHelper {
    *
    * @returns {number} The index.
    */
-  getNativeScrollIndex() {
+  getNativeScrollDimIndex() {
     let index = null;
     if (typeof this.#imageOrientation !== 'undefined') {
       index = this.#imageOrientation.getThirdColMajorDirection();

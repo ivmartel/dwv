@@ -191,9 +191,9 @@ export class Scroll {
     if (yMove && layerGroup.canScroll()) {
       // update view controller
       if (diffY > 0) {
-        positionHelper.decrementScrollPosition();
+        positionHelper.decrementPositionAlongScroll();
       } else {
-        positionHelper.incrementScrollPosition();
+        positionHelper.incrementPositionAlongScroll();
       }
     } else if (xMove && layerGroup.moreThanOne(3)) {
       // update view controller

@@ -252,21 +252,21 @@ export class ViewController {
   }
 
   /**
-   * Get the scroll index.
+   * Get the scroll dimension index.
    *
    * @returns {number} The index.
    */
-  getScrollIndex() {
-    return this.#view.getScrollIndex();
+  getScrollDimIndex() {
+    return this.#view.getScrollDimIndex();
   }
 
   /**
-   * Get the current scroll index value.
+   * Get the current index scroll value.
    *
    * @returns {number} The value.
    */
-  getCurrentScrollIndexValue() {
-    return this.getCurrentIndex().get(this.#view.getScrollIndex());
+  getCurrentIndexScrollValue() {
+    return this.getCurrentIndex().get(this.#view.getScrollDimIndex());
   }
 
   /**
@@ -305,8 +305,8 @@ export class ViewController {
    * @returns {number} The value.
    */
   getCurrentScrollPosition() {
-    const scrollIndex = this.#view.getScrollIndex();
-    return this.#view.getCurrentPosition().get(scrollIndex);
+    const scrollDimIndex = this.#view.getScrollDimIndex();
+    return this.#view.getCurrentPosition().get(scrollDimIndex);
   }
 
   /**
@@ -611,7 +611,7 @@ export class ViewController {
   getPositionFromPlanePoint(point2D, k) {
     // keep third direction
     if (typeof k === 'undefined') {
-      k = this.getCurrentScrollIndexValue();
+      k = this.getCurrentIndexScrollValue();
     }
     const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
@@ -675,7 +675,7 @@ export class ViewController {
    */
   getPlanePositionFromPlanePoint(point2D) {
     // keep third direction
-    const k = this.getCurrentScrollIndexValue();
+    const k = this.getCurrentIndexScrollValue();
     const planePoint = new Point3D(point2D.getX(), point2D.getY(), k);
     // de-orient
     const point = this.#planeHelper.getTargetDeOrientedPoint3D(planePoint);
@@ -718,7 +718,7 @@ export class ViewController {
       this.#playerID = window.setInterval(() => {
         let canDoMore = false;
         if (canScroll3D) {
-          canDoMore = this.#positionHelper.incrementScrollPosition();
+          canDoMore = this.#positionHelper.incrementPositionAlongScroll();
         } else {
           canDoMore = this.#positionHelper.incrementPosition(3);
         }

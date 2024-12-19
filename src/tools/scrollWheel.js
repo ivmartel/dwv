@@ -146,9 +146,9 @@ export class ScrollWheel {
 
     if (layerGroup.canScroll()) {
       if (up) {
-        positionHelper.incrementScrollPosition();
+        positionHelper.incrementPositionAlongScroll();
       } else {
-        positionHelper.decrementScrollPosition();
+        positionHelper.decrementPositionAlongScroll();
       }
     } else if (layerGroup.moreThanOne(3)) {
       if (up) {
