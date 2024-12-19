@@ -49,10 +49,6 @@ input[type=color] {
 select {
   width: 90px;
 }
-input[type=range] {
-  width: 100px;
-  margin: 0px 10px;
-}
 fieldset {
   legend {
     font-size: small;
@@ -83,6 +79,10 @@ fieldset ul {
 .toolFeatures {
   margin: 0 5px;
 }
+.ctrl-range {
+  width: 100px;
+  margin: 0px 10px;
+}
 /* special dwv */
 #dwv {
   display: flex;
@@ -107,10 +107,11 @@ fieldset ul {
   transform: translate(-50%, -50%);
 }
 .slider {
+  width: 90%;
   /* needed for overlay */
   position: absolute;
   /* center */
-  top: 103%;
+  top: 102%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
