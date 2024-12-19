@@ -502,6 +502,7 @@ function initSliders() {
       const maxIndex = ph.getMaximumScrollIndex();
       if (maxIndex !== 0) {
         slider.max = maxIndex;
+        slider.value = ph.getCurrentPositionScrollIndex();
         slider.style.display = '';
       }
     }
