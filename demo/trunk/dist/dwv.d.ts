@@ -3919,13 +3919,13 @@ export declare class PlaneHelper {
      *
      * @returns {number} The index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
      * Get the native (image) scroll dimension index.
      *
      * @returns {number} The index.
      */
-    getNativeScrollIndex(): number;
+    getNativeScrollDimIndex(): number;
     #private;
 }
 
@@ -4163,7 +4163,7 @@ export declare class PositionHelper {
      *
      * @returns {number} The scroll index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
      * Get the current position.
      *
@@ -4239,13 +4239,13 @@ export declare class PositionHelper {
      *
      * @returns {boolean} True if possible and in bounds.
      */
-    incrementScrollPosition(): boolean;
+    incrementPositionAlongScroll(): boolean;
     /**
      * Decrement the current position along the scroll dimension.
      *
      * @returns {boolean} True if possible and in bounds.
      */
-    decrementScrollPosition(): boolean;
+    decrementPositionAlongScroll(): boolean;
     #private;
 }
 
@@ -5380,7 +5380,7 @@ export declare class View {
      *
      * @returns {number} The index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
      * Is this view in the same orientation as the image aquisition.
      *
@@ -5552,17 +5552,17 @@ export declare class ViewController {
      */
     getCurrentOrientedIndex(): Index;
     /**
-     * Get the scroll index.
+     * Get the scroll dimension index.
      *
      * @returns {number} The index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
-     * Get the current scroll index value.
+     * Get the current index scroll value.
      *
      * @returns {number} The value.
      */
-    getCurrentScrollIndexValue(): number;
+    getCurrentIndexScrollValue(): number;
     /**
      * Get the first origin or at a given position.
      *
