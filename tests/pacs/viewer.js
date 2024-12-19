@@ -77,16 +77,13 @@ function viewerSetup() {
   // use for concurrent load
   const numberOfDataToLoad = 1;
 
-  if (_layout === 'one') {
-    // simplest: one layer group
-    addLayerGroups(1);
-  } else if (_layout === 'side') {
-    // side by side
-    addLayerGroups(2);
-  } else if (_layout === 'mpr') {
-    // MPR
+  // add layer groups div
+  const numberOfLayerGroups = getNumberOfLayerGroups();
+  addLayerGroupsDiv(numberOfLayerGroups);
+
+  // special MPR
+  if (_layout === 'mpr') {
     viewOnFirstLoadItem = false;
-    addLayerGroups(3);
   }
 
   // tools
@@ -203,6 +200,9 @@ function viewerSetup() {
         resetLayoutButton.disabled = false;
         const smoothingChk = document.getElementById('changesmoothing');
         smoothingChk.disabled = false;
+
+        // update sliders with new data info
+        initSliders();
       }
     }
 
@@ -239,6 +239,8 @@ function viewerSetup() {
     if (span) {
       span.innerHTML = text;
     }
+    // update sliders' value
+    updateSliders();
   });
 
   // default keyboard shortcuts
@@ -339,6 +341,23 @@ function viewerSetup() {
 }
 
 /**
+ * Get the number of layer groups according to layout.
+ *
+ * @returns {nunmber} The number.
+ */
+function getNumberOfLayerGroups() {
+  let number;
+  if (_layout === 'one') {
+    number = 1;
+  } else if (_layout === 'side') {
+    number = 2;
+  } else if (_layout === 'mpr') {
+    number = 3;
+  }
+  return number;
+}
+
+/**
  * Setup.
  */
 function onDOMContentLoaded() {
@@ -378,19 +397,20 @@ function onDOMContentLoaded() {
     }
     _layout = layout;
 
+    // add layer groups div
+    const numberOfLayerGroups = getNumberOfLayerGroups();
+    addLayerGroupsDiv(numberOfLayerGroups);
+
+    // get configs
     let configs;
     const dataIds = _app.getDataIds();
     if (layout === 'one') {
-      addLayerGroups(1);
       configs = getOnebyOneDataViewConfig(dataIds);
     } else if (layout === 'side') {
-      addLayerGroups(2);
       configs = getOnebyTwoDataViewConfig(dataIds);
     } else if (layout === 'mpr') {
-      addLayerGroups(3);
       configs = getMPRDataViewConfig(dataIds);
     }
-
     if (typeof configs === 'undefined') {
       return;
     }
@@ -413,6 +433,9 @@ function onDOMContentLoaded() {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
     }
+
+    // udpate sliders after render
+    initSliders();
 
     // need to set tool after config change
     setAppTool();
@@ -443,32 +466,92 @@ function onDOMContentLoaded() {
 }
 
 /**
+ * Get the slider for a given layer group.
+ *
+ * @param {number} layerGroupDivId The div id.
+ * @returns {HTMLInputElement} The slider as html range.
+ */
+function getSlider(layerGroupDivId) {
+  const range = document.createElement('input');
+  range.style.display = 'none';
+  range.className = 'slider';
+  range.type = 'range';
+  range.min = 0;
+  range.id = layerGroupDivId + '-slider';
+  // update app on slider change
+  range.oninput = function () {
+    const lg = _app.getLayerGroupByDivId(layerGroupDivId);
+    const ph = lg.getPositionHelper();
+    const pos = ph.getCurrentPositionAtScrollIndex(this.value);
+    ph.setCurrentPositon(pos);
+  };
+  return range;
+}
+
+/**
+ * Init sliders: show them and set max.
+ */
+function initSliders() {
+  const numberOfLayerGroups = getNumberOfLayerGroups();
+  for (let i = 0; i < numberOfLayerGroups; ++i) {
+    const lgId = 'layerGroup' + i;
+    const slider = document.getElementById(lgId + '-slider');
+    if (slider) {
+      slider.style.display = '';
+      const lg = _app.getLayerGroupByDivId(lgId);
+      const ph = lg.getPositionHelper();
+      slider.max = ph.getMaximumScrollIndex();
+    }
+  }
+}
+
+/**
+ * Update sliders: set the slider value to the current scroll index.
+ */
+function updateSliders() {
+  const numberOfLayerGroups = getNumberOfLayerGroups();
+  for (let i = 0; i < numberOfLayerGroups; ++i) {
+    const lgId = 'layerGroup' + i;
+    const slider = document.getElementById(lgId + '-slider');
+    if (slider) {
+      const lg = _app.getLayerGroupByDivId(lgId);
+      const ph = lg.getPositionHelper();
+      slider.value = ph.getCurrentPositionScrollIndex();
+    }
+  }
+}
+
+
+/**
  * Append a layer div in the root 'dwv' one.
  *
  * @param {string} id The id of the layer.
  */
-function addLayerGroup(id) {
+function addLayerGroupDiv(id) {
   const layerDiv = document.createElement('div');
   layerDiv.id = id;
   layerDiv.className = 'layerGroup';
+
+  // add slider
+  layerDiv.appendChild(getSlider(id));
+
   const root = document.getElementById('dwv');
   root.appendChild(layerDiv);
 }
 
 /**
- * Add Layer Groups.
- *
- * @param {number} number The number of layer groups.
+ * Add Layer Groups div.
  */
-function addLayerGroups(number) {
+function addLayerGroupsDiv() {
   // clean up
   const dwvDiv = document.getElementById('dwv');
   if (dwvDiv) {
     dwvDiv.innerHTML = '';
   }
   // add div
-  for (let i = 0; i < number; ++i) {
-    addLayerGroup('layerGroup' + i);
+  const numberOfLayerGroups = getNumberOfLayerGroups();
+  for (let i = 0; i < numberOfLayerGroups; ++i) {
+    addLayerGroupDiv('layerGroup' + i);
   }
 }
 
