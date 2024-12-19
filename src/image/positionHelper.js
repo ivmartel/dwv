@@ -91,12 +91,43 @@ export class PositionHelper {
   }
 
   /**
+   * Get the maximum scroll index.
+   *
+   * @returns {number} The maximum index.
+   */
+  getMaximumScrollIndex() {
+    return this.#geometry.getSize().get(this.#scrollDimIndex) - 1;
+  }
+
+  /**
    * Get the current position.
    *
    * @returns {Point} The current position.
    */
   getCurrentPosition() {
     return this.#positionAccessor.getCurrentPosition();
+  }
+
+  /**
+   * Get the scroll index for the current position.
+   *
+   * @returns {number} The index.
+   */
+  getCurrentPositionScrollIndex() {
+    const values = this.getCurrentIndex().getValues();
+    return values[this.#scrollDimIndex];
+  }
+
+  /**
+   * Get the current position updated at the provided scroll index.
+   *
+   * @param {number} index The scroll index.
+   * @returns {Point} The position.
+   */
+  getCurrentPositionAtScrollIndex(index) {
+    const values = this.getCurrentIndex().getValues();
+    values[this.#scrollDimIndex] = index;
+    return this.#geometry.indexToWorld(new Index(values));
   }
 
   /**
