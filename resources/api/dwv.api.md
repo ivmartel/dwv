@@ -807,13 +807,13 @@ export class PlaneHelper {
     getImageDeOrientedVector3D(vector: Vector3D): Vector3D;
     getImageOrientedPoint3D(planePoint: Point3D): Point3D;
     getImageOrientedVector3D(planeVector: Vector3D): Vector3D;
-    getNativeScrollIndex(): number;
+    getNativeScrollDimIndex(): number;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getPlaneOffsetFromOffset3D(offset3D: Scalar3D): Scalar2D;
     getPlanePointFromPosition(point: Point): Point3D;
     getPlanePoints(position: Point): Point3D[];
     getPositionFromPlanePoint(point2D: Point2D, k: number): Point3D;
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     getTargetDeOrientedPoint3D(planePoint: Point3D): Point3D;
     getTargetDeOrientedVector3D(planeVector: Vector3D): Vector3D;
     getTargetOrientation(): Matrix33;
@@ -870,15 +870,18 @@ export class Point3D {
 export class PositionHelper {
     constructor(view: View);
     decrementPosition(dim: number): boolean;
-    decrementScrollPosition(): boolean;
+    decrementPositionAlongScroll(): boolean;
     getCurrentIndex(): Index;
-    getCurrentPositon(): Point;
+    getCurrentPosition(): Point;
+    getCurrentPositionAtScrollIndex(index: number): Point;
+    getCurrentPositionScrollIndex(): number;
     getDecrementPosition(dim: number): Point;
     getGeometry(): Geometry;
     getIncrementPosition(dim: number): Point;
-    getScrollIndex(): number;
+    getMaximumScrollIndex(): number;
+    getScrollDimIndex(): number;
     incrementPosition(dim: number): boolean;
-    incrementScrollPosition(): boolean;
+    incrementPositionAlongScroll(): boolean;
     isPositionInBounds(position: Point): boolean;
     merge(rhs: PositionHelper): void;
     setCurrentPositon(position: Point, silent?: boolean): boolean;
@@ -1073,7 +1076,7 @@ export class View {
     getOrigin(position?: Point): Point3D;
     getOriginForImageUid(uid: string): Point3D | undefined;
     getPlaybackMilliseconds(recommendedDisplayFrameRate: number): number;
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     getWindowLevel(): WindowLevel;
     getWindowLevelMinMax(): WindowLevel;
     getWindowPresets(): object;
@@ -1124,9 +1127,9 @@ export class ViewController {
     getColourMap(): string;
     getCurrentImageUid(): string;
     getCurrentIndex(): Index;
+    getCurrentIndexScrollValue(): number;
     getCurrentOrientedIndex(): Index;
     getCurrentPosition(): Point;
-    getCurrentScrollIndexValue(): number;
     getCurrentScrollPosition(): number;
     getCurrentWindowPresetName(): string;
     getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
@@ -1147,7 +1150,7 @@ export class ViewController {
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     getPositionHelper(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
     includesImageUid(uid: string): boolean;
