@@ -5,10 +5,10 @@
 })(this, (function () { 'use strict';
 
   /*
-   * Konva JavaScript Framework v9.3.16
+   * Konva JavaScript Framework v9.3.18
    * http://konvajs.org/
    * Licensed under the MIT
-   * Date: Mon Oct 21 2024
+   * Date: Mon Dec 23 2024
    *
    * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
    * Modified work Copyright (C) 2014 - present by Anton Lavrenov (Konva)
@@ -35,7 +35,7 @@
               : {};
   const Konva$2 = {
       _global: glob,
-      version: '9.3.16',
+      version: '9.3.18',
       isBrowser: detectBrowser(),
       isUnminified: /param/.test(function (param) { }.toString()),
       dblClickWindow: 400,
@@ -433,7 +433,7 @@
       }
   }
   // CONSTANTS
-  let OBJECT_ARRAY = '[object Array]', OBJECT_NUMBER = '[object Number]', OBJECT_STRING = '[object String]', OBJECT_BOOLEAN = '[object Boolean]', PI_OVER_DEG180 = Math.PI / 180, DEG180_OVER_PI = 180 / Math.PI, HASH$1 = '#', EMPTY_STRING$1 = '', ZERO = '0', KONVA_WARNING = 'Konva warning: ', KONVA_ERROR = 'Konva error: ', RGB_PAREN = 'rgb(', COLORS = {
+  const OBJECT_ARRAY = '[object Array]', OBJECT_NUMBER = '[object Number]', OBJECT_STRING = '[object String]', OBJECT_BOOLEAN = '[object Boolean]', PI_OVER_DEG180 = Math.PI / 180, DEG180_OVER_PI = 180 / Math.PI, HASH$1 = '#', EMPTY_STRING$1 = '', ZERO = '0', KONVA_WARNING = 'Konva warning: ', KONVA_ERROR = 'Konva error: ', RGB_PAREN = 'rgb(', COLORS = {
       aliceblue: [240, 248, 255],
       antiquewhite: [250, 235, 215],
       aqua: [0, 255, 255],
@@ -583,7 +583,8 @@
       whitesmoke: [245, 245, 245],
       yellow: [255, 255, 0],
       yellowgreen: [154, 205, 5],
-  }, RGB_REGEX = /rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/, animQueue = [];
+  }, RGB_REGEX = /rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/;
+  let animQueue = [];
   const req = (typeof requestAnimationFrame !== 'undefined' && requestAnimationFrame) ||
       function (f) {
           setTimeout(f, 60);
@@ -1040,19 +1041,19 @@
           return pc;
       },
       _prepareArrayForTween(startArray, endArray, isClosed) {
-          let n, start = [], end = [];
+          const start = [], end = [];
           if (startArray.length > endArray.length) {
               const temp = endArray;
               endArray = startArray;
               startArray = temp;
           }
-          for (n = 0; n < startArray.length; n += 2) {
+          for (let n = 0; n < startArray.length; n += 2) {
               start.push({
                   x: startArray[n],
                   y: startArray[n + 1],
               });
           }
-          for (n = 0; n < endArray.length; n += 2) {
+          for (let n = 0; n < endArray.length; n += 2) {
               end.push({
                   x: endArray[n],
                   y: endArray[n + 1],
@@ -1186,8 +1187,8 @@
   function getNumberOrArrayOfNumbersValidator(noOfElements) {
       if (Konva$2.isUnminified) {
           return function (val, attr) {
-              const isNumber = Util._isNumber(val);
-              const isValidArray = Util._isArray(val) && val.length == noOfElements;
+              let isNumber = Util._isNumber(val);
+              let isValidArray = Util._isArray(val) && val.length == noOfElements;
               if (!isNumber && !isValidArray) {
                   Util.warn(_formatValue(val) +
                       ' is a not valid value for "' +
@@ -1203,8 +1204,8 @@
   function getNumberOrAutoValidator() {
       if (Konva$2.isUnminified) {
           return function (val, attr) {
-              const isNumber = Util._isNumber(val);
-              const isAuto = val === 'auto';
+              var isNumber = Util._isNumber(val);
+              var isAuto = val === 'auto';
               if (!(isNumber || isAuto)) {
                   Util.warn(_formatValue(val) +
                       ' is a not valid value for "' +
@@ -1233,7 +1234,7 @@
           return function (val, attr) {
               const isString = Util._isString(val);
               const isGradient = Object.prototype.toString.call(val) === '[object CanvasGradient]' ||
-                  (val && val.addColorStop);
+                  (val && val['addColorStop']);
               if (!(isString || isGradient)) {
                   Util.warn(_formatValue(val) +
                       ' is a not valid value for "' +
@@ -1277,7 +1278,7 @@
   function getBooleanValidator() {
       if (Konva$2.isUnminified) {
           return function (val, attr) {
-              const isBool = val === true || val === false;
+              var isBool = val === true || val === false;
               if (!isBool) {
                   Util.warn(_formatValue(val) +
                       ' is a not valid value for "' +
@@ -1307,7 +1308,8 @@
       }
   }
 
-  const GET = 'get', SET$1 = 'set';
+  const GET = 'get';
+  const SET$1 = 'set';
   const Factory = {
       addGetterSetter(constructor, attr, def, validator, after) {
           Factory.addGetter(constructor, attr, def);
@@ -1315,7 +1317,7 @@
           Factory.addOverloadedGetterSetter(constructor, attr);
       },
       addGetter(constructor, attr, def) {
-          const method = GET + Util._capitalize(attr);
+          var method = GET + Util._capitalize(attr);
           constructor.prototype[method] =
               constructor.prototype[method] ||
                   function () {
@@ -1324,13 +1326,13 @@
                   };
       },
       addSetter(constructor, attr, validator, after) {
-          const method = SET$1 + Util._capitalize(attr);
+          var method = SET$1 + Util._capitalize(attr);
           if (!constructor.prototype[method]) {
               Factory.overWriteSetter(constructor, attr, validator, after);
           }
       },
       overWriteSetter(constructor, attr, validator, after) {
-          const method = SET$1 + Util._capitalize(attr);
+          var method = SET$1 + Util._capitalize(attr);
           constructor.prototype[method] = function (val) {
               if (validator && val !== undefined && val !== null) {
                   val = validator.call(this, val, attr);
@@ -1343,12 +1345,12 @@
           };
       },
       addComponentsGetterSetter(constructor, attr, components, validator, after) {
-          let len = components.length, capitalize = Util._capitalize, getter = GET + capitalize(attr), setter = SET$1 + capitalize(attr), n, component;
+          const len = components.length, capitalize = Util._capitalize, getter = GET + capitalize(attr), setter = SET$1 + capitalize(attr);
           // getter
           constructor.prototype[getter] = function () {
               const ret = {};
-              for (n = 0; n < len; n++) {
-                  component = components[n];
+              for (let n = 0; n < len; n++) {
+                  const component = components[n];
                   ret[component] = this.getAttr(attr + capitalize(component));
               }
               return ret;
@@ -1356,14 +1358,14 @@
           const basicValidator = getComponentValidator(components);
           // setter
           constructor.prototype[setter] = function (val) {
-              let oldVal = this.attrs[attr], key;
+              const oldVal = this.attrs[attr];
               if (validator) {
-                  val = validator.call(this, val);
+                  val = validator.call(this, val, attr);
               }
               if (basicValidator) {
                   basicValidator.call(this, val, attr);
               }
-              for (key in val) {
+              for (const key in val) {
                   if (!val.hasOwnProperty(key)) {
                       continue;
                   }
@@ -1383,7 +1385,7 @@
           Factory.addOverloadedGetterSetter(constructor, attr);
       },
       addOverloadedGetterSetter(constructor, attr) {
-          const capitalizedAttr = Util._capitalize(attr), setter = SET$1 + capitalizedAttr, getter = GET + capitalizedAttr;
+          var capitalizedAttr = Util._capitalize(attr), setter = SET$1 + capitalizedAttr, getter = GET + capitalizedAttr;
           constructor.prototype[attr] = function () {
               // setting
               if (arguments.length) {
@@ -1433,9 +1435,9 @@
   };
 
   function simplifyArray(arr) {
-      let retArr = [], len = arr.length, util = Util, n, val;
-      for (n = 0; n < len; n++) {
-          val = arr[n];
+      const retArr = [], len = arr.length, util = Util;
+      for (let n = 0; n < len; n++) {
+          let val = arr[n];
           if (util._isNumber(val)) {
               val = Math.round(val * 1000) / 1000;
           }
@@ -5060,7 +5062,7 @@
    * // set offset y
    * node.offsetY(3);
    */
-  addGetterSetter(Node, 'dragDistance', null, getNumberValidator());
+  addGetterSetter(Node, 'dragDistance', undefined, getNumberValidator());
   /**
    * get/set drag distance
    * @name Konva.Node#dragDistance
@@ -5144,7 +5146,7 @@
    * shape.preventDefault(false);
    */
   addGetterSetter(Node, 'preventDefault', true, getBooleanValidator());
-  addGetterSetter(Node, 'filters', null, function (val) {
+  addGetterSetter(Node, 'filters', undefined, function (val) {
       this._filterUpToDate = false;
       return val;
   });
@@ -6093,8 +6095,8 @@
        * @name Konva.Stage#clear
        */
       clear() {
-          let layers = this.children, len = layers.length, n;
-          for (n = 0; n < len; n++) {
+          const layers = this.children, len = layers.length;
+          for (let n = 0; n < len; n++) {
               layers[n].clear();
           }
           return this;
@@ -6193,8 +6195,8 @@
           if (!pos) {
               return null;
           }
-          let layers = this.children, len = layers.length, end = len - 1, n;
-          for (n = end; n >= 0; n--) {
+          const layers = this.children, len = layers.length, end = len - 1;
+          for (let n = end; n >= 0; n--) {
               const shape = layers[n].getIntersection(pos);
               if (shape) {
                   return shape;
@@ -6529,7 +6531,7 @@
           // TODO: are we sure we need to prevent default at all?
           // do not call this function on mobile because it prevent "click" event on all parent containers
           // but apps may listen to it.
-          if (evt.cancelable && eventType !== 'touch') {
+          if (evt.cancelable && eventType !== 'touch' && eventType !== 'pointer') {
               evt.preventDefault();
           }
       }
@@ -6588,7 +6590,8 @@
        * });
        */
       setPointersPositions(evt) {
-          let contentPosition = this._getContentPosition(), x = null, y = null;
+          const contentPosition = this._getContentPosition();
+          let x = null, y = null;
           evt = evt ? evt : window.event;
           // touch events
           if (evt.touches !== undefined) {
@@ -7307,17 +7310,17 @@
        * shape.drawHitFromCache();
        */
       drawHitFromCache(alphaThreshold = 0) {
-          let cachedCanvas = this._getCanvasCache(), sceneCanvas = this._getCachedSceneCanvas(), hitCanvas = cachedCanvas.hit, hitContext = hitCanvas.getContext(), hitWidth = hitCanvas.getWidth(), hitHeight = hitCanvas.getHeight(), hitImageData, hitData, len, rgbColorKey, i, alpha;
+          const cachedCanvas = this._getCanvasCache(), sceneCanvas = this._getCachedSceneCanvas(), hitCanvas = cachedCanvas.hit, hitContext = hitCanvas.getContext(), hitWidth = hitCanvas.getWidth(), hitHeight = hitCanvas.getHeight();
           hitContext.clear();
           hitContext.drawImage(sceneCanvas._canvas, 0, 0, hitWidth, hitHeight);
           try {
-              hitImageData = hitContext.getImageData(0, 0, hitWidth, hitHeight);
-              hitData = hitImageData.data;
-              len = hitData.length;
-              rgbColorKey = Util._hexToRgb(this.colorKey);
+              const hitImageData = hitContext.getImageData(0, 0, hitWidth, hitHeight);
+              const hitData = hitImageData.data;
+              const len = hitData.length;
+              const rgbColorKey = Util._hexToRgb(this.colorKey);
               // replace non transparent pixels with color key
-              for (i = 0; i < len; i += 4) {
-                  alpha = hitData[i + 3];
+              for (let i = 0; i < len; i += 4) {
+                  const alpha = hitData[i + 3];
                   if (alpha > alphaThreshold) {
                       hitData[i] = rgbColorKey.r;
                       hitData[i + 1] = rgbColorKey.g;
@@ -9151,13 +9154,14 @@
   Animation.animIdCounter = 0;
   Animation.animRunning = false;
 
-  let blacklist = {
+  const blacklist = {
       node: 1,
       duration: 1,
       easing: 1,
       onFinish: 1,
       yoyo: 1,
-  }, PAUSED = 1, PLAYING = 2, REVERSING = 3, idCounter = 0, colorAttrs = ['fill', 'stroke', 'shadowColor'];
+  }, PAUSED = 1, PLAYING = 2, REVERSING = 3, colorAttrs = ['fill', 'stroke', 'shadowColor'];
+  let idCounter = 0;
   class TweenEngine {
       constructor(prop, propFunc, func, begin, finish, duration, yoyo) {
           this.prop = prop;
@@ -9300,7 +9304,8 @@
    */
   class Tween {
       constructor(config) {
-          let that = this, node = config.node, nodeId = node._id, duration, easing = config.easing || Easings.Linear, yoyo = !!config.yoyo, key;
+          const that = this, node = config.node, nodeId = node._id, easing = config.easing || Easings.Linear, yoyo = !!config.yoyo;
+          let duration, key;
           if (typeof config.duration === 'undefined') {
               duration = 0.3;
           }
@@ -9348,14 +9353,15 @@
           this.onUpdate = config.onUpdate;
       }
       _addAttr(key, end) {
-          let node = this.node, nodeId = node._id, start, diff, tweenId, n, len, trueEnd, trueStart, endRGBA;
+          const node = this.node, nodeId = node._id;
+          let diff, len, trueEnd, trueStart, endRGBA;
           // remove conflict from tween map if it exists
-          tweenId = Tween.tweens[nodeId][key];
+          const tweenId = Tween.tweens[nodeId][key];
           if (tweenId) {
               delete Tween.attrs[nodeId][tweenId][key];
           }
           // add to tween map
-          start = node.getAttr(key);
+          let start = node.getAttr(key);
           if (Util._isArray(end)) {
               diff = [];
               len = Math.max(end.length, start.length);
@@ -9374,7 +9380,7 @@
                   }
               }
               if (key.indexOf('fill') === 0) {
-                  for (n = 0; n < len; n++) {
+                  for (let n = 0; n < len; n++) {
                       if (n % 2 === 0) {
                           diff.push(end[n] - start[n]);
                       }
@@ -9392,7 +9398,7 @@
                   }
               }
               else {
-                  for (n = 0; n < len; n++) {
+                  for (let n = 0; n < len; n++) {
                       diff.push(end[n] - start[n]);
                   }
               }
@@ -9420,7 +9426,8 @@
           Tween.tweens[nodeId][key] = this._id;
       }
       _tweenFunc(i) {
-          let node = this.node, attrs = Tween.attrs[node._id][this._id], key, attr, start, diff, newVal, n, len, end;
+          const node = this.node, attrs = Tween.attrs[node._id][this._id];
+          let key, attr, start, diff, newVal, n, len, end;
           for (key in attrs) {
               attr = attrs[key];
               start = attr.start;
@@ -9578,9 +9585,9 @@
        * @name Konva.Tween#destroy
        */
       destroy() {
-          let nodeId = this.node._id, thisId = this._id, attrs = Tween.tweens[nodeId], key;
+          const nodeId = this.node._id, thisId = this._id, attrs = Tween.tweens[nodeId];
           this.pause();
-          for (key in attrs) {
+          for (const key in attrs) {
               delete Tween.tweens[nodeId][key];
           }
           delete Tween.attrs[nodeId][thisId];
@@ -12159,9 +12166,9 @@
           const lineRect = super.getSelfRect();
           const offset = this.pointerWidth() / 2;
           return {
-              x: lineRect.x - offset,
+              x: lineRect.x,
               y: lineRect.y - offset,
-              width: lineRect.width + offset * 2,
+              width: lineRect.width,
               height: lineRect.height + offset * 2,
           };
       }
@@ -14148,9 +14155,20 @@
   function stringToArray(string) {
       // Use Unicode-aware splitting
       return [...string].reduce((acc, char, index, array) => {
-          // Handle emoji sequences (including ZWJ sequences)
-          if (/\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?(?:\u200D\p{Emoji_Presentation})+/u.test(char)) {
-              acc.push(char);
+          // Handle emoji with skin tone modifiers and ZWJ sequences
+          if (/\p{Emoji}/u.test(char)) {
+              // Check if next character is a modifier or ZWJ sequence
+              const nextChar = array[index + 1];
+              if (nextChar && /\p{Emoji_Modifier}|\u200D/u.test(nextChar)) {
+                  // If we have a modifier, combine with current emoji
+                  acc.push(char + nextChar);
+                  // Skip the next character since we've used it
+                  array[index + 1] = '';
+              }
+              else {
+                  // No modifier - treat as separate emoji
+                  acc.push(char);
+              }
           }
           // Handle regional indicator symbols (flags)
           else if (/\p{Regional_Indicator}{2}/u.test(char + (array[index + 1] || ''))) {
@@ -14161,7 +14179,8 @@
               acc[acc.length - 1] += char;
           }
           // Handle other characters
-          else {
+          else if (char) {
+              // Only push if not an empty string (skipped modifier)
               acc.push(char);
           }
           return acc;
@@ -14378,7 +14397,7 @@
           for (n = 0; n < textArrLen; n++) {
               var lineTranslateX = 0;
               var lineTranslateY = 0;
-              var obj = textArr[n], text = obj.text, width = obj.width, lastLine = obj.lastInParagraph, spacesNumber, oneWord, lineWidth;
+              var obj = textArr[n], text = obj.text, width = obj.width, lastLine = obj.lastInParagraph, spacesNumber, lineWidth;
               // horizontal alignment
               context.save();
               if (align === RIGHT) {
@@ -14397,7 +14416,6 @@
                   const y = translateY + lineTranslateY + yOffset;
                   context.moveTo(x, y);
                   spacesNumber = text.split(' ').length - 1;
-                  oneWord = spacesNumber === 0;
                   lineWidth =
                       align === JUSTIFY && !lastLine ? totalWidth - padding * 2 : width;
                   context.lineTo(x + Math.round(lineWidth), y);
@@ -14415,11 +14433,8 @@
                   const yOffset = Konva$2._fixTextRendering ? -Math.round(fontSize / 4) : 0;
                   context.moveTo(lineTranslateX, translateY + lineTranslateY + yOffset);
                   spacesNumber = text.split(' ').length - 1;
-                  oneWord = spacesNumber === 0;
                   lineWidth =
-                      align === JUSTIFY && lastLine && !oneWord
-                          ? totalWidth - padding * 2
-                          : width;
+                      align === JUSTIFY && !lastLine ? totalWidth - padding * 2 : width;
                   context.lineTo(lineTranslateX + Math.round(lineWidth), translateY + lineTranslateY + yOffset);
                   context.lineWidth = fontSize / 15;
                   const gradient = this._getLinearGradient();
@@ -14564,8 +14579,9 @@
       _getTextWidth(text) {
           const letterSpacing = this.letterSpacing();
           const length = text.length;
-          return (getDummyContext().measureText(text).width +
-              (length ? letterSpacing * (length - 1) : 0));
+          // letterSpacing * length is the total letter spacing for the text
+          // previously we used letterSpacing * (length - 1) but it doesn't match DOM behavior
+          return getDummyContext().measureText(text).width + letterSpacing * length;
       }
       _setTextData() {
           let lines = this.text().split('\n'), fontSize = +this.fontSize(), textWidth = 0, lineHeightPx = this.lineHeight() * fontSize, width = this.attrs.width, height = this.attrs.height, fixedWidth = width !== AUTO && width !== undefined, fixedHeight = height !== AUTO && height !== undefined, padding = this.padding(), maxWidth = width - padding * 2, maxHeightPx = height - padding * 2, currentHeightPx = 0, wrap = this.wrap(), 
@@ -14573,7 +14589,9 @@
           shouldWrap = wrap !== NONE, wrapAtWord = wrap !== CHAR && shouldWrap, shouldAddEllipsis = this.ellipsis();
           this.textArr = [];
           getDummyContext().font = this._getContextFont();
-          const additionalWidth = shouldAddEllipsis ? this._getTextWidth(ELLIPSIS) : 0;
+          const additionalWidth = shouldAddEllipsis
+              ? this._getTextWidth(ELLIPSIS)
+              : 0;
           for (let i = 0, max = lines.length; i < max; ++i) {
               let line = lines[i];
               let lineWidth = this._getTextWidth(line);
@@ -14587,9 +14605,12 @@
                        * use binary search to find the longest substring that
                        * that would fit in the specified width
                        */
-                      let low = 0, high = line.length, match = '', matchWidth = 0;
+                      let low = 0, high = stringToArray(line).length, // Convert to array for proper emoji handling
+                      match = '', matchWidth = 0;
                       while (low < high) {
-                          const mid = (low + high) >>> 1, substr = line.slice(0, mid + 1), substrWidth = this._getTextWidth(substr) + additionalWidth;
+                          const mid = (low + high) >>> 1, 
+                          // Convert array indices to string
+                          lineArray = stringToArray(line), substr = lineArray.slice(0, mid + 1).join(''), substrWidth = this._getTextWidth(substr) + additionalWidth;
                           if (substrWidth <= maxWidth) {
                               low = mid + 1;
                               match = substr;
@@ -14608,21 +14629,23 @@
                           // a fitting substring was found
                           if (wrapAtWord) {
                               // try to find a space or dash where wrapping could be done
-                              var wrapIndex;
-                              const nextChar = line[match.length];
+                              const lineArray = stringToArray(line);
+                              const matchArray = stringToArray(match);
+                              const nextChar = lineArray[matchArray.length];
                               const nextIsSpaceOrDash = nextChar === SPACE || nextChar === DASH;
+                              let wrapIndex;
                               if (nextIsSpaceOrDash && matchWidth <= maxWidth) {
-                                  wrapIndex = match.length;
+                                  wrapIndex = matchArray.length;
                               }
                               else {
-                                  wrapIndex =
-                                      Math.max(match.lastIndexOf(SPACE), match.lastIndexOf(DASH)) +
-                                          1;
+                                  // Find last space or dash in the array
+                                  const lastSpaceIndex = matchArray.lastIndexOf(SPACE);
+                                  const lastDashIndex = matchArray.lastIndexOf(DASH);
+                                  wrapIndex = Math.max(lastSpaceIndex, lastDashIndex) + 1;
                               }
                               if (wrapIndex > 0) {
-                                  // re-cut the substring found at the space/dash position
                                   low = wrapIndex;
-                                  match = match.slice(0, low);
+                                  match = lineArray.slice(0, low).join('');
                                   matchWidth = this._getTextWidth(match);
                               }
                           }
@@ -14641,13 +14664,12 @@
                                */
                               break;
                           }
-                          line = line.slice(low);
-                          line = line.trimLeft();
+                          // Convert remaining text using array operations
+                          const lineArray = stringToArray(line);
+                          line = lineArray.slice(low).join('').trimLeft();
                           if (line.length > 0) {
-                              // Check if the remaining text would fit on one line
                               lineWidth = this._getTextWidth(line);
                               if (lineWidth <= maxWidth) {
-                                  // if it does, add the line and break out of the loop
                                   this._addTextLine(line);
                                   currentHeightPx += lineHeightPx;
                                   textWidth = Math.max(textWidth, lineWidth);
@@ -15482,7 +15504,7 @@
    * // underline text
    * shape.textDecoration('underline');
    */
-  Factory.addGetterSetter(TextPath, 'textDecoration', null);
+  Factory.addGetterSetter(TextPath, 'textDecoration', '');
   /**
    * get/set kerning function.
    * @name Konva.TextPath#kerningFunc
@@ -15498,7 +15520,7 @@
    *   return 1;
    * });
    */
-  Factory.addGetterSetter(TextPath, 'kerningFunc', null);
+  Factory.addGetterSetter(TextPath, 'kerningFunc', undefined);
 
   const EVENTS_NAME = 'tr-konva';
   const ATTR_CHANGE_LIST = [
@@ -16942,7 +16964,6 @@
    * transformer.padding(10);
    */
   Factory.addGetterSetter(Transformer, 'padding', 0, getNumberValidator());
-  Factory.addGetterSetter(Transformer, 'node');
   /**
    * get/set attached nodes of the Transformer. Transformer will adapt to their size and listen to their events
    * @method
@@ -16962,6 +16983,9 @@
    * transformer.nodes(newNodes);
    */
   Factory.addGetterSetter(Transformer, 'nodes');
+  // @ts-ignore
+  // deprecated
+  Factory.addGetterSetter(Transformer, 'node');
   /**
    * get/set bounding box function. **IMPORTANT!** boundBondFunc operates in absolute coordinates.
    * @name Konva.Transformer#boundBoxFunc
@@ -17320,7 +17344,8 @@
   function filterGaussBlurRGBA(imageData, radius) {
       const pixels = imageData.data, width = imageData.width, height = imageData.height;
       let x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum, a_sum, r_out_sum, g_out_sum, b_out_sum, a_out_sum, r_in_sum, g_in_sum, b_in_sum, a_in_sum, pr, pg, pb, pa, rbs;
-      let div = radius + radius + 1, widthMinus1 = width - 1, heightMinus1 = height - 1, radiusPlus1 = radius + 1, sumFactor = (radiusPlus1 * (radiusPlus1 + 1)) / 2, stackStart = new BlurStack(), stackEnd = null, stack = stackStart, stackIn = null, stackOut = null, mul_sum = mul_table[radius], shg_sum = shg_table[radius];
+      const div = radius + radius + 1, widthMinus1 = width - 1, heightMinus1 = height - 1, radiusPlus1 = radius + 1, sumFactor = (radiusPlus1 * (radiusPlus1 + 1)) / 2, stackStart = new BlurStack(), mul_sum = mul_table[radius], shg_sum = shg_table[radius];
+      let stackEnd = null, stack = stackStart, stackIn = null, stackOut = null;
       for (i = 1; i < div; i++) {
           stack = stack.next = new BlurStack();
           if (i === radiusPlus1) {
@@ -17536,8 +17561,8 @@
    * node.brightness(0.8);
    */
   const Brighten = function (imageData) {
-      let brightness = this.brightness() * 255, data = imageData.data, len = data.length, i;
-      for (i = 0; i < len; i += 4) {
+      const brightness = this.brightness() * 255, data = imageData.data, len = data.length;
+      for (let i = 0; i < len; i += 4) {
           // red
           data[i] += brightness;
           // green
@@ -17569,8 +17594,9 @@
    */
   const Contrast = function (imageData) {
       const adjust = Math.pow((this.contrast() + 100) / 100, 2);
-      let data = imageData.data, nPixels = data.length, red = 150, green = 150, blue = 150, i;
-      for (i = 0; i < nPixels; i += 4) {
+      const data = imageData.data, nPixels = data.length;
+      let red = 150, green = 150, blue = 150;
+      for (let i = 0; i < nPixels; i += 4) {
           red = data[i];
           green = data[i + 1];
           blue = data[i + 2];
@@ -17631,7 +17657,8 @@
       // pixastic greyLevel is between 0 and 255.  I want it between 0 and 1.  Also,
       // a max value of greyLevel yields a white emboss, and the min value yields a black
       // emboss.  Therefore, I changed greyLevel to whiteLevel
-      let strength = this.embossStrength() * 10, greyLevel = this.embossWhiteLevel() * 255, direction = this.embossDirection(), blend = this.embossBlend(), dirY = 0, dirX = 0, data = imageData.data, w = imageData.width, h = imageData.height, w4 = w * 4, y = h;
+      const strength = this.embossStrength() * 10, greyLevel = this.embossWhiteLevel() * 255, direction = this.embossDirection(), blend = this.embossBlend(), data = imageData.data, w = imageData.width, h = imageData.height, w4 = w * 4;
+      let dirY = 0, dirX = 0, y = h;
       switch (direction) {
           case 'top-left':
               dirY = -1;
@@ -17740,7 +17767,7 @@
    * @param {Number} embossWhiteLevel between 0 and 1.  Default is 0.5
    * @returns {Number}
    */
-  Factory.addGetterSetter(Node, 'embossDirection', 'top-left', null, Factory.afterSetFilter);
+  Factory.addGetterSetter(Node, 'embossDirection', 'top-left', undefined, Factory.afterSetFilter);
   /**
    * get/set emboss direction. Use with {@link Konva.Filters.Emboss} filter.
    * @name Konva.Node#embossDirection
@@ -17749,7 +17776,7 @@
    *   The default is top-left
    * @returns {String}
    */
-  Factory.addGetterSetter(Node, 'embossBlend', false, null, Factory.afterSetFilter);
+  Factory.addGetterSetter(Node, 'embossBlend', false, undefined, Factory.afterSetFilter);
   /**
    * get/set emboss blend. Use with {@link Konva.Filters.Emboss} filter.
    * @name Konva.Node#embossBlend
@@ -17760,7 +17787,7 @@
 
   function remap(fromValue, fromMin, fromMax, toMin, toMax) {
       // Compute the range of the data
-      let fromRange = fromMax - fromMin, toRange = toMax - toMin, toValue;
+      const fromRange = fromMax - fromMin, toRange = toMax - toMin;
       // If either range is 0, then the value can only be mapped to 1 value
       if (fromRange === 0) {
           return toMin + toRange / 2;
@@ -17769,7 +17796,7 @@
           return toMin;
       }
       // (1) untranslate, (2) unscale, (3) rescale, (4) retranslate
-      toValue = (fromValue - fromMin) / fromRange;
+      let toValue = (fromValue - fromMin) / fromRange;
       toValue = toRange * toValue + toMin;
       return toValue;
   }
@@ -17788,14 +17815,15 @@
    * node.enhance(0.4);
    */
   const Enhance = function (imageData) {
-      let data = imageData.data, nSubPixels = data.length, rMin = data[0], rMax = rMin, r, gMin = data[1], gMax = gMin, g, bMin = data[2], bMax = bMin, b, i;
+      const data = imageData.data, nSubPixels = data.length;
+      let rMin = data[0], rMax = rMin, r, gMin = data[1], gMax = gMin, g, bMin = data[2], bMax = bMin, b;
       // If we are not enhancing anything - don't do any computation
       const enhanceAmount = this.enhance();
       if (enhanceAmount === 0) {
           return;
       }
       // 1st Pass - find the min and max for each channel:
-      for (i = 0; i < nSubPixels; i += 4) {
+      for (let i = 0; i < nSubPixels; i += 4) {
           r = data[i + 0];
           if (r < rMin) {
               rMin = r;
@@ -17857,7 +17885,7 @@
           bGoalMin = bMin + enhanceAmount * (bMin - bMid);
       }
       // Pass 2 - remap everything, except the alpha
-      for (i = 0; i < nSubPixels; i += 4) {
+      for (let i = 0; i < nSubPixels; i += 4) {
           data[i + 0] = remap(data[i + 0], rMin, rMax, rGoalMin, rGoalMax);
           data[i + 1] = remap(data[i + 1], gMin, gMax, gGoalMin, gGoalMax);
           data[i + 2] = remap(data[i + 2], bMin, bMax, bGoalMin, bGoalMax);
@@ -17883,9 +17911,9 @@
    * node.filters([Konva.Filters.Grayscale]);
    */
   const Grayscale = function (imageData) {
-      let data = imageData.data, len = data.length, i, brightness;
-      for (i = 0; i < len; i += 4) {
-          brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
+      const data = imageData.data, len = data.length;
+      for (let i = 0; i < len; i += 4) {
+          const brightness = 0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2];
           // red
           data[i] = brightness;
           // green
@@ -17930,7 +17958,7 @@
    * image.luminance(0.2);
    */
   const HSL = function (imageData) {
-      let data = imageData.data, nPixels = data.length, v = 1, s = Math.pow(2, this.saturation()), h = Math.abs(this.hue() + 360) % 360, l = this.luminance() * 127, i;
+      const data = imageData.data, nPixels = data.length, v = 1, s = Math.pow(2, this.saturation()), h = Math.abs(this.hue() + 360) % 360, l = this.luminance() * 127;
       // Basis for the technique used:
       // http://beesbuzz.biz/code/hsv_color_transforms.php
       // V is the value multiplier (1 for none, 2 for double, 0.5 for half)
@@ -17948,7 +17976,7 @@
       const gr = 0.299 * v - 0.299 * vsu - 0.328 * vsw, gg = 0.587 * v + 0.413 * vsu + 0.035 * vsw, gb = 0.114 * v - 0.114 * vsu + 0.293 * vsw;
       const br = 0.299 * v - 0.3 * vsu + 1.25 * vsw, bg = 0.587 * v - 0.586 * vsu - 1.05 * vsw, bb = 0.114 * v + 0.886 * vsu - 0.2 * vsw;
       let r, g, b, a;
-      for (i = 0; i < nPixels; i += 4) {
+      for (let i = 0; i < nPixels; i += 4) {
           r = data[i + 0];
           g = data[i + 1];
           b = data[i + 2];
@@ -18036,8 +18064,8 @@
    * node.filters([Konva.Filters.Invert]);
    */
   const Invert = function (imageData) {
-      let data = imageData.data, len = data.length, i;
-      for (i = 0; i < len; i += 4) {
+      const data = imageData.data, len = data.length;
+      for (let i = 0; i < len; i += 4) {
           // red
           data[i] = 255 - data[i];
           // green
@@ -18063,30 +18091,30 @@
    *  default is in the middle
    */
   const ToPolar = function (src, dst, opt) {
-      let srcPixels = src.data, dstPixels = dst.data, xSize = src.width, ySize = src.height, xMid = opt.polarCenterX || xSize / 2, yMid = opt.polarCenterY || ySize / 2, i, x, y, r = 0, g = 0, b = 0, a = 0;
+      const srcPixels = src.data, dstPixels = dst.data, xSize = src.width, ySize = src.height, xMid = opt.polarCenterX || xSize / 2, yMid = opt.polarCenterY || ySize / 2;
       // Find the largest radius
-      let rad, rMax = Math.sqrt(xMid * xMid + yMid * yMid);
-      x = xSize - xMid;
-      y = ySize - yMid;
-      rad = Math.sqrt(x * x + y * y);
+      let rMax = Math.sqrt(xMid * xMid + yMid * yMid);
+      let x = xSize - xMid;
+      let y = ySize - yMid;
+      const rad = Math.sqrt(x * x + y * y);
       rMax = rad > rMax ? rad : rMax;
       // We'll be uisng y as the radius, and x as the angle (theta=t)
-      let rSize = ySize, tSize = xSize, radius, theta;
+      const rSize = ySize, tSize = xSize;
       // We want to cover all angles (0-360) and we need to convert to
       // radians (*PI/180)
-      let conversion = ((360 / tSize) * Math.PI) / 180, sin, cos;
+      const conversion = ((360 / tSize) * Math.PI) / 180;
       // var x1, x2, x1i, x2i, y1, y2, y1i, y2i, scale;
-      for (theta = 0; theta < tSize; theta += 1) {
-          sin = Math.sin(theta * conversion);
-          cos = Math.cos(theta * conversion);
-          for (radius = 0; radius < rSize; radius += 1) {
+      for (let theta = 0; theta < tSize; theta += 1) {
+          const sin = Math.sin(theta * conversion);
+          const cos = Math.cos(theta * conversion);
+          for (let radius = 0; radius < rSize; radius += 1) {
               x = Math.floor(xMid + ((rMax * radius) / rSize) * cos);
               y = Math.floor(yMid + ((rMax * radius) / rSize) * sin);
-              i = (y * xSize + x) * 4;
-              r = srcPixels[i + 0];
-              g = srcPixels[i + 1];
-              b = srcPixels[i + 2];
-              a = srcPixels[i + 3];
+              let i = (y * xSize + x) * 4;
+              const r = srcPixels[i + 0];
+              const g = srcPixels[i + 1];
+              const b = srcPixels[i + 2];
+              const a = srcPixels[i + 3];
               // Store it
               //i = (theta * xSize  +  radius) * 4;
               i = (theta + radius * xSize) * 4;
@@ -18114,15 +18142,15 @@
    *  0 is no rotation, 360 degrees is a full rotation
    */
   const FromPolar = function (src, dst, opt) {
-      let srcPixels = src.data, dstPixels = dst.data, xSize = src.width, ySize = src.height, xMid = opt.polarCenterX || xSize / 2, yMid = opt.polarCenterY || ySize / 2, i, x, y, dx, dy, r = 0, g = 0, b = 0, a = 0;
+      const srcPixels = src.data, dstPixels = dst.data, xSize = src.width, ySize = src.height, xMid = opt.polarCenterX || xSize / 2, yMid = opt.polarCenterY || ySize / 2;
       // Find the largest radius
-      let rad, rMax = Math.sqrt(xMid * xMid + yMid * yMid);
-      x = xSize - xMid;
-      y = ySize - yMid;
-      rad = Math.sqrt(x * x + y * y);
+      let rMax = Math.sqrt(xMid * xMid + yMid * yMid);
+      let x = xSize - xMid;
+      let y = ySize - yMid;
+      const rad = Math.sqrt(x * x + y * y);
       rMax = rad > rMax ? rad : rMax;
       // We'll be uisng x as the radius, and y as the angle (theta=t)
-      let rSize = ySize, tSize = xSize, radius, theta, phaseShift = 0;
+      const rSize = ySize, tSize = xSize, phaseShift = 0;
       // We need to convert to degrees and we need to make sure
       // it's between (0-360)
       // var conversion = tSize/360*180/Math.PI;
@@ -18130,18 +18158,18 @@
       let x1, y1;
       for (x = 0; x < xSize; x += 1) {
           for (y = 0; y < ySize; y += 1) {
-              dx = x - xMid;
-              dy = y - yMid;
-              radius = (Math.sqrt(dx * dx + dy * dy) * rSize) / rMax;
-              theta = ((Math.atan2(dy, dx) * 180) / Math.PI + 360 + phaseShift) % 360;
+              const dx = x - xMid;
+              const dy = y - yMid;
+              const radius = (Math.sqrt(dx * dx + dy * dy) * rSize) / rMax;
+              let theta = ((Math.atan2(dy, dx) * 180) / Math.PI + 360 + phaseShift) % 360;
               theta = (theta * tSize) / 360;
               x1 = Math.floor(theta);
               y1 = Math.floor(radius);
-              i = (y1 * xSize + x1) * 4;
-              r = srcPixels[i + 0];
-              g = srcPixels[i + 1];
-              b = srcPixels[i + 2];
-              a = srcPixels[i + 3];
+              let i = (y1 * xSize + x1) * 4;
+              const r = srcPixels[i + 0];
+              const g = srcPixels[i + 1];
+              const b = srcPixels[i + 2];
+              const a = srcPixels[i + 3];
               // Store it
               i = (y * xSize + x) * 4;
               dstPixels[i + 0] = r;
@@ -18401,7 +18429,8 @@
    */
   const Mask = function (imageData) {
       // Detect pixels close to the background color
-      let threshold = this.threshold(), mask = backgroundMask(imageData, threshold);
+      const threshold = this.threshold();
+      let mask = backgroundMask(imageData, threshold);
       if (mask) {
           // Erode
           mask = erodeMask(mask, imageData.width, imageData.height);
@@ -18545,8 +18574,8 @@
    */
   const Posterize = function (imageData) {
       // level must be between 1 and 255
-      let levels = Math.round(this.levels() * 254) + 1, data = imageData.data, len = data.length, scale = 255 / levels, i;
-      for (i = 0; i < len; i += 1) {
+      const levels = Math.round(this.levels() * 254) + 1, data = imageData.data, len = data.length, scale = 255 / levels;
+      for (let i = 0; i < len; i += 1) {
           data[i] = Math.floor(data[i] / scale) * scale;
       }
   };
@@ -18573,10 +18602,9 @@
    * node.green(200);
    */
   const RGB = function (imageData) {
-      let data = imageData.data, nPixels = data.length, red = this.red(), green = this.green(), blue = this.blue(), i, brightness;
-      for (i = 0; i < nPixels; i += 4) {
-          brightness =
-              (0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]) / 255;
+      const data = imageData.data, nPixels = data.length, red = this.red(), green = this.green(), blue = this.blue();
+      for (let i = 0; i < nPixels; i += 4) {
+          const brightness = (0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]) / 255;
           data[i] = brightness * red; // r
           data[i + 1] = brightness * green; // g
           data[i + 2] = brightness * blue; // b
@@ -18737,11 +18765,11 @@
    * node.filters([Konva.Filters.Sepia]);
    */
   const Sepia = function (imageData) {
-      let data = imageData.data, nPixels = data.length, i, r, g, b;
-      for (i = 0; i < nPixels; i += 4) {
-          r = data[i + 0];
-          g = data[i + 1];
-          b = data[i + 2];
+      const data = imageData.data, nPixels = data.length;
+      for (let i = 0; i < nPixels; i += 4) {
+          const r = data[i + 0];
+          const g = data[i + 1];
+          const b = data[i + 2];
           data[i + 0] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
           data[i + 1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
           data[i + 2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
