@@ -615,7 +615,7 @@ function getAppViewConfigOrientation(divId) {
 }
 
 /**
- * Create 1*2 view config(s).
+ * Create 1*1 view config(s).
  *
  * @param {Array} dataIds The list of dataIds.
  * @returns {object} The view config.
