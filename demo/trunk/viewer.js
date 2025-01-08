@@ -473,11 +473,12 @@ function onDOMContentLoaded() {
  */
 function getSlider(layerGroupDivId) {
   const range = document.createElement('input');
-  range.style.display = 'none';
-  range.className = 'vertical-slider';
   range.type = 'range';
-  range.min = 0;
+  range.className = 'vertical-slider';
   range.id = layerGroupDivId + '-slider';
+  range.min = 0;
+  range.max = 0;
+  range.disabled = true;
   // update app on slider change
   range.oninput = function () {
     const lg = _app.getLayerGroupByDivId(layerGroupDivId);
@@ -501,9 +502,9 @@ function initSliders() {
       const ph = lg.getPositionHelper();
       const maxIndex = ph.getMaximumScrollIndex();
       if (maxIndex !== 0) {
+        slider.disabled = false;
         slider.max = maxIndex;
         slider.value = ph.getCurrentPositionScrollIndex();
-        slider.style.display = '';
       }
     }
   }

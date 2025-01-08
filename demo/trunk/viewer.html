@@ -129,6 +129,9 @@ input.vertical-slider[type=range]::-webkit-slider-thumb {
   margin-top: 0px;
   border: 0;
 }
+input.vertical-slider[type=range]:disabled::-webkit-slider-thumb {
+  background: lightgray;
+}
 input.vertical-slider[type=range]:focus::-webkit-slider-runnable-track {
   background: lightgray;
 }
@@ -144,6 +147,9 @@ input.vertical-slider[type=range]::-moz-range-thumb {
   background: #2F3C4A;
   cursor: pointer;
   border: 0;
+}
+input.vertical-slider[type=range]:disabled::-moz-range-thumb {
+  background: lightgray;
 }
 
 canvas {
