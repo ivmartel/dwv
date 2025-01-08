@@ -93,7 +93,7 @@ fieldset ul {
 }
 .layerGroup {
   flex: 1 1;
-  margin: 5px 5px 5px 0;
+  margin: 5px 0;
   background-color: limeGreen;
   /* allow child centering */
   position: relative;
@@ -106,15 +106,46 @@ fieldset ul {
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.slider {
-  width: 90%;
-  /* needed for overlay */
-  position: absolute;
-  /* center */
-  top: 102%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.vertical-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  margin: 5px 5px 5px 0;
+  width: 10px;
+  -webkit-appearance: none;
 }
+/** slider vertical settings*/
+input.vertical-slider[type=range]::-webkit-slider-runnable-track {
+  width: 10px;
+  cursor: pointer;
+  background: lightgray;
+  border: 0;
+}
+input.vertical-slider[type=range]::-webkit-slider-thumb {
+  width: 10px;
+  height: 15px;
+  background: #2F3C4A;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: 0px;
+  border: 0;
+}
+input.vertical-slider[type=range]:focus::-webkit-slider-runnable-track {
+  background: lightgray;
+}
+input.vertical-slider[type=range]::-moz-range-track {
+  width: 10px;
+  cursor: pointer;
+  background: lightgray;
+  border: 0;
+}
+input.vertical-slider[type=range]::-moz-range-thumb {
+  width: 10px;
+  height: 15px;
+  background: #2F3C4A;
+  cursor: pointer;
+  border: 0;
+}
+
 canvas {
   /* avoid parent auto-resize */
   vertical-align: middle;

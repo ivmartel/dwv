@@ -474,7 +474,7 @@ function onDOMContentLoaded() {
 function getSlider(layerGroupDivId) {
   const range = document.createElement('input');
   range.style.display = 'none';
-  range.className = 'slider';
+  range.className = 'vertical-slider';
   range.type = 'range';
   range.min = 0;
   range.id = layerGroupDivId + '-slider';
@@ -535,11 +535,9 @@ function addLayerGroupDiv(id) {
   layerDiv.id = id;
   layerDiv.className = 'layerGroup';
 
-  // add slider
-  layerDiv.appendChild(getSlider(id));
-
   const root = document.getElementById('dwv');
   root.appendChild(layerDiv);
+  root.appendChild(getSlider(id));
 }
 
 /**
