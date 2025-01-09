@@ -74,8 +74,10 @@ function viewerSetup() {
   // stage options
   let viewOnFirstLoadItem = true;
 
-  // use for concurrent load
-  const numberOfDataToLoad = 1;
+  // load counters
+  let numberOfDataToLoad = 0;
+  let numberOfLoadendData = 0;
+  const dataLoadProgress = [];
 
   // add layer groups div
   const numberOfLayerGroups = getNumberOfLayerGroups();
@@ -128,6 +130,14 @@ function viewerSetup() {
   });
   _app.addEventListener('loadstart', function (event) {
     console.time('load-data-' + event.dataid);
+    // update load counters
+    if (numberOfDataToLoad === numberOfLoadendData) {
+      numberOfDataToLoad = 0;
+      numberOfLoadendData = 0;
+      // reset progress array
+      dataLoadProgress.length = 0;
+    }
+    ++numberOfDataToLoad;
     // add abort shortcut
     window.addEventListener('keydown', abortShortcut);
     // update data view config
@@ -145,7 +155,6 @@ function viewerSetup() {
       _app.addDataViewConfig(event.dataid, viewConfigs[i]);
     }
   });
-  const dataLoadProgress = new Array(numberOfDataToLoad);
   const sumReducer = function (sum, value) {
     return sum + value;
   };
@@ -171,27 +180,27 @@ function viewerSetup() {
   });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.dataid);
+    // update load counter
+    ++numberOfLoadendData;
     // remove abort shortcut
     window.removeEventListener('keydown', abortShortcut);
   });
 
-  let dataLoad = 0;
   const firstRender = [];
   _app.addEventListener('load', function (event) {
-    const meta = _app.getMetaData(event.dataid);
     // log meta data
+    const meta = _app.getMetaData(event.dataid);
     console.log('metadata', getMetaDataWithNames(meta));
 
     // update UI at first render
     if (!firstRender.includes(event.dataid)) {
       // store data id
       firstRender.push(event.dataid);
-      ++dataLoad;
-      // init gui
-      if (dataLoad === numberOfDataToLoad) {
+      // init gui on first load
+      if (_app.getDataIds().length === 1) {
         // set app tool
         setAppTool();
-
+        // update html
         const toolsFieldset = document.getElementById('tools');
         toolsFieldset.disabled = false;
         const changeLayoutSelect = document.getElementById('changelayout');
@@ -200,10 +209,9 @@ function viewerSetup() {
         resetLayoutButton.disabled = false;
         const smoothingChk = document.getElementById('changesmoothing');
         smoothingChk.disabled = false;
-
-        // update sliders with new data info
-        initSliders();
       }
+      // update sliders with new data info
+      initSliders();
     }
 
     let modality;
