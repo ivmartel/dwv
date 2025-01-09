@@ -168,11 +168,6 @@ function viewerSetup() {
         dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
     }
   });
-  _app.addEventListener('load', function (event) {
-    if (!viewOnFirstLoadItem) {
-      _app.render(event.dataid);
-    }
-  });
   _app.addEventListener('loaditem', function (event) {
     if (typeof event.warn !== 'undefined') {
       console.warn('load-warn', event.warn);
@@ -185,18 +180,40 @@ function viewerSetup() {
     // remove abort shortcut
     window.removeEventListener('keydown', abortShortcut);
   });
-
-  const firstRender = [];
   _app.addEventListener('load', function (event) {
+    // render if not done yet
+    if (!viewOnFirstLoadItem) {
+      _app.render(event.dataid);
+    }
+    // update sliders with new data info
+    initSliders();
+
     // log meta data
     const meta = _app.getMetaData(event.dataid);
     console.log('metadata', getMetaDataWithNames(meta));
+    // get modality
+    let modality;
+    if (event.loadtype === 'image' &&
+      typeof meta['00080060'] !== 'undefined') {
+      modality = meta['00080060'].value[0];
+    }
+    // log DICOM SEG
+    if (modality === 'SEG') {
+      logFramePosPats(_app.getMetaData(event.dataid));
+    }
+    // log DICOM SR
+    if (modality === 'SR') {
+      console.log('DICOM SR');
+      const srContent = dwv.getSRContent(meta);
+      console.log(srContent.toString());
+    }
+  });
 
-    // update UI at first render
-    if (!firstRender.includes(event.dataid)) {
-      // store data id
-      firstRender.push(event.dataid);
-      // init gui on first load
+  let didRender = false;
+  _app.addEventListener('renderend', function (/*event*/) {
+    // update UI at first render of first data
+    if (!didRender) {
+      didRender = true;
       if (_app.getDataIds().length === 1) {
         // set app tool
         setAppTool();
@@ -210,27 +227,6 @@ function viewerSetup() {
         const smoothingChk = document.getElementById('changesmoothing');
         smoothingChk.disabled = false;
       }
-      // update sliders with new data info
-      initSliders();
-    }
-
-    let modality;
-    if (event.loadtype === 'image' &&
-      typeof meta['00080060'] !== 'undefined') {
-      modality = meta['00080060'].value[0];
-    }
-
-    // Special DICOM SEG
-    if (modality === 'SEG') {
-      // log SEG details
-      logFramePosPats(_app.getMetaData(event.dataid));
-    }
-
-    // DICOM SR specific
-    if (modality === 'SR') {
-      console.log('DICOM SR');
-      const srContent = dwv.getSRContent(meta);
-      console.log(srContent.toString());
     }
   });
 
