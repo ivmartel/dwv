@@ -594,41 +594,7 @@ export class View {
   }
 
   /**
-   * Set the current position.
-   *
-   * @param {Point} position The new position.
-   * @param {boolean} [silent] Flag to fire event or not.
-   * @returns {boolean} False if not in bounds.
-   * @fires View#positionchange
-   */
-  setCurrentPosition(position, silent) {
-    // send invalid event if not in bounds
-    const geometry = this.#image.getGeometry();
-    const index = geometry.worldToIndex(position);
-    const dirs = [this.getScrollDimIndex()];
-    if (index.length() === 4) {
-      dirs.push(3);
-    }
-    if (!geometry.isIndexInBounds(index, dirs)) {
-      if (!silent) {
-        this.#currentPosition = position;
-        // fire event with valid: false
-        this.#fireEvent({
-          type: 'positionchange',
-          value: [
-            index.getValues(),
-            position.getValues(),
-          ],
-          valid: false
-        });
-      }
-      return false;
-    }
-    return this.setCurrentIndex(index, silent);
-  }
-
-  /**
-   * Set the current index.
+   * Set the current position via an index.
    *
    * @param {Index} index The new index.
    * @param {boolean} [silent] Flag to fire event or not.
@@ -636,13 +602,27 @@ export class View {
    * @fires View#positionchange
    */
   setCurrentIndex(index, silent) {
+    const geometry = this.#image.getGeometry();
+    const position = geometry.indexToWorld(index);
+    return this.setCurrentPosition(position, silent);
+  }
+
+  /**
+   * Set current position.
+   *
+   * @param {Point} position The new position.
+   * @param {boolean} [silent] Flag to fire event or not.
+   * @returns {boolean} False if not in bounds.
+   * @fires View#positionchange
+   */
+  setCurrentPosition(position, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
     const geometry = this.#image.getGeometry();
-    const position = geometry.indexToWorld(index);
+    const index = geometry.worldToIndex(position);
 
     // check if possible
     const dirs = [this.getScrollDimIndex()];
@@ -650,8 +630,8 @@ export class View {
       dirs.push(3);
     }
     if (!geometry.isIndexInBounds(index, dirs)) {
+      this.#currentPosition = position;
       if (!silent) {
-        this.#currentPosition = position;
         // fire event with valid: false
         this.#fireEvent({
           type: 'positionchange',
