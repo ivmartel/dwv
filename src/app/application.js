@@ -917,6 +917,9 @@ export class App {
    * @returns {ViewConfig[]} The list of associated configs.
    */
   getViewConfigs(dataId, excludeStarConfig) {
+    if (typeof excludeStarConfig === 'undefined') {
+      excludeStarConfig = false;
+    }
     // check options
     if (this.#options.dataViewConfigs === null ||
       typeof this.#options.dataViewConfigs === 'undefined') {
