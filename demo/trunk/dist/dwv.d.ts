@@ -3902,6 +3902,13 @@ export declare class PlaneHelper {
      */
     worldToIndex(point: Point): Index;
     /**
+     * Image index to world.
+     *
+     * @param {Index} index The input index.
+     * @returns {Point} The corresponding point.
+     */
+    indexToWorld(index: Index): Point;
+    /**
      * Is this view in the same orientation as the image aquisition.
      *
      * @returns {boolean} True if in aquisition plane.
@@ -5311,16 +5318,7 @@ export declare class View {
      */
     getOrigin(position?: Point): Point3D;
     /**
-     * Set the current position.
-     *
-     * @param {Point} position The new position.
-     * @param {boolean} [silent] Flag to fire event or not.
-     * @returns {boolean} False if not in bounds.
-     * @fires View#positionchange
-     */
-    setCurrentPosition(position: Point, silent?: boolean): boolean;
-    /**
-     * Set the current index.
+     * Set the current position via an index.
      *
      * @param {Index} index The new index.
      * @param {boolean} [silent] Flag to fire event or not.
@@ -5328,6 +5326,15 @@ export declare class View {
      * @fires View#positionchange
      */
     setCurrentIndex(index: Index, silent?: boolean): boolean;
+    /**
+     * Set current position.
+     *
+     * @param {Point} position The new position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} False if not in bounds.
+     * @fires View#positionchange
+     */
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     /**
      * Set the view window/level.
      *
