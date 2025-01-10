@@ -319,8 +319,11 @@ export class PlaneHelper {
    * @returns {Point3D[]} An origin and 2 cosines vectors.
    */
   getPlanePoints(position) {
+    // snap to grid
+    const index = this.worldToIndex(position);
+    const snapPosition = this.indexToWorld(index);
     // get plane point
-    const planePoint = this.getPlanePointFromPosition(position);
+    const planePoint = this.getPlanePointFromPosition(snapPosition);
     // get origin
     const planeOrigin = this.getPositionFromPlanePoint(
       new Point2D(0, 0), planePoint.getZ());
@@ -343,6 +346,16 @@ export class PlaneHelper {
    */
   worldToIndex(point) {
     return this.#imageGeometry.worldToIndex(point);
+  }
+
+  /**
+   * Image index to world.
+   *
+   * @param {Index} index The input index.
+   * @returns {Point} The corresponding point.
+   */
+  indexToWorld(index) {
+    return this.#imageGeometry.indexToWorld(index);
   }
 
   /**
