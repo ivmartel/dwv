@@ -487,8 +487,8 @@ function getSlider(layerGroupDivId) {
   range.oninput = function () {
     const lg = _app.getLayerGroupByDivId(layerGroupDivId);
     const ph = lg.getPositionHelper();
-    const pos = ph.getCurrentPositionAtScrollIndex(this.value);
-    ph.setCurrentPositon(pos);
+    const pos = ph.getCurrentPositionAtScrollValue(this.value);
+    ph.setCurrentPosition(pos);
   };
   return range;
 }
@@ -504,11 +504,11 @@ function initSliders() {
     if (slider) {
       const lg = _app.getLayerGroupByDivId(lgId);
       const ph = lg.getPositionHelper();
-      const maxIndex = ph.getMaximumScrollIndex();
-      if (maxIndex !== 0) {
+      const max = ph.getMaximumScrollValue();
+      if (max !== 0) {
         slider.disabled = false;
-        slider.max = maxIndex;
-        slider.value = ph.getCurrentPositionScrollIndex();
+        slider.max = max;
+        slider.value = ph.getCurrentPositionScrollValue();
       }
     }
   }
@@ -525,7 +525,7 @@ function updateSliders() {
     if (slider) {
       const lg = _app.getLayerGroupByDivId(lgId);
       const ph = lg.getPositionHelper();
-      slider.value = ph.getCurrentPositionScrollIndex();
+      slider.value = ph.getCurrentPositionScrollValue();
     }
   }
 }

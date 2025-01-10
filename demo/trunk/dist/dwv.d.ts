@@ -4172,11 +4172,18 @@ export declare class PositionHelper {
      */
     getScrollDimIndex(): number;
     /**
-     * Get the maximum scroll index.
+     * Get the maximum dimension value.
      *
-     * @returns {number} The maximum index.
+     * @param {number} dim The dimension.
+     * @returns {number} The maximum value.
      */
-    getMaximumScrollIndex(): number;
+    getMaximumDimValue(dim: number): number;
+    /**
+     * Get the maximum scroll value.
+     *
+     * @returns {number} The maximum value.
+     */
+    getMaximumScrollValue(): number;
     /**
      * Get the current position.
      *
@@ -4184,18 +4191,34 @@ export declare class PositionHelper {
      */
     getCurrentPosition(): Point;
     /**
-     * Get the scroll index for the current position.
+     * Get the value at dimension index for the current position.
      *
-     * @returns {number} The index.
+     * @param {number} dim The dimension.
+     * @returns {number} The value.
      */
-    getCurrentPositionScrollIndex(): number;
+    getCurrentPositionDimValue(dim: number): number;
     /**
-     * Get the current position updated at the provided scroll index.
+     * Get the value at scroll index for the current position.
      *
-     * @param {number} index The scroll index.
+     * @returns {number} The value.
+     */
+    getCurrentPositionScrollValue(): number;
+    /**
+     * Get the current position updated at the provided dimension index
+     *   with the input value.
+     *
+     * @param {number} dim The dimension.
+     * @param {number} value The value to used at dimension index.
      * @returns {Point} The position.
      */
-    getCurrentPositionAtScrollIndex(index: number): Point;
+    getCurrentPositionAtDimValue(dim: number, value: number): Point;
+    /**
+     * Get the current position updated at scroll index with the input value.
+     *
+     * @param {number} value The value to use at scroll index.
+     * @returns {Point} The position.
+     */
+    getCurrentPositionAtScrollValue(value: number): Point;
     /**
      * Get the current index.
      *
@@ -4209,7 +4232,7 @@ export declare class PositionHelper {
      * @param {boolean} [silent] Flag to fire event or not.
      * @returns {boolean} True if possible and in bounds.
      */
-    setCurrentPositon(position: Point, silent?: boolean): boolean;
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     /**
      * Set the current position only if it is in the geometry bounds.
      *
@@ -4217,7 +4240,7 @@ export declare class PositionHelper {
      * @param {boolean} [silent] Flag to fire event or not.
      * @returns {boolean} True if possible and in bounds.
      */
-    setCurrentPositonSafe(position: Point, silent?: boolean): boolean;
+    setCurrentPositionSafe(position: Point, silent?: boolean): boolean;
     /**
      * Merge with another helper.
      *
