@@ -91,12 +91,22 @@ export class PositionHelper {
   }
 
   /**
-   * Get the maximum scroll index.
+   * Get the maximum dimension value.
    *
-   * @returns {number} The maximum index.
+   * @param {number} dim The dimension.
+   * @returns {number} The maximum value.
    */
-  getMaximumScrollIndex() {
-    return this.#geometry.getSize().get(this.#scrollDimIndex) - 1;
+  getMaximumDimValue(dim) {
+    return this.#geometry.getSize().get(dim) - 1;
+  }
+
+  /**
+   * Get the maximum scroll value.
+   *
+   * @returns {number} The maximum value.
+   */
+  getMaximumScrollValue() {
+    return this.getMaximumDimValue(this.#scrollDimIndex);
   }
 
   /**
@@ -109,25 +119,46 @@ export class PositionHelper {
   }
 
   /**
-   * Get the scroll index for the current position.
+   * Get the value at dimension index for the current position.
    *
-   * @returns {number} The index.
+   * @param {number} dim The dimension.
+   * @returns {number} The value.
    */
-  getCurrentPositionScrollIndex() {
-    const values = this.getCurrentIndex().getValues();
-    return values[this.#scrollDimIndex];
+  getCurrentPositionDimValue(dim) {
+    return this.getCurrentIndex().get(dim);
   }
 
   /**
-   * Get the current position updated at the provided scroll index.
+   * Get the value at scroll index for the current position.
    *
-   * @param {number} index The scroll index.
+   * @returns {number} The value.
+   */
+  getCurrentPositionScrollValue() {
+    return this.getCurrentPositionDimValue(this.#scrollDimIndex);
+  }
+
+  /**
+   * Get the current position updated at the provided dimension index
+   *   with the input value.
+   *
+   * @param {number} dim The dimension.
+   * @param {number} value The value to used at dimension index.
    * @returns {Point} The position.
    */
-  getCurrentPositionAtScrollIndex(index) {
+  getCurrentPositionAtDimValue(dim, value) {
     const values = this.getCurrentIndex().getValues();
-    values[this.#scrollDimIndex] = index;
+    values[dim] = value;
     return this.#geometry.indexToWorld(new Index(values));
+  }
+
+  /**
+   * Get the current position updated at scroll index with the input value.
+   *
+   * @param {number} value The value to use at scroll index.
+   * @returns {Point} The position.
+   */
+  getCurrentPositionAtScrollValue(value) {
+    return this.getCurrentPositionAtDimValue(this.#scrollDimIndex, value);
   }
 
   /**
@@ -146,7 +177,7 @@ export class PositionHelper {
    * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} True if possible and in bounds.
    */
-  setCurrentPositon(position, silent) {
+  setCurrentPosition(position, silent) {
     let res = false;
     if (typeof position !== 'undefined') {
       res = this.#positionAccessor.setCurrentPosition(position, silent);
@@ -161,10 +192,10 @@ export class PositionHelper {
    * @param {boolean} [silent] Flag to fire event or not.
    * @returns {boolean} True if possible and in bounds.
    */
-  setCurrentPositonSafe(position, silent) {
+  setCurrentPositionSafe(position, silent) {
     let res = false;
     if (this.isPositionInBounds(position)) {
-      res = this.setCurrentPositon(position, silent);
+      res = this.setCurrentPosition(position, silent);
     }
     return res;
   }
@@ -230,7 +261,7 @@ export class PositionHelper {
    * @returns {boolean} True if possible and in bounds.
    */
   incrementPosition(dim) {
-    return this.setCurrentPositonSafe(this.getIncrementPosition(dim));
+    return this.setCurrentPositionSafe(this.getIncrementPosition(dim));
   }
 
   /**
@@ -240,7 +271,7 @@ export class PositionHelper {
    * @returns {boolean} True if possible and in bounds.
    */
   decrementPosition(dim) {
-    return this.setCurrentPositonSafe(this.getDecrementPosition(dim));
+    return this.setCurrentPositionSafe(this.getDecrementPosition(dim));
   }
 
   /**
