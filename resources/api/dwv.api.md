@@ -820,6 +820,7 @@ export class PlaneHelper {
     getTargetOrientedPositiveXYZ(values: Scalar3D): Scalar3D;
     getTargetOrientedVector3D(vector: Vector3D): Vector3D;
     getViewOrientation(): Matrix33;
+    indexToWorld(index: Index): Point;
     isAquisitionOrientation(): boolean;
     worldToIndex(point: Point): Index;
 }
@@ -873,19 +874,22 @@ export class PositionHelper {
     decrementPositionAlongScroll(): boolean;
     getCurrentIndex(): Index;
     getCurrentPosition(): Point;
-    getCurrentPositionAtScrollIndex(index: number): Point;
-    getCurrentPositionScrollIndex(): number;
+    getCurrentPositionAtDimValue(dim: number, value: number): Point;
+    getCurrentPositionAtScrollValue(value: number): Point;
+    getCurrentPositionDimValue(dim: number): number;
+    getCurrentPositionScrollValue(): number;
     getDecrementPosition(dim: number): Point;
     getGeometry(): Geometry;
     getIncrementPosition(dim: number): Point;
-    getMaximumScrollIndex(): number;
+    getMaximumDimValue(dim: number): number;
+    getMaximumScrollValue(): number;
     getScrollDimIndex(): number;
     incrementPosition(dim: number): boolean;
     incrementPositionAlongScroll(): boolean;
     isPositionInBounds(position: Point): boolean;
     merge(rhs: PositionHelper): void;
-    setCurrentPositon(position: Point, silent?: boolean): boolean;
-    setCurrentPositonSafe(position: Point, silent?: boolean): boolean;
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
+    setCurrentPositionSafe(position: Point, silent?: boolean): boolean;
 }
 
 // @public

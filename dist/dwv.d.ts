@@ -3902,6 +3902,13 @@ export declare class PlaneHelper {
      */
     worldToIndex(point: Point): Index;
     /**
+     * Image index to world.
+     *
+     * @param {Index} index The input index.
+     * @returns {Point} The corresponding point.
+     */
+    indexToWorld(index: Index): Point;
+    /**
      * Is this view in the same orientation as the image aquisition.
      *
      * @returns {boolean} True if in aquisition plane.
@@ -4165,11 +4172,18 @@ export declare class PositionHelper {
      */
     getScrollDimIndex(): number;
     /**
-     * Get the maximum scroll index.
+     * Get the maximum dimension value.
      *
-     * @returns {number} The maximum index.
+     * @param {number} dim The dimension.
+     * @returns {number} The maximum value.
      */
-    getMaximumScrollIndex(): number;
+    getMaximumDimValue(dim: number): number;
+    /**
+     * Get the maximum scroll value.
+     *
+     * @returns {number} The maximum value.
+     */
+    getMaximumScrollValue(): number;
     /**
      * Get the current position.
      *
@@ -4177,18 +4191,34 @@ export declare class PositionHelper {
      */
     getCurrentPosition(): Point;
     /**
-     * Get the scroll index for the current position.
+     * Get the value at dimension index for the current position.
      *
-     * @returns {number} The index.
+     * @param {number} dim The dimension.
+     * @returns {number} The value.
      */
-    getCurrentPositionScrollIndex(): number;
+    getCurrentPositionDimValue(dim: number): number;
     /**
-     * Get the current position updated at the provided scroll index.
+     * Get the value at scroll index for the current position.
      *
-     * @param {number} index The scroll index.
+     * @returns {number} The value.
+     */
+    getCurrentPositionScrollValue(): number;
+    /**
+     * Get the current position updated at the provided dimension index
+     *   with the input value.
+     *
+     * @param {number} dim The dimension.
+     * @param {number} value The value to used at dimension index.
      * @returns {Point} The position.
      */
-    getCurrentPositionAtScrollIndex(index: number): Point;
+    getCurrentPositionAtDimValue(dim: number, value: number): Point;
+    /**
+     * Get the current position updated at scroll index with the input value.
+     *
+     * @param {number} value The value to use at scroll index.
+     * @returns {Point} The position.
+     */
+    getCurrentPositionAtScrollValue(value: number): Point;
     /**
      * Get the current index.
      *
@@ -4202,7 +4232,7 @@ export declare class PositionHelper {
      * @param {boolean} [silent] Flag to fire event or not.
      * @returns {boolean} True if possible and in bounds.
      */
-    setCurrentPositon(position: Point, silent?: boolean): boolean;
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     /**
      * Set the current position only if it is in the geometry bounds.
      *
@@ -4210,7 +4240,7 @@ export declare class PositionHelper {
      * @param {boolean} [silent] Flag to fire event or not.
      * @returns {boolean} True if possible and in bounds.
      */
-    setCurrentPositonSafe(position: Point, silent?: boolean): boolean;
+    setCurrentPositionSafe(position: Point, silent?: boolean): boolean;
     /**
      * Merge with another helper.
      *
@@ -5311,16 +5341,7 @@ export declare class View {
      */
     getOrigin(position?: Point): Point3D;
     /**
-     * Set the current position.
-     *
-     * @param {Point} position The new position.
-     * @param {boolean} [silent] Flag to fire event or not.
-     * @returns {boolean} False if not in bounds.
-     * @fires View#positionchange
-     */
-    setCurrentPosition(position: Point, silent?: boolean): boolean;
-    /**
-     * Set the current index.
+     * Set the current position via an index.
      *
      * @param {Index} index The new index.
      * @param {boolean} [silent] Flag to fire event or not.
@@ -5328,6 +5349,15 @@ export declare class View {
      * @fires View#positionchange
      */
     setCurrentIndex(index: Index, silent?: boolean): boolean;
+    /**
+     * Set current position.
+     *
+     * @param {Point} position The new position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} False if not in bounds.
+     * @fires View#positionchange
+     */
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     /**
      * Set the view window/level.
      *
