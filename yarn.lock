@@ -1139,9 +1139,9 @@
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
 "@stylistic/eslint-plugin-js@^2.12.0":
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.12.1.tgz#93ff844df0ed699e1f4b2ff7010ed9508dc87b0d"
-  integrity sha512-5ybogtEgWIGCR6dMnaabztbWyVdAPDsf/5XOk6jBonWug875Q9/a6gm9QxnU3rhdyDEnckWKX7dduwYJMOWrVA==
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.13.0.tgz#8fb6c7b6a775689e1dd90989a36c68b12b89d928"
+  integrity sha512-GPPDK4+fcbsQD58a3abbng2Dx+jBoxM5cnYjBM4T24WFZRZdlNSKvR19TxP8CPevzMOodQ9QVzNeqWvMXzfJRA==
   dependencies:
     eslint-visitor-keys "^4.2.0"
     espree "^10.3.0"
