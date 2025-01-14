@@ -330,10 +330,11 @@ export class MaskFactory {
   }
 
   /**
-   * Check dicom elements. Throws an error if not suitable.
+   * Check dicom elements.
    *
    * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
    * @returns {string|undefined} A possible warning.
+   * @throws Error for missing or wrong data.
    */
   checkElements(_dicomElements) {
     // does nothing
@@ -348,6 +349,7 @@ export class MaskFactory {
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
    * @returns {Image} A new Image.
+   * @throws Error for missing or wrong data.
    */
   create(dataElements, pixelBuffer) {
     // check required and supported tags
