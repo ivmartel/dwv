@@ -84,13 +84,14 @@ export class DicomBufferToView {
    *
    * @param {number} index The data index.
    * @param {string} origin The data origin.
+   * @returns {boolean} True if the generation went ok.
    */
   #generateData(index, origin) {
     const dataElements = this.#dicomParserStore[index].getDicomElements();
     const factory = this.#factories[index];
     // exit if no factory
     if (typeof factory === 'undefined') {
-      return;
+      return false;
     }
     // create data
     try {
@@ -117,7 +118,32 @@ export class DicomBufferToView {
       this.onloadend({
         source: origin
       });
+      // false for error
+      return false;
     }
+
+    // all good
+    return true;
+  }
+
+  /**
+   * Generate a single data object.
+   *
+   * @param {number} index The data index.
+   * @param {string} origin The data origin.
+   */
+  #generateSingleData(index, origin) {
+    // generate image
+    if (this.#generateData(index, origin)) {
+      // send load event
+      this.onload({
+        source: origin
+      });
+    }
+    // allways send loadend
+    this.onloadend({
+      source: origin
+    });
   }
 
   /**
@@ -127,7 +153,7 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #generateImageUncompressed(index, origin) {
-    // send progress
+    // send 100% progress
     this.onprogress({
       lengthComputable: true,
       loaded: 100,
@@ -135,15 +161,8 @@ export class DicomBufferToView {
       index: index,
       source: origin
     });
-    // generate image
-    this.#generateData(index, origin);
-    // send load events
-    this.onload({
-      source: origin
-    });
-    this.onloadend({
-      source: origin
-    });
+    // generate single data
+    this.#generateSingleData(index, origin);
   }
 
   /**
@@ -291,14 +310,8 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #handleNonImageData(index, origin) {
-    this.#generateData(index, origin);
-    // send load events
-    this.onload({
-      source: origin
-    });
-    this.onloadend({
-      source: origin
-    });
+    // generate single data
+    this.#generateSingleData(index, origin);
   }
 
   /**
