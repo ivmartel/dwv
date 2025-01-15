@@ -7,6 +7,7 @@ import {defaultToolOptions, toolOptions} from '../tools/index';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Point2D, Point3D} from '../math/point';
+import {Index} from '../math/index';
 import {ViewController} from '../app/viewController';
 import {PlaneHelper} from './planeHelper';
 /* eslint-enable no-unused-vars */
