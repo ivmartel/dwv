@@ -189,6 +189,25 @@ export class Annotation {
   }
 
   /**
+   * Get the index of the plane origin.
+   *
+   * @returns {Index|undefined} The index.
+   */
+  #getOriginIndex() {
+    let res;
+    if (typeof this.#viewController !== 'undefined') {
+      let origin = this.planeOrigin;
+      if (typeof this.planePoints !== 'undefined') {
+        origin = this.planePoints[0];
+      }
+      const originPoint =
+        new Point([origin.getX(), origin.getY(), origin.getZ()]);
+      res = this.#viewController.getIndexFromPosition(originPoint);
+    }
+    return res;
+  }
+
+  /**
    * Get the centroid of the math shape.
    *
    * @returns {Point|undefined} The 3D centroid point.
@@ -198,17 +217,9 @@ export class Annotation {
     if (typeof this.#viewController !== 'undefined' &&
       typeof this.mathShape.getCentroid !== 'undefined') {
       // find the slice index of the annotation origin
-      let origin = this.planeOrigin;
-      if (typeof this.planePoints !== 'undefined') {
-        origin = this.planePoints[0];
-      }
-      const originPoint =
-        new Point([origin.getX(), origin.getY(), origin.getZ()]);
-      const originIndex =
-        this.#viewController.getIndexFromPosition(originPoint);
+      const originIndex = this.#getOriginIndex();
       const scrollDimIndex = this.#viewController.getScrollDimIndex();
       const k = originIndex.getValues()[scrollDimIndex];
-
       // shape center converted to 3D
       const planePoint = this.mathShape.getCentroid();
       res = this.#viewController.getPositionFromPlanePoint(planePoint, k);
@@ -254,7 +265,7 @@ export class Annotation {
       typeof this.mathShape.quantify !== 'undefined') {
       this.quantification = this.mathShape.quantify(
         this.#viewController,
-        this.#viewController.getCurrentIndex(),
+        this.#getOriginIndex(),
         getFlags(this.textExpr)
       );
     }
