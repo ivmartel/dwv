@@ -160,7 +160,7 @@ export class Annotation {
       const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
 
       if (cosine1.equals(this.planePoints[1]) &&
-      cosine2.equals(this.planePoints[2])) {
+        cosine2.equals(this.planePoints[2])) {
         res = true;
       }
     }
