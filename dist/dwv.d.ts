@@ -276,10 +276,11 @@ export declare class AnnotationGroupFactory {
      */
     getWarning(): string | undefined;
     /**
-     * Check dicom elements. Throws an error if not suitable.
+     * Check dicom elements.
      *
      * @param {Object<string, DataElement>} dataElements The DICOM data elements.
      * @returns {string|undefined} A possible warning.
+     * @throws Error for missing or wrong data.
      */
     checkElements(dataElements: {
         [x: string]: DataElement;
@@ -289,6 +290,7 @@ export declare class AnnotationGroupFactory {
      *
      * @param {Object<string, DataElement>} dataElements The DICOM tags.
      * @returns {AnnotationGroup} A new annotation group.
+     * @throws Error for missing or wrong data.
      */
     create(dataElements: {
         [x: string]: DataElement;
@@ -3385,10 +3387,11 @@ export declare class MaskFactory {
      */
     getWarning(): string | undefined;
     /**
-     * Check dicom elements. Throws an error if not suitable.
+     * Check dicom elements.
      *
      * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
      * @returns {string|undefined} A possible warning.
+     * @throws Error for missing or wrong data.
      */
     checkElements(_dicomElements: {
         [x: string]: DataElement;
@@ -3401,6 +3404,7 @@ export declare class MaskFactory {
          *   Uint16Array | Int16Array |
          *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
      * @returns {Image} A new Image.
+     * @throws Error for missing or wrong data.
      */
     create(dataElements: {
         [x: string]: DataElement;
