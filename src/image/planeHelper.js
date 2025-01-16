@@ -327,12 +327,23 @@ export class PlaneHelper {
     // get origin
     const planeOrigin = this.getPositionFromPlanePoint(
       new Point2D(0, 0), planePoint.getZ());
+    // find image origin
+    const origins = this.#imageGeometry.getOrigins();
+    const closestOriginIndex = planeOrigin.getClosest(origins);
+    const imageOrigin = origins[closestOriginIndex];
+
+    // use image origin for scroll to cope with
+    // possible irregular slice spacing
+    const pValues = planeOrigin.getValues();
+    const iValues = imageOrigin.getValues();
+    const scrollDimIndex = this.getNativeScrollDimIndex();
+    pValues[scrollDimIndex] = iValues[scrollDimIndex];
 
     // plane cosines
     const cosines = this.getCosines();
 
     return [
-      planeOrigin,
+      new Point3D(pValues[0], pValues[1], pValues[2]),
       new Point3D(cosines[0], cosines[1], cosines[2]),
       new Point3D(cosines[3], cosines[4], cosines[5])
     ];
