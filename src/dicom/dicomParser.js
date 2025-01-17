@@ -32,7 +32,7 @@ import {logger} from '../utils/logger';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.35.0-beta.10';
+  return '0.35.0-beta.11';
 }
 
 /**
