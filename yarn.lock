@@ -6456,9 +6456,9 @@ query-string@^6.14.1:
     strict-uri-encode "^2.0.0"
 
 qunit@^2.23.1:
-  version "2.23.1"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.23.1.tgz#392874807cb904d0a9a906d72064bbbdcd793acf"
-  integrity sha512-CGrsGy7NhkQmfiyOixBpbexh2PT7ekIb35uWiBi/hBNdTJF1W98UonyACFJJs8UmcP96lH+YJlX99dYZi5rZkg==
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.24.0.tgz#dffe6d94c040d50041a4358a040b0171964f2bb9"
+  integrity sha512-i+rJThg6YxrIAywbcS0Qr/KEO6bBH92LOeuTNC0dfFR2FbdtonVm6LQHDGwz/BB1fOuFSaE4+FEmNbxnxl+OFg==
   dependencies:
     commander "7.2.0"
     node-watch "0.7.3"
