@@ -10,7 +10,6 @@ import {DrawLayer} from './drawLayer';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
 import {Point2D, Point3D} from '../math/point';
 import {Scalar2D, Scalar3D} from '../math/scalar';
 import {PositionHelper} from '../image/positionHelper';
