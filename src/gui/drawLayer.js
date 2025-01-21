@@ -208,7 +208,7 @@ export class DrawLayer {
   }
 
   /**
-   * Get the reference data id.
+   * Get the reference layer id.
    *
    * @returns {string} The id.
    */
