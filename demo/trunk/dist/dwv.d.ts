@@ -3125,6 +3125,12 @@ export declare class LayerGroup {
     /**
      * Get the active image layer.
      *
+     * @returns {ViewLayer|DrawLayer|undefined} The layer.
+     */
+    getActiveLayer(): ViewLayer | DrawLayer | undefined;
+    /**
+     * Get the active image layer.
+     *
      * @returns {ViewLayer|undefined} The layer.
      */
     getActiveViewLayer(): ViewLayer | undefined;
@@ -3134,6 +3140,13 @@ export declare class LayerGroup {
      * @returns {ViewLayer|undefined} The layer.
      */
     getBaseViewLayer(): ViewLayer | undefined;
+    /**
+     * Get a view layer associated to a data id.
+     *
+     * @param {string} id The layer id.
+     * @returns {ViewLayer|undefined} The layer.
+     */
+    getViewLayerById(id: string): ViewLayer | undefined;
     /**
      * Get the view layers associated to a data id.
      *
@@ -3161,6 +3174,13 @@ export declare class LayerGroup {
      */
     getActiveDrawLayer(): DrawLayer | undefined;
     /**
+     * Get a draw layer associated to a data id.
+     *
+     * @param {string} id The layer id.
+     * @returns {DrawLayer|undefined} The layer.
+     */
+    getDrawLayerById(id: string): DrawLayer | undefined;
+    /**
      * Get the draw layers associated to a data id.
      *
      * @param {string} dataId The data id.
@@ -3168,30 +3188,17 @@ export declare class LayerGroup {
      */
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     /**
-     * Set the active view layer.
+     * Set the active layer.
      *
      * @param {number} index The index of the layer to set as active.
      */
-    setActiveViewLayer(index: number): void;
+    setActiveLayer(index: number): void;
     /**
-     * Set the active view layer with a data id.
+     * Set the active layer with a data id.
      *
      * @param {string} dataId The data id.
      */
-    setActiveViewLayerByDataId(dataId: string): void;
-    /**
-     * Set the active draw layer.
-     *
-     * @param {number|undefined} index The index of the layer to set as active
-     *   or undefined to not set any.
-     */
-    setActiveDrawLayer(index: number | undefined): void;
-    /**
-     * Set the active draw layer with a data id.
-     *
-     * @param {string} dataId The data id.
-     */
-    setActiveDrawLayerByDataId(dataId: string): void;
+    setActiveLayerByDataId(dataId: string): void;
     /**
      * Add a view layer.
      *

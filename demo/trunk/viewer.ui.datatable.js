@@ -266,12 +266,7 @@ test.ui.DataTable = function (app) {
         const groupDivId = split[1];
         const dataId = split[2];
         const lg = app.getLayerGroupByDivId(groupDivId);
-        if (dataIsImage) {
-          lg.setActiveViewLayerByDataId(dataId);
-          lg.setActiveDrawLayer(undefined);
-        } else {
-          lg.setActiveDrawLayerByDataId(dataId);
-        }
+        lg.setActiveLayerByDataId(dataId);
       };
       return radio;
     };
@@ -555,12 +550,7 @@ test.ui.DataTable = function (app) {
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
         const lg = app.getLayerGroupByDivId(lgIds[i]);
-        let layer;
-        if (dataIsImage) {
-          layer = lg.getActiveViewLayer();
-        } else {
-          layer = lg.getActiveDrawLayer();
-        }
+        const layer = lg.getActiveLayer();
         if (typeof layer !== 'undefined') {
           layer.setOpacity(value);
           layer.draw();
