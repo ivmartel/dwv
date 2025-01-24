@@ -205,21 +205,11 @@ export class LayerGroup {
   #positionHelper;
 
   /**
-   * Flag to update the position helper or not.
-   *
-   * @type {boolean}
-   */
-  #positionHelperNeedsUpdate = false;
-
-  /**
    * Get the position helper.
    *
    * @returns {PositionHelper} The position helper.
    */
   getPositionHelper() {
-    if (this.#positionHelperNeedsUpdate) {
-      this.#positionHelper = undefined;
-    }
     if (typeof this.#positionHelper === 'undefined') {
       for (const layer of this.#layers) {
         if (layer instanceof ViewLayer) {
@@ -232,7 +222,6 @@ export class LayerGroup {
           }
         }
       }
-      this.#positionHelperNeedsUpdate = false;
     }
     return this.#positionHelper;
   }
@@ -703,8 +692,8 @@ export class LayerGroup {
     // bind view layer events
     this.#bindViewLayer(layer);
 
-    // update flag
-    this.#positionHelperNeedsUpdate = true;
+    // force helper update
+    this.#positionHelper = undefined;
 
     // return
     return layer;
