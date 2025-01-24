@@ -217,8 +217,10 @@ export class LayerGroup {
    * @returns {PositionHelper} The position helper.
    */
   getPositionHelper() {
-    if (typeof this.#positionHelper === 'undefined' ||
-      this.#positionHelperNeedsUpdate) {
+    if (this.#positionHelperNeedsUpdate) {
+      this.#positionHelper = undefined;
+    }
+    if (typeof this.#positionHelper === 'undefined') {
       for (const layer of this.#layers) {
         if (layer instanceof ViewLayer) {
           const controller = layer.getViewController();
