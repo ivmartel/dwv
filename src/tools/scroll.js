@@ -4,11 +4,14 @@ import {
   getTouchPoints
 } from '../gui/generic';
 import {ScrollWheel} from './scrollWheel';
+import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
 import {Point2D} from '../math/point';
+import {LayerGroup} from '../gui/layerGroup';
+import {ViewLayer} from '../gui/viewLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -51,7 +54,8 @@ import {Point2D} from '../math/point';
  * // update app on slider change
  * range.oninput = function () {
  *   const lg = app.getLayerGroupByDivId('layerGroup0');
- *   const vc = lg.getActiveViewLayer().getViewController();
+ *   const vl = lg.getBaseViewLayer();
+ *   const vc = vl.getViewController();
  *   const index = vc.getCurrentIndex();
  *   const values = index.getValues();
  *   values[2] = this.value;
@@ -66,7 +70,8 @@ import {Point2D} from '../math/point';
  * // update slider on slice change (for ex via mouse wheel)
  * app.addEventListener('positionchange', function () {
  *   const lg = app.getLayerGroupByDivId('layerGroup0');
- *   const vc = lg.getActiveViewLayer().getViewController();
+ *   const vl = lg.getBaseViewLayer();
+ *   const vc = vl.getViewController();
  *   range.value = vc.getCurrentIndex().get(2);
  * });
  * // load dicom data
@@ -135,6 +140,26 @@ export class Scroll {
   }
 
   /**
+   * Get the associated view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group to search.
+   * @returns {ViewLayer|undefined} The view layer.
+   */
+  #getViewLayer(layerGroup) {
+    let viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer === 'undefined') {
+        logger.warn('No draw layer to do scroll');
+        return;
+      }
+      viewLayer = layerGroup.getViewLayerById(
+        drawLayer.getReferenceLayerId());
+    }
+    return viewLayer;
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
@@ -144,22 +169,28 @@ export class Scroll {
     // optional tooltip
     this.#removeTooltipDiv();
 
-    // stop viewer if playing
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to start scroll');
+      return;
+    }
+
     const viewController = viewLayer.getViewController();
+
+    // stop auto scroll if playing
     if (viewController.isPlaying()) {
       viewController.stop();
     }
+    // update base controller position
+    const planePos = viewLayer.displayToPlanePos(point);
+    const position = viewController.getPositionFromPlanePoint(planePos);
+    viewController.setCurrentPosition(position);
 
     // start flag
     this.#started = true;
     this.#startPoint = point;
 
-    // update controller position
-    const planePos = viewLayer.displayToPlanePos(point);
-    const position = viewController.getPositionFromPlanePoint(planePos);
-    viewController.setCurrentPosition(position);
   }
 
   /**
@@ -338,9 +369,11 @@ export class Scroll {
     const layerDetails = getLayerDetailsFromEvent(event);
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    viewController.play();
+    const viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer !== 'undefined') {
+      const viewController = viewLayer.getViewController();
+      viewController.play();
+    }
   };
 
   /**

@@ -1233,7 +1233,7 @@ export class App {
    */
   zoom(step, cx, cy) {
     const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewController = layerGroup.getActiveViewLayer().getViewController();
+    const viewController = layerGroup.getBaseViewLayer().getViewController();
     const k = viewController.getCurrentScrollPosition();
     const center = new Point3D(cx, cy, k);
     layerGroup.addScale(step, center);
@@ -1275,7 +1275,7 @@ export class App {
    */
   setDrawings(drawings, drawingsDetails, dataId) {
     const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = layerGroup.getBaseViewLayer();
     const refDataId = viewLayer.getDataId();
     const viewController = viewLayer.getViewController();
 
@@ -1445,22 +1445,11 @@ export class App {
     // bind tool to active layer
     for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
       const layerGroup = this.#stage.getLayerGroup(i);
-      // draw or view layer
-      const isDrawTool = tool === 'Draw' ||
-        tool === 'Livewire' ||
-        tool === 'Floodfill';
-      let layer;
-      if (isDrawTool &&
-        typeof layerGroup.getActiveDrawLayer() !== 'undefined') {
-        layer = layerGroup.getActiveDrawLayer();
-      } else {
-        layer = layerGroup.getActiveViewLayer();
-      }
+      const layer = layerGroup.getActiveLayer();
       if (typeof layer !== 'undefined') {
         this.#toolboxController.bindLayerGroup(layerGroup, layer);
       }
     }
-
     // set toolbox tool
     this.#toolboxController.setSelectedTool(tool);
   }

@@ -61,7 +61,8 @@ export class PositionBinder {
   getCallback = function (layerGroup) {
     return function (event) {
       const pointValues = event.value[1];
-      const vc = layerGroup.getActiveViewLayer().getViewController();
+      const vl = layerGroup.getBaseViewLayer();
+      const vc = vl.getViewController();
       // handle different number of dimensions
       const currentPos = vc.getCurrentPosition();
       const currentDims = currentPos.length();

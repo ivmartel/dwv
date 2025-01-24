@@ -9,6 +9,7 @@ import {Scissors} from '../math/scissors';
 import {guid} from '../math/stats';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ListenerHandler} from '../utils/listen';
+import {logger} from '../utils/logger';
 import {ROI} from '../math/roi';
 import {Annotation} from '../image/annotation';
 import {
@@ -137,8 +138,23 @@ export class Livewire {
    */
   #start(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+
+    let viewLayer;
+    let drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      viewLayer = layerGroup.getActiveViewLayer();
+    } else {
+      viewLayer =
+        layerGroup.getViewLayerById(drawLayer.getReferenceLayerId());
+    }
+
     const imageSize = viewLayer.getViewController().getImageSize();
+
+    this.#scissors.setDimensions(
+      imageSize.get(0),
+      imageSize.get(1));
+    this.#scissors.setData(viewLayer.getImageData().data);
+
     const index = viewLayer.displayToPlaneIndex(point);
 
     // first time
@@ -149,9 +165,7 @@ export class Livewire {
       this.#clearPaths();
       this.#clearParentPoints(imageSize);
       // get draw layer
-      let drawLayer = layerGroup.getActiveDrawLayer();
       if (typeof drawLayer === 'undefined') {
-        const viewLayer = layerGroup.getActiveViewLayer();
         const refDataId = viewLayer.getDataId();
         // create new data
         const data = this.#app.createAnnotationData(refDataId);
@@ -160,7 +174,7 @@ export class Livewire {
         // get draw layer
         drawLayer = layerGroup.getActiveDrawLayer();
         // set active to bind to toolboxController
-        layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
+        layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
       }
       // update zoom scale
       this.#style.setZoomScale(
@@ -202,7 +216,17 @@ export class Livewire {
       return;
     }
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      logger.warn('No draw layer to update livewire');
+      return;
+    }
+    const viewLayer = layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to update livewire');
+      return;
+    }
     const index = viewLayer.displayToPlaneIndex(point);
 
     // set the point to find the path to
@@ -243,7 +267,6 @@ export class Livewire {
     }
     this.#currentPath.appenPath(this.#path);
 
-    const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
 
     const newMathShape = new ROI(this.#currentPath.pointArray);
@@ -255,7 +278,6 @@ export class Livewire {
       this.#annotation.colour = this.#style.getLineColour();
       this.#annotation.id = guid();
 
-      const viewLayer = layerGroup.getActiveViewLayer();
       const viewController = viewLayer.getViewController();
       this.#annotation.init(viewController);
 
@@ -387,16 +409,6 @@ export class Livewire {
   activate(bool) {
     // start scissors if displayed
     if (bool) {
-      const layerGroup = this.#app.getActiveLayerGroup();
-      const viewLayer = layerGroup.getActiveViewLayer();
-
-      //scissors = new Scissors();
-      const imageSize = viewLayer.getViewController().getImageSize();
-      this.#scissors.setDimensions(
-        imageSize.get(0),
-        imageSize.get(1));
-      this.#scissors.setData(viewLayer.getImageData().data);
-
       // init with the app window scale
       this.#style.setBaseScale(this.#app.getBaseScale());
       // set the default to the first in the list

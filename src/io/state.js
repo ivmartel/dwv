@@ -84,8 +84,8 @@ export class State {
    */
   apply(app, data) {
     const layerGroup = app.getActiveLayerGroup();
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const viewController = viewLayer.getViewController();
     // display
     const wl = new WindowLevel(data['window-center'], data['window-width']);
     viewController.setWindowLevel(wl);

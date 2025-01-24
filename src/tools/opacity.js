@@ -96,10 +96,10 @@ export class Opacity {
     // do not trigger for small moves
     if (xMove) {
       const layerGroup = this.#app.getLayerGroupByDivId(divId);
-      const viewLayer = layerGroup.getActiveViewLayer();
-      const op = viewLayer.getOpacity();
-      viewLayer.setOpacity(op + (diffX / 200));
-      viewLayer.draw();
+      const layer = layerGroup.getActiveLayer();
+      const op = layer.getOpacity();
+      layer.setOpacity(op + (diffX / 200));
+      layer.draw();
 
       // reset origin point
       this.#startPoint = point;

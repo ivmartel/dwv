@@ -25,6 +25,7 @@ import {Style} from '../gui/style';
 import {LayerGroup} from '../gui/layerGroup';
 import {Point2D} from '../math/point';
 import {DrawLayer} from '../gui/drawLayer';
+import {ViewLayer} from '../gui/viewLayer';
 import {DrawShapeHandler} from './drawShapeHandler';
 /* eslint-enable no-unused-vars */
 
@@ -180,7 +181,6 @@ export class Draw {
     this.#style = app.getStyle();
   }
 
-
   /**
    * Start tool interaction.
    *
@@ -222,7 +222,7 @@ export class Draw {
       // set the layer shape handler
       drawLayer.setShapeHandler(this.#shapeHandler);
       // set active to bind to toolboxController
-      layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
+      layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
     }
 
     // data should exist / be created
@@ -250,6 +250,22 @@ export class Draw {
   }
 
   /**
+   * Get the associated view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group to search.
+   * @returns {ViewLayer|undefined} The view layer.
+   */
+  #getViewLayer(layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      logger.warn('No draw layer to do draw');
+      return;
+    }
+    return layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+  }
+
+  /**
    * Initializes the new shape creation:
    * - Updates the started variable,
    * - Gets the factory,
@@ -263,7 +279,11 @@ export class Draw {
     this.#shapeHandler.disableAndResetEditor();
     this.#setToDrawingState();
     // store point
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to start shape');
+      return;
+    }
     this.#lastPoint = viewLayer.displayToPlanePos(point);
     this.#points.push(this.#lastPoint);
   }
@@ -335,7 +355,11 @@ export class Draw {
    */
   #updateShapeGroupCreation(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to update shape');
+      return;
+    }
     const pos = viewLayer.displayToPlanePos(point);
 
     // draw line to current pos
@@ -497,7 +521,11 @@ export class Draw {
     const touchPoints = getTouchPoints(event);
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to handle touch move');
+      return;
+    }
     const pos = viewLayer.displayToPlanePos(touchPoints[0]);
 
     if (Math.abs(pos.getX() - this.#lastPoint.getX()) > 0 ||
@@ -561,6 +589,10 @@ export class Draw {
       typeof annotation !== 'undefined') {
       const layerGroup = this.#app.getActiveLayerGroup();
       const drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer === 'undefined') {
+        logger.warn('No draw layer to handle key down');
+        return;
+      }
       const drawController = drawLayer.getDrawController();
 
       // create remove annotation command
@@ -601,9 +633,18 @@ export class Draw {
     }
 
     const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      logger.warn('No draw layer to handle new points');
+      return;
+    }
     const drawController = drawLayer.getDrawController();
     const konvaLayer = drawLayer.getKonvaLayer();
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to handle new points');
+      return;
+    }
     const viewController = viewLayer.getViewController();
 
     // auto mode: vary shape colour with layer id
@@ -663,9 +704,18 @@ export class Draw {
     }
 
     const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      logger.warn('No draw layer to handle final points');
+      return;
+    }
     const konvaLayer = drawLayer.getKonvaLayer();
     const drawController = drawLayer.getDrawController();
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to handle final points');
+      return;
+    }
     const viewController = viewLayer.getViewController();
 
     // create final annotation

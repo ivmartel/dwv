@@ -83,8 +83,11 @@ export class WindowLevel {
   #start(point, divId) {
     // check if possible
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      return;
+    }
+    const viewController = viewLayer.getViewController();
     if (!viewController.isMonochrome()) {
       return;
     }
@@ -106,8 +109,11 @@ export class WindowLevel {
     }
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      return;
+    }
+    const viewController = viewLayer.getViewController();
 
     // difference to last position
     const diffX = point.getX() - this.#startPoint.getX();
@@ -223,6 +229,9 @@ export class WindowLevel {
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
     const viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      return;
+    }
     const index = viewLayer.displayToPlaneIndex(mousePoint);
     const viewController = viewLayer.getViewController();
     // exit if not possible

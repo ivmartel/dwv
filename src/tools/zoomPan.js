@@ -5,10 +5,13 @@ import {
   getMousePoint,
   getTouchPoints
 } from '../gui/generic';
+import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application';
+import {LayerGroup} from '../gui/layerGroup';
+import {ViewLayer} from '../gui/viewLayer';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -84,6 +87,26 @@ export class ZoomAndPan {
   }
 
   /**
+   * Get the associated view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group to search.
+   * @returns {ViewLayer|undefined} The view layer.
+   */
+  #getViewLayer(layerGroup) {
+    let viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer === 'undefined') {
+        logger.warn('No draw layer to do zoom/pan');
+        return;
+      }
+      viewLayer = layerGroup.getViewLayerById(
+        drawLayer.getReferenceLayerId());
+    }
+    return viewLayer;
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
@@ -125,7 +148,11 @@ export class ZoomAndPan {
     const ty = point.getY() - this.#startPoint.getY();
     // apply translation
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to update zoom/pan');
+      return;
+    }
     const viewController = viewLayer.getViewController();
     const planeOffset = viewLayer.displayToPlaneScale(
       new Point2D(tx, ty)
@@ -162,9 +189,6 @@ export class ZoomAndPan {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const positionHelper = layerGroup.getPositionHelper();
 
-    const viewLayer = layerGroup.getActiveViewLayer();
-    const viewController = viewLayer.getViewController();
-
     if (lineRatio === 1) {
       // scroll mode
       // difference  to last position
@@ -186,6 +210,12 @@ export class ZoomAndPan {
       const zoom = (lineRatio - 1) / 10;
       if (Math.abs(zoom) % 0.1 <= 0.05 &&
         typeof this.#midPoint !== 'undefined') {
+        const viewLayer = this.#getViewLayer(layerGroup);
+        if (typeof viewLayer === 'undefined') {
+          logger.warn('No view layer to do touch zoom/pan');
+          return;
+        }
+        const viewController = viewLayer.getViewController();
         const planePos = viewLayer.displayToMainPlanePos(this.#midPoint);
         const center = viewController.getPlanePositionFromPlanePoint(planePos);
         layerGroup.addScale(zoom, center);
@@ -202,7 +232,11 @@ export class ZoomAndPan {
    */
   #setCurrentPosition(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to set current position');
+      return;
+    }
     const viewController = viewLayer.getViewController();
     const planePos = viewLayer.displayToPlanePos(point);
     const position = viewController.getPositionFromPlanePoint(planePos);
@@ -322,7 +356,11 @@ export class ZoomAndPan {
     const mousePoint = getMousePoint(event);
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to do wheel zoom/pan');
+      return;
+    }
     const viewController = viewLayer.getViewController();
     const planePos = viewLayer.displayToMainPlanePos(mousePoint);
     const center = viewController.getPlanePositionFromPlanePoint(planePos);
