@@ -397,9 +397,8 @@ export function getImage2DSize(elements) {
  * @returns {Spacing} The read spacing or the default [1,1].
  */
 export function getPixelSpacing(elements) {
-  // default
-  let rowSpacing = 1;
-  let columnSpacing = 1;
+  let rowSpacing;
+  let columnSpacing;
 
   // 1. PixelSpacing
   // 2. ImagerPixelSpacing
@@ -417,13 +416,19 @@ export function getPixelSpacing(elements) {
   }
 
   // check
-  if (columnSpacing === 0) {
-    logger.warn('Zero column spacing.');
-    columnSpacing = 1;
-  }
-  if (rowSpacing === 0) {
-    logger.warn('Zero row spacing.');
+  if (typeof rowSpacing === 'undefined') {
+    logger.warn('Undefined row spacing, using default (1mm).');
     rowSpacing = 1;
+  } else if (rowSpacing === 0) {
+    logger.warn('Zero row spacing, using default (1mm).');
+    rowSpacing = 1;
+  }
+  if (typeof columnSpacing === 'undefined') {
+    logger.warn('Undefined column spacing, using default (1mm).');
+    columnSpacing = 1;
+  } else if (columnSpacing === 0) {
+    logger.warn('Zero column spacing, using default (1mm).');
+    columnSpacing = 1;
   }
 
   // return
