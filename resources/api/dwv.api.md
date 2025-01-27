@@ -626,12 +626,14 @@ export class LayerGroup {
     fitToContainer(divToWorldSizeRatio: number): void;
     flipScaleZ(): void;
     getActiveDrawLayer(): DrawLayer | undefined;
+    getActiveLayer(): ViewLayer | DrawLayer | undefined;
     getActiveViewLayer(): ViewLayer | undefined;
     getAddedScale(): Scalar3D;
     getBaseScale(): Scalar3D;
     getBaseViewLayer(): ViewLayer | undefined;
     getDivId(): string | undefined;
     getDivToWorldSizeRatio(): number | undefined;
+    getDrawLayerById(id: string): DrawLayer | undefined;
     getDrawLayers(callbackFn?: Function): DrawLayer[];
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     getMaxWorldSize(): Scalar2D | undefined;
@@ -642,6 +644,7 @@ export class LayerGroup {
     getScale(): Scalar3D;
     getShowCrosshair(): boolean;
     getViewDataIndices(): string[];
+    getViewLayerById(id: string): ViewLayer | undefined;
     getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
     includes(id: string): boolean;
@@ -653,10 +656,8 @@ export class LayerGroup {
     removeTooltipDiv(): void;
     reset(): void;
     searchViewLayers(meta: object): ViewLayer[];
-    setActiveDrawLayer(index: number | undefined): void;
-    setActiveDrawLayerByDataId(dataId: string): void;
-    setActiveViewLayer(index: number): void;
-    setActiveViewLayerByDataId(dataId: string): void;
+    setActiveLayer(index: number): void;
+    setActiveLayerByDataId(dataId: string): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
