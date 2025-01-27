@@ -1141,10 +1141,10 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.2.tgz#821f8442f4175d8f0467b9daf26e3a18e2d02af2"
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
-"@stylistic/eslint-plugin-js@^2.12.0":
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-2.13.0.tgz#8fb6c7b6a775689e1dd90989a36c68b12b89d928"
-  integrity sha512-GPPDK4+fcbsQD58a3abbng2Dx+jBoxM5cnYjBM4T24WFZRZdlNSKvR19TxP8CPevzMOodQ9QVzNeqWvMXzfJRA==
+"@stylistic/eslint-plugin-js@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@stylistic/eslint-plugin-js/-/eslint-plugin-js-3.0.0.tgz#7e3abd27b10d669a70867a2cb77760fb3688cdaa"
+  integrity sha512-GAAeTmhxk+lUz2rgQvoaYOlhe9G8vYlgN8D81QdA6fJCJdfcKTr7lAlToGCPLB/0iJtT4JXGuJoNJBiu6EOgcw==
   dependencies:
     eslint-visitor-keys "^4.2.0"
     espree "^10.3.0"
