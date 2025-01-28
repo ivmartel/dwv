@@ -9,8 +9,7 @@ Summary:
 
 The view creation is triggered when calling the `app.render` method. It can also be triggered
 when the app receives a `loaditem` event if the application options contain a true `viewOnFirstLoadItem`.
-
-![sequence-view-creation](sequence-view-creation.png)
+The process consists in taking an image slice and creating an HTML [canvas](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) that represents it.
 
 The library will use a series of steps and LookUp Tables (LUT) to convert the file data into the
 canvas array data:
@@ -27,6 +26,10 @@ canvas array data:
    (see [image/windowLut.js](./WindowLut.html))
 1. Assign a colour to each values using a colour map
    (see [image/luts.js](./global.html#luts))
-1. You now have the canvas data!
+1. You now have the [canvas](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) data!
 
-All this is materialised in the `generateImageData*` functions.
+![sequence-view-creation](sequence-view-creation.png)
+
+*View generation sequence.*
+
+All this is materialised in the `generateImageData*` functions called from the [View](./View.html) class.
