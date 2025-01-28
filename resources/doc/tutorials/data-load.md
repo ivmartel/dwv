@@ -3,10 +3,10 @@ describes the dwv load process.
 
 Summary:
 
-- [Classes](#classes)
-- [Sequence](#sequence)
+- [Load classes](#load-classes)
+- [Load sequence](#load-sequence)
 
-## Classes
+## Load classes
 
 Data can come from 3 types of source: url (via a [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)), file (via a [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)) or directly as a memory buffer. The 3 'meta' loaders responsible for each source are: [UrlsLoader](./UrlsLoader.html), [FilesLoader](./FilesLoader.html) and [MemoryLoader](./MemoryLoader.html).
 
@@ -32,7 +32,7 @@ When multiple items are loaded, it will append the extracted data to the first i
 image. Note that the dicom image data can be stored in a compressed format, in that case the DICOM loader will
 decompress the data to create the image.
 
-## Sequence
+## Load sequence
 
 Here are the events triggered during the complete load process (meaning the load of all the items):
 
