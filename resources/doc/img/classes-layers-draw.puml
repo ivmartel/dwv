@@ -1,6 +1,6 @@
 @startuml
 
-class KonvaShape {
+class AnnotationGroup {
   (mvc:model)
 }
 class DrawLayer {
@@ -10,9 +10,9 @@ class DrawController
 
 circle User
 
-KonvaShape --> DrawLayer: updates
+AnnotationGroup --> DrawLayer: updates
 DrawLayer -- User: sees
 User -up-> DrawController: uses
-DrawController -up-> KonvaShape: manipulates
+DrawController -up-> AnnotationGroup: manipulates
 
 @enduml
