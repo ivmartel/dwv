@@ -1147,7 +1147,9 @@ export class LayerGroup {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
-      throw new Error('Cannot fit to zero sized container.');
+      throw new Error('Cannot fit to zero sized container with id \'' +
+        this.#containerDiv.id + '\'.'
+      );
     }
     // get max world size
     const maxWorldSize = this.getMaxWorldSize();
