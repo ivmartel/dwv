@@ -774,9 +774,6 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.addEventListener(
       'positionchange', this.#fireEvent);
-    // propagate drawLayer events
-    drawLayer.addEventListener('drawcreate', this.#fireEvent);
-    drawLayer.addEventListener('drawdelete', this.#fireEvent);
   }
 
   /**
@@ -790,9 +787,6 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.removeEventListener(
       'positionchange', this.#fireEvent);
-    // propagate drawLayer events
-    drawLayer.removeEventListener('drawcreate', this.#fireEvent);
-    drawLayer.removeEventListener('drawdelete', this.#fireEvent);
   }
 
   /**

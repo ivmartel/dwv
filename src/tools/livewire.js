@@ -8,7 +8,6 @@ import {Path} from '../math/path';
 import {Scissors} from '../math/scissors';
 import {guid} from '../math/stats';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {ListenerHandler} from '../utils/listen';
 import {logger} from '../utils/logger';
 import {ROI} from '../math/roi';
 import {Annotation} from '../image/annotation';
@@ -95,13 +94,6 @@ export class Livewire {
    * @type {number}
    */
   #tolerance = 5;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Clear the parent points list.
@@ -423,45 +415,6 @@ export class Livewire {
     // does nothing
   }
 
-  /**
-   * Get the list of event names that this tool can fire.
-   *
-   * @returns {Array} The list of event names.
-   */
-  getEventNames() {
-    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *    event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  // #fireEvent = (event) => {
-  //   this.#listenerHandler.fireEvent(event);
-  // };
 
   /**
    * Set the tool live features: shape colour.

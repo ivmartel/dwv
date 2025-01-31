@@ -1825,11 +1825,6 @@ export class App {
     for (let j = 0; j < viewEventNames.length; ++j) {
       group.addEventListener(viewEventNames[j], this.#fireEvent);
     }
-    // propagate drawLayer events
-    if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
-      group.addEventListener('drawcreate', this.#fireEvent);
-      group.addEventListener('drawdelete', this.#fireEvent);
-    }
     // updata data view config
     group.addEventListener('wlchange', (event) => {
       const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
