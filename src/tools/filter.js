@@ -60,12 +60,12 @@ export class Filter {
     for (const key in this.#filterList) {
       if (bool) {
         this.#filterList[key].addEventListener('filterrun', this.#fireEvent);
-        this.#filterList[key].addEventListener('filter-undo', this.#fireEvent);
+        this.#filterList[key].addEventListener('filterundo', this.#fireEvent);
       } else {
         this.#filterList[key].removeEventListener(
           'filterrun', this.#fireEvent);
         this.#filterList[key].removeEventListener(
-          'filter-undo', this.#fireEvent);
+          'filterundo', this.#fireEvent);
       }
     }
   }
