@@ -104,7 +104,10 @@ function viewerSetup() {
       'Roi'
     ]},
     Floodfill: {},
-    Livewire: {}
+    Livewire: {},
+    Filter: {options: [
+      'Sharpen'
+    ]}
   };
 
   // app config
@@ -247,10 +250,18 @@ function viewerSetup() {
     updateSliders();
   });
 
+  _app.addEventListener('filterrun', function (event) {
+    console.log('filterrun', event);
+  });
+  _app.addEventListener('filterundo', function (event) {
+    console.log('filterundo', event);
+  });
+
+
   // default keyboard shortcuts
   window.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
-    // mask segment related
+    // mask segment related: has to be number
     if (!isNaN(parseInt(event.key, 10))) {
       const lg = _app.getActiveLayerGroup();
       const vl = lg.getActiveViewLayer();
@@ -267,10 +278,12 @@ function viewerSetup() {
         const segment = segHelper.getSegment(number);
         if (event.ctrlKey) {
           if (event.altKey) {
+            // CTRL + ALT + number
             console.log('Delete segment: ' + segment.label);
             // delete
             vc.deleteSegment(number, _app.addToUndoStack);
           } else {
+            // CTRL + number
             console.log('Show/hide segment: ' + segment.label);
             // show/hide the selected segment
             if (segHelper.isHidden(number)) {
@@ -282,6 +295,18 @@ function viewerSetup() {
           }
         }
       }
+    }
+    // filter
+    if (getSelectedToolName() === 'Filter' &&
+      event.altKey && event.key === 'r') {
+      // run the sharpen filter
+      _app.setToolFeatures({
+        filterName: 'Sharpen',
+        runArgs: {
+          dataId: _app.getDataIds()[0]
+        },
+        run: true
+      });
     }
   });
   // default on resize
@@ -825,7 +850,8 @@ function setupToolsCheckboxes() {
     input.title = key;
     input.onchange = getChangeTool(key);
 
-    if (key === 'Scroll') {
+    // select first one
+    if (i === 0) {
       input.checked = true;
     }
 
@@ -893,6 +919,20 @@ function setAppTool(toolName) {
       _app.setToolFeatures(features);
     }
   }
+}
+
+/**
+ * Get the selected tool name.
+ *
+ * @returns {string|undefined} The tool name.
+ */
+function getSelectedToolName() {
+  let res;
+  const element = document.querySelector('input[name="tools"]:checked');
+  if (element) {
+    res = element.title;
+  }
+  return res;
 }
 
 /**
