@@ -1,9 +1,7 @@
-import {ListenerHandler} from './listen';
-
 /**
  * UndoStack class.
  */
-export class UndoStack {
+export class UndoStack extends EventTarget {
   /**
    * Array of commands.
    *
@@ -13,17 +11,11 @@ export class UndoStack {
 
   /**
    * Current command index.
+   * Warning: 1 based.
    *
    * @type {number}
    */
   #curCmdIndex = 0;
-
-  /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
 
   /**
    * Get the stack size.
@@ -36,11 +28,21 @@ export class UndoStack {
 
   /**
    * Get the current stack index.
+   * Warning: 1 based.
    *
    * @returns {number} The stack index.
    */
   getCurrentStackIndex() {
     return this.#curCmdIndex;
+  }
+
+  /**
+   * Get the current command.
+   *
+   * @returns {object} The command.
+   */
+  getCurrentCommand() {
+    return this.#stack[this.#curCmdIndex - 1];
   }
 
   /**
@@ -57,22 +59,17 @@ export class UndoStack {
     // increment index
     ++this.#curCmdIndex;
     /**
-     * Command add to undo stack event.
+     * Add command to undo stack event.
+     * `event.target.getCurrentCommand()` will return the added command.
      *
      * @event UndoStack#undoadd
-     * @type {object}
-     * @property {string} type The event type.
-     * @property {string} command The name of the command added to the
-     *   undo stack.
+     * @type {Event}
      */
-    this.#fireEvent({
-      type: 'undoadd',
-      command: cmd.getName()
-    });
+    this.dispatchEvent(new Event('undoadd'));
   }
 
   /**
-   * Remove a command to the stack.
+   * Remove a command from the stack.
    *
    * @param {string} name The name of the command to remove.
    * @returns {boolean} True if the command was found and removed.
@@ -85,25 +82,22 @@ export class UndoStack {
     };
     const index = this.#stack.findIndex(hasInputName);
     if (index !== -1) {
+      // result
+      res = true;
+      /**
+       * Remove command from undo stack event.
+       * Get the removed command name from the `event.detail`.
+       *
+       * @event UndoStack#undoremove
+       * @type {CustomEvent}
+       */
+      this.dispatchEvent(new CustomEvent('undoremove', {
+        detail: {commandName: name}
+      }));
       // remove command
       this.#stack.splice(index, 1);
       // decrement index
       --this.#curCmdIndex;
-      // result
-      res = true;
-      /**
-       * Command remove from undo stack event.
-       *
-       * @event UndoStack#undoremove
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {string} command The name of the command added to the
-       *   undo stack.
-       */
-      this.#fireEvent({
-        type: 'undoremove',
-        command: name
-      });
     }
     return res;
   }
@@ -114,24 +108,19 @@ export class UndoStack {
    * @fires UndoStack#undo
    */
   undo() {
-    // a bit inefficient...
     if (this.#curCmdIndex > 0) {
+      /**
+       * Command undo event.
+       * `event.target.getCurrentCommand()` will return the undone command.
+       *
+       * @event UndoStack#undo
+       * @type {Event}
+       */
+      this.dispatchEvent(new Event('undo'));
       // decrement command index
       --this.#curCmdIndex;
       // undo last command
       this.#stack[this.#curCmdIndex].undo();
-      /**
-       * Command undo event.
-       *
-       * @event UndoStack#undo
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {string} command The name of the undone command.
-       */
-      this.#fireEvent({
-        type: 'undo',
-        command: this.#stack[this.#curCmdIndex].getName()
-      });
     }
   }
 
@@ -144,52 +133,17 @@ export class UndoStack {
     if (this.#curCmdIndex < this.#stack.length) {
       // run last command
       this.#stack[this.#curCmdIndex].execute();
-      /**
-       * Command redo event.
-       *
-       * @event UndoStack#redo
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {string} command The name of the redone command.
-       */
-      this.#fireEvent({
-        type: 'redo',
-        command: this.#stack[this.#curCmdIndex].getName()
-      });
       // increment command index
       ++this.#curCmdIndex;
+      /**
+       * Command redo event.
+       * `event.target.getCurrentCommand()` will return the re-done command.
+       *
+       * @event UndoStack#redo
+       * @type {Event}
+       */
+      this.dispatchEvent(new Event('redo'));
     }
   }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *    event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
-  };
 
 } // UndoStack class
