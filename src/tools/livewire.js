@@ -143,6 +143,7 @@ export class Livewire {
 
     // first time
     if (!this.#started) {
+      this.#annotation = undefined;
       this.#started = true;
       this.#startPoint = new Point2D(index.get(0), index.get(1));
       // clear vars

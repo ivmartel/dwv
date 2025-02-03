@@ -343,6 +343,8 @@ export class Floodfill {
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
+    this.#annotation = undefined;
+
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     const viewLayer = layerGroup.getActiveViewLayer();
     let drawLayer = layerGroup.getActiveDrawLayer();
