@@ -74,7 +74,7 @@ export class ROI {
    * a non-self-intersecting closed polygon.
    * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
    *
-   * @returns {Point2D} The centroid point.
+   * @returns {Point2D|undefined} The centroid point.
    */
   getCentroid() {
     let a = 0;
@@ -93,12 +93,13 @@ export class ROI {
       cx += (pi.getX() + pi1.getX()) * ai;
       cy += (pi.getY() + pi1.getY()) * ai;
     }
-    a *= 0.5;
-    const a1 = 1 / (6 * a);
-    cx *= a1;
-    cy *= a1;
 
-    return new Point2D(cx, cy);
+    let res;
+    if (a !== 0) {
+      const a1 = 1 / (3 * a);
+      res = new Point2D(a1 * cx, a1 * cy);
+    }
+    return res;
   }
 
 } // ROI class

@@ -216,7 +216,8 @@ export class Annotation {
   getCentroid() {
     let res;
     if (typeof this.#viewController !== 'undefined' &&
-      typeof this.mathShape.getCentroid !== 'undefined') {
+      typeof this.mathShape.getCentroid !== 'undefined' &&
+      typeof this.mathShape.getCentroid() !== 'undefined') {
       // find the slice index of the annotation origin
       const originIndex = this.#getOriginIndex();
       const scrollDimIndex = this.#viewController.getScrollDimIndex();
