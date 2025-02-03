@@ -759,6 +759,7 @@ export class App {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {File[]} files The list of files to load.
+   * @returns {string} The data ID, '-1' if problem.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -768,13 +769,13 @@ export class App {
    * @function
    */
   loadFiles = (files) => {
-    // Get new data id
-    const dataId = this.#dataController.getNextDataId();
     if (files.length === 0) {
       logger.warn('Ignoring empty input file list.');
-      return;
+      return '-1';
     }
+    const dataId = this.#dataController.getNextDataId();
     this.#loadController.loadFiles(files, dataId);
+    return dataId;
   };
 
   /**
@@ -785,6 +786,7 @@ export class App {
    * - requestHeaders: an array of {name, value} to use as request headers,
    * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
    * - batchSize: the size of the request url batch.
+   * @returns {string} The data ID, '-1' if problem.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -794,13 +796,13 @@ export class App {
    * @function
    */
   loadURLs = (urls, options) => {
-    // Get new data id
-    const dataId = this.#dataController.getNextDataId();
     if (urls.length === 0) {
       logger.warn('Ignoring empty input url list.');
-      return;
+      return '-1';
     }
+    const dataId = this.#dataController.getNextDataId();
     this.#loadController.loadURLs(urls, dataId, options);
+    return dataId;
   };
 
   /**
@@ -837,6 +839,7 @@ export class App {
    *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
+   * @returns {string} The data ID.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -846,9 +849,9 @@ export class App {
    * @function
    */
   loadImageObject = (data) => {
-    // Get new data id
     const dataId = this.#dataController.getNextDataId();
     this.#loadController.loadImageObject(data, dataId);
+    return dataId;
   };
 
   /**
