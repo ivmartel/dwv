@@ -571,6 +571,7 @@ export declare class App {
      * Load a list of files. Can be image files or a state file.
      *
      * @param {File[]} files The list of files to load.
+     * @returns {string} The data ID, '-1' if problem.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -579,7 +580,7 @@ export declare class App {
      * @fires App#abort
      * @function
      */
-    loadFiles: (files: File[]) => void;
+    loadFiles: (files: File[]) => string;
     /**
      * Load a list of URLs. Can be image files or a state file.
      *
@@ -588,6 +589,7 @@ export declare class App {
      * - requestHeaders: an array of {name, value} to use as request headers,
      * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
      * - batchSize: the size of the request url batch.
+     * @returns {string} The data ID, '-1' if problem.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -596,7 +598,7 @@ export declare class App {
      * @fires App#abort
      * @function
      */
-    loadURLs: (urls: string[], options?: object) => void;
+    loadURLs: (urls: string[], options?: object) => string;
     /**
      * Load from an input uri.
      *
@@ -610,6 +612,7 @@ export declare class App {
      *
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
+     * @returns {string} The data ID.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -618,7 +621,7 @@ export declare class App {
      * @fires App#abort
      * @function
      */
-    loadImageObject: (data: any[]) => void;
+    loadImageObject: (data: any[]) => string;
     /**
      * Abort all the current loads.
      */
@@ -4577,9 +4580,9 @@ export declare class ROI {
      * a non-self-intersecting closed polygon.
      * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
      *
-     * @returns {Point2D} The centroid point.
+     * @returns {Point2D|undefined} The centroid point.
      */
-    getCentroid(): Point2D;
+    getCentroid(): Point2D | undefined;
     #private;
 }
 

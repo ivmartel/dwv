@@ -126,10 +126,10 @@ export class App {
     init(opt: AppOptions): void;
     // @deprecated
     initWLDisplay(): void;
-    loadFiles: (files: File[]) => void;
+    loadFiles: (files: File[]) => string;
     loadFromUri: (uri: string, options?: object) => void;
-    loadImageObject: (data: any[]) => void;
-    loadURLs: (urls: string[], options?: object) => void;
+    loadImageObject: (data: any[]) => string;
+    loadURLs: (urls: string[], options?: object) => string;
     onKeydown: (event: KeyboardEvent) => void;
     onResize: () => void;
     redo(): void;
@@ -945,7 +945,7 @@ export class ROI {
     constructor(points?: Point2D[]);
     addPoint(point: Point2D): void;
     addPoints(rhs: Point2D[]): void;
-    getCentroid(): Point2D;
+    getCentroid(): Point2D | undefined;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
     getPoints(): Point2D[];
