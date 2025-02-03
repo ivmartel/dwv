@@ -196,7 +196,8 @@ export class Annotation {
   getCentroid() {
     let res;
     if (typeof this.#viewController !== 'undefined' &&
-      typeof this.mathShape.getCentroid !== 'undefined') {
+      typeof this.mathShape.getCentroid !== 'undefined' &&
+      typeof this.mathShape.getCentroid() !== 'undefined') {
       // find the slice index of the annotation origin
       let origin = this.planeOrigin;
       if (typeof this.planePoints !== 'undefined') {
