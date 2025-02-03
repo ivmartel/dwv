@@ -1655,6 +1655,13 @@ export class App {
       logger.error('Missing loaditem event load type.');
     }
 
+    let eventMetaData;
+    if (event.loadtype === 'image') {
+      eventMetaData = event.data.meta;
+    } else if (event.loadtype === 'state') {
+      eventMetaData = 'state';
+    }
+
     /**
      * Load item event: fired when an item has been successfully loaded.
      *
@@ -1678,17 +1685,14 @@ export class App {
 
     const isFirstLoadItem = event.isfirstitem;
 
-    let eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
         this.#dataController.add(event.dataid, event.data);
       } else {
         this.#dataController.update(event.dataid, event.data);
       }
-      eventMetaData = event.data.meta;
     } else if (event.loadtype === 'state') {
       this.applyJsonState(event.data, event.dataid);
-      eventMetaData = 'state';
     }
 
     // update overlay data if present
