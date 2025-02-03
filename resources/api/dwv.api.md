@@ -922,7 +922,7 @@ export class ROI {
     constructor(points?: Point2D[]);
     addPoint(point: Point2D): void;
     addPoints(rhs: Point2D[]): void;
-    getCentroid(): Point2D;
+    getCentroid(): Point2D | undefined;
     getLength(): number;
     getPoint(index: number): Point2D | undefined;
     getPoints(): Point2D[];

@@ -4380,9 +4380,9 @@ export declare class ROI {
      * a non-self-intersecting closed polygon.
      * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
      *
-     * @returns {Point2D} The centroid point.
+     * @returns {Point2D|undefined} The centroid point.
      */
-    getCentroid(): Point2D;
+    getCentroid(): Point2D | undefined;
     #private;
 }
 

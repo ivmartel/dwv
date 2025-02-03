@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.34.2](https://github.com/ivmartel/dwv/releases/tag/v0.34.2) - 03/02/2025
+
+### Fixed
+
+- ROI centroid calculation error [#1855](https://github.com/ivmartel/dwv/issues/1855)
+- Floodfill and livewire can only create one shape [#1854](https://github.com/ivmartel/dwv/issues/1854)
+
+---
+
 ## [v0.34.1](https://github.com/ivmartel/dwv/releases/tag/v0.34.1) - 05/12/2024
 
 ### Fixed

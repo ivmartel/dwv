@@ -2,18 +2,18 @@
 
 ## Context
 
-Date: Thu Dec 05 2024 17:51:12 GMT+0100 (Central European Standard Time)
+Date: Mon Feb 03 2025 12:52:27 GMT+0100 (Central European Standard Time)
 
-Commit: [131e84d](git://github.com/ivmartel/dwv.git/commit/131e84db7d4a4351294dd0e1a027fcb7092b1d4e)
+Commit: [368a6a4](git://github.com/ivmartel/dwv.git/commit/368a6a40c5fe6daa167224a21b60232317ebdab1)
 
-Browser: Chrome Headless 131.0.0.0 (Linux x86_64)
+Browser: Chrome Headless 132.0.0.0 (Linux x86_64)
 
 ## Summary
 Success: 166 ✅
 
 Failed: 0 ❌
 
-(total: 166, skipped: 0, total time: 1590ms)
+(total: 166, skipped: 0, total time: 1518ms)
 
 ## Tests details
 
