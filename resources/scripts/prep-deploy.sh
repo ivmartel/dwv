@@ -65,7 +65,16 @@ if [ "$(grep -c "'../../decoders/" $fileName)" -eq 4 ]
 then
   info "Move to local decoders"
   # change path to decoders
-  a4="'..\/..\/decoders\/"
-  b4="'.\/decoders\/"
+  a3="'..\/..\/decoders\/"
+  b3="'.\/decoders\/"
+  sed -i "s/${a3}/${b3}/g" $fileName
+fi
+
+if [ "$(grep -c "'../favicon.ico" $fileName)" -eq 1 ]
+then
+  info "Move to local favicon"
+  # change path to favicon
+  a4="'..\/favicon.ico"
+  b4="'.\/favicon.ico"
   sed -i "s/${a4}/${b4}/g" $fileName
 fi
