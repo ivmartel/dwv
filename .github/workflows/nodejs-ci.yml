@@ -39,6 +39,7 @@ jobs:
           cp -Rf dist ./build/demo
           cp -Rf decoders ./build/demo
           cp -Rf tests/pacs/viewer.* ./build/demo
+          cp tests/favicon.ico ./build/demo
           ./resources/scripts/prep-deploy.sh -f build/demo/viewer.html
           ./resources/scripts/prep-deploy.sh -f build/demo/viewer.js
       - name: Push to gh-pages (if master or develop branch)
