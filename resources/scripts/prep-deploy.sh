@@ -70,11 +70,11 @@ then
   sed -i "s/${a3}/${b3}/g" $fileName
 fi
 
-if [ "$(grep -c "'../favicon.ico" $fileName)" -eq 1 ]
+if [ "$(grep -c "../favicon.ico" $fileName)" -eq 1 ]
 then
   info "Move to local favicon"
   # change path to favicon
-  a4="'..\/favicon.ico"
-  b4="'.\/favicon.ico"
+  a4="..\/favicon.ico"
+  b4=".\/favicon.ico"
   sed -i "s/${a4}/${b4}/g" $fileName
 fi
