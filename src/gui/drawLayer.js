@@ -124,6 +124,13 @@ export class DrawLayer {
   #zoomOffset = {x: 0, y: 0};
 
   /**
+   * The pan offset.
+   *
+   * @type {Scalar2D}
+   */
+  #panOffset = {x: 0, y: 0};
+
+  /**
    * The flip offset.
    *
    * @type {Scalar2D}
@@ -454,20 +461,15 @@ export class DrawLayer {
    * @param {Scalar3D} newOffset The offset as {x,y,z}.
    */
   setOffset(newOffset) {
-    const planeNewOffset =
+    const newPanOffset =
       this.#planeHelper.getPlaneOffsetFromOffset3D(newOffset);
+    const offset = this.#konvaStage.offset();
     this.#konvaStage.offset({
-      x: planeNewOffset.x +
-        this.#viewOffset.x +
-        this.#baseOffset.x +
-        this.#zoomOffset.x +
-        this.#flipOffset.x,
-      y: planeNewOffset.y +
-        this.#viewOffset.y +
-        this.#baseOffset.y +
-        this.#zoomOffset.y +
-        this.#flipOffset.y
+      x: offset.x - this.#panOffset.x + newPanOffset.x,
+      y: offset.y - this.#panOffset.y + newPanOffset.y
     });
+    this.#panOffset = newPanOffset;
+
   }
 
   /**
