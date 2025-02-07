@@ -469,7 +469,6 @@ export class DrawLayer {
       y: offset.y - this.#panOffset.y + newPanOffset.y
     });
     this.#panOffset = newPanOffset;
-
   }
 
   /**
