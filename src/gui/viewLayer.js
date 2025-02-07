@@ -863,6 +863,22 @@ export class ViewLayer {
   fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
     let needsDraw = false;
 
+    // fit scale
+    const newFitScale = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
+    };
+    const fitRatio = {
+      x: newFitScale.x / this.#fitScale.x,
+      y: newFitScale.y / this.#fitScale.y
+    };
+
+    // size ratio (calculated before update)
+    const sizeRatio = {
+      x: containerSize.x / (this.#canvas.width * fitRatio.x),
+      y: containerSize.y / (this.#canvas.height * fitRatio.y)
+    };
+
     // set canvas size if different from previous
     if (this.#canvas.width !== containerSize.x ||
       this.#canvas.height !== containerSize.y) {
@@ -877,23 +893,18 @@ export class ViewLayer {
       needsDraw = true;
     }
 
-    // fit scale
-    const divToImageSizeRatio = {
-      x: divToWorldSizeRatio * this.#baseSpacing.x,
-      y: divToWorldSizeRatio * this.#baseSpacing.y
-    };
     // #scale = inputScale * fitScale * flipScale
     // flipScale does not change here, we can omit it
     // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: this.#scale.x * divToImageSizeRatio.x / this.#fitScale.x,
-      y: this.#scale.y * divToImageSizeRatio.y / this.#fitScale.y
+      x: this.#scale.x * fitRatio.x,
+      y: this.#scale.y * fitRatio.y
     };
 
     // set scales if different from previous
     if (this.#scale.x !== newScale.x ||
       this.#scale.y !== newScale.y) {
-      this.#fitScale = divToImageSizeRatio;
+      this.#fitScale = newFitScale;
       this.#scale = newScale;
       // update draw flag
       needsDraw = true;
@@ -901,13 +912,13 @@ export class ViewLayer {
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / divToImageSizeRatio.x,
-      y: fitOffset.y / divToImageSizeRatio.y
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
     };
     // flip offset
     const scaledImageSize = {
-      x: containerSize.x / divToImageSizeRatio.x,
-      y: containerSize.y / divToImageSizeRatio.y
+      x: containerSize.x / newFitScale.x,
+      y: containerSize.y / newFitScale.y
     };
     const newFlipOffset = {
       x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
@@ -919,18 +930,25 @@ export class ViewLayer {
       this.#viewOffset.y !== newViewOffset.y ||
       this.#flipOffset.x !== newFlipOffset.x ||
       this.#flipOffset.y !== newFlipOffset.y) {
+      const newZoomOffset = {
+        x: this.#zoomOffset.x * sizeRatio.x,
+        y: this.#zoomOffset.y * sizeRatio.y
+      };
       // update global offset
       this.#offset = {
         x: this.#offset.x +
           newViewOffset.x - this.#viewOffset.x +
-          newFlipOffset.x - this.#flipOffset.x,
+          newFlipOffset.x - this.#flipOffset.x +
+          newZoomOffset.x - this.#zoomOffset.x,
         y: this.#offset.y +
           newViewOffset.y - this.#viewOffset.y +
-          newFlipOffset.y - this.#flipOffset.y,
+          newFlipOffset.y - this.#flipOffset.y +
+          newZoomOffset.y - this.#zoomOffset.y
       };
       // update private local offsets
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
+      this.#zoomOffset = newZoomOffset;
       // update draw flag
       needsDraw = true;
     }

@@ -815,39 +815,53 @@ export class DrawLayer {
    * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
   fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
-    // update konva
-    this.#konvaStage.width(containerSize.x);
-    this.#konvaStage.height(containerSize.y);
-
     // fit scale
-    const divToImageSizeRatio = {
+    const newFitScale = {
       x: divToWorldSizeRatio * this.#baseSpacing.x,
       y: divToWorldSizeRatio * this.#baseSpacing.y
     };
+    const fitRatio = {
+      x: newFitScale.x / this.#fitScale.x,
+      y: newFitScale.y / this.#fitScale.y
+    };
+
+    // size ratio (calculated before update)
+    const sizeRatio = {
+      x: containerSize.x / (this.#konvaStage.width() * fitRatio.x),
+      y: containerSize.y / (this.#konvaStage.height() * fitRatio.y)
+    };
+
+    // set canvas size if different from previous
+    if (this.#konvaStage.width() !== containerSize.x ||
+      this.#konvaStage.height() !== containerSize.y) {
+      this.#konvaStage.width(containerSize.x);
+      this.#konvaStage.height(containerSize.y);
+    }
+
     // #scale = inputScale * fitScale * flipScale
     // flipScale does not change here, we can omit it
     // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: this.#konvaStage.scale().x * divToImageSizeRatio.x / this.#fitScale.x,
-      y: this.#konvaStage.scale().y * divToImageSizeRatio.y / this.#fitScale.y
+      x: this.#konvaStage.scale().x * fitRatio.x,
+      y: this.#konvaStage.scale().y * fitRatio.y
     };
 
     // set scales if different from previous
     if (this.#konvaStage.scale().x !== newScale.x ||
       this.#konvaStage.scale().y !== newScale.y) {
-      this.#fitScale = divToImageSizeRatio;
+      this.#fitScale = newFitScale;
       this.#konvaStage.scale(newScale);
     }
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / divToImageSizeRatio.x,
-      y: fitOffset.y / divToImageSizeRatio.y
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
     };
     // flip offset
     const scaledImageSize = {
-      x: containerSize.x / divToImageSizeRatio.x,
-      y: containerSize.y / divToImageSizeRatio.y
+      x: containerSize.x / newFitScale.x,
+      y: containerSize.y / newFitScale.y
     };
     const newFlipOffset = {
       x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
@@ -859,18 +873,25 @@ export class DrawLayer {
       this.#viewOffset.y !== newViewOffset.y ||
       this.#flipOffset.x !== newFlipOffset.x ||
       this.#flipOffset.y !== newFlipOffset.y) {
+      const newZoomOffset = {
+        x: this.#zoomOffset.x * sizeRatio.x,
+        y: this.#zoomOffset.y * sizeRatio.y
+      };
       // update global offset
       this.#konvaStage.offset({
         x: this.#konvaStage.offset().x +
           newViewOffset.x - this.#viewOffset.x +
-          newFlipOffset.x - this.#flipOffset.x,
+          newFlipOffset.x - this.#flipOffset.x +
+          newZoomOffset.x - this.#zoomOffset.x,
         y: this.#konvaStage.offset().y +
           newViewOffset.y - this.#viewOffset.y +
-          newFlipOffset.y - this.#flipOffset.y,
+          newFlipOffset.y - this.#flipOffset.y +
+          newZoomOffset.y - this.#zoomOffset.y
       });
       // update private local offsets
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
+      this.#zoomOffset = newZoomOffset;
     }
   }
 
