@@ -189,6 +189,7 @@ function viewerSetup() {
       _app.render(event.dataid);
     }
     // update sliders with new data info
+    // (has to be after full load)
     initSliders();
 
     // log meta data
@@ -257,6 +258,18 @@ function viewerSetup() {
     console.log('filterundo', event);
   });
 
+  _app.addEventListener('viewlayeradd', function (event) {
+    // init/reset layer group slider
+    initSlider(event.layergroupid);
+  });
+  _app.addEventListener('drawlayeradd', function (event) {
+    // init/reset layer group slider
+    initSlider(event.layergroupid);
+  });
+  _app.addEventListener('layerremove', function (event) {
+    // init/reset layer group slider
+    initSlider(event.layergroupid);
+  });
 
   // default keyboard shortcuts
   window.addEventListener('keydown', function (event) {
@@ -463,9 +476,6 @@ function onDOMContentLoaded() {
       }
     }
 
-    // udpate sliders after render
-    initSliders();
-
     // need to set tool after config change
     setAppTool();
   });
@@ -524,16 +534,31 @@ function getSlider(layerGroupDivId) {
 function initSliders() {
   const numberOfLayerGroups = getNumberOfLayerGroups();
   for (let i = 0; i < numberOfLayerGroups; ++i) {
-    const lgId = 'layerGroup' + i;
-    const slider = document.getElementById(lgId + '-slider');
-    if (slider) {
-      const lg = _app.getLayerGroupByDivId(lgId);
+    initSlider('layerGroup' + i);
+  }
+}
+
+/**
+ * Init individual slider.
+ *
+ * @param {string} layerGroupId The id of the layer group.
+ */
+function initSlider(layerGroupId) {
+  const slider = document.getElementById(layerGroupId + '-slider');
+  if (slider) {
+    // disabled by default
+    slider.disabled = true;
+    // init if possible
+    const lg = _app.getLayerGroupByDivId(layerGroupId);
+    if (typeof lg !== 'undefined') {
       const ph = lg.getPositionHelper();
-      const max = ph.getMaximumScrollValue();
-      if (max !== 0) {
-        slider.disabled = false;
-        slider.max = max;
-        slider.value = ph.getCurrentPositionScrollValue();
+      if (typeof ph !== 'undefined') {
+        const max = ph.getMaximumScrollValue();
+        if (max !== 0) {
+          slider.disabled = false;
+          slider.max = max;
+          slider.value = ph.getCurrentPositionScrollValue();
+        }
       }
     }
   }
