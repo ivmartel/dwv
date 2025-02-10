@@ -3235,6 +3235,7 @@ export declare class LayerGroup {
      *   methods to define the active index.
      *
      * @param {ViewLayer | DrawLayer} layer The layer to remove.
+     * @fires LayerGroup#removelayer
      */
     removeLayer(layer: ViewLayer | DrawLayer): void;
     /**
@@ -5576,6 +5577,12 @@ export declare class ViewController {
      * @returns {PositionHelper} The helper.
      */
     getPositionHelper(): PositionHelper;
+    /**
+     * Get a clone of the position helper.
+     *
+     * @returns {PositionHelper} The helper clone.
+     */
+    getPositionHelperClone(): PositionHelper;
     /**
      * Get the current position.
      *

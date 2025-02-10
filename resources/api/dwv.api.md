@@ -1154,6 +1154,7 @@ export class ViewController {
     getPlanePositionFromPosition(point: Point): Point2D;
     getPositionFromPlanePoint(point2D: Point2D, k?: number): Point;
     getPositionHelper(): PositionHelper;
+    getPositionHelperClone(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollDimIndex(): number;
     getWindowLevel(): WindowLevel;
