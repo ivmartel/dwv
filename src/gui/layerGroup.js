@@ -860,6 +860,8 @@ export class LayerGroup {
     }
     // reset in storage
     this.#layers[index] = undefined;
+    // force helper update
+    this.#positionHelper = undefined;
     // update html
     layer.removeFromDOM();
   }
