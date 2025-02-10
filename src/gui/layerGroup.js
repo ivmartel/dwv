@@ -806,18 +806,14 @@ export class LayerGroup {
    * Empty the layer list.
    */
   empty() {
-    this.#layers = [];
-    // reset active indices
-    this.#activeLayerIndex = undefined;
-    // remove possible crosshair
-    this.#removeCrosshairDiv();
-    // clean container div
-    const previous = this.#containerDiv.getElementsByClassName('layer');
-    if (previous) {
-      while (previous.length > 0) {
-        previous[0].remove();
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        this.removeLayer(layer);
       }
     }
+    this.#layers = [];
+    // remove possible crosshair
+    this.#removeCrosshairDiv();
   }
 
   /**
