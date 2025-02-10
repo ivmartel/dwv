@@ -214,7 +214,7 @@ export class LayerGroup {
       for (const layer of this.#layers) {
         if (layer instanceof ViewLayer) {
           const controller = layer.getViewController();
-          const helper = controller.getPositionHelper();
+          const helper = controller.getPositionHelperClone();
           if (typeof this.#positionHelper === 'undefined') {
             this.#positionHelper = helper;
           } else {

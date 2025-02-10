@@ -186,6 +186,15 @@ export class ViewController {
   }
 
   /**
+   * Get a clone of the position helper.
+   *
+   * @returns {PositionHelper} The helper clone.
+   */
+  getPositionHelperClone() {
+    return new PositionHelper(this.#view);
+  }
+
+  /**
    * Get the current position.
    *
    * @returns {Point} The position.
