@@ -841,6 +841,7 @@ export class LayerGroup {
    *   methods to define the active index.
    *
    * @param {ViewLayer | DrawLayer} layer The layer to remove.
+   * @fires LayerGroup#removelayer
    */
   removeLayer(layer) {
     // find layer
@@ -864,6 +865,21 @@ export class LayerGroup {
     this.#positionHelper = undefined;
     // update html
     layer.removeFromDOM();
+
+    /**
+     * Remove layer event.
+     *
+     * @event LayerGroup#removelayer
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} layerid The layer id.
+     * @property {string} layergroupid The layer group id.
+     */
+    this.#fireEvent({
+      type: 'layerremove',
+      layerid: layer.getId(),
+      layergroupid: this.getDivId()
+    });
   }
 
   /**
