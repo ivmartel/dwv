@@ -478,20 +478,6 @@ export class Draw {
   };
 
   /**
-   * Handle mouse out event.
-   *
-   * @param {object} event The mouse out event.
-   */
-  mouseout = (event) => {
-    // exit if not started draw
-    if (!this.#isDrawing) {
-      return;
-    }
-    const layerDetails = getLayerDetailsFromEvent(event);
-    this.#finishShapeGroupCreation(layerDetails.groupDivId);
-  };
-
-  /**
    * Handle touch start event.
    *
    * @param {object} event The touch start event.
