@@ -851,6 +851,7 @@ export class DrawLayer {
       this.#konvaStage.scale().y !== newScale.y) {
       this.#fitScale = newFitScale;
       this.#konvaStage.scale(newScale);
+      this.#updateLabelScale(newScale);
     }
 
     // view offset
