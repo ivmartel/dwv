@@ -55,7 +55,7 @@ const TagKeys = {
 /**
  * DICOM relationship types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
  */
 export const RelationshipTypes = {
   contains: 'CONTAINS',
@@ -70,7 +70,7 @@ export const RelationshipTypes = {
 /**
  * DICOM value types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
  */
 export const ValueTypes = {
   text: 'TEXT',

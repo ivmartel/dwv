@@ -51,7 +51,7 @@ CONTAINER: (125007, DCM, 'Measurement Group') =
 
 Example DICOM SR file with 3 rectangles: 1 on the acquisition plane and 2 on other planes. The `Reference Geometry` code is used to position annotations that are not on the acquisition plane.
 
-SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [part03/sect_C.18.6](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2)):
+SCOORD items are translated according to their `Graphic Type` ((0070,0023) see [part03/sect_C.18.6](https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2)):
 - Point -> [Point2D](./Point2D.html)
 - Multipoint: not used
 - Polyline ->
