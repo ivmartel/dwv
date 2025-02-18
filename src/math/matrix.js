@@ -16,8 +16,8 @@ export const REAL_WORLD_EPSILON = 1e-4;
  *
  * @param {number} a The first number.
  * @param {number} b The second number.
- * @param {number} tol The comparison tolerance,
- *   default to Number.EPSILON.
+ * @param {number} [tol] Optional comparison tolerance,
+ *   defaults to Number.EPSILON.
  * @returns {boolean} True if similar.
  */
 export function isSimilar(a, b, tol) {
@@ -81,16 +81,16 @@ export class Matrix33 {
    * Check for Matrix33 equality.
    *
    * @param {Matrix33} rhs The other matrix to compare to.
-   * @param {number} [p] A numeric expression for the precision to use in check
-   *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
+   * @param {number} [tol] Optional number comparison tolerance,
+   *   defaults to Number.EPSILON.
    * @returns {boolean} True if both matrices are equal.
    */
-  equals(rhs, p) {
+  equals(rhs, tol) {
     // TODO: add type check
     // check values
     for (let i = 0; i < 3; ++i) {
       for (let j = 0; j < 3; ++j) {
-        if (!isSimilar(this.get(i, j), rhs.get(i, j), p)) {
+        if (!isSimilar(this.get(i, j), rhs.get(i, j), tol)) {
           return false;
         }
       }

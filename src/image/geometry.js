@@ -176,8 +176,8 @@ export class Geometry {
    * Check if a point is in the origin list.
    *
    * @param {Point3D} point3D The point to check.
-   * @param {number} tol The comparison tolerance
-   *   default to Number.EPSILON.
+   * @param {number} [tol] Optional number comparison tolerance
+   *   defaults to Number.EPSILON.
    * @returns {boolean} True if in list.
    */
   includesOrigin(point3D, tol) {
