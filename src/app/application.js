@@ -1070,6 +1070,7 @@ export class App {
    * @param {ViewConfig} config The view configuration.
    */
   updateDataViewConfig(dataId, divId, config) {
+    // input checks
     const configs = this.#options.dataViewConfigs;
     // check data id
     if (typeof configs[dataId] === 'undefined') {
@@ -1084,25 +1085,24 @@ export class App {
       throw new Error('No config for dataId: ' +
         dataId + ' and divId: ' + divId);
     }
+
     // update config
     const configToUpdate = configs[dataId][itemIndex];
     for (const prop in config) {
       configToUpdate[prop] = config[prop];
     }
 
-    // remove previous layers
-    const lg = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
-    if (typeof lg !== 'undefined') {
-      const vls = lg.getViewLayersByDataId(dataId);
+    // update layer group
+    const layerGroup = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
+    if (typeof layerGroup !== 'undefined') {
+      // remove layer if possible
+      const vls = layerGroup.getViewLayersByDataId(dataId);
       if (vls.length === 1) {
-        lg.removeLayer(vls[0]);
+        layerGroup.removeLayer(vls[0]);
       }
-      const dls = lg.getDrawLayersByDataId(dataId);
+      const dls = layerGroup.getDrawLayersByDataId(dataId);
       if (dls.length === 1) {
-        lg.removeLayer(dls[0]);
-      }
-      if (vls.length === 0 && dls.length === 0) {
-        throw new Error('Expected one layer, got none');
+        layerGroup.removeLayer(dls[0]);
       }
     }
 
