@@ -640,6 +640,13 @@ export function getSliceGeometrySpacing(origins) {
  * @returns {Geometry} The merged geometry.
  */
 export function mergeGeometries(geometry1, geometry2) {
+  const orientation = geometry1.getOrientation();
+  // check input
+  if (!orientation.equals(geometry2.getOrientation())) {
+    throw new Error('Cannot merge geometries with different orientation');
+  }
+  const invOrientation = orientation.getInverse();
+
   const minByIndex = function (array1, array2) {
     return array1.map((v, i) => Math.min(v, array2[i]));
   };
@@ -652,8 +659,12 @@ export function mergeGeometries(geometry1, geometry2) {
     geometry2.getSpacing().getValues()
   ));
 
-  const range1 = geometry1.getRange();
-  const range2 = geometry2.getRange();
+  const deorient = function (item) {
+    return invOrientation.multiplyPoint3D(item.get3D());
+  };
+  const range1 = geometry1.getRange().map(deorient);
+  const range2 = geometry2.getRange().map(deorient);
+
   const minRangeValues = minByIndex(
     range1[0].getValues(),
     range2[0].getValues()
@@ -669,22 +680,21 @@ export function mergeGeometries(geometry1, geometry2) {
       Math.abs(maxRangeValues[i] - minRangeValues[i]) / newSpacing.get(i)
     ));
   }
+  // TODO: handle extra dims
   const newSize = new Size(sizeValues);
 
-  // TODO incorporate orientation
   const newOrigins = [];
   for (let i = 0; i < newSize.get(2); ++i) {
     const values = minRangeValues.slice();
     values[2] = minRangeValues[2] + i * newSpacing.get(2);
-    newOrigins.push(new Point3D(
-      values[0], values[1], values[2]
-    ));
+    const origin = new Point3D(values[0], values[1], values[2]);
+    newOrigins.push(orientation.multiplyPoint3D(origin));
   }
 
   return new Geometry(
     newOrigins,
     newSize,
     newSpacing,
-    geometry1.getOrientation()
+    orientation
   );
 }
