@@ -1021,7 +1021,7 @@ export class App {
    * @param {string} divId The div id.
    */
   removeDataViewConfig(dataId, divId) {
-    // remove from list
+    // input checks
     const configs = this.#options.dataViewConfigs;
     if (typeof configs[dataId] === 'undefined') {
       // no config for dataId
@@ -1035,31 +1035,29 @@ export class App {
       // no config for divId
       return;
     }
+
+    // remove from config list
     configs[dataId].splice(itemIndex, 1);
     if (configs[dataId].length === 0) {
       delete configs[dataId];
     }
 
-    const lg = this.#stage.getLayerGroupByDivId(divId);
-    // data is loaded, remove view
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      if (typeof lg !== 'undefined') {
-        const vls = lg.getViewLayersByDataId(dataId);
-        if (vls.length === 1) {
-          lg.removeLayer(vls[0]);
-        }
-        const dls = lg.getDrawLayersByDataId(dataId);
-        if (dls.length === 1) {
-          lg.removeLayer(dls[0]);
-        }
-        if (vls.length === 0 && dls.length === 0) {
-          throw new Error('Expected one layer, got none');
-        }
-
+    // update layer group
+    const layerGroup = this.#stage.getLayerGroupByDivId(divId);
+    if (typeof layerGroup !== 'undefined') {
+      // remove layer if possible
+      const vls = layerGroup.getViewLayersByDataId(dataId);
+      if (vls.length === 1) {
+        layerGroup.removeLayer(vls[0]);
       }
-    }
-    if (lg.getNumberOfLayers() === 0) {
-      this.#stage.removeLayerGroup(lg);
+      const dls = layerGroup.getDrawLayersByDataId(dataId);
+      if (dls.length === 1) {
+        layerGroup.removeLayer(dls[0]);
+      }
+      // remove layer group if empty
+      if (layerGroup.getNumberOfLayers() === 0) {
+        this.#stage.removeLayerGroup(layerGroup);
+      }
     }
   }
 
