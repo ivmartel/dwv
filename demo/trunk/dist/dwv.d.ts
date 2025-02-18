@@ -2145,11 +2145,11 @@ export declare class Geometry {
      * Check if a point is in the origin list.
      *
      * @param {Point3D} point3D The point to check.
-     * @param {number} tol The comparison tolerance
-     *   default to Number.EPSILON.
+     * @param {number} [tol] Optional number comparison tolerance
+     *   defaults to Number.EPSILON.
      * @returns {boolean} True if in list.
      */
-    includesOrigin(point3D: Point3D, tol: number): boolean;
+    includesOrigin(point3D: Point3D, tol?: number): boolean;
     /**
      * Get the object size.
      * Warning: the size comes as stored in DICOM, meaning that it could
@@ -3639,11 +3639,11 @@ export declare class Matrix33 {
      * Check for Matrix33 equality.
      *
      * @param {Matrix33} rhs The other matrix to compare to.
-     * @param {number} [p] A numeric expression for the precision to use in check
-     *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
+     * @param {number} [tol] Optional number comparison tolerance,
+     *   defaults to Number.EPSILON.
      * @returns {boolean} True if both matrices are equal.
      */
-    equals(rhs: Matrix33, p?: number): boolean;
+    equals(rhs: Matrix33, tol?: number): boolean;
     /**
      * Get a string representation of the Matrix33.
      *
@@ -4133,11 +4133,11 @@ export declare class Point3D {
      * Check for Point3D similarity.
      *
      * @param {Point3D} rhs The other point to compare to.
-     * @param {number} tol Optional comparison tolerance,
-     *   default to Number.EPSILON.
+     * @param {number} [tol] Optional number comparison tolerance,
+     *   defaults to Number.EPSILON.
      * @returns {boolean} True if both points are equal.
      */
-    isSimilar(rhs: Point3D, tol: number): boolean;
+    isSimilar(rhs: Point3D, tol?: number): boolean;
     /**
      * Get a string representation of the Point3D.
      *
