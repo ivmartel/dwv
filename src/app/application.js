@@ -1040,9 +1040,9 @@ export class App {
       delete configs[dataId];
     }
 
+    const lg = this.#stage.getLayerGroupByDivId(divId);
     // data is loaded, remove view
     if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      const lg = this.#stage.getLayerGroupByDivId(divId);
       if (typeof lg !== 'undefined') {
         const vls = lg.getViewLayersByDataId(dataId);
         if (vls.length === 1) {
@@ -1055,10 +1055,11 @@ export class App {
         if (vls.length === 0 && dls.length === 0) {
           throw new Error('Expected one layer, got none');
         }
-        if (lg.getNumberOfLayers() === 0) {
-          this.#stage.removeLayerGroup(lg);
-        }
+      
       }
+    }
+    if (lg.getNumberOfLayers() === 0) {
+      this.#stage.removeLayerGroup(lg);
     }
   }
 
