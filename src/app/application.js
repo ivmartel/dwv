@@ -1055,7 +1055,7 @@ export class App {
         if (vls.length === 0 && dls.length === 0) {
           throw new Error('Expected one layer, got none');
         }
-      
+
       }
     }
     if (lg.getNumberOfLayers() === 0) {
