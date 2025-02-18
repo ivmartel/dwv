@@ -698,6 +698,8 @@ export declare class App {
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
      * Remove a data view config.
+     * Removes the associated layer if found, removes
+     *   the layer group if empty.
      *
      * @param {string} dataId The data id.
      * @param {string} divId The div id.
