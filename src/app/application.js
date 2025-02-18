@@ -1016,7 +1016,7 @@ export class App {
 
   /**
    * Remove a data view config.
-   * Removes the associated the layer if found, removes
+   * Removes the associated layer if found, removes
    *   the layer group if empty.
    *
    * @param {string} dataId The data id.
