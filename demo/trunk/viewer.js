@@ -143,6 +143,8 @@ function viewerSetup() {
     ++numberOfDataToLoad;
     // add abort shortcut
     window.addEventListener('keydown', abortShortcut);
+    // remove post-load listeners
+    removePostLoadListeners();
     // update data view config
     const dataIds = [event.dataid];
     let configs;
@@ -191,7 +193,8 @@ function viewerSetup() {
     // update sliders with new data info
     // (has to be after full load)
     initSliders();
-
+    // add post-load listeners
+    addPostLoadListeners();
     // log meta data
     const meta = _app.getMetaData(event.dataid);
     console.log('metadata', getMetaDataWithNames(meta));
@@ -256,19 +259,6 @@ function viewerSetup() {
   });
   _app.addEventListener('filterundo', function (event) {
     console.log('filterundo', event);
-  });
-
-  _app.addEventListener('viewlayeradd', function (event) {
-    // init/reset layer group slider
-    initSlider(event.layergroupid);
-  });
-  _app.addEventListener('drawlayeradd', function (event) {
-    // init/reset layer group slider
-    initSlider(event.layergroupid);
-  });
-  _app.addEventListener('layerremove', function (event) {
-    // init/reset layer group slider
-    initSlider(event.layergroupid);
   });
 
   // default keyboard shortcuts
@@ -380,6 +370,35 @@ function viewerSetup() {
   }
   // load from window location
   _app.loadFromUri(window.location.href, uriOptions);
+}
+
+/**
+ * Init individual slider on layer related event.
+ * WARNING: needs to be called with the final geometry.
+ *
+ * @param {object} event The layer event.
+ */
+function initSliderOnEvent(event) {
+  initSlider(event.layergroupid);
+}
+
+/**
+ * Add post-load event listeners.
+ */
+function addPostLoadListeners() {
+  // post-load since sliders need the full geometry
+  _app.addEventListener('viewlayeradd', initSliderOnEvent);
+  _app.addEventListener('drawlayeradd', initSliderOnEvent);
+  _app.addEventListener('layerremove', initSliderOnEvent);
+}
+
+/**
+ * Remove post-load event listeners.
+ */
+function removePostLoadListeners() {
+  _app.removeEventListener('viewlayeradd', initSliderOnEvent);
+  _app.removeEventListener('drawlayeradd', initSliderOnEvent);
+  _app.removeEventListener('layerremove', initSliderOnEvent);
 }
 
 /**
@@ -540,6 +559,7 @@ function initSliders() {
 
 /**
  * Init individual slider.
+ * WARNING: needs to be called with the final geometry.
  *
  * @param {string} layerGroupId The id of the layer group.
  */
