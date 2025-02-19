@@ -3639,11 +3639,18 @@ export declare class Matrix33 {
      * Check for Matrix33 equality.
      *
      * @param {Matrix33} rhs The other matrix to compare to.
-     * @param {number} [tol] Optional number comparison tolerance,
-     *   defaults to Number.EPSILON.
      * @returns {boolean} True if both matrices are equal.
      */
-    equals(rhs: Matrix33, tol?: number): boolean;
+    equals(rhs: Matrix33): boolean;
+    /**
+     * Check for Matrix33 similarity.
+     *
+     * @param {Matrix33} rhs The other matrix to compare to.
+     * @param {number} [tol] Optional number comparison tolerance,
+     *   defaults to Number.EPSILON.
+     * @returns {boolean} True if both matrices are similar.
+     */
+    isSimilar(rhs: Matrix33, tol?: number): boolean;
     /**
      * Get a string representation of the Matrix33.
      *
@@ -4135,7 +4142,7 @@ export declare class Point3D {
      * @param {Point3D} rhs The other point to compare to.
      * @param {number} [tol] Optional number comparison tolerance,
      *   defaults to Number.EPSILON.
-     * @returns {boolean} True if both points are equal.
+     * @returns {boolean} True if both points are similar.
      */
     isSimilar(rhs: Point3D, tol?: number): boolean;
     /**
