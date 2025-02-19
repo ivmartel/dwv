@@ -193,7 +193,7 @@ export class Point3D {
    * @param {Point3D} rhs The other point to compare to.
    * @param {number} [tol] Optional number comparison tolerance,
    *   defaults to Number.EPSILON.
-   * @returns {boolean} True if both points are equal.
+   * @returns {boolean} True if both points are similar.
    */
   isSimilar(rhs, tol) {
     return rhs !== null &&
