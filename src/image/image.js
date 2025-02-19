@@ -780,7 +780,7 @@ export class Image {
     if (size.get(1) !== rhsSize.get(1)) {
       throw new Error('Cannot append a slice with different number of rows');
     }
-    if (!this.#geometry.getOrientation().equals(
+    if (!this.#geometry.getOrientation().isSimilar(
       rhs.getGeometry().getOrientation(), 0.0001)) {
       throw new Error('Cannot append a slice with different orientation');
     }

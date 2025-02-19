@@ -81,11 +81,30 @@ export class Matrix33 {
    * Check for Matrix33 equality.
    *
    * @param {Matrix33} rhs The other matrix to compare to.
-   * @param {number} [tol] Optional number comparison tolerance,
-   *   defaults to Number.EPSILON.
    * @returns {boolean} True if both matrices are equal.
    */
-  equals(rhs, tol) {
+  equals(rhs) {
+    // TODO: add type check
+    // check values
+    for (let i = 0; i < 3; ++i) {
+      for (let j = 0; j < 3; ++j) {
+        if (this.get(i, j) !== rhs.get(i, j)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Check for Matrix33 similarity.
+   *
+   * @param {Matrix33} rhs The other matrix to compare to.
+   * @param {number} [tol] Optional number comparison tolerance,
+   *   defaults to Number.EPSILON.
+   * @returns {boolean} True if both matrices are similar.
+   */
+  isSimilar(rhs, tol) {
     // TODO: add type check
     // check values
     for (let i = 0; i < 3; ++i) {

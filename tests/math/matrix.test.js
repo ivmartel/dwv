@@ -53,8 +53,8 @@ QUnit.test('Matrix33 class', function (assert) {
   assert.equal(m2.get(1, 2), 6, 'get(1,2)');
 
   // equals with precision
-  assert.equal(m3.equals(m4, 0.01), true, 'equals true');
-  assert.equal(m3.equals(m4, 0.001), false, 'equals false');
+  assert.equal(m3.isSimilar(m4, 0.01), true, 'isSimilar true');
+  assert.equal(m3.isSimilar(m4, 0.001), false, 'isSimilar false');
 });
 
 /**
@@ -182,11 +182,11 @@ QUnit.test('Matrix33 inverse', function (assert) {
     23 / 295,
     -26 / 295
   ]);
-  assert.ok(invm10.equals(res10), 'inverse #1');
+  assert.ok(invm10.isSimilar(res10), 'inverse #1');
 
   // double inverse
   const invinvm10 = invm10.getInverse();
-  assert.ok(invinvm10.equals(m10, BIG_EPSILON), 'inverse #1 twice');
+  assert.ok(invinvm10.isSimilar(m10, BIG_EPSILON), 'inverse #1 twice');
 });
 
 /**

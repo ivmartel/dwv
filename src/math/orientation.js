@@ -272,7 +272,7 @@ export function getTargetOrientation(imageOrientation, viewOrientation) {
 
   // TODO: why abs???
   const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
-  if (simpleImageOrientation.equals(getCoronalMat33().getAbs())) {
+  if (simpleImageOrientation.isSimilar(getCoronalMat33().getAbs())) {
     targetOrientation = targetOrientation.getAbs();
   }
 
