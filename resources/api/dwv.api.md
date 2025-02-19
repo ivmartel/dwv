@@ -452,7 +452,7 @@ export class Geometry {
     getSliceIndex(point: Point3D, time: number): number;
     getSpacing(viewOrientation?: Matrix33): Spacing;
     hasSlicesAtTime(time: number): boolean;
-    includesOrigin(point3D: Point3D, tol: number): boolean;
+    includesOrigin(point3D: Point3D, tol?: number): boolean;
     indexToWorld(index: Index): Point;
     isInBounds(point: Point): boolean;
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
@@ -756,13 +756,14 @@ export class MaskSegmentViewHelper {
 export class Matrix33 {
     constructor(values: number[]);
     asOneAndZeros(): Matrix33;
-    equals(rhs: Matrix33, p?: number): boolean;
+    equals(rhs: Matrix33): boolean;
     get(row: number, col: number): number | undefined;
     getAbs(): Matrix33;
     getColAbsMax(col: number): object;
     getInverse(): Matrix33 | undefined;
     getRowAbsMax(row: number): object;
     getThirdColMajorDirection(): number;
+    isSimilar(rhs: Matrix33, tol?: number): boolean;
     multiply(rhs: Matrix33): Matrix33;
     multiplyArray3D(array3D: number[]): number[];
     multiplyIndex3D(index3D: Index): Index;
@@ -863,7 +864,7 @@ export class Point3D {
     getX(): number;
     getY(): number;
     getZ(): number;
-    isSimilar(rhs: Point3D, tol: number): boolean;
+    isSimilar(rhs: Point3D, tol?: number): boolean;
     minus(point3D: Point3D): Vector3D;
     toString(): string;
 }
