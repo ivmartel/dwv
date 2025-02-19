@@ -634,6 +634,7 @@ export function getSliceGeometrySpacing(origins) {
 /**
  * Merge two geometries into one using the merge size and
  *   smallest resolution.
+ * WARNING: needs to be called with the final geometries.
  *
  * @param {Geometry} geometry1 The first geometry.
  * @param {Geometry} geometry2 The second geometry.
