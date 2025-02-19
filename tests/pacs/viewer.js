@@ -145,20 +145,8 @@ function viewerSetup() {
     window.addEventListener('keydown', abortShortcut);
     // remove post-load listeners
     removePostLoadListeners();
-    // update data view config
-    const dataIds = [event.dataid];
-    let configs;
-    if (_layout === 'one') {
-      configs = getOnebyOneDataViewConfig(dataIds);
-    } else if (_layout === 'side') {
-      configs = getOnebyTwoDataViewConfig(dataIds);
-    } else if (_layout === 'mpr') {
-      configs = getMPRDataViewConfig(dataIds);
-    }
-    const viewConfigs = configs[event.dataid];
-    for (let i = 0; i < viewConfigs.length; ++i) {
-      _app.addDataViewConfig(event.dataid, viewConfigs[i]);
-    }
+    // add new data view config
+    addDataViewConfig(event.dataid);
   });
   const sumReducer = function (sum, value) {
     return sum + value;
@@ -196,46 +184,29 @@ function viewerSetup() {
     // add post-load listeners
     addPostLoadListeners();
     // log meta data
-    const meta = _app.getMetaData(event.dataid);
-    console.log('metadata', getMetaDataWithNames(meta));
-    // get modality
-    let modality;
-    if (event.loadtype === 'image' &&
-      typeof meta['00080060'] !== 'undefined') {
-      modality = meta['00080060'].value[0];
-    }
-    // log DICOM SEG
-    if (modality === 'SEG') {
-      logFramePosPats(_app.getMetaData(event.dataid));
-    }
-    // log DICOM SR
-    if (modality === 'SR') {
-      console.log('DICOM SR');
-      const srContent = dwv.getSRContent(meta);
-      console.log(srContent.toString());
-    }
+    logMetaData(event.dataid, event.loadtype);
   });
 
-  let didRender = false;
-  _app.addEventListener('renderend', function (/*event*/) {
-    // update UI at first render of first data
-    if (!didRender) {
-      didRender = true;
-      if (_app.getDataIds().length === 1) {
-        // set app tool
-        setAppTool();
-        // update html
-        const toolsFieldset = document.getElementById('tools');
-        toolsFieldset.disabled = false;
-        const changeLayoutSelect = document.getElementById('changelayout');
-        changeLayoutSelect.disabled = false;
-        const resetLayoutButton = document.getElementById('resetlayout');
-        resetLayoutButton.disabled = false;
-        const smoothingChk = document.getElementById('changesmoothing');
-        smoothingChk.disabled = false;
-      }
+  // update UI at first render of first data
+  const onRenderEnd = function (/*event*/) {
+    if (_app.getDataIds().length === 1) {
+      // set app tool
+      setAppTool();
+      // update html
+      const toolsFieldset = document.getElementById('tools');
+      toolsFieldset.disabled = false;
+      const changeLayoutSelect = document.getElementById('changelayout');
+      changeLayoutSelect.disabled = false;
+      const resetLayoutButton = document.getElementById('resetlayout');
+      resetLayoutButton.disabled = false;
+      const smoothingChk = document.getElementById('changesmoothing');
+      smoothingChk.disabled = false;
+      // remove handler
+      _app.removeEventListener('renderend', onRenderEnd);
     }
-  });
+  };
+  // add handler (will be removed at first success)
+  _app.addEventListener('renderend', onRenderEnd);
 
   _app.addEventListener('positionchange', function (event) {
     const input = document.getElementById('position');
@@ -370,6 +341,34 @@ function viewerSetup() {
   }
   // load from window location
   _app.loadFromUri(window.location.href, uriOptions);
+}
+
+/**
+ * Log meta data.
+ *
+ * @param {string} dataId The data ID.
+ * @param {string} loadType The load type.
+ */
+function logMetaData(dataId, loadType) {
+  // log meta data
+  const meta = _app.getMetaData(dataId);
+  console.log('metadata', getMetaDataWithNames(meta));
+  // get modality
+  let modality;
+  if (loadType === 'image' &&
+    typeof meta['00080060'] !== 'undefined') {
+    modality = meta['00080060'].value[0];
+  }
+  // log DICOM SEG
+  if (modality === 'SEG') {
+    logFramePosPats(meta);
+  }
+  // log DICOM SR
+  if (modality === 'SR') {
+    console.log('DICOM SR');
+    const srContent = dwv.getSRContent(meta);
+    console.log(srContent.toString());
+  }
 }
 
 /**
@@ -628,6 +627,27 @@ function addLayerGroupsDiv() {
   const numberOfLayerGroups = getNumberOfLayerGroups();
   for (let i = 0; i < numberOfLayerGroups; ++i) {
     addLayerGroupDiv('layerGroup' + i);
+  }
+}
+
+/**
+ * Add data view config for the input data.
+ *
+ * @param {string} dataId The data ID.
+ */
+function addDataViewConfig(dataId) {
+  const dataIds = [dataId];
+  let configs;
+  if (_layout === 'one') {
+    configs = getOnebyOneDataViewConfig(dataIds);
+  } else if (_layout === 'side') {
+    configs = getOnebyTwoDataViewConfig(dataIds);
+  } else if (_layout === 'mpr') {
+    configs = getMPRDataViewConfig(dataIds);
+  }
+  const viewConfigs = configs[dataId];
+  for (let i = 0; i < viewConfigs.length; ++i) {
+    _app.addDataViewConfig(dataId, viewConfigs[i]);
   }
 }
 
