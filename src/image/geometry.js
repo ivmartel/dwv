@@ -525,9 +525,9 @@ export class Geometry {
     const values = point.getValues();
     // apply spacing and round
     const spacing = this.getSpacing();
-    values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
-    values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
-    values[2] = Math.round(orientedPoint3D.getZ() / spacing.get(2));
+    values[0] = Math.floor(orientedPoint3D.getX() / spacing.get(0));
+    values[1] = Math.floor(orientedPoint3D.getY() / spacing.get(1));
+    values[2] = Math.floor(orientedPoint3D.getZ() / spacing.get(2));
 
     // return index
     return new Index(values);
