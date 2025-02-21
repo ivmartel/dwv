@@ -48,6 +48,28 @@ test.getViewConfig = function (layout, divId) {
 };
 
 /**
+ * Get a HTML id from a prefix and root part.
+ *
+ * @param {string} prefix The id prefix.
+ * @param {string} root The root.
+ * @returns {string} The HTML id.
+ */
+test.getHtmlId = function (prefix, root) {
+  return prefix + root;
+};
+
+/**
+ * Get the root part from an HTML id.
+ *
+ * @param {string} prefix The id prefix.
+ * @param {string} htmlId The HTML id.
+ * @returns {string} The root.
+ */
+test.getRootFromHtmlId = function (prefix, htmlId) {
+  return htmlId.substring(prefix.length);
+};
+
+/**
  * Get a control div: label, range and number field.
  *
  * @param {string} id The control id.

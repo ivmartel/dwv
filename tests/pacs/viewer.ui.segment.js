@@ -106,35 +106,13 @@ const prefixes = {
 };
 
 /**
- * Get a HTML id from a prefix and root part.
- *
- * @param {string} prefix The id prefix.
- * @param {string} root The root.
- * @returns {string} The HTML id.
- */
-function getHtmlId(prefix, root) {
-  return prefix + root;
-}
-
-/**
- * Get the root part from an HTML id.
- *
- * @param {string} prefix The id prefix.
- * @param {string} htmlId The HTML id.
- * @returns {string} The root.
- */
-function getRootFromHtmlId(prefix, htmlId) {
-  return htmlId.substring(prefix.length);
-}
-
-/**
  * Get the HTML id of a segmentation.
  *
  * @param {number} segmentationIndex The segmentation index.
  * @returns {string} The segmentation HTML id.
  */
 function getSegmentationHtmlId(segmentationIndex) {
-  return getHtmlId(prefixes.segmentation, segmentationIndex);
+  return test.getHtmlId(prefixes.segmentation, segmentationIndex);
 }
 
 /**
@@ -144,7 +122,8 @@ function getSegmentationHtmlId(segmentationIndex) {
  * @returns {number} The segmentation index.
  */
 function splitSegmentationHtmlId(segmentationName) {
-  const indexStr = getRootFromHtmlId(prefixes.segmentation, segmentationName);
+  const indexStr = test.getRootFromHtmlId(
+    prefixes.segmentation, segmentationName);
   return parseInt(indexStr, 10);
 }
 
@@ -156,7 +135,7 @@ function splitSegmentationHtmlId(segmentationName) {
  * @returns {string} The segment HTML id.
  */
 function getSegmentHtmlId(segmentNumber, segmentationIndex) {
-  const segmentName = getHtmlId(prefixes.segment, segmentNumber);
+  const segmentName = test.getHtmlId(prefixes.segment, segmentNumber);
   const segmentationName = getSegmentationHtmlId(segmentationIndex);
   return segmentName + '-' + segmentationName;
 }
@@ -169,7 +148,7 @@ function getSegmentHtmlId(segmentNumber, segmentationIndex) {
  */
 function splitSegmentHtmlId(segmentId) {
   const split = segmentId.split('-');
-  const numberStr = getRootFromHtmlId(prefixes.segment, split[0]);
+  const numberStr = test.getRootFromHtmlId(prefixes.segment, split[0]);
   return {
     segmentNumber: parseInt(numberStr, 10),
     segmentationIndex: splitSegmentationHtmlId(split[1])
@@ -262,7 +241,6 @@ test.dataModelUI.Segmentation = function (app) {
    * @param {object} event The dataadd event.
    */
   function onDataAdd(event) {
-    console.log('onDataAdd', event);
     const dataId = event.dataid;
     const maskImage = app.getData(dataId).image;
     if (typeof maskImage !== 'undefined' &&
@@ -397,7 +375,7 @@ test.dataModelUI.Segmentation = function (app) {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      getRootFromHtmlId(prefixes.select, target.id));
+      test.getRootFromHtmlId(prefixes.select, target.id));
     _selectedSegmentationIndex = indices.segmentationIndex;
     const segmentation = _segmentations[indices.segmentationIndex];
     // select it
@@ -414,7 +392,7 @@ test.dataModelUI.Segmentation = function (app) {
     const newHexColour = target.value;
     // get segment
     const indices = splitSegmentHtmlId(
-      getRootFromHtmlId(prefixes.colour, target.id));
+      test.getRootFromHtmlId(prefixes.colour, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
     const segmentHexColour = dwv.rgbToHex(segment.displayRGBValue);
@@ -461,7 +439,7 @@ test.dataModelUI.Segmentation = function (app) {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      getRootFromHtmlId(prefixes.view, target.id));
+      test.getRootFromHtmlId(prefixes.view, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
     // toggle hidden
@@ -494,14 +472,14 @@ test.dataModelUI.Segmentation = function (app) {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      getRootFromHtmlId(prefixes.delete, target.id));
+      test.getRootFromHtmlId(prefixes.delete, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segmentId = getSegmentHtmlId(
       indices.segmentNumber, indices.segmentationIndex);
 
     // get segment divs
     const segmentSpan = document.getElementById(
-      getHtmlId(prefixes.span, segmentId)
+      test.getHtmlId(prefixes.span, segmentId)
     );
     if (!segmentSpan) {
       throw new Error('No delete span');
@@ -568,7 +546,7 @@ test.dataModelUI.Segmentation = function (app) {
     const selectInput = document.createElement('input');
     selectInput.type = 'radio';
     selectInput.name = 'select-segment';
-    selectInput.id = getHtmlId(prefixes.select, segmentId);
+    selectInput.id = test.getHtmlId(prefixes.select, segmentId);
     selectInput.title = segmentId;
     selectInput.onchange = onSegmentSelect;
 
@@ -581,28 +559,28 @@ test.dataModelUI.Segmentation = function (app) {
     const colourInput = document.createElement('input');
     colourInput.type = 'color';
     colourInput.title = 'Change segment colour';
-    colourInput.id = getHtmlId(prefixes.colour, segmentId);
+    colourInput.id = test.getHtmlId(prefixes.colour, segmentId);
     colourInput.value = dwv.rgbToHex(segment.displayRGBValue);
     colourInput.onchange = onSegmentColourChange;
 
     // segment view
     const viewButton = document.createElement('button');
     viewButton.style.borderStyle = 'outset';
-    viewButton.id = getHtmlId(prefixes.view, segmentId);
+    viewButton.id = test.getHtmlId(prefixes.view, segmentId);
     viewButton.title = 'Show/hide segment';
     viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
     viewButton.onclick = onSegmentViewChange;
 
     // segment delete
     const deleteButton = document.createElement('button');
-    deleteButton.id = getHtmlId(prefixes.delete, segmentId);
+    deleteButton.id = test.getHtmlId(prefixes.delete, segmentId);
     deleteButton.title = 'Delete segment';
     deleteButton.appendChild(document.createTextNode('\u{274C}'));
     deleteButton.onclick = onSegmentDelete;
 
     // segment span
     const span = document.createElement('span');
-    span.id = getHtmlId(prefixes.span, segmentId);
+    span.id = test.getHtmlId(prefixes.span, segmentId);
     span.appendChild(selectInput);
     span.appendChild(selectLabel);
     span.appendChild(colourInput);
@@ -621,7 +599,7 @@ test.dataModelUI.Segmentation = function (app) {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      getRootFromHtmlId(prefixes.selectEraser, target.id));
+      test.getRootFromHtmlId(prefixes.selectEraser, target.id));
     const segmentation = _segmentations[segmentationIndex];
     // select eraser
     appSelectEraser(segmentation);
@@ -636,7 +614,7 @@ test.dataModelUI.Segmentation = function (app) {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      getRootFromHtmlId(prefixes.addSegment, target.id));
+      test.getRootFromHtmlId(prefixes.addSegment, target.id));
     const segmentation = _segmentations[segmentationIndex];
     const segments = segmentation.segments;
 
@@ -669,7 +647,8 @@ test.dataModelUI.Segmentation = function (app) {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      getRootFromHtmlId(prefixes.save, target.id));
+      test.getRootFromHtmlId(prefixes.save, target.id));
+    const segmentationName = getSegmentationHtmlId(segmentationIndex);
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
 
@@ -712,7 +691,7 @@ test.dataModelUI.Segmentation = function (app) {
       // update generate button
       const element = document.createElement('a');
       element.href = window.URL.createObjectURL(blob);
-      element.download = 'seg-save.dcm';
+      element.download = segmentationName + '.dcm';
       // trigger download
       element.click();
       URL.revokeObjectURL(element.href);
@@ -745,7 +724,7 @@ test.dataModelUI.Segmentation = function (app) {
     eraserInput.type = 'radio';
     eraserInput.name = 'select-segment';
     eraserInput.title = 'Eraser';
-    eraserInput.id = getHtmlId(prefixes.selectEraser, segmentationName);
+    eraserInput.id = test.getHtmlId(prefixes.selectEraser, segmentationName);
     eraserInput.onchange = onEraserSelect;
 
     const eraserLabel = document.createElement('label');
@@ -757,14 +736,14 @@ test.dataModelUI.Segmentation = function (app) {
     const addSegmentButton = document.createElement('button');
     addSegmentButton.appendChild(document.createTextNode('\u2795'));
     addSegmentButton.title = 'Add segment';
-    addSegmentButton.id = getHtmlId(prefixes.addSegment, segmentationName);
+    addSegmentButton.id = test.getHtmlId(prefixes.addSegment, segmentationName);
     addSegmentButton.onclick = onSegmentAdd;
 
     // save segmentation
     const saveButton = document.createElement('button');
     saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
     saveButton.title = 'Save segmentation';
-    saveButton.id = getHtmlId(prefixes.save, segmentationName);
+    saveButton.id = test.getHtmlId(prefixes.save, segmentationName);
     saveButton.onclick = onSegmentationSave;
 
     // action span
