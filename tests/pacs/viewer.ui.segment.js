@@ -710,7 +710,19 @@ test.dataModelUI.Segmentation = function (app) {
 
     // segmentation item
     const segmentationItem = document.createElement('li');
+
+    // save segmentation
+    const saveButton = document.createElement('button');
+    saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
+    saveButton.title = 'Save segmentation';
+    saveButton.id = test.getHtmlId(prefixes.save, segmentationName);
+    saveButton.onclick = onSegmentationSave;
+
+    segmentationItem.appendChild(saveButton);
+
+    // segmentation name
     segmentationItem.appendChild(document.createTextNode(segmentationName));
+
     // add segments
     const segments = segmentation.segments;
     for (let j = 0; j < segments.length; ++j) {
@@ -739,20 +751,12 @@ test.dataModelUI.Segmentation = function (app) {
     addSegmentButton.id = test.getHtmlId(prefixes.addSegment, segmentationName);
     addSegmentButton.onclick = onSegmentAdd;
 
-    // save segmentation
-    const saveButton = document.createElement('button');
-    saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
-    saveButton.title = 'Save segmentation';
-    saveButton.id = test.getHtmlId(prefixes.save, segmentationName);
-    saveButton.onclick = onSegmentationSave;
-
     // action span
     const actionSpan = document.createElement('span');
     actionSpan.id = 'span-action-' + segmentationName;
     actionSpan.appendChild(eraserInput);
     actionSpan.appendChild(eraserLabel);
     actionSpan.appendChild(addSegmentButton);
-    actionSpan.appendChild(saveButton);
 
     // append span to item
     segmentationItem.appendChild(actionSpan);
