@@ -1090,6 +1090,10 @@ export class Brush extends EventTarget {
     if (this.#isInBlackList(event)) {
       return;
     }
+    if (typeof this.#selectedSegmentNumber === 'undefined') {
+      logger.warn(ERROR_MESSAGES.brush.noSelectedSegmentNumber);
+      return;
+    }
 
     // start flag
     this.#started = true;
