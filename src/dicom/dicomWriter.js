@@ -34,7 +34,7 @@ import {logger} from '../utils/logger';
  *
  * @returns {string} The dwv UID prefix.
  */
-function getDwvUIDPrefix() {
+export function getDwvUIDPrefix() {
   return '1.2.826.0.1.3680043.9.7278.1';
 }
 
