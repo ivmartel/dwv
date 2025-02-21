@@ -235,22 +235,23 @@ function viewerSetup() {
   // default keyboard shortcuts
   window.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
-    // mask segment related: has to be number
-    if (!isNaN(parseInt(event.key, 10))) {
-      const lg = _app.getActiveLayerGroup();
-      const vl = lg.getActiveViewLayer();
-      if (typeof vl === 'undefined') {
-        return;
-      }
-      const vc = vl.getViewController();
-      if (!vc.isMask()) {
-        return;
-      }
-      const number = parseInt(event.key, 10);
-      const segHelper = vc.getMaskSegmentHelper();
-      if (segHelper.hasSegment(number)) {
-        const segment = segHelper.getSegment(number);
-        if (event.ctrlKey) {
+    // use ctrl to avoid html input events
+    if (event.ctrlKey) {
+      // mask segment related: has to be number
+      if (!isNaN(parseInt(event.key, 10))) {
+        const lg = _app.getActiveLayerGroup();
+        const vl = lg.getActiveViewLayer();
+        if (typeof vl === 'undefined') {
+          return;
+        }
+        const vc = vl.getViewController();
+        if (!vc.isMask()) {
+          return;
+        }
+        const number = parseInt(event.key, 10);
+        const segHelper = vc.getMaskSegmentHelper();
+        if (segHelper.hasSegment(number)) {
+          const segment = segHelper.getSegment(number);
           if (event.altKey) {
             // CTRL + ALT + number
             console.log('Delete segment: ' + segment.label);
