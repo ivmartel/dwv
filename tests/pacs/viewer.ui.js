@@ -56,7 +56,8 @@ test.getViewConfig = function (layout, divId) {
  * @param {number} max The control maximum value.
  * @param {number} value The control value.
  * @param {Function} callback The callback on control value change.
- * @param {number} precision Optional number field float precision.
+ * @param {number} precision Number field float precision.
+ * @param {number} step The control step.
  * @returns {HTMLDivElement} The control div.
  */
 test.getControlDiv = function (
@@ -66,14 +67,19 @@ test.getControlDiv = function (
   max,
   value,
   callback,
-  precision) {
+  precision,
+  step) {
   const range = document.createElement('input');
   range.id = id + '-range';
   range.className = 'ctrl-range';
   range.type = 'range';
   range.min = min.toPrecision(precision);
   range.max = max.toPrecision(precision);
-  range.step = ((max - min) * 0.01).toPrecision(precision);
+  if (typeof step !== 'undefined') {
+    range.step = step;
+  } else {
+    range.step = ((max - min) * 0.01).toPrecision(precision);
+  }
   range.value = value.toString();
 
   const label = document.createElement('label');

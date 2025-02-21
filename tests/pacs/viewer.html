@@ -183,6 +183,16 @@ hr.vertical {
   transform-origin: left;
   transform: rotate(90deg);
 }
+#brushCursor {
+  pointer-events: none;
+  position: absolute;
+  z-index: 100;
+
+  width: 10px;
+  height: 10px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
 </style>
 
 <!-- dwv build --><!--
@@ -192,7 +202,9 @@ hr.vertical {
 --><!-- local -->
 <script type="text/javascript" src="./viewer.ui.js"></script>
 <script type="text/javascript" src="./viewer.ui.annot.js"></script>
+<script type="text/javascript" src="./viewer.ui.segment.js"></script>
 <script type="text/javascript" src="./viewer.ui.draw.js"></script>
+<script type="text/javascript" src="./viewer.ui.brush.js"></script>
 <script type="text/javascript" src="./viewer.ui.datatable.js"></script>
 <script type="text/javascript" src="./viewer.rendertest.js"></script>
 <script type="text/javascript" src="./viewer.js"></script>
@@ -238,6 +250,8 @@ hr.vertical {
 </div>
 
 <div id='annotationgroups-panel' class="line"></div>
+
+<div id='segmentations-panel' class="line"></div>
 
 <div id="layersdetails"></div>
 
