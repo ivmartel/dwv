@@ -982,7 +982,7 @@ export class Size {
     getDimSize(dimension: number, start?: number): number;
     getTotalSize(start?: number): number;
     getValues(): number[];
-    indexToOffset(index: Index, start?: number, clamp?: boolean): number;
+    indexToOffset(index: Index, start?: number): number;
     isInBounds(index: Index, dirs: number[]): boolean;
     length(): number;
     moreThanOne(dimension: number): boolean;
