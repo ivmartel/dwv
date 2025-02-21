@@ -478,10 +478,11 @@ test.dataModelUI.Segmentation = function (app) {
     const vls = app.getViewLayersByDataId(segmentation.dataId);
     if (vls.length === 0) {
       console.warn('No layers to show/hide seg');
-      return;
     }
-    const vc = vls[0].getViewController();
-    vc.setViewAlphaFunction(segViewHelper.getAlphaFunc());
+    for (const vl of vls) {
+      const vc = vl.getViewController();
+      vc.setViewAlphaFunction(segViewHelper.getAlphaFunc());
+    }
   }
 
   /**
