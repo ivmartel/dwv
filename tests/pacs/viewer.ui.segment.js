@@ -572,13 +572,6 @@ test.dataModelUI.Segmentation = function (app) {
     selectInput.title = segmentId;
     selectInput.onchange = onSegmentSelect;
 
-    // auto select for segment of first segmentation
-    if (segmentationIndex === 0 && segment.number === 1) {
-      selectInput.checked = true;
-      const segmentation = _segmentations[segmentationIndex];
-      appSelectSegment(segment.number, segmentation);
-    }
-
     const selectLabel = document.createElement('label');
     selectLabel.htmlFor = selectInput.id;
     selectLabel.title = selectInput.title;
