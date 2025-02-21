@@ -112,35 +112,6 @@ test.dataModelUI.Annotation = function (app) {
   function getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
 
-    const viewButton = document.createElement('button');
-    viewButton.style.borderStyle = 'outset';
-    const vbIdPrefix = 'vb-';
-    viewButton.id = vbIdPrefix + annotationDivId;
-    viewButton.title = 'Show/hide annotation';
-    viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
-    viewButton.onclick = function (event) {
-      const target = event.target;
-      // get annotatio
-      const indices =
-        splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
-      const dataId = indices.dataId;
-      const annotationId = indices.annotationId;
-      const drawLayers = app.getDrawLayersByDataId(dataId);
-      // toggle hidden
-      const isPressed = target.style.borderStyle === 'inset';
-      if (isPressed) {
-        target.style.borderStyle = 'outset';
-        for (const layer of drawLayers) {
-          layer.setAnnotationVisibility(annotationId, true);
-        }
-      } else {
-        target.style.borderStyle = 'inset';
-        for (const layer of drawLayers) {
-          layer.setAnnotationVisibility(annotationId, false);
-        }
-      }
-    };
-
     const inputColour = document.createElement('input');
     inputColour.type = 'color';
     inputColour.title = 'Change annotation colour';
@@ -194,6 +165,35 @@ test.dataModelUI.Annotation = function (app) {
       }
     };
 
+    const viewButton = document.createElement('button');
+    viewButton.style.borderStyle = 'outset';
+    const vbIdPrefix = 'vb-';
+    viewButton.id = vbIdPrefix + annotationDivId;
+    viewButton.title = 'Show/hide annotation';
+    viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
+    viewButton.onclick = function (event) {
+      const target = event.target;
+      // get annotatio
+      const indices =
+        splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
+      const dataId = indices.dataId;
+      const annotationId = indices.annotationId;
+      const drawLayers = app.getDrawLayersByDataId(dataId);
+      // toggle hidden
+      const isPressed = target.style.borderStyle === 'inset';
+      if (isPressed) {
+        target.style.borderStyle = 'outset';
+        for (const layer of drawLayers) {
+          layer.setAnnotationVisibility(annotationId, true);
+        }
+      } else {
+        target.style.borderStyle = 'inset';
+        for (const layer of drawLayers) {
+          layer.setAnnotationVisibility(annotationId, false);
+        }
+      }
+    };
+
     const deleteButton = document.createElement('button');
     const dbIdPrefix = 'db-';
     deleteButton.id = dbIdPrefix + annotationDivId;
@@ -229,9 +229,9 @@ test.dataModelUI.Annotation = function (app) {
     span.id = 'span-' + annotationDivId;
     span.appendChild(document.createTextNode(
       annotation.id + ' (' + annotation.getFactory().getName() + ')'));
-    span.appendChild(viewButton);
     span.appendChild(inputColour);
     span.appendChild(gotoButton);
+    span.appendChild(viewButton);
     span.appendChild(deleteButton);
 
     return span;
