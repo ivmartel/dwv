@@ -795,10 +795,43 @@ export class Image {
         key === 'custom') {
         continue;
       }
-      if (this.#meta[key] !== rhs.getMeta()[key]) {
-        throw new Error('Cannot append a slice with different ' + key +
-          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
+
+      const thisMeta = this.#meta[key];
+      const newMeta = rhs.getMeta()[key];
+
+      // Working around Javascript type weirdness
+      const areBothNumbers =
+        // Check if they were loaded in as numbers
+        (
+          (typeof thisMeta) === (typeof newMeta) &&
+          (typeof thisMeta) === 'number'
+
+        // Check if they are strings in disguise
+        ) || (
+          // Use type coersion to check if they don't parse as NaN
+          !isNaN(thisMeta) && 
+          !isNaN(newMeta) && 
+
+          // Do a second check to make sure they are not empty strings
+          !isNaN(parseFloat(thisMeta)) &&
+          !isNaN(parseFloat(newMeta))
+        )
+      
+      if(areBothNumbers){
+        // Check if values are within an epsilon of 4 decimal points to eachother
+        // If so they are probably equal enough
+        if(Math.abs(this.#meta[key] - rhs.getMeta()[key]) > 0.0001) {
+          throw new Error('Cannot append a slice with different ' + key +
+            ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
+        }
+      } else {
+        if (this.#meta[key] !== rhs.getMeta()[key]) {
+          throw new Error('Cannot append a slice with different ' + key +
+            ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
+        }
       }
+
+      
     }
 
     // update ranges
