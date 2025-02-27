@@ -1,4 +1,5 @@
 // Do not warn if these variables were not defined before.
+/* global dwv */
 
 // namespace
 // eslint-disable-next-line no-var
@@ -15,8 +16,16 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
 
   this.getValue = function () {
     const shapeSelect = document.getElementById('draw-shape-select');
+    // example annotation meta data added at draw time
+    const concept0 = new dwv.DicomCode('Comment');
+    concept0.schemeDesignator = 'DCM';
+    concept0.value = '121106';
+    const value0 = 'Cool annotation!';
     return {
-      shapeName: shapeSelect.value
+      shapeName: shapeSelect.value,
+      annotationMeta: [
+        {concept: concept0, value: value0}
+      ]
     };
   };
 

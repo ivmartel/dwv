@@ -25,7 +25,8 @@ import {
   getReferencePointsCode,
   getColourCode,
   getQuantificationName,
-  getQuantificationUnit
+  getQuantificationUnit,
+  DicomCode
 } from '../dicom/dicomCode';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {ImageReference} from '../dicom/dicomImageReference';
@@ -210,6 +211,15 @@ export class AnnotationGroupFactory {
           unit: quantifUnit
         };
       }
+      // meta
+      if ((subItem.valueType === ValueTypes.code ||
+        subItem.valueType === ValueTypes.text) &&
+        subItem.relationshipType === RelationshipTypes.contains) {
+        annotation.addMetaItem(
+          subItem.conceptNameCode,
+          subItem.value
+        );
+      }
     }
     return annotation;
   }
@@ -380,6 +390,21 @@ export class AnnotationGroupFactory {
           itemContentSequence.push(quatifContent);
         }
       }
+    }
+
+    // meta
+    const conceptIds = annotation.getMetaConceptIds();
+    for (const conceptId of conceptIds) {
+      const item = annotation.getMetaItem(conceptId);
+      let valueType = ValueTypes.text;
+      if (item.value instanceof DicomCode) {
+        valueType = ValueTypes.code;
+      }
+      const meta = new DicomSRContent(valueType);
+      meta.relationshipType = RelationshipTypes.contains;
+      meta.conceptNameCode = item.concept;
+      meta.value = item.value;
+      itemContentSequence.push(meta);
     }
 
     srScoord.contentSequence = itemContentSequence;

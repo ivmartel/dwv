@@ -10,6 +10,7 @@ import {Point2D, Point3D} from '../math/point';
 import {Index} from '../math/index';
 import {ViewController} from '../app/viewController';
 import {PlaneHelper} from './planeHelper';
+import {DicomCode} from '../dicom/dicomCode';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -94,6 +95,62 @@ export class Annotation {
    * @type {ViewController|undefined}
    */
   #viewController;
+
+  /**
+   * Annotation meta data.
+   *
+   * @type {object} Array of {concept:DicomCode, value:DicomCode}
+   *   or {concept:DicomCode, value:string}.
+   */
+  #meta = {};
+
+  /**
+   * Get the concepts ids of the annotation meta data.
+   *
+   * @returns {string[]} The ids.
+   */
+  getMetaConceptIds() {
+    return Object.keys(this.#meta);
+  }
+
+  /**
+   * Get an annotation meta data.
+   *
+   * @param {string} conceptId The value of the concept dicom code.
+   * @returns {object|undefined} The corresponding meta data item
+   *   as {concept, value} or undefined.
+   */
+  getMetaItem(conceptId) {
+    return this.#meta[conceptId];
+  }
+
+  /**
+   * Add annotation meta data.
+   *
+   * @param {DicomCode} concept The concept code.
+   * @param {DicomCode} value The value code.
+   */
+  addMetaItem(concept, value) {
+    const conceptId = concept.value;
+    if (typeof this.#meta[conceptId] !== 'undefined') {
+      logger.warn('Overwriting annotation meta with id=' + conceptId);
+    }
+    this.#meta[concept.value] = {
+      concept: concept,
+      value: value
+    };
+  }
+
+  /**
+   * Remove an annotation meta data.
+   *
+   * @param {string} conceptId The value of the concept dicom code.
+   */
+  removeMetaItem(conceptId) {
+    if (typeof this.#meta[conceptId] !== 'undefined') {
+      delete this.#meta[conceptId];
+    }
+  }
 
   /**
    * Get the orientation name for this annotation.

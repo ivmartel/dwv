@@ -137,6 +137,14 @@ export class Draw {
   #blacklist = [];
 
   /**
+   * Annotation meta data to pass to newly created annotations.
+   * Array of either {DicomCode, DicomCode} or {DicomCode, string}.
+   *
+   * @type {object[]}
+   */
+  #annotationMeta;
+
+  /**
    * Shape handler: activate listeners on existing shape.
    *
    * @type {DrawShapeHandler}
@@ -715,6 +723,13 @@ export class Draw {
     }
     annotation.id = guid();
     annotation.init(viewController);
+    // meta data
+    if (typeof this.#annotationMeta !== 'undefined') {
+      for (const meta of this.#annotationMeta) {
+        annotation.addMetaItem(meta.concept, meta.value);
+      }
+    }
+
     // set annotation shape
     this.#currentFactory.setAnnotationMathShape(annotation, finalPoints);
 
@@ -819,7 +834,7 @@ export class Draw {
   }
 
   /**
-   * Set the tool live features: shape colour and shape name.
+   * Set the tool live features.
    *
    * @param {object} features The list of features.
    */
@@ -846,6 +861,9 @@ export class Draw {
     }
     if (typeof features.blacklist !== 'undefined') {
       this.#blacklist = features.blacklist;
+    }
+    if (typeof features.annotationMeta !== 'undefined') {
+      this.#annotationMeta = features.annotationMeta;
     }
   }
 
