@@ -79,6 +79,33 @@ export declare class Annotation {
      */
     planePoints: Point3D[] | undefined;
     /**
+     * Get the concepts ids of the annotation meta data.
+     *
+     * @returns {string[]} The ids.
+     */
+    getMetaConceptIds(): string[];
+    /**
+     * Get an annotation meta data.
+     *
+     * @param {string} conceptId The value of the concept dicom code.
+     * @returns {object|undefined} The corresponding meta data item
+     *   as {concept, value} or undefined.
+     */
+    getMetaItem(conceptId: string): object | undefined;
+    /**
+     * Add annotation meta data.
+     *
+     * @param {DicomCode} concept The concept code.
+     * @param {DicomCode} value The value code.
+     */
+    addMetaItem(concept: DicomCode, value: DicomCode): void;
+    /**
+     * Remove an annotation meta data.
+     *
+     * @param {string} conceptId The value of the concept dicom code.
+     */
+    removeMetaItem(conceptId: string): void;
+    /**
      * Get the orientation name for this annotation.
      *
      * @returns {string|undefined} The orientation name,
