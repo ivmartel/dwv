@@ -20,6 +20,8 @@ import {RGB} from '../utils/colour';
 import {ColourMap} from './luts';
 /* eslint-enable no-unused-vars */
 
+const FLOAT_TOLERANCE = 1e-4;
+
 /**
  * Get the slice index of an input slice into a volume geometry.
  *
@@ -820,7 +822,7 @@ export class Image {
       if(areBothNumbers){
         // Check if values are within an epsilon of 4 decimal points to eachother
         // If so they are probably equal enough
-        if(Math.abs(this.#meta[key] - rhs.getMeta()[key]) > 0.0001) {
+        if(Math.abs(this.#meta[key] - rhs.getMeta()[key]) > FLOAT_TOLERANCE) {
           throw new Error('Cannot append a slice with different ' + key +
             ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
         }
