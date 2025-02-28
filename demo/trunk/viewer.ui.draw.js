@@ -17,10 +17,13 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
   this.getValue = function () {
     const shapeSelect = document.getElementById('draw-shape-select');
     // example annotation meta data added at draw time
-    const concept0 = new dwv.DicomCode('Comment');
+    // (not sure of the concept-value association)
+    const concept0 = new dwv.DicomCode('Processing type');
     concept0.schemeDesignator = 'DCM';
-    concept0.value = '121106';
-    const value0 = 'Cool annotation!';
+    concept0.value = '111701';
+    const value0 = new dwv.DicomCode('Manual Processing');
+    value0.schemeDesignator = 'DCM';
+    value0.value = '123109';
     return {
       shapeName: shapeSelect.value,
       annotationMeta: [
