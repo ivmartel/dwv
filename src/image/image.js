@@ -13,14 +13,12 @@ import {isMonochrome} from '../dicom/dicomElementsWrapper';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Geometry} from './geometry';
-import {Matrix33} from '../math/matrix';
+import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix';
 import {NumberRange} from '../math/stats';
 import {DataElement} from '../dicom/dataElement';
 import {RGB} from '../utils/colour';
 import {ColourMap} from './luts';
 /* eslint-enable no-unused-vars */
-
-const FLOAT_TOLERANCE = 1e-4;
 
 /**
  * Get the slice index of an input slice into a volume geometry.
@@ -783,7 +781,7 @@ export class Image {
       throw new Error('Cannot append a slice with different number of rows');
     }
     if (!this.#geometry.getOrientation().isSimilar(
-      rhs.getGeometry().getOrientation(), 0.0001)) {
+      rhs.getGeometry().getOrientation(), REAL_WORLD_EPSILON)) {
       throw new Error('Cannot append a slice with different orientation');
     }
     if (this.#photometricInterpretation !==
@@ -798,14 +796,7 @@ export class Image {
         continue;
       }
 
-      if(key === 'ImageOrientationPatient'){
-        // Check if values are within an epsilon of 4 decimal points to eachother
-        // If so they are probably equal enough
-        if(Math.abs(this.#meta[key] - rhs.getMeta()[key]) > FLOAT_TOLERANCE) {
-          throw new Error('Cannot append a slice with different ' + key +
-            ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
-        }
-      } else {
+      if(key !== 'ImageOrientationPatient'){ // This was already checked with #geometry.getOrientation()
         if (this.#meta[key] !== rhs.getMeta()[key]) {
           throw new Error('Cannot append a slice with different ' + key +
             ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
