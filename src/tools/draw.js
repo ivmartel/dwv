@@ -131,10 +131,12 @@ export class Draw {
   #withScroll = true;
 
   /**
-   * Black list: list of dataIds for which draw layer creation
-   *   is forbidden.
+   * Reference data validator: function that takes the reference
+   *   image meta data and returns a boolean.
+   *
+   * @type {Function}
    */
-  #blacklist = [];
+  #refMetaValidator;
 
   /**
    * Annotation meta data to pass to newly created annotations.
@@ -199,14 +201,21 @@ export class Draw {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     let drawLayer = layerGroup.getActiveDrawLayer();
 
+    // get reference data id
+    let referenceViewLayer;
     if (typeof drawLayer === 'undefined') {
-      const viewLayer = layerGroup.getActiveViewLayer();
-      const refDataId = viewLayer.getDataId();
+      referenceViewLayer = layerGroup.getActiveViewLayer();
+    } else {
+      referenceViewLayer = layerGroup.getViewLayerById(
+        drawLayer.getReferenceLayerId());
+    }
+    const refDataId = referenceViewLayer.getDataId();
+
+    // validate reference meta data
+    if (typeof this.#refMetaValidator !== 'undefined') {
       const refData = this.#app.getData(refDataId);
       const refMeta = refData.image.getMeta();
-      const seriesInstanceUID = refMeta.SeriesInstanceUID;
-      // check black list
-      if (this.#blacklist.includes(seriesInstanceUID)) {
+      if (!this.#refMetaValidator(refMeta)) {
         /**
          * Warn event.
          *
@@ -217,10 +226,14 @@ export class Draw {
          */
         this.#fireEvent({
           type: 'warn',
-          message: 'Cannot create draw layer, data is in black list'
+          message: 'Cannot create draw, reference meta is invalid'
         });
         return;
       }
+    }
+
+    // create layer if needed
+    if (typeof drawLayer === 'undefined') {
       // create new data
       const data = this.#app.createAnnotationData(refDataId);
       // render (will create draw layer)
@@ -859,8 +872,8 @@ export class Draw {
     if (typeof features.withScroll !== 'undefined') {
       this.#withScroll = features.withScroll;
     }
-    if (typeof features.blacklist !== 'undefined') {
-      this.#blacklist = features.blacklist;
+    if (typeof features.refMetaValidator !== 'undefined') {
+      this.#refMetaValidator = features.refMetaValidator;
     }
     if (typeof features.annotationMeta !== 'undefined') {
       this.#annotationMeta = features.annotationMeta;
