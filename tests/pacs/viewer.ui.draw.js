@@ -28,6 +28,9 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
       shapeName: shapeSelect.value,
       annotationMeta: [
         {concept: concept0, value: value0}
+      ],
+      annotationGroupMeta: [
+        {concept: 'StationName', value: 'web browser'}
       ]
     };
   };

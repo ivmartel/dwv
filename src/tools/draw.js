@@ -139,8 +139,17 @@ export class Draw {
   #refMetaValidator;
 
   /**
+   * Annotation group meta data to pass to newly created groups.
+   * Array of {concept: string, value: string}.
+   *
+   * @type {object[]}
+   */
+  #annotationGroupMeta;
+
+  /**
    * Annotation meta data to pass to newly created annotations.
-   * Array of either {DicomCode, DicomCode} or {DicomCode, string}.
+   * Array of either {concept: DicomCode, value: DicomCode} or
+   *   {concept: DicomCode, value: string}.
    *
    * @type {object[]}
    */
@@ -236,6 +245,12 @@ export class Draw {
     if (typeof drawLayer === 'undefined') {
       // create new data
       const data = this.#app.createAnnotationData(refDataId);
+      // possible meta data
+      if (typeof this.#annotationGroupMeta !== 'undefined') {
+        for (const meta of this.#annotationGroupMeta) {
+          data.annotationGroup.setMetaValue(meta.concept, meta.value);
+        }
+      }
       // render (will create draw layer)
       this.#app.addAndRenderAnnotationData(data, divId, refDataId);
       // get draw layer
@@ -874,6 +889,9 @@ export class Draw {
     }
     if (typeof features.refMetaValidator !== 'undefined') {
       this.#refMetaValidator = features.refMetaValidator;
+    }
+    if (typeof features.annotationGroupMeta !== 'undefined') {
+      this.#annotationGroupMeta = features.annotationGroupMeta;
     }
     if (typeof features.annotationMeta !== 'undefined') {
       this.#annotationMeta = features.annotationMeta;
