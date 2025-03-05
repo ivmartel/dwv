@@ -791,16 +791,18 @@ export class Image {
     }
     // all meta should be equal
     for (const key in this.#meta) {
-      if (key === 'windowPresets' || key === 'numberOfFiles' ||
-        key === 'custom') {
+      if (
+        key === 'windowPresets' || 
+        key === 'numberOfFiles' ||
+        key === 'custom' ||
+        key === 'ImageOrientationPatient' // This was already checked with #geometry.getOrientation()
+      ) {
         continue;
       }
 
-      if(key !== 'ImageOrientationPatient'){ // This was already checked with #geometry.getOrientation()
-        if (this.#meta[key] !== rhs.getMeta()[key]) {
-          throw new Error('Cannot append a slice with different ' + key +
-            ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
-        }
+      if (this.#meta[key] !== rhs.getMeta()[key]) {
+        throw new Error('Cannot append a slice with different ' + key +
+          ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
       }
     }
 
