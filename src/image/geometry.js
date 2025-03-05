@@ -503,6 +503,18 @@ export class Geometry {
   }
 
   /**
+   * Floors a number, but with an tolerance to account for rounding errors
+   *
+   * @param {Number} value The value to floor.
+   * @param {Number} tol The tolerance.
+   * @returns {Number} The floored number.
+   */
+  approximateFloor(value, tol) {
+    // We want to floor for most cases, but rounding errors may give us a value like 24.999 when we wanted 25
+    return Math.floor(value + tol);
+  }
+
+  /**
    * Convert world coordinates into an index.
    *
    * @param {Point} point The point to convert.
@@ -525,9 +537,9 @@ export class Geometry {
     const values = point.getValues();
     // apply spacing and floor
     const spacing = this.getSpacing();
-    values[0] = Math.floor(orientedPoint3D.getX() / spacing.get(0));
-    values[1] = Math.floor(orientedPoint3D.getY() / spacing.get(1));
-    values[2] = Math.floor(orientedPoint3D.getZ() / spacing.get(2));
+    values[0] = this.approximateFloor(orientedPoint3D.getX() / spacing.get(0), 0.001);
+    values[1] = this.approximateFloor(orientedPoint3D.getY() / spacing.get(1), 0.001);
+    values[2] = this.approximateFloor(orientedPoint3D.getZ() / spacing.get(2), 0.001);
 
     // return index
     return new Index(values);
