@@ -97,10 +97,10 @@ export class Annotation {
   #viewController;
 
   /**
-   * Annotation meta data.
-   *
-   * @type {object} Array of {concept:DicomCode, value:DicomCode}
+   * Annotation meta data. Array of {concept:DicomCode, value:DicomCode}
    *   or {concept:DicomCode, value:string}.
+   *
+   * @type {object}
    */
   #meta = {};
 
