@@ -24,6 +24,15 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
     const value0 = new dwv.DicomCode('Manual Processing');
     value0.schemeDesignator = 'DCM';
     value0.value = '123109';
+    // example draw meta validator
+    const drawMetaValidator = function (meta) {
+      return meta.StationName === 'web browser';
+    };
+    // example ref meta validator
+    const refMetaValidator = function (/*meta*/) {
+      //return meta.Modality === 'CT';
+      return true;
+    };
     return {
       shapeName: shapeSelect.value,
       annotationMeta: [
@@ -31,7 +40,9 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
       ],
       annotationGroupMeta: [
         {concept: 'StationName', value: 'web browser'}
-      ]
+      ],
+      drawMetaValidator,
+      refMetaValidator
     };
   };
 
