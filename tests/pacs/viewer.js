@@ -232,6 +232,10 @@ function viewerSetup() {
     console.log('filterundo', event);
   });
 
+  _app.addEventListener('warn', function (event) {
+    console.log('warn', event);
+  });
+
   // default keyboard shortcuts
   window.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
