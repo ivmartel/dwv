@@ -139,6 +139,14 @@ export class Draw {
   #refMetaValidator;
 
   /**
+   * Draw data validator: function that takes the annotation group
+   *   meta data and returns a boolean.
+   *
+   * @type {Function}
+   */
+  #drawMetaValidator;
+
+  /**
    * Annotation group meta data to pass to newly created groups.
    * Array of {concept: string, value: string}.
    *
@@ -201,6 +209,81 @@ export class Draw {
   }
 
   /**
+   * Check if a draw lqyer can be created in the given layer group.
+   * Uses the validator provided as feature. Default returns true.
+   *
+   * @param {LayerGroup} layerGroup The layer group
+   *   where to create the draw layer.
+   * @returns {boolean} True if possible.
+   */
+  #canCreateDrawLayer(layerGroup) {
+    let res = true;
+
+    // validate reference meta data
+    if (typeof this.#refMetaValidator !== 'undefined') {
+      const referenceViewLayer = layerGroup.getActiveViewLayer();
+      const dataId = referenceViewLayer.getDataId();
+      const data = this.#app.getData(dataId);
+      const meta = data.image.getMeta();
+      res = this.#refMetaValidator(meta);
+    }
+
+    return res;
+  }
+
+  /**
+   * Check if a draw can be created in the given draw layer.
+   * Uses the validator provided as feature. Default returns true.
+   *
+   * @param {DrawLayer} drawLayer The layer where to create the draw.
+   * @returns {boolean} True if possible.
+   */
+  #canCreateDraw(drawLayer) {
+    let res = true;
+
+    // validate annotation group meta data
+    if (typeof this.#drawMetaValidator !== 'undefined') {
+      const dataId = drawLayer.getDataId();
+      const data = this.#app.getData(dataId);
+      const meta = data.annotationGroup.getMeta();
+      res = this.#drawMetaValidator(meta);
+    }
+
+    return res;
+  }
+
+  /**
+   * Create a draw layer in the given layer group.
+   *
+   * @param {LayerGroup} layerGroup The layer group where to create.
+   * @returns {DrawLayer} The created layer.
+   */
+  #createDrawLayer(layerGroup) {
+    const referenceViewLayer = layerGroup.getActiveViewLayer();
+    const refDataId = referenceViewLayer.getDataId();
+
+    // create new data
+    const data = this.#app.createAnnotationData(refDataId);
+    // add possible meta data
+    if (typeof this.#annotationGroupMeta !== 'undefined') {
+      for (const meta of this.#annotationGroupMeta) {
+        data.annotationGroup.setMetaValue(meta.concept, meta.value);
+      }
+    }
+    // render (will create draw layer)
+    this.#app.addAndRenderAnnotationData(
+      data, layerGroup.getDivId(), refDataId);
+    // get draw layer
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    // set the layer shape handler
+    drawLayer.setShapeHandler(this.#shapeHandler);
+    // set active to bind to toolboxController
+    layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
+
+    return drawLayer;
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
@@ -210,55 +293,37 @@ export class Draw {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
     let drawLayer = layerGroup.getActiveDrawLayer();
 
-    // get reference data id
-    let referenceViewLayer;
-    if (typeof drawLayer === 'undefined') {
-      referenceViewLayer = layerGroup.getActiveViewLayer();
-    } else {
-      referenceViewLayer = layerGroup.getViewLayerById(
-        drawLayer.getReferenceLayerId());
-    }
-    const refDataId = referenceViewLayer.getDataId();
+    /**
+     * Draw warn event.
+     *
+     * @event Draw#warn
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} message The warning message.
+     */
 
-    // validate reference meta data
-    if (typeof this.#refMetaValidator !== 'undefined') {
-      const refData = this.#app.getData(refDataId);
-      const refMeta = refData.image.getMeta();
-      if (!this.#refMetaValidator(refMeta)) {
-        /**
-         * Warn event.
-         *
-         * @event Draw#warn
-         * @type {object}
-         * @property {string} type The event type.
-         * @property {string} message The warning message.
-         */
+    if (typeof drawLayer === 'undefined') {
+      // drawLayer creation check
+      if (!this.#canCreateDrawLayer(layerGroup)) {
+        // fire warn if not possible
         this.#fireEvent({
           type: 'warn',
-          message: 'Cannot create draw, reference meta is invalid'
+          message: 'Cannot create draw layer, reference meta is invalid'
         });
         return;
       }
-    }
-
-    // create layer if needed
-    if (typeof drawLayer === 'undefined') {
-      // create new data
-      const data = this.#app.createAnnotationData(refDataId);
-      // possible meta data
-      if (typeof this.#annotationGroupMeta !== 'undefined') {
-        for (const meta of this.#annotationGroupMeta) {
-          data.annotationGroup.setMetaValue(meta.concept, meta.value);
-        }
+      // create draw layer
+      drawLayer = this.#createDrawLayer(layerGroup);
+    } else {
+      // draw creation check
+      if (!this.#canCreateDraw(drawLayer)) {
+        // fire warn if not possible
+        this.#fireEvent({
+          type: 'warn',
+          message: 'Cannot create draw, data meta is invalid'
+        });
+        return;
       }
-      // render (will create draw layer)
-      this.#app.addAndRenderAnnotationData(data, divId, refDataId);
-      // get draw layer
-      drawLayer = layerGroup.getActiveDrawLayer();
-      // set the layer shape handler
-      drawLayer.setShapeHandler(this.#shapeHandler);
-      // set active to bind to toolboxController
-      layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
     }
 
     // data should exist / be created
@@ -889,6 +954,9 @@ export class Draw {
     }
     if (typeof features.refMetaValidator !== 'undefined') {
       this.#refMetaValidator = features.refMetaValidator;
+    }
+    if (typeof features.drawMetaValidator !== 'undefined') {
+      this.#drawMetaValidator = features.drawMetaValidator;
     }
     if (typeof features.annotationGroupMeta !== 'undefined') {
       this.#annotationGroupMeta = features.annotationGroupMeta;
