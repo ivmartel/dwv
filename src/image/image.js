@@ -1197,7 +1197,7 @@ export class Image {
     const frame = (f || 0);
     const index = new Index([i, j, k, frame]);
     return this.getValueAtOffset(
-      this.getGeometry().getSize().indexToOffset(index));
+      this.getGeometry().getSize().indexToOffset(index, 0, false));
   }
 
   /**
@@ -1209,7 +1209,7 @@ export class Image {
    */
   getValueAtIndex(index) {
     return this.getValueAtOffset(
-      this.getGeometry().getSize().indexToOffset(index));
+      this.getGeometry().getSize().indexToOffset(index, 0, false));
   }
 
   /**
@@ -1248,7 +1248,7 @@ export class Image {
    */
   getRescaledValueAtIndex(index) {
     return this.getRescaledValueAtOffset(
-      this.getGeometry().getSize().indexToOffset(index)
+      this.getGeometry().getSize().indexToOffset(index, 0, false)
     );
   }
 

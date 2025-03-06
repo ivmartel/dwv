@@ -99,8 +99,7 @@ QUnit.test('Image getValue', function (assert) {
     'Rescaled values should be equal');
   // outside value
   assert.equal(isNaN(image0.getValue(4, 3, 0)), true, 'Value outside is NaN');
-  // TODO: wrong, should not be accessed
-  assert.equal(image0.getValue(5, 0, 0), 1 * size0 + 1, 'Value at 5,0,0');
+  assert.equal(isNaN(image0.getValue(5, 0, 0)), true, 'Value at 5,0,0 is NaN');
   // check range
   const theoRange0 = {min: 0, max: (size0 * size0) - 1};
   const imgRange00 = image0.getDataRange();
