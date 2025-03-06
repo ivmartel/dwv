@@ -226,7 +226,9 @@ export class Size {
    *
    * @param {Index} index The index to convert.
    * @param {number} [start] Optional start dimension to base the offset on.
-   * @param {boolean} [clamp] Optional, if true then clamp the index to the bounds, if false then return -1 when index is out of bounds in any dimension.
+   * @param {boolean} [clamp] Optional, if true then clamp the index to the
+   *  bounds, if false then return -1 when index is out of bounds in any
+   *  dimension.
    * @returns {number} The offset.
    */
   indexToOffset(index, start, clamp = true) {
@@ -244,7 +246,7 @@ export class Size {
     let offset = 0;
     for (let i = start; i < this.length(); ++i) {
       const dimMax = this.get(i);
-      var dimIndex = index.get(i);
+      let dimIndex = index.get(i);
 
       if (clamp) {
         // Force the index into the bounds of the geometry
