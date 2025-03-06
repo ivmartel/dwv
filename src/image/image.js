@@ -792,10 +792,11 @@ export class Image {
     // all meta should be equal
     for (const key in this.#meta) {
       if (
-        key === 'windowPresets' || 
+        key === 'windowPresets' ||
         key === 'numberOfFiles' ||
         key === 'custom' ||
-        key === 'ImageOrientationPatient' // This was already checked with #geometry.getOrientation()
+        // This was already checked with #geometry.getOrientation()
+        key === 'ImageOrientationPatient'
       ) {
         continue;
       }
