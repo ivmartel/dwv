@@ -34,7 +34,6 @@ const _colours = [
 let _coloursPick = _colours.slice();
 
 const _segmentations = [];
-let _selectedSegmentationIndex = 0;
 
 /**
  * Get a segment from a segment list.
@@ -167,52 +166,6 @@ test.dataModelUI.Segmentation = function (app) {
    */
   this.registerListeners = function () {
     app.addEventListener('dataadd', onDataAdd);
-
-    // first default segment
-    _segmentations.push({
-      dataId: undefined,
-      hasNewSegments: true,
-      segments: [getNewSegment(1)],
-      selectedSegmentNumber: 1,
-      viewHelper: new dwv.MaskSegmentViewHelper()
-    });
-
-    // setup html if needed
-    if (!document.getElementById('annotationgroup-list')) {
-      setupHtml();
-    }
-
-    // add default segment to list
-    const mainList = document.getElementById('segmentation-list');
-
-    // loop on segmentations
-    for (let i = 0; i < _segmentations.length; ++i) {
-      const segmentationItem = getSegmentationHtml(_segmentations[i], i);
-      mainList.appendChild(segmentationItem);
-    }
-
-    // extra item for add segmentation button
-    const addItem = document.createElement('li');
-    addItem.id = 'addsegmentationitem';
-    const addSegmentationButton = document.createElement('button');
-    addSegmentationButton.appendChild(
-      document.createTextNode('Add segmentation'));
-    addSegmentationButton.onclick = function (/*event*/) {
-      // new segmentation
-      const segmentation = {
-        dataId: undefined,
-        hasNewSegments: true,
-        segments: [getNewSegment(1)],
-        viewHelper: new dwv.MaskSegmentViewHelper()
-      };
-      // add to list
-      _segmentations.push(segmentation);
-      // add to html
-      addSegmentationHtml(segmentation);
-    };
-    addItem.appendChild(addSegmentationButton);
-
-    mainList.appendChild(addItem);
   };
 
   /**
@@ -245,21 +198,47 @@ test.dataModelUI.Segmentation = function (app) {
     const maskImage = app.getData(dataId).image;
     if (typeof maskImage !== 'undefined' &&
       maskImage.getMeta().Modality === 'SEG') {
-      const segmentation = _segmentations[_selectedSegmentationIndex];
+      // setup html if needed
+      if (!document.getElementById('segmentation-list')) {
+        setupHtml();
+      }
 
       const segHelper = new dwv.MaskSegmentHelper(maskImage);
-
       if (segHelper.getNumberOfSegments() === 0) {
         // manually created segmentation with no segments
-        if (typeof segmentation.dataId === 'undefined') {
-          segmentation.dataId = dataId;
-          for (const segment of segmentation.segments) {
-            segHelper.addSegment(segment);
+        const selectSegmentCheckedId = getSelectSegmentCheckedId();
+        if (typeof selectSegmentCheckedId === 'undefined') {
+          // default segment created at first brush
+          const segmentNumber = 1;
+          const segment = getNewSegment(segmentNumber);
+          segHelper.addSegment(segment);
+          // default segmentation
+          const segmentation = {
+            dataId: dataId,
+            hasNewSegments: false,
+            segments: [segment],
+            selectedSegmentNumber: segmentNumber,
+            viewHelper: new dwv.MaskSegmentViewHelper()
+          };
+          // add to list
+          _segmentations.push(segmentation);
+          // add to html
+          addSegmentationHtml(segmentation);
+        } else {
+          const indices = splitSegmentHtmlId(
+            test.getRootFromHtmlId(prefixes.select, selectSegmentCheckedId));
+          const segmentation = _segmentations[indices.segmentationIndex];
+          // segmentation created with add segmentation
+          if (typeof segmentation.dataId === 'undefined') {
+            segmentation.dataId = dataId;
+            for (const segment of segmentation.segments) {
+              segHelper.addSegment(segment);
+            }
           }
+          segmentation.hasNewSegments = false;
         }
-        segmentation.hasNewSegments = false;
       } else {
-        // segmentation from  loaded file, pass segments to ui
+        // segmentation from loaded file, pass segments to ui
         const imgMeta = maskImage.getMeta();
         if (typeof imgMeta !== 'undefined') {
           // loaded segmentation
@@ -290,12 +269,41 @@ test.dataModelUI.Segmentation = function (app) {
   }
 
   /**
-   * Setup the html for the annotation list.
+   * Setup the html for the segmentation list.
    */
   function setupHtml() {
     // segmentation list
     const segList = document.createElement('ul');
     segList.id = 'segmentation-list';
+
+    // loop on segmentations
+    for (let i = 0; i < _segmentations.length; ++i) {
+      const segmentationItem = getSegmentationHtml(_segmentations[i], i);
+      segList.appendChild(segmentationItem);
+    }
+
+    // extra item for add segmentation button
+    const addItem = document.createElement('li');
+    addItem.id = 'addsegmentationitem';
+    const addSegmentationButton = document.createElement('button');
+    addSegmentationButton.appendChild(
+      document.createTextNode('Add segmentation'));
+    addSegmentationButton.onclick = function (/*event*/) {
+      // new segmentation
+      const segmentation = {
+        dataId: undefined,
+        hasNewSegments: true,
+        segments: [getNewSegment(1)],
+        viewHelper: new dwv.MaskSegmentViewHelper()
+      };
+      // add to list
+      _segmentations.push(segmentation);
+      // add to html
+      addSegmentationHtml(segmentation);
+    };
+    addItem.appendChild(addSegmentationButton);
+
+    segList.appendChild(addItem);
 
     // fieldset
     const legend = document.createElement('legend');
@@ -376,7 +384,6 @@ test.dataModelUI.Segmentation = function (app) {
     // get segment
     const indices = splitSegmentHtmlId(
       test.getRootFromHtmlId(prefixes.select, target.id));
-    _selectedSegmentationIndex = indices.segmentationIndex;
     const segmentation = _segmentations[indices.segmentationIndex];
     // select it
     appSelectSegment(indices.segmentNumber, segmentation);
@@ -533,6 +540,25 @@ test.dataModelUI.Segmentation = function (app) {
   }
 
   /**
+   * Get the id of the select segment checked input.
+   *
+   * @returns {string} The input id.
+   */
+  function getSelectSegmentCheckedId() {
+    let id;
+    const selectInputs = document.querySelectorAll(
+      'input[type=\'radio\'][name=\'select-segment\']'
+    );
+    for (const input of selectInputs) {
+      if (input.checked) {
+        id = input.id;
+        break;
+      }
+    }
+    return id;
+  }
+
+  /**
    * Get the HTML span element for a segment.
    *
    * @param {object} segment The segment.
@@ -549,6 +575,11 @@ test.dataModelUI.Segmentation = function (app) {
     selectInput.id = test.getHtmlId(prefixes.select, segmentId);
     selectInput.title = segmentId;
     selectInput.onchange = onSegmentSelect;
+
+    if (segment.number === 1) {
+      selectInput.checked = true;
+      appSelectSegment(segment.number, _segmentations[segmentationIndex]);
+    }
 
     const selectLabel = document.createElement('label');
     selectLabel.htmlFor = selectInput.id;

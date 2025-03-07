@@ -40,6 +40,16 @@ test.toolFeaturesUI.Brush = function (app, _toolConfig) {
     );
     res.appendChild(controlDiv);
 
+    // if no segmentations, use default
+    if (!document.getElementById('segmentations-list')) {
+      const features = {
+        brushMode: 'add',
+        selectedSegmentNumber: 1,
+        createMask: true
+      };
+      app.setToolFeatures(features);
+    }
+
     return res;
   };
 
