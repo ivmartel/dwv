@@ -97,9 +97,15 @@ test.dataModelUI.Annotation = function (app) {
     fieldset.appendChild(legend);
     fieldset.appendChild(annotList);
 
-    // panel div
-    const panel = document.getElementById('annotationgroups-panel');
-    panel.appendChild(fieldset);
+    // main div
+    const line = document.createElement('div');
+    line.id = 'annotationgroups-line';
+    line.className = 'line';
+    line.appendChild(fieldset);
+
+    // insert
+    const detailsEl = document.getElementById('layersdetails');
+    detailsEl.parentElement.insertBefore(line, detailsEl);
   }
 
   /**

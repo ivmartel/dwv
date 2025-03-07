@@ -312,9 +312,15 @@ test.dataModelUI.Segmentation = function (app) {
     fieldset.appendChild(legend);
     fieldset.appendChild(segList);
 
-    // panel div
-    const panel = document.getElementById('segmentations-panel');
-    panel.appendChild(fieldset);
+    // main div
+    const line = document.createElement('div');
+    line.id = 'segmentations-line';
+    line.className = 'line';
+    line.appendChild(fieldset);
+
+    // insert
+    const detailsEl = document.getElementById('layersdetails');
+    detailsEl.parentElement.insertBefore(line, detailsEl);
   }
 
   /**

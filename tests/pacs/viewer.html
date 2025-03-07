@@ -222,13 +222,13 @@ hr.vertical {
 <!-- DWV -->
 <div id="dwv"></div>
 
-<div class="line">
+<div id="position-line" class="line">
 <label for="position">Position:</label>
 <input type="text" id="position" autocomplete="off" >
 <span id="positionspan"></span>
 </div>
 
-<div class="line">
+<div id="layout-line" class="line">
 <label for="changelayout">Layout:</label>
 <select name="layout" id="changelayout" autocomplete="off" disabled>
  <option value="one">One</option>
@@ -240,18 +240,17 @@ hr.vertical {
 <label for="changesmoothing">Smoothing</label>
 </div>
 
-<div class="line">
+<div id="binders-line" class="line">
   <fieldset id="binders">
     <legend>Binders</legend>
   </fieldset>
+</div>
+
+<div id="tools-line" class="line">
   <fieldset id="tools" disabled>
     <legend>Tools</legend>
   </fieldset>
 </div>
-
-<div id='annotationgroups-panel' class="line"></div>
-
-<div id='segmentations-panel' class="line"></div>
 
 <div id="layersdetails"></div>
 
