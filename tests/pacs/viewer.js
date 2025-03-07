@@ -103,6 +103,7 @@ function viewerSetup() {
       'Protractor',
       'Roi'
     ]},
+    Brush: {},
     Floodfill: {},
     Livewire: {},
     Filter: {options: [

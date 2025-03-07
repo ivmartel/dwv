@@ -48,6 +48,28 @@ test.getViewConfig = function (layout, divId) {
 };
 
 /**
+ * Get a HTML id from a prefix and root part.
+ *
+ * @param {string} prefix The id prefix.
+ * @param {string} root The root.
+ * @returns {string} The HTML id.
+ */
+test.getHtmlId = function (prefix, root) {
+  return prefix + root;
+};
+
+/**
+ * Get the root part from an HTML id.
+ *
+ * @param {string} prefix The id prefix.
+ * @param {string} htmlId The HTML id.
+ * @returns {string} The root.
+ */
+test.getRootFromHtmlId = function (prefix, htmlId) {
+  return htmlId.substring(prefix.length);
+};
+
+/**
  * Get a control div: label, range and number field.
  *
  * @param {string} id The control id.
@@ -56,7 +78,8 @@ test.getViewConfig = function (layout, divId) {
  * @param {number} max The control maximum value.
  * @param {number} value The control value.
  * @param {Function} callback The callback on control value change.
- * @param {number} precision Optional number field float precision.
+ * @param {number} precision Number field float precision.
+ * @param {number} step The control step.
  * @returns {HTMLDivElement} The control div.
  */
 test.getControlDiv = function (
@@ -66,14 +89,19 @@ test.getControlDiv = function (
   max,
   value,
   callback,
-  precision) {
+  precision,
+  step) {
   const range = document.createElement('input');
   range.id = id + '-range';
   range.className = 'ctrl-range';
   range.type = 'range';
   range.min = min.toPrecision(precision);
   range.max = max.toPrecision(precision);
-  range.step = ((max - min) * 0.01).toPrecision(precision);
+  if (typeof step !== 'undefined') {
+    range.step = step;
+  } else {
+    range.step = ((max - min) * 0.01).toPrecision(precision);
+  }
   range.value = value.toString();
 
   const label = document.createElement('label');
