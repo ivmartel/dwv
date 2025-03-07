@@ -129,7 +129,7 @@ function getIndexCompareFunction(direction) {
     let result = 0;
     const va = a.get(direction);
     const vb = b.get(direction);
-    if (va !== undefined && vb !== undefined) {
+    if (typeof va !== 'undefined' && typeof vb !== 'undefined') {
       result = va - vb;
     }
     return result;
@@ -205,7 +205,7 @@ function getOriginIndexRangeFromMaskIndices(geometry, indices) {
 
   // lowest origin
   const z0 = sorted[0].get(2);
-  if (z0 === undefined) {
+  if (typeof z0 === 'undefined') {
     return [];
   }
   const index0 = new Index([0, 0, z0]);
@@ -213,7 +213,7 @@ function getOriginIndexRangeFromMaskIndices(geometry, indices) {
 
   // highest origin
   const z1 = sorted.at(-1).get(2);
-  if (z1 === undefined) {
+  if (typeof z1 === 'undefined') {
     return [];
   }
   const index1 = new Index([0, 0, z1]);
@@ -300,7 +300,7 @@ class DrawBrushCommand {
     this.#segmentNumber = properties.segmentNumber;
     this.#srclayerid = properties.srclayerid;
 
-    if (properties.originalValuesLists !== undefined) {
+    if (typeof properties.originalValuesLists !== 'undefined') {
       this.#originalValuesLists = properties.originalValuesLists;
     }
     this.#isSilent = properties.isSilent ?? false;
@@ -352,7 +352,7 @@ class DrawBrushCommand {
    * @fires DrawBrushCommand#brushdraw
    */
   execute() {
-    if (this.#segmentNumber === undefined) {
+    if (typeof this.#segmentNumber === 'undefined') {
       return;
     }
 
@@ -362,7 +362,7 @@ class DrawBrushCommand {
     }
 
     // draw
-    if (this.#originalValuesLists === undefined) {
+    if (typeof this.#originalValuesLists === 'undefined') {
       this.#originalValuesLists = this.#mask.setAtOffsetsAndGetOriginals(
         this.#offsetsLists,
         segNumber
@@ -390,7 +390,7 @@ class DrawBrushCommand {
    * @fires DrawBrushCommand#brushremove
    */
   undo() {
-    if (this.#originalValuesLists === undefined) {
+    if (typeof this.#originalValuesLists === 'undefined') {
       this.#originalValuesLists = this.#mask.setAtOffsetsAndGetOriginals(
         this.#offsetsLists,
         0
@@ -598,7 +598,8 @@ export class Brush extends EventTarget {
       sourceGeometry,
       circleIndices
     );
-    if (newOrigIndexRange === undefined || newOrigIndexRange.length === 0) {
+    if (typeof newOrigIndexRange === 'undefined' ||
+      newOrigIndexRange.length === 0) {
       throw new Error(ERROR_MESSAGES.brush.noBrushOrigins);
     }
 
@@ -642,7 +643,7 @@ export class Brush extends EventTarget {
     }
 
     // append slices
-    if (this.#mask === undefined) {
+    if (typeof this.#mask === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskDefined);
     }
     const tags = this.#mask.getMeta();
@@ -663,7 +664,7 @@ export class Brush extends EventTarget {
     const srclayerid = maskVl.getId();
 
     // get mask image
-    if (this.#maskDataId === undefined) {
+    if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskId);
     }
     const maskData = this.#app.getData(this.#maskDataId);
@@ -684,11 +685,11 @@ export class Brush extends EventTarget {
     command.execute();
 
     // store offsets and colours for final command
-    this.#tmpOffsetsLists?.push(offsets);
+    this.#tmpOffsetsLists.push(offsets);
     // only one element in original colours
     const originalValues = command.getOriginalValuesLists();
-    if (originalValues !== undefined) {
-      this.#tmpOriginalValuesLists?.push(originalValues[0]);
+    if (typeof originalValues !== 'undefined') {
+      this.#tmpOriginalValuesLists.push(originalValues[0]);
     }
   }
 
@@ -708,7 +709,7 @@ export class Brush extends EventTarget {
     const sourceGeometry = sourceImage.getGeometry();
 
     const imgK = sourceGeometry.worldToIndex(position).get(2);
-    if (imgK === undefined) {
+    if (typeof imgK === 'undefined') {
       throw new Error('Z position is undefined');
     }
     const index = new Index([0, 0, imgK]);
@@ -786,8 +787,8 @@ export class Brush extends EventTarget {
       const config = dataConfigs[key].find(function (item) {
         return item.divId === divId;
       });
-      if (config !== undefined) {
-        orient = config?.orientation;
+      if (typeof config !== 'undefined') {
+        orient = config.orientation;
         break;
       }
     }
@@ -801,7 +802,7 @@ export class Brush extends EventTarget {
    */
   #displayMask(divId) {
     // check mask data id
-    if (this.#maskDataId === undefined) {
+    if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.cannotDisplayMask);
     }
     const viewConfig = new ViewConfig(divId);
@@ -825,7 +826,7 @@ export class Brush extends EventTarget {
     }
     // DerivationImageSequence (0008,9124)
     const derivationImages = frameInfos[0].derivationImages;
-    if (derivationImages === undefined) {
+    if (typeof derivationImages === 'undefined') {
       return dataUid;
     }
     if (derivationImages.length === 0) {
@@ -833,7 +834,7 @@ export class Brush extends EventTarget {
     }
     // SourceImageSequence (0008,2112)
     const sourceImages = derivationImages[0].sourceImages;
-    if (sourceImages === undefined) {
+    if (typeof sourceImages === 'undefined') {
       return dataUid;
     }
     if (sourceImages.length === 0) {
@@ -877,7 +878,7 @@ export class Brush extends EventTarget {
    */
   #getLayerGroupMaskViewLayer(layerGroup) {
     // check mask data id
-    if (this.#maskDataId === undefined) {
+    if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.cannotGetMaskLayers);
     }
 
@@ -903,11 +904,11 @@ export class Brush extends EventTarget {
    * @returns {Image} The image.
    */
   #getMaskImage(maskDataId) {
-    if (maskDataId === undefined) {
+    if (typeof maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskId);
     }
     const maskData = this.#app.getData(maskDataId);
-    if (maskData === undefined) {
+    if (typeof maskData === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.noMaskImageGetOffset);
     }
     return maskData.image;
@@ -925,7 +926,7 @@ export class Brush extends EventTarget {
     const layerGroup = this.#app.getLayerGroupByDivId(
       layerDetails.groupDivId
     );
-    if (layerGroup === undefined) {
+    if (typeof layerGroup === 'undefined') {
       throw new Error('No layergroup to get mask offsets');
     }
     this.#currentLayerGroup = layerGroup;
@@ -936,7 +937,7 @@ export class Brush extends EventTarget {
     } else {
       viewLayer = layerGroup.getViewLayersByDataId(this.#maskDataId)[0];
     }
-    if (viewLayer === undefined) {
+    if (typeof viewLayer === 'undefined') {
       return [];
     }
     const viewController = viewLayer.getViewController();
@@ -985,12 +986,12 @@ export class Brush extends EventTarget {
       // create mask (sets this.#mask)
       this.#maskDataId = this.#createMask(sourcePosition, sourceImage);
       // check
-      if (this.#mask === undefined) {
+      if (typeof this.#mask === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.noCreatedMaskImage);
       }
       // display mask
       const divId = layerGroup.getDivId();
-      if (divId !== undefined) {
+      if (typeof divId !== 'undefined') {
         this.#displayMask(divId);
       }
       // newly create mask case: find the SEG view layer
@@ -1062,12 +1063,12 @@ export class Brush extends EventTarget {
     const layerGroup = this.#app.getLayerGroupByDivId(
       layerDetails.groupDivId
     );
-    if (layerGroup === undefined) {
+    if (typeof layerGroup === 'undefined') {
       throw new Error('No layergroup to check black list');
     }
     const drawLayer = layerGroup.getActiveDrawLayer();
 
-    if (drawLayer === undefined) {
+    if (typeof drawLayer === 'undefined') {
       const viewLayer = layerGroup.getActiveViewLayer();
       const referenceDataId = viewLayer.getDataId();
       const referenceData = this.#app.getData(referenceDataId);
@@ -1154,7 +1155,7 @@ export class Brush extends EventTarget {
     if (!this.#started) {
       return;
     }
-    if (this.#startPoint === undefined) {
+    if (typeof this.#startPoint === 'undefined') {
       return;
     }
     const mousePoint = new Point2D(event.offsetX, event.offsetY);
@@ -1179,13 +1180,13 @@ export class Brush extends EventTarget {
       this.#started = false;
       this.#removeEraserOnRightMousedown(_event);
 
-      if (this.#maskDataId === undefined) {
+      if (typeof this.#maskDataId === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.cannotDrawNoMaskId);
       }
-      if (this.#tmpOffsetsLists === undefined) {
+      if (typeof this.#tmpOffsetsLists === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.cannotDrawNoOffset);
       }
-      if (this.#tmpOriginalValuesLists === undefined) {
+      if (typeof this.#tmpOriginalValuesLists === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.cannotDrawNoColourList);
       }
 
@@ -1278,10 +1279,10 @@ export class Brush extends EventTarget {
    * @returns {ViewLayer} The mask view layer.
    */
   #getMaskViewLayer() {
-    if (this.#maskDataId === undefined) {
+    if (typeof this.#maskDataId === 'undefined') {
       throw new Error(ERROR_MESSAGES.brush.cannotGetMaskVCNoMaskId);
     }
-    if (this.#currentLayerGroup === undefined) {
+    if (typeof this.#currentLayerGroup === 'undefined') {
       throw new Error('No current layer group');
     }
 
@@ -1395,18 +1396,18 @@ export class Brush extends EventTarget {
    * @param {object} features The list of features.
    */
   setFeatures(features) {
-    if (features.brushSizeRange !== undefined) {
+    if (typeof features.brushSizeRange !== 'undefined') {
       this.#brushSizeRange = features.brushSizeRange;
     }
     if (
-      features.brushSize !== undefined &&
+      typeof features.brushSize !== 'undefined' &&
       features.brushSize >= this.#brushSizeRange.min &&
       features.brushSize < this.#brushSizeRange.max
     ) {
       this.#brushSize = features.brushSize;
     }
 
-    if (features.brushMode !== undefined) {
+    if (typeof features.brushMode !== 'undefined') {
       this.#brushMode = features.brushMode;
     }
 
@@ -1415,16 +1416,16 @@ export class Brush extends EventTarget {
     // just changing the brushSize
     if (features.createMask) {
       this.#maskDataId = undefined;
-    } else if (features.maskDataId !== undefined) {
+    } else if (typeof features.maskDataId !== 'undefined') {
       this.#maskDataId = features.maskDataId;
     }
 
     // used in draw events
-    if (features.selectedSegmentNumber !== undefined) {
+    if (typeof features.selectedSegmentNumber !== 'undefined') {
       this.#selectedSegmentNumber = features.selectedSegmentNumber;
     }
 
-    if (features.blacklist !== undefined) {
+    if (typeof features.blacklist !== 'undefined') {
       this.#blacklist = features.blacklist;
     }
   }
