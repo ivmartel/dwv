@@ -128,7 +128,7 @@ function viewerSetup() {
 
   // bind events
   _app.addEventListener('error', function (event) {
-    console.error('load error', event);
+    console.error('load error', event, event.error);
     // abort load
     _app.abortLoad(event.dataid);
   });
