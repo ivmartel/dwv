@@ -182,16 +182,40 @@ QUnit.test('Index to and from offset', function (assert) {
   assert.equal(size01.indexToOffset(index06, 3), 1, 'indexToOffset start #4');
 
   const index07 = new Index([5, 0, 0, 0]);
-  assert.equal(size01.indexToOffset(index07, 0, true), 4, 'indexToOffset clamp #0');
+  assert.equal(
+    size01.indexToOffset(index07, 0, true),
+    4,
+    'indexToOffset clamp #0'
+  );
   const index08 = new Index([0, 0, 3, 2]);
-  assert.equal(size01.indexToOffset(index08, 2, true), 5, 'indexToOffset clamp #1');
+  assert.equal(
+    size01.indexToOffset(index08, 2, true),
+    5,
+    'indexToOffset clamp #1'
+  );
   const index09 = new Index([0, 0, 3, 2]);
-  assert.equal(size01.indexToOffset(index09, 3, true), 1, 'indexToOffset clamp #2');
+  assert.equal(
+    size01.indexToOffset(index09, 3, true),
+    1,
+    'indexToOffset clamp #2'
+  );
 
   const index10 = new Index([5, 0, 0, 0]);
-  assert.equal(size01.indexToOffset(index10, 0, false), -1, 'indexToOffset no clamp #0');
+  assert.equal(
+    size01.indexToOffset(index10, 0, false),
+    -1,
+    'indexToOffset no clamp #0'
+  );
   const index11 = new Index([0, 0, 3, 2]);
-  assert.equal(size01.indexToOffset(index11, 2, false), -1, 'indexToOffset no clamp #1');
+  assert.equal(
+    size01.indexToOffset(index11, 2, false),
+    -1,
+    'indexToOffset no clamp #1'
+  );
   const index12 = new Index([0, 0, 3, 2]);
-  assert.equal(size01.indexToOffset(index12, 3, false), -1, 'indexToOffset no clamp #2');
+  assert.equal(
+    size01.indexToOffset(index12, 3, false),
+    -1,
+    'indexToOffset no clamp #2'
+  );
 });
