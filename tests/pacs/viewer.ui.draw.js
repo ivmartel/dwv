@@ -1,4 +1,5 @@
 // Do not warn if these variables were not defined before.
+/* global dwv */
 
 // namespace
 // eslint-disable-next-line no-var
@@ -15,8 +16,33 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
 
   this.getValue = function () {
     const shapeSelect = document.getElementById('draw-shape-select');
+    // example annotation meta data added at draw time
+    // (not sure of the concept-value association)
+    const concept0 = new dwv.DicomCode('Processing type');
+    concept0.schemeDesignator = 'DCM';
+    concept0.value = '111701';
+    const value0 = new dwv.DicomCode('Manual Processing');
+    value0.schemeDesignator = 'DCM';
+    value0.value = '123109';
+    // example draw meta validator
+    const drawMetaValidator = function (meta) {
+      return meta.StationName === 'web browser';
+    };
+    // example ref meta validator
+    const refMetaValidator = function (/*meta*/) {
+      //return meta.Modality === 'CT';
+      return true;
+    };
     return {
-      shapeName: shapeSelect.value
+      shapeName: shapeSelect.value,
+      annotationMeta: [
+        {concept: concept0, value: value0}
+      ],
+      annotationGroupMeta: [
+        {concept: 'StationName', value: 'web browser'}
+      ],
+      drawMetaValidator,
+      refMetaValidator
     };
   };
 

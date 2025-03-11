@@ -13,9 +13,12 @@ export function addTagsToDictionary(group: string, tags: {
 
 // @public
 export class Annotation {
+    addMetaItem(concept: DicomCode, value: DicomCode): void;
     colour: string | undefined;
     getCentroid(): Point | undefined;
     getFactory(): object;
+    getMetaConceptIds(): string[];
+    getMetaItem(conceptId: string): object | undefined;
     getOrientationName(): string | undefined;
     getText(): string;
     id: string;
@@ -28,6 +31,7 @@ export class Annotation {
     quantification: object | undefined;
     referencePoints: Point2D[] | undefined;
     referenceSopUID: string;
+    removeMetaItem(conceptId: string): void;
     setTextExpr(labelText: {
         [x: string]: string;
     }): void;

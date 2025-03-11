@@ -103,6 +103,7 @@ function viewerSetup() {
       'Protractor',
       'Roi'
     ]},
+    Brush: {},
     Floodfill: {},
     Livewire: {},
     Filter: {options: [
@@ -127,7 +128,7 @@ function viewerSetup() {
 
   // bind events
   _app.addEventListener('error', function (event) {
-    console.error('load error', event);
+    console.error('load error', event, event.error);
     // abort load
     _app.abortLoad(event.dataid);
   });
@@ -230,6 +231,10 @@ function viewerSetup() {
   });
   _app.addEventListener('filterundo', function (event) {
     console.log('filterundo', event);
+  });
+
+  _app.addEventListener('warn', function (event) {
+    console.log('warn', event);
   });
 
   // default keyboard shortcuts

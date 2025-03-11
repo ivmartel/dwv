@@ -38,7 +38,10 @@ import {
   getTagFromKey,
   getPixelDataTag
 } from './dicom/dicomTag';
-import {DicomCode} from './dicom/dicomCode';
+import {
+  DicomCode,
+  getSegmentationCode
+} from './dicom/dicomCode';
 import {
   DicomSRContent,
   getSRContent,
@@ -116,6 +119,8 @@ import {logger} from './utils/logger';
 import {i18n} from './utils/i18n';
 import {
   RGB,
+  rgbToHex,
+  hexToRgb,
   isEqualRgb,
   labToUintLab,
   srgbToCielab
@@ -193,6 +198,7 @@ export {
   getDefaultDicomSegJson,
   getUID,
   getElementsFromJSONTags,
+  getSegmentationCode,
   getEllipseIndices,
   getRectangleIndices,
   getLayerDetailsFromEvent,
@@ -210,5 +216,7 @@ export {
   buildMultipart,
   labToUintLab,
   srgbToCielab,
-  isEqualRgb
+  isEqualRgb,
+  rgbToHex,
+  hexToRgb
 };

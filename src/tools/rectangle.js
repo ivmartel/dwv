@@ -121,7 +121,10 @@ export class RectangleFactory {
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
-      group.add(this.#getDebugShadow(annotation));
+      const shadow = this.#getDebugShadow(annotation);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
     return group;
   }
@@ -469,7 +472,7 @@ export class RectangleFactory {
       y: round.min.getY(),
       width: rWidth,
       height: rHeight,
-      fill: 'grey',
+      fill: annotation.colour,
       strokeWidth: 0,
       strokeScaleEnabled: false,
       opacity: 0.3,
@@ -491,7 +494,10 @@ export class RectangleFactory {
       // remove previous
       kshadow.destroy();
       // add new
-      group.add(this.#getDebugShadow(annotation, group));
+      const shadow = this.#getDebugShadow(annotation);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
   }
 

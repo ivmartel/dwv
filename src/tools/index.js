@@ -3,6 +3,7 @@ import {Scroll} from './scroll';
 import {ZoomAndPan} from './zoomPan';
 import {Opacity} from './opacity';
 import {Draw} from './draw';
+import {Brush} from './brush';
 import {Floodfill} from './floodfill';
 import {Livewire} from './livewire';
 
@@ -128,6 +129,7 @@ export const defaultToolList = {
   ZoomAndPan,
   Opacity,
   Draw,
+  Brush,
   Filter,
   Floodfill,
   Livewire
