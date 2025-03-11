@@ -121,7 +121,10 @@ export class EllipseFactory {
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
-      group.add(this.#getDebugShadow(annotation));
+      const shadow = this.#getDebugShadow(annotation, group);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
     return group;
   }
@@ -530,7 +533,7 @@ export class EllipseFactory {
         y: minY - offsetY,
         width: maxX - minX,
         height: 1,
-        fill: 'grey',
+        fill: annotation.colour,
         strokeWidth: 0,
         strokeScaleEnabled: false,
         opacity: 0.3,
@@ -555,7 +558,10 @@ export class EllipseFactory {
       // remove previous
       kshadow.destroy();
       // add new
-      group.add(this.#getDebugShadow(annotation, group));
+      const shadow = this.#getDebugShadow(annotation, group);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
   }
 

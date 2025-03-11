@@ -103,6 +103,7 @@ function viewerSetup() {
       'Protractor',
       'Roi'
     ]},
+    Brush: {},
     Floodfill: {},
     Livewire: {},
     Filter: {options: [
@@ -230,6 +231,10 @@ function viewerSetup() {
   });
   _app.addEventListener('filterundo', function (event) {
     console.log('filterundo', event);
+  });
+
+  _app.addEventListener('warn', function (event) {
+    console.log('warn', event);
   });
 
   // default keyboard shortcuts

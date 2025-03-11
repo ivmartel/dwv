@@ -89,3 +89,18 @@ export function safeGet(tags, key) {
   }
   return res;
 };
+
+/**
+ * Safely get all of an elements' values from a list of elements.
+ *
+ * @param {Object<string, DataElement>} tags The list of tags.
+ * @param {string} key The tag key as for example '00100020'.
+ * @returns {any[]|undefined} The elements' values or undefined.
+ */
+export function safeGetAll(tags, key) {
+  let res;
+  if (typeof tags[key] !== 'undefined') {
+    res = tags[key].value;
+  }
+  return res;
+};
