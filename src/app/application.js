@@ -2298,8 +2298,11 @@ export class App {
         flipScale.z = true;
       }
     } else {
-      logger.warn('Unsupported orientation code: ' +
-        orientationCode + ', display could be incorrect');
+      // LIP uses default scale and offset
+      if (orientationCode !== 'LIP') {
+        logger.warn('Unsupported orientation code: ' +
+          orientationCode + ', display could be incorrect');
+      }
     }
 
     return {
