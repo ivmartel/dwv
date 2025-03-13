@@ -39,11 +39,6 @@ export class ImageReference {
   referencedSegmentNumber;
 
   /**
-   * @type {string}
-   */
-  fiducialUID;
-
-  /**
    * Get a string representation of this object.
    *
    * @returns {string} The object as string.
