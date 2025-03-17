@@ -8,6 +8,7 @@ import {logger} from '../utils/logger';
 // -> ~2e-16
 // BIG_EPSILON -> ~2e-12
 export const BIG_EPSILON = Number.EPSILON * 1e4;
+export const BIG_EPSILON_EXPONENT = 12;
 // 'real world', for example when comparing positions
 export const REAL_WORLD_EPSILON = 1e-4;
 
