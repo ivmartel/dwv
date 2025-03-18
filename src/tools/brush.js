@@ -256,7 +256,7 @@ function getOffsetsFromIndices(geometry, indices) {
   const imageSize = geometry.getSize();
   const offsets = [];
   for (const index of indices) {
-    const offset = imageSize.indexToOffset(index, 0, false);
+    const offset = imageSize.indexToOffset(index);
     if (offset >= 0) {
       offsets.push(offset);
     }

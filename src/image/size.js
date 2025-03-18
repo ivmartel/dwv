@@ -231,7 +231,7 @@ export class Size {
    *  dimension.
    * @returns {number} The offset.
    */
-  indexToOffset(index, start, clamp = true) {
+  indexToOffset(index, start) {
     // TODO check for equality
     if (index.length() < this.length()) {
       throw new Error('Incompatible index and size length');
@@ -248,11 +248,7 @@ export class Size {
       const dimMax = this.get(i);
       let dimIndex = index.get(i);
 
-      if (clamp) {
-        // Force the index into the bounds of the geometry
-        dimIndex = Math.min(dimMax - 1, Math.max(0, dimIndex));
-
-      } else if (dimIndex >= dimMax || dimIndex < 0) {
+      if (dimIndex >= dimMax || dimIndex < 0) {
         // This index is outside the bounds of the geometry
         return -1;
       }
