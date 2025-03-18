@@ -1,6 +1,7 @@
 import {
   getIdentityMat33,
-  REAL_WORLD_EPSILON
+  REAL_WORLD_EPSILON,
+  BIG_EPSILON_EXPONENT
 } from '../math/matrix';
 import {Point3D, Point} from '../math/point';
 import {Vector3D} from '../math/vector';
@@ -469,9 +470,12 @@ export class Geometry {
     // keep >3d values
     const values = index.getValues();
     const origin = this.getOrigin();
-    values[0] = origin.getX() + point3D.getX();
-    values[1] = origin.getY() + point3D.getY();
-    values[2] = origin.getZ() + point3D.getZ();
+    values[0] = precisionRound(origin.getX() + point3D.getX(),
+      BIG_EPSILON_EXPONENT);
+    values[1] = precisionRound(origin.getY() + point3D.getY(),
+      BIG_EPSILON_EXPONENT);
+    values[2] = precisionRound(origin.getZ() + point3D.getZ(),
+      BIG_EPSILON_EXPONENT);
     // return point
     return new Point(values);
   }
@@ -514,9 +518,9 @@ export class Geometry {
     // TODO: use slice origin...
     const origin = this.getOrigin();
     const point3D = new Point3D(
-      point.get(0) - origin.getX(),
-      point.get(1) - origin.getY(),
-      point.get(2) - origin.getZ()
+      precisionRound(point.get(0) - origin.getX(), BIG_EPSILON_EXPONENT),
+      precisionRound(point.get(1) - origin.getY(), BIG_EPSILON_EXPONENT),
+      precisionRound(point.get(2) - origin.getZ(), BIG_EPSILON_EXPONENT)
     );
     // orient
     const orientedPoint3D =
