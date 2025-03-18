@@ -36,6 +36,62 @@ export function getDwvVersion() {
 }
 
 /**
+ * Get the version of the library as a Unique Identifier (UI),
+ * meaning just numbers and dots.
+ *
+ * @returns {string} The UI version of the library.
+ */
+export function getDwvVersionUI() {
+  // replace beta with '.99'
+  return getDwvVersion().replace('-beta', '.99');
+}
+
+/**
+ * Get the dwv UID prefix.
+ * Issued by Medical Connections Ltd (www.medicalconnections.co.uk)
+ *   on 25/10/2017.
+ *
+ * @returns {string} The dwv UID prefix.
+ */
+export function getDwvUIDPrefix() {
+  return '1.2.826.0.1.3680043.9.7278.1';
+}
+
+/**
+ * Get the value of the ImplementationVersionName tag.
+ *
+ * @returns {string} The name.
+ */
+export function getImplementationVersionName() {
+  return 'DWV_' + getDwvVersion();
+}
+
+/**
+ * Get the value of the ImplementationClassUID tag.
+ *
+ * @returns {string} The uid.
+ */
+export function getImplementationClassUID() {
+  return getDwvUIDPrefix() + '.' + getDwvVersionUI();
+}
+
+/**
+ * Parse the value of the ImplementationClassUID tag.
+ *
+ * @param {string} uid The uid.
+ * @returns {string[]} The splitted version.
+ */
+export function parseImplementationClassUID(uid) {
+  const prefixLength = getDwvUIDPrefix().length;
+  const version = uid.substring(prefixLength + 1);
+  const split = version.split('.');
+  if (split[3] === '99') {
+    split[3] = 'beta';
+  }
+  return split;
+}
+
+/**
  * Check that an input buffer includes the DICOM prefix 'DICM'
  *   after the 128 bytes preamble.
  *

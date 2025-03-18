@@ -1,5 +1,10 @@
 import {safeGet} from '../../src/dicom/dataElement';
 import {
+  getDwvVersion,
+  getDwvVersionUI,
+  getDwvUIDPrefix,
+  getImplementationClassUID,
+  parseImplementationClassUID,
   cleanString,
   hasDicomPrefix,
   DicomParser
@@ -22,6 +27,39 @@ import dwvDicomDir from '../data/DICOMDIR';
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('dicom');
+
+/**
+ * Tests for {@link DicomParser} using simple DICOM data.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~simple-dicom-parsing
+ */
+QUnit.test('DICOM parsing - Implementation class and name', function (assert) {
+  // check UI
+  const versionUI = getDwvVersionUI();
+  const regex = /[a-zA-Z]/g;
+  assert.equal(versionUI.search(regex), -1, 'No letters in vr=UI');
+
+  // test #0: get and parse
+  const version0 = getDwvVersion();
+  // dot and possible '-' for beta
+  const versions0 = version0.split(/[\\.-]/);
+  const classUID0 = getImplementationClassUID();
+  const versions01 = parseImplementationClassUID(classUID0);
+  assert.deepEqual(versions0, versions01, 'Implementation class test #0');
+
+  // test #1: basic
+  const classUID1 = getDwvUIDPrefix() + '.' + '1.2.3';
+  const versions1 = ['1', '2', '3'];
+  const versions11 = parseImplementationClassUID(classUID1);
+  assert.deepEqual(versions1, versions11, 'Implementation class test #1');
+
+  // test #2: with beta
+  const classUID2 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
+  const versions2 = ['4', '5', '6', 'beta', '19'];
+  const versions21 = parseImplementationClassUID(classUID2);
+  assert.deepEqual(versions2, versions21, 'Implementation class test #2');
+});
 
 /**
  * Tests for {@link DicomParser} using simple DICOM data.

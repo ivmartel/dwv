@@ -8,10 +8,8 @@ import {Size} from '../image/size';
 import {Geometry} from '../image/geometry';
 import {ColourMap} from '../image/luts';
 import {getDefaultDicomSegJson} from '../image/maskFactory';
-import {
-  getDwvUIDPrefix,
-  getElementsFromJSONTags
-} from '../dicom/dicomWriter';
+import {getDwvUIDPrefix} from '../dicom/dicomParser';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {DicomData} from '../app/dataController';
 import {ViewConfig} from '../app/application';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';

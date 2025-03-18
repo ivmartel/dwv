@@ -17,7 +17,9 @@ import {
   tagCompareFunction
 } from './dicomTag';
 import {
-  getDwvVersion,
+  getDwvUIDPrefix,
+  getImplementationClassUID,
+  getImplementationVersionName,
   isImplicitTransferSyntax,
   isBigEndianTransferSyntax,
   getDataElementPrefixByteSize
@@ -26,17 +28,6 @@ import {DataElement} from './dataElement';
 import {DataWriter} from './dataWriter';
 import {DataReader} from './dataReader';
 import {logger} from '../utils/logger';
-
-/**
- * Get the dwv UID prefix.
- * Issued by Medical Connections Ltd (www.medicalconnections.co.uk)
- *   on 25/10/2017.
- *
- * @returns {string} The dwv UID prefix.
- */
-export function getDwvUIDPrefix() {
-  return '1.2.826.0.1.3680043.9.7278.1';
-}
 
 // local generated uid counter
 let _uidCount = 0;
@@ -120,34 +111,30 @@ export function getDefaultAnonymisationRules() {
  */
 export function getUID(tagName) {
   const prefix = getDwvUIDPrefix() + '.';
-  let uid = '';
-  if (tagName === 'ImplementationClassUID') {
-    uid = prefix + getDwvVersion();
-  } else {
-    // date (only numbers), do not keep milliseconds
-    const date = (new Date()).toISOString().replace(/\D/g, '');
-    const datePart = '.' + date.substring(0, 14);
-    // count
-    _uidCount += 1;
-    const countPart = '.' + _uidCount;
+  // date (only numbers), do not keep milliseconds
+  const date = (new Date()).toISOString().replace(/\D/g, '');
+  const datePart = '.' + date.substring(0, 14);
+  // count
+  _uidCount += 1;
+  const countPart = '.' + _uidCount;
 
-    // uid = prefix . tag . date . count
-    uid = prefix;
+  // uid = prefix . tag . date . count
+  let uid = prefix;
 
-    // limit tag part to not exceed 64 length
-    const nonTagLength = prefix.length + countPart.length + datePart.length;
-    const leni = Math.min(tagName.length, 64 - nonTagLength);
-    if (leni > 1) {
-      let tagNumber = '';
-      for (let i = 0; i < leni; ++i) {
-        tagNumber += tagName.charCodeAt(i);
-      }
-      uid += tagNumber.substring(0, leni);
+  // limit tag part to not exceed 64 length
+  const nonTagLength = prefix.length + countPart.length + datePart.length;
+  const leni = Math.min(tagName.length, 64 - nonTagLength);
+  if (leni > 1) {
+    let tagNumber = '';
+    for (let i = 0; i < leni; ++i) {
+      tagNumber += tagName.charCodeAt(i);
     }
-
-    // finish
-    uid += datePart + countPart;
+    uid += tagNumber.substring(0, leni);
   }
+
+  // finish
+  uid += datePart + countPart;
+
   return uid;
 }
 
@@ -983,8 +970,7 @@ export class DicomWriter {
     // ImplementationClassUID
     const icUID = getDataElement('ImplementationClassUID');
     let icUIDSize = getDataElementPrefixByteSize(icUID.vr, false);
-    const icUIDValue =
-      getUID('ImplementationClassUID').replace('-beta', '.99');
+    const icUIDValue = getImplementationClassUID();
     icUIDSize += this.#setElementValue(icUID, [icUIDValue], false);
     metaElements.push(icUID);
     metaLength += icUIDSize;
@@ -992,8 +978,7 @@ export class DicomWriter {
     // ImplementationVersionName
     const ivn = getDataElement('ImplementationVersionName');
     let ivnSize = getDataElementPrefixByteSize(ivn.vr, false);
-    const dwvVersion = getDwvVersion().replace('-beta', '.99');
-    const ivnValue = 'DWV_' + dwvVersion;
+    const ivnValue = getImplementationVersionName();
     ivnSize += this.#setElementValue(ivn, [ivnValue], false);
     metaElements.push(ivn);
     metaLength += ivnSize;
