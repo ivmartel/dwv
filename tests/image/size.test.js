@@ -183,39 +183,20 @@ QUnit.test('Index to and from offset', function (assert) {
 
   const index07 = new Index([5, 0, 0, 0]);
   assert.equal(
-    size01.indexToOffset(index07, 0, true),
-    4,
-    'indexToOffset clamp #0'
+    size01.indexToOffset(index07, 0),
+    -1,
+    'indexToOffset bounds #0'
   );
   const index08 = new Index([0, 0, 3, 2]);
   assert.equal(
-    size01.indexToOffset(index08, 2, true),
-    5,
-    'indexToOffset clamp #1'
+    size01.indexToOffset(index08, 2),
+    -1,
+    'indexToOffset bounds #1'
   );
   const index09 = new Index([0, 0, 3, 2]);
   assert.equal(
-    size01.indexToOffset(index09, 3, true),
-    1,
-    'indexToOffset clamp #2'
-  );
-
-  const index10 = new Index([5, 0, 0, 0]);
-  assert.equal(
-    size01.indexToOffset(index10, 0, false),
+    size01.indexToOffset(index09, 3),
     -1,
-    'indexToOffset no clamp #0'
-  );
-  const index11 = new Index([0, 0, 3, 2]);
-  assert.equal(
-    size01.indexToOffset(index11, 2, false),
-    -1,
-    'indexToOffset no clamp #1'
-  );
-  const index12 = new Index([0, 0, 3, 2]);
-  assert.equal(
-    size01.indexToOffset(index12, 3, false),
-    -1,
-    'indexToOffset no clamp #2'
+    'indexToOffset bounds #2'
   );
 });
