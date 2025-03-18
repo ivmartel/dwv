@@ -256,7 +256,10 @@ function getOffsetsFromIndices(geometry, indices) {
   const imageSize = geometry.getSize();
   const offsets = [];
   for (const index of indices) {
-    offsets.push(imageSize.indexToOffset(index));
+    const offset = imageSize.indexToOffset(index);
+    if (offset >= 0) {
+      offsets.push(offset);
+    }
   }
   return offsets.sort(function compareNumbers(a, b) {
     return a - b;

@@ -176,8 +176,27 @@ QUnit.test('Index to and from offset', function (assert) {
   assert.equal(size01.indexToOffset(index03, 2), 1, 'indexToOffset start #1');
   const index04 = new Index([0, 0, 0, 1]);
   assert.equal(size01.indexToOffset(index04, 2), 3, 'indexToOffset start #2');
-  const index05 = new Index([0, 0, 3, 2]);
-  assert.equal(size01.indexToOffset(index05, 2), 9, 'indexToOffset start #3');
-  const index06 = new Index([0, 0, 3, 2]);
-  assert.equal(size01.indexToOffset(index06, 3), 2, 'indexToOffset start #4');
+  const index05 = new Index([0, 0, 2, 1]);
+  assert.equal(size01.indexToOffset(index05, 2), 5, 'indexToOffset start #3');
+  const index06 = new Index([0, 0, 2, 1]);
+  assert.equal(size01.indexToOffset(index06, 3), 1, 'indexToOffset start #4');
+
+  const index07 = new Index([5, 0, 0, 0]);
+  assert.equal(
+    size01.indexToOffset(index07, 0),
+    -1,
+    'indexToOffset bounds #0'
+  );
+  const index08 = new Index([0, 0, 3, 2]);
+  assert.equal(
+    size01.indexToOffset(index08, 2),
+    -1,
+    'indexToOffset bounds #1'
+  );
+  const index09 = new Index([0, 0, 3, 2]);
+  assert.equal(
+    size01.indexToOffset(index09, 3),
+    -1,
+    'indexToOffset bounds #2'
+  );
 });
