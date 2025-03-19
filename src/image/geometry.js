@@ -470,12 +470,9 @@ export class Geometry {
     // keep >3d values
     const values = index.getValues();
     const origin = this.getOrigin();
-    values[0] = precisionRound(origin.getX() + point3D.getX(),
-      BIG_EPSILON_EXPONENT);
-    values[1] = precisionRound(origin.getY() + point3D.getY(),
-      BIG_EPSILON_EXPONENT);
-    values[2] = precisionRound(origin.getZ() + point3D.getZ(),
-      BIG_EPSILON_EXPONENT);
+    values[0] = origin.getX() + point3D.getX();
+    values[1] = origin.getY() + point3D.getY();
+    values[2] = origin.getZ() + point3D.getZ();
     // return point
     return new Point(values);
   }
@@ -518,9 +515,9 @@ export class Geometry {
     // TODO: use slice origin...
     const origin = this.getOrigin();
     const point3D = new Point3D(
-      precisionRound(point.get(0) - origin.getX(), BIG_EPSILON_EXPONENT),
-      precisionRound(point.get(1) - origin.getY(), BIG_EPSILON_EXPONENT),
-      precisionRound(point.get(2) - origin.getZ(), BIG_EPSILON_EXPONENT)
+      point.get(0) - origin.getX(),
+      point.get(1) - origin.getY(),
+      point.get(2) - origin.getZ()
     );
     // orient
     const orientedPoint3D =
@@ -528,11 +525,20 @@ export class Geometry {
     // keep >3d values
     const values = point.getValues();
     // apply spacing and floor
+    // (precisionRound to avoid float number inaccuracies)
     const spacing = this.getSpacing();
-    values[0] = Math.floor(orientedPoint3D.getX() / spacing.get(0));
-    values[1] = Math.floor(orientedPoint3D.getY() / spacing.get(1));
-    values[2] = Math.floor(orientedPoint3D.getZ() / spacing.get(2));
-
+    values[0] = Math.floor(precisionRound(
+      orientedPoint3D.getX() / spacing.get(0),
+      BIG_EPSILON_EXPONENT
+    ));
+    values[1] = Math.floor(precisionRound(
+      orientedPoint3D.getY() / spacing.get(1),
+      BIG_EPSILON_EXPONENT
+    ));
+    values[2] = Math.floor(precisionRound(
+      orientedPoint3D.getZ() / spacing.get(2),
+      BIG_EPSILON_EXPONENT
+    ));
     // return index
     return new Index(values);
   }
