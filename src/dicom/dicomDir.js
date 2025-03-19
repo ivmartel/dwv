@@ -2,6 +2,26 @@ import {DicomParser} from './dicomParser';
 import {logger} from '../utils/logger';
 
 /**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  DirectoryRecordSequence: '00041220',
+  DirectoryRecordType: '00041430',
+  ReferencedFileID: '00041500'
+};
+
+/**
+ * DICOM record types.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.3.2.2.html#table_F.3-3}.
+ */
+const DirectoryRecordTypes = {
+  study: 'STUDY',
+  series: 'SERIES',
+  image: 'IMAGE'
+};
+
+/**
  * Get the file list from a DICOMDIR.
  *
  * @param {object} data The buffer data of the DICOMDIR.
@@ -12,15 +32,25 @@ export function getFileListFromDicomDir(data) {
   // parse file
   const parser = new DicomParser();
   parser.parse(data);
-  const elements = parser.getDicomElements();
+  return getDicomDirFileList(parser.getDicomElements());
+}
 
+/**
+ * Get a DICOMDIR file list.
+ *
+ * @param {Object<string, DataElement>} dicomElements The dicom elements.
+ * @returns {Array|undefined} The file list as an array ordered by
+ *   STUDY > SERIES > IMAGES.
+ */
+function getDicomDirFileList(dicomElements) {
   // Directory Record Sequence
-  if (typeof elements['00041220'] === 'undefined' ||
-    typeof elements['00041220'].value === 'undefined') {
+  const dirRecSqElement = dicomElements[TagKeys.DirectoryRecordSequence];
+  if (typeof dirRecSqElement === 'undefined' ||
+    typeof dirRecSqElement.value === 'undefined') {
     logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return undefined;
   }
-  const dirSeq = elements['00041220'].value;
+  const dirSeq = dirRecSqElement.value;
 
   if (dirSeq.length === 0) {
     logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
@@ -32,26 +62,28 @@ export function getFileListFromDicomDir(data) {
   let study = null;
   for (let i = 0; i < dirSeq.length; ++i) {
     // Directory Record Type
-    if (typeof dirSeq[i]['00041430'] === 'undefined' ||
-      typeof dirSeq[i]['00041430'].value === 'undefined') {
+    const dirRecTypeElement = dirSeq[i][TagKeys.DirectoryRecordType];
+    if (typeof dirRecTypeElement === 'undefined' ||
+      typeof dirRecTypeElement.value === 'undefined') {
       continue;
     }
-    const recType = dirSeq[i]['00041430'].value[0];
+    const recType = dirRecTypeElement.value[0];
 
     // supposed to come in order...
-    if (recType === 'STUDY') {
+    if (recType === DirectoryRecordTypes.study) {
       study = [];
       records.push(study);
-    } else if (recType === 'SERIES') {
+    } else if (recType === DirectoryRecordTypes.series) {
       series = [];
       study.push(series);
-    } else if (recType === 'IMAGE') {
+    } else if (recType === DirectoryRecordTypes.image) {
       // Referenced File ID
-      if (typeof dirSeq[i]['00041500'] === 'undefined' ||
-        typeof dirSeq[i]['00041500'].value === 'undefined') {
+      const refFileIdElement = dirSeq[i][TagKeys.ReferencedFileID];
+      if (typeof refFileIdElement === 'undefined' ||
+        typeof refFileIdElement.value === 'undefined') {
         continue;
       }
-      const refFileIds = dirSeq[i]['00041500'].value;
+      const refFileIds = refFileIdElement.value;
       // join ids
       series.push(refFileIds.join('/'));
     }
