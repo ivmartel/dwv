@@ -18,8 +18,8 @@ import {
   getPhotometricInterpretation,
   isMonochrome
 } from '../dicom/dicomImage';
+import {getTagTime} from '../dicom/dicomDate';
 import {
-  getTagTime,
   isSecondatyCapture,
   getSopClassUid
 } from '../dicom/dicomElementsWrapper';

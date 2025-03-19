@@ -1,4 +1,3 @@
-import {custom} from '../app/custom';
 import {
   DicomParser,
   getTransferSyntaxName
@@ -355,21 +354,6 @@ function getElementAsString(tag, dicomElement, prefix) {
   }
 
   return prefix + line;
-}
-
-/**
- * Get the time from a list of tags. Defaults
- *   does nohting.
- *
- * @param {DataElements} elements The DICOM elements.
- * @returns {number|undefined} The time value if available.
- */
-export function getTagTime(elements) {
-  if (typeof custom.getTagTime !== 'undefined') {
-    return custom.getTagTime(elements);
-  } else {
-    return;
-  }
 }
 
 /**
