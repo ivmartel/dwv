@@ -5,10 +5,14 @@ import {
 } from './dicomDate';
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from './dataElement';
+/* eslint-enable no-unused-vars */
 /**
  * Check an input tag.
  *
- * @param {object} element The element to check.
+ * @param {DataElement} element The element to check.
  * @param {string} name The element name.
  * @param {Array} [values] The expected values.
  * @returns {string} A warning if the element is not as expected.
@@ -36,7 +40,7 @@ function checkTag(element, name, values) {
 /**
  * Get the decayed dose (Bq).
  *
- * @param {object} elements The DICOM elements to check.
+ * @param {Object<string, DataElement>} elements The DICOM elements to check.
  * @returns {object} The value and a warning if
  *   the elements are not as expected.
  */
@@ -229,7 +233,7 @@ function getDecayedDose(elements) {
  * - {@link https://qibawiki.rsna.org/images/6/62/SUV_vendorneutral_pseudocode_happypathonly_20180626_DAC.pdf},
  * - {@link https://qibawiki.rsna.org/images/8/86/SUV_vendorneutral_pseudocode_20180626_DAC.pdf}.
  *
- * @param {object} elements The DICOM elements.
+ * @param {Object<string, DataElement>} elements The DICOM elements.
  * @returns {object} The value and a warning if
  *   the elements are not as expected.
  */
