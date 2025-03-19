@@ -15,6 +15,27 @@ import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
 
 /**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  TransferSyntax: '00020010',
+  SOPClassUID: '00080016',
+  Modality: '00080060',
+  Rows: '00280010',
+  Columns: '00280011',
+  PixelSpacing: '00280030',
+  ImagerPixelSpacing: '00181164',
+  NominalScannedPixelSpacing: '00182010',
+  PixelAspectRatio: '00280034',
+  SpacingBetweenSlices: '00180088',
+  RescaleType: '00281054',
+  Units: '00541001',
+  ImageOrientationPatient: '00200037',
+  PhotometricInterpretation: '00280004',
+  SamplesPerPixel: '00280002'
+};
+
+/**
  * Extract the 2D size from dicom elements.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
@@ -22,7 +43,7 @@ import {DataElement} from './dataElement';
  */
 export function getImage2DSize(elements) {
   // rows
-  const rows = elements['00280010'];
+  const rows = elements[TagKeys.Rows];
   if (typeof rows === 'undefined') {
     throw new Error('Missing DICOM image number of rows');
   }
@@ -30,7 +51,7 @@ export function getImage2DSize(elements) {
     throw new Error('Empty DICOM image number of rows');
   }
   // columns
-  const columns = elements['00280011'];
+  const columns = elements[TagKeys.Columns];
   if (typeof columns === 'undefined') {
     throw new Error('Missing DICOM image number of columns');
   }
@@ -50,13 +71,15 @@ export function getPixelSpacing(elements) {
   let rowSpacing;
   let columnSpacing;
 
-  // 1. PixelSpacing
-  // 2. ImagerPixelSpacing
-  // 3. NominalScannedPixelSpacing
-  // 4. PixelAspectRatio
-  const keys = ['00280030', '00181164', '00182010', '00280034'];
-  for (let k = 0; k < keys.length; ++k) {
-    const spacing = elements[keys[k]];
+  const tags = [
+    'PixelSpacing',
+    'ImagerPixelSpacing',
+    'NominalScannedPixelSpacing',
+    'PixelAspectRatio'
+  ];
+  for (const tag of tags) {
+    const key = TagKeys[tag];
+    const spacing = elements[key];
     if (spacing && spacing.value.length === 2) {
       // spacing order: [row, column]
       rowSpacing = parseFloat(spacing.value[0]);
@@ -94,18 +117,19 @@ export function getPixelSpacing(elements) {
  */
 export function getSpacingFromMeasure(dataElements) {
   // Pixel Spacing
-  if (typeof dataElements['00280030'] === 'undefined') {
+  if (typeof dataElements[TagKeys.PixelSpacing] === 'undefined') {
     return null;
   }
-  const pixelSpacing = dataElements['00280030'];
+  const pixelSpacing = dataElements[TagKeys.PixelSpacing];
   // spacing order: [row, column]
   const spacingValues = [
     parseFloat(pixelSpacing.value[1]),
     parseFloat(pixelSpacing.value[0]),
   ];
   // Spacing Between Slices
-  if (typeof dataElements['00180088'] !== 'undefined') {
-    spacingValues.push(parseFloat(dataElements['00180088'].value[0]));
+  const element = dataElements[TagKeys.SpacingBetweenSlices];
+  if (typeof element !== 'undefined') {
+    spacingValues.push(parseFloat(element.value[0]));
   }
   return new Spacing(spacingValues);
 }
@@ -132,11 +156,10 @@ export function getTagPixelUnit(elements) {
  */
 function defaultGetTagPixelUnit(elements) {
   let unit;
-  // 1. RescaleType
-  // 2. Units (for PET)
-  const keys = ['00281054', '00541001'];
-  for (let i = 0; i < keys.length; ++i) {
-    const element = elements[keys[i]];
+  const tags = ['RescaleType', 'Units'];
+  for (const tag of tags) {
+    const key = TagKeys[tag];
+    const element = elements[key];
     if (typeof element !== 'undefined') {
       unit = element.value[0];
       break;
@@ -144,7 +167,7 @@ function defaultGetTagPixelUnit(elements) {
   }
   // default rescale type for CT
   if (typeof unit === 'undefined') {
-    const element = elements['00080060'];
+    const element = elements[TagKeys.Modality];
     if (typeof element !== 'undefined') {
       const modality = element.value[0];
       if (modality === 'CT') {
@@ -162,7 +185,7 @@ function defaultGetTagPixelUnit(elements) {
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationMatrix(dataElements) {
-  const imageOrientationPatient = dataElements['00200037'];
+  const imageOrientationPatient = dataElements[TagKeys.ImageOrientationPatient];
   let orientationMatrix;
   // slice orientation (cosines are matrices' columns)
   // http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
@@ -214,9 +237,10 @@ export function getDicomPlaneOrientationItem(orientation) {
  * @returns {string|undefined} The photometric interpretation value.
  */
 export function getPhotometricInterpretation(dataElements) {
-  const photometricInterpretation = dataElements['00280004'];
-  const syntaxElement = dataElements['00020010'];
-  const spp = dataElements['00280002'];
+  const photometricInterpretation =
+    dataElements[TagKeys.PhotometricInterpretation];
+  const syntaxElement = dataElements[TagKeys.TransferSyntax];
+  const spp = dataElements[TagKeys.SamplesPerPixel];
   // samplesPerPixel
   let samplesPerPixel = 1;
   if (typeof spp !== 'undefined') {
@@ -262,7 +286,7 @@ export function isMonochrome(photometricInterpretation) {
  * @returns {string|undefined} The sop class uid value.
  */
 export function getSopClassUid(dataElements) {
-  const SOPClassUID = dataElements['00080016'];
+  const SOPClassUID = dataElements[TagKeys.SOPClassUID];
   if (typeof SOPClassUID !== 'undefined') {
     return SOPClassUID.value[0];
   }
