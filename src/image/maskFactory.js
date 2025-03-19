@@ -8,7 +8,6 @@ import {safeGet} from '../dicom/dataElement';
 import {
   getImage2DSize,
   getSpacingFromMeasure,
-  getDimensionOrganization,
   getDicomMeasureItem,
   getDicomPlaneOrientationItem
 } from '../dicom/dicomElementsWrapper';
@@ -20,7 +19,8 @@ import {
 } from '../dicom/dicomSegment';
 import {
   getSegmentFrameInfo,
-  getDicomSegmentFrameInfoItem
+  getDicomSegmentFrameInfoItem,
+  getDimensionOrganization,
 } from '../dicom/dicomSegmentFrameInfo';
 import {transferSyntaxKeywords} from '../dicom/dictionary';
 import {Image} from '../image/image';
