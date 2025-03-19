@@ -1,6 +1,11 @@
 import {DicomParser} from './dicomParser';
 import {logger} from '../utils/logger';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from './dataElement';
+/* eslint-enable no-unused-vars */
+
 /**
  * Related DICOM tag keys.
  */
