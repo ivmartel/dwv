@@ -4,6 +4,7 @@ import {
   isJpegBaselineTransferSyntax,
   isJpegLosslessTransferSyntax
 } from './dicomParser';
+import {safeGet, safeGetAll} from './dataElement';
 import {getOrientationFromCosines} from '../math/orientation';
 import {Spacing} from '../image/spacing';
 import {logger} from '../utils/logger';
@@ -78,12 +79,12 @@ export function getPixelSpacing(elements) {
     'PixelAspectRatio'
   ];
   for (const tag of tags) {
-    const key = TagKeys[tag];
-    const spacing = elements[key];
-    if (spacing && spacing.value.length === 2) {
+    const spacing = safeGetAll(elements, TagKeys[tag]);
+    if (typeof spacing !== 'undefined' &&
+      spacing.length === 2) {
       // spacing order: [row, column]
-      rowSpacing = parseFloat(spacing.value[0]);
-      columnSpacing = parseFloat(spacing.value[1]);
+      rowSpacing = parseFloat(spacing[0]);
+      columnSpacing = parseFloat(spacing[1]);
       break;
     }
   }
@@ -113,23 +114,25 @@ export function getPixelSpacing(elements) {
  * Get a spacing object from a dicom measure element.
  *
  * @param {Object<string, DataElement>} dataElements The dicom element.
- * @returns {Spacing} A spacing object.
+ * @returns {Spacing|undefined} A spacing object.
  */
 export function getSpacingFromMeasure(dataElements) {
   // Pixel Spacing
-  if (typeof dataElements[TagKeys.PixelSpacing] === 'undefined') {
-    return null;
+  const pixelSpacing = safeGetAll(dataElements, TagKeys.PixelSpacing);
+  if (typeof pixelSpacing === 'undefined' ||
+    pixelSpacing.length !== 2
+  ) {
+    return undefined;
   }
-  const pixelSpacing = dataElements[TagKeys.PixelSpacing];
   // spacing order: [row, column]
   const spacingValues = [
-    parseFloat(pixelSpacing.value[1]),
-    parseFloat(pixelSpacing.value[0]),
+    parseFloat(pixelSpacing[1]),
+    parseFloat(pixelSpacing[0]),
   ];
   // Spacing Between Slices
-  const element = dataElements[TagKeys.SpacingBetweenSlices];
-  if (typeof element !== 'undefined') {
-    spacingValues.push(parseFloat(element.value[0]));
+  const sbs = safeGet(dataElements, TagKeys.SpacingBetweenSlices);
+  if (typeof sbs !== 'undefined') {
+    spacingValues.push(parseFloat(sbs));
   }
   return new Spacing(spacingValues);
 }
@@ -158,21 +161,16 @@ function defaultGetTagPixelUnit(elements) {
   let unit;
   const tags = ['RescaleType', 'Units'];
   for (const tag of tags) {
-    const key = TagKeys[tag];
-    const element = elements[key];
-    if (typeof element !== 'undefined') {
-      unit = element.value[0];
+    const unit = safeGet(elements, TagKeys[tag]);
+    if (typeof unit !== 'undefined') {
       break;
     }
   }
   // default rescale type for CT
   if (typeof unit === 'undefined') {
-    const element = elements[TagKeys.Modality];
-    if (typeof element !== 'undefined') {
-      const modality = element.value[0];
-      if (modality === 'CT') {
-        unit = 'HU';
-      }
+    const modality = safeGet(elements, TagKeys.Modality);
+    if (typeof modality !== 'undefined' && modality === 'CT') {
+      unit = 'HU';
     }
   }
   return unit;
@@ -185,14 +183,15 @@ function defaultGetTagPixelUnit(elements) {
  * @returns {Matrix33|undefined} The orientation matrix.
  */
 export function getOrientationMatrix(dataElements) {
-  const imageOrientationPatient = dataElements[TagKeys.ImageOrientationPatient];
+  const imageOrientationPatient =
+    safeGetAll(dataElements, TagKeys.ImageOrientationPatient);
   let orientationMatrix;
   // slice orientation (cosines are matrices' columns)
   // http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   if (typeof imageOrientationPatient !== 'undefined') {
     orientationMatrix =
       getOrientationFromCosines(
-        imageOrientationPatient.value.map((item) => parseFloat(item))
+        imageOrientationPatient.map((item) => parseFloat(item))
       );
   }
   return orientationMatrix;
@@ -238,27 +237,25 @@ export function getDicomPlaneOrientationItem(orientation) {
  */
 export function getPhotometricInterpretation(dataElements) {
   const photometricInterpretation =
-    dataElements[TagKeys.PhotometricInterpretation];
-  const syntaxElement = dataElements[TagKeys.TransferSyntax];
-  const spp = dataElements[TagKeys.SamplesPerPixel];
-  // samplesPerPixel
-  let samplesPerPixel = 1;
-  if (typeof spp !== 'undefined') {
-    samplesPerPixel = spp.value[0];
-  }
+    safeGet(dataElements, TagKeys.PhotometricInterpretation);
+  const transferSyntax = safeGet(dataElements, TagKeys.TransferSyntax);
 
   if (typeof photometricInterpretation !== 'undefined' &&
-  typeof syntaxElement !== 'undefined') {
-    let photo = photometricInterpretation.value[0].toUpperCase();
+    typeof transferSyntax !== 'undefined') {
+    let photo = photometricInterpretation.toUpperCase();
     // TransferSyntaxUID
-    const syntax = syntaxElement.value[0];
-    const jpeg2000 = isJpeg2000TransferSyntax(syntax);
-    const jpegBase = isJpegBaselineTransferSyntax(syntax);
-    const jpegLoss = isJpegLosslessTransferSyntax(syntax);
+    const jpeg2000 = isJpeg2000TransferSyntax(transferSyntax);
+    const jpegBase = isJpegBaselineTransferSyntax(transferSyntax);
+    const jpegLoss = isJpegLosslessTransferSyntax(transferSyntax);
     // jpeg decoders output RGB data
     if ((jpeg2000 || jpegBase || jpegLoss) &&
       (photo !== 'MONOCHROME1' && photo !== 'MONOCHROME2')) {
       photo = 'RGB';
+    }
+    // samplesPerPixel
+    let samplesPerPixel = safeGet(dataElements, TagKeys.SamplesPerPixel);
+    if (typeof samplesPerPixel === 'undefined') {
+      samplesPerPixel = 1;
     }
     // check samples per pixels
     if (photo === 'RGB' && samplesPerPixel === 1) {
@@ -282,15 +279,11 @@ export function isMonochrome(photometricInterpretation) {
 /**
  * Gets the sop class uid from the data elements.
  *
- * @param {Object<string, DataElement>} dataElements The data elements. *.
+ * @param {Object<string, DataElement>} dataElements The data elements.
  * @returns {string|undefined} The sop class uid value.
  */
 export function getSopClassUid(dataElements) {
-  const SOPClassUID = dataElements[TagKeys.SOPClassUID];
-  if (typeof SOPClassUID !== 'undefined') {
-    return SOPClassUID.value[0];
-  }
-  return;
+  return safeGet(dataElements, TagKeys.SOPClassUI);
 }
 
 /**
@@ -301,5 +294,6 @@ export function getSopClassUid(dataElements) {
  */
 export function isSecondatyCapture(SOPClassUID) {
   const pattern = /^1\.2\.840\.10008\.5\.1\.4\.1\.1\.7/;
-  return !SOPClassUID && pattern.test(SOPClassUID);
+  return typeof SOPClassUID !== 'undefined' &&
+    pattern.test(SOPClassUID);
 }
