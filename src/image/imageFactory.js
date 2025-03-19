@@ -15,13 +15,13 @@ import {
   getPixelSpacing,
   getTagPixelUnit,
   getTagTime,
-  getSuvFactor,
   getOrientationMatrix,
   isSecondatyCapture,
   getPhotometricInterpretation,
   getSopClassUid,
   isMonochrome
 } from '../dicom/dicomElementsWrapper';
+import {getSuvFactor} from '../dicom/dicomPet';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';
 
