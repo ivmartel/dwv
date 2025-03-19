@@ -1,7 +1,4 @@
-import {
-  DicomParser,
-  getTransferSyntaxName
-} from './dicomParser';
+import {getTransferSyntaxName} from './dicomParser';
 import {
   getDate,
   getTime
@@ -17,17 +14,12 @@ import {
   getTagFromKey
 } from './dicomTag';
 import {isNativeLittleEndian} from './dataReader';
-import {logger} from '../utils/logger';
 
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Tag} from './dicomTag';
 import {DataElement} from './dataElement';
 /* eslint-enable no-unused-vars */
-
-/**
- * @typedef {Object<string, DataElement>} DataElements
- */
 
 /**
  * Dump the DICOM tags to a string in the same way as the
@@ -72,7 +64,7 @@ export function dcmdump(dicomElements) {
  * Get a data element value as a string.
  *
  * @param {Tag} tag The DICOM tag.
- * @param {object} dicomElement The DICOM element.
+ * @param {DataElement} dicomElement The DICOM element.
  * @param {boolean} [pretty] When set to true, returns a 'pretified' content.
  * @returns {string} A string representation of the DICOM element.
  */
@@ -159,7 +151,7 @@ function getElementValueAsString(tag, dicomElement, pretty) {
  * Get a data element as a string.
  *
  * @param {Tag} tag The DICOM tag.
- * @param {object} dicomElement The DICOM element.
+ * @param {DataElement} dicomElement The DICOM element.
  * @param {string} [prefix] A string to prepend this one.
  * @returns {string} The element as a string.
  */
@@ -354,62 +346,4 @@ function getElementAsString(tag, dicomElement, prefix) {
   }
 
   return prefix + line;
-}
-
-/**
- * Get the file list from a DICOMDIR.
- *
- * @param {object} data The buffer data of the DICOMDIR.
- * @returns {Array|undefined} The file list as an array ordered by
- *   STUDY > SERIES > IMAGES.
- */
-export function getFileListFromDicomDir(data) {
-  // parse file
-  const parser = new DicomParser();
-  parser.parse(data);
-  const elements = parser.getDicomElements();
-
-  // Directory Record Sequence
-  if (typeof elements['00041220'] === 'undefined' ||
-    typeof elements['00041220'].value === 'undefined') {
-    logger.warn('No Directory Record Sequence found in DICOMDIR.');
-    return undefined;
-  }
-  const dirSeq = elements['00041220'].value;
-
-  if (dirSeq.length === 0) {
-    logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
-    return undefined;
-  }
-
-  const records = [];
-  let series = null;
-  let study = null;
-  for (let i = 0; i < dirSeq.length; ++i) {
-    // Directory Record Type
-    if (typeof dirSeq[i]['00041430'] === 'undefined' ||
-      typeof dirSeq[i]['00041430'].value === 'undefined') {
-      continue;
-    }
-    const recType = dirSeq[i]['00041430'].value[0];
-
-    // supposed to come in order...
-    if (recType === 'STUDY') {
-      study = [];
-      records.push(study);
-    } else if (recType === 'SERIES') {
-      series = [];
-      study.push(series);
-    } else if (recType === 'IMAGE') {
-      // Referenced File ID
-      if (typeof dirSeq[i]['00041500'] === 'undefined' ||
-        typeof dirSeq[i]['00041500'].value === 'undefined') {
-        continue;
-      }
-      const refFileIds = dirSeq[i]['00041500'].value;
-      // join ids
-      series.push(refFileIds.join('/'));
-    }
-  }
-  return records;
 }

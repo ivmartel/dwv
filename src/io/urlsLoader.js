@@ -1,6 +1,6 @@
 import {endsWith, getRootPath} from '../utils/string';
 import {MultiProgressHandler} from '../utils/progress';
-import {getFileListFromDicomDir} from '../dicom/dicomElementsWrapper';
+import {getFileListFromDicomDir} from '../dicom/dicomDir';
 import {loaderList} from './loaderList';
 
 // url content types

@@ -13,7 +13,7 @@ import {
   Tag,
   getPixelDataTag
 } from '../../src/dicom/dicomTag';
-import {getFileListFromDicomDir} from '../../src/dicom/dicomElementsWrapper';
+import {getFileListFromDicomDir} from '../../src/dicom/dicomDir';
 import {b64urlToArrayBuffer} from './utils';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm';
