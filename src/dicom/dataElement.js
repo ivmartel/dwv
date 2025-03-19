@@ -119,3 +119,36 @@ export function safeGetAll(dataElements, key) {
   }
   return res;
 };
+
+/**
+ * Check a DICOM data element: checks
+ * - if the element is not undefined,
+ * - if the elements' value is not undefined,
+ * - if the elements' value is not empty,
+ * - (optional) if the elements' values have specific values.
+ *
+ * @param {DataElement} element The element to check.
+ * @param {string} name The element name.
+ * @param {Array} [values] Optional list of expected values.
+ * @returns {string} A warning if the element is not as expected.
+ */
+export function checkDataElement(element, name, values) {
+  let warning = '';
+  if (typeof element === 'undefined') {
+    warning += ' ' + name + ' is undefined,';
+  } else if (typeof element.value === 'undefined') {
+    warning += ' ' + name + ' has undefined value,';
+  } else if (element.value.length === 0) {
+    warning += ' ' + name + ' is empty,';
+  } else {
+    if (typeof values !== 'undefined') {
+      for (let i = 0; i < values.length; ++i) {
+        if (!element.value.includes(values[i])) {
+          warning += ' ' + name + ' does not contain ' + values[i] +
+            ' (value: ' + element.value + '),';
+        }
+      }
+    }
+  }
+  return warning;
+}

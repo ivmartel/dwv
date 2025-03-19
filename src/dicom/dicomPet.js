@@ -3,6 +3,7 @@ import {
   getTime,
   getDateTime
 } from './dicomDate';
+import {checkDataElement} from './dataElement';
 import {logger} from '../utils/logger';
 
 // doc imports
@@ -32,33 +33,6 @@ const TagKeys = {
 };
 
 /**
- * Check an input tag.
- *
- * @param {DataElement} element The element to check.
- * @param {string} name The element name.
- * @param {Array} [values] Optional list of expected values.
- * @returns {string} A warning if the element is not as expected.
- */
-function checkTag(element, name, values) {
-  let warning = '';
-  if (typeof element === 'undefined') {
-    warning += ' ' + name + ' is undefined,';
-  } else if (element.value.length === 0) {
-    warning += ' ' + name + ' is empty,';
-  } else {
-    if (typeof values !== 'undefined') {
-      for (let i = 0; i < values.length; ++i) {
-        if (!element.value.includes(values[i])) {
-          warning += ' ' + name + ' does not contain ' + values[i] +
-            ' (value: ' + element.value + '),';
-        }
-      }
-    }
-  }
-  return warning;
-}
-
-/**
  * Get the decayed dose (Bq).
  *
  * @param {Object<string, DataElement>} elements The DICOM elements to check.
@@ -79,7 +53,7 @@ function getDecayedDose(elements) {
 
   const radioInfoSqStr = 'RadiopharmaceuticalInformationSequence (00540016)';
   const radioInfoSq = elements[TagKeys.RadiopharmaceuticalInformationSequence];
-  warning += checkTag(radioInfoSq, radioInfoSqStr);
+  warning += checkDataElement(radioInfoSq, radioInfoSqStr);
   if (typeof radioInfoSq !== 'undefined') {
     if (radioInfoSq.value.length !== 1) {
       logger.warn(
@@ -90,7 +64,7 @@ function getDecayedDose(elements) {
     // RadionuclideTotalDose (type3, Bq)
     const totalDoseStr = 'RadionuclideTotalDose (00181074)';
     const totalDoseEl = radioInfoSq.value[0][TagKeys.RadionuclideTotalDose];
-    warn = checkTag(totalDoseEl, totalDoseStr);
+    warn = checkDataElement(totalDoseEl, totalDoseStr);
     if (warn.length === 0) {
       const dose = parseFloat(totalDoseEl.value[0]);
       if (!isNaN(dose)) {
@@ -105,7 +79,7 @@ function getDecayedDose(elements) {
     // RadionuclideHalfLife (type3, seconds)
     const halfLifeStr = 'RadionuclideHalfLife (00181075)';
     const halfLifeEl = radioInfoSq.value[0][TagKeys.RadionuclideHalfLife];
-    warn = checkTag(halfLifeEl, halfLifeStr);
+    warn = checkDataElement(halfLifeEl, halfLifeStr);
     if (warn.length === 0) {
       const hl = parseFloat(halfLifeEl.value[0]);
       if (!isNaN(hl)) {
@@ -195,14 +169,15 @@ function getDecayedDose(elements) {
       let frameRefTime = 0;
       const frameRefTimeElStr = 'FrameReferenceTime (00541300)';
       const frameRefTimeEl = elements[TagKeys.FrameReferenceTime];
-      warning += checkTag(frameRefTimeEl, frameRefTimeElStr);
+      warning += checkDataElement(frameRefTimeEl, frameRefTimeElStr);
       if (typeof frameRefTimeEl !== 'undefined') {
         frameRefTime = frameRefTimeEl.value[0];
       }
       let actualFrameDuration = 0;
       const actualFrameDurationElStr = 'ActualFrameDuration (00181242)';
       const actualFrameDurationEl = elements[TagKeys.ActualFrameDuration];
-      warning += checkTag(actualFrameDurationEl, actualFrameDurationElStr);
+      warning += checkDataElement(
+        actualFrameDurationEl, actualFrameDurationElStr);
       if (typeof actualFrameDurationEl !== 'undefined') {
         actualFrameDuration = actualFrameDurationEl.value[0];
       }
@@ -268,21 +243,21 @@ export function getSuvFactor(elements) {
   // CorrectedImage (type2): must contain ATTN and DECY
   const corrImageTagStr = 'Corrected Image (00280051)';
   const corrImageEl = elements[TagKeys.CorrectedImage];
-  warning += checkTag(corrImageEl, corrImageTagStr, ['ATTN', 'DECY']);
+  warning += checkDataElement(corrImageEl, corrImageTagStr, ['ATTN', 'DECY']);
   // DecayCorrection (type1): must be START
   const decayCorrTagStr = 'Decay Correction (00541102)';
   const decayCorrEl = elements[TagKeys.DecayCorrection];
-  warning += checkTag(decayCorrEl, decayCorrTagStr, ['START']);
+  warning += checkDataElement(decayCorrEl, decayCorrTagStr, ['START']);
   // Units (type1): must be BQML
   const unitTagStr = 'Units (00541001)';
   const unitEl = elements[TagKeys.Units];
-  warning += checkTag(unitEl, unitTagStr, ['BQML']);
+  warning += checkDataElement(unitEl, unitTagStr, ['BQML']);
 
   // PatientWeight (type3, kg)
   let patWeight;
   const patientWeightStr = ' PatientWeight (00101030)';
   const patWeightEl = elements[TagKeys.PatientWeight];
-  const warn = checkTag(patWeightEl, patientWeightStr);
+  const warn = checkDataElement(patWeightEl, patientWeightStr);
   if (warn.length === 0) {
     const weight = parseFloat(patWeightEl.value[0]);
     if (!isNaN(weight)) {
