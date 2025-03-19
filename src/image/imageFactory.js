@@ -16,13 +16,11 @@ import {
   getTagPixelUnit,
   getOrientationMatrix,
   getPhotometricInterpretation,
-  isMonochrome
-} from '../dicom/dicomImage';
-import {getTagTime} from '../dicom/dicomDate';
-import {
+  isMonochrome,
   isSecondatyCapture,
   getSopClassUid
-} from '../dicom/dicomElementsWrapper';
+} from '../dicom/dicomImage';
+import {getTagTime} from '../dicom/dicomDate';
 import {getSuvFactor} from '../dicom/dicomPet';
 import {Point3D} from '../math/point';
 import {logger} from '../utils/logger';

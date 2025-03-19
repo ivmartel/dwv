@@ -357,31 +357,6 @@ function getElementAsString(tag, dicomElement, prefix) {
 }
 
 /**
- * Gets the sop class uid from the data elements.
- *
- * @param {object} dataElements The data elements. *.
- * @returns {string | undefined} The sop class uid value.
- */
-export function getSopClassUid(dataElements) {
-  const SOPClassUID = dataElements['00080016'];
-  if (typeof SOPClassUID !== 'undefined') {
-    return SOPClassUID.value[0];
-  }
-  return;
-}
-
-/**
- * Check if the received string represents a secondary capture.
- *
- * @param {string} SOPClassUID The sop class uid.
- * @returns {boolean} True if it is secondary capture.
- */
-export function isSecondatyCapture(SOPClassUID) {
-  const pattern = /^1\.2\.840\.10008\.5\.1\.4\.1\.1\.7/;
-  return !SOPClassUID && pattern.test(SOPClassUID);
-}
-
-/**
  * Get the file list from a DICOMDIR.
  *
  * @param {object} data The buffer data of the DICOMDIR.
