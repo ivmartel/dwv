@@ -76,16 +76,31 @@ export class DataElement {
 }
 
 /**
+ * Check an input data element, returns true if:
+ * - the element is not undefined,
+ * - the elements' value is not undefined,
+ * - the elements' value has content.
+ *
+ * @param {DataElement} element The data element.
+ * @returns {boolean} True if there is a value.
+ */
+function hasValue(element) {
+  return typeof element !== 'undefined' &&
+    typeof element.value !== 'undefined' &&
+    element.value.length !== 0;
+}
+
+/**
  * Safely get an elements' first value from a list of elements.
  *
- * @param {Object<string, DataElement>} tags The list of tags.
+ * @param {Object<string, DataElement>} dataElements A list of data elements.
  * @param {string} key The tag key as for example '00100020'.
  * @returns {any|undefined} The elements' value or undefined.
  */
-export function safeGet(tags, key) {
+export function safeGet(dataElements, key) {
   let res;
-  if (typeof tags[key] !== 'undefined') {
-    res = tags[key].value[0];
+  if (hasValue(dataElements[key])) {
+    res = dataElements[key].value[0];
   }
   return res;
 };
@@ -93,14 +108,14 @@ export function safeGet(tags, key) {
 /**
  * Safely get all of an elements' values from a list of elements.
  *
- * @param {Object<string, DataElement>} tags The list of tags.
+ * @param {Object<string, DataElement>} dataElements A list of data elements.
  * @param {string} key The tag key as for example '00100020'.
  * @returns {any[]|undefined} The elements' values or undefined.
  */
-export function safeGetAll(tags, key) {
+export function safeGetAll(dataElements, key) {
   let res;
-  if (typeof tags[key] !== 'undefined') {
-    res = tags[key].value;
+  if (hasValue(dataElements[key])) {
+    res = dataElements[key].value;
   }
   return res;
 };
