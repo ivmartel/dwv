@@ -8,7 +8,7 @@ import {valueRange} from './iterator';
 import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
-import {isMonochrome} from '../dicom/dicomElementsWrapper';
+import {isMonochrome} from '../dicom/dicomImage';
 
 // doc imports
 /* eslint-disable no-unused-vars */

@@ -1,4 +1,4 @@
-import {getSpacingFromMeasure} from './dicomElementsWrapper';
+import {getSpacingFromMeasure} from './dicomImage';
 import {logger} from '../utils/logger';
 import {arrayEquals} from '../utils/array';
 import {

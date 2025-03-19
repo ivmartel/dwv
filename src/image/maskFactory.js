@@ -10,7 +10,7 @@ import {
   getSpacingFromMeasure,
   getDicomMeasureItem,
   getDicomPlaneOrientationItem
-} from '../dicom/dicomElementsWrapper';
+} from '../dicom/dicomImage';
 import {Tag} from '../dicom/dicomTag';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {

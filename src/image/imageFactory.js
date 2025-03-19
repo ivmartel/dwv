@@ -14,12 +14,14 @@ import {
   getImage2DSize,
   getPixelSpacing,
   getTagPixelUnit,
-  getTagTime,
   getOrientationMatrix,
-  isSecondatyCapture,
   getPhotometricInterpretation,
-  getSopClassUid,
   isMonochrome
+} from '../dicom/dicomImage';
+import {
+  getTagTime,
+  isSecondatyCapture,
+  getSopClassUid
 } from '../dicom/dicomElementsWrapper';
 import {getSuvFactor} from '../dicom/dicomPet';
 import {Point3D} from '../math/point';
