@@ -4,7 +4,10 @@ import {
   dateToTimeObj,
   getDicomTime,
 } from '../dicom/dicomDate';
-import {safeGet} from '../dicom/dataElement';
+import {
+  safeGet,
+  safeGetAll
+} from '../dicom/dataElement';
 import {
   getImage2DSize,
   getSpacingFromMeasure,
@@ -43,6 +46,37 @@ import {MaskSegment} from '../dicom/dicomSegment';
 /**
  * @typedef {Object<string, DataElement>} DataElements
  */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  NumberOfFrames: '00280008',
+  SegmentSequence: '00620002',
+  SharedFunctionalGroupsSequence: '52009229',
+  PlaneOrientationSequence: '00209116',
+  ImageOrientationPatient: '00200037',
+  PixelMeasuresSequence: '00289110',
+  PerFrameFunctionalGroupsSequence: '52009230',
+  StudyDate: '00080020',
+  StudyTime: '00080030',
+  StudyInstanceUID: '0020000D',
+  StudyID: '00200010',
+  SeriesDate: '00080021',
+  SeriesTime: '00080031',
+  SeriesInstanceUID: '0020000E',
+  SeriesNumber: '00200011',
+  ReferringPhysicianName: '00080090',
+  PatientName: '00100010',
+  PatientID: '00100020',
+  PatientBirthDate: '00100030',
+  PatientSex: '00100040',
+  Manufacturer: '00080070',
+  ManufacturerModelName: '00081090',
+  DeviceSerialNumber: '00181000',
+  SoftwareVersions: '00181020',
+  LossyImageCompression: '00282110'
+};
 
 /**
  * Check two position patients for equality.
@@ -352,6 +386,14 @@ export class MaskFactory {
    * @throws Error for missing or wrong data.
    */
   create(dataElements, pixelBuffer) {
+    // safe get shortcuts
+    const safeGetLocal = function (key) {
+      return safeGet(dataElements, key);
+    };
+    const safeGetAllLocal = function (key) {
+      return safeGetAll(dataElements, key);
+    };
+
     // check required and supported tags
     for (let d = 0; d < RequiredDicomSegTags.length; ++d) {
       checkTag(dataElements, RequiredDicomSegTags[d]);
@@ -363,24 +405,25 @@ export class MaskFactory {
 
     const sliceSize = size.getTotalSize();
 
-    // frames
-    let frames = 1;
-    const framesElem = dataElements['00280008'];
-    if (typeof framesElem !== 'undefined') {
-      frames = parseInt(framesElem.value[0], 10);
+    // NumberOfFrames
+    let numberOfFrames = safeGetLocal(TagKeys.NumberOfFrames);
+    if (typeof numberOfFrames !== 'undefined') {
+      numberOfFrames = parseInt(numberOfFrames, 10);
+    } else {
+      numberOfFrames = 1;
     }
 
-    if (frames !== pixelBuffer.length / sliceSize) {
+    if (numberOfFrames !== pixelBuffer.length / sliceSize) {
       throw new Error(
         'Buffer and numberOfFrames meta are not equal.' +
-        frames + ' ' + pixelBuffer.length / sliceSize);
+        numberOfFrames + ' ' + pixelBuffer.length / sliceSize);
     }
 
     // Dimension Organization and Index
     const dimension = getDimensionOrganization(dataElements);
 
     // Segment Sequence
-    const segSequence = dataElements['00620002'];
+    const segSequence = safeGetAllLocal(TagKeys.SegmentSequence);
     if (typeof segSequence === 'undefined') {
       throw new Error('Missing or empty segmentation sequence');
     }
@@ -389,8 +432,8 @@ export class MaskFactory {
     const redLut = [0];
     const greenLut = [0];
     const blueLut = [0];
-    for (let i = 0; i < segSequence.value.length; ++i) {
-      const segment = getSegment(segSequence.value[i]);
+    for (let i = 0; i < segSequence.length; ++i) {
+      const segment = getSegment(segSequence[i]);
       if (typeof segment.displayRGBValue !== 'undefined') {
         // add palette colour
         redLut[segment.number] = segment.displayRGBValue.r;
@@ -411,25 +454,27 @@ export class MaskFactory {
     // Shared Functional Groups Sequence
     let spacing;
     let imageOrientationPatient;
-    const sharedFunctionalGroupsSeq = dataElements['52009229'];
+    const sharedFunctionalGroupsSeq =
+      safeGetAllLocal(TagKeys.SharedFunctionalGroupsSequence);
     if (typeof sharedFunctionalGroupsSeq !== 'undefined') {
       // should be only one
-      const funcGroup0 = sharedFunctionalGroupsSeq.value[0];
+      const funcGroup0 = sharedFunctionalGroupsSeq[0];
       // Plane Orientation Sequence
-      if (typeof funcGroup0['00209116'] !== 'undefined') {
-        const planeOrientationSeq = funcGroup0['00209116'];
+      if (typeof funcGroup0[TagKeys.PlaneOrientationSequence] !== 'undefined') {
+        const planeOrientationSeq =
+          funcGroup0[TagKeys.PlaneOrientationSequence];
         if (planeOrientationSeq.value.length !== 0) {
           // should be only one
           imageOrientationPatient =
-            planeOrientationSeq.value[0]['00200037'].value;
+            planeOrientationSeq.value[0][TagKeys.ImageOrientationPatient].value;
         } else {
           logger.warn(
             'No shared functional group plane orientation sequence items.');
         }
       }
       // Pixel Measures Sequence
-      if (typeof funcGroup0['00289110'] !== 'undefined') {
-        const pixelMeasuresSeq = funcGroup0['00289110'];
+      if (typeof funcGroup0[TagKeys.PixelMeasuresSequence] !== 'undefined') {
+        const pixelMeasuresSeq = funcGroup0[TagKeys.PixelMeasuresSequence];
         if (pixelMeasuresSeq.value.length !== 0) {
           // should be only one
           spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
@@ -453,19 +498,20 @@ export class MaskFactory {
     };
 
     // Per-frame Functional Groups Sequence
-    const perFrameFuncGroupSequence = dataElements['52009230'];
+    const perFrameFuncGroupSequence =
+      safeGetAllLocal(TagKeys.PerFrameFunctionalGroupsSequence);
     if (typeof perFrameFuncGroupSequence === 'undefined') {
       throw new Error('Missing or empty per frame functional sequence');
     }
-    if (frames !== perFrameFuncGroupSequence.value.length) {
+    if (numberOfFrames !== perFrameFuncGroupSequence.length) {
       throw new Error(
         'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
     }
     // create frame info object from per frame func
     const frameInfos = [];
-    for (let j = 0; j < perFrameFuncGroupSequence.value.length; ++j) {
+    for (let j = 0; j < perFrameFuncGroupSequence.length; ++j) {
       frameInfos.push(
-        getSegmentFrameInfo(perFrameFuncGroupSequence.value[j]));
+        getSegmentFrameInfo(perFrameFuncGroupSequence[j]));
     }
 
     // check frame infos
@@ -656,31 +702,29 @@ export class MaskFactory {
     }
     // meta information
     const meta = getDefaultDicomSegJson();
-    const safeGetLocal = function (key) {
-      return safeGet(dataElements, key);
-    };
+
     // Study
-    meta.StudyDate = safeGetLocal('00080020');
-    meta.StudyTime = safeGetLocal('00080030');
-    meta.StudyInstanceUID = safeGetLocal('0020000D');
-    meta.StudyID = safeGetLocal('00200010');
+    meta.StudyDate = safeGetLocal(TagKeys.StudyDate);
+    meta.StudyTime = safeGetLocal(TagKeys.StudyTime);
+    meta.StudyInstanceUID = safeGetLocal(TagKeys.StudyInstanceUID);
+    meta.StudyID = safeGetLocal(TagKeys.StudyID);
     // Series
-    meta.SeriesDate = safeGetLocal('00080021');
-    meta.SeriesTime = safeGetLocal('00080031');
-    meta.SeriesInstanceUID = safeGetLocal('0020000E');
-    meta.SeriesNumber = safeGetLocal('00200011');
+    meta.SeriesDate = safeGetLocal(TagKeys.SeriesDate);
+    meta.SeriesTime = safeGetLocal(TagKeys.SeriesTime);
+    meta.SeriesInstanceUID = safeGetLocal(TagKeys.SeriesInstanceUID);
+    meta.SeriesNumber = safeGetLocal(TagKeys.SeriesNumber);
     // ReferringPhysicianName
-    meta.ReferringPhysicianName = safeGetLocal('00080090');
+    meta.ReferringPhysicianName = safeGetLocal(TagKeys.ReferringPhysicianName);
     // patient info
-    meta.PatientName = safeGetLocal('00100010');
-    meta.PatientID = safeGetLocal('00100020');
-    meta.PatientBirthDate = safeGetLocal('00100030');
-    meta.PatientSex = safeGetLocal('00100040');
+    meta.PatientName = safeGetLocal(TagKeys.PatientName);
+    meta.PatientID = safeGetLocal(TagKeys.PatientID);
+    meta.PatientBirthDate = safeGetLocal(TagKeys.PatientBirthDate);
+    meta.PatientSex = safeGetLocal(TagKeys.PatientSex);
     // Enhanced General Equipment Module
-    meta.Manufacturer = safeGetLocal('00080070');
-    meta.ManufacturerModelName = safeGetLocal('00081090');
-    meta.DeviceSerialNumber = safeGetLocal('00181000');
-    meta.SoftwareVersions = safeGetLocal('00181020');
+    meta.Manufacturer = safeGetLocal(TagKeys.Manufacturer);
+    meta.ManufacturerModelName = safeGetLocal(TagKeys.ManufacturerModelName);
+    meta.DeviceSerialNumber = safeGetLocal(TagKeys.DeviceSerialNumber);
+    meta.SoftwareVersions = safeGetLocal(TagKeys.SoftwareVersions);
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
     meta.DimensionIndexSequence = dimension.indices;
@@ -688,21 +732,21 @@ export class MaskFactory {
     meta.custom = {
       segments: segments,
       frameInfos: frameInfos,
-      SOPInstanceUID: dataElements['00080018'].value[0]
+      SOPInstanceUID: safeGetLocal(TagKeys.SOPInstanceUID)
     };
 
     // number of files: in this case equal to number slices,
     //   used to calculate buffer size
     meta.numberOfFiles = numberOfSlices;
     // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = dataElements['00200052'];
-    if (frameOfReferenceUID) {
-      meta.FrameOfReferenceUID = frameOfReferenceUID.value[0];
+    const frameOfReferenceUID = safeGetLocal(TagKeys.FrameOfReferenceUID);
+    if (typeof frameOfReferenceUID !== 'undefined') {
+      meta.FrameOfReferenceUID = frameOfReferenceUID;
     }
     // LossyImageCompression (optional)
-    const lossyImageCompression = dataElements['00282110'];
-    if (lossyImageCompression) {
-      meta.LossyImageCompression = lossyImageCompression.value[0];
+    const lossyImageCompression = safeGetLocal(TagKeys.LossyImageCompression);
+    if (typeof lossyImageCompression !== 'undefined') {
+      meta.LossyImageCompression = lossyImageCompression;
     }
 
     image.setMeta(meta);

@@ -244,12 +244,11 @@ export function getPhotometricInterpretation(dataElements) {
     typeof transferSyntax !== 'undefined') {
     let photo = photometricInterpretation.toUpperCase();
     // TransferSyntaxUID
-    const jpeg2000 = isJpeg2000TransferSyntax(transferSyntax);
-    const jpegBase = isJpegBaselineTransferSyntax(transferSyntax);
-    const jpegLoss = isJpegLosslessTransferSyntax(transferSyntax);
+    const isJpeg = isJpeg2000TransferSyntax(transferSyntax) ||
+      isJpegBaselineTransferSyntax(transferSyntax) ||
+      isJpegLosslessTransferSyntax(transferSyntax);
     // jpeg decoders output RGB data
-    if ((jpeg2000 || jpegBase || jpegLoss) &&
-      (photo !== 'MONOCHROME1' && photo !== 'MONOCHROME2')) {
+    if (isJpeg && !isMonochrome(photo)) {
       photo = 'RGB';
     }
     // samplesPerPixel
@@ -274,16 +273,6 @@ export function getPhotometricInterpretation(dataElements) {
 export function isMonochrome(photometricInterpretation) {
   return typeof photometricInterpretation !== 'undefined' &&
     photometricInterpretation.match(/MONOCHROME/) !== null;
-}
-
-/**
- * Gets the sop class uid from the data elements.
- *
- * @param {Object<string, DataElement>} dataElements The data elements.
- * @returns {string|undefined} The sop class uid value.
- */
-export function getSopClassUid(dataElements) {
-  return safeGet(dataElements, TagKeys.SOPClassUI);
 }
 
 /**

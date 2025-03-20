@@ -4,7 +4,10 @@ import {
   dateToTimeObj,
   getDicomTime,
 } from '../dicom/dicomDate';
-import {safeGet} from '../dicom/dataElement';
+import {
+  safeGet,
+  safeGetAll
+} from '../dicom/dataElement';
 import {
   ValueTypes,
   RelationshipTypes,
@@ -49,6 +52,20 @@ import {Point2D, Point3D} from '../math/point';
 /* eslint-disable no-unused-vars */
 import {DataElement} from '../dicom/dataElement';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  StudyInstanceUID: '0020000D',
+  SeriesInstanceUID: '0020000E',
+  Modality: '00080060',
+  PatientName: '00100010',
+  PatientID: '00100020',
+  PatientBirthDate: '00100030',
+  PatientSex: '00100040',
+  ReferencedSeriesSequence: '00081115'
+};
 
 /**
  * Merge two tag lists.
@@ -246,26 +263,32 @@ export class AnnotationGroupFactory {
     };
 
     // StudyInstanceUID
-    annotationGroup.setMetaValue('StudyInstanceUID', safeGetLocal('0020000D'));
+    annotationGroup.setMetaValue('StudyInstanceUID',
+      safeGetLocal(TagKeys.StudyInstanceUID));
     // Modality
-    annotationGroup.setMetaValue('Modality', safeGetLocal('00080060'));
+    annotationGroup.setMetaValue('Modality',
+      safeGetLocal(TagKeys.Modality));
     // patient info
-    annotationGroup.setMetaValue('PatientName', safeGetLocal('00100010'));
-    annotationGroup.setMetaValue('PatientID', safeGetLocal('00100020'));
-    annotationGroup.setMetaValue('PatientBirthDate', safeGetLocal('00100030'));
-    annotationGroup.setMetaValue('PatientSex', safeGetLocal('00100040'));
+    annotationGroup.setMetaValue('PatientName',
+      safeGetLocal(TagKeys.PatientName));
+    annotationGroup.setMetaValue('PatientID',
+      safeGetLocal(TagKeys.PatientID));
+    annotationGroup.setMetaValue('PatientBirthDate',
+      safeGetLocal(TagKeys.PatientBirthDate));
+    annotationGroup.setMetaValue('PatientSex',
+      safeGetLocal(TagKeys.PatientSex));
 
     // ReferencedSeriesSequence
-    const element = dataElements['00081115'];
-    if (typeof element !== 'undefined') {
-      const seriesElement = element.value[0]['0020000E'];
-      if (typeof seriesElement !== 'undefined') {
+    const refSeriesSq = safeGetLocal(TagKeys.ReferencedSeriesSequence);
+    if (typeof refSeriesSq !== 'undefined') {
+      const seriesUIDs = safeGetAll(refSeriesSq, TagKeys.SeriesInstanceUID);
+      if (typeof seriesUIDs !== 'undefined') {
+        const uids = [];
+        for (const uid of seriesUIDs) {
+          uids.push({SeriesInstanceUID: uid});
+        }
         annotationGroup.setMetaValue(
-          'ReferencedSeriesSequence', {
-            value: [{
-              SeriesInstanceUID: seriesElement.value[0]
-            }]
-          }
+          'ReferencedSeriesSequence', {value: uids}
         );
       }
     }
