@@ -67,7 +67,7 @@ const TagKeys = {
   ImageOrientationPatient: '00200037',
   FrameOfReferenceUID: '00200052',
   WindowCenter: '00281050',
-  WindowWidth: '00281051',
+  WindowLevel: '00281051',
   WindowCenterWidthExplanation: '00281055',
   RedPaletteColorLookupTableDescriptor: '00281101',
   RedPaletteColorLookupTableData: '00281201',

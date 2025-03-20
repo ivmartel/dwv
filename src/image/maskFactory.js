@@ -51,6 +51,7 @@ import {MaskSegment} from '../dicom/dicomSegment';
  * Related DICOM tag keys.
  */
 const TagKeys = {
+  SOPInstanceUID: '00080018',
   NumberOfFrames: '00280008',
   SegmentSequence: '00620002',
   SharedFunctionalGroupsSequence: '52009229',
@@ -75,7 +76,8 @@ const TagKeys = {
   ManufacturerModelName: '00081090',
   DeviceSerialNumber: '00181000',
   SoftwareVersions: '00181020',
-  LossyImageCompression: '00282110'
+  LossyImageCompression: '00282110',
+  FrameOfReferenceUID: '00200052'
 };
 
 /**
