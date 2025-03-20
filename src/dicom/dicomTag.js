@@ -158,6 +158,20 @@ export class Tag {
   }
 
   /**
+   * Get the multiplicity from the dicom dictionary.
+   *
+   * @returns {number|undefined} The multiplicity.
+   */
+  getMultiplicityFromDictionary() {
+    let multiplicity;
+    const info = this.#getInfoFromDictionary();
+    if (typeof info !== 'undefined') {
+      multiplicity = parseInt(info[1], 10);
+    }
+    return multiplicity;
+  }
+
+  /**
    * Get the tag name from the dicom dictionary.
    *
    * @returns {string|undefined} The VR.
