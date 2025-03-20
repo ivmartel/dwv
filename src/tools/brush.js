@@ -722,7 +722,7 @@ export class Brush extends EventTarget {
     firstSliceMeta.DimensionOrganizationSequence = dimension.organizations;
     firstSliceMeta.DimensionIndexSequence = dimension.indices;
     // local
-    firstSliceMeta.IsSigned = false;
+    firstSliceMeta.PixelRepresentation = 0;
     firstSliceMeta.numberOfFiles = 1;
 
     const tags = sourceImage.getMeta();

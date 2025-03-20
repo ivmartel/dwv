@@ -747,7 +747,7 @@ export class Image {
     // create new
     this.#buffer = getTypedArray(
       this.#buffer.BYTES_PER_ELEMENT * 8,
-      this.#meta.IsSigned ? 1 : 0,
+      this.#meta.PixelRepresentation,
       size);
     if (this.#buffer === null) {
       throw new Error('Cannot reallocate data for image.');

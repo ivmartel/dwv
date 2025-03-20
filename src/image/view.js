@@ -362,7 +362,7 @@ export class View {
       // create the window lookup table
       this.#windowLut = new WindowLut(
         modalityLut,
-        this.#image.getMeta().IsSigned,
+        this.#image.getMeta().PixelRepresentation === 1,
         isDiscrete);
     }
 

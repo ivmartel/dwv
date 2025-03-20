@@ -309,8 +309,6 @@ export class ImageFactory {
       safeGetAllLocal(TagKeys.ImageOrientationPatient);
     meta.FrameOfReferenceUID = safeGetLocal(TagKeys.FrameOfReferenceUID);
 
-    // PixelRepresentation -> is signed
-    meta.IsSigned = meta.PixelRepresentation === 1;
     // local pixel unit
     if (isPetWithSuv) {
       meta.pixelUnit = 'SUV';
