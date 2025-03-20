@@ -4946,6 +4946,12 @@ export declare class Tag {
      */
     getVrFromDictionary(): string | undefined;
     /**
+     * Get the multiplicity from the dicom dictionary.
+     *
+     * @returns {number|undefined} The multiplicity.
+     */
+    getMultiplicityFromDictionary(): number | undefined;
+    /**
      * Get the tag name from the dicom dictionary.
      *
      * @returns {string|undefined} The VR.
