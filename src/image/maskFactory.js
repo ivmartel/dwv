@@ -39,6 +39,7 @@ import {ColourMap} from './luts';
 
 // doc imports
 /* eslint-disable no-unused-vars */
+import {Matrix33} from '../math/matrix';
 import {DataElement} from '../dicom/dataElement';
 import {MaskSegment} from '../dicom/dicomSegment';
 /* eslint-enable no-unused-vars */
