@@ -28,10 +28,10 @@ import {
 import {transferSyntaxKeywords} from '../dicom/dictionary';
 import {Image} from '../image/image';
 import {Geometry} from '../image/geometry';
+import {getOrientationFromCosines} from '../math/orientation';
 import {Point, Point3D} from '../math/point';
-import {Vector3D} from '../math/vector';
 import {Index} from '../math/index';
-import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix';
+import {REAL_WORLD_EPSILON} from '../math/matrix';
 import {logger} from '../utils/logger';
 import {arraySortEquals} from '../utils/array';
 import {Size} from './size';
@@ -567,27 +567,13 @@ export class MaskFactory {
     if (typeof imageOrientationPatient === 'undefined') {
       throw new Error('No imageOrientationPatient found for DICOM SEG');
     }
-    if (imageOrientationPatient.length !== 6) {
-      throw new Error('Incomplete imageOrientationPatient found for DICOM SEG');
-    }
-
     // orientation
-    const rowCosines = new Vector3D(
-      parseFloat(imageOrientationPatient[0]),
-      parseFloat(imageOrientationPatient[1]),
-      parseFloat(imageOrientationPatient[2]));
-    const colCosines = new Vector3D(
-      parseFloat(imageOrientationPatient[3]),
-      parseFloat(imageOrientationPatient[4]),
-      parseFloat(imageOrientationPatient[5]));
-    const normal = rowCosines.crossProduct(colCosines);
-    /* eslint-disable @stylistic/js/array-element-newline */
-    const orientationMatrix = new Matrix33([
-      rowCosines.getX(), colCosines.getX(), normal.getX(),
-      rowCosines.getY(), colCosines.getY(), normal.getY(),
-      rowCosines.getZ(), colCosines.getZ(), normal.getZ()
-    ]);
-    /* eslint-enable @stylistic/js/array-element-newline */
+    const orientationMatrix = getOrientationFromCosines(
+      imageOrientationPatient.map((item) => parseFloat(item))
+    );
+    if (typeof orientationMatrix === 'undefined') {
+      throw new Error('Invalid imageOrientationPatient found for DICOM SEG');
+    }
 
     // sort positions patient
     framePosPats.sort(getComparePosPat(orientationMatrix));
