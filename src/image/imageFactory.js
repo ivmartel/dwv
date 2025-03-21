@@ -188,18 +188,17 @@ function getPaletteColourMap(dataElements) {
  *
  * @param {Object<string, DataElement>} dataElements The data elements.
  * @param {number} intensityFactor The intensity factor.
- * @returns {object} The presets
+ * @returns {object} The presets.
  */
 function getWindowPresets(dataElements, intensityFactor) {
-  // window level presets
   let windowPresets;
   const windowCenter = safeGetAll(dataElements, TagKeys.WindowCenter);
   const windowWidth = safeGetAll(dataElements, TagKeys.WindowLevel);
-  const windowCWExplanation =
-    safeGetAll(dataElements, TagKeys.WindowCenterWidthExplanation);
   if (typeof windowCenter !== 'undefined' &&
     typeof windowWidth !== 'undefined') {
     windowPresets = {};
+    const windowCWExplanation =
+      safeGetAll(dataElements, TagKeys.WindowCenterWidthExplanation);
     let name;
     for (let j = 0; j < windowCenter.length; ++j) {
       const center = parseFloat(windowCenter[j]);
@@ -228,8 +227,9 @@ function getWindowPresets(dataElements, intensityFactor) {
         logger.warn('Zero window width found in DICOM.');
       }
     }
-    return windowPresets;
   }
+  // return
+  return windowPresets;
 }
 
 /**
