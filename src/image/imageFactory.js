@@ -188,7 +188,7 @@ function getPaletteColourMap(dataElements) {
  *
  * @param {Object<string, DataElement>} dataElements The data elements.
  * @param {number} intensityFactor The intensity factor.
- * @returns {object} The presets.
+ * @returns {object|undefined} The presets.
  */
 function getWindowPresets(dataElements, intensityFactor) {
   let windowPresets;
