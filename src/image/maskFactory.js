@@ -257,7 +257,7 @@ function createRoiBuffers(image, segments) {
 /**
  * List of DICOM Seg required tags.
  */
-const RequiredDicomSegTags = [
+const RequiredDicomTags = [
   {
     name: 'TransferSyntaxUID',
     tag: '00020010',
@@ -349,9 +349,8 @@ const RequiredDicomSegTags = [
  */
 export function getDefaultDicomSegJson() {
   const tags = {};
-  for (let i = 0; i < RequiredDicomSegTags.length; ++i) {
-    const reqTag = RequiredDicomSegTags[i];
-    tags[reqTag.name] = reqTag.enum[0];
+  for (const tag of RequiredDicomTags) {
+    tags[tag.name] = tag.enum[0];
   }
   return tags;
 }
@@ -410,8 +409,8 @@ export class MaskFactory {
     };
 
     // check required and supported tags
-    for (let d = 0; d < RequiredDicomSegTags.length; ++d) {
-      checkTag(dataElements, RequiredDicomSegTags[d]);
+    for (const tag of RequiredDicomTags) {
+      checkTag(dataElements, tag);
     }
 
     // image size
@@ -585,8 +584,8 @@ export class MaskFactory {
 
     // frame origins
     const frameOrigins = [];
-    for (let n = 0; n < framePosPats.length; ++n) {
-      frameOrigins.push(point3DFromArray(framePosPats[n]));
+    for (const framePosPat of framePosPats) {
+      frameOrigins.push(point3DFromArray(framePosPat));
     }
 
     // tmp geometry with correct spacing but only one slice
