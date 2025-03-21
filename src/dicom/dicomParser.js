@@ -128,8 +128,8 @@ export function compareVersions(a, b) {
   // beta part
   if (res === 0) {
     const betaIndex = 4;
-    const betaA = parseInt(splitA[betaIndex], 10);
-    const betaB = parseInt(splitB[betaIndex], 10);
+    const betaA = splitA[betaIndex];
+    const betaB = splitB[betaIndex];
     if (typeof betaA === 'undefined' &&
       typeof betaB === 'undefined') {
       res = 0;
@@ -140,7 +140,7 @@ export function compareVersions(a, b) {
       typeof betaB === 'undefined') {
       res = -1;
     } else {
-      res = betaA - betaB;
+      res = parseInt(betaA, 10) - parseInt(betaB, 10);
     }
   }
   return res;
