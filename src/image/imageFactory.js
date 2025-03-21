@@ -92,6 +92,147 @@ const MetaTagKeys = {
 };
 
 /**
+ * Get the palette colour map.
+ *
+ * @param {Object<string, DataElement>} dataElements The data elements.
+ * @returns {ColourMap|undefined} The palette colour map.
+ */
+function getPaletteColourMap(dataElements) {
+  let colourMap;
+  // check red palette descriptor (should all be equal)
+  // Red Palette Color Lookup Table Descriptor
+  // 0: number of entries in the lookup table
+  // 1: first input value mapped
+  // 2: number of bits for each entry in the Lookup Table Data (8 or 16)
+  const descriptor =
+    safeGetAll(dataElements, TagKeys.RedPaletteColorLookupTableDescriptor);
+  if (typeof descriptor !== 'undefined' &&
+    descriptor.length === 3) {
+    let redLut;
+    let greenLut;
+    let blueLut;
+    // Red Palette Color Lookup Table Data
+    const redLutElement =
+      dataElements[TagKeys.RedPaletteColorLookupTableData];
+    // Green Palette Color Lookup Table Data
+    const greenLutElement =
+      dataElements[TagKeys.GreenPaletteColorLookupTableData];
+    // Blue Palette Color Lookup Table Data
+    const blueLutElement =
+      dataElements[TagKeys.BluePaletteColorLookupTableData];
+
+    if (descriptor[2] === 16) {
+      let doScale = false;
+      // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
+      // Some implementations have encoded 8 bit entries with 16 bits
+      // allocated, padding the high bits;
+      let descSize = descriptor[0];
+      // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
+      // The first Palette Color Lookup Table Descriptor value is the
+      // number of entries in the lookup table. When the number of table
+      // entries is equal to 216 then this value shall be 0.
+      if (descSize === 0) {
+        descSize = 65536;
+      }
+      // red palette VL
+      // TODO vl is undefined, find info elsewhere...
+      const vlSize = redLutElement.vl;
+      // check double size
+      if (vlSize !== 2 * descSize) {
+        doScale = true;
+        logger.info('16bits lut but size is not double. desc: ' +
+          descSize + ' vl: ' + vlSize);
+      }
+      // (C.7.6.3.1.6 Palette Color Lookup Table Data)
+      // Palette color values must always be scaled across the full
+      // range of available intensities
+      const bitsAllocated = parseInt(
+        safeGet(dataElements, TagKeys.BitsAllocated), 10);
+      if (bitsAllocated === 8) {
+        doScale = true;
+        logger.info(
+          'Scaling 16bits color lut since bits allocated is 8.');
+      }
+
+      if (doScale) {
+        const scaleTo8 = function (value) {
+          return value >> 8;
+        };
+
+        redLut = redLutElement.value.map(scaleTo8);
+        greenLut = greenLutElement.value.map(scaleTo8);
+        blueLut = blueLutElement.value.map(scaleTo8);
+      }
+    } else if (descriptor[2] === 8) {
+      // lut with vr=OW was read as Uint16, convert it to Uint8
+      logger.info(
+        'Scaling 16bits color lut since the lut descriptor is 8.');
+      let clone = redLutElement.value.slice(0);
+      // @ts-expect-error
+      redLut = Array.from(new Uint8Array(clone.buffer));
+      clone = greenLutElement.value.slice(0);
+      // @ts-expect-error
+      greenLut = Array.from(new Uint8Array(clone.buffer));
+      clone = blueLutElement.value.slice(0);
+      // @ts-expect-error
+      blueLut = Array.from(new Uint8Array(clone.buffer));
+    }
+    colourMap = new ColourMap(redLut, greenLut, blueLut);
+  }
+  // return
+  return colourMap;
+}
+
+/**
+ * Get the window level presets.
+ *
+ * @param {Object<string, DataElement>} dataElements The data elements.
+ * @param {number} intensityFactor The intensity factor.
+ * @returns {object} The presets
+ */
+function getWindowPresets(dataElements, intensityFactor) {
+  // window level presets
+  let windowPresets;
+  const windowCenter = safeGetAll(dataElements, TagKeys.WindowCenter);
+  const windowWidth = safeGetAll(dataElements, TagKeys.WindowLevel);
+  const windowCWExplanation =
+    safeGetAll(dataElements, TagKeys.WindowCenterWidthExplanation);
+  if (typeof windowCenter !== 'undefined' &&
+    typeof windowWidth !== 'undefined') {
+    windowPresets = {};
+    let name;
+    for (let j = 0; j < windowCenter.length; ++j) {
+      const center = parseFloat(windowCenter[j]);
+      let width = parseFloat(windowWidth[j]);
+      if (center && width && width !== 0) {
+        name = '';
+        if (typeof windowCWExplanation !== 'undefined') {
+          name = windowCWExplanation[j];
+        }
+        if (name === '') {
+          name = 'Default' + j;
+        }
+        width *= intensityFactor;
+        if (width < 1) {
+          width = 1;
+        }
+        windowPresets[name] = {
+          wl: [new WindowLevel(
+            center * intensityFactor,
+            width
+          )],
+          name: name
+        };
+      }
+      if (width === 0) {
+        logger.warn('Zero window width found in DICOM.');
+      }
+    }
+    return windowPresets;
+  }
+}
+
+/**
  * {@link Image} factory.
  */
 export class ImageFactory {
@@ -279,6 +420,14 @@ export class ImageFactory {
     const rsi = new RescaleSlopeAndIntercept(slope, intercept);
     image.setRescaleSlopeAndIntercept(rsi);
 
+    // PALETTE COLOR lut
+    if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
+      const colourMap = getPaletteColourMap(dataElements);
+      if (typeof colourMap !== 'undefined') {
+        image.setPaletteColourMap(colourMap);
+      }
+    }
+
     // meta information
     const meta = {
       numberOfFiles: numberOfFiles
@@ -318,127 +467,11 @@ export class ImageFactory {
         meta.pixelUnit = pixelUnit;
       }
     }
+
     // window level presets
-    const windowPresets = {};
-    const windowCenter = safeGetAllLocal(TagKeys.WindowCenter);
-    const windowWidth = safeGetAllLocal(TagKeys.WindowLevel);
-    const windowCWExplanation =
-      safeGetAllLocal(TagKeys.WindowCenterWidthExplanation);
-    if (typeof windowCenter !== 'undefined' &&
-      typeof windowWidth !== 'undefined') {
-      let name;
-      for (let j = 0; j < windowCenter.length; ++j) {
-        const center = parseFloat(windowCenter[j]);
-        let width = parseFloat(windowWidth[j]);
-        if (center && width && width !== 0) {
-          name = '';
-          if (typeof windowCWExplanation !== 'undefined') {
-            name = windowCWExplanation[j];
-          }
-          if (name === '') {
-            name = 'Default' + j;
-          }
-          width *= intensityFactor;
-          if (width < 1) {
-            width = 1;
-          }
-          windowPresets[name] = {
-            wl: [new WindowLevel(
-              center * intensityFactor,
-              width
-            )],
-            name: name
-          };
-        }
-        if (width === 0) {
-          logger.warn('Zero window width found in DICOM.');
-        }
-      }
-    }
-    meta.windowPresets = windowPresets;
-
-    // PALETTE COLOR luts
-    if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      // Red Palette Color Lookup Table Data
-      const redLutElement =
-        dataElements[TagKeys.RedPaletteColorLookupTableData];
-      // Green Palette Color Lookup Table Data
-      const greenLutElement =
-        dataElements[TagKeys.GreenPaletteColorLookupTableData];
-      // Blue Palette Color Lookup Table Data
-      const blueLutElement =
-        dataElements[TagKeys.BluePaletteColorLookupTableData];
-      let redLut;
-      let greenLut;
-      let blueLut;
-      // check red palette descriptor (should all be equal)
-      // Red Palette Color Lookup Table Descriptor
-      // 0: number of entries in the lookup table
-      // 1: first input value mapped
-      // 2: number of bits for each entry in the Lookup Table Data (8 or 16)
-      const descriptor =
-        safeGetAllLocal(TagKeys.RedPaletteColorLookupTableDescriptor);
-      if (typeof descriptor !== 'undefined' &&
-        descriptor.length === 3) {
-        if (descriptor[2] === 16) {
-          let doScale = false;
-          // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
-          // Some implementations have encoded 8 bit entries with 16 bits
-          // allocated, padding the high bits;
-          let descSize = descriptor[0];
-          // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
-          // The first Palette Color Lookup Table Descriptor value is the
-          // number of entries in the lookup table. When the number of table
-          // entries is equal to 216 then this value shall be 0.
-          if (descSize === 0) {
-            descSize = 65536;
-          }
-          // red palette VL
-          // TODO vl is undefined, find info elsewhere...
-          const vlSize = redLutElement.vl;
-          // check double size
-          if (vlSize !== 2 * descSize) {
-            doScale = true;
-            logger.info('16bits lut but size is not double. desc: ' +
-              descSize + ' vl: ' + vlSize);
-          }
-          // (C.7.6.3.1.6 Palette Color Lookup Table Data)
-          // Palette color values must always be scaled across the full
-          // range of available intensities
-          const bitsAllocated = parseInt(
-            safeGetLocal(TagKeys.BitsAllocated), 10);
-          if (bitsAllocated === 8) {
-            doScale = true;
-            logger.info(
-              'Scaling 16bits color lut since bits allocated is 8.');
-          }
-
-          if (doScale) {
-            const scaleTo8 = function (value) {
-              return value >> 8;
-            };
-
-            redLut = redLutElement.value.map(scaleTo8);
-            greenLut = greenLutElement.value.map(scaleTo8);
-            blueLut = blueLutElement.value.map(scaleTo8);
-          }
-        } else if (descriptor[2] === 8) {
-          // lut with vr=OW was read as Uint16, convert it to Uint8
-          logger.info(
-            'Scaling 16bits color lut since the lut descriptor is 8.');
-          let clone = redLutElement.value.slice(0);
-          // @ts-expect-error
-          redLut = Array.from(new Uint8Array(clone.buffer));
-          clone = greenLutElement.value.slice(0);
-          // @ts-expect-error
-          greenLut = Array.from(new Uint8Array(clone.buffer));
-          clone = blueLutElement.value.slice(0);
-          // @ts-expect-error
-          blueLut = Array.from(new Uint8Array(clone.buffer));
-        }
-      }
-      // set the palette
-      image.setPaletteColourMap(new ColourMap(redLut, greenLut, blueLut));
+    const presets = getWindowPresets(dataElements, intensityFactor);
+    if (typeof presets !== 'undefined') {
+      meta.windowPresets = presets;
     }
 
     // store the meta data
