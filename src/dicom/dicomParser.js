@@ -76,19 +76,88 @@ export function getImplementationClassUID() {
 }
 
 /**
- * Parse the value of the ImplementationClassUID tag.
+ * Parse the value of the ImplementationClassUID tag. If made by
+ * dwv, returns the dwv version.
  *
  * @param {string} uid The uid.
- * @returns {string[]} The splitted version.
+ * @returns {string|undefined} The dwv version.
  */
 export function parseImplementationClassUID(uid) {
-  const prefixLength = getDwvUIDPrefix().length;
-  const version = uid.substring(prefixLength + 1);
-  const split = version.split('.');
-  if (split[3] === '99') {
-    split[3] = 'beta';
+  let version;
+  const dwvPrefix = getDwvUIDPrefix();
+  if (uid.startsWith(dwvPrefix)) {
+    // reverse getDwvVersionUI
+    version = uid.substring(dwvPrefix.length + 1).replace('.99', '-beta');
   }
-  return split;
+  return version;
+}
+
+/**
+ * Split a string version into parts.
+ *
+ * @param {string} version The version.
+ * @returns {string[]} The splited version.
+ */
+function splitVersion(version) {
+  const split = version.split('-');
+  let versions = [];
+  for (const s of split) {
+    versions = versions.concat(s.split('.'));
+  }
+  return versions;
+}
+
+/**
+ * Compare versions.
+ *
+ * @param {string} a The first version.
+ * @param {string} b The second version.
+ * @returns {number} >0 to sort a after b, <0 to sort a before b,
+ *   0 to not change order.
+ */
+export function compareVersions(a, b) {
+  let res = 0;
+  const splitA = splitVersion(a);
+  const splitB = splitVersion(b);
+  for (let i = 0; i < 3; ++i) {
+    res = splitA[i] - splitB[i];
+    if (res !== 0) {
+      break;
+    }
+  }
+  // beta part
+  if (res === 0) {
+    const betaIndex = 4;
+    const betaA = splitA[betaIndex];
+    const betaB = splitB[betaIndex];
+    if (typeof betaA === 'undefined' &&
+      typeof betaB === 'undefined') {
+      res = 0;
+    } else if (typeof betaA === 'undefined' &&
+      typeof betaB !== 'undefined') {
+      res = 1;
+    } else if (typeof betaA !== 'undefined' &&
+      typeof betaB === 'undefined') {
+      res = -1;
+    } else {
+      res = betaA - betaB;
+    }
+  }
+  return res;
+}
+
+/**
+ * Check if a version in inside bounds (bounds inclusives).
+ *
+ * @param {string} version The version to check.
+ * @param {string} min The minimum version.
+ * @param {string} max The maximum version.
+ * @returns {boolean} True if the version in inside the bounds.
+ */
+export function isVersionInBounds(version, min, max) {
+  const compareMin = compareVersions(version, min);
+  const compareMax = compareVersions(version, max);
+  return compareMin >= 0 && compareMax <= 0;
 }
 
 /**

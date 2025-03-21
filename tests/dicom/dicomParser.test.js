@@ -5,6 +5,8 @@ import {
   getDwvUIDPrefix,
   getImplementationClassUID,
   parseImplementationClassUID,
+  compareVersions,
+  isVersionInBounds,
   cleanString,
   hasDicomPrefix,
   DicomParser
@@ -29,10 +31,9 @@ import dwvDicomDir from '../data/DICOMDIR';
 QUnit.module('dicom');
 
 /**
- * Tests for {@link DicomParser} using simple DICOM data.
- * Using remote file for CI integration.
+ * Tests for {@link DicomParser} Implementation class.
  *
- * @function module:tests/dicom~simple-dicom-parsing
+ * @function module:tests/dicom~implementaion-class
  */
 QUnit.test('DICOM parsing - Implementation class and name', function (assert) {
   // check UI
@@ -41,25 +42,96 @@ QUnit.test('DICOM parsing - Implementation class and name', function (assert) {
   assert.equal(versionUI.search(regex), -1, 'No letters in vr=UI');
 
   // test #0: get and parse
-  const version0 = getDwvVersion();
+  const version00 = getDwvVersion();
   // dot and possible '-' for beta
-  const versions0 = version0.split(/[\\.-]/);
   const classUID0 = getImplementationClassUID();
-  const versions01 = parseImplementationClassUID(classUID0);
-  assert.deepEqual(versions0, versions01, 'Implementation class test #0');
+  const version01 = parseImplementationClassUID(classUID0);
+  assert.deepEqual(version00, version01, 'Implementation class test #0');
 
   // test #1: basic
-  const classUID1 = getDwvUIDPrefix() + '.' + '1.2.3';
-  const versions1 = ['1', '2', '3'];
-  const versions11 = parseImplementationClassUID(classUID1);
-  assert.deepEqual(versions1, versions11, 'Implementation class test #1');
+  const version10 = '1.2.3';
+  const classUID10 = getDwvUIDPrefix() + '.' + version10;
+  const version11 = parseImplementationClassUID(classUID10);
+  assert.deepEqual(version10, version11, 'Implementation class test #1');
 
   // test #2: with beta
-  const classUID2 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
-  const versions2 = ['4', '5', '6', 'beta', '19'];
-  const versions21 = parseImplementationClassUID(classUID2);
-  assert.deepEqual(versions2, versions21, 'Implementation class test #2');
+  const version20 = '4.5.6-beta.19';
+  const classUID20 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
+  const version21 = parseImplementationClassUID(classUID20);
+  assert.deepEqual(version20, version21, 'Implementation class test #2');
 });
+
+/**
+ * Tests for {@link DicomParser} compare version.
+ *
+ * @function module:tests/dicom~compare-version
+ */
+QUnit.test('DICOM parsing - compare version', function (assert) {
+  const versions00 = '0.0.0';
+  assert.equal(
+    compareVersions(versions00, versions00), 0, 'compare version #00');
+
+  const testVersions = function (version0, versions, id) {
+    for (let i = 0; i < versions.length; ++i) {
+      assert.equal(compareVersions(version0, versions[i]), -1,
+        'compare version #' + id + '-' + i + '0');
+      assert.equal(compareVersions(versions[i], version0), 1,
+        'compare version #' + id + '-' + i + '1');
+    }
+  };
+  const versions01 = [
+    '0.0.1',
+    '0.1.0',
+    '1.0.0',
+    '0.0.1-beta.1',
+    '0.1.0-beta.1',
+    '1.0.0-beta.1'
+  ];
+  testVersions('0.0.0', versions01, '01');
+  testVersions('0.0.0-beta.2', versions01, '02');
+
+  // with sort
+  const versions10 = [
+    '0.1.5',
+    '1.5.0',
+    '0.1.5-beta.3',
+    '1.5.0-beta.2',
+    '0.1.5-beta.4',
+    '0.0.6',
+    '0.0.6-beta.3'
+  ];
+  const theoVersions10 = [
+    '0.0.6-beta.3',
+    '0.0.6',
+    '0.1.5-beta.3',
+    '0.1.5-beta.4',
+    '0.1.5',
+    '1.5.0-beta.2',
+    '1.5.0'
+  ];
+  assert.deepEqual(
+    versions10.sort(compareVersions), theoVersions10, 'compare version #10');
+});
+
+/**
+ * Tests for {@link DicomParser} isVersionInBounds.
+ *
+ * @function module:tests/dicom~version-bounds
+ */
+QUnit.test('DICOM parsing - isVersionInBounds', function (assert) {
+  assert.ok(
+    isVersionInBounds('0.1.1', '0.1.0', '0.1.2'),
+    'isVersionInBounds #00');
+  // inclusive bounds
+  assert.ok(
+    isVersionInBounds('0.1.1', '0.1.1', '0.1.1'),
+    'isVersionInBounds #01');
+  // with beta
+  assert.ok(
+    isVersionInBounds('0.1.0', '0.0.5-beta.3', '0.2.0'),
+    'isVersionInBounds #02');
+});
+
 
 /**
  * Tests for {@link DicomParser} using simple DICOM data.
