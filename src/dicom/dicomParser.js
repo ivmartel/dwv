@@ -120,7 +120,7 @@ export function compareVersions(a, b) {
   const splitA = splitVersion(a);
   const splitB = splitVersion(b);
   for (let i = 0; i < 3; ++i) {
-    res = splitA[i] - splitB[i];
+    res = parseInt(splitA[i], 10) - parseInt(splitB[i], 10);
     if (res !== 0) {
       break;
     }
@@ -128,8 +128,8 @@ export function compareVersions(a, b) {
   // beta part
   if (res === 0) {
     const betaIndex = 4;
-    const betaA = splitA[betaIndex];
-    const betaB = splitB[betaIndex];
+    const betaA = parseInt(splitA[betaIndex], 10);
+    const betaB = parseInt(splitB[betaIndex], 10);
     if (typeof betaA === 'undefined' &&
       typeof betaB === 'undefined') {
       res = 0;
