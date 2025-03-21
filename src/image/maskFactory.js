@@ -58,26 +58,38 @@ const TagKeys = {
   PlaneOrientationSequence: '00209116',
   ImageOrientationPatient: '00200037',
   PixelMeasuresSequence: '00289110',
-  PerFrameFunctionalGroupsSequence: '52009230',
-  StudyDate: '00080020',
-  StudyTime: '00080030',
-  StudyInstanceUID: '0020000D',
-  StudyID: '00200010',
-  SeriesDate: '00080021',
-  SeriesTime: '00080031',
-  SeriesInstanceUID: '0020000E',
-  SeriesNumber: '00200011',
-  ReferringPhysicianName: '00080090',
+  PerFrameFunctionalGroupsSequence: '52009230'
+};
+
+/**
+ * Meta tag keys.
+ */
+const MetaTagKeys = {
+  // patient
   PatientName: '00100010',
   PatientID: '00100020',
   PatientBirthDate: '00100030',
   PatientSex: '00100040',
+  // general study
+  StudyDate: '00080020',
+  StudyTime: '00080030',
+  StudyInstanceUID: '0020000D',
+  StudyID: '00200010',
+  ReferringPhysicianName: '00080090',
+  // general series
+  SeriesDate: '00080021',
+  SeriesTime: '00080031',
+  SeriesInstanceUID: '0020000E',
+  SeriesNumber: '00200011',
+  // frame of reference
+  FrameOfReferenceUID: '00200052',
+  // general equipment
   Manufacturer: '00080070',
   ManufacturerModelName: '00081090',
   DeviceSerialNumber: '00181000',
   SoftwareVersions: '00181020',
-  LossyImageCompression: '00282110',
-  FrameOfReferenceUID: '00200052'
+  // general image
+  LossyImageCompression: '00282110'
 };
 
 /**
@@ -705,28 +717,12 @@ export class MaskFactory {
     // meta information
     const meta = getDefaultDicomSegJson();
 
-    // Study
-    meta.StudyDate = safeGetLocal(TagKeys.StudyDate);
-    meta.StudyTime = safeGetLocal(TagKeys.StudyTime);
-    meta.StudyInstanceUID = safeGetLocal(TagKeys.StudyInstanceUID);
-    meta.StudyID = safeGetLocal(TagKeys.StudyID);
-    // Series
-    meta.SeriesDate = safeGetLocal(TagKeys.SeriesDate);
-    meta.SeriesTime = safeGetLocal(TagKeys.SeriesTime);
-    meta.SeriesInstanceUID = safeGetLocal(TagKeys.SeriesInstanceUID);
-    meta.SeriesNumber = safeGetLocal(TagKeys.SeriesNumber);
-    // ReferringPhysicianName
-    meta.ReferringPhysicianName = safeGetLocal(TagKeys.ReferringPhysicianName);
-    // patient info
-    meta.PatientName = safeGetLocal(TagKeys.PatientName);
-    meta.PatientID = safeGetLocal(TagKeys.PatientID);
-    meta.PatientBirthDate = safeGetLocal(TagKeys.PatientBirthDate);
-    meta.PatientSex = safeGetLocal(TagKeys.PatientSex);
-    // Enhanced General Equipment Module
-    meta.Manufacturer = safeGetLocal(TagKeys.Manufacturer);
-    meta.ManufacturerModelName = safeGetLocal(TagKeys.ManufacturerModelName);
-    meta.DeviceSerialNumber = safeGetLocal(TagKeys.DeviceSerialNumber);
-    meta.SoftwareVersions = safeGetLocal(TagKeys.SoftwareVersions);
+    // meta tags
+    const metaKeys = Object.keys(MetaTagKeys);
+    for (const key of metaKeys) {
+      meta[key] = safeGetLocal(MetaTagKeys[key]);
+    }
+
     // dicom seg dimension
     meta.DimensionOrganizationSequence = dimension.organizations;
     meta.DimensionIndexSequence = dimension.indices;
@@ -740,16 +736,6 @@ export class MaskFactory {
     // number of files: in this case equal to number slices,
     //   used to calculate buffer size
     meta.numberOfFiles = numberOfSlices;
-    // FrameOfReferenceUID (optional)
-    const frameOfReferenceUID = safeGetLocal(TagKeys.FrameOfReferenceUID);
-    if (typeof frameOfReferenceUID !== 'undefined') {
-      meta.FrameOfReferenceUID = frameOfReferenceUID;
-    }
-    // LossyImageCompression (optional)
-    const lossyImageCompression = safeGetLocal(TagKeys.LossyImageCompression);
-    if (typeof lossyImageCompression !== 'undefined') {
-      meta.LossyImageCompression = lossyImageCompression;
-    }
 
     image.setMeta(meta);
 

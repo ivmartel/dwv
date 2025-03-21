@@ -49,23 +49,7 @@ const TagKeys = {
   BitsAllocated: '00280100',
   BitsStored: '00280101',
   HighBit: '00280102',
-  StudyDate: '00080020',
-  StudyTime: '00080030',
-  StudyInstanceUID: '0020000D',
-  StudyID: '00200010',
-  SeriesInstanceUID: '0020000E',
-  SeriesNumber: '00200011',
-  ReferringPhysicianName: '00080090',
-  PatientName: '00100010',
-  PatientID: '00100020',
-  PatientBirthDate: '00100030',
-  PatientSex: '00100040',
-  Manufacturer: '00080070',
-  ManufacturerModelName: '00081090',
-  DeviceSerialNumber: '00181000',
-  SoftwareVersions: '00181020',
   ImageOrientationPatient: '00200037',
-  FrameOfReferenceUID: '00200052',
   WindowCenter: '00281050',
   WindowLevel: '00281051',
   WindowCenterWidthExplanation: '00281055',
@@ -74,6 +58,37 @@ const TagKeys = {
   GreenPaletteColorLookupTableData: '00281202',
   BluePaletteColorLookupTableData: '00281203',
   RecommendedDisplayFrameRate: '00082144'
+};
+
+/**
+ * Meta tag keys.
+ */
+const MetaTagKeys = {
+  // patient
+  PatientName: '00100010',
+  PatientID: '00100020',
+  PatientBirthDate: '00100030',
+  PatientSex: '00100040',
+  // general study
+  StudyDate: '00080020',
+  StudyTime: '00080030',
+  StudyInstanceUID: '0020000D',
+  StudyID: '00200010',
+  ReferringPhysicianName: '00080090',
+  // general series
+  SeriesDate: '00080021',
+  SeriesTime: '00080031',
+  SeriesInstanceUID: '0020000E',
+  SeriesNumber: '00200011',
+  // frame of reference
+  FrameOfReferenceUID: '00200052',
+  // general equipment
+  Manufacturer: '00080070',
+  ManufacturerModelName: '00081090',
+  DeviceSerialNumber: '00181000',
+  SoftwareVersions: '00181020',
+  // general image
+  LossyImageCompression: '00282110'
 };
 
 /**
@@ -281,33 +296,18 @@ export class ImageFactory {
       safeGetLocal(TagKeys.PhotometricInterpretation);
     meta.PixelRepresentation = safeGetLocal(TagKeys.PixelRepresentation);
     meta.BitsAllocated = safeGetLocal(TagKeys.BitsAllocated);
+
     meta.BitsStored = safeGetLocal(TagKeys.BitsStored);
     meta.HighBit = safeGetLocal(TagKeys.HighBit);
 
-    // Study
-    meta.StudyDate = safeGetLocal(TagKeys.StudyDate);
-    meta.StudyTime = safeGetLocal(TagKeys.StudyTime);
-    meta.StudyInstanceUID = safeGetLocal(TagKeys.StudyInstanceUID);
-    meta.StudyID = safeGetLocal(TagKeys.StudyID);
-    // Series
-    meta.SeriesInstanceUID = safeGetLocal(TagKeys.SeriesInstanceUID);
-    meta.SeriesNumber = safeGetLocal(TagKeys.SeriesNumber);
-    // ReferringPhysicianName
-    meta.ReferringPhysicianName = safeGetLocal(TagKeys.ReferringPhysicianName);
-    // patient info
-    meta.PatientName = safeGetLocal(TagKeys.PatientName);
-    meta.PatientID = safeGetLocal(TagKeys.PatientID);
-    meta.PatientBirthDate = safeGetLocal(TagKeys.PatientBirthDate);
-    meta.PatientSex = safeGetLocal(TagKeys.PatientSex);
-    // General Equipment Module
-    meta.Manufacturer = safeGetLocal(TagKeys.Manufacturer);
-    meta.ManufacturerModelName = safeGetLocal(TagKeys.ManufacturerModelName);
-    meta.DeviceSerialNumber = safeGetLocal(TagKeys.DeviceSerialNumber);
-    meta.SoftwareVersions = safeGetLocal(TagKeys.SoftwareVersions);
-
     meta.ImageOrientationPatient =
       safeGetAllLocal(TagKeys.ImageOrientationPatient);
-    meta.FrameOfReferenceUID = safeGetLocal(TagKeys.FrameOfReferenceUID);
+
+    // meta tags
+    const metaKeys = Object.keys(MetaTagKeys);
+    for (const key of metaKeys) {
+      meta[key] = safeGetLocal(MetaTagKeys[key]);
+    }
 
     // local pixel unit
     if (isPetWithSuv) {
@@ -439,12 +439,6 @@ export class ImageFactory {
       }
       // set the palette
       image.setPaletteColourMap(new ColourMap(redLut, greenLut, blueLut));
-    }
-
-    // RecommendedDisplayFrameRate
-    const frameRate = safeGetLocal(TagKeys.RecommendedDisplayFrameRate);
-    if (typeof frameRate !== 'undefined') {
-      meta.RecommendedDisplayFrameRate = parseInt(frameRate, 10);
     }
 
     // store the meta data
