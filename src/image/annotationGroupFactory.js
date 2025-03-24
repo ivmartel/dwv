@@ -13,6 +13,7 @@ import {
   RelationshipTypes,
   getSRContent,
   getDicomSRContentItem,
+  getContentTemplate,
   DicomSRContent,
   getSRContentFromValue
 } from '../dicom/dicomSRContent';
@@ -31,6 +32,10 @@ import {
   getQuantificationUnit,
   DicomCode
 } from '../dicom/dicomCode';
+import {
+  isVersionInBounds,
+  getDwvVersionFromImplementationClassUID
+} from '../dicom/dicomParser';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {ImageReference} from '../dicom/dicomImageReference';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference';
@@ -57,6 +62,7 @@ import {DataElement} from '../dicom/dataElement';
  * Related DICOM tag keys.
  */
 const TagKeys = {
+  ImplementationClassUID: '00020012',
   StudyInstanceUID: '0020000D',
   SeriesInstanceUID: '0020000E',
   Modality: '00080060',
@@ -64,7 +70,7 @@ const TagKeys = {
   PatientID: '00100020',
   PatientBirthDate: '00100030',
   PatientSex: '00100040',
-  ReferencedSeriesSequence: '00081115'
+  ReferencedSeriesSequence: '00081115',
 };
 
 /**
@@ -116,13 +122,36 @@ export class AnnotationGroupFactory {
     // reset
     this.#warning = undefined;
 
+    // content template
+    const contentTemplate = getContentTemplate(dataElements);
+    // version
+    const classUID =
+      safeGet(dataElements, TagKeys.ImplementationClassUID);
+    const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    const isDwv034 = typeof dwvVersion !== 'undefined' &&
+      isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.20');
+    // dwv 0.34 annotations do not have template
+    const isDwv034Annotation = isDwv034 &&
+      typeof contentTemplate === 'undefined';
+
+    // root SR concept
+    let rootConcept = '';
     const srContent = getSRContent(dataElements);
     if (typeof srContent.conceptNameCode !== 'undefined') {
-      if (srContent.conceptNameCode.value !== getMeasurementGroupCode().value) {
-        this.#warning = 'Not a measurement group';
+      rootConcept = srContent.conceptNameCode.value;
+    }
+
+    if (isDwv034Annotation) {
+      if (typeof rootConcept !== 'undefined' &&
+        rootConcept !== getMeasurementGroupCode().value) {
+        this.#warning = 'No measurement group for dwv 0.34 annotation';
+      } else {
+        this.#warning = 'No root concept name code for dwv 0.34 annotation';
       }
     } else {
-      this.#warning = 'No root concept name code';
+      if (typeof rootConcept === 'undefined') {
+        this.#warning = 'No root concept name code';
+      }
     }
 
     return this.#warning;
