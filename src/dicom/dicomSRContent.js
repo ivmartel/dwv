@@ -28,7 +28,10 @@ import {
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {
+  safeGet,
+  DataElement
+} from './dataElement';
 import {DicomCode} from './dicomCode';
 import {MeasuredValue} from './dicomMeasuredValue';
 /* eslint-enable no-unused-vars */
@@ -49,7 +52,10 @@ const TagKeys = {
   UID: '0040A124',
   PersonName: '0040A123',
   TextValue: '0040A160',
-  ContinuityOfContent: '0040A050'
+  ContinuityOfContent: '0040A050',
+  ContentTemplateSequence: '0040A504',
+  MappingResource: '00080105',
+  TemplateIdentifier: '0040DB00'
 };
 
 /**
@@ -103,6 +109,29 @@ export const ValueTypeValueTagName = {
   PNAME: 'PersonName',
   CONTAINER: 'ContinuityOfContent',
 };
+
+/**
+ * Get the content template value.
+ *
+ * @param {Object<string, DataElement>} dataElements The dicom elements.
+ * @returns {string|undefined} The template as
+ *   'MappingResource'-'TemplateIdentifier'.
+ */
+export function getContentTemplate(dataElements) {
+  let template;
+  // should only be one item
+  const templateItem =
+    safeGet(dataElements, TagKeys.ContentTemplateSequence);
+  if (typeof templateItem !== 'undefined') {
+    const mappingResource = safeGet(templateItem, TagKeys.MappingResource);
+    const templateId = safeGet(templateItem, TagKeys.TemplateIdentifier);
+    if (typeof mappingResource !== 'undefined' &&
+      typeof templateId !== 'undefined') {
+      template = mappingResource + '-' + templateId;
+    }
+  }
+  return template;
+}
 
 /**
  * DICOM SR content: item of a SR content sequence.
