@@ -97,7 +97,9 @@ export class DicomBufferToView {
     try {
       const data = new DicomData(dataElements);
       if (factory instanceof AnnotationGroupFactory) {
-        data.annotationGroup = factory.create(dataElements);
+        if (typeof factory.checkElements(dataElements) === 'undefined') {
+          data.annotationGroup = factory.create(dataElements);
+        }
       } else {
         data.image = factory.create(
           dataElements,
