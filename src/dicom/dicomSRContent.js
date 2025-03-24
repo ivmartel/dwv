@@ -30,6 +30,7 @@ import {
 /* eslint-disable no-unused-vars */
 import {
   safeGet,
+  safeGetAll,
   DataElement
 } from './dataElement';
 import {DicomCode} from './dicomCode';
@@ -237,36 +238,36 @@ export function isEqualContentItem(item1, item2) {
  */
 export function getSRContent(dataElements) {
   // valueType -> ValueType (type1)
-  let valueType = '';
-  if (typeof dataElements[TagKeys.ValueType] !== 'undefined') {
-    valueType = dataElements[TagKeys.ValueType].value[0];
+  let valueType = safeGet(dataElements, TagKeys.ValueType);
+  if (typeof valueType === 'undefined') {
+    valueType = '';
   }
 
   const content = new DicomSRContent(valueType);
 
   // relationshipType -> RelationType (type1)
-  if (typeof dataElements[TagKeys.RelationshipType] !== 'undefined') {
-    content.relationshipType =
-      dataElements[TagKeys.RelationshipType].value[0];
-  }
+  content.relationshipType =
+    safeGet(dataElements, TagKeys.RelationshipType);
 
-  if (typeof dataElements[TagKeys.ConceptNameCodeSequence] !== 'undefined') {
-    content.conceptNameCode =
-      getCode(dataElements[TagKeys.ConceptNameCodeSequence].value[0]);
+  const conceptNameCode =
+    safeGet(dataElements, TagKeys.ConceptNameCodeSequence);
+  if (typeof conceptNameCode !== 'undefined') {
+    content.conceptNameCode = getCode(conceptNameCode);
   }
 
   // set value acording to valueType
   // (date and time are stored as string)
   if (valueType === ValueTypes.code) {
     content.value = getCode(
-      dataElements[TagKeys.ConceptCodeSequence].value[0]);
+      safeGet(dataElements, TagKeys.ConceptCodeSequence)
+    );
   } else if (valueType === ValueTypes.num) {
     content.value = getNumericMeasurement(dataElements);
   } else if (valueType === ValueTypes.image) {
     content.value = getImageReference(dataElements);
   } else if (valueType === ValueTypes.composite) {
     content.value = getSopInstanceReference(
-      dataElements[TagKeys.ReferencedSOPSequence].value[0]
+      safeGet(dataElements, TagKeys.ReferencedSOPSequence)
     );
   } else if (valueType === ValueTypes.scoord) {
     content.value = getSpatialCoordinate(dataElements);
@@ -275,16 +276,17 @@ export function getSRContent(dataElements) {
   } else {
     const valueTagName = ValueTypeValueTagName[valueType];
     if (typeof valueTagName !== 'undefined') {
-      content.value = dataElements[TagKeys[valueTagName]].value[0];
+      content.value =
+        safeGet(dataElements, TagKeys[valueTagName]);
     } else {
       console.warn('Unsupported input ValueType: ' + valueType);
     }
   }
 
-  const contentSqEl = dataElements[TagKeys.ContentSequence];
-  if (typeof contentSqEl !== 'undefined') {
+  const contentSq = safeGetAll(dataElements, TagKeys.ContentSequence);
+  if (typeof contentSq !== 'undefined') {
     content.contentSequence = [];
-    for (const item of dataElements[TagKeys.ContentSequence].value) {
+    for (const item of contentSq) {
       content.contentSequence.push(getSRContent(item));
     }
   }
