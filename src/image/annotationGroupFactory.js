@@ -135,23 +135,20 @@ export class AnnotationGroupFactory {
       typeof contentTemplate === 'undefined';
 
     // root SR concept
-    let rootConcept = '';
+    let rootConcept;
     const srContent = getSRContent(dataElements);
     if (typeof srContent.conceptNameCode !== 'undefined') {
       rootConcept = srContent.conceptNameCode.value;
     }
 
     if (isDwv034Annotation) {
-      if (typeof rootConcept !== 'undefined' &&
+      if (typeof rootConcept === 'undefined' ||
         rootConcept !== getMeasurementGroupCode().value) {
-        this.#warning = 'No measurement group for dwv 0.34 annotation';
-      } else {
-        this.#warning = 'No root concept name code for dwv 0.34 annotation';
+        this.#warning =
+          'Not a valid root concept name code for dwv 0.34 annotation';
       }
     } else {
-      if (typeof rootConcept === 'undefined') {
-        this.#warning = 'No root concept name code';
-      }
+      this.#warning = 'Not a dwv 0.34 annotation';
     }
 
     return this.#warning;
