@@ -76,13 +76,13 @@ export function getImplementationClassUID() {
 }
 
 /**
- * Parse the value of the ImplementationClassUID tag. If made by
- * dwv, returns the dwv version.
+ * Get the dwv version from the value of the
+ *   ImplementationClassUID tag.
  *
  * @param {string} uid The uid.
  * @returns {string|undefined} The dwv version.
  */
-export function parseImplementationClassUID(uid) {
+export function getDwvVersionFromImplementationClassUID(uid) {
   let version;
   const dwvPrefix = getDwvUIDPrefix();
   if (uid.startsWith(dwvPrefix)) {
@@ -94,6 +94,8 @@ export function parseImplementationClassUID(uid) {
 
 /**
  * Split a string version into parts.
+ * The input version follows a 'm.n.p[-beta.q]' version sheme (related
+ *   to semantic versioning).
  *
  * @param {string} version The version.
  * @returns {string[]} The splited version.
@@ -109,6 +111,8 @@ function splitVersion(version) {
 
 /**
  * Compare versions.
+ * The input versions follow a 'm.n.p[-beta.q]' version sheme (related
+ *   to semantic versioning).
  *
  * @param {string} a The first version.
  * @param {string} b The second version.
@@ -148,6 +152,8 @@ export function compareVersions(a, b) {
 
 /**
  * Check if a version in inside bounds (bounds inclusives).
+ * The input version follows a 'm.n.p[-beta.q]' version sheme (related
+ *   to semantic versioning).
  *
  * @param {string} version The version to check.
  * @param {string} min The minimum version.

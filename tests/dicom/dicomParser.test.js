@@ -4,7 +4,7 @@ import {
   getDwvVersionUI,
   getDwvUIDPrefix,
   getImplementationClassUID,
-  parseImplementationClassUID,
+  getDwvVersionFromImplementationClassUID,
   compareVersions,
   isVersionInBounds,
   cleanString,
@@ -45,19 +45,19 @@ QUnit.test('DICOM parsing - Implementation class and name', function (assert) {
   const version00 = getDwvVersion();
   // dot and possible '-' for beta
   const classUID0 = getImplementationClassUID();
-  const version01 = parseImplementationClassUID(classUID0);
+  const version01 = getDwvVersionFromImplementationClassUID(classUID0);
   assert.deepEqual(version00, version01, 'Implementation class test #0');
 
   // test #1: basic
   const version10 = '1.2.3';
   const classUID10 = getDwvUIDPrefix() + '.' + version10;
-  const version11 = parseImplementationClassUID(classUID10);
+  const version11 = getDwvVersionFromImplementationClassUID(classUID10);
   assert.deepEqual(version10, version11, 'Implementation class test #1');
 
   // test #2: with beta
   const version20 = '4.5.6-beta.19';
   const classUID20 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
-  const version21 = parseImplementationClassUID(classUID20);
+  const version21 = getDwvVersionFromImplementationClassUID(classUID20);
   assert.deepEqual(version20, version21, 'Implementation class test #2');
 });
 
