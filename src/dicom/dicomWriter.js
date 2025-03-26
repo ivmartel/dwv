@@ -232,8 +232,8 @@ function padOBValue(value) {
       typeof value[0].length !== 'undefined') {
       // handle array of array
       let size = 0;
-      for (let i = 0; i < value.length; ++i) {
-        size += value[i].length;
+      for (const valueItem of value) {
+        size += valueItem.length;
       }
       if (!isEven(size)) {
         value[value.length - 1] = uint8ArrayPush(
@@ -544,9 +544,7 @@ export class DicomWriter {
       return isItemTag(item.tag) && item.vr === 'NONE';
     };
 
-    let item;
-    for (let i = 0; i < items.length; ++i) {
-      item = items[i];
+    for (const item of items) {
       if (item.length === 0) {
         continue;
       }
@@ -655,8 +653,8 @@ export class DicomWriter {
         byteOffset = this.#writeDataElementItems(
           writer, byteOffset, value, isImplicit);
       } else if (element.vr === 'AT') {
-        for (let i = 0; i < value.length; ++i) {
-          const hexString = value[i] + '';
+        for (const valueItem of value) {
+          const hexString = valueItem + '';
           const hexString1 = hexString.substring(1, 5);
           const hexString2 = hexString.substring(6, 10);
           const dec1 = parseInt(hexString1, 16);
@@ -723,26 +721,26 @@ export class DicomWriter {
         writer, element, byteOffset, finalValue, isImplicit);
     } else {
       // pixel data as sequence
-      const item = [];
+      const sqItem = [];
       // first item: basic offset table
-      item.push({
+      sqItem.push({
         tag: getItemTag(),
         vr: 'NONE',
         vl: 0,
         value: []
       });
       // data
-      for (let i = 0; i < value.length; ++i) {
-        item.push({
+      for (const valueItem of value) {
+        sqItem.push({
           tag: getItemTag(),
           vr: element.vr,
-          vl: value[i].length,
-          value: value[i]
+          vl: valueItem.length,
+          value: valueItem
         });
       }
       // write
       byteOffset = this.#writeDataElementItems(
-        writer, byteOffset, [item], isImplicit);
+        writer, byteOffset, [sqItem], isImplicit);
     }
 
     // return new offset
@@ -888,9 +886,9 @@ export class DicomWriter {
 
     // loop through elements to get the buffer size
     const keys = Object.keys(dataElements);
-    for (let i = 0, leni = keys.length; i < leni; ++i) {
-      const originalElement = dataElements[keys[i]];
-      originalElement.tag = getTagFromKey(keys[i]);
+    for (const key of keys) {
+      const originalElement = dataElements[key];
+      originalElement.tag = getTagFromKey(key);
       element = this.getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
@@ -1014,9 +1012,9 @@ export class DicomWriter {
     // FileMetaInformationGroupLength
     offset = this.#writeDataElement(metaWriter, fmigl, offset, false);
     // write meta
-    for (let j = 0, lenj = metaElements.length; j < lenj; ++j) {
+    for (const metaElement of metaElements) {
       offset = this.#writeDataElement(
-        metaWriter, metaElements[j], offset, false);
+        metaWriter, metaElement, offset, false);
     }
 
     // check meta position
@@ -1029,9 +1027,9 @@ export class DicomWriter {
     }
 
     // write non meta
-    for (let k = 0, lenk = rawElements.length; k < lenk; ++k) {
+    for (const rawElement of rawElements) {
       offset = this.#writeDataElement(
-        dataWriter, rawElements[k], offset, isImplicit);
+        dataWriter, rawElement, offset, isImplicit);
     }
 
     // check final position
@@ -1071,8 +1069,8 @@ export class DicomWriter {
         }
 
         // items
-        for (let i = 0; i < value.length; ++i) {
-          const oldItemElements = value[i];
+        for (const valueItem of value) {
+          const oldItemElements = valueItem;
           const newItemElements = [];
           let subSize = 0;
 
@@ -1091,8 +1089,7 @@ export class DicomWriter {
 
           // elements
           const itemKeys = Object.keys(oldItemElements);
-          for (let j = 0, lenj = itemKeys.length; j < lenj; ++j) {
-            const itemKey = itemKeys[j];
+          for (const itemKey of itemKeys) {
             const subElement = oldItemElements[itemKey];
             subElement.tag = getTagFromKey(itemKey);
 
@@ -1183,8 +1180,8 @@ export class DicomWriter {
         if (isPixelDataTag(element.tag) &&
           Array.isArray(value)) {
           size = 0;
-          for (let b = 0; b < value.length; ++b) {
-            size += value[b].length;
+          for (const valueItem of value) {
+            size += valueItem.length;
           }
         } else {
           size = value.length;
@@ -1363,9 +1360,9 @@ function getBpeForVrType(vrType) {
 export function getElementsFromJSONTags(simpleTags) {
   const keys = Object.keys(simpleTags);
   const dataElements = {};
-  for (let k = 0, len = keys.length; k < len; ++k) {
+  for (const key of keys) {
     // get the DICOM element definition from its name
-    const tag = getTagFromDictionary(keys[k]);
+    const tag = getTagFromDictionary(key);
     if (typeof tag === 'undefined') {
       continue;
     }
@@ -1373,19 +1370,18 @@ export function getElementsFromJSONTags(simpleTags) {
     // tag value
     let value;
     let undefinedLength = false;
-    const simpleTag = simpleTags[keys[k]];
+    const simpleTag = simpleTags[key];
     if (vr === 'SQ') {
       const items = [];
       if (typeof simpleTag.undefinedLength !== 'undefined') {
         undefinedLength = simpleTag.undefinedLength;
       }
-      if (typeof simpleTag.value !== 'undefined' &&
-        simpleTag.value !== null) {
-        for (let i = 0; i < simpleTag.value.length; ++i) {
-          items.push(getElementsFromJSONTags(simpleTag.value[i]));
+      if (Array.isArray(simpleTag.value)) {
+        for (const item of simpleTag.value) {
+          items.push(getElementsFromJSONTags(item));
         }
       } else {
-        logger.trace('Undefined or null simpleTag SQ value.');
+        logger.trace('Non array simpleTag SQ value');
       }
       value = items;
     } else {
