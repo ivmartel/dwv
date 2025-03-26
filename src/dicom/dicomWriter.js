@@ -539,6 +539,11 @@ export class DicomWriter {
    */
   #writeDataElementItems(
     writer, byteOffset, items, isImplicit) {
+
+    const isItemTagWithNoVR = function (item) {
+      return isItemTag(item.tag) && item.vr === 'NONE';
+    };
+
     let item;
     for (let i = 0; i < items.length; ++i) {
       item = items[i];
@@ -547,7 +552,7 @@ export class DicomWriter {
       }
       // item element (create new to not modify original)
       let undefinedLength = false;
-      const itemTag = item.find((subItem) => isItemTag(subItem.tag));
+      const itemTag = item.find((subItem) => isItemTagWithNoVR(subItem));
       if (typeof itemTag !== 'undefined' &&
         typeof itemTag.undefinedLength !== 'undefined') {
         undefinedLength = itemTag.undefinedLength;
@@ -560,7 +565,7 @@ export class DicomWriter {
         writer, itemElement, byteOffset, isImplicit);
       // write rest
       for (const subItem of item) {
-        if (!isItemTag(subItem.tag) &&
+        if (!isItemTagWithNoVR(subItem) &&
           !isItemDelimitationItemTag(subItem.tag)) {
           byteOffset = this.#writeDataElement(
             writer, subItem, byteOffset, isImplicit);
@@ -718,22 +723,22 @@ export class DicomWriter {
         writer, element, byteOffset, finalValue, isImplicit);
     } else {
       // pixel data as sequence
-      const item = {};
+      const item = [];
       // first item: basic offset table
-      item['FFFEE000'] = {
+      item.push({
         tag: getItemTag(),
         vr: 'NONE',
         vl: 0,
         value: []
-      };
+      });
       // data
       for (let i = 0; i < value.length; ++i) {
-        item[i] = {
+        item.push({
           tag: getItemTag(),
           vr: element.vr,
           vl: value[i].length,
           value: value[i]
-        };
+        });
       }
       // write
       byteOffset = this.#writeDataElementItems(
