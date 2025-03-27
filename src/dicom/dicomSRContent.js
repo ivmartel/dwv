@@ -161,11 +161,11 @@ export class DicomSRContent {
   relationshipType;
 
   /**
-   * Content sequence (0040,A730).
+   * Content sequence.
    *
-   * @type {DicomSRContent[]|undefined}
+   * @type {DicomSRContent[]}
    */
-  contentSequence;
+  contentSequence = [];
 
   /**
    * Value.
@@ -206,10 +206,8 @@ export class DicomSRContent {
 
     res += ' = ' + this.value.toString();
 
-    if (typeof this.contentSequence !== 'undefined') {
-      for (const item of this.contentSequence) {
-        res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
-      }
+    for (const item of this.contentSequence) {
+      res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
     }
 
     return res;
@@ -300,7 +298,6 @@ export function getSRContent(dataElements) {
 
   const contentSq = safeGetAll(dataElements, TagKeys.ContentSequence);
   if (typeof contentSq !== 'undefined') {
-    content.contentSequence = [];
     for (const item of contentSq) {
       content.contentSequence.push(getSRContent(item));
     }
@@ -370,7 +367,7 @@ export function getDicomSRContentItem(content) {
     }
   }
 
-  if (typeof content.contentSequence !== 'undefined') {
+  if (content.contentSequence.length !== 0) {
     contentItem.ContentSequence = {
       value: []
     };

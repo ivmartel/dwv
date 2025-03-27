@@ -220,21 +220,19 @@ export class AnnotationGroupFactory {
       ValueTypes.text, getShortLabelCode(), RelationshipTypes.hasProperties
     )) {
       annotation.textExpr = content.value;
-      if (typeof content.contentSequence !== 'undefined') {
-        // optional label position
-        const scoord = content.contentSequence.find(function (item) {
-          return item.hasHeader(
-            ValueTypes.scoord,
-            getReferencePointsCode(),
-            RelationshipTypes.hasProperties
-          );
-        });
-        if (typeof scoord !== 'undefined') {
-          annotation.labelPosition = new Point2D(
-            scoord.value.graphicData[0],
-            scoord.value.graphicData[1]
-          );
-        }
+      // optional label position
+      const scoord = content.contentSequence.find(function (item) {
+        return item.hasHeader(
+          ValueTypes.scoord,
+          getReferencePointsCode(),
+          RelationshipTypes.hasProperties
+        );
+      });
+      if (typeof scoord !== 'undefined') {
+        annotation.labelPosition = new Point2D(
+          scoord.value.graphicData[0],
+          scoord.value.graphicData[1]
+        );
       }
     }
 
