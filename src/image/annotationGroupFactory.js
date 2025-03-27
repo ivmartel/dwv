@@ -30,7 +30,9 @@ import {
   getColourCode,
   getQuantificationName,
   getQuantificationUnit,
-  DicomCode
+  DicomCode,
+  getImagingMeasurementReportCode,
+  getImagingMeasurementsCode
 } from '../dicom/dicomCode';
 import {
   isVersionInBounds,
@@ -50,7 +52,6 @@ import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {Annotation} from './annotation';
 import {AnnotationGroup} from './annotationGroup';
-import {Line} from '../math/line';
 import {Point2D, Point3D} from '../math/point';
 
 // doc imports
@@ -71,6 +72,9 @@ const TagKeys = {
   PatientBirthDate: '00100030',
   PatientSex: '00100040',
   ReferencedSeriesSequence: '00081115',
+  ContentTemplateSequence: '0040A504',
+  MappingResource: '00080105',
+  TemplateIdentifier: '0040DB00'
 };
 
 /**
@@ -112,6 +116,57 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Check if input elements contain a dwv 0.34 annotation.
+   *
+   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @returns {boolean} True if the elements contain a dwv 0.34 annotation.
+   */
+  #isDwv034Annotations(dataElements) {
+    // content template
+    const contentTemplate = getContentTemplate(dataElements);
+
+    // version
+    const classUID =
+      safeGet(dataElements, TagKeys.ImplementationClassUID);
+    const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
+    const isDwv034 = typeof dwvVersion !== 'undefined' &&
+      isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.21');
+
+    // root SR concept
+    let rootConcept;
+    const srContent = getSRContent(dataElements);
+    if (typeof srContent.conceptNameCode !== 'undefined') {
+      rootConcept = srContent.conceptNameCode.value;
+    }
+
+    // dwv 0.34 annotations do not have template
+    return isDwv034 &&
+      typeof contentTemplate === 'undefined' &&
+      rootConcept === getMeasurementGroupCode().value;
+  }
+
+  /**
+   * Check if input elements contain a TID 1500 annotation.
+   *
+   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @returns {boolean} True if the elements contain a TID 1500 annotation.
+   */
+  #isTid1500Annotations(dataElements) {
+    // content template
+    const contentTemplate = getContentTemplate(dataElements);
+
+    // root SR concept
+    let rootConcept;
+    const srContent = getSRContent(dataElements);
+    if (typeof srContent.conceptNameCode !== 'undefined') {
+      rootConcept = srContent.conceptNameCode.value;
+    }
+
+    return contentTemplate === 'DCMR-1500' &&
+      rootConcept === getImagingMeasurementReportCode().value;
+  }
+
+  /**
    * Check dicom elements.
    *
    * @param {Object<string, DataElement>} dataElements The DICOM data elements.
@@ -121,129 +176,104 @@ export class AnnotationGroupFactory {
   checkElements(dataElements) {
     // reset
     this.#warning = undefined;
-
-    // content template
-    const contentTemplate = getContentTemplate(dataElements);
-    // version
-    const classUID =
-      safeGet(dataElements, TagKeys.ImplementationClassUID);
-    const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
-    const isDwv034 = typeof dwvVersion !== 'undefined' &&
-      isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.21');
-    // dwv 0.34 annotations do not have template
-    const isDwv034Annotation = isDwv034 &&
-      typeof contentTemplate === 'undefined';
-
-    // root SR concept
-    let rootConcept;
-    const srContent = getSRContent(dataElements);
-    if (typeof srContent.conceptNameCode !== 'undefined') {
-      rootConcept = srContent.conceptNameCode.value;
-    }
-
-    if (isDwv034Annotation) {
-      if (typeof rootConcept === 'undefined' ||
-        rootConcept !== getMeasurementGroupCode().value) {
-        this.#warning =
-          'Not a valid root concept name code for dwv 0.34 annotation';
-      }
-    } else {
-      this.#warning = 'Not a dwv 0.34 annotation';
+    //if (!this.#isDwv034Annotations(dataElements)) {
+    if (!this.#isDwv034Annotations(dataElements) &&
+      !this.#isTid1500Annotations(dataElements)) {
+      this.#warning = 'Not a dwv supported annotation';
     }
 
     return this.#warning;
   }
 
   /**
-   * Convert a DICOM SR content of type SCOORD into an annotation.
+   * Add the source image to an annotation.
    *
-   * @param {DicomSRContent} item The input SCOORD.
-   * @returns {Annotation} The annotation.
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
    */
-  #scoordToAnnotation(item) {
-    const annotation = new Annotation();
-    annotation.mathShape = getShapeFromScoord(item.value);
-    // default
-    annotation.id = guid();
-    annotation.textExpr = '';
+  #addSourceImageToAnnotation(annotation, content) {
+    if (content.valueType === ValueTypes.image &&
+      content.relationshipType === RelationshipTypes.selectedFrom &&
+      isEqualCode(content.conceptNameCode, getSourceImageCode())) {
+      annotation.referenceSopUID =
+        content.value.referencedSOPSequence.referencedSOPInstanceUID;
+    }
+  }
 
-    for (const subItem of item.contentSequence) {
-      // reference image UID
-      if (subItem.valueType === ValueTypes.image &&
-        subItem.relationshipType === RelationshipTypes.selectedFrom &&
-        isEqualCode(subItem.conceptNameCode, getSourceImageCode())) {
-        annotation.referenceSopUID =
-          subItem.value.referencedSOPSequence.referencedSOPInstanceUID;
-      }
-      // annotation id
-      if (subItem.valueType === ValueTypes.uidref &&
-        subItem.relationshipType === RelationshipTypes.hasProperties &&
-        isEqualCode(subItem.conceptNameCode, getTrackingIdentifierCode())) {
-        annotation.id = subItem.value;
-      }
-      // text expr
-      if (subItem.valueType === ValueTypes.text &&
-        subItem.relationshipType === RelationshipTypes.hasProperties &&
-        isEqualCode(subItem.conceptNameCode, getShortLabelCode())) {
-        annotation.textExpr = subItem.value;
-        if (typeof subItem.contentSequence !== 'undefined') {
-          for (const subsubItem of subItem.contentSequence) {
-            if (subsubItem.valueType === ValueTypes.scoord &&
-              subsubItem.relationshipType === RelationshipTypes.hasProperties &&
-              isEqualCode(
-                subsubItem.conceptNameCode, getReferencePointsCode())) {
-              annotation.labelPosition = new Point2D(
-                subsubItem.value.graphicData[0],
-                subsubItem.value.graphicData[1]
-              );
-            }
+  /**
+   * Add content to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addContentToAnnotation(annotation, content) {
+    // annotation id
+    if (content.valueType === ValueTypes.uidref &&
+      content.relationshipType === RelationshipTypes.hasProperties &&
+      isEqualCode(content.conceptNameCode, getTrackingIdentifierCode())) {
+      annotation.id = content.value;
+    }
+    // text expr
+    if (content.valueType === ValueTypes.text &&
+      content.relationshipType === RelationshipTypes.hasProperties &&
+      isEqualCode(content.conceptNameCode, getShortLabelCode())) {
+      annotation.textExpr = content.value;
+      if (typeof content.contentSequence !== 'undefined') {
+        for (const subsubItem of content.contentSequence) {
+          if (subsubItem.valueType === ValueTypes.scoord &&
+            subsubItem.relationshipType === RelationshipTypes.hasProperties &&
+            isEqualCode(
+              subsubItem.conceptNameCode, getReferencePointsCode())) {
+            annotation.labelPosition = new Point2D(
+              subsubItem.value.graphicData[0],
+              subsubItem.value.graphicData[1]
+            );
           }
         }
       }
-      // color
-      if (subItem.valueType === ValueTypes.text &&
-        subItem.relationshipType === RelationshipTypes.hasProperties &&
-        isEqualCode(subItem.conceptNameCode, getColourCode())) {
-        annotation.colour = subItem.value;
+    }
+    // color
+    if (content.valueType === ValueTypes.text &&
+      content.relationshipType === RelationshipTypes.hasProperties &&
+      isEqualCode(content.conceptNameCode, getColourCode())) {
+      annotation.colour = content.value;
+    }
+    // reference points
+    if (content.valueType === ValueTypes.scoord &&
+      content.relationshipType === RelationshipTypes.hasProperties &&
+      isEqualCode(content.conceptNameCode, getReferencePointsCode()) &&
+      content.value.graphicType === GraphicTypes.multipoint) {
+      const points = [];
+      for (let i = 0; i < content.value.graphicData.length; i += 2) {
+        points.push(new Point2D(
+          content.value.graphicData[i],
+          content.value.graphicData[i + 1]
+        ));
       }
-      // reference points
-      if (subItem.valueType === ValueTypes.scoord &&
-        subItem.relationshipType === RelationshipTypes.hasProperties &&
-        isEqualCode(subItem.conceptNameCode, getReferencePointsCode()) &&
-        subItem.value.graphicType === GraphicTypes.multipoint) {
-        const points = [];
-        for (let i = 0; i < subItem.value.graphicData.length; i += 2) {
-          points.push(new Point2D(
-            subItem.value.graphicData[i],
-            subItem.value.graphicData[i + 1]
-          ));
-        }
-        annotation.referencePoints = points;
+      annotation.referencePoints = points;
+    }
+    // plane points
+    if (content.valueType === ValueTypes.scoord3d &&
+      content.relationshipType === RelationshipTypes.hasProperties &&
+      isEqualCode(
+        content.conceptNameCode, getReferenceGeometryCode()) &&
+      content.value.graphicType === GraphicTypes.multipoint) {
+      const data = content.value.graphicData;
+      const points = [];
+      const nPoints = Math.floor(data.length / 3);
+      for (let i = 0; i < nPoints; ++i) {
+        const j = i * 3;
+        points.push(new Point3D(data[j], data[j + 1], data[j + 2]));
       }
-      // plane points
-      if (subItem.valueType === ValueTypes.scoord3d &&
-        subItem.relationshipType === RelationshipTypes.hasProperties &&
-        isEqualCode(
-          subItem.conceptNameCode, getReferenceGeometryCode()) &&
-        subItem.value.graphicType === GraphicTypes.multipoint) {
-        const data = subItem.value.graphicData;
-        const points = [];
-        const nPoints = Math.floor(data.length / 3);
-        for (let i = 0; i < nPoints; ++i) {
-          const j = i * 3;
-          points.push(new Point3D(data[j], data[j + 1], data[j + 2]));
-        }
-        annotation.planePoints = points;
-      }
-      // quantification
-      if (subItem.valueType === ValueTypes.num &&
-        subItem.relationshipType === RelationshipTypes.contains) {
-        const quantifName =
-          getQuantificationName(subItem.conceptNameCode);
-        if (typeof quantifName === 'undefined') {
-          continue;
-        }
-        const measuredValue = subItem.value.measuredValue;
+      annotation.planePoints = points;
+    }
+    // quantification
+    if (content.valueType === ValueTypes.num &&
+      content.relationshipType === RelationshipTypes.contains) {
+      const quantifName =
+        getQuantificationName(content.conceptNameCode);
+      if (typeof quantifName !== 'undefined') {
+        const measuredValue = content.value.measuredValue;
         const quantifUnit = getQuantificationUnit(
           measuredValue.measurementUnitsCode);
         if (typeof annotation.quantification === 'undefined') {
@@ -254,17 +284,143 @@ export class AnnotationGroupFactory {
           unit: quantifUnit
         };
       }
-      // meta
-      if ((subItem.valueType === ValueTypes.code ||
-        subItem.valueType === ValueTypes.text) &&
-        subItem.relationshipType === RelationshipTypes.contains) {
-        annotation.addMetaItem(
-          subItem.conceptNameCode,
-          subItem.value
-        );
+    }
+    // meta
+    if ((content.valueType === ValueTypes.code ||
+      content.valueType === ValueTypes.text) &&
+      content.relationshipType === RelationshipTypes.contains) {
+      annotation.addMetaItem(
+        content.conceptNameCode,
+        content.value
+      );
+    }
+  }
+
+  /**
+   * Convert a DICOM SR content of type 'Measurement group' into an annotation.
+   *
+   * @param {DicomSRContent} content The input SR content.
+   * @returns {Annotation} The annotation.
+   */
+  #measGroupToAnnotation(content) {
+    const annotation = new Annotation();
+    // default
+    annotation.id = guid();
+    annotation.textExpr = '';
+
+    for (const item of content.contentSequence) {
+      if (item.valueType === ValueTypes.scoord &&
+        item.relationshipType === RelationshipTypes.contains &&
+        (isEqualCode(item.conceptNameCode, getImageRegionCode()) ||
+        isEqualCode(item.conceptNameCode, getPathCode()))) {
+        console.log('got image region');
+
+        console.log('item.value', item.value);
+        annotation.mathShape = getShapeFromScoord(item.value);
+
+        console.log('mathShape', annotation.mathShape);
+
+        for (const subItem of item.contentSequence) {
+          this.#addSourceImageToAnnotation(annotation, subItem);
+        }
+      } else {
+        this.#addContentToAnnotation(annotation, item);
       }
     }
+
+    console.log('annotation', annotation);
     return annotation;
+  }
+
+  /**
+   * Convert a DICOM SR content of type SCOORD into an annotation.
+   *
+   * @param {DicomSRContent} content The input SCOORD.
+   * @returns {Annotation} The annotation.
+   */
+  #dwv034ScoordToAnnotation(content) {
+    const annotation = new Annotation();
+    annotation.mathShape = getShapeFromScoord(content.value);
+    // default
+    annotation.id = guid();
+    annotation.textExpr = '';
+
+    for (const item of content.contentSequence) {
+      this.#addSourceImageToAnnotation(annotation, item);
+      this.#addContentToAnnotation(annotation, item);
+    }
+    return annotation;
+  }
+
+  /**
+   * Convert a DICOM SR content folowing TID 1500 into a list of annotations.
+   *
+   * @param {DicomSRContent} content The input SCOORD.
+   * @returns {AnnotationGroup} The annotation group.
+   */
+  #tid1500ToAnnotationGroup(content) {
+    console.log('load TID 1500 ------------------------------');
+    // item.conceptNameCode = getImagineMeasurementReportCode()
+    if (content.valueType === ValueTypes.container &&
+      content.relationshipType === RelationshipTypes.contains &&
+      isEqualCode(content.conceptNameCode, getImagingMeasurementReportCode())) {
+      console.log('got imaging meas report');
+    }
+    console.log('content.valueType', content.valueType);
+    console.log('content.relationshipType', content.relationshipType);
+    console.log('content.conceptNameCode', content.conceptNameCode);
+
+    // tid 1500
+    // root: 'Imaging Measurement Report'
+    // - 'Imaging Measurements'
+    //   - 'Measurement Group'
+    //     - scoord
+    //     - meta
+    const annotations = [];
+
+
+    for (const item of content.contentSequence) {
+      if (item.valueType === ValueTypes.container &&
+        item.relationshipType === RelationshipTypes.contains &&
+        isEqualCode(item.conceptNameCode, getImagingMeasurementsCode())) {
+        console.log('got imaging meas');
+
+        for (const subItem of item.contentSequence) {
+          if (subItem.valueType === ValueTypes.container &&
+            subItem.relationshipType === RelationshipTypes.contains &&
+            isEqualCode(subItem.conceptNameCode, getMeasurementGroupCode())) {
+            console.log('got meas group');
+
+            annotations.push(this.#measGroupToAnnotation(subItem));
+          }
+        }
+      }
+    }
+
+    return new AnnotationGroup(annotations);
+  }
+
+  /**
+   * Convert a DICOM SR content 'Measurement group' into a list of annotations.
+   *
+   * @param {DicomSRContent} content The input.
+   * @returns {Annotation[]} The annotation.
+   */
+  #dwv034MeasGroupToAnnotationGroup(content) {
+    // item.conceptNameCode = getMeasurementGroupCode()
+
+    // dwv 0.34:
+    // root: 'Measurement group'
+    // - scoord
+    //   - meta
+
+    const annotations = [];
+    for (const item of content.contentSequence) {
+      if (item.valueType === ValueTypes.scoord) {
+        annotations.push(this.#dwv034ScoordToAnnotation(item));
+      }
+    }
+    return new AnnotationGroup(annotations);
   }
 
   /**
@@ -275,14 +431,18 @@ export class AnnotationGroupFactory {
    * @throws Error for missing or wrong data.
    */
   create(dataElements) {
-    const annotations = [];
     const srContent = getSRContent(dataElements);
-    for (const item of srContent.contentSequence) {
-      if (item.valueType === ValueTypes.scoord) {
-        annotations.push(this.#scoordToAnnotation(item));
-      }
+
+    let annotationGroup;
+    if (this.#isTid1500Annotations(dataElements)) {
+      annotationGroup = this.#tid1500ToAnnotationGroup(srContent);
+    } else if (this.#isDwv034Annotations(dataElements)) {
+      annotationGroup = this.#dwv034MeasGroupToAnnotationGroup(srContent);
     }
-    const annotationGroup = new AnnotationGroup(annotations);
+
+    if (typeof annotationGroup === 'undefined') {
+      throw new Error('Cant create annotation group');
+    }
 
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
@@ -322,24 +482,7 @@ export class AnnotationGroupFactory {
     return annotationGroup;
   }
 
-  /**
-   * Convert an annotation into a DICOM SCOORD.
-   *
-   * @param {Annotation} annotation The input annotation.
-   * @returns {DicomSRContent} An SR content of type SCOORD.
-   */
-  #annotationToScoord(annotation) {
-    const srScoord = new DicomSRContent(ValueTypes.scoord);
-    srScoord.relationshipType = RelationshipTypes.contains;
-    if (annotation.mathShape instanceof Line) {
-      srScoord.conceptNameCode = getPathCode();
-    } else {
-      srScoord.conceptNameCode = getImageRegionCode();
-    }
-    srScoord.value = getScoordFromShape(annotation.mathShape);
-
-    const itemContentSequence = [];
-
+  #getAnnotationSourceImageContent(annotation) {
     // reference image UID
     const srImage = new DicomSRContent(ValueTypes.image);
     srImage.relationshipType = RelationshipTypes.selectedFrom;
@@ -350,14 +493,19 @@ export class AnnotationGroupFactory {
     const imageRef = new ImageReference();
     imageRef.referencedSOPSequence = sopRef;
     srImage.value = imageRef;
-    itemContentSequence.push(srImage);
+
+    return srImage;
+  }
+
+  #getAnnotationContentSequence(annotation) {
+    const contentSequence = [];
 
     // annotation id
     const srUid = new DicomSRContent(ValueTypes.uidref);
     srUid.relationshipType = RelationshipTypes.hasProperties;
     srUid.conceptNameCode = getTrackingIdentifierCode();
     srUid.value = annotation.id;
-    itemContentSequence.push(srUid);
+    contentSequence.push(srUid);
 
     // text expr
     const shortLabel = new DicomSRContent(ValueTypes.text);
@@ -381,14 +529,14 @@ export class AnnotationGroupFactory {
       // add position to label sequence
       shortLabel.contentSequence = [labelPosition];
     }
-    itemContentSequence.push(shortLabel);
+    contentSequence.push(shortLabel);
 
     // colour
     const colour = new DicomSRContent(ValueTypes.text);
     colour.relationshipType = RelationshipTypes.hasProperties;
     colour.conceptNameCode = getColourCode();
     colour.value = annotation.colour;
-    itemContentSequence.push(colour);
+    contentSequence.push(colour);
 
     // reference points
     if (typeof annotation.referencePoints !== 'undefined') {
@@ -405,7 +553,7 @@ export class AnnotationGroupFactory {
       refPointsScoord.graphicData = graphicData;
 
       referencePoints.value = refPointsScoord;
-      itemContentSequence.push(referencePoints);
+      contentSequence.push(referencePoints);
     }
 
     // plane points
@@ -424,7 +572,7 @@ export class AnnotationGroupFactory {
       pointsScoord.graphicData = graphicData;
 
       planePoints.value = pointsScoord;
-      itemContentSequence.push(planePoints);
+      contentSequence.push(planePoints);
     }
 
     // quantification
@@ -436,7 +584,7 @@ export class AnnotationGroupFactory {
           annotation.quantification[key].unit
         );
         if (typeof quatifContent !== 'undefined') {
-          itemContentSequence.push(quatifContent);
+          contentSequence.push(quatifContent);
         }
       }
     }
@@ -453,11 +601,67 @@ export class AnnotationGroupFactory {
       meta.relationshipType = RelationshipTypes.contains;
       meta.conceptNameCode = item.concept;
       meta.value = item.value;
-      itemContentSequence.push(meta);
+      contentSequence.push(meta);
     }
 
-    srScoord.contentSequence = itemContentSequence;
-    return srScoord;
+    return contentSequence;
+  }
+
+  /**
+   * Convert an annotation into a 'Measurement Group' SR content.
+   *
+   * @param {Annotation} annotation The input annotation.
+   * @returns {DicomSRContent} The result SR content.
+   */
+  #annotationToMeasGroup(annotation) {
+    // measurement group
+    const srContent = new DicomSRContent(ValueTypes.container);
+    srContent.relationshipType = RelationshipTypes.contains;
+    srContent.conceptNameCode = getMeasurementGroupCode();
+
+    // scoord
+    const srScoord = new DicomSRContent(ValueTypes.scoord);
+    srScoord.relationshipType = RelationshipTypes.contains;
+    srScoord.conceptNameCode = getImageRegionCode();
+    srScoord.value = getScoordFromShape(annotation.mathShape);
+    const srcImage = this.#getAnnotationSourceImageContent(annotation);
+    srScoord.contentSequence = [srcImage];
+
+    // add extras
+    srContent.contentSequence = [srScoord].concat(
+      this.#getAnnotationContentSequence(annotation));
+
+    return srContent;
+  }
+
+
+  /**
+   * Convert an annotation group into a TID 1500 report SR content.
+   *
+   * @param {AnnotationGroup} annotationGroup The input annotation group.
+   * @returns {DicomSRContent|undefined} The result SR content.
+   */
+  #annotationGroupToTid1500(annotationGroup) {
+    let srContent;
+
+    if (annotationGroup.getList().length !== 0) {
+      // imaging measurements
+      const measContent = new DicomSRContent(ValueTypes.container);
+      measContent.conceptNameCode = getImagingMeasurementsCode();
+      measContent.relationshipType = RelationshipTypes.contains;
+      const contentSequence = [];
+      for (const annotation of annotationGroup.getList()) {
+        contentSequence.push(this.#annotationToMeasGroup(annotation));
+      }
+      measContent.contentSequence = contentSequence;
+
+      // imaging measurements report
+      srContent = new DicomSRContent(ValueTypes.container);
+      srContent.conceptNameCode = getImagingMeasurementReportCode();
+      srContent.contentSequence = [measContent];
+    }
+
+    return srContent;
   }
 
   /**
@@ -482,17 +686,19 @@ export class AnnotationGroupFactory {
     tags.ContentDate = getDicomDate(dateToDateObj(now));
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
 
-    const contentSequence = [];
-    for (const annotation of annotationGroup.getList()) {
-      contentSequence.push(this.#annotationToScoord(annotation));
-    }
+    //const srContent = this.#annotationGroupToDwv034MeasGroup(annotationGroup);
+    const srContent = this.#annotationGroupToTid1500(annotationGroup);
+
+    // TID 1500
+    tags.ContentTemplateSequence = {
+      value: [{
+        MappingResource: 'DCMR',
+        TemplateIdentifier: '1500'
+      }]
+    };
 
     // main
-    if (contentSequence.length !== 0) {
-      const srContent = new DicomSRContent(ValueTypes.container);
-      srContent.conceptNameCode = getMeasurementGroupCode();
-      srContent.contentSequence = contentSequence;
-
+    if (typeof srContent !== 'undefined') {
       tags = {
         ...tags,
         ...getDicomSRContentItem(srContent)
