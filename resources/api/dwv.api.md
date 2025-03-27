@@ -506,6 +506,9 @@ export function getRectangleIndices(center: Index, size: number[], dir: number[]
 export function getReverseOrientation(ori: string): string;
 
 // @public
+export function getSegmentationCode(): DicomCode;
+
+// @public
 export function getSRContent(dataElements: {
     [x: string]: DataElement;
 }): DicomSRContent;
@@ -524,6 +527,9 @@ export function getUID(tagName: string): string;
 
 // @public
 export function hasDicomPrefix(buffer: ArrayBuffer): boolean;
+
+// @public
+export function hexToRgb(hexStr: string): RGB;
 
 // @public (undocumented)
 export namespace i18n {
@@ -946,6 +952,9 @@ export class RGB {
 }
 
 // @public
+export function rgbToHex(rgb: RGB): string;
+
+// @public
 export class ROI {
     constructor(points?: Point2D[]);
     addPoint(point: Point2D): void;
@@ -1016,6 +1025,7 @@ export class Tag {
     getGroup(): string;
     getGroupName(): string;
     getKey(): string;
+    getMultiplicityFromDictionary(): number | undefined;
     getNameFromDictionary(): string | undefined;
     getVrFromDictionary(): string | undefined;
     isPrivate(): boolean;

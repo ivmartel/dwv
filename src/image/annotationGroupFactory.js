@@ -129,7 +129,7 @@ export class AnnotationGroupFactory {
       safeGet(dataElements, TagKeys.ImplementationClassUID);
     const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
     const isDwv034 = typeof dwvVersion !== 'undefined' &&
-      isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.20');
+      isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.21');
     // dwv 0.34 annotations do not have template
     const isDwv034Annotation = isDwv034 &&
       typeof contentTemplate === 'undefined';

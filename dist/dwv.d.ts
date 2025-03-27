@@ -2412,6 +2412,13 @@ export declare function getRectangleIndices(center: Index, size: number[], dir: 
 export declare function getReverseOrientation(ori: string): string;
 
 /**
+ * Get a segmentation DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export declare function getSegmentationCode(): DicomCode;
+
+/**
  * Get a content item object from a dicom element.
  *
  * @param {Object<string, DataElement>} dataElements The dicom element.
@@ -2475,6 +2482,14 @@ export declare function getUID(tagName: string): string;
  * @returns {boolean} True if the buffer includes the prefix.
  */
 export declare function hasDicomPrefix(buffer: ArrayBuffer): boolean;
+
+/**
+ * Convert a hex color into RGB.
+ *
+ * @param {string} hexStr The hex color as '#ab01ef'.
+ * @returns {RGB} The RGB values as {r,g,b}.
+ */
+export declare function hexToRgb(hexStr: string): RGB;
 
 export declare namespace i18n {
     /**
@@ -4572,6 +4587,14 @@ export declare class RGB {
 }
 
 /**
+ * Convert RGB to its hex equivalent.
+ *
+ * @param {RGB} rgb The RGB object as {r,g,b}.
+ * @returns {string} A string representing the hex color as '#ab01ef'.
+ */
+export declare function rgbToHex(rgb: RGB): string;
+
+/**
  * Region Of Interest shape.
  * Note: should be a closed path.
  */
@@ -4922,6 +4945,12 @@ export declare class Tag {
      * @returns {string|undefined} The VR.
      */
     getVrFromDictionary(): string | undefined;
+    /**
+     * Get the multiplicity from the dicom dictionary.
+     *
+     * @returns {number|undefined} The multiplicity.
+     */
+    getMultiplicityFromDictionary(): number | undefined;
     /**
      * Get the tag name from the dicom dictionary.
      *
