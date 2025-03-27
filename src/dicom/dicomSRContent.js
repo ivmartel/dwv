@@ -218,8 +218,8 @@ export class DicomSRContent {
 /**
  * Check if two content item objects are equal.
  *
- * @param {DicomCode} item1 The first content item.
- * @param {DicomCode} item2 The second content item.
+ * @param {DicomSRContent} item1 The first content item.
+ * @param {DicomSRContent} item2 The second content item.
  * @returns {boolean} True if both content items are equal.
  */
 export function isEqualContentItem(item1, item2) {
