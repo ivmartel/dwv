@@ -4,6 +4,7 @@ import {
   getDicomNumericMeasurementItem
 } from './dicomNumericMeasurement';
 import {
+  isEqualCode,
   getCode,
   getDicomCodeItem,
   getConceptNameCode,
@@ -212,6 +213,20 @@ export class DicomSRContent {
     }
 
     return res;
+  }
+
+  /**
+   * Check if this content has input header values.
+   *
+   * @param {string} valueType The value type.
+   * @param {DicomCode} conceptNameCode The concept name code.
+   * @param {string} relationshipType The relationship type.
+   * @returns {boolean} True if equal.
+   */
+  hasHeader(valueType, conceptNameCode, relationshipType) {
+    return this.valueType === valueType &&
+      isEqualCode(this.conceptNameCode, conceptNameCode) &&
+      this.relationshipType === relationshipType;
   }
 }
 

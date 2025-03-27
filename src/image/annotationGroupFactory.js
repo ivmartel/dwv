@@ -18,8 +18,6 @@ import {
   getSRContentFromValue
 } from '../dicom/dicomSRContent';
 import {
-  isEqualCode,
-  getPathCode,
   getMeasurementGroupCode,
   getImageRegionCode,
   getReferenceGeometryCode,
@@ -192,9 +190,9 @@ export class AnnotationGroupFactory {
    * @param {DicomSRContent} content The content to add.
    */
   #addSourceImageToAnnotation(annotation, content) {
-    if (content.valueType === ValueTypes.image &&
-      content.relationshipType === RelationshipTypes.selectedFrom &&
-      isEqualCode(content.conceptNameCode, getSourceImageCode())) {
+    if (content.hasHeader(
+      ValueTypes.image, getSourceImageCode(), RelationshipTypes.selectedFrom
+    )) {
       annotation.referenceSopUID =
         content.value.referencedSOPSequence.referencedSOPInstanceUID;
     }
@@ -208,22 +206,25 @@ export class AnnotationGroupFactory {
    */
   #addContentToAnnotation(annotation, content) {
     // annotation id
-    if (content.valueType === ValueTypes.uidref &&
-      content.relationshipType === RelationshipTypes.hasProperties &&
-      isEqualCode(content.conceptNameCode, getTrackingIdentifierCode())) {
+    if (content.hasHeader(
+      ValueTypes.uidref,
+      getTrackingIdentifierCode(),
+      RelationshipTypes.hasProperties
+    )) {
       annotation.id = content.value;
     }
     // text expr
-    if (content.valueType === ValueTypes.text &&
-      content.relationshipType === RelationshipTypes.hasProperties &&
-      isEqualCode(content.conceptNameCode, getShortLabelCode())) {
+    if (content.hasHeader(
+      ValueTypes.text, getShortLabelCode(), RelationshipTypes.hasProperties
+    )) {
       annotation.textExpr = content.value;
       if (typeof content.contentSequence !== 'undefined') {
         for (const subsubItem of content.contentSequence) {
-          if (subsubItem.valueType === ValueTypes.scoord &&
-            subsubItem.relationshipType === RelationshipTypes.hasProperties &&
-            isEqualCode(
-              subsubItem.conceptNameCode, getReferencePointsCode())) {
+          if (subsubItem.hasHeader(
+            ValueTypes.scoord,
+            getReferencePointsCode(),
+            RelationshipTypes.hasProperties
+          )) {
             annotation.labelPosition = new Point2D(
               subsubItem.value.graphicData[0],
               subsubItem.value.graphicData[1]
@@ -233,15 +234,16 @@ export class AnnotationGroupFactory {
       }
     }
     // color
-    if (content.valueType === ValueTypes.text &&
-      content.relationshipType === RelationshipTypes.hasProperties &&
-      isEqualCode(content.conceptNameCode, getColourCode())) {
+    if (content.hasHeader(
+      ValueTypes.text, getColourCode(), RelationshipTypes.hasProperties
+    )) {
       annotation.colour = content.value;
     }
     // reference points
-    if (content.valueType === ValueTypes.scoord &&
-      content.relationshipType === RelationshipTypes.hasProperties &&
-      isEqualCode(content.conceptNameCode, getReferencePointsCode()) &&
+    if (content.hasHeader(
+      ValueTypes.scoord,
+      getReferencePointsCode(),
+      RelationshipTypes.hasProperties) &&
       content.value.graphicType === GraphicTypes.multipoint) {
       const points = [];
       for (let i = 0; i < content.value.graphicData.length; i += 2) {
@@ -253,10 +255,10 @@ export class AnnotationGroupFactory {
       annotation.referencePoints = points;
     }
     // plane points
-    if (content.valueType === ValueTypes.scoord3d &&
-      content.relationshipType === RelationshipTypes.hasProperties &&
-      isEqualCode(
-        content.conceptNameCode, getReferenceGeometryCode()) &&
+    if (content.hasHeader(
+      ValueTypes.scoord3d,
+      getReferenceGeometryCode(),
+      RelationshipTypes.hasProperties) &&
       content.value.graphicType === GraphicTypes.multipoint) {
       const data = content.value.graphicData;
       const points = [];
@@ -309,16 +311,10 @@ export class AnnotationGroupFactory {
     annotation.textExpr = '';
 
     for (const item of content.contentSequence) {
-      if (item.valueType === ValueTypes.scoord &&
-        item.relationshipType === RelationshipTypes.contains &&
-        (isEqualCode(item.conceptNameCode, getImageRegionCode()) ||
-        isEqualCode(item.conceptNameCode, getPathCode()))) {
-        console.log('got image region');
-
-        console.log('item.value', item.value);
+      if (item.hasHeader(
+        ValueTypes.scoord, getImageRegionCode(), RelationshipTypes.contains
+      )) {
         annotation.mathShape = getShapeFromScoord(item.value);
-
-        console.log('mathShape', annotation.mathShape);
 
         for (const subItem of item.contentSequence) {
           this.#addSourceImageToAnnotation(annotation, subItem);
@@ -328,7 +324,6 @@ export class AnnotationGroupFactory {
       }
     }
 
-    console.log('annotation', annotation);
     return annotation;
   }
 
@@ -355,40 +350,40 @@ export class AnnotationGroupFactory {
   /**
    * Convert a DICOM SR content folowing TID 1500 into a list of annotations.
    *
+   * Structure: (root) 'Imaging Measurement Report'
+   * - 'Imaging Measurements',
+   *   - 'Measurement Group',
+   *     - scoord,
+   *     - meta.
+   *
    * @param {DicomSRContent} content The input SCOORD.
    * @returns {AnnotationGroup} The annotation group.
    */
   #tid1500ToAnnotationGroup(content) {
-    console.log('load TID 1500 ------------------------------');
-    // item.conceptNameCode = getImagineMeasurementReportCode()
-    if (content.valueType === ValueTypes.container &&
-      content.relationshipType === RelationshipTypes.contains &&
-      isEqualCode(content.conceptNameCode, getImagingMeasurementReportCode())) {
-      console.log('got imaging meas report');
+    if (!content.hasHeader(
+      ValueTypes.container,
+      getImagingMeasurementReportCode(),
+      RelationshipTypes.contains
+    )) {
+      console.warn('not the expected tid 1500 content header');
     }
-    console.log('content.valueType', content.valueType);
-    console.log('content.relationshipType', content.relationshipType);
-    console.log('content.conceptNameCode', content.conceptNameCode);
 
-    // tid 1500
-    // root: 'Imaging Measurement Report'
-    // - 'Imaging Measurements'
-    //   - 'Measurement Group'
-    //     - scoord
-    //     - meta
     const annotations = [];
 
-
     for (const item of content.contentSequence) {
-      if (item.valueType === ValueTypes.container &&
-        item.relationshipType === RelationshipTypes.contains &&
-        isEqualCode(item.conceptNameCode, getImagingMeasurementsCode())) {
+      if (item.hasHeader(
+        ValueTypes.container,
+        getImagingMeasurementsCode(),
+        RelationshipTypes.contains
+      )) {
         console.log('got imaging meas');
 
         for (const subItem of item.contentSequence) {
-          if (subItem.valueType === ValueTypes.container &&
-            subItem.relationshipType === RelationshipTypes.contains &&
-            isEqualCode(subItem.conceptNameCode, getMeasurementGroupCode())) {
+          if (subItem.hasHeader(
+            ValueTypes.container,
+            getMeasurementGroupCode(),
+            RelationshipTypes.contains
+          )) {
             console.log('got meas group');
 
             annotations.push(this.#measGroupToAnnotation(subItem));
@@ -403,16 +398,21 @@ export class AnnotationGroupFactory {
   /**
    * Convert a DICOM SR content 'Measurement group' into a list of annotations.
    *
-   * @param {DicomSRContent} content The input.
-   * @returns {Annotation[]} The annotation.
+   * Structure: (root) 'Measurement group'
+   * - scoord,
+   *   - meta.
+
+  * @param {DicomSRContent} content The input.
+   * @returns {AnnotationGroup} The annotation.
    */
   #dwv034MeasGroupToAnnotationGroup(content) {
-    // item.conceptNameCode = getMeasurementGroupCode()
-
-    // dwv 0.34:
-    // root: 'Measurement group'
-    // - scoord
-    //   - meta
+    if (!content.hasHeader(
+      ValueTypes.container,
+      getMeasurementGroupCode(),
+      RelationshipTypes.contains
+    )) {
+      console.warn('not the expected dwv034 content header');
+    }
 
     const annotations = [];
     for (const item of content.contentSequence) {
