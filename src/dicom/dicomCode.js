@@ -168,7 +168,9 @@ const DcmCodes = {
   122438: 'Reference Points',
   125007: 'Measurement Group',
   125309: 'Short label',
-  128773: 'Reference Geometry'
+  126000: 'Imaging Measurement Report',
+  126010: 'Imaging Measurements',
+  128773: 'Reference Geometry',
 };
 
 /**
@@ -251,6 +253,24 @@ function getDicomCode(value, scheme) {
  */
 export function getMeasurementGroupCode() {
   return getDicomCode('125007', 'DCM');
+}
+
+/**
+ * Get a imaging measurement report DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getImagingMeasurementReportCode() {
+  return getDicomCode('126000', 'DCM');
+}
+
+/**
+ * Get a imaging measurements DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getImagingMeasurementsCode() {
+  return getDicomCode('126010', 'DCM');
 }
 
 /**
