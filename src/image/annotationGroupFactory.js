@@ -30,7 +30,8 @@ import {
   getQuantificationUnit,
   DicomCode,
   getImagingMeasurementReportCode,
-  getImagingMeasurementsCode
+  getImagingMeasurementsCode,
+  isEqualCode
 } from '../dicom/dicomCode';
 import {
   isVersionInBounds,
@@ -213,32 +214,37 @@ export class AnnotationGroupFactory {
     )) {
       annotation.id = content.value;
     }
+
     // text expr
     if (content.hasHeader(
       ValueTypes.text, getShortLabelCode(), RelationshipTypes.hasProperties
     )) {
       annotation.textExpr = content.value;
       if (typeof content.contentSequence !== 'undefined') {
-        for (const subsubItem of content.contentSequence) {
-          if (subsubItem.hasHeader(
+        // optional label position
+        const scoord = content.contentSequence.find(function (item) {
+          return item.hasHeader(
             ValueTypes.scoord,
             getReferencePointsCode(),
             RelationshipTypes.hasProperties
-          )) {
-            annotation.labelPosition = new Point2D(
-              subsubItem.value.graphicData[0],
-              subsubItem.value.graphicData[1]
-            );
-          }
+          );
+        });
+        if (typeof scoord !== 'undefined') {
+          annotation.labelPosition = new Point2D(
+            scoord.value.graphicData[0],
+            scoord.value.graphicData[1]
+          );
         }
       }
     }
+
     // color
     if (content.hasHeader(
       ValueTypes.text, getColourCode(), RelationshipTypes.hasProperties
     )) {
       annotation.colour = content.value;
     }
+
     // reference points
     if (content.hasHeader(
       ValueTypes.scoord,
@@ -254,6 +260,7 @@ export class AnnotationGroupFactory {
       }
       annotation.referencePoints = points;
     }
+
     // plane points
     if (content.hasHeader(
       ValueTypes.scoord3d,
@@ -269,6 +276,7 @@ export class AnnotationGroupFactory {
       }
       annotation.planePoints = points;
     }
+
     // quantification
     if (content.valueType === ValueTypes.num &&
       content.relationshipType === RelationshipTypes.contains) {
@@ -287,6 +295,7 @@ export class AnnotationGroupFactory {
         };
       }
     }
+
     // meta
     if ((content.valueType === ValueTypes.code ||
       content.valueType === ValueTypes.text) &&
@@ -302,24 +311,34 @@ export class AnnotationGroupFactory {
    * Convert a DICOM SR content of type 'Measurement group' into an annotation.
    *
    * @param {DicomSRContent} content The input SR content.
-   * @returns {Annotation} The annotation.
+   * @returns {Annotation|undefined} The annotation.
    */
   #measGroupToAnnotation(content) {
-    const annotation = new Annotation();
-    // default
-    annotation.id = guid();
-    annotation.textExpr = '';
+    let annotation;
 
-    for (const item of content.contentSequence) {
-      if (item.hasHeader(
+    // get shape from scoord
+    const scoord = content.contentSequence.find(function (item) {
+      return item.hasHeader(
         ValueTypes.scoord, getImageRegionCode(), RelationshipTypes.contains
-      )) {
-        annotation.mathShape = getShapeFromScoord(item.value);
-
-        for (const subItem of item.contentSequence) {
-          this.#addSourceImageToAnnotation(annotation, subItem);
-        }
-      } else {
+      );
+    });
+    if (typeof scoord !== 'undefined') {
+      annotation = new Annotation();
+      // default
+      annotation.id = guid();
+      annotation.textExpr = '';
+      annotation.mathShape = getShapeFromScoord(scoord.value);
+      // get source image from scoord content
+      const fromImage = scoord.contentSequence.find(function (item) {
+        return item.hasHeader(
+          ValueTypes.image, getSourceImageCode(), RelationshipTypes.selectedFrom
+        );
+      });
+      if (typeof fromImage !== 'undefined') {
+        this.#addSourceImageToAnnotation(annotation, fromImage);
+      }
+      // add other meta
+      for (const item of content.contentSequence) {
         this.#addContentToAnnotation(annotation, item);
       }
     }
@@ -357,42 +376,47 @@ export class AnnotationGroupFactory {
    *     - meta.
    *
    * @param {DicomSRContent} content The input SCOORD.
-   * @returns {AnnotationGroup} The annotation group.
+   * @returns {AnnotationGroup|undefined} The annotation group.
    */
   #tid1500ToAnnotationGroup(content) {
-    if (!content.hasHeader(
-      ValueTypes.container,
-      getImagingMeasurementReportCode(),
-      RelationshipTypes.contains
+    if (!(content.valueType === ValueTypes.container &&
+      isEqualCode(content.conceptNameCode, getImagingMeasurementReportCode())
     )) {
-      console.warn('not the expected tid 1500 content header');
+      logger.warn('Not the expected tid 1500 content header');
     }
 
-    const annotations = [];
+    let annotationGroup;
 
-    for (const item of content.contentSequence) {
-      if (item.hasHeader(
+    // imaging measurements content
+    const imagingMeas = content.contentSequence.find(function (item) {
+      return item.hasHeader(
         ValueTypes.container,
         getImagingMeasurementsCode(),
         RelationshipTypes.contains
-      )) {
-        console.log('got imaging meas');
-
-        for (const subItem of item.contentSequence) {
-          if (subItem.hasHeader(
-            ValueTypes.container,
-            getMeasurementGroupCode(),
-            RelationshipTypes.contains
-          )) {
-            console.log('got meas group');
-
-            annotations.push(this.#measGroupToAnnotation(subItem));
-          }
+      );
+    });
+    if (typeof imagingMeas !== 'undefined') {
+      const annotations = [];
+      for (const item of imagingMeas.contentSequence) {
+        // measurement group content
+        if (item.hasHeader(
+          ValueTypes.container,
+          getMeasurementGroupCode(),
+          RelationshipTypes.contains
+        )) {
+          annotations.push(this.#measGroupToAnnotation(item));
         }
       }
+      if (annotations.length !== 0) {
+        annotationGroup = new AnnotationGroup(annotations);
+      } else {
+        logger.warn('No measurement groups in TID 1500 SR');
+      }
+    } else {
+      logger.warn('No imaging measurements in TID 1500 SR');
     }
 
-    return new AnnotationGroup(annotations);
+    return annotationGroup;
   }
 
   /**
@@ -401,17 +425,15 @@ export class AnnotationGroupFactory {
    * Structure: (root) 'Measurement group'
    * - scoord,
    *   - meta.
-
-  * @param {DicomSRContent} content The input.
-   * @returns {AnnotationGroup} The annotation.
+   *
+   * @param {DicomSRContent} content The input.
+   * @returns {AnnotationGroup|undefined} The annotation.
    */
   #dwv034MeasGroupToAnnotationGroup(content) {
-    if (!content.hasHeader(
-      ValueTypes.container,
-      getMeasurementGroupCode(),
-      RelationshipTypes.contains
+    if (!(content.valueType === ValueTypes.container &&
+      isEqualCode(content.conceptNameCode, getMeasurementGroupCode())
     )) {
-      console.warn('not the expected dwv034 content header');
+      console.warn('Not the expected dwv034 content header');
     }
 
     const annotations = [];
@@ -441,7 +463,7 @@ export class AnnotationGroupFactory {
     }
 
     if (typeof annotationGroup === 'undefined') {
-      throw new Error('Cant create annotation group');
+      throw new Error('Cannot create annotation group');
     }
 
     const safeGetLocal = function (key) {
@@ -482,6 +504,12 @@ export class AnnotationGroupFactory {
     return annotationGroup;
   }
 
+  /**
+   * Get the annotation source image as SR content.
+   *
+   * @param {Annotation} annotation The input annotation.
+   * @returns {DicomSRContent} The SR content.
+   */
   #getAnnotationSourceImageContent(annotation) {
     // reference image UID
     const srImage = new DicomSRContent(ValueTypes.image);
@@ -497,6 +525,12 @@ export class AnnotationGroupFactory {
     return srImage;
   }
 
+  /**
+   * Get the annotation meta as SR content list.
+   *
+   * @param {Annotation} annotation The input annotation.
+   * @returns {DicomSRContent[]} The SR content list.
+   */
   #getAnnotationContentSequence(annotation) {
     const contentSequence = [];
 
@@ -613,7 +647,7 @@ export class AnnotationGroupFactory {
    * @param {Annotation} annotation The input annotation.
    * @returns {DicomSRContent} The result SR content.
    */
-  #annotationToMeasGroup(annotation) {
+  #annotationToMeasurementGroup(annotation) {
     // measurement group
     const srContent = new DicomSRContent(ValueTypes.container);
     srContent.relationshipType = RelationshipTypes.contains;
@@ -634,7 +668,6 @@ export class AnnotationGroupFactory {
     return srContent;
   }
 
-
   /**
    * Convert an annotation group into a TID 1500 report SR content.
    *
@@ -651,7 +684,7 @@ export class AnnotationGroupFactory {
       measContent.relationshipType = RelationshipTypes.contains;
       const contentSequence = [];
       for (const annotation of annotationGroup.getList()) {
-        contentSequence.push(this.#annotationToMeasGroup(annotation));
+        contentSequence.push(this.#annotationToMeasurementGroup(annotation));
       }
       measContent.contentSequence = contentSequence;
 
@@ -686,9 +719,6 @@ export class AnnotationGroupFactory {
     tags.ContentDate = getDicomDate(dateToDateObj(now));
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
 
-    //const srContent = this.#annotationGroupToDwv034MeasGroup(annotationGroup);
-    const srContent = this.#annotationGroupToTid1500(annotationGroup);
-
     // TID 1500
     tags.ContentTemplateSequence = {
       value: [{
@@ -697,12 +727,16 @@ export class AnnotationGroupFactory {
       }]
     };
 
+    const srContent = this.#annotationGroupToTid1500(annotationGroup);
+
     // main
     if (typeof srContent !== 'undefined') {
       tags = {
         ...tags,
         ...getDicomSRContentItem(srContent)
       };
+    } else {
+      throw new Error('No annotation group SR content');
     }
 
     // merge extra tags if provided
