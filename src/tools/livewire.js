@@ -6,7 +6,6 @@ import {
 import {Point2D} from '../math/point';
 import {Path} from '../math/path';
 import {Scissors} from '../math/scissors';
-import {guid} from '../math/stats';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {logger} from '../utils/logger';
 import {ROI} from '../math/roi';
@@ -268,8 +267,8 @@ export class Livewire {
     if (typeof this.#annotation === 'undefined') {
       // create annotation
       this.#annotation = new Annotation();
+      this.#annotation.setIds();
       this.#annotation.colour = this.#style.getLineColour();
-      this.#annotation.id = guid();
 
       const viewController = viewLayer.getViewController();
       this.#annotation.init(viewController);

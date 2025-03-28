@@ -23,6 +23,7 @@ import {
   getReferenceGeometryCode,
   getSourceImageCode,
   getTrackingIdentifierCode,
+  getTrackingUniqueIdentifierCode,
   getShortLabelCode,
   getReferencePointsCode,
   getColourCode,
@@ -198,6 +199,26 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Add ids to an annotation folowing the (wrong)
+   * dwv 0.34 format.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addDwv034IdToAnnotation(annotation, content) {
+    // annotation id
+    if (content.hasHeader(
+      ValueTypes.uidref,
+      getTrackingIdentifierCode(),
+      RelationshipTypes.hasProperties
+    )) {
+      annotation.id = content.value;
+      // use it as uid
+      annotation.uid = content.value;
+    }
+  }
+
+  /**
    * Add content to an annotation.
    *
    * @param {Annotation} annotation The annotation.
@@ -206,11 +227,20 @@ export class AnnotationGroupFactory {
   #addContentToAnnotation(annotation, content) {
     // annotation id
     if (content.hasHeader(
-      ValueTypes.uidref,
+      ValueTypes.text,
       getTrackingIdentifierCode(),
       RelationshipTypes.hasProperties
     )) {
       annotation.id = content.value;
+    }
+
+    // annotation uid
+    if (content.hasHeader(
+      ValueTypes.uidref,
+      getTrackingUniqueIdentifierCode(),
+      RelationshipTypes.hasProperties
+    )) {
+      annotation.uid = content.value;
     }
 
     // text expr
@@ -350,6 +380,7 @@ export class AnnotationGroupFactory {
 
     for (const item of content.contentSequence) {
       this.#addSourceImageToAnnotation(annotation, item);
+      this.#addDwv034IdToAnnotation(annotation, item);
       this.#addContentToAnnotation(annotation, item);
     }
     return annotation;
@@ -524,10 +555,17 @@ export class AnnotationGroupFactory {
     const contentSequence = [];
 
     // annotation id
+    const srId = new DicomSRContent(ValueTypes.text);
+    srId.relationshipType = RelationshipTypes.hasProperties;
+    srId.conceptNameCode = getTrackingIdentifierCode();
+    srId.value = annotation.id;
+    contentSequence.push(srId);
+
+    // annotation uid
     const srUid = new DicomSRContent(ValueTypes.uidref);
     srUid.relationshipType = RelationshipTypes.hasProperties;
-    srUid.conceptNameCode = getTrackingIdentifierCode();
-    srUid.value = annotation.id;
+    srUid.conceptNameCode = getTrackingUniqueIdentifierCode();
+    srUid.value = annotation.uid;
     contentSequence.push(srUid);
 
     // text expr

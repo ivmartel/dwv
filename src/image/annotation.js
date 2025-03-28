@@ -3,6 +3,8 @@ import {getFlags, replaceFlags} from '../utils/string';
 import {Point} from '../math/point';
 import {getOrientationName} from '../math/orientation';
 import {defaultToolOptions, toolOptions} from '../tools/index';
+import {guid} from '../math/stats';
+import {getUID} from '../dicom/dicomWriter';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -18,11 +20,18 @@ import {DicomCode} from '../dicom/dicomCode';
  */
 export class Annotation {
   /**
-   * The ID.
+   * The ID, strored as tracking id, this id is not unique.
    *
    * @type {string}
    */
   id;
+
+  /**
+   * The UID, stored as tracking unique id.
+   *
+   * @type {string}
+   */
+  uid;
 
   /**
    * The reference image SOP UID.
@@ -103,6 +112,14 @@ export class Annotation {
    * @type {object}
    */
   #meta = {};
+
+  /**
+   * Set the annotation id and uid.
+   */
+  setIds() {
+    this.id = guid();
+    this.uid = getUID('TrackingUniqueIdentifier');
+  }
 
   /**
    * Get the concepts ids of the annotation meta data.

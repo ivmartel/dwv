@@ -3,7 +3,6 @@ import {
   getMousePoint,
   getTouchPoints
 } from '../gui/generic';
-import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {
   AddAnnotationCommand,
@@ -814,7 +813,7 @@ export class Draw {
     } else {
       annotation.colour = this.#style.getLineColour();
     }
-    annotation.id = guid();
+    annotation.setIds();
     annotation.init(viewController);
     // meta data
     if (typeof this.#annotationMeta !== 'undefined') {

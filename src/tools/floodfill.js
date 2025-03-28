@@ -5,7 +5,6 @@ import {
 } from '../tools/drawCommands';
 //import {RoiFactory} from '../tools/roi';
 import {ROI} from '../math/roi';
-import {guid} from '../math/stats';
 import {Point2D} from '../math/point';
 import {Style} from '../gui/style';
 import {
@@ -270,8 +269,8 @@ export class Floodfill {
       if (typeof this.#annotation === 'undefined') {
         // create annotation
         this.#annotation = new Annotation();
+        this.#annotation.setIds();
         this.#annotation.colour = this.#style.getLineColour();
-        this.#annotation.id = guid();
 
         const viewLayer =
           layerGroup.getViewLayerById(drawLayer.getReferenceLayerId());
