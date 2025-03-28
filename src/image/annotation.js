@@ -128,7 +128,7 @@ export class Annotation {
    * Add annotation meta data.
    *
    * @param {DicomCode} concept The concept code.
-   * @param {DicomCode} value The value code.
+   * @param {DicomCode|string} value The value code.
    */
   addMetaItem(concept, value) {
     const conceptId = concept.value;
