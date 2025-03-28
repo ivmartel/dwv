@@ -48,9 +48,9 @@ export class Annotation {
   /**
    * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
    *
-   * @type {string|undefined}
+   * @type {string}
    */
-  colour;
+  colour = '#ffff80';
 
   /**
    * Annotation quantification.
