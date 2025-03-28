@@ -120,16 +120,16 @@ export class AnnotationGroupFactory {
    * @param {Object<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a dwv 0.34 annotation.
    */
-  #isDwv034Annotations(dataElements) {
-    // content template
-    const contentTemplate = getContentTemplate(dataElements);
-
+  #isDwv034AnnotationDicomSR(dataElements) {
     // version
     const classUID =
       safeGet(dataElements, TagKeys.ImplementationClassUID);
     const dwvVersion = getDwvVersionFromImplementationClassUID(classUID);
     const isDwv034 = typeof dwvVersion !== 'undefined' &&
       isVersionInBounds(dwvVersion, '0.34.0', '0.35.0-beta.21');
+
+    // content template
+    const contentTemplate = getContentTemplate(dataElements);
 
     // root SR concept
     let rootConcept;
@@ -150,7 +150,7 @@ export class AnnotationGroupFactory {
    * @param {Object<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 1500 annotation.
    */
-  #isTid1500Annotations(dataElements) {
+  #isTid1500AnnotationDicomSR(dataElements) {
     // content template
     const contentTemplate = getContentTemplate(dataElements);
 
@@ -175,9 +175,9 @@ export class AnnotationGroupFactory {
   checkElements(dataElements) {
     // reset
     this.#warning = undefined;
-    //if (!this.#isDwv034Annotations(dataElements)) {
-    if (!this.#isDwv034Annotations(dataElements) &&
-      !this.#isTid1500Annotations(dataElements)) {
+
+    if (!this.#isDwv034AnnotationDicomSR(dataElements) &&
+      !this.#isTid1500AnnotationDicomSR(dataElements)) {
       this.#warning = 'Not a dwv supported annotation';
     }
 
@@ -454,9 +454,9 @@ export class AnnotationGroupFactory {
     const srContent = getSRContent(dataElements);
 
     let annotationGroup;
-    if (this.#isTid1500Annotations(dataElements)) {
+    if (this.#isTid1500AnnotationDicomSR(dataElements)) {
       annotationGroup = this.#tid1500ToAnnotationGroup(srContent);
-    } else if (this.#isDwv034Annotations(dataElements)) {
+    } else if (this.#isDwv034AnnotationDicomSR(dataElements)) {
       annotationGroup = this.#dwv034MeasGroupToAnnotationGroup(srContent);
     }
 
