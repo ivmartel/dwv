@@ -191,9 +191,8 @@ export class AnnotationGroupFactory {
    * @param {DicomSRContent} content The content to add.
    */
   #addSourceImageToAnnotation(annotation, content) {
-    if (content.hasHeader(
-      ValueTypes.image, getSourceImageCode(), RelationshipTypes.selectedFrom
-    )) {
+    if (content.valueType === ValueTypes.image &&
+      content.relationshipType === RelationshipTypes.selectedFrom) {
       annotation.referenceSopUID =
         content.value.referencedSOPSequence.referencedSOPInstanceUID;
     }
@@ -328,9 +327,8 @@ export class AnnotationGroupFactory {
       annotation.mathShape = getShapeFromScoord(scoord.value);
       // get source image from scoord content
       const fromImage = scoord.contentSequence.find(function (item) {
-        return item.hasHeader(
-          ValueTypes.image, getSourceImageCode(), RelationshipTypes.selectedFrom
-        );
+        return item.valueType === ValueTypes.image &&
+          item.relationshipType === RelationshipTypes.selectedFrom;
       });
       if (typeof fromImage !== 'undefined') {
         this.#addSourceImageToAnnotation(annotation, fromImage);
