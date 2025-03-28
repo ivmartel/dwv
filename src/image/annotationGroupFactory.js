@@ -479,6 +479,7 @@ export class AnnotationGroupFactory {
     if (this.#isTid1500AnnotationDicomSR(dataElements)) {
       annotationGroup = this.#tid1500ToAnnotationGroup(srContent);
     } else if (this.#isDwv034AnnotationDicomSR(dataElements)) {
+      logger.warn('DWV v0.34 annotation');
       annotationGroup = this.#dwv034MeasGroupToAnnotationGroup(srContent);
     }
 
