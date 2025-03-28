@@ -47,7 +47,6 @@ import {
   SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate';
 import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D';
-import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {Annotation} from './annotation';
 import {AnnotationGroup} from './annotationGroup';
@@ -321,9 +320,6 @@ export class AnnotationGroupFactory {
     });
     if (typeof scoord !== 'undefined') {
       annotation = new Annotation();
-      // default
-      annotation.id = guid();
-      annotation.textExpr = '';
       annotation.mathShape = getShapeFromScoord(scoord.value);
       // get source image from scoord content
       const fromImage = scoord.contentSequence.find(function (item) {
@@ -351,9 +347,6 @@ export class AnnotationGroupFactory {
   #dwv034ScoordToAnnotation(content) {
     const annotation = new Annotation();
     annotation.mathShape = getShapeFromScoord(content.value);
-    // default
-    annotation.id = guid();
-    annotation.textExpr = '';
 
     for (const item of content.contentSequence) {
       this.#addSourceImageToAnnotation(annotation, item);

@@ -63,9 +63,9 @@ export class Annotation {
    * Text expression. Can contain variables surrounded with '{}' that will
    * be extracted from the quantification object.
    *
-   * @type {string|undefined}
+   * @type {string}
    */
-  textExpr;
+  textExpr = '';
 
   /**
    * Label position. If undefined, the default shape
