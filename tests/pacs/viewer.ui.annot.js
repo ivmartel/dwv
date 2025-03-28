@@ -282,7 +282,14 @@ test.dataModelUI.Annotation = function (app) {
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
       const factory = new dwv.AnnotationGroupFactory();
-      const dicomElements = factory.toDicom(annotationGroup);
+      const sopUID = dwv.getUID('SOPInstanceUID');
+      const extraTags = {
+        MediaStorageSOPInstanceUID: sopUID,
+        SOPInstanceUID: sopUID,
+        SeriesInstanceUID: dwv.getUID('SeriesInstanceUID'),
+        SeriesDescription: 'Annnotation made with dwv',
+      };
+      const dicomElements = factory.toDicom(annotationGroup, extraTags);
       // write
       const writer = new dwv.DicomWriter();
       let dicomBuffer = null;

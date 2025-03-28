@@ -1547,10 +1547,22 @@ export class App {
     const data = new DicomData({});
     data.annotationGroup = new AnnotationGroup();
     data.annotationGroup.setMetaValue('Modality', 'SR');
-    data.annotationGroup.setMetaValue(
-      'PatientID', refMeta.PatientID);
-    data.annotationGroup.setMetaValue(
-      'StudyInstanceUID', refMeta.StudyInstanceUID);
+
+    const tagsToCopy = [
+      'PatientName',
+      'PatientID',
+      'PatientBirthDate',
+      'PatientSex',
+      'StudyDate',
+      'StudyTime',
+      'StudyInstanceUID',
+      'StudyID',
+      'StudyDescription'
+    ];
+    for (const tag of tagsToCopy) {
+      data.annotationGroup.setMetaValue(tag, refMeta[tag]);
+    }
+
     data.annotationGroup.setMetaValue(
       'ReferencedSeriesSequence', {
         value: [{
