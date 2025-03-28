@@ -319,6 +319,15 @@ export function getTrackingIdentifierCode() {
 }
 
 /**
+ * Get a tracking unique identifier DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getTrackingUniqueIdentifierCode() {
+  return getDicomCode('112040', 'DCM');
+}
+
+/**
  * Get a segmentation DICOM code.
  *
  * @returns {DicomCode} The code.
