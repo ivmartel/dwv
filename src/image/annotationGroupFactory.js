@@ -231,7 +231,7 @@ export class AnnotationGroupFactory {
     if (content.hasHeader(
       ValueTypes.text,
       getTrackingIdentifierCode(),
-      RelationshipTypes.hasProperties
+      RelationshipTypes.hasObsContext
     )) {
       annotation.id = content.value;
     }
@@ -240,7 +240,7 @@ export class AnnotationGroupFactory {
     if (content.hasHeader(
       ValueTypes.uidref,
       getTrackingUniqueIdentifierCode(),
-      RelationshipTypes.hasProperties
+      RelationshipTypes.hasObsContext
     )) {
       annotation.uid = content.value;
     }
@@ -559,14 +559,14 @@ export class AnnotationGroupFactory {
 
     // annotation id
     const srId = new DicomSRContent(ValueTypes.text);
-    srId.relationshipType = RelationshipTypes.hasProperties;
+    srId.relationshipType = RelationshipTypes.hasObsContext;
     srId.conceptNameCode = getTrackingIdentifierCode();
     srId.value = annotation.id;
     contentSequence.push(srId);
 
     // annotation uid
     const srUid = new DicomSRContent(ValueTypes.uidref);
-    srUid.relationshipType = RelationshipTypes.hasProperties;
+    srUid.relationshipType = RelationshipTypes.hasObsContext;
     srUid.conceptNameCode = getTrackingUniqueIdentifierCode();
     srUid.value = annotation.uid;
     contentSequence.push(srUid);
