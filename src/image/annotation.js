@@ -41,6 +41,13 @@ export class Annotation {
   referenceSopUID;
 
   /**
+   * The reference image SOP class UID.
+   *
+   * @type {string}
+   */
+  referenceSopClassUID;
+
+  /**
    * The mathematical shape.
    *
    * @type {object}
@@ -200,6 +207,7 @@ export class Annotation {
     this.#viewController = viewController;
     // set UID
     this.referenceSopUID = viewController.getCurrentImageUid();
+    this.referenceSopClassUID = viewController.getSopClassUid();
     // set plane origin (not saved with file)
     this.planeOrigin =
       viewController.getOriginForImageUid(this.referenceSopUID);
