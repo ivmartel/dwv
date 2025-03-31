@@ -737,9 +737,9 @@ export class AnnotationGroupFactory {
 
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
-    // class: Basic Text SR Storage
-    tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11';
-    tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.11';
+    // class: Comprehensive 3D SR Storage
+    tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
+    tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.CompletionFlag = 'PARTIAL';
     tags.VerificationFlag = 'UNVERIFIED';
 
