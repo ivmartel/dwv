@@ -552,10 +552,39 @@ export class LayerGroup {
    * @returns {ViewLayer[]} The list of view layers that contain matched data.
    */
   searchViewLayers(meta) {
+    const metaClone = structuredClone(meta);
+    // extract sop instance
+    let sopInstanceUid;
+    if (typeof metaClone.SOPInstanceUID !== 'undefined') {
+      sopInstanceUid = metaClone.SOPInstanceUID;
+      delete metaClone.SOPInstanceUID;
+    }
+    const hasSopInstance = typeof sopInstanceUid !== 'undefined';
+    const hasMeta = Object.keys(metaClone).length !== 0;
+
     const res = [];
     for (const layer of this.#layers) {
       if (layer instanceof ViewLayer) {
-        if (layer.getViewController().equalImageMeta(meta)) {
+        let equalMeta = false;
+        if (hasMeta) {
+          equalMeta = layer.getViewController().equalImageMeta(metaClone);
+        }
+        let includesSopInstance = false;
+        if (hasSopInstance) {
+          includesSopInstance =
+            layer.getViewController().includesImageUid(sopInstanceUid);
+        }
+
+        let check = false;
+        if (hasMeta && hasSopInstance) {
+          check = equalMeta && includesSopInstance;
+        } else if (hasMeta) {
+          check = equalMeta;
+        } else if (hasSopInstance) {
+          check = includesSopInstance;
+        }
+
+        if (check) {
           res.push(layer);
         }
       }
