@@ -1563,12 +1563,21 @@ export class App {
       data.annotationGroup.setMetaValue(tag, refMeta[tag]);
     }
 
+    // used to associate with a view layer
     data.annotationGroup.setMetaValue(
-      'ReferencedSeriesSequence', {
+      'CurrentRequestedProcedureEvidenceSequence', {
         value: [{
-          SeriesInstanceUID: refMeta.SeriesInstanceUID
+          ReferencedSeriesSequence: {
+            value: [{
+              // ReferencedSOPSequence: left to fill in later
+              SeriesInstanceUID: refMeta.SeriesInstanceUID
+            }]
+          },
+          StudyInstanceUID: refMeta.StudyInstanceUID
         }]
-      });
+      }
+    );
+
     return data;
   }
 
@@ -2051,11 +2060,13 @@ export class App {
 
     // use meta
     // -> will match empty groups created with createAnnotationData
-    const refSeriesSeq =
-      annotationGroup.getMetaValue('ReferencedSeriesSequence');
+    const evidenceSeq =
+      annotationGroup.getMetaValue('CurrentRequestedProcedureEvidenceSequence');
     if (typeof refSeriesSeq !== 'undefined') {
-      const refSeriesSqItem0 = refSeriesSeq.value[0];
-      const refSeriesInstanceUID = refSeriesSqItem0?.SeriesInstanceUID;
+      const evidenceSeqItem0 = evidenceSeq.value[0];
+      const refSeriesSeq = evidenceSeqItem0?.ReferencedSeriesSequence;
+      const refSeriesSeqItem0 = refSeriesSeq?.value[0];
+      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
       const metaSearch = {
         SeriesInstanceUID: refSeriesInstanceUID
       };
