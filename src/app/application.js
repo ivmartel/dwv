@@ -2040,6 +2040,51 @@ export class App {
   }
 
   /**
+   * Get the reference layer of an annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The annotation group to attach.
+   * @param {LayerGroup} layerGroup The group where to find the reference.
+   * @returns {ViewLayer} The reference view layer.
+   */
+  #getReferenceLayer(annotationGroup, layerGroup) {
+    let refViewLayer;
+
+    // use meta
+    // -> will match empty groups created with createAnnotationData
+    const refSeriesSeq =
+      annotationGroup.getMetaValue('ReferencedSeriesSequence');
+    if (typeof refSeriesSeq !== 'undefined') {
+      const refSeriesSqItem0 = refSeriesSeq.value[0];
+      const refSeriesInstanceUID = refSeriesSqItem0?.SeriesInstanceUID;
+      const metaSearch = {
+        SeriesInstanceUID: refSeriesInstanceUID
+      };
+      const viewLayers = layerGroup.searchViewLayers(metaSearch);
+      if (viewLayers.length !== 0) {
+        refViewLayer = viewLayers[0];
+      }
+    }
+
+    // if no meta, go through annotations
+    if (typeof refViewLayer === 'undefined') {
+      for (const annotation of annotationGroup.getList()) {
+        const metaSearch = {
+          SOPInstanceUID: annotation.referenceSopUID,
+          SOPClassUID: annotation.referenceSopClassUID
+        };
+        const viewLayers = layerGroup.searchViewLayers(metaSearch);
+        if (viewLayers.length !== 0) {
+          // exit at first match
+          refViewLayer = viewLayers[0];
+          break;
+        }
+      }
+    }
+
+    return refViewLayer;
+  }
+
+  /**
    * Add a draw layer.
    *
    * @param {string} dataId The data id.
@@ -2052,25 +2097,20 @@ export class App {
         viewConfig.divId);
     }
 
-    // reference is the data of the view layer with the
-    //   same StudyInstanceUID
     const data = this.#dataController.get(dataId);
     if (!data) {
       throw new Error('Cannot initialise layer with missing data, id: ' +
         dataId);
     }
-    const refSeriesSeq =
-      data.annotationGroup.getMetaValue('ReferencedSeriesSequence');
-    const refSeriesInstanceUID = refSeriesSeq.value[0].SeriesInstanceUID;
-    const viewLayers = layerGroup.searchViewLayers({
-      SeriesInstanceUID: refSeriesInstanceUID
-    });
-    if (viewLayers.length === 0) {
+    const annotationGroup = data.annotationGroup;
+
+    // find referenced view layer
+    const refViewLayer = this.#getReferenceLayer(annotationGroup, layerGroup);
+    if (typeof refViewLayer === 'undefined') {
       console.warn(
-        'No loaded data that matches the measurement reference series UID');
+        'No loaded data that matches the measurements reference series UID');
       return;
     }
-    const refViewLayer = viewLayers[0];
     const refDataId = refViewLayer.getDataId();
 
     // un-bind
