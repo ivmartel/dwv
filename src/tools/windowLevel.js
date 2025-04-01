@@ -5,7 +5,7 @@ import {
 } from '../gui/generic';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {
-  validateWindowWidth,
+  validateWindowWidthAndCenter,
   WindowLevel as WindowLevelValues
 } from '../image/windowLevel';
 
@@ -120,18 +120,26 @@ export class WindowLevel {
     const diffY = this.#startPoint.getY() - point.getY();
     // data range
     const range = viewController.getImageRescaledDataRange();
-    // 1/1000 seems to give reasonable results...
-    const pixelToIntensity = (range.max - range.min) * 0.01;
+    // 1/1000 to match existing solutions
+    const pixelToIntensity = (range.max - range.min) * 0.001;
 
     // calculate new window level
     const center = viewController.getWindowLevel().center;
     const width = viewController.getWindowLevel().width;
     const windowCenter = center + Math.round(diffY * pixelToIntensity);
-    let windowWidth = width + Math.round(diffX * pixelToIntensity);
-    // bound window width
-    windowWidth = validateWindowWidth(windowWidth);
+    const windowWidth = width + Math.round(diffX * pixelToIntensity);
+
+    // bound window center and width
+    const {center: windowCenterBound, width: windowWidthBound} =
+      validateWindowWidthAndCenter(
+        windowCenter,
+        windowWidth,
+        range.min,
+        range.max
+      );
+
     // set
-    const wl = new WindowLevelValues(windowCenter, windowWidth);
+    const wl = new WindowLevelValues(windowCenterBound, windowWidthBound);
     viewController.setWindowLevel(wl);
 
     // store position
