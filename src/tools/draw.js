@@ -208,7 +208,7 @@ export class Draw {
   }
 
   /**
-   * Check if a draw lqyer can be created in the given layer group.
+   * Check if a draw layer can be created in the given layer group.
    * Uses the validator provided as feature. Default returns true.
    *
    * @param {LayerGroup} layerGroup The layer group
