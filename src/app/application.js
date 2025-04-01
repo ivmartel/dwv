@@ -2062,7 +2062,7 @@ export class App {
     // -> will match empty groups created with createAnnotationData
     const evidenceSeq =
       annotationGroup.getMetaValue('CurrentRequestedProcedureEvidenceSequence');
-    if (typeof refSeriesSeq !== 'undefined') {
+    if (typeof evidenceSeq !== 'undefined') {
       const evidenceSeqItem0 = evidenceSeq.value[0];
       const refSeriesSeq = evidenceSeqItem0?.ReferencedSeriesSequence;
       const refSeriesSeqItem0 = refSeriesSeq?.value[0];
