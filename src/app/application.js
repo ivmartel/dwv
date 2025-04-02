@@ -2076,6 +2076,22 @@ export class App {
       }
     }
 
+    // dwv034 wrongly uses ReferencedSeriesSequence tag at root
+    // and does not set the SOPClassUID of annotation reference...
+    const refSeriesSeq =
+      annotationGroup.getMetaValue('ReferencedSeriesSequence');
+    if (typeof refSeriesSeq !== 'undefined') {
+      const refSeriesSeqItem0 = refSeriesSeq.value[0];
+      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
+      const metaSearch = {
+        SeriesInstanceUID: refSeriesInstanceUID
+      };
+      const viewLayers = layerGroup.searchViewLayers(metaSearch);
+      if (viewLayers.length !== 0) {
+        refViewLayer = viewLayers[0];
+      }
+    }
+
     // if no meta, go through annotations
     if (typeof refViewLayer === 'undefined') {
       for (const annotation of annotationGroup.getList()) {
