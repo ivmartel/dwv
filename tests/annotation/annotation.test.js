@@ -39,9 +39,10 @@ import {AnnotationGroup} from '../../src/image/annotationGroup';
 QUnit.module('annotation');
 
 /**
+ * Get an annotation group from a buffer string.
  *
- * @param {string} bufferStr
- * @returns {AnnotationGroup}
+ * @param {string} bufferStr The buffer string.
+ * @returns {AnnotationGroup} The annotation group.
  */
 function getAnnotationGroup(bufferStr) {
   const dicomParser = new DicomParser();
@@ -58,8 +59,9 @@ function getAnnotationGroup(bufferStr) {
 /**
  * Check common properties of an annotation group.
  *
- * @param {AnnotationGroup} annotationGroup
+ * @param {AnnotationGroup} annotationGroup The group to check.
  * @param {Function} assert The qunit assert.
+ * @param {string} prefix A message prefix.
  */
 function checkGroupCommonProperties(annotationGroup, assert, prefix) {
   const annotations = annotationGroup.getList();
@@ -82,6 +84,13 @@ function checkGroupCommonProperties(annotationGroup, assert, prefix) {
   }
 }
 
+/**
+ * Check a quantification.
+ *
+ * @param {object} quantification The quantification to check.
+ * @param {Function} assert The qunit assert.
+ * @param {string} prefix A message prefix.
+ */
 function checkQuantification(quantification, assert, prefix) {
   assert.ok(typeof quantification.min !== 'undefined',
     prefix + ' quantification.min');
