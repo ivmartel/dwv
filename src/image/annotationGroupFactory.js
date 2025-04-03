@@ -153,6 +153,7 @@ export class AnnotationGroupFactory {
   #isTid1500AnnotationDicomSR(dataElements) {
     // content template
     const contentTemplate = getContentTemplate(dataElements);
+    const isTid1500Template = contentTemplate === 'DCMR-1500';
 
     // root SR concept
     let rootConcept;
@@ -160,9 +161,31 @@ export class AnnotationGroupFactory {
     if (typeof srContent.conceptNameCode !== 'undefined') {
       rootConcept = srContent.conceptNameCode.value;
     }
-
-    return contentTemplate === 'DCMR-1500' &&
+    const isImagingMeasurementReport =
       rootConcept === getImagingMeasurementReportCode().value;
+
+    let res = false;
+    if (isTid1500Template && isImagingMeasurementReport) {
+      // check for at least one:
+      // ImagingMeasurements > MeasurementGroup > ImageRegion (SCOORD)
+      const imagingMeas = srContent.contentSequence.find(
+        this.#isImagingMeasurementsItem
+      );
+      if (typeof imagingMeas !== 'undefined') {
+        const measGroup = imagingMeas.contentSequence.find(
+          this.#isMeasurementGroupItem
+        );
+        if (typeof measGroup !== 'undefined') {
+          const imageRegion = measGroup.contentSequence.find(
+            this.#isImageRegionItem
+          );
+          if (typeof imageRegion !== 'undefined') {
+            res = true;
+          }
+        }
+      }
+    }
+    return res;
   }
 
   /**
@@ -336,6 +359,51 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Check if a DicomSRContent is an 'ImagingMeasurements'.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) CONTAINER: (126010, DCM, 'Imaging Measurements').
+   */
+  #isImagingMeasurementsItem(item) {
+    return item.hasHeader(
+      ValueTypes.container,
+      getImagingMeasurementsCode(),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'MeasurementGroup'.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group').
+   */
+  #isMeasurementGroupItem(item) {
+    return item.hasHeader(
+      ValueTypes.container,
+      getMeasurementGroupCode(),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is an 'ImageRegion'.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) SCOORD: (111030, DCM, 'Image Region').
+   */
+  #isImageRegionItem(item) {
+    return item.hasHeader(
+      ValueTypes.scoord,
+      getImageRegionCode(),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
    * Convert a DICOM SR content of type 'Measurement group' into an annotation.
    *
    * @param {DicomSRContent} content The input SR content.
@@ -345,11 +413,9 @@ export class AnnotationGroupFactory {
     let annotation;
 
     // get shape from scoord
-    const scoord = content.contentSequence.find(function (item) {
-      return item.hasHeader(
-        ValueTypes.scoord, getImageRegionCode(), RelationshipTypes.contains
-      );
-    });
+    const scoord = content.contentSequence.find(
+      this.#isImageRegionItem
+    );
     if (typeof scoord !== 'undefined') {
       annotation = new Annotation();
       annotation.mathShape = getShapeFromScoord(scoord.value);
@@ -404,35 +470,36 @@ export class AnnotationGroupFactory {
     if (!(content.valueType === ValueTypes.container &&
       isEqualCode(content.conceptNameCode, getImagingMeasurementReportCode())
     )) {
-      logger.warn('Not the expected tid 1500 content header');
+      logger.warn('Not the expected TID 1500 SR content header');
     }
 
     let annotationGroup;
 
     // imaging measurements content
-    const imagingMeas = content.contentSequence.find(function (item) {
-      return item.hasHeader(
-        ValueTypes.container,
-        getImagingMeasurementsCode(),
-        RelationshipTypes.contains
-      );
-    });
+    const imagingMeas = content.contentSequence.find(
+      this.#isImagingMeasurementsItem
+    );
     if (typeof imagingMeas !== 'undefined') {
       const annotations = [];
+      let hasMeasGroup = false;
       for (const item of imagingMeas.contentSequence) {
         // measurement group content
-        if (item.hasHeader(
-          ValueTypes.container,
-          getMeasurementGroupCode(),
-          RelationshipTypes.contains
-        )) {
-          annotations.push(this.#measGroupToAnnotation(item));
+        if (this.#isMeasurementGroupItem(item)) {
+          hasMeasGroup = true;
+          const annotation = this.#measGroupToAnnotation(item);
+          if (typeof annotation !== 'undefined') {
+            annotations.push(annotation);
+          }
         }
       }
-      if (annotations.length !== 0) {
-        annotationGroup = new AnnotationGroup(annotations);
-      } else {
+      if (!hasMeasGroup) {
         logger.warn('No measurement groups in TID 1500 SR');
+      } else {
+        if (annotations.length !== 0) {
+          annotationGroup = new AnnotationGroup(annotations);
+        } else {
+          logger.warn('No valid measurement groups in TID 1500 SR');
+        }
       }
     } else {
       logger.warn('No imaging measurements in TID 1500 SR');
@@ -486,7 +553,7 @@ export class AnnotationGroupFactory {
     }
 
     if (typeof annotationGroup === 'undefined') {
-      throw new Error('Cannot create annotation group');
+      throw new Error('Cannot create annotation group from TID 1500 SR');
     }
 
     const safeGetLocal = function (key) {
