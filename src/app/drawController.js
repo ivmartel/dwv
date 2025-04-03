@@ -25,11 +25,11 @@ export class DrawController {
   /**
    * Get an annotation.
    *
-   * @param {string} id The annotation id.
+   * @param {string} uid The annotation UID.
    * @returns {Annotation|undefined} The annotation.
    */
-  getAnnotation(id) {
-    return this.#annotationGroup.find(id);
+  getAnnotation(uid) {
+    return this.#annotationGroup.find(uid);
   }
 
   /**
@@ -81,23 +81,23 @@ export class DrawController {
   /**
    * Remove an anotation for the list.
    *
-   * @param {string} id The id of the annotation to remove.
+   * @param {string} uid The UID of the annotation to remove.
    */
-  removeAnnotation(id) {
-    this.#annotationGroup.remove(id);
+  removeAnnotation(uid) {
+    this.#annotationGroup.remove(uid);
   }
 
   /**
    * Remove an annotation via a remove command (triggers draw actions).
    *
-   * @param {string} id The annotation id.
+   * @param {string} uid The annotation UID.
    * @param {Function} exeCallback The undo stack callback.
    */
-  removeAnnotationWithCommand(id, exeCallback) {
-    const annotation = this.getAnnotation(id);
+  removeAnnotationWithCommand(uid, exeCallback) {
+    const annotation = this.getAnnotation(uid);
     if (typeof annotation === 'undefined') {
       logger.warn(
-        'Cannot create remove command for undefined annotation: ' + id);
+        'Cannot create remove command for undefined annotation: ' + uid);
       return;
     }
     // create remove annotation command
@@ -111,18 +111,18 @@ export class DrawController {
   /**
    * Update an annotation via an update command (triggers draw actions).
    *
-   * @param {string} id The annotation id.
+   * @param {string} uid The annotation UID.
    * @param {object} originalProps The original annotation properties
    *   that will be updated.
    * @param {object} newProps The new annotation properties
    *   that will replace the original ones.
    * @param {Function} exeCallback The undo stack callback.
    */
-  updateAnnotationWithCommand(id, originalProps, newProps, exeCallback) {
-    const annotation = this.getAnnotation(id);
+  updateAnnotationWithCommand(uid, originalProps, newProps, exeCallback) {
+    const annotation = this.getAnnotation(uid);
     if (typeof annotation === 'undefined') {
       logger.warn(
-        'Cannot create update command for undefined annotation: ' + id);
+        'Cannot create update command for undefined annotation: ' + uid);
       return;
     }
     // create remove annotation command
@@ -141,7 +141,7 @@ export class DrawController {
    */
   removeAllAnnotationsWithCommand(exeCallback) {
     for (const annotation of this.#annotationGroup.getList()) {
-      this.removeAnnotationWithCommand(annotation.id, exeCallback);
+      this.removeAnnotationWithCommand(annotation.uid, exeCallback);
     }
   }
 

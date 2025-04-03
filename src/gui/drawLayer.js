@@ -721,7 +721,7 @@ export class DrawLayer {
         return;
       }
       const posChildren = posGroup.getChildren(
-        isNodeWithId(annotation.id));
+        isNodeWithId(annotation.uid));
       if (posChildren.length !== 0 &&
         posChildren[0] instanceof Konva.Group) {
         res = posChildren[0];
@@ -1319,6 +1319,7 @@ export function konvaToAnnotation(drawings, drawingsDetails) {
       const stateGroup = statePosKids[0];
       // annotation id
       annotation.id = stateGroup.id();
+      annotation.uid = stateGroup.id();
 
       // shape
       const shape = stateGroup.getChildren(isNodeNameShape)[0];

@@ -25,7 +25,7 @@ function getAnnotationGroupDivId(dataId) {
  */
 function getAnnotationDivId(annotation, dataId) {
   const prefix = getAnnotationGroupDivId(dataId);
-  const suffix = 'annotation' + annotation.id;
+  const suffix = 'annotation' + annotation.uid;
   return prefix + '-' + suffix;
 }
 
