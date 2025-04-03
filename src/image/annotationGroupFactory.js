@@ -167,7 +167,9 @@ export class AnnotationGroupFactory {
     let res = false;
     if (isTid1500Template && isImagingMeasurementReport) {
       // check for at least one:
-      // ImagingMeasurements > MeasurementGroup > ImageRegion (SCOORD)
+      // ImagingMeasurements
+      //   - MeasurementGroup
+      //     - ImageRegion (SCOORD) OR TID 300 Measure
       const imagingMeas = srContent.contentSequence.find(
         this.#isImagingMeasurementsItem
       );
@@ -176,10 +178,16 @@ export class AnnotationGroupFactory {
           this.#isMeasurementGroupItem
         );
         if (typeof measGroup !== 'undefined') {
+          res = true;
           const imageRegion = measGroup.contentSequence.find(
             this.#isImageRegionItem
           );
-          if (typeof imageRegion !== 'undefined') {
+          const measure = measGroup.contentSequence.find(
+            this.#isTid300Measure
+          );
+          if (typeof imageRegion !== 'undefined' ||
+            typeof measure !== 'undefined'
+          ) {
             res = true;
           }
         }
@@ -244,12 +252,12 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Add content to an annotation.
+   * Add ids to an annotation.
    *
    * @param {Annotation} annotation The annotation.
    * @param {DicomSRContent} content The content to add.
    */
-  #addContentToAnnotation(annotation, content) {
+  #addIdsToAnnotation(annotation, content) {
     // annotation id
     if (content.hasHeader(
       ValueTypes.text,
@@ -267,6 +275,17 @@ export class AnnotationGroupFactory {
     )) {
       annotation.uid = content.value;
     }
+  }
+
+  /**
+   * Add content to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addContentToAnnotation(annotation, content) {
+    // ids
+    this.#addIdsToAnnotation(annotation, content);
 
     // text expr
     if (content.hasHeader(
@@ -329,6 +348,18 @@ export class AnnotationGroupFactory {
     }
 
     // quantification
+    this.#addQuantificationToAnnotation(annotation, content);
+    // meta
+    this.#addMetaToAnnotation(annotation, content);
+  }
+
+  /**
+   * Add quantification to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addQuantificationToAnnotation(annotation, content) {
     if (content.valueType === ValueTypes.num &&
       content.relationshipType === RelationshipTypes.contains) {
       const quantifName =
@@ -346,8 +377,15 @@ export class AnnotationGroupFactory {
         };
       }
     }
+  }
 
-    // meta
+  /**
+   * Add meta to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @param {DicomSRContent} content The content to add.
+   */
+  #addMetaToAnnotation(annotation, content) {
     if ((content.valueType === ValueTypes.code ||
       content.valueType === ValueTypes.text) &&
       content.relationshipType === RelationshipTypes.contains) {
@@ -404,12 +442,26 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Convert a DICOM SR content of type 'Measurement group' into an annotation.
+   * Check is a measurement group follows TID 1410:
+   * it must contain an image region.
    *
-   * @param {DicomSRContent} content The input SR content.
+   * @param {DicomSRContent} content The SR content.
+   * @returns {boolean} True if an image region was found.
+   */
+  #isTid1410MeasGroup(content) {
+    const scoord = content.contentSequence.find(
+      this.#isImageRegionItem
+    );
+    return typeof scoord !== 'undefined';
+  }
+
+  /**
+   * Convert a TID 1410 measurement group into an annotation.
+   *
+   * @param {DicomSRContent} content The SR content.
    * @returns {Annotation|undefined} The annotation.
    */
-  #measGroupToAnnotation(content) {
+  #tid1410MeasGroupToAnnotation(content) {
     let annotation;
 
     // get shape from scoord
@@ -432,8 +484,142 @@ export class AnnotationGroupFactory {
         this.#addContentToAnnotation(annotation, item);
       }
     }
+    return annotation;
+  }
+
+  /**
+   * Check is an SR content follows TID 300:
+   * it must contain a numberic value that contains an
+   * inferred from image.
+   *
+   * @param {DicomSRContent} item The SR content.
+   * @returns {boolean} True if TID 300 measure.
+   */
+  #isTid300Measure(item) {
+    // no specific concept
+    const isContainedNum =
+      item.valueType === ValueTypes.num &&
+      item.relationshipType === RelationshipTypes.contains;
+    let scoord;
+    if (isContainedNum) {
+      // no specific concept (?)
+      scoord = item.contentSequence.find(function (subItem) {
+        return subItem.valueType === ValueTypes.scoord &&
+          subItem.relationshipType === RelationshipTypes.inferredFrom;
+      });
+    }
+    return typeof scoord !== 'undefined';
+  }
+
+  /**
+   * Check is a measurement group follows TID 1501:
+   * it must contain a measure.
+   *
+   * @param {DicomSRContent} content The SR content.
+   * @returns {boolean} True if a measure was found.
+   */
+  #isTid1501MeasGroup(content) {
+    const measure = content.contentSequence.find(
+      this.#isTid300Measure
+    );
+    return typeof measure !== 'undefined';
+  }
+
+  /**
+   * Convert a TID 1501 measurement group into an annotation.
+   *
+   * @param {DicomSRContent} content The SR content.
+   * @returns {Annotation|undefined} The annotation.
+   */
+  #tid1501MeasGroupToAnnotation(content) {
+    let annotation;
+
+    // just use the first measure to get the scoord
+    // (expecting all measures to refer to the same scoord)
+    const measure = content.contentSequence.find(
+      this.#isTid300Measure
+    );
+    if (typeof measure !== 'undefined') {
+      annotation = new Annotation();
+      // no specific concept (?)
+      const scoord = measure.contentSequence.find(function (subItem) {
+        return subItem.valueType === ValueTypes.scoord &&
+          subItem.relationshipType === RelationshipTypes.inferredFrom;
+      });
+      annotation.mathShape = getShapeFromScoord(scoord.value);
+      // get source image from scoord content
+      // no specific concept (?)
+      const fromImage = scoord.contentSequence.find(function (item) {
+        return item.valueType === ValueTypes.image &&
+          item.relationshipType === RelationshipTypes.selectedFrom;
+      });
+      if (typeof fromImage !== 'undefined') {
+        this.#addSourceImageToAnnotation(annotation, fromImage);
+      }
+    }
+
+    // add meta
+    if (typeof annotation !== 'undefined') {
+      for (const item of content.contentSequence) {
+        // add ids
+        this.#addIdsToAnnotation(annotation, item);
+        // add quantification
+        this.#addQuantificationToAnnotation(annotation, measure);
+        // add meta
+        this.#addMetaToAnnotation(annotation, item);
+      }
+    }
 
     return annotation;
+  }
+
+  /**
+   * Convert an imaging measurement into an annotation group.
+   *
+   * @param {DicomSRContent} content The SR content.
+   * @returns {AnnotationGroup|undefined} The annotation group.
+   */
+  #imagingMeasToAnnotationGroup(content) {
+    if (content.contentSequence.length === 0) {
+      return undefined;
+    }
+    const item0 = content.contentSequence[0];
+    let isTid1410 = false;
+    let isTid1501 = false;
+    if (this.#isMeasurementGroupItem(item0)) {
+      isTid1410 = this.#isTid1410MeasGroup(item0);
+      isTid1501 = this.#isTid1501MeasGroup(item0);
+    }
+
+    const annotations = [];
+    let hasMeasGroup = false;
+    for (const item of content.contentSequence) {
+      // measurement group content
+      if (this.#isMeasurementGroupItem(item)) {
+        hasMeasGroup = true;
+        let annotation;
+        if (isTid1410) {
+          annotation = this.#tid1410MeasGroupToAnnotation(item);
+        } else if (isTid1501) {
+          annotation = this.#tid1501MeasGroupToAnnotation(item);
+        }
+        if (typeof annotation !== 'undefined') {
+          annotations.push(annotation);
+        }
+      }
+    }
+
+    let annotationGroup;
+    if (!hasMeasGroup) {
+      logger.warn('No measurement groups in TID 1500 SR');
+    } else {
+      if (annotations.length !== 0) {
+        annotationGroup = new AnnotationGroup(annotations);
+      } else {
+        logger.warn('No valid measurement groups in TID 1500 SR');
+      }
+    }
+    return annotationGroup;
   }
 
   /**
@@ -480,27 +666,7 @@ export class AnnotationGroupFactory {
       this.#isImagingMeasurementsItem
     );
     if (typeof imagingMeas !== 'undefined') {
-      const annotations = [];
-      let hasMeasGroup = false;
-      for (const item of imagingMeas.contentSequence) {
-        // measurement group content
-        if (this.#isMeasurementGroupItem(item)) {
-          hasMeasGroup = true;
-          const annotation = this.#measGroupToAnnotation(item);
-          if (typeof annotation !== 'undefined') {
-            annotations.push(annotation);
-          }
-        }
-      }
-      if (!hasMeasGroup) {
-        logger.warn('No measurement groups in TID 1500 SR');
-      } else {
-        if (annotations.length !== 0) {
-          annotationGroup = new AnnotationGroup(annotations);
-        } else {
-          logger.warn('No valid measurement groups in TID 1500 SR');
-        }
-      }
+      annotationGroup = this.#imagingMeasToAnnotationGroup(imagingMeas);
     } else {
       logger.warn('No imaging measurements in TID 1500 SR');
     }
