@@ -6,6 +6,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {DataElement} from './dataElement';
+import {SopInstanceReference} from './dicomSopInstanceReference';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -24,12 +25,12 @@ const TagKeys = {
  */
 export class ImageReference {
   /**
-   * @type {object}
+   * @type {SopInstanceReference}
    */
   referencedSOPSequence;
 
   /**
-   * @type {object}
+   * @type {string}
    */
   referencedFrameNumber;
 
