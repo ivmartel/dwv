@@ -48,6 +48,13 @@ export class Annotation {
   referencedSopClassUID;
 
   /**
+   * Referenced frame number.
+   *
+   * @type {number}
+   */
+  referencedFrameNumber;
+
+  /**
    * Mathematical shape.
    *
    * @type {object}
@@ -205,18 +212,20 @@ export class Annotation {
     }
 
     this.#viewController = viewController;
+    const currentPosition = viewController.getCurrentPosition();
     // set UID
     this.referencedSopInstanceUID = viewController.getCurrentImageUid();
     this.referencedSopClassUID = viewController.getSopClassUid();
+    if (currentPosition.length() > 3) {
+      this.referencedFrameNumber = currentPosition.get(3);
+    }
     // set plane origin (not saved with file)
     this.planeOrigin =
       viewController.getOriginForImageUid(this.referencedSopInstanceUID);
     // set plane points if not aquisition orientation
     // (planePoints are saved with file if present)
     if (!viewController.isAquisitionOrientation()) {
-      this.planePoints = viewController.getPlanePoints(
-        viewController.getCurrentPosition()
-      );
+      this.planePoints = viewController.getPlanePoints(currentPosition);
     }
   }
 
@@ -295,8 +304,11 @@ export class Annotation {
       if (typeof this.planePoints !== 'undefined') {
         origin = this.planePoints[0];
       }
-      const originPoint =
-        new Point([origin.getX(), origin.getY(), origin.getZ()]);
+      const values = [origin.getX(), origin.getY(), origin.getZ()];
+      if (typeof this.referencedFrameNumber !== 'undefined') {
+        values.push(this.referencedFrameNumber);
+      }
+      const originPoint = new Point(values);
       res = this.#viewController.getIndexFromPosition(originPoint);
     }
     return res;
@@ -319,6 +331,12 @@ export class Annotation {
       // shape center converted to 3D
       const planePoint = this.mathShape.getCentroid();
       res = this.#viewController.getPositionFromPlanePoint(planePoint, k);
+      // add frame number if defined
+      if (typeof this.referencedFrameNumber !== 'undefined') {
+        const values = res.getValues();
+        values[3] = this.referencedFrameNumber;
+        res = new Point(values);
+      }
     }
     return res;
   }

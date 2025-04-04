@@ -678,7 +678,7 @@ export class DrawLayer {
       // just use plane origin
       points = [annotation.planeOrigin];
     }
-    return this.#getPositionId(points);
+    return this.#getPositionId(points, annotation.referencedFrameNumber);
   }
 
   /**
@@ -687,7 +687,7 @@ export class DrawLayer {
    * @param {Point3D[]} points A list of points that defined a plane.
    * @returns {string} The string id.
    */
-  #getPositionId(points) {
+  #getPositionId(points, frameNumber) {
     let res = '';
     for (const point of points) {
       if (res.length !== 0) {
@@ -699,6 +699,9 @@ export class DrawLayer {
         precisionRound(point.getZ(), 2),
       ];
       res += toStringId(posValues);
+    }
+    if (typeof frameNumber !== 'undefined') {
+      res += '-' + frameNumber;
     }
     return res;
   }
@@ -1087,7 +1090,11 @@ export class DrawLayer {
       // use plane points
       points = planePoints;
     }
-    const posGroupId = this.#getPositionId(points);
+    let frameNumber;
+    if (position.length() > 3) {
+      frameNumber = position.get(3);
+    }
+    const posGroupId = this.#getPositionId(points, frameNumber);
 
     this.#activateDrawLayer(posGroupId);
     // TODO: add check
