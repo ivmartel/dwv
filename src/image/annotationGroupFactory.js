@@ -208,7 +208,6 @@ export class AnnotationGroupFactory {
 
     if (!this.#isDwv034AnnotationDicomSR(dataElements) &&
       !this.#isTid1500AnnotationDicomSR(dataElements)) {
-    // if (!this.#isDwv034AnnotationDicomSR(dataElements)) {
       this.#warning = 'Not a dwv supported annotation';
     }
 
