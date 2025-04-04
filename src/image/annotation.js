@@ -20,35 +20,35 @@ import {DicomCode} from '../dicom/dicomCode';
  */
 export class Annotation {
   /**
-   * The ID, strored as tracking id, this id is not unique.
+   * ID, strored as tracking id, this id is not unique.
    *
    * @type {string}
    */
   id;
 
   /**
-   * The UID, stored as tracking unique id.
+   * UID, stored as tracking unique id.
    *
    * @type {string}
    */
   uid;
 
   /**
-   * The reference image SOP UID.
+   * Referenced image SOP isntance UID.
    *
    * @type {string}
    */
   referencedSopInstanceUID;
 
   /**
-   * The reference image SOP class UID.
+   * Referenced image SOP class UID.
    *
    * @type {string}
    */
   referencedSopClassUID;
 
   /**
-   * The mathematical shape.
+   * Mathematical shape.
    *
    * @type {object}
    */
@@ -62,7 +62,7 @@ export class Annotation {
   referencePoints;
 
   /**
-   * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   * Colour: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
    *
    * @type {string}
    */
@@ -77,7 +77,7 @@ export class Annotation {
 
   /**
    * Text expression. Can contain variables surrounded with '{}' that will
-   * be extracted from the quantification object.
+   *   be extracted from the quantification object.
    *
    * @type {string}
    */
@@ -92,7 +92,7 @@ export class Annotation {
   labelPosition;
 
   /**
-   * The plane origin, the 3D position of index [0, 0, k].
+   * Plane origin: 3D position of index [0, 0, k].
    *
    * @type {Point3D|undefined}
    */
