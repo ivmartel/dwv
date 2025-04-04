@@ -221,6 +221,16 @@ export class Annotation {
   }
 
   /**
+   * Check if the annotaion can be displayed, i.e. it has
+   * an associated view controller.
+   *
+   * @returns {boolean} True is the annotation can be displayed.
+   */
+  canView() {
+    return typeof this.#viewController !== 'undefined';
+  }
+
+  /**
    * Check if an input view is compatible with the annotation.
    *
    * @param {PlaneHelper} planeHelper The input view to check.
@@ -258,6 +268,8 @@ export class Annotation {
   setViewController(viewController) {
     // check uid
     if (!viewController.includesImageUid(this.referenceSopUID)) {
+      logger.warn(
+        'Cannot view annotation with reference UID: ' + this.referenceSopUID);
       return;
     }
     // check if same view

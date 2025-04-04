@@ -739,7 +739,8 @@ export class DrawLayer {
    */
   #addAnnotationDraw(annotation, visible) {
     // check for compatible view
-    if (!annotation.isCompatibleView(this.#planeHelper)) {
+    if (!annotation.canView() ||
+      !annotation.isCompatibleView(this.#planeHelper)) {
       return;
     }
     const posGroupId = this.#getAnnotationPosGroupId(annotation);

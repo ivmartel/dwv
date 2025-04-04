@@ -57,6 +57,7 @@ test.dataModelUI.Annotation = function (app) {
    */
   this.registerListeners = function () {
     app.addEventListener('dataadd', onDataAdd);
+    app.addEventListener('drawlayeradd', onDrawLayerAdd);
     app.addEventListener('annotationadd', onAnnotationAdd);
     app.addEventListener('annotationupdate', onAnnotationUpdate);
     app.addEventListener('annotationremove', onAnnotationRemove);
@@ -367,6 +368,27 @@ test.dataModelUI.Annotation = function (app) {
       annotList.appendChild(addItem);
     }
   };
+
+  /**
+   * Handle 'drawlayeradd' event.
+   *
+   * @param {object} event The event.
+   */
+  function onDrawLayerAdd(event) {
+    const dataId = event.dataid;
+    const annotationGroup = app.getData(dataId).annotationGroup;
+    // strike through non viewable annotations
+    for (const annotation of annotationGroup.getList()) {
+      if (!annotation.canView()) {
+        const annotationDivId =
+          'span-' + getAnnotationDivId(annotation, dataId);
+        const item = document.getElementById(annotationDivId);
+        if (item) {
+          item.style['text-decoration-line'] = 'line-through';
+        }
+      }
+    }
+  }
 
   /**
    * Handle 'annotationadd' event.
