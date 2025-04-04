@@ -131,6 +131,15 @@ export class ViewController {
   }
 
   /**
+   * Get the image SOP class UID.
+   *
+   * @returns {string|undefined} The uid.
+   */
+  getSopClassUid() {
+    return this.#view.getImage().getMeta().SOPClassUID;
+  }
+
+  /**
    * Get the window/level presets names.
    *
    * @returns {string[]} The presets names.

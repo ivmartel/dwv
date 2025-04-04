@@ -4,6 +4,7 @@ import {
   getDicomNumericMeasurementItem
 } from './dicomNumericMeasurement';
 import {
+  isEqualCode,
   getCode,
   getDicomCodeItem,
   getConceptNameCode,
@@ -160,11 +161,11 @@ export class DicomSRContent {
   relationshipType;
 
   /**
-   * Content sequence (0040,A730).
+   * Content sequence.
    *
-   * @type {DicomSRContent[]|undefined}
+   * @type {DicomSRContent[]}
    */
-  contentSequence;
+  contentSequence = [];
 
   /**
    * Value.
@@ -205,13 +206,25 @@ export class DicomSRContent {
 
     res += ' = ' + this.value.toString();
 
-    if (typeof this.contentSequence !== 'undefined') {
-      for (const item of this.contentSequence) {
-        res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
-      }
+    for (const item of this.contentSequence) {
+      res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
     }
 
     return res;
+  }
+
+  /**
+   * Check if this content has input header values.
+   *
+   * @param {string} valueType The value type.
+   * @param {DicomCode} conceptNameCode The concept name code.
+   * @param {string} relationshipType The relationship type.
+   * @returns {boolean} True if equal.
+   */
+  hasHeader(valueType, conceptNameCode, relationshipType) {
+    return this.valueType === valueType &&
+      isEqualCode(this.conceptNameCode, conceptNameCode) &&
+      this.relationshipType === relationshipType;
   }
 }
 
@@ -285,7 +298,6 @@ export function getSRContent(dataElements) {
 
   const contentSq = safeGetAll(dataElements, TagKeys.ContentSequence);
   if (typeof contentSq !== 'undefined') {
-    content.contentSequence = [];
     for (const item of contentSq) {
       content.contentSequence.push(getSRContent(item));
     }
@@ -355,7 +367,7 @@ export function getDicomSRContentItem(content) {
     }
   }
 
-  if (typeof content.contentSequence !== 'undefined') {
+  if (content.contentSequence.length !== 0) {
     contentItem.ContentSequence = {
       value: []
     };

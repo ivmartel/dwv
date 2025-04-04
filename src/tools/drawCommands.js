@@ -61,7 +61,7 @@ export class AddAnnotationCommand {
    * @returns {string} The command name.
    */
   getName() {
-    return 'AddAnnotation-' + this.#annotation.id;
+    return 'AddAnnotation-' + this.#annotation.uid;
   }
 
   /**
@@ -75,7 +75,7 @@ export class AddAnnotationCommand {
    * Undo the command.
    */
   undo() {
-    this.#drawController.removeAnnotation(this.#annotation.id);
+    this.#drawController.removeAnnotation(this.#annotation.uid);
   }
 }
 
@@ -108,14 +108,14 @@ export class RemoveAnnotationCommand {
    * @returns {string} The command name.
    */
   getName() {
-    return 'RemoveAnnotation-' + this.#annotation.id;
+    return 'RemoveAnnotation-' + this.#annotation.uid;
   }
 
   /**
    * Execute the command.
    */
   execute() {
-    this.#drawController.removeAnnotation(this.#annotation.id);
+    this.#drawController.removeAnnotation(this.#annotation.uid);
   }
 
   /**
@@ -173,7 +173,7 @@ export class UpdateAnnotationCommand {
    * @returns {string} The command name.
    */
   getName() {
-    return 'UpdateAnnotation-' + this.#annotation.id;
+    return 'UpdateAnnotation-' + this.#annotation.uid;
   }
 
   /**

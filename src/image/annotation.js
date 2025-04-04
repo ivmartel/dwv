@@ -3,6 +3,8 @@ import {getFlags, replaceFlags} from '../utils/string';
 import {Point} from '../math/point';
 import {getOrientationName} from '../math/orientation';
 import {defaultToolOptions, toolOptions} from '../tools/index';
+import {guid} from '../math/stats';
+import {getUID} from '../dicom/dicomWriter';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -18,11 +20,18 @@ import {DicomCode} from '../dicom/dicomCode';
  */
 export class Annotation {
   /**
-   * The ID.
+   * The ID, strored as tracking id, this id is not unique.
    *
    * @type {string}
    */
   id;
+
+  /**
+   * The UID, stored as tracking unique id.
+   *
+   * @type {string}
+   */
+  uid;
 
   /**
    * The reference image SOP UID.
@@ -30,6 +39,13 @@ export class Annotation {
    * @type {string}
    */
   referenceSopUID;
+
+  /**
+   * The reference image SOP class UID.
+   *
+   * @type {string}
+   */
+  referenceSopClassUID;
 
   /**
    * The mathematical shape.
@@ -48,9 +64,9 @@ export class Annotation {
   /**
    * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
    *
-   * @type {string|undefined}
+   * @type {string}
    */
-  colour;
+  colour = '#ffff80';
 
   /**
    * Annotation quantification.
@@ -63,9 +79,9 @@ export class Annotation {
    * Text expression. Can contain variables surrounded with '{}' that will
    * be extracted from the quantification object.
    *
-   * @type {string|undefined}
+   * @type {string}
    */
-  textExpr;
+  textExpr = '';
 
   /**
    * Label position. If undefined, the default shape
@@ -105,6 +121,14 @@ export class Annotation {
   #meta = {};
 
   /**
+   * Set the annotation id and uid.
+   */
+  setIds() {
+    this.id = guid();
+    this.uid = getUID('TrackingUniqueIdentifier');
+  }
+
+  /**
    * Get the concepts ids of the annotation meta data.
    *
    * @returns {string[]} The ids.
@@ -128,7 +152,7 @@ export class Annotation {
    * Add annotation meta data.
    *
    * @param {DicomCode} concept The concept code.
-   * @param {DicomCode} value The value code.
+   * @param {DicomCode|string} value The value code.
    */
   addMetaItem(concept, value) {
     const conceptId = concept.value;
@@ -183,6 +207,7 @@ export class Annotation {
     this.#viewController = viewController;
     // set UID
     this.referenceSopUID = viewController.getCurrentImageUid();
+    this.referenceSopClassUID = viewController.getSopClassUid();
     // set plane origin (not saved with file)
     this.planeOrigin =
       viewController.getOriginForImageUid(this.referenceSopUID);
@@ -193,6 +218,16 @@ export class Annotation {
         viewController.getCurrentPosition()
       );
     }
+  }
+
+  /**
+   * Check if the annotation can be displayed: true if it has
+   * an associated view controller.
+   *
+   * @returns {boolean} True if the annotation can be displayed.
+   */
+  canView() {
+    return typeof this.#viewController !== 'undefined';
   }
 
   /**
@@ -233,6 +268,8 @@ export class Annotation {
   setViewController(viewController) {
     // check uid
     if (!viewController.includesImageUid(this.referenceSopUID)) {
+      logger.warn(
+        'Cannot view annotation with reference UID: ' + this.referenceSopUID);
       return;
     }
     // check if same view

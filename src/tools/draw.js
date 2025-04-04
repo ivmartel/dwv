@@ -3,7 +3,6 @@ import {
   getMousePoint,
   getTouchPoints
 } from '../gui/generic';
-import {guid} from '../math/stats';
 import {logger} from '../utils/logger';
 import {
   AddAnnotationCommand,
@@ -209,7 +208,7 @@ export class Draw {
   }
 
   /**
-   * Check if a draw lqyer can be created in the given layer group.
+   * Check if a draw layer can be created in the given layer group.
    * Uses the validator provided as feature. Default returns true.
    *
    * @param {LayerGroup} layerGroup The layer group
@@ -814,7 +813,7 @@ export class Draw {
     } else {
       annotation.colour = this.#style.getLineColour();
     }
-    annotation.id = guid();
+    annotation.setIds();
     annotation.init(viewController);
     // meta data
     if (typeof this.#annotationMeta !== 'undefined') {
