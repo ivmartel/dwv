@@ -1172,12 +1172,12 @@ export class Brush extends EventTarget {
     }
   };
 
-  #createVolumesChangedEvent(segmentnumber, dataid, srclayerid) {
+  #createVolumesChangedEvent(segmentNumber, dataId, srcLayerId) {
     return new CustomEvent('volumeschanged', {
       detail: {
-        segmentnumber,
-        dataid,
-        srclayerid
+        segmentNumber,
+        dataId,
+        srcLayerId
       }
     });
   }

@@ -164,24 +164,28 @@ test.dataModelUI.Segmentation = function (app) {
 
   const _volumes = new dwv.Volumes(app);
 
+  // Watch for volume calculations
+  _volumes.onVolumeCalculation = ((event) => {
+    const segmentation =
+      _segmentations.find(
+        (seg) => {
+          return seg.dataId = event.data.dataId;
+        }
+      );
+
+    if (typeof segmentation !== 'undefined') {
+      segmentation.volumes = event.data.volumes;
+      updateVolumesSpan(segmentation);
+    }
+  });
+
   // Watch for sementation volume changes
   const brushTool = app.getToolboxController().getToolList()['Brush'];
   if (typeof brushTool !== 'undefined') {
     brushTool.addEventListener(
       'volumeschanged',
       ((event) => {
-        const segmentation =
-          _segmentations.find(
-            (seg) => {
-              return seg.dataId = event.detail.dataid;
-            }
-          );
-
-        if (typeof segmentation !== 'undefined') {
-          segmentation.volumes =
-            _volumes.calculateVolumes(segmentation.dataId);
-          updateVolumesSpan(segmentation);
-        }
+        _volumes.calculateVolumes(event.detail.dataId);
       })
     );
   }
@@ -241,12 +245,13 @@ test.dataModelUI.Segmentation = function (app) {
           // default segmentation
           const segmentation = {
             dataId: dataId,
-            volumes: _volumes.calculateVolumes(dataId),
+            volumes: [],
             hasNewSegments: false,
             segments: [segment],
             selectedSegmentNumber: segmentNumber,
             viewHelper: new dwv.MaskSegmentViewHelper()
           };
+          _volumes.calculateVolumes(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -258,8 +263,7 @@ test.dataModelUI.Segmentation = function (app) {
           // segmentation created with add segmentation
           if (typeof segmentation.dataId === 'undefined') {
             segmentation.dataId = dataId;
-            segmentation.volumes = _volumes.calculateVolumes(dataId);
-            updateVolumesSpan(segmentation);
+            _volumes.calculateVolumes(dataId);
             for (const segment of segmentation.segments) {
               segHelper.addSegment(segment);
             }
@@ -273,11 +277,12 @@ test.dataModelUI.Segmentation = function (app) {
           // loaded segmentation
           const segmentation = {
             dataId: dataId,
-            volumes: _volumes.calculateVolumes(dataId),
+            volumes: [],
             hasNewSegments: true,
             segments: imgMeta.custom.segments,
             viewHelper: new dwv.MaskSegmentViewHelper()
           };
+          _volumes.calculateVolumes(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
