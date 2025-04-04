@@ -2096,8 +2096,8 @@ export class App {
     if (typeof refViewLayer === 'undefined') {
       for (const annotation of annotationGroup.getList()) {
         const metaSearch = {
-          SOPInstanceUID: annotation.referenceSopUID,
-          SOPClassUID: annotation.referenceSopClassUID
+          SOPInstanceUID: annotation.referencedSopInstanceUID,
+          SOPClassUID: annotation.referencedSopClassUID
         };
         const viewLayers = layerGroup.searchViewLayers(metaSearch);
         if (viewLayers.length !== 0) {

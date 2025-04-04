@@ -223,9 +223,9 @@ export class AnnotationGroupFactory {
   #addSourceImageToAnnotation(annotation, content) {
     if (content.valueType === ValueTypes.image &&
       content.relationshipType === RelationshipTypes.selectedFrom) {
-      annotation.referenceSopClassUID =
+      annotation.referencedSopClassUID =
         content.value.referencedSOPSequence.referencedSOPClassUID;
-      annotation.referenceSopUID =
+      annotation.referencedSopInstanceUID =
         content.value.referencedSOPSequence.referencedSOPInstanceUID;
     }
   }
@@ -771,8 +771,8 @@ export class AnnotationGroupFactory {
     srImage.relationshipType = RelationshipTypes.selectedFrom;
     srImage.conceptNameCode = getSourceImageCode();
     const sopRef = new SopInstanceReference();
-    sopRef.referencedSOPClassUID = annotation.referenceSopClassUID;
-    sopRef.referencedSOPInstanceUID = annotation.referenceSopUID;
+    sopRef.referencedSOPClassUID = annotation.referencedSopClassUID;
+    sopRef.referencedSOPInstanceUID = annotation.referencedSopInstanceUID;
     const imageRef = new ImageReference();
     imageRef.referencedSOPSequence = sopRef;
     srImage.value = imageRef;

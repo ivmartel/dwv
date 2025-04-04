@@ -38,14 +38,14 @@ export class Annotation {
    *
    * @type {string}
    */
-  referenceSopUID;
+  referencedSopInstanceUID;
 
   /**
    * The reference image SOP class UID.
    *
    * @type {string}
    */
-  referenceSopClassUID;
+  referencedSopClassUID;
 
   /**
    * The mathematical shape.
@@ -199,18 +199,18 @@ export class Annotation {
    * @param {ViewController} viewController The associated view controller.
    */
   init(viewController) {
-    if (typeof this.referenceSopUID !== 'undefined') {
+    if (typeof this.referencedSopInstanceUID !== 'undefined') {
       logger.debug('Cannot initialise annotation twice');
       return;
     }
 
     this.#viewController = viewController;
     // set UID
-    this.referenceSopUID = viewController.getCurrentImageUid();
-    this.referenceSopClassUID = viewController.getSopClassUid();
+    this.referencedSopInstanceUID = viewController.getCurrentImageUid();
+    this.referencedSopClassUID = viewController.getSopClassUid();
     // set plane origin (not saved with file)
     this.planeOrigin =
-      viewController.getOriginForImageUid(this.referenceSopUID);
+      viewController.getOriginForImageUid(this.referencedSopInstanceUID);
     // set plane points if not aquisition orientation
     // (planePoints are saved with file if present)
     if (!viewController.isAquisitionOrientation()) {
@@ -267,9 +267,9 @@ export class Annotation {
    */
   setViewController(viewController) {
     // check uid
-    if (!viewController.includesImageUid(this.referenceSopUID)) {
-      logger.warn(
-        'Cannot view annotation with reference UID: ' + this.referenceSopUID);
+    if (!viewController.includesImageUid(this.referencedSopInstanceUID)) {
+      logger.warn('Cannot view annotation with reference UID: ' +
+        this.referencedSopInstanceUID);
       return;
     }
     // check if same view
@@ -280,7 +280,7 @@ export class Annotation {
 
     // set plane origin (not saved with file)
     this.planeOrigin =
-      viewController.getOriginForImageUid(this.referenceSopUID);
+      viewController.getOriginForImageUid(this.referencedSopInstanceUID);
   }
 
   /**
