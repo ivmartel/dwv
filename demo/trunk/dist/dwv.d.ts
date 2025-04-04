@@ -33,13 +33,13 @@ export declare class Annotation {
      *
      * @type {string}
      */
-    referenceSopUID: string;
+    referencedSopInstanceUID: string;
     /**
      * The reference image SOP class UID.
      *
      * @type {string}
      */
-    referenceSopClassUID: string;
+    referencedSopClassUID: string;
     /**
      * The mathematical shape.
      *
