@@ -178,7 +178,6 @@ export class AnnotationGroupFactory {
           this.#isMeasurementGroupItem
         );
         if (typeof measGroup !== 'undefined') {
-          res = true;
           const imageRegion = measGroup.contentSequence.find(
             this.#isImageRegionItem
           );
@@ -209,6 +208,7 @@ export class AnnotationGroupFactory {
 
     if (!this.#isDwv034AnnotationDicomSR(dataElements) &&
       !this.#isTid1500AnnotationDicomSR(dataElements)) {
+    // if (!this.#isDwv034AnnotationDicomSR(dataElements)) {
       this.#warning = 'Not a dwv supported annotation';
     }
 
