@@ -221,10 +221,10 @@ export class Annotation {
   }
 
   /**
-   * Check if the annotaion can be displayed, i.e. it has
+   * Check if the annotation can be displayed: true if it has
    * an associated view controller.
    *
-   * @returns {boolean} True is the annotation can be displayed.
+   * @returns {boolean} True if the annotation can be displayed.
    */
   canView() {
     return typeof this.#viewController !== 'undefined';
