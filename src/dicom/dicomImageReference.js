@@ -45,7 +45,11 @@ export class ImageReference {
    * @returns {string} The object as string.
    */
   toString() {
-    return this.referencedSOPSequence.toString();
+    let res = this.referencedSOPSequence.toString();
+    if (typeof this.referencedFrameNumber !== 'undefined') {
+      res += ', frame: ' + this.referencedFrameNumber;
+    }
+    return res;
   };
 };
 
