@@ -379,13 +379,15 @@ test.dataModelUI.Annotation = function (app) {
     const annotationGroup = app.getData(dataId).annotationGroup;
     // strike through non viewable annotations
     for (const annotation of annotationGroup.getList()) {
+      let textDecoration = '';
       if (!annotation.canView()) {
-        const annotationDivId =
-          'span-' + getAnnotationDivId(annotation, dataId);
-        const item = document.getElementById(annotationDivId);
-        if (item) {
-          item.style['text-decoration-line'] = 'line-through';
-        }
+        textDecoration = 'line-through';
+      }
+      const annotationDivId =
+        'span-' + getAnnotationDivId(annotation, dataId);
+      const item = document.getElementById(annotationDivId);
+      if (item) {
+        item.style['text-decoration-line'] = textDecoration;
       }
     }
   }
