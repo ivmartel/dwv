@@ -41,6 +41,12 @@ export declare class Annotation {
      */
     referencedSopClassUID: string;
     /**
+     * Referenced frame number.
+     *
+     * @type {number}
+     */
+    referencedFrameNumber: number;
+    /**
      * Mathematical shape.
      *
      * @type {object}
