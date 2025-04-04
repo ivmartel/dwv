@@ -25,8 +25,9 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
     value0.schemeDesignator = 'DCM';
     value0.value = '123109';
     // example draw meta validator
-    const drawMetaValidator = function (meta) {
-      return meta.StationName === 'web browser';
+    const drawMetaValidator = function (/*meta*/) {
+      //return meta.StationName === 'web browser';
+      return true;
     };
     // example ref meta validator
     const refMetaValidator = function (/*meta*/) {

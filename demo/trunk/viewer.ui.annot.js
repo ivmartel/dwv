@@ -25,7 +25,7 @@ function getAnnotationGroupDivId(dataId) {
  */
 function getAnnotationDivId(annotation, dataId) {
   const prefix = getAnnotationGroupDivId(dataId);
-  const suffix = 'annotation' + annotation.id;
+  const suffix = 'annotation' + annotation.uid;
   return prefix + '-' + suffix;
 }
 
@@ -57,6 +57,7 @@ test.dataModelUI.Annotation = function (app) {
    */
   this.registerListeners = function () {
     app.addEventListener('dataadd', onDataAdd);
+    app.addEventListener('drawlayeradd', onDrawLayerAdd);
     app.addEventListener('annotationadd', onAnnotationAdd);
     app.addEventListener('annotationupdate', onAnnotationUpdate);
     app.addEventListener('annotationremove', onAnnotationRemove);
@@ -282,7 +283,14 @@ test.dataModelUI.Annotation = function (app) {
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
       const factory = new dwv.AnnotationGroupFactory();
-      const dicomElements = factory.toDicom(annotationGroup);
+      const sopUID = dwv.getUID('SOPInstanceUID');
+      const extraTags = {
+        MediaStorageSOPInstanceUID: sopUID,
+        SOPInstanceUID: sopUID,
+        SeriesInstanceUID: dwv.getUID('SeriesInstanceUID'),
+        SeriesDescription: 'Annnotation made with dwv',
+      };
+      const dicomElements = factory.toDicom(annotationGroup, extraTags);
       // write
       const writer = new dwv.DicomWriter();
       let dicomBuffer = null;
@@ -360,6 +368,29 @@ test.dataModelUI.Annotation = function (app) {
       annotList.appendChild(addItem);
     }
   };
+
+  /**
+   * Handle 'drawlayeradd' event.
+   *
+   * @param {object} event The event.
+   */
+  function onDrawLayerAdd(event) {
+    const dataId = event.dataid;
+    const annotationGroup = app.getData(dataId).annotationGroup;
+    // strike through non viewable annotations
+    for (const annotation of annotationGroup.getList()) {
+      let textDecoration = '';
+      if (!annotation.canView()) {
+        textDecoration = 'line-through';
+      }
+      const annotationDivId =
+        'span-' + getAnnotationDivId(annotation, dataId);
+      const item = document.getElementById(annotationDivId);
+      if (item) {
+        item.style['text-decoration-line'] = textDecoration;
+      }
+    }
+  }
 
   /**
    * Handle 'annotationadd' event.
