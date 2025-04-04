@@ -8,7 +8,6 @@ import {Size} from '../image/size';
 import {Geometry} from '../image/geometry';
 import {ColourMap} from '../image/luts';
 import {getDefaultDicomSegJson} from '../image/maskFactory';
-import {Volumes} from '../image/volumes';
 import {getDwvUIDPrefix} from '../dicom/dicomParser';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {DicomData} from '../app/dataController';
@@ -471,13 +470,6 @@ export class Brush extends EventTarget {
   #mask;
 
   /**
-   * Mask volume calculator.
-   *
-   * @type {Volumes}
-   */
-  #volumes;
-
-  /**
    * Mask data index.
    *
    * @type {string}
@@ -774,8 +766,6 @@ export class Brush extends EventTarget {
       sourceGeometry.getOrigins()[imgK],
       firstSliceMeta
     );
-
-    this.#volumes = new Volumes(this.#mask);
 
     // fires load events and renders data
     // (will create viewLayer for it)
@@ -1182,6 +1172,16 @@ export class Brush extends EventTarget {
     }
   };
 
+  #createVolumesChangedEvent(segmentnumber, dataid, srclayerid) {
+    return new CustomEvent('volumeschanged', {
+      detail: {
+        segmentnumber,
+        dataid,
+        srclayerid
+      }
+    });
+  }
+
   /**
    * Handle mouse up event.
    *
@@ -1229,11 +1229,28 @@ export class Brush extends EventTarget {
       };
       command.onUndo = (event) => {
         this.dispatchEvent(event);
+
+        this.dispatchEvent(
+          this.#createVolumesChangedEvent(
+            this.#selectedSegmentNumber,
+            this.#maskDataId,
+            srclayerid
+          )
+        );
       };
+
       // save command in undo stack
       this.#app.addToUndoStack(command);
       // fire event
       this.dispatchEvent(command.getExecuteEvent());
+
+      this.dispatchEvent(
+        this.#createVolumesChangedEvent(
+          this.#selectedSegmentNumber,
+          this.#maskDataId,
+          srclayerid
+        )
+      );
     }
   };
 
@@ -1456,7 +1473,11 @@ export class Brush extends EventTarget {
    */
   getEventNames() {
     return [
-      'brushdraw', 'brushremove', 'erasingactivated', 'erasingdeactivated'
+      'brushdraw',
+      'brushremove',
+      'erasingactivated',
+      'erasingdeactivated',
+      'volumeschanged'
     ];
   }
 
@@ -1476,18 +1497,5 @@ export class Brush extends EventTarget {
         touch_click: 'tool.Brush.touch_click'
       }
     };
-  }
-
-  /**
-   * Get the volumes of the segmentations in ml.
-   *
-   * @returns {number[]} A list of volumes in ml.
-   */
-  getVolumes() {
-    if (typeof this.#volumes !== 'undefined') {
-      return this.#volumes.calculateVolumes();
-    } else {
-      return [];
-    }
   }
 } // Brush class

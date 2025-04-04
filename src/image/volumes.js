@@ -1,17 +1,17 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
+import {App} from '../app/application';
 import {Size} from './size';
 /* eslint-enable no-unused-vars */
 
 export class Volumes {
 
   /**
-   * The image to calculate volumes for.
+   * The associated application.
    *
-   * @type {Image}
+   * @type {App}
    */
-  #image;
+  #app;
 
   /**
    * The last known image size.
@@ -42,41 +42,19 @@ export class Volumes {
   #labels;
 
   /**
-   * A cached array of unique labels.
-   *
-   * @type {number[]}
+   * @param {App} app The associated application.
    */
-  #uniqueLabels = [];
-
-  /**
-   * A cached array of calculated volumes.
-   *
-   * @type {number}
-   */
-  #volumes = [];
-
-  /**
-   * Invalidate volumes cache.
-   *
-   * @type {bool}
-   */
-  #volumesInvalid;
-
-  /**
-   * @param {Image} image The image to calculate volumes for.
-   */
-  constructor(image) {
-    this.#image = image;
-
-    this.#reconstructLabels();
-
-    //TODO add destructor
-    image.addEventListener(
-      'imagecontentchange',
-      (() => this.#reconstructLabels())
-    );
+  constructor(app) {
+    this.#app = app;
   }
 
+  /**
+   * Union-find find operation.
+   *
+   * @param {number} label The label to find the root of.
+   *
+   * @returns {number} The root label.
+   */
   #find(label) {
     if (label < 0) {
       return label;
@@ -99,24 +77,36 @@ export class Volumes {
     return currentLabel;
   }
 
+  /**
+   * Union-find union operation.
+   *
+   * @param {number} label1 The child label to union.
+   * @param {number} label2 The parent label to union.
+   */
   #union(label1, label2) {
+    // This will break if a non-label (-1) get passed in
+    // however with the current implmentation this should never happen
     this.#unionFind[this.#find(label1)] = this.#find(label2);
   }
 
   /**
-   * Reconstruct the volume labels after the image changes.
+   * Label the segmentation volumes using the Hoshen–Kopelman algorithm.
+   *
+   * @param {Image} image The image to regenerate the labels for.
    */
-  #reconstructLabels() {
-    const startTime = Date.now();
-
-    const currentGeometry = this.#image.getGeometry();
+  #regenerateLabels(image) {
+    const currentGeometry = image.getGeometry();
     const currentSize = currentGeometry.getSize();
 
-    //TODO: Support n-dimensional images?
+    // This check is probably redundant
     if (currentSize.length() !== 3) {
       return;
     };
 
+    // If we are re-calcing the volume of the same sized image as last time we
+    // can save a little time on re-initializing memory. Makes it slightly
+    // faster to use a seperate Volumes object per segmentation, at the cost
+    // of extra memory.
     if (typeof this.#size === 'undefined' || !this.#size.equals(currentSize)) {
       // The size of the image has changed, we need to reinitialize everything.
       this.#size = currentSize;
@@ -135,15 +125,7 @@ export class Volumes {
       this.#labels = new Int32Array(totalSize);
     }
 
-    // Reset labels.
-    const totalSize = currentSize.getTotalSize();
-    for (let i = 0; i < totalSize; i++) {
-      this.#unionFind[i] = i;
-    }
-    this.#labels.fill(-1);
-    this.#volumesInvalid = true;
-
-    //TODO: Support n-dimensional images?
+    // Generate the Hoshen–Kopelman labels
     for (let x = 0; x < currentSize.get(0); x++) {
       for (let y = 0; y < currentSize.get(1); y++) {
         for (let z = 0; z < currentSize.get(2); z++) {
@@ -153,26 +135,33 @@ export class Volumes {
             (this.#unitVectors[1] * y) +
             (this.#unitVectors[2] * z);
 
-          const thisValue = this.#image.getBuffer()[thisOffset];
+          // Reset labels.
+          this.#unionFind[thisOffset] = thisOffset;
+          this.#labels[thisOffset] = -1;
+
+          const thisValue = image.getBuffer()[thisOffset];
 
           if (thisValue > 0) {
+            // Neighbor offsets
             const xOffset = thisOffset - this.#unitVectors[0];
             const yOffset = thisOffset - this.#unitVectors[1];
             const zOffset = thisOffset - this.#unitVectors[2];
 
+            // Neighbor values
             let xValue = 0;
             if (x > 0) {
-              xValue = this.#image.getBuffer()[xOffset];
+              xValue = image.getBuffer()[xOffset];
             };
             let yValue = 0;
             if (y > 0) {
-              yValue = this.#image.getBuffer()[yOffset];
+              yValue = image.getBuffer()[yOffset];
             };
             let zValue = 0;
             if (z > 0) {
-              zValue = this.#image.getBuffer()[zOffset];
+              zValue = image.getBuffer()[zOffset];
             };
 
+            // Neighbor labels
             let xLabel = 0;
             if (x > 0) {
               xLabel = this.#labels[xOffset];
@@ -186,6 +175,7 @@ export class Volumes {
               zLabel = this.#labels[zOffset];
             };
 
+            // No neighbors with matching values
             if (
               xValue !== thisValue &&
               yValue !== thisValue &&
@@ -193,6 +183,7 @@ export class Volumes {
             ) {
               this.#labels[thisOffset] = thisOffset; // Guaranteed unique label.
 
+            // One neibour with matching values
             } else if (
               xValue === thisValue &&
               yValue !== thisValue &&
@@ -212,6 +203,7 @@ export class Volumes {
             ) {
               this.#labels[thisOffset] = this.#find(zLabel);
 
+            // Two neibours with matching values
             } else if (
               xValue !== thisValue &&
               yValue === thisValue &&
@@ -234,6 +226,7 @@ export class Volumes {
               this.#union(xLabel, yLabel);
               this.#labels[thisOffset] = this.#find(xLabel);
 
+            // All neibours with matching values
             } else if (
               xValue === thisValue &&
               yValue === thisValue &&
@@ -247,63 +240,59 @@ export class Volumes {
         }
       }
     }
-
-    const timeTaken = Date.now() - startTime;
-
-    this.calculateVolumes();
-
-    console.log('POKE time taken label: ', timeTaken, 'ms');
-    console.log(
-      'POKE size',
-      currentSize.get(0),
-      currentSize.get(1),
-      currentSize.get(2)
-    );
   }
 
-  calculateVolumes() {
-    const startTime = Date.now();
+  /**
+   * Calculate the volumes of a segmentation.
+   *
+   * @param {string} maskDataId The data ID of the mask to calculate
+   *  volumes for.
+   *
+   * @returns {number[]} The list of volumes in ml.
+   */
+  calculateVolumes(maskDataId) {
+    // Calculates the volume of segmentations using the Hoshen–Kopelman
+    // algorithm to first label all of the connected components, then does
+    // a second pass to count the number of voxels in each unique label.
+    //
+    // The Hoshen–Kopelman labelling is slightly modified to work with
+    // non-binary 3D data, but is otherwise structured the same way.
 
-    const currentGeometry = this.#image.getGeometry();
-    const currentSize = currentGeometry.getSize();
-
-    if (typeof this.#size === 'undefined' || !this.#size.equals(currentSize)) {
-      // The size changed since the last time labels were reconstructed.
-      this.#reconstructLabels();
+    const maskData = this.#app.getData(maskDataId);
+    if (!maskData) {
+      throw new Error(
+        'No mask image to calculate segmentation volumes for ID: ' + maskDataId
+      );
     }
+    const image = maskData.image;
 
-    if (this.#volumesInvalid) {
-      // Labels have been reconstructed since the last time volumes
-      // were calculated.
+    const startTime1 = Date.now();
 
-      this.#uniqueLabels = [];
-      this.#volumes = [];
+    // Generate the volume labels.
+    this.#regenerateLabels(image);
 
-      for (let x = 0; x < currentSize.get(0); x++) {
-        for (let y = 0; y < currentSize.get(1); y++) {
-          for (let z = 0; z < currentSize.get(2); z++) {
+    const timeTaken1 = Date.now() - startTime1;
+    const startTime2 = Date.now();
 
-            const thisOffset =
-              (this.#unitVectors[0] * x) +
-              (this.#unitVectors[1] * y) +
-              (this.#unitVectors[2] * z);
+    const volumes = {};
 
-            const labelValue = this.#find(this.#labels[thisOffset]);
-            const labelIndex = this.#uniqueLabels.indexOf(labelValue);
+    // Count the number of voxels per unique label,
+    // this has to be done as a second pass.
+    for (let o = 0; o < this.#labels.length; o++) {
+      const labelValue = this.#find(this.#labels[o]);
 
-            if (labelValue >= 0 && labelIndex < 0) {
-              this.#uniqueLabels.push(labelValue);
-              this.#volumes.push(1);
-
-            } else if (labelIndex >= 0) {
-              this.#volumes[labelIndex]++;
-            }
-          }
+      if (labelValue >= 0) {
+        const volume = volumes[labelValue];
+        if (typeof volume === 'undefined') {
+          volumes[labelValue] = 1;
+        } else {
+          volumes[labelValue]++;
         }
       }
     }
 
     // Convert the voxel volumes to ml.
+    const currentGeometry = image.getGeometry();
     const currentSpacing = currentGeometry.getSpacing();
     const mlVoxelVolume =
       currentSpacing.get(0) *
@@ -312,18 +301,19 @@ export class Volumes {
       0.001; // ml/mm^3
 
     const mlVolumes =
-      this.#volumes.map(
+      Object.values(volumes).map(
         (v) => {
           return (Math.round(v * mlVoxelVolume * 1e4)) / 1e4;
         }
       );
 
-    const timeTaken = Date.now() - startTime;
+    const timeTaken2 = Date.now() - startTime2;
 
-    console.log('POKE unique labels: ', this.#uniqueLabels);
-    console.log('POKE volumes (voxels): ', this.#volumes);
+    // Debug code, please ignore for now will be removed later
+    console.log('POKE volumes (voxels): ', volumes);
     console.log('POKE volumes (ml): ', mlVolumes);
-    console.log('POKE time taken volume: ', timeTaken, 'ms');
+    console.log('POKE time taken labels: ', timeTaken1, 'ms');
+    console.log('POKE time taken volume: ', timeTaken2, 'ms');
 
     return mlVolumes;
   }
