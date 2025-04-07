@@ -778,7 +778,19 @@ test.dataModelUI.Segmentation = function (app) {
    * @returns {string} The display string of volumes.
    */
   function createVolumesString(segmentation) {
-    const mlStrings = segmentation.volumes.map((volume) => volume + 'ml');
+    const mlStrings =
+      segmentation.volumes.map(
+        (volume) => {
+          return `${
+            volume.volume.toPrecision(4)
+          }ml at [${
+            volume.centroid[0].toPrecision(4)
+          }mm, ${
+            volume.centroid[1].toPrecision(4)
+          }mm, ${
+            volume.centroid[2].toPrecision(4)
+          }mm]`;
+        });
     return 'Volumes: ' + mlStrings.join(', ');
   }
 

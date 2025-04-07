@@ -9,6 +9,8 @@
  * non-binary 3D data, but is otherwise structured the same way.
  */
 
+const ML_PER_MM = 0.001; // ml/mm^3
+
 class VolumesWorker {
   /**
    * The last known image size.
@@ -221,6 +223,8 @@ class VolumesWorker {
    * Convert an offset in memory to an index.
    *
    * @param {number} offset The offset to convert.
+   * @param {number[]} unitVectors The unit vectors for index to offset
+   *  conversion.
    * @returns {number[]} The index.
    */
   #offsetToIndex(offset, unitVectors) {
@@ -242,10 +246,12 @@ class VolumesWorker {
    * @param {number} mlVoxelVolume The number of ml per image voxel.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
+   * @param {number[]} spacing The space in mm between voxels.
+   * @param {number[]} origin The origin of the image in mm.
    *
    * @returns {number[]} The list of volumes in ml.
    */
-  calculateVolumesAndCentroids(mlVoxelVolume, unitVectors) {
+  calculateVolumesAndCentroids(mlVoxelVolume, unitVectors, spacing, origin) {
     const volumes = {};
 
     // Count the number of voxels per unique label,
@@ -273,11 +279,14 @@ class VolumesWorker {
     const volumesAndCentroids =
       Object.values(volumes).map(
         (v) => {
+          const centroid = Array(v.sum.length).fill(0);
+          for (let d = 0; d < v.sum.length; d++) {
+            centroid[d] = ((v.sum[d] / v.count) * spacing[d]) + origin[d];
+          }
+
           return {
-            centroid: v.sum.map((s) => {
-              return s / v.count;
-            }),
-            volume: (Math.round(v.count * mlVoxelVolume * 1e4)) / 1e4
+            centroid: centroid,
+            volume: v.count * mlVoxelVolume
           };
         }
       );
@@ -290,28 +299,35 @@ const volumesWorker = new VolumesWorker();
 
 self.addEventListener('message', function (event) {
   const imageBuffer = event.data.imageBuffer;
-  const mlVoxelVolume = event.data.mlVoxelVolume;
   const unitVectors = event.data.unitVectors;
   const sizes = event.data.sizes;
+  const spacing = event.data.spacing;
+  const origin = event.data.origin;
   const totalSize = event.data.totalSize;
 
-  const startTime1 = Date.now();
+  // Convert the voxel volumes to ml.
+  const mlVoxelVolume =
+    spacing[0] *
+    spacing[1] *
+    spacing[2] *
+    ML_PER_MM;
+
   // Generate the volume labels.
-  volumesWorker.regenerateLabels(imageBuffer, unitVectors, sizes, totalSize);
-  const timeTaken1 = Date.now() - startTime1;
+  volumesWorker.regenerateLabels(
+    imageBuffer,
+    unitVectors,
+    sizes,
+    totalSize
+  );
 
-  const startTime2 = Date.now();
   // Calculate the volumes in ml.
-  const volumes = volumesWorker.calculateVolumesAndCentroids(mlVoxelVolume, unitVectors);
-  const timeTaken2 = Date.now() - startTime2;
-
-  // Debug code, will be removed later
-  console.log('Volume Worker: volumes: ', volumes);
-  volumes.forEach((v) => {
-    console.log('Volume Worker: centroid: ', v.centroid);
-  });
-  console.log('Volume Worker: time taken labels: ', timeTaken1, 'ms');
-  console.log('Volume Worker: time taken volume: ', timeTaken2, 'ms');
+  const volumes =
+    volumesWorker.calculateVolumesAndCentroids(
+      mlVoxelVolume,
+      unitVectors,
+      spacing,
+      origin
+    );
 
   self.postMessage({
     dataId: event.data.dataId,

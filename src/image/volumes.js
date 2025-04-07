@@ -5,8 +5,6 @@ import {ThreadPool, WorkerTask} from '../utils/thread';
 import {App} from '../app/application';
 /* eslint-enable no-unused-vars */
 
-const ML_PER_MM = 0.001; // ml/mm^3
-
 const volumesWorkerUrl = new URL('./volumesWorker.js', import.meta.url);
 
 /**
@@ -74,22 +72,29 @@ export class Volumes {
 
     const totalSize = currentSize.getTotalSize();
 
-    // Convert the voxel volumes to ml.
     const currentSpacing = currentGeometry.getSpacing();
-    const mlVoxelVolume =
-      currentSpacing.get(0) *
-      currentSpacing.get(1) *
-      currentSpacing.get(2) *
-      ML_PER_MM;
+    const spacing = [
+      currentSpacing.get(0),
+      currentSpacing.get(1),
+      currentSpacing.get(2)
+    ];
+
+    const currentOrigin = currentGeometry.getOrigin();
+    const origin = [
+      currentOrigin.getX(),
+      currentOrigin.getY(),
+      currentOrigin.getZ()
+    ];
 
     const workerTask = new WorkerTask(
       volumesWorkerUrl,
       {
         dataId: maskDataId,
         imageBuffer: image.getBuffer(),
-        mlVoxelVolume: mlVoxelVolume,
         unitVectors: unitVectors,
         sizes: sizes,
+        spacing: spacing,
+        origin: origin,
         totalSize: totalSize
       },
       {}
