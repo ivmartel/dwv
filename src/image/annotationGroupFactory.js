@@ -473,8 +473,9 @@ export class AnnotationGroupFactory {
     );
     if (typeof scoord !== 'undefined') {
       annotation = new Annotation();
+      // shape
       annotation.mathShape = getShapeFromScoord(scoord.value);
-      // get source image from scoord content
+      // shape source image
       const fromImage = scoord.contentSequence.find(function (item) {
         return item.valueType === ValueTypes.image &&
           item.relationshipType === RelationshipTypes.selectedFrom;
@@ -482,7 +483,7 @@ export class AnnotationGroupFactory {
       if (typeof fromImage !== 'undefined') {
         this.#addSourceImageToAnnotation(annotation, fromImage);
       }
-      // add other meta
+      // shape extra
       for (const item of content.contentSequence) {
         this.#addContentToAnnotation(annotation, item);
       }
@@ -544,13 +545,14 @@ export class AnnotationGroupFactory {
     );
     if (typeof measure !== 'undefined') {
       annotation = new Annotation();
+      // shape
       // no specific concept (?)
       const scoord = measure.contentSequence.find(function (subItem) {
         return subItem.valueType === ValueTypes.scoord &&
           subItem.relationshipType === RelationshipTypes.inferredFrom;
       });
       annotation.mathShape = getShapeFromScoord(scoord.value);
-      // get source image from scoord content
+      // shape source image
       // no specific concept (?)
       const fromImage = scoord.contentSequence.find(function (item) {
         return item.valueType === ValueTypes.image &&
@@ -561,7 +563,7 @@ export class AnnotationGroupFactory {
       }
     }
 
-    // add meta
+    // shape extra
     if (typeof annotation !== 'undefined') {
       for (const item of content.contentSequence) {
         // add ids
@@ -633,11 +635,15 @@ export class AnnotationGroupFactory {
    */
   #dwv034ScoordToAnnotation(content) {
     const annotation = new Annotation();
+    // shape
     annotation.mathShape = getShapeFromScoord(content.value);
 
     for (const item of content.contentSequence) {
+      // shape source image
       this.#addSourceImageToAnnotation(annotation, item);
+      // shape id
       this.#addDwv034IdToAnnotation(annotation, item);
+      // shape extra
       this.#addContentToAnnotation(annotation, item);
     }
     return annotation;
