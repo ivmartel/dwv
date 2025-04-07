@@ -160,7 +160,7 @@ class VolumesWorker {
             ) {
               this.#labels[thisOffset] = thisOffset; // Guaranteed unique label.
 
-            // One neibour with matching values
+            // One neighbor with matching values
             } else if (
               xValue === thisValue &&
               yValue !== thisValue &&
@@ -180,7 +180,7 @@ class VolumesWorker {
             ) {
               this.#labels[thisOffset] = this.#find(zLabel);
 
-            // Two neibours with matching values
+            // Two neighbor with matching values
             } else if (
               xValue !== thisValue &&
               yValue === thisValue &&
@@ -203,7 +203,7 @@ class VolumesWorker {
               this.#union(xLabel, yLabel);
               this.#labels[thisOffset] = this.#find(xLabel);
 
-            // All neibours with matching values
+            // All neighbors with matching values
             } else if (
               xValue === thisValue &&
               yValue === thisValue &&

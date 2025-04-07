@@ -169,7 +169,7 @@ test.dataModelUI.Segmentation = function (app) {
     const segmentation =
       _segmentations.find(
         (seg) => {
-          return seg.dataId = event.data.dataId;
+          return seg.dataId === event.data.dataId;
         }
       );
 
@@ -564,6 +564,9 @@ test.dataModelUI.Segmentation = function (app) {
     } else {
       segmentSpan.remove();
     }
+
+    _volumes.calculateVolumes(segmentation.dataId);
+
     // select first segment
     const spanChildren = spanParent.childNodes;
     for (const spanNode of spanChildren) {
@@ -795,7 +798,7 @@ test.dataModelUI.Segmentation = function (app) {
   }
 
   /**
-   * Updates teh text of the volumes diplay for a segmentation.
+   * Updates the text of the volumes diplay for a segmentation.
    *
    * @param {object} segmentation The segmentation.
    */
