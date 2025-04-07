@@ -285,11 +285,23 @@ export class AnnotationGroupFactory {
    *
    * @param {Annotation} annotation The annotation.
    * @param {DicomSRContent} content The content to add.
+   * @param {boolean} [isDwv034] True if the content was written using dwv 0.34,
+   * defaults to false.
    */
-  #addContentToAnnotation(annotation, content) {
+  #addContentToAnnotation(annotation, content, isDwv034) {
+    if (typeof isDwv034 === 'undefined') {
+      isDwv034 = false;
+    }
+    let relationshipType = RelationshipTypes.hasConceptMod;
+    if (isDwv034) {
+      relationshipType = RelationshipTypes.hasProperties;
+    }
+
     // text expr
     if (content.hasHeader(
-      ValueTypes.text, getShortLabelCode(), RelationshipTypes.hasProperties
+      ValueTypes.text,
+      getShortLabelCode(),
+      relationshipType
     )) {
       annotation.textExpr = content.value;
       // optional label position
@@ -310,7 +322,9 @@ export class AnnotationGroupFactory {
 
     // color
     if (content.hasHeader(
-      ValueTypes.text, getColourCode(), RelationshipTypes.hasProperties
+      ValueTypes.text,
+      getColourCode(),
+      relationshipType
     )) {
       annotation.colour = content.value;
     }
@@ -319,8 +333,9 @@ export class AnnotationGroupFactory {
     if (content.hasHeader(
       ValueTypes.scoord,
       getReferencePointsCode(),
-      RelationshipTypes.hasProperties) &&
-      content.value.graphicType === GraphicTypes.multipoint) {
+      relationshipType) &&
+      content.value.graphicType === GraphicTypes.multipoint
+    ) {
       const points = [];
       for (let i = 0; i < content.value.graphicData.length; i += 2) {
         points.push(new Point2D(
@@ -335,8 +350,9 @@ export class AnnotationGroupFactory {
     if (content.hasHeader(
       ValueTypes.scoord3d,
       getReferenceGeometryCode(),
-      RelationshipTypes.hasProperties) &&
-      content.value.graphicType === GraphicTypes.multipoint) {
+      RelationshipTypes.contains) &&
+      content.value.graphicType === GraphicTypes.multipoint
+    ) {
       const data = content.value.graphicData;
       const points = [];
       const nPoints = Math.floor(data.length / 3);
@@ -644,7 +660,7 @@ export class AnnotationGroupFactory {
       // shape id
       this.#addDwv034IdToAnnotation(annotation, item);
       // shape extra
-      this.#addContentToAnnotation(annotation, item);
+      this.#addContentToAnnotation(annotation, item, true);
     }
     return annotation;
   }
@@ -819,7 +835,7 @@ export class AnnotationGroupFactory {
 
     // text expr
     const shortLabel = new DicomSRContent(ValueTypes.text);
-    shortLabel.relationshipType = RelationshipTypes.hasProperties;
+    shortLabel.relationshipType = RelationshipTypes.hasConceptMod;
     shortLabel.conceptNameCode = getShortLabelCode();
     shortLabel.value = annotation.textExpr;
     // label position
@@ -843,7 +859,7 @@ export class AnnotationGroupFactory {
 
     // colour
     const colour = new DicomSRContent(ValueTypes.text);
-    colour.relationshipType = RelationshipTypes.hasProperties;
+    colour.relationshipType = RelationshipTypes.hasConceptMod;
     colour.conceptNameCode = getColourCode();
     colour.value = annotation.colour;
     contentSequence.push(colour);
@@ -851,7 +867,7 @@ export class AnnotationGroupFactory {
     // reference points
     if (typeof annotation.referencePoints !== 'undefined') {
       const referencePoints = new DicomSRContent(ValueTypes.scoord);
-      referencePoints.relationshipType = RelationshipTypes.hasProperties;
+      referencePoints.relationshipType = RelationshipTypes.hasConceptMod;
       referencePoints.conceptNameCode = getReferencePointsCode();
       const refPointsScoord = new SpatialCoordinate();
       refPointsScoord.graphicType = GraphicTypes.multipoint;
@@ -869,7 +885,7 @@ export class AnnotationGroupFactory {
     // plane points
     if (typeof annotation.planePoints !== 'undefined') {
       const planePoints = new DicomSRContent(ValueTypes.scoord3d);
-      planePoints.relationshipType = RelationshipTypes.hasProperties;
+      planePoints.relationshipType = RelationshipTypes.contains;
       planePoints.conceptNameCode = getReferenceGeometryCode();
       const pointsScoord = new SpatialCoordinate3D();
       pointsScoord.graphicType = GraphicTypes.multipoint;
