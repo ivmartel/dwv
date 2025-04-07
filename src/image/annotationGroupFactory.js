@@ -227,8 +227,10 @@ export class AnnotationGroupFactory {
         content.value.referencedSOPSequence.referencedSOPClassUID;
       annotation.referencedSopInstanceUID =
         content.value.referencedSOPSequence.referencedSOPInstanceUID;
-      annotation.referencedFrameNumber =
-        parseInt(content.value.referencedFrameNumber, 10);
+      if (typeof content.value.referencedFrameNumber !== 'undefined') {
+        annotation.referencedFrameNumber =
+          parseInt(content.value.referencedFrameNumber, 10);
+      }
     }
   }
 
