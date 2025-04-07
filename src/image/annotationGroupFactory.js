@@ -287,9 +287,6 @@ export class AnnotationGroupFactory {
    * @param {DicomSRContent} content The content to add.
    */
   #addContentToAnnotation(annotation, content) {
-    // ids
-    this.#addIdsToAnnotation(annotation, content);
-
     // text expr
     if (content.hasHeader(
       ValueTypes.text, getShortLabelCode(), RelationshipTypes.hasProperties
@@ -483,8 +480,11 @@ export class AnnotationGroupFactory {
       if (typeof fromImage !== 'undefined') {
         this.#addSourceImageToAnnotation(annotation, fromImage);
       }
-      // shape extra
+
       for (const item of content.contentSequence) {
+        // shape ids
+        this.#addIdsToAnnotation(annotation, item);
+        // shape extra
         this.#addContentToAnnotation(annotation, item);
       }
     }
