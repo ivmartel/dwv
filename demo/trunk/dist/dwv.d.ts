@@ -43,9 +43,9 @@ export declare class Annotation {
     /**
      * Referenced frame number.
      *
-     * @type {number}
+     * @type {number|undefined}
      */
-    referencedFrameNumber: number;
+    referencedFrameNumber: number | undefined;
     /**
      * Mathematical shape.
      *
