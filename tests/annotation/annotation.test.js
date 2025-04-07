@@ -66,6 +66,8 @@ function getAnnotationGroup(bufferStr) {
 function checkGroupCommonProperties(annotationGroup, assert, prefix) {
   const annotations = annotationGroup.getList();
 
+  const colours = ['#ffff80', '#ffa348', '#ed333b'];
+
   assert.ok(annotationGroup.getLength() === 3,
     prefix + ' annotationGroup length');
   assert.ok(annotations.length === 3,
@@ -81,6 +83,18 @@ function checkGroupCommonProperties(annotationGroup, assert, prefix) {
       prefix + ' annotation ' + i + ' referencedSopClassUID');
     assert.ok(typeof annotation.referencedSopInstanceUID !== 'undefined',
       prefix + ' annotation ' + i + ' referencedSopInstanceUID');
+
+    assert.ok(typeof annotation.colour !== 'undefined',
+      prefix + ' annotation ' + i + ' colour');
+    assert.equal(annotation.colour, colours[i],
+      prefix + ' annotation ' + i + ' good colour');
+
+    assert.ok(typeof annotation.textExpr !== 'undefined',
+      prefix + ' annotation ' + i + ' textExpr');
+    if (i === 2) {
+      assert.ok(typeof annotation.labelPosition !== 'undefined',
+        prefix + ' annotation ' + i + ' labelPosition');
+    }
   }
 }
 
@@ -117,6 +131,10 @@ function checkArrowGroup(annotationGroup, assert) {
       prefix + ' mathShape');
     assert.ok(typeof annotation.quantification === 'undefined',
       prefix + ' quantification');
+    if (i !== 0) {
+      assert.equal(annotation.textExpr, 'label',
+        prefix + ' annotation ' + i + ' good textExpr');
+    }
   }
 }
 
@@ -133,6 +151,9 @@ function checkCircleGroup(annotationGroup, assert) {
     const prefix = 'circle annotation ' + i;
     assert.ok(annotation.mathShape instanceof Circle,
       prefix + ' mathShape');
+    assert.equal(annotation.textExpr, '{surface}',
+      prefix + ' annotation ' + i + ' good textExpr');
+
     assert.ok(typeof annotation.quantification.radius !== 'undefined',
       prefix + ' quantification.radius');
     const radius = Math.round(
@@ -157,6 +178,9 @@ function checkEllipseGroup(annotationGroup, assert) {
     const prefix = 'ellipse annotation ' + i;
     assert.ok(annotation.mathShape instanceof Ellipse,
       prefix + ' mathShape');
+    assert.equal(annotation.textExpr, '{surface}',
+      prefix + ' annotation ' + i + ' good textExpr');
+
     assert.ok(typeof annotation.quantification.a !== 'undefined',
       prefix + ' quantification.a');
     assert.ok(typeof annotation.quantification.b !== 'undefined',
@@ -186,6 +210,9 @@ function checkProtractorGroup(annotationGroup, assert) {
     const prefix = 'protractor annotation ' + i;
     assert.ok(annotation.mathShape instanceof Protractor,
       prefix + ' mathShape');
+    assert.equal(annotation.textExpr, '{angle}',
+      prefix + ' annotation ' + i + ' good textExpr');
+
     assert.ok(typeof annotation.quantification.angle !== 'undefined',
       prefix + ' quantification.angle');
     const angle = Math.round(parseFloat(annotation.quantification.angle.value));
@@ -208,6 +235,9 @@ function checkRectangleGroup(annotationGroup, assert) {
     const prefix = 'rectangle annotation ' + i;
     assert.ok(annotation.mathShape instanceof Rectangle,
       prefix + ' mathShape');
+    assert.equal(annotation.textExpr, '{surface}',
+      prefix + ' annotation ' + i + ' good textExpr');
+
     assert.ok(typeof annotation.quantification.width !== 'undefined',
       prefix + ' quantification.width');
     assert.ok(typeof annotation.quantification.height !== 'undefined',
@@ -239,6 +269,11 @@ function checkRoiGroup(annotationGroup, assert) {
     const prefix = 'roi annotation ' + i;
     assert.ok(annotation.mathShape instanceof ROI,
       prefix + ' mathShape');
+    if (i !== 0) {
+      assert.equal(annotation.textExpr, 'label',
+        prefix + ' annotation ' + i + ' good textExpr');
+    }
+
     assert.ok(typeof annotation.quantification === 'undefined',
       prefix + ' quantification');
   }
@@ -257,6 +292,9 @@ function checkRulerGroup(annotationGroup, assert) {
     const prefix = 'ruler annotation ' + i;
     assert.ok(annotation.mathShape instanceof Line,
       prefix + ' mathShape');
+    assert.equal(annotation.textExpr, '{length}',
+      prefix + ' annotation ' + i + ' good textExpr');
+
     assert.ok(typeof annotation.quantification.length !== 'undefined',
       prefix + ' quantification.length');
     const length = Math.round(
