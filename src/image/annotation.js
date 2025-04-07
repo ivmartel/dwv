@@ -50,7 +50,7 @@ export class Annotation {
   /**
    * Referenced frame number.
    *
-   * @type {number}
+   * @type {number|undefined}
    */
   referencedFrameNumber;
 
