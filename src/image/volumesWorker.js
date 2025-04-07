@@ -218,13 +218,34 @@ class VolumesWorker {
   }
 
   /**
+   * Convert an offset in memory to an index.
+   *
+   * @param {number} offset The offset to convert.
+   * @returns {number[]} The index.
+   */
+  #offsetToIndex(offset, unitVectors) {
+    const values = new Array(unitVectors.length);
+    let off = offset;
+    let dimSize = 0;
+    for (let i = unitVectors.length - 1; i > 0; --i) {
+      dimSize = unitVectors[i];
+      values[i] = Math.floor(off / dimSize);
+      off = off - values[i] * dimSize;
+    }
+    values[0] = off;
+    return values;
+  }
+
+  /**
    * Calculate the volumes of a segmentation.
    *
    * @param {number} mlVoxelVolume The number of ml per image voxel.
+   * @param {number[]} unitVectors The unit vectors for index to offset
+   *  conversion.
    *
    * @returns {number[]} The list of volumes in ml.
    */
-  calculateVolumes(mlVoxelVolume) {
+  calculateVolumesAndCentroids(mlVoxelVolume, unitVectors) {
     const volumes = {};
 
     // Count the number of voxels per unique label,
@@ -233,23 +254,35 @@ class VolumesWorker {
       const labelValue = this.#find(this.#labels[o]);
 
       if (labelValue >= 0) {
+        const index = this.#offsetToIndex(o, unitVectors);
         const volume = volumes[labelValue];
         if (typeof volume === 'undefined') {
-          volumes[labelValue] = 1;
+          volumes[labelValue] = {
+            sum: index,
+            count: 1
+          };
         } else {
-          volumes[labelValue]++;
+          volume.sum[0] += index[0];
+          volume.sum[1] += index[1];
+          volume.sum[2] += index[2];
+          volume.count++;
         }
       }
     }
 
-    const mlVolumes =
+    const volumesAndCentroids =
       Object.values(volumes).map(
         (v) => {
-          return (Math.round(v * mlVoxelVolume * 1e4)) / 1e4;
+          return {
+            centroid: v.sum.map((s) => {
+              return s / v.count;
+            }),
+            volume: (Math.round(v.count * mlVoxelVolume * 1e4)) / 1e4
+          };
         }
       );
 
-    return mlVolumes;
+    return volumesAndCentroids;
   }
 }
 
@@ -269,13 +302,14 @@ self.addEventListener('message', function (event) {
 
   const startTime2 = Date.now();
   // Calculate the volumes in ml.
-  const volumes = volumesWorker.calculateVolumes(mlVoxelVolume);
+  const volumes = volumesWorker.calculateVolumesAndCentroids(mlVoxelVolume, unitVectors);
   const timeTaken2 = Date.now() - startTime2;
 
-  // TODO: calculate centroids here
-
   // Debug code, will be removed later
-  console.log('Volume Worker: volumes (ml): ', volumes);
+  console.log('Volume Worker: volumes: ', volumes);
+  volumes.forEach((v) => {
+    console.log('Volume Worker: centroid: ', v.centroid);
+  });
   console.log('Volume Worker: time taken labels: ', timeTaken1, 'ms');
   console.log('Volume Worker: time taken volume: ', timeTaken2, 'ms');
 
