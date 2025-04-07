@@ -980,6 +980,7 @@ export class AnnotationGroupFactory {
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
     // class: Comprehensive 3D SR Storage
+    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.html
     tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
     tags.CompletionFlag = 'PARTIAL';
