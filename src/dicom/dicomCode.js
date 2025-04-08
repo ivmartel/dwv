@@ -430,8 +430,8 @@ export function getQuantificationName(code) {
 
 /**
  * Quantification unit to UCUM key. Associated tags:
- * - Rescale type {@link https://dicom.innolitics.com/ciods/computed-radiography-image/modality-lut/00281054},
- * - Units {@link https://dicom.innolitics.com/ciods/positron-emission-tomography-image/pet-series/00541001}.
+ * - Rescale type {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html#sect_C.11.1.1.2},
+ * - Units {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.9.html#sect_C.8.9.1.1.3}.
  * - SUV {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/sect_CID_85.html}.
  */
 const QuantificationUnit2UcumKey = {
