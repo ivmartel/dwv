@@ -29,12 +29,12 @@ const TagKeys = {
  */
 export class NumericMeasurement {
   /**
-   * @type {MeasuredValue}
+   * @type {MeasuredValue|undefined}
    */
   measuredValue;
 
   /**
-   * @type {DicomCode}
+   * @type {DicomCode|undefined}
    */
   numericValueQualifierCode;
 
@@ -44,7 +44,10 @@ export class NumericMeasurement {
    * @returns {string} The object as string.
    */
   toString() {
-    let res = this.measuredValue.toString();
+    let res = '';
+    if (typeof this.measuredValue !== 'undefined') {
+      res += this.measuredValue.toString();
+    }
     if (typeof this.numericValueQualifierCode !== 'undefined') {
       res += ' ' + this.numericValueQualifierCode.toString();
     }
