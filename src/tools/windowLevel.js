@@ -126,8 +126,8 @@ export class WindowLevel {
     // calculate new window level
     const center = viewController.getWindowLevel().center;
     const width = viewController.getWindowLevel().width;
-    const windowCenter = center + Math.round(diffY * pixelToIntensity);
-    const windowWidth = width + Math.round(diffX * pixelToIntensity);
+    const windowCenter = center + (diffY * pixelToIntensity);
+    const windowWidth = width + (diffX * pixelToIntensity);
 
     // bound window center and width
     const {center: windowCenterBound, width: windowWidthBound} =
