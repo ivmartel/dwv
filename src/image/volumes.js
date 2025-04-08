@@ -87,8 +87,6 @@ export class Volumes {
     ];
 
     const workerTask = new WorkerTask(
-      // Typescript doesn't play nice with this webpack feature
-      // @ts-ignore
       volumesWorkerUrl,
       {
         dataId: maskDataId,

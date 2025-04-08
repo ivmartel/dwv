@@ -278,7 +278,7 @@ class WorkerThread {
  */
 export class WorkerTask {
   /**
-   * @param {string} script The worker script.
+   * @param {string | URL} script The worker script.
    * @param {object} message The data to pass to the worker.
    * @param {object} info Information object about the input data.
    */
