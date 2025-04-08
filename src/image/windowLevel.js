@@ -41,12 +41,19 @@ export function validateWindowWidthAndCenter(
   const snapDiff = (valueMax - valueMin) * 0.003;
   const valueCenter = ((valueMax - valueMin) * 0.5) + valueMin;
 
-  if (Math.abs(centerBound - valueMax) <= snapDiff) centerBound = valueMax;
-  else if (Math.abs(centerBound - valueMin) <= snapDiff) centerBound = valueMin;
-  else if (Math.abs(centerBound - valueCenter) <= snapDiff) centerBound = valueCenter;
+  if (Math.abs(centerBound - valueMax) <= snapDiff) {
+    centerBound = valueMax;
+  } else if (Math.abs(centerBound - valueMin) <= snapDiff) {
+    centerBound = valueMin;
+  } else if (Math.abs(centerBound - valueCenter) <= snapDiff) {
+    centerBound = valueCenter;
+  }
 
-  if (Math.abs(widthBound - valueMax) <= snapDiff) widthBound = valueMax;
-  else if (Math.abs(widthBound - valueMin) <= snapDiff) widthBound = valueMin;
+  if (Math.abs(widthBound - valueMax) <= snapDiff) {
+    widthBound = valueMax;
+  } else if (Math.abs(widthBound - valueMin) <= snapDiff) {
+    widthBound = valueMin;
+  }
 
   return {
     center: centerBound,
