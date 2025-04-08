@@ -24,6 +24,8 @@ const TagKeys = {
 
 /**
  * DICOM graphic types.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2}.
  */
 export const GraphicTypes = {
   point: 'POINT',
