@@ -241,7 +241,7 @@ class VolumesWorker {
   }
 
   /**
-   * Calculate the volumes of a segmentation.
+   * Calculate the volumes and centroids of a segmentation.
    *
    * @param {number} mlVoxelVolume The number of ml per image voxel.
    * @param {number[]} unitVectors The unit vectors for index to offset
@@ -249,7 +249,7 @@ class VolumesWorker {
    * @param {number[]} spacing The space in mm between voxels.
    * @param {number[]} origin The origin of the image in mm.
    *
-   * @returns {number[]} The list of volumes in ml.
+   * @returns {object[]} The list of volumes in ml and centroids in mm.
    */
   calculateVolumesAndCentroids(mlVoxelVolume, unitVectors, spacing, origin) {
     const volumes = {};
