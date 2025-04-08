@@ -568,6 +568,15 @@ export class AnnotationGroupFactory {
           subItem.relationshipType === RelationshipTypes.inferredFrom;
       });
       annotation.mathShape = getShapeFromScoord(scoord.value);
+      // special point/arrow case
+      // TODO: not very valid...
+      if (annotation.mathShape instanceof Point2D &&
+        scoord.value.graphicData.length >= 4
+      ) {
+        annotation.referencePoints = [
+          new Point2D(scoord.value.graphicData[2], scoord.value.graphicData[3])
+        ];
+      }
       // shape source image
       // no specific concept (?)
       const fromImage = scoord.contentSequence.find(function (item) {
