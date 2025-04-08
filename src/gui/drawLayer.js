@@ -685,6 +685,7 @@ export class DrawLayer {
    * Get a string id from input plane points.
    *
    * @param {Point3D[]} points A list of points that defined a plane.
+   * @param {number} [frameNumber] Optional frame number.
    * @returns {string} The string id.
    */
   #getPositionId(points, frameNumber) {
