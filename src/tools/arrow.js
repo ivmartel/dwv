@@ -348,6 +348,10 @@ export class ArrowFactory {
    */
   #createShape(annotation, style) {
     const point = annotation.mathShape;
+    if (typeof annotation.referencePoints === 'undefined' ||
+      annotation.referencePoints.length === 0) {
+      throw new Error('No reference point for arrow');
+    }
     const endPoint = annotation.referencePoints[0];
     const line = new Line(point, endPoint);
 
