@@ -11,6 +11,7 @@ import {
 import {
   ValueTypes,
   RelationshipTypes,
+  ContinuityOfContents,
   getSRContent,
   getDicomSRContentItem,
   getContentTemplate,
@@ -953,6 +954,7 @@ export class AnnotationGroupFactory {
     const srContent = new DicomSRContent(ValueTypes.container);
     srContent.relationshipType = RelationshipTypes.contains;
     srContent.conceptNameCode = getMeasurementGroupCode();
+    srContent.value = ContinuityOfContents.separate;
 
     // scoord
     const srScoord = new DicomSRContent(ValueTypes.scoord);
@@ -983,6 +985,7 @@ export class AnnotationGroupFactory {
       const measContent = new DicomSRContent(ValueTypes.container);
       measContent.conceptNameCode = getImagingMeasurementsCode();
       measContent.relationshipType = RelationshipTypes.contains;
+      measContent.value = ContinuityOfContents.separate;
       const contentSequence = [];
       for (const annotation of annotationGroup.getList()) {
         contentSequence.push(this.#annotationToMeasurementGroup(annotation));
@@ -992,6 +995,7 @@ export class AnnotationGroupFactory {
       // imaging measurements report
       srContent = new DicomSRContent(ValueTypes.container);
       srContent.conceptNameCode = getImagingMeasurementReportCode();
+      srContent.value = ContinuityOfContents.separate;
       srContent.contentSequence = [measContent];
     }
 

@@ -100,6 +100,16 @@ export const ValueTypes = {
 };
 
 /**
+ * DICOM Continuity Of Contents.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.8.html#table_C.18.8-1}.
+ */
+export const ContinuityOfContents = {
+  separate: 'SEPARATE',
+  continuous: 'CONTINUOUS'
+};
+
+/**
  * DICOM value type to associated tag name.
  */
 export const ValueTypeValueTagName = {
