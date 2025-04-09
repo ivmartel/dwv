@@ -47,6 +47,8 @@ import {
   SpatialCoordinate
 } from '../dicom/dicomSpatialCoordinate';
 import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D';
+import {BIG_EPSILON_EXPONENT} from '../math/matrix';
+import {precisionRound} from '../utils/string';
 import {logger} from '../utils/logger';
 import {Annotation} from './annotation';
 import {AnnotationGroup} from './annotationGroup';
@@ -931,7 +933,10 @@ export class AnnotationGroupFactory {
       for (const key in annotation.quantification) {
         const quantifContent = getSRContentFromValue(
           key,
-          annotation.quantification[key].value,
+          precisionRound(
+            annotation.quantification[key].value,
+            BIG_EPSILON_EXPONENT
+          ),
           annotation.quantification[key].unit
         );
         if (typeof quantifContent !== 'undefined') {
