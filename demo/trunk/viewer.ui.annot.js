@@ -287,7 +287,9 @@ test.dataModelUI.Annotation = function (app) {
       const extraTags = {
         MediaStorageSOPInstanceUID: sopUID,
         SOPInstanceUID: sopUID,
+        InstanceNumber: 123,
         SeriesInstanceUID: dwv.getUID('SeriesInstanceUID'),
+        SeriesNumber: 123,
         SeriesDescription: 'Annnotation made with dwv',
       };
       const dicomElements = factory.toDicom(annotationGroup, extraTags);
