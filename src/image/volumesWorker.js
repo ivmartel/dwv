@@ -281,7 +281,8 @@ class VolumesWorker {
         (v) => {
           const centroid = Array(v.sum.length).fill(0);
           for (let d = 0; d < v.sum.length; d++) {
-            centroid[d] = ((v.sum[d] / v.count) * spacing[d]) + origin[d];
+            centroid[d] =
+              (((v.sum[d] / v.count) + 0.5) * spacing[d]) + origin[d];
           }
 
           return {

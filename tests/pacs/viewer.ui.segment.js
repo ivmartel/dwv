@@ -866,12 +866,32 @@ test.dataModelUI.Segmentation = function (app) {
     addSegmentButton.id = test.getHtmlId(prefixes.addSegment, segmentationName);
     addSegmentButton.onclick = onSegmentAdd;
 
+    const gotoButton = document.createElement('button');
+    const gbIdPrefix = 'gotob-';
+    gotoButton.id = gbIdPrefix + segmentationName;
+    gotoButton.title = 'Goto first volume';
+    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
+    gotoButton.onclick = function (_event) {
+      if (segmentation.volumes.length > 0) {
+        const dataId = segmentation.dataId;
+        const volCentroid = segmentation.volumes[0].centroid;
+        const volCentroidPoint = new dwv.Point(volCentroid);
+        const drawLayers = app.getViewLayersByDataId(dataId);
+        for (const layer of drawLayers) {
+          layer.setCurrentPosition(volCentroidPoint);
+        }
+      } else {
+        console.log('No volumes to go to');
+      }
+    };
+
     // action span
     const actionSpan = document.createElement('span');
     actionSpan.id = 'span-action-' + segmentationName;
     actionSpan.appendChild(eraserInput);
     actionSpan.appendChild(eraserLabel);
     actionSpan.appendChild(addSegmentButton);
+    actionSpan.appendChild(gotoButton);
 
     // volumes display
     const volumesSpan = document.createElement('span');
