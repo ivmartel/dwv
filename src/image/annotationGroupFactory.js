@@ -4,10 +4,7 @@ import {
   dateToTimeObj,
   getDicomTime,
 } from '../dicom/dicomDate';
-import {
-  safeGet,
-  safeGetAll
-} from '../dicom/dataElement';
+import {safeGet} from '../dicom/dataElement';
 import {
   ValueTypes,
   RelationshipTypes,
@@ -39,6 +36,7 @@ import {
   isVersionInBounds,
   getDwvVersionFromImplementationClassUID
 } from '../dicom/dicomParser';
+import {getAsSimpleElements} from '../dicom/dicomTag';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter';
 import {ImageReference} from '../dicom/dicomImageReference';
 import {SopInstanceReference} from '../dicom/dicomSopInstanceReference';
@@ -787,19 +785,18 @@ export class AnnotationGroupFactory {
     annotationGroup.setMetaValue('PatientSex',
       safeGetLocal(TagKeys.PatientSex));
 
-    // ReferencedSeriesSequence
-    const refSeriesSq = safeGetLocal(TagKeys.ReferencedSeriesSequence);
-    if (typeof refSeriesSq !== 'undefined') {
-      const seriesUIDs = safeGetAll(refSeriesSq, TagKeys.SeriesInstanceUID);
-      if (typeof seriesUIDs !== 'undefined') {
-        const uids = [];
-        for (const uid of seriesUIDs) {
-          uids.push({SeriesInstanceUID: uid});
-        }
-        annotationGroup.setMetaValue(
-          'ReferencedSeriesSequence', {value: uids}
-        );
-      }
+    // reference
+    const evidenceTagKey = TagKeys.CurrentRequestedProcedureEvidenceSequence;
+    const evidenceSq = dataElements[evidenceTagKey];
+    if (typeof evidenceSq !== 'undefined') {
+      const evidenceSqElement = {
+        [evidenceTagKey]: evidenceSq
+      };
+      const evidences = getAsSimpleElements(evidenceSqElement);
+      annotationGroup.setMetaValue(
+        'CurrentRequestedProcedureEvidenceSequence',
+        evidences.CurrentRequestedProcedureEvidenceSequence
+      );
     }
 
     return annotationGroup;
@@ -1049,6 +1046,36 @@ export class AnnotationGroupFactory {
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
     tags.StudyDate = tags.ContentDate;
     tags.StudyTime = tags.ContentTime;
+
+    // reference
+    const evidenceSq = tags.CurrentRequestedProcedureEvidenceSequence;
+    // hoping for just one element...
+    const evidenceSq0 = evidenceSq.value[0];
+    const refSeriesSq = evidenceSq0.ReferencedSeriesSequence;
+    // hoping for just one element...
+    const refSeriesSq0 = refSeriesSq.value[0];
+    let refSopSq = refSeriesSq0.ReferencedSOPSequence;
+    if (typeof refSopSq === 'undefined') {
+      refSeriesSq0.ReferencedSOPSequence = {
+        value: []
+      };
+      refSopSq = refSeriesSq0.ReferencedSOPSequence;
+    }
+    const refs = refSopSq.value;
+    // add reference if not yet present
+    for (const annotation of annotationGroup.getList()) {
+      const ref = {
+        ReferencedSOPInstanceUID: annotation.referencedSopInstanceUID,
+        ReferencedSOPClassUID: annotation.referencedSopClassUID
+      };
+      const isSameRef = function (item) {
+        return item.ReferencedSOPInstanceUID === ref.ReferencedSOPInstanceUID &&
+          item.ReferencedSOPClassUID === ref.ReferencedSOPClassUID;
+      };
+      if (typeof refs.find(isSameRef) === 'undefined') {
+        refs.push(ref);
+      }
+    }
 
     // TID 1500
     tags.ContentTemplateSequence = {
