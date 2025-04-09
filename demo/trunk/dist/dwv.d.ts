@@ -2341,6 +2341,21 @@ export declare class Geometry {
 }
 
 /**
+ * Get the meta data as simple elements:
+ * - indexed by tag names instead of tag keys,
+ * - no element object, just value if not sequence nor merged item.
+ *
+ * @param {Object<string, DataElement>} metaData The meta data
+ *   index by tag keys.
+ * @returns {Object<string, any>} The simple elements.
+ */
+export declare function getAsSimpleElements(metaData: {
+    [x: string]: DataElement;
+}): {
+    [x: string]: any;
+};
+
+/**
  * Get the default DICOM seg tags as an object.
  *
  * @returns {object} The default tags.

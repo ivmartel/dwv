@@ -356,9 +356,16 @@ function viewerSetup() {
  * @param {string} loadType The load type.
  */
 function logMetaData(dataId, loadType) {
-  // log meta data
+  // meta data
   const meta = _app.getMetaData(dataId);
-  console.log('metadata', getMetaDataWithNames(meta));
+
+  // log tags for data with transfer syntax (dicom)
+  if (typeof meta['00020010'] !== 'undefined') {
+    console.log('metadata', dwv.getAsSimpleElements(meta));
+  } else {
+    console.log('metadata', meta);
+  }
+
   // get modality
   let modality;
   if (loadType === 'image' &&
@@ -1077,60 +1084,6 @@ function logFramePosPats(elements) {
     perPos[pos].push(dim);
   }
   console.log('DICOM SEG Segments', sortByPosPatKey(perPos));
-}
-
-/**
- * Get an array reducer to reduce an array of tag keys taken from
- *   the input dataElements and return theses dataElements indexed by tag names.
- *
- * @param {Object<string, DataElement>} dataElements The meta data
- *   index by tag keys.
- * @returns {Function} An array reducer.
- */
-function getTagKeysReducer(dataElements) {
-  return function (accumulator, currentValue) {
-    // get the tag name
-    const tag = dwv.getTagFromKey(currentValue);
-    let tagName = tag.getNameFromDictionary();
-    if (typeof tagName === 'undefined') {
-      // add 'x' to list private at end
-      tagName = 'x' + tag.getKey();
-    }
-    const currentMeta = dataElements[currentValue];
-    // remove undefined properties
-    for (const property in currentMeta) {
-      if (typeof currentMeta[property] === 'undefined') {
-        delete currentMeta[property];
-      }
-    }
-    // recurse for sequences
-    if (currentMeta.vr === 'SQ') {
-      // valid for 1D array, not for merged data elements
-      for (let i = 0; i < currentMeta.value.length; ++i) {
-        const item = currentMeta.value[i];
-        currentMeta.value[i] = Object.keys(item).reduce(
-          getTagKeysReducer(item), {});
-      }
-    }
-    accumulator[tagName] = currentMeta;
-    return accumulator;
-  };
-}
-
-/**
- * Get the meta data indexed by tag names instead of tag keys.
- *
- * @param {Object<string, DataElement>} metaData The meta data
- *   index by tag keys.
- * @returns {Object<string, DataElement>} The meta data indexed by tag names.
- */
-function getMetaDataWithNames(metaData) {
-  let meta = structuredClone(metaData);
-  if (typeof meta['00020010'] !== 'undefined') {
-    // replace tag key with tag name for dicom
-    meta = Object.keys(meta).reduce(getTagKeysReducer(meta), {});
-  }
-  return meta;
 }
 
 /**
