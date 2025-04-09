@@ -71,11 +71,7 @@ const TagKeys = {
   PatientID: '00100020',
   PatientBirthDate: '00100030',
   PatientSex: '00100040',
-  CurrentRequestedProcedureEvidenceSequence: '0040A375',
-  ReferencedSeriesSequence: '00081115',
-  ContentTemplateSequence: '0040A504',
-  MappingResource: '00080105',
-  TemplateIdentifier: '0040DB00'
+  CurrentRequestedProcedureEvidenceSequence: '0040A375'
 };
 
 /**
