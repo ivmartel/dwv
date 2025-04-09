@@ -844,30 +844,34 @@ export class AnnotationGroupFactory {
     contentSequence.push(srUid);
 
     // text expr
-    const shortLabel = new DicomSRContent(ValueTypes.text);
-    shortLabel.relationshipType = RelationshipTypes.hasConceptMod;
-    shortLabel.conceptNameCode = getShortLabelCode();
-    shortLabel.value = annotation.textExpr;
-    // label position
-    if (typeof annotation.labelPosition !== 'undefined') {
-      const labelPosition = new DicomSRContent(ValueTypes.scoord);
-      labelPosition.relationshipType = RelationshipTypes.hasProperties;
-      labelPosition.conceptNameCode = getReferencePointsCode();
-      const labelPosScoord = new SpatialCoordinate();
-      labelPosScoord.graphicType = GraphicTypes.point;
-      const graphicData = [
-        annotation.labelPosition.getX().toString(),
-        annotation.labelPosition.getY().toString()
-      ];
-      labelPosScoord.graphicData = graphicData;
-      labelPosition.value = labelPosScoord;
-      const srcImage = this.#getAnnotationSourceImageContent(annotation);
-      labelPosition.contentSequence = [srcImage];
+    if (typeof annotation.textExpr !== 'undefined' &&
+      annotation.textExpr.length !== 0
+    ) {
+      const shortLabel = new DicomSRContent(ValueTypes.text);
+      shortLabel.relationshipType = RelationshipTypes.hasConceptMod;
+      shortLabel.conceptNameCode = getShortLabelCode();
+      shortLabel.value = annotation.textExpr;
+      // label position
+      if (typeof annotation.labelPosition !== 'undefined') {
+        const labelPosition = new DicomSRContent(ValueTypes.scoord);
+        labelPosition.relationshipType = RelationshipTypes.hasProperties;
+        labelPosition.conceptNameCode = getReferencePointsCode();
+        const labelPosScoord = new SpatialCoordinate();
+        labelPosScoord.graphicType = GraphicTypes.point;
+        const graphicData = [
+          annotation.labelPosition.getX().toString(),
+          annotation.labelPosition.getY().toString()
+        ];
+        labelPosScoord.graphicData = graphicData;
+        labelPosition.value = labelPosScoord;
+        const srcImage = this.#getAnnotationSourceImageContent(annotation);
+        labelPosition.contentSequence = [srcImage];
 
-      // add position to label sequence
-      shortLabel.contentSequence = [labelPosition];
+        // add position to label sequence
+        shortLabel.contentSequence = [labelPosition];
+      }
+      contentSequence.push(shortLabel);
     }
-    contentSequence.push(shortLabel);
 
     // colour
     const colour = new DicomSRContent(ValueTypes.text);
