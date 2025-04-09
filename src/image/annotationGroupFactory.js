@@ -861,6 +861,8 @@ export class AnnotationGroupFactory {
       ];
       labelPosScoord.graphicData = graphicData;
       labelPosition.value = labelPosScoord;
+      const srcImage = this.#getAnnotationSourceImageContent(annotation);
+      labelPosition.contentSequence = [srcImage];
 
       // add position to label sequence
       shortLabel.contentSequence = [labelPosition];
@@ -889,6 +891,9 @@ export class AnnotationGroupFactory {
       refPointsScoord.graphicData = graphicData;
 
       referencePoints.value = refPointsScoord;
+      const srcImage = this.#getAnnotationSourceImageContent(annotation);
+      referencePoints.contentSequence = [srcImage];
+
       contentSequence.push(referencePoints);
     }
 
@@ -908,6 +913,9 @@ export class AnnotationGroupFactory {
       pointsScoord.graphicData = graphicData;
 
       planePoints.value = pointsScoord;
+      const srcImage = this.#getAnnotationSourceImageContent(annotation);
+      planePoints.contentSequence = [srcImage];
+
       contentSequence.push(planePoints);
     }
 
