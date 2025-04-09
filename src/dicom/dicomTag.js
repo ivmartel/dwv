@@ -367,3 +367,61 @@ export function getTagFromDictionary(tagName) {
   }
   return tag;
 }
+
+/**
+ * Get an array reducer to reduce an array of tag keys taken from
+ *   the input dataElements and return as simple elements.
+ *
+ * @param {Object<string, DataElement>} dataElements The meta data
+ *   index by tag keys.
+ * @returns {Function} An array reducer.
+ */
+function getSimpleElementReducer(dataElements) {
+  return function (accumulator, currentValue) {
+    // get the tag name
+    const tag = getTagFromKey(currentValue);
+    let tagName = tag.getNameFromDictionary();
+    if (typeof tagName === 'undefined') {
+      // add 'x' to list private at end
+      tagName = 'x' + tag.getKey();
+    }
+    let currentMeta = dataElements[currentValue];
+    // remove undefined properties
+    for (const property in currentMeta) {
+      if (typeof currentMeta[property] === 'undefined') {
+        delete currentMeta[property];
+      }
+    }
+    // recurse for sequences
+    if (currentMeta.vr === 'SQ') {
+      // valid for 1D array, not for merged data elements
+      for (let i = 0; i < currentMeta.value.length; ++i) {
+        const item = currentMeta.value[i];
+        currentMeta.value[i] = Object.keys(item).reduce(
+          getSimpleElementReducer(item), {});
+      }
+    } else {
+      if (currentMeta.value.length === 1) {
+        currentMeta = currentMeta.value[0];
+      } else {
+        currentMeta = currentMeta.value;
+      }
+    }
+    accumulator[tagName] = currentMeta;
+    return accumulator;
+  };
+}
+
+/**
+ * Get the meta data as simple elements:
+ * - indexed by tag names instead of tag keys,
+ * - no element object, just value if not sequence nor merged item.
+ *
+ * @param {Object<string, DataElement>} metaData The meta data
+ *   index by tag keys.
+ * @returns {Object<string, any>} The simple elements.
+ */
+export function getAsSimpleElements(metaData) {
+  const meta = structuredClone(metaData);
+  return Object.keys(meta).reduce(getSimpleElementReducer(meta), {});
+}

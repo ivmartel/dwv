@@ -36,7 +36,8 @@ import {addTagsToDictionary} from './dicom/dictionary';
 import {
   Tag,
   getTagFromKey,
-  getPixelDataTag
+  getPixelDataTag,
+  getAsSimpleElements
 } from './dicom/dicomTag';
 import {
   DicomCode,
@@ -204,6 +205,7 @@ export {
   getLayerDetailsFromEvent,
   getTypedArray,
   getTagFromKey,
+  getAsSimpleElements,
   getPixelDataTag,
   getOrientationName,
   getReverseOrientation,
