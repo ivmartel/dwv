@@ -161,31 +161,23 @@ function splitSegmentHtmlId(segmentId) {
  * @param {object} app The associated application.
  */
 test.dataModelUI.Segmentation = function (app) {
-
-  const _volumes = new dwv.Volumes(app);
-
   // Watch for volume calculations
-  _volumes.onVolumeCalculation = ((event) => {
-    const segmentation =
-      _segmentations.find(
-        (seg) => {
-          return seg.dataId === event.data.dataId;
-        }
-      );
-
-    if (typeof segmentation !== 'undefined') {
-      segmentation.volumes = event.data.volumes;
-      updateVolumesSpan(segmentation);
-    }
-  });
-
-  // Watch for sementation volume changes
   const brushTool = app.getToolboxController().getToolList()['Brush'];
   if (typeof brushTool !== 'undefined') {
     brushTool.addEventListener(
       'volumeschanged',
       ((event) => {
-        _volumes.calculateVolumes(event.detail.dataId);
+        const segmentation =
+          _segmentations.find(
+            (seg) => {
+              return seg.dataId === event.detail.dataId;
+            }
+          );
+
+        if (typeof segmentation !== 'undefined') {
+          segmentation.volumes = event.detail.volumes;
+          updateVolumesSpan(segmentation);
+        }
       })
     );
   }
@@ -251,7 +243,7 @@ test.dataModelUI.Segmentation = function (app) {
             selectedSegmentNumber: segmentNumber,
             viewHelper: new dwv.MaskSegmentViewHelper()
           };
-          _volumes.calculateVolumes(dataId);
+          brushTool.recalculateVolumes(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -263,7 +255,7 @@ test.dataModelUI.Segmentation = function (app) {
           // segmentation created with add segmentation
           if (typeof segmentation.dataId === 'undefined') {
             segmentation.dataId = dataId;
-            _volumes.calculateVolumes(dataId);
+            brushTool.recalculateVolumes(dataId);
             for (const segment of segmentation.segments) {
               segHelper.addSegment(segment);
             }
@@ -282,7 +274,7 @@ test.dataModelUI.Segmentation = function (app) {
             segments: imgMeta.custom.segments,
             viewHelper: new dwv.MaskSegmentViewHelper()
           };
-          _volumes.calculateVolumes(dataId);
+          brushTool.recalculateVolumes(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -565,7 +557,7 @@ test.dataModelUI.Segmentation = function (app) {
       segmentSpan.remove();
     }
 
-    _volumes.calculateVolumes(segmentation.dataId);
+    brushTool.recalculateVolumes(segmentation.dataId);
 
     // select first segment
     const spanChildren = spanParent.childNodes;
