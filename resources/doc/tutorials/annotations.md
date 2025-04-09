@@ -33,35 +33,36 @@ template for a "Measurement Report". It consists of one "Imaging Measurements" c
 SR documents following TID 1500 include the root tag (0040,A504) "Content Template Sequence" attribute containing an item with (0008,0105) "Mapping Resource": “DCMR” and (0040,DB00) "Template Identifier": “1500”.
 
 ```bash
-CONTAINER: (126000, DCM, 'Imaging Measurement Report') =
-- (CONTAINS) CONTAINER: (126010, DCM, 'Imaging Measurements') =
-  - (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group') =
+CONTAINER: (126000, DCM, 'Imaging Measurement Report') = SEPARATE
+- (CONTAINS) CONTAINER: (126010, DCM, 'Imaging Measurements') = SEPARATE
+  - (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group') = SEPARATE
     - (CONTAINS) SCOORD: (111030, DCM, 'Image Region') = POLYLINE {3.9113924503326416,5.8481011390686035,7.936708927154541,5.8481011390686035}
       - (SELECTED FROM) IMAGE: (121324, DCM, 'Source Image') = 1.2.826.0.1.3680043.9.7278.1.83798073110115.20240516075655.3.6 (class: 1.2.840.10008.5.1.4.1.1.4)
     - (HAS OBS CONTEXT) TEXT: (112039, DCM, 'Tracking Identifier') = clvovj8vyt5
     - (HAS OBS CONTEXT) UIDREF: (112040, DCM, 'Tracking Unique Identifier') = 1.2.826.0.1.3680043.9.7278.1.841149799107105110.20250407161832.1
     - (HAS CONCEPT MOD) TEXT: (125309, DCM, 'Short label') = {length}
     - (HAS CONCEPT MOD) TEXT: (718499004, SCT, 'Color') = #ffff80
-    - (CONTAINS) NUM: (410668003, SCT, 'Length') = 4.025316455696199 (mm, UCUM, 'Millimeter')
+    - (CONTAINS) NUM: (410668003, SCT, 'Length') = 4.025316455696 (mm, UCUM, 'Millimeter')
     - (CONTAINS) CODE: (111701, DCM, 'Processing type') = (123109, DCM, 'Manual Processing')
-  - (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group') =
+  - (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group') = SEPARATE
     - (CONTAINS) SCOORD: (111030, DCM, 'Image Region') = POLYLINE {15.98734188079834,5.8481011390686035,20.012659072875977,5.8481011390686035}
       - (SELECTED FROM) IMAGE: (121324, DCM, 'Source Image') = 1.2.826.0.1.3680043.9.7278.1.83798073110115.20240516075655.3.6 (class: 1.2.840.10008.5.1.4.1.1.4)
     - (HAS OBS CONTEXT) TEXT: (112039, DCM, 'Tracking Identifier') = zev6p8rale
     - (HAS OBS CONTEXT) UIDREF: (112040, DCM, 'Tracking Unique Identifier') = 1.2.826.0.1.3680043.9.7278.1.841149799107105110.20250407161846.2
     - (HAS CONCEPT MOD) TEXT: (125309, DCM, 'Short label') = {length}
     - (HAS CONCEPT MOD) TEXT: (718499004, SCT, 'Color') = #ffa348
-    - (CONTAINS) NUM: (410668003, SCT, 'Length') = 4.025316455696201 (mm, UCUM, 'Millimeter')
+    - (CONTAINS) NUM: (410668003, SCT, 'Length') = 4.025316455696 (mm, UCUM, 'Millimeter')
     - (CONTAINS) CODE: (111701, DCM, 'Processing type') = (123109, DCM, 'Manual Processing')
-  - (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group') =
+  - (CONTAINS) CONTAINER: (125007, DCM, 'Measurement Group') = SEPARATE
     - (CONTAINS) SCOORD: (111030, DCM, 'Image Region') = POLYLINE {15.98734188079834,18,20.012659072875977,18}
       - (SELECTED FROM) IMAGE: (121324, DCM, 'Source Image') = 1.2.826.0.1.3680043.9.7278.1.83798073110115.20240516075655.3.6 (class: 1.2.840.10008.5.1.4.1.1.4)
     - (HAS OBS CONTEXT) TEXT: (112039, DCM, 'Tracking Identifier') = 0kk336h6bglr
     - (HAS OBS CONTEXT) UIDREF: (112040, DCM, 'Tracking Unique Identifier') = 1.2.826.0.1.3680043.9.7278.1.841149799107105110.20250407161900.3
     - (HAS CONCEPT MOD) TEXT: (125309, DCM, 'Short label') = {length}
       - (HAS PROPERTIES) SCOORD: (122438, DCM, 'Reference Points') = POINT {7.101265907287598,20.506328582763672}
+        - (SELECTED FROM) IMAGE: (121324, DCM, 'Source Image') = 1.2.826.0.1.3680043.9.7278.1.83798073110115.20240516075655.3.6 (class: 1.2.840.10008.5.1.4.1.1.4)
     - (HAS CONCEPT MOD) TEXT: (718499004, SCT, 'Color') = #ed333b
-    - (CONTAINS) NUM: (410668003, SCT, 'Length') = 4.025316455696203 (mm, UCUM, 'Millimeter')
+    - (CONTAINS) NUM: (410668003, SCT, 'Length') = 4.025316455696 (mm, UCUM, 'Millimeter')
     - (CONTAINS) CODE: (111701, DCM, 'Processing type') = (123109, DCM, 'Manual Processing')
 ```
 
