@@ -3,6 +3,11 @@ import {
   tagGroups
 } from './dictionary';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from '../dicom/dataElement';
+/* eslint-enable no-unused-vars */
+
 /**
  * Immutable tag.
  */
@@ -374,7 +379,7 @@ export function getTagFromDictionary(tagName) {
  *
  * @param {Object<string, DataElement>} dataElements The meta data
  *   index by tag keys.
- * @returns {Function} An array reducer.
+ * @returns {any} An array reducer callbackFn.
  */
 function getSimpleElementReducer(dataElements) {
   return function (accumulator, currentValue) {
@@ -385,29 +390,31 @@ function getSimpleElementReducer(dataElements) {
       // add 'x' to list private at end
       tagName = 'x' + tag.getKey();
     }
-    let currentMeta = dataElements[currentValue];
+    const currentMeta = dataElements[currentValue];
     // remove undefined properties
     for (const property in currentMeta) {
       if (typeof currentMeta[property] === 'undefined') {
         delete currentMeta[property];
       }
     }
+    let tagValue;
     // recurse for sequences
     if (currentMeta.vr === 'SQ') {
+      tagValue = {value: []};
       // valid for 1D array, not for merged data elements
       for (let i = 0; i < currentMeta.value.length; ++i) {
         const item = currentMeta.value[i];
-        currentMeta.value[i] = Object.keys(item).reduce(
-          getSimpleElementReducer(item), {});
+        tagValue.value.push(Object.keys(item).reduce(
+          getSimpleElementReducer(item), {}));
       }
     } else {
       if (currentMeta.value.length === 1) {
-        currentMeta = currentMeta.value[0];
+        tagValue = currentMeta.value[0];
       } else {
-        currentMeta = currentMeta.value;
+        tagValue = currentMeta.value;
       }
     }
-    accumulator[tagName] = currentMeta;
+    accumulator[tagName] = tagValue;
     return accumulator;
   };
 }
