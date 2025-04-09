@@ -65,12 +65,15 @@ import {DataElement} from '../dicom/dataElement';
 const TagKeys = {
   ImplementationClassUID: '00020012',
   StudyInstanceUID: '0020000D',
+  StudyID: '00200010',
   SeriesInstanceUID: '0020000E',
+  SeriesNumber: '00200011',
   Modality: '00080060',
   PatientName: '00100010',
   PatientID: '00100020',
   PatientBirthDate: '00100030',
   PatientSex: '00100040',
+  CurrentRequestedProcedureEvidenceSequence: '0040A375',
   ReferencedSeriesSequence: '00081115',
   ContentTemplateSequence: '0040A504',
   MappingResource: '00080105',
@@ -761,13 +764,20 @@ export class AnnotationGroupFactory {
       return safeGet(dataElements, key);
     };
 
-    // StudyInstanceUID
+    // study
     annotationGroup.setMetaValue('StudyInstanceUID',
       safeGetLocal(TagKeys.StudyInstanceUID));
-    // Modality
+    annotationGroup.setMetaValue('StudyID',
+      safeGetLocal(TagKeys.StudyID));
+    // series
+    annotationGroup.setMetaValue('SeriesInstanceUID',
+      safeGetLocal(TagKeys.SeriesInstanceUID));
+    annotationGroup.setMetaValue('SeriesNumber',
+      safeGetLocal(TagKeys.SeriesNumber));
+    // modality
     annotationGroup.setMetaValue('Modality',
       safeGetLocal(TagKeys.Modality));
-    // patient info
+    // patient
     annotationGroup.setMetaValue('PatientName',
       safeGetLocal(TagKeys.PatientName));
     annotationGroup.setMetaValue('PatientID',
@@ -1033,9 +1043,12 @@ export class AnnotationGroupFactory {
     tags.CompletionFlag = 'PARTIAL';
     tags.VerificationFlag = 'UNVERIFIED';
 
+    // date
     const now = new Date();
     tags.ContentDate = getDicomDate(dateToDateObj(now));
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
+    tags.StudyDate = tags.ContentDate;
+    tags.StudyTime = tags.ContentTime;
 
     // TID 1500
     tags.ContentTemplateSequence = {
