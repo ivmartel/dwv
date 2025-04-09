@@ -936,13 +936,13 @@ export class AnnotationGroupFactory {
     // quantification
     if (typeof annotation.quantification !== 'undefined') {
       for (const key in annotation.quantification) {
-        const quatifContent = getSRContentFromValue(
+        const quantifContent = getSRContentFromValue(
           key,
           annotation.quantification[key].value,
           annotation.quantification[key].unit
         );
-        if (typeof quatifContent !== 'undefined') {
-          contentSequence.push(quatifContent);
+        if (typeof quantifContent !== 'undefined') {
+          contentSequence.push(quantifContent);
         }
       }
     }
