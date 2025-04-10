@@ -252,7 +252,13 @@ class VolumesWorker {
    *
    * @returns {object[]} The list of volumes in ml and centroids in mm.
    */
-  calculateVolumesAndCentroids(buffer, mlVoxelVolume, unitVectors, spacing, origin) {
+  calculateVolumesAndCentroids(
+    buffer,
+    mlVoxelVolume,
+    unitVectors,
+    spacing,
+    origin
+  ) {
     const volumes = {};
 
     // Count the number of voxels per unique label,

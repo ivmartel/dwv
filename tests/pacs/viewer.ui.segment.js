@@ -683,7 +683,7 @@ test.dataModelUI.Segmentation = function (app) {
           return volume.segment === segment.number;
         });
 
-      if (typeof volume !== `undefined`) {
+      if (typeof volume !== 'undefined') {
         const dataId = segmentation.dataId;
         const volCentroid = volume.centroid;
         const volCentroidPoint = new dwv.Point(volCentroid);
