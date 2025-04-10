@@ -1613,7 +1613,8 @@ export class Image {
       this.#volumes = new Volumes();
 
       this.#volumes.onVolumeCalculation = (event) => {
-        this.onVolumeCalculation({
+        this.#fireEvent({
+          type: 'volumesChanged',
           volumes: event.data.volumes
         });
       };
@@ -1621,14 +1622,5 @@ export class Image {
 
     this.#volumes.calculateVolumes(this.#buffer, this.#geometry);
   }
-
-  /**
-   * Handle a completed volume calculation. Default behavior is do nothing,
-   * this is meant to be overridden.
-   *
-   * @param {object} _event The work item event fired when a volume
-   *   calculation is completed. Should contain a 'volumes' item.
-   */
-  onVolumeCalculation(_event) {}
 
 } // class Image

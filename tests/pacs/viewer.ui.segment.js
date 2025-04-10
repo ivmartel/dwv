@@ -179,19 +179,22 @@ test.dataModelUI.Segmentation = function (app) {
       const image = maskData.image;
 
       // Watch for volume calculations
-      image.onVolumeCalculation = (event) => {
-        const segmentation =
-          _segmentations.find(
-            (seg) => {
-              return seg.dataId === dataId;
-            }
-          );
+      image.addEventListener(
+        'volumesChanged',
+        (event) => {
+          const segmentation =
+            _segmentations.find(
+              (seg) => {
+                return seg.dataId === dataId;
+              }
+            );
 
-        if (typeof segmentation !== 'undefined') {
-          segmentation.volumes = event.volumes;
-          updateVolumesSpan(segmentation);
+          if (typeof segmentation !== 'undefined') {
+            segmentation.volumes = event.volumes;
+            updateVolumesSpan(segmentation);
+          }
         }
-      };
+      );
 
       image.recalculateVolumes();
 
