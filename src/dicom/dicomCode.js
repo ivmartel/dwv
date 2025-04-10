@@ -167,7 +167,7 @@ const DcmCodes = {
   121324: 'Source Image',
   122438: 'Reference Points',
   125007: 'Measurement Group',
-  125309: 'Short label',
+  125309: 'Short Label',
   126000: 'Imaging Measurement Report',
   126010: 'Imaging Measurements',
   128773: 'Reference Geometry',
