@@ -71,18 +71,18 @@ export class DicomCode {
 }
 
 /**
- * Check if two code objects are equal.
+ * Check if two code objects are equal: just checks
+ * schemeDesignator and value.
  *
  * @param {DicomCode} code1 The first code.
  * @param {DicomCode} code2 The second code.
  * @returns {boolean} True if both codes are equal.
  */
 export function isEqualCode(code1, code2) {
-  return Object.keys(code1).length === Object.keys(code2).length &&
-  Object.keys(code1).every(key =>
-    Object.prototype.hasOwnProperty.call(code2, key) &&
-    code1[key] === code2[key]
-  );
+  return typeof code1 !== 'undefined' &&
+    typeof code2 !== 'undefined' &&
+    code1.schemeDesignator === code2.schemeDesignator &&
+    code1.value === code2.value;
 }
 
 /**
