@@ -9,6 +9,7 @@ import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
 import {isMonochrome} from '../dicom/dicomImage';
+import {Volumes} from '../image/volumes';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -238,6 +239,13 @@ export class Image {
   #listenerHandler = new ListenerHandler();
 
   /**
+   * The volumes calculator for the mask.
+   *
+   * @type {Volumes}
+   */
+  #volumes;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -246,6 +254,7 @@ export class Image {
     this.#geometry = geometry;
     this.#buffer = buffer;
     this.#imageUids = imageUids;
+    this.#volumes = null;
 
     this.#numberOfComponents = this.#buffer.length / (
       this.#geometry.getSize().getTotalSize());
@@ -1595,5 +1604,31 @@ export class Image {
     }
     return newImage;
   }
+
+  /**
+   * Recalculate volumes for a specific mask.
+   */
+  recalculateVolumes() {
+    if (this.#volumes === null) {
+      this.#volumes = new Volumes();
+
+      this.#volumes.onVolumeCalculation = (event) => {
+        this.onVolumeCalculation({
+          volumes: event.data.volumes
+        });
+      };
+    }
+
+    this.#volumes.calculateVolumes(this.#buffer, this.#geometry);
+  }
+
+  /**
+   * Handle a completed volume calculation. Default behavior is do nothing,
+   * this is meant to be overridden.
+   *
+   * @param {object} _event The work item event fired when a volume
+   *   calculation is completed. Should contain a 'volumes' item.
+   */
+  onVolumeCalculation(_event) {}
 
 } // class Image

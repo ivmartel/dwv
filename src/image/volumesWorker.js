@@ -331,7 +331,6 @@ self.addEventListener('message', function (event) {
     );
 
   self.postMessage({
-    dataId: event.data.dataId,
     volumes: volumes
   });
 });

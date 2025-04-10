@@ -14,7 +14,6 @@ import {DicomData} from '../app/dataController';
 import {ViewConfig} from '../app/application';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup';
 import {ScrollWheel} from './scrollWheel';
-import {Volumes} from '../image/volumes';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -448,26 +447,12 @@ export class Brush extends EventTarget {
   #scrollWhell;
 
   /**
-   * The volumes calculator for the mask.
-   *
-   * @type {Volumes}
-   */
-  #volumes;
-
-  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     super();
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);
-    this.#volumes = new Volumes(app);
-
-    this.#volumes.onVolumeCalculation = (event) => {
-      this.dispatchEvent(
-        this.#createVolumesChangedEvent(event.data)
-      );
-    };
   }
 
   /**
@@ -1100,28 +1085,6 @@ export class Brush extends EventTarget {
   }
 
   /**
-   * Create an event representing a volume calculation finishing.
-   *
-   * @param {object} data The return data of the volumes worker.
-   *
-   * @returns {CustomEvent} The event.
-   */
-  #createVolumesChangedEvent(data) {
-    return new CustomEvent('volumeschanged', {
-      detail: data
-    });
-  }
-
-  /**
-   * Recalculate volumes for a specific mask.
-   *
-   * @param {string} maskDataId The data id of the mask.
-   */
-  recalculateVolumes(maskDataId) {
-    this.#volumes.calculateVolumes(maskDataId);
-  }
-
-  /**
    * Handle mouse down event.
    *
    * @param {MouseEvent} event The mouse down event.
@@ -1256,14 +1219,14 @@ export class Brush extends EventTarget {
       };
       command.onUndo = (event) => {
         this.dispatchEvent(event);
-        this.recalculateVolumes(this.#maskDataId);
+        this.#mask.recalculateVolumes();
       };
 
       // save command in undo stack
       this.#app.addToUndoStack(command);
       // fire event
       this.dispatchEvent(command.getExecuteEvent());
-      this.recalculateVolumes(this.#maskDataId);
+      this.#mask.recalculateVolumes();
     }
   };
 
@@ -1489,8 +1452,7 @@ export class Brush extends EventTarget {
       'brushdraw',
       'brushremove',
       'erasingactivated',
-      'erasingdeactivated',
-      'volumeschanged'
+      'erasingdeactivated'
     ];
   }
 
