@@ -19,9 +19,6 @@ export class Volumes {
    */
   #threadPool = new ThreadPool(1);
 
-  /**
-   * @param {App} app The associated application.
-   */
   constructor() {
     this.#threadPool.onerror = ((e) => {
       console.error('Volume calculation failed!', e.error);

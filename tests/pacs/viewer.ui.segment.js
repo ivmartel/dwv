@@ -161,9 +161,15 @@ function splitSegmentHtmlId(segmentId) {
  * @param {object} app The associated application.
  */
 test.dataModelUI.Segmentation = function (app) {
-  const watching = {}
+  const watching = {};
+
+  /**
+   * Watch for volume changes on a segmentation mask.
+   *
+   * @param {string} dataId The mask data ID.
+   */
   function watchVolumes(dataId) {
-    if(!watching[dataId]) {
+    if (!watching[dataId]) {
       const maskData = app.getData(dataId);
       if (!maskData) {
         throw new Error(
@@ -185,13 +191,14 @@ test.dataModelUI.Segmentation = function (app) {
           segmentation.volumes = event.volumes;
           updateVolumesSpan(segmentation);
         }
-      }
+      };
 
       image.recalculateVolumes();
+
       watching[dataId] = true;
-      console.log("Watching mask", dataId);
+      console.log('Watching mask', dataId);
     } else {
-      console.log("Already watching mask", dataId);
+      console.log('Already watching mask', dataId);
     }
   }
 
