@@ -2,9 +2,18 @@ import {ThreadPool, WorkerTask} from '../utils/thread';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
 import {Geometry} from './geometry';
 /* eslint-enable no-unused-vars */
+
+/**
+* List of compatible typed arrays.
+*
+* @typedef {(
+*   Uint8Array | Int8Array |
+*   Uint16Array | Int16Array |
+*   Uint32Array | Int32Array
+* )} TypedArray
+*/
 
 const volumesWorkerUrl = new URL('./volumesWorker.js', import.meta.url);
 
