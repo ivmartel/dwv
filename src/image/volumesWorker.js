@@ -243,6 +243,7 @@ class VolumesWorker {
   /**
    * Calculate the volumes and centroids of a segmentation.
    *
+   * @param {TypedArray} buffer The image buffer to regenerate the labels for.
    * @param {number} mlVoxelVolume The number of ml per image voxel.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
@@ -251,7 +252,7 @@ class VolumesWorker {
    *
    * @returns {object[]} The list of volumes in ml and centroids in mm.
    */
-  calculateVolumesAndCentroids(mlVoxelVolume, unitVectors, spacing, origin) {
+  calculateVolumesAndCentroids(buffer, mlVoxelVolume, unitVectors, spacing, origin) {
     const volumes = {};
 
     // Count the number of voxels per unique label,
@@ -264,6 +265,7 @@ class VolumesWorker {
         const volume = volumes[labelValue];
         if (typeof volume === 'undefined') {
           volumes[labelValue] = {
+            segment: buffer[o],
             sum: index,
             count: 1
           };
@@ -286,6 +288,7 @@ class VolumesWorker {
           }
 
           return {
+            segment: v.segment,
             centroid: centroid,
             volume: v.count * mlVoxelVolume
           };
@@ -324,6 +327,7 @@ self.addEventListener('message', function (event) {
   // Calculate the volumes in ml.
   const volumes =
     volumesWorker.calculateVolumesAndCentroids(
+      imageBuffer,
       mlVoxelVolume,
       unitVectors,
       spacing,
