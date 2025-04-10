@@ -18,6 +18,58 @@ import {Geometry} from './geometry';
 const volumesWorkerUrl = new URL('./volumesWorker.js', import.meta.url);
 
 /**
+ * Generate a worker message to send to the volumes web worker.
+ *
+ * @param {TypedArray} imageBuffer The buffer the segmentation to
+ *  calculate volumes for.
+ * @param {Geometry} geometry The geometry of the segmentation.
+ *
+ * @returns {object} The message to send to the worker.
+ */
+export function generateWorkerMessage(imageBuffer, geometry) {
+  // We can't pass these metadata objects directly, so we will just
+  // pull out what we need and pass that.
+  const currentSize = geometry.getSize();
+  const ndims = currentSize.length();
+
+  // Cache the unit vector offsets to make a couple calculations faster.
+  const unitVectors = Array(ndims).fill(0);
+  for (let d = 0; d < ndims; d++) {
+    unitVectors[d] = currentSize.getDimSize(d);
+  }
+
+  const sizes = Array(ndims).fill(0);
+  for (let d = 0; d < ndims; d++) {
+    sizes[d] = currentSize.get(d);
+  }
+
+  const totalSize = currentSize.getTotalSize();
+
+  const currentSpacing = geometry.getSpacing();
+  const spacing = [
+    currentSpacing.get(0),
+    currentSpacing.get(1),
+    currentSpacing.get(2)
+  ];
+
+  const currentOrigin = geometry.getOrigin();
+  const origin = [
+    currentOrigin.getX(),
+    currentOrigin.getY(),
+    currentOrigin.getZ()
+  ];
+
+  return {
+    imageBuffer: imageBuffer,
+    unitVectors: unitVectors,
+    sizes: sizes,
+    spacing: spacing,
+    origin: origin,
+    totalSize: totalSize
+  };
+}
+
+/**
  * Volumes (and other related values) calculator for segmentations.
  */
 export class Volumes {
@@ -46,48 +98,9 @@ export class Volumes {
 
     this.#threadPool.onworkitem = this.onVolumeCalculation;
 
-    // We can't pass these metadata objects directly, so we will just
-    // pull out what we need and pass that.
-    const currentSize = geometry.getSize();
-    const ndims = currentSize.length();
-
-    // Cache the unit vector offsets to make a couple calculations faster.
-    const unitVectors = Array(ndims).fill(0);
-    for (let d = 0; d < ndims; d++) {
-      unitVectors[d] = currentSize.getDimSize(d);
-    }
-
-    const sizes = Array(ndims).fill(0);
-    for (let d = 0; d < ndims; d++) {
-      sizes[d] = currentSize.get(d);
-    }
-
-    const totalSize = currentSize.getTotalSize();
-
-    const currentSpacing = geometry.getSpacing();
-    const spacing = [
-      currentSpacing.get(0),
-      currentSpacing.get(1),
-      currentSpacing.get(2)
-    ];
-
-    const currentOrigin = geometry.getOrigin();
-    const origin = [
-      currentOrigin.getX(),
-      currentOrigin.getY(),
-      currentOrigin.getZ()
-    ];
-
     const workerTask = new WorkerTask(
       volumesWorkerUrl,
-      {
-        imageBuffer: imageBuffer,
-        unitVectors: unitVectors,
-        sizes: sizes,
-        spacing: spacing,
-        origin: origin,
-        totalSize: totalSize
-      },
+      generateWorkerMessage(imageBuffer, geometry),
       {}
     );
 

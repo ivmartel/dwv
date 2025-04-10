@@ -303,44 +303,52 @@ class VolumesWorker {
 
     return volumesAndCentroids;
   }
-}
 
-const volumesWorker = new VolumesWorker();
+  calculateFromEvent(data) {
+    const imageBuffer = data.imageBuffer;
+    const unitVectors = data.unitVectors;
+    const sizes = data.sizes;
+    const spacing = data.spacing;
+    const origin = data.origin;
+    const totalSize = data.totalSize;
 
-self.addEventListener('message', function (event) {
-  const imageBuffer = event.data.imageBuffer;
-  const unitVectors = event.data.unitVectors;
-  const sizes = event.data.sizes;
-  const spacing = event.data.spacing;
-  const origin = event.data.origin;
-  const totalSize = event.data.totalSize;
+    // Convert the voxel volumes to ml.
+    const mlVoxelVolume =
+      spacing[0] *
+      spacing[1] *
+      spacing[2] *
+      ML_PER_MM;
 
-  // Convert the voxel volumes to ml.
-  const mlVoxelVolume =
-    spacing[0] *
-    spacing[1] *
-    spacing[2] *
-    ML_PER_MM;
+    // Generate the volume labels.
+    this.regenerateLabels(
+      imageBuffer,
+      unitVectors,
+      sizes,
+      totalSize
+    );
 
-  // Generate the volume labels.
-  volumesWorker.regenerateLabels(
-    imageBuffer,
-    unitVectors,
-    sizes,
-    totalSize
-  );
-
-  // Calculate the volumes in ml.
-  const volumes =
-    volumesWorker.calculateVolumesAndCentroids(
+    // Calculate the volumes in ml.
+    return this.calculateVolumesAndCentroids(
       imageBuffer,
       mlVoxelVolume,
       unitVectors,
       spacing,
       origin
     );
+  }
+}
 
-  self.postMessage({
-    volumes: volumes
+const volumesWorker = new VolumesWorker();
+
+// Are we in a web worker?
+if (typeof window === 'undefined' || window !== window.window) {
+  self.addEventListener('message', function (event) {
+    self.postMessage({
+      volumes: volumesWorker.calculateFromEvent(event.data)
+    });
   });
-});
+
+// If not we are in a unit test
+} else {
+  self.volumesWorker = volumesWorker;
+}

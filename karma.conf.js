@@ -6,7 +6,8 @@ module.exports = function (config) {
     basePath: '.',
     frameworks: ['qunit', 'webpack'],
     files: [
-      {pattern: 'tests/**/*.test.js', watched: false}
+      {pattern: 'tests/**/*.test.js', watched: false},
+      {pattern: 'src/image/volumesWorker.js', watched: false},
     ],
     client: {
       clearContext: false,
