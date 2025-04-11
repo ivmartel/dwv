@@ -1,7 +1,7 @@
 import {
   getIdentityMat33,
   REAL_WORLD_EPSILON,
-  BIG_EPSILON_EXPONENT
+  REAL_WORLD_EXPONENT
 } from '../math/matrix';
 import {Point3D, Point} from '../math/point';
 import {Vector3D} from '../math/vector';
@@ -529,15 +529,15 @@ export class Geometry {
     const spacing = this.getSpacing();
     values[0] = Math.floor(precisionRound(
       orientedPoint3D.getX() / spacing.get(0),
-      BIG_EPSILON_EXPONENT
+      REAL_WORLD_EXPONENT
     ));
     values[1] = Math.floor(precisionRound(
       orientedPoint3D.getY() / spacing.get(1),
-      BIG_EPSILON_EXPONENT
+      REAL_WORLD_EXPONENT
     ));
     values[2] = Math.floor(precisionRound(
       orientedPoint3D.getZ() / spacing.get(2),
-      BIG_EPSILON_EXPONENT
+      REAL_WORLD_EXPONENT
     ));
     // return index
     return new Index(values);
