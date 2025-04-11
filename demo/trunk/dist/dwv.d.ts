@@ -4422,12 +4422,20 @@ export declare class PositionHelper {
  *
  * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
  *
- * Can be a solution to not have trailing zero as when
- *   using toFixed or toPrecision.
- * '+number.toFixed(precision)' does not pass all the tests...
+ * `toPrecision` uses all non zero digits of the number:
+ * (123.009).toPrecision(4) = "123.0";
+ * (0.09).toPrecision(4) = "0.09000".
+ *
+ * `toFixed` does not always behave as expected:
+ * (123.009).toFixed(2) = "123.01";
+ * (0.009).toFixed(2) = "0.01";
+ * but
+ * (-0.005).toFixed(2) = "-0.01" (expecting 0);
+ * (1.005).toFixed(2) = "1" (expecting 1.01).
  *
  * @param {number} number The number to round.
- * @param {number} precision The rounding precision.
+ * @param {number} precision The rounding precision, ie the result number
+ *   of digits after the comma.
  * @returns {number} The rounded number.
  */
 export declare function precisionRound(number: number, precision: number): number;
