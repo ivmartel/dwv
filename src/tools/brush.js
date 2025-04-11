@@ -766,6 +766,7 @@ export class Brush extends EventTarget {
       sourceGeometry.getOrigins()[imgK],
       firstSliceMeta
     );
+
     // fires load events and renders data
     // (will create viewLayer for it)
     const elements = getElementsFromJSONTags(firstSliceMeta);
@@ -1218,11 +1219,14 @@ export class Brush extends EventTarget {
       };
       command.onUndo = (event) => {
         this.dispatchEvent(event);
+        this.#mask.recalculateVolumes();
       };
+
       // save command in undo stack
       this.#app.addToUndoStack(command);
       // fire event
       this.dispatchEvent(command.getExecuteEvent());
+      this.#mask.recalculateVolumes();
     }
   };
 
@@ -1445,7 +1449,10 @@ export class Brush extends EventTarget {
    */
   getEventNames() {
     return [
-      'brushdraw', 'brushremove', 'erasingactivated', 'erasingdeactivated'
+      'brushdraw',
+      'brushremove',
+      'erasingactivated',
+      'erasingdeactivated'
     ];
   }
 

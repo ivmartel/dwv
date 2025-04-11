@@ -91,6 +91,7 @@ import {DeleteSegmentCommand} from './image/deleteSegmentCommand';
 import {ChangeSegmentColourCommand} from './image/changeSegmentColourCommand';
 import {MaskSegmentHelper} from './image/maskSegmentHelper';
 import {MaskSegmentViewHelper} from './image/maskSegmentViewHelper';
+import {Volumes} from './image/volumes';
 // math
 import {Point, Point2D, Point3D} from './math/point';
 import {Vector3D} from './math/vector';
@@ -141,6 +142,7 @@ export {
   PositionHelper,
   MaskSegmentHelper,
   MaskSegmentViewHelper,
+  Volumes,
   DeleteSegmentCommand,
   ChangeSegmentColourCommand,
   ToolboxController,
