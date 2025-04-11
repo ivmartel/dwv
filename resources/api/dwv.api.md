@@ -13,8 +13,9 @@ export function addTagsToDictionary(group: string, tags: {
 
 // @public
 export class Annotation {
-    addMetaItem(concept: DicomCode, value: DicomCode): void;
-    colour: string | undefined;
+    addMetaItem(concept: DicomCode, value: DicomCode | string): void;
+    canView(): boolean;
+    colour: string;
     getCentroid(): Point | undefined;
     getFactory(): object;
     getMetaConceptIds(): string[];
@@ -29,14 +30,18 @@ export class Annotation {
     planeOrigin: Point3D | undefined;
     planePoints: Point3D[] | undefined;
     quantification: object | undefined;
+    referencedFrameNumber: number | undefined;
+    referencedSopClassUID: string;
+    referencedSopInstanceUID: string;
     referencePoints: Point2D[] | undefined;
-    referenceSopUID: string;
     removeMetaItem(conceptId: string): void;
+    setIds(): void;
     setTextExpr(labelText: {
         [x: string]: string;
     }): void;
     setViewController(viewController: ViewController): void;
-    textExpr: string | undefined;
+    textExpr: string;
+    uid: string;
     updateQuantification(): void;
 }
 
@@ -45,17 +50,17 @@ export class AnnotationGroup {
     constructor(list?: Annotation[]);
     add(annotation: Annotation): void;
     addEventListener(type: string, callback: Function): void;
-    find(id: string): Annotation | undefined;
+    find(uid: string): Annotation | undefined;
     getColour(): string;
     getLength(): number;
     getList(): Annotation[];
     getMeta(): {
         [x: string]: any;
     };
-    getMetaValue(key: string): string | object;
+    getMetaValue(key: string): string | object | undefined;
     hasMeta(key: string): boolean;
     isEditable(): boolean;
-    remove(id: string): void;
+    remove(uid: string): void;
     removeEventListener(type: string, callback: Function): void;
     setColour(colour: string): void;
     setEditable(flag: boolean): void;
@@ -326,7 +331,8 @@ export class DicomParser {
 export class DicomSRContent {
     constructor(valueType: string);
     conceptNameCode: DicomCode | undefined;
-    contentSequence: DicomSRContent[] | undefined;
+    contentSequence: DicomSRContent[];
+    hasHeader(valueType: string, conceptNameCode: DicomCode, relationshipType: string): boolean;
     relationshipType: string;
     toString(prefix?: string): string;
     value: object;
@@ -351,17 +357,17 @@ export class DicomWriter {
 export class DrawController {
     constructor(group?: AnnotationGroup);
     addAnnotation(annotation: Annotation): void;
-    getAnnotation(id: string): Annotation | undefined;
+    getAnnotation(uid: string): Annotation | undefined;
     getAnnotationGroup(): AnnotationGroup;
     hasAnnotationMeta(key: string): boolean;
     isAnnotationGroupEditable(): boolean;
     removeAllAnnotationsWithCommand(exeCallback: Function): void;
-    removeAnnotation(id: string): void;
-    removeAnnotationWithCommand(id: string, exeCallback: Function): void;
+    removeAnnotation(uid: string): void;
+    removeAnnotationWithCommand(uid: string, exeCallback: Function): void;
     setAnnotationGroupEditable(flag: boolean): void;
     setAnnotationMeta(key: string, value: string): void;
     updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
-    updateAnnotationWithCommand(id: string, originalProps: object, newProps: object, exeCallback: Function): void;
+    updateAnnotationWithCommand(uid: string, originalProps: object, newProps: object, exeCallback: Function): void;
 }
 
 // @public
@@ -465,6 +471,13 @@ export class Geometry {
     worldToIndex(point: Point): Index;
     worldToPoint(point: Point): Point3D;
 }
+
+// @public
+export function getAsSimpleElements(metaData: {
+    [x: string]: DataElement;
+}): {
+    [x: string]: any;
+};
 
 // @public
 export function getDefaultDicomSegJson(): object;
@@ -1172,6 +1185,7 @@ export class ViewController {
     getPositionHelperClone(): PositionHelper;
     getRescaledImageValue(position: Point): number | undefined;
     getScrollDimIndex(): number;
+    getSopClassUid(): string | undefined;
     getWindowLevel(): WindowLevel;
     getWindowLevelPresetsNames(): string[];
     includesImageUid(uid: string): boolean;

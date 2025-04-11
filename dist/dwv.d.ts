@@ -17,19 +17,37 @@ export declare function addTagsToDictionary(group: string, tags: {
  */
 export declare class Annotation {
     /**
-     * The ID.
+     * ID, strored as tracking id, this id is not unique.
      *
      * @type {string}
      */
     id: string;
     /**
-     * The reference image SOP UID.
+     * UID, stored as tracking unique id.
      *
      * @type {string}
      */
-    referenceSopUID: string;
+    uid: string;
     /**
-     * The mathematical shape.
+     * Referenced image SOP isntance UID.
+     *
+     * @type {string}
+     */
+    referencedSopInstanceUID: string;
+    /**
+     * Referenced image SOP class UID.
+     *
+     * @type {string}
+     */
+    referencedSopClassUID: string;
+    /**
+     * Referenced frame number.
+     *
+     * @type {number|undefined}
+     */
+    referencedFrameNumber: number | undefined;
+    /**
+     * Mathematical shape.
      *
      * @type {object}
      */
@@ -41,11 +59,11 @@ export declare class Annotation {
      */
     referencePoints: Point2D[] | undefined;
     /**
-     * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+     * Colour: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
      *
-     * @type {string|undefined}
+     * @type {string}
      */
-    colour: string | undefined;
+    colour: string;
     /**
      * Annotation quantification.
      *
@@ -54,11 +72,11 @@ export declare class Annotation {
     quantification: object | undefined;
     /**
      * Text expression. Can contain variables surrounded with '{}' that will
-     * be extracted from the quantification object.
+     *   be extracted from the quantification object.
      *
-     * @type {string|undefined}
+     * @type {string}
      */
-    textExpr: string | undefined;
+    textExpr: string;
     /**
      * Label position. If undefined, the default shape
      *   label position will be used.
@@ -67,7 +85,7 @@ export declare class Annotation {
      */
     labelPosition: Point2D | undefined;
     /**
-     * The plane origin, the 3D position of index [0, 0, k].
+     * Plane origin: 3D position of index [0, 0, k].
      *
      * @type {Point3D|undefined}
      */
@@ -78,6 +96,10 @@ export declare class Annotation {
      * @type {Point3D[]|undefined}
      */
     planePoints: Point3D[] | undefined;
+    /**
+     * Set the annotation id and uid.
+     */
+    setIds(): void;
     /**
      * Get the concepts ids of the annotation meta data.
      *
@@ -96,9 +118,9 @@ export declare class Annotation {
      * Add annotation meta data.
      *
      * @param {DicomCode} concept The concept code.
-     * @param {DicomCode} value The value code.
+     * @param {DicomCode|string} value The value code.
      */
-    addMetaItem(concept: DicomCode, value: DicomCode): void;
+    addMetaItem(concept: DicomCode, value: DicomCode | string): void;
     /**
      * Remove an annotation meta data.
      *
@@ -118,6 +140,13 @@ export declare class Annotation {
      * @param {ViewController} viewController The associated view controller.
      */
     init(viewController: ViewController): void;
+    /**
+     * Check if the annotation can be displayed: true if it has
+     * an associated view controller.
+     *
+     * @returns {boolean} True if the annotation can be displayed.
+     */
+    canView(): boolean;
     /**
      * Check if an input view is compatible with the annotation.
      *
@@ -227,9 +256,9 @@ export declare class AnnotationGroup {
     /**
      * Remove an annotation.
      *
-     * @param {string} id The id of the annotation to remove.
+     * @param {string} uid The UID of the annotation to remove.
      */
-    remove(id: string): void;
+    remove(uid: string): void;
     /**
      * Set the associated view controller.
      *
@@ -239,10 +268,10 @@ export declare class AnnotationGroup {
     /**
      * Find an annotation.
      *
-     * @param {string} id The id of the annotation to find.
+     * @param {string} uid The UID of the annotation to find.
      * @returns {Annotation|undefined} The found annotation.
      */
-    find(id: string): Annotation | undefined;
+    find(uid: string): Annotation | undefined;
     /**
      * Get the meta data.
      *
@@ -262,9 +291,9 @@ export declare class AnnotationGroup {
      * Get a meta data value.
      *
      * @param {string} key The meta data key.
-     * @returns {string|object} The meta data value.
+     * @returns {string|object|undefined} The meta data value.
      */
-    getMetaValue(key: string): string | object;
+    getMetaValue(key: string): string | object | undefined;
     /**
      * Set a meta data.
      *
@@ -1500,11 +1529,11 @@ export declare class DicomSRContent {
      */
     relationshipType: string;
     /**
-     * Content sequence (0040,A730).
+     * Content sequence.
      *
-     * @type {DicomSRContent[]|undefined}
+     * @type {DicomSRContent[]}
      */
-    contentSequence: DicomSRContent[] | undefined;
+    contentSequence: DicomSRContent[];
     /**
      * Value.
      *
@@ -1518,6 +1547,15 @@ export declare class DicomSRContent {
      * @returns {string} The object as string.
      */
     toString(prefix?: string): string;
+    /**
+     * Check if this content has input header values.
+     *
+     * @param {string} valueType The value type.
+     * @param {DicomCode} conceptNameCode The concept name code.
+     * @param {string} relationshipType The relationship type.
+     * @returns {boolean} True if equal.
+     */
+    hasHeader(valueType: string, conceptNameCode: DicomCode, relationshipType: string): boolean;
 }
 
 /**
@@ -1615,10 +1653,10 @@ export declare class DrawController {
     /**
      * Get an annotation.
      *
-     * @param {string} id The annotation id.
+     * @param {string} uid The annotation UID.
      * @returns {Annotation|undefined} The annotation.
      */
-    getAnnotation(id: string): Annotation | undefined;
+    getAnnotation(uid: string): Annotation | undefined;
     /**
      * Get the annotation group.
      *
@@ -1653,27 +1691,27 @@ export declare class DrawController {
     /**
      * Remove an anotation for the list.
      *
-     * @param {string} id The id of the annotation to remove.
+     * @param {string} uid The UID of the annotation to remove.
      */
-    removeAnnotation(id: string): void;
+    removeAnnotation(uid: string): void;
     /**
      * Remove an annotation via a remove command (triggers draw actions).
      *
-     * @param {string} id The annotation id.
+     * @param {string} uid The annotation UID.
      * @param {Function} exeCallback The undo stack callback.
      */
-    removeAnnotationWithCommand(id: string, exeCallback: Function): void;
+    removeAnnotationWithCommand(uid: string, exeCallback: Function): void;
     /**
      * Update an annotation via an update command (triggers draw actions).
      *
-     * @param {string} id The annotation id.
+     * @param {string} uid The annotation UID.
      * @param {object} originalProps The original annotation properties
      *   that will be updated.
      * @param {object} newProps The new annotation properties
      *   that will replace the original ones.
      * @param {Function} exeCallback The undo stack callback.
      */
-    updateAnnotationWithCommand(id: string, originalProps: object, newProps: object, exeCallback: Function): void;
+    updateAnnotationWithCommand(uid: string, originalProps: object, newProps: object, exeCallback: Function): void;
     /**
      * Remove all annotations via remove commands (triggers draw actions).
      *
@@ -2301,6 +2339,21 @@ export declare class Geometry {
     worldToPoint(point: Point): Point3D;
     #private;
 }
+
+/**
+ * Get the meta data as simple elements:
+ * - indexed by tag names instead of tag keys,
+ * - no element object, just value if not sequence nor merged item.
+ *
+ * @param {Object<string, DataElement>} metaData The meta data
+ *   index by tag keys.
+ * @returns {Object<string, any>} The simple elements.
+ */
+export declare function getAsSimpleElements(metaData: {
+    [x: string]: DataElement;
+}): {
+    [x: string]: any;
+};
 
 /**
  * Get the default DICOM seg tags as an object.
@@ -4369,12 +4422,20 @@ export declare class PositionHelper {
  *
  * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
  *
- * Can be a solution to not have trailing zero as when
- *   using toFixed or toPrecision.
- * '+number.toFixed(precision)' does not pass all the tests...
+ * `toPrecision` uses all non zero digits of the number:
+ * (123.009).toPrecision(4) = "123.0";
+ * (0.09).toPrecision(4) = "0.09000".
+ *
+ * `toFixed` does not always behave as expected:
+ * (123.009).toFixed(2) = "123.01";
+ * (0.009).toFixed(2) = "0.01";
+ * but
+ * (-0.005).toFixed(2) = "-0.01" (expecting 0);
+ * (1.005).toFixed(2) = "1" (expecting 1.01).
  *
  * @param {number} number The number to round.
- * @param {number} precision The rounding precision.
+ * @param {number} precision The rounding precision, ie the result number
+ *   of digits after the comma.
  * @returns {number} The rounded number.
  */
 export declare function precisionRound(number: number, precision: number): number;
@@ -5120,7 +5181,7 @@ export declare const toolList: {
  *     const group = new Konva.Group();
  *     group.name('love-group');
  *     group.visible(true);
- *     group.id(annotation.id);
+ *     group.id(annotation.uid);
  *     group.add(shape);
  *     return group;
  *   }
@@ -5605,6 +5666,12 @@ export declare class ViewController {
      * @returns {string} The modality.
      */
     getModality(): string;
+    /**
+     * Get the image SOP class UID.
+     *
+     * @returns {string|undefined} The uid.
+     */
+    getSopClassUid(): string | undefined;
     /**
      * Get the window/level presets names.
      *
