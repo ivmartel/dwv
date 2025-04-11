@@ -2984,6 +2984,10 @@ declare class Image_2 {
      * Note: Uses the raw buffer values.
      */
     compose(rhs: Image_2, operator: Function): Image_2;
+    /**
+     * Recalculate volumes for a specific mask.
+     */
+    recalculateVolumes(): void;
     #private;
 }
 export { Image_2 as Image }
@@ -5215,6 +5219,11 @@ export declare const toolOptions: {
 };
 
 /**
+ * List of compatible typed arrays.
+ */
+declare type TypedArray = (Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array);
+
+/**
  * Immutable 3D vector.
  */
 export declare class Vector3D {
@@ -6306,6 +6315,29 @@ export declare class ViewLayer {
      * Clear the context.
      */
     clear(): void;
+    #private;
+}
+
+/**
+ * Volumes (and other related values) calculator for segmentations.
+ */
+export declare class Volumes {
+    /**
+     * Trigger a volume recalculation.
+     *
+     * @param {TypedArray} imageBuffer The buffer the segmentation to
+     *  calculate volumes for.
+     * @param {Geometry} geometry The geometry of the segmentation.
+     */
+    calculateVolumes(imageBuffer: TypedArray, geometry: Geometry): void;
+    /**
+     * Handle a completed volume calculation. Default behavior is do nothing,
+     * this is meant to be overridden.
+     *
+     * @param {object} _event The work item event fired when a volume
+     *   calculation is completed. Event.data should contain a 'volumes' item.
+     */
+    onVolumeCalculation(_event: object): void;
     #private;
 }
 
