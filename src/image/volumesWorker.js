@@ -328,13 +328,23 @@ class VolumesWorker {
     );
 
     // Calculate the volumes in ml.
-    return this.calculateVolumesAndCentroids(
+    const volumes = this.calculateVolumesAndCentroids(
       imageBuffer,
       mlVoxelVolume,
       unitVectors,
       spacing,
       origin
     );
+
+    // Sort by volume and segment
+    const volumesSorted =
+      volumes.sort((v1, v2) => {
+        return v2.volume - v1.volume;
+      }).sort((v1, v2) => {
+        return v1.segment - v2.segment;
+      });
+
+    return volumesSorted;
   }
 }
 

@@ -36,10 +36,26 @@ QUnit.test('VolumesWorker class', function (assert) {
   const imgEvent0 = generateWorkerMessage(imgBuffer0, imgGeometry0);
   const volumes0 = self.volumesWorker.calculateFromEvent(imgEvent0);
 
-  assert.notStrictEqual(typeof volumes0, 'undefined');
-  assert.equal(volumes0.length, 1);
-  assert.equal(volumes0[0].volume, 0.008);
-  assert.deepEqual(volumes0[0].centroid, [2, 2, 1]);
+  assert.notStrictEqual(
+    typeof volumes0,
+    'undefined',
+    'Expected volume returned for basic segment'
+  );
+  assert.equal(
+    volumes0.length,
+    1,
+    'Expected volume count for basic segment'
+  );
+  assert.equal(
+    volumes0[0].volume,
+    0.008,
+    'Expected volume value for basic segment'
+  );
+  assert.deepEqual(
+    volumes0[0].centroid,
+    [2, 2, 1],
+    'Expected volume centroid for basic segment'
+  );
 
   // Touching volumes of different segments
   const imgSize1 = new Size([3, 3, 2]);
@@ -60,14 +76,46 @@ QUnit.test('VolumesWorker class', function (assert) {
   const imgEvent1 = generateWorkerMessage(imgBuffer1, imgGeometry1);
   const volumes1 = self.volumesWorker.calculateFromEvent(imgEvent1);
 
-  assert.notStrictEqual(typeof volumes1, 'undefined');
-  assert.equal(volumes1.length, 3);
-  assert.equal(volumes1[0].volume, 0.006);
-  assert.deepEqual(volumes1[0].centroid, [1.5, 0.5, 1]);
-  assert.equal(volumes1[1].volume, 0.004);
-  assert.deepEqual(volumes1[1].centroid, [0.5, 2, 1]);
-  assert.equal(volumes1[2].volume, 0.008);
-  assert.deepEqual(volumes1[2].centroid, [2, 2, 1]);
+  assert.notStrictEqual(
+    typeof volumes1,
+    'undefined',
+    'Expected volume returned for multiple segments'
+  );
+  assert.equal(
+    volumes1.length,
+    3,
+    'Expected volume count for multiple segments'
+  );
+  assert.equal(
+    volumes1[0].volume,
+    0.008,
+    'Expected volume value 1 for multiple segments'
+  );
+  assert.deepEqual(
+    volumes1[0].centroid,
+    [2, 2, 1],
+    'Expected volume centroid 1 for multiple segments'
+  );
+  assert.equal(
+    volumes1[1].volume,
+    0.006,
+    'Expected volume value 2 for multiple segments'
+  );
+  assert.deepEqual(
+    volumes1[1].centroid,
+    [1.5, 0.5, 1],
+    'Expected volume centroid 2 for multiple segments'
+  );
+  assert.equal(
+    volumes1[2].volume,
+    0.004,
+    'Expected volume value 3 for multiple segments'
+  );
+  assert.deepEqual(
+    volumes1[2].centroid,
+    [0.5, 2, 1],
+    'Expected volume centroid 3 for multiple segments'
+  );
 
   // Altered spacing and origin
   const imgSize2 = new Size([3, 3, 2]);
@@ -88,8 +136,24 @@ QUnit.test('VolumesWorker class', function (assert) {
   const imgEvent2 = generateWorkerMessage(imgBuffer2, imgGeometry2);
   const volumes2 = self.volumesWorker.calculateFromEvent(imgEvent2);
 
-  assert.notStrictEqual(typeof volumes2, 'undefined');
-  assert.equal(volumes2.length, 1);
-  assert.equal(volumes2[0].volume, 0.24);
-  assert.deepEqual(volumes2[0].centroid, [14, 10, 4]);
+  assert.notStrictEqual(
+    typeof volumes2,
+    'undefined',
+    'Expected volume returned for sized segment'
+  );
+  assert.equal(
+    volumes2.length,
+    1,
+    'Expected volume count for sized segment'
+  );
+  assert.equal(
+    volumes2[0].volume,
+    0.24,
+    'Expected volume value for sized segment'
+  );
+  assert.deepEqual(
+    volumes2[0].centroid,
+    [14, 10, 4],
+    'Expected volume centroid for sized segment'
+  );
 });
