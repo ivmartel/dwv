@@ -315,10 +315,14 @@ QUnit.test('getFileExtension', function (assert) {
  */
 QUnit.test('precisionRound', function (assert) {
   // just to be sure...
-  assert.equal(Math.round(-0.6), -1, 'test round #00');
-  assert.equal(Math.round(-0.5), 0, 'test round #01');
-  assert.equal(Math.round(0.5), 1, 'test round #02');
-  assert.equal(Math.round(1.5), 2, 'test round #03');
+  assert.equal(Math.round(-1.5), -1, 'test round #00');
+  assert.equal(Math.round(-0.6), -1, 'test round #01');
+  assert.equal(Math.round(-0.5), 0, 'test round #02');
+  assert.equal(Math.round(-0.1), 0, 'test round #03');
+  assert.equal(Math.round(0.1), 0, 'test round #04');
+  assert.equal(Math.round(0.5), 1, 'test round #05');
+  assert.equal(Math.round(0.6), 1, 'test round #06');
+  assert.equal(Math.round(1.5), 2, 'test round #07');
 
   assert.equal(precisionRound(-0.004, 2), 0, 'test #00');
   assert.equal(precisionRound(-0.005, 2), 0, 'test #01');
@@ -346,4 +350,8 @@ QUnit.test('precisionRound', function (assert) {
   assert.equal(precisionRound(1234.566, 2), 1234.57, 'test #46');
   assert.equal(precisionRound(1234.5666, 2), 1234.57, 'test #47');
 
+  assert.equal(precisionRound(123.009, 2), 123.01, 'test #50');
+  assert.equal(precisionRound(0.009, 2), 0.01, 'test #51');
+  assert.equal(precisionRound(0.092, 2), 0.09, 'test #52');
+  assert.equal(precisionRound(0.095, 2), 0.1, 'test #53');
 });
