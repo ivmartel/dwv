@@ -3094,28 +3094,6 @@ export declare class Index {
 export declare function isEqualRgb(c1: RGB, c2: RGB): boolean;
 
 /**
- * Labeling thread.
- */
-export declare class LabelingThread {
-    /**
-     * Trigger a labels recalculation.
-     *
-     * @param {TypedArray} imageBuffer The buffer to label.
-     * @param {Size} size The image size.
-     */
-    run(imageBuffer: TypedArray, size: Size): void;
-    /**
-     * Handle a completed labeling. Default behavior is do nothing,
-     * this is meant to be overridden.
-     *
-     * @param {object} _event The work item event fired when a labeling
-     *   calculation is completed. Event.data should contain a 'lebels' item.
-     */
-    ondone(_event: object): void;
-    #private;
-}
-
-/**
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
  *   unsigned int CIE LAB ([0, 65535]).
  *
@@ -5239,11 +5217,6 @@ export declare const toolOptions: {
         [x: string]: any;
     };
 };
-
-/**
- * List of compatible typed arrays.
- */
-declare type TypedArray = (Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array);
 
 /**
  * Immutable 3D vector.
