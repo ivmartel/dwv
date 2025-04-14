@@ -2,7 +2,7 @@ import {ThreadPool, WorkerTask} from '../utils/thread';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Geometry} from './geometry';
+import {Size} from './size';
 /* eslint-enable no-unused-vars */
 
 /**
