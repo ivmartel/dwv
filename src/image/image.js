@@ -21,6 +21,8 @@ import {RGB} from '../utils/colour';
 import {ColourMap} from './luts';
 /* eslint-enable no-unused-vars */
 
+const ML_PER_MM = 0.001; // ml/mm^3
+
 /**
  * Get the slice index of an input slice into a volume geometry.
  *
@@ -1612,15 +1614,37 @@ export class Image {
     if (this.#volumes === null) {
       this.#volumes = new Volumes();
 
+      const spacing = this.#geometry.getSpacing();
+      const mlVoxelVolume =
+        spacing.get(0) *
+        spacing.get(1) *
+        spacing.get(2) *
+        ML_PER_MM;
+
       this.#volumes.onVolumeCalculation = (event) => {
+        const volumes = event.data.volumes;
+        // add centroid point and volume
+        for (const volume of volumes) {
+          volume.centroid = this.#geometry.indexToWorld(
+            new Index(volume.centroidIndex));
+          volume.volume = volume.count * mlVoxelVolume;
+        }
+        // sort
+        const volumesSorted =
+          volumes.sort((v1, v2) => {
+            return v2.volume - v1.volume;
+          }).sort((v1, v2) => {
+            return v1.segment - v2.segment;
+          });
+
         this.#fireEvent({
           type: 'volumesChanged',
-          volumes: event.data.volumes
+          volumes: volumesSorted
         });
       };
     }
 
-    this.#volumes.calculateVolumes(this.#buffer, this.#geometry);
+    this.#volumes.calculateVolumes(this.#buffer, this.#geometry.getSize());
   }
 
 } // class Image

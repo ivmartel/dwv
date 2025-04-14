@@ -22,49 +22,32 @@ const volumesWorkerUrl = new URL('./volumesWorker.js', import.meta.url);
  *
  * @param {TypedArray} imageBuffer The buffer the segmentation to
  *  calculate volumes for.
- * @param {Geometry} geometry The geometry of the segmentation.
+ * @param {Size} imageSize The image size.
  *
  * @returns {object} The message to send to the worker.
  */
-export function generateWorkerMessage(imageBuffer, geometry) {
+export function generateWorkerMessage(imageBuffer, imageSize) {
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
-  const currentSize = geometry.getSize();
-  const ndims = currentSize.length();
+  const ndims = imageSize.length();
 
   // Cache the unit vector offsets to make a couple calculations faster.
   const unitVectors = Array(ndims).fill(0);
   for (let d = 0; d < ndims; d++) {
-    unitVectors[d] = currentSize.getDimSize(d);
+    unitVectors[d] = imageSize.getDimSize(d);
   }
 
   const sizes = Array(ndims).fill(0);
   for (let d = 0; d < ndims; d++) {
-    sizes[d] = currentSize.get(d);
+    sizes[d] = imageSize.get(d);
   }
 
-  const totalSize = currentSize.getTotalSize();
-
-  const currentSpacing = geometry.getSpacing();
-  const spacing = [
-    currentSpacing.get(0),
-    currentSpacing.get(1),
-    currentSpacing.get(2)
-  ];
-
-  const currentOrigin = geometry.getOrigin();
-  const origin = [
-    currentOrigin.getX(),
-    currentOrigin.getY(),
-    currentOrigin.getZ()
-  ];
+  const totalSize = imageSize.getTotalSize();
 
   return {
     imageBuffer: imageBuffer,
     unitVectors: unitVectors,
     sizes: sizes,
-    spacing: spacing,
-    origin: origin,
     totalSize: totalSize
   };
 }
@@ -91,16 +74,16 @@ export class Volumes {
    *
    * @param {TypedArray} imageBuffer The buffer the segmentation to
    *  calculate volumes for.
-   * @param {Geometry} geometry The geometry of the segmentation.
+   * @param {Size} size The image size.
    */
-  calculateVolumes(imageBuffer, geometry) {
+  calculateVolumes(imageBuffer, size) {
     // We can't just pass in an Image or we would get a circular dependency
 
     this.#threadPool.onworkitem = this.onVolumeCalculation;
 
     const workerTask = new WorkerTask(
       volumesWorkerUrl,
-      generateWorkerMessage(imageBuffer, geometry),
+      generateWorkerMessage(imageBuffer, size),
       {}
     );
 

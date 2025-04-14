@@ -9,7 +9,7 @@
  * non-binary 3D data, but is otherwise structured the same way.
  */
 
-const ML_PER_MM = 0.001; // ml/mm^3
+// const ML_PER_MM = 0.001; // ml/mm^3
 
 class VolumesWorker {
   /**
@@ -244,20 +244,14 @@ class VolumesWorker {
    * Calculate the volumes and centroids of a segmentation.
    *
    * @param {TypedArray} buffer The image buffer to regenerate the labels for.
-   * @param {number} mlVoxelVolume The number of ml per image voxel.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
-   * @param {number[]} spacing The space in mm between voxels.
-   * @param {number[]} origin The origin of the image in mm.
    *
-   * @returns {object[]} The list of volumes in ml and centroids in mm.
+   * @returns {object[]} The list of volumes and centroids.
    */
   calculateVolumesAndCentroids(
     buffer,
-    mlVoxelVolume,
     unitVectors,
-    spacing,
-    origin
   ) {
     const volumes = {};
 
@@ -287,16 +281,15 @@ class VolumesWorker {
     const volumesAndCentroids =
       Object.values(volumes).map(
         (v) => {
-          const centroid = Array(v.sum.length).fill(0);
+          const index = Array(v.sum.length).fill(0);
           for (let d = 0; d < v.sum.length; d++) {
-            centroid[d] =
-              (((v.sum[d] / v.count) + 0.5) * spacing[d]) + origin[d];
+            index[d] = v.sum[d] / v.count;
           }
 
           return {
             segment: v.segment,
-            centroid: centroid,
-            volume: v.count * mlVoxelVolume
+            centroidIndex: index,
+            count: v.count
           };
         }
       );
@@ -308,16 +301,7 @@ class VolumesWorker {
     const imageBuffer = data.imageBuffer;
     const unitVectors = data.unitVectors;
     const sizes = data.sizes;
-    const spacing = data.spacing;
-    const origin = data.origin;
     const totalSize = data.totalSize;
-
-    // Convert the voxel volumes to ml.
-    const mlVoxelVolume =
-      spacing[0] *
-      spacing[1] *
-      spacing[2] *
-      ML_PER_MM;
 
     // Generate the volume labels.
     this.regenerateLabels(
@@ -327,24 +311,13 @@ class VolumesWorker {
       totalSize
     );
 
-    // Calculate the volumes in ml.
+    // Calculate the volumes
     const volumes = this.calculateVolumesAndCentroids(
       imageBuffer,
-      mlVoxelVolume,
       unitVectors,
-      spacing,
-      origin
     );
 
-    // Sort by volume and segment
-    const volumesSorted =
-      volumes.sort((v1, v2) => {
-        return v2.volume - v1.volume;
-      }).sort((v1, v2) => {
-        return v1.segment - v2.segment;
-      });
-
-    return volumesSorted;
+    return volumes;
   }
 }
 
