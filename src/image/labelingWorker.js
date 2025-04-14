@@ -1,17 +1,16 @@
 /**
- * Web worker for calculating segmentation volumes.
+ * Web worker for calculating labels.
  *
- * Calculates the volume of segmentations using the Hoshen–Kopelman
+ * Labels a buffer using the Hoshen–Kopelman
  * algorithm to first label all of the connected components, then does
  * a second pass to count the number of voxels in each unique label.
  *
  * The Hoshen–Kopelman labelling is slightly modified to work with
  * non-binary 3D data, but is otherwise structured the same way.
+ *
+ * Ref: {@link https://en.wikipedia.org/wiki/Hoshen%E2%80%93Kopelman_algorithm}.
  */
-
-// const ML_PER_MM = 0.001; // ml/mm^3
-
-class VolumesWorker {
+class LabelingWorker {
   /**
    * The last known image size.
    *
@@ -20,14 +19,14 @@ class VolumesWorker {
   #lastKnownTotalSize;
 
   /**
-   * A union-find (disjoint-set) representing the available volume labels.
+   * A union-find (disjoint-set) representing the available labels.
    *
    * @type {Int32Array}
    */
   #unionFind;
 
   /**
-   * A buffer containing the volume labels for each voxel.
+   * A buffer containing the labels for each voxel.
    *
    * @type {Int32Array}
    */
@@ -38,9 +37,9 @@ class VolumesWorker {
 
   /**
    * Union-find find operation.
+   * Ref: {@link https://en.wikipedia.org/wiki/Disjoint-set_data_structure}.
    *
    * @param {number} label The label to find the root of.
-   *
    * @returns {number} The root label.
    */
   #find(label) {
@@ -78,7 +77,7 @@ class VolumesWorker {
   }
 
   /**
-   * Label the segmentation volumes using the Hoshen–Kopelman algorithm.
+   * Label the buffer using the Hoshen–Kopelman algorithm.
    *
    * @param {TypedArray} buffer The image buffer to regenerate the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
@@ -87,9 +86,9 @@ class VolumesWorker {
    * @param {number} totalSize The total length of the buffer.
    */
   regenerateLabels(buffer, unitVectors, sizes, totalSize) {
-    // If we are re-calcing the volume of the same sized image as last time we
+    // If we are re-calcing the labels of the same sized image as last time we
     // can save a little time on re-initializing memory. Makes it slightly
-    // faster to use a seperate VolumesWorker object per segmentation, at the
+    // faster to use a seperate worker object per segmentation, at the
     // cost of extra memory.
     if (typeof this.#lastKnownTotalSize === 'undefined' ||
         this.#lastKnownTotalSize !== totalSize) {
@@ -241,19 +240,19 @@ class VolumesWorker {
   }
 
   /**
-   * Calculate the volumes and centroids of a segmentation.
+   * Quantify labels: count items and calculate centroid.
    *
    * @param {TypedArray} buffer The image buffer to regenerate the labels for.
    * @param {number[]} unitVectors The unit vectors for index to offset
    *  conversion.
    *
-   * @returns {object[]} The list of volumes and centroids.
+   * @returns {object[]} The list of quantified labels.
    */
-  calculateVolumesAndCentroids(
+  #quantifyLabels(
     buffer,
     unitVectors,
   ) {
-    const volumes = {};
+    const detailledInfos = {};
 
     // Count the number of voxels per unique label,
     // this has to be done as a second pass.
@@ -262,39 +261,39 @@ class VolumesWorker {
 
       if (labelValue >= 0) {
         const index = this.#offsetToIndex(o, unitVectors);
-        const volume = volumes[labelValue];
-        if (typeof volume === 'undefined') {
-          volumes[labelValue] = {
-            segment: buffer[o],
+        const info = detailledInfos[labelValue];
+        if (typeof info === 'undefined') {
+          detailledInfos[labelValue] = {
+            id: buffer[o],
             sum: index,
             count: 1
           };
         } else {
-          volume.sum[0] += index[0];
-          volume.sum[1] += index[1];
-          volume.sum[2] += index[2];
-          volume.count++;
+          info.sum[0] += index[0];
+          info.sum[1] += index[1];
+          info.sum[2] += index[2];
+          info.count++;
         }
       }
     }
 
-    const volumesAndCentroids =
-      Object.values(volumes).map(
-        (v) => {
-          const index = Array(v.sum.length).fill(0);
-          for (let d = 0; d < v.sum.length; d++) {
-            index[d] = v.sum[d] / v.count;
+    const labelsInfo =
+      Object.values(detailledInfos).map(
+        (detailledInfo) => {
+          const index = Array(detailledInfo.sum.length).fill(0);
+          for (let d = 0; d < detailledInfo.sum.length; d++) {
+            index[d] = detailledInfo.sum[d] / detailledInfo.count;
           }
 
           return {
-            segment: v.segment,
+            id: detailledInfo.id,
             centroidIndex: index,
-            count: v.count
+            count: detailledInfo.count
           };
         }
       );
 
-    return volumesAndCentroids;
+    return labelsInfo;
   }
 
   calculateFromEvent(data) {
@@ -303,7 +302,7 @@ class VolumesWorker {
     const sizes = data.sizes;
     const totalSize = data.totalSize;
 
-    // Generate the volume labels.
+    // generate labels
     this.regenerateLabels(
       imageBuffer,
       unitVectors,
@@ -311,27 +310,27 @@ class VolumesWorker {
       totalSize
     );
 
-    // Calculate the volumes
-    const volumes = this.calculateVolumesAndCentroids(
+    // quantify labels
+    const labelsInfo = this.#quantifyLabels(
       imageBuffer,
       unitVectors,
     );
 
-    return volumes;
+    return labelsInfo;
   }
 }
 
-const volumesWorker = new VolumesWorker();
+const labelingWorker = new LabelingWorker();
 
 // Are we in a web worker?
 if (typeof window === 'undefined' || window !== window.window) {
   self.addEventListener('message', function (event) {
     self.postMessage({
-      volumes: volumesWorker.calculateFromEvent(event.data)
+      labels: labelingWorker.calculateFromEvent(event.data)
     });
   });
 
 // If not we are in a unit test
 } else {
-  self.volumesWorker = volumesWorker;
+  self.labelingWorker = labelingWorker;
 }

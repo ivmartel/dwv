@@ -15,13 +15,12 @@ import {Size} from './size';
  * )} TypedArray
  */
 
-const volumesWorkerUrl = new URL('./volumesWorker.js', import.meta.url);
+const labelingWorkerUrl = new URL('./labelingWorker.js', import.meta.url);
 
 /**
- * Generate a worker message to send to the volumes web worker.
+ * Generate a worker message to send to the labeling worker.
  *
- * @param {TypedArray} imageBuffer The buffer the segmentation to
- *  calculate volumes for.
+ * @param {TypedArray} imageBuffer The buffer to label.
  * @param {Size} imageSize The image size.
  *
  * @returns {object} The message to send to the worker.
@@ -53,11 +52,11 @@ export function generateWorkerMessage(imageBuffer, imageSize) {
 }
 
 /**
- * Volumes (and other related values) calculator for segmentations.
+ * Labeling thread.
  */
-export class Volumes {
+export class LabelingThread {
   /**
-   * The volume worker thread pool.
+   * The thread pool.
    *
    * @type {ThreadPool}
    */
@@ -65,24 +64,23 @@ export class Volumes {
 
   constructor() {
     this.#threadPool.onerror = ((e) => {
-      console.error('Volume calculation failed!', e.error);
+      console.error('Labeling failed!', e.error);
     });
   }
 
   /**
-   * Trigger a volume recalculation.
+   * Trigger a labels recalculation.
    *
-   * @param {TypedArray} imageBuffer The buffer the segmentation to
-   *  calculate volumes for.
+   * @param {TypedArray} imageBuffer The buffer to label.
    * @param {Size} size The image size.
    */
-  calculateVolumes(imageBuffer, size) {
+  run(imageBuffer, size) {
     // We can't just pass in an Image or we would get a circular dependency
 
-    this.#threadPool.onworkitem = this.onVolumeCalculation;
+    this.#threadPool.onworkitem = this.ondone;
 
     const workerTask = new WorkerTask(
-      volumesWorkerUrl,
+      labelingWorkerUrl,
       generateWorkerMessage(imageBuffer, size),
       {}
     );
@@ -92,11 +90,11 @@ export class Volumes {
   }
 
   /**
-   * Handle a completed volume calculation. Default behavior is do nothing,
+   * Handle a completed labeling. Default behavior is do nothing,
    * this is meant to be overridden.
    *
-   * @param {object} _event The work item event fired when a volume
-   *   calculation is completed. Event.data should contain a 'volumes' item.
+   * @param {object} _event The work item event fired when a labeling
+   *   calculation is completed. Event.data should contain a 'lebels' item.
    */
-  onVolumeCalculation(_event) {}
+  ondone(_event) {}
 }

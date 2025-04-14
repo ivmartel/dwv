@@ -1219,14 +1219,14 @@ export class Brush extends EventTarget {
       };
       command.onUndo = (event) => {
         this.dispatchEvent(event);
-        this.#mask.recalculateVolumes();
+        this.#mask.recalculateLabels();
       };
 
       // save command in undo stack
       this.#app.addToUndoStack(command);
       // fire event
       this.dispatchEvent(command.getExecuteEvent());
-      this.#mask.recalculateVolumes();
+      this.#mask.recalculateLabels();
     }
   };
 

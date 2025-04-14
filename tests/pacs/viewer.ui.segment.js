@@ -165,23 +165,23 @@ test.dataModelUI.Segmentation = function (app) {
   const watching = {};
 
   /**
-   * Watch for volume changes on a segmentation mask.
+   * Watch a data for changes.
    *
-   * @param {string} dataId The mask data ID.
+   * @param {string} dataId The data ID.
    */
-  function watchVolumes(dataId) {
+  function watchData(dataId) {
     if (!watching[dataId]) {
       const maskData = app.getData(dataId);
       if (!maskData) {
         throw new Error(
-          'No mask image to calculate segmentation volumes for ID: ' + dataId
+          'No data to watch for dataId: ' + dataId
         );
       }
       const image = maskData.image;
 
-      // Watch for volume calculations
+      // Watch for labels change
       image.addEventListener(
-        'volumesChanged',
+        'labelschanged',
         (event) => {
           const segmentation =
             _segmentations.find(
@@ -191,18 +191,17 @@ test.dataModelUI.Segmentation = function (app) {
             );
 
           if (typeof segmentation !== 'undefined') {
-            segmentation.volumes = event.volumes;
-            updateVolumesSpan(segmentation);
+            segmentation.labels = event.labels;
+            updateLabelsSpan(segmentation);
           }
         }
       );
 
-      image.recalculateVolumes();
+      image.recalculateLabels();
 
       watching[dataId] = true;
-      console.log('Watching mask', dataId);
     } else {
-      console.log('Already watching mask', dataId);
+      console.log('Already watching data', dataId);
     }
   }
 
@@ -261,13 +260,13 @@ test.dataModelUI.Segmentation = function (app) {
           // default segmentation
           const segmentation = {
             dataId: dataId,
-            volumes: [],
+            labels: [],
             hasNewSegments: false,
             segments: [segment],
             selectedSegmentNumber: segmentNumber,
             viewHelper: new dwv.MaskSegmentViewHelper()
           };
-          watchVolumes(dataId);
+          watchData(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -279,7 +278,7 @@ test.dataModelUI.Segmentation = function (app) {
           // segmentation created with add segmentation
           if (typeof segmentation.dataId === 'undefined') {
             segmentation.dataId = dataId;
-            watchVolumes(dataId);
+            watchData(dataId);
             for (const segment of segmentation.segments) {
               segHelper.addSegment(segment);
             }
@@ -293,12 +292,12 @@ test.dataModelUI.Segmentation = function (app) {
           // loaded segmentation
           const segmentation = {
             dataId: dataId,
-            volumes: [],
+            labels: [],
             hasNewSegments: true,
             segments: imgMeta.custom.segments,
             viewHelper: new dwv.MaskSegmentViewHelper()
           };
-          watchVolumes(dataId);
+          watchData(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
@@ -343,7 +342,7 @@ test.dataModelUI.Segmentation = function (app) {
       // new segmentation
       const segmentation = {
         dataId: undefined,
-        volumes: [],
+        labels: [],
         hasNewSegments: true,
         segments: [getNewSegment(1)],
         viewHelper: new dwv.MaskSegmentViewHelper()
@@ -581,7 +580,7 @@ test.dataModelUI.Segmentation = function (app) {
       segmentSpan.remove();
     }
 
-    watchVolumes(segmentation.dataId);
+    watchData(segmentation.dataId);
 
     // select first segment
     const spanChildren = spanParent.childNodes;
@@ -672,25 +671,25 @@ test.dataModelUI.Segmentation = function (app) {
 
     const gotoButton = document.createElement('button');
     gotoButton.id = test.getHtmlId(prefixes.goto, segmentId);
-    gotoButton.title = 'Goto first volume';
+    gotoButton.title = 'Goto segment';
     gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
     gotoButton.onclick = function (_event) {
       const segmentation = _segmentations[segmentationIndex];
 
-      // Find the first volume for this segment
-      const volume =
-        segmentation.volumes.find((volume) => {
-          return volume.segment === segment.number;
+      // Find the first label for this segment
+      const label =
+        segmentation.labels.find((item) => {
+          return item.id === segment.number;
         });
 
-      if (typeof volume !== 'undefined') {
+      if (typeof label !== 'undefined') {
         const dataId = segmentation.dataId;
         const drawLayers = app.getViewLayersByDataId(dataId);
         for (const layer of drawLayers) {
-          layer.setCurrentPosition(volume.centroid);
+          layer.setCurrentPosition(label.centroid);
         }
       } else {
-        console.log('No segment volumes to go to');
+        console.log('No label for this segment');
       }
     };
 
@@ -816,36 +815,36 @@ test.dataModelUI.Segmentation = function (app) {
   }
 
   /**
-   * Convert the volumes of a segmentation into a displayable string.
+   * Convert the labels of a segmentation into a displayable string.
    *
    * @param {object} segmentation The segmentation.
-   * @returns {string} The display string of volumes.
+   * @returns {string} The display string of labels.
    */
-  function createVolumesString(segmentation) {
+  function createLabelsString(segmentation) {
     const mlStrings =
-      segmentation.volumes.map(
-        (volume) => {
+      segmentation.labels.map(
+        (label) => {
           return `s${
-            volume.segment
+            label.id
           }: ${
-            volume.volume.toPrecision(4)
+            label.volume.toPrecision(4)
           }ml at [${
-            volume.centroid.get(0).toPrecision(4)
+            label.centroid.get(0).toPrecision(4)
           }mm, ${
-            volume.centroid.get(1).toPrecision(4)
+            label.centroid.get(1).toPrecision(4)
           }mm, ${
-            volume.centroid.get(2).toPrecision(4)
+            label.centroid.get(2).toPrecision(4)
           }mm]`;
         });
-    return 'Volumes: ' + mlStrings.join(', ');
+    return 'Labels: ' + mlStrings.join(', ');
   }
 
   /**
-   * Updates the text of the volumes diplay for a segmentation.
+   * Updates the text of the labels diplay for a segmentation.
    *
    * @param {object} segmentation The segmentation.
    */
-  function updateVolumesSpan(segmentation) {
+  function updateLabelsSpan(segmentation) {
     const segmentationIndex =
       _segmentations.findIndex(
         (seg) => {
@@ -859,7 +858,7 @@ test.dataModelUI.Segmentation = function (app) {
 
       const element = document.getElementById(elementName);
       if (element) {
-        element.innerText = createVolumesString(segmentation);
+        element.innerText = createLabelsString(segmentation);
       }
     }
   }
@@ -927,7 +926,7 @@ test.dataModelUI.Segmentation = function (app) {
     // volumes display
     const volumesSpan = document.createElement('span');
     volumesSpan.id = test.getHtmlId(prefixes.volumes, segmentationName);
-    volumesSpan.innerText = createVolumesString(segmentation);
+    volumesSpan.innerText = createLabelsString(segmentation);
     actionSpan.appendChild(volumesSpan);
 
     // append span to item

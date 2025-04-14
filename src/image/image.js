@@ -9,7 +9,7 @@ import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
 import {isMonochrome} from '../dicom/dicomImage';
-import {Volumes} from '../image/volumes';
+import {LabelingThread} from './labelingThread';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -241,11 +241,11 @@ export class Image {
   #listenerHandler = new ListenerHandler();
 
   /**
-   * The volumes calculator for the mask.
+   * The labeling thread.
    *
-   * @type {Volumes}
+   * @type {LabelingThread}
    */
-  #volumes;
+  #labelingThread;
 
   /**
    * @param {Geometry} geometry The geometry of the image.
@@ -256,7 +256,7 @@ export class Image {
     this.#geometry = geometry;
     this.#buffer = buffer;
     this.#imageUids = imageUids;
-    this.#volumes = null;
+    this.#labelingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
       this.#geometry.getSize().getTotalSize());
@@ -1608,11 +1608,11 @@ export class Image {
   }
 
   /**
-   * Recalculate volumes for a specific mask.
+   * Recalculate labels.
    */
-  recalculateVolumes() {
-    if (this.#volumes === null) {
-      this.#volumes = new Volumes();
+  recalculateLabels() {
+    if (this.#labelingThread === null) {
+      this.#labelingThread = new LabelingThread();
 
       const spacing = this.#geometry.getSpacing();
       const mlVoxelVolume =
@@ -1621,30 +1621,30 @@ export class Image {
         spacing.get(2) *
         ML_PER_MM;
 
-      this.#volumes.onVolumeCalculation = (event) => {
-        const volumes = event.data.volumes;
+      this.#labelingThread.ondone = (event) => {
+        const labels = event.data.labels;
         // add centroid point and volume
-        for (const volume of volumes) {
-          volume.centroid = this.#geometry.indexToWorld(
-            new Index(volume.centroidIndex));
-          volume.volume = volume.count * mlVoxelVolume;
+        for (const label of labels) {
+          label.centroid = this.#geometry.indexToWorld(
+            new Index(label.centroidIndex));
+          label.volume = label.count * mlVoxelVolume;
         }
         // sort
-        const volumesSorted =
-          volumes.sort((v1, v2) => {
+        const labelsSorted =
+          labels.sort((v1, v2) => {
             return v2.volume - v1.volume;
           }).sort((v1, v2) => {
             return v1.segment - v2.segment;
           });
 
         this.#fireEvent({
-          type: 'volumesChanged',
-          volumes: volumesSorted
+          type: 'labelschanged',
+          labels: labelsSorted
         });
       };
     }
 
-    this.#volumes.calculateVolumes(this.#buffer, this.#geometry.getSize());
+    this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
   }
 
 } // class Image
