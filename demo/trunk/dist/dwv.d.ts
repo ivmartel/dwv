@@ -6327,9 +6327,9 @@ export declare class Volumes {
      *
      * @param {TypedArray} imageBuffer The buffer the segmentation to
      *  calculate volumes for.
-     * @param {Geometry} geometry The geometry of the segmentation.
+     * @param {Size} size The image size.
      */
-    calculateVolumes(imageBuffer: TypedArray, geometry: Geometry): void;
+    calculateVolumes(imageBuffer: TypedArray, size: Size): void;
     /**
      * Handle a completed volume calculation. Default behavior is do nothing,
      * this is meant to be overridden.

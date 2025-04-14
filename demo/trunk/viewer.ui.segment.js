@@ -685,11 +685,9 @@ test.dataModelUI.Segmentation = function (app) {
 
       if (typeof volume !== 'undefined') {
         const dataId = segmentation.dataId;
-        const volCentroid = volume.centroid;
-        const volCentroidPoint = new dwv.Point(volCentroid);
         const drawLayers = app.getViewLayersByDataId(dataId);
         for (const layer of drawLayers) {
-          layer.setCurrentPosition(volCentroidPoint);
+          layer.setCurrentPosition(volume.centroid);
         }
       } else {
         console.log('No segment volumes to go to');
@@ -832,11 +830,11 @@ test.dataModelUI.Segmentation = function (app) {
           }: ${
             volume.volume.toPrecision(4)
           }ml at [${
-            volume.centroid[0].toPrecision(4)
+            volume.centroid.get(0).toPrecision(4)
           }mm, ${
-            volume.centroid[1].toPrecision(4)
+            volume.centroid.get(1).toPrecision(4)
           }mm, ${
-            volume.centroid[2].toPrecision(4)
+            volume.centroid.get(2).toPrecision(4)
           }mm]`;
         });
     return 'Volumes: ' + mlStrings.join(', ');
