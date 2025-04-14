@@ -2985,9 +2985,9 @@ declare class Image_2 {
      */
     compose(rhs: Image_2, operator: Function): Image_2;
     /**
-     * Recalculate volumes for a specific mask.
+     * Recalculate labels.
      */
-    recalculateVolumes(): void;
+    recalculateLabels(): void;
     #private;
 }
 export { Image_2 as Image }
@@ -3092,6 +3092,28 @@ export declare class Index {
  * @returns {boolean} True if both colour are equal.
  */
 export declare function isEqualRgb(c1: RGB, c2: RGB): boolean;
+
+/**
+ * Labeling thread.
+ */
+export declare class LabelingThread {
+    /**
+     * Trigger a labels recalculation.
+     *
+     * @param {TypedArray} imageBuffer The buffer to label.
+     * @param {Size} size The image size.
+     */
+    run(imageBuffer: TypedArray, size: Size): void;
+    /**
+     * Handle a completed labeling. Default behavior is do nothing,
+     * this is meant to be overridden.
+     *
+     * @param {object} _event The work item event fired when a labeling
+     *   calculation is completed. Event.data should contain a 'lebels' item.
+     */
+    ondone(_event: object): void;
+    #private;
+}
 
 /**
  * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
@@ -6315,29 +6337,6 @@ export declare class ViewLayer {
      * Clear the context.
      */
     clear(): void;
-    #private;
-}
-
-/**
- * Volumes (and other related values) calculator for segmentations.
- */
-export declare class Volumes {
-    /**
-     * Trigger a volume recalculation.
-     *
-     * @param {TypedArray} imageBuffer The buffer the segmentation to
-     *  calculate volumes for.
-     * @param {Size} size The image size.
-     */
-    calculateVolumes(imageBuffer: TypedArray, size: Size): void;
-    /**
-     * Handle a completed volume calculation. Default behavior is do nothing,
-     * this is meant to be overridden.
-     *
-     * @param {object} _event The work item event fired when a volume
-     *   calculation is completed. Event.data should contain a 'volumes' item.
-     */
-    onVolumeCalculation(_event: object): void;
     #private;
 }
 
