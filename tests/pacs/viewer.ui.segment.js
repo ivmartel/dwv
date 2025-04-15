@@ -495,6 +495,36 @@ test.dataModelUI.Segmentation = function (app) {
   }
 
   /**
+   * Handle a goto segment.
+   *
+   * @param {MouseEvent} event HTML event.
+   */
+  function onGotoSegment(event) {
+    const target = event.target;
+    // get segment
+    const indices = splitSegmentHtmlId(
+      test.getRootFromHtmlId(prefixes.goto, target.id));
+    const segmentation = _segmentations[indices.segmentationIndex];
+    const segment = getSegment(indices.segmentNumber, segmentation.segments);
+
+    // Find the first label for this segment
+    const label =
+      segmentation.labels.find((item) => {
+        return item.id === segment.number;
+      });
+
+    if (typeof label !== 'undefined') {
+      const dataId = segmentation.dataId;
+      const drawLayers = app.getViewLayersByDataId(dataId);
+      for (const layer of drawLayers) {
+        layer.setCurrentPosition(label.centroid);
+      }
+    } else {
+      console.log('No label for this segment');
+    }
+  }
+
+  /**
    * Handle a segment view change from UI.
    *
    * @param {MouseEvent} event HTML event.
@@ -662,6 +692,13 @@ test.dataModelUI.Segmentation = function (app) {
     viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
     viewButton.onclick = onSegmentViewChange;
 
+    // goto segment
+    const gotoButton = document.createElement('button');
+    gotoButton.id = test.getHtmlId(prefixes.goto, segmentId);
+    gotoButton.title = 'Goto segment';
+    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
+    gotoButton.onclick = onGotoSegment;
+
     // segment delete
     const deleteButton = document.createElement('button');
     deleteButton.id = test.getHtmlId(prefixes.delete, segmentId);
@@ -669,39 +706,15 @@ test.dataModelUI.Segmentation = function (app) {
     deleteButton.appendChild(document.createTextNode('\u{274C}'));
     deleteButton.onclick = onSegmentDelete;
 
-    const gotoButton = document.createElement('button');
-    gotoButton.id = test.getHtmlId(prefixes.goto, segmentId);
-    gotoButton.title = 'Goto segment';
-    gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
-    gotoButton.onclick = function (_event) {
-      const segmentation = _segmentations[segmentationIndex];
-
-      // Find the first label for this segment
-      const label =
-        segmentation.labels.find((item) => {
-          return item.id === segment.number;
-        });
-
-      if (typeof label !== 'undefined') {
-        const dataId = segmentation.dataId;
-        const drawLayers = app.getViewLayersByDataId(dataId);
-        for (const layer of drawLayers) {
-          layer.setCurrentPosition(label.centroid);
-        }
-      } else {
-        console.log('No label for this segment');
-      }
-    };
-
     // segment span
     const span = document.createElement('span');
     span.id = test.getHtmlId(prefixes.span, segmentId);
     span.appendChild(selectInput);
     span.appendChild(selectLabel);
     span.appendChild(colourInput);
+    span.appendChild(gotoButton);
     span.appendChild(viewButton);
     span.appendChild(deleteButton);
-    span.appendChild(gotoButton);
 
     return span;
   }
