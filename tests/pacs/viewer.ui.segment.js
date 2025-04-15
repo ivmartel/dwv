@@ -102,7 +102,7 @@ const prefixes = {
   addSegment: 'add-segment-',
   selectEraser: 'select-eraser-',
   save: 'save-',
-  volumes: 'span-volumes',
+  volumes: 'span-volumes-',
   goto: 'gotob-'
 };
 
@@ -676,6 +676,11 @@ test.dataModelUI.Segmentation = function (app) {
     selectLabel.title = selectInput.title;
     selectLabel.appendChild(document.createTextNode(segment.label));
 
+    // volumes display
+    const volumesSpan = document.createElement('span');
+    volumesSpan.id = test.getHtmlId(prefixes.volumes, segmentId);
+    volumesSpan.innerText = getLabelsString(segment, segmentationIndex);
+
     // segment colour
     const colourInput = document.createElement('input');
     colourInput.type = 'color';
@@ -711,6 +716,7 @@ test.dataModelUI.Segmentation = function (app) {
     span.id = test.getHtmlId(prefixes.span, segmentId);
     span.appendChild(selectInput);
     span.appendChild(selectLabel);
+    span.appendChild(volumesSpan);
     span.appendChild(colourInput);
     span.appendChild(gotoButton);
     span.appendChild(viewButton);
@@ -830,26 +836,31 @@ test.dataModelUI.Segmentation = function (app) {
   /**
    * Convert the labels of a segmentation into a displayable string.
    *
-   * @param {object} segmentation The segmentation.
+   * @param {object} segment The segment.
+   * @param {number} segmentationIndex The segmentation index.
    * @returns {string} The display string of labels.
    */
-  function createLabelsString(segmentation) {
-    const mlStrings =
-      segmentation.labels.map(
-        (label) => {
-          return `s${
-            label.id
-          }: ${
-            label.volume.toPrecision(4)
-          }ml at [${
-            label.centroid.get(0).toPrecision(4)
-          }mm, ${
-            label.centroid.get(1).toPrecision(4)
-          }mm, ${
-            label.centroid.get(2).toPrecision(4)
-          }mm]`;
-        });
-    return 'Labels: ' + mlStrings.join(', ');
+  function getLabelsString(segment, segmentationIndex) {
+    const segmentation = _segmentations[segmentationIndex];
+    const start = ' [';
+
+    let res = start;
+    for (const label of segmentation.labels) {
+      if (label.id === segment.number) {
+        if (res !== start) {
+          res += ', ';
+        }
+        res += label.volume.toPrecision(4) + 'ml';
+      }
+    }
+    res += ']';
+
+    // clear if empty
+    if (res === start + ']') {
+      res = '';
+    }
+
+    return res;
   }
 
   /**
@@ -866,12 +877,13 @@ test.dataModelUI.Segmentation = function (app) {
       );
 
     if (segmentationIndex >= 0) {
-      const segmentationName = getSegmentationHtmlId(segmentationIndex);
-      const elementName = test.getHtmlId(prefixes.volumes, segmentationName);
-
-      const element = document.getElementById(elementName);
-      if (element) {
-        element.innerText = createLabelsString(segmentation);
+      for (const segment of segmentation.segments) {
+        const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
+        const spanId = test.getHtmlId(prefixes.volumes, segmentId);
+        const span = document.getElementById(spanId);
+        if (span) {
+          span.innerText = getLabelsString(segment, segmentationIndex);
+        }
       }
     }
   }
@@ -935,12 +947,6 @@ test.dataModelUI.Segmentation = function (app) {
     actionSpan.appendChild(eraserInput);
     actionSpan.appendChild(eraserLabel);
     actionSpan.appendChild(addSegmentButton);
-
-    // volumes display
-    const volumesSpan = document.createElement('span');
-    volumesSpan.id = test.getHtmlId(prefixes.volumes, segmentationName);
-    volumesSpan.innerText = createLabelsString(segmentation);
-    actionSpan.appendChild(volumesSpan);
 
     // append span to item
     segmentationItem.appendChild(actionSpan);
