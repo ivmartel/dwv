@@ -1634,7 +1634,7 @@ export class Image {
           labels.sort((v1, v2) => {
             return v2.volume - v1.volume;
           }).sort((v1, v2) => {
-            return v1.segment - v2.segment;
+            return v1.id - v2.id;
           });
 
         this.#fireEvent({
