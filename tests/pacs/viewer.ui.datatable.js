@@ -302,6 +302,11 @@ export class DataTableUI {
             getLayerUpdate(index, divId, Orientation.Coronal));
           parent.appendChild(
             getLayerUpdate(index, divId, Orientation.Sagittal));
+
+          cell.append(document.createElement('br'));
+          cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup0'));
+          cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup1'));
+          cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup2'));
         }
       };
       return button;
@@ -343,6 +348,29 @@ export class DataTableUI {
       return button;
     };
 
+    // get a layer move button
+    const getLayerMove = function (index, fromDivId, toDivId) {
+      const button = document.createElement('button');
+      button.name = 'layermv-' + index;
+      button.id = 'layermv-' + fromDivId + '-' + dataId + '-' + toDivId;
+      button.title = 'Add layer';
+      const number = toDivId[toDivId.length - 1];
+      button.appendChild(document.createTextNode('->LG' + number));
+      button.onclick = function () {
+        // update app
+        app.removeDataViewConfig(dataId, fromDivId);
+        app.addDataViewConfig(dataId, test.getViewConfig(layout, toDivId));
+        // update html
+        const parent = button.parentElement;
+        if (parent) {
+          parent.replaceChildren();
+          parent.appendChild(getLayerAdd(index, fromDivId));
+          // TODO update toDivId
+        }
+      };
+      return button;
+    };
+
     // cell: id
     cell = row.insertCell();
     cell.appendChild(document.createTextNode(dataId));
@@ -375,6 +403,11 @@ export class DataTableUI {
           }
           cell.appendChild(button);
         }
+
+        cell.append(document.createElement('br'));
+        cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup0'));
+        cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup1'));
+        cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup2'));
       } else {
         cell.appendChild(getLayerAdd(i, layerGroupDivId));
       }
