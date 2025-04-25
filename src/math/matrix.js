@@ -281,6 +281,7 @@ export class Matrix33 {
    * @returns {Matrix33} The simplified matrix.
    */
   asOneAndZeros() {
+    // TODO: This breaks at 45 degree angles
     const res = [];
     for (let j = 0; j < 3; ++j) {
       const max = this.getRowAbsMax(j);

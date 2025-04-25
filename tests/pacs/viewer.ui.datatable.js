@@ -386,11 +386,23 @@ export class DataTableUI {
         const r = 1.0 / Math.sqrt(2);
 
         // Roughly 45 degrees on the x axis
+        // const rotation = new dwv.Matrix33([
+        //   1, 0, 0,
+        //   0, r, -r,
+        //   0, r, r
+        // ]);
+
         const rotation = new dwv.Matrix33([
           1, 0, 0,
-          0, r, -r,
-          0, r, r
+          0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
+          0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
         ]);
+
+        // const rotation = new dwv.Matrix33([
+        //   1, 0, 0,
+        //   0, 0, -1,
+        //   0, 1, 0
+        // ]);
 
         // const rotation = new dwv.Matrix33([
         //   r, 0, r,

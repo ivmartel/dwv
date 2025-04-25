@@ -1672,7 +1672,7 @@ export class Image {
     const ret = this.#resamplingThread.run(
       this.#buffer,
       this.#geometry,
-      this.#meta,
+      this.#meta.PixelRepresentation,
       orientation
     );
 
