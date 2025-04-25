@@ -267,9 +267,22 @@ export class Geometry {
    */
   getRealSpacing() {
     // asOneAndZeros to not change spacing values...
-    return this.getSpacing(
-      this.#orientation.getInverse().asOneAndZeros()
-    );
+    // return this.getSpacing(
+    //   this.#orientation.getInverse().asOneAndZeros()
+    // );
+
+    let orientedValues = this.#orientation
+      .asOneAndZeros()
+      .multiplyArray3D(
+        [
+          this.#spacing.get(0),
+          this.#spacing.get(1),
+          this.#spacing.get(2)
+        ]);
+    orientedValues = orientedValues.map(Math.abs);
+    const spacing = new Spacing(orientedValues);
+
+    return spacing;
   }
 
   /**

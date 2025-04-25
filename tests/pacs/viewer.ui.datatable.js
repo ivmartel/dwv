@@ -303,10 +303,12 @@ export class DataTableUI {
           parent.appendChild(
             getLayerUpdate(index, divId, Orientation.Sagittal));
 
+          cell.append(getLayerRotate(index, divId));
+
           cell.append(document.createElement('br'));
-          cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup0'));
-          cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup1'));
-          cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup2'));
+          cell.appendChild(getLayerMove(index, divId, 'layerGroup0'));
+          cell.appendChild(getLayerMove(index, divId, 'layerGroup1'));
+          cell.appendChild(getLayerMove(index, divId, 'layerGroup2'));
         }
       };
       return button;
@@ -371,6 +373,67 @@ export class DataTableUI {
       return button;
     };
 
+    const getLayerRotate = function(index, divId) {
+      const button = document.createElement('button');
+      button.name = 'rotate-' + index;
+      button.id = 'rotate-' + divId + '-' + dataId;
+      button.title = 'Rotate Test';
+      button.appendChild(document.createTextNode('R'));
+      button.onclick = function () {
+        const image = app.getImage(dataId);
+        const geometry = image.getGeometry();
+
+        const r = 1.0 / Math.sqrt(2);
+
+        // Roughly 45 degrees on the x axis
+        const rotation = new dwv.Matrix33([
+          1, 0, 0,
+          0, r, -r,
+          0, r, r
+        ]);
+
+        // const rotation = new dwv.Matrix33([
+        //   r, 0, r,
+        //   0, 1, 0,
+        //   -r, 0, r
+        // ]);
+
+        // const rotation = new dwv.Matrix33([
+        //   r, -r, 0,
+        //   r, r, 0,
+        //   0, 0, 1
+        // ]);
+
+        // const rotation = new dwv.Matrix33([
+        //   Math.cos(Math.PI / 3), -Math.sin(Math.PI / 3), 0,
+        //   Math.sin(Math.PI / 3), Math.cos(Math.PI / 3), 0,
+        //   0, 0, 1
+        // ]);
+
+        const newOrientation = rotation.multiply(geometry.getOrientation());
+        console.log(newOrientation.getValues());
+        const newImage = image.resample(newOrientation);
+        console.log(newImage);
+
+        app.setImage(dataId, newImage);
+
+        // After we set the image we need to reset the views
+        // so it correctly updates with the new metadata
+
+        // // reset the views
+        const configs = app.getDataViewConfigs();
+        app.setDataViewConfigs(configs);
+
+        // render data (creates layers)
+        const dataIds = app.getDataIds();
+        for (let i = 0; i < dataIds.length; ++i) {
+          app.render(dataIds[i]);
+        }
+      };
+      return button;
+      
+    }
+
     // cell: id
     cell = row.insertCell();
     cell.appendChild(document.createTextNode(dataId));
@@ -403,6 +466,8 @@ export class DataTableUI {
           }
           cell.appendChild(button);
         }
+
+        cell.append(getLayerRotate(i, layerGroupDivId));
 
         cell.append(document.createElement('br'));
         cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup0'));

@@ -305,6 +305,15 @@ export class Matrix33 {
     return this.getColAbsMax(2).index;
   }
 
+  /**
+   * Get the values of the matrix as an array.
+   *
+   * @returns {number[]} The matrix.
+   */
+  getValues() {
+    return this.#values.slice();
+  }
+
 } // Matrix33
 
 /**

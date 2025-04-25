@@ -10,6 +10,7 @@ import {ImageFactory} from './imageFactory.js';
 import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
+import {ResamplingThread} from './resamplingThread';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -248,6 +249,13 @@ export class Image {
   #labelingThread;
 
   /**
+   * The resampling thread.
+   *
+   * @type {ResamplingThread}
+   */
+  #resamplingThread;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -257,6 +265,7 @@ export class Image {
     this.#buffer = buffer;
     this.#imageUids = imageUids;
     this.#labelingThread = null;
+    this.#resamplingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
       this.#geometry.getSize().getTotalSize());
@@ -1645,6 +1654,33 @@ export class Image {
     }
 
     this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
+  }
+
+  /**
+   * Resample this image to a new orientation
+   *
+   * @param {Matrix33} orientation The orientation to resample to.
+   * @returns {Image} The transformed image.
+   */
+  resample(orientation) {
+    if (this.#resamplingThread === null) {
+      this.#resamplingThread = new ResamplingThread();
+    }
+
+    console.log("POKE meta", this.#meta);
+
+    const ret = this.#resamplingThread.run(
+      this.#buffer,
+      this.#geometry,
+      this.#meta,
+      orientation
+    );
+
+    const newImage = new Image(ret.geometry, ret.buffer, this.#imageUids);
+    // TODO: not fully accurate
+    newImage.setMeta(this.#meta);
+
+    return newImage;
   }
 
 } // class Image
