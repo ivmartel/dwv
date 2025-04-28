@@ -7,7 +7,7 @@ import { Size } from './size';
 import { getTypedArray } from '../dicom/dicomParser';
 
 //TODO temp
-import { calculateResample } from './resamplingWorker';
+// import { calculateResample } from './resamplingWorker';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -24,7 +24,7 @@ import { calculateResample } from './resamplingWorker';
  * )} TypedArray
  */
 
-// const resamplingWorkerUrl = new URL('./resamplingWorker.js', import.meta.url);
+const resamplingWorkerUrl = new URL('./resamplingWorker.js', import.meta.url);
 
 /**
  * Generate a worker message to send to the resampling worker.
@@ -74,7 +74,9 @@ export function generateWorkerMessage(inImageBuffer, inImageGeometry, outImageBu
     outSpacing:      outImageGeometry.getSpacing().getValues(),
     outOrientation:  outImageGeometry.getOrientation().getValues(),
     outUnitVectors:  outUnitVectors,
-    outTotalSize:    outTotalSize
+    outTotalSize:    outTotalSize,
+
+    interpolate: true // TODO: make configurable
   };
 }
 
@@ -102,8 +104,6 @@ export class ResamplingThread {
    * @param {Geometry} inImageGeometry The current image geometry.
    * @param {string} pixelRepresentation The pixel representation of the original image.
    * @param {Matrix33} outOrientation The orientation to resample to.
-   * 
-   * @returns {object} The transformed image.
    */
   run(inImageBuffer, inImageGeometry, pixelRepresentation, outOrientation) {
     // We can't just pass in an Image or we would get a circular dependency
@@ -197,10 +197,16 @@ export class ResamplingThread {
         outImageGeometry
       )
 
-    calculateResample(workerMessage);
+    this.#threadPool.onworkitem = this.ondone;
+    
+    const workerTask = new WorkerTask(
+      resamplingWorkerUrl,
+      workerMessage,
+      {}
+    );
 
-    // TODO: this should be returned in the callback
-    return { geometry: outImageGeometry, buffer: outImageBuffer };
+    // add it the queue and run it
+    this.#threadPool.addWorkerTask(workerTask);
   }
 
   /**

@@ -11,6 +11,9 @@ import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread';
+import {Geometry} from './geometry';
+import {Size} from './size';
+import {Spacing} from './spacing';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1665,22 +1668,52 @@ export class Image {
   resample(orientation) {
     if (this.#resamplingThread === null) {
       this.#resamplingThread = new ResamplingThread();
+
+      this.#resamplingThread.ondone = (event) => {
+        const data = event.data;
+
+        const outOrigin = new Point3D(
+          data.outOrigin[0],
+          data.outOrigin[1],
+          data.outOrigin[2],
+        );
+        const outSize = new Size(data.outSize);
+        const outSpacing = new Spacing(data.outSpacing);
+        const outOrientation = new Matrix33(data.outOrientation);
+
+        const imageGeometry = new Geometry(
+          [ outOrigin ],
+          outSize,
+          outSpacing,
+          outOrientation,
+        );
+
+        const newImage = new Image(
+          imageGeometry, 
+          data.outImageBuffer, 
+          this.#imageUids // TODO: not fully accurate
+        );
+        // TODO: not fully accurate
+        newImage.setMeta(this.#meta);
+  
+        this.#fireEvent({
+          type: 'imageresampled',
+          image: newImage
+        });
+      };
     }
 
-    console.log("POKE meta", this.#meta);
+    // TODO: If this is an already resampled image we want to resample 
+    //       from the original to not degrade the data further
 
-    const ret = this.#resamplingThread.run(
+    // TODO: How to handle segmentations on resampled images?
+
+    this.#resamplingThread.run(
       this.#buffer,
       this.#geometry,
       this.#meta.PixelRepresentation,
       orientation
     );
-
-    const newImage = new Image(ret.geometry, ret.buffer, this.#imageUids);
-    // TODO: not fully accurate
-    newImage.setMeta(this.#meta);
-
-    return newImage;
   }
 
 } // class Image

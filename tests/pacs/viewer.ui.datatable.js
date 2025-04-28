@@ -36,6 +36,51 @@ export class DataTableUI {
     this.#app = app;
   }
 
+  const watching = {};
+
+  /**
+   * Watch a data for changes.
+   *
+   * @param {string} dataId The data ID.
+   */
+  function watchResample(dataId) {
+    if (!watching[dataId]) {
+      const maskData = app.getData(dataId);
+      if (!maskData) {
+        throw new Error(
+          'No data to watch for dataId: ' + dataId
+        );
+      }
+      const image = maskData.image;
+
+      // Watch for resampling
+      image.addEventListener(
+        'imageresampled',
+        (event) => {
+          console.log(event.image);
+          app.setImage(dataId, event.image);
+
+          // After we set the image we need to reset the views
+          // so it correctly updates with the new metadata
+
+          // reset the views
+          const configs = app.getDataViewConfigs();
+          app.setDataViewConfigs(configs);
+
+          // render data (creates layers)
+          const dataIds = app.getDataIds();
+          for (let i = 0; i < dataIds.length; ++i) {
+            app.render(dataIds[i]);
+          }
+        }
+      );
+
+      watching[dataId] = true;
+    } else {
+      console.log('Already watching data', dataId);
+    }
+  }
+
   /**
    * Bind app to ui.
    *
@@ -231,6 +276,9 @@ export class DataTableUI {
     //   this.registerListeners();
     // }
 
+    
+    watchResample(dataId);
+
     const image = this.#app.getData(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
@@ -383,6 +431,8 @@ export class DataTableUI {
         const image = app.getImage(dataId);
         const geometry = image.getGeometry();
 
+        console.log("POKE orientation", geometry.getOrientation().getValues());
+
         const r = 1.0 / Math.sqrt(2);
 
         // Roughly 45 degrees on the x axis
@@ -392,47 +442,37 @@ export class DataTableUI {
         //   0, r, r
         // ]);
 
-        const rotation = new dwv.Matrix33([
-          1, 0, 0,
-          0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
-          0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
-        ]);
+        // const rotation = new dwv.Matrix33([
+        //   1, 0, 0,
+        //   0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
+        //   0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
+        // ]);
 
         // const rotation = new dwv.Matrix33([
         //   1, 0, 0,
-        //   0, 0, -1,
-        //   0, 1, 0
+        //   0, Math.cos(Math.PI * 0.10), -Math.sin(Math.PI * 0.10),
+        //   0, Math.sin(Math.PI * 0.10), Math.cos(Math.PI * 0.10)
         // ]);
 
-        // const rotation = new dwv.Matrix33([
-        //   r, 0, r,
-        //   0, 1, 0,
-        //   -r, 0, r
-        // ]);
+        const rotation = new dwv.Matrix33([ 0.99944913387298, -0.0245764087885, 0.022304242167126388, 0.03116803057491, 0.92595130205154, -0.37635459979833125, -0.0114031974226, 0.37684243917465, 0.9262072251045111 ]);
 
-        // const rotation = new dwv.Matrix33([
-        //   r, -r, 0,
-        //   r, r, 0,
-        //   0, 0, 1
-        // ]);
-
-        // const rotation = new dwv.Matrix33([
-        //   Math.cos(Math.PI / 3), -Math.sin(Math.PI / 3), 0,
-        //   Math.sin(Math.PI / 3), Math.cos(Math.PI / 3), 0,
-        //   0, 0, 1
-        // ]);
+        // const rotation = new dwv.Matrix33([ 0.99944913387298, -0.0302084013819, 0.01374524186559406, 0.03116803243756, 0.99662119150161, -0.07599211905169626, -0.0114031983539, 0.07637866586446, 0.9970137230798992 ]);
 
         const newOrientation = rotation.multiply(geometry.getOrientation());
-        console.log(newOrientation.getValues());
-        const newImage = image.resample(newOrientation);
-        console.log(newImage);
+        image.resample(newOrientation);
+      };
+      return button;
+      
+    }
 
-        app.setImage(dataId, newImage);
-
-        // After we set the image we need to reset the views
-        // so it correctly updates with the new metadata
-
-        // // reset the views
+    const getReset = function(index, divId) {
+      const button = document.createElement('button');
+      button.name = 'reset-' + index;
+      button.id = 'reset-' + divId + '-' + dataId;
+      button.title = 'Reset Test';
+      button.appendChild(document.createTextNode('@'));
+      button.onclick = function () {
+        // reset the views
         const configs = app.getDataViewConfigs();
         app.setDataViewConfigs(configs);
 
@@ -479,6 +519,7 @@ export class DataTableUI {
           cell.appendChild(button);
         }
 
+        cell.append(getReset(i, layerGroupDivId));
         cell.append(getLayerRotate(i, layerGroupDivId));
 
         cell.append(document.createElement('br'));
