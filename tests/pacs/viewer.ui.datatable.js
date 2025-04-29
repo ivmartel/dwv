@@ -433,32 +433,36 @@ export class DataTableUI {
 
         console.log("POKE orientation", geometry.getOrientation().getValues());
 
-        const r = 1.0 / Math.sqrt(2);
-
-        // Roughly 45 degrees on the x axis
-        // const rotation = new dwv.Matrix33([
-        //   1, 0, 0,
-        //   0, r, -r,
-        //   0, r, r
-        // ]);
-
         // const rotation = new dwv.Matrix33([
         //   1, 0, 0,
         //   0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
         //   0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
         // ]);
 
+        const rotation = new dwv.Matrix33([
+          1, 0, 0,
+          0, Math.cos(Math.PI * 0.13), -Math.sin(Math.PI * 0.13),
+          0, Math.sin(Math.PI * 0.13), Math.cos(Math.PI * 0.13)
+        ]);
+
         // const rotation = new dwv.Matrix33([
         //   1, 0, 0,
-        //   0, Math.cos(Math.PI * 0.10), -Math.sin(Math.PI * 0.10),
-        //   0, Math.sin(Math.PI * 0.10), Math.cos(Math.PI * 0.10)
+        //   0, Math.cos(Math.PI * 0.12), -Math.sin(Math.PI * 0.12),
+        //   0, Math.sin(Math.PI * 0.12), Math.cos(Math.PI * 0.12)
         // ]);
 
-        const rotation = new dwv.Matrix33([ 0.99944913387298, -0.0245764087885, 0.022304242167126388, 0.03116803057491, 0.92595130205154, -0.37635459979833125, -0.0114031974226, 0.37684243917465, 0.9262072251045111 ]);
-
-        // const rotation = new dwv.Matrix33([ 0.99944913387298, -0.0302084013819, 0.01374524186559406, 0.03116803243756, 0.99662119150161, -0.07599211905169626, -0.0114031983539, 0.07637866586446, 0.9970137230798992 ]);
+        // const rotation = new dwv.Matrix33([
+        //   Math.cos(Math.PI * 0.10), -Math.sin(Math.PI * 0.10), 0,
+        //   Math.sin(Math.PI * 0.10), Math.cos(Math.PI * 0.10), 0,
+        //   0, 0, 1
+        // ]);
 
         const newOrientation = rotation.multiply(geometry.getOrientation());
+
+        // const newOrientation = new dwv.Matrix33([ 0.99944913387298, -0.0245764087885, 0.022304242167126388, 0.03116803057491, 0.92595130205154, -0.37635459979833125, -0.0114031974226, 0.37684243917465, 0.9262072251045111 ]);
+
+        // const newOrientation = new dwv.Matrix33([ 0.99944913387298, -0.0302084013819, 0.01374524186559406, 0.03116803243756, 0.99662119150161, -0.07599211905169626, -0.0114031983539, 0.07637866586446, 0.9970137230798992 ]);
+        
         image.resample(newOrientation);
       };
       return button;

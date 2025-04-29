@@ -164,6 +164,7 @@ export class ViewController {
    * @param {string} name The name of the preset to activate.
    */
   setWindowLevelPreset(name) {
+    console.log("POKE preset", name);
     this.#view.setWindowLevelPreset(name);
   }
 

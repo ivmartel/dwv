@@ -5,6 +5,7 @@ import { Point3D } from '../math/point';
 import { Geometry } from './geometry';
 import { Size } from './size';
 import { getTypedArray } from '../dicom/dicomParser';
+import { Spacing } from './spacing';
 
 //TODO temp
 // import { calculateResample } from './resamplingWorker';
@@ -111,15 +112,27 @@ export class ResamplingThread {
     const iOutOrientation = outOrientation.getInverse();
     const relativeMatrix = iOutOrientation.multiply(inImageGeometry.getOrientation());
 
+    const inSize = inImageGeometry.getSize();
+    const inSpacing = inImageGeometry.getSpacing();
+
+    // Calculate updated spacing
+    //---------------------------------
+    const inSpacingArr = [
+      inSpacing.get(0),
+      inSpacing.get(1),
+      inSpacing.get(2),
+    ]
+
+    const outSpacingArr = relativeMatrix.multiplyArray3D(inSpacingArr);
+    const outSpacing = new Spacing(outSpacingArr);
+
     // Calculate updated size
     //---------------------------------
-    const inSize = inImageGeometry.getSize();
-
     // The index coords of the bound if the center was at 0,0
     const boundIndex = [
-      inSize.get(0) / 2.0,
-      inSize.get(1) / 2.0,
-      inSize.get(2) / 2.0,
+      (inSize.get(0) / 2.0) * inSpacing.get(0),
+      (inSize.get(1) / 2.0) * inSpacing.get(1),
+      (inSize.get(2) / 2.0) * inSpacing.get(2),
     ];
 
     const maxBounds = [0.0, 0.0, 0.0];
@@ -147,24 +160,24 @@ export class ResamplingThread {
     }
 
     const outSize = new Size([
-      Math.ceil(Math.abs(maxBounds[0] - minBounds[0])),
-      Math.ceil(Math.abs(maxBounds[1] - minBounds[1])),
-      Math.ceil(Math.abs(maxBounds[2] - minBounds[2]))
+      Math.ceil(Math.abs((maxBounds[0] - minBounds[0]) / outSpacing.get(0))),
+      Math.ceil(Math.abs((maxBounds[1] - minBounds[1]) / outSpacing.get(1))),
+      Math.ceil(Math.abs((maxBounds[2] - minBounds[2]) / outSpacing.get(2)))
     ]);
 
     // Calculate updated origin
     //---------------------------------
     const outOriginIndexCentered = new Point3D(
-      -((outSize.get(0) - 1)/2.0),
-      -((outSize.get(1) - 1)/2.0),
-      -((outSize.get(2) - 1)/2.0),
+      -(outSize.get(0)/2.0) * outSpacing.get(0),
+      -(outSize.get(1)/2.0) * outSpacing.get(1),
+      -(outSize.get(2)/2.0) * outSpacing.get(2),
     )
     const outOriginIndexOriented = relativeMatrix.getInverse().multiplyPoint3D(outOriginIndexCentered);
 
     const outOriginInIndex = new Index([
-      Math.round(outOriginIndexOriented.getX() + ((inSize.get(0) - 1)/2.0)),
-      Math.round(outOriginIndexOriented.getY() + ((inSize.get(0) - 1)/2.0)),
-      Math.round(outOriginIndexOriented.getZ() + ((inSize.get(0) - 1)/2.0)),
+      Math.floor((outOriginIndexOriented.getX() / inSpacing.get(0)) + (inSize.get(0)/2.0)),
+      Math.floor((outOriginIndexOriented.getY() / inSpacing.get(1)) + (inSize.get(0)/2.0)),
+      Math.floor((outOriginIndexOriented.getZ() / inSpacing.get(2)) + (inSize.get(0)/2.0)),
     ]);
     const outOrigin = inImageGeometry.indexToWorld(outOriginInIndex).get3D();
 
@@ -179,12 +192,12 @@ export class ResamplingThread {
       throw new Error('Cannot reallocate data for image resampling.');
     }
 
-    outImageBuffer.fill(0);
-
+    outImageBuffer.fill(100);
+    
     const outImageGeometry = new Geometry(
       [ outOrigin ],
       outSize,
-      inImageGeometry.getSpacing(),
+      outSpacing,
       outOrientation,
     );
 

@@ -117,6 +117,15 @@ class Matrix33 {
     }
     return values;
   }
+
+  /**
+   * Get the values of the matrix as an array.
+   *
+   * @returns {number[]} The matrix.
+   */
+  getValues() {
+    return this.#values.slice();
+  }
 } // Matrix33
 
 
@@ -176,6 +185,10 @@ function calculateResample(workerMessage) {
   const outSize = workerMessage.outSize;
   const inUnitVectors = workerMessage.inUnitVectors;
   const outUnitVectors = workerMessage.outUnitVectors;
+  const inOrigin = workerMessage.inOrigin;
+  const outOrigin = workerMessage.outOrigin;
+  const inSpacing = workerMessage.inSpacing;
+  const outSpacing = workerMessage.outSpacing;
 
   const interpolate = workerMessage.interpolate;
 
@@ -183,8 +196,8 @@ function calculateResample(workerMessage) {
   const inMatrix = new Matrix33(workerMessage.inOrientation);
   const outMatrix = new Matrix33(workerMessage.outOrientation);
 
-  const ioutMatrix = outMatrix.getInverse();
-  const relativeMatrix = ioutMatrix.multiply(inMatrix);
+  const iInMatrix = inMatrix.getInverse();
+  const relativeMatrix = outMatrix.multiply(iInMatrix);
 
   for (let x = 0; x < outSize[0]; x++) {
     for (let y = 0; y < outSize[1]; y++) {
@@ -192,18 +205,18 @@ function calculateResample(workerMessage) {
         const outIndexPoint = [x, y, z];
 
         const centeredIndexPoint = [
-          outIndexPoint[0] - ((outSize[0] - 1) / 2.0),
-          outIndexPoint[1] - ((outSize[1] - 1) / 2.0),
-          outIndexPoint[2] - ((outSize[2] - 1) / 2.0)
+          (outIndexPoint[0] - (outSize[0] / 2.0)) * outSpacing[0],
+          (outIndexPoint[1] - (outSize[1] / 2.0)) * outSpacing[1],
+          (outIndexPoint[2] - (outSize[2] / 2.0)) * outSpacing[2]
         ];
 
         const rotIndexPoint =
           relativeMatrix.multiplyArray3D(centeredIndexPoint);
 
         const inIndexPoint = [
-          rotIndexPoint[0] + ((inSize[0] - 1) / 2.0),
-          rotIndexPoint[1] + ((inSize[1] - 1) / 2.0),
-          rotIndexPoint[2] + ((inSize[2] - 1) / 2.0)
+          (rotIndexPoint[0] / inSpacing[0]) + (inSize[0] / 2.0),
+          (rotIndexPoint[1] / inSpacing[1]) + (inSize[1] / 2.0),
+          (rotIndexPoint[2] / inSpacing[2]) + (inSize[2] / 2.0) 
         ];
 
         if (!(
@@ -234,7 +247,9 @@ function calculateResample(workerMessage) {
             workerMessage.outImageBuffer[outOffset] = workerMessage.inImageBuffer[inOffset];
           }
         } else {
-          // console.log("Sample out of bounds, ignoring...", inIndexPoint, outIndexPoint);
+          // if (x <= 10 && y <= 10 && z <= 10){
+          //   console.log("Sample out of bounds, ignoring...", inIndexPoint, outIndexPoint, inOrigin, outOrigin);
+          // }
         }
       }
     }
