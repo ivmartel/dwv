@@ -1,4 +1,4 @@
-import {logger} from './logger';
+import {logger} from './logger.js';
 
 /**
  * ListenerHandler class: handles add/removing and firing listeners.

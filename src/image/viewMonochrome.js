@@ -1,7 +1,7 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {WindowLut} from './windowLut';
-import {ColourMap} from './luts';
+import {WindowLut} from './windowLut.js';
+import {ColourMap} from './luts.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,10 +1,10 @@
-import {Size} from './size';
-import {Geometry} from './geometry';
-import {RescaleSlopeAndIntercept} from './rsi';
-import {WindowLevel} from './windowLevel';
-import {Image} from './image';
-import {ColourMap} from './luts';
-import {safeGet, safeGetAll} from '../dicom/dataElement';
+import {Size} from './size.js';
+import {Geometry} from './geometry.js';
+import {RescaleSlopeAndIntercept} from './rsi.js';
+import {WindowLevel} from './windowLevel.js';
+import {Image} from './image.js';
+import {ColourMap} from './luts.js';
+import {safeGet, safeGetAll} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getPixelSpacing,
@@ -13,15 +13,15 @@ import {
   getPhotometricInterpretation,
   isMonochrome,
   isSecondatyCapture
-} from '../dicom/dicomImage';
-import {getTagTime} from '../dicom/dicomDate';
-import {getSuvFactor} from '../dicom/dicomPet';
-import {Point3D} from '../math/point';
-import {logger} from '../utils/logger';
+} from '../dicom/dicomImage.js';
+import {getTagTime} from '../dicom/dicomDate.js';
+import {getSuvFactor} from '../dicom/dicomPet.js';
+import {Point3D} from '../math/point.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

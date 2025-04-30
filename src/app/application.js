@@ -1,46 +1,46 @@
-import {viewEventNames} from '../image/view';
-import {ViewFactory} from '../image/viewFactory';
+import {viewEventNames} from '../image/view.js';
+import {ViewFactory} from '../image/viewFactory.js';
 import {
   getMatrixFromName,
   getOrientationStringLPS,
   Orientation,
   getViewOrientation
-} from '../math/orientation';
-import {Point3D} from '../math/point';
-import {Stage} from '../gui/stage';
-import {Style} from '../gui/style';
-import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup';
-import {ListenerHandler} from '../utils/listen';
-import {State} from '../io/state';
-import {logger} from '../utils/logger';
-import {getUriQuery, decodeQuery} from '../utils/uri';
-import {UndoStack} from '../utils/undoStack';
-import {ToolboxController} from './toolboxController';
-import {LoadController} from './loadController';
-import {DataController} from './dataController';
-import {OverlayData} from '../gui/overlayData';
+} from '../math/orientation.js';
+import {Point3D} from '../math/point.js';
+import {Stage} from '../gui/stage.js';
+import {Style} from '../gui/style.js';
+import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {State} from '../io/state.js';
+import {logger} from '../utils/logger.js';
+import {getUriQuery, decodeQuery} from '../utils/uri.js';
+import {UndoStack} from '../utils/undoStack.js';
+import {ToolboxController} from './toolboxController.js';
+import {LoadController} from './loadController.js';
+import {DataController} from './dataController.js';
+import {OverlayData} from '../gui/overlayData.js';
 import {
   toolList,
   defaultToolList,
   toolOptions,
   defaultToolOptions
-} from '../tools';
-import {binderList} from '../gui/stage';
-import {WindowLevel} from '../image/windowLevel';
-import {PlaneHelper} from '../image/planeHelper';
-import {AnnotationGroup} from '../image/annotationGroup';
-import {konvaToAnnotation} from '../gui/drawLayer';
+} from '../tools/index.js';
+import {binderList} from '../gui/stage.js';
+import {WindowLevel} from '../image/windowLevel.js';
+import {PlaneHelper} from '../image/planeHelper.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
+import {konvaToAnnotation} from '../gui/drawLayer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup';
-import {ViewLayer} from '../gui/viewLayer';
-import {DrawLayer} from '../gui/drawLayer';
-import {Image} from '../image/image';
-import {Matrix33} from '../math/matrix';
-import {DataElement} from '../dicom/dataElement';
-import {Scalar3D} from '../math/scalar';
-import {DicomData} from './dataController';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {Image} from '../image/image.js';
+import {Matrix33} from '../math/matrix.js';
+import {DataElement} from '../dicom/dataElement.js';
+import {Scalar3D} from '../math/scalar.js';
+import {DicomData} from './dataController.js';
 /* eslint-enable no-unused-vars */
 
 /**

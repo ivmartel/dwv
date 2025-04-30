@@ -1,17 +1,17 @@
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 import {
   DicomParser,
   getSyntaxDecompressionName
-} from '../dicom/dicomParser';
-import {ImageFactory} from './imageFactory';
-import {MaskFactory} from './maskFactory';
-import {PixelBufferDecoder} from './decoder';
-import {AnnotationGroupFactory} from './annotationGroupFactory';
+} from '../dicom/dicomParser.js';
+import {ImageFactory} from './imageFactory.js';
+import {MaskFactory} from './maskFactory.js';
+import {PixelBufferDecoder} from './decoder.js';
+import {AnnotationGroupFactory} from './annotationGroupFactory.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
-import {DicomData} from '../app/dataController';
+import {DataElement} from '../dicom/dataElement.js';
+import {DicomData} from '../app/dataController.js';
 /* eslint-enable no-unused-vars */
 
 /**

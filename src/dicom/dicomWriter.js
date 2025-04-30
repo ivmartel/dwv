@@ -2,7 +2,7 @@ import {
   is32bitVLVR,
   isCharSetStringVR,
   vrTypes
-} from './dictionary';
+} from './dictionary.js';
 import {
   Tag,
   getTagFromDictionary,
@@ -15,7 +15,7 @@ import {
   isItemTag,
   isItemDelimitationItemTag,
   tagCompareFunction
-} from './dicomTag';
+} from './dicomTag.js';
 import {
   getDwvUIDPrefix,
   getImplementationClassUID,
@@ -23,11 +23,11 @@ import {
   isImplicitTransferSyntax,
   isBigEndianTransferSyntax,
   getDataElementPrefixByteSize
-} from './dicomParser';
-import {DataElement} from './dataElement';
-import {DataWriter} from './dataWriter';
-import {DataReader} from './dataReader';
-import {logger} from '../utils/logger';
+} from './dicomParser.js';
+import {DataElement} from './dataElement.js';
+import {DataWriter} from './dataWriter.js';
+import {DataReader} from './dataReader.js';
+import {logger} from '../utils/logger.js';
 
 // local generated uid counter
 let _uidCount = 0;

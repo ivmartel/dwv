@@ -1,16 +1,16 @@
-import {getSpacingFromMeasure} from './dicomImage';
-import {logger} from '../utils/logger';
-import {arrayEquals} from '../utils/array';
+import {getSpacingFromMeasure} from './dicomImage.js';
+import {logger} from '../utils/logger.js';
+import {arrayEquals} from '../utils/array.js';
 import {
   getDicomCodeItem,
   getSegmentationCode,
   getSourceImageForProcessingCode
-} from './dicomCode';
+} from './dicomCode.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
-import {Spacing} from '../image/spacing';
+import {DataElement} from './dataElement.js';
+import {Spacing} from '../image/spacing.js';
 /* eslint-enable no-unused-vars */
 
 /**

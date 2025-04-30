@@ -1,28 +1,28 @@
-import {Index} from '../math/index';
-import {Vector3D} from '../math/vector';
-import {Point3D} from '../math/point';
-import {isIdentityMat33} from '../math/matrix';
-import {Size} from '../image/size';
-import {Spacing} from '../image/spacing';
-import {Image} from '../image/image';
-import {Geometry} from '../image/geometry';
-import {PlaneHelper} from '../image/planeHelper';
+import {Index} from '../math/index.js';
+import {Vector3D} from '../math/vector.js';
+import {Point3D} from '../math/point.js';
+import {isIdentityMat33} from '../math/matrix.js';
+import {Size} from '../image/size.js';
+import {Spacing} from '../image/spacing.js';
+import {Image} from '../image/image.js';
+import {Geometry} from '../image/geometry.js';
+import {PlaneHelper} from '../image/planeHelper.js';
 import {
   getSliceIterator,
   getIteratorValues,
   getRegionSliceIterator,
   getVariableRegionSliceIterator
-} from '../image/iterator';
-import {PositionHelper} from '../image/positionHelper';
+} from '../image/iterator.js';
+import {PositionHelper} from '../image/positionHelper.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {View} from '../image/view';
-import {WindowLevel} from '../image/windowLevel';
-import {Point, Point2D} from '../math/point';
-import {Scalar2D} from '../math/scalar';
-import {Matrix33} from '../math/matrix';
-import {ViewLayer} from '../gui/viewLayer';
+import {View} from '../image/view.js';
+import {WindowLevel} from '../image/windowLevel.js';
+import {Point, Point2D} from '../math/point.js';
+import {Scalar2D} from '../math/scalar.js';
+import {Matrix33} from '../math/matrix.js';
+import {ViewLayer} from '../gui/viewLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**

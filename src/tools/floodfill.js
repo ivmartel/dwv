@@ -1,25 +1,25 @@
-import {Annotation} from '../image/annotation';
+import {Annotation} from '../image/annotation.js';
 import {
   AddAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands';
-//import {RoiFactory} from '../tools/roi';
-import {ROI} from '../math/roi';
-import {Point2D} from '../math/point';
-import {Style} from '../gui/style';
+} from '../tools/drawCommands.js';
+//import {RoiFactory} from '../tools/roi.js';
+import {ROI} from '../math/roi.js';
+import {Point2D} from '../math/point.js';
+import {Style} from '../gui/style.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {logger} from '../utils/logger';
+} from '../gui/generic.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {LayerGroup} from '../gui/layerGroup';
-import {ViewLayer} from '../gui/viewLayer';
-import {Scalar2D} from '../math/scalar';
+import {App} from '../app/application.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {Scalar2D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

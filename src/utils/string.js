@@ -1,5 +1,5 @@
 
-import {i18n} from './i18n';
+import {i18n} from './i18n.js';
 
 /**
  * Capitalise the first letter of a string.

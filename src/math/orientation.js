@@ -1,8 +1,8 @@
-import {Vector3D} from './vector';
+import {Vector3D} from './vector.js';
 import {
   Matrix33,
   getIdentityMat33
-} from './matrix';
+} from './matrix.js';
 
 /**
  * Create a 3x3 coronal (xzy) matrix.

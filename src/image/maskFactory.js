@@ -3,45 +3,45 @@ import {
   getDicomDate,
   dateToTimeObj,
   getDicomTime,
-} from '../dicom/dicomDate';
+} from '../dicom/dicomDate.js';
 import {
   safeGet,
   safeGetAll
-} from '../dicom/dataElement';
+} from '../dicom/dataElement.js';
 import {
   getImage2DSize,
   getSpacingFromMeasure,
   getDicomMeasureItem,
   getDicomPlaneOrientationItem
-} from '../dicom/dicomImage';
-import {Tag} from '../dicom/dicomTag';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter';
+} from '../dicom/dicomImage.js';
+import {Tag} from '../dicom/dicomTag.js';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
 import {
   getSegment,
   getDicomSegmentItem,
-} from '../dicom/dicomSegment';
+} from '../dicom/dicomSegment.js';
 import {
   getSegmentFrameInfo,
   getDicomSegmentFrameInfoItem,
   getDimensionOrganization,
-} from '../dicom/dicomSegmentFrameInfo';
-import {transferSyntaxKeywords} from '../dicom/dictionary';
-import {Image} from '../image/image';
-import {Geometry} from '../image/geometry';
-import {getOrientationFromCosines} from '../math/orientation';
-import {Point, Point3D} from '../math/point';
-import {Index} from '../math/index';
-import {REAL_WORLD_EPSILON} from '../math/matrix';
-import {logger} from '../utils/logger';
-import {arraySortEquals} from '../utils/array';
-import {Size} from './size';
-import {ColourMap} from './luts';
+} from '../dicom/dicomSegmentFrameInfo.js';
+import {transferSyntaxKeywords} from '../dicom/dictionary.js';
+import {Image} from '../image/image.js';
+import {Geometry} from '../image/geometry.js';
+import {getOrientationFromCosines} from '../math/orientation.js';
+import {Point, Point3D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {REAL_WORLD_EPSILON} from '../math/matrix.js';
+import {logger} from '../utils/logger.js';
+import {arraySortEquals} from '../utils/array.js';
+import {Size} from './size.js';
+import {ColourMap} from './luts.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
-import {DataElement} from '../dicom/dataElement';
-import {MaskSegment} from '../dicom/dicomSegment';
+import {Matrix33} from '../math/matrix.js';
+import {DataElement} from '../dicom/dataElement.js';
+import {MaskSegment} from '../dicom/dicomSegment.js';
 /* eslint-enable no-unused-vars */
 
 /**

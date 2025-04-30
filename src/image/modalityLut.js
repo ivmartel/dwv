@@ -1,6 +1,6 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {RescaleSlopeAndIntercept} from './rsi';
+import {RescaleSlopeAndIntercept} from './rsi.js';
 /* eslint-enable no-unused-vars */
 
 /**

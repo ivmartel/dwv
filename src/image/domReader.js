@@ -1,8 +1,8 @@
-import {Size} from '../image/size';
-import {Spacing} from '../image/spacing';
-import {Geometry} from '../image/geometry';
-import {Image} from '../image/image';
-import {Point3D} from '../math/point';
+import {Size} from '../image/size.js';
+import {Spacing} from '../image/spacing.js';
+import {Geometry} from '../image/geometry.js';
+import {Image} from '../image/image.js';
+import {Point3D} from '../math/point.js';
 
 /**
  * Convert a string into an UID.

@@ -2,13 +2,13 @@ import {
   getDate,
   getTime,
   getDateTime
-} from './dicomDate';
-import {checkDataElement} from './dataElement';
-import {logger} from '../utils/logger';
+} from './dicomDate.js';
+import {checkDataElement} from './dataElement.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

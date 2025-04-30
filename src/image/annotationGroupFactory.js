@@ -3,8 +3,8 @@ import {
   getDicomDate,
   dateToTimeObj,
   getDicomTime,
-} from '../dicom/dicomDate';
-import {safeGet} from '../dicom/dataElement';
+} from '../dicom/dicomDate.js';
+import {safeGet} from '../dicom/dataElement.js';
 import {
   ValueTypes,
   RelationshipTypes,
@@ -14,7 +14,7 @@ import {
   getContentTemplate,
   DicomSRContent,
   getSRContentFromValue
-} from '../dicom/dicomSRContent';
+} from '../dicom/dicomSRContent.js';
 import {
   getMeasurementGroupCode,
   getImageRegionCode,
@@ -31,32 +31,32 @@ import {
   getImagingMeasurementReportCode,
   getImagingMeasurementsCode,
   isEqualCode
-} from '../dicom/dicomCode';
+} from '../dicom/dicomCode.js';
 import {
   isVersionInBounds,
   getDwvVersionFromImplementationClassUID
-} from '../dicom/dicomParser';
-import {getAsSimpleElements} from '../dicom/dicomTag';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter';
-import {ImageReference} from '../dicom/dicomImageReference';
-import {SopInstanceReference} from '../dicom/dicomSopInstanceReference';
+} from '../dicom/dicomParser.js';
+import {getAsSimpleElements} from '../dicom/dicomTag.js';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {ImageReference} from '../dicom/dicomImageReference.js';
+import {SopInstanceReference} from '../dicom/dicomSopInstanceReference.js';
 import {
   GraphicTypes,
   getScoordFromShape,
   getShapeFromScoord,
   SpatialCoordinate
-} from '../dicom/dicomSpatialCoordinate';
-import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D';
-import {BIG_EPSILON_EXPONENT} from '../math/matrix';
-import {precisionRound} from '../utils/string';
-import {logger} from '../utils/logger';
-import {Annotation} from './annotation';
-import {AnnotationGroup} from './annotationGroup';
-import {Point2D, Point3D} from '../math/point';
+} from '../dicom/dicomSpatialCoordinate.js';
+import {SpatialCoordinate3D} from '../dicom/dicomSpatialCoordinate3D.js';
+import {BIG_EPSILON_EXPONENT} from '../math/matrix.js';
+import {precisionRound} from '../utils/string.js';
+import {logger} from '../utils/logger.js';
+import {Annotation} from './annotation.js';
+import {AnnotationGroup} from './annotationGroup.js';
+import {Point2D, Point3D} from '../math/point.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

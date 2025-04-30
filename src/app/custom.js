@@ -1,6 +1,6 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {WindowLevel} from '../image/windowLevel';
+import {WindowLevel} from '../image/windowLevel.js';
 /* eslint-enable no-unused-vars */
 
 /**

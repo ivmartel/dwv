@@ -1,8 +1,8 @@
-import {ThreadPool, WorkerTask} from '../utils/thread';
+import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Size} from './size';
+import {Size} from './size.js';
 /* eslint-enable no-unused-vars */
 
 /**

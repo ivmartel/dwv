@@ -1,8 +1,8 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {MaskSegment} from '../dicom/dicomSegment';
-import {RGB} from '../utils/colour';
+import {Image} from './image.js';
+import {MaskSegment} from '../dicom/dicomSegment.js';
+import {RGB} from '../utils/colour.js';
 /* eslint-enable no-unused-vars */
 
 /**

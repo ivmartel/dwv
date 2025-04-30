@@ -1,19 +1,19 @@
-import {Index} from '../math/index';
-import {ListenerHandler} from '../utils/listen';
-import {viewEventNames} from '../image/view';
-import {ViewController} from '../app/viewController';
-import {Point2D} from '../math/point';
+import {Index} from '../math/index.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {viewEventNames} from '../image/view.js';
+import {ViewController} from '../app/viewController.js';
+import {Point2D} from '../math/point.js';
 import {
   canCreateCanvas,
   InteractionEventNames
-} from './generic';
-import {getScaledOffset} from './layerGroup';
+} from './generic.js';
+import {getScaledOffset} from './layerGroup.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Vector3D} from '../math/vector';
-import {Point, Point3D} from '../math/point';
-import {Scalar2D, Scalar3D} from '../math/scalar';
+import {Vector3D} from '../math/vector.js';
+import {Point, Point3D} from '../math/point.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

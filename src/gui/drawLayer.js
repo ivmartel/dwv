@@ -1,39 +1,39 @@
-import {ListenerHandler} from '../utils/listen';
-import {DrawController} from '../app/drawController';
-import {getScaledOffset} from './layerGroup';
-import {InteractionEventNames} from './generic';
-import {logger} from '../utils/logger';
-import {toStringId} from '../utils/array';
-import {precisionRound} from '../utils/string';
-import {AddAnnotationCommand} from '../tools/drawCommands';
+import {ListenerHandler} from '../utils/listen.js';
+import {DrawController} from '../app/drawController.js';
+import {getScaledOffset} from './layerGroup.js';
+import {InteractionEventNames} from './generic.js';
+import {logger} from '../utils/logger.js';
+import {toStringId} from '../utils/array.js';
+import {precisionRound} from '../utils/string.js';
+import {AddAnnotationCommand} from '../tools/drawCommands.js';
 import {
   isNodeWithId,
   isPositionNode,
   isNodeNameShape,
   isNodeNameLabel
-} from '../tools/drawBounds';
-import {Style} from '../gui/style';
-import {Line} from '../math/line';
-import {Rectangle} from '../math/rectangle';
-import {ROI} from '../math/roi';
-import {Protractor} from '../math/protractor';
-import {Ellipse} from '../math/ellipse';
-import {Circle} from '../math/circle';
-import {Point2D} from '../math/point';
+} from '../tools/drawBounds.js';
+import {Style} from '../gui/style.js';
+import {Line} from '../math/line.js';
+import {Rectangle} from '../math/rectangle.js';
+import {ROI} from '../math/roi.js';
+import {Protractor} from '../math/protractor.js';
+import {Ellipse} from '../math/ellipse.js';
+import {Circle} from '../math/circle.js';
+import {Point2D} from '../math/point.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point, Point3D} from '../math/point';
-import {Index} from '../math/index';
-import {Vector3D} from '../math/vector';
-import {Scalar2D, Scalar3D} from '../math/scalar';
-import {PlaneHelper} from '../image/planeHelper';
-import {Annotation} from '../image/annotation';
-import {AnnotationGroup} from '../image/annotationGroup';
-import {DrawShapeHandler} from '../tools/drawShapeHandler';
+import {Point, Point3D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {Vector3D} from '../math/vector.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
+import {PlaneHelper} from '../image/planeHelper.js';
+import {Annotation} from '../image/annotation.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
+import {DrawShapeHandler} from '../tools/drawShapeHandler.js';
 /* eslint-enable no-unused-vars */
 
 /**

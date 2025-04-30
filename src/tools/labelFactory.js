@@ -3,9 +3,9 @@ import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point';
-import {Style} from '../gui/style';
-import {Annotation} from '../image/annotation';
+import {Point2D} from '../math/point.js';
+import {Style} from '../gui/style.js';
+import {Annotation} from '../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**

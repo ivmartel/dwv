@@ -1,17 +1,17 @@
 import {
   getCode,
   getDicomCodeItem
-} from './dicomCode';
+} from './dicomCode.js';
 import {
   getMeasuredValue,
   getDicomMeasuredValueItem
-} from './dicomMeasuredValue';
+} from './dicomMeasuredValue.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
-import {MeasuredValue} from './dicomMeasuredValue';
-import {DicomCode} from './dicomCode';
+import {DataElement} from './dataElement.js';
+import {MeasuredValue} from './dicomMeasuredValue.js';
+import {DicomCode} from './dicomCode.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,7 +1,7 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ModalityLut} from './modalityLut';
-import {VoiLut} from './voiLut';
+import {ModalityLut} from './modalityLut.js';
+import {VoiLut} from './voiLut.js';
 /* eslint-enable no-unused-vars */
 
 /**

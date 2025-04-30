@@ -1,5 +1,5 @@
-import {custom} from '../app/custom';
-import {DataElement} from './dataElement';
+import {custom} from '../app/custom.js';
+import {DataElement} from './dataElement.js';
 
 /**
  * Pad an input string with a '0' to form a 2 digit one.

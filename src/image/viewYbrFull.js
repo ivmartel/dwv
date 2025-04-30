@@ -1,4 +1,4 @@
-import {ybrToRgb} from '../utils/colour';
+import {ybrToRgb} from '../utils/colour.js';
 
 /**
  * Generate image data for 'YBR_FULL' photometric interpretation.

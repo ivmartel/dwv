@@ -1,14 +1,14 @@
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {ScrollWheel} from './scrollWheel';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {ScrollWheel} from './scrollWheel.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
+} from '../gui/generic.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {Point2D} from '../math/point';
+import {App} from '../app/application.js';
+import {Point2D} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,24 +1,24 @@
-import {Index} from '../math/index';
-import {Point3D} from '../math/point';
-import {logger} from '../utils/logger';
-import {arrayContains} from '../utils/array';
-import {getTypedArray} from '../dicom/dicomParser';
-import {ListenerHandler} from '../utils/listen';
-import {valueRange} from './iterator';
-import {RescaleSlopeAndIntercept} from './rsi';
-import {ImageFactory} from './imageFactory';
-import {MaskFactory} from './maskFactory';
-import {isMonochrome} from '../dicom/dicomImage';
-import {LabelingThread} from './labelingThread';
+import {Index} from '../math/index.js';
+import {Point3D} from '../math/point.js';
+import {logger} from '../utils/logger.js';
+import {arrayContains} from '../utils/array.js';
+import {getTypedArray} from '../dicom/dicomParser.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {valueRange} from './iterator.js';
+import {RescaleSlopeAndIntercept} from './rsi.js';
+import {ImageFactory} from './imageFactory.js';
+import {MaskFactory} from './maskFactory.js';
+import {isMonochrome} from '../dicom/dicomImage.js';
+import {LabelingThread} from './labelingThread.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Geometry} from './geometry';
-import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix';
-import {NumberRange} from '../math/stats';
-import {DataElement} from '../dicom/dataElement';
-import {RGB} from '../utils/colour';
-import {ColourMap} from './luts';
+import {Geometry} from './geometry.js';
+import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix.js';
+import {NumberRange} from '../math/stats.js';
+import {DataElement} from '../dicom/dataElement.js';
+import {RGB} from '../utils/colour.js';
+import {ColourMap} from './luts.js';
 /* eslint-enable no-unused-vars */
 
 const ML_PER_MM = 0.001; // ml/mm^3

@@ -1,30 +1,30 @@
-import {custom} from '../app/custom';
+import {custom} from '../app/custom.js';
 import {
   getMousePoint,
-} from '../gui/generic';
+} from '../gui/generic.js';
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand
-} from './drawCommands';
+} from './drawCommands.js';
 import {
   isNodeNameShape,
   isNodeNameLabel,
   getShapePositionRange,
   isShapeInRange
-} from './drawBounds';
-import {DrawShapeEditor} from './drawShapeEditor';
-import {DrawTrash} from './drawTrash';
+} from './drawBounds.js';
+import {DrawShapeEditor} from './drawShapeEditor.js';
+import {DrawTrash} from './drawTrash.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {Scalar2D} from '../math/scalar';
-import {DrawLayer} from '../gui/drawLayer';
-import {Annotation} from '../image/annotation';
-import {Point2D} from '../math/point';
+import {App} from '../app/application.js';
+import {Scalar2D} from '../math/scalar.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {Annotation} from '../image/annotation.js';
+import {Point2D} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**

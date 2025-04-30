@@ -1,4 +1,4 @@
-import {arrayEquals} from './array';
+import {arrayEquals} from './array.js';
 
 /**
  * Merge two similar objects.

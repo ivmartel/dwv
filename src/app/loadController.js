@@ -1,6 +1,6 @@
-import {FilesLoader} from '../io/filesLoader';
-import {MemoryLoader} from '../io/memoryLoader';
-import {UrlsLoader} from '../io/urlsLoader';
+import {FilesLoader} from '../io/filesLoader.js';
+import {MemoryLoader} from '../io/memoryLoader.js';
+import {UrlsLoader} from '../io/urlsLoader.js';
 
 /**
  * Load controller.

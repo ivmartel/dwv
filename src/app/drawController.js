@@ -1,13 +1,13 @@
-import {AnnotationGroup} from '../image/annotationGroup';
+import {AnnotationGroup} from '../image/annotationGroup.js';
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands';
-import {logger} from '../utils/logger';
+} from '../tools/drawCommands.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation';
+import {Annotation} from '../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**

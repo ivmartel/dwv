@@ -1,12 +1,12 @@
-import {Point, Point3D} from '../math/point';
-import {WindowLevel} from '../image/windowLevel';
-import {LayerGroup} from './layerGroup';
-import {logger} from '../utils/logger';
+import {Point, Point3D} from '../math/point.js';
+import {WindowLevel} from '../image/windowLevel.js';
+import {LayerGroup} from './layerGroup.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewLayer} from '../gui/viewLayer';
-import {DrawLayer} from '../gui/drawLayer';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawLayer} from '../gui/drawLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,18 +1,18 @@
-import {Index} from '../math/index';
-import {Point} from '../math/point';
-import {Vector3D} from '../math/vector';
-import {viewEventNames} from '../image/view';
-import {ListenerHandler} from '../utils/listen';
-import {logger} from '../utils/logger';
-import {precisionRound} from '../utils/string';
-import {ViewLayer} from './viewLayer';
-import {DrawLayer} from './drawLayer';
+import {Index} from '../math/index.js';
+import {Point} from '../math/point.js';
+import {Vector3D} from '../math/vector.js';
+import {viewEventNames} from '../image/view.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {logger} from '../utils/logger.js';
+import {precisionRound} from '../utils/string.js';
+import {ViewLayer} from './viewLayer.js';
+import {DrawLayer} from './drawLayer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D, Point3D} from '../math/point';
-import {Scalar2D, Scalar3D} from '../math/scalar';
-import {PositionHelper} from '../image/positionHelper';
+import {Point2D, Point3D} from '../math/point.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
+import {PositionHelper} from '../image/positionHelper.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,10 +1,10 @@
-import {Index} from '../math/index';
-import {Point2D} from '../math/point';
+import {Index} from '../math/index.js';
+import {Point2D} from '../math/point.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {Matrix33} from '../math/matrix';
+import {Image} from './image.js';
+import {Matrix33} from '../math/matrix.js';
 /* eslint-enable no-unused-vars */
 
 /**

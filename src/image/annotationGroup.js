@@ -1,10 +1,10 @@
-import {logger} from '../utils/logger';
-import {ListenerHandler} from '../utils/listen';
+import {logger} from '../utils/logger.js';
+import {ListenerHandler} from '../utils/listen.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Annotation} from './annotation';
-import {ViewController} from '../app/viewController';
+import {Annotation} from './annotation.js';
+import {ViewController} from '../app/viewController.js';
 /* eslint-enable no-unused-vars */
 
 /**

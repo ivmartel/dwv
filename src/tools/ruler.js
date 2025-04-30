@@ -1,23 +1,23 @@
-import {Line, getPerpendicularLine} from '../math/line';
-import {Point2D} from '../math/point';
-import {logger} from '../utils/logger';
-import {custom} from '../app/custom';
+import {Line, getPerpendicularLine} from '../math/line.js';
+import {Point2D} from '../math/point.js';
+import {logger} from '../utils/logger.js';
+import {custom} from '../app/custom.js';
 import {
   defaultLabelTexts,
   getLineShape,
   DRAW_DEBUG,
   getDefaultAnchor,
   getAnchorShape
-} from './drawBounds';
-import {LabelFactory} from './labelFactory';
+} from './drawBounds.js';
+import {LabelFactory} from './labelFactory.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Style} from '../gui/style';
-import {Annotation} from '../image/annotation';
+import {Style} from '../gui/style.js';
+import {Annotation} from '../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**

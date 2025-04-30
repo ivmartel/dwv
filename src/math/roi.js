@@ -1,4 +1,4 @@
-import {Point2D} from '../math/point';
+import {Point2D} from '../math/point.js';
 
 /**
  * Region Of Interest shape.

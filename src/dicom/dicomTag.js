@@ -1,11 +1,11 @@
 import {
   dictionary,
   tagGroups
-} from './dictionary';
+} from './dictionary.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

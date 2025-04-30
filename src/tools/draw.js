@@ -1,31 +1,31 @@
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {logger} from '../utils/logger';
+} from '../gui/generic.js';
+import {logger} from '../utils/logger.js';
 import {
   AddAnnotationCommand,
   RemoveAnnotationCommand
-} from './drawCommands';
+} from './drawCommands.js';
 import {
   isNodeNameShape,
-} from './drawBounds';
-import {Annotation} from '../image/annotation';
-import {ScrollWheel} from './scrollWheel';
+} from './drawBounds.js';
+import {Annotation} from '../image/annotation.js';
+import {ScrollWheel} from './scrollWheel.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {Style} from '../gui/style';
-import {LayerGroup} from '../gui/layerGroup';
-import {Point2D} from '../math/point';
-import {DrawLayer} from '../gui/drawLayer';
-import {ViewLayer} from '../gui/viewLayer';
-import {DrawShapeHandler} from './drawShapeHandler';
+import {App} from '../app/application.js';
+import {Style} from '../gui/style.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {Point2D} from '../math/point.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawShapeHandler} from './drawShapeHandler.js';
 /* eslint-enable no-unused-vars */
 
 /**

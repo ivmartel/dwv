@@ -1,9 +1,9 @@
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {MaskSegment} from '../dicom/dicomSegment';
+import {Image} from './image.js';
+import {MaskSegment} from '../dicom/dicomSegment.js';
 /* eslint-enable no-unused-vars */
 
 /**

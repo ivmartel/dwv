@@ -1,10 +1,10 @@
-import {InteractionEventNames} from '../gui/generic';
+import {InteractionEventNames} from '../gui/generic.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup';
-import {ViewLayer} from '../gui/viewLayer';
-import {DrawLayer} from '../gui/drawLayer';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawLayer} from '../gui/drawLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**

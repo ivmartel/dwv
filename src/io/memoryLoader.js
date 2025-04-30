@@ -1,5 +1,5 @@
-import {MultiProgressHandler} from '../utils/progress';
-import {loaderList} from './loaderList';
+import {MultiProgressHandler} from '../utils/progress.js';
+import {loaderList} from './loaderList.js';
 
 /**
  * Memory loader.

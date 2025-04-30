@@ -1,11 +1,11 @@
-import {custom} from '../app/custom';
-import {View} from './view';
-import {WindowLevel} from './windowLevel';
+import {custom} from '../app/custom.js';
+import {View} from './view.js';
+import {WindowLevel} from './windowLevel.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {DataElement} from '../dicom/dataElement';
+import {Image} from './image.js';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

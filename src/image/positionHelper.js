@@ -1,11 +1,11 @@
-import {mergeGeometries} from './geometry';
+import {mergeGeometries} from './geometry.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point} from '../math/point';
-import {Index} from '../math/index';
-import {View} from './view';
-import {Geometry} from './geometry';
+import {Point} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {View} from './view.js';
+import {Geometry} from './geometry.js';
 /* eslint-enable no-unused-vars */
 
 class ViewPositionAccessor {

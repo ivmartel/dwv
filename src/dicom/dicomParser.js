@@ -4,20 +4,20 @@ import {
   isSequenceDelimitationItemTag,
   isItemDelimitationItemTag,
   isPixelDataTag
-} from './dicomTag';
+} from './dicomTag.js';
 import {
   is32bitVLVR,
   isCharSetStringVR,
   transferSyntaxes,
   transferSyntaxKeywords,
   vrTypes,
-} from './dictionary';
+} from './dictionary.js';
 import {
   safeGet,
   DataElement
-} from './dataElement';
-import {DataReader} from './dataReader';
-import {logger} from '../utils/logger';
+} from './dataElement.js';
+import {DataReader} from './dataReader.js';
+import {logger} from '../utils/logger.js';
 
 /**
  * List of DICOM data elements indexed via a 8 character string formed from

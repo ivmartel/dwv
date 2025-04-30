@@ -1,13 +1,13 @@
-import {Index} from '../math/index';
-import {colourNameToHex} from '../utils/colour';
-import {WindowLevel} from '../image/windowLevel';
+import {Index} from '../math/index.js';
+import {colourNameToHex} from '../utils/colour.js';
+import {WindowLevel} from '../image/windowLevel.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
+import {App} from '../app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**

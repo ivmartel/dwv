@@ -1,7 +1,7 @@
-import {Vector3D} from './vector';
-import {Point3D} from './point';
-import {Index} from './index';
-import {logger} from '../utils/logger';
+import {Vector3D} from './vector.js';
+import {Point3D} from './point.js';
+import {Index} from './index.js';
+import {logger} from '../utils/logger.js';
 
 // Number.EPSILON is difference between 1 and the smallest
 // floating point number greater than 1

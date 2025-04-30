@@ -1,7 +1,7 @@
-import {endsWith, getRootPath} from '../utils/string';
-import {MultiProgressHandler} from '../utils/progress';
-import {getFileListFromDicomDir} from '../dicom/dicomDir';
-import {loaderList} from './loaderList';
+import {endsWith, getRootPath} from '../utils/string.js';
+import {MultiProgressHandler} from '../utils/progress.js';
+import {getFileListFromDicomDir} from '../dicom/dicomDir.js';
+import {loaderList} from './loaderList.js';
 
 // url content types
 export const urlContentTypes = {

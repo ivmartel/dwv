@@ -1,26 +1,26 @@
 
-import {logger} from '../utils/logger';
-import {Point2D} from '../math/point';
-import {Index} from '../math/index';
-import {getEllipseIndices} from '../math/ellipse';
-import {Image} from '../image/image';
-import {Size} from '../image/size';
-import {Geometry} from '../image/geometry';
-import {ColourMap} from '../image/luts';
-import {getDefaultDicomSegJson} from '../image/maskFactory';
-import {getDwvUIDPrefix} from '../dicom/dicomParser';
-import {getElementsFromJSONTags} from '../dicom/dicomWriter';
-import {DicomData} from '../app/dataController';
-import {ViewConfig} from '../app/application';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {ScrollWheel} from './scrollWheel';
+import {logger} from '../utils/logger.js';
+import {Point2D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {getEllipseIndices} from '../math/ellipse.js';
+import {Image} from '../image/image.js';
+import {Size} from '../image/size.js';
+import {Geometry} from '../image/geometry.js';
+import {ColourMap} from '../image/luts.js';
+import {getDefaultDicomSegJson} from '../image/maskFactory.js';
+import {getDwvUIDPrefix} from '../dicom/dicomParser.js';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {DicomData} from '../app/dataController.js';
+import {ViewConfig} from '../app/application.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {ScrollWheel} from './scrollWheel.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point, Point3D} from '../math/point';
-import {App} from '../app/application';
-import {LayerGroup} from '../gui/layerGroup';
-import {ViewLayer} from '../gui/viewLayer';
+import {Point, Point3D} from '../math/point.js';
+import {App} from '../app/application.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
 /* eslint-enable no-unused-vars */
 
 const ERROR_MESSAGES = {

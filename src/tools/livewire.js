@@ -1,23 +1,23 @@
-import {Style} from '../gui/style';
+import {Style} from '../gui/style.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {Point2D} from '../math/point';
-import {Path} from '../math/path';
-import {Scissors} from '../math/scissors';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {logger} from '../utils/logger';
-import {ROI} from '../math/roi';
-import {Annotation} from '../image/annotation';
+} from '../gui/generic.js';
+import {Point2D} from '../math/point.js';
+import {Path} from '../math/path.js';
+import {Scissors} from '../math/scissors.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {logger} from '../utils/logger.js';
+import {ROI} from '../math/roi.js';
+import {Annotation} from '../image/annotation.js';
 import {
   AddAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands';
+} from '../tools/drawCommands.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
+import {App} from '../app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**

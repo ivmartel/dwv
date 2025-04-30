@@ -1,18 +1,18 @@
-import {ScrollWheel} from './scrollWheel';
+import {ScrollWheel} from './scrollWheel.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+} from '../gui/generic.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {
   validateWindowWidth,
   WindowLevel as WindowLevelValues
-} from '../image/windowLevel';
+} from '../image/windowLevel.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {Point2D} from '../math/point';
+import {App} from '../app/application.js';
+import {Point2D} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**

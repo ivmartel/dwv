@@ -1,14 +1,14 @@
-import {logger} from '../utils/logger';
-import {UpdateAnnotationCommand} from './drawCommands';
-import {validateAnchorPosition} from './drawBounds';
+import {logger} from '../utils/logger.js';
+import {UpdateAnnotationCommand} from './drawCommands.js';
+import {validateAnchorPosition} from './drawBounds.js';
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {DrawLayer} from '../gui/drawLayer';
-import {Annotation} from '../image/annotation';
+import {App} from '../app/application.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {Annotation} from '../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**

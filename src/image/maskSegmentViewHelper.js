@@ -1,4 +1,4 @@
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 
 /**
  * Mask segment view helper: handles hidden segments.

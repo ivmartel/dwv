@@ -1,4 +1,4 @@
-import {BucketQueue} from './bucketQueue';
+import {BucketQueue} from './bucketQueue.js';
 
 // Pre-created to reduce allocation in inner loops
 const __twothirdpi = (2 / (3 * Math.PI));

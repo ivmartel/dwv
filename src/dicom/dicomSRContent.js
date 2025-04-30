@@ -2,30 +2,30 @@ import {
   NumericMeasurement,
   getNumericMeasurement,
   getDicomNumericMeasurementItem
-} from './dicomNumericMeasurement';
+} from './dicomNumericMeasurement.js';
 import {
   isEqualCode,
   getCode,
   getDicomCodeItem,
   getConceptNameCode,
   getMeasurementUnitsCode
-} from './dicomCode';
+} from './dicomCode.js';
 import {
   getImageReference,
   getDicomImageReferenceItem
-} from './dicomImageReference';
+} from './dicomImageReference.js';
 import {
   getSopInstanceReference,
   getDicomSopInstanceReferenceItem
-} from './dicomSopInstanceReference';
+} from './dicomSopInstanceReference.js';
 import {
   getSpatialCoordinate,
   getDicomSpatialCoordinateItem
-} from './dicomSpatialCoordinate';
+} from './dicomSpatialCoordinate.js';
 import {
   getSpatialCoordinate3D,
   getDicomSpatialCoordinate3DItem
-} from './dicomSpatialCoordinate3D';
+} from './dicomSpatialCoordinate3D.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -33,9 +33,9 @@ import {
   safeGet,
   safeGetAll,
   DataElement
-} from './dataElement';
-import {DicomCode} from './dicomCode';
-import {MeasuredValue} from './dicomMeasuredValue';
+} from './dataElement.js';
+import {DicomCode} from './dicomCode.js';
+import {MeasuredValue} from './dicomMeasuredValue.js';
 /* eslint-enable no-unused-vars */
 
 /**

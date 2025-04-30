@@ -3,8 +3,8 @@ import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation';
-import {DrawController} from '../app/drawController';
+import {Annotation} from '../image/annotation.js';
+import {DrawController} from '../app/drawController.js';
 /* eslint-enable no-unused-vars */
 
 /**

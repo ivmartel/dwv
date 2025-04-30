@@ -1,18 +1,18 @@
-import {custom} from '../app/custom';
+import {custom} from '../app/custom.js';
 import {
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
   isJpegLosslessTransferSyntax
-} from './dicomParser';
-import {safeGet, safeGetAll} from './dataElement';
-import {getOrientationFromCosines} from '../math/orientation';
-import {Spacing} from '../image/spacing';
-import {logger} from '../utils/logger';
+} from './dicomParser.js';
+import {safeGet, safeGetAll} from './dataElement.js';
+import {getOrientationFromCosines} from '../math/orientation.js';
+import {Spacing} from '../image/spacing.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
-import {DataElement} from './dataElement';
+import {Matrix33} from '../math/matrix.js';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

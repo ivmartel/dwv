@@ -1,9 +1,9 @@
-import {Index} from '../math/index';
+import {Index} from '../math/index.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
-import {Scalar2D} from '../math/scalar';
+import {Matrix33} from '../math/matrix.js';
+import {Scalar2D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

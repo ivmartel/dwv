@@ -1,8 +1,8 @@
-import {getShadowColour} from '../utils/colour';
+import {getShadowColour} from '../utils/colour.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Scalar2D} from '../math/scalar';
+import {Scalar2D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

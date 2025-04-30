@@ -1,15 +1,15 @@
-import {Point2D} from '../math/point';
-import {Line, areOrthogonal} from '../math/line';
-import {Protractor} from '../math/protractor';
-import {ROI} from '../math/roi';
-import {Circle} from '../math/circle';
-import {Ellipse} from '../math/ellipse';
-import {Rectangle} from '../math/rectangle';
-import {logger} from '../utils/logger';
+import {Point2D} from '../math/point.js';
+import {Line, areOrthogonal} from '../math/line.js';
+import {Protractor} from '../math/protractor.js';
+import {ROI} from '../math/roi.js';
+import {Circle} from '../math/circle.js';
+import {Ellipse} from '../math/ellipse.js';
+import {Rectangle} from '../math/rectangle.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

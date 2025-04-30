@@ -3,7 +3,7 @@
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Scalar3D} from '../math/scalar';
+import {Scalar3D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

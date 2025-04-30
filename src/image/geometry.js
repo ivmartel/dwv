@@ -2,19 +2,19 @@ import {
   getIdentityMat33,
   REAL_WORLD_EPSILON,
   REAL_WORLD_EXPONENT
-} from '../math/matrix';
-import {Point3D, Point} from '../math/point';
-import {Vector3D} from '../math/vector';
-import {Index} from '../math/index';
-import {getBasicStats} from '../math/stats';
-import {precisionRound} from '../utils/string';
-import {logger} from '../utils/logger';
-import {Size} from './size';
-import {Spacing} from './spacing';
+} from '../math/matrix.js';
+import {Point3D, Point} from '../math/point.js';
+import {Vector3D} from '../math/vector.js';
+import {Index} from '../math/index.js';
+import {getBasicStats} from '../math/stats.js';
+import {precisionRound} from '../utils/string.js';
+import {logger} from '../utils/logger.js';
+import {Size} from './size.js';
+import {Spacing} from './spacing.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
+import {Matrix33} from '../math/matrix.js';
 /* eslint-enable no-unused-vars */
 
 /**

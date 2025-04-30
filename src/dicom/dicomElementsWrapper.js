@@ -1,8 +1,8 @@
-import {getTransferSyntaxName} from './dicomParser';
+import {getTransferSyntaxName} from './dicomParser.js';
 import {
   getDate,
   getTime
-} from './dicomDate';
+} from './dicomDate.js';
 import {
   isPixelDataTag,
   isItemDelimitationItemTag,
@@ -12,13 +12,13 @@ import {
   getSequenceDelimitationItemTag,
   getPixelDataTag,
   getTagFromKey
-} from './dicomTag';
-import {isNativeLittleEndian} from './dataReader';
+} from './dicomTag.js';
+import {isNativeLittleEndian} from './dataReader.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Tag} from './dicomTag';
-import {DataElement} from './dataElement';
+import {Tag} from './dicomTag.js';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,30 +1,30 @@
-import {Index} from '../math/index';
-import {ModalityLut} from './modalityLut';
-import {WindowLut} from './windowLut';
-import {luts} from './luts';
-import {VoiLut} from './voiLut';
-import {WindowLevel} from './windowLevel';
-import {generateImageDataMonochrome} from './viewMonochrome';
-import {generateImageDataPaletteColor} from './viewPaletteColor';
-import {generateImageDataRgb} from './viewRgb';
-import {generateImageDataYbrFull} from './viewYbrFull';
-import {ViewFactory} from './viewFactory';
-import {isIdentityMat33} from '../math/matrix';
-import {getSliceIterator} from '../image/iterator';
-import {ListenerHandler} from '../utils/listen';
-import {logger} from '../utils/logger';
+import {Index} from '../math/index.js';
+import {ModalityLut} from './modalityLut.js';
+import {WindowLut} from './windowLut.js';
+import {luts} from './luts.js';
+import {VoiLut} from './voiLut.js';
+import {WindowLevel} from './windowLevel.js';
+import {generateImageDataMonochrome} from './viewMonochrome.js';
+import {generateImageDataPaletteColor} from './viewPaletteColor.js';
+import {generateImageDataRgb} from './viewRgb.js';
+import {generateImageDataYbrFull} from './viewYbrFull.js';
+import {ViewFactory} from './viewFactory.js';
+import {isIdentityMat33} from '../math/matrix.js';
+import {getSliceIterator} from '../image/iterator.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {RescaleSlopeAndIntercept} from './rsi';
-import {ColourMap} from './luts';
-import {Matrix33} from '../math/matrix';
+import {Image} from './image.js';
+import {RescaleSlopeAndIntercept} from './rsi.js';
+import {ColourMap} from './luts.js';
+import {Matrix33} from '../math/matrix.js';
 import {
   Point,
   Point3D
-} from '../math/point';
-import {DataElement} from '../dicom/dataElement';
+} from '../math/point.js';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

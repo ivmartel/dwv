@@ -1,4 +1,4 @@
-import {ThreadPool, WorkerTask} from '../utils/thread';
+import {ThreadPool, WorkerTask} from '../utils/thread.js';
 
 /**
  * The JPEG baseline decoder.

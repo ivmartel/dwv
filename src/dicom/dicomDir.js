@@ -1,9 +1,9 @@
-import {DicomParser} from './dicomParser';
-import {logger} from '../utils/logger';
+import {DicomParser} from './dicomParser.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**

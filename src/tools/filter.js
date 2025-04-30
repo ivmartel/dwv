@@ -1,13 +1,13 @@
-import {ListenerHandler} from '../utils/listen';
+import {ListenerHandler} from '../utils/listen.js';
 import {
   ThresholdFilter,
   SobelFilter,
   SharpenFilter
-} from '../image/filter';
+} from '../image/filter.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
+import {App} from '../app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**

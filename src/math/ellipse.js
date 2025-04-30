@@ -1,11 +1,11 @@
-import {getStats} from './stats';
-import {Index} from './index';
+import {getStats} from './stats.js';
+import {Index} from './index.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point';
-import {ViewController} from '../app/viewController';
-import {Scalar2D} from './scalar';
+import {Point2D} from '../math/point.js';
+import {ViewController} from '../app/viewController.js';
+import {Scalar2D} from './scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

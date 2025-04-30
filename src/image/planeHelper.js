@@ -1,20 +1,20 @@
-import {Vector3D} from '../math/vector';
-import {Point3D, Point2D} from '../math/point';
-import {isIdentityMat33} from '../math/matrix';
+import {Vector3D} from '../math/vector.js';
+import {Point3D, Point2D} from '../math/point.js';
+import {isIdentityMat33} from '../math/matrix.js';
 import {
   getCosinesFromOrientation,
   getTargetOrientation
-} from '../math/orientation';
-import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
+} from '../math/orientation.js';
+import {getOrientedArray3D, getDeOrientedArray3D} from './geometry.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point} from '../math/point';
-import {Index} from '../math/index';
-import {Geometry} from '../image/geometry';
-import {Matrix33} from '../math/matrix';
-import {Spacing} from './spacing';
-import {Scalar2D, Scalar3D} from '../math/scalar';
+import {Point} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {Geometry} from '../image/geometry.js';
+import {Matrix33} from '../math/matrix.js';
+import {Spacing} from './spacing.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**

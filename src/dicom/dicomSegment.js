@@ -4,18 +4,18 @@ import {
   uintLabToLab,
   labToUintLab,
   srgbToCielab
-} from '../utils/colour';
+} from '../utils/colour.js';
 import {
   getCode,
   getDicomCodeItem
-} from './dicomCode';
-import {logger} from '../utils/logger';
+} from './dicomCode.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {RGB} from '../utils/colour';
-import {DataElement} from './dataElement';
-import {DicomCode} from './dicomCode';
+import {RGB} from '../utils/colour.js';
+import {DataElement} from './dataElement.js';
+import {DicomCode} from './dicomCode.js';
 /* eslint-enable no-unused-vars */
 
 /**

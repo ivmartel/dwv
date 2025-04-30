@@ -1,10 +1,10 @@
-import {ListenerHandler} from '../utils/listen';
-import {mergeObjects} from '../utils/operator';
+import {ListenerHandler} from '../utils/listen.js';
+import {mergeObjects} from '../utils/operator.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from '../image/image';
-import {AnnotationGroup} from '../image/annotationGroup';
+import {Image} from '../image/image.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
 
 /**

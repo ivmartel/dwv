@@ -1,5 +1,5 @@
-import {isSimilar} from './matrix';
-import {Vector3D} from './vector';
+import {isSimilar} from './matrix.js';
+import {Vector3D} from './vector.js';
 
 /**
  * Immutable 2D point.
