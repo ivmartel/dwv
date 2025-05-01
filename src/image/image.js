@@ -1698,7 +1698,6 @@ export class Image {
    * @param {Matrix33} orientation The orientation to resample to.
    * @param {[boolean]} interpolated default true, if true use bilinear 
    *  sampling, otherwise use nearest neighbor.
-   * @returns {Image} The transformed image.
    */
   resample(orientation, interpolated = true) {
     if (this.#resamplingThread === null) {
@@ -1746,6 +1745,25 @@ export class Image {
 
     this.#fireEvent({type: 'imagecontentchange'});
     this.#fireEvent({type: 'imagegeometrychange'});
+  }
+
+  /**
+   * Revert a resampled image to its original state.
+   */
+  revert() {
+    if (!this.#resampled) {
+      return;
+    }
+
+    this.#resampled = false;
+    this.#buffer = this.#rawBuffer;
+    this.#geometry = this.#rawGeometry;
+    this.#rawBuffer = null;
+    this.#rawGeometry = null;
+    
+    this.#fireEvent({type: 'imagecontentchange'});
+    this.#fireEvent({type: 'imagegeometrychange'});
+    this.#fireEvent({type: 'imageresampled'});
   }
 
 } // class Image

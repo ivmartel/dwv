@@ -302,13 +302,6 @@ export class DataTableUI {
             getLayerUpdate(index, divId, Orientation.Coronal));
           parent.appendChild(
             getLayerUpdate(index, divId, Orientation.Sagittal));
-
-          cell.append(getLayerRotate(index, divId));
-
-          cell.append(document.createElement('br'));
-          cell.appendChild(getLayerMove(index, divId, 'layerGroup0'));
-          cell.appendChild(getLayerMove(index, divId, 'layerGroup1'));
-          cell.appendChild(getLayerMove(index, divId, 'layerGroup2'));
         }
       };
       return button;
@@ -350,98 +343,6 @@ export class DataTableUI {
       return button;
     };
 
-    // get a layer move button
-    const getLayerMove = function (index, fromDivId, toDivId) {
-      const button = document.createElement('button');
-      button.name = 'layermv-' + index;
-      button.id = 'layermv-' + fromDivId + '-' + dataId + '-' + toDivId;
-      button.title = 'Add layer';
-      const number = toDivId[toDivId.length - 1];
-      button.appendChild(document.createTextNode('->LG' + number));
-      button.onclick = function () {
-        // update app
-        app.removeDataViewConfig(dataId, fromDivId);
-        app.addDataViewConfig(dataId, test.getViewConfig(layout, toDivId));
-        // update html
-        const parent = button.parentElement;
-        if (parent) {
-          parent.replaceChildren();
-          parent.appendChild(getLayerAdd(index, fromDivId));
-          // TODO update toDivId
-        }
-      };
-      return button;
-    };
-
-    const getLayerRotate = function(index, divId) {
-      const button = document.createElement('button');
-      button.name = 'rotate-' + index;
-      button.id = 'rotate-' + divId + '-' + dataId;
-      button.title = 'Rotate Test';
-      button.appendChild(document.createTextNode('R'));
-      button.onclick = function () {
-        const image = app.getImage(dataId);
-        const geometry = image.getGeometry();
-
-        const rotation = new dwv.Matrix33([
-          1, 0, 0,
-          0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
-          0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
-        ]);
-
-        // const rotation = new dwv.Matrix33([
-        //   1, 0, 0,
-        //   0, Math.cos(Math.PI * 0.13), -Math.sin(Math.PI * 0.13),
-        //   0, Math.sin(Math.PI * 0.13), Math.cos(Math.PI * 0.13)
-        // ]);
-
-        // const rotation = new dwv.Matrix33([
-        //   1, 0, 0,
-        //   0, Math.cos(Math.PI * 0.12), -Math.sin(Math.PI * 0.12),
-        //   0, Math.sin(Math.PI * 0.12), Math.cos(Math.PI * 0.12)
-        // ]);
-
-        // const rotation = new dwv.Matrix33([
-        //   Math.cos(Math.PI * 0.10), -Math.sin(Math.PI * 0.10), 0,
-        //   Math.sin(Math.PI * 0.10), Math.cos(Math.PI * 0.10), 0,
-        //   0, 0, 1
-        // ]);
-
-        const newOrientation = rotation.multiply(geometry.getOrientation());
-
-        // const newOrientation = new dwv.Matrix33([ 0.99944913387298, -0.0245764087885, 0.022304242167126388, 0.03116803057491, 0.92595130205154, -0.37635459979833125, -0.0114031974226, 0.37684243917465, 0.9262072251045111 ]);
-
-        // const newOrientation = new dwv.Matrix33([ 0.99944913387298, -0.0302084013819, 0.01374524186559406, 0.03116803243756, 0.99662119150161, -0.07599211905169626, -0.0114031983539, 0.07637866586446, 0.9970137230798992 ]);
-        
-        // image.resample(newOrientation);
-
-        app.resample(dataId, newOrientation);
-      };
-      return button;
-      
-    }
-
-    const getReset = function(index, divId) {
-      const button = document.createElement('button');
-      button.name = 'reset-' + index;
-      button.id = 'reset-' + divId + '-' + dataId;
-      button.title = 'Reset Test';
-      button.appendChild(document.createTextNode('@'));
-      button.onclick = function () {
-        // reset the views
-        const configs = app.getDataViewConfigs();
-        app.setDataViewConfigs(configs);
-
-        // render data (creates layers)
-        const dataIds = app.getDataIds();
-        for (let i = 0; i < dataIds.length; ++i) {
-          app.render(dataIds[i]);
-        }
-      };
-      return button;
-      
-    }
-
     // cell: id
     cell = row.insertCell();
     cell.appendChild(document.createTextNode(dataId));
@@ -474,14 +375,6 @@ export class DataTableUI {
           }
           cell.appendChild(button);
         }
-
-        cell.append(getReset(i, layerGroupDivId));
-        cell.append(getLayerRotate(i, layerGroupDivId));
-
-        cell.append(document.createElement('br'));
-        cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup0'));
-        cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup1'));
-        cell.appendChild(getLayerMove(i, layerGroupDivId, 'layerGroup2'));
       } else {
         cell.appendChild(getLayerAdd(i, layerGroupDivId));
       }

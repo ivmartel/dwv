@@ -207,6 +207,20 @@ function viewerSetup() {
       resetLayoutButton.disabled = false;
       const smoothingChk = document.getElementById('changesmoothing');
       smoothingChk.disabled = false;
+      const swapViewsButton = document.getElementById('swapviews');
+      swapViewsButton.disabled = false;
+
+      const rotateXButton = document.getElementById('rotate-x');
+      rotateXButton.disabled = false;
+      const rotateYButton = document.getElementById('rotate-y');
+      rotateYButton.disabled = false;
+      const rotateZButton = document.getElementById('rotate-z');
+      rotateZButton.disabled = false;
+      const rotateMatchButton = document.getElementById('rotate-match');
+      rotateMatchButton.disabled = false;
+      const rotateResetButton = document.getElementById('rotate-reset');
+      rotateResetButton.disabled = false;
+
       // remove handler
       _app.removeEventListener('renderend', onRenderEnd);
     }
@@ -473,6 +487,136 @@ function setup() {
     _app.resetLayout();
   });
 
+  const swapViewsButton = document.getElementById('swapviews');
+  swapViewsButton.disabled = true;
+  swapViewsButton.addEventListener('click', function () {
+    const currentConfigs = _app.getDataViewConfigs();
+
+    const newConfigs = {};
+    for (let key in currentConfigs){
+      const currentGroup = currentConfigs[key];
+      const newGroup = []
+      for (let i = 0; i < currentGroup.length; i++) {
+        const newConfig = currentGroup[i];
+        if (newConfig.divId === 'layerGroup0') {
+          newConfig.divId = 'layerGroup1';
+        } else if (newConfig.divId === 'layerGroup1') {
+          newConfig.divId = 'layerGroup0';
+        }
+        newGroup.push(newConfig);
+      }
+      newConfigs[key] = newGroup;
+    }
+
+    // clear data table
+    dataTable.clearDataTable();
+
+    // set config (deletes previous layers)
+    _app.setDataViewConfigs(newConfigs);
+
+    // re-render
+    const dataIds = _app.getDataIds();
+    for (let i = 0; i < dataIds.length; ++i) {
+      _app.render(dataIds[i]);
+    }
+
+    // re-enable crosshairs
+    const divIds = test.getLayerGroupDivIds(newConfigs);
+    for (const divId of divIds) {
+      _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
+    }
+
+    // need to set tool after config change
+    setAppTool();
+  });
+
+  const rotateXButton = document.getElementById('rotate-x');
+  rotateXButton.disabled = true;
+  rotateXButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const rotation = new dwv.Matrix33([
+      1, 0, 0,
+      0, Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1),
+      0, Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1)
+    ]);
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateYButton = document.getElementById('rotate-y');
+  rotateYButton.disabled = true;
+  rotateYButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const rotation = new dwv.Matrix33([
+      Math.cos(Math.PI * 0.1), 0, -Math.sin(Math.PI * 0.1),
+      0, 1, 0,
+      Math.sin(Math.PI * 0.1), 0, Math.cos(Math.PI * 0.1)
+    ]);
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateZButton = document.getElementById('rotate-z');
+  rotateZButton.disabled = true;
+  rotateZButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    const rotation = new dwv.Matrix33([
+      Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1), 0,
+      Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1), 0,
+      0, 0, 1
+    ]);
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateMatchButton = document.getElementById('rotate-match');
+  rotateMatchButton.disabled = true;
+  rotateMatchButton.addEventListener('click', function () {
+    const lg0 = _app.getLayerGroupByDivId('layerGroup0');
+    const vl0 = lg0.getBaseViewLayer();
+    const dataId0 = vl0.getDataId();
+
+    const lg1 = _app.getLayerGroupByDivId('layerGroup1');
+    const vl1 = lg1.getBaseViewLayer();
+    const dataId1 = vl1.getDataId();
+
+    _app.resampleMatch(dataId0, dataId1);
+  });
+
+  const rotateResetButton = document.getElementById('rotate-reset');
+  rotateResetButton.disabled = true;
+  rotateResetButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    _app.revertResample(dataId);
+  });
+
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.disabled = true;
   changeLayoutSelect.addEventListener('change', function (event) {
@@ -520,6 +664,14 @@ function setup() {
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
+    }
+
+    if (layout == 'side') {
+      swapViewsButton.style = 'visibility: visible;';
+      rotateMatchButton.style = 'visibility: visible;';
+    } else {
+      swapViewsButton.style = 'visibility: collapse;';
+      rotateMatchButton.style = 'visibility: collapse;';
     }
 
     // need to set tool after config change

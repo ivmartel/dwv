@@ -1264,10 +1264,8 @@ export class App {
    * @param {Matrix33} orientation The orientation to resample to.
    */
   #resampleInternal(dataIdTarget, dataTarget, orientation) {
-    // TODO: how to handle segmentations?
     dataTarget.image.resample(orientation);
 
-    // input checks
     const configs = this.#options.dataViewConfigs;
 
     const metaTarget = dataTarget.image.getMeta();
@@ -1313,7 +1311,6 @@ export class App {
       this.#resampleInternal(dataIdTarget, targetImage, sourceOrientation);
     }
   }
-
   
   /**
    * Resample an image to match an arbitrary orientation.
@@ -1328,6 +1325,43 @@ export class App {
       typeof targetImage !== 'undefined'
     ) {
       this.#resampleInternal(dataIdTarget, targetImage, orientation);
+    }
+  }
+
+  /**
+   * Revert an image back to its original orientation.
+   *
+   * @param {string} dataIdTarget The target image id to revert.
+   */
+  revertResample(dataIdTarget) {
+    const targetImage = this.#dataController.get(dataIdTarget);
+
+    targetImage.image.revert();
+
+    const configs = this.#options.dataViewConfigs;
+
+    const metaTarget = targetImage.image.getMeta();
+    const dataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < dataIds.length; i++) {
+      const data = this.#dataController.get(dataIds[i])
+
+      const meta = data.image.getMeta();
+      if (meta.Modality === 'SEG' && 
+          meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        data.image.revert();
+      }
+    }
+
+    // the image drastically changed, it is much easier to just
+    // take the view config and forcefully re-initialize it
+
+    // TODO: only updating the configs of the affected images can cause
+    //    layers to inherit some configs from their segmentation layers
+    //    for some unknown reason. For now we just update all of them.
+    this.setDataViewConfigs(configs);
+    // render data (creates layers)
+    for (let i = 0; i < dataIds.length; ++i) {
+      this.render(dataIds[i]);
     }
   }
 
