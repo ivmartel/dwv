@@ -35,52 +35,7 @@ export class DataTableUI {
   constructor(app) {
     this.#app = app;
   }
-
-  const watching = {};
-
-  /**
-   * Watch a data for changes.
-   *
-   * @param {string} dataId The data ID.
-   */
-  function watchResample(dataId) {
-    if (!watching[dataId]) {
-      const maskData = app.getData(dataId);
-      if (!maskData) {
-        throw new Error(
-          'No data to watch for dataId: ' + dataId
-        );
-      }
-      const image = maskData.image;
-
-      // Watch for resampling
-      image.addEventListener(
-        'imageresampled',
-        (event) => {
-          console.log(event.image);
-          app.setImage(dataId, event.image);
-
-          // After we set the image we need to reset the views
-          // so it correctly updates with the new metadata
-
-          // reset the views
-          const configs = app.getDataViewConfigs();
-          app.setDataViewConfigs(configs);
-
-          // render data (creates layers)
-          const dataIds = app.getDataIds();
-          for (let i = 0; i < dataIds.length; ++i) {
-            app.render(dataIds[i]);
-          }
-        }
-      );
-
-      watching[dataId] = true;
-    } else {
-      console.log('Already watching data', dataId);
-    }
-  }
-
+  
   /**
    * Bind app to ui.
    *
@@ -276,9 +231,6 @@ export class DataTableUI {
     //   this.registerListeners();
     // }
 
-    
-    watchResample(dataId);
-
     const image = this.#app.getData(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
@@ -431,19 +383,17 @@ export class DataTableUI {
         const image = app.getImage(dataId);
         const geometry = image.getGeometry();
 
-        console.log("POKE orientation", geometry.getOrientation().getValues());
+        const rotation = new dwv.Matrix33([
+          1, 0, 0,
+          0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
+          0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
+        ]);
 
         // const rotation = new dwv.Matrix33([
         //   1, 0, 0,
-        //   0, Math.cos(Math.PI * 0.24), -Math.sin(Math.PI * 0.24),
-        //   0, Math.sin(Math.PI * 0.24), Math.cos(Math.PI * 0.24)
+        //   0, Math.cos(Math.PI * 0.13), -Math.sin(Math.PI * 0.13),
+        //   0, Math.sin(Math.PI * 0.13), Math.cos(Math.PI * 0.13)
         // ]);
-
-        const rotation = new dwv.Matrix33([
-          1, 0, 0,
-          0, Math.cos(Math.PI * 0.13), -Math.sin(Math.PI * 0.13),
-          0, Math.sin(Math.PI * 0.13), Math.cos(Math.PI * 0.13)
-        ]);
 
         // const rotation = new dwv.Matrix33([
         //   1, 0, 0,
@@ -463,7 +413,9 @@ export class DataTableUI {
 
         // const newOrientation = new dwv.Matrix33([ 0.99944913387298, -0.0302084013819, 0.01374524186559406, 0.03116803243756, 0.99662119150161, -0.07599211905169626, -0.0114031983539, 0.07637866586446, 0.9970137230798992 ]);
         
-        image.resample(newOrientation);
+        // image.resample(newOrientation);
+
+        app.resample(dataId, newOrientation);
       };
       return button;
       

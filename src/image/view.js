@@ -319,7 +319,9 @@ export class View {
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName].perslice !==
         'undefined' &&
-      this.#windowPresets[this.#currentPresetName].perslice === true) {
+      this.#windowPresets[this.#currentPresetName].perslice === true &&
+      // TODO: we currently can't handle per-slice wl on resampled images
+      !this.#image.isResampled()) {
       // check position
       if (!this.getCurrentIndex()) {
         this.setInitialIndex();
@@ -813,7 +815,9 @@ export class View {
     let wl = preset.wl[0];
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
-      preset.perslice === true) {
+      preset.perslice === true &&
+      // TODO: we currently can't handle per-slice wl on resampled images
+      !this.#image.isResampled() ) {
       const offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
       wl = preset.wl[offset];
     }

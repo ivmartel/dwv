@@ -1257,6 +1257,81 @@ export class App {
   }
 
   /**
+   * Resample an image to match an arbitrary orientation.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {DicomData} dataTarget The data of the target to resample.
+   * @param {Matrix33} orientation The orientation to resample to.
+   */
+  #resampleInternal(dataIdTarget, dataTarget, orientation) {
+    // TODO: how to handle segmentations?
+    dataTarget.image.resample(orientation);
+
+    // input checks
+    const configs = this.#options.dataViewConfigs;
+
+    const metaTarget = dataTarget.image.getMeta();
+    const dataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < dataIds.length; i++) {
+      const data = this.#dataController.get(dataIds[i])
+
+      const meta = data.image.getMeta();
+      if (meta.Modality === 'SEG' && 
+          meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        data.image.resample(orientation, false);
+      }
+    }
+
+    // the image drastically changed, it is much easier to just
+    // take the view config and forcefully re-initialize it
+
+    // TODO: only updating the configs of the affected images can cause
+    //    layers to inherit some configs from their segmentation layers
+    //    for some unknown reason. For now we just update all of them.
+    this.setDataViewConfigs(configs);
+    // render data (creates layers)
+    for (let i = 0; i < dataIds.length; ++i) {
+      this.render(dataIds[i]);
+    }
+  }
+
+  /**
+   * Resample one image to match the orientation of another.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {string} dataIdSource The source image id to copy the orientation from.
+   */
+  resampleMatch(dataIdTarget, dataIdSource) {
+    const sourceImage = this.#dataController.get(dataIdSource);
+    const targetImage = this.#dataController.get(dataIdTarget);
+
+    if (
+      typeof sourceImage !== 'undefined' &&
+      typeof targetImage !== 'undefined'
+    ) {
+      const sourceOrientation = sourceImage.image.getGeometry().getOrientation();
+      this.#resampleInternal(dataIdTarget, targetImage, sourceOrientation);
+    }
+  }
+
+  
+  /**
+   * Resample an image to match an arbitrary orientation.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {Matrix33} orientation The orientation to resample to.
+   */
+  resample(dataIdTarget, orientation) {
+    const targetImage = this.#dataController.get(dataIdTarget);
+
+    if (
+      typeof targetImage !== 'undefined'
+    ) {
+      this.#resampleInternal(dataIdTarget, targetImage, orientation);
+    }
+  }
+
+  /**
    * Set the active view layer (of the active layer group) opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).

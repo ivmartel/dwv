@@ -146,6 +146,27 @@ export class Image {
   #buffer;
 
   /**
+   * Whether the image has been resampled or not.
+   * 
+   * @type {boolean}
+   */
+  #resampled;
+
+  /**
+   * Data geometry, unmodified if image is resampled, null otherwise.
+   *
+   * @type {Geometry}
+   */
+  #rawGeometry;
+
+  /**
+   * Data buffer, unmodified if image is resampled, null otherwise.
+   *
+   * @type {TypedArray}
+   */
+  #rawBuffer;
+
+  /**
    * Image UIDs.
    *
    * @type {string[]}
@@ -266,6 +287,9 @@ export class Image {
   constructor(geometry, buffer, imageUids) {
     this.#geometry = geometry;
     this.#buffer = buffer;
+    this.#resampled = false;
+    this.#rawGeometry = null;
+    this.#rawBuffer = null;
     this.#imageUids = imageUids;
     this.#labelingThread = null;
     this.#resamplingThread = null;
@@ -1660,60 +1684,68 @@ export class Image {
   }
 
   /**
+   * Return if this image has been resampled
+   *
+   * @returns {boolean} If the image has been resampled.
+   */
+  isResampled() {
+    return this.#resampled;
+  }
+
+  /**
    * Resample this image to a new orientation
    *
    * @param {Matrix33} orientation The orientation to resample to.
+   * @param {[boolean]} interpolated default true, if true use bilinear 
+   *  sampling, otherwise use nearest neighbor.
    * @returns {Image} The transformed image.
    */
-  resample(orientation) {
+  resample(orientation, interpolated = true) {
     if (this.#resamplingThread === null) {
       this.#resamplingThread = new ResamplingThread();
 
       this.#resamplingThread.ondone = (event) => {
         const data = event.data;
-
-        const outOrigin = new Point3D(
-          data.outOrigin[0],
-          data.outOrigin[1],
-          data.outOrigin[2],
-        );
-        const outSize = new Size(data.outSize);
-        const outSpacing = new Spacing(data.outSpacing);
-        const outOrientation = new Matrix33(data.outOrientation);
-
-        const imageGeometry = new Geometry(
-          [ outOrigin ],
-          outSize,
-          outSpacing,
-          outOrientation,
-        );
-
-        const newImage = new Image(
-          imageGeometry, 
-          data.outImageBuffer, 
-          this.#imageUids // TODO: not fully accurate
-        );
-        // TODO: not fully accurate
-        newImage.setMeta(this.#meta);
-  
-        this.#fireEvent({
-          type: 'imageresampled',
-          image: newImage
-        });
+        this.#buffer = data.outImageBuffer;
+        this.#fireEvent({type: 'imageresampled'});
       };
     }
 
-    // TODO: If this is an already resampled image we want to resample 
-    //       from the original to not degrade the data further
+    let resampled;
 
-    // TODO: How to handle segmentations on resampled images?
+    // If we were already resampled then resample again from the original to not degrade the data
+    if (this.#resampled && this.#rawBuffer !== null && this.#rawGeometry !== null){
+      resampled =
+        this.#resamplingThread.run(
+          this.#rawBuffer,
+          this.#rawGeometry,
+          this.#meta.PixelRepresentation,
+          orientation,
+          interpolated
+        );
+    } else {
+      resampled =
+        this.#resamplingThread.run(
+          this.#buffer,
+          this.#geometry,
+          this.#meta.PixelRepresentation,
+          orientation,
+          interpolated
+        );
+    }
 
-    this.#resamplingThread.run(
-      this.#buffer,
-      this.#geometry,
-      this.#meta.PixelRepresentation,
-      orientation
-    );
+    // if the image is already resampled we don't want to override the raw
+    if (!this.#resampled) {
+      this.#resampled = true;
+      this.#rawBuffer = this.#buffer;
+      this.#rawGeometry = this.#geometry;
+    }
+
+    this.#buffer = resampled.buffer;
+    this.#geometry = resampled.geometry;
+
+    this.#fireEvent({type: 'imagecontentchange'});
+    this.#fireEvent({type: 'imagegeometrychange'});
   }
 
 } // class Image

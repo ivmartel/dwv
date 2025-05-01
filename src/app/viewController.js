@@ -164,7 +164,6 @@ export class ViewController {
    * @param {string} name The name of the preset to activate.
    */
   setWindowLevelPreset(name) {
-    console.log("POKE preset", name);
     this.#view.setWindowLevelPreset(name);
   }
 
@@ -831,6 +830,7 @@ export class ViewController {
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
   }
+  
 
   /**
    * Bind the view image to the provided layer.
@@ -844,6 +844,9 @@ export class ViewController {
     );
     image.addEventListener('imagegeometrychange',
       viewLayer.onimagegeometrychange
+    );
+    image.addEventListener('imageresampled',
+      viewLayer.onimageresampled
     );
   }
 
@@ -859,6 +862,9 @@ export class ViewController {
     );
     image.removeEventListener('imagegeometrychange',
       viewLayer.onimagegeometrychange
+    );
+    image.removeEventListener('imageresampled',
+      viewLayer.onimageresampled
     );
   }
 

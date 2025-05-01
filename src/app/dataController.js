@@ -180,6 +180,7 @@ export class DataController {
     // listen to image change
     image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
     image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+    image.addEventListener('imageresampled', this.#getFireEvent(dataId));
   }
 
   /**
@@ -247,6 +248,8 @@ export class DataController {
         'imagecontentchange', this.#getFireEvent(dataId));
       data.image.addEventListener(
         'imagegeometrychange', this.#getFireEvent(dataId));
+      data.image.addEventListener(
+        'imageresampled', this.#getFireEvent(dataId));
     }
     if (typeof data.annotationGroup !== 'undefined') {
       data.annotationGroup.addEventListener(
@@ -272,6 +275,8 @@ export class DataController {
           'imagecontentchange', this.#getFireEvent(dataId));
         image.removeEventListener(
           'imagegeometrychange', this.#getFireEvent(dataId));
+        image.removeEventListener(
+          'imageresampled', this.#getFireEvent(dataId));
       }
       const annotationGroup = this.#dataList[dataId].annotationGroup;
       if (typeof annotationGroup !== 'undefined') {
