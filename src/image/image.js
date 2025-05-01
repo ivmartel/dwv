@@ -11,9 +11,6 @@ import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
 import {ResamplingThread} from './resamplingThread';
-import {Geometry} from './geometry';
-import {Size} from './size';
-import {Spacing} from './spacing';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -147,7 +144,7 @@ export class Image {
 
   /**
    * Whether the image has been resampled or not.
-   * 
+   *
    * @type {boolean}
    */
   #resampled;
@@ -1684,7 +1681,7 @@ export class Image {
   }
 
   /**
-   * Return if this image has been resampled
+   * Return if this image has been resampled.
    *
    * @returns {boolean} If the image has been resampled.
    */
@@ -1693,10 +1690,10 @@ export class Image {
   }
 
   /**
-   * Resample this image to a new orientation
+   * Resample this image to a new orientation.
    *
    * @param {Matrix33} orientation The orientation to resample to.
-   * @param {[boolean]} interpolated default true, if true use bilinear 
+   * @param {[boolean]} interpolated Default true, if true use bilinear
    *  sampling, otherwise use nearest neighbor.
    */
   resample(orientation, interpolated = true) {
@@ -1712,8 +1709,13 @@ export class Image {
 
     let resampled;
 
-    // If we were already resampled then resample again from the original to not degrade the data
-    if (this.#resampled && this.#rawBuffer !== null && this.#rawGeometry !== null){
+    // If we were already resampled then resample again from the
+    // original to not degrade the data
+    if (
+      this.#resampled &&
+      this.#rawBuffer !== null &&
+      this.#rawGeometry !== null
+    ) {
       resampled =
         this.#resamplingThread.run(
           this.#rawBuffer,
@@ -1760,7 +1762,7 @@ export class Image {
     this.#geometry = this.#rawGeometry;
     this.#rawBuffer = null;
     this.#rawGeometry = null;
-    
+
     this.#fireEvent({type: 'imagecontentchange'});
     this.#fireEvent({type: 'imagegeometrychange'});
     this.#fireEvent({type: 'imageresampled'});

@@ -817,7 +817,7 @@ export class View {
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true &&
       // TODO: we currently can't handle per-slice wl on resampled images
-      !this.#image.isResampled() ) {
+      !this.#image.isResampled()) {
       const offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
       wl = preset.wl[offset];
     }

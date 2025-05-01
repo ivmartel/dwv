@@ -493,9 +493,9 @@ function setup() {
     const currentConfigs = _app.getDataViewConfigs();
 
     const newConfigs = {};
-    for (let key in currentConfigs){
+    for (const key in currentConfigs) {
       const currentGroup = currentConfigs[key];
-      const newGroup = []
+      const newGroup = [];
       for (let i = 0; i < currentGroup.length; i++) {
         const newConfig = currentGroup[i];
         if (newConfig.divId === 'layerGroup0') {
@@ -540,11 +540,13 @@ function setup() {
     const image = _app.getImage(dataId);
     const geometry = image.getGeometry();
 
+    /* eslint-disable @stylistic/js/array-element-newline */
     const rotation = new dwv.Matrix33([
       1, 0, 0,
       0, Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1),
       0, Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1)
     ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
 
     const newOrientation = rotation.multiply(geometry.getOrientation());
 
@@ -561,11 +563,13 @@ function setup() {
     const image = _app.getImage(dataId);
     const geometry = image.getGeometry();
 
+    /* eslint-disable @stylistic/js/array-element-newline */
     const rotation = new dwv.Matrix33([
       Math.cos(Math.PI * 0.1), 0, -Math.sin(Math.PI * 0.1),
       0, 1, 0,
       Math.sin(Math.PI * 0.1), 0, Math.cos(Math.PI * 0.1)
     ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
 
     const newOrientation = rotation.multiply(geometry.getOrientation());
 
@@ -582,11 +586,13 @@ function setup() {
     const image = _app.getImage(dataId);
     const geometry = image.getGeometry();
 
+    /* eslint-disable @stylistic/js/array-element-newline */
     const rotation = new dwv.Matrix33([
       Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1), 0,
       Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1), 0,
       0, 0, 1
     ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
 
     const newOrientation = rotation.multiply(geometry.getOrientation());
 
@@ -666,7 +672,7 @@ function setup() {
       }
     }
 
-    if (layout == 'side') {
+    if (layout === 'side') {
       swapViewsButton.style = 'visibility: visible;';
       rotateMatchButton.style = 'visibility: visible;';
     } else {

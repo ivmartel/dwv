@@ -1,6 +1,6 @@
 
 /**
- * Immutable 3x3 Matrix. (Paired down copy to play nice with the webworker)
+ * Immutable 3x3 Matrix. (Paired down copy to play nice with the webworker).
  */
 class Matrix33 {
 
@@ -56,7 +56,6 @@ class Matrix33 {
 
     let det = m00 * a1212 + m01 * a2012 + m02 * a0112;
     if (det === 0) {
-      logger.warn('Cannot invert 3*3 matrix with zero determinant.');
       return undefined;
     }
     det = 1 / det;
@@ -130,24 +129,26 @@ class Matrix33 {
 
 
 /**
- * Simple bilinear sampling function
+ * Simple bilinear sampling function.
  *
  * @param {TypedArray} buffer The buffer to sample.
  * @param {number[]} unitVectors The buffer offset space unit vectors.
- * @param {number[]} point The index space point to sample
+ * @param {number[]} point The index space point to sample.
+ *
+ * @returns {number} The sampled value.
  */
 function bilinearSample(buffer, unitVectors, point) {
   const q0Index = [
     Math.floor(point[0]),
     Math.floor(point[1]),
     Math.floor(point[2])
-  ]
+  ];
 
   const weights = [
     Math.abs(point[0] - q0Index[0]),
     Math.abs(point[1] - q0Index[1]),
     Math.abs(point[2] - q0Index[2])
-  ]
+  ];
 
   const xMeans = [0.0, 0.0];
   for (let x = 0; x < 2; x++) {
@@ -155,7 +156,7 @@ function bilinearSample(buffer, unitVectors, point) {
     for (let y = 0; y < 2; y++) {
       const zValues = [0.0, 0.0];
       for (let z = 0; z < 2; z++) {
-        const sampleOffset = 
+        const sampleOffset =
           ((q0Index[0] + x) * unitVectors[0]) +
           ((q0Index[1] + y) * unitVectors[1]) +
           ((q0Index[2] + z) * unitVectors[2]);
@@ -176,7 +177,7 @@ function bilinearSample(buffer, unitVectors, point) {
 }
 
 /**
- * Calculate the resampling
+ * Calculate the resampling.
  *
  * @param {object} workerMessage The worker message.
  */
@@ -185,8 +186,6 @@ function calculateResample(workerMessage) {
   const outSize = workerMessage.outSize;
   const inUnitVectors = workerMessage.inUnitVectors;
   const outUnitVectors = workerMessage.outUnitVectors;
-  const inOrigin = workerMessage.inOrigin;
-  const outOrigin = workerMessage.outOrigin;
   const inSpacing = workerMessage.inSpacing;
   const outSpacing = workerMessage.outSpacing;
 
@@ -216,7 +215,7 @@ function calculateResample(workerMessage) {
         const inIndexPoint = [
           (rotIndexPoint[0] / inSpacing[0]) + (inSize[0] / 2.0),
           (rotIndexPoint[1] / inSpacing[1]) + (inSize[1] / 2.0),
-          (rotIndexPoint[2] / inSpacing[2]) + (inSize[2] / 2.0) 
+          (rotIndexPoint[2] / inSpacing[2]) + (inSize[2] / 2.0)
         ];
 
         if (!(
@@ -234,7 +233,11 @@ function calculateResample(workerMessage) {
 
           if (interpolate) {
             // Bilinear
-            const sample = bilinearSample(workerMessage.inImageBuffer, inUnitVectors, inIndexPoint);
+            const sample = bilinearSample(
+              workerMessage.inImageBuffer,
+              inUnitVectors,
+              inIndexPoint
+            );
             workerMessage.outImageBuffer[outOffset] = sample;
 
           } else {
@@ -244,12 +247,9 @@ function calculateResample(workerMessage) {
               (inUnitVectors[1] * Math.round(inIndexPoint[1])) +
               (inUnitVectors[2] * Math.round(inIndexPoint[2]));
 
-            workerMessage.outImageBuffer[outOffset] = workerMessage.inImageBuffer[inOffset];
+            workerMessage.outImageBuffer[outOffset] =
+              workerMessage.inImageBuffer[inOffset];
           }
-        } else {
-          // if (x <= 10 && y <= 10 && z <= 10){
-          //   console.log("Sample out of bounds, ignoring...", inIndexPoint, outIndexPoint, inOrigin, outOrigin);
-          // }
         }
       }
     }

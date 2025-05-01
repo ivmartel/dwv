@@ -830,7 +830,6 @@ export class ViewController {
   setViewAlphaFunction(func) {
     this.#view.setAlphaFunction(func);
   }
-  
 
   /**
    * Bind the view image to the provided layer.
