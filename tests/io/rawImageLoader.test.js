@@ -1,4 +1,4 @@
-import {RawImageLoader} from '../../src/io/rawImageLoader';
+import {RawImageLoader} from '../../src/io/rawImageLoader.js';
 
 /**
  * Tests for the 'io/rawImageLoader.js' file.

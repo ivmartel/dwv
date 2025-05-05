@@ -1,7 +1,7 @@
 import {
   Matrix33,
   getIdentityMat33,
-} from '../../src/math/matrix';
+} from '../../src/math/matrix.js';
 import {
   getMatrixFromName,
   getOrientationStringLPS,
@@ -9,7 +9,7 @@ import {
   getOrientationFromCosines,
   getCosinesFromOrientation,
   getOrientationName
-} from '../../src/math/orientation';
+} from '../../src/math/orientation.js';
 
 /**
  * Tests for the 'math/point.js' file.

@@ -3,8 +3,8 @@ import {
   isEqualCode,
   getCode,
   getDicomCodeItem
-} from '../../src/dicom/dicomCode';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter';
+} from '../../src/dicom/dicomCode.js';
+import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
 
 /**
  * Tests for the 'dicom/dicomCode.js' file.

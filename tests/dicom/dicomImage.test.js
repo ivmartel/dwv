@@ -1,4 +1,4 @@
-import {isMonochrome} from '../../src/dicom/dicomImage';
+import {isMonochrome} from '../../src/dicom/dicomImage.js';
 
 /**
  * Tests for the 'dicom/dicomImage.js' file.

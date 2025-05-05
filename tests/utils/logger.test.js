@@ -1,4 +1,4 @@
-import {logger} from '../../src/utils/logger';
+import {logger} from '../../src/utils/logger.js';
 
 /**
  * Tests for the 'utils/logger' file.

@@ -1,4 +1,4 @@
-import {State} from '../../src/io/state';
+import {State} from '../../src/io/state.js';
 
 import v01Ellipse from './v0.1/state-ellipse.json';
 import v01LineMulti from './v0.1/state-line_multi-slice.json';

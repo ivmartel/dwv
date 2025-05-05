@@ -1,13 +1,13 @@
-import {Point3D} from '../../src/math/point';
-import {Index} from '../../src/math/index';
-import {getStats} from '../../src/math/stats';
-import {arrayEquals} from '../../src/utils/array';
-import {Size} from '../../src/image/size';
-import {Spacing} from '../../src/image/spacing';
-import {Geometry} from '../../src/image/geometry';
-import {RescaleSlopeAndIntercept} from '../../src/image/rsi';
-import {Image} from '../../src/image/image';
-import {ImageFactory} from '../../src/image/imageFactory';
+import {Point3D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {getStats} from '../../src/math/stats.js';
+import {arrayEquals} from '../../src/utils/array.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
+import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+import {Image} from '../../src/image/image.js';
+import {ImageFactory} from '../../src/image/imageFactory.js';
 
 /**
  * Tests for the 'image/image.js' file.

@@ -1,4 +1,4 @@
-import {UndoStack} from '../../src/utils/undoStack';
+import {UndoStack} from '../../src/utils/undoStack.js';
 
 /**
  * Tests for the 'utils/undoStack' file.

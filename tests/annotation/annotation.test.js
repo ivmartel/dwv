@@ -1,13 +1,20 @@
-import {DicomParser} from '../../src/dicom/dicomParser';
-import {b64urlToArrayBuffer} from '../dicom/utils';
-import {AnnotationGroupFactory} from '../../src/image/annotationGroupFactory';
-import {Circle} from '../../src/math/circle';
-import {Ellipse} from '../../src/math/ellipse';
-import {Line} from '../../src/math/line';
-import {Point2D} from '../../src/math/point';
-import {Protractor} from '../../src/math/protractor';
-import {Rectangle} from '../../src/math/rectangle';
-import {ROI} from '../../src/math/roi';
+import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {b64urlToArrayBuffer} from '../dicom/utils.js';
+import {
+  AnnotationGroupFactory
+} from '../../src/image/annotationGroupFactory.js';
+import {Circle} from '../../src/math/circle.js';
+import {Ellipse} from '../../src/math/ellipse.js';
+import {Line} from '../../src/math/line.js';
+import {Point2D} from '../../src/math/point.js';
+import {Protractor} from '../../src/math/protractor.js';
+import {Rectangle} from '../../src/math/rectangle.js';
+import {ROI} from '../../src/math/roi.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+/* eslint-enable no-unused-vars */
 
 import dwv034Arrow from './dwv034/sr-arrow.dcm';
 import dwv034Circle from './dwv034/sr-circle.dcm';
@@ -24,11 +31,6 @@ import tid1500v0Protractor from './tid1500-0/sr-protractor.dcm';
 import tid1500v0Rectangle from './tid1500-0/sr-rectangle.dcm';
 import tid1500v0Roi from './tid1500-0/sr-roi.dcm';
 import tid1500v0Ruler from './tid1500-0/sr-ruler.dcm';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {AnnotationGroup} from '../../src/image/annotationGroup';
-/* eslint-enable no-unused-vars */
 
 /**
  * Tests for the annotation I/O.

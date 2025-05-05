@@ -1,5 +1,5 @@
-import {Size} from '../../src/image/size';
-import {generateWorkerMessage} from '../../src/image/labelingThread';
+import {Size} from '../../src/image/size.js';
+import {generateWorkerMessage} from '../../src/image/labelingThread.js';
 
 /**
  * Tests for the 'image/labelingWorker.js' file.

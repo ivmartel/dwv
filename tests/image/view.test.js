@@ -1,11 +1,11 @@
-import {Point3D} from '../../src/math/point';
-import {Size} from '../../src/image/size';
-import {Spacing} from '../../src/image/spacing';
-import {Geometry} from '../../src/image/geometry';
-import {Image} from '../../src/image/image';
-import {View} from '../../src/image/view';
-import {RescaleSlopeAndIntercept} from '../../src/image/rsi';
-import {WindowLevel} from '../../src/image/windowLevel';
+import {Point3D} from '../../src/math/point.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
+import {Image} from '../../src/image/image.js';
+import {View} from '../../src/image/view.js';
+import {RescaleSlopeAndIntercept} from '../../src/image/rsi.js';
+import {WindowLevel} from '../../src/image/windowLevel.js';
 
 /**
  * Tests for the 'image/view.js' file.

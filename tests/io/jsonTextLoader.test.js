@@ -1,4 +1,4 @@
-import {JSONTextLoader} from '../../src/io/jsonTextLoader';
+import {JSONTextLoader} from '../../src/io/jsonTextLoader.js';
 
 /**
  * Tests for the 'io/dicomDataLoader.js' file.

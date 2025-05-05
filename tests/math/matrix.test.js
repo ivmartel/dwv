@@ -1,11 +1,11 @@
-import {Vector3D} from '../../src/math/vector';
-import {Index} from '../../src/math/index';
+import {Vector3D} from '../../src/math/vector.js';
+import {Index} from '../../src/math/index.js';
 import {
   BIG_EPSILON,
   Matrix33,
   getIdentityMat33,
   isIdentityMat33
-} from '../../src/math/matrix';
+} from '../../src/math/matrix.js';
 
 /**
  * Tests for the 'math/point.js' file.

@@ -1,5 +1,5 @@
-import {Index} from '../../src/math/index';
-import {Size} from '../../src/image/size';
+import {Index} from '../../src/math/index.js';
+import {Size} from '../../src/image/size.js';
 
 /**
  * Tests for the 'image/size.js' file.

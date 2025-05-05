@@ -1,21 +1,21 @@
-import {Point3D} from '../../src/math/point';
-import {Index} from '../../src/math/index';
+import {Point3D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
 import {
   Matrix33,
   getIdentityMat33
-} from '../../src/math/matrix';
-import {getMatrixFromName} from '../../src/math/orientation';
-import {Size} from '../../src/image/size';
-import {Spacing} from '../../src/image/spacing';
-import {Geometry} from '../../src/image/geometry';
+} from '../../src/math/matrix.js';
+import {getMatrixFromName} from '../../src/math/orientation.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 import {
   simpleRange,
   simpleRange3d,
   range,
   rangeRegion,
   getSliceIterator
-} from '../../src/image/iterator';
-import {Image} from '../../src/image/image';
+} from '../../src/image/iterator.js';
+import {Image} from '../../src/image/image.js';
 
 /**
  * Tests for the 'image/iterator.js' file.

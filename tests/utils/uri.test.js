@@ -4,7 +4,7 @@ import {
   getUriQuery,
   decodeKeyValueUri,
   decodeManifest
-} from '../../src/utils/uri';
+} from '../../src/utils/uri.js';
 
 /**
  * Tests for the 'utils/uri.js' file.

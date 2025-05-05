@@ -1,4 +1,4 @@
-import {safeGet} from '../../src/dicom/dataElement';
+import {safeGet} from '../../src/dicom/dataElement.js';
 import {
   getDwvVersion,
   getDwvVersionUI,
@@ -10,13 +10,13 @@ import {
   cleanString,
   hasDicomPrefix,
   DicomParser
-} from '../../src/dicom/dicomParser';
+} from '../../src/dicom/dicomParser.js';
 import {
   Tag,
   getPixelDataTag
-} from '../../src/dicom/dicomTag';
-import {getFileListFromDicomDir} from '../../src/dicom/dicomDir';
-import {b64urlToArrayBuffer} from './utils';
+} from '../../src/dicom/dicomTag.js';
+import {getFileListFromDicomDir} from '../../src/dicom/dicomDir.js';
+import {b64urlToArrayBuffer} from './utils.js';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm';
 import dwvTestSequence from '../data/dwv-test-sequence.dcm';

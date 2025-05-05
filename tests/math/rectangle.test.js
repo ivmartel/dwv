@@ -1,6 +1,6 @@
-import {Point2D} from '../../src/math/point';
-import {Index} from '../../src/math/index';
-import {Rectangle} from '../../src/math/rectangle';
+import {Point2D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {Rectangle} from '../../src/math/rectangle.js';
 
 /**
  * Tests for the 'math/rectangle.js' file.

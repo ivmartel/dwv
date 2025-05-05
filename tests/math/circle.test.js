@@ -1,6 +1,6 @@
-import {Point2D} from '../../src/math/point';
-import {Index} from '../../src/math/index';
-import {Circle} from '../../src/math/circle';
+import {Point2D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {Circle} from '../../src/math/circle.js';
 
 /**
  * Tests for the 'math/circle.js' file.

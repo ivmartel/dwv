@@ -1,8 +1,8 @@
-import {Point3D, Point} from '../../src/math/point';
-import {Index} from '../../src/math/index';
-import {Size} from '../../src/image/size';
-import {Spacing} from '../../src/image/spacing';
-import {Geometry} from '../../src/image/geometry';
+import {Point3D, Point} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 
 /**
  * Tests for the 'image/geometry.js' file.

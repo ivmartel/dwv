@@ -2,7 +2,7 @@ import {
   LayerGroup,
   getLayerDivId,
   getLayerDetailsFromLayerDivId
-} from '../../src/gui/layerGroup';
+} from '../../src/gui/layerGroup.js';
 
 /**
  * Tests for the 'gui/LayerGroup.js' file.

@@ -6,7 +6,7 @@ import {
   replaceFlags,
   getFileExtension,
   precisionRound
-} from '../../src/utils/string';
+} from '../../src/utils/string.js';
 
 /**
  * Tests for the 'utils/string' file.

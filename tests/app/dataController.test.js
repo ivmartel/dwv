@@ -1,12 +1,12 @@
 import {
   DicomData,
   DataController
-} from '../../src/app/dataController';
-import {Point3D} from '../../src/math/point';
-import {Image} from '../../src/image/image';
-import {Size} from '../../src/image/size';
-import {Spacing} from '../../src/image/spacing';
-import {Geometry} from '../../src/image/geometry';
+} from '../../src/app/dataController.js';
+import {Point3D} from '../../src/math/point.js';
+import {Image} from '../../src/image/image.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 
 /**
  * Tests for the 'app/dataController.js' file.

@@ -1,4 +1,4 @@
-import {mergeObjects} from '../../src/utils/operator';
+import {mergeObjects} from '../../src/utils/operator.js';
 
 /**
  * Tests for the 'utils/operator.js' file.

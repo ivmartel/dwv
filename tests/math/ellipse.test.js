@@ -1,6 +1,6 @@
-import {Point2D} from '../../src/math/point';
-import {Index} from '../../src/math/index';
-import {Ellipse, getEllipseIndices} from '../../src/math/ellipse';
+import {Point2D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {Ellipse, getEllipseIndices} from '../../src/math/ellipse.js';
 
 /**
  * Tests for the 'math/ellipse.js' file.
