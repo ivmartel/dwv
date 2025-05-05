@@ -40,7 +40,7 @@
     "eslint": "^9.26.0",
     "eslint-plugin-jsdoc": "^50.6.11",
     "github-release-notes": "0.17.2",
-    "globals": "^15.14.0",
+    "globals": "^16.0.0",
     "html-webpack-plugin": "^5.6.3",
     "jsdoc": "^4.0.4",
     "karma": "^6.4.4",
