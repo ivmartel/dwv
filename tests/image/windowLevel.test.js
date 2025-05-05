@@ -1,10 +1,10 @@
 import {
   validateWindowWidth,
   WindowLevel
-} from '../../src/image/windowLevel';
+} from '../../src/image/windowLevel.js';
 
 /**
- * Tests for the 'image/voiLut.js' file.
+ * Tests for the 'image/windowLevel.js' file.
  */
 
 /* global QUnit */
@@ -17,14 +17,13 @@ QUnit.module('image');
  */
 QUnit.test('WindowLevel class', function (assert) {
   const wcaw00 = new WindowLevel(0, 2);
-  assert.equal(wcaw00.center, 0, 'Window level getCenter.');
-  assert.equal(wcaw00.width, 2, 'Window level getWidth.');
+  assert.equal(wcaw00.center, 0, 'Window level getCenter #00');
+  assert.equal(wcaw00.width, 2, 'Window level getWidth #00');
 
-  assert.throws(function () {
-    new WindowLevel(0, 0);
-  },
-  new Error('Window width shall always be greater than or equal to 1'),
-  'WindowLevel with 0 width.');
+  // width 0 will be forced to 1
+  const wcaw01 = new WindowLevel(1, 0);
+  assert.equal(wcaw01.center, 1, 'Window level getCenter #01');
+  assert.equal(wcaw01.width, 1, 'Window level getWidth #01');
 });
 
 /**
