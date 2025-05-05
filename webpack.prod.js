@@ -1,13 +1,13 @@
-const {merge} = require('webpack-merge');
-const common = require('./webpack.common.js');
+import {merge} from 'webpack-merge';
+import {webpackCommon} from './webpack.common.js';
 
-module.exports = merge(common, {
+export default merge(webpackCommon, {
   mode: 'production',
   devtool: 'source-map',
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -26,23 +26,8 @@ module.exports = merge(common, {
     ]
   },
   externals: {
-    konva: {
-      root: 'Konva',
-      commonjs: 'konva',
-      commonjs2: 'konva',
-      amd: 'konva'
-    },
-    jszip: {
-      root: 'JSZip',
-      commonjs: 'jszip',
-      commonjs2: 'jszip',
-      amd: 'jszip'
-    },
-    'magic-wand-tool': {
-      root: 'MagicWand',
-      commonjs: 'magic-wand-tool',
-      commonjs2: 'magic-wand-tool',
-      amd: 'konmagic-wand-tool',
-    }
+    konva: 'konva',
+    jszip: 'jszip',
+    'magic-wand-tool': 'magic-wand-tool',
   }
 });

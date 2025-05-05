@@ -1,17 +1,23 @@
-const path = require('path');
+import path from 'path';
+import {fileURLToPath} from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-module.exports = {
+export const webpackCommon = {
   entry: {
     dwv: './src/index.js'
   },
   output: {
     filename: '[name].min.js',
     library: {
-      name: '[name]',
-      type: 'umd'
+      type: 'module'
     },
-    globalObject: 'this',
+    environment: {
+      module: true
+    },
     path: path.resolve(__dirname, 'dist'),
     clean: true,
+  },
+  experiments: {
+    outputModule: true, // Enable ESM output
   }
 };
