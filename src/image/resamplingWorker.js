@@ -1,4 +1,6 @@
 
+const BIG_EPSILON = Number.EPSILON * 1e4;
+
 /**
  * Immutable 3x3 Matrix. (Pared down copy to play nice with the webworker).
  */
@@ -148,11 +150,12 @@ class Matrix33W {
  *
  * @param {TypedArray} buffer The buffer to sample.
  * @param {number[]} unitVectors The buffer offset space unit vectors.
+ * @param {number[]} size The buffer size.
  * @param {number[]} point The index space point to sample.
  *
  * @returns {number} The sampled value.
  */
-function bilinearSample(buffer, unitVectors, point) {
+function bilinearSample(buffer, unitVectors, size, point) {
   const q0Index = [
     Math.floor(point[0]),
     Math.floor(point[1]),
@@ -167,28 +170,77 @@ function bilinearSample(buffer, unitVectors, point) {
 
   const xMeans = [0.0, 0.0];
   for (let x = 0; x < 2; x++) {
+    const xIndex = q0Index[0] + x;
     const yMeans = [0.0, 0.0];
     for (let y = 0; y < 2; y++) {
+      const yIndex = q0Index[1] + y;
       const zValues = [0.0, 0.0];
       for (let z = 0; z < 2; z++) {
-        const sampleOffset =
-          ((q0Index[0] + x) * unitVectors[0]) +
-          ((q0Index[1] + y) * unitVectors[1]) +
-          ((q0Index[2] + z) * unitVectors[2]);
+        const zIndex = q0Index[2] + z;
 
-        zValues[z] = buffer[sampleOffset];
+        if (
+          zIndex < 0 ||
+          zIndex >= size[2]
+        ) {
+          zValues[z] = 0;
+        } else {
+          const sampleOffset =
+            (xIndex * unitVectors[0]) +
+            (yIndex * unitVectors[1]) +
+            (zIndex * unitVectors[2]);
+
+          zValues[z] = buffer[sampleOffset];
+        }
       }
 
-      yMeans[y] = (zValues[1] * weights[2]) +
-                  (zValues[0] * (1 - weights[2]));
+      if (
+        q0Index[2] < 0
+      ) {
+        yMeans[y] = zValues[1];
+      } else if (q0Index[2] + 1 >= size[2]) {
+        yMeans[y] = zValues[0];
+      } else {
+        yMeans[y] = (zValues[1] * weights[2]) +
+                    (zValues[0] * (1 - weights[2]));
+      }
     }
 
-    xMeans[x] = (yMeans[1] * weights[1]) +
+    if (
+      q0Index[1] < 0
+    ) {
+      xMeans[x] = yMeans[1];
+    } else if (q0Index[1] + 1 >= size[1]) {
+      xMeans[x] = yMeans[0];
+    } else {
+      xMeans[x] = (yMeans[1] * weights[1]) +
                 (yMeans[0] * (1 - weights[1]));
+    }
   }
 
-  return (xMeans[1] * weights[0]) +
+  if (
+    q0Index[0] < 0
+  ) {
+    return xMeans[1];
+  } else if (q0Index[0] + 1 >= size[0]) {
+    return xMeans[0];
+  } else {
+    return (xMeans[1] * weights[0]) +
          (xMeans[0] * (1 - weights[0]));
+  }
+}
+
+/**
+ * Round if the value is close enough to an integer.
+ *
+ * @param {number} value The value to round.
+ */
+function snapRound(value) {
+  const rounded = Math.round(value);
+  if (Math.abs(value - rounded) < BIG_EPSILON) {
+    return rounded;
+  } else {
+    return value;
+  }
 }
 
 /**
@@ -238,9 +290,9 @@ function calculateResample(workerMessage) {
 
         relativeMatrix.multiplyTypedArray3D(centeredIndexPoint, rotIndexPoint);
 
-        sourceIndexPoint[0] = (rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0];
-        sourceIndexPoint[1] = (rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1];
-        sourceIndexPoint[2] = (rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2];
+        sourceIndexPoint[0] = snapRound((rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]);
+        sourceIndexPoint[1] = snapRound((rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]);
+        sourceIndexPoint[2] = snapRound((rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]);
 
         if (!(
           sourceIndexPoint[0] < 0 ||
@@ -260,6 +312,7 @@ function calculateResample(workerMessage) {
             const sample = bilinearSample(
               workerMessage.sourceImageBuffer,
               sourceUnitVectors,
+              sourceSize,
               sourceIndexPoint
             );
             workerMessage.targetImageBuffer[targetOffset] = sample;
