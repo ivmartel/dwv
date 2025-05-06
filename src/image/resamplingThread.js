@@ -120,7 +120,7 @@ export class ResamplingThread {
     inImageGeometry,
     pixelRepresentation,
     outOrientation,
-    interpolated
+    interpolated = true
   ) {
     // We can't just pass in an Image or we would get a circular dependency
 
@@ -133,11 +133,7 @@ export class ResamplingThread {
 
     // Calculate updated spacing
     //---------------------------------
-    const inSpacingArr = [
-      inSpacing.get(0),
-      inSpacing.get(1),
-      inSpacing.get(2),
-    ];
+    const inSpacingArr = inSpacing.getValues();
 
     // Calculate the bounds of the rotated pixel volume
     const maxSpacingBounds = [0.0, 0.0, 0.0];
@@ -188,7 +184,7 @@ export class ResamplingThread {
       inSpacingArr[1] *
       inSpacingArr[2];
 
-    const volumeRatio = Math.pow(inSpacingVolume / outSpacingMaxVolume, 0.3333);
+    const volumeRatio = Math.cbrt(inSpacingVolume / outSpacingMaxVolume);
 
     const outSpacingArr = [
       outSpacingArrMax[0] * volumeRatio,
@@ -207,6 +203,7 @@ export class ResamplingThread {
       (inSize.get(2) / 2.0) * inSpacing.get(2),
     ];
 
+    let firstValue = true;
     const maxBounds = [0.0, 0.0, 0.0];
     const minBounds = [0.0, 0.0, 0.0];
     for (let x = -1; x <= 1; x += 2) {
@@ -221,20 +218,30 @@ export class ResamplingThread {
           const orientedBoundPoint =
             relativeMatrix.multiplyPoint3D(boundPoint);
 
-          maxBounds[0] = Math.max(maxBounds[0], orientedBoundPoint.getX());
-          maxBounds[1] = Math.max(maxBounds[1], orientedBoundPoint.getY());
-          maxBounds[2] = Math.max(maxBounds[2], orientedBoundPoint.getZ());
-          minBounds[0] = Math.min(minBounds[0], orientedBoundPoint.getX());
-          minBounds[1] = Math.min(minBounds[1], orientedBoundPoint.getY());
-          minBounds[2] = Math.min(minBounds[2], orientedBoundPoint.getZ());
+          if (firstValue) {
+            maxBounds[0] = orientedBoundPoint.getX();
+            maxBounds[1] = orientedBoundPoint.getY();
+            maxBounds[2] = orientedBoundPoint.getZ();
+            minBounds[0] = orientedBoundPoint.getX();
+            minBounds[1] = orientedBoundPoint.getY();
+            minBounds[2] = orientedBoundPoint.getZ();
+            firstValue = false;
+          } else {
+            maxBounds[0] = Math.max(maxBounds[0], orientedBoundPoint.getX());
+            maxBounds[1] = Math.max(maxBounds[1], orientedBoundPoint.getY());
+            maxBounds[2] = Math.max(maxBounds[2], orientedBoundPoint.getZ());
+            minBounds[0] = Math.min(minBounds[0], orientedBoundPoint.getX());
+            minBounds[1] = Math.min(minBounds[1], orientedBoundPoint.getY());
+            minBounds[2] = Math.min(minBounds[2], orientedBoundPoint.getZ());
+          }
         }
       }
     }
 
     const outSize = new Size([
-      Math.ceil(Math.abs((maxBounds[0] - minBounds[0]) / outSpacing.get(0))),
-      Math.ceil(Math.abs((maxBounds[1] - minBounds[1]) / outSpacing.get(1))),
-      Math.ceil(Math.abs((maxBounds[2] - minBounds[2]) / outSpacing.get(2)))
+      Math.round(Math.abs((maxBounds[0] - minBounds[0]) / outSpacing.get(0))),
+      Math.round(Math.abs((maxBounds[1] - minBounds[1]) / outSpacing.get(1))),
+      Math.round(Math.abs((maxBounds[2] - minBounds[2]) / outSpacing.get(2)))
     ]);
 
     // Calculate updated origin
@@ -283,7 +290,6 @@ export class ResamplingThread {
       outOrientation,
     );
 
-    // TODO: TEMPORARY
     const workerMessage =
       generateWorkerMessage(
         inImageBuffer,

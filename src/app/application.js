@@ -695,6 +695,8 @@ export class App {
       'imagecontentchange', this.#fireEvent);
     this.#dataController.addEventListener(
       'imagegeometrychange', this.#fireEvent);
+    this.#dataController.addEventListener(
+      'imageresampled', this.#fireEvent);
     this.#dataController.addEventListener('annotationadd', this.#fireEvent);
     this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
     this.#dataController.addEventListener('annotationremove', this.#fireEvent);

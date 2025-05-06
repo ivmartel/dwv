@@ -1707,33 +1707,20 @@ export class Image {
       };
     }
 
-    let resampled;
-
     // If we were already resampled then resample again from the
     // original to not degrade the data
-    if (
-      this.#resampled &&
-      this.#rawBuffer !== null &&
-      this.#rawGeometry !== null
-    ) {
-      resampled =
-        this.#resamplingThread.run(
-          this.#rawBuffer,
-          this.#rawGeometry,
-          this.#meta.PixelRepresentation,
-          orientation,
-          interpolated
-        );
-    } else {
-      resampled =
-        this.#resamplingThread.run(
-          this.#buffer,
-          this.#geometry,
-          this.#meta.PixelRepresentation,
-          orientation,
-          interpolated
-        );
-    }
+
+    const source = this.#resampled && this.#rawBuffer && this.#rawGeometry
+      ? { buffer: this.#rawBuffer, geometry: this.#rawGeometry }
+      : { buffer: this.#buffer, geometry: this.#geometry };
+
+    const resampled = this.#resamplingThread.run(
+      source.buffer,
+      source.geometry,
+      this.#meta.PixelRepresentation,
+      orientation,
+      interpolated
+    );
 
     // if the image is already resampled we don't want to override the raw
     if (!this.#resampled) {

@@ -1,8 +1,8 @@
 
 /**
- * Immutable 3x3 Matrix. (Paired down copy to play nice with the webworker).
+ * Immutable 3x3 Matrix. (Pared down copy to play nice with the webworker).
  */
-class Matrix33 {
+class Matrix33W {
 
   /**
    * Matrix values.
@@ -36,7 +36,7 @@ class Matrix33 {
    * - {@link https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices},
    * - {@link https://github.com/willnode/N-Matrix-Programmer}.
    *
-   * @returns {Matrix33|undefined} The inverse matrix or undefined
+   * @returns {Matrix33W|undefined} The inverse matrix or undefined
    *   if the determinant is zero.
    */
   getInverse() {
@@ -72,14 +72,14 @@ class Matrix33 {
       det * (m00 * m11 - m01 * m10)
     ];
 
-    return new Matrix33(values);
+    return new Matrix33W(values);
   }
 
   /**
    * Multiply this matrix by another.
    *
-   * @param {Matrix33} rhs The matrix to multiply by.
-   * @returns {Matrix33} The product matrix.
+   * @param {Matrix33W} rhs The matrix to multiply by.
+   * @returns {Matrix33W} The product matrix.
    */
   multiply(rhs) {
     const values = [];
@@ -92,7 +92,7 @@ class Matrix33 {
         values.push(tmp);
       }
     }
-    return new Matrix33(values);
+    return new Matrix33W(values);
   }
 
   /**
@@ -115,6 +115,21 @@ class Matrix33 {
       values.push(tmp);
     }
     return values;
+  }
+
+  /**
+   * Multiply this matrix by a 3D typed array.
+   *
+   * @param {TypedArray[]} inArray The input 3D array.
+   * @param {TypedArray[]} outArray The array to write to.
+   */
+  multiplyTypedArray3D(inArray, outArray) {
+    for (let i = 0; i < 3; ++i) {
+      outArray[i] = 0;
+      for (let j = 0; j < 3; ++j) {
+        outArray[i] += this.get(i, j) * inArray[j];
+      }
+    }
   }
 
   /**
@@ -192,31 +207,42 @@ function calculateResample(workerMessage) {
   const interpolate = workerMessage.interpolate;
 
   // Can't pass them in as matrixes, so we need to re-create them
-  const inMatrix = new Matrix33(workerMessage.inOrientation);
-  const outMatrix = new Matrix33(workerMessage.outOrientation);
+  const inMatrix = new Matrix33W(workerMessage.inOrientation);
+  const outMatrix = new Matrix33W(workerMessage.outOrientation);
 
   const iInMatrix = inMatrix.getInverse();
   const relativeMatrix = outMatrix.multiply(iInMatrix);
+
+  const halfOutSize = [
+    outSize[0] / 2.0,
+    outSize[1] / 2.0,
+    outSize[2] / 2.0
+  ];
+
+  const halfInSize = [
+    inSize[0] / 2.0,
+    inSize[1] / 2.0,
+    inSize[2] / 2.0
+  ];
+  
+  const centeredIndexPoint = new Float64Array(3);
+  const rotIndexPoint = new Float64Array(3);
+  const inIndexPoint = new Float64Array(3);
 
   for (let x = 0; x < outSize[0]; x++) {
     for (let y = 0; y < outSize[1]; y++) {
       for (let z = 0; z < outSize[2]; z++) {
         const outIndexPoint = [x, y, z];
 
-        const centeredIndexPoint = [
-          (outIndexPoint[0] - (outSize[0] / 2.0)) * outSpacing[0],
-          (outIndexPoint[1] - (outSize[1] / 2.0)) * outSpacing[1],
-          (outIndexPoint[2] - (outSize[2] / 2.0)) * outSpacing[2]
-        ];
+        centeredIndexPoint[0] = (outIndexPoint[0] - halfOutSize[0]) * outSpacing[0];
+        centeredIndexPoint[1] = (outIndexPoint[1] - halfOutSize[1]) * outSpacing[1];
+        centeredIndexPoint[2] = (outIndexPoint[2] - halfOutSize[2]) * outSpacing[2];
 
-        const rotIndexPoint =
-          relativeMatrix.multiplyArray3D(centeredIndexPoint);
+        relativeMatrix.multiplyTypedArray3D(centeredIndexPoint, rotIndexPoint);
 
-        const inIndexPoint = [
-          (rotIndexPoint[0] / inSpacing[0]) + (inSize[0] / 2.0),
-          (rotIndexPoint[1] / inSpacing[1]) + (inSize[1] / 2.0),
-          (rotIndexPoint[2] / inSpacing[2]) + (inSize[2] / 2.0)
-        ];
+        inIndexPoint[0] = (rotIndexPoint[0] / inSpacing[0]) + halfInSize[0];
+        inIndexPoint[1] = (rotIndexPoint[1] / inSpacing[1]) + halfInSize[1];
+        inIndexPoint[2] = (rotIndexPoint[2] / inSpacing[2]) + halfInSize[2];
 
         if (!(
           inIndexPoint[0] < 0 ||

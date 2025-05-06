@@ -122,12 +122,32 @@ export class Livewire {
   #scissors = new Scissors();
 
   /**
+   * Chack if the base image is resampled.
+   *
+   * @param {string} divId The layer group divId.
+   * @returns {boolean} ture if the image is resampled.
+   */
+  #isResampled(divId) {
+    const layerGroup = this.#app.getLayerGroupByDivId(divId);
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const referenceDataId = viewLayer.getDataId();
+    const referenceData = this.#app.getData(referenceDataId);
+    const image = referenceData.image;
+
+    return image.isResampled();
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
+    if(this.#isResampled(divId)){
+      return;
+    }
+
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
 
     let viewLayer;
