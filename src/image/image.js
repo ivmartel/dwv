@@ -1702,7 +1702,7 @@ export class Image {
 
       this.#resamplingThread.ondone = (event) => {
         const data = event.data;
-        this.#buffer = data.outImageBuffer;
+        this.#buffer = data.targetImageBuffer;
         this.#fireEvent({type: 'imageresampled'});
       };
     }

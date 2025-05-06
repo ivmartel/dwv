@@ -26,60 +26,60 @@ const resamplingWorkerUrl = new URL('./resamplingWorker.js', import.meta.url);
 /**
  * Generate a worker message to send to the resampling worker.
  *
- * @param {TypedArray} inImageBuffer The buffer to resample.
- * @param {Geometry} inImageGeometry The current image geometry.
- * @param {TypedArray} outImageBuffer The buffer to resample to.
- * @param {Geometry} outImageGeometry The geometry to resample to.
+ * @param {TypedArray} sourceImageBuffer The buffer to resample.
+ * @param {Geometry} sourceImageGeometry The current image geometry.
+ * @param {TypedArray} targetImageBuffer The buffer to resample to.
+ * @param {Geometry} targetImageGeometry The geometry to resample to.
  * @param {[boolean]} interpolated Default true, if true use bilinear
  *  sampling, otherwise use nearest neighbor.
  *
  * @returns {object} The message to send to the worker.
  */
 export function generateWorkerMessage(
-  inImageBuffer,
-  inImageGeometry,
-  outImageBuffer,
-  outImageGeometry,
+  sourceImageBuffer,
+  sourceImageGeometry,
+  targetImageBuffer,
+  targetImageGeometry,
   interpolated
 ) {
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
 
-  const inSize = inImageGeometry.getSize();
-  const inNDims = inSize.length();
-  const outSize = outImageGeometry.getSize();
-  const outNDims = inSize.length();
+  const sourceSize = sourceImageGeometry.getSize();
+  const sourceNDims = sourceSize.length();
+  const targetSize = targetImageGeometry.getSize();
+  const targetNDims = sourceSize.length();
 
   // Cache the unit vector offsets to make a couple calculations faster.
-  const inUnitVectors = Array(inNDims).fill(0);
-  for (let d = 0; d < inNDims; d++) {
-    inUnitVectors[d] = inSize.getDimSize(d);
+  const sourceUnitVectors = Array(sourceNDims).fill(0);
+  for (let d = 0; d < sourceNDims; d++) {
+    sourceUnitVectors[d] = sourceSize.getDimSize(d);
   }
 
-  const outUnitVectors = Array(outNDims).fill(0);
-  for (let d = 0; d < outNDims; d++) {
-    outUnitVectors[d] = outSize.getDimSize(d);
+  const targetUnitVectors = Array(targetNDims).fill(0);
+  for (let d = 0; d < targetNDims; d++) {
+    targetUnitVectors[d] = targetSize.getDimSize(d);
   }
 
-  const inTotalSize = inSize.getTotalSize();
-  const outTotalSize = outSize.getTotalSize();
+  const sourceTotalSize = sourceSize.getTotalSize();
+  const targetTotalSize = targetSize.getTotalSize();
 
   return {
-    inImageBuffer: inImageBuffer,
-    inOrigin: inImageGeometry.getOrigin().getValues(),
-    inSize: inImageGeometry.getSize().getValues(),
-    inSpacing: inImageGeometry.getSpacing().getValues(),
-    inOrientation: inImageGeometry.getOrientation().getValues(),
-    inUnitVectors: inUnitVectors,
-    inTotalSize: inTotalSize,
+    sourceImageBuffer: sourceImageBuffer,
+    sourceOrigin: sourceImageGeometry.getOrigin().getValues(),
+    sourceSize: sourceImageGeometry.getSize().getValues(),
+    sourceSpacing: sourceImageGeometry.getSpacing().getValues(),
+    sourceOrientation: sourceImageGeometry.getOrientation().getValues(),
+    sourceUnitVectors: sourceUnitVectors,
+    sourceTotalSize: sourceTotalSize,
 
-    outImageBuffer: outImageBuffer,
-    outOrigin: outImageGeometry.getOrigin().getValues(),
-    outSize: outImageGeometry.getSize().getValues(),
-    outSpacing: outImageGeometry.getSpacing().getValues(),
-    outOrientation: outImageGeometry.getOrientation().getValues(),
-    outUnitVectors: outUnitVectors,
-    outTotalSize: outTotalSize,
+    targetImageBuffer: targetImageBuffer,
+    targetOrigin: targetImageGeometry.getOrigin().getValues(),
+    targetSize: targetImageGeometry.getSize().getValues(),
+    targetSpacing: targetImageGeometry.getSpacing().getValues(),
+    targetOrientation: targetImageGeometry.getOrientation().getValues(),
+    targetUnitVectors: targetUnitVectors,
+    targetTotalSize: targetTotalSize,
 
     interpolate: interpolated
   };
@@ -105,35 +105,35 @@ export class ResamplingThread {
   /**
    * Trigger a resampling.
    *
-   * @param {TypedArray} inImageBuffer The buffer to resample.
-   * @param {Geometry} inImageGeometry The current image geometry.
+   * @param {TypedArray} sourceImageBuffer The buffer to resample.
+   * @param {Geometry} sourceImageGeometry The current image geometry.
    * @param {string} pixelRepresentation The pixel representation
    *  of the original image.
-   * @param {Matrix33} outOrientation The orientation to resample to.
+   * @param {Matrix33} targetOrientation The orientation to resample to.
    * @param {[boolean]} interpolated Default true, if true use bilinear
    *  sampling, otherwise use nearest neighbor.
    *
    * @returns {object} Updated buffer and geometry.
    */
   run(
-    inImageBuffer,
-    inImageGeometry,
+    sourceImageBuffer,
+    sourceImageGeometry,
     pixelRepresentation,
-    outOrientation,
+    targetOrientation,
     interpolated = true
   ) {
     // We can't just pass in an Image or we would get a circular dependency
 
-    const iOutOrientation = outOrientation.getInverse();
+    const invTargetOrientation = targetOrientation.getInverse();
     const relativeMatrix =
-      iOutOrientation.multiply(inImageGeometry.getOrientation());
+      invTargetOrientation.multiply(sourceImageGeometry.getOrientation());
 
-    const inSize = inImageGeometry.getSize();
-    const inSpacing = inImageGeometry.getSpacing();
+    const sourceSize = sourceImageGeometry.getSize();
+    const sourceSpacing = sourceImageGeometry.getSpacing();
 
     // Calculate updated spacing
     //---------------------------------
-    const inSpacingArr = inSpacing.getValues();
+    const sourceSpacingArr = sourceSpacing.getValues();
 
     // Calculate the bounds of the rotated pixel volume
     const maxSpacingBounds = [0.0, 0.0, 0.0];
@@ -142,9 +142,9 @@ export class ResamplingThread {
       for (let y = 0; y <= 1; y++) {
         for (let z = 0; z <= 1; z++) {
           const boundPoint = new Point3D(
-            inSpacingArr[0] * x,
-            inSpacingArr[1] * y,
-            inSpacingArr[2] * z,
+            sourceSpacingArr[0] * x,
+            sourceSpacingArr[1] * y,
+            sourceSpacingArr[2] * z,
           );
 
           const orientedBoundPoint =
@@ -166,7 +166,7 @@ export class ResamplingThread {
       }
     }
 
-    const outSpacingArrMax = [
+    const targetSpacingArrMax = [
       Math.abs(maxSpacingBounds[0] - minSpacingBounds[0]),
       Math.abs(maxSpacingBounds[1] - minSpacingBounds[1]),
       Math.abs(maxSpacingBounds[2] - minSpacingBounds[2])
@@ -174,33 +174,33 @@ export class ResamplingThread {
 
     // Maintain the ratio of the new bounds, but the
     // per pixel volume of the original.
-    const outSpacingMaxVolume =
-      outSpacingArrMax[0] *
-      outSpacingArrMax[1] *
-      outSpacingArrMax[2];
+    const targetSpacingMaxVolume =
+      targetSpacingArrMax[0] *
+      targetSpacingArrMax[1] *
+      targetSpacingArrMax[2];
 
-    const inSpacingVolume =
-      inSpacingArr[0] *
-      inSpacingArr[1] *
-      inSpacingArr[2];
+    const sourceSpacingVolume =
+      sourceSpacingArr[0] *
+      sourceSpacingArr[1] *
+      sourceSpacingArr[2];
 
-    const volumeRatio = Math.cbrt(inSpacingVolume / outSpacingMaxVolume);
+    const volumeRatio = Math.cbrt(sourceSpacingVolume / targetSpacingMaxVolume);
 
-    const outSpacingArr = [
-      outSpacingArrMax[0] * volumeRatio,
-      outSpacingArrMax[1] * volumeRatio,
-      outSpacingArrMax[2] * volumeRatio
+    const targetSpacingArr = [
+      targetSpacingArrMax[0] * volumeRatio,
+      targetSpacingArrMax[1] * volumeRatio,
+      targetSpacingArrMax[2] * volumeRatio
     ];
 
-    const outSpacing = new Spacing(outSpacingArr);
+    const targetSpacing = new Spacing(targetSpacingArr);
 
     // Calculate updated size
     //---------------------------------
     // The index coords of the bound if the center was at 0,0
     const boundIndex = [
-      (inSize.get(0) / 2.0) * inSpacing.get(0),
-      (inSize.get(1) / 2.0) * inSpacing.get(1),
-      (inSize.get(2) / 2.0) * inSpacing.get(2),
+      (sourceSize.get(0) / 2.0) * sourceSpacing.get(0),
+      (sourceSize.get(1) / 2.0) * sourceSpacing.get(1),
+      (sourceSize.get(2) / 2.0) * sourceSpacing.get(2),
     ];
 
     let firstValue = true;
@@ -238,64 +238,64 @@ export class ResamplingThread {
       }
     }
 
-    const outSize = new Size([
-      Math.round(Math.abs((maxBounds[0] - minBounds[0]) / outSpacing.get(0))),
-      Math.round(Math.abs((maxBounds[1] - minBounds[1]) / outSpacing.get(1))),
-      Math.round(Math.abs((maxBounds[2] - minBounds[2]) / outSpacing.get(2)))
+    const targetSize = new Size([
+      Math.round(Math.abs((maxBounds[0] - minBounds[0]) / targetSpacing.get(0))),
+      Math.round(Math.abs((maxBounds[1] - minBounds[1]) / targetSpacing.get(1))),
+      Math.round(Math.abs((maxBounds[2] - minBounds[2]) / targetSpacing.get(2)))
     ]);
 
     // Calculate updated origin
     //---------------------------------
-    const outOriginIndexCentered = new Point3D(
-      (0 - (outSize.get(0) / 2.0)) * outSpacing.get(0),
-      (0 - (outSize.get(1) / 2.0)) * outSpacing.get(1),
-      (0 - (outSize.get(2) / 2.0)) * outSpacing.get(2),
+    const targetOriginIndexCentered = new Point3D(
+      (0 - (targetSize.get(0) / 2.0)) * targetSpacing.get(0),
+      (0 - (targetSize.get(1) / 2.0)) * targetSpacing.get(1),
+      (0 - (targetSize.get(2) / 2.0)) * targetSpacing.get(2),
     );
-    const outOriginIndexOriented =
-      relativeMatrix.getInverse().multiplyPoint3D(outOriginIndexCentered);
+    const targetOriginIndexOriented =
+      relativeMatrix.getInverse().multiplyPoint3D(targetOriginIndexCentered);
 
-    const outOriginInIndex = new Index([
+    const targetOriginSourceIndex = new Index([
       Math.floor(
-        (outOriginIndexOriented.getX() / inSpacing.get(0)) +
-        (inSize.get(0) / 2.0)
+        (targetOriginIndexOriented.getX() / sourceSpacing.get(0)) +
+        (sourceSize.get(0) / 2.0)
       ),
       Math.floor(
-        (outOriginIndexOriented.getY() / inSpacing.get(1)) +
-        (inSize.get(1) / 2.0)
+        (targetOriginIndexOriented.getY() / sourceSpacing.get(1)) +
+        (sourceSize.get(1) / 2.0)
       ),
       Math.floor(
-        (outOriginIndexOriented.getZ() / inSpacing.get(2)) +
-        (inSize.get(2) / 2.0)
+        (targetOriginIndexOriented.getZ() / sourceSpacing.get(2)) +
+        (sourceSize.get(2) / 2.0)
       ),
     ]);
-    const outOrigin = inImageGeometry.indexToWorld(outOriginInIndex).get3D();
+    const targetOrigin = sourceImageGeometry.indexToWorld(targetOriginSourceIndex).get3D();
 
     // Generate new image
     //---------------------------------
-    const outImageBuffer = getTypedArray(
-      inImageBuffer.BYTES_PER_ELEMENT * 8,
+    const targetImageBuffer = getTypedArray(
+      sourceImageBuffer.BYTES_PER_ELEMENT * 8,
       pixelRepresentation,
-      outSize.getTotalSize());
+      targetSize.getTotalSize());
 
-    if (outImageBuffer === null) {
+    if (targetImageBuffer === null) {
       throw new Error('Cannot reallocate data for image resampling.');
     }
 
-    outImageBuffer.fill(0);
+    targetImageBuffer.fill(0);
 
-    const outImageGeometry = new Geometry(
-      [outOrigin],
-      outSize,
-      outSpacing,
-      outOrientation,
+    const targetImageGeometry = new Geometry(
+      [targetOrigin],
+      targetSize,
+      targetSpacing,
+      targetOrientation,
     );
 
     const workerMessage =
       generateWorkerMessage(
-        inImageBuffer,
-        inImageGeometry,
-        outImageBuffer,
-        outImageGeometry,
+        sourceImageBuffer,
+        sourceImageGeometry,
+        targetImageBuffer,
+        targetImageGeometry,
         interpolated
       );
 
@@ -311,8 +311,8 @@ export class ResamplingThread {
     this.#threadPool.addWorkerTask(workerTask);
 
     return {
-      buffer: outImageBuffer,
-      geometry: outImageGeometry
+      buffer: targetImageBuffer,
+      geometry: targetImageGeometry
     };
   }
 

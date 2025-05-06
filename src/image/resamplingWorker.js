@@ -120,14 +120,14 @@ class Matrix33W {
   /**
    * Multiply this matrix by a 3D typed array.
    *
-   * @param {TypedArray[]} inArray The input 3D array.
+   * @param {TypedArray[]} sourceArray The input 3D array.
    * @param {TypedArray[]} outArray The array to write to.
    */
-  multiplyTypedArray3D(inArray, outArray) {
+  multiplyTypedArray3D(sourceArray, outArray) {
     for (let i = 0; i < 3; ++i) {
       outArray[i] = 0;
       for (let j = 0; j < 3; ++j) {
-        outArray[i] += this.get(i, j) * inArray[j];
+        outArray[i] += this.get(i, j) * sourceArray[j];
       }
     }
   }
@@ -197,84 +197,82 @@ function bilinearSample(buffer, unitVectors, point) {
  * @param {object} workerMessage The worker message.
  */
 function calculateResample(workerMessage) {
-  const inSize = workerMessage.inSize;
-  const outSize = workerMessage.outSize;
-  const inUnitVectors = workerMessage.inUnitVectors;
-  const outUnitVectors = workerMessage.outUnitVectors;
-  const inSpacing = workerMessage.inSpacing;
-  const outSpacing = workerMessage.outSpacing;
+  const sourceSize = workerMessage.sourceSize;
+  const targetSize = workerMessage.targetSize;
+  const sourceUnitVectors = workerMessage.sourceUnitVectors;
+  const targetUnitVectors = workerMessage.targetUnitVectors;
+  const sourceSpacing = workerMessage.sourceSpacing;
+  const targetSpacing = workerMessage.targetSpacing;
 
   const interpolate = workerMessage.interpolate;
 
   // Can't pass them in as matrixes, so we need to re-create them
-  const inMatrix = new Matrix33W(workerMessage.inOrientation);
-  const outMatrix = new Matrix33W(workerMessage.outOrientation);
+  const sourceMatrix = new Matrix33W(workerMessage.sourceOrientation);
+  const targetMatrix = new Matrix33W(workerMessage.targetOrientation);
 
-  const iInMatrix = inMatrix.getInverse();
-  const relativeMatrix = outMatrix.multiply(iInMatrix);
+  const invSourceMatrix = sourceMatrix.getInverse();
+  const relativeMatrix = targetMatrix.multiply(invSourceMatrix);
 
-  const halfOutSize = [
-    outSize[0] / 2.0,
-    outSize[1] / 2.0,
-    outSize[2] / 2.0
+  const halfTargetSize = [
+    targetSize[0] / 2.0,
+    targetSize[1] / 2.0,
+    targetSize[2] / 2.0
   ];
 
-  const halfInSize = [
-    inSize[0] / 2.0,
-    inSize[1] / 2.0,
-    inSize[2] / 2.0
+  const halfSourceSize = [
+    sourceSize[0] / 2.0,
+    sourceSize[1] / 2.0,
+    sourceSize[2] / 2.0
   ];
   
   const centeredIndexPoint = new Float64Array(3);
   const rotIndexPoint = new Float64Array(3);
-  const inIndexPoint = new Float64Array(3);
+  const sourceIndexPoint = new Float64Array(3);
 
-  for (let x = 0; x < outSize[0]; x++) {
-    for (let y = 0; y < outSize[1]; y++) {
-      for (let z = 0; z < outSize[2]; z++) {
-        const outIndexPoint = [x, y, z];
-
-        centeredIndexPoint[0] = (outIndexPoint[0] - halfOutSize[0]) * outSpacing[0];
-        centeredIndexPoint[1] = (outIndexPoint[1] - halfOutSize[1]) * outSpacing[1];
-        centeredIndexPoint[2] = (outIndexPoint[2] - halfOutSize[2]) * outSpacing[2];
+  for (let x = 0; x < targetSize[0]; x++) {
+    for (let y = 0; y < targetSize[1]; y++) {
+      for (let z = 0; z < targetSize[2]; z++) {
+        centeredIndexPoint[0] = (x - halfTargetSize[0]) * targetSpacing[0];
+        centeredIndexPoint[1] = (y - halfTargetSize[1]) * targetSpacing[1];
+        centeredIndexPoint[2] = (z - halfTargetSize[2]) * targetSpacing[2];
 
         relativeMatrix.multiplyTypedArray3D(centeredIndexPoint, rotIndexPoint);
 
-        inIndexPoint[0] = (rotIndexPoint[0] / inSpacing[0]) + halfInSize[0];
-        inIndexPoint[1] = (rotIndexPoint[1] / inSpacing[1]) + halfInSize[1];
-        inIndexPoint[2] = (rotIndexPoint[2] / inSpacing[2]) + halfInSize[2];
+        sourceIndexPoint[0] = (rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0];
+        sourceIndexPoint[1] = (rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1];
+        sourceIndexPoint[2] = (rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2];
 
         if (!(
-          inIndexPoint[0] < 0 ||
-          inIndexPoint[0] >= inSize[0] ||
-          inIndexPoint[1] < 0 ||
-          inIndexPoint[1] >= inSize[1] ||
-          inIndexPoint[2] < 0 ||
-          inIndexPoint[2] >= inSize[2]
+          sourceIndexPoint[0] < 0 ||
+          sourceIndexPoint[0] >= sourceSize[0] ||
+          sourceIndexPoint[1] < 0 ||
+          sourceIndexPoint[1] >= sourceSize[1] ||
+          sourceIndexPoint[2] < 0 ||
+          sourceIndexPoint[2] >= sourceSize[2]
         )) {
-          const outOffset =
-            (outUnitVectors[0] * outIndexPoint[0]) +
-            (outUnitVectors[1] * outIndexPoint[1]) +
-            (outUnitVectors[2] * outIndexPoint[2]);
+          const targetOffset =
+            (targetUnitVectors[0] * x) +
+            (targetUnitVectors[1] * y) +
+            (targetUnitVectors[2] * z);
 
           if (interpolate) {
             // Bilinear
             const sample = bilinearSample(
-              workerMessage.inImageBuffer,
-              inUnitVectors,
-              inIndexPoint
+              workerMessage.sourceImageBuffer,
+              sourceUnitVectors,
+              sourceIndexPoint
             );
-            workerMessage.outImageBuffer[outOffset] = sample;
+            workerMessage.targetImageBuffer[targetOffset] = sample;
 
           } else {
             // Nearest Neighbor
             const inOffset =
-              (inUnitVectors[0] * Math.round(inIndexPoint[0])) +
-              (inUnitVectors[1] * Math.round(inIndexPoint[1])) +
-              (inUnitVectors[2] * Math.round(inIndexPoint[2]));
+              (sourceUnitVectors[0] * Math.round(sourceIndexPoint[0])) +
+              (sourceUnitVectors[1] * Math.round(sourceIndexPoint[1])) +
+              (sourceUnitVectors[2] * Math.round(sourceIndexPoint[2]));
 
-            workerMessage.outImageBuffer[outOffset] =
-              workerMessage.inImageBuffer[inOffset];
+            workerMessage.targetImageBuffer[targetOffset] =
+              workerMessage.sourceImageBuffer[inOffset];
           }
         }
       }
