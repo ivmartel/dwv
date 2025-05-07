@@ -1693,7 +1693,7 @@ export class Image {
    * Resample this image to a new orientation.
    *
    * @param {Matrix33} orientation The orientation to resample to.
-   * @param {[boolean]} interpolated Default true, if true use bilinear
+   * @param {boolean} interpolated Default true, if true use bilinear
    *  sampling, otherwise use nearest neighbor.
    */
   resample(orientation, interpolated = true) {

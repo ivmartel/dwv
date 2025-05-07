@@ -30,7 +30,7 @@ const resamplingWorkerUrl = new URL('./resamplingWorker.js', import.meta.url);
  * @param {Geometry} sourceImageGeometry The current image geometry.
  * @param {TypedArray} targetImageBuffer The buffer to resample to.
  * @param {Geometry} targetImageGeometry The geometry to resample to.
- * @param {[boolean]} interpolated Default true, if true use bilinear
+ * @param {boolean} interpolated Default true, if true use bilinear
  *  sampling, otherwise use nearest neighbor.
  *
  * @returns {object} The message to send to the worker.
@@ -40,7 +40,7 @@ export function generateWorkerMessage(
   sourceImageGeometry,
   targetImageBuffer,
   targetImageGeometry,
-  interpolated
+  interpolated = true
 ) {
   // We can't pass these metadata objects directly, so we will just
   // pull out what we need and pass that.
@@ -107,10 +107,10 @@ export class ResamplingThread {
    *
    * @param {TypedArray} sourceImageBuffer The buffer to resample.
    * @param {Geometry} sourceImageGeometry The current image geometry.
-   * @param {string} pixelRepresentation The pixel representation
+   * @param {number} pixelRepresentation The pixel representation
    *  of the original image.
    * @param {Matrix33} targetOrientation The orientation to resample to.
-   * @param {[boolean]} interpolated Default true, if true use bilinear
+   * @param {boolean} interpolated Default true, if true use bilinear
    *  sampling, otherwise use nearest neighbor.
    *
    * @returns {object} Updated buffer and geometry.
