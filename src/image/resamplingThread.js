@@ -107,7 +107,7 @@ export class ResamplingThread {
    *
    * @param {TypedArray} sourceImageBuffer The buffer to resample.
    * @param {Geometry} sourceImageGeometry The current image geometry.
-   * @param {string} pixelRepresentation The pixel representation
+   * @param {number} pixelRepresentation The pixel representation
    *  of the original image.
    * @param {Matrix33} targetOrientation The orientation to resample to.
    * @param {boolean} interpolated If true use bilinear
