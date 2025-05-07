@@ -125,7 +125,7 @@ export class Livewire {
    * Chack if the base image is resampled.
    *
    * @param {string} divId The layer group divId.
-   * @returns {boolean} ture if the image is resampled.
+   * @returns {boolean} True if the image is resampled.
    */
   #isResampled(divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
@@ -144,7 +144,7 @@ export class Livewire {
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
-    if(this.#isResampled(divId)){
+    if (this.#isResampled(divId)) {
       return;
     }
 

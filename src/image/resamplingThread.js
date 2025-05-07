@@ -239,9 +239,15 @@ export class ResamplingThread {
     }
 
     const targetSize = new Size([
-      Math.round(Math.abs((maxBounds[0] - minBounds[0]) / targetSpacing.get(0))),
-      Math.round(Math.abs((maxBounds[1] - minBounds[1]) / targetSpacing.get(1))),
-      Math.round(Math.abs((maxBounds[2] - minBounds[2]) / targetSpacing.get(2)))
+      Math.round(
+        Math.abs((maxBounds[0] - minBounds[0]) / targetSpacing.get(0))
+      ),
+      Math.round(
+        Math.abs((maxBounds[1] - minBounds[1]) / targetSpacing.get(1))
+      ),
+      Math.round(
+        Math.abs((maxBounds[2] - minBounds[2]) / targetSpacing.get(2))
+      )
     ]);
 
     // Calculate updated origin
@@ -268,7 +274,8 @@ export class ResamplingThread {
         (sourceSize.get(2) / 2.0)
       ),
     ]);
-    const targetOrigin = sourceImageGeometry.indexToWorld(targetOriginSourceIndex).get3D();
+    const targetOrigin =
+      sourceImageGeometry.indexToWorld(targetOriginSourceIndex).get3D();
 
     // Generate new image
     //---------------------------------

@@ -1711,8 +1711,8 @@ export class Image {
     // original to not degrade the data
 
     const source = this.#resampled && this.#rawBuffer && this.#rawGeometry
-      ? { buffer: this.#rawBuffer, geometry: this.#rawGeometry }
-      : { buffer: this.#buffer, geometry: this.#geometry };
+      ? {buffer: this.#rawBuffer, geometry: this.#rawGeometry}
+      : {buffer: this.#buffer, geometry: this.#geometry};
 
     const resampled = this.#resamplingThread.run(
       source.buffer,

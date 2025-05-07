@@ -1088,7 +1088,7 @@ export class Brush extends EventTarget {
    * Chack if the base image is resampled.
    *
    * @param {MouseEvent} event The mouse down event.
-   * @returns {boolean} ture if the image is resampled.
+   * @returns {boolean} True if the image is resampled.
    */
   #isResampled(event) {
     const layerDetails = getLayerDetailsFromEvent(event);

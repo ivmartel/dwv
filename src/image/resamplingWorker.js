@@ -233,6 +233,7 @@ function bilinearSample(buffer, unitVectors, size, point) {
  * Round if the value is close enough to an integer.
  *
  * @param {number} value The value to round.
+ * @returns {number} The rounded value.
  */
 function snapRound(value) {
   const rounded = Math.round(value);
@@ -276,7 +277,7 @@ function calculateResample(workerMessage) {
     sourceSize[1] / 2.0,
     sourceSize[2] / 2.0
   ];
-  
+
   const centeredIndexPoint = new Float64Array(3);
   const rotIndexPoint = new Float64Array(3);
   const sourceIndexPoint = new Float64Array(3);
@@ -290,9 +291,12 @@ function calculateResample(workerMessage) {
 
         relativeMatrix.multiplyTypedArray3D(centeredIndexPoint, rotIndexPoint);
 
-        sourceIndexPoint[0] = snapRound((rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]);
-        sourceIndexPoint[1] = snapRound((rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]);
-        sourceIndexPoint[2] = snapRound((rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]);
+        sourceIndexPoint[0] =
+          snapRound((rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]);
+        sourceIndexPoint[1] =
+          snapRound((rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]);
+        sourceIndexPoint[2] =
+          snapRound((rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]);
 
         if (!(
           sourceIndexPoint[0] < 0 ||

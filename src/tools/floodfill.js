@@ -366,7 +366,7 @@ export class Floodfill {
    * Chack if the base image is resampled.
    *
    * @param {string} divId The layer group divId.
-   * @returns {boolean} ture if the image is resampled.
+   * @returns {boolean} True if the image is resampled.
    */
   #isResampled(divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
@@ -385,10 +385,10 @@ export class Floodfill {
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
-    if(this.#isResampled(divId)){
+    if (this.#isResampled(divId)) {
       return;
     }
-    
+
     this.#annotation = undefined;
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
