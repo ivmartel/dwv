@@ -1,21 +1,20 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
 
-// call setup on DOM loaded
-document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+import {
+  luts
+} from 'dwv';
 
 /**
  * Setup.
  */
-function onDOMContentLoaded() {
-  createImage('Plain', dwv.luts.plain);
-  createImage('InvPlain', dwv.luts.invPlain);
-  createImage('Rainbow', dwv.luts.rainbow);
-  createImage('Hot', dwv.luts.hot);
-  createImage('Hot Iron', dwv.luts.hot_iron);
-  createImage('Pet', dwv.luts.pet);
-  createImage('Hot Metal Blue', dwv.luts.hot_metal_blue);
-  createImage('Pet 20 step', dwv.luts.pet_20step);
+function setup() {
+  createImage('Plain', luts.plain);
+  createImage('InvPlain', luts.invPlain);
+  createImage('Rainbow', luts.rainbow);
+  createImage('Hot', luts.hot);
+  createImage('Hot Iron', luts.hot_iron);
+  createImage('Pet', luts.pet);
+  createImage('Hot Metal Blue', luts.hot_metal_blue);
+  createImage('Pet 20 step', luts.pet_20step);
 }
 
 /**
@@ -62,3 +61,8 @@ function createImage(colourMapName, colourMap) {
   // add to the document
   document.body.appendChild(div);
 }
+
+// ---------------------------------------------
+
+// launch
+setup();

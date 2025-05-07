@@ -1,15 +1,38 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {
+  getTypedArray,
+  getPixelDataTag
+} from 'dwv';
+
+import {
+  BinaryPixGenerator
+} from './binaryPixGenerator.js';
+import {
+  FilePixGenerator,
+  fileCheckTags
+} from './filePixGenerator.js';
+import {
+  GradSquarePixGenerator
+} from './gradSquarePixGenerator.js';
+import {
+  MPRPixGenerator,
+  mprCheckTags
+} from './mprPixGenerator.js';
+import {
+  SquarePixGenerator
+} from './squarePixGenerator.js';
 
 // List of pixel generators
-test.pixelGenerators = test.pixelGenerators || {};
+export const _pixelGenerators = {
+  binary: {generator: BinaryPixGenerator},
+  file: {generator: FilePixGenerator, checkTags: fileCheckTags},
+  gradSquare: {generator: GradSquarePixGenerator},
+  mpr: {generator: MPRPixGenerator, checkTags: mprCheckTags},
+  square: {generator: SquarePixGenerator}
+};
 
 // List of required tags for generating pixel data
-test.RequiredPixelTags = [
+const _requiredPixelTags = [
   'TransferSyntaxUID',
   'Rows',
   'Columns',
@@ -27,7 +50,7 @@ test.RequiredPixelTags = [
  * @param {boolean} withLog Flag to log errors or not.
  * @returns {boolean} True if all required tags are present in the input.
  */
-function checkTags(tags, requiredTags, withLog) {
+export function checkTags(tags, requiredTags, withLog) {
   if (typeof withLog === 'undefined') {
     withLog = false;
   }
@@ -55,7 +78,7 @@ function checkTags(tags, requiredTags, withLog) {
  * @param {number} numberOfSlices The result number of slices.
  * @returns {object} The DICOM pixel data element.
  */
-test.generatePixelDataFromJSONTags = function (
+export function generatePixelDataFromJSONTags(
   tags, pixGeneratorName, sliceNumber, images, numberOfSlices) {
 
   // default
@@ -70,7 +93,7 @@ test.generatePixelDataFromJSONTags = function (
   }
 
   // check tags
-  if (!checkTags(tags, test.RequiredPixelTags, true)) {
+  if (!checkTags(tags, _requiredPixelTags, true)) {
     throw new Error('Missing meta data for dicom creation.');
   }
 
@@ -121,14 +144,14 @@ test.generatePixelDataFromJSONTags = function (
   }
 
   // create pixel array
-  const pixels = dwv.getTypedArray(
+  const pixels = getTypedArray(
     bitsAllocated, pixelRepresentation, dataLength);
 
   // pixels generator
-  if (typeof test.pixelGenerators[pixGeneratorName] === 'undefined') {
+  if (typeof _pixelGenerators[pixGeneratorName] === 'undefined') {
     throw new Error('Unknown PixelData generator: ' + pixGeneratorName);
   }
-  const GeneratorClass = test.pixelGenerators[pixGeneratorName].generator;
+  const GeneratorClass = _pixelGenerators[pixGeneratorName].generator;
   const generator = new GeneratorClass({
     numberOfColumns: numberOfColumns,
     numberOfRows: numberOfRows,
@@ -154,7 +177,7 @@ test.generatePixelDataFromJSONTags = function (
   }
   const pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    tag: dwv.getPixelDataTag(),
+    tag: getPixelDataTag(),
     vr: vr,
     vl: pixVL,
     value: pixels
@@ -167,7 +190,7 @@ test.generatePixelDataFromJSONTags = function (
  * @param {Image} image The image to get the data from.
  * @returns {object} The image data buffer.
  */
-test.getImageDataData = function (image) {
+export function getImageDataData(image) {
   // draw the image in the canvas in order to get its data
   const canvas = document.createElement('canvas');
   canvas.width = image.width;

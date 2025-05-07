@@ -1,13 +1,11 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
-
-// call setup on DOM loaded
-document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+import {
+  buildMultipart
+} from 'dwv';
 
 /**
  * Setup.
  */
-function onDOMContentLoaded() {
+function setup() {
   const stowMultipartButton = document.getElementById('stowMultipartButton');
   stowMultipartButton.onclick = launchStowMultipart;
   const stowInstancesButton = document.getElementById('stowInstancesButton');
@@ -305,7 +303,7 @@ function launchStowMultipart() {
         });
       }
       const boundary = '----dwttestboundary';
-      const content = dwv.buildMultipart(parts, boundary);
+      const content = buildMultipart(parts, boundary);
 
       // STOW request
       const rootUrl = document.getElementById('rooturl').value;
@@ -570,3 +568,8 @@ function qidoResponseToTable() {
   div.appendChild(table);
   div.appendChild(p);
 }
+
+// ---------------------------------------------
+
+// launch
+setup();

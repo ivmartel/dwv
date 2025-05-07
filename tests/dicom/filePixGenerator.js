@@ -1,54 +1,64 @@
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {getImageDataData} from './dicomGenerator.js';
 
 /**
- * FilePixGenerator
- * Generates pixel data from file(s).
- *
- * @param {object} options The generator options.
- * @class
+ * FilePixGenerator: generates pixel data from file(s).
  */
-const FilePixGenerator = function (options) {
+export class FilePixGenerator {
 
-  const numberOfColumns = options.numberOfColumns;
-  const numberOfRows = options.numberOfRows;
-  const isRGB = options.photometricInterpretation === 'RGB';
+  #numberOfColumns;
+  #numberOfRows;
 
-  this.setImages = function (imgs) {
+  #isRGB;
+
+  #images;
+
+  /**
+   * @param {object} options The generator options.
+   */
+  constructor(options) {
+    this.#numberOfColumns = options.numberOfColumns;
+    this.#numberOfRows = options.numberOfRows;
+    this.#isRGB = options.photometricInterpretation === 'RGB';
+  }
+
+  setImages(imgs) {
     // check sizes
     let img;
     for (let i = 0; i < imgs.length; ++i) {
       img = imgs[i];
-      if (img.width !== numberOfColumns) {
+      if (img.width !== this.#numberOfColumns) {
         throw new Error('Image width mismatch: ' +
-          img.width + '!=' + numberOfColumns);
+          img.width + '!=' + this.#numberOfColumns);
       }
-      if (img.height !== numberOfRows) {
+      if (img.height !== this.#numberOfRows) {
         throw new Error('Image height mismatch: ' +
-          img.height + '!=' + numberOfRows);
+          img.height + '!=' + this.#numberOfRows);
       }
     }
     // store
-    this.images = imgs;
+    this.#images = imgs;
   };
 
-  this.generate = function (pixelBuffer, sliceNumber) {
+  /**
+   * @param {number[]} pixelBuffer The buffer.
+   * @param {number} sliceNumber The slice index.
+   */
+  generate(pixelBuffer, sliceNumber) {
     let image = null;
     if (sliceNumber < this.images.length) {
-      image = this.images[sliceNumber];
+      image = this.#images[sliceNumber];
     } else {
-      image = this.images[0];
+      image = this.#images[0];
     }
     // get the image data
-    const imageData = test.getImageDataData(image);
+    const imageData = getImageDataData(image);
     // extract fist component for the pixelBuffer
     const dataLen = imageData.length;
     let j = 0;
     for (let i = 0; i < dataLen; i += 4) {
       pixelBuffer[j] = imageData[i];
       j += 1;
-      if (isRGB) {
+      if (this.#isRGB) {
         pixelBuffer[j + 1] = imageData[i + 1];
         pixelBuffer[j + 2] = imageData[i + 2];
         j += 2;
@@ -64,7 +74,7 @@ const FilePixGenerator = function (options) {
  * @param {object} image The associated image.
  * @returns {boolean} True if the tags are ok.
  */
-function fileCheckTags(tags, image) {
+export function fileCheckTags(tags, image) {
   /**
    * @param {number} value The value to check.
    * @returns {number} The expected value.
@@ -84,9 +94,3 @@ function fileCheckTags(tags, image) {
   }
   return needUpdate;
 }
-
-test.pixelGenerators = test.pixelGenerators || {};
-test.pixelGenerators.file = {
-  generator: FilePixGenerator,
-  checkTags: fileCheckTags
-};

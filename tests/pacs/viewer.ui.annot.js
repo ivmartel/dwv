@@ -1,10 +1,9 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
-
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-test.dataModelUI = test.dataModelUI || {};
+import {
+  DrawController,
+  AnnotationGroupFactory,
+  getUID,
+  DicomWriter
+} from 'dwv';
 
 /**
  * Get the annotation group divId.
@@ -47,41 +46,48 @@ function splitAnnotationDivId(divId) {
 
 /**
  * Annotation UI.
- *
- * @param {object} app The associated application.
  */
-test.dataModelUI.Annotation = function (app) {
+export class AnnotationUI {
+
+  #app;
+
+  /**
+   * @param {object} app The associated application.
+   */
+  constructor(app) {
+    this.#app = app;
+  }
 
   /**
    * Bind app to ui.
    */
-  this.registerListeners = function () {
-    app.addEventListener('dataadd', onDataAdd);
-    app.addEventListener('drawlayeradd', onDrawLayerAdd);
-    app.addEventListener('annotationadd', onAnnotationAdd);
-    app.addEventListener('annotationupdate', onAnnotationUpdate);
-    app.addEventListener('annotationremove', onAnnotationRemove);
+  registerListeners() {
+    this.#app.addEventListener('dataadd', this.#onDataAdd);
+    this.#app.addEventListener('drawlayeradd', this.#onDrawLayerAdd);
+    this.#app.addEventListener('annotationadd', this.#onAnnotationAdd);
+    this.#app.addEventListener('annotationupdate', this.#onAnnotationUpdate);
+    this.#app.addEventListener('annotationremove', this.#onAnnotationRemove);
   };
 
   /**
    * Setup the html for the annotation list.
    */
-  function setupHtml() {
+  #setupHtml() {
     // add annotation group button
     const addItem = document.createElement('li');
     addItem.id = 'addannotationgroupitem';
     const addAnnotationGroupButton = document.createElement('button');
     addAnnotationGroupButton.appendChild(
       document.createTextNode('Add annotation group'));
-    addAnnotationGroupButton.onclick = function () {
+    addAnnotationGroupButton.onclick = () => {
       const divId = 'layerGroup0';
-      const layerGroup = app.getLayerGroupByDivId(divId);
+      const layerGroup = this.#app.getLayerGroupByDivId(divId);
       // add annotation group
       const viewLayer = layerGroup.getActiveViewLayer();
       const refDataId = viewLayer.getDataId();
-      const data = app.createAnnotationData(refDataId);
+      const data = this.#app.createAnnotationData(refDataId);
       // render (will create draw layer)
-      app.addAndRenderAnnotationData(data, divId, refDataId);
+      this.#app.addAndRenderAnnotationData(data, divId, refDataId);
       // item is added to the UI by the 'dataadd' listener
     };
     addItem.appendChild(addAnnotationGroupButton);
@@ -116,7 +122,7 @@ test.dataModelUI.Annotation = function (app) {
    * @param {string} dataId The annotation group dataId.
    * @returns {HTMLSpanElement} The HTMl element.
    */
-  function getAnnotationHtml(annotation, dataId) {
+  #getAnnotationHtml(annotation, dataId) {
     const annotationDivId = getAnnotationDivId(annotation, dataId);
 
     const inputColour = document.createElement('input');
@@ -125,7 +131,7 @@ test.dataModelUI.Annotation = function (app) {
     const inputColourPrefix = 'cb-';
     inputColour.id = inputColourPrefix + annotationDivId;
     inputColour.value = annotation.colour;
-    inputColour.onchange = function (event) {
+    inputColour.onchange = (event) => {
       const target = event.target;
       const newColour = target.value;
       // get annotation
@@ -133,16 +139,16 @@ test.dataModelUI.Annotation = function (app) {
         splitAnnotationDivId(target.id.substring(inputColourPrefix.length));
       const dataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = app.getData(dataId).annotationGroup;
+      const annotationGroup = this.#app.getData(dataId).annotationGroup;
       const annotation = annotationGroup.find(annotationId);
       // update
       if (newColour !== annotation.colour) {
-        const drawController = new dwv.DrawController(annotationGroup);
+        const drawController = new DrawController(annotationGroup);
         drawController.updateAnnotationWithCommand(
           annotationId,
           {colour: annotation.colour},
           {colour: newColour},
-          app.addToUndoStack
+          this.#app.addToUndoStack
         );
       }
     };
@@ -152,18 +158,18 @@ test.dataModelUI.Annotation = function (app) {
     gotoButton.id = gbIdPrefix + annotationDivId;
     gotoButton.title = 'Goto annotation';
     gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
-    gotoButton.onclick = function (event) {
+    gotoButton.onclick = (event) => {
       const target = event.target;
       // get annotation
       const indices =
         splitAnnotationDivId(target.id.substring(gbIdPrefix.length));
       const dataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const annotationGroup = app.getData(dataId).annotationGroup;
+      const annotationGroup = this.#app.getData(dataId).annotationGroup;
       const annotation = annotationGroup.find(annotationId);
       const annotCentroid = annotation.getCentroid();
       if (typeof annotCentroid !== 'undefined') {
-        const drawLayers = app.getDrawLayersByDataId(dataId);
+        const drawLayers = this.#app.getDrawLayersByDataId(dataId);
         for (const layer of drawLayers) {
           layer.setCurrentPosition(annotCentroid);
         }
@@ -178,14 +184,14 @@ test.dataModelUI.Annotation = function (app) {
     viewButton.id = vbIdPrefix + annotationDivId;
     viewButton.title = 'Show/hide annotation';
     viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
-    viewButton.onclick = function (event) {
+    viewButton.onclick = (event) => {
       const target = event.target;
       // get annotatio
       const indices =
         splitAnnotationDivId(target.id.substring(vbIdPrefix.length));
       const dataId = indices.dataId;
       const annotationId = indices.annotationId;
-      const drawLayers = app.getDrawLayersByDataId(dataId);
+      const drawLayers = this.#app.getDrawLayersByDataId(dataId);
       // toggle hidden
       const isPressed = target.style.borderStyle === 'inset';
       if (isPressed) {
@@ -206,7 +212,7 @@ test.dataModelUI.Annotation = function (app) {
     deleteButton.id = dbIdPrefix + annotationDivId;
     deleteButton.title = 'Delete annotation';
     deleteButton.appendChild(document.createTextNode('\u{274C}'));
-    deleteButton.onclick = function (event) {
+    deleteButton.onclick = (event) => {
       const target = event.target;
       // get segment and mask
       const indices =
@@ -214,16 +220,16 @@ test.dataModelUI.Annotation = function (app) {
       const dataId = indices.dataId;
       const annotationId = indices.annotationId;
       // delete if possible
-      const drawController = new dwv.DrawController(
-        app.getData(dataId).annotationGroup);
+      const drawController = new DrawController(
+        this.#app.getData(dataId).annotationGroup);
       drawController.removeAnnotationWithCommand(
         annotationId,
-        app.addToUndoStack
+        this.#app.addToUndoStack
       );
     };
 
     // disable/enable buttons if group is editable or not
-    const annotationGroup = app.getData(dataId).annotationGroup;
+    const annotationGroup = this.#app.getData(dataId).annotationGroup;
     annotationGroup.addEventListener(
       'annotationgroupeditablechange', function (event) {
         const disabled = !event.data;
@@ -251,7 +257,7 @@ test.dataModelUI.Annotation = function (app) {
    * @param {string} dataId The annotation group dataId.
    * @returns {HTMLIement} The annotation list element.
    */
-  function getAnnotationGroupHtml(annotationGroup, dataId) {
+  #getAnnotationGroupHtml(annotationGroup, dataId) {
     const item = document.createElement('li');
     item.id = 'li-' + getAnnotationGroupDivId(dataId);
 
@@ -282,19 +288,19 @@ test.dataModelUI.Annotation = function (app) {
     saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
     saveButton.title = 'Save annnotation group';
     saveButton.onclick = function () {
-      const factory = new dwv.AnnotationGroupFactory();
-      const sopUID = dwv.getUID('SOPInstanceUID');
+      const factory = new AnnotationGroupFactory();
+      const sopUID = getUID('SOPInstanceUID');
       const extraTags = {
         MediaStorageSOPInstanceUID: sopUID,
         SOPInstanceUID: sopUID,
         InstanceNumber: 123,
-        SeriesInstanceUID: dwv.getUID('SeriesInstanceUID'),
+        SeriesInstanceUID: getUID('SeriesInstanceUID'),
         SeriesNumber: 123,
         SeriesDescription: 'Annnotation made with dwv',
       };
       const dicomElements = factory.toDicom(annotationGroup, extraTags);
       // write
-      const writer = new dwv.DicomWriter();
+      const writer = new DicomWriter();
       let dicomBuffer = null;
       try {
         dicomBuffer = writer.getBuffer(dicomElements);
@@ -320,9 +326,9 @@ test.dataModelUI.Annotation = function (app) {
     hideLabelsButton.id = 'b-hidelabels';
     hideLabelsButton.title = 'Show/hide annotation labels';
     hideLabelsButton.appendChild(document.createTextNode('\u{1F3F7}\u{FE0F}'));
-    hideLabelsButton.onclick = function (event) {
+    hideLabelsButton.onclick = (event) => {
       const target = event.target;
-      const drawLayer = app.getDrawLayersByDataId(dataId)[0];
+      const drawLayer = this.#app.getDrawLayersByDataId(dataId)[0];
       if (typeof drawLayer === 'undefined') {
         console.warn('Cannot find draw layer with id ' + dataId);
       }
@@ -338,7 +344,7 @@ test.dataModelUI.Annotation = function (app) {
     item.appendChild(hideLabelsButton);
 
     for (const annotation of annotationGroup.getList()) {
-      item.appendChild(getAnnotationHtml(annotation, dataId));
+      item.appendChild(this.#getAnnotationHtml(annotation, dataId));
     }
 
     return item;
@@ -349,16 +355,16 @@ test.dataModelUI.Annotation = function (app) {
    *
    * @param {object} event The event.
    */
-  function onDataAdd(event) {
-    const data = app.getData(event.dataid);
+  #onDataAdd = (event) => {
+    const data = this.#app.getData(event.dataid);
     const ag = data.annotationGroup;
     if (typeof ag !== 'undefined') {
       // setup html if needed
       if (!document.getElementById('annotationgroup-list')) {
-        setupHtml();
+        this.#setupHtml();
       }
       // annotation group as html
-      const item = getAnnotationGroupHtml(ag, event.dataid);
+      const item = this.#getAnnotationGroupHtml(ag, event.dataid);
       // add annotation group item
       const addItem = document.getElementById('addannotationgroupitem');
       // remove and add after to make it last item
@@ -376,9 +382,9 @@ test.dataModelUI.Annotation = function (app) {
    *
    * @param {object} event The event.
    */
-  function onDrawLayerAdd(event) {
+  #onDrawLayerAdd = (event) => {
     const dataId = event.dataid;
-    const annotationGroup = app.getData(dataId).annotationGroup;
+    const annotationGroup = this.#app.getData(dataId).annotationGroup;
     // strike through non viewable annotations
     for (const annotation of annotationGroup.getList()) {
       let textDecoration = '';
@@ -392,20 +398,20 @@ test.dataModelUI.Annotation = function (app) {
         item.style['text-decoration-line'] = textDecoration;
       }
     }
-  }
+  };
 
   /**
    * Handle 'annotationadd' event.
    *
    * @param {object} event The event.
    */
-  function onAnnotationAdd(event) {
+  #onAnnotationAdd = (event) => {
     const annotation = event.data;
     const dataId = event.dataid;
     // add annotation html to list
     const annotationGroupDivId = 'li-' + getAnnotationGroupDivId(dataId);
     const item = document.getElementById(annotationGroupDivId);
-    item.appendChild(getAnnotationHtml(annotation, dataId));
+    item.appendChild(this.#getAnnotationHtml(annotation, dataId));
   };
 
   /**
@@ -413,7 +419,7 @@ test.dataModelUI.Annotation = function (app) {
    *
    * @param {object} event The event.
    */
-  function onAnnotationUpdate(event) {
+  #onAnnotationUpdate = (event) => {
     const annotation = event.data;
     const dataId = event.dataid;
     const keys = event.keys;
@@ -433,7 +439,7 @@ test.dataModelUI.Annotation = function (app) {
    *
    * @param {object} event The event.
    */
-  function onAnnotationRemove(event) {
+  #onAnnotationRemove = (event) => {
     const annotation = event.data;
     const dataId = event.dataid;
     // remove annotation from list
@@ -442,4 +448,4 @@ test.dataModelUI.Annotation = function (app) {
     item.remove();
   };
 
-}; // test.dataModelUI.Annotation
+}; // AnnotationUI

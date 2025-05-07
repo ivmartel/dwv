@@ -1,9 +1,8 @@
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {
+  Index,
+  getRectangleIndices,
+  getEllipseIndices
+} from 'dwv';
 
 /**
  * Get an array find callback for an index.
@@ -36,121 +35,145 @@ function getDirIncr(dir) {
 }
 
 /**
- * SquarePixGenerator
- * Generates pixel data with simple mono value squares.
- *
- * @param {object} options The generator options.
- * @class
+ * SquarePixGenerator: generates pixel data with simple mono value squares.
  */
-const SquarePixGenerator = function (options) {
+export class SquarePixGenerator {
 
-  const numberOfColumns = options.numberOfColumns;
-  const numberOfRows = options.numberOfRows;
-  const numberOfSamples = options.numberOfSamples;
-  const numberOfColourPlanes = options.numberOfColourPlanes;
-  const isRGB = options.photometricInterpretation === 'RGB';
-  const getFunc = isRGB ? getRGB : getValue;
+  #numberOfColumns;
+  #numberOfRows;
+  #numberOfSamples;
+  #numberOfColourPlanes;
 
-  // supposing as many slices as coloums
-  const numberOfSlices = options.numberOfSlices;
+  #isRGB;
 
-  const numberOfZonesI = 2;
-  const numberOfZonesJ = 2;
-  const numberOfZonesK = 2;
+  #numberOfShapes;
+  #sizeZoneI;
+  #sizeZoneJ;
+  #sizeZoneK;
 
-  const numberOfShapes = numberOfZonesI * numberOfZonesJ * numberOfZonesK;
+  #configs;
+  #indices;
 
-  const sizeZoneI = Math.floor(numberOfColumns / numberOfZonesI);
-  const sizeZoneJ = Math.floor(numberOfRows / numberOfZonesJ);
-  const sizeZoneK = Math.floor(numberOfSlices / numberOfZonesK);
+  #background = 0;
+  #maxValue = 200;
 
-  const halfSizeZoneI = Math.floor(sizeZoneI / 2);
-  const halfSizeZoneJ = Math.floor(sizeZoneJ / 2);
-  const halfSizeZoneK = Math.floor(sizeZoneK / 2);
+  /**
+   * @param {object} options The generator options.
+   */
+  constructor(options) {
+    this.#numberOfColumns = options.numberOfColumns;
+    this.#numberOfRows = options.numberOfRows;
+    this.#numberOfSamples = options.numberOfSamples;
+    this.#numberOfColourPlanes = options.numberOfColourPlanes;
+    this.#isRGB = options.photometricInterpretation === 'RGB';
 
-  // const quarterSizeZoneI = Math.floor(sizeZoneI / 4);
-  // const quarterSizeZoneJ = Math.floor(sizeZoneJ / 4);
-  // const quarterSizeZoneK = Math.floor(sizeZoneK / 4);
-  // const eigthSizeZoneJ = Math.floor(sizeZoneJ / 8);
+    // supposing as many slices as coloums
+    const numberOfSlices = options.numberOfSlices;
 
-  const squareSizes = [
-    halfSizeZoneI, halfSizeZoneJ, halfSizeZoneK
-  ];
-  // square only config
-  const configs = [
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-    {shape: 'rectangle', dir: [0, 1], size: squareSizes}
-  ];
+    const numberOfZonesI = 2;
+    const numberOfZonesJ = 2;
+    const numberOfZonesK = 2;
 
-  // const rectSizes = [
-  //   halfSizeZoneI, halfSizeZoneJ + quarterSizeZoneJ, halfSizeZoneK
-  // ];
-  // const circleSizes = [
-  //   quarterSizeZoneI, quarterSizeZoneJ, quarterSizeZoneK
-  // ];
-  // const ellipseSizes = [
-  //   quarterSizeZoneI, quarterSizeZoneJ + eigthSizeZoneJ, quarterSizeZoneK
-  // ];
+    this.#numberOfShapes = numberOfZonesI * numberOfZonesJ * numberOfZonesK;
 
-  // mix of rectangles and ellipses in different directions
-  // const configs = [
-  //   {shape: 'rectangle', dir: [0, 1], size: squareSizes},
-  //   {shape: 'rectangle', dir: [0, 2], size: squareSizes},
-  //   {shape: 'rectangle', dir: [1, 2], size: squareSizes},
-  //   {shape: 'rectangle', dir: [0, 1], size: rectSizes},
-  //   {shape: 'ellipse', dir: [0, 1], size: circleSizes},
-  //   {shape: 'ellipse', dir: [0, 2], size: circleSizes},
-  //   {shape: 'ellipse', dir: [1, 2], size: circleSizes},
-  //   {shape: 'ellipse', dir: [0, 1], size: ellipseSizes}
-  // ];
+    this.#sizeZoneI = Math.floor(this.#numberOfColumns / numberOfZonesI);
+    this.#sizeZoneJ = Math.floor(this.#numberOfRows / numberOfZonesJ);
+    this.#sizeZoneK = Math.floor(numberOfSlices / numberOfZonesK);
 
-  const indices = [];
-  let shapeNumber = 0;
-  for (let nk = 0; nk < numberOfZonesK; ++nk) {
-    for (let nj = 0; nj < numberOfZonesJ; ++nj) {
-      for (let ni = 0; ni < numberOfZonesI; ++ni) {
-        const config = configs[shapeNumber];
-        const incr = getDirIncr(config.dir);
-        const nSlices = config.size[2];
-        const halfNSlices = Math.floor(nSlices / 2);
-        for (let k = 0; k < nSlices; ++k) {
-          const center = new dwv.Index([
-            halfSizeZoneI + ni * sizeZoneI + incr[0] * (k - halfNSlices),
-            halfSizeZoneJ + nj * sizeZoneJ + incr[1] * (k - halfNSlices),
-            halfSizeZoneK + nk * sizeZoneK + incr[2] * (k - halfNSlices)
-          ]);
-          let newIndices;
-          if (config.shape === 'rectangle') {
-            newIndices =
-              dwv.getRectangleIndices(center, config.size, config.dir);
-          } else if (config.shape === 'ellipse') {
-            newIndices =
-              dwv.getEllipseIndices(center, config.size, config.dir);
+    const halfSizeZoneI = Math.floor(this.#sizeZoneI / 2);
+    const halfSizeZoneJ = Math.floor(this.#sizeZoneJ / 2);
+    const halfSizeZoneK = Math.floor(this.#sizeZoneK / 2);
+
+    // const quarterSizeZoneI = Math.floor(sizeZoneI / 4);
+    // const quarterSizeZoneJ = Math.floor(sizeZoneJ / 4);
+    // const quarterSizeZoneK = Math.floor(sizeZoneK / 4);
+    // const eigthSizeZoneJ = Math.floor(sizeZoneJ / 8);
+
+    const squareSizes = [
+      halfSizeZoneI, halfSizeZoneJ, halfSizeZoneK
+    ];
+    // square only config
+    this.#configs = [
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+      {shape: 'rectangle', dir: [0, 1], size: squareSizes}
+    ];
+
+    // const rectSizes = [
+    //   halfSizeZoneI, halfSizeZoneJ + quarterSizeZoneJ, halfSizeZoneK
+    // ];
+    // const circleSizes = [
+    //   quarterSizeZoneI, quarterSizeZoneJ, quarterSizeZoneK
+    // ];
+    // const ellipseSizes = [
+    //   quarterSizeZoneI, quarterSizeZoneJ + eigthSizeZoneJ, quarterSizeZoneK
+    // ];
+
+    // mix of rectangles and ellipses in different directions
+    // this.#configs = [
+    //   {shape: 'rectangle', dir: [0, 1], size: squareSizes},
+    //   {shape: 'rectangle', dir: [0, 2], size: squareSizes},
+    //   {shape: 'rectangle', dir: [1, 2], size: squareSizes},
+    //   {shape: 'rectangle', dir: [0, 1], size: rectSizes},
+    //   {shape: 'ellipse', dir: [0, 1], size: circleSizes},
+    //   {shape: 'ellipse', dir: [0, 2], size: circleSizes},
+    //   {shape: 'ellipse', dir: [1, 2], size: circleSizes},
+    //   {shape: 'ellipse', dir: [0, 1], size: ellipseSizes}
+    // ];
+
+    this.#indices = [];
+    let shapeNumber = 0;
+    for (let nk = 0; nk < numberOfZonesK; ++nk) {
+      for (let nj = 0; nj < numberOfZonesJ; ++nj) {
+        for (let ni = 0; ni < numberOfZonesI; ++ni) {
+          const config = this.#configs[shapeNumber];
+          const incr = getDirIncr(config.dir);
+          const nSlices = config.size[2];
+          const halfNSlices = Math.floor(nSlices / 2);
+          for (let k = 0; k < nSlices; ++k) {
+            const center = new Index([
+              halfSizeZoneI + ni * this.#sizeZoneI +
+                incr[0] * (k - halfNSlices),
+              halfSizeZoneJ + nj * this.#sizeZoneJ +
+                incr[1] * (k - halfNSlices),
+              halfSizeZoneK + nk * this.#sizeZoneK +
+                incr[2] * (k - halfNSlices)
+            ]);
+            let newIndices;
+            if (config.shape === 'rectangle') {
+              newIndices =
+                getRectangleIndices(center, config.size, config.dir);
+            } else if (config.shape === 'ellipse') {
+              newIndices =
+                getEllipseIndices(center, config.size, config.dir);
+            }
+            this.#indices.push(...newIndices);
           }
-          indices.push(...newIndices);
+          ++shapeNumber;
         }
-        ++shapeNumber;
       }
     }
   }
 
-  const background = 0;
-  const max = 200;
+  /**
+   * @param {number[]} pixelBuffer The buffer.
+   * @param {number} sliceNumber The slice number.
+   */
+  generate(pixelBuffer, sliceNumber) {
+    const getFunc = this.#isRGB ? this.#getRGB : this.#getValue;
 
-  this.generate = function (pixelBuffer, sliceNumber) {
     // main loop
     let offset = 0;
-    for (let c = 0; c < numberOfColourPlanes; ++c) {
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          for (let s = 0; s < numberOfSamples; ++s) {
-            if (numberOfColourPlanes !== 1) {
+    for (let c = 0; c < this.#numberOfColourPlanes; ++c) {
+      for (let j = 0; j < this.#numberOfRows; ++j) {
+        for (let i = 0; i < this.#numberOfColumns; ++i) {
+          for (let s = 0; s < this.#numberOfSamples; ++s) {
+            if (this.#numberOfColourPlanes !== 1) {
               pixelBuffer[offset] = getFunc(i, j, sliceNumber)[c];
             } else {
               pixelBuffer[offset] = getFunc(i, j, sliceNumber)[s];
@@ -170,10 +193,10 @@ const SquarePixGenerator = function (options) {
    * @param {number} k The slice index.
    * @returns {number} A shape number.
    */
-  function getShapeNumber(i, j, k) {
-    return Math.floor(i / sizeZoneI) +
-      Math.floor(j / sizeZoneJ) +
-      Math.floor(k / sizeZoneK);
+  #getShapeNumber(i, j, k) {
+    return Math.floor(i / this.#sizeZoneI) +
+      Math.floor(j / this.#sizeZoneJ) +
+      Math.floor(k / this.#sizeZoneK);
   }
 
   /**
@@ -184,14 +207,15 @@ const SquarePixGenerator = function (options) {
    * @param {number} k The slice index.
    * @returns {number[]} The grey value.
    */
-  function getValue(i, j, k) {
-    let value = background;
-    if (indices.find(getEqualIndexCallback(new dwv.Index([i, j, k])))) {
-      const shapeNum = getShapeNumber(i, j, k);
-      value += Math.round(max * (shapeNum + 1) / numberOfShapes) + i;
+  #getValue = (i, j, k) => {
+    let value = this.#background;
+    if (this.#indices.find(getEqualIndexCallback(new Index([i, j, k])))) {
+      const shapeNum = this.#getShapeNumber(i, j, k);
+      value += Math.round(
+        this.#maxValue * (shapeNum + 1) / this.#numberOfShapes) + i;
     }
     return [value];
-  }
+  };
 
   /**
    * Get RGB values.
@@ -201,16 +225,11 @@ const SquarePixGenerator = function (options) {
    * @param {number} k The slice index.
    * @returns {number[]} The [R,G,B] values.
    */
-  function getRGB(i, j, k) {
-    let value = getValue(i, j, k);
+  #getRGB = (i, j, k) => {
+    let value = this.#getValue(i, j, k);
     if (value > 255) {
       value = 200;
     }
     return [value, 0, 0];
-  }
-};
-
-test.pixelGenerators = test.pixelGenerators || {};
-test.pixelGenerators.square = {
-  generator: SquarePixGenerator
-};
+  };
+}

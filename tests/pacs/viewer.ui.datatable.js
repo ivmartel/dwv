@@ -1,10 +1,14 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {
+  getLayerGroupDivIds,
+  getViewConfig,
+  getControlDiv
+} from './viewer.ui.js';
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-test.ui = test.ui || {};
+import {
+  Orientation,
+  WindowLevel,
+  luts
+} from 'dwv';
 
 /**
  * Get the layer group div ids associated to a view config.
@@ -22,37 +26,44 @@ function getDivIds(dataViewConfig) {
 
 /**
  * Data table UI.
- *
- * @param {object} app The associated application.
  */
-test.ui.DataTable = function (app) {
+export class DataTableUI {
+
+  #app;
+
+  /**
+   * @param {object} app The associated application.
+   */
+  constructor(app) {
+    this.#app = app;
+  }
 
   /**
    * Bind app to ui.
    *
    * @param {string} layout The layout.
    */
-  this.registerListeners = function (layout) {
+  registerListeners(layout) {
     // add data row on layer creation
-    app.addEventListener('viewlayeradd', function (event) {
-      clearDataTableRow(event.dataid);
-      addDataRow(event.dataid, layout);
+    this.#app.addEventListener('viewlayeradd', (event) => {
+      this.#clearDataTableRow(event.dataid);
+      this.#addDataRow(event.dataid, layout);
     });
-    app.addEventListener('drawlayeradd', function (event) {
-      clearDataTableRow(event.dataid);
-      addDataRow(event.dataid, layout);
+    this.#app.addEventListener('drawlayeradd', (event) => {
+      this.#clearDataTableRow(event.dataid);
+      this.#addDataRow(event.dataid, layout);
     });
 
-    app.addEventListener('wlchange', onWLChange);
-    app.addEventListener('opacitychange', onOpacityChange);
+    this.#app.addEventListener('wlchange', this.#onWLChange);
+    this.#app.addEventListener('opacitychange', this.#onOpacityChange);
   };
 
   /**
    * Unbind app to controls.
    */
-  this.unregisterListeners = function () {
-    app.removeEventListener('wlchange', onWLChange);
-    app.removeEventListener('opacitychange', onOpacityChange);
+  unregisterListeners() {
+    this.#app.removeEventListener('wlchange', this.#onWLChange);
+    this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
   };
 
   /**
@@ -60,7 +71,7 @@ test.ui.DataTable = function (app) {
    *
    * @param {object} event The change event.
    */
-  function onWLChange(event) {
+  #onWLChange = (event) => {
     // width number
     let elemId = 'width-' + event.dataid + '-number';
     let elem = document.getElementById(elemId);
@@ -91,8 +102,8 @@ test.ui.DataTable = function (app) {
     elemId = 'preset-' + event.dataid + '-select';
     const selectElem = document.getElementById(elemId);
     if (selectElem) {
-      const ids = getDataLayerGroupDivIds(event.dataid);
-      const lg = app.getLayerGroupByDivId(ids[0]);
+      const ids = this.#getDataLayerGroupDivIds(event.dataid);
+      const lg = this.#app.getLayerGroupByDivId(ids[0]);
       const vls = lg.getViewLayersByDataId(event.dataid);
       if (typeof vls !== 'undefined' && vls.length !== 0) {
         const vl = vls[0];
@@ -114,14 +125,14 @@ test.ui.DataTable = function (app) {
         }
       }
     }
-  }
+  };
 
   /**
    * Handle app opacity change.
    *
    * @param {object} event The change event.
    */
-  function onOpacityChange(event) {
+  #onOpacityChange = (event) => {
     const value = parseFloat(event.value[0]).toPrecision(3);
     // number
     let elemId = 'opacity-' + event.dataid + '-number';
@@ -137,7 +148,7 @@ test.ui.DataTable = function (app) {
     if (elem) {
       elem.value = value;
     }
-  }
+  };
 
   /**
    * Get the layer group div ids associated to a data id.
@@ -145,8 +156,8 @@ test.ui.DataTable = function (app) {
    * @param {string} dataId The data id.
    * @returns {Array} The list of div ids.
    */
-  function getDataLayerGroupDivIds(dataId) {
-    const dataViewConfigs = app.getDataViewConfigs();
+  #getDataLayerGroupDivIds(dataId) {
+    const dataViewConfigs = this.#app.getDataViewConfigs();
     let viewConfig = dataViewConfigs[dataId];
     if (typeof viewConfig === 'undefined') {
       viewConfig = dataViewConfigs['*'];
@@ -157,7 +168,7 @@ test.ui.DataTable = function (app) {
   /**
    * Clear the data table.
    */
-  this.clearDataTable = function () {
+  clearDataTable() {
     const detailsDiv = document.getElementById('layersdetails');
     if (detailsDiv) {
       detailsDiv.innerHTML = '';
@@ -169,7 +180,7 @@ test.ui.DataTable = function (app) {
    *
    * @param {string} dataId The associated data id.
    */
-  function clearDataTableRow(dataId) {
+  #clearDataTableRow(dataId) {
     const row = document.getElementById('data-' + dataId);
     if (row) {
       row.remove();
@@ -182,7 +193,7 @@ test.ui.DataTable = function (app) {
    *   used to create the table.
    * @returns {HTMLTableElement} The table element.
    */
-  function getLayersTable(numberOfLayerGroups) {
+  #getLayersTable(numberOfLayerGroups) {
     let table = document.getElementById('layerstable');
     // create table if not present
     if (!table) {
@@ -216,21 +227,21 @@ test.ui.DataTable = function (app) {
    * @param {string} dataId The data id.
    * @param {string} layout The layout.
    */
-  function addDataRow(dataId, layout) {
+  #addDataRow(dataId, layout) {
     // bind app to controls on first id
     // if (dataId === '0') {
     //   this.registerListeners();
     // }
 
-    const image = app.getData(dataId).image;
+    const image = this.#app.getData(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
     const isMonochrome = dataIsImage && image.isMonochrome();
 
-    const dataViewConfigs = app.getDataViewConfigs();
-    const allLayerGroupDivIds = test.getLayerGroupDivIds(dataViewConfigs);
+    const dataViewConfigs = this.#app.getDataViewConfigs();
+    const allLayerGroupDivIds = getLayerGroupDivIds(dataViewConfigs);
 
-    const table = getLayersTable(allLayerGroupDivIds.length);
+    const table = this.#getLayersTable(allLayerGroupDivIds.length);
     const body = table.tBodies[0];
 
     // add new layer row
@@ -259,13 +270,13 @@ test.ui.DataTable = function (app) {
       radio.name = 'layerselect-' + index;
       radio.id = 'layerselect-' + divId + '-' + dataId;
       radio.checked = true;
-      radio.onchange = function (event) {
+      radio.onchange = (event) => {
         const element = event.target;
         const fullId = element.id;
         const split = fullId.split('-');
         const groupDivId = split[1];
         const dataId = split[2];
-        const lg = app.getLayerGroupByDivId(groupDivId);
+        const lg = this.#app.getLayerGroupByDivId(groupDivId);
         lg.setActiveLayerByDataId(dataId);
       };
       return radio;
@@ -278,9 +289,9 @@ test.ui.DataTable = function (app) {
       button.id = 'layeradd-' + divId + '-' + dataId;
       button.title = 'Add layer';
       button.appendChild(document.createTextNode('+'));
-      button.onclick = function () {
+      button.onclick = () => {
         // update app
-        app.addDataViewConfig(dataId, test.getViewConfig(layout, divId));
+        this.#app.addDataViewConfig(dataId, getViewConfig(layout, divId));
         // update html
         const parent = button.parentElement;
         if (parent) {
@@ -288,11 +299,11 @@ test.ui.DataTable = function (app) {
           parent.appendChild(getLayerRadio(index, divId));
           parent.appendChild(getLayerRem(index, divId));
           parent.appendChild(
-            getLayerUpdate(index, divId, dwv.Orientation.Axial));
+            getLayerUpdate(index, divId, Orientation.Axial));
           parent.appendChild(
-            getLayerUpdate(index, divId, dwv.Orientation.Coronal));
+            getLayerUpdate(index, divId, Orientation.Coronal));
           parent.appendChild(
-            getLayerUpdate(index, divId, dwv.Orientation.Sagittal));
+            getLayerUpdate(index, divId, Orientation.Sagittal));
         }
       };
       return button;
@@ -305,9 +316,9 @@ test.ui.DataTable = function (app) {
       button.id = 'layerrem-' + divId + '-' + dataId;
       button.title = 'Remove layer';
       button.appendChild(document.createTextNode('-'));
-      button.onclick = function () {
+      button.onclick = () => {
         // update app
-        app.removeDataViewConfig(dataId, divId);
+        this.#app.removeDataViewConfig(dataId, divId);
         // update html
         const parent = button.parentElement;
         parent.replaceChildren();
@@ -325,11 +336,11 @@ test.ui.DataTable = function (app) {
       button.title = 'Change layer orientation to ' + orientation;
       button.style.borderStyle = 'outset';
       button.appendChild(document.createTextNode(letter));
-      button.onclick = function () {
+      button.onclick = () => {
         // update app
-        const config = test.getViewConfig(layout, divId);
+        const config = getViewConfig(layout, divId);
         config.orientation = orientation;
-        app.updateDataViewConfig(dataId, divId, config);
+        this.#app.updateDataViewConfig(dataId, divId, config);
       };
       return button;
     };
@@ -339,9 +350,9 @@ test.ui.DataTable = function (app) {
     cell.appendChild(document.createTextNode(dataId));
 
     const orientations = [
-      dwv.Orientation.Axial,
-      dwv.Orientation.Coronal,
-      dwv.Orientation.Sagittal
+      Orientation.Axial,
+      Orientation.Coronal,
+      Orientation.Sagittal
     ];
 
     // cell: radio
@@ -372,8 +383,8 @@ test.ui.DataTable = function (app) {
     }
 
     // use first layer
-    const initialVls = app.getViewLayersByDataId(dataId);
-    const initialDls = app.getDrawLayersByDataId(dataId);
+    const initialVls = this.#app.getViewLayersByDataId(dataId);
+    const initialDls = this.#app.getDrawLayersByDataId(dataId);
     let initialLayer;
     if (initialVls.length !== 0) {
       initialLayer = initialVls[0];
@@ -388,7 +399,7 @@ test.ui.DataTable = function (app) {
     const minId = 'value-min-' + dataId;
     const maxId = 'value-max-' + dataId;
     // callback
-    const changeAlphaFunc = function () {
+    const onChangeAlphaFunc = () => {
       const minElement = document.getElementById(minId + '-number');
       const min = parseFloat(minElement.value);
       const maxElement = document.getElementById(maxId + '-number');
@@ -402,7 +413,7 @@ test.ui.DataTable = function (app) {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = app.getLayerGroupByDivId(lgIds[i]);
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
@@ -413,12 +424,12 @@ test.ui.DataTable = function (app) {
     // add controls
     if (canAlpha) {
       const dataRange = image.getDataRange();
-      cell.appendChild(test.getControlDiv(minId, 'min',
+      cell.appendChild(getControlDiv(minId, 'min',
         dataRange.min, dataRange.max, dataRange.min,
-        changeAlphaFunc, floatPrecision));
-      cell.appendChild(test.getControlDiv(maxId, 'max',
+        onChangeAlphaFunc, floatPrecision));
+      cell.appendChild(getControlDiv(maxId, 'max',
         dataRange.min, dataRange.max, dataRange.max,
-        changeAlphaFunc, floatPrecision));
+        onChangeAlphaFunc, floatPrecision));
     }
 
     // cell: contrast
@@ -426,7 +437,7 @@ test.ui.DataTable = function (app) {
     const widthId = 'width-' + dataId;
     const centerId = 'center-' + dataId;
     // callback
-    const changeContrast = function () {
+    const onChangeContrast = () => {
       const wElement = document.getElementById(widthId + '-number');
       const width = parseFloat(wElement.value);
       const cElement = document.getElementById(centerId + '-number');
@@ -434,11 +445,11 @@ test.ui.DataTable = function (app) {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = app.getLayerGroupByDivId(lgIds[i]);
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
-          vc.setWindowLevel(new dwv.WindowLevel(center, width));
+          vc.setWindowLevel(new WindowLevel(center, width));
         }
       }
     };
@@ -446,16 +457,16 @@ test.ui.DataTable = function (app) {
     if (isMonochrome) {
       const initialVc = initialLayer.getViewController();
       const rescaledDataRange = image.getRescaledDataRange();
-      cell.appendChild(test.getControlDiv(widthId, 'width',
+      cell.appendChild(getControlDiv(widthId, 'width',
         0,
         rescaledDataRange.max - rescaledDataRange.min,
         initialVc.getWindowLevel().width,
-        changeContrast, floatPrecision));
-      cell.appendChild(test.getControlDiv(centerId, 'center',
+        onChangeContrast, floatPrecision));
+      cell.appendChild(getControlDiv(centerId, 'center',
         rescaledDataRange.min,
         rescaledDataRange.max,
         initialVc.getWindowLevel().center,
-        changeContrast, floatPrecision));
+        onChangeContrast, floatPrecision));
     }
 
     // cell: presets
@@ -463,12 +474,12 @@ test.ui.DataTable = function (app) {
 
     // window level preset
     // callback
-    const changePreset = function (event) {
+    const onChangePreset = (event) => {
       const element = event.target;
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = app.getLayerGroupByDivId(lgIds[i]);
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
@@ -491,7 +502,7 @@ test.ui.DataTable = function (app) {
         option.appendChild(document.createTextNode(preset));
         selectPreset.appendChild(option);
       }
-      selectPreset.onchange = changePreset;
+      selectPreset.onchange = onChangePreset;
       const labelPreset = document.createElement('label');
       labelPreset.htmlFor = selectPreset.id;
       labelPreset.appendChild(document.createTextNode('wl: '));
@@ -505,12 +516,12 @@ test.ui.DataTable = function (app) {
 
     // colour map
     // callback
-    const changeColourMap = function (event) {
+    const onChangeColourMap = (event) => {
       const element = event.target;
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = app.getLayerGroupByDivId(lgIds[i]);
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
         const vl = lg.getActiveViewLayer();
         if (typeof vl !== 'undefined') {
           const vc = vl.getViewController();
@@ -522,7 +533,7 @@ test.ui.DataTable = function (app) {
       const selectColourMap = document.createElement('select');
       selectColourMap.id = 'colourmap-' + dataId + '-select';
       const initialVc = initialLayer.getViewController();
-      const colourMaps = Object.keys(dwv.luts);
+      const colourMaps = Object.keys(luts);
       const currentColourMap = initialVc.getColourMap();
       for (const colourMap of colourMaps) {
         const option = document.createElement('option');
@@ -533,7 +544,7 @@ test.ui.DataTable = function (app) {
         option.appendChild(document.createTextNode(colourMap));
         selectColourMap.appendChild(option);
       }
-      selectColourMap.onchange = changeColourMap;
+      selectColourMap.onchange = onChangeColourMap;
       const labelColourMap = document.createElement('label');
       labelColourMap.htmlFor = selectColourMap.id;
       labelColourMap.appendChild(document.createTextNode('cm: '));
@@ -545,11 +556,11 @@ test.ui.DataTable = function (app) {
     cell = row.insertCell();
     const opacityId = 'opacity-' + dataId;
     // callback
-    const changeOpacity = function (value) {
+    const onChangeOpacity = (value) => {
       // update selected layers
       const lgIds = getSelectedLayerGroupIds();
       for (let i = 0; i < lgIds.length; ++i) {
-        const lg = app.getLayerGroupByDivId(lgIds[i]);
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
         const layer = lg.getActiveLayer();
         if (typeof layer !== 'undefined') {
           layer.setOpacity(value);
@@ -558,8 +569,8 @@ test.ui.DataTable = function (app) {
       }
     };
     // add controls
-    cell.appendChild(test.getControlDiv(opacityId, 'opacity',
-      0, 1, initialLayer.getOpacity(), changeOpacity, floatPrecision));
+    cell.appendChild(getControlDiv(opacityId, 'opacity',
+      0, 1, initialLayer.getOpacity(), onChangeOpacity, floatPrecision));
   }
 
 }; // test.DataTable

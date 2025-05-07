@@ -1,55 +1,65 @@
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-
 /**
- * GradSquarePixGenerator
- * Generates pixel data as a small gradient square.
- *
- * @param {object} options The generator options.
- * @class
+ * GradSquarePixGenerator: generates pixel data as a small gradient square.
  */
-const GradSquarePixGenerator = function (options) {
+export class GradSquarePixGenerator {
 
-  const numberOfColumns = options.numberOfColumns;
-  const numberOfRows = options.numberOfRows;
-  const numberOfSamples = options.numberOfSamples;
-  const numberOfColourPlanes = options.numberOfColourPlanes;
-  const isRGB = options.photometricInterpretation === 'RGB';
-  const getFunc = isRGB ? getRGB : getValue;
+  #numberOfColumns;
+  #numberOfRows;
+  #numberOfSamples;
+  #numberOfColourPlanes;
 
-  // full grad square
-  const borderI = 0;
-  const borderJ = 0;
-  // ~centered grad square
-  // const borderI = Math.ceil(numberOfColumns * 0.25);
-  // const borderJ = Math.ceil(numberOfRows * 0.25);
+  #isRGB;
 
-  const minI = borderI;
-  const minJ = borderJ;
-  const maxI = numberOfColumns - borderI;
-  const maxJ = numberOfRows - borderJ;
-  const maxK = maxI;
+  #minI;
+  #minJ;
+  #maxI;
+  #maxJ;
 
-  const inRange = function (i, j) {
-    return i >= minI && i <= maxI &&
-      j >= minJ && j <= maxJ;
-  };
+  #background = 0;
+  #maxValue = 255;
+  #maxNoBounds = 1;
 
-  const background = 0;
-  const max = 255;
-  let maxNoBounds = 1;
-  maxNoBounds = getValue(maxI, maxJ, maxK) / max;
+  /**
+   * @param {object} options The generator options.
+   */
+  constructor(options) {
+    this.#numberOfColumns = options.numberOfColumns;
+    this.#numberOfRows = options.numberOfRows;
+    this.#numberOfSamples = options.numberOfSamples;
+    this.#numberOfColourPlanes = options.numberOfColourPlanes;
 
-  this.generate = function (pixelBuffer, sliceNumber) {
+    this.#isRGB = options.photometricInterpretation === 'RGB';
 
-    // main loop
+    // full grad square
+    const borderI = 0;
+    const borderJ = 0;
+    // ~centered grad square
+    // const borderI = Math.ceil(numberOfColumns * 0.25);
+    // const borderJ = Math.ceil(numberOfRows * 0.25);
+
+    this.#minI = borderI;
+    this.#minJ = borderJ;
+    this.#maxI = this.#numberOfColumns - borderI;
+    this.#maxJ = this.#numberOfRows - borderJ;
+
+    const maxK = this.#maxI;
+    this.#maxNoBounds =
+      this.#getValue(this.#maxI, this.#maxJ, maxK) / this.#maxValue;
+  }
+
+  /**
+   * @param {number[]} pixelBuffer The buffer.
+   * @param {number} sliceNumber The slice index.
+   */
+  generate(pixelBuffer, sliceNumber) {
+    const getFunc = this.#isRGB ? this.#getRGB : this.#getValue;
+
     let offset = 0;
-    for (let c = 0; c < numberOfColourPlanes; ++c) {
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          for (let s = 0; s < numberOfSamples; ++s) {
-            if (numberOfColourPlanes !== 1) {
+    for (let c = 0; c < this.#numberOfColourPlanes; ++c) {
+      for (let j = 0; j < this.#numberOfRows; ++j) {
+        for (let i = 0; i < this.#numberOfColumns; ++i) {
+          for (let s = 0; s < this.#numberOfSamples; ++s) {
+            if (this.#numberOfColourPlanes !== 1) {
               pixelBuffer[offset] = getFunc(i, j, sliceNumber)[c];
             } else {
               pixelBuffer[offset] = getFunc(i, j, sliceNumber)[s];
@@ -69,13 +79,15 @@ const GradSquarePixGenerator = function (options) {
    * @param {number} k The slice index.
    * @returns {number[]} The grey value.
    */
-  function getValue(i, j, k) {
-    let value = background + k * 2;
-    if (inRange(i, j)) {
-      value += Math.round((i + j) * (max / maxNoBounds));
+  #getValue = (i, j, k) => {
+    let value = this.#background + k * 2;
+    const inRange = i >= this.#minI && i <= this.#maxI &&
+      j >= this.#minJ && j <= this.#maxJ;
+    if (inRange) {
+      value += Math.round((i + j) * (this.#maxValue / this.#maxNoBounds));
     }
     return [value];
-  }
+  };
 
   /**
    * Get RGB values.
@@ -85,16 +97,11 @@ const GradSquarePixGenerator = function (options) {
    * @param {number} k The slice index.
    * @returns {number[]} The [R,G,B] values.
    */
-  function getRGB(i, j, k) {
-    let value = getValue(i, j, k);
-    if (value > 255) {
+  #getRGB = (i, j, k) => {
+    let value = this.#getValue(i, j, k);
+    if (value > this.#maxValue) {
       value = 200;
     }
     return [value, 0, 0];
-  }
-};
-
-test.pixelGenerators = test.pixelGenerators || {};
-test.pixelGenerators.gradSquare = {
-  generator: GradSquarePixGenerator
-};
+  };
+}

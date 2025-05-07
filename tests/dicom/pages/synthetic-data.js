@@ -1,17 +1,18 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {
+  generatePixelDataFromJSONTags,
+} from '../dicomGenerator.js';
 
-// call setup on DOM loaded
-document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+import {
+  addTagsToDictionary,
+  getElementsFromJSONTags,
+  DicomWriter
+} from 'dwv';
 
 /**
  * Setup.
  */
-function onDOMContentLoaded() {
+function setup() {
   // create lists
   getFileConfigsHtmlList('synthetic-data');
 }
@@ -30,29 +31,29 @@ function getObjectUrlFromTags(config) {
     for (let i = 0; i < keys.length; ++i) {
       const group = keys[i];
       const tags = config.privateDictionary[group];
-      dwv.addTagsToDictionary(group, tags);
+      addTagsToDictionary(group, tags);
     }
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
     }
   }
   // convert JSON to DICOM element object
-  const dicomElements = dwv.getElementsFromJSONTags(config.tags);
+  const dicomElements = getElementsFromJSONTags(config.tags);
   // pixels
   if (config.tags.Modality !== 'KO') {
     if (config.tags.Modality === 'SEG') {
       // simple binary
       dicomElements['7FE00010'] =
-        test.generatePixelDataFromJSONTags(config.tags, 'binary');
+        generatePixelDataFromJSONTags(config.tags, 'binary');
     } else {
       // default to grad square
       dicomElements['7FE00010'] =
-        test.generatePixelDataFromJSONTags(config.tags);
+        generatePixelDataFromJSONTags(config.tags);
     }
   }
 
   // create DICOM buffer
-  const writer = new dwv.DicomWriter();
+  const writer = new DicomWriter();
   writer.setUseUnVrForPrivateSq(useUnVrForPrivateSq);
   const dicomBuffer = writer.getBuffer(dicomElements);
 
@@ -105,42 +106,53 @@ function getFileConfigsHtmlList(fileName) {
   };
   request.onload = function (/*event*/) {
     const configs = JSON.parse(this.responseText);
-
-    const dataGroups = [
-      {
-        name: 'Synthetic data Implicit VR Little Endian',
-        short: 'sile',
-        syntax: '1.2.840.10008.1.2'
-      },
-      {
-        name: 'Synthetic data Explicit VR Little Endian',
-        short: 'sele',
-        syntax: '1.2.840.10008.1.2.1'
-      },
-      {
-        name: 'Synthetic data Explicit VR Big Endian',
-        short: 'sebe',
-        syntax: '1.2.840.10008.1.2.2'
-      }
-    ];
-
-    for (const dataGroup of dataGroups) {
-      const content = document.getElementById('content');
-      const title = document.createElement('h2');
-      title.appendChild(document.createTextNode(dataGroup.name));
-      content.append(title);
-
-      for (const config of configs) {
-        // name in json is 'test-##', replace test
-        //   with the short string of the group
-        config.name = dataGroup.short +
-          config.name.substring(config.name.length - 3);
-        // set transfer syntax
-        config.tags.TransferSyntaxUID = dataGroup.syntax;
-      }
-
-      content.append(getConfigsHtmlList(configs));
-    }
+    displayConfigs(configs);
   };
   request.send(null);
 }
+
+/**
+ * @param {object} configs Synthetic data configuration.
+ */
+function displayConfigs(configs) {
+  const dataGroups = [
+    {
+      name: 'Synthetic data Implicit VR Little Endian',
+      short: 'sile',
+      syntax: '1.2.840.10008.1.2'
+    },
+    {
+      name: 'Synthetic data Explicit VR Little Endian',
+      short: 'sele',
+      syntax: '1.2.840.10008.1.2.1'
+    },
+    {
+      name: 'Synthetic data Explicit VR Big Endian',
+      short: 'sebe',
+      syntax: '1.2.840.10008.1.2.2'
+    }
+  ];
+
+  for (const dataGroup of dataGroups) {
+    const content = document.getElementById('content');
+    const title = document.createElement('h2');
+    title.appendChild(document.createTextNode(dataGroup.name));
+    content.append(title);
+
+    for (const config of configs) {
+      // name in json is 'test-##', replace test
+      //   with the short string of the group
+      config.name = dataGroup.short +
+        config.name.substring(config.name.length - 3);
+      // set transfer syntax
+      config.tags.TransferSyntaxUID = dataGroup.syntax;
+    }
+
+    content.append(getConfigsHtmlList(configs));
+  }
+}
+
+// ---------------------------------------------
+
+// launch
+setup();

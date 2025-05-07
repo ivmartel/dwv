@@ -1,52 +1,58 @@
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-
 /**
- * BinaryPixGenerator
- * Generates binary pixel data.
- *
- * @param {object} options The generator options.
- * @class
+ * BinaryPixGenerator: generates binary pixel data.
  */
-const BinaryPixGenerator = function (options) {
+export class BinaryPixGenerator {
 
-  const numberOfColumns = options.numberOfColumns;
-  const numberOfRows = options.numberOfRows;
-  const numberOfFrames = options.numberOfFrames;
+  #numberOfColumns;
+  #numberOfRows;
+  #numberOfFrames;
 
-  const borderI = Math.ceil(numberOfColumns * 0.5);
-  const borderJ = Math.ceil(numberOfRows * 0.5);
+  #minI;
+  #minJ;
+  #maxI;
+  #maxJ;
 
-  const minI = borderI;
-  const minJ = borderJ;
-  const maxI = numberOfColumns - borderI;
-  const maxJ = numberOfRows - borderJ;
+  /**
+   * @param {object} options The generator options.
+   */
+  constructor(options) {
+    this.#numberOfColumns = options.numberOfColumns;
+    this.#numberOfRows = options.numberOfRows;
+    this.#numberOfFrames = options.numberOfFrames;
 
-  const inRange = function (i, j) {
-    return i >= minI && i < maxI &&
-      j >= minJ && j < maxJ;
-  };
+    const borderI = Math.ceil(this.#numberOfColumns * 0.5);
+    const borderJ = Math.ceil(this.#numberOfRows * 0.5);
 
-  this.generate = function (pixelBuffer /*, sliceNumber*/) {
-    const getFunc = function (i, j) {
-      return inRange(i, j) ? 1 : 0;
-    };
+    this.#minI = borderI;
+    this.#minJ = borderJ;
+    this.#maxI = this.#numberOfColumns - borderI;
+    this.#maxJ = this.#numberOfRows - borderJ;
+  }
 
-    // main loop
+  /**
+   * @param {number[]} pixelBuffer The buffer.
+   */
+  generate(pixelBuffer /*, sliceNumber*/) {
     let offset = 0;
-    for (let f = 0; f < numberOfFrames; ++f) {
-      for (let j = 0; j < numberOfRows; ++j) {
-        for (let i = 0; i < numberOfColumns; ++i) {
-          pixelBuffer[offset] = getFunc(i, j);
+    for (let f = 0; f < this.#numberOfFrames; ++f) {
+      for (let j = 0; j < this.#numberOfRows; ++j) {
+        for (let i = 0; i < this.#numberOfColumns; ++i) {
+          pixelBuffer[offset] = this.#getValue(i, j);
           ++offset;
         }
       }
     }
-  };
-};
+  }
 
-test.pixelGenerators = test.pixelGenerators || {};
-test.pixelGenerators.binary = {
-  generator: BinaryPixGenerator
+  /**
+   * @param {number} i The column index.
+   * @param {number} j The row index.
+   * @returns {number} The value.
+   */
+  #getValue = (i, j) => {
+    const inRange = i >= this.#minI && i < this.#maxI &&
+      j >= this.#minJ && j < this.#maxJ;
+    return inRange ? 1 : 0;
+  };
+
 };

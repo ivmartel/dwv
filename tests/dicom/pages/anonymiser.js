@@ -1,13 +1,21 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {
+  logger,
+  DicomParser,
+  DicomWriter
+} from 'dwv';
 
-// call setup on DOM loaded
-document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+// global vars
+// rules file
+let _rulesFile = null;
+// dicom file
+let _dicomFile = null;
+// DICOM elements
+let _dicomElements = null;
 
 /**
  * Setup.
  */
-function onDOMContentLoaded() {
+function setup() {
   const infileInput = document.getElementById('infile');
   infileInput.onchange = onInputDICOMFile;
   const inrulesfileInput = document.getElementById('inrulesfile');
@@ -20,15 +28,8 @@ function onDOMContentLoaded() {
   generateButton.onclick = generate;
 
   // logger level (optional)
-  dwv.logger.level = dwv.logger.levels.DEBUG;
+  logger.level = logger.levels.DEBUG;
 }
-
-// rules file
-let _rulesFile = null;
-// dicom file
-let _dicomFile = null;
-// DICOM elements
-let _dicomElements = null;
 
 /**
  * Handle DICOM file load.
@@ -37,7 +38,7 @@ let _dicomElements = null;
  */
 function onLoadDICOMFile(event) {
   // parse DICOM
-  const parser = new dwv.DicomParser();
+  const parser = new DicomParser();
   parser.parse(event.target.result);
   // store elements
   _dicomElements = parser.getDicomElements();
@@ -55,7 +56,7 @@ function generate() {
     return;
   }
   // create writer with textarea rules
-  const writer = new dwv.DicomWriter();
+  const writer = new DicomWriter();
   const addMissingTags = true;
   writer.setRules(
     JSON.parse(document.getElementById('rules').value),
@@ -148,3 +149,8 @@ function onInputRulesFile(event) {
   };
   reader.readAsText(_rulesFile);
 }
+
+// ---------------------------------------------
+
+// launch
+setup();
