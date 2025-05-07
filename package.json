@@ -63,6 +63,7 @@
     "start": "webpack serve --config webpack.dev.js",
     "pack": "webpack --config webpack.prod.js",
     "build": "yarn run pack && yarn run types && yarn run api",
+    "build-demo": "webpack --config webpack.demo.js",
     "lint": "eslint -c 'eslint.config-full.js' 'src/**/*.js' 'tests/**/*.js' '*.js'",
     "test": "karma start ./karma.conf.js",
     "test-ci": "karma start ./karma.conf.js --browsers ChromeHeadless --reporters progress,coverage,json --single-run",
