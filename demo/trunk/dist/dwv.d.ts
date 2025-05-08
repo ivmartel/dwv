@@ -17,17 +17,17 @@ export declare function addTagsToDictionary(group: string, tags: {
  */
 export declare class Annotation {
     /**
-     * ID, strored as tracking id, this id is not unique.
+     * Tracking id, unique within domain.
      *
      * @type {string}
      */
-    id: string;
+    trackingId: string;
     /**
-     * UID, stored as tracking unique id.
+     * Tracking Unique id.
      *
      * @type {string}
      */
-    uid: string;
+    trackingUid: string;
     /**
      * Referenced image SOP isntance UID.
      *
@@ -5185,7 +5185,7 @@ export declare const toolList: {
  *     const group = new Konva.Group();
  *     group.name('love-group');
  *     group.visible(true);
- *     group.id(annotation.uid);
+ *     group.id(annotation.trackingUid);
  *     group.add(shape);
  *     return group;
  *   }
