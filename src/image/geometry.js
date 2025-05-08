@@ -223,7 +223,7 @@ export class Geometry {
     // update local if needed
     if (typeof geoSliceSpacing !== 'undefined' &&
       this.#spacing.get(2) !== geoSliceSpacing) {
-      logger.trace('Using geometric spacing ' + geoSliceSpacing +
+      logger.debug('Using geometric spacing ' + geoSliceSpacing +
         ' instead of tag spacing ' + this.#spacing.get(2));
       const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
