@@ -1406,15 +1406,19 @@ export declare class DicomCode {
  */
 export declare class DicomData {
     /**
-     * @param {object} meta The DICOM meta data.
+     * @param {Object<string, DataElement>} meta The DICOM meta data.
      */
-    constructor(meta: object);
+    constructor(meta: {
+        [x: string]: DataElement;
+    });
     /**
      * DICOM meta data.
      *
-     * @type {object}
+     * @type {Object<string, DataElement>}
      */
-    meta: object;
+    meta: {
+        [x: string]: DataElement;
+    };
     /**
      * Image extracted from meta data.
      *
