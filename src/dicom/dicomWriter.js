@@ -1381,7 +1381,7 @@ export function getElementsFromJSONTags(simpleTags) {
           items.push(getElementsFromJSONTags(item));
         }
       } else {
-        logger.trace('Non array simpleTag SQ value');
+        logger.debug('Non array simpleTag SQ value');
       }
       value = items;
     } else {
