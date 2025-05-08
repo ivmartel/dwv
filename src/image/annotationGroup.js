@@ -152,7 +152,8 @@ export class AnnotationGroup {
    * @param {string[]} [propKeys] Optional properties that got updated.
    */
   update(annotation, propKeys) {
-    const index = this.#list.findIndex((item) => item.uid === annotation.uid);
+    const index = this.#list.findIndex(
+      (item) => item.trackingUid === annotation.trackingUid);
     if (index !== -1) {
       // update quantification if needed
       if (propKeys.includes('mathShape') ||
@@ -186,7 +187,8 @@ export class AnnotationGroup {
    * @param {string} uid The UID of the annotation to remove.
    */
   remove(uid) {
-    const index = this.#list.findIndex((item) => item.uid === uid);
+    const index = this.#list.findIndex(
+      (item) => item.trackingUid === uid);
     if (index !== -1) {
       const annotation = this.#list.splice(index, 1)[0];
       /**
@@ -226,7 +228,7 @@ export class AnnotationGroup {
    * @returns {Annotation|undefined} The found annotation.
    */
   find(uid) {
-    return this.#list.find((item) => item.uid === uid);
+    return this.#list.find((item) => item.trackingUid === uid);
   }
 
   /**

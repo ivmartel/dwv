@@ -20,18 +20,18 @@ import {DicomCode} from '../dicom/dicomCode.js';
  */
 export class Annotation {
   /**
-   * ID, strored as tracking id, this id is not unique.
+   * Tracking id, unique within domain.
    *
    * @type {string}
    */
-  id;
+  trackingId;
 
   /**
-   * UID, stored as tracking unique id.
+   * Tracking Unique id.
    *
    * @type {string}
    */
-  uid;
+  trackingUid;
 
   /**
    * Referenced image SOP isntance UID.
@@ -131,8 +131,8 @@ export class Annotation {
    * Set the annotation id and uid.
    */
   setIds() {
-    this.id = guid();
-    this.uid = getUID('TrackingUniqueIdentifier');
+    this.trackingId = guid();
+    this.trackingUid = getUID('TrackingUniqueIdentifier');
   }
 
   /**

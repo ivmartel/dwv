@@ -89,7 +89,7 @@ export const toolList = {};
  *     const group = new Konva.Group();
  *     group.name('love-group');
  *     group.visible(true);
- *     group.id(annotation.uid);
+ *     group.id(annotation.trackingUid);
  *     group.add(shape);
  *     return group;
  *   }

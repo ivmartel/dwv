@@ -141,7 +141,7 @@ export class DrawController {
    */
   removeAllAnnotationsWithCommand(exeCallback) {
     for (const annotation of this.#annotationGroup.getList()) {
-      this.removeAnnotationWithCommand(annotation.uid, exeCallback);
+      this.removeAnnotationWithCommand(annotation.trackingUid, exeCallback);
     }
   }
 

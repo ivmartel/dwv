@@ -77,10 +77,10 @@ function checkGroupCommonProperties(annotationGroup, assert, prefix) {
 
   for (let i = 0; i < annotations.length; ++i) {
     const annotation = annotations[i];
-    assert.ok(typeof annotation.id !== 'undefined',
-      prefix + ' annotation ' + i + ' id');
-    assert.ok(typeof annotation.uid !== 'undefined',
-      prefix + ' annotation ' + i + ' uid');
+    assert.ok(typeof annotation.trackingId !== 'undefined',
+      prefix + ' annotation ' + i + ' trackingId');
+    assert.ok(typeof annotation.trackingUid !== 'undefined',
+      prefix + ' annotation ' + i + ' trackingUid');
     assert.ok(typeof annotation.referencedSopClassUID !== 'undefined',
       prefix + ' annotation ' + i + ' referencedSopClassUID');
     assert.ok(typeof annotation.referencedSopInstanceUID !== 'undefined',

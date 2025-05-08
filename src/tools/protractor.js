@@ -111,7 +111,7 @@ export class ProtractorFactory {
     const group = new Konva.Group();
     group.name(this.getGroupName());
     group.visible(true);
-    group.id(annotation.uid);
+    group.id(annotation.trackingUid);
     // konva shape
     const shape = this.#createShape(annotation, style);
     group.add(this.#createShape(annotation, style));

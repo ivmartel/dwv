@@ -25,7 +25,7 @@ function getAnnotationGroupDivId(dataId) {
  */
 function getAnnotationDivId(annotation, dataId) {
   const prefix = getAnnotationGroupDivId(dataId);
-  const suffix = 'annotation' + annotation.uid;
+  const suffix = 'annotation' + annotation.trackingUid;
   return prefix + '-' + suffix;
 }
 
@@ -235,7 +235,7 @@ test.dataModelUI.Annotation = function (app) {
     const span = document.createElement('span');
     span.id = 'span-' + annotationDivId;
     span.appendChild(document.createTextNode(
-      annotation.id + ' (' + annotation.getFactory().getName() + ')'));
+      annotation.trackingId + ' (' + annotation.getFactory().getName() + ')'));
     span.appendChild(inputColour);
     span.appendChild(gotoButton);
     span.appendChild(viewButton);
