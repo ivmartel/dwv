@@ -4,6 +4,7 @@ import {mergeObjects} from '../utils/operator.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Image} from '../image/image.js';
+import {DataElement} from '../dicom/dataElement.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
 
@@ -14,7 +15,7 @@ export class DicomData {
   /**
    * DICOM meta data.
    *
-   * @type {object}
+   * @type {Object<string, DataElement>}
    */
   meta;
 
@@ -32,7 +33,7 @@ export class DicomData {
   annotationGroup;
 
   /**
-   * @param {object} meta The DICOM meta data.
+   * @param {Object<string, DataElement>} meta The DICOM meta data.
    */
   constructor(meta) {
     this.meta = meta;
