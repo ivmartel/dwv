@@ -40,6 +40,7 @@ import {ColourMap} from './luts.js';
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Matrix33} from '../math/matrix.js';
+import {Spacing} from '../image/spacing.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {MaskSegment} from '../dicom/dicomSegment.js';
 /* eslint-enable no-unused-vars */
@@ -505,9 +506,9 @@ export class MaskFactory {
       });
     };
 
-    const findIndexPosPat = function (arr, val) {
+    const findPointIndex = function (arr, val) {
       return arr.findIndex(function (arrVal) {
-        return equalPosPat(val, arrVal);
+        return val.equals(arrVal);
       });
     };
 
@@ -588,76 +589,10 @@ export class MaskFactory {
       frameOrigins.push(point3DFromArray(framePosPat));
     }
 
-    // tmp geometry with correct spacing but only one slice
-    const tmpGeometry = new Geometry(
-      [frameOrigins[0]], size, spacing, orientationMatrix);
-
-    // origin distance test
-    // TODO: maybe use sliceSpacing / 10
-    const isAboveEpsilon = function (value) {
-      let res = value > REAL_WORLD_EPSILON;
-      if (res) {
-        // try larger epsilon
-        res = value > REAL_WORLD_EPSILON * 10;
-        if (!res) {
-          // warn if epsilon < value < epsilon * 10
-          logger.warn(
-            'Using larger real world epsilon in SEG pos pat adding'
-          );
-        } else {
-          res = value > REAL_WORLD_EPSILON * 100;
-          if (!res) {
-            // warn if epsilon < value < epsilon * 100
-            logger.warn(
-              'Using larger+ real world epsilon in SEG pos pat adding'
-            );
-          }
-        }
-      }
-      return res;
-    };
-
-    // add possibly missing posPats
-    const posPats = [];
-    posPats.push(framePosPats[0]);
-    let sliceIndex = 0;
-    for (let g = 1; g < framePosPats.length; ++g) {
-      ++sliceIndex;
-      let index = new Index([0, 0, sliceIndex]);
-      let point = tmpGeometry.indexToWorld(index).get3D();
-      const frameOrigin = frameOrigins[g];
-      // check if more pos pats are needed
-      let dist = frameOrigin.getDistance(point);
-      const distPrevious = dist;
-      // TODO: good threshold?
-      while (isAboveEpsilon(dist)) {
-        logger.debug('Adding intermediate pos pats for DICOM seg at ' +
-          point.toString());
-        posPats.push([point.getX(), point.getY(), point.getZ()]);
-        ++sliceIndex;
-        index = new Index([0, 0, sliceIndex]);
-        point = tmpGeometry.indexToWorld(index).get3D();
-        dist = frameOrigin.getDistance(point);
-        if (dist > distPrevious) {
-          throw new Error(
-            'Test distance is increasing when adding intermediate pos pats');
-        }
-      }
-      // add frame pos pat
-      posPats.push(framePosPats[g]);
-    }
-
-    // as many slices as posPats
-    const numberOfSlices = posPats.length;
-
-    // final geometry
-    const geometry = new Geometry(
-      [frameOrigins[0]], size, spacing, orientationMatrix);
-    const uids = ['0'];
-    for (let m = 1; m < numberOfSlices; ++m) {
-      geometry.appendOrigin(point3DFromArray(posPats[m]), m);
-      uids.push(m.toString());
-    }
+    // calculate final mask geometry
+    const geometry =
+      this.#calculateGeometry(frameOrigins, size, spacing, orientationMatrix);
+    const numberOfSlices = geometry.getSize().get(2);
 
     const getFindSegmentFunc = function (number) {
       return function (item) {
@@ -670,12 +605,20 @@ export class MaskFactory {
       // @ts-ignore
       new pixelBuffer.constructor(sliceSize * numberOfSlices);
     buffer.fill(0);
+
     // merge frame buffers
-    let sliceOffset = null;
-    let frameOffset = null;
+    const maskOrigins = geometry.getOrigins();
+    let sliceIndex;
+    let frameOffset;
+    let sliceOffset;
     for (let f = 0; f < frameInfos.length; ++f) {
-      // get the slice index from the position in the posPat array
-      sliceIndex = findIndexPosPat(posPats, frameInfos[f].imagePosPat);
+      // get the slice index from the position in the mask origins array
+      const frameOrigin = point3DFromArray(frameInfos[f].imagePosPat);
+      sliceIndex = findPointIndex(maskOrigins, frameOrigin);
+      // should not be possible but just in case...
+      if (sliceIndex === -1) {
+        throw new Error('Cannot find frame origin in mask origins');
+      }
       frameOffset = sliceSize * f;
       sliceOffset = sliceSize * sliceIndex;
       // get the frame display value
@@ -692,6 +635,12 @@ export class MaskFactory {
           }
         }
       }
+    }
+
+    // simple uids
+    const uids = [];
+    for (let m = 0; m < numberOfSlices; ++m) {
+      uids.push(m.toString());
     }
 
     // create image
@@ -726,6 +675,86 @@ export class MaskFactory {
     image.setMeta(meta);
 
     return image;
+  }
+
+  /**
+   * Calculate the mask geometry from frame origins.
+   *
+   * @param {Point3D[]} frameOrigins The frame origins.
+   * @param {Size} size The mask temporary size.
+   * @param {Spacing} spacing The mask spcing.
+   * @param {Matrix33} orientationMatrix The mask orientation.
+   * @returns {Geometry} The final mask geometry.
+   */
+  #calculateGeometry(frameOrigins, size, spacing, orientationMatrix) {
+    // tmp geometry with correct spacing but only one slice
+    const tmpGeometry = new Geometry(
+      [frameOrigins[0]], size, spacing, orientationMatrix);
+
+    // origin distance test
+    // TODO: maybe use sliceSpacing / 10
+    const isAboveEpsilon = function (value) {
+      let res = value > REAL_WORLD_EPSILON;
+      if (res) {
+        // try larger epsilon
+        res = value > REAL_WORLD_EPSILON * 10;
+        if (!res) {
+          // warn if epsilon < value < epsilon * 10
+          logger.warn(
+            'Using larger real world epsilon in SEG pos pat adding'
+          );
+        } else {
+          res = value > REAL_WORLD_EPSILON * 100;
+          if (!res) {
+            // warn if epsilon < value < epsilon * 100
+            logger.warn(
+              'Using larger+ real world epsilon in SEG pos pat adding'
+            );
+          }
+        }
+      }
+      return res;
+    };
+
+    // add possibly missing origins
+    const maskOrigins = [];
+    maskOrigins.push(frameOrigins[0]);
+    let sliceIndex = 0;
+    for (let g = 1; g < frameOrigins.length; ++g) {
+      ++sliceIndex;
+      let index = new Index([0, 0, sliceIndex]);
+      let point = tmpGeometry.indexToWorld(index).get3D();
+      const frameOrigin = frameOrigins[g];
+      // check if more pos pats are needed
+      let dist = frameOrigin.getDistance(point);
+      const distPrevious = dist;
+      // TODO: good threshold?
+      while (isAboveEpsilon(dist)) {
+        logger.debug('Adding intermediate pos pats for DICOM seg at ' +
+          point.toString());
+        maskOrigins.push(point);
+        ++sliceIndex;
+        index = new Index([0, 0, sliceIndex]);
+        point = tmpGeometry.indexToWorld(index).get3D();
+        dist = frameOrigin.getDistance(point);
+        if (dist > distPrevious) {
+          throw new Error(
+            'Test distance is increasing when adding intermediate pos pats');
+        }
+      }
+      // add frame pos pat
+      maskOrigins.push(frameOrigin);
+    }
+
+    // final geometry
+    const geometry = new Geometry(
+      [frameOrigins[0]], size, spacing, orientationMatrix);
+    // append origins
+    for (let m = 1; m < maskOrigins.length; ++m) {
+      geometry.appendOrigin(maskOrigins[m], m);
+    }
+
+    return geometry;
   }
 
   /**
