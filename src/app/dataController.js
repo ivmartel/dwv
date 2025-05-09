@@ -34,6 +34,13 @@ export class DicomData {
   annotationGroup;
 
   /**
+   * Image buffer used to build image.
+   *
+   * @type {any|undefined}
+   */
+  buffer;
+
+  /**
    * @param {Object<string, DataElement>} meta The DICOM meta data.
    */
   constructor(meta) {
