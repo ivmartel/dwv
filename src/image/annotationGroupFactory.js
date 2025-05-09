@@ -1045,8 +1045,6 @@ export class AnnotationGroupFactory {
     const now = new Date();
     tags.ContentDate = getDicomDate(dateToDateObj(now));
     tags.ContentTime = getDicomTime(dateToTimeObj(now));
-    tags.StudyDate = tags.ContentDate;
-    tags.StudyTime = tags.ContentTime;
 
     // reference
     const evidenceSq = tags.CurrentRequestedProcedureEvidenceSequence;
