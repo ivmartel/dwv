@@ -98,6 +98,10 @@ export class DicomBufferToView {
       const data = new DicomData(dataElements);
       if (factory instanceof AnnotationGroupFactory) {
         data.annotationGroup = factory.create(dataElements);
+      } else if (factory instanceof MaskFactory) {
+        // image creation will be done in data controller
+        // if it has access to reference data
+        data.buffer = this.#finalBufferStore[index];
       } else {
         data.image = factory.create(
           dataElements,
