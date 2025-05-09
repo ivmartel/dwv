@@ -100,6 +100,10 @@ export class DicomBufferToView {
         if (typeof factory.checkElements(dataElements) === 'undefined') {
           data.annotationGroup = factory.create(dataElements);
         }
+      } else if (factory instanceof MaskFactory) {
+        // image creation will be done in data controller
+        // if it has access to reference data
+        data.buffer = this.#finalBufferStore[index];
       } else {
         data.image = factory.create(
           dataElements,

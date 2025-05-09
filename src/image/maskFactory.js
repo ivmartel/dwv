@@ -397,10 +397,12 @@ export class MaskFactory {
    * @param {Uint8Array | Int8Array |
    *   Uint16Array | Int16Array |
    *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+   * @param {Image} [refImage] Reference image, code will use its
+   *   origins if present (best) or try to calculate them.
    * @returns {Image} A new Image.
    * @throws Error for missing or wrong data.
    */
-  create(dataElements, pixelBuffer) {
+  create(dataElements, pixelBuffer, refImage) {
     // safe get shortcuts
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
@@ -589,9 +591,24 @@ export class MaskFactory {
       frameOrigins.push(point3DFromArray(framePosPat));
     }
 
-    // calculate final mask geometry
-    const geometry =
-      this.#calculateGeometry(frameOrigins, size, spacing, orientationMatrix);
+    let geometry;
+    if (typeof refImage !== 'undefined') {
+      geometry = this.#getGeometryFromReference(
+        frameOrigins,
+        size,
+        spacing,
+        orientationMatrix,
+        refImage.getGeometry().getOrigins()
+      );
+    } else {
+      geometry = this.#calculateGeometry(
+        frameOrigins,
+        size,
+        spacing,
+        orientationMatrix
+      );
+    }
+
     const numberOfSlices = geometry.getSize().get(2);
 
     const getFindSegmentFunc = function (number) {
@@ -678,6 +695,56 @@ export class MaskFactory {
   }
 
   /**
+   * Get the mask geometry from reference image.
+   *
+   * @param {Point3D[]} frameOrigins The frame origins.
+   * @param {Size} size The mask temporary size.
+   * @param {Spacing} spacing The mask spcing.
+   * @param {Matrix33} orientationMatrix The mask orientation.
+   * @param {Point3D[]} refOrigins The reference image origins.
+   * @returns {Geometry} The final mask geometry.
+   */
+  #getGeometryFromReference(
+    frameOrigins, size, spacing, orientationMatrix, refOrigins) {
+    const findPointIndex = function (arr, val) {
+      return arr.findIndex(function (arrVal) {
+        return val.isSimilar(arrVal, 1e-4);
+      });
+    };
+
+    const maskOrigins = [];
+    maskOrigins.push(frameOrigins[0]);
+    let previousIndex = findPointIndex(refOrigins, frameOrigins[0]);
+    if (previousIndex === -1) {
+      throw new Error('No index for first frame origin');
+    }
+    for (let i = 1; i < frameOrigins.length; ++i) {
+      const frameOrigin = frameOrigins[i];
+      const currentIndex = findPointIndex(refOrigins, frameOrigin);
+      if (currentIndex === -1) {
+        throw new Error('No index for frame origin ' + i);
+      }
+      if (currentIndex !== previousIndex + 1) {
+        for (let j = previousIndex + 1; j < currentIndex; ++j) {
+          maskOrigins.push(refOrigins[j]);
+        }
+      }
+      maskOrigins.push(frameOrigin);
+      previousIndex = currentIndex;
+    }
+
+    // final geometry
+    const geometry = new Geometry(
+      [frameOrigins[0]], size, spacing, orientationMatrix);
+    // append origins
+    for (let m = 1; m < maskOrigins.length; ++m) {
+      geometry.appendOrigin(maskOrigins[m], m);
+    }
+
+    return geometry;
+  }
+
+  /**
    * Calculate the mask geometry from frame origins.
    *
    * @param {Point3D[]} frameOrigins The frame origins.
@@ -687,6 +754,8 @@ export class MaskFactory {
    * @returns {Geometry} The final mask geometry.
    */
   #calculateGeometry(frameOrigins, size, spacing, orientationMatrix) {
+    logger.warn('Guessing image geometry for DICOM SEG');
+
     // tmp geometry with correct spacing but only one slice
     const tmpGeometry = new Geometry(
       [frameOrigins[0]], size, spacing, orientationMatrix);
