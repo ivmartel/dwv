@@ -1350,15 +1350,19 @@ export declare class DicomCode {
  */
 export declare class DicomData {
     /**
-     * @param {object} meta The DICOM meta data.
+     * @param {Object<string, DataElement>} meta The DICOM meta data.
      */
-    constructor(meta: object);
+    constructor(meta: {
+        [x: string]: DataElement;
+    });
     /**
      * DICOM meta data.
      *
-     * @type {object}
+     * @type {Object<string, DataElement>}
      */
-    meta: object;
+    meta: {
+        [x: string]: DataElement;
+    };
     /**
      * Image extracted from meta data.
      *
@@ -1371,6 +1375,12 @@ export declare class DicomData {
      * @type {AnnotationGroup|undefined}
      */
     annotationGroup: AnnotationGroup | undefined;
+    /**
+     * Image buffer used to build image.
+     *
+     * @type {any|undefined}
+     */
+    buffer: any | undefined;
 }
 
 /**
@@ -3416,12 +3426,14 @@ export declare class MaskFactory {
      * @param {Uint8Array | Int8Array |
          *   Uint16Array | Int16Array |
          *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+     * @param {Image} [refImage] Reference image, code will use its
+     *   origins if present (best) or try to calculate them.
      * @returns {Image} A new Image.
      * @throws Error for missing or wrong data.
      */
     create(dataElements: {
         [x: string]: DataElement;
-    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
     /**
      * Convert a mask image into a DICOM segmentation object.
      *

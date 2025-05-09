@@ -300,10 +300,15 @@ export class DicomCode {
 
 // @public
 export class DicomData {
-    constructor(meta: object);
+    constructor(meta: {
+        [x: string]: DataElement;
+    });
     annotationGroup: AnnotationGroup | undefined;
+    buffer: any | undefined;
     image: Image_2 | undefined;
-    meta: object;
+    meta: {
+        [x: string]: DataElement;
+    };
 }
 
 // @public
@@ -708,7 +713,7 @@ export class MaskFactory {
     }): string | undefined;
     create(dataElements: {
         [x: string]: DataElement;
-    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
     getWarning(): string | undefined;
     toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: {
         [x: string]: any;
