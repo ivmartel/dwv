@@ -188,9 +188,14 @@ export class DataController {
     // store the new image
     this.#dataList[dataId] = data;
 
+    let modality;
+    if (typeof data.meta['00080060'] !== 'undefined') {
+      modality = data.meta['00080060'].value[0];
+    }
+
     // DICOM seg case
     // find the reference data to allow for geometry creation
-    if (data.meta['00080060'].value[0] === 'SEG' &&
+    if (modality === 'SEG' &&
       typeof data.image === 'undefined') {
       // get referencedSeriesUID from meta
       let referencedSeriesUID;
