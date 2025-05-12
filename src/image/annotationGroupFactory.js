@@ -481,6 +481,10 @@ export class AnnotationGroupFactory {
     let annotation;
 
     // get shape from scoord
+
+    // https://dicom.nema.org/medical/Dicom/current/output/chtml/part16/chapter_A.html#sect_TID_1400
+    // image region or path...
+
     const scoord = content.contentSequence.find(
       this.#isImageRegionItem
     );
