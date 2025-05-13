@@ -1,14 +1,15 @@
-import {ThreadPool, WorkerTask} from '../utils/thread';
-import {Index} from '../math/index';
-import {Point3D} from '../math/point';
-import {Geometry} from './geometry';
-import {Size} from './size';
-import {getTypedArray} from '../dicom/dicomParser';
-import {Spacing} from './spacing';
+import {ThreadPool, WorkerTask} from '../utils/thread.js';
+import {Index} from '../math/index.js';
+import {Point3D} from '../math/point.js';
+import {Geometry} from './geometry.js';
+import {Size} from './size.js';
+import {getTypedArray} from '../dicom/dicomParser.js';
+import {Spacing} from './spacing.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
+import {Matrix33} from '../math/matrix.js';
+import {Point} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -112,6 +113,7 @@ export class ResamplingThread {
    * @param {Matrix33} targetOrientation The orientation to resample to.
    * @param {boolean} interpolated If true use bilinear
    *  sampling, otherwise use nearest neighbor.
+   * @param {[Point]} centerOfRotation World space center of rotation.
    *
    * @returns {object} Updated buffer and geometry.
    */
@@ -120,13 +122,14 @@ export class ResamplingThread {
     sourceImageGeometry,
     pixelRepresentation,
     targetOrientation,
-    interpolated
+    interpolated,
+    centerOfRotation
   ) {
     // We can't just pass in an Image or we would get a circular dependency
 
+    const sourceOrientation = sourceImageGeometry.getOrientation();
     const invTargetOrientation = targetOrientation.getInverse();
-    const relativeMatrix =
-      invTargetOrientation.multiply(sourceImageGeometry.getOrientation());
+    const relativeMatrix = invTargetOrientation.multiply(sourceOrientation);
 
     const sourceSize = sourceImageGeometry.getSize();
     const sourceSpacing = sourceImageGeometry.getSpacing();
@@ -252,30 +255,69 @@ export class ResamplingThread {
 
     // Calculate updated origin
     //---------------------------------
-    const targetOriginIndexCentered = new Point3D(
-      -((targetSize.get(0) - 1) / 2.0) * targetSpacing.get(0),
-      -((targetSize.get(1) - 1) / 2.0) * targetSpacing.get(1),
-      -((targetSize.get(2) - 1) / 2.0) * targetSpacing.get(2),
-    );
-    const targetOriginIndexOriented =
-      relativeMatrix.getInverse().multiplyPoint3D(targetOriginIndexCentered);
+    // Basic version of the calculation:
+    // (centerTarget*scaleTarget)*orientationTarget + originTarget =
+    //  (centerSource*scaleSource)*orientationSource + originSource
+    // so
+    // oT = (cS*sS)*RS + oS - (cT*sT)*RT
 
-    const targetOriginSourceIndex = new Index([
-      Math.floor(
-        (targetOriginIndexOriented.getX() / sourceSpacing.get(0)) +
-        ((sourceSize.get(0) - 1) / 2.0)
-      ),
-      Math.floor(
-        (targetOriginIndexOriented.getY() / sourceSpacing.get(1)) +
-        ((sourceSize.get(1) - 1) / 2.0)
-      ),
-      Math.floor(
-        (targetOriginIndexOriented.getZ() / sourceSpacing.get(2)) +
-        ((sourceSize.get(2) - 1) / 2.0)
-      ),
-    ]);
-    const targetOrigin =
-      sourceImageGeometry.indexToWorld(targetOriginSourceIndex).get3D();
+    const sourceCenterIndex =
+      typeof centerOfRotation === 'undefined'
+        ? new Index([
+          Math.floor((sourceSize.get(0)) / 2.0),
+          Math.floor((sourceSize.get(1)) / 2.0),
+          Math.floor((sourceSize.get(2)) / 2.0)
+        ])
+        : sourceImageGeometry.worldToIndex(centerOfRotation);
+
+    const targetCenterIndexArr = [0, 0, 0];
+    if (typeof centerOfRotation === 'undefined') {
+      // Center of rotation === Center of source
+      // Math is much simpler
+      targetCenterIndexArr[0] = Math.floor(targetSize.get(0) / 2.0);
+      targetCenterIndexArr[1] = Math.floor(targetSize.get(1) / 2.0);
+      targetCenterIndexArr[2] = Math.floor(targetSize.get(2) / 2.0);
+
+    } else {
+      const relativeSourceCenterOffsetArr = [
+        (sourceCenterIndex.get(0) - (sourceSize.get(0) / 2.0)) *
+        sourceSpacing.get(0),
+        (sourceCenterIndex.get(1) - (sourceSize.get(1) / 2.0)) *
+        sourceSpacing.get(1),
+        (sourceCenterIndex.get(2) - (sourceSize.get(2) / 2.0)) *
+        sourceSpacing.get(2)
+      ];
+
+      const relativeTargetCenterOffsetArr =
+        relativeMatrix.multiplyArray3D(relativeSourceCenterOffsetArr);
+
+      targetCenterIndexArr[0] =
+        Math.floor((relativeTargetCenterOffsetArr[0] / targetSpacing.get(0)) +
+        (targetSize.get(0) / 2.0));
+      targetCenterIndexArr[1] =
+        Math.floor((relativeTargetCenterOffsetArr[1] / targetSpacing.get(1)) +
+        (targetSize.get(1) / 2.0));
+      targetCenterIndexArr[2] =
+        Math.floor((relativeTargetCenterOffsetArr[2] / targetSpacing.get(2)) +
+        (targetSize.get(2) / 2.0));
+    }
+
+    const targetCenterIndexSpaced = new Point3D(
+      targetCenterIndexArr[0] * targetSpacing.get(0),
+      targetCenterIndexArr[1] * targetSpacing.get(1),
+      targetCenterIndexArr[2] * targetSpacing.get(2)
+    );
+    const targetCenterPointLocal =
+      targetOrientation.multiplyPoint3D(targetCenterIndexSpaced);
+
+    const sourceCenterPoint =
+      sourceImageGeometry.indexToWorld(sourceCenterIndex).get3D();
+
+    const targetOrigin = new Point3D(
+      sourceCenterPoint.getX() - targetCenterPointLocal.getX(),
+      sourceCenterPoint.getY() - targetCenterPointLocal.getY(),
+      sourceCenterPoint.getZ() - targetCenterPointLocal.getZ()
+    );
 
     const unitVector = [0, 0, targetSpacing.get(2)];
     const targetUnit = targetOrientation.multiplyArray3D(unitVector);

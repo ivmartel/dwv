@@ -7,6 +7,7 @@ import {
   getViewOrientation
 } from '../math/orientation.js';
 import {Point3D} from '../math/point.js';
+import {Index} from '../math/index.js';
 import {Stage} from '../gui/stage.js';
 import {Style} from '../gui/style.js';
 import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
@@ -1289,6 +1290,16 @@ export class App {
     if (
       typeof targetImage !== 'undefined'
     ) {
+      const baseGeometry = targetImage.image.getGeometry();
+      const baseSize = baseGeometry.getSize();
+      const baseCenterIndex = new Index([
+        Math.floor((baseSize.get(0)) / 2.0),
+        Math.floor((baseSize.get(1)) / 2.0),
+        Math.floor((baseSize.get(2)) / 2.0)
+      ]);
+      const baseCenter =
+        baseGeometry.indexToWorld(baseCenterIndex);
+
       targetImage.image.resample(orientation);
 
       const configs = this.#options.dataViewConfigs;
@@ -1301,7 +1312,7 @@ export class App {
         const meta = data.image.getMeta();
         if (meta.Modality === 'SEG' &&
             meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
-          data.image.resample(orientation, false);
+          data.image.resample(orientation, false, baseCenter);
         }
       }
 

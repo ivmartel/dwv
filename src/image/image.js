@@ -20,6 +20,7 @@ import {NumberRange} from '../math/stats.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {RGB} from '../utils/colour.js';
 import {ColourMap} from './luts.js';
+import {Point} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 const ML_PER_MM = 0.001; // ml/mm^3
@@ -1693,10 +1694,11 @@ export class Image {
    * Resample this image to a new orientation.
    *
    * @param {Matrix33} orientation The orientation to resample to.
-   * @param {boolean} interpolated Default true, if true use bilinear
+   * @param {[boolean]} interpolated Default true, if true use bilinear
    *  sampling, otherwise use nearest neighbor.
+   * @param {[Point]} centerOfRotation World space center of rotation.
    */
-  resample(orientation, interpolated = true) {
+  resample(orientation, interpolated, centerOfRotation) {
     if (this.#resamplingThread === null) {
       this.#resamplingThread = new ResamplingThread();
 
@@ -1719,7 +1721,8 @@ export class Image {
       source.geometry,
       this.#meta.PixelRepresentation,
       orientation,
-      interpolated
+      typeof interpolated === 'undefined' || interpolated,
+      centerOfRotation
     );
 
     // if the image is already resampled we don't want to override the raw
