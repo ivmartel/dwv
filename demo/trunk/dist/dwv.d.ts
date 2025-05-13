@@ -352,7 +352,8 @@ export declare class AnnotationGroupFactory {
         [x: string]: DataElement;
     }): AnnotationGroup;
     /**
-     * Convert an annotation group into a DICOM SR object.
+     * Convert an annotation group into a DICOM SR object using the
+     * TID 1500 template.
      *
      * @param {AnnotationGroup} annotationGroup The annotation group.
      * @param {Object<string, any>} [extraTags] Optional list of extra tags.
