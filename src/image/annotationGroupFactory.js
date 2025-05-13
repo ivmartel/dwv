@@ -146,6 +146,7 @@ export class AnnotationGroupFactory {
 
   /**
    * Check if input elements contain a TID 1500 annotation.
+   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1500}.
    *
    * @param {Object<string, DataElement>} dataElements The DICOM data elements.
    * @returns {boolean} True if the elements contain a TID 1500 annotation.
@@ -182,7 +183,7 @@ export class AnnotationGroupFactory {
             this.#isImageRegionItem
           );
           const measure = measGroup.contentSequence.find(
-            this.#isTid300Measure
+            this.#isTid300Measurement
           );
           if (typeof imageRegion !== 'undefined' ||
             typeof measure !== 'undefined'
@@ -460,6 +461,7 @@ export class AnnotationGroupFactory {
   /**
    * Check is a measurement group follows TID 1410:
    * it must contain an image region.
+   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1410}.
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {boolean} True if an image region was found.
@@ -481,10 +483,6 @@ export class AnnotationGroupFactory {
     let annotation;
 
     // get shape from scoord
-
-    // https://dicom.nema.org/medical/Dicom/current/output/chtml/part16/chapter_A.html#sect_TID_1400
-    // image region or path...
-
     const scoord = content.contentSequence.find(
       this.#isImageRegionItem
     );
@@ -513,13 +511,14 @@ export class AnnotationGroupFactory {
 
   /**
    * Check is an SR content follows TID 300:
-   * it must contain a numberic value that contains an
+   * it must contain a numeric value that contains an
    * inferred from image.
+   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_300}.
    *
    * @param {DicomSRContent} item The SR content.
    * @returns {boolean} True if TID 300 measure.
    */
-  #isTid300Measure(item) {
+  #isTid300Measurement(item) {
     // no specific concept
     const isContainedNum =
       item.valueType === ValueTypes.num &&
@@ -538,13 +537,14 @@ export class AnnotationGroupFactory {
   /**
    * Check is a measurement group follows TID 1501:
    * it must contain a measure.
+   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_1501}.
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {boolean} True if a measure was found.
    */
   #isTid1501MeasGroup(content) {
     const measure = content.contentSequence.find(
-      this.#isTid300Measure
+      this.#isTid300Measurement
     );
     return typeof measure !== 'undefined';
   }
@@ -561,7 +561,7 @@ export class AnnotationGroupFactory {
     // just use the first measure to get the scoord
     // (expecting all measures to refer to the same scoord)
     const measure = content.contentSequence.find(
-      this.#isTid300Measure
+      this.#isTid300Measurement
     );
     if (typeof measure !== 'undefined') {
       annotation = new Annotation();
@@ -609,6 +609,9 @@ export class AnnotationGroupFactory {
 
   /**
    * Convert an imaging measurement into an annotation group.
+   * Supports TID1500 > TID1410 ("Planar ROI Measurements
+   * and Qualitative Evaluations”) or TID1501 (“Measurement and
+   * Qualitative Evaluation Group”)
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {AnnotationGroup|undefined} The annotation group.
@@ -681,13 +684,15 @@ export class AnnotationGroupFactory {
   /**
    * Convert a DICOM SR content folowing TID 1500 into a list of annotations.
    *
-   * Structure: (root) 'Imaging Measurement Report'
-   * - 'Imaging Measurements',
-   *   - 'Measurement Group',
-   *     - scoord,
-   *     - meta.
+   * Structure: 'Imaging Measurement Report' >
+   * 'Imaging Measurements' > 'Measurement Group'.
    *
-   * @param {DicomSRContent} content The input SCOORD.
+   * Measurement Group can follow TID1410 "Planar ROI Measurements
+   * and Qualitative Evaluations” (scoord and measurements at
+   * same level) or TID1501 “Measurement and Qualitative Evaluation Group”
+   * (measurements with scoord child).
+   *
+   * @param {DicomSRContent} content The input SR content.
    * @returns {AnnotationGroup|undefined} The annotation group.
    */
   #tid1500ToAnnotationGroup(content) {
@@ -973,7 +978,7 @@ export class AnnotationGroupFactory {
    * @param {Annotation} annotation The input annotation.
    * @returns {DicomSRContent} The result SR content.
    */
-  #annotationToMeasurementGroup(annotation) {
+  #annotationToTid1410MeasGroup(annotation) {
     // measurement group
     const srContent = new DicomSRContent(ValueTypes.container);
     srContent.relationshipType = RelationshipTypes.contains;
@@ -996,7 +1001,8 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Convert an annotation group into a TID 1500 report SR content.
+   * Convert an annotation group into a TID 1500 report SR content
+   * (internally using TID 1410).
    *
    * @param {AnnotationGroup} annotationGroup The input annotation group.
    * @returns {DicomSRContent|undefined} The result SR content.
@@ -1012,7 +1018,9 @@ export class AnnotationGroupFactory {
       measContent.value = ContinuityOfContents.separate;
       const contentSequence = [];
       for (const annotation of annotationGroup.getList()) {
-        contentSequence.push(this.#annotationToMeasurementGroup(annotation));
+        contentSequence.push(
+          this.#annotationToTid1410MeasGroup(annotation)
+        );
       }
       measContent.contentSequence = contentSequence;
 
@@ -1027,7 +1035,8 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Convert an annotation group into a DICOM SR object.
+   * Convert an annotation group into a DICOM SR object using the
+   * TID 1500 template.
    *
    * @param {AnnotationGroup} annotationGroup The annotation group.
    * @param {Object<string, any>} [extraTags] Optional list of extra tags.
