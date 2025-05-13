@@ -277,11 +277,11 @@ export class ResamplingThread {
     const targetOrigin =
       sourceImageGeometry.indexToWorld(targetOriginSourceIndex).get3D();
 
-    const unitVector = [0,0,targetSpacing.get(2)];
+    const unitVector = [0, 0, targetSpacing.get(2)];
     const targetUnit = targetOrientation.multiplyArray3D(unitVector);
 
     const targetOrigins = [];
-    for(let z = 0; z < targetSize.get(2); z++){
+    for (let z = 0; z < targetSize.get(2); z++) {
       targetOrigins.push(new Point3D(
         targetOrigin.getX() + (targetUnit[0] * z),
         targetOrigin.getY() + (targetUnit[1] * z),
