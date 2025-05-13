@@ -113,7 +113,7 @@ export class ResamplingThread {
    * @param {Matrix33} targetOrientation The orientation to resample to.
    * @param {boolean} interpolated If true use bilinear
    *  sampling, otherwise use nearest neighbor.
-   * @param {[Point]} centerOfRotation World space center of rotation.
+   * @param {Point|undefined} centerOfRotation World space center of rotation.
    *
    * @returns {object} Updated buffer and geometry.
    */
@@ -123,7 +123,7 @@ export class ResamplingThread {
     pixelRepresentation,
     targetOrientation,
     interpolated,
-    centerOfRotation
+    centerOfRotation = undefined
   ) {
     // We can't just pass in an Image or we would get a circular dependency
 

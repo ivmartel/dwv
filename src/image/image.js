@@ -1694,11 +1694,15 @@ export class Image {
    * Resample this image to a new orientation.
    *
    * @param {Matrix33} orientation The orientation to resample to.
-   * @param {[boolean]} interpolated Default true, if true use bilinear
+   * @param {boolean|undefined} interpolated Default true, if true use bilinear
    *  sampling, otherwise use nearest neighbor.
-   * @param {[Point]} centerOfRotation World space center of rotation.
+   * @param {Point|undefined} centerOfRotation World space center of rotation.
    */
-  resample(orientation, interpolated, centerOfRotation) {
+  resample(
+    orientation,
+    interpolated = undefined,
+    centerOfRotation = undefined
+  ) {
     if (this.#resamplingThread === null) {
       this.#resamplingThread = new ResamplingThread();
 
