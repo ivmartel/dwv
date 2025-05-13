@@ -611,7 +611,7 @@ export class AnnotationGroupFactory {
    * Convert an imaging measurement into an annotation group.
    * Supports TID1500 > TID1410 ("Planar ROI Measurements
    * and Qualitative Evaluations”) or TID1501 (“Measurement and
-   * Qualitative Evaluation Group”)
+   * Qualitative Evaluation Group”).
    *
    * @param {DicomSRContent} content The SR content.
    * @returns {AnnotationGroup|undefined} The annotation group.
