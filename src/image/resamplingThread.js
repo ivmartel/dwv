@@ -253,9 +253,9 @@ export class ResamplingThread {
     // Calculate updated origin
     //---------------------------------
     const targetOriginIndexCentered = new Point3D(
-      (0 - (targetSize.get(0) / 2.0)) * targetSpacing.get(0),
-      (0 - (targetSize.get(1) / 2.0)) * targetSpacing.get(1),
-      (0 - (targetSize.get(2) / 2.0)) * targetSpacing.get(2),
+      -((targetSize.get(0) - 1) / 2.0) * targetSpacing.get(0),
+      -((targetSize.get(1) - 1) / 2.0) * targetSpacing.get(1),
+      -((targetSize.get(2) - 1) / 2.0) * targetSpacing.get(2),
     );
     const targetOriginIndexOriented =
       relativeMatrix.getInverse().multiplyPoint3D(targetOriginIndexCentered);
@@ -263,15 +263,15 @@ export class ResamplingThread {
     const targetOriginSourceIndex = new Index([
       Math.floor(
         (targetOriginIndexOriented.getX() / sourceSpacing.get(0)) +
-        (sourceSize.get(0) / 2.0)
+        ((sourceSize.get(0) - 1) / 2.0)
       ),
       Math.floor(
         (targetOriginIndexOriented.getY() / sourceSpacing.get(1)) +
-        (sourceSize.get(1) / 2.0)
+        ((sourceSize.get(1) - 1) / 2.0)
       ),
       Math.floor(
         (targetOriginIndexOriented.getZ() / sourceSpacing.get(2)) +
-        (sourceSize.get(2) / 2.0)
+        ((sourceSize.get(2) - 1) / 2.0)
       ),
     ]);
     const targetOrigin =
