@@ -395,17 +395,24 @@ export function getDicomSRContentItem(content) {
  * @param {string} name The value name.
  * @param {object} value The value.
  * @param {string} unit The values' unit.
+ * @param {string} [relation] Optional content relationhip.
  * @returns {DicomSRContent|undefined} The SR content.
  */
-export function getSRContentFromValue(name, value, unit) {
+export function getSRContentFromValue(
+  name, value, unit, relation) {
   const conceptNameCode = getConceptNameCode(name);
 
   if (typeof conceptNameCode === 'undefined') {
     return undefined;
   }
 
+  let relationShip = RelationshipTypes.contains;
+  if (typeof relation !== 'undefined') {
+    relationShip = relation;
+  }
+
   const content = new DicomSRContent(ValueTypes.num);
-  content.relationshipType = RelationshipTypes.contains;
+  content.relationshipType = relationShip;
   content.conceptNameCode = conceptNameCode;
 
   const measure = new MeasuredValue();

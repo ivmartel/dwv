@@ -25,17 +25,32 @@ import {
   getShortLabelCode,
   getReferencePointsCode,
   getColourCode,
+  getPathCode,
+  getSingleImageFindingCode,
+  getCADProcessingAndFindingsSummaryCode,
+  getChestCADReportCode,
+  getSelectedRegionCode,
+  getAllAlgorithmsSucceededWithFindingsCode,
+  getResponseEvaluationCode,
+  getResponseEvaluationMethodCode,
+  getRecistCode,
+  getCurrentResponseCode,
+  getMeasurementOfResponseCode,
+  getCommentCode,
   getQuantificationName,
   getQuantificationUnit,
   DicomCode,
   getImagingMeasurementReportCode,
   getImagingMeasurementsCode,
+  getMeasurementUnitsCode,
   isEqualCode
 } from '../dicom/dicomCode.js';
 import {
   isVersionInBounds,
   getDwvVersionFromImplementationClassUID
 } from '../dicom/dicomParser.js';
+import {MeasuredValue} from '../dicom/dicomMeasuredValue.js';
+import {NumericMeasurement} from '../dicom/dicomNumericMeasurement.js';
 import {getAsSimpleElements} from '../dicom/dicomTag.js';
 import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
 import {ImageReference} from '../dicom/dicomImageReference.js';
@@ -1098,6 +1113,274 @@ export class AnnotationGroupFactory {
     };
 
     const srContent = this.#annotationGroupToTid1500(annotationGroup);
+
+    // main
+    if (typeof srContent !== 'undefined') {
+      tags = {
+        ...tags,
+        ...getDicomSRContentItem(srContent)
+      };
+    } else {
+      throw new Error('No annotation group SR content');
+    }
+
+    // merge extra tags if provided
+    if (typeof extraTags !== 'undefined') {
+      mergeTags(tags, extraTags);
+    }
+
+    return getElementsFromJSONTags(tags);
+  }
+
+  /**
+   * Convert an annotation into a 'Single Image Finding' SR content.
+   *
+   * @param {Annotation} annotation The input annotation.
+   * @returns {DicomSRContent} The result SR content.
+   */
+  #annotationToTid4104SingleImageFinding(annotation) {
+    // image finding
+    const srContent = new DicomSRContent(ValueTypes.code);
+    srContent.relationshipType = RelationshipTypes.inferredFrom;
+    srContent.conceptNameCode = getSingleImageFindingCode();
+    // TODO: CID 6101
+    srContent.value = getSelectedRegionCode();
+
+    srContent.contentSequence = [];
+
+    // annotation id
+    const srId = new DicomSRContent(ValueTypes.text);
+    srId.relationshipType = RelationshipTypes.hasObsContext;
+    srId.conceptNameCode = getTrackingIdentifierCode();
+    srId.value = annotation.trackingId;
+    srContent.contentSequence.push(srId);
+
+    // annotation uid
+    const srUid = new DicomSRContent(ValueTypes.uidref);
+    srUid.relationshipType = RelationshipTypes.hasObsContext;
+    srUid.conceptNameCode = getTrackingUniqueIdentifierCode();
+    srUid.value = annotation.trackingUid;
+    srContent.contentSequence.push(srUid);
+
+    // quantification
+    if (typeof annotation.quantification !== 'undefined') {
+      for (const key in annotation.quantification) {
+        const quantifContent = getSRContentFromValue(
+          key,
+          precisionRound(
+            annotation.quantification[key].value,
+            BIG_EPSILON_EXPONENT
+          ),
+          annotation.quantification[key].unit,
+          RelationshipTypes.hasProperties
+        );
+        if (typeof quantifContent !== 'undefined') {
+          // scoord as 'has properties'
+          const srScoord = new DicomSRContent(ValueTypes.scoord);
+          srScoord.relationshipType = RelationshipTypes.inferredFrom;
+          srScoord.conceptNameCode = getPathCode();
+          srScoord.value = getScoordFromShape(annotation.mathShape);
+          const srcImage = this.#getAnnotationSourceImageContent(annotation);
+          srScoord.contentSequence = [srcImage];
+
+          // add scoord to quantif
+          quantifContent.contentSequence = [srScoord];
+          // add quantif to root
+          srContent.contentSequence.push(quantifContent);
+        }
+      }
+    }
+
+    // meta
+    const conceptIds = annotation.getMetaConceptIds();
+    for (const conceptId of conceptIds) {
+      const item = annotation.getMetaItem(conceptId);
+      let valueType = ValueTypes.text;
+      if (item.value instanceof DicomCode) {
+        valueType = ValueTypes.code;
+      }
+      const meta = new DicomSRContent(valueType);
+      meta.relationshipType = RelationshipTypes.contains;
+      meta.conceptNameCode = item.concept;
+      meta.value = item.value;
+      srContent.contentSequence.push(meta);
+    }
+
+    return srContent;
+  }
+
+  /**
+   * Convert an annotation group into a TID 1500 report SR content
+   * (internally using TID 1410).
+   *
+   * @param {AnnotationGroup} annotationGroup The input annotation group.
+   * @param {DicomSRContent[]} contentSequence The content sequence to add to.
+   */
+  #addAnnotationGroupToTid4101Sequence(annotationGroup, contentSequence) {
+    if (annotationGroup.getList().length !== 0) {
+      for (const annotation of annotationGroup.getList()) {
+        contentSequence.push(
+          this.#annotationToTid4104SingleImageFinding(annotation)
+        );
+      }
+    }
+  }
+
+  /**
+   * Get the SR content for a response evaluation.
+   *
+   * @param {object|undefined} response The response evaluation
+   * as {current, measure}.
+   * @returns {DicomSRContent} The SR content.
+   */
+  #responseToTid4106ResponseEvaluation(response) {
+    const srEvalutation = new DicomSRContent(ValueTypes.container);
+    srEvalutation.relationshipType = RelationshipTypes.hasProperties;
+    srEvalutation.conceptNameCode = getResponseEvaluationCode();
+    srEvalutation.value = ContinuityOfContents.separate;
+    srEvalutation.contentSequence = [];
+
+    // method: RECIST
+    const srMethod = new DicomSRContent(ValueTypes.code);
+    srMethod.relationshipType = RelationshipTypes.hasObsContext;
+    srMethod.conceptNameCode = getResponseEvaluationMethodCode();
+    srMethod.value = getRecistCode();
+    srEvalutation.contentSequence.push(srMethod);
+
+    if (typeof response !== 'undefined') {
+      // current response
+      if (typeof response.current !== 'undefined') {
+        const srResponse = new DicomSRContent(ValueTypes.code);
+        srResponse.relationshipType = RelationshipTypes.contains;
+        srResponse.conceptNameCode = getCurrentResponseCode();
+        srResponse.value = response.current;
+        srEvalutation.contentSequence.push(srResponse);
+      }
+
+      // measurement of response
+      if (typeof response.measure !== 'undefined') {
+        const srMeas = new DicomSRContent(ValueTypes.num);
+        srMeas.relationshipType = RelationshipTypes.contains;
+        srMeas.conceptNameCode = getMeasurementOfResponseCode();
+        const measure = new MeasuredValue();
+        measure.numericValue = response.measure;
+        measure.measurementUnitsCode = getMeasurementUnitsCode('unit.mm');
+        const numMeasure = new NumericMeasurement();
+        numMeasure.measuredValue = measure;
+        srMeas.value = numMeasure;
+        srEvalutation.contentSequence.push(srMeas);
+      }
+    }
+
+    return srEvalutation;
+  }
+
+  /**
+   * Convert a annotation groups into a DICOM CAD report SR object using
+   * the TID 4100 template.
+   *
+   * @param {AnnotationGroup[]} annotationGroups The annotation groups.
+   * @param {object[]} responseEvaluations List of response evaluations
+   * as {current, measure}.
+   * @param {string} comment Report comment.
+   * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+   * @returns {Object<string, DataElement>} A list of dicom elements.
+   */
+  toDicomCADReport(annotationGroups, responseEvaluations, comment, extraTags) {
+    // first group as tag base
+    let tags = annotationGroups[0].getMeta();
+
+    // transfer syntax: ExplicitVRLittleEndian
+    tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
+    // class: Comprehensive 3D SR Storage
+    // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_A.35.13.html
+    tags.SOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
+    tags.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.88.34';
+    tags.CompletionFlag = 'PARTIAL';
+    tags.VerificationFlag = 'UNVERIFIED';
+
+    // date
+    const now = new Date();
+    tags.ContentDate = getDicomDate(dateToDateObj(now));
+    tags.ContentTime = getDicomTime(dateToTimeObj(now));
+
+    // reference
+    const evidenceSq = tags.CurrentRequestedProcedureEvidenceSequence;
+    // hoping for just one element...
+    const evidenceSq0 = evidenceSq.value[0];
+    const refSeriesSq = evidenceSq0.ReferencedSeriesSequence;
+    // hoping for just one element...
+    const refSeriesSq0 = refSeriesSq.value[0];
+    let refSopSq = refSeriesSq0.ReferencedSOPSequence;
+    if (typeof refSopSq === 'undefined') {
+      refSeriesSq0.ReferencedSOPSequence = {
+        value: []
+      };
+      refSopSq = refSeriesSq0.ReferencedSOPSequence;
+    }
+    const refs = refSopSq.value;
+    // add reference if not yet present
+    for (const annotationGroup of annotationGroups) {
+      for (const annotation of annotationGroup.getList()) {
+        const ref = {
+          ReferencedSOPInstanceUID: annotation.referencedSopInstanceUID,
+          ReferencedSOPClassUID: annotation.referencedSopClassUID
+        };
+        const isSameRef = function (item) {
+          return item.ReferencedSOPInstanceUID ===
+            ref.ReferencedSOPInstanceUID &&
+            item.ReferencedSOPClassUID ===
+            ref.ReferencedSOPClassUID;
+        };
+        if (typeof refs.find(isSameRef) === 'undefined') {
+          refs.push(ref);
+        }
+      }
+    }
+
+    // TID 4100
+    tags.ContentTemplateSequence = {
+      value: [{
+        MappingResource: 'DCMR',
+        TemplateIdentifier: '4100'
+      }]
+    };
+
+    // findings summary
+    const srSummary = new DicomSRContent(ValueTypes.code);
+    srSummary.relationshipType = RelationshipTypes.contains;
+    srSummary.conceptNameCode = getCADProcessingAndFindingsSummaryCode();
+    // TODO: CID 6047 (All algorithms succeeded, ...)
+    srSummary.value = getAllAlgorithmsSucceededWithFindingsCode();
+    srSummary.contentSequence = [];
+
+    // response evaluation
+    for (const response of responseEvaluations) {
+      const srResponse =
+        this.#responseToTid4106ResponseEvaluation(response);
+      srSummary.contentSequence.push(srResponse);
+    }
+
+    // findings
+    for (const annotationGroup of annotationGroups) {
+      this.#addAnnotationGroupToTid4101Sequence(
+        annotationGroup, srSummary.contentSequence);
+    }
+
+    // comment
+    if (typeof comment !== 'undefined') {
+      const srComment = new DicomSRContent(ValueTypes.text);
+      srComment.relationshipType = RelationshipTypes.contains;
+      srComment.conceptNameCode = getCommentCode();
+      srComment.value = comment;
+      srSummary.contentSequence.push(srComment);
+    }
+
+    // main content
+    const srContent = new DicomSRContent(ValueTypes.container);
+    srContent.conceptNameCode = getChestCADReportCode();
+    srContent.value = ContinuityOfContents.separate;
+    srContent.contentSequence.push(srSummary);
 
     // main
     if (typeof srContent !== 'undefined') {

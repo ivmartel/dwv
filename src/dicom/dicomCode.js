@@ -153,15 +153,26 @@ export function getDicomCodeItem(code) {
  * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
 const DcmCodes = {
+  111017: 'CAD Processing and Findings Summary',
   111030: 'Image Region',
+  111059: 'Single Image Finding',
+  111099: 'Selected region',
+  111242: 'All algorithms succeeded; with findings',
+  112000: 'Chest CAD Report',
+  112020: 'Response Evaluation',
+  112021: 'Response Evaluation Method',
+  112022: 'RECIST',
   112039: 'Tracking Identifier',
+  112051: 'Measurement of Response',
   112040: 'Tracking Unique Identifier',
+  112048: 'Current Response',
   113048: 'Pixel by pixel Maximum',
   113049: 'Pixel by pixel mean',
   113051: 'Pixel by pixel Minimum',
   113061: 'Standard Deviation',
   113076: 'Segmentation',
   121055: 'Path',
+  121106: 'Comment',
   121207: 'Height',
   121322: 'Source image for image processing operation',
   121324: 'Source Image',
@@ -253,6 +264,105 @@ function getDicomCode(value, scheme) {
  */
 export function getMeasurementGroupCode() {
   return getDicomCode('125007', 'DCM');
+}
+
+/**
+ * Get a single image finding DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getSingleImageFindingCode() {
+  return getDicomCode('111059', 'DCM');
+}
+
+/**
+ * Get a CAD processing and findings summary DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getCADProcessingAndFindingsSummaryCode() {
+  return getDicomCode('111017', 'DCM');
+}
+
+/**
+ * Get a chest CAD report DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getChestCADReportCode() {
+  return getDicomCode('112000', 'DCM');
+}
+
+/**
+ * Get a selected region DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getSelectedRegionCode() {
+  return getDicomCode('111099', 'DCM');
+}
+
+/**
+ * Get a 'all algorithms succeeded; with findings' DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getAllAlgorithmsSucceededWithFindingsCode() {
+  return getDicomCode('111242', 'DCM');
+}
+
+/**
+ * Get a response evaluation DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getResponseEvaluationCode() {
+  return getDicomCode('112020', 'DCM');
+}
+
+/**
+ * Get a response evaluation method DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getResponseEvaluationMethodCode() {
+  return getDicomCode('112021', 'DCM');
+}
+
+/**
+ * Get a RECIST DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getRecistCode() {
+  return getDicomCode('112022', 'DCM');
+}
+
+/**
+ * Get a current response DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getCurrentResponseCode() {
+  return getDicomCode('112048', 'DCM');
+}
+
+/**
+ * Get a measurement of response DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getMeasurementOfResponseCode() {
+  return getDicomCode('112051', 'DCM');
+}
+
+/**
+ * Get a comment DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export function getCommentCode() {
+  return getDicomCode('121106', 'DCM');
 }
 
 /**
