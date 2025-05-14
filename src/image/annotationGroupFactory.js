@@ -16,32 +16,12 @@ import {
   getSRContentFromValue
 } from '../dicom/dicomSRContent.js';
 import {
-  getMeasurementGroupCode,
-  getImageRegionCode,
-  getReferenceGeometryCode,
-  getSourceImageCode,
-  getTrackingIdentifierCode,
-  getTrackingUniqueIdentifierCode,
-  getShortLabelCode,
-  getReferencePointsCode,
+  DcmCodes,
+  getDcmDicomCode,
   getColourCode,
-  getPathCode,
-  getSingleImageFindingCode,
-  getCADProcessingAndFindingsSummaryCode,
-  getChestCADReportCode,
-  getSelectedRegionCode,
-  getAllAlgorithmsSucceededWithFindingsCode,
-  getResponseEvaluationCode,
-  getResponseEvaluationMethodCode,
-  getRecistCode,
-  getCurrentResponseCode,
-  getMeasurementOfResponseCode,
-  getCommentCode,
   getQuantificationName,
   getQuantificationUnit,
   DicomCode,
-  getImagingMeasurementReportCode,
-  getImagingMeasurementsCode,
   getMeasurementUnitsCode,
   isEqualCode
 } from '../dicom/dicomCode.js';
@@ -156,7 +136,7 @@ export class AnnotationGroupFactory {
     // dwv 0.34 annotations do not have template
     return isDwv034 &&
       typeof contentTemplate === 'undefined' &&
-      rootConcept === getMeasurementGroupCode().value;
+      rootConcept === DcmCodes.MeasurementGroup.value;
   }
 
   /**
@@ -178,7 +158,7 @@ export class AnnotationGroupFactory {
       rootConcept = srContent.conceptNameCode.value;
     }
     const isImagingMeasurementReport =
-      rootConcept === getImagingMeasurementReportCode().value;
+      rootConcept === DcmCodes.ImagingMeasurementReport.value;
 
     let res = false;
     if (isTid1500Template && isImagingMeasurementReport) {
@@ -261,7 +241,7 @@ export class AnnotationGroupFactory {
     // annotation id
     if (content.hasHeader(
       ValueTypes.uidref,
-      getTrackingIdentifierCode(),
+      getDcmDicomCode(DcmCodes.TrackingIdentifier),
       RelationshipTypes.hasProperties
     )) {
       annotation.trackingId = content.value;
@@ -280,7 +260,7 @@ export class AnnotationGroupFactory {
     // annotation id
     if (content.hasHeader(
       ValueTypes.text,
-      getTrackingIdentifierCode(),
+      getDcmDicomCode(DcmCodes.TrackingIdentifier),
       RelationshipTypes.hasObsContext
     )) {
       annotation.trackingId = content.value;
@@ -289,7 +269,7 @@ export class AnnotationGroupFactory {
     // annotation uid
     if (content.hasHeader(
       ValueTypes.uidref,
-      getTrackingUniqueIdentifierCode(),
+      getDcmDicomCode(DcmCodes.TrackingUniqueIdentifier),
       RelationshipTypes.hasObsContext
     )) {
       annotation.trackingUid = content.value;
@@ -316,7 +296,7 @@ export class AnnotationGroupFactory {
     // text expr
     if (content.hasHeader(
       ValueTypes.text,
-      getShortLabelCode(),
+      getDcmDicomCode(DcmCodes.ShortLabel),
       relationshipType
     )) {
       annotation.textExpr = content.value;
@@ -324,7 +304,7 @@ export class AnnotationGroupFactory {
       const scoord = content.contentSequence.find(function (item) {
         return item.hasHeader(
           ValueTypes.scoord,
-          getReferencePointsCode(),
+          getDcmDicomCode(DcmCodes.ReferencePoints),
           RelationshipTypes.hasProperties
         );
       });
@@ -348,7 +328,7 @@ export class AnnotationGroupFactory {
     // reference points
     if (content.hasHeader(
       ValueTypes.scoord,
-      getReferencePointsCode(),
+      getDcmDicomCode(DcmCodes.ReferencePoints),
       relationshipType) &&
       content.value.graphicType === GraphicTypes.multipoint
     ) {
@@ -365,7 +345,7 @@ export class AnnotationGroupFactory {
     // plane points
     if (content.hasHeader(
       ValueTypes.scoord3d,
-      getReferenceGeometryCode(),
+      getDcmDicomCode(DcmCodes.ReferenceGeometry),
       RelationshipTypes.contains) &&
       content.value.graphicType === GraphicTypes.multipoint
     ) {
@@ -438,7 +418,7 @@ export class AnnotationGroupFactory {
   #isImagingMeasurementsItem(item) {
     return item.hasHeader(
       ValueTypes.container,
-      getImagingMeasurementsCode(),
+      getDcmDicomCode(DcmCodes.ImagingMeasurements),
       RelationshipTypes.contains
     );
   }
@@ -453,7 +433,7 @@ export class AnnotationGroupFactory {
   #isMeasurementGroupItem(item) {
     return item.hasHeader(
       ValueTypes.container,
-      getMeasurementGroupCode(),
+      getDcmDicomCode(DcmCodes.MeasurementGroup),
       RelationshipTypes.contains
     );
   }
@@ -468,7 +448,7 @@ export class AnnotationGroupFactory {
   #isImageRegionItem(item) {
     return item.hasHeader(
       ValueTypes.scoord,
-      getImageRegionCode(),
+      getDcmDicomCode(DcmCodes.ImageRegion),
       RelationshipTypes.contains
     );
   }
@@ -712,7 +692,10 @@ export class AnnotationGroupFactory {
    */
   #tid1500ToAnnotationGroup(content) {
     if (!(content.valueType === ValueTypes.container &&
-      isEqualCode(content.conceptNameCode, getImagingMeasurementReportCode())
+      isEqualCode(
+        content.conceptNameCode,
+        getDcmDicomCode(DcmCodes.ImagingMeasurementReport)
+      )
     )) {
       logger.warn('Not the expected TID 1500 SR content header');
     }
@@ -744,7 +727,10 @@ export class AnnotationGroupFactory {
    */
   #dwv034MeasGroupToAnnotationGroup(content) {
     if (!(content.valueType === ValueTypes.container &&
-      isEqualCode(content.conceptNameCode, getMeasurementGroupCode())
+      isEqualCode(
+        content.conceptNameCode,
+        getDcmDicomCode(DcmCodes.MeasurementGroup)
+      )
     )) {
       console.warn('Not the expected dwv034 content header');
     }
@@ -834,7 +820,7 @@ export class AnnotationGroupFactory {
     // reference image UID
     const srImage = new DicomSRContent(ValueTypes.image);
     srImage.relationshipType = RelationshipTypes.selectedFrom;
-    srImage.conceptNameCode = getSourceImageCode();
+    srImage.conceptNameCode = getDcmDicomCode(DcmCodes.SourceImage);
     const sopRef = new SopInstanceReference();
     sopRef.referencedSOPClassUID = annotation.referencedSopClassUID;
     sopRef.referencedSOPInstanceUID = annotation.referencedSopInstanceUID;
@@ -861,14 +847,14 @@ export class AnnotationGroupFactory {
     // annotation id
     const srId = new DicomSRContent(ValueTypes.text);
     srId.relationshipType = RelationshipTypes.hasObsContext;
-    srId.conceptNameCode = getTrackingIdentifierCode();
+    srId.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingIdentifier);
     srId.value = annotation.trackingId;
     contentSequence.push(srId);
 
     // annotation uid
     const srUid = new DicomSRContent(ValueTypes.uidref);
     srUid.relationshipType = RelationshipTypes.hasObsContext;
-    srUid.conceptNameCode = getTrackingUniqueIdentifierCode();
+    srUid.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingUniqueIdentifier);
     srUid.value = annotation.trackingUid;
     contentSequence.push(srUid);
 
@@ -878,13 +864,14 @@ export class AnnotationGroupFactory {
     ) {
       const shortLabel = new DicomSRContent(ValueTypes.text);
       shortLabel.relationshipType = RelationshipTypes.hasConceptMod;
-      shortLabel.conceptNameCode = getShortLabelCode();
+      shortLabel.conceptNameCode = getDcmDicomCode(DcmCodes.ShortLabel);
       shortLabel.value = annotation.textExpr;
       // label position
       if (typeof annotation.labelPosition !== 'undefined') {
         const labelPosition = new DicomSRContent(ValueTypes.scoord);
         labelPosition.relationshipType = RelationshipTypes.hasProperties;
-        labelPosition.conceptNameCode = getReferencePointsCode();
+        labelPosition.conceptNameCode =
+          getDcmDicomCode(DcmCodes.ReferencePoints);
         const labelPosScoord = new SpatialCoordinate();
         labelPosScoord.graphicType = GraphicTypes.point;
         const graphicData = [
@@ -913,7 +900,8 @@ export class AnnotationGroupFactory {
     if (typeof annotation.referencePoints !== 'undefined') {
       const referencePoints = new DicomSRContent(ValueTypes.scoord);
       referencePoints.relationshipType = RelationshipTypes.hasConceptMod;
-      referencePoints.conceptNameCode = getReferencePointsCode();
+      referencePoints.conceptNameCode =
+        getDcmDicomCode(DcmCodes.ReferencePoints);
       const refPointsScoord = new SpatialCoordinate();
       refPointsScoord.graphicType = GraphicTypes.multipoint;
       const graphicData = [];
@@ -934,7 +922,7 @@ export class AnnotationGroupFactory {
     if (typeof annotation.planePoints !== 'undefined') {
       const planePoints = new DicomSRContent(ValueTypes.scoord3d);
       planePoints.relationshipType = RelationshipTypes.contains;
-      planePoints.conceptNameCode = getReferenceGeometryCode();
+      planePoints.conceptNameCode = getDcmDicomCode(DcmCodes.ReferenceGeometry);
       const pointsScoord = new SpatialCoordinate3D();
       pointsScoord.graphicType = GraphicTypes.multipoint;
       const graphicData = [];
@@ -997,13 +985,13 @@ export class AnnotationGroupFactory {
     // measurement group
     const srContent = new DicomSRContent(ValueTypes.container);
     srContent.relationshipType = RelationshipTypes.contains;
-    srContent.conceptNameCode = getMeasurementGroupCode();
+    srContent.conceptNameCode = getDcmDicomCode(DcmCodes.MeasurementGroup);
     srContent.value = ContinuityOfContents.separate;
 
     // scoord
     const srScoord = new DicomSRContent(ValueTypes.scoord);
     srScoord.relationshipType = RelationshipTypes.contains;
-    srScoord.conceptNameCode = getImageRegionCode();
+    srScoord.conceptNameCode = getDcmDicomCode(DcmCodes.ImageRegion);
     srScoord.value = getScoordFromShape(annotation.mathShape);
     const srcImage = this.#getAnnotationSourceImageContent(annotation);
     srScoord.contentSequence = [srcImage];
@@ -1028,7 +1016,8 @@ export class AnnotationGroupFactory {
     if (annotationGroup.getList().length !== 0) {
       // imaging measurements
       const measContent = new DicomSRContent(ValueTypes.container);
-      measContent.conceptNameCode = getImagingMeasurementsCode();
+      measContent.conceptNameCode =
+        getDcmDicomCode(DcmCodes.ImagingMeasurements);
       measContent.relationshipType = RelationshipTypes.contains;
       measContent.value = ContinuityOfContents.separate;
       const contentSequence = [];
@@ -1041,7 +1030,8 @@ export class AnnotationGroupFactory {
 
       // imaging measurements report
       srContent = new DicomSRContent(ValueTypes.container);
-      srContent.conceptNameCode = getImagingMeasurementReportCode();
+      srContent.conceptNameCode =
+        getDcmDicomCode(DcmCodes.ImagingMeasurementReport);
       srContent.value = ContinuityOfContents.separate;
       srContent.contentSequence = [measContent];
     }
@@ -1142,23 +1132,23 @@ export class AnnotationGroupFactory {
     // image finding
     const srContent = new DicomSRContent(ValueTypes.code);
     srContent.relationshipType = RelationshipTypes.inferredFrom;
-    srContent.conceptNameCode = getSingleImageFindingCode();
+    srContent.conceptNameCode = getDcmDicomCode(DcmCodes.SingleImageFinding);
     // TODO: CID 6101
-    srContent.value = getSelectedRegionCode();
+    srContent.value = getDcmDicomCode(DcmCodes.SelectedRegion);
 
     srContent.contentSequence = [];
 
     // annotation id
     const srId = new DicomSRContent(ValueTypes.text);
     srId.relationshipType = RelationshipTypes.hasObsContext;
-    srId.conceptNameCode = getTrackingIdentifierCode();
+    srId.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingIdentifier);
     srId.value = annotation.trackingId;
     srContent.contentSequence.push(srId);
 
     // annotation uid
     const srUid = new DicomSRContent(ValueTypes.uidref);
     srUid.relationshipType = RelationshipTypes.hasObsContext;
-    srUid.conceptNameCode = getTrackingUniqueIdentifierCode();
+    srUid.conceptNameCode = getDcmDicomCode(DcmCodes.TrackingUniqueIdentifier);
     srUid.value = annotation.trackingUid;
     srContent.contentSequence.push(srUid);
 
@@ -1178,7 +1168,7 @@ export class AnnotationGroupFactory {
           // scoord as 'has properties'
           const srScoord = new DicomSRContent(ValueTypes.scoord);
           srScoord.relationshipType = RelationshipTypes.inferredFrom;
-          srScoord.conceptNameCode = getPathCode();
+          srScoord.conceptNameCode = getDcmDicomCode(DcmCodes.Path);
           srScoord.value = getScoordFromShape(annotation.mathShape);
           const srcImage = this.#getAnnotationSourceImageContent(annotation);
           srScoord.contentSequence = [srcImage];
@@ -1236,15 +1226,17 @@ export class AnnotationGroupFactory {
   #responseToTid4106ResponseEvaluation(response) {
     const srEvalutation = new DicomSRContent(ValueTypes.container);
     srEvalutation.relationshipType = RelationshipTypes.hasProperties;
-    srEvalutation.conceptNameCode = getResponseEvaluationCode();
+    srEvalutation.conceptNameCode =
+      getDcmDicomCode(DcmCodes.ResponseEvaluation);
     srEvalutation.value = ContinuityOfContents.separate;
     srEvalutation.contentSequence = [];
 
     // method: RECIST
     const srMethod = new DicomSRContent(ValueTypes.code);
     srMethod.relationshipType = RelationshipTypes.hasObsContext;
-    srMethod.conceptNameCode = getResponseEvaluationMethodCode();
-    srMethod.value = getRecistCode();
+    srMethod.conceptNameCode =
+      getDcmDicomCode(DcmCodes.ResponseEvaluationMethod);
+    srMethod.value = getDcmDicomCode(DcmCodes.RECIST);
     srEvalutation.contentSequence.push(srMethod);
 
     if (typeof response !== 'undefined') {
@@ -1252,7 +1244,7 @@ export class AnnotationGroupFactory {
       if (typeof response.current !== 'undefined') {
         const srResponse = new DicomSRContent(ValueTypes.code);
         srResponse.relationshipType = RelationshipTypes.contains;
-        srResponse.conceptNameCode = getCurrentResponseCode();
+        srResponse.conceptNameCode = getDcmDicomCode(DcmCodes.CurrentResponse);
         srResponse.value = response.current;
         srEvalutation.contentSequence.push(srResponse);
       }
@@ -1261,7 +1253,8 @@ export class AnnotationGroupFactory {
       if (typeof response.measure !== 'undefined') {
         const srMeas = new DicomSRContent(ValueTypes.num);
         srMeas.relationshipType = RelationshipTypes.contains;
-        srMeas.conceptNameCode = getMeasurementOfResponseCode();
+        srMeas.conceptNameCode =
+          getDcmDicomCode(DcmCodes.MeasurementOfResponse);
         const measure = new MeasuredValue();
         measure.numericValue = response.measure;
         measure.measurementUnitsCode = getMeasurementUnitsCode('unit.mm');
@@ -1349,9 +1342,11 @@ export class AnnotationGroupFactory {
     // findings summary
     const srSummary = new DicomSRContent(ValueTypes.code);
     srSummary.relationshipType = RelationshipTypes.contains;
-    srSummary.conceptNameCode = getCADProcessingAndFindingsSummaryCode();
+    srSummary.conceptNameCode =
+      getDcmDicomCode(DcmCodes.CADProcessingAndFindingsSummary);
     // TODO: CID 6047 (All algorithms succeeded, ...)
-    srSummary.value = getAllAlgorithmsSucceededWithFindingsCode();
+    srSummary.value =
+      getDcmDicomCode(DcmCodes.AllAlgorithmsSucceededWithFindings);
     srSummary.contentSequence = [];
 
     // response evaluation
@@ -1371,14 +1366,14 @@ export class AnnotationGroupFactory {
     if (typeof comment !== 'undefined') {
       const srComment = new DicomSRContent(ValueTypes.text);
       srComment.relationshipType = RelationshipTypes.contains;
-      srComment.conceptNameCode = getCommentCode();
+      srComment.conceptNameCode = getDcmDicomCode(DcmCodes.Comment);
       srComment.value = comment;
       srSummary.contentSequence.push(srComment);
     }
 
     // main content
     const srContent = new DicomSRContent(ValueTypes.container);
-    srContent.conceptNameCode = getChestCADReportCode();
+    srContent.conceptNameCode = getDcmDicomCode(DcmCodes.ChestCADReport);
     srContent.value = ContinuityOfContents.separate;
     srContent.contentSequence.push(srSummary);
 

@@ -1,4 +1,5 @@
 import {
+  DcmCodes,
   DicomCode,
   isEqualCode,
   getCode,
@@ -89,4 +90,22 @@ QUnit.test('DICOM code class', function (assert) {
     urnValue: 'urn:lex:us:federal:codified.regulation:2013-04-25;45CFR164'
   };
   testCode(code03, assert, 'Test #03 (URN)');
+});
+
+/**
+ * Tests for {@link DicomCode} dictionary.
+ *
+ * @function module:tests/dicom~dicom-code-dict
+ */
+QUnit.test('DICOM code dictionary', function (assert) {
+  let count = 0;
+  for (const key0 in DcmCodes) {
+    for (const key in DcmCodes) {
+      if (key !== key0 &&
+        DcmCodes[key].value === DcmCodes[key0].value) {
+        ++count;
+      }
+    }
+  }
+  assert.equal(count, 0, 'DCmCodes duplicate');
 });

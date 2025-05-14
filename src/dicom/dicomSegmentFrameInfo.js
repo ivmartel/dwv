@@ -3,8 +3,8 @@ import {logger} from '../utils/logger.js';
 import {arrayEquals} from '../utils/array.js';
 import {
   getDicomCodeItem,
-  getSegmentationCode,
-  getSourceImageForProcessingCode
+  DcmCodes,
+  getDcmDicomCode
 } from './dicomCode.js';
 
 // doc imports
@@ -327,9 +327,11 @@ export function getDicomSegmentFrameInfoItem(frameInfo) {
   // optional DerivationImageSequence
   if (frameInfo.derivationImages !== undefined) {
     const sourceImgPurposeOfReferenceCode =
-      getDicomCodeItem(getSourceImageForProcessingCode());
+      getDicomCodeItem(
+        getDcmDicomCode(DcmCodes.SourceImageForImageProcessingOperation)
+      );
     const segDerivationCode =
-      getDicomCodeItem(getSegmentationCode());
+      getDicomCodeItem(getDcmDicomCode(DcmCodes.Segmentation));
 
     const derivationImageItems = [];
     for (const derivationImage of frameInfo.derivationImages) {

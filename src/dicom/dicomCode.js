@@ -152,36 +152,94 @@ export function getDicomCodeItem(code) {
  * DICOM codes.
  * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
-const DcmCodes = {
-  111017: 'CAD Processing and Findings Summary',
-  111030: 'Image Region',
-  111059: 'Single Image Finding',
-  111099: 'Selected region',
-  111242: 'All algorithms succeeded; with findings',
-  112000: 'Chest CAD Report',
-  112020: 'Response Evaluation',
-  112021: 'Response Evaluation Method',
-  112022: 'RECIST',
-  112039: 'Tracking Identifier',
-  112051: 'Measurement of Response',
-  112040: 'Tracking Unique Identifier',
-  112048: 'Current Response',
-  113048: 'Pixel by pixel Maximum',
-  113049: 'Pixel by pixel mean',
-  113051: 'Pixel by pixel Minimum',
-  113061: 'Standard Deviation',
-  113076: 'Segmentation',
-  121055: 'Path',
-  121106: 'Comment',
-  121207: 'Height',
-  121322: 'Source image for image processing operation',
-  121324: 'Source Image',
-  122438: 'Reference Points',
-  125007: 'Measurement Group',
-  125309: 'Short Label',
-  126000: 'Imaging Measurement Report',
-  126010: 'Imaging Measurements',
-  128773: 'Reference Geometry',
+export const DcmCodes = {
+  CADProcessingAndFindingsSummary: {
+    value: '111017', meaning: 'CAD Processing and Findings Summary'
+  },
+  ImageRegion: {
+    value: '111030', meaning: 'Image Region'
+  },
+  SingleImageFinding: {
+    value: '111059', meaning: 'Single Image Finding'
+  },
+  SelectedRegion: {
+    value: '111099', meaning: 'Selected region'
+  },
+  AllAlgorithmsSucceededWithFindings: {
+    value: '111242', meaning: 'All algorithms succeeded; with findings'
+  },
+  ChestCADReport: {
+    value: '112000', meaning: 'Chest CAD Report'
+  },
+  ResponseEvaluation: {
+    value: '112020', meaning: 'Response Evaluation'
+  },
+  ResponseEvaluationMethod: {
+    value: '112021', meaning: 'Response Evaluation Method'
+  },
+  RECIST: {
+    value: '112022', meaning: 'RECIST'
+  },
+  TrackingIdentifier: {
+    value: '112039', meaning: 'Tracking Identifier'
+  },
+  MeasurementOfResponse: {
+    value: '112051', meaning: 'Measurement of Response'
+  },
+  TrackingUniqueIdentifier: {
+    value: '112040', meaning: 'Tracking Unique Identifier'
+  },
+  CurrentResponse: {
+    value: '112048', meaning: 'Current Response'
+  },
+  PixelByPixelMaximum: {
+    value: '113048', meaning: 'Pixel by pixel Maximum'
+  },
+  PixelByPixelMean: {
+    value: '113049', meaning: 'Pixel by pixel mean'
+  },
+  PixelByPixelMinimum: {
+    value: '113051', meaning: 'Pixel by pixel Minimum'
+  },
+  StandardDeviation: {
+    value: '113061', meaning: 'Standard Deviation'
+  },
+  Segmentation: {
+    value: '113076', meaning: 'Segmentation'
+  },
+  Path: {
+    value: '121055', meaning: 'Path'
+  },
+  Comment: {
+    value: '121106', meaning: 'Comment'
+  },
+  Height: {
+    value: '121207', meaning: 'Height'
+  },
+  SourceImageForImageProcessingOperation: {
+    value: '121322', meaning: 'Source image for image processing operation'
+  },
+  SourceImage: {
+    value: '121324', meaning: 'Source Image'
+  },
+  ReferencePoints: {
+    value: '122438', meaning: 'Reference Points'
+  },
+  MeasurementGroup: {
+    value: '125007', meaning: 'Measurement Group'
+  },
+  ShortLabel: {
+    value: '125309', meaning: 'Short Label'
+  },
+  ImagingMeasurementReport: {
+    value: '126000', meaning: 'Imaging Measurement Report'
+  },
+  ImagingMeasurements: {
+    value: '126010', meaning: 'Imaging Measurements'
+  },
+  ReferenceGeometry: {
+    value: '128773', meaning: 'Reference Geometry'
+  }
 };
 
 /**
@@ -233,6 +291,19 @@ const UcumCodes = {
 };
 
 /**
+ * Get a DICOM code from a value and meaning.
+ *
+ * @param {object} code The code value as {value, meaning}.
+ * @returns {DicomCode} The DICOM code.
+ */
+export function getDcmDicomCode(code) {
+  const dcmCode = new DicomCode(code.meaning);
+  dcmCode.schemeDesignator = 'DCM';
+  dcmCode.value = code.value;
+  return dcmCode;
+}
+
+/**
  * Get a DICOM code from a value (~id).
  *
  * @param {string} value The code value.
@@ -241,9 +312,7 @@ const UcumCodes = {
  */
 function getDicomCode(value, scheme) {
   let meaning;
-  if (scheme === 'DCM') {
-    meaning = DcmCodes[value];
-  } else if (scheme === 'SCT') {
+  if (scheme === 'SCT') {
     meaning = SctCodes[value];
   } else if (scheme === 'UCUM') {
     meaning = UcumCodes[value];
@@ -256,187 +325,6 @@ function getDicomCode(value, scheme) {
   }
   return code;
 }
-
-/**
- * Get a measurement group DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getMeasurementGroupCode() {
-  return getDicomCode('125007', 'DCM');
-}
-
-/**
- * Get a single image finding DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getSingleImageFindingCode() {
-  return getDicomCode('111059', 'DCM');
-}
-
-/**
- * Get a CAD processing and findings summary DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getCADProcessingAndFindingsSummaryCode() {
-  return getDicomCode('111017', 'DCM');
-}
-
-/**
- * Get a chest CAD report DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getChestCADReportCode() {
-  return getDicomCode('112000', 'DCM');
-}
-
-/**
- * Get a selected region DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getSelectedRegionCode() {
-  return getDicomCode('111099', 'DCM');
-}
-
-/**
- * Get a 'all algorithms succeeded; with findings' DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getAllAlgorithmsSucceededWithFindingsCode() {
-  return getDicomCode('111242', 'DCM');
-}
-
-/**
- * Get a response evaluation DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getResponseEvaluationCode() {
-  return getDicomCode('112020', 'DCM');
-}
-
-/**
- * Get a response evaluation method DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getResponseEvaluationMethodCode() {
-  return getDicomCode('112021', 'DCM');
-}
-
-/**
- * Get a RECIST DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getRecistCode() {
-  return getDicomCode('112022', 'DCM');
-}
-
-/**
- * Get a current response DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getCurrentResponseCode() {
-  return getDicomCode('112048', 'DCM');
-}
-
-/**
- * Get a measurement of response DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getMeasurementOfResponseCode() {
-  return getDicomCode('112051', 'DCM');
-}
-
-/**
- * Get a comment DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getCommentCode() {
-  return getDicomCode('121106', 'DCM');
-}
-
-/**
- * Get a imaging measurement report DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getImagingMeasurementReportCode() {
-  return getDicomCode('126000', 'DCM');
-}
-
-/**
- * Get a imaging measurements DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getImagingMeasurementsCode() {
-  return getDicomCode('126010', 'DCM');
-}
-
-/**
- * Get an image region DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getImageRegionCode() {
-  return getDicomCode('111030', 'DCM');
-}
-
-/**
- * Get a reference geometry DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getReferenceGeometryCode() {
-  return getDicomCode('128773', 'DCM');
-}
-
-/**
- * Get a path DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getPathCode() {
-  return getDicomCode('121055', 'DCM');
-}
-
-/**
- * Get a source image DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getSourceImageCode() {
-  return getDicomCode('121324', 'DCM');
-}
-
-/**
- * Get a tracking identifier DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getTrackingIdentifierCode() {
-  return getDicomCode('112039', 'DCM');
-}
-
-/**
- * Get a tracking unique identifier DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getTrackingUniqueIdentifierCode() {
-  return getDicomCode('112040', 'DCM');
-}
-
 /**
  * Get a segmentation DICOM code.
  *
@@ -444,33 +332,6 @@ export function getTrackingUniqueIdentifierCode() {
  */
 export function getSegmentationCode() {
   return getDicomCode('113076', 'DCM');
-}
-
-/**
- * Get a source image for processing DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getSourceImageForProcessingCode() {
-  return getDicomCode('121322', 'DCM');
-}
-
-/**
- * Get a short label DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getShortLabelCode() {
-  return getDicomCode('125309', 'DCM');
-}
-
-/**
- * Get a reference points DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getReferencePointsCode() {
-  return getDicomCode('122438', 'DCM');
 }
 
 /**
