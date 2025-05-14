@@ -17,17 +17,17 @@ export declare function addTagsToDictionary(group: string, tags: {
  */
 export declare class Annotation {
     /**
-     * ID, strored as tracking id, this id is not unique.
+     * Tracking id, unique within domain.
      *
      * @type {string}
      */
-    id: string;
+    trackingId: string;
     /**
-     * UID, stored as tracking unique id.
+     * Tracking Unique id.
      *
      * @type {string}
      */
-    uid: string;
+    trackingUid: string;
     /**
      * Referenced image SOP isntance UID.
      *
@@ -352,13 +352,30 @@ export declare class AnnotationGroupFactory {
         [x: string]: DataElement;
     }): AnnotationGroup;
     /**
-     * Convert an annotation group into a DICOM SR object.
+     * Convert an annotation group into a DICOM SR object using the
+     * TID 1500 template.
      *
      * @param {AnnotationGroup} annotationGroup The annotation group.
      * @param {Object<string, any>} [extraTags] Optional list of extra tags.
      * @returns {Object<string, DataElement>} A list of dicom elements.
      */
     toDicom(annotationGroup: AnnotationGroup, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
+    /**
+     * Convert a annotation groups into a DICOM CAD report SR object using
+     * the TID 4100 template.
+     *
+     * @param {AnnotationGroup[]} annotationGroups The annotation groups.
+     * @param {object[]} responseEvaluations List of response evaluations
+     * as {current, measure}.
+     * @param {string} comment Report comment.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
+     */
+    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -1406,15 +1423,19 @@ export declare class DicomCode {
  */
 export declare class DicomData {
     /**
-     * @param {object} meta The DICOM meta data.
+     * @param {Object<string, DataElement>} meta The DICOM meta data.
      */
-    constructor(meta: object);
+    constructor(meta: {
+        [x: string]: DataElement;
+    });
     /**
      * DICOM meta data.
      *
-     * @type {object}
+     * @type {Object<string, DataElement>}
      */
-    meta: object;
+    meta: {
+        [x: string]: DataElement;
+    };
     /**
      * Image extracted from meta data.
      *
@@ -1427,6 +1448,12 @@ export declare class DicomData {
      * @type {AnnotationGroup|undefined}
      */
     annotationGroup: AnnotationGroup | undefined;
+    /**
+     * Image buffer used to build image.
+     *
+     * @type {any|undefined}
+     */
+    buffer: any | undefined;
 }
 
 /**
@@ -2984,6 +3011,10 @@ declare class Image_2 {
      * Note: Uses the raw buffer values.
      */
     compose(rhs: Image_2, operator: Function): Image_2;
+    /**
+     * Recalculate labels.
+     */
+    recalculateLabels(): void;
     #private;
 }
 export { Image_2 as Image }
@@ -3511,12 +3542,14 @@ export declare class MaskFactory {
      * @param {Uint8Array | Int8Array |
          *   Uint16Array | Int16Array |
          *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+     * @param {Image} [refImage] Reference image, code will use its
+     *   origins if present (best) or try to calculate them.
      * @returns {Image} A new Image.
      * @throws Error for missing or wrong data.
      */
     create(dataElements: {
         [x: string]: DataElement;
-    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
     /**
      * Convert a mask image into a DICOM segmentation object.
      *
@@ -5181,7 +5214,7 @@ export declare const toolList: {
  *     const group = new Konva.Group();
  *     group.name('love-group');
  *     group.visible(true);
- *     group.id(annotation.uid);
+ *     group.id(annotation.trackingUid);
  *     group.add(shape);
  *     return group;
  *   }

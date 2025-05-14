@@ -22,7 +22,6 @@ export class Annotation {
     getMetaItem(conceptId: string): object | undefined;
     getOrientationName(): string | undefined;
     getText(): string;
-    id: string;
     init(viewController: ViewController): void;
     isCompatibleView(planeHelper: PlaneHelper): boolean;
     labelPosition: Point2D | undefined;
@@ -41,7 +40,8 @@ export class Annotation {
     }): void;
     setViewController(viewController: ViewController): void;
     textExpr: string;
-    uid: string;
+    trackingId: string;
+    trackingUid: string;
     updateQuantification(): void;
 }
 
@@ -79,6 +79,11 @@ export class AnnotationGroupFactory {
     }): AnnotationGroup;
     getWarning(): string | undefined;
     toDicom(annotationGroup: AnnotationGroup, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
+    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -309,10 +314,15 @@ export class DicomCode {
 
 // @public
 export class DicomData {
-    constructor(meta: object);
+    constructor(meta: {
+        [x: string]: DataElement;
+    });
     annotationGroup: AnnotationGroup | undefined;
+    buffer: any | undefined;
     image: Image_2 | undefined;
-    meta: object;
+    meta: {
+        [x: string]: DataElement;
+    };
 }
 
 // @public
@@ -596,6 +606,7 @@ class Image_2 {
     isConstantRSI(): boolean;
     isIdentityRSI(): boolean;
     isMonochrome(): boolean;
+    recalculateLabels(): void;
     removeEventListener(type: string, callback: Function): void;
     setAtOffsets(offsets: number[], value: number | RGB): void;
     setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
@@ -731,7 +742,7 @@ export class MaskFactory {
     }): string | undefined;
     create(dataElements: {
         [x: string]: DataElement;
-    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
     getWarning(): string | undefined;
     toDicom(image: Image_2, segments: MaskSegment[], sourceImage: Image_2, extraTags?: {
         [x: string]: any;
