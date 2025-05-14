@@ -364,6 +364,22 @@ export declare class AnnotationGroupFactory {
     }): {
         [x: string]: DataElement;
     };
+    /**
+     * Convert a annotation groups into a DICOM CAD report SR object using
+     * the TID 4100 template.
+     *
+     * @param {AnnotationGroup[]} annotationGroups The annotation groups.
+     * @param {object[]} responseEvaluations List of response evaluations
+     * as {current, measure}.
+     * @param {string} comment Report comment.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
+     */
+    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
     #private;
 }
 
