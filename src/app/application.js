@@ -7,7 +7,6 @@ import {
   getViewOrientation
 } from '../math/orientation.js';
 import {Point3D} from '../math/point.js';
-import {Index} from '../math/index.js';
 import {Stage} from '../gui/stage.js';
 import {Style} from '../gui/style.js';
 import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
@@ -1290,16 +1289,6 @@ export class App {
     if (
       typeof targetImage !== 'undefined'
     ) {
-      const baseGeometry = targetImage.image.getGeometry();
-      const baseSize = baseGeometry.getSize();
-      const baseCenterIndex = new Index([
-        Math.floor((baseSize.get(0)) / 2.0),
-        Math.floor((baseSize.get(1)) / 2.0),
-        Math.floor((baseSize.get(2)) / 2.0)
-      ]);
-      const baseCenter =
-        baseGeometry.indexToWorld(baseCenterIndex);
-
       targetImage.image.resample(orientation);
 
       const configs = this.#options.dataViewConfigs;
@@ -1312,7 +1301,7 @@ export class App {
         const meta = data.image.getMeta();
         if (meta.Modality === 'SEG' &&
             meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
-          data.image.resample(orientation, false, baseCenter);
+          this.#dataController.stash(dataIds[i]);
         }
       }
 
@@ -1324,8 +1313,9 @@ export class App {
       // for some unknown reason. For now we just update all of them.
       this.setDataViewConfigs(configs);
       // render data (creates layers)
-      for (let i = 0; i < dataIds.length; ++i) {
-        this.render(dataIds[i]);
+      const newDataIds = this.#dataController.getDataIds();
+      for (let i = 0; i < newDataIds.length; ++i) {
+        this.render(newDataIds[i]);
       }
     }
   }
@@ -1343,14 +1333,14 @@ export class App {
     const configs = this.#options.dataViewConfigs;
 
     const metaTarget = targetImage.image.getMeta();
-    const dataIds = this.#dataController.getDataIds();
+    const dataIds = this.#dataController.getStashedDataIds();
     for (let i = 0; i < dataIds.length; i++) {
-      const data = this.#dataController.get(dataIds[i]);
+      const data = this.#dataController.getStashed(dataIds[i]);
 
       const meta = data.image.getMeta();
       if (meta.Modality === 'SEG' &&
           meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
-        data.image.revert();
+        this.#dataController.unstash(dataIds[i]);
       }
     }
 
@@ -1362,8 +1352,9 @@ export class App {
     // for some unknown reason. For now we just update all of them.
     this.setDataViewConfigs(configs);
     // render data (creates layers)
-    for (let i = 0; i < dataIds.length; ++i) {
-      this.render(dataIds[i]);
+    const newDataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < newDataIds.length; ++i) {
+      this.render(newDataIds[i]);
     }
   }
 
