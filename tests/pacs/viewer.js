@@ -11,7 +11,6 @@ import {BrushToolUI} from './viewer.ui.brush.js';
 
 import {
   logger,
-  decoderScripts,
   custom,
   WindowLevel,
   AppOptions,
@@ -35,15 +34,6 @@ let _layout = 'one';
 function viewerSetup() {
   // logger level (optional)
   logger.level = logger.levels.DEBUG;
-
-  decoderScripts.jpeg2000 =
-    '../../decoders/pdfjs/decode-jpeg2000.js';
-  decoderScripts['jpeg-lossless'] =
-    '../../decoders/rii-mango/decode-jpegloss.js';
-  decoderScripts['jpeg-baseline'] =
-    '../../decoders/pdfjs/decode-jpegbaseline.js';
-  decoderScripts.rle =
-    '../../decoders/dwv/decode-rle.js';
 
   // example wl preset override
   custom.wlPresets = {

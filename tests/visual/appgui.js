@@ -1,6 +1,5 @@
 import {
   logger,
-  decoderScripts,
   ViewConfig,
   AppOptions,
   App
@@ -21,16 +20,6 @@ import {
 export function initDwv() {
   // logger level (optional)
   logger.level = logger.levels.DEBUG;
-
-  // image decoders (for web workers)
-  decoderScripts.jpeg2000 =
-    '../../decoders/pdfjs/decode-jpeg2000.js';
-  decoderScripts['jpeg-lossless'] =
-    '../../decoders/rii-mango/decode-jpegloss.js';
-  decoderScripts['jpeg-baseline'] =
-    '../../decoders/pdfjs/decode-jpegbaseline.js';
-  decoderScripts.rle =
-    '../../decoders/dwv/decode-rle.js';
 };
 
 /**

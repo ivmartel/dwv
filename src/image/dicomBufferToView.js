@@ -207,8 +207,7 @@ export class DicomBufferToView {
 
     // setup the decoder (one decoder per all converts)
     if (this.#pixelDecoder === null) {
-      this.#pixelDecoder = new PixelBufferDecoder(
-        algoName, numberOfItems);
+      this.#pixelDecoder = new PixelBufferDecoder(algoName);
       // callbacks
       // pixelDecoder.ondecodestart: nothing to do
       this.#pixelDecoder.ondecodeditem = (event) => {
