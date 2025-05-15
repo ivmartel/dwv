@@ -12,6 +12,23 @@ import {ThreadPool, WorkerTask} from '../utils/thread.js';
 const hasJpegBaselineDecoder = (typeof JpegImage !== 'undefined');
 
 /**
+ * Jpeg baseline worker task.
+ */
+class JpegBaselineWorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getWorker() {
+    return new Worker(
+      new URL('../decoders/pdfjs/decode-jpegbaseline.js', import.meta.url),
+      {
+        name: 'jpegbaseline.worker'
+      }
+    );
+  }
+}
+
+/**
  * The JPEG decoder namespace.
  *
  * Ref: {@link https://github.com/rii-mango/JPEGLosslessDecoderJS}.
@@ -24,6 +41,23 @@ const hasJpegLosslessDecoder =
   (typeof jpeg !== 'undefined') && (typeof jpeg.lossless !== 'undefined');
 
 /**
+ * Jpeg lossless worker task.
+ */
+class JpegLosslessWorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getWorker() {
+    return new Worker(
+      new URL('../decoders/rii-mango/decode-jpegloss.js', import.meta.url),
+      {
+        name: 'jpegloss.worker'
+      }
+    );
+  }
+}
+
+/**
  * The JPEG 2000 decoder.
  *
  * Ref: {@link https://github.com/jpambrun/jpx-medical/blob/master/jpx.js}.
@@ -33,6 +67,40 @@ const hasJpegLosslessDecoder =
 /* global JpxImage */
 // @ts-ignore
 const hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
+
+/**
+ * Jpeg 2000 worker task.
+ */
+class Jpeg2000WorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getWorker() {
+    return new Worker(
+      new URL('../decoders/pdfjs/decode-jpeg2000.js', import.meta.url),
+      {
+        name: 'jpeg2000.worker'
+      }
+    );
+  }
+}
+
+/**
+ * RLE worker task.
+ */
+class RleWorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getWorker() {
+    return new Worker(
+      new URL('../decoders/dwv/decode-rle.js', import.meta.url),
+      {
+        name: 'rle.worker'
+      }
+    );
+  }
+}
 
 /* global dwvdecoder */
 
@@ -52,11 +120,11 @@ export const decoderScripts = {
 class AsynchPixelBufferDecoder {
 
   /**
-   * The associated worker script.
+   * The name of the compression algorithm.
    *
    * @type {string}
    */
-  #script;
+  #algoName;
 
   /**
    * Associated thread pool.
@@ -73,12 +141,11 @@ class AsynchPixelBufferDecoder {
   #areCallbacksSet = false;
 
   /**
-   * @param {string} script The path to the decoder script to be used
-   *   by the web worker.
+   * @param {string} algoName The name of the compression algorithm.
    * @param {number} _numberOfData The anticipated number of data to decode.
    */
-  constructor(script, _numberOfData) {
-    this.#script = script;
+  constructor(algoName, _numberOfData) {
+    this.#algoName = algoName;
   }
 
   /**
@@ -99,17 +166,27 @@ class AsynchPixelBufferDecoder {
       this.#pool.onerror = this.onerror;
       this.#pool.onabort = this.onabort;
     }
-    // create worker task
-    const workerTask = new WorkerTask(
-      this.#script,
-      {
-        buffer: pixelBuffer,
-        meta: pixelMeta
-      },
-      info
-    );
+
+    const message = {
+      buffer: pixelBuffer,
+      meta: pixelMeta
+    };
+
+    let workerTask;
+    if (this.#algoName === 'jpeg-baseline') {
+      workerTask = new JpegBaselineWorkerTask(message, info);
+    } else if (this.#algoName === 'jpeg-lossless') {
+      workerTask = new JpegLosslessWorkerTask(message, info);
+    } else if (this.#algoName === 'jpeg2000') {
+      workerTask = new Jpeg2000WorkerTask(message, info);
+    } else if (this.#algoName === 'rle') {
+      workerTask = new RleWorkerTask(message, info);
+    }
+
     // add it the queue and run it
-    this.#pool.addWorkerTask(workerTask);
+    if (typeof workerTask !== 'undefined') {
+      this.#pool.addWorkerTask(workerTask);
+    }
   }
 
   /**
@@ -382,7 +459,7 @@ export class PixelBufferDecoder {
     if (typeof decoderScripts !== 'undefined' &&
       typeof decoderScripts[algoName] !== 'undefined') {
       this.#pixelDecoder = new AsynchPixelBufferDecoder(
-        decoderScripts[algoName], numberOfData);
+        algoName, numberOfData);
     } else {
       this.#pixelDecoder = new SynchPixelBufferDecoder(
         algoName, numberOfData);

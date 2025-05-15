@@ -1,21 +1,19 @@
 /**
  * JPEG Lossless decoder worker.
  */
-// Do not warn if these variables were not defined before.
-/* global importScripts, jpeg */
 
-importScripts('lossless-min.js');
+import {jpeg} from './lossless.js';
 
 self.addEventListener('message', function (event) {
 
   // bytes per element
-  var bpe = event.data.meta.bitsAllocated / 8;
+  const bpe = event.data.meta.bitsAllocated / 8;
   // decode DICOM buffer
-  var buf = new Uint8Array(event.data.buffer);
-  var decoder = new jpeg.lossless.Decoder();
-  var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
+  const buf = new Uint8Array(event.data.buffer);
+  const decoder = new jpeg.lossless.Decoder();
+  const decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
   // post decoded data
-  var res = null;
+  let res = null;
   if (event.data.meta.bitsAllocated === 8) {
     if (event.data.meta.isSigned) {
       res = new Int8Array(decoded.buffer);

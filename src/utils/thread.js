@@ -217,7 +217,7 @@ class WorkerThread {
     this.runningTask = workerTask;
     // create a new web worker if not done yet
     if (typeof this.worker === 'undefined') {
-      this.worker = new Worker(this.runningTask.script);
+      this.worker = this.runningTask.getWorker();
       // set callbacks
       this.worker.onmessage = this.onmessage;
       this.worker.onerror = this.onerror;
@@ -278,16 +278,23 @@ class WorkerThread {
  */
 export class WorkerTask {
   /**
-   * @param {string | URL} script The worker script.
    * @param {object} message The data to pass to the worker.
    * @param {object} info Information object about the input data.
    */
-  constructor(script, message, info) {
-    // worker script
-    this.script = script;
+  constructor(message, info) {
     // worker start message
     this.startMessage = message;
     // information about the work data
     this.info = info;
+  }
+
+  /**
+   * Get the task web worker.
+   * Defaults returns undefined.
+   *
+   * @returns {Worker|undefined} The task worker.
+   */
+  getWorker() {
+    return undefined;
   }
 }

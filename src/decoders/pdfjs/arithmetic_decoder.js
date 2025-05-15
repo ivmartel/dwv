@@ -1,3 +1,12 @@
+/* eslint-disable */
+
+/**
+ * Modified for dwv:
+ * - export root var,
+ * - remove old style import/export and
+ *   related (for ex 'use strict').
+ */
+
 /* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright 2012 Mozilla Foundation
@@ -15,8 +24,6 @@
  * limitations under the License.
  */
 
-'use strict';
-
 /* This class implements the QM Coder decoding as defined in
  *   JPEG 2000 Part I Final Committee Draft Version 1.0
  *   Annex C.3 Arithmetic decoding procedure
@@ -25,7 +32,7 @@
  * The arithmetic decoder is used in conjunction with context models to decode
  * JPEG2000 and JBIG2 streams.
  */
-var ArithmeticDecoder = (function ArithmeticDecoderClosure() {
+export var ArithmeticDecoder = (function ArithmeticDecoderClosure() {
   // Table C-2
   var QeTable = [
     {qe: 0x5601, nmps: 1, nlps: 1, switchFlag: 1},

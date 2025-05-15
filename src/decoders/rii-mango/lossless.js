@@ -1,4 +1,15 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.jpeg = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* eslint-disable */
+
+export var jpeg = jpeg || {};
+jpeg.lossless = jpeg.lossless || {};
+
+/**
+ * Modified for dwv:
+ * - export root var,
+ * - remove old style import/export and
+ *   related (for ex 'use strict').
+ */
+
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -30,13 +41,10 @@
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
 
 
 /*** Constructor ***/
@@ -46,15 +54,6 @@ jpeg.lossless.ComponentSpec = jpeg.lossless.ComponentSpec || function () {
     this.vSamp = 0; // Vertical
 };
 
-
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.ComponentSpec;
-}
-
-},{}],2:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -86,13 +85,10 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
 
 
 /*** Constructor ***/
@@ -122,14 +118,6 @@ jpeg.lossless.DataStream.prototype.get8 = function () {
 };
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.DataStream;
-}
-
-},{}],3:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -161,19 +149,18 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
 
-"use strict";
+// "use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
-jpeg.lossless.HuffmanTable = jpeg.lossless.HuffmanTable || ((typeof require !== 'undefined') ? require('./huffman-table.js') : null);
-jpeg.lossless.QuantizationTable = jpeg.lossless.QuantizationTable || ((typeof require !== 'undefined') ? require('./quantization-table.js') : null);
-jpeg.lossless.ScanHeader = jpeg.lossless.ScanHeader || ((typeof require !== 'undefined') ? require('./scan-header.js') : null);
-jpeg.lossless.FrameHeader = jpeg.lossless.FrameHeader || ((typeof require !== 'undefined') ? require('./frame-header.js') : null);
-jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
+// jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
+// jpeg.lossless.HuffmanTable = jpeg.lossless.HuffmanTable || ((typeof require !== 'undefined') ? require('./huffman-table.js') : null);
+// jpeg.lossless.QuantizationTable = jpeg.lossless.QuantizationTable || ((typeof require !== 'undefined') ? require('./quantization-table.js') : null);
+// jpeg.lossless.ScanHeader = jpeg.lossless.ScanHeader || ((typeof require !== 'undefined') ? require('./scan-header.js') : null);
+// jpeg.lossless.FrameHeader = jpeg.lossless.FrameHeader || ((typeof require !== 'undefined') ? require('./frame-header.js') : null);
+// jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
 
 
 /*** Constructor ***/
@@ -892,7 +879,7 @@ jpeg.lossless.Decoder.prototype.outputRGB = function (PRED) {
 };
 
 jpeg.lossless.Decoder.prototype.setValue8 = function (index, val) {
-    this.outputData[index] = val; 
+    this.outputData[index] = val;
 };
 
 jpeg.lossless.Decoder.prototype.getValue8 = function (index) {
@@ -908,13 +895,13 @@ var littleEndian = (function() {
 
 if (littleEndian) {
     // just reading from an array is fine then. Int16Array will use platform endianness.
-    jpeg.lossless.Decoder.prototype.setValue16 = jpeg.lossless.Decoder.prototype.setValue8; 
+    jpeg.lossless.Decoder.prototype.setValue16 = jpeg.lossless.Decoder.prototype.setValue8;
     jpeg.lossless.Decoder.prototype.getValue16 = jpeg.lossless.Decoder.prototype.getValue8;
-} 
+}
 else {
-    // If platform is big-endian, we will need to convert to little-endian 
+    // If platform is big-endian, we will need to convert to little-endian
     jpeg.lossless.Decoder.prototype.setValue16 = function (index, val) {
-        this.outputData[index] = ((val & 0xFF) << 8) | ((val >> 8) & 0xFF); 
+        this.outputData[index] = ((val & 0xFF) << 8) | ((val >> 8) & 0xFF);
     };
 
     jpeg.lossless.Decoder.prototype.getValue16 = function (index) {
@@ -977,14 +964,6 @@ jpeg.lossless.Decoder.prototype.readNumber = function() {
 
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.Decoder;
-}
-
-},{"./data-stream.js":2,"./frame-header.js":4,"./huffman-table.js":5,"./quantization-table.js":7,"./scan-header.js":9,"./utils.js":10}],4:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -1016,15 +995,12 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-jpeg.lossless.ComponentSpec = jpeg.lossless.ComponentSpec || ((typeof require !== 'undefined') ? require('./component-spec.js') : null);
-jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
+// jpeg.lossless.ComponentSpec = jpeg.lossless.ComponentSpec || ((typeof require !== 'undefined') ? require('./component-spec.js') : null);
+// jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
 
 
 /*** Constructor ***/
@@ -1092,14 +1068,6 @@ jpeg.lossless.FrameHeader.prototype.read = function (data) {
 };
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.FrameHeader;
-}
-
-},{"./component-spec.js":1,"./data-stream.js":2}],5:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -1131,15 +1099,12 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
-jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
+// jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
+// jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
 
 
 /*** Constructor ***/
@@ -1280,18 +1245,7 @@ jpeg.lossless.HuffmanTable.prototype.buildHuffTable = function(tab, L, V) {
 };
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.HuffmanTable;
-}
-
-},{"./data-stream.js":2,"./utils.js":10}],6:[function(require,module,exports){
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ****/
 
@@ -1299,33 +1253,26 @@ if ((moduleType !== 'undefined') && module.exports) {
  * jpeg
   * @type {*|{}}
  */
-var jpeg = jpeg || {};
+// var jpeg = jpeg || {};
 
 /**
  * jpeg.lossless
  * @type {*|{}}
  */
-jpeg.lossless = jpeg.lossless || {};
+// jpeg.lossless = jpeg.lossless || {};
 
 
-jpeg.lossless.ComponentSpec = jpeg.lossless.ComponentSpec || ((typeof require !== 'undefined') ? require('./component-spec.js') : null);
-jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
-jpeg.lossless.Decoder = jpeg.lossless.Decoder || ((typeof require !== 'undefined') ? require('./decoder.js') : null);
-jpeg.lossless.FrameHeader = jpeg.lossless.FrameHeader || ((typeof require !== 'undefined') ? require('./frame-header.js') : null);
-jpeg.lossless.HuffmanTable = jpeg.lossless.HuffmanTable || ((typeof require !== 'undefined') ? require('./huffman-table.js') : null);
-jpeg.lossless.QuantizationTable = jpeg.lossless.QuantizationTable || ((typeof require !== 'undefined') ? require('./quantization-table.js') : null);
-jpeg.lossless.ScanComponent = jpeg.lossless.ScanComponent || ((typeof require !== 'undefined') ? require('./scan-component.js') : null);
-jpeg.lossless.ScanHeader = jpeg.lossless.ScanHeader || ((typeof require !== 'undefined') ? require('./scan-header.js') : null);
-jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
+// jpeg.lossless.ComponentSpec = jpeg.lossless.ComponentSpec || ((typeof require !== 'undefined') ? require('./component-spec.js') : null);
+// jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
+// jpeg.lossless.Decoder = jpeg.lossless.Decoder || ((typeof require !== 'undefined') ? require('./decoder.js') : null);
+// jpeg.lossless.FrameHeader = jpeg.lossless.FrameHeader || ((typeof require !== 'undefined') ? require('./frame-header.js') : null);
+// jpeg.lossless.HuffmanTable = jpeg.lossless.HuffmanTable || ((typeof require !== 'undefined') ? require('./huffman-table.js') : null);
+// jpeg.lossless.QuantizationTable = jpeg.lossless.QuantizationTable || ((typeof require !== 'undefined') ? require('./quantization-table.js') : null);
+// jpeg.lossless.ScanComponent = jpeg.lossless.ScanComponent || ((typeof require !== 'undefined') ? require('./scan-component.js') : null);
+// jpeg.lossless.ScanHeader = jpeg.lossless.ScanHeader || ((typeof require !== 'undefined') ? require('./scan-header.js') : null);
+// jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
 
 
-/*** Exports ***/
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg;
-}
-
-},{"./component-spec.js":1,"./data-stream.js":2,"./decoder.js":3,"./frame-header.js":4,"./huffman-table.js":5,"./quantization-table.js":7,"./scan-component.js":8,"./scan-header.js":9,"./utils.js":10}],7:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -1357,15 +1304,12 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
-jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
+// jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
+// jpeg.lossless.Utils = jpeg.lossless.Utils || ((typeof require !== 'undefined') ? require('./utils.js') : null);
 
 
 /*** Constructor ***/
@@ -1482,14 +1426,6 @@ jpeg.lossless.QuantizationTable.prototype.read = function (data, table) {
 
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.QuantizationTable;
-}
-
-},{"./data-stream.js":2,"./utils.js":10}],8:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -1521,13 +1457,10 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
 
 
 /*** Constructor ***/
@@ -1539,14 +1472,6 @@ jpeg.lossless.ScanComponent = jpeg.lossless.ScanComponent || function () {
 
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.ScanComponent;
-}
-
-},{}],9:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -1578,15 +1503,12 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
-jpeg.lossless.ScanComponent = jpeg.lossless.ScanComponent || ((typeof require !== 'undefined') ? require('./scan-component.js') : null);
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
+// jpeg.lossless.DataStream = jpeg.lossless.DataStream || ((typeof require !== 'undefined') ? require('./data-stream.js') : null);
+// jpeg.lossless.ScanComponent = jpeg.lossless.ScanComponent || ((typeof require !== 'undefined') ? require('./scan-component.js') : null);
 
 
 /*** Constructor ***/
@@ -1650,14 +1572,6 @@ jpeg.lossless.ScanHeader.prototype.read = function(data) {
 
 
 
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.ScanHeader;
-}
-
-},{"./data-stream.js":2,"./scan-component.js":8}],10:[function(require,module,exports){
 /*
  * Copyright (C) 2015 Michael Martinez
  * Changes: Added support for selection values 2-7, fixed minor bugs &
@@ -1689,13 +1603,10 @@ if ((moduleType !== 'undefined') && module.exports) {
  */
 
 /*jslint browser: true, node: true */
-/*global require, module */
-
-"use strict";
 
 /*** Imports ***/
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
+// var jpeg = jpeg || {};
+// jpeg.lossless = jpeg.lossless || {};
 
 
 /*** Constructor ***/
@@ -1743,14 +1654,3 @@ jpeg.lossless.Utils.crc32 = function(dataView) {
 
     return (crc ^ (-1)) >>> 0;
 };
-
-
-/*** Exports ***/
-
-var moduleType = typeof module;
-if ((moduleType !== 'undefined') && module.exports) {
-    module.exports = jpeg.lossless.Utils;
-}
-
-},{}]},{},[6])(6)
-});
