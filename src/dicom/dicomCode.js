@@ -331,7 +331,7 @@ function getDicomCode(value, scheme) {
  * @returns {DicomCode} The code.
  */
 export function getSegmentationCode() {
-  return getDicomCode('113076', 'DCM');
+  return getDcmDicomCode(DcmCodes.Segmentation);
 }
 
 /**
