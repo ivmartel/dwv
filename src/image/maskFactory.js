@@ -432,7 +432,7 @@ export class MaskFactory {
 
     if (numberOfFrames !== pixelBuffer.length / sliceSize) {
       throw new Error(
-        'Buffer and numberOfFrames meta are not equal.' +
+        'Buffer and numberOfFrames meta are not equal ' +
         numberOfFrames + ' ' + pixelBuffer.length / sliceSize);
     }
 
