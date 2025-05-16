@@ -211,7 +211,7 @@ function getVrPad(vr) {
  * @returns {Uint8Array} The new array.
  */
 function uint8ArrayPush(arr, value) {
-  const newArr = new Uint8Array(arr.length + 1);
+  const newArr = new Uint8Array(arr.length + value.length);
   newArr.set(arr);
   newArr.set(value, arr.length);
   return newArr;
@@ -535,10 +535,11 @@ export class DicomWriter {
    * @param {number} byteOffset The offset to start writing from.
    * @param {Array} items The list of items to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writeDataElementItems(
-    writer, byteOffset, items, isImplicit) {
+    writer, byteOffset, items, isImplicit, bitsAllocated) {
 
     const isItemTagWithNoVR = function (item) {
       return isItemTag(item.tag) && item.vr === 'NONE';
@@ -566,7 +567,7 @@ export class DicomWriter {
         if (!isItemTagWithNoVR(subItem) &&
           !isItemDelimitationItemTag(subItem.tag)) {
           byteOffset = this.#writeDataElement(
-            writer, subItem, byteOffset, isImplicit);
+            writer, subItem, byteOffset, isImplicit, bitsAllocated);
         }
       }
       // item delimitation
@@ -590,20 +591,29 @@ export class DicomWriter {
    * @param {DataWriter} writer The raw data writer.
    * @param {DataElement} element The element to write.
    * @param {number} byteOffset The offset to start writing from.
-   * @param {Array} value The array to write.
+   * @param {Array|Uint8Array} value The array to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writeDataElementValue(
-    writer, element, byteOffset, value, isImplicit) {
+    writer, element, byteOffset, value, isImplicit, bitsAllocated) {
 
     const startOffset = byteOffset;
 
     if (element.vr === 'NONE') {
       // nothing to do!
     } else if (value instanceof Uint8Array) {
-      // binary data has been expanded 8 times at read
-      if (value.length === 8 * element.vl) {
+      // binary data
+      if (typeof bitsAllocated !== 'undefined' && bitsAllocated === 1) {
+        // padd if length is not a multiple of 8
+        if (value.length % 8 !== 0) {
+          logger.debug('Padding binary pixel data');
+          const newSize = Math.ceil(value.length / 8) * 8;
+          const padd = new Array(newSize - value.length);
+          padd.fill(0);
+          value = uint8ArrayPush(value, padd);
+        }
         byteOffset = writer.writeBinaryArray(byteOffset, value);
       } else {
         byteOffset = writer.writeUint8Array(byteOffset, value);
@@ -700,10 +710,11 @@ export class DicomWriter {
    * @param {number} byteOffset The offset to start writing from.
    * @param {Array} value The array to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writePixelDataElementValue(
-    writer, element, byteOffset, value, isImplicit) {
+    writer, element, byteOffset, value, isImplicit, bitsAllocated) {
     // undefined length flag
     let undefinedLength = false;
     if (typeof element.undefinedLength !== 'undefined') {
@@ -718,7 +729,7 @@ export class DicomWriter {
       }
       // write
       byteOffset = this.#writeDataElementValue(
-        writer, element, byteOffset, finalValue, isImplicit);
+        writer, element, byteOffset, finalValue, isImplicit, bitsAllocated);
     } else {
       // pixel data as sequence
       const sqItem = [];
@@ -740,7 +751,7 @@ export class DicomWriter {
       }
       // write
       byteOffset = this.#writeDataElementItems(
-        writer, byteOffset, [sqItem], isImplicit);
+        writer, byteOffset, [sqItem], isImplicit, bitsAllocated);
     }
 
     // return new offset
@@ -754,10 +765,11 @@ export class DicomWriter {
    * @param {DataElement} element The DICOM data element to write.
    * @param {number} byteOffset The offset to start writing from.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writeDataElement(
-    writer, element, byteOffset, isImplicit) {
+    writer, element, byteOffset, isImplicit, bitsAllocated) {
     const isTagWithVR = element.tag.isWithVR();
     const is32bitVL = (isImplicit || !isTagWithVR)
       ? true : is32bitVLVR(element.vr);
@@ -817,7 +829,7 @@ export class DicomWriter {
     // write
     if (isPixelDataTag(element.tag)) {
       byteOffset = this.#writePixelDataElementValue(
-        writer, element, byteOffset, value, isImplicit);
+        writer, element, byteOffset, value, isImplicit, bitsAllocated);
     } else {
       byteOffset = this.#writeDataElementValue(
         writer, element, byteOffset, value, isImplicit);
@@ -1029,7 +1041,7 @@ export class DicomWriter {
     // write non meta
     for (const rawElement of rawElements) {
       offset = this.#writeDataElement(
-        dataWriter, rawElement, offset, isImplicit);
+        dataWriter, rawElement, offset, isImplicit, bitsAllocated);
     }
 
     // check final position
@@ -1205,7 +1217,8 @@ export class DicomWriter {
             if (typeof bitsAllocated !== 'undefined') {
               if (bitsAllocated === 1) {
                 // binary data
-                size /= 8;
+                // (ceil to get integer)
+                size = Math.ceil(size / 8);
               } else if (bitsAllocated === 16) {
                 size *= Uint16Array.BYTES_PER_ELEMENT;
               }
