@@ -1212,9 +1212,18 @@ export class DicomParser {
         logger.warn('Reading DICOM pixel data with default bitsAllocated.');
       }
 
+      // NumberOfFrames
+      let numberOfFrames = 1;
+      dataElement = this.#dataElements[TagKeys.NumberOfFrames];
+      if (typeof dataElement !== 'undefined') {
+        dataElement.value = this.#interpretElement(dataElement, dataReader);
+        numberOfFrames = parseInt(dataElement.value[0], 10);
+      }
+
       pixelTags = {
         pixelRepresentation,
-        bitsAllocated
+        bitsAllocated,
+        numberOfFrames
       };
 
       // image buffer size
@@ -1232,7 +1241,7 @@ export class DicomParser {
       }
       if (typeof rows !== 'undefined' &&
         typeof cols !== 'undefined') {
-        pixelTags['imageBufferSize'] = rows * cols;
+        pixelTags['imageBufferSize'] = rows * cols * numberOfFrames;
       }
     }
 
@@ -1265,12 +1274,7 @@ export class DicomParser {
     dataElement = this.#dataElements[TagKeys.PixelData];
     if (typeof dataElement !== 'undefined') {
       if (dataElement.undefinedLength) {
-        let numberOfFrames = 1;
-        if (typeof this.#dataElements[TagKeys.NumberOfFrames] !== 'undefined') {
-          numberOfFrames = Number(
-            this.#dataElements[TagKeys.NumberOfFrames].value[0]
-          );
-        }
+        const numberOfFrames = pixelTags.numberOfFrames;
         const pixItems = dataElement.value;
         if (pixItems.length > 1 && pixItems.length > numberOfFrames) {
           // concatenate pixel data items
