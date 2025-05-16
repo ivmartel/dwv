@@ -451,6 +451,8 @@ function isKnownVR(vr) {
 const TagKeys = {
   TransferSyntax: '00020010',
   SpecificCharacterSet: '00080005',
+  Rows: '00280010',
+  Columns: '00280011',
   NumberOfFrames: '00280008',
   BitsAllocated: '00280100',
   PixelRepresentation: '00280103',
@@ -856,18 +858,22 @@ export class DicomParser {
    *
    * @param {DataElement} element The data element.
    * @param {DataReader} reader The raw data reader.
-   * @param {number} [pixelRepresentation] PixelRepresentation 0->unsigned,
-   *   1->signed (needed for pixel data or VR=xs).
-   * @param {number} [bitsAllocated] Bits allocated (needed for pixel data).
+   * @param {object} [pixelTags] Pixel data related tags.
    * @returns {object} The interpreted data.
    */
-  #interpretElement(
-    element, reader, pixelRepresentation, bitsAllocated) {
+  #interpretElement(element, reader, pixelTags) {
 
     const tag = element.tag;
     const vl = element.vl;
     const vr = element.vr;
     const offset = element.startOffset;
+
+    let bitsAllocated;
+    let pixelRepresentation;
+    if (typeof pixelTags !== 'undefined') {
+      bitsAllocated = pixelTags.bitsAllocated;
+      pixelRepresentation = pixelTags.pixelRepresentation;
+    }
 
     // data
     let data = null;
@@ -878,8 +884,7 @@ export class DicomParser {
         data = [];
         for (let j = 0; j < element.items.length; ++j) {
           data.push(this.#interpretElement(
-            element.items[j], reader,
-            pixelRepresentation, bitsAllocated));
+            element.items[j], reader, pixelTags));
         }
         // remove non parsed items
         delete element.items;
@@ -896,7 +901,8 @@ export class DicomParser {
         // read
         data = [];
         if (bitsAllocated === 1) {
-          data.push(reader.readBinaryArray(offset, vl));
+          data.push(reader.readBinaryArray(
+            offset, vl, pixelTags.imageBufferSize));
         } else if (bitsAllocated === 8) {
           if (pixelRepresentation === 0) {
             data.push(reader.readUint8Array(offset, vl));
@@ -1014,10 +1020,13 @@ export class DicomParser {
             typeof dataElement.value !== 'undefined') {
             sqPixelRepresentation = dataElement.value[0];
           }
+          const sqPixelTags = {
+            bitsAllocated: sqBitsAllocated,
+            pixelRepresentation: sqPixelRepresentation
+          };
           const subElement = item[keys[l]];
           subElement.value = this.#interpretElement(
-            subElement, reader,
-            sqPixelRepresentation, sqBitsAllocated);
+            subElement, reader, sqPixelTags);
           delete subElement.tag;
           delete subElement.vl;
           delete subElement.startOffset;
@@ -1046,20 +1055,16 @@ export class DicomParser {
    *
    * @param {DataElements} elements A list of data elements.
    * @param {DataReader} reader The raw data reader.
-   * @param {number} pixelRepresentation PixelRepresentation 0->unsigned,
-   *   1->signed.
-   * @param {number} bitsAllocated Bits allocated.
+   * @param {object} [pixelTags] Pixel data related tags.
    */
-  #interpret(
-    elements, reader,
-    pixelRepresentation, bitsAllocated) {
+  #interpret(elements, reader, pixelTags) {
 
     const keys = Object.keys(elements);
     for (let i = 0; i < keys.length; ++i) {
       const element = elements[keys[i]];
       if (typeof element.value === 'undefined') {
         element.value = this.#interpretElement(
-          element, reader, pixelRepresentation, bitsAllocated);
+          element, reader, pixelTags);
       }
       // delete interpretation specific properties
       delete element.tag;
@@ -1184,10 +1189,10 @@ export class DicomParser {
     // values needed for data interpretation
 
     // pixel specific
-    let pixelRepresentation = 0;
-    let bitsAllocated = 16;
+    let pixelTags;
     if (typeof this.#dataElements[TagKeys.PixelData] !== 'undefined') {
       // PixelRepresentation 0->unsigned, 1->signed
+      let pixelRepresentation = 0;
       dataElement = this.#dataElements[TagKeys.PixelRepresentation];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.#interpretElement(dataElement, dataReader);
@@ -1198,12 +1203,36 @@ export class DicomParser {
       }
 
       // BitsAllocated
+      let bitsAllocated = 16;
       dataElement = this.#dataElements[TagKeys.BitsAllocated];
       if (typeof dataElement !== 'undefined') {
         dataElement.value = this.#interpretElement(dataElement, dataReader);
         bitsAllocated = dataElement.value[0];
       } else {
         logger.warn('Reading DICOM pixel data with default bitsAllocated.');
+      }
+
+      pixelTags = {
+        pixelRepresentation,
+        bitsAllocated
+      };
+
+      // image buffer size
+      let rows;
+      dataElement = this.#dataElements[TagKeys.Rows];
+      if (typeof dataElement !== 'undefined') {
+        dataElement.value = this.#interpretElement(dataElement, dataReader);
+        rows = parseInt(dataElement.value[0], 10);
+      }
+      let cols;
+      dataElement = this.#dataElements[TagKeys.Columns];
+      if (typeof dataElement !== 'undefined') {
+        dataElement.value = this.#interpretElement(dataElement, dataReader);
+        cols = parseInt(dataElement.value[0], 10);
+      }
+      if (typeof rows !== 'undefined' &&
+        typeof cols !== 'undefined') {
+        pixelTags['imageBufferSize'] = rows * cols;
       }
     }
 
@@ -1228,10 +1257,7 @@ export class DicomParser {
     }
 
     // interpret the dicom elements
-    this.#interpret(
-      this.#dataElements, dataReader,
-      pixelRepresentation, bitsAllocated
-    );
+    this.#interpret(this.#dataElements, dataReader, pixelTags);
 
     // handle fragmented pixel buffer
     // Reference: http://dicom.nema.org/medical/dicom/2022a/output/chtml/part05/sect_8.2.html
