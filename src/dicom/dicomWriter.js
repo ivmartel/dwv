@@ -274,7 +274,7 @@ function flattenArrayOfTypedArrays(initialArray) {
   let offset = 0;
   for (const subArray of initialArray) {
     flattenedArray.set(subArray, offset);
-    offset = subArray.length;
+    offset += subArray.length;
   }
 
   return flattenedArray;
