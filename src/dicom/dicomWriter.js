@@ -259,21 +259,24 @@ function padOBValue(value) {
  * @returns {object} A typed array containing all values.
  */
 function flattenArrayOfTypedArrays(initialArray) {
-  const initialArrayLength = initialArray.length;
-  const arrayLength = initialArray[0].length;
-  // If this is not a array of arrays, just return the initial one:
-  if (typeof arrayLength === 'undefined') {
+  // if this is not a array of arrays, just return the initial one
+  if (typeof initialArray[0].length === 'undefined') {
     return initialArray;
   }
-
-  const flattenendArrayLength = initialArrayLength * arrayLength;
-
-  const flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
-
-  for (let i = 0; i < initialArrayLength; i++) {
-    const indexFlattenedArray = i * arrayLength;
-    flattenedArray.set(initialArray[i], indexFlattenedArray);
+  // calculate full length
+  let flattenendArrayLength = 0;
+  for (const subArray of initialArray) {
+    flattenendArrayLength += subArray.length;
   }
+  // create flattened
+  const flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
+  // fill it
+  let offset = 0;
+  for (const subArray of initialArray) {
+    flattenedArray.set(subArray, offset);
+    offset = subArray.length;
+  }
+
   return flattenedArray;
 }
 
