@@ -22,7 +22,7 @@ export default merge(webpackCommon, {
     static: [
       {
         directory: './dist',
-        publicPath: '/dist'
+        publicPath: '/assets'
       },
       {
         directory: './tests',

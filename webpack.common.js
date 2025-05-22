@@ -16,6 +16,7 @@ export const webpackCommon = {
     },
     path: path.resolve(__dirname, 'dist'),
     clean: true,
+    workerPublicPath: '/assets/'
   },
   experiments: {
     outputModule: true, // Enable ESM output
