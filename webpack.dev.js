@@ -29,10 +29,6 @@ export default merge(webpackCommon, {
         publicPath: '/tests'
       },
       {
-        directory: './decoders',
-        publicPath: '/decoders'
-      },
-      {
         directory: './node_modules/jszip',
         publicPath: '/node_modules/jszip'
       },
