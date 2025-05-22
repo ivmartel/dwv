@@ -1,9 +1,11 @@
+import {DrawController} from '../../src/app/drawController.js';
 import {
-  DrawController,
-  AnnotationGroupFactory,
+  AnnotationGroupFactory
+} from '../../src/image/annotationGroupFactory.js';
+import {
   getUID,
   DicomWriter
-} from 'dwv';
+} from '../../src/dicom/dicomWriter.js';
 
 /**
  * Get the annotation group divId.

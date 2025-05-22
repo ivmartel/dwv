@@ -1,9 +1,9 @@
+import {logger} from '../../src/utils/logger.js';
 import {
-  logger,
   ViewConfig,
   AppOptions,
   App
-} from 'dwv';
+} from '../../src/app/application.js';
 
 /**
  * Application GUI.

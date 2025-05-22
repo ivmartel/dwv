@@ -1,8 +1,6 @@
-import {
-  logger,
-  DicomParser,
-  DicomWriter
-} from 'dwv';
+import {logger} from '../../../src/utils/logger.js';
+import {DicomParser} from '../../../src/dicom/dicomParser.js';
+import {DicomWriter} from '../../../src/dicom/dicomWriter.js';
 
 // global vars
 // rules file

@@ -1,3 +1,16 @@
+import {logger} from '../../src/utils/logger.js';
+import {precisionRound} from '../../src/utils/string.js';
+import {custom} from '../../src/app/custom.js';
+import {
+  AppOptions,
+  App
+} from '../../src/app/application.js';
+import {WindowLevel} from '../../src/image/windowLevel.js';
+import {getAsSimpleElements} from '../../src/dicom/dicomTag.js';
+import {getSRContent} from '../../src/dicom/dicomSRContent.js';
+import {getDwvVersion} from '../../src/dicom/dicomParser.js';
+import {Point} from '../../src/math/point.js';
+
 import {
   getViewConfig,
   getLayerGroupDivIds
@@ -8,19 +21,6 @@ import {AnnotationUI} from './viewer.ui.annot.js';
 import {SegmentationUI} from './viewer.ui.segment.js';
 import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
-
-import {
-  logger,
-  custom,
-  WindowLevel,
-  AppOptions,
-  App,
-  getAsSimpleElements,
-  getSRContent,
-  Point,
-  precisionRound,
-  getDwvVersion
-} from 'dwv';
 
 // global vars
 let _app = null;

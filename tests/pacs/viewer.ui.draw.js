@@ -1,6 +1,4 @@
-import {
-  DicomCode
-} from 'dwv';
+import {DicomCode} from '../../src/dicom/dicomCode.js';
 
 /**
  * Draw tool UI.

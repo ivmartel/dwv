@@ -1,7 +1,5 @@
 
-import {
-  luts
-} from 'dwv';
+import {luts} from '../../../src/image/luts.js';
 
 /**
  * Setup.

@@ -1,20 +1,24 @@
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
+import {
+  rgbToHex,
+  hexToRgb,
+} from '../../src/utils/colour.js';
+import {logger} from '../../src/utils/logger.js';
+import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
+import {MaskFactory} from '../../src/image/maskFactory.js';
+import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
+import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
+import {
+  ChangeSegmentColourCommand
+} from '../../src/image/changeSegmentColourCommand.js';
+import {
+  DeleteSegmentCommand
+} from '../../src/image/deleteSegmentCommand.js';
+
 import {
   getHtmlId,
   getRootFromHtmlId
 } from './viewer.ui.js';
-
-import {
-  logger,
-  getSegmentationCode,
-  DicomWriter,
-  rgbToHex,
-  hexToRgb,
-  MaskFactory,
-  MaskSegmentHelper,
-  MaskSegmentViewHelper,
-  ChangeSegmentColourCommand,
-  DeleteSegmentCommand
-} from 'dwv';
 
 // global vars
 const _colours = [

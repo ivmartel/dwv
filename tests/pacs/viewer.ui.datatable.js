@@ -1,14 +1,12 @@
+import {Orientation} from '../../src/math/orientation.js';
+import {WindowLevel} from '../../src/image/windowLevel.js';
+import {luts} from '../../src/image/luts.js';
+
 import {
   getLayerGroupDivIds,
   getViewConfig,
   getControlDiv
 } from './viewer.ui.js';
-
-import {
-  Orientation,
-  WindowLevel,
-  luts
-} from 'dwv';
 
 /**
  * Get the layer group div ids associated to a view config.

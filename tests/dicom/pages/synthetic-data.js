@@ -1,13 +1,12 @@
+import {addTagsToDictionary} from '../../../src/dicom/dictionary.js';
+import {
+  getElementsFromJSONTags,
+  DicomWriter
+} from '../../../src/dicom/dicomWriter.js';
 
 import {
   generatePixelDataFromJSONTags,
 } from '../dicomGenerator.js';
-
-import {
-  addTagsToDictionary,
-  getElementsFromJSONTags,
-  DicomWriter
-} from 'dwv';
 
 /**
  * Setup.

@@ -1,6 +1,4 @@
-import {
-  buildMultipart
-} from 'dwv';
+import {buildMultipart} from '../../src/utils/array.js';
 
 /**
  * Setup.

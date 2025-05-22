@@ -1,9 +1,9 @@
-import {getImageDataData} from './dicomGenerator.js';
-
 import {
   getOrientationName,
   Orientation
-} from 'dwv';
+} from '../../src/math/orientation.js';
+
+import {getImageDataData} from './dicomGenerator.js';
 
 /**
  * MPRPixGenerator: generates pixel data from file

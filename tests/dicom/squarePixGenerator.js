@@ -1,8 +1,6 @@
-import {
-  Index,
-  getRectangleIndices,
-  getEllipseIndices
-} from 'dwv';
+import {Index} from '../../src/math/index.js';
+import {getRectangleIndices} from '../../src/math/rectangle.js';
+import {getEllipseIndices} from '../../src/math/ellipse.js';
 
 /**
  * Get an array find callback for an index.

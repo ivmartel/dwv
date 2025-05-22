@@ -1,8 +1,6 @@
 
-import {
-  getTypedArray,
-  getPixelDataTag
-} from 'dwv';
+import {getTypedArray} from '../../src/dicom/dicomParser.js';
+import {getPixelDataTag} from '../../src/dicom/dicomTag.js';
 
 import {
   BinaryPixGenerator

@@ -1,4 +1,4 @@
-import {Orientation} from 'dwv';
+import {Orientation} from '../../src/math/orientation.js';
 
 /**
  * Get the layer groups div ids from the data view configs.

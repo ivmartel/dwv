@@ -1,16 +1,18 @@
+import {logger} from '../../../src/utils/logger.js';
+import {
+  getUID,
+  DicomWriter,
+  getElementsFromJSONTags
+} from '../../../src/dicom/dicomWriter.js';
+import {
+  getOrientationName,
+  Orientation,
+} from '../../../src/math/orientation.js';
+
 import {
   generatePixelDataFromJSONTags,
   _pixelGenerators
 } from '../dicomGenerator.js';
-
-import {
-  logger,
-  getUID,
-  getOrientationName,
-  Orientation,
-  getElementsFromJSONTags,
-  DicomWriter
-} from 'dwv';
 
 // importing directly in generator.html seems to work...
 // import {JSZip} from 'JSZip';
