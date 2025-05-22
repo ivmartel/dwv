@@ -16,8 +16,14 @@
   },
   "type": "module",
   "sideEffects": false,
-  "exports": "./src/index.js",
-  "types": "dist/dwv.d.ts",
+  "main": "./dist/dwv.min.js",
+  "types": "./dist/dwv.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/dwv.min.js",
+      "types": "./dist/dwv.d.ts"
+    }
+  },
   "engines": {
     "node": ">= 14.0.0"
   },
