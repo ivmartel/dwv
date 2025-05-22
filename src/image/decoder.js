@@ -9,7 +9,7 @@ class JpegBaselineWorkerTask extends WorkerTask {
   }
   getWorker() {
     return new Worker(
-      new URL('../decoders/pdfjs/decode-jpegbaseline.js', import.meta.url),
+      new URL('../decoders/pdfjs/jpegbaseline.worker.js', import.meta.url),
       {
         name: 'jpegbaseline.worker'
       }
@@ -26,7 +26,7 @@ class JpegLosslessWorkerTask extends WorkerTask {
   }
   getWorker() {
     return new Worker(
-      new URL('../decoders/rii-mango/decode-jpegloss.js', import.meta.url),
+      new URL('../decoders/rii-mango/jpegloss.worker.js', import.meta.url),
       {
         name: 'jpegloss.worker'
       }
@@ -43,7 +43,7 @@ class Jpeg2000WorkerTask extends WorkerTask {
   }
   getWorker() {
     return new Worker(
-      new URL('../decoders/pdfjs/decode-jpeg2000.js', import.meta.url),
+      new URL('../decoders/pdfjs/jpeg2000.worker.js', import.meta.url),
       {
         name: 'jpeg2000.worker'
       }
@@ -60,7 +60,7 @@ class RleWorkerTask extends WorkerTask {
   }
   getWorker() {
     return new Worker(
-      new URL('../decoders/dwv/decode-rle.js', import.meta.url),
+      new URL('../decoders/dwv/rle.worker.js', import.meta.url),
       {
         name: 'rle.worker'
       }

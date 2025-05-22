@@ -58,7 +58,7 @@ class LabelingWorkerTask extends WorkerTask {
   }
   getWorker() {
     return new Worker(
-      new URL('./labelingWorker.js', import.meta.url),
+      new URL('./labeling.worker.js', import.meta.url),
       {
         name: 'labeling.worker'
       }
