@@ -255,10 +255,8 @@ class WorkerThread {
    * Finish a task and tell the parent.
    */
   stop() {
-    console.log('thread stop');
     // stop the worker
     if (typeof this.worker !== 'undefined') {
-      console.log('worker stop');
       this.worker.terminate();
       // force create at next run
       this.worker = undefined;
