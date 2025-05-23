@@ -6,11 +6,6 @@
 export class ThreadPool {
 
   /**
-   * @type {number}
-   */
-  poolSize;
-
-  /**
    * @param {number} poolSize The size of the pool.
    */
   constructor(poolSize) {
@@ -31,7 +26,7 @@ export class ThreadPool {
    * Add a worker task to the queue.
    * Will be run when a thread is made available.
    *
-   * @param {WorkerTask} workerTask The task to add to the queue.
+   * @param {object} workerTask The task to add to the queue.
    */
   addWorkerTask(workerTask) {
     // send work start if first task
@@ -66,7 +61,7 @@ export class ThreadPool {
   /**
    * Handle a task end.
    *
-   * @param {WorkerThread} workerThread The thread to free.
+   * @param {object} workerThread The thread to free.
    */
   onTaskEnd(workerThread) {
     // launch next task in queue or finish
@@ -191,27 +186,7 @@ export class ThreadPool {
 class WorkerThread {
 
   /**
-   * @type {string}
-   */
-  id;
-
-  /**
-   * @type {ThreadPool}
-   */
-  parentPool;
-
-  /**
-   * @type {WorkerTask}
-   */
-  runningTask;
-
-  /**
-   * @type {Worker}
-   */
-  worker;
-
-  /**
-   * @param {ThreadPool} parentPool The parent pool.
+   * @param {object} parentPool The parent pool.
    */
   constructor(parentPool) {
     this.parentPool = parentPool;
@@ -235,7 +210,7 @@ class WorkerThread {
   /**
    * Run a worker task.
    *
-   * @param {WorkerTask} workerTask The task to run.
+   * @param {object} workerTask The task to run.
    */
   run(workerTask) {
     // store task
