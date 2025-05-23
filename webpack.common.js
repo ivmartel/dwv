@@ -8,6 +8,7 @@ export const webpackCommon = {
   },
   output: {
     filename: '[name].min.js',
+    chunkFilename: 'assets/workers/[name].min.js',
     library: {
       type: 'module'
     },
@@ -16,7 +17,7 @@ export const webpackCommon = {
     },
     path: path.resolve(__dirname, 'dist'),
     clean: true,
-    workerPublicPath: '/assets/'
+    //workerPublicPath: '/assets/'
   },
   experiments: {
     outputModule: true, // Enable ESM output

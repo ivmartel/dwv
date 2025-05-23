@@ -21,10 +21,6 @@ export default merge(webpackCommon, {
     open: '/tests',
     static: [
       {
-        directory: './dist',
-        publicPath: '/assets'
-      },
-      {
         directory: './tests',
         publicPath: '/tests'
       },
