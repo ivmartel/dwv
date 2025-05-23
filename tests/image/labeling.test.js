@@ -1,19 +1,22 @@
 import {Size} from '../../src/image/size.js';
+import {LabelingFilter} from '../../src/image/labelingFilter.js';
 import {generateWorkerMessage} from '../../src/image/labelingThread.js';
 
 /**
- * Tests for the 'image/labelingWorker.js' file.
+ * Tests for the 'image/LabelingFilter.js' file.
  */
 
 /* global QUnit */
 QUnit.module('image');
 
 /**
- * Tests for {@link LabelingWorker}.
+ * Tests for {@link LabelingFilter}.
  *
- * @function module:tests/image~labelingWorker-class
+ * @function module:tests/image~LabelingFilter-class
  */
-QUnit.test('LabelingWorker class', function (assert) {
+QUnit.test('LabelingFilter class', function (assert) {
+  const labelingFilter = new LabelingFilter();
+
   // Basic labels
   const imgSize0 = new Size([3, 3, 2]);
   /* eslint-disable @stylistic/js/array-element-newline */
@@ -28,7 +31,7 @@ QUnit.test('LabelingWorker class', function (assert) {
   /* eslint-enable @stylistic/js/array-element-newline */
 
   const imgEvent0 = generateWorkerMessage(imgBuffer0, imgSize0);
-  const labels0 = self.labelingWorker.calculateFromEvent(imgEvent0);
+  const labels0 = labelingFilter.run(imgEvent0);
 
   assert.notStrictEqual(
     typeof labels0,
@@ -70,7 +73,7 @@ QUnit.test('LabelingWorker class', function (assert) {
   /* eslint-enable @stylistic/js/array-element-newline */
 
   const imgEvent1 = generateWorkerMessage(imgBuffer1, imgSize1);
-  const labels1 = self.labelingWorker.calculateFromEvent(imgEvent1);
+  const labels1 = labelingFilter.run(imgEvent1);
 
   assert.notStrictEqual(
     typeof labels1,

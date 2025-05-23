@@ -14,7 +14,6 @@ export default function (config) {
     frameworks: ['qunit', 'webpack'],
     files: [
       {pattern: 'tests/**/*.test.js', watched: false},
-      {pattern: 'src/image/labeling.worker.js', watched: false},
     ],
     client: {
       clearContext: false,
