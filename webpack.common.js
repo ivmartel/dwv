@@ -7,7 +7,9 @@ export const webpackCommon = {
     dwv: './src/index.js'
   },
   output: {
+    // main bundle output
     filename: '[name].min.js',
+    // web workers output
     chunkFilename: 'assets/workers/[name].min.js',
     library: {
       type: 'module'
@@ -16,9 +18,14 @@ export const webpackCommon = {
       module: true
     },
     path: path.resolve(__dirname, 'dist'),
-    clean: true
+    // clean output folder at each build
+    clean: true,
+    // web workers public path
+    // (otherwise clients look in the file system)
+    workerPublicPath: '/'
   },
   experiments: {
+    // module is still experimental
     outputModule: true
   }
 };
