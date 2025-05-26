@@ -40,7 +40,7 @@
     "@babel/preset-env": "^7.27.1",
     "@eslint/js": "^9.26.0",
     "@microsoft/api-extractor": "^7.52.7",
-    "@stylistic/eslint-plugin-js": "^3.1.0",
+    "@stylistic/eslint-plugin-js": "^4.4.0",
     "babel-loader": "^9.2.1",
     "babel-plugin-istanbul": "^7.0.0",
     "benchmark": "^2.1.4",
