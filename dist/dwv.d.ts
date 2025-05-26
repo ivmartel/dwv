@@ -1312,16 +1312,6 @@ export declare class DataElement {
 }
 
 /**
- * Decoder scripts to be passed to web workers for image decoding.
- */
-export declare const decoderScripts: {
-    jpeg2000: string;
-    'jpeg-lossless': string;
-    'jpeg-baseline': string;
-    rle: string;
-};
-
-/**
  * Delete segment command.
  */
 export declare class DeleteSegmentCommand {

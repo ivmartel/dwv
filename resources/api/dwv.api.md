@@ -283,14 +283,6 @@ export class DataElement {
 }
 
 // @public
-export const decoderScripts: {
-    jpeg2000: string;
-    'jpeg-lossless': string;
-    'jpeg-baseline': string;
-    rle: string;
-};
-
-// @public
 export class DeleteSegmentCommand {
     constructor(mask: Image_2, segment: MaskSegment, silent?: boolean);
     execute(): void;
