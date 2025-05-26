@@ -1,5 +1,5 @@
 /**
- * Web worker for calculating labels.
+ * Filter for calculating labels.
  *
  * Labels a buffer using the Hoshen–Kopelman
  * algorithm to first label all of the connected components, then does
@@ -10,7 +10,7 @@
  *
  * Ref: {@link https://en.wikipedia.org/wiki/Hoshen%E2%80%93Kopelman_algorithm}.
  */
-class LabelingWorker {
+export class LabelingFilter {
   /**
    * The last known image size.
    *
@@ -31,9 +31,6 @@ class LabelingWorker {
    * @type {Int32Array}
    */
   #labels;
-
-
-  constructor() {}
 
   /**
    * Union-find find operation.
@@ -85,7 +82,7 @@ class LabelingWorker {
    * @param {number[]} sizes The image dimensions.
    * @param {number} totalSize The total length of the buffer.
    */
-  regenerateLabels(buffer, unitVectors, sizes, totalSize) {
+  #regenerateLabels(buffer, unitVectors, sizes, totalSize) {
     // If we are re-calcing the labels of the same sized image as last time we
     // can save a little time on re-initializing memory. Makes it slightly
     // faster to use a seperate worker object per segmentation, at the
@@ -296,14 +293,20 @@ class LabelingWorker {
     return labelsInfo;
   }
 
-  calculateFromEvent(data) {
+  /**
+   * Run the filter.
+   *
+   * @param {object} data The input data.
+   * @returns {object[]} The list of quantified labels.
+   */
+  run(data) {
     const imageBuffer = data.imageBuffer;
     const unitVectors = data.unitVectors;
     const sizes = data.sizes;
     const totalSize = data.totalSize;
 
     // generate labels
-    this.regenerateLabels(
+    this.#regenerateLabels(
       imageBuffer,
       unitVectors,
       sizes,
@@ -318,19 +321,4 @@ class LabelingWorker {
 
     return labelsInfo;
   }
-}
-
-const labelingWorker = new LabelingWorker();
-
-// Are we in a web worker?
-if (typeof window === 'undefined' || window !== window.window) {
-  self.addEventListener('message', function (event) {
-    self.postMessage({
-      labels: labelingWorker.calculateFromEvent(event.data)
-    });
-  });
-
-// If not we are in a unit test
-} else {
-  self.labelingWorker = labelingWorker;
-}
+} // class labelingFilter

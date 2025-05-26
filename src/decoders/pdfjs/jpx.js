@@ -1,3 +1,12 @@
+/* eslint-disable */
+
+/**
+ * Modified for dwv:
+ * - export root var,
+ * - remove old style import/export and
+ *   related (for ex 'use strict').
+ */
+
 /* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright 2012 Mozilla Foundation
@@ -14,12 +23,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* globals ArithmeticDecoder, globalScope, log2, readUint16, readUint32,
-           info, warn */
 
-'use strict';
+import {ArithmeticDecoder} from './arithmetic_decoder.js';
+import {log2, readUint16, readUint32, info, warn} from './util.js';
 
-var JpxImage = (function JpxImageClosure() {
+export var JpxImage = (function JpxImageClosure() {
   // Table E.1
   var SubbandsGainLog2 = {
     'LL': 0,
@@ -2234,4 +2242,3 @@ var JpxImage = (function JpxImageClosure() {
 
   return JpxImage;
 })();
-

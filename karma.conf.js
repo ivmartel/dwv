@@ -1,16 +1,19 @@
+import {webpackTest} from './webpack.test.js';
+
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/6.4/config/configuration-file.html
 
-const path = require('path');
-const webpackTest = require('./webpack.test.js');
-
-module.exports = function (config) {
+/**
+ * Get the Karma config for dwv.
+ *
+ * @param {object} config The Karma configuration.
+ */
+export default function (config) {
   config.set({
     basePath: '.',
     frameworks: ['qunit', 'webpack'],
     files: [
       {pattern: 'tests/**/*.test.js', watched: false},
-      {pattern: 'src/image/labelingWorker.js', watched: false},
     ],
     client: {
       clearContext: false,
@@ -24,7 +27,7 @@ module.exports = function (config) {
       'tests/**/*.test.js': ['webpack']
     },
     coverageReporter: {
-      dir: path.join(__dirname, './build/coverage/'),
+      dir: './build/coverage/',
       reporters: [
         {type: 'html', subdir: 'report-html'},
         {type: 'text-summary'}

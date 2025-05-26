@@ -1,19 +1,31 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {logger} from '../../../src/utils/logger.js';
+import {
+  getUID,
+  DicomWriter,
+  getElementsFromJSONTags
+} from '../../../src/dicom/dicomWriter.js';
+import {
+  getOrientationName,
+  Orientation,
+} from '../../../src/math/orientation.js';
 
-// namespaces
-// eslint-disable-next-line no-var
-var test = test || {};
-// eslint-disable-next-line no-var
-var JSZip = JSZip || {};
+import {
+  generatePixelDataFromJSONTags,
+  _pixelGenerators
+} from '../dicomGenerator.js';
 
-// call setup on DOM loaded
-document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
+// importing directly in generator.html seems to work...
+// import {JSZip} from 'JSZip';
+
+// global vars
+let _tagsFile = null;
+let _images = null;
+let _generating = false;
 
 /**
  * Setup.
  */
-function onDOMContentLoaded() {
+function setup() {
   const intagsfileInput = document.getElementById('intagsfile');
   intagsfileInput.onchange = onInputTagsFile;
   const jsonlintButton = document.getElementById('jsonlint');
@@ -37,32 +49,27 @@ function onDOMContentLoaded() {
       now.getSeconds().toString().padStart(2, '0');
     // UID
     if (typeof tags.StudyInstanceUID === 'undefined') {
-      tags.StudyInstanceUID = dwv.getUID('StudyInstanceUID');
+      tags.StudyInstanceUID = getUID('StudyInstanceUID');
       tags.StudyID = 10000;
     }
     if (typeof tags.StudyDescription === 'undefined') {
       tags.StudyDescription = 'dwv generated data';
     }
     if (typeof tags.SeriesInstanceUID === 'undefined') {
-      tags.SeriesInstanceUID = dwv.getUID('SeriesInstanceUID');
+      tags.SeriesInstanceUID = getUID('SeriesInstanceUID');
       tags.SeriesNumber = tags.StudyID + 10;
     }
     if (typeof tags.SeriesDescription === 'undefined') {
       tags.SeriesDescription = 'Test data #0';
     }
-    tags.SOPInstanceUID = dwv.getUID('SOPInstanceUID');
+    tags.SOPInstanceUID = getUID('SOPInstanceUID');
     // write back
     document.getElementById('tags').value = JSON.stringify(tags, null, 2);
   }
 
   // logger level (optional)
-  dwv.logger.level = dwv.logger.levels.DEBUG;
+  logger.level = logger.levels.DEBUG;
 }
-
-// tags file
-let _tagsFile = null;
-let _images = null;
-let _generating = false;
 
 /**
  * @returns {string} The name of the selected pixel generator.
@@ -87,6 +94,8 @@ function onGenerate() {
   }
   const pixelGeneratorName = getPixelGeneratorName();
 
+  // imported directly in generator.html, seems to work...
+  // eslint-disable-next-line no-undef
   const zip = new JSZip();
 
   const numberOfSlices = document.getElementById('numberofslices').value;
@@ -147,25 +156,25 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
     sliceSpacing = tags.PixelSpacing[0];
   }
   const orientationName =
-    dwv.getOrientationName(tags.ImageOrientationPatient);
-  if (orientationName === dwv.Orientation.Axial) {
+    getOrientationName(tags.ImageOrientationPatient);
+  if (orientationName === Orientation.Axial) {
     tags.ImagePositionPatient = [0, 0, sliceNumber * sliceSpacing];
-  } else if (orientationName === dwv.Orientation.Coronal) {
+  } else if (orientationName === Orientation.Coronal) {
     tags.ImagePositionPatient = [0, sliceNumber * sliceSpacing, 0];
-  } else if (orientationName === dwv.Orientation.Sagittal) {
+  } else if (orientationName === Orientation.Sagittal) {
     tags.ImagePositionPatient = [sliceNumber * sliceSpacing, 0, 0];
   }
   // instance number
   tags.SOPInstanceUID = tags.SOPInstanceUID + '.' + sliceNumber;
   tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
-  const dicomElements = dwv.getElementsFromJSONTags(tags);
+  const dicomElements = getElementsFromJSONTags(tags);
   // pixels
-  dicomElements['7FE00010'] = test.generatePixelDataFromJSONTags(
+  dicomElements['7FE00010'] = generatePixelDataFromJSONTags(
     tags, pixelGeneratorName, sliceNumber, _images, numberOfSlices);
 
   // create writer
-  const writer = new dwv.DicomWriter();
+  const writer = new DicomWriter();
   const dicomBuffer = writer.getBuffer(dicomElements);
 
   // view as Blob to allow download
@@ -249,8 +258,8 @@ function onInputImageFiles(event) {
     return false;
   };
   const pixGeneratorName = getPixelGeneratorName();
-  if (typeof test.pixelGenerators[pixGeneratorName] !== 'undefined') {
-    checkTags = test.pixelGenerators[pixGeneratorName].checkTags;
+  if (typeof _pixelGenerators[pixGeneratorName] !== 'undefined') {
+    checkTags = _pixelGenerators[pixGeneratorName].checkTags;
   }
 
   /**
@@ -307,3 +316,8 @@ function onInputImageFiles(event) {
     reader.readAsDataURL(file);
   }
 }
+
+// ---------------------------------------------
+
+// launch
+setup();

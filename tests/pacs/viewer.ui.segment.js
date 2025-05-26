@@ -1,12 +1,26 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {DicomWriter} from '../../src/dicom/dicomWriter.js';
+import {
+  rgbToHex,
+  hexToRgb,
+} from '../../src/utils/colour.js';
+import {logger} from '../../src/utils/logger.js';
+import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
+import {MaskFactory} from '../../src/image/maskFactory.js';
+import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
+import {MaskSegmentViewHelper} from '../../src/image/maskSegmentViewHelper.js';
+import {
+  ChangeSegmentColourCommand
+} from '../../src/image/changeSegmentColourCommand.js';
+import {
+  DeleteSegmentCommand
+} from '../../src/image/deleteSegmentCommand.js';
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-test.dataModelUI = test.dataModelUI || {};
+import {
+  getHtmlId,
+  getRootFromHtmlId
+} from './viewer.ui.js';
 
-//
+// global vars
 const _colours = [
   {r: 255, g: 0, b: 0},
   {r: 0, g: 255, b: 0},
@@ -32,7 +46,7 @@ const _colours = [
 ];
 // colour array to pick from
 let _coloursPick = _colours.slice();
-
+// segmentation
 const _segmentations = [];
 
 /**
@@ -81,8 +95,8 @@ function getNewSegment(number) {
     label: 's' + number,
     displayRGBValue: nextColour(),
     displayValue: undefined,
-    propertyCategoryCode: dwv.getSegmentationCode(),
-    propertyTypeCode: dwv.getSegmentationCode(),
+    propertyCategoryCode: getSegmentationCode(),
+    propertyTypeCode: getSegmentationCode(),
     trackingId: undefined,
     trackingUid: undefined
   };
@@ -113,7 +127,7 @@ const prefixes = {
  * @returns {string} The segmentation HTML id.
  */
 function getSegmentationHtmlId(segmentationIndex) {
-  return test.getHtmlId(prefixes.segmentation, segmentationIndex);
+  return getHtmlId(prefixes.segmentation, segmentationIndex);
 }
 
 /**
@@ -123,7 +137,7 @@ function getSegmentationHtmlId(segmentationIndex) {
  * @returns {number} The segmentation index.
  */
 function splitSegmentationHtmlId(segmentationName) {
-  const indexStr = test.getRootFromHtmlId(
+  const indexStr = getRootFromHtmlId(
     prefixes.segmentation, segmentationName);
   return parseInt(indexStr, 10);
 }
@@ -136,7 +150,7 @@ function splitSegmentationHtmlId(segmentationName) {
  * @returns {string} The segment HTML id.
  */
 function getSegmentHtmlId(segmentNumber, segmentationIndex) {
-  const segmentName = test.getHtmlId(prefixes.segment, segmentNumber);
+  const segmentName = getHtmlId(prefixes.segment, segmentNumber);
   const segmentationName = getSegmentationHtmlId(segmentationIndex);
   return segmentName + '-' + segmentationName;
 }
@@ -149,7 +163,7 @@ function getSegmentHtmlId(segmentNumber, segmentationIndex) {
  */
 function splitSegmentHtmlId(segmentId) {
   const split = segmentId.split('-');
-  const numberStr = test.getRootFromHtmlId(prefixes.segment, split[0]);
+  const numberStr = getRootFromHtmlId(prefixes.segment, split[0]);
   return {
     segmentNumber: parseInt(numberStr, 10),
     segmentationIndex: splitSegmentationHtmlId(split[1])
@@ -158,20 +172,28 @@ function splitSegmentHtmlId(segmentId) {
 
 /**
  * Segmentation UI.
- *
- * @param {object} app The associated application.
  */
-test.dataModelUI.Segmentation = function (app) {
-  const watching = {};
+export class SegmentationUI {
+
+  #watching = {};
+
+  #app;
+
+  /**
+   * @param {object} app The associated application.
+   */
+  constructor(app) {
+    this.#app = app;
+  }
 
   /**
    * Watch a data for changes.
    *
    * @param {string} dataId The data ID.
    */
-  function watchData(dataId) {
-    if (!watching[dataId]) {
-      const maskData = app.getData(dataId);
+  #watchData(dataId) {
+    if (!this.#watching[dataId]) {
+      const maskData = this.#app.getData(dataId);
       if (!maskData) {
         throw new Error(
           'No data to watch for dataId: ' + dataId
@@ -192,14 +214,14 @@ test.dataModelUI.Segmentation = function (app) {
 
           if (typeof segmentation !== 'undefined') {
             segmentation.labels = event.labels;
-            updateLabelsSpan(segmentation);
+            this.#updateLabelsSpan(segmentation);
           }
         }
       );
 
       image.recalculateLabels();
 
-      watching[dataId] = true;
+      this.#watching[dataId] = true;
     } else {
       console.log('Already watching data', dataId);
     }
@@ -208,8 +230,8 @@ test.dataModelUI.Segmentation = function (app) {
   /**
    * Bind app to ui.
    */
-  this.registerListeners = function () {
-    app.addEventListener('dataadd', onDataAdd);
+  registerListeners() {
+    this.#app.addEventListener('dataadd', this.#onDataAdd);
   };
 
   /**
@@ -217,9 +239,10 @@ test.dataModelUI.Segmentation = function (app) {
    *
    * @param {object} segmentation The segmentation.
    */
-  function addSegmentationHtml(segmentation) {
+  #addSegmentationHtml(segmentation) {
     // segmentation as html
-    const item = getSegmentationHtml(segmentation, _segmentations.length - 1);
+    const item =
+      this.#getSegmentationHtml(segmentation, _segmentations.length - 1);
 
     // add segmentation item
     const addItem = document.getElementById('addsegmentationitem');
@@ -237,21 +260,21 @@ test.dataModelUI.Segmentation = function (app) {
    *
    * @param {object} event The dataadd event.
    */
-  function onDataAdd(event) {
+  #onDataAdd = (event) => {
     const dataId = event.dataid;
-    const maskImage = app.getData(dataId).image;
+    const maskImage = this.#app.getData(dataId).image;
 
     if (typeof maskImage !== 'undefined' &&
       maskImage.getMeta().Modality === 'SEG') {
       // setup html if needed
       if (!document.getElementById('segmentation-list')) {
-        setupHtml();
+        this.#setupHtml();
       }
 
-      const segHelper = new dwv.MaskSegmentHelper(maskImage);
+      const segHelper = new MaskSegmentHelper(maskImage);
       if (segHelper.getNumberOfSegments() === 0) {
         // manually created segmentation with no segments
-        const selectSegmentCheckedId = getSelectSegmentCheckedId();
+        const selectSegmentCheckedId = this.#getSelectSegmentCheckedId();
         if (typeof selectSegmentCheckedId === 'undefined') {
           // default segment created at first brush
           const segmentNumber = 1;
@@ -264,21 +287,21 @@ test.dataModelUI.Segmentation = function (app) {
             hasNewSegments: false,
             segments: [segment],
             selectedSegmentNumber: segmentNumber,
-            viewHelper: new dwv.MaskSegmentViewHelper()
+            viewHelper: new MaskSegmentViewHelper()
           };
-          watchData(dataId);
+          this.#watchData(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
-          addSegmentationHtml(segmentation);
+          this.#addSegmentationHtml(segmentation);
         } else {
           const indices = splitSegmentHtmlId(
-            test.getRootFromHtmlId(prefixes.select, selectSegmentCheckedId));
+            getRootFromHtmlId(prefixes.select, selectSegmentCheckedId));
           const segmentation = _segmentations[indices.segmentationIndex];
           // segmentation created with add segmentation
           if (typeof segmentation.dataId === 'undefined') {
             segmentation.dataId = dataId;
-            watchData(dataId);
+            this.#watchData(dataId);
             for (const segment of segmentation.segments) {
               segHelper.addSegment(segment);
             }
@@ -295,13 +318,13 @@ test.dataModelUI.Segmentation = function (app) {
             labels: [],
             hasNewSegments: true,
             segments: imgMeta.custom.segments,
-            viewHelper: new dwv.MaskSegmentViewHelper()
+            viewHelper: new MaskSegmentViewHelper()
           };
-          watchData(dataId);
+          this.#watchData(dataId);
           // add to list
           _segmentations.push(segmentation);
           // add to html
-          addSegmentationHtml(segmentation);
+          this.#addSegmentationHtml(segmentation);
 
           // remove colour from colour pick
           for (const segment of imgMeta.custom.segments) {
@@ -316,19 +339,19 @@ test.dataModelUI.Segmentation = function (app) {
         }
       }
     }
-  }
+  };
 
   /**
    * Setup the html for the segmentation list.
    */
-  function setupHtml() {
+  #setupHtml() {
     // segmentation list
     const segList = document.createElement('ul');
     segList.id = 'segmentation-list';
 
     // loop on segmentations
     for (let i = 0; i < _segmentations.length; ++i) {
-      const segmentationItem = getSegmentationHtml(_segmentations[i], i);
+      const segmentationItem = this.#getSegmentationHtml(_segmentations[i], i);
       segList.appendChild(segmentationItem);
     }
 
@@ -338,19 +361,19 @@ test.dataModelUI.Segmentation = function (app) {
     const addSegmentationButton = document.createElement('button');
     addSegmentationButton.appendChild(
       document.createTextNode('Add segmentation'));
-    addSegmentationButton.onclick = function (/*event*/) {
+    addSegmentationButton.onclick = (/*event*/) => {
       // new segmentation
       const segmentation = {
         dataId: undefined,
         labels: [],
         hasNewSegments: true,
         segments: [getNewSegment(1)],
-        viewHelper: new dwv.MaskSegmentViewHelper()
+        viewHelper: new MaskSegmentViewHelper()
       };
       // add to list
       _segmentations.push(segmentation);
       // add to html
-      addSegmentationHtml(segmentation);
+      this.#addSegmentationHtml(segmentation);
     };
     addItem.appendChild(addSegmentationButton);
 
@@ -380,14 +403,14 @@ test.dataModelUI.Segmentation = function (app) {
    * @param {number} segmentNumber The segment number.
    * @param {object} segmentation The segmentation.
    */
-  function appSelectSegment(segmentNumber, segmentation) {
+  #appSelectSegment(segmentNumber, segmentation) {
     segmentation.selectedSegmentNumber = segmentNumber;
 
     // add segment if not present
-    const data = app.getData(segmentation.dataId);
+    const data = this.#app.getData(segmentation.dataId);
     if (typeof data !== 'undefined') {
       const maskImage = data.image;
-      const segHelper = new dwv.MaskSegmentHelper(maskImage);
+      const segHelper = new MaskSegmentHelper(maskImage);
       // add segment to mask
       if (!segHelper.hasSegment(segmentNumber)) {
         console.log('Add segment', segmentNumber);
@@ -410,7 +433,7 @@ test.dataModelUI.Segmentation = function (app) {
       features.createMask = true;
     }
     console.log('set tool features [add]', features);
-    app.setToolFeatures(features);
+    this.#app.setToolFeatures(features);
   }
 
   /**
@@ -418,7 +441,7 @@ test.dataModelUI.Segmentation = function (app) {
    *
    * @param {object} segmentation The segmentation.
    */
-  function appSelectEraser(segmentation) {
+  #appSelectEraser(segmentation) {
     // app features
     const features = {
       brushMode: 'del',
@@ -428,7 +451,7 @@ test.dataModelUI.Segmentation = function (app) {
       features.maskDataId = segmentation.dataId;
     }
     console.log('set tool features [del]', features);
-    app.setToolFeatures(features);
+    this.#app.setToolFeatures(features);
   }
 
   /**
@@ -436,41 +459,41 @@ test.dataModelUI.Segmentation = function (app) {
    *
    * @param {Event} event HTML event.
    */
-  function onSegmentSelect(event) {
+  #onSegmentSelect = (event) => {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      test.getRootFromHtmlId(prefixes.select, target.id));
+      getRootFromHtmlId(prefixes.select, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     // select it
-    appSelectSegment(indices.segmentNumber, segmentation);
-  }
+    this.#appSelectSegment(indices.segmentNumber, segmentation);
+  };
 
   /**
    * Handle a segment colour change from UI.
    *
    * @param {Event} event HTML event.
    */
-  function onSegmentColourChange(event) {
+  #onSegmentColourChange = (event) => {
     const target = event.target;
     const newHexColour = target.value;
     // get segment
     const indices = splitSegmentHtmlId(
-      test.getRootFromHtmlId(prefixes.colour, target.id));
+      getRootFromHtmlId(prefixes.colour, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
-    const segmentHexColour = dwv.rgbToHex(segment.displayRGBValue);
+    const segmentHexColour = rgbToHex(segment.displayRGBValue);
 
     if (newHexColour !== segmentHexColour) {
       // update colours
-      const newRgbColour = dwv.hexToRgb(newHexColour);
+      const newRgbColour = hexToRgb(newHexColour);
       // get segment and mask
-      const maskData = app.getData(segmentation.dataId);
+      const maskData = this.#app.getData(segmentation.dataId);
       // change if possible
       if (typeof maskData !== 'undefined') {
         // create change colour command
         const previousColour = segment.displayRGBValue;
-        const chgCmd = new dwv.ChangeSegmentColourCommand(
+        const chgCmd = new ChangeSegmentColourCommand(
           maskData.image, segment, newRgbColour);
         chgCmd.onExecute = function (/*event*/) {
           // not needed the first time but on undo/redo
@@ -478,32 +501,32 @@ test.dataModelUI.Segmentation = function (app) {
         };
         chgCmd.onUndo = function () {
           // not needed the first time but on undo/redo
-          target.value = dwv.rgbToHex(previousColour);
+          target.value = rgbToHex(previousColour);
         };
         // execute command
         if (chgCmd.isValid()) {
           chgCmd.execute();
-          app.addToUndoStack(chgCmd);
+          this.#app.addToUndoStack(chgCmd);
         }
       }
 
       // update segment
       segment.displayRGBValue = newRgbColour;
       // pass updated color to brush
-      appSelectSegment(indices.segmentNumber, segmentation);
+      this.#appSelectSegment(indices.segmentNumber, segmentation);
     }
-  }
+  };
 
   /**
    * Handle a goto segment.
    *
    * @param {MouseEvent} event HTML event.
    */
-  function onGotoSegment(event) {
+  #onGotoSegment = (event) => {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      test.getRootFromHtmlId(prefixes.goto, target.id));
+      getRootFromHtmlId(prefixes.goto, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
 
@@ -515,25 +538,25 @@ test.dataModelUI.Segmentation = function (app) {
 
     if (typeof label !== 'undefined') {
       const dataId = segmentation.dataId;
-      const drawLayers = app.getViewLayersByDataId(dataId);
+      const drawLayers = this.#app.getViewLayersByDataId(dataId);
       for (const layer of drawLayers) {
         layer.setCurrentPosition(label.centroid);
       }
     } else {
       console.log('No label for this segment');
     }
-  }
+  };
 
   /**
    * Handle a segment view change from UI.
    *
    * @param {MouseEvent} event HTML event.
    */
-  function onSegmentViewChange(event) {
+  #onSegmentViewChange = (event) => {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      test.getRootFromHtmlId(prefixes.view, target.id));
+      getRootFromHtmlId(prefixes.view, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segment = getSegment(indices.segmentNumber, segmentation.segments);
     // toggle hidden
@@ -547,7 +570,7 @@ test.dataModelUI.Segmentation = function (app) {
       segViewHelper.addToHidden(segment.number);
     }
     // apply hidden
-    const vls = app.getViewLayersByDataId(segmentation.dataId);
+    const vls = this.#app.getViewLayersByDataId(segmentation.dataId);
     if (vls.length === 0) {
       console.warn('No layers to show/hide seg');
     }
@@ -555,25 +578,25 @@ test.dataModelUI.Segmentation = function (app) {
       const vc = vl.getViewController();
       vc.setViewAlphaFunction(segViewHelper.getAlphaFunc());
     }
-  }
+  };
 
   /**
    * Handle a segment delete from UI.
    *
    * @param {MouseEvent} event HTML event.
    */
-  function onSegmentDelete(event) {
+  #onSegmentDelete = (event) => {
     const target = event.target;
     // get segment
     const indices = splitSegmentHtmlId(
-      test.getRootFromHtmlId(prefixes.delete, target.id));
+      getRootFromHtmlId(prefixes.delete, target.id));
     const segmentation = _segmentations[indices.segmentationIndex];
     const segmentId = getSegmentHtmlId(
       indices.segmentNumber, indices.segmentationIndex);
 
     // get segment divs
     const segmentSpan = document.getElementById(
-      test.getHtmlId(prefixes.span, segmentId)
+      getHtmlId(prefixes.span, segmentId)
     );
     if (!segmentSpan) {
       throw new Error('No delete span');
@@ -585,13 +608,13 @@ test.dataModelUI.Segmentation = function (app) {
     const spanNext = segmentSpan.nextSibling;
 
     // get mask
-    const data = app.getData(segmentation.dataId);
+    const data = this.#app.getData(segmentation.dataId);
     // delete if possible
     if (typeof data !== 'undefined') {
       const segment =
         getSegment(indices.segmentNumber, segmentation.segments);
       // create delete command
-      const delCmd = new dwv.DeleteSegmentCommand(data.image, segment);
+      const delCmd = new DeleteSegmentCommand(data.image, segment);
       delCmd.onExecute = function () {
         segmentSpan.remove();
         if (segmentation.viewHelper.isHidden(segment.number)) {
@@ -604,13 +627,13 @@ test.dataModelUI.Segmentation = function (app) {
       // execute command
       if (delCmd.isValid()) {
         delCmd.execute();
-        app.addToUndoStack(delCmd);
+        this.#app.addToUndoStack(delCmd);
       }
     } else {
       segmentSpan.remove();
     }
 
-    watchData(segmentation.dataId);
+    this.#watchData(segmentation.dataId);
 
     // select first segment
     const spanChildren = spanParent.childNodes;
@@ -627,14 +650,14 @@ test.dataModelUI.Segmentation = function (app) {
         break;
       }
     }
-  }
+  };
 
   /**
    * Get the id of the select segment checked input.
    *
    * @returns {string} The input id.
    */
-  function getSelectSegmentCheckedId() {
+  #getSelectSegmentCheckedId() {
     let id;
     const selectInputs = document.querySelectorAll(
       'input[type=\'radio\'][name=\'select-segment\']'
@@ -655,20 +678,20 @@ test.dataModelUI.Segmentation = function (app) {
    * @param {number} segmentationIndex The segmentation index.
    * @returns {HTMLSpanElement} THe HTML element.
    */
-  function getSegmentHtml(segment, segmentationIndex) {
+  #getSegmentHtml(segment, segmentationIndex) {
     const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
 
     // segment select
     const selectInput = document.createElement('input');
     selectInput.type = 'radio';
     selectInput.name = 'select-segment';
-    selectInput.id = test.getHtmlId(prefixes.select, segmentId);
+    selectInput.id = getHtmlId(prefixes.select, segmentId);
     selectInput.title = segmentId;
-    selectInput.onchange = onSegmentSelect;
+    selectInput.onchange = this.#onSegmentSelect;
 
     if (segment.number === 1) {
       selectInput.checked = true;
-      appSelectSegment(segment.number, _segmentations[segmentationIndex]);
+      this.#appSelectSegment(segment.number, _segmentations[segmentationIndex]);
     }
 
     const selectLabel = document.createElement('label');
@@ -678,42 +701,42 @@ test.dataModelUI.Segmentation = function (app) {
 
     // volumes display
     const volumesSpan = document.createElement('span');
-    volumesSpan.id = test.getHtmlId(prefixes.volumes, segmentId);
-    volumesSpan.innerText = getLabelsString(segment, segmentationIndex);
+    volumesSpan.id = getHtmlId(prefixes.volumes, segmentId);
+    volumesSpan.innerText = this.#getLabelsString(segment, segmentationIndex);
 
     // segment colour
     const colourInput = document.createElement('input');
     colourInput.type = 'color';
     colourInput.title = 'Change segment colour';
-    colourInput.id = test.getHtmlId(prefixes.colour, segmentId);
-    colourInput.value = dwv.rgbToHex(segment.displayRGBValue);
-    colourInput.onchange = onSegmentColourChange;
+    colourInput.id = getHtmlId(prefixes.colour, segmentId);
+    colourInput.value = rgbToHex(segment.displayRGBValue);
+    colourInput.onchange = this.#onSegmentColourChange;
 
     // segment view
     const viewButton = document.createElement('button');
     viewButton.style.borderStyle = 'outset';
-    viewButton.id = test.getHtmlId(prefixes.view, segmentId);
+    viewButton.id = getHtmlId(prefixes.view, segmentId);
     viewButton.title = 'Show/hide segment';
     viewButton.appendChild(document.createTextNode('\u{1F441}\u{FE0F}'));
-    viewButton.onclick = onSegmentViewChange;
+    viewButton.onclick = this.#onSegmentViewChange;
 
     // goto segment
     const gotoButton = document.createElement('button');
-    gotoButton.id = test.getHtmlId(prefixes.goto, segmentId);
+    gotoButton.id = getHtmlId(prefixes.goto, segmentId);
     gotoButton.title = 'Goto segment';
     gotoButton.appendChild(document.createTextNode('\u{1F3AF}'));
-    gotoButton.onclick = onGotoSegment;
+    gotoButton.onclick = this.#onGotoSegment;
 
     // segment delete
     const deleteButton = document.createElement('button');
-    deleteButton.id = test.getHtmlId(prefixes.delete, segmentId);
+    deleteButton.id = getHtmlId(prefixes.delete, segmentId);
     deleteButton.title = 'Delete segment';
     deleteButton.appendChild(document.createTextNode('\u{274C}'));
-    deleteButton.onclick = onSegmentDelete;
+    deleteButton.onclick = this.#onSegmentDelete;
 
     // segment span
     const span = document.createElement('span');
-    span.id = test.getHtmlId(prefixes.span, segmentId);
+    span.id = getHtmlId(prefixes.span, segmentId);
     span.appendChild(selectInput);
     span.appendChild(selectLabel);
     span.appendChild(volumesSpan);
@@ -730,26 +753,26 @@ test.dataModelUI.Segmentation = function (app) {
    *
    * @param {Event} event HTML event.
    */
-  function onEraserSelect(event) {
+  #onEraserSelect = (event) => {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      test.getRootFromHtmlId(prefixes.selectEraser, target.id));
+      getRootFromHtmlId(prefixes.selectEraser, target.id));
     const segmentation = _segmentations[segmentationIndex];
     // select eraser
-    appSelectEraser(segmentation);
-  }
+    this.#appSelectEraser(segmentation);
+  };
 
   /**
    * Handle a segment add from UI.
    *
    * @param {MouseEvent} event HTML event.
    */
-  function onSegmentAdd(event) {
+  #onSegmentAdd = (event) => {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      test.getRootFromHtmlId(prefixes.addSegment, target.id));
+      getRootFromHtmlId(prefixes.addSegment, target.id));
     const segmentation = _segmentations[segmentationIndex];
     const segments = segmentation.segments;
 
@@ -767,39 +790,39 @@ test.dataModelUI.Segmentation = function (app) {
     actionGroup.remove();
     // add segment to list
     list.appendChild(
-      getSegmentHtml(newSegment, segmentationIndex)
+      this.#getSegmentHtml(newSegment, segmentationIndex)
     );
     // put back action group
     list.appendChild(actionGroup);
-  }
+  };
 
   /**
    * Handle a segmentation save from UI.
    *
    * @param {MouseEvent} event HTML event.
    */
-  function onSegmentationSave(event) {
+  #onSegmentationSave = (event) => {
     const target = event.target;
     // get segmentation
     const segmentationIndex = splitSegmentationHtmlId(
-      test.getRootFromHtmlId(prefixes.save, target.id));
+      getRootFromHtmlId(prefixes.save, target.id));
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
     const segmentation = _segmentations[segmentationIndex];
     const dataId = segmentation.dataId;
 
     // get data
-    const maskData = app.getData(dataId);
+    const maskData = this.#app.getData(dataId);
     if (typeof maskData === 'undefined') {
       throw new Error('Cannot save without mask image');
     }
     // TODO: find better way...
     const sourceId = dataId - 1;
-    const sourceData = app.getData(sourceId.toString());
+    const sourceData = this.#app.getData(sourceId.toString());
     if (typeof sourceData === 'undefined') {
       throw new Error('Cannot save without source image');
     }
     // dicom elements
-    const fac = new dwv.MaskFactory();
+    const fac = new MaskFactory();
     const dicomElements = fac.toDicom(
       maskData.image,
       maskData.image.getMeta().custom.segments,
@@ -812,12 +835,12 @@ test.dataModelUI.Segmentation = function (app) {
       }
     );
     // create writer with default rules
-    const writer = new dwv.DicomWriter();
+    const writer = new DicomWriter();
     let dicomBuffer;
     try {
       dicomBuffer = writer.getBuffer(dicomElements);
     } catch (error) {
-      dwv.logger.error(error);
+      logger.error(error);
       alert(error.message);
     }
     if (dicomBuffer !== undefined) {
@@ -831,7 +854,7 @@ test.dataModelUI.Segmentation = function (app) {
       element.click();
       URL.revokeObjectURL(element.href);
     }
-  }
+  };
 
   /**
    * Convert the labels of a segmentation into a displayable string.
@@ -840,7 +863,7 @@ test.dataModelUI.Segmentation = function (app) {
    * @param {number} segmentationIndex The segmentation index.
    * @returns {string} The display string of labels.
    */
-  function getLabelsString(segment, segmentationIndex) {
+  #getLabelsString(segment, segmentationIndex) {
     const segmentation = _segmentations[segmentationIndex];
     const start = ' [';
 
@@ -868,7 +891,7 @@ test.dataModelUI.Segmentation = function (app) {
    *
    * @param {object} segmentation The segmentation.
    */
-  function updateLabelsSpan(segmentation) {
+  #updateLabelsSpan(segmentation) {
     const segmentationIndex =
       _segmentations.findIndex(
         (seg) => {
@@ -879,10 +902,10 @@ test.dataModelUI.Segmentation = function (app) {
     if (segmentationIndex >= 0) {
       for (const segment of segmentation.segments) {
         const segmentId = getSegmentHtmlId(segment.number, segmentationIndex);
-        const spanId = test.getHtmlId(prefixes.volumes, segmentId);
+        const spanId = getHtmlId(prefixes.volumes, segmentId);
         const span = document.getElementById(spanId);
         if (span) {
-          span.innerText = getLabelsString(segment, segmentationIndex);
+          span.innerText = this.#getLabelsString(segment, segmentationIndex);
         }
       }
     }
@@ -895,7 +918,7 @@ test.dataModelUI.Segmentation = function (app) {
    * @param {number} segmentationIndex The segmentation index.
    * @returns {HTMLLIElement} The HTML element.
    */
-  function getSegmentationHtml(segmentation, segmentationIndex) {
+  #getSegmentationHtml(segmentation, segmentationIndex) {
     const segmentationName = getSegmentationHtmlId(segmentationIndex);
 
     // segmentation item
@@ -905,8 +928,8 @@ test.dataModelUI.Segmentation = function (app) {
     const saveButton = document.createElement('button');
     saveButton.appendChild(document.createTextNode('\u{1F4BE}'));
     saveButton.title = 'Save segmentation';
-    saveButton.id = test.getHtmlId(prefixes.save, segmentationName);
-    saveButton.onclick = onSegmentationSave;
+    saveButton.id = getHtmlId(prefixes.save, segmentationName);
+    saveButton.onclick = this.#onSegmentationSave;
 
     segmentationItem.appendChild(saveButton);
 
@@ -917,7 +940,7 @@ test.dataModelUI.Segmentation = function (app) {
     const segments = segmentation.segments;
     for (let j = 0; j < segments.length; ++j) {
       segmentationItem.appendChild(
-        getSegmentHtml(segments[j], segmentationIndex)
+        this.#getSegmentHtml(segments[j], segmentationIndex)
       );
     }
 
@@ -926,8 +949,8 @@ test.dataModelUI.Segmentation = function (app) {
     eraserInput.type = 'radio';
     eraserInput.name = 'select-segment';
     eraserInput.title = 'Eraser';
-    eraserInput.id = test.getHtmlId(prefixes.selectEraser, segmentationName);
-    eraserInput.onchange = onEraserSelect;
+    eraserInput.id = getHtmlId(prefixes.selectEraser, segmentationName);
+    eraserInput.onchange = this.#onEraserSelect;
 
     const eraserLabel = document.createElement('label');
     eraserLabel.htmlFor = eraserInput.id;
@@ -938,8 +961,8 @@ test.dataModelUI.Segmentation = function (app) {
     const addSegmentButton = document.createElement('button');
     addSegmentButton.appendChild(document.createTextNode('\u2795'));
     addSegmentButton.title = 'Add segment';
-    addSegmentButton.id = test.getHtmlId(prefixes.addSegment, segmentationName);
-    addSegmentButton.onclick = onSegmentAdd;
+    addSegmentButton.id = getHtmlId(prefixes.addSegment, segmentationName);
+    addSegmentButton.onclick = this.#onSegmentAdd;
 
     // action span
     const actionSpan = document.createElement('span');
@@ -954,4 +977,4 @@ test.dataModelUI.Segmentation = function (app) {
     return segmentationItem;
   }
 
-}; // test.dataModelUI.Segmentation
+}; // SegmentationUI

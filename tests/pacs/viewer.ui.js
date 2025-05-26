@@ -1,9 +1,4 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
-
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {Orientation} from '../../src/math/orientation.js';
 
 /**
  * Get the layer groups div ids from the data view configs.
@@ -11,7 +6,7 @@ var test = test || {};
  * @param {object} dataViewConfigs The configs.
  * @returns {string[]} The list of ids.
  */
-test.getLayerGroupDivIds = function (dataViewConfigs) {
+export function getLayerGroupDivIds(dataViewConfigs) {
   const divIds = [];
   const keys = Object.keys(dataViewConfigs);
   for (let i = 0; i < keys.length; ++i) {
@@ -33,15 +28,15 @@ test.getLayerGroupDivIds = function (dataViewConfigs) {
  * @param {string} divId The div id.
  * @returns {object} The config.
  */
-test.getViewConfig = function (layout, divId) {
+export function getViewConfig(layout, divId) {
   const config = {divId: divId};
   if (layout === 'mpr') {
     if (divId === 'layerGroup0') {
-      config.orientation = dwv.Orientation.Axial;
+      config.orientation = Orientation.Axial;
     } else if (divId === 'layerGroup1') {
-      config.orientation = dwv.Orientation.Coronal;
+      config.orientation = Orientation.Coronal;
     } else if (divId === 'layerGroup2') {
-      config.orientation = dwv.Orientation.Sagittal;
+      config.orientation = Orientation.Sagittal;
     }
   }
   return config;
@@ -54,7 +49,7 @@ test.getViewConfig = function (layout, divId) {
  * @param {string} root The root.
  * @returns {string} The HTML id.
  */
-test.getHtmlId = function (prefix, root) {
+export function getHtmlId(prefix, root) {
   return prefix + root;
 };
 
@@ -65,7 +60,7 @@ test.getHtmlId = function (prefix, root) {
  * @param {string} htmlId The HTML id.
  * @returns {string} The root.
  */
-test.getRootFromHtmlId = function (prefix, htmlId) {
+export function getRootFromHtmlId(prefix, htmlId) {
   return htmlId.substring(prefix.length);
 };
 
@@ -82,7 +77,7 @@ test.getRootFromHtmlId = function (prefix, htmlId) {
  * @param {number} step The control step.
  * @returns {HTMLDivElement} The control div.
  */
-test.getControlDiv = function (
+export function getControlDiv(
   id,
   name,
   min,

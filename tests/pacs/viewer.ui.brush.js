@@ -1,19 +1,22 @@
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-test.toolFeaturesUI = test.toolFeaturesUI || {};
+import {getControlDiv} from './viewer.ui.js';
 
 /**
- * Brush tool features.
- *
- * @param {object} app The associated application.
- * @param {object} _toolConfig The tood configuration.
+ * Brush tool UI.
  */
-test.toolFeaturesUI.Brush = function (app, _toolConfig) {
+export class BrushToolUI {
 
-  this.getValue = function () {};
+  #app;
 
-  this.getHtml = function () {
+  /**
+   * @param {object} app The associated application.
+   */
+  constructor(app, /*toolConfig*/) {
+    this.#app = app;
+  }
+
+  getValue() {};
+
+  getHtml() {
     // list of segmentations
     const res = document.createElement('ul');
     res.id = 'toolFeatures';
@@ -21,14 +24,14 @@ test.toolFeaturesUI.Brush = function (app, _toolConfig) {
 
     // brush size input
     const sizeCallback = function (size) {
-      app.setToolFeatures({brushSize: size});
-      updateBrushCursorSize(size);
+      this.#app.setToolFeatures({brushSize: size});
+      //this.updateBrushCursorSize(size);
     };
     // set default size
     const defaultCursorSize = 10;
-    app.setToolFeatures({brushSize: defaultCursorSize});
+    this.#app.setToolFeatures({brushSize: defaultCursorSize});
     // append range
-    const controlDiv = test.getControlDiv(
+    const controlDiv = getControlDiv(
       'brush-size-range',
       'Brush size',
       1,
@@ -48,7 +51,7 @@ test.toolFeaturesUI.Brush = function (app, _toolConfig) {
         createMask: true
       };
       console.log('set tool features [add-default]', features);
-      app.setToolFeatures(features);
+      this.#app.setToolFeatures(features);
     }
 
     return res;
@@ -59,30 +62,30 @@ test.toolFeaturesUI.Brush = function (app, _toolConfig) {
    *
    * @param {number} _brushSize The new size.
    */
-  function updateBrushCursorSize(_brushSize) {
-    // const lg = app.getActiveLayerGroup();
-    // if (typeof lg === 'undefined') {
-    //   throw new Error('No active layer group for brush cursor');
-    // }
-    // const vl = lg.getActiveViewLayer();
-    // if (typeof vl === 'undefined') {
-    //   throw new Error('No active view layer for brush cursor');
-    // }
-    // const scale = vl.getScale();
-    // const spacing = vl.getViewController().get2DSpacing();
+  // #updateBrushCursorSize(_brushSize) {
+  //   const lg = this.#app.getActiveLayerGroup();
+  //   if (typeof lg === 'undefined') {
+  //     throw new Error('No active layer group for brush cursor');
+  //   }
+  //   const vl = lg.getActiveViewLayer();
+  //   if (typeof vl === 'undefined') {
+  //     throw new Error('No active view layer for brush cursor');
+  //   }
+  //   const scale = vl.getScale();
+  //   const spacing = vl.getViewController().get2DSpacing();
 
-    // const width = 2 * brushSize * Math.abs(scale.x) / spacing.x;
-    // const height = 2 * brushSize * Math.abs(scale.y) / spacing.y;
+  //   const width = 2 * brushSize * Math.abs(scale.x) / spacing.x;
+  //   const height = 2 * brushSize * Math.abs(scale.y) / spacing.y;
 
-    // const cursorDiv = document.getElementById('brushCursor');
-    // cursorDiv.style.width = Math.round(width) + 'px';
-    // cursorDiv.style.height = Math.round(height) + 'px';
-  }
+  //   const cursorDiv = document.getElementById('brushCursor');
+  //   cursorDiv.style.width = Math.round(width) + 'px';
+  //   cursorDiv.style.height = Math.round(height) + 'px';
+  // }
 
   /**
    * Add the brush cursor to the dom.
    */
-  // function addBrushCursor() {
+  // #addBrushCursor() {
   //   // cursor div
   //   const cursorDiv = document.createElement('div');
   //   cursorDiv.id = 'brushCursor';
@@ -90,13 +93,13 @@ test.toolFeaturesUI.Brush = function (app, _toolConfig) {
 
   //   // default size
   //   const cursorRange = document.getElementById('brush-size-range-range');
-  //   updateBrushCursorSize(parseInt(cursorRange.value, 10));
+  //   this.#updateBrushCursorSize(parseInt(cursorRange.value, 10));
 
   //   // update position on mouse move
   //   window.addEventListener('mousemove', updateBrushCursorPos);
   // }
 
-}; // test.toolFeaturesUI.Brush
+}; // BrushToolUI
 
 /**
  * Update the brush cursor on mouse move.

@@ -1,4 +1,4 @@
-import eslintConfig from './eslint.config.mjs';
+import eslintConfig from './eslint.config.js';
 import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [

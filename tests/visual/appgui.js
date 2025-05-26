@@ -1,3 +1,10 @@
+import {logger} from '../../src/utils/logger.js';
+import {
+  ViewConfig,
+  AppOptions,
+  App
+} from '../../src/app/application.js';
+
 /**
  * Application GUI.
  *
@@ -6,30 +13,23 @@
  * - Right click on the thumbnail in the left 'Document tree area',
  * - Choose 'Convert to JPEG'.
  */
-// Do not warn if these variables were not defined before.
-/* global dwv */
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-
-// initialise dwv
-test.initDwv = function () {
+/**
+ * Initialise dwv.
+ */
+export function initDwv() {
   // logger level (optional)
-  dwv.logger.level = dwv.logger.levels.DEBUG;
-  // image decoders (for web workers)
-  dwv.decoderScripts.jpeg2000 =
-    '../../decoders/pdfjs/decode-jpeg2000.js';
-  dwv.decoderScripts['jpeg-lossless'] =
-    '../../decoders/rii-mango/decode-jpegloss.js';
-  dwv.decoderScripts['jpeg-baseline'] =
-    '../../decoders/pdfjs/decode-jpegbaseline.js';
-  dwv.decoderScripts.rle =
-    '../../decoders/dwv/decode-rle.js';
+  logger.level = logger.levels.DEBUG;
 };
 
-// test data line
-test.addDataLine = function (id, fileroot, doc) {
+/**
+ * Add one data line.
+ *
+ * @param {number} id The line id.
+ * @param {object} doc Individual data.
+ */
+function addDataLine(id, doc) {
+  const fileroot = doc.fileroot;
 
   const mainDiv = document.getElementById('data-lines');
 
@@ -44,11 +44,11 @@ test.addDataLine = function (id, fileroot, doc) {
   mainDiv.appendChild(dwvDiv);
 
   // dwv application
-  const viewConfig0 = new dwv.ViewConfig(layConDiv.id);
+  const viewConfig0 = new ViewConfig(layConDiv.id);
   const viewConfigs = {0: [viewConfig0]};
-  const options = new dwv.AppOptions(viewConfigs);
+  const options = new AppOptions(viewConfigs);
   const url = '../data/' + fileroot + '.dcm';
-  const app = new dwv.App();
+  const app = new App();
   app.init(options);
   // display loading time
   const listener = function (event) {
@@ -75,25 +75,27 @@ test.addDataLine = function (id, fileroot, doc) {
   docDiv.setAttribute('class', 'doc');
   const docUl = document.createElement('ul');
   const keys = Object.keys(doc);
-  for (let i = 0; i < keys.length; ++i) {
+  for (const key of keys) {
+    if (key === 'fileroot') {
+      continue;
+    }
     const li = document.createElement('li');
     const spanKey = document.createElement('span');
     spanKey.setAttribute('class', 'key');
-    spanKey.appendChild(document.createTextNode(keys[i]));
+    spanKey.appendChild(document.createTextNode(key));
     const spanValue = document.createElement('span');
     spanValue.setAttribute('class', 'value');
-    spanValue.appendChild(document.createTextNode(doc[keys[i]]));
-    if (keys[i] === 'origin') {
-
+    spanValue.appendChild(document.createTextNode(doc[key]));
+    if (key === 'origin') {
       const spanOrig = document.createElement('span');
       spanOrig.setAttribute('class', 'path');
       spanOrig.setAttribute('title', doc.path);
-      spanOrig.appendChild(document.createTextNode(doc[keys[i]]));
+      spanOrig.appendChild(document.createTextNode(doc[key]));
       li.appendChild(spanKey);
       li.appendChild(document.createTextNode(': '));
       li.appendChild(spanOrig);
       docUl.appendChild(li);
-    } else if (keys[i] === 'path') {
+    } else if (key === 'path') {
       // nothing to do
     } else {
       li.appendChild(spanKey);
@@ -110,3 +112,14 @@ test.addDataLine = function (id, fileroot, doc) {
   sepDiv.setAttribute('class', 'separator');
   mainDiv.appendChild(sepDiv);
 };
+
+/**
+ * Add all data lines.
+ *
+ * @param {object} data Full demo data.
+ */
+export function addDataLines(data) {
+  for (let i = 0; i < data.length; ++i) {
+    addDataLine(i, data[i]);
+  }
+}

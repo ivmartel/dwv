@@ -14,8 +14,16 @@
     "type": "git",
     "url": "git://github.com/ivmartel/dwv.git"
   },
-  "main": "dist/dwv.min.js",
-  "types": "dist/dwv.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/dwv.min.js",
+  "types": "./dist/dwv.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/dwv.min.js",
+      "types": "./dist/dwv.d.ts"
+    }
+  },
   "engines": {
     "node": ">= 14.0.0"
   },
@@ -61,7 +69,8 @@
     "start": "webpack serve --config webpack.dev.js",
     "pack": "webpack --config webpack.prod.js",
     "build": "yarn run pack && yarn run types && yarn run api",
-    "lint": "eslint -c 'eslint.config-full.mjs' 'src/**/*.js' 'tests/**/*.js' '*.js'",
+    "build-demo": "webpack --config webpack.demo.js",
+    "lint": "eslint -c 'eslint.config-full.js' 'src/**/*.js' 'tests/**/*.js' '*.js'",
     "test": "karma start ./karma.conf.js",
     "test-ci": "karma start ./karma.conf.js --browsers ChromeHeadless --reporters progress,coverage,json --single-run",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",

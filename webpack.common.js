@@ -1,17 +1,31 @@
-const path = require('path');
+import path from 'path';
+import {fileURLToPath} from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-module.exports = {
+export const webpackCommon = {
   entry: {
     dwv: './src/index.js'
   },
   output: {
+    // main bundle output
     filename: '[name].min.js',
+    // web workers output
+    chunkFilename: 'assets/workers/[name].min.js',
     library: {
-      name: '[name]',
-      type: 'umd'
+      type: 'module'
     },
-    globalObject: 'this',
+    environment: {
+      module: true
+    },
     path: path.resolve(__dirname, 'dist'),
+    // clean output folder at each build
     clean: true,
+    // web workers public path
+    // (otherwise clients look in the file system)
+    workerPublicPath: '/'
+  },
+  experiments: {
+    // module is still experimental
+    outputModule: true
   }
 };

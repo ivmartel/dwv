@@ -1,10 +1,10 @@
-module.exports = {
+export const webpackTest = {
   mode: 'development',
   devtool: 'inline-source-map',
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           // babel loader with istanbul

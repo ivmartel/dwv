@@ -1,16 +1,13 @@
 /**
  * RLE decoder worker.
  */
-// Do not warn if these variables were not defined before.
-/* global importScripts */
 
-importScripts('rle.js');
+import {RleDecoder} from './rle.js';
 
 self.addEventListener('message', function (event) {
 
   // decode DICOM buffer
-  // eslint-disable-next-line no-undef
-  var decoder = new dwvdecoder.RleDecoder();
+  const decoder = new RleDecoder();
   // post decoded data
   self.postMessage([decoder.decode(
     event.data.buffer,

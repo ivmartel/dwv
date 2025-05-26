@@ -1,3 +1,12 @@
+/* eslint-disable */
+
+/**
+ * Modified for dwv:
+ * - export root var,
+ * - remove old style import/export and
+ *   related (for ex 'use strict').
+ */
+
 /* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright 2012 Mozilla Foundation
@@ -17,15 +26,11 @@
 /* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL,
            Promise */
 
-'use strict';
-
-var globalScope = (typeof window === 'undefined') ? this : window;
-
 var isWorker = (typeof window === 'undefined');
 
-var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
+export var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
 
-var TextRenderingMode = {
+export var TextRenderingMode = {
   FILL: 0,
   STROKE: 1,
   FILL_STROKE: 2,
@@ -38,19 +43,19 @@ var TextRenderingMode = {
   ADD_TO_PATH_FLAG: 4
 };
 
-var ImageKind = {
+export var ImageKind = {
   GRAYSCALE_1BPP: 1,
   RGB_24BPP: 2,
   RGBA_32BPP: 3
 };
 
-var AnnotationType = {
+export var AnnotationType = {
   WIDGET: 1,
   TEXT: 2,
   LINK: 3
 };
 
-var StreamType = {
+export var StreamType = {
   UNKNOWN: 0,
   FLATE: 1,
   LZW: 2,
@@ -63,7 +68,7 @@ var StreamType = {
   RL: 9
 };
 
-var FontType = {
+export var FontType = {
   UNKNOWN: 0,
   TYPE1: 1,
   TYPE1C: 2,
@@ -80,11 +85,14 @@ var FontType = {
 // The global PDFJS object exposes the API
 // In production, it will be declared outside a global wrapper
 // In development, it will be declared here
-if (!globalScope.PDFJS) {
-  globalScope.PDFJS = {};
-}
+// if (!globalScope.PDFJS) {
+//   globalScope.PDFJS = {};
+// }
 
-globalScope.PDFJS.pdfBug = false;
+var PDFJS = {};
+
+// globalScope.PDFJS.pdfBug = false;
+PDFJS.pdfBug = false;
 
 PDFJS.VERBOSITY_LEVELS = {
   errors: 0,
@@ -93,7 +101,7 @@ PDFJS.VERBOSITY_LEVELS = {
 };
 
 // All the possible operations for an operator list.
-var OPS = PDFJS.OPS = {
+export var OPS = PDFJS.OPS = {
   // Intentionally start from 1 so it is easy to spot bad operators that will be
   // 0's.
   dependency: 1,
@@ -192,14 +200,14 @@ var OPS = PDFJS.OPS = {
 // A notice for devs. These are good for things that are helpful to devs, such
 // as warning that Workers were disabled, which is important to devs but not
 // end users.
-function info(msg) {
+export function info(msg) {
   if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.infos) {
     console.log('Info: ' + msg);
   }
 }
 
 // Non-fatal warnings.
-function warn(msg) {
+export function warn(msg) {
   if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.warnings) {
     console.log('Warning: ' + msg);
   }
@@ -207,7 +215,7 @@ function warn(msg) {
 
 // Fatal errors that should trigger the fallback UI and halt execution by
 // throwing an exception.
-function error(msg) {
+export function error(msg) {
   // If multiple arguments were passed, pass them all to the log function.
   if (arguments.length > 1) {
     var logArguments = ['Error:'];
@@ -223,7 +231,7 @@ function error(msg) {
   throw new Error(msg);
 }
 
-function backtrace() {
+export function backtrace() {
   try {
     throw new Error();
   } catch (e) {
@@ -231,13 +239,13 @@ function backtrace() {
   }
 }
 
-function assert(cond, msg) {
+export function assert(cond, msg) {
   if (!cond) {
     error(msg);
   }
 }
 
-var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
+export var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
   unknown: 'unknown',
   forms: 'forms',
   javaScript: 'javaScript',
@@ -246,7 +254,7 @@ var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
   font: 'font'
 };
 
-var UnsupportedManager = PDFJS.UnsupportedManager =
+export var UnsupportedManager = PDFJS.UnsupportedManager =
   (function UnsupportedManagerClosure() {
   var listeners = [];
   return {
@@ -264,7 +272,7 @@ var UnsupportedManager = PDFJS.UnsupportedManager =
 
 // Combines two URLs. The baseUrl shall be absolute URL. If the url is an
 // absolute URL, it will be returned as is.
-function combineUrl(baseUrl, url) {
+export function combineUrl(baseUrl, url) {
   if (!url) {
     return baseUrl;
   }
@@ -327,7 +335,7 @@ function shadow(obj, prop, value) {
 }
 PDFJS.shadow = shadow;
 
-var PasswordResponses = PDFJS.PasswordResponses = {
+export var PasswordResponses = PDFJS.PasswordResponses = {
   NEED_PASSWORD: 1,
   INCORRECT_PASSWORD: 2
 };
@@ -440,7 +448,7 @@ var XRefParseException = (function XRefParseExceptionClosure() {
 })();
 
 
-function bytesToString(bytes) {
+export function bytesToString(bytes) {
   assert(bytes !== null && typeof bytes === 'object' &&
          bytes.length !== undefined, 'Invalid argument for bytesToString');
   var length = bytes.length;
@@ -457,7 +465,7 @@ function bytesToString(bytes) {
   return strBuf.join('');
 }
 
-function stringToBytes(str) {
+export function stringToBytes(str) {
   assert(typeof str === 'string', 'Invalid argument for stringToBytes');
   var length = str.length;
   var bytes = new Uint8Array(length);
@@ -467,12 +475,12 @@ function stringToBytes(str) {
   return bytes;
 }
 
-function string32(value) {
+export function string32(value) {
   return String.fromCharCode((value >> 24) & 0xff, (value >> 16) & 0xff,
                              (value >> 8) & 0xff, value & 0xff);
 }
 
-function log2(x) {
+export function log2(x) {
   var n = 1, i = 0;
   while (x > n) {
     n <<= 1;
@@ -481,22 +489,22 @@ function log2(x) {
   return i;
 }
 
-function readInt8(data, start) {
+export function readInt8(data, start) {
   return (data[start] << 24) >> 24;
 }
 
-function readUint16(data, offset) {
+export function readUint16(data, offset) {
   return (data[offset] << 8) | data[offset + 1];
 }
 
-function readUint32(data, offset) {
+export function readUint32(data, offset) {
   return ((data[offset] << 24) | (data[offset + 1] << 16) |
          (data[offset + 2] << 8) | data[offset + 3]) >>> 0;
 }
 
 // Lazy test the endianness of the platform
 // NOTE: This will be 'true' for simulated TypedArrays
-function isLittleEndian() {
+export function isLittleEndian() {
   var buffer8 = new Uint8Array(2);
   buffer8[0] = 1;
   var buffer16 = new Uint16Array(buffer8.buffer);
@@ -512,7 +520,7 @@ Object.defineProperty(PDFJS, 'isLittleEndian', {
 
 //#if !(FIREFOX || MOZCENTRAL || B2G || CHROME)
 //// Lazy test if the userAgant support CanvasTypedArrays
-function hasCanvasTypedArrays() {
+export function hasCanvasTypedArrays() {
   var canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
   var ctx = canvas.getContext('2d');
@@ -527,7 +535,7 @@ Object.defineProperty(PDFJS, 'hasCanvasTypedArrays', {
   }
 });
 
-var Uint32ArrayView = (function Uint32ArrayViewClosure() {
+export var Uint32ArrayView = (function Uint32ArrayViewClosure() {
 
   function Uint32ArrayView(buffer, length) {
     this.buffer = buffer;
@@ -570,9 +578,9 @@ var Uint32ArrayView = (function Uint32ArrayViewClosure() {
 //PDFJS.hasCanvasTypedArrays = true;
 //#endif
 
-var IDENTITY_MATRIX = [1, 0, 0, 1, 0, 0];
+export var IDENTITY_MATRIX = [1, 0, 0, 1, 0, 0];
 
-var Util = PDFJS.Util = (function UtilClosure() {
+export var Util = PDFJS.Util = (function UtilClosure() {
   function Util() {}
 
   var rgbBuf = ['rgb(', 0, ',', 0, ',', 0, ')'];
@@ -789,7 +797,7 @@ var Util = PDFJS.Util = (function UtilClosure() {
  * @class
  * @alias PDFJS.PageViewport
  */
-var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
+export var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
   /**
    * @constructor
    * @private
@@ -920,7 +928,7 @@ var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
   return PageViewport;
 })();
 
-var PDFStringTranslateTable = [
+export var PDFStringTranslateTable = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0x2D8, 0x2C7, 0x2C6, 0x2D9, 0x2DD, 0x2DB, 0x2DA, 0x2DC, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -932,7 +940,7 @@ var PDFStringTranslateTable = [
   0x178, 0x17D, 0x131, 0x142, 0x153, 0x161, 0x17E, 0, 0x20AC
 ];
 
-function stringToPDFString(str) {
+export function stringToPDFString(str) {
   var i, n = str.length, strBuf = [];
   if (str[0] === '\xFE' && str[1] === '\xFF') {
     // UTF16BE BOM
@@ -949,42 +957,42 @@ function stringToPDFString(str) {
   return strBuf.join('');
 }
 
-function stringToUTF8String(str) {
+export function stringToUTF8String(str) {
   return decodeURIComponent(escape(str));
 }
 
-function isEmptyObj(obj) {
+export function isEmptyObj(obj) {
   for (var key in obj) {
     return false;
   }
   return true;
 }
 
-function isBool(v) {
+export function isBool(v) {
   return typeof v === 'boolean';
 }
 
-function isInt(v) {
+export function isInt(v) {
   return typeof v === 'number' && ((v | 0) === v);
 }
 
-function isNum(v) {
+export function isNum(v) {
   return typeof v === 'number';
 }
 
-function isString(v) {
+export function isString(v) {
   return typeof v === 'string';
 }
 
-function isName(v) {
+export function isName(v) {
   return v instanceof Name;
 }
 
-function isCmd(v, cmd) {
+export function isCmd(v, cmd) {
   return v instanceof Cmd && (cmd === undefined || v.cmd === cmd);
 }
 
-function isDict(v, type) {
+export function isDict(v, type) {
   if (!(v instanceof Dict)) {
     return false;
   }
@@ -995,19 +1003,19 @@ function isDict(v, type) {
   return isName(dictType) && dictType.name === type;
 }
 
-function isArray(v) {
+export function isArray(v) {
   return v instanceof Array;
 }
 
-function isStream(v) {
+export function isStream(v) {
   return typeof v === 'object' && v !== null && v.getBytes !== undefined;
 }
 
-function isArrayBuffer(v) {
+export function isArrayBuffer(v) {
   return typeof v === 'object' && v !== null && v.byteLength !== undefined;
 }
 
-function isRef(v) {
+export function isRef(v) {
   return v instanceof Ref;
 }
 
@@ -1038,327 +1046,7 @@ function createPromiseCapability() {
 
 PDFJS.createPromiseCapability = createPromiseCapability;
 
-/**
- * Polyfill for Promises:
- * The following promise implementation tries to generally implement the
- * Promise/A+ spec. Some notable differences from other promise libaries are:
- * - There currently isn't a seperate deferred and promise object.
- * - Unhandled rejections eventually show an error if they aren't handled.
- *
- * Based off of the work in:
- * https://bugzilla.mozilla.org/show_bug.cgi?id=810490
- */
-(function PromiseClosure() {
-  if (globalScope.Promise) {
-    // Promises existing in the DOM/Worker, checking presence of all/resolve
-    if (typeof globalScope.Promise.all !== 'function') {
-      globalScope.Promise.all = function (iterable) {
-        var count = 0, results = [], resolve, reject;
-        var promise = new globalScope.Promise(function (resolve_, reject_) {
-          resolve = resolve_;
-          reject = reject_;
-        });
-        iterable.forEach(function (p, i) {
-          count++;
-          p.then(function (result) {
-            results[i] = result;
-            count--;
-            if (count === 0) {
-              resolve(results);
-            }
-          }, reject);
-        });
-        if (count === 0) {
-          resolve(results);
-        }
-        return promise;
-      };
-    }
-    if (typeof globalScope.Promise.resolve !== 'function') {
-      globalScope.Promise.resolve = function (value) {
-        return new globalScope.Promise(function (resolve) { resolve(value); });
-      };
-    }
-    if (typeof globalScope.Promise.reject !== 'function') {
-      globalScope.Promise.reject = function (reason) {
-        return new globalScope.Promise(function (resolve, reject) {
-          reject(reason);
-        });
-      };
-    }
-    if (typeof globalScope.Promise.prototype.catch !== 'function') {
-      globalScope.Promise.prototype.catch = function (onReject) {
-        return globalScope.Promise.prototype.then(undefined, onReject);
-      };
-    }
-    return;
-  }
-//#if !MOZCENTRAL
-  var STATUS_PENDING = 0;
-  var STATUS_RESOLVED = 1;
-  var STATUS_REJECTED = 2;
-
-  // In an attempt to avoid silent exceptions, unhandled rejections are
-  // tracked and if they aren't handled in a certain amount of time an
-  // error is logged.
-  var REJECTION_TIMEOUT = 500;
-
-  var HandlerManager = {
-    handlers: [],
-    running: false,
-    unhandledRejections: [],
-    pendingRejectionCheck: false,
-
-    scheduleHandlers: function scheduleHandlers(promise) {
-      if (promise._status === STATUS_PENDING) {
-        return;
-      }
-
-      this.handlers = this.handlers.concat(promise._handlers);
-      promise._handlers = [];
-
-      if (this.running) {
-        return;
-      }
-      this.running = true;
-
-      setTimeout(this.runHandlers.bind(this), 0);
-    },
-
-    runHandlers: function runHandlers() {
-      var RUN_TIMEOUT = 1; // ms
-      var timeoutAt = Date.now() + RUN_TIMEOUT;
-      while (this.handlers.length > 0) {
-        var handler = this.handlers.shift();
-
-        var nextStatus = handler.thisPromise._status;
-        var nextValue = handler.thisPromise._value;
-
-        try {
-          if (nextStatus === STATUS_RESOLVED) {
-            if (typeof handler.onResolve === 'function') {
-              nextValue = handler.onResolve(nextValue);
-            }
-          } else if (typeof handler.onReject === 'function') {
-              nextValue = handler.onReject(nextValue);
-              nextStatus = STATUS_RESOLVED;
-
-              if (handler.thisPromise._unhandledRejection) {
-                this.removeUnhandeledRejection(handler.thisPromise);
-              }
-          }
-        } catch (ex) {
-          nextStatus = STATUS_REJECTED;
-          nextValue = ex;
-        }
-
-        handler.nextPromise._updateStatus(nextStatus, nextValue);
-        if (Date.now() >= timeoutAt) {
-          break;
-        }
-      }
-
-      if (this.handlers.length > 0) {
-        setTimeout(this.runHandlers.bind(this), 0);
-        return;
-      }
-
-      this.running = false;
-    },
-
-    addUnhandledRejection: function addUnhandledRejection(promise) {
-      this.unhandledRejections.push({
-        promise: promise,
-        time: Date.now()
-      });
-      this.scheduleRejectionCheck();
-    },
-
-    removeUnhandeledRejection: function removeUnhandeledRejection(promise) {
-      promise._unhandledRejection = false;
-      for (var i = 0; i < this.unhandledRejections.length; i++) {
-        if (this.unhandledRejections[i].promise === promise) {
-          this.unhandledRejections.splice(i);
-          i--;
-        }
-      }
-    },
-
-    scheduleRejectionCheck: function scheduleRejectionCheck() {
-      if (this.pendingRejectionCheck) {
-        return;
-      }
-      this.pendingRejectionCheck = true;
-      setTimeout(function rejectionCheck() {
-        this.pendingRejectionCheck = false;
-        var now = Date.now();
-        for (var i = 0; i < this.unhandledRejections.length; i++) {
-          if (now - this.unhandledRejections[i].time > REJECTION_TIMEOUT) {
-            var unhandled = this.unhandledRejections[i].promise._value;
-            var msg = 'Unhandled rejection: ' + unhandled;
-            if (unhandled.stack) {
-              msg += '\n' + unhandled.stack;
-            }
-            warn(msg);
-            this.unhandledRejections.splice(i);
-            i--;
-          }
-        }
-        if (this.unhandledRejections.length) {
-          this.scheduleRejectionCheck();
-        }
-      }.bind(this), REJECTION_TIMEOUT);
-    }
-  };
-
-  function Promise(resolver) {
-    this._status = STATUS_PENDING;
-    this._handlers = [];
-    try {
-      resolver.call(this, this._resolve.bind(this), this._reject.bind(this));
-    } catch (e) {
-      this._reject(e);
-    }
-  }
-  /**
-   * Builds a promise that is resolved when all the passed in promises are
-   * resolved.
-   * @param {array} array of data and/or promises to wait for.
-   * @return {Promise} New dependant promise.
-   */
-  Promise.all = function Promise_all(promises) {
-    var resolveAll, rejectAll;
-    var deferred = new Promise(function (resolve, reject) {
-      resolveAll = resolve;
-      rejectAll = reject;
-    });
-    var unresolved = promises.length;
-    var results = [];
-    if (unresolved === 0) {
-      resolveAll(results);
-      return deferred;
-    }
-    function reject(reason) {
-      if (deferred._status === STATUS_REJECTED) {
-        return;
-      }
-      results = [];
-      rejectAll(reason);
-    }
-    for (var i = 0, ii = promises.length; i < ii; ++i) {
-      var promise = promises[i];
-      var resolve = (function(i) {
-        return function(value) {
-          if (deferred._status === STATUS_REJECTED) {
-            return;
-          }
-          results[i] = value;
-          unresolved--;
-          if (unresolved === 0) {
-            resolveAll(results);
-          }
-        };
-      })(i);
-      if (Promise.isPromise(promise)) {
-        promise.then(resolve, reject);
-      } else {
-        resolve(promise);
-      }
-    }
-    return deferred;
-  };
-
-  /**
-   * Checks if the value is likely a promise (has a 'then' function).
-   * @return {boolean} true if value is thenable
-   */
-  Promise.isPromise = function Promise_isPromise(value) {
-    return value && typeof value.then === 'function';
-  };
-
-  /**
-   * Creates resolved promise
-   * @param value resolve value
-   * @returns {Promise}
-   */
-  Promise.resolve = function Promise_resolve(value) {
-    return new Promise(function (resolve) { resolve(value); });
-  };
-
-  /**
-   * Creates rejected promise
-   * @param reason rejection value
-   * @returns {Promise}
-   */
-  Promise.reject = function Promise_reject(reason) {
-    return new Promise(function (resolve, reject) { reject(reason); });
-  };
-
-  Promise.prototype = {
-    _status: null,
-    _value: null,
-    _handlers: null,
-    _unhandledRejection: null,
-
-    _updateStatus: function Promise__updateStatus(status, value) {
-      if (this._status === STATUS_RESOLVED ||
-          this._status === STATUS_REJECTED) {
-        return;
-      }
-
-      if (status === STATUS_RESOLVED &&
-          Promise.isPromise(value)) {
-        value.then(this._updateStatus.bind(this, STATUS_RESOLVED),
-                   this._updateStatus.bind(this, STATUS_REJECTED));
-        return;
-      }
-
-      this._status = status;
-      this._value = value;
-
-      if (status === STATUS_REJECTED && this._handlers.length === 0) {
-        this._unhandledRejection = true;
-        HandlerManager.addUnhandledRejection(this);
-      }
-
-      HandlerManager.scheduleHandlers(this);
-    },
-
-    _resolve: function Promise_resolve(value) {
-      this._updateStatus(STATUS_RESOLVED, value);
-    },
-
-    _reject: function Promise_reject(reason) {
-      this._updateStatus(STATUS_REJECTED, reason);
-    },
-
-    then: function Promise_then(onResolve, onReject) {
-      var nextPromise = new Promise(function (resolve, reject) {
-        this.resolve = resolve;
-        this.reject = reject;
-      });
-      this._handlers.push({
-        thisPromise: this,
-        onResolve: onResolve,
-        onReject: onReject,
-        nextPromise: nextPromise
-      });
-      HandlerManager.scheduleHandlers(this);
-      return nextPromise;
-    },
-
-    catch: function Promise_catch(onReject) {
-      return this.then(undefined, onReject);
-    }
-  };
-
-  globalScope.Promise = Promise;
-//#else
-//throw new Error('DOM Promise is not present');
-//#endif
-})();
-
-var StatTimer = (function StatTimerClosure() {
+export var StatTimer = (function StatTimerClosure() {
   function rpad(str, pad, length) {
     while (str.length < length) {
       str += pad;
@@ -1454,7 +1142,7 @@ PDFJS.createObjectURL = (function createObjectURLClosure() {
   };
 })();
 
-function MessageHandler(name, comObj) {
+export function MessageHandler(name, comObj) {
   this.name = name;
   this.comObj = comObj;
   this.callbackIndex = 1;
@@ -1575,7 +1263,7 @@ MessageHandler.prototype = {
   }
 };
 
-function loadJpegStream(id, imageUrl, objs) {
+export function loadJpegStream(id, imageUrl, objs) {
   var img = new Image();
   img.onload = (function loadJpegStream_onloadClosure() {
     objs.resolve(id, img);

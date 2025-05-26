@@ -74,7 +74,6 @@ import {
 import {Geometry} from './image/geometry.js';
 import {Size} from './image/size.js';
 import {Spacing} from './image/spacing.js';
-import {decoderScripts} from './image/decoder.js';
 import {
   ColourMap,
   luts
@@ -186,7 +185,6 @@ export {
   NumberRange,
   DicomSRContent,
   logger,
-  decoderScripts,
   custom,
   luts,
   i18n,

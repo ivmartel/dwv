@@ -1,179 +1,189 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {
+  getOrientationName,
+  Orientation
+} from '../../src/math/orientation.js';
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {getImageDataData} from './dicomGenerator.js';
 
 /**
- * MPRPixGenerator
- * Generates pixel data from file with an input per orientation.
- *
- * @param {object} options The generator options.
- * @class
+ * MPRPixGenerator: generates pixel data from file
+ *   with an input per orientation.
  */
-const MPRPixGenerator = function (options) {
+export class MPRPixGenerator {
 
-  const self = this;
+  #numberOfColumns;
+  #numberOfRows;
+  #numberOfSlices = 0;
 
-  const numberOfColumns = options.numberOfColumns;
-  const numberOfRows = options.numberOfRows;
-  const isRGB = options.photometricInterpretation === 'RGB';
+  #halfNCols;
+  #halfNRows;
+  #halfNSlices = 0;
 
-  if (isRGB) {
-    throw new Error('The MPRPixGenerator does not support RGB data.');
+  #isRGB;
+  #orientationName;
+
+  #images = [];
+  #buffers = [];
+
+  /**
+   * @param {object} options The generator options.
+   */
+  constructor(options) {
+    this.#numberOfColumns = options.numberOfColumns;
+    this.#numberOfRows = options.numberOfRows;
+    this.#isRGB = options.photometricInterpretation === 'RGB';
+
+    if (this.#isRGB) {
+      throw new Error('The MPRPixGenerator does not support RGB data.');
+    }
+
+    this.#halfNCols = this.#numberOfColumns * 0.5;
+    this.#halfNRows = this.#numberOfRows * 0.5;
+
+    this.#orientationName =
+      getOrientationName(options.imageOrientationPatient);
   }
 
-  const halfNCols = numberOfColumns * 0.5;
-  const halfNRows = numberOfRows * 0.5;
-
-  this.images = [];
-  this.buffers = [];
-
-  let numberOfSlices = 0;
-  let halfNSlices = 0;
-  this.setNumberOfSlices = function (num) {
-    numberOfSlices = num;
-    halfNSlices = num * 0.5;
+  setNumberOfSlices(num) {
+    this.#numberOfSlices = num;
+    this.#halfNSlices = num * 0.5;
   };
 
-  this.setImages = function (imgs) {
+  setImages(imgs) {
     // check sizes
     let img;
     for (let i = 0; i < imgs.length; ++i) {
       img = imgs[i];
-      if (img.width !== halfNCols) {
+      if (img.width !== this.#halfNCols) {
         throw new Error('Image width mismatch: ' +
-          img.width + '!=' + halfNCols);
+          img.width + '!=' + this.#halfNCols);
       }
-      if (img.height !== halfNRows) {
+      if (img.height !== this.#halfNRows) {
         throw new Error('Image height mismatch: ' +
-          img.height + '!=' + halfNRows);
+          img.height + '!=' + this.#halfNRows);
       }
     }
     // store
-    this.images = imgs;
+    this.#images = imgs;
     // store buffers
-    this.buffers = [];
+    this.#buffers = [];
     for (let i0 = 0; i0 < imgs.length; ++i0) {
-      this.buffers.push(test.getImageDataData(this.images[i0]));
+      this.#buffers.push(getImageDataData(this.#images[i0]));
     }
   };
 
-  this.generate = function (pixelBuffer, sliceNumber) {
-    if (sliceNumber > numberOfSlices) {
+  generate(pixelBuffer, sliceNumber) {
+    if (sliceNumber > this.#numberOfSlices) {
       throw new Error('Cannot generate slice, number is above size: ' +
-        sliceNumber + ', ' + numberOfSlices);
+        sliceNumber + ', ' + this.#numberOfSlices);
     }
-    const orientationName =
-      dwv.getOrientationName(options.imageOrientationPatient);
-    if (orientationName === dwv.Orientation.Axial) {
-      this.generateAsAxial(pixelBuffer, sliceNumber);
-    } else if (orientationName === dwv.Orientation.Coronal) {
-      this.generateAsCoronal(pixelBuffer, sliceNumber);
-    } else if (orientationName === dwv.Orientation.Sagittal) {
-      this.generateAsSagittal(pixelBuffer, sliceNumber);
+    if (this.#orientationName === Orientation.Axial) {
+      this.#generateAsAxial(pixelBuffer, sliceNumber);
+    } else if (this.#orientationName === Orientation.Coronal) {
+      this.#generateAsCoronal(pixelBuffer, sliceNumber);
+    } else if (this.#orientationName === Orientation.Sagittal) {
+      this.#generateAsSagittal(pixelBuffer, sliceNumber);
     }
   };
 
-  this.generateAsAxial = function (pixelBuffer, sliceNumber) {
+  #generateAsAxial(pixelBuffer, sliceNumber) {
     // axial
     let offset = 0;
-    for (let j0 = 0; j0 < halfNRows; ++j0) {
-      for (let i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc(dwv.Orientation.Axial, i0, j0);
+    for (let j0 = 0; j0 < this.#halfNRows; ++j0) {
+      for (let i0 = 0; i0 < this.#halfNCols; ++i0) {
+        pixelBuffer[offset] = this.#getFunc(Orientation.Axial, i0, j0);
         ++offset;
       }
-      offset += halfNCols;
+      offset += this.#halfNCols;
     }
-    if (sliceNumber < halfNSlices) {
+    if (sliceNumber < this.#halfNSlices) {
       // coronal
-      offset = halfNCols;
-      for (let j1 = 0; j1 < numberOfRows; ++j1) {
-        for (let i1 = 0; i1 < halfNCols; ++i1) {
-          pixelBuffer[offset] = getFunc(
-            dwv.Orientation.Coronal, i1, (halfNSlices - 1 - sliceNumber));
+      offset = this.#halfNCols;
+      for (let j1 = 0; j1 < this.#numberOfRows; ++j1) {
+        for (let i1 = 0; i1 < this.#halfNCols; ++i1) {
+          pixelBuffer[offset] = this.#getFunc(
+            Orientation.Coronal, i1, (this.#halfNSlices - 1 - sliceNumber));
           ++offset;
         }
-        offset += halfNCols;
+        offset += this.#halfNCols;
       }
     } else {
       // sagittal
-      offset = numberOfColumns * halfNRows;
-      for (let j2 = 0; j2 < halfNRows; ++j2) {
-        for (let i2 = 0; i2 < numberOfColumns; ++i2) {
-          pixelBuffer[offset] = getFunc(
-            dwv.Orientation.Sagittal, j2, (numberOfSlices - 1 - sliceNumber));
+      offset = this.#numberOfColumns * this.#halfNRows;
+      for (let j2 = 0; j2 < this.#halfNRows; ++j2) {
+        for (let i2 = 0; i2 < this.#numberOfColumns; ++i2) {
+          pixelBuffer[offset] = this.#getFunc(
+            Orientation.Sagittal, j2, (this.#numberOfSlices - 1 - sliceNumber));
           ++offset;
         }
       }
     }
   };
 
-  this.generateAsCoronal = function (pixelBuffer, sliceNumber) {
+  #generateAsCoronal(pixelBuffer, sliceNumber) {
     // coronal
-    let offset = numberOfColumns * halfNRows + halfNCols;
-    for (let j0 = 0; j0 < halfNRows; ++j0) {
-      for (let i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc(dwv.Orientation.Coronal, i0, j0);
+    let offset = this.#numberOfColumns * this.#halfNRows + this.#halfNCols;
+    for (let j0 = 0; j0 < this.#halfNRows; ++j0) {
+      for (let i0 = 0; i0 < this.#halfNCols; ++i0) {
+        pixelBuffer[offset] = this.#getFunc(Orientation.Coronal, i0, j0);
         ++offset;
       }
-      offset += halfNCols;
+      offset += this.#halfNCols;
     }
-    if (sliceNumber < halfNSlices) {
+    if (sliceNumber < this.#halfNSlices) {
       // axial
       offset = 0;
-      for (let j1 = 0; j1 < numberOfRows; ++j1) {
-        for (let i1 = 0; i1 < halfNCols; ++i1) {
-          pixelBuffer[offset] = getFunc(
-            dwv.Orientation.Axial, i1, sliceNumber);
+      for (let j1 = 0; j1 < this.#numberOfRows; ++j1) {
+        for (let i1 = 0; i1 < this.#halfNCols; ++i1) {
+          pixelBuffer[offset] = this.#getFunc(
+            Orientation.Axial, i1, sliceNumber);
           ++offset;
         }
-        offset += halfNCols;
+        offset += this.#halfNCols;
       }
 
     } else {
       // sagittal
       offset = 0;
-      for (let j2 = 0; j2 < halfNRows; ++j2) {
-        for (let i2 = 0; i2 < numberOfColumns; ++i2) {
-          pixelBuffer[offset] = getFunc(
-            dwv.Orientation.Sagittal, sliceNumber, j2 - 1);
+      for (let j2 = 0; j2 < this.#halfNRows; ++j2) {
+        for (let i2 = 0; i2 < this.#numberOfColumns; ++i2) {
+          pixelBuffer[offset] = this.#getFunc(
+            Orientation.Sagittal, sliceNumber, j2 - 1);
           ++offset;
         }
       }
     }
   };
 
-  this.generateAsSagittal = function (pixelBuffer, sliceNumber) {
+  #generateAsSagittal(pixelBuffer, sliceNumber) {
     // sagittal
-    let offset = halfNCols;
-    for (let j0 = 0; j0 < halfNRows; ++j0) {
-      for (let i0 = 0; i0 < halfNCols; ++i0) {
-        pixelBuffer[offset] = getFunc(dwv.Orientation.Sagittal, i0, j0);
+    let offset = this.#halfNCols;
+    for (let j0 = 0; j0 < this.#halfNRows; ++j0) {
+      for (let i0 = 0; i0 < this.#halfNCols; ++i0) {
+        pixelBuffer[offset] = this.#getFunc(Orientation.Sagittal, i0, j0);
         ++offset;
       }
-      offset += halfNCols;
+      offset += this.#halfNCols;
     }
-    if (sliceNumber < halfNSlices) {
+    if (sliceNumber < this.#halfNSlices) {
       // axial
       offset = 0;
-      for (let j1 = 0; j1 < numberOfRows; ++j1) {
-        for (let i1 = 0; i1 < halfNCols; ++i1) {
-          pixelBuffer[offset] = getFunc(
-            dwv.Orientation.Axial, sliceNumber, i1);
+      for (let j1 = 0; j1 < this.#numberOfRows; ++j1) {
+        for (let i1 = 0; i1 < this.#halfNCols; ++i1) {
+          pixelBuffer[offset] = this.#getFunc(
+            Orientation.Axial, sliceNumber, i1);
           ++offset;
         }
-        offset += halfNCols;
+        offset += this.#halfNCols;
       }
 
     } else {
       // coronal
-      offset = numberOfColumns * halfNRows;
-      for (let j2 = 0; j2 < halfNRows; ++j2) {
-        for (let i2 = 0; i2 < numberOfColumns; ++i2) {
-          pixelBuffer[offset] = getFunc(
-            dwv.Orientation.Coronal, sliceNumber, j2 - 1);
+      offset = this.#numberOfColumns * this.#halfNRows;
+      for (let j2 = 0; j2 < this.#halfNRows; ++j2) {
+        for (let i2 = 0; i2 < this.#numberOfColumns; ++i2) {
+          pixelBuffer[offset] = this.#getFunc(
+            Orientation.Coronal, sliceNumber, j2 - 1);
           ++offset;
         }
       }
@@ -185,8 +195,8 @@ const MPRPixGenerator = function (options) {
    * @param {number} j The row index.
    * @returns {number} The offset for the given position.
    */
-  function getOffset(i, j) {
-    return i + j * halfNCols;
+  #getOffset(i, j) {
+    return i + j * this.#halfNCols;
   }
 
   /**
@@ -195,16 +205,16 @@ const MPRPixGenerator = function (options) {
    * @param {number} j The row index.
    * @returns {number} The value at the given position.
    */
-  function getFunc(name, i, j) {
+  #getFunc(name, i, j) {
     let imgIdx = 0;
-    if (name === dwv.Orientation.Axial) {
+    if (name === Orientation.Axial) {
       imgIdx = 0;
-    } else if (name === dwv.Orientation.Coronal) {
+    } else if (name === Orientation.Coronal) {
       imgIdx = 1;
-    } else if (name === dwv.Orientation.Sagittal) {
+    } else if (name === Orientation.Sagittal) {
       imgIdx = 2;
     }
-    return self.buffers[imgIdx][getOffset(i, j) * 4];
+    return this.#buffers[imgIdx][this.#getOffset(i, j) * 4];
   }
 };
 
@@ -215,7 +225,7 @@ const MPRPixGenerator = function (options) {
  * @param {object} image The associated image.
  * @returns {boolean} True if the tags are ok.
  */
-function mprCheckTags(tags, image) {
+export function mprCheckTags(tags, image) {
   /**
    * @param {number} value The value to check.
    * @returns {number} The expected value.
@@ -235,9 +245,3 @@ function mprCheckTags(tags, image) {
   }
   return needUpdate;
 }
-
-test.pixelGenerators = test.pixelGenerators || {};
-test.pixelGenerators.mpr = {
-  generator: MPRPixGenerator,
-  checkTags: mprCheckTags
-};

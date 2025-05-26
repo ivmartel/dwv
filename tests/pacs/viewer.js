@@ -1,14 +1,28 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
+import {logger} from '../../src/utils/logger.js';
+import {precisionRound} from '../../src/utils/string.js';
+import {custom} from '../../src/app/custom.js';
+import {
+  AppOptions,
+  App
+} from '../../src/app/application.js';
+import {WindowLevel} from '../../src/image/windowLevel.js';
+import {getAsSimpleElements} from '../../src/dicom/dicomTag.js';
+import {getSRContent} from '../../src/dicom/dicomSRContent.js';
+import {getDwvVersion} from '../../src/dicom/dicomParser.js';
+import {Point} from '../../src/math/point.js';
 
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {
+  getViewConfig,
+  getLayerGroupDivIds
+} from './viewer.ui.js';
+import {DataTableUI} from './viewer.ui.datatable.js';
+import {setupRenderTests} from './viewer.rendertest.js';
+import {AnnotationUI} from './viewer.ui.annot.js';
+import {SegmentationUI} from './viewer.ui.segment.js';
+import {DrawToolUI} from './viewer.ui.draw.js';
+import {BrushToolUI} from './viewer.ui.brush.js';
 
-// call setup on DOM loaded
-document.addEventListener('DOMContentLoaded', onDOMContentLoaded);
-
-// globals
+// global vars
 let _app = null;
 let _tools = null;
 const _toolFeaturesUI = {};
@@ -19,27 +33,18 @@ let _layout = 'one';
  */
 function viewerSetup() {
   // logger level (optional)
-  dwv.logger.level = dwv.logger.levels.DEBUG;
-
-  dwv.decoderScripts.jpeg2000 =
-    '../../decoders/pdfjs/decode-jpeg2000.js';
-  dwv.decoderScripts['jpeg-lossless'] =
-    '../../decoders/rii-mango/decode-jpegloss.js';
-  dwv.decoderScripts['jpeg-baseline'] =
-    '../../decoders/pdfjs/decode-jpegbaseline.js';
-  dwv.decoderScripts.rle =
-    '../../decoders/dwv/decode-rle.js';
+  logger.level = logger.levels.DEBUG;
 
   // example wl preset override
-  dwv.custom.wlPresets = {
+  custom.wlPresets = {
     PT: {
-      'suv5-10': new dwv.WindowLevel(5, 10),
-      'suv6-8': new dwv.WindowLevel(6, 8)
+      'suv5-10': new WindowLevel(5, 10),
+      'suv6-8': new WindowLevel(6, 8)
     }
   };
 
   // // example labelText override
-  // dwv.custom.labelTexts = {
+  // custom.labelTexts = {
   //   rectangle: {
   //     '*': '{surface}!',
   //     MR: '{surface}!!'
@@ -47,7 +52,7 @@ function viewerSetup() {
   // };
 
   // // example private logic for roi dialog
-  // dwv.custom.openRoiDialog = function (meta, cb) {
+  // custom.openRoiDialog = function (meta, cb) {
   //   console.log('roi dialog', meta);
   //   const textExpr = prompt('[Custom dialog] Label', meta.textExpr);
   //   if (textExpr !== null) {
@@ -57,7 +62,7 @@ function viewerSetup() {
   // };
 
   // // example private logic for time value retrieval
-  // dwv.custom.getTagTime = function (elements) {
+  // custom.getTagTime = function (elements) {
   //   let value;
   //   const element = elements['ABCD0123'];
   //   if (typeof element !== 'undefined') {
@@ -67,7 +72,7 @@ function viewerSetup() {
   // };
 
   // // example private logic for pixel unit value retrieval
-  // dwv.custom.getTagPixelUnit = function (/*elements*/) {
+  // custom.getTagPixelUnit = function (/*elements*/) {
   //   return 'MyPixelUnit';
   // };
 
@@ -112,11 +117,11 @@ function viewerSetup() {
   };
 
   // app config
-  const options = new dwv.AppOptions();
+  const options = new AppOptions();
   options.tools = _tools;
   options.viewOnFirstLoadItem = viewOnFirstLoadItem;
   // app
-  _app = new dwv.App();
+  _app = new App();
   _app.init(options);
 
   // abort shortcut handler
@@ -295,16 +300,26 @@ function viewerSetup() {
   });
 
   // tool features UI
+  const toolsUI = {
+    Draw: DrawToolUI,
+    Brush: BrushToolUI
+  };
+
   for (const toolName in _tools) {
-    if (typeof test.toolFeaturesUI[toolName] !== 'undefined') {
-      const toolUI = new test.toolFeaturesUI[toolName](_app, _tools[toolName]);
+    if (typeof toolsUI[toolName] !== 'undefined') {
+      const toolUI = new toolsUI[toolName](_app, _tools[toolName]);
       _toolFeaturesUI[toolName] = toolUI;
     }
   }
 
   // data model UI
-  for (const dmName in test.dataModelUI) {
-    const dmUI = new test.dataModelUI[dmName](_app);
+  const dataModelUI = {
+    annotation: AnnotationUI,
+    segmentation: SegmentationUI
+  };
+
+  for (const dmName in dataModelUI) {
+    const dmUI = new dataModelUI[dmName](_app);
     dmUI.registerListeners();
   }
 
@@ -361,7 +376,7 @@ function logMetaData(dataId, loadType) {
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
-    console.log('metadata', dwv.getAsSimpleElements(meta));
+    console.log('metadata', getAsSimpleElements(meta));
   } else {
     console.log('metadata', meta);
   }
@@ -379,7 +394,7 @@ function logMetaData(dataId, loadType) {
   // log DICOM SR
   if (modality === 'SR') {
     console.log('DICOM SR');
-    const srContent = dwv.getSRContent(meta);
+    const srContent = getSRContent(meta);
     console.log(srContent.toString());
   }
 }
@@ -433,11 +448,11 @@ function getNumberOfLayerGroups() {
 /**
  * Setup.
  */
-function onDOMContentLoaded() {
+function setup() {
   // setup
   viewerSetup();
 
-  const dataTable = new test.ui.DataTable(_app);
+  const dataTable = new DataTableUI(_app);
   dataTable.registerListeners(_layout);
 
   const positionInput = document.getElementById('position');
@@ -446,7 +461,7 @@ function onDOMContentLoaded() {
     const vc = vls[0].getViewController();
     const element = event.target;
     const values = element.value.split(',');
-    vc.setCurrentPosition(new dwv.Point([
+    vc.setCurrentPosition(new Point([
       parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2])
     ])
     );
@@ -501,7 +516,7 @@ function onDOMContentLoaded() {
 
     // show crosshair depending on layout
     if (layout !== 'one') {
-      const divIds = test.getLayerGroupDivIds(configs);
+      const divIds = getLayerGroupDivIds(configs);
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
@@ -522,7 +537,7 @@ function onDOMContentLoaded() {
   // setup
   setupBindersCheckboxes();
   setupToolsCheckboxes();
-  test.setupRenderTests(_app);
+  setupRenderTests(_app);
   setupAbout();
 
   // bind app to input files
@@ -730,7 +745,7 @@ function getOnebyOneDataViewConfig(dataIds) {
   const orientation = getAppViewConfigOrientation('layerGroup0');
   const configs = {};
   for (const dataId of dataIds) {
-    const newConfig = test.getViewConfig('one', 'layerGroup0');
+    const newConfig = getViewConfig('one', 'layerGroup0');
     // merge possibly existing app config with the new one to
     // keed window level for example
     const appConfig = getAppViewConfig(dataId);
@@ -759,9 +774,9 @@ function getOnebyTwoDataViewConfig(dataIds) {
     const dataId = dataIds[i];
     let newConfig;
     if (i % 2 === 0) {
-      newConfig = test.getViewConfig('side', 'layerGroup0');
+      newConfig = getViewConfig('side', 'layerGroup0');
     } else {
-      newConfig = test.getViewConfig('side', 'layerGroup1');
+      newConfig = getViewConfig('side', 'layerGroup1');
     }
     // merge possibly existing app config with the new one to
     // keed window level for example
@@ -784,9 +799,9 @@ function getOnebyTwoDataViewConfig(dataIds) {
 function getMPRDataViewConfig(dataIds) {
   const configs = {};
   for (const dataId of dataIds) {
-    const newConfig0 = test.getViewConfig('mpr', 'layerGroup0');
-    const newConfig1 = test.getViewConfig('mpr', 'layerGroup1');
-    const newConfig2 = test.getViewConfig('mpr', 'layerGroup2');
+    const newConfig0 = getViewConfig('mpr', 'layerGroup0');
+    const newConfig1 = getViewConfig('mpr', 'layerGroup1');
+    const newConfig2 = getViewConfig('mpr', 'layerGroup2');
     // merge possibly existing app config with the new one to
     // keed window level for example
     const appConfig = getAppViewConfig(dataId);
@@ -1056,7 +1071,7 @@ function sortByPosPatKey(obj) {
  */
 function getPrecisionRound(precision) {
   return function (x) {
-    return dwv.precisionRound(x, precision);
+    return precisionRound(x, precision);
   };
 }
 
@@ -1095,9 +1110,14 @@ function setupAbout() {
   link.href = 'https://github.com/ivmartel/dwv';
   link.appendChild(document.createTextNode('dwv'));
   const text = document.createTextNode(
-    ' v' + dwv.getDwvVersion() +
+    ' v' + getDwvVersion() +
     ' on ' + navigator.userAgent);
 
   testsDiv.appendChild(link);
   testsDiv.appendChild(text);
 }
+
+// ---------------------------------------------
+
+// launch
+setup();

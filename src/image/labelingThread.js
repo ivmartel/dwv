@@ -15,8 +15,6 @@ import {Size} from './size.js';
  * )} TypedArray
  */
 
-const labelingWorkerUrl = new URL('./labelingWorker.js', import.meta.url);
-
 /**
  * Generate a worker message to send to the labeling worker.
  *
@@ -52,6 +50,23 @@ export function generateWorkerMessage(imageBuffer, imageSize) {
 }
 
 /**
+ * Labeling worker task.
+ */
+class LabelingWorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getWorker() {
+    return new Worker(
+      new URL('./labeling.worker.js', import.meta.url),
+      {
+        name: 'labeling.worker'
+      }
+    );
+  }
+}
+
+/**
  * Labeling thread.
  */
 export class LabelingThread {
@@ -79,8 +94,7 @@ export class LabelingThread {
 
     this.#threadPool.onworkitem = this.ondone;
 
-    const workerTask = new WorkerTask(
-      labelingWorkerUrl,
+    const workerTask = new LabelingWorkerTask(
       generateWorkerMessage(imageBuffer, size),
       {}
     );
