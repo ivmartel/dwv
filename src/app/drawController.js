@@ -73,9 +73,10 @@ export class DrawController {
    *
    * @param {Annotation} annotation The annotation to update.
    * @param {string[]} [propKeys] Optional properties that got updated.
+   * @param {boolean} [silent] Whether to send a update event or not.
    */
-  updateAnnotation(annotation, propKeys) {
-    this.#annotationGroup.update(annotation, propKeys);
+  updateAnnotation(annotation, propKeys, silent) {
+    this.#annotationGroup.update(annotation, propKeys, silent);
   }
 
   /**
