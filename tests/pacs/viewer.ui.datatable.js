@@ -35,7 +35,7 @@ export class DataTableUI {
   constructor(app) {
     this.#app = app;
   }
-  
+
   /**
    * Bind app to ui.
    *

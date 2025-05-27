@@ -522,7 +522,7 @@ function setup() {
     }
 
     // re-enable crosshairs
-    const divIds = test.getLayerGroupDivIds(newConfigs);
+    const divIds = getLayerGroupDivIds(newConfigs);
     for (const divId of divIds) {
       _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
     }

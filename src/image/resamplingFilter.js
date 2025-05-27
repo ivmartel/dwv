@@ -146,14 +146,19 @@ export class ResamplingFilter {
           centeredIndexPoint[1] = (y - halfTargetSize[1]) * targetSpacing[1];
           centeredIndexPoint[2] = (z - halfTargetSize[2]) * targetSpacing[2];
 
-          relativeMatrix.multiplyTypedArray3D(centeredIndexPoint, rotIndexPoint);
+          relativeMatrix.multiplyTypedArray3D(
+            centeredIndexPoint, rotIndexPoint
+          );
 
-          sourceIndexPoint[0] =
-            this.#snapRound((rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]);
-          sourceIndexPoint[1] =
-            this.#snapRound((rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]);
-          sourceIndexPoint[2] =
-            this.#snapRound((rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]);
+          sourceIndexPoint[0] = this.#snapRound(
+            (rotIndexPoint[0] / sourceSpacing[0]) + halfSourceSize[0]
+          );
+          sourceIndexPoint[1] = this.#snapRound(
+            (rotIndexPoint[1] / sourceSpacing[1]) + halfSourceSize[1]
+          );
+          sourceIndexPoint[2] = this.#snapRound(
+            (rotIndexPoint[2] / sourceSpacing[2]) + halfSourceSize[2]
+          );
 
           if (!(
             sourceIndexPoint[0] < 0 ||
