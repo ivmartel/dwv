@@ -4,6 +4,10 @@ import {webpackCommon} from './webpack.common.js';
 export default merge(webpackCommon, {
   mode: 'production',
   devtool: 'source-map',
+  // using 'web' target since it creates a bundle
+  //   that does not reference 'Document', as opposed to
+  //   undefined target (that then uses browserlist)
+  target: 'web',
   module: {
     rules: [
       {
