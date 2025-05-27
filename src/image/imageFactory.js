@@ -4,7 +4,7 @@ import {RescaleSlopeAndIntercept} from './rsi';
 import {WindowLevel} from './windowLevel';
 import {Image} from './image';
 import {ColourMap} from './luts';
-import {safeGet} from '../dicom/dataElement';
+import {safeGet, safeGetAll} from '../dicom/dataElement';
 import {
   isJpeg2000TransferSyntax,
   isJpegBaselineTransferSyntax,
@@ -252,6 +252,9 @@ export class ImageFactory {
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
     };
+    const safeGetAllLocal = function (key) {
+      return safeGetAll(dataElements, key);
+    };
 
     // defaults
     meta.TransferSyntaxUID = safeGetLocal('00020010');
@@ -287,7 +290,7 @@ export class ImageFactory {
     meta.DeviceSerialNumber = safeGetLocal('00181000');
     meta.SoftwareVersions = safeGetLocal('00181020');
 
-    meta.ImageOrientationPatient = safeGetLocal('00200037');
+    meta.ImageOrientationPatient = safeGetAllLocal('00200037');
     meta.FrameOfReferenceUID = safeGetLocal('00200052');
 
     // PixelRepresentation -> is signed

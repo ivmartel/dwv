@@ -9,6 +9,7 @@ import {RescaleSlopeAndIntercept} from './rsi';
 import {ImageFactory} from './imageFactory';
 import {MaskFactory} from './maskFactory';
 import {isMonochrome} from '../dicom/dicomElementsWrapper';
+import {REAL_WORLD_EPSILON} from '../math/matrix';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -781,7 +782,7 @@ export class Image {
       throw new Error('Cannot append a slice with different number of rows');
     }
     if (!this.#geometry.getOrientation().isSimilar(
-      rhs.getGeometry().getOrientation(), 0.0001)) {
+      rhs.getGeometry().getOrientation(), REAL_WORLD_EPSILON)) {
       throw new Error('Cannot append a slice with different orientation');
     }
     if (this.#photometricInterpretation !==
@@ -791,8 +792,12 @@ export class Image {
     }
     // all meta should be equal
     for (const key in this.#meta) {
-      if (key === 'windowPresets' || key === 'numberOfFiles' ||
-        key === 'custom') {
+      if (key === 'windowPresets' ||
+        key === 'numberOfFiles' ||
+        key === 'custom' ||
+        // This was already checked with #geometry.getOrientation()
+        key === 'ImageOrientationPatient'
+      ) {
         continue;
       }
       if (this.#meta[key] !== rhs.getMeta()[key]) {
