@@ -10,6 +10,7 @@ import {getAsSimpleElements} from '../../src/dicom/dicomTag.js';
 import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
+import {Matrix33} from '../../src/math/matrix.js';
 
 import {
   getViewConfig,
@@ -541,7 +542,7 @@ function setup() {
     const geometry = image.getGeometry();
 
     /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new dwv.Matrix33([
+    const rotation = new Matrix33([
       1, 0, 0,
       0, Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1),
       0, Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1)
@@ -564,7 +565,7 @@ function setup() {
     const geometry = image.getGeometry();
 
     /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new dwv.Matrix33([
+    const rotation = new Matrix33([
       Math.cos(Math.PI * 0.1), 0, -Math.sin(Math.PI * 0.1),
       0, 1, 0,
       Math.sin(Math.PI * 0.1), 0, Math.cos(Math.PI * 0.1)
@@ -587,7 +588,7 @@ function setup() {
     const geometry = image.getGeometry();
 
     /* eslint-disable @stylistic/js/array-element-newline */
-    const rotation = new dwv.Matrix33([
+    const rotation = new Matrix33([
       Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1), 0,
       Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1), 0,
       0, 0, 1

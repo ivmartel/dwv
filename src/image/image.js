@@ -10,7 +10,7 @@ import {ImageFactory} from './imageFactory.js';
 import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
-import {ResamplingThread} from './resamplingThread';
+import {ResamplingThread} from './resamplingThread.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */

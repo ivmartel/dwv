@@ -22,7 +22,22 @@ import {Point} from '../math/point.js';
  * )} TypedArray
  */
 
-const resamplingWorkerUrl = new URL('./resamplingWorker.js', import.meta.url);
+/**
+ * Resampling worker task.
+ */
+class ResamplingWorkerTask extends WorkerTask {
+  constructor(message, info) {
+    super(message, info);
+  }
+  getWorker() {
+    return new Worker(
+      new URL('./resampling.worker.js', import.meta.url),
+      {
+        name: 'resampling.worker'
+      }
+    );
+  }
+}
 
 /**
  * Generate a worker message to send to the resampling worker.
@@ -362,11 +377,7 @@ export class ResamplingThread {
 
     this.#threadPool.onworkitem = this.ondone;
 
-    const workerTask = new WorkerTask(
-      resamplingWorkerUrl,
-      workerMessage,
-      {}
-    );
+    const workerTask = new ResamplingWorkerTask(workerMessage, {});
 
     // add it the queue and run it
     this.#threadPool.addWorkerTask(workerTask);
