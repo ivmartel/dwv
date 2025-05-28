@@ -57,7 +57,8 @@ const TagKeys = {
   RedPaletteColorLookupTableData: '00281201',
   GreenPaletteColorLookupTableData: '00281202',
   BluePaletteColorLookupTableData: '00281203',
-  RecommendedDisplayFrameRate: '00082144'
+  RecommendedDisplayFrameRate: '00082144',
+  PixelData: '7FE00010'
 };
 
 /**
@@ -274,6 +275,11 @@ export class ImageFactory {
     this.#warning = undefined;
     // will throw if columns or rows is not defined
     getImage2DSize(dataElements);
+    // pixel data
+    const pixelData = safeGetAll(dataElements, TagKeys.PixelData);
+    if (typeof pixelData === 'undefined') {
+      throw new Error('No pixel data in DICOM file');
+    }
     // check PET SUV
     const modality = safeGet(dataElements, TagKeys.Modality);
     if (typeof modality !== 'undefined' && modality === 'PT') {
