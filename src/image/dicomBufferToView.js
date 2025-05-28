@@ -57,8 +57,7 @@ export class DicomBufferToView {
    *   The associated factory.
    */
   #getFactory(elements) {
-    // default
-    let factory = new ImageFactory();
+    let factory;
 
     // mask or annotation
     const modalityElement = elements['00080060'];
@@ -72,6 +71,12 @@ export class DicomBufferToView {
         factory = new AnnotationGroupFactory();
       }
     }
+
+    // default
+    if (typeof factory === 'undefined') {
+      factory = new ImageFactory();
+    }
+
     return factory;
   }
 
