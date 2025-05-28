@@ -53,11 +53,14 @@ export class DicomBufferToView {
    * Get the factory associated to input DICOM elements.
    *
    * @param {Object<string, DataElement>} elements The DICOM elements.
-   * @returns {ImageFactory|MaskFactory|AnnotationGroupFactory|undefined}
+   * @returns {ImageFactory|MaskFactory|AnnotationGroupFactory}
    *   The associated factory.
    */
   #getFactory(elements) {
-    let factory;
+    // default
+    let factory = new ImageFactory();
+
+    // mask or annotation
     const modalityElement = elements['00080060'];
     if (typeof modalityElement !== 'undefined') {
       const modality = modalityElement.value[0];
@@ -67,13 +70,6 @@ export class DicomBufferToView {
       } else if (modality === 'SR') {
         // annotation factory for DICOM SR
         factory = new AnnotationGroupFactory();
-      }
-    }
-    // image factory for pixel data
-    if (typeof factory === 'undefined') {
-      const pixelElement = elements['7FE00010'];
-      if (typeof pixelElement !== 'undefined') {
-        factory = new ImageFactory();
       }
     }
     return factory;
@@ -375,9 +371,7 @@ export class DicomBufferToView {
       dicomParser.parse(buffer);
       // check elements
       factory = this.#getFactory(dicomParser.getDicomElements());
-      if (typeof factory !== 'undefined') {
-        factory.checkElements(dicomParser.getDicomElements());
-      }
+      factory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
       this.onerror({
         error: error,
