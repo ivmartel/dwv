@@ -1,5 +1,5 @@
 import {
-  validateWindowWidth,
+  validateWindowWidthAndCenter,
   WindowLevel
 } from '../../src/image/windowLevel.js';
 
@@ -32,8 +32,12 @@ QUnit.test('WindowLevel class', function (assert) {
  * @function module:tests/image~validatewindowwidth
  */
 QUnit.test('validateWindowWidth.', function (assert) {
-  assert.equal(validateWindowWidth(1), 1, 'Validate width #0');
-  assert.equal(validateWindowWidth(10), 10, 'Validate width #1');
-  assert.equal(validateWindowWidth(0), 1, 'Validate zero width');
-  assert.equal(validateWindowWidth(-1), 1, 'Validate negative width');
+  const test01 = validateWindowWidthAndCenter(5, 1, 0, 10);
+  assert.equal(test01.width, 1, 'Validate width #0');
+  const test02 = validateWindowWidthAndCenter(5, 10, 0, 10);
+  assert.equal(test02.width, 10, 'Validate width #1');
+  const test03 = validateWindowWidthAndCenter(5, 0, 0, 10);
+  assert.equal(test03.width, 1, 'Validate zero width');
+  const test04 = validateWindowWidthAndCenter(5, -1, 0, 10);
+  assert.equal(test04.width, 1, 'Validate negative width');
 });
