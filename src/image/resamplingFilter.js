@@ -124,15 +124,15 @@ export class ResamplingFilter {
     const relativeMatrix = targetMatrix.multiply(invSourceMatrix);
 
     const halfTargetSize = [
-      targetSize[0] / 2.0,
-      targetSize[1] / 2.0,
-      targetSize[2] / 2.0
+      (targetSize[0] - 1) / 2.0,
+      (targetSize[1] - 1) / 2.0,
+      (targetSize[2] - 1) / 2.0
     ];
 
     const halfSourceSize = [
-      sourceSize[0] / 2.0,
-      sourceSize[1] / 2.0,
-      sourceSize[2] / 2.0
+      (sourceSize[0] - 1) / 2.0,
+      (sourceSize[1] - 1) / 2.0,
+      (sourceSize[2] - 1) / 2.0
     ];
 
     const centeredIndexPoint = new Float64Array(3);
