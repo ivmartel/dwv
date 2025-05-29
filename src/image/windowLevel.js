@@ -8,13 +8,57 @@ import {logger} from '../utils/logger.js';
 const minWindowWidth = 1;
 
 /**
- * Validate an input window width.
+ * Validate and constrain an input window width and center.
  *
- * @param {number} value The value to test.
- * @returns {number} A valid window width.
+ * @param {number} center The center to test.
+ * @param {number} width The width to test.
+ * @param {number} valueMin The minimum value this width and center is for.
+ * @param {number} valueMax The maximum value this width and center is for.
+ * @returns {{center: number, width: number}} A valid window width and center.
  */
-export function validateWindowWidth(value) {
-  return value < minWindowWidth ? minWindowWidth : value;
+export function validateWindowWidthAndCenter(
+  center,
+  width,
+  valueMin,
+  valueMax
+) {
+  // Assumes we are using the LINEAR VOI LUT function:
+  // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2
+
+  let centerBound = center;
+  centerBound = Math.min(valueMax + 0.5 - ((width - 1) * 0.5), centerBound);
+  centerBound = Math.max(valueMin + 0.5 + ((width - 1) * 0.5), centerBound);
+
+  let widthBound = width;
+  widthBound = Math.max(widthBound, minWindowWidth);
+  widthBound =
+    Math.min(
+      ((valueMax - center + 0.5) * 2) + 1,
+      ((center - valueMin - 0.5) * 2) + 1,
+      widthBound
+    );
+
+  const snapDiff = (valueMax - valueMin) * 0.003;
+  const valueCenter = ((valueMax - valueMin) * 0.5) + valueMin;
+
+  if (Math.abs(centerBound - valueMax) <= snapDiff) {
+    centerBound = valueMax;
+  } else if (Math.abs(centerBound - valueMin) <= snapDiff) {
+    centerBound = valueMin;
+  } else if (Math.abs(centerBound - valueCenter) <= snapDiff) {
+    centerBound = valueCenter;
+  }
+
+  if (Math.abs(widthBound - valueMax) <= snapDiff) {
+    widthBound = valueMax;
+  } else if (Math.abs(widthBound - valueMin) <= snapDiff) {
+    widthBound = valueMin;
+  }
+
+  return {
+    center: centerBound,
+    width: widthBound
+  };
 }
 
 /**
