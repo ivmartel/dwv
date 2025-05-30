@@ -4,7 +4,7 @@ import {WindowLevel} from './windowLevel.js';
 /* eslint-enable no-unused-vars */
 
 /**
- * VOI (Values of Interest) LUT class: apply window centre and width.
+ * VOI linear function.
  *
  * ```
  * if (x <= c - 0.5 - (w-1)/2) then y = ymin
@@ -12,7 +12,87 @@ import {WindowLevel} from './windowLevel.js';
  * else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * ```
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2.1}.
+ */
+export class VoiLinearFunction {
+  /**
+   * Input value minimum.
+   *
+   * @type {number}
+   */
+  #xmin;
+
+  /**
+   * Input value maximum.
+   *
+   * @type {number}
+   */
+  #xmax;
+
+  /**
+   * Output value minimum. Defaults to 0.
+   *
+   * @type {number}
+   */
+  #ymin = 0;
+
+  /**
+   * Output value maximum. Defaults to 255.
+   *
+   * @type {number}
+   */
+  #ymax = 255;
+
+  /**
+   * Function slope.
+   *
+   * @type {number}
+   */
+  #slope;
+
+  /**
+   * Function intercept.
+   *
+   * @type {number}
+   */
+  #intercept;
+
+  /**
+   * @param {number} center The window level center.
+   * @param {number} width The window level width.
+   */
+  constructor(center, width) {
+    // from the standard
+    this.#xmin = center - 0.5 - ((width - 1) / 2);
+    this.#xmax = center - 0.5 + ((width - 1) / 2);
+    // pre-calculate slope and intercept
+    this.#slope = (this.#ymax - this.#ymin) / (width - 1);
+    this.#intercept = (-(center - 0.5) / (width - 1) + 0.5) *
+      (this.#ymax - this.#ymin) + this.#ymin;
+  }
+
+  /**
+   * Get the value of the function at a given number.
+   *
+   * @param {number} x The input value.
+   * @returns {number} The value of the function at x.
+   */
+  getY(x) {
+    let res;
+    if (x <= this.#xmin) {
+      res = this.#ymin;
+    } else if (x > this.#xmax) {
+      res = this.#ymax;
+    } else {
+      res = (x * this.#slope) + this.#intercept;
+    }
+    return res;
+  }
+}
+
+/**
+ * VOI (Values of Interest) LUT class: apply window centre and width
+ * using a VOI function.
  */
 export class VoiLut {
 
@@ -31,46 +111,11 @@ export class VoiLut {
   #signedOffset = 0;
 
   /**
-   * Output value minimum. Defaults to 0.
+   * VOI function.
    *
-   * @type {number}
+   * @type {VoiLinearFunction}
    */
-  #ymin = 0;
-
-  /**
-   * Output value maximum. Defaults to 255.
-   *
-   * @type {number}
-   */
-  #ymax = 255;
-
-  /**
-   * Input value minimum (calculated).
-   *
-   * @type {number}
-   */
-  #xmin = null;
-
-  /**
-   * Input value maximum (calculated).
-   *
-   * @type {number}
-   */
-  #xmax = null;
-
-  /**
-   * Window level equation slope (calculated).
-   *
-   * @type {number}
-   */
-  #slope = null;
-
-  /**
-   * Window level equation intercept (calculated).
-   *
-   * @type {number}
-   */
-  #inter = null;
+  #voiFunction;
 
   /**
    * @param {WindowLevel} wl The window center and width.
@@ -91,22 +136,13 @@ export class VoiLut {
 
   /**
    * Initialise members. Called at construction.
-   *
    */
   #init() {
     const center = this.#windowLevel.center;
     const width = this.#windowLevel.width;
     const c = center + this.#signedOffset;
-    // from the standard
-    this.#xmin = c - 0.5 - ((width - 1) / 2);
-    this.#xmax = c - 0.5 + ((width - 1) / 2);
-    // develop the equation:
-    // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
-    // y = ( x / (w-1) ) * (ymax - ymin) +
-    //     ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
-    this.#slope = (this.#ymax - this.#ymin) / (width - 1);
-    this.#inter = (-(c - 0.5) / (width - 1) + 0.5) *
-      (this.#ymax - this.#ymin) + this.#ymin;
+
+    this.#voiFunction = new VoiLinearFunction(c, width);
   }
 
   /**
@@ -125,17 +161,10 @@ export class VoiLut {
    * Apply the window level on an input value.
    *
    * @param {number} value The value to rescale as an integer.
-   * @returns {number} The leveled value, in the
-   *  [ymin, ymax] range (default [0,255]).
+   * @returns {number} The leveled value, in the [0,255] range.
    */
   apply(value) {
-    if (value <= this.#xmin) {
-      return this.#ymin;
-    } else if (value > this.#xmax) {
-      return this.#ymax;
-    } else {
-      return (value * this.#slope) + this.#inter;
-    }
+    return this.#voiFunction.getY(value);
   }
 
 } // class VoiLut
