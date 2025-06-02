@@ -920,46 +920,46 @@ export class View {
 
     const photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation) {
-    case 'MONOCHROME1':
-    case 'MONOCHROME2':
-      generateImageDataMonochrome(
-        data,
-        iterator,
-        this.getAlphaFunction(),
-        this.#getCurrentWindowLut(),
-        this.#getColourMapLut()
-      );
-      break;
+      case 'MONOCHROME1':
+      case 'MONOCHROME2':
+        generateImageDataMonochrome(
+          data,
+          iterator,
+          this.getAlphaFunction(),
+          this.#getCurrentWindowLut(),
+          this.#getColourMapLut()
+        );
+        break;
 
-    case 'PALETTE COLOR':
-      generateImageDataPaletteColor(
-        data,
-        iterator,
-        this.getAlphaFunction(),
-        image.getPaletteColourMap(),
-        image.getMeta().BitsStored === 16
-      );
-      break;
+      case 'PALETTE COLOR':
+        generateImageDataPaletteColor(
+          data,
+          iterator,
+          this.getAlphaFunction(),
+          image.getPaletteColourMap(),
+          image.getMeta().BitsStored === 16
+        );
+        break;
 
-    case 'RGB':
-      generateImageDataRgb(
-        data,
-        iterator,
-        this.getAlphaFunction()
-      );
-      break;
+      case 'RGB':
+        generateImageDataRgb(
+          data,
+          iterator,
+          this.getAlphaFunction()
+        );
+        break;
 
-    case 'YBR_FULL':
-      generateImageDataYbrFull(
-        data,
-        iterator,
-        this.getAlphaFunction()
-      );
-      break;
+      case 'YBR_FULL':
+        generateImageDataYbrFull(
+          data,
+          iterator,
+          this.getAlphaFunction()
+        );
+        break;
 
-    default:
-      throw new Error(
-        'Unsupported photometric interpretation: ' + photoInterpretation);
+      default:
+        throw new Error(
+          'Unsupported photometric interpretation: ' + photoInterpretation);
     }
   }
 

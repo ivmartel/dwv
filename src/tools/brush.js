@@ -1013,23 +1013,23 @@ export class Brush extends EventTarget {
     let circleDims;
     const scrollIndex = viewController.getScrollDimIndex();
     switch (scrollIndex) {
-    case 0: {
-      circleDims = [1, 2];
-      break;
-    }
-    case 1: {
-      circleDims = [0, 2];
-      break;
-    }
-    case 2: {
-      circleDims = [0, 1];
-      break;
-    }
-    default: {
-      throw new Error(
-        formatString(ERROR_MESSAGES.brush.unsupportedScrollIndex, scrollIndex)
-      );
-    }
+      case 0: {
+        circleDims = [1, 2];
+        break;
+      }
+      case 1: {
+        circleDims = [0, 2];
+        break;
+      }
+      case 2: {
+        circleDims = [0, 1];
+        break;
+      }
+      default: {
+        throw new Error(
+          formatString(ERROR_MESSAGES.brush.unsupportedScrollIndex, scrollIndex)
+        );
+      }
     }
 
     this.#addMaskSlices(

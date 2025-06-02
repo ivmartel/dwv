@@ -207,25 +207,25 @@ export class EllipseFactory {
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'anchor0':
-      // block y
-      left.y(right.y());
-      break;
-    case 'anchor1':
-      // block y
-      right.y(left.y());
-      break;
-    case 'anchor2':
-      // block x
-      bottom.x(top.x());
-      break;
-    case 'anchor3':
-      // block x
-      top.x(bottom.x());
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // block y
+        left.y(right.y());
+        break;
+      case 'anchor1':
+        // block y
+        right.y(left.y());
+        break;
+      case 'anchor2':
+        // block x
+        bottom.x(top.x());
+        break;
+      case 'anchor3':
+        // block x
+        top.x(bottom.x());
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 
@@ -277,21 +277,21 @@ export class EllipseFactory {
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'anchor0':
-      radiusX = center.getX() - anchor.x();
-      break;
-    case 'anchor1':
-      radiusX = anchor.x() - center.getX();
-      break;
-    case 'anchor2':
-      radiusY = anchor.y() - center.getY();
-      break;
-    case 'anchor3':
-      radiusY = center.getY() - anchor.y();
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        radiusX = center.getX() - anchor.x();
+        break;
+      case 'anchor1':
+        radiusX = anchor.x() - center.getX();
+        break;
+      case 'anchor2':
+        radiusY = anchor.y() - center.getY();
+        break;
+      case 'anchor3':
+        radiusY = center.getY() - anchor.y();
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
 
     annotation.mathShape = new Ellipse(
@@ -465,41 +465,41 @@ export class EllipseFactory {
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'anchor0':
-      // update self
-      left.x(anchor.x());
-      // update others
-      right.x(center.getX() + swapX * radiusX);
-      bottom.y(center.getY() + radiusY);
-      top.y(center.getY() - radiusY);
-      break;
-    case 'anchor1':
-      // update self
-      right.x(anchor.x());
-      // update others
-      left.x(center.getX() - swapX * radiusX);
-      bottom.y(center.getY() + radiusY);
-      top.y(center.getY() - radiusY);
-      break;
-    case 'anchor2':
-      // update self
-      bottom.y(anchor.y());
-      // update others
-      left.x(center.getX() - radiusX);
-      right.x(center.getX() + radiusX);
-      top.y(center.getY() - swapY * radiusY);
-      break;
-    case 'anchor3':
-      // update self
-      top.y(anchor.y());
-      // update others
-      left.x(center.getX() - radiusX);
-      right.x(center.getX() + radiusX);
-      bottom.y(center.getY() + swapY * radiusY);
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // update self
+        left.x(anchor.x());
+        // update others
+        right.x(center.getX() + swapX * radiusX);
+        bottom.y(center.getY() + radiusY);
+        top.y(center.getY() - radiusY);
+        break;
+      case 'anchor1':
+        // update self
+        right.x(anchor.x());
+        // update others
+        left.x(center.getX() - swapX * radiusX);
+        bottom.y(center.getY() + radiusY);
+        top.y(center.getY() - radiusY);
+        break;
+      case 'anchor2':
+        // update self
+        bottom.y(anchor.y());
+        // update others
+        left.x(center.getX() - radiusX);
+        right.x(center.getX() + radiusX);
+        top.y(center.getY() - swapY * radiusY);
+        break;
+      case 'anchor3':
+        // update self
+        top.y(anchor.y());
+        // update others
+        left.x(center.getX() - radiusX);
+        right.x(center.getX() + radiusX);
+        bottom.y(center.getY() + swapY * radiusY);
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 

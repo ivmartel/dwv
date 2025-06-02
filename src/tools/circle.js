@@ -206,25 +206,25 @@ export class CircleFactory {
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'anchor0':
-      // block y
-      left.y(right.y());
-      break;
-    case 'anchor1':
-      // block y
-      right.y(left.y());
-      break;
-    case 'anchor2':
-      // block x
-      bottom.x(top.x());
-      break;
-    case 'anchor3':
-      // block x
-      top.x(bottom.x());
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // block y
+        left.y(right.y());
+        break;
+      case 'anchor1':
+        // block y
+        right.y(left.y());
+        break;
+      case 'anchor2':
+        // block x
+        bottom.x(top.x());
+        break;
+      case 'anchor3':
+        // block x
+        top.x(bottom.x());
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 
@@ -438,41 +438,41 @@ export class CircleFactory {
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'anchor0':
-      // update self
-      left.x(anchor.x());
-      // update others
-      right.x(center.getX() + swapX * radius);
-      bottom.y(center.getY() + radius);
-      top.y(center.getY() - radius);
-      break;
-    case 'anchor1':
-      // update self
-      right.x(anchor.x());
-      // update others
-      left.x(center.getX() - swapX * radius);
-      bottom.y(center.getY() + radius);
-      top.y(center.getY() - radius);
-      break;
-    case 'anchor2':
-      // update self
-      bottom.y(anchor.y());
-      // update others
-      left.x(center.getX() - radius);
-      right.x(center.getX() + radius);
-      top.y(center.getY() - swapY * radius);
-      break;
-    case 'anchor3':
-      // update self
-      top.y(anchor.y());
-      // update others
-      left.x(center.getX() - radius);
-      right.x(center.getX() + radius);
-      bottom.y(center.getY() + swapY * radius);
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // update self
+        left.x(anchor.x());
+        // update others
+        right.x(center.getX() + swapX * radius);
+        bottom.y(center.getY() + radius);
+        top.y(center.getY() - radius);
+        break;
+      case 'anchor1':
+        // update self
+        right.x(anchor.x());
+        // update others
+        left.x(center.getX() - swapX * radius);
+        bottom.y(center.getY() + radius);
+        top.y(center.getY() - radius);
+        break;
+      case 'anchor2':
+        // update self
+        bottom.y(anchor.y());
+        // update others
+        left.x(center.getX() - radius);
+        right.x(center.getX() + radius);
+        top.y(center.getY() - swapY * radius);
+        break;
+      case 'anchor3':
+        // update self
+        top.y(anchor.y());
+        // update others
+        left.x(center.getX() - radius);
+        right.x(center.getX() + radius);
+        bottom.y(center.getY() + swapY * radius);
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 

@@ -490,17 +490,17 @@ export class ArrowFactory {
 
     // update 'self' (undo case)
     switch (anchor.id()) {
-    case 'anchor0':
-      begin.x(anchor.x());
-      begin.y(anchor.y());
-      break;
-    case 'anchor1':
-      end.x(anchor.x());
-      end.y(anchor.y());
-      break;
-    default:
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        begin.x(anchor.x());
+        begin.y(anchor.y());
+        break;
+      case 'anchor1':
+        end.x(anchor.x());
+        end.y(anchor.y());
+        break;
+      default:
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
 
     const tickLen = 20;

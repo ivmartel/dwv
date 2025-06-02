@@ -502,18 +502,18 @@ export class ProtractorFactory {
 
     // update special points
     switch (anchor.id()) {
-    case 'anchor0':
-      begin.x(anchor.x());
-      begin.y(anchor.y());
-      break;
-    case 'anchor1':
-      mid.x(anchor.x());
-      mid.y(anchor.y());
-      break;
-    case 'anchor2':
-      end.x(anchor.x());
-      end.y(anchor.y());
-      break;
+      case 'anchor0':
+        begin.x(anchor.x());
+        begin.y(anchor.y());
+        break;
+      case 'anchor1':
+        mid.x(anchor.x());
+        mid.y(anchor.y());
+        break;
+      case 'anchor2':
+        end.x(anchor.x());
+        end.y(anchor.y());
+        break;
     }
 
     // angle

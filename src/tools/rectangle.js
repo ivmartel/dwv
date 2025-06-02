@@ -417,41 +417,41 @@ export class RectangleFactory {
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'anchor0':
-      // update self
-      topLeft.x(anchor.x());
-      topLeft.y(anchor.y());
-      // update others
-      topRight.y(anchor.y());
-      bottomLeft.x(anchor.x());
-      break;
-    case 'anchor1':
-      // update self
-      topRight.x(anchor.x());
-      topRight.y(anchor.y());
-      // update others
-      topLeft.y(anchor.y());
-      bottomRight.x(anchor.x());
-      break;
-    case 'anchor2':
-      // update self
-      bottomRight.x(anchor.x());
-      bottomRight.y(anchor.y());
-      // update others
-      bottomLeft.y(anchor.y());
-      topRight.x(anchor.x());
-      break;
-    case 'anchor3':
-      // update self
-      bottomLeft.x(anchor.x());
-      bottomLeft.y(anchor.y());
-      // update others
-      bottomRight.y(anchor.y());
-      topLeft.x(anchor.x());
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // update self
+        topLeft.x(anchor.x());
+        topLeft.y(anchor.y());
+        // update others
+        topRight.y(anchor.y());
+        bottomLeft.x(anchor.x());
+        break;
+      case 'anchor1':
+        // update self
+        topRight.x(anchor.x());
+        topRight.y(anchor.y());
+        // update others
+        topLeft.y(anchor.y());
+        bottomRight.x(anchor.x());
+        break;
+      case 'anchor2':
+        // update self
+        bottomRight.x(anchor.x());
+        bottomRight.y(anchor.y());
+        // update others
+        bottomLeft.y(anchor.y());
+        topRight.x(anchor.x());
+        break;
+      case 'anchor3':
+        // update self
+        bottomLeft.x(anchor.x());
+        bottomLeft.y(anchor.y());
+        // update others
+        bottomRight.y(anchor.y());
+        topLeft.x(anchor.x());
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 
