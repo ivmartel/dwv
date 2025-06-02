@@ -42,6 +42,7 @@ const TagKeys = {
   PlanarConfiguration: '00280006',
   RescaleSlope: '00281053',
   RescaleIntercept: '00281052',
+  VOILUTFunction: '00281056',
   MediaStorageSOPClassUID: '00020002',
   ImageType: '00080008',
   PhotometricInterpretation: '00280004',
@@ -480,6 +481,7 @@ export class ImageFactory {
     if (typeof presets !== 'undefined') {
       meta.windowPresets = presets;
     }
+    meta.VOILUTFunction = safeGetLocal(TagKeys.VOILUTFunction);
 
     // store the meta data
     image.setMeta(meta);

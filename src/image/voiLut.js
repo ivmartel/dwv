@@ -1,10 +1,20 @@
+import {logger} from '../utils/logger.js';
+
 // doc imports
 /* eslint-disable no-unused-vars */
 import {WindowLevel} from './windowLevel.js';
 /* eslint-enable no-unused-vars */
 
+const VoiLutFunctionNames = {
+  linear: 'LINEAR',
+  linear_exact: 'LINEAR_EXACT',
+  sigmoid: 'SIGMOID'
+};
+
 /**
  * VOI linear function.
+ *
+ * Can be default linear or linear exact.
  *
  * ```
  * if (x <= c - 0.5 - (w-1)/2) then y = ymin
@@ -12,7 +22,13 @@ import {WindowLevel} from './windowLevel.js';
  * else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * ```
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2.1}.
+ * ```
+ * if (x <= c - w/2), then y = ymin
+ * else if (x > c + w/2), then y = ymax
+ * else y = ((x - c) / w + 0.5) * (ymax- ymin) + ymin
+ * ```
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
  */
 export class VoiLinearFunction {
   /**
@@ -60,14 +76,24 @@ export class VoiLinearFunction {
   /**
    * @param {number} center The window level center.
    * @param {number} width The window level width.
+   * @param {boolean} [isExact] Is exact flag, defaults to false.
    */
-  constructor(center, width) {
+  constructor(center, width, isExact) {
+    if (typeof isExact === 'undefined') {
+      isExact = false;
+    }
     // from the standard
-    this.#xmin = center - 0.5 - ((width - 1) / 2);
-    this.#xmax = center - 0.5 + ((width - 1) / 2);
+    let c = center;
+    let w = width;
+    if (!isExact) {
+      c -= 0.5;
+      w -= 1;
+    }
+    this.#xmin = c - (w / 2);
+    this.#xmax = c + (w / 2);
     // pre-calculate slope and intercept
-    this.#slope = (this.#ymax - this.#ymin) / (width - 1);
-    this.#intercept = (-(center - 0.5) / (width - 1) + 0.5) *
+    this.#slope = (this.#ymax - this.#ymin) / w;
+    this.#intercept = (-c / w + 0.5) *
       (this.#ymax - this.#ymin) + this.#ymin;
   }
 
@@ -87,6 +113,68 @@ export class VoiLinearFunction {
       res = (x * this.#slope) + this.#intercept;
     }
     return res;
+  }
+}
+
+/**
+ * VOI sigmoid function.
+ *
+ * Can be default linear or linear exact.
+ *
+ * ```
+ * y = (ymax − ymin) / (1 + exp(−4 * (x − c) / w )) + ymin
+ * ```
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
+ */
+export class VoiSigmoidFunction {
+  /**
+   * Output value minimum. Defaults to 0.
+   *
+   * @type {number}
+   */
+  #ymin = 0;
+
+  /**
+   * Output value maximum. Defaults to 255.
+   *
+   * @type {number}
+   */
+  #ymax = 255;
+
+  /**
+   * Window level center.
+   *
+   * @type {number}
+   */
+  #center;
+
+  /**
+   * Window level width.
+   *
+   * @type {number}
+   */
+  #width;
+
+  /**
+   * @param {number} center The window level center.
+   * @param {number} width The window level width.
+   */
+  constructor(center, width) {
+    this.#center = center;
+    this.#width = width;
+  }
+
+  /**
+   * Get the value of the function at a given number.
+   *
+   * @param {number} x The input value.
+   * @returns {number} The value of the function at x.
+   */
+  getY(x) {
+    return ((this.#ymax - this.#ymin) /
+      (1 + Math.exp(-4 * (x - this.#center) / this.#width))) +
+      this.#ymin;
   }
 }
 
@@ -113,15 +201,38 @@ export class VoiLut {
   /**
    * VOI function.
    *
-   * @type {VoiLinearFunction}
+   * @type {VoiLinearFunction|VoiSigmoidFunction}
    */
   #voiFunction;
 
   /**
-   * @param {WindowLevel} wl The window center and width.
+   * VOI LUT function name.
+   *
+   * @type {string}
    */
-  constructor(wl) {
+  #voiLutFunctionName = VoiLutFunctionNames.linear;
+
+  /**
+   * @param {WindowLevel} wl The window center and width.
+   * @param {string} [voiLutFunctionName] The name of the VOI LUT function,
+   *   defaults to 'LINEAR'.
+   */
+  constructor(wl, voiLutFunctionName) {
     this.#windowLevel = wl;
+
+    if (typeof voiLutFunctionName !== 'undefined') {
+      // valid name check
+      const names = [];
+      for (const key in VoiLutFunctionNames) {
+        names.push(VoiLutFunctionNames[key]);
+      }
+      if (names.includes(voiLutFunctionName)) {
+        this.#voiLutFunctionName = voiLutFunctionName;
+      } else {
+        logger.log('Unknown VOI LUT function: ' + voiLutFunctionName);
+      }
+    }
+
     this.#init();
   }
 
@@ -142,7 +253,14 @@ export class VoiLut {
     const width = this.#windowLevel.width;
     const c = center + this.#signedOffset;
 
-    this.#voiFunction = new VoiLinearFunction(c, width);
+    if (this.#voiLutFunctionName === VoiLutFunctionNames.linear_exact) {
+      this.#voiFunction = new VoiLinearFunction(c, width, true);
+    } else if (this.#voiLutFunctionName === VoiLutFunctionNames.sigmoid) {
+      this.#voiFunction = new VoiSigmoidFunction(c, width);
+    } else {
+      // default case
+      this.#voiFunction = new VoiLinearFunction(c, width);
+    }
   }
 
   /**

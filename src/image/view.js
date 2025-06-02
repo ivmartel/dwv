@@ -376,7 +376,10 @@ export class View {
     if (typeof voiLut === 'undefined' ||
       !this.#currentWl.equals(voiLutWl)) {
       // set lut window level
-      const voiLut = new VoiLut(this.#currentWl);
+      const voiLut = new VoiLut(
+        this.#currentWl,
+        this.#image.getMeta().VOILUTFunction
+      );
       this.#windowLut.setVoiLut(voiLut);
     }
 
