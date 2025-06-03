@@ -227,7 +227,7 @@ export class VoiLut {
       if (names.includes(voiLutFunctionName)) {
         this.#voiLutFunctionName = voiLutFunctionName;
       } else {
-        logger.log('Unknown VOI LUT function: ' + voiLutFunctionName);
+        logger.debug('Unknown VOI LUT function: ' + voiLutFunctionName);
       }
     }
 
