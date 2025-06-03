@@ -330,8 +330,6 @@ export class DicomBufferToView {
     const dicomParser = this.#dicomParserStore[index];
 
     const pixelBuffer = dicomParser.getDicomElements()['7FE00010'].value;
-    // help GC: discard pixel buffer from elements
-    dicomParser.getDicomElements()['7FE00010'].value = [];
     this.#finalBufferStore[index] = pixelBuffer[0];
 
     // transfer syntax (always there)
