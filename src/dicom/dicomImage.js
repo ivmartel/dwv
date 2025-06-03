@@ -40,7 +40,8 @@ const TagKeys = {
  * Extract the 2D size from dicom elements.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number[]|undefined} The size.
+ * @returns {number[]|undefined} The sizes as [columns, rows] or
+ *   undefined if not present.
  */
 export function getImage2DSize(elements) {
   let res;
