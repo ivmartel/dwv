@@ -274,8 +274,10 @@ export class ImageFactory {
   checkElements(dataElements) {
     // reset
     this.#warning = undefined;
-    // will throw if columns or rows is not defined
-    getImage2DSize(dataElements);
+    // check image size
+    if (typeof getImage2DSize(dataElements) === 'undefined') {
+      throw new Error('No image rows or columns in DICOM file');
+    };
     // check pixel data
     if (!hasAnyPixelDataElement(dataElements)) {
       throw new Error('No pixel data in DICOM file');

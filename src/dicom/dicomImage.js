@@ -40,26 +40,17 @@ const TagKeys = {
  * Extract the 2D size from dicom elements.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number[]} The size.
+ * @returns {number[]|undefined} The size.
  */
 export function getImage2DSize(elements) {
-  // rows
-  const rows = elements[TagKeys.Rows];
-  if (typeof rows === 'undefined') {
-    throw new Error('Missing DICOM image number of rows');
+  let res;
+  const rows = safeGet(elements, TagKeys.Rows);
+  const columns = safeGet(elements, TagKeys.Columns);
+  if (typeof rows !== 'undefined' &&
+    typeof columns !== 'undefined') {
+    res = [columns, rows];
   }
-  if (rows.value.length === 0) {
-    throw new Error('Empty DICOM image number of rows');
-  }
-  // columns
-  const columns = elements[TagKeys.Columns];
-  if (typeof columns === 'undefined') {
-    throw new Error('Missing DICOM image number of columns');
-  }
-  if (columns.value.length === 0) {
-    throw new Error('Empty DICOM image number of columns');
-  }
-  return [columns.value[0], rows.value[0]];
+  return res;
 }
 
 /**
