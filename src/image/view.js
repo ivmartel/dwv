@@ -4,7 +4,7 @@ import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
 import {VoiLut} from './voiLut.js';
 import {
-  validateWindowWidthAndCenter,
+  validateWindowLevel,
   WindowLevel
 } from './windowLevel.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
@@ -15,7 +15,6 @@ import {ViewFactory} from './viewFactory.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {getSliceIterator} from '../image/iterator.js';
 import {ListenerHandler} from '../utils/listen.js';
-import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -743,16 +742,11 @@ export class View {
     }
 
     // bound window center and width
-    const range = this.#image.getRescaledDataRange();
-    const {center: windowCenterBound, width: windowWidthBound} =
-      validateWindowWidthAndCenter(
-        wl.center,
-        wl.width,
-        range.min,
-        range.max,
-        this.#image.getMeta().VOILUTFunction
-      );
-    const wlBound = new WindowLevel(windowCenterBound, windowWidthBound);
+    const wlBound = validateWindowLevel(
+      wl,
+      this.#image.getRescaledDataRange(),
+      this.#image.getMeta().VOILUTFunction
+    );
 
     // check if new wl
     const isNewWl = !wlBound.equals(this.#currentWl);
@@ -889,16 +883,13 @@ export class View {
    */
   getWindowLevelMinMax() {
     const range = this.getImage().getRescaledDataRange();
-    const min = range.min;
-    const max = range.max;
-    let width = max - min;
-    // full black / white images, defaults to 1.
-    if (width < 1) {
-      logger.warn('Zero or negative window width, defaulting to one.');
-      width = 1;
-    }
-    const center = min + width / 2;
-    return new WindowLevel(center, width);
+    const width = range.max - range.min;
+    const center = range.min + width / 2;
+    return validateWindowLevel(
+      new WindowLevel(center, width),
+      range,
+      this.#image.getMeta().VOILUTFunction
+    );
   }
 
   /**

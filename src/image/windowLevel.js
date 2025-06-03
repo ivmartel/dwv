@@ -1,26 +1,22 @@
 import {VoiLutFunctionNames} from './voiLut.js';
 
 /**
- * Validate and constrain an input window width and center.
+ * Validate and constrain an input window level.
  *
- * @param {number} center The center to test.
- * @param {number} width The width to test.
- * @param {number} valueMin The minimum value this width and center is for.
- * @param {number} valueMax The maximum value this width and center is for.
+ * @param {WindowLevel} wl The window level to validate.
+ * @param {object} range The image pixel data range.
  * @param {string} [voiLutFunctionName] The VOI LUT function name,
  *   defaults to 'LINEAR'.
- * @returns {{center: number, width: number}} A valid window width and center.
+ * @returns {WindowLevel} A valid window level.
  */
-export function validateWindowWidthAndCenter(
-  center,
-  width,
-  valueMin,
-  valueMax,
+export function validateWindowLevel(
+  wl,
+  range,
   voiLutFunctionName
 ) {
-  let centerBound = center;
-  centerBound = Math.min(valueMax, centerBound);
-  centerBound = Math.max(valueMin, centerBound);
+  let centerBound = wl.center;
+  centerBound = Math.min(centerBound, range.max);
+  centerBound = Math.max(centerBound, range.min);
 
   // width minimum depends on voi lut function
   // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1
@@ -32,14 +28,11 @@ export function validateWindowWidthAndCenter(
     minWindowWidth = 0;
   }
 
-  let widthBound = width;
+  let widthBound = wl.width;
   widthBound = Math.max(widthBound, minWindowWidth);
-  widthBound = Math.min(widthBound, valueMax - valueMin);
+  widthBound = Math.min(widthBound, range.max - range.min);
 
-  return {
-    center: centerBound,
-    width: widthBound
-  };
+  return new WindowLevel(centerBound, widthBound);
 }
 
 /**

@@ -1,5 +1,5 @@
 import {
-  validateWindowWidthAndCenter,
+  validateWindowLevel,
   WindowLevel
 } from '../../src/image/windowLevel.js';
 
@@ -27,17 +27,30 @@ QUnit.test('WindowLevel class', function (assert) {
 });
 
 /**
- * Tests for validateWindowWidthAndCenter.
+ * Tests for validateWindowLevel.
  *
- * @function module:tests/image~validateWindowWidthAndCenter
+ * @function module:tests/image~validateWindowLevel
  */
-QUnit.test('validateWindowWidthAndCenter.', function (assert) {
-  const test01 = validateWindowWidthAndCenter(5, 1, 0, 10);
-  assert.equal(test01.width, 1, 'Validate width #0');
-  const test02 = validateWindowWidthAndCenter(5, 10, 0, 10);
-  assert.equal(test02.width, 10, 'Validate width #1');
-  const test03 = validateWindowWidthAndCenter(5, 0, 0, 10);
-  assert.equal(test03.width, 1, 'Validate zero width');
-  const test04 = validateWindowWidthAndCenter(5, -1, 0, 10);
-  assert.equal(test04.width, 1, 'Validate negative width');
+QUnit.test('validateWindowLevel.', function (assert) {
+  const range0 = {min: 0, max: 10};
+
+  const wl00 = new WindowLevel(5, 1);
+  const wl01 = validateWindowLevel(wl00, range0);
+  assert.equal(wl01.center, wl00.center, 'Validate center #00');
+  assert.equal(wl01.width, wl00.width, 'Validate width #00');
+
+  const wl10 = new WindowLevel(5, 10);
+  const wl11 = validateWindowLevel(wl10, range0);
+  assert.equal(wl11.center, wl10.center, 'Validate center #10');
+  assert.equal(wl11.width, wl10.width, 'Validate width #10');
+
+  const wl20 = new WindowLevel(5, 0);
+  const wl21 = validateWindowLevel(wl20, range0);
+  assert.equal(wl21.center, wl20.center, 'Validate center #20');
+  assert.equal(wl21.width, 1, 'Validate zero width #20');
+
+  const wl30 = new WindowLevel(5, -1);
+  const wl31 = validateWindowLevel(wl30, range0);
+  assert.equal(wl31.center, wl30.center, 'Validate center #30');
+  assert.equal(wl31.width, 1, 'Validate negative width #30');
 });
