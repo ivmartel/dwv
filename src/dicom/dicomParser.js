@@ -3,7 +3,8 @@ import {
   getTransferSyntaxUIDTag,
   isSequenceDelimitationItemTag,
   isItemDelimitationItemTag,
-  isPixelDataTag
+  isAnyPixelDataTag,
+  hasAnyPixelDataElement
 } from './dicomTag.js';
 import {
   is32bitVLVR,
@@ -926,7 +927,7 @@ export class DicomParser {
 
     // read sequence elements
     let data;
-    if (isPixelDataTag(tag) && undefinedLength) {
+    if (isAnyPixelDataTag(tag) && undefinedLength) {
       // pixel data sequence (implicit)
       const pixItemData =
         this.#readPixelItemDataElement(reader, offset, implicit);
@@ -1009,7 +1010,7 @@ export class DicomParser {
     // data
     let data = null;
     const vrType = vrTypes[vr];
-    if (isPixelDataTag(tag)) {
+    if (isAnyPixelDataTag(tag)) {
       if (element.undefinedLength) {
         // implicit pixel data sequence
         data = [];
@@ -1046,6 +1047,10 @@ export class DicomParser {
           } else {
             data.push(reader.readInt16Array(offset, vl));
           }
+        } else if (bitsAllocated === 32) {
+          data.push(reader.readFloat32Array(offset, vl));
+        } else if (bitsAllocated === 64) {
+          data.push(reader.readFloat64Array(offset, vl));
         } else {
           throw new Error('Unsupported bits allocated: ' + bitsAllocated);
         }
@@ -1321,7 +1326,7 @@ export class DicomParser {
 
     // pixel specific
     let pixelTags;
-    if (typeof this.#dataElements[TagKeys.PixelData] !== 'undefined') {
+    if (hasAnyPixelDataElement(this.#dataElements)) {
       // PixelRepresentation 0->unsigned, 1->signed
       let pixelRepresentation = 0;
       dataElement = this.#dataElements[TagKeys.PixelRepresentation];

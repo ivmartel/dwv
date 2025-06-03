@@ -15,6 +15,16 @@ import {DicomData} from '../app/dataController.js';
 /* eslint-enable no-unused-vars */
 
 /**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  TransferSyntaxUID: '00020010',
+  FloatPixelData: '7FE00008',
+  DoubleFloatPixelData: '7FE00009',
+  PixelData: '7FE00010'
+};
+
+/**
  * Create a View from a DICOM buffer.
  */
 export class DicomBufferToView {
@@ -340,12 +350,23 @@ export class DicomBufferToView {
    */
   #handleImageData(index, origin) {
     const dicomParser = this.#dicomParserStore[index];
+    const elements = dicomParser.getDicomElements();
 
-    const pixelBuffer = dicomParser.getDicomElements()['7FE00010'].value;
+    let pixelDataEl = elements[TagKeys.PixelData];
+    // maybe float data
+    if (typeof pixelDataEl === 'undefined') {
+      pixelDataEl = elements[TagKeys.FloatPixelData];
+    }
+    // maybe double float data
+    if (typeof pixelDataEl === 'undefined') {
+      pixelDataEl = elements[TagKeys.DoubleFloatPixelData];
+    }
+
+    const pixelBuffer = pixelDataEl.value;
     this.#finalBufferStore[index] = pixelBuffer[0];
 
     // transfer syntax (always there)
-    const syntax = dicomParser.getDicomElements()['00020010'].value[0];
+    const syntax = elements[TagKeys.TransferSyntaxUID].value[0];
     const algoName = getSyntaxDecompressionName(syntax);
     const needDecompression = typeof algoName !== 'undefined';
 

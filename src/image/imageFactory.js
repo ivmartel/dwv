@@ -14,6 +14,7 @@ import {
   isMonochrome,
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
+import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {getTagTime} from '../dicom/dicomDate.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {Point3D} from '../math/point.js';
@@ -58,8 +59,7 @@ const TagKeys = {
   RedPaletteColorLookupTableData: '00281201',
   GreenPaletteColorLookupTableData: '00281202',
   BluePaletteColorLookupTableData: '00281203',
-  RecommendedDisplayFrameRate: '00082144',
-  PixelData: '7FE00010'
+  RecommendedDisplayFrameRate: '00082144'
 };
 
 /**
@@ -276,9 +276,8 @@ export class ImageFactory {
     this.#warning = undefined;
     // will throw if columns or rows is not defined
     getImage2DSize(dataElements);
-    // pixel data
-    const pixelData = safeGetAll(dataElements, TagKeys.PixelData);
-    if (typeof pixelData === 'undefined') {
+    // check pixel data
+    if (!hasAnyPixelDataElement(dataElements)) {
       throw new Error('No pixel data in DICOM file');
     }
     // check PET SUV
