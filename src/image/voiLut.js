@@ -12,7 +12,7 @@ const VoiLutFunctionNames = {
 };
 
 /**
- * VOI linear function.
+ * VOI LUT linear function.
  *
  * Can be default linear or linear exact.
  *
@@ -30,7 +30,7 @@ const VoiLutFunctionNames = {
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
  */
-export class VoiLinearFunction {
+export class VoiLutLinearFunction {
   /**
    * Input value minimum.
    *
@@ -117,17 +117,15 @@ export class VoiLinearFunction {
 }
 
 /**
- * VOI sigmoid function.
- *
- * Can be default linear or linear exact.
+ * VOI LUT sigmoid function.
  *
  * ```
- * y = (ymax − ymin) / (1 + exp(−4 * (x − c) / w )) + ymin
+ * y = (ymax − ymin) / (1 + exp(−4 * (x − c) / w)) + ymin
  * ```
  *
  * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
  */
-export class VoiSigmoidFunction {
+export class VoiLutSigmoidFunction {
   /**
    * Output value minimum. Defaults to 0.
    *
@@ -180,7 +178,7 @@ export class VoiSigmoidFunction {
 
 /**
  * VOI (Values of Interest) LUT class: apply window centre and width
- * using a VOI function.
+ * using a VOI LUT function.
  */
 export class VoiLut {
 
@@ -199,11 +197,11 @@ export class VoiLut {
   #signedOffset = 0;
 
   /**
-   * VOI function.
+   * VOI LUT function.
    *
-   * @type {VoiLinearFunction|VoiSigmoidFunction}
+   * @type {VoiLutLinearFunction|VoiLutSigmoidFunction}
    */
-  #voiFunction;
+  #voiLutFunction;
 
   /**
    * VOI LUT function name.
@@ -254,12 +252,12 @@ export class VoiLut {
     const c = center + this.#signedOffset;
 
     if (this.#voiLutFunctionName === VoiLutFunctionNames.linear_exact) {
-      this.#voiFunction = new VoiLinearFunction(c, width, true);
+      this.#voiLutFunction = new VoiLutLinearFunction(c, width, true);
     } else if (this.#voiLutFunctionName === VoiLutFunctionNames.sigmoid) {
-      this.#voiFunction = new VoiSigmoidFunction(c, width);
+      this.#voiLutFunction = new VoiLutSigmoidFunction(c, width);
     } else {
       // default case
-      this.#voiFunction = new VoiLinearFunction(c, width);
+      this.#voiLutFunction = new VoiLutLinearFunction(c, width);
     }
   }
 
@@ -282,7 +280,7 @@ export class VoiLut {
    * @returns {number} The leveled value, in the [0,255] range.
    */
   apply(value) {
-    return this.#voiFunction.getY(value);
+    return this.#voiLutFunction.getY(value);
   }
 
 } // class VoiLut
