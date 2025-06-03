@@ -39,14 +39,26 @@ export class DicomBufferToView {
    * Pixel buffer decoder.
    * Define only once to allow optional asynchronous mode.
    *
-   * @type {object}
+   * @type {PixelBufferDecoder}
    */
   #pixelDecoder = null;
 
-  // local tmp storage
+  /**
+   * List of dicom parsers.
+   *
+   * @type {DicomParser[]}
+   */
   #dicomParserStore = [];
-  #finalBufferStore = [];
+
+  /**
+   * List of decompressed data sizes.
+   *
+   * @type {number[]}
+   */
   #decompressedSizes = [];
+
+  // local tmp storage
+  #finalBufferStore = [];
   #factories = [];
 
   /**
