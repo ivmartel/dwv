@@ -3,7 +3,10 @@ import {ModalityLut} from './modalityLut.js';
 import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
 import {VoiLut} from './voiLut.js';
-import {WindowLevel} from './windowLevel.js';
+import {
+  validateWindowWidthAndCenter,
+  WindowLevel
+} from './windowLevel.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
 import {generateImageDataPaletteColor} from './viewPaletteColor.js';
 import {generateImageDataRgb} from './viewRgb.js';
@@ -739,26 +742,38 @@ export class View {
       silent = false;
     }
 
+    // bound window center and width
+    const range = this.#image.getRescaledDataRange();
+    const {center: windowCenterBound, width: windowWidthBound} =
+      validateWindowWidthAndCenter(
+        wl.center,
+        wl.width,
+        range.min,
+        range.max,
+        this.#image.getMeta().VOILUTFunction
+      );
+    const wlBound = new WindowLevel(windowCenterBound, windowWidthBound);
+
     // check if new wl
-    const isNewWl = !wl.equals(this.#currentWl);
+    const isNewWl = !wlBound.equals(this.#currentWl);
     // check if new name
     const isNewName = this.#currentPresetName !== name;
 
     // compare to previous if present
     if (isNewWl || isNewName) {
       // assign
-      this.#currentWl = wl;
+      this.#currentWl = wlBound;
       this.#currentPresetName = name;
 
       // update manual
       if (name === 'manual') {
         if (typeof this.#windowPresets[name] !== 'undefined') {
-          this.#windowPresets[name].wl[0] = wl;
+          this.#windowPresets[name].wl[0] = wlBound;
         } else {
           // add if not present
           this.addWindowPresets({
             manual: {
-              wl: [wl],
+              wl: [wlBound],
               name: 'manual'
             }
           });
@@ -778,9 +793,9 @@ export class View {
        */
       this.#fireEvent({
         type: 'wlchange',
-        value: [wl.center, wl.width, name],
-        wc: wl.center,
-        ww: wl.width,
+        value: [wlBound.center, wlBound.width, name],
+        wc: wlBound.center,
+        ww: wlBound.width,
         skipGenerate: silent
       });
     }

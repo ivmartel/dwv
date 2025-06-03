@@ -5,7 +5,6 @@ import {
 } from '../gui/generic.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {
-  validateWindowWidthAndCenter,
   WindowLevel as WindowLevelValues
 } from '../image/windowLevel.js';
 
@@ -129,17 +128,8 @@ export class WindowLevel {
     const windowCenter = center + (diffY * pixelToIntensity);
     const windowWidth = width + (diffX * pixelToIntensity);
 
-    // bound window center and width
-    const {center: windowCenterBound, width: windowWidthBound} =
-      validateWindowWidthAndCenter(
-        windowCenter,
-        windowWidth,
-        range.min,
-        range.max
-      );
-
-    // set
-    const wl = new WindowLevelValues(windowCenterBound, windowWidthBound);
+    // set (will validate values)
+    const wl = new WindowLevelValues(windowCenter, windowWidth);
     viewController.setWindowLevel(wl);
 
     // store position

@@ -1,11 +1,4 @@
-import {logger} from '../utils/logger.js';
-
-/**
- * Minimum window width value.
- *
- * Ref: {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
- */
-const minWindowWidth = 1;
+import {VoiLutFunctionNames} from './voiLut.js';
 
 /**
  * Validate and constrain an input window width and center.
@@ -14,20 +7,30 @@ const minWindowWidth = 1;
  * @param {number} width The width to test.
  * @param {number} valueMin The minimum value this width and center is for.
  * @param {number} valueMax The maximum value this width and center is for.
+ * @param {string} [voiLutFunctionName] The VOI LUT function name,
+ *   defaults to 'LINEAR'.
  * @returns {{center: number, width: number}} A valid window width and center.
  */
 export function validateWindowWidthAndCenter(
   center,
   width,
   valueMin,
-  valueMax
+  valueMax,
+  voiLutFunctionName
 ) {
-  // Assumes we are using the LINEAR VOI LUT function:
-  // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2
-
   let centerBound = center;
   centerBound = Math.min(valueMax, centerBound);
   centerBound = Math.max(valueMin, centerBound);
+
+  // width minimum depends on voi lut function
+  // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1
+  // (use linear min as default)
+  let minWindowWidth = 1;
+  if (typeof voiLutFunctionName !== 'undefined' &&
+    (voiLutFunctionName === VoiLutFunctionNames.linear_exact ||
+    voiLutFunctionName === VoiLutFunctionNames.sigmoid)) {
+    minWindowWidth = 0;
+  }
 
   let widthBound = width;
   widthBound = Math.max(widthBound, minWindowWidth);
@@ -62,12 +65,6 @@ export class WindowLevel {
    * @param {number} width The window width.
    */
   constructor(center, width) {
-    // check width
-    if (width < minWindowWidth) {
-      logger.warn('Using minimum window width since input is not valid: ' +
-        width);
-      width = minWindowWidth;
-    }
     this.center = center;
     this.width = width;
   }

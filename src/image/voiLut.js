@@ -5,7 +5,7 @@ import {logger} from '../utils/logger.js';
 import {WindowLevel} from './windowLevel.js';
 /* eslint-enable no-unused-vars */
 
-const VoiLutFunctionNames = {
+export const VoiLutFunctionNames = {
   linear: 'LINEAR',
   linear_exact: 'LINEAR_EXACT',
   sigmoid: 'SIGMOID'
