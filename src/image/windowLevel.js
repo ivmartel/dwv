@@ -26,34 +26,12 @@ export function validateWindowWidthAndCenter(
   // https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2
 
   let centerBound = center;
-  centerBound = Math.min(valueMax + 0.5 - ((width - 1) * 0.5), centerBound);
-  centerBound = Math.max(valueMin + 0.5 + ((width - 1) * 0.5), centerBound);
+  centerBound = Math.min(valueMax, centerBound);
+  centerBound = Math.max(valueMin, centerBound);
 
   let widthBound = width;
   widthBound = Math.max(widthBound, minWindowWidth);
-  widthBound =
-    Math.min(
-      ((valueMax - center + 0.5) * 2) + 1,
-      ((center - valueMin - 0.5) * 2) + 1,
-      widthBound
-    );
-
-  const snapDiff = (valueMax - valueMin) * 0.003;
-  const valueCenter = ((valueMax - valueMin) * 0.5) + valueMin;
-
-  if (Math.abs(centerBound - valueMax) <= snapDiff) {
-    centerBound = valueMax;
-  } else if (Math.abs(centerBound - valueMin) <= snapDiff) {
-    centerBound = valueMin;
-  } else if (Math.abs(centerBound - valueCenter) <= snapDiff) {
-    centerBound = valueCenter;
-  }
-
-  if (Math.abs(widthBound - valueMax) <= snapDiff) {
-    widthBound = valueMax;
-  } else if (Math.abs(widthBound - valueMin) <= snapDiff) {
-    widthBound = valueMin;
-  }
+  widthBound = Math.min(widthBound, valueMax - valueMin);
 
   return {
     center: centerBound,
