@@ -1,4 +1,5 @@
 import {Size} from './size.js';
+import {Spacing} from './spacing.js';
 import {Geometry} from './geometry.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
@@ -336,7 +337,12 @@ export class ImageFactory {
     const size = new Size(sizeValues);
 
     // image spacing
-    const spacing = getPixelSpacing(dataElements);
+    let spacingValues = [1, 1, 1];
+    const spacing2D = getPixelSpacing(dataElements);
+    if (typeof spacing2D !== 'undefined') {
+      spacingValues = [spacing2D[0], spacing2D[1], 1];
+    }
+    const spacing = new Spacing(spacingValues);
 
     // ImagePositionPatient
     const imagePositionPatient = safeGetAllLocal(TagKeys.ImagePositionPatient);
