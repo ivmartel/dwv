@@ -8,6 +8,11 @@ import {
   getControlDiv
 } from './viewer.ui.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Application} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the layer group div ids associated to a view config.
  *
@@ -27,10 +32,13 @@ function getDivIds(dataViewConfig) {
  */
 export class DataTableUI {
 
+  /**
+   * @type {Application}
+   */
   #app;
 
   /**
-   * @param {object} app The associated application.
+   * @param {Application} app The associated application.
    */
   constructor(app) {
     this.#app = app;
@@ -262,7 +270,7 @@ export class DataTableUI {
     };
 
     // get a layer radio button
-    const getLayerRadio = function (index, divId) {
+    const getLayerRadio = (index, divId) => {
       const radio = document.createElement('input');
       radio.type = 'radio';
       radio.name = 'layerselect-' + index;
@@ -281,7 +289,7 @@ export class DataTableUI {
     };
 
     // get a layer add button
-    const getLayerAdd = function (index, divId) {
+    const getLayerAdd = (index, divId) => {
       const button = document.createElement('button');
       button.name = 'layeradd-' + index;
       button.id = 'layeradd-' + divId + '-' + dataId;
@@ -308,7 +316,7 @@ export class DataTableUI {
     };
 
     // get a layer remove button
-    const getLayerRem = function (index, divId) {
+    const getLayerRem = (index, divId) => {
       const button = document.createElement('button');
       button.name = 'layerrem-' + index;
       button.id = 'layerrem-' + divId + '-' + dataId;
@@ -326,7 +334,7 @@ export class DataTableUI {
     };
 
     // get a layer update button
-    const getLayerUpdate = function (index, divId, orientation) {
+    const getLayerUpdate = (index, divId, orientation) => {
       const button = document.createElement('button');
       const letter = orientation[0].toUpperCase();
       button.name = 'layerupd-' + index + '_' + letter;

@@ -7,6 +7,11 @@ import {
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Application} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the annotation group divId.
  *
@@ -51,10 +56,13 @@ function splitAnnotationDivId(divId) {
  */
 export class AnnotationUI {
 
+  /**
+   * @type {Application}
+   */
   #app;
 
   /**
-   * @param {object} app The associated application.
+   * @param {Application} app The associated application.
    */
   constructor(app) {
     this.#app = app;
