@@ -10,6 +10,7 @@ import {
 // doc imports
 /* eslint-disable no-unused-vars */
 import {Application} from '../../src/app/application.js';
+import {AnnotationGroup} from '../../src/image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -57,6 +58,8 @@ function splitAnnotationDivId(divId) {
 export class AnnotationUI {
 
   /**
+   * The associated application.
+   *
    * @type {Application}
    */
   #app;
@@ -94,6 +97,10 @@ export class AnnotationUI {
       const layerGroup = this.#app.getLayerGroupByDivId(divId);
       // add annotation group
       const viewLayer = layerGroup.getActiveViewLayer();
+      if (typeof viewLayer === 'undefined') {
+        console.warn('No active view layer, please select one in the data table');
+        return;
+      }
       const refDataId = viewLayer.getDataId();
       const data = this.#app.createAnnotationData(refDataId);
       // render (will create draw layer)
