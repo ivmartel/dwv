@@ -98,7 +98,9 @@ export class AnnotationUI {
       // add annotation group
       const viewLayer = layerGroup.getActiveViewLayer();
       if (typeof viewLayer === 'undefined') {
-        console.warn('No active view layer, please select one in the data table');
+        console.warn(
+          'No active view layer, please select one in the data table'
+        );
         return;
       }
       const refDataId = viewLayer.getDataId();
