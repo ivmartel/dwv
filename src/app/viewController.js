@@ -389,6 +389,15 @@ export class ViewController {
   }
 
   /**
+   * Get the image length unit.
+   *
+   * @returns {string} The unit.
+   */
+  getLengthUnit() {
+    return this.#view.getImage().getMeta().lengthUnit;
+  }
+
+  /**
    * Extract a slice from an image at the given index and orientation.
    *
    * @param {Image} image The image to parse.

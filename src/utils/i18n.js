@@ -13,13 +13,15 @@ export const i18n = {
   t(key) {
     let res = key;
     const props = key.split('.');
-    // defaut units look like 'unit.cm2'
+    // default units look like 'unit.cm2'
     if (props.length === 2 &&
       props[0] === 'unit') {
       const units = {
         mm: 'mm',
         cm2: 'cm²',
-        degree: '°'
+        ml: 'ml',
+        degree: '°',
+        pixel: 'pixels'
       };
       res = units[props[1]];
     }

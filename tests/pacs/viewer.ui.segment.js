@@ -4,6 +4,7 @@ import {
   hexToRgb,
 } from '../../src/utils/colour.js';
 import {logger} from '../../src/utils/logger.js';
+import {i18n} from '../../src/utils/i18n.js';
 import {getSegmentationCode} from '../../src/dicom/dicomCode.js';
 import {MaskFactory} from '../../src/image/maskFactory.js';
 import {MaskSegmentHelper} from '../../src/image/maskSegmentHelper.js';
@@ -873,7 +874,7 @@ export class SegmentationUI {
         if (res !== start) {
           res += ', ';
         }
-        res += label.volume.toPrecision(4) + 'ml';
+        res += label.volume.toPrecision(4) + i18n.t(label.unit);
       }
     }
     res += ']';

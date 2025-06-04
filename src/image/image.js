@@ -1615,11 +1615,17 @@ export class Image {
       this.#labelingThread = new LabelingThread();
 
       const spacing = this.#geometry.getSpacing();
-      const mlVoxelVolume =
-        spacing.get(0) *
-        spacing.get(1) *
-        spacing.get(2) *
-        ML_PER_MM;
+      const lengthUnit = this.getMeta().lengthUnit;
+      let pixelVolume = 1;
+      let volumeUnit = 'unit.pixel';
+      if (lengthUnit === 'unit.mm') {
+        pixelVolume =
+          spacing.get(0) *
+          spacing.get(1) *
+          spacing.get(2) *
+          ML_PER_MM;
+        volumeUnit = 'unit.ml';
+      }
 
       this.#labelingThread.ondone = (event) => {
         const labels = event.data.labels;
@@ -1627,7 +1633,8 @@ export class Image {
         for (const label of labels) {
           label.centroid = this.#geometry.indexToWorld(
             new Index(label.centroidIndex));
-          label.volume = label.count * mlVoxelVolume;
+          label.volume = label.count * pixelVolume;
+          label.unit = volumeUnit;
         }
         // sort
         const labelsSorted =

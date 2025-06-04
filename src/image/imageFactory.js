@@ -483,6 +483,13 @@ export class ImageFactory {
       }
     }
 
+    // length unit
+    if (typeof spacing2D === 'undefined') {
+      meta.lengthUnit = 'unit.pixel';
+    } else {
+      meta.lengthUnit = 'unit.mm';
+    }
+
     // window level presets
     const presets = getWindowPresets(dataElements, intensityFactor);
     if (typeof presets !== 'undefined') {

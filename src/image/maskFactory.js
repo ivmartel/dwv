@@ -685,6 +685,9 @@ export class MaskFactory {
       SOPInstanceUID: safeGetLocal(TagKeys.SOPInstanceUID)
     };
 
+    // get length unit from ref image
+    meta.lengthUnit = refImage.getMeta().lengthUnit;
+
     // number of files: in this case equal to number slices,
     //   used to calculate buffer size
     meta.numberOfFiles = numberOfSlices;

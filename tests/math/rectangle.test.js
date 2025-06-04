@@ -74,6 +74,9 @@ QUnit.test('Rectangle quantification - #DWV-REQ-UI-07-006 Draw rectangle',
       },
       getPixelUnit: function () {
         return '';
+      },
+      getLengthUnit: function () {
+        return 'unit.mm';
       }
     };
     const theoQuant0 = {

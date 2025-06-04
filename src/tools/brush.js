@@ -761,6 +761,9 @@ export class Brush extends EventTarget {
       ]
     };
 
+    // get length unit from ref image
+    firstSliceMeta.lengthUnit = sourceImage.getMeta().lengthUnit;
+
     this.#mask = this.#createMaskImage(
       sourceGeometry,
       sourceGeometry.getOrigins()[imgK],
