@@ -97,10 +97,6 @@ export declare class Annotation {
      */
     planePoints: Point3D[] | undefined;
     /**
-     * Set the annotation id and uid.
-     */
-    setIds(): void;
-    /**
      * Get the concepts ids of the annotation meta data.
      *
      * @returns {string[]} The ids.
@@ -189,9 +185,9 @@ export declare class Annotation {
     /**
      * Get the math shape associated draw factory.
      *
-     * @returns {object} The factory.
+     * @returns {object|undefined} The factory.
      */
-    getFactory(): object;
+    getFactory(): object | undefined;
     #private;
 }
 
@@ -251,8 +247,9 @@ export declare class AnnotationGroup {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
+     * @param {boolean} [silent] Whether to send a update event or not.
      */
-    update(annotation: Annotation, propKeys?: string[]): void;
+    update(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
     /**
      * Remove an annotation.
      *
@@ -1703,8 +1700,9 @@ export declare class DrawController {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
+     * @param {boolean} [silent] Whether to send a update event or not.
      */
-    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
     /**
      * Remove an anotation for the list.
      *
@@ -2568,7 +2566,7 @@ export declare namespace i18n {
      * @param {string} key The key to the text entry.
      * @returns {string|undefined} The translated text.
      */
-    export function t(key: string): string;
+    export function t(key: string): string | undefined;
 }
 
 /**
@@ -2615,7 +2613,7 @@ declare class Image_2 {
      * @param {TypedArray} buffer The image data as a one dimensional buffer.
      * @param {string[]} [imageUids] An array of Uids indexed to slice number.
      */
-    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: string[]);
+    constructor(geometry: Geometry, buffer: Int8Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike> | Int16Array<ArrayBufferLike> | Uint16Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike>, imageUids?: string[]);
     /**
      * Get the image UID at a given index.
      *
@@ -2656,7 +2654,7 @@ declare class Image_2 {
      * @todo Dangerous...
      * @returns {TypedArray} The data buffer of the image.
      */
-    getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
+    getBuffer(): Int8Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike> | Int16Array<ArrayBufferLike> | Uint16Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike>;
     /**
      * Can the image values be quantified?
      *
@@ -2981,7 +2979,7 @@ declare class Image_2 {
      * @param {TypedArray} buffer The buffer to convolute.
      * @param {number} startOffset The index to start at.
      */
-    convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
+    convoluteBuffer(weights: number[], buffer: Int8Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike> | Int16Array<ArrayBufferLike> | Uint16Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike>, startOffset: number): void;
     /**
      * Transform an image using a specific operator.
      * WARNING: no size check!
@@ -5849,6 +5847,12 @@ export declare class ViewController {
      * @returns {string} The unit.
      */
     getPixelUnit(): string;
+    /**
+     * Get the image length unit.
+     *
+     * @returns {string} The unit.
+     */
+    getLengthUnit(): string;
     /**
      * Get some values from the associated image in a region.
      *

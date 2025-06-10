@@ -17,7 +17,7 @@ export class Annotation {
     canView(): boolean;
     colour: string;
     getCentroid(): Point | undefined;
-    getFactory(): object;
+    getFactory(): object | undefined;
     getMetaConceptIds(): string[];
     getMetaItem(conceptId: string): object | undefined;
     getOrientationName(): string | undefined;
@@ -34,7 +34,6 @@ export class Annotation {
     referencedSopInstanceUID: string;
     referencePoints: Point2D[] | undefined;
     removeMetaItem(conceptId: string): void;
-    setIds(): void;
     setTextExpr(labelText: {
         [x: string]: string;
     }): void;
@@ -66,7 +65,7 @@ export class AnnotationGroup {
     setEditable(flag: boolean): void;
     setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
-    update(annotation: Annotation, propKeys?: string[]): void;
+    update(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
 }
 
 // @public
@@ -368,7 +367,7 @@ export class DrawController {
     removeAnnotationWithCommand(uid: string, exeCallback: Function): void;
     setAnnotationGroupEditable(flag: boolean): void;
     setAnnotationMeta(key: string, value: string): void;
-    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
     updateAnnotationWithCommand(uid: string, originalProps: object, newProps: object, exeCallback: Function): void;
 }
 
@@ -548,12 +547,12 @@ export function hexToRgb(hexStr: string): RGB;
 
 // @public (undocumented)
 export namespace i18n {
-    export function t(key: string): string;
+    export function t(key: string): string | undefined;
 }
 
 // @public
 class Image_2 {
-    constructor(geometry: Geometry, buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, imageUids?: string[]);
+    constructor(geometry: Geometry, buffer: Int8Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike> | Int16Array<ArrayBufferLike> | Uint16Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike>, imageUids?: string[]);
     addEventListener(type: string, callback: Function): void;
     appendFrame(time: number, origin: Point3D): void;
     appendFrameBuffer(frameBuffer: object, frameIndex: number): void;
@@ -569,8 +568,8 @@ class Image_2 {
     compose(rhs: Image_2, operator: Function): Image_2;
     containsImageUids(uids: string[]): boolean;
     convolute2D(weights: number[]): Image_2;
-    convoluteBuffer(weights: number[], buffer: Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array, startOffset: number): void;
-    getBuffer(): Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array;
+    convoluteBuffer(weights: number[], buffer: Int8Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike> | Int16Array<ArrayBufferLike> | Uint16Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike>, startOffset: number): void;
+    getBuffer(): Int8Array<ArrayBufferLike> | Uint8Array<ArrayBufferLike> | Int16Array<ArrayBufferLike> | Uint16Array<ArrayBufferLike> | Int32Array<ArrayBufferLike> | Uint32Array<ArrayBufferLike>;
     getDataRange(): NumberRange;
     getGeometry(): Geometry;
     getHistogram(): any[];
@@ -1174,6 +1173,7 @@ export class ViewController {
     getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     getImageWorldSize(): Scalar2D;
     getIndexFromPosition(point: Point): Index;
+    getLengthUnit(): string;
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
