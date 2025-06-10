@@ -220,10 +220,14 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle}
+ * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|undefined}
  *   The math shape.
  */
 export function getShapeFromScoord(scoord) {
+  // no shape if no graphic data
+  if (typeof scoord.graphicData === 'undefined') {
+    return;
+  }
   // extract points
   const dataLength = scoord.graphicData.length;
   if (dataLength === 0) {
