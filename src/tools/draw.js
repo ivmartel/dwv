@@ -813,7 +813,6 @@ export class Draw {
     } else {
       annotation.colour = this.#style.getLineColour();
     }
-    annotation.setIds();
     annotation.init(viewController);
     // meta data
     if (typeof this.#annotationMeta !== 'undefined') {

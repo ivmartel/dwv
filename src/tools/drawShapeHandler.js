@@ -387,6 +387,9 @@ export class DrawShapeHandler {
 
       // get appropriate factory
       const factory = annotation.getFactory();
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot follow drag move without factory');
+      }
       // update annotation
       factory.updateAnnotationOnTranslation(annotation, diff);
       // update label
@@ -526,6 +529,9 @@ export class DrawShapeHandler {
     label.on('dragmove.draw', (/*event*/) => {
       // get factory
       const factory = annotation.getFactory();
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot udpate connector without factory');
+      }
       // update label
       factory.updateConnector(shapeGroup);
     });

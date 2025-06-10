@@ -259,8 +259,12 @@ export class AnnotationUI {
 
     const span = document.createElement('span');
     span.id = 'span-' + annotationDivId;
+    let factoryName = 'unknown';
+    if (typeof annotation.getFactory() !== 'undefined') {
+      factoryName = annotation.getFactory().getName();
+    }
     span.appendChild(document.createTextNode(
-      annotation.trackingId + ' (' + annotation.getFactory().getName() + ')'));
+      annotation.trackingId + ' (' + factoryName + ')'));
     span.appendChild(inputColour);
     span.appendChild(gotoButton);
     span.appendChild(viewButton);

@@ -674,11 +674,15 @@ export class DrawLayer {
     if (typeof annotation.planePoints !== 'undefined') {
       // use plane points
       points = annotation.planePoints;
-    } else {
+    } else if (typeof annotation.planeOrigin !== 'undefined') {
       // just use plane origin
       points = [annotation.planeOrigin];
     }
-    return this.#getPositionId(points, annotation.referencedFrameNumber);
+    let posId;
+    if (typeof points !== 'undefined') {
+      posId = this.#getPositionId(points, annotation.referencedFrameNumber);
+    }
+    return posId;
   }
 
   /**
@@ -771,6 +775,9 @@ export class DrawLayer {
     // shape group (use first one since it will be removed from
     // the group when we change it)
     const factory = annotation.getFactory();
+    if (typeof factory === 'undefined') {
+      throw new Error('Cannot add an annotation draw without factory');
+    }
     const shapeGroup = factory.createShapeGroup(annotation, style);
     // add group to posGroup (switches its parent)
     posGroup.add(shapeGroup);

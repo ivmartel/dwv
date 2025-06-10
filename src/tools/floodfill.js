@@ -269,7 +269,6 @@ export class Floodfill {
       if (typeof this.#annotation === 'undefined') {
         // create annotation
         this.#annotation = new Annotation();
-        this.#annotation.setIds();
         this.#annotation.colour = this.#style.getLineColour();
 
         const viewLayer =
