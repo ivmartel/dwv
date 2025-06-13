@@ -247,9 +247,10 @@ export declare class AnnotationGroup {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
-     * @param {boolean} [silent] Whether to send a update event or not.
+     * @param {boolean} [propagate] Whether the update event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    update(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
+    update(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     /**
      * Remove an annotation.
      *
@@ -339,7 +340,7 @@ export declare class AnnotationGroupFactory {
         [x: string]: DataElement;
     }): string | undefined;
     /**
-     * Get an {@link Annotation} object from the read DICOM file.
+     * Get an {@link AnnotationGroup} object from the read DICOM file.
      *
      * @param {Object<string, DataElement>} dataElements The DICOM tags.
      * @returns {AnnotationGroup} A new annotation group.
@@ -348,6 +349,15 @@ export declare class AnnotationGroupFactory {
     create(dataElements: {
         [x: string]: DataElement;
     }): AnnotationGroup;
+    /**
+     * Get an {@link CADReport} object from the read DICOM file.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
+     * @returns {CADReport|undefined} A new CAD report.
+     */
+    createCADReport(dataElements: {
+        [x: string]: DataElement;
+    }): CADReport | undefined;
     /**
      * Convert an annotation group into a DICOM SR object using the
      * TID 1500 template.
@@ -362,17 +372,14 @@ export declare class AnnotationGroupFactory {
         [x: string]: DataElement;
     };
     /**
-     * Convert a annotation groups into a DICOM CAD report SR object using
-     * the TID 4100 template.
+     * Convert a CAD report into a DICOM CAD report SR object using
+     *   the TID 4100 template.
      *
-     * @param {AnnotationGroup[]} annotationGroups The annotation groups.
-     * @param {object[]} responseEvaluations List of response evaluations
-     * as {current, measure}.
-     * @param {string} comment Report comment.
+     * @param {CADReport} report The CAD report.
      * @param {Object<string, any>} [extraTags] Optional list of extra tags.
      * @returns {Object<string, DataElement>} A list of dicom elements.
      */
-    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
+    toDicomCADReport(report: CADReport, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -1046,6 +1053,24 @@ export declare class AppOptions {
  * @returns {Uint8Array} The full multipart message.
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+/**
+ * CAD report class.
+ */
+export declare class CADReport {
+    /**
+     * @type {AnnotationGroup[]}
+     */
+    annotationGroups: AnnotationGroup[];
+    /**
+     * @type {ResponseEvaluation[]}
+     */
+    responseEvaluations: ResponseEvaluation[];
+    /**
+     * @type {string}
+     */
+    comment: string;
+}
 
 /**
  * Change segment colour command.
@@ -4636,6 +4661,24 @@ export declare class RescaleSlopeAndIntercept {
      */
     isID(): boolean;
     #private;
+}
+
+/**
+ * Response evaluation class.
+ */
+export declare class ResponseEvaluation {
+    /**
+     * Current response.
+     *
+     * @type {DicomCode}
+     */
+    current: DicomCode;
+    /**
+     * Measurement of response (mm).
+     *
+     * @type {number}
+     */
+    measure: number;
 }
 
 /**

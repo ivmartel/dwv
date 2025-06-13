@@ -65,7 +65,7 @@ export class AnnotationGroup {
     setEditable(flag: boolean): void;
     setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
-    update(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
+    update(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
 }
 
 // @public
@@ -76,13 +76,16 @@ export class AnnotationGroupFactory {
     create(dataElements: {
         [x: string]: DataElement;
     }): AnnotationGroup;
+    createCADReport(dataElements: {
+        [x: string]: DataElement;
+    }): CADReport | undefined;
     getWarning(): string | undefined;
     toDicom(annotationGroup: AnnotationGroup, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
     };
-    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
+    toDicomCADReport(report: CADReport, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -198,6 +201,13 @@ export class AppOptions {
 
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+// @public
+export class CADReport {
+    annotationGroups: AnnotationGroup[];
+    comment: string;
+    responseEvaluations: ResponseEvaluation[];
+}
 
 // @public
 export class ChangeSegmentColourCommand {
@@ -956,6 +966,12 @@ export class RescaleSlopeAndIntercept {
     getIntercept(): number;
     getSlope(): number;
     isID(): boolean;
+}
+
+// @public
+export class ResponseEvaluation {
+    current: DicomCode;
+    measure: number;
 }
 
 // @public
