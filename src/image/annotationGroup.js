@@ -150,9 +150,10 @@ export class AnnotationGroup {
    *
    * @param {Annotation} annotation The annotation to update.
    * @param {string[]} [propKeys] Optional properties that got updated.
-   * @param {boolean} [silent] Whether to send a update event or not.
+   * @param {boolean} [propagate] Whether the update event propagates
+   *   outside of dwv or not, defaults to true.
    */
-  update(annotation, propKeys, silent) {
+  update(annotation, propKeys, propagate) {
     const index = this.#list.findIndex(
       (item) => item.trackingUid === annotation.trackingUid);
     if (index !== -1) {
@@ -163,22 +164,21 @@ export class AnnotationGroup {
       }
       // update list
       this.#list[index] = annotation;
-      if (!silent) {
-        /**
-         * Annotation update event.
-         *
-         * @event AnnotationGroup#annotationupdate
-         * @type {object}
-         * @property {string} type The event type.
-         * @property {Annotation} data The added annnotation.
-         * @property {string[]} keys The properties that were updated.
-         */
-        this.#fireEvent({
-          type: 'annotationupdate',
-          data: annotation,
-          keys: propKeys
-        });
-      }
+      /**
+       * Annotation update event.
+       *
+       * @event AnnotationGroup#annotationupdate
+       * @type {object}
+       * @property {string} type The event type.
+       * @property {Annotation} data The added annnotation.
+       * @property {string[]} keys The properties that were updated.
+       */
+      this.#fireEvent({
+        type: 'annotationupdate',
+        data: annotation,
+        keys: propKeys,
+        propagate: propagate
+      });
     } else {
       logger.warn('Cannot find annotation to update');
     }
