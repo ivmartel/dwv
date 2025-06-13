@@ -1613,7 +1613,14 @@ export class App {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
+    let propagate = true;
+    if (typeof event.propagate !== 'undefined') {
+      propagate = event.propagate;
+      delete event.propagate;
+    }
+    if (propagate) {
+      this.#listenerHandler.fireEvent(event);
+    }
   };
 
   /**
