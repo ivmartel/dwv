@@ -1,4 +1,5 @@
 import {merge} from 'webpack-merge';
+
 import {webpackCommon} from './webpack.common.js';
 
 export default merge(webpackCommon, {
@@ -7,7 +8,7 @@ export default merge(webpackCommon, {
   // using 'web' target since it creates a bundle
   //   that does not reference 'Document', as opposed to
   //   undefined target (that then uses browserlist)
-  //target: 'web',
+  target: 'web',
   module: {
     rules: [
       {

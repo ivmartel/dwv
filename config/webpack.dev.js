@@ -1,6 +1,7 @@
 import {merge} from 'webpack-merge';
-import {webpackCommon} from './webpack.common.js';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+
+import {webpackCommon} from './webpack.common.js';
 
 export default merge(webpackCommon, {
   mode: 'development',
