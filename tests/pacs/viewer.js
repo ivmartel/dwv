@@ -621,8 +621,10 @@ function updateSliders() {
     const slider = document.getElementById(lgId + '-slider');
     if (slider) {
       const lg = _app.getLayerGroupByDivId(lgId);
-      const ph = lg.getPositionHelper();
-      slider.value = ph.getCurrentPositionScrollValue();
+      if (typeof lg !== 'undefined') {
+        const ph = lg.getPositionHelper();
+        slider.value = ph.getCurrentPositionScrollValue();
+      }
     }
   }
 }
