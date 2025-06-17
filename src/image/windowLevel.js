@@ -7,13 +7,17 @@ import {VoiLutFunctionNames} from './voiLut.js';
  * @param {object} range The image pixel data range.
  * @param {string} [voiLutFunctionName] The VOI LUT function name,
  *   defaults to 'LINEAR'.
- * @returns {WindowLevel} A valid window level.
+ * @returns {WindowLevel|undefined} A valid window level.
  */
 export function validateWindowLevel(
   wl,
   range,
   voiLutFunctionName
 ) {
+  if (typeof wl === 'undefined') {
+    return;
+  }
+
   let centerBound = wl.center;
   centerBound = Math.min(centerBound, range.max);
   centerBound = Math.max(centerBound, range.min);
