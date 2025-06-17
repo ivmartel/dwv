@@ -19,10 +19,11 @@
   "main": "./dist/dwv.min.js",
   "types": "./dist/dwv.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/dwv.min.js",
-      "types": "./dist/dwv.d.ts"
-    }
+    "import": {
+      "default": "./dist/dwv.min.js",
+      "node": "./dist/dwv.node.min.js"
+    },
+    "types": "./dist/dwv.d.ts"
   },
   "engines": {
     "node": ">= 14.0.0"
@@ -68,7 +69,9 @@
   "scripts": {
     "start": "webpack serve --config config/webpack.dev.js",
     "pack": "webpack --config config/webpack.prod.js",
+    "pack-node": "webpack --config config/webpack.node.js",
     "build": "yarn run pack && yarn run types && yarn run api",
+    "build-all": "yarn run build && yarn run pack-node",
     "build-demo": "webpack --config config/webpack.demo.js",
     "lint": "eslint -c config/eslint.config-full.js 'src/**/*.js' 'tests/**/*.js' '*.js'",
     "test": "karma start karma.conf.js",

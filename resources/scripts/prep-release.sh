@@ -108,7 +108,7 @@ if [ $step -eq 3 ]
 then
   info "(3/5) create build"
 
-  yarn run build
+  yarn run build-all
 
   ((step++))
 fi
