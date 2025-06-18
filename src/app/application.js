@@ -1281,10 +1281,13 @@ export class App {
     const layerGroup = this.#stage.getActiveLayerGroup();
     const viewLayer = layerGroup.getBaseViewLayer();
     const refDataId = viewLayer.getDataId();
+    const refData = this.getData(refDataId);
     const viewController = viewLayer.getViewController();
 
     // convert konva to annotation
-    const annotations = konvaToAnnotation(drawings, drawingsDetails);
+    // (assume current image is ref image)
+    const annotations = konvaToAnnotation(
+      drawings, drawingsDetails, refData.image);
     // create data
     const data = this.createAnnotationData(refDataId);
     // add annotations to data
