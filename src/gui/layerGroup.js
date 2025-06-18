@@ -493,6 +493,43 @@ export class LayerGroup {
   }
 
   /**
+   * Get the active view layer or the closest layer
+   * that is a view layer.
+   *
+   * @returns {ViewLayer|undefined} The view layer.
+   */
+  findActiveViewLayer() {
+    let layer;
+
+    let activeIndex = 0;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      activeIndex = this.#activeLayerIndex;
+    }
+
+    // from active index to 0
+    for (let i = activeIndex; i >= 0; i--) {
+      const layerI = this.#layers[i];
+      if (typeof layerI !== 'undefined' &&
+        layerI instanceof ViewLayer) {
+        layer = layerI;
+        break;
+      }
+    }
+    // from number of layers to active
+    if (typeof layer === 'undefined') {
+      for (let i = this.#layers.length; i >= activeIndex; i--) {
+        const layerI = this.#layers[i];
+        if (typeof layerI !== 'undefined' &&
+          layerI instanceof ViewLayer) {
+          layer = layerI;
+        }
+      }
+    }
+
+    return layer;
+  }
+
+  /**
    * Get the base view layer.
    *
    * @returns {ViewLayer|undefined} The layer.
