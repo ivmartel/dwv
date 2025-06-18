@@ -14,6 +14,8 @@ import {App} from '../app/application.js';
  * State class.
  * Saves: data url/path, display info.
  *
+ * @deprecated Since v0.34, please switch to DICOM SR annotations.
+ *
  * History:
  * - v0.5 (dwv 0.30.0, 12/2021):
  *   - store position as array,
