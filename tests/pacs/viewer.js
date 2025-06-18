@@ -373,9 +373,6 @@ function viewerSetup() {
 function logMetaData(dataId, loadType) {
   // meta data
   const meta = _app.getMetaData(dataId);
-  if (typeof meta === 'undefined') {
-    return;
-  }
 
   // log tags for data with transfer syntax (dicom)
   if (typeof meta['00020010'] !== 'undefined') {
