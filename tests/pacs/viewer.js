@@ -994,6 +994,13 @@ function setAppTool(toolName) {
   // set tool for app
   _app.setTool(toolName);
 
+  // force window level non strict mode
+  if (toolName === 'WindowLevel') {
+    _app.setToolFeatures({
+      strictViewLayer: false
+    });
+  }
+
   // clear options html
   const toolOptionsEl = document.getElementById('toolOptions');
   if (toolOptionsEl !== null) {

@@ -12,6 +12,8 @@ import {
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application.js';
 import {Point2D} from '../math/point.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -66,11 +68,39 @@ export class WindowLevel {
   #scrollWhell;
 
   /**
+   * Strict view layer flag: if true, use the active layer
+   * (that could be undefined, ie bail) or, if false,
+   * try to find the active view layer (active layer if view layer or
+   * closest).
+   *
+   * @type {boolean}
+   */
+  #strictViewLayer = true;
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);
+  }
+
+  /**
+   * Get the active view layer. Uses the strictViewLayer flag:
+   * if true, use the active layer (that could be undefined,
+   * ie bail) or, if false, try to find the active view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group of the view layer.
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  #getActiveViewLayer(layerGroup) {
+    let layer;
+    if (this.#strictViewLayer) {
+      layer = layerGroup.getActiveViewLayer();
+    } else {
+      layer = layerGroup.findActiveViewLayer();
+    }
+    return layer;
   }
 
   /**
@@ -82,7 +112,7 @@ export class WindowLevel {
   #start(point, divId) {
     // check if possible
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getActiveViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -108,7 +138,7 @@ export class WindowLevel {
     }
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getActiveViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -226,7 +256,7 @@ export class WindowLevel {
     const mousePoint = getMousePoint(event);
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getActiveViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -287,12 +317,14 @@ export class WindowLevel {
   }
 
   /**
-   * Set the tool live features: does nothing.
+   * Set the tool live features.
    *
-   * @param {object} _features The list of features.
+   * @param {object} features The list of features.
    */
-  setFeatures(_features) {
-    // does nothing
+  setFeatures(features) {
+    if (typeof features.strictViewLayer !== 'undefined') {
+      this.#strictViewLayer = features.strictViewLayer;
+    }
   }
 
 } // WindowLevel class
