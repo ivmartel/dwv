@@ -23,8 +23,13 @@ import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
 
 // global vars
-let _app = null;
-let _tools = null;
+
+/**
+ * @type {App}
+ */
+let _app;
+
+let _tools;
 const _toolFeaturesUI = {};
 let _layout = 'one';
 
@@ -150,7 +155,9 @@ function viewerSetup() {
     // add abort shortcut
     window.addEventListener('keydown', abortShortcut);
     // remove post-load listeners
-    removePostLoadListeners();
+    if (_app.getDataIds().length !== 0) {
+      removePostLoadListeners();
+    }
     // add new data view config
     addDataViewConfig(event.dataid);
   });
