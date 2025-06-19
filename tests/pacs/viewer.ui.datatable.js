@@ -221,10 +221,10 @@ export class DataTableUI {
       for (let j = 0; j < numberOfLayerGroups; ++j) {
         insertTCell('LG' + j);
       }
-      insertTCell('Alpha Range');
       insertTCell('Contrast');
       insertTCell('Preset');
       insertTCell('Alpha');
+      insertTCell('Alpha Range');
       table.createTBody();
       const div = document.getElementById('layersdetails');
       div.appendChild(table);
@@ -400,44 +400,6 @@ export class DataTableUI {
 
     const floatPrecision = 4;
 
-    // cell: alpha range
-    cell = row.insertCell();
-    const minId = 'value-min-' + dataId;
-    const maxId = 'value-max-' + dataId;
-    // callback
-    const onChangeAlphaFunc = () => {
-      const minElement = document.getElementById(minId + '-number');
-      const min = parseFloat(minElement.value);
-      const maxElement = document.getElementById(maxId + '-number');
-      const max = parseFloat(maxElement.value);
-      const func = function (value, _index) {
-        if (value >= min && value <= max) {
-          return 255;
-        }
-        return 0;
-      };
-      // update selected layers
-      const lgIds = getSelectedLayerGroupIds();
-      for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
-        const vl = lg.getActiveViewLayer();
-        if (typeof vl !== 'undefined') {
-          const vc = vl.getViewController();
-          vc.setViewAlphaFunction(func);
-        }
-      }
-    };
-    // add controls
-    if (canAlpha) {
-      const dataRange = image.getDataRange();
-      cell.appendChild(getControlDiv(minId, 'min',
-        dataRange.min, dataRange.max, dataRange.min,
-        onChangeAlphaFunc, floatPrecision));
-      cell.appendChild(getControlDiv(maxId, 'max',
-        dataRange.min, dataRange.max, dataRange.max,
-        onChangeAlphaFunc, floatPrecision));
-    }
-
     // cell: contrast
     cell = row.insertCell();
     const widthId = 'width-' + dataId;
@@ -577,6 +539,44 @@ export class DataTableUI {
     // add controls
     cell.appendChild(getControlDiv(opacityId, 'opacity',
       0, 1, initialLayer.getOpacity(), onChangeOpacity, floatPrecision));
+
+    // cell: alpha range
+    cell = row.insertCell();
+    const minId = 'value-min-' + dataId;
+    const maxId = 'value-max-' + dataId;
+    // callback
+    const onChangeAlphaFunc = () => {
+      const minElement = document.getElementById(minId + '-number');
+      const min = parseFloat(minElement.value);
+      const maxElement = document.getElementById(maxId + '-number');
+      const max = parseFloat(maxElement.value);
+      const func = function (value, _index) {
+        if (value >= min && value <= max) {
+          return 255;
+        }
+        return 0;
+      };
+      // update selected layers
+      const lgIds = getSelectedLayerGroupIds();
+      for (let i = 0; i < lgIds.length; ++i) {
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const vl = lg.getActiveViewLayer();
+        if (typeof vl !== 'undefined') {
+          const vc = vl.getViewController();
+          vc.setViewAlphaFunction(func);
+        }
+      }
+    };
+    // add controls
+    if (canAlpha) {
+      const dataRange = image.getDataRange();
+      cell.appendChild(getControlDiv(minId, 'min',
+        dataRange.min, dataRange.max, dataRange.min,
+        onChangeAlphaFunc, floatPrecision));
+      cell.appendChild(getControlDiv(maxId, 'max',
+        dataRange.min, dataRange.max, dataRange.max,
+        onChangeAlphaFunc, floatPrecision));
+    }
 
     // bind app to controls on first id
     if (dataId === '0') {
