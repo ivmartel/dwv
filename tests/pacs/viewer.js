@@ -460,7 +460,7 @@ function setup() {
   viewerSetup();
 
   const dataTable = new DataTableUI(_app);
-  dataTable.registerListeners(_layout);
+  dataTable.registerAddListeners(_layout);
 
   const positionInput = document.getElementById('position');
   positionInput.addEventListener('change', function (event) {

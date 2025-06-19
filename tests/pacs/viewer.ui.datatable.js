@@ -45,11 +45,11 @@ export class DataTableUI {
   }
 
   /**
-   * Bind app to ui.
+   * Bind app add events to ui.
    *
    * @param {string} layout The layout.
    */
-  registerListeners(layout) {
+  registerAddListeners(layout) {
     // add data row on layer creation
     this.#app.addEventListener('viewlayeradd', (event) => {
       this.#clearDataTableRow(event.dataid);
@@ -59,7 +59,12 @@ export class DataTableUI {
       this.#clearDataTableRow(event.dataid);
       this.#addDataRow(event.dataid, layout);
     });
+  };
 
+  /**
+   * Bind app to controls.
+   */
+  registerListeners() {
     this.#app.addEventListener('wlchange', this.#onWLChange);
     this.#app.addEventListener('opacitychange', this.#onOpacityChange);
   };
@@ -234,11 +239,6 @@ export class DataTableUI {
    * @param {string} layout The layout.
    */
   #addDataRow(dataId, layout) {
-    // bind app to controls on first id
-    // if (dataId === '0') {
-    //   this.registerListeners();
-    // }
-
     const image = this.#app.getData(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
@@ -577,6 +577,11 @@ export class DataTableUI {
     // add controls
     cell.appendChild(getControlDiv(opacityId, 'opacity',
       0, 1, initialLayer.getOpacity(), onChangeOpacity, floatPrecision));
+
+    // bind app to controls on first id
+    if (dataId === '0') {
+      this.registerListeners();
+    }
   }
 
 }; // test.DataTable
