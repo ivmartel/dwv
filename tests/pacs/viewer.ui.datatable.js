@@ -45,11 +45,11 @@ export class DataTableUI {
   }
 
   /**
-   * Bind app add events to ui.
+   * Bind app to ui.
    *
    * @param {string} layout The layout.
    */
-  registerAddListeners(layout) {
+  registerListeners(layout) {
     // add data row on layer creation
     this.#app.addEventListener('viewlayeradd', (event) => {
       this.#clearDataTableRow(event.dataid);
@@ -59,22 +59,23 @@ export class DataTableUI {
       this.#clearDataTableRow(event.dataid);
       this.#addDataRow(event.dataid, layout);
     });
-  };
 
-  /**
-   * Bind app to controls.
-   */
-  registerListeners() {
-    this.#app.addEventListener('wlchange', this.#onWLChange);
-    this.#app.addEventListener('opacitychange', this.#onOpacityChange);
-  };
-
-  /**
-   * Unbind app to controls.
-   */
-  unregisterListeners() {
-    this.#app.removeEventListener('wlchange', this.#onWLChange);
-    this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
+    // control listeners (pause during load)
+    let registered = false;
+    this.#app.addEventListener('loadstart', (/*event*/) => {
+      if (registered) {
+        this.#app.removeEventListener('wlchange', this.#onWLChange);
+        this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
+        registered = false;
+      }
+    });
+    this.#app.addEventListener('loadend', (/*event*/) => {
+      if (!registered) {
+        this.#app.addEventListener('wlchange', this.#onWLChange);
+        this.#app.addEventListener('opacitychange', this.#onOpacityChange);
+        registered = true;
+      }
+    });
   };
 
   /**
@@ -576,11 +577,6 @@ export class DataTableUI {
       cell.appendChild(getControlDiv(maxId, 'max',
         dataRange.min, dataRange.max, dataRange.max,
         onChangeAlphaFunc, floatPrecision));
-    }
-
-    // bind app to controls on first id
-    if (dataId === '0') {
-      this.registerListeners();
     }
   }
 
