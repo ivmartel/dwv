@@ -379,7 +379,7 @@ export class LayerGroup {
   }
 
   /**
-   * Get a list of view layers according to an input callback function.
+   * Get the view layers that satisfy the input callback function.
    *
    * @param {Function} [callbackFn] A function that takes
    *   a ViewLayer as input and returns a boolean. If undefined,
@@ -400,6 +400,50 @@ export class LayerGroup {
         res.push(layer);
       }
     }
+    return res;
+  }
+
+  /**
+   * Get the view layers that satisfy the input callback function
+   * starting from the active layer.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayersFromActive(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+
+    let activeIndex = 0;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      activeIndex = this.#activeLayerIndex;
+    }
+
+    const indices = [];
+    // from active index to 0
+    for (let i = activeIndex; i >= 0; i--) {
+      indices.push(i);
+    }
+    // from number of layers to active
+    for (let i = this.#layers.length - 1; i > activeIndex; i--) {
+      indices.push(i);
+    }
+
+    const res = [];
+
+    for (const index of indices) {
+      const layer = this.#layers[index];
+      if (layer instanceof ViewLayer && callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+
     return res;
   }
 
@@ -493,43 +537,6 @@ export class LayerGroup {
   }
 
   /**
-   * Get the active view layer or the closest layer
-   * that is a view layer.
-   *
-   * @returns {ViewLayer|undefined} The view layer.
-   */
-  findActiveViewLayer() {
-    let layer;
-
-    let activeIndex = 0;
-    if (typeof this.#activeLayerIndex !== 'undefined') {
-      activeIndex = this.#activeLayerIndex;
-    }
-
-    // from active index to 0
-    for (let i = activeIndex; i >= 0; i--) {
-      const layerI = this.#layers[i];
-      if (typeof layerI !== 'undefined' &&
-        layerI instanceof ViewLayer) {
-        layer = layerI;
-        break;
-      }
-    }
-    // from number of layers to active
-    if (typeof layer === 'undefined') {
-      for (let i = this.#layers.length; i >= activeIndex; i--) {
-        const layerI = this.#layers[i];
-        if (typeof layerI !== 'undefined' &&
-          layerI instanceof ViewLayer) {
-          layer = layerI;
-        }
-      }
-    }
-
-    return layer;
-  }
-
-  /**
    * Get the base view layer.
    *
    * @returns {ViewLayer|undefined} The layer.
@@ -583,7 +590,7 @@ export class LayerGroup {
   }
 
   /**
-   * Search view layers for equal imae meta data.
+   * Search view layers for equal image meta data.
    *
    * @param {object} meta The meta data to find.
    * @returns {ViewLayer[]} The list of view layers that contain matched data.

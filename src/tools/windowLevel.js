@@ -98,7 +98,10 @@ export class WindowLevel {
     if (this.#strictViewLayer) {
       layer = layerGroup.getActiveViewLayer();
     } else {
-      layer = layerGroup.findActiveViewLayer();
+      const callbackFn = function (layer) {
+        return layer.getViewController().isMonochrome();
+      };
+      layer = layerGroup.getViewLayersFromActive(callbackFn)[0];
     }
     return layer;
   }
