@@ -143,6 +143,9 @@ function viewerSetup() {
     _app.abortLoad(event.dataid);
   });
   _app.addEventListener('loadstart', function (event) {
+    console.log('%c----------------', 'color: teal;');
+    console.log('load source', event.source);
+    // timer
     console.time('load-data-' + event.dataid);
     // update load counters
     if (numberOfDataToLoad === numberOfLoadendData) {
@@ -550,10 +553,12 @@ function setup() {
   // bind app to input files
   const fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
-    console.log('%c ----------------', 'color: teal;');
-    const fileElement = event.target;
-    console.log(fileElement.files);
-    _app.loadFiles(fileElement.files);
+    const files = event.target.files;
+    if (files.length !== 0) {
+      _app.loadFiles(files);
+    } else {
+      throw new Error('No files to load');
+    }
   });
 }
 
