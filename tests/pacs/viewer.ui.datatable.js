@@ -10,7 +10,7 @@ import {
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Application} from '../../src/app/application.js';
+import {App} from '../../src/app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -33,12 +33,12 @@ function getDivIds(dataViewConfig) {
 export class DataTableUI {
 
   /**
-   * @type {Application}
+   * @type {App}
    */
   #app;
 
   /**
-   * @param {Application} app The associated application.
+   * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;

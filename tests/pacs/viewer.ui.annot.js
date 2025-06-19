@@ -9,7 +9,7 @@ import {
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Application} from '../../src/app/application.js';
+import {App} from '../../src/app/application.js';
 import {AnnotationGroup} from '../../src/image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
 
@@ -60,12 +60,12 @@ export class AnnotationUI {
   /**
    * The associated application.
    *
-   * @type {Application}
+   * @type {App}
    */
   #app;
 
   /**
-   * @param {Application} app The associated application.
+   * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
