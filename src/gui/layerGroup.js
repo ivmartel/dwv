@@ -719,6 +719,29 @@ export class LayerGroup {
   }
 
   /**
+   * Set the active layer with a layer id.
+   *
+   * @param {string} id The layer id.
+   */
+  setActiveLayerById(id) {
+    let index;
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (typeof this.#layers[i] !== 'undefined' &&
+        this.#layers[i].getId() === id) {
+        // stop at first one
+        index = i;
+        break;
+      }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveLayer(index);
+    } else {
+      logger.warn('No layer to set as active with id: ' +
+        id);
+    }
+  }
+
+  /**
    * Set the active layer with a data id.
    *
    * @param {string} dataId The data id.
