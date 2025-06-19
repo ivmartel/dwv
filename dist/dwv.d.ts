@@ -1725,9 +1725,10 @@ export declare class DrawController {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
-     * @param {boolean} [silent] Whether to send a update event or not.
+     * @param {boolean} [propagate] Whether the update event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    updateAnnotation(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     /**
      * Remove an anotation for the list.
      *
@@ -3232,7 +3233,7 @@ export declare class LayerGroup {
      */
     includes(id: string): boolean;
     /**
-     * Get a list of view layers according to an input callback function.
+     * Get the view layers that satisfy the input callback function.
      *
      * @param {Function} [callbackFn] A function that takes
      *   a ViewLayer as input and returns a boolean. If undefined,
@@ -3241,6 +3242,17 @@ export declare class LayerGroup {
      *   satisfy the callbackFn.
      */
     getViewLayers(callbackFn?: Function): ViewLayer[];
+    /**
+     * Get the view layers that satisfy the input callback function
+     * starting from the active layer.
+     *
+     * @param {Function} [callbackFn] A function that takes
+     *   a ViewLayer as input and returns a boolean. If undefined,
+     *   returns all view layers.
+     * @returns {ViewLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
     /**
      * Test if one of the view layers satisfies an input callbackFn.
      *
@@ -3299,7 +3311,7 @@ export declare class LayerGroup {
      */
     getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
-     * Search view layers for equal imae meta data.
+     * Search view layers for equal image meta data.
      *
      * @param {object} meta The meta data to find.
      * @returns {ViewLayer[]} The list of view layers that contain matched data.

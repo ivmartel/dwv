@@ -377,7 +377,7 @@ export class DrawController {
     removeAnnotationWithCommand(uid: string, exeCallback: Function): void;
     setAnnotationGroupEditable(flag: boolean): void;
     setAnnotationMeta(key: string, value: string): void;
-    updateAnnotation(annotation: Annotation, propKeys?: string[], silent?: boolean): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     updateAnnotationWithCommand(uid: string, originalProps: object, newProps: object, exeCallback: Function): void;
 }
 
@@ -682,6 +682,7 @@ export class LayerGroup {
     getViewLayerById(id: string): ViewLayer | undefined;
     getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
+    getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
     includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
     moreThanOne(dim: number): boolean;
