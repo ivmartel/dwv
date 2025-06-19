@@ -946,6 +946,7 @@ export class Brush extends EventTarget {
       return [];
     }
     const viewController = viewLayer.getViewController();
+    const savedPosition = viewController.getCurrentPosition();
 
     const searchMaskMeta = {
       Modality: 'SEG'
@@ -1043,6 +1044,11 @@ export class Brush extends EventTarget {
       radiuses,
       sliceMeta
     );
+
+    // this.#displayMask causes the position to get reset, 
+    // so we have to restore it or we may not be drawing on 
+    // the correct slice.
+    viewController.setCurrentPosition(savedPosition);
 
     // circle indices in the mask geometry
     const maskPlanePos = maskVl.displayToPlanePos(mousePoint);
