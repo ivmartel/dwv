@@ -562,6 +562,15 @@ export class ViewController {
       this.#view.getOrientation());
   }
 
+  /**
+   * Get the oriented image spacing.
+   *
+   * @returns {Spacing} The spacing.
+   */
+  getImageSpacing() {
+    return this.#view.getImage().getGeometry().getSpacing(
+      this.#view.getOrientation());
+  }
 
   /**
    * Is the data size larger than one in the given dimension?
