@@ -990,7 +990,7 @@ export class Brush extends EventTarget {
       const planePos = viewLayer.displayToPlanePos(mousePoint);
       sourcePosition = viewController.getPositionFromPlanePoint(planePos);
       // create mask (sets this.#mask)
-      this.#maskDataId = this.#createMask(sourcePosition, sourceImage);
+      this.#maskDataId = this.#createMask(savedPosition, sourceImage);
       // check
       if (typeof this.#mask === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.noCreatedMaskImage);
@@ -1049,6 +1049,7 @@ export class Brush extends EventTarget {
     // so we have to restore it or we may not be drawing on 
     // the correct slice.
     viewController.setCurrentPosition(savedPosition);
+    maskVc.setCurrentPosition(savedPosition);
 
     // circle indices in the mask geometry
     const maskPlanePos = maskVl.displayToPlanePos(mousePoint);
