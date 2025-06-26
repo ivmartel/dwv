@@ -114,7 +114,23 @@ export class ViewController {
    */
   initialise() {
     // set window/level to first preset
+    this.resetWindowLevel();
+    // default position
+    this.resetPosition();
+  }
+
+  /**
+   * Reset the window level.
+   */
+  resetWindowLevel() {
+    // set window/level to first preset
     this.setWindowLevelPresetById(0);
+  }
+
+  /**
+   * Reset the position.
+   */
+  resetPosition() {
     // default position
     this.setCurrentPosition(this.getPositionFromPlanePoint(
       new Point2D(0, 0)

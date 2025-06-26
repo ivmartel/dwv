@@ -213,8 +213,8 @@ function viewerSetup() {
       toolsFieldset.disabled = false;
       const changeLayoutSelect = document.getElementById('changelayout');
       changeLayoutSelect.disabled = false;
-      const resetLayoutButton = document.getElementById('resetlayout');
-      resetLayoutButton.disabled = false;
+      const resetViewsButton = document.getElementById('resetviews');
+      resetViewsButton.disabled = false;
       const smoothingChk = document.getElementById('changesmoothing');
       smoothingChk.disabled = false;
       // remove handler
@@ -477,10 +477,10 @@ function setup() {
     );
   });
 
-  const resetLayoutButton = document.getElementById('resetlayout');
-  resetLayoutButton.disabled = true;
-  resetLayoutButton.addEventListener('click', function () {
-    _app.resetLayout();
+  const resetViewsButton = document.getElementById('resetviews');
+  resetViewsButton.disabled = true;
+  resetViewsButton.addEventListener('click', function () {
+    _app.resetZoomPan();
   });
 
   const changeLayoutSelect = document.getElementById('changelayout');

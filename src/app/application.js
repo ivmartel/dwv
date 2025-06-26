@@ -725,10 +725,27 @@ export class App {
 
   /**
    * Reset the layout of the application.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   resetLayout() {
     this.#stage.reset();
     this.#stage.draw();
+  }
+
+  /**
+   * Reset the zoom and pan of the stage.
+   */
+  resetZoomPan() {
+    this.#stage.resetZoomPan();
+    this.#stage.draw();
+  }
+
+  /**
+   * Reset the position and window level of the stage.
+   */
+  resetViews() {
+    this.#stage.resetViews();
   }
 
   /**

@@ -1451,10 +1451,40 @@ export class LayerGroup {
 
   /**
    * Reset the stage to its initial scale and no offset.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   reset() {
     this.setScale(this.#baseScale);
     this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the zoom and pan of all layers.
+   */
+  resetZoomPan() {
+    this.setScale(this.#baseScale);
+    this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the position and window level of all view layers.
+   */
+  resetViews() {
+    let isFirstViewLayer = true;
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer instanceof ViewLayer
+      ) {
+        const vc = layer.getViewController();
+        if (isFirstViewLayer) {
+          // will be propagated to all layers
+          vc.resetPosition();
+          isFirstViewLayer = false;
+        }
+        vc.resetWindowLevel();
+      }
+    }
   }
 
   /**
