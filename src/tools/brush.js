@@ -997,12 +997,21 @@ export class Brush extends EventTarget {
       }
       // display mask
       const divId = layerGroup.getDivId();
-      if (typeof divId !== 'undefined') {
+      const layerGroupHasDiv = typeof divId !== 'undefined';
+      if (layerGroupHasDiv) {
         this.#displayMask(divId);
       }
       // newly create mask case: find the SEG view layer
       maskVl = this.#getLayerGroupMaskViewLayer(layerGroup);
       maskVc = maskVl.getViewController();
+
+      if (layerGroupHasDiv) {
+        // this.#displayMask causes the position to get reset,
+        // so we have to restore it or we may not be drawing on
+        // the correct slice.
+        viewController.setCurrentPosition(savedPosition);
+        maskVc.setCurrentPosition(savedPosition);
+      }
     }
 
     const sourceGeometry = sourceImage.getGeometry();
@@ -1044,12 +1053,6 @@ export class Brush extends EventTarget {
       radiuses,
       sliceMeta
     );
-
-    // this.#displayMask causes the position to get reset,
-    // so we have to restore it or we may not be drawing on
-    // the correct slice.
-    viewController.setCurrentPosition(savedPosition);
-    maskVc.setCurrentPosition(savedPosition);
 
     // circle indices in the mask geometry
     const maskPlanePos = maskVl.displayToPlanePos(mousePoint);
