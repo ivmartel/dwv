@@ -1045,8 +1045,8 @@ export class Brush extends EventTarget {
       sliceMeta
     );
 
-    // this.#displayMask causes the position to get reset, 
-    // so we have to restore it or we may not be drawing on 
+    // this.#displayMask causes the position to get reset,
+    // so we have to restore it or we may not be drawing on
     // the correct slice.
     viewController.setCurrentPosition(savedPosition);
     maskVc.setCurrentPosition(savedPosition);
