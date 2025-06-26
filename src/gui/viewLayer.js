@@ -114,21 +114,21 @@ export class ViewLayer {
 
   /**
    * The fit size as {x,y}.
-   * 
-   * @type {Scalar2D} 
+   *
+   * @type {Scalar2D}
    */
   #containerSize = {x: 1, y: 1};
 
   /**
    * The div to world size ratio.
-   * 
+   *
    * @type {number}
    */
   #divToWorldSizeRatio = 1;
 
   /**
    * The fit offset as {x,y}.
-   * 
+   *
    * @type {Scalar2D}
    */
   #fitOffset = {x: 1, y: 1};
@@ -370,10 +370,21 @@ export class ViewLayer {
       const vcSize = this.#viewController.getImageSize().get2D();
       const vcSpacing = this.#viewController.getImageSpacing().get2D();
 
-      if (this.#baseSize.x !== vcSize.x ||
-          this.#baseSize.y !== vcSize.y ||
+      const sizeChanged =
+          this.#baseSize.x !== vcSize.x ||
+          this.#baseSize.y !== vcSize.y;
+
+      const spacingChanged =
           this.#baseSpacing.x !== vcSpacing.x ||
-          this.#baseSpacing.y !== vcSpacing.y) {
+          this.#baseSpacing.y !== vcSpacing.y;
+
+      if (spacingChanged) {
+        this.#viewController.updatePlaneHelper();
+        // update base spacing
+        this.#setBaseSpacing(vcSpacing);
+      }
+
+      if (sizeChanged) {
         // size/spacing changed, recalculate base offset
         // in case origin changed
         if (typeof this.#layerGroupOrigin !== 'undefined' &&
@@ -388,8 +399,9 @@ export class ViewLayer {
         }
         // update base size
         this.#setBaseSize(vcSize);
-        // update base spacing
-        this.#setBaseSpacing(vcSpacing);
+      }
+
+      if (spacingChanged || sizeChanged) {
         // flag update and draw
         this.#needsDataUpdate = true;
         this.draw();
@@ -1002,8 +1014,6 @@ export class ViewLayer {
     if (needsDraw) {
       this.draw();
     }
-
-    console.log("POKE", this.#viewController);
   }
 
   /**

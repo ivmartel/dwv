@@ -101,6 +101,18 @@ export class ViewController {
   }
 
   /**
+   * Update the plane helper if there is a change in the image geometry.
+   *
+   * @returns {PlaneHelper} The helper.
+   */
+  updatePlaneHelper() {
+    this.#planeHelper = new PlaneHelper(
+      this.#view.getImage().getGeometry(),
+      this.#view.getOrientation()
+    );
+  }
+
+  /**
    * Check is the associated image is a mask.
    *
    * @returns {boolean} True if the associated image is a mask.
