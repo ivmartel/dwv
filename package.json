@@ -12,7 +12,7 @@
   "homepage": "https://ivmartel.github.io/dwv/",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ivmartel/dwv.git"
+    "url": "https://github.com/ivmartel/dwv.git"
   },
   "type": "module",
   "sideEffects": false,
