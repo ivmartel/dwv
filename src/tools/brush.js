@@ -946,6 +946,7 @@ export class Brush extends EventTarget {
       return [];
     }
     const viewController = viewLayer.getViewController();
+    const savedPosition = viewController.getCurrentPosition();
 
     const searchMaskMeta = {
       Modality: 'SEG'
@@ -989,19 +990,28 @@ export class Brush extends EventTarget {
       const planePos = viewLayer.displayToPlanePos(mousePoint);
       sourcePosition = viewController.getPositionFromPlanePoint(planePos);
       // create mask (sets this.#mask)
-      this.#maskDataId = this.#createMask(sourcePosition, sourceImage);
+      this.#maskDataId = this.#createMask(savedPosition, sourceImage);
       // check
       if (typeof this.#mask === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.noCreatedMaskImage);
       }
       // display mask
       const divId = layerGroup.getDivId();
-      if (typeof divId !== 'undefined') {
+      const layerGroupHasDiv = typeof divId !== 'undefined';
+      if (layerGroupHasDiv) {
         this.#displayMask(divId);
       }
       // newly create mask case: find the SEG view layer
       maskVl = this.#getLayerGroupMaskViewLayer(layerGroup);
       maskVc = maskVl.getViewController();
+
+      if (layerGroupHasDiv) {
+        // this.#displayMask causes the position to get reset,
+        // so we have to restore it or we may not be drawing on
+        // the correct slice.
+        viewController.setCurrentPosition(savedPosition);
+        maskVc.setCurrentPosition(savedPosition);
+      }
     }
 
     const sourceGeometry = sourceImage.getGeometry();
