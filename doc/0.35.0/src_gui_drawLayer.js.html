@@ -1,0 +1,1439 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/gui/drawLayer.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}ul li{padding:.2rem 0!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_gui_drawLayer.js</h1></header><article><pre class="prettyprint source lang-js"><code>import {ListenerHandler} from '../utils/listen.js';
+import {DrawController} from '../app/drawController.js';
+import {getScaledOffset} from './layerGroup.js';
+import {InteractionEventNames} from './generic.js';
+import {logger} from '../utils/logger.js';
+import {toStringId} from '../utils/array.js';
+import {precisionRound} from '../utils/string.js';
+import {AddAnnotationCommand} from '../tools/drawCommands.js';
+import {
+  isNodeWithId,
+  isPositionNode,
+  isNodeNameShape,
+  isNodeNameLabel
+} from '../tools/drawBounds.js';
+import {Style} from '../gui/style.js';
+import {Line} from '../math/line.js';
+import {Rectangle} from '../math/rectangle.js';
+import {ROI} from '../math/roi.js';
+import {Protractor} from '../math/protractor.js';
+import {Ellipse} from '../math/ellipse.js';
+import {Circle} from '../math/circle.js';
+import {Point2D} from '../math/point.js';
+
+// external
+import Konva from 'konva';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point, Point3D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {Vector3D} from '../math/vector.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
+import {Image} from '../image/image.js';
+import {PlaneHelper} from '../image/planeHelper.js';
+import {Annotation} from '../image/annotation.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
+import {DrawShapeHandler} from '../tools/drawShapeHandler.js';
+/* eslint-enable no-unused-vars */
+
+/**
+ * Debug function to output the layer hierarchy as text.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
+ */
+// function getHierarchyLog(layer, prefix) {
+//   if (typeof prefix === 'undefined') {
+//     prefix = '';
+//   }
+//   const kids = layer.getChildren();
+//   let log = prefix + '|__ ' + layer.name() + ': ' + layer.id() + '\n';
+//   for (let i = 0; i &lt; kids.length; ++i) {
+//     log += getHierarchyLog(kids[i], prefix + '    ');
+//   }
+//   return log;
+// }
+
+/**
+ * Draw layer.
+ */
+export class DrawLayer {
+
+  /**
+   * The container div.
+   *
+   * @type {HTMLDivElement}
+   */
+  #containerDiv;
+
+  /**
+   * Konva stage.
+   *
+   * @type {Konva.Stage}
+   */
+  #konvaStage = null;
+
+  /**
+   * The layer base size as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #baseSize;
+
+  /**
+   * The layer base spacing as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #baseSpacing;
+
+  /**
+   * The layer fit scale.
+   *
+   * @type {Scalar2D}
+   */
+  #fitScale = {x: 1, y: 1};
+
+  /**
+   * The layer flip scale.
+   *
+   * @type {Scalar3D}
+   */
+  #flipScale = {x: 1, y: 1, z: 1};
+
+  /**
+   * The base layer offset.
+   *
+   * @type {Scalar2D}
+   */
+  #baseOffset = {x: 0, y: 0};
+
+  /**
+   * The view offset.
+   *
+   * @type {Scalar2D}
+   */
+  #viewOffset = {x: 0, y: 0};
+
+  /**
+   * The zoom offset.
+   *
+   * @type {Scalar2D}
+   */
+  #zoomOffset = {x: 0, y: 0};
+
+  /**
+   * The pan offset.
+   *
+   * @type {Scalar2D}
+   */
+  #panOffset = {x: 0, y: 0};
+
+  /**
+   * The flip offset.
+   *
+   * @type {Scalar2D}
+   */
+  #flipOffset = {x: 0, y: 0};
+
+  /**
+   * The draw controller.
+   *
+   * @type {DrawController}
+   */
+  #drawController;
+
+  /**
+   * The plane helper.
+   *
+   * @type {PlaneHelper}
+   */
+  #planeHelper;
+
+  /**
+   * The associated data id.
+   *
+   * @type {string}
+   */
+  #dataId;
+
+  /**
+   * The reference layer id.
+   *
+   * @type {string}
+   */
+  #referenceLayerId;
+
+  /**
+   * Current position group id.
+   *
+   * @type {string|undefined}
+   */
+  #currentPosGroupId;
+
+  /**
+   * Draw shape handler.
+   *
+   * @type {DrawShapeHandler|undefined}
+   */
+  #shapeHandler;
+
+  /**
+   * Visible labels flag.
+   *
+   * @type {boolean}
+   */
+  #visibleLabels = true;
+
+  /**
+   * @param {HTMLDivElement} containerDiv The layer div, its id will be used
+   *   as this layer id.
+   */
+  constructor(containerDiv) {
+    this.#containerDiv = containerDiv;
+    // specific css class name
+    this.#containerDiv.className += ' drawLayer';
+  }
+
+  /**
+   * Set the draw shape handler.
+   *
+   * @param {DrawShapeHandler|undefined} handler The shape handler.
+   */
+  setShapeHandler(handler) {
+    this.#shapeHandler = handler;
+  }
+
+  /**
+   * Get the associated data id.
+   *
+   * @returns {string} The id.
+   */
+  getDataId() {
+    return this.#dataId;
+  }
+
+  /**
+   * Get the reference layer id.
+   *
+   * @returns {string} The id.
+   */
+  getReferenceLayerId() {
+    return this.#referenceLayerId;
+  }
+
+  /**
+   * Listener handler.
+   *
+   * @type {ListenerHandler}
+   */
+  #listenerHandler = new ListenerHandler();
+
+  /**
+   * Get the Konva stage.
+   *
+   * @returns {Konva.Stage} The stage.
+   */
+  getKonvaStage() {
+    return this.#konvaStage;
+  }
+
+  /**
+   * Get the Konva layer.
+   *
+   * @returns {Konva.Layer} The layer.
+   */
+  getKonvaLayer() {
+    // there should only be one layer
+    return this.#konvaStage.getLayers()[0];
+  }
+
+  /**
+   * Get the draw controller.
+   *
+   * @returns {DrawController} The controller.
+   */
+  getDrawController() {
+    return this.#drawController;
+  }
+
+  /**
+   * Set the plane helper.
+   *
+   * @param {PlaneHelper} helper The helper.
+   */
+  setPlaneHelper(helper) {
+    this.#planeHelper = helper;
+  }
+
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  getId() {
+    return this.#containerDiv.id;
+  }
+
+  /**
+   * Remove the HTML element from the DOM.
+   */
+  removeFromDOM() {
+    this.#containerDiv.remove();
+  }
+
+  /**
+   * Get the layer base size (without scale).
+   *
+   * @returns {Scalar2D} The size as {x,y}.
+   */
+  getBaseSize() {
+    return this.#baseSize;
+  }
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  getOpacity() {
+    return this.#konvaStage.opacity();
+  }
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  setOpacity(alpha) {
+    this.#konvaStage.opacity(Math.min(Math.max(alpha, 0), 1));
+  }
+
+  /**
+   * Add a flip offset along the layer X axis.
+   */
+  addFlipOffsetX() {
+    // flip offset
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
+    this.#flipOffset.x += size.width / scale.x;
+    // apply
+    const offset = this.#konvaStage.offset();
+    offset.x += this.#flipOffset.x;
+    this.#konvaStage.offset(offset);
+  }
+
+  /**
+   * Add a flip offset along the layer Y axis.
+   */
+  addFlipOffsetY() {
+    // flip offset
+    const scale = this.#konvaStage.scale();
+    const size = this.#konvaStage.size();
+    this.#flipOffset.y += size.height / scale.y;
+    // apply
+    const offset = this.#konvaStage.offset();
+    offset.y += this.#flipOffset.y;
+    this.#konvaStage.offset(offset);
+  }
+
+  /**
+   * Flip the scale along the layer X axis.
+   */
+  flipScaleX() {
+    this.#flipScale.x *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Y axis.
+   */
+  flipScaleY() {
+    this.#flipScale.y *= -1;
+  }
+
+  /**
+   * Flip the scale along the layer Z axis.
+   */
+  flipScaleZ() {
+    this.#flipScale.z *= -1;
+  }
+
+  /**
+   * Set the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Point3D} [center] The scale center.
+   */
+  setScale(newScale, center) {
+    const orientedNewScale =
+      this.#planeHelper.getTargetOrientedPositiveXYZ({
+        x: newScale.x * this.#flipScale.x,
+        y: newScale.y * this.#flipScale.y,
+        z: newScale.z * this.#flipScale.z,
+      });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+
+    const offset = this.#konvaStage.offset();
+
+    if (Math.abs(newScale.x) === 1 &amp;&amp;
+      Math.abs(newScale.y) === 1 &amp;&amp;
+      Math.abs(newScale.z) === 1) {
+      // reset zoom offset for scale=1
+      const resetOffset = {
+        x: offset.x - this.#zoomOffset.x,
+        y: offset.y - this.#zoomOffset.y
+      };
+      // store new offset
+      this.#zoomOffset = {x: 0, y: 0};
+      this.#konvaStage.offset(resetOffset);
+    } else {
+      if (typeof center !== 'undefined') {
+        let worldCenter = this.#planeHelper.getPlaneOffsetFromOffset3D({
+          x: center.getX(),
+          y: center.getY(),
+          z: center.getZ()
+        });
+        // center was obtained with viewLayer.displayToMainPlanePos
+        // compensated for baseOffset
+        // TODO: justify...
+        worldCenter = {
+          x: worldCenter.x + this.#baseOffset.x,
+          y: worldCenter.y + this.#baseOffset.y
+        };
+
+        const newOffset = getScaledOffset(
+          offset, this.#konvaStage.scale(), finalNewScale, worldCenter);
+
+        const newZoomOffset = {
+          x: this.#zoomOffset.x + newOffset.x - offset.x,
+          y: this.#zoomOffset.y + newOffset.y - offset.y
+        };
+        // store new offset
+        this.#zoomOffset = newZoomOffset;
+        this.#konvaStage.offset(newOffset);
+      }
+    }
+
+    this.#konvaStage.scale(finalNewScale);
+    // update labels
+    this.#updateLabelScale(finalNewScale);
+  }
+
+  /**
+   * Initialise the layer scale.
+   *
+   * @param {Scalar3D} newScale The scale as {x,y,z}.
+   * @param {Scalar2D} absoluteZoomOffset The zoom offset as {x,y}
+   *   without the fit scale (as provided by getAbsoluteZoomOffset).
+   */
+  initScale(newScale, absoluteZoomOffset) {
+    const orientedNewScale = this.#planeHelper.getTargetOrientedPositiveXYZ({
+      x: newScale.x * this.#flipScale.x,
+      y: newScale.y * this.#flipScale.y,
+      z: newScale.z * this.#flipScale.z,
+    });
+    const finalNewScale = {
+      x: this.#fitScale.x * orientedNewScale.x,
+      y: this.#fitScale.y * orientedNewScale.y
+    };
+    this.#konvaStage.scale(finalNewScale);
+
+    this.#zoomOffset = {
+      x: absoluteZoomOffset.x / this.#fitScale.x,
+      y: absoluteZoomOffset.y / this.#fitScale.y
+    };
+    const offset = this.#konvaStage.offset();
+    this.#konvaStage.offset({
+      x: offset.x + this.#zoomOffset.x,
+      y: offset.y + this.#zoomOffset.y
+    });
+  }
+
+  /**
+   * Set the layer offset.
+   *
+   * @param {Scalar3D} newOffset The offset as {x,y,z}.
+   */
+  setOffset(newOffset) {
+    const newPanOffset =
+      this.#planeHelper.getPlaneOffsetFromOffset3D(newOffset);
+    const offset = this.#konvaStage.offset();
+    this.#konvaStage.offset({
+      x: offset.x - this.#panOffset.x + newPanOffset.x,
+      y: offset.y - this.#panOffset.y + newPanOffset.y
+    });
+    this.#panOffset = newPanOffset;
+  }
+
+  /**
+   * Set the base layer offset. Updates the layer offset.
+   *
+   * @param {Vector3D} scrollOffset The scroll offset vector.
+   * @param {Vector3D} planeOffset The plane offset vector.
+   * @returns {boolean} True if the offset was updated.
+   */
+  setBaseOffset(scrollOffset, planeOffset) {
+    const scrollDimIndex = this.#planeHelper.getNativeScrollDimIndex();
+    const newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
+      x: scrollDimIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollDimIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollDimIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+    });
+    const needsUpdate = this.#baseOffset.x !== newOffset.x ||
+      this.#baseOffset.y !== newOffset.y;
+    // reset offset if needed
+    if (needsUpdate) {
+      const offset = this.#konvaStage.offset();
+      this.#konvaStage.offset({
+        x: offset.x - this.#baseOffset.x + newOffset.x,
+        y: offset.y - this.#baseOffset.y + newOffset.y
+      });
+      this.#baseOffset = newOffset;
+    }
+    return needsUpdate;
+  }
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  display(flag) {
+    this.#containerDiv.style.display = flag ? '' : 'none';
+  }
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  isVisible() {
+    return this.#containerDiv.style.display === '';
+  }
+
+  /**
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set.
+   */
+  draw() {
+    this.#konvaStage.draw();
+  }
+
+  /**
+   * Initialise the layer: set the canvas and context.
+   *
+   * @param {Scalar2D} size The image size as {x,y}.
+   * @param {Scalar2D} spacing The image spacing as {x,y}.
+   * @param {string} refLayerId The reference image dataId.
+   */
+  initialise(size, spacing, refLayerId) {
+    // set locals
+    this.#baseSize = size;
+    this.#baseSpacing = spacing;
+    this.#referenceLayerId = refLayerId;
+
+    // create stage
+    this.#konvaStage = new Konva.Stage({
+      container: this.#containerDiv,
+      width: this.#baseSize.x,
+      height: this.#baseSize.y,
+      listening: false
+    });
+    // reset style
+    // (avoids a not needed vertical scrollbar)
+    this.#konvaStage.getContent().setAttribute('style', '');
+
+    // create layer
+    const konvaLayer = new Konva.Layer({
+      listening: false,
+      visible: true
+    });
+    this.#konvaStage.add(konvaLayer);
+  }
+
+  /**
+   * Set the annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The annotation group.
+   * @param {string} dataId The associated data id.
+   * @param {object} exeCallback The undo stack callback.
+   */
+  setAnnotationGroup(annotationGroup, dataId, exeCallback) {
+    this.#dataId = dataId;
+    // local listeners
+    annotationGroup.addEventListener('annotationadd', (event) => {
+      // draw annotation
+      this.#addAnnotationDraw(event.data, true);
+      this.getKonvaLayer().draw();
+    });
+    annotationGroup.addEventListener('annotationupdate', (event) => {
+      // update annotation draw
+      this.#updateAnnotationDraw(event.data);
+      this.getKonvaLayer().draw();
+    });
+    annotationGroup.addEventListener('annotationremove', (event) => {
+      // remove annotation draw
+      this.#removeAnnotationDraw(event.data);
+      this.getKonvaLayer().draw();
+    });
+    annotationGroup.addEventListener(
+      'annotationgroupeditablechange',
+      (event) => {
+        this.activateCurrentPositionShapes(event.data);
+      }
+    );
+
+    // create draw controller
+    this.#drawController = new DrawController(annotationGroup);
+
+    // annotations are allready in the annotation list,
+    // -> no need to add them, just draw and save command
+    if (annotationGroup.getLength() !== 0) {
+      for (const annotation of annotationGroup.getList()) {
+        // draw annotation
+        this.#addAnnotationDraw(annotation, false);
+        // create the draw command
+        const command = new AddAnnotationCommand(
+          annotation, this.getDrawController());
+        // add command to undo stack
+        exeCallback(command);
+      }
+    }
+  }
+
+  /**
+   * Activate shapes at current position.
+   *
+   * @param {boolean} flag The flag to activate or not.
+   */
+  activateCurrentPositionShapes(flag) {
+    const konvaLayer = this.getKonvaLayer();
+
+    // stop stage listening
+    this.#konvaStage.listening(false);
+
+    if (typeof this.#shapeHandler !== 'undefined') {
+      // reset shape editor (remove anchors)
+      this.#shapeHandler.disableAndResetEditor();
+      // remove listeners for all position groups
+      const allPosGroups = konvaLayer.getChildren();
+      for (const posGroup of allPosGroups) {
+        if (posGroup instanceof Konva.Group) {
+          posGroup.getChildren().forEach((group) => {
+            if (group instanceof Konva.Group) {
+              this.#shapeHandler.removeShapeListeners(group);
+            }
+          });
+        }
+      }
+    }
+
+    // activate shape listeners if possible
+    const drawController = this.getDrawController();
+    if (flag &amp;&amp;
+      drawController.getAnnotationGroup().isEditable()) {
+      // start stage listening
+      this.#konvaStage.listening(true);
+      // shape groups at the current position
+      const shapeGroups =
+        this.#getCurrentPosGroup().getChildren();
+      // listen if we have shapes
+      if (shapeGroups.length !== 0) {
+        konvaLayer.listening(true);
+      }
+      // add listeners for position group
+      if (typeof this.#shapeHandler !== 'undefined') {
+        shapeGroups.forEach((group) => {
+          if (group instanceof Konva.Group) {
+            const annotation = drawController.getAnnotation(group.id());
+            this.#shapeHandler.addShapeGroupListeners(group, annotation, this);
+          }
+        });
+      }
+    }
+
+    konvaLayer.draw();
+  }
+
+  /**
+   * Get the position group id for an annotation.
+   *
+   * @param {Annotation} annotation The target annotation.
+   * @returns {string|undefined} The group id.
+   */
+  #getAnnotationPosGroupId(annotation) {
+    let points;
+    // annotation planePoints are only present
+    // for non aquisition plane
+    if (typeof annotation.planePoints !== 'undefined') {
+      // use plane points
+      points = annotation.planePoints;
+    } else if (typeof annotation.planeOrigin !== 'undefined') {
+      // just use plane origin
+      points = [annotation.planeOrigin];
+    }
+    let posId;
+    if (typeof points !== 'undefined') {
+      posId = this.#getPositionId(points, annotation.referencedFrameNumber);
+    }
+    return posId;
+  }
+
+  /**
+   * Get a string id from input plane points.
+   *
+   * @param {Point3D[]} points A list of points that defined a plane.
+   * @param {number} [frameNumber] Optional frame number.
+   * @returns {string} The string id.
+   */
+  #getPositionId(points, frameNumber) {
+    let res = '';
+    for (const point of points) {
+      if (res.length !== 0) {
+        res += '-';
+      }
+      const posValues = [
+        precisionRound(point.getX(), 2),
+        precisionRound(point.getY(), 2),
+        precisionRound(point.getZ(), 2),
+      ];
+      res += toStringId(posValues);
+    }
+    if (typeof frameNumber !== 'undefined') {
+      res += '-' + frameNumber;
+    }
+    return res;
+  }
+
+  /**
+   * Find the shape group associated to an annotation.
+   *
+   * @param {Annotation} annotation The annotation.
+   * @returns {Konva.Group|undefined} The shape group.
+   */
+  #findShapeGroup(annotation) {
+    let res;
+
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
+    const layerChildren = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId));
+    if (layerChildren.length !== 0) {
+      const posGroup = layerChildren[0];
+      if (!(posGroup instanceof Konva.Group)) {
+        return;
+      }
+      const posChildren = posGroup.getChildren(
+        isNodeWithId(annotation.trackingUid));
+      if (posChildren.length !== 0 &amp;&amp;
+        posChildren[0] instanceof Konva.Group) {
+        res = posChildren[0];
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Draw an annotation: create the shape group and add it to
+   *   the Konva layer.
+   *
+   * @param {Annotation} annotation The annotation to draw.
+   * @param {boolean} visible The position group visibility.
+   */
+  #addAnnotationDraw(annotation, visible) {
+    // check for compatible view
+    if (!annotation.canView() ||
+      !annotation.isCompatibleView(this.#planeHelper)) {
+      return;
+    }
+    const posGroupId = this.#getAnnotationPosGroupId(annotation);
+    // Get or create position-group if it does not exist and
+    // append it to konvaLayer
+    let posGroup = this.getKonvaLayer().getChildren(
+      isNodeWithId(posGroupId))[0];
+    if (typeof posGroup === 'undefined') {
+      posGroup = new Konva.Group({
+        id: posGroupId,
+        name: 'position-group',
+        visible: visible
+      });
+      this.getKonvaLayer().add(posGroup);
+    }
+    if (!(posGroup instanceof Konva.Group)) {
+      return;
+    };
+
+    const style = new Style();
+    const stage = this.getKonvaStage();
+    style.setZoomScale(stage.scale());
+
+    // shape group (use first one since it will be removed from
+    // the group when we change it)
+    const factory = annotation.getFactory();
+    if (typeof factory === 'undefined') {
+      throw new Error('Cannot add an annotation draw without factory');
+    }
+    const shapeGroup = factory.createShapeGroup(annotation, style);
+    // add group to posGroup (switches its parent)
+    posGroup.add(shapeGroup);
+
+    // activate shape if possible
+    if (visible &amp;&amp;
+      typeof this.#shapeHandler !== 'undefined'
+    ) {
+      this.#shapeHandler.addShapeGroupListeners(shapeGroup, annotation, this);
+    }
+    // set label visibility
+    this.setLabelVisibility(shapeGroup);
+  }
+
+  /**
+   * Remove an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to remove.
+   * @returns {boolean} True if the shape group has been found and removed.
+   */
+  #removeAnnotationDraw(annotation) {
+    const shapeGroup = this.#findShapeGroup(annotation);
+    if (!(shapeGroup instanceof Konva.Group)) {
+      logger.debug('No shape group to remove');
+      return false;
+    };
+    shapeGroup.remove();
+    return true;
+  }
+
+  /**
+   * Update an annotation draw.
+   *
+   * @param {Annotation} annotation The annotation to update.
+   */
+  #updateAnnotationDraw(annotation) {
+    if (this.#removeAnnotationDraw(annotation)) {
+      this.#addAnnotationDraw(annotation, true);
+    }
+  }
+
+  /**
+   * Fit the layer to its parent container.
+   *
+   * @param {Scalar2D} containerSize The container size as {x,y}.
+   * @param {number} divToWorldSizeRatio The div to world size ratio.
+   * @param {Scalar2D} fitOffset The fit offset as {x,y}.
+   */
+  fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
+    // fit scale
+    const newFitScale = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
+    };
+    const fitRatio = {
+      x: newFitScale.x / this.#fitScale.x,
+      y: newFitScale.y / this.#fitScale.y
+    };
+
+    // size ratio (calculated before update)
+    const sizeRatio = {
+      x: containerSize.x / (this.#konvaStage.width() * fitRatio.x),
+      y: containerSize.y / (this.#konvaStage.height() * fitRatio.y)
+    };
+
+    // set canvas size if different from previous
+    if (this.#konvaStage.width() !== containerSize.x ||
+      this.#konvaStage.height() !== containerSize.y) {
+      this.#konvaStage.width(containerSize.x);
+      this.#konvaStage.height(containerSize.y);
+    }
+
+    // #scale = inputScale * fitScale * flipScale
+    // flipScale does not change here, we can omit it
+    // newScale = (#scale / fitScale) * newFitScale
+    const newScale = {
+      x: this.#konvaStage.scale().x * fitRatio.x,
+      y: this.#konvaStage.scale().y * fitRatio.y
+    };
+
+    // set scales if different from previous
+    if (this.#konvaStage.scale().x !== newScale.x ||
+      this.#konvaStage.scale().y !== newScale.y) {
+      this.#fitScale = newFitScale;
+      this.#konvaStage.scale(newScale);
+      this.#updateLabelScale(newScale);
+    }
+
+    // view offset
+    const newViewOffset = {
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
+    };
+    // flip offset
+    const scaledImageSize = {
+      x: containerSize.x / newFitScale.x,
+      y: containerSize.y / newFitScale.y
+    };
+    const newFlipOffset = {
+      x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
+      y: this.#flipOffset.y !== 0 ? scaledImageSize.y : 0,
+    };
+
+    // set offsets if different from previous
+    if (this.#viewOffset.x !== newViewOffset.x ||
+      this.#viewOffset.y !== newViewOffset.y ||
+      this.#flipOffset.x !== newFlipOffset.x ||
+      this.#flipOffset.y !== newFlipOffset.y) {
+      const newZoomOffset = {
+        x: this.#zoomOffset.x * sizeRatio.x,
+        y: this.#zoomOffset.y * sizeRatio.y
+      };
+      // update global offset
+      this.#konvaStage.offset({
+        x: this.#konvaStage.offset().x +
+          newViewOffset.x - this.#viewOffset.x +
+          newFlipOffset.x - this.#flipOffset.x +
+          newZoomOffset.x - this.#zoomOffset.x,
+        y: this.#konvaStage.offset().y +
+          newViewOffset.y - this.#viewOffset.y +
+          newFlipOffset.y - this.#flipOffset.y +
+          newZoomOffset.y - this.#zoomOffset.y
+      });
+      // update private local offsets
+      this.#flipOffset = newFlipOffset;
+      this.#viewOffset = newViewOffset;
+      this.#zoomOffset = newZoomOffset;
+    }
+  }
+
+  /**
+   * Check the visibility of an annotation.
+   *
+   * @param {string} id The id of the annotation.
+   * @returns {boolean} True if the annotation is visible.
+   */
+  isAnnotationVisible(id) {
+    // get the group (annotation and group have same id)
+    const group = this.#getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // get visibility
+    return group.isVisible();
+  }
+
+  /**
+   * Set the visibility of an annotation.
+   *
+   * @param {string} id The id of the annotation.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   * @returns {boolean} False if the annotation shape cannot be found.
+   */
+  setAnnotationVisibility(id, visible) {
+    // get the group (annotation and group have same id)
+    const group = this.#getGroup(id);
+    if (typeof group === 'undefined') {
+      return false;
+    }
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !group.isVisible();
+    }
+    group.visible(visible);
+
+    // udpate
+    this.draw();
+
+    return true;
+  }
+
+  /**
+   * Set the visibility of all labels.
+   *
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  setLabelsVisibility(visible) {
+    this.#visibleLabels = visible;
+
+    const posGroups = this.getKonvaLayer().getChildren();
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        const shapeGroups = posGroup.getChildren();
+        for (const shapeGroup of shapeGroups) {
+          if (shapeGroup instanceof Konva.Group) {
+            this.#setLabelVisibility(shapeGroup, visible);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Set a shape group label visibility.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   * @param {boolean} [visible] True to set to visible,
+   *   will toggle visibility if not defined.
+   */
+  #setLabelVisibility(shapeGroup, visible) {
+    const label = shapeGroup.getChildren(isNodeNameLabel)[0];
+    if (!(label instanceof Konva.Label)) {
+      return;
+    }
+    // if not set, toggle visibility
+    if (typeof visible === 'undefined') {
+      visible = !label.isVisible();
+    }
+    // set visible only for non empty text
+    if (typeof label.getText() !== 'undefined' &amp;&amp;
+      label.getText().text().length !== 0) {
+      label.visible(visible);
+      const connector = shapeGroup.getChildren(node =>
+        (node.className === 'Line') &amp;&amp; node.name() === 'connector')[0];
+      if (connector) {
+        connector.visible(visible);
+      }
+    }
+  }
+
+  /**
+   * Set a shape group label visibility according to
+   *  this layer setting.
+   *
+   * @param {Konva.Group} shapeGroup The shape group.
+   */
+  setLabelVisibility(shapeGroup) {
+    this.#setLabelVisibility(shapeGroup, this.#visibleLabels);
+  }
+
+  /**
+   * Delete a Draw from the stage.
+   *
+   * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
+   * @param {string} _id The id of the group to delete.
+   * @param {Function} _exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  deleteDraw(_id, _exeCallback) {
+    // does nothing
+  }
+
+  /**
+   * Delete all Draws from the stage.
+   *
+   * @deprecated Since v0.34, please switch to `annotationGroup.remove`.
+   * @param {Function} _exeCallback The callback to call once the
+   *  DeleteCommand has been executed.
+   */
+  deleteDraws(_exeCallback) {
+    // does nothing
+  }
+
+  /**
+   * Get the total number of draws of this layer
+   * (at all positions).
+   *
+   * @returns {number|undefined} The total number of draws.
+   */
+  getNumberOfDraws() {
+    const posGroups = this.getKonvaLayer().getChildren();
+    let count = 0;
+    for (const posGroup of posGroups) {
+      if (posGroup instanceof Konva.Group) {
+        count += posGroup.getChildren().length;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Enable and listen to container interaction events.
+   */
+  bindInteraction() {
+    this.#konvaStage.listening(true);
+    // allow pointer events
+    this.#containerDiv.style.pointerEvents = 'auto';
+    // interaction events
+    const names = InteractionEventNames;
+    for (let i = 0; i &lt; names.length; ++i) {
+      this.#containerDiv.addEventListener(names[i], this.#fireEvent);
+    }
+  }
+
+  /**
+   * Disable and stop listening to container interaction events.
+   */
+  unbindInteraction() {
+    this.#konvaStage.listening(false);
+    // disable pointer events
+    this.#containerDiv.style.pointerEvents = 'none';
+    // interaction events
+    const names = InteractionEventNames;
+    for (let i = 0; i &lt; names.length; ++i) {
+      this.#containerDiv.removeEventListener(names[i], this.#fireEvent);
+    }
+  }
+
+  /**
+   * Set the current position.
+   *
+   * @param {Point} position The new position.
+   * @param {Index} [index] Optional coresponding index.
+   * @returns {boolean} True if the position was updated.
+   */
+  setCurrentPosition(position, index) {
+    if (typeof index === 'undefined') {
+      index = this.#planeHelper.worldToIndex(position);
+    }
+    const planePoints = this.#planeHelper.getPlanePoints(position);
+    let points;
+    if (this.#planeHelper.isAquisitionOrientation()) {
+      // just use plane origin
+      points = [planePoints[0]];
+    } else {
+      // use plane points
+      points = planePoints;
+    }
+    let frameNumber;
+    if (position.length() > 3) {
+      frameNumber = position.get(3);
+    }
+    const posGroupId = this.#getPositionId(points, frameNumber);
+
+    this.#activateDrawLayer(posGroupId);
+    // TODO: add check
+    this.#fireEvent({
+      type: 'positionchange',
+      value: [
+        index.getValues(),
+        position.getValues(),
+      ],
+      valid: true
+    });
+
+    return true;
+  }
+
+  /**
+   * Activate the current draw layer.
+   *
+   * @param {string} posGroupId The position group ID.
+   */
+  #activateDrawLayer(posGroupId) {
+    this.#currentPosGroupId = posGroupId;
+
+    // get all position groups
+    const posGroups = this.getKonvaLayer().getChildren(isPositionNode);
+    // reset or set the visible property
+    let visible;
+    for (let i = 0, leni = posGroups.length; i &lt; leni; ++i) {
+      visible = false;
+      if (typeof posGroupId !== 'undefined' &amp;&amp;
+        posGroups[i].id() === posGroupId) {
+        visible = true;
+      }
+      // group members inherit the visible property
+      posGroups[i].visible(visible);
+    }
+
+    // show current draw layer
+    this.getKonvaLayer().draw();
+  }
+
+  /**
+   * Get the current position group.
+   *
+   * @returns {Konva.Group|undefined} The Konva group.
+   */
+  #getCurrentPosGroup() {
+    if (typeof this.#currentPosGroupId === 'undefined') {
+      return;
+    }
+    // get position groups
+    const posGroups = this.getKonvaLayer().getChildren((node) => {
+      return node.id() === this.#currentPosGroupId;
+    });
+    // if one group, use it
+    // if no group, create one
+    let posGroup;
+    if (posGroups.length === 1) {
+      if (posGroups[0] instanceof Konva.Group) {
+        posGroup = posGroups[0];
+      }
+    } else if (posGroups.length === 0) {
+      posGroup = new Konva.Group();
+      posGroup.name('position-group');
+      posGroup.id(this.#currentPosGroupId);
+      posGroup.visible(true); // dont inherit
+      // add new group to layer
+      this.getKonvaLayer().add(posGroup);
+    } else {
+      logger.warn('Unexpected number of draw position groups');
+    }
+    // return
+    return posGroup;
+  }
+
+  /**
+   * Get a Konva group using its id.
+   *
+   * @param {string} id The group id.
+   * @returns {Konva.Group|undefined} The Konva group.
+   */
+  #getGroup(id) {
+    return this.getKonvaLayer().findOne('#' + id);
+  }
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type.
+   */
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   */
+  #fireEvent = (event) => {
+    event.srclayerid = this.getId();
+    event.dataid = this.#dataId;
+    this.#listenerHandler.fireEvent(event);
+  };
+
+  // common layer methods [end] ---------------
+
+  /**
+   * Update label scale: compensate for it so
+   *   that label size stays visually the same.
+   *
+   * @param {Scalar2D} scale The scale to compensate for as {x,y}.
+   */
+  #updateLabelScale(scale) {
+    // same formula as in labelFactory::create
+    // compensate for scale and times 2 so that font 10 looks like a 10
+    const ratioX = 2 / scale.x;
+    const ratioY = 2 / scale.y;
+    // compensate scale for labels
+    const labels = this.#konvaStage.find('Label');
+    for (let i = 0; i &lt; labels.length; ++i) {
+      labels[i].scale({x: ratioX, y: ratioY});
+    }
+  }
+
+} // DrawLayer class
+
+// *************************
+// legacy code to allow to convert old state into annotation
+// *************************
+
+/**
+ * Draw meta data.
+ */
+export class DrawMeta {
+  /**
+   * Draw quantification.
+   *
+   * @type {object}
+   */
+  quantification;
+
+  /**
+   * Draw text expression. Can contain variables surrounded with '{}' that will
+   * be extracted from the quantification object.
+   *
+   * @type {string}
+   */
+  textExpr;
+}
+
+/**
+ * Draw details.
+ */
+export class DrawDetails {
+  /**
+   * The draw ID.
+   *
+   * @type {number}
+   */
+  id;
+
+  /**
+   * The draw position: an Index converted to string.
+   *
+   * @type {string}
+   */
+  position;
+
+  /**
+   * The draw type.
+   *
+   * @type {string}
+   */
+  type;
+
+  /**
+   * The draw color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   *
+   * @type {string}
+   */
+  color;
+
+  /**
+   * The draw meta.
+   *
+   * @type {DrawMeta}
+   */
+  meta;
+}
+
+/**
+ * Convert a posGroup id (for ex '#2-0') into index values.
+ *
+ * @param {string} id The posGroup id.
+ * @returns {number[]} The index values.
+ */
+function posGroupIdToArray(id) {
+  const res = [0, 0, 0];
+
+  const splitHashes = id.split('#');
+  for (const splitHash of splitHashes) {
+    const split = splitHash.split('-');
+    res[split[0]] = split[1];
+  }
+
+  return res;
+}
+
+/**
+ * Convert a KonvaLayer object to a list of annotations.
+ *
+ * @param {Array} drawings An array of drawings stored
+ *   with 'KonvaLayer().toObject()'.
+ * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+ * @param {Image} refImage The reference image.
+ * @returns {Annotation[]} The associated list of annotations.
+ */
+export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
+  const annotations = [];
+
+  // regular Konva deserialize
+  const stateLayer = Konva.Node.create(drawings);
+
+  // get all position groups
+  const statePosGroups = stateLayer.getChildren(isPositionNode);
+
+  for (let i = 0, leni = statePosGroups.length; i &lt; leni; ++i) {
+    const statePosGroup = statePosGroups[i];
+    const statePosKids = statePosGroup.getChildren();
+    for (let j = 0, lenj = statePosKids.length; j &lt; lenj; ++j) {
+      const annotation = new Annotation();
+      // use posGroup id as origin
+      const posGroupIndex = new Index(posGroupIdToArray(statePosGroup.id()));
+      // find ref SOP UID
+      // WARN: getImageUid returns first UID is the index is not found...
+      annotation.referencedSopInstanceUID = refImage.getImageUid(posGroupIndex);
+
+      // shape group (use first one since it will be removed from
+      // the group when we change it)
+      const stateGroup = statePosKids[0];
+      // annotation id
+      annotation.trackingId = stateGroup.id();
+      annotation.trackingUid = stateGroup.id();
+
+      // shape
+      const shape = stateGroup.getChildren(isNodeNameShape)[0];
+      // annotation colour
+      annotation.colour = shape.stroke();
+
+      if (stateGroup.name() === 'line-group') {
+        const points = shape.points();
+        annotation.mathShape = new Point2D(points[0], points[1]);
+        annotation.referencePoints = [
+          new Point2D(points[2], points[3])
+        ];
+      } else if (stateGroup.name() === 'ruler-group') {
+        const points = shape.points();
+        annotation.mathShape = new Line(
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3])
+        );
+      } else if (stateGroup.name() === 'rectangle-group') {
+        annotation.mathShape = new Rectangle(
+          new Point2D(shape.x(), shape.y()),
+          new Point2D(shape.x() + shape.width(), shape.y() + shape.height())
+        );
+      } else if (stateGroup.name() === 'roi-group') {
+        const points = shape.points();
+        const pointsArray = [];
+        for (let i = 0; i &lt; points.length; i = i + 2) {
+          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        }
+        annotation.mathShape = new ROI(pointsArray);
+      } else if (stateGroup.name() === 'freeHand-group') {
+        logger.warn('Converting freehand into ROI shape');
+        const points = shape.points();
+        const pointsArray = [];
+        for (let i = 0; i &lt; points.length; i = i + 2) {
+          pointsArray.push(new Point2D(points[i], points[i + 1]));
+        }
+        annotation.mathShape = new ROI(pointsArray);
+      } else if (stateGroup.name() === 'protractor-group') {
+        const points = shape.points();
+        annotation.mathShape = new Protractor([
+          new Point2D(points[0], points[1]),
+          new Point2D(points[2], points[3]),
+          new Point2D(points[4], points[5])
+        ]);
+      } else if (stateGroup.name() === 'ellipse-group') {
+        const absPosition = shape.absolutePosition();
+        annotation.mathShape = new Ellipse(
+          new Point2D(absPosition.x, absPosition.y),
+          shape.radiusX(),
+          shape.radiusY()
+        );
+      } else if (stateGroup.name() === 'circle-group') {
+        const absPosition = shape.absolutePosition();
+        annotation.mathShape = new Circle(
+          new Point2D(absPosition.x, absPosition.y),
+          shape.radius()
+        );
+      }
+
+      // details
+      if (drawingsDetails) {
+        const details = drawingsDetails[stateGroup.id()];
+        annotation.textExpr = details.meta.textExpr;
+        annotation.quantification = details.meta.quantification;
+      }
+
+      annotations.push(annotation);
+    }
+  }
+
+  return annotations;
+}
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.35.0.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

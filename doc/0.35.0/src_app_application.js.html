@@ -1,0 +1,2441 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/app/application.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}ul li{padding:.2rem 0!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_app_application.js</h1></header><article><pre class="prettyprint source lang-js"><code>import {viewEventNames} from '../image/view.js';
+import {ViewFactory} from '../image/viewFactory.js';
+import {
+  getMatrixFromName,
+  getOrientationStringLPS,
+  Orientation,
+  getViewOrientation
+} from '../math/orientation.js';
+import {Point3D} from '../math/point.js';
+import {Stage} from '../gui/stage.js';
+import {Style} from '../gui/style.js';
+import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {State} from '../io/state.js';
+import {logger} from '../utils/logger.js';
+import {getUriQuery, decodeQuery} from '../utils/uri.js';
+import {UndoStack} from '../utils/undoStack.js';
+import {ToolboxController} from './toolboxController.js';
+import {LoadController} from './loadController.js';
+import {DataController} from './dataController.js';
+import {OverlayData} from '../gui/overlayData.js';
+import {
+  toolList,
+  defaultToolList,
+  toolOptions,
+  defaultToolOptions
+} from '../tools/index.js';
+import {binderList} from '../gui/stage.js';
+import {WindowLevel} from '../image/windowLevel.js';
+import {PlaneHelper} from '../image/planeHelper.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
+import {konvaToAnnotation} from '../gui/drawLayer.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {Image} from '../image/image.js';
+import {Matrix33} from '../math/matrix.js';
+import {DataElement} from '../dicom/dataElement.js';
+import {Scalar3D} from '../math/scalar.js';
+import {DicomData} from './dataController.js';
+/* eslint-enable no-unused-vars */
+
+/**
+ * View configuration: mainly defines the ´divId´
+ * of the associated HTML div.
+ */
+export class ViewConfig {
+  /**
+   * Associated HTML div id.
+   *
+   * @type {string}
+   */
+  divId;
+  /**
+   * Optional orientation of the data; 'axial', 'coronal' or 'sagittal'.
+   * If undefined, will use the data aquisition plane.
+   *
+   * @type {string|undefined}
+   */
+  orientation;
+  /**
+   * Optional view colour map name.
+   *
+   * @type {string|undefined}
+   */
+  colourMap;
+  /**
+   * Optional layer opacity; in [0, 1] range.
+   *
+   * @type {number|undefined}
+   */
+  opacity;
+  /**
+   * Optional layer window level preset name.
+   * If present, the preset name will be used and
+   * the window centre and width ignored.
+   *
+   * @type {string|undefined}
+   */
+  wlPresetName;
+  /**
+   * Optional layer window center.
+   *
+   * @type {number|undefined}
+   */
+  windowCenter;
+  /**
+   * Optional layer window width.
+   *
+   * @type {number|undefined}
+   */
+  windowWidth;
+
+  /**
+   * @param {string} divId The associated HTML div id.
+   */
+  constructor(divId) {
+    this.divId = divId;
+  }
+}
+
+/**
+ * Tool configuration.
+ */
+export class ToolConfig {
+  /**
+   * Optional tool options.
+   * For Draw: list of shape names.
+   * For Filter: list of filter names.
+   *
+   * @type {string[]|undefined}
+   */
+  options;
+
+  /**
+   * @param {string[]} [options] Optional tool options.
+   */
+  constructor(options) {
+    this.options = options;
+  }
+}
+
+/**
+ * Application options.
+ */
+export class AppOptions {
+  /**
+   * DataId indexed object containing the data view configurations.
+   *
+   * @type {Object&lt;string, ViewConfig[]>|undefined}
+   */
+  dataViewConfigs;
+  /**
+   * Tool name indexed object containing individual tool configurations.
+   *
+   * @type {Object&lt;string, ToolConfig>|undefined}
+   */
+  tools;
+  /**
+   * Optional array of layerGroup binder names.
+   *
+   * @type {string[]|undefined}
+   */
+  binders;
+  /**
+   * Optional boolean flag to trigger the first data render
+   *   after the first loaded data or not. Defaults to true.
+   *
+   * @type {boolean|undefined}
+   */
+  viewOnFirstLoadItem;
+  /**
+   * Optional default chraracterset string used for DICOM parsing if
+   *   not passed in DICOM file.
+   *
+   * Valid values: {@link https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API/Encodings}.
+   *
+   * @type {string|undefined}
+   */
+  defaultCharacterSet;
+  /**
+   * Optional overlay config.
+   *
+   * @type {object|undefined}
+   */
+  overlayConfig;
+  /**
+   * DOM root document.
+   *
+   * @type {DocumentFragment}
+   */
+  rootDocument;
+
+  /**
+   * @param {Object&lt;string, ViewConfig[]>} [dataViewConfigs] Optional dataId
+   *   indexed object containing the data view configurations.
+   */
+  constructor(dataViewConfigs) {
+    this.dataViewConfigs = dataViewConfigs;
+  }
+}
+
+/**
+ * List of ViewConfigs indexed by dataIds.
+ *
+ * @typedef {Object&lt;string, ViewConfig[]>} DataViewConfigs
+ */
+
+/**
+ * Main application class.
+ *
+ * @example
+ * // create the dwv app
+ * const app = new dwv.App();
+ * // initialise
+ * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfigs = {'*': [viewConfig0]};
+ * const options = new dwv.AppOptions(viewConfigs);
+ * app.init(options);
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
+ */
+export class App {
+
+  /**
+   * App options.
+   *
+   * @type {AppOptions}
+   */
+  #options = null;
+
+  /**
+   * Data controller.
+   *
+   * @type {DataController}
+   */
+  #dataController = null;
+
+  /**
+   * Toolbox controller.
+   *
+   * @type {ToolboxController}
+   */
+  #toolboxController = null;
+
+  /**
+   * Load controller.
+   *
+   * @type {LoadController}
+   */
+  #loadController = null;
+
+  /**
+   * Stage.
+   *
+   * @type {Stage}
+   */
+  #stage = null;
+
+  /**
+   * Undo stack.
+   *
+   * @type {UndoStack}
+   */
+  #undoStack = null;
+
+  /**
+   * Style.
+   *
+   * @type {Style}
+   */
+  #style = new Style();
+
+  // overlay datas
+  #overlayDatas = {};
+
+  /**
+   * Listener handler.
+   *
+   * @type {ListenerHandler}
+   */
+  #listenerHandler = new ListenerHandler();
+
+  /**
+   * Get a DicomData.
+   *
+   * @param {string} dataId The data id.
+   * @returns {DicomData|undefined} The data.
+   */
+  getData(dataId) {
+    return this.#dataController.get(dataId);
+  }
+
+  /**
+   * Get the image.
+   *
+   * @param {string} dataId The data id.
+   * @returns {Image|undefined} The associated image.
+   * @deprecated Since v0.34, please use the getData method.
+   */
+  getImage(dataId) {
+    let res;
+    if (typeof this.getData(dataId) !== 'undefined') {
+      res = this.getData(dataId).image;
+    }
+    return res;
+  }
+
+  /**
+   * Set the image at the given id.
+   *
+   * @param {string} dataId The data id.
+   * @param {Image} img The associated image.
+   */
+  setImage(dataId, img) {
+    this.#dataController.setImage(dataId, img);
+  }
+
+  /**
+   * Add a new DicomData.
+   *
+   * @param {DicomData} data The new data.
+   * @returns {string} The data id.
+   */
+  addData(data) {
+    // get a new dataId
+    const dataId = this.#dataController.getNextDataId();
+    // add image to data controller
+    this.#dataController.add(
+      dataId,
+      data
+    );
+    // optional render
+    // if (this.#options.viewOnFirstLoadItem) {
+    //   this.render(dataId);
+    // }
+    // return
+    return dataId;
+  }
+
+  /**
+   * Get the meta data.
+   *
+   * @param {string} dataId The data id.
+   * @returns {Object&lt;string, DataElement>|undefined} The list of meta data.
+   */
+  getMetaData(dataId) {
+    let res;
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      res = this.#dataController.get(dataId).meta;
+    }
+    return res;
+  }
+
+  /**
+   * Get the list of ids in the data storage.
+   *
+   * @returns {string[]} The list of data ids.
+   */
+  getDataIds() {
+    return this.#dataController.getDataIds();
+  }
+
+  /**
+   * Get the list of dataIds that contain the input UIDs.
+   *
+   * @param {string[]} uids A list of UIDs.
+   * @returns {string[]} The list of dataIds that contain the UIDs.
+   */
+  getDataIdsFromSopUids(uids) {
+    return this.#dataController.getDataIdsFromSopUids(uids);
+  }
+
+  /**
+   * Can the data (of the active view of the active layer) be scrolled?
+   *
+   * @returns {boolean} True if the data has a third dimension greater than one.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
+   */
+  canScroll() {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
+    return controller.canScroll();
+  }
+
+  /**
+   * Can window and level be applied to the data
+   * (of the active view of the active layer)?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
+   */
+  canWindowLevel() {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
+    return controller.canWindowLevel();
+  }
+
+  /**
+   * Get the active layer group scale on top of the base scale.
+   *
+   * @returns {Scalar3D} The scale as {x,y,z}.
+   */
+  getAddedScale() {
+    return this.#stage.getActiveLayerGroup().getAddedScale();
+  }
+
+  /**
+   * Get the base scale of the active layer group.
+   *
+   * @returns {Scalar3D} The scale as {x,y,z}.
+   */
+  getBaseScale() {
+    return this.#stage.getActiveLayerGroup().getBaseScale();
+  }
+
+  /**
+   * Get the layer offset of the active layer group.
+   *
+   * @returns {Scalar3D} The offset as {x,y,z}.
+   */
+  getOffset() {
+    return this.#stage.getActiveLayerGroup().getOffset();
+  }
+
+  /**
+   * Get the toolbox controller.
+   *
+   * @returns {ToolboxController} The controller.
+   */
+  getToolboxController() {
+    return this.#toolboxController;
+  }
+
+  /**
+   * Get the active layer group.
+   * The layer is available after the first loaded item.
+   *
+   * @returns {LayerGroup|undefined} The layer group.
+   */
+  getActiveLayerGroup() {
+    return this.#stage.getActiveLayerGroup();
+  }
+
+  /**
+   * Set the active layer group.
+   *
+   * @param {number} index The layer group index.
+   */
+  setActiveLayerGroup(index) {
+    this.#stage.setActiveLayerGroup(index);
+  }
+
+  /**
+   * Get the view layers associated to a data id.
+   * The layer are available after the first loaded item.
+   *
+   * @param {string} dataId The data id.
+   * @returns {ViewLayer[]} The layers.
+   */
+  getViewLayersByDataId(dataId) {
+    return this.#stage.getViewLayersByDataId(dataId);
+  }
+
+  /**
+   * Get a list of view layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayers(callbackFn) {
+    return this.#stage.getViewLayers(callbackFn);
+  }
+
+  /**
+   * Get the draw layers associated to a data id.
+   * The layer are available after the first loaded item.
+   *
+   * @param {string} dataId The data id.
+   * @returns {DrawLayer[]} The layers.
+   */
+  getDrawLayersByDataId(dataId) {
+    return this.#stage.getDrawLayersByDataId(dataId);
+  }
+
+  /**
+   * Get a list of draw layers according to an input callback function.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a DrawLayer as input and returns a boolean. If undefined,
+   *   returns all draw layers.
+   * @returns {DrawLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getDrawLayers(callbackFn) {
+    return this.#stage.getDrawLayers(callbackFn);
+  }
+
+  /**
+   * Get a layer group by div id.
+   * The layer is available after the first loaded item.
+   *
+   * @param {string} divId The div id.
+   * @returns {LayerGroup|undefined} The layer group.
+   */
+  getLayerGroupByDivId(divId) {
+    return this.#stage.getLayerGroupByDivId(divId);
+  }
+
+  /**
+   * Get the number of layer groups.
+   *
+   * @returns {number} The number of groups.
+   */
+  getNumberOfLayerGroups() {
+    return this.#stage.getNumberOfLayerGroups();
+  }
+
+  /**
+   * Get the app style.
+   *
+   * @returns {object} The app style.
+   */
+  getStyle() {
+    return this.#style;
+  }
+
+  /**
+   * Add a command to the undo stack.
+   *
+   * @param {object} cmd The command to add.
+   * @fires UndoStack#undoadd
+   * @function
+   */
+  addToUndoStack = (cmd) => {
+    if (this.#undoStack !== null) {
+      this.#undoStack.add(cmd);
+    }
+  };
+
+  /**
+   * Remove a command from the undo stack.
+   *
+   * @param {string} name The name of the command to remove.
+   * @returns {boolean} True if the command was found and removed.
+   * @fires UndoStack#undoremove
+   * @function
+   */
+  removeFromUndoStack = (name) => {
+    let res = false;
+    if (this.#undoStack !== null) {
+      res = this.#undoStack.remove(name);
+    }
+    return res;
+  };
+
+  /**
+   * Initialise the application.
+   *
+   * @param {AppOptions} opt The application options.
+   * @example
+   * // create the dwv app
+   * const app = new dwv.App();
+   * // initialise
+   * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+   * const viewConfigs = {'*': [viewConfig0]};
+   * const options = new dwv.AppOptions(viewConfigs);
+   * options.viewOnFirstLoadItem = false;
+   * app.init(options);
+   * // render button
+   * const button = document.createElement('button');
+   * button.id = 'render';
+   * button.disabled = true;
+   * button.appendChild(document.createTextNode('render'));
+   * document.body.appendChild(button);
+   * app.addEventListener('load', function () {
+   *   const button = document.getElementById('render');
+   *   button.disabled = false;
+   *   button.onclick = function () {
+   *     // render data #0
+   *     app.render(0);
+   *   };
+   * });
+   * // load dicom data
+   * app.loadURLs([
+   *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+   * ]);
+   */
+  init(opt) {
+    // store
+    this.#options = opt;
+    // defaults
+    if (typeof this.#options.viewOnFirstLoadItem === 'undefined') {
+      this.#options.viewOnFirstLoadItem = true;
+    }
+    if (typeof this.#options.dataViewConfigs === 'undefined') {
+      this.#options.dataViewConfigs = {};
+    }
+    if (typeof this.#options.rootDocument === 'undefined') {
+      this.#options.rootDocument = document;
+    }
+
+    // undo stack
+    this.#undoStack = new UndoStack();
+    this.#undoStack.addEventListener('undoadd', this.#fireEvent);
+    this.#undoStack.addEventListener('undo', this.#fireEvent);
+    this.#undoStack.addEventListener('redo', this.#fireEvent);
+
+    // tools
+    if (typeof this.#options.tools !== 'undefined') {
+      // setup the tool list
+      const appToolList = {};
+      const keys = Object.keys(this.#options.tools);
+      for (let t = 0; t &lt; keys.length; ++t) {
+        const toolName = keys[t];
+        // find the tool in the default tool list
+        let toolClass = defaultToolList[toolName];
+        // or use external one
+        if (typeof toolClass === 'undefined') {
+          toolClass = toolList[toolName];
+        }
+        if (typeof toolClass !== 'undefined') {
+          // create tool instance
+          appToolList[toolName] = new toolClass(this);
+          // register listeners
+          if (typeof appToolList[toolName].addEventListener !== 'undefined') {
+            const names = appToolList[toolName].getEventNames();
+            for (let j = 0; j &lt; names.length; ++j) {
+              appToolList[toolName].addEventListener(names[j], this.#fireEvent);
+            }
+          }
+          // tool options
+          const toolParams = this.#options.tools[toolName];
+          if (typeof toolParams.options !== 'undefined' &amp;&amp;
+            toolParams.options.length !== 0) {
+            let type = 'raw';
+            if (typeof appToolList[toolName].getOptionsType !== 'undefined') {
+              type = appToolList[toolName].getOptionsType();
+            }
+            let appToolOptions;
+            if (type === 'instance' || type === 'factory') {
+              appToolOptions = {};
+              for (let i = 0; i &lt; toolParams.options.length; ++i) {
+                const optionName = toolParams.options[i];
+                let optionClassName = optionName;
+                if (type === 'factory') {
+                  optionClassName += 'Factory';
+                }
+                const toolNamespace = toolName.charAt(0).toLowerCase() +
+                  toolName.slice(1);
+                // find the option in the external tool list
+                let tOptions = toolOptions[toolNamespace];
+                let optionClass;
+                if (typeof tOptions !== 'undefined') {
+                  optionClass = tOptions[optionClassName];
+                }
+                // or use the default one
+                if (typeof optionClass === 'undefined') {
+                  tOptions = defaultToolOptions[toolNamespace];
+                  if (typeof tOptions !== 'undefined') {
+                    optionClass = tOptions[optionClassName];
+                  }
+                }
+                if (typeof optionClass !== 'undefined') {
+                  appToolOptions[optionName] = optionClass;
+                } else {
+                  logger.warn('Could not find option class for: ' +
+                    optionName);
+                }
+              }
+            } else {
+              appToolOptions = toolParams.options;
+            }
+            appToolList[toolName].setOptions(appToolOptions);
+          }
+        } else {
+          logger.warn('Could not initialise unknown tool: ' + toolName);
+        }
+      }
+      // add tools to the controller
+      this.#toolboxController = new ToolboxController(appToolList);
+    }
+
+    // create load controller
+    this.#loadController =
+      new LoadController(this.#options.defaultCharacterSet);
+    this.#loadController.onloadstart = this.#onloadstart;
+    this.#loadController.onprogress = this.#onloadprogress;
+    this.#loadController.onloaditem = this.#onloaditem;
+    this.#loadController.onload = this.#onload;
+    this.#loadController.onloadend = this.#onloadend;
+    this.#loadController.onerror = this.#onloaderror;
+    this.#loadController.ontimeout = this.#onloadtimeout;
+    this.#loadController.onabort = this.#onloadabort;
+
+    // create data controller
+    this.#dataController = new DataController();
+    // propagate data events
+    this.#dataController.addEventListener('dataadd', this.#fireEvent);
+    this.#dataController.addEventListener('dataremove', this.#fireEvent);
+    this.#dataController.addEventListener('dataimageset', this.#fireEvent);
+    this.#dataController.addEventListener('dataupdate', this.#fireEvent);
+    // propage individual data events
+    this.#dataController.addEventListener(
+      'imagecontentchange', this.#fireEvent);
+    this.#dataController.addEventListener(
+      'imagegeometrychange', this.#fireEvent);
+    this.#dataController.addEventListener('annotationadd', this.#fireEvent);
+    this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
+    this.#dataController.addEventListener('annotationremove', this.#fireEvent);
+    this.#dataController.addEventListener(
+      'annotationgroupeditablechange', this.#fireEvent);
+    // create stage
+    this.#stage = new Stage();
+    if (typeof this.#options.binders !== 'undefined') {
+      this.#stage.setBinders(this.#options.binders);
+    }
+  }
+
+  /**
+   * Reset the application.
+   */
+  reset() {
+    // clear objects
+    this.#stage.empty();
+    this.#overlayDatas = {};
+    // reset undo/redo
+    if (this.#undoStack) {
+      this.#undoStack = new UndoStack();
+      this.#undoStack.addEventListener('undoadd', this.#fireEvent);
+      this.#undoStack.addEventListener('undo', this.#fireEvent);
+      this.#undoStack.addEventListener('redo', this.#fireEvent);
+    }
+  }
+
+  /**
+   * Reset the layout of the application.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
+   */
+  resetLayout() {
+    this.#stage.reset();
+    this.#stage.draw();
+  }
+
+  /**
+   * Reset the zoom and pan of the stage.
+   */
+  resetZoomPan() {
+    this.#stage.resetZoomPan();
+    this.#stage.draw();
+  }
+
+  /**
+   * Reset the position and window level of the stage.
+   */
+  resetViews() {
+    this.#stage.resetViews();
+  }
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  addEventListener(type, callback) {
+    this.#listenerHandler.add(type, callback);
+  }
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {Function} callback The function associated with the provided
+   *   event type.
+   */
+  removeEventListener(type, callback) {
+    this.#listenerHandler.remove(type, callback);
+  }
+
+  // load API [begin] -------------------------------------------------------
+
+  /**
+   * Load a list of files. Can be image files or a state file.
+   *
+   * @param {File[]} files The list of files to load.
+   * @returns {string} The data ID, '-1' if problem.
+   * @fires App#loadstart
+   * @fires App#loadprogress
+   * @fires App#loaditem
+   * @fires App#loadend
+   * @fires App#error
+   * @fires App#abort
+   * @function
+   */
+  loadFiles = (files) => {
+    if (files.length === 0) {
+      logger.warn('Ignoring empty input file list.');
+      return '-1';
+    }
+    const dataId = this.#dataController.getNextDataId();
+    this.#loadController.loadFiles(files, dataId);
+    return dataId;
+  };
+
+  /**
+   * Load a list of URLs. Can be image files or a state file.
+   *
+   * @param {string[]} urls The list of urls to load.
+   * @param {object} [options] The options object, can contain:
+   * - requestHeaders: an array of {name, value} to use as request headers,
+   * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
+   * - batchSize: the size of the request url batch.
+   * @returns {string} The data ID, '-1' if problem.
+   * @fires App#loadstart
+   * @fires App#loadprogress
+   * @fires App#loaditem
+   * @fires App#loadend
+   * @fires App#error
+   * @fires App#abort
+   * @function
+   */
+  loadURLs = (urls, options) => {
+    if (urls.length === 0) {
+      logger.warn('Ignoring empty input url list.');
+      return '-1';
+    }
+    const dataId = this.#dataController.getNextDataId();
+    this.#loadController.loadURLs(urls, dataId, options);
+    return dataId;
+  };
+
+  /**
+   * Load from an input uri.
+   *
+   * @param {string} uri The input uri, for example: 'window.location.href'.
+   * @param {object} [options] Optional url request options.
+   * @function
+   */
+  loadFromUri = (uri, options) => {
+    const query = getUriQuery(uri);
+
+    // load end callback: loads the state.
+    const onLoadEnd = (/*event*/) => {
+      this.removeEventListener('loadend', onLoadEnd);
+      this.loadURLs([query.state]);
+    };
+
+    // check query
+    if (query &amp;&amp; typeof query.input !== 'undefined') {
+      // optional display state
+      if (typeof query.state !== 'undefined') {
+        // queue after main data load
+        this.addEventListener('loadend', onLoadEnd);
+      }
+      // load base image
+      decodeQuery(query, this.loadURLs, options);
+    }
+    // no else to allow for empty uris
+  };
+
+  /**
+   * Load a list of ArrayBuffers.
+   *
+   * @param {Array} data The list of ArrayBuffers to load
+   *   in the form of [{name: "", filename: "", data: data}].
+   * @returns {string} The data ID.
+   * @fires App#loadstart
+   * @fires App#loadprogress
+   * @fires App#loaditem
+   * @fires App#loadend
+   * @fires App#error
+   * @fires App#abort
+   * @function
+   */
+  loadImageObject = (data) => {
+    const dataId = this.#dataController.getNextDataId();
+    this.#loadController.loadImageObject(data, dataId);
+    return dataId;
+  };
+
+  /**
+   * Abort all the current loads.
+   */
+  abortAllLoads() {
+    const ids = this.#loadController.getLoadingDataIds();
+    for (const id of ids) {
+      this.abortLoad(id);
+    }
+  }
+
+  /**
+   * Abort an individual data load.
+   *
+   * @param {string} dataId The data to stop loading.
+   */
+  abortLoad(dataId) {
+    // abort load
+    this.#loadController.abort(dataId);
+    // remove data
+    this.#dataController.remove(dataId);
+    // clean up stage
+    this.#stage.removeLayersByDataId(dataId);
+  }
+
+  // load API [end] ---------------------------------------------------------
+
+  /**
+   * Fit the display to the data of each layer group.
+   * To be called once the image is loaded.
+   */
+  fitToContainer() {
+    this.#stage.fitToContainer();
+  }
+
+  /**
+   * Init the Window/Level display
+   * (of the active layer of the active layer group).
+   *
+   * @deprecated Since v0.33, please set the opacity
+   *   of the desired view layer directly.
+   */
+  initWLDisplay() {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    const controller = viewLayer.getViewController();
+    controller.initialise();
+  }
+
+  /**
+   * Set the imageSmoothing flag value. Default is false.
+   *
+   * @param {boolean} flag True to enable smoothing.
+   */
+  setImageSmoothing(flag) {
+    this.#stage.setImageSmoothing(flag);
+    this.#stage.draw();
+  }
+
+  /**
+   * Get the layer group configuration from a data id.
+   *
+   * @param {string} dataId The data id.
+   * @param {boolean} [excludeStarConfig] Exclude the star config
+   *  (default to false).
+   * @returns {ViewConfig[]} The list of associated configs.
+   */
+  getViewConfigs(dataId, excludeStarConfig) {
+    if (typeof excludeStarConfig === 'undefined') {
+      excludeStarConfig = false;
+    }
+    // check options
+    if (this.#options.dataViewConfigs === null ||
+      typeof this.#options.dataViewConfigs === 'undefined') {
+      throw new Error('No available data view configuration');
+    }
+    let configs = [];
+    if (typeof this.#options.dataViewConfigs[dataId] !== 'undefined') {
+      configs = this.#options.dataViewConfigs[dataId];
+    } else if (!excludeStarConfig &amp;&amp;
+      typeof this.#options.dataViewConfigs['*'] !== 'undefined') {
+      configs = this.#options.dataViewConfigs['*'];
+    }
+    return configs;
+  }
+
+  /**
+   * Get the layer group configuration for a data id and group
+   * div id.
+   *
+   * @param {string} dataId The data id.
+   * @param {string} groupDivId The layer group div id.
+   * @param {boolean} [excludeStarConfig] Exclude the star config
+   *  (default to false).
+   * @returns {ViewConfig|undefined} The associated config.
+   */
+  getViewConfig(dataId, groupDivId, excludeStarConfig) {
+    const configs = this.getViewConfigs(dataId, excludeStarConfig);
+    return configs.find(function (item) {
+      return item.divId === groupDivId;
+    });
+  }
+
+  /**
+   * Get the data view config.
+   * Carefull, returns a reference, do not modify without resetting.
+   *
+   * @returns {Object&lt;string, ViewConfig[]>} The configuration list.
+   */
+  getDataViewConfigs() {
+    return this.#options.dataViewConfigs;
+  }
+
+  /**
+   * Set the data view configuration.
+   * Resets the stage and recreates all the views.
+   *
+   * @param {Object&lt;string, ViewConfig[]>} configs The configuration list.
+   */
+  setDataViewConfigs(configs) {
+    // clean up
+    this.#stage.empty();
+    // set new
+    this.#options.dataViewConfigs = configs;
+    // create layer groups
+    this.#createLayerGroups(configs);
+  }
+
+  /**
+   * Add a data view config.
+   *
+   * @param {string} dataId The data id.
+   * @param {ViewConfig} config The view configuration.
+   */
+  addDataViewConfig(dataId, config) {
+    // add to list
+    const configs = this.#options.dataViewConfigs;
+    if (typeof configs[dataId] === 'undefined') {
+      configs[dataId] = [];
+    }
+    const equalDivId = function (item) {
+      return item.divId === config.divId;
+    };
+    const itemIndex = configs[dataId].findIndex(equalDivId);
+    if (itemIndex === -1) {
+      this.#options.dataViewConfigs[dataId].push(config);
+    } else {
+      throw new Error('Duplicate view config for data ' + dataId +
+        ' and div ' + config.divId);
+    }
+
+    // add layer group if not done
+    if (typeof this.#stage.getLayerGroupByDivId(config.divId) === 'undefined') {
+      this.#createLayerGroup(config);
+    }
+
+    // render (will create layers)
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      this.render(dataId, [config]);
+    }
+  }
+
+  /**
+   * Remove a data view config.
+   * Removes the associated layer if found, removes
+   *   the layer group if empty.
+   *
+   * @param {string} dataId The data id.
+   * @param {string} divId The div id.
+   */
+  removeDataViewConfig(dataId, divId) {
+    // input checks
+    const configs = this.#options.dataViewConfigs;
+    if (typeof configs[dataId] === 'undefined') {
+      // no config for dataId
+      return;
+    }
+    const equalDivId = function (item) {
+      return item.divId === divId;
+    };
+    const itemIndex = configs[dataId].findIndex(equalDivId);
+    if (itemIndex === -1) {
+      // no config for divId
+      return;
+    }
+
+    // remove from config list
+    configs[dataId].splice(itemIndex, 1);
+    if (configs[dataId].length === 0) {
+      delete configs[dataId];
+    }
+
+    // update layer group
+    const layerGroup = this.#stage.getLayerGroupByDivId(divId);
+    if (typeof layerGroup !== 'undefined') {
+      // remove layer if possible
+      const vls = layerGroup.getViewLayersByDataId(dataId);
+      if (vls.length === 1) {
+        layerGroup.removeLayer(vls[0]);
+      }
+      const dls = layerGroup.getDrawLayersByDataId(dataId);
+      if (dls.length === 1) {
+        layerGroup.removeLayer(dls[0]);
+      }
+      // remove layer group if empty
+      if (layerGroup.getNumberOfLayers() === 0) {
+        this.#stage.removeLayerGroup(layerGroup);
+      }
+    }
+  }
+
+  /**
+   * Update an existing data view config.
+   * Removes and re-creates the layer if found.
+   *
+   * @param {string} dataId The data id.
+   * @param {string} divId The div id.
+   * @param {ViewConfig} config The view configuration.
+   */
+  updateDataViewConfig(dataId, divId, config) {
+    // input checks
+    const configs = this.#options.dataViewConfigs;
+    // check data id
+    if (typeof configs[dataId] === 'undefined') {
+      throw new Error('No config for dataId: ' + dataId);
+    }
+    // check div id
+    const equalDivId = function (item) {
+      return item.divId === divId;
+    };
+    const itemIndex = configs[dataId].findIndex(equalDivId);
+    if (itemIndex === -1) {
+      throw new Error('No config for dataId: ' +
+        dataId + ' and divId: ' + divId);
+    }
+
+    // update config
+    const configToUpdate = configs[dataId][itemIndex];
+    for (const prop in config) {
+      configToUpdate[prop] = config[prop];
+    }
+
+    // update layer group
+    const layerGroup = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
+    if (typeof layerGroup !== 'undefined') {
+      // remove layer if possible
+      const vls = layerGroup.getViewLayersByDataId(dataId);
+      if (vls.length === 1) {
+        layerGroup.removeLayer(vls[0]);
+      }
+      const dls = layerGroup.getDrawLayersByDataId(dataId);
+      if (dls.length === 1) {
+        layerGroup.removeLayer(dls[0]);
+      }
+    }
+
+    // render (will create layer)
+    if (typeof this.#dataController.get(dataId) !== 'undefined') {
+      this.render(dataId, [configToUpdate]);
+    }
+  }
+
+  /**
+   * Create layer groups according to a data view config:
+   * adds them to stage and binds them.
+   *
+   * @param {DataViewConfigs} dataViewConfigs The data view config.
+   */
+  #createLayerGroups(dataViewConfigs) {
+    const dataKeys = Object.keys(dataViewConfigs);
+    const divIds = [];
+    for (let i = 0; i &lt; dataKeys.length; ++i) {
+      const viewConfigs = dataViewConfigs[dataKeys[i]];
+      for (let j = 0; j &lt; viewConfigs.length; ++j) {
+        const viewConfig = viewConfigs[j];
+        // view configs can contain the same divIds, avoid duplicating
+        if (!divIds.includes(viewConfig.divId)) {
+          this.#createLayerGroup(viewConfig);
+          divIds.push(viewConfig.divId);
+        }
+      }
+    }
+  }
+
+  /**
+   * Create a layer group according to a view config:
+   * adds it to stage and binds it.
+   *
+   * @param {ViewConfig} viewConfig The view config.
+   */
+  #createLayerGroup(viewConfig) {
+    // create new layer group
+    const element = this.#options.rootDocument.getElementById(viewConfig.divId);
+    const layerGroup = this.#stage.addLayerGroup(element);
+    // bind events
+    this.#bindLayerGroupToApp(layerGroup);
+  }
+
+  /**
+   * Set the layer groups binders.
+   *
+   * @param {string[]} list The list of binder names.
+   */
+  setLayerGroupsBinders(list) {
+    // create instances
+    const instances = [];
+    for (let i = 0; i &lt; list.length; ++i) {
+      if (typeof binderList[list[i]] !== 'undefined') {
+        instances.push(new binderList[list[i]]);
+      }
+    }
+    // pass to stage
+    this.#stage.setBinders(instances);
+  }
+
+  /**
+   * Render the current data.
+   *
+   * @param {string} dataId The data id to render.
+   * @param {ViewConfig[]} [viewConfigs] The list of configs to render.
+   */
+  render(dataId, viewConfigs) {
+    if (typeof dataId === 'undefined' || dataId === null) {
+      throw new Error('Cannot render without data id');
+    }
+    // guess data type
+    const isImage =
+      typeof this.getData(dataId).image !== 'undefined';
+    const isMeasurement =
+      typeof this.getData(dataId).annotationGroup !== 'undefined';
+
+    // create layer groups if not done yet
+    // (create all to allow for ratio sync)
+    if (this.#stage.getNumberOfLayerGroups() === 0) {
+      this.#createLayerGroups(this.#options.dataViewConfigs);
+    }
+
+    // use options list if non provided
+    if (typeof viewConfigs === 'undefined') {
+      viewConfigs = this.getViewConfigs(dataId);
+    }
+
+    // nothing to do if no view config
+    if (viewConfigs.length === 0) {
+      logger.info('Not rendering data: ' + dataId +
+        ' (no data view config)');
+      return;
+    }
+
+    // loop on configs
+    for (let i = 0; i &lt; viewConfigs.length; ++i) {
+      const config = viewConfigs[i];
+      const layerGroup =
+        this.#stage.getLayerGroupByDivId(config.divId);
+      // layer group must exist
+      if (!layerGroup) {
+        throw new Error('No layer group for ' + config.divId);
+      }
+      // create layer if needed
+      // warn: needs a loaded DOM
+      if (typeof this.#dataController.get(dataId) !== 'undefined') {
+        if (isImage &amp;&amp;
+          layerGroup.getViewLayersByDataId(dataId).length === 0
+        ) {
+          this.#addViewLayer(dataId, config);
+        } else if (isMeasurement &amp;&amp;
+          layerGroup.getDrawLayersByDataId(dataId).length === 0
+        ) {
+          this.addDrawLayer(dataId, config);
+        }
+      }
+      // draw
+      layerGroup.draw();
+    }
+  }
+
+  /**
+   * Zoom the layers of the active layer group.
+   *
+   * @param {number} step The step to add to the current zoom.
+   * @param {number} cx The zoom center X coordinate.
+   * @param {number} cy The zoom center Y coordinate.
+   */
+  zoom(step, cx, cy) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewController = layerGroup.getBaseViewLayer().getViewController();
+    const k = viewController.getCurrentScrollPosition();
+    const center = new Point3D(cx, cy, k);
+    layerGroup.addScale(step, center);
+    layerGroup.draw();
+  }
+
+  /**
+   * Apply a translation to the layers of the active layer group.
+   *
+   * @param {number} tx The translation along X.
+   * @param {number} ty The translation along Y.
+   */
+  translate(tx, ty) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    layerGroup.addTranslation({x: tx, y: ty, z: 0});
+    layerGroup.draw();
+  }
+
+  /**
+   * Set the active view layer (of the active layer group) opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   * @deprecated Since v0.33, pplease set the opacity
+   *   of the desired view layer directly.
+   */
+  setOpacity(alpha) {
+    const viewLayer = this.#stage.getActiveLayerGroup().getActiveViewLayer();
+    viewLayer.setOpacity(alpha);
+    viewLayer.draw();
+  }
+
+  /**
+   * Set the drawings of the active layer group.
+   *
+   * @deprecated Since v0.34, please switch to DICOM SR annotations.
+   * @param {Array} drawings An array of drawings.
+   * @param {Array} drawingsDetails An array of drawings details.
+   * @param {string} dataId The converted data id.
+   */
+  setDrawings(drawings, drawingsDetails, dataId) {
+    const layerGroup = this.#stage.getActiveLayerGroup();
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const refDataId = viewLayer.getDataId();
+    const refData = this.getData(refDataId);
+    const viewController = viewLayer.getViewController();
+
+    // convert konva to annotation
+    // (assume current image is ref image)
+    const annotations = konvaToAnnotation(
+      drawings, drawingsDetails, refData.image);
+    // create data
+    const data = this.createAnnotationData(refDataId);
+    // add annotations to data
+    for (const annotation of annotations) {
+      annotation.setViewController(viewController);
+      data.annotationGroup.add(annotation);
+    }
+    // add to data controller
+    this.#dataController.add(dataId, data);
+    // render
+    this.render(dataId);
+  }
+
+  /**
+   * Apply a JSON state to this app.
+   *
+   * @deprecated Since v0.34, please switch to DICOM SR
+   *   for annotations.
+   * @param {string} jsonState The state of the app as a JSON string.
+   * @param {string} dataId The state data id.
+   */
+  applyJsonState(jsonState, dataId) {
+    const state = new State(dataId);
+    state.apply(this, state.fromJSON(jsonState));
+  }
+
+  // Handler Methods -----------------------------------------------------------
+
+  /**
+   * Handle resize: fit the display to the window.
+   * To be called once the image is loaded.
+   * Can be connected to a window 'resize' event.
+   *
+   * @function
+   */
+  onResize = () => {
+    this.fitToContainer();
+  };
+
+  /**
+   * Key down callback. Meant to be used in tools.
+   *
+   * @param {KeyboardEvent} event The key down event.
+   * @fires App#keydown
+   * @function
+   */
+  onKeydown = (event) => {
+    /**
+     * Key down event.
+     *
+     * @event App#keydown
+     * @type {KeyboardEvent}
+     * @property {string} type The event type: keydown.
+     * @property {string} context The tool where the event originated.
+     */
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Key down event handler example.
+   * - CRTL-Z: undo,
+   * - CRTL-Y: redo,
+   * - CRTL-ARROW_LEFT: next element on fourth dim,
+   * - CRTL-ARROW_UP: next element on third dim,
+   * - CRTL-ARROW_RIGHT: previous element on fourth dim,
+   * - CRTL-ARROW_DOWN: previous element on third dim.
+   *
+   * Applies to the active view of the active layer group.
+   *
+   * @param {KeyboardEvent} event The key down event.
+   * @fires UndoStack#undo
+   * @fires UndoStack#redo
+   * @function
+   */
+  defaultOnKeydown = (event) => {
+    if (event.ctrlKey) {
+      if (event.shiftKey) {
+        const layerGroup = this.#stage.getActiveLayerGroup();
+        const positionHelper = layerGroup.getPositionHelper();
+        if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
+          if (layerGroup.moreThanOne(3)) {
+            positionHelper.decrementPosition(3);
+          }
+        } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
+          if (layerGroup.canScroll()) {
+            positionHelper.incrementPositionAlongScroll();
+          }
+        } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
+          if (layerGroup.moreThanOne(3)) {
+            positionHelper.incrementPosition(3);
+          }
+        } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
+          if (layerGroup.canScroll()) {
+            positionHelper.decrementPositionAlongScroll();
+          }
+        }
+      } else if (event.key === 'y') { // crtl-y
+        this.#undoStack.redo();
+      } else if (event.key === 'z') { // crtl-z
+        this.#undoStack.undo();
+      } else if (event.key === ' ') { // crtl-space
+        for (let i = 0; i &lt; this.#stage.getNumberOfLayerGroups(); ++i) {
+          this.#stage.getLayerGroup(i).setShowCrosshair(
+            !this.#stage.getLayerGroup(i).getShowCrosshair()
+          );
+        }
+      }
+    }
+  };
+
+  // Internal members shortcuts-----------------------------------------------
+
+  /**
+   * Reset the display.
+   */
+  resetDisplay() {
+    this.resetLayout();
+    this.initWLDisplay();
+  }
+
+  /**
+   * Reset the app zoom.
+   */
+  resetZoom() {
+    this.resetLayout();
+  }
+
+  /**
+   * Set the colour map of the active view of the active layer group.
+   *
+   * @param {string} name The colour map name.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
+   */
+  setColourMap(name) {
+    const viewController =
+      this.#stage.getActiveLayerGroup()
+        .getActiveViewLayer().getViewController();
+    viewController.setColourMap(name);
+  }
+
+  /**
+   * Set the window/level preset of the active view of the active layer group.
+   *
+   * @param {string} preset The window/level preset.
+   * @deprecated Since v0.33, please use the ViewController
+   *   equivalent directly instead.
+   */
+  setWindowLevelPreset(preset) {
+    const viewController =
+      this.#stage.getActiveLayerGroup()
+        .getActiveViewLayer().getViewController();
+    viewController.setWindowLevelPreset(preset);
+  }
+
+  /**
+   * Set the tool.
+   *
+   * @param {string} tool The tool.
+   */
+  setTool(tool) {
+    // bind tool to active layer
+    for (let i = 0; i &lt; this.#stage.getNumberOfLayerGroups(); ++i) {
+      const layerGroup = this.#stage.getLayerGroup(i);
+      const layer = layerGroup.getActiveLayer();
+      if (typeof layer !== 'undefined') {
+        this.#toolboxController.bindLayerGroup(layerGroup, layer);
+      }
+    }
+    // set toolbox tool
+    this.#toolboxController.setSelectedTool(tool);
+  }
+
+  /**
+   * Set the tool live features.
+   *
+   * @param {object} list The list of features.
+   */
+  setToolFeatures(list) {
+    this.#toolboxController.setToolFeatures(list);
+  }
+
+  /**
+   * Undo the last action.
+   *
+   * @fires UndoStack#undo
+   */
+  undo() {
+    this.#undoStack.undo();
+  }
+
+  /**
+   * Redo the last action.
+   *
+   * @fires UndoStack#redo
+   */
+  redo() {
+    this.#undoStack.redo();
+  }
+
+  /**
+   * Get the undo stack size.
+   *
+   * @returns {number} The size of the stack.
+   */
+  getStackSize() {
+    return this.#undoStack.getStackSize();
+  }
+
+  /**
+   * Get the current undo stack index.
+   *
+   * @returns {number} The stack index.
+   */
+  getCurrentStackIndex() {
+    return this.#undoStack.getCurrentStackIndex();
+  }
+
+  /**
+   * Get the overlay data for a data id.
+   *
+   * @param {string} dataId The data id.
+   * @returns {OverlayData|undefined} The overlay data.
+   */
+  getOverlayData(dataId) {
+    let data;
+    if (typeof this.#overlayDatas !== 'undefined') {
+      data = this.#overlayDatas[dataId];
+    }
+    return data;
+  }
+
+  /**
+   * Toggle overlay listeners.
+   *
+   * @param {string} dataId The data id.
+   */
+  toggleOverlayListeners(dataId) {
+    const data = this.getOverlayData(dataId);
+    if (typeof data !== 'undefined') {
+      if (data.isListening()) {
+        data.removeAppListeners();
+      } else {
+        data.addAppListeners();
+      }
+    }
+  }
+
+  /**
+   * Create new annotation data based on the data of
+   *   the active view layer.
+   *
+   * @param {string} refDataId The reference data id.
+   * @returns {DicomData} The new data.
+   */
+  createAnnotationData(refDataId) {
+    const refData = this.getData(refDataId);
+    const refMeta = refData.image.getMeta();
+
+    const data = new DicomData({});
+    data.annotationGroup = new AnnotationGroup();
+    data.annotationGroup.setMetaValue('Modality', 'SR');
+
+    const tagsToCopy = [
+      'PatientName',
+      'PatientID',
+      'PatientBirthDate',
+      'PatientSex',
+      'StudyDate',
+      'StudyTime',
+      'StudyInstanceUID',
+      'StudyID',
+      'StudyDescription'
+    ];
+    for (const tag of tagsToCopy) {
+      data.annotationGroup.setMetaValue(tag, refMeta[tag]);
+    }
+
+    // used to associate with a view layer
+    data.annotationGroup.setMetaValue(
+      'CurrentRequestedProcedureEvidenceSequence', {
+        value: [{
+          ReferencedSeriesSequence: {
+            value: [{
+              // ReferencedSOPSequence: left to fill in later
+              SeriesInstanceUID: refMeta.SeriesInstanceUID
+            }]
+          },
+          StudyInstanceUID: refMeta.StudyInstanceUID
+        }]
+      }
+    );
+
+    return data;
+  }
+
+  /**
+   * Add new data and render it with a simple new data view config.
+   *
+   * @param {DicomData} data The data to add.
+   * @param {string} divId The div where to draw.
+   * @param {string} refDataId The reference data id.
+   */
+  addAndRenderAnnotationData(data, divId, refDataId) {
+    // add new data
+    const dataId = this.addData(data);
+    // add data view config based on reference data
+    const refDataViewConfigs = this.getViewConfigs(refDataId);
+    const refDataViewConfig = refDataViewConfigs.find(
+      element => element.divId === divId);
+    if (typeof refDataViewConfig === 'undefined') {
+      throw new Error('No reference data view config for draw');
+    }
+    const drawDataViewConfig = new ViewConfig(divId);
+    drawDataViewConfig.orientation = refDataViewConfig.orientation;
+    this.addDataViewConfig(dataId, drawDataViewConfig);
+    // render (will create draw layer)
+    this.render(dataId);
+  }
+
+  // Private Methods -----------------------------------------------------------
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   */
+  #fireEvent = (event) => {
+    let propagate = true;
+    if (typeof event.propagate !== 'undefined') {
+      propagate = event.propagate;
+      delete event.propagate;
+    }
+    if (propagate) {
+      this.#listenerHandler.fireEvent(event);
+    }
+  };
+
+  /**
+   * Data load start callback.
+   *
+   * @param {object} event The load start event.
+   */
+  #onloadstart = (event) => {
+    // create overlay data
+    if (typeof this.#options.overlayConfig !== 'undefined') {
+      this.#overlayDatas[event.dataid] = new OverlayData(
+        this, event.dataid, this.#options.overlayConfig);
+    }
+    /**
+     * Load start event.
+     *
+     * @event App#loadstart
+     * @type {object}
+     * @property {string} type The event type: loadstart.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     */
+    event.type = 'loadstart';
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load progress callback.
+   *
+   * @param {object} event The progress event.
+   */
+  #onloadprogress = (event) => {
+    /**
+     * Load progress event.
+     *
+     * @event App#loadprogress
+     * @type {object}
+     * @property {string} type The event type: loadprogress.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     * @property {number} loaded The loaded percentage.
+     * @property {number} total The total percentage.
+     */
+    event.type = 'loadprogress';
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load callback.
+   *
+   * @param {object} event The load event.
+   */
+  #onloaditem = (event) => {
+    // check event
+    if (typeof event.data === 'undefined') {
+      logger.error('Missing loaditem event data.');
+    }
+    if (typeof event.loadtype === 'undefined') {
+      logger.error('Missing loaditem event load type.');
+    }
+
+    let eventMetaData;
+    if (event.loadtype === 'image') {
+      eventMetaData = event.data.meta;
+    } else if (event.loadtype === 'state') {
+      eventMetaData = 'state';
+    }
+
+    /**
+     * Load item event: fired when an item has been successfully loaded.
+     *
+     * @event App#loaditem
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     * @property {object} data The loaded meta data.
+     */
+    this.#fireEvent({
+      type: 'loaditem',
+      data: eventMetaData,
+      source: event.source,
+      loadtype: event.loadtype,
+      dataid: event.dataid,
+      isfirstitem: event.isfirstitem,
+      warn: event.warn
+    });
+
+    const isFirstLoadItem = event.isfirstitem;
+
+    if (event.loadtype === 'image') {
+      if (isFirstLoadItem) {
+        this.#dataController.add(event.dataid, event.data);
+      } else {
+        this.#dataController.update(event.dataid, event.data);
+      }
+    } else if (event.loadtype === 'state') {
+      this.applyJsonState(event.data, event.dataid);
+    }
+
+    // update overlay data if present
+    if (typeof this.#overlayDatas !== 'undefined' &amp;&amp;
+      typeof this.#overlayDatas[event.dataid] !== 'undefined') {
+      this.#overlayDatas[event.dataid].addItemMeta(eventMetaData);
+    }
+
+    // render if first and flag allows
+    if (event.loadtype === 'image' &amp;&amp;
+      this.getViewConfigs(event.dataid).length !== 0 &amp;&amp;
+      isFirstLoadItem &amp;&amp; this.#options.viewOnFirstLoadItem) {
+      this.render(event.dataid);
+    }
+  };
+
+  /**
+   * Data load callback.
+   *
+   * @param {object} event The load event.
+   */
+  #onload = (event) => {
+    /**
+     * Load event: fired when a load finishes successfully.
+     *
+     * @event App#load
+     * @type {object}
+     * @property {string} type The event type: load.
+     * @property {string} loadType The load type: image or state.
+     */
+    event.type = 'load';
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load end callback.
+   *
+   * @param {object} event The load end event.
+   */
+  #onloadend = (event) => {
+    /**
+     * Main load end event: fired when the load finishes,
+     *   successfully or not.
+     *
+     * @event App#loadend
+     * @type {object}
+     * @property {string} type The event type: loadend.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     */
+    event.type = 'loadend';
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load error callback.
+   *
+   * @param {object} event The error event.
+   */
+  #onloaderror = (event) => {
+    /**
+     * Load error event.
+     *
+     * @event App#error
+     * @type {object}
+     * @property {string} type The event type: error.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     * @property {object} error The error.
+     * @property {object} target The event target.
+     */
+    if (typeof event.type === 'undefined') {
+      event.type = 'error';
+    }
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load timeout callback.
+   *
+   * @param {object} event The timeout event.
+   */
+  #onloadtimeout = (event) => {
+    /**
+     * Load timeout event.
+     *
+     * @event App#timeout
+     * @type {object}
+     * @property {string} type The event type: timeout.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: an url as a string.
+     * @property {object} target The event target.
+     */
+    if (typeof event.type === 'undefined') {
+      event.type = 'timeout';
+    }
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Data load abort callback.
+   *
+   * @param {object} event The abort event.
+   */
+  #onloadabort = (event) => {
+    /**
+     * Load abort event.
+     *
+     * @event App#abort
+     * @type {object}
+     * @property {string} type The event type: abort.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     */
+    if (typeof event.type === 'undefined') {
+      event.type = 'abort';
+    }
+    this.#fireEvent(event);
+  };
+
+  /**
+   * Bind layer group events to app.
+   *
+   * @param {LayerGroup} group The layer group.
+   */
+  #bindLayerGroupToApp(group) {
+    // propagate layer group events
+    group.addEventListener('zoomchange', this.#fireEvent);
+    group.addEventListener('offsetchange', this.#fireEvent);
+    group.addEventListener('layerremove', this.#fireEvent);
+    // propagate viewLayer events
+    group.addEventListener('renderstart', this.#fireEvent);
+    group.addEventListener('renderend', this.#fireEvent);
+    // propagate view events
+    for (let j = 0; j &lt; viewEventNames.length; ++j) {
+      group.addEventListener(viewEventNames[j], this.#fireEvent);
+    }
+    // updata data view config
+    group.addEventListener('wlchange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        // reset previous values
+        config.windowCenter = undefined;
+        config.windowWidth = undefined;
+        config.wlPresetName = undefined;
+        // window width, center and name
+        if (event.value.length === 3) {
+          config.windowCenter = event.value[0];
+          config.windowWidth = event.value[1];
+          config.wlPresetName = event.value[2];
+        }
+      }
+    });
+    group.addEventListener('opacitychange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.opacity = event.value[0];
+      }
+    });
+    group.addEventListener('colourmapchange', (event) => {
+      const layerDetails = getLayerDetailsFromLayerDivId(event.srclayerid);
+      const groupId = layerDetails.groupDivId;
+      const config = this.getViewConfig(event.dataid, groupId, true);
+      if (typeof config !== 'undefined') {
+        config.colourMap = event.value[0];
+      }
+    });
+  }
+
+  /**
+   * Add a view layer.
+   *
+   * @param {string} dataId The data id.
+   * @param {ViewConfig} viewConfig The data view config.
+   */
+  #addViewLayer(dataId, viewConfig) {
+    const data = this.#dataController.get(dataId);
+    if (!data) {
+      throw new Error('Cannot initialise layer with missing data, id: ' +
+        dataId);
+    }
+    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
+    if (!layerGroup) {
+      throw new Error('Cannot initialise layer with missing group, id: ' +
+        viewConfig.divId);
+    }
+    const imageGeometry = data.image.getGeometry();
+
+    // un-bind
+    this.#stage.unbindLayerGroups();
+
+    // create and setup view
+    const viewFactory = new ViewFactory();
+    const view = viewFactory.create(data.meta, data.image);
+    const viewOrientation = getViewOrientation(
+      imageGeometry.getOrientation(),
+      getMatrixFromName(viewConfig.orientation)
+    );
+    view.setOrientation(viewOrientation);
+
+    // make pixel of value 0 transparent for segmentation
+    // (assuming RGB data)
+    if (data.image.getMeta().Modality === 'SEG') {
+      view.setAlphaFunction(function (value /*, index*/) {
+        if (value === 0) {
+          return 0;
+        } else {
+          return 0xff;
+        }
+      });
+    }
+
+    // do we have more than one layer
+    // (the layer has not been added to the layer group yet)
+    const isBaseLayer = layerGroup.getNumberOfViewLayers() === 0;
+
+    // opacity
+    let opacity = 1;
+    if (typeof viewConfig.opacity !== 'undefined') {
+      opacity = viewConfig.opacity;
+    } else {
+      if (!isBaseLayer) {
+        opacity = 0.5;
+      }
+    }
+
+    // view layer
+    const viewLayer = layerGroup.addViewLayer();
+    viewLayer.setView(view, dataId);
+    const size2D = imageGeometry.getSize(viewOrientation).get2D();
+    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
+    viewLayer.initialise(size2D, spacing2D, opacity);
+
+    // view controller
+    const viewController = viewLayer.getViewController();
+    // window/level
+    if (typeof viewConfig.wlPresetName !== 'undefined') {
+      viewController.setWindowLevelPreset(viewConfig.wlPresetName);
+    } else if (typeof viewConfig.windowCenter !== 'undefined' &amp;&amp;
+      typeof viewConfig.windowWidth !== 'undefined') {
+      const wl = new WindowLevel(
+        viewConfig.windowCenter, viewConfig.windowWidth);
+      viewController.setWindowLevel(wl);
+    }
+    // colour map
+    if (typeof viewConfig.colourMap !== 'undefined') {
+      viewController.setColourMap(viewConfig.colourMap);
+    } else {
+      if (!isBaseLayer) {
+        if (data.image.getMeta().Modality === 'PT') {
+          viewController.setColourMap('hot');
+        } else {
+          viewController.setColourMap('rainbow');
+        }
+      }
+    }
+
+    // listen to image set
+    this.#dataController.addEventListener(
+      'dataimageset', viewLayer.onimageset);
+
+    // sync layers position
+    const value = [
+      viewController.getCurrentIndex().getValues(),
+      viewController.getCurrentPosition().getValues()
+    ];
+    layerGroup.updateLayersToPositionChange({
+      value: value,
+      srclayerid: viewLayer.getId()
+    });
+
+    // sync layer groups
+    this.#stage.fitToContainer();
+
+    // layer offset (done before scale)
+    viewLayer.setOffset(layerGroup.getOffset());
+
+    // get and apply flip flags
+    const flipFlags = this.#getViewFlipFlags(
+      imageGeometry.getOrientation(),
+      viewConfig.orientation);
+    this.#applyFlipFlags(flipFlags, viewLayer);
+
+    // layer scale (done after possible flip)
+    if (!isBaseLayer) {
+      // use zoom offset of base layer
+      const baseViewLayer = layerGroup.getBaseViewLayer();
+      viewLayer.initScale(
+        layerGroup.getScale(),
+        baseViewLayer.getAbsoluteZoomOffset()
+      );
+    } else {
+      viewLayer.setScale(layerGroup.getScale());
+    }
+
+    // bind
+    this.#stage.bindLayerGroups();
+    if (this.#toolboxController) {
+      this.#toolboxController.bindLayerGroup(layerGroup, viewLayer);
+    }
+
+    /**
+     * Add view layer event.
+     *
+     * @event App#viewlayeradd
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} layerid The layer id.
+     * @property {string} layergroupid The layer group id.
+     * @property {string} dataid The data id.
+     */
+    this.#fireEvent({
+      type: 'viewlayeradd',
+      layerid: viewLayer.getId(),
+      layergroupid: layerGroup.getDivId(),
+      dataid: dataId
+    });
+
+    // initialise the toolbox for base
+    if (isBaseLayer) {
+      if (this.#toolboxController) {
+        this.#toolboxController.init();
+      }
+    }
+  }
+
+  /**
+   * Get the reference layer of an annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The annotation group to attach.
+   * @param {LayerGroup} layerGroup The group where to find the reference.
+   * @returns {ViewLayer} The reference view layer.
+   */
+  #getReferenceLayer(annotationGroup, layerGroup) {
+    let refViewLayer;
+
+    // use meta
+    // -> will match empty groups created with createAnnotationData
+    const evidenceSeq =
+      annotationGroup.getMetaValue('CurrentRequestedProcedureEvidenceSequence');
+    if (typeof evidenceSeq !== 'undefined') {
+      const evidenceSeqItem0 = evidenceSeq.value[0];
+      const refSeriesSeq = evidenceSeqItem0?.ReferencedSeriesSequence;
+      const refSeriesSeqItem0 = refSeriesSeq?.value[0];
+      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
+      const metaSearch = {
+        SeriesInstanceUID: refSeriesInstanceUID
+      };
+      const viewLayers = layerGroup.searchViewLayers(metaSearch);
+      if (viewLayers.length !== 0) {
+        refViewLayer = viewLayers[0];
+      }
+    }
+
+    // dwv034 wrongly uses ReferencedSeriesSequence tag at root
+    // and does not set the SOPClassUID of annotation reference...
+    const refSeriesSeq =
+      annotationGroup.getMetaValue('ReferencedSeriesSequence');
+    if (typeof refSeriesSeq !== 'undefined') {
+      const refSeriesSeqItem0 = refSeriesSeq.value[0];
+      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
+      const metaSearch = {
+        SeriesInstanceUID: refSeriesInstanceUID
+      };
+      const viewLayers = layerGroup.searchViewLayers(metaSearch);
+      if (viewLayers.length !== 0) {
+        refViewLayer = viewLayers[0];
+      }
+    }
+
+    // if no meta, go through annotations
+    if (typeof refViewLayer === 'undefined') {
+      for (const annotation of annotationGroup.getList()) {
+        const metaSearch = {
+          SOPInstanceUID: annotation.referencedSopInstanceUID,
+          SOPClassUID: annotation.referencedSopClassUID
+        };
+        const viewLayers = layerGroup.searchViewLayers(metaSearch);
+        if (viewLayers.length !== 0) {
+          // exit at first match
+          refViewLayer = viewLayers[0];
+          break;
+        }
+      }
+    }
+
+    return refViewLayer;
+  }
+
+  /**
+   * Add a draw layer.
+   *
+   * @param {string} dataId The data id.
+   * @param {ViewConfig} viewConfig The data view config.
+   */
+  addDrawLayer(dataId, viewConfig) {
+    const layerGroup = this.#stage.getLayerGroupByDivId(viewConfig.divId);
+    if (!layerGroup) {
+      throw new Error('Cannot initialise layer with missing group, id: ' +
+        viewConfig.divId);
+    }
+
+    const data = this.#dataController.get(dataId);
+    if (!data) {
+      throw new Error('Cannot initialise layer with missing data, id: ' +
+        dataId);
+    }
+    const annotationGroup = data.annotationGroup;
+
+    // find referenced view layer
+    const refViewLayer = this.#getReferenceLayer(annotationGroup, layerGroup);
+    if (typeof refViewLayer === 'undefined') {
+      console.warn(
+        'No loaded data that matches the measurements reference series UID');
+      return;
+    }
+    const refDataId = refViewLayer.getDataId();
+
+    // un-bind
+    this.#stage.unbindLayerGroups();
+
+    // set annotation view controller (allows quantification)
+    const refViewController = refViewLayer.getViewController();
+    data.annotationGroup.setViewController(refViewController);
+
+    // reference data to use as base for layer properties
+    const refData = this.#dataController.get(refDataId);
+    if (!refData) {
+      throw new Error(
+        'Cannot initialise layer without reference data, id: ' +
+        refDataId);
+    }
+    const imageGeometry = refData.image.getGeometry();
+
+    const viewOrientation = getViewOrientation(
+      imageGeometry.getOrientation(),
+      getMatrixFromName(viewConfig.orientation)
+    );
+    const size2D = imageGeometry.getSize(viewOrientation).get2D();
+    const spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
+
+    const drawLayer = layerGroup.addDrawLayer();
+    drawLayer.initialise(size2D, spacing2D, refViewLayer.getId());
+
+    const planeHelper = new PlaneHelper(
+      imageGeometry,
+      viewOrientation
+    );
+    drawLayer.setPlaneHelper(planeHelper);
+
+    // sync layers position
+    const value = [
+      refViewController.getCurrentIndex().getValues(),
+      refViewController.getCurrentPosition().getValues()
+    ];
+    layerGroup.updateLayersToPositionChange({
+      value: value,
+      srclayerid: drawLayer.getId()
+    });
+
+    // sync layer groups
+    this.#stage.fitToContainer();
+
+    // layer offset (done before scale)
+    drawLayer.setOffset(layerGroup.getOffset());
+
+    // get and apply flip flags
+    const flipFlags = this.#getViewFlipFlags(
+      imageGeometry.getOrientation(),
+      viewConfig.orientation);
+    this.#applyFlipFlags(flipFlags, drawLayer);
+
+    // layer scale (done after possible flip)
+    // use zoom offset of ref layer
+    drawLayer.initScale(
+      layerGroup.getScale(),
+      refViewLayer.getAbsoluteZoomOffset()
+    );
+
+    // add possible existing data
+    drawLayer.setAnnotationGroup(
+      data.annotationGroup,
+      dataId,
+      this.addToUndoStack);
+
+    drawLayer.setCurrentPosition(
+      refViewController.getCurrentPosition(),
+      refViewController.getCurrentIndex()
+    );
+
+    // bind
+    this.#stage.bindLayerGroups();
+    if (this.#toolboxController) {
+      this.#toolboxController.bindLayerGroup(layerGroup, drawLayer);
+    }
+
+    /**
+     * Add draw layer event.
+     *
+     * @event App#drawlayeradd
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} layerid The layer id.
+     * @property {string} layergroupid The layer group id.
+     * @property {string} dataid The data id.
+     */
+    this.#fireEvent({
+      type: 'drawlayeradd',
+      layerid: drawLayer.getId(),
+      layergroupid: layerGroup.getDivId(),
+      dataid: dataId
+    });
+  }
+
+  /**
+   * Get the view flip flags: offset (x, y) and scale (x, y, z) flags.
+   *
+   * @param {Matrix33} imageOrientation The image orientation.
+   * @param {string} viewConfigOrientation The view config orientation.
+   * @returns {object} Offset and scale flip flags.
+   */
+  #getViewFlipFlags(imageOrientation, viewConfigOrientation) {
+    // 'simple' orientation code (does not take into account angles)
+    const orientationCode =
+      getOrientationStringLPS(imageOrientation.asOneAndZeros());
+    if (typeof orientationCode === 'undefined') {
+      throw new Error('Unsupported undefined orientation code');
+    }
+
+    // view orientation flags
+    const isViewUndefined = typeof viewConfigOrientation === 'undefined';
+    const isViewAxial = !isViewUndefined &amp;&amp;
+      viewConfigOrientation === Orientation.Axial;
+    const isViewCoronal = !isViewUndefined &amp;&amp;
+      viewConfigOrientation === Orientation.Coronal;
+    const isViewSagittal = !isViewUndefined &amp;&amp;
+      viewConfigOrientation === Orientation.Sagittal;
+
+    // default flags
+    const flipOffset = {
+      x: false,
+      y: false
+    };
+    const flipScale = {
+      x: false,
+      y: false,
+      z: false
+    };
+
+    if (orientationCode === 'LPS') {
+      // axial
+      if (isViewCoronal || isViewSagittal) {
+        flipScale.z = true;
+        flipOffset.y = true;
+      }
+    } else if (orientationCode === 'LAI') {
+      // axial
+      if (isViewUndefined || isViewAxial) {
+        flipOffset.y = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+      } else if (isViewSagittal) {
+        flipScale.z = true;
+        flipOffset.x = true;
+      }
+    } else if (orientationCode === 'RPI') {
+      // axial
+      if (isViewUndefined || isViewAxial) {
+        flipOffset.x = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+        flipOffset.x = true;
+      } else if (isViewSagittal) {
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'RAS') {
+      // axial
+      flipOffset.x = true;
+      flipOffset.y = true;
+      if (isViewCoronal || isViewSagittal) {
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'LSA') {
+      // coronal
+      flipOffset.y = true;
+      if (isViewUndefined || isViewCoronal) {
+        flipScale.z = true;
+      } else if (isViewAxial) {
+        flipScale.y = true;
+      } else if (isViewSagittal) {
+        flipOffset.x = true;
+        flipScale.y = true;
+        flipScale.z = true;
+      }
+    // } else if (orientationCode === 'LIP') { // nothing to do
+    } else if (orientationCode === 'RSP') {
+      // coronal
+      if (isViewUndefined || isViewCoronal) {
+        flipOffset.x = true;
+        flipOffset.y = true;
+        flipScale.x = true;
+        flipScale.z = true;
+      } else if (isViewAxial) {
+        flipOffset.x = true;
+        flipScale.x = true;
+      } else if (isViewSagittal) {
+        flipOffset.y = true;
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'RIA') {
+      // coronal
+      flipOffset.x = true;
+      if (isViewUndefined || isViewCoronal) {
+        flipScale.x = true;
+      } else if (isViewAxial) {
+        flipOffset.y = true;
+        flipScale.x = true;
+        flipScale.y = true;
+      } else if (isViewSagittal) {
+        flipScale.y = true;
+      }
+    } else if (orientationCode === 'PSL') {
+      // sagittal
+      flipScale.z = true;
+      if (isViewUndefined || isViewSagittal) {
+        flipOffset.y = true;
+      } else if (isViewCoronal) {
+        flipOffset.y = true;
+      }
+    } else if (orientationCode === 'PIR') {
+      // sagittal
+      flipScale.z = true;
+      if (isViewAxial || isViewCoronal) {
+        flipOffset.x = true;
+      }
+    } else if (orientationCode === 'ASR') {
+      // sagittal
+      flipOffset.x = true;
+      flipOffset.y = true;
+      if (isViewUndefined || isViewSagittal) {
+        flipScale.z = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+      }
+    } else if (orientationCode === 'AIL') {
+      // sagittal
+      if (isViewUndefined || isViewSagittal) {
+        flipOffset.x = true;
+        flipScale.z = true;
+      } else if (isViewAxial) {
+        flipOffset.y = true;
+      } else if (isViewCoronal) {
+        flipScale.z = true;
+      }
+    } else {
+      // LIP uses default scale and offset
+      if (orientationCode !== 'LIP') {
+        logger.warn('Unsupported orientation code: ' +
+          orientationCode + ', display could be incorrect');
+      }
+    }
+
+    return {
+      scale: flipScale,
+      offset: flipOffset
+    };
+  }
+
+  #applyFlipFlags(flipFlags, layer) {
+    if (flipFlags.offset.x) {
+      layer.addFlipOffsetX();
+    }
+    if (flipFlags.offset.y) {
+      layer.addFlipOffsetY();
+    }
+    if (flipFlags.scale.x) {
+      layer.flipScaleX();
+    }
+    if (flipFlags.scale.y) {
+      layer.flipScaleY();
+    }
+    if (flipFlags.scale.z) {
+      layer.flipScaleZ();
+    }
+  }
+
+} // class App
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.35.0.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

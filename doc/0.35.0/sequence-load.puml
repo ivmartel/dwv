@@ -1,0 +1,32 @@
+@startuml
+
+User -> dwv: app::loadURLs
+dwv -> server: XML HTTP Request
+activate server
+server --> dwv : loadstart
+dwv --> User : loadstart (only first url)
+server --> dwv: progress
+dwv --> User : loadprogress
+...
+server --> dwv: progress
+dwv --> User : loadprogress
+server --> dwv: load (+ loadend)
+deactivate server
+
+dwv -> loader: loader::load
+activate loader
+loader --> dwv: progress
+dwv --> User : loadprogress
+...
+loader --> dwv: progress
+dwv --> User : loadprogress
+loader --> dwv: load (+ loadend)
+deactivate loader
+dwv --> User : loaditem
+
+note over dwv, server: Repeated for all urls
+
+...
+dwv --> User : load (+ loadend)
+
+@enduml
