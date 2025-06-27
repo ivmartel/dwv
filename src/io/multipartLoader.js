@@ -1,8 +1,8 @@
-import {startsWith} from '../utils/string';
-import {parseMultipart} from '../utils/array';
-import {MemoryLoader} from './memoryLoader';
-import {fileContentTypes} from './filesLoader';
-import {urlContentTypes} from './urlsLoader';
+import {startsWith} from '../utils/string.js';
+import {parseMultipart} from '../utils/array.js';
+import {MemoryLoader} from './memoryLoader.js';
+import {fileContentTypes} from './filesLoader.js';
+import {urlContentTypes} from './urlsLoader.js';
 
 /**
  * Multipart data loader.

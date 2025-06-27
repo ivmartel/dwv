@@ -3,7 +3,7 @@ import {
   getTagFromDictionary,
   getTagFromKey,
   getTransferSyntaxUIDTag
-} from '../../src/dicom/dicomTag';
+} from '../../src/dicom/dicomTag.js';
 
 /**
  * Tests for the 'dicom/dicomTag.js' file.

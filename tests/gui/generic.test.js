@@ -1,4 +1,4 @@
-import {canCreateCanvas} from '../../src/gui/generic';
+import {canCreateCanvas} from '../../src/gui/generic.js';
 
 /**
  * Tests for the 'gui/generic.js' file.

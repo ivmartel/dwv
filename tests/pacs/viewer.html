@@ -6,6 +6,7 @@
 <meta charset="UTF-8">
 <meta name="description" content="DICOM Web Viewer (DWV) simple version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<link rel="icon" href="../favicon.ico"/>
 <!-- Style -->
 <style type="text/css">
 body {
@@ -49,10 +50,6 @@ input[type=color] {
 select {
   width: 90px;
 }
-input[type=range] {
-  width: 100px;
-  margin: 0px 10px;
-}
 fieldset {
   legend {
     font-size: small;
@@ -83,6 +80,10 @@ fieldset ul {
 .toolFeatures {
   margin: 0 5px;
 }
+.ctrl-range {
+  width: 100px;
+  margin: 0px 10px;
+}
 /* special dwv */
 #dwv {
   display: flex;
@@ -93,7 +94,7 @@ fieldset ul {
 }
 .layerGroup {
   flex: 1 1;
-  margin: 5px 5px 5px 0;
+  margin: 5px 0;
   background-color: limeGreen;
   /* allow child centering */
   position: relative;
@@ -106,6 +107,52 @@ fieldset ul {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.vertical-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  margin: 5px 5px 5px 0;
+  width: 10px;
+  -webkit-appearance: none;
+}
+/** slider vertical settings*/
+input.vertical-slider[type=range]::-webkit-slider-runnable-track {
+  width: 10px;
+  cursor: pointer;
+  background: lightgray;
+  border: 0;
+}
+input.vertical-slider[type=range]::-webkit-slider-thumb {
+  width: 10px;
+  height: 15px;
+  background: #2F3C4A;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: 0px;
+  border: 0;
+}
+input.vertical-slider[type=range]:disabled::-webkit-slider-thumb {
+  background: lightgray;
+}
+input.vertical-slider[type=range]:focus::-webkit-slider-runnable-track {
+  background: lightgray;
+}
+input.vertical-slider[type=range]::-moz-range-track {
+  width: 10px;
+  cursor: pointer;
+  background: lightgray;
+  border: 0;
+}
+input.vertical-slider[type=range]::-moz-range-thumb {
+  width: 10px;
+  height: 15px;
+  background: #2F3C4A;
+  cursor: pointer;
+  border: 0;
+}
+input.vertical-slider[type=range]:disabled::-moz-range-thumb {
+  background: lightgray;
+}
+
 canvas {
   /* avoid parent auto-resize */
   vertical-align: middle;
@@ -136,19 +183,21 @@ hr.vertical {
   transform-origin: left;
   transform: rotate(90deg);
 }
+#brushCursor {
+  pointer-events: none;
+  position: absolute;
+  z-index: 100;
+
+  width: 10px;
+  height: 10px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+}
 </style>
 
 <!-- dwv build --><!--
-<script type="text/javascript" src="./node_modules/jszip/dist/jszip.min.js"></script>
-<script type="text/javascript" src="./node_modules/konva/konva.min.js"></script>
-<script type="text/javascript" src="./dist/dwv.min.js"></script>
+<script type="text/javascript" src="./viewer.min.js" defer></script>
 --><!-- local -->
-<script type="text/javascript" src="./viewer.ui.js"></script>
-<script type="text/javascript" src="./viewer.ui.annot.js"></script>
-<script type="text/javascript" src="./viewer.ui.draw.js"></script>
-<script type="text/javascript" src="./viewer.ui.datatable.js"></script>
-<script type="text/javascript" src="./viewer.rendertest.js"></script>
-<script type="text/javascript" src="./viewer.js"></script>
 
 </head>
 
@@ -163,34 +212,35 @@ hr.vertical {
 <!-- DWV -->
 <div id="dwv"></div>
 
-<div class="line">
+<div id="position-line" class="line">
 <label for="position">Position:</label>
 <input type="text" id="position" autocomplete="off" >
 <span id="positionspan"></span>
 </div>
 
-<div class="line">
+<div id="layout-line" class="line">
 <label for="changelayout">Layout:</label>
 <select name="layout" id="changelayout" autocomplete="off" disabled>
  <option value="one">One</option>
  <option value="side">Side by side</option>
  <option value="mpr">MPR</option>
 </select>
-<button id="resetlayout" disabled>Reset views</button>
+<button id="resetviews" disabled>Reset views</button>
 <input type="checkbox" id="changesmoothing">
 <label for="changesmoothing">Smoothing</label>
 </div>
 
-<div class="line">
+<div id="binders-line" class="line">
   <fieldset id="binders">
     <legend>Binders</legend>
   </fieldset>
+</div>
+
+<div id="tools-line" class="line">
   <fieldset id="tools" disabled>
     <legend>Tools</legend>
   </fieldset>
 </div>
-
-<div id='annotationgroups-panel' class="line"></div>
 
 <div id="layersdetails"></div>
 

@@ -1,9 +1,4 @@
-import {logger} from '../utils/logger';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {MaskSegment} from '../dicom/dicomSegment';
-/* eslint-enable no-unused-vars */
+import {logger} from '../utils/logger.js';
 
 /**
  * Mask segment view helper: handles hidden segments.
@@ -11,13 +6,11 @@ import {MaskSegment} from '../dicom/dicomSegment';
 export class MaskSegmentViewHelper {
 
   /**
-   * List of hidden segments.
+   * List of hidden segment numbers.
    *
-   * @type {MaskSegment[]}
+   * @type {number[]}
    */
-  #hiddenSegments = [];
-
-  #isMonochrome;
+  #hiddenNumbers = [];
 
   /**
    * Get the index of a segment in the hidden list.
@@ -26,9 +19,7 @@ export class MaskSegmentViewHelper {
    * @returns {number} The index in the array, -1 if not found.
    */
   #findHiddenIndex(segmentNumber) {
-    return this.#hiddenSegments.findIndex(function (item) {
-      return item.number === segmentNumber;
-    });
+    return this.#hiddenNumbers.indexOf(segmentNumber);
   }
 
   /**
@@ -44,17 +35,15 @@ export class MaskSegmentViewHelper {
   /**
    * Add a segment to the hidden list.
    *
-   * @param {MaskSegment} segment The segment to add.
+   * @param {number} segmentNumber The segment number.
    */
-  addToHidden(segment) {
-    if (!this.isHidden(segment.number)) {
-      this.#hiddenSegments.push(segment);
-      // base flag on latest added
-      this.#isMonochrome = typeof segment.displayValue !== 'undefined';
+  addToHidden(segmentNumber) {
+    if (!this.isHidden(segmentNumber)) {
+      this.#hiddenNumbers.push(segmentNumber);
     } else {
       logger.warn(
         'Not hidding segment, it is allready in the hidden list: ' +
-          segment.number);
+          segmentNumber);
     }
   }
 
@@ -66,7 +55,7 @@ export class MaskSegmentViewHelper {
   removeFromHidden(segmentNumber) {
     const index = this.#findHiddenIndex(segmentNumber);
     if (index !== -1) {
-      this.#hiddenSegments.splice(index, 1);
+      this.#hiddenNumbers.splice(index, 1);
     } else {
       logger.warn(
         'Cannot remove segment, it is not in the hidden list: ' +
@@ -76,7 +65,7 @@ export class MaskSegmentViewHelper {
 
   /**
    * @callback alphaFn
-   * @param {number[]|number} value The pixel value.
+   * @param {number|number[]} value The pixel value.
    * @param {number} index The values' index.
    * @returns {number} The opacity of the input value.
    */
@@ -87,46 +76,16 @@ export class MaskSegmentViewHelper {
    * @returns {alphaFn} The corresponding alpha function.
    */
   getAlphaFunc() {
-    // get colours
-    const hiddenColours = [];
-    if (this.#isMonochrome) {
-      hiddenColours[0] = 0;
-    } else {
-      hiddenColours[0] = {r: 0, g: 0, b: 0};
-    }
-    for (const segment of this.#hiddenSegments) {
-      if (this.#isMonochrome) {
-        hiddenColours.push(segment.displayValue);
-      } else {
-        hiddenColours.push(segment.displayRGBValue);
-      }
-    }
-
     // create alpha function
-    let resultFn;
-    if (this.#isMonochrome) {
-      resultFn = function (value/*, index*/) {
-        for (let i = 0; i < hiddenColours.length; ++i) {
-          if (value === hiddenColours[i]) {
-            return 0;
-          }
-        }
-        // default
-        return 255;
-      };
-    } else {
-      resultFn = function (value/*, index*/) {
-        for (let i = 0; i < hiddenColours.length; ++i) {
-          if (value[0] === hiddenColours[i].r &&
-            value[1] === hiddenColours[i].g &&
-            value[2] === hiddenColours[i].b) {
-            return 0;
-          }
-        }
-        // default
-        return 255;
-      };
-    }
-    return resultFn;
+    // (zero is hidden by default)
+    return (value/*, index*/) => {
+      if (!Array.isArray(value) && (
+        value === 0 ||
+        this.#hiddenNumbers.includes(value))) {
+        return 0;
+      }
+      // default
+      return 255;
+    };
   }
 }

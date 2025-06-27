@@ -1,6 +1,6 @@
-import {Point2D} from '../../src/math/point';
-import {Index} from '../../src/math/index';
-import {Ellipse, getEllipseIndices} from '../../src/math/ellipse';
+import {Point2D} from '../../src/math/point.js';
+import {Index} from '../../src/math/index.js';
+import {Ellipse, getEllipseIndices} from '../../src/math/ellipse.js';
 
 /**
  * Tests for the 'math/ellipse.js' file.
@@ -64,14 +64,14 @@ QUnit.test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
       get2DSpacing: function () {
         return {x: 1, y: 1};
       },
-      getCurrentPosition: function () {
-        return new Index([0, 0, 0]);
-      },
       getImageVariableRegionValues: function () {
         return [0, 1, 1, 0, 0, 1, 1, 0];
       },
       getPixelUnit: function () {
         return '';
+      },
+      getLengthUnit: function () {
+        return 'unit.mm';
       }
     };
     const theoQuant0 = {
@@ -81,7 +81,8 @@ QUnit.test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
       stdDev: {value: 0.5, unit: ''},
       surface: {value: 0.06283185307179587, unit: undefined}
     };
-    const resQuant0 = e0.quantify(mockVc0);
+    const index0 = new Index([0, 0, 0]);
+    const resQuant0 = e0.quantify(mockVc0, index0);
     assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
     assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
     assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');

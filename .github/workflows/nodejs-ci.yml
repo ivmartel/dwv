@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "22.x"
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Run lint
@@ -32,15 +32,10 @@ jobs:
       - name: Prepare for deploy (if master or develop branch)
         if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
         run: |
-          rm -Rf ./node_modules/*
-          yarn install --prod --frozen-lockfile
-          mkdir ./build/demo
-          cp -Rf node_modules ./build/demo
-          cp -Rf dist ./build/demo
-          cp -Rf decoders ./build/demo
-          cp -Rf tests/pacs/viewer.* ./build/demo
+          yarn run build-demo
+          cp -Rf tests/pacs/viewer.html ./build/demo
+          cp tests/favicon.ico ./build/demo
           ./resources/scripts/prep-deploy.sh -f build/demo/viewer.html
-          ./resources/scripts/prep-deploy.sh -f build/demo/viewer.js
       - name: Push to gh-pages (if master or develop branch)
         if: env.IS_PUSH_DEVELOP == 'true' || env.IS_PUSH_MASTER == 'true'
         run: |

@@ -1,10 +1,22 @@
+import {safeGet} from '../../src/dicom/dataElement.js';
 import {
+  getDwvVersion,
+  getDwvVersionUI,
+  getDwvUIDPrefix,
+  getImplementationClassUID,
+  getDwvVersionFromImplementationClassUID,
+  compareVersions,
+  isVersionInBounds,
   cleanString,
   hasDicomPrefix,
   DicomParser
-} from '../../src/dicom/dicomParser';
-import {getFileListFromDicomDir} from '../../src/dicom/dicomElementsWrapper';
-import {b64urlToArrayBuffer} from './utils';
+} from '../../src/dicom/dicomParser.js';
+import {
+  Tag,
+  getPixelDataTag
+} from '../../src/dicom/dicomTag.js';
+import {getFileListFromDicomDir} from '../../src/dicom/dicomDir.js';
+import {b64urlToArrayBuffer} from './utils.js';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm';
 import dwvTestSequence from '../data/dwv-test-sequence.dcm';
@@ -17,6 +29,109 @@ import dwvDicomDir from '../data/DICOMDIR';
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module('dicom');
+
+/**
+ * Tests for {@link DicomParser} Implementation class.
+ *
+ * @function module:tests/dicom~implementaion-class
+ */
+QUnit.test('DICOM parsing - Implementation class and name', function (assert) {
+  // check UI
+  const versionUI = getDwvVersionUI();
+  const regex = /[a-zA-Z]/g;
+  assert.equal(versionUI.search(regex), -1, 'No letters in vr=UI');
+
+  // test #0: get and parse
+  const version00 = getDwvVersion();
+  // dot and possible '-' for beta
+  const classUID0 = getImplementationClassUID();
+  const version01 = getDwvVersionFromImplementationClassUID(classUID0);
+  assert.deepEqual(version00, version01, 'Implementation class test #0');
+
+  // test #1: basic
+  const version10 = '1.2.3';
+  const classUID10 = getDwvUIDPrefix() + '.' + version10;
+  const version11 = getDwvVersionFromImplementationClassUID(classUID10);
+  assert.deepEqual(version10, version11, 'Implementation class test #1');
+
+  // test #2: with beta
+  const version20 = '4.5.6-beta.19';
+  const classUID20 = getDwvUIDPrefix() + '.' + '4.5.6.99.19';
+  const version21 = getDwvVersionFromImplementationClassUID(classUID20);
+  assert.deepEqual(version20, version21, 'Implementation class test #2');
+});
+
+/**
+ * Tests for {@link DicomParser} compare version.
+ *
+ * @function module:tests/dicom~compare-version
+ */
+QUnit.test('DICOM parsing - compare version', function (assert) {
+  const versions00 = '0.0.0';
+  assert.equal(
+    compareVersions(versions00, versions00), 0, 'compare version #00');
+
+  const testVersions = function (version0, versions, id) {
+    for (let i = 0; i < versions.length; ++i) {
+      assert.equal(compareVersions(version0, versions[i]), -1,
+        'compare version #' + id + '-' + i + '0');
+      assert.equal(compareVersions(versions[i], version0), 1,
+        'compare version #' + id + '-' + i + '1');
+    }
+  };
+  const versions01 = [
+    '0.0.1',
+    '0.1.0',
+    '1.0.0',
+    '0.0.1-beta.1',
+    '0.1.0-beta.1',
+    '1.0.0-beta.1'
+  ];
+  testVersions('0.0.0', versions01, '01');
+  testVersions('0.0.0-beta.2', versions01, '02');
+
+  // with sort
+  const versions10 = [
+    '0.1.5',
+    '1.5.0',
+    '0.1.5-beta.3',
+    '1.5.0-beta.2',
+    '0.1.5-beta.4',
+    '0.0.6',
+    '0.0.6-beta.3'
+  ];
+  const theoVersions10 = [
+    '0.0.6-beta.3',
+    '0.0.6',
+    '0.1.5-beta.3',
+    '0.1.5-beta.4',
+    '0.1.5',
+    '1.5.0-beta.2',
+    '1.5.0'
+  ];
+  assert.deepEqual(
+    versions10.sort(compareVersions), theoVersions10, 'compare version #10');
+});
+
+/**
+ * Tests for {@link DicomParser} isVersionInBounds.
+ *
+ * @function module:tests/dicom~version-bounds
+ */
+QUnit.test('DICOM parsing - isVersionInBounds', function (assert) {
+  assert.ok(
+    isVersionInBounds('0.1.1', '0.1.0', '0.1.2'),
+    'isVersionInBounds #00');
+  // inclusive bounds
+  assert.ok(
+    isVersionInBounds('0.1.1', '0.1.1', '0.1.1'),
+    'isVersionInBounds #01');
+  // with beta
+  assert.ok(
+    isVersionInBounds('0.1.0', '0.0.5-beta.3', '0.2.0'),
+    'isVersionInBounds #02');
+});
+
 
 /**
  * Tests for {@link DicomParser} using simple DICOM data.
@@ -71,6 +186,71 @@ QUnit.test('Simple DICOM parsing - #DWV-REQ-IO-01-001 Load DICOM file(s)',
     assert.equal(tags['00081140'].value[0]['00081155'].value[0],
       '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
       'ReferencedImageSequence SQ');
+  }
+);
+
+/**
+ * Tests for {@link DicomParser} using simple DICOM data.
+ * Using remote file for CI integration.
+ *
+ * @function module:tests/dicom~simple-dicom-parsing
+ */
+QUnit.test('Simple DICOM parsing - until tag',
+  function (assert) {
+    const buffer = b64urlToArrayBuffer(dwvTestSimple);
+
+    assert.ok(hasDicomPrefix(buffer), 'Response has DICOM prefix.');
+
+    const getRefUID = function (tags) {
+      return safeGet(safeGet(tags, '00081140'), '00081155');
+    };
+
+    const patientNameKey = '00100010';
+    const patientIdKey = '00100020';
+    const rowsKey = '00280010';
+    const colsKey = '00280011';
+
+    const patientName = 'dwv^PatientName';
+    const patientId = 'dwv-patient-id123';
+    const numRows = 32;
+    const numCols = 32;
+    const refUID = '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094';
+
+    // test #0: parse until patient id
+    const dicomParser0 = new DicomParser();
+    const untilTag0 = new Tag('0010', '0020'); // patient id
+    dicomParser0.parse(buffer, untilTag0);
+    const tags0 = dicomParser0.getDicomElements();
+    // check values
+    assert.equal(
+      dicomParser0.safeGet(patientNameKey), patientName, '#0 Patient name');
+    assert.ok(
+      typeof tags0[untilTag0.getKey()] === 'undefined',
+      '#0 Until tag is not defined');
+    assert.ok(
+      typeof tags0[rowsKey] === 'undefined', '#0 Number of rows');
+    assert.ok(
+      typeof tags0[colsKey] === 'undefined', '#0 Number of columns');
+
+    // test #1: parse until pixel data
+    const dicomParser1 = new DicomParser();
+    const untilTag1 = getPixelDataTag();
+    dicomParser1.parse(buffer, untilTag1);
+    const tags1 = dicomParser1.getDicomElements();
+    // check values
+    assert.equal(
+      dicomParser1.safeGet(patientNameKey), patientName, '#1 Patient name');
+    assert.equal(
+      dicomParser1.safeGet(patientIdKey), patientId, '#1 Patient id');
+    assert.equal(
+      dicomParser1.safeGet(rowsKey), numRows, '#1 Number of rows');
+    assert.equal(
+      dicomParser1.safeGet(colsKey), numCols, '#1 Number of columns');
+    assert.equal(
+      getRefUID(tags1), refUID, '#1 ReferencedImageSequence SQ');
+    assert.ok(
+      typeof tags1[untilTag1.getKey()] === 'undefined',
+      '#1 Until tag is not defined');
   }
 );
 

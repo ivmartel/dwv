@@ -1,14 +1,15 @@
-import {Point2D} from '../math/point';
-import {Line, areOrthogonal} from '../math/line';
-import {Protractor} from '../math/protractor';
-import {ROI} from '../math/roi';
-import {Circle} from '../math/circle';
-import {Ellipse} from '../math/ellipse';
-import {Rectangle} from '../math/rectangle';
+import {Point2D} from '../math/point.js';
+import {Line, areOrthogonal} from '../math/line.js';
+import {Protractor} from '../math/protractor.js';
+import {ROI} from '../math/roi.js';
+import {Circle} from '../math/circle.js';
+import {Ellipse} from '../math/ellipse.js';
+import {Rectangle} from '../math/rectangle.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -23,6 +24,8 @@ const TagKeys = {
 
 /**
  * DICOM graphic types.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.6.html#sect_C.18.6.1.2}.
  */
 export const GraphicTypes = {
   point: 'POINT',
@@ -217,14 +220,21 @@ export function getScoordFromShape(shape) {
  * Get a mathematical shape from a DICOM spatial coordinate (SCOORD).
  *
  * @param {SpatialCoordinate} scoord The DICOM scoord.
- * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle}
+ * @returns {Point2D|Line|Protractor|ROI|Circle|Ellipse|Rectangle|undefined}
  *   The math shape.
  */
 export function getShapeFromScoord(scoord) {
+  // no shape if no graphic data
+  if (typeof scoord.graphicData === 'undefined') {
+    return;
+  }
   // extract points
   const dataLength = scoord.graphicData.length;
+  if (dataLength === 0) {
+    throw new Error('No coordinates in scoord data');
+  }
   if (dataLength % 2 !== 0) {
-    throw new Error('Expecting even number of coordinates in scroord data');
+    throw new Error('Expecting even number of coordinates in scoord data');
   }
   const points = [];
   for (let i = 0; i < dataLength; i += 2) {
@@ -244,21 +254,27 @@ export function getShapeFromScoord(scoord) {
   // create math shape
   let shape;
   if (scoord.graphicType === GraphicTypes.point) {
-    if (points.length !== 1) {
-      throw new Error('Expecting 1 point for point');
+    if (points.length > 1) {
+      logger.warn('Expecting 1 point for point, got ' + numberOfPoints);
     }
     shape = points[0];
   } else if (scoord.graphicType === GraphicTypes.circle) {
-    if (points.length !== 2) {
-      throw new Error('Expecting 2 points for circles');
+    if (points.length < 2) {
+      throw new Error('Expecting 2 points for circles, got ' + numberOfPoints);
+    }
+    if (points.length > 2) {
+      logger.warn('Expecting 2 points for circles, got ' + numberOfPoints);
     }
     const center = points[0];
     const pointPerimeter = points[1];
     const radius = pointPerimeter.getDistance(center);
     shape = new Circle(center, radius);
   } else if (scoord.graphicType === GraphicTypes.ellipse) {
-    if (points.length !== 4) {
-      throw new Error('Expecting 4 points for ellipses');
+    if (points.length < 4) {
+      throw new Error('Expecting 4 points for ellipses, got ' + numberOfPoints);
+    }
+    if (points.length > 4) {
+      logger.warn('Expecting 4 points for ellipses, got ' + numberOfPoints);
     }
     // TODO: make more generic
     const radiusX = points[0].getDistance(points[1]) / 2;

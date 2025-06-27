@@ -1,4 +1,4 @@
-import {ZipLoader} from '../../src/io/zipLoader';
+import {ZipLoader} from '../../src/io/zipLoader.js';
 
 /**
  * Tests for the 'io/zipLoader.js' file.

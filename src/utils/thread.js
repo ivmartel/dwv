@@ -6,6 +6,23 @@
 export class ThreadPool {
 
   /**
+   * @type {number}
+   */
+  poolSize;
+  /**
+   * @type {WorkerTask[]}
+   */
+  taskQueue;
+  /**
+   * @type {WorkerThread[]}
+   */
+  freeThreads;
+  /**
+   * @type {WorkerThread[]}
+   */
+  runningThreads;
+
+  /**
    * @param {number} poolSize The size of the pool.
    */
   constructor(poolSize) {
@@ -26,7 +43,7 @@ export class ThreadPool {
    * Add a worker task to the queue.
    * Will be run when a thread is made available.
    *
-   * @param {object} workerTask The task to add to the queue.
+   * @param {WorkerTask} workerTask The task to add to the queue.
    */
   addWorkerTask(workerTask) {
     // send work start if first task
@@ -61,7 +78,7 @@ export class ThreadPool {
   /**
    * Handle a task end.
    *
-   * @param {object} workerThread The thread to free.
+   * @param {WorkerThread} workerThread The thread to free.
    */
   onTaskEnd(workerThread) {
     // launch next task in queue or finish
@@ -184,18 +201,30 @@ export class ThreadPool {
  * Worker thread.
  */
 class WorkerThread {
+  /**
+   * @type {ThreadPool}
+   */
+  parentPool;
+  /**
+   * @type {string}
+   */
+  id;
+  /**
+   * @type {WorkerTask}
+   */
+  runningTask;
+  /**
+   * @type {Worker}
+   */
+  worker;
 
   /**
-   * @param {object} parentPool The parent pool.
+   * @param {ThreadPool} parentPool The parent pool.
    */
   constructor(parentPool) {
     this.parentPool = parentPool;
     // thread ID
     this.id = Math.random().toString(36).substring(2, 15);
-    // running task
-    this.runningTask = null;
-    // worker used to run task
-    this.worker;
   }
 
   /**
@@ -210,14 +239,14 @@ class WorkerThread {
   /**
    * Run a worker task.
    *
-   * @param {object} workerTask The task to run.
+   * @param {WorkerTask} workerTask The task to run.
    */
   run(workerTask) {
     // store task
     this.runningTask = workerTask;
     // create a new web worker if not done yet
     if (typeof this.worker === 'undefined') {
-      this.worker = new Worker(this.runningTask.script);
+      this.worker = this.runningTask.getWorker();
       // set callbacks
       this.worker.onmessage = this.onmessage;
       this.worker.onerror = this.onerror;
@@ -278,16 +307,23 @@ class WorkerThread {
  */
 export class WorkerTask {
   /**
-   * @param {string} script The worker script.
    * @param {object} message The data to pass to the worker.
    * @param {object} info Information object about the input data.
    */
-  constructor(script, message, info) {
-    // worker script
-    this.script = script;
+  constructor(message, info) {
     // worker start message
     this.startMessage = message;
     // information about the work data
     this.info = info;
+  }
+
+  /**
+   * Get the task web worker.
+   * Defaults returns undefined.
+   *
+   * @returns {Worker|undefined} The task worker.
+   */
+  getWorker() {
+    return undefined;
   }
 }

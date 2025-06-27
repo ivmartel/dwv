@@ -1,22 +1,23 @@
-import {Rectangle} from '../math/rectangle';
-import {Point2D} from '../math/point';
-import {logger} from '../utils/logger';
-import {defaults} from '../app/defaults';
+import {Rectangle} from '../math/rectangle.js';
+import {Point2D} from '../math/point.js';
+import {logger} from '../utils/logger.js';
+import {custom} from '../app/custom.js';
 import {
+  defaultLabelTexts,
   isNodeNameShape,
   DRAW_DEBUG,
   getDefaultAnchor,
   getAnchorShape
-} from './drawBounds';
-import {LabelFactory} from './labelFactory';
+} from './drawBounds.js';
+import {LabelFactory} from './labelFactory.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Style} from '../gui/style';
-import {Annotation} from '../image/annotation';
+import {Style} from '../gui/style.js';
+import {Annotation} from '../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -108,7 +109,7 @@ export class RectangleFactory {
     const group = new Konva.Group();
     group.name(this.getGroupName());
     group.visible(true);
-    group.id(annotation.id);
+    group.id(annotation.trackingUid);
     // konva shape
     const shape = this.#createShape(annotation, style);
     group.add(shape);
@@ -120,7 +121,10 @@ export class RectangleFactory {
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
-      group.add(this.#getDebugShadow(annotation));
+      const shadow = this.#getDebugShadow(annotation);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
     return group;
   }
@@ -212,14 +216,12 @@ export class RectangleFactory {
     this.#updateShape(annotation, anchor, style);
     // update label
     this.updateLabelContent(annotation, group, style);
-    // label position
+    // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      // update label position if default position
       this.#labelFactory.updatePosition(annotation, group);
-    } else {
-      // update connector if not default position
-      this.updateConnector(group);
     }
+    // update connector
+    this.updateConnector(group);
     // update shadow
     if (DRAW_DEBUG) {
       this.#updateDebugShadow(annotation, group);
@@ -318,7 +320,13 @@ export class RectangleFactory {
    * @returns {object} The label list.
    */
   #getDefaultLabel() {
-    return defaults.labelText.rectangle;
+    if (typeof custom.labelTexts !== 'undefined' &&
+      typeof custom.labelTexts[this.#name] !== 'undefined'
+    ) {
+      return custom.labelTexts[this.#name];
+    } else {
+      return defaultLabelTexts[this.#name];
+    }
   }
 
   /**
@@ -407,41 +415,41 @@ export class RectangleFactory {
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'anchor0':
-      // update self
-      topLeft.x(anchor.x());
-      topLeft.y(anchor.y());
-      // update others
-      topRight.y(anchor.y());
-      bottomLeft.x(anchor.x());
-      break;
-    case 'anchor1':
-      // update self
-      topRight.x(anchor.x());
-      topRight.y(anchor.y());
-      // update others
-      topLeft.y(anchor.y());
-      bottomRight.x(anchor.x());
-      break;
-    case 'anchor2':
-      // update self
-      bottomRight.x(anchor.x());
-      bottomRight.y(anchor.y());
-      // update others
-      bottomLeft.y(anchor.y());
-      topRight.x(anchor.x());
-      break;
-    case 'anchor3':
-      // update self
-      bottomLeft.x(anchor.x());
-      bottomLeft.y(anchor.y());
-      // update others
-      bottomRight.y(anchor.y());
-      topLeft.x(anchor.x());
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // update self
+        topLeft.x(anchor.x());
+        topLeft.y(anchor.y());
+        // update others
+        topRight.y(anchor.y());
+        bottomLeft.x(anchor.x());
+        break;
+      case 'anchor1':
+        // update self
+        topRight.x(anchor.x());
+        topRight.y(anchor.y());
+        // update others
+        topLeft.y(anchor.y());
+        bottomRight.x(anchor.x());
+        break;
+      case 'anchor2':
+        // update self
+        bottomRight.x(anchor.x());
+        bottomRight.y(anchor.y());
+        // update others
+        bottomLeft.y(anchor.y());
+        topRight.x(anchor.x());
+        break;
+      case 'anchor3':
+        // update self
+        bottomLeft.x(anchor.x());
+        bottomLeft.y(anchor.y());
+        // update others
+        bottomRight.y(anchor.y());
+        topLeft.x(anchor.x());
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 
@@ -462,7 +470,7 @@ export class RectangleFactory {
       y: round.min.getY(),
       width: rWidth,
       height: rHeight,
-      fill: 'grey',
+      fill: annotation.colour,
       strokeWidth: 0,
       strokeScaleEnabled: false,
       opacity: 0.3,
@@ -484,7 +492,10 @@ export class RectangleFactory {
       // remove previous
       kshadow.destroy();
       // add new
-      group.add(this.#getDebugShadow(annotation, group));
+      const shadow = this.#getDebugShadow(annotation);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
   }
 

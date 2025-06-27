@@ -1,7 +1,12 @@
 import {
   dictionary,
   tagGroups
-} from './dictionary';
+} from './dictionary.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {DataElement} from '../dicom/dataElement.js';
+/* eslint-enable no-unused-vars */
 
 /**
  * Immutable tag.
@@ -158,6 +163,20 @@ export class Tag {
   }
 
   /**
+   * Get the multiplicity from the dicom dictionary.
+   *
+   * @returns {number|undefined} The multiplicity.
+   */
+  getMultiplicityFromDictionary() {
+    let multiplicity;
+    const info = this.#getInfoFromDictionary();
+    if (typeof info !== 'undefined') {
+      multiplicity = parseInt(info[1], 10);
+    }
+    return multiplicity;
+  }
+
+  /**
    * Get the tag name from the dicom dictionary.
    *
    * @returns {string|undefined} The VR.
@@ -306,14 +325,43 @@ export function getPixelDataTag() {
 }
 
 /**
- * Is the input tag the PixelData Tag.
+ * Get the list of pixel data DICOM tag keys: PixelData,
+ *   FloatPixelData and DoubleFloatPixelData.
+ *
+ * @returns {string[]} The key list.
+ */
+function getAllPixelDataTagKeys() {
+  return ['7FE00010', '7FE00009', '7FE00008'];
+}
+
+/**
+ * Is the input tag one of the pixel data tag.
  *
  * @param {Tag} tag The tag to test.
- * @returns {boolean} True if the asked tag.
+ * @returns {boolean} True if input is a pixel data tag.
  */
-export function isPixelDataTag(tag) {
-  // faster than tag.equals(getPixelDataTag());
-  return tag.getKey() === '7FE00010';
+export function isAnyPixelDataTag(tag) {
+  const keys = getAllPixelDataTagKeys();
+  return keys.includes(tag.getKey());
+}
+
+/**
+ * Check if an input data elements contains a pixel data element.
+ *
+ * @param {Object<string, DataElement>} elements Data elements.
+ * @returns {boolean} True if the elements contain one of the
+ *   pixel data tags.
+ */
+export function hasAnyPixelDataElement(elements) {
+  const keys = getAllPixelDataTagKeys();
+  let found = false;
+  for (const key of keys) {
+    if (typeof elements[key] !== 'undefined') {
+      found = true;
+      break;
+    }
+  }
+  return found;
 }
 
 /**
@@ -352,4 +400,64 @@ export function getTagFromDictionary(tagName) {
     tag = new Tag(group, element);
   }
   return tag;
+}
+
+/**
+ * Get an array reducer to reduce an array of tag keys taken from
+ *   the input dataElements and return as simple elements.
+ *
+ * @param {Object<string, DataElement>} dataElements The meta data
+ *   index by tag keys.
+ * @returns {any} An array reducer callbackFn.
+ */
+function getSimpleElementReducer(dataElements) {
+  return function (accumulator, currentValue) {
+    // get the tag name
+    const tag = getTagFromKey(currentValue);
+    let tagName = tag.getNameFromDictionary();
+    if (typeof tagName === 'undefined') {
+      // add 'x' to list private at end
+      tagName = 'x' + tag.getKey();
+    }
+    const currentMeta = dataElements[currentValue];
+    // remove undefined properties
+    for (const property in currentMeta) {
+      if (typeof currentMeta[property] === 'undefined') {
+        delete currentMeta[property];
+      }
+    }
+    let tagValue;
+    // recurse for sequences
+    if (currentMeta.vr === 'SQ') {
+      tagValue = {value: []};
+      // valid for 1D array, not for merged data elements
+      for (let i = 0; i < currentMeta.value.length; ++i) {
+        const item = currentMeta.value[i];
+        tagValue.value.push(Object.keys(item).reduce(
+          getSimpleElementReducer(item), {}));
+      }
+    } else {
+      if (currentMeta.value.length === 1) {
+        tagValue = currentMeta.value[0];
+      } else {
+        tagValue = currentMeta.value;
+      }
+    }
+    accumulator[tagName] = tagValue;
+    return accumulator;
+  };
+}
+
+/**
+ * Get the meta data as simple elements:
+ * - indexed by tag names instead of tag keys,
+ * - no element object, just value if not sequence nor merged item.
+ *
+ * @param {Object<string, DataElement>} metaData The meta data
+ *   index by tag keys.
+ * @returns {Object<string, any>} The simple elements.
+ */
+export function getAsSimpleElements(metaData) {
+  const meta = structuredClone(metaData);
+  return Object.keys(meta).reduce(getSimpleElementReducer(meta), {});
 }

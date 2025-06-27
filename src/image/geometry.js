@@ -1,19 +1,20 @@
 import {
   getIdentityMat33,
-  REAL_WORLD_EPSILON
-} from '../math/matrix';
-import {Point3D, Point} from '../math/point';
-import {Vector3D} from '../math/vector';
-import {Index} from '../math/index';
-import {getBasicStats} from '../math/stats';
-import {precisionRound} from '../utils/string';
-import {logger} from '../utils/logger';
-import {Size} from './size';
-import {Spacing} from './spacing';
+  REAL_WORLD_EPSILON,
+  REAL_WORLD_EXPONENT
+} from '../math/matrix.js';
+import {Point3D, Point} from '../math/point.js';
+import {Vector3D} from '../math/vector.js';
+import {Index} from '../math/index.js';
+import {getBasicStats} from '../math/stats.js';
+import {precisionRound} from '../utils/string.js';
+import {logger} from '../utils/logger.js';
+import {Size} from './size.js';
+import {Spacing} from './spacing.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
+import {Matrix33} from '../math/matrix.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -71,20 +72,20 @@ export class Geometry {
   #newOrigins = false;
 
   /**
-   * @param {Point3D} origin The object origin (a 3D point).
+   * @param {Point3D[]} origins The object origins.
    * @param {Size} size The object size.
    * @param {Spacing} spacing The object spacing.
    * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
    *   default to 3*3 identity).
    * @param {number} [time] Optional time index.
    */
-  constructor(origin, size, spacing, orientation, time) {
-    this.#origins = [origin];
+  constructor(origins, size, spacing, orientation, time) {
+    this.#origins = origins;
     this.#size = size;
     this.#spacing = spacing;
     if (typeof time !== 'undefined') {
       this.#initialTime = time;
-      this.#timeOrigins[time] = [origin];
+      this.#timeOrigins[time] = origins;
     }
     // check input orientation
     if (typeof orientation !== 'undefined') {
@@ -176,8 +177,8 @@ export class Geometry {
    * Check if a point is in the origin list.
    *
    * @param {Point3D} point3D The point to check.
-   * @param {number} tol The comparison tolerance
-   *   default to Number.EPSILON.
+   * @param {number} [tol] Optional number comparison tolerance
+   *   defaults to Number.EPSILON.
    * @returns {boolean} True if in list.
    */
   includesOrigin(point3D, tol) {
@@ -220,10 +221,13 @@ export class Geometry {
   #updateSliceSpacing() {
     const geoSliceSpacing = getSliceGeometrySpacing(this.#origins);
     // update local if needed
-    if (typeof geoSliceSpacing !== 'undefined' &&
-      this.#spacing.get(2) !== geoSliceSpacing) {
-      logger.trace('Using geometric spacing ' + geoSliceSpacing +
-        ' instead of tag spacing ' + this.#spacing.get(2));
+    if (typeof geoSliceSpacing !== 'undefined') {
+      // 1 is default
+      if (this.#spacing.get(2) !== 1 &&
+        this.#spacing.get(2) !== geoSliceSpacing) {
+        logger.debug('Using geometric spacing ' + geoSliceSpacing +
+          ' instead of tag spacing ' + this.#spacing.get(2));
+      }
       const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
       this.#spacing = new Spacing(values);
@@ -432,6 +436,24 @@ export class Geometry {
   }
 
   /**
+   * Get the geometrical range, ie the minimum and maximum
+   *   positions.
+   *
+   * @returns {Point[]} The min and max positions.
+   */
+  getRange() {
+    const nDims = this.getSize().length();
+    const minValues = new Array(nDims);
+    minValues.fill(0);
+    const minIndex = new Index(minValues);
+    const maxIndex = new Index(this.getSize().getValues());
+    return [
+      this.indexToWorld(minIndex),
+      this.indexToWorld(maxIndex)
+    ];
+  }
+
+  /**
    * Convert an index into world coordinates.
    *
    * @param {Index} index The index to convert.
@@ -505,12 +527,21 @@ export class Geometry {
       this.getOrientation().getInverse().multiplyPoint3D(point3D);
     // keep >3d values
     const values = point.getValues();
-    // apply spacing and round
+    // apply spacing and floor
+    // (precisionRound to avoid float number inaccuracies)
     const spacing = this.getSpacing();
-    values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
-    values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
-    values[2] = Math.round(orientedPoint3D.getZ() / spacing.get(2));
-
+    values[0] = Math.floor(precisionRound(
+      orientedPoint3D.getX() / spacing.get(0),
+      REAL_WORLD_EXPONENT
+    ));
+    values[1] = Math.floor(precisionRound(
+      orientedPoint3D.getY() / spacing.get(1),
+      REAL_WORLD_EXPONENT
+    ));
+    values[2] = Math.floor(precisionRound(
+      orientedPoint3D.getZ() / spacing.get(2),
+      REAL_WORLD_EXPONENT
+    ));
     // return index
     return new Index(values);
   }
@@ -611,4 +642,73 @@ export function getSliceGeometrySpacing(origins) {
   }
 
   return spacing;
+}
+
+/**
+ * Merge two geometries into one using the merge size and
+ *   smallest resolution.
+ * WARNING: needs to be called with the final geometries.
+ *
+ * @param {Geometry} geometry1 The first geometry.
+ * @param {Geometry} geometry2 The second geometry.
+ * @returns {Geometry} The merged geometry.
+ */
+export function mergeGeometries(geometry1, geometry2) {
+  const orientation = geometry1.getOrientation();
+  // check input
+  if (!orientation.isSimilar(geometry2.getOrientation())) {
+    throw new Error('Cannot merge geometries with different orientation');
+  }
+  const invOrientation = orientation.getInverse();
+
+  const minByIndex = function (array1, array2) {
+    return array1.map((v, i) => Math.min(v, array2[i]));
+  };
+  const maxByIndex = function (array1, array2) {
+    return array1.map((v, i) => Math.max(v, array2[i]));
+  };
+
+  const newSpacing = new Spacing(minByIndex(
+    geometry1.getSpacing().getValues(),
+    geometry2.getSpacing().getValues()
+  ));
+
+  const deorient = function (item) {
+    return invOrientation.multiplyPoint3D(item.get3D());
+  };
+  const range1 = geometry1.getRange().map(deorient);
+  const range2 = geometry2.getRange().map(deorient);
+
+  const minRangeValues = minByIndex(
+    range1[0].getValues(),
+    range2[0].getValues()
+  );
+  const maxRangeValues = maxByIndex(
+    range1[1].getValues(),
+    range2[1].getValues()
+  );
+
+  const sizeValues = [];
+  for (let i = 0; i < minRangeValues.length; ++i) {
+    sizeValues.push(Math.round(
+      Math.abs(maxRangeValues[i] - minRangeValues[i]) / newSpacing.get(i)
+    ));
+  }
+  // TODO: handle extra dims
+  const newSize = new Size(sizeValues);
+
+  const newOrigins = [];
+  for (let i = 0; i < newSize.get(2); ++i) {
+    const values = minRangeValues.slice();
+    values[2] = minRangeValues[2] + i * newSpacing.get(2);
+    const origin = new Point3D(values[0], values[1], values[2]);
+    newOrigins.push(orientation.multiplyPoint3D(origin));
+  }
+
+  return new Geometry(
+    newOrigins,
+    newSize,
+    newSpacing,
+    orientation
+  );
 }

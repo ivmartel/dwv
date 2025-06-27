@@ -1,10 +1,10 @@
-import {Point2D} from '../../src/math/point';
+import {Point2D} from '../../src/math/point.js';
 import {
   Line,
   getAngle,
   areOrthogonal,
   getPerpendicularLine
-} from '../../src/math/line';
+} from '../../src/math/line.js';
 
 /**
  * Tests for the 'math/line.js' file.

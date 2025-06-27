@@ -1,13 +1,9 @@
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-
 /**
  * Setup test line.
  *
  * @param {object} app The associated application.
  */
-test.setupRenderTests = function (app) {
+export function setupRenderTests(app) {
   const renderTestButton = document.createElement('button');
   renderTestButton.onclick = getRunRenderTest(app);
   renderTestButton.appendChild(document.createTextNode('render test'));
@@ -34,7 +30,7 @@ function getRunRenderTest(app) {
     }
     const vc = vl.getViewController();
     const runner = function () {
-      vc.incrementScrollIndex();
+      vc.getPositionHelper().incrementPositionAlongScroll();
     };
 
     let startTime;

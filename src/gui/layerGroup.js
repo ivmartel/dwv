@@ -1,18 +1,18 @@
-import {Index} from '../math/index';
-import {Point} from '../math/point';
-import {Vector3D} from '../math/vector';
-import {viewEventNames} from '../image/view';
-import {ListenerHandler} from '../utils/listen';
-import {logger} from '../utils/logger';
-import {precisionRound} from '../utils/string';
-import {ViewLayer} from './viewLayer';
-import {DrawLayer} from './drawLayer';
+import {Index} from '../math/index.js';
+import {Point} from '../math/point.js';
+import {Vector3D} from '../math/vector.js';
+import {viewEventNames} from '../image/view.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {logger} from '../utils/logger.js';
+import {precisionRound} from '../utils/string.js';
+import {ViewLayer} from './viewLayer.js';
+import {DrawLayer} from './drawLayer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
-import {Point2D, Point3D} from '../math/point';
-import {Scalar2D, Scalar3D} from '../math/scalar';
+import {Point2D, Point3D} from '../math/point.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
+import {PositionHelper} from '../image/positionHelper.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -149,18 +149,11 @@ export class LayerGroup {
   #offset = {x: 0, y: 0, z: 0};
 
   /**
-   * Active view layer index.
+   * Active layer index.
    *
    * @type {number}
    */
-  #activeViewLayerIndex = undefined;
-
-  /**
-   * Active draw layer index.
-   *
-   * @type {number}
-   */
-  #activeDrawLayerIndex = undefined;
+  #activeLayerIndex = undefined;
 
   /**
    * Listener handler.
@@ -203,6 +196,35 @@ export class LayerGroup {
    * @type {boolean}
    */
   #imageSmoothing = false;
+
+  /**
+   * Position helper.
+   *
+   * @type {PositionHelper}
+   */
+  #positionHelper;
+
+  /**
+   * Get the position helper.
+   *
+   * @returns {PositionHelper} The position helper.
+   */
+  getPositionHelper() {
+    if (typeof this.#positionHelper === 'undefined') {
+      for (const layer of this.#layers) {
+        if (layer instanceof ViewLayer) {
+          const controller = layer.getViewController();
+          const helper = controller.getPositionHelperClone();
+          if (typeof this.#positionHelper === 'undefined') {
+            this.#positionHelper = helper;
+          } else {
+            this.#positionHelper.merge(helper);
+          }
+        }
+      }
+    }
+    return this.#positionHelper;
+  }
 
   /**
    * @param {HTMLElement} containerDiv The associated HTML div.
@@ -269,10 +291,15 @@ export class LayerGroup {
   /**
    * Get the Id of the container div.
    *
-   * @returns {string} The id of the div.
+   * @returns {string|undefined} The id of the div.
    */
   getDivId() {
-    return this.#containerDiv.id;
+    let divId;
+    // could be null if html changed
+    if (this.#containerDiv !== null) {
+      divId = this.#containerDiv.id;
+    }
+    return divId;
   }
 
   /**
@@ -352,7 +379,7 @@ export class LayerGroup {
   }
 
   /**
-   * Get a list of view layers according to an input callback function.
+   * Get the view layers that satisfy the input callback function.
    *
    * @param {Function} [callbackFn] A function that takes
    *   a ViewLayer as input and returns a boolean. If undefined,
@@ -373,6 +400,50 @@ export class LayerGroup {
         res.push(layer);
       }
     }
+    return res;
+  }
+
+  /**
+   * Get the view layers that satisfy the input callback function
+   * starting from the active layer.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayersFromActive(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+
+    let activeIndex = 0;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      activeIndex = this.#activeLayerIndex;
+    }
+
+    const indices = [];
+    // from active index to 0
+    for (let i = activeIndex; i >= 0; i--) {
+      indices.push(i);
+    }
+    // from number of layers to active
+    for (let i = this.#layers.length - 1; i > activeIndex; i--) {
+      indices.push(i);
+    }
+
+    const res = [];
+
+    for (const index of indices) {
+      const layer = this.#layers[index];
+      if (layer instanceof ViewLayer && callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+
     return res;
   }
 
@@ -440,15 +511,27 @@ export class LayerGroup {
   /**
    * Get the active image layer.
    *
+   * @returns {ViewLayer|DrawLayer|undefined} The layer.
+   */
+  getActiveLayer() {
+    let layer;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      layer = this.#layers[this.#activeLayerIndex];
+    }
+    return layer;
+  }
+
+  /**
+   * Get the active image layer.
+   *
    * @returns {ViewLayer|undefined} The layer.
    */
   getActiveViewLayer() {
     let layer;
-    if (typeof this.#activeViewLayerIndex !== 'undefined') {
-      const tmpLayer = this.#layers[this.#activeViewLayerIndex];
-      if (tmpLayer instanceof ViewLayer) {
-        layer = tmpLayer;
-      }
+    const activeLayer = this.getActiveLayer();
+    if (typeof activeLayer !== 'undefined' &&
+      activeLayer instanceof ViewLayer) {
+      layer = activeLayer;
     }
     return layer;
   }
@@ -476,6 +559,24 @@ export class LayerGroup {
   }
 
   /**
+   * Get a view layer associated to a data id.
+   *
+   * @param {string} id The layer id.
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  getViewLayerById(id) {
+    const callbackFn = function (layer) {
+      return layer.getId() === id;
+    };
+    const layers = this.getViewLayers(callbackFn);
+    let layer;
+    if (layers.length === 1) {
+      layer = layers[0];
+    }
+    return layer;
+  }
+
+  /**
    * Get the view layers associated to a data id.
    *
    * @param {string} dataId The data id.
@@ -489,16 +590,45 @@ export class LayerGroup {
   }
 
   /**
-   * Search view layers for equal imae meta data.
+   * Search view layers for equal image meta data.
    *
    * @param {object} meta The meta data to find.
    * @returns {ViewLayer[]} The list of view layers that contain matched data.
    */
   searchViewLayers(meta) {
+    const metaClone = structuredClone(meta);
+    // extract sop instance
+    let sopInstanceUid;
+    if (typeof metaClone.SOPInstanceUID !== 'undefined') {
+      sopInstanceUid = metaClone.SOPInstanceUID;
+      delete metaClone.SOPInstanceUID;
+    }
+    const hasSopInstance = typeof sopInstanceUid !== 'undefined';
+    const hasMeta = Object.keys(metaClone).length !== 0;
+
     const res = [];
     for (const layer of this.#layers) {
       if (layer instanceof ViewLayer) {
-        if (layer.getViewController().equalImageMeta(meta)) {
+        let equalMeta = false;
+        if (hasMeta) {
+          equalMeta = layer.getViewController().equalImageMeta(metaClone);
+        }
+        let includesSopInstance = false;
+        if (hasSopInstance) {
+          includesSopInstance =
+            layer.getViewController().includesImageUid(sopInstanceUid);
+        }
+
+        let check = false;
+        if (hasMeta && hasSopInstance) {
+          check = equalMeta && includesSopInstance;
+        } else if (hasMeta) {
+          check = equalMeta;
+        } else if (hasSopInstance) {
+          check = includesSopInstance;
+        }
+
+        if (check) {
           res.push(layer);
         }
       }
@@ -528,11 +658,28 @@ export class LayerGroup {
    */
   getActiveDrawLayer() {
     let layer;
-    if (typeof this.#activeDrawLayerIndex !== 'undefined') {
-      const tmpLayer = this.#layers[this.#activeDrawLayerIndex];
-      if (tmpLayer instanceof DrawLayer) {
-        layer = tmpLayer;
-      }
+    const activeLayer = this.getActiveLayer();
+    if (typeof activeLayer !== 'undefined' &&
+      activeLayer instanceof DrawLayer) {
+      layer = activeLayer;
+    }
+    return layer;
+  }
+
+  /**
+   * Get a draw layer associated to a data id.
+   *
+   * @param {string} id The layer id.
+   * @returns {DrawLayer|undefined} The layer.
+   */
+  getDrawLayerById(id) {
+    const callbackFn = function (layer) {
+      return layer.getId() === id;
+    };
+    const layers = this.getDrawLayers(callbackFn);
+    let layer;
+    if (layers.length === 1) {
+      layer = layers[0];
     }
     return layer;
   }
@@ -551,62 +698,20 @@ export class LayerGroup {
   }
 
   /**
-   * Set the active view layer.
+   * Set the active layer.
    *
    * @param {number} index The index of the layer to set as active.
    */
-  setActiveViewLayer(index) {
-    if (this.#layers[index] instanceof ViewLayer) {
-      this.#activeViewLayerIndex = index;
-      /**
-       * Active layer change event.
-       *
-       * @event LayerGroup#activelayerchange
-       * @type {object}
-       * @property {string} type The event type.
-       * @property {Array} value The changed value.
-       */
-      this.#fireEvent({
-        type: 'activelayerchange',
-        value: [this.#layers[index]]
-      });
-    } else {
-      logger.warn('No view layer to set as active with index: ' +
-        index);
-    }
-  }
-
-  /**
-   * Set the active view layer with a data id.
-   *
-   * @param {string} dataId The data id.
-   */
-  setActiveViewLayerByDataId(dataId) {
-    let index;
-    for (let i = 0; i < this.#layers.length; ++i) {
-      if (this.#layers[i] instanceof ViewLayer &&
-        this.#layers[i].getDataId() === dataId) {
-        // stop at first one
-        index = i;
-        break;
-      }
-    }
-    if (typeof index !== 'undefined') {
-      this.setActiveViewLayer(index);
-    } else {
-      logger.warn('No view layer to set as active with dataId: ' +
-        dataId);
-    }
-  }
-
-  /**
-   * Set the active draw layer.
-   *
-   * @param {number|undefined} index The index of the layer to set as active
-   *   or undefined to not set any.
-   */
-  setActiveDrawLayer(index) {
-    this.#activeDrawLayerIndex = index;
+  setActiveLayer(index) {
+    this.#activeLayerIndex = index;
+    /**
+     * Active layer change event.
+     *
+     * @event LayerGroup#activelayerchange
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {Array} value The changed value.
+     */
     this.#fireEvent({
       type: 'activelayerchange',
       value: [this.#layers[index]]
@@ -614,14 +719,37 @@ export class LayerGroup {
   }
 
   /**
-   * Set the active draw layer with a data id.
+   * Set the active layer with a layer id.
+   *
+   * @param {string} id The layer id.
+   */
+  setActiveLayerById(id) {
+    let index;
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (typeof this.#layers[i] !== 'undefined' &&
+        this.#layers[i].getId() === id) {
+        // stop at first one
+        index = i;
+        break;
+      }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveLayer(index);
+    } else {
+      logger.warn('No layer to set as active with id: ' +
+        id);
+    }
+  }
+
+  /**
+   * Set the active layer with a data id.
    *
    * @param {string} dataId The data id.
    */
-  setActiveDrawLayerByDataId(dataId) {
+  setActiveLayerByDataId(dataId) {
     let index;
     for (let i = 0; i < this.#layers.length; ++i) {
-      if (this.#layers[i] instanceof DrawLayer &&
+      if (typeof this.#layers[i] !== 'undefined' &&
         this.#layers[i].getDataId() === dataId) {
         // stop at first one
         index = i;
@@ -629,9 +757,9 @@ export class LayerGroup {
       }
     }
     if (typeof index !== 'undefined') {
-      this.setActiveDrawLayer(index);
+      this.setActiveLayer(index);
     } else {
-      logger.warn('No draw layer to set as active with dataId: ' +
+      logger.warn('No layer to set as active with dataId: ' +
         dataId);
     }
   }
@@ -656,9 +784,13 @@ export class LayerGroup {
     // add layer
     this.#layers.push(layer);
     // mark it as active
-    this.setActiveViewLayer(viewLayerIndex);
+    this.setActiveLayer(viewLayerIndex);
     // bind view layer events
     this.#bindViewLayer(layer);
+
+    // force helper update
+    this.#positionHelper = undefined;
+
     // return
     return layer;
   }
@@ -672,7 +804,7 @@ export class LayerGroup {
    */
   addDrawLayer() {
     // store active index
-    this.#activeDrawLayerIndex = this.#layers.length;
+    this.#activeLayerIndex = this.#layers.length;
     // create div
     const div = this.#getNextLayerDiv();
     // prepend to container
@@ -738,9 +870,6 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.addEventListener(
       'positionchange', this.#fireEvent);
-    // propagate drawLayer events
-    drawLayer.addEventListener('drawcreate', this.#fireEvent);
-    drawLayer.addEventListener('drawdelete', this.#fireEvent);
   }
 
   /**
@@ -754,9 +883,6 @@ export class LayerGroup {
       'positionchange', this.updateLayersToPositionChange);
     drawLayer.removeEventListener(
       'positionchange', this.#fireEvent);
-    // propagate drawLayer events
-    drawLayer.removeEventListener('drawcreate', this.#fireEvent);
-    drawLayer.removeEventListener('drawdelete', this.#fireEvent);
   }
 
   /**
@@ -776,19 +902,14 @@ export class LayerGroup {
    * Empty the layer list.
    */
   empty() {
-    this.#layers = [];
-    // reset active indices
-    this.#activeViewLayerIndex = undefined;
-    this.#activeDrawLayerIndex = undefined;
-    // remove possible crosshair
-    this.#removeCrosshairDiv();
-    // clean container div
-    const previous = this.#containerDiv.getElementsByClassName('layer');
-    if (previous) {
-      while (previous.length > 0) {
-        previous[0].remove();
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined') {
+        this.removeLayer(layer);
       }
     }
+    this.#layers = [];
+    // remove possible crosshair
+    this.#removeCrosshairDiv();
   }
 
   /**
@@ -812,6 +933,7 @@ export class LayerGroup {
    *   methods to define the active index.
    *
    * @param {ViewLayer | DrawLayer} layer The layer to remove.
+   * @fires LayerGroup#removelayer
    */
   removeLayer(layer) {
     // find layer
@@ -819,22 +941,37 @@ export class LayerGroup {
     if (index === -1) {
       throw new Error('Cannot find layer to remove');
     }
+    // update active index
+    if (this.#activeLayerIndex === index) {
+      this.#activeLayerIndex = undefined;
+    }
     // unbind and update active index
     if (layer instanceof ViewLayer) {
       this.#unbindViewLayer(layer);
-      if (this.#activeViewLayerIndex === index) {
-        this.#activeViewLayerIndex = undefined;
-      }
     } else {
       this.#unbindDrawLayer(layer);
-      if (this.#activeDrawLayerIndex === index) {
-        this.#activeDrawLayerIndex = undefined;
-      }
     }
     // reset in storage
     this.#layers[index] = undefined;
+    // force helper update
+    this.#positionHelper = undefined;
     // update html
     layer.removeFromDOM();
+
+    /**
+     * Remove layer event.
+     *
+     * @event LayerGroup#removelayer
+     * @type {object}
+     * @property {string} type The event type.
+     * @property {string} layerid The layer id.
+     * @property {string} layergroupid The layer group id.
+     */
+    this.#fireEvent({
+      type: 'layerremove',
+      layerid: layer.getId(),
+      layergroupid: this.getDivId()
+    });
   }
 
   /**
@@ -918,7 +1055,7 @@ export class LayerGroup {
     // remove previous div
     this.removeTooltipDiv();
 
-    const viewLayer = this.getActiveViewLayer();
+    const viewLayer = this.getBaseViewLayer();
     const viewController = viewLayer.getViewController();
     const planePos = viewLayer.displayToPlanePos(point);
     const position = viewController.getPositionFromPlanePoint(planePos);
@@ -990,7 +1127,7 @@ export class LayerGroup {
   }
 
   /**
-   * Update layers (but not the active view layer) to a position change.
+   * Update layers (but not the event source layer) to a position change.
    *
    * @param {object} event The position change event.
    * @function
@@ -1114,7 +1251,9 @@ export class LayerGroup {
     // check container
     if (this.#containerDiv.offsetWidth === 0 &&
       this.#containerDiv.offsetHeight === 0) {
-      throw new Error('Cannot fit to zero sized container.');
+      throw new Error('Cannot fit to zero sized container with id \'' +
+        this.#containerDiv.id + '\'.'
+      );
     }
     // get max world size
     const maxWorldSize = this.getMaxWorldSize();
@@ -1312,10 +1451,40 @@ export class LayerGroup {
 
   /**
    * Reset the stage to its initial scale and no offset.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   reset() {
     this.setScale(this.#baseScale);
     this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the zoom and pan of all layers.
+   */
+  resetZoomPan() {
+    this.setScale(this.#baseScale);
+    this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the position and window level of all view layers.
+   */
+  resetViews() {
+    let isFirstViewLayer = true;
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer instanceof ViewLayer
+      ) {
+        const vc = layer.getViewController();
+        if (isFirstViewLayer) {
+          // will be propagated to all layers
+          vc.resetPosition();
+          isFirstViewLayer = false;
+        }
+        vc.resetWindowLevel();
+      }
+    }
   }
 
   /**

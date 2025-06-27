@@ -1,6 +1,6 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
+import {Image} from './image.js';
 /* eslint-enable no-unused-vars */
 
 /**

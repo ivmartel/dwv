@@ -165,18 +165,18 @@ export class DataWriter {
   }
 
   /**
-   * Write a boolean array as binary.
+   * Write a boolean array as bitpacked Uint8 array.
    *
    * @param {number} byteOffset The offset to start writing from.
-   * @param {Array} array The array to write.
+   * @param {Array|Uint8Array} array The array to write.
    * @returns {number} The new offset position.
    */
   writeBinaryArray(byteOffset, array) {
     if (array.length % 8 !== 0) {
       throw new Error('Cannot write boolean array as binary.');
     }
-    let byte = null;
-    let val = null;
+    let byte;
+    let val;
     for (let i = 0, len = array.length; i < len; i += 8) {
       byte = 0;
       for (let j = 0; j < 8; ++j) {

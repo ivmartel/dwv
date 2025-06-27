@@ -1,46 +1,46 @@
-import {viewEventNames} from '../image/view';
-import {ViewFactory} from '../image/viewFactory';
+import {viewEventNames} from '../image/view.js';
+import {ViewFactory} from '../image/viewFactory.js';
 import {
   getMatrixFromName,
   getOrientationStringLPS,
   Orientation,
   getViewOrientation
-} from '../math/orientation';
-import {Point3D} from '../math/point';
-import {Stage} from '../gui/stage';
-import {Style} from '../gui/style';
-import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup';
-import {ListenerHandler} from '../utils/listen';
-import {State} from '../io/state';
-import {logger} from '../utils/logger';
-import {getUriQuery, decodeQuery} from '../utils/uri';
-import {UndoStack} from '../utils/undoStack';
-import {ToolboxController} from './toolboxController';
-import {LoadController} from './loadController';
-import {DataController} from './dataController';
-import {OverlayData} from '../gui/overlayData';
+} from '../math/orientation.js';
+import {Point3D} from '../math/point.js';
+import {Stage} from '../gui/stage.js';
+import {Style} from '../gui/style.js';
+import {getLayerDetailsFromLayerDivId} from '../gui/layerGroup.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {State} from '../io/state.js';
+import {logger} from '../utils/logger.js';
+import {getUriQuery, decodeQuery} from '../utils/uri.js';
+import {UndoStack} from '../utils/undoStack.js';
+import {ToolboxController} from './toolboxController.js';
+import {LoadController} from './loadController.js';
+import {DataController} from './dataController.js';
+import {OverlayData} from '../gui/overlayData.js';
 import {
   toolList,
   defaultToolList,
   toolOptions,
   defaultToolOptions
-} from '../tools';
-import {binderList} from '../gui/stage';
-import {WindowLevel} from '../image/windowLevel';
-import {PlaneHelper} from '../image/planeHelper';
-import {AnnotationGroup} from '../image/annotationGroup';
-import {konvaToAnnotation} from '../gui/drawLayer';
+} from '../tools/index.js';
+import {binderList} from '../gui/stage.js';
+import {WindowLevel} from '../image/windowLevel.js';
+import {PlaneHelper} from '../image/planeHelper.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
+import {konvaToAnnotation} from '../gui/drawLayer.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {LayerGroup} from '../gui/layerGroup';
-import {ViewLayer} from '../gui/viewLayer';
-import {DrawLayer} from '../gui/drawLayer';
-import {Image} from '../image/image';
-import {Matrix33} from '../math/matrix';
-import {DataElement} from '../dicom/dataElement';
-import {Scalar3D} from '../math/scalar';
-import {DicomData} from './dataController';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {Image} from '../image/image.js';
+import {Matrix33} from '../math/matrix.js';
+import {DataElement} from '../dicom/dataElement.js';
+import {Scalar3D} from '../math/scalar.js';
+import {DicomData} from './dataController.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -491,7 +491,7 @@ export class App {
    * The layer is available after the first loaded item.
    *
    * @param {string} divId The div id.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroupByDivId(divId) {
     return this.#stage.getLayerGroupByDivId(divId);
@@ -680,6 +680,7 @@ export class App {
     this.#loadController.onload = this.#onload;
     this.#loadController.onloadend = this.#onloadend;
     this.#loadController.onerror = this.#onloaderror;
+    this.#loadController.ontimeout = this.#onloadtimeout;
     this.#loadController.onabort = this.#onloadabort;
 
     // create data controller
@@ -724,10 +725,27 @@ export class App {
 
   /**
    * Reset the layout of the application.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   resetLayout() {
     this.#stage.reset();
     this.#stage.draw();
+  }
+
+  /**
+   * Reset the zoom and pan of the stage.
+   */
+  resetZoomPan() {
+    this.#stage.resetZoomPan();
+    this.#stage.draw();
+  }
+
+  /**
+   * Reset the position and window level of the stage.
+   */
+  resetViews() {
+    this.#stage.resetViews();
   }
 
   /**
@@ -758,6 +776,7 @@ export class App {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {File[]} files The list of files to load.
+   * @returns {string} The data ID, '-1' if problem.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -767,13 +786,13 @@ export class App {
    * @function
    */
   loadFiles = (files) => {
-    // Get new data id
-    const dataId = this.#dataController.getNextDataId();
     if (files.length === 0) {
       logger.warn('Ignoring empty input file list.');
-      return;
+      return '-1';
     }
+    const dataId = this.#dataController.getNextDataId();
     this.#loadController.loadFiles(files, dataId);
+    return dataId;
   };
 
   /**
@@ -784,6 +803,7 @@ export class App {
    * - requestHeaders: an array of {name, value} to use as request headers,
    * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
    * - batchSize: the size of the request url batch.
+   * @returns {string} The data ID, '-1' if problem.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -793,13 +813,13 @@ export class App {
    * @function
    */
   loadURLs = (urls, options) => {
-    // Get new data id
-    const dataId = this.#dataController.getNextDataId();
     if (urls.length === 0) {
       logger.warn('Ignoring empty input url list.');
-      return;
+      return '-1';
     }
+    const dataId = this.#dataController.getNextDataId();
     this.#loadController.loadURLs(urls, dataId, options);
+    return dataId;
   };
 
   /**
@@ -836,6 +856,7 @@ export class App {
    *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
+   * @returns {string} The data ID.
    * @fires App#loadstart
    * @fires App#loadprogress
    * @fires App#loaditem
@@ -845,9 +866,9 @@ export class App {
    * @function
    */
   loadImageObject = (data) => {
-    // Get new data id
     const dataId = this.#dataController.getNextDataId();
     this.#loadController.loadImageObject(data, dataId);
+    return dataId;
   };
 
   /**
@@ -916,6 +937,9 @@ export class App {
    * @returns {ViewConfig[]} The list of associated configs.
    */
   getViewConfigs(dataId, excludeStarConfig) {
+    if (typeof excludeStarConfig === 'undefined') {
+      excludeStarConfig = false;
+    }
     // check options
     if (this.#options.dataViewConfigs === null ||
       typeof this.#options.dataViewConfigs === 'undefined') {
@@ -1009,12 +1033,14 @@ export class App {
 
   /**
    * Remove a data view config.
+   * Removes the associated layer if found, removes
+   *   the layer group if empty.
    *
    * @param {string} dataId The data id.
    * @param {string} divId The div id.
    */
   removeDataViewConfig(dataId, divId) {
-    // remove from list
+    // input checks
     const configs = this.#options.dataViewConfigs;
     if (typeof configs[dataId] === 'undefined') {
       // no config for dataId
@@ -1028,29 +1054,28 @@ export class App {
       // no config for divId
       return;
     }
+
+    // remove from config list
     configs[dataId].splice(itemIndex, 1);
     if (configs[dataId].length === 0) {
       delete configs[dataId];
     }
 
-    // data is loaded, remove view
-    if (typeof this.#dataController.get(dataId) !== 'undefined') {
-      const lg = this.#stage.getLayerGroupByDivId(divId);
-      if (typeof lg !== 'undefined') {
-        const vls = lg.getViewLayersByDataId(dataId);
-        if (vls.length === 1) {
-          lg.removeLayer(vls[0]);
-        }
-        const dls = lg.getDrawLayersByDataId(dataId);
-        if (dls.length === 1) {
-          lg.removeLayer(dls[0]);
-        }
-        if (vls.length === 0 && dls.length === 0) {
-          throw new Error('Expected one layer, got none');
-        }
-        if (lg.getNumberOfLayers() === 0) {
-          this.#stage.removeLayerGroup(lg);
-        }
+    // update layer group
+    const layerGroup = this.#stage.getLayerGroupByDivId(divId);
+    if (typeof layerGroup !== 'undefined') {
+      // remove layer if possible
+      const vls = layerGroup.getViewLayersByDataId(dataId);
+      if (vls.length === 1) {
+        layerGroup.removeLayer(vls[0]);
+      }
+      const dls = layerGroup.getDrawLayersByDataId(dataId);
+      if (dls.length === 1) {
+        layerGroup.removeLayer(dls[0]);
+      }
+      // remove layer group if empty
+      if (layerGroup.getNumberOfLayers() === 0) {
+        this.#stage.removeLayerGroup(layerGroup);
       }
     }
   }
@@ -1064,6 +1089,7 @@ export class App {
    * @param {ViewConfig} config The view configuration.
    */
   updateDataViewConfig(dataId, divId, config) {
+    // input checks
     const configs = this.#options.dataViewConfigs;
     // check data id
     if (typeof configs[dataId] === 'undefined') {
@@ -1078,25 +1104,24 @@ export class App {
       throw new Error('No config for dataId: ' +
         dataId + ' and divId: ' + divId);
     }
+
     // update config
     const configToUpdate = configs[dataId][itemIndex];
     for (const prop in config) {
       configToUpdate[prop] = config[prop];
     }
 
-    // remove previous layers
-    const lg = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
-    if (typeof lg !== 'undefined') {
-      const vls = lg.getViewLayersByDataId(dataId);
+    // update layer group
+    const layerGroup = this.#stage.getLayerGroupByDivId(configToUpdate.divId);
+    if (typeof layerGroup !== 'undefined') {
+      // remove layer if possible
+      const vls = layerGroup.getViewLayersByDataId(dataId);
       if (vls.length === 1) {
-        lg.removeLayer(vls[0]);
+        layerGroup.removeLayer(vls[0]);
       }
-      const dls = lg.getDrawLayersByDataId(dataId);
+      const dls = layerGroup.getDrawLayersByDataId(dataId);
       if (dls.length === 1) {
-        lg.removeLayer(dls[0]);
-      }
-      if (vls.length === 0 && dls.length === 0) {
-        throw new Error('Expected one layer, got none');
+        layerGroup.removeLayer(dls[0]);
       }
     }
 
@@ -1229,7 +1254,7 @@ export class App {
    */
   zoom(step, cx, cy) {
     const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewController = layerGroup.getActiveViewLayer().getViewController();
+    const viewController = layerGroup.getBaseViewLayer().getViewController();
     const k = viewController.getCurrentScrollPosition();
     const center = new Point3D(cx, cy, k);
     layerGroup.addScale(step, center);
@@ -1271,12 +1296,15 @@ export class App {
    */
   setDrawings(drawings, drawingsDetails, dataId) {
     const layerGroup = this.#stage.getActiveLayerGroup();
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = layerGroup.getBaseViewLayer();
     const refDataId = viewLayer.getDataId();
+    const refData = this.getData(refDataId);
     const viewController = viewLayer.getViewController();
 
     // convert konva to annotation
-    const annotations = konvaToAnnotation(drawings, drawingsDetails);
+    // (assume current image is ref image)
+    const annotations = konvaToAnnotation(
+      drawings, drawingsDetails, refData.image);
     // create data
     const data = this.createAnnotationData(refDataId);
     // add annotations to data
@@ -1355,23 +1383,22 @@ export class App {
     if (event.ctrlKey) {
       if (event.shiftKey) {
         const layerGroup = this.#stage.getActiveLayerGroup();
-        const viewController =
-          layerGroup.getActiveViewLayer().getViewController();
+        const positionHelper = layerGroup.getPositionHelper();
         if (event.key === 'ArrowLeft') { // crtl-shift-arrow-left
-          if (viewController.moreThanOne(3)) {
-            viewController.decrementIndex(3);
+          if (layerGroup.moreThanOne(3)) {
+            positionHelper.decrementPosition(3);
           }
         } else if (event.key === 'ArrowUp') { // crtl-shift-arrow-up
           if (layerGroup.canScroll()) {
-            viewController.incrementScrollIndex();
+            positionHelper.incrementPositionAlongScroll();
           }
         } else if (event.key === 'ArrowRight') { // crtl-shift-arrow-right
           if (layerGroup.moreThanOne(3)) {
-            viewController.incrementIndex(3);
+            positionHelper.incrementPosition(3);
           }
         } else if (event.key === 'ArrowDown') { // crtl-shift-arrow-down
           if (layerGroup.canScroll()) {
-            viewController.decrementScrollIndex();
+            positionHelper.decrementPositionAlongScroll();
           }
         }
       } else if (event.key === 'y') { // crtl-y
@@ -1442,22 +1469,11 @@ export class App {
     // bind tool to active layer
     for (let i = 0; i < this.#stage.getNumberOfLayerGroups(); ++i) {
       const layerGroup = this.#stage.getLayerGroup(i);
-      // draw or view layer
-      const isDrawTool = tool === 'Draw' ||
-        tool === 'Livewire' ||
-        tool === 'Floodfill';
-      let layer;
-      if (isDrawTool &&
-        typeof layerGroup.getActiveDrawLayer() !== 'undefined') {
-        layer = layerGroup.getActiveDrawLayer();
-      } else {
-        layer = layerGroup.getActiveViewLayer();
-      }
+      const layer = layerGroup.getActiveLayer();
       if (typeof layer !== 'undefined') {
         this.#toolboxController.bindLayerGroup(layerGroup, layer);
       }
     }
-
     // set toolbox tool
     this.#toolboxController.setSelectedTool(tool);
   }
@@ -1551,16 +1567,37 @@ export class App {
     const data = new DicomData({});
     data.annotationGroup = new AnnotationGroup();
     data.annotationGroup.setMetaValue('Modality', 'SR');
+
+    const tagsToCopy = [
+      'PatientName',
+      'PatientID',
+      'PatientBirthDate',
+      'PatientSex',
+      'StudyDate',
+      'StudyTime',
+      'StudyInstanceUID',
+      'StudyID',
+      'StudyDescription'
+    ];
+    for (const tag of tagsToCopy) {
+      data.annotationGroup.setMetaValue(tag, refMeta[tag]);
+    }
+
+    // used to associate with a view layer
     data.annotationGroup.setMetaValue(
-      'PatientID', refMeta.PatientID);
-    data.annotationGroup.setMetaValue(
-      'StudyInstanceUID', refMeta.StudyInstanceUID);
-    data.annotationGroup.setMetaValue(
-      'ReferencedSeriesSequence', {
+      'CurrentRequestedProcedureEvidenceSequence', {
         value: [{
-          SeriesInstanceUID: refMeta.SeriesInstanceUID
+          ReferencedSeriesSequence: {
+            value: [{
+              // ReferencedSOPSequence: left to fill in later
+              SeriesInstanceUID: refMeta.SeriesInstanceUID
+            }]
+          },
+          StudyInstanceUID: refMeta.StudyInstanceUID
         }]
-      });
+      }
+    );
+
     return data;
   }
 
@@ -1596,7 +1633,14 @@ export class App {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
+    let propagate = true;
+    if (typeof event.propagate !== 'undefined') {
+      propagate = event.propagate;
+      delete event.propagate;
+    }
+    if (propagate) {
+      this.#listenerHandler.fireEvent(event);
+    }
   };
 
   /**
@@ -1660,23 +1704,15 @@ export class App {
       logger.error('Missing loaditem event load type.');
     }
 
-    const isFirstLoadItem = event.isfirstitem;
-
-    let eventMetaData = null;
+    let eventMetaData;
     if (event.loadtype === 'image') {
-      if (isFirstLoadItem) {
-        this.#dataController.add(event.dataid, event.data);
-      } else {
-        this.#dataController.update(event.dataid, event.data);
-      }
       eventMetaData = event.data.meta;
     } else if (event.loadtype === 'state') {
-      this.applyJsonState(event.data, event.dataid);
       eventMetaData = 'state';
     }
 
     /**
-     * Load item event: fired when a load item is successfull.
+     * Load item event: fired when an item has been successfully loaded.
      *
      * @event App#loaditem
      * @type {object}
@@ -1695,6 +1731,18 @@ export class App {
       isfirstitem: event.isfirstitem,
       warn: event.warn
     });
+
+    const isFirstLoadItem = event.isfirstitem;
+
+    if (event.loadtype === 'image') {
+      if (isFirstLoadItem) {
+        this.#dataController.add(event.dataid, event.data);
+      } else {
+        this.#dataController.update(event.dataid, event.data);
+      }
+    } else if (event.loadtype === 'state') {
+      this.applyJsonState(event.data, event.dataid);
+    }
 
     // update overlay data if present
     if (typeof this.#overlayDatas !== 'undefined' &&
@@ -1774,6 +1822,28 @@ export class App {
   };
 
   /**
+   * Data load timeout callback.
+   *
+   * @param {object} event The timeout event.
+   */
+  #onloadtimeout = (event) => {
+    /**
+     * Load timeout event.
+     *
+     * @event App#timeout
+     * @type {object}
+     * @property {string} type The event type: timeout.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: an url as a string.
+     * @property {object} target The event target.
+     */
+    if (typeof event.type === 'undefined') {
+      event.type = 'timeout';
+    }
+    this.#fireEvent(event);
+  };
+
+  /**
    * Data load abort callback.
    *
    * @param {object} event The abort event.
@@ -1804,17 +1874,13 @@ export class App {
     // propagate layer group events
     group.addEventListener('zoomchange', this.#fireEvent);
     group.addEventListener('offsetchange', this.#fireEvent);
+    group.addEventListener('layerremove', this.#fireEvent);
     // propagate viewLayer events
     group.addEventListener('renderstart', this.#fireEvent);
     group.addEventListener('renderend', this.#fireEvent);
     // propagate view events
     for (let j = 0; j < viewEventNames.length; ++j) {
       group.addEventListener(viewEventNames[j], this.#fireEvent);
-    }
-    // propagate drawLayer events
-    if (this.#toolboxController && this.#toolboxController.hasTool('Draw')) {
-      group.addEventListener('drawcreate', this.#fireEvent);
-      group.addEventListener('drawdelete', this.#fireEvent);
     }
     // updata data view config
     group.addEventListener('wlchange', (event) => {
@@ -1887,9 +1953,7 @@ export class App {
     // (assuming RGB data)
     if (data.image.getMeta().Modality === 'SEG') {
       view.setAlphaFunction(function (value /*, index*/) {
-        if (value[0] === 0 &&
-          value[1] === 0 &&
-          value[2] === 0) {
+        if (value === 0) {
           return 0;
         } else {
           return 0xff;
@@ -2012,6 +2076,69 @@ export class App {
   }
 
   /**
+   * Get the reference layer of an annotation group.
+   *
+   * @param {AnnotationGroup} annotationGroup The annotation group to attach.
+   * @param {LayerGroup} layerGroup The group where to find the reference.
+   * @returns {ViewLayer} The reference view layer.
+   */
+  #getReferenceLayer(annotationGroup, layerGroup) {
+    let refViewLayer;
+
+    // use meta
+    // -> will match empty groups created with createAnnotationData
+    const evidenceSeq =
+      annotationGroup.getMetaValue('CurrentRequestedProcedureEvidenceSequence');
+    if (typeof evidenceSeq !== 'undefined') {
+      const evidenceSeqItem0 = evidenceSeq.value[0];
+      const refSeriesSeq = evidenceSeqItem0?.ReferencedSeriesSequence;
+      const refSeriesSeqItem0 = refSeriesSeq?.value[0];
+      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
+      const metaSearch = {
+        SeriesInstanceUID: refSeriesInstanceUID
+      };
+      const viewLayers = layerGroup.searchViewLayers(metaSearch);
+      if (viewLayers.length !== 0) {
+        refViewLayer = viewLayers[0];
+      }
+    }
+
+    // dwv034 wrongly uses ReferencedSeriesSequence tag at root
+    // and does not set the SOPClassUID of annotation reference...
+    const refSeriesSeq =
+      annotationGroup.getMetaValue('ReferencedSeriesSequence');
+    if (typeof refSeriesSeq !== 'undefined') {
+      const refSeriesSeqItem0 = refSeriesSeq.value[0];
+      const refSeriesInstanceUID = refSeriesSeqItem0?.SeriesInstanceUID;
+      const metaSearch = {
+        SeriesInstanceUID: refSeriesInstanceUID
+      };
+      const viewLayers = layerGroup.searchViewLayers(metaSearch);
+      if (viewLayers.length !== 0) {
+        refViewLayer = viewLayers[0];
+      }
+    }
+
+    // if no meta, go through annotations
+    if (typeof refViewLayer === 'undefined') {
+      for (const annotation of annotationGroup.getList()) {
+        const metaSearch = {
+          SOPInstanceUID: annotation.referencedSopInstanceUID,
+          SOPClassUID: annotation.referencedSopClassUID
+        };
+        const viewLayers = layerGroup.searchViewLayers(metaSearch);
+        if (viewLayers.length !== 0) {
+          // exit at first match
+          refViewLayer = viewLayers[0];
+          break;
+        }
+      }
+    }
+
+    return refViewLayer;
+  }
+
+  /**
    * Add a draw layer.
    *
    * @param {string} dataId The data id.
@@ -2024,25 +2151,20 @@ export class App {
         viewConfig.divId);
     }
 
-    // reference is the data of the view layer with the
-    //   same StudyInstanceUID
     const data = this.#dataController.get(dataId);
     if (!data) {
       throw new Error('Cannot initialise layer with missing data, id: ' +
         dataId);
     }
-    const refSeriesSeq =
-      data.annotationGroup.getMetaValue('ReferencedSeriesSequence');
-    const refSeriesInstanceUID = refSeriesSeq.value[0].SeriesInstanceUID;
-    const viewLayers = layerGroup.searchViewLayers({
-      SeriesInstanceUID: refSeriesInstanceUID
-    });
-    if (viewLayers.length === 0) {
+    const annotationGroup = data.annotationGroup;
+
+    // find referenced view layer
+    const refViewLayer = this.#getReferenceLayer(annotationGroup, layerGroup);
+    if (typeof refViewLayer === 'undefined') {
       console.warn(
-        'No loaded data that matches the measurement reference series UID');
+        'No loaded data that matches the measurements reference series UID');
       return;
     }
-    const refViewLayer = viewLayers[0];
     const refDataId = refViewLayer.getDataId();
 
     // un-bind
@@ -2282,8 +2404,11 @@ export class App {
         flipScale.z = true;
       }
     } else {
-      logger.warn('Unsupported orientation code: ' +
-        orientationCode + ', display could be incorrect');
+      // LIP uses default scale and offset
+      if (orientationCode !== 'LIP') {
+        logger.warn('Unsupported orientation code: ' +
+          orientationCode + ', display could be incorrect');
+      }
     }
 
     return {

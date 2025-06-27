@@ -1,26 +1,25 @@
-import {Annotation} from '../image/annotation';
+import {Annotation} from '../image/annotation.js';
 import {
   AddAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands';
-//import {RoiFactory} from '../tools/roi';
-import {ROI} from '../math/roi';
-import {guid} from '../math/stats';
-import {Point2D} from '../math/point';
-import {Style} from '../gui/style';
+} from '../tools/drawCommands.js';
+//import {RoiFactory} from '../tools/roi.js';
+import {ROI} from '../math/roi.js';
+import {Point2D} from '../math/point.js';
+import {Style} from '../gui/style.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {ListenerHandler} from '../utils/listen';
-import {logger} from '../utils/logger';
+} from '../gui/generic.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {LayerGroup} from '../gui/layerGroup';
-import {Scalar2D} from '../math/scalar';
+import {App} from '../app/application.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {Scalar2D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -148,13 +147,6 @@ export class Floodfill {
   #style = new Style();
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * Set extend option for painting border on all slices.
    *
    * @param {boolean} bool The option to set.
@@ -174,15 +166,35 @@ export class Floodfill {
   }
 
   /**
+   * Get the associated view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group to search.
+   * @returns {ViewLayer|undefined} The view layer.
+   */
+  #getViewLayer(layerGroup) {
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      logger.warn('No draw layer to do floodfill');
+      return;
+    }
+    return layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+  }
+
+  /**
    * Get (x, y) coordinates referenced to the canvas.
    *
    * @param {Point2D} point The start point.
    * @param {string} divId The layer group divId.
-   * @returns {Scalar2D} The coordinates as a {x,y}.
+   * @returns {Scalar2D|undefined} The coordinates as a {x,y}.
    */
   #getIndex = (point, divId) => {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to get index');
+      return;
+    }
     const index = viewLayer.displayToPlaneIndex(point);
     return {
       x: index.get(0),
@@ -245,6 +257,10 @@ export class Floodfill {
     // Paint the border
     if (this.#border.length !== 0) {
       const drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer === 'undefined') {
+        logger.warn('No draw layer to paint border');
+        return false;
+      }
       const drawController = drawLayer.getDrawController();
 
       const newMathShape = new ROI(this.#border);
@@ -254,9 +270,13 @@ export class Floodfill {
         // create annotation
         this.#annotation = new Annotation();
         this.#annotation.colour = this.#style.getLineColour();
-        this.#annotation.id = guid();
 
-        const viewLayer = layerGroup.getActiveViewLayer();
+        const viewLayer =
+          layerGroup.getViewLayerById(drawLayer.getReferenceLayerId());
+        if (typeof viewLayer === 'undefined') {
+          logger.warn('No view layer to paint border');
+          return false;
+        }
         const viewController = viewLayer.getViewController();
         this.#annotation.init(viewController);
 
@@ -298,8 +318,13 @@ export class Floodfill {
       throw '\'initialpoint\' not found. User must click before use extend!';
     }
 
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const positionHelper = layerGroup.getPositionHelper();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to extend floodfill');
+      return;
+    }
+    const viewController = viewLayer.getViewController();
 
     const pos = viewController.getCurrentIndex();
     const imageSize = viewController.getImageSize();
@@ -313,18 +338,18 @@ export class Floodfill {
       if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
-      viewController.incrementIndex(2);
+      positionHelper.incrementPositionAlongScroll();
     }
-    viewController.setCurrentPosition(pos);
+    viewController.setCurrentIndex(pos);
 
     // Iterate over the prev images and paint border on each slice.
     for (let j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
       if (!this.#paintBorder(this.#initialpoint, threshold, layerGroup)) {
         break;
       }
-      viewController.decrementIndex(2);
+      positionHelper.decrementPositionAlongScroll();
     }
-    viewController.setCurrentPosition(pos);
+    viewController.setCurrentIndex(pos);
   }
 
   /**
@@ -343,12 +368,14 @@ export class Floodfill {
    * @param {string} divId The layer group divId.
    */
   #start(point, divId) {
+    this.#annotation = undefined;
+
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    let viewLayer;
     let drawLayer = layerGroup.getActiveDrawLayer();
 
     if (typeof drawLayer === 'undefined') {
-      const viewLayer = layerGroup.getActiveViewLayer();
+      viewLayer = layerGroup.getActiveViewLayer();
       const refDataId = viewLayer.getDataId();
       // create new data
       const data = this.#app.createAnnotationData(refDataId);
@@ -357,7 +384,14 @@ export class Floodfill {
       // get draw layer
       drawLayer = layerGroup.getActiveDrawLayer();
       // set active to bind to toolboxController
-      layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
+      layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
+    } else {
+      viewLayer = layerGroup.getViewLayerById(
+        drawLayer.getReferenceLayerId());
+      if (typeof viewLayer === 'undefined') {
+        logger.warn('No view layer to start floodfill');
+        return;
+      }
     }
 
     this.#imageInfo = viewLayer.getImageData();
@@ -521,46 +555,6 @@ export class Floodfill {
   init() {
     // does nothing
   }
-
-  /**
-   * Get the list of event names that this tool can fire.
-   *
-   * @returns {Array} The list of event names.
-   */
-  getEventNames() {
-    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  // #fireEvent = (event) => {
-  //   this.#listenerHandler.fireEvent(event);
-  // };
 
   /**
    * Set the tool live features: shape colour.

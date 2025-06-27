@@ -1,22 +1,23 @@
-import {Ellipse} from '../math/ellipse';
-import {Point2D} from '../math/point';
-import {logger} from '../utils/logger';
-import {defaults} from '../app/defaults';
+import {Ellipse} from '../math/ellipse.js';
+import {Point2D} from '../math/point.js';
+import {logger} from '../utils/logger.js';
+import {custom} from '../app/custom.js';
 import {
+  defaultLabelTexts,
   isNodeNameShape,
   DRAW_DEBUG,
   getDefaultAnchor,
   getAnchorShape
-} from './drawBounds';
-import {LabelFactory} from './labelFactory';
+} from './drawBounds.js';
+import {LabelFactory} from './labelFactory.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Style} from '../gui/style';
-import {Annotation} from '../image/annotation';
+import {Style} from '../gui/style.js';
+import {Annotation} from '../image/annotation.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -108,7 +109,7 @@ export class EllipseFactory {
     const group = new Konva.Group();
     group.name(this.getGroupName());
     group.visible(true);
-    group.id(annotation.id);
+    group.id(annotation.trackingUid);
     // konva shape
     const shape = this.#createShape(annotation, style);
     group.add(this.#createShape(annotation, style));
@@ -120,7 +121,10 @@ export class EllipseFactory {
     group.add(this.#labelFactory.getConnector(connectorsPos, label, style));
     // konva shadow (if debug)
     if (DRAW_DEBUG) {
-      group.add(this.#getDebugShadow(annotation));
+      const shadow = this.#getDebugShadow(annotation, group);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
     return group;
   }
@@ -203,25 +207,25 @@ export class EllipseFactory {
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'anchor0':
-      // block y
-      left.y(right.y());
-      break;
-    case 'anchor1':
-      // block y
-      right.y(left.y());
-      break;
-    case 'anchor2':
-      // block x
-      bottom.x(top.x());
-      break;
-    case 'anchor3':
-      // block x
-      top.x(bottom.x());
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // block y
+        left.y(right.y());
+        break;
+      case 'anchor1':
+        // block y
+        right.y(left.y());
+        break;
+      case 'anchor2':
+        // block x
+        bottom.x(top.x());
+        break;
+      case 'anchor3':
+        // block x
+        top.x(bottom.x());
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 
@@ -244,14 +248,12 @@ export class EllipseFactory {
     this.#updateShape(annotation, anchor, style);
     // update label
     this.updateLabelContent(annotation, group, style);
-    // label position
+    // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      // update label position if default position
       this.#labelFactory.updatePosition(annotation, group);
-    } else {
-      // update connector if not default position
-      this.updateConnector(group);
     }
+    // update connector
+    this.updateConnector(group);
     // update shadow
     if (DRAW_DEBUG) {
       this.#updateDebugShadow(annotation, group);
@@ -273,21 +275,21 @@ export class EllipseFactory {
 
     // update 'self' (undo case) and special points
     switch (anchor.id()) {
-    case 'anchor0':
-      radiusX = center.getX() - anchor.x();
-      break;
-    case 'anchor1':
-      radiusX = anchor.x() - center.getX();
-      break;
-    case 'anchor2':
-      radiusY = anchor.y() - center.getY();
-      break;
-    case 'anchor3':
-      radiusY = center.getY() - anchor.y();
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        radiusX = center.getX() - anchor.x();
+        break;
+      case 'anchor1':
+        radiusX = anchor.x() - center.getX();
+        break;
+      case 'anchor2':
+        radiusY = anchor.y() - center.getY();
+        break;
+      case 'anchor3':
+        radiusY = center.getY() - anchor.y();
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
 
     annotation.mathShape = new Ellipse(
@@ -358,7 +360,13 @@ export class EllipseFactory {
    * @returns {object} The label list.
    */
   #getDefaultLabel() {
-    return defaults.labelText.ellipse;
+    if (typeof custom.labelTexts !== 'undefined' &&
+      typeof custom.labelTexts[this.#name] !== 'undefined'
+    ) {
+      return custom.labelTexts[this.#name];
+    } else {
+      return defaultLabelTexts[this.#name];
+    }
   }
 
   /**
@@ -455,41 +463,41 @@ export class EllipseFactory {
 
     // update 'self' (undo case) and other anchors
     switch (anchor.id()) {
-    case 'anchor0':
-      // update self
-      left.x(anchor.x());
-      // update others
-      right.x(center.getX() + swapX * radiusX);
-      bottom.y(center.getY() + radiusY);
-      top.y(center.getY() - radiusY);
-      break;
-    case 'anchor1':
-      // update self
-      right.x(anchor.x());
-      // update others
-      left.x(center.getX() - swapX * radiusX);
-      bottom.y(center.getY() + radiusY);
-      top.y(center.getY() - radiusY);
-      break;
-    case 'anchor2':
-      // update self
-      bottom.y(anchor.y());
-      // update others
-      left.x(center.getX() - radiusX);
-      right.x(center.getX() + radiusX);
-      top.y(center.getY() - swapY * radiusY);
-      break;
-    case 'anchor3':
-      // update self
-      top.y(anchor.y());
-      // update others
-      left.x(center.getX() - radiusX);
-      right.x(center.getX() + radiusX);
-      bottom.y(center.getY() + swapY * radiusY);
-      break;
-    default :
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        // update self
+        left.x(anchor.x());
+        // update others
+        right.x(center.getX() + swapX * radiusX);
+        bottom.y(center.getY() + radiusY);
+        top.y(center.getY() - radiusY);
+        break;
+      case 'anchor1':
+        // update self
+        right.x(anchor.x());
+        // update others
+        left.x(center.getX() - swapX * radiusX);
+        bottom.y(center.getY() + radiusY);
+        top.y(center.getY() - radiusY);
+        break;
+      case 'anchor2':
+        // update self
+        bottom.y(anchor.y());
+        // update others
+        left.x(center.getX() - radiusX);
+        right.x(center.getX() + radiusX);
+        top.y(center.getY() - swapY * radiusY);
+        break;
+      case 'anchor3':
+        // update self
+        top.y(anchor.y());
+        // update others
+        left.x(center.getX() - radiusX);
+        right.x(center.getX() + radiusX);
+        bottom.y(center.getY() + swapY * radiusY);
+        break;
+      default :
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
   }
 
@@ -523,7 +531,7 @@ export class EllipseFactory {
         y: minY - offsetY,
         width: maxX - minX,
         height: 1,
-        fill: 'grey',
+        fill: annotation.colour,
         strokeWidth: 0,
         strokeScaleEnabled: false,
         opacity: 0.3,
@@ -548,7 +556,10 @@ export class EllipseFactory {
       // remove previous
       kshadow.destroy();
       // add new
-      group.add(this.#getDebugShadow(annotation, group));
+      const shadow = this.#getDebugShadow(annotation, group);
+      group.add(shadow);
+      // move to bottom to not bother main shape
+      shadow.moveToBottom();
     }
   }
 

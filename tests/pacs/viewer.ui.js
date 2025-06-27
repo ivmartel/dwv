@@ -1,9 +1,4 @@
-// Do not warn if these variables were not defined before.
-/* global dwv */
-
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
+import {Orientation} from '../../src/math/orientation.js';
 
 /**
  * Get the layer groups div ids from the data view configs.
@@ -11,7 +6,7 @@ var test = test || {};
  * @param {object} dataViewConfigs The configs.
  * @returns {string[]} The list of ids.
  */
-test.getLayerGroupDivIds = function (dataViewConfigs) {
+export function getLayerGroupDivIds(dataViewConfigs) {
   const divIds = [];
   const keys = Object.keys(dataViewConfigs);
   for (let i = 0; i < keys.length; ++i) {
@@ -33,18 +28,40 @@ test.getLayerGroupDivIds = function (dataViewConfigs) {
  * @param {string} divId The div id.
  * @returns {object} The config.
  */
-test.getViewConfig = function (layout, divId) {
+export function getViewConfig(layout, divId) {
   const config = {divId: divId};
   if (layout === 'mpr') {
     if (divId === 'layerGroup0') {
-      config.orientation = dwv.Orientation.Axial;
+      config.orientation = Orientation.Axial;
     } else if (divId === 'layerGroup1') {
-      config.orientation = dwv.Orientation.Coronal;
+      config.orientation = Orientation.Coronal;
     } else if (divId === 'layerGroup2') {
-      config.orientation = dwv.Orientation.Sagittal;
+      config.orientation = Orientation.Sagittal;
     }
   }
   return config;
+};
+
+/**
+ * Get a HTML id from a prefix and root part.
+ *
+ * @param {string} prefix The id prefix.
+ * @param {string} root The root.
+ * @returns {string} The HTML id.
+ */
+export function getHtmlId(prefix, root) {
+  return prefix + root;
+};
+
+/**
+ * Get the root part from an HTML id.
+ *
+ * @param {string} prefix The id prefix.
+ * @param {string} htmlId The HTML id.
+ * @returns {string} The root.
+ */
+export function getRootFromHtmlId(prefix, htmlId) {
+  return htmlId.substring(prefix.length);
 };
 
 /**
@@ -56,24 +73,30 @@ test.getViewConfig = function (layout, divId) {
  * @param {number} max The control maximum value.
  * @param {number} value The control value.
  * @param {Function} callback The callback on control value change.
- * @param {number} precision Optional number field float precision.
+ * @param {number} precision Number field float precision.
+ * @param {number} step The control step.
  * @returns {HTMLDivElement} The control div.
  */
-test.getControlDiv = function (
+export function getControlDiv(
   id,
   name,
   min,
   max,
   value,
   callback,
-  precision) {
+  precision,
+  step) {
   const range = document.createElement('input');
   range.id = id + '-range';
   range.className = 'ctrl-range';
   range.type = 'range';
   range.min = min.toPrecision(precision);
   range.max = max.toPrecision(precision);
-  range.step = ((max - min) * 0.01).toPrecision(precision);
+  if (typeof step !== 'undefined') {
+    range.step = step;
+  } else {
+    range.step = ((max - min) * 0.01).toPrecision(precision);
+  }
   range.value = value.toString();
 
   const label = document.createElement('label');

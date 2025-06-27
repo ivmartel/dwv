@@ -1,5 +1,5 @@
-import {Point2D} from '../../src/math/point';
-import {Path} from '../../src/math/path';
+import {Point2D} from '../../src/math/point.js';
+import {Path} from '../../src/math/path.js';
 
 /**
  * Tests for the 'math/path.js' file.

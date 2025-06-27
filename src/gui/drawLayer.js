@@ -1,39 +1,40 @@
-import {ListenerHandler} from '../utils/listen';
-import {DrawController} from '../app/drawController';
-import {getScaledOffset} from './layerGroup';
-import {InteractionEventNames} from './generic';
-import {logger} from '../utils/logger';
-import {toStringId} from '../utils/array';
-import {precisionRound} from '../utils/string';
-import {AddAnnotationCommand} from '../tools/drawCommands';
+import {ListenerHandler} from '../utils/listen.js';
+import {DrawController} from '../app/drawController.js';
+import {getScaledOffset} from './layerGroup.js';
+import {InteractionEventNames} from './generic.js';
+import {logger} from '../utils/logger.js';
+import {toStringId} from '../utils/array.js';
+import {precisionRound} from '../utils/string.js';
+import {AddAnnotationCommand} from '../tools/drawCommands.js';
 import {
   isNodeWithId,
   isPositionNode,
   isNodeNameShape,
   isNodeNameLabel
-} from '../tools/drawBounds';
-import {Style} from '../gui/style';
-import {Line} from '../math/line';
-import {Rectangle} from '../math/rectangle';
-import {ROI} from '../math/roi';
-import {Protractor} from '../math/protractor';
-import {Ellipse} from '../math/ellipse';
-import {Circle} from '../math/circle';
-import {Point2D} from '../math/point';
+} from '../tools/drawBounds.js';
+import {Style} from '../gui/style.js';
+import {Line} from '../math/line.js';
+import {Rectangle} from '../math/rectangle.js';
+import {ROI} from '../math/roi.js';
+import {Protractor} from '../math/protractor.js';
+import {Ellipse} from '../math/ellipse.js';
+import {Circle} from '../math/circle.js';
+import {Point2D} from '../math/point.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point, Point3D} from '../math/point';
-import {Index} from '../math/index';
-import {Vector3D} from '../math/vector';
-import {Scalar2D, Scalar3D} from '../math/scalar';
-import {PlaneHelper} from '../image/planeHelper';
-import {Annotation} from '../image/annotation';
-import {AnnotationGroup} from '../image/annotationGroup';
-import {DrawShapeHandler} from '../tools/drawShapeHandler';
+import {Point, Point3D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {Vector3D} from '../math/vector.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
+import {Image} from '../image/image.js';
+import {PlaneHelper} from '../image/planeHelper.js';
+import {Annotation} from '../image/annotation.js';
+import {AnnotationGroup} from '../image/annotationGroup.js';
+import {DrawShapeHandler} from '../tools/drawShapeHandler.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -124,6 +125,13 @@ export class DrawLayer {
   #zoomOffset = {x: 0, y: 0};
 
   /**
+   * The pan offset.
+   *
+   * @type {Scalar2D}
+   */
+  #panOffset = {x: 0, y: 0};
+
+  /**
    * The flip offset.
    *
    * @type {Scalar2D}
@@ -208,7 +216,7 @@ export class DrawLayer {
   }
 
   /**
-   * Get the reference data id.
+   * Get the reference layer id.
    *
    * @returns {string} The id.
    */
@@ -454,20 +462,14 @@ export class DrawLayer {
    * @param {Scalar3D} newOffset The offset as {x,y,z}.
    */
   setOffset(newOffset) {
-    const planeNewOffset =
+    const newPanOffset =
       this.#planeHelper.getPlaneOffsetFromOffset3D(newOffset);
+    const offset = this.#konvaStage.offset();
     this.#konvaStage.offset({
-      x: planeNewOffset.x +
-        this.#viewOffset.x +
-        this.#baseOffset.x +
-        this.#zoomOffset.x +
-        this.#flipOffset.x,
-      y: planeNewOffset.y +
-        this.#viewOffset.y +
-        this.#baseOffset.y +
-        this.#zoomOffset.y +
-        this.#flipOffset.y
+      x: offset.x - this.#panOffset.x + newPanOffset.x,
+      y: offset.y - this.#panOffset.y + newPanOffset.y
     });
+    this.#panOffset = newPanOffset;
   }
 
   /**
@@ -478,11 +480,11 @@ export class DrawLayer {
    * @returns {boolean} True if the offset was updated.
    */
   setBaseOffset(scrollOffset, planeOffset) {
-    const scrollIndex = this.#planeHelper.getNativeScrollIndex();
+    const scrollDimIndex = this.#planeHelper.getNativeScrollDimIndex();
     const newOffset = this.#planeHelper.getPlaneOffsetFromOffset3D({
-      x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
-      y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
-      z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+      x: scrollDimIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollDimIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollDimIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
       this.#baseOffset.y !== newOffset.y;
@@ -614,7 +616,7 @@ export class DrawLayer {
   activateCurrentPositionShapes(flag) {
     const konvaLayer = this.getKonvaLayer();
 
-    // stop listening
+    // stop stage listening
     this.#konvaStage.listening(false);
 
     if (typeof this.#shapeHandler !== 'undefined') {
@@ -637,12 +639,13 @@ export class DrawLayer {
     const drawController = this.getDrawController();
     if (flag &&
       drawController.getAnnotationGroup().isEditable()) {
+      // start stage listening
+      this.#konvaStage.listening(true);
       // shape groups at the current position
       const shapeGroups =
-        this.getCurrentPosGroup().getChildren();
+        this.#getCurrentPosGroup().getChildren();
       // listen if we have shapes
       if (shapeGroups.length !== 0) {
-        this.#konvaStage.listening(true);
         konvaLayer.listening(true);
       }
       // add listeners for position group
@@ -672,20 +675,25 @@ export class DrawLayer {
     if (typeof annotation.planePoints !== 'undefined') {
       // use plane points
       points = annotation.planePoints;
-    } else {
+    } else if (typeof annotation.planeOrigin !== 'undefined') {
       // just use plane origin
       points = [annotation.planeOrigin];
     }
-    return this.#getPositionId(points);
+    let posId;
+    if (typeof points !== 'undefined') {
+      posId = this.#getPositionId(points, annotation.referencedFrameNumber);
+    }
+    return posId;
   }
 
   /**
    * Get a string id from input plane points.
    *
    * @param {Point3D[]} points A list of points that defined a plane.
+   * @param {number} [frameNumber] Optional frame number.
    * @returns {string} The string id.
    */
-  #getPositionId(points) {
+  #getPositionId(points, frameNumber) {
     let res = '';
     for (const point of points) {
       if (res.length !== 0) {
@@ -697,6 +705,9 @@ export class DrawLayer {
         precisionRound(point.getZ(), 2),
       ];
       res += toStringId(posValues);
+    }
+    if (typeof frameNumber !== 'undefined') {
+      res += '-' + frameNumber;
     }
     return res;
   }
@@ -719,7 +730,7 @@ export class DrawLayer {
         return;
       }
       const posChildren = posGroup.getChildren(
-        isNodeWithId(annotation.id));
+        isNodeWithId(annotation.trackingUid));
       if (posChildren.length !== 0 &&
         posChildren[0] instanceof Konva.Group) {
         res = posChildren[0];
@@ -737,7 +748,8 @@ export class DrawLayer {
    */
   #addAnnotationDraw(annotation, visible) {
     // check for compatible view
-    if (!annotation.isCompatibleView(this.#planeHelper)) {
+    if (!annotation.canView() ||
+      !annotation.isCompatibleView(this.#planeHelper)) {
       return;
     }
     const posGroupId = this.#getAnnotationPosGroupId(annotation);
@@ -764,6 +776,9 @@ export class DrawLayer {
     // shape group (use first one since it will be removed from
     // the group when we change it)
     const factory = annotation.getFactory();
+    if (typeof factory === 'undefined') {
+      throw new Error('Cannot add an annotation draw without factory');
+    }
     const shapeGroup = factory.createShapeGroup(annotation, style);
     // add group to posGroup (switches its parent)
     posGroup.add(shapeGroup);
@@ -800,9 +815,6 @@ export class DrawLayer {
    * @param {Annotation} annotation The annotation to update.
    */
   #updateAnnotationDraw(annotation) {
-    // update quantification after math shape update
-    annotation.updateQuantification();
-    // update draw if needed
     if (this.#removeAnnotationDraw(annotation)) {
       this.#addAnnotationDraw(annotation, true);
     }
@@ -816,39 +828,54 @@ export class DrawLayer {
    * @param {Scalar2D} fitOffset The fit offset as {x,y}.
    */
   fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
-    // update konva
-    this.#konvaStage.width(containerSize.x);
-    this.#konvaStage.height(containerSize.y);
-
     // fit scale
-    const divToImageSizeRatio = {
+    const newFitScale = {
       x: divToWorldSizeRatio * this.#baseSpacing.x,
       y: divToWorldSizeRatio * this.#baseSpacing.y
     };
+    const fitRatio = {
+      x: newFitScale.x / this.#fitScale.x,
+      y: newFitScale.y / this.#fitScale.y
+    };
+
+    // size ratio (calculated before update)
+    const sizeRatio = {
+      x: containerSize.x / (this.#konvaStage.width() * fitRatio.x),
+      y: containerSize.y / (this.#konvaStage.height() * fitRatio.y)
+    };
+
+    // set canvas size if different from previous
+    if (this.#konvaStage.width() !== containerSize.x ||
+      this.#konvaStage.height() !== containerSize.y) {
+      this.#konvaStage.width(containerSize.x);
+      this.#konvaStage.height(containerSize.y);
+    }
+
     // #scale = inputScale * fitScale * flipScale
     // flipScale does not change here, we can omit it
     // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: this.#konvaStage.scale().x * divToImageSizeRatio.x / this.#fitScale.x,
-      y: this.#konvaStage.scale().y * divToImageSizeRatio.y / this.#fitScale.y
+      x: this.#konvaStage.scale().x * fitRatio.x,
+      y: this.#konvaStage.scale().y * fitRatio.y
     };
 
     // set scales if different from previous
     if (this.#konvaStage.scale().x !== newScale.x ||
       this.#konvaStage.scale().y !== newScale.y) {
-      this.#fitScale = divToImageSizeRatio;
+      this.#fitScale = newFitScale;
       this.#konvaStage.scale(newScale);
+      this.#updateLabelScale(newScale);
     }
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / divToImageSizeRatio.x,
-      y: fitOffset.y / divToImageSizeRatio.y
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
     };
     // flip offset
     const scaledImageSize = {
-      x: containerSize.x / divToImageSizeRatio.x,
-      y: containerSize.y / divToImageSizeRatio.y
+      x: containerSize.x / newFitScale.x,
+      y: containerSize.y / newFitScale.y
     };
     const newFlipOffset = {
       x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
@@ -860,18 +887,25 @@ export class DrawLayer {
       this.#viewOffset.y !== newViewOffset.y ||
       this.#flipOffset.x !== newFlipOffset.x ||
       this.#flipOffset.y !== newFlipOffset.y) {
+      const newZoomOffset = {
+        x: this.#zoomOffset.x * sizeRatio.x,
+        y: this.#zoomOffset.y * sizeRatio.y
+      };
       // update global offset
       this.#konvaStage.offset({
         x: this.#konvaStage.offset().x +
           newViewOffset.x - this.#viewOffset.x +
-          newFlipOffset.x - this.#flipOffset.x,
+          newFlipOffset.x - this.#flipOffset.x +
+          newZoomOffset.x - this.#zoomOffset.x,
         y: this.#konvaStage.offset().y +
           newViewOffset.y - this.#viewOffset.y +
-          newFlipOffset.y - this.#flipOffset.y,
+          newFlipOffset.y - this.#flipOffset.y +
+          newZoomOffset.y - this.#zoomOffset.y
       });
       // update private local offsets
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
+      this.#zoomOffset = newZoomOffset;
     }
   }
 
@@ -883,7 +917,7 @@ export class DrawLayer {
    */
   isAnnotationVisible(id) {
     // get the group (annotation and group have same id)
-    const group = this.getGroup(id);
+    const group = this.#getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -901,7 +935,7 @@ export class DrawLayer {
    */
   setAnnotationVisibility(id, visible) {
     // get the group (annotation and group have same id)
-    const group = this.getGroup(id);
+    const group = this.#getGroup(id);
     if (typeof group === 'undefined') {
       return false;
     }
@@ -1065,7 +1099,11 @@ export class DrawLayer {
       // use plane points
       points = planePoints;
     }
-    const posGroupId = this.#getPositionId(points);
+    let frameNumber;
+    if (position.length() > 3) {
+      frameNumber = position.get(3);
+    }
+    const posGroupId = this.#getPositionId(points, frameNumber);
 
     this.#activateDrawLayer(posGroupId);
     // TODO: add check
@@ -1110,9 +1148,9 @@ export class DrawLayer {
   /**
    * Get the current position group.
    *
-   * @returns {Konva.Group|undefined} The Konva.Group.
+   * @returns {Konva.Group|undefined} The Konva group.
    */
-  getCurrentPosGroup() {
+  #getCurrentPosGroup() {
     if (typeof this.#currentPosGroupId === 'undefined') {
       return;
     }
@@ -1145,14 +1183,10 @@ export class DrawLayer {
    * Get a Konva group using its id.
    *
    * @param {string} id The group id.
-   * @returns {object|undefined} The Konva group.
+   * @returns {Konva.Group|undefined} The Konva group.
    */
-  getGroup(id) {
-    const group = this.getKonvaLayer().findOne('#' + id);
-    if (typeof group === 'undefined') {
-      logger.warn('Cannot find node with id: ' + id);
-    }
-    return group;
+  #getGroup(id) {
+    return this.getKonvaLayer().findOne('#' + id);
   }
 
   /**
@@ -1275,14 +1309,33 @@ export class DrawDetails {
 }
 
 /**
+ * Convert a posGroup id (for ex '#2-0') into index values.
+ *
+ * @param {string} id The posGroup id.
+ * @returns {number[]} The index values.
+ */
+function posGroupIdToArray(id) {
+  const res = [0, 0, 0];
+
+  const splitHashes = id.split('#');
+  for (const splitHash of splitHashes) {
+    const split = splitHash.split('-');
+    res[split[0]] = split[1];
+  }
+
+  return res;
+}
+
+/**
  * Convert a KonvaLayer object to a list of annotations.
  *
  * @param {Array} drawings An array of drawings stored
  *   with 'KonvaLayer().toObject()'.
  * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+ * @param {Image} refImage The reference image.
  * @returns {Annotation[]} The associated list of annotations.
  */
-export function konvaToAnnotation(drawings, drawingsDetails) {
+export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
   const annotations = [];
 
   // regular Konva deserialize
@@ -1296,12 +1349,18 @@ export function konvaToAnnotation(drawings, drawingsDetails) {
     const statePosKids = statePosGroup.getChildren();
     for (let j = 0, lenj = statePosKids.length; j < lenj; ++j) {
       const annotation = new Annotation();
+      // use posGroup id as origin
+      const posGroupIndex = new Index(posGroupIdToArray(statePosGroup.id()));
+      // find ref SOP UID
+      // WARN: getImageUid returns first UID is the index is not found...
+      annotation.referencedSopInstanceUID = refImage.getImageUid(posGroupIndex);
 
       // shape group (use first one since it will be removed from
       // the group when we change it)
       const stateGroup = statePosKids[0];
       // annotation id
-      annotation.id = stateGroup.id();
+      annotation.trackingId = stateGroup.id();
+      annotation.trackingUid = stateGroup.id();
 
       // shape
       const shape = stateGroup.getChildren(isNodeNameShape)[0];

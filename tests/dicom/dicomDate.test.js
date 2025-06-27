@@ -2,7 +2,7 @@ import {
   getDate,
   getTime,
   getDateTime
-} from '../../src/dicom/dicomDate';
+} from '../../src/dicom/dicomDate.js';
 
 /**
  * Tests for the 'dicom/dicomDate.js' file.

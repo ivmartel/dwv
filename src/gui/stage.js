@@ -1,12 +1,12 @@
-import {Point, Point3D} from '../math/point';
-import {WindowLevel} from '../image/windowLevel';
-import {LayerGroup} from './layerGroup';
-import {logger} from '../utils/logger';
+import {Point, Point3D} from '../math/point.js';
+import {WindowLevel} from '../image/windowLevel.js';
+import {LayerGroup} from './layerGroup.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewLayer} from '../gui/viewLayer';
-import {DrawLayer} from '../gui/drawLayer';
+import {ViewLayer} from '../gui/viewLayer.js';
+import {DrawLayer} from '../gui/drawLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -61,7 +61,8 @@ export class PositionBinder {
   getCallback = function (layerGroup) {
     return function (event) {
       const pointValues = event.value[1];
-      const vc = layerGroup.getActiveViewLayer().getViewController();
+      const vl = layerGroup.getBaseViewLayer();
+      const vc = vl.getViewController();
       // handle different number of dimensions
       const currentPos = vc.getCurrentPosition();
       const currentDims = currentPos.length();
@@ -245,8 +246,8 @@ export class Stage {
    */
   getViewLayersByDataId(dataId) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getViewLayersByDataId(dataId));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getViewLayersByDataId(dataId));
     }
     return res;
   }
@@ -262,8 +263,8 @@ export class Stage {
    */
   getViewLayers(callbackFn) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getViewLayers(callbackFn));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getViewLayers(callbackFn));
     }
     return res;
   }
@@ -276,8 +277,8 @@ export class Stage {
    */
   getDrawLayersByDataId(dataId) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getDrawLayersByDataId(dataId));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getDrawLayersByDataId(dataId));
     }
     return res;
   }
@@ -293,8 +294,8 @@ export class Stage {
    */
   getDrawLayers(callbackFn) {
     let res = [];
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      res = res.concat(this.#layerGroups[i].getDrawLayers(callbackFn));
+    for (const layerGroup of this.#layerGroups) {
+      res = res.concat(layerGroup.getDrawLayers(callbackFn));
     }
     return res;
   }
@@ -328,7 +329,7 @@ export class Stage {
    * Get a layer group from an HTML element id.
    *
    * @param {string} id The element id to find.
-   * @returns {LayerGroup} The layer group.
+   * @returns {LayerGroup|undefined} The layer group.
    */
   getLayerGroupByDivId(id) {
     return this.#layerGroups.find(function (item) {
@@ -357,8 +358,8 @@ export class Stage {
    */
   empty() {
     this.unbindLayerGroups();
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].empty();
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.empty();
     }
     this.#layerGroups = [];
     this.#activeLayerGroupIndex = undefined;
@@ -402,10 +403,30 @@ export class Stage {
 
   /**
    * Reset the stage: calls reset on all layer groups.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   reset() {
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].reset();
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.reset();
+    }
+  }
+
+  /**
+   * Reset the zoom and pan of all layer groups.
+   */
+  resetZoomPan() {
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.resetZoomPan();
+    }
+  }
+
+  /**
+   * Reset the position and window level of all layer groups.
+   */
+  resetViews() {
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.resetViews();
     }
   }
 
@@ -413,8 +434,8 @@ export class Stage {
    * Draw the stage: calls draw on all layer groups.
    */
   draw() {
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].draw();
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.draw();
     }
   }
 
@@ -494,8 +515,8 @@ export class Stage {
   setImageSmoothing(flag) {
     this.#imageSmoothing = flag;
     // set for existing layer groups
-    for (let i = 0; i < this.#layerGroups.length; ++i) {
-      this.#layerGroups[i].setImageSmoothing(flag);
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.setImageSmoothing(flag);
     }
   }
 

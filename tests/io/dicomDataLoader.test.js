@@ -1,9 +1,9 @@
 // tests fails weirdly withtout this import...
 /* eslint-disable no-unused-vars */
-import {MemoryLoader} from '../../src/io/memoryLoader';
+import {MemoryLoader} from '../../src/io/memoryLoader.js';
 /* eslint-enable no-unused-vars */
 
-import {DicomDataLoader} from '../../src/io/dicomDataLoader';
+import {DicomDataLoader} from '../../src/io/dicomDataLoader.js';
 
 /**
  * Tests for the 'io/dicomDataLoader.js' file.

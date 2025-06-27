@@ -1,14 +1,18 @@
-import {logger} from '../utils/logger';
-import {getFlags, replaceFlags} from '../utils/string';
-import {Point} from '../math/point';
-import {getOrientationName} from '../math/orientation';
-import {defaultToolOptions, toolOptions} from '../tools/index';
+import {logger} from '../utils/logger.js';
+import {getFlags, replaceFlags} from '../utils/string.js';
+import {Point} from '../math/point.js';
+import {getOrientationName} from '../math/orientation.js';
+import {defaultToolOptions, toolOptions} from '../tools/index.js';
+import {guid} from '../math/stats.js';
+import {getUID} from '../dicom/dicomWriter.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D, Point3D} from '../math/point';
-import {ViewController} from '../app/viewController';
-import {PlaneHelper} from './planeHelper';
+import {Point2D, Point3D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {ViewController} from '../app/viewController.js';
+import {PlaneHelper} from './planeHelper.js';
+import {DicomCode} from '../dicom/dicomCode.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -16,21 +20,42 @@ import {PlaneHelper} from './planeHelper';
  */
 export class Annotation {
   /**
-   * The ID.
+   * Tracking id, unique within domain.
    *
    * @type {string}
    */
-  id;
+  trackingId;
 
   /**
-   * The reference image SOP UID.
+   * Tracking Unique id.
    *
    * @type {string}
    */
-  referenceSopUID;
+  trackingUid;
 
   /**
-   * The mathematical shape.
+   * Referenced image SOP isntance UID.
+   *
+   * @type {string}
+   */
+  referencedSopInstanceUID;
+
+  /**
+   * Referenced image SOP class UID.
+   *
+   * @type {string}
+   */
+  referencedSopClassUID;
+
+  /**
+   * Referenced frame number.
+   *
+   * @type {number|undefined}
+   */
+  referencedFrameNumber;
+
+  /**
+   * Mathematical shape.
    *
    * @type {object}
    */
@@ -44,11 +69,11 @@ export class Annotation {
   referencePoints;
 
   /**
-   * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+   * Colour: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
    *
-   * @type {string|undefined}
+   * @type {string}
    */
-  colour;
+  colour = '#ffff80';
 
   /**
    * Annotation quantification.
@@ -59,11 +84,11 @@ export class Annotation {
 
   /**
    * Text expression. Can contain variables surrounded with '{}' that will
-   * be extracted from the quantification object.
+   *   be extracted from the quantification object.
    *
-   * @type {string|undefined}
+   * @type {string}
    */
-  textExpr;
+  textExpr = '';
 
   /**
    * Label position. If undefined, the default shape
@@ -74,7 +99,7 @@ export class Annotation {
   labelPosition;
 
   /**
-   * The plane origin, the 3D position of index [0, 0, k].
+   * Plane origin: 3D position of index [0, 0, k].
    *
    * @type {Point3D|undefined}
    */
@@ -93,6 +118,70 @@ export class Annotation {
    * @type {ViewController|undefined}
    */
   #viewController;
+
+  /**
+   * Annotation meta data. Array of {concept:DicomCode, value:DicomCode}
+   *   or {concept:DicomCode, value:string}.
+   *
+   * @type {object}
+   */
+  #meta = {};
+
+  /**
+   * Constructor: set default annotation id and uid.
+   */
+  constructor() {
+    this.trackingId = guid();
+    this.trackingUid = getUID('TrackingUniqueIdentifier');
+  }
+
+  /**
+   * Get the concepts ids of the annotation meta data.
+   *
+   * @returns {string[]} The ids.
+   */
+  getMetaConceptIds() {
+    return Object.keys(this.#meta);
+  }
+
+  /**
+   * Get an annotation meta data.
+   *
+   * @param {string} conceptId The value of the concept dicom code.
+   * @returns {object|undefined} The corresponding meta data item
+   *   as {concept, value} or undefined.
+   */
+  getMetaItem(conceptId) {
+    return this.#meta[conceptId];
+  }
+
+  /**
+   * Add annotation meta data.
+   *
+   * @param {DicomCode} concept The concept code.
+   * @param {DicomCode|string} value The value code.
+   */
+  addMetaItem(concept, value) {
+    const conceptId = concept.value;
+    if (typeof this.#meta[conceptId] !== 'undefined') {
+      logger.warn('Overwriting annotation meta with id=' + conceptId);
+    }
+    this.#meta[concept.value] = {
+      concept: concept,
+      value: value
+    };
+  }
+
+  /**
+   * Remove an annotation meta data.
+   *
+   * @param {string} conceptId The value of the concept dicom code.
+   */
+  removeMetaItem(conceptId) {
+    if (typeof this.#meta[conceptId] !== 'undefined') {
+      delete this.#meta[conceptId];
+    }
+  }
 
   /**
    * Get the orientation name for this annotation.
@@ -117,24 +206,37 @@ export class Annotation {
    * @param {ViewController} viewController The associated view controller.
    */
   init(viewController) {
-    if (typeof this.referenceSopUID !== 'undefined') {
+    if (typeof this.referencedSopInstanceUID !== 'undefined') {
       logger.debug('Cannot initialise annotation twice');
       return;
     }
 
     this.#viewController = viewController;
+    const currentPosition = viewController.getCurrentPosition();
     // set UID
-    this.referenceSopUID = viewController.getCurrentImageUid();
+    this.referencedSopInstanceUID = viewController.getCurrentImageUid();
+    this.referencedSopClassUID = viewController.getSopClassUid();
+    if (currentPosition.length() > 3) {
+      this.referencedFrameNumber = currentPosition.get(3);
+    }
     // set plane origin (not saved with file)
     this.planeOrigin =
-      viewController.getOriginForImageUid(this.referenceSopUID);
+      viewController.getOriginForImageUid(this.referencedSopInstanceUID);
     // set plane points if not aquisition orientation
     // (planePoints are saved with file if present)
     if (!viewController.isAquisitionOrientation()) {
-      this.planePoints = viewController.getPlanePoints(
-        viewController.getCurrentPosition()
-      );
+      this.planePoints = viewController.getPlanePoints(currentPosition);
     }
+  }
+
+  /**
+   * Check if the annotation can be displayed: true if it has
+   * an associated view controller.
+   *
+   * @returns {boolean} True if the annotation can be displayed.
+   */
+  canView() {
+    return typeof this.#viewController !== 'undefined';
   }
 
   /**
@@ -160,7 +262,7 @@ export class Annotation {
       const cosine2 = new Point3D(cosines[3], cosines[4], cosines[5]);
 
       if (cosine1.equals(this.planePoints[1]) &&
-      cosine2.equals(this.planePoints[2])) {
+        cosine2.equals(this.planePoints[2])) {
         res = true;
       }
     }
@@ -174,7 +276,9 @@ export class Annotation {
    */
   setViewController(viewController) {
     // check uid
-    if (!viewController.includesImageUid(this.referenceSopUID)) {
+    if (!viewController.includesImageUid(this.referencedSopInstanceUID)) {
+      logger.warn('Cannot view annotation with reference UID: ' +
+        this.referencedSopInstanceUID);
       return;
     }
     // check if same view
@@ -185,7 +289,29 @@ export class Annotation {
 
     // set plane origin (not saved with file)
     this.planeOrigin =
-      viewController.getOriginForImageUid(this.referenceSopUID);
+      viewController.getOriginForImageUid(this.referencedSopInstanceUID);
+  }
+
+  /**
+   * Get the index of the plane origin.
+   *
+   * @returns {Index|undefined} The index.
+   */
+  #getOriginIndex() {
+    let res;
+    if (typeof this.#viewController !== 'undefined') {
+      let origin = this.planeOrigin;
+      if (typeof this.planePoints !== 'undefined') {
+        origin = this.planePoints[0];
+      }
+      const values = [origin.getX(), origin.getY(), origin.getZ()];
+      if (typeof this.referencedFrameNumber !== 'undefined') {
+        values.push(this.referencedFrameNumber);
+      }
+      const originPoint = new Point(values);
+      res = this.#viewController.getIndexFromPosition(originPoint);
+    }
+    return res;
   }
 
   /**
@@ -196,22 +322,21 @@ export class Annotation {
   getCentroid() {
     let res;
     if (typeof this.#viewController !== 'undefined' &&
-      typeof this.mathShape.getCentroid !== 'undefined') {
+      typeof this.mathShape.getCentroid !== 'undefined' &&
+      typeof this.mathShape.getCentroid() !== 'undefined') {
       // find the slice index of the annotation origin
-      let origin = this.planeOrigin;
-      if (typeof this.planePoints !== 'undefined') {
-        origin = this.planePoints[0];
-      }
-      const originPoint =
-        new Point([origin.getX(), origin.getY(), origin.getZ()]);
-      const originIndex =
-        this.#viewController.getIndexFromPosition(originPoint);
-      const scrollIndex = this.#viewController.getScrollIndex();
-      const k = originIndex.getValues()[scrollIndex];
-
+      const originIndex = this.#getOriginIndex();
+      const scrollDimIndex = this.#viewController.getScrollDimIndex();
+      const k = originIndex.getValues()[scrollDimIndex];
       // shape center converted to 3D
       const planePoint = this.mathShape.getCentroid();
       res = this.#viewController.getPositionFromPlanePoint(planePoint, k);
+      // add frame number if defined
+      if (typeof this.referencedFrameNumber !== 'undefined') {
+        const values = res.getValues();
+        values[3] = this.referencedFrameNumber;
+        res = new Point(values);
+      }
     }
     return res;
   }
@@ -254,17 +379,23 @@ export class Annotation {
       typeof this.mathShape.quantify !== 'undefined') {
       this.quantification = this.mathShape.quantify(
         this.#viewController,
-        getFlags(this.textExpr));
+        this.#getOriginIndex(),
+        getFlags(this.textExpr)
+      );
     }
   }
 
   /**
    * Get the math shape associated draw factory.
    *
-   * @returns {object} The factory.
+   * @returns {object|undefined} The factory.
    */
   getFactory() {
     let fac;
+    // no factory if no mathShape
+    if (typeof this.mathShape === 'undefined') {
+      return fac;
+    }
     // check in user provided factories
     if (typeof toolOptions.draw !== 'undefined') {
       for (const factoryName in toolOptions.draw) {

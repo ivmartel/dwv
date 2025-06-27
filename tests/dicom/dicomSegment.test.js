@@ -3,14 +3,14 @@ import {
   isEqualSegment,
   getSegment,
   getDicomSegmentItem
-} from '../../src/dicom/dicomSegment';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter';
-import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour';
+} from '../../src/dicom/dicomSegment.js';
+import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
+import {cielabToSrgb, uintLabToLab} from '../../src/utils/colour.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from '../../src/dicom/dataElement';
-import {DicomCode} from '../../src/dicom/dicomCode';
+import {DataElement} from '../../src/dicom/dataElement.js';
+import {DicomCode} from '../../src/dicom/dicomCode.js';
 /* eslint-enable no-unused-vars */
 
 /**

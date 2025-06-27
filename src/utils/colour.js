@@ -3,7 +3,7 @@
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Scalar3D} from '../math/scalar';
+import {Scalar3D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -39,9 +39,6 @@ export class RGB {
     this.b = b;
   }
 }
-
-// black rgb
-export const BLACK = {r: 0, g: 0, b: 0};
 
 /**
  * Check if two rgb objects are equal.

@@ -1,31 +1,45 @@
+import {custom} from '../app/custom.js';
 import {
   getMousePoint,
-  customUI
-} from '../gui/generic';
+} from '../gui/generic.js';
 import {
   RemoveAnnotationCommand,
   UpdateAnnotationCommand
-} from './drawCommands';
+} from './drawCommands.js';
 import {
   isNodeNameShape,
   isNodeNameLabel,
   getShapePositionRange,
   isShapeInRange
-} from './drawBounds';
-import {DrawShapeEditor} from './drawShapeEditor';
-import {DrawTrash} from './drawTrash';
+} from './drawBounds.js';
+import {DrawShapeEditor} from './drawShapeEditor.js';
+import {DrawTrash} from './drawTrash.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {Scalar2D} from '../math/scalar';
-import {DrawLayer} from '../gui/drawLayer';
-import {Annotation} from '../image/annotation';
-import {Point2D} from '../math/point';
+import {App} from '../app/application.js';
+import {Scalar2D} from '../math/scalar.js';
+import {DrawLayer} from '../gui/drawLayer.js';
+import {Annotation} from '../image/annotation.js';
+import {Point2D} from '../math/point.js';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Open a dialogue to edit roi data. Defaults to window.prompt.
+ *
+ * @param {Annotation} annotation The roi data.
+ * @param {Function} callback The callback to launch on dialogue exit.
+ */
+function defaultOpenRoiDialog(annotation, callback) {
+  const textExpr = prompt('Label', annotation.textExpr);
+  if (textExpr !== null) {
+    annotation.textExpr = textExpr;
+    callback(annotation);
+  }
+}
 
 /**
  * Draw shape handler: handle action on existing shapes.
@@ -278,7 +292,11 @@ export class DrawShapeHandler {
       };
 
       // call roi dialog
-      customUI.openRoiDialog(annotation, onSaveCallback);
+      if (typeof custom.openRoiDialog !== 'undefined') {
+        custom.openRoiDialog(annotation, onSaveCallback);
+      } else {
+        defaultOpenRoiDialog(annotation, onSaveCallback);
+      }
     });
   }
 
@@ -369,6 +387,9 @@ export class DrawShapeHandler {
 
       // get appropriate factory
       const factory = annotation.getFactory();
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot follow drag move without factory');
+      }
       // update annotation
       factory.updateAnnotationOnTranslation(annotation, diff);
       // update label
@@ -508,6 +529,9 @@ export class DrawShapeHandler {
     label.on('dragmove.draw', (/*event*/) => {
       // get factory
       const factory = annotation.getFactory();
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot udpate connector without factory');
+      }
       // update label
       factory.updateConnector(shapeGroup);
     });

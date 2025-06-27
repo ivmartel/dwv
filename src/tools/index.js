@@ -1,20 +1,21 @@
-import {WindowLevel} from './windowLevel';
-import {Scroll} from './scroll';
-import {ZoomAndPan} from './zoomPan';
-import {Opacity} from './opacity';
-import {Draw} from './draw';
-import {Floodfill} from './floodfill';
-import {Livewire} from './livewire';
+import {WindowLevel} from './windowLevel.js';
+import {Scroll} from './scroll.js';
+import {ZoomAndPan} from './zoomPan.js';
+import {Opacity} from './opacity.js';
+import {Draw} from './draw.js';
+import {Brush} from './brush.js';
+import {Floodfill} from './floodfill.js';
+import {Livewire} from './livewire.js';
 
-import {ArrowFactory} from './arrow';
-import {CircleFactory} from './circle';
-import {EllipseFactory} from './ellipse';
-import {ProtractorFactory} from './protractor';
-import {RectangleFactory} from './rectangle';
-import {RoiFactory} from './roi';
-import {RulerFactory} from './ruler';
+import {ArrowFactory} from './arrow.js';
+import {CircleFactory} from './circle.js';
+import {EllipseFactory} from './ellipse.js';
+import {ProtractorFactory} from './protractor.js';
+import {RectangleFactory} from './rectangle.js';
+import {RoiFactory} from './roi.js';
+import {RulerFactory} from './ruler.js';
 
-import {Filter, Threshold, Sobel, Sharpen} from './filter';
+import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
 
 /**
  * List of client provided tools to be added to
@@ -88,7 +89,7 @@ export const toolList = {};
  *     const group = new Konva.Group();
  *     group.name('love-group');
  *     group.visible(true);
- *     group.id(annotation.id);
+ *     group.id(annotation.trackingUid);
  *     group.add(shape);
  *     return group;
  *   }
@@ -128,6 +129,7 @@ export const defaultToolList = {
   ZoomAndPan,
   Opacity,
   Draw,
+  Brush,
   Filter,
   Floodfill,
   Livewire

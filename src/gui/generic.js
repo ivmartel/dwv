@@ -1,10 +1,5 @@
-import {logger} from '../utils/logger';
-import {Point2D} from '../math/point';
-
-// doc imports
-/* eslint-disable no-unused-vars */
-import {Annotation} from '../image/annotation';
-/* eslint-enable no-unused-vars */
+import {logger} from '../utils/logger.js';
+import {Point2D} from '../math/point.js';
 
 /**
  * List of interaction event names.
@@ -20,25 +15,6 @@ export const InteractionEventNames = [
   'touchmove',
   'touchend'
 ];
-
-/**
- * Overridalbe custom UI object for client defined UI.
- */
-export const customUI = {
-  /**
-   * Open a dialogue to edit roi data. Defaults to window.prompt.
-   *
-   * @param {Annotation} annotation The roi data.
-   * @param {Function} callback The callback to launch on dialogue exit.
-   */
-  openRoiDialog(annotation, callback) {
-    const textExpr = prompt('Label', annotation.textExpr);
-    if (textExpr !== null) {
-      annotation.textExpr = textExpr;
-      callback(annotation);
-    }
-  }
-};
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.

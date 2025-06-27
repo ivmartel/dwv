@@ -1,24 +1,23 @@
-import {Style} from '../gui/style';
+import {Style} from '../gui/style.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {Point2D} from '../math/point';
-import {Path} from '../math/path';
-import {Scissors} from '../math/scissors';
-import {guid} from '../math/stats';
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
-import {ListenerHandler} from '../utils/listen';
-import {ROI} from '../math/roi';
-import {Annotation} from '../image/annotation';
+} from '../gui/generic.js';
+import {Point2D} from '../math/point.js';
+import {Path} from '../math/path.js';
+import {Scissors} from '../math/scissors.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {logger} from '../utils/logger.js';
+import {ROI} from '../math/roi.js';
+import {Annotation} from '../image/annotation.js';
 import {
   AddAnnotationCommand,
   UpdateAnnotationCommand
-} from '../tools/drawCommands';
+} from '../tools/drawCommands.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
+import {App} from '../app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -96,13 +95,6 @@ export class Livewire {
   #tolerance = 5;
 
   /**
-   * Listener handler.
-   *
-   * @type {ListenerHandler}
-   */
-  #listenerHandler = new ListenerHandler();
-
-  /**
    * Clear the parent points list.
    *
    * @param {object} imageSize The image size.
@@ -137,21 +129,35 @@ export class Livewire {
    */
   #start(point, divId) {
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+
+    let viewLayer;
+    let drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      viewLayer = layerGroup.getActiveViewLayer();
+    } else {
+      viewLayer =
+        layerGroup.getViewLayerById(drawLayer.getReferenceLayerId());
+    }
+
     const imageSize = viewLayer.getViewController().getImageSize();
+
+    this.#scissors.setDimensions(
+      imageSize.get(0),
+      imageSize.get(1));
+    this.#scissors.setData(viewLayer.getImageData().data);
+
     const index = viewLayer.displayToPlaneIndex(point);
 
     // first time
     if (!this.#started) {
+      this.#annotation = undefined;
       this.#started = true;
       this.#startPoint = new Point2D(index.get(0), index.get(1));
       // clear vars
       this.#clearPaths();
       this.#clearParentPoints(imageSize);
       // get draw layer
-      let drawLayer = layerGroup.getActiveDrawLayer();
       if (typeof drawLayer === 'undefined') {
-        const viewLayer = layerGroup.getActiveViewLayer();
         const refDataId = viewLayer.getDataId();
         // create new data
         const data = this.#app.createAnnotationData(refDataId);
@@ -160,7 +166,7 @@ export class Livewire {
         // get draw layer
         drawLayer = layerGroup.getActiveDrawLayer();
         // set active to bind to toolboxController
-        layerGroup.setActiveDrawLayerByDataId(drawLayer.getDataId());
+        layerGroup.setActiveLayerByDataId(drawLayer.getDataId());
       }
       // update zoom scale
       this.#style.setZoomScale(
@@ -202,7 +208,17 @@ export class Livewire {
       return;
     }
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const drawLayer = layerGroup.getActiveDrawLayer();
+    if (typeof drawLayer === 'undefined') {
+      logger.warn('No draw layer to update livewire');
+      return;
+    }
+    const viewLayer = layerGroup.getViewLayerById(
+      drawLayer.getReferenceLayerId());
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to update livewire');
+      return;
+    }
     const index = viewLayer.displayToPlaneIndex(point);
 
     // set the point to find the path to
@@ -243,7 +259,6 @@ export class Livewire {
     }
     this.#currentPath.appenPath(this.#path);
 
-    const drawLayer = layerGroup.getActiveDrawLayer();
     const drawController = drawLayer.getDrawController();
 
     const newMathShape = new ROI(this.#currentPath.pointArray);
@@ -253,9 +268,7 @@ export class Livewire {
       // create annotation
       this.#annotation = new Annotation();
       this.#annotation.colour = this.#style.getLineColour();
-      this.#annotation.id = guid();
 
-      const viewLayer = layerGroup.getActiveViewLayer();
       const viewController = viewLayer.getViewController();
       this.#annotation.init(viewController);
 
@@ -387,16 +400,6 @@ export class Livewire {
   activate(bool) {
     // start scissors if displayed
     if (bool) {
-      const layerGroup = this.#app.getActiveLayerGroup();
-      const viewLayer = layerGroup.getActiveViewLayer();
-
-      //scissors = new Scissors();
-      const imageSize = viewLayer.getViewController().getImageSize();
-      this.#scissors.setDimensions(
-        imageSize.get(0),
-        imageSize.get(1));
-      this.#scissors.setData(viewLayer.getImageData().data);
-
       // init with the app window scale
       this.#style.setBaseScale(this.#app.getBaseScale());
       // set the default to the first in the list
@@ -411,45 +414,6 @@ export class Livewire {
     // does nothing
   }
 
-  /**
-   * Get the list of event names that this tool can fire.
-   *
-   * @returns {Array} The list of event names.
-   */
-  getEventNames() {
-    return ['drawcreate', 'drawchange', 'drawmove', 'drawdelete'];
-  }
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *    event type, will be called with the fired event.
-   */
-  addEventListener(type, callback) {
-    this.#listenerHandler.add(type, callback);
-  }
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {Function} callback The function associated with the provided
-   *   event type.
-   */
-  removeEventListener(type, callback) {
-    this.#listenerHandler.remove(type, callback);
-  }
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   */
-  // #fireEvent = (event) => {
-  //   this.#listenerHandler.fireEvent(event);
-  // };
 
   /**
    * Set the tool live features: shape colour.

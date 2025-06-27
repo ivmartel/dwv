@@ -1,17 +1,17 @@
 import {
   getCode,
   getDicomCodeItem
-} from './dicomCode';
+} from './dicomCode.js';
 import {
   getMeasuredValue,
   getDicomMeasuredValueItem
-} from './dicomMeasuredValue';
+} from './dicomMeasuredValue.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
-import {MeasuredValue} from './dicomMeasuredValue';
-import {DicomCode} from './dicomCode';
+import {DataElement} from './dataElement.js';
+import {MeasuredValue} from './dicomMeasuredValue.js';
+import {DicomCode} from './dicomCode.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -29,12 +29,12 @@ const TagKeys = {
  */
 export class NumericMeasurement {
   /**
-   * @type {MeasuredValue}
+   * @type {MeasuredValue|undefined}
    */
   measuredValue;
 
   /**
-   * @type {DicomCode}
+   * @type {DicomCode|undefined}
    */
   numericValueQualifierCode;
 
@@ -44,7 +44,10 @@ export class NumericMeasurement {
    * @returns {string} The object as string.
    */
   toString() {
-    let res = this.measuredValue.toString();
+    let res = '';
+    if (typeof this.measuredValue !== 'undefined') {
+      res += this.measuredValue.toString();
+    }
     if (typeof this.numericValueQualifierCode !== 'undefined') {
       res += ' ' + this.numericValueQualifierCode.toString();
     }

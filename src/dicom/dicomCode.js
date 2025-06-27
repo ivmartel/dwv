@@ -1,6 +1,6 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -71,18 +71,18 @@ export class DicomCode {
 }
 
 /**
- * Check if two code objects are equal.
+ * Check if two code objects are equal: just checks
+ * schemeDesignator and value.
  *
  * @param {DicomCode} code1 The first code.
  * @param {DicomCode} code2 The second code.
  * @returns {boolean} True if both codes are equal.
  */
 export function isEqualCode(code1, code2) {
-  return Object.keys(code1).length === Object.keys(code2).length &&
-  Object.keys(code1).every(key =>
-    Object.prototype.hasOwnProperty.call(code2, key) &&
-    code1[key] === code2[key]
-  );
+  return typeof code1 !== 'undefined' &&
+    typeof code2 !== 'undefined' &&
+    code1.schemeDesignator === code2.schemeDesignator &&
+    code1.value === code2.value;
 }
 
 /**
@@ -152,23 +152,94 @@ export function getDicomCodeItem(code) {
  * DICOM codes.
  * List: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/chapter_d.html}.
  */
-const DcmCodes = {
-  111030: 'Image Region',
-  112039: 'Tracking Identifier',
-  112040: 'Tracking Unique Identifier',
-  113048: 'Pixel by pixel Maximum',
-  113049: 'Pixel by pixel mean',
-  113051: 'Pixel by pixel Minimum',
-  113061: 'Standard Deviation',
-  113076: 'Segmentation',
-  121055: 'Path',
-  121207: 'Height',
-  121322: 'Source image for image processing operation',
-  121324: 'Source Image',
-  122438: 'Reference Points',
-  125007: 'Measurement Group',
-  125309: 'Short label',
-  128773: 'Reference Geometry'
+export const DcmCodes = {
+  CADProcessingAndFindingsSummary: {
+    value: '111017', meaning: 'CAD Processing and Findings Summary'
+  },
+  ImageRegion: {
+    value: '111030', meaning: 'Image Region'
+  },
+  SingleImageFinding: {
+    value: '111059', meaning: 'Single Image Finding'
+  },
+  SelectedRegion: {
+    value: '111099', meaning: 'Selected region'
+  },
+  AllAlgorithmsSucceededWithFindings: {
+    value: '111242', meaning: 'All algorithms succeeded; with findings'
+  },
+  ChestCADReport: {
+    value: '112000', meaning: 'Chest CAD Report'
+  },
+  ResponseEvaluation: {
+    value: '112020', meaning: 'Response Evaluation'
+  },
+  ResponseEvaluationMethod: {
+    value: '112021', meaning: 'Response Evaluation Method'
+  },
+  RECIST: {
+    value: '112022', meaning: 'RECIST'
+  },
+  TrackingIdentifier: {
+    value: '112039', meaning: 'Tracking Identifier'
+  },
+  MeasurementOfResponse: {
+    value: '112051', meaning: 'Measurement of Response'
+  },
+  TrackingUniqueIdentifier: {
+    value: '112040', meaning: 'Tracking Unique Identifier'
+  },
+  CurrentResponse: {
+    value: '112048', meaning: 'Current Response'
+  },
+  PixelByPixelMaximum: {
+    value: '113048', meaning: 'Pixel by pixel Maximum'
+  },
+  PixelByPixelMean: {
+    value: '113049', meaning: 'Pixel by pixel mean'
+  },
+  PixelByPixelMinimum: {
+    value: '113051', meaning: 'Pixel by pixel Minimum'
+  },
+  StandardDeviation: {
+    value: '113061', meaning: 'Standard Deviation'
+  },
+  Segmentation: {
+    value: '113076', meaning: 'Segmentation'
+  },
+  Path: {
+    value: '121055', meaning: 'Path'
+  },
+  Comment: {
+    value: '121106', meaning: 'Comment'
+  },
+  Height: {
+    value: '121207', meaning: 'Height'
+  },
+  SourceImageForImageProcessingOperation: {
+    value: '121322', meaning: 'Source image for image processing operation'
+  },
+  SourceImage: {
+    value: '121324', meaning: 'Source Image'
+  },
+  ReferencePoints: {
+    value: '122438', meaning: 'Reference Points'
+  },
+  MeasurementGroup: {
+    value: '125007', meaning: 'Measurement Group'
+  },
+  ShortLabel: {
+    value: '125309', meaning: 'Short Label'
+  },
+  ImagingMeasurementReport: {
+    value: '126000', meaning: 'Imaging Measurement Report'
+  },
+  ImagingMeasurements: {
+    value: '126010', meaning: 'Imaging Measurements'
+  },
+  ReferenceGeometry: {
+    value: '128773', meaning: 'Reference Geometry'
+  }
 };
 
 /**
@@ -220,6 +291,19 @@ const UcumCodes = {
 };
 
 /**
+ * Get a DICOM code from a value and meaning.
+ *
+ * @param {object} code The code value as {value, meaning}.
+ * @returns {DicomCode} The DICOM code.
+ */
+export function getDcmDicomCode(code) {
+  const dcmCode = new DicomCode(code.meaning);
+  dcmCode.schemeDesignator = 'DCM';
+  dcmCode.value = code.value;
+  return dcmCode;
+}
+
+/**
  * Get a DICOM code from a value (~id).
  *
  * @param {string} value The code value.
@@ -228,9 +312,7 @@ const UcumCodes = {
  */
 function getDicomCode(value, scheme) {
   let meaning;
-  if (scheme === 'DCM') {
-    meaning = DcmCodes[value];
-  } else if (scheme === 'SCT') {
+  if (scheme === 'SCT') {
     meaning = SctCodes[value];
   } else if (scheme === 'UCUM') {
     meaning = UcumCodes[value];
@@ -243,95 +325,13 @@ function getDicomCode(value, scheme) {
   }
   return code;
 }
-
-/**
- * Get a measurement group DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getMeasurementGroupCode() {
-  return getDicomCode('125007', 'DCM');
-}
-
-/**
- * Get an image region DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getImageRegionCode() {
-  return getDicomCode('111030', 'DCM');
-}
-
-/**
- * Get a reference geometry DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getReferenceGeometryCode() {
-  return getDicomCode('128773', 'DCM');
-}
-
-/**
- * Get a path DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getPathCode() {
-  return getDicomCode('121055', 'DCM');
-}
-
-/**
- * Get a source image DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getSourceImageCode() {
-  return getDicomCode('121324', 'DCM');
-}
-
-/**
- * Get a tracking identifier DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getTrackingIdentifierCode() {
-  return getDicomCode('112039', 'DCM');
-}
-
 /**
  * Get a segmentation DICOM code.
  *
  * @returns {DicomCode} The code.
  */
 export function getSegmentationCode() {
-  return getDicomCode('113076', 'DCM');
-}
-
-/**
- * Get a source image for processing DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getSourceImageForProcessingCode() {
-  return getDicomCode('121322', 'DCM');
-}
-
-/**
- * Get a short label DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getShortLabelCode() {
-  return getDicomCode('125309', 'DCM');
-}
-
-/**
- * Get a reference points DICOM code.
- *
- * @returns {DicomCode} The code.
- */
-export function getReferencePointsCode() {
-  return getDicomCode('122438', 'DCM');
+  return getDcmDicomCode(DcmCodes.Segmentation);
 }
 
 /**
@@ -401,9 +401,9 @@ export function getQuantificationName(code) {
 
 /**
  * Quantification unit to UCUM key. Associated tags:
- * - Rescale type {@link https://dicom.innolitics.com/ciods/computed-radiography-image/modality-lut/00281054},
- * - Units {@link https://dicom.innolitics.com/ciods/positron-emission-tomography-image/pet-series/00541001}.
- * - SUV {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_85.html}.
+ * - Rescale type {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.html#sect_C.11.1.1.2},
+ * - Units {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.8.9.html#sect_C.8.9.1.1.3}.
+ * - SUV {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part16/sect_CID_85.html}.
  */
 const QuantificationUnit2UcumKey = {
   'unit.mm': 'mm',

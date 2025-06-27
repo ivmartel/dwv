@@ -2,7 +2,7 @@ import {
   is32bitVLVR,
   isCharSetStringVR,
   vrTypes
-} from './dictionary';
+} from './dictionary.js';
 import {
   Tag,
   getTagFromDictionary,
@@ -11,32 +11,23 @@ import {
   getItemDelimitationItemTag,
   getSequenceDelimitationItemTag,
   getFileMetaInformationGroupLengthTag,
-  isPixelDataTag,
+  isAnyPixelDataTag,
   isItemTag,
   isItemDelimitationItemTag,
   tagCompareFunction
-} from './dicomTag';
+} from './dicomTag.js';
 import {
-  getDwvVersion,
+  getDwvUIDPrefix,
+  getImplementationClassUID,
+  getImplementationVersionName,
   isImplicitTransferSyntax,
   isBigEndianTransferSyntax,
   getDataElementPrefixByteSize
-} from './dicomParser';
-import {DataElement} from './dataElement';
-import {DataWriter} from './dataWriter';
-import {DataReader} from './dataReader';
-import {logger} from '../utils/logger';
-
-/**
- * Get the dwv UID prefix.
- * Issued by Medical Connections Ltd (www.medicalconnections.co.uk)
- *   on 25/10/2017.
- *
- * @returns {string} The dwv UID prefix.
- */
-function getDwvUIDPrefix() {
-  return '1.2.826.0.1.3680043.9.7278.1';
-}
+} from './dicomParser.js';
+import {DataElement} from './dataElement.js';
+import {DataWriter} from './dataWriter.js';
+import {DataReader} from './dataReader.js';
+import {logger} from '../utils/logger.js';
 
 // local generated uid counter
 let _uidCount = 0;
@@ -120,34 +111,30 @@ export function getDefaultAnonymisationRules() {
  */
 export function getUID(tagName) {
   const prefix = getDwvUIDPrefix() + '.';
-  let uid = '';
-  if (tagName === 'ImplementationClassUID') {
-    uid = prefix + getDwvVersion();
-  } else {
-    // date (only numbers), do not keep milliseconds
-    const date = (new Date()).toISOString().replace(/\D/g, '');
-    const datePart = '.' + date.substring(0, 14);
-    // count
-    _uidCount += 1;
-    const countPart = '.' + _uidCount;
+  // date (only numbers), do not keep milliseconds
+  const date = (new Date()).toISOString().replace(/\D/g, '');
+  const datePart = '.' + date.substring(0, 14);
+  // count
+  _uidCount += 1;
+  const countPart = '.' + _uidCount;
 
-    // uid = prefix . tag . date . count
-    uid = prefix;
+  // uid = prefix . tag . date . count
+  let uid = prefix;
 
-    // limit tag part to not exceed 64 length
-    const nonTagLength = prefix.length + countPart.length + datePart.length;
-    const leni = Math.min(tagName.length, 64 - nonTagLength);
-    if (leni > 1) {
-      let tagNumber = '';
-      for (let i = 0; i < leni; ++i) {
-        tagNumber += tagName.charCodeAt(i);
-      }
-      uid += tagNumber.substring(0, leni);
+  // limit tag part to not exceed 64 length
+  const nonTagLength = prefix.length + countPart.length + datePart.length;
+  const leni = Math.min(tagName.length, 64 - nonTagLength);
+  if (leni > 1) {
+    let tagNumber = '';
+    for (let i = 0; i < leni; ++i) {
+      tagNumber += tagName.charCodeAt(i);
     }
-
-    // finish
-    uid += datePart + countPart;
+    uid += tagNumber.substring(0, leni);
   }
+
+  // finish
+  uid += datePart + countPart;
+
   return uid;
 }
 
@@ -224,7 +211,7 @@ function getVrPad(vr) {
  * @returns {Uint8Array} The new array.
  */
 function uint8ArrayPush(arr, value) {
-  const newArr = new Uint8Array(arr.length + 1);
+  const newArr = new Uint8Array(arr.length + value.length);
   newArr.set(arr);
   newArr.set(value, arr.length);
   return newArr;
@@ -245,8 +232,8 @@ function padOBValue(value) {
       typeof value[0].length !== 'undefined') {
       // handle array of array
       let size = 0;
-      for (let i = 0; i < value.length; ++i) {
-        size += value[i].length;
+      for (const valueItem of value) {
+        size += valueItem.length;
       }
       if (!isEven(size)) {
         value[value.length - 1] = uint8ArrayPush(
@@ -272,21 +259,24 @@ function padOBValue(value) {
  * @returns {object} A typed array containing all values.
  */
 function flattenArrayOfTypedArrays(initialArray) {
-  const initialArrayLength = initialArray.length;
-  const arrayLength = initialArray[0].length;
-  // If this is not a array of arrays, just return the initial one:
-  if (typeof arrayLength === 'undefined') {
+  // if this is not a array of arrays, just return the initial one
+  if (typeof initialArray[0].length === 'undefined') {
     return initialArray;
   }
-
-  const flattenendArrayLength = initialArrayLength * arrayLength;
-
-  const flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
-
-  for (let i = 0; i < initialArrayLength; i++) {
-    const indexFlattenedArray = i * arrayLength;
-    flattenedArray.set(initialArray[i], indexFlattenedArray);
+  // calculate full length
+  let flattenendArrayLength = 0;
+  for (const subArray of initialArray) {
+    flattenendArrayLength += subArray.length;
   }
+  // create flattened
+  const flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
+  // fill it
+  let offset = 0;
+  for (const subArray of initialArray) {
+    flattenedArray.set(subArray, offset);
+    offset += subArray.length;
+  }
+
   return flattenedArray;
 }
 
@@ -548,19 +538,23 @@ export class DicomWriter {
    * @param {number} byteOffset The offset to start writing from.
    * @param {Array} items The list of items to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writeDataElementItems(
-    writer, byteOffset, items, isImplicit) {
-    let item;
-    for (let i = 0; i < items.length; ++i) {
-      item = items[i];
+    writer, byteOffset, items, isImplicit, bitsAllocated) {
+
+    const isItemTagWithNoVR = function (item) {
+      return isItemTag(item.tag) && item.vr === 'NONE';
+    };
+
+    for (const item of items) {
       if (item.length === 0) {
         continue;
       }
       // item element (create new to not modify original)
       let undefinedLength = false;
-      const itemTag = item.find((subItem) => isItemTag(subItem.tag));
+      const itemTag = item.find((subItem) => isItemTagWithNoVR(subItem));
       if (typeof itemTag !== 'undefined' &&
         typeof itemTag.undefinedLength !== 'undefined') {
         undefinedLength = itemTag.undefinedLength;
@@ -573,10 +567,10 @@ export class DicomWriter {
         writer, itemElement, byteOffset, isImplicit);
       // write rest
       for (const subItem of item) {
-        if (!isItemTag(subItem.tag) &&
+        if (!isItemTagWithNoVR(subItem) &&
           !isItemDelimitationItemTag(subItem.tag)) {
           byteOffset = this.#writeDataElement(
-            writer, subItem, byteOffset, isImplicit);
+            writer, subItem, byteOffset, isImplicit, bitsAllocated);
         }
       }
       // item delimitation
@@ -600,20 +594,29 @@ export class DicomWriter {
    * @param {DataWriter} writer The raw data writer.
    * @param {DataElement} element The element to write.
    * @param {number} byteOffset The offset to start writing from.
-   * @param {Array} value The array to write.
+   * @param {Array|Uint8Array} value The array to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writeDataElementValue(
-    writer, element, byteOffset, value, isImplicit) {
+    writer, element, byteOffset, value, isImplicit, bitsAllocated) {
 
     const startOffset = byteOffset;
 
     if (element.vr === 'NONE') {
       // nothing to do!
     } else if (value instanceof Uint8Array) {
-      // binary data has been expanded 8 times at read
-      if (value.length === 8 * element.vl) {
+      // binary data
+      if (typeof bitsAllocated !== 'undefined' && bitsAllocated === 1) {
+        // padd if length is not a multiple of 8
+        if (value.length % 8 !== 0) {
+          logger.debug('Padding binary pixel data');
+          const newSize = Math.ceil(value.length / 8) * 8;
+          const padd = new Array(newSize - value.length);
+          padd.fill(0);
+          value = uint8ArrayPush(value, padd);
+        }
         byteOffset = writer.writeBinaryArray(byteOffset, value);
       } else {
         byteOffset = writer.writeUint8Array(byteOffset, value);
@@ -663,8 +666,8 @@ export class DicomWriter {
         byteOffset = this.#writeDataElementItems(
           writer, byteOffset, value, isImplicit);
       } else if (element.vr === 'AT') {
-        for (let i = 0; i < value.length; ++i) {
-          const hexString = value[i] + '';
+        for (const valueItem of value) {
+          const hexString = valueItem + '';
           const hexString1 = hexString.substring(1, 5);
           const hexString2 = hexString.substring(6, 10);
           const dec1 = parseInt(hexString1, 16);
@@ -710,10 +713,11 @@ export class DicomWriter {
    * @param {number} byteOffset The offset to start writing from.
    * @param {Array} value The array to write.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writePixelDataElementValue(
-    writer, element, byteOffset, value, isImplicit) {
+    writer, element, byteOffset, value, isImplicit, bitsAllocated) {
     // undefined length flag
     let undefinedLength = false;
     if (typeof element.undefinedLength !== 'undefined') {
@@ -728,29 +732,29 @@ export class DicomWriter {
       }
       // write
       byteOffset = this.#writeDataElementValue(
-        writer, element, byteOffset, finalValue, isImplicit);
+        writer, element, byteOffset, finalValue, isImplicit, bitsAllocated);
     } else {
       // pixel data as sequence
-      const item = {};
+      const sqItem = [];
       // first item: basic offset table
-      item['FFFEE000'] = {
+      sqItem.push({
         tag: getItemTag(),
         vr: 'NONE',
         vl: 0,
         value: []
-      };
+      });
       // data
-      for (let i = 0; i < value.length; ++i) {
-        item[i] = {
+      for (const valueItem of value) {
+        sqItem.push({
           tag: getItemTag(),
           vr: element.vr,
-          vl: value[i].length,
-          value: value[i]
-        };
+          vl: valueItem.length,
+          value: valueItem
+        });
       }
       // write
       byteOffset = this.#writeDataElementItems(
-        writer, byteOffset, [item], isImplicit);
+        writer, byteOffset, [sqItem], isImplicit, bitsAllocated);
     }
 
     // return new offset
@@ -764,10 +768,11 @@ export class DicomWriter {
    * @param {DataElement} element The DICOM data element to write.
    * @param {number} byteOffset The offset to start writing from.
    * @param {boolean} isImplicit Is the DICOM VR implicit?
+   * @param {number} [bitsAllocated] Bits allocated used for pixel data.
    * @returns {number} The new offset position.
    */
   #writeDataElement(
-    writer, element, byteOffset, isImplicit) {
+    writer, element, byteOffset, isImplicit, bitsAllocated) {
     const isTagWithVR = element.tag.isWithVR();
     const is32bitVL = (isImplicit || !isTagWithVR)
       ? true : is32bitVLVR(element.vr);
@@ -794,7 +799,7 @@ export class DicomWriter {
 
     let undefinedLengthSequence = false;
     if (element.vr === 'SQ' ||
-      isPixelDataTag(element.tag)) {
+      isAnyPixelDataTag(element.tag)) {
       if (typeof element.undefinedLength !== 'undefined') {
         undefinedLengthSequence = element.undefinedLength;
       }
@@ -825,9 +830,9 @@ export class DicomWriter {
       value = [];
     }
     // write
-    if (isPixelDataTag(element.tag)) {
+    if (isAnyPixelDataTag(element.tag)) {
       byteOffset = this.#writePixelDataElementValue(
-        writer, element, byteOffset, value, isImplicit);
+        writer, element, byteOffset, value, isImplicit, bitsAllocated);
     } else {
       byteOffset = this.#writeDataElementValue(
         writer, element, byteOffset, value, isImplicit);
@@ -896,9 +901,9 @@ export class DicomWriter {
 
     // loop through elements to get the buffer size
     const keys = Object.keys(dataElements);
-    for (let i = 0, leni = keys.length; i < leni; ++i) {
-      const originalElement = dataElements[keys[i]];
-      originalElement.tag = getTagFromKey(keys[i]);
+    for (const key of keys) {
+      const originalElement = dataElements[key];
+      originalElement.tag = getTagFromKey(key);
       element = this.getElementToWrite(originalElement);
       if (element !== null &&
         !fmiglTag.equals(element.tag) &&
@@ -983,8 +988,7 @@ export class DicomWriter {
     // ImplementationClassUID
     const icUID = getDataElement('ImplementationClassUID');
     let icUIDSize = getDataElementPrefixByteSize(icUID.vr, false);
-    const icUIDValue =
-      getUID('ImplementationClassUID').replace('-beta', '.99');
+    const icUIDValue = getImplementationClassUID();
     icUIDSize += this.#setElementValue(icUID, [icUIDValue], false);
     metaElements.push(icUID);
     metaLength += icUIDSize;
@@ -992,8 +996,7 @@ export class DicomWriter {
     // ImplementationVersionName
     const ivn = getDataElement('ImplementationVersionName');
     let ivnSize = getDataElementPrefixByteSize(ivn.vr, false);
-    const dwvVersion = getDwvVersion().replace('-beta', '.99');
-    const ivnValue = 'DWV_' + dwvVersion;
+    const ivnValue = getImplementationVersionName();
     ivnSize += this.#setElementValue(ivn, [ivnValue], false);
     metaElements.push(ivn);
     metaLength += ivnSize;
@@ -1024,9 +1027,9 @@ export class DicomWriter {
     // FileMetaInformationGroupLength
     offset = this.#writeDataElement(metaWriter, fmigl, offset, false);
     // write meta
-    for (let j = 0, lenj = metaElements.length; j < lenj; ++j) {
+    for (const metaElement of metaElements) {
       offset = this.#writeDataElement(
-        metaWriter, metaElements[j], offset, false);
+        metaWriter, metaElement, offset, false);
     }
 
     // check meta position
@@ -1039,9 +1042,9 @@ export class DicomWriter {
     }
 
     // write non meta
-    for (let k = 0, lenk = rawElements.length; k < lenk; ++k) {
+    for (const rawElement of rawElements) {
       offset = this.#writeDataElement(
-        dataWriter, rawElements[k], offset, isImplicit);
+        dataWriter, rawElement, offset, isImplicit, bitsAllocated);
     }
 
     // check final position
@@ -1081,8 +1084,8 @@ export class DicomWriter {
         }
 
         // items
-        for (let i = 0; i < value.length; ++i) {
-          const oldItemElements = value[i];
+        for (const valueItem of value) {
+          const oldItemElements = valueItem;
           const newItemElements = [];
           let subSize = 0;
 
@@ -1101,8 +1104,7 @@ export class DicomWriter {
 
           // elements
           const itemKeys = Object.keys(oldItemElements);
-          for (let j = 0, lenj = itemKeys.length; j < lenj; ++j) {
-            const itemKey = itemKeys[j];
+          for (const itemKey of itemKeys) {
             const subElement = oldItemElements[itemKey];
             subElement.tag = getTagFromKey(itemKey);
 
@@ -1190,11 +1192,11 @@ export class DicomWriter {
       } else if (element.vr === 'xs') {
         size = value.length * Uint16Array.BYTES_PER_ELEMENT;
       } else if (isTypedArrayVr(element.vr) || element.vr === 'ox') {
-        if (isPixelDataTag(element.tag) &&
+        if (isAnyPixelDataTag(element.tag) &&
           Array.isArray(value)) {
           size = 0;
-          for (let b = 0; b < value.length; ++b) {
-            size += value[b].length;
+          for (const valueItem of value) {
+            size += valueItem.length;
           }
         } else {
           size = value.length;
@@ -1202,7 +1204,7 @@ export class DicomWriter {
 
         // convert size to bytes
         const vrType = vrTypes[element.vr];
-        if (isPixelDataTag(element.tag) || element.vr === 'ox') {
+        if (isAnyPixelDataTag(element.tag) || element.vr === 'ox') {
           if (element.undefinedLength) {
             const itemPrefixSize =
               getDataElementPrefixByteSize('NONE', isImplicit);
@@ -1218,7 +1220,8 @@ export class DicomWriter {
             if (typeof bitsAllocated !== 'undefined') {
               if (bitsAllocated === 1) {
                 // binary data
-                size /= 8;
+                // (ceil to get integer)
+                size = Math.ceil(size / 8);
               } else if (bitsAllocated === 16) {
                 size *= Uint16Array.BYTES_PER_ELEMENT;
               }
@@ -1373,9 +1376,9 @@ function getBpeForVrType(vrType) {
 export function getElementsFromJSONTags(simpleTags) {
   const keys = Object.keys(simpleTags);
   const dataElements = {};
-  for (let k = 0, len = keys.length; k < len; ++k) {
+  for (const key of keys) {
     // get the DICOM element definition from its name
-    const tag = getTagFromDictionary(keys[k]);
+    const tag = getTagFromDictionary(key);
     if (typeof tag === 'undefined') {
       continue;
     }
@@ -1383,19 +1386,18 @@ export function getElementsFromJSONTags(simpleTags) {
     // tag value
     let value;
     let undefinedLength = false;
-    const simpleTag = simpleTags[keys[k]];
+    const simpleTag = simpleTags[key];
     if (vr === 'SQ') {
       const items = [];
       if (typeof simpleTag.undefinedLength !== 'undefined') {
         undefinedLength = simpleTag.undefinedLength;
       }
-      if (typeof simpleTag.value !== 'undefined' &&
-        simpleTag.value !== null) {
-        for (let i = 0; i < simpleTag.value.length; ++i) {
-          items.push(getElementsFromJSONTags(simpleTag.value[i]));
+      if (Array.isArray(simpleTag.value)) {
+        for (const item of simpleTag.value) {
+          items.push(getElementsFromJSONTags(item));
         }
       } else {
-        logger.trace('Undefined or null simpleTag SQ value.');
+        logger.debug('Non array simpleTag SQ value');
       }
       value = items;
     } else {

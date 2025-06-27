@@ -1,13 +1,13 @@
-import {Point2D} from './point';
+import {Point2D} from './point.js';
 import {
   isSimilar,
   REAL_WORLD_EPSILON,
-} from './matrix';
+} from './matrix.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController';
-import {Scalar2D} from './scalar';
+import {ViewController} from '../app/viewController.js';
+import {Scalar2D} from './scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -183,7 +183,10 @@ export class Line {
     const spacing2D = viewController.get2DSpacing();
     const length = this.getWorldLength(spacing2D);
     if (length !== null) {
-      quant.length = {value: length, unit: 'unit.mm'};
+      quant.length = {
+        value: length,
+        unit: viewController.getLengthUnit()
+      };
     }
     // return
     return quant;

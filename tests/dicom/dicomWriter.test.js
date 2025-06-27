@@ -1,22 +1,22 @@
-import {DicomParser} from '../../src/dicom/dicomParser';
+import {DicomParser} from '../../src/dicom/dicomParser.js';
 import {
   DicomWriter,
   getElementsFromJSONTags,
   getUID
-} from '../../src/dicom/dicomWriter';
+} from '../../src/dicom/dicomWriter.js';
 import {
   getTagFromDictionary,
   getPixelDataTag
-} from '../../src/dicom/dicomTag';
+} from '../../src/dicom/dicomTag.js';
 import {
   dictionary,
   transferSyntaxKeywords
-} from '../../src/dicom/dictionary';
-import {b64urlToArrayBuffer} from './utils';
+} from '../../src/dicom/dictionary.js';
+import {b64urlToArrayBuffer} from './utils.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {WriterRule} from '../../src/dicom/dicomWriter';
+import {WriterRule} from '../../src/dicom/dicomWriter.js';
 /* eslint-enable no-unused-vars */
 
 // test data

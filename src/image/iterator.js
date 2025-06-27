@@ -1,11 +1,10 @@
-import {Index} from '../math/index';
-import {Point2D} from '../math/point';
+import {Index} from '../math/index.js';
+import {Point2D} from '../math/point.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {Point} from '../math/point';
-import {Matrix33} from '../math/matrix';
+import {Image} from './image.js';
+import {Matrix33} from '../math/matrix.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -373,23 +372,23 @@ export function getIteratorValues(iterator) {
  * Get a slice index iterator.
  *
  * @param {Image} image The image to parse.
- * @param {Index} position The current position.
+ * @param {Index} index The current index.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Matrix33} viewOrientation The view orientation.
  * @returns {object} The slice iterator.
  */
 export function getSliceIterator(
-  image, position, isRescaled, viewOrientation) {
+  image, index, isRescaled, viewOrientation) {
   const size = image.getGeometry().getSize();
   // zero-ify non direction index
   let dirMax2Index = 2;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
     dirMax2Index = viewOrientation.getColAbsMax(2).index;
   }
-  const posValues = position.getValues();
+  const posValues = index.getValues();
   // keep the main direction and any other than 3D
-  const indexFilter = function (element, index) {
-    return (index === dirMax2Index || index > 2) ? element : 0;
+  const indexFilter = function (element, i) {
+    return (i === dirMax2Index || i > 2) ? element : 0;
   };
   const posStart = new Index(posValues.map(indexFilter));
   let start = size.indexToOffset(posStart);
@@ -499,7 +498,7 @@ export function getSliceIterator(
  * Get a slice index iterator for a rectangular region.
  *
  * @param {Image} image The image to parse.
- * @param {Index} index The current position.
+ * @param {Index} index The current index.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Point2D} min The minimum position (optional).
  * @param {Point2D} max The maximum position (optional).
@@ -558,7 +557,7 @@ export function getRegionSliceIterator(
  * Get a slice index iterator for a rectangular region.
  *
  * @param {Image} image The image to parse.
- * @param {Index} index The current position.
+ * @param {Index} index The current index.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {number[][][]} regions An array of [x, y] pairs (min, max).
  * @returns {object|undefined} The slice iterator.
@@ -629,28 +628,28 @@ export function getVariableRegionSliceIterator(
 }
 
 /**
- * Get a colour iterator. The input array defines the colours and
+ * Get a multiple value iterator. The input array defines the values and
  * their start index.
  *
  * Ref: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols}.
  *
- * @param {Array} colours An array of {index, colour} pairs.
+ * @param {Array} values An array of {index, value} pairs.
  * @param {number} end The end of the range (excluded).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-export function colourRange(colours, end) {
+export function valueRange(values, end) {
   let nextIndex = 0;
-  let nextColourIndex = 0;
+  let nextValueIndex = 0;
   // result
   return {
     next: function () {
       if (nextIndex < end) {
-        if (nextColourIndex + 1 < colours.length &&
-          nextIndex >= colours[nextColourIndex + 1].index) {
-          ++nextColourIndex;
+        if (nextValueIndex + 1 < values.length &&
+          nextIndex >= values[nextValueIndex + 1].index) {
+          ++nextValueIndex;
         }
         const result = {
-          value: colours[nextColourIndex].colour,
+          value: values[nextValueIndex].value,
           done: false,
           index: nextIndex
         };

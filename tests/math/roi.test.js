@@ -1,5 +1,5 @@
-import {Point2D} from '../../src/math/point';
-import {ROI} from '../../src/math/roi';
+import {Point2D} from '../../src/math/point.js';
+import {ROI} from '../../src/math/roi.js';
 
 /**
  * Tests for the 'math/roi.js' file.

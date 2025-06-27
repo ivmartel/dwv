@@ -1,23 +1,25 @@
-import {Vector3D} from './vector';
-import {Point3D} from './point';
-import {Index} from './index';
-import {logger} from '../utils/logger';
+import {Vector3D} from './vector.js';
+import {Point3D} from './point.js';
+import {Index} from './index.js';
+import {logger} from '../utils/logger.js';
 
 // Number.EPSILON is difference between 1 and the smallest
 // floating point number greater than 1
 // -> ~2e-16
 // BIG_EPSILON -> ~2e-12
 export const BIG_EPSILON = Number.EPSILON * 1e4;
+export const BIG_EPSILON_EXPONENT = 12;
 // 'real world', for example when comparing positions
 export const REAL_WORLD_EPSILON = 1e-4;
+export const REAL_WORLD_EXPONENT = 5;
 
 /**
  * Check if two numbers are similar.
  *
  * @param {number} a The first number.
  * @param {number} b The second number.
- * @param {number} tol The comparison tolerance,
- *   default to Number.EPSILON.
+ * @param {number} [tol] Optional comparison tolerance,
+ *   defaults to Number.EPSILON.
  * @returns {boolean} True if similar.
  */
 export function isSimilar(a, b, tol) {
@@ -81,16 +83,35 @@ export class Matrix33 {
    * Check for Matrix33 equality.
    *
    * @param {Matrix33} rhs The other matrix to compare to.
-   * @param {number} [p] A numeric expression for the precision to use in check
-   *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
    * @returns {boolean} True if both matrices are equal.
    */
-  equals(rhs, p) {
+  equals(rhs) {
     // TODO: add type check
     // check values
     for (let i = 0; i < 3; ++i) {
       for (let j = 0; j < 3; ++j) {
-        if (!isSimilar(this.get(i, j), rhs.get(i, j), p)) {
+        if (this.get(i, j) !== rhs.get(i, j)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Check for Matrix33 similarity.
+   *
+   * @param {Matrix33} rhs The other matrix to compare to.
+   * @param {number} [tol] Optional number comparison tolerance,
+   *   defaults to Number.EPSILON.
+   * @returns {boolean} True if both matrices are similar.
+   */
+  isSimilar(rhs, tol) {
+    // TODO: add type check
+    // check values
+    for (let i = 0; i < 3; ++i) {
+      for (let j = 0; j < 3; ++j) {
+        if (!isSimilar(this.get(i, j), rhs.get(i, j), tol)) {
           return false;
         }
       }

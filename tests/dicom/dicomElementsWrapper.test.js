@@ -1,6 +1,6 @@
-import {DicomParser} from '../../src/dicom/dicomParser';
-import {dcmdump} from '../../src/dicom/dicomElementsWrapper';
-import {b64urlToArrayBuffer} from './utils';
+import {DicomParser} from '../../src/dicom/dicomParser.js';
+import {dcmdump} from '../../src/dicom/dicomElementsWrapper.js';
+import {b64urlToArrayBuffer} from './utils.js';
 
 import dwvTestSimple from '../data/dwv-test-simple.dcm';
 

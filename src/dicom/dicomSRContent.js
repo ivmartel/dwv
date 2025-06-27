@@ -2,35 +2,40 @@ import {
   NumericMeasurement,
   getNumericMeasurement,
   getDicomNumericMeasurementItem
-} from './dicomNumericMeasurement';
+} from './dicomNumericMeasurement.js';
 import {
+  isEqualCode,
   getCode,
   getDicomCodeItem,
   getConceptNameCode,
   getMeasurementUnitsCode
-} from './dicomCode';
+} from './dicomCode.js';
 import {
   getImageReference,
   getDicomImageReferenceItem
-} from './dicomImageReference';
+} from './dicomImageReference.js';
 import {
   getSopInstanceReference,
   getDicomSopInstanceReferenceItem
-} from './dicomSopInstanceReference';
+} from './dicomSopInstanceReference.js';
 import {
   getSpatialCoordinate,
   getDicomSpatialCoordinateItem
-} from './dicomSpatialCoordinate';
+} from './dicomSpatialCoordinate.js';
 import {
   getSpatialCoordinate3D,
   getDicomSpatialCoordinate3DItem
-} from './dicomSpatialCoordinate3D';
+} from './dicomSpatialCoordinate3D.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
-import {DicomCode} from './dicomCode';
-import {MeasuredValue} from './dicomMeasuredValue';
+import {
+  safeGet,
+  safeGetAll,
+  DataElement
+} from './dataElement.js';
+import {DicomCode} from './dicomCode.js';
+import {MeasuredValue} from './dicomMeasuredValue.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -49,13 +54,16 @@ const TagKeys = {
   UID: '0040A124',
   PersonName: '0040A123',
   TextValue: '0040A160',
-  ContinuityOfContent: '0040A050'
+  ContinuityOfContent: '0040A050',
+  ContentTemplateSequence: '0040A504',
+  MappingResource: '00080105',
+  TemplateIdentifier: '0040DB00'
 };
 
 /**
  * DICOM relationship types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.4.html#sect_C.17.3.2.4}.
  */
 export const RelationshipTypes = {
   contains: 'CONTAINS',
@@ -70,7 +78,7 @@ export const RelationshipTypes = {
 /**
  * DICOM value types.
  *
- * Ref: {@link https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.17.3.2.html#sect_C.17.3.2.1}.
  */
 export const ValueTypes = {
   text: 'TEXT',
@@ -92,6 +100,16 @@ export const ValueTypes = {
 };
 
 /**
+ * DICOM Continuity Of Contents.
+ *
+ * Ref: {@link https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.18.8.html#table_C.18.8-1}.
+ */
+export const ContinuityOfContents = {
+  separate: 'SEPARATE',
+  continuous: 'CONTINUOUS'
+};
+
+/**
  * DICOM value type to associated tag name.
  */
 export const ValueTypeValueTagName = {
@@ -103,6 +121,29 @@ export const ValueTypeValueTagName = {
   PNAME: 'PersonName',
   CONTAINER: 'ContinuityOfContent',
 };
+
+/**
+ * Get the content template value.
+ *
+ * @param {Object<string, DataElement>} dataElements The dicom elements.
+ * @returns {string|undefined} The template as
+ *   'MappingResource'-'TemplateIdentifier'.
+ */
+export function getContentTemplate(dataElements) {
+  let template;
+  // should only be one item
+  const templateItem =
+    safeGet(dataElements, TagKeys.ContentTemplateSequence);
+  if (typeof templateItem !== 'undefined') {
+    const mappingResource = safeGet(templateItem, TagKeys.MappingResource);
+    const templateId = safeGet(templateItem, TagKeys.TemplateIdentifier);
+    if (typeof mappingResource !== 'undefined' &&
+      typeof templateId !== 'undefined') {
+      template = mappingResource + '-' + templateId;
+    }
+  }
+  return template;
+}
 
 /**
  * DICOM SR content: item of a SR content sequence.
@@ -130,11 +171,11 @@ export class DicomSRContent {
   relationshipType;
 
   /**
-   * Content sequence (0040,A730).
+   * Content sequence.
    *
-   * @type {DicomSRContent[]|undefined}
+   * @type {DicomSRContent[]}
    */
-  contentSequence;
+  contentSequence = [];
 
   /**
    * Value.
@@ -175,21 +216,33 @@ export class DicomSRContent {
 
     res += ' = ' + this.value.toString();
 
-    if (typeof this.contentSequence !== 'undefined') {
-      for (const item of this.contentSequence) {
-        res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
-      }
+    for (const item of this.contentSequence) {
+      res += '\n' + prefix + '- ' + item.toString(prefix + '  ');
     }
 
     return res;
+  }
+
+  /**
+   * Check if this content has input header values.
+   *
+   * @param {string} valueType The value type.
+   * @param {DicomCode} conceptNameCode The concept name code.
+   * @param {string} relationshipType The relationship type.
+   * @returns {boolean} True if equal.
+   */
+  hasHeader(valueType, conceptNameCode, relationshipType) {
+    return this.valueType === valueType &&
+      isEqualCode(this.conceptNameCode, conceptNameCode) &&
+      this.relationshipType === relationshipType;
   }
 }
 
 /**
  * Check if two content item objects are equal.
  *
- * @param {DicomCode} item1 The first content item.
- * @param {DicomCode} item2 The second content item.
+ * @param {DicomSRContent} item1 The first content item.
+ * @param {DicomSRContent} item2 The second content item.
  * @returns {boolean} True if both content items are equal.
  */
 export function isEqualContentItem(item1, item2) {
@@ -208,36 +261,36 @@ export function isEqualContentItem(item1, item2) {
  */
 export function getSRContent(dataElements) {
   // valueType -> ValueType (type1)
-  let valueType = '';
-  if (typeof dataElements[TagKeys.ValueType] !== 'undefined') {
-    valueType = dataElements[TagKeys.ValueType].value[0];
+  let valueType = safeGet(dataElements, TagKeys.ValueType);
+  if (typeof valueType === 'undefined') {
+    valueType = '';
   }
 
   const content = new DicomSRContent(valueType);
 
   // relationshipType -> RelationType (type1)
-  if (typeof dataElements[TagKeys.RelationshipType] !== 'undefined') {
-    content.relationshipType =
-      dataElements[TagKeys.RelationshipType].value[0];
-  }
+  content.relationshipType =
+    safeGet(dataElements, TagKeys.RelationshipType);
 
-  if (typeof dataElements[TagKeys.ConceptNameCodeSequence] !== 'undefined') {
-    content.conceptNameCode =
-      getCode(dataElements[TagKeys.ConceptNameCodeSequence].value[0]);
+  const conceptNameCode =
+    safeGet(dataElements, TagKeys.ConceptNameCodeSequence);
+  if (typeof conceptNameCode !== 'undefined') {
+    content.conceptNameCode = getCode(conceptNameCode);
   }
 
   // set value acording to valueType
   // (date and time are stored as string)
   if (valueType === ValueTypes.code) {
     content.value = getCode(
-      dataElements[TagKeys.ConceptCodeSequence].value[0]);
+      safeGet(dataElements, TagKeys.ConceptCodeSequence)
+    );
   } else if (valueType === ValueTypes.num) {
     content.value = getNumericMeasurement(dataElements);
   } else if (valueType === ValueTypes.image) {
     content.value = getImageReference(dataElements);
   } else if (valueType === ValueTypes.composite) {
     content.value = getSopInstanceReference(
-      dataElements[TagKeys.ReferencedSOPSequence].value[0]
+      safeGet(dataElements, TagKeys.ReferencedSOPSequence)
     );
   } else if (valueType === ValueTypes.scoord) {
     content.value = getSpatialCoordinate(dataElements);
@@ -246,16 +299,16 @@ export function getSRContent(dataElements) {
   } else {
     const valueTagName = ValueTypeValueTagName[valueType];
     if (typeof valueTagName !== 'undefined') {
-      content.value = dataElements[TagKeys[valueTagName]].value[0];
+      content.value =
+        safeGet(dataElements, TagKeys[valueTagName]);
     } else {
       console.warn('Unsupported input ValueType: ' + valueType);
     }
   }
 
-  const contentSqEl = dataElements[TagKeys.ContentSequence];
-  if (typeof contentSqEl !== 'undefined') {
-    content.contentSequence = [];
-    for (const item of dataElements[TagKeys.ContentSequence].value) {
+  const contentSq = safeGetAll(dataElements, TagKeys.ContentSequence);
+  if (typeof contentSq !== 'undefined') {
+    for (const item of contentSq) {
       content.contentSequence.push(getSRContent(item));
     }
   }
@@ -324,7 +377,7 @@ export function getDicomSRContentItem(content) {
     }
   }
 
-  if (typeof content.contentSequence !== 'undefined') {
+  if (content.contentSequence.length !== 0) {
     contentItem.ContentSequence = {
       value: []
     };
@@ -342,17 +395,24 @@ export function getDicomSRContentItem(content) {
  * @param {string} name The value name.
  * @param {object} value The value.
  * @param {string} unit The values' unit.
+ * @param {string} [relation] Optional content relationhip.
  * @returns {DicomSRContent|undefined} The SR content.
  */
-export function getSRContentFromValue(name, value, unit) {
+export function getSRContentFromValue(
+  name, value, unit, relation) {
   const conceptNameCode = getConceptNameCode(name);
 
   if (typeof conceptNameCode === 'undefined') {
     return undefined;
   }
 
+  let relationShip = RelationshipTypes.contains;
+  if (typeof relation !== 'undefined') {
+    relationShip = relation;
+  }
+
   const content = new DicomSRContent(ValueTypes.num);
-  content.relationshipType = RelationshipTypes.contains;
+  content.relationshipType = relationShip;
   content.conceptNameCode = conceptNameCode;
 
   const measure = new MeasuredValue();

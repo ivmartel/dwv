@@ -1,8 +1,8 @@
-import {startsWith, getFileExtension} from '../utils/string';
-import {getUrlFromUri} from '../utils/uri';
-import {fileContentTypes} from './filesLoader';
-import {urlContentTypes} from './urlsLoader';
-import {DicomBufferToView} from '../image/dicomBufferToView';
+import {startsWith, getFileExtension} from '../utils/string.js';
+import {getUrlFromUri} from '../utils/uri.js';
+import {fileContentTypes} from './filesLoader.js';
+import {urlContentTypes} from './urlsLoader.js';
+import {DicomBufferToView} from '../image/dicomBufferToView.js';
 
 /**
  * DICOM data loader.

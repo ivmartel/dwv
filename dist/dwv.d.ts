@@ -17,19 +17,37 @@ export declare function addTagsToDictionary(group: string, tags: {
  */
 export declare class Annotation {
     /**
-     * The ID.
+     * Tracking id, unique within domain.
      *
      * @type {string}
      */
-    id: string;
+    trackingId: string;
     /**
-     * The reference image SOP UID.
+     * Tracking Unique id.
      *
      * @type {string}
      */
-    referenceSopUID: string;
+    trackingUid: string;
     /**
-     * The mathematical shape.
+     * Referenced image SOP isntance UID.
+     *
+     * @type {string}
+     */
+    referencedSopInstanceUID: string;
+    /**
+     * Referenced image SOP class UID.
+     *
+     * @type {string}
+     */
+    referencedSopClassUID: string;
+    /**
+     * Referenced frame number.
+     *
+     * @type {number|undefined}
+     */
+    referencedFrameNumber: number | undefined;
+    /**
+     * Mathematical shape.
      *
      * @type {object}
      */
@@ -41,11 +59,11 @@ export declare class Annotation {
      */
     referencePoints: Point2D[] | undefined;
     /**
-     * The color: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
+     * Colour: for example 'green', '#00ff00' or 'rgb(0,255,0)'.
      *
-     * @type {string|undefined}
+     * @type {string}
      */
-    colour: string | undefined;
+    colour: string;
     /**
      * Annotation quantification.
      *
@@ -54,11 +72,11 @@ export declare class Annotation {
     quantification: object | undefined;
     /**
      * Text expression. Can contain variables surrounded with '{}' that will
-     * be extracted from the quantification object.
+     *   be extracted from the quantification object.
      *
-     * @type {string|undefined}
+     * @type {string}
      */
-    textExpr: string | undefined;
+    textExpr: string;
     /**
      * Label position. If undefined, the default shape
      *   label position will be used.
@@ -67,7 +85,7 @@ export declare class Annotation {
      */
     labelPosition: Point2D | undefined;
     /**
-     * The plane origin, the 3D position of index [0, 0, k].
+     * Plane origin: 3D position of index [0, 0, k].
      *
      * @type {Point3D|undefined}
      */
@@ -78,6 +96,33 @@ export declare class Annotation {
      * @type {Point3D[]|undefined}
      */
     planePoints: Point3D[] | undefined;
+    /**
+     * Get the concepts ids of the annotation meta data.
+     *
+     * @returns {string[]} The ids.
+     */
+    getMetaConceptIds(): string[];
+    /**
+     * Get an annotation meta data.
+     *
+     * @param {string} conceptId The value of the concept dicom code.
+     * @returns {object|undefined} The corresponding meta data item
+     *   as {concept, value} or undefined.
+     */
+    getMetaItem(conceptId: string): object | undefined;
+    /**
+     * Add annotation meta data.
+     *
+     * @param {DicomCode} concept The concept code.
+     * @param {DicomCode|string} value The value code.
+     */
+    addMetaItem(concept: DicomCode, value: DicomCode | string): void;
+    /**
+     * Remove an annotation meta data.
+     *
+     * @param {string} conceptId The value of the concept dicom code.
+     */
+    removeMetaItem(conceptId: string): void;
     /**
      * Get the orientation name for this annotation.
      *
@@ -91,6 +136,13 @@ export declare class Annotation {
      * @param {ViewController} viewController The associated view controller.
      */
     init(viewController: ViewController): void;
+    /**
+     * Check if the annotation can be displayed: true if it has
+     * an associated view controller.
+     *
+     * @returns {boolean} True if the annotation can be displayed.
+     */
+    canView(): boolean;
     /**
      * Check if an input view is compatible with the annotation.
      *
@@ -133,9 +185,9 @@ export declare class Annotation {
     /**
      * Get the math shape associated draw factory.
      *
-     * @returns {object} The factory.
+     * @returns {object|undefined} The factory.
      */
-    getFactory(): object;
+    getFactory(): object | undefined;
     #private;
 }
 
@@ -195,14 +247,16 @@ export declare class AnnotationGroup {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
+     * @param {boolean} [propagate] Whether the update event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    update(annotation: Annotation, propKeys?: string[]): void;
+    update(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     /**
      * Remove an annotation.
      *
-     * @param {string} id The id of the annotation to remove.
+     * @param {string} uid The UID of the annotation to remove.
      */
-    remove(id: string): void;
+    remove(uid: string): void;
     /**
      * Set the associated view controller.
      *
@@ -212,10 +266,10 @@ export declare class AnnotationGroup {
     /**
      * Find an annotation.
      *
-     * @param {string} id The id of the annotation to find.
+     * @param {string} uid The UID of the annotation to find.
      * @returns {Annotation|undefined} The found annotation.
      */
-    find(id: string): Annotation | undefined;
+    find(uid: string): Annotation | undefined;
     /**
      * Get the meta data.
      *
@@ -235,9 +289,9 @@ export declare class AnnotationGroup {
      * Get a meta data value.
      *
      * @param {string} key The meta data key.
-     * @returns {string|object} The meta data value.
+     * @returns {string|object|undefined} The meta data value.
      */
-    getMetaValue(key: string): string | object;
+    getMetaValue(key: string): string | object | undefined;
     /**
      * Set a meta data.
      *
@@ -276,31 +330,56 @@ export declare class AnnotationGroupFactory {
      */
     getWarning(): string | undefined;
     /**
-     * Check dicom elements. Throws an error if not suitable.
+     * Check dicom elements.
      *
      * @param {Object<string, DataElement>} dataElements The DICOM data elements.
      * @returns {string|undefined} A possible warning.
+     * @throws Error for missing or wrong data.
      */
     checkElements(dataElements: {
         [x: string]: DataElement;
     }): string | undefined;
     /**
-     * Get an {@link Annotation} object from the read DICOM file.
+     * Get an {@link AnnotationGroup} object from the read DICOM file.
      *
      * @param {Object<string, DataElement>} dataElements The DICOM tags.
      * @returns {AnnotationGroup} A new annotation group.
+     * @throws Error for missing or wrong data.
      */
     create(dataElements: {
         [x: string]: DataElement;
     }): AnnotationGroup;
     /**
-     * Convert an annotation group into a DICOM SR object.
+     * Get an {@link CADReport} object from the read DICOM file.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
+     * @returns {CADReport|undefined} A new CAD report.
+     */
+    createCADReport(dataElements: {
+        [x: string]: DataElement;
+    }): CADReport | undefined;
+    /**
+     * Convert an annotation group into a DICOM SR object using the
+     * TID 1500 template.
      *
      * @param {AnnotationGroup} annotationGroup The annotation group.
      * @param {Object<string, any>} [extraTags] Optional list of extra tags.
      * @returns {Object<string, DataElement>} A list of dicom elements.
      */
     toDicom(annotationGroup: AnnotationGroup, extraTags?: {
+        [x: string]: any;
+    }): {
+        [x: string]: DataElement;
+    };
+    /**
+     * Convert a CAD report into a DICOM CAD report SR object using
+     *   the TID 4100 template.
+     *
+     * @param {CADReport} report The CAD report.
+     * @param {Object<string, any>} [extraTags] Optional list of extra tags.
+     * @returns {Object<string, DataElement>} A list of dicom elements.
+     */
+    toDicomCADReport(report: CADReport, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -476,9 +555,9 @@ export declare class App {
      * The layer is available after the first loaded item.
      *
      * @param {string} divId The div id.
-     * @returns {LayerGroup} The layer group.
+     * @returns {LayerGroup|undefined} The layer group.
      */
-    getLayerGroupByDivId(divId: string): LayerGroup;
+    getLayerGroupByDivId(divId: string): LayerGroup | undefined;
     /**
      * Get the number of layer groups.
      *
@@ -547,8 +626,18 @@ export declare class App {
     reset(): void;
     /**
      * Reset the layout of the application.
+     *
+     * @deprecated Since v0.35, prefer resetZoomPan.
      */
     resetLayout(): void;
+    /**
+     * Reset the zoom and pan of the stage.
+     */
+    resetZoomPan(): void;
+    /**
+     * Reset the position and window level of the stage.
+     */
+    resetViews(): void;
     /**
      * Add an event listener to this class.
      *
@@ -569,6 +658,7 @@ export declare class App {
      * Load a list of files. Can be image files or a state file.
      *
      * @param {File[]} files The list of files to load.
+     * @returns {string} The data ID, '-1' if problem.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -577,7 +667,7 @@ export declare class App {
      * @fires App#abort
      * @function
      */
-    loadFiles: (files: File[]) => void;
+    loadFiles: (files: File[]) => string;
     /**
      * Load a list of URLs. Can be image files or a state file.
      *
@@ -586,6 +676,7 @@ export declare class App {
      * - requestHeaders: an array of {name, value} to use as request headers,
      * - withCredentials: boolean xhr.withCredentials flag to pass to the request,
      * - batchSize: the size of the request url batch.
+     * @returns {string} The data ID, '-1' if problem.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -594,7 +685,7 @@ export declare class App {
      * @fires App#abort
      * @function
      */
-    loadURLs: (urls: string[], options?: object) => void;
+    loadURLs: (urls: string[], options?: object) => string;
     /**
      * Load from an input uri.
      *
@@ -608,6 +699,7 @@ export declare class App {
      *
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
+     * @returns {string} The data ID.
      * @fires App#loadstart
      * @fires App#loadprogress
      * @fires App#loaditem
@@ -616,7 +708,7 @@ export declare class App {
      * @fires App#abort
      * @function
      */
-    loadImageObject: (data: any[]) => void;
+    loadImageObject: (data: any[]) => string;
     /**
      * Abort all the current loads.
      */
@@ -693,6 +785,8 @@ export declare class App {
     addDataViewConfig(dataId: string, config: ViewConfig): void;
     /**
      * Remove a data view config.
+     * Removes the associated layer if found, removes
+     *   the layer group if empty.
      *
      * @param {string} dataId The data id.
      * @param {string} divId The div id.
@@ -956,12 +1050,6 @@ export declare class AppOptions {
     rootDocument: DocumentFragment;
 }
 
-export declare namespace BLACK {
-    let r: number;
-    let g: number;
-    let b: number;
-}
-
 /**
  * Build a multipart message.
  *
@@ -975,6 +1063,24 @@ export declare namespace BLACK {
  * @returns {Uint8Array} The full multipart message.
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+/**
+ * CAD report class.
+ */
+export declare class CADReport {
+    /**
+     * @type {AnnotationGroup[]}
+     */
+    annotationGroups: AnnotationGroup[];
+    /**
+     * @type {ResponseEvaluation[]}
+     */
+    responseEvaluations: ResponseEvaluation[];
+    /**
+     * @type {string}
+     */
+    comment: string;
+}
 
 /**
  * Change segment colour command.
@@ -1092,10 +1198,12 @@ export declare class Circle {
      * Quantify an circle according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -1161,14 +1269,20 @@ export declare function createView(elements: {
     [x: string]: DataElement;
 }, image: Image_2): View;
 
-export declare namespace customUI {
-    /**
-     * Open a dialogue to edit roi data. Defaults to window.prompt.
-     *
-     * @param {Annotation} annotation The roi data.
-     * @param {Function} callback The callback to launch on dialogue exit.
-     */
-    export function openRoiDialog(annotation: Annotation, callback: Function): void;
+export declare namespace custom {
+    let wlPresets: {
+        [x: string]: {
+            [x: string]: WindowLevel;
+        };
+    };
+    let labelTexts: {
+        [x: string]: {
+            [x: string]: string;
+        };
+    };
+    let openRoiDialog: any;
+    let getTagTime: any;
+    let getTagPixelUnit: any;
 }
 
 /**
@@ -1227,35 +1341,6 @@ export declare class DataElement {
      * @type {Array}
      */
     items: any[];
-}
-
-/**
- * Decoder scripts to be passed to web workers for image decoding.
- */
-export declare const decoderScripts: {
-    jpeg2000: string;
-    'jpeg-lossless': string;
-    'jpeg-baseline': string;
-    rle: string;
-};
-
-/**
- * List of default window level presets.
- *
- * @type {Object.<string, Object.<string, WindowLevel>>}
- */
-export declare const defaultPresets: {
-    [x: string]: {
-        [x: string]: WindowLevel;
-    };
-};
-
-export declare namespace defaults {
-    let labelText: {
-        [x: string]: {
-            [x: string]: string;
-        };
-    };
 }
 
 /**
@@ -1360,15 +1445,19 @@ export declare class DicomCode {
  */
 export declare class DicomData {
     /**
-     * @param {object} meta The DICOM meta data.
+     * @param {Object<string, DataElement>} meta The DICOM meta data.
      */
-    constructor(meta: object);
+    constructor(meta: {
+        [x: string]: DataElement;
+    });
     /**
      * DICOM meta data.
      *
-     * @type {object}
+     * @type {Object<string, DataElement>}
      */
-    meta: object;
+    meta: {
+        [x: string]: DataElement;
+    };
     /**
      * Image extracted from meta data.
      *
@@ -1381,6 +1470,12 @@ export declare class DicomData {
      * @type {AnnotationGroup|undefined}
      */
     annotationGroup: AnnotationGroup | undefined;
+    /**
+     * Image buffer used to build image.
+     *
+     * @type {any|undefined}
+     */
+    buffer: any | undefined;
 }
 
 /**
@@ -1437,12 +1532,20 @@ export declare class DicomParser {
         [x: string]: DataElement;
     };
     /**
-     * Parse the complete DICOM file (given as input to the class).
+     * Safely get an elements' first value from the parsed elements.
+     *
+     * @param {string} key The tag key as for example '00100020'.
+     * @returns {any|undefined} The elements' value or undefined.
+     */
+    safeGet(key: string): any | undefined;
+    /**
+     * Parse a DICOM buffer.
      * Fills in the member object 'dataElements'.
      *
      * @param {ArrayBuffer} buffer The input array buffer.
+     * @param {Tag} [untilTag] Optional tag to stop the parsing once reached.
      */
-    parse(buffer: ArrayBuffer): void;
+    parse(buffer: ArrayBuffer, untilTag?: Tag): void;
     #private;
 }
 
@@ -1475,11 +1578,11 @@ export declare class DicomSRContent {
      */
     relationshipType: string;
     /**
-     * Content sequence (0040,A730).
+     * Content sequence.
      *
-     * @type {DicomSRContent[]|undefined}
+     * @type {DicomSRContent[]}
      */
-    contentSequence: DicomSRContent[] | undefined;
+    contentSequence: DicomSRContent[];
     /**
      * Value.
      *
@@ -1493,6 +1596,15 @@ export declare class DicomSRContent {
      * @returns {string} The object as string.
      */
     toString(prefix?: string): string;
+    /**
+     * Check if this content has input header values.
+     *
+     * @param {string} valueType The value type.
+     * @param {DicomCode} conceptNameCode The concept name code.
+     * @param {string} relationshipType The relationship type.
+     * @returns {boolean} True if equal.
+     */
+    hasHeader(valueType: string, conceptNameCode: DicomCode, relationshipType: string): boolean;
 }
 
 /**
@@ -1590,10 +1702,10 @@ export declare class DrawController {
     /**
      * Get an annotation.
      *
-     * @param {string} id The annotation id.
+     * @param {string} uid The annotation UID.
      * @returns {Annotation|undefined} The annotation.
      */
-    getAnnotation(id: string): Annotation | undefined;
+    getAnnotation(uid: string): Annotation | undefined;
     /**
      * Get the annotation group.
      *
@@ -1623,32 +1735,34 @@ export declare class DrawController {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
+     * @param {boolean} [propagate] Whether the update event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     /**
      * Remove an anotation for the list.
      *
-     * @param {string} id The id of the annotation to remove.
+     * @param {string} uid The UID of the annotation to remove.
      */
-    removeAnnotation(id: string): void;
+    removeAnnotation(uid: string): void;
     /**
      * Remove an annotation via a remove command (triggers draw actions).
      *
-     * @param {string} id The annotation id.
+     * @param {string} uid The annotation UID.
      * @param {Function} exeCallback The undo stack callback.
      */
-    removeAnnotationWithCommand(id: string, exeCallback: Function): void;
+    removeAnnotationWithCommand(uid: string, exeCallback: Function): void;
     /**
      * Update an annotation via an update command (triggers draw actions).
      *
-     * @param {string} id The annotation id.
+     * @param {string} uid The annotation UID.
      * @param {object} originalProps The original annotation properties
      *   that will be updated.
      * @param {object} newProps The new annotation properties
      *   that will replace the original ones.
      * @param {Function} exeCallback The undo stack callback.
      */
-    updateAnnotationWithCommand(id: string, originalProps: object, newProps: object, exeCallback: Function): void;
+    updateAnnotationWithCommand(uid: string, originalProps: object, newProps: object, exeCallback: Function): void;
     /**
      * Remove all annotations via remove commands (triggers draw actions).
      *
@@ -1701,7 +1815,7 @@ export declare class DrawLayer {
      */
     getDataId(): string;
     /**
-     * Get the reference data id.
+     * Get the reference layer id.
      *
      * @returns {string} The id.
      */
@@ -1925,19 +2039,6 @@ export declare class DrawLayer {
      */
     setCurrentPosition(position: Point, index?: Index): boolean;
     /**
-     * Get the current position group.
-     *
-     * @returns {Konva.Group|undefined} The Konva.Group.
-     */
-    getCurrentPosGroup(): Konva.Group | undefined;
-    /**
-     * Get a Konva group using its id.
-     *
-     * @param {string} id The group id.
-     * @returns {object|undefined} The Konva group.
-     */
-    getGroup(id: string): object | undefined;
-    /**
      * Add an event listener to this class.
      *
      * @param {string} type The event type.
@@ -2092,10 +2193,12 @@ export declare class Ellipse {
      * Quantify an ellipse according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -2104,14 +2207,14 @@ export declare class Ellipse {
  */
 export declare class Geometry {
     /**
-     * @param {Point3D} origin The object origin (a 3D point).
+     * @param {Point3D[]} origins The object origins.
      * @param {Size} size The object size.
      * @param {Spacing} spacing The object spacing.
      * @param {Matrix33} [orientation] The object orientation (3*3 matrix,
      *   default to 3*3 identity).
      * @param {number} [time] Optional time index.
      */
-    constructor(origin: Point3D, size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
+    constructor(origins: Point3D[], size: Size, spacing: Spacing, orientation?: Matrix33, time?: number);
     /**
      * Get the time value that was passed at construction.
      *
@@ -2158,11 +2261,11 @@ export declare class Geometry {
      * Check if a point is in the origin list.
      *
      * @param {Point3D} point3D The point to check.
-     * @param {number} tol The comparison tolerance
-     *   default to Number.EPSILON.
+     * @param {number} [tol] Optional number comparison tolerance
+     *   defaults to Number.EPSILON.
      * @returns {boolean} True if in list.
      */
-    includesOrigin(point3D: Point3D, tol: number): boolean;
+    includesOrigin(point3D: Point3D, tol?: number): boolean;
     /**
      * Get the object size.
      * Warning: the size comes as stored in DICOM, meaning that it could
@@ -2251,6 +2354,13 @@ export declare class Geometry {
      */
     isIndexInBounds(index: Index, dirs?: number[]): boolean;
     /**
+     * Get the geometrical range, ie the minimum and maximum
+     *   positions.
+     *
+     * @returns {Point[]} The min and max positions.
+     */
+    getRange(): Point[];
+    /**
      * Convert an index into world coordinates.
      *
      * @param {Index} index The index to convert.
@@ -2280,6 +2390,21 @@ export declare class Geometry {
     worldToPoint(point: Point): Point3D;
     #private;
 }
+
+/**
+ * Get the meta data as simple elements:
+ * - indexed by tag names instead of tag keys,
+ * - no element object, just value if not sequence nor merged item.
+ *
+ * @param {Object<string, DataElement>} metaData The meta data
+ *   index by tag keys.
+ * @returns {Object<string, any>} The simple elements.
+ */
+export declare function getAsSimpleElements(metaData: {
+    [x: string]: DataElement;
+}): {
+    [x: string]: any;
+};
 
 /**
  * Get the default DICOM seg tags as an object.
@@ -2391,6 +2516,13 @@ export declare function getRectangleIndices(center: Index, size: number[], dir: 
 export declare function getReverseOrientation(ori: string): string;
 
 /**
+ * Get a segmentation DICOM code.
+ *
+ * @returns {DicomCode} The code.
+ */
+export declare function getSegmentationCode(): DicomCode;
+
+/**
  * Get a content item object from a dicom element.
  *
  * @param {Object<string, DataElement>} dataElements The dicom element.
@@ -2455,6 +2587,14 @@ export declare function getUID(tagName: string): string;
  */
 export declare function hasDicomPrefix(buffer: ArrayBuffer): boolean;
 
+/**
+ * Convert a hex color into RGB.
+ *
+ * @param {string} hexStr The hex color as '#ab01ef'.
+ * @returns {RGB} The RGB values as {r,g,b}.
+ */
+export declare function hexToRgb(hexStr: string): RGB;
+
 export declare namespace i18n {
     /**
      * Get the translated text.
@@ -2462,7 +2602,7 @@ export declare namespace i18n {
      * @param {string} key The key to the text entry.
      * @returns {string|undefined} The translated text.
      */
-    export function t(key: string): string;
+    export function t(key: string): string | undefined;
 }
 
 /**
@@ -2626,6 +2766,25 @@ declare class Image_2 {
      */
     setPhotometricInterpretation(interp: string): void;
     /**
+     * Set the palette colour map.
+     *
+     * @param {ColourMap} map The colour map.
+     */
+    setPaletteColourMap(map: ColourMap): void;
+    /**
+     * Get the palette colour map.
+     *
+     * @returns {ColourMap} The colour map.
+     */
+    getPaletteColourMap(): ColourMap;
+    /**
+     * Update the palette colour map.
+     *
+     * @param {number} index The index to change the colour of.
+     * @param {RGB} colour The colour to use at index.
+     */
+    updatePaletteColourMap(index: number, colour: RGB): void;
+    /**
      * Get the planarConfiguration of the image.
      *
      * @returns {number} The planarConfiguration of the image.
@@ -2757,21 +2916,21 @@ declare class Image_2 {
      *
      * @param {number[][]} offsetsLists List of offset lists where
      *   to set the data.
-     * @param {RGB} value The value to set at the given offsets.
+     * @param {number} value The value to set at the given offsets.
      * @returns {Array} A list of objects representing the original values before
      *  replacing them.
      * @fires Image#imagecontentchange
      */
-    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: RGB): any[];
+    setAtOffsetsAndGetOriginals(offsetsLists: number[][], value: number): any[];
     /**
      * Set the inner buffer values at given offsets.
      *
      * @param {number[][]} offsetsLists List of offset lists
      *   where to set the data.
-     * @param {RGB|Array} value The value to set at the given offsets.
+     * @param {number|Array} value The value to set at the given offsets.
      * @fires Image#imagecontentchange
      */
-    setAtOffsetsWithIterator(offsetsLists: number[][], value: RGB | any[]): void;
+    setAtOffsetsWithIterator(offsetsLists: number[][], value: number | any[]): void;
     /**
      * Get the value of the image at a specific coordinate.
      *
@@ -2876,6 +3035,10 @@ declare class Image_2 {
      * Note: Uses the raw buffer values.
      */
     compose(rhs: Image_2, operator: Function): Image_2;
+    /**
+     * Recalculate labels.
+     */
+    recalculateLabels(): void;
     #private;
 }
 export { Image_2 as Image }
@@ -2937,14 +3100,32 @@ export declare class Index {
      */
     compare(rhs: Index): number[];
     /**
-     * Add another index to this one.
+     * Add another index to this one and return
+     *   the result as a new index.
      *
      * @param {Index} rhs The index to add.
      * @returns {Index} The index representing the sum of both indices.
      */
     add(rhs: Index): Index;
     /**
-     * Get the current index with a new 2D base.
+     * Increment this index by 1 at the given dimension
+     *   and return the result as a new index.
+     *
+     * @param {number} dim The dimension number.
+     * @returns {Index} The result index.
+     */
+    next(dim: number): Index;
+    /**
+     * Decrement this index by 1 at the given dimension
+     *   and return the result as a new index.
+     *
+     * @param {number} dim The dimension number.
+     * @returns {Index} The result index.
+     */
+    previous(dim: number): Index;
+    /**
+     * Get the current index with a new 2D base
+     *   and return the result as a new index.
      *
      * @param {number} i The new 0 index.
      * @param {number} j The new 1 index.
@@ -2994,6 +3175,12 @@ export declare class LayerGroup {
      */
     constructor(containerDiv: HTMLElement);
     /**
+     * Get the position helper.
+     *
+     * @returns {PositionHelper} The position helper.
+     */
+    getPositionHelper(): PositionHelper;
+    /**
      * Get the showCrosshair flag.
      *
      * @returns {boolean} True to display the crosshair.
@@ -3014,9 +3201,9 @@ export declare class LayerGroup {
     /**
      * Get the Id of the container div.
      *
-     * @returns {string} The id of the div.
+     * @returns {string|undefined} The id of the div.
      */
-    getDivId(): string;
+    getDivId(): string | undefined;
     /**
      * Get the layer scale.
      *
@@ -3056,7 +3243,7 @@ export declare class LayerGroup {
      */
     includes(id: string): boolean;
     /**
-     * Get a list of view layers according to an input callback function.
+     * Get the view layers that satisfy the input callback function.
      *
      * @param {Function} [callbackFn] A function that takes
      *   a ViewLayer as input and returns a boolean. If undefined,
@@ -3065,6 +3252,17 @@ export declare class LayerGroup {
      *   satisfy the callbackFn.
      */
     getViewLayers(callbackFn?: Function): ViewLayer[];
+    /**
+     * Get the view layers that satisfy the input callback function
+     * starting from the active layer.
+     *
+     * @param {Function} [callbackFn] A function that takes
+     *   a ViewLayer as input and returns a boolean. If undefined,
+     *   returns all view layers.
+     * @returns {ViewLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
     /**
      * Test if one of the view layers satisfies an input callbackFn.
      *
@@ -3093,6 +3291,12 @@ export declare class LayerGroup {
     /**
      * Get the active image layer.
      *
+     * @returns {ViewLayer|DrawLayer|undefined} The layer.
+     */
+    getActiveLayer(): ViewLayer | DrawLayer | undefined;
+    /**
+     * Get the active image layer.
+     *
      * @returns {ViewLayer|undefined} The layer.
      */
     getActiveViewLayer(): ViewLayer | undefined;
@@ -3103,6 +3307,13 @@ export declare class LayerGroup {
      */
     getBaseViewLayer(): ViewLayer | undefined;
     /**
+     * Get a view layer associated to a data id.
+     *
+     * @param {string} id The layer id.
+     * @returns {ViewLayer|undefined} The layer.
+     */
+    getViewLayerById(id: string): ViewLayer | undefined;
+    /**
      * Get the view layers associated to a data id.
      *
      * @param {string} dataId The data id.
@@ -3110,7 +3321,7 @@ export declare class LayerGroup {
      */
     getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
-     * Search view layers for equal imae meta data.
+     * Search view layers for equal image meta data.
      *
      * @param {object} meta The meta data to find.
      * @returns {ViewLayer[]} The list of view layers that contain matched data.
@@ -3129,6 +3340,13 @@ export declare class LayerGroup {
      */
     getActiveDrawLayer(): DrawLayer | undefined;
     /**
+     * Get a draw layer associated to a data id.
+     *
+     * @param {string} id The layer id.
+     * @returns {DrawLayer|undefined} The layer.
+     */
+    getDrawLayerById(id: string): DrawLayer | undefined;
+    /**
      * Get the draw layers associated to a data id.
      *
      * @param {string} dataId The data id.
@@ -3136,30 +3354,23 @@ export declare class LayerGroup {
      */
     getDrawLayersByDataId(dataId: string): DrawLayer[];
     /**
-     * Set the active view layer.
+     * Set the active layer.
      *
      * @param {number} index The index of the layer to set as active.
      */
-    setActiveViewLayer(index: number): void;
+    setActiveLayer(index: number): void;
     /**
-     * Set the active view layer with a data id.
+     * Set the active layer with a layer id.
+     *
+     * @param {string} id The layer id.
+     */
+    setActiveLayerById(id: string): void;
+    /**
+     * Set the active layer with a data id.
      *
      * @param {string} dataId The data id.
      */
-    setActiveViewLayerByDataId(dataId: string): void;
-    /**
-     * Set the active draw layer.
-     *
-     * @param {number|undefined} index The index of the layer to set as active
-     *   or undefined to not set any.
-     */
-    setActiveDrawLayer(index: number | undefined): void;
-    /**
-     * Set the active draw layer with a data id.
-     *
-     * @param {string} dataId The data id.
-     */
-    setActiveDrawLayerByDataId(dataId: string): void;
+    setActiveLayerByDataId(dataId: string): void;
     /**
      * Add a view layer.
      *
@@ -3193,6 +3404,7 @@ export declare class LayerGroup {
      *   methods to define the active index.
      *
      * @param {ViewLayer | DrawLayer} layer The layer to remove.
+     * @fires LayerGroup#removelayer
      */
     removeLayer(layer: ViewLayer | DrawLayer): void;
     /**
@@ -3228,7 +3440,7 @@ export declare class LayerGroup {
      */
     moreThanOne(dim: number): boolean;
     /**
-     * Update layers (but not the active view layer) to a position change.
+     * Update layers (but not the event source layer) to a position change.
      *
      * @param {object} event The position change event.
      * @function
@@ -3287,8 +3499,18 @@ export declare class LayerGroup {
     setOffset(newOffset: Scalar3D): void;
     /**
      * Reset the stage to its initial scale and no offset.
+     *
+     * @deprecated Since v0.35, prefer resetZoomPan.
      */
     reset(): void;
+    /**
+     * Reset the zoom and pan of all layers.
+     */
+    resetZoomPan(): void;
+    /**
+     * Reset the position and window level of all view layers.
+     */
+    resetViews(): void;
     /**
      * Draw the layer.
      */
@@ -3355,10 +3577,11 @@ export declare class MaskFactory {
      */
     getWarning(): string | undefined;
     /**
-     * Check dicom elements. Throws an error if not suitable.
+     * Check dicom elements.
      *
      * @param {Object<string, DataElement>} _dicomElements The DICOM tags.
      * @returns {string|undefined} A possible warning.
+     * @throws Error for missing or wrong data.
      */
     checkElements(_dicomElements: {
         [x: string]: DataElement;
@@ -3370,11 +3593,14 @@ export declare class MaskFactory {
      * @param {Uint8Array | Int8Array |
          *   Uint16Array | Int16Array |
          *   Uint32Array | Int32Array} pixelBuffer The pixel buffer.
+     * @param {Image} [refImage] Reference image, code will use its
+     *   origins if present (best) or try to calculate them.
      * @returns {Image} A new Image.
+     * @throws Error for missing or wrong data.
      */
     create(dataElements: {
         [x: string]: DataElement;
-    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array): Image_2;
+    }, pixelBuffer: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array, refImage?: Image_2): Image_2;
     /**
      * Convert a mask image into a DICOM segmentation object.
      *
@@ -3541,9 +3767,9 @@ export declare class MaskSegmentViewHelper {
     /**
      * Add a segment to the hidden list.
      *
-     * @param {MaskSegment} segment The segment to add.
+     * @param {number} segmentNumber The segment number.
      */
-    addToHidden(segment: MaskSegment): void;
+    addToHidden(segmentNumber: number): void;
     /**
      * Remove a segment from the hidden list.
      *
@@ -3552,7 +3778,7 @@ export declare class MaskSegmentViewHelper {
     removeFromHidden(segmentNumber: number): void;
     /**
      * @callback alphaFn@callback alphaFn
-     * @param {number[]|number} value The pixel value.
+     * @param {number|number[]} value The pixel value.
      * @param {number} index The values' index.
      * @returns {number} The opacity of the input value.
      */
@@ -3561,7 +3787,7 @@ export declare class MaskSegmentViewHelper {
      *
      * @returns {alphaFn} The corresponding alpha function.
      */
-    getAlphaFunc(): (value: number[] | number, index: number) => number;
+    getAlphaFunc(): (value: number | number[], index: number) => number;
     #private;
 }
 
@@ -3592,11 +3818,18 @@ export declare class Matrix33 {
      * Check for Matrix33 equality.
      *
      * @param {Matrix33} rhs The other matrix to compare to.
-     * @param {number} [p] A numeric expression for the precision to use in check
-     *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
      * @returns {boolean} True if both matrices are equal.
      */
-    equals(rhs: Matrix33, p?: number): boolean;
+    equals(rhs: Matrix33): boolean;
+    /**
+     * Check for Matrix33 similarity.
+     *
+     * @param {Matrix33} rhs The other matrix to compare to.
+     * @param {number} [tol] Optional number comparison tolerance,
+     *   defaults to Number.EPSILON.
+     * @returns {boolean} True if both matrices are similar.
+     */
+    isSimilar(rhs: Matrix33, tol?: number): boolean;
     /**
      * Get a string representation of the Matrix33.
      *
@@ -3872,6 +4105,13 @@ export declare class PlaneHelper {
      */
     worldToIndex(point: Point): Index;
     /**
+     * Image index to world.
+     *
+     * @param {Index} index The input index.
+     * @returns {Point} The corresponding point.
+     */
+    indexToWorld(index: Index): Point;
+    /**
      * Is this view in the same orientation as the image aquisition.
      *
      * @returns {boolean} True if in aquisition plane.
@@ -3889,13 +4129,13 @@ export declare class PlaneHelper {
      *
      * @returns {number} The index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
      * Get the native (image) scroll dimension index.
      *
      * @returns {number} The index.
      */
-    getNativeScrollIndex(): number;
+    getNativeScrollDimIndex(): number;
     #private;
 }
 
@@ -4079,11 +4319,11 @@ export declare class Point3D {
      * Check for Point3D similarity.
      *
      * @param {Point3D} rhs The other point to compare to.
-     * @param {number} tol Optional comparison tolerance,
-     *   default to Number.EPSILON.
-     * @returns {boolean} True if both points are equal.
+     * @param {number} [tol] Optional number comparison tolerance,
+     *   defaults to Number.EPSILON.
+     * @returns {boolean} True if both points are similar.
      */
-    isSimilar(rhs: Point3D, tol: number): boolean;
+    isSimilar(rhs: Point3D, tol?: number): boolean;
     /**
      * Get a string representation of the Point3D.
      *
@@ -4115,16 +4355,171 @@ export declare class Point3D {
 }
 
 /**
+ * Position helper.
+ */
+export declare class PositionHelper {
+    /**
+     * @param {View} view The associated view.
+     */
+    constructor(view: View);
+    /**
+     * Get the geometry.
+     *
+     * @returns {Geometry} The geometry.
+     */
+    getGeometry(): Geometry;
+    /**
+     * Get the scroll index.
+     *
+     * @returns {number} The scroll index.
+     */
+    getScrollDimIndex(): number;
+    /**
+     * Get the maximum dimension value.
+     *
+     * @param {number} dim The dimension.
+     * @returns {number} The maximum value.
+     */
+    getMaximumDimValue(dim: number): number;
+    /**
+     * Get the maximum scroll value.
+     *
+     * @returns {number} The maximum value.
+     */
+    getMaximumScrollValue(): number;
+    /**
+     * Get the current position.
+     *
+     * @returns {Point} The current position.
+     */
+    getCurrentPosition(): Point;
+    /**
+     * Get the value at dimension index for the current position.
+     *
+     * @param {number} dim The dimension.
+     * @returns {number} The value.
+     */
+    getCurrentPositionDimValue(dim: number): number;
+    /**
+     * Get the value at scroll index for the current position.
+     *
+     * @returns {number} The value.
+     */
+    getCurrentPositionScrollValue(): number;
+    /**
+     * Get the current position updated at the provided dimension index
+     *   with the input value.
+     *
+     * @param {number} dim The dimension.
+     * @param {number} value The value to used at dimension index.
+     * @returns {Point} The position.
+     */
+    getCurrentPositionAtDimValue(dim: number, value: number): Point;
+    /**
+     * Get the current position updated at scroll index with the input value.
+     *
+     * @param {number} value The value to use at scroll index.
+     * @returns {Point} The position.
+     */
+    getCurrentPositionAtScrollValue(value: number): Point;
+    /**
+     * Get the current index.
+     *
+     * @returns {Index} The current index.
+     */
+    getCurrentIndex(): Index;
+    /**
+     * Set the current position.
+     *
+     * @param {Point} position The position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
+    /**
+     * Set the current position only if it is in the geometry bounds.
+     *
+     * @param {Point} position The position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    setCurrentPositionSafe(position: Point, silent?: boolean): boolean;
+    /**
+     * Merge with another helper.
+     *
+     * @param {PositionHelper} rhs The helper to merge with this one.
+     */
+    merge(rhs: PositionHelper): void;
+    /**
+     * Check if the current position (default) or
+     * the provided position is in bounds.
+     *
+     * @param {Point} position Optional position.
+     * @returns {boolean} True is the position is in bounds.
+     */
+    isPositionInBounds(position: Point): boolean;
+    /**
+     * Get the current position incremented in the input direction.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {Point} The resulting point.
+     */
+    getIncrementPosition(dim: number): Point;
+    /**
+     * Get the current position decremented in the input direction.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {Point} The resulting point.
+     */
+    getDecrementPosition(dim: number): Point;
+    /**
+     * Increment the current position along the provided dim.
+     *
+     * @param {number} dim The direction in which to increment.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    incrementPosition(dim: number): boolean;
+    /**
+     * Decrement the current position along the provided dim.
+     *
+     * @param {number} dim The direction in which to decrement.
+     * @returns {boolean} True if possible and in bounds.
+     */
+    decrementPosition(dim: number): boolean;
+    /**
+     * Increment the current position along the scroll dimension.
+     *
+     * @returns {boolean} True if possible and in bounds.
+     */
+    incrementPositionAlongScroll(): boolean;
+    /**
+     * Decrement the current position along the scroll dimension.
+     *
+     * @returns {boolean} True if possible and in bounds.
+     */
+    decrementPositionAlongScroll(): boolean;
+    #private;
+}
+
+/**
  * Round a float number to a given precision.
  *
  * Inspired from {@link https://stackoverflow.com/a/49729715/3639892}.
  *
- * Can be a solution to not have trailing zero as when
- *   using toFixed or toPrecision.
- * '+number.toFixed(precision)' does not pass all the tests...
+ * `toPrecision` uses all non zero digits of the number:
+ * (123.009).toPrecision(4) = "123.0";
+ * (0.09).toPrecision(4) = "0.09000".
+ *
+ * `toFixed` does not always behave as expected:
+ * (123.009).toFixed(2) = "123.01";
+ * (0.009).toFixed(2) = "0.01";
+ * but
+ * (-0.005).toFixed(2) = "-0.01" (expecting 0);
+ * (1.005).toFixed(2) = "1" (expecting 1.01).
  *
  * @param {number} number The number to round.
- * @param {number} precision The rounding precision.
+ * @param {number} precision The rounding precision, ie the result number
+ *   of digits after the comma.
  * @returns {number} The rounded number.
  */
 export declare function precisionRound(number: number, precision: number): number;
@@ -4253,10 +4648,12 @@ export declare class Rectangle {
      * Quantify a rectangle according to view information.
      *
      * @param {ViewController} viewController The associated view controller.
+     * @param {Index} index The index at which to get the
+     *   image values.
      * @param {string[]} flags A list of stat values to calculate.
      * @returns {object} A quantification object.
      */
-    quantify(viewController: ViewController, flags: string[]): object;
+    quantify(viewController: ViewController, index: Index, flags: string[]): object;
     #private;
 }
 
@@ -4305,6 +4702,24 @@ export declare class RescaleSlopeAndIntercept {
 }
 
 /**
+ * Response evaluation class.
+ */
+export declare class ResponseEvaluation {
+    /**
+     * Current response.
+     *
+     * @type {DicomCode}
+     */
+    current: DicomCode;
+    /**
+     * Measurement of response (mm).
+     *
+     * @type {number}
+     */
+    measure: number;
+}
+
+/**
  * RGB colour class.
  */
 export declare class RGB {
@@ -4333,6 +4748,14 @@ export declare class RGB {
      */
     b: number;
 }
+
+/**
+ * Convert RGB to its hex equivalent.
+ *
+ * @param {RGB} rgb The RGB object as {r,g,b}.
+ * @returns {string} A string representing the hex color as '#ab01ef'.
+ */
+export declare function rgbToHex(rgb: RGB): string;
 
 /**
  * Region Of Interest shape.
@@ -4380,9 +4803,9 @@ export declare class ROI {
      * a non-self-intersecting closed polygon.
      * Ref: {@link https://en.wikipedia.org/wiki/Centroid#Of_a_polygon}.
      *
-     * @returns {Point2D} The centroid point.
+     * @returns {Point2D|undefined} The centroid point.
      */
-    getCentroid(): Point2D;
+    getCentroid(): Point2D | undefined;
     #private;
 }
 
@@ -4686,29 +5109,18 @@ export declare class Tag {
      */
     getVrFromDictionary(): string | undefined;
     /**
+     * Get the multiplicity from the dicom dictionary.
+     *
+     * @returns {number|undefined} The multiplicity.
+     */
+    getMultiplicityFromDictionary(): number | undefined;
+    /**
      * Get the tag name from the dicom dictionary.
      *
      * @returns {string|undefined} The VR.
      */
     getNameFromDictionary(): string | undefined;
     #private;
-}
-
-/**
- * Methods used to extract values from DICOM elements.
- *
- * Implemented as class and method to allow for override via its prototype.
- */
-export declare class TagValueExtractor {
-    /**
-     * Get the time.
-     *
-     * @param {Object<string, DataElement>} _elements The DICOM elements.
-     * @returns {number|undefined} The time value if available.
-     */
-    getTime(_elements: {
-        [x: string]: DataElement;
-    }): number | undefined;
 }
 
 /**
@@ -4871,7 +5283,7 @@ export declare const toolList: {
  *     const group = new Konva.Group();
  *     group.name('love-group');
  *     group.visible(true);
- *     group.id(annotation.id);
+ *     group.id(annotation.trackingUid);
  *     group.add(shape);
  *     return group;
  *   }
@@ -5172,16 +5584,7 @@ export declare class View {
      */
     getOrigin(position?: Point): Point3D;
     /**
-     * Set the current position.
-     *
-     * @param {Point} position The new position.
-     * @param {boolean} [silent] Flag to fire event or not.
-     * @returns {boolean} False if not in bounds.
-     * @fires View#positionchange
-     */
-    setCurrentPosition(position: Point, silent?: boolean): boolean;
-    /**
-     * Set the current index.
+     * Set the current position via an index.
      *
      * @param {Index} index The new index.
      * @param {boolean} [silent] Flag to fire event or not.
@@ -5189,6 +5592,15 @@ export declare class View {
      * @fires View#positionchange
      */
     setCurrentIndex(index: Index, silent?: boolean): boolean;
+    /**
+     * Set current position.
+     *
+     * @param {Point} position The new position.
+     * @param {boolean} [silent] Flag to fire event or not.
+     * @returns {boolean} False if not in bounds.
+     * @fires View#positionchange
+     */
+    setCurrentPosition(position: Point, silent?: boolean): boolean;
     /**
      * Set the view window/level.
      *
@@ -5260,7 +5672,7 @@ export declare class View {
      *
      * @returns {number} The index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
      * Is this view in the same orientation as the image aquisition.
      *
@@ -5351,11 +5763,25 @@ export declare class ViewController {
      */
     initialise(): void;
     /**
+     * Reset the window level.
+     */
+    resetWindowLevel(): void;
+    /**
+     * Reset the position.
+     */
+    resetPosition(): void;
+    /**
      * Get the image modality.
      *
      * @returns {string} The modality.
      */
     getModality(): string;
+    /**
+     * Get the image SOP class UID.
+     *
+     * @returns {string|undefined} The uid.
+     */
+    getSopClassUid(): string | undefined;
     /**
      * Get the window/level presets names.
      *
@@ -5387,6 +5813,18 @@ export declare class ViewController {
      * @returns {boolean} True if the controler is playing.
      */
     isPlaying(): boolean;
+    /**
+     * Get the position helper.
+     *
+     * @returns {PositionHelper} The helper.
+     */
+    getPositionHelper(): PositionHelper;
+    /**
+     * Get a clone of the position helper.
+     *
+     * @returns {PositionHelper} The helper clone.
+     */
+    getPositionHelperClone(): PositionHelper;
     /**
      * Get the current position.
      *
@@ -5426,17 +5864,17 @@ export declare class ViewController {
      */
     getCurrentOrientedIndex(): Index;
     /**
-     * Get the scroll index.
+     * Get the scroll dimension index.
      *
      * @returns {number} The index.
      */
-    getScrollIndex(): number;
+    getScrollDimIndex(): number;
     /**
-     * Get the current scroll index value.
+     * Get the current index scroll value.
      *
-     * @returns {object} The value.
+     * @returns {number} The value.
      */
-    getCurrentScrollIndexValue(): object;
+    getCurrentIndexScrollValue(): number;
     /**
      * Get the first origin or at a given position.
      *
@@ -5499,20 +5937,30 @@ export declare class ViewController {
      */
     getPixelUnit(): string;
     /**
+     * Get the image length unit.
+     *
+     * @returns {string} The unit.
+     */
+    getLengthUnit(): string;
+    /**
      * Get some values from the associated image in a region.
      *
      * @param {Point2D} min Minimum point.
      * @param {Point2D} max Maximum point.
+     * @param {Index} index The index at which to get the
+     *   image values (combined with min/max).
      * @returns {Array} A list of values.
      */
-    getImageRegionValues(min: Point2D, max: Point2D): any[];
+    getImageRegionValues(min: Point2D, max: Point2D, index: Index): any[];
     /**
      * Get some values from the associated image in variable regions.
      *
      * @param {number[][][]} regions A list of [x, y] pairs (min, max).
+     * @param {Index} index The index at which to get the
+     *   image values (combined with regions min/max).
      * @returns {Array} A list of values.
      */
-    getImageVariableRegionValues(regions: number[][][]): any[];
+    getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     /**
      * Can the image values be quantified?
      *
@@ -5635,62 +6083,6 @@ export declare class ViewController {
      * @returns {Vector3D} The 3D world offset.
      */
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
-    /**
-     * Get the current position incremented in the input direction.
-     *
-     * @param {number} dim The direction in which to increment.
-     * @returns {Point} The resulting point.
-     */
-    getIncrementPosition(dim: number): Point;
-    /**
-     * Get the current position decremented in the input direction.
-     *
-     * @param {number} dim The direction in which to decrement.
-     * @returns {Point} The resulting point.
-     */
-    getDecrementPosition(dim: number): Point;
-    /**
-     * Get the current position decremented in the scroll direction.
-     *
-     * @returns {Point} The resulting point.
-     */
-    getIncrementScrollPosition(): Point;
-    /**
-     * Get the current position decremented in the scroll direction.
-     *
-     * @returns {Point} The resulting point.
-     */
-    getDecrementScrollPosition(): Point;
-    /**
-     * Increment the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementIndex(dim: number, silent?: boolean): boolean;
-    /**
-     * Decrement the provided dimension.
-     *
-     * @param {number} dim The dimension to increment.
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementIndex(dim: number, silent?: boolean): boolean;
-    /**
-     * Decrement the scroll dimension index.
-     *
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    decrementScrollIndex(silent?: boolean): boolean;
-    /**
-     * Increment the scroll dimension index.
-     *
-     * @param {boolean} [silent] Do not send event.
-     * @returns {boolean} False if not in bounds.
-     */
-    incrementScrollIndex(silent?: boolean): boolean;
     /**
      * Scroll play: loop through all slices.
      */

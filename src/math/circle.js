@@ -1,10 +1,11 @@
-import {getStats} from './stats';
+import {getStats} from './stats.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point';
-import {ViewController} from '../app/viewController';
-import {Scalar2D} from './scalar';
+import {Index} from './index.js';
+import {Point2D} from '../math/point.js';
+import {ViewController} from '../app/viewController.js';
+import {Scalar2D} from './scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -158,30 +159,41 @@ export class Circle {
    * Quantify an circle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
+   * @param {Index} index The index at which to get the
+   *   image values.
    * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
-  quantify(viewController, flags) {
+  quantify(viewController, index, flags) {
     const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
+    const lengthUnit = viewController.getLengthUnit();
     quant.radius = {
       value: this.getRadius() * spacing2D.x,
-      unit: 'unit.mm'
+      unit: lengthUnit
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {
-        value: surface / 100,
-        unit: 'unit.cm2'
-      };
+      if (lengthUnit === 'unit.mm') {
+        quant.surface = {
+          value: surface / 100,
+          unit: 'unit.cm2'
+        };
+      } else {
+        quant.surface = {
+          value: surface,
+          unit: lengthUnit
+        };
+      }
     }
 
     // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const regions = this.getRound();
       if (regions.length !== 0) {
-        const values = viewController.getImageVariableRegionValues(regions);
+        const values = viewController.getImageVariableRegionValues(
+          regions, index);
         const unit = viewController.getPixelUnit();
         const quantif = getStats(values, flags);
         quant.min = {value: quantif.min, unit: unit};

@@ -1,18 +1,20 @@
-import {Index} from '../math/index';
-import {colourNameToHex} from '../utils/colour';
-import {WindowLevel} from '../image/windowLevel';
+import {Index} from '../math/index.js';
+import {colourNameToHex} from '../utils/colour.js';
+import {WindowLevel} from '../image/windowLevel.js';
 
 // external
 import Konva from 'konva';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
+import {App} from '../app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**
  * State class.
  * Saves: data url/path, display info.
+ *
+ * @deprecated Since v0.34, please switch to DICOM SR annotations.
  *
  * History:
  * - v0.5 (dwv 0.30.0, 12/2021):
@@ -84,13 +86,16 @@ export class State {
    */
   apply(app, data) {
     const layerGroup = app.getActiveLayerGroup();
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const viewController = viewLayer.getViewController();
     // display
     const wl = new WindowLevel(data['window-center'], data['window-width']);
     viewController.setWindowLevel(wl);
-    // position is index...
-    viewController.setCurrentIndex(new Index(data.position));
+
+    // position is index for state before v0.4, point for v0.5
+    // position is origin so set position does not make much sense...
+    //viewController.setCurrentIndex(new Index(data.position));
+
     // apply saved scale on top of current base one
     const baseScale = app.getActiveLayerGroup().getBaseScale();
     let scale = null;

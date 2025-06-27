@@ -1,9 +1,9 @@
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {MaskSegment} from '../dicom/dicomSegment';
+import {Image} from './image.js';
+import {MaskSegment} from '../dicom/dicomSegment.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -91,7 +91,7 @@ export class MaskSegmentHelper {
         if (typeof segment.displayValue !== 'undefined') {
           values.push(segment.displayValue);
         } else {
-          values.push(segment.displayRGBValue);
+          values.push(segment.number);
         }
       } else {
         logger.warn('Unknown segment in maskHasSegments: ' + numbers[i]);
@@ -130,6 +130,11 @@ export class MaskSegmentHelper {
     const index = this.#findSegmentIndex(segment.number);
     if (index === -1) {
       this.#segments.push(segment);
+      // update palette colour map
+      if (typeof segment.displayRGBValue !== 'undefined') {
+        this.#mask.updatePaletteColourMap(
+          segment.number, segment.displayRGBValue);
+      }
     } else {
       logger.warn(
         'Not adding segment, it is allready in the segments list: ' +

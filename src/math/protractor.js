@@ -1,9 +1,9 @@
-import {Line, getAngle} from './line';
+import {Line, getAngle} from './line.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point2D} from '../math/point';
-import {ViewController} from '../app/viewController';
+import {Point2D} from '../math/point.js';
+import {ViewController} from '../app/viewController.js';
 /* eslint-enable no-unused-vars */
 
 /**

@@ -1,12 +1,12 @@
 import {
   getCode,
   getDicomCodeItem
-} from './dicomCode';
+} from './dicomCode.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
-import {DicomCode} from './dicomCode';
+import {DataElement} from './dataElement.js';
+import {DicomCode} from './dicomCode.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -73,19 +73,20 @@ export function getMeasuredValue(dataElements) {
   const value = new MeasuredValue();
 
   if (typeof dataElements[TagKeys.NumericValue] !== 'undefined') {
-    value.numericValue = dataElements[TagKeys.NumericValue].value[0];
+    value.numericValue =
+      parseFloat(dataElements[TagKeys.NumericValue].value[0]);
   }
   if (typeof dataElements[TagKeys.FloatingPointValue] !== 'undefined') {
     value.floatingPointValue =
-      dataElements[TagKeys.FloatingPointValue].value[0];
+      parseFloat(dataElements[TagKeys.FloatingPointValue].value[0]);
   }
   if (typeof dataElements[TagKeys.RationalNumeratorValue] !== 'undefined') {
     value.rationalNumeratorValue =
-      dataElements[TagKeys.RationalNumeratorValue].value[0];
+      parseInt(dataElements[TagKeys.RationalNumeratorValue].value[0], 10);
   }
   if (typeof dataElements[TagKeys.RationalDenominatorValue] !== 'undefined') {
     value.rationalDenominatorValue =
-      dataElements[TagKeys.RationalDenominatorValue].value[0];
+      parseInt(dataElements[TagKeys.RationalDenominatorValue].value[0], 10);
   }
   if (typeof dataElements[TagKeys.MeasurementUnitsCodeSequence] !==
     'undefined') {

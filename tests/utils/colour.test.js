@@ -10,7 +10,7 @@ import {
   srgbToCiexyz,
   cielabToSrgb,
   srgbToCielab
-} from '../../src/utils/colour';
+} from '../../src/utils/colour.js';
 
 /**
  * Tests for the 'utils/colour' file.

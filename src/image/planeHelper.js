@@ -1,20 +1,20 @@
-import {Vector3D} from '../math/vector';
-import {Point3D, Point2D} from '../math/point';
-import {isIdentityMat33} from '../math/matrix';
+import {Vector3D} from '../math/vector.js';
+import {Point3D, Point2D} from '../math/point.js';
+import {isIdentityMat33} from '../math/matrix.js';
 import {
   getCosinesFromOrientation,
   getTargetOrientation
-} from '../math/orientation';
-import {getOrientedArray3D, getDeOrientedArray3D} from './geometry';
+} from '../math/orientation.js';
+import {getOrientedArray3D, getDeOrientedArray3D} from './geometry.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Point} from '../math/point';
-import {Index} from '../math/index';
-import {Geometry} from '../image/geometry';
-import {Matrix33} from '../math/matrix';
-import {Spacing} from './spacing';
-import {Scalar2D, Scalar3D} from '../math/scalar';
+import {Point} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {Geometry} from '../image/geometry.js';
+import {Matrix33} from '../math/matrix.js';
+import {Spacing} from './spacing.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -319,17 +319,31 @@ export class PlaneHelper {
    * @returns {Point3D[]} An origin and 2 cosines vectors.
    */
   getPlanePoints(position) {
+    // snap to grid
+    const index = this.worldToIndex(position);
+    const snapPosition = this.indexToWorld(index);
     // get plane point
-    const planePoint = this.getPlanePointFromPosition(position);
+    const planePoint = this.getPlanePointFromPosition(snapPosition);
     // get origin
     const planeOrigin = this.getPositionFromPlanePoint(
       new Point2D(0, 0), planePoint.getZ());
+    // find image origin
+    const origins = this.#imageGeometry.getOrigins();
+    const closestOriginIndex = planeOrigin.getClosest(origins);
+    const imageOrigin = origins[closestOriginIndex];
+
+    // use image origin for scroll to cope with
+    // possible irregular slice spacing
+    const pValues = planeOrigin.getValues();
+    const iValues = imageOrigin.getValues();
+    const scrollDimIndex = this.getNativeScrollDimIndex();
+    pValues[scrollDimIndex] = iValues[scrollDimIndex];
 
     // plane cosines
     const cosines = this.getCosines();
 
     return [
-      planeOrigin,
+      new Point3D(pValues[0], pValues[1], pValues[2]),
       new Point3D(cosines[0], cosines[1], cosines[2]),
       new Point3D(cosines[3], cosines[4], cosines[5])
     ];
@@ -343,6 +357,16 @@ export class PlaneHelper {
    */
   worldToIndex(point) {
     return this.#imageGeometry.worldToIndex(point);
+  }
+
+  /**
+   * Image index to world.
+   *
+   * @param {Index} index The input index.
+   * @returns {Point} The corresponding point.
+   */
+  indexToWorld(index) {
+    return this.#imageGeometry.indexToWorld(index);
   }
 
   /**
@@ -380,7 +404,7 @@ export class PlaneHelper {
    *
    * @returns {number} The index.
    */
-  getScrollIndex() {
+  getScrollDimIndex() {
     let index = null;
     if (typeof this.#viewOrientation !== 'undefined') {
       index = this.#viewOrientation.getThirdColMajorDirection();
@@ -395,7 +419,7 @@ export class PlaneHelper {
    *
    * @returns {number} The index.
    */
-  getNativeScrollIndex() {
+  getNativeScrollDimIndex() {
     let index = null;
     if (typeof this.#imageOrientation !== 'undefined') {
       index = this.#imageOrientation.getThirdColMajorDirection();

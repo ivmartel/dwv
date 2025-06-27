@@ -1,18 +1,28 @@
-import {logger} from '../utils/logger';
+import {logger} from '../utils/logger.js';
 import {
   DicomParser,
   getSyntaxDecompressionName
-} from '../dicom/dicomParser';
-import {ImageFactory} from './imageFactory';
-import {MaskFactory} from './maskFactory';
-import {PixelBufferDecoder} from './decoder';
-import {AnnotationGroupFactory} from './annotationGroupFactory';
+} from '../dicom/dicomParser.js';
+import {ImageFactory} from './imageFactory.js';
+import {MaskFactory} from './maskFactory.js';
+import {PixelBufferDecoder} from './decoder.js';
+import {AnnotationGroupFactory} from './annotationGroupFactory.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from '../dicom/dataElement';
-import {DicomData} from '../app/dataController';
+import {DataElement} from '../dicom/dataElement.js';
+import {DicomData} from '../app/dataController.js';
 /* eslint-enable no-unused-vars */
+
+/**
+ * Related DICOM tag keys.
+ */
+const TagKeys = {
+  TransferSyntaxUID: '00020010',
+  FloatPixelData: '7FE00008',
+  DoubleFloatPixelData: '7FE00009',
+  PixelData: '7FE00010'
+};
 
 /**
  * Create a View from a DICOM buffer.
@@ -39,25 +49,39 @@ export class DicomBufferToView {
    * Pixel buffer decoder.
    * Define only once to allow optional asynchronous mode.
    *
-   * @type {object}
+   * @type {PixelBufferDecoder}
    */
   #pixelDecoder = null;
 
-  // local tmp storage
+  /**
+   * List of dicom parsers.
+   *
+   * @type {DicomParser[]}
+   */
   #dicomParserStore = [];
-  #finalBufferStore = [];
+
+  /**
+   * List of decompressed data sizes.
+   *
+   * @type {number[]}
+   */
   #decompressedSizes = [];
+
+  // local tmp storage
+  #finalBufferStore = [];
   #factories = [];
 
   /**
    * Get the factory associated to input DICOM elements.
    *
    * @param {Object<string, DataElement>} elements The DICOM elements.
-   * @returns {ImageFactory|MaskFactory|AnnotationGroupFactory|undefined}
+   * @returns {ImageFactory|MaskFactory|AnnotationGroupFactory}
    *   The associated factory.
    */
   #getFactory(elements) {
     let factory;
+
+    // mask or annotation
     const modalityElement = elements['00080060'];
     if (typeof modalityElement !== 'undefined') {
       const modality = modalityElement.value[0];
@@ -69,13 +93,12 @@ export class DicomBufferToView {
         factory = new AnnotationGroupFactory();
       }
     }
-    // image factory for pixel data
+
+    // default
     if (typeof factory === 'undefined') {
-      const pixelElement = elements['7FE00010'];
-      if (typeof pixelElement !== 'undefined') {
-        factory = new ImageFactory();
-      }
+      factory = new ImageFactory();
     }
+
     return factory;
   }
 
@@ -84,19 +107,26 @@ export class DicomBufferToView {
    *
    * @param {number} index The data index.
    * @param {string} origin The data origin.
+   * @returns {boolean} True if the generation went ok.
    */
   #generateData(index, origin) {
     const dataElements = this.#dicomParserStore[index].getDicomElements();
     const factory = this.#factories[index];
     // exit if no factory
     if (typeof factory === 'undefined') {
-      return;
+      return false;
     }
     // create data
     try {
       const data = new DicomData(dataElements);
       if (factory instanceof AnnotationGroupFactory) {
-        data.annotationGroup = factory.create(dataElements);
+        if (typeof factory.checkElements(dataElements) === 'undefined') {
+          data.annotationGroup = factory.create(dataElements);
+        }
+      } else if (factory instanceof MaskFactory) {
+        // image creation will be done in data controller
+        // if it has access to reference data
+        data.buffer = this.#finalBufferStore[index];
       } else {
         data.image = factory.create(
           dataElements,
@@ -117,7 +147,32 @@ export class DicomBufferToView {
       this.onloadend({
         source: origin
       });
+      // false for error
+      return false;
     }
+
+    // all good
+    return true;
+  }
+
+  /**
+   * Generate a single data object.
+   *
+   * @param {number} index The data index.
+   * @param {string} origin The data origin.
+   */
+  #generateSingleData(index, origin) {
+    // generate image
+    if (this.#generateData(index, origin)) {
+      // send load event
+      this.onload({
+        source: origin
+      });
+    }
+    // allways send loadend
+    this.onloadend({
+      source: origin
+    });
   }
 
   /**
@@ -127,7 +182,7 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #generateImageUncompressed(index, origin) {
-    // send progress
+    // send 100% progress
     this.onprogress({
       lengthComputable: true,
       loaded: 100,
@@ -135,15 +190,8 @@ export class DicomBufferToView {
       index: index,
       source: origin
     });
-    // generate image
-    this.#generateData(index, origin);
-    // send load events
-    this.onload({
-      source: origin
-    });
-    this.onloadend({
-      source: origin
-    });
+    // generate single data
+    this.#generateSingleData(index, origin);
   }
 
   /**
@@ -186,8 +234,7 @@ export class DicomBufferToView {
 
     // setup the decoder (one decoder per all converts)
     if (this.#pixelDecoder === null) {
-      this.#pixelDecoder = new PixelBufferDecoder(
-        algoName, numberOfItems);
+      this.#pixelDecoder = new PixelBufferDecoder(algoName);
       // callbacks
       // pixelDecoder.ondecodestart: nothing to do
       this.#pixelDecoder.ondecodeditem = (event) => {
@@ -291,14 +338,8 @@ export class DicomBufferToView {
    * @param {string} origin The data origin.
    */
   #handleNonImageData(index, origin) {
-    this.#generateData(index, origin);
-    // send load events
-    this.onload({
-      source: origin
-    });
-    this.onloadend({
-      source: origin
-    });
+    // generate single data
+    this.#generateSingleData(index, origin);
   }
 
   /**
@@ -309,14 +350,23 @@ export class DicomBufferToView {
    */
   #handleImageData(index, origin) {
     const dicomParser = this.#dicomParserStore[index];
+    const elements = dicomParser.getDicomElements();
 
-    const pixelBuffer = dicomParser.getDicomElements()['7FE00010'].value;
-    // help GC: discard pixel buffer from elements
-    dicomParser.getDicomElements()['7FE00010'].value = [];
+    let pixelDataEl = elements[TagKeys.PixelData];
+    // maybe float data
+    if (typeof pixelDataEl === 'undefined') {
+      pixelDataEl = elements[TagKeys.FloatPixelData];
+    }
+    // maybe double float data
+    if (typeof pixelDataEl === 'undefined') {
+      pixelDataEl = elements[TagKeys.DoubleFloatPixelData];
+    }
+
+    const pixelBuffer = pixelDataEl.value;
     this.#finalBufferStore[index] = pixelBuffer[0];
 
     // transfer syntax (always there)
-    const syntax = dicomParser.getDicomElements()['00020010'].value[0];
+    const syntax = elements[TagKeys.TransferSyntaxUID].value[0];
     const algoName = getSyntaxDecompressionName(syntax);
     const needDecompression = typeof algoName !== 'undefined';
 
@@ -357,9 +407,7 @@ export class DicomBufferToView {
       dicomParser.parse(buffer);
       // check elements
       factory = this.#getFactory(dicomParser.getDicomElements());
-      if (typeof factory !== 'undefined') {
-        factory.checkElements(dicomParser.getDicomElements());
-      }
+      factory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
       this.onerror({
         error: error,

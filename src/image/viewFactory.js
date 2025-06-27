@@ -1,16 +1,27 @@
-import {View} from './view';
-import {luts} from './luts';
-import {
-  WindowLevel,
-  defaultPresets
-} from './windowLevel';
-import {logger} from '../utils/logger';
+import {custom} from '../app/custom.js';
+import {View} from './view.js';
+import {WindowLevel} from './windowLevel.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {DataElement} from '../dicom/dataElement';
+import {Image} from './image.js';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
+
+/**
+ * List of default window level presets.
+ *
+ * @type {Object.<string, Object.<string, WindowLevel>>}
+ */
+const defaultWlPresets = {
+  CT: {
+    mediastinum: new WindowLevel(40, 400),
+    lung: new WindowLevel(-500, 1500),
+    bone: new WindowLevel(500, 2000),
+    brain: new WindowLevel(40, 80),
+    head: new WindowLevel(90, 350)
+  }
+};
 
 /**
  * {@link View} factory.
@@ -31,12 +42,6 @@ export class ViewFactory {
     // default color map
     if (image.getPhotometricInterpretation() === 'MONOCHROME1') {
       view.setColourMap('invPlain');
-    } else if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
-      if (typeof luts['palette'] !== 'undefined') {
-        view.setColourMap('palette');
-      } else {
-        logger.warn('Cannot find Palette lut');
-      }
     }
 
     // window level presets
@@ -52,15 +57,20 @@ export class ViewFactory {
     // Order is important, if no wl from DICOM, this will be the default.
     windowPresets.minmax = {name: 'minmax'};
     // optional modality presets
-    if (typeof defaultPresets !== 'undefined') {
-      const modality = image.getMeta().Modality;
-      for (const key in defaultPresets[modality]) {
-        const preset = defaultPresets[modality][key];
-        windowPresets[key] = {
-          wl: [new WindowLevel(preset.center, preset.width)],
-          name: key
-        };
-      }
+    const modality = image.getMeta().Modality;
+    let wlPresets;
+    if (typeof custom.wlPresets !== 'undefined' &&
+      typeof custom.wlPresets[modality] !== 'undefined') {
+      wlPresets = custom.wlPresets[modality];
+    } else {
+      wlPresets = defaultWlPresets[modality];
+    }
+    for (const key in wlPresets) {
+      const preset = wlPresets[key];
+      windowPresets[key] = {
+        wl: [new WindowLevel(preset.center, preset.width)],
+        name: key
+      };
     }
 
     // store

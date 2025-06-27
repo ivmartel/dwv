@@ -1,4 +1,4 @@
-import {stringToUint8Array} from './string';
+import {stringToUint8Array} from './string.js';
 
 /**
  * Get a string id from array values in the form of: '#0-1_#1-2'.

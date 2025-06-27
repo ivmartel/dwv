@@ -1,9 +1,9 @@
-import {Index} from '../math/index';
+import {Index} from '../math/index.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Matrix33} from '../math/matrix';
-import {Scalar2D} from '../math/scalar';
+import {Matrix33} from '../math/matrix.js';
+import {Scalar2D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -242,7 +242,15 @@ export class Size {
     }
     let offset = 0;
     for (let i = start; i < this.length(); ++i) {
-      offset += index.get(i) * this.getDimSize(i, start);
+      const dimMax = this.get(i);
+      const dimIndex = index.get(i);
+
+      if (dimIndex >= dimMax || dimIndex < 0) {
+        // This index is outside the bounds of the geometry
+        return -1;
+      }
+
+      offset += dimIndex * this.getDimSize(i, start);
     }
     return offset;
   }

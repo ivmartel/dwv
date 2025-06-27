@@ -163,17 +163,24 @@ export class DataReader {
   }
 
   /**
-   * Read binary (0/1) array.
+   * Read binary (0/1) bitpacked array.
    *
    * @param {number} byteOffset The offset to start reading from.
-   * @param {number} size The size of the array.
+   * @param {number} size The size of the input array.
+   * @param {number} [outputSize] The size of the output buffer, defaults
+   * to 8 times the input size.
    * @returns {Uint8Array} The read data.
    */
-  readBinaryArray(byteOffset, size) {
+  readBinaryArray(byteOffset, size, outputSize) {
     // input
     const bitArray = new Uint8Array(this.#buffer, byteOffset, size);
     // result
-    const byteArrayLength = 8 * bitArray.length;
+    let byteArrayLength;
+    if (typeof outputSize !== 'undefined') {
+      byteArrayLength = outputSize;
+    } else {
+      byteArrayLength = 8 * bitArray.length;
+    }
     const data = new Uint8Array(byteArrayLength);
     let bitNumber = 0;
     let bitIndex = 0;

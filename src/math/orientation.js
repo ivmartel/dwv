@@ -1,8 +1,8 @@
-import {Vector3D} from './vector';
+import {Vector3D} from './vector.js';
 import {
   Matrix33,
   getIdentityMat33
-} from './matrix';
+} from './matrix.js';
 
 /**
  * Create a 3x3 coronal (xzy) matrix.
@@ -272,7 +272,7 @@ export function getTargetOrientation(imageOrientation, viewOrientation) {
 
   // TODO: why abs???
   const simpleImageOrientation = imageOrientation.asOneAndZeros().getAbs();
-  if (simpleImageOrientation.equals(getCoronalMat33().getAbs())) {
+  if (simpleImageOrientation.isSimilar(getCoronalMat33().getAbs())) {
     targetOrientation = targetOrientation.getAbs();
   }
 

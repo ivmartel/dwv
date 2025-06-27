@@ -1,7 +1,7 @@
-import {endsWith, getRootPath} from '../utils/string';
-import {MultiProgressHandler} from '../utils/progress';
-import {getFileListFromDicomDir} from '../dicom/dicomElementsWrapper';
-import {loaderList} from './loaderList';
+import {endsWith, getRootPath} from '../utils/string.js';
+import {MultiProgressHandler} from '../utils/progress.js';
+import {getFileListFromDicomDir} from '../dicom/dicomDir.js';
+import {loaderList} from './loaderList.js';
 
 // url content types
 export const urlContentTypes = {
@@ -357,6 +357,12 @@ export class UrlsLoader {
         this.#addLoadend();
         errorCallback(event);
       };
+      const timeoutCallback =
+        this.#augmentCallbackEvent(this.ontimeout, dataElement);
+      request.ontimeout = (event) => {
+        this.#addLoadend();
+        timeoutCallback(event);
+      };
       const abortCallback =
         this.#augmentCallbackEvent(this.onabort, dataElement);
       request.onabort = (event) => {
@@ -511,6 +517,14 @@ export class UrlsLoader {
    * @param {object} _event The error event.
    */
   onerror(_event) {}
+
+  /**
+   * Handle a timeout event.
+   * Default does nothing.
+   *
+   * @param {object} _event The timeout event.
+   */
+  ontimeout(_event) {}
 
   /**
    * Handle an abort event.

@@ -1,4 +1,4 @@
-import {stringToUint8Array} from '../../src/utils/string';
+import {stringToUint8Array} from '../../src/utils/string.js';
 import {
   toStringId,
   getArrayFromStringId,
@@ -7,7 +7,7 @@ import {
   arrayEquals,
   parseMultipart,
   buildMultipart
-} from '../../src/utils/array';
+} from '../../src/utils/array.js';
 
 /**
  * Tests for the 'utils/array' file.

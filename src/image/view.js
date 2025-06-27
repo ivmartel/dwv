@@ -1,30 +1,32 @@
-import {Index} from '../math/index';
-import {ModalityLut} from './modalityLut';
-import {WindowLut} from './windowLut';
-import {luts} from './luts';
-import {VoiLut} from './voiLut';
-import {WindowLevel} from './windowLevel';
-import {generateImageDataMonochrome} from './viewMonochrome';
-import {generateImageDataPaletteColor} from './viewPaletteColor';
-import {generateImageDataRgb} from './viewRgb';
-import {generateImageDataYbrFull} from './viewYbrFull';
-import {ViewFactory} from './viewFactory';
-import {isIdentityMat33} from '../math/matrix';
-import {getSliceIterator} from '../image/iterator';
-import {ListenerHandler} from '../utils/listen';
-import {logger} from '../utils/logger';
+import {Index} from '../math/index.js';
+import {ModalityLut} from './modalityLut.js';
+import {WindowLut} from './windowLut.js';
+import {luts} from './luts.js';
+import {VoiLut} from './voiLut.js';
+import {
+  validateWindowLevel,
+  WindowLevel
+} from './windowLevel.js';
+import {generateImageDataMonochrome} from './viewMonochrome.js';
+import {generateImageDataPaletteColor} from './viewPaletteColor.js';
+import {generateImageDataRgb} from './viewRgb.js';
+import {generateImageDataYbrFull} from './viewYbrFull.js';
+import {ViewFactory} from './viewFactory.js';
+import {isIdentityMat33} from '../math/matrix.js';
+import {getSliceIterator} from '../image/iterator.js';
+import {ListenerHandler} from '../utils/listen.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {RescaleSlopeAndIntercept} from './rsi';
-import {ColourMap} from './luts';
-import {Matrix33} from '../math/matrix';
+import {Image} from './image.js';
+import {RescaleSlopeAndIntercept} from './rsi.js';
+import {ColourMap} from './luts.js';
+import {Matrix33} from '../math/matrix.js';
 import {
   Point,
   Point3D
-} from '../math/point';
-import {DataElement} from '../dicom/dataElement';
+} from '../math/point.js';
+import {DataElement} from '../dicom/dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -331,7 +333,9 @@ export class View {
       const sliceWl = currentPreset.wl[offset];
       // set window level: will send a change event, mark it as silent as
       // this change is always triggered by a position change
-      this.setWindowLevel(sliceWl, this.#currentPresetName, true);
+      if (typeof sliceWl !== 'undefined') {
+        this.setWindowLevel(sliceWl, this.#currentPresetName, true);
+      }
     }
 
     // if no current, use first id
@@ -362,7 +366,7 @@ export class View {
       // create the window lookup table
       this.#windowLut = new WindowLut(
         modalityLut,
-        this.#image.getMeta().IsSigned,
+        this.#image.getMeta().PixelRepresentation === 1,
         isDiscrete);
     }
 
@@ -376,7 +380,10 @@ export class View {
     if (typeof voiLut === 'undefined' ||
       !this.#currentWl.equals(voiLutWl)) {
       // set lut window level
-      const voiLut = new VoiLut(this.#currentWl);
+      const voiLut = new VoiLut(
+        this.#currentWl,
+        this.#image.getMeta().VOILUTFunction
+      );
       this.#windowLut.setVoiLut(voiLut);
     }
 
@@ -569,7 +576,7 @@ export class View {
     }
     const geometry = this.#image.getGeometry();
     const index = geometry.worldToIndex(position);
-    const dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollDimIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
@@ -594,41 +601,7 @@ export class View {
   }
 
   /**
-   * Set the current position.
-   *
-   * @param {Point} position The new position.
-   * @param {boolean} [silent] Flag to fire event or not.
-   * @returns {boolean} False if not in bounds.
-   * @fires View#positionchange
-   */
-  setCurrentPosition(position, silent) {
-    // send invalid event if not in bounds
-    const geometry = this.#image.getGeometry();
-    const index = geometry.worldToIndex(position);
-    const dirs = [this.getScrollIndex()];
-    if (index.length() === 4) {
-      dirs.push(3);
-    }
-    if (!geometry.isIndexInBounds(index, dirs)) {
-      if (!silent) {
-        this.#currentPosition = position;
-        // fire event with valid: false
-        this.#fireEvent({
-          type: 'positionchange',
-          value: [
-            index.getValues(),
-            position.getValues(),
-          ],
-          valid: false
-        });
-      }
-      return false;
-    }
-    return this.setCurrentIndex(index, silent);
-  }
-
-  /**
-   * Set the current index.
+   * Set the current position via an index.
    *
    * @param {Index} index The new index.
    * @param {boolean} [silent] Flag to fire event or not.
@@ -636,22 +609,36 @@ export class View {
    * @fires View#positionchange
    */
   setCurrentIndex(index, silent) {
+    const geometry = this.#image.getGeometry();
+    const position = geometry.indexToWorld(index);
+    return this.setCurrentPosition(position, silent);
+  }
+
+  /**
+   * Set current position.
+   *
+   * @param {Point} position The new position.
+   * @param {boolean} [silent] Flag to fire event or not.
+   * @returns {boolean} False if not in bounds.
+   * @fires View#positionchange
+   */
+  setCurrentPosition(position, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
     const geometry = this.#image.getGeometry();
-    const position = geometry.indexToWorld(index);
+    const index = geometry.worldToIndex(position);
 
     // check if possible
-    const dirs = [this.getScrollIndex()];
+    const dirs = [this.getScrollDimIndex()];
     if (index.length() === 4) {
       dirs.push(3);
     }
     if (!geometry.isIndexInBounds(index, dirs)) {
+      this.#currentPosition = position;
       if (!silent) {
-        this.#currentPosition = position;
         // fire event with valid: false
         this.#fireEvent({
           type: 'positionchange',
@@ -756,26 +743,33 @@ export class View {
       silent = false;
     }
 
+    // bound window center and width
+    const wlBound = validateWindowLevel(
+      wl,
+      this.#image.getRescaledDataRange(),
+      this.#image.getMeta().VOILUTFunction
+    );
+
     // check if new wl
-    const isNewWl = !wl.equals(this.#currentWl);
+    const isNewWl = !wlBound.equals(this.#currentWl);
     // check if new name
     const isNewName = this.#currentPresetName !== name;
 
     // compare to previous if present
     if (isNewWl || isNewName) {
       // assign
-      this.#currentWl = wl;
+      this.#currentWl = wlBound;
       this.#currentPresetName = name;
 
       // update manual
       if (name === 'manual') {
         if (typeof this.#windowPresets[name] !== 'undefined') {
-          this.#windowPresets[name].wl[0] = wl;
+          this.#windowPresets[name].wl[0] = wlBound;
         } else {
           // add if not present
           this.addWindowPresets({
             manual: {
-              wl: [wl],
+              wl: [wlBound],
               name: 'manual'
             }
           });
@@ -795,9 +789,9 @@ export class View {
        */
       this.#fireEvent({
         type: 'wlchange',
-        value: [wl.center, wl.width, name],
-        wc: wl.center,
-        ww: wl.width,
+        value: [wlBound.center, wlBound.width, name],
+        wc: wlBound.center,
+        ww: wlBound.width,
         skipGenerate: silent
       });
     }
@@ -838,7 +832,9 @@ export class View {
       wl = preset.wl[offset];
     }
     // set w/l
-    this.setWindowLevel(wl, name, silent);
+    if (typeof wl !== 'undefined') {
+      this.setWindowLevel(wl, name, silent);
+    }
   }
 
   /**
@@ -891,16 +887,13 @@ export class View {
    */
   getWindowLevelMinMax() {
     const range = this.getImage().getRescaledDataRange();
-    const min = range.min;
-    const max = range.max;
-    let width = max - min;
-    // full black / white images, defaults to 1.
-    if (width < 1) {
-      logger.warn('Zero or negative window width, defaulting to one.');
-      width = 1;
-    }
-    const center = min + width / 2;
-    return new WindowLevel(center, width);
+    const width = range.max - range.min;
+    const center = range.min + width / 2;
+    return validateWindowLevel(
+      new WindowLevel(center, width),
+      range,
+      this.#image.getMeta().VOILUTFunction
+    );
   }
 
   /**
@@ -937,46 +930,46 @@ export class View {
 
     const photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation) {
-    case 'MONOCHROME1':
-    case 'MONOCHROME2':
-      generateImageDataMonochrome(
-        data,
-        iterator,
-        this.getAlphaFunction(),
-        this.#getCurrentWindowLut(),
-        this.#getColourMapLut()
-      );
-      break;
+      case 'MONOCHROME1':
+      case 'MONOCHROME2':
+        generateImageDataMonochrome(
+          data,
+          iterator,
+          this.getAlphaFunction(),
+          this.#getCurrentWindowLut(),
+          this.#getColourMapLut()
+        );
+        break;
 
-    case 'PALETTE COLOR':
-      generateImageDataPaletteColor(
-        data,
-        iterator,
-        this.getAlphaFunction(),
-        this.#getColourMapLut(),
-        image.getMeta().BitsStored === 16
-      );
-      break;
+      case 'PALETTE COLOR':
+        generateImageDataPaletteColor(
+          data,
+          iterator,
+          this.getAlphaFunction(),
+          image.getPaletteColourMap(),
+          image.getMeta().BitsStored === 16
+        );
+        break;
 
-    case 'RGB':
-      generateImageDataRgb(
-        data,
-        iterator,
-        this.getAlphaFunction()
-      );
-      break;
+      case 'RGB':
+        generateImageDataRgb(
+          data,
+          iterator,
+          this.getAlphaFunction()
+        );
+        break;
 
-    case 'YBR_FULL':
-      generateImageDataYbrFull(
-        data,
-        iterator,
-        this.getAlphaFunction()
-      );
-      break;
+      case 'YBR_FULL':
+        generateImageDataYbrFull(
+          data,
+          iterator,
+          this.getAlphaFunction()
+        );
+        break;
 
-    default:
-      throw new Error(
-        'Unsupported photometric interpretation: ' + photoInterpretation);
+      default:
+        throw new Error(
+          'Unsupported photometric interpretation: ' + photoInterpretation);
     }
   }
 
@@ -985,7 +978,7 @@ export class View {
    *
    * @returns {number} The index.
    */
-  getScrollIndex() {
+  getScrollDimIndex() {
     let index = null;
     const orientation = this.getOrientation();
     if (typeof orientation !== 'undefined') {

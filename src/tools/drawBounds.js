@@ -1,12 +1,41 @@
-import {Point2D} from '../math/point';
+import {Point2D} from '../math/point.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Scalar2D} from '../math/scalar';
-import {Style} from '../gui/style';
+import {Scalar2D} from '../math/scalar.js';
+import {Style} from '../gui/style.js';
 // external
 import Konva from 'konva';
 /* eslint-enable no-unused-vars */
+
+/**
+ * List of default label texts.
+ *
+ * @type {Object.<string, Object.<string, string>>}
+ */
+export const defaultLabelTexts = {
+  arrow: {
+    '*': ''
+  },
+  circle: {
+    '*': '{surface}'
+  },
+  ellipse: {
+    '*': '{surface}'
+  },
+  protractor: {
+    '*': '{angle}'
+  },
+  rectangle: {
+    '*': '{surface}'
+  },
+  roi: {
+    '*': ''
+  },
+  ruler: {
+    '*': '{length}'
+  }
+};
 
 /**
  * Is an input node's name 'label'.

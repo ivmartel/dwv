@@ -1,8 +1,8 @@
-import {startsWith, getFileExtension} from '../utils/string';
-import {getUrlFromUri} from '../utils/uri';
-import {getViewFromDOMVideo} from '../image/domReader';
-import {fileContentTypes} from './filesLoader';
-import {urlContentTypes} from './urlsLoader';
+import {startsWith, getFileExtension} from '../utils/string.js';
+import {getUrlFromUri} from '../utils/uri.js';
+import {getViewFromDOMVideo} from '../image/domReader.js';
+import {fileContentTypes} from './filesLoader.js';
+import {urlContentTypes} from './urlsLoader.js';
 
 /**
  * Raw video loader.

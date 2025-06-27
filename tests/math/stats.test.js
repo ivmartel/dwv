@@ -2,7 +2,7 @@ import {
   getStats,
   getBasicStats,
   guid
-} from '../../src/math/stats';
+} from '../../src/math/stats.js';
 
 /**
  * Tests for the 'math/stats.js' file.

@@ -1,13 +1,13 @@
-import {ListenerHandler} from '../utils/listen';
+import {ListenerHandler} from '../utils/listen.js';
 import {
   ThresholdFilter,
   SobelFilter,
   SharpenFilter
-} from '../image/filter';
+} from '../image/filter.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
+import {App} from '../app/application.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -60,12 +60,12 @@ export class Filter {
     for (const key in this.#filterList) {
       if (bool) {
         this.#filterList[key].addEventListener('filterrun', this.#fireEvent);
-        this.#filterList[key].addEventListener('filter-undo', this.#fireEvent);
+        this.#filterList[key].addEventListener('filterundo', this.#fireEvent);
       } else {
         this.#filterList[key].removeEventListener(
           'filterrun', this.#fireEvent);
         this.#filterList[key].removeEventListener(
-          'filter-undo', this.#fireEvent);
+          'filterundo', this.#fireEvent);
       }
     }
   }

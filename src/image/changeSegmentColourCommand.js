@@ -1,8 +1,8 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Image} from './image';
-import {MaskSegment} from '../dicom/dicomSegment';
-import {RGB} from '../utils/colour';
+import {Image} from './image.js';
+import {MaskSegment} from '../dicom/dicomSegment.js';
+import {RGB} from '../utils/colour.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -69,8 +69,8 @@ export class ChangeSegmentColourCommand {
       this.#previousColour = segment.displayRGBValue;
     } else {
       this.#previousColour = segment.displayValue;
+      this.#offsets = mask.getOffsets(this.#previousColour);
     }
-    this.#offsets = mask.getOffsets(this.#previousColour);
   }
 
   /**
@@ -88,7 +88,11 @@ export class ChangeSegmentColourCommand {
    * @returns {boolean} True if the command is valid.
    */
   isValid() {
-    return this.#offsets.length !== 0;
+    let valid = true;
+    if (typeof this.#offsets !== 'undefined') {
+      valid = this.#offsets.length !== 0;
+    }
+    return valid;
   }
 
   /**
@@ -97,12 +101,19 @@ export class ChangeSegmentColourCommand {
    * @fires ChangeSegmentColourCommand#changemasksegmentcolour
    */
   execute() {
-    // remove
-    this.#mask.setAtOffsets(this.#offsets, this.#newColour);
     // update segment property
     if (typeof this.#newColour === 'number') {
+      // remove
+      this.#mask.setAtOffsets(this.#offsets, this.#newColour);
+      // update segment
       this.#segment.displayValue = this.#newColour;
     } else {
+      // update palette colour map (sends update event)
+      this.#mask.updatePaletteColourMap(
+        this.#segment.number,
+        this.#newColour
+      );
+      // update segment
       this.#segment.displayRGBValue = this.#newColour;
     }
 
@@ -129,12 +140,19 @@ export class ChangeSegmentColourCommand {
    * @fires ChangeSegmentColourCommand#changemasksegmentcolour
    */
   undo() {
-    // re-draw
-    this.#mask.setAtOffsets(this.#offsets, this.#previousColour);
     // update segment property
     if (typeof this.#previousColour === 'number') {
+      // update values
+      this.#mask.setAtOffsets(this.#offsets, this.#previousColour);
+      // update segment
       this.#segment.displayValue = this.#previousColour;
     } else {
+      // update palette colour map (sends update event)
+      this.#mask.updatePaletteColourMap(
+        this.#segment.number,
+        this.#previousColour
+      );
+      // udpate segment
       this.#segment.displayRGBValue = this.#previousColour;
     }
 

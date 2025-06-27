@@ -1,11 +1,11 @@
-import {Point2D} from './point';
-import {getStats} from './stats';
-import {Index} from './index';
+import {Point2D} from './point.js';
+import {getStats} from './stats.js';
+import {Index} from './index.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {ViewController} from '../app/viewController';
-import {Scalar2D} from './scalar';
+import {ViewController} from '../app/viewController.js';
+import {Scalar2D} from './scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -186,33 +186,44 @@ export class Rectangle {
    * Quantify a rectangle according to view information.
    *
    * @param {ViewController} viewController The associated view controller.
+   * @param {Index} index The index at which to get the
+   *   image values.
    * @param {string[]} flags A list of stat values to calculate.
    * @returns {object} A quantification object.
    */
-  quantify(viewController, flags) {
+  quantify(viewController, index, flags) {
     const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
+    const lengthUnit = viewController.getLengthUnit();
     quant.width = {
       value: this.getWidth() * spacing2D.x,
-      unit: 'unit.mm'
+      unit: lengthUnit
     };
     quant.height = {
       value: this.getHeight() * spacing2D.y,
-      unit: 'unit.mm'
+      unit: lengthUnit
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {
-        value: surface / 100,
-        unit: 'unit.cm2'
-      };
+      if (lengthUnit === 'unit.mm') {
+        quant.surface = {
+          value: surface / 100,
+          unit: 'unit.cm2'
+        };
+      } else {
+        quant.surface = {
+          value: surface,
+          unit: lengthUnit
+        };
+      }
     }
 
     // pixel values quantification
     if (viewController.canQuantifyImage()) {
       const round = this.getRound();
-      const values = viewController.getImageRegionValues(round.min, round.max);
+      const values = viewController.getImageRegionValues(
+        round.min, round.max, index);
       const unit = viewController.getPixelUnit();
       const quantif = getStats(values, flags);
       quant.min = {value: quantif.min, unit: unit};

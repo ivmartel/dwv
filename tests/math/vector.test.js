@@ -1,4 +1,4 @@
-import {Vector3D} from '../../src/math/vector';
+import {Vector3D} from '../../src/math/vector.js';
 
 /**
  * Tests for the 'math/point.js' file.

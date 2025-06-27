@@ -1,16 +1,16 @@
-import {getSpacingFromMeasure} from './dicomElementsWrapper';
-import {logger} from '../utils/logger';
-import {arrayEquals} from '../utils/array';
+import {getSpacingFromMeasure} from './dicomImage.js';
+import {logger} from '../utils/logger.js';
+import {arrayEquals} from '../utils/array.js';
 import {
   getDicomCodeItem,
-  getSegmentationCode,
-  getSourceImageForProcessingCode
-} from './dicomCode';
+  DcmCodes,
+  getDcmDicomCode
+} from './dicomCode.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
-import {Spacing} from '../image/spacing';
+import {DataElement} from './dataElement.js';
+import {Spacing} from '../image/spacing.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -31,6 +31,72 @@ const TagKeys = {
   ImageOrientation: '00200037',
   PixelMeasuresSequence: '00289110'
 };
+
+/**
+ * Check the dimension organization from a dicom element.
+ *
+ * @param {Object<string, DataElement>} dataElements The root dicom element.
+ * @returns {object} The dimension organizations and indices.
+ */
+export function getDimensionOrganization(dataElements) {
+  // Dimension Organization Sequence (required)
+  const orgSq = dataElements['00209221'];
+  if (typeof orgSq === 'undefined' || orgSq.value.length !== 1) {
+    throw new Error('Unsupported dimension organization sequence length');
+  }
+  // Dimension Organization UID
+  const orgUID = orgSq.value[0]['00209164'].value[0];
+
+  // Dimension Index Sequence (conditionally required)
+  const indices = [];
+  const indexSqElem = dataElements['00209222'];
+  if (typeof indexSqElem !== 'undefined') {
+    const indexSq = indexSqElem.value;
+    // expecting 2D index
+    if (indexSq.length !== 2) {
+      throw new Error('Unsupported dimension index sequence length');
+    }
+    let indexPointer;
+    for (let i = 0; i < indexSq.length; ++i) {
+      // Dimension Organization UID (required)
+      const indexOrg = indexSq[i]['00209164'].value[0];
+      if (indexOrg !== orgUID) {
+        throw new Error(
+          'Dimension Index Sequence contains a unknown Dimension Organization');
+      }
+      // Dimension Index Pointer (required)
+      indexPointer = indexSq[i]['00209165'].value[0];
+
+      const index = {
+        DimensionOrganizationUID: indexOrg,
+        DimensionIndexPointer: indexPointer
+      };
+      // Dimension Description Label (optional)
+      if (typeof indexSq[i]['00209421'] !== 'undefined') {
+        index.DimensionDescriptionLabel = indexSq[i]['00209421'].value[0];
+      }
+      // store
+      indices.push(index);
+    }
+    // expecting Image Position at last position
+    if (indexPointer !== '(0020,0032)') {
+      throw new Error('Unsupported non image position as last index');
+    }
+  }
+
+  return {
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: orgUID
+        }
+      ]
+    },
+    indices: {
+      value: indices
+    }
+  };
+}
 
 /**
  * DICOM segment frame info: item of a
@@ -261,9 +327,11 @@ export function getDicomSegmentFrameInfoItem(frameInfo) {
   // optional DerivationImageSequence
   if (frameInfo.derivationImages !== undefined) {
     const sourceImgPurposeOfReferenceCode =
-      getDicomCodeItem(getSourceImageForProcessingCode());
+      getDicomCodeItem(
+        getDcmDicomCode(DcmCodes.SourceImageForImageProcessingOperation)
+      );
     const segDerivationCode =
-      getDicomCodeItem(getSegmentationCode());
+      getDicomCodeItem(getDcmDicomCode(DcmCodes.Segmentation));
 
     const derivationImageItems = [];
     for (const derivationImage of frameInfo.derivationImages) {

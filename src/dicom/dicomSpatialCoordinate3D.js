@@ -1,6 +1,6 @@
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -46,7 +46,7 @@ export class SpatialCoordinate3D {
    */
   toString() {
     return this.graphicType +
-      '{' + this.graphicData + '}';
+      ' {' + this.graphicData + '}';
   };
 };
 

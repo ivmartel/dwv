@@ -1,4 +1,4 @@
-import {Spacing} from '../../src/image/spacing';
+import {Spacing} from '../../src/image/spacing.js';
 
 /**
  * Tests for the 'image/spacing.js' file.

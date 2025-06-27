@@ -1,14 +1,17 @@
-import {getLayerDetailsFromEvent} from '../gui/layerGroup';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {
   getMousePoint,
   getTouchPoints
-} from '../gui/generic';
-import {ScrollWheel} from './scrollWheel';
+} from '../gui/generic.js';
+import {ScrollWheel} from './scrollWheel.js';
+import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {App} from '../app/application';
-import {Point2D} from '../math/point';
+import {App} from '../app/application.js';
+import {Point2D} from '../math/point.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -51,7 +54,8 @@ import {Point2D} from '../math/point';
  * // update app on slider change
  * range.oninput = function () {
  *   const lg = app.getLayerGroupByDivId('layerGroup0');
- *   const vc = lg.getActiveViewLayer().getViewController();
+ *   const vl = lg.getBaseViewLayer();
+ *   const vc = vl.getViewController();
  *   const index = vc.getCurrentIndex();
  *   const values = index.getValues();
  *   values[2] = this.value;
@@ -66,7 +70,8 @@ import {Point2D} from '../math/point';
  * // update slider on slice change (for ex via mouse wheel)
  * app.addEventListener('positionchange', function () {
  *   const lg = app.getLayerGroupByDivId('layerGroup0');
- *   const vc = lg.getActiveViewLayer().getViewController();
+ *   const vl = lg.getBaseViewLayer();
+ *   const vc = vl.getViewController();
  *   range.value = vc.getCurrentIndex().get(2);
  * });
  * // load dicom data
@@ -135,6 +140,26 @@ export class Scroll {
   }
 
   /**
+   * Get the associated view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group to search.
+   * @returns {ViewLayer|undefined} The view layer.
+   */
+  #getViewLayer(layerGroup) {
+    let viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer === 'undefined') {
+      const drawLayer = layerGroup.getActiveDrawLayer();
+      if (typeof drawLayer === 'undefined') {
+        logger.warn('No draw layer to do scroll');
+        return;
+      }
+      viewLayer = layerGroup.getViewLayerById(
+        drawLayer.getReferenceLayerId());
+    }
+    return viewLayer;
+  }
+
+  /**
    * Start tool interaction.
    *
    * @param {Point2D} point The start point.
@@ -144,22 +169,28 @@ export class Scroll {
     // optional tooltip
     this.#removeTooltipDiv();
 
-    // stop viewer if playing
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getViewLayer(layerGroup);
+    if (typeof viewLayer === 'undefined') {
+      logger.warn('No view layer to start scroll');
+      return;
+    }
+
     const viewController = viewLayer.getViewController();
+
+    // stop auto scroll if playing
     if (viewController.isPlaying()) {
       viewController.stop();
     }
+    // update base controller position
+    const planePos = viewLayer.displayToPlanePos(point);
+    const position = viewController.getPositionFromPlanePoint(planePos);
+    viewController.setCurrentPosition(position);
 
     // start flag
     this.#started = true;
     this.#startPoint = point;
 
-    // update controller position
-    const planePos = viewLayer.displayToPlanePos(point);
-    const position = viewController.getPositionFromPlanePoint(planePos);
-    viewController.setCurrentPosition(position);
   }
 
   /**
@@ -178,41 +209,30 @@ export class Scroll {
     }
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
-    const viewController = viewLayer.getViewController();
-
-    let newPosition;
+    const positionHelper = layerGroup.getPositionHelper();
 
     // difference to last Y position
     const diffY = point.getY() - this.#startPoint.getY();
     const yMove = (Math.abs(diffY) > 15);
+    // difference to last X position
+    const diffX = point.getX() - this.#startPoint.getX();
+    const xMove = (Math.abs(diffX) > 15);
+
     // do not trigger for small moves
     if (yMove && layerGroup.canScroll()) {
       // update view controller
       if (diffY > 0) {
-        newPosition = viewController.getDecrementScrollPosition();
+        positionHelper.decrementPositionAlongScroll();
       } else {
-        newPosition = viewController.getIncrementScrollPosition();
+        positionHelper.incrementPositionAlongScroll();
       }
-    }
-
-    // difference to last X position
-    const diffX = point.getX() - this.#startPoint.getX();
-    const xMove = (Math.abs(diffX) > 15);
-    // do not trigger for small moves
-    if (xMove && layerGroup.moreThanOne(3)) {
+    } else if (xMove && layerGroup.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
-        newPosition = viewController.getIncrementPosition(3);
+        positionHelper.incrementPosition(3);
       } else {
-        newPosition = viewController.getDecrementPosition(3);
+        positionHelper.decrementPosition(3);
       }
-    }
-
-    // set all layers if at least one can be set
-    if (typeof newPosition !== 'undefined' &&
-      layerGroup.isPositionInBounds(newPosition)) {
-      viewController.setCurrentPosition(newPosition);
     }
 
     // reset origin point
@@ -349,9 +369,11 @@ export class Scroll {
     const layerDetails = getLayerDetailsFromEvent(event);
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    viewController.play();
+    const viewLayer = layerGroup.getActiveViewLayer();
+    if (typeof viewLayer !== 'undefined') {
+      const viewController = viewLayer.getViewController();
+      viewController.play();
+    }
   };
 
   /**

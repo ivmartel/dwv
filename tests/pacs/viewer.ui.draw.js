@@ -1,30 +1,60 @@
-// Do not warn if these variables were not defined before.
-
-// namespace
-// eslint-disable-next-line no-var
-var test = test || {};
-test.toolFeaturesUI = test.toolFeaturesUI || {};
+import {DicomCode} from '../../src/dicom/dicomCode.js';
 
 /**
- * Draw tool features.
- *
- * @param {object} app The associated application.
- * @param {object} toolConfig The tood configuration.
+ * Draw tool UI.
  */
-test.toolFeaturesUI.Draw = function (app, toolConfig) {
+export class DrawToolUI {
 
-  this.getValue = function () {
+  #app;
+  #toolConfig;
+
+  /**
+   * @param {object} app The associated application.
+   * @param {object} toolConfig The tood configuration.
+   */
+  constructor(app, toolConfig) {
+    this.#app = app;
+    this.#toolConfig = toolConfig;
+  }
+
+  getValue() {
     const shapeSelect = document.getElementById('draw-shape-select');
+    // example annotation meta data added at draw time
+    // (not sure of the concept-value association)
+    const concept0 = new DicomCode('Processing type');
+    concept0.schemeDesignator = 'DCM';
+    concept0.value = '111701';
+    const value0 = new DicomCode('Manual Processing');
+    value0.schemeDesignator = 'DCM';
+    value0.value = '123109';
+    // example draw meta validator
+    const drawMetaValidator = function (/*meta*/) {
+      //return meta.StationName === 'web browser';
+      return true;
+    };
+    // example ref meta validator
+    const refMetaValidator = function (/*meta*/) {
+      //return meta.Modality === 'CT';
+      return true;
+    };
     return {
-      shapeName: shapeSelect.value
+      shapeName: shapeSelect.value,
+      annotationMeta: [
+        {concept: concept0, value: value0}
+      ],
+      annotationGroupMeta: [
+        // {concept: 'StationName', value: 'web browser'}
+      ],
+      drawMetaValidator,
+      refMetaValidator
     };
   };
 
-  this.getHtml = function () {
+  getHtml() {
     const shapeSelect = document.createElement('select');
     shapeSelect.id = 'draw-shape-select';
 
-    const shapeNames = toolConfig.options;
+    const shapeNames = this.#toolConfig.options;
     if (typeof shapeNames === 'undefined') {
       return;
     }
@@ -37,9 +67,9 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
       shapeSelect.appendChild(opt);
     }
 
-    shapeSelect.onchange = function (event) {
+    shapeSelect.onchange = (event) => {
       const element = event.target;
-      app.setToolFeatures({shapeName: element.value});
+      this.#app.setToolFeatures({shapeName: element.value});
     };
 
     const autoColourInput = document.createElement('input');
@@ -56,15 +86,15 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
     colourInput.id = 'draw-colour-chooser';
     colourInput.value = '#ffff80';
 
-    autoColourInput.onchange = function (event) {
+    autoColourInput.onchange = (event) => {
       const element = event.target;
-      app.setToolFeatures({autoShapeColour: element.checked});
+      this.#app.setToolFeatures({autoShapeColour: element.checked});
       colourInput.disabled = element.checked;
     };
 
-    colourInput.onchange = function (event) {
+    colourInput.onchange = (event) => {
       const element = event.target;
-      app.setToolFeatures({shapeColour: element.value});
+      this.#app.setToolFeatures({shapeColour: element.value});
     };
 
     const res = document.createElement('span');
@@ -78,4 +108,4 @@ test.toolFeaturesUI.Draw = function (app, toolConfig) {
     return res;
   };
 
-}; // test.toolFeaturesUI.Draw
+}; // DrawToolUI

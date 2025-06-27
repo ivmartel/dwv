@@ -2,7 +2,7 @@ import {
   Point2D,
   Point3D,
   Point
-} from '../../src/math/point';
+} from '../../src/math/point.js';
 
 /**
  * Tests for the 'math/point.js' file.

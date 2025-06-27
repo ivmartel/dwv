@@ -1,5 +1,5 @@
-import {logger} from './logger';
-import {splitKeyValueString} from './string';
+import {logger} from './logger.js';
+import {splitKeyValueString} from './string.js';
 
 /**
  * Get an full object URL from a string uri.

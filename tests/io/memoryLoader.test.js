@@ -1,5 +1,5 @@
-import {MemoryLoader} from '../../src/io/memoryLoader';
-import {b64urlToArrayBuffer} from '../dicom/utils';
+import {MemoryLoader} from '../../src/io/memoryLoader.js';
+import {b64urlToArrayBuffer} from '../dicom/utils.js';
 
 import bbmri53323131 from '../data/bbmri-53323131.dcm';
 import bbmri53323275 from '../data/bbmri-53323275.dcm';

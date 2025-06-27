@@ -1,5 +1,74 @@
 # Changelog
 
+## [v0.35.0](https://github.com/ivmartel/dwv/releases/tag/v0.35.0) - 27/06/2025
+
+### Added
+
+- Use pixel unitt for data without pixel spacing [#1941](https://github.com/ivmartel/dwv/issues/1941)
+- Add support for VOI LUT functions [#1935](https://github.com/ivmartel/dwv/issues/1935)
+- Use reference geometry for seg [#1922](https://github.com/ivmartel/dwv/issues/1922)
+- Output ESM bundle [#1905](https://github.com/ivmartel/dwv/issues/1905)
+- Use ProcedureEvidence instead of ref series [#1904](https://github.com/ivmartel/dwv/issues/1904)
+- Add file extension to imports [#1903](https://github.com/ivmartel/dwv/issues/1903)
+- Update webpack config to expose web workers [#1900](https://github.com/ivmartel/dwv/issues/1900)
+- Window/Level tool enhancements [#1896](https://github.com/ivmartel/dwv/issues/1896)
+- Add mask centroid calculation [#1895](https://github.com/ivmartel/dwv/issues/1895)
+- Add mask volume quantification [#1894](https://github.com/ivmartel/dwv/issues/1894)
+- Improve handling of "image data missing" condition [#1890](https://github.com/ivmartel/dwv/issues/1890)
+- Follow TID1500 for annotation DICOM SR [#1887](https://github.com/ivmartel/dwv/issues/1887)
+- Remove warning for LIP orientation [#1882](https://github.com/ivmartel/dwv/issues/1882)
+- Change draw blacklist into more generic validation [#1880](https://github.com/ivmartel/dwv/issues/1880)
+- Add meta data to annotations [#1876](https://github.com/ivmartel/dwv/issues/1876)
+- Add brush tool [#1870](https://github.com/ivmartel/dwv/issues/1870)
+- Change loaditem and dataadd/dataupdate event order [#1861](https://github.com/ivmartel/dwv/issues/1861)
+- App load methods return loadid [#1860](https://github.com/ivmartel/dwv/issues/1860)
+- Make UndoStack extend EventTarget [#1853](https://github.com/ivmartel/dwv/issues/1853)
+- Only one active layer [#1845](https://github.com/ivmartel/dwv/issues/1845)
+- Allow to listen for request timeout [#1832](https://github.com/ivmartel/dwv/issues/1832)
+- Move overridable properties to single 'custom' object [#1831](https://github.com/ivmartel/dwv/issues/1831)
+- Scroll use minimum resolution [#1821](https://github.com/ivmartel/dwv/issues/1821)
+- Add untilTag to dicom parser [#1814](https://github.com/ivmartel/dwv/issues/1814)
+- Add decoders code to dist [#1802](https://github.com/ivmartel/dwv/issues/1802)
+- Support same colour segments [#1800](https://github.com/ivmartel/dwv/issues/1800)
+
+### Fixed
+
+- Bug: Creating a new segmentation mask on an MPR view will draw on the wrong slice [#1954](https://github.com/ivmartel/dwv/issues/1954)
+- [bug] Baby MRI with state image is not displayed [#1953](https://github.com/ivmartel/dwv/issues/1953)
+- [bug] Error message appears in MPR mode [#1952](https://github.com/ivmartel/dwv/issues/1952)
+- [bug] Error message while clicking on the viewer after selecting Side by Side layout [#1950](https://github.com/ivmartel/dwv/issues/1950)
+- [bug] Error message while opening Toutatics series [#1949](https://github.com/ivmartel/dwv/issues/1949)
+- Revert upgrade to typescript >5.7 [#1945](https://github.com/ivmartel/dwv/issues/1945)
+- Error 'Cannot write boolean array as binary’ when writing DICOM seg [#1926](https://github.com/ivmartel/dwv/issues/1926)
+- Error while writing pixel data stored in sequence [#1891](https://github.com/ivmartel/dwv/issues/1891)
+- Number precision related error [#1885](https://github.com/ivmartel/dwv/issues/1885)
+- Error loading when orientation is decimals different among slices of a series [#1877](https://github.com/ivmartel/dwv/issues/1877)
+- Field of view change on viewer resize [#1864](https://github.com/ivmartel/dwv/issues/1864)
+- Handle DICOM seg segments without recommended display [#1863](https://github.com/ivmartel/dwv/issues/1863)
+- Wrong merge size in mergeGeometries [#1846](https://github.com/ivmartel/dwv/issues/1846)
+- Annotation quantification change on view update [#1842](https://github.com/ivmartel/dwv/issues/1842)
+
+---
+
+## [v0.34.2](https://github.com/ivmartel/dwv/releases/tag/v0.34.2) - 03/02/2025
+
+### Fixed
+
+- ROI centroid calculation error [#1888](https://github.com/ivmartel/dwv/issues/1855)
+- Floodfill and livewire can only create one shape [#1854](https://github.com/ivmartel/dwv/issues/1854)
+
+---
+
+## [v0.34.1](https://github.com/ivmartel/dwv/releases/tag/v0.34.1) - 05/12/2024
+
+### Fixed
+
+- Cannot annotate on raw image (jpg, png...) [#1813](https://github.com/ivmartel/dwv/issues/1813)
+- Annotation update always updates quantification [#1820](https://github.com/ivmartel/dwv/issues/1820)
+- New annotation cannot be moved after loading another [#1819](https://github.com/ivmartel/dwv/issues/1819)
+
+---
+
 ## [v0.34.0](https://github.com/ivmartel/dwv/releases/tag/v0.34.0) - 14/11/2024
 
 ### Added

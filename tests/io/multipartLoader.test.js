@@ -1,4 +1,4 @@
-import {MultipartLoader} from '../../src/io/multipartLoader';
+import {MultipartLoader} from '../../src/io/multipartLoader.js';
 
 /**
  * Tests for the 'io/multipartLoader.js' file.

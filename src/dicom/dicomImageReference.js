@@ -1,11 +1,12 @@
 import {
   getSopInstanceReference,
   getDicomSopInstanceReferenceItem
-} from './dicomSopInstanceReference';
+} from './dicomSopInstanceReference.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {DataElement} from './dataElement';
+import {DataElement} from './dataElement.js';
+import {SopInstanceReference} from './dicomSopInstanceReference.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -24,12 +25,12 @@ const TagKeys = {
  */
 export class ImageReference {
   /**
-   * @type {object}
+   * @type {SopInstanceReference}
    */
   referencedSOPSequence;
 
   /**
-   * @type {object}
+   * @type {string}
    */
   referencedFrameNumber;
 
@@ -39,17 +40,16 @@ export class ImageReference {
   referencedSegmentNumber;
 
   /**
-   * @type {string}
-   */
-  fiducialUID;
-
-  /**
    * Get a string representation of this object.
    *
    * @returns {string} The object as string.
    */
   toString() {
-    return this.referencedSOPSequence.toString();
+    let res = this.referencedSOPSequence.toString();
+    if (typeof this.referencedFrameNumber !== 'undefined') {
+      res += ', frame: ' + this.referencedFrameNumber;
+    }
+    return res;
   };
 };
 

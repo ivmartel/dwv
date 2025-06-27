@@ -1,22 +1,27 @@
-import {Index} from '../math/index';
-import {Point3D} from '../math/point';
-import {logger} from '../utils/logger';
-import {arrayContains} from '../utils/array';
-import {getTypedArray} from '../dicom/dicomParser';
-import {ListenerHandler} from '../utils/listen';
-import {colourRange} from './iterator';
-import {RescaleSlopeAndIntercept} from './rsi';
-import {ImageFactory} from './imageFactory';
-import {MaskFactory} from './maskFactory';
+import {Index} from '../math/index.js';
+import {Point3D} from '../math/point.js';
+import {logger} from '../utils/logger.js';
+import {arrayContains} from '../utils/array.js';
+import {getTypedArray} from '../dicom/dicomParser.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {valueRange} from './iterator.js';
+import {RescaleSlopeAndIntercept} from './rsi.js';
+import {ImageFactory} from './imageFactory.js';
+import {MaskFactory} from './maskFactory.js';
+import {isMonochrome} from '../dicom/dicomImage.js';
+import {LabelingThread} from './labelingThread.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Geometry} from './geometry';
-import {Matrix33} from '../math/matrix';
-import {NumberRange} from '../math/stats';
-import {DataElement} from '../dicom/dataElement';
-import {RGB} from '../utils/colour';
+import {Geometry} from './geometry.js';
+import {Matrix33, REAL_WORLD_EPSILON} from '../math/matrix.js';
+import {NumberRange} from '../math/stats.js';
+import {DataElement} from '../dicom/dataElement.js';
+import {RGB} from '../utils/colour.js';
+import {ColourMap} from './luts.js';
 /* eslint-enable no-unused-vars */
+
+const ML_PER_MM = 0.001; // ml/mm^3
 
 /**
  * Get the slice index of an input slice into a volume geometry.
@@ -179,6 +184,13 @@ export class Image {
   #photometricInterpretation = 'MONOCHROME2';
 
   /**
+   * Palette colour map.
+   *
+   * @type {ColourMap}
+   */
+  #paletteColourMap;
+
+  /**
    * Planar configuration for RGB data (`0:RGBRGBRGBRGB...` or
    *   `1:RRR...GGG...BBB...`).
    *
@@ -229,6 +241,13 @@ export class Image {
   #listenerHandler = new ListenerHandler();
 
   /**
+   * The labeling thread.
+   *
+   * @type {LabelingThread}
+   */
+  #labelingThread;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -237,6 +256,7 @@ export class Image {
     this.#geometry = geometry;
     this.#buffer = buffer;
     this.#imageUids = imageUids;
+    this.#labelingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
       this.#geometry.getSize().getTotalSize());
@@ -336,8 +356,7 @@ export class Image {
    * @returns {boolean} True if the data is monochrome.
    */
   isMonochrome() {
-    return this.getPhotometricInterpretation()
-      .match(/MONOCHROME/) !== null;
+    return isMonochrome(this.getPhotometricInterpretation());
   }
 
   /**
@@ -482,6 +501,40 @@ export class Image {
    */
   setPhotometricInterpretation(interp) {
     this.#photometricInterpretation = interp;
+  }
+
+  /**
+   * Set the palette colour map.
+   *
+   * @param {ColourMap} map The colour map.
+   */
+  setPaletteColourMap(map) {
+    this.#paletteColourMap = map;
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
+  }
+
+  /**
+   * Get the palette colour map.
+   *
+   * @returns {ColourMap} The colour map.
+   */
+  getPaletteColourMap() {
+    return this.#paletteColourMap;
+  }
+
+  /**
+   * Update the palette colour map.
+   *
+   * @param {number} index The index to change the colour of.
+   * @param {RGB} colour The colour to use at index.
+   */
+  updatePaletteColourMap(index, colour) {
+    this.#paletteColourMap.red[index] = colour.r;
+    this.#paletteColourMap.green[index] = colour.g;
+    this.#paletteColourMap.blue[index] = colour.b;
+    // fire imagecontentchange
+    this.#fireEvent({type: 'imagecontentchange'});
   }
 
   /**
@@ -705,7 +758,7 @@ export class Image {
     // create new
     this.#buffer = getTypedArray(
       this.#buffer.BYTES_PER_ELEMENT * 8,
-      this.#meta.IsSigned ? 1 : 0,
+      this.#meta.PixelRepresentation,
       size);
     if (this.#buffer === null) {
       throw new Error('Cannot reallocate data for image.');
@@ -738,8 +791,8 @@ export class Image {
     if (size.get(1) !== rhsSize.get(1)) {
       throw new Error('Cannot append a slice with different number of rows');
     }
-    if (!this.#geometry.getOrientation().equals(
-      rhs.getGeometry().getOrientation(), 0.0001)) {
+    if (!this.#geometry.getOrientation().isSimilar(
+      rhs.getGeometry().getOrientation(), REAL_WORLD_EPSILON)) {
       throw new Error('Cannot append a slice with different orientation');
     }
     if (this.#photometricInterpretation !==
@@ -749,10 +802,16 @@ export class Image {
     }
     // all meta should be equal
     for (const key in this.#meta) {
-      if (key === 'windowPresets' || key === 'numberOfFiles' ||
-        key === 'custom') {
+      if (
+        key === 'windowPresets' ||
+        key === 'numberOfFiles' ||
+        key === 'custom' ||
+        // This was already checked with #geometry.getOrientation()
+        key === 'ImageOrientationPatient'
+      ) {
         continue;
       }
+
       if (this.#meta[key] !== rhs.getMeta()[key]) {
         throw new Error('Cannot append a slice with different ' + key +
           ': ' + this.#meta[key] + ' != ' + rhs.getMeta()[key]);
@@ -1056,58 +1115,46 @@ export class Image {
    *
    * @param {number[][]} offsetsLists List of offset lists where
    *   to set the data.
-   * @param {RGB} value The value to set at the given offsets.
+   * @param {number} value The value to set at the given offsets.
    * @returns {Array} A list of objects representing the original values before
    *  replacing them.
    * @fires Image#imagecontentchange
    */
   setAtOffsetsAndGetOriginals(offsetsLists, value) {
-    const originalColoursLists = [];
+    const originalValuesLists = [];
 
     // update and store
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
-      // first colour
-      let offset = offsets[0] * 3;
-      let previousColour = {
-        r: this.#buffer[offset],
-        g: this.#buffer[offset + 1],
-        b: this.#buffer[offset + 2]
-      };
+      // first value
+      let offset = offsets[0];
+      let previousValue = this.#buffer[offset];
       // original value storage
-      const originalColours = [];
-      originalColours.push({
+      const originalValues = [];
+      originalValues.push({
         index: 0,
-        colour: previousColour
+        value: previousValue
       });
       for (let i = 0; i < offsets.length; ++i) {
-        offset = offsets[i] * 3;
-        const currentColour = {
-          r: this.#buffer[offset],
-          g: this.#buffer[offset + 1],
-          b: this.#buffer[offset + 2]
-        };
-        // check if new colour
-        if (previousColour.r !== currentColour.r ||
-          previousColour.g !== currentColour.g ||
-          previousColour.b !== currentColour.b) {
-          // store new colour
-          originalColours.push({
+        offset = offsets[i];
+        const currentValue = this.#buffer[offset];
+        // check if new value
+        if (previousValue !== currentValue) {
+          // store new value
+          originalValues.push({
             index: i,
-            colour: currentColour
+            value: currentValue
           });
-          previousColour = currentColour;
+          previousValue = currentValue;
         }
-        // write update colour
-        this.#buffer[offset] = value.r;
-        this.#buffer[offset + 1] = value.g;
-        this.#buffer[offset + 2] = value.b;
+        // write update value
+        this.#buffer[offset] = value;
       }
-      originalColoursLists.push(originalColours);
+      originalValuesLists.push(originalValues);
     }
     // fire imagecontentchange
     this.#fireEvent({type: 'imagecontentchange'});
-    return originalColoursLists;
+    return originalValuesLists;
   }
 
   /**
@@ -1115,33 +1162,31 @@ export class Image {
    *
    * @param {number[][]} offsetsLists List of offset lists
    *   where to set the data.
-   * @param {RGB|Array} value The value to set at the given offsets.
+   * @param {number|Array} value The value to set at the given offsets.
    * @fires Image#imagecontentchange
    */
   setAtOffsetsWithIterator(offsetsLists, value) {
+    const isValueArray = Array.isArray(value);
+
     for (let j = 0; j < offsetsLists.length; ++j) {
       const offsets = offsetsLists[j];
       let iterator;
-      if (Array.isArray(value)) {
+      if (isValueArray) {
         // input value is a list of iterators
         // created by setAtOffsetsAndGetOriginals
-        iterator = colourRange(
+        iterator = valueRange(
           value[j], offsets.length);
-      } else if (typeof value.r !== 'undefined' &&
-        typeof value.g !== 'undefined' &&
-        typeof value.b !== 'undefined') {
+      } else {
         // input value is a simple color
-        iterator = colourRange(
-          [{index: 0, colour: value}], offsets.length);
+        iterator = valueRange(
+          [{index: 0, value: value}], offsets.length);
       }
 
       // set values
       let ival = iterator.next();
       while (!ival.done) {
-        const offset = offsets[ival.index] * 3;
-        this.#buffer[offset] = ival.value.r;
-        this.#buffer[offset + 1] = ival.value.g;
-        this.#buffer[offset + 2] = ival.value.b;
+        const offset = offsets[ival.index];
+        this.#buffer[offset] = ival.value;
         ival = iterator.next();
       }
     }
@@ -1560,6 +1605,53 @@ export class Image {
       );
     }
     return newImage;
+  }
+
+  /**
+   * Recalculate labels.
+   */
+  recalculateLabels() {
+    if (this.#labelingThread === null) {
+      this.#labelingThread = new LabelingThread();
+
+      const spacing = this.#geometry.getSpacing();
+      const lengthUnit = this.getMeta().lengthUnit;
+      let pixelVolume = 1;
+      let volumeUnit = 'unit.pixel';
+      if (lengthUnit === 'unit.mm') {
+        pixelVolume =
+          spacing.get(0) *
+          spacing.get(1) *
+          spacing.get(2) *
+          ML_PER_MM;
+        volumeUnit = 'unit.ml';
+      }
+
+      this.#labelingThread.ondone = (event) => {
+        const labels = event.data.labels;
+        // add centroid point and volume
+        for (const label of labels) {
+          label.centroid = this.#geometry.indexToWorld(
+            new Index(label.centroidIndex));
+          label.volume = label.count * pixelVolume;
+          label.unit = volumeUnit;
+        }
+        // sort
+        const labelsSorted =
+          labels.sort((v1, v2) => {
+            return v2.volume - v1.volume;
+          }).sort((v1, v2) => {
+            return v1.id - v2.id;
+          });
+
+        this.#fireEvent({
+          type: 'labelschanged',
+          labels: labelsSorted
+        });
+      };
+    }
+
+    this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
   }
 
 } // class Image

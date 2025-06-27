@@ -1,4 +1,4 @@
-import {RawVideoLoader} from '../../src/io/rawVideoLoader';
+import {RawVideoLoader} from '../../src/io/rawVideoLoader.js';
 
 /**
  * Tests for the 'io/rawVideoLoader.js' file.

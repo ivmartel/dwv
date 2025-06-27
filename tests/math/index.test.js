@@ -1,5 +1,5 @@
-import {Index} from '../../src/math/index';
-import {Point} from '../../src/math/point';
+import {Index} from '../../src/math/index.js';
+import {Point} from '../../src/math/point.js';
 
 /**
  * Tests for the 'math/index.js' file.

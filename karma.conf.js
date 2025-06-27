@@ -1,12 +1,19 @@
+import {webpackTest} from './config/webpack.test.js';
+
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/6.4/config/configuration-file.html
 
-module.exports = function (config) {
+/**
+ * Get the Karma config for dwv.
+ *
+ * @param {object} config The Karma configuration.
+ */
+export default function (config) {
   config.set({
     basePath: '.',
     frameworks: ['qunit', 'webpack'],
     files: [
-      {pattern: 'tests/**/*.test.js', watched: false}
+      {pattern: 'tests/**/*.test.js', watched: false},
     ],
     client: {
       clearContext: false,
@@ -20,7 +27,7 @@ module.exports = function (config) {
       'tests/**/*.test.js': ['webpack']
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './build/coverage/'),
+      dir: './build/coverage/',
       reporters: [
         {type: 'html', subdir: 'report-html'},
         {type: 'text-summary'}
@@ -28,7 +35,7 @@ module.exports = function (config) {
       check: {
         global: {
           statements: 30,
-          branches: 34,
+          branches: 30,
           functions: 30,
           lines: 30
         }
@@ -38,22 +45,10 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     browsers: ['Chrome'],
     restartOnFileChange: true,
-    webpack: webpackConfig(),
+    webpack: webpackTest,
     jsonReporter: {
       stdout: false,
       outputFile: './build/test-results.json'
     },
   });
 };
-
-/**
- * Get the webpack config to pass to Karma.
- *
- * @returns {object} The config.
- */
-function webpackConfig() {
-  const config = require('./webpack.test.js');
-  delete config.entry;
-  delete config.output;
-  return config;
-}

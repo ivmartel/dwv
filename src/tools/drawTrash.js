@@ -1,8 +1,8 @@
 import Konva from 'konva';
 
 /* eslint-disable no-unused-vars */
-import {Scalar2D} from '../math/scalar';
-import {DrawLayer} from '../gui/drawLayer';
+import {Scalar2D} from '../math/scalar.js';
+import {DrawLayer} from '../gui/drawLayer.js';
 /* eslint-enable no-unused-vars */
 
 export class DrawTrash {

@@ -1,19 +1,19 @@
-import {Index} from '../math/index';
-import {ListenerHandler} from '../utils/listen';
-import {viewEventNames} from '../image/view';
-import {ViewController} from '../app/viewController';
-import {Point2D} from '../math/point';
+import {Index} from '../math/index.js';
+import {ListenerHandler} from '../utils/listen.js';
+import {viewEventNames} from '../image/view.js';
+import {ViewController} from '../app/viewController.js';
+import {Point2D} from '../math/point.js';
 import {
   canCreateCanvas,
   InteractionEventNames
-} from './generic';
-import {getScaledOffset} from './layerGroup';
+} from './generic.js';
+import {getScaledOffset} from './layerGroup.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Vector3D} from '../math/vector';
-import {Point, Point3D} from '../math/point';
-import {Scalar2D, Scalar3D} from '../math/scalar';
+import {Vector3D} from '../math/vector.js';
+import {Point, Point3D} from '../math/point.js';
+import {Scalar2D, Scalar3D} from '../math/scalar.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -113,7 +113,7 @@ export class ViewLayer {
   #flipScale = {x: 1, y: 1, z: 1};
 
   /**
-   * The layer offset.
+   * The full layer offset: sum of all other offsets.
    *
    * @type {Scalar2D}
    */
@@ -139,6 +139,13 @@ export class ViewLayer {
    * @type {Scalar2D}
    */
   #zoomOffset = {x: 0, y: 0};
+
+  /**
+   * The pan offset.
+   *
+   * @type {Scalar2D}
+   */
+  #panOffset = {x: 0, y: 0};
 
   /**
    * The flip offset.
@@ -575,11 +582,11 @@ export class ViewLayer {
     scrollOffset, planeOffset,
     layerGroupOrigin, layerGroupOrigin0) {
     const helper = this.#viewController.getPlaneHelper();
-    const scrollIndex = helper.getNativeScrollIndex();
+    const scrollDimIndex = helper.getNativeScrollDimIndex();
     const newOffset = helper.getPlaneOffsetFromOffset3D({
-      x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
-      y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
-      z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
+      x: scrollDimIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollDimIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollDimIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
     const needsUpdate = this.#baseOffset.x !== newOffset.x ||
       this.#baseOffset.y !== newOffset.y;
@@ -607,19 +614,12 @@ export class ViewLayer {
    */
   setOffset(newOffset) {
     const helper = this.#viewController.getPlaneHelper();
-    const planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
+    const newPanOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
     this.#offset = {
-      x: planeNewOffset.x +
-        this.#viewOffset.x +
-        this.#baseOffset.x +
-        this.#zoomOffset.x +
-        this.#flipOffset.x,
-      y: planeNewOffset.y +
-        this.#viewOffset.y +
-        this.#baseOffset.y +
-        this.#zoomOffset.y +
-        this.#flipOffset.y
+      x: this.#offset.x - this.#panOffset.x + newPanOffset.x,
+      y: this.#offset.y - this.#panOffset.y + newPanOffset.y
     };
+    this.#panOffset = newPanOffset;
   }
 
   /**
@@ -863,6 +863,22 @@ export class ViewLayer {
   fitToContainer(containerSize, divToWorldSizeRatio, fitOffset) {
     let needsDraw = false;
 
+    // fit scale
+    const newFitScale = {
+      x: divToWorldSizeRatio * this.#baseSpacing.x,
+      y: divToWorldSizeRatio * this.#baseSpacing.y
+    };
+    const fitRatio = {
+      x: newFitScale.x / this.#fitScale.x,
+      y: newFitScale.y / this.#fitScale.y
+    };
+
+    // size ratio (calculated before update)
+    const sizeRatio = {
+      x: containerSize.x / (this.#canvas.width * fitRatio.x),
+      y: containerSize.y / (this.#canvas.height * fitRatio.y)
+    };
+
     // set canvas size if different from previous
     if (this.#canvas.width !== containerSize.x ||
       this.#canvas.height !== containerSize.y) {
@@ -877,23 +893,18 @@ export class ViewLayer {
       needsDraw = true;
     }
 
-    // fit scale
-    const divToImageSizeRatio = {
-      x: divToWorldSizeRatio * this.#baseSpacing.x,
-      y: divToWorldSizeRatio * this.#baseSpacing.y
-    };
     // #scale = inputScale * fitScale * flipScale
     // flipScale does not change here, we can omit it
     // newScale = (#scale / fitScale) * newFitScale
     const newScale = {
-      x: this.#scale.x * divToImageSizeRatio.x / this.#fitScale.x,
-      y: this.#scale.y * divToImageSizeRatio.y / this.#fitScale.y
+      x: this.#scale.x * fitRatio.x,
+      y: this.#scale.y * fitRatio.y
     };
 
     // set scales if different from previous
     if (this.#scale.x !== newScale.x ||
       this.#scale.y !== newScale.y) {
-      this.#fitScale = divToImageSizeRatio;
+      this.#fitScale = newFitScale;
       this.#scale = newScale;
       // update draw flag
       needsDraw = true;
@@ -901,13 +912,13 @@ export class ViewLayer {
 
     // view offset
     const newViewOffset = {
-      x: fitOffset.x / divToImageSizeRatio.x,
-      y: fitOffset.y / divToImageSizeRatio.y
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
     };
     // flip offset
     const scaledImageSize = {
-      x: containerSize.x / divToImageSizeRatio.x,
-      y: containerSize.y / divToImageSizeRatio.y
+      x: containerSize.x / newFitScale.x,
+      y: containerSize.y / newFitScale.y
     };
     const newFlipOffset = {
       x: this.#flipOffset.x !== 0 ? scaledImageSize.x : 0,
@@ -919,18 +930,25 @@ export class ViewLayer {
       this.#viewOffset.y !== newViewOffset.y ||
       this.#flipOffset.x !== newFlipOffset.x ||
       this.#flipOffset.y !== newFlipOffset.y) {
+      const newZoomOffset = {
+        x: this.#zoomOffset.x * sizeRatio.x,
+        y: this.#zoomOffset.y * sizeRatio.y
+      };
       // update global offset
       this.#offset = {
         x: this.#offset.x +
           newViewOffset.x - this.#viewOffset.x +
-          newFlipOffset.x - this.#flipOffset.x,
+          newFlipOffset.x - this.#flipOffset.x +
+          newZoomOffset.x - this.#zoomOffset.x,
         y: this.#offset.y +
           newViewOffset.y - this.#viewOffset.y +
-          newFlipOffset.y - this.#flipOffset.y,
+          newFlipOffset.y - this.#flipOffset.y +
+          newZoomOffset.y - this.#zoomOffset.y
       };
       // update private local offsets
       this.#flipOffset = newFlipOffset;
       this.#viewOffset = newViewOffset;
+      this.#zoomOffset = newZoomOffset;
       // update draw flag
       needsDraw = true;
     }
@@ -1070,9 +1088,9 @@ export class ViewLayer {
         // 3D dimensions
         const dims3D = [0, 1, 2];
         // remove scroll index
-        const indexScrollIndex =
-          dims3D.indexOf(this.#viewController.getScrollIndex());
-        dims3D.splice(indexScrollIndex, 1);
+        const indexScrollDimIndex =
+          dims3D.indexOf(this.#viewController.getScrollDimIndex());
+        dims3D.splice(indexScrollDimIndex, 1);
         // remove non scroll index from diff dims
         const diffDims = event.diffDims.filter(function (item) {
           return dims3D.indexOf(item) === -1;

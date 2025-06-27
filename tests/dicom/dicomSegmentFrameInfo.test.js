@@ -3,8 +3,8 @@ import {
   getSegmentFrameInfo,
   isEqualSegmentFrameInfo,
   getDicomSegmentFrameInfoItem
-} from '../../src/dicom/dicomSegmentFrameInfo';
-import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter';
+} from '../../src/dicom/dicomSegmentFrameInfo.js';
+import {getElementsFromJSONTags} from '../../src/dicom/dicomWriter.js';
 
 /**
  * Tests for the 'dicom/dicomSegmentFrameInfo.js' file.

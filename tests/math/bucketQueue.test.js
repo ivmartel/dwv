@@ -1,4 +1,4 @@
-import {BucketQueue} from '../../src/math/bucketQueue';
+import {BucketQueue} from '../../src/math/bucketQueue.js';
 
 /**
  * Tests for the 'math/BucketQueue.js' file.

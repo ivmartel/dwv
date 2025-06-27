@@ -1,12 +1,12 @@
 import {
   DicomData,
   DataController
-} from '../../src/app/dataController';
-import {Point3D} from '../../src/math/point';
-import {Image} from '../../src/image/image';
-import {Size} from '../../src/image/size';
-import {Spacing} from '../../src/image/spacing';
-import {Geometry} from '../../src/image/geometry';
+} from '../../src/app/dataController.js';
+import {Point3D} from '../../src/math/point.js';
+import {Image} from '../../src/image/image.js';
+import {Size} from '../../src/image/size.js';
+import {Spacing} from '../../src/image/spacing.js';
+import {Geometry} from '../../src/image/geometry.js';
 
 /**
  * Tests for the 'app/dataController.js' file.
@@ -31,7 +31,7 @@ QUnit.test('DataController class', function (assert) {
   const imgSize0 = new Size([size0, size0, 1]);
   const imgSpacing0 = new Spacing([1, 1, 1]);
   const imgOrigin0 = new Point3D(0, 0, 0);
-  const imgGeometry0 = new Geometry(imgOrigin0, imgSize0, imgSpacing0);
+  const imgGeometry0 = new Geometry([imgOrigin0], imgSize0, imgSpacing0);
   const buffer0 = [];
   for (let i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;

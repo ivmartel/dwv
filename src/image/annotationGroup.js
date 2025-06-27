@@ -1,10 +1,10 @@
-import {logger} from '../utils/logger';
-import {ListenerHandler} from '../utils/listen';
+import {logger} from '../utils/logger.js';
+import {ListenerHandler} from '../utils/listen.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
-import {Annotation} from './annotation';
-import {ViewController} from '../app/viewController';
+import {Annotation} from './annotation.js';
+import {ViewController} from '../app/viewController.js';
 /* eslint-enable no-unused-vars */
 
 /**
@@ -150,10 +150,19 @@ export class AnnotationGroup {
    *
    * @param {Annotation} annotation The annotation to update.
    * @param {string[]} [propKeys] Optional properties that got updated.
+   * @param {boolean} [propagate] Whether the update event propagates
+   *   outside of dwv or not, defaults to true.
    */
-  update(annotation, propKeys) {
-    const index = this.#list.findIndex((item) => item.id === annotation.id);
+  update(annotation, propKeys, propagate) {
+    const index = this.#list.findIndex(
+      (item) => item.trackingUid === annotation.trackingUid);
     if (index !== -1) {
+      // update quantification if needed
+      if (propKeys.includes('mathShape') ||
+        propKeys.includes('textExpr')) {
+        annotation.updateQuantification();
+      }
+      // update list
       this.#list[index] = annotation;
       /**
        * Annotation update event.
@@ -167,7 +176,8 @@ export class AnnotationGroup {
       this.#fireEvent({
         type: 'annotationupdate',
         data: annotation,
-        keys: propKeys
+        keys: propKeys,
+        propagate: propagate
       });
     } else {
       logger.warn('Cannot find annotation to update');
@@ -177,10 +187,11 @@ export class AnnotationGroup {
   /**
    * Remove an annotation.
    *
-   * @param {string} id The id of the annotation to remove.
+   * @param {string} uid The UID of the annotation to remove.
    */
-  remove(id) {
-    const index = this.#list.findIndex((item) => item.id === id);
+  remove(uid) {
+    const index = this.#list.findIndex(
+      (item) => item.trackingUid === uid);
     if (index !== -1) {
       const annotation = this.#list.splice(index, 1)[0];
       /**
@@ -216,11 +227,11 @@ export class AnnotationGroup {
   /**
    * Find an annotation.
    *
-   * @param {string} id The id of the annotation to find.
+   * @param {string} uid The UID of the annotation to find.
    * @returns {Annotation|undefined} The found annotation.
    */
-  find(id) {
-    return this.#list.find((item) => item.id === id);
+  find(uid) {
+    return this.#list.find((item) => item.trackingUid === uid);
   }
 
   /**
@@ -246,7 +257,7 @@ export class AnnotationGroup {
    * Get a meta data value.
    *
    * @param {string} key The meta data key.
-   * @returns {string|object} The meta data value.
+   * @returns {string|object|undefined} The meta data value.
    */
   getMetaValue(key) {
     return this.#meta[key];
