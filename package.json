@@ -19,11 +19,9 @@
   "main": "./dist/dwv.min.js",
   "types": "./dist/dwv.d.ts",
   "exports": {
-    "import": {
-      "default": "./dist/dwv.min.js",
-      "node": "./dist/dwv.node.min.js"
-    },
-    "types": "./dist/dwv.d.ts"
+    "types": "./dist/dwv.d.ts",
+    "node": "./dist/dwv.node.min.js",
+    "default": "./dist/dwv.min.js"
   },
   "engines": {
     "node": ">= 14.0.0"
