@@ -33,7 +33,7 @@ import {logger} from '../utils/logger.js';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.35.0';
+  return '0.36.0-beta.0';
 }
 
 /**
