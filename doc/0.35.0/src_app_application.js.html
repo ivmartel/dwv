@@ -195,12 +195,13 @@ export class AppOptions {
  * Main application class.
  *
  * @example
+ * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * app.init(options);
  * // load dicom data
  * app.loadURLs([
@@ -551,12 +552,13 @@ export class App {
    *
    * @param {AppOptions} opt The application options.
    * @example
+   * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
    * // create the dwv app
-   * const app = new dwv.App();
+   * const app = new App();
    * // initialise
-   * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+   * const viewConfig0 = new ViewConfig('layerGroup0');
    * const viewConfigs = {'*': [viewConfig0]};
-   * const options = new dwv.AppOptions(viewConfigs);
+   * const options = new AppOptions(viewConfigs);
    * options.viewOnFirstLoadItem = false;
    * app.init(options);
    * // render button

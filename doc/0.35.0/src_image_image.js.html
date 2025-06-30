@@ -87,13 +87,14 @@ export function createMaskImage(elements) {
  * - planar configuration (default RGBRGB...).
  *
  * @example
+ * import {DicomParser, createImage} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
