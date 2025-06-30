@@ -50,7 +50,6 @@
         "codepen": {
           "enable_for": ["examples"],
           "options": {
-            "js_external": "https://github.com/ivmartel/dwv/releases/download/v0.36.0-beta.0/dwv-0.36.0-beta.0.min.js",
             "html": "<div id='dwv'><div id='layerGroup0'></div></div>"
           }
         }
