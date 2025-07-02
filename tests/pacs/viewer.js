@@ -217,6 +217,8 @@ function viewerSetup() {
       resetLayoutButton.disabled = false;
       const smoothingChk = document.getElementById('changesmoothing');
       smoothingChk.disabled = false;
+      const swapViewsButton = document.getElementById('swapviews');
+      swapViewsButton.disabled = false;
       // remove handler
       _app.removeEventListener('renderend', onRenderEnd);
     }
@@ -483,6 +485,49 @@ function setup() {
     _app.resetLayout();
   });
 
+  const swapViewsButton = document.getElementById('swapviews');
+  swapViewsButton.disabled = true;
+  swapViewsButton.addEventListener('click', function () {
+    const currentConfigs = _app.getDataViewConfigs();
+
+    const newConfigs = {};
+    for (const key in currentConfigs) {
+      const currentGroup = currentConfigs[key];
+      const newGroup = [];
+      for (let i = 0; i < currentGroup.length; i++) {
+        const newConfig = currentGroup[i];
+        if (newConfig.divId === 'layerGroup0') {
+          newConfig.divId = 'layerGroup1';
+        } else if (newConfig.divId === 'layerGroup1') {
+          newConfig.divId = 'layerGroup0';
+        }
+        newGroup.push(newConfig);
+      }
+      newConfigs[key] = newGroup;
+    }
+
+    // clear data table
+    dataTable.clearDataTable();
+
+    // set config (deletes previous layers)
+    _app.setDataViewConfigs(newConfigs);
+
+    // re-render
+    const dataIds = _app.getDataIds();
+    for (let i = 0; i < dataIds.length; ++i) {
+      _app.render(dataIds[i]);
+    }
+
+    // re-enable crosshairs
+    const divIds = getLayerGroupDivIds(newConfigs);
+    for (const divId of divIds) {
+      _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
+    }
+
+    // need to set tool after config change
+    setAppTool();
+  });
+
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.disabled = true;
   changeLayoutSelect.addEventListener('change', function (event) {
@@ -530,6 +575,12 @@ function setup() {
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
+    }
+    
+    if (layout === 'side') {
+      swapViewsButton.style = 'visibility: visible;';
+    } else {
+      swapViewsButton.style = 'visibility: collapse;';
     }
 
     // need to set tool after config change
