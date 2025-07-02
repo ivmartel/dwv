@@ -102,8 +102,6 @@ export class ViewController {
 
   /**
    * Update the plane helper if there is a change in the image geometry.
-   *
-   * @returns {PlaneHelper} The helper.
    */
   updatePlaneHelper() {
     this.#planeHelper = new PlaneHelper(
