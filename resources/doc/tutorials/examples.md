@@ -28,6 +28,7 @@ Displays:
 Extending dwv:
 
 - [custom tool example #1](./global.html#toolList): add a custom tool
+- [custom tool options example #1](./global.html#toolOptions): add a custom shape
 
 All the ones of jsfiddle: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
 

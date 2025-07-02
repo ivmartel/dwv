@@ -396,12 +396,13 @@ export declare class AnnotationGroupFactory {
  * Main application class.
  *
  * @example
+ * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * app.init(options);
  * // load dicom data
  * app.loadURLs([
@@ -592,12 +593,13 @@ export declare class App {
      *
      * @param {AppOptions} opt The application options.
      * @example
+     * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
      * // create the dwv app
-     * const app = new dwv.App();
+     * const app = new App();
      * // initialise
-     * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+     * const viewConfig0 = new ViewConfig('layerGroup0');
      * const viewConfigs = {'*': [viewConfig0]};
-     * const options = new dwv.AppOptions(viewConfigs);
+     * const options = new AppOptions(viewConfigs);
      * options.viewOnFirstLoadItem = false;
      * app.init(options);
      * // render button
@@ -1482,10 +1484,11 @@ export declare class DicomData {
  * DicomParser class.
  *
  * @example
+ * import {DicomParser} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // setup the dicom parser
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the dicom tags
@@ -1611,6 +1614,7 @@ export declare class DicomSRContent {
  * DICOM writer.
  *
  * @example
+ * import {DicomParser, DicomWriter} from '//esm.sh/dwv';
  * // add link to html
  * const link = document.createElement("a");
  * link.appendChild(document.createTextNode("download"));
@@ -1618,10 +1622,10 @@ export declare class DicomSRContent {
  * div.appendChild(link);
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   const parser = new dwv.DicomParser();
+ *   const parser = new DicomParser();
  *   parser.parse(event.target.response);
  *   // create writer
- *   const writer = new dwv.DicomWriter();
+ *   const writer = new DicomWriter();
  *   // get buffer using default rules
  *   const dicomBuffer = writer.getBuffer(parser.getDicomElements());
  *   // create blob
@@ -2613,13 +2617,14 @@ export declare namespace i18n {
  * - planar configuration (default RGBRGB...).
  *
  * @example
+ * import {DicomParser, createImage} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -5214,6 +5219,7 @@ export declare class ToolConfig {
  * the default ones.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, toolList} from '//esm.sh/dwv';
  * // custom tool
  * class AlertTool {
  *   mousedown() {alert('AlertTool mousedown');}
@@ -5221,13 +5227,13 @@ export declare class ToolConfig {
  *   activate() {}
  * }
  * // pass it to dwv tool list
- * dwv.toolList['Alert'] = AlertTool;
+ * toolList['Alert'] = AlertTool;
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * options.tools = {Alert: {}};
  * app.init(options);
  * // activate tool
@@ -5250,6 +5256,8 @@ export declare const toolList: {
  * the default ones.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, toolOptions, ROI, Point2D}
+ *   from '//esm.sh/dwv';
  * // custom factory
  * class LoveFactory {
  *   getName() {return 'love';}
@@ -5259,10 +5267,10 @@ export declare const toolList: {
  *   setAnnotationMathShape(annotation, points) {
  *     const px = points[0].getX();
  *     const py = points[0].getY();
- *     annotation.mathShape = new dwv.ROI([
- *       new dwv.Point2D(px+15,py), new dwv.Point2D(px+10,py-10),
- *       new dwv.Point2D(px,py), new dwv.Point2D(px-10,py-10),
- *       new dwv.Point2D(px-15,py), new dwv.Point2D(px,py+20)
+ *     annotation.mathShape = new ROI([
+ *       new Point2D(px+15,py), new Point2D(px+10,py-10),
+ *       new Point2D(px,py), new Point2D(px-10,py-10),
+ *       new Point2D(px-15,py), new Point2D(px,py+20)
  *     ]);
  *     annotation.getFactory = function () {return new LoveFactory();}
  *   }
@@ -5289,13 +5297,13 @@ export declare const toolList: {
  *   }
  * }
  * // pass it to dwv option list
- * dwv.toolOptions['draw'] = {LoveFactory};
+ * toolOptions['draw'] = {LoveFactory};
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * options.tools = {Draw: {options: ['Love']}};
  * app.init(options);
  * // activate tool
@@ -5400,15 +5408,16 @@ export declare class Vector3D {
  * (either directly or with helper methods).
  *
  * @example
+ * import {DicomParser, createImage, createView} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = dwv.createView(dicomParser.getDicomElements(), image);
+ *   const view = createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;

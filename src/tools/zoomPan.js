@@ -18,13 +18,14 @@ import {ViewLayer} from '../gui/viewLayer.js';
  * ZoomAndPan class.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, ToolConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
- * options.tools = {ZoomAndPan: new dwv.ToolConfig()};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {ZoomAndPan: new ToolConfig()};
  * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {

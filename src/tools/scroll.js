@@ -18,13 +18,14 @@ import {ViewLayer} from '../gui/viewLayer.js';
  * Scroll class.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, ToolConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
- * options.tools = {Scroll: new dwv.ToolConfig()};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {Scroll: new ToolConfig()};
  * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
@@ -37,13 +38,14 @@ import {ViewLayer} from '../gui/viewLayer.js';
  *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323563.dcm'
  * ]);
  * @example <caption>Example with slider</caption>
+ * import {App, AppOptions, ViewConfig, ToolConfig, Index} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
- * options.tools = {Scroll: new dwv.ToolConfig()};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {Scroll: new ToolConfig()};
  * app.init(options);
  * // create range
  * const range = document.createElement('input');
@@ -59,7 +61,7 @@ import {ViewLayer} from '../gui/viewLayer.js';
  *   const index = vc.getCurrentIndex();
  *   const values = index.getValues();
  *   values[2] = this.value;
- *   vc.setCurrentIndex(new dwv.Index(values));
+ *   vc.setCurrentIndex(new Index(values));
  * }
  * // activate tool and update range max on load
  * app.addEventListener('load', function () {

@@ -2,18 +2,18 @@
 
 ## Context
 
-Date: Fri Jun 27 2025 17:23:57 GMT+0200 (Central European Summer Time)
+Date: Wed Jul 02 2025 12:51:27 GMT+0200 (Central European Summer Time)
 
-Commit: [eec8c11](https://github.com/ivmartel/dwv.git/commit/eec8c1157592fdeadebb6b127d401cec2532d30c)
+Commit: [0291298](https://github.com/ivmartel/dwv/commit/029129879492980b65e0bc2d2cd6e86694b486ba)
 
-Browser: Chrome Headless 137.0.0.0 (Linux x86_64)
+Browser: Chrome Headless 138.0.0.0 (Linux x86_64)
 
 ## Summary
 Success: 191 ✅
 
 Failed: 0 ❌
 
-(total: 191, skipped: 0, total time: 1670ms)
+(total: 191, skipped: 0, total time: 1879ms)
 
 ## Tests details
 

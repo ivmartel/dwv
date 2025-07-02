@@ -312,6 +312,7 @@ const TagKeys = {
  * DICOM writer.
  *
  * @example
+ * import {DicomParser, DicomWriter} from '//esm.sh/dwv';
  * // add link to html
  * const link = document.createElement("a");
  * link.appendChild(document.createTextNode("download"));
@@ -319,10 +320,10 @@ const TagKeys = {
  * div.appendChild(link);
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   const parser = new dwv.DicomParser();
+ *   const parser = new DicomParser();
  *   parser.parse(event.target.response);
  *   // create writer
- *   const writer = new dwv.DicomWriter();
+ *   const writer = new DicomWriter();
  *   // get buffer using default rules
  *   const dicomBuffer = writer.getBuffer(parser.getDicomElements());
  *   // create blob

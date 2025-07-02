@@ -33,7 +33,7 @@ import {logger} from '../utils/logger.js';
  * @returns {string} The version of the library.
  */
 export function getDwvVersion() {
-  return '0.35.0';
+  return '0.35.1';
 }
 
 /**
@@ -595,10 +595,11 @@ const TagKeys = {
  * DicomParser class.
  *
  * @example
+ * import {DicomParser} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // setup the dicom parser
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   // parse the buffer
  *   dicomParser.parse(event.target.response);
  *   // get the dicom tags

@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.35.1](https://github.com/ivmartel/dwv/releases/tag/v0.35.1) - 02/07/2025
+
+### Fixed
+
+- Workers have to be in root '/assets' [#1968](https://github.com/ivmartel/dwv/issues/1968)
+- Doc examples not working [#1967](https://github.com/ivmartel/dwv/issues/1967)
+
+
 ## [v0.35.0](https://github.com/ivmartel/dwv/releases/tag/v0.35.0) - 27/06/2025
 
 ### Added
