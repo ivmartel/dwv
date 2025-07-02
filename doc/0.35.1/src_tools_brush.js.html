@@ -1,0 +1,1491 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/tools/brush.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}ul li{padding:.2rem 0!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_tools_brush.js</h1></header><article><pre class="prettyprint source lang-js"><code>
+import {logger} from '../utils/logger.js';
+import {Point2D} from '../math/point.js';
+import {Index} from '../math/index.js';
+import {getEllipseIndices} from '../math/ellipse.js';
+import {Image} from '../image/image.js';
+import {Size} from '../image/size.js';
+import {Geometry} from '../image/geometry.js';
+import {ColourMap} from '../image/luts.js';
+import {getDefaultDicomSegJson} from '../image/maskFactory.js';
+import {getDwvUIDPrefix} from '../dicom/dicomParser.js';
+import {getElementsFromJSONTags} from '../dicom/dicomWriter.js';
+import {DicomData} from '../app/dataController.js';
+import {ViewConfig} from '../app/application.js';
+import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
+import {ScrollWheel} from './scrollWheel.js';
+
+// doc imports
+/* eslint-disable no-unused-vars */
+import {Point, Point3D} from '../math/point.js';
+import {App} from '../app/application.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
+/* eslint-enable no-unused-vars */
+
+const ERROR_MESSAGES = {
+  brush: {
+    noSourceDataId: 'No source data ID defined',
+    noSourceDataIdAdd: 'No source data ID defined when adding mask slices',
+    noSourceImage: 'No source image to get origins, ID: {0}',
+    noSourceImageCreateMask: 'No source image to create mask',
+    noSourceImageGetOffset: 'No source image to get offsets, ID: {0}',
+    noBrushOrigins: 'No brush origins',
+    noBrushColour: 'No brush colour',
+    noMaskDefined: 'No mask defined when adding mask slices',
+    noCreatedMaskImage: 'No created mask image',
+    noMaskImage: 'No mask image for temporary draw command, ID: {0}',
+    noMaskImageGetOffset: 'No mask image to get offsets from',
+    noMaskImageDraw: 'No mask image for draw command, ID: {0}',
+    noMaskId: 'No mask ID to apply mask index',
+    noMaskImageForApply: 'No mask image for apply index, ID: {0}',
+    noSegments: 'No segments have been set for a new mask',
+    noMaskViewLayers: 'No mask view layers',
+    noSelectedSegmentNumber: 'No selected segment number',
+    tooManyMaskLayers: 'Too many mask view layers: {0}',
+    moreMaskLayers: 'More mask layers than expected',
+    cannotCreateMask: 'Cannot create mask with no source ID',
+    cannotDisplayMask: 'Cannot display mask with no mask ID',
+    cannotDrawNoMaskId: 'Cannot draw with no mask data ID',
+    cannotDrawNoOffset: 'Cannot draw with no offsets',
+    cannotDrawNoSegment: 'Cannot draw with no selected segment',
+    cannotDrawNoColourList: 'Cannot draw with no colour list',
+    cannotGetMaskLayers: 'Cannot get mask layers with no mask ID',
+    cannotGetMaskVCNoMaskId: 'Cannot get mask view controller: no mask ID',
+    cannotGetMaskVCNoMaskLayers:
+      'Cannot get mask view controller: no mask layers',
+    cannotSaveNoSourceId: 'Cannot save with no source data ID',
+    cannotSaveNoMask: 'Cannot save with no mask',
+    cannotFindSourceData:
+      'Cannot find source data for an existing mask, ID: {0}',
+    cannotFindSegment: 'Cannot find a segment for the selected number: {0}',
+    unsupportedScrollIndex: 'Unsupported scroll index: {0}'
+  }
+};
+
+/**
+ * Format string.
+ *
+ * @param {*} template The template where to add values.
+ * @param  {...any} values The values to add to the template.
+ * @returns {string} The formated string.
+ */
+function formatString(template, ...values) {
+  return template.replace(/{(\d+)}/g, (_match, index) => values[index] || '');
+};
+
+/**
+ * Retrieves the unique div ids in the current data view configs.
+ *
+ * @param {object} dataViewConfigs The data view configs.
+ * @returns {string[]} Array of unique div ids.
+ */
+function getUniqueDataViewConfigsDivIds(dataViewConfigs) {
+  let allDivIds = [];
+  if (!dataViewConfigs) {
+    return [];
+  }
+  for (const key in dataViewConfigs) {
+    if (dataViewConfigs[key]) {
+      const viewConfigs = dataViewConfigs[key];
+      if (Array.isArray(viewConfigs)) {
+        const divIds = viewConfigs.map(function (config) {
+          return config.divId;
+        });
+        allDivIds = [...allDivIds, ...divIds];
+      }
+    }
+  }
+  return [...new Set(allDivIds)];
+};
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+const _MouseEventButtons = {
+  left: 0,
+  middle: 1,
+  right: 2
+};
+
+const _BrushMode = {
+  Del: 'del',
+  Add: 'add'
+};
+
+/**
+ * Get an array sort callback:
+ * - f(a,b) > 0 -> b,a,
+ * - f(a,b) &lt; 0 -> a,b,
+ * - f(a,b) = 0 -> original order.
+ *
+ * @param {number} direction The direction to use to compare indices.
+ * @returns {object} A function that compares two Index.
+ */
+function getIndexCompareFunction(direction) {
+  return function (a, b) {
+    let result = 0;
+    const va = a.get(direction);
+    const vb = b.get(direction);
+    if (typeof va !== 'undefined' &amp;&amp; typeof vb !== 'undefined') {
+      result = va - vb;
+    }
+    return result;
+  };
+}
+
+/**
+ * Get a dimension organisation used to index a DICOM seg.
+ *
+ * @returns {object} The indices and organisations.
+ */
+function getDimensionOrganization() {
+  // 681051091011101: first 15 of charCode('DimensionOrganizationUID')
+  const organizationUID = getDwvUIDPrefix() + '681051091011101.1';
+  return {
+    indices: {
+      value: [
+        {
+          DimensionOrganizationUID: organizationUID,
+          DimensionDescriptionLabel: 'ReferencedSegmentNumber',
+          DimensionIndexPointer: '(0062,000B)',
+          FunctionalGroupPointer: '(0062,000A)'
+        },
+        {
+          DimensionOrganizationUID: organizationUID,
+          DimensionDescriptionLabel: 'ImagePositionPatient',
+          DimensionIndexPointer: '(0020,0032)',
+          FunctionalGroupPointer: '(0020,9113)'
+        }
+      ]
+    },
+    organizations: {
+      value: [
+        {
+          DimensionOrganizationUID: organizationUID
+        }
+      ]
+    }
+  };
+}
+
+/**
+ * Get the indices that form a circle.
+ * Can be an ellipse to adapt to view.
+ *
+ * @param {Geometry} geometry The geometry.
+ * @param {Point} position The circle center.
+ * @param {number[]} radiuses The circle radiuses.
+ * @param {number[]} dims The 2 dimensions.
+ * @returns {Index[]} The indices of the circle.
+ */
+function getCircleIndices(
+  geometry,
+  position,
+  radiuses,
+  dims
+) {
+  const centerIndex = geometry.worldToIndex(position);
+  return getEllipseIndices(centerIndex, radiuses, dims);
+}
+
+/**
+ * Get the range of origin indices that correspond to input new
+ * mask indices.
+ *
+ * @param {Geometry} geometry The geometry.
+ * @param {Index[]} indices An array of indices.
+ * @returns {number[]} Range of indices in the input origins.
+ */
+function getOriginIndexRangeFromMaskIndices(geometry, indices) {
+  // sort indices according to Z
+  const sorted = indices.sort(getIndexCompareFunction(2));
+
+  // lowest origin
+  const z0 = sorted[0].get(2);
+  if (typeof z0 === 'undefined') {
+    return [];
+  }
+  const index0 = new Index([0, 0, z0]);
+  const origin0 = geometry.indexToWorld(index0);
+
+  // highest origin
+  const z1 = sorted.at(-1).get(2);
+  if (typeof z1 === 'undefined') {
+    return [];
+  }
+  const index1 = new Index([0, 0, z1]);
+  const origin1 = geometry.indexToWorld(index1);
+
+  const origins = geometry.getOrigins();
+  // threshold for distance warning
+  const spacing = geometry.getSpacing().get(2);
+  const threshold = 0.1 * spacing;
+
+  // index of origin closest to lowest point
+  const indexStart = origin0.get3D().getClosest(origins);
+  const originStart = origins[indexStart];
+  const d0 = origin0.get3D().getDistance(originStart);
+  if (d0 > threshold) {
+    logger.warn(
+      'Large distance between origin and origin for first index: ' + d0);
+  }
+
+  // index of origin closest to highest point
+  const indexEnd = origin1.get3D().getClosest(origins);
+  const originEnd = origins[indexEnd];
+  const d1 = origin1.get3D().getDistance(originEnd);
+  if (d1 > threshold) {
+    logger.warn(
+      'Large distance between origin and origin for last index: ' + d1);
+  }
+
+  return [indexStart, indexEnd];
+}
+
+/**
+ * Get the data offsets that correspond to input indices.
+ *
+ * @param {Geometry} geometry The geometry.
+ * @param {Index[]} indices An array of indices.
+ * @returns {number[]} An array of offsets.
+ */
+function getOffsetsFromIndices(geometry, indices) {
+  const imageSize = geometry.getSize();
+  const offsets = [];
+  for (const index of indices) {
+    const offset = imageSize.indexToOffset(index);
+    if (offset >= 0) {
+      offsets.push(offset);
+    }
+  }
+  return offsets.sort(function compareNumbers(a, b) {
+    return a - b;
+  });
+}
+
+class DrawBrushCommandProperties {
+  mask;
+  dataId;
+  offsetsLists;
+  mode;
+  segmentNumber;
+  srclayerid;
+  originalValuesLists;
+  isSilent;
+}
+/**
+ * Draw brush command.
+ */
+class DrawBrushCommand {
+  #mask;
+  #dataId;
+  #offsetsLists;
+  #mode;
+  #segmentNumber;
+  #srclayerid;
+  #originalValuesLists;
+  #isSilent;
+
+  #exeType;
+  #undoType;
+
+  /**
+   * @param {DrawBrushCommandProperties} properties The command properties.
+   */
+  constructor(properties) {
+    this.#mask = properties.mask;
+    this.#dataId = properties.dataId;
+    this.#offsetsLists = properties.offsetsLists;
+    this.#mode = properties.mode;
+    this.#segmentNumber = properties.segmentNumber;
+    this.#srclayerid = properties.srclayerid;
+
+    if (typeof properties.originalValuesLists !== 'undefined') {
+      this.#originalValuesLists = properties.originalValuesLists;
+    }
+    this.#isSilent = properties.isSilent ?? false;
+    // event types
+    this.#exeType = this.#mode === _BrushMode.Del ? 'brushremove' : 'brushdraw';
+    this.#undoType =
+      this.#exeType === 'brushdraw' ? 'brushremove' : 'brushdraw';
+  }
+
+  /**
+   * Get the original values before applying brush.
+   *
+   * @returns {Array|undefined} Lists of original value iterators,
+   *   undefined when erasing.
+   */
+  getOriginalValuesLists() {
+    return this.#originalValuesLists;
+  }
+
+  /**
+   * Get the execute event.
+   *
+   * @returns {CustomEvent} The event.
+   */
+  getExecuteEvent() {
+    const segNumber =
+      this.#exeType === 'brushdraw' ? this.#segmentNumber : undefined;
+    return new CustomEvent(this.#exeType, {
+      detail: {
+        segmentnumber: segNumber,
+        dataid: this.#dataId,
+        srclayerid: this.#srclayerid
+      }
+    });
+  }
+
+  /**
+   * Get the command name.
+   *
+   * @returns {string} The command name.
+   */
+  getName() {
+    return 'Draw-brush';
+  }
+
+  /**
+   * Execute the command.
+   *
+   * @fires DrawBrushCommand#brushdraw
+   */
+  execute() {
+    if (typeof this.#segmentNumber === 'undefined') {
+      return;
+    }
+
+    let segNumber = this.#segmentNumber;
+    if (this.#exeType === 'brushremove') {
+      segNumber = 0;
+    }
+
+    // draw
+    if (typeof this.#originalValuesLists === 'undefined') {
+      this.#originalValuesLists = this.#mask.setAtOffsetsAndGetOriginals(
+        this.#offsetsLists,
+        segNumber
+      );
+    } else {
+      this.#mask.setAtOffsetsWithIterator(this.#offsetsLists, segNumber);
+    }
+
+    // callback
+    if (!this.#isSilent) {
+      /**
+       * Draw create event.
+       *
+       * @event DrawBrushCommand#brushdraw
+       * @type {object}
+       * @property {number} id The id of the created brush.
+       */
+      this.onExecute(this.getExecuteEvent());
+    }
+  }
+
+  /**
+   * Undo the command.
+   *
+   * @fires DrawBrushCommand#brushremove
+   */
+  undo() {
+    if (typeof this.#originalValuesLists === 'undefined') {
+      this.#originalValuesLists = this.#mask.setAtOffsetsAndGetOriginals(
+        this.#offsetsLists,
+        0
+      );
+    } else {
+      this.#mask.setAtOffsetsWithIterator(
+        this.#offsetsLists, this.#originalValuesLists);
+    }
+
+    // callback
+    const number =
+      this.#undoType === 'brushdraw' ? this.#segmentNumber : undefined;
+    const undoEvent = new CustomEvent(this.#undoType, {
+      detail: {
+        segmentnumber: number,
+        dataid: this.#dataId,
+        srclayerid: this.#srclayerid
+      }
+    });
+    this.onUndo(undoEvent);
+  }
+
+  /**
+   * Handle an execute event.
+   *
+   * @param {CustomEvent} _event The execute event with type and id.
+   */
+  onExecute(_event) {
+    // default does nothing.
+  }
+
+  /**
+   * Handle an undo event.
+   *
+   * @param {CustomEvent} _event The undo event with type and id.
+   */
+  onUndo(_event) {
+    // default does nothing.
+  }
+} // DrawBrushCommand class
+
+/**
+ * Brush class.
+ */
+export class Brush extends EventTarget {
+  #app;
+
+  /**
+   * Scroll wheel handler.
+   *
+   * @type {ScrollWheel}
+   */
+  #scrollWhell;
+
+  /**
+   * @param {App} app The associated application.
+   */
+  constructor(app) {
+    super();
+    this.#app = app;
+    this.#scrollWhell = new ScrollWheel(app);
+  }
+
+  /**
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
+  #started = false;
+
+  /**
+   * Mask image.
+   *
+   * @type {Image}
+   */
+  #mask;
+
+  /**
+   * Mask data index.
+   *
+   * @type {string}
+   */
+  #maskDataId;
+
+  /**
+   * The brush size.
+   *
+   * @type {number}
+   */
+  #brushSize = 10;
+
+  /**
+   * The brush size range.
+   *
+   * @type {object}
+   */
+  #brushSizeRange = {min: 1, max: 20};
+
+  /**
+   * The brush mode: 'add' or 'del'.
+   *
+   * @type {string}
+   */
+  #brushMode = _BrushMode.Del;
+
+  /**
+   * The selected segment number.
+   *
+   * @type {number}
+   */
+  #selectedSegmentNumber;
+
+  /**
+   * UID counter.
+   *
+   * @type {number}
+   */
+  #uid = 0;
+
+  /**
+   * Current layer group.
+   *
+   * @type {LayerGroup}
+   */
+  #currentLayerGroup;
+
+  /**
+   * Interaction start point.
+   *
+   * @type {Point2D}
+   */
+  #startPoint;
+
+  // temporary variables
+  #tmpOffsetsLists;
+  #tmpOriginalValuesLists;
+
+  /**
+   * Black list: series instance uid list
+   * for which brush segmentation creation
+   * is forbidden.
+   *
+   * @type {string[]}
+   */
+  #blacklist = [];
+
+  /**
+   * Get a mask slice.
+   *
+   * @param {Geometry} geometry The mask geometry.
+   * @param {Point3D} origin The slice origin.
+   * @param {object} meta The mask meta.
+   * @returns {Image} The slice.
+   */
+  #createMaskImage(geometry, origin, meta) {
+    // create data
+    const sizeValues = geometry.getSize().getValues();
+    sizeValues[2] = 1;
+    const maskSize = new Size(sizeValues);
+    const maskGeometry = new Geometry(
+      [origin],
+      maskSize,
+      geometry.getSpacing(),
+      geometry.getOrientation()
+    );
+    const values = new Uint8Array(maskSize.getDimSize(2));
+    values.fill(0);
+    ++this.#uid;
+    const uids = [this.#uid.toString()];
+    const maskSlice = new Image(maskGeometry, values, uids);
+    maskSlice.setMeta(meta);
+    maskSlice.setPhotometricInterpretation('PALETTE COLOR');
+    maskSlice.setPaletteColourMap(new ColourMap([0], [0], [0]));
+
+    return maskSlice;
+  }
+
+  /**
+   * Add slices to mask if needed.
+   *
+   * @param {Geometry} sourceGeometry The source geometry.
+   * @param {Geometry} maskGeometry The mask geometry.
+   * @param {Point} position The circle center.
+   * @param {number[]} circleDims The circle dimensions.
+   * @param {number[]} radiuses The circle radiuses.
+   * @param {object} sliceMeta The slice meta.
+   */
+  #addMaskSlices(
+    sourceGeometry,
+    maskGeometry,
+    position,
+    circleDims,
+    radiuses,
+    sliceMeta
+  ) {
+    // circle indices in the image geometry
+    const circleIndices = getCircleIndices(
+      sourceGeometry,
+      position,
+      radiuses,
+      circleDims
+    );
+    // origin index range represented by the circle indicies
+    const newOrigIndexRange = getOriginIndexRangeFromMaskIndices(
+      sourceGeometry,
+      circleIndices
+    );
+    if (typeof newOrigIndexRange === 'undefined' ||
+      newOrigIndexRange.length === 0) {
+      throw new Error(ERROR_MESSAGES.brush.noBrushOrigins);
+    }
+
+    const sourceOrigins = sourceGeometry.getOrigins();
+    const maskOrigins = maskGeometry.getOrigins();
+
+    // min and max mask origin closest source origin indices
+    const maskOrigIndexStart = maskOrigins[0].getClosest(sourceOrigins);
+    const maskOrigIndexEnd = maskOrigins.at(-1).getClosest(sourceOrigins);
+
+    // index in source origin array of slices to add
+    const indicesToAdd = [];
+
+    // first index compare
+    // (go from closest to mask to avoid variable spacing warning
+    //  when appending image slices)
+    if (newOrigIndexRange[0] &lt; maskOrigIndexStart) {
+      for (
+        let index = maskOrigIndexStart - 1;
+        index >= newOrigIndexRange[0];
+        --index
+      ) {
+        indicesToAdd.push(index);
+      }
+    }
+    // last index compare
+    if (newOrigIndexRange[1] > maskOrigIndexEnd) {
+      for (
+        let index = maskOrigIndexEnd + 1;
+        index &lt;= newOrigIndexRange[1];
+        ++index
+      ) {
+        indicesToAdd.push(index);
+      }
+    }
+
+    // convert index to origin
+    const originsToAdd = [];
+    for (const index of indicesToAdd) {
+      originsToAdd.push(sourceOrigins[index]);
+    }
+
+    // append slices
+    if (typeof this.#mask === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.noMaskDefined);
+    }
+    const tags = this.#mask.getMeta();
+    for (const element of originsToAdd) {
+      tags.numberOfFiles += 1;
+      this.#mask.appendSlice(
+        this.#createMaskImage(maskGeometry, element, sliceMeta));
+    }
+  }
+
+  /**
+   * Paint the mask at the given offsets.
+   *
+   * @param {Array} offsets The mask offsets.
+   */
+  #paintMaskAtOffsets(offsets) {
+    const maskVl = this.#getMaskViewLayer();
+    const srclayerid = maskVl.getId();
+
+    // get mask image
+    if (typeof this.#maskDataId === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.noMaskId);
+    }
+    const maskData = this.#app.getData(this.#maskDataId);
+    if (!maskData) {
+      throw new Error(
+        formatString(ERROR_MESSAGES.brush.noMaskImage, this.#maskDataId));
+    }
+
+    // temporary command
+    const props = new DrawBrushCommandProperties();
+    props.mask = maskData.image;
+    props.dataId = this.#maskDataId;
+    props.offsetsLists = [offsets];
+    props.mode = this.#brushMode;
+    props.segmentNumber = this.#selectedSegmentNumber;
+    props.srclayerid = srclayerid;
+    const command = new DrawBrushCommand(props);
+    command.execute();
+
+    // store offsets and colours for final command
+    this.#tmpOffsetsLists.push(offsets);
+    // only one element in original colours
+    const originalValues = command.getOriginalValuesLists();
+    if (typeof originalValues !== 'undefined') {
+      this.#tmpOriginalValuesLists.push(originalValues[0]);
+    }
+  }
+
+  /**
+   * Create the mask.
+   *
+   * @param {Point} position The first slice position.
+   * @param {Image} sourceImage The source image.
+   * @returns {string} The mask data id.
+   */
+  #createMask(position, sourceImage) {
+    // check souce image
+    if (!sourceImage) {
+      throw new Error(
+        formatString(ERROR_MESSAGES.brush.noSourceImageCreateMask));
+    }
+    const sourceGeometry = sourceImage.getGeometry();
+
+    const imgK = sourceGeometry.worldToIndex(position).get(2);
+    if (typeof imgK === 'undefined') {
+      throw new Error('Z position is undefined');
+    }
+    const index = new Index([0, 0, imgK]);
+
+    // default tags
+    const firstSliceMeta = getDefaultDicomSegJson();
+    // dicom seg dimension
+    const dimension = getDimensionOrganization();
+    firstSliceMeta.DimensionOrganizationSequence = dimension.organizations;
+    firstSliceMeta.DimensionIndexSequence = dimension.indices;
+    // local
+    firstSliceMeta.PixelRepresentation = 0;
+    firstSliceMeta.numberOfFiles = 1;
+
+    const tags = sourceImage.getMeta();
+
+    firstSliceMeta.PatientID = tags.PatientID;
+    firstSliceMeta.StudyInstanceUID = tags.StudyInstanceUID;
+    firstSliceMeta.SeriesInstanceUID = tags.SeriesInstanceUID;
+    const referencedSOPs = [
+      {
+        referencedSOPClassUID: tags.SOPClassUID,
+        referencedSOPInstanceUID: sourceImage.getImageUid(index)
+      }
+    ];
+    const referenceSeriesTag = [];
+    referenceSeriesTag.push({
+      ReferencedInstanceSequence: {
+        value: referencedSOPs
+      },
+      SeriesInstanceUID: tags.SeriesInstanceUID
+    });
+    firstSliceMeta.ReferencedSeriesSequence = {
+      value: referenceSeriesTag
+    };
+    firstSliceMeta.custom = {
+      frameInfos: [
+        {
+          dimIndex: [1, 1],
+          refSegmentNumber: 1,
+          imagePosPat: tags.ImageOrientationPatient,
+          derivationImages: [
+            {
+              sourceImages: referencedSOPs
+            }
+          ]
+        }
+      ]
+    };
+
+    // get length unit from ref image
+    firstSliceMeta.lengthUnit = sourceImage.getMeta().lengthUnit;
+
+    this.#mask = this.#createMaskImage(
+      sourceGeometry,
+      sourceGeometry.getOrigins()[imgK],
+      firstSliceMeta
+    );
+
+    // fires load events and renders data
+    // (will create viewLayer for it)
+    const elements = getElementsFromJSONTags(firstSliceMeta);
+    const data = new DicomData(elements);
+    data.image = this.#mask;
+    return this.#app.addData(data);
+  }
+
+  /**
+   * Get the orientation of the first data view config of the input
+   * divId.
+   *
+   * @param {string} divId The divId.
+   * @returns {string} The orientation.
+   */
+  #getDataViewConfigOrientation(divId) {
+    const dataConfigs = this.#app.getDataViewConfigs();
+    let orient;
+    for (const key in dataConfigs) {
+      const config = dataConfigs[key].find(function (item) {
+        return item.divId === divId;
+      });
+      if (typeof config !== 'undefined') {
+        orient = config.orientation;
+        break;
+      }
+    }
+    return orient;
+  }
+
+  /**
+   * Display a newly created mask.
+   *
+   * @param {string} divId The div id where to display the mask.
+   */
+  #displayMask(divId) {
+    // check mask data id
+    if (typeof this.#maskDataId === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.cannotDisplayMask);
+    }
+    const viewConfig = new ViewConfig(divId);
+    viewConfig.orientation = this.#getDataViewConfigOrientation(divId);
+    this.#app.addDataViewConfig(this.#maskDataId, viewConfig);
+    this.#app.render(this.#maskDataId);
+  }
+
+  /**
+   * Get the first referenced UID of a mask image.
+   *
+   * @param {object} meta The mask image meta.
+   * @returns {string|undefined} The UID.
+   */
+  #getReferenceDataUID(meta) {
+    let dataUid;
+    const customMeta = meta.custom;
+    const frameInfos = customMeta.frameInfos;
+    if (frameInfos.length === 0) {
+      return dataUid;
+    }
+    // DerivationImageSequence (0008,9124)
+    const derivationImages = frameInfos[0].derivationImages;
+    if (typeof derivationImages === 'undefined') {
+      return dataUid;
+    }
+    if (derivationImages.length === 0) {
+      return dataUid;
+    }
+    // SourceImageSequence (0008,2112)
+    const sourceImages = derivationImages[0].sourceImages;
+    if (typeof sourceImages === 'undefined') {
+      return dataUid;
+    }
+    if (sourceImages.length === 0) {
+      return;
+    }
+    // ReferencedSOPInstanceUID (0008,1155)
+    return sourceImages[0].referencedSOPInstanceUID;
+  }
+
+  /**
+   * Get the source data id from the mask image meta.
+   *
+   * @param {Image} mask The mask image.
+   * @returns {string} The source data id.
+   */
+  #getSourceDataIdFromMask(mask) {
+    // get source id from mask meta
+    const meta = mask.getMeta();
+    const sourceDataUID = this.#getReferenceDataUID(meta);
+    // search app for the data ID of this SOPInstanceUID...
+    let ids = [];
+    if (sourceDataUID !== 'undefined') {
+      ids = this.#app.getDataIdsFromSopUids([sourceDataUID]);
+    }
+    let sourceDataId = '0';
+    if (ids.length > 0) {
+      sourceDataId = ids[0];
+    } else {
+      // mask with no source data...
+      logger.warn(
+        formatString(ERROR_MESSAGES.brush.cannotFindSourceData, sourceDataUID));
+    }
+    return sourceDataId;
+  }
+
+  /**
+   * Get the mask view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group to search.
+   * @returns {ViewLayer} The view layer.
+   */
+  #getLayerGroupMaskViewLayer(layerGroup) {
+    // check mask data id
+    if (typeof this.#maskDataId === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.cannotGetMaskLayers);
+    }
+
+    const maskViewLayers = layerGroup.getViewLayersByDataId(
+      this.#maskDataId
+    );
+    if (maskViewLayers.length === 0) {
+      throw new Error(ERROR_MESSAGES.brush.noMaskViewLayers);
+    }
+    if (maskViewLayers.length !== 1) {
+      logger.warn(
+        formatString(
+          ERROR_MESSAGES.brush.tooManyMaskLayers, maskViewLayers.length)
+      );
+    }
+    return maskViewLayers[0];
+  }
+
+  /**
+   * Get the mask image.
+   *
+   * @param {string} maskDataId The mask data id.
+   * @returns {Image} The image.
+   */
+  #getMaskImage(maskDataId) {
+    if (typeof maskDataId === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.noMaskId);
+    }
+    const maskData = this.#app.getData(maskDataId);
+    if (typeof maskData === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.noMaskImageGetOffset);
+    }
+    return maskData.image;
+  }
+
+  /**
+   * Get the mask offset for an event.
+   *
+   * @param {object} event The event containing the mask position.
+   * @returns {Array} The array of offset to paint.
+   */
+  #getMaskOffsets(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const mousePoint = new Point2D(event.offsetX, event.offsetY);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    if (typeof layerGroup === 'undefined') {
+      throw new Error('No layergroup to get mask offsets');
+    }
+    this.#currentLayerGroup = layerGroup;
+
+    let viewLayer;
+    if (typeof this.#maskDataId === 'undefined') {
+      viewLayer = layerGroup.getBaseViewLayer();
+    } else {
+      viewLayer = layerGroup.getViewLayersByDataId(this.#maskDataId)[0];
+    }
+    if (typeof viewLayer === 'undefined') {
+      return [];
+    }
+    const viewController = viewLayer.getViewController();
+    const savedPosition = viewController.getCurrentPosition();
+
+    const searchMaskMeta = {
+      Modality: 'SEG'
+    };
+
+    // update existing mask from current vl or create a new one
+    let maskVl;
+    let maskVc;
+    let sourcePosition;
+    let sourceImage;
+    if (viewController.equalImageMeta(searchMaskMeta)) {
+      this.#mask = this.#getMaskImage(this.#maskDataId);
+      // get source image
+      const sourceDataId = this.#getSourceDataIdFromMask(this.#mask);
+      const sourceData = this.#app.getData(sourceDataId);
+      if (!sourceData) {
+        throw new Error(formatString(
+          ERROR_MESSAGES.brush.noSourceImageGetOffset, sourceDataId
+        ));
+      }
+      sourceImage = sourceData.image;
+      //
+      const sourceVl = layerGroup.getViewLayersByDataId(sourceDataId)[0];
+      const sourceViewController = sourceVl.getViewController();
+      const planePos = sourceVl.displayToPlanePos(mousePoint);
+      sourcePosition = sourceViewController.getPositionFromPlanePoint(planePos);
+      // update locals
+      maskVl = viewLayer;
+      maskVc = viewController;
+    } else {
+      // view layer is source
+      const sourceDataId = viewLayer.getDataId();
+      const sourceData = this.#app.getData(sourceDataId);
+      if (!sourceData) {
+        throw new Error(formatString(
+          ERROR_MESSAGES.brush.noSourceImageGetOffset, sourceDataId
+        ));
+      }
+      sourceImage = sourceData.image;
+
+      const planePos = viewLayer.displayToPlanePos(mousePoint);
+      sourcePosition = viewController.getPositionFromPlanePoint(planePos);
+      // create mask (sets this.#mask)
+      this.#maskDataId = this.#createMask(savedPosition, sourceImage);
+      // check
+      if (typeof this.#mask === 'undefined') {
+        throw new Error(ERROR_MESSAGES.brush.noCreatedMaskImage);
+      }
+      // display mask
+      const divId = layerGroup.getDivId();
+      const layerGroupHasDiv = typeof divId !== 'undefined';
+      if (layerGroupHasDiv) {
+        this.#displayMask(divId);
+      }
+      // newly create mask case: find the SEG view layer
+      maskVl = this.#getLayerGroupMaskViewLayer(layerGroup);
+      maskVc = maskVl.getViewController();
+
+      if (layerGroupHasDiv) {
+        // this.#displayMask causes the position to get reset,
+        // so we have to restore it or we may not be drawing on
+        // the correct slice.
+        maskVc.setCurrentPosition(savedPosition);
+      }
+    }
+
+    const sourceGeometry = sourceImage.getGeometry();
+    const sliceMeta = this.#mask.getMeta();
+    const maskGeometry = this.#mask.getGeometry();
+
+    const spacing2D = viewController.get2DSpacing();
+    const rx = Math.round(this.#brushSize / spacing2D.x);
+    const ry = Math.round(this.#brushSize / spacing2D.y);
+    const radiuses = [rx, ry];
+
+    let circleDims;
+    const scrollIndex = viewController.getScrollDimIndex();
+    switch (scrollIndex) {
+      case 0: {
+        circleDims = [1, 2];
+        break;
+      }
+      case 1: {
+        circleDims = [0, 2];
+        break;
+      }
+      case 2: {
+        circleDims = [0, 1];
+        break;
+      }
+      default: {
+        throw new Error(
+          formatString(ERROR_MESSAGES.brush.unsupportedScrollIndex, scrollIndex)
+        );
+      }
+    }
+
+    this.#addMaskSlices(
+      sourceGeometry,
+      maskGeometry,
+      sourcePosition,
+      circleDims,
+      radiuses,
+      sliceMeta
+    );
+
+    // circle indices in the mask geometry
+    const maskPlanePos = maskVl.displayToPlanePos(mousePoint);
+    const maskPosition = maskVc.getPositionFromPlanePoint(maskPlanePos);
+    const maskCircleIndices = getCircleIndices(
+      maskGeometry,
+      maskPosition,
+      radiuses,
+      circleDims
+    );
+
+    return getOffsetsFromIndices(maskGeometry, maskCircleIndices);
+  }
+
+  /**
+   * Determines if the event is over a series inside the blacklist.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   * @returns {boolean} True if in black list.
+   */
+  #isInBlackList(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    if (typeof layerGroup === 'undefined') {
+      throw new Error('No layergroup to check black list');
+    }
+    const drawLayer = layerGroup.getActiveDrawLayer();
+
+    if (typeof drawLayer === 'undefined') {
+      const viewLayer = layerGroup.getActiveViewLayer();
+      const referenceDataId = viewLayer.getDataId();
+      const referenceData = this.#app.getData(referenceDataId);
+      const referenceMeta = referenceData.image.getMeta();
+      const seriesInstanceUID = referenceMeta.SeriesInstanceUID;
+      // check black list
+      if (this.#blacklist.includes(seriesInstanceUID)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   */
+  mousedown = (event) => {
+    if (this.#isInBlackList(event)) {
+      return;
+    }
+    if (typeof this.#selectedSegmentNumber === 'undefined') {
+      logger.warn(ERROR_MESSAGES.brush.noSelectedSegmentNumber);
+      return;
+    }
+
+    // start flag
+    this.#started = true;
+    // first position
+    this.#startPoint = new Point2D(event.offsetX, event.offsetY);
+
+    // reset tmp vars
+    this.#tmpOffsetsLists = [];
+    this.#tmpOriginalValuesLists = [];
+
+    // check right button
+    this.#setEraserOnRightMousedown(event);
+    // paint
+    const offsets = this.#getMaskOffsets(event);
+    if (offsets.length > 0) {
+      this.#paintMaskAtOffsets(offsets);
+    } else {
+      // reset flag
+      this.#started = false;
+      this.#removeEraserOnRightMousedown(event);
+    }
+  };
+
+  /**
+   * Checks if the mouse down event has been done with right click
+   * and if true, set erasing mode to the brush color.
+   *
+   * @param {MouseEvent} event The mouse event.
+   */
+  #setEraserOnRightMousedown(event) {
+    if (event.button === _MouseEventButtons.right) {
+      this.#brushMode = _BrushMode.Del;
+      const activateErasingEvent = new CustomEvent('erasingactivated');
+      this.dispatchEvent(activateErasingEvent);
+    }
+  }
+
+  /**
+   * Checks if the mouse down event has been done with right click
+   * and if true, removes erasing mode from the brush color.
+   *
+   * @param {MouseEvent} event The mouse event.
+   */
+  #removeEraserOnRightMousedown(event) {
+    if (event.button === _MouseEventButtons.right) {
+      this.#brushMode = _BrushMode.Add;
+      const deactivateErasingEvent = new CustomEvent('erasingdeactivated');
+      this.dispatchEvent(deactivateErasingEvent);
+    }
+  }
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  mousemove = (event) => {
+    if (!this.#started) {
+      return;
+    }
+    if (typeof this.#startPoint === 'undefined') {
+      return;
+    }
+    const mousePoint = new Point2D(event.offsetX, event.offsetY);
+    const diffX = Math.abs(mousePoint.getX() - this.#startPoint.getX());
+    const diffY = Math.abs(mousePoint.getY() - this.#startPoint.getY());
+    if (diffX > this.#brushSize / 2 || diffY > this.#brushSize / 2) {
+      const offsets = this.#getMaskOffsets(event);
+      if (offsets.length > 0) {
+        this.#paintMaskAtOffsets(offsets);
+      }
+      this.#startPoint = mousePoint;
+    }
+  };
+
+  /**
+   * Handle mouse up event.
+   *
+   * @param {MouseEvent} _event The mouse up event.
+   */
+  mouseup = (_event) => {
+    if (this.#started) {
+      this.#started = false;
+      this.#removeEraserOnRightMousedown(_event);
+
+      if (typeof this.#maskDataId === 'undefined') {
+        throw new Error(ERROR_MESSAGES.brush.cannotDrawNoMaskId);
+      }
+      if (typeof this.#tmpOffsetsLists === 'undefined') {
+        throw new Error(ERROR_MESSAGES.brush.cannotDrawNoOffset);
+      }
+      if (typeof this.#tmpOriginalValuesLists === 'undefined') {
+        throw new Error(ERROR_MESSAGES.brush.cannotDrawNoColourList);
+      }
+
+      // reverse lists for command to respect original colours
+      this.#tmpOffsetsLists.reverse();
+      this.#tmpOriginalValuesLists.reverse();
+      const maskVl = this.#getMaskViewLayer();
+      const srclayerid = maskVl.getId();
+
+      // full draw from mouse down to up
+      const maskData = this.#app.getData(this.#maskDataId);
+      if (!maskData) {
+        throw new Error(
+          formatString(ERROR_MESSAGES.brush.noMaskImageDraw, this.#maskDataId)
+        );
+      }
+      const props = new DrawBrushCommandProperties();
+      props.mask = maskData.image;
+      props.dataId = this.#maskDataId;
+      props.offsetsLists = this.#tmpOffsetsLists;
+      props.mode = this.#brushMode;
+      props.segmentNumber = this.#selectedSegmentNumber;
+      props.srclayerid = srclayerid;
+      props.originalValuesLists = this.#tmpOriginalValuesLists;
+      const command = new DrawBrushCommand(props);
+      command.onExecute = (event) => {
+        this.dispatchEvent(event);
+      };
+      command.onUndo = (event) => {
+        this.dispatchEvent(event);
+        this.#mask.recalculateLabels();
+      };
+
+      // save command in undo stack
+      this.#app.addToUndoStack(command);
+      // fire event
+      this.dispatchEvent(command.getExecuteEvent());
+      this.#mask.recalculateLabels();
+    }
+  };
+
+  /**
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
+  mouseout = (event) => {
+    this.mouseup(event);
+  };
+
+  /**
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
+  touchstart = (event) => {
+    // call mouse equivalent
+    this.mousedown(event);
+  };
+
+  /**
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
+  touchmove = (event) => {
+    // call mouse equivalent
+    this.mousemove(event);
+  };
+
+  /**
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
+  touchend = (event) => {
+    // call mouse equivalent
+    this.mouseup(event);
+  };
+
+  /**
+   * Handle mouse wheel event.
+   *
+   * @param {WheelEvent} event The mouse wheel event.
+   */
+  wheel = (event) => {
+    this.#scrollWhell.wheel(event);
+  };
+
+  /**
+   * Get the mask view layer.
+   *
+   * @returns {ViewLayer} The mask view layer.
+   */
+  #getMaskViewLayer() {
+    if (typeof this.#maskDataId === 'undefined') {
+      throw new Error(ERROR_MESSAGES.brush.cannotGetMaskVCNoMaskId);
+    }
+    if (typeof this.#currentLayerGroup === 'undefined') {
+      throw new Error('No current layer group');
+    }
+
+    const maskLayers = this.#currentLayerGroup.getViewLayersByDataId(
+      this.#maskDataId
+    );
+    if (maskLayers.length === 0) {
+      throw new Error(ERROR_MESSAGES.brush.cannotGetMaskVCNoMaskLayers);
+    }
+    if (maskLayers.length !== 1) {
+      logger.warn(ERROR_MESSAGES.brush.moreMaskLayers);
+    }
+    return maskLayers[0];
+  }
+
+  /**
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
+  keydown = (event) => {
+    event.context = 'Brush';
+    this.#app.onKeydown(event);
+
+    const ctrlOrAlt = event.ctrlKey || event.altKey;
+
+    if (
+      !ctrlOrAlt &amp;&amp;
+      event.key === '+' &amp;&amp;
+      this.#brushSize + 1 &lt; this.#brushSizeRange.max
+    ) {
+      this.#brushSize += 1;
+      logger.debug('Brush size: ' + this.#brushSize);
+    } else if (
+      !ctrlOrAlt &amp;&amp;
+      event.key === '-' &amp;&amp;
+      this.#brushSize - 1 >= this.#brushSizeRange.min
+    ) {
+      this.#brushSize -= 1;
+      logger.debug('Brush size: ' + this.#brushSize);
+    } else if (!ctrlOrAlt &amp;&amp; !Number.isNaN(Number.parseInt(event.key, 10))) {
+      this.#brushMode = _BrushMode.Add;
+      //const number = Number.parseInt(event.key, 10);
+      //this.#setSelectedSegment2(number);
+    } else if (!ctrlOrAlt &amp;&amp; event.key === 'a') {
+      this.#brushMode = _BrushMode.Add;
+      logger.debug('Brush mode: ' + this.#brushMode);
+    } else if (!ctrlOrAlt &amp;&amp; event.key === 'd') {
+      this.#brushMode = _BrushMode.Del;
+      logger.debug('Brush mode: ' + this.#brushMode);
+    }
+  };
+
+  /**
+   * Activate the tool and activates/deactivates
+   * the context menu of all dwv div ids.
+   *
+   * @param {boolean} bool The flag to activate or not.
+   */
+  activate(bool) {
+    const viewConfigs = this.#app.getDataViewConfigs();
+    const allDivIds = getUniqueDataViewConfigsDivIds(viewConfigs);
+    if (bool) {
+      this.#deactivateDivIdsContextMenu(allDivIds);
+      return;
+    }
+    this.#reactivateDivIdsContextMenu(allDivIds);
+  }
+
+  /**
+   * Deactivates the context menu on all dwv div ids.
+   *
+   * @param {string[]} divIds The div ids whose context menu
+   *   should be deactivated.
+   */
+  #deactivateDivIdsContextMenu(divIds) {
+    for (const divId of divIds) {
+      const element = document.querySelector('#' + divId);
+      if (!element) {
+        return;
+      }
+      element.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+    }
+  }
+
+  /**
+   * Reactivates the context menu on all dwv div ids.
+   *
+   * @param {string[]} divIds The div ids whose context menu
+   *   should be reactivated.
+   */
+  #reactivateDivIdsContextMenu(divIds) {
+    for (const divId of divIds) {
+      const element = document.querySelector('#' + divId);
+      if (!element) {
+        return;
+      }
+      element.addEventListener('contextmenu', (_event) => {
+        // Intentionally empty
+      });
+    }
+  }
+
+  /**
+   * Set the tool live features.
+   * See the documentation of the class members for details.
+   *
+   * @param {object} features The list of features.
+   */
+  setFeatures(features) {
+    if (typeof features.brushSizeRange !== 'undefined') {
+      this.#brushSizeRange = features.brushSizeRange;
+    }
+    if (
+      typeof features.brushSize !== 'undefined' &amp;&amp;
+      features.brushSize >= this.#brushSizeRange.min &amp;&amp;
+      features.brushSize &lt; this.#brushSizeRange.max
+    ) {
+      this.#brushSize = features.brushSize;
+    }
+
+    if (typeof features.brushMode !== 'undefined') {
+      this.#brushMode = features.brushMode;
+    }
+
+    // createMask is needed since not all properties are always needed,
+    // maskDataId could be undefined for example when
+    // just changing the brushSize
+    if (features.createMask) {
+      this.#maskDataId = undefined;
+    } else if (typeof features.maskDataId !== 'undefined') {
+      this.#maskDataId = features.maskDataId;
+    }
+
+    // used in draw events
+    if (typeof features.selectedSegmentNumber !== 'undefined') {
+      this.#selectedSegmentNumber = features.selectedSegmentNumber;
+    }
+
+    if (typeof features.blacklist !== 'undefined') {
+      this.#blacklist = features.blacklist;
+    }
+  }
+
+  /**
+   * Initialise the tool.
+   */
+  init() {
+    // does nothing
+  }
+
+  /**
+   * Get the list of event names that this tool can fire.
+   *
+   * @returns {Array} The list of event names.
+   */
+  getEventNames() {
+    return [
+      'brushdraw',
+      'brushremove',
+      'erasingactivated',
+      'erasingdeactivated'
+    ];
+  }
+
+  /**
+   * Help for this tool.
+   *
+   * @returns {object} The help content.
+   */
+  getHelpKeys() {
+    return {
+      title: 'tool.Brush.name',
+      brief: 'tool.Brush.brief',
+      mouse: {
+        mouse_click: 'tool.Brush.mouse_click'
+      },
+      touch: {
+        touch_click: 'tool.Brush.touch_click'
+      }
+    };
+  }
+} // Brush class
+</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.35.1.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

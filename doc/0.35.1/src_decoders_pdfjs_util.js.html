@@ -1,0 +1,1278 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: src/decoders/pdfjs/util.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><style>ul{list-style-type:disc!important}ul ul{list-style-type:circle!important}ul li{padding:.2rem 0!important}</style><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">src_decoders_pdfjs_util.js</h1></header><article><pre class="prettyprint source lang-js"><code>/* eslint-disable */
+
+/**
+ * Modified for dwv:
+ * - export root var,
+ * - remove old style import/export and
+ *   related (for ex 'use strict').
+ */
+
+/* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
+/* Copyright 2012 Mozilla Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/* globals Cmd, ColorSpace, Dict, MozBlobBuilder, Name, PDFJS, Ref, URL,
+           Promise */
+
+var isWorker = (typeof window === 'undefined');
+
+export var FONT_IDENTITY_MATRIX = [0.001, 0, 0, 0.001, 0, 0];
+
+export var TextRenderingMode = {
+  FILL: 0,
+  STROKE: 1,
+  FILL_STROKE: 2,
+  INVISIBLE: 3,
+  FILL_ADD_TO_PATH: 4,
+  STROKE_ADD_TO_PATH: 5,
+  FILL_STROKE_ADD_TO_PATH: 6,
+  ADD_TO_PATH: 7,
+  FILL_STROKE_MASK: 3,
+  ADD_TO_PATH_FLAG: 4
+};
+
+export var ImageKind = {
+  GRAYSCALE_1BPP: 1,
+  RGB_24BPP: 2,
+  RGBA_32BPP: 3
+};
+
+export var AnnotationType = {
+  WIDGET: 1,
+  TEXT: 2,
+  LINK: 3
+};
+
+export var StreamType = {
+  UNKNOWN: 0,
+  FLATE: 1,
+  LZW: 2,
+  DCT: 3,
+  JPX: 4,
+  JBIG: 5,
+  A85: 6,
+  AHX: 7,
+  CCF: 8,
+  RL: 9
+};
+
+export var FontType = {
+  UNKNOWN: 0,
+  TYPE1: 1,
+  TYPE1C: 2,
+  CIDFONTTYPE0: 3,
+  CIDFONTTYPE0C: 4,
+  TRUETYPE: 5,
+  CIDFONTTYPE2: 6,
+  TYPE3: 7,
+  OPENTYPE: 8,
+  TYPE0: 9,
+  MMTYPE1: 10
+};
+
+// The global PDFJS object exposes the API
+// In production, it will be declared outside a global wrapper
+// In development, it will be declared here
+// if (!globalScope.PDFJS) {
+//   globalScope.PDFJS = {};
+// }
+
+var PDFJS = {};
+
+// globalScope.PDFJS.pdfBug = false;
+PDFJS.pdfBug = false;
+
+PDFJS.VERBOSITY_LEVELS = {
+  errors: 0,
+  warnings: 1,
+  infos: 5
+};
+
+// All the possible operations for an operator list.
+export var OPS = PDFJS.OPS = {
+  // Intentionally start from 1 so it is easy to spot bad operators that will be
+  // 0's.
+  dependency: 1,
+  setLineWidth: 2,
+  setLineCap: 3,
+  setLineJoin: 4,
+  setMiterLimit: 5,
+  setDash: 6,
+  setRenderingIntent: 7,
+  setFlatness: 8,
+  setGState: 9,
+  save: 10,
+  restore: 11,
+  transform: 12,
+  moveTo: 13,
+  lineTo: 14,
+  curveTo: 15,
+  curveTo2: 16,
+  curveTo3: 17,
+  closePath: 18,
+  rectangle: 19,
+  stroke: 20,
+  closeStroke: 21,
+  fill: 22,
+  eoFill: 23,
+  fillStroke: 24,
+  eoFillStroke: 25,
+  closeFillStroke: 26,
+  closeEOFillStroke: 27,
+  endPath: 28,
+  clip: 29,
+  eoClip: 30,
+  beginText: 31,
+  endText: 32,
+  setCharSpacing: 33,
+  setWordSpacing: 34,
+  setHScale: 35,
+  setLeading: 36,
+  setFont: 37,
+  setTextRenderingMode: 38,
+  setTextRise: 39,
+  moveText: 40,
+  setLeadingMoveText: 41,
+  setTextMatrix: 42,
+  nextLine: 43,
+  showText: 44,
+  showSpacedText: 45,
+  nextLineShowText: 46,
+  nextLineSetSpacingShowText: 47,
+  setCharWidth: 48,
+  setCharWidthAndBounds: 49,
+  setStrokeColorSpace: 50,
+  setFillColorSpace: 51,
+  setStrokeColor: 52,
+  setStrokeColorN: 53,
+  setFillColor: 54,
+  setFillColorN: 55,
+  setStrokeGray: 56,
+  setFillGray: 57,
+  setStrokeRGBColor: 58,
+  setFillRGBColor: 59,
+  setStrokeCMYKColor: 60,
+  setFillCMYKColor: 61,
+  shadingFill: 62,
+  beginInlineImage: 63,
+  beginImageData: 64,
+  endInlineImage: 65,
+  paintXObject: 66,
+  markPoint: 67,
+  markPointProps: 68,
+  beginMarkedContent: 69,
+  beginMarkedContentProps: 70,
+  endMarkedContent: 71,
+  beginCompat: 72,
+  endCompat: 73,
+  paintFormXObjectBegin: 74,
+  paintFormXObjectEnd: 75,
+  beginGroup: 76,
+  endGroup: 77,
+  beginAnnotations: 78,
+  endAnnotations: 79,
+  beginAnnotation: 80,
+  endAnnotation: 81,
+  paintJpegXObject: 82,
+  paintImageMaskXObject: 83,
+  paintImageMaskXObjectGroup: 84,
+  paintImageXObject: 85,
+  paintInlineImageXObject: 86,
+  paintInlineImageXObjectGroup: 87,
+  paintImageXObjectRepeat: 88,
+  paintImageMaskXObjectRepeat: 89,
+  paintSolidColorImageMask: 90,
+  constructPath: 91
+};
+
+// A notice for devs. These are good for things that are helpful to devs, such
+// as warning that Workers were disabled, which is important to devs but not
+// end users.
+export function info(msg) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.infos) {
+    console.log('Info: ' + msg);
+  }
+}
+
+// Non-fatal warnings.
+export function warn(msg) {
+  if (PDFJS.verbosity >= PDFJS.VERBOSITY_LEVELS.warnings) {
+    console.log('Warning: ' + msg);
+  }
+}
+
+// Fatal errors that should trigger the fallback UI and halt execution by
+// throwing an exception.
+export function error(msg) {
+  // If multiple arguments were passed, pass them all to the log function.
+  if (arguments.length > 1) {
+    var logArguments = ['Error:'];
+    logArguments.push.apply(logArguments, arguments);
+    console.log.apply(console, logArguments);
+    // Join the arguments into a single string for the lines below.
+    msg = [].join.call(arguments, ' ');
+  } else {
+    console.log('Error: ' + msg);
+  }
+  console.log(backtrace());
+  UnsupportedManager.notify(UNSUPPORTED_FEATURES.unknown);
+  throw new Error(msg);
+}
+
+export function backtrace() {
+  try {
+    throw new Error();
+  } catch (e) {
+    return e.stack ? e.stack.split('\n').slice(2).join('\n') : '';
+  }
+}
+
+export function assert(cond, msg) {
+  if (!cond) {
+    error(msg);
+  }
+}
+
+export var UNSUPPORTED_FEATURES = PDFJS.UNSUPPORTED_FEATURES = {
+  unknown: 'unknown',
+  forms: 'forms',
+  javaScript: 'javaScript',
+  smask: 'smask',
+  shadingPattern: 'shadingPattern',
+  font: 'font'
+};
+
+export var UnsupportedManager = PDFJS.UnsupportedManager =
+  (function UnsupportedManagerClosure() {
+  var listeners = [];
+  return {
+    listen: function (cb) {
+      listeners.push(cb);
+    },
+    notify: function (featureId) {
+      warn('Unsupported feature "' + featureId + '"');
+      for (var i = 0, ii = listeners.length; i &lt; ii; i++) {
+        listeners[i](featureId);
+      }
+    }
+  };
+})();
+
+// Combines two URLs. The baseUrl shall be absolute URL. If the url is an
+// absolute URL, it will be returned as is.
+export function combineUrl(baseUrl, url) {
+  if (!url) {
+    return baseUrl;
+  }
+  if (/^[a-z][a-z0-9+\-.]*:/i.test(url)) {
+    return url;
+  }
+  var i;
+  if (url.charAt(0) === '/') {
+    // absolute path
+    i = baseUrl.indexOf('://');
+    if (url.charAt(1) === '/') {
+      ++i;
+    } else {
+      i = baseUrl.indexOf('/', i + 3);
+    }
+    return baseUrl.substring(0, i) + url;
+  } else {
+    // relative path
+    var pathLength = baseUrl.length;
+    i = baseUrl.lastIndexOf('#');
+    pathLength = i >= 0 ? i : pathLength;
+    i = baseUrl.lastIndexOf('?', pathLength);
+    pathLength = i >= 0 ? i : pathLength;
+    var prefixLength = baseUrl.lastIndexOf('/', pathLength);
+    return baseUrl.substring(0, prefixLength + 1) + url;
+  }
+}
+
+// Validates if URL is safe and allowed, e.g. to avoid XSS.
+function isValidUrl(url, allowRelative) {
+  if (!url) {
+    return false;
+  }
+  // RFC 3986 (http://tools.ietf.org/html/rfc3986#section-3.1)
+  // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+  var protocol = /^[a-z][a-z0-9+\-.]*(?=:)/i.exec(url);
+  if (!protocol) {
+    return allowRelative;
+  }
+  protocol = protocol[0].toLowerCase();
+  switch (protocol) {
+    case 'http':
+    case 'https':
+    case 'ftp':
+    case 'mailto':
+    case 'tel':
+      return true;
+    default:
+      return false;
+  }
+}
+PDFJS.isValidUrl = isValidUrl;
+
+function shadow(obj, prop, value) {
+  Object.defineProperty(obj, prop, { value: value,
+                                     enumerable: true,
+                                     configurable: true,
+                                     writable: false });
+  return value;
+}
+PDFJS.shadow = shadow;
+
+export var PasswordResponses = PDFJS.PasswordResponses = {
+  NEED_PASSWORD: 1,
+  INCORRECT_PASSWORD: 2
+};
+
+var PasswordException = (function PasswordExceptionClosure() {
+  function PasswordException(msg, code) {
+    this.name = 'PasswordException';
+    this.message = msg;
+    this.code = code;
+  }
+
+  PasswordException.prototype = new Error();
+  PasswordException.constructor = PasswordException;
+
+  return PasswordException;
+})();
+PDFJS.PasswordException = PasswordException;
+
+var UnknownErrorException = (function UnknownErrorExceptionClosure() {
+  function UnknownErrorException(msg, details) {
+    this.name = 'UnknownErrorException';
+    this.message = msg;
+    this.details = details;
+  }
+
+  UnknownErrorException.prototype = new Error();
+  UnknownErrorException.constructor = UnknownErrorException;
+
+  return UnknownErrorException;
+})();
+PDFJS.UnknownErrorException = UnknownErrorException;
+
+var InvalidPDFException = (function InvalidPDFExceptionClosure() {
+  function InvalidPDFException(msg) {
+    this.name = 'InvalidPDFException';
+    this.message = msg;
+  }
+
+  InvalidPDFException.prototype = new Error();
+  InvalidPDFException.constructor = InvalidPDFException;
+
+  return InvalidPDFException;
+})();
+PDFJS.InvalidPDFException = InvalidPDFException;
+
+var MissingPDFException = (function MissingPDFExceptionClosure() {
+  function MissingPDFException(msg) {
+    this.name = 'MissingPDFException';
+    this.message = msg;
+  }
+
+  MissingPDFException.prototype = new Error();
+  MissingPDFException.constructor = MissingPDFException;
+
+  return MissingPDFException;
+})();
+PDFJS.MissingPDFException = MissingPDFException;
+
+var UnexpectedResponseException =
+    (function UnexpectedResponseExceptionClosure() {
+  function UnexpectedResponseException(msg, status) {
+    this.name = 'UnexpectedResponseException';
+    this.message = msg;
+    this.status = status;
+  }
+
+  UnexpectedResponseException.prototype = new Error();
+  UnexpectedResponseException.constructor = UnexpectedResponseException;
+
+  return UnexpectedResponseException;
+})();
+PDFJS.UnexpectedResponseException = UnexpectedResponseException;
+
+var NotImplementedException = (function NotImplementedExceptionClosure() {
+  function NotImplementedException(msg) {
+    this.message = msg;
+  }
+
+  NotImplementedException.prototype = new Error();
+  NotImplementedException.prototype.name = 'NotImplementedException';
+  NotImplementedException.constructor = NotImplementedException;
+
+  return NotImplementedException;
+})();
+
+var MissingDataException = (function MissingDataExceptionClosure() {
+  function MissingDataException(begin, end) {
+    this.begin = begin;
+    this.end = end;
+    this.message = 'Missing data [' + begin + ', ' + end + ')';
+  }
+
+  MissingDataException.prototype = new Error();
+  MissingDataException.prototype.name = 'MissingDataException';
+  MissingDataException.constructor = MissingDataException;
+
+  return MissingDataException;
+})();
+
+var XRefParseException = (function XRefParseExceptionClosure() {
+  function XRefParseException(msg) {
+    this.message = msg;
+  }
+
+  XRefParseException.prototype = new Error();
+  XRefParseException.prototype.name = 'XRefParseException';
+  XRefParseException.constructor = XRefParseException;
+
+  return XRefParseException;
+})();
+
+
+export function bytesToString(bytes) {
+  assert(bytes !== null &amp;&amp; typeof bytes === 'object' &amp;&amp;
+         bytes.length !== undefined, 'Invalid argument for bytesToString');
+  var length = bytes.length;
+  var MAX_ARGUMENT_COUNT = 8192;
+  if (length &lt; MAX_ARGUMENT_COUNT) {
+    return String.fromCharCode.apply(null, bytes);
+  }
+  var strBuf = [];
+  for (var i = 0; i &lt; length; i += MAX_ARGUMENT_COUNT) {
+    var chunkEnd = Math.min(i + MAX_ARGUMENT_COUNT, length);
+    var chunk = bytes.subarray(i, chunkEnd);
+    strBuf.push(String.fromCharCode.apply(null, chunk));
+  }
+  return strBuf.join('');
+}
+
+export function stringToBytes(str) {
+  assert(typeof str === 'string', 'Invalid argument for stringToBytes');
+  var length = str.length;
+  var bytes = new Uint8Array(length);
+  for (var i = 0; i &lt; length; ++i) {
+    bytes[i] = str.charCodeAt(i) &amp; 0xFF;
+  }
+  return bytes;
+}
+
+export function string32(value) {
+  return String.fromCharCode((value >> 24) &amp; 0xff, (value >> 16) &amp; 0xff,
+                             (value >> 8) &amp; 0xff, value &amp; 0xff);
+}
+
+export function log2(x) {
+  var n = 1, i = 0;
+  while (x > n) {
+    n &lt;&lt;= 1;
+    i++;
+  }
+  return i;
+}
+
+export function readInt8(data, start) {
+  return (data[start] &lt;&lt; 24) >> 24;
+}
+
+export function readUint16(data, offset) {
+  return (data[offset] &lt;&lt; 8) | data[offset + 1];
+}
+
+export function readUint32(data, offset) {
+  return ((data[offset] &lt;&lt; 24) | (data[offset + 1] &lt;&lt; 16) |
+         (data[offset + 2] &lt;&lt; 8) | data[offset + 3]) >>> 0;
+}
+
+// Lazy test the endianness of the platform
+// NOTE: This will be 'true' for simulated TypedArrays
+export function isLittleEndian() {
+  var buffer8 = new Uint8Array(2);
+  buffer8[0] = 1;
+  var buffer16 = new Uint16Array(buffer8.buffer);
+  return (buffer16[0] === 1);
+}
+
+Object.defineProperty(PDFJS, 'isLittleEndian', {
+  configurable: true,
+  get: function PDFJS_isLittleEndian() {
+    return shadow(PDFJS, 'isLittleEndian', isLittleEndian());
+  }
+});
+
+//#if !(FIREFOX || MOZCENTRAL || B2G || CHROME)
+//// Lazy test if the userAgant support CanvasTypedArrays
+export function hasCanvasTypedArrays() {
+  var canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 1;
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.createImageData(1, 1);
+  return (typeof imageData.data.buffer !== 'undefined');
+}
+
+Object.defineProperty(PDFJS, 'hasCanvasTypedArrays', {
+  configurable: true,
+  get: function PDFJS_hasCanvasTypedArrays() {
+    return shadow(PDFJS, 'hasCanvasTypedArrays', hasCanvasTypedArrays());
+  }
+});
+
+export var Uint32ArrayView = (function Uint32ArrayViewClosure() {
+
+  function Uint32ArrayView(buffer, length) {
+    this.buffer = buffer;
+    this.byteLength = buffer.length;
+    this.length = length === undefined ? (this.byteLength >> 2) : length;
+    ensureUint32ArrayViewProps(this.length);
+  }
+  Uint32ArrayView.prototype = Object.create(null);
+
+  var uint32ArrayViewSetters = 0;
+  function createUint32ArrayProp(index) {
+    return {
+      get: function () {
+        var buffer = this.buffer, offset = index &lt;&lt; 2;
+        return (buffer[offset] | (buffer[offset + 1] &lt;&lt; 8) |
+          (buffer[offset + 2] &lt;&lt; 16) | (buffer[offset + 3] &lt;&lt; 24)) >>> 0;
+      },
+      set: function (value) {
+        var buffer = this.buffer, offset = index &lt;&lt; 2;
+        buffer[offset] = value &amp; 255;
+        buffer[offset + 1] = (value >> 8) &amp; 255;
+        buffer[offset + 2] = (value >> 16) &amp; 255;
+        buffer[offset + 3] = (value >>> 24) &amp; 255;
+      }
+    };
+  }
+
+  function ensureUint32ArrayViewProps(length) {
+    while (uint32ArrayViewSetters &lt; length) {
+      Object.defineProperty(Uint32ArrayView.prototype,
+        uint32ArrayViewSetters,
+        createUint32ArrayProp(uint32ArrayViewSetters));
+      uint32ArrayViewSetters++;
+    }
+  }
+
+  return Uint32ArrayView;
+})();
+//#else
+//PDFJS.hasCanvasTypedArrays = true;
+//#endif
+
+export var IDENTITY_MATRIX = [1, 0, 0, 1, 0, 0];
+
+export var Util = PDFJS.Util = (function UtilClosure() {
+  function Util() {}
+
+  var rgbBuf = ['rgb(', 0, ',', 0, ',', 0, ')'];
+
+  // makeCssRgb() can be called thousands of times. Using |rgbBuf| avoids
+  // creating many intermediate strings.
+  Util.makeCssRgb = function Util_makeCssRgb(r, g, b) {
+    rgbBuf[1] = r;
+    rgbBuf[3] = g;
+    rgbBuf[5] = b;
+    return rgbBuf.join('');
+  };
+
+  // Concatenates two transformation matrices together and returns the result.
+  Util.transform = function Util_transform(m1, m2) {
+    return [
+      m1[0] * m2[0] + m1[2] * m2[1],
+      m1[1] * m2[0] + m1[3] * m2[1],
+      m1[0] * m2[2] + m1[2] * m2[3],
+      m1[1] * m2[2] + m1[3] * m2[3],
+      m1[0] * m2[4] + m1[2] * m2[5] + m1[4],
+      m1[1] * m2[4] + m1[3] * m2[5] + m1[5]
+    ];
+  };
+
+  // For 2d affine transforms
+  Util.applyTransform = function Util_applyTransform(p, m) {
+    var xt = p[0] * m[0] + p[1] * m[2] + m[4];
+    var yt = p[0] * m[1] + p[1] * m[3] + m[5];
+    return [xt, yt];
+  };
+
+  Util.applyInverseTransform = function Util_applyInverseTransform(p, m) {
+    var d = m[0] * m[3] - m[1] * m[2];
+    var xt = (p[0] * m[3] - p[1] * m[2] + m[2] * m[5] - m[4] * m[3]) / d;
+    var yt = (-p[0] * m[1] + p[1] * m[0] + m[4] * m[1] - m[5] * m[0]) / d;
+    return [xt, yt];
+  };
+
+  // Applies the transform to the rectangle and finds the minimum axially
+  // aligned bounding box.
+  Util.getAxialAlignedBoundingBox =
+    function Util_getAxialAlignedBoundingBox(r, m) {
+
+    var p1 = Util.applyTransform(r, m);
+    var p2 = Util.applyTransform(r.slice(2, 4), m);
+    var p3 = Util.applyTransform([r[0], r[3]], m);
+    var p4 = Util.applyTransform([r[2], r[1]], m);
+    return [
+      Math.min(p1[0], p2[0], p3[0], p4[0]),
+      Math.min(p1[1], p2[1], p3[1], p4[1]),
+      Math.max(p1[0], p2[0], p3[0], p4[0]),
+      Math.max(p1[1], p2[1], p3[1], p4[1])
+    ];
+  };
+
+  Util.inverseTransform = function Util_inverseTransform(m) {
+    var d = m[0] * m[3] - m[1] * m[2];
+    return [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d,
+      (m[2] * m[5] - m[4] * m[3]) / d, (m[4] * m[1] - m[5] * m[0]) / d];
+  };
+
+  // Apply a generic 3d matrix M on a 3-vector v:
+  //   | a b c |   | X |
+  //   | d e f | x | Y |
+  //   | g h i |   | Z |
+  // M is assumed to be serialized as [a,b,c,d,e,f,g,h,i],
+  // with v as [X,Y,Z]
+  Util.apply3dTransform = function Util_apply3dTransform(m, v) {
+    return [
+      m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
+      m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
+      m[6] * v[0] + m[7] * v[1] + m[8] * v[2]
+    ];
+  };
+
+  // This calculation uses Singular Value Decomposition.
+  // The SVD can be represented with formula A = USV. We are interested in the
+  // matrix S here because it represents the scale values.
+  Util.singularValueDecompose2dScale =
+    function Util_singularValueDecompose2dScale(m) {
+
+    var transpose = [m[0], m[2], m[1], m[3]];
+
+    // Multiply matrix m with its transpose.
+    var a = m[0] * transpose[0] + m[1] * transpose[2];
+    var b = m[0] * transpose[1] + m[1] * transpose[3];
+    var c = m[2] * transpose[0] + m[3] * transpose[2];
+    var d = m[2] * transpose[1] + m[3] * transpose[3];
+
+    // Solve the second degree polynomial to get roots.
+    var first = (a + d) / 2;
+    var second = Math.sqrt((a + d) * (a + d) - 4 * (a * d - c * b)) / 2;
+    var sx = first + second || 1;
+    var sy = first - second || 1;
+
+    // Scale values are the square roots of the eigenvalues.
+    return [Math.sqrt(sx), Math.sqrt(sy)];
+  };
+
+  // Normalize rectangle rect=[x1, y1, x2, y2] so that (x1,y1) &lt; (x2,y2)
+  // For coordinate systems whose origin lies in the bottom-left, this
+  // means normalization to (BL,TR) ordering. For systems with origin in the
+  // top-left, this means (TL,BR) ordering.
+  Util.normalizeRect = function Util_normalizeRect(rect) {
+    var r = rect.slice(0); // clone rect
+    if (rect[0] > rect[2]) {
+      r[0] = rect[2];
+      r[2] = rect[0];
+    }
+    if (rect[1] > rect[3]) {
+      r[1] = rect[3];
+      r[3] = rect[1];
+    }
+    return r;
+  };
+
+  // Returns a rectangle [x1, y1, x2, y2] corresponding to the
+  // intersection of rect1 and rect2. If no intersection, returns 'false'
+  // The rectangle coordinates of rect1, rect2 should be [x1, y1, x2, y2]
+  Util.intersect = function Util_intersect(rect1, rect2) {
+    function compare(a, b) {
+      return a - b;
+    }
+
+    // Order points along the axes
+    var orderedX = [rect1[0], rect1[2], rect2[0], rect2[2]].sort(compare),
+        orderedY = [rect1[1], rect1[3], rect2[1], rect2[3]].sort(compare),
+        result = [];
+
+    rect1 = Util.normalizeRect(rect1);
+    rect2 = Util.normalizeRect(rect2);
+
+    // X: first and second points belong to different rectangles?
+    if ((orderedX[0] === rect1[0] &amp;&amp; orderedX[1] === rect2[0]) ||
+        (orderedX[0] === rect2[0] &amp;&amp; orderedX[1] === rect1[0])) {
+      // Intersection must be between second and third points
+      result[0] = orderedX[1];
+      result[2] = orderedX[2];
+    } else {
+      return false;
+    }
+
+    // Y: first and second points belong to different rectangles?
+    if ((orderedY[0] === rect1[1] &amp;&amp; orderedY[1] === rect2[1]) ||
+        (orderedY[0] === rect2[1] &amp;&amp; orderedY[1] === rect1[1])) {
+      // Intersection must be between second and third points
+      result[1] = orderedY[1];
+      result[3] = orderedY[2];
+    } else {
+      return false;
+    }
+
+    return result;
+  };
+
+  Util.sign = function Util_sign(num) {
+    return num &lt; 0 ? -1 : 1;
+  };
+
+  Util.appendToArray = function Util_appendToArray(arr1, arr2) {
+    Array.prototype.push.apply(arr1, arr2);
+  };
+
+  Util.prependToArray = function Util_prependToArray(arr1, arr2) {
+    Array.prototype.unshift.apply(arr1, arr2);
+  };
+
+  Util.extendObj = function extendObj(obj1, obj2) {
+    for (var key in obj2) {
+      obj1[key] = obj2[key];
+    }
+  };
+
+  Util.getInheritableProperty = function Util_getInheritableProperty(dict,
+                                                                     name) {
+    while (dict &amp;&amp; !dict.has(name)) {
+      dict = dict.get('Parent');
+    }
+    if (!dict) {
+      return null;
+    }
+    return dict.get(name);
+  };
+
+  Util.inherit = function Util_inherit(sub, base, prototype) {
+    sub.prototype = Object.create(base.prototype);
+    sub.prototype.constructor = sub;
+    for (var prop in prototype) {
+      sub.prototype[prop] = prototype[prop];
+    }
+  };
+
+  Util.loadScript = function Util_loadScript(src, callback) {
+    var script = document.createElement('script');
+    var loaded = false;
+    script.setAttribute('src', src);
+    if (callback) {
+      script.onload = function() {
+        if (!loaded) {
+          callback();
+        }
+        loaded = true;
+      };
+    }
+    document.getElementsByTagName('head')[0].appendChild(script);
+  };
+
+  return Util;
+})();
+
+/**
+ * PDF page viewport created based on scale, rotation and offset.
+ * @class
+ * @alias PDFJS.PageViewport
+ */
+export var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
+  /**
+   * @constructor
+   * @private
+   * @param viewBox {Array} xMin, yMin, xMax and yMax coordinates.
+   * @param scale {number} scale of the viewport.
+   * @param rotation {number} rotations of the viewport in degrees.
+   * @param offsetX {number} offset X
+   * @param offsetY {number} offset Y
+   * @param dontFlip {boolean} if true, axis Y will not be flipped.
+   */
+  function PageViewport(viewBox, scale, rotation, offsetX, offsetY, dontFlip) {
+    this.viewBox = viewBox;
+    this.scale = scale;
+    this.rotation = rotation;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+
+    // creating transform to convert pdf coordinate system to the normal
+    // canvas like coordinates taking in account scale and rotation
+    var centerX = (viewBox[2] + viewBox[0]) / 2;
+    var centerY = (viewBox[3] + viewBox[1]) / 2;
+    var rotateA, rotateB, rotateC, rotateD;
+    rotation = rotation % 360;
+    rotation = rotation &lt; 0 ? rotation + 360 : rotation;
+    switch (rotation) {
+      case 180:
+        rotateA = -1; rotateB = 0; rotateC = 0; rotateD = 1;
+        break;
+      case 90:
+        rotateA = 0; rotateB = 1; rotateC = 1; rotateD = 0;
+        break;
+      case 270:
+        rotateA = 0; rotateB = -1; rotateC = -1; rotateD = 0;
+        break;
+      //case 0:
+      default:
+        rotateA = 1; rotateB = 0; rotateC = 0; rotateD = -1;
+        break;
+    }
+
+    if (dontFlip) {
+      rotateC = -rotateC; rotateD = -rotateD;
+    }
+
+    var offsetCanvasX, offsetCanvasY;
+    var width, height;
+    if (rotateA === 0) {
+      offsetCanvasX = Math.abs(centerY - viewBox[1]) * scale + offsetX;
+      offsetCanvasY = Math.abs(centerX - viewBox[0]) * scale + offsetY;
+      width = Math.abs(viewBox[3] - viewBox[1]) * scale;
+      height = Math.abs(viewBox[2] - viewBox[0]) * scale;
+    } else {
+      offsetCanvasX = Math.abs(centerX - viewBox[0]) * scale + offsetX;
+      offsetCanvasY = Math.abs(centerY - viewBox[1]) * scale + offsetY;
+      width = Math.abs(viewBox[2] - viewBox[0]) * scale;
+      height = Math.abs(viewBox[3] - viewBox[1]) * scale;
+    }
+    // creating transform for the following operations:
+    // translate(-centerX, -centerY), rotate and flip vertically,
+    // scale, and translate(offsetCanvasX, offsetCanvasY)
+    this.transform = [
+      rotateA * scale,
+      rotateB * scale,
+      rotateC * scale,
+      rotateD * scale,
+      offsetCanvasX - rotateA * scale * centerX - rotateC * scale * centerY,
+      offsetCanvasY - rotateB * scale * centerX - rotateD * scale * centerY
+    ];
+
+    this.width = width;
+    this.height = height;
+    this.fontScale = scale;
+  }
+  PageViewport.prototype = /** @lends PDFJS.PageViewport.prototype */ {
+    /**
+     * Clones viewport with additional properties.
+     * @param args {Object} (optional) If specified, may contain the 'scale' or
+     * 'rotation' properties to override the corresponding properties in
+     * the cloned viewport.
+     * @returns {PDFJS.PageViewport} Cloned viewport.
+     */
+    clone: function PageViewPort_clone(args) {
+      args = args || {};
+      var scale = 'scale' in args ? args.scale : this.scale;
+      var rotation = 'rotation' in args ? args.rotation : this.rotation;
+      return new PageViewport(this.viewBox.slice(), scale, rotation,
+                              this.offsetX, this.offsetY, args.dontFlip);
+    },
+    /**
+     * Converts PDF point to the viewport coordinates. For examples, useful for
+     * converting PDF location into canvas pixel coordinates.
+     * @param x {number} X coordinate.
+     * @param y {number} Y coordinate.
+     * @returns {Object} Object that contains 'x' and 'y' properties of the
+     * point in the viewport coordinate space.
+     * @see {@link convertToPdfPoint}
+     * @see {@link convertToViewportRectangle}
+     */
+    convertToViewportPoint: function PageViewport_convertToViewportPoint(x, y) {
+      return Util.applyTransform([x, y], this.transform);
+    },
+    /**
+     * Converts PDF rectangle to the viewport coordinates.
+     * @param rect {Array} xMin, yMin, xMax and yMax coordinates.
+     * @returns {Array} Contains corresponding coordinates of the rectangle
+     * in the viewport coordinate space.
+     * @see {@link convertToViewportPoint}
+     */
+    convertToViewportRectangle:
+      function PageViewport_convertToViewportRectangle(rect) {
+      var tl = Util.applyTransform([rect[0], rect[1]], this.transform);
+      var br = Util.applyTransform([rect[2], rect[3]], this.transform);
+      return [tl[0], tl[1], br[0], br[1]];
+    },
+    /**
+     * Converts viewport coordinates to the PDF location. For examples, useful
+     * for converting canvas pixel location into PDF one.
+     * @param x {number} X coordinate.
+     * @param y {number} Y coordinate.
+     * @returns {Object} Object that contains 'x' and 'y' properties of the
+     * point in the PDF coordinate space.
+     * @see {@link convertToViewportPoint}
+     */
+    convertToPdfPoint: function PageViewport_convertToPdfPoint(x, y) {
+      return Util.applyInverseTransform([x, y], this.transform);
+    }
+  };
+  return PageViewport;
+})();
+
+export var PDFStringTranslateTable = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0x2D8, 0x2C7, 0x2C6, 0x2D9, 0x2DD, 0x2DB, 0x2DA, 0x2DC, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x2022, 0x2020, 0x2021, 0x2026, 0x2014,
+  0x2013, 0x192, 0x2044, 0x2039, 0x203A, 0x2212, 0x2030, 0x201E, 0x201C,
+  0x201D, 0x2018, 0x2019, 0x201A, 0x2122, 0xFB01, 0xFB02, 0x141, 0x152, 0x160,
+  0x178, 0x17D, 0x131, 0x142, 0x153, 0x161, 0x17E, 0, 0x20AC
+];
+
+export function stringToPDFString(str) {
+  var i, n = str.length, strBuf = [];
+  if (str[0] === '\xFE' &amp;&amp; str[1] === '\xFF') {
+    // UTF16BE BOM
+    for (i = 2; i &lt; n; i += 2) {
+      strBuf.push(String.fromCharCode(
+        (str.charCodeAt(i) &lt;&lt; 8) | str.charCodeAt(i + 1)));
+    }
+  } else {
+    for (i = 0; i &lt; n; ++i) {
+      var code = PDFStringTranslateTable[str.charCodeAt(i)];
+      strBuf.push(code ? String.fromCharCode(code) : str.charAt(i));
+    }
+  }
+  return strBuf.join('');
+}
+
+export function stringToUTF8String(str) {
+  return decodeURIComponent(escape(str));
+}
+
+export function isEmptyObj(obj) {
+  for (var key in obj) {
+    return false;
+  }
+  return true;
+}
+
+export function isBool(v) {
+  return typeof v === 'boolean';
+}
+
+export function isInt(v) {
+  return typeof v === 'number' &amp;&amp; ((v | 0) === v);
+}
+
+export function isNum(v) {
+  return typeof v === 'number';
+}
+
+export function isString(v) {
+  return typeof v === 'string';
+}
+
+export function isName(v) {
+  return v instanceof Name;
+}
+
+export function isCmd(v, cmd) {
+  return v instanceof Cmd &amp;&amp; (cmd === undefined || v.cmd === cmd);
+}
+
+export function isDict(v, type) {
+  if (!(v instanceof Dict)) {
+    return false;
+  }
+  if (!type) {
+    return true;
+  }
+  var dictType = v.get('Type');
+  return isName(dictType) &amp;&amp; dictType.name === type;
+}
+
+export function isArray(v) {
+  return v instanceof Array;
+}
+
+export function isStream(v) {
+  return typeof v === 'object' &amp;&amp; v !== null &amp;&amp; v.getBytes !== undefined;
+}
+
+export function isArrayBuffer(v) {
+  return typeof v === 'object' &amp;&amp; v !== null &amp;&amp; v.byteLength !== undefined;
+}
+
+export function isRef(v) {
+  return v instanceof Ref;
+}
+
+/**
+ * Promise Capability object.
+ *
+ * @typedef {Object} PromiseCapability
+ * @property {Promise} promise - A promise object.
+ * @property {function} resolve - Fullfills the promise.
+ * @property {function} reject - Rejects the promise.
+ */
+
+/**
+ * Creates a promise capability object.
+ * @alias PDFJS.createPromiseCapability
+ *
+ * @return {PromiseCapability} A capability object contains:
+ * - a Promise, resolve and reject methods.
+ */
+function createPromiseCapability() {
+  var capability = {};
+  capability.promise = new Promise(function (resolve, reject) {
+    capability.resolve = resolve;
+    capability.reject = reject;
+  });
+  return capability;
+}
+
+PDFJS.createPromiseCapability = createPromiseCapability;
+
+export var StatTimer = (function StatTimerClosure() {
+  function rpad(str, pad, length) {
+    while (str.length &lt; length) {
+      str += pad;
+    }
+    return str;
+  }
+  function StatTimer() {
+    this.started = {};
+    this.times = [];
+    this.enabled = true;
+  }
+  StatTimer.prototype = {
+    time: function StatTimer_time(name) {
+      if (!this.enabled) {
+        return;
+      }
+      if (name in this.started) {
+        warn('Timer is already running for ' + name);
+      }
+      this.started[name] = Date.now();
+    },
+    timeEnd: function StatTimer_timeEnd(name) {
+      if (!this.enabled) {
+        return;
+      }
+      if (!(name in this.started)) {
+        warn('Timer has not been started for ' + name);
+      }
+      this.times.push({
+        'name': name,
+        'start': this.started[name],
+        'end': Date.now()
+      });
+      // Remove timer from started so it can be called again.
+      delete this.started[name];
+    },
+    toString: function StatTimer_toString() {
+      var i, ii;
+      var times = this.times;
+      var out = '';
+      // Find the longest name for padding purposes.
+      var longest = 0;
+      for (i = 0, ii = times.length; i &lt; ii; ++i) {
+        var name = times[i]['name'];
+        if (name.length > longest) {
+          longest = name.length;
+        }
+      }
+      for (i = 0, ii = times.length; i &lt; ii; ++i) {
+        var span = times[i];
+        var duration = span.end - span.start;
+        out += rpad(span['name'], ' ', longest) + ' ' + duration + 'ms\n';
+      }
+      return out;
+    }
+  };
+  return StatTimer;
+})();
+
+PDFJS.createBlob = function createBlob(data, contentType) {
+  if (typeof Blob !== 'undefined') {
+    return new Blob([data], { type: contentType });
+  }
+  // Blob builder is deprecated in FF14 and removed in FF18.
+  var bb = new MozBlobBuilder();
+  bb.append(data);
+  return bb.getBlob(contentType);
+};
+
+PDFJS.createObjectURL = (function createObjectURLClosure() {
+  // Blob/createObjectURL is not available, falling back to data schema.
+  var digits =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+  return function createObjectURL(data, contentType) {
+    if (!PDFJS.disableCreateObjectURL &amp;&amp;
+        typeof URL !== 'undefined' &amp;&amp; URL.createObjectURL) {
+      var blob = PDFJS.createBlob(data, contentType);
+      return URL.createObjectURL(blob);
+    }
+
+    var buffer = 'data:' + contentType + ';base64,';
+    for (var i = 0, ii = data.length; i &lt; ii; i += 3) {
+      var b1 = data[i] &amp; 0xFF;
+      var b2 = data[i + 1] &amp; 0xFF;
+      var b3 = data[i + 2] &amp; 0xFF;
+      var d1 = b1 >> 2, d2 = ((b1 &amp; 3) &lt;&lt; 4) | (b2 >> 4);
+      var d3 = i + 1 &lt; ii ? ((b2 &amp; 0xF) &lt;&lt; 2) | (b3 >> 6) : 64;
+      var d4 = i + 2 &lt; ii ? (b3 &amp; 0x3F) : 64;
+      buffer += digits[d1] + digits[d2] + digits[d3] + digits[d4];
+    }
+    return buffer;
+  };
+})();
+
+export function MessageHandler(name, comObj) {
+  this.name = name;
+  this.comObj = comObj;
+  this.callbackIndex = 1;
+  this.postMessageTransfers = true;
+  var callbacksCapabilities = this.callbacksCapabilities = {};
+  var ah = this.actionHandler = {};
+
+  ah['console_log'] = [function ahConsoleLog(data) {
+    console.log.apply(console, data);
+  }];
+  ah['console_error'] = [function ahConsoleError(data) {
+    console.error.apply(console, data);
+  }];
+  ah['_unsupported_feature'] = [function ah_unsupportedFeature(data) {
+    UnsupportedManager.notify(data);
+  }];
+
+  comObj.onmessage = function messageHandlerComObjOnMessage(event) {
+    var data = event.data;
+    if (data.isReply) {
+      var callbackId = data.callbackId;
+      if (data.callbackId in callbacksCapabilities) {
+        var callback = callbacksCapabilities[callbackId];
+        delete callbacksCapabilities[callbackId];
+        if ('error' in data) {
+          callback.reject(data.error);
+        } else {
+          callback.resolve(data.data);
+        }
+      } else {
+        error('Cannot resolve callback ' + callbackId);
+      }
+    } else if (data.action in ah) {
+      var action = ah[data.action];
+      if (data.callbackId) {
+        Promise.resolve().then(function () {
+          return action[0].call(action[1], data.data);
+        }).then(function (result) {
+          comObj.postMessage({
+            isReply: true,
+            callbackId: data.callbackId,
+            data: result
+          });
+        }, function (reason) {
+          comObj.postMessage({
+            isReply: true,
+            callbackId: data.callbackId,
+            error: reason
+          });
+        });
+      } else {
+        action[0].call(action[1], data.data);
+      }
+    } else {
+      error('Unknown action from worker: ' + data.action);
+    }
+  };
+}
+
+MessageHandler.prototype = {
+  on: function messageHandlerOn(actionName, handler, scope) {
+    var ah = this.actionHandler;
+    if (ah[actionName]) {
+      error('There is already an actionName called "' + actionName + '"');
+    }
+    ah[actionName] = [handler, scope];
+  },
+  /**
+   * Sends a message to the comObj to invoke the action with the supplied data.
+   * @param {String} actionName Action to call.
+   * @param {JSON} data JSON data to send.
+   * @param {Array} [transfers] Optional list of transfers/ArrayBuffers
+   */
+  send: function messageHandlerSend(actionName, data, transfers) {
+    var message = {
+      action: actionName,
+      data: data
+    };
+    this.postMessage(message, transfers);
+  },
+  /**
+   * Sends a message to the comObj to invoke the action with the supplied data.
+   * Expects that other side will callback with the response.
+   * @param {String} actionName Action to call.
+   * @param {JSON} data JSON data to send.
+   * @param {Array} [transfers] Optional list of transfers/ArrayBuffers.
+   * @returns {Promise} Promise to be resolved with response data.
+   */
+  sendWithPromise:
+    function messageHandlerSendWithPromise(actionName, data, transfers) {
+    var callbackId = this.callbackIndex++;
+    var message = {
+      action: actionName,
+      data: data,
+      callbackId: callbackId
+    };
+    var capability = createPromiseCapability();
+    this.callbacksCapabilities[callbackId] = capability;
+    try {
+      this.postMessage(message, transfers);
+    } catch (e) {
+      capability.reject(e);
+    }
+    return capability.promise;
+  },
+  /**
+   * Sends raw message to the comObj.
+   * @private
+   * @param message {Object} Raw message.
+   * @param transfers List of transfers/ArrayBuffers, or undefined.
+   */
+  postMessage: function (message, transfers) {
+    if (transfers &amp;&amp; this.postMessageTransfers) {
+      this.comObj.postMessage(message, transfers);
+    } else {
+      this.comObj.postMessage(message);
+    }
+  }
+};
+
+export function loadJpegStream(id, imageUrl, objs) {
+  var img = new Image();
+  img.onload = (function loadJpegStream_onloadClosure() {
+    objs.resolve(id, img);
+  });
+  img.onerror = (function loadJpegStream_onerrorClosure() {
+    objs.resolve(id, null);
+    warn('Error during JPEG image loading');
+  });
+  img.src = imageUrl;
+}</code></pre></article></section><footer class="footer" id="PeOAagUepe"><div class="wrapper"><i>Documentation generated for dwv v0.35.1.</i></div></footer></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><a href="/" class="sidebar-title sidebar-title-anchor">DWV</a><div class="mobile-nav-links"><div class="navbar-item"><a id="" href="https://github.com/ivmartel/dwv" target="_blank">github</a></div><div class="navbar-item"><a id="" href="https://www.npmjs.com/package/dwv" target="_blank">npm</a></div></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-tutorials"><div>Tutorials</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="tutorial-annotations.html">annotations</a></div><div class="sidebar-section-children"><a href="tutorial-architecture.html">architecture</a></div><div class="sidebar-section-children"><a href="tutorial-conformance.html">conformance</a></div><div class="sidebar-section-children"><a href="tutorial-data-load.html">data-load</a></div><div class="sidebar-section-children"><a href="tutorial-developing.html">developing</a></div><div class="sidebar-section-children"><a href="tutorial-errors.html">errors</a></div><div class="sidebar-section-children"><a href="tutorial-examples.html">examples</a></div><div class="sidebar-section-children"><a href="tutorial-integrations.html">integrations</a></div><div class="sidebar-section-children"><a href="tutorial-layout.html">layout</a></div><div class="sidebar-section-children"><a href="tutorial-module.html">module</a></div><div class="sidebar-section-children"><a href="tutorial-standards.html">standards</a></div><div class="sidebar-section-children"><a href="tutorial-test-results.html">test-results</a></div><div class="sidebar-section-children"><a href="tutorial-user-stories.html">user-stories</a></div><div class="sidebar-section-children"><a href="tutorial-view-create.html">view-create</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-events"><div>Events</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationadd">annotationadd</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationgroupeditablechange">annotationgroupeditablechange</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationremove">annotationremove</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html#event:annotationupdate">annotationupdate</a></div><div class="sidebar-section-children"><a href="App.html#event:abort">abort</a></div><div class="sidebar-section-children"><a href="App.html#event:drawlayeradd">drawlayeradd</a></div><div class="sidebar-section-children"><a href="App.html#event:error">error</a></div><div class="sidebar-section-children"><a href="App.html#event:keydown">keydown</a></div><div class="sidebar-section-children"><a href="App.html#event:load">load</a></div><div class="sidebar-section-children"><a href="App.html#event:loadend">loadend</a></div><div class="sidebar-section-children"><a href="App.html#event:loaditem">loaditem</a></div><div class="sidebar-section-children"><a href="App.html#event:loadprogress">loadprogress</a></div><div class="sidebar-section-children"><a href="App.html#event:loadstart">loadstart</a></div><div class="sidebar-section-children"><a href="App.html#event:opacitychange">opacitychange</a></div><div class="sidebar-section-children"><a href="App.html#event:renderend">renderend</a></div><div class="sidebar-section-children"><a href="App.html#event:renderstart">renderstart</a></div><div class="sidebar-section-children"><a href="App.html#event:timeout">timeout</a></div><div class="sidebar-section-children"><a href="App.html#event:viewlayeradd">viewlayeradd</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html#event:changemasksegmentcolour">changemasksegmentcolour</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataadd">dataadd</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataimageset">dataimageset</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataremove">dataremove</a></div><div class="sidebar-section-children"><a href="DataController.html#event:dataupdate">dataupdate</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentdelete">masksegmentdelete</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html#event:masksegmentredraw">masksegmentredraw</a></div><div class="sidebar-section-children"><a href="Draw.html#event:annotationselect">annotationselect</a></div><div class="sidebar-section-children"><a href="Draw.html#event:warn">warn</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html#event:brushdraw">brushdraw</a></div><div class="sidebar-section-children"><a href="Image.html#event:appendframe">appendframe</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagecontentchange">imagecontentchange</a></div><div class="sidebar-section-children"><a href="Image.html#event:imagegeometrychange">imagegeometrychange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:activelayerchange">activelayerchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:offsetchange">offsetchange</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:removelayer">removelayer</a></div><div class="sidebar-section-children"><a href="LayerGroup.html#event:zoomchange">zoomchange</a></div><div class="sidebar-section-children"><a href="OverlayData.html#event:valuechange">valuechange</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterrun">filterrun</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html#event:filterundo">filterundo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:redo">redo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undo">undo</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoadd">undoadd</a></div><div class="sidebar-section-children"><a href="UndoStack.html#event:undoremove">undoremove</a></div><div class="sidebar-section-children"><a href="View.html#event:alphafuncchange">alphafuncchange</a></div><div class="sidebar-section-children"><a href="View.html#event:colourmapchange">colourmapchange</a></div><div class="sidebar-section-children"><a href="View.html#event:positionchange">positionchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlchange">wlchange</a></div><div class="sidebar-section-children"><a href="View.html#event:wlpresetadd">wlpresetadd</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="AddAnnotationCommand.html">AddAnnotationCommand</a></div><div class="sidebar-section-children"><a href="Annotation.html">Annotation</a></div><div class="sidebar-section-children"><a href="AnnotationGroup.html">AnnotationGroup</a></div><div class="sidebar-section-children"><a href="AnnotationGroupFactory.html">AnnotationGroupFactory</a></div><div class="sidebar-section-children"><a href="AnnotationUI.html">AnnotationUI</a></div><div class="sidebar-section-children"><a href="App.html">App</a></div><div class="sidebar-section-children"><a href="AppOptions.html">AppOptions</a></div><div class="sidebar-section-children"><a href="ArrowFactory.html">ArrowFactory</a></div><div class="sidebar-section-children"><a href="BinaryPixGenerator.html">BinaryPixGenerator</a></div><div class="sidebar-section-children"><a href="Brush.html">Brush</a></div><div class="sidebar-section-children"><a href="BrushToolUI.html">BrushToolUI</a></div><div class="sidebar-section-children"><a href="BucketQueue.html">BucketQueue</a></div><div class="sidebar-section-children"><a href="CADReport.html">CADReport</a></div><div class="sidebar-section-children"><a href="ChangeSegmentColourCommand.html">ChangeSegmentColourCommand</a></div><div class="sidebar-section-children"><a href="Circle.html">Circle</a></div><div class="sidebar-section-children"><a href="CircleFactory.html">CircleFactory</a></div><div class="sidebar-section-children"><a href="ColourMap.html">ColourMap</a></div><div class="sidebar-section-children"><a href="ColourMapBinder.html">ColourMapBinder</a></div><div class="sidebar-section-children"><a href="DataElement.html">DataElement</a></div><div class="sidebar-section-children"><a href="DataReader.html">DataReader</a></div><div class="sidebar-section-children"><a href="DataTableUI.html">DataTableUI</a></div><div class="sidebar-section-children"><a href="DataWriter.html">DataWriter</a></div><div class="sidebar-section-children"><a href="DefaultTextDecoder.html">DefaultTextDecoder</a></div><div class="sidebar-section-children"><a href="DefaultTextEncoder.html">DefaultTextEncoder</a></div><div class="sidebar-section-children"><a href="DeleteSegmentCommand.html">DeleteSegmentCommand</a></div><div class="sidebar-section-children"><a href="DicomBufferToView.html">DicomBufferToView</a></div><div class="sidebar-section-children"><a href="DicomCode.html">DicomCode</a></div><div class="sidebar-section-children"><a href="DicomData.html">DicomData</a></div><div class="sidebar-section-children"><a href="DicomDataLoader.html">DicomDataLoader</a></div><div class="sidebar-section-children"><a href="DicomParser.html">DicomParser</a></div><div class="sidebar-section-children"><a href="DicomSRContent.html">DicomSRContent</a></div><div class="sidebar-section-children"><a href="DicomSegmentFrameInfo.html">DicomSegmentFrameInfo</a></div><div class="sidebar-section-children"><a href="DicomWriter.html">DicomWriter</a></div><div class="sidebar-section-children"><a href="Draw.html">Draw</a></div><div class="sidebar-section-children"><a href="DrawBrushCommand.html">DrawBrushCommand</a></div><div class="sidebar-section-children"><a href="DrawController.html">DrawController</a></div><div class="sidebar-section-children"><a href="DrawDetails.html">DrawDetails</a></div><div class="sidebar-section-children"><a href="DrawLayer.html">DrawLayer</a></div><div class="sidebar-section-children"><a href="DrawMeta.html">DrawMeta</a></div><div class="sidebar-section-children"><a href="DrawShapeEditor.html">DrawShapeEditor</a></div><div class="sidebar-section-children"><a href="DrawShapeHandler.html">DrawShapeHandler</a></div><div class="sidebar-section-children"><a href="DrawToolUI.html">DrawToolUI</a></div><div class="sidebar-section-children"><a href="Ellipse.html">Ellipse</a></div><div class="sidebar-section-children"><a href="EllipseFactory.html">EllipseFactory</a></div><div class="sidebar-section-children"><a href="FilePixGenerator.html">FilePixGenerator</a></div><div class="sidebar-section-children"><a href="FilesLoader.html">FilesLoader</a></div><div class="sidebar-section-children"><a href="Filter.html">Filter</a></div><div class="sidebar-section-children"><a href="Floodfill.html">Floodfill</a></div><div class="sidebar-section-children"><a href="Geometry.html">Geometry</a></div><div class="sidebar-section-children"><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Image.html">Image</a></div><div class="sidebar-section-children"><a href="ImageFactory.html">ImageFactory</a></div><div class="sidebar-section-children"><a href="ImageReference.html">ImageReference</a></div><div class="sidebar-section-children"><a href="Index_.html">Index</a></div><div class="sidebar-section-children"><a href="JSONTextLoader.html">JSONTextLoader</a></div><div class="sidebar-section-children"><a href="Jpeg2000WorkerTask.html">Jpeg2000WorkerTask</a></div><div class="sidebar-section-children"><a href="JpegBaselineWorkerTask.html">JpegBaselineWorkerTask</a></div><div class="sidebar-section-children"><a href="JpegLosslessWorkerTask.html">JpegLosslessWorkerTask</a></div><div class="sidebar-section-children"><a href="LabelFactory.html">LabelFactory</a></div><div class="sidebar-section-children"><a href="LabelingFilter.html">LabelingFilter</a></div><div class="sidebar-section-children"><a href="LabelingThread.html">LabelingThread</a></div><div class="sidebar-section-children"><a href="LabelingWorkerTask.html">LabelingWorkerTask</a></div><div class="sidebar-section-children"><a href="LayerGroup.html">LayerGroup</a></div><div class="sidebar-section-children"><a href="Line.html">Line</a></div><div class="sidebar-section-children"><a href="ListenerHandler.html">ListenerHandler</a></div><div class="sidebar-section-children"><a href="Livewire.html">Livewire</a></div><div class="sidebar-section-children"><a href="LoadController.html">LoadController</a></div><div class="sidebar-section-children"><a href="MPRPixGenerator.html">MPRPixGenerator</a></div><div class="sidebar-section-children"><a href="MaskFactory.html">MaskFactory</a></div><div class="sidebar-section-children"><a href="MaskSegment.html">MaskSegment</a></div><div class="sidebar-section-children"><a href="MaskSegmentHelper.html">MaskSegmentHelper</a></div><div class="sidebar-section-children"><a href="MaskSegmentViewHelper.html">MaskSegmentViewHelper</a></div><div class="sidebar-section-children"><a href="Matrix33.html">Matrix33</a></div><div class="sidebar-section-children"><a href="MeasuredValue.html">MeasuredValue</a></div><div class="sidebar-section-children"><a href="MemoryLoader.html">MemoryLoader</a></div><div class="sidebar-section-children"><a href="ModalityLut.html">ModalityLut</a></div><div class="sidebar-section-children"><a href="MultiProgressHandler.html">MultiProgressHandler</a></div><div class="sidebar-section-children"><a href="MultipartLoader.html">MultipartLoader</a></div><div class="sidebar-section-children"><a href="NumberRange.html">NumberRange</a></div><div class="sidebar-section-children"><a href="NumericMeasurement.html">NumericMeasurement</a></div><div class="sidebar-section-children"><a href="OffsetBinder.html">OffsetBinder</a></div><div class="sidebar-section-children"><a href="Opacity.html">Opacity</a></div><div class="sidebar-section-children"><a href="OpacityBinder.html">OpacityBinder</a></div><div class="sidebar-section-children"><a href="OverlayData.html">OverlayData</a></div><div class="sidebar-section-children"><a href="PDFJS.PageViewport.html">PageViewport</a></div><div class="sidebar-section-children"><a href="Path.html">Path</a></div><div class="sidebar-section-children"><a href="PixelBufferDecoder.html">PixelBufferDecoder</a></div><div class="sidebar-section-children"><a href="PlaneHelper.html">PlaneHelper</a></div><div class="sidebar-section-children"><a href="Point.html">Point</a></div><div class="sidebar-section-children"><a href="Point2D.html">Point2D</a></div><div class="sidebar-section-children"><a href="Point3D.html">Point3D</a></div><div class="sidebar-section-children"><a href="PositionBinder.html">PositionBinder</a></div><div class="sidebar-section-children"><a href="PositionHelper.html">PositionHelper</a></div><div class="sidebar-section-children"><a href="Protractor.html">Protractor</a></div><div class="sidebar-section-children"><a href="ProtractorFactory.html">ProtractorFactory</a></div><div class="sidebar-section-children"><a href="RGB.html">RGB</a></div><div class="sidebar-section-children"><a href="ROI.html">ROI</a></div><div class="sidebar-section-children"><a href="RawImageLoader.html">RawImageLoader</a></div><div class="sidebar-section-children"><a href="RawVideoLoader.html">RawVideoLoader</a></div><div class="sidebar-section-children"><a href="Rectangle.html">Rectangle</a></div><div class="sidebar-section-children"><a href="RectangleFactory.html">RectangleFactory</a></div><div class="sidebar-section-children"><a href="RemoveAnnotationCommand.html">RemoveAnnotationCommand</a></div><div class="sidebar-section-children"><a href="RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></div><div class="sidebar-section-children"><a href="ResponseEvaluation.html">ResponseEvaluation</a></div><div class="sidebar-section-children"><a href="RleDecoder.html">RleDecoder</a></div><div class="sidebar-section-children"><a href="RleWorkerTask.html">RleWorkerTask</a></div><div class="sidebar-section-children"><a href="RoiFactory.html">RoiFactory</a></div><div class="sidebar-section-children"><a href="RulerFactory.html">RulerFactory</a></div><div class="sidebar-section-children"><a href="RunFilterCommand.html">RunFilterCommand</a></div><div class="sidebar-section-children"><a href="Scalar2D.html">Scalar2D</a></div><div class="sidebar-section-children"><a href="Scalar3D.html">Scalar3D</a></div><div class="sidebar-section-children"><a href="Scissors.html">Scissors</a></div><div class="sidebar-section-children"><a href="Scroll.html">Scroll</a></div><div class="sidebar-section-children"><a href="ScrollSum.html">ScrollSum</a></div><div class="sidebar-section-children"><a href="ScrollWheel.html">ScrollWheel</a></div><div class="sidebar-section-children"><a href="SegmentationUI.html">SegmentationUI</a></div><div class="sidebar-section-children"><a href="Sharpen.html">Sharpen</a></div><div class="sidebar-section-children"><a href="SharpenFilter.html">SharpenFilter</a></div><div class="sidebar-section-children"><a href="Size.html">Size</a></div><div class="sidebar-section-children"><a href="Sobel.html">Sobel</a></div><div class="sidebar-section-children"><a href="SobelFilter.html">SobelFilter</a></div><div class="sidebar-section-children"><a href="SopInstanceReference.html">SopInstanceReference</a></div><div class="sidebar-section-children"><a href="Spacing.html">Spacing</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate.html">SpatialCoordinate</a></div><div class="sidebar-section-children"><a href="SpatialCoordinate3D.html">SpatialCoordinate3D</a></div><div class="sidebar-section-children"><a href="SquarePixGenerator.html">SquarePixGenerator</a></div><div class="sidebar-section-children"><a href="Stage.html">Stage</a></div><div class="sidebar-section-children"><a href="State.html">State</a></div><div class="sidebar-section-children"><a href="Statistics.html">Statistics</a></div><div class="sidebar-section-children"><a href="Style.html">Style</a></div><div class="sidebar-section-children"><a href="Tag.html">Tag</a></div><div class="sidebar-section-children"><a href="ThreadPool.html">ThreadPool</a></div><div class="sidebar-section-children"><a href="Threshold.html">Threshold</a></div><div class="sidebar-section-children"><a href="ThresholdFilter.html">ThresholdFilter</a></div><div class="sidebar-section-children"><a href="ToolConfig.html">ToolConfig</a></div><div class="sidebar-section-children"><a href="ToolboxController.html">ToolboxController</a></div><div class="sidebar-section-children"><a href="UndoStack.html">UndoStack</a></div><div class="sidebar-section-children"><a href="UpdateAnnotationCommand.html">UpdateAnnotationCommand</a></div><div class="sidebar-section-children"><a href="UrlsLoader.html">UrlsLoader</a></div><div class="sidebar-section-children"><a href="Vector3D.html">Vector3D</a></div><div class="sidebar-section-children"><a href="View.html">View</a></div><div class="sidebar-section-children"><a href="ViewConfig.html">ViewConfig</a></div><div class="sidebar-section-children"><a href="ViewController.html">ViewController</a></div><div class="sidebar-section-children"><a href="ViewFactory.html">ViewFactory</a></div><div class="sidebar-section-children"><a href="ViewLayer.html">ViewLayer</a></div><div class="sidebar-section-children"><a href="ViewPositionAccessor.html">ViewPositionAccessor</a></div><div class="sidebar-section-children"><a href="VoiLut.html">VoiLut</a></div><div class="sidebar-section-children"><a href="VoiLutLinearFunction.html">VoiLutLinearFunction</a></div><div class="sidebar-section-children"><a href="VoiLutSigmoidFunction.html">VoiLutSigmoidFunction</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevel.html">WindowLevel</a></div><div class="sidebar-section-children"><a href="WindowLevelBinder.html">WindowLevelBinder</a></div><div class="sidebar-section-children"><a href="WindowLut.html">WindowLut</a></div><div class="sidebar-section-children"><a href="WorkerTask.html">WorkerTask</a></div><div class="sidebar-section-children"><a href="WorkerThread.html">WorkerThread</a></div><div class="sidebar-section-children"><a href="WriterRule.html">WriterRule</a></div><div class="sidebar-section-children"><a href="ZipLoader.html">ZipLoader</a></div><div class="sidebar-section-children"><a href="ZoomAndPan.html">ZoomAndPan</a></div><div class="sidebar-section-children"><a href="ZoomBinder.html">ZoomBinder</a></div><div class="sidebar-section-children"><a href="dcmb.utils.ListenerHandler.html">ListenerHandler</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-externals"><div>Externals</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="external-FileReader.html">FileReader</a></div><div class="sidebar-section-children"><a href="external-JSZip.html">JSZip</a></div><div class="sidebar-section-children"><a href="external-MagicWand.html">MagicWand</a></div><div class="sidebar-section-children"><a href="external-TextDecoder.html">TextDecoder</a></div><div class="sidebar-section-children"><a href="external-TextEncoder.html">TextEncoder</a></div><div class="sidebar-section-children"><a href="external-Worker.html">Worker</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div><div class="sidebar-section-children"><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-tests_annotation.html">tests/annotation</a></div><div class="sidebar-section-children"><a href="module-tests_dicom.html">tests/dicom</a></div><div class="sidebar-section-children"><a href="module-tests_gui.html">tests/gui</a></div><div class="sidebar-section-children"><a href="module-tests_image.html">tests/image</a></div><div class="sidebar-section-children"><a href="module-tests_io.html">tests/io</a></div><div class="sidebar-section-children"><a href="module-tests_math.html">tests/math</a></div><div class="sidebar-section-children"><a href="module-tests_state.html">tests/state</a></div><div class="sidebar-section-children"><a href="module-tests_utils.html">tests/utils</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>
