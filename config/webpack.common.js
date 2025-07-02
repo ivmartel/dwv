@@ -22,8 +22,8 @@ export const webpackCommon = {
     // clean output folder at each build
     clean: true,
     // web workers public path
-    // (otherwise clients look in the file system)
-    workerPublicPath: '/'
+    // (otherwise clients use file:// scheme creating CORS error)
+    workerPublicPath: './'
   },
   experiments: {
     // module is still experimental
