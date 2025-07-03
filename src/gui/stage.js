@@ -429,7 +429,7 @@ export class Stage {
     const hasRatio = [];
     for (let i = 0; i < this.#layerGroups.length; ++i) {
       const ratio = this.#layerGroups[i].getDivToWorldSizeRatio();
-      if (typeof ratio !== 'undefined') {
+      if (typeof ratio !== 'undefined' && this.#layerGroups[i].shouldBind()) {
         hasRatio.push(i);
         if (typeof minRatio === 'undefined' || ratio < minRatio) {
           minRatio = ratio;
@@ -442,8 +442,11 @@ export class Stage {
     }
     // apply min ratio to layers
     for (let j = 0; j < this.#layerGroups.length; ++j) {
-      if (hasRatio.includes(j)) {
+      if (hasRatio.includes(j) && this.#layerGroups[j].shouldBind()) {
         this.#layerGroups[j].fitToContainer(minRatio);
+      } else {
+        const ratio = this.#layerGroups[j].getDivToWorldSizeRatio();
+        this.#layerGroups[j].fitToContainer(ratio);
       }
     }
   }
@@ -461,8 +464,10 @@ export class Stage {
     this.#callbackStore = new Array(this.#layerGroups.length);
     // add listeners
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      for (let j = 0; j < this.#binders.length; ++j) {
-        this.#addEventListeners(i, this.#binders[j]);
+      if (this.#layerGroups[i].shouldBind()) {
+        for (let j = 0; j < this.#binders.length; ++j) {
+          this.#addEventListeners(i, this.#binders[j]);
+        }
       }
     }
   }
@@ -542,7 +547,7 @@ export class Stage {
    */
   #addEventListeners(index, binder) {
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      if (i !== index) {
+      if (i !== index && this.#layerGroups[i].shouldBind()) {
         this.#layerGroups[index].addEventListener(
           binder.getEventType(),
           this.#getBinderCallback(binder, i)

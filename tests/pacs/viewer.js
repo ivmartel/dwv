@@ -576,7 +576,7 @@ function setup() {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
     }
-    
+
     if (layout === 'side') {
       swapViewsButton.style = 'visibility: visible;';
     } else {

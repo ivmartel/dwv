@@ -1114,6 +1114,27 @@ export class LayerGroup {
   }
 
   /**
+   * Returns whether or not a layer group should have its zoom/pan/etc.
+   * synced to other views. Used for things like Secondary Capture where
+   * there is no meaningful real-world scale.
+   *
+   * @returns {boolean} Whether to sync the zoom/pan.
+   */
+  shouldBind() {
+    const baseLayer = this.getBaseViewLayer();
+    if (!baseLayer) {
+      return false;
+    }
+
+    const SOPClassUID = baseLayer.getViewController().getSopClassUid();
+    const dontSync =
+      // Secondary Capture
+      SOPClassUID.startsWith('1.2.840.10008.5.1.4.1.1.7');
+
+    return !dontSync;
+  }
+
+  /**
    * Does one of the view layer have more than one slice in the
    *   given dimension.
    *
