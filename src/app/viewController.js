@@ -101,6 +101,16 @@ export class ViewController {
   }
 
   /**
+   * Update the plane helper if there is a change in the image geometry.
+   */
+  updatePlaneHelper() {
+    this.#planeHelper = new PlaneHelper(
+      this.#view.getImage().getGeometry(),
+      this.#view.getOrientation()
+    );
+  }
+
+  /**
    * Check is the associated image is a mask.
    *
    * @returns {boolean} True if the associated image is a mask.
@@ -562,6 +572,15 @@ export class ViewController {
       this.#view.getOrientation());
   }
 
+  /**
+   * Get the oriented image spacing.
+   *
+   * @returns {Spacing} The spacing.
+   */
+  getImageSpacing() {
+    return this.#view.getImage().getGeometry().getSpacing(
+      this.#view.getOrientation());
+  }
 
   /**
    * Is the data size larger than one in the given dimension?
