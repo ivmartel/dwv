@@ -379,7 +379,7 @@ export class LayerGroup {
   }
 
   /**
-   * Get a list of view layers according to an input callback function.
+   * Get the view layers that satisfy the input callback function.
    *
    * @param {Function} [callbackFn] A function that takes
    *   a ViewLayer as input and returns a boolean. If undefined,
@@ -400,6 +400,50 @@ export class LayerGroup {
         res.push(layer);
       }
     }
+    return res;
+  }
+
+  /**
+   * Get the view layers that satisfy the input callback function
+   * starting from the active layer.
+   *
+   * @param {Function} [callbackFn] A function that takes
+   *   a ViewLayer as input and returns a boolean. If undefined,
+   *   returns all view layers.
+   * @returns {ViewLayer[]} The layers that
+   *   satisfy the callbackFn.
+   */
+  getViewLayersFromActive(callbackFn) {
+    if (typeof callbackFn === 'undefined') {
+      callbackFn = function () {
+        return true;
+      };
+    }
+
+    let activeIndex = 0;
+    if (typeof this.#activeLayerIndex !== 'undefined') {
+      activeIndex = this.#activeLayerIndex;
+    }
+
+    const indices = [];
+    // from active index to 0
+    for (let i = activeIndex; i >= 0; i--) {
+      indices.push(i);
+    }
+    // from number of layers to active
+    for (let i = this.#layers.length - 1; i > activeIndex; i--) {
+      indices.push(i);
+    }
+
+    const res = [];
+
+    for (const index of indices) {
+      const layer = this.#layers[index];
+      if (layer instanceof ViewLayer && callbackFn(layer)) {
+        res.push(layer);
+      }
+    }
+
     return res;
   }
 
@@ -546,7 +590,7 @@ export class LayerGroup {
   }
 
   /**
-   * Search view layers for equal imae meta data.
+   * Search view layers for equal image meta data.
    *
    * @param {object} meta The meta data to find.
    * @returns {ViewLayer[]} The list of view layers that contain matched data.
@@ -672,6 +716,29 @@ export class LayerGroup {
       type: 'activelayerchange',
       value: [this.#layers[index]]
     });
+  }
+
+  /**
+   * Set the active layer with a layer id.
+   *
+   * @param {string} id The layer id.
+   */
+  setActiveLayerById(id) {
+    let index;
+    for (let i = 0; i < this.#layers.length; ++i) {
+      if (typeof this.#layers[i] !== 'undefined' &&
+        this.#layers[i].getId() === id) {
+        // stop at first one
+        index = i;
+        break;
+      }
+    }
+    if (typeof index !== 'undefined') {
+      this.setActiveLayer(index);
+    } else {
+      logger.warn('No layer to set as active with id: ' +
+        id);
+    }
   }
 
   /**
@@ -1384,10 +1451,40 @@ export class LayerGroup {
 
   /**
    * Reset the stage to its initial scale and no offset.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   reset() {
     this.setScale(this.#baseScale);
     this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the zoom and pan of all layers.
+   */
+  resetZoomPan() {
+    this.setScale(this.#baseScale);
+    this.setOffset({x: 0, y: 0, z: 0});
+  }
+
+  /**
+   * Reset the position and window level of all view layers.
+   */
+  resetViews() {
+    let isFirstViewLayer = true;
+    for (const layer of this.#layers) {
+      if (typeof layer !== 'undefined' &&
+        layer instanceof ViewLayer
+      ) {
+        const vc = layer.getViewController();
+        if (isFirstViewLayer) {
+          // will be propagated to all layers
+          vc.resetPosition();
+          isFirstViewLayer = false;
+        }
+        vc.resetWindowLevel();
+      }
+    }
   }
 
   /**

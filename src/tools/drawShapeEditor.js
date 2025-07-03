@@ -96,7 +96,7 @@ export class DrawShapeEditor {
       this.#removeAnchors();
 
       this.#currentFactory = annotation.getFactory();
-      if (this.#currentFactory === null) {
+      if (typeof this.#currentFactory === 'undefined') {
         throw new Error('Could not find a factory to update shape.');
       }
 

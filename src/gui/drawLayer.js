@@ -30,6 +30,7 @@ import {Point, Point3D} from '../math/point.js';
 import {Index} from '../math/index.js';
 import {Vector3D} from '../math/vector.js';
 import {Scalar2D, Scalar3D} from '../math/scalar.js';
+import {Image} from '../image/image.js';
 import {PlaneHelper} from '../image/planeHelper.js';
 import {Annotation} from '../image/annotation.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
@@ -674,11 +675,15 @@ export class DrawLayer {
     if (typeof annotation.planePoints !== 'undefined') {
       // use plane points
       points = annotation.planePoints;
-    } else {
+    } else if (typeof annotation.planeOrigin !== 'undefined') {
       // just use plane origin
       points = [annotation.planeOrigin];
     }
-    return this.#getPositionId(points, annotation.referencedFrameNumber);
+    let posId;
+    if (typeof points !== 'undefined') {
+      posId = this.#getPositionId(points, annotation.referencedFrameNumber);
+    }
+    return posId;
   }
 
   /**
@@ -771,6 +776,9 @@ export class DrawLayer {
     // shape group (use first one since it will be removed from
     // the group when we change it)
     const factory = annotation.getFactory();
+    if (typeof factory === 'undefined') {
+      throw new Error('Cannot add an annotation draw without factory');
+    }
     const shapeGroup = factory.createShapeGroup(annotation, style);
     // add group to posGroup (switches its parent)
     posGroup.add(shapeGroup);
@@ -1301,14 +1309,33 @@ export class DrawDetails {
 }
 
 /**
+ * Convert a posGroup id (for ex '#2-0') into index values.
+ *
+ * @param {string} id The posGroup id.
+ * @returns {number[]} The index values.
+ */
+function posGroupIdToArray(id) {
+  const res = [0, 0, 0];
+
+  const splitHashes = id.split('#');
+  for (const splitHash of splitHashes) {
+    const split = splitHash.split('-');
+    res[split[0]] = split[1];
+  }
+
+  return res;
+}
+
+/**
  * Convert a KonvaLayer object to a list of annotations.
  *
  * @param {Array} drawings An array of drawings stored
  *   with 'KonvaLayer().toObject()'.
  * @param {DrawDetails[]} drawingsDetails An array of drawings details.
+ * @param {Image} refImage The reference image.
  * @returns {Annotation[]} The associated list of annotations.
  */
-export function konvaToAnnotation(drawings, drawingsDetails) {
+export function konvaToAnnotation(drawings, drawingsDetails, refImage) {
   const annotations = [];
 
   // regular Konva deserialize
@@ -1322,6 +1349,11 @@ export function konvaToAnnotation(drawings, drawingsDetails) {
     const statePosKids = statePosGroup.getChildren();
     for (let j = 0, lenj = statePosKids.length; j < lenj; ++j) {
       const annotation = new Annotation();
+      // use posGroup id as origin
+      const posGroupIndex = new Index(posGroupIdToArray(statePosGroup.id()));
+      // find ref SOP UID
+      // WARN: getImageUid returns first UID is the index is not found...
+      annotation.referencedSopInstanceUID = refImage.getImageUid(posGroupIndex);
 
       // shape group (use first one since it will be removed from
       // the group when we change it)

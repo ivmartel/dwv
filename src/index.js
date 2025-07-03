@@ -14,7 +14,11 @@ import {
 } from './app/dataController.js';
 import {Annotation} from './image/annotation.js';
 import {AnnotationGroup} from './image/annotationGroup.js';
-import {AnnotationGroupFactory} from './image/annotationGroupFactory.js';
+import {
+  ResponseEvaluation,
+  CADReport,
+  AnnotationGroupFactory
+} from './image/annotationGroupFactory.js';
 import {ViewController} from './app/viewController.js';
 import {ToolboxController} from './app/toolboxController.js';
 // dicom
@@ -135,6 +139,8 @@ export {
   ToolConfig,
   Annotation,
   AnnotationGroup,
+  ResponseEvaluation,
+  CADReport,
   AnnotationGroupFactory,
   DrawController,
   ViewController,

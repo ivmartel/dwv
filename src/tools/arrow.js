@@ -216,14 +216,12 @@ export class ArrowFactory {
     this.#updateShape(annotation, anchor, style);
     // update label
     this.updateLabelContent(annotation, group, style);
-    // label position
+    // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      // update label position if default position
       this.#labelFactory.updatePosition(annotation, group);
-    } else {
-      // update connector if not default position
-      this.updateConnector(group);
     }
+    // update connector
+    this.updateConnector(group);
     // update shadow
     if (DRAW_DEBUG) {
       this.#updateDebugShadow(annotation, group);
@@ -490,17 +488,17 @@ export class ArrowFactory {
 
     // update 'self' (undo case)
     switch (anchor.id()) {
-    case 'anchor0':
-      begin.x(anchor.x());
-      begin.y(anchor.y());
-      break;
-    case 'anchor1':
-      end.x(anchor.x());
-      end.y(anchor.y());
-      break;
-    default:
-      logger.error('Unhandled anchor id: ' + anchor.id());
-      break;
+      case 'anchor0':
+        begin.x(anchor.x());
+        begin.y(anchor.y());
+        break;
+      case 'anchor1':
+        end.x(anchor.x());
+        end.y(anchor.y());
+        break;
+      default:
+        logger.error('Unhandled anchor id: ' + anchor.id());
+        break;
     }
 
     const tickLen = 20;

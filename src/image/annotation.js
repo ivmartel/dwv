@@ -128,9 +128,9 @@ export class Annotation {
   #meta = {};
 
   /**
-   * Set the annotation id and uid.
+   * Constructor: set default annotation id and uid.
    */
-  setIds() {
+  constructor() {
     this.trackingId = guid();
     this.trackingUid = getUID('TrackingUniqueIdentifier');
   }
@@ -388,10 +388,14 @@ export class Annotation {
   /**
    * Get the math shape associated draw factory.
    *
-   * @returns {object} The factory.
+   * @returns {object|undefined} The factory.
    */
   getFactory() {
     let fac;
+    // no factory if no mathShape
+    if (typeof this.mathShape === 'undefined') {
+      return fac;
+    }
     // check in user provided factories
     if (typeof toolOptions.draw !== 'undefined') {
       for (const factoryName in toolOptions.draw) {

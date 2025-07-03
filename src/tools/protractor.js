@@ -218,14 +218,12 @@ export class ProtractorFactory {
     this.#updateShape(annotation, anchor, style);
     // update label
     this.updateLabelContent(annotation, group, style);
-    // label position
+    // update label position if default position
     if (typeof annotation.labelPosition === 'undefined') {
-      // update label position if default position
       this.#labelFactory.updatePosition(annotation, group);
-    } else {
-      // update connector if not default position
-      this.updateConnector(group);
     }
+    // update connector
+    this.updateConnector(group);
     // update shadow
     if (DRAW_DEBUG) {
       this.#updateDebugShadow(annotation, group);
@@ -502,18 +500,18 @@ export class ProtractorFactory {
 
     // update special points
     switch (anchor.id()) {
-    case 'anchor0':
-      begin.x(anchor.x());
-      begin.y(anchor.y());
-      break;
-    case 'anchor1':
-      mid.x(anchor.x());
-      mid.y(anchor.y());
-      break;
-    case 'anchor2':
-      end.x(anchor.x());
-      end.y(anchor.y());
-      break;
+      case 'anchor0':
+        begin.x(anchor.x());
+        begin.y(anchor.y());
+        break;
+      case 'anchor1':
+        mid.x(anchor.x());
+        mid.y(anchor.y());
+        break;
+      case 'anchor2':
+        end.x(anchor.x());
+        end.y(anchor.y());
+        break;
     }
 
     // angle

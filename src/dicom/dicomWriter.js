@@ -11,7 +11,7 @@ import {
   getItemDelimitationItemTag,
   getSequenceDelimitationItemTag,
   getFileMetaInformationGroupLengthTag,
-  isPixelDataTag,
+  isAnyPixelDataTag,
   isItemTag,
   isItemDelimitationItemTag,
   tagCompareFunction
@@ -312,6 +312,7 @@ const TagKeys = {
  * DICOM writer.
  *
  * @example
+ * import {DicomParser, DicomWriter} from '//esm.sh/dwv';
  * // add link to html
  * const link = document.createElement("a");
  * link.appendChild(document.createTextNode("download"));
@@ -319,10 +320,10 @@ const TagKeys = {
  * div.appendChild(link);
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
- *   const parser = new dwv.DicomParser();
+ *   const parser = new DicomParser();
  *   parser.parse(event.target.response);
  *   // create writer
- *   const writer = new dwv.DicomWriter();
+ *   const writer = new DicomWriter();
  *   // get buffer using default rules
  *   const dicomBuffer = writer.getBuffer(parser.getDicomElements());
  *   // create blob
@@ -799,7 +800,7 @@ export class DicomWriter {
 
     let undefinedLengthSequence = false;
     if (element.vr === 'SQ' ||
-      isPixelDataTag(element.tag)) {
+      isAnyPixelDataTag(element.tag)) {
       if (typeof element.undefinedLength !== 'undefined') {
         undefinedLengthSequence = element.undefinedLength;
       }
@@ -830,7 +831,7 @@ export class DicomWriter {
       value = [];
     }
     // write
-    if (isPixelDataTag(element.tag)) {
+    if (isAnyPixelDataTag(element.tag)) {
       byteOffset = this.#writePixelDataElementValue(
         writer, element, byteOffset, value, isImplicit, bitsAllocated);
     } else {
@@ -1192,7 +1193,7 @@ export class DicomWriter {
       } else if (element.vr === 'xs') {
         size = value.length * Uint16Array.BYTES_PER_ELEMENT;
       } else if (isTypedArrayVr(element.vr) || element.vr === 'ox') {
-        if (isPixelDataTag(element.tag) &&
+        if (isAnyPixelDataTag(element.tag) &&
           Array.isArray(value)) {
           size = 0;
           for (const valueItem of value) {
@@ -1204,7 +1205,7 @@ export class DicomWriter {
 
         // convert size to bytes
         const vrType = vrTypes[element.vr];
-        if (isPixelDataTag(element.tag) || element.vr === 'ox') {
+        if (isAnyPixelDataTag(element.tag) || element.vr === 'ox') {
           if (element.undefinedLength) {
             const itemPrefixSize =
               getDataElementPrefixByteSize('NONE', isImplicit);

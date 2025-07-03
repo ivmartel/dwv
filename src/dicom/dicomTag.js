@@ -325,14 +325,43 @@ export function getPixelDataTag() {
 }
 
 /**
- * Is the input tag the PixelData Tag.
+ * Get the list of pixel data DICOM tag keys: PixelData,
+ *   FloatPixelData and DoubleFloatPixelData.
+ *
+ * @returns {string[]} The key list.
+ */
+function getAllPixelDataTagKeys() {
+  return ['7FE00010', '7FE00009', '7FE00008'];
+}
+
+/**
+ * Is the input tag one of the pixel data tag.
  *
  * @param {Tag} tag The tag to test.
- * @returns {boolean} True if the asked tag.
+ * @returns {boolean} True if input is a pixel data tag.
  */
-export function isPixelDataTag(tag) {
-  // faster than tag.equals(getPixelDataTag());
-  return tag.getKey() === '7FE00010';
+export function isAnyPixelDataTag(tag) {
+  const keys = getAllPixelDataTagKeys();
+  return keys.includes(tag.getKey());
+}
+
+/**
+ * Check if an input data elements contains a pixel data element.
+ *
+ * @param {Object<string, DataElement>} elements Data elements.
+ * @returns {boolean} True if the elements contain one of the
+ *   pixel data tags.
+ */
+export function hasAnyPixelDataElement(elements) {
+  const keys = getAllPixelDataTagKeys();
+  let found = false;
+  for (const key of keys) {
+    if (typeof elements[key] !== 'undefined') {
+      found = true;
+      break;
+    }
+  }
+  return found;
 }
 
 /**

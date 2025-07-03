@@ -1,6 +1,6 @@
 {
   "name": "dwv",
-  "version": "0.35.0-beta.25",
+  "version": "0.36.0-beta.0",
   "description": "DICOM Web Viewer.",
   "keywords": [
     "DICOM",
@@ -12,17 +12,16 @@
   "homepage": "https://ivmartel.github.io/dwv/",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ivmartel/dwv.git"
+    "url": "https://github.com/ivmartel/dwv"
   },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/dwv.min.js",
   "types": "./dist/dwv.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/dwv.min.js",
-      "types": "./dist/dwv.d.ts"
-    }
+    "types": "./dist/dwv.d.ts",
+    "node": "./dist/dwv.node.min.js",
+    "default": "./dist/dwv.min.js"
   },
   "engines": {
     "node": ">= 14.0.0"
@@ -32,23 +31,23 @@
   ],
   "dependencies": {
     "jszip": "^3.10.1",
-    "konva": "~9.3.18",
+    "konva": "~9.3.20",
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.1",
-    "@babel/preset-env": "^7.27.1",
-    "@eslint/js": "^9.26.0",
-    "@microsoft/api-extractor": "^7.52.7",
-    "@stylistic/eslint-plugin-js": "^4.4.0",
-    "babel-loader": "^9.2.1",
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@eslint/js": "^9.30.1",
+    "@microsoft/api-extractor": "^7.52.8",
+    "@stylistic/eslint-plugin": "^5.1.0",
+    "babel-loader": "^10.0.0",
     "babel-plugin-istanbul": "^7.0.0",
     "benchmark": "^2.1.4",
     "clean-jsdoc-theme": "^4.3.0",
-    "eslint": "^9.26.0",
-    "eslint-plugin-jsdoc": "^50.6.11",
+    "eslint": "^9.30.1",
+    "eslint-plugin-jsdoc": "^51.3.3",
     "github-release-notes": "0.17.2",
-    "globals": "^16.0.0",
+    "globals": "^16.2.0",
     "html-webpack-plugin": "^5.6.3",
     "jsdoc": "^4.0.4",
     "karma": "^6.4.4",
@@ -59,20 +58,22 @@
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^5.0.1",
     "qunit": "^2.24.1",
-    "typescript": "~5.4.5",
-    "webpack": "^5.99.7",
+    "typescript": "5.6.3",
+    "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.1",
+    "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^6.0.1"
   },
   "scripts": {
-    "start": "webpack serve --config webpack.dev.js",
-    "pack": "webpack --config webpack.prod.js",
+    "start": "webpack serve --config config/webpack.dev.js",
+    "pack": "webpack --config config/webpack.prod.js",
+    "pack-node": "webpack --config config/webpack.node.js",
     "build": "yarn run pack && yarn run types && yarn run api",
-    "build-demo": "webpack --config webpack.demo.js",
-    "lint": "eslint -c 'eslint.config-full.js' 'src/**/*.js' 'tests/**/*.js' '*.js'",
-    "test": "karma start ./karma.conf.js",
-    "test-ci": "karma start ./karma.conf.js --browsers ChromeHeadless --reporters progress,coverage,json --single-run",
+    "build-all": "yarn run build && yarn run pack-node",
+    "build-demo": "webpack --config config/webpack.demo.js",
+    "lint": "eslint -c config/eslint.config-full.js 'src/**/*.js' 'tests/**/*.js' '*.js'",
+    "test": "karma start karma.conf.js",
+    "test-ci": "karma start karma.conf.js --browsers ChromeHeadless --reporters progress,coverage,json --single-run",
     "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "gren": "gren",
     "types": "tsc -p resources/api/tsconfig.json",

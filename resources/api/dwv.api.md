@@ -17,7 +17,7 @@ export class Annotation {
     canView(): boolean;
     colour: string;
     getCentroid(): Point | undefined;
-    getFactory(): object;
+    getFactory(): object | undefined;
     getMetaConceptIds(): string[];
     getMetaItem(conceptId: string): object | undefined;
     getOrientationName(): string | undefined;
@@ -34,7 +34,6 @@ export class Annotation {
     referencedSopInstanceUID: string;
     referencePoints: Point2D[] | undefined;
     removeMetaItem(conceptId: string): void;
-    setIds(): void;
     setTextExpr(labelText: {
         [x: string]: string;
     }): void;
@@ -66,7 +65,7 @@ export class AnnotationGroup {
     setEditable(flag: boolean): void;
     setMetaValue(key: string, value: string | object): void;
     setViewController(viewController: ViewController): void;
-    update(annotation: Annotation, propKeys?: string[]): void;
+    update(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
 }
 
 // @public
@@ -77,13 +76,16 @@ export class AnnotationGroupFactory {
     create(dataElements: {
         [x: string]: DataElement;
     }): AnnotationGroup;
+    createCADReport(dataElements: {
+        [x: string]: DataElement;
+    }): CADReport | undefined;
     getWarning(): string | undefined;
     toDicom(annotationGroup: AnnotationGroup, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
     };
-    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
+    toDicomCADReport(report: CADReport, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -153,8 +155,11 @@ export class App {
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
     reset(): void;
     resetDisplay(): void;
+    // @deprecated
     resetLayout(): void;
+    resetViews(): void;
     resetZoom(): void;
+    resetZoomPan(): void;
     setActiveLayerGroup(index: number): void;
     // @deprecated
     setColourMap(name: string): void;
@@ -199,6 +204,13 @@ export class AppOptions {
 
 // @public
 export function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+// @public
+export class CADReport {
+    annotationGroups: AnnotationGroup[];
+    comment: string;
+    responseEvaluations: ResponseEvaluation[];
+}
 
 // @public
 export class ChangeSegmentColourCommand {
@@ -368,7 +380,7 @@ export class DrawController {
     removeAnnotationWithCommand(uid: string, exeCallback: Function): void;
     setAnnotationGroupEditable(flag: boolean): void;
     setAnnotationMeta(key: string, value: string): void;
-    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     updateAnnotationWithCommand(uid: string, originalProps: object, newProps: object, exeCallback: Function): void;
 }
 
@@ -548,7 +560,7 @@ export function hexToRgb(hexStr: string): RGB;
 
 // @public (undocumented)
 export namespace i18n {
-    export function t(key: string): string;
+    export function t(key: string): string | undefined;
 }
 
 // @public
@@ -673,6 +685,7 @@ export class LayerGroup {
     getViewLayerById(id: string): ViewLayer | undefined;
     getViewLayers(callbackFn?: Function): ViewLayer[];
     getViewLayersByDataId(dataId: string): ViewLayer[];
+    getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
     includes(id: string): boolean;
     isPositionInBounds(position: Point): boolean;
     moreThanOne(dim: number): boolean;
@@ -680,10 +693,14 @@ export class LayerGroup {
     removeLayer(layer: ViewLayer | DrawLayer): void;
     removeLayersByDataId(dataId: string): void;
     removeTooltipDiv(): void;
+    // @deprecated
     reset(): void;
+    resetViews(): void;
+    resetZoomPan(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveLayer(index: number): void;
     setActiveLayerByDataId(dataId: string): void;
+    setActiveLayerById(id: string): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
@@ -960,6 +977,12 @@ export class RescaleSlopeAndIntercept {
 }
 
 // @public
+export class ResponseEvaluation {
+    current: DicomCode;
+    measure: number;
+}
+
+// @public
 export class RGB {
     constructor(r: number, g: number, b: number);
     b: number;
@@ -1174,6 +1197,7 @@ export class ViewController {
     getImageVariableRegionValues(regions: number[][][], index: Index): any[];
     getImageWorldSize(): Scalar2D;
     getIndexFromPosition(point: Point): Index;
+    getLengthUnit(): string;
     getModality(): string;
     getOffset3DFromPlaneOffset(offset2D: Scalar2D): Vector3D;
     getOrigin(position?: Point): Point3D;
@@ -1200,6 +1224,8 @@ export class ViewController {
     isPositionInBounds(position?: Point): boolean;
     moreThanOne(dim: number): boolean;
     play(): void;
+    resetPosition(): void;
+    resetWindowLevel(): void;
     setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;

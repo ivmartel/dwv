@@ -403,10 +403,30 @@ export class Stage {
 
   /**
    * Reset the stage: calls reset on all layer groups.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   reset() {
     for (const layerGroup of this.#layerGroups) {
       layerGroup.reset();
+    }
+  }
+
+  /**
+   * Reset the zoom and pan of all layer groups.
+   */
+  resetZoomPan() {
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.resetZoomPan();
+    }
+  }
+
+  /**
+   * Reset the position and window level of all layer groups.
+   */
+  resetViews() {
+    for (const layerGroup of this.#layerGroups) {
+      layerGroup.resetViews();
     }
   }
 

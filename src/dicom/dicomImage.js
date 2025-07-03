@@ -7,7 +7,6 @@ import {
 import {safeGet, safeGetAll} from './dataElement.js';
 import {getOrientationFromCosines} from '../math/orientation.js';
 import {Spacing} from '../image/spacing.js';
-import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -40,37 +39,29 @@ const TagKeys = {
  * Extract the 2D size from dicom elements.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {number[]} The size.
+ * @returns {number[]|undefined} The sizes as [columns, rows] or
+ *   undefined if not present.
  */
 export function getImage2DSize(elements) {
-  // rows
-  const rows = elements[TagKeys.Rows];
-  if (typeof rows === 'undefined') {
-    throw new Error('Missing DICOM image number of rows');
+  let res;
+  const rows = safeGet(elements, TagKeys.Rows);
+  const columns = safeGet(elements, TagKeys.Columns);
+  if (typeof rows !== 'undefined' &&
+    typeof columns !== 'undefined') {
+    res = [columns, rows];
   }
-  if (rows.value.length === 0) {
-    throw new Error('Empty DICOM image number of rows');
-  }
-  // columns
-  const columns = elements[TagKeys.Columns];
-  if (typeof columns === 'undefined') {
-    throw new Error('Missing DICOM image number of columns');
-  }
-  if (columns.value.length === 0) {
-    throw new Error('Empty DICOM image number of columns');
-  }
-  return [columns.value[0], rows.value[0]];
+  return res;
 }
 
 /**
  * Get the pixel spacing from the different spacing tags.
  *
  * @param {Object<string, DataElement>} elements The DICOM elements.
- * @returns {Spacing} The read spacing or the default [1,1].
+ * @returns {number[]|undefined} The spacing as [columnSapcing, rowSpacing] or
+ *   undefined if not present.
  */
 export function getPixelSpacing(elements) {
-  let rowSpacing;
-  let columnSpacing;
+  let res;
 
   const tags = [
     'PixelSpacing',
@@ -82,32 +73,16 @@ export function getPixelSpacing(elements) {
     const spacing = safeGetAll(elements, TagKeys[tag]);
     if (typeof spacing !== 'undefined' &&
       spacing.length === 2) {
-      // spacing order: [row, column]
-      rowSpacing = parseFloat(spacing[0]);
-      columnSpacing = parseFloat(spacing[1]);
+      // dicom spacing order: [row, column]
+      res = [
+        parseFloat(spacing[1]),
+        parseFloat(spacing[0])
+      ];
       break;
     }
   }
 
-  // check
-  if (typeof rowSpacing === 'undefined') {
-    logger.warn('Undefined row spacing, using default (1mm).');
-    rowSpacing = 1;
-  } else if (rowSpacing === 0) {
-    logger.warn('Zero row spacing, using default (1mm).');
-    rowSpacing = 1;
-  }
-  if (typeof columnSpacing === 'undefined') {
-    logger.warn('Undefined column spacing, using default (1mm).');
-    columnSpacing = 1;
-  } else if (columnSpacing === 0) {
-    logger.warn('Zero column spacing, using default (1mm).');
-    columnSpacing = 1;
-  }
-
-  // return
-  // (slice spacing will be calculated using the image position patient)
-  return new Spacing([columnSpacing, rowSpacing, 1]);
+  return res;
 }
 
 /**

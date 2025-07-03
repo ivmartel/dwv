@@ -1,4 +1,5 @@
 import {Size} from './size.js';
+import {Spacing} from './spacing.js';
 import {Geometry} from './geometry.js';
 import {RescaleSlopeAndIntercept} from './rsi.js';
 import {WindowLevel} from './windowLevel.js';
@@ -14,6 +15,7 @@ import {
   isMonochrome,
   isSecondatyCapture
 } from '../dicom/dicomImage.js';
+import {hasAnyPixelDataElement} from '../dicom/dicomTag.js';
 import {getTagTime} from '../dicom/dicomDate.js';
 import {getSuvFactor} from '../dicom/dicomPet.js';
 import {Point3D} from '../math/point.js';
@@ -42,6 +44,7 @@ const TagKeys = {
   PlanarConfiguration: '00280006',
   RescaleSlope: '00281053',
   RescaleIntercept: '00281052',
+  VOILUTFunction: '00281056',
   MediaStorageSOPClassUID: '00020002',
   ImageType: '00080008',
   PhotometricInterpretation: '00280004',
@@ -272,8 +275,14 @@ export class ImageFactory {
   checkElements(dataElements) {
     // reset
     this.#warning = undefined;
-    // will throw if columns or rows is not defined
-    getImage2DSize(dataElements);
+    // check image size
+    if (typeof getImage2DSize(dataElements) === 'undefined') {
+      throw new Error('No image rows or columns in DICOM file');
+    };
+    // check pixel data
+    if (!hasAnyPixelDataElement(dataElements)) {
+      throw new Error('No pixel data in DICOM file');
+    }
     // check PET SUV
     const modality = safeGet(dataElements, TagKeys.Modality);
     if (typeof modality !== 'undefined' && modality === 'PT') {
@@ -328,7 +337,12 @@ export class ImageFactory {
     const size = new Size(sizeValues);
 
     // image spacing
-    const spacing = getPixelSpacing(dataElements);
+    let spacingValues = [1, 1, 1];
+    const spacing2D = getPixelSpacing(dataElements);
+    if (typeof spacing2D !== 'undefined') {
+      spacingValues = [spacing2D[0], spacing2D[1], 1];
+    }
+    const spacing = new Spacing(spacingValues);
 
     // ImagePositionPatient
     const imagePositionPatient = safeGetAllLocal(TagKeys.ImagePositionPatient);
@@ -469,11 +483,19 @@ export class ImageFactory {
       }
     }
 
+    // length unit
+    if (typeof spacing2D === 'undefined') {
+      meta.lengthUnit = 'unit.pixel';
+    } else {
+      meta.lengthUnit = 'unit.mm';
+    }
+
     // window level presets
     const presets = getWindowPresets(dataElements, intensityFactor);
     if (typeof presets !== 'undefined') {
       meta.windowPresets = presets;
     }
+    meta.VOILUTFunction = safeGetLocal(TagKeys.VOILUTFunction);
 
     // store the meta data
     image.setMeta(meta);

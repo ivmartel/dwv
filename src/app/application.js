@@ -193,12 +193,13 @@ export class AppOptions {
  * Main application class.
  *
  * @example
+ * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * app.init(options);
  * // load dicom data
  * app.loadURLs([
@@ -549,12 +550,13 @@ export class App {
    *
    * @param {AppOptions} opt The application options.
    * @example
+   * import {App, AppOptions, ViewConfig} from '//esm.sh/dwv';
    * // create the dwv app
-   * const app = new dwv.App();
+   * const app = new App();
    * // initialise
-   * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+   * const viewConfig0 = new ViewConfig('layerGroup0');
    * const viewConfigs = {'*': [viewConfig0]};
-   * const options = new dwv.AppOptions(viewConfigs);
+   * const options = new AppOptions(viewConfigs);
    * options.viewOnFirstLoadItem = false;
    * app.init(options);
    * // render button
@@ -727,10 +729,27 @@ export class App {
 
   /**
    * Reset the layout of the application.
+   *
+   * @deprecated Since v0.35, prefer resetZoomPan.
    */
   resetLayout() {
     this.#stage.reset();
     this.#stage.draw();
+  }
+
+  /**
+   * Reset the zoom and pan of the stage.
+   */
+  resetZoomPan() {
+    this.#stage.resetZoomPan();
+    this.#stage.draw();
+  }
+
+  /**
+   * Reset the position and window level of the stage.
+   */
+  resetViews() {
+    this.#stage.resetViews();
   }
 
   /**
@@ -1383,10 +1402,13 @@ export class App {
     const layerGroup = this.#stage.getActiveLayerGroup();
     const viewLayer = layerGroup.getBaseViewLayer();
     const refDataId = viewLayer.getDataId();
+    const refData = this.getData(refDataId);
     const viewController = viewLayer.getViewController();
 
     // convert konva to annotation
-    const annotations = konvaToAnnotation(drawings, drawingsDetails);
+    // (assume current image is ref image)
+    const annotations = konvaToAnnotation(
+      drawings, drawingsDetails, refData.image);
     // create data
     const data = this.createAnnotationData(refDataId);
     // add annotations to data
@@ -1715,7 +1737,14 @@ export class App {
    * @param {object} event The event to fire.
    */
   #fireEvent = (event) => {
-    this.#listenerHandler.fireEvent(event);
+    let propagate = true;
+    if (typeof event.propagate !== 'undefined') {
+      propagate = event.propagate;
+      delete event.propagate;
+    }
+    if (propagate) {
+      this.#listenerHandler.fireEvent(event);
+    }
   };
 
   /**

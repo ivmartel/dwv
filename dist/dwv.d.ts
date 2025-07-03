@@ -97,10 +97,6 @@ export declare class Annotation {
      */
     planePoints: Point3D[] | undefined;
     /**
-     * Set the annotation id and uid.
-     */
-    setIds(): void;
-    /**
      * Get the concepts ids of the annotation meta data.
      *
      * @returns {string[]} The ids.
@@ -189,9 +185,9 @@ export declare class Annotation {
     /**
      * Get the math shape associated draw factory.
      *
-     * @returns {object} The factory.
+     * @returns {object|undefined} The factory.
      */
-    getFactory(): object;
+    getFactory(): object | undefined;
     #private;
 }
 
@@ -251,8 +247,10 @@ export declare class AnnotationGroup {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
+     * @param {boolean} [propagate] Whether the update event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    update(annotation: Annotation, propKeys?: string[]): void;
+    update(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     /**
      * Remove an annotation.
      *
@@ -342,7 +340,7 @@ export declare class AnnotationGroupFactory {
         [x: string]: DataElement;
     }): string | undefined;
     /**
-     * Get an {@link Annotation} object from the read DICOM file.
+     * Get an {@link AnnotationGroup} object from the read DICOM file.
      *
      * @param {Object<string, DataElement>} dataElements The DICOM tags.
      * @returns {AnnotationGroup} A new annotation group.
@@ -351,6 +349,15 @@ export declare class AnnotationGroupFactory {
     create(dataElements: {
         [x: string]: DataElement;
     }): AnnotationGroup;
+    /**
+     * Get an {@link CADReport} object from the read DICOM file.
+     *
+     * @param {Object<string, DataElement>} dataElements The DICOM tags.
+     * @returns {CADReport|undefined} A new CAD report.
+     */
+    createCADReport(dataElements: {
+        [x: string]: DataElement;
+    }): CADReport | undefined;
     /**
      * Convert an annotation group into a DICOM SR object using the
      * TID 1500 template.
@@ -365,17 +372,14 @@ export declare class AnnotationGroupFactory {
         [x: string]: DataElement;
     };
     /**
-     * Convert a annotation groups into a DICOM CAD report SR object using
-     * the TID 4100 template.
+     * Convert a CAD report into a DICOM CAD report SR object using
+     *   the TID 4100 template.
      *
-     * @param {AnnotationGroup[]} annotationGroups The annotation groups.
-     * @param {object[]} responseEvaluations List of response evaluations
-     * as {current, measure}.
-     * @param {string} comment Report comment.
+     * @param {CADReport} report The CAD report.
      * @param {Object<string, any>} [extraTags] Optional list of extra tags.
      * @returns {Object<string, DataElement>} A list of dicom elements.
      */
-    toDicomCADReport(annotationGroups: AnnotationGroup[], responseEvaluations: object[], comment: string, extraTags?: {
+    toDicomCADReport(report: CADReport, extraTags?: {
         [x: string]: any;
     }): {
         [x: string]: DataElement;
@@ -622,8 +626,18 @@ export declare class App {
     reset(): void;
     /**
      * Reset the layout of the application.
+     *
+     * @deprecated Since v0.35, prefer resetZoomPan.
      */
     resetLayout(): void;
+    /**
+     * Reset the zoom and pan of the stage.
+     */
+    resetZoomPan(): void;
+    /**
+     * Reset the position and window level of the stage.
+     */
+    resetViews(): void;
     /**
      * Add an event listener to this class.
      *
@@ -1049,6 +1063,24 @@ export declare class AppOptions {
  * @returns {Uint8Array} The full multipart message.
  */
 export declare function buildMultipart(parts: any[], boundary: string): Uint8Array;
+
+/**
+ * CAD report class.
+ */
+export declare class CADReport {
+    /**
+     * @type {AnnotationGroup[]}
+     */
+    annotationGroups: AnnotationGroup[];
+    /**
+     * @type {ResponseEvaluation[]}
+     */
+    responseEvaluations: ResponseEvaluation[];
+    /**
+     * @type {string}
+     */
+    comment: string;
+}
 
 /**
  * Change segment colour command.
@@ -1703,8 +1735,10 @@ export declare class DrawController {
      *
      * @param {Annotation} annotation The annotation to update.
      * @param {string[]} [propKeys] Optional properties that got updated.
+     * @param {boolean} [propagate] Whether the update event propagates
+     *   outside of dwv or not, defaults to true.
      */
-    updateAnnotation(annotation: Annotation, propKeys?: string[]): void;
+    updateAnnotation(annotation: Annotation, propKeys?: string[], propagate?: boolean): void;
     /**
      * Remove an anotation for the list.
      *
@@ -2568,7 +2602,7 @@ export declare namespace i18n {
      * @param {string} key The key to the text entry.
      * @returns {string|undefined} The translated text.
      */
-    export function t(key: string): string;
+    export function t(key: string): string | undefined;
 }
 
 /**
@@ -3209,7 +3243,7 @@ export declare class LayerGroup {
      */
     includes(id: string): boolean;
     /**
-     * Get a list of view layers according to an input callback function.
+     * Get the view layers that satisfy the input callback function.
      *
      * @param {Function} [callbackFn] A function that takes
      *   a ViewLayer as input and returns a boolean. If undefined,
@@ -3218,6 +3252,17 @@ export declare class LayerGroup {
      *   satisfy the callbackFn.
      */
     getViewLayers(callbackFn?: Function): ViewLayer[];
+    /**
+     * Get the view layers that satisfy the input callback function
+     * starting from the active layer.
+     *
+     * @param {Function} [callbackFn] A function that takes
+     *   a ViewLayer as input and returns a boolean. If undefined,
+     *   returns all view layers.
+     * @returns {ViewLayer[]} The layers that
+     *   satisfy the callbackFn.
+     */
+    getViewLayersFromActive(callbackFn?: Function): ViewLayer[];
     /**
      * Test if one of the view layers satisfies an input callbackFn.
      *
@@ -3276,7 +3321,7 @@ export declare class LayerGroup {
      */
     getViewLayersByDataId(dataId: string): ViewLayer[];
     /**
-     * Search view layers for equal imae meta data.
+     * Search view layers for equal image meta data.
      *
      * @param {object} meta The meta data to find.
      * @returns {ViewLayer[]} The list of view layers that contain matched data.
@@ -3314,6 +3359,12 @@ export declare class LayerGroup {
      * @param {number} index The index of the layer to set as active.
      */
     setActiveLayer(index: number): void;
+    /**
+     * Set the active layer with a layer id.
+     *
+     * @param {string} id The layer id.
+     */
+    setActiveLayerById(id: string): void;
     /**
      * Set the active layer with a data id.
      *
@@ -3448,8 +3499,18 @@ export declare class LayerGroup {
     setOffset(newOffset: Scalar3D): void;
     /**
      * Reset the stage to its initial scale and no offset.
+     *
+     * @deprecated Since v0.35, prefer resetZoomPan.
      */
     reset(): void;
+    /**
+     * Reset the zoom and pan of all layers.
+     */
+    resetZoomPan(): void;
+    /**
+     * Reset the position and window level of all view layers.
+     */
+    resetViews(): void;
     /**
      * Draw the layer.
      */
@@ -4641,6 +4702,24 @@ export declare class RescaleSlopeAndIntercept {
 }
 
 /**
+ * Response evaluation class.
+ */
+export declare class ResponseEvaluation {
+    /**
+     * Current response.
+     *
+     * @type {DicomCode}
+     */
+    current: DicomCode;
+    /**
+     * Measurement of response (mm).
+     *
+     * @type {number}
+     */
+    measure: number;
+}
+
+/**
  * RGB colour class.
  */
 export declare class RGB {
@@ -5684,6 +5763,14 @@ export declare class ViewController {
      */
     initialise(): void;
     /**
+     * Reset the window level.
+     */
+    resetWindowLevel(): void;
+    /**
+     * Reset the position.
+     */
+    resetPosition(): void;
+    /**
      * Get the image modality.
      *
      * @returns {string} The modality.
@@ -5849,6 +5936,12 @@ export declare class ViewController {
      * @returns {string} The unit.
      */
     getPixelUnit(): string;
+    /**
+     * Get the image length unit.
+     *
+     * @returns {string} The unit.
+     */
+    getLengthUnit(): string;
     /**
      * Get some values from the associated image in a region.
      *

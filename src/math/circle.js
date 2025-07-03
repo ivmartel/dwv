@@ -168,16 +168,24 @@ export class Circle {
     const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
+    const lengthUnit = viewController.getLengthUnit();
     quant.radius = {
       value: this.getRadius() * spacing2D.x,
-      unit: 'unit.mm'
+      unit: lengthUnit
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {
-        value: surface / 100,
-        unit: 'unit.cm2'
-      };
+      if (lengthUnit === 'unit.mm') {
+        quant.surface = {
+          value: surface / 100,
+          unit: 'unit.cm2'
+        };
+      } else {
+        quant.surface = {
+          value: surface,
+          unit: lengthUnit
+        };
+      }
     }
 
     // pixel values quantification

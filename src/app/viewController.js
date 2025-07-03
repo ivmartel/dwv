@@ -101,6 +101,16 @@ export class ViewController {
   }
 
   /**
+   * Update the plane helper if there is a change in the image geometry.
+   */
+  updatePlaneHelper() {
+    this.#planeHelper = new PlaneHelper(
+      this.#view.getImage().getGeometry(),
+      this.#view.getOrientation()
+    );
+  }
+
+  /**
    * Check is the associated image is a mask.
    *
    * @returns {boolean} True if the associated image is a mask.
@@ -114,7 +124,23 @@ export class ViewController {
    */
   initialise() {
     // set window/level to first preset
+    this.resetWindowLevel();
+    // default position
+    this.resetPosition();
+  }
+
+  /**
+   * Reset the window level.
+   */
+  resetWindowLevel() {
+    // set window/level to first preset
     this.setWindowLevelPresetById(0);
+  }
+
+  /**
+   * Reset the position.
+   */
+  resetPosition() {
     // default position
     this.setCurrentPosition(this.getPositionFromPlanePoint(
       new Point2D(0, 0)
@@ -389,6 +415,15 @@ export class ViewController {
   }
 
   /**
+   * Get the image length unit.
+   *
+   * @returns {string} The unit.
+   */
+  getLengthUnit() {
+    return this.#view.getImage().getMeta().lengthUnit;
+  }
+
+  /**
    * Extract a slice from an image at the given index and orientation.
    *
    * @param {Image} image The image to parse.
@@ -537,6 +572,15 @@ export class ViewController {
       this.#view.getOrientation());
   }
 
+  /**
+   * Get the oriented image spacing.
+   *
+   * @returns {Spacing} The spacing.
+   */
+  getImageSpacing() {
+    return this.#view.getImage().getGeometry().getSpacing(
+      this.#view.getOrientation());
+  }
 
   /**
    * Is the data size larger than one in the given dimension?

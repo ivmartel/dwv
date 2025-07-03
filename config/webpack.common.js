@@ -1,5 +1,6 @@
 import path from 'path';
 import {fileURLToPath} from 'url';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const webpackCommon = {
@@ -17,12 +18,12 @@ export const webpackCommon = {
     environment: {
       module: true
     },
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '../dist'),
     // clean output folder at each build
     clean: true,
     // web workers public path
-    // (otherwise clients look in the file system)
-    workerPublicPath: '/'
+    // (otherwise clients use file:// scheme creating CORS error)
+    workerPublicPath: './'
   },
   experiments: {
     // module is still experimental

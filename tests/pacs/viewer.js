@@ -24,8 +24,13 @@ import {DrawToolUI} from './viewer.ui.draw.js';
 import {BrushToolUI} from './viewer.ui.brush.js';
 
 // global vars
-let _app = null;
-let _tools = null;
+
+/**
+ * @type {App}
+ */
+let _app;
+
+let _tools;
 const _toolFeaturesUI = {};
 let _layout = 'one';
 
@@ -139,6 +144,9 @@ function viewerSetup() {
     _app.abortLoad(event.dataid);
   });
   _app.addEventListener('loadstart', function (event) {
+    console.log('%c----------------', 'color: teal;');
+    console.log('load source', event.source);
+    // timer
     console.time('load-data-' + event.dataid);
     // update load counters
     if (numberOfDataToLoad === numberOfLoadendData) {
@@ -151,7 +159,9 @@ function viewerSetup() {
     // add abort shortcut
     window.addEventListener('keydown', abortShortcut);
     // remove post-load listeners
-    removePostLoadListeners();
+    if (_app.getDataIds().length !== 0) {
+      removePostLoadListeners();
+    }
     // add new data view config
     addDataViewConfig(event.dataid);
   });
@@ -204,8 +214,8 @@ function viewerSetup() {
       toolsFieldset.disabled = false;
       const changeLayoutSelect = document.getElementById('changelayout');
       changeLayoutSelect.disabled = false;
-      const resetLayoutButton = document.getElementById('resetlayout');
-      resetLayoutButton.disabled = false;
+      const resetViewsButton = document.getElementById('resetviews');
+      resetViewsButton.disabled = false;
       const smoothingChk = document.getElementById('changesmoothing');
       smoothingChk.disabled = false;
       const swapViewsButton = document.getElementById('swapviews');
@@ -482,10 +492,10 @@ function setup() {
     );
   });
 
-  const resetLayoutButton = document.getElementById('resetlayout');
-  resetLayoutButton.disabled = true;
-  resetLayoutButton.addEventListener('click', function () {
-    _app.resetLayout();
+  const resetViewsButton = document.getElementById('resetviews');
+  resetViewsButton.disabled = true;
+  resetViewsButton.addEventListener('click', function () {
+    _app.resetZoomPan();
   });
 
   const swapViewsButton = document.getElementById('swapviews');
@@ -702,10 +712,12 @@ function setup() {
   // bind app to input files
   const fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
-    console.log('%c ----------------', 'color: teal;');
-    const fileElement = event.target;
-    console.log(fileElement.files);
-    _app.loadFiles(fileElement.files);
+    const files = event.target.files;
+    if (files.length !== 0) {
+      _app.loadFiles(files);
+    } else {
+      throw new Error('No files to load');
+    }
   });
 }
 
@@ -780,7 +792,7 @@ function updateSliders() {
     const slider = document.getElementById(lgId + '-slider');
     if (slider) {
       const lg = _app.getLayerGroupByDivId(lgId);
-      if (lg) {
+      if (typeof lg !== 'undefined') {
         const ph = lg.getPositionHelper();
         slider.value = ph.getCurrentPositionScrollValue();
       }
@@ -1152,6 +1164,13 @@ function setAppTool(toolName) {
 
   // set tool for app
   _app.setTool(toolName);
+
+  // force window level non strict mode
+  if (toolName === 'WindowLevel') {
+    _app.setToolFeatures({
+      strictViewLayer: false
+    });
+  }
 
   // clear options html
   const toolOptionsEl = document.getElementById('toolOptions');

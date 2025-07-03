@@ -1,20 +1,42 @@
-import {logger} from '../utils/logger.js';
+import {VoiLutFunctionNames} from './voiLut.js';
 
 /**
- * Minimum window width value.
+ * Validate and constrain an input window level.
  *
- * Ref: {@link http://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1.2}.
+ * @param {WindowLevel} wl The window level to validate.
+ * @param {object} range The image pixel data range.
+ * @param {string} [voiLutFunctionName] The VOI LUT function name,
+ *   defaults to 'LINEAR'.
+ * @returns {WindowLevel|undefined} A valid window level.
  */
-const minWindowWidth = 1;
+export function validateWindowLevel(
+  wl,
+  range,
+  voiLutFunctionName
+) {
+  if (typeof wl === 'undefined') {
+    return;
+  }
 
-/**
- * Validate an input window width.
- *
- * @param {number} value The value to test.
- * @returns {number} A valid window width.
- */
-export function validateWindowWidth(value) {
-  return value < minWindowWidth ? minWindowWidth : value;
+  let centerBound = wl.center;
+  centerBound = Math.min(centerBound, range.max);
+  centerBound = Math.max(centerBound, range.min);
+
+  // width minimum depends on voi lut function
+  // see https://dicom.nema.org/medical/dicom/2022a/output/chtml/part03/sect_C.11.2.html#sect_C.11.2.1
+  // (use linear min as default)
+  let minWindowWidth = 1;
+  if (typeof voiLutFunctionName !== 'undefined' &&
+    (voiLutFunctionName === VoiLutFunctionNames.linear_exact ||
+    voiLutFunctionName === VoiLutFunctionNames.sigmoid)) {
+    minWindowWidth = 0;
+  }
+
+  let widthBound = wl.width;
+  widthBound = Math.max(widthBound, minWindowWidth);
+  widthBound = Math.min(widthBound, range.max - range.min);
+
+  return new WindowLevel(centerBound, widthBound);
 }
 
 /**
@@ -40,12 +62,6 @@ export class WindowLevel {
    * @param {number} width The window width.
    */
   constructor(center, width) {
-    // check width
-    if (width < minWindowWidth) {
-      logger.warn('Using minimum window width since input is not valid: ' +
-        width);
-      width = minWindowWidth;
-    }
     this.center = center;
     this.width = width;
   }

@@ -69,6 +69,9 @@ QUnit.test('Ellipse quantification - #DWV-REQ-UI-07-003 Draw ellipse',
       },
       getPixelUnit: function () {
         return '';
+      },
+      getLengthUnit: function () {
+        return 'unit.mm';
       }
     };
     const theoQuant0 = {

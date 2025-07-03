@@ -23,7 +23,7 @@ export class BrushToolUI {
     res.className = 'toolFeatures';
 
     // brush size input
-    const sizeCallback = function (size) {
+    const sizeCallback = (size) => {
       this.#app.setToolFeatures({brushSize: size});
       //this.updateBrushCursorSize(size);
     };

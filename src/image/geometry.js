@@ -221,10 +221,13 @@ export class Geometry {
   #updateSliceSpacing() {
     const geoSliceSpacing = getSliceGeometrySpacing(this.#origins);
     // update local if needed
-    if (typeof geoSliceSpacing !== 'undefined' &&
-      this.#spacing.get(2) !== geoSliceSpacing) {
-      logger.debug('Using geometric spacing ' + geoSliceSpacing +
-        ' instead of tag spacing ' + this.#spacing.get(2));
+    if (typeof geoSliceSpacing !== 'undefined') {
+      // 1 is default
+      if (this.#spacing.get(2) !== 1 &&
+        this.#spacing.get(2) !== geoSliceSpacing) {
+        logger.debug('Using geometric spacing ' + geoSliceSpacing +
+          ' instead of tag spacing ' + this.#spacing.get(2));
+      }
       const values = this.#spacing.getValues();
       values[2] = geoSliceSpacing;
       this.#spacing = new Spacing(values);

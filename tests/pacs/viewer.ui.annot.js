@@ -7,6 +7,12 @@ import {
   DicomWriter
 } from '../../src/dicom/dicomWriter.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../../src/app/application.js';
+import {AnnotationGroup} from '../../src/image/annotationGroup.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the annotation group divId.
  *
@@ -51,10 +57,15 @@ function splitAnnotationDivId(divId) {
  */
 export class AnnotationUI {
 
+  /**
+   * The associated application.
+   *
+   * @type {App}
+   */
   #app;
 
   /**
-   * @param {object} app The associated application.
+   * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
@@ -86,6 +97,12 @@ export class AnnotationUI {
       const layerGroup = this.#app.getLayerGroupByDivId(divId);
       // add annotation group
       const viewLayer = layerGroup.getActiveViewLayer();
+      if (typeof viewLayer === 'undefined') {
+        console.warn(
+          'No active view layer, please select one in the data table'
+        );
+        return;
+      }
       const refDataId = viewLayer.getDataId();
       const data = this.#app.createAnnotationData(refDataId);
       // render (will create draw layer)
@@ -242,8 +259,12 @@ export class AnnotationUI {
 
     const span = document.createElement('span');
     span.id = 'span-' + annotationDivId;
+    let factoryName = 'unknown';
+    if (typeof annotation.getFactory() !== 'undefined') {
+      factoryName = annotation.getFactory().getName();
+    }
     span.appendChild(document.createTextNode(
-      annotation.trackingId + ' (' + annotation.getFactory().getName() + ')'));
+      annotation.trackingId + ' (' + factoryName + ')'));
     span.appendChild(inputColour);
     span.appendChild(gotoButton);
     span.appendChild(viewButton);

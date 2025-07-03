@@ -14,6 +14,8 @@ import {App} from '../app/application.js';
  * State class.
  * Saves: data url/path, display info.
  *
+ * @deprecated Since v0.34, please switch to DICOM SR annotations.
+ *
  * History:
  * - v0.5 (dwv 0.30.0, 12/2021):
  *   - store position as array,
@@ -89,8 +91,11 @@ export class State {
     // display
     const wl = new WindowLevel(data['window-center'], data['window-width']);
     viewController.setWindowLevel(wl);
-    // position is index...
-    viewController.setCurrentIndex(new Index(data.position));
+
+    // position is index for state before v0.4, point for v0.5
+    // position is origin so set position does not make much sense...
+    //viewController.setCurrentIndex(new Index(data.position));
+
     // apply saved scale on top of current base one
     const baseScale = app.getActiveLayerGroup().getBaseScale();
     let scale = null;

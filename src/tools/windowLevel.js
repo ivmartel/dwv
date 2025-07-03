@@ -5,7 +5,6 @@ import {
 } from '../gui/generic.js';
 import {getLayerDetailsFromEvent} from '../gui/layerGroup.js';
 import {
-  validateWindowWidth,
   WindowLevel as WindowLevelValues
 } from '../image/windowLevel.js';
 
@@ -13,19 +12,22 @@ import {
 /* eslint-disable no-unused-vars */
 import {App} from '../app/application.js';
 import {Point2D} from '../math/point.js';
+import {LayerGroup} from '../gui/layerGroup.js';
+import {ViewLayer} from '../gui/viewLayer.js';
 /* eslint-enable no-unused-vars */
 
 /**
  * WindowLevel tool: handle window/level related events.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, ToolConfig} from '//esm.sh/dwv';
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
- * options.tools = {WindowLevel: new dwv.ToolConfig()};
+ * const options = new AppOptions(viewConfigs);
+ * options.tools = {WindowLevel: new ToolConfig()};
  * app.init(options);
  * // activate tool
  * app.addEventListener('load', function () {
@@ -67,11 +69,42 @@ export class WindowLevel {
   #scrollWhell;
 
   /**
+   * Strict view layer flag: if true, use the active layer
+   * (that could be undefined, ie bail) or, if false,
+   * try to find the active view layer (active layer if view layer or
+   * closest).
+   *
+   * @type {boolean}
+   */
+  #strictViewLayer = true;
+
+  /**
    * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
     this.#scrollWhell = new ScrollWheel(app);
+  }
+
+  /**
+   * Get the active view layer. Uses the strictViewLayer flag:
+   * if true, use the active layer (that could be undefined,
+   * ie bail) or, if false, try to find the active view layer.
+   *
+   * @param {LayerGroup} layerGroup The layer group of the view layer.
+   * @returns {ViewLayer|undefined} The layer.
+   */
+  #getActiveViewLayer(layerGroup) {
+    let layer;
+    if (this.#strictViewLayer) {
+      layer = layerGroup.getActiveViewLayer();
+    } else {
+      const callbackFn = function (layer) {
+        return layer.getViewController().isMonochrome();
+      };
+      layer = layerGroup.getViewLayersFromActive(callbackFn)[0];
+    }
+    return layer;
   }
 
   /**
@@ -83,7 +116,7 @@ export class WindowLevel {
   #start(point, divId) {
     // check if possible
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getActiveViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -109,7 +142,7 @@ export class WindowLevel {
     }
 
     const layerGroup = this.#app.getLayerGroupByDivId(divId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getActiveViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -120,17 +153,16 @@ export class WindowLevel {
     const diffY = this.#startPoint.getY() - point.getY();
     // data range
     const range = viewController.getImageRescaledDataRange();
-    // 1/1000 seems to give reasonable results...
-    const pixelToIntensity = (range.max - range.min) * 0.01;
+    // 1/1000 to match existing solutions
+    const pixelToIntensity = (range.max - range.min) * 0.001;
 
     // calculate new window level
     const center = viewController.getWindowLevel().center;
     const width = viewController.getWindowLevel().width;
-    const windowCenter = center + Math.round(diffY * pixelToIntensity);
-    let windowWidth = width + Math.round(diffX * pixelToIntensity);
-    // bound window width
-    windowWidth = validateWindowWidth(windowWidth);
-    // set
+    const windowCenter = center + (diffY * pixelToIntensity);
+    const windowWidth = width + (diffX * pixelToIntensity);
+
+    // set (will validate values)
     const wl = new WindowLevelValues(windowCenter, windowWidth);
     viewController.setWindowLevel(wl);
 
@@ -228,7 +260,7 @@ export class WindowLevel {
     const mousePoint = getMousePoint(event);
 
     const layerGroup = this.#app.getLayerGroupByDivId(layerDetails.groupDivId);
-    const viewLayer = layerGroup.getActiveViewLayer();
+    const viewLayer = this.#getActiveViewLayer(layerGroup);
     if (typeof viewLayer === 'undefined') {
       return;
     }
@@ -289,12 +321,14 @@ export class WindowLevel {
   }
 
   /**
-   * Set the tool live features: does nothing.
+   * Set the tool live features.
    *
-   * @param {object} _features The list of features.
+   * @param {object} features The list of features.
    */
-  setFeatures(_features) {
-    // does nothing
+  setFeatures(features) {
+    if (typeof features.strictViewLayer !== 'undefined') {
+      this.#strictViewLayer = features.strictViewLayer;
+    }
   }
 
 } // WindowLevel class

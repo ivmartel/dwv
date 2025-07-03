@@ -4,7 +4,7 @@ import {
   getTime
 } from './dicomDate.js';
 import {
-  isPixelDataTag,
+  isAnyPixelDataTag,
   isItemDelimitationItemTag,
   isSequenceDelimitationItemTag,
   getItemTag,
@@ -93,7 +93,7 @@ function getElementValueAsString(tag, dicomElement, pretty) {
   if (dicomElement.vr !== 'SQ' &&
     dicomElement.value.length === 1 && dicomElement.value[0] === '') {
     str += '(no value available)';
-  } else if (isPixelDataTag(tag) &&
+  } else if (isAnyPixelDataTag(tag) &&
     dicomElement.undefinedLength) {
     str = '(PixelSequence)';
   } else if (dicomElement.vr === 'DA' && pretty) {
@@ -176,7 +176,7 @@ function getElementAsString(tag, dicomElement, prefix) {
     deSize = 1;
   }
 
-  const isPixSequence = (isPixelDataTag(tag) &&
+  const isPixSequence = (isAnyPixelDataTag(tag) &&
     dicomElement.undefinedLength);
 
   let line = null;

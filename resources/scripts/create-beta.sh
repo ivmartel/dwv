@@ -78,7 +78,7 @@ if [ $step -eq 2 ]
 then
   info "(2/4) create build"
 
-  yarn run build
+  yarn run build-all
 
   ((step++))
 fi

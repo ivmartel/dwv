@@ -8,6 +8,11 @@ import {
   getControlDiv
 } from './viewer.ui.js';
 
+// doc imports
+/* eslint-disable no-unused-vars */
+import {App} from '../../src/app/application.js';
+/* eslint-enable no-unused-vars */
+
 /**
  * Get the layer group div ids associated to a view config.
  *
@@ -27,10 +32,13 @@ function getDivIds(dataViewConfig) {
  */
 export class DataTableUI {
 
+  /**
+   * @type {App}
+   */
   #app;
 
   /**
-   * @param {object} app The associated application.
+   * @param {App} app The associated application.
    */
   constructor(app) {
     this.#app = app;
@@ -52,16 +60,22 @@ export class DataTableUI {
       this.#addDataRow(event.dataid, layout);
     });
 
-    this.#app.addEventListener('wlchange', this.#onWLChange);
-    this.#app.addEventListener('opacitychange', this.#onOpacityChange);
-  };
-
-  /**
-   * Unbind app to controls.
-   */
-  unregisterListeners() {
-    this.#app.removeEventListener('wlchange', this.#onWLChange);
-    this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
+    // control listeners (pause during load)
+    let registered = false;
+    this.#app.addEventListener('loadstart', (/*event*/) => {
+      if (registered) {
+        this.#app.removeEventListener('wlchange', this.#onWLChange);
+        this.#app.removeEventListener('opacitychange', this.#onOpacityChange);
+        registered = false;
+      }
+    });
+    this.#app.addEventListener('loadend', (/*event*/) => {
+      if (!registered) {
+        this.#app.addEventListener('wlchange', this.#onWLChange);
+        this.#app.addEventListener('opacitychange', this.#onOpacityChange);
+        registered = true;
+      }
+    });
   };
 
   /**
@@ -208,10 +222,10 @@ export class DataTableUI {
       for (let j = 0; j < numberOfLayerGroups; ++j) {
         insertTCell('LG' + j);
       }
-      insertTCell('Alpha Range');
       insertTCell('Contrast');
       insertTCell('Preset');
       insertTCell('Alpha');
+      insertTCell('Alpha Range');
       table.createTBody();
       const div = document.getElementById('layersdetails');
       div.appendChild(table);
@@ -226,11 +240,6 @@ export class DataTableUI {
    * @param {string} layout The layout.
    */
   #addDataRow(dataId, layout) {
-    // bind app to controls on first id
-    // if (dataId === '0') {
-    //   this.registerListeners();
-    // }
-
     const image = this.#app.getData(dataId).image;
     const dataIsImage = typeof image !== 'undefined';
     const canAlpha = dataIsImage;
@@ -262,7 +271,7 @@ export class DataTableUI {
     };
 
     // get a layer radio button
-    const getLayerRadio = function (index, divId) {
+    const getLayerRadio = (index, divId) => {
       const radio = document.createElement('input');
       radio.type = 'radio';
       radio.name = 'layerselect-' + index;
@@ -281,7 +290,7 @@ export class DataTableUI {
     };
 
     // get a layer add button
-    const getLayerAdd = function (index, divId) {
+    const getLayerAdd = (index, divId) => {
       const button = document.createElement('button');
       button.name = 'layeradd-' + index;
       button.id = 'layeradd-' + divId + '-' + dataId;
@@ -308,7 +317,7 @@ export class DataTableUI {
     };
 
     // get a layer remove button
-    const getLayerRem = function (index, divId) {
+    const getLayerRem = (index, divId) => {
       const button = document.createElement('button');
       button.name = 'layerrem-' + index;
       button.id = 'layerrem-' + divId + '-' + dataId;
@@ -326,7 +335,7 @@ export class DataTableUI {
     };
 
     // get a layer update button
-    const getLayerUpdate = function (index, divId, orientation) {
+    const getLayerUpdate = (index, divId, orientation) => {
       const button = document.createElement('button');
       const letter = orientation[0].toUpperCase();
       button.name = 'layerupd-' + index + '_' + letter;
@@ -391,44 +400,6 @@ export class DataTableUI {
     }
 
     const floatPrecision = 4;
-
-    // cell: alpha range
-    cell = row.insertCell();
-    const minId = 'value-min-' + dataId;
-    const maxId = 'value-max-' + dataId;
-    // callback
-    const onChangeAlphaFunc = () => {
-      const minElement = document.getElementById(minId + '-number');
-      const min = parseFloat(minElement.value);
-      const maxElement = document.getElementById(maxId + '-number');
-      const max = parseFloat(maxElement.value);
-      const func = function (value, _index) {
-        if (value >= min && value <= max) {
-          return 255;
-        }
-        return 0;
-      };
-      // update selected layers
-      const lgIds = getSelectedLayerGroupIds();
-      for (let i = 0; i < lgIds.length; ++i) {
-        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
-        const vl = lg.getActiveViewLayer();
-        if (typeof vl !== 'undefined') {
-          const vc = vl.getViewController();
-          vc.setViewAlphaFunction(func);
-        }
-      }
-    };
-    // add controls
-    if (canAlpha) {
-      const dataRange = image.getDataRange();
-      cell.appendChild(getControlDiv(minId, 'min',
-        dataRange.min, dataRange.max, dataRange.min,
-        onChangeAlphaFunc, floatPrecision));
-      cell.appendChild(getControlDiv(maxId, 'max',
-        dataRange.min, dataRange.max, dataRange.max,
-        onChangeAlphaFunc, floatPrecision));
-    }
 
     // cell: contrast
     cell = row.insertCell();
@@ -569,6 +540,44 @@ export class DataTableUI {
     // add controls
     cell.appendChild(getControlDiv(opacityId, 'opacity',
       0, 1, initialLayer.getOpacity(), onChangeOpacity, floatPrecision));
+
+    // cell: alpha range
+    cell = row.insertCell();
+    const minId = 'value-min-' + dataId;
+    const maxId = 'value-max-' + dataId;
+    // callback
+    const onChangeAlphaFunc = () => {
+      const minElement = document.getElementById(minId + '-number');
+      const min = parseFloat(minElement.value);
+      const maxElement = document.getElementById(maxId + '-number');
+      const max = parseFloat(maxElement.value);
+      const func = function (value, _index) {
+        if (value >= min && value <= max) {
+          return 255;
+        }
+        return 0;
+      };
+      // update selected layers
+      const lgIds = getSelectedLayerGroupIds();
+      for (let i = 0; i < lgIds.length; ++i) {
+        const lg = this.#app.getLayerGroupByDivId(lgIds[i]);
+        const vl = lg.getActiveViewLayer();
+        if (typeof vl !== 'undefined') {
+          const vc = vl.getViewController();
+          vc.setViewAlphaFunction(func);
+        }
+      }
+    };
+    // add controls
+    if (canAlpha) {
+      const dataRange = image.getDataRange();
+      cell.appendChild(getControlDiv(minId, 'min',
+        dataRange.min, dataRange.max, dataRange.min,
+        onChangeAlphaFunc, floatPrecision));
+      cell.appendChild(getControlDiv(maxId, 'max',
+        dataRange.min, dataRange.max, dataRange.max,
+        onChangeAlphaFunc, floatPrecision));
+    }
   }
 
 }; // test.DataTable

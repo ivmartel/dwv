@@ -761,6 +761,9 @@ export class Brush extends EventTarget {
       ]
     };
 
+    // get length unit from ref image
+    firstSliceMeta.lengthUnit = sourceImage.getMeta().lengthUnit;
+
     this.#mask = this.#createMaskImage(
       sourceGeometry,
       sourceGeometry.getOrigins()[imgK],
@@ -943,6 +946,7 @@ export class Brush extends EventTarget {
       return [];
     }
     const viewController = viewLayer.getViewController();
+    const savedPosition = viewController.getCurrentPosition();
 
     const searchMaskMeta = {
       Modality: 'SEG'
@@ -986,19 +990,27 @@ export class Brush extends EventTarget {
       const planePos = viewLayer.displayToPlanePos(mousePoint);
       sourcePosition = viewController.getPositionFromPlanePoint(planePos);
       // create mask (sets this.#mask)
-      this.#maskDataId = this.#createMask(sourcePosition, sourceImage);
+      this.#maskDataId = this.#createMask(savedPosition, sourceImage);
       // check
       if (typeof this.#mask === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.noCreatedMaskImage);
       }
       // display mask
       const divId = layerGroup.getDivId();
-      if (typeof divId !== 'undefined') {
+      const layerGroupHasDiv = typeof divId !== 'undefined';
+      if (layerGroupHasDiv) {
         this.#displayMask(divId);
       }
       // newly create mask case: find the SEG view layer
       maskVl = this.#getLayerGroupMaskViewLayer(layerGroup);
       maskVc = maskVl.getViewController();
+
+      if (layerGroupHasDiv) {
+        // this.#displayMask causes the position to get reset,
+        // so we have to restore it or we may not be drawing on
+        // the correct slice.
+        maskVc.setCurrentPosition(savedPosition);
+      }
     }
 
     const sourceGeometry = sourceImage.getGeometry();
@@ -1013,23 +1025,23 @@ export class Brush extends EventTarget {
     let circleDims;
     const scrollIndex = viewController.getScrollDimIndex();
     switch (scrollIndex) {
-    case 0: {
-      circleDims = [1, 2];
-      break;
-    }
-    case 1: {
-      circleDims = [0, 2];
-      break;
-    }
-    case 2: {
-      circleDims = [0, 1];
-      break;
-    }
-    default: {
-      throw new Error(
-        formatString(ERROR_MESSAGES.brush.unsupportedScrollIndex, scrollIndex)
-      );
-    }
+      case 0: {
+        circleDims = [1, 2];
+        break;
+      }
+      case 1: {
+        circleDims = [0, 2];
+        break;
+      }
+      case 2: {
+        circleDims = [0, 1];
+        break;
+      }
+      default: {
+        throw new Error(
+          formatString(ERROR_MESSAGES.brush.unsupportedScrollIndex, scrollIndex)
+        );
+      }
     }
 
     this.#addMaskSlices(

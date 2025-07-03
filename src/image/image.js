@@ -87,13 +87,14 @@ export function createMaskImage(elements) {
  * - planar configuration (default RGBRGB...).
  *
  * @example
+ * import {DicomParser, createImage} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // result div
  *   const div = document.getElementById('dwv');
  *   // display the image size
@@ -1649,11 +1650,17 @@ export class Image {
       this.#labelingThread = new LabelingThread();
 
       const spacing = this.#geometry.getSpacing();
-      const mlVoxelVolume =
-        spacing.get(0) *
-        spacing.get(1) *
-        spacing.get(2) *
-        ML_PER_MM;
+      const lengthUnit = this.getMeta().lengthUnit;
+      let pixelVolume = 1;
+      let volumeUnit = 'unit.pixel';
+      if (lengthUnit === 'unit.mm') {
+        pixelVolume =
+          spacing.get(0) *
+          spacing.get(1) *
+          spacing.get(2) *
+          ML_PER_MM;
+        volumeUnit = 'unit.ml';
+      }
 
       this.#labelingThread.ondone = (event) => {
         const labels = event.data.labels;
@@ -1661,7 +1668,8 @@ export class Image {
         for (const label of labels) {
           label.centroid = this.#geometry.indexToWorld(
             new Index(label.centroidIndex));
-          label.volume = label.count * mlVoxelVolume;
+          label.volume = label.count * pixelVolume;
+          label.unit = volumeUnit;
         }
         // sort
         const labelsSorted =

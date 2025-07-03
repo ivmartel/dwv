@@ -195,20 +195,28 @@ export class Rectangle {
     const quant = {};
     // shape quantification
     const spacing2D = viewController.get2DSpacing();
+    const lengthUnit = viewController.getLengthUnit();
     quant.width = {
       value: this.getWidth() * spacing2D.x,
-      unit: 'unit.mm'
+      unit: lengthUnit
     };
     quant.height = {
       value: this.getHeight() * spacing2D.y,
-      unit: 'unit.mm'
+      unit: lengthUnit
     };
     const surface = this.getWorldSurface(spacing2D);
     if (surface !== null) {
-      quant.surface = {
-        value: surface / 100,
-        unit: 'unit.cm2'
-      };
+      if (lengthUnit === 'unit.mm') {
+        quant.surface = {
+          value: surface / 100,
+          unit: 'unit.cm2'
+        };
+      } else {
+        quant.surface = {
+          value: surface,
+          unit: lengthUnit
+        };
+      }
     }
 
     // pixel values quantification

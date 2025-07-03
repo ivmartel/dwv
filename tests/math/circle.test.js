@@ -62,6 +62,9 @@ QUnit.test('Circle quantication - #DWV-REQ-UI-07-002 Draw circle',
       },
       getPixelUnit: function () {
         return '';
+      },
+      getLengthUnit: function () {
+        return 'unit.mm';
       }
     };
     const theoQuant0 = {

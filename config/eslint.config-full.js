@@ -1,5 +1,6 @@
-import eslintConfig from './eslint.config.js';
 import jsdoc from 'eslint-plugin-jsdoc';
+
+import eslintConfig from '../eslint.config.js';
 
 export default [
   ...eslintConfig,

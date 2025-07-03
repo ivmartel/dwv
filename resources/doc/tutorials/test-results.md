@@ -2,23 +2,66 @@
 
 ## Context
 
-Date: Thu Nov 14 2024 18:36:05 GMT+0100 (Central European Standard Time)
+Date: Fri Jun 27 2025 17:23:57 GMT+0200 (Central European Summer Time)
 
-Commit: [166d5ed](git://github.com/ivmartel/dwv.git/commit/166d5edd4ac03e0fcdee6eefe8974770eda6ea74)
+Commit: [eec8c11](https://github.com/ivmartel/dwv.git/commit/eec8c1157592fdeadebb6b127d401cec2532d30c)
 
-Browser: Chrome Headless 130.0.0.0 (Linux x86_64)
+Browser: Chrome Headless 137.0.0.0 (Linux x86_64)
 
 ## Summary
-Success: 166 ✅
+Success: 191 ✅
 
 Failed: 0 ❌
 
-(total: 166, skipped: 0, total time: 1644ms)
+(total: 191, skipped: 0, total time: 1670ms)
 
 ## Tests details
 
-(38 / 166 tests with requirement(s), 128 tests with no requirement)
+(38 / 191 tests with requirement(s), 153 tests with no requirement)
 
+### annotation
+
+- Read dwv034 annotation arrow: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-arrow))
+
+- Read dwv034 annotation circle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-circle))
+
+- Read dwv034 annotation ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-ellipse))
+
+- Read dwv034 annotation protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-protractor))
+
+- Read dwv034 annotation rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-rectangle))
+
+- Read dwv034 annotation roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-roi))
+
+- Read dwv034 annotation ruler: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-dwv034-annotation-ruler))
+
+- Read tid1500 v0 annotation arrow: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-arrow))
+
+- Read tid1500 v0 annotation circle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-circle))
+
+- Read tid1500 v0 annotation ellipse: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-ellipse))
+
+- Read tid1500 v0 annotation protractor: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-protractor))
+
+- Read tid1500 v0 annotation rectangle: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-rectangle))
+
+- Read tid1500 v0 annotation roi: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-roi))
+
+- Read tid1500 v0 annotation ruler: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_annotation.html#~read-tid1500-v0-annotation-ruler))
 ### utils
 
 - Index stringId: ✅ 
@@ -225,6 +268,9 @@ Failed: 0 ❌
 - DICOM code class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-code-class))
 
+- DICOM code dictionary: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-code-dictionary))
+
 - Get DICOM Date: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~get-dicom-date))
 
@@ -237,8 +283,23 @@ Failed: 0 ❌
 - DICOM dump: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-dump))
 
+- isMonochrome: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~ismonochrome))
+
+- DICOM parsing - Implementation class and name: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-parsing---implementation-class-and-name))
+
+- DICOM parsing - compare version: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-parsing---compare-version))
+
+- DICOM parsing - isVersionInBounds: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~dicom-parsing---isversioninbounds))
+
 - Simple DICOM parsing: ✅ 
 (URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~simple-dicom-parsing))
+
+- Simple DICOM parsing - until tag: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_dicom.html#~simple-dicom-parsing---until-tag))
 
 - DICOM sequence parsing: ✅ 
 (URS [#DWV-REQ-IO-01-001 (Load DICOM file(s))](tutorial-user-stories.html#dwv-req-io-01-001-load-dicom-file(s)), [jsdoc](module-tests_dicom.html#~dicom-sequence-parsing))
@@ -384,6 +445,9 @@ Failed: 0 ❌
 - Region iterator: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~region-iterator))
 
+- LabelingFilter class: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~labelingfilter-class))
+
 - Size class: ✅ 
 (⚠️ No requirement reference, [jsdoc](module-tests_image.html#~size-class))
 
@@ -410,6 +474,18 @@ Failed: 0 ❌
 
 - Generate data timing: ✅ 
 (URS [#DWV-REQ-UI-02-001 (Display image)](tutorial-user-stories.html#dwv-req-ui-02-001-display-image), [jsdoc](module-tests_image.html#~generate-data-timing))
+
+- VoiLutLinearFunction class: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~voilutlinearfunction-class))
+
+- VoiLutSigmoidFunction class: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~voilutsigmoidfunction-class))
+
+- WindowLevel class: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~windowlevel-class))
+
+- validateWindowLevel.: ✅ 
+(⚠️ No requirement reference, [jsdoc](module-tests_image.html#~validatewindowlevel.))
 ### state
 
 - Read v01 state line: ✅ 

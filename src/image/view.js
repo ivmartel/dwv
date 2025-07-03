@@ -3,7 +3,10 @@ import {ModalityLut} from './modalityLut.js';
 import {WindowLut} from './windowLut.js';
 import {luts} from './luts.js';
 import {VoiLut} from './voiLut.js';
-import {WindowLevel} from './windowLevel.js';
+import {
+  validateWindowLevel,
+  WindowLevel
+} from './windowLevel.js';
 import {generateImageDataMonochrome} from './viewMonochrome.js';
 import {generateImageDataPaletteColor} from './viewPaletteColor.js';
 import {generateImageDataRgb} from './viewRgb.js';
@@ -12,7 +15,6 @@ import {ViewFactory} from './viewFactory.js';
 import {isIdentityMat33} from '../math/matrix.js';
 import {getSliceIterator} from '../image/iterator.js';
 import {ListenerHandler} from '../utils/listen.js';
-import {logger} from '../utils/logger.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -60,15 +62,16 @@ export function createView(elements, image) {
  * (either directly or with helper methods).
  *
  * @example
+ * import {DicomParser, createImage, createView} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = dwv.createView(dicomParser.getDicomElements(), image);
+ *   const view = createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;
@@ -333,7 +336,9 @@ export class View {
       const sliceWl = currentPreset.wl[offset];
       // set window level: will send a change event, mark it as silent as
       // this change is always triggered by a position change
-      this.setWindowLevel(sliceWl, this.#currentPresetName, true);
+      if (typeof sliceWl !== 'undefined') {
+        this.setWindowLevel(sliceWl, this.#currentPresetName, true);
+      }
     }
 
     // if no current, use first id
@@ -378,7 +383,10 @@ export class View {
     if (typeof voiLut === 'undefined' ||
       !this.#currentWl.equals(voiLutWl)) {
       // set lut window level
-      const voiLut = new VoiLut(this.#currentWl);
+      const voiLut = new VoiLut(
+        this.#currentWl,
+        this.#image.getMeta().VOILUTFunction
+      );
       this.#windowLut.setVoiLut(voiLut);
     }
 
@@ -738,26 +746,33 @@ export class View {
       silent = false;
     }
 
+    // bound window center and width
+    const wlBound = validateWindowLevel(
+      wl,
+      this.#image.getRescaledDataRange(),
+      this.#image.getMeta().VOILUTFunction
+    );
+
     // check if new wl
-    const isNewWl = !wl.equals(this.#currentWl);
+    const isNewWl = !wlBound.equals(this.#currentWl);
     // check if new name
     const isNewName = this.#currentPresetName !== name;
 
     // compare to previous if present
     if (isNewWl || isNewName) {
       // assign
-      this.#currentWl = wl;
+      this.#currentWl = wlBound;
       this.#currentPresetName = name;
 
       // update manual
       if (name === 'manual') {
         if (typeof this.#windowPresets[name] !== 'undefined') {
-          this.#windowPresets[name].wl[0] = wl;
+          this.#windowPresets[name].wl[0] = wlBound;
         } else {
           // add if not present
           this.addWindowPresets({
             manual: {
-              wl: [wl],
+              wl: [wlBound],
               name: 'manual'
             }
           });
@@ -777,9 +792,9 @@ export class View {
        */
       this.#fireEvent({
         type: 'wlchange',
-        value: [wl.center, wl.width, name],
-        wc: wl.center,
-        ww: wl.width,
+        value: [wlBound.center, wlBound.width, name],
+        wc: wlBound.center,
+        ww: wlBound.width,
         skipGenerate: silent
       });
     }
@@ -822,7 +837,9 @@ export class View {
       wl = preset.wl[offset];
     }
     // set w/l
-    this.setWindowLevel(wl, name, silent);
+    if (typeof wl !== 'undefined') {
+      this.setWindowLevel(wl, name, silent);
+    }
   }
 
   /**
@@ -875,16 +892,13 @@ export class View {
    */
   getWindowLevelMinMax() {
     const range = this.getImage().getRescaledDataRange();
-    const min = range.min;
-    const max = range.max;
-    let width = max - min;
-    // full black / white images, defaults to 1.
-    if (width < 1) {
-      logger.warn('Zero or negative window width, defaulting to one.');
-      width = 1;
-    }
-    const center = min + width / 2;
-    return new WindowLevel(center, width);
+    const width = range.max - range.min;
+    const center = range.min + width / 2;
+    return validateWindowLevel(
+      new WindowLevel(center, width),
+      range,
+      this.#image.getMeta().VOILUTFunction
+    );
   }
 
   /**
@@ -921,46 +935,46 @@ export class View {
 
     const photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation) {
-    case 'MONOCHROME1':
-    case 'MONOCHROME2':
-      generateImageDataMonochrome(
-        data,
-        iterator,
-        this.getAlphaFunction(),
-        this.#getCurrentWindowLut(),
-        this.#getColourMapLut()
-      );
-      break;
+      case 'MONOCHROME1':
+      case 'MONOCHROME2':
+        generateImageDataMonochrome(
+          data,
+          iterator,
+          this.getAlphaFunction(),
+          this.#getCurrentWindowLut(),
+          this.#getColourMapLut()
+        );
+        break;
 
-    case 'PALETTE COLOR':
-      generateImageDataPaletteColor(
-        data,
-        iterator,
-        this.getAlphaFunction(),
-        image.getPaletteColourMap(),
-        image.getMeta().BitsStored === 16
-      );
-      break;
+      case 'PALETTE COLOR':
+        generateImageDataPaletteColor(
+          data,
+          iterator,
+          this.getAlphaFunction(),
+          image.getPaletteColourMap(),
+          image.getMeta().BitsStored === 16
+        );
+        break;
 
-    case 'RGB':
-      generateImageDataRgb(
-        data,
-        iterator,
-        this.getAlphaFunction()
-      );
-      break;
+      case 'RGB':
+        generateImageDataRgb(
+          data,
+          iterator,
+          this.getAlphaFunction()
+        );
+        break;
 
-    case 'YBR_FULL':
-      generateImageDataYbrFull(
-        data,
-        iterator,
-        this.getAlphaFunction()
-      );
-      break;
+      case 'YBR_FULL':
+        generateImageDataYbrFull(
+          data,
+          iterator,
+          this.getAlphaFunction()
+        );
+        break;
 
-    default:
-      throw new Error(
-        'Unsupported photometric interpretation: ' + photoInterpretation);
+      default:
+        throw new Error(
+          'Unsupported photometric interpretation: ' + photoInterpretation);
     }
   }
 

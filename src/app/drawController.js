@@ -73,9 +73,11 @@ export class DrawController {
    *
    * @param {Annotation} annotation The annotation to update.
    * @param {string[]} [propKeys] Optional properties that got updated.
+   * @param {boolean} [propagate] Whether the update event propagates
+   *   outside of dwv or not, defaults to true.
    */
-  updateAnnotation(annotation, propKeys) {
-    this.#annotationGroup.update(annotation, propKeys);
+  updateAnnotation(annotation, propKeys, propagate) {
+    this.#annotationGroup.update(annotation, propKeys, propagate);
   }
 
   /**

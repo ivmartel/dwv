@@ -88,6 +88,44 @@ function mergeTags(tags1, tags2) {
 }
 
 /**
+ * Response evaluation class.
+ */
+export class ResponseEvaluation {
+  /**
+   * Current response.
+   *
+   * @type {DicomCode}
+   */
+  current;
+  /**
+   * Measurement of response (mm).
+   *
+   * @type {number}
+   */
+  measure;
+}
+
+/**
+ * CAD report class.
+ */
+export class CADReport {
+  /**
+   * @type {AnnotationGroup[]}
+   */
+  annotationGroups;
+
+  /**
+   * @type {ResponseEvaluation[]}
+   */
+  responseEvaluations;
+
+  /**
+   * @type {string}
+   */
+  comment;
+}
+
+/**
  * {@link AnnotationGroup} factory.
  */
 export class AnnotationGroupFactory {
@@ -192,6 +230,19 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Check if input elements contain a TID 4100 template.
+   * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_4100}.
+   *
+   * @param {Object<string, DataElement>} dataElements The DICOM data elements.
+   * @returns {boolean} True if the elements contain a TID 4100 template.
+   */
+  #isTid4100DicomSR(dataElements) {
+    // content template
+    const contentTemplate = getContentTemplate(dataElements);
+    return contentTemplate === 'DCMR-4100';
+  }
+
+  /**
    * Check dicom elements.
    *
    * @param {Object<string, DataElement>} dataElements The DICOM data elements.
@@ -203,7 +254,8 @@ export class AnnotationGroupFactory {
     this.#warning = undefined;
 
     if (!this.#isDwv034AnnotationDicomSR(dataElements) &&
-      !this.#isTid1500AnnotationDicomSR(dataElements)) {
+      !this.#isTid1500AnnotationDicomSR(dataElements) &&
+      !this.#isTid4100DicomSR(dataElements)) {
       this.#warning = 'Not a dwv supported annotation';
     }
 
@@ -370,10 +422,16 @@ export class AnnotationGroupFactory {
    *
    * @param {Annotation} annotation The annotation.
    * @param {DicomSRContent} content The content to add.
+   * @param {string} [relationshipType] The content relationshipType, defaults
+   *   to 'CONTAINS'.
    */
-  #addQuantificationToAnnotation(annotation, content) {
+  #addQuantificationToAnnotation(annotation, content, relationshipType) {
+    let relation;
+    if (typeof relationshipType === 'undefined') {
+      relation = RelationshipTypes.contains;
+    }
     if (content.valueType === ValueTypes.num &&
-      content.relationshipType === RelationshipTypes.contains) {
+      content.relationshipType === relation) {
       const quantifName =
         getQuantificationName(content.conceptNameCode);
       if (typeof quantifName !== 'undefined') {
@@ -434,6 +492,96 @@ export class AnnotationGroupFactory {
     return item.hasHeader(
       ValueTypes.container,
       getDcmDicomCode(DcmCodes.MeasurementGroup),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'SingleImageFinding' code.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (INFERRED FROM) CODE: (111059, DCM, 'Single Image Finding').
+   */
+  #isSingleImageFindingItem(item) {
+    return item.hasHeader(
+      ValueTypes.code,
+      getDcmDicomCode(DcmCodes.SingleImageFinding),
+      RelationshipTypes.inferredFrom
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'ResponseEvaluation' container.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (HAS PROPERTIES) CODE: (112020, DCM, 'Response Evaluation').
+   */
+  #isResponseEvaluationItem(item) {
+    return item.hasHeader(
+      ValueTypes.container,
+      getDcmDicomCode(DcmCodes.ResponseEvaluation),
+      RelationshipTypes.hasProperties
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'Comment' text.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) TEXT: (121106, DCM, 'Comment').
+   */
+  #isCommentItem(item) {
+    return item.hasHeader(
+      ValueTypes.text,
+      getDcmDicomCode(DcmCodes.Comment),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'CurrentResponse' code.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) CODE: (112048, DCM, 'Current Response').
+   */
+  #isCurrentResponseItem(item) {
+    return item.hasHeader(
+      ValueTypes.code,
+      getDcmDicomCode(DcmCodes.CurrentResponse),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'MeasurementOfResponse' number.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) NUM: (112051, DCM, 'Measurement Of Response').
+   */
+  #isMeasurementOfResponseItem(item) {
+    return item.hasHeader(
+      ValueTypes.num,
+      getDcmDicomCode(DcmCodes.MeasurementOfResponse),
+      RelationshipTypes.contains
+    );
+  }
+
+  /**
+   * Check if a DicomSRContent is a 'CADProcessingAndFindingsSummary' code.
+   *
+   * @param {DicomSRContent} item The item to check.
+   * @returns {boolean} True if item has the properties:
+   *   (CONTAINS) CODE: (111017, DCM, 'CAD Processing and Findings Summary').
+   */
+  #isCadProcessingSummaryItem(item) {
+    return item.hasHeader(
+      ValueTypes.code,
+      getDcmDicomCode(DcmCodes.CADProcessingAndFindingsSummary),
       RelationshipTypes.contains
     );
   }
@@ -505,9 +653,8 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Check is an SR content follows TID 300:
-   * it must contain a numeric value that contains an
-   * inferred from image.
+   * Check is an SR content follows TID 300: it must be
+   *   a 'contains' numeric value with an 'inferred from' scoord.
    * Ref: {@link https://dicom.nema.org/medical/Dicom/2022a/output/chtml/part16/chapter_A.html#sect_TID_300}.
    *
    * @param {DicomSRContent} item The SR content.
@@ -520,6 +667,30 @@ export class AnnotationGroupFactory {
       item.relationshipType === RelationshipTypes.contains;
     let scoord;
     if (isContainedNum) {
+      // no specific concept (?)
+      scoord = item.contentSequence.find(function (subItem) {
+        return subItem.valueType === ValueTypes.scoord &&
+          subItem.relationshipType === RelationshipTypes.inferredFrom;
+      });
+    }
+    return typeof scoord !== 'undefined';
+  }
+
+  /**
+   * Check is an SR content follows TID 1400: it must be
+   *   a 'has properties' numeric value with an 'inferred from' scoord.
+   * Ref: {@link https://dicom.nema.org/medical/Dicom/current/output/chtml/part16/chapter_A.html#sect_TID_1400}.
+   *
+   * @param {DicomSRContent} item The SR content.
+   * @returns {boolean} True if TID 300 measure.
+   */
+  #isTid1400LinearMeasurement(item) {
+    // no specific concept
+    const isHasPropNum =
+      item.valueType === ValueTypes.num &&
+      item.relationshipType === RelationshipTypes.hasProperties;
+    let scoord;
+    if (isHasPropNum) {
       // no specific concept (?)
       scoord = item.contentSequence.find(function (subItem) {
         return subItem.valueType === ValueTypes.scoord &&
@@ -603,6 +774,67 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Convert a TID 4104 image finding into an annotation.
+   * Similar to tid1501MeasGroupToAnnotation apart from measure
+   *  code and quantification relationship.
+   *
+   * @param {DicomSRContent} content The SR content.
+   * @returns {Annotation|undefined} The annotation.
+   */
+  #singleImageFindingToAnnotation(content) {
+    let annotation;
+
+    // just use the first measure to get the scoord
+    // (expecting all measures to refer to the same scoord)
+    const measure = content.contentSequence.find(
+      this.#isTid1400LinearMeasurement
+    );
+    if (typeof measure !== 'undefined') {
+      annotation = new Annotation();
+      // shape
+      // no specific concept (?)
+      const scoord = measure.contentSequence.find(function (subItem) {
+        return subItem.valueType === ValueTypes.scoord &&
+          subItem.relationshipType === RelationshipTypes.inferredFrom;
+      });
+      annotation.mathShape = getShapeFromScoord(scoord.value);
+      // special point/arrow case
+      // TODO: not very valid...
+      if (annotation.mathShape instanceof Point2D &&
+        scoord.value.graphicData.length >= 4
+      ) {
+        annotation.referencePoints = [
+          new Point2D(scoord.value.graphicData[2], scoord.value.graphicData[3])
+        ];
+      }
+      // shape source image
+      // no specific concept (?)
+      const fromImage = scoord.contentSequence.find(function (item) {
+        return item.valueType === ValueTypes.image &&
+          item.relationshipType === RelationshipTypes.selectedFrom;
+      });
+      if (typeof fromImage !== 'undefined') {
+        this.#addSourceImageToAnnotation(annotation, fromImage);
+      }
+    }
+
+    // shape extra
+    if (typeof annotation !== 'undefined') {
+      for (const item of content.contentSequence) {
+        // add ids
+        this.#addIdsToAnnotation(annotation, item);
+        // add quantification
+        this.#addQuantificationToAnnotation(
+          annotation, measure, RelationshipTypes.hasProperties);
+        // add meta
+        this.#addMetaToAnnotation(annotation, item);
+      }
+    }
+
+    return annotation;
+  }
+
+  /**
    * Convert an imaging measurement into an annotation group.
    * Supports TID1500 > TID1410 ("Planar ROI Measurements
    * and Qualitative Evaluations”) or TID1501 (“Measurement and
@@ -652,6 +884,43 @@ export class AnnotationGroupFactory {
       }
     }
     return annotationGroup;
+  }
+
+  /**
+   * Convert a CAD processing summary into an annotation group.
+   *
+   * @param {DicomSRContent} content The SR content.
+   * @returns {AnnotationGroup[]|undefined} The annotation group.
+   */
+  #cadProcessingSummaryToAnnotationGroups(content) {
+    // get annotations
+    const annotations = [];
+    let hasMeasGroup = false;
+    for (const item of content.contentSequence) {
+      // measurement group content
+      if (this.#isSingleImageFindingItem(item)) {
+        hasMeasGroup = true;
+        const annotation = this.#singleImageFindingToAnnotation(item);
+        if (typeof annotation !== 'undefined') {
+          annotations.push(annotation);
+        }
+      }
+    }
+
+    // TODO: split annotations according to referenced image.
+
+    // create group
+    const annotationGroups = [];
+    if (!hasMeasGroup) {
+      logger.warn('No image findings in TID 4100 SR');
+    } else {
+      if (annotations.length !== 0) {
+        annotationGroups.push(new AnnotationGroup(annotations));
+      } else {
+        logger.warn('No valid measurement groups in TID 4100 SR');
+      }
+    }
+    return annotationGroups;
   }
 
   /**
@@ -716,6 +985,29 @@ export class AnnotationGroupFactory {
   }
 
   /**
+   * Get the CAD processing and findings summary from
+   *   and input SR content.
+   *
+   * @param {DicomSRContent} content The input SR content.
+   * @returns {DicomSRContent|undefined} The summary.
+   */
+  #getTid4100Summary(content) {
+    if (!(content.valueType === ValueTypes.container &&
+      isEqualCode(
+        content.conceptNameCode,
+        getDcmDicomCode(DcmCodes.ChestCADReport)
+      )
+    )) {
+      logger.warn('Not the expected TID 4100 SR content header');
+    }
+
+    // CAD processing summary content
+    return content.contentSequence.find(
+      this.#isCadProcessingSummaryItem
+    );
+  }
+
+  /**
    * Convert a DICOM SR content 'Measurement group' into a list of annotations.
    *
    * Structure: (root) 'Measurement group'
@@ -745,27 +1037,12 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Get an {@link Annotation} object from the read DICOM file.
+   * Add root meta data to an annotation group.
    *
+   * @param {AnnotationGroup} annotationGroup The group to add meta to.
    * @param {Object<string, DataElement>} dataElements The DICOM tags.
-   * @returns {AnnotationGroup} A new annotation group.
-   * @throws Error for missing or wrong data.
    */
-  create(dataElements) {
-    const srContent = getSRContent(dataElements);
-
-    let annotationGroup;
-    if (this.#isTid1500AnnotationDicomSR(dataElements)) {
-      annotationGroup = this.#tid1500ToAnnotationGroup(srContent);
-    } else if (this.#isDwv034AnnotationDicomSR(dataElements)) {
-      logger.warn('DWV v0.34 annotation');
-      annotationGroup = this.#dwv034MeasGroupToAnnotationGroup(srContent);
-    }
-
-    if (typeof annotationGroup === 'undefined') {
-      throw new Error('Cannot create annotation group from TID 1500 SR');
-    }
-
+  #addMetaToAnnotationGroup(annotationGroup, dataElements) {
     const safeGetLocal = function (key) {
       return safeGet(dataElements, key);
     };
@@ -806,8 +1083,102 @@ export class AnnotationGroupFactory {
         evidences.CurrentRequestedProcedureEvidenceSequence
       );
     }
+  }
+
+  /**
+   * Get an {@link AnnotationGroup} object from the read DICOM file.
+   *
+   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @returns {AnnotationGroup} A new annotation group.
+   * @throws Error for missing or wrong data.
+   */
+  create(dataElements) {
+    const srContent = getSRContent(dataElements);
+
+    let annotationGroup;
+    let srType;
+    if (this.#isTid1500AnnotationDicomSR(dataElements)) {
+      srType = 'TID 1500 SR';
+      annotationGroup = this.#tid1500ToAnnotationGroup(srContent);
+    } else if (this.#isDwv034AnnotationDicomSR(dataElements)) {
+      logger.warn('DWV v0.34 annotation');
+      srType = 'DWV v0.34 SR';
+      annotationGroup = this.#dwv034MeasGroupToAnnotationGroup(srContent);
+    }
+
+    // CAD report
+    if (this.#isTid4100DicomSR(dataElements)) {
+      srType = 'TID 4100 SR';
+      const report = this.createCADReport(dataElements);
+      if (typeof report !== 'undefined') {
+        annotationGroup = report.annotationGroups[0];
+        // console.log('-- CAD report -- ');
+        // console.log('comment', report.comment);
+        // console.log('evaluations', report.responseEvaluations);
+      }
+    }
+
+    if (typeof annotationGroup === 'undefined') {
+      throw new Error('Cannot create annotation group from ' + srType);
+    }
+
+    // add dicom meta
+    this.#addMetaToAnnotationGroup(annotationGroup, dataElements);
 
     return annotationGroup;
+  }
+
+  /**
+   * Get an {@link CADReport} object from the read DICOM file.
+   *
+   * @param {Object<string, DataElement>} dataElements The DICOM tags.
+   * @returns {CADReport|undefined} A new CAD report.
+   */
+  createCADReport(dataElements) {
+    const srContent = getSRContent(dataElements);
+
+    // get the summary
+    const summary = this.#getTid4100Summary(srContent);
+    if (typeof summary === 'undefined') {
+      logger.warn('No CAD processing and Findings Summary in TID 4100 SR');
+      return;
+    }
+
+    let annotationGroups = [];
+    if (this.#isTid4100DicomSR(dataElements)) {
+      annotationGroups = this.#cadProcessingSummaryToAnnotationGroups(summary);
+    }
+
+    if (typeof annotationGroups === 'undefined') {
+      throw new Error('Cannot create annotation groups from TID 4100 SR');
+    }
+
+    // add dicom meta
+    for (const group of annotationGroups) {
+      this.#addMetaToAnnotationGroup(group, dataElements);
+    }
+
+    // evaluations
+    const evaluations = [];
+    let comment;
+    for (const item of summary.contentSequence) {
+      // measurement group content
+      if (this.#isResponseEvaluationItem(item)) {
+        const evaluation = this.#tid4106ResponseEvaluationToResponse(item);
+        if (typeof evaluation !== 'undefined') {
+          evaluations.push(evaluation);
+        }
+      } else if (this.#isCommentItem(item)) {
+        comment = item.value;
+      }
+    }
+
+    const report = new CADReport();
+    report.annotationGroups = annotationGroups;
+    report.responseEvaluations = evaluations;
+    report.comment = comment;
+
+    return report;
   }
 
   /**
@@ -1219,8 +1590,7 @@ export class AnnotationGroupFactory {
   /**
    * Get the SR content for a response evaluation.
    *
-   * @param {object|undefined} response The response evaluation
-   * as {current, measure}.
+   * @param {ResponseEvaluation|undefined} response The response evaluation.
    * @returns {DicomSRContent} The SR content.
    */
   #responseToTid4106ResponseEvaluation(response) {
@@ -1269,19 +1639,44 @@ export class AnnotationGroupFactory {
   }
 
   /**
-   * Convert a annotation groups into a DICOM CAD report SR object using
-   * the TID 4100 template.
+   * Convert a TID 4106 response evaluation into an response evaluation.
    *
-   * @param {AnnotationGroup[]} annotationGroups The annotation groups.
-   * @param {object[]} responseEvaluations List of response evaluations
-   * as {current, measure}.
-   * @param {string} comment Report comment.
+   * @param {DicomSRContent} content The SR content.
+   * @returns {ResponseEvaluation|undefined} The response.
+   */
+  #tid4106ResponseEvaluationToResponse(content) {
+    let currentResponse;
+    let measure;
+    for (const item of content.contentSequence) {
+      if (this.#isCurrentResponseItem(item)) {
+        currentResponse = item.value;
+      } else if (this.#isMeasurementOfResponseItem(item)) {
+        measure = item.value.measuredValue.numericValue;
+      }
+    }
+
+    let response;
+    if (typeof currentResponse !== 'undefined') {
+      response = new ResponseEvaluation();
+      response.current = currentResponse;
+      if (typeof measure !== 'undefined') {
+        response.measure = measure;
+      }
+    }
+    return response;
+  }
+
+  /**
+   * Convert a CAD report into a DICOM CAD report SR object using
+   *   the TID 4100 template.
+   *
+   * @param {CADReport} report The CAD report.
    * @param {Object<string, any>} [extraTags] Optional list of extra tags.
    * @returns {Object<string, DataElement>} A list of dicom elements.
    */
-  toDicomCADReport(annotationGroups, responseEvaluations, comment, extraTags) {
+  toDicomCADReport(report, extraTags) {
     // first group as tag base
-    let tags = annotationGroups[0].getMeta();
+    let tags = report.annotationGroups[0].getMeta();
 
     // transfer syntax: ExplicitVRLittleEndian
     tags.TransferSyntaxUID = '1.2.840.10008.1.2.1';
@@ -1313,7 +1708,7 @@ export class AnnotationGroupFactory {
     }
     const refs = refSopSq.value;
     // add reference if not yet present
-    for (const annotationGroup of annotationGroups) {
+    for (const annotationGroup of report.annotationGroups) {
       for (const annotation of annotationGroup.getList()) {
         const ref = {
           ReferencedSOPInstanceUID: annotation.referencedSopInstanceUID,
@@ -1350,24 +1745,24 @@ export class AnnotationGroupFactory {
     srSummary.contentSequence = [];
 
     // response evaluation
-    for (const response of responseEvaluations) {
+    for (const response of report.responseEvaluations) {
       const srResponse =
         this.#responseToTid4106ResponseEvaluation(response);
       srSummary.contentSequence.push(srResponse);
     }
 
     // findings
-    for (const annotationGroup of annotationGroups) {
+    for (const annotationGroup of report.annotationGroups) {
       this.#addAnnotationGroupToTid4101Sequence(
         annotationGroup, srSummary.contentSequence);
     }
 
-    // comment
-    if (typeof comment !== 'undefined') {
+    // comment (not part of TID 4100)
+    if (typeof report.comment !== 'undefined') {
       const srComment = new DicomSRContent(ValueTypes.text);
       srComment.relationshipType = RelationshipTypes.contains;
       srComment.conceptNameCode = getDcmDicomCode(DcmCodes.Comment);
-      srComment.value = comment;
+      srComment.value = report.comment;
       srSummary.contentSequence.push(srComment);
     }
 
