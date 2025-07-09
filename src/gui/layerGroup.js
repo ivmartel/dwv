@@ -7,6 +7,7 @@ import {logger} from '../utils/logger.js';
 import {precisionRound} from '../utils/string.js';
 import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
+import {SOPClassUIDs} from '../dicom/dictionary.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1127,9 +1128,14 @@ export class LayerGroup {
     }
 
     const SOPClassUID = baseLayer.getViewController().getSopClassUid();
+    if (typeof SOPClassUID === 'undefined' || SOPClassUID === null) {
+      // We don't know what it is, assume it is a normal scan
+      return true;
+    }
+
     const dontSync =
       // Secondary Capture
-      SOPClassUID.startsWith('1.2.840.10008.5.1.4.1.1.7');
+      SOPClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
 
     return !dontSync;
   }
