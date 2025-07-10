@@ -1115,7 +1115,7 @@ export class LayerGroup {
   }
 
   /**
-   * Returns whether or not a layer group should have its zoom/pan/etc.
+   * Returns whether or not a layer group should have its zoom/pan/etc
    * synced to other views. Used for things like Secondary Capture where
    * there is no meaningful real-world scale.
    *
