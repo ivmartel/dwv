@@ -525,7 +525,7 @@ function setup() {
     }
 
     // show crosshair depending on layout
-    if (layout !== 'one') {
+    if (layout === 'mpr') {
       const divIds = getLayerGroupDivIds(configs);
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
@@ -777,7 +777,8 @@ function getOnebyOneDataViewConfig(dataIds) {
 }
 
 /**
- * Create 1*2 view config(s).
+ * Create 1*2 view config(s): even data ids will go
+ * in one layer group and odds in the other one.
  *
  * @param {Array} dataIds The list of dataIds.
  * @returns {object} The view config.
@@ -787,7 +788,7 @@ function getOnebyTwoDataViewConfig(dataIds) {
   for (let i = 0; i < dataIds.length; ++i) {
     const dataId = dataIds[i];
     let newConfig;
-    if (i % 2 === 0) {
+    if (dataId % 2 === 0) {
       newConfig = getViewConfig('side', 'layerGroup0');
     } else {
       newConfig = getViewConfig('side', 'layerGroup1');
