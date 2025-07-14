@@ -6,6 +6,11 @@ import {webpackCommon} from './webpack.common.js';
 export default merge(webpackCommon, {
   mode: 'development',
   devtool: 'inline-source-map',
+  output: {
+    // web workers public path
+    // (generated at root for dev)
+    workerPublicPath: '/'
+  },
   entry: {
     viewer: './tests/pacs/viewer.js',
     dcmweb: './tests/pacs/dcmweb.js',
