@@ -46,6 +46,30 @@ export class DicomData {
   constructor(meta) {
     this.meta = meta;
   }
+
+  /**
+   * Set the image complete flag (for image data).
+   *
+   * @param {boolean} flag True if the image is complete.
+   */
+  setComplete(flag) {
+    if (typeof this.image !== 'undefined') {
+      this.image.setComplete(flag);
+    }
+  }
+
+  /**
+   * Get the image complete flag (for image data).
+   *
+   * @returns {boolean|undefined} True if the image is complete.
+   */
+  getComplete() {
+    let res;
+    if (typeof this.image !== 'undefined') {
+      res = this.image.getComplete();
+    }
+    return res;
+  }
 }
 
 /*
@@ -345,6 +369,18 @@ export class DataController {
       type: 'dataupdate',
       dataid: dataId
     });
+  }
+
+  /**
+   * Mark a data a complete (fully loaded).
+   *
+   * @param {string} dataId The data id.
+   */
+  markDataAsComplete(dataId) {
+    if (typeof this.#dataList[dataId] === 'undefined') {
+      throw new Error('Cannot find data to mark as complete: ' + dataId);
+    }
+    this.#dataList[dataId].setComplete(true);
   }
 
   /**

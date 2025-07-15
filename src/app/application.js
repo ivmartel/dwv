@@ -1766,6 +1766,9 @@ export class App {
    * @param {object} event The load event.
    */
   #onload = (event) => {
+    // mark data as complete
+    this.#dataController.markDataAsComplete(event.dataid);
+
     /**
      * Load event: fired when a load finishes successfully.
      *

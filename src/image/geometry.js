@@ -65,13 +65,6 @@ export class Geometry {
   #orientation = getIdentityMat33();
 
   /**
-   * Flag to know if new origins were added.
-   *
-   * @type {boolean}
-   */
-  #newOrigins = false;
-
-  /**
    * @param {Point3D[]} origins The object origins.
    * @param {Size} size The object size.
    * @param {Spacing} spacing The object spacing.
@@ -218,7 +211,7 @@ export class Geometry {
    * Calculate slice spacing from origins and replace current
    *   if needed.
    */
-  #updateSliceSpacing() {
+  updateSliceSpacing() {
     const geoSliceSpacing = getSliceGeometrySpacing(this.#origins);
     // update local if needed
     if (typeof geoSliceSpacing !== 'undefined') {
@@ -243,11 +236,6 @@ export class Geometry {
    * @returns {Spacing} The object spacing.
    */
   getSpacing(viewOrientation) {
-    // update slice spacing after appendSlice
-    if (this.#newOrigins) {
-      this.#updateSliceSpacing();
-      this.#newOrigins = false;
-    }
     let res = this.#spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
       let orientedValues = getOrientedArray3D(
@@ -356,8 +344,6 @@ export class Geometry {
       if (typeof found !== 'undefined') {
         throw new Error('Cannot append same origin twice');
       }
-      // update flag
-      this.#newOrigins = true;
       // add in origin array
       this.#origins.splice(index, 0, origin);
       // increment second dimension

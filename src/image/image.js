@@ -249,6 +249,13 @@ export class Image {
   #labelingThread;
 
   /**
+   * Image complete flag, default to false.
+   *
+   * @type {boolean}
+   */
+  #complete = false;
+
+  /**
    * @param {Geometry} geometry The geometry of the image.
    * @param {TypedArray} buffer The image data as a one dimensional buffer.
    * @param {string[]} [imageUids] An array of Uids indexed to slice number.
@@ -261,6 +268,27 @@ export class Image {
 
     this.#numberOfComponents = this.#buffer.length / (
       this.#geometry.getSize().getTotalSize());
+  }
+
+  /**
+   * Set the image complete flag.
+   *
+   * @param {boolean} flag True if the data is complete.
+   */
+  setComplete(flag) {
+    this.#complete = flag;
+    if (flag) {
+      this.#geometry.updateSliceSpacing();
+    }
+  }
+
+  /**
+   * Get the image complete flag.
+   *
+   * @returns {boolean} True if the data is complete.
+   */
+  getComplete() {
+    return this.#complete;
   }
 
   /**
