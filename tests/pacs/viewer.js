@@ -10,6 +10,7 @@ import {getAsSimpleElements} from '../../src/dicom/dicomTag.js';
 import {getSRContent} from '../../src/dicom/dicomSRContent.js';
 import {getDwvVersion} from '../../src/dicom/dicomParser.js';
 import {Point} from '../../src/math/point.js';
+import {Matrix33} from '../../src/math/matrix.js';
 
 import {
   getViewConfig,
@@ -217,6 +218,18 @@ function viewerSetup() {
       resetViewsButton.disabled = false;
       const smoothingChk = document.getElementById('changesmoothing');
       smoothingChk.disabled = false;
+
+      const rotateXButton = document.getElementById('rotate-x');
+      rotateXButton.disabled = false;
+      const rotateYButton = document.getElementById('rotate-y');
+      rotateYButton.disabled = false;
+      const rotateZButton = document.getElementById('rotate-z');
+      rotateZButton.disabled = false;
+      const rotateMatchButton = document.getElementById('rotate-match');
+      rotateMatchButton.disabled = false;
+      const rotateResetButton = document.getElementById('rotate-reset');
+      rotateResetButton.disabled = false;
+
       // remove handler
       _app.removeEventListener('renderend', onRenderEnd);
     }
@@ -483,6 +496,99 @@ function setup() {
     _app.resetZoomPan();
   });
 
+  const rotateXButton = document.getElementById('rotate-x');
+  rotateXButton.disabled = true;
+  rotateXButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      1, 0, 0,
+      0, Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1),
+      0, Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1)
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateYButton = document.getElementById('rotate-y');
+  rotateYButton.disabled = true;
+  rotateYButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      Math.cos(Math.PI * 0.1), 0, -Math.sin(Math.PI * 0.1),
+      0, 1, 0,
+      Math.sin(Math.PI * 0.1), 0, Math.cos(Math.PI * 0.1)
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateZButton = document.getElementById('rotate-z');
+  rotateZButton.disabled = true;
+  rotateZButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    const image = _app.getImage(dataId);
+    const geometry = image.getGeometry();
+
+    /* eslint-disable @stylistic/js/array-element-newline */
+    const rotation = new Matrix33([
+      Math.cos(Math.PI * 0.1), -Math.sin(Math.PI * 0.1), 0,
+      Math.sin(Math.PI * 0.1), Math.cos(Math.PI * 0.1), 0,
+      0, 0, 1
+    ]);
+    /* eslint-enable @stylistic/js/array-element-newline */
+
+    const newOrientation = rotation.multiply(geometry.getOrientation());
+
+    _app.resample(dataId, newOrientation);
+  });
+
+  const rotateMatchButton = document.getElementById('rotate-match');
+  rotateMatchButton.disabled = true;
+  rotateMatchButton.addEventListener('click', function () {
+    const lg0 = _app.getLayerGroupByDivId('layerGroup0');
+    const vl0 = lg0.getBaseViewLayer();
+    const dataId0 = vl0.getDataId();
+
+    const lg1 = _app.getLayerGroupByDivId('layerGroup1');
+    const vl1 = lg1.getBaseViewLayer();
+    const dataId1 = vl1.getDataId();
+
+    _app.resampleMatch(dataId0, dataId1);
+  });
+
+  const rotateResetButton = document.getElementById('rotate-reset');
+  rotateResetButton.disabled = true;
+  rotateResetButton.addEventListener('click', function () {
+    const lg = _app.getLayerGroupByDivId('layerGroup0');
+    const vl = lg.getBaseViewLayer();
+    const dataId = vl.getDataId();
+
+    _app.revertResample(dataId);
+  });
+
   const changeLayoutSelect = document.getElementById('changelayout');
   changeLayoutSelect.disabled = true;
   changeLayoutSelect.addEventListener('change', function (event) {
@@ -530,6 +636,12 @@ function setup() {
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
+    }
+
+    if (layout === 'side') {
+      rotateMatchButton.style = 'visibility: visible;';
+    } else {
+      rotateMatchButton.style = 'visibility: collapse;';
     }
 
     // need to set tool after config change
