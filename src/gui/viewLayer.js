@@ -113,6 +113,27 @@ export class ViewLayer {
   #flipScale = {x: 1, y: 1, z: 1};
 
   /**
+   * The fit size as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #containerSize = {x: 1, y: 1};
+
+  /**
+   * The div to world size ratio.
+   *
+   * @type {number}
+   */
+  #divToWorldSizeRatio = 1;
+
+  /**
+   * The fit offset as {x,y}.
+   *
+   * @type {Scalar2D}
+   */
+  #fitOffset = {x: 1, y: 1};
+
+  /**
    * The full layer offset: sum of all other offsets.
    *
    * @type {Scalar2D}
@@ -347,26 +368,59 @@ export class ViewLayer {
     // event.value = [index]
     if (this.#dataId === event.dataid) {
       const vcSize = this.#viewController.getImageSize().get2D();
-      if (this.#baseSize.x !== vcSize.x ||
-        this.#baseSize.y !== vcSize.y) {
-        // size changed, recalculate base offset
+      const vcSpacing = this.#viewController.getImageSpacing().get2D();
+
+      const sizeChanged =
+          this.#baseSize.x !== vcSize.x ||
+          this.#baseSize.y !== vcSize.y;
+
+      const spacingChanged =
+          this.#baseSpacing.x !== vcSpacing.x ||
+          this.#baseSpacing.y !== vcSpacing.y;
+
+      if (spacingChanged) {
+        this.#viewController.updatePlaneHelper();
+        // update base spacing
+        this.#setBaseSpacing(vcSpacing);
+      }
+
+      if (sizeChanged) {
+        // size/spacing changed, recalculate base offset
         // in case origin changed
         if (typeof this.#layerGroupOrigin !== 'undefined' &&
-          typeof this.#layerGroupOrigin0 !== 'undefined') {
+            typeof this.#layerGroupOrigin0 !== 'undefined') {
           const origin0 = this.#viewController.getOrigin();
           const scrollOffset = this.#layerGroupOrigin0.minus(origin0);
           const origin = this.#viewController.getOrigin(
             this.#viewController.getCurrentPosition()
           );
-          const planeOffset = this.#layerGroupOrigin.minus(origin);
-          this.setBaseOffset(scrollOffset, planeOffset);
+          if (typeof origin !== 'undefined') {
+            const planeOffset = this.#layerGroupOrigin.minus(origin);
+            this.setBaseOffset(scrollOffset, planeOffset);
+          }
         }
         // update base size
         this.#setBaseSize(vcSize);
+      }
+
+      if (spacingChanged || sizeChanged) {
         // flag update and draw
         this.#needsDataUpdate = true;
         this.draw();
       }
+    }
+  };
+
+  /**
+   * Handle an image resampled event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimageresampled = (event) => {
+    if (this.#dataId === event.dataid) {
+      this.#needsDataUpdate = true;
+      this.draw();
     }
   };
 
@@ -854,6 +908,20 @@ export class ViewLayer {
   }
 
   /**
+   * Set the base spacing of the layer.
+   *
+   * @param {Scalar2D} spacing The spacing as {x,y}.
+   */
+  #setBaseSpacing(spacing) {
+    this.#baseSpacing = spacing;
+    this.fitToContainer(
+      this.#containerSize,
+      this.#divToWorldSizeRatio,
+      this.#fitOffset
+    );
+  }
+
+  /**
    * Fit the layer to its parent container.
    *
    * @param {Scalar2D} containerSize The fit size as {x,y}.
@@ -952,6 +1020,10 @@ export class ViewLayer {
       // update draw flag
       needsDraw = true;
     }
+
+    this.#containerSize = containerSize;
+    this.#divToWorldSizeRatio = divToWorldSizeRatio;
+    this.#fitOffset = fitOffset;
 
     // draw if needed
     if (needsDraw) {

@@ -30,25 +30,6 @@ import {DrawShapeHandler} from './drawShapeHandler.js';
 
 /**
  * Drawing tool.
- *
- * This tool is responsible for the draw of layer group structure.
- *
- * ```
- * drawLayer
- * |_ positionGroup: {name="position-group", id="#2-0#_#3-1"}
- *    |_ shapeGroup: {name="{shape name}-group", id="#"}
- *       |_ shape: {name="shape"},
- *       |_ label: {name="label"},
- *       |_ extra: line tick, protractor arc...
- * ```
- *
- * Discussion:
- * - posGroup > shapeGroup:
- *   (pro) slice/frame display: 1 loop -
- *   (cons) multi-slice shape splitted in positionGroups.
- * - shapeGroup > posGroup:
- *   (pros) more logical -
- *   (cons) slice/frame display: 2 loops.
  */
 export class Draw {
 
@@ -506,13 +487,32 @@ export class Draw {
   }
 
   /**
+   * Chack if the base image is resampled.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   * @returns {boolean} True if the image is resampled.
+   */
+  #isResampled(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const referenceDataId = viewLayer.getDataId();
+    const referenceData = this.#app.getData(referenceDataId);
+    const image = referenceData.image;
+
+    return image.isResampled();
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
    */
   mousedown = (event) => {
     // exit if not started draw
-    if (this.#isDrawing) {
+    if (this.#isDrawing || this.#isResampled(event)) {
       return;
     }
     const mousePoint = getMousePoint(event);

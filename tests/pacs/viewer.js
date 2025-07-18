@@ -213,12 +213,10 @@ function viewerSetup() {
       toolsFieldset.disabled = false;
       const changeLayoutSelect = document.getElementById('changelayout');
       changeLayoutSelect.disabled = false;
-      const resetLayoutButton = document.getElementById('resetlayout');
-      resetLayoutButton.disabled = false;
+      const resetViewsButton = document.getElementById('resetviews');
+      resetViewsButton.disabled = false;
       const smoothingChk = document.getElementById('changesmoothing');
       smoothingChk.disabled = false;
-      const swapViewsButton = document.getElementById('swapviews');
-      swapViewsButton.disabled = false;
       // remove handler
       _app.removeEventListener('renderend', onRenderEnd);
     }
@@ -479,53 +477,10 @@ function setup() {
     );
   });
 
-  const resetLayoutButton = document.getElementById('resetlayout');
-  resetLayoutButton.disabled = true;
-  resetLayoutButton.addEventListener('click', function () {
-    _app.resetLayout();
-  });
-
-  const swapViewsButton = document.getElementById('swapviews');
-  swapViewsButton.disabled = true;
-  swapViewsButton.addEventListener('click', function () {
-    const currentConfigs = _app.getDataViewConfigs();
-
-    const newConfigs = {};
-    for (const key in currentConfigs) {
-      const currentGroup = currentConfigs[key];
-      const newGroup = [];
-      for (let i = 0; i < currentGroup.length; i++) {
-        const newConfig = currentGroup[i];
-        if (newConfig.divId === 'layerGroup0') {
-          newConfig.divId = 'layerGroup1';
-        } else if (newConfig.divId === 'layerGroup1') {
-          newConfig.divId = 'layerGroup0';
-        }
-        newGroup.push(newConfig);
-      }
-      newConfigs[key] = newGroup;
-    }
-
-    // clear data table
-    dataTable.clearDataTable();
-
-    // set config (deletes previous layers)
-    _app.setDataViewConfigs(newConfigs);
-
-    // re-render
-    const dataIds = _app.getDataIds();
-    for (let i = 0; i < dataIds.length; ++i) {
-      _app.render(dataIds[i]);
-    }
-
-    // re-enable crosshairs
-    const divIds = getLayerGroupDivIds(newConfigs);
-    for (const divId of divIds) {
-      _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
-    }
-
-    // need to set tool after config change
-    setAppTool();
+  const resetViewsButton = document.getElementById('resetviews');
+  resetViewsButton.disabled = true;
+  resetViewsButton.addEventListener('click', function () {
+    _app.resetZoomPan();
   });
 
   const changeLayoutSelect = document.getElementById('changelayout');
@@ -570,17 +525,11 @@ function setup() {
     }
 
     // show crosshair depending on layout
-    if (layout !== 'one') {
+    if (layout === 'mpr') {
       const divIds = getLayerGroupDivIds(configs);
       for (const divId of divIds) {
         _app.getLayerGroupByDivId(divId).setShowCrosshair(true);
       }
-    }
-
-    if (layout === 'side') {
-      swapViewsButton.style = 'visibility: visible;';
-    } else {
-      swapViewsButton.style = 'visibility: collapse;';
     }
 
     // need to set tool after config change
@@ -828,7 +777,8 @@ function getOnebyOneDataViewConfig(dataIds) {
 }
 
 /**
- * Create 1*2 view config(s).
+ * Create 1*2 view config(s): even data ids will go
+ * in one layer group and odds in the other one.
  *
  * @param {Array} dataIds The list of dataIds.
  * @returns {object} The view config.
@@ -838,7 +788,7 @@ function getOnebyTwoDataViewConfig(dataIds) {
   for (let i = 0; i < dataIds.length; ++i) {
     const dataId = dataIds[i];
     let newConfig;
-    if (i % 2 === 0) {
+    if (dataId % 2 === 0) {
       newConfig = getViewConfig('side', 'layerGroup0');
     } else {
       newConfig = getViewConfig('side', 'layerGroup1');

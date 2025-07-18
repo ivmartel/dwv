@@ -946,6 +946,7 @@ export class Brush extends EventTarget {
       return [];
     }
     const viewController = viewLayer.getViewController();
+    const savedPosition = viewController.getCurrentPosition();
 
     const searchMaskMeta = {
       Modality: 'SEG'
@@ -989,19 +990,27 @@ export class Brush extends EventTarget {
       const planePos = viewLayer.displayToPlanePos(mousePoint);
       sourcePosition = viewController.getPositionFromPlanePoint(planePos);
       // create mask (sets this.#mask)
-      this.#maskDataId = this.#createMask(sourcePosition, sourceImage);
+      this.#maskDataId = this.#createMask(savedPosition, sourceImage);
       // check
       if (typeof this.#mask === 'undefined') {
         throw new Error(ERROR_MESSAGES.brush.noCreatedMaskImage);
       }
       // display mask
       const divId = layerGroup.getDivId();
-      if (typeof divId !== 'undefined') {
+      const layerGroupHasDiv = typeof divId !== 'undefined';
+      if (layerGroupHasDiv) {
         this.#displayMask(divId);
       }
       // newly create mask case: find the SEG view layer
       maskVl = this.#getLayerGroupMaskViewLayer(layerGroup);
       maskVc = maskVl.getViewController();
+
+      if (layerGroupHasDiv) {
+        // this.#displayMask causes the position to get reset,
+        // so we have to restore it or we may not be drawing on
+        // the correct slice.
+        maskVc.setCurrentPosition(savedPosition);
+      }
     }
 
     const sourceGeometry = sourceImage.getGeometry();
@@ -1088,12 +1097,31 @@ export class Brush extends EventTarget {
   }
 
   /**
+   * Chack if the base image is resampled.
+   *
+   * @param {MouseEvent} event The mouse down event.
+   * @returns {boolean} True if the image is resampled.
+   */
+  #isResampled(event) {
+    const layerDetails = getLayerDetailsFromEvent(event);
+    const layerGroup = this.#app.getLayerGroupByDivId(
+      layerDetails.groupDivId
+    );
+    const viewLayer = layerGroup.getBaseViewLayer();
+    const referenceDataId = viewLayer.getDataId();
+    const referenceData = this.#app.getData(referenceDataId);
+    const image = referenceData.image;
+
+    return image.isResampled();
+  }
+
+  /**
    * Handle mouse down event.
    *
    * @param {MouseEvent} event The mouse down event.
    */
   mousedown = (event) => {
-    if (this.#isInBlackList(event)) {
+    if (this.#isInBlackList(event) || this.#isResampled(event)) {
       return;
     }
     if (typeof this.#selectedSegmentNumber === 'undefined') {

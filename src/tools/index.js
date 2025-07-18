@@ -22,6 +22,7 @@ import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
  * the default ones.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, toolList} from '//esm.sh/dwv';
  * // custom tool
  * class AlertTool {
  *   mousedown() {alert('AlertTool mousedown');}
@@ -29,13 +30,13 @@ import {Filter, Threshold, Sobel, Sharpen} from './filter.js';
  *   activate() {}
  * }
  * // pass it to dwv tool list
- * dwv.toolList['Alert'] = AlertTool;
+ * toolList['Alert'] = AlertTool;
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * options.tools = {Alert: {}};
  * app.init(options);
  * // activate tool
@@ -56,6 +57,8 @@ export const toolList = {};
  * the default ones.
  *
  * @example
+ * import {App, AppOptions, ViewConfig, toolOptions, ROI, Point2D}
+ *   from '//esm.sh/dwv';
  * // custom factory
  * class LoveFactory {
  *   getName() {return 'love';}
@@ -65,10 +68,10 @@ export const toolList = {};
  *   setAnnotationMathShape(annotation, points) {
  *     const px = points[0].getX();
  *     const py = points[0].getY();
- *     annotation.mathShape = new dwv.ROI([
- *       new dwv.Point2D(px+15,py), new dwv.Point2D(px+10,py-10),
- *       new dwv.Point2D(px,py), new dwv.Point2D(px-10,py-10),
- *       new dwv.Point2D(px-15,py), new dwv.Point2D(px,py+20)
+ *     annotation.mathShape = new ROI([
+ *       new Point2D(px+15,py), new Point2D(px+10,py-10),
+ *       new Point2D(px,py), new Point2D(px-10,py-10),
+ *       new Point2D(px-15,py), new Point2D(px,py+20)
  *     ]);
  *     annotation.getFactory = function () {return new LoveFactory();}
  *   }
@@ -95,13 +98,13 @@ export const toolList = {};
  *   }
  * }
  * // pass it to dwv option list
- * dwv.toolOptions['draw'] = {LoveFactory};
+ * toolOptions['draw'] = {LoveFactory};
  * // create the dwv app
- * const app = new dwv.App();
+ * const app = new App();
  * // initialise
- * const viewConfig0 = new dwv.ViewConfig('layerGroup0');
+ * const viewConfig0 = new ViewConfig('layerGroup0');
  * const viewConfigs = {'*': [viewConfig0]};
- * const options = new dwv.AppOptions(viewConfigs);
+ * const options = new AppOptions(viewConfigs);
  * options.tools = {Draw: {options: ['Love']}};
  * app.init(options);
  * // activate tool

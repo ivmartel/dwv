@@ -212,6 +212,7 @@ export class PositionHelper {
         'Cannot merge helper of a view with different orientation'
       );
     }
+
     // merge geometries
     this.#geometry = mergeGeometries(this.#geometry, rhs.getGeometry());
   }

@@ -96,7 +96,7 @@ export default [
       '@stylistic/js/keyword-spacing': 'error',
       // no space before function call (default: never)
       // https://eslint.style/rules/js/function-call-spacing
-      '@stylistic/js/func-call-spacing': 'error',
+      '@stylistic/js/function-call-spacing': 'error',
       // spacing around colon
       // (default: {'beforeColon': false, 'afterColon': true})
       // https://eslint.style/rules/js/key-spacing

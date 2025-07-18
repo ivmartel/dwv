@@ -155,8 +155,11 @@ export class App {
     render(dataId: string, viewConfigs?: ViewConfig[]): void;
     reset(): void;
     resetDisplay(): void;
+    // @deprecated
     resetLayout(): void;
+    resetViews(): void;
     resetZoom(): void;
+    resetZoomPan(): void;
     setActiveLayerGroup(index: number): void;
     // @deprecated
     setColourMap(name: string): void;
@@ -690,10 +693,14 @@ export class LayerGroup {
     removeLayer(layer: ViewLayer | DrawLayer): void;
     removeLayersByDataId(dataId: string): void;
     removeTooltipDiv(): void;
+    // @deprecated
     reset(): void;
+    resetViews(): void;
+    resetZoomPan(): void;
     searchViewLayers(meta: object): ViewLayer[];
     setActiveLayer(index: number): void;
     setActiveLayerByDataId(dataId: string): void;
+    setActiveLayerById(id: string): void;
     setImageSmoothing(flag: boolean): void;
     setOffset(newOffset: Scalar3D): void;
     setScale(newScale: Scalar3D, center?: Point3D): void;
@@ -1217,6 +1224,8 @@ export class ViewController {
     isPositionInBounds(position?: Point): boolean;
     moreThanOne(dim: number): boolean;
     play(): void;
+    resetPosition(): void;
+    resetWindowLevel(): void;
     setColourMap(name: string): void;
     setCurrentIndex(index: Index, silent?: boolean): boolean;
     setCurrentPosition(pos: Point, silent?: boolean): boolean;

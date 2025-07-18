@@ -626,8 +626,18 @@ export declare class App {
     reset(): void;
     /**
      * Reset the layout of the application.
+     *
+     * @deprecated Since v0.35, prefer resetZoomPan.
      */
     resetLayout(): void;
+    /**
+     * Reset the zoom and pan of the stage.
+     */
+    resetZoomPan(): void;
+    /**
+     * Reset the position and window level of the stage.
+     */
+    resetViews(): void;
     /**
      * Add an event listener to this class.
      *
@@ -3350,6 +3360,12 @@ export declare class LayerGroup {
      */
     setActiveLayer(index: number): void;
     /**
+     * Set the active layer with a layer id.
+     *
+     * @param {string} id The layer id.
+     */
+    setActiveLayerById(id: string): void;
+    /**
      * Set the active layer with a data id.
      *
      * @param {string} dataId The data id.
@@ -3483,8 +3499,18 @@ export declare class LayerGroup {
     setOffset(newOffset: Scalar3D): void;
     /**
      * Reset the stage to its initial scale and no offset.
+     *
+     * @deprecated Since v0.35, prefer resetZoomPan.
      */
     reset(): void;
+    /**
+     * Reset the zoom and pan of all layers.
+     */
+    resetZoomPan(): void;
+    /**
+     * Reset the position and window level of all view layers.
+     */
+    resetViews(): void;
     /**
      * Draw the layer.
      */
@@ -5736,6 +5762,14 @@ export declare class ViewController {
      * Initialise the controller.
      */
     initialise(): void;
+    /**
+     * Reset the window level.
+     */
+    resetWindowLevel(): void;
+    /**
+     * Reset the position.
+     */
+    resetPosition(): void;
     /**
      * Get the image modality.
      *

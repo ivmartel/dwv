@@ -62,15 +62,16 @@ export function createView(elements, image) {
  * (either directly or with helper methods).
  *
  * @example
+ * import {DicomParser, createImage, createView} from '//esm.sh/dwv';
  * // XMLHttpRequest onload callback
  * const onload = function (event) {
  *   // parse the dicom buffer
- *   const dicomParser = new dwv.DicomParser();
+ *   const dicomParser = new DicomParser();
  *   dicomParser.parse(event.target.response);
  *   // create the image object
- *   const image = dwv.createImage(dicomParser.getDicomElements());
+ *   const image = createImage(dicomParser.getDicomElements());
  *   // create the view
- *   const view = dwv.createView(dicomParser.getDicomElements(), image);
+ *   const view = createView(dicomParser.getDicomElements(), image);
  *   // setup canvas
  *   const canvas = document.createElement('canvas');
  *   canvas.width = 256;
@@ -82,7 +83,7 @@ export function createView(elements, image) {
  *   ctx.putImageData(imageData, 0, 0);
  *   // update html
  *   const div = document.getElementById('dwv');
- *   div.appendChild(canvas);;
+ *   div.appendChild(canvas);
  * };
  * // DICOM file request
  * const request = new XMLHttpRequest();
@@ -321,7 +322,9 @@ export class View {
       typeof this.#windowPresets[this.#currentPresetName] !== 'undefined' &&
       typeof this.#windowPresets[this.#currentPresetName].perslice !==
         'undefined' &&
-      this.#windowPresets[this.#currentPresetName].perslice === true) {
+      this.#windowPresets[this.#currentPresetName].perslice === true &&
+      // TODO: we currently can't handle per-slice wl on resampled images
+      !this.#image.isResampled()) {
       // check position
       if (!this.getCurrentIndex()) {
         this.setInitialIndex();
@@ -827,7 +830,9 @@ export class View {
     let wl = preset.wl[0];
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
-      preset.perslice === true) {
+      preset.perslice === true &&
+      // TODO: we currently can't handle per-slice wl on resampled images
+      !this.#image.isResampled()) {
       const offset = this.#image.getSecondaryOffset(this.getCurrentIndex());
       wl = preset.wl[offset];
     }
