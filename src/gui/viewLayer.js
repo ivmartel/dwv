@@ -394,8 +394,10 @@ export class ViewLayer {
           const origin = this.#viewController.getOrigin(
             this.#viewController.getCurrentPosition()
           );
-          const planeOffset = this.#layerGroupOrigin.minus(origin);
-          this.setBaseOffset(scrollOffset, planeOffset);
+          if (typeof origin !== 'undefined') {
+            const planeOffset = this.#layerGroupOrigin.minus(origin);
+            this.setBaseOffset(scrollOffset, planeOffset);
+          }
         }
         // update base size
         this.#setBaseSize(vcSize);
@@ -406,6 +408,19 @@ export class ViewLayer {
         this.#needsDataUpdate = true;
         this.draw();
       }
+    }
+  };
+
+  /**
+   * Handle an image resampled event.
+   *
+   * @param {object} event The event.
+   * @function
+   */
+  onimageresampled = (event) => {
+    if (this.#dataId === event.dataid) {
+      this.#needsDataUpdate = true;
+      this.draw();
     }
   };
 

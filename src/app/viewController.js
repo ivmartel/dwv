@@ -888,6 +888,9 @@ export class ViewController {
     image.addEventListener('imagegeometrychange',
       viewLayer.onimagegeometrychange
     );
+    image.addEventListener('imageresampled',
+      viewLayer.onimageresampled
+    );
   }
 
   /**
@@ -902,6 +905,9 @@ export class ViewController {
     );
     image.removeEventListener('imagegeometrychange',
       viewLayer.onimagegeometrychange
+    );
+    image.removeEventListener('imageresampled',
+      viewLayer.onimageresampled
     );
   }
 

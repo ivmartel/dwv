@@ -10,6 +10,7 @@ import {ImageFactory} from './imageFactory.js';
 import {MaskFactory} from './maskFactory.js';
 import {isMonochrome} from '../dicom/dicomImage.js';
 import {LabelingThread} from './labelingThread.js';
+import {ResamplingThread} from './resamplingThread.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -19,6 +20,7 @@ import {NumberRange} from '../math/stats.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {RGB} from '../utils/colour.js';
 import {ColourMap} from './luts.js';
+import {Point} from '../math/point.js';
 /* eslint-enable no-unused-vars */
 
 const ML_PER_MM = 0.001; // ml/mm^3
@@ -143,6 +145,27 @@ export class Image {
   #buffer;
 
   /**
+   * Whether the image has been resampled or not.
+   *
+   * @type {boolean}
+   */
+  #resampled;
+
+  /**
+   * Data geometry, unmodified if image is resampled, null otherwise.
+   *
+   * @type {Geometry}
+   */
+  #rawGeometry;
+
+  /**
+   * Data buffer, unmodified if image is resampled, null otherwise.
+   *
+   * @type {TypedArray}
+   */
+  #rawBuffer;
+
+  /**
    * Image UIDs.
    *
    * @type {string[]}
@@ -249,6 +272,13 @@ export class Image {
   #labelingThread;
 
   /**
+   * The resampling thread.
+   *
+   * @type {ResamplingThread}
+   */
+  #resamplingThread;
+
+  /**
    * Image complete flag, default to false.
    *
    * @type {boolean}
@@ -263,8 +293,12 @@ export class Image {
   constructor(geometry, buffer, imageUids) {
     this.#geometry = geometry;
     this.#buffer = buffer;
+    this.#resampled = false;
+    this.#rawGeometry = null;
+    this.#rawBuffer = null;
     this.#imageUids = imageUids;
     this.#labelingThread = null;
+    this.#resamplingThread = null;
 
     this.#numberOfComponents = this.#buffer.length / (
       this.#geometry.getSize().getTotalSize());
@@ -1681,6 +1715,87 @@ export class Image {
     }
 
     this.#labelingThread.run(this.#buffer, this.#geometry.getSize());
+  }
+
+  /**
+   * Return if this image has been resampled.
+   *
+   * @returns {boolean} If the image has been resampled.
+   */
+  isResampled() {
+    return this.#resampled;
+  }
+
+  /**
+   * Resample this image to a new orientation.
+   *
+   * @param {Matrix33} orientation The orientation to resample to.
+   * @param {boolean|undefined} interpolated Default true, if true use bilinear
+   *  sampling, otherwise use nearest neighbor.
+   * @param {Point|undefined} centerOfRotation World space center of rotation.
+   */
+  resample(
+    orientation,
+    interpolated = undefined,
+    centerOfRotation = undefined
+  ) {
+    if (this.#resamplingThread === null) {
+      this.#resamplingThread = new ResamplingThread();
+
+      this.#resamplingThread.ondone = (event) => {
+        const data = event.data;
+        this.#buffer = data.targetImageBuffer;
+        this.#fireEvent({type: 'imageresampled'});
+      };
+    }
+
+    // If we were already resampled then resample again from the
+    // original to not degrade the data
+
+    const source = this.#resampled && this.#rawBuffer && this.#rawGeometry
+      ? {buffer: this.#rawBuffer, geometry: this.#rawGeometry}
+      : {buffer: this.#buffer, geometry: this.#geometry};
+
+    const resampled = this.#resamplingThread.run(
+      source.buffer,
+      source.geometry,
+      this.#meta.PixelRepresentation,
+      orientation,
+      typeof interpolated === 'undefined' || interpolated,
+      centerOfRotation
+    );
+
+    // if the image is already resampled we don't want to override the raw
+    if (!this.#resampled) {
+      this.#resampled = true;
+      this.#rawBuffer = this.#buffer;
+      this.#rawGeometry = this.#geometry;
+    }
+
+    this.#buffer = resampled.buffer;
+    this.#geometry = resampled.geometry;
+
+    this.#fireEvent({type: 'imagecontentchange'});
+    this.#fireEvent({type: 'imagegeometrychange'});
+  }
+
+  /**
+   * Revert a resampled image to its original state.
+   */
+  revert() {
+    if (!this.#resampled) {
+      return;
+    }
+
+    this.#resampled = false;
+    this.#buffer = this.#rawBuffer;
+    this.#geometry = this.#rawGeometry;
+    this.#rawBuffer = null;
+    this.#rawGeometry = null;
+
+    this.#fireEvent({type: 'imagecontentchange'});
+    this.#fireEvent({type: 'imagegeometrychange'});
+    this.#fireEvent({type: 'imageresampled'});
   }
 
 } // class Image

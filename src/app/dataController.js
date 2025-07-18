@@ -85,6 +85,13 @@ export class DataController {
   #dataList = {};
 
   /**
+   * List of DICOM data.
+   *
+   * @type {Object<string, DicomData>}
+   */
+  #dataListStashed = {};
+
+  /**
    * Distinct data loaded counter.
    *
    * @type {number}
@@ -204,6 +211,7 @@ export class DataController {
     // listen to image change
     image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
     image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
+    image.addEventListener('imageresampled', this.#getFireEvent(dataId));
   }
 
   /**
@@ -271,6 +279,8 @@ export class DataController {
         'imagecontentchange', this.#getFireEvent(dataId));
       data.image.addEventListener(
         'imagegeometrychange', this.#getFireEvent(dataId));
+      data.image.addEventListener(
+        'imageresampled', this.#getFireEvent(dataId));
     }
     if (typeof data.annotationGroup !== 'undefined') {
       data.annotationGroup.addEventListener(
@@ -296,6 +306,8 @@ export class DataController {
           'imagecontentchange', this.#getFireEvent(dataId));
         image.removeEventListener(
           'imagegeometrychange', this.#getFireEvent(dataId));
+        image.removeEventListener(
+          'imageresampled', this.#getFireEvent(dataId));
       }
       const annotationGroup = this.#dataList[dataId].annotationGroup;
       if (typeof annotationGroup !== 'undefined') {
@@ -321,6 +333,49 @@ export class DataController {
         dataid: dataId
       });
     }
+  }
+
+  /**
+   * Stash a data from the list.
+   *
+   * @param {string} dataId The data id.
+   */
+  stash(dataId) {
+    if (typeof this.#dataList[dataId] !== 'undefined') {
+      this.#dataListStashed[dataId] = this.#dataList[dataId];
+      this.remove(dataId);
+    }
+  }
+
+  /**
+   * Unstash a data from the list.
+   *
+   * @param {string} dataId The data id.
+   */
+  unstash(dataId) {
+    if (typeof this.#dataListStashed[dataId] !== 'undefined') {
+      this.add(dataId, this.#dataListStashed[dataId]);
+      delete this.#dataListStashed[dataId];
+    }
+  }
+
+  /**
+   * Get the list of ids in the stashed data storage.
+   *
+   * @returns {string[]} The list of data ids.
+   */
+  getStashedDataIds() {
+    return Object.keys(this.#dataListStashed);
+  }
+
+  /**
+   * Get a stashed data at a given index.
+   *
+   * @param {string} dataId The data id.
+   * @returns {DicomData|undefined} The DICOM data.
+   */
+  getStashed(dataId) {
+    return this.#dataListStashed[dataId];
   }
 
   /**

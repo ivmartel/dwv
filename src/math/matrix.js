@@ -3,6 +3,16 @@ import {Point3D} from './point.js';
 import {Index} from './index.js';
 import {logger} from '../utils/logger.js';
 
+/**
+ * List of compatible typed arrays.
+ *
+ * @typedef {(
+ *   Uint8Array | Int8Array |
+ *   Uint16Array | Int16Array |
+ *   Uint32Array | Int32Array
+ * )} TypedArray
+ */
+
 // Number.EPSILON is difference between 1 and the smallest
 // floating point number greater than 1
 // -> ~2e-16
@@ -199,6 +209,21 @@ export class Matrix33 {
   }
 
   /**
+   * Multiply this matrix by a 3D typed array.
+   *
+   * @param {TypedArray} sourceArray The input 3D array.
+   * @param {TypedArray} outArray The array to write to.
+   */
+  multiplyTypedArray3D(sourceArray, outArray) {
+    for (let i = 0; i < 3; ++i) {
+      outArray[i] = 0;
+      for (let j = 0; j < 3; ++j) {
+        outArray[i] += this.get(i, j) * sourceArray[j];
+      }
+    }
+  }
+
+  /**
    * Multiply this matrix by a 3D vector.
    *
    * @param {Vector3D} vector3D The input 3D vector.
@@ -281,6 +306,7 @@ export class Matrix33 {
    * @returns {Matrix33} The simplified matrix.
    */
   asOneAndZeros() {
+    // TODO: This breaks at 45 degree angles
     const res = [];
     for (let j = 0; j < 3; ++j) {
       const max = this.getRowAbsMax(j);
@@ -303,6 +329,15 @@ export class Matrix33 {
    */
   getThirdColMajorDirection() {
     return this.getColAbsMax(2).index;
+  }
+
+  /**
+   * Get the values of the matrix as an array.
+   *
+   * @returns {number[]} The matrix.
+   */
+  getValues() {
+    return this.#values.slice();
   }
 
 } // Matrix33

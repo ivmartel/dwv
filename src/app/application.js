@@ -697,6 +697,8 @@ export class App {
       'imagecontentchange', this.#fireEvent);
     this.#dataController.addEventListener(
       'imagegeometrychange', this.#fireEvent);
+    this.#dataController.addEventListener(
+      'imageresampled', this.#fireEvent);
     this.#dataController.addEventListener('annotationadd', this.#fireEvent);
     this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
     this.#dataController.addEventListener('annotationremove', this.#fireEvent);
@@ -1273,6 +1275,106 @@ export class App {
     const layerGroup = this.#stage.getActiveLayerGroup();
     layerGroup.addTranslation({x: tx, y: ty, z: 0});
     layerGroup.draw();
+  }
+
+  /**
+   * Resample one image to match the orientation of another.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {string} dataIdSource The source image id to copy the
+   *  orientation from.
+   */
+  resampleMatch(dataIdTarget, dataIdSource) {
+    const sourceImage = this.#dataController.get(dataIdSource);
+
+    if (
+      typeof sourceImage !== 'undefined'
+    ) {
+      const sourceOrientation =
+        sourceImage.image.getGeometry().getOrientation();
+      this.resample(dataIdTarget, sourceOrientation);
+    }
+  }
+
+  /**
+   * Resample an image to match an arbitrary orientation.
+   *
+   * @param {string} dataIdTarget The target image id to resample.
+   * @param {Matrix33} orientation The orientation to resample to.
+   */
+  resample(dataIdTarget, orientation) {
+    const targetImage = this.#dataController.get(dataIdTarget);
+
+    if (
+      typeof targetImage !== 'undefined'
+    ) {
+      targetImage.image.resample(orientation);
+
+      const configs = this.#options.dataViewConfigs;
+
+      const metaTarget = targetImage.image.getMeta();
+      const dataIds = this.#dataController.getDataIds();
+      for (let i = 0; i < dataIds.length; i++) {
+        const data = this.#dataController.get(dataIds[i]);
+
+        const meta = data.image.getMeta();
+        if (meta.Modality === 'SEG' &&
+            meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+          this.#dataController.stash(dataIds[i]);
+        }
+      }
+
+      // the image drastically changed, it is much easier to just
+      // take the view config and forcefully re-initialize it
+
+      // Only updating the configs of the affected images can cause
+      // layers to inherit some configs from their segmentation layers
+      // for some unknown reason. For now we just update all of them.
+      this.setDataViewConfigs(configs);
+      // render data (creates layers)
+      const newDataIds = this.#dataController.getDataIds();
+      for (let i = 0; i < newDataIds.length; ++i) {
+        this.render(newDataIds[i]);
+      }
+    }
+  }
+
+  /**
+   * Revert an image back to its original orientation.
+   *
+   * @param {string} dataIdTarget The target image id to revert.
+   */
+  revertResample(dataIdTarget) {
+    const targetImage = this.#dataController.get(dataIdTarget);
+
+    targetImage.image.revert();
+
+    const configs = this.#options.dataViewConfigs;
+
+    const metaTarget = targetImage.image.getMeta();
+    const dataIds = this.#dataController.getStashedDataIds();
+    for (let i = 0; i < dataIds.length; i++) {
+      const data = this.#dataController.getStashed(dataIds[i]);
+
+      const meta = data.image.getMeta();
+      if (meta.Modality === 'SEG' &&
+          meta.SeriesInstanceUID === metaTarget.SeriesInstanceUID) {
+        this.#dataController.unstash(dataIds[i]);
+      }
+    }
+
+    // the image drastically changed, it is much easier to just
+    // take the view config and forcefully re-initialize it
+
+    // Only updating the configs of the affected images can cause
+    // layers to inherit some configs from their segmentation layers
+    // for some unknown reason. For now we just update all of them.
+    this.setDataViewConfigs(configs);
+    // render data (creates layers)
+    const newDataIds = this.#dataController.getDataIds();
+    for (let i = 0; i < newDataIds.length; ++i) {
+      this.render(newDataIds[i]);
+    }
   }
 
   /**
