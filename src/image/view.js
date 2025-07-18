@@ -83,7 +83,7 @@ export function createView(elements, image) {
  *   ctx.putImageData(imageData, 0, 0);
  *   // update html
  *   const div = document.getElementById('dwv');
- *   div.appendChild(canvas);;
+ *   div.appendChild(canvas);
  * };
  * // DICOM file request
  * const request = new XMLHttpRequest();
