@@ -282,7 +282,7 @@ export class Geometry {
    * magic...
    *
    * @param {Point3D} point The point to evaluate.
-   * @param {number} time Optional time index.
+   * @param {number} [time] Optional time index.
    * @returns {number} The slice index.
    */
   getSliceIndex(point, time) {
