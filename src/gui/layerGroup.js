@@ -7,6 +7,7 @@ import {logger} from '../utils/logger.js';
 import {precisionRound} from '../utils/string.js';
 import {ViewLayer} from './viewLayer.js';
 import {DrawLayer} from './drawLayer.js';
+import {SOPClassUIDs} from '../dicom/dictionary.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -1111,6 +1112,32 @@ export class LayerGroup {
     return this.someViewLayer(function (layer) {
       return layer.getViewController().canScroll();
     });
+  }
+
+  /**
+   * Returns whether or not a layer group should have its zoom/pan/etc
+   * synced to other views. Used for things like Secondary Capture where
+   * there is no meaningful real-world scale.
+   *
+   * @returns {boolean} Whether to sync the zoom/pan.
+   */
+  shouldBind() {
+    const baseLayer = this.getBaseViewLayer();
+    if (!baseLayer) {
+      return false;
+    }
+
+    const SOPClassUID = baseLayer.getViewController().getSopClassUid();
+    if (typeof SOPClassUID === 'undefined' || SOPClassUID === null) {
+      // We don't know what it is, assume it is a normal scan
+      return true;
+    }
+
+    const dontSync =
+      // Secondary Capture
+      SOPClassUID.startsWith(SOPClassUIDs.SecondaryCapture);
+
+    return !dontSync;
   }
 
   /**
