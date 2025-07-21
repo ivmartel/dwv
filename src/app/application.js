@@ -1,4 +1,7 @@
 import {viewEventNames} from '../image/view.js';
+import {imageEventNames} from '../image/image.js';
+import {annotationGroupEventNames} from '../image/annotationGroup.js';
+import {dataEventNames} from '../app/dataController.js';
 import {ViewFactory} from '../image/viewFactory.js';
 import {
   getMatrixFromName,
@@ -688,22 +691,17 @@ export class App {
     // create data controller
     this.#dataController = new DataController();
     // propagate data events
-    this.#dataController.addEventListener('dataadd', this.#fireEvent);
-    this.#dataController.addEventListener('dataremove', this.#fireEvent);
-    this.#dataController.addEventListener('dataimageset', this.#fireEvent);
-    this.#dataController.addEventListener('dataupdate', this.#fireEvent);
-    // propage individual data events
-    this.#dataController.addEventListener(
-      'imagecontentchange', this.#fireEvent);
-    this.#dataController.addEventListener(
-      'imagegeometrychange', this.#fireEvent);
-    this.#dataController.addEventListener(
-      'imageresampled', this.#fireEvent);
-    this.#dataController.addEventListener('annotationadd', this.#fireEvent);
-    this.#dataController.addEventListener('annotationupdate', this.#fireEvent);
-    this.#dataController.addEventListener('annotationremove', this.#fireEvent);
-    this.#dataController.addEventListener(
-      'annotationgroupeditablechange', this.#fireEvent);
+    for (const eventName of dataEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propage image events
+    for (const eventName of imageEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
+    // propage annotation events
+    for (const eventName of annotationGroupEventNames) {
+      this.#dataController.addEventListener(eventName, this.#fireEvent);
+    }
     // create stage
     this.#stage = new Stage();
     if (typeof this.#options.binders !== 'undefined') {

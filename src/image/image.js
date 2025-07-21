@@ -26,6 +26,18 @@ import {Point} from '../math/point.js';
 const ML_PER_MM = 0.001; // ml/mm^3
 
 /**
+ * List of image event names.
+ *
+ * @type {string[]}
+ */
+export const imageEventNames = [
+  'imagecontentchange',
+  'imagegeometrychange',
+  'imageresampled',
+  'labelschanged'
+];
+
+/**
  * Get the slice index of an input slice into a volume geometry.
  *
  * @param {Geometry} volumeGeometry The volume geometry.

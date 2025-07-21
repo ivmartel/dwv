@@ -8,6 +8,18 @@ import {ViewController} from '../app/viewController.js';
 /* eslint-enable no-unused-vars */
 
 /**
+ * List of annotation group event names.
+ *
+ * @type {string[]}
+ */
+export const annotationGroupEventNames = [
+  'annotationgroupeditablechange',
+  'annotationadd',
+  'annotationupdate',
+  'annotationremove'
+];
+
+/**
  * Annotation group.
  */
 export class AnnotationGroup {

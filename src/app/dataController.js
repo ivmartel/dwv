@@ -1,6 +1,8 @@
 import {ListenerHandler} from '../utils/listen.js';
 import {mergeObjects} from '../utils/operator.js';
 import {MaskFactory} from '../image/maskFactory.js';
+import {imageEventNames} from '../image/image.js';
+import {annotationGroupEventNames} from '../image/annotationGroup.js';
 
 // doc imports
 /* eslint-disable no-unused-vars */
@@ -8,6 +10,18 @@ import {Image} from '../image/image.js';
 import {DataElement} from '../dicom/dataElement.js';
 import {AnnotationGroup} from '../image/annotationGroup.js';
 /* eslint-enable no-unused-vars */
+
+/**
+ * List of data event names.
+ *
+ * @type {string[]}
+ */
+export const dataEventNames = [
+  'dataadd',
+  'dataremove',
+  'dataimageset',
+  'dataupdate'
+];
 
 /**
  * DICOM data: meta and possible image.
@@ -208,10 +222,10 @@ export class DataController {
       value: [image],
       dataid: dataId
     });
-    // listen to image change
-    image.addEventListener('imagecontentchange', this.#getFireEvent(dataId));
-    image.addEventListener('imagegeometrychange', this.#getFireEvent(dataId));
-    image.addEventListener('imageresampled', this.#getFireEvent(dataId));
+    // propagate image events
+    for (const eventName of imageEventNames) {
+      image.addEventListener(eventName, this.#getFireEvent(dataId));
+    }
   }
 
   /**
@@ -273,22 +287,18 @@ export class DataController {
       type: 'dataadd',
       dataid: dataId
     });
-    // listen to image change
+    // propagate image events
     if (typeof data.image !== 'undefined') {
-      data.image.addEventListener(
-        'imagecontentchange', this.#getFireEvent(dataId));
-      data.image.addEventListener(
-        'imagegeometrychange', this.#getFireEvent(dataId));
-      data.image.addEventListener(
-        'imageresampled', this.#getFireEvent(dataId));
+      for (const eventName of imageEventNames) {
+        data.image.addEventListener(eventName, this.#getFireEvent(dataId));
+      }
     }
+    // propagate annotation group events
     if (typeof data.annotationGroup !== 'undefined') {
-      data.annotationGroup.addEventListener(
-        'annotationadd', this.#getFireEvent(dataId));
-      data.annotationGroup.addEventListener(
-        'annotationupdate', this.#getFireEvent(dataId));
-      data.annotationGroup.addEventListener(
-        'annotationremove', this.#getFireEvent(dataId));
+      for (const eventName of imageEventNames) {
+        data.annotationGroup.addEventListener(
+          eventName, this.#getFireEvent(dataId));
+      }
     }
   }
 
@@ -299,24 +309,20 @@ export class DataController {
    */
   remove(dataId) {
     if (typeof this.#dataList[dataId] !== 'undefined') {
-      // stop listeners
+      // stop propagating image events
       const image = this.#dataList[dataId].image;
       if (typeof image !== 'undefined') {
-        image.removeEventListener(
-          'imagecontentchange', this.#getFireEvent(dataId));
-        image.removeEventListener(
-          'imagegeometrychange', this.#getFireEvent(dataId));
-        image.removeEventListener(
-          'imageresampled', this.#getFireEvent(dataId));
+        for (const eventName of imageEventNames) {
+          image.removeEventListener(eventName, this.#getFireEvent(dataId));
+        }
       }
+      // stop propagating annotation group events
       const annotationGroup = this.#dataList[dataId].annotationGroup;
       if (typeof annotationGroup !== 'undefined') {
-        annotationGroup.removeEventListener(
-          'annotationadd', this.#getFireEvent(dataId));
-        annotationGroup.removeEventListener(
-          'annotationupdate', this.#getFireEvent(dataId));
-        annotationGroup.removeEventListener(
-          'annotationremove', this.#getFireEvent(dataId));
+        for (const eventName of annotationGroupEventNames) {
+          annotationGroup.removeEventListener(
+            eventName, this.#getFireEvent(dataId));
+        }
       }
       // remove data from list
       delete this.#dataList[dataId];
