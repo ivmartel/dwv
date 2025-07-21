@@ -552,10 +552,6 @@ export class LayerGroup {
         break;
       }
     }
-    if (typeof baseLayer === 'undefined') {
-      logger.warn('No layer found');
-      return;
-    }
     return baseLayer;
   }
 
