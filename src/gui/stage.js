@@ -504,8 +504,10 @@ export class Stage {
     }
     // remove listeners
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      for (let j = 0; j < this.#binders.length; ++j) {
-        this.#removeEventListeners(i, this.#binders[j]);
+      if (this.#layerGroups[i].shouldBind()) {
+        for (let j = 0; j < this.#binders.length; ++j) {
+          this.#removeEventListeners(i, this.#binders[j]);
+        }
       }
     }
     // clear callback store
@@ -584,7 +586,7 @@ export class Stage {
    */
   #removeEventListeners(index, binder) {
     for (let i = 0; i < this.#layerGroups.length; ++i) {
-      if (i !== index) {
+      if (i !== index && this.#layerGroups[i].shouldBind()) {
         this.#layerGroups[index].removeEventListener(
           binder.getEventType(),
           this.#getBinderCallback(binder, i)
