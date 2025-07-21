@@ -1986,8 +1986,8 @@ export class App {
     group.addEventListener('renderstart', this.#fireEvent);
     group.addEventListener('renderend', this.#fireEvent);
     // propagate view events
-    for (let j = 0; j < viewEventNames.length; ++j) {
-      group.addEventListener(viewEventNames[j], this.#fireEvent);
+    for (const eventName of viewEventNames) {
+      group.addEventListener(eventName, this.#fireEvent);
     }
     // updata data view config
     group.addEventListener('wlchange', (event) => {

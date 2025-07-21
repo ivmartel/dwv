@@ -281,9 +281,9 @@ export class ViewLayer {
     view.addEventListener('colourmapchange', this.#onColourMapChange);
     view.addEventListener('positionchange', this.#onPositionChange);
     view.addEventListener('alphafuncchange', this.#onAlphaFuncChange);
-    // view events
-    for (let j = 0; j < viewEventNames.length; ++j) {
-      view.addEventListener(viewEventNames[j], this.#fireEvent);
+    // propagate view events
+    for (const eventName of viewEventNames) {
+      view.addEventListener(eventName, this.#fireEvent);
     }
     // create view controller
     this.#viewController = new ViewController(view);
