@@ -260,6 +260,20 @@ function viewerSetup() {
   _app.addEventListener('filterundo', function (event) {
     console.log('filterundo', event);
   });
+  // labels
+  _app.addEventListener('labelingstart', function (event) {
+    console.time('label-data-' + event.dataid);
+  });
+  _app.addEventListener('labelschanged', function (event) {
+    console.timeEnd('label-data-' + event.dataid);
+  });
+  // resampling
+  _app.addEventListener('imageresamplingstart', function (event) {
+    console.time('resample-data-' + event.dataid);
+  });
+  _app.addEventListener('imageresampled', function (event) {
+    console.timeEnd('resample-data-' + event.dataid);
+  });
 
   _app.addEventListener('warn', function (event) {
     console.log('warn', event);
